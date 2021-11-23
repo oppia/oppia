@@ -37,6 +37,7 @@ import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 import { LoaderService } from 'services/loader.service';
 import { PageTitleService } from 'services/page-title.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 
 @Component({
@@ -67,15 +68,19 @@ export class TopicViewerPageComponent implements OnInit {
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
     private windowDimensionsService: WindowDimensionsService,
+    private windowRef: WindowRef,
   ) {}
 
   ngOnInit(): void {
     if (this.urlService.getPathname().endsWith('revision')) {
-      this.setActiveTab('subtopics');
+      this.activeTab = 'subtopics';
     } else if (this.urlService.getPathname().endsWith('practice')) {
-      this.setActiveTab('practice');
+      this.activeTab = 'practice';
     } else {
-      this.setActiveTab('story');
+      if (!this.urlService.getPathname().endsWith('story')) {
+        this.setUrlAccordingToActiveTab('story');
+      }
+      this.activeTab = 'story';
     }
     this.topicUrlFragment = (
       this.urlService.getTopicUrlFragmentFromLearnerUrl());
@@ -126,7 +131,28 @@ export class TopicViewerPageComponent implements OnInit {
   }
 
   setActiveTab(newActiveTabName: string): void {
+    if (newActiveTabName === 'story') {
+      this.setUrlAccordingToActiveTab('story');
+    } else if (newActiveTabName === 'practice') {
+      this.setUrlAccordingToActiveTab('practice');
+    } else {
+      this.setUrlAccordingToActiveTab('revision');
+    }
     this.activeTab = newActiveTabName;
+  }
+
+  setUrlAccordingToActiveTab(newTabName: string): void {
+    let getCurrentLocation = this.windowRef.nativeWindow.location.toString();
+    if (this.activeTab === '') {
+      this.windowRef.nativeWindow.history.pushState(
+        {}, '', getCurrentLocation + '/' + newTabName);
+    } else if (this.activeTab === 'subtopics') {
+      this.windowRef.nativeWindow.history.pushState(
+        {}, '', getCurrentLocation.replace('revision', newTabName));
+    } else {
+      this.windowRef.nativeWindow.history.pushState(
+        {}, '', getCurrentLocation.replace(this.activeTab, newTabName));
+    }
   }
 }
 

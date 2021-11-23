@@ -42,11 +42,13 @@
           </div>
         </li>
       </ul>
-      <oppia-hint-and-solution-buttons *ngIf="windowIsNarrow"></oppia-hint-and-solution-buttons>
+      <oppia-hint-and-solution-buttons *ngIf="windowIsNarrow && hintsAndSolutionsAreSupported">
+      </oppia-hint-and-solution-buttons>
     </div>
     <div [ngClass]="{'col-sm-7': isLanguageRTL(), 'col-sm-9': !isLanguageRTL()}">
       <div [ngClass]="{'float-left': isLanguageRTL(), 'float-right': !isLanguageRTL()}">
-        <oppia-hint-and-solution-buttons *ngIf="!windowIsNarrow"></oppia-hint-and-solution-buttons>
+        <oppia-hint-and-solution-buttons *ngIf="!windowIsNarrow && hintsAndSolutionsAreSupported">
+        </oppia-hint-and-solution-buttons>
       </div>
     </div>
   </div>
