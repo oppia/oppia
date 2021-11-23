@@ -16,7 +16,8 @@
 
 """Tests for parameter domain objects."""
 
-from __future__ import annotations
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from core import utils
 from core.domain import param_domain

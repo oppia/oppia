@@ -16,7 +16,8 @@
 
 """Domain objects relating to parameters."""
 
-from __future__ import annotations
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import re
 
@@ -25,6 +26,7 @@ from typing_extensions import TypedDict
 from typing import Dict
 
 from core import feconf
+from core import python_utils
 from core import utils
 from core.domain import object_registry
 from core.domain import value_generators_domain
@@ -204,7 +206,7 @@ class ParamChange:
 
     def validate(self) -> None:
         """Checks that the properties of this ParamChange object are valid."""
-        if not isinstance(self.name, str):
+        if not isinstance(self.name, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected param_change name to be a string, received %s'
                 % self.name)
@@ -213,7 +215,7 @@ class ParamChange:
                 'Only parameter names with characters in [a-zA-Z0-9] are '
                 'accepted.')
 
-        if not isinstance(self._generator_id, str):
+        if not isinstance(self._generator_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected generator ID to be a string, received %s '
                 % self._generator_id)
@@ -229,7 +231,7 @@ class ParamChange:
                 'Expected a dict of customization_args, received %s'
                 % self.customization_args)
         for arg_name in self.customization_args:
-            if not isinstance(arg_name, str):
+            if not isinstance(arg_name, python_utils.BASESTRING):
                 raise Exception(
                     'Invalid parameter change customization_arg name: %s'
                     % arg_name)
