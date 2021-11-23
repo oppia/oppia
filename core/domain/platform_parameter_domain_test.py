@@ -66,6 +66,9 @@ class PlatformParameterChangeTests(test_utils.GenericTestBase):
                 'invalid': 'invalid'
             })
 
+    # PlatformParameterChange is defined line 79 file core/domain/platform_parameter_domain.py
+    # but according to mypy it has no attribute new_rules (line 81) even if it is defined 
+    # before (line 76)
     def test_param_change_object_with_valid_data_success(self)-> None:
         param_change_object = (
             parameter_domain.PlatformParameterChange({ # type: ignore[no-untyped-call]
@@ -76,7 +79,7 @@ class PlatformParameterChangeTests(test_utils.GenericTestBase):
         self.assertEqual(
             param_change_object.cmd, self.CMD_EDIT_RULES)
         self.assertEqual(
-            param_change_object.new_rules, [])
+            param_change_object.new_rules, []) #type: ignore[attr-defined]
 
     def test_to_dict_returns_correct_dict(self)-> None:
         param_change_dict = {
