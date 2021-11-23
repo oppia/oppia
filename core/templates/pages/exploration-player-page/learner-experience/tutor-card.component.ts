@@ -16,13 +16,14 @@
  * @fileoverview Component for the Tutor Card.
  */
 
-import { Component, Input } from '@angular/core';
+import { Component, Input, SimpleChanges } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { BindableVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { StateCard } from 'domain/state_card/state-card.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import cloneDeep from 'lodash/cloneDeep';
+import isEqual from 'lodash/isEqual';
 import { Subscription } from 'rxjs';
 import { AudioBarStatusService } from 'services/audio-bar-status.service';
 import { AudioPlayerService } from 'services/audio-player.service';
@@ -40,6 +41,7 @@ import { CurrentInteractionService } from '../services/current-interaction.servi
 import { ExplorationPlayerStateService } from '../services/exploration-player-state.service';
 import { LearnerAnswerInfoService } from '../services/learner-answer-info.service';
 import { PlayerPositionService } from '../services/player-position.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'oppia-tutor-card',
@@ -74,6 +76,7 @@ export class TutorCardComponent {
     private currentInteractionService: CurrentInteractionService,
     private deviceInfoService: DeviceInfoService,
     private explorationPlayerStateService: ExplorationPlayerStateService,
+    private i18nLanguageCodeService: I18nLanguageCodeService,
     private learnerAnswerInfoService: LearnerAnswerInfoService,
     private playerPositionService: PlayerPositionService,
     private urlInterpolationService: UrlInterpolationService,
@@ -137,11 +140,25 @@ export class TutorCardComponent {
     this.directiveSubscriptions.unsubscribe();
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if (
+      changes.displayedCard &&
+      !isEqual(
+        changes.displayedCard.previousValue,
+        changes.displayedCard.currentValue)) {
+      this.updateDisplayedCard();
+    }
+  }
+
   isAudioBarExpandedOnMobileDevice(): boolean {
     return (
       this.deviceInfoService.isMobileDevice() &&
       this.audioBarStatusService.isAudioBarExpanded()
     );
+  }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   updateDisplayedCard(): void {

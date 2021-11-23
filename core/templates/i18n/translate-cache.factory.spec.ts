@@ -29,7 +29,7 @@ describe('Translate Cache Factory', () => {
     ) {}
   }
   let mockTranslateCacheService = new MockTranslateCacheService(
-    <TranslateService>{}, <TranslateCacheSettings>{});
+    {} as TranslateService, {} as TranslateCacheSettings);
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -44,6 +44,6 @@ describe('Translate Cache Factory', () => {
 
   it('should create translate cache service', () => {
     expect(TranslateCacheFactory.createTranslateCacheService(
-      <TranslateService>{}, <TranslateCacheSettings>{})).toBeDefined();
+      {} as TranslateService, {} as TranslateCacheSettings)).toBeDefined();
   });
 });

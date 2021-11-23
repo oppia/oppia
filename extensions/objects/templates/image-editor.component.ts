@@ -79,12 +79,12 @@ interface Dimensions {
 
 // Reference: https://github.com/yahoo/gifshot#creategifoptions-callback.
 interface GifshotCallbackObject {
-  image: string,
-  cameraStream: MediaStream,
-  error: boolean,
-  errorCode: string,
-  errorMsg: string,
-  savedRenderingContexts: ImageData
+  image: string;
+  cameraStream: MediaStream;
+  error: boolean;
+  errorCode: string;
+  errorMsg: string;
+  savedRenderingContexts: ImageData;
 }
 
 @Component({
@@ -134,14 +134,14 @@ export class ImageEditorComponent implements OnInit, OnChanges {
   allowedImageFormats = AppConstants.ALLOWED_IMAGE_FORMATS;
   HUNDRED_KB_IN_BYTES: number = 100 * 1024;
   imageResizeRatio: number;
-  cropArea: { x1: number; y1: number; x2: number; y2: number; };
+  cropArea: { x1: number; y1: number; x2: number; y2: number };
   mousePositionWithinCropArea: null | number;
-  mouseLastKnownCoordinates: { x: number; y: number; };
-  lastMouseDownEventCoordinates: { x: number; y: number; };
+  mouseLastKnownCoordinates: { x: number; y: number };
+  lastMouseDownEventCoordinates: { x: number; y: number };
   userIsDraggingCropArea: boolean = false;
   cropAreaResizeDirection: null | number;
   userIsResizingCropArea: boolean = false;
-  invalidTagsAndAttributes: { tags: string[]; attrs: string[]; };
+  invalidTagsAndAttributes: { tags: string[]; attrs: string[] };
   processedImageIsTooLarge: boolean;
   entityId: string;
   entityType: string;
@@ -824,8 +824,8 @@ export class ImageEditorComponent implements OnInit, OnChanges {
   private updateValidationWithLatestDimensions(): void {
     const dimensions = this.calculateTargetImageDimensions();
     const imageDataURI = (
-      this.imgData || <string> this.data.metadata.uploadedImageData);
-    const mimeType = (<string>imageDataURI).split(';')[0];
+      this.imgData || this.data.metadata.uploadedImageData as string);
+    const mimeType = (imageDataURI as string).split(';')[0];
     if (mimeType === this.MIME_TYPE_GIF) {
       let successCb = obj => {
         this.validateProcessedFilesize(obj.image);
@@ -886,7 +886,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
         };
         this.updateValidationWithLatestDimensions();
       };
-      img.src = <string>(reader.result);
+      img.src = (reader.result) as string;
     };
     reader.readAsDataURL(file);
   }

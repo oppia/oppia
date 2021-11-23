@@ -33,7 +33,7 @@ const generateContent = (html: string): HTMLElement => {
     container.content.firstChild.firstChild === null) {
     throw new Error('First Child is null');
   }
-  return <HTMLElement>(container.content.firstChild.firstChild);
+  return (container.content.firstChild.firstChild) as HTMLElement;
 };
 
 describe('Ck editor copy content service', () => {
@@ -167,7 +167,7 @@ describe('Ck editor copy content service', () => {
       throw new Error('First Child is null');
     }
     const nestedMathWidgetElement = (
-      <HTMLElement>mathWidgetElement.firstChild.firstChild);
+      mathWidgetElement.firstChild.firstChild) as HTMLElement;
 
     service.bindPasteHandler(ckEditorStub);
     service.broadcastCopy(nestedMathWidgetElement);

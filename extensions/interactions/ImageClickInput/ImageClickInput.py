@@ -16,8 +16,7 @@
 
 """Python configuration for ImageClickInput interaction."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from extensions.interactions import base
 
@@ -30,7 +29,7 @@ class ImageClickInput(base.BaseInteraction):
     display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
     _dependency_ids = []
     answer_type = 'ClickOnImage'
-    instructions = 'Click on the image'
+    instructions = 'I18N_INTERACTIONS_IMAGE_CLICK_INSTRUCTION'
     narrow_instructions = 'View image'
     needs_summary = False
     # It is required to show which region is being clicked on while specifying

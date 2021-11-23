@@ -16,8 +16,7 @@
 
 """Lint checks of other file types."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import glob
 import json
@@ -49,7 +48,7 @@ WORKFLOWS_DIR = os.path.join(os.getcwd(), '.github', 'workflows')
 WORKFLOW_FILENAME_REGEX = r'\.(yaml)|(yml)$'
 MERGE_STEP = {'uses': './.github/actions/merge'}
 WORKFLOWS_EXEMPT_FROM_MERGE_REQUIREMENT = (
-    'backend_tests.yml',)
+    'backend_tests.yml', 'pending-review-notification.yml')
 
 THIRD_PARTY_LIBS = [
     {

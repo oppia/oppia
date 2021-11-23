@@ -16,15 +16,13 @@
 
 """Models for Oppia statistics."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import datetime
 import json
 import sys
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.platform import models
 
@@ -111,8 +109,8 @@ class StateCounterModel(base_models.BaseModel):
 
     @classmethod
     def get_or_create(
-            cls, exploration_id: str, state_name: str
-    ) -> 'StateCounterModel':
+        cls, exploration_id: str, state_name: str
+    ) -> StateCounterModel:
         """Gets or creates an entity by exploration_id and state_name.
 
         Args:
@@ -1259,8 +1257,8 @@ class ExplorationStatsModel(base_models.BaseModel):
 
     @classmethod
     def get_model(
-            cls, exp_id: str, exp_version: int
-    ) -> Optional['ExplorationStatsModel']:
+        cls, exp_id: str, exp_version: int
+    ) -> Optional[ExplorationStatsModel]:
         """Retrieves ExplorationStatsModel given exploration ID and version.
 
         Args:
@@ -1326,8 +1324,8 @@ class ExplorationStatsModel(base_models.BaseModel):
 
     @classmethod
     def get_multi_versions(
-            cls, exp_id: str, version_numbers: List[int]
-    ) -> List[Optional['ExplorationStatsModel']]:
+        cls, exp_id: str, version_numbers: List[int]
+    ) -> List[Optional[ExplorationStatsModel]]:
         """Gets stats model instances for each version specified in
         version_numbers.
 
@@ -1346,8 +1344,8 @@ class ExplorationStatsModel(base_models.BaseModel):
 
     @classmethod
     def get_multi_stats_models(
-            cls, exp_version_references: 'List[exp_domain.ExpVersionReference]'
-    ) -> List[Optional['ExplorationStatsModel']]:
+        cls, exp_version_references: List[exp_domain.ExpVersionReference]
+    ) -> List[Optional[ExplorationStatsModel]]:
         """Gets stats model instances for each exploration and the corresponding
         version number.
 
@@ -1426,7 +1424,7 @@ class ExplorationIssuesModel(base_models.BaseModel):
     @classmethod
     def get_model(
             cls, exp_id: str, exp_version: int
-    ) -> Optional['ExplorationIssuesModel']:
+    ) -> Optional[ExplorationIssuesModel]:
         """Retrieves ExplorationIssuesModel given exploration ID and version.
 
         Args:
@@ -1547,8 +1545,7 @@ class PlaythroughModel(base_models.BaseModel):
             new_id = '%s.%s' % (
                 exp_id,
                 utils.convert_to_hash(
-                    python_utils.UNICODE(
-                        utils.get_random_int(base_models.RAND_RANGE)),
+                    str(utils.get_random_int(base_models.RAND_RANGE)),
                     base_models.ID_LENGTH))
             if not cls.get_by_id(new_id):
                 return new_id
@@ -1699,13 +1696,13 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
     # to remove Any used below.
     @classmethod
     def create_model_instance(
-            cls,
-            entity_type: str,
-            state_reference: str,
-            interaction_id: str,
-            learner_answer_info_list: 'List[stats_domain.LearnerAnswerInfo]',
-            learner_answer_info_schema_version: int,
-            accumulated_answer_info_json_size_bytes: int
+        cls,
+        entity_type: str,
+        state_reference: str,
+        interaction_id: str,
+        learner_answer_info_list: List[stats_domain.LearnerAnswerInfo],
+        learner_answer_info_schema_version: int,
+        accumulated_answer_info_json_size_bytes: int
     ) -> None:
         """Creates a new LearnerAnswerDetailsModel for the given entity type
         then writes it to the datastore.
@@ -1747,8 +1744,8 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
 
     @classmethod
     def get_model_instance(
-            cls, entity_type: str, state_reference: str
-    ) -> Optional['LearnerAnswerDetailsModel']:
+        cls, entity_type: str, state_reference: str
+    ) -> Optional[LearnerAnswerDetailsModel]:
         """Returns the model instance related to the entity type and
         state reference.
 
@@ -1969,12 +1966,12 @@ class StateAnswersModel(base_models.BaseModel):
 
     @classmethod
     def _get_model(
-            cls,
-            exploration_id: str,
-            exploration_version: int,
-            state_name: str,
-            shard_id: int
-    ) -> Optional['StateAnswersModel']:
+        cls,
+        exploration_id: str,
+        exploration_version: int,
+        state_name: str,
+        shard_id: int
+    ) -> Optional[StateAnswersModel]:
         """Gets model instance based on given exploration state and shard_id.
 
         Args:
@@ -1995,11 +1992,11 @@ class StateAnswersModel(base_models.BaseModel):
 
     @classmethod
     def get_master_model(
-            cls,
-            exploration_id: str,
-            exploration_version: int,
-            state_name: str
-    ) -> Optional['StateAnswersModel']:
+        cls,
+        exploration_id: str,
+        exploration_version: int,
+        state_name: str
+    ) -> Optional[StateAnswersModel]:
         """Retrieves the master model associated with the specific exploration
         state. Returns None if no answers have yet been submitted to the
         specified exploration state.
@@ -2021,11 +2018,8 @@ class StateAnswersModel(base_models.BaseModel):
 
     @classmethod
     def get_all_models(
-            cls,
-            exploration_id: str,
-            exploration_version: int,
-            state_name: str
-    ) -> Optional[List['StateAnswersModel']]:
+        cls, exploration_id: str, exploration_version: int, state_name: str
+    ) -> Optional[List[StateAnswersModel]]:
         """Retrieves all models and shards associated with the specific
         exploration state.
 
@@ -2223,8 +2217,11 @@ class StateAnswersModel(base_models.BaseModel):
             str. Entity_id for a StateAnswersModel instance.
         """
         return ':'.join([
-            exploration_id, python_utils.UNICODE(exploration_version),
-            state_name, python_utils.UNICODE(shard_id)])
+            exploration_id,
+            str(exploration_version),
+            state_name,
+            str(shard_id)
+        ])
 
     # TODO(#13523): Change answer lists to TypedDict/Domain Object
     # to remove Any used below.

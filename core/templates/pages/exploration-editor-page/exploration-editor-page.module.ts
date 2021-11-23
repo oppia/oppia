@@ -40,6 +40,11 @@ import { LostChangesModalComponent } from './modal-templates/lost-changes-modal.
 import { WelcomeModalComponent } from './modal-templates/welcome-modal.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { StateDiffModalComponent } from './modal-templates/state-diff-modal.component';
+import { PostPublishModalComponent } from './modal-templates/post-publish-modal.component';
+import { ExplorationPublishModalComponent } from 'pages/exploration-editor-page/modal-templates/exploration-publish-modal.component';
+import { EditorReloadingModalComponent } from './modal-templates/editor-reloading-modal.component';
+import { ConfirmDiscardChangesModalComponent } from './modal-templates/confirm-discard-changes-modal.component';
+import { CreateFeedbackThreadModalComponent } from './feedback-tab/templates/create-feedback-thread-modal.component';
 
 @NgModule({
   imports: [
@@ -62,6 +67,11 @@ import { StateDiffModalComponent } from './modal-templates/state-diff-modal.comp
     LostChangesModalComponent,
     WelcomeModalComponent,
     StateDiffModalComponent,
+    PostPublishModalComponent,
+    ConfirmDiscardChangesModalComponent,
+    ExplorationPublishModalComponent,
+    EditorReloadingModalComponent,
+    CreateFeedbackThreadModalComponent
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -74,6 +84,11 @@ import { StateDiffModalComponent } from './modal-templates/state-diff-modal.comp
     LostChangesModalComponent,
     WelcomeModalComponent,
     StateDiffModalComponent,
+    PostPublishModalComponent,
+    ConfirmDiscardChangesModalComponent,
+    ExplorationPublishModalComponent,
+    EditorReloadingModalComponent,
+    CreateFeedbackThreadModalComponent
   ],
   providers: [
     {

@@ -44,7 +44,7 @@ export class QuestionDifficultySelectorComponent {
     for (let difficulty in AppConstants.SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
       this.availableDifficultyValues.push(
         AppConstants.SKILL_DIFFICULTY_LABEL_TO_FLOAT[
-          <SkillLabelToFloatKey> difficulty]);
+          difficulty as SkillLabelToFloatKey]);
     }
   }
 

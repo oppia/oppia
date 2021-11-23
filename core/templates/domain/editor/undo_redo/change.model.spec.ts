@@ -102,8 +102,9 @@ describe('Change domain objects model', () => {
         backendChangeObject, () => {}, () => {});
 
       const returnedBackendObject = changeDomainObject.getBackendChangeObject();
-      (<typeof backendChangeObject> returnedBackendObject)
-        .property_name = 'language_code';
+      (
+        returnedBackendObject as typeof backendChangeObject
+      ).property_name = 'language_code';
 
       expect(changeDomainObject.getBackendChangeObject()).toEqual({
         cmd: 'update_question_property',
