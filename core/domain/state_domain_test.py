@@ -5377,3 +5377,68 @@ class SolutionDomainTests(test_utils.GenericTestBase):
         self.assertEqual(
             solution_proto.explanation.text,
             '<p>This is a solution.</p>')
+
+
+class ContinueInteractionTests(test_utils.GenericTestBase):
+
+    def test_to_proto(self):
+        interaction_dict = {
+            'answer_groups': [],
+            'confirmed_unclassified_answers': [],
+            'customization_args': {
+                'buttonText': {
+                    'value': {
+                        'content_id': 'ca_placeholder_0',
+                        'unicode_str': 'Click me!',
+                    },
+                },
+            },
+            'default_outcome': {
+                'dest': 'end_state_name',
+                'feedback': {
+                    'content_id': 'default_outcome',
+                    'html': '<p>html outcome</p>',
+                },
+                'labelled_as_correct': False,
+                'missing_prerequisite_skill_id': None,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+            },
+            'hints': [],
+            'id': 'Continue',
+            'solution': None,
+        }
+        continue_instance = (
+            interaction_registry.Registry.get_interaction_by_id(
+                'Continue'))
+        interaction_domain = (
+            state_domain.InteractionInstance.from_dict(interaction_dict))
+        continue_proto = continue_instance.to_proto(
+            interaction_domain.default_outcome,
+            interaction_domain.customization_args)
+        self.assertEqual(
+            continue_proto.customization_args.button_text.content_id,
+            'ca_placeholder_0')
+        self.assertEqual(
+            continue_proto.customization_args.button_text.text,
+            'Click me!')
+        self.assertEqual(
+            continue_proto.default_outcome.destination_state,
+            'end_state_name')
+        self.assertEqual(
+            continue_proto.default_outcome.labelled_as_correct, False)
+        self.assertEqual(
+            continue_proto.default_outcome.feedback.content_id,
+            'default_outcome')
+        self.assertEqual(
+            continue_proto.default_outcome.feedback.text, '<p>html outcome</p>')
+
+
+class EndExplorationInteractionTests(test_utils.GenericTestBase):
+
+    def test_to_proto(self):
+        end_exploration_instance = (
+            interaction_registry.Registry.get_interaction_by_id(
+                'EndExploration'))
+        end_proto = end_exploration_instance.to_proto()
+        self.assertEqual(end_proto.ByteSize(), 0)
