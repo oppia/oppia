@@ -99,9 +99,11 @@
                     </picture>
                   </div>
                   <div class="nav-item-bottom d-flex flex-column" *ngIf="!userIsLoggedIn">
-                    <a class="nav-item-links" (keydown)="onMenuKeypress($event, 'classroomMenu', {shiftTab: ACTION_CLOSE})" (click)="navigateToClassroomPage('/learn/math/' + topicSummary.getUrlFragment())" *ngFor="let topicSummary of classroomData.getTopicSummaries().slice(0, 3)">
+                    <div class="nav-item-links"  *ngFor="let topicSummary of classroomData.getTopicSummaries().slice(0, 3)">
+                      <a (keydown)="onMenuKeypress($event, 'classroomMenu', {shiftTab: ACTION_CLOSE})" (click)="navigateToClassroomPage('/learn/math/' + topicSummary.getUrlFragment())">
                       {{ topicSummary.getName() }}
-                    </a>
+                      </a>
+                    </div>
                     <a class="nav-item-bottom-link" href="/learn/math"><span [innerHTML]="'I18N_TOPNAV_CLASSROOM_LINK_1' | translate"></span> <span class="material-icons">arrow_right_alt</span></a>
                   </div>
                   <a *ngIf="userIsLoggedIn" class="nav-item-bottom-link-logged" href="/learn/math"><span [innerHTML]="'I18N_TOPNAV_CLASSROOM_LINK_2' | translate"></span> <span class="material-icons">arrow_right_alt</span></a>
