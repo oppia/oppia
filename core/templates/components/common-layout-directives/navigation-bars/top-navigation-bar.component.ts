@@ -22,6 +22,7 @@ import { Subscription } from 'rxjs';
 import { ContextService } from 'services/context.service';
 import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
+import { ClassroomData } from 'domain/classroom/classroom-data.model';
 import { SidebarStatusService } from 'services/sidebar-status.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { DebouncerService } from 'services/debouncer.service';
@@ -58,6 +59,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   currentLanguageCode!: string;
   supportedSiteLanguages!: LanguageInfo[];
   currentLanguageText!: string;
+  classroomData!: ClassroomData;
   isModerator: boolean = false;
   isCurriculumAdmin: boolean = false;
   isTopicManager: boolean = false;
@@ -158,6 +160,11 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
         return languageInfo;
       }
     );
+
+    this.classroomBackendApiService.fetchClassroomDataAsync(
+      'math').then((classroomData) => {
+      this.classroomData = classroomData;
+    });
 
     this.showLanguageSelector = (
       !this.contextService.getPageContext().endsWith('editor'));
