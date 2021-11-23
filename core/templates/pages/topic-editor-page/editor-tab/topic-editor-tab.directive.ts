@@ -337,8 +337,7 @@ angular.module('oppia').directive('topicEditorTab', [
             $scope.topic.getSkillIds().forEach(item => {
               countQuestions += $scope.skillQuestionCountDict[item];
             })
-            console.log($scope.skillQuestionCountDict)
-            return countQuestions >= 2;
+            return countQuestions >= 10;
           };
 
           $scope.deleteUncategorizedSkillFromTopic = function(skillSummary) {
