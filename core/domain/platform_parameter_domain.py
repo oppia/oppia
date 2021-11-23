@@ -28,12 +28,12 @@ from core import utils
 from core.constants import constants
 from core.domain import change_domain
 
-SERVER_MODES = enum.Enum("SERVER_MODES", {
+SERVER_MODES = enum.Enum('SERVER_MODES', {
     'dev': 'dev',
     'test': 'test',
     'prod': 'prod'})
 FEATURE_STAGES = SERVER_MODES # pylint: disable=invalid-name
-DATA_TYPES = enum.Enum("DATA_TYPES", {
+DATA_TYPES = enum.Enum('DATA_TYPES', {
     'bool': 'bool',
     'string': 'string',
     'number': 'number'})

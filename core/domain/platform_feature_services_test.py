@@ -28,9 +28,9 @@ from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_registry as registry
 from core.tests import test_utils
 
-PARAM_NAMES = enum.Enum("PARAM_NAMES", {
+PARAM_NAMES = enum.Enum('PARAM_NAMES', {
     'feature_a': 'feature_a',
-     'feature_b': 'feature_b',})
+     'feature_b': 'feature_b'})
 SERVER_MODES = platform_parameter_domain.SERVER_MODES
 FEATURE_STAGES = platform_parameter_domain.FEATURE_STAGES
 

@@ -32,7 +32,6 @@ import enum
 import re
 
 from core import feconf
-from core import python_utils
 from core.jobs import job_utils
 from core.jobs.decorators import validation_decorators
 from core.jobs.types import base_validation_errors
@@ -46,7 +45,7 @@ import apache_beam as beam
 BASE_MODEL_ID_PATTERN = r'^[A-Za-z0-9-_]{1,%s}$' % base_models.ID_LENGTH
 MAX_CLOCK_SKEW_SECS = datetime.timedelta(seconds=1)
 
-VALIDATION_MODES = enum.Enum("VALIDATION_MODES", {
+VALIDATION_MODES = enum.Enum('VALIDATION_MODES', {
     'neutral': 'neutral',
     'strict': 'strict',
     'non_strict': 'non_strict'})

@@ -63,7 +63,7 @@ from core.tests import test_utils
 BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
 BOTH_MODERATOR_AND_ADMIN_USERNAME = 'moderatorandadm1n'
 
-PARAM_NAMES = enum.Enum( "PARAM_NAMES", {
+PARAM_NAMES = enum.Enum('PARAM_NAMES', {
     'test_feature_1': 'test_feature_1',
 })
 FEATURE_STAGES = platform_parameter_domain.FEATURE_STAGES
