@@ -284,7 +284,7 @@
           </span>
         </div>
 
-        <div ng-show="$ctrl.ExplorationRightsService.ownerNames.length > 0">
+        <div ng-if="$ctrl.ExplorationRightsService.ownerNames.length() > 0 ">
           <strong>Managers</strong>
           <ul>
             <li ng-repeat="ownerName in $ctrl.ExplorationRightsService.ownerNames track by $index">

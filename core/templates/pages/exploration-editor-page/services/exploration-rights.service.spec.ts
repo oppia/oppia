@@ -17,17 +17,19 @@
  * of the exploration editor page.
  */
 
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { AlertsService } from 'services/alerts.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
-import { ExplorationRightsService } from './exploration-rights-backend-api.service';
+import { ExplorationRightsService } from './exploration-rights.service';
+import { ExplorationRightsBackendApiService } from './exploration-rights-backend-api.service';
 
 describe('Exploration rights service', () => {
   let ers: ExplorationRightsService = null;
   let als: AlertsService = null;
   let httpTestingController: HttpTestingController = null;
+  let explorationRightsBackendApiService: ExplorationRightsBackendApiService;
   let csrfService = null;
   let clearWarningsSpy = null;
   let successHandler = null;
@@ -57,13 +59,16 @@ describe('Exploration rights service', () => {
               version: 1
             }
           }
-        }
+        },
+        ExplorationRightsBackendApiService
       ]
     });
     als = TestBed.inject(AlertsService);
     csrfService = TestBed.inject(CsrfTokenService);
     ers = TestBed.inject(ExplorationRightsService);
     httpTestingController = TestBed.inject(HttpTestingController);
+    explorationRightsBackendApiService =
+      TestBed.inject(ExplorationRightsBackendApiService);
   });
 
   beforeEach(() => {
@@ -152,32 +157,32 @@ describe('Exploration rights service', () => {
     });
 
   it('should change community owned to true', fakeAsync(() => {
+    serviceData.rights.community_owned = true;
+    spyOn(
+      explorationRightsBackendApiService,
+      'makeCommunityOwnedPutData').and.returnValue(
+      Promise.resolve(serviceData));
+
     ers.init(['abc'], [], [], [], 'private', 'e1234', false, true);
     ers.makeCommunityOwned();
-
-    const req = httpTestingController.expectOne('/createhandler/rights/12345');
-    expect(req.request.method).toEqual('PUT');
-    req.flush(serviceData);
-
-    flushMicrotasks();
-
-    expect(clearWarningsSpy).toHaveBeenCalled();
+    tick();
+    expect(explorationRightsBackendApiService.makeCommunityOwnedPutData)
+      .toHaveBeenCalled();
     expect(ers.isCommunityOwned()).toBe(true);
   }));
 
   it('should use reject handler when changing community owned to true fails',
     fakeAsync(() => {
+      spyOn(
+        explorationRightsBackendApiService,
+        'makeCommunityOwnedPutData').and.returnValue(
+        Promise.reject());
+
       ers.init(
         ['abc'], [], [], [], 'private', 'e1234', false, true);
       ers.makeCommunityOwned().then(
         successHandler, failHandler);
-
-      const req = httpTestingController.expectOne(
-        '/createhandler/rights/12345');
-      expect(req.request.method).toEqual('PUT');
-      req.flush({}, { status: 500, statusText: '' });
-
-      flushMicrotasks();
+      tick();
 
       expect(ers.isCommunityOwned()).toBe(false);
       expect(clearWarningsSpy).not.toHaveBeenCalled();
@@ -186,34 +191,30 @@ describe('Exploration rights service', () => {
     }));
 
   it('should change exploration right viewability', fakeAsync(() => {
-    let sampleDataResultsCopy = angular.copy(serviceData);
-    sampleDataResultsCopy.rights.viewable_if_private = true;
+    serviceData.rights.viewable_if_private = true;
+    spyOn(
+      explorationRightsBackendApiService,
+      'setViewabilityPutData').and.returnValue(
+      Promise.resolve(serviceData));
 
     ers.setViewability(true);
-
-    const req = httpTestingController.expectOne(
-      '/createhandler/rights/12345');
-    expect(req.request.method).toEqual('PUT');
-    req.flush(sampleDataResultsCopy, { status: 200, statusText: '' });
-
-    flushMicrotasks();
+    tick();
 
     expect(ers.viewableIfPrivate()).toBe(true);
   }));
 
   it('should use reject when changing exploration right viewability fails',
     fakeAsync(() => {
+      spyOn(
+        explorationRightsBackendApiService,
+        'setViewabilityPutData').and.returnValue(
+        Promise.reject());
+
       ers.init(
         ['abc'], [], [], [], 'private', 'e1234', false, false);
       ers.setViewability(true).then(
         successHandler, failHandler);
-
-      const req = httpTestingController.expectOne(
-        '/createhandler/rights/12345');
-      expect(req.request.method).toEqual('PUT');
-      req.flush({}, { status: 500, statusText: '' });
-
-      flushMicrotasks();
+      tick();
 
       expect(ers.viewableIfPrivate()).toBe(false);
       expect(clearWarningsSpy).not.toHaveBeenCalled();
@@ -222,72 +223,68 @@ describe('Exploration rights service', () => {
     }));
 
   it('should save a new member', fakeAsync(() => {
-    let sampleDataResultsCopy = angular.copy(serviceData);
-    sampleDataResultsCopy.rights.viewer_names.push('newUser');
+    serviceData.rights.viewer_names = ['shivam'];
+    spyOn(
+      explorationRightsBackendApiService,
+      'saveRoleChangesPutData').and.returnValue(
+      Promise.resolve(serviceData));
+
     ers.saveRoleChanges('newUser', 'viewer');
-
-    const req = httpTestingController.expectOne(
-      '/createhandler/rights/12345');
-    expect(req.request.method).toEqual('PUT');
-    req.flush(sampleDataResultsCopy, { status: 200, statusText: '' });
-
-    flushMicrotasks();
+    tick();
 
     expect(ers.viewerNames).toEqual(
-      sampleDataResultsCopy.rights.viewer_names);
+      ['shivam']);
   }));
 
   it('should remove existing user', fakeAsync(() => {
-    let sampleDataResultsCopy = angular.copy(serviceData);
-    sampleDataResultsCopy.rights.viewer_names.push('newUser');
+    serviceData.rights.viewer_names = ['newUser'];
+    spyOn(
+      explorationRightsBackendApiService,
+      'removeRoleAsyncDeleteData').and.returnValue(
+      Promise.resolve(serviceData));
 
     ers.removeRoleAsync('newUser').then(successHandler, failHandler);
-
-    const req = httpTestingController.expectOne(
-      '/createhandler/rights/12345?username=newUser');
-    expect(req.request.method).toEqual('DELETE');
-    req.flush(sampleDataResultsCopy, { status: 200, statusText: '' });
-
-    flushMicrotasks();
+    tick();
 
     expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
 
     expect(ers.viewerNames).toEqual(
-      sampleDataResultsCopy.rights.viewer_names);
+      serviceData.rights.viewer_names);
   }));
 
   it('should save a new voice artist', fakeAsync(() => {
+    serviceData.rights.voice_artist_names = ['voiceArtist'];
+    spyOn(
+      explorationRightsBackendApiService,
+      'assignVoiceArtistRoleAsyncPostData').and.returnValue(
+      Promise.resolve(serviceData));
+
     ers.init(['abc'], [], [], [], 'public', '1234', true, false);
     expect(ers.voiceArtistNames).toEqual([]);
 
     ers.assignVoiceArtistRoleAsync('voiceArtist').then(
       successHandler, failHandler);
-
-    const req = httpTestingController.expectOne(
-      '/voice_artist_management_handler/exploration/12345');
-    expect(req.request.method).toEqual('POST');
-    req.flush({}, { status: 200, statusText: '' });
-
-    flushMicrotasks();
+    tick();
 
     expect(ers.voiceArtistNames).toEqual(['voiceArtist']);
   }));
 
   it('should remove existing voice artist', fakeAsync(() => {
+    serviceData.rights.voice_artist_names = [];
+
+    spyOn(
+      explorationRightsBackendApiService,
+      'removeVoiceArtistRoleAsyncDeleteData').and.returnValue(
+      Promise.resolve(serviceData));
+
     ers.init(['abc'], [], ['voiceArtist'], [], 'public', '1234', true, false);
+    tick();
     expect(ers.voiceArtistNames).toEqual(['voiceArtist']);
 
     ers.removeVoiceArtistRoleAsync('voiceArtist').then(
       successHandler, failHandler);
-
-    const req = httpTestingController.expectOne(
-      '/voice_artist_management_handler/exploration/12345' +
-      '?voice_artist=voiceArtist');
-    expect(req.request.method).toEqual('DELETE');
-    req.flush({}, { status: 200, statusText: '' });
-
-    flushMicrotasks();
+    tick();
 
     expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
@@ -296,21 +293,20 @@ describe('Exploration rights service', () => {
   }));
 
   it('should check user already has roles', () => {
-    let sampleDataResultsCopy = angular.copy(serviceData);
-    sampleDataResultsCopy.rights.owner_names.push('newOwner');
-    sampleDataResultsCopy.rights.viewer_names.push('newViewer');
-    sampleDataResultsCopy.rights.editor_names.push('newEditor');
-    sampleDataResultsCopy.rights.voice_artist_names.push('newVoiceArtist');
+    serviceData.rights.owner_names = ['newOwner'];
+    serviceData.rights.viewer_names = ['newViewer'];
+    serviceData.rights.editor_names = ['newEditor'];
+    serviceData.rights.voice_artist_names = ['newVoiceArtist'];
 
     ers.init(
-      sampleDataResultsCopy.rights.owner_names,
-      sampleDataResultsCopy.rights.editor_names,
-      sampleDataResultsCopy.rights.voice_artist_names,
-      sampleDataResultsCopy.rights.viewer_names,
-      sampleDataResultsCopy.rights.status,
-      sampleDataResultsCopy.rights.cloned_from,
-      sampleDataResultsCopy.rights.community_owned,
-      sampleDataResultsCopy.rights.viewable_if_private
+      serviceData.rights.owner_names,
+      serviceData.rights.editor_names,
+      serviceData.rights.voice_artist_names,
+      serviceData.rights.viewer_names,
+      serviceData.rights.status,
+      serviceData.rights.cloned_from,
+      serviceData.rights.community_owned,
+      serviceData.rights.viewable_if_private
     );
 
     expect(ers.checkUserAlreadyHasRoles('newOwner')).toBeTruthy();
@@ -345,16 +341,16 @@ describe('Exploration rights service', () => {
   });
 
   it('should reject handler when saving a new member fails', fakeAsync(() => {
+    spyOn(
+      explorationRightsBackendApiService,
+      'saveRoleChangesPutData').and.returnValue(
+      Promise.reject());
+
     ers.saveRoleChanges(
       'newUser', 'viewer').then(
       successHandler, failHandler);
 
-    const req = httpTestingController.expectOne(
-      '/createhandler/rights/12345');
-    expect(req.request.method).toEqual('PUT');
-    req.flush({}, { status: 500, statusText: '' });
-
-    flushMicrotasks();
+    tick();
 
     expect(clearWarningsSpy).not.toHaveBeenCalled();
     expect(successHandler).not.toHaveBeenCalled();
@@ -365,28 +361,26 @@ describe('Exploration rights service', () => {
     let sampleDataResultsCopy = angular.copy(serviceData);
     sampleDataResultsCopy.rights.status = 'public';
 
+    spyOn(
+      explorationRightsBackendApiService,
+      'publishPutData').and.returnValue(
+      Promise.resolve(sampleDataResultsCopy));
+
     ers.publish();
-
-    const req = httpTestingController.expectOne(
-      '/createhandler/status/12345');
-    expect(req.request.method).toEqual('PUT');
-    req.flush(sampleDataResultsCopy, { status: 200, statusText: '' });
-
-    flushMicrotasks();
+    tick();
 
     expect(ers.isPublic()).toBe(true);
   }));
 
   it('should call reject handler when making exploration rights public fails',
     fakeAsync(() => {
+      spyOn(
+        explorationRightsBackendApiService,
+        'publishPutData').and.returnValue(
+        Promise.reject());
+
       ers.publish().then(successHandler, failHandler);
-
-      const req = httpTestingController.expectOne(
-        '/createhandler/status/12345');
-      expect(req.request.method).toEqual('PUT');
-      req.flush({}, { status: 500, statusText: '' });
-
-      flushMicrotasks();
+      tick();
 
       expect(clearWarningsSpy).not.toHaveBeenCalled();
       expect(successHandler).not.toHaveBeenCalled();
@@ -394,13 +388,13 @@ describe('Exploration rights service', () => {
     }));
 
   it('should save moderator change to backend', fakeAsync(() => {
-    ers.saveModeratorChangeToBackendAsync('');
+    spyOn(
+      explorationRightsBackendApiService,
+      'saveModeratorChangeToBackendAsyncPutData').and.returnValue(
+      Promise.resolve(serviceData));
 
-    const req = httpTestingController.expectOne(
-      '/createhandler/moderatorrights/12345');
-    expect(req.request.method).toEqual('PUT');
-    req.flush(serviceData, { status: 200, statusText: '' });
-    flushMicrotasks();
+    ers.saveModeratorChangeToBackendAsync('');
+    tick();
 
     expect(clearWarningsSpy).toHaveBeenCalled();
     expect(ers.ownerNames).toEqual(
@@ -422,13 +416,13 @@ describe('Exploration rights service', () => {
 
   it('should reject handler when saving moderator change to backend fails',
     fakeAsync(() => {
-      ers.saveModeratorChangeToBackendAsync('');
+      spyOn(
+        explorationRightsBackendApiService,
+        'saveModeratorChangeToBackendAsyncPutData').and.returnValue(
+        Promise.reject());
 
-      const req = httpTestingController.expectOne(
-        '/createhandler/moderatorrights/12345');
-      expect(req.request.method).toEqual('PUT');
-      req.flush({}, { status: 500, statusText: '' });
-      flushMicrotasks();
+      ers.saveModeratorChangeToBackendAsync('');
+      tick();
 
       expect(clearWarningsSpy).not.toHaveBeenCalled();
       expect(ers.ownerNames).toBe(null);
