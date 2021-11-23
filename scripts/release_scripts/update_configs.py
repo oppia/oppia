@@ -28,6 +28,7 @@ import getpass
 import os
 import re
 import sys
+import urllib.request as urlrequest
 
 from core import python_utils
 from .. import common
@@ -277,7 +278,7 @@ def main(args=None):
 
     if options.prompt_for_mailgun_and_terms_update:
         try:
-            python_utils.url_open(TERMS_PAGE_FOLDER_URL)
+            urlrequest.urlopen(TERMS_PAGE_FOLDER_URL)
         except Exception:
             raise Exception('Terms mainpage does not exist on Github.')
         add_mailgun_api_key(release_feconf_path)

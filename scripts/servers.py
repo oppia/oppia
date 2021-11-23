@@ -25,6 +25,7 @@ import signal
 import subprocess
 import sys
 import threading
+import urllib.request as urlrequest
 
 from core import feconf
 from core import python_utils
@@ -532,7 +533,7 @@ def managed_webdriver_server(chrome_version=None):
         installed_version_parts = b''.join(re.findall(rb'[0-9.]', output))
         installed_version = '.'.join(
             installed_version_parts.decode('utf-8').split('.')[:-1])
-        response = python_utils.url_open(
+        response = urlrequest.urlopen(
             'https://chromedriver.storage.googleapis.com/LATEST_RELEASE_%s' % (
                 installed_version))
         chrome_version = response.read().decode('utf-8')

@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import csv
 import datetime
+import io
 import json
 
 from core import feconf
@@ -184,7 +185,7 @@ def get_topic_similarities_as_csv():
     The first line is a list of the current topics. The next lines are an
     adjacency matrix of similarities.
     """
-    output = python_utils.string_io()
+    output = io.StringIO()
     writer = csv.writer(output)
     writer.writerow(RECOMMENDATION_CATEGORIES)
 

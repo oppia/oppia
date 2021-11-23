@@ -42,6 +42,7 @@ import argparse
 import json
 import re
 import subprocess
+import urllib.request as urlrequest
 
 from core import constants
 from core import python_utils
@@ -132,7 +133,7 @@ def verify_target_version_compatible_with_latest_release(
             minor version plus one.
         AssertionError. The current patch version is different than 0.
     """
-    response = python_utils.url_open(
+    response = urlrequest.urlopen(
         'https://api.github.com/repos/oppia/oppia/releases/latest')
     if response.getcode() != 200:
         raise Exception(

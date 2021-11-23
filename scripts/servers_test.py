@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import collections
 import contextlib
+import io
 import logging
 import os
 import re
@@ -694,7 +695,7 @@ class ManagedProcessTests(test_utils.TestBase):
     def test_managed_webpack_compiler_in_watch_mode_when_build_succeeds(self):
         popen_calls = self.exit_stack.enter_context(self.swap_popen(
             outputs=[b'abc', b'Built at: 123', b'def']))
-        str_io = python_utils.string_io()
+        str_io = io.StringIO()
         self.exit_stack.enter_context(contextlib.redirect_stdout(str_io))
         logs = self.exit_stack.enter_context(self.capture_logging())
 
@@ -718,7 +719,7 @@ class ManagedProcessTests(test_utils.TestBase):
     def test_managed_webpack_compiler_in_watch_mode_raises_when_not_built(self):
         # NOTE: The 'Built at: ' message is never printed.
         self.exit_stack.enter_context(self.swap_popen(outputs=[b'abc', b'def']))
-        str_io = python_utils.string_io()
+        str_io = io.StringIO()
         self.exit_stack.enter_context(contextlib.redirect_stdout(str_io))
 
         self.assertRaisesRegexp(

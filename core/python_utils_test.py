@@ -58,11 +58,6 @@ class PythonUtilsTests(test_utils.GenericTestBase):
             with python_utils.open_file('invalid_file.py', 'r') as f:
                 f.readlines()
 
-    def test_url_open(self):
-        response = python_utils.url_open('http://www.google.com')
-        self.assertEqual(response.getcode(), 200)
-        self.assertEqual(response.url, 'http://www.google.com')
-
     def test_url_request(self):
         response = python_utils.url_request('http://www.google.com', None, {})
         self.assertEqual(response.get_full_url(), 'http://www.google.com')
@@ -193,7 +188,7 @@ class PythonUtilsForPython3Tests(test_utils.GenericTestBase):
     """Tests for feature detection utilities for Python 3."""
 
     def test_string_io(self):
-        stdout = python_utils.string_io()
+        stdout = io.StringIO()
         self.assertIsInstance(stdout, io.StringIO)
 
     def test_unicode_and_str_chars_in_file(self):

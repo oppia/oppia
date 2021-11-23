@@ -25,6 +25,7 @@ import argparse
 import json
 import re
 import sys
+import urllib.request as urlrequest
 
 from core import python_utils
 from scripts import common
@@ -145,7 +146,7 @@ def lookup_pr(owner, repo, pull_number):
         GITHUB_API_PR_ENDPOINT % (owner, repo, pull_number),
         None,
         {'Accept': 'application/vnd.github.v3+json'})
-    response = python_utils.url_open(request)
+    response = urlrequest.urlopen(request)
     if response.getcode() != 200:
         return {}
     pr = json.load(response)
