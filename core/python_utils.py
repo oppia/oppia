@@ -359,6 +359,7 @@ def divide(number1, number2):
     """
     return past.utils.old_div(number1, number2)
 
+
 def _recursively_convert_to_str(value):
     """Convert all builtins.bytes and builtins.str elements in a data structure
     to bytes and unicode respectively. This is required for the
