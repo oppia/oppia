@@ -79,7 +79,7 @@ class PlatformParameterChangeTests(test_utils.GenericTestBase):
         self.assertEqual(
             param_change_object.cmd, self.CMD_EDIT_RULES)
         self.assertEqual(
-            param_change_object.new_rules, []) #type: ignore[attr-defined]
+            param_change_object.new_rules, [])
 
     def test_to_dict_returns_correct_dict(self)-> None:
         param_change_dict = {

@@ -146,9 +146,9 @@ class QuestionChangeTest(test_utils.GenericTestBase):
         )
 
         self.assertEqual('update_question_property', observed_object.cmd)
-        self.assertEqual('question_state_data', observed_object.property_name) # type: ignore[attr-defined]
-        self.assertEqual('new_value', observed_object.new_value) # type: ignore[attr-defined]
-        self.assertEqual('old_value', observed_object.old_value) # type: ignore[attr-defined]
+        self.assertEqual('question_state_data', observed_object.property_name)
+        self.assertEqual('new_value', observed_object.new_value)
+        self.assertEqual('old_value', observed_object.old_value)
 
     def test_create_new_fully_specified_question(self) -> None:
         """Test to verify __init__ method of the Question Change object
@@ -165,8 +165,8 @@ class QuestionChangeTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             'create_new_fully_specified_question', observed_object.cmd)
-        self.assertEqual('10', observed_object.skill_id) # type: ignore[attr-defined]
-        self.assertEqual({}, observed_object.question_dict) # type: ignore[attr-defined]
+        self.assertEqual('10', observed_object.skill_id)
+        self.assertEqual({}, observed_object.question_dict)
 
     def test_migrate_state_schema_to_latest_version(self) -> None:
         """Test to verify __init__ method of the Question Change object
@@ -183,8 +183,8 @@ class QuestionChangeTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             'migrate_state_schema_to_latest_version', observed_object.cmd)
-        self.assertEqual(0, observed_object.from_version) # type: ignore[attr-defined]
-        self.assertEqual(10, observed_object.to_version) # type: ignore[attr-defined]
+        self.assertEqual(0, observed_object.from_version)
+        self.assertEqual(10, observed_object.to_version)
 
 
 class QuestionSuggestionChangeTest(test_utils.GenericTestBase):
@@ -280,8 +280,8 @@ class QuestionSuggestionChangeTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             'create_new_fully_specified_question', observed_object.cmd)
-        self.assertEqual('10', observed_object.skill_id) # type: ignore[attr-defined]
-        self.assertEqual({}, observed_object.question_dict) # type: ignore[attr-defined]
+        self.assertEqual('10', observed_object.skill_id)
+        self.assertEqual({}, observed_object.question_dict)
 
 
 class QuestionDomainTest(test_utils.GenericTestBase):

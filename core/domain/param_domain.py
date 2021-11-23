@@ -136,7 +136,7 @@ class ParamChange:
             subclass of BaseValueGenerator. The generator object for the
             parameter.
         """
-        return value_generators_domain.Registry.get_generator_class_by_id(  # type: ignore[no-untyped-call]
+        return value_generators_domain.Registry.get_generator_class_by_id(
             self._generator_id)()
 
     @property
@@ -204,9 +204,10 @@ class ParamChange:
         return object_registry.Registry.get_object_class_by_type(  # type: ignore[no-untyped-call]
             obj_type).normalize(raw_value)
 
+    # Module in python.utils has no attribute BASESTRING
     def validate(self) -> None:
         """Checks that the properties of this ParamChange object are valid."""
-        if not isinstance(self.name, python_utils.BASESTRING):
+        if not isinstance(self.name, python_utils.BASESTRING): # type: ignore[attr-defined]
             raise utils.ValidationError(
                 'Expected param_change name to be a string, received %s'
                 % self.name)
@@ -215,7 +216,7 @@ class ParamChange:
                 'Only parameter names with characters in [a-zA-Z0-9] are '
                 'accepted.')
 
-        if not isinstance(self._generator_id, python_utils.BASESTRING):
+        if not isinstance(self._generator_id, python_utils.BASESTRING): # type: ignore[attr-defined]
             raise utils.ValidationError(
                 'Expected generator ID to be a string, received %s '
                 % self._generator_id)
@@ -231,7 +232,7 @@ class ParamChange:
                 'Expected a dict of customization_args, received %s'
                 % self.customization_args)
         for arg_name in self.customization_args:
-            if not isinstance(arg_name, python_utils.BASESTRING):
+            if not isinstance(arg_name, python_utils.BASESTRING): # type: ignore[attr-defined]
                 raise Exception(
                     'Invalid parameter change customization_arg name: %s'
                     % arg_name)

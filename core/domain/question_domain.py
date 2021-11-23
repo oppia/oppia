@@ -1265,13 +1265,14 @@ class Question:
         versioned_question_state['state'] = conversion_fn(
             versioned_question_state['state'])
 
+    # Module in python.utils has no attribute BASESTRING
     def partial_validate(self) -> None:
         """Validates the Question domain object, but doesn't require the
         object to contain an ID and a version. To be used to validate the
         question before it is finalized.
         """
 
-        if not isinstance(self.language_code, python_utils.BASESTRING):
+        if not isinstance(self.language_code, python_utils.BASESTRING): # type: ignore[attr-defined]
             raise utils.ValidationError(
                 'Expected language_code to be a string, received %s' %
                 self.language_code)
@@ -1282,7 +1283,7 @@ class Question:
 
         if not (isinstance(self.linked_skill_ids, list) and (
                 all(isinstance(
-                    elem, python_utils.BASESTRING) for elem in (
+                    elem, python_utils.BASESTRING) for elem in ( # type: ignore[attr-defined]
                         self.linked_skill_ids)))):
             raise utils.ValidationError(
                 'Expected linked_skill_ids to be a list of strings, '
@@ -1295,7 +1296,7 @@ class Question:
             self.inapplicable_skill_misconception_ids, list)
         if not (inapplicable_skill_misconception_ids_is_list and (
                 all(isinstance(
-                    elem, python_utils.BASESTRING) for elem in (
+                    elem, python_utils.BASESTRING) for elem in ( # type: ignore[attr-defined]
                         self.inapplicable_skill_misconception_ids)))):
             raise utils.ValidationError(
                 'Expected inapplicable_skill_misconception_ids to be a list '
@@ -1369,10 +1370,11 @@ class Question:
             )
         self.question_state_data.validate({}, False) # type: ignore[no-untyped-call]
 
+    # Module in python.utils has no attribute BASESTRING
     def validate(self) -> None:
         """Validates the Question domain object before it is saved."""
 
-        if not isinstance(self.id, python_utils.BASESTRING):
+        if not isinstance(self.id, python_utils.BASESTRING): # type: ignore[attr-defined]
             raise utils.ValidationError(
                 'Expected ID to be a string, received %s' % self.id)
 
@@ -1504,6 +1506,7 @@ class QuestionSummary:
             'misconception_ids': self.misconception_ids
         }
 
+    # Module in python.utils has no attribute BASESTRING
     def validate(self) -> None:
         """Validates the Question summary domain object before it is saved.
 
@@ -1511,16 +1514,16 @@ class QuestionSummary:
             ValidationError. One or more attributes of question summary are
                 invalid.
         """
-        if not isinstance(self.id, python_utils.BASESTRING):
+        if not isinstance(self.id, python_utils.BASESTRING): # type: ignore[attr-defined]
             raise utils.ValidationError(
                 'Expected id to be a string, received %s' % self.id)
 
-        if not isinstance(self.question_content, python_utils.BASESTRING):
+        if not isinstance(self.question_content, python_utils.BASESTRING): # type: ignore[attr-defined]
             raise utils.ValidationError(
                 'Expected question content to be a string, received %s' %
                 self.question_content)
 
-        if not isinstance(self.interaction_id, python_utils.BASESTRING):
+        if not isinstance(self.interaction_id, python_utils.BASESTRING): # type: ignore[attr-defined]
             raise utils.ValidationError(
                 'Expected interaction id to be a string, received %s' %
                 self.interaction_id)
@@ -1536,7 +1539,7 @@ class QuestionSummary:
                 self.last_updated)
 
         if not (isinstance(self.misconception_ids, list) and (
-                all(isinstance(elem, python_utils.BASESTRING) for elem in (
+                all(isinstance(elem, python_utils.BASESTRING) for elem in ( # type: ignore[attr-defined]
                     self.misconception_ids)))):
             raise utils.ValidationError(
                 'Expected misconception ids to be a list of '
