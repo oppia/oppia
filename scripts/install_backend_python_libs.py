@@ -690,7 +690,7 @@ def main():
         validate_metadata_directories()
     else:
         print(
-            'Refer to https://github.com/oppia/oppia/wiki/Troubleshooting')
+            'All third-party Python libraries are already installed correctly.')
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

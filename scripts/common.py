@@ -285,8 +285,7 @@ def open_new_tab_in_browser_if_possible(url):
         if subprocess.call(['which', cmd]) == 0:
             subprocess.check_call([cmd, url])
             return
-    print(
-        '******************************************************************')
+    print('******************************************************************')
     print(
         'WARNING: Unable to open browser. Please manually open the following')
     print('URL in a browser window, then press Enter to confirm.')

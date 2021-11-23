@@ -79,7 +79,7 @@ def main():
                 'Version {} was found instead.'
             ).format(CHROME_VERSION, found_version)
         )
-    print('Refer to https://github.com/oppia/oppia/wiki/Troubleshooting')
+    print('Chrome version {} installed.'.format(found_version))
 
 
 if __name__ == '__main__':  # pragma: no cover

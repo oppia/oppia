@@ -140,9 +140,7 @@ def main():
     """Test the CI config files and protractor.conf.js to have same
     e2e test suites.
     """
-    print(
-        'Checking all e2e test files are captured '
-        'in protractor.conf.js...')
+    print('Checking all e2e test files are captured in protractor.conf.js...')
     protractor_test_suite_files = get_e2e_test_filenames_from_protractor_dir()
     protractor_conf_test_suites = (
         get_e2e_test_filenames_from_protractor_conf_file())

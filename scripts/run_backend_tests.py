@@ -372,7 +372,7 @@ def main(args=None):
                 print('')
                 print('------------------------------------------------------')
                 print(
-                'WARNING : test_target flag should point to the test file.')
+                    'WARNING : test_target flag should point to the test file.')
                 print('------------------------------------------------------')
                 print('')
                 time.sleep(3)
@@ -470,8 +470,7 @@ def main(args=None):
                 print('    WARNING: FAILED TO RUN %s' % spec.test_target)
                 print('')
                 print('    This is most likely due to an import error.')
-                print(
-                    '------------------------------------------------------')
+                print('------------------------------------------------------')
                 raise task.exception
         else:
             try:
