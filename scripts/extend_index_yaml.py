@@ -66,8 +66,9 @@ def write_yaml(new_yaml_data_dict):
         yaml_data += '\n'
     yaml_data = yaml_data[:-1]
     yaml_data = yaml_data.replace('\n-', '\n\n-')
-    with open(INDEX_YAML_PATH, 'w', encoding='utf-8') as fo:
-        fo.write(yaml_data)
+    fo = open(INDEX_YAML_PATH, 'w', encoding='utf-8')
+    data = fo.write(yaml_data)
+    fo.close()
 
 
 def extract_new_kind_from_yaml(INDEX_YAML_DICT, WEB_INF_INDEX_YAML_DICT):
