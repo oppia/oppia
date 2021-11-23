@@ -689,6 +689,8 @@ def _create_exploration(
     """
     # This line is needed because otherwise a rights object will be created,
     # but the creation of an exploration object will fail.
+    exploration.update_proto_size_in_bytes(
+        exploration.get_proto_size())
     exploration.validate()
     rights_manager.create_new_exploration_rights(exploration.id, committer_id)
 

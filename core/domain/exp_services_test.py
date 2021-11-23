@@ -1842,7 +1842,7 @@ language_code: en
 objective: The objective
 param_changes: []
 param_specs: {}
-proto_size_in_bytes: 0
+proto_size_in_bytes: 366
 schema_version: %d
 states:
   %s:
@@ -1951,7 +1951,7 @@ language_code: en
 objective: The objective
 param_changes: []
 param_specs: {}
-proto_size_in_bytes: 0
+proto_size_in_bytes: 374
 schema_version: %d
 states:
   %s:
@@ -5197,93 +5197,6 @@ class ExplorationConversionPipelineTests(ExplorationServicesUnitTests):
 
     NEW_EXP_ID = 'exp_id1'
 
-    UPGRADED_EXP_YAML = (
-        """author_notes: ''
-auto_tts_enabled: true
-blurb: ''
-category: category
-correctness_feedback_enabled: false
-init_state_name: %s
-language_code: en
-objective: Old objective
-param_changes: []
-param_specs: {}
-proto_size_in_bytes: 0
-schema_version: %d
-states:
-  END:
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: <p>Congratulations, you have finished!</p>
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        recommendedExplorationIds:
-          value: []
-      default_outcome: null
-      hints: []
-      id: EndExploration
-      solution: null
-    linked_skill_id: null
-    next_content_id_index: 0
-    param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content: {}
-    solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-  %s:
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: ''
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        buttonText:
-          value:
-            content_id: ca_buttonText
-            unicode_str: Continue
-      default_outcome:
-        dest: END
-        feedback:
-          content_id: default_outcome
-          html: ''
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: Continue
-      solution: null
-    linked_skill_id: null
-    next_content_id_index: 0
-    param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_buttonText: {}
-        content: {}
-        default_outcome: {}
-    solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        ca_buttonText: {}
-        content: {}
-        default_outcome: {}
-states_schema_version: %d
-tags: []
-title: Old Title
-""") % (
-    feconf.DEFAULT_INIT_STATE_NAME.encode('utf-8'),
-    exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
-    feconf.DEFAULT_INIT_STATE_NAME.encode('utf-8'),
-    feconf.CURRENT_STATE_SCHEMA_VERSION)
-
     ALBERT_EMAIL = 'albert@example.com'
     ALBERT_NAME = 'albert'
 
@@ -5564,8 +5477,36 @@ title: Old Title
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(exploration.blurb, 'blurb')
 
-    def test_update_exploration_proto_size(self):
+        # Check that the property can be changed when working
+        # on old version.
+        # Add change to upgrade the version.
+        exp_services.update_exploration(
+            self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'new title'
+            })], 'Changed title.')
+
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+            'property_name': 'blurb',
+            'new_value': 'blurb_changed'
+        })]
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.NEW_EXP_ID, 2, change_list)
+        self.assertTrue(changes_are_mergeable)
+        exp_services.update_exploration(
+            self.albert_id, self.NEW_EXP_ID, change_list,
+            'Changed blurb.')
+
+        # Assert that final version consists all the changes.
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
+        self.assertEqual(exploration.title, 'new title')
+        self.assertEqual(exploration.blurb, 'blurb_changed')
+
+    def test_update_exploration_proto_size(self):
+        exploration = (
+            exp_domain.Exploration.create_default_exploration(self.NEW_EXP_ID))
         self.assertEqual(exploration.proto_size_in_bytes, 0)
         exp_services.update_exploration(
             self.albert_id, self.NEW_EXP_ID, [
@@ -5675,35 +5616,9 @@ title: Old Title
                     'state_name': 'State 3',
                 })], 'changes')
 
-        exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
-        self.assertEqual(exploration.proto_size_in_bytes, 0)
-
-        # Check that the property can be changed when working
-        # on old version.
-        # Add change to upgrade the version.
-        exp_services.update_exploration(
-            self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                'property_name': 'title',
-                'new_value': 'new title'
-            })], 'Changed title.')
-
-        change_list = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-            'property_name': 'blurb',
-            'new_value': 'blurb_changed'
-        })]
-        changes_are_mergeable = exp_services.are_changes_mergeable(
-            self.NEW_EXP_ID, 2, change_list)
-        self.assertTrue(changes_are_mergeable)
-        exp_services.update_exploration(
-            self.albert_id, self.NEW_EXP_ID, change_list,
-            'Changed blurb.')
-
-        # Assert that final version consists all the changes.
-        exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
-        self.assertEqual(exploration.title, 'new title')
-        self.assertEqual(exploration.blurb, 'blurb_changed')
+        updated_exploration = exp_fetchers.get_exploration_by_id(
+            self.NEW_EXP_ID)
+        self.assertEqual(updated_exploration.proto_size_in_bytes, 108)
 
     def test_update_exploration_param_changes(self):
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)

@@ -700,8 +700,6 @@ class Exploration:
         exploration.auto_tts_enabled = exploration_dict['auto_tts_enabled']
         exploration.correctness_feedback_enabled = exploration_dict[
             'correctness_feedback_enabled']
-        exploration.proto_size_in_bytes = exploration_dict[
-            'proto_size_in_bytes']
 
         exploration.param_specs = {
             ps_name: param_domain.ParamSpec.from_dict(ps_val) for
@@ -785,6 +783,13 @@ class Exploration:
         exploration.version = exploration_version
         exploration.created_on = exploration_created_on
         exploration.last_updated = exploration_last_updated
+
+        if exploration_dict.get('proto_size_in_bytes') is None:
+            exploration_dict['proto_size_in_bytes'] = (
+                exploration.get_proto_size())
+        else:
+            exploration.proto_size_in_bytes = exploration_dict[
+                'proto_size_in_bytes']
 
         return exploration
 
@@ -2257,15 +2262,9 @@ class Exploration:
         """
         exploration_dict['id'] = exploration_id
 
-        # Need to a proto_size_in_bytes with zero value as the earlier versions
-        # doesn't have this attribute. In order to calulate the size, we need
-        # to call from_dict which uses the attribute proto_size_in_bytes.
-        if exploration_dict.get('proto_size_in_bytes') is None:
-            exploration_dict['proto_size_in_bytes'] = 0
-
         exploration = cls.from_dict(exploration_dict)
         exploration_dict['proto_size_in_bytes'] = (
-            exploration.get_proto_size())
+            exploration.proto_size_in_bytes)
         return exploration_dict
 
     @classmethod
@@ -2382,6 +2381,7 @@ class Exploration:
         """
         exp_dict = self.to_dict()
         exp_dict['schema_version'] = self.CURRENT_EXP_SCHEMA_VERSION
+        exp_dict['proto_size_in_bytes'] = self.get_proto_size()
 
         # The ID is the only property which should not be stored within the
         # YAML representation.
