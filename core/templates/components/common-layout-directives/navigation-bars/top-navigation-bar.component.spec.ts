@@ -424,6 +424,18 @@ describe('TopNavigationBarComponent', () => {
     expect(component.CLASSROOM_PROMOS_ARE_ENABLED).toBe(true);
   }));
 
+  it('should check if classroom data is fetched', fakeAsync(() => {
+    spyOn(component, 'truncateNavbar').and.stub();
+    spyOn(
+      classroomBackendApiService, 'fetchClassroomDataAsync')
+      .and.resolveTo(undefined);
+
+    component.ngOnInit();
+    tick();
+
+    expect(component.classroomData).toBe(undefined);
+  }));
+
   it('should change current language code on' +
     ' I18nLanguageCode change', fakeAsync(() => {
     let onI18nLanguageCodeChangeEmitter = new EventEmitter();
