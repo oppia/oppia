@@ -81,6 +81,12 @@ describe('Edit Thumbnail Modal Component', () => {
     },
   };
 
+  const fileContent = (
+    'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjA' +
+    'wMC9zdmciICB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCI+PGNpcmNsZSBjeD0iNTAiIGN5' +
+    'PSI1MCIgcj0iNDAiIHN0cm9rZT0iZ3JlZW4iIHN0cm9rZS13aWR0aD0iNCIgZmlsbD0ie' +
+    'WVsbG93IiAvPjwvc3ZnPg==');
+
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
@@ -127,11 +133,6 @@ describe('Edit Thumbnail Modal Component', () => {
     spyOn(component, 'isUploadedImageSvg').and.returnValue(true);
     spyOn(component, 'isValidFilename').and.returnValue(true);
     const resetSpy = spyOn(component, 'reset').and.callThrough();
-    let fileContent = (
-      'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjA' +
-      'wMC9zdmciICB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCI+PGNpcmNsZSBjeD0iNTAiIGN5' +
-      'PSI1MCIgcj0iNDAiIHN0cm9rZT0iZ3JlZW4iIHN0cm9rZS13aWR0aD0iNCIgZmlsbD0ie' +
-      'WVsbG93IiAvPjwvc3ZnPg==');
     let file = new File([fileContent], 'circle.svg', {type: 'image/svg'});
     component.invalidImageWarningIsShown = false;
     component.invalidFilenameWarningIsShown = false;
@@ -270,13 +271,7 @@ describe('Edit Thumbnail Modal Component', () => {
     ).and.callFake(() => {
       return { tags: [], attrs: [] };
     });
-    const safeSvg = (
-      'data:image/svg+xml;base64,PHN2ZyBpZD0ic291cmNlIiB2ZXJzaW9uPSIxLjEiIGJhc2' +
-      'VQcm9maWxlPSJmdWxsIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgogID' +
-      'xwb2x5Z29uIGlkPSJ0cmlhbmdsZSIgcG9pbnRzPSIwLDAgMCw1MCA1MCwwIiBmaWxsPSIjMD' +
-      'A5OTAwIiBzdHJva2U9IiMwMDQ0MDAiPjwvcG9seWdvbj4KPC9zdmc+'
-    );
-    let file = new File([safeSvg], 'triangle.svg', {type: 'image/svg'});
+    let file = new File([fileContent], 'triangle.svg', {type: 'image/svg'});
     component.uploadedImageMimeType = 'image/svg+xml';
     expect(component.thumbnailHasChanged).toBeFalse();
     component.onFileChanged(file);
