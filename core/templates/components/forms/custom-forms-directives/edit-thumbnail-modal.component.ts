@@ -69,6 +69,7 @@ export class EditThumbnailModalComponent implements OnInit {
 
   invalidImageWarningIsShown = false;
   invalidFilenameWarningIsShown = false;
+  thumbnailHasChanged = false;
   allowedImageFormats = ['svg'];
 
   constructor(
@@ -125,6 +126,8 @@ export class EditThumbnailModalComponent implements OnInit {
       this.attrs = this.invalidTagsAndAttributes.attrs;
       if (this.tags.length > 0 || this.attrs.length > 0) {
         this.reset();
+      } else {
+        this.thumbnailHasChanged = true;
       }
     };
     reader.readAsDataURL(file);
