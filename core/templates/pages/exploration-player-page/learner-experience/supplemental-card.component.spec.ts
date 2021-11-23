@@ -205,7 +205,7 @@ describe('Supplemental card component', () => {
   it('should update the displayedCard when changes are detected', () => {
     let updatedStateCard = new StateCard(
       'state_name', 'new content', 'html', null, [], null,
-      null, '', null);;
+      null, '', null);
     const changes: SimpleChanges = {
       displayedCard: {
         previousValue: mockStateCard,
