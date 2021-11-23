@@ -29,14 +29,14 @@ describe('Question player state service', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({}).compileComponents();
-  }));
-
-  beforeEach(() => {
-    qpss = TestBed.inject(QuestionPlayerStateService);
     stateObject = TestBed.inject(StateObjectFactory);
     question = new Question(
       questionId, stateObject.createDefaultState('state'), '', 7, [], []
     );
+  }));
+
+  beforeEach(() => {
+    qpss = TestBed.inject(QuestionPlayerStateService);
   });
 
   it('should register hint as used', () => {
