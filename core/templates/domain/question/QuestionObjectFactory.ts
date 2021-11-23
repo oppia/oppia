@@ -26,7 +26,7 @@ import { MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
 import { InteractionSpecsConstants, InteractionSpecsKey } from 'pages/interaction-specs.constants';
 
 export interface QuestionBackendDict {
-  'id': string | null;
+  'id': string;
   'question_state_data': StateBackendDict;
   'question_state_data_schema_version': number;
   'language_code': string;
@@ -36,7 +36,7 @@ export interface QuestionBackendDict {
 }
 
 export class Question {
-  _id: string | null;
+  _id: string;
   _stateData: State;
   _languageCode: string;
   _version: number;
@@ -44,7 +44,7 @@ export class Question {
   _inapplicableSkillMisconceptionIds: string[];
 
   constructor(
-      id: string | null, stateData: State, languageCode: string,
+      id: string, stateData: State, languageCode: string,
       version: number, linkedSkillIds: string[],
       inapplicableSkillMisconceptionIds: string[]) {
     this._id = id;
@@ -56,7 +56,7 @@ export class Question {
       inapplicableSkillMisconceptionIds);
   }
 
-  getId(): string | null {
+  getId(): string {
     return this._id;
   }
 
@@ -171,7 +171,7 @@ export class Question {
 
   toBackendDict(isNewQuestion: boolean): QuestionBackendDict {
     var questionBackendDict: QuestionBackendDict = {
-      id: null,
+      id: 'id',
       question_state_data: this._stateData.toBackendDict(),
       question_state_data_schema_version: this._version,
       language_code: this._languageCode,
@@ -197,7 +197,7 @@ export class QuestionObjectFactory {
 
   createDefaultQuestion(skillIds: string[]): Question {
     return new Question(
-      null, this.stateObject.createDefaultState(null),
+      'id', this.stateObject.createDefaultState('state'),
       constants.DEFAULT_LANGUAGE_CODE, 1, skillIds, []);
   }
 

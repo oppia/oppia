@@ -21,7 +21,7 @@ import { EventEmitter, Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Question } from 'domain/question/QuestionObjectFactory';
 
-interface UsedHint {
+interface UsedHintOrSolution {
   timestamp: number;
 }
 
@@ -35,8 +35,8 @@ interface QuestionPlayerState {
   [key: string]: {
     linkedSkillIds: string[];
     answers: Answer[];
-    usedHints: UsedHint[];
-    viewedSolution: UsedHint | null;
+    usedHints: UsedHintOrSolution[];
+    viewedSolution: UsedHintOrSolution;
   };
 }
 
@@ -59,12 +59,14 @@ export class QuestionPlayerStateService {
       linkedSkillIds: linkedSkillIds,
       answers: [],
       usedHints: [],
-      viewedSolution: null
+      viewedSolution: {
+        timestamp: 0 // Default case when solution is not viewed.
+      }
     };
   }
 
   hintUsed(question: Question): void {
-    let questionId = String(question.getId());
+    let questionId = question.getId();
     if (!this.questionPlayerState[questionId]) {
       this._createNewQuestionPlayerState(
         questionId, question.getLinkedSkillIds());
@@ -75,7 +77,7 @@ export class QuestionPlayerStateService {
   }
 
   solutionViewed(question: Question): void {
-    let questionId = String(question.getId());
+    let questionId = question.getId();
     if (!this.questionPlayerState[questionId]) {
       this._createNewQuestionPlayerState(
         questionId, question.getLinkedSkillIds());
@@ -89,14 +91,15 @@ export class QuestionPlayerStateService {
       question: Question,
       isCorrect: boolean,
       taggedSkillMisconceptionId: string): void {
-    let questionId = String(question.getId());
+    let questionId = question.getId();
     if (!this.questionPlayerState[questionId]) {
       this._createNewQuestionPlayerState(
         questionId, question.getLinkedSkillIds());
     }
     // Don't store a correct answer in the case where
     // the learner viewed the solution for this question.
-    if (isCorrect && this.questionPlayerState[questionId].viewedSolution) {
+    if (isCorrect && this.questionPlayerState[questionId]
+      .viewedSolution.timestamp !== 0) {
       return;
     }
     this.questionPlayerState[questionId].answers.push(
