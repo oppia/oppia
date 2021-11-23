@@ -51,20 +51,6 @@ export class TranslateTextBackendApiService {
       reader.onerror = error => reject(error);
     });
   }
-  async ImagesDict(imagesData: ImagesData[]): Promise<object> {
-    // eslint-disable-next-line no-async-promise-executor
-    return new Promise<object>(async(resolve, reject) => {
-      const images: {[key: string]: string} = {};
-      for await (const obj of imagesData) {
-        if (obj.imageBlob === null) {
-          return reject('No image data found');
-        }
-        const image = await this.blobtoBase64(obj.imageBlob);
-        images[obj.filename] = image;
-      }
-      resolve(images);
-    });
-  }
   async suggestTranslatedTextAsync(
       expId: string, expVersion: string, contentId: string, stateName: string,
       languageCode: string, contentHtml: string | string[],
@@ -87,9 +73,12 @@ export class TranslateTextBackendApiService {
       }
     };
     const body = new FormData();
-    if (imagesData) {
-      const images = await this.ImagesDict(imagesData);
-      postData.files = images;
+    for await (const obj of imagesData) {
+      if (obj.imageBlob === null) {
+        throw new Error('No image data found');
+      }
+      const image = await this.blobtoBase64(obj.imageBlob);
+      postData.files[obj.filename] = image;
     }
     body.append('payload', JSON.stringify(postData));
     return this.http.post(
