@@ -610,8 +610,16 @@ class PlatformParameter:
     PARAMETER_NAME_REGEXP = r'^[A-Za-z0-9_]{1,100}$'
 
     def __init__(
-            self, name: str, description: str, data_type: DATA_TYPES, rules: List[PlatformParameterRule],
-            rule_schema_version: int, default_value: Any, is_feature: bool, feature_stage: SERVER_MODES) -> None:
+        self, 
+        name: str, 
+        description: str, 
+        data_type: DATA_TYPES, 
+        rules: List[PlatformParameterRule],
+        rule_schema_version: int, 
+        default_value: Any, 
+        is_feature: bool, 
+        feature_stage: SERVER_MODES
+    ) -> None:
         self._name = name
         self._description = description
         self._data_type = data_type
