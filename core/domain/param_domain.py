@@ -21,9 +21,8 @@ from __future__ import unicode_literals
 
 import re
 
-from typing_extensions import TypedDict
-
 from typing import Dict
+from typing_extensions import TypedDict
 
 from core import feconf
 from core import python_utils
