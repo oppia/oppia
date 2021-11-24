@@ -368,7 +368,7 @@ class PlatformParameterFilter:
         }
 
     @classmethod
-    def from_dict(cls, filter_dict: Filter_dict) -> PlatformParameterFilter :
+    def from_dict(cls, filter_dict: Filter_dict) -> PlatformParameterFilter:
         """Returns an PlatformParameterFilter object from a dict.
 
         Args:
