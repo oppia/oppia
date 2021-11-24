@@ -2242,8 +2242,8 @@ class ExplorationStartEventHandlerTests(test_utils.GenericTestBase):
             }, expected_status_int=400
         )
 
-        self.assertEqual(
-            response['error'], 'NONE EXP VERSION: Exploration start')
+        error_msg = 'Missing key in handler args: version.'
+        self.assertEqual(response['error'], error_msg)
 
         self.logout()
 
@@ -2307,7 +2307,8 @@ class ExplorationActualStartEventHandlerTests(test_utils.GenericTestBase):
             }, expected_status_int=400
         )
 
-        self.assertEqual(response['error'], 'NONE EXP VERSION: Actual Start')
+        error_msg = 'Missing key in handler args: exploration_version.'
+        self.assertEqual(response['error'], error_msg)
 
         self.logout()
 
