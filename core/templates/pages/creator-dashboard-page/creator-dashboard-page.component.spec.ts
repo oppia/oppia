@@ -29,9 +29,17 @@ import { UserService } from 'services/user.service';
 import { ExplorationCreationService } from 'components/entity-creation-services/exploration-creation.service';
 import { UserInfo } from 'domain/user/user-info.model';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { SortByPipe } from 'filters/string-utility-filters/sort-by.pipe';
+import { LoaderService } from 'services/loader.service';
+
+@Pipe({name: 'truncate'})
+class MockTruncatePipe {
+  transform(value: string, params: Object | undefined): string {
+    return value;
+  }
+}
 
 describe('Creator Dashboard Page Component', () => {
   let fixture: ComponentFixture<CreatorDashboardPageComponent>;
@@ -44,6 +52,7 @@ describe('Creator Dashboard Page Component', () => {
   let userInfo = {
     canCreateCollections: () => true
   };
+  let loaderService: LoaderService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -51,6 +60,7 @@ describe('Creator Dashboard Page Component', () => {
       declarations: [
         CreatorDashboardPageComponent,
         MockTranslatePipe,
+        MockTruncatePipe,
         SortByPipe
       ],
       providers: [],
@@ -67,6 +77,7 @@ describe('Creator Dashboard Page Component', () => {
     csrfService = TestBed.inject(CsrfTokenService);
     explorationCreationService = TestBed.inject(ExplorationCreationService);
     userService = TestBed.inject(UserService);
+    loaderService = TestBed.inject(LoaderService);
 
     spyOn(csrfService, 'getTokenAsync').and.returnValue(
       Promise.resolve('sample-csrf-token'));
@@ -108,6 +119,11 @@ describe('Creator Dashboard Page Component', () => {
     ' relative path', () => {
     expect(component.getCompleteThumbnailIconUrl('/path/to/icon.png')).toBe(
       '/assets/images/path/to/icon.png');
+  });
+
+  it('should get Trusted Resource Url', () => {
+    expect(component.getTrustedResourceUrl('%2Fimages%2Furl%2F1')).toBe(
+      '/images/url/1');
   });
 
   it('should create new exploration when clicked on CREATE' +
@@ -339,7 +355,7 @@ describe('Creator Dashboard Page Component', () => {
         component.setExplorationsSortingOptions('ratings');
         expect(component.currentSortType).toBe('ratings');
 
-        expect(component.sortByFunction()).toBe('ratings');
+        expect(component.sortByFunction()).toBe('title');
       });
 
       it('should sort exploration list by last updated when last updated' +
@@ -458,13 +474,17 @@ describe('Creator Dashboard Page Component', () => {
 
   describe('when fetching dashboard fails', () => {
     it('should use reject handler', fakeAsync(() => {
+      spyOn(loaderService, 'showLoadingScreen');
       spyOn(creatorDashboardBackendApiService, 'fetchDashboardDataAsync')
         .and.returnValue(Promise.reject({
-          status: 404
+          status: 500
         }));
-      spyOn(alertsService, 'addWarning');
+      spyOn(alertsService, 'addWarning').and.callThrough();
       component.ngOnInit();
       tick();
+      expect(component.canCreateCollections).toBeNull();
+      expect(creatorDashboardBackendApiService.fetchDashboardDataAsync)
+        .toHaveBeenCalled();
       expect(alertsService.addWarning).toHaveBeenCalledWith(
         'Failed to get dashboard data');
     }));
