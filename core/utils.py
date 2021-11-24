@@ -1183,7 +1183,7 @@ def quoted(s: str) -> str:
     return json.dumps(s)
 
 
-def url_open(source_url: str) -> urllib.request.urlopen:
+def url_open(source_url: str) -> Any:
     """Opens a URL and returns the response.
 
     Args:
