@@ -22,7 +22,7 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { fakeAsync, tick } from '@angular/core/testing';
 require('services/ngb-modal.service.ts');
 
-fdescribe('Story Creation Service', () => {
+describe('Story Creation Service', () => {
   let $rootScope = null;
   let $scope = null;
   let StoryCreationService = null;
