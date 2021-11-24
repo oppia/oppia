@@ -888,9 +888,8 @@ class ExplorationMaybeLeaveHandler(base.BaseHandler):
             'params': {
                 'schema': {
                     'type': 'object_dict',
-                    'object_class': stats_domain.SubmittedAnswer
-                    #'validation_method': (
-                        #domain_objects_validator.validate_params_dict),
+                    'validation_method': (
+                        domain_objects_validator.validate_params_dict),
                 }
             }
         }
