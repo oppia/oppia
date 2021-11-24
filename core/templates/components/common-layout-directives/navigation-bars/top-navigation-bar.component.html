@@ -55,8 +55,7 @@
     <li>
       <ul *ngIf="!windowIsNarrow"
           class="nav oppia-navbar-tabs">
-        <li *ngIf="CLASSROOM_PROMOS_ARE_ENABLED"
-            [ngClass]="{'open' : activeMenuName === 'classroomMenu'}"
+        <li [ngClass]="{'open' : activeMenuName === 'classroomMenu'}"
             ngbDropdown
             [hidden]="!navElementsVisibilityStatus.I18N_TOPNAV_CLASSROOM"
             aria-hidden="false"
@@ -77,6 +76,7 @@
             </span>
           </a>
           <ul ngbDropdownMenu
+              [ngClass]="{'classroom-disabled': !CLASSROOM_PROMOS_ARE_ENABLED, 'classroom-enabled': CLASSROOM_PROMOS_ARE_ENABLED}"
               class="dropdown-menu oppia-navbar-dropdown classroom-dropdown-menu"
               (mouseover)="openSubmenu($event, 'classroomMenu')"
               (mouseleave)="closeSubmenuIfNotMobile($event)"
@@ -84,7 +84,7 @@
               autofocus>
             <li class="nav-item">
               <div class="nav-item-main d-flex justify-content-between">
-                <div class="nav-item-left d-flex flex-column">
+                <div *ngIf="CLASSROOM_PROMOS_ARE_ENABLED" class="nav-item-left d-flex flex-column">
                   <div class="nav-item-top d-flex justify-content-between">
                     <div class="nav-content d-flex flex-column">
                       <a (keydown)="onMenuKeypress($event, 'classroomMenu', {shiftTab: ACTION_CLOSE})" (click)="navigateToClassroomPage('/learn/math')" class="dropdown-item nav-link oppia-navbar-tab-content protractor-test-classroom-link nav-item-top-link" href="#">{{ 'I18N_TOPNAV_CLASSROOM_BASIC_MATHS' | translate }}</a>
@@ -101,10 +101,12 @@
                     </picture>
                   </div>
                   <div class="nav-item-bottom d-flex flex-column" *ngIf="!userIsLoggedIn">
-                    <div class="nav-item-links"  *ngFor="let topicSummary of classroomData.getTopicSummaries().slice(0, 3)">
-                      <a (keydown)="onMenuKeypress($event, 'classroomMenu', {shiftTab: ACTION_CLOSE})" (click)="navigateToClassroomPage('/learn/math/' + topicSummary.getUrlFragment())">
+                    <div *ngIf="classroomData.getTopicSummaries().length > 0" class="nav-lists">
+                      <div class="nav-item-links"  *ngFor="let topicSummary of classroomData.getTopicSummaries().slice(0, 3)">
+                        <a (keydown)="onMenuKeypress($event, 'classroomMenu', {shiftTab: ACTION_CLOSE})" (click)="navigateToClassroomPage('/learn/math/' + topicSummary.getUrlFragment())">
                       {{ topicSummary.getName() }}
-                      </a>
+                        </a>
+                      </div>
                     </div>
                     <a class="nav-item-bottom-link" href="/learn/math"><span>{{ 'I18N_TOPNAV_CLASSROOM_LINK_1' | translate }}</span> <span class="material-icons">arrow_right_alt</span></a>
                   </div>
@@ -113,7 +115,7 @@
                 <div class="nav-content nav-item-right d-flex flex-column">
                   <div class="nav-item-right-head">{{ 'I18N_TOPNAV_CLASSROOM_HEADING' | translate }}</div>
                   <div class="des">{{ 'I18N_TOPNAV_LIBRARY_DESCRIPTION' | translate }}</div>
-                  <a class="nav-item-bottom-link" href="/community-library"><span>{{ 'I18N_TOPNAV_LIBRARY' | translate }}</span> <span class="material-icons">arrow_right_alt</span></a>
+                  <a class="nav-item-bottom-link nav-item-bottom-link-right" href="/community-library"><span>{{ 'I18N_TOPNAV_LIBRARY' | translate }}</span> <span class="material-icons">arrow_right_alt</span></a>
                 </div>
               </div>
             </li>
@@ -472,8 +474,16 @@
   .classroom-dropdown-menu {
     border-radius: 3px;
     left: 0 !important;
-    min-width: 668px;
     padding: 0;
+  }
+  .classroom-enabled {
+    min-width: 668px;
+  }
+  .classroom-disabled {
+    min-width: 300px;
+  }
+  .nav-lists {
+    padding-top: 8px;
   }
   .classroom-dropdown-menu .nav-item-top-link {
     color: #333;
@@ -502,7 +512,7 @@
     font-weight: 500;
     line-height: 16.41px;
     padding: 0;
-    padding-top: 16px;
+    padding-bottom: 16px;
     text-transform: capitalize;
   }
   .classroom-dropdown-menu .nav-item-left {
@@ -529,6 +539,8 @@
     font-weight: 500;
     line-height: 16.41px;
     padding: 0;
+  }
+  .classroom-dropdown-menu .nav-item-bottom-link-right {
     padding-top: 16px;
   }
   .classroom-dropdown-menu .nav-item-bottom-link-logged {
