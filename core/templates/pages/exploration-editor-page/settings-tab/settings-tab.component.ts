@@ -165,7 +165,9 @@ angular.module('oppia').component('settingsTab', {
           controller: 'ReassignRoleConfirmationModalController'
         }).result.then(function() {
           ExplorationRightsService.saveRoleChanges(
-            username, newRole);
+            username, newRole).then(() => {
+            $rootScope.$applyAsync();
+          });
           ctrl.closeRolesForm();
         }, () => {
           // Note to developers:
@@ -321,7 +323,9 @@ angular.module('oppia').component('settingsTab', {
         if (!ExplorationRightsService.checkUserAlreadyHasRoles(
           newMemberUsername)) {
           ExplorationRightsService.saveRoleChanges(
-            newMemberUsername, newMemberRole);
+            newMemberUsername, newMemberRole).then(() => {
+            $rootScope.$applyAsync();
+          });
           ctrl.closeRolesForm();
           return;
         }
