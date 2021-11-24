@@ -253,3 +253,52 @@ indexes2:
                 extend_index_yaml.INDEX_YAML_PATH, 'w', encoding='utf-8'
             )
             mock_open_file().write.assert_called_with(expected_result)
+
+    def test_missing_key_in_index_yaml_with_multi_index(self):
+        index_yaml = """indexes1:
+
+- kind: AppFeedbackReportModel
+  properties:
+  - name: created_on
+  - name: scrubbed_by
+"""
+        web_inf_index_yaml = """indexes1:
+
+- kind: AppFeedbackReportModel
+  properties:
+  - name: created_on
+  - name: scrubbed_by
+
+indexes2:
+
+- kind: UserStatsRealtimeModel
+  properties:
+  - name: realtime_layer
+  - name: created_on
+"""
+        expected_result = """indexes1:
+
+- kind: AppFeedbackReportModel
+  properties:
+  - name: created_on
+  - name: scrubbed_by
+
+indexes2:
+
+- kind: UserStatsRealtimeModel
+  properties:
+  - name: realtime_layer
+  - name: created_on
+"""
+
+        with mock.patch('builtins.open', mock.mock_open()) as mock_open_file:
+            mock_open_file.return_value.__enter__.side_effect = [
+                index_yaml,
+                web_inf_index_yaml,
+            ]
+            extend_index_yaml.main()
+
+            mock_open_file.assert_called_with(
+                extend_index_yaml.INDEX_YAML_PATH, 'w', encoding='utf-8'
+            )
+            mock_open_file().write.assert_called_with(expected_result)
