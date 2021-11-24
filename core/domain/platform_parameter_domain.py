@@ -197,8 +197,11 @@ class EvaluationContext:
 
     # Type ignore because key 'server_mode' can not be None
     @classmethod
-    def from_dict(cls, client_context_dict: Dict[str, Optional[str]],
-    server_context_dict: Server_context_dict) -> EvaluationContext:
+    def from_dict(
+        cls,
+        client_context_dict: Dict[str, Optional[str]],
+        server_context_dict: Server_context_dict
+    ) -> EvaluationContext:
         """Creates a new EvaluationContext object by combining both client side
         and server side context.
 
