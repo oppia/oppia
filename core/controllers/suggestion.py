@@ -185,9 +185,10 @@ class SuggestionToSkillActionHandler(base.BaseHandler):
             suggestion_services.accept_suggestion(
                 suggestion_id, self.user_id, 'UNUSED_COMMIT_MESSAGE',
                 self.payload.get('review_message'))
-            
+
             suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
-            target_entity_html_list = suggestion.get_target_entity_html_strings()
+            target_entity_html_list = (
+                suggestion.get_target_entity_html_strings())
             target_image_filenames = (
                 html_cleaner.get_image_filenames_from_html_strings(
                     target_entity_html_list))

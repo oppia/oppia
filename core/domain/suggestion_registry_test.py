@@ -2446,10 +2446,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         fs_services.save_original_and_compressed_versions_of_image(
             'image.png', 'question_suggestions', 'skill1.thread1',
             original_image_content, 'image', True)
-        html_content = (
-            '<p>Value</p>')
-        question_state_data = self._create_valid_question_data(
-            'default_state')
+
         customization_args_dict = {
             'highlightRegionsOnHover': {'value': True},
             'imageAndRegions': {
@@ -2468,10 +2465,31 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
                 }
             }
         }
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'eid', title='title', category='category')
+        exploration.add_states(['state1', 'state2', 'state3'])
+
+        question_state_data = exploration.states['state1']
+        content_dict = {
+            'content_id': 'content',
+            'html': (
+                '<p>Hello, this is state1</p>')
+        }
+        question_state_data.update_content(
+            state_domain.SubtitledHtml.from_dict(content_dict))
+        self.set_interaction_for_state(question_state_data, 'ImageClickInput')
         question_state_data.update_interaction_customization_args(
             customization_args_dict)
+
+        default_outcome = state_domain.Outcome(
+            'state2', state_domain.SubtitledHtml(
+                'default_outcome', '<p>Default outcome for state1</p>'),
+            False, [], None, None
+        )
+        question_state_data.update_interaction_default_outcome(default_outcome)
+
         question_state_dict = question_state_data.to_dict()
-        question_state_dict['content']['html'] = html_content
         self.save_new_skill('skill1', self.author_id, description='description')
 
         suggestion_dict = {
