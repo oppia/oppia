@@ -27,8 +27,28 @@ import { AlertsService } from 'services/alerts.service';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 import { PageTitleService } from 'services/page-title.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
+
+class MockWindowRef {
+  _window = {
+    location: {
+      pathname: '/learn/math',
+      _hash: '',
+      toString() {
+        return 'http://localhost/test_path';
+      }
+    },
+    history: {
+      pushState(data, title: string, url?: string | null) {}
+    }
+  };
+
+  get nativeWindow() {
+    return this._window;
+  }
+}
 
 describe('Topic viewer page', () => {
   let httpTestingController = null;
@@ -37,6 +57,7 @@ describe('Topic viewer page', () => {
   let urlService = null;
   let windowDimensionsService = null;
   let topicViewerPageComponent = null;
+  let windowRef: MockWindowRef;
 
   let topicName = 'Topic Name';
   let topicUrlFragment = 'topic-frag';
@@ -65,16 +86,28 @@ describe('Topic viewer page', () => {
   };
 
   beforeEach(() => {
+    windowRef = new MockWindowRef();
     TestBed.configureTestingModule({
-      declarations: [TopicViewerPageComponent, MockTranslatePipe],
-      imports: [HttpClientTestingModule],
+      declarations: [
+        TopicViewerPageComponent,
+        MockTranslatePipe
+      ],
+      imports: [
+        HttpClientTestingModule
+      ],
+      providers: [
+        {
+          provide: WindowRef,
+          useValue: windowRef
+        }
+      ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
-    httpTestingController = TestBed.get(HttpTestingController);
-    alertsService = TestBed.get(AlertsService);
-    pageTitleService = TestBed.get(PageTitleService);
-    urlService = TestBed.get(UrlService);
-    windowDimensionsService = TestBed.get(WindowDimensionsService);
+    httpTestingController = TestBed.inject(HttpTestingController);
+    alertsService = TestBed.inject(AlertsService);
+    pageTitleService = TestBed.inject(PageTitleService);
+    urlService = TestBed.inject(UrlService);
+    windowDimensionsService = TestBed.inject(WindowDimensionsService);
     let fixture = TestBed.createComponent(TopicViewerPageComponent);
     topicViewerPageComponent = fixture.componentInstance;
   });
@@ -88,14 +121,15 @@ describe('Topic viewer page', () => {
       topicUrlFragment);
     spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
       'math');
-
     spyOn(pageTitleService, 'setDocumentTitle').and.callThrough();
     spyOn(pageTitleService, 'updateMetaTag').and.callThrough();
+    spyOn(windowRef.nativeWindow.history, 'pushState');
 
     topicViewerPageComponent.ngOnInit();
     expect(topicViewerPageComponent.canonicalStorySummaries).toEqual([]);
     expect(topicViewerPageComponent.activeTab).toBe('story');
-
+    expect(windowRef.nativeWindow.history.pushState).toHaveBeenCalledWith(
+      {}, '', 'http://localhost/test_path/story');
     var req = httpTestingController.expectOne(
       `/topic_data_handler/math/${topicUrlFragment}`);
     req.flush(topicDict);
@@ -195,5 +229,47 @@ describe('Topic viewer page', () => {
 
     widthSpy.and.returnValue(700);
     expect(topicViewerPageComponent.checkMobileView()).toBe(false);
+  });
+
+  it('should set url accordingly when user changes active tab to' +
+  ' story tab', () => {
+    spyOn(windowRef.nativeWindow.history, 'pushState');
+    topicViewerPageComponent.activeTab = 'subtopics';
+    spyOn(windowRef.nativeWindow.location, 'toString').and.returnValue(
+      'http://localhost/test_path/revision');
+
+    topicViewerPageComponent.setActiveTab('story');
+
+    expect(windowRef.nativeWindow.history.pushState).toHaveBeenCalledWith(
+      {}, '', 'http://localhost/test_path/story');
+    expect(topicViewerPageComponent.activeTab).toBe('story');
+  });
+
+  it('should set url hash accordingly when user changes active tab to' +
+  ' practice tab', () => {
+    spyOn(windowRef.nativeWindow.history, 'pushState');
+    topicViewerPageComponent.activeTab = 'subtopics';
+    spyOn(windowRef.nativeWindow.location, 'toString').and.returnValue(
+      'http://localhost/test_path/revision');
+
+    topicViewerPageComponent.setActiveTab('practice');
+
+    expect(windowRef.nativeWindow.history.pushState).toHaveBeenCalledWith(
+      {}, '', 'http://localhost/test_path/practice');
+    expect(topicViewerPageComponent.activeTab).toBe('practice');
+  });
+
+  it('should set url hash accordingly when user changes active tab to' +
+  ' subtopics tab', () => {
+    spyOn(windowRef.nativeWindow.history, 'pushState');
+    topicViewerPageComponent.activeTab = 'story';
+    spyOn(windowRef.nativeWindow.location, 'toString').and.returnValue(
+      'http://localhost/test_path/story');
+
+    topicViewerPageComponent.setActiveTab('subtopics');
+
+    expect(windowRef.nativeWindow.history.pushState).toHaveBeenCalledWith(
+      {}, '', 'http://localhost/test_path/revision');
+    expect(topicViewerPageComponent.activeTab).toBe('subtopics');
   });
 });
