@@ -79,18 +79,26 @@ export class Topic {
   _pageTitleFragmentForWeb: string;
   storyReferenceObjectFactory: StoryReferenceObjectFactory;
   constructor(
-      id: string | null, name: string, abbreviatedName: string,
-      urlFragment: string, description: string, languageCode: string,
+      id: string | null,
+      name: string,
+      abbreviatedName: string,
+      urlFragment: string,
+      description: string,
+      languageCode: string,
       canonicalStoryReferences: StoryReference[],
       additionalStoryReferences: StoryReference[],
       uncategorizedSkillIds: string[],
-      nextSubtopicId: number, version: number, subtopics: Subtopic[],
+      nextSubtopicId: number,
+      version: number,
+      subtopics: Subtopic[],
       thumbnailFilename: string | null,
       thumbnailBgColor: string,
       skillIdToDescriptionMap: SkillIdToDescriptionMap,
       storyReferenceObjectFactory: StoryReferenceObjectFactory,
       practiceTabIsDisplayed: boolean,
-      metaTagContent: string, pageTitleFragmentForWeb: string) {
+      metaTagContent: string,
+      pageTitleFragmentForWeb: string
+  ) {
     this._id = id;
     this._name = name;
     this._abbreviatedName = abbreviatedName;
@@ -115,9 +123,7 @@ export class Topic {
     this._pageTitleFragmentForWeb = pageTitleFragmentForWeb;
   }
 
-  // Some methods have either string or null return value,
-  // because when we create interstitial topic object
-  // their fields get null value.
+  // Returns 'null' when the topic is not yet saved on the backend.
   getId(): string | null {
     return this._id;
   }
@@ -614,7 +620,11 @@ export class TopicObjectFactory {
     );
   }
 
-  // Create an interstitial topic that would be displayed in the editor until
+  /**
+ * TODO(#14309): Remove the interstitial topic so that full topic can be
+ * created from start.
+ */
+  // Create an interstitial topic that until
   // the actual topic is fetched from the backend.
   createInterstitialTopic(): Topic {
     return new Topic(

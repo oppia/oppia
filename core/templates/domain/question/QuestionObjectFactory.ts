@@ -124,7 +124,8 @@ export class Question {
     }
     if (
       !interaction.solution &&
-      INTERACTION_SPECS[interactionId].can_have_solution) {
+      INTERACTION_SPECS[interactionId].can_have_solution
+    ) {
       return 'A solution must be specified';
     }
     var answerGroups = this._stateData.interaction.answerGroups;
@@ -210,6 +211,11 @@ export class QuestionObjectFactory {
   constructor(
     private stateObject: StateObjectFactory) {}
 
+  /**
+ * TODO(#14312): Remove the createDefaultQuestion so that full question can be
+ * created from start.
+ */
+  // Create a default question until the actual question is saved.
   createDefaultQuestion(skillIds: string[]): Question {
     return new Question(
       null, this.stateObject.createDefaultState(null),

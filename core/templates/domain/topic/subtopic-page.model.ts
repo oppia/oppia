@@ -41,9 +41,7 @@ export class SubtopicPage {
     private languageCode: string,
   ) {}
 
-  // Some methods have either string or null return value,
-  // because when we create interstitial subtopicpage
-  // their fields get null value.
+  // Returns 'null' when the subtopic page is not yet saved on the backend.
 
   // Returns the id of the subtopic page.
   getId(): string | null {
@@ -102,8 +100,12 @@ export class SubtopicPage {
       'en');
   }
 
-  // Create an interstitial subtopic page that would be displayed in the
-  // editor until the actual subtopic page is fetched from the backend.
+  /**
+ * TODO(#14310): Remove the interstitial subtopic so that full subtopic can be
+ * created from start.
+ */
+  // Create an interstitial subtopic that would be displayed in the editor until
+  // the actual subtopic is fetched from the backend.
   static createInterstitialSubtopicPage(): SubtopicPage {
     return new SubtopicPage(null, null, null, 'en');
   }

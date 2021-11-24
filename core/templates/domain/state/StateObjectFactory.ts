@@ -61,8 +61,7 @@ export interface StateBackendDict {
 }
 
 export class State {
-  // A null 'name' indicates that the 'State' has been created
-  // but not saved.
+  // Name is null before saving a state.
   name: string | null;
   classifierModelId: string | null;
   linkedSkillId: string | null;
@@ -168,6 +167,12 @@ export class StateObjectFactory {
   get NEW_STATE_TEMPLATE(): StateBackendDict {
     return constants.NEW_STATE_TEMPLATE as StateBackendDict;
   }
+
+  /**
+ * TODO(#14313): Remove the createDefaultState so that full state can be
+ * created from start.
+ */
+  // Create a default state until the actual state is saved.
   // Passes name as null before saving a state.
   createDefaultState(newStateName: string | null): State {
     var newStateTemplate = this.NEW_STATE_TEMPLATE;
