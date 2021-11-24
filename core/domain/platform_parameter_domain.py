@@ -578,7 +578,7 @@ class PlatformParameterRule:
             filter_domain_object.validate()
 
     @classmethod
-    def from_dict(cls, rule_dict : PlatformParameterRule_dict) -> PlatformParameterRule :
+    def from_dict(cls, rule_dict : PlatformParameterRule_dict) -> PlatformParameterRule:
         """Returns an PlatformParameterRule object from a dict.
 
         Args:
