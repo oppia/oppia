@@ -238,7 +238,7 @@ class PlatformParameterFilter:
         'app_version': ['=', '<', '<=', '>', '>='],
     }
 
-    def __init__(self, filter_type: str , conditions: List[Tuple[str, str]] ) -> None:
+    def __init__(self, filter_type: str , conditions: List[Tuple[str, str]]) -> None:
         self._type = filter_type
         self._conditions = conditions
 
