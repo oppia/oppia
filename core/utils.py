@@ -1195,4 +1195,4 @@ def url_open(source_url: str) -> Any:
     # TODO(#12912): Remove pylint disable after the arg-name-for-non-keyword-arg
     # check is refactored.
     context = ssl.create_default_context(cafile=certifi.where())  # pylint: disable=arg-name-for-non-keyword-arg
-    return urllib.request.urlopen(source_url, context=context)
+    return urllib.request.urlopen(source_url, context=context) # type: ignore[no-any-return, no-untyped-call]
