@@ -693,6 +693,8 @@ class _Validators:
 
         Args:
             obj: str. The string to verify.
+            choices: List[str]. All valid extensions.
+            match_case: bool. Whether the match is case sensitive.
 
         Returns:
             bool. Whether the given object is a filename with valid
@@ -700,7 +702,7 @@ class _Validators:
         """
         dot_index = obj.rfind('.')
         extension = obj[dot_index + 1:]
-        if match_case == False:
+        if match_case is False:
             extension = extension.lower()
             choices = [choice.lower() for choice in choices]
         if extension not in choices:

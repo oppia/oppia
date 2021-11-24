@@ -898,10 +898,10 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
             'should_end_with')
         self.assertTrue(should_end_with('abc.xyz', ['XYZ', 'efg']))
         self.assertTrue(should_end_with('abc.XyZ', ['efg', 'XyZ'], True))
-        
+
         self.assertFalse(should_end_with('abc.def', ['xyz', 'efg']))
         self.assertFalse(should_end_with('abc.XYZ', ['xyz', 'efg'], True))
-        
+
 
 class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
     """Test schema-based normalization of objects."""
