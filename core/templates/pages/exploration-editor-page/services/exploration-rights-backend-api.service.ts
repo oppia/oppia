@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Backend api service for Setting tab;
+ * @fileoverview Backend api service for Exploration Rights Service;
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
