@@ -683,7 +683,11 @@ class _Validators:
             return False
 
     @staticmethod
-    def has_allowed_audio_extension(obj: str) -> bool:
+    def should_end_with(
+        obj: str,
+        choices: List[str],
+        match_case: Optional[bool] = False
+    ) -> bool:
         """Checks if the given obj (a string) is a filename with
         valid audio extension.
 
@@ -695,7 +699,10 @@ class _Validators:
             audio extension.
         """
         dot_index = obj.rfind('.')
-        extension = obj[dot_index + 1:].lower()
-        if extension not in feconf.ACCEPTED_AUDIO_EXTENSIONS:
+        extension = obj[dot_index + 1:]
+        if match_case == False:
+            extension = extension.lower()
+            choices = [choice.lower() for choice in choices]
+        if extension not in choices:
             return False
         return True

@@ -68,7 +68,8 @@ class AudioUploadHandler(base.BaseHandler):
                         'id': 'is_regex_matched',
                         'regex_pattern': r'^[A-Za-z0-9-]+[.][a-z0-9]+$'
                     }, {
-                        'id': 'has_allowed_audio_extension'
+                        'id': 'should_end_with',
+                        'choices': list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys())
                     }]
                 }
             }
