@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import base64
+import certifi 
 import collections
 import datetime
 import hashlib
@@ -26,6 +27,7 @@ import json
 import os
 import random
 import re
+import ssl  
 import string
 import sys
 import time
@@ -1179,3 +1181,17 @@ def quoted(s: str) -> str:
         str. The quoted string.
     """
     return json.dumps(s)
+
+
+def url_open(source_url):
+    """Opens a URL and returns the response.
+
+    Args:
+        source_url: str. The URL.
+    Returns:
+        urlopen. The 'urlopen' object.
+    """
+    # TODO(#12912): Remove pylint disable after the arg-name-for-non-keyword-arg
+    # check is refactored.
+    context = ssl.create_default_context(cafile=certifi.where())  # pylint: disable=arg-name-for-non-keyword-arg
+    return urllib.request.urlopen(source_url, context=context)

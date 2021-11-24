@@ -187,10 +187,6 @@ class PythonUtilsTests(test_utils.GenericTestBase):
 class PythonUtilsForPython3Tests(test_utils.GenericTestBase):
     """Tests for feature detection utilities for Python 3."""
 
-    def test_string_io(self):
-        stdout = io.StringIO()
-        self.assertIsInstance(stdout, io.StringIO)
-
     def test_unicode_and_str_chars_in_file(self):
         self.assertIsInstance(unicode_and_str_handler.SOME_STR_TEXT, str)
         self.assertIsInstance(
