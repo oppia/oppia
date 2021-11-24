@@ -216,7 +216,7 @@ class EvaluationContext:
             client_context_dict.get('browser_type'),
             client_context_dict.get('app_version'),
             server_context_dict.get('server_mode'), # type: ignore[arg-type]
-            )
+        )
 
 
 class PlatformParameterFilter:
