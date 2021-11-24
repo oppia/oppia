@@ -17,7 +17,7 @@
  */
 
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { SmoothHeightComponent } from './smooth-height-animation.component';
+import { SmoothHeightComponent } from './smooth-height-animator.component';
 
 describe('Smooth height animation component', () => {
   let componentInstance: SmoothHeightComponent;
