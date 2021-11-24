@@ -52,7 +52,7 @@ class FilterDict(TypedDict):
     type: str
     conditions: List[Tuple[str,str]]
 
-class PlatformParameterRule_dict(TypedDict):
+class PlatformParameterRuleDict(TypedDict):
     filters: List[Filter_dict]
     value_when_matched: Any
 
