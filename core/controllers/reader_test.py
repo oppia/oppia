@@ -1203,7 +1203,9 @@ class LearnerProgressTest(test_utils.GenericTestBase):
 
         payload = {
             'client_time_spent_in_secs': 0,
-            'params': {},
+            'params': {
+                'param1': 'value'
+            },
             'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
             'state_name': 'final',
             'version': 1
