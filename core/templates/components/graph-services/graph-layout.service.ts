@@ -590,25 +590,23 @@ export class StateGraphLayoutService {
   }
 
   modifyPositionValues(
-      nodeData: NodeDataDict, graphWidth: number,
-      graphHeight: number): NodeDataDict {
+    nodeData: Record<string, number>[], graphWidth: number,
+    graphHeight: number): Record<string, number>[] {
     var HORIZONTAL_NODE_PROPERTIES = ['x0', 'width', 'xLabel'];
     var VERTICAL_NODE_PROPERTIES = ['y0', 'height', 'yLabel'];
-      
+
     // Change the position values in nodeData to use pixels.
     for (var nodeId in nodeData) {
       for (var i = 0; i < HORIZONTAL_NODE_PROPERTIES.length; i++) {
-        nodeData[nodeId][HORIZONTAL_NODE_PROPERTIES[i]] = (
-          graphWidth *
-          nodeData[nodeId][HORIZONTAL_NODE_PROPERTIES[i]]);
-        nodeData[nodeId][VERTICAL_NODE_PROPERTIES[i]] = (
-          graphHeight *
-          nodeData[nodeId][VERTICAL_NODE_PROPERTIES[i]]);
+        let nodeeData = nodeData[nodeId] as Record<string, number>;
+        (nodeeData[(HORIZONTAL_NODE_PROPERTIES[i]) as string]) = (
+          graphWidth * nodeeData[HORIZONTAL_NODE_PROPERTIES[i]]);
+        nodeeData[VERTICAL_NODE_PROPERTIES[i]] = (
+          graphHeight * nodeeData[VERTICAL_NODE_PROPERTIES[i]]);
       }
     }
     return nodeData;
   }
-
   getGraphWidth(maxNodesPerRow: number, maxNodeLabelLength: number): number {
     // A rough upper bound for the width of a single letter, in pixels,
     // to use as a scaling factor to determine the width of graph nodes.
