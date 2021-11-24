@@ -22,7 +22,7 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { fakeAsync, tick } from '@angular/core/testing';
 require('services/ngb-modal.service.ts');
 
-describe('Story Creation Service', () => {
+fdescribe('Story Creation Service', () => {
   let $rootScope = null;
   let $scope = null;
   let StoryCreationService = null;
@@ -146,4 +146,14 @@ describe('Story Creation Service', () => {
       }).toThrowError('Story fields cannot be empty');
     })
   );
+
+  it('should do nothing when user cancels the topic creation modal',
+    fakeAsync(() => {
+      spyOn(ngbModal, 'open').and.returnValue({
+        result: Promise.reject()
+      } as NgbModalRef);
+      StoryCreationService.createNewCanonicalStory();
+      tick();
+      expect(ngbModal.open).toHaveBeenCalled();
+  }));
 });
