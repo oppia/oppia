@@ -65,7 +65,12 @@ export class CreateNewStoryModalComponent extends ConfirmOrCancelModal {
       this.newlyCreatedStory.urlFragment, () => {
         this.storyUrlFragmentExists = (
           this.storyEditorStateService.getStoryWithUrlFragmentExists());
+        $rootScope.$applyAsync();
       });
+  }
+
+  updateView(): void{
+    $scope.$applyAsync();
   }
 
   isValid(): boolean {

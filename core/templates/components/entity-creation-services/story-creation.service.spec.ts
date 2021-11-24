@@ -155,5 +155,6 @@ describe('Story Creation Service', () => {
       StoryCreationService.createNewCanonicalStory();
       tick();
       expect(ngbModal.open).toHaveBeenCalled();
-  }));
+    })
+  );
 });

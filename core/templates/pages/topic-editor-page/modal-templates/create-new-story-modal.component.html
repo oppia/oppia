@@ -76,7 +76,8 @@
                                 [disabled]="false"
                                 [useLocalStorage]="true"
                                 [allowedBgColors]="allowedBgColors"
-                                previewDescriptionBgColor="#2F6687">
+                                previewDescriptionBgColor="#2F6687"
+                                (image-save)="updateView()">
       </oppia-thumbnail-uploader>
     </div>
   </div>
