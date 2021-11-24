@@ -22,15 +22,15 @@ import { Injectable } from '@angular/core';
 
 export interface ExplorationRightsBackendData {
   rights: {
-    'cloned_from': string
-    'status': string,
-    'community_owned': boolean,
-    'owner_names': string[],
-    'editor_names': string[],
-    'voice_artist_names': string[],
-    'viewer_names': string[],
-    'viewable_if_private': boolean
-  }
+    'cloned_from': string;
+    'status': string;
+    'community_owned': boolean;
+    'owner_names': string[];
+    'editor_names': string[];
+    'voice_artist_names': string[];
+    'viewer_names': string[];
+    'viewable_if_private': boolean;
+  };
 }
 
 @Injectable({
