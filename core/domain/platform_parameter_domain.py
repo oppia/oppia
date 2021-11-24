@@ -558,7 +558,7 @@ class PlatformParameterRule:
             filter_domain.type == 'server_mode'
             for filter_domain in self._filters)
 
-    def to_dict(self) -> PlatformParameterRule_dict :
+    def to_dict(self) -> PlatformParameterRule_dict:
         """Returns a dict representation of the PlatformParameterRule domain
         object.
 
