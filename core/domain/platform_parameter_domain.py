@@ -139,7 +139,7 @@ class EvaluationContext:
         return self._app_version
 
     @property
-    def server_mode(self) -> SERVER_MODES :
+    def server_mode(self) -> SERVER_MODES:
         """Returns the server mode of Oppia.
 
         Returns:
