@@ -620,10 +620,8 @@ export class TopicObjectFactory {
     );
   }
 
-  /**
- * TODO(#14309): Remove the interstitial topic so that full topic can be
- * created from start.
- */
+  // TODO(#14309): Remove the interstitial topic so that full topic can be
+  // created from start.
   // Create an interstitial topic that until
   // the actual topic is fetched from the backend.
   createInterstitialTopic(): Topic {

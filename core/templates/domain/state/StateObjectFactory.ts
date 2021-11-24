@@ -168,10 +168,8 @@ export class StateObjectFactory {
     return constants.NEW_STATE_TEMPLATE as StateBackendDict;
   }
 
-  /**
- * TODO(#14313): Remove the createDefaultState so that full state can be
- * created from start.
- */
+  // TODO(#14313): Remove the createDefaultState so that full state can be
+  // created from start.
   // Create a default state until the actual state is saved.
   // Passes name as null before saving a state.
   createDefaultState(newStateName: string | null): State {

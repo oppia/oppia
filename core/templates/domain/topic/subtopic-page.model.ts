@@ -42,7 +42,6 @@ export class SubtopicPage {
   ) {}
 
   // Returns 'null' when the subtopic page is not yet saved on the backend.
-
   // Returns the id of the subtopic page.
   getId(): string | null {
     return this.id;
@@ -100,10 +99,8 @@ export class SubtopicPage {
       'en');
   }
 
-  /**
- * TODO(#14310): Remove the interstitial subtopic so that full subtopic can be
- * created from start.
- */
+  // TODO(#14310): Remove the interstitial subtopic so that full subtopic can be
+  // created from start.
   // Create an interstitial subtopic that would be displayed in the editor until
   // the actual subtopic is fetched from the backend.
   static createInterstitialSubtopicPage(): SubtopicPage {

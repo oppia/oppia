@@ -211,10 +211,8 @@ export class QuestionObjectFactory {
   constructor(
     private stateObject: StateObjectFactory) {}
 
-  /**
- * TODO(#14312): Remove the createDefaultQuestion so that full question can be
- * created from start.
- */
+  // TODO(#14312): Remove the createDefaultQuestion so that full question can be
+  // created from start.
   // Create a default question until the actual question is saved.
   createDefaultQuestion(skillIds: string[]): Question {
     return new Question(
