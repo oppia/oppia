@@ -232,7 +232,7 @@ def dict_from_yaml(yaml_str: str) -> Dict[str, Any]:
         raise InvalidInputException(e)
 
 
-def yaml_from_dict(dictionary: Dict[str, Any], width: int =80) -> Any:
+def yaml_from_dict(dictionary: Dict[str, Any], width: int = 80) -> Any:
     """Gets the YAML representation of a dict.
 
     Args:
@@ -244,7 +244,7 @@ def yaml_from_dict(dictionary: Dict[str, Any], width: int =80) -> Any:
         str. Converted yaml of the passed dictionary.
     """
     return yaml.dump(
-            dictionary, allow_unicode=True, width=width
+           dictionary, allow_unicode=True, width=width
     )
 
 
