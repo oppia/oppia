@@ -17,7 +17,6 @@
 from __future__ import annotations
 
 import base64
-import certifi 
 import collections
 import datetime
 import hashlib
@@ -27,7 +26,6 @@ import json
 import os
 import random
 import re
-import ssl  
 import string
 import sys
 import time
@@ -47,6 +45,8 @@ _YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-5.1.2')
 sys.path.insert(0, _YAML_PATH)
 
 import yaml  # isort:skip  # pylint: disable=wrong-import-position
+import certifi  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+import ssl  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 DATETIME_FORMAT = '%m/%d/%Y, %H:%M:%S:%f'
 ISO_8601_DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%fz'
@@ -1183,7 +1183,7 @@ def quoted(s: str) -> str:
     return json.dumps(s)
 
 
-def url_open(source_url):
+def url_open(source_url) -> urllib.request.urlopen:
     """Opens a URL and returns the response.
 
     Args:
