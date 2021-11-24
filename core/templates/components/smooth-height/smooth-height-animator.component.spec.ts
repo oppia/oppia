@@ -17,20 +17,20 @@
  */
 
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { SmoothHeightComponent } from './smooth-height-animator.component';
+import { SmoothHeightAnimatorComponent } from './smooth-height-animator.component';
 
-describe('Smooth height animation component', () => {
-  let componentInstance: SmoothHeightComponent;
-  let fixture: ComponentFixture<SmoothHeightComponent>;
+describe('Smooth height animator component', () => {
+  let componentInstance: SmoothHeightAnimatorComponent;
+  let fixture: ComponentFixture<SmoothHeightAnimatorComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [SmoothHeightComponent]
+      declarations: [SmoothHeightAnimatorComponent]
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(SmoothHeightComponent);
+    fixture = TestBed.createComponent(SmoothHeightAnimatorComponent);
     componentInstance = fixture.componentInstance;
   });
 
