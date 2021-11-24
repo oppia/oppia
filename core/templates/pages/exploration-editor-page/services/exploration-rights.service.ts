@@ -102,8 +102,7 @@ export class ExplorationRightsService {
   }
 
   saveRoleChanges(
-      newMemberUsername: string,
-      newMemberRole: string): Promise<void> {
+      newMemberUsername: string, newMemberRole: string): Promise<void> {
     const requestUrl = (
       '/createhandler/rights/' + this.explorationDataService.explorationId);
     return this.explorationRightsBackendApiService.saveRoleChangesPutData(
