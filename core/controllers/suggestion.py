@@ -70,6 +70,13 @@ class SuggestionHandler(base.BaseHandler):
         ):
             self.render_json(self.values)
             return
+
+        # Images for question suggestions are already stored in the server
+        # before actually the question is submitted. Therefore no need of
+        # uploading images when the suggestion type is 'add_question'. But this
+        # is not good, since when the user cancels a question suggestion after
+        # adding an image, there is no method to remove the uploaded image.
+        # See more - https://github.com/oppia/oppia/issues/14298
         if self.payload.get(
             'suggestion_type') != (feconf.SUGGESTION_TYPE_ADD_QUESTION):
             _upload_suggestion_images(

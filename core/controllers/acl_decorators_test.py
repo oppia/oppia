@@ -4748,7 +4748,7 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
             self.assertEqual(response['entity_type'], 'question_suggestions')
         self.logout()
 
-    def test_cannot_submit_images_to_questions_by_unaunthenticated_users(self):
+    def test_unauthenticated_users_cannot_submit_images_to_questions(self):
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id, self.admin_id, description='Description')
         with self.swap(self, 'testapp', self.mock_testapp):

@@ -26,6 +26,7 @@ from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import html_validation_service
 from core.domain import question_domain
@@ -2436,6 +2437,86 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             suggestion_dict['change'], suggestion_dict['score_category'],
             suggestion_dict['language_code'], False, self.fake_date)
         suggestion.accept('commit_message')
+
+    def test_accept_suggestion_with_image_region_interactions(self):
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
+            encoding=None) as f:
+            original_image_content = f.read()
+        fs_services.save_original_and_compressed_versions_of_image(
+            'image.png', 'question_suggestions', 'skill1.thread1',
+            original_image_content, 'image', True)
+        html_content = (
+            '<p>Value</p>')
+        question_state_data = self._create_valid_question_data(
+            'default_state')
+        customization_args_dict = {
+            'highlightRegionsOnHover': {'value': True},
+            'imageAndRegions': {
+                'value': {
+                    'imagePath': 'image.png',
+                    'labeledRegions': [{
+                        'label': 'classdef',
+                        'region': {
+                            'area': [
+                                [0.004291845493562232, 0.004692192192192192],
+                                [0.40987124463519314, 0.05874624624624625]
+                            ],
+                            'regionType': 'Rectangle'
+                        }
+                    }]
+                }
+            }
+        }
+        question_state_data.state.update_interaction_customization_args(
+            customization_args_dict)
+        question_state_dict = question_state_data.to_dict()
+        question_state_dict['content']['html'] = html_content
+        self.save_new_skill('skill1', self.author_id, description='description')
+
+        suggestion_dict = {
+            'suggestion_id': 'skill1.thread1',
+            'suggestion_type': feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            'target_type': feconf.ENTITY_TYPE_SKILL,
+            'target_id': 'skill1',
+            'target_version_at_submission': 1,
+            'status': suggestion_models.STATUS_ACCEPTED,
+            'author_name': 'author',
+            'final_reviewer_id': self.reviewer_id,
+            'change': {
+                'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+                'question_dict': {
+                    'question_state_data': question_state_dict,
+                    'language_code': 'en',
+                    'question_state_data_schema_version': (
+                        feconf.CURRENT_STATE_SCHEMA_VERSION),
+                    'linked_skill_ids': ['skill_1'],
+                    'inapplicable_skill_misconception_ids': []
+                },
+                'skill_id': 'skill1',
+                'skill_difficulty': 0.3,
+            },
+            'score_category': 'question.skill1',
+            'language_code': 'en',
+            'last_updated': utils.get_time_in_millisecs(self.fake_date)
+        }
+        accepted_suggestion = suggestion_registry.SuggestionAddQuestion(
+            suggestion_dict['suggestion_id'], suggestion_dict['target_id'],
+            suggestion_dict['target_version_at_submission'],
+            suggestion_dict['status'], self.author_id, self.reviewer_id,
+            suggestion_dict['change'], suggestion_dict['score_category'],
+            suggestion_dict['language_code'], False, self.fake_date)
+        accepted_suggestion.accept('commit_message')
+
+        suggestion = suggestion_services.get_suggestion_by_id(
+            suggestion_dict['suggestion_id'])
+        destination_fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_QUESTION, suggestion.change.question_id))
+        self.assertTrue(destination_fs.isfile('image/%s' % 'image.png'))
+        self.assertEqual(
+            suggestion.status,
+            suggestion_models.STATUS_ACCEPTED)
 
     def test_contructor_updates_state_shema_in_change_cmd(self):
         score_category = (
