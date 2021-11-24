@@ -421,7 +421,7 @@ class PlatformParameterFilter:
         return False
 
 
-    def _is_first_version_smaller(self, version_a_str: str, version_b_str: str) -> bool:
+    def _is_first_version_smaller(self, version_a: str, version_b: str) -> bool:
         """Compares two version strings, return True if the first version is
         smaller. 
 
