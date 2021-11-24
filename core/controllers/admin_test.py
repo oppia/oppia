@@ -66,9 +66,10 @@ BOTH_MODERATOR_AND_ADMIN_USERNAME = 'moderatorandadm1n'
 class PARAM_NAMES(enum.Enum): # pylint: disable=invalid-name
     """Enum for parameter names."""
 
-    test_feature_1 = 'test_feature_1'
+    test_feature_1 = 'test_feature_1' # pylint: disable=invalid-name
 
-FEATURE_STAGES = platform_parameter_domain.FEATURE_STAGES
+
+FEATURE_STAGES = platform_parameter_domain.FEATURE_STAGES # pylint: disable=invalid-name
 
 
 class AdminIntegrationTest(test_utils.GenericTestBase):
