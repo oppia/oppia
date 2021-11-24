@@ -48,7 +48,7 @@ class DATA_TYPES(enum.Enum):
 class ServerContextDict(TypedDict):
     server_mode: SERVER_MODES
 
-class Filter_dict(TypedDict):
+class FilterDict(TypedDict):
     type: str
     conditions: List[Tuple[str,str]]
 
