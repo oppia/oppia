@@ -28,7 +28,7 @@ import { FeaturedTranslationLanguage } from 'domain/opportunity/featured-transla
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import { EventEmitter } from '@angular/core';
 
-fdescribe('Translation language selector', () => {
+describe('Translation language selector', () => {
   let component: TranslationLanguageSelectorComponent;
   let fixture: ComponentFixture<TranslationLanguageSelectorComponent>;
   let translationLanguageService: TranslationLanguageService;
