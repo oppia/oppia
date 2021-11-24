@@ -46,6 +46,7 @@ interface QuestionPlayerState {
 export class QuestionPlayerStateService {
   questionPlayerState: QuestionPlayerState = {};
   private _questionSessionCompletedEventEmitter = new EventEmitter<void>();
+  private _resultsPageIsLoadedEventEmitter = new EventEmitter<boolean>();
 
   private _getCurrentTime(): number {
     return new Date().getTime();
@@ -117,6 +118,10 @@ export class QuestionPlayerStateService {
 
   get onQuestionSessionCompleted(): EventEmitter<void> {
     return this._questionSessionCompletedEventEmitter;
+  }
+
+  get resultsPageIsLoadedEventEmitter(): EventEmitter<boolean> {
+    return this._resultsPageIsLoadedEventEmitter;
   }
 }
 
