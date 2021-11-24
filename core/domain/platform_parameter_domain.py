@@ -45,7 +45,7 @@ class DATA_TYPES(enum.Enum):
     string = 'string'
     number = 'number'
 
-class Server_context_dict(TypedDict):
+class ServerContextDict(TypedDict):
     server_mode: SERVER_MODES
 
 class Filter_dict(TypedDict):
