@@ -59,7 +59,7 @@ export class TranslationLanguageSelectorComponent implements OnInit {
     this.translationLanguageService.onActiveLanguageChanged.subscribe(
       () => {
         this.languageSelection = this.languageIdToDescription[
-          this.translationLanguageService.getActiveLanguageCode()]
+          this.translationLanguageService.getActiveLanguageCode()];
       });
     this.options = this.languageUtilService
       .getAllVoiceoverLanguageCodes().map(languageCode => {

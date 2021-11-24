@@ -185,14 +185,14 @@ fdescribe('Translation language selector', () => {
 
   it('should show the correct language when the language is changed'
     , () => {
-      expect(component.languageSelection).toBe('Select a language...');
+      expect(component.languageSelection).toBe('English');
       component.ngOnInit();
       spyOn(
         translationLanguageService, 'getActiveLanguageCode').and.returnValue(
-        'en');
+        'fr');
 
       activeLanguageChangedEmitter.emit();
 
-      expect(component.languageSelection).toBe('English');
+      expect(component.languageSelection).toBe('French');
     });
 });
