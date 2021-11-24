@@ -603,8 +603,7 @@ class PlatformParameter:
     # Module in python.utils has no attribute BASESTRING
     DATA_TYPE_PREDICATES_DICT = {
         DATA_TYPES.bool.value: lambda x: isinstance(x, bool),
-        DATA_TYPES.string.value: (
-            lambda x: isinstance(x, python_utils.BASESTRING)), # type: ignore[attr-defined]
+        DATA_TYPES.string.value: lambda x: isinstance(x, str),
         DATA_TYPES.number.value: lambda x: isinstance(x, (float, int)),
     }
 
