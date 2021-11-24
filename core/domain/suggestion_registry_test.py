@@ -2468,7 +2468,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
                 }
             }
         }
-        question_state_data.state.update_interaction_customization_args(
+        question_state_data.update_interaction_customization_args(
             customization_args_dict)
         question_state_dict = question_state_data.to_dict()
         question_state_dict['content']['html'] = html_content
