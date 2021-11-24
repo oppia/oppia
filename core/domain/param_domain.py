@@ -31,8 +31,7 @@ from core.domain import object_registry
 from core.domain import value_generators_domain
 from value_generators_domain import BaseValueGenerator
 
-# TypedDict used for MyPy Type annotations
-class ParamChange_dict(TypedDict):
+class ParamChangeDict(TypedDict):
     name: str
     generator_id: str
     customization_args: Dict[str,str]
