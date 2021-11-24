@@ -27,9 +27,10 @@ Registry = registry.Registry
 FEATURE_STAGES = platform_parameter_domain.FEATURE_STAGES # pylint: disable=invalid-name
 DATA_TYPES = platform_parameter_domain.DATA_TYPES # pylint: disable=invalid-name
 
-PARAM_NAMES = enum.Enum('PARAM_NAMES', {
-    'dummy_feature': 'dummy_feature',
-    'dummy_parameter': 'dummy_parameter'})
+class PARAM_NAMES(enum.Enum):
+    """Enum for parameter names."""
+    dummy_feature = 'dummy_feature'
+    dummy_parameter = 'dummy_parameter'
 
 # Platform parameters should all be defined below.
 

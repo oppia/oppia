@@ -26,9 +26,11 @@ from core.domain import platform_parameter_list as param_list
 from core.domain import platform_parameter_registry as registry
 from core.tests import test_utils
 
-PARAM_NAMES = enum.Enum('PARAM_NAMES', {
-    'parameter_a': 'parameter_a',
-     'parameter_b': 'parameter_b'})
+class PARAM_NAME(enum.Enum):
+    """Enum for parameter names."""
+    parameter_a = 'parameter_a'
+    parameter_b = 'parameter_b'
+
 DATA_TYPES = param_domain.DATA_TYPES
 
 
