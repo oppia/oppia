@@ -303,16 +303,6 @@ class BaseSuggestion:
         new_image_filenames = utils.compute_list_difference(
             all_image_filenames, target_image_filenames)
 
-        question_dict = self.change.question_dict
-        question = question_domain.Question.from_dict(question_dict)
-
-        # Image for interactions with Image Regions in not included as an html
-        # string. This image is as the imagePath in customization args.
-        if question.question_state_data.interaction.id == 'ImageClickInput':
-            new_image_filenames.append(
-                question.question_state_data.interaction.customization_args[
-                    'imageAndRegions'].value['imagePath'])
-
         return new_image_filenames
 
     def _copy_new_images_to_target_entity_storage(self):
@@ -905,6 +895,13 @@ class SuggestionAddQuestion(BaseSuggestion):
         # Images need to be stored in the storage path corresponding to the
         # question.
         new_image_filenames = self.get_new_image_filenames_added_in_suggestion()
+
+        # Image for interactions with Image Regions in not included as an html
+        # string. This image is as the imagePath in customization args.
+        if question.question_state_data.interaction.id == 'ImageClickInput':
+            new_image_filenames.append(
+                question.question_state_data.interaction.customization_args[
+                    'imageAndRegions'].value['imagePath'])
         fs_services.copy_images(
             self.image_context, self.target_id, feconf.ENTITY_TYPE_QUESTION,
             question_dict['id'], new_image_filenames)
