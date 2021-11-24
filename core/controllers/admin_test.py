@@ -63,8 +63,9 @@ from core.tests import test_utils
 BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
 BOTH_MODERATOR_AND_ADMIN_USERNAME = 'moderatorandadm1n'
 
-class PARAM_NAME(enum.Enum):
+class PARAM_NAMES(enum.Enum): # pylint: disable=invalid-name
     """Enum for parameter names."""
+
     test_feature_1 = 'test_feature_1'
 
 FEATURE_STAGES = platform_parameter_domain.FEATURE_STAGES
