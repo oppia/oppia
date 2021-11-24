@@ -34,7 +34,7 @@ from value_generators_domain import BaseValueGenerator
 class ParamChangeDict(TypedDict):
     name: str
     generator_id: str
-    customization_args: Dict[str,str]
+    customization_args: Dict[str, str]
 
 class ParamSpec:
     """Value object for an exploration parameter specification."""
