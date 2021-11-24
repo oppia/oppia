@@ -50,18 +50,18 @@ interface NodeData {
   depth: number;
   offset: number;
   reachable: boolean;
-  y0: number;
-  x0: number;
-  yLabel: number;
-  xLabel: number;
-  height: number;
-  width: number;
-  id: string;
-  label: string;
+  y0: number | null;
+  x0: number | null;
+  yLabel: number | null;
+  xLabel: number | null;
+  height: number | null;
+  width: number | null;
+  id: string | null;
+  label: string | null;
   reachableFromEnd: boolean;
 }
 
-interface NodeDataDict {
+interface NodeDataDict{
   [nodeId: string]: NodeData;
 }
 
@@ -73,11 +73,11 @@ export class StateGraphLayoutService {
 
   // The last result of a call to computeLayout(). Used for determining the
   // order in which to specify states in rules.
-  lastComputedArrangement: NodeDataDict = null;
+  lastComputedArrangement: NodeDataDict | undefined;
 
   getGraphAsAdjacencyLists(
       nodes: GraphNodes, links: GraphLink[]): GraphAdjacencyLists {
-    var adjacencyLists = {};
+    var adjacencyLists: GraphAdjacencyLists = {};
 
     for (var nodeId in nodes) {
       adjacencyLists[nodeId] = [];
@@ -94,7 +94,7 @@ export class StateGraphLayoutService {
 
   getIndentationLevels(
       adjacencyLists: GraphAdjacencyLists, trunkNodeIds: string[]): number[] {
-    var indentationLevels = [];
+    var indentationLevels: number[] = [];
 
     // Recursively find and indent the longest shortcut for the segment of
     // nodes ranging from trunkNodeIds[startInd] to trunkNodeIds[endInd]
@@ -183,7 +183,7 @@ export class StateGraphLayoutService {
     var bestPath = [initNodeId];
     // Note that this is a 'global variable' for the purposes of the
     // backtracking computation.
-    var currentPath = [];
+    var currentPath: string[] = [];
 
     var backtrack = (currentNodeId: string) => {
       currentPath.push(currentNodeId);
@@ -250,12 +250,12 @@ export class StateGraphLayoutService {
         label: null,
         height: null,
         width: null,
-        reachableFromEnd: false
+        reachableFromEnd: false,
       };
     }
 
     var maxDepth = 0;
-    var maxOffsetInEachLevel = {
+    var maxOffsetInEachLevel: {[id: number]: number} = {
       0: 0
     };
     var trunkNodesIndentationLevels = this.getIndentationLevels(
@@ -485,7 +485,7 @@ export class StateGraphLayoutService {
     return nodeData;
   }
 
-  getLastComputedArrangement(): NodeDataDict {
+  getLastComputedArrangement(): NodeDataDict | undefined {
     return cloneDeep(this.lastComputedArrangement);
   }
 
@@ -500,15 +500,15 @@ export class StateGraphLayoutService {
 
     for (var nodeId in nodeData) {
       leftEdge = Math.min(
-        nodeData[nodeId].x0 - BORDER_PADDING, leftEdge);
+        Number(nodeData[nodeId].x0) - BORDER_PADDING, leftEdge);
       topEdge = Math.min(
-        nodeData[nodeId].y0 - BORDER_PADDING, topEdge);
+        Number(nodeData[nodeId].y0) - BORDER_PADDING, topEdge);
       rightEdge = Math.max(
-        nodeData[nodeId].x0 + BORDER_PADDING + nodeData[nodeId].width,
-        rightEdge);
+        Number(nodeData[nodeId].x0) + BORDER_PADDING +
+        Number(nodeData[nodeId].width), rightEdge);
       bottomEdge = Math.max(
-        nodeData[nodeId].y0 + BORDER_PADDING + nodeData[nodeId].height,
-        bottomEdge);
+        Number(nodeData[nodeId].y0) + BORDER_PADDING +
+        Number(nodeData[nodeId].height), bottomEdge);
     }
 
     return {
@@ -520,7 +520,8 @@ export class StateGraphLayoutService {
   }
 
   getAugmentedLinks(
-      nodeData: NodeDataDict, nodeLinks: GraphLink[]): AugmentedLink[] {
+      nodeData: NodeDataDict,
+      nodeLinks: GraphLink[]): AugmentedLink[] | undefined {
     var links = cloneDeep(nodeLinks);
     var augmentedLinks: AugmentedLink[] = links.map(link => {
       return {
@@ -547,39 +548,42 @@ export class StateGraphLayoutService {
         var targetWidth = link.target.width;
         var targetHeight = link.target.height;
 
-        var dx = targetx - sourcex;
-        var dy = targety - sourcey;
+        if (targetx && sourcex && targety && sourcey && targetWidth &&
+          sourceWidth && targetHeight && sourceHeight) {
+          var dx = targetx - sourcex;
+          var dy = targety - sourcey;
 
-        /* Fractional amount of truncation to be applied to the end of
-           each link. */
-        var startCutoff = (sourceWidth / 2) / Math.abs(dx);
-        var endCutoff = (targetWidth / 2) / Math.abs(dx);
-        if (dx === 0 || dy !== 0) {
-          startCutoff = (
-            (dx === 0) ? (sourceHeight / 2) / Math.abs(dy) :
-            Math.min(startCutoff, (sourceHeight / 2) / Math.abs(dy)));
-          endCutoff = (
-            (dx === 0) ? (targetHeight / 2) / Math.abs(dy) :
-            Math.min(endCutoff, (targetHeight / 2) / Math.abs(dy)));
+          /* Fractional amount of truncation to be applied to the end of
+            each link. */
+          var startCutoff = (sourceWidth / 2) / Math.abs(dx);
+          var endCutoff = (targetWidth / 2) / Math.abs(dx);
+          if (dx === 0 || dy !== 0) {
+            startCutoff = (
+              (dx === 0) ? (sourceHeight / 2) / Math.abs(dy) :
+              Math.min(startCutoff, (sourceHeight / 2) / Math.abs(dy)));
+            endCutoff = (
+              (dx === 0) ? (targetHeight / 2) / Math.abs(dy) :
+              Math.min(endCutoff, (targetHeight / 2) / Math.abs(dy)));
+          }
+
+          var dxperp = targety - sourcey;
+          var dyperp = sourcex - targetx;
+          var norm = Math.sqrt(dxperp * dxperp + dyperp * dyperp);
+          dxperp /= norm;
+          dyperp /= norm;
+
+          var midx = sourcex + dx / 2 + dxperp * (sourceHeight / 4);
+          var midy = sourcey + dy / 2 + dyperp * (targetHeight / 4);
+          var startx = sourcex + startCutoff * dx;
+          var starty = sourcey + startCutoff * dy;
+          var endx = targetx - endCutoff * dx;
+          var endy = targety - endCutoff * dy;
+
+          // Draw a quadratic bezier curve.
+          augmentedLinks[i].d = (
+            'M' + startx + ' ' + starty + ' Q ' + midx + ' ' + midy +
+            ' ' + endx + ' ' + endy);
         }
-
-        var dxperp = targety - sourcey;
-        var dyperp = sourcex - targetx;
-        var norm = Math.sqrt(dxperp * dxperp + dyperp * dyperp);
-        dxperp /= norm;
-        dyperp /= norm;
-
-        var midx = sourcex + dx / 2 + dxperp * (sourceHeight / 4);
-        var midy = sourcey + dy / 2 + dyperp * (targetHeight / 4);
-        var startx = sourcex + startCutoff * dx;
-        var starty = sourcey + startCutoff * dy;
-        var endx = targetx - endCutoff * dx;
-        var endy = targety - endCutoff * dy;
-
-        // Draw a quadratic bezier curve.
-        augmentedLinks[i].d = (
-          'M' + startx + ' ' + starty + ' Q ' + midx + ' ' + midy +
-          ' ' + endx + ' ' + endy);
       }
     }
     return augmentedLinks;
@@ -588,9 +592,6 @@ export class StateGraphLayoutService {
   modifyPositionValues(
       nodeData: NodeDataDict, graphWidth: number,
       graphHeight: number): NodeDataDict {
-    var HORIZONTAL_NODE_PROPERTIES = ['x0', 'width', 'xLabel'];
-    var VERTICAL_NODE_PROPERTIES = ['y0', 'height', 'yLabel'];
-
     // Change the position values in nodeData to use pixels.
     for (var nodeId in nodeData) {
       for (var i = 0; i < HORIZONTAL_NODE_PROPERTIES.length; i++) {
