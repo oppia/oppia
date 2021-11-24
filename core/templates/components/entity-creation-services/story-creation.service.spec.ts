@@ -129,22 +129,21 @@ describe('Story Creation Service', () => {
 
   it('should throw error if the newly created story is not valid',
     fakeAsync(() => {
-      spyOn(ngbModal, 'open').and.returnValue(
-      {
-        result: Promise.resolve({
-          isValid: () => true,
-          title: 'Title',
-          description: 'Description',
-          urlFragment: 'url'
-        })
-      } as NgbModalRef
-      );
-      try {
+      spyOn(ngbModal, 'open').and.returnValue({
+        result: {
+          then: (successCallback: (arg1) => void, errorCallback) => {
+            successCallback({
+              isValid: () => {
+                return false;
+              }
+            });
+          }
+        }
+      } as NgbModalRef);
+      expect(() => {
         StoryCreationService.createNewCanonicalStory();
         tick();
-      } catch (e) {
-        expect(e).toBe(new Error('Story fields cannot be empty'));
-      }
+      }).toThrowError('Story fields cannot be empty');
     })
   );
 });

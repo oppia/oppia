@@ -24,16 +24,15 @@ import { StoryEditorStateService } from 'pages/story-editor-page/services/story-
 import { TopicEditorStateService } from '../services/topic-editor-state.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 
 @Component({
   selector: 'oppia-create-new-story-modal',
   templateUrl: './create-new-story-modal.component.html'
 })
-
 export class CreateNewStoryModalComponent extends ConfirmOrCancelModal {
-  allowedBgColors: object = constants.ALLOWED_THUMBNAIL_BG_COLORS.story;
-  validUrlFragmentRegex = new RegExp(constants.VALID_URL_FRAGMENT_REGEX);
+  allowedBgColors: object = AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.story;
+  validUrlFragmentRegex = new RegExp(AppConstants.VALID_URL_FRAGMENT_REGEX);
   newlyCreatedStory: NewlyCreatedStory = NewlyCreatedStory.createDefault();
   storyUrlFragmentExists: boolean = false;
   hostname: string = this.windowRef.nativeWindow.location.hostname;
@@ -41,11 +40,11 @@ export class CreateNewStoryModalComponent extends ConfirmOrCancelModal {
     this.topicEditorStateService.getClassroomUrlFragment());
   topicUrlFragment = (
     this.topicEditorStateService.getTopic().getUrlFragment());
-  MAX_CHARS_IN_STORY_TITLE: number = constants.MAX_CHARS_IN_STORY_TITLE;
+  MAX_CHARS_IN_STORY_TITLE: number = AppConstants.MAX_CHARS_IN_STORY_TITLE;
   MAX_CHARS_IN_STORY_URL_FRAGMENT: number = (
-    constants.MAX_CHARS_IN_STORY_URL_FRAGMENT);
+    AppConstants.MAX_CHARS_IN_STORY_URL_FRAGMENT);
   MAX_CHARS_IN_STORY_DESCRIPTION: number = (
-    constants.MAX_CHARS_IN_STORY_DESCRIPTION);
+    AppConstants.MAX_CHARS_IN_STORY_DESCRIPTION);
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -55,14 +54,6 @@ export class CreateNewStoryModalComponent extends ConfirmOrCancelModal {
     private windowRef: WindowRef,
   ) {
     super(ngbActiveModal);
-  }
-
-  save(): void {
-    this.ngbActiveModal.close(this.newlyCreatedStory);
-  }
-
-  cancel(): void {
-    this.ngbActiveModal.dismiss('cancel');
   }
 
   onStoryUrlFragmentChange(): void {

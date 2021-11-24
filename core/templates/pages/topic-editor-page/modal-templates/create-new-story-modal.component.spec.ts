@@ -25,7 +25,7 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { FormsModule } from '@angular/forms';
 import { TopicEditorStateService } from '../services/topic-editor-state.service';
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 
 describe('Create New Story Modal Component', function() {
   let componentInstance: CreateNewStoryModalComponent;
@@ -62,12 +62,6 @@ describe('Create New Story Modal Component', function() {
 
   it('should create', () => {
     expect(componentInstance).toBeDefined();
-  });
-
-  it('should save new story', () => {
-    spyOn(ngbActiveModal, 'close');
-    componentInstance.save();
-    expect(ngbActiveModal.close).toHaveBeenCalled();
   });
 
   it('should cancel', () => {
@@ -112,7 +106,7 @@ describe('Create New Story Modal Component', function() {
     expect(componentInstance.newlyCreatedStory.title).toBe('');
     expect(componentInstance.newlyCreatedStory.description).toBe('');
     expect(componentInstance.MAX_CHARS_IN_STORY_TITLE).toBe(
-      constants.MAX_CHARS_IN_STORY_TITLE);
+      AppConstants.MAX_CHARS_IN_STORY_TITLE);
   });
 
   it('should check if url fragment already exists', () => {
