@@ -96,8 +96,12 @@ class EvaluationContext:
     """Domain object representing the context for parameter evaluation."""
 
     def __init__(
-            self, platform_type: Optional[str], browser_type: Optional[str], 
-            app_version: Optional[str], server_mode: SERVER_MODES) -> None:
+        self, 
+        platform_type: Optional[str], 
+        browser_type: Optional[str], 
+        app_version: Optional[str], 
+        server_mode: SERVER_MODES
+    ) -> None:
         self._platform_type = platform_type
         self._browser_type = browser_type
         self._app_version = app_version
