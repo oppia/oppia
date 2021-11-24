@@ -26,7 +26,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import { GroupedSkillSummaries } from 'pages/skill-editor-page/services/skill-editor-state.service';
 
 interface SubTopicFilterDict {
-  [topicName: string]: { subTopicName: string; checked: boolean }[]
+  [topicName: string]: { subTopicName: string; checked: boolean }[];
 }
 
 @Component({
