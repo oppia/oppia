@@ -20,7 +20,6 @@ from __future__ import annotations
 
 import ast
 import builtins
-import io
 import os
 import sys
 import unittest
