@@ -137,9 +137,7 @@ def main(args=None):
     # the "latter" context (context managers exit in reverse-order).
     with contextlib.ExitStack() as stack, alert_on_exit():
         # ExitStack unwinds in reverse-order, so this will be the final action.
-        stack.callback(
-            notify_about_successful_shutdown
-        )
+        stack.callback(notify_about_successful_shutdown)
 
         build_args = []
         if parsed_args.prod_env:

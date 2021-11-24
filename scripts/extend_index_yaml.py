@@ -104,7 +104,3 @@ def main() -> None:
             ind[key] += value
 
     write_yaml(ind)
-
-
-if __name__ == '__main__':
-    main()

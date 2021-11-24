@@ -136,3 +136,120 @@ class ExtendIndexYamlTest(unittest.TestCase):
                 extend_index_yaml.INDEX_YAML_PATH, 'w', encoding='utf-8'
             )
             mock_open_file().write.assert_called_with(expected_result)
+
+    def test_extend_index_yaml_with_multi_indexes(self):
+        # This is a case which is probably not possible, but considering
+        # that there can be multiple different indexes for kind.
+        index_yaml = """indexes1:
+
+- kind: AppFeedbackReportModel
+  properties:
+  - name: created_on
+  - name: scrubbed_by
+
+- kind: BlogPostRightsModel
+  properties:
+  - name: blog_post_is_published
+  - name: editor_ids
+  - name: last_updated
+    direction: desc
+
+- kind: ClassifierTrainingJobModel
+  properties:
+  - name: status
+  - name: next_scheduled_check_time
+
+indexes2:
+
+- kind: UserContributionProficiencyModel
+  properties:
+  - name: realtime_layer
+  - name: created_on
+
+"""
+        web_inf_index_yaml = """indexes1:
+
+- kind: AppFeedbackReportModel
+  properties:
+  - name: created_on
+  - name: scrubbed_by
+
+- kind: ClassifierTrainingJobModel
+  properties:
+  - name: status
+  - name: next_scheduled_check_time
+
+- kind: CollectionRightsSnapshotMetadataModel
+  properties:
+  - name: committer_id
+  - name: commit_message
+  - name: commit_type
+
+indexes2:
+
+- kind: UserStatsRealtimeModel
+  properties:
+  - name: realtime_layer
+  - name: created_on
+
+- kind: _AE_Pipeline_Record
+  properties:
+  - name: is_root_pipeline
+  - name: start_time
+    direction: desc
+
+"""
+        expected_result = """indexes1:
+
+- kind: AppFeedbackReportModel
+  properties:
+  - name: created_on
+  - name: scrubbed_by
+
+- kind: BlogPostRightsModel
+  properties:
+  - name: blog_post_is_published
+  - name: editor_ids
+  - name: last_updated
+    direction: desc
+
+- kind: ClassifierTrainingJobModel
+  properties:
+  - name: status
+  - name: next_scheduled_check_time
+
+- kind: CollectionRightsSnapshotMetadataModel
+  properties:
+  - name: committer_id
+  - name: commit_message
+  - name: commit_type
+
+indexes2:
+
+- kind: UserContributionProficiencyModel
+  properties:
+  - name: realtime_layer
+  - name: created_on
+
+- kind: UserStatsRealtimeModel
+  properties:
+  - name: realtime_layer
+  - name: created_on
+
+- kind: _AE_Pipeline_Record
+  properties:
+  - name: is_root_pipeline
+  - name: start_time
+    direction: desc
+"""
+        with mock.patch('builtins.open', mock.mock_open()) as mock_open_file:
+            mock_open_file.return_value.__enter__.side_effect = [
+                index_yaml,
+                web_inf_index_yaml,
+            ]
+            extend_index_yaml.main()
+
+            mock_open_file.assert_called_with(
+                extend_index_yaml.INDEX_YAML_PATH, 'w', encoding='utf-8'
+            )
+            mock_open_file().write.assert_called_with(expected_result)
