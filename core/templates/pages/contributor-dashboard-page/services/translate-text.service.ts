@@ -223,8 +223,7 @@ export class TranslateTextService {
 
   suggestTranslatedText(
       translation: string | string[], languageCode: string, imagesData:
-      ImagesData[], dataFormat: string, files: object | null,
-      successCallback: () => void,
+      ImagesData[], dataFormat: string, successCallback: () => void,
       errorCallback: (reason: string) => void): void {
     this.translateTextBackedApiService.suggestTranslatedTextAsync(
       this.activeExpId,
