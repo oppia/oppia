@@ -22,7 +22,7 @@ import os
 from core import feconf
 from core import python_utils
 from core import utils
-from core.domain import config_services
+from core.domain import config_services, question_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -2587,9 +2587,11 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion = suggestion_services.get_suggestion_by_id(
             suggestion_dict['suggestion_id'])
+        question = question_services.get_questions_by_skill_ids(
+            1, ['skill1'], False)[0]
         destination_fs = fs_domain.AbstractFileSystem(
             fs_domain.GcsFileSystem(
-                feconf.ENTITY_TYPE_QUESTION, suggestion.change.question_id))
+                feconf.ENTITY_TYPE_QUESTION, question.question_id))
         self.assertTrue(destination_fs.isfile('image/%s' % 'image.png'))
         self.assertEqual(
             suggestion.status,
