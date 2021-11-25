@@ -43,7 +43,6 @@ import { RefresherExplorationConfirmationModal } from './modals/refresher-explor
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
 import { ToastrModule } from 'ngx-toastr';
-import { RatingsAndRecommendationsComponent } from './learner-experience/ratings-and-recommendations.component';
 
 @NgModule({
   imports: [
