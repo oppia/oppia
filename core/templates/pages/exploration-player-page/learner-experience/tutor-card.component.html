@@ -1,7 +1,7 @@
 <oppia-audio-bar *ngIf="showAudioBar()"></oppia-audio-bar>
 <div class="oppia-learner-view-card"
      [ngStyle]="{'text-align': isLanguageRTL() ? 'right' : 'left', 'margin-top': isAudioBarExpandedOnMobileDevice() ? '60px' : '30px'}">
-  <oppia-smooth-height [trigger]="displayedCard.getContentHtml()">
+  <oppia-smooth-height-animator [trigger]="displayedCard.getContentHtml()">
     <div class="oppia-learner-view-card-content">
       <div class="oppia-learner-view-card-top-section">
         <oppia-content-language-selector></oppia-content-language-selector>
@@ -43,14 +43,14 @@
       </div>
 
       <div class="conversation-skin-tutor-card-middle-section"
-          [@expandInOut]="(arePreviousResponsesShown && !conceptCardIsBeingShown) ? 'in' : 'out'">
+           *ngIf="(arePreviousResponsesShown && !conceptCardIsBeingShown)" [@expandInOut]>
         <div *ngFor="let responsePair of displayedCard.getInputResponsePairs(); index as index">
           <div *ngIf="index !== (displayedCard.getInputResponsePairs().length - 1) || !isInteractionInline()">
             <oppia-input-response-pair [data]="responsePair"
-                                        [profilePicture]="profilePicture"
-                                        [oppiaAvatarImageUrl]="OPPIA_AVATAR_IMAGE_URL"
-                                        [inputResponsePairId]="getInputResponsePairId($index)"
-                                        [isLastPair]="false">
+                                       [profilePicture]="profilePicture"
+                                       [oppiaAvatarImageUrl]="OPPIA_AVATAR_IMAGE_URL"
+                                       [inputResponsePairId]="getInputResponsePairId($index)"
+                                       [isLastPair]="false">
             </oppia-input-response-pair>
           </div>
         </div>
@@ -59,6 +59,7 @@
       <!-- If the interaction is inline, always show the most recent response pair, if there is one. -->
       <div class="conversation-skin-tutor-card-bottom-section" *ngIf="isInteractionInline() && displayedCard.getInputResponsePairs().length > 0">
         <oppia-input-response-pair [data]="displayedCard.getInputResponsePairs()[displayedCard.getInputResponsePairs().length - 1]"
+                                   [bottomSection]="true"
                                    [profilePicture]="profilePicture"
                                    [oppiaAvatarImageUrl]="OPPIA_AVATAR_IMAGE_URL"
                                    [inputResponsePairId]="getInputResponsePairId(displayedCard.getInputResponsePairs().length - 1)"
@@ -90,7 +91,7 @@
       </div>
 
       <div *ngIf="!isInteractionInline() && !conceptCardIsBeingShown"
-          class="conversation-skin-inline-interaction">
+           class="conversation-skin-inline-interaction">
         <div class="oppia-conversation-skin-instruction-container">
           <span [ngClass]="{'conversation-skin-instruction-disabled': !interactionIsActive}">
             {{ interactionInstructions | translate }}
@@ -109,7 +110,7 @@
         </div>
       </div>
     </div>
-  </oppia-smooth-height>
+  </oppia-smooth-height-animator>
 </div>
 
 <style>

@@ -20,7 +20,7 @@ import { ElementRef, HostBinding, Component, Input, OnChanges } from '@angular/c
 import { animate, style, transition, trigger } from '@angular/animations';
 
 @Component({
-  selector: 'oppia-smooth-height',
+  selector: 'oppia-smooth-height-animator',
   template: `
     <ng-content></ng-content>
   `,
@@ -39,7 +39,7 @@ import { animate, style, transition, trigger } from '@angular/animations';
     ])
   ]
 })
-export class SmoothHeightComponent implements OnChanges {
+export class SmoothHeightAnimatorComponent implements OnChanges {
   @Input() trigger;
   startHeight: number;
   @HostBinding('@grow') grow;

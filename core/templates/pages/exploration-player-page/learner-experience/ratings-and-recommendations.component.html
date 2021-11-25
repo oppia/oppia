@@ -26,7 +26,7 @@
       <span *ngIf="!collectionSummary && !isRefresherExploration" class="conversation-skin-final-recommendations-header"
             translate="I18N_PLAYER_RECOMMEND_EXPLORATIONS">
       </span>
-      <div class="oppia-exp-summary-tiles-container conversation-skin-recommended-activities-container">
+      <div class="ratings-and-recommendations-exp-summary-tiles-container conversation-skin-recommended-activities-container">
         <oppia-exploration-summary-tile *ngFor="let exp of (recommendedExplorationSummaries|limitTo:3)"
                                         [collectionId]="collectionId"
                                         [explorationId]="exp.id"
@@ -107,10 +107,6 @@
     padding-top: 10px;
   }
 
-  .oppia-exploration-summary-tile {
-    margin-left: 10px;
-  }
-
   .conversation-skin-back-to-collection-container {
     margin-bottom: 92px;
     margin-top: 25px;
@@ -139,17 +135,17 @@
     font-weight: 500;
   }
 
-  .oppia-login-button.md-raised {
-    background-color: #00645C;
-    font-size: 1em;
-    min-width: max-content;
-    width: 30%;
-  }
-
-  .oppia-sign-up-button.md-raised {
-    background-color: #00609C;
-    font-size: 1em;
-    min-width: max-content;
-    width: 30%;
+  .ratings-and-recommendations-exp-summary-tiles-container {
+      align-items: center;
+      display: flex;
+      height: 100%;
+      justify-content: center;
+      margin-left: auto;
+      margin-right: auto;
+      max-width: 928px;
+      min-height: 300px;
+      padding-bottom: 24px;
+      padding-top: 24px;
+      width: 100vw;
   }
 </style>
