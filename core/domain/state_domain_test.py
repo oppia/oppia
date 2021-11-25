@@ -5618,3 +5618,274 @@ class FractionInputInteractionTests(test_utils.GenericTestBase):
         self.assertEqual(
             fraction_proto.answer_groups[0].rule_specs[0].is_exactly_equal_to.input.is_negative, # pylint: disable=line-too-long
             False)
+
+
+class ItemSelectionInputInteractionTests(test_utils.GenericTestBase):
+
+    def test_to_proto(self):
+        html_with_old_math_schema = (
+            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
+            'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
+        interaction_dict = {
+            'answer_groups': [{
+                'outcome': {
+                    'dest': 'abc',
+                    'feedback': {
+                        'content_id': 'feedback_1',
+                        'html': '<p>Feedback</p>'
+                    },
+                    'labelled_as_correct': True,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
+                },
+                'rule_specs': [{
+                    'rule_type': 'Equals',
+                    'inputs': {
+                        'x': [html_with_old_math_schema]
+                    }
+                }, {
+                    'rule_type': 'ContainsAtLeastOneOf',
+                    'inputs': {
+                        'x': [html_with_old_math_schema]
+                    }
+                }, {
+                    'rule_type': 'IsProperSubsetOf',
+                    'inputs': {
+                        'x': [html_with_old_math_schema]
+                    }
+                }, {
+                    'rule_type': 'DoesNotContainAtLeastOneOf',
+                    'inputs': {
+                        'x': [html_with_old_math_schema]
+                    }
+                }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+            }],
+            'confirmed_unclassified_answers': [],
+            'customization_args': {
+                'choices': {
+                    'value': [{
+                        'content_id': 'ca_choices_2',
+                        'html': '<p>Choice 1</p>'
+                    }, {
+                        'content_id': 'ca_choices_3',
+                        'html': '<p>Choice 2</p>'
+                    }]
+                },
+                'maxAllowableSelectionCount': {
+                    'value': 2
+                },
+                'minAllowableSelectionCount': {
+                    'value': 1
+                }
+            },
+            'default_outcome': {
+                'dest': 'abc',
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': 'Correct Answer'
+                },
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'labelled_as_correct': True,
+                'missing_prerequisite_skill_id': None
+            },
+            'hints': [{
+                'hint_content': {
+                    'content_id': 'hint_1',
+                    'html': '<p>This is a first hint.</p>'
+                }
+            }, {
+                'hint_content': {
+                    'content_id': 'hint_2',
+                    'html': '<p>This is the second hint.</p>'
+                }
+            }],
+            'solution': {
+                'answer_is_exclusive': True,
+                'correct_answer': ['<p>Choice 1</p>'],
+                'explanation': {
+                    'content_id': 'solution',
+                    'html': 'This is <i>solution</i> for state1'
+                }
+            },
+            'id': 'ItemSelectionInput'
+        }
+        item_selection_input_instance = (
+            interaction_registry.Registry.get_interaction_by_id(
+                'ItemSelectionInput'))
+        interaction_domain = (
+            state_domain.InteractionInstance.from_dict(
+                interaction_dict))
+        item_selection_proto = item_selection_input_instance.to_proto(
+            interaction_domain.default_outcome,
+            interaction_domain.customization_args,
+            interaction_domain.hints,
+            interaction_domain.answer_groups)
+        self.assertEqual(
+            item_selection_proto.customization_args.max_allowable_selection_count, # pylint: disable=line-too-long
+            2)
+        self.assertEqual(
+            item_selection_proto.customization_args.min_allowable_selection_count, # pylint: disable=line-too-long
+            1)
+        self.assertEqual(
+            item_selection_proto.customization_args.choices[0].content_id,
+            'ca_choices_2')
+        self.assertEqual(
+            item_selection_proto.customization_args.choices[1].content_id,
+            'ca_choices_3')
+        self.assertEqual(
+            item_selection_proto.customization_args.choices[0].text,
+            '<p>Choice 1</p>')
+        self.assertEqual(
+            item_selection_proto.customization_args.choices[1].text,
+            '<p>Choice 2</p>')
+        self.assertEqual(
+            item_selection_proto.default_outcome.feedback.text,
+            'Correct Answer')
+        self.assertEqual(
+            item_selection_proto.default_outcome.feedback.content_id,
+            'feedback_1')
+        self.assertEqual(
+            item_selection_proto.hints[0].hint_content.content_id,
+            'hint_1')
+        self.assertEqual(
+            item_selection_proto.hints[1].hint_content.content_id,
+            'hint_2')
+        self.assertEqual(
+            item_selection_proto.hints[0].hint_content.text,
+            '<p>This is a first hint.</p>')
+        self.assertEqual(
+            item_selection_proto.hints[1].hint_content.text,
+            '<p>This is the second hint.</p>')
+        self.assertEqual(
+            item_selection_proto.answer_groups[0].base_answer_group.outcome.destination_state, # pylint: disable=line-too-long
+            'abc')
+        self.assertEqual(
+            item_selection_proto.answer_groups[0].base_answer_group.outcome.labelled_as_correct, # pylint: disable=line-too-long
+            True)
+        self.assertEqual(
+            item_selection_proto.answer_groups[0].base_answer_group.outcome.feedback.content_id, # pylint: disable=line-too-long
+            'feedback_1')
+        self.assertEqual(
+            item_selection_proto.answer_groups[0].base_answer_group.outcome.feedback.text, # pylint: disable=line-too-long
+            '<p>Feedback</p>')
+
+
+class MultipleChoiceInputInteractionTests(test_utils.GenericTestBase):
+
+    def test_to_proto(self):
+        answer_group = {
+            'outcome': {
+                'dest': 'abc',
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': True,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': 5
+                },
+                'rule_type': 'Equals'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+        interaction_dict = {
+            'answer_groups': [answer_group],
+            'confirmed_unclassified_answers': [],
+            'customization_args': {
+                'choices': {
+                    'value': [{
+                        'content_id': 'ca_choices_2',
+                        'html': '<p>Choice 1</p>'
+                    }, {
+                        'content_id': 'ca_choices_3',
+                        'html': '<p>Choice 2</p>'
+                    }]
+                },
+                'showChoicesInShuffledOrder': {'value': True}
+            },
+            'default_outcome': {
+                'dest': 'abc',
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': 'Correct Answer'
+                },
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'labelled_as_correct': False,
+                'missing_prerequisite_skill_id': None
+            },
+            'hints': [{
+                'hint_content': {
+                    'content_id': 'hint_1',
+                    'html': '<p>This is a first hint.</p>'
+                }
+            }, {
+                'hint_content': {
+                    'content_id': 'hint_2',
+                    'html': '<p>This is the second hint.</p>'
+                }
+            }],
+            'solution': {},
+            'id': 'MultipleChoiceInput'
+        }
+        multiple_choice_input_instance = (
+            interaction_registry.Registry.get_interaction_by_id(
+                'MultipleChoiceInput'))
+        interaction_domain = (
+            state_domain.InteractionInstance.from_dict(
+                interaction_dict))
+        multiple_choice_input_proto = (
+            multiple_choice_input_instance.to_proto(
+                interaction_domain.default_outcome,
+                interaction_domain.customization_args,
+                interaction_domain.hints,
+                interaction_domain.answer_groups))
+        self.assertEqual(
+            multiple_choice_input_proto.customization_args.choices[0].content_id, # pylint: disable=line-too-long
+            'ca_choices_2')
+        self.assertEqual(
+            multiple_choice_input_proto.customization_args.choices[1].content_id, # pylint: disable=line-too-long
+            'ca_choices_3')
+        self.assertEqual(
+            multiple_choice_input_proto.customization_args.choices[0].text,
+            '<p>Choice 1</p>')
+        self.assertEqual(
+            multiple_choice_input_proto.customization_args.choices[1].text,
+            '<p>Choice 2</p>')
+        self.assertEqual(
+            multiple_choice_input_proto.default_outcome.destination_state,
+            'abc')
+        self.assertEqual(
+            multiple_choice_input_proto.default_outcome.labelled_as_correct,
+            False)
+        self.assertEqual(
+            multiple_choice_input_proto.default_outcome.feedback.content_id,
+            'feedback_1')
+        self.assertEqual(
+            multiple_choice_input_proto.default_outcome.feedback.text,
+            'Correct Answer')
+        self.assertEqual(
+            multiple_choice_input_proto.hints[0].hint_content.content_id,
+            'hint_1')
+        self.assertEqual(
+            multiple_choice_input_proto.hints[1].hint_content.content_id,
+            'hint_2')
+        self.assertEqual(
+            multiple_choice_input_proto.hints[0].hint_content.text,
+            '<p>This is a first hint.</p>')
+        self.assertEqual(
+            multiple_choice_input_proto.hints[1].hint_content.text,
+            '<p>This is the second hint.</p>')
+        self.assertEqual(
+            multiple_choice_input_proto.answer_groups[0].rule_specs[0].equals.input, # pylint: disable=line-too-long
+            5)

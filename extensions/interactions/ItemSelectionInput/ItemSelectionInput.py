@@ -181,3 +181,53 @@ class ItemSelectionInput(base.BaseInteraction):
             answer_group_list_proto.append(answer_group_proto)
 
         return answer_group_list_proto
+
+    @classmethod
+    def _to_item_selection_rule_specs_proto(cls, rule_specs_list):
+        """Creates a RuleSpec proto object.
+
+        Args:
+            rule_specs_list: list(RuleSpec). List of rule specifications.
+
+        Returns:
+            list. The RuleSpec proto object list.
+        """
+        rule_specs_list_proto = []
+        rules_specs_proto = {}
+
+        rule_type_to_proto_func_mapping = {
+            'Equals': cls._to_is_equal_to_proto,
+            'ContainsAtLeastOneOf': cls._to_contains_at_least_one_of_to_proto,
+            'IsProperSubsetOf': cls._to_is_proper_subset_of_to_proto,
+            'DoesNotContainAtLeastOneOf': (
+                cls._to_does_not_contains_at_least_one_of_to_proto),
+        }
+
+        rule_type_to_proto_mapping = {
+            'Equals': lambda x: (
+                state_pb2.ItemSelectionInputInstance.RuleSpec(
+                    equals=x)),
+            'ContainsAtLeastOneOf': lambda x: (
+                state_pb2.ItemSelectionInputInstance.RuleSpec(
+                    contains_at_least_one_of=x)),
+            'IsProperSubsetOf': lambda x: (
+                state_pb2.ItemSelectionInputInstance.RuleSpec(
+                    does_not_contain_at_least_one_of=x)),
+            'DoesNotContainAtLeastOneOf': lambda x: (
+                state_pb2.ItemSelectionInputInstance.RuleSpec(
+                    is_proper_subset_of=x))
+        }
+
+        for rule_spec in rule_specs_list:
+            rule_type = rule_spec.rule_type
+            rule_proto = (
+                rule_type_to_proto_func_mapping[rule_type](
+                    rule_spec.inputs['f']
+                )
+            )
+            rules_specs_proto = (
+                rule_type_to_proto_mapping[rule_type](rule_proto)
+            )
+            rule_specs_list_proto.append(rules_specs_proto)
+
+        return rule_specs_list_proto

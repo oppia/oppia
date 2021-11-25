@@ -152,11 +152,63 @@ class MultipleChoiceInput(base.BaseInteraction):
 
         for answer_group in answer_groups:
             base_answer_group_proto = answer_group.to_proto()
+            rules_spec_proto = cls._to_multiple_input_specs_proto(
+                answer_group.rule_specs)
             answer_group_proto = (
                 state_pb2.MultipleChoiceInputInstance.AnswerGroup(
-                    base_answer_group=base_answer_group_proto
+                    base_answer_group=base_answer_group_proto,
+                    rule_specs=rules_spec_proto
                 )
             )
             answer_group_list_proto.append(answer_group_proto)
 
         return answer_group_list_proto
+
+    @classmethod
+    def _to_multiple_input_specs_proto(cls, rule_specs_list):
+        """Creates a RuleSpec proto object.
+
+        Args:
+            rule_specs_list: list(RuleSpec). List of rule specifications.
+
+        Returns:
+            list. The RuleSpec proto object list.
+        """
+        rule_specs_list_proto = []
+        rules_specs_proto = {}
+
+        rule_type_to_proto_func_mapping = {
+            'Equals': cls._to_equal_to_proto
+        }
+        rule_type_to_proto_mapping = {
+             'Equals': lambda x: (
+                state_pb2.MultipleChoiceInputInstance.RuleSpec(
+                    equals=x))
+        }
+
+        for rule_spec in rule_specs_list:
+            rule_type = rule_spec.rule_type
+            rule_proto = (
+                rule_type_to_proto_func_mapping[rule_type](
+                    rule_spec.inputs['x']
+                )
+            )
+            rules_specs_proto = (
+                rule_type_to_proto_mapping[rule_type](rule_proto)
+            )
+            rule_specs_list_proto.append(rules_specs_proto)
+
+        return rule_specs_list_proto
+
+    @classmethod
+    def _to_equal_to_proto(cls, equal):
+        """Creates a proto object for EqualsSpec.
+
+        Args:
+            equal: int. The input to match with.
+
+        Returns:
+            EqualsSpec. The proto object.
+        """
+        return state_pb2.MultipleChoiceInputInstance.RuleSpec.EqualsSpec(
+            input=equal)
