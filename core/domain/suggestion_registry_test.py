@@ -22,7 +22,7 @@ import os
 from core import feconf
 from core import python_utils
 from core import utils
-from core.domain import config_services, question_services
+from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -30,6 +30,7 @@ from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import html_validation_service
 from core.domain import question_domain
+from core.domain import question_services
 from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import suggestion_registry
@@ -2585,8 +2586,6 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             suggestion_dict['language_code'], False, self.fake_date)
         suggestion.accept('commit_message')
 
-        accepted_suggestion = suggestion_services.get_suggestion_by_id(
-            suggestion.suggestion_id)
         question = question_services.get_questions_by_skill_ids(
             1, ['skill1'], False)[0]
         destination_fs = fs_domain.AbstractFileSystem(
