@@ -2444,7 +2444,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             encoding=None) as f:
             original_image_content = f.read()
         fs_services.save_original_and_compressed_versions_of_image(
-            'image.png', 'question_suggestions', 'skill1.thread1',
+            'image.png', 'question_suggestions', 'skill1',
             original_image_content, 'image', True)
 
         question_state_dict = {
@@ -2471,10 +2471,10 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
                             },
                             'labelled_as_correct': True,
                             'param_changes': [],
-                            'refresher_exploration_id': None, 
+                            'refresher_exploration_id': None,
                             'missing_prerequisite_skill_id': None
-                        }, 
-                        'training_data': [], 
+                        },
+                        'training_data': [],
                         'tagged_skill_misconception_id': None
                     }
                 ],
@@ -2546,7 +2546,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
                     'feedback_0': {},
                     'hint_1': {}
                 }
-            }, 
+            },
             'next_content_id_index': 2
         }
         suggestion_dict = {
