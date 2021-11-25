@@ -83,13 +83,14 @@ class FractionInput(base.BaseInteraction):
 
     @classmethod
     def to_proto(
-        cls, default_outcome, customization_args, solution, answer_groups
+        cls, default_outcome, customization_args, hints, solution, answer_groups
     ):
         """Creates a FractionInputInstance proto object.
 
         Args:
             default_outcome: Outcome. The domain object.
             customization_args: CustominzationArgs. The domain object.
+            hints: Hint. The domain object.
             solution: Solution. The domain object.
             answer_groups: AnswerGroups. The domain object.
 
@@ -101,6 +102,7 @@ class FractionInput(base.BaseInteraction):
                 customization_args)
         )
         outcome_proto = default_outcome.to_proto()
+        hints_proto_list = cls.get_hint_proto(cls, hints)
         solution_proto = cls._to_solution_proto(solution)
         answer_groups_proto = cls._to_answer_groups_proto(
             answer_groups)
@@ -108,6 +110,7 @@ class FractionInput(base.BaseInteraction):
         return state_pb2.FractionInputInstance(
             customization_args=customization_args_proto,
             default_outcome=outcome_proto,
+            hints=hints_proto_list,
             solution=solution_proto,
             answer_groups=answer_groups_proto
         )
@@ -126,6 +129,8 @@ class FractionInput(base.BaseInteraction):
         Returns:
             CustomizationArgs. The proto object.
         """
+        placeholder_proto = (
+            customization_args['customPlaceholder'].value.to_proto())
         return state_pb2.FractionInputInstance.CustomizationArgs(
             requires_simplest_form=(
                 customization_args['requireSimplestForm'].value
@@ -135,7 +140,8 @@ class FractionInput(base.BaseInteraction):
             ),
             allow_nonzero_integer_part=(
                 customization_args['allowNonzeroIntegerPart'].value
-            )
+            ),
+            placeholder=placeholder_proto
         )
 
     @classmethod

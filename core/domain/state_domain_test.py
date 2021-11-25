@@ -5442,3 +5442,179 @@ class EndExplorationInteractionTests(test_utils.GenericTestBase):
                 'EndExploration'))
         end_proto = end_exploration_instance.to_proto()
         self.assertEqual(end_proto.ByteSize(), 0)
+
+
+class FractionInputInteractionTests(test_utils.GenericTestBase):
+
+    def test_to_proto(self):
+        interaction_dict = {
+            'id': 'FractionInput',
+            'customization_args': {
+                'requireSimplestForm': {
+                     'value': False
+                },
+                'allowImproperFraction': {
+                    'value': True
+                },
+                'allowNonzeroIntegerPart': {
+                    'value': True
+                },
+                'customPlaceholder': {
+                    'value': {
+                        'content_id': 'ca_customPlaceholder_2',
+                        'unicode_str': '😍😍😍😍'
+                    }
+                },
+            },
+            'answer_groups': [{
+                'outcome': {
+                    'dest': 'Number With Units',
+                    'feedback': {
+                        'content_id': 'feedback_1',
+                        'html': '<p>Yes, well done!</p>'
+                    },
+                    'labelled_as_correct': False,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
+                },
+                'rule_specs': [{
+                    'rule_type': 'IsExactlyEqualTo',
+                    'inputs': {
+                        'f': {
+                            'denominator': 5,
+                            'isNegative': False,
+                            'numerator': 2,
+                            'wholeNumber': 0
+                        }
+                    }
+                }],
+                'training_data': [],
+                'tagged_skill_misconception_id': None
+            }],
+            'default_outcome': {
+                'dest': 'Introduction',
+                'feedback': {
+                    'content_id': 'default_outcome',
+                    'html': '<p> introduce </p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'confirmed_unclassified_answers': [],
+            'hints': [{
+                'hint_content': {
+                    'content_id': 'hint_1',
+                    'html': '<p>This is a first hint.</p>'
+                }
+            }, {
+                'hint_content': {
+                    'content_id': 'hint_2',
+                    'html': '<p>This is the second hint.</p>'
+                }
+            }],
+            'solution': {
+                'answer_is_exclusive': True,
+                'correct_answer': {
+                    'denominator': 5,
+                    'isNegative': False,
+                    'numerator': 2,
+                    'wholeNumber': 0
+                },
+                'explanation': {
+                    'content_id': 'solution',
+                    'html': '<p>This is solution for fraction.</p>'
+                }
+            }
+        }
+        fraction_instance = (
+            interaction_registry.Registry.get_interaction_by_id(
+                'FractionInput'))
+        interaction_domain = (
+            state_domain.InteractionInstance.from_dict(interaction_dict))
+        fraction_proto = fraction_instance.to_proto(
+            interaction_domain.default_outcome,
+            interaction_domain.customization_args,
+            interaction_domain.hints,
+            interaction_domain.solution,
+            interaction_domain.answer_groups)
+        self.assertEqual(
+            fraction_proto.customization_args.requires_simplest_form,
+            False)
+        self.assertEqual(
+            fraction_proto.customization_args.allow_improper_fractions,
+            True)
+        self.assertEqual(
+            fraction_proto.customization_args.allow_nonzero_integer_part,
+            True)
+        self.assertEqual(
+            fraction_proto.customization_args.placeholder.content_id,
+            'ca_customPlaceholder_2')
+        self.assertEqual(
+            fraction_proto.customization_args.placeholder.text,
+            '😍😍😍😍')
+        self.assertEqual(
+            fraction_proto.default_outcome.destination_state,
+            'Introduction')
+        self.assertEqual(
+            fraction_proto.default_outcome.feedback.content_id,
+            'default_outcome')
+        self.assertEqual(
+            fraction_proto.default_outcome.feedback.text,
+            '<p> introduce </p>')
+        self.assertEqual(
+            fraction_proto.default_outcome.labelled_as_correct,
+            False)
+        self.assertEqual(
+            fraction_proto.hints[0].hint_content.content_id,
+            'hint_1')
+        self.assertEqual(
+            fraction_proto.hints[1].hint_content.content_id,
+            'hint_2')
+        self.assertEqual(
+            fraction_proto.hints[0].hint_content.text,
+            '<p>This is a first hint.</p>')
+        self.assertEqual(
+            fraction_proto.hints[1].hint_content.text,
+            '<p>This is the second hint.</p>')
+        self.assertEqual(
+            fraction_proto.solution.correct_answer.is_negative,
+            False)
+        self.assertEqual(
+            fraction_proto.solution.correct_answer.whole_number, 0)
+        self.assertEqual(
+            fraction_proto.solution.correct_answer.numerator, 2)
+        self.assertEqual(
+            fraction_proto.solution.correct_answer.denominator, 5)
+        self.assertEqual(
+            fraction_proto.solution.base_solution.explanation.content_id,
+            'solution')
+        self.assertEqual(
+            fraction_proto.solution.base_solution.explanation.text,
+            '<p>This is solution for fraction.</p>')
+        self.assertEqual(
+            fraction_proto.answer_groups[0].base_answer_group.outcome.destination_state, # pylint: disable=line-too-long
+            'Number With Units')
+        self.assertEqual(
+            fraction_proto.answer_groups[0].base_answer_group.outcome.labelled_as_correct, # pylint: disable=line-too-long
+            False)
+        self.assertEqual(
+            fraction_proto.answer_groups[0].base_answer_group.outcome.feedback.content_id, # pylint: disable=line-too-long
+            'feedback_1')
+        self.assertEqual(
+            fraction_proto.answer_groups[0].base_answer_group.outcome.feedback.text, # pylint: disable=line-too-long
+            '<p>Yes, well done!</p>')
+        self.assertEqual(
+            fraction_proto.answer_groups[0].rule_specs[0].is_exactly_equal_to.input.denominator, # pylint: disable=line-too-long
+            5)
+        self.assertEqual(
+            fraction_proto.answer_groups[0].rule_specs[0].is_exactly_equal_to.input.numerator, # pylint: disable=line-too-long
+            2)
+        self.assertEqual(
+            fraction_proto.answer_groups[0].rule_specs[0].is_exactly_equal_to.input.whole_number, # pylint: disable=line-too-long
+            0)
+        self.assertEqual(
+            fraction_proto.answer_groups[0].rule_specs[0].is_exactly_equal_to.input.is_negative, # pylint: disable=line-too-long
+            False)

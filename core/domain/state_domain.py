@@ -609,7 +609,7 @@ class InteractionInstance:
             interaction_proto = state_pb2.InteractionInstance(
                 fraction_input=interaction_instance.to_proto(
                     self.default_outcome, self.customization_args,
-                    self.solution, self.answer_groups))
+                    self.hints, self.solution, self.answer_groups))
         elif self.id == 'ItemSelectionInput':
             interaction_proto = state_pb2.InteractionInstance(
                 item_selection_input=interaction_instance.to_proto(
