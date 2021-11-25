@@ -371,8 +371,6 @@
     "core/templates/pages/exploration-editor-page/translation-tab/services/translation-tab-active-mode.service.spec.ts",
     "core/templates/pages/exploration-player-page/exploration-player-page.constants.ts",
     "core/templates/pages/exploration-player-page/layout-directives/correctness-footer.component.ts",
-    "core/templates/pages/exploration-player-page/layout-directives/exploration-footer.component.ts",
-    "core/templates/pages/exploration-player-page/layout-directives/exploration-footer.component.spec.ts",
     "core/templates/pages/exploration-player-page/learner-experience/continue-button.component.ts",
     "core/templates/pages/exploration-player-page/modals/display-solution-interstitial-modal.component.ts",
     "core/templates/pages/exploration-player-page/modals/display-solution-interstitial-modal.component.spec.ts",
