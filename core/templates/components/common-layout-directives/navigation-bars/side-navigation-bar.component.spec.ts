@@ -1,3 +1,4 @@
+/* eslint-disable oppia/no-test-blockers */
 // Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,11 +21,16 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, TestBed, fakeAsync, tick, waitForAsync } from '@angular/core/testing';
 import { MockRouterModule } from 'hybrid-router-module-provider';
+import { ClassroomData } from 'domain/classroom/classroom-data.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { SideNavigationBarComponent } from './side-navigation-bar.component';
+import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
+import { UserService } from 'services/user.service';
+import { UserInfo } from 'domain/user/user-info.model';
+import { CreatorTopicSummaryBackendDict } from 'domain/topic/creator-topic-summary.model';
 
 class MockWindowRef {
   nativeWindow = {
@@ -40,13 +46,15 @@ class MockWindowRef {
 }
 
 
-describe('Side Navigation Bar Component', () => {
+fdescribe('Side Navigation Bar Component', () => {
   let fixture: ComponentFixture<SideNavigationBarComponent>;
   let componentInstance: SideNavigationBarComponent;
   let currentUrl: string = '/test';
   let imageUrl: string = 'image_url';
   let mockWindowRef: MockWindowRef;
   let siteAnalyticsService: SiteAnalyticsService;
+  let classroomBackendApiService: ClassroomBackendApiService;
+  let userService: UserService;
 
   class MockUrlInterpolationService {
     getStaticImageUrl(imagePath: string): string {
@@ -85,6 +93,8 @@ describe('Side Navigation Bar Component', () => {
     fixture = TestBed.createComponent(SideNavigationBarComponent);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     componentInstance = fixture.componentInstance;
+    classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
+    userService = TestBed.inject(UserService);
   });
 
   it('should create', () => {
@@ -135,4 +145,26 @@ describe('Side Navigation Bar Component', () => {
     expect(siteAnalyticsService.registerClassroomHeaderClickEvent)
       .toHaveBeenCalled();
   });
+
+  it('should check if classroom promos are enabled', fakeAsync(() => {
+    let classroomData = ClassroomData.createFromBackendData(
+      'Math',
+      [{id: '123', name: 'asd'} as CreatorTopicSummaryBackendDict]
+      , 'Course details', 'Topics covered');
+    let userInfo = new UserInfo(
+      ['USER_ROLE'], true, false, false, false, true,
+      'en', 'username1', 'tester@example.com', true
+    );
+    spyOn(classroomBackendApiService, 'fetchClassroomDataAsync')
+      .and.resolveTo(classroomData);
+    spyOn(
+      classroomBackendApiService, 'fetchClassroomPromosAreEnabledStatusAsync')
+      .and.resolveTo(true);
+    spyOn(userService, 'getUserInfoAsync').and.resolveTo(userInfo);
+    componentInstance.ngOnInit();
+    tick();
+
+    expect(componentInstance.classroomData).toBe(classroomData);
+    expect(componentInstance.CLASSROOM_PROMOS_ARE_ENABLED).toBe(true);
+  }));
 });
