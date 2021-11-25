@@ -2447,63 +2447,108 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'image.png', 'question_suggestions', 'skill1.thread1',
             original_image_content, 'image', True)
 
-        customization_args_dict = {
-            'highlightRegionsOnHover': {'value': True},
-            'imageAndRegions': {
-                'value': {
-                    'imagePath': 'image.png',
-                    'labeledRegions': [{
-                        'label': 'classdef',
-                        'region': {
-                            'area': [
-                                [0.004291845493562232, 0.004692192192192192],
-                                [0.40987124463519314, 0.05874624624624625]
-                            ],
-                            'regionType': 'Rectangle'
+        question_state_dict = {
+            'content': {
+                'html': '<p>Text</p>',
+                'content_id': 'content'
+            },
+            'classifier_model_id': None,
+            'linked_skill_id': None,
+            'interaction': {
+                'answer_groups': [
+                    {
+                        'rule_specs': [
+                            {
+                                'rule_type': 'IsInRegion',
+                                'inputs': {'x': 'Region1'}
+                            }
+                        ],
+                        'outcome': {
+                            'dest': None,
+                            'feedback': {
+                                'html': '<p>assas</p>',
+                                'content_id': 'feedback_0'
+                            },
+                            'labelled_as_correct': True,
+                            'param_changes': [],
+                            'refresher_exploration_id': None, 
+                            'missing_prerequisite_skill_id': None
+                        }, 
+                        'training_data': [], 
+                        'tagged_skill_misconception_id': None
+                    }
+                ],
+                'confirmed_unclassified_answers': [],
+                'customization_args': {
+                    'imageAndRegions': {
+                        'value': {
+                            'imagePath': 'image.png',
+                            'labeledRegions': [
+                                {
+                                    'label': 'Region1',
+                                    'region': {
+                                        'regionType': 'Rectangle',
+                                        'area': [
+                                            [
+                                                0.2644628099173554,
+                                                0.21807065217391305
+                                            ],
+                                            [
+                                                0.9201101928374655,
+                                                0.8847373188405797
+                                            ]
+                                        ]
+                                    }
+                                }
+                            ]
                         }
-                    }]
+                    },
+                    'highlightRegionsOnHover': {
+                        'value': False
+                    }
+                },
+                'default_outcome': {
+                    'dest': None,
+                    'feedback': {
+                        'html': '<p>wer</p>',
+                        'content_id': 'default_outcome'
+                    },
+                    'labelled_as_correct': False,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
+                },
+                'hints': [
+                    {
+                        'hint_content': {
+                            'html': '<p>assaas</p>',
+                            'content_id': 'hint_1'
+                        }
+                    }
+                ],
+                'id': 'ImageClickInput', 'solution': None
+            },
+            'param_changes': [],
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {
+                    'content': {},
+                    'default_outcome': {},
+                    'feedback_0': {},
+                    'hint_1': {}
                 }
-            }
+            },
+            'solicit_answer_details': False,
+            'card_is_checkpoint': False,
+            'written_translations': {
+                'translations_mapping': {
+                    'content': {},
+                    'default_outcome': {},
+                    'feedback_0': {},
+                    'hint_1': {}
+                }
+            }, 
+            'next_content_id_index': 2
         }
-
-        exploration = exp_domain.Exploration.create_default_exploration(
-            'eid', title='title', category='category')
-        exploration.add_states(['state1', 'state2', 'state3'])
-
-        question_state_data = exploration.states['state1']
-        content_dict = {
-            'content_id': 'content',
-            'html': (
-                '<p>Hello, this is state1</p>')
-        }
-        question_state_data.update_content(
-            state_domain.SubtitledHtml.from_dict(content_dict))
-        self.set_interaction_for_state(question_state_data, 'ImageClickInput')
-        question_state_data.update_interaction_customization_args(
-            customization_args_dict)
-
-        default_outcome = state_domain.Outcome(
-            None, state_domain.SubtitledHtml(
-                'default_outcome', '<p>Default outcome for state1</p>'),
-            True, [], None, None
-        )
-        question_state_data.update_interaction_default_outcome(default_outcome)
-
-        hint_list = [
-            state_domain.Hint(
-                state_domain.SubtitledHtml(
-                    'hint_1',
-                    (
-                        '<p>Hello, this is html1 for state1</p>'
-                    )
-                )
-            )
-        ]
-        question_state_data.update_interaction_hints(hint_list)
-
-        question_state_dict = question_state_data.to_dict()
-        self.save_new_skill('skill1', self.author_id, description='description')
-
         suggestion_dict = {
             'suggestion_id': 'skill1.thread1',
             'suggestion_type': feconf.SUGGESTION_TYPE_ADD_QUESTION,
