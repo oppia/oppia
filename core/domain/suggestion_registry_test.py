@@ -2577,21 +2577,21 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         }
         self.save_new_skill(
             'skill1', self.author_id, description='description')
-        accepted_suggestion = suggestion_registry.SuggestionAddQuestion(
+        suggestion = suggestion_registry.SuggestionAddQuestion(
             suggestion_dict['suggestion_id'], suggestion_dict['target_id'],
             suggestion_dict['target_version_at_submission'],
             suggestion_dict['status'], self.author_id, self.reviewer_id,
             suggestion_dict['change'], suggestion_dict['score_category'],
             suggestion_dict['language_code'], False, self.fake_date)
-        accepted_suggestion.accept('commit_message')
+        suggestion.accept('commit_message')
 
-        suggestion = suggestion_services.get_suggestion_by_id(
-            suggestion_dict['suggestion_id'])
+        accepted_suggestion = suggestion_services.get_suggestion_by_id(
+            suggestion.suggestion_id)
         question = question_services.get_questions_by_skill_ids(
             1, ['skill1'], False)[0]
         destination_fs = fs_domain.AbstractFileSystem(
             fs_domain.GcsFileSystem(
-                feconf.ENTITY_TYPE_QUESTION, question.question_id))
+                feconf.ENTITY_TYPE_QUESTION, question.id))
         self.assertTrue(destination_fs.isfile('image/%s' % 'image.png'))
         self.assertEqual(
             suggestion.status,
