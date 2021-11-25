@@ -27,6 +27,7 @@ import { ContributionOpportunitiesBackendApiService } from
 import { FeaturedTranslationLanguage } from
   'domain/opportunity/featured-translation-language.model';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
+import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 
 @Component({
   selector: 'translation-language-selector',
@@ -50,10 +51,16 @@ export class TranslationLanguageSelectorComponent implements OnInit {
   constructor(
     private contributionOpportunitiesBackendApiService:
       ContributionOpportunitiesBackendApiService,
-    private languageUtilService: LanguageUtilService
+    private languageUtilService: LanguageUtilService,
+    private readonly translationLanguageService: TranslationLanguageService,
   ) {}
 
   ngOnInit(): void {
+    this.translationLanguageService.onActiveLanguageChanged.subscribe(
+      () => {
+        this.languageSelection = this.languageIdToDescription[
+          this.translationLanguageService.getActiveLanguageCode()];
+      });
     this.options = this.languageUtilService
       .getAllVoiceoverLanguageCodes().map(languageCode => {
         const description = this.languageUtilService

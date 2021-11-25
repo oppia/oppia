@@ -130,7 +130,7 @@
           </div>
           <div class="oppia-dashboard-language-container" ng-if="$ctrl.showLanguageSelector()">
             <span class="oppia-collapsed-dashboard-language-container-label">Translate to</span>
-            <button focus-on="selectLangDropDown" class="oppia-autofocus border-0 p-0">
+            <button focus-on="selectLangDropDown" class="oppia-autofocus oppia-collapsed-language-selector-button border-0 p-0">
               <translation-language-selector class="oppia-collapsed-language-selector" [active-language-code]="$ctrl.languageCode"
                                              (set-active-language-code)="$ctrl.onChangeLanguage($event)">
               </translation-language-selector>
@@ -156,6 +156,9 @@
 <style>
   button.oppia-autofocus:focus {
     outline: 0;
+  }
+  .oppia-collapsed-language-selector-button {
+    margin-bottom: 15px;
   }
   .oppia-dashboard-language-container-label {
     color: #4a4a4a;
