@@ -521,7 +521,8 @@ export class StateGraphLayoutService {
 
   getAugmentedLinks(
       nodeData: NodeDataDict,
-      nodeLinks: GraphLink[]): AugmentedLink[] | undefined {
+      nodeLinks: GraphLink[]
+  ): AugmentedLink[] | undefined {
     var links = cloneDeep(nodeLinks);
     var augmentedLinks: AugmentedLink[] = links.map(link => {
       return {
