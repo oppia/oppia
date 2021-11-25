@@ -2373,6 +2373,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'language_code': 'en',
             'last_updated': utils.get_time_in_millisecs(self.fake_date)
         }
+        self.save_new_skill('skill_1', self.author_id, description='description')
         suggestion = suggestion_registry.SuggestionAddQuestion(
             suggestion_dict['suggestion_id'], suggestion_dict['target_id'],
             suggestion_dict['target_version_at_submission'],
