@@ -16,27 +16,37 @@
  * @fileoverview Unit tests for SideNavigationBarComponent.
  */
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { HttpClientModule } from '@angular/common/http';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick, waitForAsync } from '@angular/core/testing';
 import { MockRouterModule } from 'hybrid-router-module-provider';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { SideNavigationBarComponent } from './side-navigation-bar.component';
+
+class MockWindowRef {
+  nativeWindow = {
+    location: {
+      pathname: '/test',
+      href: ''
+    },
+    gtag: () => {},
+    history: {
+      pushState(data, title: string, url?: string | null) {}
+    }
+  };
+}
+
 
 describe('Side Navigation Bar Component', () => {
   let fixture: ComponentFixture<SideNavigationBarComponent>;
   let componentInstance: SideNavigationBarComponent;
   let currentUrl: string = '/test';
   let imageUrl: string = 'image_url';
-
-  class MockWindowRef {
-    nativeWindow = {
-      location: {
-        pathname: currentUrl
-      }
-    };
-  }
+  let mockWindowRef: MockWindowRef;
+  let siteAnalyticsService: SiteAnalyticsService;
 
   class MockUrlInterpolationService {
     getStaticImageUrl(imagePath: string): string {
@@ -45,9 +55,11 @@ describe('Side Navigation Bar Component', () => {
   }
 
   beforeEach(waitForAsync(() => {
+    mockWindowRef = new MockWindowRef();
     TestBed.configureTestingModule({
       imports: [
         HttpClientModule,
+        HttpClientTestingModule,
         // TODO(#13443): Remove hybrid router module provider once all pages are
         // migrated to angular router.
         MockRouterModule
@@ -59,7 +71,7 @@ describe('Side Navigation Bar Component', () => {
       providers: [
         {
           provide: WindowRef,
-          useClass: MockWindowRef
+          useValue: mockWindowRef
         },
         {
           provide: UrlInterpolationService,
@@ -71,6 +83,7 @@ describe('Side Navigation Bar Component', () => {
 
   beforeEach(() => {
     fixture = TestBed.createComponent(SideNavigationBarComponent);
+    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     componentInstance = fixture.componentInstance;
   });
 
@@ -101,5 +114,25 @@ describe('Side Navigation Bar Component', () => {
 
   it('should get static image url', () => {
     expect(componentInstance.getStaticImageUrl('test')).toEqual(imageUrl);
+  });
+
+  it('should navigate to classroom page when user clicks' +
+  ' on \'Basic Mathematics\'', fakeAsync(() => {
+    expect(mockWindowRef.nativeWindow.location.href).toBe('');
+
+    componentInstance.navigateToClassroomPage('/classroom/url');
+    tick(151);
+
+    expect(mockWindowRef.nativeWindow.location.href).toBe('/classroom/url');
+  }));
+
+  it('should registers classroom header click event when user clicks' +
+  ' on \'Basic Mathematics\'', () => {
+    spyOn(siteAnalyticsService, 'registerClassroomHeaderClickEvent');
+
+    componentInstance.navigateToClassroomPage('/classroom/url');
+
+    expect(siteAnalyticsService.registerClassroomHeaderClickEvent)
+      .toHaveBeenCalled();
   });
 });

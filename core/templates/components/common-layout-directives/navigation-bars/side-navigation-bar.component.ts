@@ -19,7 +19,11 @@
 import { Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
+import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
+import { ClassroomData } from 'domain/classroom/classroom-data.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { UserService } from 'services/user.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
  @Component({
@@ -31,15 +35,24 @@ export class SideNavigationBarComponent {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
    @Input() display!: boolean;
+
    currentUrl!: string;
-   learnSubmenuIsShown: boolean = true;
+   classroomData!: ClassroomData;
+   topicSummariesLength: number = 0;
+   CLASSROOM_PROMOS_ARE_ENABLED: boolean = false;
    getinvolvedSubmenuIsShown: boolean = false;
+   learnSubmenuIsShown: boolean = true;
+   userIsLoggedIn: boolean;
+
    PAGES_REGISTERED_WITH_FRONTEND = (
      AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
 
    constructor(
-     private windowRef: WindowRef,
-     private urlInterpolationService: UrlInterpolationService
+     private classroomBackendApiService: ClassroomBackendApiService,
+     private siteAnalyticsService: SiteAnalyticsService,
+     private urlInterpolationService: UrlInterpolationService,
+     private userService: UserService,
+     private windowRef: WindowRef
    ) {}
 
    getStaticImageUrl(imagePath: string): string {
@@ -48,6 +61,24 @@ export class SideNavigationBarComponent {
 
    ngOnInit(): void {
      this.currentUrl = this.windowRef.nativeWindow.location.pathname;
+
+     this.classroomBackendApiService.fetchClassroomDataAsync(
+       'math').then((classroomData) => {
+       this.topicSummariesLength = classroomData.getTopicSummaries().length;
+       if (this.topicSummariesLength !== 0) {
+         this.classroomData = classroomData;
+       }
+     });
+
+     let service = this.classroomBackendApiService;
+     service.fetchClassroomPromosAreEnabledStatusAsync().then(
+       classroomPromosAreEnabled => {
+         this.CLASSROOM_PROMOS_ARE_ENABLED = classroomPromosAreEnabled;
+       });
+
+     this.userService.getUserInfoAsync().then((userInfo) => {
+       this.userIsLoggedIn = userInfo.isLoggedIn();
+     });
    }
 
    togglelearnSubmenu(): void {
@@ -58,6 +89,13 @@ export class SideNavigationBarComponent {
      this.getinvolvedSubmenuIsShown =
      !this.getinvolvedSubmenuIsShown;
      this.learnSubmenuIsShown = false;
+   }
+
+   navigateToClassroomPage(classroomUrl: string): void {
+     this.siteAnalyticsService.registerClassroomHeaderClickEvent();
+     setTimeout(() => {
+       this.windowRef.nativeWindow.location.href = classroomUrl;
+     }, 150);
    }
 }
 

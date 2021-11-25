@@ -631,6 +631,7 @@
 	"I18N_SIDEBAR_DONATE_DESCRIPTION": "Text displayed inside drop-down get involved menu. - It's shown in the bottom of the donate link.",
 	"I18N_SIDEBAR_FORUM": "Text displayed in the side navigation bar. - When the user clicks the link, they are redirected to the forum (an external page)\n{{Identical|Forum}}",
 	"I18N_SIDEBAR_GET_INVOLVED": "Text displayed in the side navigation bar. - When the user clicks the link, The list is shown after the user clicks the I18N_SIDEBAR_GET_INVOLVED.\n{{Identical|Get Involved}}",
+	"I18N_SIDEBAR_HOME": "Text displayed in the side navigation bar. - When the user clicks the link, they are redirected to the Home page.",
 	"I18N_SIDEBAR_LEARN": "Text displayed in the side navigation bar. - When the user clicks the link, they are redirected to the learn/math page. \n{{Identical|Learn}}",
 	"I18N_SIDEBAR_LIBRARY_LINK": "Text displayed in the side navigation bar. - When the user clicks the link, they are redirected to the Library page.\n{{Identical|Library}}",
 	"I18N_SIDEBAR_MATH_FOUNDATIONS": "Text displayed inside drop-down learn menu. - When the user clicks the link, they are redirected to the learn/math page. \n{{Identical|Learn}}",
