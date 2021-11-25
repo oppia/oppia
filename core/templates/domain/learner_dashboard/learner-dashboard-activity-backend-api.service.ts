@@ -25,7 +25,6 @@ import { HttpClient } from '@angular/common/http';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { LearnerDashboardActivityIds } from 'domain/learner_dashboard/learner-dashboard-activity-ids.model';
-import { LearnerPlaylistModalComponent } from 'pages/learner-dashboard-page/modal-templates/learner-playlist-modal.component';
 import { RemoveActivityModalComponent } from 'pages/learner-dashboard-page/modal-templates/remove-activity-modal.component';
 
 interface LearnerPlaylistResponseObject {
@@ -101,30 +100,18 @@ export class LearnerDashboardActivityBackendApiService {
     return this.successfullyAdded;
   }
 
-  // This function will open a modal to remove an exploration
-  // from the 'Play Later' list in the Library Page.
-  removeFromLearnerPlaylistModal(
-      activityId: string, activityTitle: string, activityType: string,
-      learnerDashboardActivityIds: LearnerDashboardActivityIds): void {
-    const modelRef = this.ngbModal.open(
-      LearnerPlaylistModalComponent, {backdrop: true});
-    modelRef.componentInstance.activityId = activityId;
-    modelRef.componentInstance.activityTitle = activityTitle;
-    modelRef.componentInstance.activityType = activityType;
-    modelRef.result.then((playlistUrl) => {
-      this.http.delete<void>(playlistUrl).toPromise();
-      if (activityType === AppConstants.ACTIVITY_TYPE_EXPLORATION) {
-        learnerDashboardActivityIds.removeFromExplorationLearnerPlaylist(
-          activityId);
-      } else if (activityType === AppConstants.ACTIVITY_TYPE_COLLECTION) {
-        learnerDashboardActivityIds.removeFromCollectionLearnerPlaylist(
-          activityId);
-      }
-    }, () => {
-      // Note to developers:
-      // This callback is triggered when the Cancel button is clicked.
-      // No further action is needed.
-    });
+  removeFromLearnerPlaylist(
+      activityId: string, activityType: string,
+      learnerDashboardActivityIds: LearnerDashboardActivityIds,
+      playlistUrl: string): void {
+    this.http.delete<void>(playlistUrl).toPromise();
+    if (activityType === AppConstants.ACTIVITY_TYPE_EXPLORATION) {
+      learnerDashboardActivityIds.removeFromExplorationLearnerPlaylist(
+        activityId);
+    } else if (activityType === AppConstants.ACTIVITY_TYPE_COLLECTION) {
+      learnerDashboardActivityIds.removeFromCollectionLearnerPlaylist(
+        activityId);
+    }
   }
 
   async addToLearnerGoals(
