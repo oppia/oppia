@@ -192,7 +192,7 @@ describe('Questions List Service', () => {
     flushMicrotasks();
 
     expect(qls.getCurrentPageNumber()).toBe(0);
-    expect(qls.isLastQuestionBatch()).toBe(true);
+    expect(qls.isLastQuestionBatch()).toBeTrue();
     expect(quesionSummariesInitializedSpy).toHaveBeenCalledTimes(1);
 
     const cachedQuestionSummaries = qls.getCachedQuestionSummaries();

@@ -218,8 +218,7 @@ export class EditableQuestionBackendApiService {
       changeList: string[]): Promise<QuestionBackendDict> {
     return new Promise((resolve, reject) => {
       this._updateQuestionAsync(
-        questionId,
-        commitMessage, changeList, resolve, reject);
+        questionId, commitMessage, changeList, resolve, reject);
     });
   }
 }
