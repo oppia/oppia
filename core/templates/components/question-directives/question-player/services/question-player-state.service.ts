@@ -36,7 +36,7 @@ interface QuestionPlayerState {
     linkedSkillIds: string[];
     answers: Answer[];
     usedHints: UsedHintOrSolution[];
-    viewedSolution: UsedHintOrSolution;
+    viewedSolution: UsedHintOrSolution | undefined;
   };
 }
 
@@ -60,9 +60,7 @@ export class QuestionPlayerStateService {
       linkedSkillIds: linkedSkillIds,
       answers: [],
       usedHints: [],
-      viewedSolution: {
-        timestamp: 0 // Default case when solution is not viewed.
-      }
+      viewedSolution: undefined
     };
   }
 
@@ -99,8 +97,7 @@ export class QuestionPlayerStateService {
     }
     // Don't store a correct answer in the case where
     // the learner viewed the solution for this question.
-    if (isCorrect && this.questionPlayerState[questionId]
-      .viewedSolution.timestamp !== 0) {
+    if (isCorrect && this.questionPlayerState[questionId].viewedSolution) {
       return;
     }
     this.questionPlayerState[questionId].answers.push(

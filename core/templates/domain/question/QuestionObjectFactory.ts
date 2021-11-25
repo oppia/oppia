@@ -119,7 +119,9 @@ export class Question {
     if (
       !interaction.solution &&
       InteractionSpecsConstants.INTERACTION_SPECS[
-        interaction.id as InteractionSpecsKey].can_have_solution) {
+        interaction.id as InteractionSpecsKey
+      ].can_have_solution
+    ) {
       return 'A solution must be specified';
     }
     var answerGroups = this._stateData.interaction.answerGroups;
@@ -137,7 +139,8 @@ export class Question {
   }
 
   getUnaddressedMisconceptionNames(
-      misconceptionsBySkill: MisconceptionSkillMap = {}): string[] {
+      misconceptionsBySkill: MisconceptionSkillMap = {}
+  ): string[] {
     var answerGroups = this._stateData.interaction.answerGroups;
     var taggedSkillMisconceptionIds: { [stateName: string]: boolean } = {};
     for (var i = 0; i < answerGroups.length; i++) {
@@ -170,9 +173,11 @@ export class Question {
     return unaddressedMisconceptionNames;
   }
 
+  /* Empty string in id denotes the a new question whose id is yet
+  to be set, this id is layer set in backend api service. */
   toBackendDict(isNewQuestion: boolean): QuestionBackendDict {
     var questionBackendDict: QuestionBackendDict = {
-      id: 'id',
+      id: '',
       question_state_data: this._stateData.toBackendDict(),
       question_state_data_schema_version: this._version,
       language_code: this._languageCode,
@@ -196,9 +201,14 @@ export class QuestionObjectFactory {
   constructor(
     private stateObject: StateObjectFactory) {}
 
+  /* Empty string in id denotes the a new question whose id is yet
+  to be set, this id is layer set in backend api service. the same
+  is the case with state name being empty string. This function cannot
+  be removed as it is used to create a temperory default question in
+  question editor until the question is once saved. */
   createDefaultQuestion(skillIds: string[]): Question {
     return new Question(
-      'id', this.stateObject.createDefaultState('state'),
+      '', this.stateObject.createDefaultState(''),
       constants.DEFAULT_LANGUAGE_CODE, 1, skillIds, []);
   }
 
