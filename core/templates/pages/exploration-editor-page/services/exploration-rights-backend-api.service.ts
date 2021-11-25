@@ -67,8 +67,8 @@ export class ExplorationRightsBackendApiService {
   async setViewabilityPutData(
       explorationId: string, version: number, viewableIfPrivate: boolean
   ): Promise<ExplorationRightsBackendData> {
-    const requestUrl = (
-      '/createhandler/rights/' + explorationId);
+    const requestUrl = ('/createhandler/rights/' + explorationId);
+
     return this.http.put<ExplorationRightsBackendData>(requestUrl, {
       version: version,
       viewableIfPrivate: viewableIfPrivate
@@ -78,8 +78,7 @@ export class ExplorationRightsBackendApiService {
   async publishPutData(
       explorationId: string, makePublic: boolean
   ): Promise<ExplorationRightsBackendData> {
-    const requestUrl = (
-      '/createhandler/status/' + explorationId);
+    const requestUrl = ('/createhandler/status/' + explorationId);
 
     return this.http.put<ExplorationRightsBackendData>(requestUrl, {
       make_public: makePublic
@@ -124,8 +123,7 @@ export class ExplorationRightsBackendApiService {
       explorationId: string, voiceArtistUsername: string
   ): Promise<ExplorationRightsBackendData> {
     const requestUrl = (
-      '/voice_artist_management_handler/' + 'exploration/' +
-      explorationId);
+      '/voice_artist_management_handler/' + 'exploration/' + explorationId);
 
     return this.http.delete<ExplorationRightsBackendData>(requestUrl, {
       params: {

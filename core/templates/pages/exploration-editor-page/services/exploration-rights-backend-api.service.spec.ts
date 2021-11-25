@@ -40,76 +40,72 @@ describe('Exploration Rights Backend Api Service', () => {
     httpTestingController.verify();
   });
 
-  it('should check makeCommunityOwnedPutData working fine',
-    fakeAsync(() => {
-      service.makeCommunityOwnedPutData(
-        'oppia12345', 3, true
-      ).then(successHandler, failHandler);
+  it('should check makeCommunityOwnedPutData working fine', fakeAsync(() => {
+    service.makeCommunityOwnedPutData(
+      'oppia12345', 3, true
+    ).then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne(
-        '/createhandler/rights/oppia12345');
-      expect(req.request.method).toEqual('PUT');
-      req.flush([]);
+    let req = httpTestingController.expectOne(
+      '/createhandler/rights/oppia12345');
+    expect(req.request.method).toEqual('PUT');
+    req.flush([]);
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-    })
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  })
   );
 
-  it('should check saveRoleChangesPutData working fine',
-    fakeAsync(() => {
-      service.saveRoleChangesPutData(
-        'oppia12345', 3, 'editor', 'usernameForEditorRole'
-      ).then(successHandler, failHandler);
+  it('should check saveRoleChangesPutData working fine', fakeAsync(() => {
+    service.saveRoleChangesPutData(
+      'oppia12345', 3, 'editor', 'usernameForEditorRole'
+    ).then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne(
-        '/createhandler/rights/oppia12345');
-      expect(req.request.method).toEqual('PUT');
-      req.flush([]);
+    let req = httpTestingController.expectOne(
+      '/createhandler/rights/oppia12345');
+    expect(req.request.method).toEqual('PUT');
+    req.flush([]);
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-    })
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  })
   );
 
-  it('should check setViewabilityPutData working fine',
-    fakeAsync(() => {
-      service.setViewabilityPutData(
-        'oppia12345', 3, true
-      ).then(successHandler, failHandler);
+  it('should check setViewabilityPutData working fine', fakeAsync(() => {
+    service.setViewabilityPutData(
+      'oppia12345', 3, true
+    ).then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne(
-        '/createhandler/rights/oppia12345');
-      expect(req.request.method).toEqual('PUT');
-      req.flush([]);
+    let req = httpTestingController.expectOne(
+      '/createhandler/rights/oppia12345');
+    expect(req.request.method).toEqual('PUT');
+    req.flush([]);
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-    })
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  })
   );
 
-  it('should check publishPutData working fine',
-    fakeAsync(() => {
-      service.publishPutData(
-        'oppia12345', true
-      ).then(successHandler, failHandler);
+  it('should check publishPutData working fine', fakeAsync(() => {
+    service.publishPutData(
+      'oppia12345', true
+    ).then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne(
-        '/createhandler/status/oppia12345');
-      expect(req.request.method).toEqual('PUT');
-      req.flush([]);
+    let req = httpTestingController.expectOne(
+      '/createhandler/status/oppia12345');
+    expect(req.request.method).toEqual('PUT');
+    req.flush([]);
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-    })
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  })
   );
 
   it('should check saveModeratorChangeToBackendAsyncPutData working fine',
@@ -130,22 +126,21 @@ describe('Exploration Rights Backend Api Service', () => {
     })
   );
 
-  it('should check removeRoleAsyncDeleteData working fine',
-    fakeAsync(() => {
-      service.removeRoleAsyncDeleteData(
-        'oppia12345', 'userNameForDeleteTheUser'
-      ).then(successHandler, failHandler);
+  it('should check removeRoleAsyncDeleteData working fine', fakeAsync(() => {
+    service.removeRoleAsyncDeleteData(
+      'oppia12345', 'userNameForDeleteTheUser'
+    ).then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne(
-        '/createhandler/rights/oppia12345?username=userNameForDeleteTheUser');
-      expect(req.request.method).toEqual('DELETE');
-      req.flush([]);
+    let req = httpTestingController.expectOne(
+      '/createhandler/rights/oppia12345?username=userNameForDeleteTheUser');
+    expect(req.request.method).toEqual('DELETE');
+    req.flush([]);
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-    })
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  })
   );
 
   it('should check assignVoiceArtistRoleAsyncPostData working fine',

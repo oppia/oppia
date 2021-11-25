@@ -63,6 +63,7 @@ describe('Exploration rights service', () => {
         ExplorationRightsBackendApiService
       ]
     });
+
     als = TestBed.inject(AlertsService);
     csrfService = TestBed.inject(CsrfTokenService);
     ers = TestBed.inject(ExplorationRightsService);

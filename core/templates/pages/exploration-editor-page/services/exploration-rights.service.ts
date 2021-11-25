@@ -121,8 +121,8 @@ export class ExplorationRightsService {
       viewableIfPrivate: boolean): Promise<void> {
     return this.explorationRightsBackendApiService.setViewabilityPutData(
       this.explorationDataService.explorationId,
-      this.explorationDataService.data.version, viewableIfPrivate)
-      .then((response: ExplorationRightsBackendData) => {
+      this.explorationDataService.data.version, viewableIfPrivate).then(
+      (response: ExplorationRightsBackendData) => {
         let data = response;
         this.alertsService.clearWarnings();
         this.init(
@@ -135,25 +135,8 @@ export class ExplorationRightsService {
 
   publish(): Promise<void> {
     return this.explorationRightsBackendApiService.publishPutData(
-      this.explorationDataService.explorationId,
-      true).then((response: ExplorationRightsBackendData) => {
-      let data = response;
-      this.alertsService.clearWarnings();
-      this.init(
-        data.rights.owner_names, data.rights.editor_names,
-        data.rights.voice_artist_names, data.rights.viewer_names,
-        data.rights.status, data.rights.cloned_from,
-        data.rights.community_owned, data.rights.viewable_if_private);
-    });
-  }
-
-  saveModeratorChangeToBackendAsync(emailBody: string): Promise<void> {
-    return this.explorationRightsBackendApiService
-      .saveModeratorChangeToBackendAsyncPutData(
-        this.explorationDataService.explorationId,
-        this.explorationDataService.data.version,
-        emailBody)
-      .then((response: ExplorationRightsBackendData) => {
+      this.explorationDataService.explorationId, true).then(
+      (response: ExplorationRightsBackendData) => {
         let data = response;
         this.alertsService.clearWarnings();
         this.init(
@@ -161,7 +144,23 @@ export class ExplorationRightsService {
           data.rights.voice_artist_names, data.rights.viewer_names,
           data.rights.status, data.rights.cloned_from,
           data.rights.community_owned, data.rights.viewable_if_private);
-      }).catch(() => {
+      });
+  }
+
+  saveModeratorChangeToBackendAsync(emailBody: string): Promise<void> {
+    return this.explorationRightsBackendApiService
+      .saveModeratorChangeToBackendAsyncPutData(
+        this.explorationDataService.explorationId,
+        this.explorationDataService.data.version, emailBody).then(
+        (response: ExplorationRightsBackendData) => {
+          let data = response;
+          this.alertsService.clearWarnings();
+          this.init(
+            data.rights.owner_names, data.rights.editor_names,
+            data.rights.voice_artist_names, data.rights.viewer_names,
+            data.rights.status, data.rights.cloned_from,
+            data.rights.community_owned, data.rights.viewable_if_private);
+        }).catch(() => {
         this.init(
           null, null, null, null,
           null, null, null, null);
@@ -170,8 +169,8 @@ export class ExplorationRightsService {
 
   removeRoleAsync(memberUsername: string): Promise<void> {
     return this.explorationRightsBackendApiService.removeRoleAsyncDeleteData(
-      this.explorationDataService.explorationId, memberUsername)
-      .then((response: ExplorationRightsBackendData) => {
+      this.explorationDataService.explorationId, memberUsername).then(
+      (response: ExplorationRightsBackendData) => {
         let data = response;
         this.alertsService.clearWarnings();
         this.init(
@@ -195,15 +194,15 @@ export class ExplorationRightsService {
   removeVoiceArtistRoleAsync(voiceArtistUsername: string): Promise<void> {
     return this.explorationRightsBackendApiService
       .removeVoiceArtistRoleAsyncDeleteData(
-        this.explorationDataService.explorationId,
-        voiceArtistUsername).then((response) => {
-        this.alertsService.clearWarnings();
-        this.voiceArtistNames.forEach((username, index) => {
-          if (username === voiceArtistUsername) {
-            this.voiceArtistNames.splice(index, 1);
-          }
+        this.explorationDataService.explorationId, voiceArtistUsername).then(
+        (response) => {
+          this.alertsService.clearWarnings();
+          this.voiceArtistNames.forEach((username, index) => {
+            if (username === voiceArtistUsername) {
+              this.voiceArtistNames.splice(index, 1);
+            }
+          });
         });
-      });
   }
 
   checkUserAlreadyHasRoles(username: string): boolean {
