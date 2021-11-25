@@ -517,6 +517,17 @@ class ElasticSearchStub:
 class AuthServicesStub:
     """Test-only implementation of the public API in core.platform.auth."""
 
+    class AuthUser:
+        """Authentication user with ID and deletion status."""
+
+        def __init__(self, user_id, deleted=False):
+            self.id = user_id
+            self.deleted = deleted
+
+        def mark_as_deleted(self):
+            """Marks the user as deleted."""
+            self.deleted = True
+
     def __init__(self):
         """Initializes a new instance that emulates an empty auth server."""
         self._user_id_by_auth_id = {}
@@ -639,10 +650,9 @@ class AuthServicesStub:
             user_id: str. The unique ID of the user whose associations should be
                 deleted.
         """
-        self._user_id_by_auth_id = {
-            a: u if u['id'] != user_id else {'id': u['id'], 'deleted': True}
-            for a, u in self._user_id_by_auth_id.items()
-        }
+        for user in self._user_id_by_auth_id.values():
+            if user.id == user_id:
+                user.mark_as_deleted()
 
     def delete_external_auth_associations(self, user_id):
         """Deletes all associations that refer to the user outside of Oppia.
@@ -678,8 +688,8 @@ class AuthServicesStub:
             no association exists.
         """
         return next((
-            a for a, u in self._user_id_by_auth_id.items()
-            if u['id'] == user_id and not u['deleted']
+            auth_id for auth_id, user in self._user_id_by_auth_id.items()
+            if user.id == user_id and not user.deleted
         ), None)
 
     def get_user_id_from_auth_id(self, auth_id, include_deleted=False):
@@ -694,12 +704,12 @@ class AuthServicesStub:
             str|None. The user ID associated with the given auth ID, or None if
             no association exists.
         """
-        auth_id_to_user_id = self._user_id_by_auth_id.get(auth_id, None)
-        if auth_id_to_user_id is None:
+        user = self._user_id_by_auth_id.get(auth_id, None)
+        if user is None:
             return None
 
-        if include_deleted or not auth_id_to_user_id['deleted']:
-            return auth_id_to_user_id['id']
+        if include_deleted or not user.deleted:
+            return user.id
 
         return None
 
@@ -726,7 +736,8 @@ class AuthServicesStub:
             IDs, or None for associations which don't exist.
         """
         auth_id_by_user_id = {
-            u['id']: a for a, u in self._user_id_by_auth_id.items()
+            user.id: auth_id
+            for auth_id, user in self._user_id_by_auth_id.items()
         }
         return [auth_id_by_user_id.get(user_id, None) for user_id in user_ids]
 
@@ -750,7 +761,7 @@ class AuthServicesStub:
         auth_models.UserAuthDetailsModel(
             id=user_id, firebase_auth_id=auth_id).put()
         self._external_user_id_associations.add(user_id)
-        self._user_id_by_auth_id[auth_id] = {'id': user_id, 'deleted': False}
+        self._user_id_by_auth_id[auth_id] = AuthServicesStub.AuthUser(user_id)
 
     def associate_multi_auth_ids_with_user_ids(self, auth_id_user_id_pairs):
         """Commits the associations between auth IDs and user IDs.
@@ -776,7 +787,8 @@ class AuthServicesStub:
         self._external_user_id_associations.add(
             u for _, u in auth_id_user_id_pairs)
         auth_id_user_id_pairs_with_deletion = {
-            a: {'id': u, 'deleted': False} for a, u in auth_id_user_id_pairs
+            auth_id: AuthServicesStub.AuthUser(user_id)
+            for auth_id, user_id in auth_id_user_id_pairs
         }
         self._user_id_by_auth_id.update(auth_id_user_id_pairs_with_deletion)
 

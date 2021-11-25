@@ -47,7 +47,7 @@ class StaleAuthSessionError(Exception):
 
 
 class UserDisabledError(Exception):
-    """Error raised when the user which details are requested is disabled."""
+    """Error raised when the user whose details are requested is disabled."""
 
     pass
 
