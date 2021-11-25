@@ -590,8 +590,10 @@ export class StateGraphLayoutService {
   }
 
   modifyPositionValues(
-      nodeData: Record<string, number>[], graphWidth: number,
-      graphHeight: number): Record<string, number>[] {
+      nodeData: Record<string, number>[], 
+      graphWidth: number,
+      graphHeight: number
+  ): Record<string, number>[] {
     var HORIZONTAL_NODE_PROPERTIES = ['x0', 'width', 'xLabel'];
     var VERTICAL_NODE_PROPERTIES = ['y0', 'height', 'yLabel'];
 
