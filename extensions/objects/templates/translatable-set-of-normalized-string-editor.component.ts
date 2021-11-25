@@ -18,6 +18,12 @@
 import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
+export interface TranslatableSetOfStringSchema {
+  type: string;
+  items: { type: string };
+  validators: { id: string }[];
+}
+
 @Component({
   selector: 'translatable-set-of-normalized-string-editor',
   templateUrl: './translatable-set-of-normalized-string-editor.component.html'
@@ -28,11 +34,7 @@ export class TranslatableSetOfNormalizedStringEditorComponent {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() value!: { normalizedStrSet: string };
   @Output() valueChanged = new EventEmitter();
-  schema: {
-    type: string;
-    items: { type: string; };
-    validators: { id: string; }[];
-  } = {
+  schema: TranslatableSetOfStringSchema = {
     type: 'list',
     items: {
       type: 'unicode'
@@ -53,11 +55,7 @@ export class TranslatableSetOfNormalizedStringEditorComponent {
     this.changeDetectorRef.detectChanges();
   }
 
-  getSchema(): {
-    type: string;
-    items: { type: string; };
-    validators: { id: string; }[];
-    } {
+  getSchema(): TranslatableSetOfStringSchema {
     return this.schema;
   }
 }
