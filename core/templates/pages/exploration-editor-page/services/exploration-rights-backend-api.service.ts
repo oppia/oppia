@@ -42,18 +42,22 @@ export class ExplorationRightsBackendApiService {
   ) { }
 
   async makeCommunityOwnedPutData(
-      url: string, version: number, makeCommunityOwned: boolean):
+      explorationId: string, version: number, makeCommunityOwned: boolean):
     Promise<ExplorationRightsBackendData> {
-    return this.http.put<ExplorationRightsBackendData>(url, {
+    const requestUrl = ('/createhandler/rights/' + explorationId);
+
+    return this.http.put<ExplorationRightsBackendData>(requestUrl, {
       version: version,
       make_communityOwned: makeCommunityOwned
     }).toPromise();
   }
 
   async saveRoleChangesPutData(
-      url: string, version: number, newMemberRole: string,
+      explorationId: string, version: number, newMemberRole: string,
       newMemberUsername: string): Promise<ExplorationRightsBackendData> {
-    return this.http.put<ExplorationRightsBackendData>(url, {
+    const requestUrl = ('/createhandler/rights/' + explorationId);
+
+    return this.http.put<ExplorationRightsBackendData>(requestUrl, {
       version: version,
       new_member_role: newMemberRole,
       new_member_username: newMemberUsername
@@ -61,35 +65,44 @@ export class ExplorationRightsBackendApiService {
   }
 
   async setViewabilityPutData(
-      url: string, version: number, viewableIfPrivate: boolean
+      explorationId: string, version: number, viewableIfPrivate: boolean
   ): Promise<ExplorationRightsBackendData> {
-    return this.http.put<ExplorationRightsBackendData>(url, {
+    const requestUrl = (
+      '/createhandler/rights/' + explorationId);
+    return this.http.put<ExplorationRightsBackendData>(requestUrl, {
       version: version,
       viewableIfPrivate: viewableIfPrivate
     }).toPromise();
   }
 
   async publishPutData(
-      url: string, makePublic: boolean
+      explorationId: string, makePublic: boolean
   ): Promise<ExplorationRightsBackendData> {
-    return this.http.put<ExplorationRightsBackendData>(url, {
+    const requestUrl = (
+      '/createhandler/status/' + explorationId);
+
+    return this.http.put<ExplorationRightsBackendData>(requestUrl, {
       make_public: makePublic
     }).toPromise();
   }
 
   async saveModeratorChangeToBackendAsyncPutData(
-      url: string, version: number, emailBody: string
+      explorationId: string, version: number, emailBody: string
   ): Promise<ExplorationRightsBackendData> {
-    return this.http.put<ExplorationRightsBackendData>(url, {
+    const requestUrl = ('/createhandler/moderatorrights/' + explorationId);
+
+    return this.http.put<ExplorationRightsBackendData>(requestUrl, {
       email_body: emailBody,
       version: version
     }).toPromise();
   }
 
   async removeRoleAsyncDeleteData(
-      url: string, memberUsername: string
+      explorationId: string, memberUsername: string
   ): Promise<ExplorationRightsBackendData> {
-    return this.http.delete<ExplorationRightsBackendData>(url, {
+    const requestUrl = ('/createhandler/rights/' + explorationId);
+
+    return this.http.delete<ExplorationRightsBackendData>(requestUrl, {
       params: {
         username: memberUsername
       }
@@ -97,17 +110,24 @@ export class ExplorationRightsBackendApiService {
   }
 
   async assignVoiceArtistRoleAsyncPostData(
-      url: string, newVoiceArtistUsername: string
+      explorationId: string, newVoiceArtistUsername: string
   ): Promise<ExplorationRightsBackendData> {
-    return this.http.post<ExplorationRightsBackendData>(url, {
+    const requestUrl = (
+      '/voice_artist_management_handler/' + 'exploration/' + explorationId);
+
+    return this.http.post<ExplorationRightsBackendData>(requestUrl, {
       username: newVoiceArtistUsername
     }).toPromise();
   }
 
   async removeVoiceArtistRoleAsyncDeleteData(
-      url: string, voiceArtistUsername: string
+      explorationId: string, voiceArtistUsername: string
   ): Promise<ExplorationRightsBackendData> {
-    return this.http.delete<ExplorationRightsBackendData>(url, {
+    const requestUrl = (
+      '/voice_artist_management_handler/' + 'exploration/' +
+      explorationId);
+
+    return this.http.delete<ExplorationRightsBackendData>(requestUrl, {
       params: {
         voice_artist: voiceArtistUsername
       }

@@ -85,11 +85,10 @@ export class ExplorationRightsService {
   }
 
   makeCommunityOwned(): Promise<void> {
-    const requestUrl = (
-      '/createhandler/rights/' + this.explorationDataService.explorationId);
     return this.explorationRightsBackendApiService
       .makeCommunityOwnedPutData(
-        requestUrl, this.explorationDataService.data.version, true)
+        this.explorationDataService.explorationId,
+        this.explorationDataService.data.version, true)
       .then((response: ExplorationRightsBackendData) => {
         let data = response;
         this.alertsService.clearWarnings();
@@ -103,10 +102,9 @@ export class ExplorationRightsService {
 
   saveRoleChanges(
       newMemberUsername: string, newMemberRole: string): Promise<void> {
-    const requestUrl = (
-      '/createhandler/rights/' + this.explorationDataService.explorationId);
     return this.explorationRightsBackendApiService.saveRoleChangesPutData(
-      requestUrl, this.explorationDataService.data.version,
+      this.explorationDataService.explorationId,
+      this.explorationDataService.data.version,
       newMemberRole, newMemberUsername)
       .then((response: ExplorationRightsBackendData) => {
         let data = response;
@@ -121,11 +119,9 @@ export class ExplorationRightsService {
 
   setViewability(
       viewableIfPrivate: boolean): Promise<void> {
-    const requestUrl = (
-      '/createhandler/rights/' + this.explorationDataService.explorationId);
-
     return this.explorationRightsBackendApiService.setViewabilityPutData(
-      requestUrl, this.explorationDataService.data.version, viewableIfPrivate)
+      this.explorationDataService.explorationId,
+      this.explorationDataService.data.version, viewableIfPrivate)
       .then((response: ExplorationRightsBackendData) => {
         let data = response;
         this.alertsService.clearWarnings();
@@ -138,11 +134,9 @@ export class ExplorationRightsService {
   }
 
   publish(): Promise<void> {
-    const requestUrl = (
-      '/createhandler/status/' + this.explorationDataService.explorationId);
-
     return this.explorationRightsBackendApiService.publishPutData(
-      requestUrl, true).then((response: ExplorationRightsBackendData) => {
+      this.explorationDataService.explorationId,
+      true).then((response: ExplorationRightsBackendData) => {
       let data = response;
       this.alertsService.clearWarnings();
       this.init(
@@ -154,13 +148,10 @@ export class ExplorationRightsService {
   }
 
   saveModeratorChangeToBackendAsync(emailBody: string): Promise<void> {
-    const explorationModeratorRightsUrl = (
-      '/createhandler/moderatorrights/' +
-      this.explorationDataService.explorationId);
-
     return this.explorationRightsBackendApiService
       .saveModeratorChangeToBackendAsyncPutData(
-        explorationModeratorRightsUrl, this.explorationDataService.data.version,
+        this.explorationDataService.explorationId,
+        this.explorationDataService.data.version,
         emailBody)
       .then((response: ExplorationRightsBackendData) => {
         let data = response;
@@ -178,11 +169,8 @@ export class ExplorationRightsService {
   }
 
   removeRoleAsync(memberUsername: string): Promise<void> {
-    const requestUrl = (
-      '/createhandler/rights/' + this.explorationDataService.explorationId);
-
     return this.explorationRightsBackendApiService.removeRoleAsyncDeleteData(
-      requestUrl, memberUsername)
+      this.explorationDataService.explorationId, memberUsername)
       .then((response: ExplorationRightsBackendData) => {
         let data = response;
         this.alertsService.clearWarnings();
@@ -195,25 +183,20 @@ export class ExplorationRightsService {
   }
 
   assignVoiceArtistRoleAsync(newVoiceArtistUsername: string): Promise<void> {
-    const requestUrl = (
-      '/voice_artist_management_handler/' + 'exploration/' +
-      this.explorationDataService.explorationId);
-
     return this.explorationRightsBackendApiService
       .assignVoiceArtistRoleAsyncPostData(
-        requestUrl, newVoiceArtistUsername).then(() => {
+        this.explorationDataService.explorationId,
+        newVoiceArtistUsername).then(() => {
         this.alertsService.clearWarnings();
         this.voiceArtistNames.push(newVoiceArtistUsername);
       });
   }
 
   removeVoiceArtistRoleAsync(voiceArtistUsername: string): Promise<void> {
-    const requestUrl = (
-      '/voice_artist_management_handler/' + 'exploration/' +
-      this.explorationDataService.explorationId);
     return this.explorationRightsBackendApiService
       .removeVoiceArtistRoleAsyncDeleteData(
-        requestUrl, voiceArtistUsername).then((response) => {
+        this.explorationDataService.explorationId,
+        voiceArtistUsername).then((response) => {
         this.alertsService.clearWarnings();
         this.voiceArtistNames.forEach((username, index) => {
           if (username === voiceArtistUsername) {

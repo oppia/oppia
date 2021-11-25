@@ -43,10 +43,11 @@ describe('Exploration Rights Backend Api Service', () => {
   it('should check makeCommunityOwnedPutData working fine',
     fakeAsync(() => {
       service.makeCommunityOwnedPutData(
-        '/oppia', 3, true
+        'oppia12345', 3, true
       ).then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne('/oppia');
+      let req = httpTestingController.expectOne(
+        '/createhandler/rights/oppia12345');
       expect(req.request.method).toEqual('PUT');
       req.flush([]);
 
@@ -60,10 +61,11 @@ describe('Exploration Rights Backend Api Service', () => {
   it('should check saveRoleChangesPutData working fine',
     fakeAsync(() => {
       service.saveRoleChangesPutData(
-        '/oppia', 3, 'editor', 'shivam'
+        'oppia12345', 3, 'editor', 'usernameForEditorRole'
       ).then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne('/oppia');
+      let req = httpTestingController.expectOne(
+        '/createhandler/rights/oppia12345');
       expect(req.request.method).toEqual('PUT');
       req.flush([]);
 
@@ -77,10 +79,11 @@ describe('Exploration Rights Backend Api Service', () => {
   it('should check setViewabilityPutData working fine',
     fakeAsync(() => {
       service.setViewabilityPutData(
-        '/oppia', 3, true
+        'oppia12345', 3, true
       ).then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne('/oppia');
+      let req = httpTestingController.expectOne(
+        '/createhandler/rights/oppia12345');
       expect(req.request.method).toEqual('PUT');
       req.flush([]);
 
@@ -94,10 +97,11 @@ describe('Exploration Rights Backend Api Service', () => {
   it('should check publishPutData working fine',
     fakeAsync(() => {
       service.publishPutData(
-        '/oppia', true
+        'oppia12345', true
       ).then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne('/oppia');
+      let req = httpTestingController.expectOne(
+        '/createhandler/status/oppia12345');
       expect(req.request.method).toEqual('PUT');
       req.flush([]);
 
@@ -111,10 +115,11 @@ describe('Exploration Rights Backend Api Service', () => {
   it('should check saveModeratorChangeToBackendAsyncPutData working fine',
     fakeAsync(() => {
       service.saveModeratorChangeToBackendAsyncPutData(
-        '/oppia', 3, ''
+        'oppia12345', 3, ''
       ).then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne('/oppia');
+      let req = httpTestingController.expectOne(
+        '/createhandler/moderatorrights/oppia12345');
       expect(req.request.method).toEqual('PUT');
       req.flush([]);
 
@@ -128,10 +133,11 @@ describe('Exploration Rights Backend Api Service', () => {
   it('should check removeRoleAsyncDeleteData working fine',
     fakeAsync(() => {
       service.removeRoleAsyncDeleteData(
-        '/oppia', 'shivam'
+        'oppia12345', 'userNameForDeleteTheUser'
       ).then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne('/oppia?username=shivam');
+      let req = httpTestingController.expectOne(
+        '/createhandler/rights/oppia12345?username=userNameForDeleteTheUser');
       expect(req.request.method).toEqual('DELETE');
       req.flush([]);
 
@@ -145,10 +151,11 @@ describe('Exploration Rights Backend Api Service', () => {
   it('should check assignVoiceArtistRoleAsyncPostData working fine',
     fakeAsync(() => {
       service.assignVoiceArtistRoleAsyncPostData(
-        '/oppia', 'shivam'
+        'oppia12345', 'usernameForAssignVoiceArtistRole'
       ).then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne('/oppia');
+      let req = httpTestingController.expectOne(
+        '/voice_artist_management_handler/exploration/oppia12345');
       expect(req.request.method).toEqual('POST');
       req.flush([]);
 
@@ -162,10 +169,12 @@ describe('Exploration Rights Backend Api Service', () => {
   it('should check removeVoiceArtistRoleAsyncDeleteData working fine',
     fakeAsync(() => {
       service.removeVoiceArtistRoleAsyncDeleteData(
-        '/oppia', 'shivam'
+        'oppia12345', 'usernameForRemoveVoiceArtistRole'
       ).then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne('/oppia?voice_artist=shivam');
+      let req = httpTestingController.expectOne(
+        '/voice_artist_management_handler/' +
+        'exploration/oppia12345?voice_artist=usernameForRemoveVoiceArtistRole');
       expect(req.request.method).toEqual('DELETE');
       req.flush([]);
 

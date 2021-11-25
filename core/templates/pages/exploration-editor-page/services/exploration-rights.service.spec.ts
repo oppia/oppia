@@ -223,7 +223,7 @@ describe('Exploration rights service', () => {
     }));
 
   it('should save a new member', fakeAsync(() => {
-    serviceData.rights.viewer_names = ['shivam'];
+    serviceData.rights.viewer_names = ['viewerName'];
     spyOn(
       explorationRightsBackendApiService,
       'saveRoleChangesPutData').and.returnValue(
@@ -233,7 +233,7 @@ describe('Exploration rights service', () => {
     tick();
 
     expect(ers.viewerNames).toEqual(
-      ['shivam']);
+      ['viewerName']);
   }));
 
   it('should remove existing user', fakeAsync(() => {
