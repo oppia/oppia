@@ -2483,11 +2483,23 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             customization_args_dict)
 
         default_outcome = state_domain.Outcome(
-            'state2', state_domain.SubtitledHtml(
+            None, state_domain.SubtitledHtml(
                 'default_outcome', '<p>Default outcome for state1</p>'),
-            False, [], None, None
+            True, [], None, None
         )
         question_state_data.update_interaction_default_outcome(default_outcome)
+
+        hint_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint_1',
+                    (
+                        '<p>Hello, this is html1 for state1</p>'
+                    )
+                )
+            )
+        ]
+        question_state_data.update_interaction_hints(hint_list)
 
         question_state_dict = question_state_data.to_dict()
         self.save_new_skill('skill1', self.author_id, description='description')
