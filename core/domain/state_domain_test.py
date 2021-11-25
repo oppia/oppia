@@ -5889,3 +5889,131 @@ class MultipleChoiceInputInteractionTests(test_utils.GenericTestBase):
         self.assertEqual(
             multiple_choice_input_proto.answer_groups[0].rule_specs[0].equals.input, # pylint: disable=line-too-long
             5)
+
+
+class TextInputInteractionTests(test_utils.GenericTestBase):
+
+    def test_to_proto(self):
+        interaction_dict = {
+            'hints': [{
+                'hint_content': {
+                    'content_id': 'hint_1',
+                    'html': '<p>This is a copyright character ©.</p>'
+                }
+            }],
+            'confirmed_unclassified_answers': [],
+            'solution': {
+                'correct_answer': 'Solution',
+                'explanation': {
+                    'content_id': 'solution',
+                    'html': '<p>Solution explanation</p>',
+                },
+                'answer_is_exclusive': False,
+            },
+            'id': 'TextInput',
+            'customization_args': {
+                'rows': {
+                    'value': 1
+                },
+                'placeholder': {
+                    'value': {
+                        'content_id': 'ca_placeholder_0',
+                        'unicode_str': '😍😍😍😍'
+                    }
+                }
+            },
+            'default_outcome': {
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'dest': 'Introduction',
+                'missing_prerequisite_skill_id': None,
+                'feedback': {
+                    'content_id': 'default_outcome',
+                    'html': '<p> Default Outcome </p>'
+                },
+                'labelled_as_correct': False
+            },
+            'answer_groups': [{
+                'training_data': [],
+                'outcome': {
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'dest': 'Introduction',
+                    'missing_prerequisite_skill_id': None,
+                    'feedback': {
+                        'content_id': 'feedback_2',
+                        'html': '<p>This is great! ®®</p>'
+                    },
+                    'labelled_as_correct': False
+                },
+                'rule_specs': [{
+                    'rule_type': 'Contains',
+                    'inputs': {
+                        'x': {
+                            'contentId': 'rule_input_4',
+                            'normalizedStrSet': ['®®']
+                        }
+                    }
+                }],
+                'tagged_skill_misconception_id': None
+            }]
+        }
+        text_input_instance = (
+            interaction_registry.Registry.get_interaction_by_id(
+                'TextInput'))
+        interaction_domain = (
+            state_domain.InteractionInstance.from_dict(
+                interaction_dict))
+        text_input_proto = text_input_instance.to_proto(
+            interaction_domain.default_outcome,
+            interaction_domain.customization_args,
+            interaction_domain.solution,
+            interaction_domain.hints,
+            interaction_domain.answer_groups)
+        self.assertEqual(
+            text_input_proto.customization_args.placeholder.content_id,
+            'ca_placeholder_0')
+        self.assertEqual(
+            text_input_proto.customization_args.placeholder.text,
+            '😍😍😍😍')
+        self.assertEqual(
+            text_input_proto.customization_args.rows,
+            1)
+        self.assertEqual(
+            text_input_proto.hints[0].hint_content.content_id,
+            'hint_1')
+        self.assertEqual(
+            text_input_proto.hints[0].hint_content.text,
+            '<p>This is a copyright character ©.</p>')
+        self.assertEqual(
+            text_input_proto.default_outcome.destination_state,
+            'Introduction')
+        self.assertEqual(
+            text_input_proto.default_outcome.feedback.content_id,
+            'default_outcome')
+        self.assertEqual(
+            text_input_proto.default_outcome.feedback.text,
+            '<p> Default Outcome </p>')
+        self.assertEqual(
+            text_input_proto.default_outcome.labelled_as_correct,
+            False)
+        self.assertEqual(
+            text_input_proto.answer_groups[0].base_answer_group.outcome.destination_state, # pylint: disable=line-too-long
+            'Introduction')
+        self.assertEqual(
+            text_input_proto.answer_groups[0].base_answer_group.outcome.labelled_as_correct, # pylint: disable=line-too-long
+            False)
+        self.assertEqual(
+            text_input_proto.answer_groups[0].base_answer_group.outcome.feedback.content_id, # pylint: disable=line-too-long
+            'feedback_2')
+        self.assertEqual(
+            text_input_proto.answer_groups[0].base_answer_group.outcome.feedback.text, # pylint: disable=line-too-long
+            '<p>This is great! ®®</p>')
+        self.assertEqual(
+            text_input_proto.solution.correct_answer, 'Solution')
+        self.assertEqual(
+            text_input_proto.solution.base_solution.explanation.content_id,
+            'solution')
+        self.assertEqual(
+            text_input_proto.solution.base_solution.explanation.text,
+            '<p>Solution explanation</p>')

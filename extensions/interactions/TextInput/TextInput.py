@@ -182,7 +182,10 @@ class TextInput(base.BaseInteraction):
         Returns:
             CustomizationArgs. The proto object.
         """
+        placeholder_proto = (
+            customization_args['placeholder'].value.to_proto())
 
         return state_pb2.TextInputInstance.CustomizationArgs(
+            placeholder=placeholder_proto,
             rows=customization_args['rows'].value
         )
