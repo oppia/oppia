@@ -19,7 +19,6 @@
 from __future__ import annotations
 
 import io
-import itertools
 import os
 import pkgutil
 import sys
