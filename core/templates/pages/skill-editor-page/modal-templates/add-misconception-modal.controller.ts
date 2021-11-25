@@ -26,9 +26,11 @@ require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 angular.module('oppia').controller('AddMisconceptionModalController', [
   '$controller', '$scope', '$uibModalInstance', 'MisconceptionObjectFactory',
   'SkillEditorStateService', 'MAX_CHARS_IN_MISCONCEPTION_NAME',
+  'MAX_CHARS_IN_SKILL_MISCONCEPTION_EDITOR',
   function(
       $controller, $scope, $uibModalInstance, MisconceptionObjectFactory,
-      SkillEditorStateService, MAX_CHARS_IN_MISCONCEPTION_NAME) {
+      SkillEditorStateService, MAX_CHARS_IN_MISCONCEPTION_NAME,
+      MAX_CHARS_IN_SKILL_MISCONCEPTION_EDITOR) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
@@ -36,6 +38,8 @@ angular.module('oppia').controller('AddMisconceptionModalController', [
     $scope.skill = SkillEditorStateService.getSkill();
     $scope.MAX_CHARS_IN_MISCONCEPTION_NAME =
       MAX_CHARS_IN_MISCONCEPTION_NAME;
+    $scope.MAX_CHARS_IN_SKILL_MISCONCEPTION_EDITOR =
+      MAX_CHARS_IN_SKILL_MISCONCEPTION_EDITOR;
     $scope.MISCONCEPTION_PROPERTY_FORM_SCHEMA = {
       type: 'html',
       ui_config: {
@@ -62,10 +66,12 @@ angular.module('oppia').controller('AddMisconceptionModalController', [
     $scope.misconceptionNameIsDuplicate = false;
 
     $scope.isMisconceptionNotesHtmlLengthExceeded = () =>
-      $scope.misconceptionNotes.length > 1000;
+      $scope.misconceptionNotes.length >
+      $scope.MAX_CHARS_IN_SKILL_MISCONCEPTION_EDITOR;
 
     $scope.isMisconceptionFeedbackHtmlLengthExceeded = () =>
-      $scope.misconceptionFeedback.length > 1000;
+      $scope.misconceptionFeedback.length >
+      $scope.MAX_CHARS_IN_SKILL_MISCONCEPTION_EDITOR;
 
     $scope.saveMisconception = function() {
       if ($scope.misconceptionNameIsDuplicate) {

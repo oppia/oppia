@@ -22,11 +22,17 @@ require(
 
 angular.module('oppia').controller('AddWorkedExampleModalController', [
   '$controller', '$scope', '$uibModalInstance',
-  function($controller, $scope, $uibModalInstance) {
+  'MAX_CHARS_IN_SKILL_WORKED_EXAMPLE_EDITOR',
+  function(
+      $controller, $scope, $uibModalInstance,
+      MAX_CHARS_IN_SKILL_WORKED_EXAMPLE_EDITOR) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
     });
+
+    $scope.MAX_CHARS_IN_SKILL_WORKED_EXAMPLE_EDITOR =
+      MAX_CHARS_IN_SKILL_WORKED_EXAMPLE_EDITOR;
 
     $scope.WORKED_EXAMPLE_FORM_SCHEMA = {
       type: 'html',
@@ -37,10 +43,12 @@ angular.module('oppia').controller('AddWorkedExampleModalController', [
     $scope.tmpWorkedExampleExplanationHtml = '';
 
     $scope.isWorkedExampleQuestionHtmlLengthExceeded = () =>
-      $scope.tmpWorkedExampleQuestionHtml.length > 1000;
+      $scope.tmpWorkedExampleQuestionHtml.length >
+      $scope.MAX_CHARS_IN_SKILL_WORKED_EXAMPLE_EDITOR;
 
     $scope.isWorkedExampleExplanationHtmlLengthExceeded = () =>
-      $scope.tmpWorkedExampleExplanationHtml.length > 1000;
+      $scope.tmpWorkedExampleExplanationHtml.length >
+      $scope.MAX_CHARS_IN_SKILL_WORKED_EXAMPLE_EDITOR;
 
     $scope.saveWorkedExample = function() {
       $uibModalInstance.close({
