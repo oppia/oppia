@@ -39,7 +39,7 @@ export interface ExplorationRightsBackendData {
 export class ExplorationRightsBackendApiService {
   constructor(
     private http: HttpClient,
-  ) { }
+  ) {}
 
   async makeCommunityOwnedPutData(
       explorationId: string, version: number, makeCommunityOwned: boolean):
