@@ -25,8 +25,13 @@ import constants from 'assets/constants';
 import { MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
 import { InteractionSpecsConstants, InteractionSpecsKey } from 'pages/interaction-specs.constants';
 
+/* Null in id denotes the a new question whose id is yet
+  to be set, this id is layer set in backend API service.
+  when the question object is passed to API on saving question
+  for the 1st time. This also prevents from assigning a id to
+  questions which are not saved and only temporary created. */
 export interface QuestionBackendDict {
-  'id': string;
+  'id': string | null;
   'question_state_data': StateBackendDict;
   'question_state_data_schema_version': number;
   'language_code': string;
@@ -35,8 +40,9 @@ export interface QuestionBackendDict {
   'inapplicable_skill_misconception_ids': string[];
 }
 
+// Null will be temperory and will be updated once the question is saved.
 export class Question {
-  _id: string;
+  _id: string | null;
   _stateData: State;
   _languageCode: string;
   _version: number;
@@ -44,7 +50,7 @@ export class Question {
   _inapplicableSkillMisconceptionIds: string[];
 
   constructor(
-      id: string, stateData: State, languageCode: string,
+      id: string | null, stateData: State, languageCode: string,
       version: number, linkedSkillIds: string[],
       inapplicableSkillMisconceptionIds: string[]) {
     this._id = id;
@@ -56,8 +62,11 @@ export class Question {
       inapplicableSkillMisconceptionIds);
   }
 
+  // Explicitly cast to string as getting id means that the question
+  // has been created in the backend. This is important as the temporary
+  // of the question id is null but getId should not return null in any case.
   getId(): string {
-    return this._id;
+    return String(this._id);
   }
 
   getStateData(): State {
@@ -147,7 +156,8 @@ export class Question {
       if (!answerGroups[i].outcome.labelledAsCorrect &&
           answerGroups[i].taggedSkillMisconceptionId !== null) {
         taggedSkillMisconceptionIds[
-          answerGroups[i].taggedSkillMisconceptionId || 'null'] = true;
+          // Typcasting just to deal with Typescript error.
+          String(answerGroups[i].taggedSkillMisconceptionId)] = true;
       }
     }
     var unaddressedMisconceptionNames: string[] = [];
@@ -173,11 +183,9 @@ export class Question {
     return unaddressedMisconceptionNames;
   }
 
-  /* Empty string in id denotes the a new question whose id is yet
-  to be set, this id is layer set in backend api service. */
   toBackendDict(isNewQuestion: boolean): QuestionBackendDict {
     var questionBackendDict: QuestionBackendDict = {
-      id: '',
+      id: null,
       question_state_data: this._stateData.toBackendDict(),
       question_state_data_schema_version: this._version,
       language_code: this._languageCode,
@@ -201,14 +209,15 @@ export class QuestionObjectFactory {
   constructor(
     private stateObject: StateObjectFactory) {}
 
-  /* Empty string in id denotes the a new question whose id is yet
-  to be set, this id is layer set in backend api service. the same
-  is the case with state name being empty string. This function cannot
-  be removed as it is used to create a temperory default question in
-  question editor until the question is once saved. */
+  /* Null in id denotes the a new question whose id is yet to be
+  set, this id is layer set in backend API service. Reagrding statename
+  as question, this statename is used throughout creating the state
+  for question like in createFromBackendDict. This function cannot be
+  removed as it is used to create a temperory default question in question
+  editor until the question is once saved. */
   createDefaultQuestion(skillIds: string[]): Question {
     return new Question(
-      '', this.stateObject.createDefaultState(''),
+      null, this.stateObject.createDefaultState('question'),
       constants.DEFAULT_LANGUAGE_CODE, 1, skillIds, []);
   }
 
