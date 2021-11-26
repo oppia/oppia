@@ -23,7 +23,7 @@ import { CustomSchema } from 'services/schema-default-value.service';
 interface ObjectEditorCustomScope extends ng.IScope {
   objType?: string;
   ngModelController: {
-    $setValidity: (validationErrorKey: string, isValid: boolean) => void
+    $setValidity: (validationErrorKey: string, isValid: boolean) => void;
   };
   schema: CustomSchema;
   initArgs?: Object;
