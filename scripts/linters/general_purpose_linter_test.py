@@ -225,7 +225,7 @@ class GeneralLintTests(test_utils.LinterTestBase):
             [INVALID_TODO_FILEPATH], FILE_CACHE)
         lint_task_report = linter.check_bad_patterns()
         self.assert_same_list_elements([
-            'Line 30: Please assign TODO comments to an issue in the format'
+            'Line 30: Please link TODO comments to an issue in the format'
             ' TODO(#issuenum): XXX.'], lint_task_report.trimmed_messages)
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
