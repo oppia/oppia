@@ -183,8 +183,6 @@ class GoogleDocstring(_check_docs_utils.GoogleDocstring):
     Guide.
     """
 
-    print(_check_docs_utils.__file__)
-
     re_multiple_type = _check_docs_utils.GoogleDocstring.re_multiple_type
     re_param_line = re.compile(
         r"""
