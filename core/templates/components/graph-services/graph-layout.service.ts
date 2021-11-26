@@ -592,7 +592,7 @@ export class StateGraphLayoutService {
   }
 
   modifyPositionValues(
-      nodeData: NodeDataDict, 
+      nodeData: NodeDataDict,
       graphWidth: number,
       graphHeight: number
     ): NodeDataDict {
