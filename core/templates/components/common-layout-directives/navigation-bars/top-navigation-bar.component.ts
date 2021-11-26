@@ -117,7 +117,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   // The order of the elements in this array specifies the order in
   // which they will be hidden. Earlier elements will be hidden first.
   NAV_ELEMENTS_ORDER = [
-    'I18N_TOPNAV_DONATE', 'I18N_TOPNAV_CLASSROOM', 'I18N_TOPNAV_ABOUT',
+    'I18N_TOPNAV_DONATE', 'I18N_TOPNAV_LEARN', 'I18N_TOPNAV_ABOUT',
     'I18N_CREATE_EXPLORATION_CREATE', 'I18N_TOPNAV_LIBRARY'];
 
   CLASSROOM_PROMOS_ARE_ENABLED = false;

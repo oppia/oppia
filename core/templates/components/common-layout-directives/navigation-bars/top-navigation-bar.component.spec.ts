@@ -372,7 +372,7 @@ describe('TopNavigationBarComponent', () => {
 
     component.navElementsVisibilityStatus = {
       I18N_TOPNAV_DONATE: true,
-      I18N_TOPNAV_CLASSROOM: true,
+      I18N_TOPNAV_LEARN: true,
       I18N_TOPNAV_ABOUT: true,
       I18N_CREATE_EXPLORATION_CREATE: true,
       I18N_TOPNAV_LIBRARY: true
@@ -384,7 +384,7 @@ describe('TopNavigationBarComponent', () => {
     fixture.whenStable().then(() => {
       expect(component.navElementsVisibilityStatus).toEqual({
         I18N_TOPNAV_DONATE: false,
-        I18N_TOPNAV_CLASSROOM: true,
+        I18N_TOPNAV_LEARN: true,
         I18N_TOPNAV_ABOUT: true,
         I18N_CREATE_EXPLORATION_CREATE: true,
         I18N_TOPNAV_LIBRARY: true
