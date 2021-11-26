@@ -1,6 +1,14 @@
 <background-banner></background-banner>
 <div class="oppia-dashboard-container position-relative">
-  <div class="m-auto oppia-dashboard-aggregated-stats oppia-creator-dashboard-main-content"
+
+  <div class="oppia-dashboard-title" ng-class="$ctrl.checkMobileView() ? 'oppia-dashboard-title-mobile-padding': 'oppia-dashboard-title-desktop-padding'">
+    <span class="float-left" translate="I18N_DASHBOARD_CREATOR_DASHBOARD"></span>
+    <button type="button" class="oppia-creator-dashboard-intro-button oppia-transition-200 protractor-test-create-new-exploration-button oppia-autofocus" ng-class="$ctrl.checkMobileView() ? 'oppia-creator-dashboard-button-mobile': 'oppia-creator-dashboard-button-desktop'" ng-click="$ctrl.createNewExploration()" autofocus>
+      + {{'I18N_CREATE_EXPLORATION' | translate}}
+    </button>
+  </div>
+
+  <div class="m-auto oppia-dashboard-aggregated-stats oppia-creator-dashboard-main-content pt-1"
        ng-if="$ctrl.explorationsList.length > 0 || $ctrl.collectionsList.length > 0 || $ctrl.mySuggestionsList.length > 0  || $ctrl.suggestionsToReviewList.length > 0"
        ng-class="{'oppia-creator-dashboard-mobile-mode': $ctrl.checkMobileView()}">
     <md-card layout="row">
@@ -95,21 +103,12 @@
     </ul>
   </div>
 
-  <div ng-if="$ctrl.explorationsList.length === 0 && $ctrl.collectionsList.length === 0 && $ctrl.mySuggestionsList.length === 0 && $ctrl.suggestionsToReviewList.length === 0">
-    <h2 class="oppia-dashboard-title" translate="I18N_DASHBOARD_CREATOR_DASHBOARD"></h2>
-  </div>
-
   <div ng-if="$ctrl.activeTab === 'myExplorations'">
-    <div ng-if="$ctrl.explorationsList.length === 0 && $ctrl.collectionsList.length === 0 && $ctrl.mySuggestionsList.length === 0 && $ctrl.suggestionsToReviewList.length === 0" class="oppia-dashboard-empty-text">
+    <div ng-if="$ctrl.explorationsList.length === 0 && $ctrl.collectionsList.length === 0 && $ctrl.mySuggestionsList.length === 0 && $ctrl.suggestionsToReviewList.length === 0" class="oppia-dashboard-empty-text pt-1">
       <md-card layout="row"
                class="oppia-page-card oppia-dashboard-intro-card mt-0">
         <div>
           <p translate="I18N_DASHBOARD_EXPLORATIONS_EMPTY_MESSAGE"></p>
-          <button type="button"
-                  class="btn oppia-dashboard-intro-button oppia-transition-200 protractor-test-create-new-exploration-button oppia-autofocus"
-                  ng-click="$ctrl.createNewExploration()"
-                  translate="I18N_CREATE_EXPLORATION" autofocus>
-          </button>
           <button type="button"
                   class="btn oppia-dashboard-intro-button oppia-transition-200 protractor-test-create-new-exploration-button"
                   ng-click="$ctrl.showCreateQuestionModal()"
@@ -536,7 +535,7 @@
     text-decoration: none;
   }
   .oppia-dashboard-empty-text {
-    padding-top: 15px;
+    padding-top: 1em;
   }
   .oppia-dashboard-title {
     color: #01645c;
@@ -544,8 +543,13 @@
     font-size: 3em;
     margin-bottom: 25px;
     margin-top: 0;
-    padding-top: 78.5px;
     text-align: center;
+  }
+  .oppia-dashboard-title-desktop-padding {
+    padding-top: 78.5px;
+  }
+  .oppia-dashboard-title-mobile-padding {
+    padding-top: 15px;
   }
   .oppia-dashboard-tabs .list-card-view-toggle {
     margin-left: auto;
@@ -656,6 +660,25 @@
 
   .oppia-dashboard-table td {
     padding: 7px 3px;
+  }
+  .oppia-creator-dashboard-intro-button {
+    background-color: #00645c;
+    border-radius: 6px;
+    color: #fff;
+    font-family: "Roboto", Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.7px;
+    margin-top: 10px;
+    padding: 10px 12px;
+    text-transform: uppercase;
+    width: 200px;
+  }
+  .oppia-creator-dashboard-button-mobile {
+    transform: none;
+  }
+  .oppia-creator-dashboard-button-desktop {
+    transform: translate(70px, -15px);
   }
   .oppia-dashboard-intro-card {
     font-family: "Capriola", "Roboto", Arial, sans-serif;
