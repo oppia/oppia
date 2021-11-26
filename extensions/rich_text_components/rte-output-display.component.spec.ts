@@ -50,6 +50,7 @@ describe('RTE display component', () => {
       '</oppia-noninteractive-link>');
     let rteComponentDe: DebugElement = fixture.debugElement;
 
+    // eslint-disable-next-line oppia/no-inner-html
     let html = fixture.nativeElement.innerHTML.replace(/<!--[^>]*-->/g, '');
     expect(html).toBe('');
 
@@ -73,6 +74,7 @@ describe('RTE display component', () => {
     expect(attrs['text-with-value']).toBe('"Oppia"');
     const link = rteComponentDe.query(By.css('a')).nativeElement;
     expect(link.attributes.href.nodeValue).toEqual('https://oppia.org');
+    // eslint-disable-next-line oppia/no-inner-html
     expect(link.innerHTML.replace(/\s/g, '')).toEqual('Oppia');
   });
 });

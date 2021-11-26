@@ -120,10 +120,12 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
     // in such cases, it is sufficient to update the ckeditor instance manually
     // with the latest value.
     let value = this.value;
+    // Refer to the note at the top of the file for the reason behind replace.
     value = value.replace(
       /<oppia-noninteractive-/g,
       '<oppia-noninteractive-ckeditor-'
     );
+    // Refer to the note at the top of the file for the reason behind replace.
     value = value.replace(
       /<\/oppia-noninteractive-/g,
       '</oppia-noninteractive-ckeditor-'
@@ -469,10 +471,12 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
       }
       let html = elt.html();
       this.value = html;
+      // Refer to the note at the top of the file for the reason behind replace.
       html = html.replace(
         /<oppia-noninteractive-ckeditor-/g,
         '<oppia-noninteractive-'
       );
+      // Refer to the note at the top of the file for the reason behind replace.
       html = html.replace(
         /<\/oppia-noninteractive-ckeditor-/g,
         '</oppia-noninteractive-'
