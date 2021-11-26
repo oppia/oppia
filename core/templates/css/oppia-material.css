@@ -379,14 +379,6 @@ input.mat-input-element {
   padding-top: 8px;
   padding-bottom: 8px; }
 
-.mat-radio-group-questions .mat-radio-button .mat-radio-label {
-  align-items: flex-start;
-}
-
-.mat-radio-group-questions .mat-radio-button .mat-radio-label .mat-list-item {
-  height: auto;
-}
-
 .mat-list-item {
   font-family: Roboto, "Helvetica Neue", sans-serif; }
 
