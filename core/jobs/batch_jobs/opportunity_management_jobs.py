@@ -123,7 +123,7 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
                 operation.
         """
         try:
-            skill_opportunity.validate()
+            skill_opportunity.validate() # type: ignore[no-untyped-call]
             skill_opportunity_model = opportunity_models.SkillOpportunityModel(
                 id=skill_opportunity.id,
                 skill_description=skill_opportunity.skill_description,
@@ -143,7 +143,7 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
                 'model': None
             }
 
-    def count_unique_question_ids(self, question_skill_link_models):
+    def count_unique_question_ids(self, question_skill_link_models) -> int:
         """Counts the number of unique question ids.
 
         Args:
@@ -196,7 +196,7 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
                     opportunity_domain.SkillOpportunity(
                         skill_id=n[1]['skills'][0][0].id,
                         skill_description=n[1]['skills'][0][0].description,
-                        question_count=self.count_unique_question_ids(
+                        question_count=self.count_unique_question_ids( # type: ignore[no-untyped-call]
                             n[1]['question_skill_links']
                         ))))
         )
