@@ -4647,6 +4647,19 @@ div.oppia-issues-learner-action {
   padding-top: 0;
 }
 
+/*
+ For issue #12165 The following style is required so as to prevent long
+ description texts for questions getting overflowed in the editor because
+ of fixed height given which exceeds after word-break and breaks the view.
+*/
+.mat-radio-group-questions .mat-radio-button .mat-radio-label {
+  align-items: flex-start;
+}
+
+.mat-radio-group-questions .mat-radio-button .mat-radio-label .mat-list-item {
+  height: auto;
+}
+
 /* For issue #1867 (https://github.com/oppia/oppia/issues/1867)
   Added "overflow: hidden;" to this class to fix a problem with the screen
   flickering between 2 and 3 columns when someone hovered over either
