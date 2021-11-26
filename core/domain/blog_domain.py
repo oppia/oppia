@@ -18,22 +18,71 @@
 
 from __future__ import annotations
 
+import datetime
 import re
 
 from core import utils
 from core.constants import constants
 from core.domain import html_cleaner
 
+from typing import List, Optional
+from typing_extensions import TypedDict
+
 # This is same as base_models.ID_Length.
 BLOG_POST_ID_LENGTH = 12
+
+
+class BlogPostDict(TypedDict):
+    """Dict type for BlogPost object."""
+
+    id: str
+    title: str
+    author_id: str
+    content: str
+    url_fragment: str
+    tags: List[str]
+    thumbnail_filename: Optional[str]
+    last_updated: Optional[str]
+    published_on: Optional[str]
+
+
+class BlogPostRightsDict(TypedDict):
+    """Dict type for BlogPostRights object."""
+
+    blog_post_id: str
+    editor_ids: List[str]
+    blog_post_is_published: bool
+
+
+class BlogPostSummaryDict(TypedDict):
+    """Dict type for BlogPostSummary object."""
+
+    id: str
+    title: str
+    author_id: str
+    summary: str
+    url_fragment: str
+    tags: List[str]
+    thumbnail_filename: Optional[str]
+    last_updated: Optional[str]
+    published_on: Optional[str]
 
 
 class BlogPost:
     """Domain object for an Oppia Blog Post."""
 
     def __init__(
-            self, blog_post_id, author_id, title, content, url_fragment, tags,
-            thumbnail_filename=None, last_updated=None, published_on=None):
+        self,
+        blog_post_id: str,
+        author_id: str,
+        title: str,
+        content: str,
+        url_fragment: str,
+        tags: List[str],
+        thumbnail_filename: Optional[str] = None,
+        last_updated: Optional[datetime.datetime] = None,
+        published_on: Optional[datetime.datetime] = None
+    ) -> None:
         """Constructs a BlogPost domain object.
 
         Args:
@@ -52,7 +101,7 @@ class BlogPost:
         self.id = blog_post_id
         self.author_id = author_id
         self.title = title
-        self.content = html_cleaner.clean(content)
+        self.content = html_cleaner.clean(content) # type: ignore[no-untyped-call]
         self.url_fragment = url_fragment
         self.tags = tags
         self.thumbnail_filename = thumbnail_filename
@@ -60,7 +109,9 @@ class BlogPost:
         self.published_on = published_on
 
     @classmethod
-    def require_valid_thumbnail_filename(cls, thumbnail_filename, strict=False):
+    def require_valid_thumbnail_filename(
+        cls, thumbnail_filename: str, strict: bool = False
+    ) -> None:
         """Checks whether the thumbnail filename of the blog post is a valid
         one.
 
@@ -76,7 +127,8 @@ class BlogPost:
             if not isinstance(thumbnail_filename, str):
                 raise utils.ValidationError(
                     'Expected thumbnail filename to be a string, received: %s.'
-                    % thumbnail_filename)
+                    % thumbnail_filename
+                )
 
         if thumbnail_filename == '':
             raise utils.ValidationError(
@@ -84,7 +136,7 @@ class BlogPost:
 
         utils.require_valid_image_filename(thumbnail_filename)
 
-    def validate(self, strict=False):
+    def validate(self, strict: bool = False) -> None:
         """Validates various properties of the blog post object.
 
         Args:
@@ -96,8 +148,13 @@ class BlogPost:
         """
         self.require_valid_title(self.title, strict)
         self.require_valid_tags(self.tags, strict)
-        self.require_valid_thumbnail_filename(
-            self.thumbnail_filename, strict=strict)
+        if strict:
+            if not isinstance(self.thumbnail_filename, str):
+                raise utils.ValidationError(
+                    'Expected Thumbnail filename should be a string,'
+                    ' received %s' % self.thumbnail_filename)
+            self.require_valid_thumbnail_filename(
+                self.thumbnail_filename, strict=strict)
 
         if not isinstance(self.content, str):
             raise utils.ValidationError(
@@ -109,7 +166,7 @@ class BlogPost:
                 raise utils.ValidationError('Content can not be empty')
 
     @classmethod
-    def require_valid_tags(cls, tags, strict):
+    def require_valid_tags(cls, tags: List[str], strict: bool) -> None:
         """Validates tags for the blog post object.
 
         Args:
@@ -120,10 +177,6 @@ class BlogPost:
         Raises:
             ValidationErrors. One or more tags provided are invalid.
         """
-        if not isinstance(tags, list):
-            raise utils.ValidationError(
-                'Expected \'tags\' to be a list, received: %s' % tags)
-
         for tag in tags:
             if not isinstance(tag, str):
                 raise utils.ValidationError(
@@ -159,7 +212,7 @@ class BlogPost:
                 'Some tags duplicate each other')
 
     @classmethod
-    def require_valid_title(cls, title, strict):
+    def require_valid_title(cls, title: str, strict: bool) -> None:
         """Checks whether the blog post title is a valid one.
 
         Args:
@@ -188,7 +241,7 @@ class BlogPost:
                     % title)
 
     @classmethod
-    def require_valid_url_fragment(cls, url_fragment):
+    def require_valid_url_fragment(cls, url_fragment: str) -> None:
         """Checks whether the url fragment of the blog post is a valid one.
 
         Args:
@@ -200,7 +253,9 @@ class BlogPost:
         if not isinstance(url_fragment, str):
             raise utils.ValidationError(
                 'Blog Post URL Fragment field must be a string. '
-                'Received %s.' % (url_fragment))
+                'Received %s.' % (url_fragment)
+            )
+
         if not url_fragment:
             raise utils.ValidationError(
                 'Blog Post URL Fragment field should not be empty.')
@@ -216,7 +271,7 @@ class BlogPost:
                 'Only lowercase words, numbers separated by hyphens are'
                 ' allowed. Received %s.' % (url_fragment))
 
-    def to_dict(self):
+    def to_dict(self) -> BlogPostDict:
         """Returns a dict representing this blog post domain object.
 
         Returns:
@@ -239,7 +294,7 @@ class BlogPost:
         }
 
     @classmethod
-    def from_dict(cls, blog_post_dict):
+    def from_dict(cls, blog_post_dict: BlogPostDict) -> 'BlogPost':
         """Returns a blog post domain object from a dictionary.
 
         Args:
@@ -249,26 +304,24 @@ class BlogPost:
         Returns:
             BlogPost. The corresponding blog post domain object.
         """
-
-        last_updated = (
-            utils.convert_string_to_naive_datetime_object(
-                blog_post_dict['last_updated'])
-            if blog_post_dict['last_updated'] else None)
-        published_on = (
-            utils.convert_string_to_naive_datetime_object(
-                blog_post_dict['published_on'])
-            if blog_post_dict['published_on'] else None)
+        last_updated = utils.convert_string_to_naive_datetime_object(
+            blog_post_dict['last_updated']
+        ) if isinstance(blog_post_dict['last_updated'], str) else None
+        published_on = utils.convert_string_to_naive_datetime_object(
+            blog_post_dict['published_on']
+        ) if isinstance(blog_post_dict['published_on'], str) else None
         blog_post = cls(
             blog_post_dict['id'], blog_post_dict['author_id'],
             blog_post_dict['title'], blog_post_dict['content'],
             blog_post_dict['url_fragment'], blog_post_dict['tags'],
             blog_post_dict['thumbnail_filename'],
             last_updated,
-            published_on)
+            published_on
+        )
 
         return blog_post
 
-    def update_title(self, new_title):
+    def update_title(self, new_title: str) -> None:
         """Updates the title of a blog post object.
 
         Args:
@@ -277,7 +330,7 @@ class BlogPost:
         self.require_valid_title(new_title, True)
         self.title = new_title
 
-    def update_url_fragment(self, new_url_fragment):
+    def update_url_fragment(self, new_url_fragment: str) -> None:
         """Updates the url_fragment of a blog post object.
 
         Args:
@@ -286,25 +339,28 @@ class BlogPost:
         self.require_valid_url_fragment(new_url_fragment)
         self.url_fragment = new_url_fragment
 
-    def update_thumbnail_filename(self, new_thumbnail_filename):
+    def update_thumbnail_filename(
+        self, new_thumbnail_filename: Optional[str]
+    ) -> None:
         """Updates the thumbnail filename of a blog post object.
 
         Args:
             new_thumbnail_filename: str|None. The updated thumbnail filename
                 for the blog post.
         """
-        self.require_valid_thumbnail_filename(self.thumbnail_filename)
+        if new_thumbnail_filename is not None:
+            self.require_valid_thumbnail_filename(new_thumbnail_filename)
         self.thumbnail_filename = new_thumbnail_filename
 
-    def update_content(self, content):
+    def update_content(self, content: str) -> None:
         """Updates the content of the blog post.
 
         Args:
             content: str. The new content of the blog post.
         """
-        self.content = html_cleaner.clean(content)
+        self.content = html_cleaner.clean(content) # type: ignore[no-untyped-call]
 
-    def update_tags(self, tags):
+    def update_tags(self, tags: List[str]) -> None:
         """Updates the tags list of the blog post.
 
         Args:
@@ -314,16 +370,12 @@ class BlogPost:
         self.tags = tags
 
     @classmethod
-    def require_valid_blog_post_id(cls, blog_id):
+    def require_valid_blog_post_id(cls, blog_id: str) -> None:
         """Checks whether the blog id is a valid one.
 
         Args:
             blog_id: str. The blog post id to validate.
         """
-        if not isinstance(blog_id, str):
-            raise utils.ValidationError(
-                'Blog Post ID should be a string, received: %s' % blog_id)
-
         if len(blog_id) != BLOG_POST_ID_LENGTH:
             raise utils.ValidationError('Blog ID %s is invalid' % blog_id)
 
@@ -332,8 +384,17 @@ class BlogPostSummary:
     """Domain object for Blog Post Summary."""
 
     def __init__(
-            self, blog_post_id, author_id, title, summary, url_fragment, tags,
-            thumbnail_filename=None, last_updated=None, published_on=None):
+        self,
+        blog_post_id: str,
+        author_id: str,
+        title: str,
+        summary: str,
+        url_fragment: str,
+        tags: List[str],
+        thumbnail_filename: Optional[str] = None,
+        last_updated: Optional[datetime.datetime] = None,
+        published_on: Optional[datetime.datetime] = None
+    ) -> None:
         """Constructs a Blog Post Summary domain object.
 
         Args:
@@ -361,13 +422,15 @@ class BlogPostSummary:
         self.published_on = published_on
 
     @classmethod
-    def require_valid_thumbnail_filename(cls, thumbnail_filename, strict=False):
+    def require_valid_thumbnail_filename(
+        cls, thumbnail_filename: str, strict: bool = False
+    ) -> None:
         """Checks whether the thumbnail filename of the blog post is a valid
         one.
 
         Args:
             thumbnail_filename: str. The thumbnail filename to validate.
-            strict: bool. Enable strict checks on the blog post summary when the
+            strict: bool. Enable strict checks on the blog post when the
                 blog post is published or is going to be published.
 
         Raises:
@@ -377,7 +440,8 @@ class BlogPostSummary:
             if not isinstance(thumbnail_filename, str):
                 raise utils.ValidationError(
                     'Expected thumbnail filename to be a string, received: %s.'
-                    % thumbnail_filename)
+                    % thumbnail_filename
+                )
 
         if thumbnail_filename == '':
             raise utils.ValidationError(
@@ -385,7 +449,7 @@ class BlogPostSummary:
 
         utils.require_valid_image_filename(thumbnail_filename)
 
-    def validate(self, strict=False):
+    def validate(self, strict: bool = False) -> None:
         """Validates various properties of the blog post summary object.
 
         Args:
@@ -397,8 +461,19 @@ class BlogPostSummary:
         """
         self.require_valid_title(self.title, strict)
         self.require_valid_tags(self.tags, strict)
-        self.require_valid_thumbnail_filename(
-            self.thumbnail_filename, strict=strict)
+        if strict:
+            if not isinstance(self.url_fragment, str):
+                raise utils.ValidationError(
+                    'Expected url fragment to be a string, received: %s.'
+                    % self.url_fragment
+                )
+            if not isinstance(self.thumbnail_filename, str):
+                raise utils.ValidationError(
+                    'Expected thumbnail filename to be a string, received: %s.'
+                    % self.thumbnail_filename
+                )
+            self.require_valid_thumbnail_filename(
+                self.thumbnail_filename, strict=strict)
 
         if not isinstance(self.summary, str):
             raise utils.ValidationError(
@@ -410,7 +485,7 @@ class BlogPostSummary:
                 raise utils.ValidationError('Summary can not be empty')
 
     @classmethod
-    def require_valid_url_fragment(cls, url_fragment):
+    def require_valid_url_fragment(cls, url_fragment: str) -> None:
         """Checks whether the url fragment of the blog post is a valid one.
 
         Args:
@@ -422,7 +497,8 @@ class BlogPostSummary:
         if not isinstance(url_fragment, str):
             raise utils.ValidationError(
                 'Blog Post URL Fragment field must be a string. '
-                'Received %s.' % (url_fragment))
+                'Received %s.' % (url_fragment)
+            )
 
         if not url_fragment:
             raise utils.ValidationError(
@@ -440,7 +516,7 @@ class BlogPostSummary:
                 ' allowed. Received %s.' % (url_fragment))
 
     @classmethod
-    def require_valid_title(cls, title, strict):
+    def require_valid_title(cls, title: str, strict: bool) -> None:
         """Checks whether the blog post title is a valid one.
 
         Args:
@@ -452,7 +528,8 @@ class BlogPostSummary:
             ValidationErrors. Title provided is invalid.
         """
         if not isinstance(title, str):
-            raise utils.ValidationError('Title should be a string.')
+            raise utils.ValidationError(
+                'Expected title to be a string, received: %s.' % title)
 
         if len(title) > constants.MAX_CHARS_IN_BLOG_POST_TITLE:
             raise utils.ValidationError(
@@ -464,7 +541,7 @@ class BlogPostSummary:
                 raise utils.ValidationError('Title should not be empty')
 
     @classmethod
-    def require_valid_tags(cls, tags, strict):
+    def require_valid_tags(cls, tags: List[str], strict: bool) -> None:
         """Validates tags for the blog post object.
 
         Args:
@@ -475,14 +552,12 @@ class BlogPostSummary:
         Raises:
             ValidationErrors.One or more tags provided are invalid.
         """
-        if not isinstance(tags, list):
-            raise utils.ValidationError(
-                'Expected \'tags\' to be a list, received: %s' % tags)
         for tag in tags:
             if not isinstance(tag, str):
                 raise utils.ValidationError(
                     'Expected each tag in \'tags\' to be a string, received: '
-                    '\'%s\'' % tag)
+                    '\'%s\'' % tag
+                )
 
             if not tag:
                 raise utils.ValidationError(
@@ -511,7 +586,7 @@ class BlogPostSummary:
         if len(set(tags)) != len(tags):
             raise utils.ValidationError('Some tags duplicate each other')
 
-    def to_dict(self):
+    def to_dict(self) -> BlogPostSummaryDict:
         """Returns a dict representing this blog post summary domain object.
 
         Returns:
@@ -537,7 +612,12 @@ class BlogPostSummary:
 class BlogPostRights:
     """Domain object for Blog Post rights."""
 
-    def __init__(self, blog_post_id, editor_ids, blog_post_is_published=False):
+    def __init__(
+        self,
+        blog_post_id: str,
+        editor_ids: List[str],
+        blog_post_is_published: bool = False
+    ) -> None:
         """Constructs a BlogPostRights domain object.
 
         Args:
@@ -550,7 +630,7 @@ class BlogPostRights:
         self.editor_ids = editor_ids
         self.blog_post_is_published = blog_post_is_published
 
-    def to_dict(self):
+    def to_dict(self) -> BlogPostRightsDict:
         """Returns a dict suitable for use by the frontend.
 
         Returns:
@@ -563,7 +643,7 @@ class BlogPostRights:
             'blog_post_is_published': self.blog_post_is_published
         }
 
-    def is_editor(self, user_id):
+    def is_editor(self, user_id: Optional[str]) -> bool:
         """Checks whether given user is an editor of the blog post.
 
         Args:
