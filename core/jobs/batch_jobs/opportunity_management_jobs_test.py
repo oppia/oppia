@@ -298,7 +298,7 @@ class GenerateSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
             self.SKILL_2_DESCRIPTION)
         self.assertEqual(opportunity_model_2.question_count, 1)
 
-    def test_generation_job_returns_opportunity_multiple_questions(self) -> None:
+    def test_generation_job_counts_multiple_questions(self) -> None:
         all_opportunity_models = list(
             opportunity_models.SkillOpportunityModel.get_all())
         self.assertEqual(len(all_opportunity_models), 0)

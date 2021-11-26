@@ -167,7 +167,7 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
                     question_models.QuestionSkillLinkModel
                     .get_all(include_deleted=False))
                 )
-            | 'Group QuestionSkillLinkModels by skill id' >> 
+            | 'Group QuestionSkillLinkModels by skill id' >>
                 beam.GroupBy(lambda n: n.skill_id)
         )
 
@@ -182,7 +182,8 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
         )
 
         skills_with_question_counts = (({
-            'skills': all_skill_models, 'question_skill_links': all_question_skill_link_models
+            'skills': all_skill_models,
+            'question_skill_links': all_question_skill_link_models
         })
             | 'Merge by skill id' >> beam.CoGroupByKey()
         )
