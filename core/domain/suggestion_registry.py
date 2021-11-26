@@ -896,8 +896,11 @@ class SuggestionAddQuestion(BaseSuggestion):
         # question.
         new_image_filenames = self.get_new_image_filenames_added_in_suggestion()
 
-        # Image for interactions with Image Regions in not included as an html
-        # string. This image is as the imagePath in customization args.
+        # Image for interaction with Image Region is not included as an html
+        # string. This image is included in the imagePath in customization args.
+        # Other interactions such as Item Selection, Multiple Choice, Drag and
+        # Drop Sort have ck editor that includes the images of the interactions
+        # so that references for those images are included as html strings.
         if question.question_state_data.interaction.id == 'ImageClickInput':
             new_image_filenames.append(
                 question.question_state_data.interaction.customization_args[
