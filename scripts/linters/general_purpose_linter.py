@@ -457,7 +457,7 @@ class GeneralPurposeLinter:
             total_error_count += temp_count
             error_messages.extend(bad_pattern_error_messages)
 
-            if filepath == 'constants.ts':
+            if filepath.endswith('constants.ts'):
                 for pattern, constants in BAD_STRINGS_CONSTANTS.items():
                     for line in file_content:
                         if pattern in line:

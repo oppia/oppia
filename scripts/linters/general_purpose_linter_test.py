@@ -76,7 +76,7 @@ INVALID_COPYRIGHT_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_copyright.py')
 INVALID_ANNOTATIONS_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_annotations.py')
-CONSTANTS_FILEPATH = 'constants.ts'
+CONSTANTS_FILEPATH = os.path.join(os.getcwd(), 'assets', 'constants.ts')
 VALID_PY_IGNORE_PRAGMA_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'valid_py_ignore_pragma.py')
 
@@ -274,7 +274,7 @@ class GeneralLintTests(test_utils.LinterTestBase):
         self.assertTrue(lint_task_report.failed)
 
     def test_invalid_dev_mode_in_constants_ts(self):
-        def mock_readlines(unused_self, unused_filepath):
+        def mock_readlines(unused_self):
             return (
                 'Copyright 2020 The Oppia Authors. All Rights Reserved.',
                 ' * @fileoverview Initializes constants for '
@@ -282,10 +282,7 @@ class GeneralLintTests(test_utils.LinterTestBase):
                 '"DEV_MODE": false,\n'
                 '"EMULATOR_MODE": true\n')
 
-        readlines_swap = self.swap(
-            pre_commit_linter.FileCache, 'readlines', mock_readlines)
-
-        with readlines_swap:
+        with self.swap(FILE_CACHE, 'readlines', mock_readlines):
             linter = general_purpose_linter.GeneralPurposeLinter(
                 [CONSTANTS_FILEPATH], FILE_CACHE)
             lint_task_report = linter.check_bad_patterns()
@@ -298,7 +295,7 @@ class GeneralLintTests(test_utils.LinterTestBase):
         self.assertTrue(lint_task_report.failed)
 
     def test_invalid_emulator_mode_in_constants_ts(self):
-        def mock_readlines(unused_self, unused_filepath):
+        def mock_readlines(unused_self):
             return (
                 'Copyright 2020 The Oppia Authors. All Rights Reserved.',
                 ' * @fileoverview Initializes constants for '
@@ -306,10 +303,7 @@ class GeneralLintTests(test_utils.LinterTestBase):
                 '"DEV_MODE": true,\n'
                 '"EMULATOR_MODE": false\n')
 
-        readlines_swap = self.swap(
-            pre_commit_linter.FileCache, 'readlines', mock_readlines)
-
-        with readlines_swap:
+        with self.swap(FILE_CACHE, 'readlines', mock_readlines):
             linter = general_purpose_linter.GeneralPurposeLinter(
                 [CONSTANTS_FILEPATH], FILE_CACHE)
             lint_task_report = linter.check_bad_patterns()
