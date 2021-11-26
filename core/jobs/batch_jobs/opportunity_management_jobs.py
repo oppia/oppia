@@ -143,15 +143,18 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
                     stderr='FAILURE: %s' % e),
                 'model': None
             }
-            
+
     def count_unique_question_ids(self, question_skill_link_models):
         """Counts the number of unique question ids.
 
         Args:
-            question_skill_link_models (list[[list[QuestionSkillLinkModel]]): 2D array of QuestionSkillLinkModels.
+            question_skill_link_models (list[[list[QuestionSkillLinkModel]]): 
+            2D array of QuestionSkillLinkModels.
         """
-        
-        question_ids = [link.question_id for link_list in question_skill_link_models for link in link_list]
+
+        question_ids = [link.question_id 
+                        for link_list in question_skill_link_models 
+                        for link in link_list]
         return len(set(question_ids))
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
