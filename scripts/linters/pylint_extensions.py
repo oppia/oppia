@@ -419,6 +419,11 @@ class DocstringParameterChecker(checkers.BaseChecker):
             'missing-param-doc',
             'Please add parameter declarations for all parameters.',
             {'old_names': [('W9003', 'old-missing-param-doc')]}),
+        'W9016': (
+            '"%s" missing in parameter type documentation',
+            'missing-type-doc',
+            'Please add parameter type declarations for all parameters.'
+        ),
         'W9017': (
             '"%s" differing in parameter documentation',
             'differing-param-doc',
@@ -1287,6 +1292,8 @@ class DocstringParameterChecker(checkers.BaseChecker):
         _compare_missing_args(
             params_with_doc, 'missing-param-doc',
             self.not_needed_param_in_docstring)
+        _compare_missing_args(
+            params_with_type, 'missing-type-doc', not_needed_type_in_docstring)
 
         _compare_different_args(
             params_with_doc, 'differing-param-doc',
