@@ -1758,10 +1758,6 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                 node=missing_param_func_node,
                 args=('test_var_two',),
             ), testutils.Message(
-                msg_id='missing-type-doc',
-                node=missing_param_func_node,
-                args=('test_var_two',),
-            ), testutils.Message(
                 msg_id='differing-param-doc',
                 node=missing_param_func_node,
                 args=('invalid_var_name',),
