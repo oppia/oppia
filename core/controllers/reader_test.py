@@ -1203,9 +1203,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
 
         payload = {
             'client_time_spent_in_secs': 0,
-            'params': {
-                'param1': 'value'
-            },
+            'params': {},
             'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
             'state_name': 'final',
             'version': 1
@@ -1296,6 +1294,24 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             payload, csrf_token=csrf_token, expected_status_int=400)
         self.assertEqual(
             response['error'], 'Missing key in handler args: version.')
+
+    def test_exp_with_invalid_params_data_raises_error(self):
+        self.login(self.USER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        payload = {
+            'client_time_spent_in_secs': 0,
+            'collection_id': self.COL_ID_1,
+            'params': {
+                10: 50
+            },
+            'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
+            'state_name': 'middle',
+            'version': 1
+        }
+        self.post_json(
+            '/explorehandler/exploration_complete_event/%s' % self.EXP_ID_1_0,
+            payload, csrf_token=csrf_token, expected_status_int=400)
 
     def test_exp_incomplete_event_handler(self):
         """Test handler for leaving an exploration incomplete."""
