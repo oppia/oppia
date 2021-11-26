@@ -143,8 +143,11 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
                 'model': None
             }
 
-    def count_unique_question_ids(self,
-        question_skill_link_models: list[list[question_models.QuestionSkillLinkModel]] ) -> int:
+    def count_unique_question_ids(
+        self,
+        question_skill_link_models: 
+            list[list[question_models.QuestionSkillLinkModel]]
+        ) -> int:
         """Counts the number of unique question ids.
 
         Args:
