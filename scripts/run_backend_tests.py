@@ -465,8 +465,7 @@ def main(args=None):
                 test_count = 0
                 total_errors += 1
                 print('')
-                print(
-                    '------------------------------------------------------')
+                print('------------------------------------------------------')
                 print('    WARNING: FAILED TO RUN %s' % spec.test_target)
                 print('')
                 print('    This is most likely due to an import error.')
