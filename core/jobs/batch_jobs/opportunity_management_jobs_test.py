@@ -108,7 +108,7 @@ class GenerateSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
             question_state_data={},
             language_code=constants.DEFAULT_LANGUAGE_CODE,
             version=0,
-            linked_skill_ids=[self.SKILL_1_ID],
+            linked_skill_ids=[self.SKILL_1_ID, self.SKILL_2_ID],
             inapplicable_skill_misconception_ids=[],
             question_state_data_schema_version=feconf
                 .CURRENT_STATE_SCHEMA_VERSION
@@ -120,7 +120,7 @@ class GenerateSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
             question_state_data={},
             language_code=constants.DEFAULT_LANGUAGE_CODE,
             version=0,
-            linked_skill_ids=[self.SKILL_2_ID],
+            linked_skill_ids=[self.SKILL_1_ID, self.SKILL_2_ID],
             inapplicable_skill_misconception_ids=[],
             question_state_data_schema_version=feconf
                 .CURRENT_STATE_SCHEMA_VERSION
@@ -253,6 +253,90 @@ class GenerateSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
             opportunity_model_2.skill_description,
             self.SKILL_2_DESCRIPTION)
         self.assertEqual(opportunity_model_2.question_count, 1)
+        
+    def test_generation_job_does_not_count_duplicate_question_ids(self) -> None:
+        all_opportunity_models = list(
+            opportunity_models.SkillOpportunityModel.get_all())
+        self.assertEqual(len(all_opportunity_models), 0)
+        
+        question_1_duplicate_skilllinkmodel = self.create_model(
+            question_models.QuestionSkillLinkModel,
+            question_id=self.QUESTION_1_ID,
+            skill_id=self.SKILL_1_ID,
+            skill_difficulty=1
+        )
+        question_1_duplicate_skilllinkmodel.update_timestamps()
+        datastore_services.put_multi([question_1_duplicate_skilllinkmodel])
+        
+        all_skill_link_models = list(
+            question_models.QuestionSkillLinkModel.get_all())
+        self.assertEqual(len(all_skill_link_models), 3)
+        
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(stdout='SUCCESS'),
+            job_run_result.JobRunResult(stdout='SUCCESS')
+        ])
+
+        opportunity_model_1 = (
+            opportunity_models.SkillOpportunityModel.get(
+                self.SKILL_1_ID))
+        # Ruling out the possibility of None for mypy type checking.
+        assert opportunity_model_1 is not None
+        self.assertEqual(opportunity_model_1.id, self.SKILL_1_ID)
+        self.assertEqual(
+            opportunity_model_1.skill_description,
+            self.SKILL_1_DESCRIPTION)
+        self.assertEqual(opportunity_model_1.question_count, 1)
+
+        opportunity_model_2 = (
+            opportunity_models.SkillOpportunityModel.get(
+                self.SKILL_2_ID))
+        assert opportunity_model_2 is not None
+        self.assertEqual(opportunity_model_2.id, self.SKILL_2_ID)
+        self.assertEqual(
+            opportunity_model_2.skill_description,
+            self.SKILL_2_DESCRIPTION)
+        self.assertEqual(opportunity_model_2.question_count, 1)
+        
+    def test_generation_job_returns_opportunity_with_multiple_questions(self) -> None:
+        all_opportunity_models = list(
+            opportunity_models.SkillOpportunityModel.get_all())
+        self.assertEqual(len(all_opportunity_models), 0)
+        
+        question_1_skilllinkmodel = self.create_model(
+            question_models.QuestionSkillLinkModel,
+            question_id=self.QUESTION_1_ID,
+            skill_id=self.SKILL_2_ID,
+            skill_difficulty=1
+        )
+        question_1_skilllinkmodel.update_timestamps()
+        datastore_services.put_multi([question_1_skilllinkmodel])    
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(stdout='SUCCESS'),
+            job_run_result.JobRunResult(stdout='SUCCESS')
+        ])
+
+        opportunity_model_1 = (
+            opportunity_models.SkillOpportunityModel.get(
+                self.SKILL_1_ID))
+        # Ruling out the possibility of None for mypy type checking.
+        assert opportunity_model_1 is not None
+        self.assertEqual(opportunity_model_1.id, self.SKILL_1_ID)
+        self.assertEqual(
+            opportunity_model_1.skill_description,
+            self.SKILL_1_DESCRIPTION)
+        self.assertEqual(opportunity_model_1.question_count, 1)
+
+        opportunity_model_2 = (
+            opportunity_models.SkillOpportunityModel.get(
+                self.SKILL_2_ID))
+        assert opportunity_model_2 is not None
+        self.assertEqual(opportunity_model_2.id, self.SKILL_2_ID)
+        self.assertEqual(
+            opportunity_model_2.skill_description,
+            self.SKILL_2_DESCRIPTION)
+        self.assertEqual(opportunity_model_2.question_count, 2)
 
 
 class DeleteExplorationOpportunitySummariesJobTests(job_test_utils.JobTestBase):

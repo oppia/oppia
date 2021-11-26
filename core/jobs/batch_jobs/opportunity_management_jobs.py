@@ -126,7 +126,7 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
         try:
             skill_opportunity.validate()
             skill_opportunity_model = opportunity_models.SkillOpportunityModel(
-                skill_id=skill_opportunity.id,
+                id=skill_opportunity.id,
                 skill_description=skill_opportunity.skill_description,
                 question_count=skill_opportunity.question_count
             )
@@ -143,89 +143,58 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
                     stderr='FAILURE: %s' % e),
                 'model': None
             }
-
-    @staticmethod
-    def _get_num_questions(
-        skill_id: str,
-    ) -> Dict[str, Union[
-        str,
-        job_run_result.JobRunResult,
-        int]
-    ]:
-        """Get the number of questions linked to a skill (upper bounded by
-            MAX_QUESTIONS_PER_SKILL).
+            
+    def count_unique_question_ids(self, question_skill_link_models):
+        """Counts the number of unique question ids.
 
         Args:
-            skill_id: str. The skill ID to count questions for.
-
-        Returns:
-            dict(str, *). Metadata about the operation. Keys are:
-                status: str. Whether the job succeeded or failed.
-                job_result: JobRunResult. A detailed report of the status,
-                    including exception details if a failure occurred.
-                count: int. The number of questions linked to the skill.
+            question_skill_link_models (list[[list[QuestionSkillLinkModel]]): 2D array of QuestionSkillLinkModels.
         """
-        try:
-            question_skill_link_models, _ = (
-                question_models.QuestionSkillLinkModel
-                .get_question_skill_links_by_skill_ids(
-                    constants.MAX_QUESTIONS_PER_SKILL, [skill_id], 0))
-
-            count = (
-                question_skill_link_models
-                | 'Map to question IDs' >> beam.Map(lambda n: n.question_id)
-                | 'Get the number of distinct question IDs' >> beam.Distinct() # pylint: disable=no-value-for-parameter
-                | 'Get the total number' >> beam.combiners.Count.Globally()
-
-            )
-
-            return {
-                'status': 'SUCCESS',
-                'job_result': job_run_result.JobRunResult(stdout='SUCCESS'),
-                'count': count
-            }
-        except Exception as e:
-            return {
-                'status': 'FAILURE',
-                'job_result': job_run_result.JobRunResult(
-                    stderr='FAILURE: %s' % e),
-                'count': 0
-            }
+        
+        question_ids = [link.question_id for link_list in question_skill_link_models for link in link_list]
+        return len(set(question_ids))
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        skills_with_questions = (
+        all_question_skill_link_models = (
             self.pipeline
-            | 'Get all non-deleted skill models' >> (
+            | 'Get all non-deleted QuestionSkillLinkModels' >> (
+                ndb_io.GetModels(
+                    question_models.QuestionSkillLinkModel.get_all(include_deleted=False)))
+            | 'Group QuestionSkillLinkModels by skill id' >> beam.GroupBy(lambda n: n.skill_id)
+        )
+
+        all_skill_models = (
+            self.pipeline
+            | 'Get all non-deleted SkillModels' >> (
                 ndb_io.GetModels(
                     skill_models.SkillModel.get_all(include_deleted=False)))
             | 'Get skill from model' >> beam.Map(
                 skill_fetchers.get_skill_from_model)
-            | 'Filter out any skills with an existing SkillOpportunityModel'
-                >> beam.Filter(
-                    lambda n: opportunity_models.SkillOpportunityModel
-                        .get_by_id is None
-                    )
-            | 'Get number of questions linked to skill' >> beam.Map(
-                lambda skill: [skill, self._get_num_questions(skill.skill_id)]
-            )
+            | 'Group Skills by skill id' >> beam.GroupBy(lambda m: m.id)
+        )
+
+        skills_with_question_counts = (({
+            'skills': all_skill_models, 'question_skill_links': all_question_skill_link_models
+        })
+            | 'Merge by skill id' >> beam.CoGroupByKey()
         )
 
         opportunities_results = (
-            skills_with_questions
+            skills_with_question_counts
             | beam.Map(
                 lambda n:
                 self._create_skill_opportunity_model(
                     opportunity_domain.SkillOpportunity(
-                        skill_id=n[0].skill_id,
-                        skill_description=n[0].skill_description,
-                        question_count=n[1])))
+                        skill_id=n[1]['skills'][0][0].id,
+                        skill_description=n[1]['skills'][0][0].description,
+                        question_count=self.count_unique_question_ids(n[1]['question_skill_links']))))
         )
 
         unused_put_result = (
             opportunities_results
             | 'Filter the results with SUCCESS status' >> beam.Filter(
                 lambda result: result['status'] == 'SUCCESS')
-            | 'Fetch the models to be put' >> beam.FlatMap(
+            | 'Fetch the models to be put' >> beam.Map(
                 lambda result: result['model'])
             | 'Put models into the datastore' >> ndb_io.PutModels()
         )
