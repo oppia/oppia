@@ -522,7 +522,8 @@ export class StateGraphLayoutService {
 
   getAugmentedLinks(
       nodeData: NodeDataDict,
-      nodeLinks: GraphLink[]): AugmentedLink[] | undefined {
+      nodeLinks: GraphLink[]
+  ): AugmentedLink[] | undefined {
     var links = cloneDeep(nodeLinks);
     var augmentedLinks: AugmentedLink[] = links.map(link => {
       return {
@@ -591,8 +592,10 @@ export class StateGraphLayoutService {
   }
 
   modifyPositionValues(
-      nodeData: NodeDataDict, graphWidth: number,
-      graphHeight: number): NodeDataDict {
+      nodeData: NodeDataDict, 
+      graphWidth: number,
+      graphHeight: number
+    ): NodeDataDict {
     var HORIZONTAL_NODE_PROPERTIES = ['x0', 'width', 'xLabel'];
     var VERTICAL_NODE_PROPERTIES = ['y0', 'height', 'yLabel'];
 
