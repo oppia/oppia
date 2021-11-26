@@ -65,7 +65,7 @@
             </button>
             <button type="button"
                     class="btn btn-success protractor-test-save-rubric-explanation-button"
-                    [disabled]="this.isExplanationEmpty(explanation)
+                    [disabled]="!this.isExplanationValid(this.rubric.getDifficulty(), idx)
                       || !this.isExplanationLengthValid(this.rubric.getDifficulty(), idx)"
                     (click)="this.saveExplanation(this.rubric.getDifficulty(), idx)">
               Save
@@ -88,7 +88,7 @@
       + ADD EXPLANATION FOR DIFFICULTY
     </button>
     <div *ngIf="!this.isMediumLevelExplanationValid()"
-          class="rubric-error-message">
+         class="rubric-error-message">
       There should be at least one explanation for the Medium level rubric.
     </div>
   </div>
@@ -100,7 +100,7 @@
   }
 
   .rubric-error-message {
-    color: red;
+    color: #ff0000;
     display: block;
     font-size: 0.8em;
   }

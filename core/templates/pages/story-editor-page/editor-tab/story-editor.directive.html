@@ -130,7 +130,7 @@
                   <div class="editor-buttons">
                     <button type="button"
                             class="btn btn-success oppia-save-state-item-button float-right protractor-test-save-story-notes-button"
-                            ng-disabled="isNotesLengthExceeded(editableNotes) || !editableNotes"
+                            ng-disabled="!editableNotes || isNotesLengthExceeded(editableNotes)"
                             ng-click="updateNotes(editableNotes)">
                       Save
                     </button>

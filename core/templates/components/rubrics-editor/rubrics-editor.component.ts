@@ -69,6 +69,8 @@ export class RubricsEditorComponent {
     ui_config: {}};
   rubricsOptions: RubricsOptions[];
   rubric: Rubric;
+  maximumNumberofExplanations: number = 10;
+  maximumCharacterLengthOfExplanation: number = 300;
 
   constructor(
     private skillCreationService: SkillCreationService,
@@ -91,30 +93,34 @@ export class RubricsEditorComponent {
     this.explanationEditorIsOpen[difficulty][index] = true;
   }
 
+  isExplanationValid(difficulty: string, index: number): boolean {
+    return Boolean(this.editableExplanations[difficulty][index]);
+  }
+
   isExplanationLengthValid(difficulty: string, idx: number): boolean {
-    return this.editableExplanations[difficulty][idx].length <= 300;
+    return this.editableExplanations[difficulty][idx].length <=
+    this.maximumCharacterLengthOfExplanation;
   }
 
   isMediumLevelExplanationValid(): boolean {
-    if (this.rubrics[1] === undefined) {
+    // Checking if medium level rubrics have atleast one explantion.
+    let idx: number = 1;
+    if (this.rubrics[idx] === undefined) {
       return false;
     }
-    return (this.rubrics[1]._explanations.length >= 1);
+    return (this.rubrics[idx].getExplanations().length >= 1);
   }
 
   isTotalExplanationsLengthReached(): boolean {
-    if (this.rubrics[0] === undefined || this.rubrics[1] === undefined ||
-      this.rubrics[2] === undefined) {
-      return false;
-    } else {
-      let totalEasyExplanations = this.rubrics[0]._explanations.length;
-      let totalMediumExplanations = this.rubrics[1]._explanations.length;
-      let totalHardExplanations = this.rubrics[2]._explanations.length;
-
-      return (
-        totalEasyExplanations + totalMediumExplanations +
-        totalHardExplanations >= 10);
+    let totalExplanations: number = 0;
+    for (let idx in this.rubrics) {
+      if (this.rubrics[idx] === undefined) {
+        return false;
+      } else {
+        totalExplanations += this.rubrics[idx].getExplanations().length;
+      }
     }
+    return (totalExplanations >= this.maximumNumberofExplanations);
   }
 
   updateExplanation($event: string, idx: number): void {
