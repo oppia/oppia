@@ -173,7 +173,11 @@ class TopicAssignmentsHandler(base.BaseHandler):
     URL_PATH_ARGS_SCHEMAS = {
         'skill_id': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
             }
         }
     }
