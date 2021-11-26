@@ -20,7 +20,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed} from '@angular/core/testing';
 import { AnswerClassificationResult } from 'domain/classifier/answer-classification-result.model';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
-import { QuestionBackendDict, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
+import { Question, QuestionBackendDict, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { StateCard } from 'domain/state_card/state-card.model';
 import { ExpressionInterpolationService } from 'expressions/expression-interpolation.service';
 import { TextInputRulesService } from 'interactions/TextInput/directives/text-input-rules.service';
@@ -44,6 +44,8 @@ describe('Question player engine service ', () => {
   let questionObjectFactory: QuestionObjectFactory;
   let questionPlayerEngineService: QuestionPlayerEngineService;
   let singleQuestionBackendDict: QuestionBackendDict;
+  let singleQuestionObject: Question;
+  let multipleQuestionsObjects: Question[];
   let textInputService: InteractionRulesService;
 
   beforeEach(() => {
@@ -428,6 +430,13 @@ describe('Question player engine service ', () => {
     outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
     focusManagerService = TestBed.inject(FocusManagerService);
     textInputService = TestBed.get(TextInputRulesService);
+
+    singleQuestionObject = questionObjectFactory.createFromBackendDict(
+      singleQuestionBackendDict);
+    multipleQuestionsObjects = multipleQuestionsBackendDict.map(
+      function(questionDict) {
+        return questionObjectFactory.createFromBackendDict(questionDict);
+      });
   });
 
   it('should load questions when initialized', () => {
@@ -440,7 +449,7 @@ describe('Question player engine service ', () => {
     expect(questionPlayerEngineService.getQuestionCount()).toBe(0);
 
     questionPlayerEngineService.init(
-      multipleQuestionsBackendDict, initSuccessCb, initErrorCb);
+      multipleQuestionsObjects, initSuccessCb, initErrorCb);
 
     expect(questionPlayerEngineService.getQuestionCount()).toBe(3);
   });
@@ -452,7 +461,7 @@ describe('Question player engine service ', () => {
     expect(contextService.isInQuestionPlayerMode()).toBe(false);
 
     questionPlayerEngineService.init(
-      multipleQuestionsBackendDict, initSuccessCb, initErrorCb);
+      multipleQuestionsObjects, initSuccessCb, initErrorCb);
 
     expect(contextService.isInQuestionPlayerMode()).toBe(true);
   });
@@ -475,16 +484,15 @@ describe('Question player engine service ', () => {
       .and.callFake((html, envs) => html);
 
     questionPlayerEngineService.init(
-      multipleQuestionsBackendDict, initSuccessCb, initErrorCb);
+      multipleQuestionsObjects, initSuccessCb, initErrorCb);
     let currentQuestion1 = questionPlayerEngineService.getCurrentQuestion();
-    expect(currentQuestion1.getId()).toBe(multipleQuestionsBackendDict[0].id);
+    expect(currentQuestion1.getId()).toBe(multipleQuestionsObjects[0]._id);
 
     questionPlayerEngineService.submitAnswer(
       answer, textInputService, submitAnswerSuccessCb);
     questionPlayerEngineService.recordNewCardAdded();
     let currentQuestion2 = questionPlayerEngineService.getCurrentQuestion();
-
-    expect(currentQuestion2.getId()).toBe(multipleQuestionsBackendDict[1].id);
+    expect(currentQuestion2.getId()).toBe(multipleQuestionsObjects[1]._id);
   });
 
   it('should return the current question Id', () => {
@@ -500,10 +508,10 @@ describe('Question player engine service ', () => {
       'Cannot read properties of undefined (reading \'getId\')');
 
     questionPlayerEngineService.init(
-      multipleQuestionsBackendDict, initSuccessCb, initErrorCb);
+      multipleQuestionsObjects, initSuccessCb, initErrorCb);
 
     expect(questionPlayerEngineService.getCurrentQuestionId())
-      .toBe(multipleQuestionsBackendDict[0].id);
+      .toBe(multipleQuestionsObjects[0]._id);
   });
 
   it('should return number of questions', () => {
@@ -514,7 +522,7 @@ describe('Question player engine service ', () => {
     spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
 
     questionPlayerEngineService.init(
-      multipleQuestionsBackendDict, initSuccessCb, initErrorCb);
+      multipleQuestionsObjects, initSuccessCb, initErrorCb);
     let totalQuestions = questionPlayerEngineService.getQuestionCount();
     expect(totalQuestions).toBe(3);
 
@@ -523,7 +531,7 @@ describe('Question player engine service ', () => {
     expect(totalQuestions).toBe(0);
 
     questionPlayerEngineService.init(
-      [singleQuestionBackendDict], initSuccessCb, initErrorCb);
+      [singleQuestionObject], initSuccessCb, initErrorCb);
     totalQuestions = questionPlayerEngineService.getQuestionCount();
     expect(totalQuestions).toBe(1);
   });
@@ -536,7 +544,7 @@ describe('Question player engine service ', () => {
     spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
 
     questionPlayerEngineService.init(
-      multipleQuestionsBackendDict, initSuccessCb, initErrorCb);
+      multipleQuestionsObjects, initSuccessCb, initErrorCb);
 
     expect(questionPlayerEngineService.getQuestionCount()).toBe(3);
 
@@ -564,24 +572,24 @@ describe('Question player engine service ', () => {
       .and.callFake((html, envs) => html);
 
     questionPlayerEngineService.init(
-      multipleQuestionsBackendDict, initSuccessCb, initErrorCb);
+      multipleQuestionsObjects, initSuccessCb, initErrorCb);
     let languageCode = questionPlayerEngineService.getLanguageCode();
 
-    expect(languageCode).toBe(multipleQuestionsBackendDict[0].language_code);
+    expect(languageCode).toBe(multipleQuestionsObjects[0]._languageCode);
 
     questionPlayerEngineService.submitAnswer(
       answer, textInputService, submitAnswerSuccessCb);
     questionPlayerEngineService.recordNewCardAdded();
 
     languageCode = questionPlayerEngineService.getLanguageCode();
-    expect(languageCode).toBe(multipleQuestionsBackendDict[1].language_code);
+    expect(languageCode).toBe(multipleQuestionsObjects[1]._languageCode);
 
     questionPlayerEngineService.submitAnswer(
       answer, textInputService, submitAnswerSuccessCb);
     questionPlayerEngineService.recordNewCardAdded();
 
     languageCode = questionPlayerEngineService.getLanguageCode();
-    expect(languageCode).toBe(multipleQuestionsBackendDict[2].language_code);
+    expect(languageCode).toBe(multipleQuestionsObjects[2]._languageCode);
   });
 
   it('should always return false when calling \'isInPreviewMode()\'', () => {
@@ -603,7 +611,8 @@ describe('Question player engine service ', () => {
       .and.callFake((html, envs) => html);
 
     questionPlayerEngineService.init(
-      [singleQuestionBackendDict], initSuccessCb, initErrorCb);
+      [questionObjectFactory.createFromBackendDict(
+        singleQuestionBackendDict)], initSuccessCb, initErrorCb);
 
     expect(alertsServiceSpy).toHaveBeenCalledWith(
       'Question name should not be empty.');
@@ -642,7 +651,7 @@ describe('Question player engine service ', () => {
         .and.returnValue(answerClassificationResult);
 
       questionPlayerEngineService.init(
-        multipleQuestionsBackendDict, initSuccessCb, initErrorCb);
+        multipleQuestionsObjects, initSuccessCb, initErrorCb);
       questionPlayerEngineService.submitAnswer(
         answer, textInputService, submitAnswerSuccessCb);
 
@@ -691,7 +700,8 @@ describe('Question player engine service ', () => {
       singleQuestionBackendDict.question_state_data
         .interaction.default_outcome.feedback.html = null;
       questionPlayerEngineService.init(
-        [singleQuestionBackendDict], initSuccessCb, initErrorCb);
+        [questionObjectFactory.createFromBackendDict(
+          singleQuestionBackendDict)], initSuccessCb, initErrorCb);
 
       questionPlayerEngineService.submitAnswer(
         answer, textInputService, submitAnswerSuccessCb);
@@ -729,7 +739,7 @@ describe('Question player engine service ', () => {
         .and.callFake((html, envs) => html);
 
       questionPlayerEngineService.init(
-        [singleQuestionBackendDict], initSuccessCb, initErrorCb);
+        [sampleQuestion], initSuccessCb, initErrorCb);
       questionPlayerEngineService.setCurrentIndex(0);
       questionPlayerEngineService.submitAnswer(
         answer, textInputService, submitAnswerSuccessCb);
@@ -757,7 +767,7 @@ describe('Question player engine service ', () => {
         .and.callFake((html, envs) => html);
 
       questionPlayerEngineService.init(
-        multipleQuestionsBackendDict, initSuccessCb, initErrorCb);
+        multipleQuestionsObjects, initSuccessCb, initErrorCb);
       questionPlayerEngineService.submitAnswer(
         answer, textInputService, submitAnswerSuccessCb);
 
@@ -793,7 +803,7 @@ describe('Question player engine service ', () => {
 
       // We are using a stub backend dict which consists of three questions.
       questionPlayerEngineService.init(
-        multipleQuestionsBackendDict, initSuccessCb, initErrorCb);
+        multipleQuestionsObjects, initSuccessCb, initErrorCb);
 
       let createNewCardSpy = spyOn(
         StateCard, 'createNewCard').and.returnValue(sampleCard);
@@ -806,7 +816,7 @@ describe('Question player engine service ', () => {
 
       expect(
         questionPlayerEngineService.getCurrentQuestionId()).toBe(
-        multipleQuestionsBackendDict[0].id);
+        multipleQuestionsObjects[0]._id);
       expect(createNewCardSpy).toHaveBeenCalledTimes(1);
 
       questionPlayerEngineService.recordNewCardAdded();
@@ -816,7 +826,7 @@ describe('Question player engine service ', () => {
 
       expect(
         questionPlayerEngineService.getCurrentQuestionId()).toBe(
-        multipleQuestionsBackendDict[1].id);
+        multipleQuestionsObjects[1]._id);
       expect(createNewCardSpy).toHaveBeenCalledTimes(2);
 
       questionPlayerEngineService.recordNewCardAdded();
@@ -826,7 +836,7 @@ describe('Question player engine service ', () => {
 
       expect(
         questionPlayerEngineService.getCurrentQuestionId()).toBe(
-        multipleQuestionsBackendDict[2].id);
+        multipleQuestionsObjects[2]._id);
       // Please note that after submitting answer to the final question,
       // a new card was not created, hence createNewCardSpy was not called.
       expect(createNewCardSpy).toHaveBeenCalledTimes(2);

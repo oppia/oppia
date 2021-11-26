@@ -34,10 +34,10 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
 
 class MockRemoveActivityNgbModalRef {
   componentInstance: {
-    sectionNameI18nId: null,
-    subsectionName: null,
-    activityId: null,
-    activityTitle: null
+    sectionNameI18nId: null;
+    subsectionName: null;
+    activityId: null;
+    activityTitle: null;
   };
 }
 

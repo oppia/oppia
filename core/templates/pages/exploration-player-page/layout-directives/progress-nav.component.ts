@@ -31,6 +31,7 @@ import { ExplorationPlayerStateService } from '../services/exploration-player-st
 import { PlayerPositionService } from '../services/player-position.service';
 import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
 
 @Component({
   selector: 'oppia-progress-nav',
@@ -72,6 +73,7 @@ export class ProgressNavComponent {
     private playerPositionService: PlayerPositionService,
     private playerTranscriptService: PlayerTranscriptService,
     private urlService: UrlService,
+    private schemaFormSubmittedService: SchemaFormSubmittedService,
     private windowDimensionsService: WindowDimensionsService
   ) {}
 
@@ -99,6 +101,13 @@ export class ProgressNavComponent {
       this.playerPositionService.onHelpCardAvailable.subscribe(
         (helpCard) => {
           this.helpCardHasContinueButton = helpCard.hasContinueButton;
+        }
+      )
+    );
+    this.directiveSubscriptions.add(
+      this.schemaFormSubmittedService.onSubmittedSchemaBasedForm.subscribe(
+        () => {
+          this.submit.emit();
         }
       )
     );

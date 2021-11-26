@@ -29,6 +29,7 @@ import re
 import types
 
 from core import feconf
+from core import handler_schema_constants
 from core import python_utils
 from core import utils
 from core.constants import constants
@@ -1336,7 +1337,7 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
     architecture.
     """
     handler_class_names_with_no_schema = (
-        payload_validator.HANDLER_CLASS_NAMES_WITH_NO_SCHEMA)
+        handler_schema_constants.HANDLER_CLASS_NAMES_WITH_NO_SCHEMA)
     wiki_page_link = (
         'https://github.com/oppia/oppia/wiki/Writing-schema-for-handler-args')
 
@@ -1522,13 +1523,13 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
 
     def test_handlers_with_schemas_are_not_in_handler_schema_todo_list(self):
         """This test ensures that the
-        HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS list in payload validator
+        HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS list in handler_schema_constants
         only contains handler class names which require schemas.
         """
 
         list_of_handlers_to_be_removed = []
         handler_names_which_require_schemas = (
-            payload_validator.HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS)
+        handler_schema_constants.HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS)
         list_of_routes_which_need_schemas = (
             self._get_list_of_routes_which_need_schemas())
 
@@ -1551,7 +1552,7 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
 
         error_msg = (
             'Handlers to be removed from schema requiring list in '
-            'payload validator file: [ %s ].' % (
+            'handler_schema_constants file: [ %s ].' % (
                 ', '.join(list_of_handlers_to_be_removed)))
 
         self.assertEqual(list_of_handlers_to_be_removed, [], error_msg)
@@ -1984,3 +1985,53 @@ class ImageUploadHandlerTest(test_utils.GenericTestBase):
             )
             filename = response_dict['filename']
         self.logout()
+
+
+class UrlPathNormalizationTest(test_utils.GenericTestBase):
+    """Tests that ensure url path arguments are normalized"""
+
+    class MockHandler(base.BaseHandler):
+        URL_PATH_ARGS_SCHEMAS = {
+            'mock_list': {
+                'schema': {
+                    'type': 'custom',
+                    'obj_type': 'JsonEncodedInString'
+                }
+            },
+            'mock_int': {
+                'schema': {
+                    'type': 'int'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {
+            'GET': {}
+        }
+
+        def get(self, mock_list, mock_int):
+            if not isinstance(mock_list, list):
+                raise self.InvalidInputException(
+                    'Expected arg mock_list to be a list. Was type %s' %
+                    type(mock_list))
+            if not isinstance(mock_int, int):
+                raise self.InvalidInputException(
+                    'Expected arg mock_int to be a int. Was type %s' %
+                    type(mock_int))
+            self.render_json({'mock_list': mock_list, 'mock_int': mock_int})
+
+    def setUp(self):
+        super(UrlPathNormalizationTest, self).setUp()
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock_normalization/<mock_int>/<mock_list>',
+            self.MockHandler, name='MockHandler')],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_url_path_arg_normalization_is_successful(self):
+        list_string = '["id1", "id2", "id3"]'
+        int_string = '1'
+
+        with self.swap(self, 'testapp', self.testapp):
+            self.get_json(
+                '/mock_normalization/%s/%s' % (int_string, list_string),
+                expected_status_int=200)

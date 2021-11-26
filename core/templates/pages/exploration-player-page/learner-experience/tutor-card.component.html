@@ -93,7 +93,9 @@
     <div *ngIf="!isInteractionInline() && !conceptCardIsBeingShown"
          class="conversation-skin-inline-interaction">
       <div class="oppia-conversation-skin-instruction-container">
-        <span [ngClass]="{'conversation-skin-instruction-disabled': !interactionIsActive}">{{ interactionInstructions }}</span>
+        <span [ngClass]="{'conversation-skin-instruction-disabled': !interactionIsActive}">
+          {{ interactionInstructions | translate }}
+        </span>
         <i *ngIf="canWindowShowTwoCards() && !isLanguageRTL()" [ngClass]="{'conversation-skin-instruction-disabled': !interactionIsActive}" class="material-icons md-18 position-relative">&#xE5C8;</i>
         <i *ngIf="canWindowShowTwoCards() && isLanguageRTL()" [ngClass]="{'conversation-skin-instruction-disabled': !interactionIsActive}" class="material-icons md-18 position-relative">&#xE5C4;</i>
         <i *ngIf="!canWindowShowTwoCards()" [ngClass]="{'conversation-skin-instruction-disabled': !interactionIsActive}" class="material-icons md-18 position-relative">&#xE5DB;</i>
