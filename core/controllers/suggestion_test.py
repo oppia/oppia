@@ -1679,7 +1679,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             suggestion.status,
-            feconf.SUGGESTION_TYPE_ADD_QUESTION)
+            suggestion_models.STATUS_IN_REVIEW)
 
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
