@@ -230,6 +230,18 @@ class GeneralLintTests(test_utils.LinterTestBase):
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
+    def test_error_message_includes_filepath(self):
+        def _mock_readlines_error(unused_self):
+            raise Exception('filecache error')
+
+        with self.swap(FILE_CACHE, 'readlines', _mock_readlines_error):
+            linter = general_purpose_linter.GeneralPurposeLinter(
+                [INVALID_ANNOTATIONS_FILEPATH], FILE_CACHE)
+            with self.assertRaisesRegexp(
+                    Exception,
+                    '%s filecache error' % INVALID_ANNOTATIONS_FILEPATH):
+                linter.check_mandatory_patterns()
+
     def test_missing_unicode_literal(self):
         linter = general_purpose_linter.GeneralPurposeLinter(
             [INVALID_ANNOTATIONS_FILEPATH], FILE_CACHE)
@@ -277,13 +289,11 @@ class GeneralLintTests(test_utils.LinterTestBase):
             linter = general_purpose_linter.GeneralPurposeLinter(
                 [CONSTANTS_FILEPATH], FILE_CACHE)
             lint_task_report = linter.check_bad_patterns()
-        self.assertItemsEqual(
-            [
-                'constants.ts --> Please set the DEV_MODE variable in '
-                'constants.ts to true before committing.',
-            ],
-            lint_task_report.trimmed_messages
-        )
+        self.assertEqual(len(lint_task_report.trimmed_messages), 1)
+        self.assertTrue(lint_task_report.trimmed_messages[0].endswith(
+            'constants.ts --> Please set the DEV_MODE variable in '
+            'constants.ts to true before committing.'))
+
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
@@ -303,13 +313,11 @@ class GeneralLintTests(test_utils.LinterTestBase):
             linter = general_purpose_linter.GeneralPurposeLinter(
                 [CONSTANTS_FILEPATH], FILE_CACHE)
             lint_task_report = linter.check_bad_patterns()
-        self.assertItemsEqual(
-            [
-                'constants.ts --> Please set the EMULATOR_MODE variable in '
-                'constants.ts to true before committing.',
-            ],
-            lint_task_report.trimmed_messages
-        )
+        self.assertEqual(len(lint_task_report.trimmed_messages), 1)
+        self.assertTrue(lint_task_report.trimmed_messages[0].endswith(
+            'constants.ts --> Please set the EMULATOR_MODE variable in '
+            'constants.ts to true before committing.'))
+
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
