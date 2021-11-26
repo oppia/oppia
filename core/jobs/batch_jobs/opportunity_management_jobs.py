@@ -22,7 +22,6 @@ from __future__ import unicode_literals
 
 import itertools
 
-from core.constants import constants
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import opportunity_domain
@@ -148,12 +147,15 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
         """Counts the number of unique question ids.
 
         Args:
-            question_skill_link_models: list[[list[QuestionSkillLinkModel]]: 
+            question_skill_link_models: list[[list[QuestionSkillLinkModel]].
                 2D array of QuestionSkillLinkModels.
+
+        Returns:
+            int. The number of unique question ids.
         """
 
-        question_ids = [link.question_id 
-                        for link_list in question_skill_link_models 
+        question_ids = [link.question_id
+                        for link_list in question_skill_link_models
                         for link in link_list]
         return len(set(question_ids))
 
@@ -162,8 +164,11 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
             self.pipeline
             | 'Get all non-deleted QuestionSkillLinkModels' >> (
                 ndb_io.GetModels(
-                    question_models.QuestionSkillLinkModel.get_all(include_deleted=False)))
-            | 'Group QuestionSkillLinkModels by skill id' >> beam.GroupBy(lambda n: n.skill_id)
+                    question_models.QuestionSkillLinkModel
+                    .get_all(include_deleted=False))
+                )
+            | 'Group QuestionSkillLinkModels by skill id' >> 
+                beam.GroupBy(lambda n: n.skill_id)
         )
 
         all_skill_models = (
@@ -190,7 +195,9 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
                     opportunity_domain.SkillOpportunity(
                         skill_id=n[1]['skills'][0][0].id,
                         skill_description=n[1]['skills'][0][0].description,
-                        question_count=self.count_unique_question_ids(n[1]['question_skill_links']))))
+                        question_count=self.count_unique_question_ids(
+                            n[1]['question_skill_links']
+                        ))))
         )
 
         unused_put_result = (
