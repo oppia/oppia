@@ -1677,6 +1677,10 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_SKILL, skill_id, 1,
             self.author_id, suggestion_change, 'test description')
 
+        self.assertEqual(
+            suggestion.status,
+            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION)
+
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -1701,7 +1705,10 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
             suggestion_post_accept.status,
             suggestion_models.STATUS_ACCEPTED)
         # Checks whether image of the Image Region interaction is accessible
-        # from the question player.
+        # from the question player. Pre checks can not be added to check there
+        # are no images in the given directory before accepting the question
+        # suggestion since the directory is created only after the suggestion
+        # is accepted.
         destination_fs = fs_domain.AbstractFileSystem(
             fs_domain.GcsFileSystem(
                 feconf.ENTITY_TYPE_QUESTION, question.id))

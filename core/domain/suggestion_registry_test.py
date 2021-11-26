@@ -2584,6 +2584,11 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             suggestion_dict['status'], self.author_id, self.reviewer_id,
             suggestion_dict['change'], suggestion_dict['score_category'],
             suggestion_dict['language_code'], False, self.fake_date)
+
+        self.assertEqual(
+            suggestion.status,
+            feconf.SUGGESTION_TYPE_ADD_QUESTION)
+
         suggestion.accept('commit_message')
 
         question = question_services.get_questions_by_skill_ids(
