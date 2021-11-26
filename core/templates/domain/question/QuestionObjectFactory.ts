@@ -113,12 +113,10 @@ export class Question {
       return 'An interaction must be specified';
     }
     if (
-      interaction.defaultOutcome !== null &&
-      interaction.defaultOutcome.feedback._html.length === 0
+      interaction.defaultOutcome?.feedback._html.length === 0
     ) {
       return 'Please enter a feedback for the default outcome.';
     }
-
     if (interaction.hints.length === 0) {
       return 'At least 1 hint should be specified';
     }
