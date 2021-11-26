@@ -28,7 +28,7 @@ import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 
 export interface QuestionBackendDict {
   'id': string | null;
-  'question_state_data': StateBackendDict,
+  'question_state_data': StateBackendDict;
   'question_state_data_schema_version': number;
   'language_code': string;
   'version': number;
