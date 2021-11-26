@@ -1,3 +1,5 @@
+from core.domain import auth_domain
+
 import datetime
 from typing import Any, Dict, List, Optional, Sequence, Union
 
@@ -20,7 +22,6 @@ class UserRecord:
 
     @property
     def disabled(self) -> bool: ...
-
 
 class ImportUserRecord:
     @property
@@ -110,7 +111,7 @@ def verify_session_cookie(
         session_cookie: str,
         check_revoked: bool = ...,
         app: Optional[App] = ...
-) -> Dict[str, Any]: ...
+) -> auth_domain.AuthClaimsDict: ...
 
 
 class UserNotFoundError(Exception): ...
