@@ -24,7 +24,7 @@ import { Voiceover } from
   'domain/exploration/voiceover.model';
 
 export interface AudioTranslations {
-  [languageCode: string]: Voiceover
+  [languageCode: string]: Voiceover;
 }
 
 @Injectable({

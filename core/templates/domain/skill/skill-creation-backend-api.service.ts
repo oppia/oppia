@@ -26,15 +26,15 @@ export interface RubricBackendDict {
 }
 
 export interface SkillCreationBackendDict {
-  'description': string,
-  'explanation_dict': string,
-  'linked_topic_ids': string[],
-  'rubrics': RubricBackendDict
+  'description': string;
+  'explanation_dict': string;
+  'linked_topic_ids': string[];
+  'rubrics': RubricBackendDict;
 }
 
 export interface ImageData {
-  filename: string,
-  imageBlob: Blob
+  filename: string;
+  imageBlob: Blob;
 }
 
 interface SkillCreationBackendResponse {

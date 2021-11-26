@@ -37,7 +37,7 @@ interface FetchSkillBackendResponse {
   };
   'grouped_skill_summaries': {
     [topicName: string]: SkillSummaryBackendDict[];
-  }
+  };
 }
 
 interface FetchSkillResponse {
