@@ -363,7 +363,11 @@ class GeneralPurposeLinter:
         # found in the file.
         pattern_found_list = []
         error_messages = []
-        file_content = self.file_cache.readlines(filepath)
+
+        try:
+            file_content = self.file_cache.readlines(filepath)
+        except Exception as e:
+            raise Exception('%s %s' % (filepath, e))
         for index, regexp_to_check in enumerate(
                 pattern_list):
             if (any(filepath.endswith(
