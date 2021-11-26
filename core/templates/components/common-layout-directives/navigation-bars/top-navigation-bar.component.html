@@ -55,20 +55,20 @@
     <li>
       <ul *ngIf="!windowIsNarrow"
           class="nav oppia-navbar-tabs">
-        <li [ngClass]="{'open' : activeMenuName === 'classroomMenu'}"
+        <li [ngClass]="{'open' : activeMenuName === 'learnMenu'}"
             ngbDropdown
             [hidden]="!navElementsVisibilityStatus.I18N_TOPNAV_LEARN"
             aria-hidden="false"
             class="nav-item  dropdown oppia-navbar-clickable-dropdown protractor-test-classroom-oppia-list-item">
           <a ngbDropdownToggle
-             (keydown)="onMenuKeypress($event, 'classroomMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
+             (keydown)="onMenuKeypress($event, 'learnMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
              class="nav-link oppia-navbar-tab dropdown-toggle"
              role="menuitem"
              aria-haspopup="true"
              aria-expanded="false"
              aria-hidden="false"
              tabindex="0"
-             (mouseover)="openSubmenu($event, 'classroomMenu')"
+             (mouseover)="openSubmenu($event, 'learnMenu')"
              (mouseleave)="closeSubmenuIfNotMobile($event)"
              autofocus>
             <span class="oppia-navbar-tab-content"
@@ -77,17 +77,17 @@
           </a>
           <ul ngbDropdownMenu
               [ngClass]="{'classroom-disabled': !CLASSROOM_PROMOS_ARE_ENABLED, 'classroom-enabled': CLASSROOM_PROMOS_ARE_ENABLED}"
-              class="dropdown-menu oppia-navbar-dropdown classroom-dropdown-menu"
-              (mouseover)="openSubmenu($event, 'classroomMenu')"
+              class="dropdown-menu oppia-navbar-dropdown learn-dropdown-menu"
+              (mouseover)="openSubmenu($event, 'learnMenu')"
               (mouseleave)="closeSubmenuIfNotMobile($event)"
               role="menu"
               autofocus>
             <li class="nav-item">
-              <div class="nav-item-main d-flex justify-content-between">
-                <div *ngIf="CLASSROOM_PROMOS_ARE_ENABLED" class="nav-item-left d-flex flex-column">
+              <div class="nav-item-main d-flex">
+                <div *ngIf="CLASSROOM_PROMOS_ARE_ENABLED" class="nav-item-left d-flex flex-column justify-content-between">
                   <div class="nav-item-top d-flex justify-content-between">
                     <div class="nav-content d-flex flex-column">
-                      <a (keydown)="onMenuKeypress($event, 'classroomMenu', {shiftTab: ACTION_CLOSE})"
+                      <a (keydown)="onMenuKeypress($event, 'learnMenu', {shiftTab: ACTION_CLOSE})"
                          (click)="navigateToClassroomPage('/learn/math')"
                          class="dropdown-item nav-link oppia-navbar-tab-content protractor-test-classroom-link nav-item-top-link"
                          href="#">
@@ -106,10 +106,11 @@
                     </picture>
                   </div>
                   <div class="nav-item-bottom d-flex flex-column" *ngIf="!userIsLoggedIn">
-                    <div *ngIf="classroomData.getTopicSummaries().length > 0" class="nav-lists">
+                    <div *ngIf="classroomData.getTopicSummaries().length > 0">
                       <div class="nav-item-links"  *ngFor="let topicSummary of classroomData.getTopicSummaries().slice(0, 3)">
-                        <a (keydown)="onMenuKeypress($event, 'classroomMenu', {shiftTab: ACTION_CLOSE})" (click)="navigateToClassroomPage('/learn/math/' + topicSummary.getUrlFragment())">
-                      {{ topicSummary.getName() }}
+                        <a (keydown)="onMenuKeypress($event, 'learnMenu', {shiftTab: ACTION_CLOSE})"
+                           (click)="navigateToClassroomPage('/learn/math/' + topicSummary.getUrlFragment())">
+                            {{ topicSummary.getName() }}
                         </a>
                       </div>
                     </div>
@@ -493,15 +494,12 @@
     padding: 0;
   }
   .classroom-enabled {
-    min-width: 668px;
+    min-width: 582px;
   }
   .classroom-disabled {
-    min-width: 300px;
+    min-width: 266px;
   }
-  .nav-lists {
-    padding-top: 8px;
-  }
-  .classroom-dropdown-menu .nav-item-top-link {
+  .learn-dropdown-menu .nav-item-top-link {
     color: #333;
     font-family: 'Roboto', sans-serif;
     font-size: 16px;
@@ -528,7 +526,7 @@
     font-weight: 500;
     line-height: 16.41px;
     padding: 0;
-    padding-bottom: 16px;
+    padding-top: 16px;
     text-transform: capitalize;
   }
   .learn-dropdown-menu .nav-item-left {
@@ -555,8 +553,6 @@
     font-weight: 500;
     line-height: 16.41px;
     padding: 0;
-  }
-  .classroom-dropdown-menu .nav-item-bottom-link-right {
     padding-top: 16px;
   }
   .learn-dropdown-menu .nav-item-bottom-link-logged {

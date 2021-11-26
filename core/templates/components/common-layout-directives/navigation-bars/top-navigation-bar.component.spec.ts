@@ -231,10 +231,10 @@ describe('TopNavigationBarComponent', () => {
     spyOn(navigationService, 'openSubmenu');
     spyOn(deviceInfoService, 'isMobileDevice').and.returnValue(false);
 
-    component.openSubmenu(mouseoverEvent, 'classroomMenu');
+    component.openSubmenu(mouseoverEvent, 'learnMenu');
 
     expect(navigationService.openSubmenu).toHaveBeenCalledWith(
-      mouseoverEvent, 'classroomMenu');
+      mouseoverEvent, 'learnMenu');
   });
 
   it('should close submenu when user moves the mouse away' +
