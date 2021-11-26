@@ -253,12 +253,12 @@ class GenerateSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
             opportunity_model_2.skill_description,
             self.SKILL_2_DESCRIPTION)
         self.assertEqual(opportunity_model_2.question_count, 1)
-        
+
     def test_generation_job_does_not_count_duplicate_question_ids(self) -> None:
         all_opportunity_models = list(
             opportunity_models.SkillOpportunityModel.get_all())
         self.assertEqual(len(all_opportunity_models), 0)
-        
+
         question_1_duplicate_skilllinkmodel = self.create_model(
             question_models.QuestionSkillLinkModel,
             question_id=self.QUESTION_1_ID,
@@ -267,11 +267,11 @@ class GenerateSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
         )
         question_1_duplicate_skilllinkmodel.update_timestamps()
         datastore_services.put_multi([question_1_duplicate_skilllinkmodel])
-        
+
         all_skill_link_models = list(
             question_models.QuestionSkillLinkModel.get_all())
         self.assertEqual(len(all_skill_link_models), 3)
-        
+
         self.assert_job_output_is([
             job_run_result.JobRunResult(stdout='SUCCESS'),
             job_run_result.JobRunResult(stdout='SUCCESS')
@@ -297,12 +297,12 @@ class GenerateSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
             opportunity_model_2.skill_description,
             self.SKILL_2_DESCRIPTION)
         self.assertEqual(opportunity_model_2.question_count, 1)
-        
+
     def test_generation_job_returns_opportunity_with_multiple_questions(self) -> None:
         all_opportunity_models = list(
             opportunity_models.SkillOpportunityModel.get_all())
         self.assertEqual(len(all_opportunity_models), 0)
-        
+
         question_1_skilllinkmodel = self.create_model(
             question_models.QuestionSkillLinkModel,
             question_id=self.QUESTION_1_ID,
