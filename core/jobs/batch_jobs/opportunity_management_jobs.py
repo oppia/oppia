@@ -197,10 +197,10 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
             | beam.Map(
                 lambda n:
                 self._create_skill_opportunity_model(
-                    opportunity_domain.SkillOpportunity(
+                    opportunity_domain.SkillOpportunity( # type: ignore[no-untyped-call]
                         skill_id=n[1]['skills'][0][0].id,
                         skill_description=n[1]['skills'][0][0].description,
-                        question_count=self.count_unique_question_ids( # type: ignore[no-untyped-call]
+                        question_count=self.count_unique_question_ids(
                             n[1]['question_skill_links']
                         ))))
         )
