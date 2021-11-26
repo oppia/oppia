@@ -93,6 +93,31 @@ describe('Rubrics Editor Component', () => {
       .toBeTrue();
   });
 
+  it('should check for maximum character length of explanation', () => {
+    let index: number = 2;
+    componentInstance.ngOnInit();
+    componentInstance.editableExplanations[difficulty][index] = 'not_empty';
+    expect(componentInstance.isExplanationLengthValid(difficulty, index))
+      .toBeTrue();
+  });
+
+  it('should check if medium level rubrics' +
+      'have atleast one explantion',
+  () => {
+    componentInstance.ngOnInit();
+    expect(componentInstance.isMediumLevelExplanationValid()).toBeTrue;
+  });
+
+  it('should check check if total number of explanations' +
+      'have reached the limit',
+  () => {
+    let index: number = 2;
+    componentInstance.ngOnInit();
+    componentInstance.editableExplanations[difficulty][index] = 'not_empty';
+    expect(componentInstance.isTotalExplanationsLengthReached())
+      .toBeFalse();
+  });
+
   it('should update explanation', () => {
     let index: number = 0;
     let newExplanation: string = 'new';

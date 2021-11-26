@@ -104,11 +104,12 @@ export class RubricsEditorComponent {
 
   isMediumLevelExplanationValid(): boolean {
     // Checking if medium level rubrics have atleast one explantion.
-    let idx: number = 1;
-    if (this.rubrics[idx] === undefined) {
+    this.selectedRubricIndex = 1;
+    if (this.rubrics[this.selectedRubricIndex] === undefined) {
       return false;
     }
-    return (this.rubrics[idx].getExplanations().length >= 1);
+    return (this.rubrics[this.selectedRubricIndex].getExplanations().length >=
+    1);
   }
 
   isTotalExplanationsLengthReached(): boolean {

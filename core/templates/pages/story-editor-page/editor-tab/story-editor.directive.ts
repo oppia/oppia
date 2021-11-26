@@ -225,8 +225,8 @@ angular.module('oppia').directive('storyEditor', [
           };
 
           $scope.isNotesLengthExceeded = function(editableNotes) {
-            return (editableNotes.length >
-              $scope.maximumCharacterLengthOfNotes);
+            return (
+              editableNotes.length > $scope.maximumCharacterLengthOfNotes);
           };
 
           $scope.navigateToChapterWithId = function(id, index) {
