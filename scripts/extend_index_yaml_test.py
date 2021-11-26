@@ -18,13 +18,14 @@
 
 from __future__ import annotations
 
-import unittest
 from unittest import mock
+
+from core.tests import test_utils
 
 from . import extend_index_yaml
 
 
-class ExtendIndexYamlTest(unittest.TestCase):
+class ExtendIndexYamlTest(test_utils.GenericTestBase):
     """Class for testing the extend_index_yaml script."""
 
     def test_extend_index_yaml_with_changes(self):
@@ -41,31 +42,15 @@ class ExtendIndexYamlTest(unittest.TestCase):
   - name: editor_ids
   - name: last_updated
     direction: desc
-
-- kind: ClassifierTrainingJobModel
-  properties:
-  - name: status
-  - name: next_scheduled_check_time
 """
         web_inf_index_yaml = """indexes:
 
-- kind: AppFeedbackReportModel
-  properties:
-  - name: created_on
-  - name: scrubbed_by
-
 - kind: ClassifierTrainingJobModel
   properties:
   - name: status
   - name: next_scheduled_check_time
-
-- kind: CollectionRightsSnapshotMetadataModel
-  properties:
-  - name: committer_id
-  - name: commit_message
-  - name: commit_type
 """
-        expected_result = """indexes:
+        expected_index_yaml = """indexes:
 
 - kind: AppFeedbackReportModel
   properties:
@@ -83,24 +68,17 @@ class ExtendIndexYamlTest(unittest.TestCase):
   properties:
   - name: status
   - name: next_scheduled_check_time
-
-- kind: CollectionRightsSnapshotMetadataModel
-  properties:
-  - name: committer_id
-  - name: commit_message
-  - name: commit_type
 """
+
         with mock.patch('builtins.open', mock.mock_open()) as mock_open_file:
             mock_open_file.return_value.__enter__.side_effect = [
                 index_yaml,
                 web_inf_index_yaml,
+                open(extend_index_yaml.INDEX_YAML_PATH, 'w', encoding='utf-8'),
             ]
             extend_index_yaml.main()
 
-            mock_open_file.assert_called_with(
-                extend_index_yaml.INDEX_YAML_PATH, 'w', encoding='utf-8'
-            )
-            mock_open_file().write.assert_called_with(expected_result)
+            mock_open_file().write.assert_called_with(expected_index_yaml)
 
     def test_extend_index_yaml_without_changes(self):
         index_yaml = """indexes:
@@ -119,12 +97,14 @@ class ExtendIndexYamlTest(unittest.TestCase):
 """
         web_inf_index_yaml = """indexes:
 
-- kind: AppFeedbackReportModel
+- kind: BlogPostRightsModel
   properties:
-  - name: created_on
-  - name: scrubbed_by
+  - name: blog_post_is_published
+  - name: editor_ids
+  - name: last_updated
+    direction: desc
 """
-        expected_result = index_yaml
+
         with mock.patch('builtins.open', mock.mock_open()) as mock_open_file:
             mock_open_file.return_value.__enter__.side_effect = [
                 index_yaml,
@@ -132,15 +112,38 @@ class ExtendIndexYamlTest(unittest.TestCase):
             ]
             extend_index_yaml.main()
 
-            mock_open_file.assert_called_with(
-                extend_index_yaml.INDEX_YAML_PATH, 'w', encoding='utf-8'
-            )
-            mock_open_file().write.assert_called_with(expected_result)
+            assert mock_open_file().write.called is False
 
-    def test_extend_index_yaml_with_multi_indexes(self):
-        # This is a case which is probably not possible, but considering
-        # that there can be multiple different indexes for kind.
-        index_yaml = """indexes1:
+    def test_extend_index_yaml_with_empty_web_inf_ind_yaml(self):
+        index_yaml = """indexes:
+
+- kind: AppFeedbackReportModel
+  properties:
+  - name: created_on
+  - name: scrubbed_by
+
+- kind: BlogPostRightsModel
+  properties:
+  - name: blog_post_is_published
+  - name: editor_ids
+  - name: last_updated
+    direction: desc
+"""
+        web_inf_index_yaml = """indexes:
+
+"""
+
+        with mock.patch('builtins.open', mock.mock_open()) as mock_open_file:
+            mock_open_file.return_value.__enter__.side_effect = [
+                index_yaml,
+                web_inf_index_yaml,
+            ]
+            extend_index_yaml.main()
+
+        assert mock_open_file().write.called is False
+
+    def test_extend_index_yaml_with_same_kind(self):
+        index_yaml = """indexes:
 
 - kind: AppFeedbackReportModel
   properties:
@@ -156,50 +159,18 @@ class ExtendIndexYamlTest(unittest.TestCase):
 
 - kind: ClassifierTrainingJobModel
   properties:
+  - name: task
   - name: status
   - name: next_scheduled_check_time
-
-indexes2:
-
-- kind: UserContributionProficiencyModel
-  properties:
-  - name: realtime_layer
-  - name: created_on
-
 """
-        web_inf_index_yaml = """indexes1:
-
-- kind: AppFeedbackReportModel
-  properties:
-  - name: created_on
-  - name: scrubbed_by
+        web_inf_index_yaml = """indexes:
 
 - kind: ClassifierTrainingJobModel
   properties:
   - name: status
   - name: next_scheduled_check_time
-
-- kind: CollectionRightsSnapshotMetadataModel
-  properties:
-  - name: committer_id
-  - name: commit_message
-  - name: commit_type
-
-indexes2:
-
-- kind: UserStatsRealtimeModel
-  properties:
-  - name: realtime_layer
-  - name: created_on
-
-- kind: _AE_Pipeline_Record
-  properties:
-  - name: is_root_pipeline
-  - name: start_time
-    direction: desc
-
 """
-        expected_result = """indexes1:
+        expected_index_yaml = """indexes:
 
 - kind: AppFeedbackReportModel
   properties:
@@ -215,90 +186,85 @@ indexes2:
 
 - kind: ClassifierTrainingJobModel
   properties:
+  - name: task
   - name: status
   - name: next_scheduled_check_time
 
-- kind: CollectionRightsSnapshotMetadataModel
+- kind: ClassifierTrainingJobModel
   properties:
-  - name: committer_id
-  - name: commit_message
-  - name: commit_type
+  - name: status
+  - name: next_scheduled_check_time
+"""
+        with mock.patch('builtins.open', mock.mock_open()) as mock_open_file:
+            mock_open_file.return_value.__enter__.side_effect = [
+                index_yaml,
+                web_inf_index_yaml,
+                open(extend_index_yaml.INDEX_YAML_PATH, 'w', encoding='utf-8'),
+            ]
+            extend_index_yaml.main()
 
-indexes2:
+            mock_open_file().write.assert_called_with(expected_index_yaml)
 
-- kind: UserContributionProficiencyModel
+    def test_extend_index_yaml_with_same_kind_in_web_inf(self):
+        index_yaml = """indexes:
+
+- kind: AppFeedbackReportModel
   properties:
-  - name: realtime_layer
   - name: created_on
+  - name: scrubbed_by
 
-- kind: UserStatsRealtimeModel
+- kind: BlogPostRightsModel
   properties:
-  - name: realtime_layer
-  - name: created_on
-
-- kind: _AE_Pipeline_Record
-  properties:
-  - name: is_root_pipeline
-  - name: start_time
+  - name: blog_post_is_published
+  - name: editor_ids
+  - name: last_updated
     direction: desc
 """
+        web_inf_index_yaml = """indexes:
+
+
+- kind: ClassifierTrainingJobModel
+  properties:
+  - name: task
+  - name: status
+  - name: next_scheduled_check_time
+
+- kind: ClassifierTrainingJobModel
+  properties:
+  - name: status
+  - name: next_scheduled_check_time
+"""
+        expected_index_yaml = """indexes:
+
+- kind: AppFeedbackReportModel
+  properties:
+  - name: created_on
+  - name: scrubbed_by
+
+- kind: BlogPostRightsModel
+  properties:
+  - name: blog_post_is_published
+  - name: editor_ids
+  - name: last_updated
+    direction: desc
+
+- kind: ClassifierTrainingJobModel
+  properties:
+  - name: task
+  - name: status
+  - name: next_scheduled_check_time
+
+- kind: ClassifierTrainingJobModel
+  properties:
+  - name: status
+  - name: next_scheduled_check_time
+"""
         with mock.patch('builtins.open', mock.mock_open()) as mock_open_file:
             mock_open_file.return_value.__enter__.side_effect = [
                 index_yaml,
                 web_inf_index_yaml,
+                open(extend_index_yaml.INDEX_YAML_PATH, 'w', encoding='utf-8'),
             ]
             extend_index_yaml.main()
 
-            mock_open_file.assert_called_with(
-                extend_index_yaml.INDEX_YAML_PATH, 'w', encoding='utf-8'
-            )
-            mock_open_file().write.assert_called_with(expected_result)
-
-    def test_missing_key_in_index_yaml_with_multi_index(self):
-        index_yaml = """indexes1:
-
-- kind: AppFeedbackReportModel
-  properties:
-  - name: created_on
-  - name: scrubbed_by
-"""
-        web_inf_index_yaml = """indexes1:
-
-- kind: AppFeedbackReportModel
-  properties:
-  - name: created_on
-  - name: scrubbed_by
-
-indexes2:
-
-- kind: UserStatsRealtimeModel
-  properties:
-  - name: realtime_layer
-  - name: created_on
-"""
-        expected_result = """indexes1:
-
-- kind: AppFeedbackReportModel
-  properties:
-  - name: created_on
-  - name: scrubbed_by
-
-indexes2:
-
-- kind: UserStatsRealtimeModel
-  properties:
-  - name: realtime_layer
-  - name: created_on
-"""
-
-        with mock.patch('builtins.open', mock.mock_open()) as mock_open_file:
-            mock_open_file.return_value.__enter__.side_effect = [
-                index_yaml,
-                web_inf_index_yaml,
-            ]
-            extend_index_yaml.main()
-
-            mock_open_file.assert_called_with(
-                extend_index_yaml.INDEX_YAML_PATH, 'w', encoding='utf-8'
-            )
-            mock_open_file().write.assert_called_with(expected_result)
+            mock_open_file().write.assert_called_with(expected_index_yaml)

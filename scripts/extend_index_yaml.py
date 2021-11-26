@@ -24,83 +24,39 @@ from __future__ import annotations
 
 import os
 
-from core import utils
-
 import yaml
 
 INDEX_YAML_PATH = os.path.join(os.getcwd(), 'index.yaml')
 WEB_INF_INDEX_YAML_PATH = os.path.join(
-    os.getcwd(), '..', 'cloud_datastore_emulator_cache',
-    'WEB-INF', 'index.yaml'
+    os.getcwd(), '..', 'cloud_datastore_emulator_cache', 'WEB-INF', 'index.yaml'
 )
-
-
-def read_yaml(file_path):
-    """Reads yaml file.
-
-    Args:
-        file_path: str. Path of yaml file.
-
-    Returns:
-        dict. Dictionary of yaml file.
-    """
-    with open(file_path, 'r', encoding='utf-8') as yaml_file:
-        return utils.dict_from_yaml(yaml_file)
-
-
-def write_yaml(new_yaml_data_dict):
-    """Writes new yaml data to index.yaml.
-
-    Args:
-        new_yaml_data_dict: dict. Dictionary of new yaml data.
-    """
-    yaml_data = ''
-    for data in new_yaml_data_dict:
-        yaml_data += data + ':\n'
-        yaml_data += yaml.dump(
-            new_yaml_data_dict[data],
-            indent=1,
-            default_flow_style=False,
-            sort_keys=False
-        )
-        yaml_data += '\n'
-    yaml_data = yaml_data[:-1]
-    yaml_data = yaml_data.replace('\n-', '\n\n-')
-    fo = open(INDEX_YAML_PATH, 'w', encoding='utf-8')
-    data = fo.write(yaml_data)
-    fo.close()
-
-
-def extract_new_kind_from_yaml(INDEX_YAML_DICT, WEB_INF_INDEX_YAML_DICT):
-    """Extract new kind from
-    ../cloud_datastore_emulator_cache/WEB-INF/index.yaml
-    and appends it to index.yaml.
-
-    Args:
-        INDEX_YAML_DICT: dict. Dictionary of index.yaml.
-        WEB_INF_INDEX_YAML_DICT: dict. Dictionary of index.yaml in WEB-INF.
-
-    Returns:
-        list. List of new kind missing in index.yaml.
-    """
-    extracted_data = []
-    web_ind_index_yaml_data = [data['kind'] for data in WEB_INF_INDEX_YAML_DICT]
-    for data in INDEX_YAML_DICT:
-        if data['kind'] not in web_ind_index_yaml_data:
-            extracted_data.append(data)
-    return extracted_data
 
 
 def main() -> None:
     """Extends index.yaml file."""
-    ind = read_yaml(INDEX_YAML_PATH)
-    web_inf_ind = read_yaml(WEB_INF_INDEX_YAML_PATH)
-    web_inf_ind_keys = web_inf_ind.keys()
-    for key in web_inf_ind_keys:
-        if key not in ind.keys():
-            ind[key] = []
-        if web_inf_ind[key] is not None:
-            value = extract_new_kind_from_yaml(web_inf_ind[key], ind[key])
-            ind[key] += value
-
-    write_yaml(ind)
+    with open(INDEX_YAML_PATH, 'r', encoding='utf-8') as f:
+        ind = yaml.safe_load(f)
+    with open(WEB_INF_INDEX_YAML_PATH, 'r', encoding='utf-8') as f:
+        cld = yaml.safe_load(f)
+    new_kind = []
+    index_yaml = yaml.safe_dump(ind, default_flow_style=False, sort_keys=False)
+    if cld['indexes'] is None:
+        return
+    for kind in cld['indexes']:
+        clds = (
+            '- '
+            + yaml.safe_dump(
+                kind, default_flow_style=False, sort_keys=False).replace(
+                    '\n', '\n  '
+            )[:-3]
+        )
+        if clds not in index_yaml:
+            new_kind.append(clds)
+    if len(new_kind) == 0:
+        return
+    new_index = 'indexes:\n\n' + '\n'.join(new_kind)
+    ind['indexes'] += yaml.safe_load(new_index)['indexes']
+    ind = yaml.safe_dump(ind, default_flow_style=False, sort_keys=False)
+    ind = ind.replace('- kind', '\n- kind')
+    with open(INDEX_YAML_PATH, 'w', encoding='utf-8') as file:
+        file.write(ind)
