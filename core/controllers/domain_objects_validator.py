@@ -178,3 +178,13 @@ def validate_aggregated_stats(aggregated_stats):
                 raise base.BaseHandler.InvalidInputException(
                     '%s not in state stats mapping of %s in aggregated '
                     'stats dict.' % (state_stats_property, state_name))
+
+
+def validate_params_dict(params):
+    """validates params dict
+
+    Args:
+        params: dict. Data that needs to be validated.
+    """
+    for value in params.values():
+        assert isinstance(value, str), ('Expected str, got %s' % value)
