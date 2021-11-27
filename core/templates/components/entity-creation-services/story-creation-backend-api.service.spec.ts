@@ -35,7 +35,7 @@ describe('Story creation backend api service', () => {
   let imagesData: ImageData[];
   const thumbnailBgColor = '#e3e3e3';
   let postData = {
-    name: 'story-name',
+    title: 'story-title',
     description: 'Description',
     thumbnailBgColor: thumbnailBgColor,
     filename: 'image.svg',
