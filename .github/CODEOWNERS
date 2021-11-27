@@ -467,13 +467,13 @@
 
 
 # Beam jobs
-/setup.py @vojtechjelinek @brianrodri
-/MANIFEST.in @vojtechjelinek @brianrodri
+/setup.py @vojtechjelinek
+/MANIFEST.in @vojtechjelinek
 /core/jobs/ @vojtechjelinek
 /core/jobs/transforms @vojtechjelinek
 /core/jobs/types @vojtechjelinek
 /core/templates/domain/jobs/ @vojtechjelinek
-/core/controllers/beam_jobs*.py @brianrodri
+/core/controllers/beam_jobs*.py @vojtechjelinek
 
 # Infrastructure.
 /core/controllers/cron*.py @nithusha21
