@@ -123,7 +123,8 @@ export class Topic {
     this._pageTitleFragmentForWeb = pageTitleFragmentForWeb;
   }
 
-  // Returns 'null' when the topic is not yet saved on the backend.
+  // Returns 'null' when the topic is not yet fetched from the backend,
+  // not saved.
   getId(): string | null {
     return this._id;
   }
