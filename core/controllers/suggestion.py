@@ -127,10 +127,18 @@ class SuggestionHandler(base.BaseHandler):
             self.render_json(self.values)
             return
 
-        _upload_suggestion_images(
-            self.normalized_payload.get('files'),
-            suggestion,
-            suggestion.get_new_image_filenames_added_in_suggestion())
+        # Images for question suggestions are already stored in the server
+        # before actually the question is submitted. Therefore no need of
+        # uploading images when the suggestion type is 'add_question'. But this
+        # is not good, since when the user cancels a question suggestion after
+        # adding an image, there is no method to remove the uploaded image.
+        # See more - https://github.com/oppia/oppia/issues/14298
+        if self.payload.get(
+            'suggestion_type') != (feconf.SUGGESTION_TYPE_ADD_QUESTION):
+            _upload_suggestion_images(
+                self.normalized_payload.get('files'),
+                suggestion,
+                suggestion.get_new_image_filenames_added_in_suggestion())
 
         self.render_json(self.values)
 
@@ -233,6 +241,18 @@ class SuggestionToSkillActionHandler(base.BaseHandler):
             suggestion_services.accept_suggestion(
                 suggestion_id, self.user_id, 'UNUSED_COMMIT_MESSAGE',
                 self.payload.get('review_message'))
+
+            suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+            target_entity_html_list = (
+                suggestion.get_target_entity_html_strings())
+            target_image_filenames = (
+                html_cleaner.get_image_filenames_from_html_strings(
+                    target_entity_html_list))
+
+            fs_services.copy_images(
+                suggestion.target_type, suggestion.target_id,
+                feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS, suggestion.target_id,
+                target_image_filenames)
         elif action == constants.ACTION_REJECT_SUGGESTION:
             suggestion_services.reject_suggestion(
                 suggestion_id, self.user_id, self.payload.get('review_message'))
@@ -444,23 +464,10 @@ class UpdateQuestionSuggestionHandler(base.BaseHandler):
             self.payload.get('question_state_data'))
         question_state_data_obj.validate(None, False)
 
-        updated_suggestion = suggestion_services.update_question_suggestion(
+        suggestion_services.update_question_suggestion(
             suggestion_id,
             self.payload.get('skill_difficulty'),
             self.payload.get('question_state_data'))
-
-        new_image_filenames = (
-            utils.compute_list_difference(
-                updated_suggestion
-                    .get_new_image_filenames_added_in_suggestion(),
-                suggestion.get_new_image_filenames_added_in_suggestion()
-            )
-        )
-        # TODO(#14204): Refactor this to use the normalized_payload files.
-        _upload_suggestion_images(
-            self.payload.get('files', None),
-            updated_suggestion, new_image_filenames
-        )
 
         self.render_json(self.values)
 
