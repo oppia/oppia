@@ -473,6 +473,20 @@ class StateHitEventHandler(base.BaseHandler):
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
+    URL_PATH_ARGS_SCHEMAS = {
+        'username': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_valid_username_string'
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {}
+    }
+
     @acl_decorators.can_play_exploration
     def post(self, exploration_id):
         """Handles POST requests.
