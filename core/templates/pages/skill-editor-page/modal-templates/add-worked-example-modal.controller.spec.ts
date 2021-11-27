@@ -48,7 +48,8 @@ describe('Add Worked Example Modal Controller', function() {
     });
   });
 
-  it('should check content length in example questions within 1000 chars',
+  // eslint-disable-next-line max-len
+  it('should check if the content length of example questions is within 1000 chars',
     function() {
       $scope.tmpWorkedExampleQuestionHtml = 'a'.repeat(1000);
       expect($scope.isWorkedExampleQuestionHtmlLengthExceeded()).toBe(false);
@@ -57,7 +58,8 @@ describe('Add Worked Example Modal Controller', function() {
       expect($scope.isWorkedExampleQuestionHtmlLengthExceeded()).toBe(true);
     });
 
-  it('should check content length in example explanation within 1000 chars',
+  // eslint-disable-next-line max-len
+  it('should check if the content length of example explanation is within 1000 chars',
     function() {
       $scope.tmpWorkedExampleExplanationHtml = 'a'.repeat(1000);
       expect($scope.isWorkedExampleExplanationHtmlLengthExceeded()).toBe(false);

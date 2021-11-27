@@ -122,7 +122,8 @@ describe('Add Misconception Modal Controller', function() {
     expect($uibModalInstance.close).not.toHaveBeenCalled();
   });
 
-  it('should check content length in misconception notes within 1000 chars',
+  // eslint-disable-next-line max-len
+  it('should check if the content length of misconception notes is within 1000 chars',
     function() {
       $scope.misconceptionNotes = 'a'.repeat(1000);
       expect($scope.isMisconceptionNotesHtmlLengthExceeded()).toBe(false);
@@ -131,7 +132,8 @@ describe('Add Misconception Modal Controller', function() {
       expect($scope.isMisconceptionNotesHtmlLengthExceeded()).toBe(true);
     });
 
-  it('should check content length in misconception feedback within 1000 chars',
+  // eslint-disable-next-line max-len
+  it('should check if the content length of misconception feedback is within 1000 chars',
     function() {
       $scope.misconceptionFeedback = 'a'.repeat(1000);
       expect($scope.isMisconceptionFeedbackHtmlLengthExceeded()).toBe(false);
