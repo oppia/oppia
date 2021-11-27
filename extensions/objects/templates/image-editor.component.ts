@@ -79,12 +79,12 @@ interface Dimensions {
 
 // Reference: https://github.com/yahoo/gifshot#creategifoptions-callback.
 interface GifshotCallbackObject {
-  image: string,
-  cameraStream: MediaStream,
-  error: boolean,
-  errorCode: string,
-  errorMsg: string,
-  savedRenderingContexts: ImageData
+  image: string;
+  cameraStream: MediaStream;
+  error: boolean;
+  errorCode: string;
+  errorMsg: string;
+  savedRenderingContexts: ImageData;
 }
 
 @Component({
@@ -134,14 +134,14 @@ export class ImageEditorComponent implements OnInit, OnChanges {
   allowedImageFormats = AppConstants.ALLOWED_IMAGE_FORMATS;
   HUNDRED_KB_IN_BYTES: number = 100 * 1024;
   imageResizeRatio: number;
-  cropArea: { x1: number; y1: number; x2: number; y2: number; };
+  cropArea: { x1: number; y1: number; x2: number; y2: number };
   mousePositionWithinCropArea: null | number;
-  mouseLastKnownCoordinates: { x: number; y: number; };
-  lastMouseDownEventCoordinates: { x: number; y: number; };
+  mouseLastKnownCoordinates: { x: number; y: number };
+  lastMouseDownEventCoordinates: { x: number; y: number };
   userIsDraggingCropArea: boolean = false;
   cropAreaResizeDirection: null | number;
   userIsResizingCropArea: boolean = false;
-  invalidTagsAndAttributes: { tags: string[]; attrs: string[]; };
+  invalidTagsAndAttributes: { tags: string[]; attrs: string[] };
   processedImageIsTooLarge: boolean;
   entityId: string;
   entityType: string;
