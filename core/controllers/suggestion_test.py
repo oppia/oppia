@@ -1340,6 +1340,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     'translation_html': valid_html,
                     'data_format': 'html'
                 },
+                'description':'test'
             }, csrf_token=csrf_token, expected_status_int=400)
 
         self.assertIn(
@@ -1415,6 +1416,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     'translation_html': valid_html,
                     'data_format': 'html'
                 },
+                'description':'test'
             }, csrf_token=csrf_token,
             upload_files=(
                  ('file.svg', 'file.svg', large_image),),
