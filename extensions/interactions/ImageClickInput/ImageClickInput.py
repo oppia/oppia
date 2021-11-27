@@ -202,6 +202,7 @@ class ImageClickInput(base.BaseInteraction):
         image_file_path = image_and_regions_list.value['imagePath']
         labeled_regions_list_proto = cls._to_labeled_region_list_proto(
             image_and_regions_list.value['labeledRegions'])
+
         return objects_pb2.ImageWithRegions(
             image_file_path=image_file_path,
             labeled_regions=labeled_regions_list_proto

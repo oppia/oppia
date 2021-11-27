@@ -276,7 +276,10 @@ class RatioExpressionInput(base.BaseInteraction):
         Returns:
             CustomizationArgs. The proto object.
         """
+        placeholder_proto = (
+            customization_args['placeholder'].value.to_proto())
 
         return state_pb2.RatioExpressionInputInstance.CustomizationArgs(
+            placeholder=placeholder_proto,
             number_of_terms=customization_args['numberOfTerms'].value
         )

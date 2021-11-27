@@ -6017,3 +6017,338 @@ class TextInputInteractionTests(test_utils.GenericTestBase):
         self.assertEqual(
             text_input_proto.solution.base_solution.explanation.text,
             '<p>Solution explanation</p>')
+
+
+class NumericInputInteractionTests(test_utils.GenericTestBase):
+
+    def test_to_proto(self):
+        answer_group = {
+            'outcome': {
+                'dest': 'abc',
+                'feedback': {
+                    'content_id': 'feedback_2',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': True,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': ['Test']
+                },
+                'rule_type': 'Equals'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+        interaction_dict = {
+            'answer_groups': [answer_group],
+            'confirmed_unclassified_answers': [],
+            'customization_args': {
+                'requireNonnegativeInput': {
+                    'value': False
+                },
+                'rows': {'value': 1}
+            },
+            'default_outcome': {
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'dest': 'Introduction',
+                'missing_prerequisite_skill_id': None,
+                'feedback': {
+                    'content_id': 'default_outcome',
+                    'html': '<p> Default Outcome </p>'
+                },
+                'labelled_as_correct': False
+            },
+            'hints': [{
+                'hint_content': {
+                    'content_id': 'hint_1',
+                    'html': '<p>This is a copyright character ©.</p>'
+                }
+            }],
+            'solution': {},
+            'id': 'NumericInput'
+        }
+        numeric_input_instance = (
+            interaction_registry.Registry.get_interaction_by_id(
+                'NumericInput'))
+        interaction_domain = (
+            state_domain.InteractionInstance.from_dict(
+                interaction_dict))
+        numeric_input_proto = numeric_input_instance.to_proto(
+            interaction_domain.default_outcome,
+            interaction_domain.solution,
+            interaction_domain.hints,
+            interaction_domain.answer_groups)
+        self.assertEqual(
+            numeric_input_proto.hints[0].hint_content.content_id,
+            'hint_1')
+        self.assertEqual(
+            numeric_input_proto.hints[0].hint_content.text,
+            '<p>This is a copyright character ©.</p>')
+        self.assertEqual(
+            numeric_input_proto.default_outcome.destination_state,
+            'Introduction')
+        self.assertEqual(
+            numeric_input_proto.default_outcome.feedback.content_id,
+            'default_outcome')
+        self.assertEqual(
+            numeric_input_proto.default_outcome.feedback.text,
+            '<p> Default Outcome </p>')
+        self.assertEqual(
+            numeric_input_proto.default_outcome.labelled_as_correct,
+            False)
+        self.assertEqual(
+            numeric_input_proto.answer_groups[0].base_answer_group.outcome.destination_state, # pylint: disable=line-too-long
+            'abc')
+        self.assertEqual(
+            numeric_input_proto.answer_groups[0].base_answer_group.outcome.labelled_as_correct, # pylint: disable=line-too-long
+            True)
+        self.assertEqual(
+            numeric_input_proto.answer_groups[0].base_answer_group.outcome.feedback.content_id, # pylint: disable=line-too-long
+            'feedback_2')
+        self.assertEqual(
+            numeric_input_proto.answer_groups[0].base_answer_group.outcome.feedback.text, # pylint: disable=line-too-long
+            '<p>Feedback</p>')
+
+
+class RatioExpressionInputInteractionTests(test_utils.GenericTestBase):
+
+    def test_to_proto(self):
+        answer_group = {
+            'outcome': {
+                'dest': 'abc',
+                'feedback': {
+                    'content_id': 'feedback_2',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': True,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': [1, 2]
+                },
+                'rule_type': 'Equals'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+        interaction_dict = {
+            'answer_groups': [answer_group],
+            'confirmed_unclassified_answers': [],
+            'customization_args': {
+                'placeholder': {
+                    'value': {
+                        'content_id': 'ca_placeholder_0',
+                        'unicode_str': '😍😍😍😍'
+                    }
+                },
+                'numberOfTerms': {
+                    'value': 1
+                }
+            },
+            'default_outcome': {
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'dest': 'Introduction',
+                'missing_prerequisite_skill_id': None,
+                'feedback': {
+                    'content_id': 'default_outcome',
+                    'html': '<p> Default Outcome </p>'
+                },
+                'labelled_as_correct': False
+            },
+            'hints': [{
+                'hint_content': {
+                    'content_id': 'hint_1',
+                    'html': '<p>This is a copyright character ©.</p>'
+                }
+            }],
+            'solution': None,
+            'id': 'RatioExpressionInput'
+        }
+        ratio_input_instance = (
+            interaction_registry.Registry.get_interaction_by_id(
+                'RatioExpressionInput'))
+        interaction_domain = (
+            state_domain.InteractionInstance.from_dict(
+                interaction_dict))
+        ratio_input_proto = ratio_input_instance.to_proto(
+            interaction_domain.default_outcome,
+            interaction_domain.customization_args,
+            interaction_domain.solution,
+            interaction_domain.hints,
+            interaction_domain.answer_groups)
+        self.assertEqual(
+            ratio_input_proto.customization_args.placeholder.content_id,
+            'ca_placeholder_0')
+        self.assertEqual(
+            ratio_input_proto.customization_args.placeholder.text,
+            '😍😍😍😍')
+        self.assertEqual(
+            ratio_input_proto.customization_args.number_of_terms,
+            1)
+        self.assertEqual(
+            ratio_input_proto.hints[0].hint_content.content_id,
+            'hint_1')
+        self.assertEqual(
+            ratio_input_proto.hints[0].hint_content.text,
+            '<p>This is a copyright character ©.</p>')
+        self.assertEqual(
+            ratio_input_proto.default_outcome.destination_state,
+            'Introduction')
+        self.assertEqual(
+            ratio_input_proto.default_outcome.feedback.content_id,
+            'default_outcome')
+        self.assertEqual(
+            ratio_input_proto.default_outcome.feedback.text,
+            '<p> Default Outcome </p>')
+        self.assertEqual(
+            ratio_input_proto.default_outcome.labelled_as_correct,
+            False)
+        self.assertEqual(
+            ratio_input_proto.answer_groups[0].base_answer_group.outcome.destination_state, # pylint: disable=line-too-long
+            'abc')
+        self.assertEqual(
+            ratio_input_proto.answer_groups[0].base_answer_group.outcome.labelled_as_correct, # pylint: disable=line-too-long
+            True)
+        self.assertEqual(
+            ratio_input_proto.answer_groups[0].base_answer_group.outcome.feedback.content_id, # pylint: disable=line-too-long
+            'feedback_2')
+        self.assertEqual(
+            ratio_input_proto.answer_groups[0].base_answer_group.outcome.feedback.text, # pylint: disable=line-too-long
+            '<p>Feedback</p>')
+
+
+class ImageClickInputInteractionTests(test_utils.GenericTestBase):
+
+    def test_to_proto(self):
+        interaction_dict = {
+            'answer_groups': {
+                'outcome': {
+                    'dest': 'Image Region',
+                    'feedback': {
+                        'content_id': 'feedback_1',
+                        'html': '<p>That the class definition. Try again.</p>'
+                    },
+                    'labelled_as_correct': False,
+                    'missing_prerequisite_skill_id': None,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                },
+                'rule_specs': {
+                    'inputs': [{
+                        'x': 'classdef'
+                    }],
+                    'rule_type': 'IsInRegion'
+                },
+                'tagged_skill_misconception_id': null,
+                'training_data': []
+            },
+            'confirmed_unclassified_answers': [],
+            'customization_args': {
+                'highlightRegionsOnHover': {'value': True},
+                'imageAndRegions': {
+                    'value': {
+                        'imagePath': 's1ImagePath.png',
+                        'labeledRegions': [{
+                            'label': 'classdef',
+                            'region': {
+                                'area': [
+                                    [0.004291845493562232, 0.004692192192192192], # pylint: disable=line-too-long
+                                    [0.40987124463519314, 0.05874624624624625] # pylint: disable=line-too-long
+                                ],
+                                'regionType': 'Rectangle'
+                            }
+                        }]
+                    }
+                }
+            },
+            'default_outcome': {
+                'dest': 'Image Region',
+                'feedback': {
+                    'content_id': 'default_outcome',
+                    'html': '<p> Default Outcome </p>'
+                },
+                'labelled_as_correct': False,
+                'missing_prerequisite_skill_id': null,
+                'param_changes': [],
+                'refresher_exploration_id': null
+            },
+            'hints': [{
+                'hint_content': {
+                    'content_id': 'hint_1',
+                    'html': '<p>This is a copyright character ©.</p>'
+                }
+            }],
+            'id': 'ImageClickInput',
+            'solution': null
+        }
+        image_input_instance = (
+            interaction_registry.Registry.get_interaction_by_id(
+                'ImageClickInput'))
+        interaction_domain = (
+            state_domain.InteractionInstance.from_dict(
+                interaction_dict))
+        image_input_proto = image_input_instance.to_proto(
+            interaction_domain.default_outcome,
+            interaction_domain.customization_args,
+            interaction_domain.hints,
+            interaction_domain.answer_groups)
+        self.assertEqual(
+            image_input_proto.customization_args.image_and_regions.image_file_path, # pylint: disable=line-too-long
+            's1ImagePath.png')
+        self.assertEqual(
+            image_input_proto.customization_args.image_and_regions.labeled_regions[0].label, # pylint: disable=line-too-long
+            'classdef')
+        self.assertEqual(
+            image_input_proto.customization_args.image_and_regions.labeled_regions[0].normalized_rectangle_2d.top_left.x, # pylint: disable=line-too-long
+            0.004291845493562232)
+        self.assertEqual(
+            image_input_proto.customization_args.image_and_regions.labeled_regions[0].normalized_rectangle_2d.bottom_right.y, # pylint: disable=line-too-long
+            0.004692192192192192)
+        self.assertEqual(
+            image_input_proto.customization_args.image_and_regions.labeled_regions[0].normalized_rectangle_2d.top_left.x, # pylint: disable=line-too-long
+            0.40987124463519314)
+        self.assertEqual(
+            image_input_proto.customization_args.image_and_regions.labeled_regions[0].normalized_rectangle_2d.bottom_right.y, # pylint: disable=line-too-long
+            0.05874624624624625)
+        self.assertEqual(
+            image_input_proto.answer_groups[0].base_answer_group.outcome.destination_state, # pylint: disable=line-too-long
+            'Image Region')
+        self.assertEqual(
+            image_input_proto.answer_groups[0].base_answer_group.outcome.labelled_as_correct, # pylint: disable=line-too-long
+            False)
+        self.assertEqual(
+            image_input_proto.answer_groups[0].base_answer_group.outcome.feedback.content_id, # pylint: disable=line-too-long
+            'feedback_1')
+        self.assertEqual(
+            image_input_proto.answer_groups[0].base_answer_group.outcome.feedback.text, # pylint: disable=line-too-long
+            '<p>That the class definition. Try again.</p>')
+        self.assertEqual(
+            image_input_proto.default_outcome.destination_state,
+            'Image Region')
+        self.assertEqual(
+            image_input_proto.default_outcome.feedback.content_id,
+            'default_outcome')
+        self.assertEqual(
+            image_input_proto.default_outcome.feedback.text,
+            '<p> Default Outcome </p>')
+        self.assertEqual(
+            image_input_proto.default_outcome.labelled_as_correct,
+            False)
+        self.assertEqual(
+            ratio_input_proto.hints[0].hint_content.content_id,
+            'hint_1')
+        self.assertEqual(
+            ratio_input_proto.hints[0].hint_content.text,
+            '<p>This is a copyright character ©.</p>')
+        self.assertEqual(
+            ratio_input_proto.answer_groups[0].rule_specs[0].is_in_region.input_region, # pylint: disable=line-too-long
+            'classdef')
