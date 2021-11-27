@@ -28,12 +28,12 @@
     </div>
     <div *ngIf="!loadingData && !uploadingTranslation" class="oppia-text-to-translate-container">
       <!-- textToTranslate contains the html content of an exploration state -->
-      <angular-html-bind-wrapper *ngIf="activeDataFormat === 'html' || activeDataFormat === 'unicode'"
-                                 [ngClass]="{'oppia-rte-editor-focused': isCopyModeActive()}"
-                                 (click)="onContentClick($event)"
-                                 [htmlData]="textToTranslate"
-                                 class="oppia-rte-editor">
-      </angular-html-bind-wrapper>
+      <oppia-rte-output-display *ngIf="activeDataFormat === 'html' || activeDataFormat === 'unicode'"
+                                [ngClass]="{'oppia-rte-editor-focused': isCopyModeActive()}"
+                                (click)="onContentClick($event)"
+                                [rteString]="textToTranslate"
+                                class="oppia-rte-editor">
+      </oppia-rte-output-display>
       <div *ngIf="isSetOfStringDataFormat()">
         <strong>{{ activeRuleDescription }}</strong>
         <ul class="oppia-option-list oppia-translate-rule-list" role="tablist">
@@ -87,9 +87,9 @@
     </div>
     <strong *ngIf="isSubmitted()">Submitted translation:</strong>
     <div *ngIf="isSubmitted()" class="oppia-text-to-translate-container">
-      <angular-html-bind-wrapper [htmlData]="activeWrittenTranslation"
-                                 class="oppia-rte-editor">
-      </angular-html-bind-wrapper>
+      <oppia-rte-output-display [rteString]="activeWrittenTranslation"
+                                class="oppia-rte-editor">
+      </oppia-rte-output-display>
     </div>
     <div *ngIf="TRANSLATION_TIPS[activeLanguageCode]" class="oppia-translation-tips-container">
       <ul>

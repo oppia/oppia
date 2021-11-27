@@ -166,7 +166,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
         componentMap[rteKey].component_class,
         {injector: this.injector});
       customElements.define(
-        'oppia-noninteractive-' +
+        'oppia-noninteractive-ckeditor-' +
         ServicesConstants.RTE_COMPONENT_SPECS[rteKey].frontend_id,
         rteElement
       );
