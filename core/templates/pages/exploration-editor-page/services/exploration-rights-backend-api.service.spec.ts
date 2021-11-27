@@ -42,19 +42,19 @@ describe('Exploration Rights Backend Api Service', () => {
 
   it('should put requestData when makeCommunityOwnedPutData called', fakeAsync(
     () => {
-      let dataToSend = {
+      let requestData = {
         version: 3,
         make_communityOwned: true
       };
 
       service.makeCommunityOwnedPutData(
-        'oppia12345', dataToSend.version, dataToSend.make_communityOwned
+        'oppia12345', requestData.version, requestData.make_communityOwned
       ).then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
         '/createhandler/rights/oppia12345');
       expect(req.request.method).toEqual('PUT');
-      expect(req.request.body).toEqual(dataToSend);
+      expect(req.request.body).toEqual(requestData);
       req.flush([]);
 
       flushMicrotasks();
