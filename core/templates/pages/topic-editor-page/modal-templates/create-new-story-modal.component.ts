@@ -64,6 +64,10 @@ export class CreateNewStoryModalComponent extends ConfirmOrCancelModal
     this.contextService.setImageSaveDestinationToLocalStorage();
   }
 
+  cancel(): void {
+    this.ngbActiveModal.dismiss('cancel');
+  }
+
   onStoryUrlFragmentChange(): void {
     if (!this.newlyCreatedStory.urlFragment) {
       return;
