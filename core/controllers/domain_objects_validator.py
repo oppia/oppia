@@ -179,16 +179,3 @@ def validate_aggregated_stats(aggregated_stats):
                     '%s not in state stats mapping of %s in aggregated '
                     'stats dict.' % (state_stats_property, state_name))
 
-
-def validate_params_dict(params):
-    """Validates the params dict keys.
-
-    Args:
-        params: dict. Data that needs to be validated.
-
-    Raises:
-        Exception. Params dict value has invalid data type.
-    """
-    for key, value in params.items():
-        if not isinstance(value, str):
-            raise Exception('Excepted str, received %s' % value)
