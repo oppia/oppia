@@ -37,10 +37,7 @@ class MockWindowRef {
       pathname: '/test',
       href: ''
     },
-    gtag: () => {},
-    history: {
-      pushState(data, title: string, url?: string | null) {}
-    }
+    gtag: () => {}
   };
 }
 

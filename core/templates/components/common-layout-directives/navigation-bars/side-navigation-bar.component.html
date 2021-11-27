@@ -204,7 +204,7 @@
         </div>
         <a href="/learn/math" routerLink="/learn/math" class="protractor-mobile-test-mathematics-link">
           <span>{{ 'I18N_SIDEBAR_MATH_FOUNDATIONS' | translate }}</span>
-          <P class="oppia-sidebar-learn-subtext">{{ 'I18N_SIDEBAR_MATH_FOUNDATIONS_DESCRIPTION' | translate }}</P>
+          <p class="oppia-sidebar-learn-subtext">{{ 'I18N_SIDEBAR_MATH_FOUNDATIONS_DESCRIPTION' | translate }}</p>
         </a>
         <div *ngIf="!userIsLoggedIn && topicSummariesLength">
           <div *ngFor="let topicSummary of classroomData.getTopicSummaries().slice(0, 3)">
@@ -225,7 +225,7 @@
       </div>
       <div [hidden]="!learnSubmenuIsShown" class="oppia-community-library-section">
         <a href="/community-library" [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE" class="protractor-mobile-test-library-link">
-          <P class="oppia-sidebar-learn-subtext mb-2">{{ 'I18N_SIDEBAR_SUBMENU_COMMUNITY_LIBRARY_DESCRIPTION' | translate }}</P>
+          <p class="oppia-sidebar-learn-subtext mb-2">{{ 'I18N_SIDEBAR_SUBMENU_COMMUNITY_LIBRARY_DESCRIPTION' | translate }}</p>
           <span class="learn-submenu-links">{{ 'I18N_SIDEBAR_SUBMENU_COMMUNITY_LIBRARY' | translate }}</span>
           <i class="material-icons oppia-sidebar-menu-icon float-none learn-submenu-links">arrow_forward</i>
         </a>
@@ -241,7 +241,7 @@
     </li>
 
     <li class="oppia-sidebar-rows" *ngIf="userIsLoggedIn">
-      <a href="/learner-dashboard" routerLink="/learner-dashboard" class="protractor-mobile-test-about-link text-uppercase">
+      <a href="/learner-dashboard" routerLink="/learner-dashboard" class="text-uppercase">
         <span >{{ 'I18N_SIDEBAR_HOME' | translate }}</span>
       </a>
     </li>
@@ -256,28 +256,28 @@
           <a href="/partnerships" [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.ROUTE">
             <i class="material-icons oppia-sidebar-submenu-icon partnerships-icon">language</i>
             <span>{{ 'I18N_SIDEBAR_PARTNERSHIPS' | translate }}</span>
-            <P class="oppia-sidebar-submenu-text">{{ 'I18N_SIDEBAR_PARTNERSHIPS_DESCRIPTION' | translate }}</P>
+            <p class="oppia-sidebar-submenu-text">{{ 'I18N_SIDEBAR_PARTNERSHIPS_DESCRIPTION' | translate }}</p>
           </a>
         </div>
         <div class="oppia-sidebar-submenu-upperborder">
           <a href="/volunteer" routerLink="/volunteer">
             <i class="material-icons oppia-sidebar-submenu-icon volunteer-icon">people</i>
             <span>{{ 'I18N_SIDEBAR_VOLUNTEER' | translate }}</span>
-            <P class="oppia-sidebar-submenu-text">{{ 'I18N_SIDEBAR_VOLUNTEER_DESCRIPTION' | translate }}</P>
+            <p class="oppia-sidebar-submenu-text">{{ 'I18N_SIDEBAR_VOLUNTEER_DESCRIPTION' | translate }}</p>
           </a>
         </div>
         <div class="oppia-sidebar-submenu-upperborder">
           <a href="/donate" [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE">
             <i class="material-icons oppia-sidebar-submenu-icon donate-icon">favorite</i>
             <span>{{ 'I18N_SIDEBAR_DONATE' | translate }}</span>
-            <P class="oppia-sidebar-submenu-text">{{ 'I18N_SIDEBAR_DONATE_DESCRIPTION' | translate }}</P>
+            <p class="oppia-sidebar-submenu-text">{{ 'I18N_SIDEBAR_DONATE_DESCRIPTION' | translate }}</p>
           </a>
         </div>
         <div class="oppia-sidebar-submenu-upperborder">
           <a href="/contact" [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.CONTACT.ROUTE">
             <i class="material-icons oppia-sidebar-submenu-icon contact-icon">email</i>
             <span>{{ 'I18N_SIDEBAR_CONTACT_US' | translate }}</span>
-            <P class="oppia-sidebar-submenu-text">{{ 'I18N_SIDEBAR_CONTACT_US_DESCRIPTION' | translate }}</P>
+            <p class="oppia-sidebar-submenu-text">{{ 'I18N_SIDEBAR_CONTACT_US_DESCRIPTION' | translate }}</p>
           </a>
         </div>
       </div>

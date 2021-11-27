@@ -42,7 +42,7 @@ export class SideNavigationBarComponent {
    CLASSROOM_PROMOS_ARE_ENABLED: boolean = false;
    getinvolvedSubmenuIsShown: boolean = false;
    learnSubmenuIsShown: boolean = true;
-   userIsLoggedIn: boolean;
+   userIsLoggedIn!: boolean;
 
    PAGES_REGISTERED_WITH_FRONTEND = (
      AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
