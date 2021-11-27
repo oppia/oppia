@@ -43,17 +43,17 @@ export class StoryCreationBackendApiService {
   STORY_CREATOR_URL_TEMPLATE: string = '/topic_editor_story_handler/<topic_id>';
 
   _createStory(
-    successCallback: (value: StoryCreationResponse) => void,
-    errorCallback: (reason: string) => void,
-    newlyCreatedStory: NewlyCreatedStory, imagesData: ImageData[],
-    bgColor: string): void {
-      let postData = {
-        title: newlyCreatedStory.title,
-        description: newlyCreatedStory.description,
-        story_url_fragment: newlyCreatedStory.urlFragment,
-        thumbnailBgColor: bgColor,
-        filename: imagesData[0].filename
-      };
+      successCallback: (value: StoryCreationResponse) => void,
+      errorCallback: (reason: string) => void,
+      newlyCreatedStory: NewlyCreatedStory, imagesData: ImageData[],
+      bgColor: string): void {
+    let postData = {
+      title: newlyCreatedStory.title,
+      description: newlyCreatedStory.description,
+      story_url_fragment: newlyCreatedStory.urlFragment,
+      thumbnailBgColor: bgColor,
+      filename: imagesData[0].filename
+    };
     let topic = this.topicEditorStateService.getTopic();
     let createStoryUrl = this.urlInterpolationService.interpolateUrl(
       this.STORY_CREATOR_URL_TEMPLATE, {
@@ -83,8 +83,8 @@ export class StoryCreationBackendApiService {
       newlyCreatedStory: NewlyCreatedStory, imagesData: ImageData[],
       bgColor: string): Promise<StoryCreationResponse> {
     return new Promise((resolve, reject) => {
-      this._createStory(resolve, reject,
-        newlyCreatedStory, imagesData, bgColor);
+      this._createStory(
+        resolve, reject, newlyCreatedStory, imagesData, bgColor);
     });
   }
 }
