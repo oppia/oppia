@@ -16,145 +16,144 @@
  * @fileoverview Unit test for Story Creation Service.
  */
 
-import { CsrfTokenService } from 'services/csrf-token.service';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
-import { fakeAsync, tick } from '@angular/core/testing';
-require('services/ngb-modal.service.ts');
+import { NgbModal, NgbModalModule, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { StoryCreationService } from './story-creation.service';
+import { AlertsService } from 'services/alerts.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { ImageLocalStorageService } from 'services/image-local-storage.service';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { NewlyCreatedStory } from 'domain/topic/newly-created-story.model';
+import { StoryCreationBackendApiService } from './story-creation-backend-api.service';
 
 describe('Story Creation Service', () => {
-  let $rootScope = null;
-  let $scope = null;
-  let StoryCreationService = null;
-  let TopicEditorStateService = null;
-  let ImageLocalStorageService = null;
-  let CsrfTokenService: CsrfTokenService;
-  let ngbModal: NgbModal = null;
-  let $httpBackend = null;
-  let $q = null;
-  let imageBlob = null;
-  let mockWindow = {
-    location: ''
-  };
+  let storyCreationService: StoryCreationService;
+  let imageLocalStorageService: ImageLocalStorageService;
+  let storyCreationBackendApiService: StoryCreationBackendApiService;
+  let ngbModal: NgbModal;
+  let alertsService: AlertsService;
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('NgbModal', {
+  class MockWindowRef {
+    nativeWindow = {
       open: () => {
         return {
-          result: Promise.resolve()
+          close: () => {},
+          location: ''
         };
       }
-    });
-  }));
-  importAllAngularServices();
+    };
+  }
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('$window', mockWindow);
-  }));
-
-  beforeEach(angular.mock.inject(function($injector) {
-    $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
-    StoryCreationService = $injector.get('StoryCreationService');
-    ngbModal = $injector.get('NgbModal');
-    $q = $injector.get('$q');
-    $httpBackend = $injector.get('$httpBackend');
-    TopicEditorStateService = $injector.get('TopicEditorStateService');
-    ImageLocalStorageService = $injector.get('ImageLocalStorageService');
-    CsrfTokenService = $injector.get('CsrfTokenService');
-
-    imageBlob = new Blob(['image data'], {type: 'imagetype'});
-
-    spyOn(ImageLocalStorageService, 'getStoredImagesData').and.returnValue(
-      [{
-        filename: 'Image1',
-        imageBlob: imageBlob
-      }]);
-    spyOn(ImageLocalStorageService, 'getThumbnailBgColor').and.returnValue(
-      '#f00');
-    spyOn(TopicEditorStateService, 'getTopic').and.returnValue({
-      getId: () => 'id'
-    });
-    spyOn(CsrfTokenService, 'getTokenAsync')
-      .and.returnValue($q.resolve('sample-csrf-token'));
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [
+        HttpClientTestingModule,
+        NgbModalModule
+      ],
+      providers: [
+        {
+          provide: WindowRef,
+          useClass: MockWindowRef
+        },
+        AlertsService,
+        ImageLocalStorageService,
+        StoryCreationBackendApiService,
+        UrlInterpolationService
+      ]
+    }).compileComponents();
   }));
 
-  it('should not initiate new story creation if another is in process',
-    fakeAsync(() => {
-      spyOn(ngbModal, 'open').and.returnValue(
-      {
-        result: Promise.resolve({
-          isValid: () => true,
-          title: 'Title',
-          description: 'Description',
-          urlFragment: 'url'
-        })
-      } as NgbModalRef
-      );
+  beforeEach(() => {
+    storyCreationService = TestBed.inject(StoryCreationService);
+    ngbModal = TestBed.inject(NgbModal);
+    alertsService = TestBed.inject(AlertsService);
+    imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
+    storyCreationBackendApiService = TestBed.inject(
+      StoryCreationBackendApiService);
+  });
 
-      StoryCreationService.createNewCanonicalStory();
-      tick();
-
-      // Creating a new story while previous was in creation process.
-      expect(StoryCreationService.createNewCanonicalStory()).toBe(undefined);
-    })
-  );
-
-  it('should post story data to server and change window location' +
-    ' on success', fakeAsync(() => {
+  it('should create a new story', fakeAsync(() => {
+    storyCreationService.storyCreationInProgress = false;
+    storyCreationService.createNewCanonicalStory();
+    spyOn(alertsService, 'clearWarnings');
+    spyOn(imageLocalStorageService, 'flushStoredImagesData');
+    spyOn(storyCreationBackendApiService, 'createStoryAsync').and.returnValue(
+      Promise.resolve({ storyId: 'storyId' }));
     spyOn(ngbModal, 'open').and.returnValue(
-      {
-        result: Promise.resolve({
-          isValid: () => true,
-          title: 'Title',
-          description: 'Description',
-          urlFragment: 'url'
-        })
-      } as NgbModalRef
+    {
+      result: Promise.resolve({
+        isValid: () => true,
+        title: 'Title',
+        description: 'Description',
+        urlFragment: 'url'
+      })
+    } as NgbModalRef
     );
-
-    $httpBackend.expectPOST('/topic_editor_story_handler/id')
-      .respond(200, {storyId: 'id'});
-
-    expect(mockWindow.location).toBe('');
-
-    StoryCreationService.createNewCanonicalStory();
-
-    $scope.$apply();
     tick();
-    $httpBackend.flush();
-
-    expect(mockWindow.location).toBe('/story_editor/id');
+    expect(ngbModal.open).toHaveBeenCalled();
+    expect(alertsService.clearWarnings).toHaveBeenCalled();
+    expect(imageLocalStorageService.flushStoredImagesData).toHaveBeenCalled();
   }));
 
-  it('should throw error if the newly created story is not valid',
-    fakeAsync(() => {
-      spyOn(ngbModal, 'open').and.returnValue({
-        result: {
-          then: (successCallback: (arg1) => void, errorCallback) => {
-            successCallback({
-              isValid: () => {
-                return false;
-              }
-            });
-          }
+  it('should not create story if creation is already in process', () => {
+    storyCreationService.storyCreationInProgress = true;
+    spyOn(imageLocalStorageService, 'getStoredImagesData');
+    storyCreationService.createNewCanonicalStory();
+    expect(imageLocalStorageService.getStoredImagesData)
+      .not.toHaveBeenCalled();
+  });
+
+  it('should throw error if story fields are empty', fakeAsync(() => {
+    storyCreationService.storyCreationInProgress = false;
+    spyOn(ngbModal, 'open').and.returnValue({
+      result: {
+        then: (successCallback: (arg1) => void, errorCallback) => {
+          successCallback({
+            isValid: () => {
+              return false;
+            }
+          });
         }
-      } as NgbModalRef);
-      expect(() => {
-        StoryCreationService.createNewCanonicalStory();
-        tick();
-      }).toThrowError('Story fields cannot be empty');
-    })
-  );
+      }
+    } as NgbModalRef);
+    expect(() => {
+      storyCreationService.createNewCanonicalStory();
+      tick();
+    }).toThrowError('Story fields cannot be empty');
+    expect(ngbModal.open).toHaveBeenCalled();
+  }));
+
+  it('should handle error if story creation fails', fakeAsync(() => {
+    let error = 'promise rejected';
+    storyCreationService.storyCreationInProgress = false;
+    spyOn(ngbModal, 'open').and.returnValue({
+      result: Promise.resolve(new NewlyCreatedStory('valid', 'valid', 'valid'))
+    } as NgbModalRef);
+    spyOn(alertsService, 'clearWarnings');
+    spyOn(alertsService, 'addWarning');
+    spyOn(imageLocalStorageService, 'getStoredImagesData').and.returnValue([]);
+    spyOn(imageLocalStorageService, 'getThumbnailBgColor').and.returnValue(
+      'bgColor');
+    spyOn(imageLocalStorageService, 'flushStoredImagesData');
+    spyOn(storyCreationBackendApiService, 'createStoryAsync').and.returnValue(
+      Promise.reject({ error }));
+    storyCreationService.createNewCanonicalStory();
+    tick();
+    tick();
+    expect(storyCreationService.storyCreationInProgress).toBeFalse();
+    expect(alertsService.addWarning).toHaveBeenCalledWith(error);
+  }));
 
   it('should do nothing when user cancels the topic creation modal',
     fakeAsync(() => {
+      storyCreationService.storyCreationInProgress = false;
       spyOn(ngbModal, 'open').and.returnValue({
         result: Promise.reject()
       } as NgbModalRef);
-      StoryCreationService.createNewCanonicalStory();
+      spyOn(alertsService, 'clearWarnings');
+      storyCreationService.createNewCanonicalStory();
       tick();
       expect(ngbModal.open).toHaveBeenCalled();
-    })
-  );
+    }));
 });

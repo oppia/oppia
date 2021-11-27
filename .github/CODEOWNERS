@@ -115,6 +115,7 @@
 /core/domain/collection*.py @aks681
 /core/templates/components/entity-creation-services/collection-creation.service*.ts @EricZLou
 /core/templates/components/entity-creation-services/collection-creation-backend-api.service*.ts @EricZLou
+/core/templates/components/entity-creation-services/story-creation-backend-api.service*.ts @EricZLou
 /core/templates/domain/collection/ @EricZLou
 /core/templates/pages/collection-editor-page/ @EricZLou
 /core/templates/pages/collection-player-page/ @EricZLou
