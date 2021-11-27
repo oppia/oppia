@@ -124,4 +124,3 @@ describe('Story creation backend api service', () => {
       expect(successHandler).not.toHaveBeenCalled();
     }));
 });
- 

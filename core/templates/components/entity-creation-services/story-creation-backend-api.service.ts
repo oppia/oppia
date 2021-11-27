@@ -43,29 +43,29 @@ export class StoryCreationBackendApiService {
   STORY_CREATOR_URL_TEMPLATE: string = '/topic_editor_story_handler/<topic_id>';
 
   _createStory(
-      successCallback: (value: StoryCreationResponse) => void,
-      errorCallback: (reason: string) => void,
-      newlyCreatedStory: NewlyCreatedStory, imagesData: ImageData[],
-      bgColor: string): void {
-       let postData = {
-          title: newlyCreatedStory.title,
-          description: newlyCreatedStory.description,
-          story_url_fragment: newlyCreatedStory.urlFragment,
-          thumbnailBgColor: bgColor,
-          filename: imagesData[0].filename
-       };
+    successCallback: (value: StoryCreationResponse) => void,
+    errorCallback: (reason: string) => void,
+    newlyCreatedStory: NewlyCreatedStory, imagesData: ImageData[],
+    bgColor: string): void {
+      let postData = {
+        title: newlyCreatedStory.title,
+        description: newlyCreatedStory.description,
+        story_url_fragment: newlyCreatedStory.urlFragment,
+        thumbnailBgColor: bgColor,
+        filename: imagesData[0].filename
+      };
     let topic = this.topicEditorStateService.getTopic();
     let createStoryUrl = this.urlInterpolationService.interpolateUrl(
-        this.STORY_CREATOR_URL_TEMPLATE, {
-          topic_id: topic.getId()
-        }
-      );
+      this.STORY_CREATOR_URL_TEMPLATE, {
+        topic_id: topic.getId()
+      }
+    );
     let body = new FormData();
     body.append('payload', JSON.stringify(postData));
     body.append('image', imagesData[0].imageBlob);
 
     this.http.post<StoryCreationResponse>(
-       createStoryUrl, body).toPromise()
+      createStoryUrl, body).toPromise()
       .then(response => {
         if (successCallback) {
           successCallback({
@@ -83,11 +83,11 @@ export class StoryCreationBackendApiService {
       newlyCreatedStory: NewlyCreatedStory, imagesData: ImageData[],
       bgColor: string): Promise<StoryCreationResponse> {
     return new Promise((resolve, reject) => {
-      this._createStory(resolve, reject, newlyCreatedStory, imagesData, bgColor);
+      this._createStory(resolve, reject,
+        newlyCreatedStory, imagesData, bgColor);
     });
   }
 }
 
 angular.module('oppia').factory('StoryCreationBackendApiService',
-   downgradeInjectable(StoryCreationBackendApiService));
- 
+  downgradeInjectable(StoryCreationBackendApiService));

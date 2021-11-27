@@ -32,7 +32,7 @@ import { ContextService } from 'services/context.service';
   templateUrl: './create-new-story-modal.component.html'
 })
 export class CreateNewStoryModalComponent extends ConfirmOrCancelModal
- implements OnInit{
+  implements OnInit {
   allowedBgColors = AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.story;
   validUrlFragmentRegex = new RegExp(AppConstants.VALID_URL_FRAGMENT_REGEX);
   newlyCreatedStory: NewlyCreatedStory = NewlyCreatedStory.createDefault();
@@ -84,7 +84,7 @@ export class CreateNewStoryModalComponent extends ConfirmOrCancelModal
       !this.storyUrlFragmentExists);
   }
 
-  updateView(){
+  updateView(): void {
     this.changeDetectorRef.detectChanges();
   }
 }
