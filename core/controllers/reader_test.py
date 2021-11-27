@@ -1303,7 +1303,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             'client_time_spent_in_secs': 0,
             'collection_id': self.COL_ID_1,
             'params': {
-                10: 50
+                'param1': 40
             },
             'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
             'state_name': 'middle',

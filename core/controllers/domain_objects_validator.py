@@ -187,10 +187,8 @@ def validate_params_dict(params):
         params: dict. Data that needs to be validated.
 
     Raises:
-        InvalidInputException. Params dict key has invalid data type.
+        Exception. Params dict value has invalid data type.
     """
     for key, value in params.items():
-        if not isinstance(key, str):
-            raise Exception('Expected str, received %s' % key)
         if not isinstance(value, str):
             raise Exception('Excepted str, received %s' % value)
