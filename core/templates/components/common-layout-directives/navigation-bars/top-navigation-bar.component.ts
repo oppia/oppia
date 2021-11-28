@@ -60,6 +60,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   supportedSiteLanguages!: LanguageInfo[];
   currentLanguageText!: string;
   classroomData!: ClassroomData;
+  learnDropdownOffset: number = 0;
   isModerator: boolean = false;
   isCurriculumAdmin: boolean = false;
   isTopicManager: boolean = false;
@@ -273,6 +274,21 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     setTimeout(function() {
       that.truncateNavbar();
     }, 0);
+  }
+
+  ngAfterViewChecked(): void {
+    this.learnDropdownOffset = this.getLearnOffset();
+  }
+
+  getLearnOffset(): number {
+    var learnTab: HTMLElement = document.querySelector('.learn-tab');
+    var leftOffset = learnTab.getBoundingClientRect().left;
+    var space = window.innerWidth - leftOffset;
+    if (space < 688) {
+      return (Math.round(space - 688));
+    } else {
+      return 0;
+    }
   }
 
   async getProfileImageDataAsync(): Promise<void> {

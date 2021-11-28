@@ -62,7 +62,7 @@
             class="nav-item  dropdown oppia-navbar-clickable-dropdown protractor-test-classroom-oppia-list-item">
           <a ngbDropdownToggle
              (keydown)="onMenuKeypress($event, 'learnMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
-             class="nav-link oppia-navbar-tab dropdown-toggle"
+             class="nav-link oppia-navbar-tab dropdown-toggle learn-tab"
              role="menuitem"
              aria-haspopup="true"
              aria-expanded="false"
@@ -76,6 +76,7 @@
             </span>
           </a>
           <ul ngbDropdownMenu
+              [ngStyle]="{'left.px': learnDropdownOffset}"
               [ngClass]="{'classroom-disabled': !CLASSROOM_PROMOS_ARE_ENABLED, 'classroom-enabled': CLASSROOM_PROMOS_ARE_ENABLED}"
               class="dropdown-menu oppia-navbar-dropdown learn-dropdown-menu"
               (mouseover)="openSubmenu($event, 'learnMenu')"
@@ -490,14 +491,14 @@
   }
   .learn-dropdown-menu {
     border-radius: 3px;
-    left: 0 !important;
+    /* left: 0 !important; */
     padding: 0;
   }
   .classroom-enabled {
-    min-width: 582px;
+    min-width: 688px;
   }
   .classroom-disabled {
-    min-width: 266px;
+    min-width: 300px;
   }
   .learn-dropdown-menu .nav-item-top-link {
     color: #333;
@@ -531,12 +532,12 @@
   }
   .learn-dropdown-menu .nav-item-left {
     border-right: 1px solid #0000000d;
-    padding: 30px;
-    width: 316px;
+    padding: 32px;
+    width: 388px;
   }
   .learn-dropdown-menu .nav-item-right {
-    min-width: 266px;
-    padding: 30px;
+    min-width: 300px;
+    padding: 32px;
   }
   .learn-dropdown-menu .nav-content {
     color: #767676;
@@ -565,7 +566,7 @@
   }
   .dropdown-menu {
     border-radius: 3px;
-    right: 0 !important;
+    /* right: 0 !important; */
   }
   .rtl-navbar-header .dropdown-menu {
     left: 0 !important;
