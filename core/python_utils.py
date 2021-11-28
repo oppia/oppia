@@ -322,10 +322,7 @@ def url_open(source_url):
     # TODO(#12912): Remove pylint disable after the arg-name-for-non-keyword-arg
     # check is refactored.
     context = ssl.create_default_context(cafile=certifi.where())  # pylint: disable=arg-name-for-non-keyword-arg
-    try:
-        import urllib.request as urlrequest
-    except ImportError:
-        import urllib2 as urlrequest
+    import urllib.request as urlrequest
     return urlrequest.urlopen(source_url, context=context)
 
 
