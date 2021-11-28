@@ -22,7 +22,6 @@ import { Subscription } from 'rxjs';
 import { ContextService } from 'services/context.service';
 import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
-import { ClassroomData } from 'domain/classroom/classroom-data.model';
 import { SidebarStatusService } from 'services/sidebar-status.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { DebouncerService } from 'services/debouncer.service';
@@ -38,6 +37,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { I18nService } from 'i18n/i18n.service';
+import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 
 interface LanguageInfo {
   id: string;
@@ -59,7 +59,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   currentLanguageCode!: string;
   supportedSiteLanguages!: LanguageInfo[];
   currentLanguageText!: string;
-  classroomData!: ClassroomData;
+  classroomData: CreatorTopicSummary[] = [];
   learnDropdownOffset: number = 0;
   isModerator: boolean = false;
   isCurriculumAdmin: boolean = false;
@@ -164,7 +164,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
 
     this.classroomBackendApiService.fetchClassroomDataAsync(
       'math').then((classroomData) => {
-      this.classroomData = classroomData;
+      this.classroomData = classroomData.getTopicSummaries();
     });
 
     this.showLanguageSelector = (
@@ -277,7 +277,8 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   }
 
   ngAfterViewChecked(): void {
-    this.learnDropdownOffset = this.getDropdownOffset('.learn-tab', 688);
+    this.learnDropdownOffset = this.getDropdownOffset(
+      '.learn-tab', (this.CLASSROOM_PROMOS_ARE_ENABLED) ? 688 : 300);
     // https://stackoverflow.com/questions/34364880/expression-has-changed-after-it-was-checked
     this.changeDetectorRef.detectChanges();
   }

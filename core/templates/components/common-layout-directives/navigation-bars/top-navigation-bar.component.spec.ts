@@ -35,6 +35,8 @@ import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-a
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { I18nService } from 'i18n/i18n.service';
 import { CookieService } from 'ngx-cookie';
+import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
+import { ClassroomData } from 'domain/classroom/classroom-data.model';
 
 class MockWindowRef {
   nativeWindow = {
@@ -426,14 +428,16 @@ describe('TopNavigationBarComponent', () => {
 
   it('should check if classroom data is fetched', fakeAsync(() => {
     spyOn(component, 'truncateNavbar').and.stub();
+    let array: CreatorTopicSummary[] = [];
+    let classroomData = new ClassroomData('test', array, 'dummy', 'dummy');
     spyOn(
       classroomBackendApiService, 'fetchClassroomDataAsync')
-      .and.resolveTo(undefined);
+      .and.resolveTo(classroomData);
 
     component.ngOnInit();
     tick();
 
-    expect(component.classroomData).toBe(undefined);
+    expect(component.classroomData).toEqual(array);
   }));
 
   it('should change current language code on' +
@@ -504,8 +508,9 @@ describe('TopNavigationBarComponent', () => {
 
   it('should check if navbar dropdown offsets are updated', fakeAsync (()=>{
     spyOn(component, 'truncateNavbar').and.stub();
-    spyOn(component, 'getDropdownOffset').withArgs('.learn-tab', 688).and
-      .returnValue(-10);
+    spyOn(component, 'getDropdownOffset')
+      .withArgs('.learn-tab', 688).and.returnValue(-10)
+      .withArgs('.learn-tab', 300).and.returnValue(-10);
 
     expect(component.learnDropdownOffset).toBe(0);
 

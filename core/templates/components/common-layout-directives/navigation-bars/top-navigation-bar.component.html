@@ -107,8 +107,8 @@
                     </picture>
                   </div>
                   <div class="nav-item-bottom d-flex flex-column" *ngIf="!userIsLoggedIn">
-                    <div *ngIf="classroomData.getTopicSummaries().length > 0">
-                      <div class="nav-item-links"  *ngFor="let topicSummary of classroomData.getTopicSummaries().slice(0, 3)">
+                    <div *ngIf="classroomData.length > 0">
+                      <div class="nav-item-links"  *ngFor="let topicSummary of classroomData.slice(0, 3)">
                         <a (keydown)="onMenuKeypress($event, 'learnMenu', {shiftTab: ACTION_CLOSE})"
                            (click)="navigateToClassroomPage('/learn/math/' + topicSummary.getUrlFragment())">
                             {{ topicSummary.getName() }}
