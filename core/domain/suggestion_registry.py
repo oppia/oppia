@@ -16,13 +16,11 @@
 subclasses for each type of suggestion.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import copy
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.domain import config_domain
@@ -168,7 +166,7 @@ class BaseSuggestion:
                 'Expected target_type to be among allowed choices, '
                 'received %s' % self.target_type)
 
-        if not isinstance(self.target_id, python_utils.BASESTRING):
+        if not isinstance(self.target_id, str):
             raise utils.ValidationError(
                 'Expected target_id to be a string, received %s' % type(
                     self.target_id))
@@ -183,7 +181,7 @@ class BaseSuggestion:
                 'Expected status to be among allowed choices, '
                 'received %s' % self.status)
 
-        if not isinstance(self.author_id, python_utils.BASESTRING):
+        if not isinstance(self.author_id, str):
             raise utils.ValidationError(
                 'Expected author_id to be a string, received %s' % type(
                     self.author_id))
@@ -195,7 +193,7 @@ class BaseSuggestion:
                 'received %s' % self.author_id)
 
         if self.final_reviewer_id is not None:
-            if not isinstance(self.final_reviewer_id, python_utils.BASESTRING):
+            if not isinstance(self.final_reviewer_id, str):
                 raise utils.ValidationError(
                     'Expected final_reviewer_id to be a string, received %s' %
                     type(self.final_reviewer_id))
@@ -208,7 +206,7 @@ class BaseSuggestion:
                     'Expected final_reviewer_id to be in a valid user ID '
                     'format, received %s' % self.final_reviewer_id)
 
-        if not isinstance(self.score_category, python_utils.BASESTRING):
+        if not isinstance(self.score_category, str):
             raise utils.ValidationError(
                 'Expected score_category to be a string, received %s' % type(
                     self.score_category))
@@ -648,10 +646,9 @@ class SuggestionTranslateContent(BaseSuggestion):
         # If the translation is for a set of strings, we don't want to process
         # the HTML strings for images.
         if (
-                hasattr(self.change, 'data_format') and (
-                    self.change.data_format == 'set_of_normalized_string' or
-                    self.change.data_format == 'set_of_unicode_string'
-                )
+                hasattr(self.change, 'data_format') and
+                state_domain.WrittenTranslation.is_data_format_list(
+                    self.change.data_format)
         ):
             exp_services.update_exploration(
                 self.final_reviewer_id, self.target_id, [self.change],
@@ -898,6 +895,16 @@ class SuggestionAddQuestion(BaseSuggestion):
         # Images need to be stored in the storage path corresponding to the
         # question.
         new_image_filenames = self.get_new_image_filenames_added_in_suggestion()
+
+        # Image for interaction with Image Region is not included as an html
+        # string. This image is included in the imagePath in customization args.
+        # Other interactions such as Item Selection, Multiple Choice, Drag and
+        # Drop Sort have ck editor that includes the images of the interactions
+        # so that references for those images are included as html strings.
+        if question.question_state_data.interaction.id == 'ImageClickInput':
+            new_image_filenames.append(
+                question.question_state_data.interaction.customization_args[
+                    'imageAndRegions'].value['imagePath'])
         fs_services.copy_images(
             self.image_context, self.target_id, feconf.ENTITY_TYPE_QUESTION,
             question_dict['id'], new_image_filenames)
@@ -1044,7 +1051,7 @@ class BaseVoiceoverApplication:
                 'Expected target_type to be among allowed choices, '
                 'received %s' % self.target_type)
 
-        if not isinstance(self.target_id, python_utils.BASESTRING):
+        if not isinstance(self.target_id, str):
             raise utils.ValidationError(
                 'Expected target_id to be a string, received %s' % type(
                     self.target_id))
@@ -1054,7 +1061,7 @@ class BaseVoiceoverApplication:
                 'Expected status to be among allowed choices, '
                 'received %s' % self.status)
 
-        if not isinstance(self.author_id, python_utils.BASESTRING):
+        if not isinstance(self.author_id, str):
             raise utils.ValidationError(
                 'Expected author_id to be a string, received %s' % type(
                     self.author_id))
@@ -1064,13 +1071,12 @@ class BaseVoiceoverApplication:
                     'Expected final_reviewer_id to be None as the '
                     'voiceover application is not yet handled.')
         else:
-            if not isinstance(self.final_reviewer_id, python_utils.BASESTRING):
+            if not isinstance(self.final_reviewer_id, str):
                 raise utils.ValidationError(
                     'Expected final_reviewer_id to be a string, received %s' % (
                         type(self.final_reviewer_id)))
             if self.status == suggestion_models.STATUS_REJECTED:
-                if not isinstance(
-                        self.rejection_message, python_utils.BASESTRING):
+                if not isinstance(self.rejection_message, str):
                     raise utils.ValidationError(
                         'Expected rejection_message to be a string for a '
                         'rejected application, received %s' % type(
@@ -1082,7 +1088,7 @@ class BaseVoiceoverApplication:
                         'accepted voiceover application, received %s' % (
                             self.rejection_message))
 
-        if not isinstance(self.language_code, python_utils.BASESTRING):
+        if not isinstance(self.language_code, str):
             raise utils.ValidationError(
                 'Expected language_code to be a string, received %s' %
                 self.language_code)
@@ -1090,12 +1096,12 @@ class BaseVoiceoverApplication:
             raise utils.ValidationError(
                 'Invalid language_code: %s' % self.language_code)
 
-        if not isinstance(self.filename, python_utils.BASESTRING):
+        if not isinstance(self.filename, str):
             raise utils.ValidationError(
                 'Expected filename to be a string, received %s' % type(
                     self.filename))
 
-        if not isinstance(self.content, python_utils.BASESTRING):
+        if not isinstance(self.content, str):
             raise utils.ValidationError(
                 'Expected content to be a string, received %s' % type(
                     self.content))
@@ -1427,7 +1433,7 @@ class TranslationContributionStats:
     @classmethod
     def create_default(
         cls, language_code=None, contributor_user_id=None, topic_id=None
-    ) -> 'TranslationContributionStats':
+    ) -> TranslationContributionStats:
         """Create default translation contribution stats.
 
         Args:

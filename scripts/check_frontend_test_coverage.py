@@ -14,8 +14,7 @@
 
 """Check for decrease in coverage from 100% of frontend files."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import fnmatch
 import logging
@@ -46,9 +45,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'Base.ts',
     'ck-editor-4-rte.component.ts',
     'ck-editor-4-widgets.initializer.ts',
-    'collection-editor-navbar-breadcrumb.component.ts',
-    'collection-footer.component.ts',
-    'collection-navbar.component.ts',
     'collection-player-page.directive.ts',
     'collection.model.ts',
     'contribution-and-review.service.ts',
@@ -69,12 +65,9 @@ NOT_FULLY_COVERED_FILENAMES = [
     'oppia-interactive-pencil-code-editor.directive.ts',
     'oppia-root.directive.ts',
     'parameterize-rule-description.filter.ts',
-    'player-correctness-feedback-enabled.service.ts',
-    'player-transcript.service.ts',
     'python-program.tokenizer.ts',
     'question-update.service.ts',
     'refresher-exploration-confirmation-modal.service.ts',
-    'release-coordinator-page.component.ts',
     'rule-type-selector.directive.ts',
     'schema-based-custom-viewer.directive.ts',
     'schema-based-html-viewer.directive.ts',

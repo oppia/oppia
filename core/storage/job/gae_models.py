@@ -16,8 +16,7 @@
 
 """Models for long-running jobs."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from core.platform import models
 
@@ -118,7 +117,7 @@ class JobModel(base_models.BaseModel):
         return self.status_code in [STATUS_CODE_QUEUED, STATUS_CODE_STARTED]
 
     @classmethod
-    def get_all_unfinished_jobs(cls, limit: int) -> Sequence['JobModel']:
+    def get_all_unfinished_jobs(cls, limit: int) -> Sequence[JobModel]:
         """Gets at most `limit` unfinished jobs.
 
         Args:

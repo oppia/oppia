@@ -74,10 +74,10 @@ export class UploadBlogPostThumbnailComponent implements OnInit {
     let reader = new FileReader();
     reader.onload = (e) => {
       this.uploadedImage = this.svgSanitizerService.getTrustedSvgResourceUrl(
-        (<FileReader>e.target).result as string);
+        (e.target as FileReader).result as string);
       if (!this.uploadedImage) {
         this.uploadedImage = decodeURIComponent(
-          (<FileReader>e.target).result as string);
+          (e.target as FileReader).result as string);
       }
       this.changeDetectorRef.detectChanges();
       this.initializeCropper();

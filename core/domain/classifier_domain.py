@@ -14,14 +14,12 @@
 
 """Domain objects for classifier models."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import copy
 import datetime
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.platform import models
 
@@ -288,11 +286,11 @@ class ClassifierTrainingJob:
         """Validates the training job before it is saved to storage."""
 
         algorithm_ids = []
-        if not isinstance(self.job_id, python_utils.BASESTRING):
+        if not isinstance(self.job_id, str):
             raise utils.ValidationError(
                 'Expected id to be a string, received %s' % self.job_id)
 
-        if not isinstance(self.exp_id, python_utils.BASESTRING):
+        if not isinstance(self.exp_id, str):
             raise utils.ValidationError(
                 'Expected exp_id to be a string, received %s' % self.exp_id)
 
@@ -306,7 +304,7 @@ class ClassifierTrainingJob:
                 'Expected next_scheduled_check_time to be datetime,' +
                 ' received %s' % self.next_scheduled_check_time)
 
-        if not isinstance(self.state_name, python_utils.BASESTRING):
+        if not isinstance(self.state_name, str):
             raise utils.ValidationError(
                 'Expected state to be a string, received %s' % self.state_name)
         utils.require_valid_name(self.state_name, 'the state name')
@@ -316,7 +314,7 @@ class ClassifierTrainingJob:
                 'Expected status to be in %s, received %s'
                 % (feconf.ALLOWED_TRAINING_JOB_STATUSES, self.status))
 
-        if not isinstance(self.interaction_id, python_utils.BASESTRING):
+        if not isinstance(self.interaction_id, str):
             raise utils.ValidationError(
                 'Expected interaction_id to be a string, received %s' %
                 self.interaction_id)
@@ -325,7 +323,7 @@ class ClassifierTrainingJob:
             raise utils.ValidationError(
                 'Invalid interaction id: %s' % self.interaction_id)
 
-        if not isinstance(self.algorithm_id, python_utils.BASESTRING):
+        if not isinstance(self.algorithm_id, str):
             raise utils.ValidationError(
                 'Expected algorithm_id to be a string, received %s' %
                 self.algorithm_id)
@@ -464,7 +462,7 @@ class StateTrainingJobsMapping:
     def validate(self):
         """Validates the mapping before it is saved to storage."""
 
-        if not isinstance(self.exp_id, python_utils.BASESTRING):
+        if not isinstance(self.exp_id, str):
             raise utils.ValidationError(
                 'Expected exp_id to be a string, received %s' % self.exp_id)
 
@@ -473,7 +471,7 @@ class StateTrainingJobsMapping:
                 'Expected exp_version to be an int, received %s' % (
                     self.exp_version))
 
-        if not isinstance(self.state_name, python_utils.BASESTRING):
+        if not isinstance(self.state_name, str):
             raise utils.ValidationError(
                 'Expected state_name to be a string, received %s' % (
                     self.state_name))
@@ -485,14 +483,12 @@ class StateTrainingJobsMapping:
                     self.algorithm_ids_to_job_ids))
 
         for algorithm_id in self.algorithm_ids_to_job_ids:
-            if not isinstance(algorithm_id, python_utils.BASESTRING):
+            if not isinstance(algorithm_id, str):
                 raise utils.ValidationError(
                     'Expected algorithm_id to be str, received %s' % (
                         algorithm_id))
 
-            if not isinstance(
-                    self.algorithm_ids_to_job_ids[algorithm_id],
-                    python_utils.BASESTRING):
+            if not isinstance(self.algorithm_ids_to_job_ids[algorithm_id], str):
                 raise utils.ValidationError(
                     'Expected job_id to be str, received %s' % (
                         self.algorithm_ids_to_job_ids[algorithm_id]))

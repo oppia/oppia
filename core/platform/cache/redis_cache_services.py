@@ -16,11 +16,9 @@
 
 """Provides the redis cache service functionality."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from core import feconf
-from core import python_utils
 from core.domain import caching_domain
 
 import redis
@@ -58,7 +56,7 @@ def get_memory_cache_stats() -> caching_domain.MemoryCacheStats:
     # TODO(#13617): Update our typeshed after redis stubs are improved in
     # typeshed. Then the ignore[attr-defined] used below can be removed.
     redis_full_profile = OPPIA_REDIS_CLIENT.memory_stats() # type: ignore[attr-defined]
-    memory_stats = caching_domain.MemoryCacheStats( # type: ignore[no-untyped-call]
+    memory_stats = caching_domain.MemoryCacheStats(
         redis_full_profile.get('total.allocated'),
         redis_full_profile.get('peak.allocated'),
         redis_full_profile.get('keys.count'))
@@ -121,6 +119,6 @@ def delete_multi(keys: List[str]) -> int:
         int. Number of successfully deleted keys.
     """
     for key in keys:
-        assert isinstance(key, python_utils.BASESTRING)
+        assert isinstance(key, str)
     number_of_deleted_keys = OPPIA_REDIS_CLIENT.delete(*keys)
     return number_of_deleted_keys

@@ -32,12 +32,15 @@ import { NoninteractiveTabs } from './Tabs/directives/oppia-noninteractive-tabs.
 import { NoninteractiveVideo } from './Video/directives/oppia-noninteractive-video.component';
 import { NoninteractiveSkillreview } from './Skillreview/directives/oppia-noninteractive-skillreview.component';
 import { OppiaNoninteractiveSkillreviewConceptCardModalComponent } from './Skillreview/directives/oppia-noninteractive-skillreview-concept-card-modal.component';
-import { ConceptCardComponent } from 'components/concept-card/concept-card.directive';
+import { ConceptCardComponent } from 'components/concept-card/concept-card.component';
 import { PortalModule } from '@angular/cdk/portal';
+import { OppiaRteTextNodeDirective, RteOutputDisplayComponent } from './rte-output-display.component';
 
+import { CommonElementsModule } from 'components/common-layout-directives/common-elements/common-elements.module';
 
 @NgModule({
   imports: [
+    CommonElementsModule,
     CommonModule,
     DynamicContentModule,
     MatButtonModule,
@@ -57,7 +60,9 @@ import { PortalModule } from '@angular/cdk/portal';
     NoninteractiveSkillreview,
     NoninteractiveTabs,
     NoninteractiveVideo,
-    OppiaNoninteractiveSkillreviewConceptCardModalComponent
+    OppiaNoninteractiveSkillreviewConceptCardModalComponent,
+    RteOutputDisplayComponent,
+    OppiaRteTextNodeDirective
   ],
   entryComponents: [
     NoninteractiveCollapsible,
@@ -67,7 +72,8 @@ import { PortalModule } from '@angular/cdk/portal';
     NoninteractiveSkillreview,
     NoninteractiveTabs,
     NoninteractiveVideo,
-    OppiaNoninteractiveSkillreviewConceptCardModalComponent
+    OppiaNoninteractiveSkillreviewConceptCardModalComponent,
+    RteOutputDisplayComponent
   ],
   exports: [
     ConceptCardComponent,
@@ -78,7 +84,9 @@ import { PortalModule } from '@angular/cdk/portal';
     NoninteractiveSkillreview,
     NoninteractiveTabs,
     NoninteractiveVideo,
-    OppiaNoninteractiveSkillreviewConceptCardModalComponent
+    OppiaNoninteractiveSkillreviewConceptCardModalComponent,
+    RteOutputDisplayComponent,
+    OppiaRteTextNodeDirective
   ],
 })
 

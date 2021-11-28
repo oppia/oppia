@@ -16,8 +16,7 @@
 
 """Tests for the HTML validation."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import os
 import re
@@ -74,8 +73,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             elif index == 2:
                 tag = soup.find(name='b')
             html_validation_service.wrap_with_siblings(tag, soup.new_tag('p'))
-            self.assertEqual(
-                python_utils.UNICODE(soup), test_case['expected_output'])
+            self.assertEqual(str(soup), test_case['expected_output'])
 
     def test_validate_rte_format(self):
         test_cases_for_ckeditor = [
@@ -781,8 +779,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             html_validation_service.validate_math_tags_in_html(html_string))
 
         for index, invalid_tag in enumerate(invalid_tags):
-            self.assertEqual(
-                python_utils.UNICODE(invalid_tag), expected_invalid_tags[index])
+            self.assertEqual(str(invalid_tag), expected_invalid_tags[index])
 
     def test_validate_math_tags_in_html_with_attribute_math_content(self):
         """Test that the validate_math_tags_in_html_with_attribute_math_content
@@ -839,8 +836,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(invalid_tags), 5)
         for invalid_tag in invalid_tags:
-            self.assertTrue(
-                python_utils.UNICODE(invalid_tag) in expected_invalid_tags)
+            self.assertIn(str(invalid_tag), expected_invalid_tags)
 
     def test_extract_svg_filenames_in_math_rte_components(self):
         """Test that the extract_svg_filenames_in_math_rte_components
@@ -1061,11 +1057,11 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 test_case['expected_output'])
 
     def test_parsable_as_xml(self):
-        invalid_xml = 'aDRjSzNS'
+        invalid_xml = b'aDRjSzNS'
         self.assertEqual(
             html_validation_service.is_parsable_as_xml(invalid_xml),
             False)
-        invalid_xml = '123'
+        invalid_xml = b'123'
         self.assertEqual(
             html_validation_service.is_parsable_as_xml(invalid_xml),
             False)
@@ -1073,7 +1069,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             html_validation_service.is_parsable_as_xml(invalid_xml),
             False)
-        valid_xml = '<svg><path d="0" /></svg>'
+        valid_xml = b'<svg><path d="0" /></svg>'
         self.assertEqual(
             html_validation_service.is_parsable_as_xml(valid_xml),
             True)

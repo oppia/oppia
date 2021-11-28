@@ -14,14 +14,12 @@
 
 """Controllers for the library page."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import logging
 import string
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
@@ -48,7 +46,7 @@ def get_matching_activity_dicts(
             it is empty, no language code filter is applied to the results. If
             it is not empty, then a result is considered valid if it matches at
             least one of these language codes.
-        search_offset: str or None. Offset indicating where, in the list of
+        search_offset: int or None. Offset indicating where, in the list of
             exploration search results, to start the search from. If None,
             collection search results are returned first before the
             explorations.
@@ -57,7 +55,7 @@ def get_matching_activity_dicts(
         tuple. A tuple consisting of two elements:
             - list(dict). Each element in this list is a collection or
                 exploration summary dict, representing a search result.
-            - str. The exploration index offset from which to start the
+            - int. The exploration index offset from which to start the
                 next search.
     """
     # We only populate collections in the initial load, since the current
@@ -253,9 +251,9 @@ class SearchHandler(base.BaseHandler):
                 },
                 'default_value': ''
             },
-            'cursor': {
+            'offset': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'int'
                 },
                 'default_value': None
             }
@@ -294,8 +292,7 @@ class SearchHandler(base.BaseHandler):
             language_code_string[2:-2].split('" OR "')
             if language_code_string else [])
 
-        # TODO(#11314): Change 'cursor' to 'offset' here and in the frontend.
-        search_offset = self.normalized_request.get('cursor')
+        search_offset = self.normalized_request.get('offset')
 
         activity_list, new_search_offset = get_matching_activity_dicts(
             query_string, categories, language_codes, search_offset)
@@ -357,9 +354,10 @@ class ExplorationSummariesHandler(base.BaseHandler):
         if not editor_user_id:
             include_private_exps = False
 
-        if (not isinstance(exp_ids, list) or not all(
-                isinstance(
-                    exp_id, python_utils.BASESTRING) for exp_id in exp_ids)):
+        if (
+                not isinstance(exp_ids, list) or
+                not all(isinstance(exp_id, str) for exp_id in exp_ids)
+        ):
             raise self.PageNotFoundException
 
         if include_private_exps:

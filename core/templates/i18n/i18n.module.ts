@@ -25,13 +25,13 @@ import { MissingTranslationHandler, TranslateDefaultParser,
   TranslateLoader, TranslateModule, TranslateParser,
   TranslateService } from '@ngx-translate/core';
 
-import constants from 'assets/constants';
-
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { TranslateLoaderFactory } from 'i18n/translate-loader.factory';
 import { TranslateCacheFactory } from 'i18n/translate-cache.factory';
 import { TranslateCustomParser } from 'i18n/translate-custom-parser';
 import { MissingTranslationCustomHandler } from 'i18n/missing-translation-custom-handler';
+import { AppConstants } from 'app.constants';
+import { I18nService } from './i18n.service';
 
 /**
  * The Translate Module will look for translations in the following order:
@@ -45,7 +45,7 @@ import { MissingTranslationCustomHandler } from 'i18n/missing-translation-custom
 @NgModule({
   imports: [
     TranslateModule.forRoot({
-      defaultLanguage: constants.DEFAULT_LANGUAGE_CODE,
+      defaultLanguage: AppConstants.DEFAULT_LANGUAGE_CODE,
       missingTranslationHandler: {
         provide: MissingTranslationHandler,
         useClass: MissingTranslationCustomHandler
@@ -66,19 +66,18 @@ import { MissingTranslationCustomHandler } from 'i18n/missing-translation-custom
         provide: TranslateCacheService,
         useFactory: TranslateCacheFactory.createTranslateCacheService,
         deps: [TranslateService, TranslateCacheSettings]
-      },
-      cacheName: 'NG_TRANSLATE_LANG_KEY',
-      cacheMechanism: 'Cookie',
-      cookieExpiry: 30
+      }
     })
   ],
 
   providers: [
-    TranslateDefaultParser
+    TranslateDefaultParser,
+    I18nService
   ],
 
   exports: [
-    TranslateModule
+    TranslateModule,
+    TranslateCacheModule
   ]
 })
 export class I18nModule {}

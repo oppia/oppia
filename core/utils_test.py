@@ -16,13 +16,13 @@
 
 """Unit tests for utils.py."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import base64
 import copy
 import datetime
 import os
+import urllib
 
 from core import feconf
 from core import python_utils
@@ -216,7 +216,7 @@ class UtilsTests(test_utils.GenericTestBase):
     def test_generate_random_string(self) -> None:
         # Generate a random string of length 12.
         random_string = utils.generate_random_string(12)
-        self.assertTrue(isinstance(random_string, python_utils.BASESTRING))
+        self.assertIsInstance(random_string, str)
         self.assertEqual(len(random_string), 12)
 
     def test_convert_png_data_url_to_binary_with_incorrect_prefix(self) -> None:
@@ -733,7 +733,8 @@ class UtilsTests(test_utils.GenericTestBase):
     def test_convert_png_data_url_to_binary(self) -> None:
         image_data_url = '%s%s' % (
             utils.PNG_DATA_URL_PREFIX,
-            python_utils.url_quote(base64.b64encode(b'test123'))) # type: ignore[no-untyped-call]
+            urllib.parse.quote(base64.b64encode(b'test123'))
+        )
 
         self.assertEqual(
             utils.convert_png_data_url_to_binary(image_data_url), b'test123')
@@ -741,7 +742,7 @@ class UtilsTests(test_utils.GenericTestBase):
     def test_convert_png_data_url_to_binary_raises_if_prefix_is_missing(
             self
     ) -> None:
-        image_data_url = python_utils.url_quote(base64.b64encode(b'test123')) # type: ignore[no-untyped-call]
+        image_data_url = urllib.parse.quote(base64.b64encode(b'test123'))
 
         self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'The given string does not represent a PNG data URL.',

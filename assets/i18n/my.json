@@ -14,6 +14,7 @@
 	"I18N_CREATE_EXPLORATION_CREATE": "ဖန်တီးရန်",
 	"I18N_CREATE_NO_THANKS": "မလိုပါ၊ ကျေးဇူးတင်ပါသည်။",
 	"I18N_CREATE_YES_PLEASE": "ဟုတ်ကဲ့",
+	"I18N_CREATOR_IMPACT": "သက်ရောက်မှု",
 	"I18N_DASHBOARD_EXPLORATIONS_SORT_BY_CATEGORY": "ကဏ္ဍ",
 	"I18N_DASHBOARD_EXPLORATIONS_SORT_BY_TITLE": "ခေါင်းစဉ်",
 	"I18N_DASHBOARD_SUGGESTIONS": "အကြံပေးမှုများ",
@@ -26,6 +27,7 @@
 	"I18N_FOOTER_FORUM": "ဖိုရမ်",
 	"I18N_GET_STARTED_PAGE_HEADING": "စတင်လိုက်ပါ",
 	"I18N_GET_STARTED_PAGE_PARAGRAPH_11_HEADING": "ပါဝင်ပတ်သက်",
+	"I18N_GOT_IT": "သဘောပေါက်ပြီ",
 	"I18N_INTERACTIONS_GRAPH_DELETE": "ဖျက်​ပါ​",
 	"I18N_INTERACTIONS_GRAPH_MOVE": "ရွှေ့ရန်",
 	"I18N_INTERACTIONS_GRAPH_RESET_BUTTON": "ပြန်စရန်",
@@ -140,5 +142,6 @@
 	"I18N_TOPNAV_CONTACT_US": "မိမိတို့အား ဆက်သွယ်ရန်",
 	"I18N_TOPNAV_LOGOUT": "ထွက်ရန်",
 	"I18N_TOPNAV_PREFERENCES": "​ရွေး​ချယ်​စ​ရာ​များ",
-	"I18N_TOPNAV_SIGN_IN": "အကောင့်ထဲဝင်ရန်"
+	"I18N_TOPNAV_SIGN_IN": "အကောင့်ထဲဝင်ရန်",
+	"I18N_WARNING_MODAL_TITLE": "သတိပေးချက်"
 }
