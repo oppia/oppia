@@ -223,3 +223,18 @@ class ValidateStateDictInStateYamlHandler(test_utils.GenericTestBase):
         # The error is representing the keyerror.
         with self.assertRaisesRegexp(Exception, 'content'): # type: ignore[no-untyped-call]
             domain_objects_validator.validate_state_dict(invalid_state_dict)
+
+
+class ValidateParamsDictTests(test_utils.GenericTestBase):
+    """Tests to validate params data."""
+
+    def test_incorrect_data_raises_exception(self) -> None:
+        params_properties = {13: 20}
+        with self.assertRaisesRegexp(
+            Exception, 'Excepted str, received 13'):
+            domain_objects_validator.validate_params_dict(
+                params_properties)
+
+    def test_correct_data_do_not_raises_exception(self) -> None:
+        params_properties = {'param1': 20}
+        domain_objects_validator.validate_params_dict(params_properties)
