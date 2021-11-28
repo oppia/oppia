@@ -1,5 +1,6 @@
 {
     "1": [
+        "core.jobs.transforms.job_result_transforms_test",
         "scripts.linters.pre_commit_linter_test",
         "core.controllers.base_test",
         "core.controllers.collection_editor_test",
