@@ -79,8 +79,14 @@ describe('Side Navigation Bar Component', () => {
   });
 
   it('should initialize', () => {
+    const clickEvent = new CustomEvent('click');
+    spyOn(clickEvent, 'stopPropagation');
     componentInstance.ngOnInit();
+
     expect(componentInstance.currentUrl).toEqual(currentUrl);
+    expect(componentInstance.listSubmenu).not.toBeNull();
+    componentInstance.listSubmenu?.dispatchEvent(clickEvent);
+    expect(clickEvent.stopPropagation).toHaveBeenCalled();
   });
 
   it('should toggle classroom submenu', () => {

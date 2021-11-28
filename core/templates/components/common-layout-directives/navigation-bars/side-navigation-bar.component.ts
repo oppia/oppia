@@ -33,6 +33,7 @@ export class SideNavigationBarComponent {
    @Input() display!: boolean;
    currentUrl!: string;
    classroomSubmenuIsShown: boolean = false;
+   listSubmenu!: Element | null;
    PAGES_REGISTERED_WITH_FRONTEND = (
      AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
 
@@ -47,6 +48,15 @@ export class SideNavigationBarComponent {
 
    ngOnInit(): void {
      this.currentUrl = this.windowRef.nativeWindow.location.pathname;
+
+     // To stop catching of click event in bubbling phase,
+     // we use stopPropagation method.
+     this.listSubmenu = document.querySelector(
+       '.oppia-sidebar-expandable-list'
+     );
+     this.listSubmenu?.addEventListener('click', (Event: Event) => {
+       Event.stopPropagation();
+     });
    }
 
    toggleClassroomSubmenu(): void {
