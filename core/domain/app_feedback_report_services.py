@@ -541,7 +541,7 @@ def get_all_filter_options() -> List[
     for filter_field in constants.ALLOWED_FILTERS:
         filter_values = model_class.get_filter_options_for_field(filter_field)
         filter_list.append(app_feedback_report_domain.AppFeedbackReportFilter(
-            filter_field.name, filter_values))
+            filter_field, filter_values))
     return filter_list
 
 

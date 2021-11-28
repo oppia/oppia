@@ -17,6 +17,7 @@
 """Interface for storage model switching."""
 
 from __future__ import annotations
+import enum
 
 import inspect
 from types import ModuleType  # pylint: disable=import-only-modules
@@ -32,15 +33,33 @@ if MYPY: # pragma: no cover
     from mypy_imports import base_models  # pylint: disable=unused-import
 
 # Valid model names.
-NAMES = python_utils.create_enum( # type: ignore[no-untyped-call]
-    'activity', 'app_feedback_report', 'audit', 'base_model', 'beam_job',
-    'blog', 'classifier', 'collection', 'config', 'email', 'exploration',
-    'feedback', 'improvements', 'job', 'opportunity', 'question',
-    'recommendations', 'skill', 'statistics', 'activity', 'audit', 'auth',
-    'base_model', 'classifier', 'collection', 'config', 'email', 'exploration',
-    'feedback', 'improvements', 'job', 'opportunity', 'question',
-    'recommendations', 'skill', 'statistics', 'story', 'subtopic', 'suggestion',
-    'topic', 'translation', 'user')
+class NAMES(enum.Enum):
+    activity = 'activity'
+    app_feedback_report = 'app_feedback_report'
+    audit = 'audit'
+    base_model = 'base_model'
+    beam_job = 'beam_job'
+    blog = 'blog'
+    classifier = 'classifier'
+    collection = 'collection'
+    config = 'config'
+    email = 'email'
+    exploration = 'exploration'
+    feedback = 'feedback'
+    improvements = 'improvements'
+    job = 'job'
+    opportunity = 'opportunity'
+    question = 'question'
+    recommendations = 'recommendations'
+    skill = 'skill'
+    statistics = 'statistics'
+    auth = 'auth'
+    story = 'story'
+    subtopic = 'subtopic'
+    suggestion = 'suggestion'
+    topic = 'topic'
+    translation = 'translation'
+    user = 'user'
 
 # Types of deletion policies. The pragma comment is needed because Enums are
 # evaluated as classes in Python and they should use PascalCase, but using
@@ -81,7 +100,7 @@ class _Gae(Platform):
     # doesn't match with BaseModel.delete_multi().
     # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     @classmethod
-    def import_models(cls, model_names: List[str]) -> Tuple[ModuleType, ...]:
+    def import_models(cls, model_names: List[NAMES]) -> Tuple[ModuleType, ...]: # type: ignore[override]
         """Imports and returns the storage modules listed in model_names.
 
         Args:
@@ -193,7 +212,7 @@ class _Gae(Platform):
 
     @classmethod
     def get_storage_model_classes(
-            cls, model_names: List[str]
+            cls, model_names: List[NAMES]
     ) -> List[base_models.BaseModel]:
         """Get the storage model classes that are in the modules listed in
         model_names.
@@ -411,7 +430,7 @@ class Registry:
         return klass
 
     @classmethod
-    def import_models(cls, model_names: List[str]) -> Tuple[ModuleType, ...]:
+    def import_models(cls, model_names: List[NAMES]) -> Tuple[ModuleType, ...]:
         """Imports and returns the storage modules listed in model_names.
 
         Args:
@@ -424,7 +443,7 @@ class Registry:
 
     @classmethod
     def get_storage_model_classes(
-            cls, model_names: List[str]
+            cls, model_names: List[NAMES]
     ) -> List[base_models.BaseModel]:
         """Get the storage model classes that are in the modules listed in
         model_names.

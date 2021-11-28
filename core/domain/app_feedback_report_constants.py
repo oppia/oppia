@@ -18,6 +18,8 @@
 
 from __future__ import annotations
 
+import enum
+
 from core import python_utils
 from core.platform import models
 
@@ -52,23 +54,51 @@ STATS_ID_DELIMITER = ':'
 ANDROID_VERSION_NAME_DELIMITER = '-'
 
 # Ignoring the untyped call error because python_utils is untyped.
-REPORT_TYPE = python_utils.create_enum('suggestion', 'issue', 'crash') # type: ignore[no-untyped-call]
-CATEGORY = python_utils.create_enum( # type: ignore[no-untyped-call]
-    'feature_suggestion', 'language_suggestion', 'other_suggestion',
-    'lesson_question_issue', 'language_general_issue', 'language_audio_issue',
-    'language_text_issue', 'topics_issue', 'profile_issue', 'other_issue',
-    'lesson_player_crash', 'practice_questions_crash', 'options_page_crash',
-    'profile_page_crash', 'other_crash')
-ENTRY_POINT = python_utils.create_enum( # type: ignore[no-untyped-call]
-    'navigation_drawer', 'lesson_player', 'revision_card', 'crash')
-STATS_PARAMETER_NAMES = python_utils.create_enum( # type: ignore[no-untyped-call]
-    'platform', 'report_type', 'country_locale_code',
-    'entry_point_name', 'text_language_code', 'audio_language_code',
-    'android_sdk_version', 'version_name')
-ANDROID_TEXT_SIZE = python_utils.create_enum( # type: ignore[no-untyped-call]
-    'text_size_unspecified', 'small_text_size', 'medium_text_size',
-    'large_text_size', 'extra_large_text_size')
-ANDROID_NETWORK_TYPE = python_utils.create_enum('wifi', 'cellular', 'none') # type: ignore[no-untyped-call]
+class REPORT_TYPE(enum.Enum):
+    """Enum for report types."""
+    suggestion = 'suggestion'
+    issue = 'issue'
+    crash = 'crash'
+class CATEGORY(enum.Enum):
+    feature_suggestion = 'feature_suggestion'
+    language_suggestion = 'language_suggestion'
+    other_suggestion = 'other_suggestion'
+    lesson_question_issue = 'lesson_question_issue'
+    language_general_issue = 'language_general_issue'
+    language_audio_issue = 'language_audio_issue'
+    language_text_issue = 'language_text_issue'
+    topics_issue = 'topics_issue'
+    profile_issue = 'profile_issue'
+    other_issue = 'other_issue'
+    lesson_player_crash = 'lesson_player_crash'
+    practice_questions_crash = 'practice_questions_crash'
+    options_page_crash = 'options_page_crash'
+    profile_page_crash = 'profile_page_crash'
+    other_crash = 'other_crash'
+class ENTRY_POINT(enum.Enum):
+    navigation_drawer = 'navigation_drawer'
+    lesson_player = 'lesson_player'
+    revision_card = 'revision_card' 
+    crash = 'crash'
+class STATS_PARAMETER_NAMES(enum.Enum):
+    platform = 'platform'
+    report_type = 'report_type'
+    country_locale_code = 'country_locale_code'
+    entry_point_name = 'entry_point_name'
+    text_language_code = 'text_language_code'
+    audio_language_code = 'audio_language_code'
+    android_sdk_version = 'android_sdk_version'
+    version_name = 'version_name'
+class ANDROID_TEXT_SIZE(enum.Enum):
+    text_size_unspecified = 'text_size_unspecified' 
+    small_text_size = 'small_text_size'
+    medium_text_size = 'medium_text_size'
+    large_text_size = 'large_text_size'
+    extra_large_text_size = 'extra_large_text_size'
+class ANDROID_NETWORK_TYPE(enum.Enum):
+    wifi = 'wifi'
+    cellular = 'cellular'
+    none = 'none'
 FILTER_FIELD_NAMES = app_feedback_report_models.FILTER_FIELD_NAMES
 
 ANDROID_ENTRY_POINT = [

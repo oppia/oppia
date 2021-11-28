@@ -206,11 +206,6 @@ class RegistryUnitTest(test_utils.TestBase):
             expected_user_models,
             self.registry_instance.import_models([models.NAMES.user]))
 
-    def test_import_models_invalid(self) -> None:
-        """Tests import_models function with an invalid option."""
-        with self.assertRaisesRegexp(Exception, 'Invalid model name: '): # type: ignore[no-untyped-call]
-            self.registry_instance.import_models([''])
-
     def test_get_storage_model_classes(self) -> None:
         """Tests get_all_storage_model_classes."""
         from core.storage.user import gae_models as user_models
@@ -409,4 +404,4 @@ class RegistryUnitTest(test_utils.TestBase):
             re.escape(
                 'import_models() method is not overwritten in '
                 'derived classes')):
-            models.Platform().import_models([models.NAMES.base_model])
+            models.Platform().import_models([models.NAMES.base_model.value])

@@ -497,7 +497,9 @@ class UserSuppliedFeedback:
                     constants.ALLOWED_REPORT_TYPES))
 
     @classmethod
-    def require_valid_category(cls, category: str) -> None:
+    def require_valid_category(
+        cls, category: constants.CATEGORY
+    ) -> None:
         """Checks whether the category is valid.
 
         Args:
@@ -517,7 +519,7 @@ class UserSuppliedFeedback:
     @classmethod
     def require_valid_user_feedback_items_for_category(
         cls,
-        category: str,
+        category: constants.CATEGORY,
         selected_items: List[str],
         other_text_input: str
     ) -> None:
@@ -823,7 +825,7 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
 
     @classmethod
     def require_valid_network_type(
-        cls, network_type: Type[constants.ANDROID_NETWORK_TYPE]
+        cls, network_type: constants.ANDROID_NETWORK_TYPE
     ) -> None:
         """Checks that the Android device's network type is valid.
 
@@ -903,7 +905,7 @@ class AndroidAppContext(AppContext):
         entry_point: EntryPoint,
         text_language_code: str,
         audio_language_code: str,
-        text_size: Type[constants.ANDROID_TEXT_SIZE],
+        text_size: constants.ANDROID_TEXT_SIZE,
         only_allows_wifi_download_and_update: bool,
         automatically_update_topics: bool,
         account_is_profile_admin: bool,
@@ -1075,7 +1077,7 @@ class EntryPoint:
 
     def __init__(
         self,
-        entry_point: Type[constants.ENTRY_POINT],
+        entry_point: constants.ENTRY_POINT,
         topic_id: Optional[str] = None,
         story_id: Optional[str] = None,
         exploration_id: Optional[str] = None,
@@ -1127,7 +1129,7 @@ class EntryPoint:
     def require_valid_entry_point_name(
         cls,
         actual_name: str,
-        expected_entry_point: Type[constants.ENTRY_POINT]
+        expected_entry_point: constants.ENTRY_POINT
     ) -> None:
         """Validates this EntryPoint name.
 
@@ -1686,7 +1688,7 @@ class AppFeedbackReportFilter:
 
     def __init__(
         self,
-        filter_field: Type[constants.FILTER_FIELD_NAMES],
+        filter_field: constants.FILTER_FIELD_NAMES,
         filter_options: List[str]
     ) -> None:
         """Constructs a AppFeedbackReportFilter domain object.

@@ -408,32 +408,6 @@ def yaml_from_dict(dictionary, width=80):
     return yaml.safe_dump(dictionary, default_flow_style=False, width=width)
 
 
-def create_enum(*sequential):
-    """Creates a enumerated constant.
-
-    Args:
-        *sequential: *. Sequence List to generate the enumerations.
-
-    Returns:
-        dict. Dictionary containing the enumerated constants.
-    """
-    enum_values = dict(ZIP(sequential, sequential))
-    try:
-        from enum import Enum  # pylint: disable=import-only-modules
-
-        # The type() of argument 1 in Enum must be str, not unicode.
-        return Enum(str('Enum'), enum_values)  # pylint: disable=disallowed-function-calls
-    except ImportError:
-        _enums = {}
-        for name, value in enum_values.items():
-            _value = {
-                'name': name,
-                'value': value
-            }
-            _enums[name] = type('Enum', (), _value)
-        return type('Enum', (), _enums)
-
-
 def zip_longest(*args, **kwargs):
     """Creates an iterator that aggregates elements from each of the iterables.
     If the iterables are of uneven length, missing values are

@@ -17,9 +17,9 @@
 from __future__ import annotations
 
 import datetime
+import enum
 
-from core import feconf
-from core import python_utils
+from core import constants, feconf
 from core import utils
 from core.platform import models
 
@@ -44,11 +44,17 @@ GITHUB_REPO_CHOICES = PLATFORM_CHOICES
 
 # The model field names that can be filtered / sorted for when maintainers
 # triage feedback reports.
-FILTER_FIELD_NAMES = python_utils.create_enum( # type: ignore[no-untyped-call]
-    'platform', 'report_type', 'entry_point', 'submitted_on',
-    'android_device_model', 'android_sdk_version', 'text_language_code',
-    'audio_language_code', 'platform_version',
-    'android_device_country_locale_code')
+class FILTER_FIELD_NAMES(enum.Enum):
+    platform = 'platform'
+    report_type = 'report_type'
+    entry_point = 'entry_point'
+    submitted_on = 'submitted_on'
+    android_device_model = 'android_device_model'
+    android_sdk_version = 'android_sdk_version'
+    text_language_code = 'text_language_code'
+    audio_language_code = 'audio_language_code'
+    platform_version = 'platform_version'
+    android_device_country_locale_code = 'android_device_country_locale_code'
 
 # An ID used for stats model entities tracking all unticketed reports.
 UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID = (
@@ -309,7 +315,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
         return report_models
 
     @classmethod
-    def get_filter_options_for_field(cls, filter_field: str) -> List[str]:
+    def get_filter_options_for_field(cls, filter_field: FILTER_FIELD_NAMES) -> List[str]:
         """Fetches values that can be used to filter reports by.
 
         Args:
@@ -319,7 +325,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
         Returns:
             list(str). The possible values that the field name can have.
         """
-        query = cls.query(projection=[filter_field.name], distinct=True) # type: ignore[attr-defined]
+        query = cls.query(projection=[filter_field.name], distinct=True)
         filter_values = []
         if filter_field == FILTER_FIELD_NAMES.report_type:
             filter_values = [model.report_type for model in query]
@@ -346,7 +352,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
         else:
             raise utils.InvalidInputException(
                 'The field %s is not a valid field to filter reports on' % (
-                    filter_field.name)) # type: ignore[attr-defined]
+                    filter_field.name))
         return filter_values
 
     @staticmethod
