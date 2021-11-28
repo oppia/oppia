@@ -68,7 +68,7 @@ export class CkEditorInitializerService {
         if (CKEDITOR.plugins.registered[ckName] !== undefined) {
           return;
         }
-        var tagName = 'oppia-noninteractive-' + componentDefn.id;
+        var tagName = 'oppia-noninteractive-ckeditor-' + componentDefn.id;
         var customizationArgSpecs = componentDefn.customizationArgSpecs;
         var isInline = rteHelperService.isInlineComponent(componentDefn.id);
 
