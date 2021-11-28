@@ -32,7 +32,7 @@ export interface StoryContentsBackendDict {
 }
 
 interface NodeTitles {
-  [title: string]: string
+  [title: string]: string;
 }
 
 export class StoryContents {

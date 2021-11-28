@@ -52,7 +52,7 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
   tempImageName: string;
   uploadedImage: string;
   uploadedImageMimeType: string;
-  dimensions: { height: number; width: number; };
+  dimensions: { height: number; width: number };
   resampledFile: Blob;
   newThumbnailDataUrl: string;
   localStorageBgcolor: string;
