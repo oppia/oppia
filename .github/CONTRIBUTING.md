@@ -7,7 +7,7 @@ To make it easier to get started, we've catalogued some of the different ways to
   * [Coders](https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia)
   * [Instructional designers and storytellers](https://github.com/oppia/oppia/wiki/Teaching-with-Oppia)
   * [UX researchers](https://github.com/oppia/oppia/wiki/Conducting-research-with-students)
-  * [[Voice artists | Instructions-for-voice-artists]]
+  * [Voice artists](https://github.com/oppia/oppia/wiki/Instructions-for-voice-artists)
   * [Designers and artists](https://github.com/oppia/oppia/wiki/Contributing-to-Oppia%27s-design)
 
 If you are interested in working on Oppia's Android app, you should also take a look at the [oppia/oppia-android repository](https://github.com/oppia/oppia-android).
