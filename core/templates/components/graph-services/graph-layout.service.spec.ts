@@ -471,7 +471,7 @@ describe('Graph Layout Service', () => {
 
     // Starting with index 1 as, links2 has first link with same source and
     // target node. So, first augmentedLink will not have a Bezier curve.
-    if(returnedAugmentedLinks){
+    if (returnedAugmentedLinks) {
       for (var i = 1; i < returnedAugmentedLinks.length; i++) {
         returnedBezierCurveValues.push(returnedAugmentedLinks[i].d);
       }

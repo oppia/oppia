@@ -595,7 +595,7 @@ export class StateGraphLayoutService {
       nodeData: NodeDataDict,
       graphWidth: number,
       graphHeight: number
-    ): NodeDataDict {
+  ): NodeDataDict {
     var HORIZONTAL_NODE_PROPERTIES = ['x0', 'width', 'xLabel'];
     var VERTICAL_NODE_PROPERTIES = ['y0', 'height', 'yLabel'];
 
