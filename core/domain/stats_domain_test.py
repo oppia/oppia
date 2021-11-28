@@ -1122,30 +1122,25 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
                 'value': ''
             }
         }
-        exp_issue1 = stats_domain.ExplorationIssue.from_dict({
-            'issue_type': 'EarlyQuit',
-            'issue_customization_args': expected_customization_args,
-            'playthrough_ids': [],
-            'schema_version': 1,
-            'is_valid': True
-        })
-        exp_issue2 = stats_domain.ExplorationIssue.from_dict({
-            'issue_type': 'EarlyQuit',
-            'issue_customization_args': expected_customization_args,
-            'playthrough_ids': [],
-            'schema_version': 2,
-            'is_valid': True
-        })
-        exp_issue3 = stats_domain.ExplorationIssue.from_dict({
-            'issue_type': 'EarlyQuit',
-            'issue_customization_args': expected_customization_args,
-            'playthrough_ids': [],
-            'schema_version': 1,
-            'is_valid': True
-        })
+        exp_issue1 = stats_domain.ExplorationIssue(
+            'EarlyQuit',
+            expected_customization_args,
+            [],
+            1,
+            True
+        )
+        exp_issue2 = stats_domain.ExplorationIssue(
+            'EarlyQuit',
+            expected_customization_args,
+            [],
+            2,
+            True
+        )
+        exp_issue3 = exp_issue1
 
         self.assertTrue(exp_issue1 == exp_issue3)
         self.assertFalse(exp_issue2 == exp_issue3)
+        self.assertFalse(exp_issue1 == exp_issue2)
 
 
 class LearnerActionTests(test_utils.GenericTestBase):
