@@ -175,17 +175,6 @@ class PythonUtilsTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(AttributeError, 'fourth'):
             getattr(enums, 'fourth')
 
-    def test_zip_longest(self):
-        self.assertEqual(
-            [list(g) for g in python_utils.zip_longest(
-                [0, 1, 2, 3], [4, 5, 6], [7, 8])],
-            [[0, 4, 7], [1, 5, 8], [2, 6, None], [3, None, None]])
-        # Zip longest with fillvalue.
-        self.assertEqual(
-            [''.join(g) for g in python_utils.zip_longest(
-                'ABC', 'DE', 'F', fillvalue='x')],
-            ['ADF', 'BEx', 'Cxx'])
-
 
 @unittest.skipUnless(
     sys.version[0] == '3', 'Test cases for ensuring Python 3 behavior only')
