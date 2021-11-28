@@ -278,8 +278,10 @@ export class Topic {
 
   prepublishValidate(): string[] {
     const metaTagContentCharLimit = constants.MAX_CHARS_IN_META_TAG_CONTENT;
-    const pageTitleFragForWebCharLimit = (
+    const pageTitleFragForWebCharMaxLimit = (
       constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB);
+    const pageTitleFragForWebCharMinLimit = (
+      constants.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB);
     let issues = [];
     if (!this._thumbnailFilename) {
       issues.push('Topic should have a thumbnail.');
@@ -294,10 +296,14 @@ export class Topic {
     let pageTitleFragForWebNumChars = this._pageTitleFragmentForWeb.length;
     if (!this._pageTitleFragmentForWeb) {
       issues.push('Topic should have page title fragment.');
-    } else if (pageTitleFragForWebNumChars > pageTitleFragForWebCharLimit) {
+    } else if (pageTitleFragForWebNumChars > pageTitleFragForWebCharMaxLimit) {
       issues.push(
         'Topic page title fragment should not be longer than ' +
         `${constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB} characters.`);
+    } else if (pageTitleFragForWebNumChars < pageTitleFragForWebCharMinLimit) {
+      issues.push(
+        'Topic page title fragment should not be shorter than ' +
+        `${constants.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB} characters.`);
     }
     if (!this._metaTagContent) {
       issues.push('Topic should have meta tag content.');
