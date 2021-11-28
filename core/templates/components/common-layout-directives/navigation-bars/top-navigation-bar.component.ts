@@ -277,18 +277,19 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   }
 
   ngAfterViewChecked(): void {
-    this.learnDropdownOffset = this.getLearnOffset();
+    this.learnDropdownOffset = this.getDropdownOffset('.learn-tab', 688);
+    // https://stackoverflow.com/questions/34364880/expression-has-changed-after-it-was-checked
+    this.changeDetectorRef.detectChanges();
   }
 
-  getLearnOffset(): number {
-    var learnTab: HTMLElement = document.querySelector('.learn-tab');
-    var leftOffset = learnTab.getBoundingClientRect().left;
-    var space = window.innerWidth - leftOffset;
-    if (space < 688) {
-      return (Math.round(space - 688));
-    } else {
-      return 0;
+  getDropdownOffset(cssClass: string, width: number): number {
+    var learnTab: HTMLElement | null = document.querySelector(cssClass);
+    if (learnTab) {
+      var leftOffset = learnTab.getBoundingClientRect().left;
+      var space = window.innerWidth - leftOffset;
+      return (space < width) ? (Math.round(space - width)) : 0;
     }
+    return 0;
   }
 
   async getProfileImageDataAsync(): Promise<void> {
