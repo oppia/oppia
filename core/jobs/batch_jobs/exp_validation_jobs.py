@@ -30,7 +30,7 @@ import apache_beam as beam
     [models.NAMES.exploration])
 
 
-class FindExplorationRightsWithDuplicateUsersJob(base_jobs.JobBase):
+class GetNumberOfExpRightsWithDuplicateUsersJob(base_jobs.JobBase):
     """Validates that no user is assigned to multiple roles for 
     any exploration (owner, editor, voice artist, viewer)."""
 
