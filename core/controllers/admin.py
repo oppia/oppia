@@ -14,8 +14,7 @@
 
 """Controllers for the admin view."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import io
 import logging
@@ -187,7 +186,7 @@ class AdminHandler(base.BaseHandler):
         feature_flag_dicts = feature_services.get_all_feature_flag_dicts()
 
         config_properties = config_domain.Registry.get_config_property_schemas()
-        # Removes promo-bar related configs as promo-bar is handlded by
+        # Removes promo-bar related configs as promo-bar is handled by
         # release coordinators in /release-coordinator page.
         del config_properties['promo_bar_enabled']
         del config_properties['promo_bar_message']

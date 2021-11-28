@@ -16,8 +16,7 @@
 
 """Domain object for states and their constituents."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import collections
 import copy
@@ -1467,6 +1466,22 @@ class WrittenTranslation:
             'TranslatableSetOfNormalizedString'),
         DATA_FORMAT_SET_OF_UNICODE_STRING: 'TranslatableSetOfUnicodeString',
     }
+
+    @classmethod
+    def is_data_format_list(cls, data_format):
+        """Checks whether the content of translation with given format is of
+        a list type.
+
+        Args:
+            data_format: str. The format of the translation.
+
+        Returns:
+            bool. Whether the content of translation is a list.
+        """
+        return data_format in (
+            cls.DATA_FORMAT_SET_OF_NORMALIZED_STRING,
+            cls.DATA_FORMAT_SET_OF_UNICODE_STRING
+        )
 
     def __init__(self, data_format, translation, needs_update):
         """Initializes a WrittenTranslation domain object.

@@ -16,8 +16,7 @@
 
 """Stores various configuration options and constants for Oppia."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import copy
 import datetime
@@ -207,6 +206,10 @@ DEFAULT_CLASSIFIER_LABEL = '_default'
 
 # The maximum number of results to retrieve in a datastore query.
 DEFAULT_QUERY_LIMIT = 1000
+
+# The maximum number of results to retrieve in a datastore query
+# for suggestions.
+DEFAULT_SUGGESTION_QUERY_LIMIT = 100
 
 # The maximum number of results to retrieve in a datastore query
 # for top rated published explorations in /library page.
@@ -497,7 +500,7 @@ GOOGLE_APP_ENGINE_REGION = 'us-central1'
 DATAFLOW_TEMP_LOCATION = 'gs://todo/todo'
 DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
 
-OPPIA_VERSION = '3.1.4'
+OPPIA_VERSION = '3.2.1'
 OPPIA_PYTHON_PACKAGE_PATH = './build/oppia-beam-job-%s.tar.gz' % OPPIA_VERSION
 
 # Committer id for system actions. The username for the system committer

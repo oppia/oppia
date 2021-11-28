@@ -16,8 +16,7 @@
 
 """Unit tests for jobs.batch_jobs.suggestion_stats_computation_jobs."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import datetime
 
@@ -92,7 +91,7 @@ class GenerateTranslationContributionStatsJobTests(job_test_utils.JobTestBase):
                 'language_code': 'lang',
                 'content_html': '111 222 333',
                 'translation_html': '111 222 333',
-                'data_format': 'format'
+                'data_format': 'html'
             },
             score_category='irelevant',
             status=suggestion_models.STATUS_IN_REVIEW,
@@ -105,14 +104,14 @@ class GenerateTranslationContributionStatsJobTests(job_test_utils.JobTestBase):
         suggestion_model.put()
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS 1')
+            job_run_result.JobRunResult(stdout='SUCCESS: 1')
         ])
 
         translation_stats_model = (
             suggestion_models.TranslationContributionStatsModel.get(
                 self.LANG_1, self.VALID_USER_ID_1, ''))
 
-        assert translation_stats_model is not None
+        self.assertIsNotNone(translation_stats_model)
         self.assertEqual(translation_stats_model.language_code, self.LANG_1)
         self.assertEqual(
             translation_stats_model.contributor_user_id, self.VALID_USER_ID_1)
@@ -121,6 +120,65 @@ class GenerateTranslationContributionStatsJobTests(job_test_utils.JobTestBase):
             translation_stats_model.submitted_translations_count, 1)
         self.assertEqual(
             translation_stats_model.submitted_translation_word_count, 3)
+        self.assertEqual(translation_stats_model.accepted_translations_count, 0)
+        self.assertEqual(
+            translation_stats_model
+            .accepted_translations_without_reviewer_edits_count,
+            0
+        )
+        self.assertEqual(
+            translation_stats_model.accepted_translation_word_count, 0)
+        self.assertEqual(translation_stats_model.rejected_translations_count, 0)
+        self.assertEqual(
+            translation_stats_model.rejected_translation_word_count, 0)
+        self.assertItemsEqual( # type: ignore[no-untyped-call]
+            translation_stats_model.contribution_dates,
+            [datetime.date.today()]
+        )
+
+    def test_creates_stats_model_from_one_suggestion_in_set_format(
+        self
+    ) -> None:
+        suggestion_model = self.create_model(
+            suggestion_models.GeneralSuggestionModel,
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            author_id=self.VALID_USER_ID_1,
+            change_cmd={
+                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                'state_name': 'state',
+                'content_id': 'content_id',
+                'language_code': 'lang',
+                'content_html': ['111 a', '222 b', '333 c'],
+                'translation_html': ['111 a', '222 b', '333 c'],
+                'data_format': 'set_of_normalized_string'
+            },
+            score_category='irelevant',
+            status=suggestion_models.STATUS_IN_REVIEW,
+            target_type='exploration',
+            target_id=self.EXP_1_ID,
+            target_version_at_submission=0,
+            language_code=self.LANG_1
+        )
+        suggestion_model.update_timestamps()
+        suggestion_model.put()
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(stdout='SUCCESS: 1')
+        ])
+
+        translation_stats_model = (
+            suggestion_models.TranslationContributionStatsModel.get(
+                self.LANG_1, self.VALID_USER_ID_1, ''))
+
+        self.assertIsNotNone(translation_stats_model)
+        self.assertEqual(translation_stats_model.language_code, self.LANG_1)
+        self.assertEqual(
+            translation_stats_model.contributor_user_id, self.VALID_USER_ID_1)
+        self.assertEqual(translation_stats_model.topic_id, '')
+        self.assertEqual(
+            translation_stats_model.submitted_translations_count, 1)
+        self.assertEqual(
+            translation_stats_model.submitted_translation_word_count, 6)
         self.assertEqual(translation_stats_model.accepted_translations_count, 0)
         self.assertEqual(
             translation_stats_model
@@ -151,7 +209,7 @@ class GenerateTranslationContributionStatsJobTests(job_test_utils.JobTestBase):
                 'language_code': 'lang',
                 'content_html': '111 222 333',
                 'translation_html': '111 222 333',
-                'data_format': 'format'
+                'data_format': 'html'
             },
             score_category='irelevant',
             status=suggestion_models.STATUS_IN_REVIEW,
@@ -176,14 +234,14 @@ class GenerateTranslationContributionStatsJobTests(job_test_utils.JobTestBase):
         opportunity_model.put()
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS 1')
+            job_run_result.JobRunResult(stdout='SUCCESS: 1')
         ])
 
         translation_stats_model = (
             suggestion_models.TranslationContributionStatsModel.get(
                 self.LANG_1, self.VALID_USER_ID_1, self.TOPIC_1_ID))
 
-        assert translation_stats_model is not None
+        self.assertIsNotNone(translation_stats_model)
         self.assertEqual(translation_stats_model.language_code, self.LANG_1)
         self.assertEqual(
             translation_stats_model.contributor_user_id, self.VALID_USER_ID_1)
@@ -220,7 +278,7 @@ class GenerateTranslationContributionStatsJobTests(job_test_utils.JobTestBase):
                 'language_code': 'lang',
                 'content_html': '111 222 333',
                 'translation_html': '111 222 333',
-                'data_format': 'format'
+                'data_format': 'unicode'
             },
             score_category='irelevant',
             status=suggestion_models.STATUS_ACCEPTED,
@@ -233,14 +291,14 @@ class GenerateTranslationContributionStatsJobTests(job_test_utils.JobTestBase):
         suggestion_model.put()
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS 1')
+            job_run_result.JobRunResult(stdout='SUCCESS: 1')
         ])
 
         translation_stats_model = (
             suggestion_models.TranslationContributionStatsModel.get(
                 self.LANG_1, self.VALID_USER_ID_1, ''))
 
-        assert translation_stats_model is not None
+        self.assertIsNotNone(translation_stats_model)
         self.assertEqual(translation_stats_model.language_code, self.LANG_1)
         self.assertEqual(
             translation_stats_model.contributor_user_id, self.VALID_USER_ID_1)
@@ -265,7 +323,7 @@ class GenerateTranslationContributionStatsJobTests(job_test_utils.JobTestBase):
             [datetime.date.today()]
         )
 
-    def test_creates_stats_model_from_one_multiple_suggestions(self) -> None:
+    def test_creates_stats_model_from_multiple_suggestions(self) -> None:
         suggestion_1_model = self.create_model(
             suggestion_models.GeneralSuggestionModel,
             suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
@@ -277,7 +335,7 @@ class GenerateTranslationContributionStatsJobTests(job_test_utils.JobTestBase):
                 'language_code': 'lang',
                 'content_html': '111 222 333',
                 'translation_html': '111 222 333',
-                'data_format': 'format'
+                'data_format': 'html'
             },
             score_category='irelevant',
             status=suggestion_models.STATUS_ACCEPTED,
@@ -296,9 +354,9 @@ class GenerateTranslationContributionStatsJobTests(job_test_utils.JobTestBase):
                 'state_name': 'state',
                 'content_id': 'content_id',
                 'language_code': 'lang',
-                'content_html': '111 222 333 444 555',
-                'translation_html': '111 222 333 444 555',
-                'data_format': 'format'
+                'content_html': ['111', '222', '333', '444', '555'],
+                'translation_html': ['111', '222', '333', '444', '555'],
+                'data_format': 'set_of_unicode_string'
             },
             score_category='irelevant',
             status=suggestion_models.STATUS_REJECTED,
@@ -313,14 +371,14 @@ class GenerateTranslationContributionStatsJobTests(job_test_utils.JobTestBase):
             suggestion_1_model, suggestion_2_model])
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS 1')
+            job_run_result.JobRunResult(stdout='SUCCESS: 1')
         ])
 
         translation_stats_model = (
             suggestion_models.TranslationContributionStatsModel.get(
                 self.LANG_1, self.VALID_USER_ID_1, ''))
 
-        assert translation_stats_model is not None
+        self.assertIsNotNone(translation_stats_model)
         self.assertEqual(translation_stats_model.language_code, self.LANG_1)
         self.assertEqual(
             translation_stats_model.contributor_user_id, self.VALID_USER_ID_1)

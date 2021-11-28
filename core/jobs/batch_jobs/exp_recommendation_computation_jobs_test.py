@@ -16,8 +16,7 @@
 
 """Unit tests for jobs.batch_jobs.exp_recommendation_computation_jobs."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import datetime
 
@@ -108,7 +107,7 @@ class ComputeExplorationRecommendationsJobTests(job_test_utils.JobTestBase):
         self.put_multi([exp_summary_1, exp_summary_2])
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS 2')
+            job_run_result.JobRunResult(stdout='SUCCESS: 2')
         ])
 
         exp_recommendations_model_1 = (
@@ -258,7 +257,7 @@ class ComputeExplorationRecommendationsJobTests(job_test_utils.JobTestBase):
         self.put_multi([exp_summary_1, exp_summary_2, exp_summary_3])
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS 3')
+            job_run_result.JobRunResult(stdout='SUCCESS: 3')
         ])
 
         exp_recommendations_model_1 = (

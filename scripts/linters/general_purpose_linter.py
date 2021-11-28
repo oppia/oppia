@@ -16,8 +16,7 @@
 
 """Lint checks used by all the linters."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import os
 import re
@@ -100,8 +99,8 @@ BAD_PATTERNS = {
 BAD_PATTERNS_REGEXP = [
     {
         'regexp': re.compile(r'TODO[^\(]*[^\)][^:]*[^A-Z]+[^\w]*$'),
-        'message': 'Please assign TODO comments to a user '
-                   'in the format TODO(username): XXX. ',
+        'message': 'Please link TODO comments to an issue '
+                   'in the format TODO(#issuenum): XXX. ',
         'excluded_files': (),
         'excluded_dirs': ()
     }
@@ -119,8 +118,8 @@ MANDATORY_PATTERNS_REGEXP = [
         'excluded_dirs': EXCLUDED_PATHS
     },
     {
-        'regexp': re.compile('from __future__ import unicode_literals'),
-        'message': 'Please ensure this file should contain unicode_literals '
+        'regexp': re.compile('from __future__ import annotations'),
+        'message': 'Please ensure this file should contain annotations '
                    'future import.',
         'included_types': ('.py'),
         'excluded_files': GENERATED_FILE_PATHS + CONFIG_FILE_PATHS + (
@@ -364,7 +363,11 @@ class GeneralPurposeLinter:
         # found in the file.
         pattern_found_list = []
         error_messages = []
-        file_content = self.file_cache.readlines(filepath)
+
+        try:
+            file_content = self.file_cache.readlines(filepath)
+        except Exception as e:
+            raise Exception('%s %s' % (filepath, e))
         for index, regexp_to_check in enumerate(
                 pattern_list):
             if (any(filepath.endswith(
@@ -454,7 +457,7 @@ class GeneralPurposeLinter:
             total_error_count += temp_count
             error_messages.extend(bad_pattern_error_messages)
 
-            if filepath == 'constants.ts':
+            if filepath.endswith('constants.ts'):
                 for pattern, constants in BAD_STRINGS_CONSTANTS.items():
                     for line in file_content:
                         if pattern in line:

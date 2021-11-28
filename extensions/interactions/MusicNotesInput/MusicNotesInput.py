@@ -16,8 +16,7 @@
 
 """Python configuration for MusicNotesInput interaction."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from extensions.interactions import base
 
@@ -32,8 +31,8 @@ class MusicNotesInput(base.BaseInteraction):
     display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
     _dependency_ids = ['midijs']
     answer_type = 'MusicPhrase'
-    instructions = 'Drag notes to the staff to form a sequence'
-    narrow_instructions = 'Show music staff'
+    instructions = 'I18N_INTERACTIONS_MUSIC_INSTRUCTION'
+    narrow_instructions = 'I18N_INTERACTIONS_MUSIC_NARROW_INSTRUCTION'
     needs_summary = True
     can_have_solution = True
     show_generic_submit_button = True
