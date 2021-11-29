@@ -295,7 +295,6 @@ class NewTopicHandler(base.BaseHandler):
         }
     }
 
-
     @acl_decorators.can_create_topic
     def post(self):
         """Handles POST requests."""

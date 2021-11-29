@@ -25,8 +25,10 @@ from core.domain import html_validation_service
 
 def validate_filename(filename: str):
     """Validates the filename.
+
     Args:
         filename: str. The filename for the image.
+
     Raises:
         ValidationError. Image or filename supplied fails one of the
             validation checks.

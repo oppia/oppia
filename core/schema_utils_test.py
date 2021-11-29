@@ -859,6 +859,7 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
 
     def test_is_valid_filename(self) -> None:
         """Checks whether a given string is a valid filename.
+
         Returns:
             bool. A boolean value representing whether a given string is a
             valid filename.

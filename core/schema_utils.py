@@ -666,12 +666,13 @@ class _Validators:
             return False
         return True
 
-
     @staticmethod
     def is_valid_filename(obj: str) -> bool:
         """Checks if the given obj (a string) is a valid filename string.
+
         Args:
             obj: str. The filename to verify.
+
         Returns:
             bool. Whether the given object is a valid filename.
         """
@@ -681,7 +682,6 @@ class _Validators:
             return True
         except utils.ValidationError:
             return False
-
 
     @staticmethod
     def is_valid_username_string(obj: str) -> bool:
