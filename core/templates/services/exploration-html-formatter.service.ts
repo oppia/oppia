@@ -79,12 +79,18 @@ export class ExplorationHtmlFormatterService {
       parentHasLastAnswerProperty: boolean,
       labelForFocusTarget: string,
       savedSolution: string | null): string {
-    const htmlInteractionId = this.camelCaseToHyphens.transform(interactionId);
-    const interactionInitTag = '<oppia-interactive-' + htmlInteractionId + '>';
-    let directiveOuterHtml = (
+    var htmlInteractionId = this.camelCaseToHyphens.transform(interactionId);
+    // TODO(#14340): Remove the usage of jQuery.
+    var element = $('<oppia-interactive-' + htmlInteractionId + '>');
+    element = (
       this.extensionTagAssembler.formatCustomizationArgAttrs(
-        interactionInitTag, interactionCustomizationArgs)
-    ).replace('>', '');
+        element, interactionCustomizationArgs)
+    );
+    const tagEnd = '></oppia-interactive-' + htmlInteractionId + '>';
+    // This throws "Object is possibly 'undefined'.". We need to suppress this
+    // error because we know that the get won't return undefined.
+    // @ts-ignore
+    let directiveOuterHtml = element.get(0).outerHTML.replace(tagEnd, '');
     let spaceToBeAdded = true;
     const getLastAnswer = (): string => {
       let propValue = parentHasLastAnswerProperty ? 'lastAnswer' : 'null';
@@ -119,7 +125,6 @@ export class ExplorationHtmlFormatterService {
     if (spaceToBeAdded) {
       directiveOuterHtml += ' ';
     }
-    const tagEnd = '></oppia-interactive-' + htmlInteractionId + '>';
     directiveOuterHtml += getLastAnswer() + tagEnd;
     return directiveOuterHtml;
   }

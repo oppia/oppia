@@ -36,17 +36,22 @@ describe('Extension Tag Assembler Service', () => {
   });
 
   it('should not format element without customization', () => {
-    const element = '<p></p>';
+    const element = $('<p>');
     const interactionCustomizationArgs = {};
     const expectedElement = '<p></p>';
 
     expect(
-      etas.formatCustomizationArgAttrs(element, interactionCustomizationArgs)
+      // This throws "Object is possibly 'undefined'.". We need to suppress this
+      // error because we know that the get won't return undefined.
+      // @ts-ignore
+      etas.formatCustomizationArgAttrs(
+        element, interactionCustomizationArgs
+      ).get(0).outerHTML
     ).toEqual(expectedElement);
   });
 
   it('should format element with customization', () => {
-    const element = '<p></p>';
+    const element = $('<p>');
     const interactionCustomizationArgs = {
       choices: {value: 'sampleChoice'}
     };
@@ -55,12 +60,17 @@ describe('Extension Tag Assembler Service', () => {
       '></p>';
 
     expect(
-      etas.formatCustomizationArgAttrs(element, interactionCustomizationArgs)
+      // This throws "Object is possibly 'undefined'.". We need to suppress this
+      // error because we know that the get won't return undefined.
+      // @ts-ignore
+      etas.formatCustomizationArgAttrs(
+        element, interactionCustomizationArgs
+      ).get(0).outerHTML
     ).toEqual(expectedElement);
   });
 
   it('should format element with complex customization', () => {
-    const element = '<p></p>';
+    const element = $('<p>');
     const interactionCustomizationArgs = {
       test: {
         value: {
@@ -73,12 +83,17 @@ describe('Extension Tag Assembler Service', () => {
       'content_id&amp;quot;:&amp;quot;ca_id&amp;quot;}]}"></p>';
 
     expect(
-      etas.formatCustomizationArgAttrs(element, interactionCustomizationArgs)
+      // This throws "Object is possibly 'undefined'.". We need to suppress this
+      // error because we know that the get won't return undefined.
+      // @ts-ignore
+      etas.formatCustomizationArgAttrs(
+        element, interactionCustomizationArgs
+      ).get(0).outerHTML
     ).toEqual(expectedElement);
   });
 
   it('should format element with multiple customizations', () => {
-    const element = '<p></p>';
+    const element = $('<p>');
     const interactionCustomizationArgs = {
       choices: {value: 'sampleChoice'},
       test: {value: 'sampleValue'}
@@ -89,7 +104,12 @@ describe('Extension Tag Assembler Service', () => {
       '></p>';
 
     expect(
-      etas.formatCustomizationArgAttrs(element, interactionCustomizationArgs)
+      // This throws "Object is possibly 'undefined'.". We need to suppress this
+      // error because we know that the get won't return undefined.
+      // @ts-ignore
+      etas.formatCustomizationArgAttrs(
+        element, interactionCustomizationArgs
+      ).get(0).outerHTML
     ).toEqual(expectedElement);
   });
 });

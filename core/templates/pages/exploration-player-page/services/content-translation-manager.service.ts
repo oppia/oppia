@@ -246,10 +246,14 @@ export class ContentTranslationManagerService {
       }
     }
 
-    const interactionHtml = card.getInteractionHtml();
+    // TODO(#14340): Remove the usage of jQuery.
+    const element = $(card.getInteractionHtml());
     this.extensionTagAssemblerService.formatCustomizationArgAttrs(
-      interactionHtml, caValues);
-    card.setInteractionHtml(interactionHtml);
+      element, caValues);
+    // This throws "Object is possibly 'undefined'.". We need to suppress this
+    // error because we know that the get won't return undefined.
+    // @ts-ignore
+    card.setInteractionHtml(element.get(0).outerHTML);
   }
 
   _swapContentInRules(card: StateCard, languageCode: string): void {
