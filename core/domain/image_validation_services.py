@@ -23,6 +23,30 @@ from core import utils
 from core.domain import html_validation_service
 
 
+def validate_filename(filename: str):
+    """Validates the filename.
+    Args:
+        filename: str. The filename for the image.
+    Raises:
+        ValidationError. Image or filename supplied fails one of the
+            validation checks.
+    """
+    allowed_formats = ', '.join(
+        list(feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.keys()))
+    if not filename:
+        raise utils.ValidationError('No filename supplied')
+    if filename.rfind('.') == 0:
+        raise utils.ValidationError('Invalid filename')
+    if '/' in filename or '..' in filename:
+        raise utils.ValidationError(
+            'Filenames should not include slashes (/) or consecutive '
+            'dot characters.')
+    if '.' not in filename:
+        raise utils.ValidationError(
+            'Image filename with no extension: it should have '
+            'one of the following extensions: %s.' % allowed_formats)
+
+
 def validate_image_and_filename(raw_image, filename):
     """Validates the image data and its filename.
 
@@ -44,8 +68,6 @@ def validate_image_and_filename(raw_image, filename):
     if len(raw_image) > hundred_kb_in_bytes:
         raise utils.ValidationError(
             'Image exceeds file size limit of 100 KB.')
-    allowed_formats = ', '.join(
-        list(feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.keys()))
     if html_validation_service.is_parsable_as_xml(raw_image):
         file_format = 'svg'
         invalid_tags, invalid_attrs = (
@@ -69,18 +91,7 @@ def validate_image_and_filename(raw_image, filename):
             raise utils.ValidationError('Image not recognized')
 
     # Verify that the file type matches the supplied extension.
-    if not filename:
-        raise utils.ValidationError('No filename supplied')
-    if filename.rfind('.') == 0:
-        raise utils.ValidationError('Invalid filename')
-    if '/' in filename or '..' in filename:
-        raise utils.ValidationError(
-            'Filenames should not include slashes (/) or consecutive '
-            'dot characters.')
-    if '.' not in filename:
-        raise utils.ValidationError(
-            'Image filename with no extension: it should have '
-            'one of the following extensions: %s.' % allowed_formats)
+    validate_filename(filename)
 
     dot_index = filename.rfind('.')
     extension = filename[dot_index + 1:].lower()

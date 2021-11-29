@@ -857,6 +857,25 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         self.assertFalse(is_search_query_string('(missing-inner-quotes)'))
         self.assertFalse(is_search_query_string('missing-outer-parens'))
 
+    def test_is_valid_filename(self) -> None:
+        """Checks whether a given string is a valid filename.
+        Returns:
+            bool. A boolean value representing whether a given string is a
+            valid filename.
+        """
+        is_valid_filename = schema_utils.get_validator('is_valid_filename')
+
+        self.assertTrue(is_valid_filename('abc.png'))
+        self.assertTrue(is_valid_filename('testImage.jpg'))
+        self.assertTrue(is_valid_filename('something.jpeg'))
+        self.assertTrue(is_valid_filename('abcd.gif'))
+        self.assertTrue(is_valid_filename('testUser.svg'))
+
+        self.assertFalse(is_valid_filename('testUser.webp'))
+        self.assertFalse(is_valid_filename('.png'))
+        self.assertFalse(is_valid_filename('test..user.png'))
+        self.assertFalse(is_valid_filename('testImage'))
+
     def test_is_valid_username_string(self) -> None:
         """Checks whether given username string is valid.
 

@@ -20,8 +20,10 @@ from __future__ import annotations
 
 import logging
 
+from core import android_validation_constants
 from core import feconf
 from core import utils
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import config_domain
@@ -238,21 +240,72 @@ class SkillsDashboardPageDataHandler(base.BaseHandler):
 class NewTopicHandler(base.BaseHandler):
     """Creates a new topic."""
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'POST': {
+            'name': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_nonempty'
+                    }, {
+                        'id': 'has_length_at_most',
+                        'max_value': (
+                            android_validation_constants.MAX_CHARS_IN_TOPIC_NAME
+                        )
+                    }]
+                }
+            },
+            'url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
+            'description': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': (
+                            android_validation_constants
+                            .MAX_CHARS_IN_TOPIC_DESCRIPTION
+                        )
+                    }]
+                }
+            },
+            'filename': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_valid_filename'
+                    }]
+                }
+            },
+            'thumbnailBgColor': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_regex_matched',
+                        'regex_pattern': '^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$'
+                    }]
+                }
+            },
+            'image': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+    }
+
+
     @acl_decorators.can_create_topic
     def post(self):
         """Handles POST requests."""
-        name = self.payload.get('name')
-        url_fragment = self.payload.get('url_fragment')
-        description = self.payload.get('description')
-        thumbnail_filename = self.payload.get('filename')
-        thumbnail_bg_color = self.payload.get('thumbnailBgColor')
-        raw_image = self.request.get('image')
+        name = self.normalized_payload.get('name')
+        url_fragment = self.normalized_payload.get('url_fragment')
+        description = self.normalized_payload.get('description')
+        thumbnail_filename = self.normalized_payload.get('filename')
+        thumbnail_bg_color = self.normalized_payload.get('thumbnailBgColor')
+        raw_image = self.normalized_request.get('image')
 
-        try:
-            topic_domain.Topic.require_valid_name(name)
-        except:
-            raise self.InvalidInputException(
-                'Invalid topic name, received %s.' % name)
         new_topic_id = topic_fetchers.get_new_topic_id()
         topic = topic_domain.Topic.create_default_topic(
             new_topic_id, name, url_fragment, description)
@@ -294,27 +347,60 @@ class NewTopicHandler(base.BaseHandler):
 class NewSkillHandler(base.BaseHandler):
     """Creates a new skill."""
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'POST': {
+            'description': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_nonempty'
+                    }, {
+                        'id': 'has_length_at_most',
+                        'max_value': (
+                            android_validation_constants
+                            .MAX_CHARS_IN_SKILL_DESCRIPTION
+                        )
+                    }]
+                }
+            },
+            'linked_topic_ids': {
+                'schema': {
+                    'type': 'list',
+                    'items': {
+                        'type': 'str',
+                        'validators': [{
+                            'id': 'is_regex_matched',
+                            'regex_pattern': constants.ENTITY_ID_REGEX
+                        }]
+                    }
+                }
+            },
+            'explanation_dict': {
+                'schema': {
+                    'type': 'object_dict',
+                    'object_class': state_domain.SubtitledHtml
+                }
+            },
+            'rubrics': {
+                'schema': {
+                    'type': 'list',
+                    'items': {
+                        'type': 'object_dict',
+                        'object_class': skill_domain.Rubric
+                    }
+                }
+            }
+        }
+    }
+
     @acl_decorators.can_create_skill
     def post(self):
-        description = self.payload.get('description')
-        linked_topic_ids = self.payload.get('linked_topic_ids')
-        explanation_dict = self.payload.get('explanation_dict')
-        rubrics = self.payload.get('rubrics')
-
-        if not isinstance(rubrics, list):
-            raise self.InvalidInputException('Rubrics should be a list.')
-
-        if not isinstance(explanation_dict, dict):
-            raise self.InvalidInputException(
-                'Explanation should be a dict.')
-
-        try:
-            subtitled_html = (
-                state_domain.SubtitledHtml.from_dict(explanation_dict))
-            subtitled_html.validate()
-        except:
-            raise self.InvalidInputException(
-                'Explanation should be a valid SubtitledHtml dict.')
+        description = self.normalized_payload.get('description')
+        linked_topic_ids = self.normalized_payload.get('linked_topic_ids')
+        explanation_dict = self.normalized_payload.get('explanation_dict')
+        rubrics = self.normalized_payload.get('rubrics')
 
         rubrics = [skill_domain.Rubric.from_dict(rubric) for rubric in rubrics]
         new_skill_id = skill_services.get_new_skill_id()

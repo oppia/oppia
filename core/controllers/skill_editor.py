@@ -16,6 +16,7 @@
 
 from __future__ import annotations
 
+from core import android_validation_constants
 from core import feconf
 from core import utils
 from core.constants import constants
@@ -255,6 +256,18 @@ class SkillDataHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    URL_PATH_ARGS_SCHEMAS = {
+        'comma_separated_skill_ids': {
+            'schema': {
+                'type': 'custom',
+                'obj_type': 'JsonEncodedInString'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
     @acl_decorators.open_access
     def get(self, comma_separated_skill_ids):
         """Populates the data on skill pages of the skill ids."""
@@ -284,6 +297,11 @@ class FetchSkillsHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
     @acl_decorators.open_access
     def get(self):
         """Returns all skill IDs linked to some topic."""
@@ -304,6 +322,26 @@ class SkillDescriptionHandler(base.BaseHandler):
     """A data handler for checking if a skill with given description exists."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'skill_description': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_nonempty'
+                }, {
+                    'id': 'has_length_at_most',
+                    'max_value': (
+                        android_validation_constants
+                        .MAX_CHARS_IN_SKILL_DESCRIPTION
+                    )
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.can_create_skill
     def get(self, skill_description):
