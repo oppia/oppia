@@ -186,6 +186,5 @@ def validate_params_dict(params):
     Args:
         params: dict. Data that needs to be validated.
     """
-    for key in params.keys():
-        if not isinstance(key, str):
-            raise Exception('Excepted str, received %s' % key)
+    if not isinstance(params, dict):
+        raise Exception('Excepted dict, received %s' % params)
