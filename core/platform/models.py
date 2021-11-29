@@ -23,7 +23,6 @@ import inspect
 from types import ModuleType  # pylint: disable=import-only-modules
 
 from core import feconf
-from core import python_utils
 from core.constants import constants
 
 from typing import List, Tuple, Type
@@ -33,33 +32,35 @@ if MYPY: # pragma: no cover
     from mypy_imports import base_models  # pylint: disable=unused-import
 
 # Valid model names.
-class NAMES(enum.Enum):
-    activity = 'activity'
-    app_feedback_report = 'app_feedback_report'
-    audit = 'audit'
-    base_model = 'base_model'
-    beam_job = 'beam_job'
-    blog = 'blog'
-    classifier = 'classifier'
-    collection = 'collection'
-    config = 'config'
-    email = 'email'
-    exploration = 'exploration'
-    feedback = 'feedback'
-    improvements = 'improvements'
-    job = 'job'
-    opportunity = 'opportunity'
-    question = 'question'
-    recommendations = 'recommendations'
-    skill = 'skill'
-    statistics = 'statistics'
-    auth = 'auth'
-    story = 'story'
-    subtopic = 'subtopic'
-    suggestion = 'suggestion'
-    topic = 'topic'
-    translation = 'translation'
-    user = 'user'
+class NAMES(enum.Enum): # pylint: disable=invalid-name
+    """Enum for valid model names."""
+
+    activity = 'activity' # pylint: disable=invalid-name
+    app_feedback_report = 'app_feedback_report' # pylint: disable=invalid-name
+    audit = 'audit' # pylint: disable=invalid-name
+    base_model = 'base_model' # pylint: disable=invalid-name
+    beam_job = 'beam_job' # pylint: disable=invalid-name
+    blog = 'blog' # pylint: disable=invalid-name
+    classifier = 'classifier' # pylint: disable=invalid-name
+    collection = 'collection' # pylint: disable=invalid-name
+    config = 'config' # pylint: disable=invalid-name
+    email = 'email' # pylint: disable=invalid-name
+    exploration = 'exploration' # pylint: disable=invalid-name
+    feedback = 'feedback' # pylint: disable=invalid-name
+    improvements = 'improvements' # pylint: disable=invalid-name
+    job = 'job' # pylint: disable=invalid-name
+    opportunity = 'opportunity' # pylint: disable=invalid-name
+    question = 'question' # pylint: disable=invalid-name
+    recommendations = 'recommendations' # pylint: disable=invalid-name
+    skill = 'skill' # pylint: disable=invalid-name
+    statistics = 'statistics' # pylint: disable=invalid-name
+    auth = 'auth' # pylint: disable=invalid-name
+    story = 'story' # pylint: disable=invalid-name
+    subtopic = 'subtopic' # pylint: disable=invalid-name
+    suggestion = 'suggestion' # pylint: disable=invalid-name
+    topic = 'topic' # pylint: disable=invalid-name
+    translation = 'translation' # pylint: disable=invalid-name
+    user = 'user' # pylint: disable=invalid-name
 
 # Types of deletion policies. The pragma comment is needed because Enums are
 # evaluated as classes in Python and they should use PascalCase, but using

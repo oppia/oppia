@@ -33,9 +33,10 @@ from core.tests import test_utils
 
 DATA_TYPES = parameter_domain.DATA_TYPES # pylint: disable=invalid-name
 FEATURE_STAGES = parameter_domain.FEATURE_STAGES # pylint: disable=invalid-name
-class PARAM_NAMES(enum.Enum):
+class PARAM_NAMES(enum.Enum): # pylint: disable=invalid-name
     """Enum for parameter names."""
-    parameter_a = 'parameter_a'
+
+    parameter_a = 'parameter_a' # pylint: disable=invalid-name
 
 
 class PlatformParameterRegistryTests(test_utils.GenericTestBase):
@@ -89,9 +90,10 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         parameter.validate()
 
     def test_create_platform_parameter_with_invalid_type_failure(self):
-        class _data_type(enum.Enum):
+        class _data_type(enum.Enum): # pylint: disable=invalid-name
             """Enum for data type."""
-            invalid = 'invalid'
+
+            invalid = 'invalid' # pylint: disable=invalid-name
         with self.assertRaisesRegexp(
             Exception, 'Unsupported data type \'invalid\''):
             registry.Registry.create_platform_parameter(

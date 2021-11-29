@@ -19,7 +19,7 @@ from __future__ import annotations
 import datetime
 import enum
 
-from core import constants, feconf
+from core import feconf
 from core import utils
 from core.platform import models
 
@@ -44,17 +44,19 @@ GITHUB_REPO_CHOICES = PLATFORM_CHOICES
 
 # The model field names that can be filtered / sorted for when maintainers
 # triage feedback reports.
-class FILTER_FIELD_NAMES(enum.Enum):
-    platform = 'platform'
-    report_type = 'report_type'
-    entry_point = 'entry_point'
-    submitted_on = 'submitted_on'
-    android_device_model = 'android_device_model'
-    android_sdk_version = 'android_sdk_version'
-    text_language_code = 'text_language_code'
-    audio_language_code = 'audio_language_code'
-    platform_version = 'platform_version'
-    android_device_country_locale_code = 'android_device_country_locale_code'
+class FILTER_FIELD_NAMES(enum.Enum): # pylint: disable=invalid-name
+    """Enum for the model field names that can be filtered"""
+
+    platform = 'platform' # pylint: disable=invalid-name
+    report_type = 'report_type' # pylint: disable=invalid-name
+    entry_point = 'entry_point' # pylint: disable=invalid-name
+    submitted_on = 'submitted_on' # pylint: disable=invalid-name
+    android_device_model = 'android_device_model' # pylint: disable=invalid-name
+    android_sdk_version = 'android_sdk_version' # pylint: disable=invalid-name
+    text_language_code = 'text_language_code' # pylint: disable=invalid-name
+    audio_language_code = 'audio_language_code' # pylint: disable=invalid-name
+    platform_version = 'platform_version' # pylint: disable=invalid-name
+    android_device_country_locale_code = 'android_device_country_locale_code' # pylint: disable=invalid-name
 
 # An ID used for stats model entities tracking all unticketed reports.
 UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID = (
@@ -315,7 +317,9 @@ class AppFeedbackReportModel(base_models.BaseModel):
         return report_models
 
     @classmethod
-    def get_filter_options_for_field(cls, filter_field: FILTER_FIELD_NAMES) -> List[str]:
+    def get_filter_options_for_field(
+        cls, filter_field: FILTER_FIELD_NAMES
+        ) -> List[str]:
         """Fetches values that can be used to filter reports by.
 
         Args:

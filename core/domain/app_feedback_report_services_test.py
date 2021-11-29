@@ -730,7 +730,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                 self.assertEqual(
                     filter_obj.filter_options[0],
                     self.REPORT_SUBMITTED_TIMESTAMP.date())
-            elif filter_obj.filter_field == ( 
+            elif filter_obj.filter_field == (
                     constants.FILTER_FIELD_NAMES.android_device_model):
                 self.assertEqual(
                     filter_obj.filter_options[0], self.ANDROID_DEVICE_MODEL)
@@ -738,7 +738,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                     constants.FILTER_FIELD_NAMES.android_sdk_version):
                 self.assertEqual(
                     filter_obj.filter_options[0], self.ANDROID_SDK_VERSION)
-            elif filter_obj.filter_field == ( 
+            elif filter_obj.filter_field == (
                     constants.FILTER_FIELD_NAMES.text_language_code):
                 self.assertEqual(
                     filter_obj.filter_options[0],
