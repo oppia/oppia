@@ -14,12 +14,9 @@
 
 """Tests for question domain objects."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
-
 import datetime
 import re
-from typing import Any
+from typing import Any, Dict
 
 from core import feconf
 from core import utils
@@ -34,7 +31,7 @@ class QuestionChangeTest(test_utils.GenericTestBase):
 
     def test_to_dict(self) -> None:
         """Test to verify to_dict method of the Question Change object."""
-        expected_object_dict = {
+        expected_object_dict: Dict[str,str] = {
             'cmd': 'update_question_property',
             'property_name': 'question_state_data',
             'new_value': 'new_value',
@@ -47,6 +44,7 @@ class QuestionChangeTest(test_utils.GenericTestBase):
             'new_value': 'new_value',
             'old_value': 'old_value',
         }
+        # TODO(#14033): Remove the type ignore[no-untyped-call] when file change_domain is fully type-annotated. 
         observed_object = question_domain.QuestionChange( # type: ignore[no-untyped-call]
             change_dict=change_dict,
         ) 
@@ -57,6 +55,7 @@ class QuestionChangeTest(test_utils.GenericTestBase):
         """Test to verify __init__ method of the Question Change object
         when change_dict is without cmd key.
         """
+        # TODO(#xx2): Remove the type ignore[no-untyped-call] when file test_utils is fully type-annotated. 
         self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, 
             'Missing cmd key in change dict',
@@ -68,7 +67,8 @@ class QuestionChangeTest(test_utils.GenericTestBase):
         """Test to verify __init__ method of the Question Change object
         when change_dict is with wrong cmd value.
         """
-        self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        # TODO(#xx2): Remove the type ignore[no-untyped-call] when file test_utils is fully type-annotated.
+        self.assertRaisesRegexp( # type: ignore[no-untyped-call] 
             utils.ValidationError,
             'Command wrong is not allowed',
             callableObj=question_domain.QuestionChange,
@@ -79,6 +79,7 @@ class QuestionChangeTest(test_utils.GenericTestBase):
         """Test to verify __init__ method of the Question Change object
         when change_dict is with missing attributes in cmd.
         """
+        # TODO(#xx2): Remove the type ignore[no-untyped-call] when file test_utils is fully type-annotated.
         self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError,
             'The following required attributes are present: new_value',
@@ -94,6 +95,7 @@ class QuestionChangeTest(test_utils.GenericTestBase):
         """Test to verify __init__ method of the Question Change object
         when change_dict is with extra attributes in cmd.
         """
+        # TODO(#xx2): Remove the type ignore[no-untyped-call] when file test_utils is fully type-annotated.
         self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError,
             'The following extra attributes are present: invalid',
@@ -105,6 +107,7 @@ class QuestionChangeTest(test_utils.GenericTestBase):
         """Test to verify __init__ method of the Question Change object
         when cmd is update_question_property and wrong property_name is given.
         """
+        # TODO(#xx2): Remove the type ignore[no-untyped-call] when file test_utils is fully type-annotated.
         self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, (
                 'Value for property_name in cmd update_question_property: '
@@ -125,6 +128,7 @@ class QuestionChangeTest(test_utils.GenericTestBase):
         change_dict = {
             'cmd': 'create_new'
         }
+        # TODO(#14033): Remove the type ignore[no-untyped-call] when file change_domain is fully type-annotated. 
         observed_object = question_domain.QuestionChange( # type: ignore[no-untyped-call]
             change_dict=change_dict,
         )
@@ -141,6 +145,7 @@ class QuestionChangeTest(test_utils.GenericTestBase):
             'new_value': 'new_value',
             'old_value': 'old_value'
         }
+        # TODO(#14033): Remove the type ignore[no-untyped-call] when file change_domain is fully type-annotated. 
         observed_object = question_domain.QuestionChange( # type: ignore[no-untyped-call]
             change_dict=change_dict
         )
@@ -159,6 +164,7 @@ class QuestionChangeTest(test_utils.GenericTestBase):
             'question_dict': {},
             'skill_id': '10',
         }
+        # TODO(#14033): Remove the type ignore[no-untyped-call] when file change_domain is fully type-annotated. 
         observed_object = question_domain.QuestionChange( # type: ignore[no-untyped-call]
             change_dict=change_dict,
         )
@@ -177,6 +183,7 @@ class QuestionChangeTest(test_utils.GenericTestBase):
             'from_version': 0,
             'to_version': 10,
         }
+        # TODO(#14033): Remove the type ignore[no-untyped-call] when file change_domain is fully type-annotated. 
         observed_object = question_domain.QuestionChange( # type: ignore[no-untyped-call]
             change_dict=change_dict,
         )
@@ -205,6 +212,7 @@ class QuestionSuggestionChangeTest(test_utils.GenericTestBase):
             'skill_id': 'skill_1',
             'skill_difficulty': '0.3'
         }
+        # TODO(#14033): Remove the type ignore[no-untyped-call] when file change_domain is fully type-annotated. 
         observed_object = question_domain.QuestionSuggestionChange( # type: ignore[no-untyped-call]
             change_dict=change_dict,
         )
@@ -215,6 +223,7 @@ class QuestionSuggestionChangeTest(test_utils.GenericTestBase):
         """Test to verify __init__ method of the QuestionSuggestionChange
         object when change_dict is without cmd key.
         """
+        # TODO(#xx2): Remove the type ignore[no-untyped-call] when file test_utils is fully type-annotated.
         self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Missing cmd key in change dict',
@@ -226,6 +235,7 @@ class QuestionSuggestionChangeTest(test_utils.GenericTestBase):
         """Test to verify __init__ method of the QuestionSuggestionChange object
         when change_dict is with wrong cmd value.
         """
+        # TODO(#xx2): Remove the type ignore[no-untyped-call] when file test_utils is fully type-annotated.
         self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Command wrong is not allowed',
@@ -237,6 +247,7 @@ class QuestionSuggestionChangeTest(test_utils.GenericTestBase):
         """Test to verify __init__ method of the QuestionSuggestionChange object
         when change_dict is with missing attributes in cmd.
         """
+        # TODO(#xx2): Remove the type ignore[no-untyped-call] when file test_utils is fully type-annotated.
         self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError,
             'The following required attributes are present: new_value',
@@ -251,6 +262,7 @@ class QuestionSuggestionChangeTest(test_utils.GenericTestBase):
         """Test to verify __init__ method of the QuestionSuggestionChange object
         when change_dict is with extra attributes in cmd.
         """
+        # TODO(#xx2): Remove the type ignore[no-untyped-call] when file test_utils is fully type-annotated.
         self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError,
             'The following extra attributes are present: invalid',
@@ -274,6 +286,7 @@ class QuestionSuggestionChangeTest(test_utils.GenericTestBase):
             'skill_id': '10',
             'skill_difficulty': '0.3',
         }
+        # TODO(#14033): Remove the type ignore[no-untyped-call] when file change_domain is fully type-annotated.
         observed_object = question_domain.QuestionSuggestionChange( # type: ignore[no-untyped-call]
             change_dict=change_dict,
         )
@@ -290,6 +303,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
     def setUp(self) -> None:
         """Before each individual test, create a question."""
         super(QuestionDomainTest, self).setUp()
+        # TODO(#xx2): Remove the type ignore[no-untyped-call] when file test_utils is fully type-annotated.
         question_state_data = self._create_valid_question_data('ABC') # type: ignore[no-untyped-call]
         self.question = question_domain.Question(
             'question_id', question_state_data,
@@ -304,6 +318,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             question_domain.Question.create_default_question_state())
         question_dict: QuestionInstanceDict = {
             'id': 'col1.random',
+            # TODO(#xx2): Remove the type ignore[no-untyped-call] when file test_utils is fully type-annotated.
             'question_state_data': default_question_state_data.to_dict(), # type: ignore[no-untyped-call]
             'question_state_data_schema_version': (
                 feconf.CURRENT_STATE_SCHEMA_VERSION),
@@ -316,8 +331,10 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         observed_object = question_domain.Question.from_dict(question_dict)
         self.assertEqual(question_dict, observed_object.to_dict())
 
+    # Signature of "_assert_validation_error" incompatible with supertype "TestBase"
     def _assert_validation_error(self, expected_error_substring: Any) -> None: # type: ignore[override]
         """Checks that the skill passes strict validation."""
+        # TODO(#xx2): Remove the type ignore[no-untyped-call] when file test_utils is fully type-annotated.
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring
         ):
@@ -348,6 +365,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         state = self.question.question_state_data
         state.interaction.default_outcome.labelled_as_correct = False
         state.interaction.answer_groups = [
+            # TODO(#14033): Remove the type ignore[no-untyped-call] when file state_domain is fully type-annotated.
             state_domain.AnswerGroup.from_dict({ # type: ignore[no-untyped-call]
                 'outcome': {
                     'dest': 'abc',
@@ -376,33 +394,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
         self._assert_validation_error(
             'Expected all answer groups to have destination as None.')
-
-    # TODO: Remove this test after the backend is fully type-annotated. 
-    # Here ignore[list-item] is used to test inapplicable_skill_misconception_ids 
-    # value for invalid list type.
-    def test_validate_invalid_list_of_inapplicable_skill_misconception_ids(
-            self) -> None:
-        """Test to verify that the validation fails when
-        inapplicable_skill_misconception_ids value is an invalid list.
-        """
-        self.question.inapplicable_skill_misconception_ids = ['Test', 1] # type: ignore[list-item]
-        self._assert_validation_error(
-            re.escape(
-                'Expected inapplicable_skill_misconception_ids to be a list of '
-                'strings, received [\'Test\', 1]'))
-
-    # TODO: Remove this test after the backend is fully type-annotated. 
-    # Here ignore[assignment] is used to test inapplicable_skill_misconception_ids 
-    # value for invalid type.
-    def test_validate_invalid_type_of_inapplicable_skill_misconception_ids(
-            self) -> None:
-        """Test to verify that the validation fails when
-        inapplicable_skill_misconception_ids value is an invalid type.
-        """
-        self.question.inapplicable_skill_misconception_ids = 123 # type: ignore[assignment]
-        self._assert_validation_error(
-            'Expected inapplicable_skill_misconception_ids to be a list of '
-            'strings, received 123')
 
     def test_validate_invalid_format_of_inapplicable_skill_misconception_ids(
             self) -> None:
@@ -433,9 +424,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         """
         self.question.validate()
 
-    # TODO: Remove this test after the backend is fully type-annotated. 
-    # Here ignore[assignment] is used to test Question domain object
-    # attributes for invalid type.
     def test_not_strict_validation(self) -> None:
         """Test to verify validate method of Question domain object with
         strict as False.
@@ -443,42 +431,13 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self.question.language_code = 'abc'
         self._assert_validation_error('Invalid language code')
 
-        self.question.question_state_data = 'State data' # type: ignore[assignment]
-        self._assert_validation_error(
-            'Expected question state data to be a State object')
-
-        self.question.question_state_data_schema_version = 'abc' # type: ignore[assignment]
-        self._assert_validation_error(
-            'Expected schema version to be an integer')
-
-        self.question.linked_skill_ids = 'Test' # type: ignore[assignment]
-        self._assert_validation_error(
-            'Expected linked_skill_ids to be a list of strings')
-
-        self.question.linked_skill_ids = None # type: ignore[assignment]
-        self._assert_validation_error(
-            'inked_skill_ids is either null or an empty list')
-
         self.question.linked_skill_ids = [] 
         self._assert_validation_error(
             'linked_skill_ids is either null or an empty list')
 
-        self.question.linked_skill_ids = ['Test', 1] # type: ignore[list-item]
-        self._assert_validation_error(
-            'Expected linked_skill_ids to be a list of strings')
-
         self.question.linked_skill_ids = ['skill1', 'skill1']
         self._assert_validation_error(
             'linked_skill_ids has duplicate skill ids')
-
-        self.question.language_code = 1 # type: ignore[assignment]
-        self._assert_validation_error('Expected language_code to be a string')
-
-        self.question.version = 'abc' # type: ignore[assignment]
-        self._assert_validation_error('Expected version to be an integer')
-
-        self.question.id = 123 # type: ignore[assignment]
-        self._assert_validation_error('Expected ID to be a string')
 
     def test_create_default_question(self) -> None:
         """Test to verify create_default_question method of the Question domain
@@ -489,10 +448,12 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         question = question_domain.Question.create_default_question(
             question_id, skill_ids)
         default_question_data = (
+            # TODO(#14033): Remove the type ignore[no-untyped-call] when file state_domain is fully type-annotated.
             question_domain.Question.create_default_question_state().to_dict()) # type: ignore[no-untyped-call]
 
         self.assertEqual(question.id, question_id)
         self.assertEqual(
+            # TODO(#14033): Remove the type ignore[no-untyped-call] when file state_domain is fully type-annotated.
             question.question_state_data.to_dict(), default_question_data) # type: ignore[no-untyped-call]
         self.assertEqual(question.language_code, 'en')
         self.assertEqual(question.version, 0)
@@ -531,12 +492,14 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         """Test to verify update_question_state_data method of the Question
         domain object.
         """
+        # TODO(#xx2): Remove the type ignore[no-untyped-call] when file test_utils is fully type-annotated.
         question_state_data = self._create_valid_question_data('Test') # type: ignore[no-untyped-call]
 
         self.question.update_question_state_data(question_state_data)
 
         self.assertEqual(
             question_state_data.to_dict(),
+            # TODO(#14033): Remove the type ignore[no-untyped-call] when file state_domain is fully type-annotated.
             self.question.question_state_data.to_dict() # type: ignore[no-untyped-call]
         )
 
@@ -579,77 +542,13 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
     def test_validation_with_valid_properties(self) -> None:
         self.observed_object.validate()
 
-    # TODO: Remove this test after the backend is fully type-annotated. 
-    # Here ignore[assignment] is used to test id value for invalid type.
-    def test_validation_with_invalid_id(self) -> None:
-        self.observed_object.id = 1 # type: ignore[assignment]
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-            utils.ValidationError, 'Expected id to be a string, received 1'):
-            self.observed_object.validate()
-
-    # TODO: Remove this test after the backend is fully type-annotated. 
-    # Here ignore[assignment] is used to test interaction id value for invalid type.
-    def test_validation_with_invalid_interaction_id(self) -> None:
-        self.observed_object.interaction_id = 1 # type: ignore[assignment]
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-            utils.ValidationError,
-            'Expected interaction id to be a string, received 1'):
-            self.observed_object.validate()
-
     def test_validation_with_invalid_question_content(self) -> None:
         self.observed_object.question_content = 1
+        # TODO(#xx2): Remove the type ignore[no-untyped-call] when file test_utils is fully type-annotated.
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected question content to be a string, received 1'):
             self.observed_object.validate()
-
-    # TODO: Remove this test after the backend is fully type-annotated. 
-    # Here ignore[assignment] is used to test datetime value for invalid type.
-    def test_validation_with_invalid_created_on(self) -> None:
-        self.observed_object.created_on = 1 # type: ignore[assignment]
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-            utils.ValidationError,
-            'Expected created on to be a datetime, received 1'):
-            self.observed_object.validate()
-
-    # TODO: Remove this test after the backend is fully type-annotated. 
-    # Here ignore[assignment] is used to test datetime value for invalid type.
-    def test_validation_with_invalid_last_updated(self) -> None:
-        self.observed_object.last_updated = 1 # type: ignore[assignment]
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-            utils.ValidationError,
-            'Expected last updated to be a datetime, received 1'):
-            self.observed_object.validate()
-
-    # TODO: Remove this test after the backend is fully type-annotated. 
-    # Here ignore[assignment] is used to test misconception_ids 
-    # value for invalid list type.
-    def test_validate_invalid_list_of_misconception_ids(self) -> None:
-        """Test to verify that the validation fails when
-        misconception_ids value is an invalid list.
-        """
-        self.observed_object.misconception_ids = ['Test', 1] # type: ignore[list-item]
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-            utils.ValidationError,
-            re.escape(
-                'Expected misconception ids to be a list of strings, '
-                'received [\'Test\', 1]')):
-            self.observed_object.validate()
-
-    # TODO: Remove this test after the backend is fully type-annotated. 
-    # Here ignore[assignment] is used to test misconception_ids 
-    # value for invalid type.
-    def test_validate_invalid_type_of_misconception_ids(self) -> None:
-        """Test to verify that the validation fails when
-        misconception_ids value is an invalid type.
-        """
-        self.observed_object.misconception_ids = 123 # type: ignore[assignment]
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-            utils.ValidationError,
-            'Expected misconception ids to be a list of strings, '
-            'received 123'):
-            self.observed_object.validate()
-
 
 class QuestionSkillLinkDomainTest(test_utils.GenericTestBase):
     """Test for Question Skill Link Domain object."""

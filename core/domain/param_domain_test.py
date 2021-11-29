@@ -16,9 +16,6 @@
 
 """Tests for parameter domain objects."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
-
 from core import utils
 from core.domain import param_domain
 from core.tests import test_utils
@@ -30,10 +27,12 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
     def test_param_spec_validation(self) -> None:
         """Test validation of param specs."""
         param_spec = param_domain.ParamSpec('FakeType')
+        # TODO(#xx2): Remove the type ignore[no-untyped-call] when file test_utils is fully type-annotated. 
         with self.assertRaisesRegexp(TypeError, 'is not a valid object class'): # type: ignore[no-untyped-call]
             param_spec.validate()
 
         param_spec.obj_type = 'Real'
+        # TODO(#xx2): Remove the type ignore[no-untyped-call] when file test_utils is fully type-annotated. 
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, 'is not among the supported object types'
         ):
@@ -43,49 +42,6 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
         param_spec.obj_type = 'UnicodeString'
         param_spec.validate()
 
-    # TODO(#XXXXX): Remove some of the test in the method after the backend is fully type-annotated.
-    # Here ignore[arg-type] and ignore[dict-item] is used to test invalid types.
-    def test_param_change_validation(self) -> None:
-        """Test validation of parameter changes."""
-        # Raise an error because the name is invalid.
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-            utils.ValidationError, 'Only parameter names'
-        ):
-            param_domain.ParamChange('¡hola', 'Copier', {}).validate()
-
-        # Raise an error because generator ID is not string.
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-            utils.ValidationError, 'Expected generator ID to be a string'
-        ):
-            param_domain.ParamChange('abc', 123, {}).validate() # type: ignore[arg-type]
-
-        # Raise an error because no such generator type exists.
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-            utils.ValidationError, 'Invalid generator ID'
-        ):
-            param_domain.ParamChange('abc', 'InvalidGenerator', {}).validate()
-
-        # Raise an error because customization_args is not a dict.
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-            utils.ValidationError, 'Expected a dict'
-        ):
-            param_domain.ParamChange('abc', 'Copier', ['a', 'b']).validate() # type: ignore[arg-type]
-
-        # Raise an error because the param_change name is not a string.
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-            utils.ValidationError,
-            'Expected param_change name to be a string, received'
-        ):
-            param_domain.ParamChange(3, 'Copier', {}).validate() # type: ignore[arg-type]
-
-        # Raise an error because the arg names in customization_args are not
-        # strings.
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-            Exception, 'Invalid parameter change customization_arg name:'):
-            param_domain.ParamChange('abc', 'Copier', {1: '1'}).validate() # type: ignore[dict-item]
-
-    # TODO: Remove the last test in the method after the backend is fully type-annotated.
-    # Here ignore[arg-type] is used to test invalid types.
     def test_param_change_class(self) -> None:
         """Test the ParamChange class."""
         param_change = param_domain.ParamChange(
@@ -97,4 +53,3 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
             'generator_id': 'Copier',
             'customization_args': {'value': '3'}
         })
-        self.assertEqual(param_change.get_normalized_value('Int', {}), 3) # type: ignore[arg-type]

@@ -16,13 +16,11 @@
 
 """Domain objects relating to parameters."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
-
 import re
 
-from typing import Dict
 from typing_extensions import TypedDict
+
+from typing import Dict
 
 from core import feconf
 from core import python_utils
@@ -31,10 +29,11 @@ from core.domain import object_registry
 from core.domain import value_generators_domain
 from value_generators_domain import BaseValueGenerator
 
-class ParamChangeDict(TypedDict):
+# TypedDict used for MyPy Type annotations
+class ParamChange_dict(TypedDict):
     name: str
     generator_id: str
-    customization_args: Dict[str, str]
+    customization_args: Dict[str,str]
 
 class ParamSpec:
     """Value object for an exploration parameter specification."""
@@ -52,7 +51,7 @@ class ParamSpec:
         """
         self.obj_type = obj_type
 
-    def to_dict(self) -> Dict[str, str]:
+    def to_dict(self) -> Dict[str,str]:
         """Returns a dict representation of this ParamSpec.
 
         Returns:
@@ -64,7 +63,7 @@ class ParamSpec:
         }
 
     @classmethod
-    def from_dict(cls, param_spec_dict: Dict[str, str]) -> ParamSpec:
+    def from_dict(cls, param_spec_dict: Dict[str,str]) -> ParamSpec:
         """Creates a ParamSpec object from its dict representation.
 
         Args:
@@ -95,7 +94,7 @@ class ParamSpec:
 class ParamChange:
     """Value object for a parameter change."""
 
-    def __init__(self, name: str, generator_id: str, customization_args: Dict[str, str]) -> None:
+    def __init__(self, name: str, generator_id: str, customization_args: Dict[str,str]) -> None:
         """Initialize a ParamChange object with the specified arguments.
 
         Args:
@@ -138,7 +137,7 @@ class ParamChange:
             self._generator_id)()
 
     @property
-    def customization_args(self) -> Dict[str, str]:
+    def customization_args(self) -> Dict[str,str]:
         """A dict containing several arguments that determine the changing value
         of the parameter.
 
@@ -202,22 +201,12 @@ class ParamChange:
         return object_registry.Registry.get_object_class_by_type(  # type: ignore[no-untyped-call]
             obj_type).normalize(raw_value)
 
-    # Module in python.utils has no attribute BASESTRING
     def validate(self) -> None:
         """Checks that the properties of this ParamChange object are valid."""
-        if not isinstance(self.name, python_utils.BASESTRING): # type: ignore[attr-defined]
-            raise utils.ValidationError(
-                'Expected param_change name to be a string, received %s'
-                % self.name)
         if not re.match(feconf.ALPHANUMERIC_REGEX, self.name):
             raise utils.ValidationError(
                 'Only parameter names with characters in [a-zA-Z0-9] are '
                 'accepted.')
-
-        if not isinstance(self._generator_id, python_utils.BASESTRING): # type: ignore[attr-defined]
-            raise utils.ValidationError(
-                'Expected generator ID to be a string, received %s '
-                % self._generator_id)
 
         try:
             hasattr(self, 'generator')
@@ -229,8 +218,5 @@ class ParamChange:
             raise utils.ValidationError(
                 'Expected a dict of customization_args, received %s'
                 % self.customization_args)
-        for arg_name in self.customization_args:
-            if not isinstance(arg_name, python_utils.BASESTRING): # type: ignore[attr-defined]
-                raise Exception(
-                    'Invalid parameter change customization_arg name: %s'
-                    % arg_name)
+
+

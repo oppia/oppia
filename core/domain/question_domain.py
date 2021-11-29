@@ -16,9 +16,6 @@
 
 """Domain objects relating to questions."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
-
 import collections
 import copy
 import datetime
@@ -68,7 +65,6 @@ CMD_REMOVE_QUESTION_SKILL = 'remove_question_skill'
 
 CMD_CREATE_NEW = 'create_new'
 
-# TypedDict used for MyPy Type annotations
 class QuestionInstanceDict(TypedDict):
     id: str
     question_state_data: state_domain.State
@@ -124,7 +120,7 @@ class QuestionChange(change_domain.BaseChange):
         QUESTION_PROPERTY_LINKED_SKILL_IDS,
         QUESTION_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS)
 
-    ALLOWED_COMMANDS = [{
+    ALLOWED_COMMANDS: List[Dict[str,Any]] = [{
         'name': CMD_CREATE_NEW,
         'required_attribute_names': [],
         'optional_attribute_names': [],
@@ -218,6 +214,7 @@ class Question:
         """
         return {
             'id': self.id,
+            # TODO(#14033): Remove the type ignore[no-any-return] when file state_domain is fully type-annotated.
             'question_state_data': self.question_state_data.to_dict(), # type: ignore[no-untyped-call]
             'question_state_data_schema_version': (
                 self.question_state_data_schema_version),
@@ -228,8 +225,6 @@ class Question:
                 self.inapplicable_skill_misconception_ids)
         }
 
-    # TODO: Remove the type ignore[no-any-return] when file state_domain is fully type-annotated. 
-
     @classmethod
     def create_default_question_state(cls) -> state_domain.State:
         """Return a State domain object with default value for being used as
@@ -238,9 +233,13 @@ class Question:
         Returns:
             State. The corresponding State domain object.
         """
+        # TODO(#14033): Remove the type ignores when file state_domain is fully type-annotated. 
         return state_domain.State.create_default_state( # type: ignore[no-untyped-call,no-any-return]
             None, is_initial_state=True)
 
+    # The argument question_state_dict in each of the following convert functions is always 
+    # a dictionnary, but it doesn't always have the same keys. So in this specific case, we use
+    # a Dict[Str,Any] annotation.
     @classmethod
     def _convert_state_v27_dict_to_v28_dict(cls, 
     question_state_dict: Dict[str,Any]) -> Dict[str,Any]:
@@ -393,6 +392,7 @@ class Question:
         Returns:
             dict. The converted question_state_dict.
         """
+        # TODO(#14033): Remove the type ignore[no-untyped-call] when file state_domain is fully type-annotated. 
         question_state_dict = state_domain.State.convert_html_fields_in_state( # type: ignore[no-untyped-call]
             question_state_dict,
             html_validation_service.add_math_content_to_math_rte_components,
@@ -431,7 +431,7 @@ class Question:
                 new_answer_group = copy.deepcopy(group)
                 for rule_spec in new_answer_group['rule_specs']:
                     rule_input = ltt.latex_to_text(rule_spec['inputs']['x'])
-
+                    # TODO(#14033): Remove the type ignore[no-untyped-call] when file exp_domain is fully type-annotated. 
                     rule_input = exp_domain.clean_math_expression( # type: ignore[no-untyped-call]
                         rule_input)
 
@@ -521,6 +521,7 @@ class Question:
                 if question_state_dict['interaction']['solution']:
                     correct_answer = question_state_dict['interaction'][
                         'solution']['correct_answer']['ascii']
+                    # TODO(#14033): Remove the type ignore[no-untyped-call] when file exp_domain is fully type-annotated. 
                     correct_answer = exp_domain.clean_math_expression( # type: ignore[no-untyped-call]
                         correct_answer)
                     question_state_dict['interaction'][
@@ -626,12 +627,14 @@ class Question:
         # interaction_specs.json to ensure that this migration remains
         # stable even when interaction_specs.json is changed.
         ca_specs = [
+            # TODO(#xxx): Remove the type ignore[no-untyped-call] when file domain is fully type-annotated. 
             domain.CustomizationArgSpec( # type: ignore[no-untyped-call]
                 ca_spec_dict['name'],
                 ca_spec_dict['description'],
                 ca_spec_dict['schema'],
                 ca_spec_dict['default_value']
             ) for ca_spec_dict in (
+                # TODO(#xx1): Remove the type ignore[no-untyped-call] when file interaction_registry is fully type-annotated. 
                 interaction_registry.Registry # type: ignore[no-untyped-call]
                 .get_all_specs_for_state_schema_version(36)[
                     interaction_id]['customization_arg_specs']
@@ -696,6 +699,7 @@ class Question:
             elif ca_name not in ca_dict:
                 ca_dict[ca_name] = {'value': ca_spec.default_value}
 
+        # TODO(#xx1): Remove the type ignore[no-untyped-call] when file customization_args_util is fully type-annotated. 
         (
             customization_args_util # type: ignore[no-untyped-call]
             .validate_customization_args_and_values(
@@ -763,6 +767,7 @@ class Question:
                     'interaction']['answer_groups']:
                 for rule_spec in group['rule_specs']:
                     rule_input = rule_spec['inputs']['x']
+                    # TODO(#xx1): Remove the type ignore[no-untyped-call] when file expression_parser is fully type-annotated. 
                     for variable in expression_parser.get_variables( # type: ignore[no-untyped-call]
                             rule_input):
                         # Replacing greek letter names with greek symbols.
@@ -1187,6 +1192,7 @@ class Question:
             dict. The converted states_dict.
         """
 
+        # TODO(#14033): Remove the type ignore[no-untyped-call] when file state_domain is fully type-annotated. 
         state_domain.State.convert_html_fields_in_state( # type: ignore[no-untyped-call]
             question_state_dict,
             html_validation_service.convert_svg_diagram_tags_to_image_tags)
@@ -1206,7 +1212,7 @@ class Question:
         Returns:
             dict. The converted states_dict.
         """
-
+        # TODO(#14033): Remove the type ignore[no-untyped-call] when file state_domain is fully type-annotated. 
         state_domain.State.convert_html_fields_in_state( # type: ignore[no-untyped-call]
             question_state_dict,
             html_validation_service.fix_incorrectly_encoded_chars)
@@ -1265,43 +1271,21 @@ class Question:
         versioned_question_state['state'] = conversion_fn(
             versioned_question_state['state'])
 
-    # Module in python.utils has no attribute BASESTRING
     def partial_validate(self) -> None:
         """Validates the Question domain object, but doesn't require the
         object to contain an ID and a version. To be used to validate the
         question before it is finalized.
         """
 
-        if not isinstance(self.language_code, python_utils.BASESTRING): # type: ignore[attr-defined]
-            raise utils.ValidationError(
-                'Expected language_code to be a string, received %s' %
-                self.language_code)
-
         if not self.linked_skill_ids:
             raise utils.ValidationError(
                 'linked_skill_ids is either null or an empty list')
-
-        if not (isinstance(self.linked_skill_ids, list) and (
-                all(isinstance(
-                    elem, python_utils.BASESTRING) for elem in ( # type: ignore[attr-defined]
-                        self.linked_skill_ids)))):
-            raise utils.ValidationError(
-                'Expected linked_skill_ids to be a list of strings, '
-                'received %s' % self.linked_skill_ids)
 
         if len(set(self.linked_skill_ids)) != len(self.linked_skill_ids):
             raise utils.ValidationError(
                 'linked_skill_ids has duplicate skill ids')
         inapplicable_skill_misconception_ids_is_list = isinstance(
             self.inapplicable_skill_misconception_ids, list)
-        if not (inapplicable_skill_misconception_ids_is_list and (
-                all(isinstance(
-                    elem, python_utils.BASESTRING) for elem in ( # type: ignore[attr-defined]
-                        self.inapplicable_skill_misconception_ids)))):
-            raise utils.ValidationError(
-                'Expected inapplicable_skill_misconception_ids to be a list '
-                'of strings, received %s'
-                % self.inapplicable_skill_misconception_ids)
 
         if not (all(
                 re.match(
@@ -1331,6 +1315,7 @@ class Question:
             raise utils.ValidationError(
                 'Invalid language code: %s' % self.language_code)
 
+        # TODO(#xx1): Remove the type ignore[no-untyped-call] when file interaction_registry is fully type-annotated. 
         interaction_specs = interaction_registry.Registry.get_all_specs() # type: ignore[no-untyped-call]
         at_least_one_correct_answer = False
         dest_is_specified = False
@@ -1368,15 +1353,11 @@ class Question:
             raise utils.ValidationError(
                 'Expected the question to have a solution'
             )
+        # TODO(#14033): Remove the type ignore[no-untyped-call] when file state_domain is fully type-annotated. 
         self.question_state_data.validate({}, False) # type: ignore[no-untyped-call]
 
-    # Module in python.utils has no attribute BASESTRING
     def validate(self) -> None:
         """Validates the Question domain object before it is saved."""
-
-        if not isinstance(self.id, python_utils.BASESTRING): # type: ignore[attr-defined]
-            raise utils.ValidationError(
-                'Expected ID to be a string, received %s' % self.id)
 
         if not isinstance(self.version, int):
             raise utils.ValidationError(
@@ -1394,6 +1375,7 @@ class Question:
         """
         question = cls(
             question_dict['id'],
+            # TODO(#14033): Remove the type ignore[no-untyped-call] when file state_domain is fully type-annotated. 
             state_domain.State.from_dict(question_dict['question_state_data']), # type: ignore[no-untyped-call]
             question_dict['question_state_data_schema_version'],
             question_dict['language_code'], question_dict['version'],
@@ -1483,6 +1465,7 @@ class QuestionSummary:
                 when the question model was last updated.
         """
         self.id = question_id
+        # TODO(#xxx): Remove the type ignore[no-untyped-call] when file html_cleaner is fully type-annotated. 
         self.question_content = html_cleaner.clean(question_content) # type: ignore[no-untyped-call]
         self.misconception_ids = misconception_ids
         self.interaction_id = interaction_id
@@ -1506,7 +1489,6 @@ class QuestionSummary:
             'misconception_ids': self.misconception_ids
         }
 
-    # Module in python.utils has no attribute BASESTRING
     def validate(self) -> None:
         """Validates the Question summary domain object before it is saved.
 
@@ -1514,19 +1496,6 @@ class QuestionSummary:
             ValidationError. One or more attributes of question summary are
                 invalid.
         """
-        if not isinstance(self.id, python_utils.BASESTRING): # type: ignore[attr-defined]
-            raise utils.ValidationError(
-                'Expected id to be a string, received %s' % self.id)
-
-        if not isinstance(self.question_content, python_utils.BASESTRING): # type: ignore[attr-defined]
-            raise utils.ValidationError(
-                'Expected question content to be a string, received %s' %
-                self.question_content)
-
-        if not isinstance(self.interaction_id, python_utils.BASESTRING): # type: ignore[attr-defined]
-            raise utils.ValidationError(
-                'Expected interaction id to be a string, received %s' %
-                self.interaction_id)
 
         if not isinstance(self.created_on, datetime.datetime):
             raise utils.ValidationError(
@@ -1537,13 +1506,6 @@ class QuestionSummary:
             raise utils.ValidationError(
                 'Expected last updated to be a datetime, received %s' %
                 self.last_updated)
-
-        if not (isinstance(self.misconception_ids, list) and (
-                all(isinstance(elem, python_utils.BASESTRING) for elem in ( # type: ignore[attr-defined]
-                    self.misconception_ids)))):
-            raise utils.ValidationError(
-                'Expected misconception ids to be a list of '
-                'strings, received %s' % self.misconception_ids)
 
 
 class QuestionSkillLink:
@@ -1630,3 +1592,4 @@ class MergedQuestionSkillLink:
             'skill_descriptions': self.skill_descriptions,
             'skill_difficulties': self.skill_difficulties,
         }
+
