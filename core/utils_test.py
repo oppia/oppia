@@ -63,10 +63,10 @@ class UtilsTests(test_utils.GenericTestBase):
 
     def test_yaml_dict_conversion(self) -> None:
         """Test yaml_from_dict and dict_from_yaml methods."""
-        test_dicts = [{}, {'a': 'b'}, {'a': 2}, {'a': ['b', 2, {'c': 3.5}]}]
+        test_dicts: List[Dict[str, Any]] = [{}, {'a': 'b'}, {'a': 2}, {'a': ['b', 2, {'c': 3.5}]}]
 
         for adict in test_dicts:
-            yaml_str = utils.yaml_from_dict(adict)  # type: ignore
+            yaml_str = utils.yaml_from_dict(adict)
 
             yaml_dict = utils.dict_from_yaml(yaml_str)
             self.assertEqual(adict, yaml_dict)
