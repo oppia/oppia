@@ -1,4 +1,4 @@
-name: Frontend Karma tests
+name: Lint Checks
 on:
   push:
     branches:
@@ -10,11 +10,12 @@ on:
       - release-*
 
 jobs:
-  frontend:
+  lint:
     runs-on:  ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-18.04]
+        shard: ['1', 'other']
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
@@ -34,12 +35,9 @@ jobs:
             ${{ runner.os }}-build-
             ${{ runner.os }}-
       - uses: ./.github/actions/install-oppia-dependencies
-      - name: Suppress ENOSPC error from chokidar file watcher. See https://stackoverflow.com/a/32600959.
-        run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
-      - name: Run frontend tests
-        run: PYTHONIOENCODING=utf-8 python -m scripts.run_frontend_tests --run_minified_tests --skip_install --check_coverage
-        if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
-        uses: ./.github/actions/send-webhook-notification
-        with:
-          message: "A frontend test failed on the upstream develop branch."
-          webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
+      - name: Third Party Size Check
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        run: python -m scripts.third_party_size_check
+      - name: Run Lint Checks
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        run: PYTHONIOENCODING=utf-8 python -m scripts.linters.pre_commit_linter --shard ${{ matrix.shard }} --verbose
