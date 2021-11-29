@@ -1133,7 +1133,7 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
         self.assertEqual(
             firebase_auth_services.get_auth_claims_from_request(
                 self.create_request(session_cookie=cookie)),
-            auth_domain.AuthClaims(self.AUTH_ID, self.EMAIL, False)) # type: ignore[no-untyped-call]
+            auth_domain.AuthClaims(self.AUTH_ID, self.EMAIL, False))
 
     def test_feconf_admin_email_address_is_super_admin(self) -> None:
         cookie = firebase_auth.create_session_cookie(
@@ -1144,7 +1144,7 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
         self.assertEqual(
             firebase_auth_services.get_auth_claims_from_request(
                 self.create_request(session_cookie=cookie)),
-            auth_domain.AuthClaims( # type: ignore[no-untyped-call]
+            auth_domain.AuthClaims(
                 self.AUTH_ID, feconf.ADMIN_EMAIL_ADDRESS, True))
 
     def test_raises_stale_auth_session_error_when_cookie_is_expired(
