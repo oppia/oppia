@@ -389,6 +389,7 @@ class BulkEmailModel(base_models.BaseModel):
         return dict(super(cls, cls).get_export_policy(), **{
             'sender_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'sender_email': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'recipient_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'intent': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'subject': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'html_body': base_models.EXPORT_POLICY.NOT_APPLICABLE,
