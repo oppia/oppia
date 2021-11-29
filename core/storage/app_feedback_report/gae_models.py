@@ -44,6 +44,7 @@ GITHUB_REPO_CHOICES = PLATFORM_CHOICES
 
 # The model field names that can be filtered / sorted for when maintainers
 # triage feedback reports.
+
 class FILTER_FIELD_NAMES(enum.Enum): # pylint: disable=invalid-name
     """Enum for the model field names that can be filtered"""
 
@@ -59,6 +60,7 @@ class FILTER_FIELD_NAMES(enum.Enum): # pylint: disable=invalid-name
     android_device_country_locale_code = 'android_device_country_locale_code' # pylint: disable=invalid-name
 
 # An ID used for stats model entities tracking all unticketed reports.
+
 UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID = (
     'unticketed_android_reports_stats_ticket_id')
 
