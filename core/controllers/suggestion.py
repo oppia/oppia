@@ -485,11 +485,19 @@ def _construct_exploration_suggestions(suggestions):
 
     suggestion_dicts = []
     for suggestion in suggestions:
-        content_html = exp_id_to_exp[suggestion.target_id].get_content_html(
-            suggestion.change.state_name, suggestion.change.content_id)
-        suggestion_dict = suggestion.to_dict()
-        suggestion_dict['exploration_content_html'] = content_html
-        suggestion_dicts.append(suggestion_dict)
+        available_states = exp_id_to_exp[suggestion.target_id].states
+        available_content_ids = []
+
+        if suggestion.change.state_name in available_states:
+            available_content_ids = available_states[
+                suggestion.change.state_name]._get_all_translatable_content()
+
+        if suggestion.change.content_id in available_content_ids:
+            content_html = exp_id_to_exp[suggestion.target_id].get_content_html(
+                suggestion.change.state_name, suggestion.change.content_id)
+            suggestion_dict = suggestion.to_dict()
+            suggestion_dict['exploration_content_html'] = content_html
+            suggestion_dicts.append(suggestion_dict)
     return suggestion_dicts
 
 
