@@ -31,9 +31,6 @@ angular.module('oppia').controller('AddWorkedExampleModalController', [
       $uibModalInstance: $uibModalInstance
     });
 
-    $scope.MAX_CHARS_IN_SKILL_WORKED_EXAMPLE_EDITOR =
-      MAX_CHARS_IN_SKILL_WORKED_EXAMPLE_EDITOR;
-
     $scope.WORKED_EXAMPLE_FORM_SCHEMA = {
       type: 'html',
       ui_config: {}
@@ -44,11 +41,11 @@ angular.module('oppia').controller('AddWorkedExampleModalController', [
 
     $scope.isWorkedExampleQuestionHtmlLengthExceeded = () =>
       $scope.tmpWorkedExampleQuestionHtml.length >
-      $scope.MAX_CHARS_IN_SKILL_WORKED_EXAMPLE_EDITOR;
+      MAX_CHARS_IN_SKILL_WORKED_EXAMPLE_EDITOR;
 
     $scope.isWorkedExampleExplanationHtmlLengthExceeded = () =>
       $scope.tmpWorkedExampleExplanationHtml.length >
-      $scope.MAX_CHARS_IN_SKILL_WORKED_EXAMPLE_EDITOR;
+      MAX_CHARS_IN_SKILL_WORKED_EXAMPLE_EDITOR;
 
     $scope.saveWorkedExample = function() {
       $uibModalInstance.close({

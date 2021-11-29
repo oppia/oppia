@@ -38,8 +38,6 @@ angular.module('oppia').controller('AddMisconceptionModalController', [
     $scope.skill = SkillEditorStateService.getSkill();
     $scope.MAX_CHARS_IN_MISCONCEPTION_NAME =
       MAX_CHARS_IN_MISCONCEPTION_NAME;
-    $scope.MAX_CHARS_IN_SKILL_MISCONCEPTION_EDITOR =
-      MAX_CHARS_IN_SKILL_MISCONCEPTION_EDITOR;
     $scope.MISCONCEPTION_PROPERTY_FORM_SCHEMA = {
       type: 'html',
       ui_config: {
@@ -67,11 +65,11 @@ angular.module('oppia').controller('AddMisconceptionModalController', [
 
     $scope.isMisconceptionNotesHtmlLengthExceeded = () =>
       $scope.misconceptionNotes.length >
-      $scope.MAX_CHARS_IN_SKILL_MISCONCEPTION_EDITOR;
+      MAX_CHARS_IN_SKILL_MISCONCEPTION_EDITOR;
 
     $scope.isMisconceptionFeedbackHtmlLengthExceeded = () =>
       $scope.misconceptionFeedback.length >
-      $scope.MAX_CHARS_IN_SKILL_MISCONCEPTION_EDITOR;
+      MAX_CHARS_IN_SKILL_MISCONCEPTION_EDITOR;
 
     $scope.saveMisconception = function() {
       if ($scope.misconceptionNameIsDuplicate) {
