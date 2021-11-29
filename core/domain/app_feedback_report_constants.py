@@ -52,7 +52,6 @@ TICKET_ID_DELIMITER = '.'
 STATS_ID_DELIMITER = ':'
 ANDROID_VERSION_NAME_DELIMITER = '-'
 
-# Ignoring the untyped call error because python_utils is untyped.
 class REPORT_TYPE(enum.Enum): # pylint: disable: invalid-name
     """Enum for report types."""
 
