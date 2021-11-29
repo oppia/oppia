@@ -120,7 +120,7 @@ class ANDROID_NETWORK_TYPE(enum.Enum): # pylint: disable=invalid-name
     cellular = 'cellular' # pylint: disable=invalid-name
     none = 'none' # pylint: disable=invalid-name
 
-    
+
 FILTER_FIELD_NAMES = app_feedback_report_models.FILTER_FIELD_NAMES
 
 ANDROID_ENTRY_POINT = [

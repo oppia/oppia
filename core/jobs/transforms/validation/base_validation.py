@@ -45,6 +45,7 @@ import apache_beam as beam
 BASE_MODEL_ID_PATTERN = r'^[A-Za-z0-9-_]{1,%s}$' % base_models.ID_LENGTH
 MAX_CLOCK_SKEW_SECS = datetime.timedelta(seconds=1)
 
+
 class VALIDATION_MODES(enum.Enum): # pylint: disable=invalid-name
     """Enum for validation modes."""
 

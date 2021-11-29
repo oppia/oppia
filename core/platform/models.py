@@ -32,6 +32,8 @@ if MYPY: # pragma: no cover
     from mypy_imports import base_models  # pylint: disable=unused-import
 
 # Valid model names.
+
+
 class NAMES(enum.Enum): # pylint: disable=invalid-name
     """Enum for valid model names."""
 
@@ -65,6 +67,7 @@ class NAMES(enum.Enum): # pylint: disable=invalid-name
 # Types of deletion policies. The pragma comment is needed because Enums are
 # evaluated as classes in Python and they should use PascalCase, but using
 # UPPER_CASE seems more appropriate here.
+
 MODULES_WITH_PSEUDONYMIZABLE_CLASSES = (  # pylint: disable=invalid-name
     NAMES.app_feedback_report, NAMES.blog, NAMES.collection, NAMES.config,
     NAMES.exploration, NAMES.feedback, NAMES.question, NAMES.skill, NAMES.story,

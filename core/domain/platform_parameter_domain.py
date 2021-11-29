@@ -28,6 +28,7 @@ from core import utils
 from core.constants import constants
 from core.domain import change_domain
 
+
 class SERVER_MODES(enum.Enum): # pylint: disable=invalid-name
     """Enum for server modes."""
 
@@ -35,13 +36,17 @@ class SERVER_MODES(enum.Enum): # pylint: disable=invalid-name
     test = 'test' # pylint: disable=invalid-name
     prod = 'prod' # pylint: disable=invalid-name
 
+
 FEATURE_STAGES = SERVER_MODES # pylint: disable=invalid-name
+
+
 class DATA_TYPES(enum.Enum): # pylint: disable=invalid-name
     """Enum for data types."""
 
     bool = 'bool' # pylint: disable=invalid-name
     string = 'string' # pylint: disable=invalid-name
     number = 'number' # pylint: disable=invalid-name
+
 
 ALLOWED_SERVER_MODES = [
     SERVER_MODES.dev.value, SERVER_MODES.test.value, SERVER_MODES.prod.value]
