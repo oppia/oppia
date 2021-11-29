@@ -181,7 +181,7 @@ def validate_aggregated_stats(aggregated_stats):
 
 
 def validate_params_dict(params):
-    """validates params dict
+    """validates params data type
 
     Args:
         params: dict. Data that needs to be validated.
