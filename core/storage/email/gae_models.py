@@ -362,6 +362,9 @@ class BulkEmailModel(base_models.BaseModel):
     sent_datetime = (
         datastore_services.DateTimeProperty(required=True, indexed=True))
 
+    # DEPRECATED in v3.2.1. Do not use.
+    recipient_ids = datastore_services.JsonProperty(default=[], compressed=True)
+
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model contains data corresponding to a user: sender_id, and
@@ -394,7 +397,7 @@ class BulkEmailModel(base_models.BaseModel):
 
     @classmethod
     def apply_deletion_policy(cls, user_id: str) -> None:
-        """Delete instances of SentEmailModel for the user.
+        """Delete instances of BulkEmailModel for the user.
 
         Args:
             user_id: str. The ID of the user whose data should be deleted.
