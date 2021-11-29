@@ -386,7 +386,8 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
         expected_error = (
             'Schema validation for \'num_skills_to_fetch\' '
-            'failed: Could not convert str to int: string')
+            'failed: Could not convert str to int: string'
+        )
 
         self.assertEqual(
             json_response['error'],
@@ -408,7 +409,8 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
         expected_error = (
             'Schema validation for \'next_cursor\' failed: '
-            'Expected string, received 40')
+            'Expected string, received 40'
+        )
 
         self.assertEqual(
             json_response['error'], expected_error)
@@ -440,7 +442,8 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
         expected_error = (
             'Schema validation for \'classroom_name\' failed: '
-            'Expected string, received 20')
+            'Expected string, received 20'
+        )
 
         self.assertEqual(
             json_response['error'], expected_error)
@@ -458,7 +461,8 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
         expected_error = (
             'Schema validation for \'keywords\' failed: '
-            'Expected list, received 20')
+            'Expected list, received 20'
+        )
 
         self.assertEqual(
             json_response['error'], expected_error)
@@ -472,7 +476,8 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
         expected_error = (
             'Schema validation for \'keywords\' failed: '
-            'Expected string, received 20')
+            'Expected string, received 20'
+        )
 
         self.assertEqual(
             json_response['error'], expected_error)
@@ -490,7 +495,8 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
         expected_error = (
             'Schema validation for \'status\' failed: '
-            'Expected string, received 20')
+            'Expected string, received 20'
+        )
 
         self.assertEqual(
             json_response['error'], expected_error)
@@ -508,7 +514,8 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
         expected_error = (
             'Schema validation for \'sort\' failed: '
-            'Expected string, received 20')
+            'Expected string, received 20'
+        )
 
         self.assertEqual(
             json_response['error'], expected_error)
