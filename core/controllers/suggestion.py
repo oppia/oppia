@@ -488,10 +488,14 @@ def _construct_exploration_suggestions(suggestions):
         available_states = exp_id_to_exp[suggestion.target_id].states
         available_content_ids = []
 
+        # Checks whether the state name within change object of the suggestion
+        # is actually available in the target entity being suggested to.
         if suggestion.change.state_name in available_states:
             available_content_ids = available_states[
-                suggestion.change.state_name]._get_all_translatable_content()
+                suggestion.change.state_name].get_all_translatable_content()
 
+        # Checks whether the content ID within change object of the suggestion
+        # is actually available in the target entity being suggested to.
         if suggestion.change.content_id in available_content_ids:
             content_html = exp_id_to_exp[suggestion.target_id].get_content_html(
                 suggestion.change.state_name, suggestion.change.content_id)

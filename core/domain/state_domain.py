@@ -3257,6 +3257,16 @@ class State:
 
         return content_id_to_translatable_item
 
+    def get_all_translatable_content(self):
+        """Returns output of _get_all_translatable_content private method.
+
+        Returns:
+            dict(str, TranslatableItem). Returns a dict with key as content
+            id and TranslatableItem as value with the appropriate data
+            format.
+        """
+        return self._get_all_translatable_content()
+
     def get_content_id_mapping_needing_translations(self, language_code):
         """Returns all text html which can be translated in the given language.
 
