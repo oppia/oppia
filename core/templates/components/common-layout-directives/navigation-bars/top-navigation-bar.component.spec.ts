@@ -470,4 +470,36 @@ describe('TopNavigationBarComponent', () => {
     expect(component.username).toBe('username1');
     expect(component.profilePageUrl).toBe('/profile/username1');
   }));
+
+  it('should return proper offset for dropdown', ()=>{
+    var dummyElement = document.createElement('div');
+    spyOn(document, 'querySelector').and.returnValue(dummyElement);
+
+    spyOn(Element.prototype, 'getBoundingClientRect').and.callFake(
+      jasmine.createSpy('getBoundingClientRect').and
+        .returnValue({ top: 1, height: 100, left: 0, width: 200, right: 202 })
+    );
+
+    expect(component.getDropdownOffset('.dummy', 0, 0)).toBe(0);
+  });
+
+  it('should return proper offset for dropdown when element is undefined',
+    ()=>{
+      spyOn(document, 'querySelector').and.returnValue(null);
+
+      expect(component.getDropdownOffset('.dummy', 0, 10)).toBe(10);
+    });
+
+  it('should check if navbar dropdown offsets are updated', fakeAsync (()=>{
+    spyOn(component, 'truncateNavbar').and.stub();
+    spyOn(component, 'getDropdownOffset')
+      .withArgs('.get-involved', 574, 0).and.returnValue(-10);
+
+    expect(component.getInvolvedMenuOffset).toBe(0);
+
+    component.ngAfterViewChecked();
+    tick();
+
+    expect(component.getInvolvedMenuOffset).toBe(-10);
+  }));
 });

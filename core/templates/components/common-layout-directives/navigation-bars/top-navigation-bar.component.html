@@ -153,7 +153,7 @@
             [hidden]="navElementsVisibilityStatus.I18N_TOPNAV_GET_INVOLVED"
             class="nav-item oppia-navbar-clickable-dropdown protractor-test-about-oppia-list-item">
           <a ngbDropdownToggle (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
-             class="nav-link oppia-navbar-tab dropdown-toggle"
+             class="nav-link oppia-navbar-tab dropdown-toggle get-involved"
              aria-haspopup="true"
              aria-expanded="false"
              tabindex="0"
@@ -165,6 +165,7 @@
             </span>
           </a>
           <ul ngbDropdownMenu
+              [ngStyle]="{'left.px': getInvolvedMenuOffset}"
               class="dropdown-menu oppia-navbar-dropdown get-involved-dropdown"
               (mouseover)="openSubmenu($event, 'getInvolvedMenu')"
               (mouseleave)="closeSubmenuIfNotMobile($event)">
@@ -477,7 +478,6 @@
   .get-involved-dropdown {
     min-width: 574px;
     padding: 0;
-    left: -100px;
   }
   .get-involved-dropdown .nav-item {
     width: 100%;

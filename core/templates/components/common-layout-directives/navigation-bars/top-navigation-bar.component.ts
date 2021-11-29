@@ -70,6 +70,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   inClassroomPage: boolean = false;
   showLanguageSelector: boolean = false;
   standardNavIsShown: boolean = false;
+  getInvolvedMenuOffset: number = 0;
   ACTION_OPEN!: string;
   ACTION_CLOSE!: string;
   KEYBOARD_EVENT_TO_KEY_CODES!: {
@@ -266,6 +267,23 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     setTimeout(function() {
       that.truncateNavbar();
     }, 0);
+  }
+
+  ngAfterViewChecked(): void {
+    this.getInvolvedMenuOffset = this
+      .getDropdownOffset('.get-involved', 574, 0);
+    // https://stackoverflow.com/questions/34364880/expression-has-changed-after-it-was-checked
+    this.changeDetectorRef.detectChanges();
+  }
+
+  getDropdownOffset(cssClass: string, width: number, fallback: number): number {
+    var learnTab: HTMLElement | null = document.querySelector(cssClass);
+    if (learnTab) {
+      var leftOffset = learnTab.getBoundingClientRect().left;
+      var space = window.innerWidth - leftOffset;
+      return (space < width) ? (Math.round(space - width)) : fallback;
+    }
+    return fallback;
   }
 
   async getProfileImageDataAsync(): Promise<void> {
