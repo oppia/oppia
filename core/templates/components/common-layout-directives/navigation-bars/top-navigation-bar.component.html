@@ -169,65 +169,65 @@
               class="dropdown-menu oppia-navbar-dropdown get-involved-dropdown"
               (mouseover)="openSubmenu($event, 'getInvolvedMenu')"
               (mouseleave)="closeSubmenuIfNotMobile($event)">
-              <div class="d-flex flex-column">
-                <div class="top-section d-flex">
-                  <a class="item item-border d-flex flex-column"
-                    (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {shiftTab: ACTION_CLOSE})"
-                     href="/partnerships"
-                     [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.ROUTE"
-                     target="_blank"
-                     rel="noopener">
-                    <div class="heading">
-                      <span class="material-icons language">language</span>
-                      {{'I18N_TOPNAV_PARTNERSHIPS' | translate}}
-                    </div>
-                    <div class="des">
-                      {{'I18N_TOPNAV_PARTNERSHIPS_DESCRIPTION' | translate}}
-                    </div>
-                  </a>
-                  <a class="item d-flex flex-column"
-                     href="/volunteer"
-                     [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.VOLUNTEER.ROUTE"
-                     target="_blank"
-                     rel="noopener">
-                    <div class="heading">
-                      <span class="material-icons volunteer">supervisor_account</span>
-                      {{'I18N_HEADING_VOLUNTEER'| translate}}
-                    </div>
-                    <div class="des">
-                      {{'I18N_TOPNAV_VOLUNTEER_DESCRIPTION' | translate}}
-                    </div>
-                  </a>
-                </div>
-                <div class="bottom-section d-flex">
-                  <a class="item item-border d-flex flex-column"
-                     href="/contact"
-                     [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.CONTACT.ROUTE"
-                     target="_blank"
-                     rel="noopener">
-                    <div class="heading">
-                      <span class="material-icons contact">mail</span>
-                      {{'I18N_TOPNAV_CONTACT_US' | translate}}
-                    </div>
-                    <div class="des">
-                      {{'I18N_TOPNAV_CONTACT_US_DESCRIPTION' | translate}}
-                    </div>
-                  </a>
-                  <a class="item d-flex flex-column"
-                     href="/donate"
-                     [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE"
-                     target="_blank"
-                     rel="noopener">
-                    <div class="heading">
-                      <span class="material-icons fav">favorite</span>
-                      {{'I18N_TOPNAV_DONATE' | translate}}
-                    </div>
-                    <div class="des">
-                      {{'I18N_TOPNAV_DONATE_DESCRIPTION' | translate}}
-                    </div>
-                  </a>
-                </div>
+            <div class="d-flex flex-column">
+              <div class="top-section d-flex">
+                <a class="item item-border d-flex flex-column"
+                   (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {shiftTab: ACTION_CLOSE})"
+                   href="/partnerships"
+                   [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.ROUTE"
+                   target="_blank"
+                   rel="noopener">
+                  <div class="heading">
+                    <span class="material-icons language">language</span>
+                    {{'I18N_TOPNAV_PARTNERSHIPS' | translate}}
+                  </div>
+                  <div class="des">
+                    {{'I18N_TOPNAV_PARTNERSHIPS_DESCRIPTION' | translate}}
+                  </div>
+                </a>
+                <a class="item d-flex flex-column"
+                   href="/volunteer"
+                   [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.VOLUNTEER.ROUTE"
+                   target="_blank"
+                   rel="noopener">
+                  <div class="heading">
+                    <span class="material-icons volunteer">supervisor_account</span>
+                    {{'I18N_HEADING_VOLUNTEER'| translate}}
+                  </div>
+                  <div class="des">
+                    {{'I18N_TOPNAV_VOLUNTEER_DESCRIPTION' | translate}}
+                  </div>
+                </a>
               </div>
+              <div class="bottom-section d-flex">
+                <a class="item item-border d-flex flex-column"
+                   href="/contact"
+                   [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.CONTACT.ROUTE"
+                   target="_blank"
+                   rel="noopener">
+                  <div class="heading">
+                    <span class="material-icons contact">mail</span>
+                    {{'I18N_TOPNAV_CONTACT_US' | translate}}
+                  </div>
+                  <div class="des">
+                    {{'I18N_TOPNAV_CONTACT_US_DESCRIPTION' | translate}}
+                  </div>
+                </a>
+                <a class="item d-flex flex-column"
+                   href="/donate"
+                   [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE"
+                   target="_blank"
+                   rel="noopener">
+                  <div class="heading">
+                    <span class="material-icons fav">favorite</span>
+                    {{'I18N_TOPNAV_DONATE' | translate}}
+                  </div>
+                  <div class="des">
+                    {{'I18N_TOPNAV_DONATE_DESCRIPTION' | translate}}
+                  </div>
+                </a>
+              </div>
+            </div>
           </ul>
         </li>
         <li [ngClass]="{'open': activeMenuName === 'donateMenu'}"
@@ -483,7 +483,7 @@
     width: 100%;
   }
   .get-involved-dropdown .heading {
-    color: #333333;
+    color: #333;
     font-family: 'Roboto', sans-serif;
     font-size: 16px;
     font-weight: 500;
