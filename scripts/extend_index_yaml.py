@@ -35,28 +35,25 @@ WEB_INF_INDEX_YAML_PATH = os.path.join(
 def main() -> None:
     """Extends index.yaml file."""
     with open(INDEX_YAML_PATH, 'r', encoding='utf-8') as f:
-        ind = yaml.safe_load(f)
+        index_yaml_dict = yaml.safe_load(f)
     with open(WEB_INF_INDEX_YAML_PATH, 'r', encoding='utf-8') as f:
-        cld = yaml.safe_load(f)
-    new_kind = []
-    index_yaml = yaml.safe_dump(ind, default_flow_style=False, sort_keys=False)
-    if cld['indexes'] is None:
+        web_inf_index_yaml_dict = yaml.safe_load(f)
+
+    if web_inf_index_yaml_dict['indexes'] is None:
         return
-    for kind in cld['indexes']:
-        clds = (
-            '- '
-            + yaml.safe_dump(
-                kind, default_flow_style=False, sort_keys=False).replace(
-                    '\n', '\n  '
-            )[:-3]
-        )
-        if clds not in index_yaml:
-            new_kind.append(clds)
-    if len(new_kind) == 0:
+
+    new_kinds = []
+    for i in web_inf_index_yaml_dict['indexes']:
+        if i not in index_yaml_dict['indexes']:
+            new_kinds.append(i)
+
+    if len(new_kinds) == 0:
         return
-    new_index = 'indexes:\n\n' + '\n'.join(new_kind)
-    ind['indexes'] += yaml.safe_load(new_index)['indexes']
-    ind = yaml.safe_dump(ind, default_flow_style=False, sort_keys=False)
-    ind = ind.replace('- kind', '\n- kind')
-    with open(INDEX_YAML_PATH, 'w', encoding='utf-8') as file:
-        file.write(ind)
+
+    index_yaml_dict['indexes']+= new_kinds
+    index_yaml_dict = yaml.safe_dump(
+        index_yaml_dict, default_flow_style=False, sort_keys=False
+    )
+    index_yaml_dict = index_yaml_dict.replace('- kind', '\n- kind')
+    with open(INDEX_YAML_PATH, 'w') as f:
+        f.write(index_yaml_dict)

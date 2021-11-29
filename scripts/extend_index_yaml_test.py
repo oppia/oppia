@@ -19,7 +19,6 @@
 from __future__ import annotations
 
 from unittest import mock
-
 from core.tests import test_utils
 
 from . import extend_index_yaml
@@ -109,6 +108,7 @@ class ExtendIndexYamlTest(test_utils.GenericTestBase):
             mock_open_file.return_value.__enter__.side_effect = [
                 index_yaml,
                 web_inf_index_yaml,
+                open(extend_index_yaml.INDEX_YAML_PATH, 'w', encoding='utf-8'),
             ]
             extend_index_yaml.main()
 
