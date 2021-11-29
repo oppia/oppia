@@ -38,11 +38,13 @@ require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 require(
   'pages/topic-editor-page/modal-templates/preview-thumbnail.component.ts');
 require('services/stateful/focus-manager.service.ts');
+require('services/ngb-modal.service.ts');
 import { Subscription } from 'rxjs';
 
 // TODO(#9186): Change variable name to 'constants' once this file
 // is migrated to Angular.
 import storyConstants from 'assets/constants';
+import { CreateNewChapterModalComponent } from '../modal-templates/new-chapter-title-modal.component';
 
 angular.module('oppia').directive('storyEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -53,7 +55,7 @@ angular.module('oppia').directive('storyEditor', [
         '/pages/story-editor-page/editor-tab/story-editor.directive.html'),
       controller: [
         '$rootScope', '$scope', '$uibModal', 'AlertsService',
-        'FocusManagerService',
+        'FocusManagerService', 'NgbModal',
         'StoryEditorNavigationService', 'StoryEditorStateService',
         'StoryUpdateService', 'UndoRedoService', 'WindowDimensionsService',
         'WindowRef', 'MAX_CHARS_IN_META_TAG_CONTENT',
@@ -61,7 +63,7 @@ angular.module('oppia').directive('storyEditor', [
         'MAX_CHARS_IN_STORY_TITLE', 'MAX_CHARS_IN_STORY_URL_FRAGMENT',
         function(
             $rootScope, $scope, $uibModal, AlertsService,
-            FocusManagerService,
+            FocusManagerService, NgbModal,
             StoryEditorNavigationService, StoryEditorStateService,
             StoryUpdateService, UndoRedoService, WindowDimensionsService,
             WindowRef, MAX_CHARS_IN_META_TAG_CONTENT,
@@ -184,17 +186,12 @@ angular.module('oppia').directive('storyEditor', [
             var nodeTitles = $scope.linearNodesList.map(function(node) {
               return node.getTitle();
             });
-            $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/story-editor-page/modal-templates/' +
-                'new-chapter-title-modal.template.html'),
+            let modelRef = NgbModal.open(CreateNewChapterModalComponent, {
               backdrop: 'static',
-              resolve: {
-                nodeTitles: () => nodeTitles
-              },
               windowClass: 'create-new-chapter',
-              controller: 'CreateNewChapterModalController'
-            }).result.then(function() {
+            })
+            modelRef.componentInstance.nodeTitles = nodeTitles;
+            return modelRef.result.then(function() {
               _initEditor();
               // If the first node is added, open it just after creation.
               if ($scope.story.getStoryContents().getNodes().length === 1) {

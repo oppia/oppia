@@ -35,6 +35,7 @@ import { StoryEditorUnpublishModalComponent } from './modal-templates/story-edit
 import { StoryPreviewTabComponent } from './story-preview-tab/story-preview-tab.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
+import { CreateNewChapterModalComponent } from './modal-templates/new-chapter-title-modal.component';
 
 @NgModule({
   imports: [
@@ -50,7 +51,8 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     StoryEditorSaveModalComponent,
     StoryEditorUnpublishModalComponent,
     StoryEditorNavbarComponent,
-    StoryPreviewTabComponent
+    StoryPreviewTabComponent,
+    CreateNewChapterModalComponent
   ],
   entryComponents: [
     StoryEditorNavbarBreadcrumbComponent,
@@ -58,7 +60,8 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     StoryEditorSaveModalComponent,
     StoryEditorUnpublishModalComponent,
     StoryEditorNavbarComponent,
-    StoryPreviewTabComponent
+    StoryPreviewTabComponent,
+    CreateNewChapterModalComponent
   ],
   providers: [
     {
