@@ -55,7 +55,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'expression-interpolation.service.ts',
     'fatigue-detection.service.ts',
     'google-analytics.initializer.ts',
-    'language-util.service.ts',
     'learner-answer-info.service.ts',
     'mathjax-bind.directive.ts',
     'normalize-whitespace-punctuation-and-case.pipe.ts',
