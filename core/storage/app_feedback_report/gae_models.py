@@ -42,6 +42,7 @@ PLATFORM_CHOICE_WEB = 'web'
 PLATFORM_CHOICES = [PLATFORM_CHOICE_ANDROID, PLATFORM_CHOICE_WEB]
 GITHUB_REPO_CHOICES = PLATFORM_CHOICES
 
+
 # The model field names that can be filtered / sorted for when maintainers
 # triage feedback reports.
 class FILTER_FIELD_NAMES(enum.Enum): # pylint: disable=invalid-name
@@ -57,6 +58,7 @@ class FILTER_FIELD_NAMES(enum.Enum): # pylint: disable=invalid-name
     audio_language_code = 'audio_language_code' # pylint: disable=invalid-name
     platform_version = 'platform_version' # pylint: disable=invalid-name
     android_device_country_locale_code = 'android_device_country_locale_code' # pylint: disable=invalid-name
+
 
 # An ID used for stats model entities tracking all unticketed reports.
 UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID = (
