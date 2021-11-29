@@ -474,17 +474,48 @@ class StateHitEventHandler(base.BaseHandler):
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
     URL_PATH_ARGS_SCHEMAS = {
-        'username': {
+        'exploration_id': {
             'schema': {
                 'type': 'basestring',
                 'validators': [{
-                    'id': 'is_valid_username_string'
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
                 }]
             }
         }
     }
     HANDLER_ARGS_SCHEMAS = {
-        'POST': {}
+        'POST': {
+            'session_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'new_state_name': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'exploration_version': {
+                'schema': {
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 1
+                    }]
+                }
+            },
+	    'client_time_spent_in_secs': {
+                'schema': {
+                    'type': 'int',
+                }
+            },
+            'old_params': {
+                'schema': {
+                    'type': 'int',
+                }
+            },
+        }
     }
 
     @acl_decorators.can_play_exploration
