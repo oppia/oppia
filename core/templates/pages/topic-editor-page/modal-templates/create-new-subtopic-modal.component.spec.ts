@@ -131,7 +131,7 @@ describe('create new subtopic modal', function() {
     fixture.detectChanges();
   });
 
-  it('should assign default values to modal', () => {
+  it('should assign default values to modal when initialized', () => {
     spyOn(topicUpdateService, 'addSubtopic').and.stub();
 
     component.ngOnInit();
@@ -147,30 +147,33 @@ describe('create new subtopic modal', function() {
     expect(component.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT)
       .toBe(constants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT);
     expect(topicUpdateService.addSubtopic).toHaveBeenCalledWith(topic, '');
+
+    component.localValueChange('working fine');
+    expect(component.htmlData).toBe('working fine');
   });
 
-  it('should call getSchema function properly', () => {
+  it('should show Schema editor when showSchemaEditor called', () => {
     let SUBTOPIC_PAGE_SCHEMA = component.getSchema();
-
     expect(SUBTOPIC_PAGE_SCHEMA).toEqual(DefaultSubtopicPageSchema);
-  });
 
-  it('should call showSchemaEditor function properly', () => {
     component.showSchemaEditor();
-
     expect(component.schemaEditorIsShown).toBe(true);
   });
 
-  it('should call updateSubtopicThumbnailFilename function properly', () => {
-    let newFileName = 'shivam';
-    spyOn(topicUpdateService, 'setSubtopicThumbnailFilename').and.stub();
-    component.updateSubtopicThumbnailFilename(newFileName);
+  it('should update file name when updateSubtopicThumbnailFilename called',
+    () => {
+      let newFileName = 'shivamOppiaFile';
+      spyOn(topicUpdateService, 'setSubtopicThumbnailFilename').and.stub();
+      component.updateSubtopicThumbnailFilename(newFileName);
 
-    expect(component.editableThumbnailFilename).toBe(newFileName);
-    expect(topicUpdateService.setSubtopicThumbnailFilename).toHaveBeenCalled();
-  });
+      expect(component.editableThumbnailFilename).toBe(newFileName);
+      expect(topicUpdateService.setSubtopicThumbnailFilename)
+        .toHaveBeenCalled();
+    });
 
-  it('should call updateSubtopicThumbnailBgColor function properly', () => {
+  it('should update ThumbnailBgColor when ' +
+    'updateSubtopicThumbnailBgColor called',
+  () => {
     let newThumbnailBgColor = 'red';
     spyOn(topicUpdateService, 'setSubtopicThumbnailBgColor').and.stub();
     component.updateSubtopicThumbnailBgColor(newThumbnailBgColor);
@@ -179,26 +182,28 @@ describe('create new subtopic modal', function() {
     expect(topicUpdateService.setSubtopicThumbnailBgColor).toHaveBeenCalled();
   });
 
-  it('should call resetErrorMsg function properly', () => {
+  it('should reset errorMsg when resetErrorMsg called', () => {
     component.resetErrorMsg();
 
     expect(component.errorMsg).toBe(null);
   });
 
-  it('should call isSubtopicValid function properly', () => {
-    component.editableThumbnailFilename = 'something';
-    component.subtopicTitle = 'something';
-    component.htmlData = 'something';
-    component.editableUrlFragment = 'something';
+  it('should check whether subtopic is valid when isSubtopicValid fxn called',
+    () => {
+      component.editableThumbnailFilename = 'examplefilename';
+      component.subtopicTitle = 'title';
+      component.htmlData = 'data';
+      component.editableUrlFragment = 'url';
 
-    let isSubtopicValid = component.isSubtopicValid();
+      let isSubtopicValid = component.isSubtopicValid();
 
-    spyOn(subtopicValidationService, 'isUrlFragmentValid')
-      .and.returnValue(true);
-    expect(isSubtopicValid).toBe(true);
-  });
+      spyOn(subtopicValidationService, 'isUrlFragmentValid')
+        .and.returnValue(true);
+      expect(isSubtopicValid).toBe(true);
+    });
 
-  it('should call cancel function properly', fakeAsync(() => {
+  it('should call deleteSubtopicPage & deleteSubtopic functions' +
+    'when cancel fxn called', fakeAsync(() => {
     spyOn(topicEditorStateService, 'deleteSubtopicPage');
     spyOn(topicUpdateService, 'deleteSubtopic');
 
@@ -208,7 +213,8 @@ describe('create new subtopic modal', function() {
     expect(topicUpdateService.deleteSubtopic).toHaveBeenCalled();
   }));
 
-  it('should call checkSubtopicExistence function properly', () => {
+  it('should check whether subtopicUrlFragmentExists ' +
+    'when checkSubtopicExistence called', () => {
     spyOn(subtopicValidationService, 'doesSubtopicWithUrlFragmentExist')
       .and.returnValue(true);
     component.checkSubtopicExistence();
@@ -216,14 +222,7 @@ describe('create new subtopic modal', function() {
     expect(component.subtopicUrlFragmentExists).toBe(true);
   });
 
-  it('should call localValueChange function properly', () => {
-    let stringPassed = 'working fine';
-    component.localValueChange(stringPassed);
-
-    expect(component.htmlData).toBe(stringPassed);
-  });
-
-  it('should call save function properly', () => {
+  it('should save subtoic when save function called', () => {
     component.subtopicId = 123;
     spyOn(subtopicValidationService, 'checkValidSubtopicName')
       .and.returnValue(true);
@@ -241,7 +240,7 @@ describe('create new subtopic modal', function() {
     expect(ngbActiveModal.close).toHaveBeenCalled();
   });
 
-  it('should call if in save function properly', () => {
+  it('should not close modal if subtopic name is not valid', () => {
     spyOn(ngbActiveModal, 'close');
 
     spyOn(subtopicValidationService, 'checkValidSubtopicName')

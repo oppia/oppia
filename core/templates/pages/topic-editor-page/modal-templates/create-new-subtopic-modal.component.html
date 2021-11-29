@@ -48,7 +48,6 @@
           <div class="oppia-editor-card-body" >
             <schema-based-editor [schema]="getSchema.bind(this)"
                                  class="protractor-test-create-subtopic-page-content"
-                                 [localValue]="htmlData"
                                  (localValueChange)="localValueChange($event)">
             </schema-based-editor>
           </div>
@@ -64,8 +63,7 @@
 
       <div class="thumbnail-editor protractor-test-thumbnail-editor create-new-subtopic-input-field">
         <strong>Thubmnail Image*</strong>
-        <oppia-thumbnail-uploader
-                                  (updateFilename)="updateSubtopicThumbnailFilename($event)"
+        <oppia-thumbnail-uploader (updateFilename)="updateSubtopicThumbnailFilename($event)"
                                   [bgColor]="editableThumbnailBgColor"
                                   (updateBgColor)="updateSubtopicThumbnailBgColor($event)"
                                   [allowedBgColors]="allowedBgColors"
