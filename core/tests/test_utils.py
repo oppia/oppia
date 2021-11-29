@@ -757,7 +757,7 @@ class AuthServicesStub:
         if auth_id in self._user_id_by_auth_id:
             raise Exception(
                 'auth_id=%r is already associated with user_id=%r' % (
-                    auth_id, self._user_id_by_auth_id[auth_id]['id']))
+                    auth_id, self._user_id_by_auth_id[auth_id].id))
         auth_models.UserAuthDetailsModel(
             id=user_id, firebase_auth_id=auth_id).put()
         self._external_user_id_associations.add(user_id)
@@ -776,7 +776,7 @@ class AuthServicesStub:
             Exception. One or more auth associations already exist.
         """
         collisions = ', '.join(
-            '{auth_id=%r: user_id=%r}' % (a, self._user_id_by_auth_id[a]['id'])
+            '{auth_id=%r: user_id=%r}' % (a, self._user_id_by_auth_id[a].id)
             for a, _ in auth_id_user_id_pairs if a in self._user_id_by_auth_id)
         if collisions:
             raise Exception('already associated: %s' % collisions)
