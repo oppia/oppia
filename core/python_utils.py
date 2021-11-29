@@ -19,7 +19,6 @@
 from __future__ import annotations
 
 import io
-import itertools
 import os
 import pkgutil
 import sys
@@ -432,23 +431,3 @@ def create_enum(*sequential):
             }
             _enums[name] = type('Enum', (), _value)
         return type('Enum', (), _enums)
-
-
-def zip_longest(*args, **kwargs):
-    """Creates an iterator that aggregates elements from each of the iterables.
-    If the iterables are of uneven length, missing values are
-    filled-in with fillvalue.
-
-    Args:
-        *args: list(*). Iterables that needs to be aggregated into an iterable.
-        **kwargs: dict. It contains fillvalue.
-
-    Returns:
-        iterable(iterable). A sequence of aggregates elements
-        from each of the iterables.
-    """
-    fillvalue = kwargs.get('fillvalue')
-    try:
-        return itertools.zip_longest(*args, fillvalue=fillvalue)
-    except AttributeError:
-        return itertools.izip_longest(*args, fillvalue=fillvalue)
