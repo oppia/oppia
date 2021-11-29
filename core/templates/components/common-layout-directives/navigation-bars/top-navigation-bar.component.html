@@ -165,37 +165,68 @@
             </span>
           </a>
           <ul ngbDropdownMenu
-              class="dropdown-menu oppia-navbar-dropdown"
+              class="dropdown-menu oppia-navbar-dropdown get-involved-dropdown"
               (mouseover)="openSubmenu($event, 'getInvolvedMenu')"
               (mouseleave)="closeSubmenuIfNotMobile($event)">
-            <li class="nav-item">
-              <a (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {shiftTab: ACTION_CLOSE})"
-                 class="dropdown-item nav-link oppia-navbar-tab-content protractor-test-about-link"
-                 href="/volunteer"
-                 [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.VOLUNTEER.ROUTE"
-                 target="_blank"
-                 rel="noopener"
-                 [innerHTML]="'I18N_HEADING_VOLUNTEER'| translate">
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="dropdown-item nav-link oppia-navbar-tab-content"
-                 href="/partnerships"
-                 [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.ROUTE"
-                 target="_blank"
-                 rel="noopener"
-                 [innerHTML]="'I18N_TOPNAV_PARTNERSHIPS' | translate">
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="dropdown-item nav-link oppia-navbar-tab-content"
-                 href="/donate"
-                 [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE"
-                 target="_blank"
-                 rel="noopener"
-                 [innerHTML]="'I18N_TOPNAV_DONATE' | translate">
-              </a>
-            </li>
+              <div class="d-flex flex-column">
+                <div class="top-section d-flex">
+                  <a class="item item-border d-flex flex-column"
+                    (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {shiftTab: ACTION_CLOSE})"
+                     href="/partnerships"
+                     [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.ROUTE"
+                     target="_blank"
+                     rel="noopener">
+                    <div class="heading">
+                      <span class="material-icons language">language</span>
+                      {{'I18N_TOPNAV_PARTNERSHIPS' | translate}}
+                    </div>
+                    <div class="des">
+                      Partner and bring Oppia to your school, community or area.
+                    </div>
+                  </a>
+                  <a class="item d-flex flex-column"
+                     href="/volunteer"
+                     [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.VOLUNTEER.ROUTE"
+                     target="_blank"
+                     rel="noopener">
+                    <div class="heading">
+                      <span class="material-icons volunteer">supervisor_account</span>
+                      {{'I18N_HEADING_VOLUNTEER'| translate}}
+                    </div>
+                    <div class="des">
+                      Partner and bring Oppia to your school, community or area.
+                    </div>
+                  </a>
+                </div>
+                <div class="bottom-section d-flex">
+                  <a class="item item-border d-flex flex-column"
+                     href="/contact"
+                     [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.CONTACT.ROUTE"
+                     target="_blank"
+                     rel="noopener">
+                    <div class="heading">
+                      <span class="material-icons contact">mail</span>
+                      Contact Us
+                    </div>
+                    <div class="des">
+                      Partner and bring Oppia to your school, community or area.
+                    </div>
+                  </a>
+                  <a class="item d-flex flex-column"
+                     href="/donate"
+                     [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE"
+                     target="_blank"
+                     rel="noopener">
+                    <div class="heading">
+                      <span class="material-icons fav">favorite</span>
+                      {{'I18N_TOPNAV_DONATE' | translate}}
+                    </div>
+                    <div class="des">
+                      Partner and bring Oppia to your school, community or area.
+                    </div>
+                  </a>
+                </div>
+              </div>
           </ul>
         </li>
         <li [ngClass]="{'open': activeMenuName === 'donateMenu'}"
@@ -443,6 +474,62 @@
   </ul>
 </div>
 <style>
+  .get-involved-dropdown {
+    min-width: 574px;
+    padding: 0;
+    left: -100px;
+  }
+  .get-involved-dropdown .nav-item {
+    width: 100%;
+  }
+  .get-involved-dropdown .heading {
+    color: #333333;
+    font-family: 'Roboto', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 18.75px;
+    padding: 0;    
+  }
+  .get-involved-dropdown a {
+    text-decoration: none;   
+  }
+  .get-involved-dropdown .language{
+    color: #F2994A;
+  }
+  .get-involved-dropdown .volunteer{
+    color: #2D9CDB;
+  }
+  .get-involved-dropdown .contact{
+    color: #B4BBC3;
+  }
+  .get-involved-dropdown .fav{
+    color: #EB5757;
+  }
+  .get-involved-dropdown .des{
+    color: #767676;
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 20px;
+    padding: 0;
+    padding-left: 28px;
+    text-overflow: clip;
+  }
+  .top-section {
+    border-bottom: 1px solid #2121211a;
+  }
+  .item-border{
+    border-right: 1px solid #2121211a;
+  }
+  .item {
+    padding: 32px;
+  }
+  .item:hover, .item:focus {
+    background-color: #21212107;
+  }
+  .bottom-section .item {
+    padding-bottom: 27px;
+  }
   .rtl-navbar-header {
     display: flex;
     margin-left: -30px;
@@ -452,7 +539,6 @@
   }
   .dropdown-menu {
     border-radius: 3px;
-    right: 0 !important;
   }
   .rtl-navbar-header .dropdown-menu {
     left: 0 !important;
