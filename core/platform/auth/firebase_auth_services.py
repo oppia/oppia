@@ -64,7 +64,7 @@ from core.platform import models
 import firebase_admin
 from firebase_admin import auth as firebase_auth
 from firebase_admin import exceptions as firebase_exceptions
-from typing import Dict, List, Optional, Union
+from typing import List, Optional
 import webapp2
 
 MYPY = False
@@ -567,7 +567,7 @@ def _get_auth_claims_from_session_cookie(
 
 
 def _create_auth_claims(
-        firebase_claims: Dict[str, Optional[Union[str, bool]]]
+    firebase_claims: auth_domain.AuthClaimsDict
 ) -> auth_domain.AuthClaims:
     """Returns a new AuthClaims domain object from Firebase claims.
 
@@ -578,10 +578,10 @@ def _create_auth_claims(
     Returns:
         AuthClaims. Oppia's representation of auth claims.
     """
-    auth_id = firebase_claims.get('sub')
+    auth_id = firebase_claims['sub']
     email = firebase_claims.get('email')
     role_is_super_admin = (
         email == feconf.ADMIN_EMAIL_ADDRESS or
         firebase_claims.get('role') == feconf.FIREBASE_ROLE_SUPER_ADMIN)
-    return auth_domain.AuthClaims( # type: ignore[no-untyped-call]
+    return auth_domain.AuthClaims(
         auth_id, email, role_is_super_admin=role_is_super_admin)
