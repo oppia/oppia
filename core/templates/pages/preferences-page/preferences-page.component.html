@@ -261,9 +261,9 @@
       </div>
     </div>
 
-    <hr *ngIf="userCanDeleteAccount">
+    <hr>
 
-    <div *ngIf="userCanDeleteAccount" role="form" class="form-group row">
+    <div role="form" class="form-group row">
       <label class="col-lg-4 col-md-4 col-sm-4">{{ 'I18N_DELETE_ACCOUNT_PAGE_HEADING' | translate }}</label>
       <div class="col-lg-8 col-md-8 col-sm-8">
         <a href="/delete-account" [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DELETE_ACCOUNT.ROUTE">
@@ -277,9 +277,9 @@
       </div>
     </div>
 
-    <hr *ngIf="userCanExportAccount">
+    <hr>
 
-    <div *ngIf="userCanExportAccount" role="form" class="form-group row">
+    <div role="form" class="form-group row">
       <label class="col-lg-4 col-md-4 col-sm-4">Export Account</label>
       <div class="col-lg-8 col-md-8 col-sm-8" *ngIf="!exportingData">
         <a href="/export-account-handler">
