@@ -26,7 +26,8 @@ from core import feconf
 from core import utils
 from core.domain import platform_parameter_domain as parameter_domain
 from core.tests import test_utils
-from platform_parameter_domain import EvaluationContext, Filter_dict, PlatformParameterRule_dict
+from platform_parameter_domain import EvaluationContext,
+Filter_dict, PlatformParameterRule_dict
 
 SERVER_MODES = parameter_domain.SERVER_MODES
 
@@ -36,27 +37,47 @@ class PlatformParameterChangeTests(test_utils.GenericTestBase):
 
     CMD_EDIT_RULES = parameter_domain.PlatformParameterChange.CMD_EDIT_RULES
 
-    def test_param_change_object_with_missing_cmd_raises_exception(self) -> None:
+    def test_param_change_object_with_missing_cmd_raises_exception(
+        self
+        ) -> None:
+        # TODO(XXXX): Remove the type ignore[no-untyped-call]
+        # after the file tests/test_utils is fully type-annotated.
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, 'Missing cmd key in change dict'):
+            # TODO(XXX): Remove the type ignore[no-untyped-call]
+            # after the file core/domain/change_domain is fully type-annotated.
             parameter_domain.PlatformParameterChange({'invalid': 'data'}) # type: ignore[no-untyped-call]
 
-    def test_param_change_object_with_invalid_cmd_raises_exception(self) -> None:
+    def test_param_change_object_with_invalid_cmd_raises_exception(
+        self
+        ) -> None:
+        # TODO(#test_utils): Remove the type ignore[no-untyped-call]
+        # after the file tests/test_utils is fully type-annotated.
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, 'Command invalid is not allowed'):
+            # TODO(XXX): Remove the type ignore[no-untyped-call]
+            # after the file core/domain/change_domain is fully type-annotated.
             parameter_domain.PlatformParameterChange({'cmd': 'invalid'}) # type: ignore[no-untyped-call]
 
     def test_param_change_object_missing_attribute_in_cmd_raises_exception(
-            self) -> None:
+            self
+            ) -> None:
+        # TODO(#test_utils): Remove the type ignore[no-untyped-call]
+        # after the file tests/test_utils is fully type-annotated.
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError,
             'The following required attributes are missing: new_rules'):
+            # TODO(XXX): Remove the type ignore[no-untyped-call]
+            # after the file core/domain/change_domain is fully type-annotated.
             parameter_domain.PlatformParameterChange({ # type: ignore[no-untyped-call]
                 'cmd': self.CMD_EDIT_RULES
             })
 
     def test_param_change_object_with_extra_attribute_in_cmd_raises_exception(
-            self) -> None:
+            self
+            ) -> None:
+        # TODO(#test_utils): Remove the type ignore[no-untyped-call]
+        # after the file tests/test_utils is fully type-annotated.
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError,
             'The following extra attributes are present: invalid'):
@@ -66,11 +87,14 @@ class PlatformParameterChangeTests(test_utils.GenericTestBase):
                 'invalid': 'invalid'
             })
 
-    # PlatformParameterChange is defined line 79 file core/domain/platform_parameter_domain.py
-    # but according to mypy it has no attribute new_rules (line 81) even if it is defined 
-    # before (line 76)
+    # PlatformParameterChange is defined line 79 file
+    # core/domain/platform_parameter_domain.py
+    # but according to mypy it has no attribute new_rules
+    # (line 81) even if it is defined before (line 76)
     def test_param_change_object_with_valid_data_success(self)-> None:
         param_change_object = (
+            # TODO(XXX): Remove the type ignore[no-untyped-call]
+            # after the file core/domain/change_domain is fully type-annotated.
             parameter_domain.PlatformParameterChange({ # type: ignore[no-untyped-call]
                 'cmd': self.CMD_EDIT_RULES,
                 'new_rules': []
@@ -86,9 +110,13 @@ class PlatformParameterChangeTests(test_utils.GenericTestBase):
             'cmd': self.CMD_EDIT_RULES,
             'new_rules': []
         }
+        # TODO(XXX): Remove the type ignore[no-untyped-call]
+        # after the file core/domain/change_domain is fully type-annotated.
         param_change_object = parameter_domain.PlatformParameterChange( # type: ignore[no-untyped-call]
             param_change_dict)
         self.assertEqual(
+            # TODO(XXX): Remove the type ignore[no-untyped-call]
+            # after the file core/domain/change_domain is fully type-annotated.
             param_change_object.to_dict(), # type: ignore[no-untyped-call]
             param_change_dict)
 
@@ -202,6 +230,8 @@ class EvaluationContextTests(test_utils.GenericTestBase) :
                 'server_mode': SERVER_MODES.dev,
             },
         )
+        # TODO(XXXX): Remove the type ignore[no-untyped-call]
+        # after the file tests/test_utils is fully type-annotated.
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, 'Invalid browser type \'Invalid\''):
             context.validate()
@@ -217,6 +247,8 @@ class EvaluationContextTests(test_utils.GenericTestBase) :
                 'server_mode': SERVER_MODES.dev,
             },
         )
+        # TODO(#test_utils): Remove the type ignore[no-untyped-call] 
+        # after the file tests/test_utils is fully type-annotated.
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, 'Invalid version \'a.a.a\''):
             context.validate()
@@ -233,6 +265,8 @@ class EvaluationContextTests(test_utils.GenericTestBase) :
                 'server_mode': SERVER_MODES.dev,
             },
         )
+        # TODO(#test_utils): Remove the type ignore[no-untyped-call] 
+        # after the file tests/test_utils is fully type-annotated.
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, 'Invalid version \'1.0.0.0\''):
             context.validate()
@@ -248,11 +282,12 @@ class EvaluationContextTests(test_utils.GenericTestBase) :
                 'server_mode': SERVER_MODES.dev,
             },
         )
+        # TODO(#test_utils): Remove the type ignore[no-untyped-call] 
+        # after the file tests/test_utils is fully type-annotated.
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, 'Invalid version flavor \'invalid\''):
             context.validate()
-
-     # TODO: Remove this test after the backend is fully type-annotated. 
+ 
     # Here ignore[typeddict-item] is used to test server_mode value for invalid type.
     def test_validate_with_invalid_server_mode_raises_exception(self) -> None:
         MockEnum = collections.namedtuple('MockEnum', ['value'])
@@ -267,6 +302,8 @@ class EvaluationContextTests(test_utils.GenericTestBase) :
                 'server_mode': mock_enum, # type: ignore[typeddict-item]
             },
         )
+        # TODO(#test_utils): Remove the type ignore[no-untyped-call] 
+        # after the file tests/test_utils is fully type-annotated.
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, 'Invalid server mode \'invalid\''
         ):
@@ -1096,6 +1133,8 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
             .PlatformParameterFilter.from_dict(
                 {'type': 'server_mode', 'conditions': [('!=', 'dev')]}
             ))
+        # TODO(#test_utils): Remove the type ignore[no-untyped-call] 
+        # after the file tests/test_utils is fully type-annotated.
         with self.assertRaisesRegexp(  # type: ignore[no-untyped-call]
             Exception, 'Unsupported comparison operator \'!=\''):
             filter_domain.evaluate(self._create_example_context())
@@ -1116,6 +1155,8 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
             .PlatformParameterFilter.from_dict(
                 {'type': 'invalid', 'conditions': [('=', 'value1')]}
             ))
+        # TODO(#test_utils): Remove the type ignore[no-untyped-call] 
+        # after the file tests/test_utils is fully type-annotated.
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, 'Unsupported filter type \'invalid\''):
             filter_domain.validate()
@@ -1126,6 +1167,8 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
             .PlatformParameterFilter.from_dict(
                 {'type': 'server_mode', 'conditions': [('!=', 'dev')]}
             ))
+        # TODO(#test_utils): Remove the type ignore[no-untyped-call] 
+        # after the file tests/test_utils is fully type-annotated.
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, 'Unsupported comparison operator \'!=\''):
             filter_domain.validate()
@@ -1136,6 +1179,8 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
             .PlatformParameterFilter.from_dict(
                 {'type': 'server_mode', 'conditions': [('=', 'invalid')]}
             ))
+        # TODO(#test_utils): Remove the type ignore[no-untyped-call] 
+        # after the file tests/test_utils is fully type-annotated.
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, 'Invalid server mode \'invalid\''):
             filter_domain.validate()
@@ -1146,6 +1191,8 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
             .PlatformParameterFilter.from_dict(
                 {'type': 'platform_type', 'conditions': [('=', 'invalid')]}
             ))
+        # TODO(#test_utils): Remove the type ignore[no-untyped-call] 
+        # after the file tests/test_utils is fully type-annotated.
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, 'Invalid platform type \'invalid\''):
             filter_domain.validate()
@@ -1157,6 +1204,8 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
                 {'type': 'app_version', 'conditions': [('=', '1.a.2')]}
             ))
 
+        # TODO(#test_utils): Remove the type ignore[no-untyped-call] 
+        # after the file tests/test_utils is fully type-annotated.
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, 'Invalid version expression \'1.a.2\''):
             filter_domain.validate()
@@ -1167,11 +1216,11 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
             .PlatformParameterFilter.from_dict(
                 {'type': 'app_version_flavor', 'conditions': [('=', 'invalid')]}
             ))
-
+        # TODO(#test_utils): Remove the type ignore[no-untyped-call] 
+        # after the file tests/test_utils is fully type-annotated.
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, 'Invalid app version flavor \'invalid\''):
             filter_domain.validate()
-
 
 class PlatformParameterRuleTests(test_utils.GenericTestBase):
     """Test for the PlatformParameterRule."""
@@ -1297,6 +1346,8 @@ class PlatformParameterRuleTests(test_utils.GenericTestBase):
                 'value_when_matched': False,
             }
         )
+        # TODO(#test_utils): Remove the type ignore[no-untyped-call] 
+        # after the file tests/test_utils is fully type-annotated.
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, 'Unsupported filter type \'invalid\''):
             rule.validate()
@@ -1362,6 +1413,8 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             'is_feature': False,
             'feature_stage': None,
         })
+        # TODO(#test_utils): Remove the type ignore[no-untyped-call] 
+        # after the file tests/test_utils is fully type-annotated.
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Invalid parameter name \'%s\'' % param.name):
@@ -1388,6 +1441,8 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             'is_feature': False,
             'feature_stage': None,
         })
+        # TODO(#test_utils): Remove the type ignore[no-untyped-call] 
+        # after the file tests/test_utils is fully type-annotated.
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Invalid parameter name \'%s\'' % param1.name):
@@ -1416,6 +1471,8 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             'is_feature': False,
             'feature_stage': None,
         })
+        # TODO(#test_utils): Remove the type ignore[no-untyped-call] 
+        # after the file tests/test_utils is fully type-annotated.
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Invalid parameter name \'%s\'' % long_name):
@@ -1443,6 +1500,8 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             'is_feature': False,
             'feature_stage': None,
         })
+        # TODO(#test_utils): Remove the type ignore[no-untyped-call] 
+        # after the file tests/test_utils is fully type-annotated.
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, 'Unsupported data type \'InvalidType\''):
             param.validate()
@@ -1470,6 +1529,8 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             'is_feature': False,
             'feature_stage': None,
         })
+        # TODO(#test_utils): Remove the type ignore[no-untyped-call] 
+        # after the file tests/test_utils is fully type-annotated.
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected bool, received \'222\' in value_when_matched'):
@@ -1488,6 +1549,8 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             'is_feature': False,
             'feature_stage': None,
         })
+        # TODO(#test_utils): Remove the type ignore[no-untyped-call] 
+        # after the file tests/test_utils is fully type-annotated.
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected bool, received \'111\' in default value'):
@@ -1496,6 +1559,8 @@ class PlatformParameterTests(test_utils.GenericTestBase):
     def test_create_with_old_rule_schema_version_failure(self)-> None:
         with self.swap(
             feconf, 'CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION', 2):
+            # TODO(#test_utils): Remove the type ignore[no-untyped-call] 
+            # after the file tests/test_utils is fully type-annotated.
             with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
                 Exception,
                 'Current platform parameter rule schema version is v2, '
@@ -1763,6 +1828,8 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             'is_feature': True,
             'feature_stage': 'dev',
         })
+        # TODO(#test_utils): Remove the type ignore[no-untyped-call] 
+        # after the file tests/test_utils is fully type-annotated.
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Data type of feature flags must be bool, got \'string\' instead'):
@@ -1780,6 +1847,8 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             'is_feature': True,
             'feature_stage': 'Invalid',
         })
+        # TODO(#test_utils): Remove the type ignore[no-untyped-call] 
+        # after the file tests/test_utils is fully type-annotated.
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, 'Invalid feature stage, got \'Invalid\''):
             parameter.validate()
@@ -1801,6 +1870,8 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             'is_feature': True,
             'feature_stage': 'dev',
         })
+        # TODO(#test_utils): Remove the type ignore[no-untyped-call] 
+        # after the file tests/test_utils is fully type-annotated.
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, 'must have a server_mode filter'):
             parameter.validate()
@@ -1823,6 +1894,8 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             'is_feature': True,
             'feature_stage': 'dev',
         })
+        # TODO(#test_utils): Remove the type ignore[no-untyped-call] 
+        # after the file tests/test_utils is fully type-annotated.
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, 'cannot be enabled in test or production'):
             parameter.validate()
@@ -1845,6 +1918,8 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             'is_feature': True,
             'feature_stage': 'dev',
         })
+        # TODO(#test_utils): Remove the type ignore[no-untyped-call] 
+        # after the file tests/test_utils is fully type-annotated.
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, 'cannot be enabled in test or production'):
             parameter.validate()
@@ -1868,6 +1943,8 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             'is_feature': True,
             'feature_stage': 'test',
         })
+        # TODO(#test_utils): Remove the type ignore[no-untyped-call] 
+        # after the file tests/test_utils is fully type-annotated.
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, 'cannot be enabled in production'):
             parameter.validate()
