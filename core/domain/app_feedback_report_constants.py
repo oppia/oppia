@@ -52,62 +52,62 @@ TICKET_ID_DELIMITER = '.'
 STATS_ID_DELIMITER = ':'
 ANDROID_VERSION_NAME_DELIMITER = '-'
 
-class REPORT_TYPE(enum.Enum): # pylint: disable: invalid-name
+class REPORT_TYPE(enum.Enum): # pylint: disable=invalid-name
     """Enum for report types."""
 
-    suggestion = 'suggestion' # pylint: disable: invalid-name
-    issue = 'issue' # pylint: disable: invalid-name
-    crash = 'crash' # pylint: disable: invalid-name
-class CATEGORY(enum.Enum): # pylint: disable: invalid-name
+    suggestion = 'suggestion' # pylint: disable=invalid-name
+    issue = 'issue' # pylint: disable=invalid-name
+    crash = 'crash' # pylint: disable=invalid-name
+class CATEGORY(enum.Enum): # pylint: disable=invalid-name
     """Enum for categories."""
 
-    feature_suggestion = 'feature_suggestion' # pylint: disable: invalid-name
-    language_suggestion = 'language_suggestion' # pylint: disable: invalid-name
-    other_suggestion = 'other_suggestion' # pylint: disable: invalid-name
-    lesson_question_issue = 'lesson_question_issue' # pylint: disable: invalid-name
-    language_general_issue = 'language_general_issue' # pylint: disable: invalid-name
-    language_audio_issue = 'language_audio_issue' # pylint: disable: invalid-name
-    language_text_issue = 'language_text_issue' # pylint: disable: invalid-name
-    topics_issue = 'topics_issue' # pylint: disable: invalid-name
-    profile_issue = 'profile_issue' # pylint: disable: invalid-name
-    other_issue = 'other_issue' # pylint: disable: invalid-name
-    lesson_player_crash = 'lesson_player_crash' # pylint: disable: invalid-name
-    practice_questions_crash = 'practice_questions_crash' # pylint: disable: invalid-name
-    options_page_crash = 'options_page_crash' # pylint: disable: invalid-name
-    profile_page_crash = 'profile_page_crash' # pylint: disable: invalid-name
-    other_crash = 'other_crash' # pylint: disable: invalid-name
-class ENTRY_POINT(enum.Enum): # pylint: disable: invalid-name
+    feature_suggestion = 'feature_suggestion' # pylint: disable=invalid-name
+    language_suggestion = 'language_suggestion' # pylint: disable=invalid-name
+    other_suggestion = 'other_suggestion' # pylint: disable=invalid-name
+    lesson_question_issue = 'lesson_question_issue' # pylint: disable=invalid-name
+    language_general_issue = 'language_general_issue' # pylint: disable=invalid-name
+    language_audio_issue = 'language_audio_issue' # pylint: disable=invalid-name
+    language_text_issue = 'language_text_issue' # pylint: disable=invalid-name
+    topics_issue = 'topics_issue' # pylint: disable=invalid-name
+    profile_issue = 'profile_issue' # pylint: disable=invalid-name
+    other_issue = 'other_issue' # pylint: disable=invalid-name
+    lesson_player_crash = 'lesson_player_crash' # pylint: disable=invalid-name
+    practice_questions_crash = 'practice_questions_crash' # pylint: disable=invalid-name
+    options_page_crash = 'options_page_crash' # pylint: disable=invalid-name
+    profile_page_crash = 'profile_page_crash' # pylint: disable=invalid-name
+    other_crash = 'other_crash' # pylint: disable=invalid-name
+class ENTRY_POINT(enum.Enum): # pylint: disable=invalid-name
     """Enum for entry points."""
 
-    navigation_drawer = 'navigation_drawer' # pylint: disable: invalid-name
-    lesson_player = 'lesson_player' # pylint: disable: invalid-name
-    revision_card = 'revision_card' # pylint: disable: invalid-name
-    crash = 'crash' # pylint: disable: invalid-name
-class STATS_PARAMETER_NAMES(enum.Enum): # pylint: disable: invalid-name
+    navigation_drawer = 'navigation_drawer' # pylint: disable=invalid-name
+    lesson_player = 'lesson_player' # pylint: disable=invalid-name
+    revision_card = 'revision_card' # pylint: disable=invalid-name
+    crash = 'crash' # pylint: disable=invalid-name
+class STATS_PARAMETER_NAMES(enum.Enum): # pylint: disable=invalid-name
     """Enum for stats parameter names."""
 
-    platform = 'platform' # pylint: disable: invalid-name
-    report_type = 'report_type' # pylint: disable: invalid-name
-    country_locale_code = 'country_locale_code' # pylint: disable: invalid-name
-    entry_point_name = 'entry_point_name' # pylint: disable: invalid-name
-    text_language_code = 'text_language_code' # pylint: disable: invalid-name
-    audio_language_code = 'audio_language_code' # pylint: disable: invalid-name
-    android_sdk_version = 'android_sdk_version' # pylint: disable: invalid-name
-    version_name = 'version_name' # pylint: disable: invalid-name
-class ANDROID_TEXT_SIZE(enum.Enum): # pylint: disable: invalid-name
+    platform = 'platform' # pylint: disable=invalid-name
+    report_type = 'report_type' # pylint: disable=invalid-name
+    country_locale_code = 'country_locale_code' # pylint: disable=invalid-name
+    entry_point_name = 'entry_point_name' # pylint: disable=invalid-name
+    text_language_code = 'text_language_code' # pylint: disable=invalid-name
+    audio_language_code = 'audio_language_code' # pylint: disable=invalid-name
+    android_sdk_version = 'android_sdk_version' # pylint: disable=invalid-name
+    version_name = 'version_name' # pylint: disable=invalid-name
+class ANDROID_TEXT_SIZE(enum.Enum): # pylint: disable=invalid-name
     """Enum for android text sizes."""
 
-    text_size_unspecified = 'text_size_unspecified' # pylint: disable: invalid-name
-    small_text_size = 'small_text_size' # pylint: disable: invalid-name
-    medium_text_size = 'medium_text_size' # pylint: disable: invalid-name
-    large_text_size = 'large_text_size' # pylint: disable: invalid-name
-    extra_large_text_size = 'extra_large_text_size' # pylint: disable: invalid-name
-class ANDROID_NETWORK_TYPE(enum.Enum): # pylint: disable: invalid-name
+    text_size_unspecified = 'text_size_unspecified' # pylint: disable=invalid-name
+    small_text_size = 'small_text_size' # pylint: disable=invalid-name
+    medium_text_size = 'medium_text_size' # pylint: disable=invalid-name
+    large_text_size = 'large_text_size' # pylint: disable=invalid-name
+    extra_large_text_size = 'extra_large_text_size' # pylint: disable=invalid-name
+class ANDROID_NETWORK_TYPE(enum.Enum): # pylint: disable=invalid-name
     """Enum for android network types."""
 
-    wifi = 'wifi' # pylint: disable: invalid-name
-    cellular = 'cellular' # pylint: disable: invalid-name
-    none = 'none' # pylint: disable: invalid-name
+    wifi = 'wifi' # pylint: disable=invalid-name
+    cellular = 'cellular' # pylint: disable=invalid-name
+    none = 'none' # pylint: disable=invalid-name
 FILTER_FIELD_NAMES = app_feedback_report_models.FILTER_FIELD_NAMES
 
 ANDROID_ENTRY_POINT = [
