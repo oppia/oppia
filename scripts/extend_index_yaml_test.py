@@ -34,7 +34,7 @@ MOCK_WEB_INF_INDEX_YAML_PATH = os.path.join(
 
 class ExtendIndexYamlTest(test_utils.GenericTestBase):
     """Class for testing the extend_index_yaml script."""
-    
+
     def test_extend_index_yaml_with_changes(self):
         index_yaml = """indexes:
 
@@ -83,12 +83,13 @@ class ExtendIndexYamlTest(test_utils.GenericTestBase):
             with self.swap(
                 extend_index_yaml, 'WEB_INF_INDEX_YAML_PATH',
                 MOCK_WEB_INF_INDEX_YAML_PATH):
-                with open(MOCK_INDEX_YAML_PATH, 'w') as f:
+                with open(MOCK_INDEX_YAML_PATH, 'w', encoding='utf-8') as f:
                     f.write(index_yaml)
-                with open(MOCK_WEB_INF_INDEX_YAML_PATH, 'w') as f:
+                with open(
+                    MOCK_WEB_INF_INDEX_YAML_PATH, 'w', encoding='utf-8') as f:
                     f.write(web_inf_index_yaml)
                 extend_index_yaml.main()
-                with open(MOCK_INDEX_YAML_PATH, 'r') as f:
+                with open(MOCK_INDEX_YAML_PATH, 'r', encoding='utf-8') as f:
                     actual_index_yaml = f.read()
                 self.assertEqual(actual_index_yaml, expected_index_yaml)
 
@@ -123,12 +124,13 @@ class ExtendIndexYamlTest(test_utils.GenericTestBase):
             with self.swap(
                 extend_index_yaml, 'WEB_INF_INDEX_YAML_PATH',
                 MOCK_WEB_INF_INDEX_YAML_PATH):
-                with open(MOCK_INDEX_YAML_PATH, 'w') as f:
+                with open(MOCK_INDEX_YAML_PATH, 'w', encoding='utf-8') as f:
                     f.write(index_yaml)
-                with open(MOCK_WEB_INF_INDEX_YAML_PATH, 'w') as f:
+                with open(
+                    MOCK_WEB_INF_INDEX_YAML_PATH, 'w', encoding='utf-8') as f:
                     f.write(web_inf_index_yaml)
                 extend_index_yaml.main()
-                with open(MOCK_INDEX_YAML_PATH, 'r') as f:
+                with open(MOCK_INDEX_YAML_PATH, 'r', encoding='utf-8') as f:
                     actual_index_yaml = f.read()
                 self.assertEqual(actual_index_yaml, index_yaml)
 
@@ -157,12 +159,13 @@ class ExtendIndexYamlTest(test_utils.GenericTestBase):
             with self.swap(
                 extend_index_yaml, 'WEB_INF_INDEX_YAML_PATH',
                 MOCK_WEB_INF_INDEX_YAML_PATH):
-                with open(MOCK_INDEX_YAML_PATH, 'w') as f:
+                with open(MOCK_INDEX_YAML_PATH, 'w', encoding='utf-8') as f:
                     f.write(index_yaml)
-                with open(MOCK_WEB_INF_INDEX_YAML_PATH, 'w') as f:
+                with open(
+                    MOCK_WEB_INF_INDEX_YAML_PATH, 'w', encoding='utf-8') as f:
                     f.write(web_inf_index_yaml)
                 extend_index_yaml.main()
-                with open(MOCK_INDEX_YAML_PATH, 'r') as f:
+                with open(MOCK_INDEX_YAML_PATH, 'r', encoding='utf-8') as f:
                     actual_index_yaml = f.read()
                 self.assertEqual(actual_index_yaml, index_yaml)
 
@@ -225,12 +228,13 @@ class ExtendIndexYamlTest(test_utils.GenericTestBase):
             with self.swap(
                 extend_index_yaml, 'WEB_INF_INDEX_YAML_PATH',
                 MOCK_WEB_INF_INDEX_YAML_PATH):
-                with open(MOCK_INDEX_YAML_PATH, 'w') as f:
+                with open(MOCK_INDEX_YAML_PATH, 'w', encoding='utf-8') as f:
                     f.write(index_yaml)
-                with open(MOCK_WEB_INF_INDEX_YAML_PATH, 'w') as f:
+                with open(
+                    MOCK_WEB_INF_INDEX_YAML_PATH, 'w', encoding='utf-8') as f:
                     f.write(web_inf_index_yaml)
                 extend_index_yaml.main()
-                with open(MOCK_INDEX_YAML_PATH, 'r') as f:
+                with open(MOCK_INDEX_YAML_PATH, 'r', encoding='utf-8') as f:
                     actual_index_yaml = f.read()
                 self.assertEqual(actual_index_yaml, expected_index_yaml)
 
@@ -294,11 +298,12 @@ class ExtendIndexYamlTest(test_utils.GenericTestBase):
             with self.swap(
                 extend_index_yaml, 'WEB_INF_INDEX_YAML_PATH',
                 MOCK_WEB_INF_INDEX_YAML_PATH):
-                with open(MOCK_INDEX_YAML_PATH, 'w') as f:
+                with open(MOCK_INDEX_YAML_PATH, 'w', encoding='utf-8') as f:
                     f.write(index_yaml)
-                with open(MOCK_WEB_INF_INDEX_YAML_PATH, 'w') as f:
+                with open(
+                    MOCK_WEB_INF_INDEX_YAML_PATH, 'w', encoding='utf-8') as f:
                     f.write(web_inf_index_yaml)
                 extend_index_yaml.main()
-                with open(MOCK_INDEX_YAML_PATH, 'r') as f:
+                with open(MOCK_INDEX_YAML_PATH, 'r', encoding='utf-8') as f:
                     actual_index_yaml = f.read()
                 self.assertEqual(actual_index_yaml, expected_index_yaml)

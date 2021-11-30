@@ -50,10 +50,10 @@ def main() -> None:
     if len(new_kinds) == 0:
         return
 
-    index_yaml_dict['indexes']+= new_kinds
+    index_yaml_dict['indexes'] += new_kinds
     index_yaml_dict = yaml.safe_dump(
         index_yaml_dict, default_flow_style=False, sort_keys=False
     )
     index_yaml_dict = index_yaml_dict.replace('- kind', '\n- kind')
-    with open(INDEX_YAML_PATH, 'w') as f:
+    with open(INDEX_YAML_PATH, 'w', encoding='utf-8') as f:
         f.write(index_yaml_dict)
