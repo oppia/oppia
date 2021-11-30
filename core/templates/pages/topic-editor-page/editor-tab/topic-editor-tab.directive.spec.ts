@@ -395,8 +395,8 @@ describe('Topic editor tab directive', function() {
     expect(topicPracticeTabSpy).not.toHaveBeenCalled();
    })
   
-  fit('should call the TopicUpdateService for practice tab if there are more than 10 questions '+
-  'in the topic, if practice tab is displayed property is changed', function () {
+  it('should set the practice tab as displayed if there are at least 10 '+
+  'practice questions in the topic', function () {
     $scope.skillQuestionCountDict = {"skill1": 3, "skill2": 7};
     var topicPracticeTabSpy = (
       spyOn(TopicUpdateService, 'setPracticeTabIsDisplayed'));
