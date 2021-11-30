@@ -31,6 +31,7 @@ import time
 from unittest import mock
 
 from core import python_utils
+from core import utils
 from core.tests import test_utils
 from scripts import common
 from scripts import scripts_test_utils
@@ -889,7 +890,7 @@ class ManagedProcessTests(test_utils.TestBase):
                 (['google-chrome', '--version'],),
             ]))
         self.exit_stack.enter_context(self.swap_with_checks(
-            python_utils, 'url_open',
+            utils, 'url_open',
             lambda _: mock.Mock(read=lambda: b'1.2.3'),
             expected_args=[
                 (
@@ -932,7 +933,7 @@ class ManagedProcessTests(test_utils.TestBase):
         self.exit_stack.enter_context(self.swap_to_always_return(
             subprocess, 'check_output', value=b'1.2.3.45'))
         self.exit_stack.enter_context(self.swap_to_always_return(
-            python_utils, 'url_open', value=mock.Mock(read=lambda: b'1.2.3')))
+            utils, 'url_open', value=mock.Mock(read=lambda: b'1.2.3')))
         self.exit_stack.enter_context(self.swap_to_always_return(
             common, 'is_x64_architecture', value=True))
         self.exit_stack.enter_context(self.swap_with_checks(
