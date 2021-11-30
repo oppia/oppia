@@ -486,18 +486,18 @@ def _construct_exploration_suggestions(suggestions):
     suggestion_dicts = []
     for suggestion in suggestions:
         available_states = exp_id_to_exp[suggestion.target_id].states
-        is_content_id_available = False
+        content_id_exists = False
 
         # Checks whether the state name within change object of the suggestion
         # is actually available in the target entity being suggested to and
         # then find the availability of the content ID in the translatable
         # content. See more - https://github.com/oppia/oppia/issues/14339
         if suggestion.change.state_name in available_states:
-            is_content_id_available = available_states[
+            content_id_exists = available_states[
                 suggestion.change.state_name].has_content_id(
                     suggestion.change.content_id)
 
-        if is_content_id_available:
+        if content_id_exists:
             content_html = exp_id_to_exp[suggestion.target_id].get_content_html(
                 suggestion.change.state_name, suggestion.change.content_id)
             suggestion_dict = suggestion.to_dict()
