@@ -21,6 +21,7 @@ from __future__ import annotations
 import logging
 
 from core import feconf
+from core import schema_utils
 from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
@@ -286,12 +287,14 @@ class UserSubmittedSuggestionsHandler(SuggestionsProviderHandler):
     URL_PATH_ARGS_SCHEMAS = {
         'target_type': {
             'schema': {
-                'type': 'basestring',
+                'type': schema_utils.SCHEMA_TYPE_BASESTRING,
+                'choices': feconf.SUGGESTION_TARGET_TYPE_CHOICES,
             }
         },
         'suggestion_type': {
             'schema': {
-                'type': 'basestring',
+                'type': schema_utils.SCHEMA_TYPE_BASESTRING,
+                'choices': feconf.SUGGESTION_TYPE_CHOICES,
             }
         }
     }
