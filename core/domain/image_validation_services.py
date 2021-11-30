@@ -38,7 +38,6 @@ def validate_image_and_filename(raw_image, filename):
         ValidationError. Image or filename supplied fails one of the
             validation checks.
     """
-
     hundred_kb_in_bytes = 100 * 1024
     if not raw_image:
         raise utils.ValidationError('No image supplied')
@@ -47,7 +46,6 @@ def validate_image_and_filename(raw_image, filename):
             'Image exceeds file size limit of 100 KB.')
     allowed_formats = ', '.join(
         list(feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.keys()))
-    # TODO(#14204): Refactor this to use the normalized_payload files.
     if utils.is_base64_encoded(raw_image):
         raw_image = base64.decodebytes(raw_image.encode('utf-8'))
     if html_validation_service.is_parsable_as_xml(raw_image):

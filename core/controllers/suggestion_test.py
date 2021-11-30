@@ -985,14 +985,10 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
             suggestion.suggestion_id), {
                 'question_state_data': question_state_data,
-                'skill_difficulty': 0.6,
-                'files': {
-                    'img.png': (
-                        base64.b64encode(raw_image).decode('utf-8'))
-                 }
+                'skill_difficulty': 0.6
             },
-            csrf_token=csrf_token,
-            )
+            csrf_token=csrf_token, upload_files=(
+                ('img.png', 'img.png', raw_image),))
 
         updated_suggestion = suggestion_services.get_suggestion_by_id(
             suggestion.suggestion_id)
@@ -1416,11 +1412,10 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     'translation_html': valid_html,
                     'data_format': 'html'
                 },
-                'description':'test'
-            }, csrf_token=csrf_token,
-            upload_files=(
-                 ('file.svg', 'file.svg', large_image),),
-            expected_status_int=400)
+                'description': 'test',
+                'files': { 'file.svg': large_image },
+            }, csrf_token=csrf_token, expected_status_int=400,
+        )
 
         self.assertIn(
             'Image exceeds file size limit of 100 KB.',
