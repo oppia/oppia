@@ -2600,7 +2600,7 @@ class State:
         Raises:
             ValueError. The given content_id does not exist.
         """
-        content_id_to_translatable_item = self._get_all_translatable_content()
+        content_id_to_translatable_item = self.get_all_translatable_content()
         if content_id not in content_id_to_translatable_item:
             raise ValueError('Content ID %s does not exist' % content_id)
 
@@ -2706,7 +2706,7 @@ class State:
         object.
 
         Note: This method only counts the translations which are translatable as
-        per _get_all_translatable_content method.
+        per get_all_translatable_content method.
 
         Returns:
             dict(str, int). A dict with language code as a key and number of
@@ -2715,7 +2715,7 @@ class State:
         translation_counts = collections.defaultdict(int)
         translations_mapping = self.written_translations.translations_mapping
 
-        for content_id in self._get_all_translatable_content():
+        for content_id in self.get_all_translatable_content():
             for language_code, translation in (
                     translations_mapping[content_id].items()):
                 if not translation.needs_update:
@@ -2730,7 +2730,7 @@ class State:
             int. The number of content fields available for translation in
             the state.
         """
-        return len(self._get_all_translatable_content())
+        return len(self.get_all_translatable_content())
 
     def _update_content_ids_in_assets(self, old_ids_list, new_ids_list):
         """Adds or deletes content ids in assets i.e, other parts of state
@@ -3149,7 +3149,7 @@ class State:
                 % card_is_checkpoint)
         self.card_is_checkpoint = card_is_checkpoint
 
-    def _get_all_translatable_content(self):
+    def get_all_translatable_content(self):
         """Returns all content which can be translated into different languages.
 
         Returns:
@@ -3257,16 +3257,6 @@ class State:
 
         return content_id_to_translatable_item
 
-    def get_all_translatable_content(self):
-        """Returns output of _get_all_translatable_content private method.
-
-        Returns:
-            dict(str, TranslatableItem). Returns a dict with key as content
-            id and TranslatableItem as value with the appropriate data
-            format.
-        """
-        return self._get_all_translatable_content()
-
     def get_content_id_mapping_needing_translations(self, language_code):
         """Returns all text html which can be translated in the given language.
 
@@ -3278,7 +3268,7 @@ class State:
             value as TranslatableItem containing the content and the data
             format.
         """
-        content_id_to_translatable_item = self._get_all_translatable_content()
+        content_id_to_translatable_item = self.get_all_translatable_content()
         available_translation_content_ids = (
             self.written_translations
             .get_content_ids_that_are_correctly_translated(language_code))
