@@ -2164,16 +2164,13 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
                 'Unsupported entity_type: topic')
         self.logout()
 
-    def test_voiceover_admin_cannot_assign_voice_artist_in_private_exp(self):
+    def test_voiceover_admin_can_manage_voice_artist_in_private_exp(self):
         self.login(self.VOICEOVER_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.post_json(
+            self.post_json(
                 '/mock/exploration/%s' % self.private_exp_id_1, {},
-                csrf_token=csrf_token, expected_status_int=401)
-            self.assertEqual(
-                response['error'],
-                'You do not have credentials to manage voice artists.')
+                csrf_token=csrf_token)
         self.logout()
 
     def test_owner_cannot_assign_voice_artist_in_public_exp(self):
