@@ -30,6 +30,8 @@ export const QuestionPlayerConstants = {
     FAILED_COLOR_OUTER: 'rgb(244, 206, 186)',
     // Color green.
     PASSED_COLOR: 'rgb(0, 150, 136)',
+    // Color blue.
+    PASSED_COLOR_BAR: 'rgb(32, 93, 134)',
     // Color shallow green.
     PASSED_COLOR_OUTER: 'rgb(143, 217, 209)'
   },

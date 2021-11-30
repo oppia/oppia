@@ -4737,6 +4737,38 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
             self.assertEqual(response['entity_type'], 'skill')
         self.logout()
 
+    def test_can_submit_images_to_questions(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id, self.admin_id, description='Description')
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock_edit_entity/%s/%s' % (
+                feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS, skill_id))
+            self.assertEqual(response['entity_id'], skill_id)
+            self.assertEqual(response['entity_type'], 'question_suggestions')
+        self.logout()
+
+    def test_unauthenticated_users_cannot_submit_images_to_questions(self):
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id, self.admin_id, description='Description')
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock_edit_entity/%s/%s' % (
+                feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS, skill_id),
+                expected_status_int=401)
+
+    def test_cannot_submit_images_to_questions_without_having_permissions(self):
+        self.login(self.user_email)
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id, self.admin_id, description='Description')
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock_edit_entity/%s/%s' % (
+                feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS, skill_id),
+                expected_status_int=401)
+            self.assertEqual(
+                response['error'], 'You do not have credentials to submit'
+                ' images to questions.')
+        self.logout()
+
     def test_can_edit_blog_post(self):
         self.login(self.BLOG_ADMIN_EMAIL)
         blog_admin_id = (
