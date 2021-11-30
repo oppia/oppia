@@ -337,7 +337,7 @@ angular.module('oppia').directive('topicEditorTab', [
             }
           };
 
-          $scope.hasMoreThanTenQuestions = function() {
+          $scope.topicHasAtLeastTenPracticeQuestions = function() {
             var countQuestions = 0;
             $scope.topic.getSkillIds().forEach(item => {
               countQuestions += $scope.skillQuestionCountDict[item];
