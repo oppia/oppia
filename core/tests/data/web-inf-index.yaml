@@ -1,0 +1,8 @@
+indexes:
+
+- kind: BlogPostRightsModel
+  properties:
+  - name: blog_post_is_published
+  - name: editor_ids
+  - name: last_updated
+    direction: desc

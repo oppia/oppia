@@ -18,15 +18,23 @@
 
 from __future__ import annotations
 
-from unittest import mock
+import os
+
 from core.tests import test_utils
 
 from . import extend_index_yaml
 
+INDEX_YAML_TEST_DIR = os.path.join('core', 'tests', 'data', '')
+
+MOCK_INDEX_YAML_PATH = os.path.join(
+    INDEX_YAML_TEST_DIR, 'index.yaml')
+MOCK_WEB_INF_INDEX_YAML_PATH = os.path.join(
+    INDEX_YAML_TEST_DIR, 'web-inf-index.yaml')
+
 
 class ExtendIndexYamlTest(test_utils.GenericTestBase):
     """Class for testing the extend_index_yaml script."""
-
+    
     def test_extend_index_yaml_with_changes(self):
         index_yaml = """indexes:
 
@@ -69,15 +77,20 @@ class ExtendIndexYamlTest(test_utils.GenericTestBase):
   - name: next_scheduled_check_time
 """
 
-        with mock.patch('builtins.open', mock.mock_open()) as mock_open_file:
-            mock_open_file.return_value.__enter__.side_effect = [
-                index_yaml,
-                web_inf_index_yaml,
-                open(extend_index_yaml.INDEX_YAML_PATH, 'w', encoding='utf-8'),
-            ]
-            extend_index_yaml.main()
-
-            mock_open_file().write.assert_called_with(expected_index_yaml)
+        with self.swap(
+            extend_index_yaml, 'INDEX_YAML_PATH',
+            MOCK_INDEX_YAML_PATH):
+            with self.swap(
+                extend_index_yaml, 'WEB_INF_INDEX_YAML_PATH',
+                MOCK_WEB_INF_INDEX_YAML_PATH):
+                with open(MOCK_INDEX_YAML_PATH, 'w') as f:
+                    f.write(index_yaml)
+                with open(MOCK_WEB_INF_INDEX_YAML_PATH, 'w') as f:
+                    f.write(web_inf_index_yaml)
+                extend_index_yaml.main()
+                with open(MOCK_INDEX_YAML_PATH, 'r') as f:
+                    actual_index_yaml = f.read()
+                self.assertEqual(actual_index_yaml, expected_index_yaml)
 
     def test_extend_index_yaml_without_changes(self):
         index_yaml = """indexes:
@@ -104,15 +117,20 @@ class ExtendIndexYamlTest(test_utils.GenericTestBase):
     direction: desc
 """
 
-        with mock.patch('builtins.open', mock.mock_open()) as mock_open_file:
-            mock_open_file.return_value.__enter__.side_effect = [
-                index_yaml,
-                web_inf_index_yaml,
-                open(extend_index_yaml.INDEX_YAML_PATH, 'w', encoding='utf-8'),
-            ]
-            extend_index_yaml.main()
-
-            assert mock_open_file().write.called is False
+        with self.swap(
+            extend_index_yaml, 'INDEX_YAML_PATH',
+            MOCK_INDEX_YAML_PATH):
+            with self.swap(
+                extend_index_yaml, 'WEB_INF_INDEX_YAML_PATH',
+                MOCK_WEB_INF_INDEX_YAML_PATH):
+                with open(MOCK_INDEX_YAML_PATH, 'w') as f:
+                    f.write(index_yaml)
+                with open(MOCK_WEB_INF_INDEX_YAML_PATH, 'w') as f:
+                    f.write(web_inf_index_yaml)
+                extend_index_yaml.main()
+                with open(MOCK_INDEX_YAML_PATH, 'r') as f:
+                    actual_index_yaml = f.read()
+                self.assertEqual(actual_index_yaml, index_yaml)
 
     def test_extend_index_yaml_with_empty_web_inf_ind_yaml(self):
         index_yaml = """indexes:
@@ -133,14 +151,20 @@ class ExtendIndexYamlTest(test_utils.GenericTestBase):
 
 """
 
-        with mock.patch('builtins.open', mock.mock_open()) as mock_open_file:
-            mock_open_file.return_value.__enter__.side_effect = [
-                index_yaml,
-                web_inf_index_yaml,
-            ]
-            extend_index_yaml.main()
-
-        assert mock_open_file().write.called is False
+        with self.swap(
+            extend_index_yaml, 'INDEX_YAML_PATH',
+            MOCK_INDEX_YAML_PATH):
+            with self.swap(
+                extend_index_yaml, 'WEB_INF_INDEX_YAML_PATH',
+                MOCK_WEB_INF_INDEX_YAML_PATH):
+                with open(MOCK_INDEX_YAML_PATH, 'w') as f:
+                    f.write(index_yaml)
+                with open(MOCK_WEB_INF_INDEX_YAML_PATH, 'w') as f:
+                    f.write(web_inf_index_yaml)
+                extend_index_yaml.main()
+                with open(MOCK_INDEX_YAML_PATH, 'r') as f:
+                    actual_index_yaml = f.read()
+                self.assertEqual(actual_index_yaml, index_yaml)
 
     def test_extend_index_yaml_with_same_kind(self):
         index_yaml = """indexes:
@@ -195,15 +219,20 @@ class ExtendIndexYamlTest(test_utils.GenericTestBase):
   - name: status
   - name: next_scheduled_check_time
 """
-        with mock.patch('builtins.open', mock.mock_open()) as mock_open_file:
-            mock_open_file.return_value.__enter__.side_effect = [
-                index_yaml,
-                web_inf_index_yaml,
-                open(extend_index_yaml.INDEX_YAML_PATH, 'w', encoding='utf-8'),
-            ]
-            extend_index_yaml.main()
-
-            mock_open_file().write.assert_called_with(expected_index_yaml)
+        with self.swap(
+            extend_index_yaml, 'INDEX_YAML_PATH',
+            MOCK_INDEX_YAML_PATH):
+            with self.swap(
+                extend_index_yaml, 'WEB_INF_INDEX_YAML_PATH',
+                MOCK_WEB_INF_INDEX_YAML_PATH):
+                with open(MOCK_INDEX_YAML_PATH, 'w') as f:
+                    f.write(index_yaml)
+                with open(MOCK_WEB_INF_INDEX_YAML_PATH, 'w') as f:
+                    f.write(web_inf_index_yaml)
+                extend_index_yaml.main()
+                with open(MOCK_INDEX_YAML_PATH, 'r') as f:
+                    actual_index_yaml = f.read()
+                self.assertEqual(actual_index_yaml, expected_index_yaml)
 
     def test_extend_index_yaml_with_same_kind_in_web_inf(self):
         index_yaml = """indexes:
@@ -259,12 +288,17 @@ class ExtendIndexYamlTest(test_utils.GenericTestBase):
   - name: status
   - name: next_scheduled_check_time
 """
-        with mock.patch('builtins.open', mock.mock_open()) as mock_open_file:
-            mock_open_file.return_value.__enter__.side_effect = [
-                index_yaml,
-                web_inf_index_yaml,
-                open(extend_index_yaml.INDEX_YAML_PATH, 'w', encoding='utf-8'),
-            ]
-            extend_index_yaml.main()
-
-            mock_open_file().write.assert_called_with(expected_index_yaml)
+        with self.swap(
+            extend_index_yaml, 'INDEX_YAML_PATH',
+            MOCK_INDEX_YAML_PATH):
+            with self.swap(
+                extend_index_yaml, 'WEB_INF_INDEX_YAML_PATH',
+                MOCK_WEB_INF_INDEX_YAML_PATH):
+                with open(MOCK_INDEX_YAML_PATH, 'w') as f:
+                    f.write(index_yaml)
+                with open(MOCK_WEB_INF_INDEX_YAML_PATH, 'w') as f:
+                    f.write(web_inf_index_yaml)
+                extend_index_yaml.main()
+                with open(MOCK_INDEX_YAML_PATH, 'r') as f:
+                    actual_index_yaml = f.read()
+                self.assertEqual(actual_index_yaml, expected_index_yaml)
