@@ -338,11 +338,9 @@ angular.module('oppia').directive('topicEditorTab', [
           };
 
           $scope.topicHasAtLeastTenPracticeQuestions = function() {
-            var countQuestions = 0;
-            $scope.topic.getSkillIds().forEach(item => {
-              countQuestions += $scope.skillQuestionCountDict[item];
-            })
-            return countQuestions >= 10;
+            let skillQuestionCounts = Object.values($scope.skillQuestionCountDict);
+            let numberOfPracticeQuestions = skillQuestionCounts.reduce((a, b) => a + b, 0);
+            return numberOfPracticeQuestions >= 10;
           };
 
           $scope.deleteUncategorizedSkillFromTopic = function(skillSummary) {
