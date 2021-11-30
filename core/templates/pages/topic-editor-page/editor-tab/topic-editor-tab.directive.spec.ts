@@ -385,8 +385,8 @@ describe('Topic editor tab directive', function() {
     expect(topicPracticeTabSpy).not.toHaveBeenCalled();
   });
 
-  fit('should not call the TopicUpdateService for practice tab if there are less than 10 questions '+
-   'in the topic, no matter what', function () {
+  it('should not set the practice tab as displayed if there are less than 10 '+
+   'practice questions in the topic', function () {
      // There are initially less than 10 questions in the topic
     var topicPracticeTabSpy = (
       spyOn(TopicUpdateService, 'setPracticeTabIsDisplayed'));
