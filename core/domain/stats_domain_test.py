@@ -1136,7 +1136,13 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
             2,
             True
         )
-        exp_issue3 = exp_issue1
+        exp_issue3 = stats_domain.ExplorationIssue(
+            'EarlyQuit',
+            expected_customization_args,
+            [],
+            1,
+            True
+        )
 
         self.assertTrue(exp_issue1 == exp_issue3)
         self.assertFalse(exp_issue2 == exp_issue3)

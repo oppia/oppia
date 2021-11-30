@@ -150,7 +150,7 @@ class Registry:
 
     @classmethod
     def update_platform_parameter(
-            cls, name, committer_id, commit_message, new_rules):
+        cls, name, committer_id, commit_message, new_rules):
         """Updates the platform parameter with new rules.
 
         Args:

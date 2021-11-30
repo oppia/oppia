@@ -113,7 +113,7 @@ def is_feature_enabled(feature_name):
 
 
 def update_feature_flag_rules(
-        feature_name, committer_id, commit_message, new_rules):
+    feature_name, committer_id, commit_message, new_rules):
     """Updates the feature flag's rules.
 
     Args:

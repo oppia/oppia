@@ -117,11 +117,11 @@ class PayloadValidationUnitTests(test_utils.GenericTestBase):
                 'apply_draft': {
                     'schema': {
                         'type': 'bool',
-                        'new_key_for_argument': 'new_kay_for_apply_draft'
+                        'new_key_for_argument': 'new_key_for_apply_draft'
                     }
                 }
             }, {
-                'new_kay_for_apply_draft': True
+                'new_key_for_apply_draft': True
             })
         ]
         for handler_args, handler_args_schema, normalized_value_for_args in (
