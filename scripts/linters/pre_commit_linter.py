@@ -374,7 +374,8 @@ def _get_filepaths_from_path(input_path, namespace=None):
         return [input_path]
     else:
         eslintignore_path = os.path.join(os.getcwd(), '.eslintignore')
-        excluded_glob_patterns = file_cache.readlines(eslintignore_path)
+        excluded_glob_patterns = [
+            line.strip() for line in file_cache.readlines(eslintignore_path)]
         return _get_all_files_in_directory(
             input_path, excluded_glob_patterns)
 

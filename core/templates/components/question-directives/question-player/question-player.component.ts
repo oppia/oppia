@@ -381,6 +381,8 @@ angular.module('oppia').component('questionPlayer', {
         ctrl.totalScore = Math.round(
           ctrl.totalScore * 100 / totalQuestions);
         $scope.resultsLoaded = true;
+        QuestionPlayerStateService.resultsPageIsLoadedEventEmitter.emit(
+          $scope.resultsLoaded);
       };
 
       var getMasteryChangeForWrongAnswers = function(
@@ -584,6 +586,8 @@ angular.module('oppia').component('questionPlayer', {
         // called in $scope.$on when some external events are triggered.
         initResults();
         ctrl.questionPlayerConfig = ctrl.getQuestionPlayerConfig();
+        QuestionPlayerStateService.resultsPageIsLoadedEventEmitter.emit(
+          $scope.resultsLoaded);
         PreventPageUnloadEventService.addListener(
           () => {
             return (getCurrentQuestion() > 1);
