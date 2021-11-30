@@ -397,7 +397,7 @@ describe('Topic editor tab directive', function() {
   
   it('should set the practice tab as displayed if there are at least 10 '+
   'practice questions in the topic', function () {
-    $scope.skillQuestionCountDict = {"skill1": 3, "skill2": 7};
+    $scope.skillQuestionCountDict = {"skill1": 3, "skill2": 6};
     var topicPracticeTabSpy = (
       spyOn(TopicUpdateService, 'setPracticeTabIsDisplayed'));
     $scope.updatePracticeTabIsDisplayed(true);
