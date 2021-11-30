@@ -135,14 +135,129 @@ class DragAndDropSortInput(base.BaseInteraction):
         answer_group_list_proto = []
         for answer_group in answer_groups:
             base_answer_group_proto = answer_group.to_proto()
+            rules_spec_proto = cls._to_rule_specs_proto(
+                answer_group.rule_specs)
             answer_group_proto = (
                 state_pb2.DragAndDropSortInputInstance.AnswerGroup(
-                    base_answer_group=base_answer_group_proto
+                    base_answer_group=base_answer_group_proto,
+                    rule_specs=rules_spec_proto
                 )
             )
             answer_group_list_proto.append(answer_group_proto)
 
         return answer_group_list_proto
+
+    @classmethod
+    def _to_rule_specs_proto(cls, rule_specs_list):
+        """Creates a RuleSpec proto object.
+
+        Args:
+            rule_specs_list: list(RuleSpec). List of rule specifications.
+
+        Returns:
+            list. The RuleSpec proto object list.
+        """
+        rule_specs_list_proto = []
+        rules_specs_proto = {}
+
+        rule_type_to_proto_func_mapping = {
+            'IsEqualToOrdering': cls._to_equal_to_proto,
+            'IsEqualToOrderingWithOneItemAtIncorrectPosition': (
+                cls._to_equal_one_incorrect_to_proto),
+            'HasElementXAtPositionY': (
+                cls._to_has_element_x_at_proto),
+            'HasElementXBeforeElementY': (
+                cls._to_has_element_x_before_proto)
+        }
+
+        rule_type_to_proto_mapping = {
+            'IsEqualToOrdering': lambda x: (
+                state_pb2.DragAndDropSortInputInstance.RuleSpec(
+                    is_equal_to_ordering=x)),
+            'IsEqualToOrderingWithOneItemAtIncorrectPosition': lambda x: (
+                state_pb2.DragAndDropSortInputInstance.RuleSpec(
+                    is_equal_to_ordering_with_one_item_at_incorrect_position=x)), # pylint: disable=line-too-long
+            'HasElementXAtPositionY': lambda x: (
+                state_pb2.DragAndDropSortInputInstance.RuleSpec(
+                    has_element_x_at_position_y=x)),
+            'HasElementXBeforeElementY': lambda x: (
+                state_pb2.DragAndDropSortInputInstance.RuleSpec(
+                    has_element_x_before_element_y=x))
+        }
+
+        for rule_spec in rule_specs_list:
+            rule_type = rule_spec.rule_type
+            rule_proto = (
+                rule_type_to_proto_func_mapping[rule_type](
+                    rule_spec.inputs
+                )
+            )
+            rules_specs_proto = (
+                rule_type_to_proto_mapping[rule_type](rule_proto)
+            )
+            rule_specs_list_proto.append(rules_specs_proto)
+
+        return rule_specs_list_proto
+
+    @classmethod
+    def _to_equal_to_proto(cls, input_dict):
+        """Creates a proto object for IsEqualToOrderingSpec.
+
+        Args:
+            input_dict: dict. The rule dict.
+
+        Returns:
+            IsEqualToOrderingSpec. The proto object.
+        """
+        return state_pb2.DragAndDropSortInputInstance.RuleSpec.IsEqualToOrderingSpec( # pylint: disable=line-too-long
+            input=cls._to_list_of_set_of_translatable_html_content_ids(input_dict['x']) # pylint: disable=line-too-long
+        )
+
+    @classmethod
+    def _to_equal_one_incorrect_to_proto(cls, input_dict):
+        """Creates a proto object
+        for IsEqualToOrderingWithOneItemAtIncorrectPositionSpec.
+
+        Args:
+            input_dict: dict. The rule dict.
+
+        Returns:
+            IsEqualToOrderingWithOneItemAtIncorrectPositionSpec.
+            The proto object.
+        """
+        return state_pb2.DragAndDropSortInputInstance.RuleSpec.IsEqualToOrderingWithOneItemAtIncorrectPositionSpec( # pylint: disable=line-too-long
+            input=cls._to_list_of_set_of_translatable_html_content_ids(input_dict['x']) # pylint: disable=line-too-long
+        )
+
+    @classmethod
+    def _to_has_element_x_at_proto(cls, input_dict):
+        """Creates a proto object for IsEqualToOrderingSpec.
+
+        Args:
+            input_dict: dict. The rule dict.
+
+        Returns:
+            IsEqualToOrderingSpec. The proto object.
+        """
+        return state_pb2.DragAndDropSortInputInstance.RuleSpec.HasElementXAtPositionYSpec( # pylint: disable=line-too-long
+            element=cls._to_translatable_html_content_id_proto(input_dict['x']), # pylint: disable=line-too-long
+            position=input_dict['y']
+        )
+
+    @classmethod
+    def _to_has_element_x_before_proto(cls, input_dict):
+        """Creates a proto object for IsEqualToOrderingSpec.
+
+        Args:
+            input_dict: dict. The rule dict.
+
+        Returns:
+            IsEqualToOrderingSpec. The proto object.
+        """
+        return state_pb2.DragAndDropSortInputInstance.RuleSpec.HasElementXBeforeElementYSpec( # pylint: disable=line-too-long
+            considered_element=cls._to_translatable_html_content_id_proto(input_dict['x']), # pylint: disable=line-too-long
+            later_element=cls._to_translatable_html_content_id_proto(input_dict['y']) # pylint: disable=line-too-long
+        )
 
     @classmethod
     def _to_solution_proto(cls, solution):

@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 from extensions.interactions import base
+from proto_files import objects_pb2
 from proto_files import state_pb2
 
 
@@ -173,9 +174,12 @@ class ItemSelectionInput(base.BaseInteraction):
 
         for answer_group in answer_groups:
             base_answer_group_proto = answer_group.to_proto()
+            rules_spec_proto = cls._to_item_selection_rule_specs_proto(
+                answer_group.rule_specs)
             answer_group_proto = (
                 state_pb2.ItemSelectionInputInstance.AnswerGroup(
-                    base_answer_group=base_answer_group_proto
+                    base_answer_group=base_answer_group_proto,
+                    rule_specs=rules_spec_proto
                 )
             )
             answer_group_list_proto.append(answer_group_proto)
@@ -210,10 +214,10 @@ class ItemSelectionInput(base.BaseInteraction):
             'ContainsAtLeastOneOf': lambda x: (
                 state_pb2.ItemSelectionInputInstance.RuleSpec(
                     contains_at_least_one_of=x)),
-            'IsProperSubsetOf': lambda x: (
+            'DoesNotContainAtLeastOneOf': lambda x: (
                 state_pb2.ItemSelectionInputInstance.RuleSpec(
                     does_not_contain_at_least_one_of=x)),
-            'DoesNotContainAtLeastOneOf': lambda x: (
+            'IsProperSubsetOf': lambda x: (
                 state_pb2.ItemSelectionInputInstance.RuleSpec(
                     is_proper_subset_of=x))
         }
@@ -222,7 +226,7 @@ class ItemSelectionInput(base.BaseInteraction):
             rule_type = rule_spec.rule_type
             rule_proto = (
                 rule_type_to_proto_func_mapping[rule_type](
-                    rule_spec.inputs['f']
+                    rule_spec.inputs['x']
                 )
             )
             rules_specs_proto = (
@@ -231,3 +235,103 @@ class ItemSelectionInput(base.BaseInteraction):
             rule_specs_list_proto.append(rules_specs_proto)
 
         return rule_specs_list_proto
+
+    @classmethod
+    def _to_is_equal_to_proto(cls, choice_list):
+        """Creates a proto object for EqualsSpec.
+
+        Args:
+            choice_list: list. Choice list to select from.
+
+        Returns:
+            EqualsSpec. The proto object.
+        """
+        return state_pb2.ItemSelectionInputInstance.RuleSpec.EqualsSpec( # pylint: disable=line-too-long
+            input=cls._to_set_of_translatable_html_content_ids_proto(choice_list) # pylint: disable=line-too-long
+        )
+
+    @classmethod
+    def _to_contains_at_least_one_of_to_proto(cls, choice_list):
+        """Creates a proto object for ContainsAtLeastOneOfSpec.
+
+        Args:
+            choice_list: list. Choice list to select from.
+
+        Returns:
+            ContainsAtLeastOneOfSpec. The proto object.
+        """
+        return state_pb2.ItemSelectionInputInstance.RuleSpec.ContainsAtLeastOneOfSpec( # pylint: disable=line-too-long
+            input=cls._to_set_of_translatable_html_content_ids_proto(choice_list) # pylint: disable=line-too-long
+        )
+
+    @classmethod
+    def _to_is_proper_subset_of_to_proto(cls, choice_list):
+        """Creates a proto object for IsProperSubsetOfSpec.
+
+        Args:
+            choice_list: list. Choice list to select from.
+
+        Returns:
+            IsProperSubsetOfSpec. The proto object.
+        """
+        return state_pb2.ItemSelectionInputInstance.RuleSpec.IsProperSubsetOfSpec( # pylint: disable=line-too-long
+            input=cls._to_set_of_translatable_html_content_ids_proto(choice_list) # pylint: disable=line-too-long
+        )
+
+    @classmethod
+    def _to_does_not_contains_at_least_one_of_to_proto(
+        cls, choice_list
+    ):
+        """Creates a proto object for DoesNotContainAtLeastOneOfSpec.
+
+        Args:
+            choice_list: list. Choice list to select from.
+
+        Returns:
+            DoesNotContainAtLeastOneOfSpec. The proto object.
+        """
+        return state_pb2.ItemSelectionInputInstance.RuleSpec.DoesNotContainAtLeastOneOfSpec( # pylint: disable=line-too-long
+            input=cls._to_set_of_translatable_html_content_ids_proto(choice_list) # pylint: disable=line-too-long
+        )
+
+    @classmethod
+    def _to_set_of_translatable_html_content_ids_proto(
+        cls, set_of_content_id
+    ):
+        """Creates a SetOfTranslatableHtmlContentIds proto object.
+
+        Args:
+            set_of_content_id: list. A list of
+                TranslatableHtmlContentId.
+
+        Returns:
+            SetOfTranslatableHtmlContentIds. The proto object.
+        """
+        content_id_lists_proto = []
+        for translatable_html_content_id in set_of_content_id:
+            translatable_html_content_id_proto = (
+                cls._to_translatable_html_content_id_proto(
+                    translatable_html_content_id)
+            )
+            content_id_lists_proto.append(translatable_html_content_id_proto) # pylint: disable=line-too-long
+
+        return objects_pb2.SetOfTranslatableHtmlContentIds(
+            content_ids=content_id_lists_proto
+        )
+
+    @classmethod
+    def _to_translatable_html_content_id_proto(
+        cls, translatable_html_content_id
+    ):
+        """Creates a TranslatableHtmlContentId proto object.
+
+        Args:
+            translatable_html_content_id: str. A
+                TranslatableHtml content id.
+
+        Returns:
+            TranslatableHtmlContentId. The proto object.
+        """
+        return objects_pb2.TranslatableHtmlContentId(
+            content_id=translatable_html_content_id
+        )

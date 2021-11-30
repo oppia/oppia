@@ -5623,9 +5623,6 @@ class FractionInputInteractionTests(test_utils.GenericTestBase):
 class ItemSelectionInputInteractionTests(test_utils.GenericTestBase):
 
     def test_to_proto(self):
-        html_with_old_math_schema = (
-            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
-            'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
         interaction_dict = {
             'answer_groups': [{
                 'outcome': {
@@ -5642,26 +5639,71 @@ class ItemSelectionInputInteractionTests(test_utils.GenericTestBase):
                 'rule_specs': [{
                     'rule_type': 'Equals',
                     'inputs': {
-                        'x': [html_with_old_math_schema]
-                    }
-                }, {
-                    'rule_type': 'ContainsAtLeastOneOf',
-                    'inputs': {
-                        'x': [html_with_old_math_schema]
-                    }
-                }, {
-                    'rule_type': 'IsProperSubsetOf',
-                    'inputs': {
-                        'x': [html_with_old_math_schema]
-                    }
-                }, {
-                    'rule_type': 'DoesNotContainAtLeastOneOf',
-                    'inputs': {
-                        'x': [html_with_old_math_schema]
+                        'x': ['<p>Choice 1</p>', '<p>Choice 2</p>']
                     }
                 }],
-            'training_data': [],
-            'tagged_skill_misconception_id': None
+                'training_data': [],
+                'tagged_skill_misconception_id': None
+            }, {
+                'outcome': {
+                    'dest': 'abc',
+                    'feedback': {
+                        'content_id': 'feedback_1',
+                        'html': '<p>Feedback</p>'
+                    },
+                    'labelled_as_correct': True,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
+                },
+                'rule_specs': [{
+                    'rule_type': 'ContainsAtLeastOneOf',
+                    'inputs': {
+                        'x': ['<p>Choice 1</p>', '<p>Choice 2</p>']
+                    }
+                }],
+                'training_data': [],
+                'tagged_skill_misconception_id': None
+            }, {
+                'outcome': {
+                    'dest': 'abc',
+                    'feedback': {
+                        'content_id': 'feedback_1',
+                        'html': '<p>Feedback</p>'
+                    },
+                    'labelled_as_correct': True,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
+                },
+                'rule_specs': [{
+                    'rule_type': 'DoesNotContainAtLeastOneOf',
+                    'inputs': {
+                        'x': ['<p>Choice 1</p>', '<p>Choice 2</p>']
+                    }
+                }],
+                'training_data': [],
+                'tagged_skill_misconception_id': None
+            }, {
+                'outcome': {
+                    'dest': 'abc',
+                    'feedback': {
+                        'content_id': 'feedback_1',
+                        'html': '<p>Feedback</p>'
+                    },
+                    'labelled_as_correct': True,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
+                },
+                'rule_specs': [{
+                    'rule_type': 'IsProperSubsetOf',
+                    'inputs': {
+                        'x': ['<p>Choice 1</p>', '<p>Choice 2</p>']
+                    }
+                }],
+                'training_data': [],
+                'tagged_skill_misconception_id': None
             }],
             'confirmed_unclassified_answers': [],
             'customization_args': {
@@ -5772,6 +5814,21 @@ class ItemSelectionInputInteractionTests(test_utils.GenericTestBase):
         self.assertEqual(
             item_selection_proto.answer_groups[0].base_answer_group.outcome.feedback.text, # pylint: disable=line-too-long
             '<p>Feedback</p>')
+        self.assertEqual(
+            item_selection_proto.answer_groups[0].rule_specs[0].equals.input.content_ids[0].content_id, # pylint: disable=line-too-long
+            '<p>Choice 1</p>')
+        self.assertEqual(
+            item_selection_proto.answer_groups[0].rule_specs[0].equals.input.content_ids[1].content_id, # pylint: disable=line-too-long
+            '<p>Choice 2</p>')
+        self.assertEqual(
+            item_selection_proto.answer_groups[1].rule_specs[0].contains_at_least_one_of.input.content_ids[0].content_id, # pylint: disable=line-too-long
+            '<p>Choice 1</p>')
+        self.assertEqual(
+            item_selection_proto.answer_groups[2].rule_specs[0].does_not_contain_at_least_one_of.input.content_ids[0].content_id, # pylint: disable=line-too-long
+            '<p>Choice 1</p>')
+        self.assertEqual(
+            item_selection_proto.answer_groups[3].rule_specs[0].is_proper_subset_of.input.content_ids[0].content_id, # pylint: disable=line-too-long
+            '<p>Choice 1</p>')
 
 
 class MultipleChoiceInputInteractionTests(test_utils.GenericTestBase):
@@ -5956,6 +6013,75 @@ class TextInputInteractionTests(test_utils.GenericTestBase):
                     }
                 }],
                 'tagged_skill_misconception_id': None
+            }, {
+                'training_data': [],
+                'outcome': {
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'dest': 'Introduction',
+                    'missing_prerequisite_skill_id': None,
+                    'feedback': {
+                        'content_id': 'feedback_1',
+                        'html': '<p>This is great! ®®</p>'
+                    },
+                    'labelled_as_correct': False
+                },
+                'rule_specs': [{
+                    'rule_type': 'Equals',
+                    'inputs': {
+                        'x': {
+                            'contentId': 'rule_input_1',
+                            'normalizedStrSet': ['®®']
+                        }
+                    }
+                }],
+                'tagged_skill_misconception_id': None
+            }, {
+                'training_data': [],
+                'outcome': {
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'dest': 'Introduction',
+                    'missing_prerequisite_skill_id': None,
+                    'feedback': {
+                        'content_id': 'feedback_1',
+                        'html': '<p>This is great! ®®</p>'
+                    },
+                    'labelled_as_correct': False
+                },
+                'rule_specs': [{
+                    'rule_type': 'StartsWith',
+                    'inputs': {
+                        'x': {
+                            'contentId': 'rule_input_1',
+                            'normalizedStrSet': ['®®']
+                        }
+                    }
+                }],
+                'tagged_skill_misconception_id': None
+            }, {
+                'training_data': [],
+                'outcome': {
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'dest': 'Introduction',
+                    'missing_prerequisite_skill_id': None,
+                    'feedback': {
+                        'content_id': 'feedback_1',
+                        'html': '<p>This is great! ®®</p>'
+                    },
+                    'labelled_as_correct': False
+                },
+                'rule_specs': [{
+                    'rule_type': 'FuzzyEquals',
+                    'inputs': {
+                        'x': {
+                            'contentId': 'rule_input_1',
+                            'normalizedStrSet': ['®®']
+                        }
+                    }
+                }],
+                'tagged_skill_misconception_id': None
             }]
         }
         text_input_instance = (
@@ -6017,34 +6143,179 @@ class TextInputInteractionTests(test_utils.GenericTestBase):
         self.assertEqual(
             text_input_proto.solution.base_solution.explanation.text,
             '<p>Solution explanation</p>')
+        self.assertEqual(
+            text_input_proto.answer_groups[0].rule_specs[0].contains.input.content_id, # pylint: disable=line-too-long
+            'rule_input_4')
+        self.assertEqual(
+            text_input_proto.answer_groups[1].rule_specs[0].equals.input.content_id, # pylint: disable=line-too-long
+            'rule_input_1')
+        self.assertEqual(
+            text_input_proto.answer_groups[2].rule_specs[0].starts_with.input.content_id, # pylint: disable=line-too-long
+            'rule_input_1')
+        self.assertEqual(
+            text_input_proto.answer_groups[3].rule_specs[0].fuzzy_equals.input.content_id, # pylint: disable=line-too-long
+            'rule_input_1')
+        self.assertEqual(
+            text_input_proto.answer_groups[0].rule_specs[0].contains.input.normalized_strings[0], # pylint: disable=line-too-long
+            '®®')
+        self.assertEqual(
+            text_input_proto.answer_groups[1].rule_specs[0].equals.input.normalized_strings[0], # pylint: disable=line-too-long
+            '®®')
+        self.assertEqual(
+            text_input_proto.answer_groups[2].rule_specs[0].starts_with.input.normalized_strings[0], # pylint: disable=line-too-long
+            '®®')
+        self.assertEqual(
+            text_input_proto.answer_groups[3].rule_specs[0].fuzzy_equals.input.normalized_strings[0], # pylint: disable=line-too-long
+            '®®')
 
 
 class NumericInputInteractionTests(test_utils.GenericTestBase):
 
     def test_to_proto(self):
-        answer_group = {
-            'outcome': {
-                'dest': 'abc',
-                'feedback': {
-                    'content_id': 'feedback_2',
-                    'html': '<p>Feedback</p>'
-                },
-                'labelled_as_correct': True,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'rule_specs': [{
-                'inputs': {
-                    'x': ['Test']
-                },
-                'rule_type': 'Equals'
-            }],
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }
         interaction_dict = {
-            'answer_groups': [answer_group],
+            'answer_groups': [{
+                'outcome': {
+                    'dest': 'abc',
+                    'feedback': {
+                        'content_id': 'feedback_2',
+                        'html': '<p>Feedback</p>'
+                    },
+                    'labelled_as_correct': True,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
+                },
+                'rule_specs': [{
+                    'inputs': {
+                        'x': 5.0
+                    },
+                    'rule_type': 'Equals'
+                }],
+                'training_data': [],
+                'tagged_skill_misconception_id': None
+            }, {
+                'outcome': {
+                    'dest': 'abc',
+                    'feedback': {
+                        'content_id': 'feedback_2',
+                        'html': '<p>Feedback</p>'
+                    },
+                    'labelled_as_correct': True,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
+                },
+                'rule_specs': [{
+                    'inputs': {
+                        'x': 5.0
+                    },
+                    'rule_type': 'IsLessThan'
+                }],
+                'training_data': [],
+                'tagged_skill_misconception_id': None
+            }, {
+                'outcome': {
+                    'dest': 'abc',
+                    'feedback': {
+                        'content_id': 'feedback_2',
+                        'html': '<p>Feedback</p>'
+                    },
+                    'labelled_as_correct': True,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
+                },
+                'rule_specs': [{
+                    'inputs': {
+                        'x': 5.0
+                    },
+                    'rule_type': 'IsGreaterThan'
+                }],
+                'training_data': [],
+                'tagged_skill_misconception_id': None
+            }, {
+                'outcome': {
+                    'dest': 'abc',
+                    'feedback': {
+                        'content_id': 'feedback_2',
+                        'html': '<p>Feedback</p>'
+                    },
+                    'labelled_as_correct': True,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
+                },
+                'rule_specs': [{
+                    'inputs': {
+                        'x': 5.0
+                    },
+                    'rule_type': 'IsLessThanOrEqualTo'
+                }],
+                'training_data': [],
+                'tagged_skill_misconception_id': None
+            }, {
+                'outcome': {
+                    'dest': 'abc',
+                    'feedback': {
+                        'content_id': 'feedback_2',
+                        'html': '<p>Feedback</p>'
+                    },
+                    'labelled_as_correct': True,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
+                },
+                'rule_specs': [{
+                    'inputs': {
+                        'x': 5.0
+                    },
+                    'rule_type': 'IsGreaterThanOrEqualTo'
+                }],
+                'training_data': [],
+                'tagged_skill_misconception_id': None
+            }, {
+                'outcome': {
+                    'dest': 'abc',
+                    'feedback': {
+                        'content_id': 'feedback_2',
+                        'html': '<p>Feedback</p>'
+                    },
+                    'labelled_as_correct': True,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
+                },
+                'rule_specs': [{
+                    'inputs': {
+                        'a': 5.0,
+                        'b': 10.0
+                    },
+                    'rule_type': 'IsInclusivelyBetween'
+                }],
+                'training_data': [],
+                'tagged_skill_misconception_id': None
+            }, {
+                'outcome': {
+                    'dest': 'abc',
+                    'feedback': {
+                        'content_id': 'feedback_2',
+                        'html': '<p>Feedback</p>'
+                    },
+                    'labelled_as_correct': True,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
+                },
+                'rule_specs': [{
+                    'inputs': {
+                        'x': 5.0,
+                        'tol': 5.0
+                    },
+                    'rule_type': 'IsWithinTolerance'
+                }],
+                'training_data': [],
+                'tagged_skill_misconception_id': None
+            }],
             'confirmed_unclassified_answers': [],
             'customization_args': {
                 'requireNonnegativeInput': {
@@ -6113,34 +6384,120 @@ class NumericInputInteractionTests(test_utils.GenericTestBase):
         self.assertEqual(
             numeric_input_proto.answer_groups[0].base_answer_group.outcome.feedback.text, # pylint: disable=line-too-long
             '<p>Feedback</p>')
+        self.assertEqual(
+            numeric_input_proto.answer_groups[0].rule_specs[0].equals.input, # pylint: disable=line-too-long
+            5.0)
+        self.assertEqual(
+            numeric_input_proto.answer_groups[1].rule_specs[0].is_less_than.input, # pylint: disable=line-too-long
+            5.0)
+        self.assertEqual(
+            numeric_input_proto.answer_groups[2].rule_specs[0].is_greater_than.input, # pylint: disable=line-too-long
+            5.0)
+        self.assertEqual(
+            numeric_input_proto.answer_groups[3].rule_specs[0].is_less_than_or_equal_to.input, # pylint: disable=line-too-long
+            5.0)
+        self.assertEqual(
+            numeric_input_proto.answer_groups[4].rule_specs[0].is_greater_than_or_equal_to.input, # pylint: disable=line-too-long
+            5.0)
+        self.assertEqual(
+            numeric_input_proto.answer_groups[5].rule_specs[0].is_inclusively_between.inputLowerInclusive, # pylint: disable=line-too-long
+            5.0)
+        self.assertEqual(
+            numeric_input_proto.answer_groups[5].rule_specs[0].is_inclusively_between.inputUpperInclusive, # pylint: disable=line-too-long
+            10.0)
+        self.assertEqual(
+            numeric_input_proto.answer_groups[6].rule_specs[0].is_within_tolerance.inputTolerance, # pylint: disable=line-too-long
+            5.0)
+        self.assertEqual(
+            numeric_input_proto.answer_groups[6].rule_specs[0].is_within_tolerance.inputComparedValue, # pylint: disable=line-too-long
+            5.0)
 
 
 class RatioExpressionInputInteractionTests(test_utils.GenericTestBase):
 
     def test_to_proto(self):
-        answer_group = {
-            'outcome': {
-                'dest': 'abc',
-                'feedback': {
-                    'content_id': 'feedback_2',
-                    'html': '<p>Feedback</p>'
-                },
-                'labelled_as_correct': True,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'rule_specs': [{
-                'inputs': {
-                    'x': [1, 2]
-                },
-                'rule_type': 'Equals'
-            }],
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }
         interaction_dict = {
-            'answer_groups': [answer_group],
+            'answer_groups': [{
+                'outcome': {
+                    'dest': 'abc',
+                    'feedback': {
+                        'content_id': 'feedback_2',
+                        'html': '<p>Feedback</p>'
+                    },
+                    'labelled_as_correct': True,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
+                },
+                'rule_specs': [{
+                    'inputs': {
+                        'x': [1, 2]
+                    },
+                    'rule_type': 'Equals'
+                }],
+                'training_data': [],
+                'tagged_skill_misconception_id': None
+            }, {
+                'outcome': {
+                    'dest': 'abc',
+                    'feedback': {
+                        'content_id': 'feedback_2',
+                        'html': '<p>Feedback</p>'
+                    },
+                    'labelled_as_correct': True,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
+                },
+                'rule_specs': [{
+                    'inputs': {
+                        'x': [1, 2]
+                    },
+                    'rule_type': 'IsEquivalent'
+                }],
+                'training_data': [],
+                'tagged_skill_misconception_id': None
+            }, {
+                'outcome': {
+                    'dest': 'abc',
+                    'feedback': {
+                        'content_id': 'feedback_2',
+                        'html': '<p>Feedback</p>'
+                    },
+                    'labelled_as_correct': True,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
+                },
+                'rule_specs': [{
+                    'inputs': {
+                        'x': 1
+                    },
+                    'rule_type': 'HasNumberOfTermsEqualTo'
+                }],
+                'training_data': [],
+                'tagged_skill_misconception_id': None
+            }, {
+                'outcome': {
+                    'dest': 'abc',
+                    'feedback': {
+                        'content_id': 'feedback_2',
+                        'html': '<p>Feedback</p>'
+                    },
+                    'labelled_as_correct': True,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
+                },
+                'rule_specs': [{
+                    'inputs': {
+                        'x': [1, 2]
+                    },
+                    'rule_type': 'HasSpecificTermEqualTo'
+                }],
+                'training_data': [],
+                'tagged_skill_misconception_id': None
+            }],
             'confirmed_unclassified_answers': [],
             'customization_args': {
                 'placeholder': {
@@ -6224,13 +6581,34 @@ class RatioExpressionInputInteractionTests(test_utils.GenericTestBase):
         self.assertEqual(
             ratio_input_proto.answer_groups[0].base_answer_group.outcome.feedback.text, # pylint: disable=line-too-long
             '<p>Feedback</p>')
+        self.assertEqual(
+            ratio_input_proto.answer_groups[0].rule_specs[0].equals.input.components[0], # pylint: disable=line-too-long
+            1)
+        self.assertEqual(
+            ratio_input_proto.answer_groups[0].rule_specs[0].equals.input.components[1], # pylint: disable=line-too-long
+            2)
+        self.assertEqual(
+            ratio_input_proto.answer_groups[1].rule_specs[0].is_equivalent.input.components[0], # pylint: disable=line-too-long
+            1)
+        self.assertEqual(
+            ratio_input_proto.answer_groups[1].rule_specs[0].is_equivalent.input.components[1], # pylint: disable=line-too-long
+            2)
+        self.assertEqual(
+            ratio_input_proto.answer_groups[2].rule_specs[0].has_number_of_terms_equal_to.input_term_count, # pylint: disable=line-too-long
+            1)
+        self.assertEqual(
+            ratio_input_proto.answer_groups[3].rule_specs[0].has_specific_term_equal_to.input_term_index, # pylint: disable=line-too-long
+            1)
+        self.assertEqual(
+            ratio_input_proto.answer_groups[3].rule_specs[0].has_specific_term_equal_to.input_expected_term_value, # pylint: disable=line-too-long
+            2)
 
 
 class ImageClickInputInteractionTests(test_utils.GenericTestBase):
 
     def test_to_proto(self):
         interaction_dict = {
-            'answer_groups': {
+            'answer_groups': [{
                 'outcome': {
                     'dest': 'Image Region',
                     'feedback': {
@@ -6242,15 +6620,15 @@ class ImageClickInputInteractionTests(test_utils.GenericTestBase):
                     'param_changes': [],
                     'refresher_exploration_id': None,
                 },
-                'rule_specs': {
-                    'inputs': [{
+                'rule_specs': [{
+                    'inputs': {
                         'x': 'classdef'
-                    }],
+                    },
                     'rule_type': 'IsInRegion'
-                },
+                }],
                 'tagged_skill_misconception_id': None,
                 'training_data': []
-            },
+            }],
             'confirmed_unclassified_answers': [],
             'customization_args': {
                 'highlightRegionsOnHover': {'value': True},
@@ -6277,9 +6655,9 @@ class ImageClickInputInteractionTests(test_utils.GenericTestBase):
                     'html': '<p> Default Outcome </p>'
                 },
                 'labelled_as_correct': False,
-                'missing_prerequisite_skill_id': None,
                 'param_changes': [],
-                'refresher_exploration_id': None
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
             },
             'hints': [{
                 'hint_content': {
@@ -6312,13 +6690,13 @@ class ImageClickInputInteractionTests(test_utils.GenericTestBase):
             0.004291845493562232)
         self.assertEqual(
             image_input_proto.customization_args.image_and_regions.labeled_regions[0].normalized_rectangle_2d.bottom_right.y, # pylint: disable=line-too-long
+            0.05874624624624625)
+        self.assertEqual(
+            image_input_proto.customization_args.image_and_regions.labeled_regions[0].normalized_rectangle_2d.top_left.y, # pylint: disable=line-too-long
             0.004692192192192192)
         self.assertEqual(
-            image_input_proto.customization_args.image_and_regions.labeled_regions[0].normalized_rectangle_2d.top_left.x, # pylint: disable=line-too-long
+            image_input_proto.customization_args.image_and_regions.labeled_regions[0].normalized_rectangle_2d.bottom_right.x, # pylint: disable=line-too-long
             0.40987124463519314)
-        self.assertEqual(
-            image_input_proto.customization_args.image_and_regions.labeled_regions[0].normalized_rectangle_2d.bottom_right.y, # pylint: disable=line-too-long
-            0.05874624624624625)
         self.assertEqual(
             image_input_proto.answer_groups[0].base_answer_group.outcome.destination_state, # pylint: disable=line-too-long
             'Image Region')
@@ -6371,7 +6749,7 @@ class DragAndDropSortInputInteractionTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': [['<p>Choice 1</p>', '<p>Choice 2</p>', 'invalid']] # pylint: disable=line-too-long
+                    'x': [['<p>Choice 1</p>', '<p>Choice 2</p>']] # pylint: disable=line-too-long
                 },
                 'rule_type': 'IsEqualToOrdering'
             }, {
@@ -6476,3 +6854,24 @@ class DragAndDropSortInputInteractionTests(test_utils.GenericTestBase):
         self.assertEqual(
             drag_and_drop_proto.solution.correct_answer.content_id_sets[0].content_ids[0].content_id, # pylint: disable=line-too-long
             '<p>Choice 1</p>')
+        self.assertEqual(
+            drag_and_drop_proto.answer_groups[0].rule_specs[0].is_equal_to_ordering.input.content_id_sets[0].content_ids[0].content_id, # pylint: disable=line-too-long
+            '<p>Choice 1</p>')
+        self.assertEqual(
+            drag_and_drop_proto.answer_groups[0].rule_specs[0].is_equal_to_ordering.input.content_id_sets[0].content_ids[1].content_id, # pylint: disable=line-too-long
+            '<p>Choice 2</p>')
+        self.assertEqual(
+            drag_and_drop_proto.answer_groups[0].rule_specs[1].is_equal_to_ordering_with_one_item_at_incorrect_position.input.content_id_sets[0].content_ids[0].content_id, # pylint: disable=line-too-long
+            '<p>Choice 1</p>')
+        self.assertEqual(
+            drag_and_drop_proto.answer_groups[0].rule_specs[2].has_element_x_at_position_y.element.content_id, # pylint: disable=line-too-long
+            '<p>Choice 1</p>')
+        self.assertEqual(
+            drag_and_drop_proto.answer_groups[0].rule_specs[2].has_element_x_at_position_y.position, # pylint: disable=line-too-long
+            1)
+        self.assertEqual(
+            drag_and_drop_proto.answer_groups[0].rule_specs[3].has_element_x_before_element_y.considered_element.content_id, # pylint: disable=line-too-long
+            '<p>Choice 1</p>')
+        self.assertEqual(
+            drag_and_drop_proto.answer_groups[0].rule_specs[3].has_element_x_before_element_y.later_element.content_id, # pylint: disable=line-too-long
+            '<p>Choice 2</p>')

@@ -147,7 +147,9 @@ class RatioExpressionInput(base.BaseInteraction):
             'Equals': cls._to_ratio_equals_to_proto,
             'IsEquivalent': cls._to_ratio_is_equivalent_proto,
             'HasNumberOfTermsEqualTo': (
-                cls._to_ratio_has_numer_of_terms_equal_to_proto)
+                cls._to_ratio_has_numer_of_terms_equal_to_proto),
+            'HasSpecificTermEqualTo': (
+                cls._to_ratio_has_specific_terms_equal_to_proto)
         }
         rule_typ_to_proto_mapping = {
             'Equals': lambda x: (
@@ -158,7 +160,10 @@ class RatioExpressionInput(base.BaseInteraction):
                     is_equivalent=x)),
             'HasNumberOfTermsEqualTo': lambda x: (
                 state_pb2.RatioExpressionInputInstance.RuleSpec(
-                    has_number_of_terms_equal_to=x))
+                    has_number_of_terms_equal_to=x)),
+            'HasSpecificTermEqualTo': lambda x: (
+                state_pb2.RatioExpressionInputInstance.RuleSpec(
+                    has_specific_term_equal_to=x))
         }
 
         for rule_spec in rule_specs_list:
@@ -215,6 +220,23 @@ class RatioExpressionInput(base.BaseInteraction):
         """
         return state_pb2.RatioExpressionInputInstance.RuleSpec.HasNumberOfTermsEqualToSpec( # pylint: disable=line-too-long
             input_term_count=input_term_count
+        )
+
+    @classmethod
+    def _to_ratio_has_specific_terms_equal_to_proto(
+        cls, input_dict
+    ):
+        """Creates a HasSpecificTermEqualToSpec proto object.
+
+        Args:
+            input_dict: int. The number of terms.
+
+        Returns:
+            HasSpecificTermEqualToSpec. The proto object.
+        """
+        return state_pb2.RatioExpressionInputInstance.RuleSpec.HasSpecificTermEqualToSpec( # pylint: disable=line-too-long
+            input_term_index=input_dict[0],
+            input_expected_term_value=input_dict[1]
         )
 
     @classmethod

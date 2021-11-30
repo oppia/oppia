@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 from extensions.interactions import base
+from proto_files import objects_pb2
 from proto_files import state_pb2
 
 
@@ -141,11 +142,141 @@ class TextInput(base.BaseInteraction):
 
         for answer_group in answer_groups:
             base_answer_group_proto = answer_group.to_proto()
+            rules_spec_proto = cls._to_text_input_rule_specs_proto(
+                answer_group.rule_specs)
             answer_group_proto = state_pb2.TextInputInstance.AnswerGroup(
-                base_answer_group=base_answer_group_proto
+                base_answer_group=base_answer_group_proto,
+                rule_specs=rules_spec_proto
             )
             answer_group_list_proto.append(answer_group_proto)
         return answer_group_list_proto
+
+    @classmethod
+    def _to_text_input_rule_specs_proto(cls, rule_specs_list):
+        """Creates a RuleSpec proto object.
+
+        Args:
+            rule_specs_list: list(RuleSpec). List of rule specifications.
+
+        Returns:
+            list. The RuleSpec proto object list.
+        """
+        rule_specs_list_proto = []
+        rules_specs_proto = {}
+
+        rule_type_to_proto_func_mapping = {
+            'Equals': cls._to_equal_to_proto,
+            'StartsWith': cls._to_starts_with_to_proto,
+            'Contains': (
+                cls._to_contains_proto),
+            'FuzzyEquals': cls._to_fuzzy_equals_proto
+        }
+        rule_type_to_proto_mapping = {
+            'Equals': lambda x: (
+                state_pb2.TextInputInstance.RuleSpec(
+                    equals=x)),
+            'StartsWith': lambda x: (
+                state_pb2.TextInputInstance.RuleSpec(
+                    starts_with=x)),
+            'Contains': lambda x: (
+                state_pb2.TextInputInstance.RuleSpec(
+                    contains=x)),
+            'FuzzyEquals': lambda x: (
+                state_pb2.TextInputInstance.RuleSpec(
+                    fuzzy_equals=x))
+        }
+
+        for rule_spec in rule_specs_list:
+            rule_type = rule_spec.rule_type
+            rule_proto = (
+                rule_type_to_proto_func_mapping[rule_type](
+                    rule_spec.inputs['x']
+                )
+            )
+            rules_specs_proto = (
+                rule_type_to_proto_mapping[rule_type](rule_proto)
+            )
+            rule_specs_list_proto.append(rules_specs_proto)
+
+        return rule_specs_list_proto
+
+    @classmethod
+    def _to_equal_to_proto(cls, input_dict):
+        """Creates a proto object for EqualsSpec.
+
+        Args:
+            input_dict: dict. The rule dict.
+
+        Returns:
+            EqualsSpec. The proto object.
+        """
+        return state_pb2.TextInputInstance.RuleSpec.EqualsSpec( # pylint: disable=line-too-long
+            input=cls._to_translatable_normalized_string_set(input_dict) # pylint: disable=line-too-long
+        )
+
+    @classmethod
+    def _to_starts_with_to_proto(cls, input_dict):
+        """Creates a proto object for StartsWithSpec.
+
+        Args:
+            input_dict: dict. The rule dict.
+
+        Returns:
+            StartsWithSpec. The proto object.
+        """
+        return state_pb2.TextInputInstance.RuleSpec.StartsWithSpec( # pylint: disable=line-too-long
+            input=cls._to_translatable_normalized_string_set(input_dict) # pylint: disable=line-too-long
+        )
+
+    @classmethod
+    def _to_contains_proto(cls, input_dict):
+        """Creates a proto object for ContainsSpec.
+
+        Args:
+            input_dict: dict. The rule dict.
+
+        Returns:
+            ContainsSpec. The proto object.
+        """
+        return state_pb2.TextInputInstance.RuleSpec.ContainsSpec( # pylint: disable=line-too-long
+            input=cls._to_translatable_normalized_string_set(input_dict) # pylint: disable=line-too-long
+        )
+
+    @classmethod
+    def _to_fuzzy_equals_proto(cls, input_dict):
+        """Creates a proto object for FuzzyEqualsSpec.
+
+        Args:
+            input_dict: dict. The rule dict.
+
+        Returns:
+            FuzzyEqualsSpec. The proto object.
+        """
+        return state_pb2.TextInputInstance.RuleSpec.FuzzyEqualsSpec( # pylint: disable=line-too-long
+            input=cls._to_translatable_normalized_string_set(input_dict) # pylint: disable=line-too-long
+        )
+
+    @classmethod
+    def _to_translatable_normalized_string_set(
+        cls, input_dict
+    ):
+        """Creates a TranslatableHtmlContentId proto object.
+
+        Args:
+            input_dict: str. A TranslatableHtml content id.
+
+        Returns:
+            TranslatableHtmlContentId. The proto object.
+        """
+        normalized_strings_set = []
+
+        for item in input_dict['normalizedStrSet']:
+            normalized_strings_set.append(item)
+
+        return objects_pb2.TranslatableSetOfNormalizedString(
+            content_id=input_dict['contentId'],
+            normalized_strings=normalized_strings_set
+        )
 
     @classmethod
     def _to_solution_proto(cls, solution):
