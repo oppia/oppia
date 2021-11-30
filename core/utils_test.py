@@ -752,4 +752,5 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(utils.quoted('a"b\'c'), '"a\\"b\'c"')
 
     def test_url_open(self) -> None:
-        self.assertEqual(utils.url_open('http://www.google.com'), 'http://www.google.com')
+        self.assertEqual(
+            utils.url_open('http://www.google.com'), 'http://www.google.com')
