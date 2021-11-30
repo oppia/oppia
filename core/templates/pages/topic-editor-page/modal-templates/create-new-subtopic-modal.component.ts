@@ -19,15 +19,13 @@
 import { Component, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-
+import { WindowRef } from 'services/contextual/window-ref.service';
+import AppConstants from 'assets/constants';
+import { Topic } from 'domain/topic/TopicObjectFactory';
+import { SubtopicPage } from 'domain/topic/subtopic-page.model';
 import { TopicUpdateService } from 'domain/topic/topic-update.service';
 import { TopicEditorStateService } from 'pages/topic-editor-page/services/topic-editor-state.service';
 import { SubtopicValidationService } from 'pages/topic-editor-page/services/subtopic-validation.service';
-
-import { WindowRef } from 'services/contextual/window-ref.service';
-import constants from 'assets/constants';
-import { Topic } from 'domain/topic/TopicObjectFactory';
-import { SubtopicPage } from 'domain/topic/subtopic-page.model';
 
 @Component({
   selector: 'oppia-create-new-subtopic-modal',
@@ -81,11 +79,11 @@ export class CreateNewSubtopicModalComponent
     this.editableThumbnailBgColor = '';
     this.editableUrlFragment = '';
     this.allowedBgColors = (
-      constants.ALLOWED_THUMBNAIL_BG_COLORS.subtopic);
+      AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.subtopic);
     this.subtopicId = this.topic.getNextSubtopicId();
-    this.MAX_CHARS_IN_SUBTOPIC_TITLE = constants.MAX_CHARS_IN_SUBTOPIC_TITLE;
+    this.MAX_CHARS_IN_SUBTOPIC_TITLE = AppConstants.MAX_CHARS_IN_SUBTOPIC_TITLE;
     this.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT = (
-      constants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT);
+      AppConstants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT);
     this.subtopicTitle = '';
     this.errorMsg = null;
     this.subtopicUrlFragmentExists = false;
