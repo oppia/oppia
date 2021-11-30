@@ -87,10 +87,8 @@ export class ExplorationHtmlFormatterService {
         element, interactionCustomizationArgs)
     );
     const tagEnd = '></oppia-interactive-' + htmlInteractionId + '>';
-    // This throws "Object is possibly 'undefined'.". We need to suppress this
-    // error because we know that the get won't return undefined.
-    // @ts-ignore
-    let directiveOuterHtml = element.get(0).outerHTML.replace(tagEnd, '');
+    let directiveElement = element.get(0);
+    let directiveOuterHtml = directiveElement?.outerHTML.replace(tagEnd, '');
     let spaceToBeAdded = true;
     const getLastAnswer = (): string => {
       let propValue = parentHasLastAnswerProperty ? 'lastAnswer' : 'null';

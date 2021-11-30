@@ -250,10 +250,8 @@ export class ContentTranslationManagerService {
     const element = $(card.getInteractionHtml());
     this.extensionTagAssemblerService.formatCustomizationArgAttrs(
       element, caValues);
-    // This throws "Object is possibly 'undefined'.". We need to suppress this
-    // error because we know that the get won't return undefined.
-    // @ts-ignore
-    card.setInteractionHtml(element.get(0).outerHTML);
+    let directiveElement = element.get(0);
+    card.setInteractionHtml(directiveElement?.outerHTML);
   }
 
   _swapContentInRules(card: StateCard, languageCode: string): void {

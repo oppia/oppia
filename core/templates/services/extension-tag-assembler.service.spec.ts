@@ -41,12 +41,10 @@ describe('Extension Tag Assembler Service', () => {
     const expectedElement = '<p></p>';
 
     expect(
-      // This throws "Object is possibly 'undefined'.". We need to suppress this
-      // error because we know that the get won't return undefined.
-      // @ts-ignore
+
       etas.formatCustomizationArgAttrs(
         element, interactionCustomizationArgs
-      ).get(0).outerHTML
+      ).get(0)?.outerHTML
     ).toEqual(expectedElement);
   });
 
@@ -60,12 +58,9 @@ describe('Extension Tag Assembler Service', () => {
       '></p>';
 
     expect(
-      // This throws "Object is possibly 'undefined'.". We need to suppress this
-      // error because we know that the get won't return undefined.
-      // @ts-ignore
       etas.formatCustomizationArgAttrs(
         element, interactionCustomizationArgs
-      ).get(0).outerHTML
+      ).get(0)?.outerHTML
     ).toEqual(expectedElement);
   });
 
@@ -83,12 +78,9 @@ describe('Extension Tag Assembler Service', () => {
       'content_id&amp;quot;:&amp;quot;ca_id&amp;quot;}]}"></p>';
 
     expect(
-      // This throws "Object is possibly 'undefined'.". We need to suppress this
-      // error because we know that the get won't return undefined.
-      // @ts-ignore
       etas.formatCustomizationArgAttrs(
         element, interactionCustomizationArgs
-      ).get(0).outerHTML
+      ).get(0)?.outerHTML
     ).toEqual(expectedElement);
   });
 
@@ -104,12 +96,9 @@ describe('Extension Tag Assembler Service', () => {
       '></p>';
 
     expect(
-      // This throws "Object is possibly 'undefined'.". We need to suppress this
-      // error because we know that the get won't return undefined.
-      // @ts-ignore
       etas.formatCustomizationArgAttrs(
         element, interactionCustomizationArgs
-      ).get(0).outerHTML
+      ).get(0)?.outerHTML
     ).toEqual(expectedElement);
   });
 });
