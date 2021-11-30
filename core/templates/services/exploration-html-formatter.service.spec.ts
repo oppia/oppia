@@ -109,7 +109,7 @@ describe('Exploration Html Formatter Service', () => {
         '</oppia-interactive-non-migrated-interaction>';
       expect(
         ehfs.getInteractionHtml(
-          interactionId, {}, false, focusLabel, 'solution')
+          interactionId, {}, false, focusLabel, 'savedMemento()')
       ).toBe(expectedHtmlTag);
       interactionId = 'GraphInput';
       focusLabel = 'sampleLabel';
@@ -119,7 +119,7 @@ describe('Exploration Html Formatter Service', () => {
         '</oppia-interactive-graph-input>';
       expect(
         ehfs.getInteractionHtml(
-          interactionId, {}, false, focusLabel, 'solution')
+          interactionId, {}, false, focusLabel, 'savedMemento()')
       ).toBe(expectedHtmlTag);
     });
 

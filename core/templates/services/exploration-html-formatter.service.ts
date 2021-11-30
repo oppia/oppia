@@ -19,6 +19,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+import { AppConstants } from 'app.constants';
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { ExtensionTagAssemblerService } from
@@ -27,7 +28,6 @@ import { HtmlEscaperService } from 'services/html-escaper.service';
 import { InteractionAnswer } from 'interactions/answer-defs';
 import { InteractionCustomizationArgs } from
   'interactions/customization-args-defs';
-
 
 // A service that provides a number of utility functions useful to both the
 // editor and player.
@@ -58,7 +58,7 @@ export class ExplorationHtmlFormatterService {
   ) {}
   /**
    * @param {string} interactionId - The interaction id.
-   * @param {object} interactionCustomizationArgSpecs - The various
+   * @param {object} interactionCustomizationArgs - The various
    *   attributes that the interaction depends on.
    * @param {boolean} parentHasLastAnswerProperty - If this function is
    *   called in the exploration_player view (including the preview mode),
@@ -78,16 +78,29 @@ export class ExplorationHtmlFormatterService {
       interactionCustomizationArgs: InteractionCustomizationArgs,
       parentHasLastAnswerProperty: boolean,
       labelForFocusTarget: string,
-      savedSolution: string | null
+      savedSolution: 'savedMemento()' | null
   ): string {
+    let availableInteractionIds = Array.prototype.concat.apply(
+      [],
+      AppConstants.ALLOWED_INTERACTION_CATEGORIES.map(
+        category => category.interaction_ids
+      )
+    );
+    if (!availableInteractionIds.includes(interactionId)) {
+      throw new Error(`Invalid interaction id: ${interactionId}.`);
+    }
     let htmlInteractionId = this.camelCaseToHyphens.transform(interactionId);
+    // The createElement is safe because we verify that the interactionId
+    // belongs to a list of interaction IDs.
     let element = document.createElement(
       `oppia-interactive-${htmlInteractionId}`);
     element = (
       this.extensionTagAssembler.formatCustomizationArgAttrs(
         element, interactionCustomizationArgs)
     );
-    if (savedSolution) {
+    // The setAttribute is safe because we verify that the savedSolution
+    // is 'savedMemento()'.
+    if (savedSolution === 'savedMemento()') {
       // TODO(#12292): Refactor this once all interactions have been migrated to
       // Angular 2+, such that we don't need to parse the string in the
       // interaction directives/components.
@@ -97,16 +110,21 @@ export class ExplorationHtmlFormatterService {
         element.setAttribute('saved-solution', savedSolution);
       }
     }
-    if (labelForFocusTarget) {
+    const alphabetRegex = new RegExp('[a-zA-Z]*');
+    // The setAttribute is safe because we verify that the labelForFocusTarget
+    // is only formed of alphabetical characters.
+    if (labelForFocusTarget && alphabetRegex.test(labelForFocusTarget)) {
       element.setAttribute('label-for-focus-target', labelForFocusTarget);
     }
-    let propValue = parentHasLastAnswerProperty ? 'lastAnswer' : 'null';
-    // This setAttribute is safe because the only two possible values are
-    // 'lastAnswer' and 'null' as per the line above.
-    if (this.migratedInteractions.indexOf(interactionId) >= 0) {
-      element.setAttribute('[last-answer]', propValue);
-    } else {
-      element.setAttribute('last-answer', propValue);
+    let propValue = parentHasLastAnswerProperty ? 'lastAnswer' : null;
+    // The setAttribute is safe because the only possible value is 'lastAnswer'
+    // as per the line above.
+    if (propValue) {
+      if (this.migratedInteractions.indexOf(interactionId) >= 0) {
+        element.setAttribute('[last-answer]', propValue);
+      } else {
+        element.setAttribute('last-answer', propValue);
+      }
     }
     return element.outerHTML;
   }
