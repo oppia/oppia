@@ -251,7 +251,11 @@ export class ContentTranslationManagerService {
     this.extensionTagAssemblerService.formatCustomizationArgAttrs(
       element, caValues);
     let directiveElement = element.get(0);
-    card.setInteractionHtml(directiveElement?.outerHTML);
+
+    if (directiveElement === undefined) {
+      throw Error('directiveElement is undefined');
+    }
+    card.setInteractionHtml(directiveElement.outerHTML);
   }
 
   _swapContentInRules(card: StateCard, languageCode: string): void {

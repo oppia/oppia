@@ -78,7 +78,8 @@ export class ExplorationHtmlFormatterService {
       interactionCustomizationArgs: InteractionCustomizationArgs,
       parentHasLastAnswerProperty: boolean,
       labelForFocusTarget: string,
-      savedSolution: string | null): string {
+      savedSolution: string | null
+  ): string {
     var htmlInteractionId = this.camelCaseToHyphens.transform(interactionId);
     // TODO(#14340): Remove the usage of jQuery.
     var element = $('<oppia-interactive-' + htmlInteractionId + '>');
@@ -88,7 +89,10 @@ export class ExplorationHtmlFormatterService {
     );
     const tagEnd = '></oppia-interactive-' + htmlInteractionId + '>';
     let directiveElement = element.get(0);
-    let directiveOuterHtml = directiveElement?.outerHTML.replace(tagEnd, '');
+    if (directiveElement === undefined) {
+      throw Error('directiveElement is undefined');
+    }
+    let directiveOuterHtml = directiveElement.outerHTML.replace(tagEnd, '');
     let spaceToBeAdded = true;
     const getLastAnswer = (): string => {
       let propValue = parentHasLastAnswerProperty ? 'lastAnswer' : 'null';
