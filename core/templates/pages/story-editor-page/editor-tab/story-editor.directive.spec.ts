@@ -279,10 +279,6 @@ describe('Story editor Directive having two story nodes', function() {
     expect(storyUpdateSpy).toHaveBeenCalled();
   });
 
-  it('should check if story notes length is exceeded', function() {
-    expect($scope.isNotesLengthExceeded('story notes')).toEqual('false');
-  });
-
   it('should call StoryUpdateService to update story notes', function() {
     var storyUpdateSpy = spyOn(StoryUpdateService, 'setStoryMetaTagContent');
     $scope.updateStoryMetaTagContent('storyone');

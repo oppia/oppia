@@ -114,7 +114,6 @@ angular.module('oppia').directive('storyEditor', [
             $scope.storyDescriptionChanged = false;
             $scope.storyUrlFragmentExists = false;
             $scope.$applyAsync();
-            $scope.maximumCharacterLengthOfNotes = 4000;
           };
 
           $scope.setNodeToEdit = function(nodeId) {
@@ -222,11 +221,6 @@ angular.module('oppia').directive('storyEditor', [
               StoryUpdateService.setStoryNotes($scope.story, newNotes);
               _initEditor();
             }
-          };
-
-          $scope.isNotesLengthExceeded = function(editableNotes) {
-            return (
-              editableNotes.length > $scope.maximumCharacterLengthOfNotes);
           };
 
           $scope.navigateToChapterWithId = function(id, index) {

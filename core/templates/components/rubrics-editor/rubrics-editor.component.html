@@ -75,7 +75,7 @@
           <div *ngIf="!this.isExplanationLengthValid(this.rubric.getDifficulty(), idx)" class="rubric-error-message">
             Explanations should have at most 300 characters.
           </div>
-          <div class="oppia-card-content-limit-error" *ngIf="this.isTotalExplanationsLengthReached()">
+          <div class="oppia-card-content-limit-error" *ngIf="this.hasReachedExplanationCountLimit()">
             There can be maximum of 10 explanations across all levels.
           </div>
         </div>
@@ -84,7 +84,7 @@
     <button class="btn add-explanation-button skill-editor-add-btn protractor-test-add-explanation-button-{{this.rubric.getDifficulty()}}"
             type="button"
             (click)="this.addExplanationForDifficulty(this.rubric.getDifficulty())"
-            [disabled]="this.isAnyExplanationEmptyForDifficulty(this.rubric.getDifficulty()) || this.isTotalExplanationsLengthReached()">
+            [disabled]="this.isAnyExplanationEmptyForDifficulty(this.rubric.getDifficulty()) || this.hasReachedExplanationCountLimit()">
       + ADD EXPLANATION FOR DIFFICULTY
     </button>
     <div *ngIf="!this.isMediumLevelExplanationValid()"

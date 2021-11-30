@@ -114,7 +114,7 @@ describe('Rubrics Editor Component', () => {
     let index: number = 2;
     componentInstance.ngOnInit();
     componentInstance.editableExplanations[difficulty][index] = 'not_empty';
-    expect(componentInstance.isTotalExplanationsLengthReached())
+    expect(componentInstance.hasReachedExplanationCountLimit())
       .toBeFalse();
   });
 
