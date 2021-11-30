@@ -31,6 +31,7 @@ import sys
 import time
 import unicodedata
 import urllib
+import urllib.request as urlrequest
 import zlib
 
 from core import feconf
@@ -1197,4 +1198,4 @@ def url_open(source_url: str) -> str:
     context = ssl.create_default_context(cafile=certifi.where())  # pylint: disable=arg-name-for-non-keyword-arg
     # The type ignore is needed, because typestubs define the return type
     # of 'urlopen' as 'Any' which is wrong.
-    return urllib.request.urlopen(source_url, context=context) # type: ignore[no-any-return] # pylint: disable=no-member
+    return urlrequest.urlopen(source_url, context=context) # type: ignore[no-any-return]
