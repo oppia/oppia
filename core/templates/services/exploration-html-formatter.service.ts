@@ -101,6 +101,8 @@ export class ExplorationHtmlFormatterService {
       element.setAttribute('label-for-focus-target', labelForFocusTarget);
     }
     let propValue = parentHasLastAnswerProperty ? 'lastAnswer' : 'null';
+    // This setAttribute is safe because the only two possible values are
+    // 'lastAnswer' and 'null' as per the line above.
     if (this.migratedInteractions.indexOf(interactionId) >= 0) {
       element.setAttribute('[last-answer]', propValue);
     } else {
@@ -110,46 +112,39 @@ export class ExplorationHtmlFormatterService {
   }
 
   getAnswerHtml(
-      answer: string, interactionId: string,
-      interactionCustomizationArgs: InteractionCustomizationArgs): string {
+      answer: string,
+      interactionId: string,
+      interactionCustomizationArgs: InteractionCustomizationArgs
+  ): string {
+    var element = document.createElement(
+      `oppia-response-${this.camelCaseToHyphens.transform(interactionId)}`);
+    element.setAttribute('answer', this.htmlEscaper.objToEscapedJson(answer));
     // TODO(sll): Get rid of this special case for multiple choice.
-    var interactionChoices = null;
-
     if ('choices' in interactionCustomizationArgs) {
-      interactionChoices = interactionCustomizationArgs.choices.value;
+      let interactionChoices = interactionCustomizationArgs.choices.value;
+      element.setAttribute(
+        'choices', this.htmlEscaper.objToEscapedJson(interactionChoices));
     }
-
-    var el = $(
-      '<oppia-response-' + this.camelCaseToHyphens.transform(
-        interactionId) + '>');
-    el.attr('answer', this.htmlEscaper.objToEscapedJson(answer));
-    if (interactionChoices) {
-      el.attr('choices', this.htmlEscaper.objToEscapedJson(
-        interactionChoices));
-    }
-    return ($('<div>').append(el)).html();
+    return element.outerHTML;
   }
 
   getShortAnswerHtml(
-      answer: InteractionAnswer, interactionId: string,
-      interactionCustomizationArgs: InteractionCustomizationArgs): string {
-    var interactionChoices = null;
-
+      answer: InteractionAnswer,
+      interactionId: string,
+      interactionCustomizationArgs: InteractionCustomizationArgs
+  ): string {
+    let element = document.createElement(
+      `oppia-short-response-${this.camelCaseToHyphens.transform(interactionId)}`
+    );
+    element.setAttribute('answer', this.htmlEscaper.objToEscapedJson(answer));
     // TODO(sll): Get rid of this special case for multiple choice.
     if ('choices' in interactionCustomizationArgs) {
-      interactionChoices = interactionCustomizationArgs.choices.value.map(
+      let interactionChoices = interactionCustomizationArgs.choices.value.map(
         choice => choice.html);
+      element.setAttribute(
+        'choices', this.htmlEscaper.objToEscapedJson(interactionChoices));
     }
-
-    var el = $(
-      '<oppia-short-response-' + this.camelCaseToHyphens.transform(
-        interactionId) + '>');
-    el.attr('answer', this.htmlEscaper.objToEscapedJson(answer));
-    if (interactionChoices) {
-      el.attr('choices', this.htmlEscaper.objToEscapedJson(
-        interactionChoices));
-    }
-    return ($('<span>').append(el)).html();
+    return element.outerHTML;
   }
 }
 
