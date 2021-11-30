@@ -25,8 +25,8 @@ import constants from 'assets/constants';
 import { MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
 import { InteractionSpecsConstants, InteractionSpecsKey } from 'pages/interaction-specs.constants';
 
-/* Null in id denotes the a new question whose id is yet
-  to be set, this id is layer set in backend API service.
+/* Null in id denotes a new question whose id is yet
+  to be set, this id is later set in backend API service.
   when the question object is passed to API on saving question
   for the 1st time. This also prevents from assigning a id to
   questions which are not saved and only temporary created. */
