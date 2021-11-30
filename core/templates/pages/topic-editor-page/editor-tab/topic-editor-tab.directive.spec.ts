@@ -368,14 +368,6 @@ describe('Topic editor tab directive', function() {
       expect(topicPageTitleFragmentForWebSpy).not.toHaveBeenCalled();
     });
 
-  it('should call the TopicUpdateService if practice tab is displayed ' +
-    'property is updated', function() {
-    var topicPracticeTabSpy = (
-      spyOn(TopicUpdateService, 'setPracticeTabIsDisplayed'));
-    $scope.updatePracticeTabIsDisplayed(true);
-    expect(topicPracticeTabSpy).toHaveBeenCalled();
-  });
-
   it('should not call the TopicUpdateService if practice tab is displayed ' +
    'property is same', function() {
     $scope.updatePracticeTabIsDisplayed(true);
