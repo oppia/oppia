@@ -62,11 +62,8 @@ export class Question {
       inapplicableSkillMisconceptionIds);
   }
 
-  // Explicitly cast to string as getting id means that the question
-  // has been created in the backend. This is important as the temporary
-  // of the question id is null but getId should not return null in any case.
-  getId(): string {
-    return String(this._id);
+  getId(): string | null {
+    return this._id;
   }
 
   getStateData(): State {
@@ -209,15 +206,13 @@ export class QuestionObjectFactory {
   constructor(
     private stateObject: StateObjectFactory) {}
 
-  /* Null in id denotes the a new question whose id is yet to be
-  set, this id is layer set in backend API service. Reagrding statename
-  as question, this statename is used throughout creating the state
-  for question like in createFromBackendDict. This function cannot be
-  removed as it is used to create a temperory default question in question
-  editor until the question is once saved. */
+  /* Null in id denotes the a new question whose id is yet to be set,
+  this id is layer set in backend API service, same is with statename.
+  This function cannot be removed as it is used to create a temperory
+  default question in question editor until the question is once saved. */
   createDefaultQuestion(skillIds: string[]): Question {
     return new Question(
-      null, this.stateObject.createDefaultState('question'),
+      null, this.stateObject.createDefaultState(null),
       constants.DEFAULT_LANGUAGE_CODE, 1, skillIds, []);
   }
 

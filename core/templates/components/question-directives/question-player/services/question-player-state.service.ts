@@ -31,6 +31,8 @@ interface Answer {
   taggedSkillMisconceptionId: string;
 }
 
+// Viewed solution being undefined signifies that the solution
+// has not yet being viewed.
 interface QuestionPlayerState {
   [key: string]: {
     linkedSkillIds: string[];
@@ -66,24 +68,36 @@ export class QuestionPlayerStateService {
 
   hintUsed(question: Question): void {
     let questionId = question.getId();
-    if (!this.questionPlayerState[questionId]) {
-      this._createNewQuestionPlayerState(
-        questionId, question.getLinkedSkillIds());
+    // QuestionId null signifies temporary question and it does
+    // not have associated question player state.
+    if (questionId !== null) {
+      // Typecasting is done just to deal with TS error.
+      questionId = String(questionId);
+      if (!this.questionPlayerState[questionId]) {
+        this._createNewQuestionPlayerState(
+          questionId, question.getLinkedSkillIds());
+      }
+      this.questionPlayerState[questionId].usedHints.push({
+        timestamp: this._getCurrentTime()
+      });
     }
-    this.questionPlayerState[questionId].usedHints.push(
-      {timestamp: this._getCurrentTime()}
-    );
   }
 
   solutionViewed(question: Question): void {
     let questionId = question.getId();
-    if (!this.questionPlayerState[questionId]) {
-      this._createNewQuestionPlayerState(
-        questionId, question.getLinkedSkillIds());
+    // QuestionId null signifies temporary question and it does
+    // not have a question player state.
+    if (questionId !== null) {
+      // Typecasting is done just to deal with TS error.
+      questionId = String(questionId);
+      if (!this.questionPlayerState[questionId]) {
+        this._createNewQuestionPlayerState(
+          questionId, question.getLinkedSkillIds());
+      }
+      this.questionPlayerState[questionId].viewedSolution = {
+        timestamp: this._getCurrentTime()
+      };
     }
-    this.questionPlayerState[questionId].viewedSolution = {
-      timestamp: this._getCurrentTime()
-    };
   }
 
   answerSubmitted(
@@ -91,22 +105,28 @@ export class QuestionPlayerStateService {
       isCorrect: boolean,
       taggedSkillMisconceptionId: string): void {
     let questionId = question.getId();
-    if (!this.questionPlayerState[questionId]) {
-      this._createNewQuestionPlayerState(
-        questionId, question.getLinkedSkillIds());
-    }
-    // Don't store a correct answer in the case where
-    // the learner viewed the solution for this question.
-    if (isCorrect && this.questionPlayerState[questionId].viewedSolution) {
-      return;
-    }
-    this.questionPlayerState[questionId].answers.push(
-      {
-        isCorrect: isCorrect,
-        timestamp: this._getCurrentTime(),
-        taggedSkillMisconceptionId: taggedSkillMisconceptionId
+    // QuestionId null signifies temporary question and it does
+    // not have a question player state.
+    if (questionId !== null) {
+      // Typecasting is done just to deal with TS error.
+      questionId = String(questionId);
+      if (!this.questionPlayerState[questionId]) {
+        this._createNewQuestionPlayerState(
+          questionId, question.getLinkedSkillIds());
       }
-    );
+      // Don't store a correct answer in the case where
+      // the learner viewed the solution for this question.
+      if (isCorrect && this.questionPlayerState[questionId].viewedSolution) {
+        return;
+      }
+      this.questionPlayerState[questionId].answers.push(
+        {
+          isCorrect: isCorrect,
+          timestamp: this._getCurrentTime(),
+          taggedSkillMisconceptionId: taggedSkillMisconceptionId
+        }
+      );
+    }
   }
 
   getQuestionPlayerStateData(): object {

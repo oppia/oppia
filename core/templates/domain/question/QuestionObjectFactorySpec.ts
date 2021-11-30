@@ -290,9 +290,9 @@ describe('Question object factory', function() {
   it('should correctly create a Default Question', function() {
     var sampleQuestion1 = QuestionObjectFactory.createDefaultQuestion(
       ['skill_id3', 'skill_id4']);
-    var state = StateObjectFactory.createDefaultState('question');
+    var state = StateObjectFactory.createDefaultState(null);
 
-    expect(sampleQuestion1.getId()).toEqual('null');
+    expect(sampleQuestion1.getId()).toEqual(null);
     expect(sampleQuestion1.getLanguageCode()).toEqual('en');
     expect(sampleQuestion1.getVersion()).toEqual(1);
     expect(sampleQuestion1.getStateData()).toEqual(state);
