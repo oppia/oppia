@@ -331,7 +331,7 @@ angular.module('oppia').directive('topicEditorTab', [
               newPracticeTabIsDisplayed) {
             if (
               newPracticeTabIsDisplayed !==
-              $scope.topic.getPracticeTabIsDisplayed() && $scope.hasMoreThanTenQuestions()) {
+              $scope.topic.getPracticeTabIsDisplayed() && $scope.topicHasAtLeastTenPracticeQuestions()) {
               TopicUpdateService.setPracticeTabIsDisplayed(
                 $scope.topic, newPracticeTabIsDisplayed);
               }
