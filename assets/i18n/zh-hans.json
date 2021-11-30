@@ -184,7 +184,7 @@
 	"I18N_DELETE_ACCOUNT_PAGE_LIST_2_1": "反馈意见与建议",
 	"I18N_DELETE_ACCOUNT_PAGE_LIST_2_2": "用户统计",
 	"I18N_DELETE_ACCOUNT_PAGE_MODAL_TEXT": "为了确认删除，请在下面的字段中输入您的<strong>用户名</strong>，然后按“删除我的帐户”按钮。 <strong>此操作不能撤消。</strong>",
-	"I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_1": "该行动会删除本用户与所有与他相关的隐私信息。为了使信息无法与本用户相联，已经公开的信息会被转为匿名。其中一些数据的所有权可能会转移到社群。",
+	"I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_1": "该行动会删除本用户与所有与他相关的隐私信息。为了使信息无法与本用户相联，已经公开的信息会被转为匿名，备份数据（将会保存6个月）除外。下面提到的某些分类可能不适用于您的账户。",
 	"I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_1_HEADING": "概览",
 	"I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_2": "以下是将被删除的数据类型：",
 	"I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_3": "以下是将被匿名化的数据类型：",
