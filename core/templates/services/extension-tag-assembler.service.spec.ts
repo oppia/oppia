@@ -36,19 +36,19 @@ describe('Extension Tag Assembler Service', () => {
   });
 
   it('should not format element without customization', () => {
-    const element = $('<p>');
+    const element = document.createElement('p');
     const interactionCustomizationArgs = {};
     const expectedElement = '<p></p>';
 
     expect(
       etas.formatCustomizationArgAttrs(
         element, interactionCustomizationArgs
-      ).get(0)?.outerHTML
+      ).outerHTML
     ).toEqual(expectedElement);
   });
 
   it('should format element with customization', () => {
-    const element = $('<p>');
+    const element = document.createElement('p');
     const interactionCustomizationArgs = {
       choices: {value: 'sampleChoice'}
     };
@@ -59,12 +59,12 @@ describe('Extension Tag Assembler Service', () => {
     expect(
       etas.formatCustomizationArgAttrs(
         element, interactionCustomizationArgs
-      ).get(0)?.outerHTML
+      ).outerHTML
     ).toEqual(expectedElement);
   });
 
   it('should format element with complex customization', () => {
-    const element = $('<p>');
+    const element = document.createElement('p');
     const interactionCustomizationArgs = {
       test: {
         value: {
@@ -79,12 +79,12 @@ describe('Extension Tag Assembler Service', () => {
     expect(
       etas.formatCustomizationArgAttrs(
         element, interactionCustomizationArgs
-      ).get(0)?.outerHTML
+      ).outerHTML
     ).toEqual(expectedElement);
   });
 
   it('should format element with multiple customizations', () => {
-    const element = $('<p>');
+    const element = document.createElement('p');
     const interactionCustomizationArgs = {
       choices: {value: 'sampleChoice'},
       test: {value: 'sampleValue'}
@@ -97,7 +97,7 @@ describe('Extension Tag Assembler Service', () => {
     expect(
       etas.formatCustomizationArgAttrs(
         element, interactionCustomizationArgs
-      ).get(0)?.outerHTML
+      ).outerHTML
     ).toEqual(expectedElement);
   });
 });

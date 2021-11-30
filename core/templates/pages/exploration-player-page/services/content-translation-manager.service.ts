@@ -246,16 +246,10 @@ export class ContentTranslationManagerService {
       }
     }
 
-    // TODO(#14340): Remove the usage of jQuery.
-    const element = $(card.getInteractionHtml());
+    const element = document.createElement(card.getInteractionHtml());
     this.extensionTagAssemblerService.formatCustomizationArgAttrs(
       element, caValues);
-    let directiveElement = element.get(0);
-
-    if (directiveElement === undefined) {
-      throw Error('directiveElement is undefined');
-    }
-    card.setInteractionHtml(directiveElement.outerHTML);
+    card.setInteractionHtml(element.outerHTML);
   }
 
   _swapContentInRules(card: StateCard, languageCode: string): void {

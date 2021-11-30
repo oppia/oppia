@@ -80,55 +80,33 @@ export class ExplorationHtmlFormatterService {
       labelForFocusTarget: string,
       savedSolution: string | null
   ): string {
-    var htmlInteractionId = this.camelCaseToHyphens.transform(interactionId);
-    // TODO(#14340): Remove the usage of jQuery.
-    var element = $('<oppia-interactive-' + htmlInteractionId + '>');
+    let htmlInteractionId = this.camelCaseToHyphens.transform(interactionId);
+    let element = document.createElement(
+      `oppia-interactive-${htmlInteractionId}`);
     element = (
       this.extensionTagAssembler.formatCustomizationArgAttrs(
         element, interactionCustomizationArgs)
     );
-    const tagEnd = '></oppia-interactive-' + htmlInteractionId + '>';
-    let directiveElement = element.get(0);
-    if (directiveElement === undefined) {
-      throw Error('directiveElement is undefined');
-    }
-    let directiveOuterHtml = directiveElement.outerHTML.replace(tagEnd, '');
-    let spaceToBeAdded = true;
-    const getLastAnswer = (): string => {
-      let propValue = parentHasLastAnswerProperty ? 'lastAnswer' : 'null';
-      if (this.migratedInteractions.indexOf(interactionId) >= 0) {
-        return '[last-answer]="' + propValue + '"';
-      } else {
-        return 'last-answer="' + propValue + '"';
-      }
-    };
     if (savedSolution) {
       // TODO(#12292): Refactor this once all interactions have been migrated to
       // Angular 2+, such that we don't need to parse the string in the
       // interaction directives/components.
-      if (spaceToBeAdded) {
-        directiveOuterHtml += ' ';
-      }
       if (this.migratedInteractions.indexOf(interactionId) >= 0) {
-        directiveOuterHtml += '[saved-solution]="' + savedSolution + '" ';
+        element.setAttribute('[saved-solution]', savedSolution);
       } else {
-        directiveOuterHtml += 'saved-solution="' + savedSolution + '" ';
+        element.setAttribute('saved-solution', savedSolution);
       }
-      spaceToBeAdded = false;
     }
     if (labelForFocusTarget) {
-      if (spaceToBeAdded) {
-        directiveOuterHtml += ' ';
-      }
-      directiveOuterHtml += (
-        'label-for-focus-target="' + labelForFocusTarget + '" ');
-      spaceToBeAdded = false;
+      element.setAttribute('label-for-focus-target', labelForFocusTarget);
     }
-    if (spaceToBeAdded) {
-      directiveOuterHtml += ' ';
+    let propValue = parentHasLastAnswerProperty ? 'lastAnswer' : 'null';
+    if (this.migratedInteractions.indexOf(interactionId) >= 0) {
+      element.setAttribute('[last-answer]', propValue);
+    } else {
+      element.setAttribute('last-answer', propValue);
     }
-    directiveOuterHtml += getLastAnswer() + tagEnd;
-    return directiveOuterHtml;
+    return element.outerHTML;
   }
 
   getAnswerHtml(
