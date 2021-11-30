@@ -323,13 +323,13 @@ angular.module('oppia').directive('topicEditorTab', [
           };
 
           $scope.updatePracticeTabIsDisplayed = function(
-            newPracticeTabIsDisplayed) {
-          if (
-            newPracticeTabIsDisplayed !==
-            $scope.topic.getPracticeTabIsDisplayed() && $scope.hasMoreThanTenQuestions()) {
-            TopicUpdateService.setPracticeTabIsDisplayed(
-              $scope.topic, newPracticeTabIsDisplayed);
-            }
+              newPracticeTabIsDisplayed) {
+            if (
+              newPracticeTabIsDisplayed !==
+              $scope.topic.getPracticeTabIsDisplayed() && $scope.hasMoreThanTenQuestions()) {
+              TopicUpdateService.setPracticeTabIsDisplayed(
+                $scope.topic, newPracticeTabIsDisplayed);
+              }
           };
 
           $scope.hasMoreThanTenQuestions = function() {

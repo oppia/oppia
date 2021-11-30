@@ -385,7 +385,7 @@ describe('Topic editor tab directive', function() {
     expect(topicPracticeTabSpy).not.toHaveBeenCalled();
   });
 
-  fit('should not call the TopicUpdateService for practice tab if there are less than 10 questions '+
+  it('should not call the TopicUpdateService for practice tab if there are less than 10 questions '+
    'in the topic, no matter what', function () {
      // There are initially less than 10 questions in the topic
     var topicPracticeTabSpy = (
@@ -395,11 +395,14 @@ describe('Topic editor tab directive', function() {
     expect(topicPracticeTabSpy).not.toHaveBeenCalled();
    })
   
-  fit('should call the TopicUpdateService for practice tab if there are more than 10 questions '+
+  it('should call the TopicUpdateService for practice tab if there are more than 10 questions '+
   'in the topic, if practice tab is displayed property is changed', function () {
-    $scope.skillQuestionCountDict = {"skill1": 3, "skill2": 7};
+    $scope.skillQuestionCountDict = {"skill1": 3, "skill2": 6};
     var topicPracticeTabSpy = (
       spyOn(TopicUpdateService, 'setPracticeTabIsDisplayed'));
+    $scope.updatePracticeTabIsDisplayed(true);
+    expect(topicPracticeTabSpy).not.toHaveBeenCalled();
+    $scope.skillQuestionCountDict = {"skill1": 3, "skill2": 7};
     $scope.updatePracticeTabIsDisplayed(true);
     expect(topicPracticeTabSpy).toHaveBeenCalled();
   })
