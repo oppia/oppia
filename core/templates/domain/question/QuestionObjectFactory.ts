@@ -156,7 +156,7 @@ export class Question {
       if (!answerGroups[i].outcome.labelledAsCorrect &&
           answerGroups[i].taggedSkillMisconceptionId !== null) {
         taggedSkillMisconceptionIds[
-          // Typcasting just to deal with Typescript error.
+          // Typecasting is done just to deal with TS error.
           String(answerGroups[i].taggedSkillMisconceptionId)] = true;
       }
     }
