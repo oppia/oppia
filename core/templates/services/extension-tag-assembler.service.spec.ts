@@ -41,7 +41,6 @@ describe('Extension Tag Assembler Service', () => {
     const expectedElement = '<p></p>';
 
     expect(
-
       etas.formatCustomizationArgAttrs(
         element, interactionCustomizationArgs
       ).get(0)?.outerHTML
