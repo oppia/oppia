@@ -42,12 +42,12 @@ export class TranslateTextBackendApiService {
   async blobtoBase64(blob: Blob): Promise<string> {
     return new Promise<string> ((resolve, reject)=> {
       const reader = new FileReader();
-      reader.readAsDataURL(blob);
       reader.onloadend = () => {
         const dataurl = reader.result as string;
         const base64 = dataurl.substring(dataurl.indexOf(',') + 1);
         resolve(base64);
       };
+      reader.readAsDataURL(blob);
       reader.onerror = error => reject(error);
     });
   }
@@ -73,12 +73,15 @@ export class TranslateTextBackendApiService {
       }
     };
     const body = new FormData();
-    for await (const obj of imagesData) {
-      if (obj.imageBlob === null) {
-        throw new Error('No image data found');
+    if (imagesData.length > 0) {
+      postData.files = {};
+      for await (const obj of imagesData) {
+        if (obj.imageBlob === null) {
+          throw new Error('No image data found');
+        }
+        const image = await this.blobtoBase64(obj.imageBlob);
+        postData.files[obj.filename] = image;
       }
-      const image = await this.blobtoBase64(obj.imageBlob);
-      postData.files[obj.filename] = image;
     }
     body.append('payload', JSON.stringify(postData));
     return this.http.post(

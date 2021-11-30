@@ -393,6 +393,7 @@ describe('Translation Modal Component', () => {
 
       component.suggestTranslatedText();
 
+      flushMicrotasks();
       const req = httpTestingController.expectOne(
         '/suggestionhandler/');
       expect(component.hadCopyParagraphError).toEqual(false);
@@ -406,6 +407,7 @@ describe('Translation Modal Component', () => {
     it('should correctly submit a translation suggestion', fakeAsync(() => {
       component.suggestTranslatedText();
 
+      flushMicrotasks();
       const req = httpTestingController.expectOne(
         '/suggestionhandler/');
       expect(req.request.method).toEqual('POST');
@@ -578,6 +580,7 @@ describe('Translation Modal Component', () => {
           imagesData
         );
         component.suggestTranslatedText();
+        flushMicrotasks();
         const req = httpTestingController.expectOne(
           '/suggestionhandler/');
         expect(req.request.method).toEqual('POST');

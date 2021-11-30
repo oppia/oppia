@@ -106,14 +106,13 @@ describe('TranslateTextBackendApiService', () => {
       failHandler = jasmine.createSpy('error');
       imagesData = [{
         filename: 'imageFilename',
-        imageBlob: {
-          size: 0,
-          type: 'imageBlob'
-        } as Blob
+        imageBlob: new Blob(['image data'], {type: 'imagetype'})
       }];
     });
 
     it('should correctly submit a translation suggestion', fakeAsync(() => {
+      spyOn(translateTextBackendApiService, 'blobtoBase64').and.returnValue(
+        Promise.resolve('image data'));
       const expectedPayload = {
         suggestion_type: 'translate_content',
         target_type: 'exploration',
@@ -128,6 +127,9 @@ describe('TranslateTextBackendApiService', () => {
           content_html: 'contentHtml',
           translation_html: 'translationHtml',
           data_format: 'html'
+        },
+        files: {
+          imageFilename: 'image data'
         }
       };
 
@@ -141,6 +143,7 @@ describe('TranslateTextBackendApiService', () => {
         'translationHtml',
         imagesData,
         'html').then(successHandler, failHandler);
+      flushMicrotasks();
       const req = httpTestingController.expectOne(
         '/suggestionhandler/');
       expect(req.request.method).toEqual('POST');
@@ -153,6 +156,8 @@ describe('TranslateTextBackendApiService', () => {
     }));
 
     it('should append image data to form data', fakeAsync(() => {
+      spyOn(translateTextBackendApiService, 'blobtoBase64').and.returnValue(
+        Promise.resolve('image data'));
       translateTextBackendApiService.suggestTranslatedTextAsync(
         'activeExpId',
         'activeExpVersion',
@@ -163,77 +168,13 @@ describe('TranslateTextBackendApiService', () => {
         'translationHtml',
         imagesData,
         'html').then(successHandler, failHandler);
-      const req = httpTestingController.expectOne(
-        '/suggestionhandler/');
-      expect(req.request.method).toEqual('POST');
-      expect(req.request.body.getAll('imageFilename')[0]).toContain([{
-        size: 0,
-        type: 'imageBlob'
-      }]);
-      req.flush({});
       flushMicrotasks();
-
-      expect(successHandler).toHaveBeenCalled();
-    }));
-    it('should handle multiple image blobs per filename', fakeAsync(() => {
-      imagesData = [{
-        filename: 'imageFilename1',
-        imageBlob: {
-          size: 0,
-          type: 'imageBlob1'
-        } as Blob
-      }, {
-        filename: 'imageFilename1',
-        imageBlob: {
-          size: 0,
-          type: 'imageBlob2'
-        } as Blob
-      }, {
-        filename: 'imageFilename2',
-        imageBlob: {
-          size: 0,
-          type: 'imageBlob1'
-        } as Blob
-      }, {
-        filename: 'imageFilename2',
-        imageBlob: {
-          size: 0,
-          type: 'imageBlob2'
-        } as Blob
-      }];
-      translateTextBackendApiService.suggestTranslatedTextAsync(
-        'activeExpId',
-        'activeExpVersion',
-        'activeContentId',
-        'activeStateName',
-        'languageCode',
-        'contentHtml',
-        'translationHtml',
-        imagesData,
-        'html').then(successHandler, failHandler);
       const req = httpTestingController.expectOne(
         '/suggestionhandler/');
+      const files = JSON.parse(req.request.body.getAll('payload')[0]).files;
+      const images = Object.values(files);
       expect(req.request.method).toEqual('POST');
-      const filename1Blobs = req.request.body.getAll('imageFilename1')[0];
-      const filename2Blobs = req.request.body.getAll('imageFilename2')[0];
-      const filename3Blobs = req.request.body.getAll('imageFilename1')[1];
-      const filename4Blobs = req.request.body.getAll('imageFilename2')[1];
-      expect(filename1Blobs).toContain([{
-        size: 0,
-        type: 'imageBlob1'
-      }]);
-      expect(filename2Blobs).toContain([{
-        size: 0,
-        type: 'imageBlob1'
-      }]);
-      expect(filename3Blobs).toContain([{
-        size: 0,
-        type: 'imageBlob2'
-      }]);
-      expect(filename4Blobs).toContain([{
-        size: 0,
-        type: 'imageBlob2'
-      }]);
+      expect(images).toContain('image data');
       req.flush({});
       flushMicrotasks();
 
@@ -256,6 +197,7 @@ describe('TranslateTextBackendApiService', () => {
         'translationHtml',
         imagesData,
         'html').then(successHandler, failHandler);
+      flushMicrotasks();
       const req = httpTestingController.expectOne(
         '/suggestionhandler/');
       expect(req.request.method).toEqual('POST');
