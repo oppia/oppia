@@ -339,7 +339,7 @@ angular.module('oppia').directive('topicEditorTab', [
 
           $scope.topicHasAtLeastTenPracticeQuestions = function() {
             let skillQuestionCounts = Object.values($scope.skillQuestionCountDict);
-            let numberOfPracticeQuestions = skillQuestionCounts.reduce((a, b) => a + b, 0);
+            let numberOfPracticeQuestions = skillQuestionCounts.reduce((a: number, b: number) => a + b, 0);
             return numberOfPracticeQuestions >= 10;
           };
 
