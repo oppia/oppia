@@ -3257,6 +3257,21 @@ class State:
 
         return content_id_to_translatable_item
 
+    def has_content_id(self, content_id):
+        """Returns whether a given content ID is available in the translatable
+        content.
+
+        Args:
+            content_id: str. The content ID that needs to be checked for the
+                availability.
+
+        Returns:
+            bool. A boolean that indicates the availability of the content ID
+            in the translatable content.
+        """
+        available_translate_content = self._get_all_translatable_content()
+        return bool(content_id in available_translate_content)
+
     def get_content_id_mapping_needing_translations(self, language_code):
         """Returns all text html which can be translated in the given language.
 
