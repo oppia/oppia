@@ -85,10 +85,6 @@ class PythonUtilsTests(test_utils.GenericTestBase):
         response = python_utils.urllib_unquote('/El%20Ni%C3%B1o/')
         self.assertEqual(response, '/El Niño/')
 
-    def test_url_parse(self):
-        response = python_utils.url_parse('http://www.google.com')
-        self.assertEqual(response.geturl(), 'http://www.google.com')
-
     def test_recursively_convert_to_str_with_dict(self):
         test_var_1_in_unicode = str('test_var_1')
         test_var_2_in_unicode = str('test_var_2')
@@ -174,17 +170,6 @@ class PythonUtilsTests(test_utils.GenericTestBase):
         enums = python_utils.create_enum('first', 'second', 'third')
         with self.assertRaisesRegexp(AttributeError, 'fourth'):
             getattr(enums, 'fourth')
-
-    def test_zip_longest(self):
-        self.assertEqual(
-            [list(g) for g in python_utils.zip_longest(
-                [0, 1, 2, 3], [4, 5, 6], [7, 8])],
-            [[0, 4, 7], [1, 5, 8], [2, 6, None], [3, None, None]])
-        # Zip longest with fillvalue.
-        self.assertEqual(
-            [''.join(g) for g in python_utils.zip_longest(
-                'ABC', 'DE', 'F', fillvalue='x')],
-            ['ADF', 'BEx', 'Cxx'])
 
 
 @unittest.skipUnless(
