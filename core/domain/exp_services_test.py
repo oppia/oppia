@@ -5197,6 +5197,92 @@ class ExplorationConversionPipelineTests(ExplorationServicesUnitTests):
 
     NEW_EXP_ID = 'exp_id1'
 
+    UPGRADED_EXP_YAML = (
+        """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: category
+correctness_feedback_enabled: false
+init_state_name: %s
+language_code: en
+objective: Old objective
+param_changes: []
+param_specs: {}
+schema_version: %d
+states:
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  %s:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        buttonText:
+          value:
+            content_id: ca_buttonText
+            unicode_str: Continue
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: Continue
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_buttonText: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_buttonText: {}
+        content: {}
+        default_outcome: {}
+states_schema_version: %d
+tags: []
+title: Old Title
+""") % (
+    feconf.DEFAULT_INIT_STATE_NAME.encode('utf-8'),
+    exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
+    feconf.DEFAULT_INIT_STATE_NAME.encode('utf-8'),
+    feconf.CURRENT_STATE_SCHEMA_VERSION)
+
     ALBERT_EMAIL = 'albert@example.com'
     ALBERT_NAME = 'albert'
 
