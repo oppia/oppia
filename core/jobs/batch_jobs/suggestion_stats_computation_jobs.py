@@ -119,6 +119,8 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
             user_stats_results
             | 'Filter err results' >> beam.Filter(
                 lambda key_and_result: key_and_result[1].is_err())
+            # Pylint disable is needed because pylint is not able to correctly
+            # detect that the value is passed through the pipe.
             | 'Remove keys' >> beam.Values()  # pylint: disable=no-value-for-parameter
             | 'Transform result to job run result' >> (
                 job_result_transforms.ResultsToJobRunResults())
