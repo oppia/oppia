@@ -41,107 +41,106 @@ class MockActiveModal {
 }
  
 describe('Create New Chapter Modal Controller', function() {
-    let componentInstance: CreateNewChapterModalComponent;
-    let fixture: ComponentFixture<CreateNewChapterModalComponent>;
-    let ngbActiveModal: NgbActiveModal;
-    let storyEditorStateService: StoryEditorStateService = null;
-    let storyUpdateService: StoryUpdateService = null;
-    let storyObjectFactory = null;
-    let explorationIdValidationService: ExplorationIdValidationService = null;
-    let nodeTitles: string[] = ['title 1', 'title 2', 'title 3'];
+  let componentInstance: CreateNewChapterModalComponent;
+  let fixture: ComponentFixture<CreateNewChapterModalComponent>;
+  let ngbActiveModal: NgbActiveModal;
+  let storyEditorStateService: StoryEditorStateService = null;
+  let storyUpdateService: StoryUpdateService = null;
+  let storyObjectFactory = null;
+  let explorationIdValidationService: ExplorationIdValidationService = null;
+  let nodeTitles: string[] = ['title 1', 'title 2', 'title 3'];
 
-    beforeEach(waitForAsync(() => {
-        TestBed.configureTestingModule({
-          imports: [
-            HttpClientTestingModule
-          ],
-          declarations: [
-            CreateNewChapterModalComponent,
-          ],
-          providers: [
-            {
-                provide: NgbActiveModal,
-                useClass: MockActiveModal
-            },
-            ExplorationSummaryBackendApiService,
-            EditableStoryBackendApiService,
-            AlertsService,
-            ExplorationIdValidationService,
-            StoryObjectFactory,
-            StoryContentsObjectFactory
-          ],
-          schemas: [NO_ERRORS_SCHEMA]
-        }).compileComponents();
-    }));
- 
-    beforeEach(() => {
-        fixture = TestBed.createComponent(CreateNewChapterModalComponent);
-        componentInstance = fixture.componentInstance;
-        ngbActiveModal = TestBed.inject(NgbActiveModal);
-        storyEditorStateService = TestBed.inject(StoryEditorStateService);
-        storyUpdateService = TestBed.inject(StoryUpdateService);
-        storyObjectFactory = TestBed.inject(StoryObjectFactory);
-        storyEditorStateService = TestBed.inject(StoryEditorStateService);
-        explorationIdValidationService = TestBed.inject(
-          ExplorationIdValidationService);
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [
+        HttpClientTestingModule
+      ],
+      declarations: [
+        CreateNewChapterModalComponent,
+      ],
+      providers: [
+        {
+            provide: NgbActiveModal,
+            useClass: MockActiveModal
+        },
+        ExplorationSummaryBackendApiService,
+        EditableStoryBackendApiService,
+        AlertsService,
+        ExplorationIdValidationService,
+        StoryObjectFactory,
+        StoryContentsObjectFactory
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
+  }));
 
-        let sampleStoryBackendObject = {
-          id: 'sample_story_id',
-          title: 'Story title',
-          description: 'Story description',
-          notes: 'Story notes',
-          version: 1,
-          corresponding_topic_id: 'topic_id',
-          story_contents: {
-            initial_node_id: 'node_2',
-            nodes: [
-              {
-                id: 'node_1',
-                title: 'Title 1',
-                description: 'Description 1',
-                prerequisite_skill_ids: ['skill_1'],
-                acquired_skill_ids: ['skill_2'],
-                destination_node_ids: [],
-                outline: 'Outline',
-                exploration_id: null,
-                outline_is_finalized: false
-              }, {
-                id: 'node_2',
-                title: 'Title 2',
-                description: 'Description 2',
-                prerequisite_skill_ids: ['skill_3'],
-                acquired_skill_ids: ['skill_4'],
-                destination_node_ids: ['node_1'],
-                outline: 'Outline 2',
-                exploration_id: 'exp_1',
-                outline_is_finalized: true
-              }],
-            next_node_id: 'node_3'
-            },
-            language_code: 'en'
+  beforeEach(() => {
+    fixture = TestBed.createComponent(CreateNewChapterModalComponent);
+    componentInstance = fixture.componentInstance;
+    ngbActiveModal = TestBed.inject(NgbActiveModal);
+    storyEditorStateService = TestBed.inject(StoryEditorStateService);
+    storyUpdateService = TestBed.inject(StoryUpdateService);
+    storyObjectFactory = TestBed.inject(StoryObjectFactory);
+    storyEditorStateService = TestBed.inject(StoryEditorStateService);
+    explorationIdValidationService = TestBed.inject(
+      ExplorationIdValidationService);
+
+    let sampleStoryBackendObject = {
+      id: 'sample_story_id',
+      title: 'Story title',
+      description: 'Story description',
+      notes: 'Story notes',
+      version: 1,
+      corresponding_topic_id: 'topic_id',
+      story_contents: {
+        initial_node_id: 'node_2',
+        nodes: [
+          {
+          id: 'node_1',
+          title: 'Title 1',
+          description: 'Description 1',
+          prerequisite_skill_ids: ['skill_1'],
+          acquired_skill_ids: ['skill_2'],
+          destination_node_ids: [],
+          outline: 'Outline',
+          exploration_id: null,
+          outline_is_finalized: false
+          }, {
+          id: 'node_2',
+          title: 'Title 2',
+          description: 'Description 2',
+          prerequisite_skill_ids: ['skill_3'],
+          acquired_skill_ids: ['skill_4'],
+          destination_node_ids: ['node_1'],
+          outline: 'Outline 2',
+          exploration_id: 'exp_1',
+          outline_is_finalized: true
+        }],
+          next_node_id: 'node_3'
+          },
+          language_code: 'en'
         };
-        let story = storyObjectFactory.createFromBackendDict(
-            sampleStoryBackendObject);
-        spyOn(storyEditorStateService, 'getStory').and.returnValue(story);
+    let story = storyObjectFactory.createFromBackendDict(
+      sampleStoryBackendObject);
+    spyOn(storyEditorStateService, 'getStory').and.returnValue(story);
       
     });
  
-   it('should validate explorationId correctly',
-      () => {
-      componentInstance.explorationId = 'validId';
-      expect(componentInstance.validateExplorationId()).toBeTrue();
-      componentInstance.explorationId = 'oppia.org/validId';
-      expect(componentInstance.validateExplorationId()).toBeFalse();
-    });
- 
+  it('should validate explorationId correctly', () => {
+    componentInstance.explorationId = 'validId';
+    expect(componentInstance.validateExplorationId()).toBeTrue();
+    componentInstance.explorationId = 'oppia.org/validId';
+    expect(componentInstance.validateExplorationId()).toBeFalse();
+  });
+
   it('should update thumbnail filename when changing thumbnail file',
-    () => {
+  () => {
     let storyUpdateSpy = spyOn(
       storyUpdateService, 'setStoryNodeThumbnailFilename');
     componentInstance.updateThumbnailFilename('abc');
     expect(storyUpdateSpy).toHaveBeenCalled();
     expect(componentInstance.editableThumbnailFilename).toEqual('abc');
-   });
+  });
  
    it('should update thumbnail bg color when changing thumbnail color',
      () => {
