@@ -567,6 +567,8 @@ def check_can_voiceover_activity(user, activity_rights):
 
 def check_can_manage_voice_artist_in_activity(user, activity_rights):
     """Check whether the user can manage voice artist for an activity.
+    Callers are expected to ensure that the activity is published when we are
+    adding voice artists.
 
     Args:
         user: UserActionInfo. Object having user_id, role, and actions for
@@ -769,7 +771,6 @@ def _assign_role(
     committer_id = committer.user_id
     activity_rights = _get_activity_rights(activity_type, activity_id)
 
-    user_can_assign_role = False
     if (
             new_role == rights_domain.ROLE_VOICE_ARTIST and
             activity_type == constants.ACTIVITY_TYPE_EXPLORATION
@@ -777,6 +778,9 @@ def _assign_role(
         if activity_rights.is_published():
             user_can_assign_role = check_can_manage_voice_artist_in_activity(
                 committer, activity_rights)
+        else:
+            raise Exception(
+                'Could not assign voice artist to unpublished activity.')
     else:
         user_can_assign_role = check_can_modify_core_activity_roles(
             committer, activity_rights)
@@ -901,7 +905,6 @@ def _deassign_role(committer, removed_user_id, activity_id, activity_type):
     committer_id = committer.user_id
     activity_rights = _get_activity_rights(activity_type, activity_id)
 
-    user_can_deassign_role = False
     if (
             activity_rights.is_voice_artist(removed_user_id) and
             activity_type == constants.ACTIVITY_TYPE_EXPLORATION

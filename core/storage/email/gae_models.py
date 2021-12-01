@@ -337,6 +337,9 @@ class BulkEmailModel(base_models.BaseModel):
     This model is read-only; entries cannot be modified once created. The
     id/key of instances of this model is randomly generated string of
     length 12.
+
+    The recipient IDs are not stored in this model but we store all bulk emails
+    that are sent to particular user in UserBulkEmailsModel.
     """
 
     # The user ID of the email sender. For site-generated emails this is equal

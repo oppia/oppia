@@ -2165,6 +2165,10 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_voiceover_admin_can_manage_voice_artist_in_private_exp(self):
+        # Voiceover admin can manage voice artists in private explorations, this
+        # does not mean that they can assign voice artists to private
+        # explorations, but the logic of assigning voice artists to different
+        # types of explorations is handled in rights_manager.py.
         self.login(self.VOICEOVER_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         with self.swap(self, 'testapp', self.mock_testapp):
