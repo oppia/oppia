@@ -134,47 +134,46 @@ describe('Create New Chapter Modal Controller', function() {
   });
 
   it('should update thumbnail filename when changing thumbnail file',
-  () => {
-    let storyUpdateSpy = spyOn(
-      storyUpdateService, 'setStoryNodeThumbnailFilename');
-    componentInstance.updateThumbnailFilename('abc');
-    expect(storyUpdateSpy).toHaveBeenCalled();
-    expect(componentInstance.editableThumbnailFilename).toEqual('abc');
+    () => {
+      let storyUpdateSpy = spyOn(
+        storyUpdateService, 'setStoryNodeThumbnailFilename');
+      componentInstance.updateThumbnailFilename('abc');
+      expect(storyUpdateSpy).toHaveBeenCalled();
+      expect(componentInstance.editableThumbnailFilename).toEqual('abc');
   });
  
-   it('should update thumbnail bg color when changing thumbnail color',
-     () => {
-        let storyUpdateSpy = spyOn(
-          storyUpdateService, 'setStoryNodeThumbnailBgColor');
-        componentInstance.updateThumbnailBgColor('abc');
-        expect(storyUpdateSpy).toHaveBeenCalled();
-        expect(componentInstance.editableThumbnailBgColor).toEqual('abc');
-     });
+  it('should update thumbnail bg color when changing thumbnail color',
+    () => {
+      let storyUpdateSpy = spyOn(
+         storyUpdateService, 'setStoryNodeThumbnailBgColor');
+      componentInstance.updateThumbnailBgColor('abc');
+      expect(storyUpdateSpy).toHaveBeenCalled();
+      expect(componentInstance.editableThumbnailBgColor).toEqual('abc');
+  });
  
-   it('should delete the story node when closing the modal',
-     () => {
-       let storyUpdateSpy = spyOn(storyUpdateService, 'deleteStoryNode');
-       componentInstance.cancel();
-       expect(storyUpdateSpy).toHaveBeenCalled();
-     });
+  it('should delete the story node when closing the modal', () => {
+    let storyUpdateSpy = spyOn(storyUpdateService, 'deleteStoryNode');
+    componentInstance.cancel();
+    expect(storyUpdateSpy).toHaveBeenCalled();
+  });
  
-   it('should update the title', () => {
-     let storyUpdateSpy = spyOn(storyUpdateService, 'setStoryNodeTitle');
-     componentInstance.updateTitle();
-     expect(storyUpdateSpy).toHaveBeenCalled();
-   });
+  it('should update the title', () => {
+    let storyUpdateSpy = spyOn(storyUpdateService, 'setStoryNodeTitle');
+    componentInstance.updateTitle();
+    expect(storyUpdateSpy).toHaveBeenCalled();
+  });
  
-   it('should check if chapter is valid when it has title, exploration id and' +
-     ' thumbnail file', () => {
-     expect(componentInstance.isValid()).toEqual(false);
-     componentInstance.title = 'title';
-     componentInstance.explorationId = '1';
-     expect(componentInstance.isValid()).toEqual(false);
-     componentInstance.editableThumbnailFilename = '1';
-     expect(componentInstance.isValid()).toEqual(true);
-     componentInstance.explorationId = '';
-     expect(componentInstance.isValid()).toEqual(false);
-   });
+  it('should check if chapter is valid when it has title, exploration id and' +
+    ' thumbnail file', () => {
+      expect(componentInstance.isValid()).toEqual(false);
+      componentInstance.title = 'title';
+      componentInstance.explorationId = '1';
+      expect(componentInstance.isValid()).toEqual(false);
+      componentInstance.editableThumbnailFilename = '1';
+      expect(componentInstance.isValid()).toEqual(true);
+      componentInstance.explorationId = '';
+      expect(componentInstance.isValid()).toEqual(false);
+  });
  
  //   it('should warn that the exploration is not published when trying to save' +
  //     ' a chapter with an invalid exploration id', function() {
@@ -188,15 +187,15 @@ describe('Create New Chapter Modal Controller', function() {
  //     expect(this.invalidExpId).toEqual(true);
  //   });
  
-   it('should warn that the exploration already exists in the story when' +
-     ' trying to save a chapter with an already used exploration id',
+  it('should warn that the exploration already exists in the story when' +
+    ' trying to save a chapter with an already used exploration id',
     () => {
-    componentInstance.explorationId = 'exp_1';
-    componentInstance.updateExplorationId();
-    expect(componentInstance.invalidExpErrorString).toEqual(
-      'The given exploration already exists in the story.');
-    expect(componentInstance.invalidExpId).toEqual(true);
-   });
+      componentInstance.explorationId = 'exp_1';
+      componentInstance.updateExplorationId();
+      expect(componentInstance.invalidExpErrorString).toEqual(
+        'The given exploration already exists in the story.');
+      expect(componentInstance.invalidExpId).toEqual(true);
+  });
  
  //   it('should close the modal when saving a chapter with a valid exploration id',
  //     function() {
@@ -209,33 +208,31 @@ describe('Create New Chapter Modal Controller', function() {
  //       expect(this.ngbActiveModal.close).toHaveBeenCalled();
  //     });
  
-   it('should set story node exploration id when updating exploration id',
-     () => {
-       spyOn(this.storyEditorStateService, 'isStoryPublished').and.returnValue(false);
+  it('should set story node exploration id when updating exploration id',
+    () => {
+      spyOn(this.storyEditorStateService, 'isStoryPublished').and.returnValue(false);
       let storyUpdateSpy = spyOn(
         storyUpdateService, 'setStoryNodeExplorationId');
-        componentInstance.updateExplorationId();
+      componentInstance.updateExplorationId();
       expect(storyUpdateSpy).toHaveBeenCalled();
-     });
+  });
  
-   it('should not save when the chapter title is already used', () =>  {
+  it('should not save when the chapter title is already used', () => {
     componentInstance.title = nodeTitles[0];
     componentInstance.save();
     expect(componentInstance.errorMsg).toBe('A chapter with this title already exists');
     expect(this.ngbActiveModal.close).not.toHaveBeenCalled();
-   });
+  });
  
-   it('should clear error message when changing exploration id', () => {
+  it('should clear error message when changing exploration id', () => {
     componentInstance.title = nodeTitles[0];
     componentInstance.save();
     expect(componentInstance.errorMsg).toBe('A chapter with this title already exists');
     expect(this.ngbActiveModal.close).not.toHaveBeenCalled();
-
     componentInstance.resetErrorMsg();
     expect(componentInstance.errorMsg).toBe(null);
     expect(componentInstance.invalidExpId).toBe(false);
     expect(componentInstance.invalidExpErrorString).toBe(
       'Please enter a valid exploration id.');
-   });
- 
+  });
  });

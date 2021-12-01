@@ -16,7 +16,7 @@
  * @fileoverview Controller for new chapter title modal.
  */
 
-import { ChangeDetectorRef, Component, Input, OnInit } from "@angular/core";
+import { Component, Input, OnInit } from "@angular/core";
 import { NgbActiveModal } from "@ng-bootstrap/ng-bootstrap";
 import { AppConstants } from "app.constants";
 import { ConfirmOrCancelModal } from "components/common-layout-directives/common-elements/confirm-or-cancel-modal.component";
@@ -115,11 +115,11 @@ export class CreateNewChapterModalComponent extends ConfirmOrCancelModal
               this.invalidExpId = true;
             }
           });
-        } else {
-          this.storyUpdateService.setStoryNodeExplorationId(
-            this.story, this.nodeId, this.explorationId);
-          this.ngbActiveModal.close();
-        }
+    } else {
+      this.storyUpdateService.setStoryNodeExplorationId(
+        this.story, this.nodeId, this.explorationId);
+      this.ngbActiveModal.close();
+    }
   }
   
   resetErrorMsg(): void {
