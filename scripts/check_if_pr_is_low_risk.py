@@ -25,10 +25,10 @@ import argparse
 import json
 import re
 import sys
+import urllib.request as urlrequest
 
 from core import python_utils
 from scripts import common
-import urllib.request as urlrequest
 
 
 GITHUB_API_PR_ENDPOINT = (
