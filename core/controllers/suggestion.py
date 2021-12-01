@@ -572,15 +572,12 @@ def _upload_suggestion_images(files, suggestion, filenames):
             raise base.BaseHandler.InvalidInputException(
                 'No image data provided for file with name %s.'
                 % (filename))
-        try:
-            # TODO(#14204): Refactor this to use the normalized_payload files.
-            if utils.is_base64_encoded(image):
-                image = base64.decodebytes(image.encode('utf-8'))
-            file_format = (
-                image_validation_services.validate_image_and_filename(
-                    image, filename))
-        except utils.ValidationError as e:
-            raise base.BaseHandler.InvalidInputException('%s' % (e))
+        # TODO(#14204): Refactor this to use the normalized_payload files.
+        if utils.is_base64_encoded(image):
+            image = base64.decodebytes(image.encode('utf-8'))
+        file_format = (
+            image_validation_services.validate_image_and_filename(
+                image, filename))
         image_is_compressible = (
             file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
         fs_services.save_original_and_compressed_versions_of_image(
