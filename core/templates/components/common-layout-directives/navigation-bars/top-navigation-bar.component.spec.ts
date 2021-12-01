@@ -37,6 +37,7 @@ import { I18nService } from 'i18n/i18n.service';
 import { CookieService } from 'ngx-cookie';
 import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 import { ClassroomData } from 'domain/classroom/classroom-data.model';
+import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
 
 class MockWindowRef {
   nativeWindow = {
@@ -60,6 +61,7 @@ class MockWindowRef {
 }
 
 describe('TopNavigationBarComponent', () => {
+  let accessValidationBackendApiService: AccessValidationBackendApiService;
   let fixture: ComponentFixture<TopNavigationBarComponent>;
   let component: TopNavigationBarComponent;
   let mockWindowRef: MockWindowRef;
@@ -127,6 +129,8 @@ describe('TopNavigationBarComponent', () => {
     i18nService = TestBed.inject(I18nService);
     classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+    accessValidationBackendApiService = TestBed
+      .inject(AccessValidationBackendApiService);
 
     spyOn(searchService, 'onSearchBarLoaded')
       .and.returnValue(new EventEmitter<string>());
@@ -426,20 +430,6 @@ describe('TopNavigationBarComponent', () => {
     expect(component.CLASSROOM_PROMOS_ARE_ENABLED).toBe(true);
   }));
 
-  it('should check if classroom data is fetched', fakeAsync(() => {
-    spyOn(component, 'truncateNavbar').and.stub();
-    let array: CreatorTopicSummary[] = [];
-    let classroomData = new ClassroomData('test', array, 'dummy', 'dummy');
-    spyOn(
-      classroomBackendApiService, 'fetchClassroomDataAsync')
-      .and.resolveTo(classroomData);
-
-    component.ngOnInit();
-    tick();
-
-    expect(component.classroomData).toEqual(array);
-  }));
-
   it('should change current language code on' +
     ' I18nLanguageCode change', fakeAsync(() => {
     let onI18nLanguageCodeChangeEmitter = new EventEmitter();
@@ -518,5 +508,22 @@ describe('TopNavigationBarComponent', () => {
     tick();
 
     expect(component.learnDropdownOffset).toBe(-10);
+  }));
+
+  it('should check if classroom data is fetched', fakeAsync(() => {
+    spyOn(component, 'truncateNavbar').and.stub();
+    component.CLASSROOM_PROMOS_ARE_ENABLED = true;
+    spyOn(accessValidationBackendApiService, 'validateAccessToClassroomPage')
+      .and.returnValue(Promise.resolve());
+    let array: CreatorTopicSummary[] = [];
+    let classroomData = new ClassroomData('test', array, 'dummy', 'dummy');
+    spyOn(
+      classroomBackendApiService, 'fetchClassroomDataAsync')
+      .and.resolveTo(classroomData);
+
+    component.ngOnInit();
+    tick();
+
+    expect(component.classroomData).toEqual(array);
   }));
 });

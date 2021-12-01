@@ -38,6 +38,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { I18nService } from 'i18n/i18n.service';
 import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
+import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
 
 interface LanguageInfo {
   id: string;
@@ -129,6 +130,8 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
 
   constructor(
+    private accessValidationBackendApiService:
+      AccessValidationBackendApiService,
     private changeDetectorRef: ChangeDetectorRef,
     private classroomBackendApiService: ClassroomBackendApiService,
     private contextService: ContextService,
@@ -161,12 +164,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
         return languageInfo;
       }
     );
-
-    this.classroomBackendApiService.fetchClassroomDataAsync(
-      'math').then((classroomData) => {
-      this.classroomData = classroomData.getTopicSummaries();
-    });
-
     this.showLanguageSelector = (
       !this.contextService.getPageContext().endsWith('editor'));
 
@@ -274,6 +271,16 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     setTimeout(function() {
       that.truncateNavbar();
     }, 0);
+
+    if (this.CLASSROOM_PROMOS_ARE_ENABLED) {
+      this.accessValidationBackendApiService.validateAccessToClassroomPage(
+        'math').then(()=>{
+        this.classroomBackendApiService.fetchClassroomDataAsync(
+          'math').then((classroomData) => {
+          this.classroomData = classroomData.getTopicSummaries();
+        });
+      });
+    }
   }
 
   ngAfterViewChecked(): void {
