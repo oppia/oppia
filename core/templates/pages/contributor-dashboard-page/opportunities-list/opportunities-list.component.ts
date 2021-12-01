@@ -25,7 +25,6 @@ import { ContributionOpportunitiesService } from '../services/contribution-oppor
 import { ExplorationOpportunity } from '../opportunities-list-item/opportunities-list-item.component';
 import constants from 'assets/constants';
 import { Subscription } from 'rxjs';
-import { range } from 'lodash';
 
 @Component({
   selector: 'oppia-opportunities-list',
