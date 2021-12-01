@@ -428,14 +428,14 @@ describe('Exploration rights service', () => {
       tick();
 
       expect(clearWarningsSpy).not.toHaveBeenCalled();
-      expect(ers.ownerNames).toBe(null);
-      expect(ers.editorNames).toBe(null);
-      expect(ers.voiceArtistNames).toBe(null);
-      expect(ers.viewerNames).toBe(null);
+      expect(ers.ownerNames).toBeNull();
+      expect(ers.editorNames).toBeNull();
+      expect(ers.voiceArtistNames).toBeNull();
+      expect(ers.viewerNames).toBeNull();
       expect(ers.isPrivate()).toBe(false);
       expect(ers.isPublic()).toBe(false);
-      expect(ers.clonedFrom()).toBe(null);
-      expect(ers.isCommunityOwned()).toBe(null);
-      expect(ers.viewableIfPrivate()).toBe(null);
+      expect(ers.clonedFrom()).toBeNull();
+      expect(ers.isCommunityOwned()).toBeNull();
+      expect(ers.viewableIfPrivate()).toBeNull();
     }));
 });
