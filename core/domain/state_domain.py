@@ -3482,9 +3482,8 @@ class State:
             ca_specs = (
                 interaction_registry.Registry
                 .get_all_specs_for_state_schema_version_or_latest(
-                    state_schema_version,
-                    interaction_id
-                )
+                    state_schema_version
+                )[interaction_id]['customization_args']
             )
             state_dict['interaction'] = (
                 InteractionInstance.convert_html_in_interaction(

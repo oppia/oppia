@@ -148,7 +148,6 @@ class Registry:
     def get_all_specs_for_state_schema_version_or_latest(
         cls,
         state_schema_version,
-        interaction_id
     ):
         """Returns a dict containing the full specs of each interaction for the
         given state schema version, if available else return the latest specs.
@@ -179,8 +178,6 @@ class Registry:
                 cls._state_schema_version_to_interaction_specs[
                     state_schema_version] = specs_from_json
                 return cls._state_schema_version_to_interaction_specs[
-                    state_schema_version][interaction_id][
-                        'customization_arg_specs']
+                    state_schema_version]
             else:
-                return cls.get_all_specs()[interaction_id][
-                    'customization_arg_specs']
+                return cls.get_all_specs()
