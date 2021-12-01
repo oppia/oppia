@@ -24,7 +24,7 @@ import { CsrfTokenService } from 'services/csrf-token.service';
 import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
 import { ExplorationRightsService } from './exploration-rights.service';
 import { ExplorationRightsBackendApiService } from './exploration-rights-backend-api.service';
-import * as cloneDeep from 'lodash/cloneDeep';
+import cloneDeep from 'lodash/cloneDeep';
 
 
 describe('Exploration rights service', () => {
