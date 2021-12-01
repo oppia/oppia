@@ -16,6 +16,13 @@
 
 """Tests for Continue objects and methods defined on them."""
 
+from __future__ import annotations
+
+from core.domain import interaction_registry
+from core.domain import state_domain
+from core.tests import test_utils
+
+
 class ContinueInteractionTests(test_utils.GenericTestBase):
 
     def test_to_proto(self):

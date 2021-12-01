@@ -16,9 +16,12 @@
 
 """Tests for ItemSelectionInput objects and methods defined on them."""
 
+from __future__ import annotations
+
 from core.domain import interaction_registry
 from core.domain import state_domain
 from core.tests import test_utils
+
 
 class ItemSelectionInputInteractionTests(test_utils.GenericTestBase):
 
@@ -125,10 +128,10 @@ class ItemSelectionInputInteractionTests(test_utils.GenericTestBase):
         item_customization_args = (
             item_selection_proto.customization_args)
         self.assertEqual(
-            item_customization_args.max_allowable_selection_count, 
+            item_customization_args.max_allowable_selection_count,
             2)
         self.assertEqual(
-            item_customization_args.min_allowable_selection_count, 
+            item_customization_args.min_allowable_selection_count,
             1)
         self.assertEqual(
             item_customization_args.choices[0].content_id,
@@ -200,7 +203,7 @@ class ItemSelectionInputInteractionTests(test_utils.GenericTestBase):
             item_selection_proto.answer_groups[0]
                 .rule_specs[1].contains_at_least_one_of.input)
         self.assertEqual(
-            item_rule_spec.content_ids[0].content_id, 
+            item_rule_spec.content_ids[0].content_id,
             '<p>Choice 1</p>')
         self.assertEqual(
             item_rule_spec.content_ids[1].content_id,
@@ -210,7 +213,7 @@ class ItemSelectionInputInteractionTests(test_utils.GenericTestBase):
             item_selection_proto.answer_groups[0]
                 .rule_specs[2].does_not_contain_at_least_one_of.input)
         self.assertEqual(
-            item_rule_spec.content_ids[0].content_id, 
+            item_rule_spec.content_ids[0].content_id,
             '<p>Choice 1</p>')
         self.assertEqual(
             item_rule_spec.content_ids[1].content_id,
@@ -220,7 +223,7 @@ class ItemSelectionInputInteractionTests(test_utils.GenericTestBase):
             item_selection_proto.answer_groups[0]
                 .rule_specs[3].is_proper_subset_of.input)
         self.assertEqual(
-            item_rule_spec.content_ids[0].content_id, 
+            item_rule_spec.content_ids[0].content_id,
             '<p>Choice 1</p>')
         self.assertEqual(
             item_rule_spec.content_ids[1].content_id,

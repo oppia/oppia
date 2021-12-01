@@ -16,9 +16,12 @@
 
 """Tests for FractionInput objects and methods defined on them."""
 
+from __future__ import annotations
+
 from core.domain import interaction_registry
 from core.domain import state_domain
 from core.tests import test_utils
+
 
 class FractionInputInteractionTests(test_utils.GenericTestBase):
 
@@ -207,7 +210,7 @@ class FractionInputInteractionTests(test_utils.GenericTestBase):
             fraction_customization_args.placeholder.content_id,
             'ca_customPlaceholder_2')
         self.assertEqual(
-            fraction_customization_arg.placeholder.text,
+            fraction_customization_args.placeholder.text,
             '😍😍😍😍')
 
         fraction_outcome = fraction_proto.default_outcome
