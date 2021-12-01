@@ -478,7 +478,8 @@ def _construct_exploration_suggestions(suggestions):
     Returns:
         list(dict). List of suggestion dicts with an additional
         exploration_content_html field representing the target
-        exploration's current content.
+        exploration's current content. Suggestions with the target
+        exploration's contents that do not exists will be omitted.
     """
     exp_ids = {suggestion.target_id for suggestion in suggestions}
     exp_id_to_exp = exp_fetchers.get_multiple_explorations_by_id(list(exp_ids))
