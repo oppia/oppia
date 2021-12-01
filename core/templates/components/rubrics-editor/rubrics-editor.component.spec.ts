@@ -93,29 +93,40 @@ describe('Rubrics Editor Component', () => {
       .toBeTrue();
   });
 
-  it('should check for maximum character length of explanation', () => {
+  it('should check if explanations are at most 300 characters long', () => {
     let index: number = 2;
     componentInstance.ngOnInit();
-    componentInstance.editableExplanations[difficulty][index] = 'not_empty';
+    componentInstance.editableExplanations[difficulty][index] = 'a'.repeat(300);
     expect(componentInstance.isExplanationLengthValid(difficulty, index))
       .toBeTrue();
+    componentInstance.editableExplanations[difficulty][index] = 'a'.repeat(301);
+    expect(componentInstance.isExplanationLengthValid(difficulty, index))
+      .toBeFalse();
   });
 
   it('should check if medium level rubrics' +
       'have atleast one explantion',
   () => {
+    let index: number = 0;
+    expect(componentInstance.isMediumLevelExplanationValid()).toBeFalse;
     componentInstance.ngOnInit();
+    componentInstance.editableExplanations[difficulty][index] = 'not_empty';
     expect(componentInstance.isMediumLevelExplanationValid()).toBeTrue;
   });
 
-  it('should check check if total number of explanations' +
+  it('should check if total number of explanations' +
       'have reached the limit',
   () => {
-    let index: number = 2;
+    let index: number = 0;
     componentInstance.ngOnInit();
     componentInstance.editableExplanations[difficulty][index] = 'not_empty';
     expect(componentInstance.hasReachedExplanationCountLimit())
       .toBeFalse();
+    for (index = 1; index < 10; index++) {
+      componentInstance.editableExplanations[difficulty][index] = 'not_empty';
+    }
+    expect(componentInstance.hasReachedExplanationCountLimit())
+      .toBeTrue();
   });
 
   it('should update explanation', () => {
