@@ -46,7 +46,7 @@ export class ExplorationRightsBackendApiService {
       version: number,
       makeCommunityOwned: boolean):
     Promise<ExplorationRightsBackendData> {
-    const requestUrl = ('/createhandler/rights/' + explorationId);
+    const requestUrl = '/createhandler/rights/' + explorationId;
 
     return this.http.put<ExplorationRightsBackendData>(requestUrl, {
       version: version,
@@ -60,7 +60,7 @@ export class ExplorationRightsBackendApiService {
       newMemberRole: string,
       newMemberUsername: string
   ): Promise<ExplorationRightsBackendData> {
-    const requestUrl = ('/createhandler/rights/' + explorationId);
+    const requestUrl = '/createhandler/rights/' + explorationId;
 
     return this.http.put<ExplorationRightsBackendData>(requestUrl, {
       version: version,
@@ -106,7 +106,7 @@ export class ExplorationRightsBackendApiService {
   async removeRoleAsyncDeleteData(
       explorationId: string, memberUsername: string
   ): Promise<ExplorationRightsBackendData> {
-    const requestUrl = ('/createhandler/rights/' + explorationId);
+    const requestUrl = '/createhandler/rights/' + explorationId;
 
     return this.http.delete<ExplorationRightsBackendData>(requestUrl, {
       params: {
