@@ -334,7 +334,7 @@ angular.module('oppia').directive('topicEditorTab', [
               $scope.topic.getPracticeTabIsDisplayed() && $scope.topicHasAtLeastTenPracticeQuestions()) {
               TopicUpdateService.setPracticeTabIsDisplayed(
                 $scope.topic, newPracticeTabIsDisplayed);
-              }
+            }
           };
 
           $scope.topicHasAtLeastTenPracticeQuestions = function() {

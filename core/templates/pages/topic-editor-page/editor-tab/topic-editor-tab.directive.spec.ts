@@ -376,16 +376,6 @@ describe('Topic editor tab directive', function() {
     $scope.updatePracticeTabIsDisplayed(true);
     expect(topicPracticeTabSpy).not.toHaveBeenCalled();
   });
-
-  it('should not set the practice tab as displayed if there are less than 10 '+
-   'practice questions in the topic', function () {
-     // There are initially less than 10 questions in the topic
-    var topicPracticeTabSpy = (
-      spyOn(TopicUpdateService, 'setPracticeTabIsDisplayed'));
-    $scope.updatePracticeTabIsDisplayed(true);
-    $scope.updatePracticeTabIsDisplayed(false);
-    expect(topicPracticeTabSpy).not.toHaveBeenCalled();
-   })
   
   it('should set the practice tab as displayed if there are at least 10 '+
   'practice questions in the topic', function () {
