@@ -85,7 +85,7 @@ export class ExplorationRightsBackendApiService {
   async publishPutData(
       explorationId: string, makePublic: boolean
   ): Promise<ExplorationRightsBackendData> {
-    const requestUrl = ('/createhandler/status/' + explorationId);
+    const requestUrl = '/createhandler/status/' + explorationId;
 
     return this.http.put<ExplorationRightsBackendData>(requestUrl, {
       make_public: makePublic
@@ -95,7 +95,7 @@ export class ExplorationRightsBackendApiService {
   async saveModeratorChangeToBackendAsyncPutData(
       explorationId: string, version: number, emailBody: string
   ): Promise<ExplorationRightsBackendData> {
-    const requestUrl = ('/createhandler/moderatorrights/' + explorationId);
+    const requestUrl = '/createhandler/moderatorrights/' + explorationId;
 
     return this.http.put<ExplorationRightsBackendData>(requestUrl, {
       email_body: emailBody,
@@ -118,8 +118,8 @@ export class ExplorationRightsBackendApiService {
   async assignVoiceArtistRoleAsyncPostData(
       explorationId: string, newVoiceArtistUsername: string
   ): Promise<ExplorationRightsBackendData> {
-    const requestUrl = (
-      '/voice_artist_management_handler/' + 'exploration/' + explorationId);
+    const requestUrl =
+      '/voice_artist_management_handler/' + 'exploration/' + explorationId;
 
     return this.http.post<ExplorationRightsBackendData>(requestUrl, {
       username: newVoiceArtistUsername
@@ -129,8 +129,8 @@ export class ExplorationRightsBackendApiService {
   async removeVoiceArtistRoleAsyncDeleteData(
       explorationId: string, voiceArtistUsername: string
   ): Promise<ExplorationRightsBackendData> {
-    const requestUrl = (
-      '/voice_artist_management_handler/' + 'exploration/' + explorationId);
+    const requestUrl =
+      '/voice_artist_management_handler/' + 'exploration/' + explorationId;
 
     return this.http.delete<ExplorationRightsBackendData>(requestUrl, {
       params: {
