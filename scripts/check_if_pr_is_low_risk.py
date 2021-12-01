@@ -28,6 +28,7 @@ import sys
 
 from core import python_utils
 from scripts import common
+import urllib.request as urlrequest
 
 
 GITHUB_API_PR_ENDPOINT = (
@@ -141,7 +142,8 @@ def lookup_pr(owner, repo, pull_number):
         empty dictionary if the response code from the GitHub API is not
         200.
     """
-    request = python_utils.url_request(
+    
+    request = urlrequest.Request(
         GITHUB_API_PR_ENDPOINT % (owner, repo, pull_number),
         None,
         {'Accept': 'application/vnd.github.v3+json'})

@@ -141,7 +141,7 @@ def download_and_unzip_files(
                 os.remove(TMP_UNZIP_PATH)
 
             # Some downloads (like jqueryui-themes) may require a user-agent.
-            req = python_utils.url_request(source_url, None, {})
+            req = urlrequest.Request(source_url, None, {})
             req.add_header('User-agent', 'python')
             # This is needed to get a seekable filestream that can be used
             # by zipfile.ZipFile.
