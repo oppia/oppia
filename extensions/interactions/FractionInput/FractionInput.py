@@ -248,7 +248,7 @@ class FractionInput(base.BaseInteraction):
                     is_less_than=x)),
             'IsGreaterThanSpec': lambda x: (
                 state_pb2.FractionInputInstance.RuleSpec(
-                    to_is_greater_than=x)),
+                    is_greater_than=x)),
             'HasNumeratorEqualTo': lambda x: (
                 state_pb2.FractionInputInstance.RuleSpec(
                     has_numerator_equal_to=x)),
@@ -393,8 +393,11 @@ class FractionInput(base.BaseInteraction):
         )
 
     @classmethod
-    def _to_has_no_fractional_part_proto(cls):
+    def _to_has_no_fractional_part_proto(cls, interger_part): # pylint: disable=unused-argument
         """Creates a proto object for HasNoFractionalPartSpec.
+
+        Args:
+            interger_part: int. The expected integer part.
 
         Returns:
             HasNoFractionalPartSpec. The proto object.
