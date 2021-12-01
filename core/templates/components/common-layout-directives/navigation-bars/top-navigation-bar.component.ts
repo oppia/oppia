@@ -272,15 +272,13 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       that.truncateNavbar();
     }, 0);
 
-    if (this.CLASSROOM_PROMOS_ARE_ENABLED) {
-      this.accessValidationBackendApiService.validateAccessToClassroomPage(
-        'math').then(()=>{
-        this.classroomBackendApiService.fetchClassroomDataAsync(
-          'math').then((classroomData) => {
-          this.classroomData = classroomData.getTopicSummaries();
-        });
+    this.accessValidationBackendApiService.validateAccessToClassroomPage(
+      'math').then(()=>{
+      this.classroomBackendApiService.fetchClassroomDataAsync(
+        'math').then((classroomData) => {
+        this.classroomData = classroomData.getTopicSummaries();
       });
-    }
+    });
   }
 
   ngAfterViewChecked(): void {
