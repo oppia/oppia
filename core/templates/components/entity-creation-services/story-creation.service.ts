@@ -25,7 +25,6 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { CreateNewStoryModalComponent } from 'pages/topic-editor-page/modal-templates/create-new-story-modal.component';
-import { ContextService } from 'services/context.service';
 import { StoryCreationBackendApiService } from './story-creation-backend-api.service';
 
 @Injectable({
@@ -42,7 +41,6 @@ export class StoryCreationService {
     private imageLocalStorageService: ImageLocalStorageService,
     private loaderService: LoaderService,
     private storyCreationBackendApiService: StoryCreationBackendApiService,
-    private contextService: ContextService,
     private urlInterpolationService: UrlInterpolationService
 
   ) {}
@@ -51,7 +49,6 @@ export class StoryCreationService {
     if (this.storyCreationInProgress) {
       return;
     }
-    this.contextService.setImageSaveDestinationToLocalStorage();
     let modalRef = this.ngbModal.open(CreateNewStoryModalComponent, {
       backdrop: 'static'
     });
@@ -69,9 +66,7 @@ export class StoryCreationService {
       this.storyCreationBackendApiService.createStoryAsync(
         newlyCreatedStory, imagesData, bgColor).then((response) => {
         this.storyCreationInProgress = false;
-        this.loaderService.hideLoadingScreen();
         this.imageLocalStorageService.flushStoredImagesData();
-        this.contextService.resetImageSaveDestination();
         newTab.location.href = this.urlInterpolationService.interpolateUrl(
           this.STORY_EDITOR_URL_TEMPLATE, {
             story_id: response.storyId

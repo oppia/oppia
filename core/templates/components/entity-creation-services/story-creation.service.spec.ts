@@ -29,18 +29,16 @@ import { StoryCreationBackendApiService } from './story-creation-backend-api.ser
 
 describe('Story Creation Service', () => {
   let storyCreationService: StoryCreationService;
-  let imageLocalStorageService: ImageLocalStorageService;
-  let storyCreationBackendApiService: StoryCreationBackendApiService;
   let ngbModal: NgbModal;
   let alertsService: AlertsService;
+  let imageLocalStorageService: ImageLocalStorageService;
+  let storyCreationBackendApiService: StoryCreationBackendApiService;
+  let urlInterpolationService: UrlInterpolationService;
 
   class MockWindowRef {
     nativeWindow = {
-      open: () => {
-        return {
-          close: () => {},
-          location: ''
-        };
+      location: {
+        hostname: 'local'
       }
     };
   }
@@ -71,29 +69,32 @@ describe('Story Creation Service', () => {
     imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
     storyCreationBackendApiService = TestBed.inject(
       StoryCreationBackendApiService);
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
   });
 
   it('should create a new story', fakeAsync(() => {
     storyCreationService.storyCreationInProgress = false;
-    storyCreationService.createNewCanonicalStory();
+    spyOn(ngbModal, 'open').and.returnValue({
+      result: Promise.resolve(new NewlyCreatedStory('valid', 'valid', 'valid'))
+    } as NgbModalRef);
     spyOn(alertsService, 'clearWarnings');
+    spyOn(imageLocalStorageService, 'getStoredImagesData').and.returnValue([]);
+    spyOn(imageLocalStorageService, 'getThumbnailBgColor').and.returnValue(
+      'bgColor');
     spyOn(imageLocalStorageService, 'flushStoredImagesData');
     spyOn(storyCreationBackendApiService, 'createStoryAsync').and.returnValue(
       Promise.resolve({ storyId: 'storyId' }));
-    spyOn(ngbModal, 'open').and.returnValue(
-    {
-      result: Promise.resolve({
-        isValid: () => true,
-        title: 'Title',
-        description: 'Description',
-        urlFragment: 'url'
-      })
-    } as NgbModalRef
-    );
+    spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue('');
+    storyCreationService.createNewCanonicalStory();
+    tick();
     tick();
     expect(ngbModal.open).toHaveBeenCalled();
     expect(alertsService.clearWarnings).toHaveBeenCalled();
+    expect(imageLocalStorageService.getStoredImagesData).toHaveBeenCalled();
+    expect(imageLocalStorageService.getThumbnailBgColor).toHaveBeenCalled();
     expect(imageLocalStorageService.flushStoredImagesData).toHaveBeenCalled();
+    expect(storyCreationBackendApiService.createStoryAsync).toHaveBeenCalled();
+    expect(urlInterpolationService.interpolateUrl).toHaveBeenCalled();
   }));
 
   it('should not create story if creation is already in process', () => {

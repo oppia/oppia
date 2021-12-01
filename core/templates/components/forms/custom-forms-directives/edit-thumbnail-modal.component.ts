@@ -17,7 +17,7 @@
  */
 
 import { trigger, transition, style, animate } from '@angular/animations';
-import { Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import constants from 'assets/constants';
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
@@ -73,6 +73,7 @@ export class EditThumbnailModalComponent implements OnInit {
   allowedImageFormats = ['svg'];
 
   constructor(
+    private changeDetectorRef: ChangeDetectorRef,
     private svgSanitizerService: SvgSanitizerService,
     private ngbActiveModal: NgbActiveModal,
   ) {}
@@ -86,6 +87,7 @@ export class EditThumbnailModalComponent implements OnInit {
       height: Math.round(height),
       width: Math.round(width)
     };
+    this.changeDetectorRef.detectChanges();
   }
 
   isUploadedImageSvg(): boolean {

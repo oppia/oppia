@@ -49,7 +49,7 @@
              [ngModelOptions]="{standalone: true}"
              [maxlength]="MAX_CHARS_IN_STORY_URL_FRAGMENT"
              [ngClass]="{'invalid-field': storyUrlFragmentExists || !validUrlFragmentRegex.test(newlyCreatedStory.urlFragment)}"
-             (change)="onStoryUrlFragmentChange()"
+             (ngModelChange)="onStoryUrlFragmentChange($event)"
              aria-label="Url fragment">
       <div>
         <span class="oppia-input-box-subtitle">
@@ -76,8 +76,7 @@
                                 [disabled]="false"
                                 [useLocalStorage]="true"
                                 [allowedBgColors]="allowedBgColors"
-                                previewDescriptionBgColor="#2F6687"
-                                (imageSave)="updateView()">
+                                previewDescriptionBgColor="#2F6687">
       </oppia-thumbnail-uploader>
     </div>
   </div>

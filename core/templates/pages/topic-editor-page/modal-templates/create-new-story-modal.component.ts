@@ -17,7 +17,7 @@
  */
 
 import { NewlyCreatedStory } from 'domain/topic/newly-created-story.model';
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { StoryEditorStateService } from 'pages/story-editor-page/services/story-editor-state.service';
@@ -25,14 +25,12 @@ import { TopicEditorStateService } from '../services/topic-editor-state.service'
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { AppConstants } from 'app.constants';
-import { ContextService } from 'services/context.service';
 
 @Component({
   selector: 'oppia-create-new-story-modal',
   templateUrl: './create-new-story-modal.component.html'
 })
-export class CreateNewStoryModalComponent extends ConfirmOrCancelModal
-  implements OnInit {
+export class CreateNewStoryModalComponent extends ConfirmOrCancelModal {
   allowedBgColors = AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.story;
   validUrlFragmentRegex = new RegExp(AppConstants.VALID_URL_FRAGMENT_REGEX);
   newlyCreatedStory: NewlyCreatedStory = NewlyCreatedStory.createDefault();
@@ -49,7 +47,6 @@ export class CreateNewStoryModalComponent extends ConfirmOrCancelModal
     AppConstants.MAX_CHARS_IN_STORY_DESCRIPTION);
 
   constructor(
-    private contextService: ContextService,
     private ngbActiveModal: NgbActiveModal,
     private imageLocalStorageService: ImageLocalStorageService,
     private storyEditorStateService: StoryEditorStateService,
@@ -60,15 +57,13 @@ export class CreateNewStoryModalComponent extends ConfirmOrCancelModal
     super(ngbActiveModal);
   }
 
-  ngOnInit(): void {
-    this.contextService.setImageSaveDestinationToLocalStorage();
-  }
-
   cancel(): void {
     this.ngbActiveModal.dismiss('cancel');
   }
 
-  onStoryUrlFragmentChange(): void {
+  onStoryUrlFragmentChange(urlFrag: string): void {
+    this.newlyCreatedStory.urlFragment = urlFrag;
+    this.changeDetectorRef.detectChanges();
     if (!this.newlyCreatedStory.urlFragment) {
       return;
     }
@@ -86,9 +81,5 @@ export class CreateNewStoryModalComponent extends ConfirmOrCancelModal
       this.newlyCreatedStory.isValid() &&
       this.imageLocalStorageService.getStoredImagesData().length > 0 &&
       !this.storyUrlFragmentExists);
-  }
-
-  updateView(): void {
-    this.changeDetectorRef.detectChanges();
   }
 }

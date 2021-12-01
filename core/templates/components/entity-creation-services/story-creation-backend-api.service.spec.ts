@@ -24,10 +24,15 @@ import { CsrfTokenService } from 'services/csrf-token.service';
 import { ImageData } from 'domain/skill/skill-creation-backend-api.service';
 import { NewlyCreatedStory } from 'domain/topic/newly-created-story.model';
 import { StoryCreationBackendApiService } from './story-creation-backend-api.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+
+class MockUrlInterpolationService {
+  interpolateUrl() {
+    return '/story_editor_handler/create_new';
+  }
+}
 
 describe('Story creation backend api service', () => {
-  let successHandler = jasmine.createSpy('success');
-  let failHandler = jasmine.createSpy('fail');
   let csrfService: CsrfTokenService;
   let httpTestingController: HttpTestingController;
   let storyCreationBackendApiService: StoryCreationBackendApiService;
@@ -36,15 +41,22 @@ describe('Story creation backend api service', () => {
   const thumbnailBgColor = '#e3e3e3';
   let postData = {
     title: 'story-title',
-    description: 'Description',
+    description: 'description',
+    story_url_fragment: 'url-fragment',
     thumbnailBgColor: thumbnailBgColor,
     filename: 'image.svg',
-    url_fragment: 'url-fragment'
   };
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [StoryCreationBackendApiService]
+      providers: [
+        {
+          provide: UrlInterpolationService,
+          useClass: MockUrlInterpolationService
+        },
+        StoryCreationBackendApiService
+      ]
     });
 
     csrfService = TestBed.get(CsrfTokenService);
@@ -53,7 +65,7 @@ describe('Story creation backend api service', () => {
       StoryCreationBackendApiService);
     story = NewlyCreatedStory.createDefault();
     story.title = 'story-title';
-    story.description = 'Description';
+    story.description = 'description';
     story.urlFragment = 'url-fragment';
     let imageBlob = new Blob(
       ['data:image/png;base64,xyz']);
@@ -80,6 +92,8 @@ describe('Story creation backend api service', () => {
 
   it('should successfully create a new story',
     fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
       storyCreationBackendApiService.createStoryAsync(
         story, imagesData, thumbnailBgColor).then(
         successHandler);

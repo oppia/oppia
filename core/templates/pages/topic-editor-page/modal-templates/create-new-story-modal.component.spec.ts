@@ -87,7 +87,7 @@ describe('Create New Story Modal Component', function() {
       });
     spyOn(storyEditorStateService, 'getStoryWithUrlFragmentExists')
       .and.returnValue(true);
-    componentInstance.onStoryUrlFragmentChange();
+    componentInstance.onStoryUrlFragmentChange('not-empty');
     expect(storyEditorStateService.updateExistenceOfStoryUrlFragment)
       .toHaveBeenCalled();
     expect(storyEditorStateService.getStoryWithUrlFragmentExists)
@@ -97,7 +97,7 @@ describe('Create New Story Modal Component', function() {
   it('should not update topic url fragment if not provided by user', () => {
     componentInstance.newlyCreatedStory.urlFragment = '';
     spyOn(storyEditorStateService, 'updateExistenceOfStoryUrlFragment');
-    componentInstance.onStoryUrlFragmentChange();
+    componentInstance.onStoryUrlFragmentChange('');
     expect(storyEditorStateService.updateExistenceOfStoryUrlFragment)
       .not.toHaveBeenCalled();
   });
@@ -119,7 +119,7 @@ describe('Create New Story Modal Component', function() {
       'getStoryWithUrlFragmentExists').and.returnValue(true);
     expect(componentInstance.storyUrlFragmentExists).toBeFalse();
     componentInstance.newlyCreatedStory.urlFragment = 'test-url';
-    componentInstance.onStoryUrlFragmentChange();
+    componentInstance.onStoryUrlFragmentChange('test-url');
     expect(componentInstance.storyUrlFragmentExists).toBeTrue();
   });
 });
