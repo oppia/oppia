@@ -43,10 +43,13 @@ export class TranslateTextBackendApiService {
     return new Promise<string> ((resolve, reject)=> {
       const reader = new FileReader();
       reader.onloadend = () => {
+        // Read the Base64 data from restult.
         const dataurl = reader.result as string;
+        // Remove the prefix of Data URL and just return Base64 string.
         const base64 = dataurl.substring(dataurl.indexOf(',') + 1);
         resolve(base64);
       };
+      // Read image blob and store the result.
       reader.readAsDataURL(blob);
       reader.onerror = error => reject(error);
     });
