@@ -1,5 +1,153 @@
 This file contains a summary of changes to the Oppia code base.
 
+v3.2.1 (27 Nov 2021)
+------------------------
+Learner/Creator Pages
+* Fix #14227: Disable "Add Thumbnail" button when user has not uploaded new thumbnail (#14297)
+* Fix #14235: Enable to submit question suggestions with image region interations (#14289)
+* Fix #14228 and #14253: Set classroom filter choices in skills tab and fix change detection/propagation issue in the supplemental card component (#14270)
+* Fix #10315, #14200: Fixes white spacing issues in RTE (#14233)
+* Fix submitting answers using 'enter key' in Interactions. (#14195)
+* Add same padding on both top and bottom of drag and drop answer fields. (#14191)
+* Fix #14009: adds animation to topic navbar and fixes background banner. (#14184)
+* Fix part of #12858: Add Dutch, Slovak and Ukrainian to the list of site-supported languages. (#14183)
+* Fix #14055: Disables making changes to topic if user has no topic rights. (#14139)
+* Fix skill edit editor lag issue (#14129)
+* Fix part of #13764: Add frontend validation checks for exploration tags (#14119)
+* Learner dashboard fixes (#14105)
+* Learner dashboard fixes (#14101)
+* Fix part of #13764: Add validation checks for Outcome, Hint and Solution Explanation (#14035)
+* Fix #14007: Removed extra dropdown icon from  admin page navbar (#14008)
+* Fix part of #13380: Fixed exploration player rtl formatting issues (#13980)
+* Scale and center SVG in the editor (#14178)
+* Fix #12452 and #13358: Guppy Configuration Service (#14138)
+* Fix part of #13764: State content should be a valid HTML string with at most 10,000 characters (#13918)
+* Fix part of #13603: Validation for Continue, Text Input, Multiple Choice Interaction (#13838)
+
+Angular Migration
+* Fix #14225: Move modal creation logic from service to component for remove from play later playlist modal (#14291)
+* Fix part of #9749: Migrate few instances of angular-html-bind (#14263)
+* Migrate confirm discard change modal template (#14167)
+* Fix part of issue #9749: migrate exploration-publish-modal to angular component (#14152)
+* Fix part of #8016: Make Http Calls of history-tab.component.ts through  service component (#14111)
+* Fix #14052: Introduce i18n service for encapsulating all translation logic (#14099)
+* Fix part of #9749: Migrates editor reloading modal to angular  (#14089)
+* Fix part of issue #9749: migrate post-publish-modal  to angular component  (#14079)
+* Fix part of #8472: Migrate question player state service (#14074)
+* Fix part of #9749: Migrates welcome modal to angular (#13890)
+* Fix part of #9749: Migrates Score-Ring, Concept-Card, Completion-Graph to Angular  (#13837)
+* Fix part of #9749: Migrate tutor card directive (#12892)
+* Fix part of #9749: Migrate Progress nav directive (#12864)
+
+Contributor Pages
+* Fix #14234 Unable to accept/reject a suggestions during reviews. (#14283)
+* Add Azerbaijani language to contributor dashboard. (#14273)
+* Fix #14265: Make translation language selector to show selected language correctly (#14268)
+* Fix translation stats job to work with sets (#14254)
+* Fix #14189: Make translations editable for reviewers (#14194)
+* Fix part of #14072, 14027: Surface submit translation suggestion errors and admin dashboard cleanup (#14151)
+* Fix #13440: Make it clearer what language is being translated (#14104)
+* Fix #14004 Handle frontend display of skill opportunities correctly  (#14097)
+* Fix part of #12013: Update exploration changed UI to make old content less ambiguous  (#14047)
+* Fix #13833: Disables 'Translate' button when all translations are in review (#13972)
+* Fix #12181: [Contributor Dashboard] Allow filtering of translation opportunities by topic (#13539)
+
+Bug fixes
+* Fix lang param not working due to mulitple lang cookies. (#14266)
+* Fix tasks on production (#14176)
+* Fix multiple production issues (#14164)
+* Address comments from PR 14101 (#14142)
+
+Data handling
+* Add voiceover admin role to admin user (#14252)
+* Update note for pre-deletion page. (#14181)
+* Fix part of #13162: Add argument schema for ReleaseCoordinatorPage, JobsHandler, JobOutputHandler, MemoryCacheHandler classes. (#14175)
+* Fix part of #10474: Made typescript checks strict for display-solutio… (#14051)
+* Fix part of #13162: Add schema for PretestHandler, StorePlaythroughHandler, and StatsEventsHandler. (#14046)
+* Fix #12297: Use Firebase Session Cookie for PlatformFeatureService.sa… (#14002)
+* Fix part of #13162: Add schema for handlers in story_editor and story_viewer (#13914)
+* Fix part of #13162: Add argument schema for LearnerIncompleteActivityHandler, RatingHandler and FlagExplorationHandler classes (#14131)
+* Add schema for subscribe, unsubscribe handlers. (#13995)
+
+Python Migration
+* Introduce Cloud Logging (#14185)
+* Refactor future imports and MyPy typing (#14132)
+* Update setup.py version on new release (#14062)
+* Fix part of #13956 : Handle ExitStack without python_utils (#14037)
+* Fix small Python 3 migration issues (#14005)
+* Fix part of #13956: python_utils.with_metaclass (#13998)
+* Fix #13956: Migrate python_utils.redirect_stdout to Python 3 function (#13997)
+* Fix #13956: Remove the use of python_utils.OBJECT (#13996)
+* Fix part of #13956: Remove python_utils.nullcontext (#13993)
+* Fix part of #13956 and fix #11547: Remove python_utils.reraise_exception (#13992)
+* Give jobs a standard module and naming convention (#13989)
+* Fix part of #13956: Remove python_utils.url_split (#13987)
+* Fix part of #13956: Remove python_utils.RANGE variable (#13983)
+* Fix part of #13956: python utils.url_encode-->urllib.parse.urlencode (#13978)
+* Fix part of #13956: Removed the ROUND variable and its references (#13976)
+* Fix part of #13956: Replace python_utils.MAP, python_utils.NEXT with map, next  (#13969)
+* Fix part of #13956: python_utils.url_quote->urllib.parse.quote (#13964)
+* Fix part of #13935: Handle input without python_utils (#13955)
+* Remove enforcing python_utils function usage from pylint (#13954)
+* Fix part of #13935: Handle str and bytes without python_utils (#13882)
+
+Miscellaneous
+* Fix #14116: Fix typo in core/controllers/admin.py (#14117)
+* Fix part of #8668: Document suggestion-modal.service.ts file (#14125)
+
+Typing
+* Fix part of #14033: Type annotate value_generators_domain (#14180)
+* Fix part of #10474: Cover profile-page-backend-api.service with strict checks (#14140)
+* Fix part of #10474: Fixing typescript strict checks issues for StoryObjectFactory.ts (#14134)
+* Fix part of #14033: Type annotate rights_domain (#14108)
+* Fix part of #14033: Type annotate learner progress domain files (#14093)
+* Fix part of #10474: Made typescript checks strict for exploration-foo… (#14045)
+* Fix #10474: cover autogenerated audio player service (#14043)
+* Fix part of #10474: Enable strict mode in subtopic.model.ts (#14039)
+* Fix part of #14033: Type annotate activity_domain file (#14034)
+* Fix part of #10616: Introduced typescript-eslint/method-signature-style rule (#13922)
+* Fix part of #10474: Cover more files with strict checks (#13876)
+* Fix part of #10474: Made typescript checks strict for filtered-choices-field.component.ts and spec (#13819)
+* Fix part of #14033: Mypy type annotations added to takeout_domain and translation_domian (#14149)
+* Introduce MyPy reviewers (#14135)
+* Change codeowner for mypy script and add directories to mypy denylist (#14032)
+
+Release team
+* Fix issues in release (#14174)
+
+Developer UX
+* Fix #14094: Reinstate codeownership of learner analytics files. (#14160)
+* Fix `--save_datastore` flag in start command (#14133)
+* Fix #14080: Pip index global config bug (#14112)
+* Add code to help with the Python 2 unavailable issue (#14076)
+* Fix part of #10616: Introduce @typesctript-eslint rules that extend eslint rules (#14029)
+* Make output from scripts/typescript_checks.py pretty (#14025)
+* Fix part of #13956: python_utils.url_retrieve->urllib.request.urlretrieve (#13990)
+* Adds quote before the message to fix no message issue (#13984)
+* Fix  part for #13956: Removes "python utils.url_unquote_plus" (#13981)
+* Fix part of #10616: Introduced typescript-eslint/consistent-type-assertions rule in the codebase (#13942)
+* Fix #13872: Brave browser support added for development server (#13873)
+* Fix part of #10474: Oppia-Response-Code-Repl with strict checks (#13768)
+* Add "pending review notification" workflow (#14100)
+* Change pending review notification workflow config to run on workflow_dispatch event (#14177)
+* Fix part of #13467: Coverage flake in edit-profile-picture-modal.component (#14088)
+
+Automated QA Team
+* Quote webhook url in action  (#14145)
+* Fix part of #10798: Fix end to end tests for SkillEditorPage.js (#14114)
+* Fix #14090: Tighten rerun policies based on failure rates (#14092)
+* Consolidate Backend Tests (2nd PR) (#14081)
+* Fix #10798:  End-to-End Tests with action.js and waitFor.js in TopicsAndSkillsDashboardPage.js  (#14077)
+* Fix #14057: Change List Service [Coverage-Flake]  (#14068)
+* Fix error message when user needs to set chromedriver version (#14053)
+* Resolve `getValidationIssues` E2E flake (#14038)
+* Fix part of #10798: Fixing End-to-End Tests with action.js and waitFor.js for forms.js (#13924)
+
+Translations
+* Routine update of translations (#14065)
+* Routine update of translations (#14182)
+
+
 v3.2.0 (28 Oct 2021)
 ------------------------
 Learner/Creator Pages

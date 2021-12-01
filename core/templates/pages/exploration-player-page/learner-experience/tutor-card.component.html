@@ -19,9 +19,9 @@
            [ngClass]="getContentAudioHighlightClass()"
            [oppiaFocusOn]="getContentFocusLabel($index)">
         <div tabindex="1">
-          <angular-html-bind-wrapper classStr="protractor-test-conversation-content"
-                                     [htmlData]="displayedCard.getContentHtml()">
-          </angular-html-bind-wrapper>
+          <oppia-rte-output-display [rteString]="displayedCard.getContentHtml()"
+                                    class="protractor-test-conversation-content">
+          </oppia-rte-output-display>
         </div>
         <div *ngIf="isContentAudioTranslationAvailable()"
              class="conversation-skin-audio-controls">
