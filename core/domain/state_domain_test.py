@@ -1604,6 +1604,16 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         self.assertFalse(
             'ca_choices_2' in content_id_mapping_needing_translations)
 
+    def test_content_id_existance_checks_work_correctly(self):
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+        init_state = exploration.states[exploration.init_state_name]
+
+        self.assertEqual(init_state.has_content_id('content'), True)
+        with self.assertRaisesRegexp(
+            ValueError, 'Content ID content0 does not exist'):
+            init_state.get_content_html('content0')
+        self.assertEqual(init_state.has_content_id('content0'), False)
+
     def test_add_translation_works_correctly(self):
         exploration = exp_domain.Exploration.create_default_exploration('0')
         init_state = exploration.states[exploration.init_state_name]
