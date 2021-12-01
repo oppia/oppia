@@ -142,7 +142,6 @@ def lookup_pr(owner, repo, pull_number):
         empty dictionary if the response code from the GitHub API is not
         200.
     """
-    
     request = urlrequest.Request(
         GITHUB_API_PR_ENDPOINT % (owner, repo, pull_number),
         None,

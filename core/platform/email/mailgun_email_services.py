@@ -20,12 +20,12 @@ from __future__ import annotations
 
 import base64
 import urllib
+import urllib.request as urlrequest
 
 from core import feconf
 from core import python_utils
 
 from typing import Dict, List, Optional, Union
-import urllib.request as urlrequest
 
 
 def send_email_to_recipients(
