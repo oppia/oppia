@@ -368,7 +368,7 @@ class NewSkillHandler(base.BaseHandler):
                 'schema': {
                     'type': 'list',
                     'items': {
-                        'type': 'str',
+                        'type': 'basestring',
                         'validators': [{
                             'id': 'is_regex_matched',
                             'regex_pattern': constants.ENTITY_ID_REGEX
@@ -410,8 +410,6 @@ class NewSkillHandler(base.BaseHandler):
                     raise self.InvalidInputException
                 topic_services.add_uncategorized_skill(
                     self.user_id, topic.id, new_skill_id)
-
-        skill_domain.Skill.require_valid_description(description)
 
         if skill_services.does_skill_with_description_exist(description):
             raise self.InvalidInputException(

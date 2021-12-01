@@ -676,7 +676,6 @@ class _Validators:
         Returns:
             bool. Whether the given object is a valid filename.
         """
-
         try:
             image_validation_services.validate_filename(obj)
             return True

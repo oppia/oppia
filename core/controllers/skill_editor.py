@@ -260,7 +260,14 @@ class SkillDataHandler(base.BaseHandler):
         'comma_separated_skill_ids': {
             'schema': {
                 'type': 'custom',
-                'obj_type': 'JsonEncodedInString'
+                'obj_type': 'JsonEncodedInString',
+                'items': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': 12
+                    }]
+                }
             }
         }
     }
@@ -272,7 +279,7 @@ class SkillDataHandler(base.BaseHandler):
     def get(self, comma_separated_skill_ids):
         """Populates the data on skill pages of the skill ids."""
 
-        skill_ids = comma_separated_skill_ids.split(',')
+        skill_ids = comma_separated_skill_ids
 
         try:
             for skill_id in skill_ids:
