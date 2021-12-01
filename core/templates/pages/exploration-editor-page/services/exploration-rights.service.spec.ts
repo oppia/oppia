@@ -24,6 +24,8 @@ import { CsrfTokenService } from 'services/csrf-token.service';
 import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
 import { ExplorationRightsService } from './exploration-rights.service';
 import { ExplorationRightsBackendApiService } from './exploration-rights-backend-api.service';
+import * as cloneDeep from 'lodash/cloneDeep';
+
 
 describe('Exploration rights service', () => {
   let ers: ExplorationRightsService = null;
@@ -318,7 +320,7 @@ describe('Exploration rights service', () => {
   });
 
   it('should check oldrole of user', () => {
-    let sampleDataResultsCopy = angular.copy(serviceData);
+    let sampleDataResultsCopy = cloneDeep(serviceData);
     sampleDataResultsCopy.rights.owner_names.push('newOwner');
     sampleDataResultsCopy.rights.viewer_names.push('newViewer');
     sampleDataResultsCopy.rights.editor_names.push('newEditor');

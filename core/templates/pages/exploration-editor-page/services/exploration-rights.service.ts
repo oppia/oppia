@@ -90,13 +90,12 @@ export class ExplorationRightsService {
         this.explorationDataService.explorationId,
         this.explorationDataService.data.version, true)
       .then((response: ExplorationRightsBackendData) => {
-        let data = response;
         this.alertsService.clearWarnings();
         this.init(
-          data.rights.owner_names, data.rights.editor_names,
-          data.rights.voice_artist_names, data.rights.viewer_names,
-          data.rights.status, data.rights.cloned_from,
-          data.rights.community_owned, data.rights.viewable_if_private);
+          response.rights.owner_names, response.rights.editor_names,
+          response.rights.voice_artist_names, response.rights.viewer_names,
+          response.rights.status, response.rights.cloned_from,
+          response.rights.community_owned, response.rights.viewable_if_private);
       });
   }
 
@@ -107,13 +106,12 @@ export class ExplorationRightsService {
       this.explorationDataService.data.version,
       newMemberRole, newMemberUsername)
       .then((response: ExplorationRightsBackendData) => {
-        let data = response;
         this.alertsService.clearWarnings();
         this.init(
-          data.rights.owner_names, data.rights.editor_names,
-          data.rights.voice_artist_names, data.rights.viewer_names,
-          data.rights.status, data.rights.cloned_from,
-          data.rights.community_owned, data.rights.viewable_if_private);
+          response.rights.owner_names, response.rights.editor_names,
+          response.rights.voice_artist_names, response.rights.viewer_names,
+          response.rights.status, response.rights.cloned_from,
+          response.rights.community_owned, response.rights.viewable_if_private);
       });
   }
 
@@ -123,13 +121,12 @@ export class ExplorationRightsService {
       this.explorationDataService.explorationId,
       this.explorationDataService.data.version, viewableIfPrivate).then(
       (response: ExplorationRightsBackendData) => {
-        let data = response;
         this.alertsService.clearWarnings();
         this.init(
-          data.rights.owner_names, data.rights.editor_names,
-          data.rights.voice_artist_names, data.rights.viewer_names,
-          data.rights.status, data.rights.cloned_from,
-          data.rights.community_owned, data.rights.viewable_if_private);
+          response.rights.owner_names, response.rights.editor_names,
+          response.rights.voice_artist_names, response.rights.viewer_names,
+          response.rights.status, response.rights.cloned_from,
+          response.rights.community_owned, response.rights.viewable_if_private);
       });
   }
 
@@ -137,13 +134,12 @@ export class ExplorationRightsService {
     return this.explorationRightsBackendApiService.publishPutData(
       this.explorationDataService.explorationId, true).then(
       (response: ExplorationRightsBackendData) => {
-        let data = response;
         this.alertsService.clearWarnings();
         this.init(
-          data.rights.owner_names, data.rights.editor_names,
-          data.rights.voice_artist_names, data.rights.viewer_names,
-          data.rights.status, data.rights.cloned_from,
-          data.rights.community_owned, data.rights.viewable_if_private);
+          response.rights.owner_names, response.rights.editor_names,
+          response.rights.voice_artist_names, response.rights.viewer_names,
+          response.rights.status, response.rights.cloned_from,
+          response.rights.community_owned, response.rights.viewable_if_private);
       });
   }
 
@@ -153,13 +149,13 @@ export class ExplorationRightsService {
         this.explorationDataService.explorationId,
         this.explorationDataService.data.version, emailBody).then(
         (response: ExplorationRightsBackendData) => {
-          let data = response;
           this.alertsService.clearWarnings();
           this.init(
-            data.rights.owner_names, data.rights.editor_names,
-            data.rights.voice_artist_names, data.rights.viewer_names,
-            data.rights.status, data.rights.cloned_from,
-            data.rights.community_owned, data.rights.viewable_if_private);
+            response.rights.owner_names, response.rights.editor_names,
+            response.rights.voice_artist_names, response.rights.viewer_names,
+            response.rights.status, response.rights.cloned_from,
+            response.rights.community_owned, response.rights.viewable_if_private
+          );
         }).catch(() => {
         this.init(
           null, null, null, null,
@@ -171,13 +167,12 @@ export class ExplorationRightsService {
     return this.explorationRightsBackendApiService.removeRoleAsyncDeleteData(
       this.explorationDataService.explorationId, memberUsername).then(
       (response: ExplorationRightsBackendData) => {
-        let data = response;
         this.alertsService.clearWarnings();
         this.init(
-          data.rights.owner_names, data.rights.editor_names,
-          data.rights.voice_artist_names, data.rights.viewer_names,
-          data.rights.status, data.rights.cloned_from,
-          data.rights.community_owned, data.rights.viewable_if_private);
+          response.rights.owner_names, response.rights.editor_names,
+          response.rights.voice_artist_names, response.rights.viewer_names,
+          response.rights.status, response.rights.cloned_from,
+          response.rights.community_owned, response.rights.viewable_if_private);
       });
   }
 

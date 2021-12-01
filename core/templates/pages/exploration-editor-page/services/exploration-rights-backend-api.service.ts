@@ -42,7 +42,9 @@ export class ExplorationRightsBackendApiService {
   ) {}
 
   async makeCommunityOwnedPutData(
-      explorationId: string, version: number, makeCommunityOwned: boolean):
+      explorationId: string,
+      version: number,
+      makeCommunityOwned: boolean):
     Promise<ExplorationRightsBackendData> {
     const requestUrl = ('/createhandler/rights/' + explorationId);
 
@@ -53,8 +55,11 @@ export class ExplorationRightsBackendApiService {
   }
 
   async saveRoleChangesPutData(
-      explorationId: string, version: number, newMemberRole: string,
-      newMemberUsername: string): Promise<ExplorationRightsBackendData> {
+      explorationId: string,
+      version: number,
+      newMemberRole: string,
+      newMemberUsername: string
+  ): Promise<ExplorationRightsBackendData> {
     const requestUrl = ('/createhandler/rights/' + explorationId);
 
     return this.http.put<ExplorationRightsBackendData>(requestUrl, {
@@ -65,9 +70,11 @@ export class ExplorationRightsBackendApiService {
   }
 
   async setViewabilityPutData(
-      explorationId: string, version: number, viewableIfPrivate: boolean
+      explorationId: string,
+      version: number,
+      viewableIfPrivate: boolean
   ): Promise<ExplorationRightsBackendData> {
-    const requestUrl = ('/createhandler/rights/' + explorationId);
+    const requestUrl = '/createhandler/rights/' + explorationId;
 
     return this.http.put<ExplorationRightsBackendData>(requestUrl, {
       version: version,
