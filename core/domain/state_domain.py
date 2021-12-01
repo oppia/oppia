@@ -828,12 +828,13 @@ class InteractionInstance:
         return html_list
 
     @staticmethod
-    def convert_html_in_interaction(interaction_dict, conversion_fn):
+    def convert_html_in_interaction(interaction_dict, ca_specs, conversion_fn):
         """Checks for HTML fields in the interaction and converts it
         according to the conversion function.
 
         Args:
             interaction_dict: dict. The interaction dict.
+            ca_specs: dict. The customization args dict.
             conversion_fn: function. The function to be used for converting the
                 HTML.
 
@@ -871,14 +872,12 @@ class InteractionInstance:
                 interaction_id,
                 interaction_dict['customization_args'])
         )
-        ca_specs = interaction_registry.Registry.get_interaction_by_id(
-            interaction_id).customization_arg_specs
 
         for ca_spec in ca_specs:
-            ca_spec_name = ca_spec.name
+            ca_spec_name = ca_spec['name']
             customization_args[ca_spec_name].value = (
                 InteractionCustomizationArg.traverse_by_schema_and_convert(
-                    ca_spec.schema,
+                    ca_spec['schema'],
                     customization_args[ca_spec_name].value,
                     wrapped_conversion_fn
                 )
@@ -3355,6 +3354,7 @@ class State:
     @classmethod
     def convert_html_fields_in_state(
             cls, state_dict, conversion_fn,
+            state_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
             state_uses_old_interaction_cust_args_schema=False,
             state_uses_old_rule_template_schema=False):
         """Applies a conversion function on all the html strings in a state
@@ -3364,6 +3364,7 @@ class State:
             state_dict: dict. The dict representation of State object.
             conversion_fn: function. The conversion function to be applied on
                 the states_dict.
+            state_schema_version: number. The state schema version.
             state_uses_old_interaction_cust_args_schema: bool. Whether the
                 interaction customization arguments contain SubtitledHtml
                 and SubtitledUnicode dicts (should be True if prior to state
@@ -3478,9 +3479,17 @@ class State:
                                     'choices']['value']
                         ])
         else:
+            ca_specs = (
+                interaction_registry.Registry
+                .get_all_specs_for_state_schema_version_or_latest(
+                    state_schema_version,
+                    interaction_id
+                )
+            )
             state_dict['interaction'] = (
                 InteractionInstance.convert_html_in_interaction(
                     state_dict['interaction'],
+                    ca_specs,
                     conversion_fn
                 ))
 
