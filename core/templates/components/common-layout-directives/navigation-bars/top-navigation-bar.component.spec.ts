@@ -521,7 +521,7 @@ describe('TopNavigationBarComponent', () => {
       classroomBackendApiService, 'fetchClassroomDataAsync')
       .and.resolveTo(classroomData);
 
-    component.ngOnInit();
+    component.ngAfterViewChecked();
     tick();
 
     expect(component.classroomData).toEqual(array);
