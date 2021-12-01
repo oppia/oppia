@@ -264,8 +264,8 @@ class SkillDataHandler(base.BaseHandler):
                 'items': {
                     'type': 'basestring',
                     'validators': [{
-                        'id': 'has_length_at_most',
-                        'max_value': 12
+                        'id': 'has_length',
+                        'value': 12
                     }]
                 }
             }
@@ -281,11 +281,6 @@ class SkillDataHandler(base.BaseHandler):
 
         skill_ids = comma_separated_skill_ids
 
-        try:
-            for skill_id in skill_ids:
-                skill_domain.Skill.require_valid_skill_id(skill_id)
-        except utils.ValidationError:
-            raise self.PageNotFoundException('Invalid skill id.')
         try:
             skills = skill_fetchers.get_multi_skills(skill_ids)
         except Exception as e:
