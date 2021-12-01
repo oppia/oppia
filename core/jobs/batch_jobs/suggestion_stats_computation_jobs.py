@@ -35,6 +35,7 @@ from core.platform import models
 
 import apache_beam as beam
 
+import result
 from typing import Dict, Iterable, Optional, Tuple, Union
 
 MYPY = False
@@ -88,7 +89,7 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
             | 'Group by ID' >> beam.GroupBy(lambda m: m.id)
         )
 
-        new_user_stats_models = (
+        user_stats_results = (
             {
                 'suggestion': suggestions_grouped_by_target,
                 'opportunity': exp_opportunities
@@ -101,27 +102,54 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                     list(x['opportunity'][0])[0]
                     if len(x['opportunity']) else None
                 ))
+        )
+
+        user_stats_models = (
+            user_stats_results
+            | 'Filter ok results' >> beam.Filter(
+                lambda key_and_result: key_and_result[1].is_ok())
+            | 'Unpack result' >> beam.MapTuple(
+                lambda key, result: (key, result.unwrap()))
             | 'Combine the stats' >> beam.CombinePerKey(CombineStats())
             | 'Generate models from stats' >> beam.MapTuple(
                 self._generate_translation_contribution_model)
         )
 
+        user_stats_error_job_run_results = (
+            user_stats_results
+            | 'Filter err results' >> beam.Filter(
+                lambda key_and_result: key_and_result[1].is_err())
+            # Pylint disable is needed because pylint is not able to correctly
+            # detect that the value is passed through the pipe.
+            | 'Remove keys' >> beam.Values()  # pylint: disable=no-value-for-parameter
+            | 'Transform result to job run result' >> (
+                job_result_transforms.ResultsToJobRunResults())
+        )
+
         unused_put_result = (
-            new_user_stats_models
+            user_stats_models
             | 'Put models into the datastore' >> ndb_io.PutModels()
         )
 
-        return (
-            new_user_stats_models
+        user_stats_models_job_run_results = (
+            user_stats_models
             | 'Create job run result' >> (
                 job_result_transforms.CountObjectsToJobRunResult())
+        )
+
+        return (
+            (
+                user_stats_error_job_run_results,
+                user_stats_models_job_run_results
+            )
+            | 'Merge job run results' >> beam.Flatten()
         )
 
     @staticmethod
     def _generate_stats(
         suggestions: Iterable[suggestion_registry.SuggestionTranslateContent],
         opportunity: Optional[opportunity_domain.ExplorationOpportunitySummary]
-    ) -> Iterable[Tuple[str, Dict[str, Union[bool, int, str]]]]:
+    ) -> Tuple[str, result.Result[Dict[str, Union[bool, int, str]], str]]:
         """Generates translation contribution stats for each suggestion.
 
         Args:
@@ -146,33 +174,39 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
             topic_id = opportunity.topic_id
 
         for suggestion in suggestions:
-            # Content in set format is a list, content in unicode and html
-            # format is a string. This code normalizes the content to the list
-            # type so that we can easily count words.
-            if state_domain.WrittenTranslation.is_data_format_list(
-                    suggestion.change.data_format
-            ):
-                content_items = suggestion.change.content_html
-            else:
-                content_items = [suggestion.change.content_html]
-
-            content_word_count = 0
-            for item in content_items:
-                # Count the number of words in the original content, ignoring
-                # any HTML tags and attributes.
-                content_plain_text = html_cleaner.strip_html_tags(item) # type: ignore[no-untyped-call,attr-defined]
-                content_word_count += len(content_plain_text.split())
-
             key = (
                 suggestion_models.TranslationContributionStatsModel.generate_id(
                     suggestion.language_code, suggestion.author_id, topic_id))
-            translation_contribution_stats_dict = {
-                'suggestion_status': suggestion.status,
-                'edited_by_reviewer': suggestion.edited_by_reviewer,
-                'content_word_count': content_word_count,
-                'last_updated_date': suggestion.last_updated.date().isoformat()
-            }
-            yield (key, translation_contribution_stats_dict)
+            try:
+                # Content in set format is a list, content in unicode and html
+                # format is a string. This code normalizes the content to the
+                # list type so that we can easily count words.
+                if state_domain.WrittenTranslation.is_data_format_list(
+                        suggestion.change.data_format
+                ):
+                    content_items = suggestion.change.content_html
+                else:
+                    content_items = [suggestion.change.content_html]
+
+                content_word_count = 0
+                for item in content_items:
+                    # Count the number of words in the original content,
+                    # ignoring any HTML tags and attributes.
+                    content_plain_text = html_cleaner.strip_html_tags(item) # type: ignore[no-untyped-call,attr-defined]
+                    content_word_count += len(content_plain_text.split())
+
+                translation_contribution_stats_dict = {
+                    'suggestion_status': suggestion.status,
+                    'edited_by_reviewer': suggestion.edited_by_reviewer,
+                    'content_word_count': content_word_count,
+                    'last_updated_date': (
+                        suggestion.last_updated.date().isoformat())
+                }
+                yield (key, result.Ok(translation_contribution_stats_dict))
+            except Exception as e:
+                yield (
+                    key, result.Err('%s: %s' % (suggestion.suggestion_id, e))
+                )
 
     @staticmethod
     def _generate_translation_contribution_model(
