@@ -25,6 +25,7 @@ import { ContributionOpportunitiesService } from '../services/contribution-oppor
 import { ExplorationOpportunity } from '../opportunities-list-item/opportunities-list-item.component';
 import constants from 'assets/constants';
 import { Subscription } from 'rxjs';
+import { range } from 'lodash';
 
 @Component({
   selector: 'oppia-opportunities-list',
@@ -92,6 +93,7 @@ export class OpportunitiesListComponent {
   }
 
   ngOnInit(): void {
+    this.loadingOpportunityData = true;
     this.loadOpportunities().then(({opportunitiesDicts, more}) => {
       // This ngZone run closure will not be required after \
       // migration is complete.
