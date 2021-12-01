@@ -478,8 +478,10 @@ def _construct_exploration_suggestions(suggestions):
     Returns:
         list(dict). List of suggestion dicts with an additional
         exploration_content_html field representing the target
-        exploration's current content. Suggestions with the target
-        exploration's contents that do not exists will be omitted.
+        exploration's current content. If the given suggestion refers to an
+        invalid content ID in the current exploration (this can happen if that
+        content was deleted after the suggestion was made), the corresponding
+        suggestion dict will be omitted from the return value.
     """
     exp_ids = {suggestion.target_id for suggestion in suggestions}
     exp_id_to_exp = exp_fetchers.get_multiple_explorations_by_id(list(exp_ids))

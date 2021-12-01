@@ -2439,7 +2439,8 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
             }
         )
 
-    def test_exploration_handler_when_state_is_removed(self):
+    def test_get_reviewable_suggestions_when_state_of_a_target_is_removed(
+        self):
         exploration = self.save_new_valid_exploration(
             'exp2', self.owner_id, objective='The objective')
         init_state = exploration.states[exploration.init_state_name]
@@ -2545,7 +2546,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_exploration_handler_when_original_content_not_exists(self):
+    def test_get_reviewable_suggestions_when_original_content_is_removed(self):
         exploration = self.save_new_valid_exploration(
             'exp2', self.owner_id, objective='The objective')
         init_state = exploration.states[exploration.init_state_name]
