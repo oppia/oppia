@@ -550,8 +550,16 @@ export class StateGraphLayoutService {
         var targetWidth = link.target.width;
         var targetHeight = link.target.height;
 
-        if (targetx && sourcex && targety && sourcey && targetWidth &&
-          sourceWidth && targetHeight && sourceHeight) {
+        if (
+          target !== null && 
+          sourcex !== null && 
+          targety !== null && 
+          sourcey !== null &&
+          targetWidth  !== null && 
+          sourceWidth !== null && 
+          targetHeight !== null && 
+          sourceHeight !== null 
+        ) {
           var dx = targetx - sourcex;
           var dy = targety - sourcey;
 
