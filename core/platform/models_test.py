@@ -206,6 +206,11 @@ class RegistryUnitTest(test_utils.TestBase):
             expected_user_models,
             self.registry_instance.import_models([models.NAMES.user]))
 
+    def test_import_models_invalid(self) -> None:
+        """Tests import_models function with an invalid option."""
+        with self.assertRaisesRegexp(Exception, 'Invalid model name: '): # type: ignore[no-untyped-call]
+            self.registry_instance.import_models(['']) # type: ignore[list-item]
+
     def test_get_storage_model_classes(self) -> None:
         """Tests get_all_storage_model_classes."""
         from core.storage.user import gae_models as user_models
