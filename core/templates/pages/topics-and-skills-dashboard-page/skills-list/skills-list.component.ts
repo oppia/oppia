@@ -37,13 +37,13 @@ import { TopicAssignmentsSummary, UnassignSkillFromTopicsModalComponent } from '
 
 export interface SkillsCategorizedByTopics {
   [topicName: string]: {
-    [subtopicName: string]: ShortSkillSummary[]
-  }
+    [subtopicName: string]: ShortSkillSummary[];
+  };
 }
 
 interface MergeModalResult {
-  skill: AugmentedSkillSummary,
-  supersedingSkillId: string
+  skill: AugmentedSkillSummary;
+  supersedingSkillId: string;
 }
 
 @Component({

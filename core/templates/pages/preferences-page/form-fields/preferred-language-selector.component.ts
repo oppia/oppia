@@ -19,9 +19,9 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 interface Language {
-  id: string,
-  text: string,
-  dir: string
+  id: string;
+  text: string;
+  dir: string;
 }
 
 @Component({

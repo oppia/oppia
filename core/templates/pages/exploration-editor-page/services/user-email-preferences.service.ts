@@ -23,14 +23,14 @@ import { UserEmailPreferencesBackendApiService } from './user-email-preferences-
 
 export interface EmailPreferencesData {
   'email_preferences': {
-    'mute_feedback_notifications': boolean,
-    'mute_suggestion_notifications': boolean
-  }
+    'mute_feedback_notifications': boolean;
+    'mute_suggestion_notifications': boolean;
+  };
 }
 
 export interface RequestParams {
-  'message_type': string,
-  mute: boolean
+  'message_type': string;
+  mute: boolean;
 }
 
 @Injectable({
