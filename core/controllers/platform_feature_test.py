@@ -27,11 +27,11 @@ from core.domain import platform_parameter_registry as registry
 from core.tests import test_utils
 
 
-class PARAM_NAMES(enum.Enum): # pylint: disable=invalid-name
+class ParamNames(enum.Enum): # pylint: disable=invalid-name
     """Enum for parameter names."""
 
-    parameter_a = 'parameter_a' # pylint: disable=invalid-name
-    parameter_b = 'parameter_b' # pylint: disable=invalid-name
+    PARAMETER_A = 'parameter_a' # pylint: disable=invalid-name
+    PARAMETER_B = 'parameter_b' # pylint: disable=invalid-name
 
 
 DATA_TYPES = param_domain.DATA_TYPES # pylint: disable=invalid-name
@@ -57,10 +57,10 @@ class PlatformFeaturesEvaluationHandlerTest(test_utils.GenericTestBase):
 
         registry.Registry.parameter_registry.clear()
         self.dev_feature = registry.Registry.create_platform_parameter(
-            PARAM_NAMES.parameter_a, 'parameter for test', DATA_TYPES.bool,
+            ParamNames.PARAMETER_A, 'parameter for test', DATA_TYPES.bool,
             is_feature=True, feature_stage=param_domain.FEATURE_STAGES.dev)
         self.prod_feature = registry.Registry.create_platform_parameter(
-            PARAM_NAMES.parameter_b, 'parameter for test', DATA_TYPES.bool,
+            ParamNames.PARAMETER_B, 'parameter for test', DATA_TYPES.bool,
             is_feature=True, feature_stage=param_domain.FEATURE_STAGES.prod)
         registry.Registry.update_platform_parameter(
             self.prod_feature.name, self.user_id, 'edit rules',
