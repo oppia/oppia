@@ -59,7 +59,6 @@ describe('Story creation backend api service', () => {
       ]
     });
 
-    csrfService = TestBed.inject(CsrfTokenService);
     httpTestingController = TestBed.inject(HttpTestingController);
     storyCreationBackendApiService = TestBed.inject(
       StoryCreationBackendApiService);
