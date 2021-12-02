@@ -105,7 +105,7 @@ describe('Rubrics Editor Component', () => {
   });
 
   it('should check if medium level rubrics' +
-      'have atleast one explantion',
+      ' have atleast one explantion',
   () => {
     let index: number = 0;
     expect(componentInstance.isMediumLevelExplanationValid()).toBeFalse;
@@ -115,7 +115,7 @@ describe('Rubrics Editor Component', () => {
   });
 
   it('should check if total number of explanations' +
-      'have reached the limit',
+      ' have reached the limit',
   () => {
     let index: number = 0;
     componentInstance.ngOnInit();
@@ -123,7 +123,7 @@ describe('Rubrics Editor Component', () => {
     expect(componentInstance.hasReachedExplanationCountLimit())
       .toBeFalse();
     for (index = 1; index < 10; index++) {
-      componentInstance.editableExplanations[difficulty][index] = 'not_empty';
+      componentInstance.editableExplanations[difficulty].push('not_empty');
     }
     expect(componentInstance.hasReachedExplanationCountLimit())
       .toBeTrue();
