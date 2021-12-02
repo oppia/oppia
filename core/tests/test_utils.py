@@ -1722,6 +1722,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
+proto_size_in_bytes: %d
 schema_version: %d
 states:
   %s:
@@ -1796,7 +1797,7 @@ states_schema_version: %d
 tags: []
 title: Title
 """) % (
-    feconf.DEFAULT_INIT_STATE_NAME,
+    feconf.DEFAULT_INIT_STATE_NAME, 99,
     exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
     feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
     feconf.CURRENT_STATE_SCHEMA_VERSION)
