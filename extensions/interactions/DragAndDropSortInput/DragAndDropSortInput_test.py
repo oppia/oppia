@@ -162,7 +162,7 @@ class DragAndDropSortInputInteractionTests(test_utils.GenericTestBase):
             '<p>Choice 1</p>')
         self.assertEqual(
             drag_input_rule_spec.content_id_sets[0].content_ids[1]
-                .content_id, 
+                .content_id,
             '<p>Choice 2</p>')
 
         drag_input_rule_spec = (

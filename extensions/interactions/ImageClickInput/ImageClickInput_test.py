@@ -58,8 +58,10 @@ class ImageClickInputInteractionTests(test_utils.GenericTestBase):
                             'label': 'classdef',
                             'region': {
                                 'area': [
-                                    [0.004291845493562232, 0.004692192192192192],
-                                    [0.40987124463519314, 0.05874624624624625]
+                                    [0.004291845493562232,
+                                        0.004692192192192192],
+                                    [0.40987124463519314,
+                                        0.05874624624624625]
                                 ],
                                 'regionType': 'Rectangle'
                             }
