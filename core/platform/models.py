@@ -83,7 +83,7 @@ class Platform:
 
     @classmethod
     def import_models(
-            cls, unused_model_names: List[str]
+            cls, unused_model_names: List[NAMES]
     ) -> Tuple[ModuleType, ...]:
         """An abstract method that should be implemented on inherited
         classes.
@@ -105,7 +105,7 @@ class _Gae(Platform):
     # doesn't match with BaseModel.delete_multi().
     # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     @classmethod
-    def import_models(cls, model_names: List[NAMES]) -> Tuple[ModuleType, ...]: # type: ignore[override]
+    def import_models(cls, model_names: List[NAMES]) -> Tuple[ModuleType, ...]:
         """Imports and returns the storage modules listed in model_names.
 
         Args:
