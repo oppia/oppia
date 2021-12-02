@@ -47,7 +47,7 @@ class MigrateSkillJobTests(job_test_utils.JobTestBase):
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty()
 
-    def test_one_unmigrated_skill(self) -> None:
+    def test_one_unmigrated_rubric_skill(self) -> None:
         skill_model = self.create_model(
             skill_models.SkillModel,
             id=self.SKILL_1_ID,
@@ -57,13 +57,13 @@ class MigrateSkillJobTests(job_test_utils.JobTestBase):
             rubric_schema_version=4,
             rubrics=[{
                 'difficulty': 'Easy',
-                'explanations': 'a'
+                'explanations': ['a\nb']
             }, {
                 'difficulty': 'Medium',
-                'explanations': 'a'
+                'explanations': ['a&nbsp;b']
             }, {
                 'difficulty': 'Hard',
-                'explanations': 'a'
+                'explanations': ['a&nbsp;b']
             }],
             language_code='cs',
             skill_contents_schema_version=(
@@ -86,8 +86,7 @@ class MigrateSkillJobTests(job_test_utils.JobTestBase):
                 }
             },
             next_misconception_id=2,
-            all_questions_merged=False,
-            version=1
+            all_questions_merged=False
         )
         skill_model.update_timestamps()
         skill_model.commit(feconf.SYSTEM_COMMITTER_ID, 'Create skill', [{
@@ -114,5 +113,21 @@ class MigrateSkillJobTests(job_test_utils.JobTestBase):
             job_run_result.JobRunResult(stdout='CACHE DELETION SUCCESS: 1')
         ])
 
-        migrated_skill_model = skill_models.SkillModel.get(self.SKILL_1_ID)
+        migrated_skill_model = skill_models.SkillModel.get_by_id(self.SKILL_1_ID)
         self.assertEqual(migrated_skill_model.version, 2)
+        self.assertEqual(
+            migrated_skill_model.rubric_schema_version,
+            feconf.CURRENT_RUBRIC_SCHEMA_VERSION)
+        self.assertEqual(
+            migrated_skill_model.rubrics,
+            [{
+                'difficulty': 'Easy',
+                'explanations': ['ab']
+            }, {
+                'difficulty': 'Medium',
+                'explanations': ['a b']
+            }, {
+                'difficulty': 'Hard',
+                'explanations': ['a b']
+            }]
+        )

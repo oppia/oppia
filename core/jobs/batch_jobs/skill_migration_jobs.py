@@ -20,6 +20,7 @@ from __future__ import absolute_import
 from __future__ import annotations
 from __future__ import unicode_literals
 
+import logging
 import traceback
 
 from core import feconf
@@ -61,7 +62,7 @@ class MigrateSkillJob(base_jobs.JobBase):
             skill = skill_fetchers.get_skill_from_model(skill_model)
             skill.validate()
         except Exception as e:
-            traceback.print_exc()
+            logging.exception(e)
             return result.Err((skill_id, e))
 
         return result.Ok((skill_id, skill))
