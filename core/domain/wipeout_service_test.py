@@ -454,17 +454,15 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
             'exp_id',
             self.user_2_id,
             feconf.ROLE_VOICE_ARTIST)
-        rights_manager.unpublish_exploration(
-            user_services.get_system_user(), 'exp_id')
 
         exp_summary_model = exp_models.ExpSummaryModel.get_by_id('exp_id')
-        self.assertEqual(exp_summary_model.voice_artist_ids, [self.user_2_id])
+        self.assertFalse(exp_summary_model.community_owned)
 
-        wipeout_service.pre_delete_user(self.user_2_id)
+        wipeout_service.pre_delete_user(self.user_1_id)
         self.process_and_flush_pending_tasks()
 
         exp_summary_model = exp_models.ExpSummaryModel.get_by_id('exp_id')
-        self.assertEqual(exp_summary_model.voice_artist_ids, [])
+        self.assertTrue(exp_summary_model.community_owned)
 
     def test_pre_delete_user_collection_user_is_deassigned(self):
         self.save_new_valid_collection('col_id', self.user_1_id)
@@ -513,6 +511,8 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
             self.user_2_id,
             feconf.ROLE_VOICE_ARTIST
         )
+        rights_manager.unpublish_exploration(
+            user_services.get_system_user(), 'exp_id')
 
         exp_summary_model = exp_models.ExpSummaryModel.get_by_id('exp_id')
         self.assertEqual(exp_summary_model.voice_artist_ids, [self.user_2_id])

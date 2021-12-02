@@ -37,7 +37,6 @@ from typing import Iterator, Optional, Type
 
 datastore_services = models.Registry.import_datastore_services()
 
-
 # This is a mapping from the Google Cloud Dataflow JobState enum to our enum.
 # https://cloud.google.com/dataflow/docs/reference/rest/v1b3/projects.jobs#jobstate
 _GCLOUD_DATAFLOW_JOB_STATE_TO_OPPIA_BEAM_JOB_STATE = {
