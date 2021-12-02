@@ -13,23 +13,21 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for Remove role confirm or cancel modal.
+ * @fileoverview Component for Delete exploration modal.
  */
 
-require(
-  'components/common-layout-directives/common-elements/' +
-  'confirm-or-cancel-modal.controller.ts');
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import { Component } from '@angular/core';
 
-angular.module('oppia').controller(
-  'RemoveRoleConfirmationModalController', [
-    '$controller', '$scope', '$uibModalInstance', 'role', 'username',
-    function(
-        $controller, $scope, $uibModalInstance, role, username) {
-      $controller('ConfirmOrCancelModalController', {
-        $scope: $scope,
-        $uibModalInstance: $uibModalInstance
-      });
-      $scope.username = username;
-      $scope.role = role;
-    }
-  ]);
+@Component({
+  selector: 'oppia-delete-exploration-modal',
+  templateUrl: './delete-exploration-modal.component.html'
+})
+export class DeleteExplorationModal extends ConfirmOrCancelModal {
+  constructor(
+    private ngbActiveModal: NgbActiveModal,
+  ) {
+    super(ngbActiveModal);
+  }
+}
