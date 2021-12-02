@@ -29,11 +29,11 @@ from core.domain import platform_parameter_registry as registry
 from core.tests import test_utils
 
 
-class ParamNames(enum.Enum):  # pylint: disable=invalid-name
+class ParamNames(enum.Enum):
     """Enum for parameter names."""
 
-    FEATURE_A = 'feature_a' # pylint: disable=invalid-name
-    FEATURE_B = 'feature_b' # pylint: disable=invalid-name
+    FEATURE_A = 'feature_a'
+    FEATURE_B = 'feature_b'
 
 
 SERVER_MODES = platform_parameter_domain.SERVER_MODES # pylint: disable=invalid-name
