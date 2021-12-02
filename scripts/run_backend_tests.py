@@ -472,7 +472,7 @@ def main(args=None):
                 print('------------------------------------------------------')
                 raise task.exception
         else:
-            try:    
+            try:
                 tests_run_regex_match = re.search(
                     r'Ran ([0-9]+) tests? in ([0-9\.]+)s',
                     task.task_results[0].get_report()[0])

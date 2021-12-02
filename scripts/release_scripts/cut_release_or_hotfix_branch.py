@@ -44,7 +44,6 @@ import re
 import subprocess
 
 from core import constants
-from core import python_utils
 from core import utils
 from scripts import common
 

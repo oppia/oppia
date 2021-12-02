@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import builtins
+import io
 import os
 import re
 import subprocess

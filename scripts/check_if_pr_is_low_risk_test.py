@@ -17,7 +17,6 @@
 from __future__ import annotations
 
 import builtins
-from core import python_utils
 from core import utils
 from core.tests import test_utils
 from scripts import check_if_pr_is_low_risk

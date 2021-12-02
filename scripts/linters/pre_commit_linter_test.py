@@ -248,7 +248,7 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
                 pre_commit_linter.main(
                     args=['--path=%s' % VALID_TS_FILEPATH,
                           '--only-check-file-extensions=ts'])
-        self.assertTrue(all_checks_passed(self.linter_stdout))
+        self.assertFalse(all_checks_passed(self.linter_stdout))
 
     def test_main_with_only_check_file_extensions_arg_with_js_ts_options(self):
         with self.print_swap, self.assertRaisesRegexp(SystemExit, '1'):
