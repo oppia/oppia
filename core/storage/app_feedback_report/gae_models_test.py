@@ -292,8 +292,7 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
             self) -> None:
         model_class = app_feedback_report_models.AppFeedbackReportModel
         class InvalidFilter(enum.Enum):
-            """Invalid filter."""
-            
+            """Invalid filter."""   
             INVALID_FIELD = 'invalid_field'
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.InvalidInputException,
