@@ -1336,7 +1336,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     'translation_html': valid_html,
                     'data_format': 'html'
                 },
-                'description':'test'
+                'description': 'test'
             }, csrf_token=csrf_token, expected_status_int=400)
 
         self.assertIn(
@@ -1413,7 +1413,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     'data_format': 'html'
                 },
                 'description': 'test',
-                'files': { 'file.svg': large_image },
+                'files': {'file.svg': large_image},
             }, csrf_token=csrf_token, expected_status_int=400,
         )
 
