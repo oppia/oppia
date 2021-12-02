@@ -321,7 +321,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
     @classmethod
     def get_filter_options_for_field(
         cls, filter_field: FILTER_FIELD_NAMES
-        ) -> List[str]:
+    ) -> List[str]:
         """Fetches values that can be used to filter reports by.
 
         Args:
