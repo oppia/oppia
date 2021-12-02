@@ -64,4 +64,3 @@ export class ModeratorUnpublishExplorationModalComponent
     this.ngbActiveModal.close(this.emailBody);
   }
 }
-

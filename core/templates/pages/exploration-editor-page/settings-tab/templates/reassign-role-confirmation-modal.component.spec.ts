@@ -60,4 +60,3 @@ describe('Remove Role Confirm Or Cancel Modal Controller ', function() {
     expect(component).toBeDefined();
   });
 });
-
