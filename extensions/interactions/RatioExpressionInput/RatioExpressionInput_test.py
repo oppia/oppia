@@ -162,13 +162,13 @@ class RatioExpressionInputInteractionTests(test_utils.GenericTestBase):
             ratio_input_answer_group.destination_state,
             'abc')
         self.assertEqual(
-            ratio_input_answer_group.labelled_as_correct, 
+            ratio_input_answer_group.labelled_as_correct,
             True)
         self.assertEqual(
-            ratio_input_answer_group.feedback.content_id, 
+            ratio_input_answer_group.feedback.content_id,
             'feedback_2')
         self.assertEqual(
-            ratio_input_answer_group.feedback.text, 
+            ratio_input_answer_group.feedback.text,
             '<p>Feedback</p>')
 
         ratio_input_solution = (
@@ -191,35 +191,35 @@ class RatioExpressionInputInteractionTests(test_utils.GenericTestBase):
             ratio_input_proto.answer_groups[0]
                 .rule_specs[0].equals.input)
         self.assertEqual(
-            ratio_input_rule_spec.components[0], 
+            ratio_input_rule_spec.components[0],
             1)
         self.assertEqual(
-            ratio_input_rule_spec.components[1], 
+            ratio_input_rule_spec.components[1],
             2)
 
         ratio_input_rule_spec = (
             ratio_input_proto.answer_groups[0]
                 .rule_specs[1].is_equivalent.input)
         self.assertEqual(
-            ratio_input_rule_spec.components[0], 
+            ratio_input_rule_spec.components[0],
             1)
         self.assertEqual(
-            ratio_input_rule_spec.components[1], 
+            ratio_input_rule_spec.components[1],
             2)
 
         ratio_input_rule_spec = (
             ratio_input_proto.answer_groups[0]
                 .rule_specs[2].has_number_of_terms_equal_to)
         self.assertEqual(
-            ratio_input_rule_spec.input_term_count, 
+            ratio_input_rule_spec.input_term_count,
             1)
 
         ratio_input_rule_spec = (
             ratio_input_proto.answer_groups[0]
                 .rule_specs[3].has_specific_term_equal_to)
         self.assertEqual(
-            ratio_input_rule_spec.input_term_index, 
+            ratio_input_rule_spec.input_term_index,
             1)
         self.assertEqual(
-            ratio_input_rule_spec.input_expected_term_value, 
+            ratio_input_rule_spec.input_expected_term_value,
             2)

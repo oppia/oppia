@@ -40,14 +40,14 @@ class DragAndDropSortInputInteractionTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': [['<p>Choice 1</p>', '<p>Choice 2</p>']] 
+                    'x': [['<p>Choice 1</p>', '<p>Choice 2</p>']]
                 },
                 'rule_type': 'IsEqualToOrdering'
             }, {
                 'inputs': {
                     'x': [['<p>Choice 1</p>']]
                 },
-                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition' 
+                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition'
             }, {
                 'inputs': {
                     'x': '<p>Choice 1</p>',
@@ -70,7 +70,7 @@ class DragAndDropSortInputInteractionTests(test_utils.GenericTestBase):
             'customization_args': {
                 'allowMultipleItemsInSamePosition': {
                     'value': True
-                }, 
+                },
                 'choices': {
                     'value': [{
                         'content_id': 'ca_choices_2',
@@ -100,7 +100,7 @@ class DragAndDropSortInputInteractionTests(test_utils.GenericTestBase):
             }],
             'solution': {
                 'answer_is_exclusive': True,
-                'correct_answer': [['<p>Choice 1</p>', '<p>Choice 2</p>']], 
+                'correct_answer': [['<p>Choice 1</p>', '<p>Choice 2</p>']],
                 'explanation': {
                     'content_id': 'solution',
                     'html': 'This is <i>solution</i> for state1'
@@ -142,7 +142,7 @@ class DragAndDropSortInputInteractionTests(test_utils.GenericTestBase):
             '<p>This is a copyright character ©.</p>')
 
         self.assertEqual(
-            drag_and_drop_proto.solution.base_solution.explanation.content_id, 
+            drag_and_drop_proto.solution.base_solution.explanation.content_id,
             'solution')
         self.assertEqual(
             drag_and_drop_proto.solution.base_solution.explanation.text,
@@ -150,7 +150,7 @@ class DragAndDropSortInputInteractionTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             drag_and_drop_proto.solution.correct_answer.content_id_sets[0]
-                .content_ids[0].content_id, 
+                .content_ids[0].content_id,
             '<p>Choice 1</p>')
 
         drag_input_rule_spec = (
@@ -158,7 +158,7 @@ class DragAndDropSortInputInteractionTests(test_utils.GenericTestBase):
                 .is_equal_to_ordering.input)
         self.assertEqual(
             drag_input_rule_spec.content_id_sets[0].content_ids[0]
-                .content_id, 
+                .content_id,
             '<p>Choice 1</p>')
         self.assertEqual(
             drag_input_rule_spec.content_id_sets[0].content_ids[1]
@@ -170,25 +170,25 @@ class DragAndDropSortInputInteractionTests(test_utils.GenericTestBase):
                 .is_equal_to_ordering_with_one_item_at_incorrect_position.input)
         self.assertEqual(
             drag_input_rule_spec.content_id_sets[0].content_ids[0]
-                .content_id, 
+                .content_id,
             '<p>Choice 1</p>')
 
         drag_input_rule_spec = (
             drag_and_drop_proto.answer_groups[0].rule_specs[2]
                 .has_element_x_at_position_y)
         self.assertEqual(
-            drag_input_rule_spec.element.content_id, 
+            drag_input_rule_spec.element.content_id,
             '<p>Choice 1</p>')
         self.assertEqual(
-            drag_input_rule_spec.position, 
+            drag_input_rule_spec.position,
             1)
 
         drag_input_rule_spec = (
             drag_and_drop_proto.answer_groups[0].rule_specs[3]
                 .has_element_x_before_element_y)
         self.assertEqual(
-            drag_input_rule_spec.considered_element.content_id, 
+            drag_input_rule_spec.considered_element.content_id,
             '<p>Choice 1</p>')
         self.assertEqual(
-            drag_input_rule_spec.later_element.content_id, 
+            drag_input_rule_spec.later_element.content_id,
             '<p>Choice 2</p>')

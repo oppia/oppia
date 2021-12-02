@@ -32,7 +32,7 @@ class ImageClickInputInteractionTests(test_utils.GenericTestBase):
                     'dest': 'Image Region',
                     'feedback': {
                         'content_id': 'feedback_1',
-                        'html': '<p>That the class definition. Try again.</p>' 
+                        'html': '<p>That the class definition. Try again.</p>'
                     },
                     'labelled_as_correct': False,
                     'missing_prerequisite_skill_id': None,
@@ -58,8 +58,8 @@ class ImageClickInputInteractionTests(test_utils.GenericTestBase):
                             'label': 'classdef',
                             'region': {
                                 'area': [
-                                    [0.004291845493562232, 0.004692192192192192], 
-                                    [0.40987124463519314, 0.05874624624624625] 
+                                    [0.004291845493562232, 0.004692192192192192],
+                                    [0.40987124463519314, 0.05874624624624625]
                                 ],
                                 'regionType': 'Rectangle'
                             }
@@ -102,47 +102,47 @@ class ImageClickInputInteractionTests(test_utils.GenericTestBase):
         image_input_customization_args = (
             image_input_proto.customization_args.image_and_regions)
         self.assertEqual(
-            image_input_customization_args.image_file_path, 
+            image_input_customization_args.image_file_path,
             's1ImagePath.png')
         self.assertEqual(
             image_input_customization_args.labeled_regions[0]
-                .label, 
+                .label,
             'classdef')
         self.assertEqual(
             image_input_customization_args.labeled_regions[0]
-                .normalized_rectangle_2d.top_left.x, 
+                .normalized_rectangle_2d.top_left.x,
             0.004291845493562232)
         self.assertEqual(
             image_input_customization_args.labeled_regions[0]
-                .normalized_rectangle_2d.bottom_right.y, 
+                .normalized_rectangle_2d.bottom_right.y,
             0.05874624624624625)
         self.assertEqual(
             image_input_customization_args.labeled_regions[0]
-                .normalized_rectangle_2d.top_left.y, 
+                .normalized_rectangle_2d.top_left.y,
             0.004692192192192192)
         self.assertEqual(
             image_input_customization_args.labeled_regions[0]
-                .normalized_rectangle_2d.bottom_right.x, 
+                .normalized_rectangle_2d.bottom_right.x,
             0.40987124463519314)
 
         image_input_answer_group = (
             image_input_proto.answer_groups[0].base_answer_group.outcome)
         self.assertEqual(
-            image_input_answer_group.destination_state, 
+            image_input_answer_group.destination_state,
             'Image Region')
         self.assertEqual(
-            image_input_answer_group.labelled_as_correct, 
+            image_input_answer_group.labelled_as_correct,
             False)
         self.assertEqual(
-            image_input_answer_group.feedback.content_id, 
+            image_input_answer_group.feedback.content_id,
             'feedback_1')
         self.assertEqual(
-            image_input_answer_group.feedback.text, 
+            image_input_answer_group.feedback.text,
             '<p>That the class definition. Try again.</p>')
 
         self.assertEqual(
             image_input_proto.answer_groups[0].rule_specs[0]
-                .is_in_region.input_region, 
+                .is_in_region.input_region,
             'classdef')
 
         self.assertEqual(
@@ -164,4 +164,3 @@ class ImageClickInputInteractionTests(test_utils.GenericTestBase):
         self.assertEqual(
             image_input_proto.hints[0].hint_content.text,
             '<p>This is a copyright character ©.</p>')
-
