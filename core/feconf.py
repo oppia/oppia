@@ -209,7 +209,7 @@ DEFAULT_QUERY_LIMIT = 1000
 
 # The maximum number of results to retrieve in a datastore query
 # for suggestions.
-DEFAULT_SUGGESTION_QUERY_LIMIT = 100
+DEFAULT_SUGGESTION_QUERY_LIMIT = 1000
 
 # The maximum number of results to retrieve in a datastore query
 # for top rated published explorations in /library page.
