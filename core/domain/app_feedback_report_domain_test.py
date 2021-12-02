@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import datetime
+import enum
 
 from core import feconf
 from core import utils
@@ -448,6 +449,18 @@ class UserSuppliedFeedbackDomainTests(test_utils.GenericTestBase):
         self.assertDictEqual(
             expected_dict, self.user_supplied_feedback.to_dict())
 
+    def test_validation_invalid_report_type_fails(self) -> None:
+        self.user_supplied_feedback.report_type = 'invalid_report_type' # type: ignore[assignment]
+        self._assert_validation_error(
+            self.user_supplied_feedback, 'Invalid report type ')
+
+    def test_validation_invalid_report_category_fails(self) -> None:
+        self.user_supplied_feedback.report_type = REPORT_TYPE_ISSUE
+        self.user_supplied_feedback.category = 'invalid_category' # type: ignore[assignment]
+        self._assert_validation_error(
+            self.user_supplied_feedback,
+            'Invalid category invalid_category,')
+
     def test_validation_has_selected_items_for_invalid_category_fails(
             self) -> None:
         self.user_supplied_feedback.user_feedback_selected_items = (
@@ -490,6 +503,16 @@ class UserSuppliedFeedbackDomainTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             self.user_supplied_feedback,
             'Invalid input text, must be a string')
+
+    def test_report_type_is_none_fails_validation(self) -> None:
+        self.user_supplied_feedback.report_type = None # type: ignore[assignment]
+        self._assert_validation_error(
+            self.user_supplied_feedback, 'No report_type supplied.')
+
+    def test_report_category_is_none_fails_validation(self) -> None:
+        self.user_supplied_feedback.category = None # type: ignore[assignment]
+        self._assert_validation_error(
+            self.user_supplied_feedback, 'No category supplied.')
 
     def _assert_validation_error(
             self,
@@ -667,6 +690,16 @@ class AndroidDeviceSystemContextTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             self.device_system_context, 'No build fingerprint supplied.')
 
+    def test_validation_network_type_is_none_fails(self) -> None:
+        self.device_system_context.network_type = None # type: ignore[assignment]
+        self._assert_validation_error(
+            self.device_system_context, 'No network type supplied.')
+
+    def test_validation_invalid_network_type_fails(self) -> None:
+        self.device_system_context.network_type = 'invaid_network_type' # type: ignore[assignment]
+        self._assert_validation_error(
+            self.device_system_context, 'Invalid network type,')        
+
     def _assert_validation_error(
             self,
             context_obj: app_feedback_report_domain.AndroidDeviceSystemContext,
@@ -722,6 +755,28 @@ class NavigationDrawerEntryPointDomainTests(test_utils.GenericTestBase):
         self.assertDictEqual(
             expected_dict, self.entry_point.to_dict())
 
+    def test_validation_name_is_none_fails(self) -> None:
+        self.entry_point.entry_point_name = None # type: ignore[assignment]
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+            utils.ValidationError,
+            'No entry point name supplied.'):
+            self.entry_point.validate()
+
+    def test_validation_name_not_a_string_fails(self) -> None:
+        self.entry_point.entry_point_name = 123 # type: ignore[assignment]
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+            utils.ValidationError,
+            'Entry point name must be a string,'):
+            self.entry_point.validate()
+
+    def test_validation_name_is_invalid_fails(self) -> None:
+        self.entry_point.entry_point_name = 'invalid_entry_point_name'
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+            utils.ValidationError,
+            'Expected entry point name %s' % (
+                constants.ENTRY_POINT.navigation_drawer.name)):
+            self.entry_point.validate()
+
 
 class LessonPlayerEntryPointDomainTests(test_utils.GenericTestBase):
 
@@ -741,6 +796,25 @@ class LessonPlayerEntryPointDomainTests(test_utils.GenericTestBase):
         }
         self.assertDictEqual(
             expected_dict, self.entry_point.to_dict())
+
+    def test_validation_name_is_none_fails(self) -> None:
+        self.entry_point.entry_point_name = None # type: ignore[assignment]
+        self._assert_validation_error(
+            self.entry_point,
+            'No entry point name supplied.')
+
+    def test_validation_name_not_a_string_fails(self) -> None:
+        self.entry_point.entry_point_name = 123 # type: ignore[assignment]
+        self._assert_validation_error(
+            self.entry_point,
+            'Entry point name must be a string,')
+
+    def test_validation_name_is_invalid_fails(self) -> None:
+        self.entry_point.entry_point_name = 'invalid_entry_point_name'
+        self._assert_validation_error(
+            self.entry_point,
+            'Expected entry point name %s' % (
+                constants.ENTRY_POINT.lesson_player.name))
 
     def test_validation_invalid_topic_id_fails(self) -> None:
         self.entry_point.topic_id = 'invalid_topic_id'
@@ -807,6 +881,25 @@ class RevisionCardEntryPointDomainTests(test_utils.GenericTestBase):
         self.assertDictEqual(
             expected_dict, self.entry_point.to_dict())
 
+    def test_validation_name_is_none_fails(self) -> None:
+        self.entry_point.entry_point_name = None # type: ignore[assignment]
+        self._assert_validation_error(
+            self.entry_point,
+            'No entry point name supplied.')
+
+    def test_validation_name_not_a_string_fails(self) -> None:
+        self.entry_point.entry_point_name = 123 # type: ignore[assignment]
+        self._assert_validation_error(
+            self.entry_point,
+            'Entry point name must be a string,')
+
+    def test_validation_name_is_invalid_fails(self) -> None:
+        self.entry_point.entry_point_name = 'invalid_entry_point_name'
+        self._assert_validation_error(
+            self.entry_point,
+            'Expected entry point name %s' % (
+                constants.ENTRY_POINT.revision_card.name))
+
     def test_validation_invalid_topic_id_fails(self) -> None:
         self.entry_point.topic_id = 'invalid_topic_id'
         self._assert_validation_error(
@@ -851,6 +944,28 @@ class CrashEntryPointDomainTests(test_utils.GenericTestBase):
         }
         self.assertDictEqual(
             expected_dict, self.entry_point.to_dict())
+
+    def test_validation_name_is_none_fails(self) -> None:
+        self.entry_point.entry_point_name = None # type: ignore[assignment]
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+            utils.ValidationError,
+            'No entry point name supplied.'):
+            self.entry_point.validate()
+
+    def test_validation_name_not_a_string_fails(self) -> None:
+        self.entry_point.entry_point_name = 123 # type: ignore[assignment]
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+            utils.ValidationError,
+            'Entry point name must be a string,'):
+            self.entry_point.validate()
+
+    def test_validation_name_is_invalid_fails(self) -> None:
+        self.entry_point.entry_point_name = 'invalid_entry_point_name'
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+            utils.ValidationError,
+            'Expected entry point name %s' % (
+                constants.ENTRY_POINT.crash.name)):
+            self.entry_point.validate()
 
 
 class AppContextDomainTests(test_utils.GenericTestBase):
@@ -1374,6 +1489,14 @@ class AppFeedbackReportFilterDomainTests(test_utils.GenericTestBase):
         }
         self.assertDictEqual(
             expected_dict, self.filter.to_dict())
+
+    def test_validation_with_invalid_filter_field_fails(self) -> None:
+        class InvalidFieldName(enum.Enum):
+            INVALID_FILTER_FIELD = 'invalid_filter_field'
+        self.filter.filter_field = InvalidFieldName.INVALID_FILTER_FIELD # type: ignore[assignment]
+        self._assert_validation_error(
+            self.filter,
+            'The filter field should be one of ')
 
     def test_validation_filter_values_list_is_none_fails(self) -> None:
         self.filter.filter_options = None # type: ignore[assignment]

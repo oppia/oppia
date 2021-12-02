@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import datetime
+import enum
 import types
 
 from core import feconf
@@ -286,6 +287,22 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
 
         self.assertTrue(model_class.has_reference_to_user_id('scrubber_user'))
         self.assertFalse(model_class.has_reference_to_user_id('id_x'))
+
+    def test_get_filter_options_with_invalid_field_throws_exception(
+            self) -> None:
+        model_class = app_feedback_report_models.AppFeedbackReportModel
+        class InvalidFilter(enum.Enum):
+            INVALID_FIELD = 'invalid_field'
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+            utils.InvalidInputException,
+            'The field %s is not a valid field to filter reports on' % (
+                InvalidFilter.INVALID_FIELD.name)
+        ):
+            with self.swap(
+                model_class, 'query',
+                self._mock_query_filters_returns_empy_list):
+                model_class.get_filter_options_for_field(
+                    InvalidFilter.INVALID_FIELD) # type: ignore[arg-type]
 
     def _mock_query_filters_returns_empy_list(
             self, projection: bool, distinct: bool) -> List[Any]: # pylint: disable=unused-argument
