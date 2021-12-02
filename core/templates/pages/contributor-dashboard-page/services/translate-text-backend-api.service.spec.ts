@@ -106,13 +106,13 @@ describe('TranslateTextBackendApiService', () => {
       failHandler = jasmine.createSpy('error');
       imagesData = [{
         filename: 'imageFilename',
-        imageBlob: new Blob(['image data'], {type: 'imagetype'})
+        imageBlob: new Blob(['imageBlob'], {type: 'imagetype'})
       }];
     });
 
     it('should correctly submit a translation suggestion', fakeAsync(() => {
       spyOn(translateTextBackendApiService, 'blobtoBase64').and.returnValue(
-        Promise.resolve('image data'));
+        Promise.resolve('imageBlob'));
       const expectedPayload = {
         suggestion_type: 'translate_content',
         target_type: 'exploration',
@@ -129,7 +129,7 @@ describe('TranslateTextBackendApiService', () => {
           data_format: 'html'
         },
         files: {
-          imageFilename: 'image data'
+          imageFilename: 'imageBlob'
         }
       };
 
@@ -157,7 +157,7 @@ describe('TranslateTextBackendApiService', () => {
 
     it('should append image data to form data', fakeAsync(() => {
       spyOn(translateTextBackendApiService, 'blobtoBase64').and.returnValue(
-        Promise.resolve('image data'));
+        Promise.resolve('imageBlob'));
       translateTextBackendApiService.suggestTranslatedTextAsync(
         'activeExpId',
         'activeExpVersion',
@@ -174,19 +174,78 @@ describe('TranslateTextBackendApiService', () => {
       const files = JSON.parse(req.request.body.getAll('payload')[0]).files;
       const images = Object.values(files);
       expect(req.request.method).toEqual('POST');
-      expect(images).toContain('image data');
+      expect(images).toContain('imageBlob');
+      req.flush({});
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+    }));
+    it('should handle multiple image blobs per filename', fakeAsync(() => {
+      imagesData = [{
+        filename: 'imageFilename1',
+        imageBlob: {
+          size: 0,
+          type: 'imageBlob1'
+        } as Blob
+      }, {
+        filename: 'imageFilename1',
+        imageBlob: {
+          size: 0,
+          type: 'imageBlob2'
+        } as Blob
+      }, {
+        filename: 'imageFilename2',
+        imageBlob: {
+          size: 0,
+          type: 'imageBlob1'
+        } as Blob
+      }, {
+        filename: 'imageFilename2',
+        imageBlob: {
+          size: 0,
+          type: 'imageBlob2'
+        } as Blob
+      }];
+      spyOn(translateTextBackendApiService, 'blobtoBase64').and.returnValue(
+        Promise.resolve(['imageBlob1', 'imageBlob2'])
+      );
+      translateTextBackendApiService.suggestTranslatedTextAsync(
+        'activeExpId',
+        'activeExpVersion',
+        'activeContentId',
+        'activeStateName',
+        'languageCode',
+        'contentHtml',
+        'translationHtml',
+        imagesData,
+        'html').then(successHandler, failHandler);
+      flushMicrotasks();
+      const req = httpTestingController.expectOne(
+        '/suggestionhandler/');
+      expect(req.request.method).toEqual('POST');
+      const files = JSON.parse(req.request.body.getAll('payload')[0]).files;
+      const filename1Blobs = files.imageFilename1[0];
+      const filename2Blobs = files.imageFilename2[0];
+      const filename3Blobs = files.imageFilename1[1];
+      const filename4Blobs = files.imageFilename2[1];
+      expect(filename1Blobs).toContain('imageBlob1');
+      expect(filename2Blobs).toContain('imageBlob1');
+      expect(filename3Blobs).toContain('imageBlob2');
+      expect(filename4Blobs).toContain('imageBlob2');
       req.flush({});
       flushMicrotasks();
 
       expect(successHandler).toHaveBeenCalled();
     }));
 
+
     it('should call the failhandler on error response', fakeAsync(() => {
       const errorEvent = new ErrorEvent('error');
       failHandler = (error: HttpErrorResponse) => {
         expect(error.error).toBe(errorEvent);
       };
-
+      spyOn(translateTextBackendApiService, 'blobtoBase64').and.returnValue(
+        Promise.resolve('imageBlob'));
       translateTextBackendApiService.suggestTranslatedTextAsync(
         'activeExpId',
         'activeExpVersion',
