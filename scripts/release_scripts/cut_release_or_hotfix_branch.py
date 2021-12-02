@@ -45,6 +45,7 @@ import subprocess
 
 from core import constants
 from core import python_utils
+from core import utils
 from scripts import common
 
 
@@ -132,7 +133,7 @@ def verify_target_version_compatible_with_latest_release(
             minor version plus one.
         AssertionError. The current patch version is different than 0.
     """
-    response = python_utils.url_open(
+    response = utils.url_open(
         'https://api.github.com/repos/oppia/oppia/releases/latest')
     if response.getcode() != 200:
         raise Exception(

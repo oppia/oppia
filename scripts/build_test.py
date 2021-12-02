@@ -21,6 +21,7 @@ from __future__ import annotations
 import ast
 import collections
 import contextlib
+import io
 import os
 import random
 import re
@@ -102,8 +103,7 @@ class BuildTests(test_utils.GenericTestBase):
         """Determine third_party.js contains the content of the first 10 JS
         files in /third_party/static.
         """
-        # Prepare a file_stream object from python_utils.string_io().
-        third_party_js_stream = python_utils.string_io()
+        third_party_js_stream = io.StringIO()
         # Get all filepaths from dependencies.json.
         dependency_filepaths = build.get_dependencies_filepaths()
         # Join and write all JS files in /third_party/static to file_stream.
@@ -243,8 +243,7 @@ class BuildTests(test_utils.GenericTestBase):
             os.path.join(MOCK_TEMPLATES_DEV_DIR, 'base.html'))
 
         build._ensure_files_exist([base_html_source_path])  # pylint: disable=protected-access
-        # Prepare a file_stream object from python_utils.string_io().
-        minified_html_file_stream = python_utils.string_io()
+        minified_html_file_stream = io.StringIO()
 
         # Assert that base.html has white spaces and has original filepaths.
         with python_utils.open_file(

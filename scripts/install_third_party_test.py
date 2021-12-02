@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import io
 import os
 import re
 import subprocess
@@ -27,6 +28,7 @@ import urllib.request as urlrequest
 import zipfile
 
 from core import python_utils
+from core import utils
 from core.tests import test_utils
 
 from . import common
@@ -151,8 +153,8 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             return MOCK_TMP_UNZIP_PATH
 
         exists_swap = self.swap(os.path, 'exists', mock_exists)
-        url_open_swap = self.swap(python_utils, 'url_open', mock_url_open)
-        string_io_swap = self.swap(python_utils, 'string_io', mock_string_io)
+        url_open_swap = self.swap(utils, 'url_open', mock_url_open)
+        string_io_swap = self.swap(io, 'StringIO', mock_string_io)
         with exists_swap, self.dir_exists_swap, self.url_retrieve_swap:
             with self.remove_swap, self.rename_swap, self.extract_swap:
                 with url_open_swap, string_io_swap:

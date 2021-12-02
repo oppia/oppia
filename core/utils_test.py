@@ -750,3 +750,9 @@ class UtilsTests(test_utils.GenericTestBase):
 
     def test_quoted_string(self) -> None:
         self.assertEqual(utils.quoted('a"b\'c'), '"a\\"b\'c"')
+
+    def test_url_open(self) -> None:
+        response = utils.url_open('http://www.google.com')
+        self.assertEqual(response.getcode(), 200) # type: ignore[attr-defined]
+        self.assertEqual(
+            response.url, 'http://www.google.com') # type: ignore[attr-defined]

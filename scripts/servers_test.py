@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import collections
 import contextlib
+import io
 import logging
 import os
 import re
@@ -29,7 +30,7 @@ import threading
 import time
 from unittest import mock
 
-from core import python_utils
+from core import utils
 from core.tests import test_utils
 from scripts import common
 from scripts import scripts_test_utils
@@ -694,7 +695,7 @@ class ManagedProcessTests(test_utils.TestBase):
     def test_managed_webpack_compiler_in_watch_mode_when_build_succeeds(self):
         popen_calls = self.exit_stack.enter_context(self.swap_popen(
             outputs=[b'abc', b'Built at: 123', b'def']))
-        str_io = python_utils.string_io()
+        str_io = io.StringIO()
         self.exit_stack.enter_context(contextlib.redirect_stdout(str_io))
         logs = self.exit_stack.enter_context(self.capture_logging())
 
@@ -718,7 +719,7 @@ class ManagedProcessTests(test_utils.TestBase):
     def test_managed_webpack_compiler_in_watch_mode_raises_when_not_built(self):
         # NOTE: The 'Built at: ' message is never printed.
         self.exit_stack.enter_context(self.swap_popen(outputs=[b'abc', b'def']))
-        str_io = python_utils.string_io()
+        str_io = io.StringIO()
         self.exit_stack.enter_context(contextlib.redirect_stdout(str_io))
 
         self.assertRaisesRegexp(
@@ -856,7 +857,7 @@ class ManagedProcessTests(test_utils.TestBase):
                 ),
             ]))
         self.exit_stack.enter_context(self.swap_with_checks(
-            python_utils,
+            utils,
             'url_open',
             lambda _: mock.Mock(read=lambda: b'4.5.6'),
             expected_args=[
@@ -888,7 +889,7 @@ class ManagedProcessTests(test_utils.TestBase):
                 (['google-chrome', '--version'],),
             ]))
         self.exit_stack.enter_context(self.swap_with_checks(
-            python_utils, 'url_open',
+            utils, 'url_open',
             lambda _: mock.Mock(read=lambda: b'1.2.3'),
             expected_args=[
                 (
@@ -931,7 +932,7 @@ class ManagedProcessTests(test_utils.TestBase):
         self.exit_stack.enter_context(self.swap_to_always_return(
             subprocess, 'check_output', value=b'1.2.3.45'))
         self.exit_stack.enter_context(self.swap_to_always_return(
-            python_utils, 'url_open', value=mock.Mock(read=lambda: b'1.2.3')))
+            utils, 'url_open', value=mock.Mock(read=lambda: b'1.2.3')))
         self.exit_stack.enter_context(self.swap_to_always_return(
             common, 'is_x64_architecture', value=True))
         self.exit_stack.enter_context(self.swap_with_checks(

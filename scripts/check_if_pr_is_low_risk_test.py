@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 from core import python_utils
+from core import utils
 from core.tests import test_utils
 from scripts import check_if_pr_is_low_risk
 from scripts import common
@@ -281,7 +282,7 @@ class LookupPrTests(test_utils.GenericTestBase):
             return MockResponse(data=data)
 
         url_open_swap = self.swap(
-            python_utils, 'url_open', mock_url_open)
+            utils, 'url_open', mock_url_open)
 
         with url_open_swap:
             pr = check_if_pr_is_low_risk.lookup_pr(
@@ -299,7 +300,7 @@ class LookupPrTests(test_utils.GenericTestBase):
             return MockResponse(code=404)
 
         url_open_swap = self.swap(
-            python_utils, 'url_open', mock_url_open)
+            utils, 'url_open', mock_url_open)
 
         with url_open_swap:
             pr = check_if_pr_is_low_risk.lookup_pr(
