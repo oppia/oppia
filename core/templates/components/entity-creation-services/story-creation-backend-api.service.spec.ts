@@ -20,7 +20,6 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { HttpClientTestingModule, HttpTestingController }
   from '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
-import { CsrfTokenService } from 'services/csrf-token.service';
 import { ImageData } from 'domain/skill/skill-creation-backend-api.service';
 import { NewlyCreatedStory } from 'domain/topic/newly-created-story.model';
 import { StoryCreationBackendApiService } from './story-creation-backend-api.service';
