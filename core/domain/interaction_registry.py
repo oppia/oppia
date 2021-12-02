@@ -181,3 +181,6 @@ class Registry:
                     state_schema_version]
             else:
                 return cls.get_all_specs()
+
+        return cls._state_schema_version_to_interaction_specs[
+            state_schema_version]

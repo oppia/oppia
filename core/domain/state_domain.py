@@ -828,13 +828,17 @@ class InteractionInstance:
         return html_list
 
     @staticmethod
-    def convert_html_in_interaction(interaction_dict, ca_specs, conversion_fn):
+    def convert_html_in_interaction(
+        interaction_dict,
+        ca_specs_dict,
+        conversion_fn
+    ):
         """Checks for HTML fields in the interaction and converts it
         according to the conversion function.
 
         Args:
             interaction_dict: dict. The interaction dict.
-            ca_specs: dict. The customization args dict.
+            ca_specs_dict: dict. The customization args dict.
             conversion_fn: function. The function to be used for converting the
                 HTML.
 
@@ -873,7 +877,7 @@ class InteractionInstance:
                 interaction_dict['customization_args'])
         )
 
-        for ca_spec in ca_specs:
+        for ca_spec in ca_specs_dict:
             ca_spec_name = ca_spec['name']
             customization_args[ca_spec_name].value = (
                 InteractionCustomizationArg.traverse_by_schema_and_convert(
@@ -3479,16 +3483,16 @@ class State:
                                     'choices']['value']
                         ])
         else:
-            ca_specs = (
+            ca_specs_dict = (
                 interaction_registry.Registry
                 .get_all_specs_for_state_schema_version_or_latest(
                     state_schema_version
-                )[interaction_id]['customization_args']
+                )[interaction_id]['customization_arg_specs']
             )
             state_dict['interaction'] = (
                 InteractionInstance.convert_html_in_interaction(
                     state_dict['interaction'],
-                    ca_specs,
+                    ca_specs_dict,
                     conversion_fn
                 ))
 
