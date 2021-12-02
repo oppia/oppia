@@ -698,7 +698,7 @@ class AndroidDeviceSystemContextTests(test_utils.GenericTestBase):
     def test_validation_invalid_network_type_fails(self) -> None:
         self.device_system_context.network_type = 'invaid_network_type' # type: ignore[assignment]
         self._assert_validation_error(
-            self.device_system_context, 'Invalid network type,')        
+            self.device_system_context, 'Invalid network type,')      
 
     def _assert_validation_error(
             self,
@@ -1492,6 +1492,8 @@ class AppFeedbackReportFilterDomainTests(test_utils.GenericTestBase):
 
     def test_validation_with_invalid_filter_field_fails(self) -> None:
         class InvalidFieldName(enum.Enum):
+            """Invalid field name."""
+
             INVALID_FILTER_FIELD = 'invalid_filter_field'
         self.filter.filter_field = InvalidFieldName.INVALID_FILTER_FIELD # type: ignore[assignment]
         self._assert_validation_error(
