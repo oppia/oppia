@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit test for TopicCreationBackendApiService.
+ * @fileoverview Unit test for StoryCreationBackendApiService.
  */
 
 import { HttpErrorResponse } from '@angular/common/http';

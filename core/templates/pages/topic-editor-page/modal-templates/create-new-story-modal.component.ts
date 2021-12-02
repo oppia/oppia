@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for create new story modal.
+ * @fileoverview Component for create new story modal.
  */
 
 import { NewlyCreatedStory } from 'domain/topic/newly-created-story.model';

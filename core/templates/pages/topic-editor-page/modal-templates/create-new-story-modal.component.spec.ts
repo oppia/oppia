@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for CreateNewStoryModalController.
+ * @fileoverview Unit tests for CreateNewStoryModalComponent.
  */
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
