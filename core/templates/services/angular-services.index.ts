@@ -389,7 +389,6 @@ import { HistoryTabBackendApiService } from 'pages/exploration-editor-page/servi
 import { StoryCreationService } from 'components/entity-creation-services/story-creation.service';
 import { StoryCreationBackendApiService } from 'components/entity-creation-services/story-creation-backend-api.service';
 
-
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
   ['AdminBackendApiService', AdminBackendApiService],

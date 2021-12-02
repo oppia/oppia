@@ -27,7 +27,7 @@ import { StoryCreationBackendApiService } from './story-creation-backend-api.ser
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 
 class MockUrlInterpolationService {
-  interpolateUrl() {
+  interpolateUrl(): string {
     return '/story_editor_handler/create_new';
   }
 }
@@ -59,9 +59,9 @@ describe('Story creation backend api service', () => {
       ]
     });
 
-    csrfService = TestBed.get(CsrfTokenService);
-    httpTestingController = TestBed.get(HttpTestingController);
-    storyCreationBackendApiService = TestBed.get(
+    csrfService = TestBed.inject(CsrfTokenService);
+    httpTestingController = TestBed.inject(HttpTestingController);
+    storyCreationBackendApiService = TestBed.inject(
       StoryCreationBackendApiService);
     story = NewlyCreatedStory.createDefault();
     story.title = 'story-title';
@@ -73,17 +73,6 @@ describe('Story creation backend api service', () => {
       filename: 'image.svg',
       imageBlob: imageBlob
     }];
-
-    // This throws "Argument of type '() -> Promise<unknown>'
-    // is not assignable to parameter of type 'PromiseLike<string>'.".
-    // We need to suppress this error because we need to mock the
-    // `getTokenAsync` function for testing purposes.
-    // @ts-expect-error
-    spyOn(csrfService, 'getTokenAsync').and.returnValue(async() => {
-      return new Promise((resolve) => {
-        resolve('sample-csrf-token');
-      });
-    });
   });
 
   afterEach(()=> {
