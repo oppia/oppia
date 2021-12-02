@@ -116,7 +116,6 @@
 /core/domain/collection*.py @aks681
 /core/templates/components/entity-creation-services/collection-creation.service*.ts @EricZLou
 /core/templates/components/entity-creation-services/collection-creation-backend-api.service*.ts @EricZLou
-/core/templates/components/entity-creation-services/story-creation-backend-api.service*.ts @EricZLou
 /core/templates/domain/collection/ @EricZLou
 /core/templates/pages/collection-editor-page/ @EricZLou
 /core/templates/pages/collection-player-page/ @EricZLou
@@ -437,7 +436,7 @@
 # Story project.
 /core/controllers/story*.py @aks681
 /core/domain/story*.py @aks681
-/core/templates/components/entity-creation-services/story-creation.service*.ts @EricZLou
+/core/templates/components/entity-creation-services/story-creation-backend-api.service*.ts @EricZLou
 /core/templates/domain/story/ @kevintab95
 /core/templates/domain/story_viewer/ @kevintab95
 /core/templates/pages/story-editor-page/ @EricZLou

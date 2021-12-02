@@ -42,7 +42,6 @@ export class StoryCreationService {
     private loaderService: LoaderService,
     private storyCreationBackendApiService: StoryCreationBackendApiService,
     private urlInterpolationService: UrlInterpolationService
-
   ) {}
 
   createNewCanonicalStory(): void {
