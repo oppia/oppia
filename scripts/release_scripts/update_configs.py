@@ -30,6 +30,7 @@ import re
 import sys
 
 from core import python_utils
+from core import utils
 from .. import common
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
@@ -277,7 +278,7 @@ def main(args=None):
 
     if options.prompt_for_mailgun_and_terms_update:
         try:
-            python_utils.url_open(TERMS_PAGE_FOLDER_URL)
+            utils.url_open(TERMS_PAGE_FOLDER_URL)
         except Exception:
             raise Exception('Terms mainpage does not exist on Github.')
         add_mailgun_api_key(release_feconf_path)
