@@ -29,11 +29,11 @@ from core.domain import platform_parameter_registry as registry
 from core.tests import test_utils
 
 
-class PARAM_NAMES(enum.Enum):  # pylint: disable=invalid-name
+class ParamNames(enum.Enum):  # pylint: disable=invalid-name
     """Enum for parameter names."""
 
-    feature_a = 'feature_a' # pylint: disable=invalid-name
-    feature_b = 'feature_b' # pylint: disable=invalid-name
+    FEATURE_A = 'feature_a' # pylint: disable=invalid-name
+    FEATURE_B = 'feature_b' # pylint: disable=invalid-name
 
 
 SERVER_MODES = platform_parameter_domain.SERVER_MODES # pylint: disable=invalid-name
@@ -52,16 +52,16 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         registry.Registry.parameter_registry.clear()
         # Parameter names that might be used in following tests.
         param_names = ['feature_a', 'feature_b']
-        param_name_enums = [PARAM_NAMES.feature_a, PARAM_NAMES.feature_b]
+        param_name_enums = [ParamNames.FEATURE_A, ParamNames.FEATURE_B]
         caching_services.delete_multi(
             caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER, None,
             param_names)
 
         self.dev_feature = registry.Registry.create_feature_flag(
-            PARAM_NAMES.feature_a, 'a feature in dev stage',
+            ParamNames.FEATURE_A, 'a feature in dev stage',
             platform_parameter_domain.FEATURE_STAGES.dev)
         self.prod_feature = registry.Registry.create_feature_flag(
-            PARAM_NAMES.feature_b, 'a feature in prod stage',
+            ParamNames.FEATURE_B, 'a feature in prod stage',
             platform_parameter_domain.FEATURE_STAGES.prod)
         registry.Registry.update_platform_parameter(
             self.dev_feature.name, self.user_id, 'edit rules',
