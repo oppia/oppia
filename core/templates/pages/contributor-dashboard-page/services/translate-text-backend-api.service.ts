@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// eslint-disable-next-line oppia/no-multiline-disable
+/* eslint-disable camelcase */
 /**
  * @fileoverview Service for handling user contributed translations.
  */
@@ -21,6 +23,15 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { TranslatableTexts, TranslatableTextsBackendDict } from 'domain/opportunity/translatable-texts.model';
 import { ImagesData } from 'services/image-local-storage.service';
 
+interface Data {
+  suggestion_type: string;
+  target_type: string;
+  description: string;
+  target_id: string;
+  target_version_at_submission: string;
+  change: object;
+  files?: Record<string, unknown>;
+}
 @Injectable({
   providedIn: 'root'
 })
@@ -39,8 +50,8 @@ export class TranslateTextBackendApiService {
       return TranslatableTexts.createFromBackendDict(backendDict);
     });
   }
-  async blobtoBase64(blob: Blob): Promise<string> {
-    return new Promise<string> ((resolve, reject)=> {
+  async blobtoBase64(blob: Blob): Promise<unknown> {
+    return new Promise<unknown> ((resolve, reject)=> {
       const reader = new FileReader();
       reader.onloadend = () => {
         // Read the Base64 data from restult.
@@ -59,7 +70,7 @@ export class TranslateTextBackendApiService {
       languageCode: string, contentHtml: string | string[],
       translationHtml: string | string[], imagesData: ImagesData[],
       dataFormat: string): Promise<unknown> {
-    const postData: Record<string, unknown> = {
+    const postData: Data = {
       suggestion_type: 'translate_content',
       target_type: 'exploration',
       description: 'Adds translation',
