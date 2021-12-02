@@ -405,23 +405,3 @@ def yaml_from_dict(dictionary, width=80):
     """
     dictionary = _recursively_convert_to_str(dictionary)
     return yaml.safe_dump(dictionary, default_flow_style=False, width=width)
-
-
-def zip_longest(*args, **kwargs):
-    """Creates an iterator that aggregates elements from each of the iterables.
-    If the iterables are of uneven length, missing values are
-    filled-in with fillvalue.
-
-    Args:
-        *args: list(*). Iterables that needs to be aggregated into an iterable.
-        **kwargs: dict. It contains fillvalue.
-
-    Returns:
-        iterable(iterable). A sequence of aggregates elements
-        from each of the iterables.
-    """
-    fillvalue = kwargs.get('fillvalue')
-    try:
-        return itertools.zip_longest(*args, fillvalue=fillvalue)
-    except AttributeError:
-        return itertools.izip_longest(*args, fillvalue=fillvalue)
