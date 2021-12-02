@@ -28,7 +28,7 @@ from core.constants import constants
 from core.platform import models
 import core.storage.base_model.gae_models as base_models
 
-from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, cast
+from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -299,6 +299,12 @@ class CollectionModel(base_models.VersionedModel):
                 reconstruct the commit. Each dict always contains:
                     cmd: str. Unique command.
                 and then additional arguments for that command.
+            additional_models: dict(str, BaseModel). Additional models that are
+                needed for the commit process.
+
+        Returns:
+            ModelsToPutDict. A dict of models that should be put into
+            the datastore.
         """
         models_to_put = super().compute_models_to_commit(
             committer_id,
@@ -639,6 +645,12 @@ class CollectionRightsModel(base_models.VersionedModel):
                 reconstruct the commit. Each dict always contains:
                     cmd: str. Unique command.
                 and then additional arguments for that command.
+            additional_models: dict(str, BaseModel). Additional models that are
+                needed for the commit process.
+
+        Returns:
+            ModelsToPutDict. A dict of models that should be put into
+            the datastore.
         """
         models_to_put = super().compute_models_to_commit(
             committer_id,

@@ -197,6 +197,12 @@ class TopicModel(base_models.VersionedModel):
                 reconstruct the commit. Each dict always contains:
                     cmd: str. Unique command.
                 and then additional arguments for that command.
+            additional_models: dict(str, BaseModel). Additional models that are
+                needed for the commit process.
+
+        Returns:
+            ModelsToPutDict. A dict of models that should be put into
+            the datastore.
         """
         models_to_put = super().compute_models_to_commit(
             committer_id,
@@ -516,6 +522,12 @@ class TopicRightsModel(base_models.VersionedModel):
                 reconstruct the commit. Each dict always contains:
                     cmd: str. Unique command.
                 and then additional arguments for that command.
+            additional_models: dict(str, BaseModel). Additional models that are
+                needed for the commit process.
+
+        Returns:
+            ModelsToPutDict. A dict of models that should be put into
+            the datastore.
         """
         models_to_put = super().compute_models_to_commit(
             committer_id,
@@ -565,7 +577,6 @@ class TopicRightsModel(base_models.VersionedModel):
             'commit_log_model': topic_commit_log,
             'versioned_model': models_to_put['versioned_model'],
         }
-
 
     @staticmethod
     def get_model_association_to_user(

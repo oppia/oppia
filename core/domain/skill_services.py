@@ -728,7 +728,15 @@ def apply_change_list(skill_id, change_list, committer_id):
 
 
 def populate_skill_model_with_skill(skill_model, skill):
-    """TODO"""
+    """Populate skill model with the data from skill object.
+
+    Args:
+        skill_model: SkillModel. The model to populate.
+        skill: Skill. The object from which is the model populated.
+
+    Returns:
+        SkillModel. Populated model.
+    """
     skill_model.description = skill.description
     skill_model.language_code = skill.language_code
     skill_model.superseding_skill_id = skill.superseding_skill_id
@@ -917,7 +925,16 @@ def create_skill_summary(skill_id):
 def populate_skill_summary_model_with_skill_summary(
     skill_summary_model, skill_summary
 ):
-    """TODO"""
+    """Populate skill summary model with the data from skill summary object.
+
+    Args:
+        skill_summary_model: SkillSummaryModel. The model to populate.
+        skill_summary: SkillSummary. The object from which is the model
+            populated.
+
+    Returns:
+        SkillSummaryModel. Populated model.
+    """
     skill_summary_dict = {
         'description': skill_summary.description,
         'language_code': skill_summary.language_code,

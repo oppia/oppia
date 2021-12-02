@@ -16,12 +16,9 @@
 
 """Jobs that are run by CRON scheduler."""
 
-from __future__ import absolute_import
 from __future__ import annotations
-from __future__ import unicode_literals
 
 import logging
-import traceback
 
 from core import feconf
 from core.domain import caching_services
@@ -42,22 +39,32 @@ from typing import Iterable, Sequence, Tuple
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import base_models
-    from mypy_imports import skill_models
     from mypy_imports import datastore_services
+    from mypy_imports import skill_models
 
 (base_models, skill_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.skill
 ])
-
 datastore_services = models.Registry.import_datastore_services()
 
+
 class MigrateSkillJob(base_jobs.JobBase):
-    """"""
+    """Job that migrates skill models."""
 
     @staticmethod
     def _migrate_skill(
         skill_id: str, skill_model: skill_models.SkillModel
     ) -> result.Result[skill_domain.Skill, Exception]:
+        """Migrates skill and transform skill model into skill object.
+
+        Args:
+            skill_id: str. The id of the skill.
+            skill_model: SkillModel. The skill model to migrate.
+
+        Returns:
+            Result(Skill,Exception). Skill object when the migration
+            was successful or Exception when the migration failed.
+        """
         try:
             skill = skill_fetchers.get_skill_from_model(skill_model)
             skill.validate()
@@ -71,8 +78,19 @@ class MigrateSkillJob(base_jobs.JobBase):
     def _generate_skill_changes(
         skill_id: str, skill_model: skill_models.SkillModel
     ) -> Iterable[Tuple[str, skill_domain.SkillChange]]:
+        """Generates skill change objects. Skill change object is generated when
+        schema version for some field is lower than the latest schema version.
+
+        Args:
+            skill_id: str. The id of the skill.
+            skill_model: SkillModel. The skill for which generate
+                the change objects.
+
+        Yields:
+            (str,SkillChange). Iterable of skill change objects.
+        """
         contents_version = skill_model.skill_contents_schema_version
-        if contents_version <= feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION:
+        if contents_version < feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION:
             skill_change = skill_domain.SkillChange({
                 'cmd': (
                     skill_domain.CMD_MIGRATE_CONTENTS_SCHEMA_TO_LATEST_VERSION),
@@ -82,17 +100,19 @@ class MigrateSkillJob(base_jobs.JobBase):
             yield (skill_id, skill_change)
 
         misconceptions_version = skill_model.misconceptions_schema_version
-        if misconceptions_version <= feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION:  # pylint: disable=line-too-long
+        if misconceptions_version < feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION:  # pylint: disable=line-too-long
             skill_change = skill_domain.SkillChange({
-                'cmd': skill_domain.CMD_MIGRATE_MISCONCEPTIONS_SCHEMA_TO_LATEST_VERSION,
-                # pylint: disable=line-too-long
+                'cmd': (
+                    skill_domain
+                    .CMD_MIGRATE_MISCONCEPTIONS_SCHEMA_TO_LATEST_VERSION
+                ),
                 'from_version': skill_model.misconceptions_schema_version,
                 'to_version': feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION
             })
             yield (skill_id, skill_change)
 
         rubric_schema_version = skill_model.rubric_schema_version
-        if rubric_schema_version <= feconf.CURRENT_RUBRIC_SCHEMA_VERSION:
+        if rubric_schema_version < feconf.CURRENT_RUBRIC_SCHEMA_VERSION:
             skill_change = skill_domain.SkillChange({
                 'cmd': (
                     skill_domain.CMD_MIGRATE_RUBRICS_SCHEMA_TO_LATEST_VERSION),
@@ -105,6 +125,15 @@ class MigrateSkillJob(base_jobs.JobBase):
     def _delete_skill_from_cache(
         skill: skill_domain.Skill
     ) -> result.Result[str, Exception]:
+        """Deletes skill from cache.
+
+        Args:
+            skill: Skill. The skill which should be deleted from cache.
+
+        Returns:
+            Result(str,Exception). The id of the skill when the deletion
+            was successful or Exception when the deletion failed.
+        """
         try:
             caching_services.delete_multi(
                 caching_services.CACHE_NAMESPACE_SKILL, None, [skill.id])
@@ -115,11 +144,23 @@ class MigrateSkillJob(base_jobs.JobBase):
     @staticmethod
     def _update_skill(
         skill_model: skill_models.SkillModel,
-        skill: skill_domain.Skill,
+        migrated_skill: skill_domain.Skill,
         skill_changes: Sequence[skill_domain.SkillChange]
     ) -> Sequence[base_models.BaseModel]:
+        """Generates newly updated skill models.
+
+        Args:
+            skill_model: SkillModel. The skill which should be updated.
+            migrated_skill: Skill. The migrated skill domain object.
+            skill_changes: sequence(SkillChange). The skill changes to apply.
+
+        Returns:
+            sequence(BaseModel). Sequence of models which should be put into
+            the datastore.
+        """
         updated_skill_model = (
-            skill_services.populate_skill_model_with_skill(skill_model, skill))
+            skill_services.populate_skill_model_with_skill(
+                skill_model, migrated_skill))
         commit_message = (
             'Update skill content schema version to %d and '
             'skill misconceptions schema version to %d and '
@@ -142,10 +183,22 @@ class MigrateSkillJob(base_jobs.JobBase):
 
     @staticmethod
     def _update_skill_summary(
-        skill: skill_domain.Skill,
+        migrated_skill: skill_domain.Skill,
         skill_summary_model: skill_models.SkillSummaryModel
-    ):
-        skill_summary = skill_services.compute_summary_of_skill(skill)
+    ) -> skill_models.SkillSummaryModel:
+        """Generates newly updated skill summary model.
+
+        Args:
+            migrated_skill: Skill. The migrated skill domain object.
+            skill_summary_model: SkillSummaryModel. The skill summary model
+                to update.
+
+        Returns:
+            SkillSummaryModel. The updated skill summary model to put into
+            the datastore.
+        """
+        skill_summary = skill_services.compute_summary_of_skill(migrated_skill)
+        skill_summary.version += 1
         updated_skill_summary_model = (
             skill_services.populate_skill_summary_model_with_skill_summary(
                 skill_summary_model, skill_summary
@@ -154,20 +207,27 @@ class MigrateSkillJob(base_jobs.JobBase):
         return updated_skill_summary_model
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        """"""
+        """Returns a PCollection of results from the skill migration.
 
+        Returns:
+            PCollection. A PCollection of results from the skill migration.
+        """
         unmigrated_skill_models = (
             self.pipeline
             | 'Get all non-deleted skill models' >> (
                 ndb_io.GetModels(skill_models.SkillModel.get_all()))
-            | 'Add skill model ID' >> beam.WithKeys(
+            # Pylint disable is needed because pylint is not able to correctly
+            # detect that the value is passed through the pipe.
+            | 'Add skill model ID' >> beam.WithKeys( # pylint: disable=no-value-for-parameter
                 lambda skill_model: skill_model.id)
         )
         skill_summary_models = (
             self.pipeline
             | 'Get all non-deleted skill summary models' >> (
                 ndb_io.GetModels(skill_models.SkillSummaryModel.get_all()))
-            | 'Add skill summary ID' >> beam.WithKeys(
+            # Pylint disable is needed because pylint is not able to correctly
+            # detect that the value is passed through the pipe.
+            | 'Add skill summary ID' >> beam.WithKeys( # pylint: disable=no-value-for-parameter
                 lambda skill_summary_model: skill_summary_model.id)
         )
 
@@ -223,8 +283,9 @@ class MigrateSkillJob(base_jobs.JobBase):
 
         cache_deletion_job_run_results = (
             skill_objects_list
-            | 'Delete skills from cache' >> beam.Map(lambda skill_object:
-                self._delete_skill_from_cache(skill_object['skill']))
+            | 'Delete skill from cache' >> beam.Map(
+                lambda skill_object: self._delete_skill_from_cache(
+                    skill_object['skill']))
             | 'Generate results for cache deletion' >> (
                 job_result_transforms.ResultsToJobRunResults('CACHE DELETION'))
         )

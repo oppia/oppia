@@ -16,13 +16,12 @@
 
 """Jobs that are run by CRON scheduler."""
 
-from __future__ import absolute_import
 from __future__ import annotations
-from __future__ import unicode_literals
+
+import logging
 
 from core import feconf
 from core.domain import caching_services
-from core.domain import opportunity_services
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_services
@@ -35,28 +34,43 @@ from core.platform import models
 import apache_beam as beam
 import result
 
-from typing import Dict, Iterable, List, Tuple, Union, cast
+from typing import Sequence, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
+    from mypy_imports import base_models
+    from mypy_imports import datastore_services
     from mypy_imports import story_models
 
-(story_models,) = models.Registry.import_models([models.NAMES.story])
+(base_models, story_models,) = models.Registry.import_models([
+    models.NAMES.base_model, models.NAMES.story])
+datastore_services = models.Registry.import_datastore_services()
 
 
 class MigrateStoryJob(base_jobs.JobBase):
-    """"""
+    """Job that migrates story models."""
 
     @staticmethod
     def _migrate_story(
         story_id: str, story_model: story_models.StoryModel
     ) -> result.Result[story_domain.Story, Exception]:
+        """Migrates story and transform story model into story object.
+
+        Args:
+            story_id: str. The id of the story.
+            story_model: StoryModel. The story model to migrate.
+
+        Returns:
+            Result(Story,Exception). Story object when the migration
+            was successful or Exception when the migration failed.
+        """
         try:
             story = story_fetchers.get_story_from_model(story_model)
             story.validate()
             story_services.validate_prerequisite_skills_in_story_contents(
                 story.corresponding_topic_id, story.story_contents)
         except Exception as e:
+            logging.exception(e)
             return result.Err((story_id, e))
 
         return result.Ok((story_id, story))
@@ -65,8 +79,19 @@ class MigrateStoryJob(base_jobs.JobBase):
     def _generate_story_changes(
         story_id: str, story_model: story_models.StoryModel
     ) -> Tuple[str, story_domain.StoryChange]:
+        """Generates story change objects. Story change object is generated when
+        schema version for some field is lower than the latest schema version.
+
+        Args:
+            story_id: str. The id of the story.
+            story_model: StoryModel. The story for which generate
+                the change objects.
+
+        Returns:
+            Iterable((str,StoryChange)). Iterable of story change objects.
+        """
         schema_version = story_model.story_contents_schema_version
-        if schema_version <= feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION:
+        if schema_version < feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION:
             story_change = story_domain.StoryChange({
                 'cmd': story_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION,
                 'from_version': story_model.story_contents_schema_version,
@@ -76,8 +101,17 @@ class MigrateStoryJob(base_jobs.JobBase):
 
     @staticmethod
     def _delete_story_from_cache(
-        story: story_domain.Skill
+        story: story_domain.Story
     ) -> result.Result[str, Exception]:
+        """Deletes story from cache.
+
+        Args:
+            story: Story. The story which should be deleted from cache.
+
+        Returns:
+            Result(str,Exception). The id of the story when the deletion
+            was successful or Exception when the deletion failed.
+        """
         try:
             caching_services.delete_multi(
                 caching_services.CACHE_NAMESPACE_STORY, None, [story.id])
@@ -86,40 +120,84 @@ class MigrateStoryJob(base_jobs.JobBase):
             return result.Err(e)
 
     @staticmethod
-    def _update_story(story_model, story, commit_cmd):
+    def _update_story(
+        story_model: story_models.StoryModel,
+        migrated_story: story_domain.Story,
+        story_changes: Sequence[story_domain.StoryChange]
+    ) -> Sequence[base_models.BaseModel]:
+        """Generates newly updated story models.
+
+        Args:
+            story_model: StoryModel. The story which should be updated.
+            migrated_story: Story. The migrated story domain object.
+            story_changes: sequence(StoryChange). The story changes to apply.
+
+        Returns:
+            sequence(BaseModel). Sequence of models which should be put into
+            the datastore.
+        """
         updated_story_model = story_services.populate_story_model_with_story(
-            story_model, story)
-        change_dicts = [commit_cmd.to_dict()]
-        updated_story_model.commit(committer_id, commit_message, change_dicts)
+            story_model, migrated_story)
+        change_dicts = [change.to_dict() for change in story_changes]
+        models_to_put = updated_story_model.compute_models_to_commit(
+            feconf.MIGRATION_BOT_USERNAME,
+            updated_story_model._COMMIT_TYPE_EDIT,
+            'Update story contents schema version to %d.' % (
+                feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION),
+            change_dicts,
+            additional_models={}
+        ).values()
+        datastore_services.update_timestamps_multi(list(models_to_put))
+        return models_to_put
 
     @staticmethod
     def _update_story_summary(
-        story: story_domain.Story,
+        migrated_story: story_domain.Story,
         story_summary_model: story_models.StorySummaryModel
-    ):
-        skill_summary = story_services.compute_summary_of_story(story)
-        updated_skill_summary_model = (
+    ) -> story_models.StorySummaryModel:
+        """Generates newly updated story summary model.
+
+        Args:
+            migrated_story: Story. The migrated story domain object.
+            story_summary_model: StorySummaryModel. The story summary model
+                to update.
+
+        Returns:
+            StorySummaryModel. The updated story summary model to put into
+            the datastore.
+        """
+        story_summary = story_services.compute_summary_of_story(migrated_story)
+        story_summary.version += 1
+        updated_story_summary_model = (
             story_services.populate_story_model_with_story(
-                story_summary_model, skill_summary
+                story_summary_model, story_summary
             )
         )
-        return updated_skill_summary_model
+        return updated_story_summary_model
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        """"""
+        """Returns a PCollection of results from the story migration.
+
+        Returns:
+            PCollection. A PCollection of results from the story migration.
+        """
 
         unmigrated_story_models = (
             self.pipeline
-            | 'Get all non-deleted models' >> (
+            | 'Get all non-deleted story models' >> (
                 ndb_io.GetModels(story_models.StoryModel.get_all()))
-            | 'Add story keys' >> beam.WithKeys(
+            # Pylint disable is needed because pylint is not able to correctly
+            # detect that the value is passed through the pipe.
+            | 'Add story keys' >> beam.WithKeys( # pylint: disable=no-value-for-parameter
                 lambda story_model: story_model.id)
         )
         story_summary_models = (
             self.pipeline
-            | 'Get all non-deleted models' >> (
+            | 'Get all non-deleted story summary models' >> (
                 ndb_io.GetModels(story_models.StorySummaryModel.get_all()))
-            | 'Add story summary keys' >> beam.WithKeys(
+            # Pylint disable is needed because pylint is not able to correctly
+            # detect that the value is passed through the pipe.
+            | 'Add story summary keys' >> beam.WithKeys( # pylint: disable=no-value-for-parameter
                 lambda story_summary_model: story_summary_model.id)
         )
 
@@ -135,7 +213,7 @@ class MigrateStoryJob(base_jobs.JobBase):
             | 'Unwrap ok' >> beam.Map(
                 lambda result_item: result_item.unwrap())
         )
-        migrated_skill_job_run_results = (
+        migrated_story_job_run_results = (
             migrated_story_results
             | 'Generate results for migration' >> (
                 job_result_transforms.ResultsToJobRunResults('STORY MIGRATION'))
@@ -144,7 +222,7 @@ class MigrateStoryJob(base_jobs.JobBase):
         story_changes = (
             unmigrated_story_models
             | 'Transform and migrate model' >> beam.MapTuple(
-                self._generate_skill_changes)
+                self._generate_story_changes)
         )
 
         story_objects_list = (
@@ -157,26 +235,34 @@ class MigrateStoryJob(base_jobs.JobBase):
             | 'Merge objects' >> beam.CoGroupByKey()
             | 'Get rid of ID' >> beam.Values()  # pylint: disable=no-value-for-parameter
             | 'Remove unmigrated stories' >> beam.Filter(
-                lambda x: len(x['story_change']) > 0)
+                lambda x: len(x['story_change']) > 0 and len(x['story']) > 0)
             | 'Reorganize the story objects' >> beam.Map(lambda objects: {
-                'story_model': objects['story_model'][0],
-                'story_summary_model': objects['story_summary_model'][0],
-                'story': objects['story'][0],
-                'story_change': objects['story_change'][0]
-            })
+                    'story_model': objects['story_model'][0],
+                    'story_summary_model': objects['story_summary_model'][0],
+                    'story': objects['story'][0],
+                    'story_change': objects['story_change']
+                })
+        )
+
+        story_objects_list_job_run_results = (
+            story_objects_list
+            | 'Transform story objects into job run results' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'SKILL MIGRATED'))
         )
 
         cache_deletion_job_run_results = (
             story_objects_list
-            | 'Delete skills from cache' >> beam.Map(lambda story_objects:
-                self._delete_story_from_cache(story_objects['story']))
+            | 'Delete story from cache' >> beam.Map(
+                lambda story_objects: self._delete_story_from_cache(
+                    story_objects['story']))
             | 'Generate results for cache deletion' >> (
                 job_result_transforms.ResultsToJobRunResults('CACHE DELETION'))
         )
 
         story_models_to_put = (
             story_objects_list
-            | 'Generate skill models to put' >> beam.FlatMap(
+            | 'Generate story models to put' >> beam.FlatMap(
                 lambda story_objects: self._update_story(
                     story_objects['story_model'],
                     story_objects['story'],
@@ -186,7 +272,7 @@ class MigrateStoryJob(base_jobs.JobBase):
 
         story_summary_models_to_put = (
             story_objects_list
-            | 'Generate skill summary models to put' >> beam.Map(
+            | 'Generate story summary models to put' >> beam.Map(
                 lambda story_objects: self._update_story_summary(
                     story_objects['story'],
                     story_objects['story_summary_model']
@@ -200,6 +286,10 @@ class MigrateStoryJob(base_jobs.JobBase):
         )
 
         return (
-            (cache_deletion_job_run_results, migrated_skill_job_run_results)
+            (
+                cache_deletion_job_run_results,
+                migrated_story_job_run_results,
+                story_objects_list_job_run_results
+            )
             | beam.Flatten()
         )

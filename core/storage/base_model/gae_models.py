@@ -24,10 +24,21 @@ from core import utils
 from core.constants import constants
 from core.platform import models
 
-from typing import ( # isort:skip
-    Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple, Type, Union, TypeVar, cast
-)
 from typing_extensions import TypedDict
+
+from typing import ( # isort:skip
+    Any,
+    Dict,
+    List,
+    Mapping,
+    Optional,
+    Sequence,
+    Tuple,
+    Type,
+    Union,
+    TypeVar,
+    cast
+)
 
 SELF_BASE_MODEL = TypeVar(  # pylint: disable=invalid-name
     'SELF_BASE_MODEL', bound='BaseModel')
@@ -113,6 +124,8 @@ class MODEL_ASSOCIATION_TO_USER(enum.Enum): # pylint: disable=invalid-name
 
 
 class ModelsToPutDict(TypedDict, total=False):
+    """Dict representing models to be put into the datastore."""
+
     versioned_model: VersionedModel
     snapshot_metadata_model: BaseSnapshotMetadataModel
     snapshot_content_model: BaseSnapshotContentModel
@@ -900,6 +913,14 @@ class VersionedModel(BaseModel):
             instance_id, VERSION_DELIMITER, version_number)
 
     def _prepare_additional_models(self) -> Mapping[str, BaseModel]:
+        """Prepares additional models needed for the commit process. The dict
+        is empty by default  and this method should be overriden in models that
+        inherit from VersionedModel.
+
+        Returns:
+            dict(str, BaseModel). Additional models needed for
+            the commit process.
+        """
         return {}
 
     # TODO(#13523): Change 'commit_cmds' to domain object/TypedDict to
@@ -910,7 +931,7 @@ class VersionedModel(BaseModel):
         commit_type: Optional[str],
         commit_message: str,
         commit_cmds: List[Dict[str, Any]],
-        additional_models: Mapping[str, BaseModel]
+        unused_additional_models: Mapping[str, BaseModel]
     ) -> ModelsToPutDict:
         """Evaluates and executes commit. Main function for all commit types.
 
@@ -923,10 +944,16 @@ class VersionedModel(BaseModel):
                 made in this model, should give sufficient information to
                 reconstruct the commit. Dict always contains:
                     cmd: str. Unique command.
-                And then additional arguments for that command. For example:
+                And then additional arguments for that command. For example: {
+                    'cmd': 'AUTO_revert_version_number',
+                    'version_number': 4
+                }
+            unused_additional_models: dict(str, BaseModel). Additional models
+                that are needed for the commit process.
 
-                {'cmd': 'AUTO_revert_version_number'
-                 'version_number': 4}
+        Returns:
+            ModelsToPutDict. A dict of models that should be put into
+            the datastore.
 
         Raises:
             Exception. No snapshot metadata class has been defined.

@@ -184,6 +184,12 @@ class SkillModel(base_models.VersionedModel):
                 reconstruct the commit. Each dict always contains:
                     cmd: str. Unique command.
                 and then additional arguments for that command.
+            additional_models: dict(str, BaseModel). Additional models that are
+                needed for the commit process.
+
+        Returns:
+            ModelsToPutDict. A dict of models that should be put into
+            the datastore.
         """
         models_to_put = super().compute_models_to_commit(
             committer_id,

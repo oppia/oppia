@@ -16,32 +16,93 @@
 
 """Unit tests for jobs.batch_jobs.exp_recommendation_computation_jobs."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import datetime
 
-from core.constants import constants
-from core.domain import recommendations_services
+from core import feconf
+from core.domain import story_domain
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import story_migration_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 
-from typing import Dict, List, Tuple, Union # isort:skip
-
 MYPY = False
 if MYPY:
-    from mypy_imports import exp_models
-    from mypy_imports import recommendations_models
+    from mypy_imports import story_models
 
-(exp_models, recommendations_models) = models.Registry.import_models(
-    [models.NAMES.exploration, models.NAMES.recommendations])
+(story_models,) = models.Registry.import_models([models.NAMES.story])
 
 
-class MigrateSkillJobTests(job_test_utils.JobTestBase):
+class MigrateStoryJobTests(job_test_utils.JobTestBase):
 
     JOB_CLASS = story_migration_jobs.MigrateStoryJob
 
+    STORY_1_ID = 'story_1_id'
+
+    def setUp(self):
+        super().setUp()
+        story_summary_model = self.create_model(
+            story_models.StorySummaryModel,
+            id=self.SKILL_1_ID,
+            description='description',
+            misconception_count=0,
+            worked_examples_count=0,
+            language_code='cs',
+            skill_model_last_updated=datetime.datetime.utcnow(),
+            skill_model_created_on=datetime.datetime.utcnow(),
+            version=1
+        )
+        story_summary_model.update_timestamps()
+        story_summary_model.put()
+        self.latest_story_contents = {
+            'nodes': [{
+                'id': self.id,
+                'title': self.title,
+                'description': self.description,
+                'thumbnail_filename': self.thumbnail_filename,
+                'thumbnail_bg_color': self.thumbnail_bg_color,
+                'thumbnail_size_in_bytes': self.thumbnail_size_in_bytes,
+                'destination_node_ids': self.destination_node_ids,
+                'acquired_skill_ids': self.acquired_skill_ids,
+                'prerequisite_skill_ids': self.prerequisite_skill_ids,
+                'outline': self.outline,
+                'outline_is_finalized': self.outline_is_finalized,
+                'exploration_id': self.exploration_id
+            }],
+            'initial_node_id': 'initial_node_id',
+            'next_node_id': 'next_node_id'
+        }
+
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty()
+
+    def test_unmigrated_story_with_unmigrated_rubric_is_migrated(self) -> None:
+        story_model = self.create_model(
+            story_models.StoryModel,
+            id=self.STORY_1_ID,
+            story_contents_schema_version=4,
+            title='title',
+            language_code='cs',
+            story_contents=self.latest_story_contents,
+            corresponding_topic_id='topic_id',
+            url_fragment='url_fragment',
+        )
+        story_model.update_timestamps()
+        story_model.commit(feconf.SYSTEM_COMMITTER_ID, 'Create story', [{
+            'cmd': story_domain.CMD_CREATE_NEW
+        }])
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(stdout='STORY PROCESSED SUCCESS: 1'),
+            job_run_result.JobRunResult(stdout='STORY MIGRATED SUCCESS: 1'),
+            job_run_result.JobRunResult(stdout='CACHE DELETION SUCCESS: 1')
+        ])
+
+        migrated_story_model = story_model.SkillModel.get(self.SKILL_1_ID)
+        self.assertEqual(migrated_story_model.version, 2)
+        self.assertEqual(
+            migrated_story_model.story_contents_schema_version,
+            feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION)
+        self.assertEqual(
+            migrated_story_model.story_contents, self.story_contents)

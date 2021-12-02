@@ -397,7 +397,15 @@ def validate_explorations_for_story(exp_ids, strict):
 
 
 def populate_story_model_with_story(story_model, story):
-    """TODO"""
+    """Populate story model with the data from story object.
+
+    Args:
+        story_model: StoryModel. The model to populate.
+        story: Story. The object from which is the model populated.
+
+    Returns:
+        StoryModel. Populated model.
+    """
     story_model.description = story.description
     story_model.title = story.title
     story_model.thumbnail_bg_color = story.thumbnail_bg_color
@@ -415,9 +423,9 @@ def populate_story_model_with_story(story_model, story):
     return story_model
 
 
-
 def _save_story(
-        committer_id, story, commit_message, change_list, story_is_published):
+    committer_id, story, commit_message, change_list, story_is_published
+):
     """Validates a story and commits it to persistent storage. If
     successful, increments the version number of the incoming story domain
     object by 1.
@@ -677,7 +685,16 @@ def create_story_summary(story_id):
 def populate_story_summary_model_with_story_summary(
     story_summary_model, story_summary
 ):
-    """TODO"""
+    """Populate story summary model with the data from story summary object.
+
+    Args:
+        story_summary_model: StorySummaryModel. The model to populate.
+        story_summary: StorySummary. The object from which is the model
+            populated.
+
+    Returns:
+        StorySummaryModel. Populated model.
+    """
     story_summary_dict = {
         'title': story_summary.title,
         'description': story_summary.description,
