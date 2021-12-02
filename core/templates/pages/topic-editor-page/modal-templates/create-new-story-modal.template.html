@@ -34,10 +34,9 @@
       <div class="story-input-header">
         <span>Url Fragment*</span>
       </div>
-      <input class="form-control protractor-test-new-story-url-fragment-field" ng-model="story.urlFragment" maxlength="<[MAX_CHARS_IN_STORY_URL_FRAGMENT]>"
-             ng-class="{'is-invalid': storyUrlFragmentExists || !validUrlFragmentRegex.test(story.urlFragment)}"
-             ng-change="onStoryUrlFragmentChange()"
+      <input class="form-control protractor-test-new-story-url-fragment-field" ng-model = "unsubmittedUrlFragment" maxlength="<[MAX_CHARS_IN_STORY_URL_FRAGMENT]>"
              aria-label="Url fragment">
+      <button class="btn btn-primary .protractor-test-submit-story-url-fragnment-button" ng-click="assignUrlFragment()" ng-class="{'is-invalid': storyUrlFragmentExists || !validUrlFragmentRegex.test(story.urlFragment)}" type="button">Submit</button>
       <div>
         <span class="oppia-input-box-subtitle">
           <em>

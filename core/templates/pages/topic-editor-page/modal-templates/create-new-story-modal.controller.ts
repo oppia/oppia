@@ -56,18 +56,7 @@ angular.module('oppia').controller('CreateNewStoryModalController', [
       TopicEditorStateService.getClassroomUrlFragment());
     $scope.topicUrlFragment = (
       TopicEditorStateService.getTopic().getUrlFragment());
-    $scope.onStoryUrlFragmentChange = function() {
-      if (!$scope.story.urlFragment) {
-        return;
-      }
-      StoryEditorStateService.updateExistenceOfStoryUrlFragment(
-        $scope.story.urlFragment, function() {
-          $scope.storyUrlFragmentExists = (
-            StoryEditorStateService.getStoryWithUrlFragmentExists());
-          $rootScope.$applyAsync();
-        });
-    };
-
+    $scope.unsubmittedUrlFragment = '';
     $scope.updateView = function() {
       $scope.$applyAsync();
     };
@@ -77,6 +66,19 @@ angular.module('oppia').controller('CreateNewStoryModalController', [
         $scope.story.isValid() &&
         ImageLocalStorageService.getStoredImagesData().length > 0 &&
         !$scope.storyUrlFragmentExists);
+    };
+
+    $scope.assignUrlFragment = function() {
+      $scope.story.urlFragment = $scope.unsubmittedUrlFragment;
+      if (!$scope.story.urlFragment) {
+        return;
+      }
+      StoryEditorStateService.updateExistenceOfStoryUrlFragment(
+        $scope.story.urlFragment, function() {
+          $scope.storyUrlFragmentExists = (
+            StoryEditorStateService.getStoryWithUrlFragmentExists());
+          $rootScope.$applyAsync();
+        });
     };
   }
 ]);
