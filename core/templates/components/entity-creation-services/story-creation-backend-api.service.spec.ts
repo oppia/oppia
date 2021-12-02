@@ -33,7 +33,6 @@ class MockUrlInterpolationService {
 }
 
 describe('Story creation backend api service', () => {
-  let csrfService: CsrfTokenService;
   let httpTestingController: HttpTestingController;
   let storyCreationBackendApiService: StoryCreationBackendApiService;
   let story: NewlyCreatedStory;
