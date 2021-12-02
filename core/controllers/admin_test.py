@@ -64,11 +64,10 @@ BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
 BOTH_MODERATOR_AND_ADMIN_USERNAME = 'moderatorandadm1n'
 
 
-class ParamNames(enum.Enum):
+class PARAM_NAMES(enum.Enum): # pylint: disable=invalid-name
     """Enum for parameter names."""
 
-    TEST_FEATURE_1 = 'test_feature_1'
-
+    test_feature_1 = 'test_feature_1' # pylint: disable=invalid-name
 
 FEATURE_STAGES = platform_parameter_domain.FEATURE_STAGES # pylint: disable=invalid-name
 
@@ -472,11 +471,11 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_get_handler_includes_all_feature_flags(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         feature = platform_parameter_registry.Registry.create_feature_flag(
-            ParamNames.TEST_FEATURE_1, 'feature for test.', FEATURE_STAGES.dev)
+            PARAM_NAMES.test_feature_1, 'feature for test.', FEATURE_STAGES.dev)
 
         feature_list_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_LIST',
-            [getattr(ParamNames, feature.name)])
+            [getattr(PARAM_NAMES, feature.name)])
         feature_set_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_NAMES_SET',
             set([feature.name]))
@@ -494,7 +493,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         feature = platform_parameter_registry.Registry.create_feature_flag(
-            ParamNames.TEST_FEATURE_1, 'feature for test.', FEATURE_STAGES.dev)
+            PARAM_NAMES.test_feature_1, 'feature for test.', FEATURE_STAGES.dev)
         new_rule_dicts = [
             {
                 'filters': [
@@ -509,7 +508,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         feature_list_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_LIST',
-            [getattr(ParamNames, feature.name)])
+            [getattr(PARAM_NAMES, feature.name)])
         feature_set_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_NAMES_SET',
             set([feature.name]))
@@ -538,7 +537,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         feature = platform_parameter_registry.Registry.create_feature_flag(
-            ParamNames.TEST_FEATURE_1, 'feature for test.', FEATURE_STAGES.dev)
+            PARAM_NAMES.test_feature_1, 'feature for test.', FEATURE_STAGES.dev)
         new_rule_dicts = [
             {
                 'filters': [
@@ -553,7 +552,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         feature_list_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_LIST',
-            [getattr(ParamNames, feature.name)])
+            [getattr(PARAM_NAMES, feature.name)])
         feature_set_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_NAMES_SET',
             set([feature.name]))
@@ -583,7 +582,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         feature = platform_parameter_registry.Registry.create_feature_flag(
-            ParamNames.TEST_FEATURE_1, 'feature for test.', FEATURE_STAGES.dev)
+            PARAM_NAMES.test_feature_1, 'feature for test.', FEATURE_STAGES.dev)
         new_rule_dicts = [
             {
                 'filters': [
@@ -598,7 +597,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         feature_list_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_LIST',
-            [getattr(ParamNames, feature.name)])
+            [getattr(PARAM_NAMES, feature.name)])
         feature_set_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_NAMES_SET',
             set([feature.name]))
@@ -751,7 +750,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         feature = platform_parameter_registry.Registry.create_feature_flag(
-            ParamNames.TEST_FEATURE_1, 'feature for test.', FEATURE_STAGES.dev)
+            PARAM_NAMES.test_feature_1, 'feature for test.', FEATURE_STAGES.dev)
         new_rule_dicts = [
             {
                 'filters': [
@@ -766,7 +765,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         feature_list_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_LIST',
-            [getattr(ParamNames, feature.name)])
+            [getattr(PARAM_NAMES, feature.name)])
         feature_set_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_NAMES_SET',
             set([feature.name]))
