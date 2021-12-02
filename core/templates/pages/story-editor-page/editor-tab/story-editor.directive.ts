@@ -24,9 +24,6 @@ require(
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require('pages/story-editor-page/editor-tab/story-node-editor.directive.ts');
-require(
-  'pages/story-editor-page/modal-templates/' +
-  'new-chapter-title-modal.controller.ts');
 
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/story/story-update.service.ts');
@@ -189,7 +186,7 @@ angular.module('oppia').directive('storyEditor', [
             let modelRef = NgbModal.open(CreateNewChapterModalComponent, {
               backdrop: 'static',
               windowClass: 'create-new-chapter',
-            })
+            });
             modelRef.componentInstance.nodeTitles = nodeTitles;
             return modelRef.result.then(function() {
               _initEditor();

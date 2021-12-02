@@ -13,27 +13,26 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for new chapter title modal.
+ * @fileoverview Co for new chapter title modal.
  */
 
-import { Component, Input, OnInit } from "@angular/core";
-import { NgbActiveModal } from "@ng-bootstrap/ng-bootstrap";
-import { AppConstants } from "app.constants";
-import { ConfirmOrCancelModal } from "components/common-layout-directives/common-elements/confirm-or-cancel-modal.component";
-import { ExplorationIdValidationService } from "domain/exploration/exploration-id-validation.service";
-import { StoryUpdateService } from "domain/story/story-update.service";
-import { Story } from "domain/story/StoryObjectFactory";
-import { ValidatorsService } from "services/validators.service";
-import { StoryEditorStateService } from "../services/story-editor-state.service";
- 
- 
+import { Component, Input, OnInit } from '@angular/core';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { AppConstants } from 'app.constants';
+import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import { ExplorationIdValidationService } from 'domain/exploration/exploration-id-validation.service';
+import { StoryUpdateService } from 'domain/story/story-update.service';
+import { Story } from 'domain/story/StoryObjectFactory';
+import { ValidatorsService } from 'services/validators.service';
+import { StoryEditorStateService } from '../services/story-editor-state.service';
+
 @Component({
   selector: 'oppia-new-chapter-title-modal',
   templateUrl: './new-chapter-title-modal.component.html'
 })
 export class CreateNewChapterModalComponent extends ConfirmOrCancelModal
-  implements OnInit{
-  @Input()  nodeTitles: string[];
+  implements OnInit {
+  @Input() nodeTitles: string[];
   MAX_CHARS_IN_EXPLORATION_TITLE: number;
   title: string;
   invalidExpId: boolean;
@@ -105,23 +104,23 @@ export class CreateNewChapterModalComponent extends ConfirmOrCancelModal
     }
     if (this.storyEditorStateService.isStoryPublished()) {
       this.explorationIdValidationService.isExpPublishedAsync(
-          this.explorationId).then(function(expIdIsValid) {
-            this.expIdIsValid = expIdIsValid;
-            if (this.expIdIsValid) {
-              this.soryUpdateService.setStoryNodeExplorationId(
-                this.story, this.nodeId, this.explorationId);
-              this.ngbActiveModal.close();
-            } else {
-              this.invalidExpId = true;
-            }
-          });
+        this.explorationId).then(function(expIdIsValid) {
+        this.expIdIsValid = expIdIsValid;
+        if (this.expIdIsValid) {
+          this.soryUpdateService.setStoryNodeExplorationId(
+            this.story, this.nodeId, this.explorationId);
+          this.ngbActiveModal.close();
+        } else {
+          this.invalidExpId = true;
+        }
+      });
     } else {
       this.storyUpdateService.setStoryNodeExplorationId(
         this.story, this.nodeId, this.explorationId);
       this.ngbActiveModal.close();
     }
   }
-  
+
   resetErrorMsg(): void {
     this.errorMsg = null;
     this.invalidExpId = false;
