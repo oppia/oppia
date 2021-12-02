@@ -209,8 +209,7 @@ class SkillsDashboardPageDataHandler(base.BaseHandler):
             'classroom_name': {
                 'schema': {
                     'type': 'basestring'
-                },
-                'default_value': None
+                }
             },
             'next_cursor': {
                 'schema': {
@@ -224,8 +223,7 @@ class SkillsDashboardPageDataHandler(base.BaseHandler):
                     'items': {
                         'type': 'basestring'
                     }
-                },
-                'default_value': None
+                }
             },
             'num_skills_to_fetch': {
                 'schema': {
@@ -240,15 +238,13 @@ class SkillsDashboardPageDataHandler(base.BaseHandler):
                 'schema': {
                     'type': 'basestring'
                 },
-                'choices': constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS,
-                'default_value': None
+                'choices': constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS
             },
             'status': {
                 'schema': {
                     'type': 'basestring'
                 },
-                'choices': constants.SKILL_STATUS_OPTIONS,
-                'default_value': None
+                'choices': constants.SKILL_STATUS_OPTIONS
             }
         }
     }
