@@ -133,6 +133,11 @@ export class AudioPlayerService {
     this.setCurrentTime(0);
     this._currentTrack.stop();
     this._stopIntervalSubject.next();
+
+    this._currentTrack = null;
+    this._currentTrackFilename = null;
+    this._lastPauseOrSeekPos = null;
+    this.audioTranslationManagerService.clearSecondaryAudioTranslations();
   }
 
   rewind(seconds: number): void {

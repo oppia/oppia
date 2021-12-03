@@ -184,6 +184,9 @@ describe('AudioPlayerService', () => {
       fakeAsync(() => {
         spyOn(audioPlayerService, 'setCurrentTime');
         spyOn(console, 'error');
+        spyOn(
+          audioTranslationManagerService,
+          'clearSecondaryAudioTranslations');
         let subjectNext = spyOn(Subject.prototype, 'next');
         audioPlayerService.loadAsync('test.mp3');
         flushMicrotasks();
@@ -193,7 +196,9 @@ describe('AudioPlayerService', () => {
         expect(console.error).toHaveBeenCalledWith('Howl.stop');
         expect(audioPlayerService.setCurrentTime).toHaveBeenCalledWith(0);
         expect(subjectNext).toHaveBeenCalledTimes(2);
-      }));
+        expect(audioTranslationManagerService.clearSecondaryAudioTranslations)
+          .toHaveBeenCalled();
+    }));
 
     it('should rewind the track when user clicks the \'Rewind\' ' +
     'button', fakeAsync(() => {
