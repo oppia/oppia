@@ -98,21 +98,38 @@ describe('TranslateTextBackendApiService', () => {
   });
 
   describe('suggestTranslatedTextAsync', () => {
+    class MockReaderObject {
+    result = 'imageBlob1';
+    onload: () => string;
+    constructor() {
+      this.onload = () => {
+        return 'Fake onload executed';
+      };
+    }
+    readAsDataURL(file: Blob) {
+      this.onload();
+      return 'The file is loaded';
+    }
+    }
     let successHandler: jasmine.Spy<jasmine.Func>;
     let failHandler: (error: HttpErrorResponse) => void;
     let imagesData: ImagesData[];
     beforeEach(() => {
+    // This throws "Argument of type 'mockReaderObject' is not assignable to
+    // parameter of type 'HTMLImageElement'.". We need to suppress this
+    // error because 'HTMLImageElement' has around 250 more properties.
+    // We have only defined the properties we need in 'mockReaderObject'.
+    // @ts-expect-error
+      spyOn(window, 'FileReader').and.returnValue(new MockReaderObject());
       successHandler = jasmine.createSpy('success');
       failHandler = jasmine.createSpy('error');
       imagesData = [{
         filename: 'imageFilename',
-        imageBlob: new Blob(['imageBlob'], {type: 'imagetype'})
+        imageBlob: new Blob(['imageBlob1'], {type: 'image'})
       }];
     });
 
     it('should correctly submit a translation suggestion', fakeAsync(() => {
-      spyOn(translateTextBackendApiService, 'blobtoBase64').and.returnValue(
-        Promise.resolve('imageBlob'));
       const expectedPayload = {
         suggestion_type: 'translate_content',
         target_type: 'exploration',
@@ -129,7 +146,7 @@ describe('TranslateTextBackendApiService', () => {
           data_format: 'html'
         },
         files: {
-          imageFilename: 'imageBlob'
+          imageFilename: 'imageBlob1'
         }
       };
 

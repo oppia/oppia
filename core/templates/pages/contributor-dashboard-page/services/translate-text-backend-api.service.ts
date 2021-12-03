@@ -53,7 +53,7 @@ export class TranslateTextBackendApiService {
   async blobtoBase64(blob: Blob): Promise<unknown> {
     return new Promise<unknown> ((resolve, reject)=> {
       const reader = new FileReader();
-      reader.onloadend = () => {
+      reader.onload = () => {
         // Read the Base64 data from restult.
         const dataurl = reader.result as string;
         // Remove the prefix of Data URL and just return Base64 string.
