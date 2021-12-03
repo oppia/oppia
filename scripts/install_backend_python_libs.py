@@ -14,8 +14,7 @@
 
 """Installation script for Oppia python backend libraries."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import collections
 import json
@@ -298,21 +297,12 @@ def _rectify_third_party_directory(mismatches):
         # The library listed in 'requirements.txt' is not in the
         # 'third_party/python_libs' directory.
         if not directory_version:
-            _install_library(
-                normalized_library_name,
-                python_utils.UNICODE(requirements_version)
-            )
+            _install_library(normalized_library_name, str(requirements_version))
         # The currently installed library version is not equal to the required
         # 'requirements.txt' version.
         elif requirements_version != directory_version:
-            _install_library(
-                normalized_library_name,
-                python_utils.UNICODE(requirements_version)
-            )
-            _remove_metadata(
-                normalized_library_name,
-                python_utils.UNICODE(directory_version)
-            )
+            _install_library(normalized_library_name, str(requirements_version))
+            _remove_metadata(normalized_library_name, str(directory_version))
 
 
 def _is_git_url_mismatch(mismatch_item):
@@ -395,8 +385,6 @@ def _get_possible_normalized_metadata_directory_names(
     """
     # Some metadata folders replace the hyphens in the library name with
     # underscores.
-    # TODO(#11474): The '-py2.7' suffix might be used in some metadata directory
-    # names, this will need to be changed after the Python 3 migration.
     return {
         normalize_directory_name(
             '%s-%s.dist-info' % (library_name, version_string)),
@@ -412,12 +400,7 @@ def _get_possible_normalized_metadata_directory_names(
             '%s-%s-py3.7.egg-info' % (library_name, version_string)),
         normalize_directory_name(
             '%s-%s-py3.7.egg-info' % (
-                library_name.replace('-', '_'), version_string)),
-        normalize_directory_name(
-            '%s-%s-py2.7.egg-info' % (library_name, version_string)),
-        normalize_directory_name(
-            '%s-%s-py2.7.egg-info' % (
-                library_name.replace('-', '_'), version_string)),
+                library_name.replace('-', '_'), version_string))
     }
 
 
@@ -427,7 +410,7 @@ def verify_pip_is_installed():
     Raises:
         ImportError. Error importing pip.
     """
-    python_utils.PRINT('Checking if pip is installed on the local machine')
+    print('Checking if pip is installed on the local machine')
     try:
         import pip
     except ImportError as e:
@@ -438,15 +421,15 @@ def verify_pip_is_installed():
             'page:'])
 
         if common.is_mac_os():
-            python_utils.PRINT(
+            print(
                 'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Mac-'
                 'OS%29')
         elif common.is_linux_os():
-            python_utils.PRINT(
+            print(
                 'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Linux'
                 '%29')
         else:
-            python_utils.PRINT(
+            print(
                 'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28'
                 'Windows%29')
         raise ImportError('Error importing pip: %s' % e)
@@ -480,15 +463,14 @@ def _run_pip_command(cmd_parts):
         encoding='utf-8')
     stdout, stderr = process.communicate()
     if process.returncode == 0:
-        python_utils.PRINT(stdout)
+        print(stdout)
     elif 'can\'t combine user with prefix' in stderr:
-        python_utils.PRINT('Trying by setting --user and --prefix flags.')
+        print('Trying by setting --user and --prefix flags.')
         subprocess.check_call(
             command + ['--user', '--prefix=', '--system'])
     else:
-        python_utils.PRINT(stderr)
-        python_utils.PRINT(
-            'Refer to https://github.com/oppia/oppia/wiki/Troubleshooting')
+        print(stderr)
+        print('Refer to https://github.com/oppia/oppia/wiki/Troubleshooting')
         raise Exception('Error installing package')
 
 
@@ -669,7 +651,7 @@ def main():
     mismatches.
     """
     verify_pip_is_installed()
-    python_utils.PRINT('Regenerating "requirements.txt" file...')
+    print('Regenerating "requirements.txt" file...')
     # Calls the script to regenerate requirements. The reason we cannot call the
     # regenerate requirements functionality inline is because the python script
     # that regenerates the file is a command-line interface (CLI). Once the CLI
@@ -677,8 +659,16 @@ def main():
     # callstack to exit.
     # Therefore, in order to allow continued execution after the requirements
     # file is generated, we must call it as a separate process.
+    # The option --no-emit-index-url is specified to prevent pip compile from
+    # generating an index configuration line(s) in requirements.txt when the
+    # local pip configuration uses one or more custom index servers.
     subprocess.check_call(
-        ['python', '-m', 'scripts.regenerate_requirements'],
+        [
+            'python',
+            '-m',
+            'scripts.regenerate_requirements',
+            '--no-emit-index-url',
+        ],
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE)
     # Adds a note to the beginning of the 'requirements.txt' file to make sure
@@ -699,7 +689,7 @@ def main():
         _rectify_third_party_directory(mismatches)
         validate_metadata_directories()
     else:
-        python_utils.PRINT(
+        print(
             'All third-party Python libraries are already installed correctly.')
 
 

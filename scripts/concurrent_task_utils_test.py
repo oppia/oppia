@@ -16,9 +16,9 @@
 
 """Unit tests for scripts/concurrent_task_utils.py."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
+import builtins
 import threading
 import time
 
@@ -41,16 +41,15 @@ class ConcurrentTaskUtilsTests(test_utils.GenericTestBase):
         self.task_stdout = []
 
         def mock_print(*args):
-            """Mock for python_utils.PRINT. Append the values to print to
+            """Mock for print. Append the values to print to
             task_stdout list.
 
             Args:
                 *args: list(*). Variable length argument list of values to print
                     in the same line of output.
             """
-            self.task_stdout.append(
-                ' '.join(python_utils.UNICODE(arg) for arg in args))
-        self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
+            self.task_stdout.append(' '.join(str(arg) for arg in args))
+        self.print_swap = self.swap(builtins, 'print', mock_print)
 
 
 class TaskResultTests(ConcurrentTaskUtilsTests):

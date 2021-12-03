@@ -14,16 +14,15 @@
 
 """Python execution environment setup for scripts that require GAE."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import argparse
 import os
 import subprocess
 import sys
 import tarfile
+import urllib.request as urlrequest
 
-from core import python_utils
 
 from . import common
 
@@ -50,25 +49,24 @@ def main(args=None):
                 filepath = os.path.join(directory, file_name)
                 os.remove(filepath)
 
-    python_utils.PRINT(
+    print(
         'Checking whether google-cloud-sdk is installed in %s'
         % common.GOOGLE_CLOUD_SDK_HOME)
     if not os.path.exists(common.GOOGLE_CLOUD_SDK_HOME):
-        python_utils.PRINT(
-            'Downloading Google Cloud SDK (this may take a little while)...')
+        print('Downloading Google Cloud SDK (this may take a little while)...')
         os.makedirs(common.GOOGLE_CLOUD_SDK_HOME)
         try:
             # If the google cloud version is updated here, the corresponding
             # lines (GAE_DIR and GCLOUD_PATH) in assets/release_constants.json
             # should also be updated.
-            python_utils.url_retrieve(
+            urlrequest.urlretrieve(
                 'https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/'
                 'google-cloud-sdk-335.0.0-linux-x86_64.tar.gz',
                 filename='gcloud-sdk.tar.gz')
         except Exception:
-            python_utils.PRINT('Error downloading Google Cloud SDK. Exiting.')
+            print('Error downloading Google Cloud SDK. Exiting.')
             raise Exception('Error downloading Google Cloud SDK.')
-        python_utils.PRINT('Download complete. Installing Google Cloud SDK...')
+        print('Download complete. Installing Google Cloud SDK...')
         tar = tarfile.open(name='gcloud-sdk.tar.gz')
         tar.extractall(
             path=os.path.join(

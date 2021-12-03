@@ -24,8 +24,8 @@ import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 interface ClickRegion {
-  clickPosition: number[],
-  clickedRegions: string[]
+  clickPosition: number[];
+  clickedRegions: string[];
 }
 @Component({
   selector: 'oppia-short-response-image-click-input',

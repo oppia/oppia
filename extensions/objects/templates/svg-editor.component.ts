@@ -120,7 +120,7 @@ export class SvgEditorComponent implements OnInit {
   // The data variable is used to store the saved svg data
   // and the filename.
   data: {
-    savedSvgUrl?: SafeResourceUrl | string,
+    savedSvgUrl?: SafeResourceUrl | string;
     savedSvgFileName?: string;
   } = {};
   // The diagramStatus stores the mode of the tool that is being used.
@@ -164,8 +164,8 @@ export class SvgEditorComponent implements OnInit {
   }];
   allowedImageFormats = ['svg'];
   uploadedSvgDataUrl: {
-    safeUrl: SafeResourceUrl,
-    unsafeUrl: string
+    safeUrl: SafeResourceUrl;
+    unsafeUrl: string;
   } = null;
   loadType = 'group';
   defaultTopCoordinate = 50;
@@ -252,8 +252,8 @@ export class SvgEditorComponent implements OnInit {
   }
 
   private getTrustedResourceUrlForSvgFileName(
-      svgFileName: string): {
-        safeUrl: SafeResourceUrl | string, unsafeUrl: string} {
+      svgFileName: string
+  ): { safeUrl: SafeResourceUrl | string; unsafeUrl: string } {
     if (
       this.imageSaveDestination ===
       AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE && (
@@ -459,21 +459,17 @@ export class SvgEditorComponent implements OnInit {
       obj: fabric.Object,
       groupedObjects: fabric.Object[][]
   ): fabric.Object[][] {
-    // Checks if the id starts with 'group' to identify whether the
-    // svg objects are grouped together.
-    if (objId.startsWith('group')) {
-      // The objId is of the form "group" + number.
-      const GROUP_ID_PREFIX_LENGTH = 5;
-      const groupId = parseInt(objId.slice(GROUP_ID_PREFIX_LENGTH));
-      // Checks whether the object belongs to an already existing group
-      // or not.
-      if (groupedObjects.length <= groupId) {
-        groupedObjects.push([]);
-      }
-      obj.toSVG = this.createCustomToSVG(
-        obj.toSVG, obj.type, (obj as unknown as {id: string}).id, obj);
-      groupedObjects[groupId].push(obj);
+    // The objId is of the form "group" + number.
+    const GROUP_ID_PREFIX_LENGTH = 5;
+    const groupId = parseInt(objId.slice(GROUP_ID_PREFIX_LENGTH));
+    // Checks whether the object belongs to an already existing group
+    // or not.
+    if (groupedObjects.length <= groupId) {
+      groupedObjects.push([]);
     }
+    obj.toSVG = this.createCustomToSVG(
+      obj.toSVG, obj.type, (obj as unknown as {id: string}).id, obj);
+    groupedObjects[groupId].push(obj);
     return groupedObjects;
   }
 
@@ -573,7 +569,9 @@ export class SvgEditorComponent implements OnInit {
           let groupedObjects = [];
           objects.forEach((obj, index) => {
             const objId = elements[index].id;
-            if (objId !== '') {
+            // Checks if the id starts with 'group' to identify whether the
+            // svg objects are grouped together.
+            if (objId.startsWith('group')) {
               groupedObjects = this.loadGroupedObject(
                 objId, obj, groupedObjects);
             } else {
@@ -597,10 +595,22 @@ export class SvgEditorComponent implements OnInit {
             this.canvas.add(new fabric.Group(objs));
             this.groupCount += 1;
           });
+          this.centerContent();
         }) as unknown as (results: Object[], options) => void
       );
       this.changeDetectorRef.detectChanges();
     });
+  }
+
+  centerContent(): void {
+    let temporarySelection = new fabric.ActiveSelection(
+      this.canvas.getObjects(),
+      { canvas: this.canvas }
+    );
+    temporarySelection.scaleToWidth(this.canvas.getWidth());
+    temporarySelection.center();
+    this.canvas.setActiveObject(temporarySelection);
+    this.canvas.discardActiveObject();
   }
 
   validate(): boolean {
@@ -919,7 +929,7 @@ export class SvgEditorComponent implements OnInit {
   }
 
   getPieSlice(
-      center: {x: number, y: number},
+      center: { x: number; y: number },
       radius: number,
       startAngle: number,
       endAngle: number,
@@ -1119,7 +1129,7 @@ export class SvgEditorComponent implements OnInit {
         };
         //  $scope.$apply();
       };
-      img.src = <string>(reader.result);
+      img.src = reader.result as string;
     };
     reader.readAsDataURL(file);
   }
@@ -1488,7 +1498,8 @@ export class SvgEditorComponent implements OnInit {
       if (this.drawMode === this.DRAW_MODE_BEZIER) {
         var pt = e.target;
         var curve = this.getQuadraticBezierCurve() as unknown as {
-          path: number[][]};
+          path: number[][];
+        };
         if (e.target.name === 'p0') {
           curve.path[0][1] = pt.left;
           curve.path[0][2] = pt.top;
@@ -1595,8 +1606,10 @@ export class SvgEditorComponent implements OnInit {
   }
 
   setCanvasDimensions(): void {
-    this.canvas.setHeight(this.CANVAS_HEIGHT);
-    this.canvas.setWidth(this.CANVAS_WIDTH);
+    let dimensions = this.value && (
+      this.imagePreloaderService.getDimensionsOfImage(this.value));
+    this.canvas.setHeight(dimensions?.height || this.CANVAS_HEIGHT);
+    this.canvas.setWidth(dimensions?.width || this.CANVAS_WIDTH);
     this.canvas.renderAll();
   }
 

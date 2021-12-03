@@ -14,8 +14,7 @@
 
 """Build file for production version of Oppia. Minifies JS and CSS."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import argparse
 import collections
@@ -72,7 +71,7 @@ WEBPACK_DIRNAMES_TO_DIRPATHS = {
 # interprets the paths in this file as URLs.
 HASHES_JSON_FILENAME = 'hashes.json'
 HASHES_JSON_FILEPATH = os.path.join('assets', HASHES_JSON_FILENAME)
-MANIFEST_FILE_PATH = os.path.join('manifest.json')
+DEPENDENCIES_FILE_PATH = os.path.join('dependencies.json')
 
 REMOVE_WS = re.compile(r'\s{2,}').sub
 
@@ -219,21 +218,26 @@ def modify_constants(
     common.inplace_replace_file(
         common.CONSTANTS_FILE_PATH,
         r'"DEV_MODE": (true|false)',
-        dev_mode_variable)
+        dev_mode_variable,
+        expected_number_of_replacements=1
+    )
     emulator_mode_variable = (
         '"EMULATOR_MODE": true' if emulator_mode else '"EMULATOR_MODE": false')
     common.inplace_replace_file(
         common.CONSTANTS_FILE_PATH,
         r'"EMULATOR_MODE": (true|false)',
-        emulator_mode_variable
+        emulator_mode_variable,
+        expected_number_of_replacements=1
     )
 
     enable_maintenance_mode_variable = (
-        'ENABLE_MAINTENANCE_MODE = %s' % python_utils.UNICODE(maintenance_mode))
+        'ENABLE_MAINTENANCE_MODE = %s' % str(maintenance_mode))
     common.inplace_replace_file(
         common.FECONF_PATH,
         r'ENABLE_MAINTENANCE_MODE = (True|False)',
-        enable_maintenance_mode_variable)
+        enable_maintenance_mode_variable,
+        expected_number_of_replacements=1
+    )
 
 
 def set_constants_to_default():
@@ -274,7 +278,7 @@ def write_to_file_stream(file_stream, content):
         file_stream: file. A stream handling object to do write operation on.
         content: str. String content to write to file object.
     """
-    file_stream.write(python_utils.UNICODE(content))
+    file_stream.write(str(content))
 
 
 def _join_files(source_paths, target_file_stream):
@@ -297,7 +301,7 @@ def _minify_and_create_sourcemap(source_path, target_file_path):
         source_path: str. Path to JS file to minify.
         target_file_path: str. Path to location of the minified file.
     """
-    python_utils.PRINT('Minifying and creating sourcemap for %s' % source_path)
+    print('Minifying and creating sourcemap for %s' % source_path)
     source_map_properties = 'includeSources,url=\'third_party.min.js.map\''
     cmd = '%s %s %s -c -m --source-map %s -o %s ' % (
         common.NODE_BIN_PATH, UGLIFY_FILE, source_path,
@@ -441,8 +445,7 @@ def _compare_file_count(
     for second_dir_path in second_dir_list:
         file_counts[1] += get_file_count(second_dir_path)
     if file_counts[0] != file_counts[1]:
-        python_utils.PRINT(
-            'Comparing %s vs %s' % (first_dir_list, second_dir_list))
+        print('Comparing %s vs %s' % (first_dir_list, second_dir_list))
         raise ValueError(
             '%s files in first dir list != %s files in second dir list' % (
                 file_counts[0], file_counts[1]))
@@ -467,7 +470,7 @@ def get_dependency_directory(dependency):
 
     Args:
         dependency: dict(str, str). Dictionary representing single dependency
-            from manifest.json.
+            from dependencies.json.
 
     Returns:
         str. Dependency directory.
@@ -533,7 +536,7 @@ def get_font_filepaths(dependency_bundle, dependency_dir):
         list(str). List of paths to font files that need to be copied.
     """
     if 'fontsPath' not in dependency_bundle:
-        # Skip dependency bundles in manifest.json that do not have
+        # Skip dependency bundles in dependencies.json that do not have
         # fontsPath property.
         return []
     fonts_path = dependency_bundle['fontsPath']
@@ -549,7 +552,7 @@ def get_font_filepaths(dependency_bundle, dependency_dir):
 
 
 def get_dependencies_filepaths():
-    """Extracts dependencies filepaths from manifest.json file into
+    """Extracts dependencies filepaths from dependencies.json file into
     a dictionary.
 
     Returns:
@@ -563,10 +566,10 @@ def get_dependencies_filepaths():
         'css': [],
         'fonts': []
     }
-    with python_utils.open_file(MANIFEST_FILE_PATH, 'r') as json_file:
-        manifest = json.loads(
+    with python_utils.open_file(DEPENDENCIES_FILE_PATH, 'r') as json_file:
+        dependencies_json = json.loads(
             json_file.read(), object_pairs_hook=collections.OrderedDict)
-    frontend_dependencies = manifest['dependencies']['frontend']
+    frontend_dependencies = dependencies_json['dependencies']['frontend']
     for dependency in frontend_dependencies.values():
         if 'bundle' in dependency:
             dependency_dir = get_dependency_directory(dependency)
@@ -610,8 +613,7 @@ def build_third_party_libs(third_party_directory_path):
     single js file. Copies both files and all fonts into third party folder.
     """
 
-    python_utils.PRINT(
-        'Building third party libs at %s' % third_party_directory_path)
+    print('Building third party libs at %s' % third_party_directory_path)
 
     third_party_js_filepath = os.path.join(
         third_party_directory_path, THIRD_PARTY_JS_RELATIVE_FILEPATH)
@@ -647,7 +649,7 @@ def build_using_webpack(config_path):
         config_path: str. Webpack config to be used for building.
     """
 
-    python_utils.PRINT('Building webpack')
+    print('Building webpack')
     managed_webpack_compiler = servers.managed_webpack_compiler(
         config_path=config_path, max_old_space_size=4096)
     with managed_webpack_compiler as p:
@@ -716,12 +718,12 @@ def generate_copy_tasks_to_copy_from_source_to_target(
         deque(Thread). A deque that contains all copy tasks queued
         to be processed.
     """
-    python_utils.PRINT('Processing %s' % os.path.join(os.getcwd(), source))
-    python_utils.PRINT('Copying into %s' % os.path.join(os.getcwd(), target))
+    print('Processing %s' % os.path.join(os.getcwd(), source))
+    print('Copying into %s' % os.path.join(os.getcwd(), target))
     copy_tasks = collections.deque()
     for root, dirnames, filenames in os.walk(os.path.join(os.getcwd(), source)):
         for directory in dirnames:
-            python_utils.PRINT('Copying %s' % os.path.join(root, directory))
+            print('Copying %s' % os.path.join(root, directory))
         for filename in filenames:
             source_path = os.path.join(root, filename)
             # Python files should not be copied to final build directory.
@@ -814,7 +816,7 @@ def get_file_hashes(directory_path):
     """
     file_hashes = {}
 
-    python_utils.PRINT(
+    print(
         'Computing hashes for files in %s'
         % os.path.join(os.getcwd(), directory_path))
 
@@ -871,8 +873,7 @@ def save_hashes_to_file(file_hashes):
     ensure_directory_exists(HASHES_JSON_FILEPATH)
     with python_utils.open_file(HASHES_JSON_FILEPATH, 'w+') as hashes_json_file:
         hashes_json_file.write(
-            python_utils.UNICODE(
-                json.dumps(filtered_hashes, ensure_ascii=False)))
+            str(json.dumps(filtered_hashes, ensure_ascii=False)))
         hashes_json_file.write(u'\n')
 
 
@@ -887,17 +888,17 @@ def minify_func(source_path, target_path, filename):
     skip_minify = any(
         filename.endswith(p) for p in JS_FILENAME_SUFFIXES_NOT_TO_MINIFY)
     if filename.endswith('.html'):
-        python_utils.PRINT('Building %s' % source_path)
+        print('Building %s' % source_path)
         with python_utils.open_file(source_path, 'r+') as source_html_file:
             with python_utils.open_file(
                 target_path, 'w+') as minified_html_file:
                 process_html(source_html_file, minified_html_file)
     elif ((filename.endswith('.css') or filename.endswith('.js')) and
           not skip_minify):
-        python_utils.PRINT('Minifying %s' % source_path)
+        print('Minifying %s' % source_path)
         _minify(source_path, target_path)
     else:
-        python_utils.PRINT('Copying %s' % source_path)
+        print('Copying %s' % source_path)
         safe_copy_file(source_path, target_path)
 
 
@@ -937,14 +938,13 @@ def generate_build_tasks_to_build_all_files_in_directory(source, target):
         deque(Thread). A deque that contains all build tasks queued
         to be processed.
     """
-    python_utils.PRINT('Processing %s' % os.path.join(os.getcwd(), source))
-    python_utils.PRINT('Generating into %s' % os.path.join(os.getcwd(), target))
+    print('Processing %s' % os.path.join(os.getcwd(), source))
+    print('Generating into %s' % os.path.join(os.getcwd(), target))
     build_tasks = collections.deque()
 
     for root, dirnames, filenames in os.walk(os.path.join(os.getcwd(), source)):
         for directory in dirnames:
-            python_utils.PRINT(
-                'Building directory %s' % os.path.join(root, directory))
+            print('Building directory %s' % os.path.join(root, directory))
         for filename in filenames:
             source_path = os.path.join(root, filename)
             target_path = source_path.replace(source, target)
@@ -1004,8 +1004,7 @@ def generate_delete_tasks_to_remove_deleted_files(
         deque(Thread). A deque that contains all delete tasks
         queued to be processed.
     """
-    python_utils.PRINT(
-        'Scanning directory %s to remove deleted file' % staging_directory)
+    print('Scanning directory %s to remove deleted file' % staging_directory)
     delete_tasks = collections.deque()
     for root, _, filenames in os.walk(
             os.path.join(os.getcwd(), staging_directory)):
@@ -1022,7 +1021,7 @@ def generate_delete_tasks_to_remove_deleted_files(
                 # Remove file found in staging directory but not in source
                 # directory, i.e. file not listed in hash dict.
                 if relative_path not in source_dir_hashes:
-                    python_utils.PRINT(
+                    print(
                         'Unable to find %s in file hashes, deleting file'
                         % target_path)
                     task = threading.Thread(
@@ -1062,7 +1061,7 @@ def get_recently_changed_filenames(source_dir_hashes, out_dir):
                 # been recently changed or created since last build.
                 recently_changed_filenames.append(filename)
     if recently_changed_filenames:
-        python_utils.PRINT(
+        print(
             'The following files will be rebuilt due to recent changes: %s'
             % recently_changed_filenames)
     return recently_changed_filenames
@@ -1092,14 +1091,14 @@ def generate_build_tasks_to_build_directory(dirnames_dict):
     build_tasks = collections.deque()
     if not os.path.isdir(staging_dir):
         # If there is no staging dir, perform build process on all files.
-        python_utils.PRINT('Creating new %s folder' % staging_dir)
+        print('Creating new %s folder' % staging_dir)
         ensure_directory_exists(staging_dir)
         build_tasks += generate_build_tasks_to_build_all_files_in_directory(
             source_dir, staging_dir)
     else:
         # If staging dir exists, rebuild all HTML and Python files.
         file_extensions_to_always_rebuild = ('.html', '.py',)
-        python_utils.PRINT(
+        print(
             'Staging dir exists, re-building all %s files'
             % ', '.join(file_extensions_to_always_rebuild))
 
@@ -1118,19 +1117,18 @@ def generate_build_tasks_to_build_directory(dirnames_dict):
         _execute_tasks(generate_delete_tasks_to_remove_deleted_files(
             source_hashes, staging_dir))
 
-        python_utils.PRINT(
+        print(
             'Getting files that have changed between %s and %s'
             % (source_dir, out_dir))
         recently_changed_filenames = get_recently_changed_filenames(
             dev_dir_hashes, out_dir)
         if recently_changed_filenames:
-            python_utils.PRINT(
+            print(
                 'Re-building recently changed files at %s' % source_dir)
             build_tasks += generate_build_tasks_to_build_files_from_filepaths(
                 source_dir, staging_dir, recently_changed_filenames)
         else:
-            python_utils.PRINT(
-                'No changes detected. Using previously built files.')
+            print('No changes detected. Using previously built files.')
 
     return build_tasks
 
@@ -1257,7 +1255,7 @@ def generate_build_directory(hashes):
     in HTMLs to include hashes. Renames the files to include hashes and copies
     them into build directory.
     """
-    python_utils.PRINT('Building Oppia in production mode...')
+    print('Building Oppia in production mode...')
 
     build_tasks = collections.deque()
     copy_tasks = collections.deque()
@@ -1314,15 +1312,14 @@ def generate_build_directory(hashes):
         TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['out_dir']]
     _compare_file_count(source_dirs_for_templates, output_dirs_for_templates)
 
-    python_utils.PRINT('Build completed.')
+    print('Build completed.')
 
 
 def generate_python_package():
     """Generates Python package using setup.py."""
-    python_utils.PRINT('Building Oppia package...')
-    subprocess.check_call(
-        ['python', 'setup.py', 'sdist', '-d', 'build'], shell=True)
-    python_utils.PRINT('Oppia package build completed.')
+    print('Building Oppia package...')
+    subprocess.check_call('python setup.py sdist -d build', shell=True)
+    print('Oppia package build completed.')
 
 
 def main(args=None):

@@ -14,8 +14,7 @@
 
 """Tests for Oppia resource handling (e.g. templates, images)."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import os
 
@@ -241,6 +240,32 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
             raw_image = f.read()
         response_dict = self.post_json(
             '%s/skill/%s' % (self.IMAGE_UPLOAD_URL_PREFIX, skill_id),
+            {'filename': 'test.png'},
+            csrf_token=csrf_token,
+            upload_files=(('image', 'unused_filename', raw_image),)
+        )
+        filename = response_dict['filename']
+
+        self.logout()
+
+        response = self.get_custom_response(
+            self._get_image_url('skill', skill_id, filename), 'image/png')
+        self.assertEqual(response.body, raw_image)
+
+        # Image context: Question Suggestions.
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
+            encoding=None
+        ) as f:
+            raw_image = f.read()
+        response_dict = self.post_json(
+            '%s/question_suggestions/%s' % (
+                self.IMAGE_UPLOAD_URL_PREFIX,
+                skill_id
+            ),
             {'filename': 'test.png'},
             csrf_token=csrf_token,
             upload_files=(('image', 'unused_filename', raw_image),)

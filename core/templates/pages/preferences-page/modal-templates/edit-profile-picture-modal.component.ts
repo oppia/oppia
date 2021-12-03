@@ -16,7 +16,7 @@
  * @fileoverview Component for edit profile picture modal.
  */
 
-import { ChangeDetectorRef, Component, ElementRef, ViewChild, ViewRef } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, ViewChild } from '@angular/core';
 import { SafeResourceUrl } from '@angular/platform-browser';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
@@ -65,13 +65,18 @@ export class EditProfilePictureModalComponent extends ConfirmOrCancelModal {
     let reader = new FileReader();
     reader.onload = (e) => {
       this.uploadedImage = this.svgSanitizerService.getTrustedSvgResourceUrl(
-        (<FileReader>e.target).result as string);
+        (e.target as FileReader).result as string);
       if (!this.uploadedImage) {
         this.uploadedImage = decodeURIComponent(
-          (<FileReader>e.target).result as string);
+          (e.target as FileReader).result as string);
       }
-      if (!(this.changeDetectorRef as ViewRef).destroyed) {
+      try {
         this.changeDetectorRef.detectChanges();
+      } catch (viewDestroyedError) {
+        // This try catch block handles the following error in FE tests:
+        // ViewDestroyedError:
+        //   Attempt to use a destroyed view: detectChanges thrown.
+        // No further action is needed.
       }
       this.initializeCropper();
     };

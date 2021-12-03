@@ -16,15 +16,14 @@
 
 """System for computing recommendations for explorations and users."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import csv
 import datetime
+import io
 import json
 
 from core import feconf
-from core import python_utils
 from core.domain import rights_domain
 from core.platform import models
 
@@ -185,7 +184,7 @@ def get_topic_similarities_as_csv():
     The first line is a list of the current topics. The next lines are an
     adjacency matrix of similarities.
     """
-    output = python_utils.string_io()
+    output = io.StringIO()
     writer = csv.writer(output)
     writer.writerow(RECOMMENDATION_CATEGORIES)
 

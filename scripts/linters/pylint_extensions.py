@@ -18,8 +18,7 @@
 presubmit checks. Next message id would be C0041.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import linecache
 import os
@@ -27,7 +26,7 @@ import re
 import sys
 import tokenize
 
-from core.controllers import payload_validator
+from core import handler_schema_constants
 
 from .. import docstrings_checker
 
@@ -1369,7 +1368,12 @@ class ImportOnlyModulesChecker(checkers.BaseChecker):
     }
 
     # If import from any of these is made, it may not be a module.
-    EXCLUDED_IMPORT_MODULES = ['__future__', 'typing', 'mypy_imports']
+    EXCLUDED_IMPORT_MODULES = [
+        '__future__',
+        'typing',
+        'mypy_imports',
+        'typing_extensions'
+    ]
 
     @checker_utils.check_messages('import-only-modules')
     def visit_importfrom(self, node):
@@ -2143,36 +2147,6 @@ class DisallowedFunctionsChecker(checkers.BaseChecker):
                     break
 
 
-class DisallowDunderMetaclassChecker(checkers.BaseChecker):
-    """Custom pylint checker prohibiting use of "__metaclass__" and
-    enforcing use of "python_utils.with_metaclass()" instead.
-    """
-
-    __implements__ = interfaces.IAstroidChecker
-
-    name = 'no-dunder-metaclass'
-    priority = -1
-    msgs = {
-        'C0034': (
-            'Please use python_utils.with_metaclass() instead of __metaclass__',
-            'no-dunder-metaclass',
-            'Enforce usage of python_utils.with_metaclass() '
-            'instead of __metaclass__'
-        )
-    }
-
-    def visit_classdef(self, node):
-        """Visit each class definition in a module and check if there is a
-        __metaclass__ present.
-
-        Args:
-            node: astroid.nodes.ClassDef. Node for a class definition
-                in the AST.
-        """
-        if '__metaclass__' in node.locals:
-            self.add_message('no-dunder-metaclass', node=node)
-
-
 class DisallowHandlerWithoutSchema(checkers.BaseChecker):
     """Custom pylint checker prohibiting handlers which do not have schema
     defined within the class.
@@ -2256,7 +2230,10 @@ class DisallowHandlerWithoutSchema(checkers.BaseChecker):
         if not self.check_parent_class_is_basehandler(node):
             return
 
-        if node.name in payload_validator.HANDLER_CLASS_NAMES_WITH_NO_SCHEMA:
+        if (
+            node.name in
+            handler_schema_constants.HANDLER_CLASS_NAMES_WITH_NO_SCHEMA
+        ):
             return
 
         if 'URL_PATH_ARGS_SCHEMAS' not in node.locals:
@@ -2330,6 +2307,5 @@ def register(linter):
     linter.register_checker(InequalityWithNoneChecker(linter))
     linter.register_checker(NonTestFilesFunctionNameChecker(linter))
     linter.register_checker(DisallowedFunctionsChecker(linter))
-    linter.register_checker(DisallowDunderMetaclassChecker(linter))
     linter.register_checker(DisallowHandlerWithoutSchema(linter))
     linter.register_checker(DisallowedImportsChecker(linter))

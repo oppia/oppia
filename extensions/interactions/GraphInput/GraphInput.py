@@ -16,8 +16,7 @@
 
 """Python configuration for GraphInput interaction."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from extensions.interactions import base
 
@@ -31,8 +30,8 @@ class GraphInput(base.BaseInteraction):
     is_trainable = False
     _dependency_ids = []
     answer_type = 'Graph'
-    instructions = 'Create a graph'
-    narrow_instructions = 'View graph'
+    instructions = 'I18N_INTERACTIONS_GRAPH_INPUT_INSTRUCTION'
+    narrow_instructions = 'I18N_INTERACTIONS_GRAPH_INPUT_NARROW_INSTRUCTION'
     needs_summary = True
     can_have_solution = True
     show_generic_submit_button = True

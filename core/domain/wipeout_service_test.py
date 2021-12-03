@@ -14,8 +14,7 @@
 
 """Tests for wipeout service."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import datetime
 import logging
@@ -500,6 +499,27 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
 
         exp_summary_model = exp_models.ExpSummaryModel.get_by_id('exp_id')
         self.assertEqual(exp_summary_model.editor_ids, [])
+
+    def test_pre_delete_user_exp_user_with_voice_artist_role_is_deassigned(
+        self
+    ):
+        self.save_new_valid_exploration('exp_id', self.user_1_id)
+        self.publish_exploration(self.user_1_id, 'exp_id')
+        rights_manager.assign_role_for_exploration(
+            user_services.get_system_user(),
+            'exp_id',
+            self.user_2_id,
+            feconf.ROLE_VOICE_ARTIST
+        )
+
+        exp_summary_model = exp_models.ExpSummaryModel.get_by_id('exp_id')
+        self.assertEqual(exp_summary_model.voice_artist_ids, [self.user_2_id])
+
+        wipeout_service.pre_delete_user(self.user_2_id)
+        self.process_and_flush_pending_tasks()
+
+        exp_summary_model = exp_models.ExpSummaryModel.get_by_id('exp_id')
+        self.assertEqual(exp_summary_model.voice_artist_ids, [])
 
     def test_pre_delete_user_user_is_deassigned_from_topics(self):
         self.save_new_topic('top_id', self.user_1_id)
@@ -3824,6 +3844,7 @@ class WipeoutServiceDeleteSuggestionModelsTests(test_utils.GenericTestBase):
     USER_2_USERNAME = 'username2'
     VOICEOVER_1_ID = 'voiceover_1_id'
     VOICEOVER_2_ID = 'voiceover_2_id'
+    TRANSLATION_STATS_1_ID = 'translation_1_id'
     EXP_1_ID = 'exp_1_id'
     EXP_2_ID = 'exp_2_id'
 
@@ -3855,6 +3876,20 @@ class WipeoutServiceDeleteSuggestionModelsTests(test_utils.GenericTestBase):
             author_id=self.user_2_id,
             final_reviewer_id=self.user_1_id,
         ).put()
+        suggestion_models.TranslationContributionStatsModel(
+            id=self.TRANSLATION_STATS_1_ID,
+            language_code='cs',
+            contributor_user_id=self.user_1_id,
+            topic_id='topic',
+            submitted_translations_count=1,
+            submitted_translation_word_count=1,
+            accepted_translations_count=1,
+            accepted_translations_without_reviewer_edits_count=2,
+            accepted_translation_word_count=3,
+            rejected_translations_count=4,
+            rejected_translation_word_count=6,
+            contribution_dates=[]
+        ).put()
         wipeout_service.pre_delete_user(self.user_1_id)
         self.process_and_flush_pending_tasks()
 
@@ -3884,6 +3919,14 @@ class WipeoutServiceDeleteSuggestionModelsTests(test_utils.GenericTestBase):
             voiceover_application_model_2.final_reviewer_id,
             suggestion_mappings[self.VOICEOVER_2_ID]
         )
+
+    def test_translation_contribution_stats_are_deleted(self):
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+
+        self.assertIsNone(
+            suggestion_models.TranslationContributionStatsModel.get_by_id(
+                self.TRANSLATION_STATS_1_ID))
 
 
 class WipeoutServiceVerifyDeleteSuggestionModelsTests(

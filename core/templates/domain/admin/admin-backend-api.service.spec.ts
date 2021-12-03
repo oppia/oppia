@@ -88,7 +88,7 @@ describe('Admin backend api service', () => {
       rules: [{
         filters: [{
           type: PlatformParameterFilterType.ServerMode,
-          conditions: [<[string, string]>['=', 'dev']]
+          conditions: [['=', 'dev'] as [string, string]]
         }],
         value_when_matched: true
       }],
@@ -109,7 +109,6 @@ describe('Admin backend api service', () => {
       url_fragment: 'mathfsad',
     },
     classroom_promos_are_enabled: false,
-    contributor_can_suggest_questions: false,
     contributor_dashboard_is_enabled: true,
     contributor_dashboard_reviewer_emails_is_enabled: true,
     email_footer: 'fsdf',

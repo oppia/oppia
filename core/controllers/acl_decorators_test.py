@@ -16,14 +16,12 @@
 
 """Tests for core.domain.acl_decorators."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import json
 
 from core import android_validation_constants
 from core import feconf
-from core import python_utils
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -4739,6 +4737,38 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
             self.assertEqual(response['entity_type'], 'skill')
         self.logout()
 
+    def test_can_submit_images_to_questions(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id, self.admin_id, description='Description')
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock_edit_entity/%s/%s' % (
+                feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS, skill_id))
+            self.assertEqual(response['entity_id'], skill_id)
+            self.assertEqual(response['entity_type'], 'question_suggestions')
+        self.logout()
+
+    def test_unauthenticated_users_cannot_submit_images_to_questions(self):
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id, self.admin_id, description='Description')
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock_edit_entity/%s/%s' % (
+                feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS, skill_id),
+                expected_status_int=401)
+
+    def test_cannot_submit_images_to_questions_without_having_permissions(self):
+        self.login(self.user_email)
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id, self.admin_id, description='Description')
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock_edit_entity/%s/%s' % (
+                feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS, skill_id),
+                expected_status_int=401)
+            self.assertEqual(
+                response['error'], 'You do not have credentials to submit'
+                ' images to questions.')
+        self.logout()
+
     def test_can_edit_blog_post(self):
         self.login(self.BLOG_ADMIN_EMAIL)
         blog_admin_id = (
@@ -4965,8 +4995,8 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
         secret = 'fake_secret'
         payload['message'] = json.dumps('malicious message')
         payload['signature'] = classifier_services.generate_signature(
-            python_utils.convert_to_bytes(secret),
-            python_utils.convert_to_bytes(payload['message']),
+            secret.encode('utf-8'),
+            payload['message'].encode('utf-8'),
             payload['vm_id'])
 
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -4980,8 +5010,8 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
         secret = feconf.DEFAULT_VM_SHARED_SECRET
         payload['message'] = json.dumps('malicious message')
         payload['signature'] = classifier_services.generate_signature(
-            python_utils.convert_to_bytes(secret),
-            python_utils.convert_to_bytes(payload['message']),
+            secret.encode('utf-8'),
+            payload['message'].encode('utf-8'),
             payload['vm_id'])
         with self.swap(self, 'testapp', self.mock_testapp):
             with self.swap(constants, 'DEV_MODE', False):
@@ -4994,8 +5024,7 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
         secret = feconf.DEFAULT_VM_SHARED_SECRET
         payload['message'] = json.dumps('malicious message')
         payload['signature'] = classifier_services.generate_signature(
-            python_utils.convert_to_bytes(secret),
-            python_utils.convert_to_bytes('message'), payload['vm_id'])
+            secret.encode('utf-8'), 'message'.encode('utf-8'), payload['vm_id'])
 
         with self.swap(self, 'testapp', self.mock_testapp):
             self.post_json(
@@ -5007,8 +5036,8 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
         secret = feconf.DEFAULT_VM_SHARED_SECRET
         payload['message'] = json.dumps('message')
         payload['signature'] = classifier_services.generate_signature(
-            python_utils.convert_to_bytes(secret),
-            python_utils.convert_to_bytes(payload['message']),
+            secret.encode('utf-8'),
+            payload['message'].encode('utf-8'),
             payload['vm_id'])
 
         with self.swap(self, 'testapp', self.mock_testapp):

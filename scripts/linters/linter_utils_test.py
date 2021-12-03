@@ -16,9 +16,9 @@
 
 """Unit tests for linter_utils.py."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
+import builtins
 import collections
 import os
 import tempfile
@@ -185,7 +185,7 @@ class RedirectStoutTest(test_utils.GenericTestBase):
 
         with python_utils.open_file(temp_file.name, 'r+') as temp_file_contents:
             with linter_utils.redirect_stdout(temp_file_contents):
-                python_utils.PRINT('This is a test')
+                print('This is a test')
             temp_file_contents.seek(0)
             data = temp_file_contents.read()
         temp_file.close()
@@ -241,10 +241,10 @@ class ColorMessagePrintTest(test_utils.GenericTestBase):
         self.log = ''
 
         def mock_print(*args):
-            """Mock for python_utils.PRINT."""
-            self.log = ' '.join(python_utils.UNICODE(arg) for arg in args)
+            """Mock for print."""
+            self.log = ' '.join(str(arg) for arg in args)
 
-        self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
+        self.print_swap = self.swap(builtins, 'print', mock_print)
 
     def test_print_failure_message_prints_in_red_color(self):
         message = 'Failure Message'

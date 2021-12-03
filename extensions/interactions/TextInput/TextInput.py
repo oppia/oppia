@@ -16,8 +16,7 @@
 
 """Python configuration for TextInput interaction."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from extensions.interactions import base
 
@@ -65,7 +64,7 @@ class TextInput(base.BaseInteraction):
                 'min_value': 1,
             }, {
                 'id': 'is_at_most',
-                'max_value': 200,
+                'max_value': 10,
             }]
         },
         'default_value': 1,

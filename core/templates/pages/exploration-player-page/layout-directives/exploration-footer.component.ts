@@ -19,31 +19,39 @@
 
 import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { QuestionPlayerStateService } from 'components/question-directives/question-player/services/question-player-state.service';
 import { ExplorationSummaryBackendApiService } from 'domain/summary/exploration-summary-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { Subscription } from 'rxjs';
 import { ContextService } from 'services/context.service';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'oppia-exploration-footer',
   templateUrl: './exploration-footer.component.html'
 })
 export class ExplorationFooterComponent {
-  explorationId: string;
-  iframed: boolean;
-  windowIsNarrow: boolean;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  explorationId!: string;
+  iframed!: boolean;
+  windowIsNarrow!: boolean;
+  resizeSubscription!: Subscription;
   contributorNames: string[] = [];
-  resizeSubscription: Subscription;
+  hintsAndSolutionsAreSupported: boolean = true;
 
   constructor(
     private contextService: ContextService,
     private explorationSummaryBackendApiService:
     ExplorationSummaryBackendApiService,
+    private i18nLanguageCodeService: I18nLanguageCodeService,
     private urlService: UrlService,
     private windowDimensionsService: WindowDimensionsService,
-    private urlInterpolationService: UrlInterpolationService
+    private urlInterpolationService: UrlInterpolationService,
+    private questionPlayerStateService: QuestionPlayerStateService
   ) {}
 
   getStaticImageUrl(imagePath: string): string {
@@ -90,12 +98,23 @@ export class ExplorationFooterComponent {
           });
       }
     } catch (err) { }
+
+    if (this.contextService.isInQuestionPlayerMode()) {
+      this.questionPlayerStateService.resultsPageIsLoadedEventEmitter
+        .subscribe((resultsLoaded: boolean) => {
+          this.hintsAndSolutionsAreSupported = !resultsLoaded;
+        });
+    }
   }
 
   ngOnDestroy(): void {
     if (this.resizeSubscription) {
       this.resizeSubscription.unsubscribe();
     }
+  }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 }
 

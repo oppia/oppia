@@ -34,10 +34,10 @@ import { LoaderService } from 'services/loader.service';
 
 export interface GroupedSkillSummaries {
   current: {
-    id: string,
-    description: string,
-  }[],
-  others: SkillSummaryBackendDict[]
+    id: string;
+    description: string;
+  }[];
+  others: SkillSummaryBackendDict[];
 }
 @Injectable({
   providedIn: 'root'
@@ -233,6 +233,13 @@ export class SkillEditorStateService {
         this._skillIsBeingSaved = false;
       });
     return true;
+  }
+  /**
+   * Returns any validation issues associated with the current
+   * skill.
+   */
+  getSkillValidationIssues(): string[] {
+    return this._skill.getValidationIssues();
   }
   /**
    * Checks if the skill description exists and updates class

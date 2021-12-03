@@ -16,8 +16,7 @@
 
 """Tests for test_utils, mainly for the FunctionWrapper."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import logging
 import os
@@ -404,7 +403,7 @@ class TestUtilsTests(test_utils.GenericTestBase):
             logging.debug('2')
             logging.warn('3')
             logging.error('4')
-            python_utils.PRINT('5')
+            print('5')
         logging.info('6')
 
         self.assertEqual(logs, ['1', '2', '3', '4'])
@@ -416,7 +415,7 @@ class TestUtilsTests(test_utils.GenericTestBase):
             logging.debug('2')
             logging.warn('3')
             logging.error('4')
-            python_utils.PRINT('5')
+            print('5')
         logging.error('6')
 
         self.assertEqual(logs, ['3', '4'])
@@ -449,7 +448,7 @@ class TestUtilsTests(test_utils.GenericTestBase):
                 obj.func()
             except Exception as e:
                 self.assertIs(type(e), Exception)
-                self.assertEqual(python_utils.UNICODE(e), '')
+                self.assertEqual(str(e), '')
             else:
                 self.fail(msg='obj.func() did not raise an Exception')
 

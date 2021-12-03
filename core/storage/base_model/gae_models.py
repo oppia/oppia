@@ -14,14 +14,12 @@
 
 """Base model class."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import datetime
 import enum
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.platform import models
@@ -777,10 +775,10 @@ class VersionedModel(BaseModel):
 
     # The class designated as the snapshot model. This should be a subclass of
     # BaseSnapshotMetadataModel.
-    SNAPSHOT_METADATA_CLASS: Optional[Type['BaseSnapshotMetadataModel']] = None
+    SNAPSHOT_METADATA_CLASS: Optional[Type[BaseSnapshotMetadataModel]] = None
     # The class designated as the snapshot content model. This should be a
     # subclass of BaseSnapshotContentModel.
-    SNAPSHOT_CONTENT_CLASS: Optional[Type['BaseSnapshotContentModel']] = None
+    SNAPSHOT_CONTENT_CLASS: Optional[Type[BaseSnapshotContentModel]] = None
     # The class designated as the commit log entry model. This should be
     # a subclass of BaseCommitLogEntryModel. In cases where we do not need
     # to log the commits it can be None.
@@ -1245,7 +1243,7 @@ class VersionedModel(BaseModel):
             commit_cmds)
 
     @classmethod
-    def get_version( # type: ignore[return]
+    def get_version(
             cls: Type[SELF_VERSIONED_MODEL],
             entity_id: str,
             version_number: int,
@@ -1282,10 +1280,10 @@ class VersionedModel(BaseModel):
                 id=entity_id,
                 version=version_number
             )._reconstitute_from_snapshot_id(snapshot_id)
-        except cls.EntityNotFoundError:
+        except cls.EntityNotFoundError as e:
             if not strict:
                 return None
-            python_utils.reraise_exception() # type: ignore[no-untyped-call]
+            raise e
 
     @classmethod
     def get_multi_versions(

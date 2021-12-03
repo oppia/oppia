@@ -16,8 +16,7 @@
 
 """Unit tests for jobs.io.job_run_results_io."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from core.domain import beam_job_services
 from core.jobs import job_test_utils

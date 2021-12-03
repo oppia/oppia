@@ -16,12 +16,9 @@
 
 """Feature detection utilities for Python 2 and Python 3."""
 
-from __future__ import absolute_import
-from __future__ import print_function
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import io
-import itertools
 import os
 import pkgutil
 import sys
@@ -39,22 +36,13 @@ sys.path.insert(0, _CERTIFI_PATH)
 import yaml  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 import builtins  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-import future.utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 import past.builtins  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 import past.utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-import six  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-
-import certifi  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-import ssl  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 
-BASESTRING = past.builtins.basestring
-INPUT = builtins.input
 MAP = builtins.map
 NEXT = builtins.next
 OBJECT = builtins.object
-PRINT = print
-UNICODE = builtins.str
 ZIP = builtins.zip
 
 
@@ -97,54 +85,23 @@ def SimpleXMLRPCServer( # pylint: disable=invalid-name
         bind_and_activate=bind_and_activate)
 
 
-def nullcontext(enter_result=None):
-    """Returns nullcontext from contextlib2 if run under Python 2 and from
+def redirect_stdout(new_target):
+    """Returns redirect_stdout from contextlib2 if run under Python 2 and from
     contextlib if run under Python 3.
 
     Args:
-        enter_result: *. The object returned by the nullcontext when entered.
+        new_target: FileLike. The file-like object all messages printed to
+            stdout will be redirected to.
 
     Returns:
-        contextlib.nullcontext or contextlib2.nullcontext. The nullcontext
-        object.
+        contextlib.redirect_stdout or contextlib2.redirect_stdout. The
+        redirect_stdout object.
     """
     try:
-        from contextlib import nullcontext as impl  # pylint: disable=import-only-modules
+        from contextlib import redirect_stdout as impl  # pylint: disable=import-only-modules
     except ImportError:
-        from contextlib2 import nullcontext as impl  # pylint: disable=import-only-modules
-    return impl(enter_result=enter_result)
-
-
-def ExitStack(): # pylint: disable=invalid-name
-    """Returns ExitStack from contextlib2 if run under Python 2 and from
-    contextlib if run under Python 3.
-
-    Returns:
-        contextlib.ExitStack or contextlib2.ExitStack. The ExitStack object.
-    """
-    try:
-        from contextlib import ExitStack as impl  # pylint: disable=import-only-modules
-    except ImportError:
-        from contextlib2 import ExitStack as impl  # pylint: disable=import-only-modules
-    return impl()
-
-
-def string_io(buffer_value=''):
-    """Returns StringIO from StringIO module if run under Python 2 and from io
-    module if run under Python 3.
-
-    Args:
-        buffer_value: str. A string that is to be converted to in-memory text
-            stream.
-
-    Returns:
-        StringIO.StringIO or io.StringIO. The StringIO object.
-    """
-    try:
-        from StringIO import StringIO  # pylint: disable=import-only-modules
-    except ImportError:
-        from io import StringIO  # pylint: disable=import-only-modules
-    return StringIO(buffer_value)  # pylint: disable=disallowed-function-calls
+        from contextlib2 import redirect_stdout as impl  # pylint: disable=import-only-modules
+    return impl(new_target)
 
 
 def get_args_of_function_node(function_node, args_to_ignore):
@@ -215,25 +172,6 @@ def get_package_file_contents(package: str, filepath: str) -> str:
         return file.read()
     except FileNotFoundError:
         return pkgutil.get_data(package, filepath).decode('utf-8')
-
-
-def url_parse(urlstring):
-    """Parse a URL into six components using urlparse.urlparse if run under
-    Python 2 and urllib.parse.urlparse if run under Python 3. This corresponds
-    to the general structure of a URL:
-    scheme://netloc/path;parameters?query#fragment.
-
-    Args:
-        urlstring: str. The URL.
-
-    Returns:
-        tuple(str). The components of a URL.
-    """
-    try:
-        import urllib.parse as urlparse
-    except ImportError:
-        import urlparse
-    return urlparse.urlparse(urlstring)  # pylint: disable=disallowed-function-calls
 
 
 def url_unsplit(url_parts):
@@ -328,53 +266,6 @@ def url_encode(query, doseq=False):
     return urlparse.urlencode(query, doseq=doseq)
 
 
-def url_retrieve(source_url, filename=None):
-    """Copy a network object denoted by a URL to a local file using
-    urllib.urlretrieve if run under Python 2 and urllib.request.urlretrieve if
-    run under Python 3.
-
-    Args:
-        source_url: str. The URL.
-        filename: str. The file location to copy to.
-
-    Returns:
-        urlretrieve. The 'urlretrieve' object.
-    """
-    try:
-        import urllib.request as urlrequest
-    except ImportError:
-        import urllib as urlrequest
-
-    # Change the User-Agent to prevent servers from blocking requests.
-    # See https://support.cloudflare.com/hc/en-us/articles/360029779472-Troubleshooting-Cloudflare-1XXX-errors#error1010. # pylint: disable=line-too-long
-    urlrequest.URLopener.version = (
-        'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) '
-        'Gecko/20100101 Firefox/47.0'
-    )
-    return urlrequest.urlretrieve(source_url, filename=filename)
-
-
-def url_open(source_url):
-    """Open a network object denoted by a URL for reading using
-    urllib2.urlopen if run under Python 2 and urllib.request.urlopen if
-    run under Python 3.
-
-    Args:
-        source_url: str. The URL.
-
-    Returns:
-        urlopen. The 'urlopen' object.
-    """
-    # TODO(#12912): Remove pylint disable after the arg-name-for-non-keyword-arg
-    # check is refactored.
-    context = ssl.create_default_context(cafile=certifi.where())  # pylint: disable=arg-name-for-non-keyword-arg
-    try:
-        import urllib.request as urlrequest
-    except ImportError:
-        import urllib2 as urlrequest
-    return urlrequest.urlopen(source_url, context=context)
-
-
 def url_request(source_url, data, headers):
     """This function provides an abstraction of a URL request. It uses
     urllib2.Request if run under Python 2 and urllib.request.Request if
@@ -409,57 +300,6 @@ def divide(number1, number2):
     return past.utils.old_div(number1, number2)
 
 
-def with_metaclass(meta, *bases):
-    """Python 2 & 3 helper for installing metaclasses.
-
-    Example:
-
-        class BaseForm:
-            pass
-
-        class FormType(type):
-            pass
-
-        class Form(with_metaclass(FormType, BaseForm)):
-            pass
-
-    Args:
-        meta: type. The metaclass to install on the derived class.
-        *bases: tuple(class). The base classes to install on the derived class.
-            When empty, `object` will be the sole base class.
-
-    Returns:
-        class. A proxy class that mutates the classes which inherit from it to
-        install the input meta class and inherit from the input base classes.
-        The proxy class itself does not actually become one of the base classes.
-    """
-    if not bases:
-        bases = (OBJECT,)
-    return future.utils.with_metaclass(meta, *bases)
-
-
-def convert_to_bytes(string_to_convert) -> bytes:
-    """Converts the string to bytes.
-
-    Args:
-        string_to_convert: unicode|str. Required string to be converted into
-            bytes.
-
-    Returns:
-        bytes. The encoded string.
-    """
-    if isinstance(string_to_convert, UNICODE):
-        return string_to_convert.encode('utf-8')
-    elif isinstance(string_to_convert, int):
-        raise Exception(
-            'Passing int is not allowed, since it is insecure, because when a '
-            'big number is passed to the bytes function it can spend some time '
-            'generating an array with empty bytes. '
-            'See: https://beginnersbook.com/2019/05/python-bytes/'
-        )
-    return bytes(string_to_convert)
-
-
 def _recursively_convert_to_str(value):
     """Convert all builtins.bytes and builtins.str elements in a data structure
     to bytes and unicode respectively. This is required for the
@@ -482,7 +322,7 @@ def _recursively_convert_to_str(value):
         }
     # We are using 'type' here instead of 'isinstance' because we need to
     # clearly distinguish the builtins.str and builtins.bytes strings.
-    elif type(value) == UNICODE:  # pylint: disable=unidiomatic-typecheck
+    elif type(value) == str:  # pylint: disable=unidiomatic-typecheck
         return value
     elif type(value) == builtins.bytes:  # pylint: disable=unidiomatic-typecheck
         return value.decode('utf-8')
@@ -503,16 +343,6 @@ def yaml_from_dict(dictionary, width=80):
     """
     dictionary = _recursively_convert_to_str(dictionary)
     return yaml.safe_dump(dictionary, default_flow_style=False, width=width)
-
-
-def reraise_exception():
-    """Reraise exception with complete stacktrace."""
-    # TODO(#11547): This method can be replace by 'raise e' after we migrate
-    # to Python 3.
-    # This code is needed in order to reraise the error properly with
-    # the stacktrace. See https://stackoverflow.com/a/18188660/3688189.
-    exec_info = sys.exc_info()
-    six.reraise(exec_info[0], exec_info[1], tb=exec_info[2])
 
 
 def create_enum(*sequential):
@@ -539,23 +369,3 @@ def create_enum(*sequential):
             }
             _enums[name] = type('Enum', (), _value)
         return type('Enum', (), _enums)
-
-
-def zip_longest(*args, **kwargs):
-    """Creates an iterator that aggregates elements from each of the iterables.
-    If the iterables are of uneven length, missing values are
-    filled-in with fillvalue.
-
-    Args:
-        *args: list(*). Iterables that needs to be aggregated into an iterable.
-        **kwargs: dict. It contains fillvalue.
-
-    Returns:
-        iterable(iterable). A sequence of aggregates elements
-        from each of the iterables.
-    """
-    fillvalue = kwargs.get('fillvalue')
-    try:
-        return itertools.zip_longest(*args, fillvalue=fillvalue)
-    except AttributeError:
-        return itertools.izip_longest(*args, fillvalue=fillvalue)
