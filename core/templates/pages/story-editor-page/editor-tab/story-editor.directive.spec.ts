@@ -19,7 +19,7 @@
 import { EventEmitter } from '@angular/core';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-describe('Story editor Directive having two story nodes', function() {
+fdescribe('Story editor Directive having two story nodes', function() {
   beforeEach(angular.mock.module('oppia'));
 
   importAllAngularServices();

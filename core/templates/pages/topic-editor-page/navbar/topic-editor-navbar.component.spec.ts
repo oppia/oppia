@@ -24,7 +24,7 @@ import { TopicRights } from 'domain/topic/topic-rights.model';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 require('services/ngb-modal.service.ts');
 
-fdescribe('topicEditorNavbar', () => {
+describe('topicEditorNavbar', () => {
   let ctrl = null;
   let $scope = null;
   let $rootScope = null;
@@ -463,7 +463,6 @@ fdescribe('topicEditorNavbar', () => {
         callback();
         expect(msg).toBe('commitMessage');
       });
-    $scope.topicIsPublished = true;
     $scope.saveChanges();
     tick();
 
@@ -487,7 +486,6 @@ fdescribe('topicEditorNavbar', () => {
         };
       });
     spyOn(AlertsService, 'addSuccessMessage');
-    $scope.topicIsPublished = true;
     $scope.saveChanges();
     tick();
 
