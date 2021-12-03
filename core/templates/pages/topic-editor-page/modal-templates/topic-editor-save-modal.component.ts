@@ -16,16 +16,16 @@
  * @fileoverview Component for topic editor save modal.
  */
 
-import { Component, Input, OnInit } from "@angular/core";
-import { NgbActiveModal } from "@ng-bootstrap/ng-bootstrap";
-import { AppConstants } from "app.constants";
-import { ConfirmOrCancelModal } from "components/common-layout-directives/common-elements/confirm-or-cancel-modal.component";
+import { Component, Input, OnInit } from '@angular/core';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { AppConstants } from 'app.constants';
+import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
   selector: 'oppia-topic-editor-save-modal',
   templateUrl: './topic-editor-save-modal.component.html'
 })
-export class TopicEditorSaveModalComponent extends ConfirmOrCancelModal 
+export class TopicEditorSaveModalComponent extends ConfirmOrCancelModal
   implements OnInit {
   @Input() topicIsPublished: boolean;
 

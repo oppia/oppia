@@ -16,10 +16,10 @@
  * @fileoverview Unit tests for TopicEditorSaveModalComponent.
  */
 
-import { NO_ERRORS_SCHEMA } from "@angular/core";
-import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
-import { NgbActiveModal } from "@ng-bootstrap/ng-bootstrap";
-import { TopicEditorSaveModalComponent } from "./topic-editor-save-modal.component";
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { TopicEditorSaveModalComponent } from './topic-editor-save-modal.component';
 
 class MockActiveModal {
   close(): void {
@@ -58,8 +58,8 @@ describe('Topic Editor Save Modal Controller', function() {
   });
 
   it('should initialize component properties after component is initialized',
-   () => {
+    () => {
       component.isTopicPublished = topicIsPublished;
       expect(component.isTopicPublished).toBe(true);
-   });
+    });
 });
