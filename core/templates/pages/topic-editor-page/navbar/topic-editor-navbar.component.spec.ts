@@ -22,8 +22,9 @@ import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { Subtopic } from 'domain/topic/subtopic.model';
 import { TopicRights } from 'domain/topic/topic-rights.model';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+require('services/ngb-modal.service.ts');
 
-describe('topicEditorNavbar', () => {
+fdescribe('topicEditorNavbar', () => {
   let ctrl = null;
   let $scope = null;
   let $rootScope = null;
@@ -42,7 +43,15 @@ describe('topicEditorNavbar', () => {
   let undoRedoChangeAppliedEventEmitter = new EventEmitter();
 
   importAllAngularServices();
-  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
   beforeEach(angular.mock.module('oppia', function($provide) {
     let mockWindow = {
       location: '',
@@ -454,7 +463,7 @@ describe('topicEditorNavbar', () => {
         callback();
         expect(msg).toBe('commitMessage');
       });
-
+    $scope.topicIsPublished = true;
     $scope.saveChanges();
     tick();
 
@@ -478,7 +487,7 @@ describe('topicEditorNavbar', () => {
         };
       });
     spyOn(AlertsService, 'addSuccessMessage');
-
+    $scope.topicIsPublished = true;
     $scope.saveChanges();
     tick();
 
