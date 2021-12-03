@@ -198,7 +198,7 @@ describe('AudioPlayerService', () => {
         expect(subjectNext).toHaveBeenCalledTimes(2);
         expect(audioTranslationManagerService.clearSecondaryAudioTranslations)
           .toHaveBeenCalled();
-    }));
+      }));
 
     it('should rewind the track when user clicks the \'Rewind\' ' +
     'button', fakeAsync(() => {
