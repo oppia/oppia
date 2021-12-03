@@ -24,8 +24,6 @@ from __future__ import annotations
 import argparse
 import subprocess
 
-from core import python_utils
-
 from . import common
 from . import run_backend_tests
 from . import run_frontend_tests
@@ -59,10 +57,10 @@ def main(args=None):
     parsed_args = _PARSER.parse_args(args=args)
 
     # Run Javascript and Python linters.
-    python_utils.PRINT('Linting files since the last commit')
+    print('Linting files since the last commit')
     pre_commit_linter.main(args=[])
-    python_utils.PRINT('Linting passed.')
-    python_utils.PRINT('')
+    print('Linting passed.')
+    print('')
 
     current_branch = subprocess.check_output([
         'git', 'rev-parse', '--abbrev-ref', 'HEAD'])
@@ -81,16 +79,16 @@ def main(args=None):
     else:
         branch = 'develop'
 
-    python_utils.PRINT('Comparing the current branch with %s' % branch)
+    print('Comparing the current branch with %s' % branch)
 
     all_changed_files = subprocess.check_output([
         'git', 'diff', '--cached', '--name-only', '--diff-filter=ACM', branch])
 
     if common.FRONTEND_DIR in all_changed_files:
         # Run frontend unit tests.
-        python_utils.PRINT('Running frontend unit tests')
+        print('Running frontend unit tests')
         run_frontend_tests.main(args=['--run_minified_tests'])
-        python_utils.PRINT('Frontend tests passed.')
+        print('Frontend tests passed.')
     else:
         # If files in common.FRONTEND_DIR were not changed, skip the tests.
         common.print_each_string_after_two_new_lines([
@@ -98,9 +96,9 @@ def main(args=None):
             'Skipped frontend tests'])
 
     # Run backend tests.
-    python_utils.PRINT('Running backend tests')
+    print('Running backend tests')
     run_backend_tests.main(args=[])
-    python_utils.PRINT('Backend tests passed.')
+    print('Backend tests passed.')
 
 
 if __name__ == '__main__':
