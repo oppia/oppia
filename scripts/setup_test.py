@@ -270,7 +270,7 @@ class SetupTests(test_utils.GenericTestBase):
         with self.test_py_swap, getcwd_swap, print_swap:
             with self.assertRaisesRegexp(Exception, 'Invalid root directory.'):
                 setup.main(args=[])
-        self.assertTrue(
+        self.assertFalse(
             'WARNING   This script should be run from the oppia/ '
             'root folder.' in print_arr)
         self.assertTrue(
