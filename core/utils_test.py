@@ -751,7 +751,6 @@ class UtilsTests(test_utils.GenericTestBase):
     def test_quoted_string(self) -> None:
         self.assertEqual(utils.quoted('a"b\'c'), '"a\\"b\'c"')
 
-
     def test_is_base64_encoded(self) -> None:
         image = '<svg><path d="%s" /></svg>' % (
             'M150 0 L75 200 L225 200 Z ' * 1000)
@@ -767,4 +766,3 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(response.getcode(), 200) # type: ignore[attr-defined]
         self.assertEqual(
             response.url, 'http://www.google.com') # type: ignore[attr-defined]
-
