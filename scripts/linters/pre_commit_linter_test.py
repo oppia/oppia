@@ -193,7 +193,7 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
         with self.print_swap, self.sys_swap:
             with self.install_swap:
                 pre_commit_linter.main(args=['--files=%s' % PYLINTRC_FILEPATH])
-        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(all_checks_passed(self.linter_stdout))
 
     def test_main_with_error_message(self):
         all_errors_swap = self.swap(
