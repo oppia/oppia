@@ -1467,6 +1467,22 @@ class WrittenTranslation:
         DATA_FORMAT_SET_OF_UNICODE_STRING: 'TranslatableSetOfUnicodeString',
     }
 
+    @classmethod
+    def is_data_format_list(cls, data_format):
+        """Checks whether the content of translation with given format is of
+        a list type.
+
+        Args:
+            data_format: str. The format of the translation.
+
+        Returns:
+            bool. Whether the content of translation is a list.
+        """
+        return data_format in (
+            cls.DATA_FORMAT_SET_OF_NORMALIZED_STRING,
+            cls.DATA_FORMAT_SET_OF_UNICODE_STRING
+        )
+
     def __init__(self, data_format, translation, needs_update):
         """Initializes a WrittenTranslation domain object.
 
@@ -3240,6 +3256,21 @@ class State:
                         self.interaction.id)
 
         return content_id_to_translatable_item
+
+    def has_content_id(self, content_id):
+        """Returns whether a given content ID is available in the translatable
+        content.
+
+        Args:
+            content_id: str. The content ID that needs to be checked for the
+                availability.
+
+        Returns:
+            bool. A boolean that indicates the availability of the content ID
+            in the translatable content.
+        """
+        available_translate_content = self._get_all_translatable_content()
+        return bool(content_id in available_translate_content)
 
     def get_content_id_mapping_needing_translations(self, language_code):
         """Returns all text html which can be translated in the given language.
