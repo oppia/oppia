@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import argparse
 import contextlib
+import io
 import json
 import os
 import subprocess
@@ -27,6 +28,7 @@ import urllib.request as urlrequest
 import zipfile
 
 from core import python_utils
+from core import utils
 
 from . import common
 from . import install_backend_python_libs
@@ -145,8 +147,7 @@ def download_and_unzip_files(
             req.add_header('User-agent', 'python')
             # This is needed to get a seekable filestream that can be used
             # by zipfile.ZipFile.
-            file_stream = python_utils.string_io(
-                buffer_value=python_utils.url_open(req).read())
+            file_stream = io.StringIO(utils.url_open(req).read())
             with zipfile.ZipFile(file_stream, 'r') as zfile:
                 zfile.extractall(path=target_parent_dir)
 
