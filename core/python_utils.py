@@ -180,13 +180,13 @@ def url_parse(urlstring):
     Python 2 and urllib.parse.urlparse if run under Python 3. This corresponds
     to the general structure of a URL:
     scheme://netloc/path;parameters?query#fragment.
-
+    
     Args:
         urlstring: str. The URL.
 
     Returns:
         tuple(str). The components of a URL.
-=======
+    """
 def url_unsplit(url_parts):
     """Combine the elements of a tuple as returned by urlsplit() into a complete
     URL as a string using urlparse.urlunsplit if run under Python 2 and
@@ -197,7 +197,6 @@ def url_unsplit(url_parts):
 
     Returns:
         str. The complete URL.
-
     """
     try:
         import urllib.parse as urlparse
