@@ -1,5 +1,5 @@
 <div class="oppia-opportunities-list">
-  <div *ngFor="let opportunity of visibleOpportunities">
+  <div [hidden]="loadingOpportunityData" *ngFor="let opportunity of visibleOpportunities">
     <oppia-opportunities-list-item [opportunity]="opportunity"
                              (clickActionButton)="clickActionButton.emit($event)"
                              [progressBarRequired]="progressBarRequired"
@@ -12,7 +12,7 @@
     <oppia-opportunities-list-item></oppia-opportunities-list-item>
     <oppia-opportunities-list-item></oppia-opportunities-list-item>
   </div>
-  <div class="oppia-opportunity-pagination-contaniner" *ngIf="visibleOpportunities.length > 0">
+  <div class="oppia-opportunity-pagination-container" *ngIf="visibleOpportunities.length > 0">
     <button type="button"
             class="oppia-pagination-button"
             (click)="gotoPage(activePageNumber - 1)"
@@ -57,7 +57,7 @@
     overflow: auto;
     width: 80%;
   }
-  .oppia-opportunity-pagination-contaniner {
+  .oppia-opportunity-pagination-container {
     display: flex;
     justify-content: space-around;
     margin: 20px 0;

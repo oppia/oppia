@@ -92,6 +92,7 @@ export class OpportunitiesListComponent {
   }
 
   ngOnInit(): void {
+    this.loadingOpportunityData = true;
     this.loadOpportunities().then(({opportunitiesDicts, more}) => {
       // This ngZone run closure will not be required after \
       // migration is complete.
