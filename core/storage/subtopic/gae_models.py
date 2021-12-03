@@ -21,7 +21,7 @@ from __future__ import annotations
 from core.constants import constants
 from core.platform import models
 
-from typing import Any, Dict, List, Mapping, Optional
+from typing import Any, Dict, List, Mapping
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -128,7 +128,7 @@ class SubtopicPageModel(base_models.VersionedModel):
     def compute_models_to_commit(
         self,
         committer_id: str,
-        commit_type: Optional[str],
+        commit_type: str,
         commit_message: str,
         commit_cmds: List[Dict[str, Any]],
         additional_models: Mapping[str, base_models.BaseModel]

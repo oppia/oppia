@@ -173,7 +173,7 @@ class MigrateSkillJob(base_jobs.JobBase):
         change_dicts = [change.to_dict() for change in skill_changes]
         models_to_put = updated_skill_model.compute_models_to_commit(
             feconf.MIGRATION_BOT_USERNAME,
-            updated_skill_model._COMMIT_TYPE_EDIT,
+            feconf.COMMIT_TYPE_EDIT,
             commit_message,
             change_dicts,
             additional_models={}

@@ -809,15 +809,12 @@ class VersionedModel(BaseModel):
 
     # IMPORTANT: Subclasses should only overwrite things above this line.
 
-    # The possible commit types.
-    _COMMIT_TYPE_CREATE = 'create'
-    _COMMIT_TYPE_REVERT = 'revert'
-    _COMMIT_TYPE_EDIT = 'edit'
-    _COMMIT_TYPE_DELETE = 'delete'
     # A list containing the possible commit types.
     COMMIT_TYPE_CHOICES = [
-        _COMMIT_TYPE_CREATE, _COMMIT_TYPE_REVERT, _COMMIT_TYPE_EDIT,
-        _COMMIT_TYPE_DELETE
+        feconf.COMMIT_TYPE_CREATE,
+        feconf.COMMIT_TYPE_REVERT,
+        feconf.COMMIT_TYPE_EDIT,
+        feconf.COMMIT_TYPE_DELETE
     ]
     # The reserved prefix for keys that are automatically inserted into a
     # commit_cmd dict by this model.
@@ -928,7 +925,7 @@ class VersionedModel(BaseModel):
     def compute_models_to_commit(
         self,
         committer_id: str,
-        commit_type: Optional[str],
+        commit_type: str,
         commit_message: str,
         commit_cmds: List[Dict[str, Any]],
         unused_additional_models: Mapping[str, BaseModel]
@@ -1056,14 +1053,14 @@ class VersionedModel(BaseModel):
                 List[BaseModel],
                 self.compute_models_to_commit(
                     committer_id,
-                    self._COMMIT_TYPE_DELETE,
+                    feconf.COMMIT_TYPE_DELETE,
                     commit_message,
                     commit_cmds,
                     self._prepare_additional_models()
-                )
-            ).values()
-            datastore_services.update_timestamps_multi(list(models_to_put))
-            datastore_services.put_multi(list(models_to_put))
+                ).values()
+            )
+            BaseModel.update_timestamps_multi(models_to_put)
+            BaseModel.put_multi(models_to_put)
 
     # We have ignored [override] here because the signature of this method
     # doesn't match with BaseModel.delete_multi().
@@ -1161,8 +1158,13 @@ class VersionedModel(BaseModel):
                 assert model.SNAPSHOT_METADATA_CLASS is not None
                 snapshot_metadata_models.append(
                     model.SNAPSHOT_METADATA_CLASS.create(
-                        snapshot_id, committer_id, cls._COMMIT_TYPE_DELETE,
-                        commit_message, commit_cmds))
+                        snapshot_id,
+                        committer_id,
+                        feconf.COMMIT_TYPE_DELETE,
+                        commit_message,
+                        commit_cmds
+                    )
+                )
 
                 # This assert is used to eliminate the possibility of None
                 # during mypy type checking.
@@ -1231,20 +1233,23 @@ class VersionedModel(BaseModel):
                     'Invalid change list command: %s' % commit_cmd['cmd'])
 
         commit_type = (
-            self._COMMIT_TYPE_CREATE
+            feconf.COMMIT_TYPE_CREATE
             if self.version == 0
-            else self._COMMIT_TYPE_EDIT
+            else feconf.COMMIT_TYPE_EDIT
         )
 
-        models_to_put = self.compute_models_to_commit(
-            committer_id,
-            commit_type,
-            commit_message,
-            commit_cmds,
-            self._prepare_additional_models()
-        ).values()
-        BaseModel.update_timestamps_multi(list(models_to_put))
-        BaseModel.put_multi_transactional(list(models_to_put))
+        models_to_put = cast(
+            List[BaseModel],
+            self.compute_models_to_commit(
+                committer_id,
+                commit_type,
+                commit_message,
+                commit_cmds,
+                self._prepare_additional_models()
+            ).values()
+        )
+        BaseModel.update_timestamps_multi(models_to_put)
+        BaseModel.put_multi_transactional(models_to_put)
 
     @classmethod
     def revert(
@@ -1298,7 +1303,7 @@ class VersionedModel(BaseModel):
             List[BaseModel],
             new_model.compute_models_to_commit(
                 committer_id,
-                cls._COMMIT_TYPE_REVERT,
+                feconf.COMMIT_TYPE_REVERT,
                 commit_message,
                 commit_cmds,
                 new_model._prepare_additional_models()

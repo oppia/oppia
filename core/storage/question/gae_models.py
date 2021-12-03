@@ -25,7 +25,7 @@ from core import utils
 from core.constants import constants
 from core.platform import models
 
-from typing import Any, Dict, List, Mapping, Optional, Sequence
+from typing import Any, Dict, List, Mapping, Sequence
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -186,7 +186,7 @@ class QuestionModel(base_models.VersionedModel):
     def compute_models_to_commit(
         self,
         committer_id: str,
-        commit_type: Optional[str],
+        commit_type: str,
         commit_message: str,
         commit_cmds: List[Dict[str, Any]],
         additional_models: Mapping[str, base_models.BaseModel]

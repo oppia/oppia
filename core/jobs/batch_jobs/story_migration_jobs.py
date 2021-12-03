@@ -141,7 +141,7 @@ class MigrateStoryJob(base_jobs.JobBase):
         change_dicts = [change.to_dict() for change in story_changes]
         models_to_put = updated_story_model.compute_models_to_commit(
             feconf.MIGRATION_BOT_USERNAME,
-            updated_story_model._COMMIT_TYPE_EDIT,
+            feconf.COMMIT_TYPE_EDIT,
             'Update story contents schema version to %d.' % (
                 feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION),
             change_dicts,

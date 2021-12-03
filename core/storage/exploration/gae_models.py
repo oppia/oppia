@@ -27,7 +27,7 @@ from core.constants import constants
 from core.platform import models
 import core.storage.base_model.gae_models as base_models
 
-from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
+from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -312,14 +312,19 @@ class ExplorationModel(base_models.VersionedModel):
             additional_models
         )
 
+        # The cast is needed because the additional_models is list of BaseModels
+        # and we want to hint the mypy that this is ExplorationRightsModel.
+        exploration_rights_model = cast(
+            ExplorationRightsModel, additional_models['rights_model']
+        )
         exploration_commit_log = ExplorationCommitLogEntryModel.create(
             self.id, self.version,
             committer_id,
             commit_type,
             commit_message,
             commit_cmds,
-            additional_models['rights_model'].status,
-            additional_models['rights_model'].community_owned
+            exploration_rights_model.status,
+            exploration_rights_model.community_owned
         )
         exploration_commit_log.exploration_id = self.id
         return {
@@ -369,7 +374,7 @@ class ExplorationModel(base_models.VersionedModel):
                 assert rights_model is not None
                 exploration_commit_log = ExplorationCommitLogEntryModel.create(
                     model.id, model.version, committer_id,
-                    cls._COMMIT_TYPE_DELETE,
+                    feconf.COMMIT_TYPE_DELETE,
                     commit_message, [{'cmd': cls.CMD_DELETE_COMMIT}],
                     rights_model.status, rights_model.community_owned
                 )
@@ -721,7 +726,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
     def compute_models_to_commit(
         self,
         committer_id: str,
-        commit_type: Optional[str],
+        commit_type: str,
         commit_message: str,
         commit_cmds: List[Dict[str, Any]],
         additional_models: Mapping[str, base_models.BaseModel]
