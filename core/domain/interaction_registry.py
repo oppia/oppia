@@ -170,12 +170,12 @@ class Registry:
         spec_file = os.path.join(
             feconf.INTERACTIONS_LEGACY_SPECS_FILE_DIR, file_name)
 
-        if os.path.isfile(spec_file):
+        try:
             with python_utils.open_file(spec_file, 'r') as f:
                 specs_from_json = json.loads(f.read())
             cls._state_schema_version_to_interaction_specs[
                 state_schema_version] = specs_from_json
             return cls._state_schema_version_to_interaction_specs[
                 state_schema_version]
-        else:
+        except IOError:
             return cls.get_all_specs()
