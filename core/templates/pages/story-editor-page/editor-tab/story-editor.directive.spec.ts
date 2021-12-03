@@ -17,8 +17,6 @@
  */
 
 import { EventEmitter } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 require('services/ngb-modal.service.ts');
 
@@ -49,10 +47,8 @@ describe('Story editor Directive having two story nodes', function() {
   var StoryObjectFactory = null;
   var WindowRef = null;
   let fetchSpy = null;
-  let ngbModal: NgbModal;
 
   beforeEach(angular.mock.inject(function($injector) {
-    ngbModal = TestBed.inject(NgbModal);
     $uibModal = $injector.get('$uibModal');
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
