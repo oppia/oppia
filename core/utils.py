@@ -232,7 +232,7 @@ def dict_from_yaml(yaml_str: str) -> Dict[str, Any]:
         raise InvalidInputException(e)
 
 
-def yaml_from_dict(dictionary: Dict[str, Any], width: int = 80) -> Any:
+def yaml_from_dict(dictionary: Dict[str, Any], width: int = 80) -> str:
     """Gets the YAML representation of a dict.
 
     Args:
@@ -244,7 +244,7 @@ def yaml_from_dict(dictionary: Dict[str, Any], width: int = 80) -> Any:
         str. Converted yaml of the passed dictionary.
     """
     # The type ignore is needed, because typestubs define the return type
-    # of 'safe_dump' as 'Any' which is wrong.
+    # of 'dump' as 'Any' which is wrong.
     return yaml.dump( # type: ignore[no-any-return]
            dictionary, allow_unicode=True, width=width
     )
