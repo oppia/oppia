@@ -13,12 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for reassign role confirmation modal.
+ * @fileoverview Component for reassign role confirmation modal.
  */
 
+import { Component, Input } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'oppia-remove-role-confirmation-modal',

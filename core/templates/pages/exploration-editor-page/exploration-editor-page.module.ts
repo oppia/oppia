@@ -45,7 +45,7 @@ import { ExplorationPublishModalComponent } from 'pages/exploration-editor-page/
 import { EditorReloadingModalComponent } from './modal-templates/editor-reloading-modal.component';
 import { ConfirmDiscardChangesModalComponent } from './modal-templates/confirm-discard-changes-modal.component';
 import { CreateFeedbackThreadModalComponent } from './feedback-tab/templates/create-feedback-thread-modal.component';
-import { DeleteExplorationModal } from './settings-tab/templates/delete-exploration-modal.component';
+import { DeleteExplorationModalComponent } from './settings-tab/templates/delete-exploration-modal.component';
 import { RemoveRoleConfirmationModalComponent } from './settings-tab/templates/remove-role-confirmation-modal.component';
 import { ReassignRoleConfirmationModalComponent } from './settings-tab/templates/reassign-role-confirmation-modal.component';
 import { ModeratorUnpublishExplorationModalComponent } from './settings-tab/templates/moderator-unpublish-exploration-modal.component';
@@ -77,7 +77,7 @@ import { TransferExplorationOwnershipModalComponent } from './settings-tab/templ
     ExplorationPublishModalComponent,
     EditorReloadingModalComponent,
     CreateFeedbackThreadModalComponent,
-    DeleteExplorationModal,
+    DeleteExplorationModalComponent,
     RemoveRoleConfirmationModalComponent,
     ReassignRoleConfirmationModalComponent,
     ModeratorUnpublishExplorationModalComponent,
@@ -99,7 +99,7 @@ import { TransferExplorationOwnershipModalComponent } from './settings-tab/templ
     ExplorationPublishModalComponent,
     EditorReloadingModalComponent,
     CreateFeedbackThreadModalComponent,
-    DeleteExplorationModal,
+    DeleteExplorationModalComponent,
     RemoveRoleConfirmationModalComponent,
     ReassignRoleConfirmationModalComponent,
     ModeratorUnpublishExplorationModalComponent,

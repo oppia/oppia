@@ -20,7 +20,7 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { DeleteExplorationModal } from './delete-exploration-modal.component';
+import { DeleteExplorationModalComponent } from './delete-exploration-modal.component';
 
 class MockActiveModal {
   close(): void {
@@ -33,13 +33,13 @@ class MockActiveModal {
 }
 
 describe('Delete Exploration Modal', function() {
-  let component: DeleteExplorationModal;
-  let fixture: ComponentFixture<DeleteExplorationModal>;
+  let component: DeleteExplorationModalComponent;
+  let fixture: ComponentFixture<DeleteExplorationModalComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
-        DeleteExplorationModal
+        DeleteExplorationModalComponent
       ],
       providers: [{
         provide: NgbActiveModal,
@@ -50,7 +50,7 @@ describe('Delete Exploration Modal', function() {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(DeleteExplorationModal);
+    fixture = TestBed.createComponent(DeleteExplorationModalComponent);
     component = fixture.componentInstance;
 
     TestBed.inject(NgbActiveModal);

@@ -16,7 +16,7 @@
  * @fileoverview Directive for the exploration settings tab.
  */
 
-import { DeleteExplorationModal } from './templates/delete-exploration-modal.component';
+import { DeleteExplorationModalComponent } from './templates/delete-exploration-modal.component';
 import { RemoveRoleConfirmationModalComponent } from './templates/remove-role-confirmation-modal.component';
 import { ModeratorUnpublishExplorationModalComponent } from './templates/moderator-unpublish-exploration-modal.component';
 import { ReassignRoleConfirmationModalComponent } from './templates/reassign-role-confirmation-modal.component';
@@ -433,7 +433,7 @@ angular.module('oppia').component('settingsTab', {
       ctrl.deleteExploration = function() {
         AlertsService.clearWarnings();
 
-        NgbModal.open(DeleteExplorationModal, {
+        NgbModal.open(DeleteExplorationModalComponent, {
           backdrop: true,
         }).result.then(function() {
           EditableExplorationBackendApiService.deleteExplorationAsync(

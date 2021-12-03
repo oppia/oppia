@@ -13,12 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview component for Transfer Exploration Ownership Modal.
+ * @fileoverview Component for transfer exploration ownership modal.
  */
 
+import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { Component } from '@angular/core';
 
 @Component({
   selector: 'oppia-transfer-exploration-ownership-modal',
