@@ -1293,7 +1293,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             '/explorehandler/exploration_complete_event/%s' % self.EXP_ID_1_0,
             payload, csrf_token=csrf_token, expected_status_int=400)
         self.assertEqual(
-            response['error'], 'NONE EXP VERSION: Exploration complete')
+            response['error'], 'Missing key in handler args: version.')
 
     def test_exp_incomplete_event_handler(self):
         """Test handler for leaving an exploration incomplete."""
@@ -1394,7 +1394,8 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         response = self.post_json(
             '/explorehandler/exploration_maybe_leave_event/%s' % self.EXP_ID_0,
             payload, csrf_token=csrf_token, expected_status_int=400)
-        self.assertEqual(response['error'], 'NONE EXP VERSION: Maybe quit')
+        error_msg = 'Missing key in handler args: version.'
+        self.assertEqual(response['error'], error_msg)
 
     def test_remove_exp_from_incomplete_list_handler(self):
         """Test handler for removing explorations from the partially completed
@@ -2373,8 +2374,8 @@ class SolutionHitEventHandlerTests(test_utils.GenericTestBase):
                 'time_spent_in_state_secs': 2.0
             }, expected_status_int=400
         )
-
-        self.assertEqual(response['error'], 'NONE EXP VERSION: Solution hit')
+        error_msg = 'Missing key in handler args: exploration_version.'
+        self.assertEqual(response['error'], error_msg)
 
         self.logout()
 
