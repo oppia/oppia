@@ -783,7 +783,7 @@ class Exploration:
         exploration.last_updated = exploration_last_updated
 
         if exploration_dict.get('proto_size_in_bytes') is None:
-           exploration.proto_size_in_bytes = (
+            exploration.proto_size_in_bytes = (
                 exploration.get_proto_size())
         else:
             exploration.proto_size_in_bytes = exploration_dict[
