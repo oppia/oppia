@@ -54,7 +54,7 @@ describe('Topic Editor Save Modal Controller', function() {
     component = fixture.componentInstance;
 
     TestBed.inject(NgbActiveModal);
-    component.ngOnInit();
+    fixture.detectChanges();
   });
 
   it('should initialize component properties after component is initialized',
