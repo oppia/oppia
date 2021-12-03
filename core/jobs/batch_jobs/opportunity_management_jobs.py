@@ -112,8 +112,8 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
 
         Returns:
             result.Result[opportunity_models.SkillOpportunityModel, Exception].
-                Metadata about the operation. Returns SkillOpportunityModel, or
-                Exception if an exception occurs.
+            Metadata about the operation. Returns SkillOpportunityModel, or
+            Exception if an exception occurs.
         """
         try:
             skill_opportunity.validate() # type: ignore[no-untyped-call]
