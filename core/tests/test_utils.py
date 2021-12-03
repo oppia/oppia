@@ -1797,7 +1797,7 @@ states_schema_version: %d
 tags: []
 title: Title
 """) % (
-    feconf.DEFAULT_INIT_STATE_NAME, 99,
+    feconf.DEFAULT_INIT_STATE_NAME, 104,
     exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
     feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
     feconf.CURRENT_STATE_SCHEMA_VERSION)

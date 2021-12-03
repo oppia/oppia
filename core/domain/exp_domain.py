@@ -661,8 +661,7 @@ class Exploration:
             init_state_name, states_dict, {}, [], 0,
             feconf.DEFAULT_AUTO_TTS_ENABLED, False)
 
-        exploration.update_proto_size_in_bytes(
-            exploration.get_proto_size())
+        exploration.proto_size_in_bytes = exploration.get_proto_size()
 
         return exploration
 
@@ -784,7 +783,7 @@ class Exploration:
         exploration.last_updated = exploration_last_updated
 
         if exploration_dict.get('proto_size_in_bytes') is None:
-            exploration_dict['proto_size_in_bytes'] = (
+           exploration.proto_size_in_bytes = (
                 exploration.get_proto_size())
         else:
             exploration.proto_size_in_bytes = exploration_dict[
