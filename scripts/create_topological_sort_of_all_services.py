@@ -141,7 +141,7 @@ def main():
 
     topo_sort_stack.reverse()
     for service in topo_sort_stack:
-        python_utils.PRINT(service)
+        print(service)
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

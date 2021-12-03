@@ -100,7 +100,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             if 'Invalid Input' in msg:
                 print_msgs.append(msg)
         input_swap = self.swap(builtins, 'input', mock_input)
-        print_swap = self.swap(python_utils, 'PRINT', mock_print)
+        print_swap = self.swap(builtins, 'print', mock_print)
         with self.getpass_swap, self.get_org_swap, self.get_repo_swap:
             with self.open_tab_swap, input_swap, print_swap:
                 update_configs.check_updates_to_terms_of_service(

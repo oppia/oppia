@@ -172,7 +172,7 @@ def main(args=None):
     """Main method for fetching repo specific changes."""
     options = _PARSER.parse_args(args=args)
     changes = get_changes(options.release_tag)
-    python_utils.PRINT('\n'.join(changes))
+    print('\n'.join(changes))
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

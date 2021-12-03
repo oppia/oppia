@@ -16,9 +16,9 @@
 
 from __future__ import annotations
 
+import builtins
 import subprocess
 
-from core import python_utils
 from core.tests import test_utils
 from scripts import common
 from scripts import install_chrome_for_ci
@@ -134,7 +134,7 @@ class MainTests(test_utils.GenericTestBase):
             mock_get_chrome_version,
             expected_args=[tuple()])
         print_swap = self.swap_with_checks(
-            python_utils, 'PRINT', mock_print,
+            builtins, 'print', mock_print,
             expected_args=[
                 (
                     'Chrome version {} installed.'.format(

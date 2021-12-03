@@ -35,7 +35,6 @@ import subprocess
 import sys
 
 sys.path.append(os.getcwd())
-from core import python_utils  # isort:skip  # pylint: disable=wrong-import-position
 from scripts import common  # isort:skip # pylint: disable=wrong-import-position
 
 FECONF_FILEPATH = os.path.join('core', 'feconf.py')
@@ -69,7 +68,7 @@ def install_hook():
     file_is_symlink = os.path.islink(pre_commit_file)
     file_exists = os.path.exists(pre_commit_file)
     if file_is_symlink and file_exists:
-        python_utils.PRINT('Symlink already exists')
+        print('Symlink already exists')
     else:
         # This is needed, because otherwise some systems symlink/copy the .pyc
         # file instead of the .py file.
@@ -77,21 +76,21 @@ def install_hook():
         # If its a broken symlink, delete it.
         if file_is_symlink and not file_exists:
             os.unlink(pre_commit_file)
-            python_utils.PRINT('Removing broken symlink')
+            print('Removing broken symlink')
         try:
             os.symlink(os.path.abspath(this_file), pre_commit_file)
-            python_utils.PRINT('Created symlink in .git/hooks directory')
+            print('Created symlink in .git/hooks directory')
         # Raises AttributeError on windows, OSError added as failsafe.
         except (OSError, AttributeError):
             shutil.copy(this_file, pre_commit_file)
-            python_utils.PRINT('Copied file to .git/hooks directory')
+            print('Copied file to .git/hooks directory')
 
-    python_utils.PRINT('Making pre-commit hook file executable ...')
+    print('Making pre-commit hook file executable ...')
     if not common.is_windows_os():
         _, err_chmod_cmd = start_subprocess_for_result(chmod_cmd)
 
         if not err_chmod_cmd:
-            python_utils.PRINT('pre-commit hook file is now executable!')
+            print('pre-commit hook file is now executable!')
         else:
             raise ValueError(err_chmod_cmd)
 
@@ -192,15 +191,15 @@ def main(args=None):
         install_hook()
         return
 
-    python_utils.PRINT('Running pre-commit check for feconf and constants ...')
+    print('Running pre-commit check for feconf and constants ...')
     check_changes_in_config()
-    python_utils.PRINT('Running pre-commit check for package-lock.json ...')
+    print('Running pre-commit check for package-lock.json ...')
     if does_diff_include_package_lock_file() and (
             does_current_folder_contain_have_package_lock_file()):
         # The following message is necessary since there git commit aborts
         # quietly when the status is non-zero.
-        python_utils.PRINT('-----------COMMIT ABORTED-----------')
-        python_utils.PRINT(
+        print('-----------COMMIT ABORTED-----------')
+        print(
             'Oppia utilize Yarn to manage node packages. Please delete '
             'package-lock.json, revert the changes in package.json, and use '
             'yarn to add, update, or delete the packages. For more information '

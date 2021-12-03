@@ -34,8 +34,6 @@ from . import common # isort:skip  pylint: disable=wrong-import-position, wrong-
 from . import servers # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 from core.constants import constants # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-from core import python_utils # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-
 
 _PARSER = argparse.ArgumentParser(
     description="""
@@ -90,7 +88,7 @@ def alert_on_exit():
     try:
         yield
     finally:
-        python_utils.PRINT(
+        print(
             '\n\n'
             # ANSI escape sequence for bright yellow text color.
             '\033[93m'
@@ -106,7 +104,7 @@ def alert_on_exit():
 
 def notify_about_successful_shutdown():
     """Notifies developers that the servers have shutdown gracefully."""
-    python_utils.PRINT(
+    print(
         '\n\n'
         # ANSI escape sequence for bright green text color.
         '\033[92m'

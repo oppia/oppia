@@ -403,7 +403,7 @@ class TestUtilsTests(test_utils.GenericTestBase):
             logging.debug('2')
             logging.warn('3')
             logging.error('4')
-            python_utils.PRINT('5')
+            print('5')
         logging.info('6')
 
         self.assertEqual(logs, ['1', '2', '3', '4'])
@@ -415,7 +415,7 @@ class TestUtilsTests(test_utils.GenericTestBase):
             logging.debug('2')
             logging.warn('3')
             logging.error('4')
-            python_utils.PRINT('5')
+            print('5')
         logging.error('6')
 
         self.assertEqual(logs, ['3', '4'])

@@ -410,7 +410,7 @@ def verify_pip_is_installed():
     Raises:
         ImportError. Error importing pip.
     """
-    python_utils.PRINT('Checking if pip is installed on the local machine')
+    print('Checking if pip is installed on the local machine')
     try:
         import pip
     except ImportError as e:
@@ -421,15 +421,15 @@ def verify_pip_is_installed():
             'page:'])
 
         if common.is_mac_os():
-            python_utils.PRINT(
+            print(
                 'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Mac-'
                 'OS%29')
         elif common.is_linux_os():
-            python_utils.PRINT(
+            print(
                 'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Linux'
                 '%29')
         else:
-            python_utils.PRINT(
+            print(
                 'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28'
                 'Windows%29')
         raise ImportError('Error importing pip: %s' % e)
@@ -463,15 +463,14 @@ def _run_pip_command(cmd_parts):
         encoding='utf-8')
     stdout, stderr = process.communicate()
     if process.returncode == 0:
-        python_utils.PRINT(stdout)
+        print(stdout)
     elif 'can\'t combine user with prefix' in stderr:
-        python_utils.PRINT('Trying by setting --user and --prefix flags.')
+        print('Trying by setting --user and --prefix flags.')
         subprocess.check_call(
             command + ['--user', '--prefix=', '--system'])
     else:
-        python_utils.PRINT(stderr)
-        python_utils.PRINT(
-            'Refer to https://github.com/oppia/oppia/wiki/Troubleshooting')
+        print(stderr)
+        print('Refer to https://github.com/oppia/oppia/wiki/Troubleshooting')
         raise Exception('Error installing package')
 
 
@@ -652,7 +651,7 @@ def main():
     mismatches.
     """
     verify_pip_is_installed()
-    python_utils.PRINT('Regenerating "requirements.txt" file...')
+    print('Regenerating "requirements.txt" file...')
     # Calls the script to regenerate requirements. The reason we cannot call the
     # regenerate requirements functionality inline is because the python script
     # that regenerates the file is a command-line interface (CLI). Once the CLI
@@ -690,7 +689,7 @@ def main():
         _rectify_third_party_directory(mismatches)
         validate_metadata_directories()
     else:
-        python_utils.PRINT(
+        print(
             'All third-party Python libraries are already installed correctly.')
 
 

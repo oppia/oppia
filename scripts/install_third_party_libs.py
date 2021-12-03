@@ -162,9 +162,9 @@ def compile_protobuf_files(proto_files_paths):
             env=proto_env)
         stdout, stderr = process.communicate()
         if process.returncode == 0:
-            python_utils.PRINT(stdout)
+            print(stdout)
         else:
-            python_utils.PRINT(stderr)
+            print(stderr)
             raise Exception('Error compiling proto files at %s' % path)
 
     # Since there is no simple configuration for imports when using protobuf to
@@ -187,12 +187,11 @@ def ensure_pip_library_is_installed(package, version, path):
         version: str. The package version.
         path: str. The installation path for the package.
     """
-    python_utils.PRINT(
-        'Checking if %s is installed in %s' % (package, path))
+    print('Checking if %s is installed in %s' % (package, path))
 
     exact_lib_path = os.path.join(path, '%s-%s' % (package, version))
     if not os.path.exists(exact_lib_path):
-        python_utils.PRINT('Installing %s' % package)
+        print('Installing %s' % package)
         install_backend_python_libs.pip_install(
             '%s==%s' % (package, version), exact_lib_path)
 
@@ -206,8 +205,7 @@ def ensure_system_python_libraries_are_installed(package, version):
         package: str. The package name.
         version: str. The package version.
     """
-    python_utils.PRINT(
-        'Checking if %s is installed.' % (package))
+    print('Checking if %s is installed.' % (package))
     install_backend_python_libs.pip_install_to_system(package, version)
 
 
@@ -247,7 +245,7 @@ def main() -> None:
         ensure_system_python_libraries_are_installed(package, version)
 
     # Download and install required JS and zip files.
-    python_utils.PRINT('Installing third-party JS libraries and zip files.')
+    print('Installing third-party JS libraries and zip files.')
     install_third_party.main(args=[])
 
     # The following steps solves the problem of multiple google paths confusing
@@ -257,8 +255,7 @@ def main() -> None:
     # so we must combine the two modules into one. We solve this by copying the
     # Google Cloud SDK libraries that we need into the correct google
     # module directory in the 'third_party/python_libs' directory.
-    python_utils.PRINT(
-        'Copying Google Cloud SDK modules to third_party/python_libs...')
+    print('Copying Google Cloud SDK modules to third_party/python_libs...')
     correct_google_path = os.path.join(
         common.THIRD_PARTY_PYTHON_LIBS_DIR, 'google')
     if not os.path.isdir(correct_google_path):
@@ -288,7 +285,7 @@ def main() -> None:
     # __init__.py files (python requires modules to have __init__.py files in
     # in order to recognize them as modules and import them):
     # https://github.com/googleapis/python-ndb/issues/518
-    python_utils.PRINT(
+    print(
         'Checking that all google library modules contain __init__.py files...')
     for path_list in os.walk(correct_google_path):
         root_path = path_list[0]
@@ -306,20 +303,20 @@ def main() -> None:
     subprocess.check_call([get_yarn_command(), 'install', '--pure-lockfile'])
 
     # Compile protobuf files.
-    python_utils.PRINT('Installing buf and protoc binary.')
+    print('Installing buf and protoc binary.')
     install_buf_and_protoc()
-    python_utils.PRINT('Compiling protobuf files.')
+    print('Compiling protobuf files.')
     compile_protobuf_files(PROTO_FILES_PATHS)
 
     # Install pre-commit script.
-    python_utils.PRINT('Installing pre-commit hook for git')
+    print('Installing pre-commit hook for git')
     pre_commit_hook.main(args=['--install'])
 
     # TODO(#8112): Once pre_commit_linter is working correctly, this
     # condition should be removed.
     if not common.is_windows_os():
         # Install pre-push script.
-        python_utils.PRINT('Installing pre-push hook for git')
+        print('Installing pre-push hook for git')
         pre_push_hook.main(args=['--install'])
 
 

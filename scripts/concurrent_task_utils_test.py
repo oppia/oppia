@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import builtins
 import threading
 import time
 
@@ -40,7 +41,7 @@ class ConcurrentTaskUtilsTests(test_utils.GenericTestBase):
         self.task_stdout = []
 
         def mock_print(*args):
-            """Mock for python_utils.PRINT. Append the values to print to
+            """Mock for print. Append the values to print to
             task_stdout list.
 
             Args:
@@ -48,7 +49,7 @@ class ConcurrentTaskUtilsTests(test_utils.GenericTestBase):
                     in the same line of output.
             """
             self.task_stdout.append(' '.join(str(arg) for arg in args))
-        self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
+        self.print_swap = self.swap(builtins, 'print', mock_print)
 
 
 class TaskResultTests(ConcurrentTaskUtilsTests):

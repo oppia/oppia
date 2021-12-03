@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import builtins
 import itertools
 import json
 import os
@@ -94,7 +95,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
         def mock_print(msg):
             self.print_arr.append(msg)
-        self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
+        self.print_swap = self.swap(builtins, 'print', mock_print)
 
         self.file_arr = []
         def mock_write(msg):
@@ -476,7 +477,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             install_backend_python_libs, 'get_mismatches',
             mock_get_mismatches)
         swap_call = self.swap(subprocess, 'check_call', mock_call)
-        swap_print = self.swap(python_utils, 'PRINT', mock_print)
+        swap_print = self.swap(builtins, 'print', mock_print)
         with swap_call, swap_get_mismatches, swap_print, self.open_file_swap:
             with swap_validate_metadata_directories:
                 install_backend_python_libs.main()
