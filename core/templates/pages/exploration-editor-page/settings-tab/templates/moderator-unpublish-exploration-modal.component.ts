@@ -59,8 +59,4 @@ export class ModeratorUnpublishExplorationModalComponent
   updateValue(value: string): void {
     this.emailBody = value;
   }
-
-  confirm<T>(value: T): void {
-    this.ngbActiveModal.close(this.emailBody);
-  }
 }
