@@ -88,7 +88,7 @@ class ChangedBranch:
                 subprocess.check_output(
                     ['git', 'checkout', self.new_branch, '--'])
             except subprocess.CalledProcessError:
-                python_utils.PRINT(
+                print(
                     '\nCould not change branch to %s. This is most probably '
                     'because you are in a dirty state. Change manually to '
                     'the branch that is being linted or stash your changes.'
@@ -151,7 +151,7 @@ def get_remote_name():
             'https://github.com/oppia/oppia.git\'\n'
         )
     elif remote_num > 1:
-        python_utils.PRINT(
+        print(
             'Warning: Please keep only one remote branch for oppia:develop '
             'to run the lint checks efficiently.\n')
         return
@@ -302,11 +302,11 @@ def collect_files_being_pushed(ref_list, remote):
 
     for branch, (modified_files, files_to_lint) in collected_files.items():
         if modified_files:
-            python_utils.PRINT('\nModified files in %s:' % branch)
+            print('\nModified files in %s:' % branch)
             pprint.pprint(modified_files)
-            python_utils.PRINT('\nFiles to lint in %s:' % branch)
+            print('\nFiles to lint in %s:' % branch)
             pprint.pprint(files_to_lint)
-            python_utils.PRINT('\n')
+            print('\n')
     return collected_files
 
 
@@ -315,7 +315,7 @@ def get_refs():
     # Git provides refs in STDIN.
     ref_list = [GitRef(*ref_str.split()) for ref_str in sys.stdin]
     if ref_list:
-        python_utils.PRINT('ref_list:')
+        print('ref_list:')
         pprint.pprint(ref_list)
     return ref_list
 
@@ -377,25 +377,25 @@ def install_hook():
     file_is_symlink = os.path.islink(pre_push_file)
     file_exists = os.path.exists(pre_push_file)
     if file_is_symlink and file_exists:
-        python_utils.PRINT('Symlink already exists')
+        print('Symlink already exists')
     else:
         # If its a broken symlink, delete it.
         if file_is_symlink and not file_exists:
             os.unlink(pre_push_file)
-            python_utils.PRINT('Removing broken symlink')
+            print('Removing broken symlink')
         try:
             os.symlink(os.path.abspath(__file__), pre_push_file)
-            python_utils.PRINT('Created symlink in .git/hooks directory')
+            print('Created symlink in .git/hooks directory')
         # Raises AttributeError on windows, OSError added as failsafe.
         except (OSError, AttributeError):
             shutil.copy(__file__, pre_push_file)
-            python_utils.PRINT('Copied file to .git/hooks directory')
+            print('Copied file to .git/hooks directory')
 
-    python_utils.PRINT('Making pre-push hook file executable ...')
+    print('Making pre-push hook file executable ...')
     _, err_chmod_cmd = start_subprocess_for_result(chmod_cmd)
 
     if not err_chmod_cmd:
-        python_utils.PRINT('pre-push hook file is now executable!')
+        print('pre-push hook file is now executable!')
     else:
         raise ValueError(err_chmod_cmd)
 
@@ -459,27 +459,26 @@ def check_for_backend_python_library_inconsistencies():
     mismatches = install_backend_python_libs.get_mismatches()
 
     if mismatches:
-        python_utils.PRINT(
+        print(
             'Your currently installed python libraries do not match the\n'
             'libraries listed in your "requirements.txt" file. Here is a\n'
             'full list of library/version discrepancies:\n')
 
-        python_utils.PRINT(
+        print(
             '{:<35} |{:<25}|{:<25}'.format(
                 'Library', 'Requirements Version',
                 'Currently Installed Version'))
         for library_name, version_strings in mismatches.items():
-            python_utils.PRINT('{!s:<35} |{!s:<25}|{!s:<25}'.format(
+            print('{!s:<35} |{!s:<25}|{!s:<25}'.format(
                 library_name, version_strings[0], version_strings[1]))
-        python_utils.PRINT('\n')
+        print('\n')
         common.print_each_string_after_two_new_lines([
             'Please fix these discrepancies by editing the `requirements.in`\n'
             'file or running `scripts.install_third_party` to regenerate\n'
             'the `third_party/python_libs` directory.\n'])
         sys.exit(1)
     else:
-        python_utils.PRINT(
-            'Python dependencies consistency check succeeded.')
+        print('Python dependencies consistency check succeeded.')
 
 
 def main(args=None):
@@ -503,7 +502,7 @@ def main(args=None):
     collected_files = collect_files_being_pushed(refs, remote)
     # Only interfere if we actually have something to lint (prevent annoyances).
     if collected_files and has_uncommitted_files():
-        python_utils.PRINT(
+        print(
             'Your repo is in a dirty state which prevents the linting from'
             ' working.\nStash your changes or commit them.\n')
         sys.exit(1)
@@ -517,13 +516,13 @@ def main(args=None):
             if files_to_lint:
                 lint_status = start_linter(files_to_lint)
                 if lint_status != 0:
-                    python_utils.PRINT(
+                    print(
                         'Push failed, please correct the linting issues above.')
                     sys.exit(1)
 
             mypy_check_status = execute_mypy_checks()
             if mypy_check_status != 0:
-                python_utils.PRINT(
+                print(
                     'Push failed, please correct the mypy type annotation '
                     'issues above.')
                 sys.exit(mypy_check_status)
@@ -533,8 +532,7 @@ def main(args=None):
                 typescript_checks_status = run_script_and_get_returncode(
                     TYPESCRIPT_CHECKS_CMDS)
             if typescript_checks_status != 0:
-                python_utils.PRINT(
-                    'Push aborted due to failing typescript checks.')
+                print('Push aborted due to failing typescript checks.')
                 sys.exit(1)
 
             strict_typescript_checks_status = 0
@@ -542,7 +540,7 @@ def main(args=None):
                 strict_typescript_checks_status = run_script_and_get_returncode(
                     STRICT_TYPESCRIPT_CHECKS_CMDS)
             if strict_typescript_checks_status != 0:
-                python_utils.PRINT(
+                print(
                     'Push aborted due to failing typescript checks in '
                     'strict mode.')
                 sys.exit(1)
@@ -553,14 +551,13 @@ def main(args=None):
                 frontend_status = run_script_and_get_returncode(
                     FRONTEND_TEST_CMDS)
             if frontend_status != 0:
-                python_utils.PRINT(
-                    'Push aborted due to failing frontend tests.')
+                print('Push aborted due to failing frontend tests.')
                 sys.exit(1)
             if does_diff_include_ci_config_or_js_files(files_to_lint):
                 ci_check_status = run_script_and_get_returncode(
                     CI_PROTRACTOR_CHECK_CMDS)
             if ci_check_status != 0:
-                python_utils.PRINT(
+                print(
                     'Push aborted due to failing e2e test configuration check.')
                 sys.exit(1)
     return
