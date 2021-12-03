@@ -29,7 +29,7 @@ var TopicEditorPage = function() {
   var createStoryButton = element(
     by.css('.protractor-test-create-story-button'));
   var submitStoryUrlFragmentButton = element(
-    by.css('.protractor-test-submit-story-url-fragnment-button'));
+    by.css('.protractor-test-submit-story-url-fragment-button'));
   var newStoryTitleField = element(
     by.css('.protractor-test-new-story-title-field'));
   var newStoryUrlFragmentField = element(
