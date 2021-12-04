@@ -636,6 +636,12 @@ describe('Conversation skin directive', function() {
     sampleCollection = Collection.create(
       sampleCollectionBackendObject);
 
+    // The conversation-skin file uses jqueryUI to animate some of the html
+    // elements. When testing the ".animate" function from jqueryUI generates
+    // "TypeError: S.easing[this.easing] is not a function" error.
+    // Therefore the call is stubbed there since changes made by
+    // animations to the html elements are not tested here.
+    spyOn($.fn, 'animate').and.stub();
     spyOn(userService, 'getUserInfoAsync')
       .and.returnValue(Promise.resolve(userInfoForCollectionCreator));
     spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
@@ -664,12 +670,6 @@ describe('Conversation skin directive', function() {
     $scope.getQuestionPlayerConfig = function() {
       return;
     };
-    let element = angular.element(
-      '<html><body><div class="conversation-skin-main-tutor-card">' +
-      '</div></body></html>');
-    angular.element(document.body).append(element);
-    $compile(element)($scope);
-    $rootScope.$digest();
   }));
 
   afterEach(() => {
@@ -837,6 +837,64 @@ describe('Conversation skin directive', function() {
       $window.onresize();
 
       expect(recordMaybeLeaveEvent).toHaveBeenCalled();
+    });
+
+    it('should show upcoming card if feedback html ' +
+      'is not specified and \'remainOnSameCard\' is set false', function() {
+      spyOnProperty(currentInteractionService, 'onAnswerChanged$')
+        .and.returnValue(onAnswerChangedEventEmitter);
+      spyOn($window, 'addEventListener').and.callFake((evt, cb) => {
+        $scope.displayedCard = sampleCard;
+        cb();
+      });
+
+      sampleCard = StateCard.createNewCard(
+        'State 1', '<p>Content</p>', '<interaction></interaction>',
+        interactionObjectFactory.createFromBackendDict(interactionDict2),
+        RecordedVoiceovers.createEmpty(),
+        writtenTranslationsObjectFactory.createEmpty(),
+        'content', audioTranslationLanguageService);
+      spyOn(explorationEngineService, 'getState').and.returnValue(sampleState);
+      spyOn(playerTranscriptService, 'isLastCard')
+        .and.returnValue(true);
+      spyOn(playerTranscriptService, 'addNewInput').and.returnValue(null);
+      spyOn(playerTranscriptService, 'addNewResponse')
+        .and.returnValue(null);
+      spyOn(playerPositionService, 'recordAnswerSubmission')
+        .and.returnValue(null);
+      spyOn(explorationPlayerStateService, 'getCurrentEngineService')
+        .and.returnValue(explorationEngineService);
+      spyOn(explorationEngineService, 'submitAnswer').and.callFake(
+        (answer, service, successCallback) => {
+          successCallback(
+            sampleCard, true, null, audioTranslations, null,
+            'skillId', false, 'taggedSkillId', true, false, true, 'focusLabel');
+          return true;
+        });
+      spyOn(playerPositionService, 'getCurrentStateName')
+        .and.returnValue('currentState');
+      spyOn(statsReportingService, 'recordStateTransition')
+        .and.returnValue(null);
+      spyOn(statsReportingService, 'recordExplorationActuallyStarted')
+        .and.returnValue(null);
+      spyOn(statsReportingService, 'recordStateCompleted')
+        .and.returnValue(null);
+      spyOn(playerTranscriptService, 'getLastStateName')
+        .and.returnValue('lastState');
+      spyOn(
+        statsReportingService, 'recordMaybeLeaveEvent')
+        .and.returnValue(null);
+      let upcomingCardSpy = spyOn($scope, 'showUpcomingCard')
+        .and.returnValue(null);
+
+      $scope.answerIsBeingProcessed = false;
+      $scope.displayedCard = sampleCard;
+      $scope.submitAnswer();
+      $timeout.flush();
+      ctrl.$onInit();
+      $window.onresize();
+
+      expect(upcomingCardSpy).toHaveBeenCalled();
     });
 
     it('should not record event when user redirects ' +
@@ -1459,8 +1517,8 @@ describe('Conversation skin directive', function() {
     $scope.getQuestionPlayerConfig = function() {
       return {
         resultActionButtons: [{
-          type: 'BOOST_SCORE',
-          i18nId: 'I18N_QUESTION_PLAYER_BOOST_SCORE'
+          type: 'REVIEW_LOWEST_SCORED_SKILL',
+          i18nId: 'I18N_QUESTION_PLAYER_REVIEW_LOWEST_SCORED_SKILL'
         }, {
           type: 'RETRY_SESSION',
           i18nId: 'I18N_QUESTION_PLAYER_RETRY_TEST',
@@ -1502,6 +1560,12 @@ describe('Conversation skin directive', function() {
 
   it('should focus on the given focus label if user is on ' +
     'desktop', fakeAsync(function() {
+    let element = angular.element(
+      '<html><body><div class="conversation-skin-main-tutor-card"' +
+      'style="height: 2000px"></div></body></html>');
+    angular.element(document.body).append(element);
+    $compile(element)($scope);
+    $rootScope.$digest();
     spyOn(explorationEngineService, 'getState').and.returnValue(sampleState);
     spyOn(playerTranscriptService, 'isLastCard')
       .and.returnValue(true);
@@ -1785,8 +1849,8 @@ describe('Conversation skin directive', function() {
     $scope.getQuestionPlayerConfig = function() {
       return {
         resultActionButtons: [{
-          type: 'BOOST_SCORE',
-          i18nId: 'I18N_QUESTION_PLAYER_BOOST_SCORE'
+          type: 'REVIEW_LOWEST_SCORED_SKILL',
+          i18nId: 'I18N_QUESTION_PLAYER_REVIEW_LOWEST_SCORED_SKILL'
         }, {
           type: 'RETRY_SESSION',
           i18nId: 'I18N_QUESTION_PLAYER_RETRY_TEST',
@@ -2359,7 +2423,8 @@ describe('Conversation skin directive', function() {
       expect(() => {
         $scope.recommendedExplorationSummaries[0].parentExplorationIds;
       }).toThrowError(
-        'Cannot read property \'parentExplorationIds\' of undefined');
+        'Cannot read properties of undefined (reading \'parentExplorationIds\')'
+      );
     }));
 
     it('should fetch recommeded summary dicts ' +

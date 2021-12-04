@@ -30,6 +30,10 @@ export interface BlogPostBackendDict {
   'published_on'?: string;
 }
 export class BlogPostData {
+  // TODO(#13637): Remove the use of interstitial blog post
+  // The 'id' and 'thumbnailFilename' is 'null' for an interstitial
+  // blog post that is displayed in the editor until the actual
+  // is fetched from the backend.
   _id: string | null;
   _authorUsername: string;
   _title: string;
@@ -85,7 +89,11 @@ export class BlogPostData {
   }
 
   get tags(): string[] {
-    return this._tags.slice();
+    return this._tags;
+  }
+
+  set tags(tags: string[]) {
+    this._tags = tags;
   }
 
   addTag(tag: string): void {
@@ -101,7 +109,7 @@ export class BlogPostData {
     return this._urlFragment;
   }
 
-  set thumbnailFilename(thumbnailFilename: string) {
+  set thumbnailFilename(thumbnailFilename: string | null) {
     this._thumbnailFilename = thumbnailFilename;
   }
 
@@ -122,6 +130,11 @@ export class BlogPostData {
     if (this._title === '') {
       issues.push(
         'Blog Post title should not be empty.');
+    } else if (this._title.length < AppConstants.MIN_CHARS_IN_BLOG_POST_TITLE) {
+      issues.push(
+        'Blog Post title should not be less than ' +
+        `${AppConstants.MIN_CHARS_IN_BLOG_POST_TITLE} characters.`
+      );
     }
     if (this._content === '') {
       issues.push(
@@ -135,11 +148,15 @@ export class BlogPostData {
     if (this._title === '') {
       issues.push(
         'Blog Post title should not be empty.');
-    }
-    if (this._title.length > AppConstants.MAX_CHARS_IN_BLOG_POST_TITLE) {
+    } else if (this._title.length > AppConstants.MAX_CHARS_IN_BLOG_POST_TITLE) {
       issues.push(
         'Blog Post title should not exceed ' +
         `${AppConstants.MAX_CHARS_IN_BLOG_POST_TITLE} characters.`
+      );
+    } else if (this._title.length < AppConstants.MIN_CHARS_IN_BLOG_POST_TITLE) {
+      issues.push(
+        'Blog Post title should not be less than ' +
+        `${AppConstants.MIN_CHARS_IN_BLOG_POST_TITLE} characters.`
       );
     }
     if (!this._thumbnailFilename) {

@@ -16,13 +16,10 @@
 
 """Domain objects used within multiple extensions."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
-
-import python_utils
+from __future__ import annotations
 
 
-class CustomizationArgSpec(python_utils.OBJECT):
+class CustomizationArgSpec:
     """Value object for a customization arg specification."""
 
     def __init__(self, name, description, schema, default_value):

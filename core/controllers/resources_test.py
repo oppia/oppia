@@ -14,12 +14,13 @@
 
 """Tests for Oppia resource handling (e.g. templates, images)."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import os
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core.constants import constants
 from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import fs_services
@@ -30,8 +31,6 @@ from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import user_services
 from core.tests import test_utils
-import feconf
-import python_utils
 
 
 class AssetDevHandlerImageTests(test_utils.GenericTestBase):
@@ -71,7 +70,8 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
             upload_files=(('image', 'unused_filename', raw_image),),
             expected_status_int=400)
 
-        self.assertEqual(response_dict['error'], 'No filename supplied')
+        self.assertEqual(
+            response_dict['error'], 'Missing key in handler args: filename.')
 
         self.logout()
 
@@ -101,7 +101,12 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
             upload_files=(('image', 'unused_filename', raw_image),),
             expected_status_int=400)
 
-        self.assertEqual(response_dict['error'], 'Invalid filename')
+        error_msg = (
+            'Schema validation for \'filename\' failed: Validation'
+            ' failed: is_regex_matched ({\'regex_pattern\': '
+            '\'\\\\w+[.]\\\\w+\'}) for object .png'
+        )
+        self.assertEqual(response_dict['error'], error_msg)
 
         self.logout()
 
@@ -235,6 +240,32 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
             raw_image = f.read()
         response_dict = self.post_json(
             '%s/skill/%s' % (self.IMAGE_UPLOAD_URL_PREFIX, skill_id),
+            {'filename': 'test.png'},
+            csrf_token=csrf_token,
+            upload_files=(('image', 'unused_filename', raw_image),)
+        )
+        filename = response_dict['filename']
+
+        self.logout()
+
+        response = self.get_custom_response(
+            self._get_image_url('skill', skill_id, filename), 'image/png')
+        self.assertEqual(response.body, raw_image)
+
+        # Image context: Question Suggestions.
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
+            encoding=None
+        ) as f:
+            raw_image = f.read()
+        response_dict = self.post_json(
+            '%s/question_suggestions/%s' % (
+                self.IMAGE_UPLOAD_URL_PREFIX,
+                skill_id
+            ),
             {'filename': 'test.png'},
             csrf_token=csrf_token,
             upload_files=(('image', 'unused_filename', raw_image),)
@@ -396,7 +427,12 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
             upload_files=(('image', 'unused_filename', raw_image),),
         )
         self.assertEqual(response_dict['status_code'], 400)
-        self.assertIn('Filenames should not include', response_dict['error'])
+
+        error_msg = (
+            'Schema validation for \'filename\' failed: Validation failed: '
+            'is_regex_matched ({\'regex_pattern\': \'\\\\w+[.]\\\\w+\'}) '
+            'for object test/a.png')
+        self.assertIn(error_msg, response_dict['error'])
 
         self.logout()
 
@@ -416,8 +452,12 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
             upload_files=(('image', 'unused_filename', raw_image),),
         )
         self.assertEqual(response_dict['status_code'], 400)
-        self.assertIn(
-            'Image filename with no extension', response_dict['error'])
+
+        error_msg = (
+            'Schema validation for \'filename\' failed: Validation failed: '
+            'is_regex_matched ({\'regex_pattern\': \'\\\\w+[.]\\\\w+\'}) '
+            'for object test')
+        self.assertIn(error_msg, response_dict['error'])
 
         self.logout()
 

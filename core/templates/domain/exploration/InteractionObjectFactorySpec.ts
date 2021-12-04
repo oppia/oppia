@@ -33,10 +33,7 @@ import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { MultipleChoiceInputCustomizationArgs } from 'interactions/customization-args-defs';
-
-import INTERACTION_SPECS from 'interactions/interaction_specs.json';
-
-type InteractionSpecsKeys = keyof typeof INTERACTION_SPECS;
+import { InteractionSpecsConstants, InteractionSpecsKey } from 'pages/interaction-specs.constants';
 
 describe('Interaction object factory', () => {
   let iof: InteractionObjectFactory;
@@ -358,14 +355,21 @@ describe('Interaction object factory', () => {
     const testInteraction = iof.createFromBackendDict({
       answer_groups: answerGroupsDict,
       confirmed_unclassified_answers: [],
-      customization_args: {},
+      customization_args: {
+        requireNonnegativeInput: {
+          value: true
+        }
+      },
       default_outcome: defaultOutcomeDict,
       hints: hintsDict,
       id: 'NumericInput',
       solution: solutionDict
     });
-
-    expect(testInteraction.customizationArgs).toEqual({});
+    expect(testInteraction.customizationArgs).toEqual({
+      requireNonnegativeInput: {
+        value: true
+      }
+    });
   });
 
   it('should correctly set customization arguments for ' +
@@ -373,14 +377,22 @@ describe('Interaction object factory', () => {
     const testInteraction = iof.createFromBackendDict({
       answer_groups: answerGroupsDict,
       confirmed_unclassified_answers: [],
-      customization_args: {},
+      customization_args: {
+        requireNonnegativeInput: {
+          value: false
+        }
+      },
       default_outcome: defaultOutcomeDict,
       hints: hintsDict,
       id: 'NumericInput',
       solution: solutionDict
     });
 
-    expect(testInteraction.customizationArgs).toEqual({});
+    expect(testInteraction.customizationArgs).toEqual({
+      requireNonnegativeInput: {
+        value: false
+      }
+    });
   });
 
   it('should correctly set customization arguments for ' +
@@ -662,8 +674,9 @@ describe('Interaction object factory', () => {
     const otherInteraction = iof.createFromBackendDict(otherInteractionDict);
     testInteraction.copy(otherInteraction);
     expect(testInteraction).toEqual(otherInteraction);
-    const args = <MultipleChoiceInputCustomizationArgs> (
-      otherInteraction.customizationArgs);
+    const args = (
+      otherInteraction.customizationArgs
+    ) as MultipleChoiceInputCustomizationArgs;
     args.showChoicesInShuffledOrder.value = false;
     expect(testInteraction).toEqual(iof.createFromBackendDict({
       answer_groups: newAnswerGroups,
@@ -783,14 +796,16 @@ describe('Interaction object factory', () => {
 
   it('should fully cover constructing customization arguments for all ' +
      'interactions', () => {
-    const keys = <InteractionSpecsKeys[]> Object.keys(INTERACTION_SPECS);
+    const keys = Object.keys(
+      InteractionSpecsConstants.INTERACTION_SPECS
+    ) as InteractionSpecsKey[];
     keys.forEach(interactionId => {
       expect(() => {
         const defaultCa: Record<string, Object> = {};
-        const caSpecs = INTERACTION_SPECS[
+        const caSpecs = InteractionSpecsConstants.INTERACTION_SPECS[
           interactionId].customization_arg_specs;
         caSpecs.forEach(
-          (caSpec: { name: string; 'default_value': Object; }) => {
+          (caSpec: { name: string; 'default_value': Object }) => {
             defaultCa[caSpec.name] = {value: caSpec.default_value};
           }
         );

@@ -14,18 +14,20 @@
 
 """Controllers for the admin view."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import io
 import logging
 import random
 
-from constants import constants
+from core import feconf
+from core import utils
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.controllers import domain_objects_validator as validation_method
 from core.domain import auth_services
+from core.domain import blog_services
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import config_services
@@ -55,9 +57,6 @@ from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 from core.domain import wipeout_service
-import feconf
-import python_utils
-import utils
 
 
 class AdminPage(base.BaseHandler):
@@ -187,7 +186,7 @@ class AdminHandler(base.BaseHandler):
         feature_flag_dicts = feature_services.get_all_feature_flag_dicts()
 
         config_properties = config_domain.Registry.get_config_property_schemas()
-        # Removes promo-bar related configs as promo-bar is handlded by
+        # Removes promo-bar related configs as promo-bar is handled by
         # release coordinators in /release-coordinator page.
         del config_properties['promo_bar_enabled']
         del config_properties['promo_bar_message']
@@ -288,8 +287,8 @@ class AdminHandler(base.BaseHandler):
             self.render_json(result)
         except Exception as e:
             logging.exception('[ADMIN] %s', e)
-            self.render_json({'error': python_utils.UNICODE(e)})
-            python_utils.reraise_exception()
+            self.render_json({'error': str(e)})
+            raise e
 
     def _reload_exploration(self, exploration_id):
         """Reloads the exploration in dev_mode corresponding to the given
@@ -305,10 +304,9 @@ class AdminHandler(base.BaseHandler):
             logging.info(
                 '[ADMIN] %s reloaded exploration %s' %
                 (self.user_id, exploration_id))
-            exp_services.load_demo(python_utils.UNICODE(exploration_id))
+            exp_services.load_demo(exploration_id)
             rights_manager.release_ownership_of_exploration(
-                user_services.get_system_user(),
-                python_utils.UNICODE(exploration_id))
+                user_services.get_system_user(), exploration_id)
         else:
             raise Exception('Cannot reload an exploration in production.')
 
@@ -578,15 +576,13 @@ class AdminHandler(base.BaseHandler):
                 raise Exception(
                     'User does not have enough rights to generate data.')
             skill_id = skill_services.get_new_skill_id()
-            skill_name = 'Dummy Skill %s' % python_utils.UNICODE(
-                random.getrandbits(32))
+            skill_name = 'Dummy Skill %s' % str(random.getrandbits(32))
             skill = self._create_dummy_skill(
                 skill_id, skill_name, '<p>Dummy Explanation 1</p>')
             skill_services.save_new_skill(self.user_id, skill)
-            for i in python_utils.RANGE(15):
+            for i in range(15):
                 question_id = question_services.get_new_question_id()
-                question_name = 'Question number %s %s' % (
-                    python_utils.UNICODE(i), skill_name)
+                question_name = 'Question number %s %s' % (str(i), skill_name)
                 question = self._create_dummy_question(
                     question_id, question_name, [skill_id])
                 question_services.add_question(self.user_id, question)
@@ -641,7 +637,7 @@ class AdminHandler(base.BaseHandler):
                                'Elvish, language of "Lord of the Rings',
                                'The Science of Superheroes']
             exploration_ids_to_publish = []
-            for i in python_utils.RANGE(num_dummy_exps_to_generate):
+            for i in range(num_dummy_exps_to_generate):
                 title = random.choice(possible_titles)
                 category = random.choice(constants.SEARCH_DROPDOWN_CATEGORIES)
                 new_exploration_id = exp_fetchers.get_new_exploration_id()
@@ -1178,3 +1174,60 @@ class DeleteUserHandler(base.BaseHandler):
             )
         wipeout_service.pre_delete_user(user_id)
         self.render_json({'success': True})
+
+
+class UpdateBlogPostHandler(base.BaseHandler):
+    """Handler for changing author ids and published on date in
+    blog posts."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'blog_post_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'author_username': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_USERNAME_LENGTH
+                    }]
+                }
+            },
+            'published_on': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+    }
+
+    @acl_decorators.can_access_admin_page
+    def put(self):
+        blog_post_id = self.normalized_payload.get('blog_post_id')
+        author_username = self.normalized_payload.get('author_username')
+        published_on = self.normalized_payload.get('published_on')
+
+        author_id = user_services.get_user_id_from_username(author_username)
+        if author_id is None:
+            raise self.InvalidInputException(
+                'Invalid username: %s' % author_username)
+
+        user_actions = user_services.get_user_actions_info(author_id).actions
+        if role_services.ACTION_ACCESS_BLOG_DASHBOARD not in user_actions:
+            raise self.InvalidInputException(
+                'User does not have enough rights to be blog post author.')
+
+        blog_post = (
+            blog_services.get_blog_post_by_id(blog_post_id, strict=False))
+        if blog_post is None:
+            raise self.PageNotFoundException(
+                Exception(
+                    'The blog post with the given id or url doesn\'t exist.'))
+
+        blog_services.update_blog_models_author_and_published_on_date(
+            blog_post_id, author_id, published_on)
+        self.render_json({})

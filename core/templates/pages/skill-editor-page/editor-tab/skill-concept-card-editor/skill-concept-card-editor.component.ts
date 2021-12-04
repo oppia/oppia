@@ -20,7 +20,7 @@ require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 require(
-  'components/review-material-editor/review-material-editor.directive.ts');
+  'components/review-material-editor/review-material-editor.component.ts');
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require('directives/angular-html-bind.directive.ts');
@@ -70,7 +70,7 @@ angular.module('oppia').component('skillConceptCardEditor', {
 
       ctrl.directiveSubscriptions = new Subscription();
       var initBindableFieldsDict = function() {
-        PageTitleService.setPageSubtitleForMobileView(
+        PageTitleService.setNavbarSubtitleForMobileView(
           SkillEditorStateService.getSkill().getDescription());
         $scope.bindableFieldsDict = {
           displayedConceptCardExplanation:

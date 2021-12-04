@@ -25,8 +25,11 @@ import { downgradeComponent } from '@angular/upgrade/static';
   styleUrls: []
 })
 export class FilepathEditorComponent implements OnInit {
-  @Input() modalId;
-  @Input() value;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() modalId!: symbol;
+  @Input() value!: string;
   @Output() valueChanged = new EventEmitter();
   @Output() validityChange = new EventEmitter<Record<'empty', boolean>>();
   svgEditorIsShown = false;

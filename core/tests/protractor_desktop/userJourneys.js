@@ -153,8 +153,7 @@ describe('Site language', function() {
     await waitFor.pageToFullyLoad();
     var url = await browser.getCurrentUrl();
     var pathname = url.split('/');
-    // In the url a # is added at the end that is not part of collection ID.
-    collectionId = pathname[5].slice(0, -1);
+    collectionId = pathname[5];
     // Add existing explorations.
     await collectionEditorPage.addExistingExploration(firstExplorationId);
     await collectionEditorPage.saveDraft();
@@ -240,9 +239,13 @@ describe('Site language', function() {
     await general.openEditor(firstExplorationId, false);
 
     // Spanish is still selected.
-    var placeholder = await element(by.css('.protractor-test-float-form-input'))
-      .getAttribute('placeholder');
-    expect(placeholder).toEqual('Ingresa un número');
+    var placeholderElement = await element(
+      by.css('.protractor-test-float-form-input'));
+    await waitFor.visibilityOf(
+      placeholderElement, 'Placeholder Element taking too long to appear');
+    await waitFor.elementAttributeToBe(
+      placeholderElement, 'placeholder', 'Ingresa un número',
+      'Placeholder text taking too long to change from English to Spanish');
     await general.ensurePageHasNoTranslationIds();
     await users.logout();
   });

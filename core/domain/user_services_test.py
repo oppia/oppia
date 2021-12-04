@@ -16,15 +16,17 @@
 
 """Unit tests for core.domain.user_services."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import datetime
 import logging
 import os
 import re
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core import utils
+from core.constants import constants
 from core.domain import auth_services
 from core.domain import collection_services
 from core.domain import event_services
@@ -36,9 +38,6 @@ from core.domain import user_domain
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import python_utils
-import utils
 
 import requests_mock
 
@@ -282,7 +281,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         ]
         for ind, (actual_email, expected_email) in enumerate(email_addresses):
             user_settings = user_services.create_new_user(
-                python_utils.UNICODE(ind), actual_email)
+                str(ind), actual_email)
             self.assertEqual(user_settings.truncated_email, expected_email)
 
     def test_get_user_id_from_username(self):

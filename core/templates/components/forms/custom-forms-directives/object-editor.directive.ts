@@ -23,7 +23,7 @@ import { CustomSchema } from 'services/schema-default-value.service';
 interface ObjectEditorCustomScope extends ng.IScope {
   objType?: string;
   ngModelController: {
-    $setValidity: (validationErrorKey: string, isValid: boolean) => void
+    $setValidity: (validationErrorKey: string, isValid: boolean) => void;
   };
   schema: CustomSchema;
   initArgs?: Object;
@@ -68,8 +68,6 @@ angular.module('oppia').directive('objectEditor', [
           'list-of-sets-of-translatable-html-content-ids',
           'list-of-tabs',
           'list-of-unicode-string',
-          'logic-error-category',
-          'logic-question',
           'math-equation',
           'math-expression-content',
           'set-of-unicode-string',

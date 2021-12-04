@@ -16,10 +16,15 @@
  * @fileoverview Root component for Story Viewer Page.
  */
 
-import { Component } from '@angular/core';
+import { Component, ViewEncapsulation } from '@angular/core';
 
 @Component({
   selector: 'oppia-story-viewer-page-root',
-  templateUrl: './story-viewer-page-root.component.html'
+  templateUrl: './story-viewer-page-root.component.html',
+  encapsulation: ViewEncapsulation.None
 })
-export class StoryViewerPageRootComponent {}
+export class StoryViewerPageRootComponent {
+  // Page title and meta tags are not required to be updated here
+  // as the page title is updated by story viewer page component
+  // and this pages uses default meta tags.
+}

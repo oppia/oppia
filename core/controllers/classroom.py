@@ -14,37 +14,15 @@
 
 """Controllers for the classroom page."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
-from constants import constants
+from core import feconf
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import classroom_services
 from core.domain import config_domain
 from core.domain import topic_fetchers
-import feconf
-
-
-class ClassroomPage(base.BaseHandler):
-    """Renders the classroom page."""
-
-    URL_PATH_ARGS_SCHEMAS = {
-        'classroom_url_fragment': {
-            'schema': {
-                'type': 'basestring'
-            }
-        }
-    }
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
-
-    @acl_decorators.does_classroom_exist
-    def get(self, _):
-        """Handles GET requests."""
-
-        self.render_template('classroom-page.mainpage.html')
 
 
 class ClassroomDataHandler(base.BaseHandler):

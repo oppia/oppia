@@ -16,14 +16,12 @@
 
 """Domain object for changes made to domain objects of storage models."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import copy
 
+from core import utils
 from core.platform import models
-import python_utils
-import utils
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
@@ -95,7 +93,7 @@ def validate_cmd(cmd_name, valid_cmd_attribute_specs, actual_cmd_attributes):
                     attribute_name, cmd_name, actual_value))
 
 
-class BaseChange(python_utils.OBJECT):
+class BaseChange:
     """Domain object for changes made to storage models' domain objects."""
 
     # The list of allowed commands of a change domain object. Each item in the
@@ -224,3 +222,11 @@ class BaseChange(python_utils.OBJECT):
                     self, attribute_name)
 
         return base_change_dict
+
+    def __getattr__(self, name: str) -> str:
+        # AttributeError needs to be thrown in order to make
+        # instances of this class picklable.
+        try:
+            return self.__dict__[name]
+        except KeyError:
+            raise AttributeError(name)

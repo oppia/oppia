@@ -19,11 +19,17 @@
 import { trigger, transition, style, animate } from '@angular/animations';
 import { Component, Input, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import constants from 'assets/constants';
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 
 interface InvalidTagsAndAttributes {
   tags: string[];
   attrs: string[];
+}
+
+interface Dimensions {
+  height: number;
+  width: number;
 }
 
 @Component({
@@ -39,26 +45,32 @@ interface InvalidTagsAndAttributes {
   ]
 })
 export class EditThumbnailModalComponent implements OnInit {
-  @Input() bgColor: string;
-  @Input() uploadedImage: string | null;
-  @Input() aspectRatio: string;
-  @Input() previewDescription: string;
-  @Input() previewDescriptionBgColor: string;
-  @Input() previewFooter: string;
-  @Input() previewTitle: string;
-  @Input() allowedBgColors: string[];
-  @Input() tempBgColor: string;
-  @Input() dimensions: { height: number; width: number; };
-  @Input() openInUploadMode: boolean;
-  @Input() uploadedImageMimeType: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() bgColor!: string;
+  // 'uploadedImage' will be null when an invalid image has
+  // been uploaded.
+  @Input() uploadedImage!: string | null;
+  @Input() aspectRatio!: string;
+  @Input() previewDescription!: string;
+  @Input() previewDescriptionBgColor!: string;
+  @Input() previewFooter!: string;
+  @Input() previewTitle!: string;
+  @Input() allowedBgColors!: string[];
+  @Input() tempBgColor!: string;
+  @Input() dimensions!: Dimensions;
+  @Input() uploadedImageMimeType!: string;
+  @Input() openInUploadMode: boolean = false;
+  tags!: string[];
+  attrs!: string[];
+  imgSrc!: string;
+  invalidTagsAndAttributes!: InvalidTagsAndAttributes;
 
   invalidImageWarningIsShown = false;
+  invalidFilenameWarningIsShown = false;
+  thumbnailHasChanged = false;
   allowedImageFormats = ['svg'];
-  file: Blob;
-  tags: string[];
-  attrs: string[];
-  imgSrc: string;
-  invalidTagsAndAttributes: InvalidTagsAndAttributes;
 
   constructor(
     private svgSanitizerService: SvgSanitizerService,
@@ -80,6 +92,12 @@ export class EditThumbnailModalComponent implements OnInit {
     return this.uploadedImageMimeType === 'image/svg+xml';
   }
 
+  isValidFilename(file: File): boolean {
+    const VALID_THUMBNAIL_FILENAME_REGEX = new RegExp(
+      constants.VALID_THUMBNAIL_FILENAME_REGEX);
+    return VALID_THUMBNAIL_FILENAME_REGEX.test(file.name);
+  }
+
   updateBackgroundColor(color: string): void {
     this.bgColor = color;
   }
@@ -97,7 +115,7 @@ export class EditThumbnailModalComponent implements OnInit {
           img.naturalHeight || 150,
           img.naturalWidth || 300);
       };
-      this.imgSrc = <string>reader.result;
+      this.imgSrc = reader.result as string;
       this.updateBackgroundColor(this.tempBgColor);
       img.src = this.imgSrc;
       this.uploadedImage = this.imgSrc;
@@ -108,6 +126,8 @@ export class EditThumbnailModalComponent implements OnInit {
       this.attrs = this.invalidTagsAndAttributes.attrs;
       if (this.tags.length > 0 || this.attrs.length > 0) {
         this.reset();
+      } else {
+        this.thumbnailHasChanged = true;
       }
     };
     reader.readAsDataURL(file);
@@ -116,15 +136,20 @@ export class EditThumbnailModalComponent implements OnInit {
   onFileChanged(file: File): void {
     this.uploadedImageMimeType = file.type;
     this.invalidImageWarningIsShown = false;
+    this.invalidFilenameWarningIsShown = false;
     this.invalidTagsAndAttributes = {
       tags: [],
       attrs: []
     };
-    if (this.isUploadedImageSvg()) {
+    if (this.isUploadedImageSvg() && this.isValidFilename(file)) {
       this.setUploadedFile(file);
     } else {
       this.reset();
-      this.invalidImageWarningIsShown = true;
+      if (!this.isUploadedImageSvg()) {
+        this.invalidImageWarningIsShown = true;
+      } else {
+        this.invalidFilenameWarningIsShown = true;
+      }
     }
   }
 

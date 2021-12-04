@@ -403,7 +403,7 @@ describe('Exploration engine service ', () => {
     expect(explorationEngineService.isInPreviewMode()).toBe(false);
     expect(() => {
       explorationEngineService.getExplorationTitle();
-    }).toThrowError('Cannot read property \'title\' of undefined');
+    }).toThrowError('Cannot read properties of undefined (reading \'title\')');
 
     explorationEngineService.init(
       explorationDict, 1, null, true, ['en'], initSuccessCb);
@@ -432,7 +432,7 @@ describe('Exploration engine service ', () => {
     expect(explorationEngineService.isInPreviewMode()).toBe(true);
     expect(() => {
       explorationEngineService.getExplorationTitle();
-    }).toThrowError('Cannot read property \'title\' of undefined');
+    }).toThrowError('Cannot read properties of undefined (reading \'title\')');
 
     explorationEngineService.initSettingsFromEditor('Start', [paramChanges]);
     explorationEngineService.init(
@@ -690,7 +690,7 @@ describe('Exploration engine service ', () => {
 
     expect(() => {
       explorationEngineService.getExplorationTitle();
-    }).toThrowError('Cannot read property \'title\' of undefined');
+    }).toThrowError('Cannot read properties of undefined (reading \'title\')');
 
     explorationEngineService.init(
       explorationDict, 1, null, true, ['en'], initSuccessCb);
@@ -724,7 +724,8 @@ describe('Exploration engine service ', () => {
     expect(() => {
       explorationEngineService.getAuthorRecommendedExpIds();
     }).toThrowError(
-      'Cannot read property \'getAuthorRecommendedExpIds\' of undefined');
+      'Cannot read properties of undefined ' +
+      '(reading \'getAuthorRecommendedExpIds\')');
 
     explorationEngineService.init(
       explorationDict, 1, null, true, ['en'], initSuccessCb);
@@ -810,7 +811,8 @@ describe('Exploration engine service ', () => {
 
     expect(() => {
       explorationEngineService.isCurrentStateInitial();
-    }).toThrowError('Cannot read property \'initStateName\' of undefined');
+    }).toThrowError(
+      'Cannot read properties of undefined (reading \'initStateName\')');
 
     explorationEngineService.init(
       explorationDict, 1, null, true, ['en'], initSuccessCb);
@@ -825,7 +827,8 @@ describe('Exploration engine service ', () => {
 
     expect(() => {
       explorationEngineService.getState();
-    }).toThrowError('Cannot read property \'getState\' of undefined');
+    }).toThrowError(
+      'Cannot read properties of undefined (reading \'getState\')');
 
     explorationEngineService.init(
       explorationDict, 1, null, true, ['en'], initSuccessCb);
@@ -857,7 +860,8 @@ describe('Exploration engine service ', () => {
 
     expect(() => {
       explorationEngineService.getLanguageCode();
-    }).toThrowError('Cannot read property \'getLanguageCode\' of undefined');
+    }).toThrowError(
+      'Cannot read properties of undefined (reading \'getLanguageCode\')');
 
     // First exploration has language code 'en'.
     explorationEngineService.init(

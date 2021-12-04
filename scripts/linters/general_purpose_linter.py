@@ -16,13 +16,10 @@
 
 """Lint checks used by all the linters."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import os
 import re
-
-import python_utils
 
 from . import js_ts_linter
 from . import warranted_angular_security_bypasses
@@ -48,9 +45,7 @@ EXCLUDED_PATHS = (
     '%s/*' % js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH)
 
 GENERATED_FILE_PATHS = (
-    'extensions/interactions/LogicProof/static/js/generatedDefaultData.ts',
-    'extensions/interactions/LogicProof/static/js/generatedParser.ts',
-    'core/templates/expressions/parser.js')
+    'core/templates/expressions/parser.js',)
 
 CONFIG_FILE_PATHS = (
     'core/tests/.browserstack.env.example',
@@ -104,8 +99,8 @@ BAD_PATTERNS = {
 BAD_PATTERNS_REGEXP = [
     {
         'regexp': re.compile(r'TODO[^\(]*[^\)][^:]*[^A-Z]+[^\w]*$'),
-        'message': 'Please assign TODO comments to a user '
-                   'in the format TODO(username): XXX. ',
+        'message': 'Please link TODO comments to an issue '
+                   'in the format TODO(#issuenum): XXX. ',
         'excluded_files': (),
         'excluded_dirs': ()
     }
@@ -123,8 +118,8 @@ MANDATORY_PATTERNS_REGEXP = [
         'excluded_dirs': EXCLUDED_PATHS
     },
     {
-        'regexp': re.compile('from __future__ import unicode_literals'),
-        'message': 'Please ensure this file should contain unicode_literals '
+        'regexp': re.compile('from __future__ import annotations'),
+        'message': 'Please ensure this file should contain annotations '
                    'future import.',
         'included_types': ('.py'),
         'excluded_files': GENERATED_FILE_PATHS + CONFIG_FILE_PATHS + (
@@ -201,7 +196,8 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'message': 'Please do not use print statement.',
         'excluded_files': (
             'core/tests/test_utils.py',
-            'core/tests/performance_framework/perf_domain.py'),
+            'core/tests/performance_framework/perf_domain.py',
+            'core/tests/test_utils_test.py'),
         'excluded_dirs': ('scripts/',)
     },
     {
@@ -214,45 +210,9 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_dirs': ()
     },
     {
-        'regexp': re.compile(r'urllib\..*quote\('),
-        'message': 'Please use python_utils.url_quote().',
-        'excluded_files': ('python_utils.py', 'python_utils_test.py'),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'urllib\..*unquote_plus\('),
-        'message': 'Please use python_utils.url_unquote_plus().',
-        'excluded_files': ('python_utils.py', 'python_utils_test.py'),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'urllib\..*urlencode\('),
-        'message': 'Please use python_utils.url_encode().',
-        'excluded_files': ('python_utils.py', 'python_utils_test.py'),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'urllib\..*urlretrieve\('),
-        'message': 'Please use python_utils.url_retrieve().',
-        'excluded_files': ('python_utils.py', 'python_utils_test.py'),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'urllib(2)?\..*urlopen\('),
-        'message': 'Please use python_utils.url_open().',
-        'excluded_files': ('python_utils.py', 'python_utils_test.py'),
-        'excluded_dirs': ()
-    },
-    {
         'regexp': re.compile(r'urllib(2)?\..*Request\('),
         'message': 'Please use python_utils.url_request().',
-        'excluded_files': ('python_utils.py', 'python_utils_test.py'),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'object\):'),
-        'message': 'Please use python_utils.OBJECT.',
-        'excluded_files': (),
+        'excluded_files': ('core/python_utils.py', 'core/python_utils_test.py'),
         'excluded_dirs': ()
     },
 ]
@@ -354,7 +314,7 @@ def check_file_type_specific_bad_pattern(filepath, content):
     return failed, total_error_count, error_messages
 
 
-class GeneralPurposeLinter(python_utils.OBJECT):
+class GeneralPurposeLinter:
     """Manages all the common linting functions. As an abstract base class, this
     is not intended to be used directly.
     """
@@ -398,7 +358,11 @@ class GeneralPurposeLinter(python_utils.OBJECT):
         # found in the file.
         pattern_found_list = []
         error_messages = []
-        file_content = self.file_cache.readlines(filepath)
+
+        try:
+            file_content = self.file_cache.readlines(filepath)
+        except Exception as e:
+            raise Exception('%s %s' % (filepath, e))
         for index, regexp_to_check in enumerate(
                 pattern_list):
             if (any(filepath.endswith(
@@ -488,7 +452,7 @@ class GeneralPurposeLinter(python_utils.OBJECT):
             total_error_count += temp_count
             error_messages.extend(bad_pattern_error_messages)
 
-            if filepath == 'constants.ts':
+            if filepath.endswith('constants.ts'):
                 for pattern, constants in BAD_STRINGS_CONSTANTS.items():
                     for line in file_content:
                         if pattern in line:
@@ -567,10 +531,11 @@ class GeneralPurposeLinter(python_utils.OBJECT):
         failed = False
 
         for filepath in files_to_lint:
-            if (filepath.endswith(('.js')) and
-                    filepath.startswith(('core/templates', 'extensions')) and
-                    filepath not in build.JS_FILEPATHS_NOT_TO_BUILD and
-                    not filepath.endswith('protractor.js')):
+            if filepath.endswith(
+                ('.js')) and filepath.startswith(
+                    ('core/templates', 'extensions')) and (
+                        filepath not in build.JS_FILEPATHS_NOT_TO_BUILD
+                        ) and not filepath.endswith('protractor.js'):
                 error_message = (
                     '%s  --> Found extra .js file' % filepath)
                 error_messages.append(error_message)

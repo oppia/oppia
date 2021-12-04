@@ -22,8 +22,7 @@ delegate to the Exploration model class. This will enable the exploration
 storage model to be changed without affecting this module and others above it.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import collections
 import datetime
@@ -34,8 +33,11 @@ import os
 import pprint
 import zipfile
 
-import android_validation_constants
-from constants import constants
+from core import android_validation_constants
+from core import feconf
+from core import python_utils
+from core import utils
+from core.constants import constants
 from core.domain import activity_services
 from core.domain import caching_services
 from core.domain import classifier_services
@@ -59,9 +61,6 @@ from core.domain import stats_services
 from core.domain import taskqueue_services
 from core.domain import user_services
 from core.platform import models
-import feconf
-import python_utils
-import utils
 
 datastore_services = models.Registry.import_datastore_services()
 (exp_models, feedback_models, user_models) = models.Registry.import_models([
@@ -152,17 +151,25 @@ def get_exploration_ids_matching_query(
             it is empty, no language code filter is applied to the results. If
             it is not empty, then a result is considered valid if it matches at
             least one of these language codes.
-        offset: str or None. Optional offset from which to start the search
+        offset: int or None. Optional offset from which to start the search
             query. If no offset is supplied, the first N results matching
             the query are returned.
 
     Returns:
-        list(str). A list of exploration ids matching the given search query.
+        2-tuple of (returned_exploration_ids, search_offset). Where:
+            returned_exploration_ids : list(str). A list with all
+                exploration ids matching the given search query string,
+                as well as a search offset for future fetches.
+                The list contains exactly feconf.SEARCH_RESULTS_PAGE_SIZE
+                results if there are at least that many, otherwise it
+                contains all remaining results. (If this behaviour does
+                not occur, an error will be logged.)
+            search_offset: int. Search offset for future fetches.
     """
     returned_exploration_ids = []
     search_offset = offset
 
-    for _ in python_utils.RANGE(MAX_ITERATIONS):
+    for _ in range(MAX_ITERATIONS):
         remaining_to_fetch = feconf.SEARCH_RESULTS_PAGE_SIZE - len(
             returned_exploration_ids)
 
@@ -377,8 +384,7 @@ def apply_change_list(exploration_id, change_list):
                 state = exploration.states[change.state_name]
                 if (change.property_name ==
                         exp_domain.STATE_PROPERTY_PARAM_CHANGES):
-                    state.update_param_changes(
-                        list(python_utils.MAP(
+                    state.update_param_changes(list(map(
                             to_param_domain, change.new_value)))
                 elif change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
                     content = (
@@ -506,6 +512,14 @@ def apply_change_list(exploration_id, change_list):
                     change.content_id, change.language_code,
                     change.translation_html, change.data_format)
             elif (change.cmd ==
+                  exp_domain.CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE):
+                exploration.states[
+                    change.state_name
+                ].mark_written_translation_as_needing_update(
+                    change.content_id,
+                    change.language_code
+                )
+            elif (change.cmd ==
                   exp_domain.CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE):
                 exploration.states[
                     change.state_name
@@ -529,7 +543,7 @@ def apply_change_list(exploration_id, change_list):
                     exploration.update_param_specs(change.new_value)
                 elif change.property_name == 'param_changes':
                     exploration.update_param_changes(list(
-                        python_utils.MAP(to_param_domain, change.new_value)))
+                        map(to_param_domain, change.new_value)))
                 elif change.property_name == 'init_state_name':
                     exploration.update_init_state_name(change.new_value)
                 elif change.property_name == 'auto_tts_enabled':
@@ -548,7 +562,7 @@ def apply_change_list(exploration_id, change_list):
                 # migrate to is the latest version.
                 target_version_is_current_state_schema_version = (
                     change.to_version ==
-                    python_utils.UNICODE(feconf.CURRENT_STATE_SCHEMA_VERSION))
+                    str(feconf.CURRENT_STATE_SCHEMA_VERSION))
                 if not target_version_is_current_state_schema_version:
                     raise Exception(
                         'Expected to migrate to the latest state schema '
@@ -563,7 +577,7 @@ def apply_change_list(exploration_id, change_list):
                 e.__class__.__name__, e, exploration_id,
                 pprint.pprint(change_list))
         )
-        python_utils.reraise_exception()
+        raise e
 
 
 def _save_exploration(committer_id, exploration, commit_message, change_list):
@@ -938,7 +952,7 @@ def get_exploration_snapshots_metadata(exploration_id, allow_deleted=False):
     """
     exploration = exp_fetchers.get_exploration_by_id(exploration_id)
     current_version = exploration.version
-    version_nums = list(python_utils.RANGE(1, current_version + 1))
+    version_nums = list(range(1, current_version + 1))
 
     return exp_models.ExplorationModel.get_snapshots_metadata(
         exploration_id, version_nums, allow_deleted=allow_deleted)
@@ -1734,7 +1748,7 @@ def get_composite_change_list(exp_id, from_version, to_version):
             'of exploration to version %s.'
             % (from_version, to_version))
 
-    version_nums = list(python_utils.RANGE(from_version + 1, to_version + 1))
+    version_nums = list(range(from_version + 1, to_version + 1))
     snapshots_metadata = exp_models.ExplorationModel.get_snapshots_metadata(
         exp_id, version_nums, allow_deleted=False)
 

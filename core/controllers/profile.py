@@ -14,8 +14,7 @@
 
 """Controllers for the profile page."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import io
 import json
@@ -23,7 +22,8 @@ import logging
 import re
 import zipfile
 
-from constants import constants
+from core import feconf
+from core import utils
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import email_manager
@@ -34,23 +34,6 @@ from core.domain import takeout_service
 from core.domain import user_domain
 from core.domain import user_services
 from core.domain import wipeout_service
-import feconf
-import utils
-
-
-class ProfilePage(base.BaseHandler):
-    """The world-viewable profile page."""
-
-    @acl_decorators.open_access
-    def get(self, username):
-        """Handles GET requests for the publicly-viewable profile page."""
-
-        user_settings = user_services.get_user_settings_from_username(username)
-
-        if not user_settings:
-            raise self.PageNotFoundException
-
-        self.render_template('profile-page.mainpage.html')
 
 
 class ProfileHandler(base.BaseHandler):
@@ -102,15 +85,6 @@ class ProfileHandler(base.BaseHandler):
             'is_user_visiting_own_profile': is_user_visiting_own_profile
         })
         self.render_json(self.values)
-
-
-class PreferencesPage(base.BaseHandler):
-    """The preferences page."""
-
-    @acl_decorators.can_manage_own_account
-    def get(self):
-        """Handles GET requests."""
-        self.render_template('preferences-page.mainpage.html')
 
 
 class BulkEmailWebhookEndpoint(base.BaseHandler):
@@ -261,6 +235,11 @@ class ProfilePictureHandler(base.BaseHandler):
     picture is uploaded.
     """
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_manage_own_account
@@ -279,6 +258,20 @@ class ProfilePictureHandlerByUsernameHandler(base.BaseHandler):
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'username': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_valid_username_string'
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.open_access
     def get(self, username):
@@ -310,7 +303,7 @@ class SignupPage(base.BaseHandler):
             self.redirect(return_url)
             return
 
-        self.render_template('signup-page.mainpage.html')
+        self.render_template('oppia-root.mainpage.html')
 
 
 class SignupHandler(base.BaseHandler):
@@ -399,26 +392,17 @@ class SignupHandler(base.BaseHandler):
         })
 
 
-class DeleteAccountPage(base.BaseHandler):
-    """The delete account page."""
-
-    @acl_decorators.can_manage_own_account
-    def get(self):
-        """Handles GET requests."""
-        if not constants.ENABLE_ACCOUNT_DELETION:
-            raise self.PageNotFoundException
-        self.render_template('delete-account-page.mainpage.html')
-
-
 class DeleteAccountHandler(base.BaseHandler):
     """Provides data for the delete account page."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'DELETE': {}
+    }
 
     @acl_decorators.can_manage_own_account
     def delete(self):
         """Handles DELETE requests."""
-        if not constants.ENABLE_ACCOUNT_DELETION:
-            raise self.PageNotFoundException
-
         wipeout_service.pre_delete_user(self.user_id)
         self.render_json({'success': True})
 
@@ -431,9 +415,6 @@ class ExportAccountHandler(base.BaseHandler):
     @acl_decorators.can_manage_own_account
     def get(self):
         """Handles GET requests."""
-        if not constants.ENABLE_ACCOUNT_EXPORT:
-            raise self.PageNotFoundException
-
         # Retrieve user data.
         user_takeout_object = takeout_service.export_data_for_user(
             self.user_id)
@@ -466,20 +447,6 @@ class ExportAccountHandler(base.BaseHandler):
         # Render file for download.
         self.render_downloadable_file(
             temp_file, 'oppia_takeout_data.zip', 'text/plain')
-
-
-class PendingAccountDeletionPage(base.BaseHandler):
-    """The account pending deletion page. This page is accessible by all users
-    even if they are not scheduled for deletion. This is because users that are
-    scheduled for deletion are logged out instantly when they try to login.
-    """
-
-    @acl_decorators.open_access
-    def get(self):
-        """Handles GET requests."""
-        if not constants.ENABLE_ACCOUNT_DELETION:
-            raise self.PageNotFoundException
-        self.render_template('pending-account-deletion-page.mainpage.html')
 
 
 class UsernameCheckHandler(base.BaseHandler):

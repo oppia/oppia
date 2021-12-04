@@ -16,13 +16,10 @@
 
 """Domain objects for Classroom."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
-
-import python_utils
+from __future__ import annotations
 
 
-class Classroom(python_utils.OBJECT):
+class Classroom:
     """Domain object for a classroom."""
 
     def __init__(

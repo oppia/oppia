@@ -43,9 +43,9 @@ export interface JobsDataBackendDict {
 }
 
 interface MemoryCacheProfileResponse {
-  'peak_allocation': string,
-  'total_allocation': string,
-  'total_keys_stored': string
+  'peak_allocation': string;
+  'total_allocation': string;
+  'total_keys_stored': string;
 }
 
 interface BeamJobsResponse {
@@ -165,12 +165,10 @@ export class ReleaseCoordinatorBackendApiService {
     );
   }
 
-  startNewBeamJob(
-      beamJob: BeamJob, jobArguments: string[]): Observable<BeamJobRun> {
-    const params = {job_name: beamJob.name, job_arguments: jobArguments};
-    return this.http.put<BeamJobRunBackendDict>('/beam_job_run', params).pipe(
-      map(BeamJobRun.createFromBackendDict)
-    );
+  startNewBeamJob(beamJob: BeamJob): Observable<BeamJobRun> {
+    return this.http.put<BeamJobRunBackendDict>('/beam_job_run', {
+      job_name: beamJob.name
+    }).pipe(map(BeamJobRun.createFromBackendDict));
   }
 
   cancelBeamJobRun(beamJobRun: BeamJobRun): Observable<BeamJobRun> {

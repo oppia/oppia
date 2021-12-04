@@ -24,10 +24,10 @@ import { LoginRequiredModalContent } from '../modal-templates/login-required-mod
 import { SkillOpportunity } from 'domain/opportunity/skill-opportunity.model';
 import { ExplorationOpportunitySummary } from 'domain/opportunity/exploration-opportunity-summary.model';
 class MockNgbModalRef {
-  componentInstance: {};
+  componentInstance!: {};
 }
 
-describe('Contribution Opportunities Service', function() {
+describe('Contribution Opportunities Service', () => {
   let ngbModal: NgbModal;
   let contributionOpportunitiesBackendApiService:
     ContributionOpportunitiesBackendApiService;
@@ -53,6 +53,9 @@ describe('Contribution Opportunities Service', function() {
       content_count: 100,
       translation_counts: {
         hi: 15
+      },
+      translation_in_review_counts: {
+        hi: 20
       }
     }],
     next_cursor: '6',
@@ -92,10 +95,11 @@ describe('Contribution Opportunities Service', function() {
 
   it('should open login modal when user is not logged in', () => {
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return <NgbModalRef>(
+      return (
         { componentInstance: MockNgbModalRef,
           result: Promise.resolve('success')
-        });
+        }
+      ) as NgbModalRef;
     });
 
     contributionOpportunitiesService.showRequiresLoginModal();
@@ -182,7 +186,8 @@ describe('Contribution Opportunities Service', function() {
         }
       ));
 
-    contributionOpportunitiesService.getTranslationOpportunitiesAsync('en')
+    contributionOpportunitiesService
+      .getTranslationOpportunitiesAsync('en', 'Topic')
       .then(successHandler, failHandler);
     tick();
 
@@ -211,7 +216,8 @@ describe('Contribution Opportunities Service', function() {
         }
       ));
 
-    contributionOpportunitiesService.getMoreTranslationOpportunitiesAsync('en')
+    contributionOpportunitiesService
+      .getMoreTranslationOpportunitiesAsync('en', 'Topic')
       .then(successHandler, failHandler);
     tick();
 
@@ -276,4 +282,24 @@ describe('Contribution Opportunities Service', function() {
     expect(getVoiceoverOpportunitiesSpy).toHaveBeenCalled();
     expect(successHandler).toHaveBeenCalledWith(voiceoverOpportunitiesDict);
   }));
+
+  it('should return all topic names when calling \'getAllTopicNamesAsync\'',
+    fakeAsync(() => {
+      const successHandler = jasmine.createSpy('success');
+      const failHandler = jasmine.createSpy('fail');
+
+      let topicNamesDict = ['Topic 1', 'Topic 2'];
+
+      let getAllTopicNamesSpy = spyOn(
+        contributionOpportunitiesBackendApiService,
+        'fetchAllTopicNamesAsync')
+        .and.returnValue(Promise.resolve(topicNamesDict));
+
+      contributionOpportunitiesService.getAllTopicNamesAsync()
+        .then(successHandler, failHandler);
+      tick();
+
+      expect(getAllTopicNamesSpy).toHaveBeenCalled();
+      expect(successHandler).toHaveBeenCalledWith(topicNamesDict);
+    }));
 });

@@ -16,13 +16,12 @@
 
 """Custom value generator classes."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import copy
 
+from core import utils
 from core.domain import value_generators_domain
-import utils
 
 
 class Copier(value_generators_domain.BaseValueGenerator):

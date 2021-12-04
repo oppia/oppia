@@ -14,14 +14,36 @@
 
 /**
  * @fileoverview Directive for CK Editor.
+ * NOTE: The way we show rich text components in CKEditor is by using Web
+ * components. We don't create an angular view inside ckeditor. In our case,
+ * the web components can't have the same selector as the angular component even
+ * though they are literally the same component and use the same class. This is
+ * because using the same selector is causing issues in the angular view as
+ * angular creates a component instance and adds it to the view. When adding to
+ * the view, it will also create a node with the selector we have specified.
+ * Usually, this has no effect as there is no element in the web-browser
+ * registered by the selector. But in our case, we did it to show rte components
+ * in the ck-editor view.
+ *
+ * In order to overcome this situation, ck-editor uses the same component but we
+ * register it with a different selector. The selector prefix is now
+ * oppia-noninteractive-ckeditor-* instead of oppia-noninteractive we have for
+ * the angular counterpart. This just an internal representation and the value
+ * emitted to the parent component doesn't have oppia-noninteractive-ckeditor-*
+ * tags, They have the normal oppia-noninteractive tags in them. Similarly, for
+ * the value that's passed in, we don't expect oppia-noninteractive-ckeditor-*
+ * tags. We expect the normal angular version of our tags and that is converted
+ * on the fly.
  */
 
-import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { ContextService } from 'services/context.service';
 import { CkEditorCopyContentService } from './ck-editor-copy-content.service';
+import { InternetConnectivityService } from 'services/internet-connectivity.service';
+import { Subscription } from 'rxjs';
 
 interface UiConfig {
   (): UiConfig;
@@ -38,14 +60,11 @@ interface RteConfig extends CKEDITOR.config {
 
 @Component({
   selector: 'ck-editor-4-rte',
-  template: '<div><div></div>' +
-            '<div contenteditable="true" ' +
-            'class="oppia-rte-resizer oppia-rte protractor-test-rte">' +
-            '</div></div>',
+  templateUrl: './ck-editor-4-rte.component.html',
   styleUrls: []
 })
 export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
-    OnDestroy {
+    OnDestroy, OnInit {
   @Input() uiConfig: UiConfig;
   @Input() value;
   @Input() headersEnabled = false;
@@ -53,6 +72,9 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
   rteHelperService;
   ck: CKEDITOR.editor;
   currentValue: string;
+  connectedToInternet = true;
+  componentsThatRequireInternet: string[] = [];
+  subscriptions: Subscription;
   // A RegExp for matching rich text components.
   componentRe = (
     /(<(oppia-noninteractive-(.+?))\b[^>]*>)[\s\S]*?<\/\2>/g
@@ -60,11 +82,26 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
   constructor(
     private ckEditorCopyContentService: CkEditorCopyContentService,
     private contextService: ContextService,
-    private elementRef: ElementRef
+    private elementRef: ElementRef,
+    private internetConnectivityService: InternetConnectivityService
   ) {
     this.rteHelperService = OppiaAngularRootComponent.rteHelperService;
+    this.subscriptions = new Subscription();
   }
 
+  ngOnInit(): void {
+    this.subscriptions.add(
+      this.internetConnectivityService.onInternetStateChange.subscribe(
+        internetAccessible => {
+          if (internetAccessible) {
+            this.enableRTEicons();
+            this.connectedToInternet = internetAccessible;
+          } else {
+            this.disableRTEicons();
+            this.connectedToInternet = internetAccessible;
+          }
+        }));
+  }
   ngOnChanges(changes: SimpleChanges): void {
     // Ckeditor 'change' event gets triggered when a user types. In the
     // change listener, value is set and it triggers the ngOnChanges
@@ -82,6 +119,18 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
     // components may change without re-rendering each of the components,
     // in such cases, it is sufficient to update the ckeditor instance manually
     // with the latest value.
+    let value = this.value;
+    // Refer to the note at the top of the file for the reason behind replace.
+    value = value.replace(
+      /<oppia-noninteractive-/g,
+      '<oppia-noninteractive-ckeditor-'
+    );
+    // Refer to the note at the top of the file for the reason behind replace.
+    value = value.replace(
+      /<\/oppia-noninteractive-/g,
+      '</oppia-noninteractive-ckeditor-'
+    );
+    this.value = value;
     if (this.ck && this.ck.status === 'ready' && changes.value) {
       this.ck.setData(this.wrapComponents(this.value));
     }
@@ -200,6 +249,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
     var _RICH_TEXT_COMPONENTS = this.rteHelperService.getRichTextComponents();
     var names = [];
     var icons = [];
+    this.componentsThatRequireInternet = [];
 
     _RICH_TEXT_COMPONENTS.forEach((componentDefn) => {
       var hideComplexExtensionFlag = (
@@ -214,6 +264,9 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
         names.push(componentDefn.id);
         icons.push(componentDefn.iconDataUrl);
       }
+      if (componentDefn.requiresInternet) {
+        this.componentsThatRequireInternet.push(componentDefn.id);
+      }
     });
 
     var editable = document.querySelectorAll('.oppia-rte-resizer');
@@ -224,10 +277,10 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
       });
     };
     for (let i of Object.keys(editable)) {
-      (<HTMLElement>editable[i]).onchange = () => {
+      (editable[i] as HTMLElement).onchange = () => {
         resize();
       };
-      (<HTMLElement>editable[i]).onclick = () => {
+      (editable[i] as HTMLElement).onclick = () => {
         resize();
       };
     }
@@ -240,7 +293,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
        */
     // Whitelist the component tags with any attributes and classes.
     var componentRule = names.map((name) => {
-      return 'oppia-noninteractive-' + name;
+      return 'oppia-noninteractive-ckeditor-' + name;
     }).join(' ') + '(*)[*];';
       // Whitelist the inline component wrapper, which is a
       // span with a "type" attribute.
@@ -280,7 +333,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
 
     const sharedSpaces = {
       top: (
-          <HTMLElement> this.elementRef.nativeElement.children[0].children[0])
+        this.elementRef.nativeElement.children[0].children[0] as HTMLElement)
     };
 
     const ckConfig = this._createCKEditorConfig(
@@ -289,10 +342,10 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
 
     // Initialize CKEditor.
     var ck = CKEDITOR.inline(
-            <HTMLElement>(
-              this.elementRef.nativeElement.children[0].children[1]
-              ),
-            ckConfig
+      (
+        this.elementRef.nativeElement.children[0].children[1] as HTMLElement
+      ),
+      ckConfig
     );
 
     // Hide the editor until it is fully loaded after `instanceReady`
@@ -307,11 +360,11 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
     ck.on('instanceReady', () => {
       // Show the editor now that it is fully loaded.
       (
-        <HTMLElement> this.elementRef.nativeElement
+        this.elementRef.nativeElement as HTMLElement
       ).setAttribute('style', 'display: block');
       // Focus on the CK editor text box.
       (
-        <HTMLElement> this.elementRef.nativeElement.children[0].children[1]
+        this.elementRef.nativeElement.children[0].children[1] as HTMLElement
       ).focus();
       // Remove the loading text.
       this.elementRef.nativeElement.parentElement.removeChild(loadingDiv);
@@ -368,7 +421,10 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
         $('.cke_combo_button')
           .css('display', 'none');
       }
-
+      if (!this.internetConnectivityService.isOnline()) {
+        this.connectedToInternet = false;
+        this.disableRTEicons();
+      }
       ck.setData(this.wrapComponents(this.value));
     });
 
@@ -413,17 +469,51 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
           break;
         }
       }
-      this.valueChange.emit(elt.html());
-      this.value = elt.html();
-      this.currentValue = this.value;
+      let html = elt.html();
+      this.value = html;
+      // Refer to the note at the top of the file for the reason behind replace.
+      html = html.replace(
+        /<oppia-noninteractive-ckeditor-/g,
+        '<oppia-noninteractive-'
+      );
+      // Refer to the note at the top of the file for the reason behind replace.
+      html = html.replace(
+        /<\/oppia-noninteractive-ckeditor-/g,
+        '</oppia-noninteractive-'
+      );
+      this.valueChange.emit(html);
+      this.currentValue = html;
     });
     ck.setData(this.value);
     this.ck = ck;
     this.ckEditorCopyContentService.bindPasteHandler(ck);
   }
 
+  disableRTEicons(): void {
+    // Add disabled cursor pointer to the icons.
+    this.componentsThatRequireInternet.forEach((name) => {
+      let buttons = this.elementRef.nativeElement.getElementsByClassName(
+        'cke_button__oppia' + name);
+      for (let i = 0; i < buttons.length; i++) {
+        buttons[i].style.backgroundColor = '#cccccc';
+        buttons[i].style.pointerEvents = 'none';
+      }
+    });
+  }
+  enableRTEicons(): void {
+    this.componentsThatRequireInternet.forEach((name) => {
+      let buttons = this.elementRef.nativeElement.getElementsByClassName(
+        'cke_button__oppia' + name);
+      for (let i = 0; i < buttons.length; i++) {
+        buttons[i].style.backgroundColor = '';
+        buttons[i].style.pointerEvents = '';
+      }
+    });
+  }
+
   ngOnDestroy(): void {
     this.ck.destroy();
+    this.subscriptions.unsubscribe();
   }
 }
 

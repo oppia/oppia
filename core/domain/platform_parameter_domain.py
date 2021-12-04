@@ -16,18 +16,16 @@
 
 """Domain objects for platform parameters."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import json
 import re
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core import utils
+from core.constants import constants
 from core.domain import change_domain
-import feconf
-import python_utils
-import utils
-
 
 SERVER_MODES = python_utils.create_enum('dev', 'test', 'prod') # pylint: disable=invalid-name
 FEATURE_STAGES = SERVER_MODES # pylint: disable=invalid-name
@@ -67,7 +65,7 @@ class PlatformParameterChange(change_domain.BaseChange):
     }]
 
 
-class EvaluationContext(python_utils.OBJECT):
+class EvaluationContext:
     """Domain object representing the context for parameter evaluation."""
 
     def __init__(
@@ -186,7 +184,7 @@ class EvaluationContext(python_utils.OBJECT):
         )
 
 
-class PlatformParameterFilter(python_utils.OBJECT):
+class PlatformParameterFilter:
     """Domain object for filters in platform parameters."""
 
     SUPPORTED_FILTER_TYPES = [
@@ -459,7 +457,7 @@ class PlatformParameterFilter(python_utils.OBJECT):
         )
 
 
-class PlatformParameterRule(python_utils.OBJECT):
+class PlatformParameterRule:
     """Domain object for rules in platform parameters."""
 
     def __init__(self, filters, value_when_matched):
@@ -547,13 +545,12 @@ class PlatformParameterRule(python_utils.OBJECT):
         )
 
 
-class PlatformParameter(python_utils.OBJECT):
+class PlatformParameter:
     """Domain object for platform parameters."""
 
     DATA_TYPE_PREDICATES_DICT = {
         DATA_TYPES.bool.value: lambda x: isinstance(x, bool),
-        DATA_TYPES.string.value: (
-            lambda x: isinstance(x, python_utils.BASESTRING)),
+        DATA_TYPES.string.value: lambda x: isinstance(x, str),
         DATA_TYPES.number.value: lambda x: isinstance(x, (float, int)),
     }
 

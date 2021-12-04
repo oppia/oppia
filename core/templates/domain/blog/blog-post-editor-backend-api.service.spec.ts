@@ -25,8 +25,8 @@ describe('Blog Post Editor backend api service', () => {
   let bpebas: BlogPostEditorBackendApiService;
   let httpTestingController: HttpTestingController;
   let blogPostEditorDataObject: BlogPostEditorData;
-  let successHandler;
-  let failHandler;
+  let successHandler: jasmine.Spy<jasmine.Func>;
+  let failHandler: jasmine.Spy<jasmine.Func>;
 
   const fakeImage = (): File => {
     const blob = new Blob([''], { type: 'image/jpeg' });
@@ -105,7 +105,7 @@ describe('Blog Post Editor backend api service', () => {
     flushMicrotasks();
 
     expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith('Error loading blog post.');
+    expect(failHandler).toHaveBeenCalledWith(500);
   }));
 
   it('should successfully delete a blog post', fakeAsync(() => {

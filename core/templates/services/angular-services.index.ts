@@ -182,8 +182,6 @@ import { InteractiveMapRulesService } from 'interactions/InteractiveMap/directiv
 import { InteractiveMapValidationService } from 'interactions/InteractiveMap/directives/interactive-map-validation.service';
 import { ItemSelectionInputRulesService } from 'interactions/ItemSelectionInput/directives/item-selection-input-rules.service';
 import { ItemSelectionInputValidationService } from 'interactions/ItemSelectionInput/directives/item-selection-input-validation.service';
-import { LogicProofRulesService } from 'interactions/LogicProof/directives/logic-proof-rules.service';
-import { LogicProofValidationService } from 'interactions/LogicProof/directives/logic-proof-validation.service';
 import { MathEquationInputRulesService } from 'interactions/MathEquationInput/directives/math-equation-input-rules.service';
 import { MathEquationInputValidationService } from 'interactions/MathEquationInput/directives/math-equation-input-validation.service';
 import { MultipleChoiceInputRulesService } from 'interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service';
@@ -212,6 +210,7 @@ import { AdminDataService } from 'pages/admin-page/services/admin-data.service';
 import { AdminRouterService } from 'pages/admin-page/services/admin-router.service';
 import { AdminTaskManagerService } from 'pages/admin-page/services/admin-task-manager.service';
 import { BlogAdminDataService } from 'pages/blog-admin-page/services/blog-admin-data.service';
+import { BlogDashboardPageService } from 'pages/blog-dashboard-page/services/blog-dashboard-page.service';
 import { CollectionEditorStateService } from 'pages/collection-editor-page/services/collection-editor-state.service';
 import { ContributionOpportunitiesBackendApiService } from 'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service';
 import { ContributorDashboardAdminBackendApiService } from 'pages/contributor-dashboard-admin-page/services/contributor-dashboard-admin-backend-api.service';
@@ -241,6 +240,7 @@ import { UserExplorationPermissionsService } from 'pages/exploration-editor-page
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import { TranslationTabActiveContentIdService } from 'pages/exploration-editor-page/translation-tab/services/translation-tab-active-content-id.service';
 import { TranslationTabActiveModeService } from 'pages/exploration-editor-page/translation-tab/services/translation-tab-active-mode.service';
+import { TranslationTopicService } from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
 import { AnswerClassificationService } from 'pages/exploration-player-page/services/answer-classification.service';
 import { AudioPreloaderService } from 'pages/exploration-player-page/services/audio-preloader.service';
 import { AudioTranslationLanguageService } from 'pages/exploration-player-page/services/audio-translation-language.service';
@@ -286,6 +286,7 @@ import { BottomNavbarStatusService } from 'services/bottom-navbar-status.service
 import { ClassifierDataBackendApiService } from 'services/classifier-data-backend-api.service';
 import { CodeNormalizerService } from 'services/code-normalizer.service';
 import { ComputeGraphService } from 'services/compute-graph.service';
+import { InternetConnectivityService } from 'services/internet-connectivity.service';
 import { ConstructTranslationIdsService } from 'services/construct-translation-ids.service';
 import { ContextService } from 'services/context.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
@@ -334,6 +335,7 @@ import { SchemaFormSubmittedService } from 'services/schema-form-submitted.servi
 import { SchemaUndefinedLastElementService } from 'services/schema-undefined-last-element.service';
 import { SearchBackendApiService } from 'services/search-backend-api.service';
 import { SearchService } from 'services/search.service';
+import { ServerConnectionBackendApiService } from 'services/server-connection-backend-api.service';
 import { SidebarStatusService } from 'services/sidebar-status.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { SpeechSynthesisChunkerService } from 'services/speech-synthesis-chunker.service';
@@ -354,6 +356,7 @@ import { LearnerViewRatingService } from 'pages/exploration-player-page/services
 import { LearnerViewRatingBackendApiService } from 'pages/exploration-player-page/services/learner-view-rating-backend-api.service';
 import { LearnerLocalNavBackendApiService } from 'pages/exploration-player-page/services/learner-local-nav-backend-api.service';
 import { FeedbackPopupBackendApiService } from 'pages/exploration-player-page/services/feedback-popup-backend-api.service';
+import { TopicCreationService } from 'components/entity-creation-services/topic-creation.service';
 import { AutosaveInfoModalsService } from 'pages/exploration-editor-page/services/autosave-info-modals.service';
 import { ChangeListService } from 'pages/exploration-editor-page/services/change-list.service';
 import { ExplorationPropertyService } from 'pages/exploration-editor-page/services/exploration-property.service';
@@ -367,15 +370,25 @@ import { ExplorationPlayerStateService } from 'pages/exploration-player-page/ser
 import { TopicEditorRoutingService } from 'pages/topic-editor-page/services/topic-editor-routing.service';
 import { SubtopicValidationService } from 'pages/topic-editor-page/services/subtopic-validation.service';
 import { NavigationService } from './navigation.service';
+import { OppiaRteParserService } from './oppia-rte-parser.service';
 import { TopicEditorStateService } from 'pages/topic-editor-page/services/topic-editor-state.service';
 import { ExplorationTagsService } from 'pages/exploration-editor-page/services/exploration-tags.service';
 import { ExplorationLanguageCodeService } from 'pages/exploration-editor-page/services/exploration-language-code.service';
 import { ExplorationInitStateNameService } from 'pages/exploration-editor-page/services/exploration-init-state-name.service';
 import { LibraryPageBackendApiService } from 'pages/library-page/services/library-page-backend-api.service';
 import { SignupPageBackendApiService } from 'pages/signup-page/services/signup-page-backend-api.service';
+import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
 import { PageHeadService } from './page-head.service';
+import { CollectionEditorRoutingService } from 'pages/collection-editor-page/services/collection-editor-routing.service';
+import { EmailDashboardResultBackendApiService } from 'pages/email-dashboard-pages/email-dashboard-result-backend-api.service';
+import { StateDiffModalBackendApiService } from 'pages/exploration-editor-page/services/state-diff-modal-backend-api.service';
+import { I18nService } from 'i18n/i18n.service';
+import { QuestionPlayerStateService } from 'components/question-directives/question-player/services/question-player-state.service';
+import { SettingTabBackendApiService } from 'pages/exploration-editor-page/services/setting-tab-backend-api.service';
+import { HistoryTabBackendApiService } from 'pages/exploration-editor-page/services/history-tab-backend-api.service';
 
 export const angularServices: [string, Type<{}>][] = [
+  ['AccessValidationBackendApiService', AccessValidationBackendApiService],
   ['AdminBackendApiService', AdminBackendApiService],
   ['AdminDataService', AdminDataService],
   ['AdminRouterService', AdminRouterService],
@@ -405,6 +418,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['BlogAdminBackendApiService', BlogAdminBackendApiService],
   ['BlogAdminDataService', BlogAdminDataService],
   ['BlogDashboardBackendApiService', BlogDashboardBackendApiService],
+  ['BlogDashboardPageService', BlogDashboardPageService],
   ['BlogPostEditorBackendApiService', BlogPostEditorBackendApiService],
   ['BottomNavbarStatusService', BottomNavbarStatusService],
   ['BrowserCheckerService', BrowserCheckerService],
@@ -419,11 +433,13 @@ export const angularServices: [string, Type<{}>][] = [
   ['CodeReplValidationService', CodeReplValidationService],
   ['CollectionCreationBackendService', CollectionCreationBackendService],
   ['CollectionCreationService', CollectionCreationService],
+  ['CollectionEditorRoutingService', CollectionEditorRoutingService],
   ['CollectionLinearizerService', CollectionLinearizerService],
   ['CollectionRightsBackendApiService', CollectionRightsBackendApiService],
   ['CollectionValidationService', CollectionValidationService],
   ['CollectionUpdateService', CollectionUpdateService],
   ['ComputeGraphService', ComputeGraphService],
+  ['InternetConnectivityService', InternetConnectivityService],
   ['ConceptCardBackendApiService', ConceptCardBackendApiService],
   ['ConceptCardObjectFactory', ConceptCardObjectFactory],
   ['ConstructTranslationIdsService', ConstructTranslationIdsService],
@@ -461,6 +477,8 @@ export const angularServices: [string, Type<{}>][] = [
   ['EditorFirstTimeEventsService', EditorFirstTimeEventsService],
   ['EmailDashboardBackendApiService', EmailDashboardBackendApiService],
   ['EmailDashboardDataService', EmailDashboardDataService],
+  ['EmailDashboardResultBackendApiService',
+    EmailDashboardResultBackendApiService],
   ['EndExplorationRulesService', EndExplorationRulesService],
   ['EndExplorationValidationService', EndExplorationValidationService],
   ['ExplorationCreationBackendApiService',
@@ -525,8 +543,10 @@ export const angularServices: [string, Type<{}>][] = [
   ['HintAndSolutionModalService', HintAndSolutionModalService],
   ['HintsAndSolutionManagerService', HintsAndSolutionManagerService],
   ['HintObjectFactory', HintObjectFactory],
+  ['HistoryTabBackendApiService', HistoryTabBackendApiService],
   ['HtmlEscaperService', HtmlEscaperService],
   ['I18nLanguageCodeService', I18nLanguageCodeService],
+  ['I18nService', I18nService],
   ['IdGenerationService', IdGenerationService],
   ['ImageClickInputRulesService', ImageClickInputRulesService],
   ['ImageClickInputValidationService', ImageClickInputValidationService],
@@ -565,8 +585,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['LoaderService', LoaderService],
   ['LocalStorageService', LocalStorageService],
   ['LoggerService', LoggerService],
-  ['LogicProofRulesService', LogicProofRulesService],
-  ['LogicProofValidationService', LogicProofValidationService],
   ['LostChangeObjectFactory', LostChangeObjectFactory],
   ['MathEquationInputRulesService', MathEquationInputRulesService],
   ['MathEquationInputValidationService', MathEquationInputValidationService],
@@ -596,6 +614,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['NumericInputRulesService', NumericInputRulesService],
   ['NumericInputValidationService', NumericInputValidationService],
   ['OutcomeObjectFactory', OutcomeObjectFactory],
+  ['OppiaRteParserService', OppiaRteParserService],
   ['PageHeadService', PageHeadService],
   ['PageTitleService', PageTitleService],
   ['ParamChangeObjectFactory', ParamChangeObjectFactory],
@@ -631,6 +650,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['EditableQuestionBackendApiService', EditableQuestionBackendApiService],
   ['QuestionObjectFactory', QuestionObjectFactory],
   ['QuestionBackendApiService', QuestionBackendApiService],
+  ['QuestionPlayerStateService', QuestionPlayerStateService],
   ['QuestionSuggestionBackendApiService', QuestionSuggestionBackendApiService],
   ['QuestionsListService', QuestionsListService],
   ['QuestionPlayerEngineService', QuestionPlayerEngineService],
@@ -657,14 +677,17 @@ export const angularServices: [string, Type<{}>][] = [
   ['SearchExplorationsBackendApiService', SearchExplorationsBackendApiService],
   ['SearchBackendApiService', SearchBackendApiService],
   ['SearchService', SearchService],
+  ['ServerConnectionBackendApiService', ServerConnectionBackendApiService],
   ['SetInputRulesService', SetInputRulesService],
   ['SetInputValidationService', SetInputValidationService],
+  ['SettingTabBackendApiService', SettingTabBackendApiService],
   ['SidebarStatusService', SidebarStatusService],
   ['SignupPageBackendApiService', SignupPageBackendApiService],
   ['SiteAnalyticsService', SiteAnalyticsService],
   ['SkillBackendApiService', SkillBackendApiService],
   ['SkillCreationService', SkillCreationService],
   ['SkillCreationBackendApiService', SkillCreationBackendApiService],
+  ['SkillCreationService', SkillCreationService],
   ['SkillEditorStateService', SkillEditorStateService],
   ['SkillMasteryBackendApiService', SkillMasteryBackendApiService],
   ['SkillObjectFactory', SkillObjectFactory],
@@ -679,6 +702,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['StateContentService', StateContentService],
   ['StateLinkedSkillIdService', StateLinkedSkillIdService],
   ['StateCustomizationArgsService', StateCustomizationArgsService],
+  ['StateDiffModalBackendApiService', StateDiffModalBackendApiService],
   ['StateEditorRefreshService', StateEditorRefreshService],
   ['StateEditorService', StateEditorService],
   ['StateGraphLayoutService', StateGraphLayoutService],
@@ -729,6 +753,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ThreadDataBackendApiService', ThreadDataBackendApiService],
   ['ThreadStatusDisplayService', ThreadStatusDisplayService],
   ['TopicCreationBackendApiService', TopicCreationBackendApiService],
+  ['TopicCreationService', TopicCreationService],
   ['TopicEditorRoutingService', TopicEditorRoutingService],
   ['TopicEditorStateService', TopicEditorStateService],
   ['TopicObjectFactory', TopicObjectFactory],
@@ -744,6 +769,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['TranslationTabActiveContentIdService',
     TranslationTabActiveContentIdService],
   ['TranslationTabActiveModeService', TranslationTabActiveModeService],
+  ['TranslationTopicService', TranslationTopicService],
   ['TruncatePipe', TruncatePipe],
   ['SortByPipe', SortByPipe],
   ['UndoRedoService', UndoRedoService],

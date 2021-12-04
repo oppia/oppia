@@ -29,7 +29,7 @@ import {
   EmailDashboardQueryBackendDict,
 } from 'domain/email-dashboard/email-dashboard-query.model';
 
-export type QueryData = Record<string, boolean | number>;
+export type QueryData = Record<string, boolean | number | null>;
 
 @Injectable({
   providedIn: 'root'
@@ -49,7 +49,7 @@ export class EmailDashboardBackendApiService {
     // If we send a null value of 'cursor' the request URL would have
     // something like '?cursor=null' and the backend would start looking for
     // cursor with value 'null' which is not correct.
-    let params: {'cursor'?: string; 'num_queries_to_fetch': string;} = {
+    let params: { 'cursor'?: string; 'num_queries_to_fetch': string } = {
       num_queries_to_fetch: String(pageSize)
     };
     if (cursor) {

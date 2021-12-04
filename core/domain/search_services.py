@@ -16,8 +16,7 @@
 
 """Commands for operating on the search status of activities."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from core.domain import rights_domain
 from core.domain import rights_manager
@@ -84,8 +83,10 @@ def _should_index_exploration(exp_summary):
         bool. Whether the given exploration should be indexed for future
         search queries.
     """
-    rights = rights_manager.get_exploration_rights(exp_summary.id)
-    return rights.status != rights_domain.ACTIVITY_STATUS_PRIVATE
+    return (
+        not exp_summary.deleted and
+        exp_summary.status != rights_domain.ACTIVITY_STATUS_PRIVATE
+    )
 
 
 def get_search_rank_from_exp_summary(exp_summary):
@@ -106,10 +107,11 @@ def get_search_rank_from_exp_summary(exp_summary):
 
     rank = _DEFAULT_RANK
     if exp_summary.ratings:
-        for rating_value in exp_summary.ratings:
+        for rating_value in exp_summary.ratings.keys():
             rank += (
                 exp_summary.ratings[rating_value] *
-                rating_weightings[rating_value])
+                rating_weightings[rating_value]
+            )
 
     # Ranks must be non-negative.
     return max(rank, 0)
@@ -178,19 +180,17 @@ def search_explorations(query, categories, language_codes, size, offset=None):
             it is not empty, then a result is considered valid if it matches at
             least one of these language codes.
         size: int. The maximum number of results to return.
-        offset: str or None. A marker that is used to get the next page of
+        offset: int or None. A marker that is used to get the next page of
             results. If there are more documents that match the query than
             'size', this function will return an offset to get the next page.
 
     Returns:
         tuple. A 2-tuple consisting of:
             - list(str). A list of exploration ids that match the query.
-            - str or None. An offset if there are more matching explorations to
+            - int or None. An offset if there are more matching explorations to
               fetch, None otherwise. If an offset is returned, it will be a
               web-safe string that can be used in URLs.
     """
-    # TODO(#11314): Change the offset to an int once the underlying search
-    # service is fully migrated to elasticsearch.
     return platform_search_services.search(
         query, SEARCH_INDEX_EXPLORATIONS, categories, language_codes,
         offset=offset, size=size, ids_only=True)
@@ -229,7 +229,7 @@ def search_collections(query, categories, language_codes, size, offset=None):
             it is not empty, then a result is considered valid if it matches at
             least one of these language codes.
         size: int. The maximum number of results to return.
-        offset: str|None. An offset, used to get the next page of results.
+        offset: int|None. An offset, used to get the next page of results.
             If there are more documents that match the query than 'size', this
             function will return an offset to get the next page.
 
@@ -240,8 +240,6 @@ def search_collections(query, categories, language_codes, size, offset=None):
               otherwise. If an offset is returned, it will be a web-safe string
               that can be used in URLs.
     """
-    # TODO(#11314): Change the offset to be an int instead once the underlying
-    # search service is migrated over to elasticsearch.
     return platform_search_services.search(
         query, SEARCH_INDEX_COLLECTIONS, categories, language_codes,
         offset=offset, size=size, ids_only=True)

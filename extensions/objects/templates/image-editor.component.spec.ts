@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,7 +28,14 @@ import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { AlertsService } from 'services/alerts.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { SimpleChanges } from '@angular/core';
+import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 let gifshot = require('gifshot');
+
+declare global {
+  interface Window {
+    GifFrames: Function;
+  }
+}
 
 describe('ImageEditor', () => {
   let component: ImageEditorComponent;
@@ -39,6 +46,7 @@ describe('ImageEditor', () => {
   let imageUploadHelperService: ImageUploadHelperService;
   let imageLocalStorageService: ImageLocalStorageService;
   let alertsService: AlertsService;
+  let svgSanitizerService: SvgSanitizerService;
   let dimensionsOfImage = {
     width: 450,
     height: 350
@@ -339,6 +347,9 @@ describe('ImageEditor', () => {
     set src(url) {
       this.onload();
     }
+    addEventListener(txt, func, bool) {
+      func();
+    }
   }
 
   beforeEach(waitForAsync(() => {
@@ -358,6 +369,7 @@ describe('ImageEditor', () => {
   }));
 
   beforeEach(() => {
+    svgSanitizerService = TestBed.inject(SvgSanitizerService);
     alertsService = TestBed.inject(AlertsService);
     imageUploadHelperService = TestBed.inject(ImageUploadHelperService);
     imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
@@ -374,7 +386,9 @@ describe('ImageEditor', () => {
     // error because 'HTMLImageElement' has around 250 more properties.
     // We have only defined the properties we need in 'mockImageObject'.
     // @ts-expect-error
-    spyOn(window, 'Image').and.returnValue(new MockImageObject());
+    spyOn(window, 'Image').and.returnValues(new MockImageObject(), {
+      src: null
+    });
     // This throws "Argument of type 'mockReaderObject' is not assignable to
     // parameter of type 'HTMLImageElement'.". We need to suppress this
     // error because 'HTMLImageElement' has around 250 more properties.
@@ -1605,6 +1619,50 @@ describe('ImageEditor', () => {
       .toBe('width: 490px; height: 864px;');
   });
 
+  it('should upload file when the user clicks \’Upload Image\’ image', () => {
+    spyOn(document, 'createElement').and.callFake(
+      jasmine.createSpy('createElement').and.returnValue(
+        {
+          width: 0,
+          height: 0,
+          getContext: (txt) => {
+            return {
+              drawImage: (txt, x, y) => {
+                return;
+              },
+              getImageData: (x, y, width, height) => {
+                return 'data';
+              },
+              putImageData: (data, x, y) => {
+                return;
+              }
+            };
+          },
+          toDataURL: (str, x) => {
+            return component.data.metadata.uploadedImageData;
+          }
+        }
+      )
+    );
+    let dataSvg = component.data.metadata;
+    component.data = { mode: component.MODE_EMPTY, metadata: {}, crop: true };
+    spyOn(svgSanitizerService, 'getTrustedSvgResourceUrl').and.returnValue(
+      dataSvg.uploadedImageData);
+
+    component.onFileChanged(dataSvg.uploadedFile);
+
+    expect(component.data).toEqual({
+      mode: 2,
+      metadata: {
+        uploadedFile: dataSvg.uploadedFile,
+        uploadedImageData: dataSvg.uploadedImageData,
+        originalWidth: 300,
+        originalHeight: 150
+      },
+      crop: false
+    });
+  });
+
   it('should crop svg when user clicks the \'crop\' button', () => {
     spyOn(gifshot, 'createGIF').and.callFake((obj, func) => {
       func({image: obj.images});
@@ -1684,6 +1742,74 @@ describe('ImageEditor', () => {
       140, 120);
     expect(component.data.metadata.originalWidth).toBe(140);
     expect(component.data.metadata.originalHeight).toBe(120);
+  });
+
+  it('should crop gif when user clicks the \'crop\' button', (done) => {
+    spyOn(gifshot, 'createGIF').and.callFake((obj, func) => {
+      func({image: dataGif.uploadedImageData});
+    });
+    component.cropArea = {
+      x1: 0,
+      y1: 0,
+      x2: 140,
+      y2: 120
+    };
+    spyOn(document, 'createElement').and.callFake(
+      jasmine.createSpy('createElement').and.returnValue(
+        {
+          width: 0,
+          height: 0,
+          getContext: (txt) => {
+            return {
+              drawImage: (txt, x, y) => {
+                return;
+              },
+              getImageData: (x, y, width, height) => {
+                return 'data';
+              },
+              putImageData: (data, x, y) => {
+                return;
+              }
+            };
+          },
+          toDataURL: (str, x) => {
+            return component.data.metadata.uploadedImageData;
+          }
+        }
+      )
+    );
+    spyOn(window, 'GifFrames').and.resolveTo([{
+      getImage: () => {
+        return {
+          toDataURL: () => {
+            return {
+              image: dataGif.uploadedImageData
+            };
+          }
+        };
+      },
+      frameInfo: {
+        disposal: 1
+      },
+    }] as unknown as never);
+    // This throws an error "Type '{ lastModified: number; name:
+    // string; size: number; type: string; }' is missing the following
+    // properties from type 'File': arrayBuffer, slice, stream, text"
+    // We need to suppress this error because we only need the values given
+    // below.
+    // @ts-expect-error
+    component.data.metadata = dataGif;
+
+    expect(component.data.metadata.originalWidth).toBe(260);
+    expect(component.data.metadata.originalHeight).toBe(200);
+
+    component.confirmCropImage();
+
+    setTimeout(() => {
+      expect(component.data.metadata.originalWidth).toBe(140);
+      expect(component.data.metadata.originalHeight).toBe(120);
+      done();
+    }, 150);
   });
 
   it('should cancel cropping image when user click the \'cancel\' button',
@@ -2035,6 +2161,46 @@ describe('ImageEditor', () => {
     }, 150);
   });
 
+  it('should not save uploaded gif when file size over 100 KB', (done) => {
+    spyOnProperty(MouseEvent.prototype, 'offsetX').and.returnValue(360);
+    spyOnProperty(MouseEvent.prototype, 'offsetY').and.returnValue(420);
+    spyOnProperty(MouseEvent.prototype, 'target').and.returnValue({
+      offsetLeft: 0,
+      offsetTop: 0,
+      offsetParent: null,
+      classList: {
+        contains: (text) => {
+          return false;
+        }
+      }
+    });
+    spyOn(gifshot, 'createGIF').and.callFake((obj, func) => {
+      func({
+        image: btoa('data:image/gif;base64,' + Array(102410).join('a')),
+        error: false
+      });
+    });
+    spyOn(component, 'saveImage');
+    spyOn(component, 'validateProcessedFilesize').and.callThrough();
+    // This throws an error "Type '{ lastModified: number; name:
+    // string; size: number; type: string; }' is missing the following
+    // properties from type 'File': arrayBuffer, slice, stream, text"
+    // We need to suppress this error because we only need the values given
+    // below.
+    // @ts-expect-error
+    component.data.metadata = dataGif;
+
+    component.saveUploadedFile();
+
+    setTimeout(() => {
+      expect(component.validateProcessedFilesize).toHaveBeenCalled();
+      expect(document.body.style.cursor).toBe('default');
+      expect(component.saveImage).not.toHaveBeenCalled();
+      expect(component.data.mode).toBe(component.MODE_UPLOADED);
+      done();
+    }, 150);
+  });
+
   it('should alert user if resampled gif file is not obtained when the user' +
   ' saves image', (done) => {
     spyOn(alertsService, 'addWarning');
@@ -2172,6 +2338,65 @@ describe('ImageEditor', () => {
 
     expect(component.saveImage).toHaveBeenCalled();
     expect(component.data.mode).toBe(component.MODE_SAVED);
+  });
+
+  it('should not save uploaded png when file size over 100 KB', () => {
+    spyOnProperty(MouseEvent.prototype, 'offsetX').and.returnValue(360);
+    spyOnProperty(MouseEvent.prototype, 'offsetY').and.returnValue(420);
+    spyOnProperty(MouseEvent.prototype, 'target').and.returnValue({
+      offsetLeft: 0,
+      offsetTop: 0,
+      offsetParent: null,
+      classList: {
+        contains: (text) => {
+          return false;
+        }
+      }
+    });
+    spyOn(document, 'createElement').and.callFake(
+      jasmine.createSpy('createElement').and.returnValue(
+        {
+          width: 0,
+          height: 0,
+          getContext: (txt) => {
+            return {
+              drawImage: (txt, x, y) => {
+                return;
+              }
+            };
+          },
+          toDataURL: (str, x) => {
+            return component.data.metadata.uploadedImageData;
+          }
+        }
+      )
+    );
+    spyOn(component, 'saveImage');
+    component.data.metadata = {
+    // This throws an error "Type '{ lastModified: number; name:
+    // string; size: number; type: string; }' is missing the following
+    // properties from type 'File': arrayBuffer, slice, stream, text"
+    // We need to suppress this error because we only need the values given
+    // below.
+    // @ts-expect-error
+      uploadedFile: {
+        lastModified: 1622307491398,
+        name: '2442125.png',
+        size: 102410,
+        type: 'image/png'
+      },
+      uploadedImageData:
+        btoa('data:image/png;base64,' + Array(102410).join('a')),
+      originalWidth: 360,
+      originalHeight: 360,
+      savedImageFilename: 'saved_file_name.gif',
+      savedImageUrl: 'assets/images'
+    };
+
+    component.saveUploadedFile();
+
+    expect(component.saveImage).not.toHaveBeenCalled();
+    expect(component.data.mode).toBe(component.MODE_UPLOADED);
   });
 
   it('should alert user if resampled png file is not obtained when the user' +

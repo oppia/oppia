@@ -42,6 +42,7 @@ angular.module('oppia').directive('angularHtmlBind', [
           // middle may actually be required. Only the trailing ones need to be
           // replaced.
           if (newValue) {
+            newValue = newValue.replace(/^(<p>\&nbsp\;<\/p>\n\n)+/g, '');
             newValue = newValue.replace(/(&nbsp;(\s)?)*(<\/p>)/g, '</p>');
             // The following line is required since blank newlines in between
             // paragraphs are treated as <p>&nbsp;</p> by ckedior. So, these
@@ -50,7 +51,7 @@ angular.module('oppia').directive('angularHtmlBind', [
             // affect any other data.
             newValue = newValue.replace(/<p><\/p>/g, '<p>&nbsp;</p>');
           }
-          elm.html(<string>newValue);
+          elm.html(newValue as string);
           $compile(elm.contents())(newScope);
         });
       }

@@ -23,6 +23,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { AppConstants } from 'app.constants';
 import { AlertsService } from 'services/alerts.service';
+import { HumanReadableContributorsSummary } from 'domain/summary/creator-exploration-summary.model';
 import { ValidatorsService } from 'services/validators.service';
 
 export interface ExplorationSummaryBackendDict {
@@ -33,7 +34,7 @@ export interface ExplorationSummaryDict {
   'category': string;
   'community_owned': boolean;
   'human_readable_contributors_summary': (
-    HumanReadableContributorSummaryBackendDict);
+    HumanReadableContributorsSummary);
   'id': string;
   'language_code': string;
   'num_views': number;
@@ -43,10 +44,6 @@ export interface ExplorationSummaryDict {
   'thumbnail_bg_color': string;
   'thumbnail_icon_url': string;
   'title': string;
-}
-
-interface HumanReadableContributorSummaryBackendDict {
-  'num_commits': number
 }
 
 @Injectable({
@@ -61,8 +58,7 @@ export class ExplorationSummaryBackendApiService {
   private _fetchExpSummaries(
       explorationIds: string[],
       includePrivateExplorations: boolean,
-      successCallback: (
-        value: ExplorationSummaryBackendDict) => void,
+      successCallback: (value: ExplorationSummaryBackendDict) => void,
       errorCallback: (reason: string | null[]) => void): void {
     if (!explorationIds.every(expId =>
       this.validatorsService.isValidExplorationId(expId, true))) {
@@ -83,7 +79,8 @@ export class ExplorationSummaryBackendApiService {
           include_private_explorations: JSON.stringify(
             includePrivateExplorations)
         }
-      }).toPromise().then((summaries: ExplorationSummaryBackendDict) => {
+      }
+    ).toPromise().then((summaries: ExplorationSummaryBackendDict) => {
       if (summaries === null) {
         const summariesError = (
           'Summaries fetched are null for explorationIds: ' + explorationIds

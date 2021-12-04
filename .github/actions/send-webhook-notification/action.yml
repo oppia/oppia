@@ -1,0 +1,24 @@
+name: 'Send notification through webhook'
+description: 'This action sends notifications to the given webhook url.'
+inputs:
+  webhook-url:
+    description: 'The webhook URL.'
+    required: true
+  message:
+    description: 'A message to send through webhook.'
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Store build URL in an environment variable
+      run: echo "BUILD_URL=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" >> $GITHUB_ENV
+      shell: bash
+    - name: Send notification
+      run: |
+        curl -X POST \
+        -H 'Content-Type: application/json' \
+        '${{ inputs.webhook-url }}' \
+        -d '{
+          "text": "${{ format('*Message*: {0}\n*Build url*: {1}', inputs.message, env.BUILD_URL) }}"
+        }'
+      shell: bash

@@ -115,15 +115,6 @@ describe('Solution object factory', () => {
         'One solution is "1/6". This is the explanation to the answer.');
 
       solution.setCorrectAnswer({
-        assumptions_string: 'required',
-        target_string: 'required',
-        proof_string: 'required',
-        correct: true
-      });
-      expect(solution.getSummary('LogicProof')).toEqual(
-        'One solution is "true". This is the explanation to the answer.');
-
-      solution.setCorrectAnswer({
         type: 'real',
         real: 1,
         fraction: {
@@ -162,6 +153,18 @@ describe('Solution object factory', () => {
 
       expect(solution.getOppiaShortAnswerResponseHtml(interaction)).toEqual(
         expectedShortAnswerHtml);
+    });
+
+    it('should throw an error if Interaction\'s id is null', () => {
+      const interaction = new Interaction([], [], {
+        choices: {
+          value: [new SubtitledHtml('This is a choice', '')]
+        }
+      }, null, [], null, null);
+
+      expect(() => {
+        solution.getOppiaShortAnswerResponseHtml(interaction);
+      }).toThrowError('Interaction id is possibly null.');
     });
 
     it('should handle when answer exclusivity is true', () => {

@@ -14,11 +14,10 @@
 
 """Tests for the release coordinator page."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
+from core import feconf
 from core.tests import test_utils
-import feconf
 
 
 class ReleaseCoordinatorPageTest(test_utils.GenericTestBase):
@@ -34,24 +33,6 @@ class ReleaseCoordinatorPageTest(test_utils.GenericTestBase):
         self.add_user_role(
             self.RELEASE_COORDINATOR_USERNAME,
             feconf.ROLE_ID_RELEASE_COORDINATOR)
-
-    def test_guest_user_cannot_access_the_page(self):
-        self.get_html_response(
-            '/release-coordinator', expected_status_int=302)
-
-    def test_exploration_editor_cannot_access_the_page(self):
-        self.login(self.EDITOR_EMAIL)
-        self.get_html_response(
-            '/release-coordinator', expected_status_int=401)
-
-    def test_release_coordinator_can_acces_the_page(self):
-        self.login(self.RELEASE_COORDINATOR_EMAIL)
-
-        response = self.get_html_response('/release-coordinator')
-        response.mustcontain(
-            '<oppia-release-coordinator-page-root>' +
-            '</oppia-release-coordinator-page-root>')
-        self.logout()
 
 
 class MemoryCacheHandlerTest(test_utils.GenericTestBase):

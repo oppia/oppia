@@ -14,14 +14,11 @@
 
 """Deletes temporary and installed files."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import argparse
 import os
 import shutil
-
-import python_utils
 
 CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, '..', 'oppia_tools')
@@ -76,7 +73,7 @@ def main(args=None):
         if filename.startswith('tmpcompiledjs'):
             delete_directory_tree(filename)
 
-    python_utils.PRINT('Temporary and installed files deleted')
+    print('Temporary and installed files deleted')
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

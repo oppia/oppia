@@ -14,8 +14,7 @@
 
 """File for compiling and checking typescript."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import argparse
 import json
@@ -24,7 +23,7 @@ import shutil
 import subprocess
 import sys
 
-import python_utils
+from core import python_utils
 from . import common
 
 _PARSER = argparse.ArgumentParser(
@@ -70,24 +69,25 @@ def compile_and_check_typescript(config_path):
     if os.path.exists(COMPILED_JS_DIR):
         shutil.rmtree(COMPILED_JS_DIR)
 
-    python_utils.PRINT('Compiling and testing typescript...')
+    print('Compiling and testing typescript...')
     cmd = [
         './node_modules/typescript/bin/tsc', '--project',
         config_path]
-    process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+    process = subprocess.Popen(
+        cmd, stdout=subprocess.PIPE, encoding='utf-8')
     error_messages = []
-    for line in iter(process.stdout.readline, b''):
-        if not line.startswith(b'node_modules'):
+    for line in iter(process.stdout.readline, ''):
+        if not line.startswith('node_modules'):
             error_messages.append(line)
     if os.path.exists(COMPILED_JS_DIR):
         shutil.rmtree(COMPILED_JS_DIR)
     if error_messages:
-        python_utils.PRINT('Errors found during compilation\n')
+        print('Errors found during compilation\n')
         for message in error_messages:
-            python_utils.PRINT(message)
+            print(message, end='')
         sys.exit(1)
     else:
-        python_utils.PRINT('Compilation successful!')
+        print('Compilation successful!')
 
 
 def main(args=None):

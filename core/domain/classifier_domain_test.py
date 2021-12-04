@@ -16,16 +16,15 @@
 
 """Tests for classifier domain objects."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import datetime
 import re
 
+from core import feconf
+from core import utils
 from core.domain import classifier_domain
 from core.tests import test_utils
-import feconf
-import utils
 
 
 class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):

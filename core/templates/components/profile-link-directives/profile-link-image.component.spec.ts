@@ -15,6 +15,7 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { MockRouterModule } from 'hybrid-router-module-provider';
 import { ProfileLinkImageBackendApiService } from './profile-link-image-backend-api.service';
 import { ProfileLinkImageComponent } from './profile-link-image.component';
 
@@ -30,7 +31,10 @@ describe('ProfileLinkImageComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [
+        HttpClientTestingModule,
+        MockRouterModule
+      ],
       declarations: [
         ProfileLinkImageComponent
       ]

@@ -21,30 +21,29 @@ import { TestBed } from '@angular/core/testing';
 
 import { EditorFirstTimeEventsService } from 'pages/exploration-editor-page/services/editor-first-time-events.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { StateTutorialFirstTimeService } from
-  'pages/exploration-editor-page/services/state-tutorial-first-time.service';
+import { StateTutorialFirstTimeService } from 'pages/exploration-editor-page/services/state-tutorial-first-time.service';
 import { TutorialEventsBackendApiService } from 'pages/exploration-editor-page/services/tutorial-events-backend-api.service';
 
 describe('State Tutorial First Time Service', () => {
-  let stft = null;
-  let eftes = null;
-  let tebas = null;
-  let mockEmitter = null;
+  let stft: StateTutorialFirstTimeService;
+  let eftes: EditorFirstTimeEventsService;
+  let tebas: TutorialEventsBackendApiService;
+  let mockEmitter: EventEmitter<void>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
     });
     mockEmitter = new EventEmitter();
-    stft = TestBed.get(StateTutorialFirstTimeService);
-    eftes = TestBed.get(EditorFirstTimeEventsService);
-    tebas = TestBed.get(TutorialEventsBackendApiService);
+    stft = TestBed.inject(StateTutorialFirstTimeService);
+    eftes = TestBed.inject(EditorFirstTimeEventsService);
+    tebas = TestBed.inject(TutorialEventsBackendApiService);
   });
 
   it('should check the initialisation of the EventEmitters', () => {
-    expect(stft.enterEditorForTheFirstTimeEventEmitter).toEqual(
+    expect(stft.onEnterEditorForTheFirstTime).toEqual(
       mockEmitter);
-    expect(stft.enterTranslationForTheFirstTimeEventEmitter).toEqual(
+    expect(stft.onEnterTranslationForTheFirstTime).toEqual(
       mockEmitter);
   });
 
@@ -75,14 +74,14 @@ describe('State Tutorial First Time Service', () => {
 
   it('should initialise the Editor', ()=> {
     spyOn(eftes, 'initRegisterEvents');
-    spyOn(stft.enterEditorForTheFirstTimeEventEmitter, 'emit');
+    spyOn(stft.onEnterEditorForTheFirstTime, 'emit');
     spyOn(tebas, 'recordStartedEditorTutorialEventAsync').and
-      .returnValue(Promise.resolve(null));
+      .returnValue(Promise.resolve({}));
     const errorLog = spyOn(console, 'error').and.callThrough();
     const expId = 'abc';
     stft.initEditor(true, expId);
     expect(eftes.initRegisterEvents).toHaveBeenCalled();
-    expect(stft.enterEditorForTheFirstTimeEventEmitter.emit).toHaveBeenCalled();
+    expect(stft.onEnterEditorForTheFirstTime.emit).toHaveBeenCalled();
     expect(errorLog).not.toHaveBeenCalledWith(
       'Warning: could not record editor tutorial start event.');
     expect(tebas.recordStartedEditorTutorialEventAsync).toHaveBeenCalled();
@@ -90,15 +89,15 @@ describe('State Tutorial First Time Service', () => {
 
   it('should not initialise the Editor', () => {
     spyOn(eftes, 'initRegisterEvents');
-    spyOn(stft.enterEditorForTheFirstTimeEventEmitter, 'emit');
+    spyOn(stft.onEnterEditorForTheFirstTime, 'emit');
     spyOn(tebas, 'recordStartedEditorTutorialEventAsync').and
-      .returnValue(Promise.resolve(null));
+      .returnValue(Promise.resolve({}));
     const errorLog = spyOn(console, 'error').and.callThrough();
     const expId = 'abc';
     stft.markEditorTutorialFinished();
     stft.initEditor(false, expId);
     expect(eftes.initRegisterEvents).not.toHaveBeenCalled();
-    expect(stft.enterEditorForTheFirstTimeEventEmitter.emit).not
+    expect(stft.onEnterEditorForTheFirstTime.emit).not
       .toHaveBeenCalled();
     expect(errorLog).not.toHaveBeenCalledWith(
       'Warning: could not record editor tutorial start event.');
@@ -125,15 +124,15 @@ describe('State Tutorial First Time Service', () => {
 
   it('should initialise the translation', () => {
     spyOn(eftes, 'initRegisterEvents');
-    spyOn(stft.enterTranslationForTheFirstTimeEventEmitter, 'emit');
+    spyOn(stft.onEnterTranslationForTheFirstTime, 'emit');
     spyOn(tebas, 'recordStartedTranslationTutorialEventAsync').and
-      .returnValue(Promise.resolve(null));
+      .returnValue(Promise.resolve({}));
     const errorLog = spyOn(console, 'error').and.callThrough();
     const expId = 'abc';
     stft.initTranslation(expId);
     expect(eftes.initRegisterEvents).not
       .toHaveBeenCalled();
-    expect(stft.enterTranslationForTheFirstTimeEventEmitter.emit).not
+    expect(stft.onEnterTranslationForTheFirstTime.emit).not
       .toHaveBeenCalled();
     expect(errorLog).not.toHaveBeenCalledWith(
       'Warning: could not record translation tutorial start event.');
@@ -143,15 +142,15 @@ describe('State Tutorial First Time Service', () => {
 
   it('should not initialise the translation', () => {
     spyOn(eftes, 'initRegisterEvents');
-    spyOn(stft.enterTranslationForTheFirstTimeEventEmitter, 'emit');
+    spyOn(stft.onEnterTranslationForTheFirstTime, 'emit');
     spyOn(tebas, 'recordStartedTranslationTutorialEventAsync').and
-      .returnValue(Promise.resolve(null));
+      .returnValue(Promise.resolve({}));
     const errorLog = spyOn(console, 'error').and.callThrough();
     const expId = 'abc';
     stft.markTranslationTutorialNotSeenBefore();
     stft.initTranslation(expId);
     expect(eftes.initRegisterEvents).toHaveBeenCalled();
-    expect(stft.enterTranslationForTheFirstTimeEventEmitter.emit)
+    expect(stft.onEnterTranslationForTheFirstTime.emit)
       .toHaveBeenCalled();
     expect(errorLog).not.toHaveBeenCalledWith(
       'Warning: could not record translation tutorial start event.');

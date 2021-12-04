@@ -30,12 +30,12 @@ angular.module('oppia').controller('CreateNewChapterModalController', [
   '$controller', '$scope', '$uibModalInstance',
   'ExplorationIdValidationService', 'StoryEditorStateService',
   'StoryUpdateService', 'ValidatorsService', 'nodeTitles',
-  'MAX_CHARS_IN_CHAPTER_TITLE',
+  'MAX_CHARS_IN_EXPLORATION_TITLE',
   function(
       $controller, $scope, $uibModalInstance,
       ExplorationIdValidationService, StoryEditorStateService,
       StoryUpdateService, ValidatorsService, nodeTitles,
-      MAX_CHARS_IN_CHAPTER_TITLE) {
+      MAX_CHARS_IN_EXPLORATION_TITLE) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
@@ -48,7 +48,7 @@ angular.module('oppia').controller('CreateNewChapterModalController', [
       $scope.nodeTitles = nodeTitles;
       $scope.errorMsg = null;
       $scope.invalidExpErrorString = 'Please enter a valid exploration id.';
-      $scope.MAX_CHARS_IN_CHAPTER_TITLE = MAX_CHARS_IN_CHAPTER_TITLE;
+      $scope.MAX_CHARS_IN_EXPLORATION_TITLE = MAX_CHARS_IN_EXPLORATION_TITLE;
       $scope.story = StoryEditorStateService.getStory();
       $scope.nodeId = $scope.story.getStoryContents().getNextNodeId();
       $scope.editableThumbnailFilename = '';

@@ -214,6 +214,18 @@ angular.module('oppia').component('stateTranslationEditor', {
             }
           }));
       };
+
+      $scope.markAsNeedingUpdate = function() {
+        let contentId = (
+          TranslationTabActiveContentIdService.getActiveContentId());
+        let stateName = StateEditorService.getActiveStateName();
+        let languageCode = TranslationLanguageService.getActiveLanguageCode();
+        $scope.activeWrittenTranslation.needsUpdate = true;
+        ExplorationStatesService.markWrittenTranslationAsNeedingUpdate(
+          contentId, languageCode, stateName);
+        TranslationStatusService.refresh();
+      };
+
       ctrl.$onDestroy = function() {
         ctrl.directiveSubscriptions.unsubscribe();
       };

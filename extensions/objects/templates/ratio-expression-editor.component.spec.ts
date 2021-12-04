@@ -34,13 +34,19 @@ describe('RatioExpression', () => {
       RatioExpressionEditorComponent).componentInstance;
   }));
 
-  it('should initialize ctrl.value with an default value', () => {
+  it('should initialize @Input() value with a default value', () => {
+    // This throws "Type 'null' is not assignable to type
+    // 'number[]'". We need to suppress this error
+    // because we are testing validations here.
+    // @ts-ignore
     component.value = null;
+
     component.ngOnInit();
-    expect(component.value).not.toBeNull();
+    expect(component.value).toEqual([1, 1]);
+    expect(component.localValue).toEqual({ label: '1:1' });
   });
 
-  it('should initialize ctrl.warningText with non-integer ratio', () => {
+  it('should initialize warningText with non-integer ratio', () => {
     component.isValidRatio('1:1:2.3');
     expect(component.warningText)
       .toBe(
@@ -48,13 +54,13 @@ describe('RatioExpression', () => {
         'whole number (not a fraction or a decimal).');
   });
 
-  it('should initialize ctrl.warningText with invalid ratio', () => {
+  it('should initialize warningText with invalid ratio', () => {
     component.isValidRatio('1:2:3:');
     expect(component.warningText)
       .toBe('Please enter a valid ratio (e.g. 1:2 or 1:2:3).');
   });
 
-  it('should initialize ctrl.warningText with invalid character', () => {
+  it('should initialize warningText with invalid character', () => {
     component.isValidRatio('abc');
     expect(component.warningText)
       .toBe(
@@ -62,19 +68,19 @@ describe('RatioExpression', () => {
         '(e.g. 1:2 or 1:2:3).');
   });
 
-  it('should initialize ctrl.warningText with empty ratio', () => {
+  it('should initialize warningText with empty ratio', () => {
     component.isValidRatio('');
     expect(component.warningText)
       .toBe('Please enter a valid ratio (e.g. 1:2 or 1:2:3).');
   });
 
-  it('should initialize ctrl.warningText with invalid colons', () => {
+  it('should initialize warningText with invalid colons', () => {
     component.isValidRatio('1:2::3');
     expect(component.warningText)
       .toBe('Your answer has multiple colons (:) next to each other.');
   });
 
-  it('should initialize ctrl.warningText with invalid zero ratio', () => {
+  it('should initialize warningText with invalid zero ratio', () => {
     component.isValidRatio('1:0');
     expect(component.warningText)
       .toBe('Ratios cannot have 0 as a element.');

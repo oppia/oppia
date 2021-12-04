@@ -16,11 +16,11 @@
 
 """Service functions to set and retrieve data from the memory cache."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import json
 
+from core import python_utils
 from core.domain import collection_domain
 from core.domain import exp_domain
 from core.domain import platform_parameter_domain
@@ -28,7 +28,6 @@ from core.domain import skill_domain
 from core.domain import story_domain
 from core.domain import topic_domain
 from core.platform import models
-import python_utils
 
 memory_cache_services = models.Registry.import_cache_services()
 

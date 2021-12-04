@@ -19,7 +19,7 @@
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbModalRef, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { StateEditorService } from
   // eslint-disable-next-line max-len
@@ -36,6 +36,8 @@ import { UserExplorationPermissionsService } from
   'pages/exploration-editor-page/services/user-exploration-permissions.service';
 import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
+import { AlertsService } from 'services/alerts.service';
+import { InternetConnectivityService } from 'services/internet-connectivity.service';
 import { ContextService } from 'services/context.service';
 import { EditabilityService } from 'services/editability.service';
 import { ExplorationFeaturesBackendApiService } from
@@ -54,11 +56,16 @@ import { AutosaveInfoModalsService } from './services/autosave-info-modals.servi
 import { ChangeListService } from './services/change-list.service';
 import { ExplorationDataService } from './services/exploration-data.service';
 import { UserInfo } from 'domain/user/user-info.model';
+import { WelcomeModalComponent } from './modal-templates/welcome-modal.component';
 
 require('pages/exploration-editor-page/exploration-editor-page.component.ts');
 require(
   'pages/exploration-editor-page/services/' +
   'state-tutorial-first-time.service.ts');
+
+class MockNgbModalRef {
+  componentInstance = {};
+}
 
 describe('Exploration editor page component', function() {
   importAllAngularServices();
@@ -71,6 +78,7 @@ describe('Exploration editor page component', function() {
   var $uibModal = null;
   let aims: AutosaveInfoModalsService = null;
   let cls: ChangeListService = null;
+  let as: AlertsService = null;
   var cs = null;
   var efbas = null;
   var eis = null;
@@ -92,15 +100,18 @@ describe('Exploration editor page component', function() {
   var tds = null;
   var userService = null;
   var ueps = null;
+  var ics = null;
   var mockEnterEditorForTheFirstTime = null;
   var registerAcceptTutorialModalEventSpy;
   var registerDeclineTutorialModalEventSpy;
   var focusManagerService = null;
 
+  let ngbModal: NgbModal;
+
   var refreshGraphEmitter = new EventEmitter();
 
   var autosaveIsInProgress = new EventEmitter();
-
+  var mockConnectionServiceEmitter = new EventEmitter<boolean>();
   var mockOpenEditorTutorialEmitter = new EventEmitter();
   var mockOpenTranslationTutorialEmitter = new EventEmitter();
 
@@ -195,15 +206,18 @@ describe('Exploration editor page component', function() {
         NgbModule
       ],
       declarations: [
-        LostChangesModalComponent
+        LostChangesModalComponent,
+        WelcomeModalComponent
       ],
       providers: [
+        AlertsService,
         AutosaveInfoModalsService,
         ChangeListService,
         ContextService,
         EditabilityService,
         ExplorationFeaturesBackendApiService,
         ExplorationFeaturesService,
+        InternetConnectivityService,
         PageTitleService,
         LoaderService,
         ParamChangesObjectFactory,
@@ -232,13 +246,25 @@ describe('Exploration editor page component', function() {
       schemas: [NO_ERRORS_SCHEMA]
     }).overrideModule(BrowserDynamicTestingModule, {
       set: {
-        entryComponents: [LostChangesModalComponent]
+        entryComponents: [LostChangesModalComponent, WelcomeModalComponent]
       }
     });
 
     aims = TestBed.inject(AutosaveInfoModalsService);
     cls = TestBed.inject(ChangeListService);
+    as = TestBed.inject(AlertsService);
+    ngbModal = TestBed.inject(NgbModal);
   });
+
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $q = $injector.get('$q');
@@ -246,6 +272,7 @@ describe('Exploration editor page component', function() {
     $uibModal = $injector.get('$uibModal');
     cs = $injector.get('ContextService');
     efbas = $injector.get('ExplorationFeaturesBackendApiService');
+    ics = $injector.get('InternetConnectivityService');
     eis = $injector.get('ExplorationImprovementsService');
     ers = $injector.get('ExplorationRightsService');
     es = $injector.get('EditabilityService');
@@ -268,7 +295,10 @@ describe('Exploration editor page component', function() {
     focusManagerService = $injector.get('FocusManagerService');
 
     $scope = $rootScope.$new();
-    ctrl = $componentController('explorationEditorPage');
+    ctrl = $componentController('explorationEditorPage', {
+      NgbModal: ngbModal,
+      $scope: $scope,
+    });
   }));
 
   afterEach(() => {
@@ -289,7 +319,7 @@ describe('Exploration editor page component', function() {
         .and.returnValue(Promise.resolve());
       spyOn(ews, 'updateWarnings').and.callThrough();
       spyOn(gds, 'recompute').and.callThrough();
-      spyOn(pts, 'setPageTitle').and.callThrough();
+      spyOn(pts, 'setDocumentTitle').and.callThrough();
       spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue($q.resolve(0));
       spyOn(ueps, 'getPermissionsAsync')
         .and.returnValue($q.resolve({canEdit: true, canVoiceover: true}));
@@ -493,6 +523,64 @@ describe('Exploration editor page component', function() {
     });
   });
 
+  describe('Checking internet Connection', () => {
+    beforeEach(() => {
+      registerAcceptTutorialModalEventSpy = (
+        spyOn(sas, 'registerAcceptTutorialModalEvent'));
+      registerDeclineTutorialModalEventSpy = (
+        spyOn(sas, 'registerDeclineTutorialModalEvent'));
+      spyOn(cs, 'getExplorationId').and.returnValue(explorationId);
+      spyOn(efbas, 'fetchExplorationFeaturesAsync')
+        .and.returnValue($q.resolve({}));
+      spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());
+      spyOn(eis, 'flushUpdatedTasksToBackend')
+        .and.returnValue(Promise.resolve());
+      spyOn(ews, 'updateWarnings').and.callThrough();
+      spyOn(gds, 'recompute').and.callThrough();
+      spyOn(pts, 'setDocumentTitle').and.callThrough();
+      spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue($q.resolve(0));
+      spyOn(ueps, 'getPermissionsAsync')
+        .and.returnValue($q.resolve({canEdit: true, canVoiceover: true}));
+      spyOnProperty(stfts, 'onOpenEditorTutorial').and.returnValue(
+        mockOpenEditorTutorialEmitter);
+      spyOnProperty(ics, 'onInternetStateChange').and.returnValue(
+        mockConnectionServiceEmitter);
+      spyOnProperty(stfts, 'onOpenTranslationTutorial').and.returnValue(
+        mockOpenTranslationTutorialEmitter);
+      spyOn(as, 'addInfoMessage');
+      spyOn(as, 'addSuccessMessage');
+      explorationData.is_version_of_draft_valid = false;
+
+      ctrl.$onInit();
+    });
+
+    afterEach(() => {
+      ctrl.$onDestroy();
+    });
+
+    it('should change status to ONLINE when internet is connected', () => {
+      mockConnectionServiceEmitter.emit(true);
+      $scope.$apply();
+      expect(as.addSuccessMessage).toHaveBeenCalled();
+    });
+
+    it('should change status to OFFLINE when internet disconnects', () => {
+      mockConnectionServiceEmitter.emit(false);
+      $scope.$apply();
+      expect(as.addInfoMessage).toHaveBeenCalled();
+    });
+
+    it('should navigate to editor tab when internet disconnects', () => {
+      var activeTabNameSpy = spyOn(rs, 'getActiveTabName');
+      activeTabNameSpy.and.returnValue('settings');
+      spyOn(rs, 'navigateToMainTab');
+      mockConnectionServiceEmitter.emit(false);
+      $scope.$apply();
+      expect(as.addInfoMessage).toHaveBeenCalled();
+      expect(rs.navigateToMainTab).toHaveBeenCalled();
+    });
+  });
+
   describe('when user permission is false and draft changes are true', () => {
     var mockExplorationPropertyChangedEventEmitter = new EventEmitter();
 
@@ -511,7 +599,7 @@ describe('Exploration editor page component', function() {
         mockExplorationPropertyChangedEventEmitter);
       spyOn(ews, 'updateWarnings');
       spyOn(gds, 'recompute');
-      spyOn(pts, 'setPageTitle').and.callThrough();
+      spyOn(pts, 'setDocumentTitle').and.callThrough();
       spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue($q.resolve(1));
       spyOn(ueps, 'getPermissionsAsync')
         .and.returnValue($q.resolve({canEdit: false}));
@@ -575,7 +663,7 @@ describe('Exploration editor page component', function() {
       ets.init('Exploration Title');
       mockExplorationPropertyChangedEventEmitter.emit();
 
-      expect(pts.setPageTitle).toHaveBeenCalledWith(
+      expect(pts.setDocumentTitle).toHaveBeenCalledWith(
         'Exploration Title - Oppia Editor');
     });
 
@@ -583,7 +671,7 @@ describe('Exploration editor page component', function() {
       ets.init('');
       mockExplorationPropertyChangedEventEmitter.emit();
 
-      expect(pts.setPageTitle).toHaveBeenCalledWith(
+      expect(pts.setDocumentTitle).toHaveBeenCalledWith(
         'Untitled Exploration - Oppia Editor');
     });
 
@@ -596,7 +684,7 @@ describe('Exploration editor page component', function() {
 
     it('should react to initExplorationPage broadcasts', fakeAsync(() => {
       $scope.$apply();
-
+      spyOn(ics, 'startCheckingConnection');
       var successCallback = jasmine.createSpy('success');
       mockInitExplorationPageEmitter.emit(successCallback);
       // Need to flush and $apply twice to fire the callback. In practice, this
@@ -612,9 +700,12 @@ describe('Exploration editor page component', function() {
     it('should start editor tutorial when closing welcome exploration' +
       ' modal', () => {
       spyOn(ctrl, 'startEditorTutorial').and.callThrough();
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve(explorationId)
-      });
+      spyOn(ngbModal, 'open').and.returnValue(
+        {
+          componentInstance: new MockNgbModalRef(),
+          result: $q.resolve(explorationId)
+        } as NgbModalRef
+      );
 
       ctrl.showWelcomeExplorationModal();
       $scope.$apply();
@@ -627,9 +718,12 @@ describe('Exploration editor page component', function() {
     it('should dismiss tutorial when dismissing welcome exploration' +
       ' modal', () => {
       spyOn(ctrl, 'startEditorTutorial').and.callThrough();
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.reject(explorationId)
-      });
+      spyOn(ngbModal, 'open').and.returnValue(
+        {
+          componentInstance: new MockNgbModalRef(),
+          result: $q.reject(explorationId)
+        } as NgbModalRef
+      );
 
       ctrl.showWelcomeExplorationModal();
       $scope.$apply();
@@ -681,7 +775,7 @@ describe('Exploration editor page component', function() {
       spyOn(ers, 'isPublic').and.returnValue(true);
       spyOn(ews, 'updateWarnings').and.callThrough();
       spyOn(gds, 'recompute').and.callThrough();
-      spyOn(pts, 'setPageTitle').and.callThrough();
+      spyOn(pts, 'setDocumentTitle').and.callThrough();
       spyOn(tds, 'getOpenThreadsCountAsync')
         .and.returnValue(Promise.resolve(1));
       spyOn(ueps, 'getPermissionsAsync')
@@ -697,6 +791,7 @@ describe('Exploration editor page component', function() {
     });
 
     it('should recognize when improvements tab is enabled', fakeAsync(() => {
+      spyOn(ics, 'startCheckingConnection');
       spyOn(eis, 'isImprovementsTabEnabledAsync').and.returnValue(
         Promise.resolve(true));
 
@@ -708,6 +803,7 @@ describe('Exploration editor page component', function() {
     }));
 
     it('should recognize when improvements tab is disabled', fakeAsync(() => {
+      spyOn(ics, 'startCheckingConnection');
       spyOn(eis, 'isImprovementsTabEnabledAsync').and.returnValue(
         Promise.resolve(false));
 

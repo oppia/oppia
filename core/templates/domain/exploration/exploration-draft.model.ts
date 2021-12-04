@@ -27,6 +27,7 @@ import { RecordedVoiceOverBackendDict } from './recorded-voiceovers.model';
 export type ExplorationChange = (
   ExplorationChangeAddState |
   ExplorationChangeAddWrittenTranslation |
+  ExplorationChangeMarkWrittenTranslationAsNeedingUpdate |
   ExplorationChangeMarkWrittenTranslationsAsNeedingUpdate |
   ExplorationChangeRenameState |
   ExplorationChangeDeleteState |
@@ -42,7 +43,7 @@ export interface ExplorationChangeAddState {
 }
 
 export interface ExplorationChangeRenameState {
-  'cmd': 'rename_state',
+  'cmd': 'rename_state';
   'new_state_name': string;
   'old_state_name': string;
 }
@@ -53,7 +54,7 @@ export interface ExplorationChangeDeleteState {
 }
 
 export interface ExplorationChangeEditStateProperty {
-  'cmd': 'edit_state_property',
+  'cmd': 'edit_state_property';
   'new_value': SubtitledHtmlBackendDict |
     InteractionBackendDict |
     ParamChangeBackendDict[] |
@@ -104,6 +105,13 @@ export interface ExplorationChangeAddWrittenTranslation {
   'translation_html': string;
 }
 
+export interface ExplorationChangeMarkWrittenTranslationAsNeedingUpdate {
+  'cmd': 'mark_written_translation_as_needing_update';
+  'content_id': string;
+  'language_code': string;
+  'state_name': string;
+}
+
 export interface ExplorationChangeMarkWrittenTranslationsAsNeedingUpdate {
   'cmd': 'mark_written_translations_as_needing_update';
   'content_id': string;
@@ -112,7 +120,7 @@ export interface ExplorationChangeMarkWrittenTranslationsAsNeedingUpdate {
 
 export interface ExplorationDraftDict {
   draftChanges: ExplorationChange[];
-  draftChangeListId: number
+  draftChangeListId: number;
 }
 
 export class ExplorationDraft {

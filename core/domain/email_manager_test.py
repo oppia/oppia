@@ -14,14 +14,15 @@
 
 """Tests for methods relating to sending emails."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import datetime
 import logging
 import types
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core.constants import constants
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import email_manager
@@ -34,8 +35,6 @@ from core.domain import suggestion_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import python_utils
 
 (email_models, suggestion_models) = models.Registry.import_models(
     [models.NAMES.email, models.NAMES.suggestion])
@@ -1782,7 +1781,7 @@ class FlagExplorationEmailTest(test_utils.EmailTestBase):
 
             # Make sure correct email models are stored.
             all_models = email_models.SentEmailModel.get_all().fetch()
-            sent_email_model = python_utils.NEXT(
+            sent_email_model = next(
                 m for m in all_models if m.recipient_id == self.moderator_id)
             self.assertEqual(sent_email_model.subject, expected_email_subject)
             self.assertEqual(
@@ -1794,7 +1793,7 @@ class FlagExplorationEmailTest(test_utils.EmailTestBase):
                 'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
             self.assertEqual(
                 sent_email_model.intent, feconf.EMAIL_INTENT_REPORT_BAD_CONTENT)
-            sent_email_model = python_utils.NEXT(
+            sent_email_model = next(
                 m for m in all_models if m.recipient_id == self.moderator2_id)
             self.assertEqual(sent_email_model.subject, expected_email_subject)
             self.assertEqual(
@@ -3692,6 +3691,8 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                     email_manager
                     .send_mail_to_notify_admins_suggestions_waiting_long(
                         [self.admin_1_id],
+                        [],
+                        [],
                         [self.reviewable_suggestion_email_info])
                 )
 
@@ -3714,7 +3715,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 (
                     email_manager
                     .send_mail_to_notify_admins_suggestions_waiting_long(
-                        [self.admin_1_id],
+                        [self.admin_1_id], [], [],
                         [self.reviewable_suggestion_email_info])
                 )
 
@@ -3739,7 +3740,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 (
                     email_manager
                     .send_mail_to_notify_admins_suggestions_waiting_long(
-                        ['admin_id_without_email'],
+                        ['admin_id_without_email'], [], [],
                         [self.reviewable_suggestion_email_info])
                 )
 
@@ -3763,7 +3764,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 (
                     email_manager
                     .send_mail_to_notify_admins_suggestions_waiting_long(
-                        [], [self.reviewable_suggestion_email_info])
+                        [], [], [], [self.reviewable_suggestion_email_info])
                 )
 
         messages = self._get_all_sent_email_messages()
@@ -3785,7 +3786,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 (
                     email_manager
                     .send_mail_to_notify_admins_suggestions_waiting_long(
-                        [self.admin_1_id], [])
+                        [self.admin_1_id], [], [], [])
                 )
 
         messages = self._get_all_sent_email_messages()
@@ -3849,7 +3850,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                     (
                         email_manager
                         .send_mail_to_notify_admins_suggestions_waiting_long(
-                            [self.admin_1_id],
+                            [self.admin_1_id], [], [],
                             [reviewable_suggestion_email_info])
                     )
 
@@ -3926,7 +3927,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                     (
                         email_manager
                         .send_mail_to_notify_admins_suggestions_waiting_long(
-                            [self.admin_1_id],
+                            [self.admin_1_id], [], [],
                             reviewable_suggestion_email_infos)
                     )
 
@@ -3994,7 +3995,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                     (
                         email_manager
                         .send_mail_to_notify_admins_suggestions_waiting_long(
-                            [self.admin_1_id],
+                            [self.admin_1_id], [], [],
                             [reviewable_suggestion_email_info])
                     )
 
@@ -4071,7 +4072,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                     (
                         email_manager
                         .send_mail_to_notify_admins_suggestions_waiting_long(
-                            [self.admin_1_id],
+                            [self.admin_1_id], [], [],
                             reviewable_suggestion_email_infos)
                     )
 
@@ -4140,9 +4141,6 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             '<li>The following French translation suggestion was submitted for '
             'review 2 days ago:'
             '<br>Translation 2</li><br>'
-            '<li>The following question suggestion was submitted for review 2 '
-            'days ago:'
-            '<br>Question 1</li><br>'
             '</ul><br>'
             'Thanks so much - we appreciate your help!<br>'
             'Best Wishes!<br><br>'
@@ -4159,19 +4157,41 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                     (
                         email_manager
                         .send_mail_to_notify_admins_suggestions_waiting_long(
-                            [self.admin_1_id],
+                            [self.admin_1_id], [], [],
                             reviewable_suggestion_email_infos)
                     )
 
         # Make sure correct email is sent.
         messages = self._get_sent_email_messages(self.CURRICULUM_ADMIN_1_EMAIL)
-        self.assertEqual(len(messages), 1)
+        messages.sort(key=lambda m: m.html)
+        self.assertEqual(len(messages), 2)
         self.assertEqual(messages[0].html, expected_email_html_body)
 
         # Make sure correct email model is stored.
-        self._assert_email_data_stored_in_sent_email_model_is_correct(
-            expected_email_html_body, self.admin_1_id,
-            self.CURRICULUM_ADMIN_1_EMAIL)
+        sent_email_models = email_models.SentEmailModel.get_all().filter(
+            email_models.SentEmailModel.recipient_id == self.admin_1_id).fetch()
+        self.assertEqual(len(sent_email_models), 2)
+        sent_email_models.sort(key=lambda m: m.html_body)
+        sent_email_model = sent_email_models[0]
+        self.assertEqual(
+            sent_email_model.subject,
+            email_manager
+            .ADMIN_NOTIFICATION_FOR_SUGGESTIONS_NEEDING_REVIEW_EMAIL_DATA[
+                'email_subject'])
+        self.assertEqual(
+            sent_email_model.recipient_id, self.admin_1_id)
+        self.assertEqual(
+            sent_email_model.recipient_email, self.CURRICULUM_ADMIN_1_EMAIL)
+        self.assertEqual(
+            sent_email_model.html_body, expected_email_html_body)
+        self.assertEqual(
+            sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
+        self.assertEqual(
+            sent_email_model.sender_email,
+            'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+        self.assertEqual(
+            sent_email_model.intent,
+            feconf.EMAIL_INTENT_ADDRESS_CONTRIBUTOR_DASHBOARD_SUGGESTIONS)
 
     def test_email_sent_to_multiple_admins(self):
         config_services.set_property(
@@ -4253,7 +4273,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                     (
                         email_manager
                         .send_mail_to_notify_admins_suggestions_waiting_long(
-                            [self.admin_1_id, self.admin_2_id],
+                            [self.admin_1_id, self.admin_2_id], [], [],
                             [reviewable_suggestion_email_info])
                     )
 
@@ -4412,7 +4432,8 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
         with self.cannot_send_emails_ctx, self.log_new_error_ctx:
             email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
-                [self.admin_1_id], self.suggestion_types_needing_reviewers)
+                [self.admin_1_id], [], [],
+                self.suggestion_types_needing_reviewers)
 
         messages = self._get_all_sent_email_messages()
         self.assertEqual(len(messages), 0)
@@ -4428,7 +4449,8 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
             email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
-                [self.admin_1_id], self.suggestion_types_needing_reviewers)
+                [self.admin_1_id], [], [],
+                self.suggestion_types_needing_reviewers)
 
         messages = self._get_all_sent_email_messages()
         self.assertEqual(len(messages), 0)
@@ -4446,7 +4468,8 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
             email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
-                [], self.suggestion_types_needing_reviewers)
+                [], [], [],
+                self.suggestion_types_needing_reviewers)
 
         messages = self._get_all_sent_email_messages()
         self.assertEqual(len(messages), 0)
@@ -4462,7 +4485,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
         with self.can_send_emails_ctx, self.log_new_info_ctx:
             email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
-                [self.admin_1_id], {})
+                [self.admin_1_id], [], [], {})
 
         messages = self._get_all_sent_email_messages()
         self.assertEqual(len(messages), 0)
@@ -4478,7 +4501,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
             email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
-                ['admin_id_without_email'],
+                ['admin_id_without_email'], [], [],
                 self.suggestion_types_needing_reviewers)
 
         messages = self._get_all_sent_email_messages()
@@ -4521,7 +4544,8 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
         with self.can_send_emails_ctx:
             email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
-                [self.admin_1_id], self.suggestion_types_needing_reviewers)
+                [self.admin_1_id], [], [],
+                self.suggestion_types_needing_reviewers)
 
         # Make sure correct email is sent.
         messages = self._get_sent_email_messages(self.CURRICULUM_ADMIN_1_EMAIL)
@@ -4583,7 +4607,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
         with self.can_send_emails_ctx:
             email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
-                [self.admin_1_id, self.admin_2_id],
+                [self.admin_1_id, self.admin_2_id], [], [],
                 suggestion_types_needing_reviewers)
 
         # Make sure correct emails are sent.
@@ -4633,7 +4657,8 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
         with self.can_send_emails_ctx:
             email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
-                [self.admin_1_id], suggestion_types_needing_reviewers)
+                [self.admin_1_id], [], [],
+                suggestion_types_needing_reviewers)
 
         # Make sure correct email is sent.
         messages = self._get_sent_email_messages(self.CURRICULUM_ADMIN_1_EMAIL)
@@ -4693,7 +4718,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
         with self.can_send_emails_ctx:
             email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
-                [self.admin_1_id, self.admin_2_id],
+                [self.admin_1_id, self.admin_2_id], [], [],
                 suggestion_types_needing_reviewers)
 
         # Make sure correct emails are sent.
@@ -4750,7 +4775,8 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
         with self.can_send_emails_ctx:
             email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
-                [self.admin_1_id], suggestion_types_needing_reviewers)
+                [self.admin_1_id], [], [],
+                suggestion_types_needing_reviewers)
 
         # Make sure correct email is sent.
         messages = self._get_sent_email_messages(self.CURRICULUM_ADMIN_1_EMAIL)
@@ -4822,7 +4848,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
         with self.can_send_emails_ctx:
             email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
-                [self.admin_1_id, self.admin_2_id],
+                [self.admin_1_id, self.admin_2_id], [], [],
                 suggestion_types_needing_reviewers)
 
         # Make sure correct emails are sent.
@@ -4874,15 +4900,10 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             '<li><b>French</b></li><br>'
             '<li><b>Hindi</b></li><br>'
             '</ul><br>'
-            'There have been <b>question suggestions</b> created on the '
-            '<a href="%s%s">Contributor Dashboard page</a> where there are not '
-            'enough reviewers.'
-            '<br><br>'
             'Thanks so much - we appreciate your help!<br><br>'
             'Best Wishes!<br>'
             '- The Oppia Contributor Dashboard Team' % (
                 feconf.OPPIA_SITE_URL, feconf.ADMIN_URL, feconf.OPPIA_SITE_URL,
-                feconf.CONTRIBUTOR_DASHBOARD_URL, feconf.OPPIA_SITE_URL,
                 feconf.CONTRIBUTOR_DASHBOARD_URL)
         )
         expected_email_html_body_for_admin_2 = (
@@ -4901,35 +4922,52 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             '<li><b>French</b></li><br>'
             '<li><b>Hindi</b></li><br>'
             '</ul><br>'
-            'There have been <b>question suggestions</b> created on the '
-            '<a href="%s%s">Contributor Dashboard page</a> where there are not '
-            'enough reviewers.'
-            '<br><br>'
             'Thanks so much - we appreciate your help!<br><br>'
             'Best Wishes!<br>'
             '- The Oppia Contributor Dashboard Team' % (
                 feconf.OPPIA_SITE_URL, feconf.ADMIN_URL, feconf.OPPIA_SITE_URL,
-                feconf.CONTRIBUTOR_DASHBOARD_URL, feconf.OPPIA_SITE_URL,
                 feconf.CONTRIBUTOR_DASHBOARD_URL)
         )
 
         with self.can_send_emails_ctx:
             email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
-                [self.admin_1_id, self.admin_2_id],
+                [self.admin_1_id], [self.admin_2_id], [],
                 suggestion_types_needing_reviewers)
 
         # Make sure correct emails are sent.
         messages = self._get_sent_email_messages(self.CURRICULUM_ADMIN_1_EMAIL)
-        self.assertEqual(len(messages), 1)
-        self.assertEqual(messages[0].html, expected_email_html_body_for_admin_1)
+        messages.sort(key=lambda m: m.html)
+        self.assertEqual(len(messages), 2)
+        self.assertEqual(messages[1].html, expected_email_html_body_for_admin_1)
         messages = self._get_sent_email_messages(self.CURRICULUM_ADMIN_2_EMAIL)
         self.assertEqual(len(messages), 1)
         self.assertEqual(messages[0].html, expected_email_html_body_for_admin_2)
 
         # Make sure correct email models are stored.
-        self._assert_email_data_stored_in_sent_email_model_is_correct(
-            expected_email_html_body_for_admin_1, self.admin_1_id,
-            self.CURRICULUM_ADMIN_1_EMAIL)
+        sent_email_models = email_models.SentEmailModel.get_all().filter(
+            email_models.SentEmailModel.recipient_id == self.admin_1_id).fetch()
+        self.assertEqual(len(sent_email_models), 2)
+        sent_email_models.sort(key=lambda m: m.html_body)
+        sent_email_model = sent_email_models[1]
+        self.assertEqual(
+            sent_email_model.subject,
+            email_manager.ADMIN_NOTIFICATION_FOR_REVIEWER_SHORTAGE_EMAIL_DATA[
+                'email_subject'])
+        self.assertEqual(
+            sent_email_model.recipient_id, self.admin_1_id)
+        self.assertEqual(
+            sent_email_model.recipient_email, self.CURRICULUM_ADMIN_1_EMAIL)
+        self.assertEqual(
+            sent_email_model.html_body, expected_email_html_body_for_admin_1)
+        self.assertEqual(
+            sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
+        self.assertEqual(
+            sent_email_model.sender_email,
+            'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+        self.assertEqual(
+            sent_email_model.intent,
+            feconf.EMAIL_INTENT_ADD_CONTRIBUTOR_DASHBOARD_REVIEWERS)
+
         self._assert_email_data_stored_in_sent_email_model_is_correct(
             expected_email_html_body_for_admin_2, self.admin_2_id,
             self.CURRICULUM_ADMIN_2_EMAIL)

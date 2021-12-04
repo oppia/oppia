@@ -16,11 +16,11 @@
 
 """Controllers for the translation changes."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import io
 
+from core import feconf
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import fs_domain
@@ -28,7 +28,6 @@ from core.domain import fs_services
 from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import user_services
-import feconf
 
 import mutagen
 from mutagen import mp3

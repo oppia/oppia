@@ -25,19 +25,24 @@ require('services/context.service.ts');
 require('services/site-analytics.service.ts');
 require('services/suggestion-modal.service.ts');
 require('services/validators.service.ts');
+require(
+  'pages/exploration-editor-page/feedback-tab/services/' +
+  'thread-data-backend-api.service.ts');
 
 angular.module('oppia').controller(
   'TranslationSuggestionReviewModalController', [
-    '$http', '$scope', '$uibModalInstance', 'AlertsService', 'ContextService',
+    '$scope', '$uibModalInstance', 'AlertsService', 'ContextService',
     'ContributionAndReviewService', 'ContributionOpportunitiesService',
-    'LanguageUtilService', 'SiteAnalyticsService', 'UrlInterpolationService',
+    'LanguageUtilService', 'SiteAnalyticsService',
+    'ThreadDataBackendApiService',
     'UserService', 'ValidatorsService', 'initialSuggestionId', 'reviewable',
     'subheading', 'suggestionIdToContribution', 'ACTION_ACCEPT_SUGGESTION',
     'ACTION_REJECT_SUGGESTION', 'IMAGE_CONTEXT', 'MAX_REVIEW_MESSAGE_LENGTH',
     function(
-        $http, $scope, $uibModalInstance, AlertsService, ContextService,
+        $scope, $uibModalInstance, AlertsService, ContextService,
         ContributionAndReviewService, ContributionOpportunitiesService,
-        LanguageUtilService, SiteAnalyticsService, UrlInterpolationService,
+        LanguageUtilService, SiteAnalyticsService,
+        ThreadDataBackendApiService,
         UserService, ValidatorsService, initialSuggestionId, reviewable,
         subheading, suggestionIdToContribution, ACTION_ACCEPT_SUGGESTION,
         ACTION_REJECT_SUGGESTION, IMAGE_CONTEXT, MAX_REVIEW_MESSAGE_LENGTH) {
@@ -59,22 +64,39 @@ angular.module('oppia').controller(
       $scope.HTML_SCHEMA = {
         type: 'html'
       };
+      $scope.UNICODE_SCHEMA = { type: 'unicode' };
+      $scope.SET_OF_STRINGS_SCHEMA = {
+        type: 'list',
+        items: {
+          type: 'unicode'
+        }
+      };
       $scope.canEditTranslation = false;
+      // The 'html' value is passed as an object as it is required for
+      // schema-based-editor. Otherwise the corrrectly updated value for
+      // the translation is not received from the editor when the translation
+      // is edited by the reviewer.
+      $scope.editedContent = {
+        html: $scope.translationHtml
+      };
+      $scope.errorMessage = '';
+      $scope.errorFound = false;
 
       $scope.updateSuggestion = function() {
         const updatedTranslation = $scope.editedContent.html;
         const suggestionId = $scope.activeSuggestion.suggestion_id;
+        $scope.preEditTranslationHtml = $scope.translationHtml;
+        $scope.translationHtml = updatedTranslation;
         ContributionAndReviewService.updateTranslationSuggestionAsync(
           suggestionId,
           updatedTranslation,
-          (success) => {
-            $scope.translationHtml = updatedTranslation;
+          () => {
             $scope.translationUpdated = true;
+            $scope.startedEditing = false;
             ContributionOpportunitiesService.
               reloadOpportunitiesEventEmitter.emit();
           },
           $scope.showTranslationSuggestionUpdateError);
-        $scope.startedEditing = false;
       };
 
       delete suggestionIdToContribution[initialSuggestionId];
@@ -96,17 +118,12 @@ angular.module('oppia').controller(
 
         return commitMessage;
       };
-
-      var _getThreadHandlerUrl = function(suggestionId) {
-        return UrlInterpolationService.interpolateUrl(
-          '/threadhandler/<suggestionId>', { suggestionId });
-      };
-
-      var _getThreadMessagesAsync = function(threadId) {
-        return $http.get(_getThreadHandlerUrl(threadId)).then((response) => {
-          let threadMessageBackendDicts = response.data.messages;
-          return threadMessageBackendDicts.map(
-            m => ThreadMessage.createFromBackendDict(m));
+      const _getThreadMessagesAsync = function(threadId) {
+        return ThreadDataBackendApiService.fetchMessagesAsync(
+          threadId).then((response) => {
+          const threadMessageBackendDicts = response.messages;
+          $scope.reviewMessage = threadMessageBackendDicts.map(
+            m => ThreadMessage.createFromBackendDict(m))[1].text;
         });
       };
 
@@ -129,6 +146,9 @@ angular.module('oppia').controller(
                 author_name
             );
           });
+        $scope.errorMessage = '';
+        $scope.errorFound = false;
+        $scope.startedEditing = false;
         $scope.resolvingSuggestion = false;
         $scope.lastSuggestionToReview = remainingContributions.length <= 0;
         $scope.translationHtml = (
@@ -136,21 +156,26 @@ angular.module('oppia').controller(
         $scope.status = $scope.activeSuggestion.status;
         $scope.contentHtml = (
           $scope.activeSuggestion.change.content_html);
-        // The 'html' value is passed as an object as it is required for
-        // schema-based-editor.
-        $scope.editedContent = {
-          html: $scope.translationHtml
-        };
+        $scope.explorationContentHtml = (
+          $scope.activeSuggestion.exploration_content_html);
+        $scope.isHtmlContent = (
+          $scope.activeSuggestion.change.data_format === 'html'
+        );
+        $scope.isUnicodeContent = (
+          $scope.activeSuggestion.change.data_format === 'unicode'
+        );
+        $scope.isSetOfStringsContent = (
+          $scope.activeSuggestion.change.data_format ===
+            'set_of_normalized_string' ||
+          $scope.activeSuggestion.change.data_format ===
+            'set_of_unicode_string'
+        );
         $scope.reviewMessage = '';
         if (!reviewable) {
           $scope.suggestionIsRejected = (
             $scope.activeSuggestion.status === 'rejected');
           if ($scope.suggestionIsRejected) {
-            _getThreadMessagesAsync($scope.activeSuggestionId).then(
-              function(messageSummaries) {
-                $scope.reviewMessage = messageSummaries[1].text;
-              }
-            );
+            _getThreadMessagesAsync($scope.activeSuggestionId);
           }
         }
       };
@@ -167,6 +192,13 @@ angular.module('oppia').controller(
 
         [$scope.activeSuggestionId, $scope.activeContribution] = (
           remainingContributions.pop());
+        // Close modal instance if the suggestion's corresponding opportunity
+        // is deleted. See issue #14234.
+        if (!$scope.activeContribution.details) {
+          $uibModalInstance.close(resolvedSuggestionIds);
+          return;
+        }
+
         $scope.activeSuggestion = $scope.activeContribution.suggestion;
         $scope.activeContributionDetails = $scope.activeContribution.details;
         ContextService.setCustomEntityContext(
@@ -214,12 +246,41 @@ angular.module('oppia').controller(
         }
       };
 
+      // Returns the HTML content representing the most up-to-date exploration
+      // content for the active suggestion.
+      $scope.displayExplorationContent = function() {
+        return (
+          $scope.hasExplorationContentChanged() ?
+          $scope.explorationContentHtml :
+          $scope.contentHtml);
+      };
+
+      // Returns whether the active suggestion's exploration_content_html
+      // differs from the content_html of the suggestion's change object.
+      $scope.hasExplorationContentChanged = function() {
+        if (
+          Array.isArray($scope.contentHtml) ||
+          Array.isArray($scope.explorationContentHtml)) {
+          // Check equality of all array elements.
+          return (
+            $scope.contentHtml.length !==
+              $scope.explorationContentHtml.length ||
+            $scope.contentHtml.some(
+              (val, index) => val !== $scope.explorationContentHtml[index])
+          );
+        }
+        return $scope.contentHtml !== $scope.explorationContentHtml;
+      };
+
       $scope.editSuggestion = function() {
         $scope.startedEditing = true;
+        $scope.editedContent.html = $scope.translationHtml;
       };
 
       $scope.cancelEdit = function() {
+        $scope.errorMessage = '';
         $scope.startedEditing = false;
+        $scope.errorFound = false;
         $scope.editedContent.html = $scope.translationHtml;
       };
 
@@ -228,8 +289,10 @@ angular.module('oppia').controller(
       };
 
       $scope.showTranslationSuggestionUpdateError = function(error) {
-        AlertsService.clearWarnings();
-        AlertsService.addWarning(`Invalid Suggestion: ${error.data.error}`);
+        $scope.errorMessage = 'Invalid Suggestion: ' + error.data.error;
+        $scope.errorFound = true;
+        $scope.startedEditing = true;
+        $scope.translationHtml = $scope.preEditTranslationHtml;
       };
     }
   ]);

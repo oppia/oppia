@@ -24,7 +24,7 @@ import { TextInputPredictionService } from
 import { InteractionAnswer } from 'interactions/answer-defs';
 
 interface PredictionService {
-  predict(classifierData: ArrayBuffer, answer: InteractionAnswer): number;
+  predict: (classifierData: ArrayBuffer, answer: InteractionAnswer) => number;
 }
 
 type AlgorithmIdPredictionServiceMap = (
@@ -64,8 +64,9 @@ export class PredictionAlgorithmRegistryService {
     if (!this.algorithmIdPredictionServiceMapping.get(algorithmId)) {
       this.algorithmIdPredictionServiceMapping.set(algorithmId, new Map());
     }
-    this.algorithmIdPredictionServiceMapping.get(algorithmId)
-      .set(dataSchemaVersion, service);
+    let _algorithmId = (
+      this.algorithmIdPredictionServiceMapping.get(algorithmId));
+    _algorithmId?.set(dataSchemaVersion, service);
   }
 }
 

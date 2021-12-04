@@ -34,6 +34,10 @@ import { Error404PageComponent } from './error-404-page.component';
   entryComponents: [
     Error404PageComponent,
     Error404PageRootComponent,
+  ],
+  exports: [
+    Error404PageComponent,
+    Error404PageRootComponent
   ]
 })
 export class Error404PageModule {}

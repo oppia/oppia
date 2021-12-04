@@ -14,9 +14,10 @@
 
 """Tests for feedback-related services."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
+from core import feconf
+from core import python_utils
 from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import feedback_domain
@@ -27,8 +28,6 @@ from core.domain import taskqueue_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import python_utils
 
 (
     feedback_models, email_models, suggestion_models
@@ -1234,7 +1233,7 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.EmailTestBase):
             self.post_json(
                 '%s/%s' % (
                     feconf.FEEDBACK_THREAD_VIEW_EVENT_URL, thread_id),
-                {'thread_id': thread_id}, csrf_token=csrf_token)
+                {}, csrf_token=csrf_token)
 
             self.process_and_flush_pending_tasks()
             messages = self._get_sent_email_messages(

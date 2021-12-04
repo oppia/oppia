@@ -1,5 +1,5 @@
 <div class="oppia-topic-viewer-container position-relative">
-  <div class="oppia-topic-viewer-tabs-container" headroom>
+  <div class="oppia-topic-viewer-tabs-container position-relative" headroom>
     <div class="topic-viewer-tabs-list">
       <ul class="topic-viewer-tabs">
         <li [ngClass]="{'topic-viewer-tabs-active': activeTab === 'story'}">
@@ -39,7 +39,7 @@
                     [classroomUrlFragment]="classroomUrlFragment"
                     [topicUrlFragment]="topicUrlFragment">
       </stories-list>
-      <mat-card *ngIf="!canonicalStorySummaries.length" class="oppia-page-card practice-tab-not-available-card">
+      <mat-card dir="auto" *ngIf="!canonicalStorySummaries.length" class="oppia-page-card practice-tab-not-available-card">
         <h2 class="coming-soon-title">Coming Soon!</h2>
         <div class="coming-soon-text">Come back later when lessons are available for this topic.</div>
       </mat-card>
@@ -49,7 +49,7 @@
                     [subtopicsList]="subtopics"
                     [topicName]="topicName">
       </practice-tab>
-      <mat-card *ngIf="!practiceTabIsDisplayed" class="oppia-page-card practice-tab-not-available-card">
+      <mat-card dir="auto" *ngIf="!practiceTabIsDisplayed" class="oppia-page-card practice-tab-not-available-card">
         <h2 class="coming-soon-title">Coming Soon!</h2>
         <div class="coming-soon-text">Come back later when practice questions are available for this topic.</div>
       </mat-card>
@@ -109,8 +109,17 @@
     z-index: 1000;
   }
 
+  .oppia-topic-viewer-container /deep/ .oppia-background-banner {
+    margin-top: -50px;
+  }
+
   .oppia-topic-viewer-container .headroom--unpinned {
     transform: translateY(-150%);
+  }
+
+  .oppia-topic-viewer-container .headroom {
+    transition: transform 200ms linear;
+    will-change: transform;
   }
 
   .oppia-topic-viewer-tabs-container .topic-viewer-tabs .tab-icon {

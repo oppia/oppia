@@ -34,7 +34,7 @@ describe('TranslatableSetOfNormalizedStringEditor', () => {
     component = TestBed.createComponent(
       TranslatableSetOfNormalizedStringEditorComponent
     ).componentInstance;
-    component.value = {};
+    component.value = { normalizedStrSet: '' };
     component.updateValue('random val');
   }));
 

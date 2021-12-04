@@ -14,12 +14,12 @@
 
 """Tests for the story viewer page"""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import logging
 
-from constants import constants
+from core import feconf
+from core.constants import constants
 from core.domain import learner_goals_services
 from core.domain import learner_progress_services
 from core.domain import question_services
@@ -31,7 +31,6 @@ from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
 from core.tests import test_utils
-import feconf
 
 
 class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
@@ -174,27 +173,6 @@ class StoryPageTests(BaseStoryViewerControllerTests):
     def test_any_user_can_access_story_viewer_page(self):
         self.get_html_response(
             '/learn/staging/topic/story/%s' % self.STORY_URL_FRAGMENT)
-
-    def test_accessibility_of_unpublished_story_viewer_page(self):
-        topic_services.unpublish_story(
-            self.TOPIC_ID, self.STORY_ID, self.admin_id)
-        self.get_html_response(
-            '/learn/staging/topic/story/%s' % self.STORY_URL_FRAGMENT,
-            expected_status_int=404)
-        self.login(self.CURRICULUM_ADMIN_EMAIL)
-        self.get_html_response(
-            '/learn/staging/topic/story/%s' % self.STORY_URL_FRAGMENT)
-        self.logout()
-
-    def test_accessibility_of_story_viewer_in_unpublished_topic(self):
-        topic_services.unpublish_topic(self.TOPIC_ID, self.admin_id)
-        self.get_html_response(
-            '/learn/staging/topic/story/%s' % self.STORY_URL_FRAGMENT,
-            expected_status_int=404)
-        self.login(self.CURRICULUM_ADMIN_EMAIL)
-        self.get_html_response(
-            '/learn/staging/topic/story/%s' % self.STORY_URL_FRAGMENT)
-        self.logout()
 
 
 class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
@@ -419,8 +397,18 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
             self.post_json(
                 '%s/staging/topic/%s/%s' % (
                     feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_URL_FRAGMENT,
-                    'invalid_node'
+                    'node_0000'
                 ), {}, csrf_token=csrf_token, expected_status_int=404
+            )
+
+    def test_post_fails_when_node_id_schema_is_invalid(self):
+        csrf_token = self.get_new_csrf_token()
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
+            self.post_json(
+                '%s/staging/topic/%s/%s' % (
+                    feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_URL_FRAGMENT,
+                    'invalid_node'
+                ), {}, csrf_token=csrf_token, expected_status_int=400
             )
 
     def test_post_fails_when_story_is_not_published_in_story_mode(self):

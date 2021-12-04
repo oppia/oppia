@@ -14,16 +14,15 @@
 
 """Tests for the blog dashboard page."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import os
 
+from core import feconf
+from core import python_utils
+from core import utils
 from core.domain import blog_services
 from core.tests import test_utils
-import feconf
-import python_utils
-import utils
 
 
 class BlogDashboardPageTests(test_utils.GenericTestBase):
@@ -188,6 +187,7 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(self.BLOG_EDITOR_USERNAME, json_response['username'])
         expected_blog_post_dict = {
             'id': u'%s' % self.blog_post.id,
+            'author_username': self.BLOG_EDITOR_USERNAME,
             'title': '',
             'content': '',
             'tags': [],
@@ -210,6 +210,7 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(self.BLOG_EDITOR_USERNAME, json_response['username'])
         expected_blog_post_dict = {
             'id': u'%s' % self.blog_post.id,
+            'author_username': self.BLOG_EDITOR_USERNAME,
             'title': '',
             'content': '',
             'tags': [],

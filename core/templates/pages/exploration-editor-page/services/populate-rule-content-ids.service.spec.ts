@@ -17,12 +17,13 @@
 */
 
 import { TestBed } from '@angular/core/testing';
+import { RuleBackendDict } from 'domain/exploration/RuleObjectFactory';
 
 import { PopulateRuleContentIdsService } from
   'pages/exploration-editor-page/services/populate-rule-content-ids.service';
 
 describe('Populate Rule Content Ids Service', () => {
-  let populateRuleContentIdsService = null;
+  let populateRuleContentIdsService: PopulateRuleContentIdsService;
 
   beforeEach(() => {
     populateRuleContentIdsService = TestBed.get(PopulateRuleContentIdsService);
@@ -32,10 +33,18 @@ describe('Populate Rule Content Ids Service', () => {
     let rule = {
       type: 'Equals',
       inputTypes: {x: 'TranslatableSetOfNormalizedString'},
-      inputs: {x: {
-        contentId: null,
-        normalizedStrSet: []
-      }}
+      inputs: {
+        x: {
+          contentId: null,
+          normalizedStrSet: []
+        }
+      },
+      toBackendDict(): RuleBackendDict {
+        return {
+          rule_type: this.type,
+          inputs: this.inputs
+        };
+      }
     };
     expect(rule.inputs.x.contentId).toBeNull();
     populateRuleContentIdsService.populateNullRuleContentIds(rule);
@@ -50,7 +59,14 @@ describe('Populate Rule Content Ids Service', () => {
 
     let rule = {
       inputTypes: {x: 'TranslatableSetOfNormalizedString'},
-      inputs: {x: ruleInput}
+      inputs: {x: ruleInput},
+      type: 'Equals',
+      toBackendDict(): RuleBackendDict {
+        return {
+          rule_type: this.type,
+          inputs: this.inputs
+        };
+      }
     };
 
     populateRuleContentIdsService.populateNullRuleContentIds(rule);
@@ -61,7 +77,13 @@ describe('Populate Rule Content Ids Service', () => {
     let rule = {
       type: 'HasNumberOfTermsEqualTo',
       inputTypes: {y: 'NonnegativeInt'},
-      inputs: {y: 1}
+      inputs: {y: 1},
+      toBackendDict(): RuleBackendDict {
+        return {
+          rule_type: this.type,
+          inputs: this.inputs
+        };
+      }
     };
     populateRuleContentIdsService.populateNullRuleContentIds(rule);
     expect(rule.inputs).toEqual({y: 1});

@@ -28,10 +28,6 @@ module.exports = {
     'assert': {
       'assertMatrix': [
         {
-          'matchingUrlPattern': '^http://127.0.0.1:8181/partners$',
-          'assertions': baseConfig['baseAccessibilityAssertions']
-        },
-        {
           'matchingUrlPattern': '^http://127.0.0.1:8181/preferences$',
           'assertions': {
             'categories:accessibility': ['error', {'minScore': 0.85}]
@@ -54,10 +50,6 @@ module.exports = {
           'assertions': baseConfig['baseAccessibilityAssertions']
         },
         {
-          'matchingUrlPattern': '^http://127.0.0.1:8181/teachers$',
-          'assertions': baseConfig['baseAccessibilityAssertions']
-        },
-        {
           'matchingUrlPattern': '^http://127.0.0.1:8181/topics-and-skills-dashboard$',
           'assertions': baseConfig['baseAccessibilityAssertions']
         },
@@ -70,8 +62,10 @@ module.exports = {
           'assertions': baseConfig['baseAccessibilityAssertions']
         },
         {
-          'matchingUrlPattern': '^http://127.0.0.1:8181/volunteers$',
-          'assertions': baseConfig['baseAccessibilityAssertions']
+          'matchingUrlPattern': '^http://127.0.0.1:8181/volunteer$',
+          'assertions': {
+            'categories:accessibility': ['error', {'minScore': 0.9}]
+          }
         },
         {
           'matchingUrlPattern': '^http://127.0.0.1:8181/create/.*$',

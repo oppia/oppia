@@ -13,23 +13,33 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive scripts for oppia email dashboard page.
+ * @fileoverview Directive scripts for the email dashboard result page.
  */
 
 import 'core-js/es7/reflect';
 import 'zone.js';
 
-angular.module('oppia', [
-  require('angular-cookies'), 'ngAnimate', 'ngMaterial',
-  'ngSanitize', 'ngTouch', 'pascalprecht.translate', 'ui.bootstrap'
-]);
+// TODO(#13080): Remove the mock-ajs.ts file after the migration is complete.
+import 'pages/mock-ajs';
+import 'Polyfills.ts';
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 
-require('Polyfills.ts');
+import { AppConstants } from 'app.constants';
+import { enableProdMode } from '@angular/core';
+import { LoggerService } from 'services/contextual/logger.service';
+import { EmailDashboardResultModule } from './email-dashboard-result.module';
 
-// The module needs to be loaded directly after jquery since it defines the
-// main module the elements are attached to.
-require('pages/email-dashboard-pages/email-dashboard-result.module.ts');
-require('App.ts');
-require('base-components/oppia-root.directive.ts');
+if (!AppConstants.DEV_MODE) {
+  enableProdMode();
+}
 
-require('pages/email-dashboard-pages/email-dashboard-result.component.ts');
+const loggerService = new LoggerService();
+
+platformBrowserDynamic().bootstrapModule(EmailDashboardResultModule).catch(
+  (err) => loggerService.error(err)
+);
+
+// This prevents angular pages to cause side effects to hybrid pages.
+// TODO(#13080): Remove window.name statement from import.ts files
+// after migration is complete.
+window.name = '';

@@ -29,6 +29,7 @@ import { LoaderService } from 'services/loader.service';
 import { PageTitleService } from 'services/page-title.service';
 import { SidebarStatusService } from 'services/sidebar-status.service';
 import { BackgroundMaskService } from 'services/stateful/background-mask.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'oppia-base-content',
@@ -37,7 +38,7 @@ import { BackgroundMaskService } from 'services/stateful/background-mask.service
 export class BaseContentComponent {
   loadingMessage: string = '';
   mobileNavOptionsAreShown: boolean = false;
-  iframed: boolean;
+  iframed: boolean = false;
   DEV_MODE = AppConstants.DEV_MODE;
   COOKIE_NAME_COOKIES_ACKNOWLEDGED = 'OPPIA_COOKIES_ACKNOWLEDGED';
   ONE_YEAR_IN_MSECS = 31536000000;
@@ -53,7 +54,8 @@ export class BaseContentComponent {
     private pageTitleService: PageTitleService,
     private sidebarStatusService: SidebarStatusService,
     private urlService: UrlService,
-    private cookieService: CookieService
+    private cookieService: CookieService,
+    private i18nLanguageCodeService: I18nLanguageCodeService
   ) {}
 
   ngOnInit(): void {
@@ -88,12 +90,16 @@ export class BaseContentComponent {
     this.directiveSubscriptions.unsubscribe();
   }
 
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
+  }
+
   getHeaderText(): string {
-    return this.pageTitleService.getPageTitleForMobileView();
+    return this.pageTitleService.getNavbarTitleForMobileView();
   }
 
   getSubheaderText(): string {
-    return this.pageTitleService.getPageSubtitleForMobileView();
+    return this.pageTitleService.getNavbarSubtitleForMobileView();
   }
 
   isMainProdServer(): boolean {
@@ -122,11 +128,13 @@ export class BaseContentComponent {
   }
 
   skipToMainContent(): void {
-    let mainContentElement: HTMLElement = document.getElementById(
+    // 'getElementById' can return null if the element provided as
+    // an argument is invalid.
+    let mainContentElement: HTMLElement | null = document.getElementById(
       'oppia-main-content');
 
     if (!mainContentElement) {
-      throw new Error('Variable mainContentElement is undefined.');
+      throw new Error('Variable mainContentElement is null.');
     }
     mainContentElement.tabIndex = -1;
     mainContentElement.scrollIntoView();
@@ -144,8 +152,18 @@ export class BaseContentComponent {
 
   acknowledgeCookies(): void {
     let currentDateInUnixTimeMsecs = new Date().valueOf();
+    // This cookie should support cross-site context so secure=true and
+    // sameSite='none' is set explicitly. Not setting this can cause
+    // inconsistent behaviour in different browsers in third-party contexts
+    // e.g. In Firefox, the cookie is accepted with a warning when
+    // sameSite='none' but secure=true is not set. For the same scenario in
+    // Chrome, the cookie gets rejected.
+    // See https://caniuse.com/same-site-cookie-attribute
+    // See https://www.chromium.org/updates/same-site/faq
     let cookieOptions = {
-      expires: new Date(currentDateInUnixTimeMsecs + this.ONE_YEAR_IN_MSECS)
+      expires: new Date(currentDateInUnixTimeMsecs + this.ONE_YEAR_IN_MSECS),
+      secure: true,
+      sameSite: 'none' as const
     };
     this.cookieService.put(
       this.COOKIE_NAME_COOKIES_ACKNOWLEDGED, String(currentDateInUnixTimeMsecs),

@@ -18,7 +18,9 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
-type Choice = { val: string };
+interface Choice {
+  val: string;
+}
 
 @Component({
   selector: 'set-of-translatable-html-content-ids-editor',
@@ -61,6 +63,7 @@ export class SetOfTranslatableHtmlContentIdsEditorComponent implements OnInit {
     } else {
       this.value.push(this.choices[choiceListIndex].val);
     }
+    this.valueChanged.emit(this.value);
   }
 }
 angular.module('oppia').directive(

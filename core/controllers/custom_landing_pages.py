@@ -16,8 +16,7 @@
 
 """Controllers for custom landing pages."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -59,20 +58,3 @@ class TopicLandingRedirectPage(base.BaseHandler):
             topic: str. Topic of page to be redirected to.
         """
         self.redirect('/math/%s' % topic)
-
-
-class StewardsLandingPage(base.BaseHandler):
-    """Page showing the landing page for stewards (parents, teachers,
-    volunteers, or NGOs).
-    """
-
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
-
-    @acl_decorators.open_access
-    def get(self):
-        """Handles GET requests."""
-        self.render_template(
-            'stewards-landing-page.mainpage.html')

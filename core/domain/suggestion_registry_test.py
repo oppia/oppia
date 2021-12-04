@@ -14,28 +14,29 @@
 
 """Tests for suggestion registry classes."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import datetime
 import os
 
+from core import feconf
+from core import python_utils
+from core import utils
 from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import html_validation_service
 from core.domain import question_domain
+from core.domain import question_services
 from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import python_utils
-import utils
 
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
@@ -1417,67 +1418,53 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         ):
             suggestion.pre_accept_validate()
 
-    def test_pre_accept_validate_content_html(self):
-        self.save_new_default_exploration('exp1', self.author_id)
-        expected_suggestion_dict = self.suggestion_dict
-        suggestion = suggestion_registry.SuggestionTranslateContent(
-            expected_suggestion_dict['suggestion_id'],
-            expected_suggestion_dict['target_id'],
-            expected_suggestion_dict['target_version_at_submission'],
-            expected_suggestion_dict['status'], self.author_id,
-            self.reviewer_id, expected_suggestion_dict['change'],
-            expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], False, self.fake_date)
-
-        exp_services.update_exploration(
-            self.author_id, 'exp1', [
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_ADD_STATE,
-                    'state_name': 'State A',
-                }),
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-                    'new_value': {
-                        'content_id': 'content',
-                        'html': '<p>This is a content.</p>'
-                    },
-                    'state_name': 'State A',
-                })
-            ], 'Added state')
-        suggestion.change.state_name = 'State A'
-
-        suggestion.pre_accept_validate()
-
-        suggestion.change.content_html = 'invalid content_html'
-        with self.assertRaisesRegexp(
-            utils.ValidationError,
-            'The Exploration content has changed since this translation '
-            'was submitted.'
-        ):
-            suggestion.pre_accept_validate()
-
     def test_accept_suggestion_adds_translation_in_exploration(self):
         self.save_new_default_exploration('exp1', self.author_id)
-
         exploration = exp_fetchers.get_exploration_by_id('exp1')
         self.assertEqual(exploration.get_translation_counts(), {})
-
-        expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
-            expected_suggestion_dict['suggestion_id'],
-            expected_suggestion_dict['target_id'],
-            expected_suggestion_dict['target_version_at_submission'],
-            expected_suggestion_dict['status'], self.author_id,
-            self.reviewer_id, expected_suggestion_dict['change'],
-            expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], False, self.fake_date)
+            self.suggestion_dict['suggestion_id'],
+            self.suggestion_dict['target_id'],
+            self.suggestion_dict['target_version_at_submission'],
+            self.suggestion_dict['status'], self.author_id,
+            self.reviewer_id, self.suggestion_dict['change'],
+            self.suggestion_dict['score_category'],
+            self.suggestion_dict['language_code'], False, self.fake_date)
 
         suggestion.accept(
             'Accepted suggestion by translator: Add translation change.')
 
         exploration = exp_fetchers.get_exploration_by_id('exp1')
+        self.assertEqual(exploration.get_translation_counts(), {
+            'hi': 1
+        })
 
+    def test_accept_suggestion_with_set_of_string_adds_translation(self):
+        self.save_new_default_exploration('exp1', self.author_id)
+        exploration = exp_fetchers.get_exploration_by_id('exp1')
+        self.assertEqual(exploration.get_translation_counts(), {})
+        suggestion = suggestion_registry.SuggestionTranslateContent(
+            self.suggestion_dict['suggestion_id'],
+            self.suggestion_dict['target_id'],
+            self.suggestion_dict['target_version_at_submission'],
+            self.suggestion_dict['status'], self.author_id,
+            self.reviewer_id,
+            {
+                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                'state_name': 'Introduction',
+                'content_id': 'content',
+                'language_code': 'hi',
+                'content_html': ['text1', 'text2'],
+                'translation_html': ['translated text1', 'translated text2'],
+                'data_format': 'set_of_normalized_string'
+            },
+            self.suggestion_dict['score_category'],
+            self.suggestion_dict['language_code'], False, self.fake_date)
+
+        suggestion.accept(
+            'Accepted suggestion by translator: Add translation change.')
+
+        exploration = exp_fetchers.get_exploration_by_id('exp1')
         self.assertEqual(exploration.get_translation_counts(), {
             'hi': 1
         })
@@ -1518,8 +1505,34 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             self.suggestion_dict['language_code'], False, self.fake_date)
 
         actual_outcome_list = suggestion.get_all_html_content_strings()
+
         expected_outcome_list = [
             u'<p>This is translated html.</p>', u'<p>This is a content.</p>']
+        self.assertEqual(expected_outcome_list, actual_outcome_list)
+
+    def test_get_all_html_content_strings_for_content_lists(self):
+        suggestion = suggestion_registry.SuggestionTranslateContent(
+            self.suggestion_dict['suggestion_id'],
+            self.suggestion_dict['target_id'],
+            self.suggestion_dict['target_version_at_submission'],
+            self.suggestion_dict['status'], self.author_id,
+            self.reviewer_id,
+            {
+                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                'state_name': 'Introduction',
+                'content_id': 'content',
+                'language_code': 'hi',
+                'content_html': ['text1', 'text2'],
+                'translation_html': ['translated text1', 'translated text2'],
+                'data_format': 'set_of_normalized_string'
+            },
+            self.suggestion_dict['score_category'],
+            self.suggestion_dict['language_code'], False, self.fake_date)
+
+        actual_outcome_list = suggestion.get_all_html_content_strings()
+
+        expected_outcome_list = [
+            'translated text1', 'translated text2', 'text1', 'text2']
         self.assertEqual(expected_outcome_list, actual_outcome_list)
 
     def test_get_target_entity_html_strings_returns_expected_strings(self):
@@ -2425,6 +2438,164 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             suggestion_dict['change'], suggestion_dict['score_category'],
             suggestion_dict['language_code'], False, self.fake_date)
         suggestion.accept('commit_message')
+
+    def test_accept_suggestion_with_image_region_interactions(self):
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
+            encoding=None) as f:
+            original_image_content = f.read()
+        fs_services.save_original_and_compressed_versions_of_image(
+            'image.png', 'question_suggestions', 'skill1',
+            original_image_content, 'image', True)
+
+        question_state_dict = {
+            'content': {
+                'html': '<p>Text</p>',
+                'content_id': 'content'
+            },
+            'classifier_model_id': None,
+            'linked_skill_id': None,
+            'interaction': {
+                'answer_groups': [
+                    {
+                        'rule_specs': [
+                            {
+                                'rule_type': 'IsInRegion',
+                                'inputs': {'x': 'Region1'}
+                            }
+                        ],
+                        'outcome': {
+                            'dest': None,
+                            'feedback': {
+                                'html': '<p>assas</p>',
+                                'content_id': 'feedback_0'
+                            },
+                            'labelled_as_correct': True,
+                            'param_changes': [],
+                            'refresher_exploration_id': None,
+                            'missing_prerequisite_skill_id': None
+                        },
+                        'training_data': [],
+                        'tagged_skill_misconception_id': None
+                    }
+                ],
+                'confirmed_unclassified_answers': [],
+                'customization_args': {
+                    'imageAndRegions': {
+                        'value': {
+                            'imagePath': 'image.png',
+                            'labeledRegions': [
+                                {
+                                    'label': 'Region1',
+                                    'region': {
+                                        'regionType': 'Rectangle',
+                                        'area': [
+                                            [
+                                                0.2644628099173554,
+                                                0.21807065217391305
+                                            ],
+                                            [
+                                                0.9201101928374655,
+                                                0.8847373188405797
+                                            ]
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    'highlightRegionsOnHover': {
+                        'value': False
+                    }
+                },
+                'default_outcome': {
+                    'dest': None,
+                    'feedback': {
+                        'html': '<p>wer</p>',
+                        'content_id': 'default_outcome'
+                    },
+                    'labelled_as_correct': False,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
+                },
+                'hints': [
+                    {
+                        'hint_content': {
+                            'html': '<p>assaas</p>',
+                            'content_id': 'hint_1'
+                        }
+                    }
+                ],
+                'id': 'ImageClickInput', 'solution': None
+            },
+            'param_changes': [],
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {
+                    'content': {},
+                    'default_outcome': {},
+                    'feedback_0': {},
+                    'hint_1': {}
+                }
+            },
+            'solicit_answer_details': False,
+            'card_is_checkpoint': False,
+            'written_translations': {
+                'translations_mapping': {
+                    'content': {},
+                    'default_outcome': {},
+                    'feedback_0': {},
+                    'hint_1': {}
+                }
+            },
+            'next_content_id_index': 2
+        }
+        suggestion_dict = {
+            'suggestion_id': 'skill1.thread1',
+            'suggestion_type': feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            'target_type': feconf.ENTITY_TYPE_SKILL,
+            'target_id': 'skill1',
+            'target_version_at_submission': 1,
+            'status': suggestion_models.STATUS_ACCEPTED,
+            'author_name': 'author',
+            'final_reviewer_id': self.reviewer_id,
+            'change': {
+                'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+                'question_dict': {
+                    'question_state_data': question_state_dict,
+                    'language_code': 'en',
+                    'question_state_data_schema_version': (
+                        feconf.CURRENT_STATE_SCHEMA_VERSION),
+                    'linked_skill_ids': ['skill1'],
+                    'inapplicable_skill_misconception_ids': []
+                },
+                'skill_id': 'skill1',
+                'skill_difficulty': 0.3,
+            },
+            'score_category': 'question.skill1',
+            'language_code': 'en',
+            'last_updated': utils.get_time_in_millisecs(self.fake_date)
+        }
+        self.save_new_skill(
+            'skill1', self.author_id, description='description')
+        suggestion = suggestion_registry.SuggestionAddQuestion(
+            suggestion_dict['suggestion_id'], suggestion_dict['target_id'],
+            suggestion_dict['target_version_at_submission'],
+            suggestion_dict['status'], self.author_id, self.reviewer_id,
+            suggestion_dict['change'], suggestion_dict['score_category'],
+            suggestion_dict['language_code'], False, self.fake_date)
+
+        suggestion.accept('commit_message')
+
+        question = question_services.get_questions_by_skill_ids(
+            1, ['skill1'], False)[0]
+        destination_fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_QUESTION, question.id))
+        self.assertTrue(destination_fs.isfile('image/%s' % 'image.png'))
+        self.assertEqual(
+            suggestion.status,
+            suggestion_models.STATUS_ACCEPTED)
 
     def test_contructor_updates_state_shema_in_change_cmd(self):
         score_category = (

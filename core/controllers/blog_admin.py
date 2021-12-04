@@ -14,11 +14,11 @@
 
 """Controllers for the blog admin page"""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import logging
 
+from core import feconf
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.controllers import domain_objects_validator as validation_method
@@ -27,7 +27,6 @@ from core.domain import config_domain
 from core.domain import config_services
 from core.domain import role_services
 from core.domain import user_services
-import feconf
 
 BLOG_POST_EDITOR = feconf.ROLE_ID_BLOG_POST_EDITOR
 BLOG_ADMIN = feconf.ROLE_ID_BLOG_ADMIN
@@ -81,8 +80,7 @@ class BlogAdminHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_access_blog_admin_page
-    def get(self):
-        # type: () -> None
+    def get(self) -> None:
         """Handles GET requests."""
         config_properties = config_domain.Registry.get_config_property_schemas()
         config_prop_for_blog_admin = {
@@ -106,8 +104,7 @@ class BlogAdminHandler(base.BaseHandler):
         })
 
     @acl_decorators.can_access_blog_admin_page
-    def post(self):
-        # type: () -> None
+    def post(self) -> None:
         """Handles POST requests."""
         result = {}
         if self.normalized_payload.get(
@@ -160,8 +157,7 @@ class BlogAdminRolesHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_manage_blog_post_editors
-    def post(self):
-        # type: () -> None
+    def post(self) -> None:
         """Handles POST requests."""
         username = self.normalized_payload.get('username')
         role = self.normalized_payload.get('role')
@@ -176,8 +172,7 @@ class BlogAdminRolesHandler(base.BaseHandler):
         self.render_json({})
 
     @acl_decorators.can_manage_blog_post_editors
-    def put(self):
-        # type: () -> None
+    def put(self) -> None:
         """Handles PUT requests."""
         username = self.normalized_payload.get('username')
         user_id = user_services.get_user_id_from_username(username)

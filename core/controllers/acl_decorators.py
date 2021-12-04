@@ -16,13 +16,16 @@
 
 """Decorators to provide authorization across the site."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import functools
 import logging
+import re
 
-from constants import constants
+from core import android_validation_constants
+from core import feconf
+from core import utils
+from core.constants import constants
 from core.controllers import base
 from core.domain import blog_services
 from core.domain import classifier_services
@@ -41,8 +44,8 @@ from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
-import feconf
-import utils
+
+from typing import Any, Callable # isort: skip
 
 
 def _redirect_based_on_return_type(
@@ -151,10 +154,18 @@ def does_classroom_exist(handler):
             classroom_url_fragment)
 
         if not classroom:
-            _redirect_based_on_return_type(
-                self, '/learn/%s' % constants.DEFAULT_CLASSROOM_URL_FRAGMENT,
-                self.GET_HANDLER_ERROR_RETURN_TYPE)
-            return
+            # This decorator should only be used for JSON handlers, since all
+            # HTML page handlers are expected to be migrated to the Angular
+            # router and access validation for such pages should be done using
+            # the access validation handler endpoint.
+            if self.GET_HANDLER_ERROR_RETURN_TYPE == feconf.HANDLER_TYPE_JSON:
+                raise self.PageNotFoundException
+            else:
+                # As this decorator is not expected to be used with other
+                # handler types, raising an error here.
+                raise Exception(
+                    'does_classroom_exist decorator is only expected to '
+                    'be used with json return type handlers.')
 
         return handler(self, classroom_url_fragment, **kwargs)
     test_does_classroom_exist.__wrapped__ = True
@@ -790,7 +801,7 @@ def can_manage_memcache(handler):
     return test_can_manage_memcache
 
 
-def can_run_any_job(handler):
+def can_run_any_job(handler: Callable[..., None]) -> Callable[..., None]:
     """Decorator to check whether user can can run any job.
 
     Args:
@@ -801,10 +812,13 @@ def can_run_any_job(handler):
         permission to run any job.
     """
 
-    def test_can_run_any_job(self, **kwargs):
+    def test_can_run_any_job(
+        self: base.BaseHandler, *args: Any, **kwargs: Any
+    ) -> None:
         """Checks if the user is logged in and can run any job.
 
         Args:
+            *args: list(*). Positional arguments.
             **kwargs: *. Keyword arguments.
 
         Returns:
@@ -819,11 +833,11 @@ def can_run_any_job(handler):
             raise base.UserFacingExceptions.NotLoggedInException
 
         if role_services.ACTION_RUN_ANY_JOB in self.user.actions:
-            return handler(self, **kwargs)
+            return handler(self, *args, **kwargs)
 
         raise self.UnauthorizedUserException(
             'You do not have credentials to run jobs.')
-    test_can_run_any_job.__wrapped__ = True
+    setattr(test_can_run_any_job, '__wrapped__', True)
 
     return test_can_run_any_job
 
@@ -1297,8 +1311,12 @@ def can_view_feedback_thread(handler):
             UnauthorizedUserException. The user does not have credentials to
                 view an exploration feedback.
         """
-        if '.' not in thread_id:
-            raise self.InvalidInputException('Thread ID must contain a .')
+        # This should already be checked by the controller handler
+        # argument schemas, but we are adding it here for additional safety.
+        regex_pattern = constants.VALID_THREAD_ID_REGEX
+        regex_matched = bool(re.match(regex_pattern, thread_id))
+        if not regex_matched:
+            raise self.InvalidInputException('Not a valid thread id.')
 
         entity_type = feedback_services.get_thread(thread_id).entity_type
         entity_types_with_unrestricted_view_suggestion_access = (
@@ -1355,8 +1373,12 @@ def can_comment_on_feedback_thread(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        if '.' not in thread_id:
-            raise self.InvalidInputException('Thread ID must contain a .')
+        # This should already be checked by the controller handler
+        # argument schemas, but we are adding it here for additional safety.
+        regex_pattern = constants.VALID_THREAD_ID_REGEX
+        regex_matched = bool(re.match(regex_pattern, thread_id))
+        if not regex_matched:
+            raise self.InvalidInputException('Not a valid thread id.')
 
         exploration_id = feedback_services.get_exp_id_from_thread_id(thread_id)
 
@@ -2544,6 +2566,45 @@ def can_edit_skill(handler):
     return test_can_edit_skill
 
 
+def can_submit_images_to_questions(handler):
+    """Decorator to check whether the user can submit images to questions.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks if
+        the user has permission to submit a question.
+    """
+    def test_can_submit_images_to_questions(self, skill_id, **kwargs):
+        """Test to see if user can submit images to questions.
+
+        Args:
+            skill_id: str. The skill ID.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            PageNotFoundException. The given page cannot be found.
+            UnauthorizedUserException. The user does not have the
+                credentials to edit the given skill.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        if role_services.ACTION_SUGGEST_CHANGES in self.user.actions:
+            return handler(self, skill_id, **kwargs)
+        else:
+            raise self.UnauthorizedUserException(
+                'You do not have credentials to submit images to questions.')
+
+    test_can_submit_images_to_questions.__wrapped__ = True
+    return test_can_submit_images_to_questions
+
+
 def can_delete_skill(handler):
     """Decorator to check whether the user can delete a skill.
 
@@ -3385,19 +3446,32 @@ def can_edit_entity(handler):
         # for the corresponding decorators.
         reduced_handler = functools.partial(
             arg_swapped_handler, entity_type)
-        if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
-            return can_edit_exploration(reduced_handler)(
-                self, entity_id, **kwargs)
-        elif entity_type == feconf.ENTITY_TYPE_QUESTION:
-            return can_edit_question(reduced_handler)(self, entity_id, **kwargs)
-        elif entity_type == feconf.ENTITY_TYPE_TOPIC:
-            return can_edit_topic(reduced_handler)(self, entity_id, **kwargs)
-        elif entity_type == feconf.ENTITY_TYPE_SKILL:
-            return can_edit_skill(reduced_handler)(self, entity_id, **kwargs)
-        elif entity_type == feconf.ENTITY_TYPE_STORY:
-            return can_edit_story(reduced_handler)(self, entity_id, **kwargs)
-        else:
+        functions = {
+            feconf.ENTITY_TYPE_EXPLORATION: lambda entity_id: (
+                can_edit_exploration(reduced_handler)(
+                    self, entity_id, **kwargs)),
+            feconf.ENTITY_TYPE_QUESTION: lambda entity_id: (
+                can_edit_question(reduced_handler)(
+                    self, entity_id, **kwargs)),
+            feconf.ENTITY_TYPE_TOPIC: lambda entity_id: (
+                can_edit_topic(reduced_handler)(
+                    self, entity_id, **kwargs)),
+            feconf.ENTITY_TYPE_SKILL: lambda entity_id: (
+                can_edit_skill(reduced_handler)(
+                    self, entity_id, **kwargs)),
+            feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS: lambda entity_id: (
+                can_submit_images_to_questions(reduced_handler)(
+                    self, entity_id, **kwargs)),
+            feconf.ENTITY_TYPE_STORY: lambda entity_id: (
+                can_edit_story(reduced_handler)(
+                    self, entity_id, **kwargs)),
+            feconf.ENTITY_TYPE_BLOG_POST: lambda entity_id: (
+                can_edit_blog_post(reduced_handler)(
+                    self, entity_id, **kwargs))
+        }
+        if entity_type not in dict.keys(functions):
             raise self.PageNotFoundException
+        return functions[entity_type](entity_id)
 
     test_can_edit_entity.__wrapped__ = True
 
@@ -3572,3 +3646,52 @@ def can_update_suggestion(handler):
 
     test_can_update_suggestion.__wrapped__ = True
     return test_can_update_suggestion
+
+
+def is_from_oppia_android(handler):
+    """Decorator to check whether the request was sent from Oppia Android.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function.
+    """
+
+    def test_is_from_oppia_android(self, **kwargs):
+        """Checks whether the request was sent from Oppia Android.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            UnauthorizedUserException. If incoming request is not from a valid
+                Oppia Android request.
+        """
+        headers = self.request.headers
+        api_key = headers['api_key']
+        app_package_name = headers['app_package_name']
+        app_version_name = headers['app_version_name']
+        app_version_code = headers['app_version_code']
+
+        version_name_matches = (
+            android_validation_constants.APP_VERSION_WITH_HASH_REGEXP.match(
+                app_version_name))
+        version_code_is_positive_int = app_version_code.isdigit() and (
+            int(app_version_code) > 0)
+        if (
+                api_key != android_validation_constants.ANDROID_API_KEY or
+                app_package_name != (
+                    android_validation_constants.ANDROID_APP_PACKAGE_NAME) or
+                not version_name_matches or
+                not version_code_is_positive_int):
+            raise self.UnauthorizedUserException(
+                'The incoming request is not a valid Oppia Android request.')
+        return handler(self, **kwargs)
+
+    test_is_from_oppia_android.__wrapped__ = True
+
+    return test_is_from_oppia_android

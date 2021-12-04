@@ -113,6 +113,7 @@ angular.module('oppia').component('questionOpportunities', {
           backdrop: 'static',
           keyboard: false,
           resolve: {
+            suggestionId: () => '',
             question: () => question,
             questionId: () => questionId,
             questionStateData: () => questionStateData,
@@ -125,6 +126,7 @@ angular.module('oppia').component('questionOpportunities', {
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.
           // No further action is needed.
+          $rootScope.$applyAsync();
         });
       };
 

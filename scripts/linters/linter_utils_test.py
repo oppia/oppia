@@ -16,15 +16,15 @@
 
 """Unit tests for linter_utils.py."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
+import builtins
 import collections
 import os
 import tempfile
 
+from core import python_utils
 from core.tests import test_utils
-import python_utils
 
 from . import linter_utils
 
@@ -91,7 +91,7 @@ class MemoizeTest(test_utils.GenericTestBase):
         self.assertEqual(call_counter[0], 1)
 
     def test_memoize_with_methods(self):
-        class CallCounter(python_utils.OBJECT):
+        class CallCounter:
             """Counts calls made to an instance."""
 
             def __init__(self):
@@ -115,7 +115,7 @@ class MemoizeTest(test_utils.GenericTestBase):
         self.assertEqual(call_counter_b.count, 1)
 
     def test_memoize_with_classmethods(self):
-        class GoodCallCounter(python_utils.OBJECT):
+        class GoodCallCounter:
             """Counts calls made to the class."""
 
             count = 0
@@ -137,7 +137,7 @@ class MemoizeTest(test_utils.GenericTestBase):
         self.assertEqual(GoodCallCounter.count, 1)
 
         with self.assertRaisesRegexp(TypeError, 'unsupported callable'):
-            class BadCallCounter(python_utils.OBJECT):  # pylint: disable=unused-variable
+            class BadCallCounter:  # pylint: disable=unused-variable
                 """Counts calls made to the class."""
 
                 count = 0
@@ -185,7 +185,7 @@ class RedirectStoutTest(test_utils.GenericTestBase):
 
         with python_utils.open_file(temp_file.name, 'r+') as temp_file_contents:
             with linter_utils.redirect_stdout(temp_file_contents):
-                python_utils.PRINT('This is a test')
+                print('This is a test')
             temp_file_contents.seek(0)
             data = temp_file_contents.read()
         temp_file.close()
@@ -241,10 +241,10 @@ class ColorMessagePrintTest(test_utils.GenericTestBase):
         self.log = ''
 
         def mock_print(*args):
-            """Mock for python_utils.PRINT."""
-            self.log = ' '.join(python_utils.UNICODE(arg) for arg in args)
+            """Mock for print."""
+            self.log = ' '.join(str(arg) for arg in args)
 
-        self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
+        self.print_swap = self.swap(builtins, 'print', mock_print)
 
     def test_print_failure_message_prints_in_red_color(self):
         message = 'Failure Message'

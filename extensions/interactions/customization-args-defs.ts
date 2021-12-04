@@ -102,7 +102,7 @@ export interface DragAndDropSortInputCustomizationArgsBackendDict {
   };
   allowMultipleItemsInSamePosition: {
     value: boolean;
-  }
+  };
 }
 export interface DragAndDropSortInputCustomizationArgs {
   choices: {
@@ -110,7 +110,7 @@ export interface DragAndDropSortInputCustomizationArgs {
   };
   allowMultipleItemsInSamePosition: {
     value: boolean;
-  }
+  };
 }
 
 
@@ -276,17 +276,6 @@ export interface ItemSelectionInputCustomizationArgs {
 }
 
 
-export interface LogicProofCustomizationArgsBackendDict {
-  question: {
-    value: Object;
-  };
-}
-export interface LogicProofCustomizationArgs {
-  question: {
-    value: Object;
-  };
-}
-
 
 export interface MathEquationInputCustomizationArgsBackendDict {
   useFractionForDivision: boolean;
@@ -411,8 +400,16 @@ export interface NumericExpressionInputCustomizationArgs {
 }
 
 
-export interface NumericInputCustomizationArgsBackendDict { }
-export interface NumericInputCustomizationArgs { }
+export interface NumericInputCustomizationArgsBackendDict {
+  requireNonnegativeInput: {
+    value: boolean;
+  };
+}
+export interface NumericInputCustomizationArgs {
+  requireNonnegativeInput: {
+    value: boolean;
+  };
+}
 
 
 export interface NumberWithUnitsCustomizationArgsBackendDict { }
@@ -430,7 +427,6 @@ export type InteractionCustomizationArgsBackendDict = (
   ImageClickInputCustomizationArgsBackendDict |
   InteractiveMapCustomizationArgsBackendDict |
   ItemSelectionInputCustomizationArgsBackendDict |
-  LogicProofCustomizationArgsBackendDict |
   MathEquationInputCustomizationArgsBackendDict |
   MultipleChoiceInputCustomizationArgsBackendDict |
   MusicNotesInputCustomizationArgsBackendDict |
@@ -453,7 +449,6 @@ export type InteractionCustomizationArgs = (
   ImageClickInputCustomizationArgs |
   InteractiveMapCustomizationArgs |
   ItemSelectionInputCustomizationArgs |
-  LogicProofCustomizationArgs |
   MathEquationInputCustomizationArgs |
   MultipleChoiceInputCustomizationArgs |
   MusicNotesInputCustomizationArgs |

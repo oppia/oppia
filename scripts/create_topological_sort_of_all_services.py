@@ -18,13 +18,12 @@
 services are dependent on each other.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import collections
 import os
 import sys
-import python_utils
+from core import python_utils
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 
@@ -142,7 +141,7 @@ def main():
 
     topo_sort_stack.reverse()
     for service in topo_sort_stack:
-        python_utils.PRINT(service)
+        print(service)
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

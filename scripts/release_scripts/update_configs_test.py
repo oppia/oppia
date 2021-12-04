@@ -16,15 +16,16 @@
 
 """Unit tests for scripts/release_scripts/update_configs.py."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
+import builtins
 import getpass
 import os
 import tempfile
 
+from core import python_utils
+from core import utils
 from core.tests import test_utils
-import python_utils
 from scripts import common
 from scripts.release_scripts import update_configs
 
@@ -70,12 +71,12 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         self.open_tab_swap = self.swap(
             common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
         self.getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
-        self.url_open_swap = self.swap(python_utils, 'url_open', mock_url_open)
+        self.url_open_swap = self.swap(utils, 'url_open', mock_url_open)
 
     def test_missing_terms_page(self):
         def mock_url_open(unused_url):
             raise Exception('Not found.')
-        url_open_swap = self.swap(python_utils, 'url_open', mock_url_open)
+        url_open_swap = self.swap(utils, 'url_open', mock_url_open)
         with url_open_swap, self.assertRaisesRegexp(
             Exception, 'Terms mainpage does not exist on Github.'
         ):
@@ -98,8 +99,8 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         def mock_print(msg):
             if 'Invalid Input' in msg:
                 print_msgs.append(msg)
-        input_swap = self.swap(python_utils, 'INPUT', mock_input)
-        print_swap = self.swap(python_utils, 'PRINT', mock_print)
+        input_swap = self.swap(builtins, 'input', mock_input)
+        print_swap = self.swap(builtins, 'print', mock_print)
         with self.getpass_swap, self.get_org_swap, self.get_repo_swap:
             with self.open_tab_swap, input_swap, print_swap:
                 update_configs.check_updates_to_terms_of_service(
@@ -116,7 +117,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
                 attributes={
                     'commit': {'committer': {'date': '2016-11-15T3:41:01Z'}}},
                 completed='')
-        input_swap = self.swap(python_utils, 'INPUT', mock_input)
+        input_swap = self.swap(builtins, 'input', mock_input)
         get_commit_swap = self.swap(
             github.Repository.Repository, 'get_commit', mock_get_commit)
 

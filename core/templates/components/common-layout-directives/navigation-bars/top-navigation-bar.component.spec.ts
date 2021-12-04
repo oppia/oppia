@@ -22,44 +22,40 @@ import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angul
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { NavigationService } from 'services/navigation.service';
+import { EventToCodes, NavigationService } from 'services/navigation.service';
 import { SearchService } from 'services/search.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UserService } from 'services/user.service';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { MockI18nService, MockTranslatePipe } from 'tests/unit-test-utils';
 import { TopNavigationBarComponent } from './top-navigation-bar.component';
 import { DebouncerService } from 'services/debouncer.service';
 import { SidebarStatusService } from 'services/sidebar-status.service';
+import { UserInfo } from 'domain/user/user-info.model';
+import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { I18nService } from 'i18n/i18n.service';
+import { CookieService } from 'ngx-cookie';
 
 class MockWindowRef {
-  _window = {
+  nativeWindow = {
     location: {
-      _pathname: '/learn/math',
-      _href: '',
-      get href() {
-        return this._href;
-      },
-      set href(val) {
-        this._href = val;
-      },
-      get pathname() {
-        return this._pathname;
-      },
-      set pathname(val) {
-        this._pathname = val;
-      },
-      reload: () => {}
+      pathname: '/learn/math',
+      href: '',
+      reload: () => {},
+      toString: () => {
+        return 'http://localhost:8181/?lang=es';
+      }
     },
     localStorage: {
       last_uploaded_audio_lang: 'en',
       removeItem: (name: string) => {}
+    },
+    gtag: () => {},
+    history: {
+      pushState(data: object, title: string, url?: string | null) {}
     }
   };
-  get nativeWindow() {
-    return this._window;
-  }
 }
-
 
 describe('TopNavigationBarComponent', () => {
   let fixture: ComponentFixture<TopNavigationBarComponent>;
@@ -73,6 +69,9 @@ describe('TopNavigationBarComponent', () => {
   let deviceInfoService: DeviceInfoService;
   let debouncerService: DebouncerService;
   let sidebarStatusService: SidebarStatusService;
+  let classroomBackendApiService: ClassroomBackendApiService;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
+  let i18nService: I18nService;
 
   let mockResizeEmitter: EventEmitter<void>;
 
@@ -89,7 +88,12 @@ describe('TopNavigationBarComponent', () => {
       ],
       providers: [
         NavigationService,
+        CookieService,
         UserService,
+        {
+          provide: I18nService,
+          useClass: MockI18nService
+        },
         {
           provide: WindowRef,
           useValue: mockWindowRef
@@ -118,6 +122,9 @@ describe('TopNavigationBarComponent', () => {
     deviceInfoService = TestBed.inject(DeviceInfoService);
     debouncerService = TestBed.inject(DebouncerService);
     sidebarStatusService = TestBed.inject(SidebarStatusService);
+    i18nService = TestBed.inject(I18nService);
+    classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
 
     spyOn(searchService, 'onSearchBarLoaded')
       .and.returnValue(new EventEmitter<string>());
@@ -261,7 +268,7 @@ describe('TopNavigationBarComponent', () => {
 
     component.onMenuKeypress(keydownEvent, 'aboutMenu', {
       shiftTab: 'open',
-    });
+    } as EventToCodes);
 
     expect(component.activeMenuName).toBe('aboutMenu');
   });
@@ -339,8 +346,7 @@ describe('TopNavigationBarComponent', () => {
   ' complete', fakeAsync(() => {
     spyOn(wds, 'isWindowNarrow').and.returnValues(false, true);
     spyOn(document, 'querySelector').and.stub();
-
-    component.checkIfI18NCompleted = null;
+    spyOn(component, 'checkIfI18NCompleted').and.returnValue(false);
 
     component.truncateNavbar();
     tick(101);
@@ -384,5 +390,84 @@ describe('TopNavigationBarComponent', () => {
         I18N_TOPNAV_LIBRARY: true
       });
     });
+  }));
+
+  it('should get profile image data asynchronously', fakeAsync(() => {
+    spyOn(userService, 'getProfileImageDataUrlAsync')
+      .and.resolveTo('%2Fimages%2Furl%2F1');
+    expect(component.profilePictureDataUrl).toBe(undefined);
+
+    component.getProfileImageDataAsync();
+    tick();
+
+    expect(component.profilePictureDataUrl).toBe('/images/url/1');
+  }));
+
+  it('should change the language when user clicks on new language' +
+    ' from dropdown', () => {
+    let langCode = 'hi';
+    spyOn(i18nService, 'updateUserPreferredLanguage');
+    component.changeLanguage(langCode);
+    expect(i18nService.updateUserPreferredLanguage).toHaveBeenCalledWith(
+      langCode);
+  });
+
+  it('should check if classroom promos are enabled', fakeAsync(() => {
+    spyOn(component, 'truncateNavbar').and.stub();
+    spyOn(
+      classroomBackendApiService, 'fetchClassroomPromosAreEnabledStatusAsync')
+      .and.resolveTo(true);
+
+    component.ngOnInit();
+    tick();
+
+    expect(component.CLASSROOM_PROMOS_ARE_ENABLED).toBe(true);
+  }));
+
+  it('should change current language code on' +
+    ' I18nLanguageCode change', fakeAsync(() => {
+    let onI18nLanguageCodeChangeEmitter = new EventEmitter();
+    spyOnProperty(i18nLanguageCodeService, 'onI18nLanguageCodeChange')
+      .and.returnValue(onI18nLanguageCodeChangeEmitter);
+    spyOn(component, 'truncateNavbar').and.stub();
+
+    component.ngOnInit();
+
+    component.currentLanguageCode = 'hi';
+
+    onI18nLanguageCodeChangeEmitter.emit('en');
+    tick();
+
+    expect(component.currentLanguageCode).toBe('en');
+  }));
+
+  it('should get user information on initialization', fakeAsync(() => {
+    let userInfo = new UserInfo(
+      ['USER_ROLE'], true, false, false, false, true,
+      'en', 'username1', 'tester@example.com', true
+    );
+    spyOn(component, 'truncateNavbar').and.stub();
+    spyOn(userService, 'getUserInfoAsync').and.resolveTo(userInfo);
+    spyOn(i18nLanguageCodeService, 'getCurrentI18nLanguageCode')
+      .and.returnValue('en');
+
+    expect(component.isModerator).toBe(false);
+    expect(component.isCurriculumAdmin).toBe(false);
+    expect(component.isTopicManager).toBe(false);
+    expect(component.isSuperAdmin).toBe(false);
+    expect(component.userIsLoggedIn).toBe(false);
+    expect(component.username).toBe(undefined);
+    expect(component.profilePageUrl).toBe(undefined);
+
+    component.ngOnInit();
+    tick();
+
+    expect(component.isModerator).toBe(true);
+    expect(component.isCurriculumAdmin).toBe(false);
+    expect(component.isTopicManager).toBe(false);
+    expect(component.isSuperAdmin).toBe(false);
+    expect(component.userIsLoggedIn).toBe(true);
+    expect(component.username).toBe('username1');
+    expect(component.profilePageUrl).toBe('/profile/username1');
   }));
 });

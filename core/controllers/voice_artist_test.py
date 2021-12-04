@@ -14,17 +14,16 @@
 
 """Tests for the exploration voice artist work."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import datetime
 
+from core import feconf
 from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
@@ -92,7 +91,7 @@ class VoiceArtistTest(BaseVoiceArtistControllerTests):
 
     def test_put_with_no_payload_version_raises_error(self):
         with self.assertRaisesRegexp(
-            Exception, 'Invalid POST request: a version must be specified.'):
+            Exception, 'Missing key in handler args: version.'):
             self.put_json(
                 '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, self.EXP_ID), {
                     'change_list': [{

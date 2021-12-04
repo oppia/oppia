@@ -22,9 +22,14 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { SkillEditorStateService } from '../services/skill-editor-state.service';
-import { Skill, SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
+import { Skill } from 'domain/skill/SkillObjectFactory';
 import { EventEmitter } from '@angular/core';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
+import { UrlService } from 'services/contextual/url.service';
+import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
+import { AppConstants } from 'app.constants';
+import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
 describe('Skill Editor Navbar Directive', function() {
   let $scope = null;
@@ -35,8 +40,8 @@ describe('Skill Editor Navbar Directive', function() {
   let $q = null;
   let skillEditorRoutingService = null;
   let skillEditorStateService: SkillEditorStateService = null;
-  let skillObjectFactory: SkillObjectFactory = null;
   let undoRedoService: UndoRedoService = null;
+  let urlService: UrlService = null;
 
   let sampleSkill: Skill = null;
   let mockEventEmitter = new EventEmitter();
@@ -58,12 +63,24 @@ describe('Skill Editor Navbar Directive', function() {
     $uibModal = $injector.get('$uibModal');
     $q = $injector.get('$q');
     directive = $injector.get('skillEditorNavbarDirective')[0];
-    skillObjectFactory = $injector.get('SkillObjectFactory');
     skillEditorStateService = $injector.get('SkillEditorStateService');
     skillEditorRoutingService = $injector.get('SkillEditorRoutingService');
     undoRedoService = $injector.get('UndoRedoService');
+    urlService = $injector.get('UrlService');
 
-    sampleSkill = skillObjectFactory.createInterstitialSkill();
+    const conceptCard = new ConceptCard(
+      SubtitledHtml.createDefault(
+        'review material', AppConstants.COMPONENT_NAME_EXPLANATION),
+      [],
+      RecordedVoiceovers.createFromBackendDict({
+        voiceovers_mapping: {
+          COMPONENT_NAME_EXPLANATION: {}
+        }
+      })
+    );
+    sampleSkill = new Skill(
+      'id1', 'description', [], [], conceptCard, 'en', 1, 0, 'id1', false, []
+    );
     spyOn(skillEditorStateService, 'getSkill').and.returnValue(sampleSkill);
     spyOnProperty(skillEditorStateService, 'onSkillChange')
       .and.returnValue(mockEventEmitter);
@@ -76,13 +93,11 @@ describe('Skill Editor Navbar Directive', function() {
 
   it('should set properties when initialized', function() {
     expect($scope.activeTab).toBe(undefined);
-    expect(ctrl.skill).toEqual(undefined);
 
     ctrl.$onInit();
     mockEventEmitter.emit();
 
     expect($scope.activeTab).toBe('Editor');
-    expect(ctrl.skill).toEqual(sampleSkill);
   });
 
   it('should get current active tab name when ' +
@@ -129,19 +144,32 @@ describe('Skill Editor Navbar Directive', function() {
     '\'discardChanges\'', function() {
     let discardSpy = spyOn(undoRedoService, 'clearChanges')
       .and.returnValue(null);
+    let loadSkillSpy = spyOn(skillEditorStateService, 'loadSkill')
+      .and.returnValue(null);
+    let urlSpy = spyOn(urlService, 'getSkillIdFromUrl')
+      .and.returnValue('');
 
     ctrl.$onInit();
     $scope.discardChanges();
 
     expect(discardSpy).toHaveBeenCalled();
+    expect(loadSkillSpy).toHaveBeenCalled();
+    expect(urlSpy).toHaveBeenCalled();
   });
 
   it('should get change list count when calling ' +
     '\'getChangeListCount\'', function() {
-    ctrl.$onInit();
-    let result = $scope.getWarningsCount();
+    spyOn(undoRedoService, 'getChangeCount').and.returnValue(3);
 
-    expect(result).toBe(1);
+    expect($scope.getChangeListCount()).toBe(3);
+  });
+
+  it('should get number of warnings when calling ' +
+    '\'getWarningsCount\'', function() {
+    spyOn(skillEditorStateService, 'getSkillValidationIssues')
+      .and.returnValue(['issue 1', 'issue 2', 'issue 3']);
+
+    expect($scope.getWarningsCount()).toBe(3);
   });
 
   it('should check whether the skill is saveable when ' +

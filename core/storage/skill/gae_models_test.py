@@ -16,15 +16,18 @@
 
 """Tests for Skill models."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import datetime
 
-from constants import constants
+from core.constants import constants
 from core.platform import models
 from core.tests import test_utils
-import python_utils
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import base_models
+    from mypy_imports import skill_models
 
 (base_models, skill_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.skill])
@@ -32,7 +35,7 @@ import python_utils
 
 class SkillSnapshotContentModelTests(test_utils.GenericTestBase):
 
-    def test_get_deletion_policy_is_not_applicable(self):
+    def test_get_deletion_policy_is_not_applicable(self) -> None:
         self.assertEqual(
             skill_models.SkillSnapshotContentModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
@@ -41,7 +44,7 @@ class SkillSnapshotContentModelTests(test_utils.GenericTestBase):
 class SkillModelUnitTest(test_utils.GenericTestBase):
     """Test the SkillModel class."""
 
-    def test_get_deletion_policy(self):
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             skill_models.SkillModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
@@ -50,7 +53,7 @@ class SkillModelUnitTest(test_utils.GenericTestBase):
 class SkillCommitLogEntryModelUnitTests(test_utils.GenericTestBase):
     """Tests the SkillCommitLogEntryModel class."""
 
-    def test_has_reference_to_user_id(self):
+    def test_has_reference_to_user_id(self) -> None:
         commit = skill_models.SkillCommitLogEntryModel.create(
             'b', 0, 'committer_id', 'msg', 'create', [{}],
             constants.ACTIVITY_STATUS_PUBLIC, False
@@ -69,12 +72,12 @@ class SkillCommitLogEntryModelUnitTests(test_utils.GenericTestBase):
 class SkillSummaryModelUnitTest(test_utils.GenericTestBase):
     """Test the SkillSummaryModel class."""
 
-    def test_get_deletion_policy(self):
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             skill_models.SkillSummaryModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
-    def test_fetch_page(self):
+    def test_fetch_page(self) -> None:
         skill_models.SkillSummaryModel(
             id='skill_id1',
             description='description1',
@@ -100,7 +103,7 @@ class SkillSummaryModelUnitTest(test_utils.GenericTestBase):
             skill_models.SkillSummaryModel.fetch_page(1, None, None))
         self.assertEqual(skill_summaries[0].id, 'skill_id2')
         self.assertTrue(more)
-        self.assertTrue(isinstance(next_cursor, python_utils.BASESTRING))
+        self.assertIsInstance(next_cursor, str)
 
         skill_summaries, next_cursor, more = (
             skill_models.SkillSummaryModel.fetch_page(10, None, None))

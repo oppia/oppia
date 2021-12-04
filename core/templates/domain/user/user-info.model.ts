@@ -77,6 +77,14 @@ export class UserInfo {
     return this._isModerator;
   }
 
+  isBlogAdmin(): boolean {
+    return (this._roles.includes('BLOG_ADMIN'));
+  }
+
+  isBlogPostEditor(): boolean {
+    return (this._roles.includes('BLOG_POST_EDITOR'));
+  }
+
   isCurriculumAdmin(): boolean {
     return this._isCurriculumAdmin;
   }

@@ -14,8 +14,7 @@
 
 """Tests for the profile page."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import datetime
 import io
@@ -23,7 +22,9 @@ import logging
 import re
 import zipfile
 
-from constants import constants
+from core import feconf
+from core import utils
+from core.constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
@@ -31,24 +32,16 @@ from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import utils
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
 
 class ProfilePageTests(test_utils.GenericTestBase):
 
-    def test_get_profile_page_of_non_existing_user_raises_status_404(self):
-        self.get_html_response(
-            '/profile/%s' % self.OWNER_USERNAME, expected_status_int=404)
-
     def test_get_profile_page_of_existing_user(self):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         response = self.get_html_response('/profile/%s' % self.OWNER_USERNAME)
-        self.assertIn(
-            b'<oppia-profile-page-root></oppia-profile-page-root>',
-            response.body)
+        self.assertIn(b'<oppia-root></oppia-root>', response.body)
 
 
 class ProfileDataHandlerTests(test_utils.GenericTestBase):
@@ -134,7 +127,7 @@ class ProfileDataHandlerTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
 
         response = self.get_html_response(feconf.PREFERENCES_URL)
-        self.assertIn(b'{"title": "Preferences | Oppia"})', response.body)
+        self.assertIn(b'<oppia-root></oppia-root>', response.body)
 
         self.logout()
 
@@ -818,15 +811,8 @@ class DeleteAccountPageTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
 
     def test_get_delete_account_page(self):
-        with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', True):
-            response = self.get_html_response('/delete-account')
-            self.assertIn(
-                b'<oppia-delete-account-page-root>' +
-                b'</oppia-delete-account-page-root>', response.body)
-
-    def test_get_delete_account_page_disabled(self):
-        with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', False):
-            self.get_html_response('/delete-account', expected_status_int=404)
+        response = self.get_html_response('/delete-account')
+        self.assertIn(b'<oppia-root></oppia-root>', response.body)
 
 
 class BulkEmailWebhookEndpointTests(test_utils.GenericTestBase):
@@ -921,13 +907,8 @@ class DeleteAccountHandlerTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
 
     def test_delete_delete_account_page(self):
-        with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', True):
-            data = self.delete_json('/delete-account-handler')
-            self.assertEqual(data, {'success': True})
-
-    def test_delete_delete_account_page_disabled(self):
-        with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', False):
-            self.delete_json('/delete-account-handler', expected_status_int=404)
+        data = self.delete_json('/delete-account-handler')
+        self.assertEqual(data, {'success': True})
 
 
 class ExportAccountHandlerTests(test_utils.GenericTestBase):
@@ -983,11 +964,10 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
             deleted=user_settings.deleted
         ).put()
 
-        constants_swap = self.swap(constants, 'ENABLE_ACCOUNT_EXPORT', True)
         time_swap = self.swap(
             user_services, 'record_user_logged_in', lambda *args: None)
 
-        with constants_swap, time_swap:
+        with time_swap:
             data = self.get_custom_response(
                 '/export-account-handler', 'text/plain')
 
@@ -1046,11 +1026,10 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
             deleted=user_settings.deleted
         ).put()
 
-        constants_swap = self.swap(constants, 'ENABLE_ACCOUNT_EXPORT', True)
         time_swap = self.swap(
             user_services, 'record_user_logged_in', lambda *args: None)
 
-        with constants_swap, time_swap:
+        with time_swap:
             data = self.get_custom_response(
                 '/export-account-handler', 'text/plain')
 
@@ -1067,32 +1046,16 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
                 ]
             )
 
-    def test_export_account_handler_disabled_logged_in(self):
-        with self.swap(constants, 'ENABLE_ACCOUNT_EXPORT', False):
-            self.get_json('/export-account-handler', expected_status_int=404)
-
-    def test_export_account_hander_disabled_logged_out(self):
-        self.logout()
-        with self.swap(constants, 'ENABLE_ACCOUNT_EXPORT', False):
-            self.get_json('/export-account-handler', expected_status_int=401)
-
     def test_export_account_handler_enabled_logged_out(self):
         self.logout()
-        with self.swap(constants, 'ENABLE_ACCOUNT_EXPORT', True):
-            self.get_json('/export-account-handler', expected_status_int=401)
+        self.get_json('/export-account-handler', expected_status_int=401)
 
 
 class PendingAccountDeletionPageTests(test_utils.GenericTestBase):
 
     def test_get_pending_account_deletion_page(self):
-        with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', True):
-            response = self.get_html_response('/pending-account-deletion')
-            self.assertIn(b'Pending Account Deletion', response.body)
-
-    def test_get_pending_account_deletion_page_disabled(self):
-        with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', False):
-            self.get_html_response(
-                '/pending-account-deletion', expected_status_int=404)
+        response = self.get_html_response('/pending-account-deletion')
+        self.assertIn(b'<oppia-root></oppia-root>', response.body)
 
 
 class UsernameCheckHandlerTests(test_utils.GenericTestBase):

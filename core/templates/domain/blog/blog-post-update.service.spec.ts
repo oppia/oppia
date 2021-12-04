@@ -78,17 +78,11 @@ describe('Blog Post update service', () => {
   it('should update the blog post tags and add the change', () => {
     expect(sampleBlogPost.tags).toEqual(['news']);
 
-    blogPostUpdateService.addBlogPostTag(sampleBlogPost, 'learners');
+    blogPostUpdateService.setBlogPostTags(sampleBlogPost, ['news', 'learners']);
 
     expect(sampleBlogPost.tags).toEqual(['news', 'learners']);
     expect(blogPostUpdateService.getBlogPostChangeDict()).toEqual(
       { tags: ['news', 'learners'] });
-
-    blogPostUpdateService.removeBlogPostTag(sampleBlogPost, 'learners');
-
-    expect(sampleBlogPost.tags).toEqual(['news']);
-    expect(blogPostUpdateService.getBlogPostChangeDict()).toEqual(
-      { tags: ['news']});
   });
 
   it('should update the blog post content and add the change in change dict',
@@ -116,10 +110,19 @@ describe('Blog Post update service', () => {
 
       blogPostUpdateService.setBlogPostContent(
         sampleBlogPost, '<p>Hello World</p>');
-      blogPostUpdateService.addBlogPostTag(sampleBlogPost, 'learners');
+      blogPostUpdateService.setBlogPostTags(
+        sampleBlogPost, ['news', 'learners']);
       blogPostUpdateService.setBlogPostTitle(sampleBlogPost, 'story');
 
       expect(blogPostUpdateService.getBlogPostChangeDict()).toEqual(
         expectedChangeDict);
     });
+
+
+  it('should set change dict to default when' +
+  ' setBlogPostChangeDictToDefault is called.', () => {
+    blogPostUpdateService.setBlogPostChangeDictToDefault();
+
+    expect(blogPostUpdateService.changeDict).toEqual({});
+  });
 });

@@ -14,8 +14,7 @@
 
 """Common utility functions and classes used by multiple Python scripts."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import contextlib
 import errno
@@ -30,8 +29,8 @@ import subprocess
 import sys
 import time
 
-import constants
-import python_utils
+from core import constants
+from core import python_utils
 
 AFFIRMATIVE_CONFIRMATIONS = ['y', 'ye', 'yes']
 
@@ -44,7 +43,7 @@ ISORT_VERSION = '5.8.0'
 PYCODESTYLE_VERSION = '2.6.0'
 PSUTIL_VERSION = '5.8.0'
 PYLINT_VERSION = '2.8.3'
-PYLINT_QUOTES_VERSION = '0.1.8'
+PYLINT_QUOTES_VERSION = '0.1.9'
 PYGITHUB_VERSION = '1.45'
 WEBTEST_VERSION = '2.0.35'
 PIP_TOOLS_VERSION = '6.0.1'
@@ -97,6 +96,7 @@ GOOGLE_CLOUD_SDK_HOME = os.path.join(
 GOOGLE_APP_ENGINE_SDK_HOME = os.path.join(
     GOOGLE_CLOUD_SDK_HOME, 'platform', 'google_appengine')
 GOOGLE_CLOUD_SDK_BIN = os.path.join(GOOGLE_CLOUD_SDK_HOME, 'bin')
+ISORT_PATH = os.path.join(OPPIA_TOOLS_DIR, 'isort-%s' % ISORT_VERSION)
 WEBPACK_BIN_PATH = (
     os.path.join(CURR_DIR, 'node_modules', 'webpack', 'bin', 'webpack.js'))
 DEV_APPSERVER_PATH = (
@@ -142,7 +142,7 @@ HOTFIX_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)-hotfix-[1-9]+$'
 TEST_BRANCH_REGEX = r'test-[A-Za-z0-9-]*$'
 USER_PREFERENCES = {'open_new_tab_in_browser': None}
 
-FECONF_PATH = os.path.join('feconf.py')
+FECONF_PATH = os.path.join('core', 'feconf.py')
 CONSTANTS_FILE_PATH = os.path.join('assets', 'constants.ts')
 MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS = 5 * 60
 MAX_WAIT_TIME_FOR_PORT_TO_CLOSE_SECS = 60
@@ -194,7 +194,6 @@ DIRS_TO_ADD_TO_SYS_PATH = [
     os.path.join(OPPIA_TOOLS_DIR, 'grpcio-%s' % GRPCIO_VERSION),
     os.path.join(OPPIA_TOOLS_DIR, 'setuptools-%s' % '36.6.0'),
     os.path.join(OPPIA_TOOLS_DIR, 'PyGithub-%s' % PYGITHUB_VERSION),
-    os.path.join(OPPIA_TOOLS_DIR, 'pip-tools-%s' % PIP_TOOLS_VERSION),
     CURR_DIR,
     THIRD_PARTY_PYTHON_LIBS_DIR,
 ]
@@ -242,7 +241,8 @@ def run_cmd(cmd_tokens):
     Returns:
         str. The output of the command.
     """
-    return subprocess.check_output(cmd_tokens, stderr=subprocess.STDOUT).strip()
+    return subprocess.check_output(
+        cmd_tokens, stderr=subprocess.STDOUT, encoding='utf-8').strip()
 
 
 def ensure_directory_exists(d):
@@ -273,33 +273,29 @@ def require_cwd_to_be_oppia(allow_deploy_dir=False):
 def open_new_tab_in_browser_if_possible(url):
     """Opens the given URL in a new browser tab, if possible."""
     if USER_PREFERENCES['open_new_tab_in_browser'] is None:
-        python_utils.PRINT(
+        print(
             '\nDo you want the url to be opened in the browser? '
             'Confirm by entering y/ye/yes.')
-        USER_PREFERENCES['open_new_tab_in_browser'] = python_utils.INPUT()
+        USER_PREFERENCES['open_new_tab_in_browser'] = input()
     if USER_PREFERENCES['open_new_tab_in_browser'] not in ['y', 'ye', 'yes']:
-        python_utils.PRINT(
-            'Please open the following link in browser: %s' % url)
+        print('Please open the following link in browser: %s' % url)
         return
-    browser_cmds = ['chromium-browser', 'google-chrome', 'firefox']
+    browser_cmds = ['brave', 'chromium-browser', 'google-chrome', 'firefox']
     for cmd in browser_cmds:
         if subprocess.call(['which', cmd]) == 0:
             subprocess.check_call([cmd, url])
             return
-    python_utils.PRINT(
-        '******************************************************************')
-    python_utils.PRINT(
+    print('******************************************************************')
+    print(
         'WARNING: Unable to open browser. Please manually open the following')
-    python_utils.PRINT('URL in a browser window, then press Enter to confirm.')
-    python_utils.PRINT('')
-    python_utils.PRINT('    %s' % url)
-    python_utils.PRINT('')
-    python_utils.PRINT(
-        'NOTE: To get rid of this message, open scripts/common.py and fix')
-    python_utils.PRINT(
-        'the function open_new_tab_in_browser_if_possible() to work on your')
-    python_utils.PRINT('system.')
-    python_utils.INPUT()
+    print('URL in a browser window, then press Enter to confirm.')
+    print('')
+    print('    %s' % url)
+    print('')
+    print('NOTE: To get rid of this message, open scripts/common.py and fix')
+    print('the function open_new_tab_in_browser_if_possible() to work on your')
+    print('system.')
+    input()
 
 
 def get_remote_alias(remote_url):
@@ -469,7 +465,7 @@ def print_each_string_after_two_new_lines(strings):
         strings: list(str). The strings to print.
     """
     for string in strings:
-        python_utils.PRINT('%s\n' % string)
+        print('%s\n' % string)
 
 
 def install_npm_library(library_name, version, path):
@@ -480,10 +476,9 @@ def install_npm_library(library_name, version, path):
         version: str. The library version.
         path: str. The installation path for the library.
     """
-    python_utils.PRINT(
-        'Checking whether %s is installed in %s' % (library_name, path))
+    print('Checking whether %s is installed in %s' % (library_name, path))
     if not os.path.exists(os.path.join(NODE_MODULES_PATH, library_name)):
-        python_utils.PRINT('Installing %s' % library_name)
+        print('Installing %s' % library_name)
         subprocess.check_call([
             'yarn', 'add', '%s@%s' % (library_name, version)])
 
@@ -496,11 +491,10 @@ def ask_user_to_confirm(message):
             to do.
     """
     while True:
-        python_utils.PRINT(
-            '******************************************************')
-        python_utils.PRINT(message)
-        python_utils.PRINT('Confirm once you are done by entering y/ye/yes.\n')
-        answer = python_utils.INPUT().lower()
+        print('******************************************************')
+        print(message)
+        print('Confirm once you are done by entering y/ye/yes.\n')
+        answer = input().lower()
         if answer in AFFIRMATIVE_CONFIRMATIONS:
             return
 
@@ -525,30 +519,6 @@ def get_personal_access_token():
             'access token at https://github.com/settings/tokens and re-run '
             'the script')
     return personal_access_token
-
-
-def check_blocking_bug_issue_count(repo):
-    """Checks the number of unresolved blocking bugs.
-
-    Args:
-        repo: github.Repository.Repository. The PyGithub object for the repo.
-
-    Raises:
-        Exception. Number of unresolved blocking bugs is not zero.
-        Exception. The blocking bug milestone is closed.
-    """
-    blocking_bugs_milestone = repo.get_milestone(
-        number=constants.release_constants.BLOCKING_BUG_MILESTONE_NUMBER)
-    if blocking_bugs_milestone.state == 'closed':
-        raise Exception('The blocking bug milestone is closed.')
-    if blocking_bugs_milestone.open_issues:
-        open_new_tab_in_browser_if_possible(
-            'https://github.com/oppia/oppia/issues?q=is%3Aopen+'
-            'is%3Aissue+milestone%3A%22Blocking+bugs%22')
-        raise Exception(
-            'There are %s unresolved blocking bugs. Please ensure '
-            'that they are resolved before release summary generation.' % (
-                blocking_bugs_milestone.open_issues))
 
 
 def check_prs_for_current_release_are_released(repo):
@@ -607,7 +577,12 @@ def create_readme(dir_path, readme_content):
         f.write(readme_content)
 
 
-def inplace_replace_file(filename, regex_pattern, replacement_string):
+def inplace_replace_file(
+    filename,
+    regex_pattern,
+    replacement_string,
+    expected_number_of_replacements=None
+):
     """Replace the file content in-place with regex pattern. The pattern is used
     to replace the file's content line by line.
 
@@ -619,20 +594,39 @@ def inplace_replace_file(filename, regex_pattern, replacement_string):
         filename: str. The name of the file to be changed.
         regex_pattern: str. The pattern to check.
         replacement_string: str. The content to be replaced.
+        expected_number_of_replacements: optional(int). The number of
+            replacements that should be made. When None no check is done.
     """
     backup_filename = '%s.bak' % filename
     shutil.copyfile(filename, backup_filename)
     new_contents = []
+    total_number_of_replacements = 0
     try:
         regex = re.compile(regex_pattern)
         with python_utils.open_file(backup_filename, 'r') as f:
             for line in f:
-                new_contents.append(regex.sub(replacement_string, line))
+                new_line, number_of_replacements = regex.subn(
+                    replacement_string, line)
+                new_contents.append(new_line)
+                total_number_of_replacements += number_of_replacements
 
         with python_utils.open_file(filename, 'w') as f:
             for line in new_contents:
                 f.write(line)
+
+        if (
+                expected_number_of_replacements is not None and
+                total_number_of_replacements != expected_number_of_replacements
+        ):
+            raise ValueError(
+                'Wrong number of replacements. Expected %s. Performed %s.' % (
+                    expected_number_of_replacements,
+                    total_number_of_replacements
+                )
+            )
+
         os.remove(backup_filename)
+
     except Exception:
         # Restore the content if there was en error.
         os.remove(filename)
@@ -686,10 +680,8 @@ def wait_for_port_to_be_in_use(port_number):
         waited_seconds += 1
     if (waited_seconds == MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS
             and not is_port_in_use(port_number)):
-        python_utils.PRINT(
-            'Failed to start server on port %s, exiting ...' %
-            port_number)
-        python_utils.PRINT(
+        print('Failed to start server on port %s, exiting ...' % port_number)
+        print(
             'This may be because you do not have enough available '
             'memory. Please refer to '
             'https://github.com/oppia/oppia/wiki/Troubleshooting#low-ram')
@@ -748,7 +740,7 @@ def fix_third_party_imports() -> None:
     sys.path.insert(1, THIRD_PARTY_PYTHON_LIBS_DIR)
 
 
-class CD(python_utils.OBJECT):
+class CD:
     """Context manager for changing the current working directory."""
 
     def __init__(self, new_path):

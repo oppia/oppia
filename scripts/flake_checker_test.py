@@ -14,15 +14,12 @@
 
 """Unit tests for scripts/flake_checker.py."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import datetime
 import os
 
 from core.tests import test_utils
-import python_utils
-
 from scripts import flake_checker
 
 import requests
@@ -61,7 +58,7 @@ class CheckIfOnCITests(test_utils.GenericTestBase):
         self.assertFalse(on_ci)
 
 
-class MockDatetime(python_utils.OBJECT):
+class MockDatetime:
 
     def __init__(self, date):
         self.date = date
@@ -204,7 +201,7 @@ class ReportPassTests(test_utils.GenericTestBase):
     def test_unknown_build_environment(self):
 
         def mock_getenv(variable):
-            environment_vars = dict()
+            environment_vars = {}
             return environment_vars.get(variable)
 
         def mock_post(url, json, allow_redirects, headers):  # pylint: disable=unused-argument
@@ -241,12 +238,12 @@ class ReportPassTests(test_utils.GenericTestBase):
                 flake_checker.report_pass('suiteName')
 
 
-class MockResponse(python_utils.OBJECT):
+class MockResponse:
 
     def __init__(
             self, ok=True, json=None, status_code=200, reason='foo'):
         if json is None:
-            json = dict()
+            json = {}
         self.ok = ok
         self.json_dict = json
         self.status_code = status_code

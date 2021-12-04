@@ -16,17 +16,22 @@
 
 """Model for an Oppia exploration."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import datetime
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core import utils
+from core.constants import constants
 from core.platform import models
 import core.storage.base_model.gae_models as base_models
-import feconf
-import python_utils
-import utils
+
+from typing import Any, Dict, List, Optional, Sequence, Tuple
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import datastore_services  # pylint: disable=unused-import
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -41,7 +46,7 @@ class ExplorationSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of an exploration snapshot."""
 
     @staticmethod
-    def get_deletion_policy():
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
@@ -61,7 +66,7 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         datastore_services.StringProperty(indexed=True, required=True))
 
     @staticmethod
-    def get_deletion_policy():
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model contains data to pseudonymize or delete corresponding
         to a user: user_id field.
         """
@@ -70,14 +75,15 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         )
 
     @staticmethod
-    def get_model_association_to_user():
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """The history of commits is not relevant for the purposes of Takeout
         since commits don't contain relevant data corresponding to users.
         """
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls):
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data corresponding to a user, but this isn't exported
         because the history of commits isn't deemed as useful for users since
         commit logs don't contain relevant data corresponding to those users.
@@ -86,8 +92,12 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
             'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
+    # We have ignored [override] here because the signature of this method
+    # doesn't match with BaseModel.get_multi().
     @classmethod
-    def get_multi(cls, exp_id, exp_versions):
+    def get_multi( # type: ignore[override]
+        cls, exp_id: str, exp_versions: List[int]
+    ) -> List[Optional[ExplorationCommitLogEntryModel]]:
         """Gets the ExplorationCommitLogEntryModels for the given exploration
         id and exploration versions.
 
@@ -107,7 +117,7 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
             instance_ids)
 
     @classmethod
-    def get_instance_id(cls, exp_id, exp_version):
+    def get_instance_id(cls, exp_id: str, exp_version: int) -> str:
         """Returns ID of the exploration commit log entry model.
 
         Args:
@@ -120,9 +130,15 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         """
         return 'exploration-%s-%s' % (exp_id, exp_version)
 
+    # TODO(#13523): Change the return value of the function below from
+    # tuple(list, str|None, bool)  to a domain object.
     @classmethod
     def get_all_non_private_commits(
-            cls, page_size, urlsafe_start_cursor, max_age=None):
+        cls,
+        page_size: int,
+        urlsafe_start_cursor: Optional[str],
+        max_age: Optional[datetime.timedelta] = None
+    ) -> Tuple[Sequence[ExplorationCommitLogEntryModel], Optional[str], bool]:
         """Fetches a list of all the non-private commits sorted by their
         last updated attribute.
 
@@ -215,17 +231,18 @@ class ExplorationModel(base_models.VersionedModel):
         default=False, indexed=True)
 
     @staticmethod
-    def get_deletion_policy():
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user():
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls):
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -246,12 +263,19 @@ class ExplorationModel(base_models.VersionedModel):
         })
 
     @classmethod
-    def get_exploration_count(cls):
+    def get_exploration_count(cls) -> int:
         """Returns the total number of explorations."""
         return cls.get_all().count()
 
+    # TODO(#13523): Change 'commit_cmds' to TypedDict/Domain Object
+    # to remove Any used below.
     def _trusted_commit(
-            self, committer_id, commit_type, commit_message, commit_cmds):
+            self,
+            committer_id: str,
+            commit_type: str,
+            commit_message: str,
+            commit_cmds: List[Dict[str, Any]]
+    ) -> None:
         """Record the event to the commit log after the model commit.
 
         Note that this extends the superclass method.
@@ -281,10 +305,16 @@ class ExplorationModel(base_models.VersionedModel):
         exploration_commit_log.update_timestamps()
         exploration_commit_log.put()
 
+    # We have ignored [override] here because the signature of this method
+    # doesn't match with BaseModel.delete_multi().
     @classmethod
-    def delete_multi(
-            cls, entity_ids, committer_id, commit_message,
-            force_deletion=False):
+    def delete_multi( # type: ignore[override]
+            cls,
+            entity_ids: List[str],
+            committer_id: str,
+            commit_message: str,
+            force_deletion: bool = False
+    ) -> None:
         """Deletes the given cls instances with the given entity_ids.
 
         Note that this extends the superclass method.
@@ -310,6 +340,9 @@ class ExplorationModel(base_models.VersionedModel):
             versioned_and_exp_rights_models = python_utils.ZIP(
                 versioned_models, exp_rights_models)
             for model, rights_model in versioned_and_exp_rights_models:
+                # Ruling out the possibility of None for mypy type checking.
+                assert model is not None
+                assert rights_model is not None
                 exploration_commit_log = ExplorationCommitLogEntryModel.create(
                     model.id, model.version, committer_id,
                     cls._COMMIT_TYPE_DELETE,
@@ -322,8 +355,10 @@ class ExplorationModel(base_models.VersionedModel):
                 commit_log_models)
             datastore_services.put_multi(commit_log_models)
 
+    # TODO(#13523): Change snapshot of this model to TypedDict/Domain Object
+    # to remove Any used below.
     @staticmethod
-    def convert_to_valid_dict(snapshot_dict):
+    def convert_to_valid_dict(snapshot_dict: Dict[str, Any]) -> Dict[str, Any]:
         """Replace invalid fields and values in the ExplorationModel dict.
         Some old ExplorationModels can contain fields
         and field values that are no longer supported and would cause
@@ -349,7 +384,12 @@ class ExplorationModel(base_models.VersionedModel):
 
         return snapshot_dict
 
-    def _reconstitute(self, snapshot_dict):
+    # TODO(#13523): Change 'snapshot_dict' to TypedDict/Domain Object
+    # to remove Any used below.
+    def _reconstitute(
+            self,
+            snapshot_dict: Dict[str, Any]
+    ) -> ExplorationModel:
         """Populates the model instance with the snapshot.
         Some old ExplorationSnapshotContentModels can contain fields
         and field values that are no longer supported and would cause
@@ -380,17 +420,18 @@ class ExplorationContextModel(base_models.BaseModel):
     story_id = datastore_services.StringProperty(required=True, indexed=True)
 
     @staticmethod
-    def get_deletion_policy():
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user():
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls):
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'story_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
@@ -409,7 +450,7 @@ class ExplorationRightsSnapshotContentModel(
     """Storage model for the content of an exploration rights snapshot."""
 
     @staticmethod
-    def get_deletion_policy():
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model contains data to pseudonymize or delete corresponding
         to a user: inside the content field there are owner_ids, editor_ids,
         voice_artist_ids, and viewer_ids fields.
@@ -422,7 +463,7 @@ class ExplorationRightsSnapshotContentModel(
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
     @classmethod
-    def has_reference_to_user_id(cls, user_id):
+    def has_reference_to_user_id(cls, user_id: str) -> bool:
         """Check whether ExplorationRightsSnapshotContentModel references
         the given user. The owner_ids, editor_ids, voice_artist_ids,
         and viewer_ids fields are checked through content_user_ids field in
@@ -484,7 +525,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
     )
 
     @staticmethod
-    def get_deletion_policy():
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model contains data to pseudonymize or delete corresponding
         to a user: viewer_ids, voice_artist_ids, editor_ids,
         and owner_ids fields.
@@ -494,7 +535,8 @@ class ExplorationRightsModel(base_models.VersionedModel):
         )
 
     @staticmethod
-    def get_model_association_to_user():
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as one instance shared across users since multiple
         users contribute to an exploration and have varying rights.
         """
@@ -504,7 +546,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
             .ONE_INSTANCE_SHARED_ACROSS_USERS)
 
     @classmethod
-    def get_export_policy(cls):
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'owner_ids': base_models.EXPORT_POLICY.EXPORTED,
@@ -519,7 +561,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
         })
 
     @classmethod
-    def get_field_name_mapping_to_takeout_keys(cls):
+    def get_field_name_mapping_to_takeout_keys(cls) -> Dict[str, str]:
         """Defines the mapping of field names to takeout keys since this model
         is exported as one instance shared across users.
         """
@@ -531,7 +573,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
         }
 
     @classmethod
-    def has_reference_to_user_id(cls, user_id):
+    def has_reference_to_user_id(cls, user_id: str) -> bool:
         """Check whether ExplorationRightsModel reference user.
 
         Args:
@@ -547,7 +589,14 @@ class ExplorationRightsModel(base_models.VersionedModel):
             cls.viewer_ids == user_id
         )).get(keys_only=True) is not None
 
-    def save(self, committer_id, commit_message, commit_cmds):
+    # TODO(#13523): Change 'commit_cmds' to TypedDict/Domain Object
+    # to remove Any used below.
+    def save(
+            self,
+            committer_id: str,
+            commit_message: str,
+            commit_cmds: List[Dict[str, Any]]
+    ) -> None:
         """Saves a new version of the exploration, updating the Exploration
         datastore model.
 
@@ -568,8 +617,10 @@ class ExplorationRightsModel(base_models.VersionedModel):
         super(ExplorationRightsModel, self).commit(
             committer_id, commit_message, commit_cmds)
 
+    # TODO(#13523): Change snapshot of this model to TypedDict/Domain Object
+    # to remove Any used below.
     @staticmethod
-    def convert_to_valid_dict(model_dict):
+    def convert_to_valid_dict(model_dict: Dict[str, Any]) -> Dict[str, Any]:
         """Replace invalid fields and values in the ExplorationRightsModel dict.
 
         Some old ExplorationRightsSnapshotContentModels can contain fields
@@ -617,7 +668,12 @@ class ExplorationRightsModel(base_models.VersionedModel):
 
         return model_dict
 
-    def _reconstitute(self, snapshot_dict):
+    # TODO(#13523): Change 'snapshot_dict' to TypedDict/Domain Object
+    # to remove Any used below.
+    def _reconstitute(
+            self,
+            snapshot_dict: Dict[str, Any]
+    ) -> ExplorationRightsModel:
         """Populates the model instance with the snapshot.
 
         Some old ExplorationRightsSnapshotContentModels can contain fields
@@ -637,8 +693,15 @@ class ExplorationRightsModel(base_models.VersionedModel):
             **ExplorationRightsModel.convert_to_valid_dict(snapshot_dict))
         return self
 
+    # TODO(#13523): Change 'commit_cmds' to TypedDict/Domain Object
+    # to remove Any used below.
     def _trusted_commit(
-            self, committer_id, commit_type, commit_message, commit_cmds):
+            self,
+            committer_id: str,
+            commit_type: str,
+            commit_message: str,
+            commit_cmds: List[Dict[str, Any]]
+    ) -> None:
         """Record the event to the commit log after the model commit.
 
         Note that this extends the superclass method.
@@ -678,6 +741,8 @@ class ExplorationRightsModel(base_models.VersionedModel):
 
         snapshot_metadata_model = self.SNAPSHOT_METADATA_CLASS.get(
             self.get_snapshot_id(self.id, self.version))
+        # Ruling out the possibility of None for mypy type checking.
+        assert snapshot_metadata_model is not None
         snapshot_metadata_model.content_user_ids = list(sorted(
             set(self.owner_ids) |
             set(self.editor_ids) |
@@ -687,7 +752,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
 
         commit_cmds_user_ids = set()
         for commit_cmd in commit_cmds:
-            user_id_attribute_names = python_utils.NEXT(
+            user_id_attribute_names = next(
                 cmd['user_id_attribute_names']
                 for cmd in feconf.EXPLORATION_RIGHTS_CHANGE_ALLOWED_COMMANDS
                 if cmd['name'] == commit_cmd['cmd']
@@ -701,7 +766,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
         snapshot_metadata_model.put()
 
     @classmethod
-    def export_data(cls, user_id):
+    def export_data(cls, user_id: str) -> Dict[str, List[str]]:
         """(Takeout) Export user-relevant properties of ExplorationRightsModel.
 
         Args:
@@ -820,7 +885,7 @@ class ExpSummaryModel(base_models.BaseModel):
     version = datastore_services.IntegerProperty()
 
     @staticmethod
-    def get_deletion_policy():
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model contains data to pseudonymize or delete corresponding
         to a user: viewer_ids, voice_artist_ids, editor_ids, owner_ids,
         contributor_ids, and contributors_summary fields.
@@ -830,7 +895,7 @@ class ExpSummaryModel(base_models.BaseModel):
         )
 
     @classmethod
-    def has_reference_to_user_id(cls, user_id):
+    def has_reference_to_user_id(cls, user_id: str) -> bool:
         """Check whether ExpSummaryModel references user.
 
         Args:
@@ -848,7 +913,7 @@ class ExpSummaryModel(base_models.BaseModel):
         )).get(keys_only=True) is not None
 
     @classmethod
-    def get_non_private(cls):
+    def get_non_private(cls) -> Sequence[ExpSummaryModel]:
         """Returns an iterable with non-private ExpSummary models.
 
         Returns:
@@ -861,7 +926,7 @@ class ExpSummaryModel(base_models.BaseModel):
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
-    def get_top_rated(cls, limit):
+    def get_top_rated(cls, limit: int) -> Sequence[ExpSummaryModel]:
         """Fetches the top-rated exp summaries that are public in descending
         order of scaled_average_rating.
 
@@ -881,7 +946,9 @@ class ExpSummaryModel(base_models.BaseModel):
         ).fetch(limit)
 
     @classmethod
-    def get_private_at_least_viewable(cls, user_id):
+    def get_private_at_least_viewable(
+        cls, user_id: str
+    ) -> Sequence[ExpSummaryModel]:
         """Fetches private exp summaries that are at least viewable by the
         given user.
 
@@ -905,7 +972,7 @@ class ExpSummaryModel(base_models.BaseModel):
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
-    def get_at_least_editable(cls, user_id):
+    def get_at_least_editable(cls, user_id: str) -> Sequence[ExpSummaryModel]:
         """Fetches exp summaries that are at least editable by the given user.
 
         Args:
@@ -924,7 +991,7 @@ class ExpSummaryModel(base_models.BaseModel):
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
-    def get_recently_published(cls, limit):
+    def get_recently_published(cls, limit: int) -> Sequence[ExpSummaryModel]:
         """Fetches exp summaries that are recently published.
 
         Args:
@@ -944,14 +1011,15 @@ class ExpSummaryModel(base_models.BaseModel):
         ).fetch(limit)
 
     @staticmethod
-    def get_model_association_to_user():
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model data has already been exported as a part of the
         ExplorationModel and thus does not need a separate export.
         """
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_export_policy(cls):
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data corresponding to a user, but this isn't exported
         because because noteworthy details that belong to this model have
         already been exported as a part of the ExplorationModel.

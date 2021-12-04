@@ -18,14 +18,12 @@
 models the Cloud Translate API.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
-import python_utils
-import utils
+from core import utils
 
 
-class CloudTranslateEmulator(python_utils.OBJECT):
+class CloudTranslateEmulator:
     """The emulator mocks the translate_text function from the Cloud Translate
     API. This emulator can be used in backend testing, or a local dev
     environment without access to the Cloud Translate API. Expected responses
@@ -62,14 +60,19 @@ class CloudTranslateEmulator(python_utils.OBJECT):
         'cloud_translate/cloud_translate_emulator.py for details)'
     )
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initializes the emulator with pregenerated responses."""
 
         # Pre-generated translations for the following phrases:
         # ('hello world', 'CONTINUE', 'Please continue.', 'Correct!')
         self.expected_responses = self.PREGENERATED_TRANSLATIONS
 
-    def translate(self, text, source_language_code, target_language_code):
+    def translate(
+            self,
+            text: str,
+            source_language_code: str,
+            target_language_code: str
+    ) -> str:
         """Returns the saved expected response for a given input. If no
         response exists for the given input, returns a default response.
 
@@ -96,8 +99,12 @@ class CloudTranslateEmulator(python_utils.OBJECT):
         return self.expected_responses.get(key, self.DEFAULT_RESPONSE)
 
     def add_expected_response(
-            self, source_language_code, target_language_code, source_text,
-            response):
+            self,
+            source_language_code: str,
+            target_language_code: str,
+            source_text: str,
+            response: str
+    ) -> None:
         """Adds an expected response for a given set of inputs.
 
         Args:

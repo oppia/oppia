@@ -20,8 +20,7 @@ Responses are prepopulated, to add additional translations, use:
         source_language_code, target_language_code, source_text, response)
 See cloud_translate_emulator.py for more details"""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from core.platform.translate import cloud_translate_emulator
 from core.platform.translate import cloud_translate_services
@@ -29,7 +28,9 @@ from core.platform.translate import cloud_translate_services
 CLIENT = cloud_translate_emulator.CloudTranslateEmulator()
 
 
-def translate_text(text, source_language, target_language):
+def translate_text(
+        text: str, source_language: str, target_language: str
+) -> str:
     """Translates text into the target language.
 
     For more information on ISO 639-1 see:

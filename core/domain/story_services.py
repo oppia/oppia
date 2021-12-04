@@ -20,13 +20,14 @@ delegate to the Story model class. This will enable the story
 storage model to be changed without affecting this module and others above it.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import copy
 import logging
 
-from constants import constants
+from core import feconf
+from core import utils
+from core.constants import constants
 from core.domain import caching_services
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -37,9 +38,6 @@ from core.domain import story_fetchers
 from core.domain import suggestion_services
 from core.domain import topic_fetchers
 from core.platform import models
-import feconf
-import python_utils
-import utils
 
 (exp_models, story_models, user_models,) = models.Registry.import_models(
     [models.NAMES.exploration, models.NAMES.story, models.NAMES.user])
@@ -222,7 +220,7 @@ def apply_change_list(story_id, change_list):
             '%s %s %s %s' % (
                 e.__class__.__name__, e, story_id, change_list)
         )
-        python_utils.reraise_exception()
+        raise e
 
 
 def does_story_exist_with_url_fragment(url_fragment):
@@ -557,7 +555,7 @@ def update_story(
         committer_id, new_story, commit_message, change_list,
         story_is_published)
     create_story_summary(new_story.id)
-    if story_is_published and _is_topic_published(new_story):
+    if story_is_published:
         opportunity_services.update_exploration_opportunities(
             old_story, new_story)
     suggestion_services.auto_reject_translation_suggestions_for_exp_ids(
@@ -573,19 +571,6 @@ def update_story(
     exp_models.ExplorationContextModel.update_timestamps_multi(
         new_exploration_context_models)
     exp_models.ExplorationContextModel.put_multi(new_exploration_context_models)
-
-
-def _is_topic_published(story):
-    """Returns whether the story's corresponding topic is published.
-
-    Args:
-        story: Story. The story domain object.
-
-    Returns:
-        bool. Whether the the story's corresponding topic is published.
-    """
-    topic_rights = topic_fetchers.get_topic_rights(story.corresponding_topic_id)
-    return topic_rights.topic_is_published
 
 
 def delete_story(committer_id, story_id, force_deletion=False):

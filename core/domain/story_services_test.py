@@ -14,13 +14,15 @@
 
 """Tests the methods defined in story services."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import logging
 import os
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core import utils
+from core.constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import fs_domain
@@ -33,10 +35,6 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-
-import feconf
-import python_utils
-import utils
 
 (story_models, user_models) = models.Registry.import_models(
     [models.NAMES.story, models.NAMES.user])
@@ -1302,7 +1300,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         self.save_new_valid_exploration(
             'exp_id_1', self.user_id_a, title='title', category='Category 1',
-            interaction_id='LogicProof', correctness_feedback_enabled=True)
+            interaction_id='GraphInput', correctness_feedback_enabled=True)
         self.publish_exploration(self.user_id_a, 'exp_id_1')
 
         change_list = [
@@ -1320,10 +1318,10 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_services.validate_explorations_for_story(['exp_id_1'], False))
         self.assertEqual(
             validation_error_messages, [
-                'Invalid interaction LogicProof in exploration with ID: '
+                'Invalid interaction GraphInput in exploration with ID: '
                 'exp_id_1.'])
         with self.assertRaisesRegexp(
-            Exception, 'Invalid interaction LogicProof in exploration with '
+            Exception, 'Invalid interaction GraphInput in exploration with '
             'ID: exp_id_1'):
             story_services.update_story(
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
@@ -1463,7 +1461,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
 
         self.save_new_valid_exploration(
             'exp_id_2', self.user_id_a, title='title 2', category='Category 1',
-            interaction_id='LogicProof', correctness_feedback_enabled=True)
+            interaction_id='GraphInput', correctness_feedback_enabled=True)
         exp_services.update_exploration(
             self.user_id_a, 'exp_id_2', [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,

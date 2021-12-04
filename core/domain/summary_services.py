@@ -16,10 +16,11 @@
 
 """Commands that can be used to operate on activity summaries."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
-from constants import constants
+from core import python_utils
+from core import utils
+from core.constants import constants
 from core.domain import activity_services
 from core.domain import collection_services
 from core.domain import exp_domain
@@ -30,8 +31,6 @@ from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import stats_services
 from core.domain import user_services
-import python_utils
-import utils
 
 _LIBRARY_INDEX_GROUPS = [{
     'header_i18n_id': 'I18N_LIBRARY_GROUPS_MATHEMATICS_&_STATISTICS',
@@ -91,7 +90,7 @@ def get_human_readable_contributors_summary(contributors_summary):
         contributor_usernames[ind]: {
             'num_commits': contributors_summary[contributor_ids[ind]],
         }
-        for ind in python_utils.RANGE(len(contributor_ids))
+        for ind in range(len(contributor_ids))
     }
 
 
@@ -214,7 +213,7 @@ def get_exp_metadata_dicts_matching_query(query_string, search_offset, user):
     Args:
         query_string: str. The search query for which the search is to be
             performed.
-        search_offset: str or None. The offset location to start the search
+        search_offset: int or None. The offset location to start the search
             from. If None, the returned values are from the beginning
             of the results list.
         user: UserActionsInfo. Object having user_id, role and actions for
@@ -224,7 +223,7 @@ def get_exp_metadata_dicts_matching_query(query_string, search_offset, user):
         2-tuple of (exploration_list, new_search_offset). Where:
             - exploration_list list(dict). A list of metadata dicts for
                 explorations matching the query.
-            - new_search_offset (str). New search offset location.
+            - new_search_offset (int). New search offset location.
     """
     exp_ids, new_search_offset = (
         exp_services.get_exploration_ids_matching_query(

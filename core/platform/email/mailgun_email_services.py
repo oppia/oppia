@@ -16,19 +16,29 @@
 
 """Provides mailgun api to send emails."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import base64
+import urllib
 
-import feconf
-import python_utils
+from core import feconf
+from core import python_utils
+from core import utils
+
+from typing import Dict, List, Optional, Union
 
 
 def send_email_to_recipients(
-        sender_email, recipient_emails, subject,
-        plaintext_body, html_body, bcc=None, reply_to=None,
-        recipient_variables=None):
+        sender_email: str,
+        recipient_emails: List[str],
+        subject: str,
+        plaintext_body: str,
+        html_body: str,
+        bcc: Optional[List[str]] = None,
+        reply_to: Optional[str] = None,
+        recipient_variables: Optional[
+            Dict[str, Dict[str, Union[str, float]]]] = None
+) -> bool:
     """Send POST HTTP request to mailgun api. This method is adopted from
     the requests library's post method.
 
@@ -80,7 +90,7 @@ def send_email_to_recipients(
     # https://documentation.mailgun.com/user_manual.html#batch-sending
     recipient_email_lists = [
         recipient_emails[i:i + 1000]
-        for i in python_utils.RANGE(0, len(recipient_emails), 1000)]
+        for i in range(0, len(recipient_emails), 1000)]
     for email_list in recipient_email_lists:
         data = {
             'from': sender_email,
@@ -112,9 +122,12 @@ def send_email_to_recipients(
         server = (
             ('https://api.mailgun.net/v3/%s/messages')
             % feconf.MAILGUN_DOMAIN_NAME)
-        encoded_url = python_utils.url_encode(data)
+        # The 'ascii' is used here, because only ASCII char are allowed in url,
+        # also the docs recommend this approach:
+        # https://docs.python.org/3.7/library/urllib.request.html#urllib-examples
+        encoded_url = urllib.parse.urlencode(data).encode('ascii')
         req = python_utils.url_request(server, encoded_url, header)
-        resp = python_utils.url_open(req)
+        resp = utils.url_open(req)
         # The function url_open returns a file_like object that can be queried
         # for the status code of the url query. If it is not 200, the mail query
         # failed so we return False (this function did not complete

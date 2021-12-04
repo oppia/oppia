@@ -16,15 +16,14 @@
 
 """Tests for the domain objects relating to the user queries."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import datetime
 
+from core import feconf
+from core import utils
 from core.domain import user_query_domain
 from core.tests import test_utils
-import feconf
-import utils
 
 
 class UserQueryTests(test_utils.GenericTestBase):

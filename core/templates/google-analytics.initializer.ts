@@ -18,7 +18,13 @@
 
 import constants from 'assets/constants';
 
-(function() {
+export function initializeGoogleAnalytics() {
+  if (!constants.CAN_SEND_ANALYTICS_EVENTS) {
+    // Mock gtag function will prevent sending analytics to google.
+    window.gtag = function() {}
+    return;
+  }
+
   if (constants.ANALYTICS_ID && constants.SITE_NAME_FOR_ANALYTICS) {
     // Reference doc:
     // https://developers.google.com/analytics/devguides/collection/gtagjs
@@ -35,4 +41,4 @@ import constants from 'assets/constants';
       'forceSSL': true,
     });
   }
-})()
+}

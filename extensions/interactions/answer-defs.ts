@@ -70,27 +70,16 @@ export type InteractiveMapAnswer = number[];
 
 export type ItemSelectionAnswer = string[];
 
-export interface LogicProofAnswer {
-  'assumptions_string': string,
-  'target_string': string,
-  'proof_string': string,
-  'correct': boolean,
-  'error_category'?: string,
-  'error_code'?: string,
-  'error_message'?: string,
-  'error_line_number'?: number
-}
-
 export type MathEquationAnswer = string;
 
 export type MultipleChoiceAnswer = number;
 
 export interface MusicNotesAnswer {
-  readableNoteName: string,
+  readableNoteName: string;
   noteDuration: {
-    num: number,
-    den: number
-  }
+    num: number;
+    den: number;
+  };
 }
 
 export interface NumberWithUnitsAnswer {
@@ -127,7 +116,6 @@ export type InteractionAnswer = (
   ImageClickAnswer |
   InteractiveMapAnswer |
   ItemSelectionAnswer |
-  LogicProofAnswer |
   MultipleChoiceAnswer |
   MusicNotesAnswer |
   NumericExpressionAnswer |

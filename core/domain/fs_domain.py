@@ -16,13 +16,11 @@
 
 """Domain objects representing a file system and a file stream."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
+from core import feconf
+from core import utils
 from core.platform import models
-import feconf
-import python_utils
-import utils
 
 storage_services = models.Registry.import_storage_services()
 app_identity_services = models.Registry.import_app_identity_services()
@@ -39,7 +37,7 @@ ALLOWED_SUGGESTION_IMAGE_CONTEXTS = [
     feconf.IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS]
 
 
-class FileStream(python_utils.OBJECT):
+class FileStream:
     """A class that wraps a file stream, but adds extra attributes to it.
 
     Attributes:
@@ -65,7 +63,7 @@ class FileStream(python_utils.OBJECT):
         return content
 
 
-class GeneralFileSystem(python_utils.OBJECT):
+class GeneralFileSystem:
     """The parent class which is inherited by GcsFileSystem.
 
     Attributes:
@@ -99,7 +97,7 @@ class GeneralFileSystem(python_utils.OBJECT):
                 entity_name not in ALLOWED_SUGGESTION_IMAGE_CONTEXTS):
             raise utils.ValidationError(
                 'Invalid entity_name received: %s.' % entity_name)
-        if not isinstance(entity_id, python_utils.BASESTRING):
+        if not isinstance(entity_id, str):
             raise utils.ValidationError(
                 'Invalid entity_id received: %s' % entity_id)
         if entity_id == '':
@@ -244,7 +242,7 @@ class GcsFileSystem(GeneralFileSystem):
             blob.name.replace(assets_path, '') for blob in blobs_in_dir]
 
 
-class AbstractFileSystem(python_utils.OBJECT):
+class AbstractFileSystem:
     """Interface for a file system."""
 
     def __init__(self, impl):
@@ -339,9 +337,11 @@ class AbstractFileSystem(python_utils.OBJECT):
         # be stored in a file opened in binary mode. However, it is not
         # required for binary data (i.e. when mimetype is set to
         # 'application/octet-stream').
+
+        if isinstance(raw_bytes, str):
+            raw_bytes = raw_bytes.encode('utf-8')
         file_content = (
-            python_utils.convert_to_bytes(raw_bytes)
-            if mimetype != 'application/octet-stream' else raw_bytes)
+            raw_bytes if mimetype != 'application/octet-stream' else raw_bytes)
         self._check_filepath(filepath)
         self._impl.commit(filepath, file_content, mimetype)
 

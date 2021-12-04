@@ -20,16 +20,14 @@ delegate to the Story model class. This will enable the story
 storage model to be changed without affecting this module and others above it.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import copy
 
+from core import feconf
 from core.domain import caching_services
 from core.domain import story_domain
 from core.platform import models
-import feconf
-import python_utils
 
 (story_models, user_models) = models.Registry.import_models(
     [models.NAMES.story, models.NAMES.user])
@@ -146,7 +144,7 @@ def get_story_by_id(story_id, strict=True, version=None):
         Story or None. The domain object representing a story with the
         given id, or None if it does not exist.
     """
-    sub_namespace = python_utils.UNICODE(version) if version else None
+    sub_namespace = str(version) if version else None
     cached_story = caching_services.get_multi(
         caching_services.CACHE_NAMESPACE_STORY,
         sub_namespace,

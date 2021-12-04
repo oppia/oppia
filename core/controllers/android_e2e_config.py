@@ -14,12 +14,13 @@
 
 """Controller for initializing android specific structures."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import os
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import exp_domain
@@ -41,8 +42,6 @@ from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
-import feconf
-import python_utils
 
 
 class InitializeAndroidTestDataHandler(base.BaseHandler):

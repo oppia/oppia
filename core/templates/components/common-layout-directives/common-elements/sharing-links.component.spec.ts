@@ -30,7 +30,8 @@ class MockWindowRef {
       protocol: 'https:',
       host: 'www.oppia.org'
     },
-    open: (url: string) => {}
+    open: (url: string) => {},
+    gtag: () => {}
   };
   get nativeWindow() {
     return this._window;
@@ -165,7 +166,7 @@ describe('SharingLinksComponent', () => {
     component.serverName = 'https://www.oppia.org';
     component.explorationId = 'exp1';
     const modalSpy = spyOn(ngbModal, 'open').and.returnValue(
-      <NgbModalRef>ngbModalRef);
+      ngbModalRef as NgbModalRef);
 
     component.showEmbedExplorationModal();
 

@@ -14,12 +14,11 @@
 
 """Controllers for simple, mostly-static pages (like About, Splash, etc.)."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
+from core import feconf
 from core.controllers import acl_decorators
 from core.controllers import base
-import feconf
 
 
 class ForumRedirectPage(base.BaseHandler):
@@ -61,7 +60,7 @@ class FoundationRedirectPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.redirect(feconf.FOUNDATION_SITE_URL)
+        self.redirect(feconf.ABOUT_FOUNDATION_PAGE_URL)
 
 
 class TeachRedirectPage(base.BaseHandler):

@@ -14,15 +14,13 @@
 
 """Image validation service."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import imghdr
 
+from core import feconf
+from core import utils
 from core.domain import html_validation_service
-
-import feconf
-import utils
 
 
 def validate_image_and_filename(raw_image, filename):

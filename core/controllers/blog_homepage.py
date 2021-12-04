@@ -14,15 +14,14 @@
 
 """Controllers for the blog homepage."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
+from core import feconf
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import blog_services
 from core.domain import config_domain
 from core.domain import user_services
-import feconf
 
 BLOG_ADMIN = feconf.ROLE_ID_BLOG_ADMIN
 BLOG_POST_EDITOR = feconf.ROLE_ID_BLOG_POST_EDITOR
@@ -153,7 +152,7 @@ class AuthorsPageHandler(base.BaseHandler):
         blog_post_summaries = (
             blog_services.get_published_blog_post_summaries_by_user_id(
                 user_settings.user_id,
-                feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_AUTHOR_SPECIFIC_BLOG_POST_PAGE)) #pylint: disable=line-too-long
+                feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_AUTHOR_SPECIFIC_BLOG_POST_PAGE)) # pylint: disable=line-too-long
         blog_post_summary_dicts = []
         if blog_post_summaries:
             blog_post_summary_dicts = (

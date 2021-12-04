@@ -16,17 +16,20 @@
 
 """Tests for core.domain.acl_decorators."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import json
 
-from constants import constants
+from core import android_validation_constants
+from core import feconf
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import app_feedback_report_domain
 from core.domain import blog_services
 from core.domain import classifier_domain
 from core.domain import classifier_services
+from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
@@ -45,8 +48,6 @@ from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 from core.tests import test_utils
-import feconf
-import python_utils
 
 import webapp2
 import webtest
@@ -351,6 +352,86 @@ class EditCollectionDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
 
+class ClassroomExistDecoratorTests(test_utils.GenericTestBase):
+    """Tests for does_classroom_exist decorator"""
+
+    class MockDataHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'classroom_url_fragment': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {
+            'GET': {}
+        }
+
+        @acl_decorators.does_classroom_exist
+        def get(self, _):
+            self.render_json({'success': True})
+
+    class MockPageHandler(base.BaseHandler):
+        URL_PATH_ARGS_SCHEMAS = {
+            'classroom_url_fragment': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {
+            'GET': {}
+        }
+
+        @acl_decorators.does_classroom_exist
+        def get(self, _):
+            self.render_json('oppia-root.mainpage.html')
+
+    def setUp(self):
+        super(ClassroomExistDecoratorTests, self).setUp()
+        self.signup(
+            self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.user_id_admin = (
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        config_services.set_property(
+            self.user_id_admin, 'classroom_pages_data', [{
+                'name': 'math',
+                'url_fragment': 'math',
+                'topic_ids': [],
+                'course_details': '',
+                'topic_list_intro': ''
+            }])
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route(
+                '/mock_classroom_data/<classroom_url_fragment>',
+                self.MockDataHandler),
+            webapp2.Route(
+                '/mock_classroom_page/<classroom_url_fragment>',
+                self.MockPageHandler
+            )],
+            debug=feconf.DEBUG
+        ))
+
+    def test_any_user_can_access_a_valid_classroom(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock_classroom_data/math', expected_status_int=200)
+
+    def test_redirects_user_to_default_classroom_if_given_not_available(
+            self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock_classroom_data/invalid', expected_status_int=404)
+
+    def test_raises_error_if_return_type_is_not_json(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_html_response(
+                '/mock_classroom_page/invalid', expected_status_int=500)
+
+
 class CreateExplorationDecoratorTests(test_utils.GenericTestBase):
     """Tests for can_create_exploration decorator."""
 
@@ -563,7 +644,7 @@ class CommentOnFeedbackThreadTests(test_utils.GenericTestBase):
             response = self.get_json(
                 '/mock_comment_on_feedback_thread/invalid_thread_id',
                 expected_status_int=400)
-            self.assertEqual(response['error'], 'Thread ID must contain a .')
+            self.assertEqual(response['error'], 'Not a valid thread id.')
         self.logout()
 
     def test_guest_cannot_comment_on_feedback_threads_via_json_handler(self):
@@ -772,6 +853,15 @@ class ViewFeedbackThreadTests(test_utils.GenericTestBase):
             self.assertEqual(
                 response['error'], 'You do not have credentials to view '
                 'exploration feedback.')
+        self.logout()
+
+    def test_viewer_cannot_view_feedback_threads_with_invalid_thread_id(self):
+        self.login(self.viewer_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_view_feedback_thread/invalid_thread_id',
+                expected_status_int=400)
+            self.assertEqual(response['error'], 'Not a valid thread id.')
         self.logout()
 
     def test_viewer_can_view_non_exploration_related_feedback(self):
@@ -3295,7 +3385,7 @@ class StoryViewerTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_access_story_viewer_page
         def get(self, _):
-            self.render_template('story-viewer-page.mainpage.html')
+            self.render_template('oppia-root.mainpage.html')
 
     def setUp(self):
         super(StoryViewerTests, self).setUp()
@@ -4548,6 +4638,9 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
+        self.signup(self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
+        self.add_user_role(
+            self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_BLOG_ADMIN)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.set_moderators([self.MODERATOR_USERNAME])
@@ -4642,6 +4735,51 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
                 feconf.ENTITY_TYPE_SKILL, skill_id))
             self.assertEqual(response['entity_id'], skill_id)
             self.assertEqual(response['entity_type'], 'skill')
+        self.logout()
+
+    def test_can_submit_images_to_questions(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id, self.admin_id, description='Description')
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock_edit_entity/%s/%s' % (
+                feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS, skill_id))
+            self.assertEqual(response['entity_id'], skill_id)
+            self.assertEqual(response['entity_type'], 'question_suggestions')
+        self.logout()
+
+    def test_unauthenticated_users_cannot_submit_images_to_questions(self):
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id, self.admin_id, description='Description')
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock_edit_entity/%s/%s' % (
+                feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS, skill_id),
+                expected_status_int=401)
+
+    def test_cannot_submit_images_to_questions_without_having_permissions(self):
+        self.login(self.user_email)
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id, self.admin_id, description='Description')
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock_edit_entity/%s/%s' % (
+                feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS, skill_id),
+                expected_status_int=401)
+            self.assertEqual(
+                response['error'], 'You do not have credentials to submit'
+                ' images to questions.')
+        self.logout()
+
+    def test_can_edit_blog_post(self):
+        self.login(self.BLOG_ADMIN_EMAIL)
+        blog_admin_id = (
+            self.get_user_id_from_email(self.BLOG_ADMIN_EMAIL))
+        blog_post = blog_services.create_new_blog_post(blog_admin_id)
+        blog_post_id = blog_post.id
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock_edit_entity/%s/%s' % (
+                feconf.ENTITY_TYPE_BLOG_POST, blog_post_id))
+            self.assertEqual(response['entity_id'], blog_post_id)
+            self.assertEqual(response['entity_type'], 'blog_post')
         self.logout()
 
     def test_can_edit_story(self):
@@ -4857,8 +4995,8 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
         secret = 'fake_secret'
         payload['message'] = json.dumps('malicious message')
         payload['signature'] = classifier_services.generate_signature(
-            python_utils.convert_to_bytes(secret),
-            python_utils.convert_to_bytes(payload['message']),
+            secret.encode('utf-8'),
+            payload['message'].encode('utf-8'),
             payload['vm_id'])
 
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -4872,8 +5010,8 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
         secret = feconf.DEFAULT_VM_SHARED_SECRET
         payload['message'] = json.dumps('malicious message')
         payload['signature'] = classifier_services.generate_signature(
-            python_utils.convert_to_bytes(secret),
-            python_utils.convert_to_bytes(payload['message']),
+            secret.encode('utf-8'),
+            payload['message'].encode('utf-8'),
             payload['vm_id'])
         with self.swap(self, 'testapp', self.mock_testapp):
             with self.swap(constants, 'DEV_MODE', False):
@@ -4886,8 +5024,7 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
         secret = feconf.DEFAULT_VM_SHARED_SECRET
         payload['message'] = json.dumps('malicious message')
         payload['signature'] = classifier_services.generate_signature(
-            python_utils.convert_to_bytes(secret),
-            python_utils.convert_to_bytes('message'), payload['vm_id'])
+            secret.encode('utf-8'), 'message'.encode('utf-8'), payload['vm_id'])
 
         with self.swap(self, 'testapp', self.mock_testapp):
             self.post_json(
@@ -4899,8 +5036,8 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
         secret = feconf.DEFAULT_VM_SHARED_SECRET
         payload['message'] = json.dumps('message')
         payload['signature'] = classifier_services.generate_signature(
-            python_utils.convert_to_bytes(secret),
-            python_utils.convert_to_bytes(payload['message']),
+            secret.encode('utf-8'),
+            payload['message'].encode('utf-8'),
             payload['vm_id'])
 
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -5154,3 +5291,160 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
         self.assertEqual(
             response['error'], 'Invalid suggestion type.')
         self.logout()
+
+
+class OppiaAndroidDecoratorTest(test_utils.GenericTestBase):
+    """Tests for is_from_oppia_android decorator."""
+
+    class MockHandler(base.BaseHandler):
+        REQUIRE_PAYLOAD_CSRF_CHECK = False
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {
+            'POST': {
+                'report': {
+                    'schema': {
+                        'type': 'object_dict',
+                        'object_class': (
+                            app_feedback_report_domain.AppFeedbackReport)
+                    }
+                }
+            }
+        }
+
+        @acl_decorators.is_from_oppia_android
+        def post(self):
+            return self.render_json({})
+
+    REPORT_JSON = {
+        'platform_type': 'android',
+        'android_report_info_schema_version': 1,
+        'app_context': {
+            'entry_point': {
+                'entry_point_name': 'navigation_drawer',
+                'entry_point_exploration_id': None,
+                'entry_point_story_id': None,
+                'entry_point_topic_id': None,
+                'entry_point_subtopic_id': None,
+            },
+            'text_size': 'large_text_size',
+            'text_language_code': 'en',
+            'audio_language_code': 'en',
+            'only_allows_wifi_download_and_update': True,
+            'automatically_update_topics': False,
+            'account_is_profile_admin': False,
+            'event_logs': ['example', 'event'],
+            'logcat_logs': ['example', 'log']
+        },
+        'device_context': {
+            'android_device_model': 'example_model',
+            'android_sdk_version': 23,
+            'build_fingerprint': 'example_fingerprint_id',
+            'network_type': 'wifi'
+        },
+        'report_submission_timestamp_sec': 1615519337,
+        'report_submission_utc_offset_hrs': 0,
+        'system_context': {
+            'platform_version': '0.1-alpha-abcdef1234',
+            'package_version_code': 1,
+            'android_device_country_locale_code': 'in',
+            'android_device_language_locale_code': 'en'
+        },
+        'user_supplied_feedback': {
+            'report_type': 'suggestion',
+            'category': 'language_suggestion',
+            'user_feedback_selected_items': [],
+            'user_feedback_other_text_input': 'french'
+        }
+    }
+
+    ANDROID_APP_VERSION_NAME = '1.0.0-flavor-commithash'
+    ANDROID_APP_VERSION_CODE = '2'
+
+    def setUp(self):
+        super(OppiaAndroidDecoratorTest, self).setUp()
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route(
+                '/appfeedbackreporthandler/incoming_android_report',
+                self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_that_no_exception_is_raised_when_valid_oppia_android_headers(self):
+        headers = {
+            'api_key': android_validation_constants.ANDROID_API_KEY,
+            'app_package_name': (
+                android_validation_constants.ANDROID_APP_PACKAGE_NAME),
+            'app_version_name': self.ANDROID_APP_VERSION_NAME,
+            'app_version_code': self.ANDROID_APP_VERSION_CODE
+        }
+        payload = {}
+        payload['report'] = self.REPORT_JSON
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.post_json(
+                '/appfeedbackreporthandler/incoming_android_report', payload,
+                headers=headers)
+
+    def test_invalid_api_key_raises_exception(self):
+        invalid_headers = {
+            'api_key': 'bad_key',
+            'app_package_name': (
+                android_validation_constants.ANDROID_APP_PACKAGE_NAME),
+            'app_version_name': self.ANDROID_APP_VERSION_NAME,
+            'app_version_code': self.ANDROID_APP_VERSION_CODE
+        }
+        payload = {}
+        payload['report'] = self.REPORT_JSON
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.post_json(
+                '/appfeedbackreporthandler/incoming_android_report', payload,
+                headers=invalid_headers, expected_status_int=401)
+
+    def test_invalid_package_name_raises_exception(self):
+        invalid_headers = {
+            'api_key': android_validation_constants.ANDROID_API_KEY,
+            'app_package_name': 'bad_package_name',
+            'app_version_name': self.ANDROID_APP_VERSION_NAME,
+            'app_version_code': self.ANDROID_APP_VERSION_CODE
+        }
+        payload = {}
+        payload['report'] = self.REPORT_JSON
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.post_json(
+                '/appfeedbackreporthandler/incoming_android_report', payload,
+                headers=invalid_headers, expected_status_int=401)
+
+    def test_invalid_version_name_raises_exception(self):
+        invalid_headers = {
+            'api_key': android_validation_constants.ANDROID_API_KEY,
+            'app_package_name': (
+                android_validation_constants.ANDROID_APP_PACKAGE_NAME),
+            'app_version_name': 'bad_version_name',
+            'app_version_code': self.ANDROID_APP_VERSION_CODE
+        }
+        payload = {}
+        payload['report'] = self.REPORT_JSON
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.post_json(
+                '/appfeedbackreporthandler/incoming_android_report', payload,
+                headers=invalid_headers, expected_status_int=401)
+
+    def test_invalid_version_code_raises_exception(self):
+        invalid_headers = {
+            'api_key': android_validation_constants.ANDROID_API_KEY,
+            'app_package_name': (
+                android_validation_constants.ANDROID_APP_PACKAGE_NAME),
+            'app_version_name': self.ANDROID_APP_VERSION_NAME,
+            'app_version_code': 'bad_version_code'
+        }
+        payload = {}
+        payload['report'] = self.REPORT_JSON
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.post_json(
+                '/appfeedbackreporthandler/incoming_android_report', payload,
+                headers=invalid_headers, expected_status_int=401)

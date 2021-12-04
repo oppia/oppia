@@ -53,14 +53,14 @@ angular.module('oppia').component('practiceSessionPage', {
               topic_url_fragment: topicUrlFragment,
               classroom_url_fragment: (
                 UrlService.getClassroomUrlFragmentFromLearnerUrl()),
-              comma_separated_subtopic_ids: ctrl.commaSeparatedSubtopicIds
+              stringified_subtopic_ids: ctrl.stringifiedSubtopicIds
             });
         var practiceSessionsUrl = UrlInterpolationService.interpolateUrl(
           PRACTICE_SESSIONS_URL, {
             topic_url_fragment: topicUrlFragment,
             classroom_url_fragment: (
               UrlService.getClassroomUrlFragmentFromLearnerUrl()),
-            comma_separated_subtopic_ids: ctrl.commaSeparatedSubtopicIds
+            stringified_subtopic_ids: ctrl.stringifiedSubtopicIds
           });
         var topicViewerUrl = UrlInterpolationService.interpolateUrl(
           TOPIC_VIEWER_PAGE, {
@@ -79,19 +79,19 @@ angular.module('oppia').component('practiceSessionPage', {
           var questionPlayerConfig = {
             resultActionButtons: [
               {
-                type: 'BOOST_SCORE',
-                i18nId: 'I18N_QUESTION_PLAYER_BOOST_SCORE'
+                type: 'REVIEW_LOWEST_SCORED_SKILL',
+                i18nId: 'I18N_QUESTION_PLAYER_REVIEW_LOWEST_SCORED_SKILL'
+              },
+              {
+                type: 'DASHBOARD',
+                i18nId: 'I18N_QUESTION_PLAYER_MY_DASHBOARD',
+                url: topicViewerUrl
               },
               {
                 type: 'RETRY_SESSION',
                 i18nId: 'I18N_QUESTION_PLAYER_NEW_SESSION',
                 url: practiceSessionsUrl
               },
-              {
-                type: 'DASHBOARD',
-                i18nId: 'I18N_QUESTION_PLAYER_MY_DASHBOARD',
-                url: topicViewerUrl
-              }
             ],
             skillList: skillList,
             skillDescriptions: skillDescriptions,
@@ -100,13 +100,13 @@ angular.module('oppia').component('practiceSessionPage', {
           };
           ctrl.questionPlayerConfig = questionPlayerConfig;
           ctrl.topicName = result.data.topic_name;
-          PageTitleService.setPageTitle(
+          PageTitleService.setDocumentTitle(
             'Practice Session: ' + ctrl.topicName + ' - Oppia');
         });
       };
       ctrl.$onInit = function() {
         ctrl.topicName = UrlService.getTopicUrlFragmentFromLearnerUrl();
-        ctrl.commaSeparatedSubtopicIds = (
+        ctrl.stringifiedSubtopicIds = (
           UrlService.getSelectedSubtopicsFromUrl());
         _fetchSkillDetails();
       };

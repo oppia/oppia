@@ -47,13 +47,13 @@ import {
   InteractiveMapCustomizationArgs,
   ItemSelectionInputCustomizationArgs,
   ItemSelectionInputCustomizationArgsBackendDict,
-  LogicProofCustomizationArgs,
   MathEquationInputCustomizationArgs,
   MultipleChoiceInputCustomizationArgs,
   MultipleChoiceInputCustomizationArgsBackendDict,
   MusicNotesInputCustomizationArgs,
   NumberWithUnitsCustomizationArgs,
   NumericExpressionInputCustomizationArgs,
+  NumericInputCustomizationArgsBackendDict,
   NumericInputCustomizationArgs,
   PencilCodeEditorCustomizationArgs,
   RatioExpressionInputCustomizationArgs,
@@ -78,7 +78,8 @@ export interface InteractionBackendDict {
   'confirmed_unclassified_answers': readonly InteractionAnswer[];
   'customization_args': InteractionCustomizationArgsBackendDict;
   'hints': readonly HintBackendDict[];
-  'id': string;
+  // Id is null until populated from the backend,
+  'id': string | null;
   // A null 'solution' indicates that this Interaction does not have a hint
   // or there is a hint, but no solution. A new interaction is initialised with
   // null 'solution' and stays null until the first hint with solution is added.
@@ -91,14 +92,14 @@ export class Interaction {
   customizationArgs: InteractionCustomizationArgs;
   defaultOutcome: Outcome | null;
   hints: Hint[];
-  id: string;
+  id: string | null;
   solution: Solution | null;
   constructor(
       answerGroups: AnswerGroup[],
       confirmedUnclassifiedAnswers: readonly InteractionAnswer[],
       customizationArgs: InteractionCustomizationArgs,
       defaultOutcome: Outcome | null,
-      hints: Hint[], id: string, solution: Solution | null) {
+      hints: Hint[], id: string | null, solution: Solution | null) {
     this.answerGroups = answerGroups;
     this.confirmedUnclassifiedAnswers = confirmedUnclassifiedAnswers;
     this.customizationArgs = customizationArgs;
@@ -157,7 +158,7 @@ export class Interaction {
       } else if (value instanceof Object) {
         type KeyOfValue = keyof typeof value;
         let _result: Record<KeyOfValue, Object> = {};
-        let keys = <KeyOfValue[]>Object.keys(value);
+        let keys = Object.keys(value) as KeyOfValue[];
         keys.forEach(key => {
           _result[key] = traverseSchemaAndConvertSubtitledToDicts(value[key]);
         });
@@ -206,7 +207,7 @@ export class Interaction {
           element => traverseValueAndRetrieveContentIdsFromSubtitled(element));
       } else if (value instanceof Object) {
         type KeyOfValue = keyof typeof value;
-        const keys = <KeyOfValue[]>Object.keys(value);
+        const keys = Object.keys(value) as KeyOfValue[];
         keys.forEach(key => {
           traverseValueAndRetrieveContentIdsFromSubtitled(value[key]);
         });
@@ -379,8 +380,15 @@ export class InteractionObjectFactory {
     };
   }
 
+  _createFromNumericInputCustomizationArgsBackendDict(
+      caBackendDict: NumericInputCustomizationArgsBackendDict
+  ): NumericInputCustomizationArgs {
+    const { requireNonnegativeInput } = caBackendDict;
+    return { requireNonnegativeInput };
+  }
+
   convertFromCustomizationArgsBackendDict(
-      interactionId: string,
+      interactionId: string | null,
       caBackendDict: InteractionCustomizationArgsBackendDict
   ): InteractionCustomizationArgs {
     if (interactionId === null) {
@@ -389,59 +397,61 @@ export class InteractionObjectFactory {
     switch (interactionId) {
       case 'AlgebraicExpressionInput':
         return (
-          <AlgebraicExpressionInputCustomizationArgs> cloneDeep(caBackendDict));
+          cloneDeep(caBackendDict as AlgebraicExpressionInputCustomizationArgs)
+        );
       case 'CodeRepl':
-        return <CodeReplCustomizationArgs> cloneDeep(caBackendDict);
+        return cloneDeep(caBackendDict as CodeReplCustomizationArgs);
       case 'Continue':
         return this._createFromContinueCustomizationArgsBackendDict(
-          <ContinueCustomizationArgsBackendDict> caBackendDict);
+          caBackendDict as ContinueCustomizationArgsBackendDict);
       case 'DragAndDropSortInput':
         return this._createFromDragAndDropSortInputCustomizationArgsBackendDict(
-          <DragAndDropSortInputCustomizationArgsBackendDict> caBackendDict);
+          caBackendDict as DragAndDropSortInputCustomizationArgsBackendDict);
       case 'EndExploration':
-        return <EndExplorationCustomizationArgs> cloneDeep(caBackendDict);
+        return cloneDeep(caBackendDict as EndExplorationCustomizationArgs);
       case 'FractionInput':
         return this._createFromFractionInputCustomizationArgsBackendDict(
-          <FractionInputCustomizationArgsBackendDict> caBackendDict);
+          caBackendDict as FractionInputCustomizationArgsBackendDict);
       case 'GraphInput':
         return (
-          <GraphInputCustomizationArgs> cloneDeep(caBackendDict));
+          cloneDeep(caBackendDict as GraphInputCustomizationArgs));
       case 'ImageClickInput':
-        return <ImageClickInputCustomizationArgs> cloneDeep(caBackendDict);
+        return cloneDeep(caBackendDict as ImageClickInputCustomizationArgs);
       case 'InteractiveMap':
-        return <InteractiveMapCustomizationArgs> cloneDeep(caBackendDict);
+        return cloneDeep(caBackendDict as InteractiveMapCustomizationArgs);
       case 'ItemSelectionInput':
         return this._createFromItemSelectionInputCustomizationArgsBackendDict(
-          <ItemSelectionInputCustomizationArgsBackendDict> caBackendDict);
-      case 'LogicProof':
-        return <LogicProofCustomizationArgs> cloneDeep(caBackendDict);
+          caBackendDict as ItemSelectionInputCustomizationArgsBackendDict);
       case 'MathEquationInput':
-        return <MathEquationInputCustomizationArgs> cloneDeep(caBackendDict);
+        return cloneDeep(caBackendDict as MathEquationInputCustomizationArgs);
       case 'MultipleChoiceInput':
         return this._createFromIMultipleChoiceInputCustomizationArgsBackendDict(
-          <MultipleChoiceInputCustomizationArgsBackendDict> caBackendDict);
+          caBackendDict as MultipleChoiceInputCustomizationArgsBackendDict);
       case 'MusicNotesInput':
-        return <MusicNotesInputCustomizationArgs> cloneDeep(caBackendDict);
+        return cloneDeep(caBackendDict as MusicNotesInputCustomizationArgs);
       case 'NumberWithUnits':
-        return <NumberWithUnitsCustomizationArgs> cloneDeep(caBackendDict);
+        return cloneDeep(caBackendDict as NumberWithUnitsCustomizationArgs);
       case 'NumericExpressionInput':
         return (
           this._createFromNumericExpressionInputCustomizationArgsBackendDict(
-            <NumericExpressionInputCustomizationArgsBackendDict> caBackendDict)
+            caBackendDict as NumericExpressionInputCustomizationArgsBackendDict)
         );
       case 'NumericInput':
-        return <NumericInputCustomizationArgs> cloneDeep(caBackendDict);
+        return (
+          this._createFromNumericInputCustomizationArgsBackendDict(
+            caBackendDict as NumericInputCustomizationArgsBackendDict)
+        );
       case 'PencilCodeEditor':
-        return <PencilCodeEditorCustomizationArgs> cloneDeep(caBackendDict);
+        return cloneDeep(caBackendDict as PencilCodeEditorCustomizationArgs);
       case 'RatioExpressionInput':
         return this._createFromRatioExpressionInputCustomizationArgsBackendDict(
-          <RatioExpressionInputCustomizationArgsBackendDict> caBackendDict);
+          caBackendDict as RatioExpressionInputCustomizationArgsBackendDict);
       case 'SetInput':
         return this._createFromSetInputCustomizationArgsBackendDict(
-          <SetInputCustomizationArgsBackendDict> caBackendDict);
+          caBackendDict as SetInputCustomizationArgsBackendDict);
       case 'TextInput':
         return this._createFromTextInputCustomizationArgsBackendDict(
-          <TextInputCustomizationArgsBackendDict> caBackendDict);
+          caBackendDict as TextInputCustomizationArgsBackendDict);
       default:
         throw new Error(`Unrecognized interaction id ${interactionId}`);
     }
@@ -465,7 +475,7 @@ export class InteractionObjectFactory {
 
   createAnswerGroupsFromBackendDict(
       answerGroupBackendDicts: readonly AnswerGroupBackendDict[],
-      interactionId: string
+      interactionId: string | null
   ): AnswerGroup[] {
     return answerGroupBackendDicts.map((
         answerGroupBackendDict) => {

@@ -69,6 +69,9 @@ class MatIcon {
   constructor(
       public readonly tooltip: string,
       public readonly code: string,
+      // The color is null for the job state 'cancelling', 'cancelled' and
+      // 'drained' since we want their respective icons to use the default
+      // font color of the component and not any of the theme colors.
       public readonly color: string | null) {}
 }
 
@@ -76,7 +79,6 @@ export interface BeamJobRunBackendDict {
   'job_id': string;
   'job_name': string;
   'job_state': BeamJobRunState;
-  'job_arguments': string[];
   'job_started_on_msecs': number;
   'job_updated_on_msecs': number;
   'job_is_synchronous': boolean;
@@ -89,7 +91,6 @@ export class BeamJobRun {
       public readonly jobId: string,
       public readonly jobName: string,
       public readonly jobState: BeamJobRunState,
-      public readonly jobArguments: readonly string[],
       public readonly jobStartedOnMsecs: number,
       public readonly jobUpdatedOnMsecs: number,
       public readonly jobIsSynchronous: boolean) {
@@ -139,7 +140,9 @@ export class BeamJobRun {
     return this.matIcon.code;
   }
 
-  getJobStatusMaterialThemeColor(): string {
+  // This will return null if the current font color of the
+  // component is to be used as the color for the icon.
+  getJobStatusMaterialThemeColor(): string | null {
     return this.matIcon.color;
   }
 
@@ -178,7 +181,7 @@ export class BeamJobRun {
   static createFromBackendDict(backendDict: BeamJobRunBackendDict): BeamJobRun {
     return new BeamJobRun(
       backendDict.job_id, backendDict.job_name, backendDict.job_state,
-      backendDict.job_arguments, backendDict.job_started_on_msecs,
-      backendDict.job_updated_on_msecs, backendDict.job_is_synchronous);
+      backendDict.job_started_on_msecs, backendDict.job_updated_on_msecs,
+      backendDict.job_is_synchronous);
   }
 }

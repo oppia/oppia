@@ -16,17 +16,14 @@
 
 """Tests for cloud_storage_services."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import annotations  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
 from core.platform.storage import cloud_storage_services
 from core.tests import test_utils
 
 from google.cloud import storage
 
-from typing import ( # isort:skip # pylint: disable=unused-import
-    Any, Dict, List, Optional, Sequence, Text, Tuple, TypeVar)
+from typing import Dict, List, Optional
 
 
 class MockClient:

@@ -14,12 +14,12 @@
 
 """Tests for the page that allows learners to play through an exploration."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import logging
 
-from constants import constants
+from core import feconf
+from core.constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_domain
@@ -43,8 +43,6 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import python_utils
 
 (classifier_models, stats_models) = models.Registry.import_models(
     [models.NAMES.classifier, models.NAMES.statistics])
@@ -343,8 +341,7 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
         skill_ids_for_url = ''
 
         # Create multiple skills, questions and skill links.
-        for _ in python_utils.RANGE(
-                feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME):
+        for _ in range(feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME):
             skill_id = skill_services.get_new_skill_id()
             skill_ids_for_url = skill_ids_for_url + skill_id + ','
             self.save_new_skill(skill_id, 'user', description='Description')
@@ -357,7 +354,7 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
 
         # Create additional skills with user skill mastery > 0.0,
         # so that these are filtered out correctly.
-        for _ in python_utils.RANGE(5):
+        for _ in range(5):
             skill_id = skill_services.get_new_skill_id()
             skill_ids_for_url = skill_ids_for_url + skill_id + ','
             self.save_new_skill(skill_id, 'user', description='Description')
@@ -376,7 +373,7 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
         json_response = self.get_json(url)
         self.assertEqual(
             len(json_response['question_dicts']),
-            feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME)
+            feconf.QUESTION_BATCH_SIZE)
 
     def test_invalid_skill_id_returns_no_questions(self):
         # Call the handler.
@@ -1296,7 +1293,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             '/explorehandler/exploration_complete_event/%s' % self.EXP_ID_1_0,
             payload, csrf_token=csrf_token, expected_status_int=400)
         self.assertEqual(
-            response['error'], 'NONE EXP VERSION: Exploration complete')
+            response['error'], 'Missing key in handler args: version.')
 
     def test_exp_incomplete_event_handler(self):
         """Test handler for leaving an exploration incomplete."""
@@ -1397,7 +1394,8 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         response = self.post_json(
             '/explorehandler/exploration_maybe_leave_event/%s' % self.EXP_ID_0,
             payload, csrf_token=csrf_token, expected_status_int=400)
-        self.assertEqual(response['error'], 'NONE EXP VERSION: Maybe quit')
+        error_msg = 'Missing key in handler args: version.'
+        self.assertEqual(response['error'], error_msg)
 
     def test_remove_exp_from_incomplete_list_handler(self):
         """Test handler for removing explorations from the partially completed
@@ -1567,7 +1565,6 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
         self.post_json('/explorehandler/store_playthrough/%s' % (self.exp_id), {
             'playthrough_data': self.playthrough_data,
             'issue_schema_version': 1,
-            'playthrough_id': None
         }, csrf_token=self.csrf_token)
         self.process_and_flush_pending_tasks()
 
@@ -1858,31 +1855,38 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
             self):
         self.aggregated_stats.pop('num_starts')
 
-        with self.capture_logging(min_level=logging.ERROR) as captured_logs:
-            self.post_json('/explorehandler/stats_events/%s' % (
-                self.exp_id), {
-                    'aggregated_stats': self.aggregated_stats,
-                    'exp_version': self.exp_version})
+        response = self.post_json('/explorehandler/stats_events/%s' % (
+            self.exp_id), {
+                'aggregated_stats': self.aggregated_stats,
+                'exp_version': self.exp_version
+        }, expected_status_int=400)
 
-        self.assertEqual(len(captured_logs), 1)
-        self.assertIn(
-            'num_starts not in aggregated stats dict.', captured_logs[0])
+        error_msg = (
+            'Schema validation for \'aggregated_stats\' '
+            'failed: num_starts not in aggregated stats dict.'
+        )
+        self.assertEqual(response['error'], error_msg)
+
+        self.logout()
 
     def test_stats_events_handler_raise_error_with_invalid_state_stats_property(
             self):
         self.aggregated_stats['state_stats_mapping']['Home'].pop(
             'total_hit_count')
 
-        with self.capture_logging(min_level=logging.ERROR) as captured_logs:
-            self.post_json('/explorehandler/stats_events/%s' % (
+        response = self.post_json('/explorehandler/stats_events/%s' % (
                 self.exp_id), {
                     'aggregated_stats': self.aggregated_stats,
-                    'exp_version': self.exp_version})
+                    'exp_version': self.exp_version}, expected_status_int=400)
 
-        self.assertEqual(len(captured_logs), 1)
-        self.assertIn(
-            'total_hit_count not in state stats mapping '
-            'of Home in aggregated stats dict.', captured_logs[0])
+        error_msg = (
+            'Schema validation for \'aggregated_stats\' '
+            'failed: total_hit_count not in '
+            'state stats mapping of Home in aggregated stats dict.'
+        )
+        self.assertEqual(response['error'], error_msg)
+
+        self.logout()
 
 
 class AnswerSubmittedEventHandlerTest(test_utils.GenericTestBase):
@@ -2238,8 +2242,8 @@ class ExplorationStartEventHandlerTests(test_utils.GenericTestBase):
             }, expected_status_int=400
         )
 
-        self.assertEqual(
-            response['error'], 'NONE EXP VERSION: Exploration start')
+        error_msg = 'Missing key in handler args: version.'
+        self.assertEqual(response['error'], error_msg)
 
         self.logout()
 
@@ -2303,7 +2307,8 @@ class ExplorationActualStartEventHandlerTests(test_utils.GenericTestBase):
             }, expected_status_int=400
         )
 
-        self.assertEqual(response['error'], 'NONE EXP VERSION: Actual Start')
+        error_msg = 'Missing key in handler args: exploration_version.'
+        self.assertEqual(response['error'], error_msg)
 
         self.logout()
 
@@ -2369,8 +2374,8 @@ class SolutionHitEventHandlerTests(test_utils.GenericTestBase):
                 'time_spent_in_state_secs': 2.0
             }, expected_status_int=400
         )
-
-        self.assertEqual(response['error'], 'NONE EXP VERSION: Solution hit')
+        error_msg = 'Missing key in handler args: exploration_version.'
+        self.assertEqual(response['error'], error_msg)
 
         self.logout()
 

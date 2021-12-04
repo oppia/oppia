@@ -25,8 +25,7 @@ import { ExpressionInterpolationService } from
   'expressions/expression-interpolation.service';
 
 describe('expression interpolation service', ()=> {
-  let expressionInterpolationService:
-    ExpressionInterpolationService = null;
+  let expressionInterpolationService: ExpressionInterpolationService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({

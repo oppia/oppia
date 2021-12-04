@@ -51,7 +51,7 @@ describe('File path editor', () => {
   });
   it('should cause the form to be invalid when filepath is empty', () => {
     spyOn(component.validityChange, 'emit');
-    component.value = undefined;
+    component.value = '';
     component.ngOnInit();
     expect(component.validityChange.emit).toHaveBeenCalledWith(
       { empty: false });

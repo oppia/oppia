@@ -16,15 +16,14 @@
 
 """Unit tests for app_dev_linter.py."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
+import io
 import multiprocessing
 import os
 
+from core import python_utils
 from core.tests import test_utils
-
-import python_utils
 
 from . import other_files_linter
 from . import pre_commit_linter
@@ -43,12 +42,12 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
     def setUp(self):
         super(CustomLintChecksManagerTests, self).setUp()
         self.verbose_mode_enabled = False
-        self.manifest_file = python_utils.string_io(
-            buffer_value='{\"dependencies\":{\"frontend\":{\"guppy\":'
+        self.dependencies_file = io.StringIO(
+            '{\"dependencies\":{\"frontend\":{\"guppy\":'
             '{\"version\": \"0.1\"},\"skulpt-dist\":{\"version\": \"0.2\"}'
             ',\"midiJs\":{\"version\": \"0.4\"}}}}')
-        self.package_file = python_utils.string_io(
-            buffer_value='{\"dependencies\":{\"nerdamer\":\"^0.6\"}}')
+        self.package_file = io.StringIO(
+            '{\"dependencies\":{\"nerdamer\":\"^0.6\"}}')
         self.files_in_typings_dir = [
             'guppy-defs-0.1.d.ts',
             'skulpt-defs-0.2.d.ts',
@@ -56,8 +55,8 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             'nerdamer-defs-0.6.d.ts'
         ]
         def mock_open_file(path, unused_permissions):
-            if path == other_files_linter.MANIFEST_JSON_FILE_PATH:
-                return self.manifest_file
+            if path == other_files_linter.DEPENDENCIES_JSON_FILE_PATH:
+                return self.dependencies_file
             elif path == other_files_linter.PACKAGE_JSON_FILE_PATH:
                 return self.package_file
         def mock_listdir(unused_path):
@@ -286,6 +285,59 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                 error_messages.get_report())
             self.assertEqual('Sorted strict TS config', error_messages.name)
             self.assertTrue(error_messages.failed)
+
+    def test_check_github_workflows_use_merge_action_checks(self):
+        def mock_listdir(unused_path):
+            return ['pass.yml', 'fail.yml', 'README']
+
+        def mock_read(path):
+            if path.endswith('pass.yml'):
+                return '\n'.join([
+                    'name: Passing workflow file',
+                    'on:',
+                    '  push:',
+                    '    branches:',
+                    '      - develop',
+                    '',
+                    'jobs:',
+                    '  run:',
+                    '    steps:',
+                    '      - uses: actions/checkout@v2',
+                    '      - uses: ./.github/actions/merge',
+                    '      - run: echo "oppia"',
+                ])
+            elif path.endswith('fail.yml'):
+                return '\n'.join([
+                    'name: Passing workflow file',
+                    'on:',
+                    '  push:',
+                    '    branches:',
+                    '      - develop',
+                    '',
+                    'jobs:',
+                    '  run:',
+                    '    steps:',
+                    '      - uses: actions/checkout@v2',
+                    '      - run: echo "oppia"',
+                ])
+            raise AssertionError(
+                'mock_read called with unexpected path %s' % path)
+
+        listdir_swap = self.swap_with_checks(
+            os, 'listdir', mock_listdir,
+            expected_args=[(other_files_linter.WORKFLOWS_DIR,)])
+        read_swap = self.swap(FILE_CACHE, 'read', mock_read)
+
+        expected = [
+            '%s --> Job run does not use the .github/actions/merge action.' %
+            os.path.join(other_files_linter.WORKFLOWS_DIR, 'fail.yml'),
+            'FAILED  Github workflows use merge action check failed',
+        ]
+
+        with listdir_swap, read_swap:
+            task_results = other_files_linter.CustomLintChecksManager(
+                FILE_CACHE).check_github_workflows_use_merge_action()
+            self.assertEqual(task_results.get_report(), expected)
 
     def test_perform_all_lint_checks(self):
         lint_task_report = other_files_linter.CustomLintChecksManager(

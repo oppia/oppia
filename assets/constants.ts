@@ -19,6 +19,7 @@
 
 export default {
   // Whether to allow custom event reporting to Google Analytics.
+  // Mock gtag function is used when disabled.
   "CAN_SEND_ANALYTICS_EVENTS": false,
 
   // The term 'staging' is used instead of the classroom url fragment field
@@ -73,6 +74,8 @@ export default {
 
   // The default language code for an exploration.
   "DEFAULT_LANGUAGE_CODE": "en",
+
+  "RTL_LANGUAGE_CODES": ["ar"],
 
   "ALLOWED_THUMBNAIL_BG_COLORS": {
     "chapter": ["#F8BF74", "#D68F78", "#8EBBB6", "#B3D8F1"],
@@ -4769,6 +4772,10 @@ export default {
     "description": "shqip (Albanian)",
     "direction": "ltr"
   }, {
+    "code": "az",
+    "description": "Azeri (Azerbaijani)",
+    "direction": "ltr"
+  }, {
     "code": "bg",
     "description": "български (Bulgarian)",
     "direction": "ltr"
@@ -4955,23 +4962,12 @@ export default {
   }],
 
   // NOTE TO DEVELOPERS: While adding another language, please ensure that the
-  // languages are in alphabetical order.
+  // languages are roughly in order of how much support we have for them in
+  // terms of lesson content translations.
   // List of supported site languages in which the platform is offered.
   "SUPPORTED_SITE_LANGUAGES": [{
-    "id": "id",
-    "text": "Bahasa Indonesia",
-    "direction": "ltr"
-  }, {
     "id": "en",
     "text": "English",
-    "direction": "ltr"
-  }, {
-    "id": "es",
-    "text": "Español",
-    "direction": "ltr"
-  }, {
-    "id": "fr",
-    "text": "français (French)",
     "direction": "ltr"
   }, {
     "id": "pt-br",
@@ -4981,6 +4977,38 @@ export default {
     "id": "ar",
     "text": "العربية",
     "direction": "rtl"
+  }, {
+    "id": "hi",
+    "text": "हिन्दी",
+    "direction": "ltr"
+  }, {
+    "id": "es",
+    "text": "Español",
+    "direction": "ltr"
+  }, {
+    "id": "bn",
+    "text": "বাংলা",
+    "direction": "ltr"
+  }, {
+    "id": "fr",
+    "text": "français (French)",
+    "direction": "ltr"
+  }, {
+    "id": "id",
+    "text": "Bahasa Indonesia",
+    "direction": "ltr"
+  }, {
+    "id": "uk",
+    "text": "украї́нська мо́ва (Ukrainian)",
+    "direction": "ltr"
+  }, {
+    "id": "sk",
+    "text": "slovenčina (Slovak)",
+    "direction": "ltr"
+  }, {
+    "id": "nl",
+    "text": "Nederlands (Dutch)",
+    "direction": "ltr"
   }, {
     "id": "kab",
     "text": "Taqbaylit (Kabyle)",
@@ -4992,14 +5020,6 @@ export default {
   }, {
     "id": "tr",
     "text": "Türkçe (Turkish)",
-    "direction": "ltr"
-  }, {
-    "id": "hi",
-    "text": "हिन्दी",
-    "direction": "ltr"
-  }, {
-    "id": "bn",
-    "text": "বাংলা",
     "direction": "ltr"
   }, {
     "id": "zh-hans",
@@ -5035,6 +5055,11 @@ export default {
     "description": "Arabic",
     "relatedLanguages": ["ar"],
     "direction": "rtl"
+  }, {
+    "id": "az",
+    "description": "Azerbaijani",
+    "relatedLanguages": ["az"],
+    "direction": "ltr"
   }, {
     "id": "bg",
     "description": "Bulgarian",
@@ -5458,7 +5483,6 @@ export default {
     "interaction_ids": [
       "FractionInput",
       "GraphInput",
-      "LogicProof",
       "NumericInput",
       "SetInput",
       "NumericExpressionInput",
@@ -5584,11 +5608,13 @@ export default {
   "MAX_CHARS_IN_SKILL_DESCRIPTION": 100,
   "MAX_CHARS_IN_STORY_TITLE": 39,
   "MAX_CHARS_IN_STORY_DESCRIPTION": 1000,
-  "MAX_CHARS_IN_CHAPTER_TITLE": 36,
+  "MAX_CHARS_IN_EXPLORATION_TITLE": 36,
   "MAX_CHARS_IN_CHAPTER_DESCRIPTION": 152,
   "MAX_CHARS_IN_MISCONCEPTION_NAME": 100,
   "MAX_CHARS_IN_BLOG_POST_TITLE": 40,
+  "MIN_CHARS_IN_BLOG_POST_TITLE": 5,
   "MAX_CHARS_IN_BLOG_POST_SUMMARY": 300,
+  "STORY_ID_LENGTH": 12,
   // This represents the maximum number of characters in the URL fragment for
   // story in the story page URL. E.g.
   // in /learn/math/fractions/story/bakery/..., 'bakery' is the
@@ -5605,6 +5631,7 @@ export default {
   // The recommended length for meta tag contents. Search engines will truncate
   // results greater than this limit.
   "MAX_CHARS_IN_META_TAG_CONTENT": 160,
+  "MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB": 5,
   "MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB": 50,
 
   "NEW_STATE_TEMPLATE": {
@@ -5667,7 +5694,10 @@ export default {
   "FIREBASE_CONFIG_APP_ID": "",
   "FIREBASE_CONFIG_GOOGLE_CLIENT_ID": "",
 
-  "BEAM_JOBS_ARE_ENABLED": false,
+  // The name of the cookie Oppia will place the session cookie into. The name
+  // is arbitrary. If it is changed later on, then the cookie will live on in
+  // the users' browsers as garbage (although it'd expire eventually).
+  "FIREBASE_AUTH_SESSION_COOKIE_NAME": "session",
 
   "ALLOW_YAML_FILE_UPLOAD": false,
 
@@ -5680,11 +5710,21 @@ export default {
   // A regular expression for allowed characters in URL fragment fields.
   "VALID_URL_FRAGMENT_REGEX": "^[a-z]+(-[a-z]+)*$",
 
+  // A regular expression for allowed characters for thumbnail filename.
+  "VALID_THUMBNAIL_FILENAME_REGEX": "^[^.](?!.*/)(?!.*\\.\\.).*.svg$",
+
+  // A regular expression for allowed entity id's.
+  "ENTITY_ID_REGEX": "^[a-zA-Z0-9-_]{1,12}$",
+
   // A regular expression for allowed characters in Title field for Blog Post.
   "VALID_BLOG_POST_TITLE_REGEX": "^[a-zA-Z0-9][a-zA-Z0-9 ]+(-[a-zA-Z0-9]+)*$",
 
   // A regular expression for allowed characters in URL fragment for Blog Post.
   "VALID_URL_BLOG_FRAGMENT_REGEX": "^[a-z0-9]+(-[a-z0-9]+)*$",
+
+  // A regular expression for allowed characters in URL fragment for Blog Post.
+  // eslint-disable-next-line max-len
+  "VALID_THREAD_ID_REGEX": "(exploration|collection|skill).[a-zA-Z0-9]+.[a-zA-Z0-9=]+",
 
   // A regular expression for valid skill misconception id.
   "VALID_SKILL_MISCONCEPTION_ID_REGEX": "[A-Za-z0-9]{12}-[0-9]+",
@@ -5788,9 +5828,10 @@ export default {
 
   // Placeholder texts for the math interactions.
   "MATH_INTERACTION_PLACEHOLDERS": {
-    "AlgebraicExpressionInput": "Type an expression here.",
-    "NumericExpressionInput": "Type an expression here, using only numbers.",
-    "MathEquationInput": "Type an equation here."
+    "AlgebraicExpressionInput": "I18N_INTERACTIONS_ALGEBRAIC_EXPR_INSTRUCTION",
+    "MathEquationInput": "I18N_INTERACTIONS_MATH_EQ_INSTRUCTION",
+    // The following is user editable and hence, is not translated.
+    "NumericExpressionInput": "Type an expression here, using only numbers."
   },
 
   // Unfinished features.
@@ -5809,12 +5850,6 @@ export default {
   "GCS_RESOURCE_BUCKET_NAME": "app_default_bucket",
 
   "ENABLE_EXP_FEEDBACK_FOR_LOGGED_OUT_USERS": true,
-
-  // Used to disable account removal until it is fully implemented.
-  "ENABLE_ACCOUNT_DELETION": true,
-
-  // Used to disable account data export until it is fully implemented.
-  "ENABLE_ACCOUNT_EXPORT": true,
 
   // Link to open when the Oppia avatar is clicked on any page.
   "OPPIA_AVATAR_LINK_URL": null,
@@ -5934,18 +5969,6 @@ export default {
         }]
       },
       "default_value": false
-    },
-    {
-      "backend_id": "used_logic_proof_interaction",
-      "backend_attr": "used_logic_proof_interaction",
-      "description": "Has used LogicProof interaction in any exploration",
-      "schema": {
-        "type": "bool",
-        "validators": [{
-          "id": "is_nonempty"
-        }]
-      },
-      "default_value": false
     }
   ],
 
@@ -5965,10 +5988,37 @@ export default {
           "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
         },
         {
-          "PROPERTY_TYPE": "property",
+          "PROPERTY_TYPE": "itemprop",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        }
+      ]
+    },
+    "ABOUT_FOUNDATION": {
+      "ROUTE": "about-foundation",
+      "TITLE": "About the Oppia Foundation | Oppia",
+      "META": []
+    },
+    "CLASSROOM": {
+      "ROUTE": "learn/:classroom_url_fragment",
+      "TITLE": "Oppia",
+      // Some routes contain url fragments, as syntax for url fragments are
+      // different for angular router and backend. They have to be registered
+      // manually in the backend. Please use angular router syntax here.
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it"
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it"
         }
       ]
     },
@@ -6078,6 +6128,23 @@ export default {
       "TITLE": "Privacy Policy | Oppia",
       "META": []
     },
+    "SIGNUP": {
+      "ROUTE": "signup",
+      "TITLE": "Join the community - Oppia",
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          "CONTENT": "Sign up for Oppia and begin exploring a new subject."
+        },
+        {
+          "PROPERTY_TYPE": "property",
+          "PROPERTY_VALUE": "og:description",
+          "CONTENT": "Sign up for Oppia and begin exploring a new subject."
+        }
+      ]
+    },
     "TEACH": {
       "ROUTE": "teach",
       "TITLE": "Guide to Oppia for Parents and Teachers | Oppia",
@@ -6129,7 +6196,171 @@ export default {
           "CONTENT": "Thank you for donating to The Oppia Foundation!"
         }
       ]
+    },
+    "DELETE_ACCOUNT": {
+      "ROUTE": "delete-account",
+      "TITLE": "Delete Account | Oppia",
+      "META": []
+    },
+    "LIBRARY_INDEX": {
+      "ROUTE": "community-library",
+      "TITLE": "Oppia",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Looking to learn something new? Learn any subject of your choice created by professors, teachers and Oppia users! Free lessons are always available for any topic and level you want."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Looking to learn something new? Learn any subject of your choice created by professors, teachers and Oppia users! Free lessons are always available for any topic and level you want."
+        }
+      ]
+    },
+    "LIBRARY_RECENTLY_PUBLISHED": {
+      "ROUTE": "community-library/recently-published",
+      "TITLE": "Oppia",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Looking to learn something new? Learn any subject of your choice created by professors, teachers and Oppia users! Free lessons are always available for any topic and level you want."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Looking to learn something new? Learn any subject of your choice created by professors, teachers and Oppia users! Free lessons are always available for any topic and level you want."
+        }
+      ]
+    },
+    "LIBRARY_SEARCH": {
+      "ROUTE": "search/find",
+      "TITLE": "Oppia",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Looking to learn something new? Learn any subject of your choice created by professors, teachers and Oppia users! Free lessons are always available for any topic and level you want."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Looking to learn something new? Learn any subject of your choice created by professors, teachers and Oppia users! Free lessons are always available for any topic and level you want."
+        }
+      ]
+    },
+    "LIBRARY_TOP_RATED": {
+      "ROUTE": "community-library/top-rated",
+      "TITLE": "Oppia",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Looking to learn something new? Learn any subject of your choice created by professors, teachers and Oppia users! Free lessons are always available for any topic and level you want."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Looking to learn something new? Learn any subject of your choice created by professors, teachers and Oppia users! Free lessons are always available for any topic and level you want."
+        }
+      ]
+    },
+    "PENDING_ACCOUNT_DELETION": {
+      "ROUTE": "pending-account-deletion",
+      "TITLE": "Pending Account Deletion | Oppia",
+      "META": []
+    },
+    "PREFERENCES": {
+      "ROUTE": "preferences",
+      "TITLE": "Preferences | Oppia",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          "CONTENT": "Change your Oppia profile settings and preferences"
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          "CONTENT": "Change your Oppia profile settings and preferences"
+        }
+      ]
+    },
+    "PROFILE": {
+      "ROUTE": "profile/:username_fragment",
+      "TITLE": "Profile | Oppia",
+      // Some routes contain url fragments, as syntax for url fragments are
+      // different for angular router and backend. They have to be registered
+      // manually in the backend. Please use angular router syntax here.
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
+      "META": []
+    },
+    "RELEASE_COORDINATOR_PAGE": {
+      "ROUTE": "release-coordinator",
+      "TITLE": "Oppia Release Coordinator Panel",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        }
+      ]
+    },
+    "SPLASH": {
+      "ROUTE": "",
+      "TITLE": "Oppia | Free, Online and Interactive Lessons for Anyone",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        }
+      ]
+    },
+    "STORY_VIEWER": {
+      // eslint-disable-next-line max-len
+      "ROUTE": "learn/:classroom_url_fragment/:topic_url_fragment/story/:story_url_fragment",
+      "TITLE": "Oppia",
+      // Some routes contain url fragments, as syntax for url fragments are
+      // different for angular router and backend. They have to be registered
+      // manually in the backend. Please use angular router syntax here.
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
+      "META": []
+    },
+    "VOLUNTEER": {
+      "ROUTE": "volunteer",
+      "TITLE": "Volunteer | Oppia",
+      "META": []
     }
+  },
+
+  "STEWARDS_LANDING_PAGE": {
+    "ROUTES": ["parents", "partners", "nonprofits", "teachers", "volunteers"],
+    "TITLE": "Getting Started with Oppia",
+    "META": []
   },
 
   // A dict representing available landing pages, having subject as a key
@@ -6140,6 +6371,45 @@ export default {
   // topic-landing-page.constants.ts file.
   "AVAILABLE_LANDING_PAGES": {
     "math": ["fractions", "negative-numbers", "ratios"]
+  },
+
+  "SCHEMA_FOR_TOPIC_URL_FRAGMENTS": {
+    "schema": {
+      "type": "basestring",
+      "validators": [{
+        "id": "is_regex_matched",
+        "regex_pattern": "^[a-z]+(-[a-z]+)*$"
+      }, {
+        "id": "has_length_at_most",
+        "max_value": 20
+      }]
+    }
+  },
+
+  "SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS": {
+    "schema": {
+      "type": "basestring",
+      "validators": [{
+        "id": "is_regex_matched",
+        "regex_pattern": "^[a-z]+(-[a-z]+)*$"
+      }, {
+        "id": "has_length_at_most",
+        "max_value": 20
+      }]
+    }
+  },
+
+  "SCHEMA_FOR_STORY_URL_FRAGMENTS": {
+    "schema": {
+      "type": "basestring",
+      "validators": [{
+        "id": "is_regex_matched",
+        "regex_pattern": "^[a-z]+(-[a-z]+)*$"
+      }, {
+        "id": "has_length_at_most",
+        "max_value": 30
+      }]
+    }
   },
 
   "DEV_MODE": true,

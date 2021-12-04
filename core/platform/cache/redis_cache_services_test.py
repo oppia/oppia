@@ -16,28 +16,27 @@
 
 """Tests for methods in the redis_cache_services."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import os
 
+from core import feconf
+from core import python_utils
 from core.platform.cache import redis_cache_services
 from core.tests import test_utils
-import feconf
-import python_utils
 from scripts import common
 
 
 class RedisCacheServicesUnitTests(test_utils.TestBase):
     """Tests for redis_cache_services."""
 
-    def test_memory_stats_returns_dict(self):
+    def test_memory_stats_returns_dict(self) -> None:
         memory_stats = redis_cache_services.get_memory_cache_stats()
         self.assertIsNotNone(memory_stats.total_allocated_in_bytes)
         self.assertIsNotNone(memory_stats.peak_memory_usage_in_bytes)
         self.assertIsNotNone(memory_stats.total_number_of_keys_stored)
 
-    def test_flush_cache_wipes_cache_clean(self):
+    def test_flush_cache_wipes_cache_clean(self) -> None:
         redis_cache_services.flush_caches()
         key_value_mapping = {'a1': '1', 'b1': '2', 'c1': '3'}
         redis_cache_services.set_multi(key_value_mapping)
@@ -49,7 +48,7 @@ class RedisCacheServicesUnitTests(test_utils.TestBase):
             [None, None, None]
         )
 
-    def test_get_multi_retrieves_cache_elements(self):
+    def test_get_multi_retrieves_cache_elements(self) -> None:
         redis_cache_services.flush_caches()
         self.assertEqual(
             redis_cache_services.get_multi(['a2', 'b2', 'c2']),
@@ -62,13 +61,13 @@ class RedisCacheServicesUnitTests(test_utils.TestBase):
         self.assertEqual(
             redis_cache_services.get_multi(['a2', 'b2', 'c2']), ['1', '2', '3'])
 
-    def test_set_multi_sets_elements(self):
+    def test_set_multi_sets_elements(self) -> None:
         redis_cache_services.flush_caches()
         key_value_mapping = {'a3': '1', 'b3': '2', 'c3': '3'}
         response = redis_cache_services.set_multi(key_value_mapping)
         self.assertTrue(response)
 
-    def test_delete_multi_deletes_cache_elements(self):
+    def test_delete_multi_deletes_cache_elements(self) -> None:
         redis_cache_services.flush_caches()
         key_value_mapping = {'a4': '1', 'b4': '2', 'c4': '3'}
         redis_cache_services.set_multi(key_value_mapping)
@@ -87,7 +86,7 @@ class RedisCacheServicesUnitTests(test_utils.TestBase):
             ['d4', 'e4', 'f4'])
         self.assertEqual(return_number_of_keys_set, 0)
 
-    def test_partial_fetches_returns_reasonable_output(self):
+    def test_partial_fetches_returns_reasonable_output(self) -> None:
         redis_cache_services.flush_caches()
         self.assertEqual(
             redis_cache_services.get_multi(['a5', 'b5', 'c5']),
@@ -103,7 +102,7 @@ class RedisCacheServicesUnitTests(test_utils.TestBase):
             redis_cache_services.get_multi(['x5', 'b5', 'd5']),
             [None, '2', None])
 
-    def test_partial_deletes_deletes_correct_elements(self):
+    def test_partial_deletes_deletes_correct_elements(self) -> None:
         redis_cache_services.flush_caches()
         key_value_mapping = {'a6': '1', 'b6': '2', 'c6': '3'}
         redis_cache_services.set_multi(key_value_mapping)
@@ -115,17 +114,18 @@ class RedisCacheServicesUnitTests(test_utils.TestBase):
             redis_cache_services.get_multi(['a6', 'b6', 'c6']),
             [None, '2', '3'])
 
-    def test_redis_configuration_file_matches_feconf_redis_configuration(self):
+    def test_redis_configuration_file_matches_feconf_redis_configuration(
+            self
+    ) -> None:
         """Tests that the redis configuration file and feconf variables have
         the same port definition.
         """
         self.assertTrue(os.path.exists(
             os.path.join(common.CURR_DIR, 'redis.conf')))
 
-        with python_utils.open_file(
+        with python_utils.open_file( # type: ignore[no-untyped-call]
                 os.path.join(common.CURR_DIR, 'redis.conf'), 'r') as redis_conf:
             lines = redis_conf.readlines()
             elements = lines[0].split()
             self.assertEqual(len(elements), 2)
-            self.assertEqual(
-                elements[1], python_utils.UNICODE(feconf.REDISPORT))
+            self.assertEqual(elements[1], str(feconf.REDISPORT))

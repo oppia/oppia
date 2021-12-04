@@ -141,11 +141,6 @@ interface RuleTemplates {
     DoesNotContainAtLeastOneOf: RuleDescription;
     IsProperSubsetOf: RuleDescription;
   };
-  LogicProof: {
-    Correct: RuleDescription;
-    NotCorrect: RuleDescription;
-    NotCorrectByCategory: RuleDescription;
-  };
   MathEquationInput: {
     MatchesExactlyWith: RuleDescription;
     IsEquivalentTo: RuleDescription;

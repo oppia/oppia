@@ -16,24 +16,24 @@
 
 """Services for user data."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import datetime
 import hashlib
 import imghdr
 import logging
 import re
+import urllib
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core import utils
+from core.constants import constants
 from core.domain import auth_domain
 from core.domain import auth_services
 from core.domain import role_services
 from core.domain import user_domain
 from core.platform import models
-import feconf
-import python_utils
-import utils
 
 import requests
 
@@ -174,7 +174,9 @@ def get_users_settings(user_ids, strict=False, include_marked_deleted=False):
                 roles=[
                     feconf.ROLE_ID_FULL_USER,
                     feconf.ROLE_ID_CURRICULUM_ADMIN,
-                    feconf.ROLE_ID_MODERATOR],
+                    feconf.ROLE_ID_MODERATOR,
+                    feconf.ROLE_ID_VOICEOVER_ADMIN
+                ],
                 banned=False,
                 username='admin',
                 last_agreed_to_terms=datetime.datetime.utcnow()
@@ -1140,7 +1142,7 @@ def update_subject_interests(user_id, subject_interests):
         raise utils.ValidationError('Expected subject_interests to be a list.')
     else:
         for interest in subject_interests:
-            if not isinstance(interest, python_utils.BASESTRING):
+            if not isinstance(interest, str):
                 raise utils.ValidationError(
                     'Expected each subject interest to be a string.')
             elif not interest:
@@ -1746,7 +1748,7 @@ def _save_user_contributions(user_contributions):
     ).put()
 
 
-def _migrate_dashboard_stats_to_latest_schema(versioned_dashboard_stats):
+def migrate_dashboard_stats_to_latest_schema(versioned_dashboard_stats):
     """Holds responsibility of updating the structure of dashboard stats.
 
     Args:
@@ -1886,7 +1888,7 @@ def update_dashboard_stats_log(user_id):
     model = user_models.UserStatsModel.get_or_create(user_id)
 
     if model.schema_version != feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION:
-        _migrate_dashboard_stats_to_latest_schema(model)
+        migrate_dashboard_stats_to_latest_schema(model)
 
     weekly_dashboard_stats = {
         get_current_date_as_string(): {
@@ -2218,7 +2220,7 @@ def create_login_url(return_url):
     Returns:
         str. The correct login URL that includes the page to redirect to.
     """
-    return '/login?%s' % python_utils.url_encode({'return_url': return_url})
+    return '/login?%s' % urllib.parse.urlencode({'return_url': return_url})
 
 
 def mark_user_banned(user_id):

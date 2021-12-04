@@ -21,7 +21,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AlertsService } from 'services/alerts.service';
 
 interface ExplorationObj {
-  yamlFile: File | null
+  yamlFile: File | null;
 }
 
 @Component({
@@ -38,7 +38,7 @@ export class UploadActivityModalComponent {
       yamlFile: null
     };
     let label =
-     <HTMLInputElement>document.getElementById('newFileInput');
+      document.getElementById('newFileInput') as HTMLInputElement;
     if (label === null) {
       throw new Error('No label found for uploading files.');
     }

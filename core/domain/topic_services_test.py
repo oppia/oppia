@@ -16,12 +16,13 @@
 
 """Tests for topic services."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import os
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core.constants import constants
 from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import question_domain
@@ -37,8 +38,6 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import python_utils
 
 (
     topic_models, suggestion_models
@@ -1539,6 +1538,18 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
     def test_cannot_update_topic_and_subtopic_pages_with_empty_commit_message(
             self):
+        changelist = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
+            'old_subtopic_id': None,
+            'new_subtopic_id': self.subtopic_id,
+            'skill_id': 'skill_1'
+        })]
+        # Test can have an empty commit message when not published.
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin, self.TOPIC_ID, changelist,
+            None)
+        topic_services.publish_topic(self.TOPIC_ID, self.user_id_admin)
+        # Test must have a commit message when published.
         with self.assertRaisesRegexp(
             Exception, 'Expected a commit message, received none.'):
             topic_services.update_topic_and_subtopic_pages(

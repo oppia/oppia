@@ -14,16 +14,15 @@
 
 """Python execution for running e2e tests."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import argparse
+import contextlib
 import os
 import subprocess
 import sys
 
-from constants import constants
-import python_utils
+from core.constants import constants
 from scripts import build
 from scripts import common
 from scripts import flake_checker
@@ -85,14 +84,6 @@ _PARSER.add_argument(
          'https://www.protractortest.org/#/debugging#disabled-control-flow',
     action='store_true')
 _PARSER.add_argument(
-    '--deparallelize_terser',
-    help='Disable parallelism on terser plugin in webpack. Use with prod_env. '
-         'This flag is required for tests to run on CircleCI, since CircleCI '
-         'sometimes flakes when parallelism is used. It is not required in the '
-         'local dev environment. See https://discuss.circleci.com/t/'
-         'build-fails-with-error-spawn-enomem/30537/10',
-    action='store_true')
-_PARSER.add_argument(
     '--server_log_level',
     help='Sets the log level for the appengine server. The default value is '
          'set to error.',
@@ -113,17 +104,17 @@ RERUN_POLICY_ALWAYS = 'always'
 
 RERUN_POLICIES = {
     'accessibility': RERUN_POLICY_NEVER,
-    'additionaleditorfeatures': RERUN_POLICY_ALWAYS,
+    'additionaleditorfeatures': RERUN_POLICY_KNOWN_FLAKES,
     'additionaleditorfeaturesmodals': RERUN_POLICY_ALWAYS,
-    'additionalplayerfeatures': RERUN_POLICY_ALWAYS,
+    'additionalplayerfeatures': RERUN_POLICY_NEVER,
     'adminpage': RERUN_POLICY_NEVER,
-    'classroompage': RERUN_POLICY_KNOWN_FLAKES,
+    'blogdashboard': RERUN_POLICY_NEVER,
+    'classroompage': RERUN_POLICY_NEVER,
     'classroompagefileuploadfeatures': RERUN_POLICY_NEVER,
     'collections': RERUN_POLICY_NEVER,
     'contributordashboard': RERUN_POLICY_KNOWN_FLAKES,
     'coreeditorandplayerfeatures': RERUN_POLICY_KNOWN_FLAKES,
     'creatordashboard': RERUN_POLICY_KNOWN_FLAKES,
-    'emaildashboard': RERUN_POLICY_ALWAYS,
     'embedding': RERUN_POLICY_KNOWN_FLAKES,
     'explorationfeedbacktab': RERUN_POLICY_NEVER,
     'explorationhistorytab': RERUN_POLICY_KNOWN_FLAKES,
@@ -134,9 +125,9 @@ RERUN_POLICIES = {
     'featuregating': RERUN_POLICY_ALWAYS,
     'fileuploadextensions': RERUN_POLICY_NEVER,
     'fileuploadfeatures': RERUN_POLICY_KNOWN_FLAKES,
-    'learner': RERUN_POLICY_KNOWN_FLAKES,
-    'learnerdashboard': RERUN_POLICY_KNOWN_FLAKES,
-    'library': RERUN_POLICY_KNOWN_FLAKES,
+    'learner': RERUN_POLICY_NEVER,
+    'learnerdashboard': RERUN_POLICY_NEVER,
+    'library': RERUN_POLICY_NEVER,
     'navigation': RERUN_POLICY_KNOWN_FLAKES,
     'playvoiceovers': RERUN_POLICY_NEVER,
     'preferences': RERUN_POLICY_NEVER,
@@ -146,11 +137,11 @@ RERUN_POLICIES = {
     'releasecoordinatorpagefeatures': RERUN_POLICY_NEVER,
     'skilleditor': RERUN_POLICY_KNOWN_FLAKES,
     'subscriptions': RERUN_POLICY_NEVER,
-    'topicandstoryeditor': RERUN_POLICY_KNOWN_FLAKES,
-    'topicandstoryeditorfileuploadfeatures': RERUN_POLICY_KNOWN_FLAKES,
-    'topicandstoryviewer': RERUN_POLICY_KNOWN_FLAKES,
-    'topicsandskillsdashboard': RERUN_POLICY_KNOWN_FLAKES,
-    'users': RERUN_POLICY_KNOWN_FLAKES,
+    'topicandstoryeditor': RERUN_POLICY_NEVER,
+    'topicandstoryeditorfileuploadfeatures': RERUN_POLICY_NEVER,
+    'topicandstoryviewer': RERUN_POLICY_NEVER,
+    'topicsandskillsdashboard': RERUN_POLICY_NEVER,
+    'users': RERUN_POLICY_NEVER,
     'wipeout': RERUN_POLICY_NEVER,
     # The suite name is `full` when no --suite argument is passed. This
     # indicates that all the tests should be run.
@@ -167,7 +158,7 @@ def is_oppia_server_already_running():
     """
     for port in PORTS_USED_BY_OPPIA_PROCESSES:
         if common.is_port_in_use(port):
-            python_utils.PRINT(
+            print(
                 'There is already a server running on localhost:%s. '
                 'Please terminate it before running the end-to-end tests. '
                 'Exiting.' % port)
@@ -184,21 +175,21 @@ def run_webpack_compilation(source_maps=False):
     max_tries = 5
     webpack_bundles_dir_name = 'webpack_bundles'
 
-    for _ in python_utils.RANGE(max_tries):
+    for _ in range(max_tries):
         try:
             managed_webpack_compiler = (
                 servers.managed_webpack_compiler(use_source_maps=source_maps))
             with managed_webpack_compiler as proc:
                 proc.wait()
         except subprocess.CalledProcessError as error:
-            python_utils.PRINT(error.output)
+            print(error.output)
             sys.exit(error.returncode)
             return
         if os.path.isdir(webpack_bundles_dir_name):
             break
     else:
         # We didn't break out of the loop, meaning all attempts have failed.
-        python_utils.PRINT('Failed to complete webpack compilation, exiting...')
+        print('Failed to complete webpack compilation, exiting...')
         sys.exit(1)
 
 
@@ -212,23 +203,19 @@ def install_third_party_libraries(skip_install):
         install_third_party_libs.main()
 
 
-def build_js_files(dev_mode, deparallelize_terser=False, source_maps=False):
+def build_js_files(dev_mode, source_maps=False):
     """Build the javascript files.
 
     Args:
         dev_mode: bool. Represents whether to run the related commands in dev
             mode.
-        deparallelize_terser: bool. Represents whether to use webpack
-            compilation config that disables parallelism on terser plugin.
         source_maps: bool. Represents whether to use source maps while
             building webpack.
     """
     if not dev_mode:
-        python_utils.PRINT('Generating files for production mode...')
+        print('Generating files for production mode...')
 
         build_args = ['--prod_env']
-        if deparallelize_terser:
-            build_args.append('--deparallelize_terser')
         if source_maps:
             build_args.append('--source_maps')
         build.main(args=build_args)
@@ -245,15 +232,13 @@ def run_tests(args):
 
     install_third_party_libraries(args.skip_install)
 
-    with python_utils.ExitStack() as stack:
+    with contextlib.ExitStack() as stack:
         dev_mode = not args.prod_env
 
         if args.skip_build:
             build.modify_constants(prod_env=args.prod_env)
         else:
-            build_js_files(
-                dev_mode, deparallelize_terser=args.deparallelize_terser,
-                source_maps=args.source_maps)
+            build_js_files(dev_mode, source_maps=args.source_maps)
         stack.callback(build.set_constants_to_default)
 
         stack.enter_context(servers.managed_redis_server())
@@ -268,6 +253,9 @@ def run_tests(args):
             app_yaml_path,
             port=GOOGLE_APP_ENGINE_PORT,
             log_level=args.server_log_level,
+            # Automatic restart can be disabled since we don't expect code
+            # changes to happen while the e2e tests are running.
+            automatic_restart=False,
             skip_sdk_update_check=True,
             env={
                 **os.environ,
@@ -284,7 +272,7 @@ def run_tests(args):
             sharding_instances=args.sharding_instances,
             stdout=subprocess.PIPE))
 
-        python_utils.PRINT(
+        print(
             'Servers have come up.\n'
             'Note: If ADD_SCREENSHOT_REPORTER is set to true in '
             'core/tests/protractor.conf.js, you can view screenshots of the '
@@ -317,13 +305,13 @@ def main(args=None):
     policy = RERUN_POLICIES[parsed_args.suite.lower()]
 
     with servers.managed_portserver():
-        for attempt_num in python_utils.RANGE(1, MAX_RETRY_COUNT + 1):
-            python_utils.PRINT('***Attempt %d.***' % attempt_num)
+        for attempt_num in range(1, MAX_RETRY_COUNT + 1):
+            print('***Attempt %d.***' % attempt_num)
             output, return_code = run_tests(parsed_args)
 
             if not flake_checker.check_if_on_ci():
                 # Don't rerun off of CI.
-                python_utils.PRINT('No reruns because not running on CI.')
+                print('No reruns because not running on CI.')
                 break
 
             if return_code == 0:
@@ -335,8 +323,16 @@ def main(args=None):
             test_is_flaky = flake_checker.is_test_output_flaky(
                 output, parsed_args.suite)
             if policy == RERUN_POLICY_NEVER:
+                print(
+                    'Not rerunning because the policy is to never '
+                    'rerun the {} suite'.format(parsed_args.suite))
                 break
             if policy == RERUN_POLICY_KNOWN_FLAKES and not test_is_flaky:
+                print((
+                    'Not rerunning because the policy is to only '
+                    'rerun the %s suite on known flakes, and this '
+                    'failure did not match any known flakes')
+                    % parsed_args.suite)
                 break
 
     sys.exit(return_code)

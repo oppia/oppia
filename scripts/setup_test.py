@@ -16,18 +16,17 @@
 
 """Unit tests for scripts/setup.py."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
+import builtins
 import collections
 import os
 import subprocess
 import sys
 import tarfile
+import urllib.request as urlrequest
 
 from core.tests import test_utils
-
-import python_utils
 
 from . import clean
 from . import common
@@ -39,7 +38,7 @@ TEST_DATA_DIR = os.path.join('core', 'tests', 'data', '')
 MOCK_YARN_PATH = os.path.join(TEST_DATA_DIR, 'yarn-v' + common.YARN_VERSION)
 
 
-class MockCD(python_utils.OBJECT):
+class MockCD:
     """Mock for context manager for changing the current working directory."""
 
     def __init__(self, unused_new_path):
@@ -107,6 +106,22 @@ class SetupTests(test_utils.GenericTestBase):
         self.delete_swap = self.swap(clean, 'delete_file', mock_delete_file)
         self.get_swap = self.swap(os.environ, 'get', mock_get)
         self.cd_swap = self.swap(common, 'CD', MockCD)
+        version_info = collections.namedtuple(
+            'version_info', ['major', 'minor'])
+        self.version_info_py37_swap = self.swap(
+            sys, 'version_info', version_info(major=3, minor=7)
+        )
+        self.python2_print_swap = self.swap_with_checks(
+            builtins,
+            'print',
+            lambda *x: None,
+            expected_args=[(
+                '\033[91mThe Oppia server needs Python 2 to be installed. '
+                'Please follow the instructions at https://github.com/oppia/'
+                'oppia/wiki/Troubleshooting#python-2-is-not-available to fix '
+                'this.\033[0m',
+            )]
+        )
 
     def test_create_directory_tree_with_missing_dir(self):
         check_function_calls = {
@@ -137,10 +152,7 @@ class SetupTests(test_utils.GenericTestBase):
         self.assertFalse(check_function_calls['makedirs_is_called'])
 
     def test_python_version_testing_with_correct_version(self):
-        version_info = collections.namedtuple(
-            'version_info', ['major', 'minor'])
-        with self.swap(
-            sys, 'version_info', version_info(major=3, minor=7)):
+        with self.version_info_py37_swap:
             setup.test_python_version()
 
     def test_python_version_testing_with_incorrect_version_and_linux_os(self):
@@ -189,6 +201,13 @@ class SetupTests(test_utils.GenericTestBase):
                 'https://stackoverflow.com/questions/3701646/how-to-add-to-the-'
                 'pythonpath-in-windows-7'])
 
+    def test_python_version_testing_with_python2_wrong_code(self):
+        check_call_swap = self.swap_to_always_return(subprocess, 'call', 1)
+
+        with self.python2_print_swap, self.version_info_py37_swap:
+            with check_call_swap, self.assertRaisesRegexp(SystemExit, '1'):
+                setup.test_python_version()
+
     def test_download_and_install_package(self):
         check_function_calls = {
             'url_retrieve_is_called': False,
@@ -218,7 +237,7 @@ class SetupTests(test_utils.GenericTestBase):
             check_function_calls['remove_is_called'] = True
 
         url_retrieve_swap = self.swap(
-            python_utils, 'url_retrieve', mock_url_retrieve)
+            urlrequest, 'urlretrieve', mock_url_retrieve)
         open_swap = self.swap(tarfile, 'open', mock_open)
         extract_swap = self.swap(tarfile.TarFile, 'extractall', mock_extractall)
         close_swap = self.swap(tarfile.TarFile, 'close', mock_close)
@@ -247,11 +266,11 @@ class SetupTests(test_utils.GenericTestBase):
             print_arr.append(msg)
 
         getcwd_swap = self.swap(os, 'getcwd', mock_getcwd)
-        print_swap = self.swap(python_utils, 'PRINT', mock_print)
+        print_swap = self.swap(builtins, 'print', mock_print)
         with self.test_py_swap, getcwd_swap, print_swap:
             with self.assertRaisesRegexp(Exception, 'Invalid root directory.'):
                 setup.main(args=[])
-        self.assertTrue(
+        self.assertFalse(
             'WARNING   This script should be run from the oppia/ '
             'root folder.' in print_arr)
         self.assertTrue(
@@ -386,7 +405,7 @@ class SetupTests(test_utils.GenericTestBase):
             common, 'is_x64_architecture', mock_is_x64)
         exists_swap = self.swap(os.path, 'exists', mock_exists)
         url_retrieve_swap = self.swap(
-            python_utils, 'url_retrieve', mock_url_retrieve)
+            urlrequest, 'urlretrieve', mock_url_retrieve)
         check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
 
         with self.test_py_swap, self.create_swap, os_name_swap, exists_swap:
@@ -430,7 +449,7 @@ class SetupTests(test_utils.GenericTestBase):
             common, 'is_x64_architecture', mock_is_x64)
         exists_swap = self.swap(os.path, 'exists', mock_exists)
         url_retrieve_swap = self.swap(
-            python_utils, 'url_retrieve', mock_url_retrieve)
+            urlrequest, 'urlretrieve', mock_url_retrieve)
         check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
 
         with self.test_py_swap, self.create_swap, os_name_swap, exists_swap:
@@ -465,6 +484,16 @@ class SetupTests(test_utils.GenericTestBase):
                 with self.get_swap, isfile_swap:
                     setup.main(args=[])
         self.assertEqual(os.environ['CHROME_BIN'], '/usr/bin/google-chrome')
+
+    def test_chrome_bin_setup_with_brave_browser(self):
+        def mock_isfile(path):
+            return path == '/usr/bin/brave'
+        isfile_swap = self.swap(os.path, 'isfile', mock_isfile)
+        with self.test_py_swap, self.create_swap, self.uname_swap:
+            with self.exists_swap, self.chown_swap, self.chmod_swap:
+                with self.get_swap, isfile_swap:
+                    setup.main(args=[])
+        self.assertEqual(os.environ['CHROME_BIN'], '/usr/bin/brave')
 
     def test_chrome_bin_setup_with_chromium_browser(self):
         def mock_isfile(path):
@@ -552,7 +581,7 @@ class SetupTests(test_utils.GenericTestBase):
         def mock_print(msg):
             print_arr.append(msg)
         isfile_swap = self.swap(os.path, 'isfile', mock_isfile)
-        print_swap = self.swap(python_utils, 'PRINT', mock_print)
+        print_swap = self.swap(builtins, 'print', mock_print)
 
         with self.test_py_swap, self.create_swap, self.uname_swap:
             with self.exists_swap, self.chown_swap, self.chmod_swap, print_swap:

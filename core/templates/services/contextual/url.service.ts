@@ -27,7 +27,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 // This makes the UrlParamsType like a dict whose keys and values both are
 // string.
 export interface UrlParamsType {
-  [param: string]: string
+  [param: string]: string;
 }
 
 @Injectable({
@@ -257,6 +257,20 @@ export class UrlService {
       throw new Error('Invalid Skill Id');
     }
     return skillId;
+  }
+
+  /**
+   * This function is used to find the blog id from the url.
+   * @return {string} the blog post id.
+   * @throws Will throw an error if the blog post Id is invalid.
+   */
+  getBlogPostIdFromUrl(): string {
+    let pathname = this.getHash();
+    let blogPostId = pathname.split('/')[2];
+    if (blogPostId.length !== 12) {
+      throw new Error('Invalid Blog Post Id.');
+    }
+    return blogPostId;
   }
 
   /**

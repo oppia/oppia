@@ -74,7 +74,7 @@ describe('Exploration history', function() {
     await explorationEditorMainTab.setStateName('first');
     explorationEditorMainTab.setContent(await forms.toRichText(
       'enter 6 to continue'));
-    await explorationEditorMainTab.setInteraction('NumericInput');
+    await explorationEditorMainTab.setInteraction('NumericInput', false);
     await explorationEditorMainTab.addResponse(
       'NumericInput', null, 'second', true, 'Equals', 6);
     await explorationEditorMainTab.moveToState('second');
@@ -125,7 +125,7 @@ describe('Exploration history', function() {
       },
       9: {
         text: '  customization_args: {}',
-        highlighted: false
+        highlighted: true
       },
       10: {
         text: '  default_outcome:',
@@ -325,114 +325,122 @@ describe('Exploration history', function() {
         highlighted: false
       },
       24: {
-        text: '  customization_args: {}',
-        highlighted: false
+        text: '  customization_args:',
+        highlighted: true
       },
       25: {
-        text: '  default_outcome:',
-        highlighted: false
+        text: '    requireNonnegativeInput:',
+        highlighted: true
       },
       26: {
-        text: '    dest: first',
+        text: '      value: false',
         highlighted: true
       },
       27: {
-        text: '    feedback:',
+        text: '  default_outcome:',
         highlighted: false
       },
       28: {
-        text: '      content_id: default_outcome',
-        highlighted: false
+        text: '    dest: first',
+        highlighted: true
       },
       29: {
-        text: '      html: \'\'',
+        text: '    feedback:',
         highlighted: false
       },
       30: {
-        text: '    labelled_as_correct: false',
+        text: '      content_id: default_outcome',
         highlighted: false
       },
       31: {
-        text: '    missing_prerequisite_skill_id: null',
+        text: '      html: \'\'',
         highlighted: false
       },
       32: {
-        text: '    param_changes: []',
+        text: '    labelled_as_correct: false',
         highlighted: false
       },
       33: {
-        text: '    refresher_exploration_id: null',
+        text: '    missing_prerequisite_skill_id: null',
         highlighted: false
       },
       34: {
-        text: '  hints: []',
+        text: '    param_changes: []',
         highlighted: false
       },
       35: {
-        text: '  id: NumericInput',
-        highlighted: true
+        text: '    refresher_exploration_id: null',
+        highlighted: false
       },
       36: {
-        text: '  solution: null',
+        text: '  hints: []',
         highlighted: false
       },
       37: {
+        text: '  id: NumericInput',
+        highlighted: true
+      },
+      38: {
+        text: '  solution: null',
+        highlighted: false
+      },
+      39: {
         text: 'linked_skill_id: null',
         highlighted: false
       },
-      38: {
+      40: {
         text: 'next_content_id_index: 2',
         highlighted: true
       },
-      39: {
+      41: {
         text: 'param_changes: []',
         highlighted: false
       },
-      40: {
+      42: {
         text: 'recorded_voiceovers:',
         highlighted: false
       },
-      41: {
+      43: {
         text: '  voiceovers_mapping:',
         highlighted: false
       },
-      42: {
+      44: {
         text: '    content: {}',
         highlighted: false
       },
-      43: {
-        text: '    default_outcome: {}',
-        highlighted: false
-      },
-      44: {
-        text: '    feedback_1: {}',
-        highlighted: true
-      },
       45: {
-        text: 'solicit_answer_details: false',
+        text: '    default_outcome: {}',
         highlighted: false
       },
       46: {
-        text: 'written_translations:',
-        highlighted: false
-      },
-      47: {
-        text: '  translations_mapping:',
-        highlighted: false
-      },
-      48: {
-        text: '    content: {}',
-        highlighted: false
-      },
-      49: {
-        text: '    default_outcome: {}',
-        highlighted: true
-      },
-      50: {
         text: '    feedback_1: {}',
         highlighted: true
       },
+      47: {
+        text: 'solicit_answer_details: false',
+        highlighted: false
+      },
+      48: {
+        text: 'written_translations:',
+        highlighted: false
+      },
+      49: {
+        text: '  translations_mapping:',
+        highlighted: false
+      },
+      50: {
+        text: '    content: {}',
+        highlighted: false
+      },
       51: {
+        text: '    default_outcome: {}',
+        highlighted: true
+      },
+      52: {
+        text: '    feedback_1: {}',
+        highlighted: true
+      },
+      53: {
         text: '',
         highlighted: false
       }

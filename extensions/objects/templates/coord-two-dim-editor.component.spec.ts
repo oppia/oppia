@@ -20,6 +20,7 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { icon, LatLng, LeafletEvent, LeafletMouseEvent, tileLayer} from 'leaflet';
 import { CoordTwoDimEditorComponent } from './coord-two-dim-editor.component';
+import * as alias from 'leaflet';
 
 describe('CoordTwoDimEditorComponent', () => {
   let component: CoordTwoDimEditorComponent;
@@ -89,9 +90,16 @@ describe('CoordTwoDimEditorComponent', () => {
         }
       }
     } as unknown as LeafletEvent;
+    spyOn(component, 'leafletMove').and.callThrough();
+    spyOn(alias, 'marker').and.returnValue({
+      on: (txt, func) => {
+        func(e);
+      }
+    } as alias.Marker);
 
-    component.leafletMove(e);
+    component.ngOnInit();
 
+    expect(component.leafletMove).toHaveBeenCalledWith(e);
     expect(component.value).toEqual([45, 50]);
   });
 

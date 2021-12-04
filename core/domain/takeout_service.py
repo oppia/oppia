@@ -16,15 +16,14 @@
 user_id.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import re
 
+from core import feconf
 from core.domain import takeout_domain
 from core.domain import user_services
 from core.platform import models
-import feconf
 
 (
     base_models, collection_models, email_models,
@@ -76,7 +75,7 @@ def export_data_for_user(user_id):
             feconf.ROLE_ID_MOBILE_LEARNER in user_settings.roles):
         raise NotImplementedError(
             'Takeout for profile users is not yet supported.')
-    exported_data = dict()
+    exported_data = {}
     models_to_export = get_models_which_should_be_exported()
     for model in models_to_export:
         split_name = re.findall('[A-Z][^A-Z]*', model.__name__)[:-1]

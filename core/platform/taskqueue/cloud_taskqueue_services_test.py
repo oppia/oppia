@@ -16,8 +16,7 @@
 
 """Tests for methods in the cloud_taskqueue_services."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import datetime
 import json
@@ -25,25 +24,27 @@ import json
 from core.domain import taskqueue_services
 from core.platform.taskqueue import cloud_taskqueue_services
 from core.tests import test_utils
-import python_utils
 
 from google.api_core import retry as retry_lib
 from google.cloud import tasks_v2
 from google.protobuf import timestamp_pb2
+from typing import Any, Dict, Optional
 
 
 class CloudTaskqueueServicesUnitTests(test_utils.TestBase):
     """Tests for cloud_taskqueue_services."""
 
-    class Response(python_utils.OBJECT):
+    class Response:
         """Mock for the response object that is returned from a Cloud
         Tasks query.
         """
 
-        def __init__(self, name):
+        def __init__(self, name: str) -> None:
             self.name = name
 
-    def test_http_task_scheduled_immediately_sends_correct_request(self):
+    def test_http_task_scheduled_immediately_sends_correct_request(
+            self
+    ) -> None:
         queue_name = 'queue'
         dummy_url = '/task/dummy_handler'
         payload = {
@@ -54,7 +55,14 @@ class CloudTaskqueueServicesUnitTests(test_utils.TestBase):
         }
         task_name = 'task1'
 
-        def mock_create_task(parent, task, retry=None):
+        # In the type annotation below, task is of type Dict[str, Any]
+        # because it mocks the behaviour of
+        # cloud_taskqueue_services.CLIENT.create_task.
+        def mock_create_task(
+                parent: str,
+                task: Dict[str, Any],
+                retry: Optional[retry_lib.Retry] = None
+        ) -> CloudTaskqueueServicesUnitTests.Response:
             self.assertIsInstance(retry, retry_lib.Retry)
             self.assertEqual(
                 parent,
@@ -63,8 +71,7 @@ class CloudTaskqueueServicesUnitTests(test_utils.TestBase):
                 task,
                 {
                     'app_engine_http_request': {
-                        'http_method': (
-                            tasks_v2.types.target_pb2.HttpMethod.POST),
+                        'http_method': tasks_v2.types.HttpMethod.POST,
                         'relative_uri': dummy_url,
                         'headers': {
                             'Content-type': 'application/json'
@@ -81,7 +88,7 @@ class CloudTaskqueueServicesUnitTests(test_utils.TestBase):
             cloud_taskqueue_services.create_http_task(
                 queue_name, dummy_url, payload=payload, task_name=task_name)
 
-    def test_http_task_scheduled_for_later_sends_correct_request(self):
+    def test_http_task_scheduled_for_later_sends_correct_request(self) -> None:
         queue_name = 'queue'
         dummy_url = '/task/dummy_handler'
         payload = {
@@ -97,7 +104,14 @@ class CloudTaskqueueServicesUnitTests(test_utils.TestBase):
         timestamp.FromDatetime(datetime_to_execute_task)
         task_name = 'task1'
 
-        def mock_create_task(parent, task, retry):
+        # In the type annotation below, task is of type Dict[str, Any]
+        # because it mocks the behaviour of
+        # cloud_taskqueue_services.CLIENT.create_task.
+        def mock_create_task(
+                parent: str,
+                task: Dict[str, Any],
+                retry: Optional[retry_lib.Retry] = None
+        ) -> CloudTaskqueueServicesUnitTests.Response:
             self.assertIsInstance(retry, retry_lib.Retry)
             self.assertEqual(
                 parent,
@@ -106,8 +120,7 @@ class CloudTaskqueueServicesUnitTests(test_utils.TestBase):
                 task,
                 {
                     'app_engine_http_request': {
-                        'http_method': (
-                            tasks_v2.types.target_pb2.HttpMethod.POST),
+                        'http_method': tasks_v2.types.HttpMethod.POST,
                         'relative_uri': dummy_url,
                         'headers': {
                             'Content-type': 'application/json'

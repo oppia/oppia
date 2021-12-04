@@ -16,12 +16,11 @@
 
 """Services for the learner goals feature of the learner dashboard."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
+from core import feconf
 from core.domain import user_domain
 from core.platform import models
-import feconf
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 

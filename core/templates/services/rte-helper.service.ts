@@ -47,7 +47,8 @@ angular.module('oppia').factory('RteHelperService', [
         isComplex: RTE_COMPONENT_SPECS[componentId].is_complex,
         isBlockElement: RTE_COMPONENT_SPECS[componentId].is_block_element,
         requiresFs: RTE_COMPONENT_SPECS[componentId].requires_fs,
-        tooltip: RTE_COMPONENT_SPECS[componentId].tooltip
+        tooltip: RTE_COMPONENT_SPECS[componentId].tooltip,
+        requiresInternet: RTE_COMPONENT_SPECS[componentId].requires_internet
       });
     });
 

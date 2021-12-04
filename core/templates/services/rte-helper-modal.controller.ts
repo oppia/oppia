@@ -86,7 +86,23 @@ angular.module('oppia').controller('RteHelperModalController', [
     }
 
     $scope.cancel = function() {
-      $uibModalInstance.dismiss('cancel');
+      for (let i = 0; i < customizationArgSpecs.length; i++) {
+        let caName = customizationArgSpecs[i].name;
+        let attrsCaDict = attrsCustomizationArgsDict;
+        // If the RTE component contains only default ca values, we remove it
+        // from the editor on clicking cancel. When the
+        // uibModalInstance.dismiss method is called with true, the tag from
+        // the editor is removed and when called with false, the tag remains
+        // as-is.
+        if (
+          attrsCaDict.hasOwnProperty(caName) &&
+          attrsCaDict[caName] !== customizationArgSpecs[i].default_value
+        ) {
+          $uibModalInstance.dismiss(false);
+          return;
+        }
+      }
+      $uibModalInstance.dismiss(true);
     };
 
     $scope.disableSaveButtonForMathRte = function() {

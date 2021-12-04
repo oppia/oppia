@@ -23,26 +23,37 @@
 import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import isUndefined from 'lodash/isUndefined';
+import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
 import { InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
+import { NumericInputCustomizationArgs } from 'interactions/customization-args-defs';
 import { NumericInputRulesService } from './numeric-input-rules.service';
 import { NumericInputValidationService } from './numeric-input-validation.service';
+
+interface NumericInputFormSchema {
+  type: string;
+  'ui_config': {};
+}
 
 @Component({
   selector: 'oppia-interactive-numeric-input',
   templateUrl: './numeric-input-interaction.component.html'
 })
 export class InteractiveNumericInput implements OnInit {
+  @Input() requireNonnegativeInputWithValue: string = '';
   @Input() savedSolution;
   @Input() labelForFocusTarget;
   errorString = '';
+  requireNonnegativeInput: boolean = false;
   answer = null;
-  NUMERIC_INPUT_FORM_SCHEMA: { type: string; 'ui_config': {}; };
+  NUMERIC_INPUT_FORM_SCHEMA: NumericInputFormSchema;
   constructor(
     private currentInteractionService: CurrentInteractionService,
     private numericInputRulesService: NumericInputRulesService,
     private numericInputValidationService: NumericInputValidationService,
-    private changeDetectorRef: ChangeDetectorRef
+    private changeDetectorRef: ChangeDetectorRef,
+    private interactionAttributesExtractorService:
+      InteractionAttributesExtractorService
   ) { }
 
   private isAnswerValid(): boolean {
@@ -52,7 +63,7 @@ export class InteractiveNumericInput implements OnInit {
       this.answer !== '' &&
       isUndefined(
         this.numericInputValidationService.getErrorString(
-          this.answer)));
+          this.answer, this.requireNonnegativeInput)));
   }
 
   submitAnswer(answer: number): void {
@@ -63,6 +74,13 @@ export class InteractiveNumericInput implements OnInit {
     }
   }
 
+  private getAttributesObject() {
+    return {
+      requireNonnegativeInputWithValue:
+        this.requireNonnegativeInputWithValue
+    };
+  }
+
   onAnswerChange(answer: string | number): void {
     if (this.answer === answer) {
       return;
@@ -71,7 +89,7 @@ export class InteractiveNumericInput implements OnInit {
     this.changeDetectorRef.detectChanges();
   }
 
-  getSchema(): { type: string; 'ui_config': {}; } {
+  getSchema(): NumericInputFormSchema {
     return this.NUMERIC_INPUT_FORM_SCHEMA;
   }
 
@@ -80,6 +98,13 @@ export class InteractiveNumericInput implements OnInit {
   }
 
   ngOnInit(): void {
+    const {
+      requireNonnegativeInput
+    } = this.interactionAttributesExtractorService.getValuesFromAttributes(
+      'NumericInput',
+      this.getAttributesObject()
+    ) as NumericInputCustomizationArgs;
+    this.requireNonnegativeInput = requireNonnegativeInput.value;
     this.answer = (
       this.savedSolution !== undefined ?
       this.savedSolution : ''
@@ -88,7 +113,9 @@ export class InteractiveNumericInput implements OnInit {
 
     this.NUMERIC_INPUT_FORM_SCHEMA = {
       type: 'float',
-      ui_config: {}
+      ui_config: {
+        checkRequireNonnegativeInput: this.requireNonnegativeInput
+      }
     };
 
     this.currentInteractionService.registerCurrentInteraction(

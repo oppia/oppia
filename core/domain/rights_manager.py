@@ -16,12 +16,13 @@
 
 """Functions that manage rights for various user actions."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import logging
 
-from constants import constants
+from core import feconf
+from core import utils
+from core.constants import constants
 from core.domain import activity_services
 from core.domain import rights_domain
 from core.domain import role_services
@@ -29,8 +30,6 @@ from core.domain import subscription_services
 from core.domain import taskqueue_services
 from core.domain import user_services
 from core.platform import models
-import feconf
-import utils
 
 datastore_services = models.Registry.import_datastore_services()
 (collection_models, exp_models) = models.Registry.import_models([
@@ -648,12 +647,10 @@ def check_can_modify_core_activity_roles(user, activity_rights):
     if activity_rights is None:
         return False
 
-    if (activity_rights.community_owned or
-            activity_rights.cloned_from):
+    if activity_rights.community_owned or activity_rights.cloned_from:
         return False
 
-    if (role_services.ACTION_MODIFY_CORE_ROLES_FOR_ANY_ACTIVITY in
-            user.actions):
+    if role_services.ACTION_MODIFY_CORE_ROLES_FOR_ANY_ACTIVITY in user.actions:
         return True
     if (role_services.ACTION_MODIFY_CORE_ROLES_FOR_OWNED_ACTIVITY in
             user.actions):
@@ -986,6 +983,7 @@ def _release_ownership_of_activity(committer, activity_id, activity_type):
     activity_rights.owner_ids = []
     activity_rights.editor_ids = []
     activity_rights.viewer_ids = []
+    activity_rights.voice_artist_ids = []
     commit_cmds = [{
         'cmd': rights_domain.CMD_RELEASE_OWNERSHIP,
     }]

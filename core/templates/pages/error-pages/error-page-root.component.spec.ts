@@ -63,9 +63,9 @@ describe('Error page root component', () => {
   });
 
   it('should initialize', () => {
-    spyOn(pageTitleService, 'setPageTitle');
+    spyOn(pageTitleService, 'setDocumentTitle');
     componentInstance.ngOnInit();
-    expect(pageTitleService.setPageTitle).toHaveBeenCalled();
+    expect(pageTitleService.setDocumentTitle).toHaveBeenCalled();
     expect(componentInstance.statusCode).toEqual('401');
   });
 });

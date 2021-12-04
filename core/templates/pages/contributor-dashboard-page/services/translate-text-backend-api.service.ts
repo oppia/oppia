@@ -42,8 +42,9 @@ export class TranslateTextBackendApiService {
 
   async suggestTranslatedTextAsync(
       expId: string, expVersion: string, contentId: string, stateName: string,
-      languageCode: string, contentHtml: string, translationHtml: string,
-      imagesData: ImagesData[], dataFormat: string): Promise<unknown> {
+      languageCode: string, contentHtml: string | string[],
+      translationHtml: string | string[], imagesData: ImagesData[],
+      dataFormat: string): Promise<unknown> {
     const postData = {
       suggestion_type: 'translate_content',
       target_type: 'exploration',
@@ -63,7 +64,12 @@ export class TranslateTextBackendApiService {
 
     const body = new FormData();
     body.append('payload', JSON.stringify(postData));
-    imagesData.forEach(obj => body.append(obj.filename, obj.imageBlob));
+    imagesData.forEach(obj => {
+      if (obj.imageBlob === null) {
+        throw new Error('No image data found');
+      }
+      body.append(obj.filename, obj.imageBlob);
+    });
     return this.http.post(
       '/suggestionhandler/', body).toPromise();
   }

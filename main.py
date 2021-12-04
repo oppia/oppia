@@ -14,16 +14,19 @@
 
 """URL routing definitions, and some basic error/warmup handlers."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import logging
 
-from constants import constants
+from core import android_validation_constants
+from core import feconf
+from core.constants import constants
+from core.controllers import access_validators
 from core.controllers import acl_decorators
 from core.controllers import admin
 from core.controllers import android_e2e_config
 from core.controllers import base
+from core.controllers import beam_jobs
 from core.controllers import blog_admin
 from core.controllers import blog_dashboard
 from core.controllers import blog_homepage
@@ -42,6 +45,7 @@ from core.controllers import email_dashboard
 from core.controllers import features
 from core.controllers import feedback
 from core.controllers import improvements
+from core.controllers import incoming_app_feedback_report
 from core.controllers import learner_dashboard
 from core.controllers import learner_goals
 from core.controllers import learner_playlist
@@ -71,15 +75,13 @@ from core.controllers import topic_editor
 from core.controllers import topic_viewer
 from core.controllers import topics_and_skills_dashboard
 from core.controllers import voice_artist
-from core.domain import user_services
 from core.platform import models
 from core.platform.auth import firebase_auth_services
-import feconf
 
+import google.cloud.logging
+from typing import Any, Dict, Optional, Type, TypeVar, cast
 import webapp2
 from webapp2_extras import routes
-
-from typing import Any, Dict, Optional, Text, Type, TypeVar  # isort:skip
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -90,10 +92,39 @@ T = TypeVar('T')  # pylint: disable=invalid-name
 cache_services = models.Registry.import_cache_services()
 datastore_services = models.Registry.import_datastore_services()
 
+# Cloud Logging is disabled in emulator mode, since it is unnecessary and
+# creates a lot of noise.
+if not constants.EMULATOR_MODE:
+    # Instantiates a client and rtrieves a Cloud Logging handler based on the
+    # environment you're running in and integrates the handler with the Python
+    # logging module.
+    client = google.cloud.logging.Client()
+    client.setup_logging()
+
 # Suppress debug logging for chardet. See https://stackoverflow.com/a/48581323.
 # Without this, a lot of unnecessary debug logs are printed in error logs,
 # which makes it tiresome to identify the actual error.
 logging.getLogger(name='chardet.charsetprober').setLevel(logging.INFO)
+
+
+class InternetConnectivityHandler(base.BaseHandler):
+    """Handles the get request to the server from the
+    frontend to check for internet connection."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    # Using Dict[str, Any] because this class inherits this attribute
+    # from core.controllers.base.BaseModel.
+    URL_PATH_ARGS_SCHEMAS: Dict[str, Any] = {}
+    # Using Dict[str, Any] because this class inherits this attribute
+    # from core.controllers.base.BaseModel.
+    HANDLER_ARGS_SCHEMAS: Dict[str, Any] = {'GET': {}}
+
+    # Using type ignore[misc] here because untyped decorator makes function
+    # "get" also untyped.
+    @acl_decorators.open_access # type: ignore[misc]
+    def get(self) -> None:
+        """Handles GET requests."""
+        self.render_json({'is_internet_connected': True})
 
 
 class FrontendErrorHandler(base.BaseHandler):
@@ -101,53 +132,42 @@ class FrontendErrorHandler(base.BaseHandler):
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
+    # Using type ignore[misc] here because untyped decorator makes function
+    # "post" also untyped.
     @acl_decorators.open_access # type: ignore[misc]
     def post(self) -> None:
         """Records errors reported by the frontend."""
         logging.error('Frontend error: %s' % self.payload.get('error'))
-        self.render_json(self.values) # type: ignore[no-untyped-call]
+        self.render_json(self.values)
 
 
 class WarmupPage(base.BaseHandler):
     """Handles warmup requests."""
 
+    # Using type ignore[misc] here because untyped decorator makes function
+    # "get" also untyped.
     @acl_decorators.open_access # type: ignore[misc]
     def get(self) -> None:
         """Handles GET warmup requests."""
         pass
 
 
-class HomePageRedirectPage(base.BaseHandler):
-    """When a request is made to '/', check the user's login status, and
-    redirect them appropriately.
-    """
-
-    @acl_decorators.open_access  # type: ignore[misc]
-    def get(self) -> None:
-        if self.user_id and user_services.has_fully_registered_account( # type: ignore[no-untyped-call]
-                self.user_id):
-            user_settings = user_services.get_user_settings(self.user_id) # type: ignore[no-untyped-call]
-            default_dashboard = user_settings.default_dashboard
-            if default_dashboard == constants.DASHBOARD_TYPE_CREATOR:
-                self.redirect(feconf.CREATOR_DASHBOARD_URL)
-            else:
-                self.redirect(feconf.LEARNER_DASHBOARD_URL)
-        else:
-            self.render_template('splash-page.mainpage.html') # type: ignore[no-untyped-call]
-
-
 class SplashRedirectPage(base.BaseHandler):
     """Redirect the old splash URL, '/splash' to the new one, '/'."""
 
+    # Using type ignore[misc] here because untyped decorator makes function
+    # "get" also untyped.
     @acl_decorators.open_access  # type: ignore[misc]
     def get(self) -> None:
         self.redirect('/')
 
 
+# Type for `defaults` is set to Dict[str, str] based on the usage in our
+# backend. Should be changed in future as per the requirements.
 def get_redirect_route(
-        regex_route: Text,
+        regex_route: str,
         handler: Type[base.BaseHandler],
-        defaults: Optional[Dict[Any, Any]] = None
+        defaults: Optional[Dict[str, str]] = None
 ) -> routes.RedirectRoute:
     """Returns a route that redirects /foo/ to /foo.
 
@@ -173,9 +193,9 @@ def get_redirect_route(
 # Register the URLs with the classes responsible for handling them.
 URLS = [
     get_redirect_route(r'/_ah/warmup', WarmupPage),
-    get_redirect_route(r'/', HomePageRedirectPage),
     get_redirect_route(r'/splash', SplashRedirectPage),
-
+    get_redirect_route(
+        r'/internetconnectivityhandler', InternetConnectivityHandler),
     get_redirect_route(r'/foundation', pages.FoundationRedirectPage),
     get_redirect_route(r'/credits', pages.AboutRedirectPage),
     get_redirect_route(r'/participate', pages.TeachRedirectPage),
@@ -183,6 +203,27 @@ URLS = [
     get_redirect_route(r'/console_errors', pages.ConsoleErrorPage),
 
     get_redirect_route(r'/forum', pages.ForumRedirectPage),
+
+    # Access Validators.
+    get_redirect_route(
+        r'%s/can_access_classroom_page' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.ClassroomAccessValidationHandler),
+
+    get_redirect_route(
+        r'%s/can_manage_own_account' % feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.ManageOwnAccountValidationHandler),
+
+    get_redirect_route(
+        r'%s/does_profile_exist/<username>' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.ProfileExistsValidationHandler),
+
+    get_redirect_route(
+        r'%s/can_access_release_coordinator_page' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.ReleaseCoordinatorAccessValidationHandler
+    ),
 
     get_redirect_route(r'%s' % feconf.ADMIN_URL, admin.AdminPage),
     get_redirect_route(r'/adminhandler', admin.AdminHandler),
@@ -195,6 +236,8 @@ URLS = [
     get_redirect_route(
         r'/admintopicscsvdownloadhandler',
         admin.AdminTopicsCsvFileDownloader),
+    get_redirect_route(
+        r'/updateblogpostdatahandler', admin.UpdateBlogPostHandler),
     get_redirect_route(
         r'/contributionrightshandler/<category>',
         contributor_dashboard_admin.ContributionRightsHandler),
@@ -252,6 +295,9 @@ URLS = [
         r'/retrivefeaturedtranslationlanguages',
         contributor_dashboard.FeaturedTranslationLanguagesHandler),
     get_redirect_route(
+        r'/getalltopicnames',
+        contributor_dashboard.AllTopicNamesHandler),
+    get_redirect_route(
         r'%s' % feconf.NEW_SKILL_URL,
         topics_and_skills_dashboard.NewSkillHandler),
     get_redirect_route(
@@ -297,9 +343,7 @@ URLS = [
     get_redirect_route(
         r'%s/story' % feconf.TOPIC_VIEWER_URL_PREFIX,
         topic_viewer.TopicViewerPage),
-    get_redirect_route(
-        r'%s/story/<story_url_fragment>' % feconf.TOPIC_VIEWER_URL_PREFIX,
-        story_viewer.StoryPage),
+
     get_redirect_route(
         r'%s/<classroom_url_fragment>/<topic_url_fragment>'
         r'/<story_url_fragment>/<node_id>' % feconf.STORY_PROGRESS_URL_PREFIX,
@@ -343,8 +387,17 @@ URLS = [
         r'%s' % feconf.LEARNER_DASHBOARD_URL,
         learner_dashboard.LearnerDashboardPage),
     get_redirect_route(
-        r'%s' % feconf.LEARNER_DASHBOARD_DATA_URL,
-        learner_dashboard.LearnerDashboardHandler),
+        r'%s' % feconf.LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL,
+        learner_dashboard.LearnerDashboardTopicsAndStoriesProgressHandler),
+    get_redirect_route(
+        r'%s' % feconf.LEARNER_DASHBOARD_COLLECTION_DATA_URL,
+        learner_dashboard.LearnerDashboardCollectionsProgressHandler),
+    get_redirect_route(
+        r'%s' % feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL,
+        learner_dashboard.LearnerDashboardExplorationsProgressHandler),
+    get_redirect_route(
+        r'%s' % feconf.LEARNER_DASHBOARD_FEEDBACK_UPDATES_DATA_URL,
+        learner_dashboard.LearnerDashboardFeedbackUpdatesHandler),
     get_redirect_route(
         r'%s' % feconf.LEARNER_DASHBOARD_IDS_DATA_URL,
         learner_dashboard.LearnerDashboardIdsHandler),
@@ -400,36 +453,12 @@ URLS = [
         r'/value_generator_handler/<generator_id>',
         resources.ValueGeneratorHandler),
     get_redirect_route(r'/promo_bar_handler', resources.PromoBarHandler),
-    get_redirect_route(
-        r'%s' % feconf.CUSTOM_PARENTS_LANDING_PAGE_URL,
-        custom_landing_pages.StewardsLandingPage),
-    get_redirect_route(
-        r'%s' % feconf.CUSTOM_PARTNERS_LANDING_PAGE_URL,
-        custom_landing_pages.StewardsLandingPage),
-    get_redirect_route(
-        r'%s' % feconf.CUSTOM_NONPROFITS_LANDING_PAGE_URL,
-        custom_landing_pages.StewardsLandingPage),
-    get_redirect_route(
-        r'%s' % feconf.CUSTOM_TEACHERS_LANDING_PAGE_URL,
-        custom_landing_pages.StewardsLandingPage),
-    get_redirect_route(
-        r'%s' % feconf.CUSTOM_VOLUNTEERS_LANDING_PAGE_URL,
-        custom_landing_pages.StewardsLandingPage),
-
     get_redirect_route('/library', library.OldLibraryRedirectPage),
-    get_redirect_route(
-        r'%s' % feconf.LIBRARY_INDEX_URL, library.LibraryPage),
     get_redirect_route(
         r'%s' % feconf.LIBRARY_INDEX_DATA_URL, library.LibraryIndexHandler),
     get_redirect_route(
-        r'%s' % feconf.LIBRARY_RECENTLY_PUBLISHED_URL,
-        library.LibraryGroupPage),
-    get_redirect_route(
-        r'%s' % feconf.LIBRARY_TOP_RATED_URL, library.LibraryGroupPage),
-    get_redirect_route(
         r'%s' % feconf.LIBRARY_GROUP_DATA_URL,
         library.LibraryGroupIndexHandler),
-    get_redirect_route(r'%s' % feconf.LIBRARY_SEARCH_URL, library.LibraryPage),
     get_redirect_route(
         r'%s' % feconf.LIBRARY_SEARCH_DATA_URL, library.SearchHandler),
     get_redirect_route(r'/gallery', library.LibraryRedirectPage),
@@ -443,10 +472,8 @@ URLS = [
         feconf.COLLECTION_SUMMARIES_DATA_URL,
         library.CollectionSummariesHandler),
 
-    get_redirect_route(r'/profile/<username>', profile.ProfilePage),
     get_redirect_route(
         r'/profilehandler/data/<username>', profile.ProfileHandler),
-    get_redirect_route(feconf.PREFERENCES_URL, profile.PreferencesPage),
     get_redirect_route(
         r'%s/<secret>' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT,
         profile.BulkEmailWebhookEndpoint),
@@ -459,14 +486,10 @@ URLS = [
         profile.ProfilePictureHandlerByUsernameHandler),
     get_redirect_route(r'%s' % feconf.SIGNUP_URL, profile.SignupPage),
     get_redirect_route(r'%s' % feconf.SIGNUP_DATA_URL, profile.SignupHandler),
-    get_redirect_route(feconf.DELETE_ACCOUNT_URL, profile.DeleteAccountPage),
     get_redirect_route(
         feconf.DELETE_ACCOUNT_HANDLER_URL, profile.DeleteAccountHandler),
     get_redirect_route(
         feconf.EXPORT_ACCOUNT_HANDLER_URL, profile.ExportAccountHandler),
-    get_redirect_route(
-        feconf.PENDING_ACCOUNT_DELETION_URL,
-        profile.PendingAccountDeletionPage),
     get_redirect_route(
         r'%s' % feconf.USERNAME_CHECK_DATA_URL, profile.UsernameCheckHandler),
     get_redirect_route(
@@ -479,8 +502,6 @@ URLS = [
     get_redirect_route(
         r'/moderatorhandler/email_draft', moderator.EmailDraftHandler),
 
-    get_redirect_route(
-        r'/release-coordinator', release_coordinator.ReleaseCoordinatorPage),
     get_redirect_route(
         r'/memorycachehandler', release_coordinator.MemoryCacheHandler),
 
@@ -592,7 +613,7 @@ URLS = [
         r'/createhandler/statistics/<exploration_id>',
         editor.ExplorationStatisticsHandler),
     get_redirect_route(
-        r'/createhandler/state_interaction_stats/<exploration_id>/<escaped_state_name>',  # pylint: disable=line-too-long
+        r'/createhandler/state_interaction_stats/<exploration_id>/<state_name>',
         editor.StateInteractionStatsHandler),
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_STATE_ANSWER_STATS_PREFIX,
@@ -826,6 +847,11 @@ URLS = [
     get_redirect_route(
         r'/blogadminhandler', blog_admin.BlogAdminHandler),
 
+    get_redirect_route('/beam_job', beam_jobs.BeamJobHandler),
+    get_redirect_route('/beam_job_run', beam_jobs.BeamJobRunHandler),
+    get_redirect_route(
+        '/beam_job_run_result', beam_jobs.BeamJobRunResultHandler),
+
     get_redirect_route(
         r'%s/<blog_post_id>' % feconf.BLOG_EDITOR_DATA_URL_PREFIX,
         blog_dashboard.BlogPostHandler),
@@ -861,7 +887,9 @@ URLS = [
         platform_feature.PlatformFeatureDummyHandler),
 
     get_redirect_route(
-        r'/learn/<classroom_url_fragment>', classroom.ClassroomPage),
+        r'%s' % (
+            android_validation_constants.INCOMING_ANDROID_FEEDBACK_REPORT_URL),
+        incoming_app_feedback_report.IncomingAndroidFeedbackReportHandler),
 
     get_redirect_route(
         r'/voice_artist_management_handler/<entity_type>/<entity_id>',
@@ -882,16 +910,58 @@ if constants.DEV_MODE:
             r'/initialize_android_test_data',
             android_e2e_config.InitializeAndroidTestDataHandler))
 
-# Add cron urls.
+# Adding redirects for all stewards landing pages.
+for stewards_route in constants.STEWARDS_LANDING_PAGE['ROUTES']:
+    URLS.append(
+        get_redirect_route(
+            r'/%s' % stewards_route, oppia_root.OppiaRootPage))
+
+# Redirect all routes handled using angular router to the oppia root page.
+for page in constants.PAGES_REGISTERED_WITH_FRONTEND.values():
+    if not 'MANUALLY_REGISTERED_WITH_BACKEND' in page:
+        URLS.append(
+            get_redirect_route(
+                r'/%s' % page['ROUTE'], oppia_root.OppiaRootPage))
+
+# Manually redirect routes with url fragments to the oppia root page.
+URLS.extend((
+    get_redirect_route(r'/profile/<username>', oppia_root.OppiaRootPage),
+    get_redirect_route(
+        r'%s/story/<story_url_fragment>' % feconf.TOPIC_VIEWER_URL_PREFIX,
+        oppia_root.OppiaRootPage),
+    get_redirect_route(
+        r'/learn/<classroom_url_fragment>', oppia_root.OppiaRootPage),
+))
+
+# Add cron urls. Note that cron URLs MUST start with /cron for them to work
+# in production (see dispatch() in base.py).
 URLS.extend((
     get_redirect_route(
         r'/cron/models/cleanup', cron.CronModelsCleanupHandler),
+    get_redirect_route(
+        r'/cron/users/user_deletion', cron.CronUserDeletionHandler),
+    get_redirect_route(
+        r'/cron/users/fully_complete_user_deletion',
+        cron.CronFullyCompleteUserDeletionHandler),
     get_redirect_route(
         r'/cron/mail/admins/contributor_dashboard_bottlenecks',
         cron.CronMailAdminContributorDashboardBottlenecksHandler),
     get_redirect_route(
         r'/cron/mail/reviewers/contributor_dashboard_suggestions',
         cron.CronMailReviewersContributorDashboardSuggestionsHandler),
+    get_redirect_route(
+        r'/cron/app_feedback_report/scrub_expiring_reports',
+        cron.CronAppFeedbackReportsScrubberHandlerPage),
+    get_redirect_route(
+        r'/cron/explorations/recommendations',
+        cron.CronExplorationRecommendationsHandler),
+    get_redirect_route(
+        r'/cron/explorations/search_rank', cron.CronActivitySearchRankHandler),
+    get_redirect_route(
+        r'/cron/users/dashboard_stats', cron.CronDashboardStatsHandler),
+    get_redirect_route(
+        r'/cron/suggestions/translation_contribution_stats',
+        cron.CronTranslationContributionStatsHandler),
 ))
 
 # Add tasks urls.
@@ -912,16 +982,8 @@ URLS.extend((
         r'%s' % feconf.TASK_URL_FEEDBACK_STATUS_EMAILS,
         tasks.FeedbackThreadStatusChangeEmailHandler),
     get_redirect_route(
-        r'%s' % feconf.TASK_URL_DEFERRED,
-        tasks.DeferredTasksHandler),
+        r'%s' % feconf.TASK_URL_DEFERRED, tasks.DeferredTasksHandler),
 ))
-
-
-# Redirect all routes handled using angular router to the oppia root page.
-for page in constants.PAGES_REGISTERED_WITH_FRONTEND.values():
-    URLS.append(
-        get_redirect_route(
-            r'/%s' % page['ROUTE'], oppia_root.OppiaRootPage))
 
 # 404 error handler (Needs to be at the end of the URLS list).
 URLS.append(get_redirect_route(r'/<:.*>', base.Error404Handler))
@@ -934,16 +996,19 @@ class NdbWsgiMiddleware:
         self.wsgi_app = wsgi_app
 
     def __call__(
-            self,
-            environ: Dict[str, str],
-            start_response: webapp2.Response
-    ) -> Any:
+        self,
+        environ: Dict[str, str],
+        start_response: webapp2.Response
+    ) -> webapp2.Response:
         global_cache = datastore_services.RedisCache(
             cache_services.CLOUD_NDB_REDIS_CLIENT)  # type: ignore[attr-defined]
         with datastore_services.get_ndb_context(global_cache=global_cache):
-            return self.wsgi_app(environ, start_response)
+            # Cast is needed since webapp2.WSGIApplication is not
+            # correctly typed.
+            return cast(
+                webapp2.Response, self.wsgi_app(environ, start_response))
 
 
 app_without_context = webapp2.WSGIApplication(URLS, debug=feconf.DEBUG)
 app = NdbWsgiMiddleware(app_without_context)
-firebase_auth_services.establish_firebase_connection()  # type: ignore[no-untyped-call]
+firebase_auth_services.establish_firebase_connection()

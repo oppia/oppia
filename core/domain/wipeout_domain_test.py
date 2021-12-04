@@ -16,24 +16,23 @@
 
 """Tests for topic domain objects."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
+from core import utils
 from core.domain import wipeout_domain
 from core.tests import test_utils
-import utils
 
 
 class PendingDeletionRequestUnitTests(test_utils.GenericTestBase):
     """Tests for topic domain objects."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         super(PendingDeletionRequestUnitTests, self).setUp()
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
-        self.user_id_a = self.get_user_id_from_email('a@example.com')
+        self.user_id_a = self.get_user_id_from_email('a@example.com') # type: ignore[no-untyped-call]
 
-    def test_create_default_pending_deletion_request(self):
+    def test_create_default_pending_deletion_request(self) -> None:
         """Tests the create_default_topic() function."""
         default_pending_deletion = (
             wipeout_domain.PendingDeletionRequest.create_default(
@@ -46,7 +45,7 @@ class PendingDeletionRequestUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             default_pending_deletion.pseudonymizable_entity_mappings, {})
 
-    def test_validate_fails_for_wrong_key_in_activity_mappings(self):
+    def test_validate_fails_for_wrong_key_in_activity_mappings(self) -> None:
         """Tests the create_default_topic() function."""
         pending_deletion_request = (
             wipeout_domain.PendingDeletionRequest.create_default(
@@ -54,7 +53,7 @@ class PendingDeletionRequestUnitTests(test_utils.GenericTestBase):
         pending_deletion_request.pseudonymizable_entity_mappings = {
             'wrong_key': {}
         }
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError,
             'pseudonymizable_entity_mappings contain wrong key'
         ):

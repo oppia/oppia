@@ -16,8 +16,7 @@
 
 """Lint checks for Js and Ts files."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import collections
 import os
@@ -25,8 +24,6 @@ import re
 import shutil
 import subprocess
 import sys
-
-import python_utils
 
 from .. import common
 from .. import concurrent_task_utils
@@ -50,8 +47,12 @@ COMPILED_TYPESCRIPT_TMP_PATH = 'tmpcompiledjs/'
 # NOTE TO DEVELOPERS: Don't add any more files to this list. If you have any
 # questions, please talk to @srijanreddy98.
 INJECTABLES_TO_IGNORE = [
-    'MockIgnoredService', # This file is required for the js-ts-linter-test.
-    'UpgradedServices' # We don't want this service to be present in the index.
+    # This file is required for the js-ts-linter-test.
+    'MockIgnoredService',
+    # We don't want this service to be present in the index.
+    'UpgradedServices',
+    # Route guards cannot be made injectables until migration is complete.
+    'CanAccessSplashPageGuard',
 ]
 
 
@@ -140,7 +141,7 @@ def compile_all_ts_files():
     subprocess.call(cmd, stdout=subprocess.PIPE, shell=True)
 
 
-class JsTsLintChecksManager(python_utils.OBJECT):
+class JsTsLintChecksManager:
     """Manages all the Js and Ts linting functions."""
 
     def __init__(self, js_files, ts_files, file_cache):
@@ -186,7 +187,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
 
         # Select JS files which need to be checked.
         files_to_check = self.all_filepaths
-        parsed_js_and_ts_files = dict()
+        parsed_js_and_ts_files = {}
         concurrent_task_utils.log('Validating and parsing JS and TS files ...')
         for filepath in files_to_check:
             file_content = self.file_cache.read(filepath)
@@ -439,7 +440,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         return linter_stdout
 
 
-class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
+class ThirdPartyJsTsLintChecksManager:
     """Manages all the third party Python linting functions."""
 
     def __init__(self, files_to_lint):

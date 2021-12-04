@@ -16,14 +16,17 @@
 
 """Tests for state domain objects and methods defined on them."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
+import contextlib
 import copy
 import logging
 import os
 import re
 
+from core import feconf
+from core import schema_utils
+from core import utils
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -33,10 +36,6 @@ from core.domain import rules_registry
 from core.domain import state_domain
 from core.domain import translatable_object_registry
 from core.tests import test_utils
-import feconf
-import python_utils
-import schema_utils
-import utils
 
 
 class StateDomainUnitTests(test_utils.GenericTestBase):
@@ -1219,7 +1218,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         _verify_interaction_does_not_support_android(self, 'CodeRepl')
         _verify_interaction_does_not_support_android(self, 'GraphInput')
         _verify_interaction_does_not_support_android(self, 'InteractiveMap')
-        _verify_interaction_does_not_support_android(self, 'LogicProof')
         _verify_interaction_does_not_support_android(self, 'MusicNotesInput')
         _verify_interaction_does_not_support_android(self, 'PencilCodeEditor')
         _verify_interaction_does_not_support_android(self, 'SetInput')
@@ -1387,7 +1385,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     {
                         'x': {
                             'contentId': 'rule_input_4',
-                            'normalizedStrSet': ['Test']
+                            'normalizedStrSet': ['Input1', 'Input2']
                             }
                     })
             ],
@@ -1471,6 +1469,63 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             ].content,
             'Placeholder'
         )
+        rule_translatable_item = content_id_mapping_needing_translations[
+            'rule_input_4'
+        ]
+        self.assertEqual(rule_translatable_item.content, ['Input1', 'Input2'])
+        self.assertEqual(rule_translatable_item.interaction_id, 'TextInput')
+        self.assertEqual(rule_translatable_item.rule_type, 'Contains')
+
+    def test_get_content_id_mapping_needing_translations_for_set_input_rule(self): # pylint: disable=line-too-long
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+        init_state = exploration.states[exploration.init_state_name]
+        init_state.update_content(
+            state_domain.SubtitledHtml.from_dict({
+                'content_id': 'content',
+                'html': '<p>This is content</p>'
+            }))
+        init_state.update_interaction_id('SetInput')
+
+        state_answer_group = state_domain.AnswerGroup(
+            state_domain.Outcome(
+                exploration.init_state_name, state_domain.SubtitledHtml(
+                    'feedback_1', '<p>Feedback</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Equals',
+                    {
+                        'x': {
+                            'contentId': 'rule_input_4',
+                            'unicodeStrSet': ['Input1', 'Input2']
+                            }
+                    })
+            ],
+            [],
+            None
+        )
+        init_state.update_interaction_answer_groups(
+            [state_answer_group])
+
+        written_translations_dict = {
+            'translations_mapping': {
+                'content': {},
+                'feedback_1': {},
+                'rule_input_4': {}
+            }
+        }
+        written_translations = state_domain.WrittenTranslations.from_dict(
+            written_translations_dict)
+        init_state.update_written_translations(written_translations)
+
+        content_id_mapping_needing_translations = (
+            init_state.get_content_id_mapping_needing_translations('hi'))
+        rule_translatable_item = content_id_mapping_needing_translations[
+            'rule_input_4'
+        ]
+        self.assertEqual(rule_translatable_item.content, ['Input1', 'Input2'])
+        self.assertEqual(rule_translatable_item.interaction_id, 'SetInput')
+        self.assertEqual(rule_translatable_item.rule_type, 'Equals')
 
     def test_get_content_id_mapping_needing_translations_does_not_return_numeric_content(self): # pylint: disable=line-too-long
         exploration = exp_domain.Exploration.create_default_exploration('0')
@@ -1548,6 +1603,16 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             ].content, '1,000')
         self.assertFalse(
             'ca_choices_2' in content_id_mapping_needing_translations)
+
+    def test_content_id_existance_checks_work_correctly(self):
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+        init_state = exploration.states[exploration.init_state_name]
+
+        self.assertEqual(init_state.has_content_id('content'), True)
+        with self.assertRaisesRegexp(
+            ValueError, 'Content ID content0 does not exist'):
+            init_state.get_content_html('content0')
+        self.assertEqual(init_state.has_content_id('content0'), False)
 
     def test_add_translation_works_correctly(self):
         exploration = exp_domain.Exploration.create_default_exploration('0')
@@ -3898,7 +3963,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
     def test_cannot_convert_state_dict_to_yaml_with_invalid_state_dict(self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
 
-        with python_utils.ExitStack() as stack:
+        with contextlib.ExitStack() as stack:
             captured_logs = stack.enter_context(
                 self.capture_logging(min_level=logging.ERROR))
             stack.enter_context(

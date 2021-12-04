@@ -14,19 +14,18 @@
 
 """Tests for the oppia root page."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import annotations
 
-from constants import constants
+from core.constants import constants
 from core.tests import test_utils
 
 
 class OppiaRootPageTests(test_utils.GenericTestBase):
 
-    def test_oppia_root_page(self):
-        # type: () -> None
+    def test_oppia_root_page(self) -> None:
         """Tests access to the unified entry page."""
         for page in constants.PAGES_REGISTERED_WITH_FRONTEND.values():
-            response = self.get_html_response( # type: ignore[no-untyped-call]
-                '/%s' % page['ROUTE'], expected_status_int=200)
-            response.mustcontain('<oppia-root></oppia-root>')
+            if not 'MANUALLY_REGISTERED_WITH_BACKEND' in page:
+                response = self.get_html_response( # type: ignore[no-untyped-call]
+                    '/%s' % page['ROUTE'], expected_status_int=200)
+                response.mustcontain('<oppia-root></oppia-root>')

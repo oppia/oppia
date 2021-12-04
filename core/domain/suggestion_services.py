@@ -16,14 +16,14 @@
 suggestions.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import heapq
 import logging
 import re
 
-from constants import constants
+from core import feconf
+from core.constants import constants
 from core.domain import email_manager
 from core.domain import exp_fetchers
 from core.domain import feedback_services
@@ -34,8 +34,6 @@ from core.domain import suggestion_registry
 from core.domain import user_domain
 from core.domain import user_services
 from core.platform import models
-import feconf
-import python_utils
 
 (feedback_models, suggestion_models, user_models) = (
     models.Registry.import_models(
@@ -266,7 +264,6 @@ def _update_suggestion(suggestion):
     Args:
         suggestion: Suggestion. The suggestion to be updated.
     """
-
     _update_suggestions([suggestion])
 
 
@@ -878,8 +875,7 @@ def get_suggestions_waiting_for_review_info_to_notify_reviewers(reviewer_ids):
         # Get the key information from each suggestion that will be used to
         # email reviewers.
         reviewer_reviewable_suggestion_infos = []
-        for _ in python_utils.RANGE(
-                MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_REVIEWER):
+        for _ in range(MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_REVIEWER):
             if len(suggestions_waiting_longest_heap) == 0:
                 break
             _, suggestion = heapq.heappop(suggestions_waiting_longest_heap)
@@ -1342,7 +1338,12 @@ def update_translation_suggestion(suggestion_id, translation_html):
     """
     suggestion = get_suggestion_by_id(suggestion_id)
 
-    suggestion.change.translation_html = html_cleaner.clean(translation_html)
+    # Clean the translation HTML if not a list of strings.
+    suggestion.change.translation_html = (
+        html_cleaner.clean(translation_html)
+        if isinstance(translation_html, str)
+        else translation_html
+    )
     suggestion.edited_by_reviewer = True
     suggestion.pre_update_validate(suggestion.change)
     _update_suggestion(suggestion)
@@ -1357,6 +1358,10 @@ def update_question_suggestion(
         suggestion_id: str. The id of the suggestion to be updated.
         skill_difficulty: double. The difficulty level of the question.
         question_state_data: obj. Details of the question.
+
+    Returns:
+        Suggestion|None. The corresponding suggestion, or None if no suggestion
+        is found.
     """
     suggestion = get_suggestion_by_id(suggestion_id)
     new_change_obj = question_domain.QuestionSuggestionChange(
@@ -1383,3 +1388,5 @@ def update_question_suggestion(
     suggestion.change = new_change_obj
 
     _update_suggestion(suggestion)
+
+    return suggestion

@@ -9,6 +9,7 @@
  */
 var constants = {
   // Whether to allow custom event reporting to Google Analytics.
+  // Mock gtag function is used when disabled.
   "CAN_SEND_ANALYTICS_EVENTS": false,
 
   "ALL_CATEGORIES": ["Algebra", "Algorithms", "Architecture", "Arithmetic",
@@ -470,7 +471,6 @@ var constants = {
     "interaction_ids": [
         "FractionInput",
         "GraphInput",
-        "LogicProof",
         "NumericInput",
         "SetInput",
         "NumericExpressionInput",

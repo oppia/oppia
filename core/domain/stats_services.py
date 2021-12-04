@@ -16,19 +16,18 @@
 
 """Services for exploration-related statistics."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import copy
 import datetime
 import itertools
 
+from core import feconf
+from core import utils
 from core.domain import exp_fetchers
 from core.domain import question_services
 from core.domain import stats_domain
 from core.platform import models
-import feconf
-import utils
 
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 transaction_services = models.Registry.import_transaction_services()
@@ -975,8 +974,7 @@ def create_learner_answer_details_model_instance(learner_answer_details):
         learner_answer_details.entity_type,
         learner_answer_details.state_reference,
         learner_answer_details.interaction_id,
-        [learner_answer_info.to_dict() for learner_answer_info
-         in learner_answer_details.learner_answer_info_list],
+        learner_answer_details.learner_answer_info_list,
         learner_answer_details.learner_answer_info_schema_version,
         learner_answer_details.accumulated_answer_info_json_size_bytes)
 

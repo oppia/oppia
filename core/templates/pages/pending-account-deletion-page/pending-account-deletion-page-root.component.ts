@@ -17,9 +17,24 @@
  */
 
 import { Component } from '@angular/core';
+import { AppConstants } from 'app.constants';
+import { PageHeadService } from 'services/page-head.service';
 
 @Component({
   selector: 'oppia-pending-account-deletion-page-root',
   templateUrl: './pending-account-deletion-page-root.component.html'
 })
-export class PendingAccountDeletionPageRootComponent {}
+export class PendingAccountDeletionPageRootComponent {
+  pageIsShown: boolean = false;
+  errorPageIsShown: boolean = false;
+
+  constructor(
+    private pageHeadService: PageHeadService
+  ) {}
+
+  ngOnInit(): void {
+    this.pageHeadService.updateTitleAndMetaTags(
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PENDING_ACCOUNT_DELETION);
+    this.pageIsShown = true;
+  }
+}

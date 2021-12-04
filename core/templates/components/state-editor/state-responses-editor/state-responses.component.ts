@@ -24,7 +24,7 @@ require(
   'components/state-directives/answer-group-editor/' +
   'answer-group-editor.component.ts');
 require(
-  'components/state-directives/response-header/response-header.directive.ts');
+  'components/state-directives/response-header/response-header.component.ts');
 require('components/state-editor/state-editor.component.ts');
 require(
   'components/state-directives/outcome-editor/' +

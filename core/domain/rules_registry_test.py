@@ -16,15 +16,14 @@
 
 """Tests for methods in the rule registry."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import json
 import os
 
+from core import python_utils
 from core.domain import rules_registry
 from core.tests import test_utils
-import python_utils
 
 
 class RulesRegistryUnitTests(test_utils.GenericTestBase):

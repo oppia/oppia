@@ -19,15 +19,15 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable, EventEmitter } from '@angular/core';
 
+import { SearchBackendApiService, SearchResponseBackendDict } from './search-backend-api.service';
 import { ExplorationSummaryDict } from 'domain/summary/exploration-summary-backend-api.service';
-import { SearchBackendApiService } from './search-backend-api.service';
 import cloneDeep from 'lodash/cloneDeep';
 
-export class SelectionList {
+export interface SelectionList {
   [key: string]: boolean;
 }
 
-class FilterDetails {
+interface FilterDetails {
   description: string;
   itemsName: string;
   masterList: {
@@ -39,7 +39,8 @@ class FilterDetails {
   summary: string;
 }
 
-export class SelectionDetails {
+export interface SelectionDetails {
+  [key: string]: FilterDetails;
   categories: FilterDetails;
   languageCodes: FilterDetails;
 }
@@ -48,10 +49,13 @@ export class SelectionDetails {
   providedIn: 'root'
 })
 export class SearchService {
-  private _lastQuery: string = null;
+  // These properties are initialized using functions
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  private _lastQuery!: string;
+  private _searchOffset!: number;
   private _lastSelectedCategories: SelectionList = {};
   private _lastSelectedLanguageCodes: SelectionList = {};
-  private _searchCursor: string = null;
   private _isCurrentlyFetchingResults = false;
   private _searchBarLoadedEventEmitter = new EventEmitter<string>();
   private _initialSearchResultsLoadedEventEmitter =
@@ -97,7 +101,7 @@ export class SearchService {
   }
 
   hasReachedEndOfPage(): boolean {
-    return this._searchCursor === null;
+    return this._searchOffset === null;
   }
 
   updateSearchFields(
@@ -160,7 +164,7 @@ export class SearchService {
         this._lastQuery = searchQuery;
         this._lastSelectedCategories = cloneDeep(selectedCategories);
         this._lastSelectedLanguageCodes = cloneDeep(selectedLanguageCodes);
-        this._searchCursor = response.search_cursor;
+        this._searchOffset = response.search_offset;
         this.numSearchesInProgress--;
 
         this._initialSearchResultsLoadedEventEmitter.emit(
@@ -228,26 +232,34 @@ export class SearchService {
     );
   }
 
+  // Here failure callback is optional so that it gets invoked
+  // only when the end of page has reached and return void otherwise.
   loadMoreData(
-      successCallback: (SearchResponseData, boolean) => void,
-      failureCallback?: (boolean) => void): void {
+      successCallback: (
+        SearchResponseData: SearchResponseBackendDict,
+        boolean: boolean
+      ) => void,
+      failureCallback?: (arg0: boolean) => void
+  ): void {
     // If a new query is still being sent, or the end of the page has been
     // reached, do not fetch more results.
     if (this._isCurrentlyFetchingResults || this.hasReachedEndOfPage()) {
-      failureCallback(this.hasReachedEndOfPage());
+      if (failureCallback) {
+        failureCallback(this.hasReachedEndOfPage());
+      }
       return;
     }
 
     let queryUrl = this.getQueryUrl(this.getCurrentUrlQueryString());
 
-    if (this._searchCursor) {
-      queryUrl += '&cursor=' + this._searchCursor;
+    if (this._searchOffset) {
+      queryUrl += '&offset=' + this._searchOffset;
     }
 
     this._isCurrentlyFetchingResults = true;
     this._searchBackendApiService.fetchExplorationSearchResultAsync(queryUrl)
       .then((response) => {
-        this._searchCursor = response.search_cursor;
+        this._searchOffset = response.search_offset;
         this._isCurrentlyFetchingResults = false;
 
         if (successCallback) {

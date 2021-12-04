@@ -1,7 +1,7 @@
 <oppia-learner-dashboard-icons *ngIf="showLearnerDashboardIconsIfPossible && userIsLoggedIn"
                                [activityType]="activityType"
-                               [activityId]="getExplorationId"
-                               [activityTitle]="getExplorationTitle"
+                               [activityId]="explorationId"
+                               [activityTitle]="explorationTitle"
                                [isContainerNarrow]="isContainerNarrow"
                                [activityActive]="explorationIsCurrentlyHoveredOver"
                                [isAddToPlaylistIconShown]="!isOwnedByCurrentUser">
@@ -10,11 +10,11 @@
 <mat-card [ngClass]="{'oppia-activity-summary-tile-mobile': isCollectionPreviewTile, 'oppia-activity-summary-tile': !isCollectionPreviewTile, 'small-width': !isWindowLarge, 'oppia-activity-playlist-tile': isPlaylistTile}"
          *ngIf="!isRefresherExploration" [style.padding]="0" class="oppia-exploration-dashboard-card protractor-test-exploration-dashboard-card">
   <a [href]="getExplorationLink()" target="{{ openInNewWindow ? '_blank' : '_self' }}">
-    <div class="title-section protractor-test-exp-hover" [ngStyle]="{'background-color': getThumbnailBgColor}">
-      <img class="thumbnail-image" [src]="thumbnailIcon" alt="{{ getCategory }}">
+    <div class="title-section protractor-test-exp-hover" [ngStyle]="{'background-color': thumbnailBgColor}">
+      <img class="thumbnail-image" [src]="thumbnailIcon" alt="{{ category }}">
       <h3 class="activity-title protractor-test-exp-summary-tile-title">
-        <span *ngIf="isWindowLarge">{{ getExplorationTitle | truncate:40 }}</span>
-        <span *ngIf="!isWindowLarge">{{ getExplorationTitle | truncate:40 }}</span>
+        <span *ngIf="isWindowLarge">{{ explorationTitle | truncate:40 }}</span>
+        <span *ngIf="!isWindowLarge">{{ explorationTitle | truncate:40 }}</span>
       </h3>
     </div>
     <div *ngIf="!isPlaylistTile" class="title-section-mask"
@@ -22,9 +22,9 @@
     </div>
     <div class="summary-section"
          section="{isWindowLarge?undefined:'right-section'}">
-      <div *ngIf="isWindowLarge" class="objective protractor-test-exp-summary-tile-objective" [innerHTML]="getObjective | truncateAndCapitalize:95">
+      <div *ngIf="isWindowLarge" class="objective protractor-test-exp-summary-tile-objective" [innerHTML]="objective | truncateAndCapitalize:95">
       </div>
-      <div *ngIf="!getObjective" class="objective">
+      <div *ngIf="!objective" class="objective">
         <span [innerHTML]="'I18N_LIBRARY_NO_OBJECTIVE' | translate">
         </span>
       </div>
@@ -45,10 +45,10 @@
           <span class="far fa-eye" ngbTooltip="I18N_LIBRARY_VIEWS_TOOLTIP' | translate" placement="top" container="body">
             <span class="oppia-icon-accessibility-label" [innerHTML]="'I18N_LIBRARY_VIEWS_TOOLTIP' | translate"></span>
           </span>
-          <span *ngIf="getNumViews">
-            {{ getNumViews | summarizeNonnegativeNumber }}
+          <span *ngIf="numViews">
+            {{ numViews | summarizeNonnegativeNumber }}
           </span>
-          <span *ngIf="!getNumViews" [innerHTML]="'I18N_LIBRARY_N/A' | translate" class="oppia-inactive-summary-tile-attribute">
+          <span *ngIf="!numViews" [innerHTML]="'I18N_LIBRARY_N/A' | translate" class="oppia-inactive-summary-tile-attribute">
           </span>
         </li>
         <li>

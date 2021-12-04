@@ -16,11 +16,10 @@
 
 """Commands for moderator message operations."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
+from core import feconf
 from core.domain import taskqueue_services
-import feconf
 
 
 def enqueue_flag_exploration_email_task(

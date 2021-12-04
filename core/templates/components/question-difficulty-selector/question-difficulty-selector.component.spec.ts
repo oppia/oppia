@@ -14,7 +14,7 @@
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { MatRadioChange } from '@angular/material/radio';
+import { MatRadioChange, _MatRadioButtonBase } from '@angular/material/radio';
 import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
 import { QuestionDifficultySelectorComponent } from './question-difficulty-selector.component';
 
@@ -50,7 +50,7 @@ describe('QuestionDifficultySelectorComponent', () => {
     component.skillWithDifficulty = new SkillDifficulty('id', '', 0.6);
     spyOn(component.skillWithDifficultyChange, 'emit');
     let mockMatRadioChange: MatRadioChange = {
-      source: null,
+      source: {} as _MatRadioButtonBase,
       value: 0.9
     };
 

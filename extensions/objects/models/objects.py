@@ -16,17 +16,16 @@
 
 """Classes for interpreting typed objects in Oppia."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import copy
+import json
 
-from constants import constants
-import python_utils
-import schema_utils
+from core import schema_utils
+from core.constants import constants
 
 
-class BaseObject(python_utils.OBJECT):
+class BaseObject:
     """Base object class.
 
     This is the superclass for typed object specifications in Oppia, such as
@@ -735,136 +734,18 @@ class CheckedProof(BaseObject):
         """
         try:
             assert isinstance(raw, dict)
-            assert isinstance(
-                raw['assumptions_string'], python_utils.BASESTRING)
-            assert isinstance(raw['target_string'], python_utils.BASESTRING)
-            assert isinstance(raw['proof_string'], python_utils.BASESTRING)
+            assert isinstance(raw['assumptions_string'], str)
+            assert isinstance(raw['target_string'], str)
+            assert isinstance(raw['proof_string'], str)
             assert raw['correct'] in [True, False]
             if not raw['correct']:
-                assert isinstance(
-                    raw['error_category'], python_utils.BASESTRING)
-                assert isinstance(raw['error_code'], python_utils.BASESTRING)
-                assert isinstance(
-                    raw['error_message'], python_utils.BASESTRING)
+                assert isinstance(raw['error_category'], str)
+                assert isinstance(raw['error_code'], str)
+                assert isinstance(raw['error_message'], str)
                 assert isinstance(raw['error_line_number'], int)
             return copy.deepcopy(raw)
         except Exception:
             raise TypeError('Cannot convert to checked proof %s' % raw)
-
-
-class LogicQuestion(BaseObject):
-    """A question giving a formula to prove."""
-
-    description = 'A question giving a formula to prove.'
-
-    @classmethod
-    def normalize(cls, raw):
-        """Validates and normalizes a raw Python object.
-
-        Args:
-            raw: *. A Python object to be validated against the schema,
-                normalizing if necessary.
-
-        Returns:
-            dict. The normalized object containing the following key-value
-            pairs:
-                assumptions: list(dict(str, *)). The list containing all the
-                    assumptions in the dict format containing following
-                    key-value pairs:
-                        top_kind_name: str. The top kind name in the
-                            expression.
-                        top_operator_name: str. The top operator name
-                            in the expression.
-                        arguments: list(str). A list of arguments.
-                        dummies: list. A list of dummy values.
-                results: list(dict(str, *)). The list containing the final
-                    results of the required proof in the dict format
-                    containing following key-value pairs:
-                        top_kind_name: str. The top kind name in the
-                            expression.
-                        top_operator_name: str. The top operator name
-                            in the expression.
-                        arguments: list(str). A list of arguments.
-                        dummies: list. A list of dummy values.
-                default_proof_string: str. The default proof string.
-
-        Raises:
-            TypeError. Cannot convert to LogicQuestion schema.
-        """
-
-        def _validate_expression(expression):
-            """Validates the given expression.
-
-            Args:
-                expression: dict(str, *). The expression to be verified in the
-                    dict format.
-
-            Raises:
-                AssertionError. The specified expression is not in the correct
-                    format.
-            """
-            assert isinstance(expression, dict)
-            assert isinstance(
-                expression['top_kind_name'], python_utils.BASESTRING)
-            top_operator_name_type = (
-                int
-                if (
-                    expression['top_kind_name'] == 'constant' and
-                    'type' in expression and
-                    expression['type'] == 'integer'
-                ) else python_utils.BASESTRING
-            )
-            assert isinstance(
-                expression['top_operator_name'], top_operator_name_type)
-            _validate_expression_array(expression['arguments'])
-            _validate_expression_array(expression['dummies'])
-
-        def _validate_expression_array(array):
-            """Validates the given expression array.
-
-            Args:
-                array: list(dict(str, *)). The expression array to be verified.
-
-            Raises:
-                AssertionError. The specified expression array is not in the
-                    list format.
-            """
-            assert isinstance(array, list)
-            for item in array:
-                _validate_expression(item)
-
-        try:
-            assert isinstance(raw, dict)
-            _validate_expression_array(raw['assumptions'])
-            _validate_expression_array(raw['results'])
-            assert isinstance(
-                raw['default_proof_string'], python_utils.BASESTRING)
-
-            return copy.deepcopy(raw)
-        except Exception:
-            raise TypeError('Cannot convert to a logic question %s' % raw)
-
-
-class LogicErrorCategory(BaseObject):
-    """A string from a list of possible categories."""
-
-    description = 'One of the possible error categories of a logic proof.'
-    default_value = 'mistake'
-
-    @classmethod
-    def get_schema(cls):
-        """Returns the object schema.
-
-        Returns:
-            dict. The object schema.
-        """
-        return {
-            'type': 'unicode',
-            'choices': [
-                'parsing', 'typing', 'line', 'layout', 'variables', 'logic',
-                'target', 'mistake'
-            ]
-        }
 
 
 class Graph(BaseObject):
@@ -1709,3 +1590,25 @@ class TranslatableSetOfUnicodeString(BaseTranslatableObject):
         'contentId': None,
         'unicodeStrSet': [],
     }
+
+
+class JsonEncodedInString(BaseObject):
+    """Converts stringified value to its actual data type."""
+
+    @classmethod
+    def normalize(cls, raw):
+        """Validates and normalizes a raw Python object.
+
+        Args:
+            raw: str. Strings to be validated and normalized.
+
+        Returns:
+            *. The normalized value of any type, it depends on the raw value
+            which we want to load from json.
+        """
+        if not isinstance(raw, str):
+            raise Exception('Expected string received %s of type %s' % (
+                raw, type(raw))
+            )
+
+        return json.loads(raw)

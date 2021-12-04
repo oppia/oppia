@@ -52,6 +52,9 @@ describe('Learner dashboard functionality', function() {
     await action.click('Continue button', continueButton);
     await waitFor.pageToFullyLoad();
   };
+  var testExplorationId = null;
+  var collectionExplorationId = null;
+  var dummyExplorationId = null;
 
   var createDummyExplorationOnDesktop = async function(welcomeModalIsShown) {
     await creatorDashboardPage.get();
@@ -93,6 +96,7 @@ describe('Learner dashboard functionality', function() {
     await explorationEditorSettingsTab.setLanguage('English');
     await explorationEditorPage.saveChanges();
     await workflow.publishExploration();
+    dummyExplorationId = await general.getExplorationIdFromEditor();
   };
 
   beforeAll(function() {
@@ -152,13 +156,13 @@ describe('Learner dashboard functionality', function() {
           'English',
           true
         );
+        testExplorationId = await general.getExplorationIdFromEditor();
         // Update the role of the user to admin since only admin users
         // can create a collection.
         await adminPage.get();
         await adminPage.addRole('expOfCollectionCreator', 'collection editor');
         await workflow.createCollectionAsAdmin();
-        await collectionEditorPage.searchForAndAddExistingExploration(
-          'Demo Exploration');
+        await collectionEditorPage.addExistingExploration(testExplorationId);
         await collectionEditorPage.saveDraft();
         await collectionEditorPage.closeSaveModal();
         await collectionEditorPage.publishCollection();
@@ -229,12 +233,14 @@ describe('Learner dashboard functionality', function() {
     await waitFor.pageToFullyLoad();
     // Learner Dashboard should display 'Dummy Exploration'
     // as incomplete.
-    await learnerDashboardPage.checkIncompleteExplorationSection(
-      'Dummy Exploration');
+    await learnerDashboardPage
+      .navigateToCommunityLessonsAndCheckIncompleteExplorations(
+        'Dummy Exploration');
     // Learner Dashboard should display 'Test Exploration'
     // exploration as complete.
-    await learnerDashboardPage.checkCompleteExplorationSection(
-      'Test Exploration');
+    await learnerDashboardPage
+      .navigateToCommunityLessonsAndCheckCompleteExplorations(
+        'Test Exploration');
 
     await libraryPage.get();
     await libraryPage.findExploration('Dummy Exploration');
@@ -254,10 +260,12 @@ describe('Learner dashboard functionality', function() {
     }
     // Both should be added to the completed section.
     await learnerDashboardPage.get();
-    await learnerDashboardPage.checkCompleteExplorationSection(
-      'Dummy Exploration');
-    await learnerDashboardPage.checkCompleteExplorationSection(
-      'Test Exploration');
+    await learnerDashboardPage
+      .navigateToCommunityLessonsAndCheckCompleteExplorations(
+        'Dummy Exploration');
+    await learnerDashboardPage
+      .navigateToCommunityLessonsAndCheckCompleteExplorations(
+        'Test Exploration');
     await users.logout();
 
     // For desktop, go to the exploration editor page and
@@ -282,7 +290,7 @@ describe('Learner dashboard functionality', function() {
       // from learner dashboard.
       await users.login('learner@learnerDashboard.com');
       await learnerDashboardPage.get();
-      await learnerDashboardPage.navigateToCompletedSection();
+      await learnerDashboardPage.navigateToCommunityLessonsSection();
       await learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
         'Test Exploration');
       await learnerDashboardPage.expectTitleOfExplorationSummaryTileToBeHidden(
@@ -307,6 +315,7 @@ describe('Learner dashboard functionality', function() {
         'English',
         false
       );
+      collectionExplorationId = await general.getExplorationIdFromEditor();
       // Update the role of the user to collection editor since only collection
       // editors can create a collection.
       await adminPage.get();
@@ -314,8 +323,7 @@ describe('Learner dashboard functionality', function() {
       // Create new 'Test Collection' containing
       // exploration 'Dummy Exploration'.
       await workflow.createCollectionAsAdmin();
-      await collectionEditorPage.searchForAndAddExistingExploration(
-        'Dummy Exploration');
+      await collectionEditorPage.addExistingExploration(dummyExplorationId);
       await collectionEditorPage.saveDraft();
       await collectionEditorPage.closeSaveModal();
       await collectionEditorPage.publishCollection();
@@ -360,8 +368,9 @@ describe('Learner dashboard functionality', function() {
 
     // Learner Dashboard should display
     // 'Test Collection' as incomplete.
-    await learnerDashboardPage.checkIncompleteCollectionSection(
-      'Test Collection');
+    await learnerDashboardPage
+      .navigateToCommunityLessonsAndCheckIncompleteCollections(
+        'Test Collection');
     // Now find and play 'Test Collection' completely.
     await libraryPage.get();
     await libraryPage.findCollection('Test Collection');
@@ -394,8 +403,9 @@ describe('Learner dashboard functionality', function() {
     // Learner Dashboard should display
     // 'Test Collection' as complete.
     await learnerDashboardPage.get();
-    await learnerDashboardPage.checkCompleteCollectionSection(
-      'Test Collection');
+    await learnerDashboardPage
+      .navigateToCommunityLessonsAndCheckCompleteCollections(
+        'Test Collection');
     await users.logout();
 
     // This part of the test is desktop-only for the following reasons:
@@ -421,8 +431,8 @@ describe('Learner dashboard functionality', function() {
       var collectionsTab = element(by.css('.protractor-test-collections-tab'));
       await action.click('Collections tab', collectionsTab);
       await creatorDashboardPage.navigateToCollectionEditor();
-      await collectionEditorPage.searchForAndAddExistingExploration(
-        'Collection Exploration');
+      await collectionEditorPage.addExistingExploration(
+        collectionExplorationId);
       await collectionEditorPage.saveDraft();
       await collectionEditorPage.setCommitMessage('Add Collection Exploration');
       await collectionEditorPage.closeSaveModal();
@@ -431,8 +441,9 @@ describe('Learner dashboard functionality', function() {
       // Verify 'Test Collection' is now in the incomplete section.
       await users.login('learner4@learnerDashboard.com');
       await learnerDashboardPage.get();
-      await learnerDashboardPage.checkIncompleteCollectionSection(
-        'Test Collection');
+      await learnerDashboardPage
+        .navigateToCommunityLessonsAndCheckIncompleteCollections(
+          'Test Collection');
     }
   });
 

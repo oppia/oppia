@@ -14,12 +14,12 @@
 
 """Tests for the collection editor page."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import base64
 
-from constants import constants
+from core import feconf
+from core.constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_fetchers
@@ -27,7 +27,6 @@ from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import user_services
 from core.tests import test_utils
-import feconf
 
 
 class BaseCollectionEditorControllerTests(test_utils.GenericTestBase):

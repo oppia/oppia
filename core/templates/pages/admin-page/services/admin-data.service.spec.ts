@@ -30,7 +30,7 @@ import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 
 
 describe('Admin Data Service', () => {
-  let adminDataService: AdminDataService = null;
+  let adminDataService: AdminDataService;
   let httpTestingController: HttpTestingController;
   var sampleAdminData: AdminPageDataBackendDict = {
     role_to_actions: {
@@ -89,7 +89,7 @@ describe('Admin Data Service', () => {
       rules: [{
         filters: [{
           type: PlatformParameterFilterType.ServerMode,
-          conditions: [<[string, string]>['=', 'dev']]
+          conditions: [['=', 'dev'] as [string, string]]
         }],
         value_when_matched: true
       }],

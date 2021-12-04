@@ -16,19 +16,20 @@
 
 """Provides functionality for Google Cloud Tasks-related operations."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
+import datetime
 import json
 import logging
 
-from constants import constants
-import feconf
+from core import feconf
+from core.constants import constants
 
 from google import auth
 from google.api_core import retry
 from google.cloud import tasks_v2
 from google.protobuf import timestamp_pb2
+from typing import Any, Dict, Optional
 
 CLIENT = tasks_v2.CloudTasksClient(
     credentials=(
@@ -36,8 +37,15 @@ CLIENT = tasks_v2.CloudTasksClient(
         if constants.EMULATOR_MODE else auth.default()[0]))
 
 
+# In the type annotation below, payload is of type Dict[str, Any] because
+# the payload here has no constraints.
 def create_http_task(
-        queue_name, url, payload=None, scheduled_for=None, task_name=None):
+        queue_name: str,
+        url: str,
+        payload: Optional[Dict[str, Any]] = None,
+        scheduled_for: Optional[datetime.datetime] = None,
+        task_name: Optional[str] = None
+) -> tasks_v2.types.Task:
     """Creates an http task with the correct http headers/payload and sends
     that task to the Cloud Tasks API. An http task is an asynchronous task that
     consists of a post request to a specified url with the specified payload.
@@ -61,23 +69,27 @@ def create_http_task(
     parent = CLIENT.queue_path(
         feconf.OPPIA_PROJECT_ID, feconf.GOOGLE_APP_ENGINE_REGION, queue_name)
 
-    # Construct the request body.
-    task = {
-        'app_engine_http_request': {  # Specify the type of request.
-            'http_method': tasks_v2.types.target_pb2.HttpMethod.POST,
+    # In the type annotation below, task is of type Dict[str, Any] because
+    # its structure can vary a lot.
+    # We can see how the proto message for Task is defined. See the link:
+    # https://github.com/googleapis/python-tasks/blob/2f6ae8318e9a6fc2963d4a7825ee96e41f330043/google/cloud/tasks_v2/types/task.py#L29
+    task: Dict[str, Any] = {
+        # Specify the type of request.
+        'app_engine_http_request': {
+            'http_method': tasks_v2.types.HttpMethod.POST,
             'relative_uri': url,
         }
     }
 
     if payload is not None:
         if isinstance(payload, dict):
-            payload = json.dumps(payload)
+            payload_text = json.dumps(payload)
             task['app_engine_http_request']['headers'] = {
                 'Content-type': 'application/json'
             }
 
         # The API expects a payload of type bytes.
-        converted_payload = payload.encode('utf-8')
+        converted_payload = payload_text.encode('utf-8')
 
         # Add the payload to the request.
         task['app_engine_http_request']['body'] = converted_payload
@@ -97,7 +109,7 @@ def create_http_task(
     # Note: retry=retry.Retry() means that the default retry arguments
     # are used. It cannot be removed since then some failures that occur in
     # Taskqueue API are not repeated.
-    response = CLIENT.create_task(parent, task, retry=retry.Retry())
+    response = CLIENT.create_task(parent=parent, task=task, retry=retry.Retry())
 
     logging.info('Created task %s' % response.name)
     return response

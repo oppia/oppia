@@ -14,32 +14,37 @@
 
 """Tests for the cron jobs."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import datetime
 
-from constants import constants
+from core import feconf
+from core.constants import constants
+from core.domain import beam_job_services
 from core.domain import config_services
 from core.domain import email_manager
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import question_domain
 from core.domain import suggestion_services
+from core.domain import taskqueue_services
 from core.domain import user_services
+from core.jobs.batch_jobs import exp_recommendation_computation_jobs
+from core.jobs.batch_jobs import exp_search_indexing_jobs
+from core.jobs.batch_jobs import suggestion_stats_computation_jobs
+from core.jobs.batch_jobs import user_stats_computation_jobs
 from core.platform import models
 from core.tests import test_utils
-import feconf
 import main
 
 import webtest
 
 (
-    exp_models, job_models,
+    app_feedback_report_models, exp_models, job_models,
     suggestion_models, user_models
 ) = models.Registry.import_models([
-    models.NAMES.exploration, models.NAMES.job,
-    models.NAMES.suggestion, models.NAMES.user
+    models.NAMES.app_feedback_report, models.NAMES.exploration,
+    models.NAMES.job, models.NAMES.suggestion, models.NAMES.user
 ])
 
 
@@ -47,6 +52,7 @@ class CronJobTests(test_utils.GenericTestBase):
 
     FIVE_WEEKS = datetime.timedelta(weeks=5)
     NINE_WEEKS = datetime.timedelta(weeks=9)
+    FOURTEEN_WEEKS = datetime.timedelta(weeks=14)
 
     def setUp(self):
         super(CronJobTests, self).setUp()
@@ -69,6 +75,17 @@ class CronJobTests(test_utils.GenericTestBase):
         self.send_mail_to_admin_swap = self.swap(
             email_manager, 'send_mail_to_admin', _mock_send_mail_to_admin)
 
+        self.task_status = 'Not Started'
+        def _mock_taskqueue_service_defer(
+                unused_function_id, unused_queue_name):
+            """Mocks taskqueue_services.defer() so that it can be checked
+            if the method is being invoked or not.
+            """
+            self.task_status = 'Started'
+
+        self.taskqueue_service_defer_swap = self.swap(
+            taskqueue_services, 'defer', _mock_taskqueue_service_defer)
+
     def test_run_cron_to_hard_delete_models_marked_as_deleted(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         admin_user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
@@ -87,7 +104,7 @@ class CronJobTests(test_utils.GenericTestBase):
         completed_activities_model.put()
 
         with self.testapp_swap:
-            self.get_html_response('/cron/models/cleanup')
+            self.get_json('/cron/models/cleanup')
 
         self.assertIsNone(
             user_models.CompletedActivitiesModel.get_by_id(admin_user_id))
@@ -104,7 +121,7 @@ class CronJobTests(test_utils.GenericTestBase):
         self.assertIsNotNone(exp_models.ExplorationModel.get_by_id('exp_id'))
 
         with self.testapp_swap:
-            self.get_html_response('/cron/models/cleanup')
+            self.get_json('/cron/models/cleanup')
 
         self.assertIsNone(exp_models.ExplorationModel.get_by_id('exp_id'))
 
@@ -123,9 +140,97 @@ class CronJobTests(test_utils.GenericTestBase):
         user_query_model.put()
 
         with self.testapp_swap:
-            self.get_html_response('/cron/models/cleanup')
+            self.get_json('/cron/models/cleanup')
 
         self.assertTrue(user_query_model.get_by_id('query_id').deleted)
+
+    def test_run_cron_to_scrub_app_feedback_reports_scrubs_reports(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+
+        report_timestamp = (
+            datetime.datetime.utcnow() - self.FOURTEEN_WEEKS)
+        report_submitted_timestamp = report_timestamp
+        ticket_creation_timestamp = datetime.datetime.fromtimestamp(1616173836)
+        android_report_info = {
+            'user_feedback_selected_items': [],
+            'user_feedback_other_text_input': 'add an admin',
+            'event_logs': ['event1', 'event2'],
+            'logcat_logs': ['logcat1', 'logcat2'],
+            'package_version_code': 1,
+            'build_fingerprint': 'example_fingerprint_id',
+            'network_type': 'wifi',
+            'android_device_language_locale_code': 'en',
+            'entry_point_info': {
+                'entry_point_name': 'crash',
+            },
+            'text_size': 'medium_text_size',
+            'only_allows_wifi_download_and_update': True,
+            'automatically_update_topics': False,
+            'account_is_profile_admin': False
+        }
+        report_id = (
+            app_feedback_report_models.AppFeedbackReportModel.generate_id(
+                'android', report_submitted_timestamp))
+        report_model = (
+            app_feedback_report_models.AppFeedbackReportModel(
+                id=report_id,
+                platform='android',
+                ticket_id='%s.%s.%s' % (
+                    'random_hash',
+                    ticket_creation_timestamp.second,
+                    '16CharString1234'),
+                submitted_on=report_submitted_timestamp,
+                local_timezone_offset_hrs=0,
+                report_type='suggestion',
+                category='other_suggestion',
+                platform_version='0.1-alpha-abcdef1234',
+                android_device_country_locale_code='in',
+                android_device_model='Pixel 4a',
+                android_sdk_version=23,
+                entry_point='navigation_drawer',
+                text_language_code='en',
+                audio_language_code='en',
+                android_report_info=android_report_info,
+                android_report_info_schema_version=1))
+        report_model.created_on = report_timestamp
+        report_model.update_timestamps(update_last_updated_time=False)
+        report_model.put()
+
+        with self.testapp_swap:
+            self.get_html_response(
+                '/cron/app_feedback_report/scrub_expiring_reports')
+
+        scrubbed_model = (
+            app_feedback_report_models.AppFeedbackReportModel.get_by_id(
+                report_id))
+        scrubbed_report_info = scrubbed_model.android_report_info
+        self.assertEqual(
+            scrubbed_model.scrubbed_by,
+            feconf.APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID)
+        self.assertEqual(
+            scrubbed_report_info['user_feedback_other_text_input'], '')
+        self.assertEqual(
+            scrubbed_report_info['event_logs'], [])
+        self.assertEqual(
+            scrubbed_report_info['logcat_logs'], [])
+
+    def test_cron_user_deletion_handler(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+
+        self.assertEqual(self.task_status, 'Not Started')
+        with self.testapp_swap, self.taskqueue_service_defer_swap:
+            self.get_json('/cron/users/user_deletion')
+            self.assertEqual(self.task_status, 'Started')
+        self.logout()
+
+    def test_cron_fully_complete_user_deletion_handler(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+
+        self.assertEqual(self.task_status, 'Not Started')
+        with self.testapp_swap, self.taskqueue_service_defer_swap:
+            self.get_json('/cron/users/fully_complete_user_deletion')
+            self.assertEqual(self.task_status, 'Started')
+            self.logout()
 
 
 class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
@@ -232,7 +337,7 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
                 email_manager,
                 'send_mail_to_notify_contributor_dashboard_reviewers',
                 self._mock_send_contributor_dashboard_reviewers_emails):
-                self.get_html_response(
+                self.get_json(
                     '/cron/mail/reviewers/contributor_dashboard_suggestions')
 
         self.assertEqual(len(self.reviewer_ids), 0)
@@ -251,7 +356,7 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
                 email_manager,
                 'send_mail_to_notify_contributor_dashboard_reviewers',
                 self._mock_send_contributor_dashboard_reviewers_emails):
-                self.get_html_response(
+                self.get_json(
                     '/cron/mail/reviewers/contributor_dashboard_suggestions')
 
         self.assertEqual(len(self.reviewer_ids), 0)
@@ -270,7 +375,7 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
                 email_manager,
                 'send_mail_to_notify_contributor_dashboard_reviewers',
                 self._mock_send_contributor_dashboard_reviewers_emails):
-                self.get_html_response(
+                self.get_json(
                     '/cron/mail/reviewers/contributor_dashboard_suggestions')
 
         self.assertEqual(len(self.reviewer_ids), 1)
@@ -294,7 +399,7 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
                 email_manager,
                 'send_mail_to_notify_contributor_dashboard_reviewers',
                 self._mock_send_contributor_dashboard_reviewers_emails):
-                self.get_html_response(
+                self.get_json(
                     '/cron/mail/reviewers/contributor_dashboard_suggestions')
 
         self.assertEqual(len(self.reviewer_ids), 0)
@@ -376,24 +481,30 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
             expected_reviewable_suggestion_email_info.submission_datetime)
 
     def mock_send_mail_to_notify_admins_that_reviewers_are_needed(
-            self, admin_ids, suggestion_types_needing_reviewers):
+            self, admin_ids, translation_admin_ids, question_admin_ids,
+            suggestion_types_needing_reviewers):
         """Mocks
         email_manager.send_mail_to_notify_admins_that_reviewers_are_needed as
         it's not possible to send mail with self.testapp_swap, i.e with the URLs
         defined in main.
         """
         self.admin_ids = admin_ids
+        self.translation_admin_ids = translation_admin_ids
+        self.question_admin_ids = question_admin_ids
         self.suggestion_types_needing_reviewers = (
             suggestion_types_needing_reviewers)
 
     def _mock_send_mail_to_notify_admins_suggestions_waiting(
-            self, admin_ids, reviewable_suggestion_email_infos):
+            self, admin_ids, translation_admin_ids, question_admin_ids,
+            reviewable_suggestion_email_infos):
         """Mocks
         email_manager.send_mail_to_notify_admins_suggestions_waiting_long as
         it's not possible to send mail with self.testapp_swap, i.e with the URLs
         defined in main.
         """
         self.admin_ids = admin_ids
+        self.translation_admin_ids = translation_admin_ids
+        self.question_admin_ids = question_admin_ids
         self.reviewable_suggestion_email_infos = (
             reviewable_suggestion_email_infos)
 
@@ -437,6 +548,8 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         self.admin_ids = []
         self.suggestion_types_needing_reviewers = {}
         self.reviewable_suggestion_email_infos = []
+        self.translation_admin_ids = []
+        self.question_admin_ids = []
 
     def test_email_not_sent_if_sending_emails_is_disabled(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
@@ -459,7 +572,7 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
                     with self.swap(
                         suggestion_models,
                         'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
-                        self.get_html_response(
+                        self.get_json(
                             '/cron/mail/admins/contributor_dashboard'
                             '_bottlenecks')
 
@@ -479,7 +592,7 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
                 email_manager,
                 'send_mail_to_notify_admins_that_reviewers_are_needed',
                 self.mock_send_mail_to_notify_admins_that_reviewers_are_needed):
-                self.get_html_response(
+                self.get_json(
                     '/cron/mail/admins/contributor_dashboard_bottlenecks')
 
         self.assertEqual(len(self.admin_ids), 0)
@@ -499,7 +612,7 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
                 email_manager,
                 'send_mail_to_notify_admins_that_reviewers_are_needed',
                 self.mock_send_mail_to_notify_admins_that_reviewers_are_needed):
-                self.get_html_response(
+                self.get_json(
                     '/cron/mail/admins/contributor_dashboard_bottlenecks')
 
         self.assertEqual(len(self.admin_ids), 0)
@@ -519,7 +632,7 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
                 email_manager,
                 'send_mail_to_notify_admins_that_reviewers_are_needed',
                 self.mock_send_mail_to_notify_admins_that_reviewers_are_needed):
-                self.get_html_response(
+                self.get_json(
                     '/cron/mail/admins/contributor_dashboard_bottlenecks')
 
         self.assertEqual(len(self.admin_ids), 1)
@@ -543,7 +656,7 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
                     email_manager,
                     'send_mail_to_notify_admins_suggestions_waiting_long',
                     self._mock_send_mail_to_notify_admins_suggestions_waiting):
-                    self.get_html_response(
+                    self.get_json(
                         '/cron/mail/admins/contributor_dashboard_bottlenecks')
 
         self.assertEqual(len(self.admin_ids), 1)
@@ -558,3 +671,54 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         self._assert_reviewable_suggestion_email_infos_are_equal(
             self.reviewable_suggestion_email_infos[2],
             self.expected_reviewable_suggestion_email_infos[2])
+
+    def test_cron_exploration_recommendations_handler(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        swap_with_checks = self.swap_with_checks(
+            beam_job_services, 'run_beam_job', lambda **_: None,
+            expected_kwargs=[{
+                'job_class': (
+                    exp_recommendation_computation_jobs
+                    .ComputeExplorationRecommendationsJob),
+            }]
+        )
+        with swap_with_checks, self.testapp_swap:
+            self.get_html_response('/cron/explorations/recommendations')
+
+    def test_cron_activity_search_rank_handler(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        swap_with_checks = self.swap_with_checks(
+            beam_job_services, 'run_beam_job', lambda **_: None,
+            expected_kwargs=[{
+                'job_class': (
+                    exp_search_indexing_jobs.IndexExplorationsInSearchJob),
+            }]
+        )
+        with swap_with_checks, self.testapp_swap:
+            self.get_html_response('/cron/explorations/search_rank')
+
+    def test_cron_dashboard_stats_handler(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        swap_with_checks = self.swap_with_checks(
+            beam_job_services, 'run_beam_job', lambda **_: None,
+            expected_kwargs=[{
+                'job_class': (
+                    user_stats_computation_jobs.CollectWeeklyDashboardStatsJob),
+            }]
+        )
+        with swap_with_checks, self.testapp_swap:
+            self.get_html_response('/cron/users/dashboard_stats')
+
+    def test_cron_translation_contribution_stats_handler(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        swap_with_checks = self.swap_with_checks(
+            beam_job_services, 'run_beam_job', lambda **_: None,
+            expected_kwargs=[{
+                'job_class': (
+                    suggestion_stats_computation_jobs
+                    .GenerateTranslationContributionStatsJob),
+            }]
+        )
+        with swap_with_checks, self.testapp_swap:
+            self.get_html_response(
+                '/cron/suggestions/translation_contribution_stats')

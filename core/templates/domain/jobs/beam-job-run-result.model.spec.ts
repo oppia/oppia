@@ -32,4 +32,19 @@ describe('BeamJobRunResult model', () => {
     expect(result.stdout).toEqual('abc');
     expect(result.stderr).toEqual('def');
   });
+
+  it('should identify non-empty stdout', () => {
+    const result = new BeamJobRunResult('abc', '');
+    expect(result.isEmpty()).toBeFalse();
+  });
+
+  it('should identify non-empty stderr', () => {
+    const result = new BeamJobRunResult('', 'def');
+    expect(result.isEmpty()).toBeFalse();
+  });
+
+  it('should identify empty stdout and stderr', () => {
+    const result = new BeamJobRunResult('', '');
+    expect(result.isEmpty()).toBeTrue();
+  });
 });

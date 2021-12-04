@@ -14,8 +14,7 @@
 
 """Services for classifier data models."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import base64
 import datetime
@@ -23,13 +22,13 @@ import hashlib
 import hmac
 import logging
 
+from core import feconf
+from core import python_utils
 from core.domain import classifier_domain
 from core.domain import config_domain
 from core.domain import exp_fetchers
 from core.domain import fs_services
 from core.platform import models
-import feconf
-import python_utils
 
 (classifier_models, exp_models) = models.Registry.import_models(
     [models.NAMES.classifier, models.NAMES.exploration])
@@ -48,8 +47,11 @@ def generate_signature(secret, message, vm_id):
     Returns:
         str. The signature of the payload data.
     """
-    encoded_vm_id = python_utils.convert_to_bytes(vm_id)
-    message = b'%s|%s' % (base64.b64encode(message), encoded_vm_id)
+    if isinstance(vm_id, str):
+        vm_id = vm_id.encode('utf-8')
+    if isinstance(message, str):
+        message = message.encode('utf-8')
+    message = b'%s|%s' % (base64.b64encode(message), vm_id)
     return hmac.new(
         secret, msg=message, digestmod=hashlib.sha256
     ).hexdigest()
@@ -68,14 +70,13 @@ def verify_signature(oppia_ml_auth_info):
     secret = None
     for val in config_domain.VMID_SHARED_SECRET_KEY_MAPPING.value:
         if val['vm_id'] == oppia_ml_auth_info.vm_id:
-            secret = python_utils.convert_to_bytes(val['shared_secret_key'])
+            secret = val['shared_secret_key'].encode('utf-8')
             break
     if secret is None:
         return False
 
     generated_signature = generate_signature(
-        secret, python_utils.convert_to_bytes(oppia_ml_auth_info.message),
-        oppia_ml_auth_info.vm_id)
+        secret, oppia_ml_auth_info.message, oppia_ml_auth_info.vm_id)
     if generated_signature != oppia_ml_auth_info.signature:
         return False
     return True
@@ -280,7 +281,7 @@ def _update_classifier_training_jobs_status(job_ids, status):
     classifier_training_job_models = (
         classifier_models.ClassifierTrainingJobModel.get_multi(job_ids))
 
-    for index in python_utils.RANGE(len(job_ids)):
+    for index in range(len(job_ids)):
         if classifier_training_job_models[index] is None:
             raise Exception(
                 'The ClassifierTrainingJobModel corresponding to the job_id '

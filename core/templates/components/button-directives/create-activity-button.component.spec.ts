@@ -39,8 +39,9 @@ class MockWindowRef {
       set href(val) {
         this._href = val;
       },
-      replace: (val) => {}
+      replace: (val: string) => {}
     },
+    gtag: () => {}
   };
   get nativeWindow() {
     return this._window;
@@ -85,6 +86,8 @@ describe('CreateActivityButtonComponent', () => {
     isSuperAdmin: () => false,
     isTopicManager: () => false,
     isTranslationAdmin: () => false,
+    isBlogAdmin: () => false,
+    isBlogPostEditor: () => false,
     isQuestionAdmin: () => false,
     canCreateCollections: () => true,
     getPreferredSiteLanguageCode: () =>'en',
@@ -110,6 +113,8 @@ describe('CreateActivityButtonComponent', () => {
     isTopicManager: () => false,
     isTranslationAdmin: () => false,
     isQuestionAdmin: () => false,
+    isBlogAdmin: () => false,
+    isBlogPostEditor: () => false,
     canCreateCollections: () => false,
     getPreferredSiteLanguageCode: () =>'en',
     getUsername: () => 'username1',
@@ -191,9 +196,9 @@ describe('CreateActivityButtonComponent', () => {
         }
       });
       const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        return <NgbModalRef>({
+        return ({
           result: Promise.resolve('success')
-        });
+        } as NgbModalRef);
       });
       const replaceSpy = spyOn(windowRef.nativeWindow.location, 'replace');
 
@@ -210,9 +215,9 @@ describe('CreateActivityButtonComponent', () => {
       spyOn(urlService, 'getPathname').and.returnValue(
         '/creator-dashboard');
       const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        return <NgbModalRef>({
+        return ({
           result: Promise.resolve('success')
-        });
+        } as NgbModalRef);
       });
       const replaceSpy = spyOn(windowRef.nativeWindow.location, 'replace');
 
@@ -229,9 +234,9 @@ describe('CreateActivityButtonComponent', () => {
       spyOn(urlService, 'getPathname').and.returnValue(
         '/creator-dashboard');
       const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        return <NgbModalRef>({
+        return ({
           result: Promise.reject('cancel')
-        });
+        } as NgbModalRef);
       });
 
       component.initCreationProcess();

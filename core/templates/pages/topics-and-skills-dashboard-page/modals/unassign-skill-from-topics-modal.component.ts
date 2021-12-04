@@ -23,13 +23,13 @@ import { AssignedSkill } from 'domain/skill/assigned-skill.model';
 import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 
 export interface TopicAssignmentsSummary {
-  subtopicId: number,
-  topicVersion: number,
-  topicId: string
+  subtopicId: number;
+  topicVersion: number;
+  topicId: string;
 }
 
-interface TopicAssignments {
-  [key: string]: TopicAssignmentsSummary
+export interface TopicAssignments {
+  [key: string]: TopicAssignmentsSummary;
 }
 
 @Component({
@@ -38,11 +38,14 @@ interface TopicAssignments {
 })
 export class UnassignSkillFromTopicsModalComponent
   extends ConfirmOrCancelModal {
-  skillId: string;
-  topicsAssignments: TopicAssignments;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  skillId!: string;
+  topicsAssignments!: TopicAssignments;
   topicsAssignmentsAreFetched: boolean = false;
   selectedTopicNames: string[] = [];
-  selectedTopics: TopicAssignmentsSummary[];
+  selectedTopics: TopicAssignmentsSummary[] = [];
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -81,7 +84,6 @@ export class UnassignSkillFromTopicsModalComponent
     }
   }
   close(): void {
-    this.selectedTopics = [];
     for (let index in this.selectedTopicNames) {
       this.selectedTopics.push(
         this.topicsAssignments[this.selectedTopicNames[index]]);

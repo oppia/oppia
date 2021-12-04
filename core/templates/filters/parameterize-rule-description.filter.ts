@@ -162,7 +162,8 @@ angular.module('oppia').filter('parameterizeRuleDescription', [
         } else if (
           varType === 'SetOfAlgebraicIdentifier' ||
           varType === 'SetOfUnicodeString' ||
-          varType === 'SetOfNormalizedString') {
+          varType === 'SetOfNormalizedString'
+        ) {
           replacementText = '[';
           for (var i = 0; i < inputs[varName].length; i++) {
             if (i !== 0) {
@@ -190,14 +191,20 @@ angular.module('oppia').filter('parameterizeRuleDescription', [
           }
           replacementText += ']';
         } else if (
-          varType === 'Real' || varType === 'NonnegativeInt' ||
-          varType === 'Int' || varType === 'PositiveInt') {
+          varType === 'Real' ||
+          varType === 'NonnegativeInt' ||
+          varType === 'Int' ||
+          varType === 'PositiveInt'
+        ) {
           replacementText = inputs[varName] + '';
         } else if (
-          varType === 'CodeString' || varType === 'UnicodeString' ||
-          varType === 'LogicErrorCategory' || varType === 'NormalizedString' ||
-          varType === 'AlgebraicExpression' || varType === 'MathEquation' ||
-          varType === 'NumericExpression') {
+          varType === 'CodeString' ||
+          varType === 'UnicodeString' ||
+          varType === 'NormalizedString' ||
+          varType === 'AlgebraicExpression' ||
+          varType === 'MathEquation' ||
+          varType === 'NumericExpression'
+        ) {
           replacementText = inputs[varName];
         } else if (varType === 'PositionOfTerms') {
           for (var i = 0; i < POSITION_OF_TERMS_MAPPING.length; i++) {

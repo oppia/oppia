@@ -19,9 +19,24 @@
 // This page is used as error page for 404 status code.
 
 import { Component } from '@angular/core';
+import { LoggerService } from 'services/contextual/logger.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 @Component({
   selector: 'oppia-error-page-root',
   templateUrl: './error-404-page-root.component.html'
 })
-export class Error404PageRootComponent {}
+export class Error404PageRootComponent {
+  constructor(
+    private loggerService: LoggerService,
+    private windowRef: WindowRef
+  ) {}
+
+  ngOnInit(): void {
+    let pathname = this.windowRef.nativeWindow.location.pathname;
+    // Raise a path not found error. So, e2e tests block the regressions due to
+    // wrong route order where an unexpected 404 page shows up instead of
+    // the expected page.
+    this.loggerService.error(`The requested path ${pathname} is not found.`);
+  }
+}

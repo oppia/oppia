@@ -32,10 +32,10 @@ import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
 import { ReadOnlyStoryNode } from 'domain/story_viewer/read-only-story-node.model';
 
 interface IconParametersArray {
-  thumbnailIconUrl: string,
-  left: string,
-  top: string,
-  thumbnailBgColor: string,
+  thumbnailIconUrl: string;
+  left: string;
+  top: string;
+  thumbnailBgColor: string;
 }
 
 @Component({
@@ -155,7 +155,7 @@ export class StoryViewerPageComponent implements OnInit {
         this.storyNodes = this.storyPlaythroughObject.getStoryNodes();
         this.storyId = this.storyPlaythroughObject.getStoryId();
         this.topicName = this.storyPlaythroughObject.topicName;
-        this.pageTitleService.setPageTitle(
+        this.pageTitleService.setDocumentTitle(
           `Learn ${this.topicName} | ${storyDataDict.title} | Oppia`);
         this.pageTitleService.updateMetaTag(
           storyDataDict.getMetaTagContent());

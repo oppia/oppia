@@ -14,10 +14,11 @@
 
 """Controllers for the skill editor."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
-from constants import constants
+from core import feconf
+from core import utils
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import role_services
@@ -26,8 +27,6 @@ from core.domain import skill_fetchers
 from core.domain import skill_services
 from core.domain import topic_fetchers
 from core.domain import user_services
-import feconf
-import utils
 
 
 def _require_valid_version(version_from_payload, skill_version):
@@ -56,6 +55,22 @@ def _require_valid_version(version_from_payload, skill_version):
 
 class SkillEditorPage(base.BaseHandler):
     """The editor page for a single skill."""
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'skill_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+    }
 
     @acl_decorators.can_edit_skill
     def get(self, skill_id):
@@ -90,6 +105,22 @@ def check_can_edit_skill_description(user):
 
 class SkillRightsHandler(base.BaseHandler):
     """A handler for returning skill rights."""
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'skill_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+    }
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 

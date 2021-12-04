@@ -51,6 +51,8 @@ export class LocalStorageService {
 
   LAST_SELECTED_TRANSLATION_LANGUAGE_KEY = ('last_selected_translation_lang');
 
+  LAST_SELECTED_TRANSLATION_TOPIC_NAME = ('last_selected_translation_topic');
+
   /**
    * Create the key to access the changeList in localStorage
    * @param {String} explorationId - The exploration id of the changeList
@@ -82,7 +84,12 @@ export class LocalStorageService {
     if (this.isStorageAvailable()) {
       let draftDict = ExplorationDraft.toLocalStorageDict(
         changeList, draftChangeListId);
-      this.storage.setItem(localSaveKey, JSON.stringify(draftDict));
+      // It is possible that storage does not exist or the user does not have
+      // permission to access it but this condition is already being checked by
+      // calling 'isStorageAvailable()' so the typecast is safe.
+      (this.storage as Storage).setItem(
+        localSaveKey,
+        JSON.stringify(draftDict));
     }
   }
   /**
@@ -95,10 +102,15 @@ export class LocalStorageService {
    */
   getExplorationDraft(explorationId: string): ExplorationDraft | null {
     if (this.isStorageAvailable()) {
-      let draftDict = JSON.parse(
-        this.storage.getItem(this._createExplorationDraftKey(explorationId)));
+      // It is possible that storage does not exist or the user does not have
+      // permission to access it but this condition is already being checked by
+      // calling 'isStorageAvailable()' so the typecast is safe.
+      let draftDict = (this.storage as Storage).getItem(
+        this._createExplorationDraftKey(explorationId));
       if (draftDict) {
-        return ExplorationDraft.createFromLocalStorageDict(draftDict);
+        return (
+          ExplorationDraft.createFromLocalStorageDict(JSON.parse(draftDict))
+        );
       }
     }
     return null;
@@ -111,7 +123,11 @@ export class LocalStorageService {
    */
   removeExplorationDraft(explorationId: string): void {
     if (this.isStorageAvailable()) {
-      this.storage.removeItem(this._createExplorationDraftKey(explorationId));
+      // It is possible that storage does not exist or the user does not have
+      // permission to access it but this condition is already being checked by
+      // calling 'isStorageAvailable()' so the typecast is safe.
+      (this.storage as Storage).removeItem(
+        this._createExplorationDraftKey(explorationId));
     }
   }
 
@@ -121,7 +137,10 @@ export class LocalStorageService {
    */
   updateLastSelectedTranslationLanguageCode(languageCode: string): void {
     if (this.isStorageAvailable()) {
-      this.storage.setItem(
+      // It is possible that storage does not exist or the user does not have
+      // permission to access it but this condition is already being checked by
+      // calling 'isStorageAvailable()' so the typecast is safe.
+      (this.storage as Storage).setItem(
         this.LAST_SELECTED_TRANSLATION_LANGUAGE_KEY, languageCode);
     }
   }
@@ -133,7 +152,42 @@ export class LocalStorageService {
   getLastSelectedTranslationLanguageCode(): string | null {
     if (this.isStorageAvailable()) {
       return (
-        this.storage.getItem(this.LAST_SELECTED_TRANSLATION_LANGUAGE_KEY));
+        // It is possible that storage does not exist or the user does not have
+        // permission to access it but this condition is already being checked
+        // by calling 'isStorageAvailable()' so the typecast is safe.
+        (this.storage as Storage).getItem(
+          this.LAST_SELECTED_TRANSLATION_LANGUAGE_KEY));
+    }
+    return null;
+  }
+
+  /**
+   * Save the given active topic name to localStorage.
+   * @param topicName
+   */
+  updateLastSelectedTranslationTopicName(topicName: string): void {
+    if (this.isStorageAvailable()) {
+      // It is possible that storage does not exist or the user does not have
+      // permission to access it but this condition is already being checked by
+      // calling 'isStorageAvailable()' so the typecast is safe.
+      (this.storage as Storage).setItem(
+        this.LAST_SELECTED_TRANSLATION_TOPIC_NAME, topicName);
+    }
+  }
+
+  /**
+   * Retrieve the local save of the last selected topic for translation.
+   * @returns {String} The local save of the last selected topic for
+   *   translation if it exists, else null.
+   */
+  getLastSelectedTranslationTopicName(): string | null {
+    if (this.isStorageAvailable()) {
+      return (
+        // It is possible that storage does not exist or the user does not have
+        // permission to access it but this condition is already being checked
+        // by calling 'isStorageAvailable()' so the typecast is safe.
+        (this.storage as Storage).getItem(
+          this.LAST_SELECTED_TRANSLATION_TOPIC_NAME));
     }
     return null;
   }

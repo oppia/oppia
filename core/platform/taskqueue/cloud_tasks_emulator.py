@@ -21,23 +21,30 @@ This emulator is an extension of the emulator from this github page:
 https://github.com/doitintl/Cloud-Tasks-In-Process-Emulator
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
+import datetime  # pylint: disable=unused-import
 import threading
 import time
 
-import python_utils
+from typing import Any, Callable, Dict, List, Optional
 
 
-class Task(python_utils.OBJECT):
+class Task:
     """A mock for a Google Cloud Tasks task that is handled by execution using
     the cloud tasks emulator.
     """
 
+    # In the type annotation below, payload is of type Dict[str, Any] because
+    # the payload here has no constraints.
     def __init__(
-            self, queue_name, url, payload=None, scheduled_for=None,
-            task_name=None):
+            self,
+            queue_name: str,
+            url: str,
+            payload: Optional[Dict[str, Any]] = None,
+            scheduled_for: Optional[float] = None,
+            task_name: Optional[str] = None
+    ) -> None:
         """Initialize a Task that can be executed by making a post request to
         the given url with the correct data payload.
 
@@ -57,7 +64,7 @@ class Task(python_utils.OBJECT):
         self.task_name = task_name
 
 
-class Emulator(python_utils.OBJECT):
+class Emulator:
     """The emulator mocks the core.platform.taskqueue API. The queues in this
     emulator are priority queues: Elements are popped in the order of the time
     they are scheduled for and executed after the time for execution has
@@ -78,7 +85,11 @@ class Emulator(python_utils.OBJECT):
            can be executed using process_and_flush_tasks().
     """
 
-    def __init__(self, task_handler, automatic_task_handling=True):
+    def __init__(
+            self,
+            task_handler: Callable[..., Any],
+            automatic_task_handling: bool = True
+    ) -> None:
         """Initializes the emulator with an empty task queue and the correct
         task_handler callback.
 
@@ -92,12 +103,12 @@ class Emulator(python_utils.OBJECT):
         """
         self._lock = threading.Lock()
         self._task_handler = task_handler
-        self._queues = {}
+        self._queues: Dict[str, List[Task]] = {}
         self.automatic_task_handling = automatic_task_handling
 
-        self._queue_threads = {}
+        self._queue_threads: Dict[str, threading.Thread] = {}
 
-    def _process_queue(self, queue_name):
+    def _process_queue(self, queue_name: str) -> None:
         """The callback function for each individual queue thread. Each queue
         thread repeatedly queries the queue, pops tasks, and executes the tasks
         that need to be executed.
@@ -112,6 +123,7 @@ class Emulator(python_utils.OBJECT):
                 if queue:
                     peek = queue[0]
                     now = time.time()
+                    assert peek.scheduled_for is not None
                     if peek.scheduled_for <= now:
                         task = queue.pop(0)
             if task:
@@ -122,7 +134,7 @@ class Emulator(python_utils.OBJECT):
 
             time.sleep(0.01)
 
-    def _launch_queue_thread(self, queue_name):
+    def _launch_queue_thread(self, queue_name: str) -> None:
         """Launches a persistent thread for an individual queue in the
         taskqueue.
 
@@ -136,7 +148,7 @@ class Emulator(python_utils.OBJECT):
         self._queue_threads[queue_name] = new_thread
         new_thread.start()
 
-    def _execute_tasks(self, task_list):
+    def _execute_tasks(self, task_list: List[Task]) -> None:
         """Executes all of the tasks in the task list using the task handler
         callback.
 
@@ -149,7 +161,7 @@ class Emulator(python_utils.OBJECT):
                 queue_name=task.queue_name,
                 task_name=task.task_name)
 
-    def _total_enqueued_tasks(self):
+    def _total_enqueued_tasks(self) -> int:
         """Returns the total number of tasks across all of the queues in the
         taskqueue.
 
@@ -158,14 +170,17 @@ class Emulator(python_utils.OBJECT):
         """
         return sum(len(q) for q in self._queues.values())
 
+    # In the type annotation below, payload is of type Dict[str, Any] because
+    # the payload here has no constraints.
     def create_task(
             self,
-            queue_name,
-            url,
-            payload,
-            scheduled_for=None,
-            task_name=None,
-            retry=None):  # pylint: disable=unused-argument
+            queue_name: str,
+            url: str,
+            payload: Optional[Dict[str, Any]] = None,
+            scheduled_for: Optional[datetime.datetime] = None,
+            task_name: Optional[str] = None,
+            retry: None = None  # pylint: disable=unused-argument
+    ) -> None:
         """Creates a Task in the corresponding queue that will be executed when
         the 'scheduled_for' time is reached. If the queue doesn't exist yet,
         it will be created.
@@ -194,9 +209,14 @@ class Emulator(python_utils.OBJECT):
                 queue_name, url, payload, scheduled_for=scheduled_for_time,
                 task_name=task_name)
             queue.append(task)
-            queue.sort(key=lambda t: t.scheduled_for)
+            # The key for sorting is defined separately because of a mypy bug.
+            # A [no-any-return] is thrown if key is defined in the sort()
+            # method instead.
+            # https://github.com/python/mypy/issues/9590
+            k = lambda t: t.scheduled_for
+            queue.sort(key=k)
 
-    def get_number_of_tasks(self, queue_name=None):
+    def get_number_of_tasks(self, queue_name: Optional[str] = None) -> int:
         """Returns the total number of tasks in a single queue if a queue name
         is specified or the entire taskqueue if no queue name is specified.
 
@@ -213,7 +233,9 @@ class Emulator(python_utils.OBJECT):
         else:
             return self._total_enqueued_tasks()
 
-    def process_and_flush_tasks(self, queue_name=None):
+    def process_and_flush_tasks(
+            self, queue_name: Optional[str] = None
+    ) -> None:
         """Executes all of the tasks in a single queue if a queue name is
         specified or all of the tasks in the taskqueue if no queue name is
         specified.
@@ -230,7 +252,7 @@ class Emulator(python_utils.OBJECT):
                 self._execute_tasks(task_list)
                 self._queues[queue] = []
 
-    def get_tasks(self, queue_name=None):
+    def get_tasks(self, queue_name: Optional[str] = None) -> List[Task]:
         """Returns a list of the tasks in a single queue if a queue name is
         specified or a list of all of the tasks in the taskqueue if no queue
         name is specified.

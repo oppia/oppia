@@ -17,7 +17,7 @@
  */
 
 require(
-  'components/state-directives/response-header/response-header.directive.ts');
+  'components/state-directives/response-header/response-header.component.ts');
 require(
   'pages/exploration-editor-page/translation-tab/audio-translation-bar/' +
   'audio-translation-bar.directive.ts');
@@ -454,7 +454,7 @@ angular.module('oppia').component('stateTranslation', {
       };
 
       const getInteractionRuleTranslatableContents = (): {
-        rule: Rule, inputName: string, contentId: string
+        rule: Rule; inputName: string; contentId: string;
       }[] => {
         const allRules = $scope.stateAnswerGroups.map(
           answerGroup => answerGroup.rules).flat();
@@ -476,7 +476,7 @@ angular.module('oppia').component('stateTranslation', {
 
       $scope.getInteractionCustomizationArgTranslatableContents = function(
           customizationArgs: InteractionCustomizationArgs
-      ): {name: string, content: SubtitledUnicode|SubtitledHtml}[] {
+      ): { name: string; content: SubtitledUnicode|SubtitledHtml }[] {
         const translatableContents = [];
 
         const camelCaseToSentenceCase = (s) => {

@@ -14,12 +14,12 @@
 
 """Tests the methods defined in skill services."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import logging
 
-from constants import constants
+from core import feconf
+from core.constants import constants
 from core.domain import config_services
 from core.domain import question_domain
 from core.domain import skill_domain
@@ -32,8 +32,6 @@ from core.domain import topic_fetchers
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import python_utils
 
 (skill_models, suggestion_models) = models.Registry.import_models(
     [models.NAMES.skill, models.NAMES.suggestion])
@@ -96,7 +94,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             prerequisite_skill_ids=['skill_id_1', 'skill_id_2'])
 
     def test_apply_change_list_with_invalid_property_name(self):
-        class MockSkillChange(python_utils.OBJECT):
+        class MockSkillChange:
             def __init__(self, cmd, property_name):
                 self.cmd = cmd
                 self.property_name = property_name
@@ -1458,12 +1456,12 @@ class SkillMigrationTests(test_utils.GenericTestBase):
             'user_id_admin', 'skill model created', commit_cmd_dicts)
 
         current_schema_version_swap = self.swap(
-            feconf, 'CURRENT_SKILL_CONTENTS_SCHEMA_VERSION', 3)
+            feconf, 'CURRENT_SKILL_CONTENTS_SCHEMA_VERSION', 4)
 
         with current_schema_version_swap:
             skill = skill_fetchers.get_skill_from_model(model)
 
-        self.assertEqual(skill.skill_contents_schema_version, 3)
+        self.assertEqual(skill.skill_contents_schema_version, 4)
 
         self.assertEqual(
             skill.skill_contents.explanation.html,
@@ -1526,12 +1524,12 @@ class SkillMigrationTests(test_utils.GenericTestBase):
             'user_id_admin', 'skill model created', commit_cmd_dicts)
 
         current_schema_version_swap = self.swap(
-            feconf, 'CURRENT_MISCONCEPTIONS_SCHEMA_VERSION', 4)
+            feconf, 'CURRENT_MISCONCEPTIONS_SCHEMA_VERSION', 5)
 
         with current_schema_version_swap:
             skill = skill_fetchers.get_skill_from_model(model)
 
-        self.assertEqual(skill.misconceptions_schema_version, 4)
+        self.assertEqual(skill.misconceptions_schema_version, 5)
         self.assertEqual(skill.misconceptions[0].must_be_addressed, True)
         self.assertEqual(skill.misconceptions[0].notes, expected_html_content)
         self.assertEqual(
@@ -1591,12 +1589,12 @@ class SkillMigrationTests(test_utils.GenericTestBase):
             'user_id_admin', 'skill model created', commit_cmd_dicts)
 
         current_schema_version_swap = self.swap(
-            feconf, 'CURRENT_RUBRIC_SCHEMA_VERSION', 4)
+            feconf, 'CURRENT_RUBRIC_SCHEMA_VERSION', 5)
 
         with current_schema_version_swap:
             skill = skill_fetchers.get_skill_from_model(model)
 
-        self.assertEqual(skill.rubric_schema_version, 4)
+        self.assertEqual(skill.rubric_schema_version, 5)
         self.assertEqual(skill.rubrics[0].difficulty, 'Easy')
         self.assertEqual(skill.rubrics[0].explanations, ['Easy explanation'])
         self.assertEqual(skill.rubrics[1].difficulty, 'Medium')

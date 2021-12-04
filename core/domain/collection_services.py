@@ -22,15 +22,17 @@ delegate to the Collection model class. This will enable the collection
 storage model to be changed without affecting this module and others above it.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import collections
 import copy
 import logging
 import os
 
-from constants import constants
+from core import feconf
+from core import python_utils
+from core import utils
+from core.constants import constants
 from core.domain import activity_services
 from core.domain import caching_services
 from core.domain import collection_domain
@@ -42,9 +44,6 @@ from core.domain import search_services
 from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
-import feconf
-import python_utils
-import utils
 
 (collection_models, user_models) = models.Registry.import_models([
     models.NAMES.collection, models.NAMES.user])
@@ -183,7 +182,7 @@ def get_collection_by_id(collection_id, strict=True, version=None):
         Collection or None. The domain object representing a collection with the
         given id, or None if it does not exist.
     """
-    sub_namespace = python_utils.UNICODE(version) if version else None
+    sub_namespace = str(version) if version else None
     cached_collection = caching_services.get_multi(
         caching_services.CACHE_NAMESPACE_COLLECTION,
         sub_namespace,
@@ -580,7 +579,7 @@ def get_collection_ids_matching_query(
             it is empty, no language code filter is applied to the results. If
             it is not empty, then a result is considered valid if it matches at
             least one of these language codes.
-        offset: str or None. Offset indicating where, in the list of
+        offset: int or None. Offset indicating where, in the list of
             collections, to start the search from.
 
     Returns:
@@ -591,12 +590,12 @@ def get_collection_ids_matching_query(
                 feconf.SEARCH_RESULTS_PAGE_SIZE results if there are at least
                 that many, otherwise it contains all remaining results. (If this
                 behaviour does not occur, an error will be logged.)
-            search_offset: str. Search offset for future fetches.
+            search_offset: int. Search offset for future fetches.
     """
     returned_collection_ids = []
     search_offset = offset
 
-    for _ in python_utils.RANGE(MAX_ITERATIONS):
+    for _ in range(MAX_ITERATIONS):
         remaining_to_fetch = feconf.SEARCH_RESULTS_PAGE_SIZE - len(
             returned_collection_ids)
 
@@ -679,7 +678,7 @@ def apply_change_list(collection_id, change_list):
             '%s %s %s %s' % (
                 e.__class__.__name__, e, collection_id, change_list)
         )
-        python_utils.reraise_exception()
+        raise e
 
 
 def validate_exps_in_collection_are_public(collection):
@@ -914,7 +913,7 @@ def get_collection_snapshots_metadata(collection_id):
     """
     collection = get_collection_by_id(collection_id)
     current_version = collection.version
-    version_nums = list(python_utils.RANGE(1, current_version + 1))
+    version_nums = list(range(1, current_version + 1))
 
     return collection_models.CollectionModel.get_snapshots_metadata(
         collection_id, version_nums)

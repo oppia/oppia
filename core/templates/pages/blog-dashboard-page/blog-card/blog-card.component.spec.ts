@@ -101,8 +101,28 @@ describe('Blog Dashboard Tile Component', () => {
     expect(component.authorProfilePictureUrl).toEqual('data_image_url');
     expect(component.DEFAULT_PROFILE_PICTURE_URL).toEqual('sample_url');
     expect(component.thumbnailUrl).toBe(
-      '/assetsdevhandler/blog_post/sampleId/assets/thumbnail/image.png');
+      '/assetsdevhandler/blog_post/sampleId/assets/' +
+      'thumbnail/image.png');
     expect(component.publishedDateString).toBe('November 21, 2014');
+  });
+
+  it('should throw error if published date is not defined', () => {
+    const invalidBlogPostSummary: BlogPostSummaryBackendDict = {
+      id: 'sampleId',
+      author_username: 'test_user',
+      title: 'Title',
+      summary: 'Hello World',
+      tags: ['news'],
+      thumbnail_filename: 'image.png',
+      url_fragment: 'title',
+      last_updated: '11/21/2014',
+    };
+    component.blogPostSummary = BlogPostSummary.createFromBackendDict(
+      invalidBlogPostSummary);
+
+    expect(() => {
+      component.ngOnInit();
+    }).toThrowError('Blog Post Summary published date is not defined');
   });
 
   it('should not show thumbnail if thumbnail filename is not given', () => {

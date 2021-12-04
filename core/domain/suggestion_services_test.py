@@ -14,12 +14,13 @@
 
 """Tests for suggestion related services."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import datetime
 
-from constants import constants
+from core import feconf
+from core import utils
+from core.constants import constants
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -37,9 +38,6 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
-import python_utils
-import utils
 
 (suggestion_models, feedback_models, user_models) = (
     models.Registry.import_models(
@@ -142,7 +140,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         thread_id = 'thread_%s' % exp_id[-1]
         return '.'.join([entity_type, exp_id, thread_id])
 
-    class MockExploration(python_utils.OBJECT):
+    class MockExploration:
         """Mocks an exploration. To be used only for testing."""
 
         def __init__(self, exploration_id, states):
@@ -225,12 +223,13 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
 
     def test_cannot_create_translation_suggestion_with_invalid_content_html_raise_error(self): # pylint: disable=line-too-long
         add_translation_change_dict = {
-            'cmd': 'add_translation',
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': 'Introduction',
             'content_id': 'content',
             'language_code': 'hi',
             'content_html': '<p>The invalid content html</p>',
-            'translation_html': '<p>Translation for invalid content.</p>'
+            'translation_html': '<p>Translation for invalid content.</p>',
+            'data_format': 'html'
         }
         with self.assertRaisesRegexp(
             Exception,
@@ -783,12 +782,13 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             state_domain.SubtitledHtml.from_dict(old_content))
         exp_services._save_exploration(self.author_id, exploration, '', [])  # pylint: disable=protected-access
         add_translation_change_dict = {
-            'cmd': 'add_translation',
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': 'state 1',
             'content_id': 'content',
             'language_code': 'hi',
             'content_html': '<p>old content html</p>',
-            'translation_html': '<p>Translation for original content.</p>'
+            'translation_html': '<p>Translation for original content.</p>',
+            'data_format': 'html'
         }
         suggestion = suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
@@ -913,12 +913,13 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             state_domain.SubtitledHtml.from_dict(old_content))
         exp_services._save_exploration(self.author_id, exploration, '', [])  # pylint: disable=protected-access
         add_translation_change_dict = {
-            'cmd': 'add_translation',
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': 'state 1',
             'content_id': 'content',
             'language_code': 'hi',
             'content_html': '<p>old content html</p>',
-            'translation_html': '<p>Translation for original content.</p>'
+            'translation_html': '<p>Translation for original content.</p>',
+            'data_format': 'html'
         }
         suggestion = suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
@@ -973,7 +974,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         'data_format': 'html'
     }
 
-    class MockExploration(python_utils.OBJECT):
+    class MockExploration:
         """Mocks an exploration. To be used only for testing."""
 
         def __init__(self, exploration_id, states):
@@ -1355,7 +1356,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             suggestions[1].suggestion_id, suggestion_2.suggestion_id)
         self.assertEqual(
             suggestions[2].suggestion_id, suggestion_3.suggestion_id)
-        for i in python_utils.RANGE(len(suggestions) - 1):
+        for i in range(len(suggestions) - 1):
             self.assertLessEqual(
                 suggestions[i].last_updated, suggestions[i + 1].last_updated)
 
@@ -1448,7 +1449,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             suggestions[1].suggestion_id, suggestion_2.suggestion_id)
         self.assertEqual(
             suggestions[2].suggestion_id, suggestion_3.suggestion_id)
-        for i in python_utils.RANGE(len(suggestions) - 1):
+        for i in range(len(suggestions) - 1):
             self.assertLessEqual(
                 suggestions[i].last_updated, suggestions[i + 1].last_updated)
 
@@ -1883,8 +1884,8 @@ class UserContributionProficiencyUnitTests(test_utils.GenericTestBase):
             self.user_1_id, 'category3', 3)
 
         expected_scores_dict = {}
-        for index in python_utils.RANGE(1, 4):
-            key = 'category%s' % python_utils.UNICODE(index)
+        for index in range(1, 4):
+            key = 'category%s' % str(index)
             expected_scores_dict[key] = index
 
         scores_dict = suggestion_services.get_all_scores_of_user(
@@ -2683,8 +2684,7 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
                 reviewable_suggestion_email_info.submission_datetime,
                 expected_reviewable_suggestion_email_infos[
                     index].submission_datetime)
-        for index in python_utils.RANGE(
-                len(reviewable_suggestion_email_infos) - 1):
+        for index in range(len(reviewable_suggestion_email_infos) - 1):
             self.assertLessEqual(
                 reviewable_suggestion_email_infos[index].submission_datetime,
                 reviewable_suggestion_email_infos[
@@ -3794,8 +3794,7 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
                 reviewable_suggestion_email_info.submission_datetime,
                 expected_reviewable_suggestion_email_infos[
                     index].submission_datetime)
-        for index in python_utils.RANGE(
-                len(reviewable_suggestion_email_infos) - 1):
+        for index in range(len(reviewable_suggestion_email_infos) - 1):
             self.assertLessEqual(
                 reviewable_suggestion_email_infos[index].submission_datetime,
                 reviewable_suggestion_email_infos[

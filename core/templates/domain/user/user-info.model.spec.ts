@@ -40,6 +40,8 @@ describe('User info model', () => {
     expect(userInfo.isCurriculumAdmin()).toBe(false);
     expect(userInfo.isSuperAdmin()).toBe(false);
     expect(userInfo.isTopicManager()).toBe(false);
+    expect(userInfo.isBlogAdmin()).toBe(false),
+    expect(userInfo.isBlogPostEditor()).toBe(false),
     expect(userInfo.isTranslationAdmin()).toBe(false);
     expect(userInfo.isQuestionAdmin()).toBe(false);
     expect(userInfo.canCreateCollections()).toBe(true);
@@ -55,6 +57,8 @@ describe('User info model', () => {
     expect(userInfo.isCurriculumAdmin()).toBe(false);
     expect(userInfo.isSuperAdmin()).toBe(false);
     expect(userInfo.isTopicManager()).toBe(false);
+    expect(userInfo.isBlogAdmin()).toBe(false),
+    expect(userInfo.isBlogPostEditor()).toBe(false),
     expect(userInfo.canCreateCollections()).toBe(false);
     expect(userInfo.getPreferredSiteLanguageCode()).toBeNull();
     expect(userInfo.getUsername()).toBeNull();

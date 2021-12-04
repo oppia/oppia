@@ -35,7 +35,8 @@ class MockWindowRef {
   nativeWindow = {
     location: {
       href: ''
-    }
+    },
+    gtag: () => {}
   };
 }
 

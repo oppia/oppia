@@ -34,6 +34,7 @@ export const AdminPageConstants = {
   ADMIN_DELETE_USER_HANDLER_URL: '/deleteuserhandler',
   ADMIN_SUPER_ADMIN_PRIVILEGES_HANDLER_URL: '/adminsuperadminhandler',
   ADMIN_BANNED_USERS_HANDLER: '/bannedusershandler',
+  ADMIN_UPDATE_BLOG_POST_DATA_HANDLER: '/updateblogpostdatahandler',
 
   ADMIN_TAB_URLS: {
     ACTIVITIES: '#/activities',

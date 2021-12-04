@@ -17,8 +17,10 @@
  * interaction.
  */
 
-var customizeInteraction = function() {
-  // There are no customizations.
+var objects = require(process.cwd() + '/extensions/objects/protractor.js');
+var customizeInteraction = async function(elem, requireNonnegativeInput) {
+  await objects.BooleanEditor(elem.element(by.tagName(
+    'schema-based-bool-editor'))).setValue(requireNonnegativeInput);
 };
 
 var expectInteractionDetailsToMatch = async function(elem) {
@@ -37,11 +39,23 @@ var submitAnswer = async function(elem, answer) {
 var answerObjectType = 'Real';
 
 var testSuite = [{
-  interactionArguments: [],
+  interactionArguments: [false],
   ruleArguments: ['IsWithinTolerance', 2, 143],
   expectedInteractionDetails: [],
   wrongAnswers: [146, 130],
   correctAnswers: [142]
+}, {
+  interactionArguments: [true],
+  ruleArguments: ['IsLessThan', 143],
+  expectedInteractionDetails: [true],
+  wrongAnswers: [146, 152],
+  correctAnswers: [142]
+}, {
+  interactionArguments: [true],
+  ruleArguments: ['IsGreaterThan', 2],
+  expectedInteractionDetails: [true],
+  wrongAnswers: [0, 1],
+  correctAnswers: [3]
 }];
 
 exports.customizeInteraction = customizeInteraction;

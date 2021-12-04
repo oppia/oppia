@@ -20,16 +20,12 @@ import { BeamJob } from 'domain/jobs/beam-job.model';
 
 describe('BeamJob model', () => {
   it('should copy arguments', () => {
-    const job = new BeamJob('FooJob', ['foo', 'bar']);
+    const job = new BeamJob('FooJob');
     expect(job.name).toEqual('FooJob');
-    expect(job.parameterNames).toEqual(['foo', 'bar']);
   });
 
   it('should copy values from backend dict', () => {
-    const job = BeamJob.createFromBackendDict({
-      name: 'FooJob', parameter_names: ['foo', 'bar']
-    });
+    const job = BeamJob.createFromBackendDict({ name: 'FooJob' });
     expect(job.name).toEqual('FooJob');
-    expect(job.parameterNames).toEqual(['foo', 'bar']);
   });
 });

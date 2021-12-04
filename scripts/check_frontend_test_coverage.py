@@ -14,8 +14,7 @@
 
 """Check for decrease in coverage from 100% of frontend files."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import fnmatch
 import logging
@@ -23,7 +22,7 @@ import os
 import re
 import sys
 
-import python_utils
+from core import python_utils
 
 LCOV_FILE_PATH = os.path.join(os.pardir, 'karma_coverage_reports', 'lcov.info')
 RELEVANT_LCOV_LINE_PREFIXES = ['SF', 'LH', 'LF']
@@ -42,51 +41,22 @@ NOT_FULLY_COVERED_FILENAMES = [
     'angular-html-bind.directive.ts',
     'answer-classification.service.ts',
     'App.ts',
-    'audio-player.service.ts',
     'audio-preloader.service.ts',
     'Base.ts',
-    'change-list.service.ts',
     'ck-editor-4-rte.component.ts',
     'ck-editor-4-widgets.initializer.ts',
-    'collection-details-editor.directive.ts',
-    'collection-editor-navbar-breadcrumb.directive.ts',
-    'collection-editor-navbar.directive.ts',
-    'collection-editor-page.directive.ts',
-    'collection-editor-tab.directive.ts',
-    'collection-footer.component.ts',
-    'collection-navbar.component.ts',
-    'collection-node-creator.directive.ts',
-    'collection-node-editor.component.ts',
     'collection-player-page.directive.ts',
     'collection.model.ts',
-    'concept-card.directive.ts',
     'contribution-and-review.service.ts',
-    'contributions-and-review.component.ts',
-    'contributor-dashboard-admin-page.component.ts',
     'conversation-skin.directive.ts',
-    'convert-to-plain-text.pipe.ts',
     'current-interaction.service.ts',
-    'exploration-footer.component.ts',
-    'exploration-save.service.ts',
     'exploration-states.service.ts',
     'expression-evaluator.service.ts',
     'expression-interpolation.service.ts',
     'fatigue-detection.service.ts',
-    'feedback-popup.component.ts',
-    'feedback-popup.directive.ts',
-    'focus-on.directive.ts',
-    'format-timer.pipe.ts',
-    'generatedParser.ts',
     'google-analytics.initializer.ts',
-    'graph-input-validation.service.ts',
-    'hint-editor.directive.ts',
-    'html-select.directive.ts',
-    'image-editor.component.ts',
-    'input-response-pair.component.ts',
     'language-util.service.ts',
-    'learner-answer-info-card.component.ts',
     'learner-answer-info.service.ts',
-    'learner-view-rating.service.ts',
     'mathjax-bind.directive.ts',
     'normalize-whitespace-punctuation-and-case.pipe.ts',
     'object-editor.directive.ts',
@@ -95,76 +65,31 @@ NOT_FULLY_COVERED_FILENAMES = [
     'oppia-interactive-pencil-code-editor.directive.ts',
     'oppia-root.directive.ts',
     'parameterize-rule-description.filter.ts',
-    'player-correctness-feedback-enabled.service.ts',
-    'player-transcript.service.ts',
     'python-program.tokenizer.ts',
     'question-update.service.ts',
     'refresher-exploration-confirmation-modal.service.ts',
-    'release-coordinator-page.component.ts',
-    'remove-duplicates-in-array.pipe.ts',
-    'response-header.directive.ts',
-    'review-material-editor.directive.ts',
     'rule-type-selector.directive.ts',
-    'schema-based-choices-editor.directive.ts',
     'schema-based-custom-viewer.directive.ts',
-    'schema-based-dict-editor.directive.ts',
-    'schema-based-dict-viewer.directive.ts',
-    'schema-based-editor.directive.ts',
-    'schema-based-expression-editor.directive.ts',
-    'schema-based-float-editor.directive.ts',
-    'schema-based-html-editor.directive.ts',
     'schema-based-html-viewer.directive.ts',
-    'schema-based-int-editor.directive.ts',
-    'schema-based-list-editor.directive.ts',
     'schema-based-list-viewer.directive.ts',
-    'schema-based-primitive-viewer.directive.ts',
-    'schema-based-unicode-editor.directive.ts',
-    'schema-based-unicode-viewer.directive.ts',
-    'schema-based-viewer.directive.ts',
-    'score-ring.directive.ts',
     'select2-dropdown.directive.ts',
-    'shared.ts',
-    'skill-editor-navbar-breadcrumb.component.ts',
-    'skill-editor-state.service.ts',
-    'skill-prerequisite-skills-editor.directive.ts',
-    'skill-questions-tab.directive.ts',
-    'skill-rubrics-editor.directive.ts',
-    'skills-mastery-list.directive.ts',
-    'solution-editor.directive.ts',
-    'solution-explanation-editor.directive.ts',
     'state-card.model.ts',
     'state-content-editor.directive.ts',
     'state-interaction-editor.directive.ts',
-    'state-solution-editor.directive.ts',
-    'story-creation.service.ts',
-    'story-editor-navbar-breadcrumb.component.ts',
-    'story-editor.directive.ts',
-    'story-node-editor.directive.ts',
     'story-node.model.ts',
-    'story-update.service.ts',
-    'student.ts',
-    'subtopic-summary-tile.component.ts',
     'subtopic.model.ts',
-    'suggestion-modal-for-exploration-editor.service.ts',
-    'teacher.ts',
-    'teacher2.ts',
-    'top-navigation-bar.component.ts',
-    'topic-creation.service.ts',
-    'topic-summary-tile.component.ts',
     'translation-file-hash-loader-backend-api.service.ts',
     'truncate-and-capitalize.filter.ts',
     'truncate-and-capitalize.pipe.ts',
     'truncate-input-based-on-interaction-answer-type.filter.ts',
     'truncate.filter.ts',
-    'truncate.pipe.ts',
-    'tutor-card.directive.ts',
-    'unit-test-utils.ajs.ts', # Please don't try to cover this file.
+    # Please don't try to cover `unit-test-utils.ajs.ts` file.
+    'unit-test-utils.ajs.ts',
     'voiceover-recording.service.ts',
-    'worked-example-editor.directive.ts',
 ]
 
 
-class LcovStanzaRelevantLines(python_utils.OBJECT):
+class LcovStanzaRelevantLines:
     """Gets the relevant lines from a lcov stanza."""
 
     def __init__(self, stanza):
@@ -299,15 +224,15 @@ def check_coverage_changes():
                 .format(test_name))
 
     if errors:
-        python_utils.PRINT('------------------------------------')
-        python_utils.PRINT('Frontend Coverage Checks Not Passed.')
-        python_utils.PRINT('------------------------------------')
+        print('------------------------------------')
+        print('Frontend Coverage Checks Not Passed.')
+        print('------------------------------------')
         logging.error(errors)
         sys.exit(1)
     else:
-        python_utils.PRINT('------------------------------------')
-        python_utils.PRINT('All Frontend Coverage Checks Passed.')
-        python_utils.PRINT('------------------------------------')
+        print('------------------------------------')
+        print('All Frontend Coverage Checks Passed.')
+        print('------------------------------------')
 
     check_not_fully_covered_filenames_list_is_sorted()
 

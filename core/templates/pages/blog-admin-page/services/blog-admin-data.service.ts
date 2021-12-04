@@ -25,12 +25,13 @@ import { BlogAdminPageData, BlogAdminBackendApiService } from 'domain/blog-admin
   providedIn: 'root'
 })
 export class BlogAdminDataService {
-  dataPromise: Promise<BlogAdminPageData>;
+  // This property is initialized using private methods
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  dataPromise!: Promise<BlogAdminPageData>;
 
   constructor(
-    private BackendApiService: BlogAdminBackendApiService) {
-    this.dataPromise = null;
-  }
+    private BackendApiService: BlogAdminBackendApiService) {}
 
   async _getDataAsync(): Promise<BlogAdminPageData> {
     this.dataPromise = this.BackendApiService.getDataAsync();

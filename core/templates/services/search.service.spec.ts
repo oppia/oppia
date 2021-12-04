@@ -38,7 +38,7 @@ describe('Search Service', () => {
   });
 
   describe('updateSearchFieldsBasedOnUrlQuery', () => {
-    let urlComponent;
+    let urlComponent: string;
     beforeEach(() => {
       results = {
         categories: {
@@ -223,15 +223,15 @@ describe('Search Service', () => {
   });
 
   describe('executeSearchQuery', () => {
-    let successHandler;
-    let errorHandler;
-    let searchQuery;
-    let categories;
-    let languageCodes;
-    let initialSearchResultsLoadedSpy;
+    let successHandler: jasmine.Spy<jasmine.Func>;
+    let errorHandler: jasmine.Spy<jasmine.Func>;
+    let searchQuery: string;
+    let categories: SelectionList;
+    let languageCodes: SelectionList;
+    let initialSearchResultsLoadedSpy: jasmine.Spy<jasmine.Func>;
     let testSubscriptions: Subscription;
     const SAMPLE_RESULTS = {
-      search_cursor: 'notempty',
+      search_offset: 'notempty',
       activity_list: []
     };
     const SAMPLE_QUERY = '/searchhandler/data?q=example&category=' +
@@ -292,9 +292,9 @@ describe('Search Service', () => {
 
     describe('loadMoreData', () => {
       const MORE_DATA_REQUEST = '/searchhandler/data?q=example&category=' +
-      '("exploration")&language_code=("en" OR "hi")&cursor=notempty';
+      '("exploration")&language_code=("en" OR "hi")&offset=notempty';
       const MORE_DATA_RESPONSE = {
-        search_cursor: 'newcursor'
+        search_offset: 'newcursor'
       };
 
       it('should successfully load more data', fakeAsync(() => {
@@ -343,8 +343,8 @@ describe('Search Service', () => {
 
           searchService.loadMoreData(() => { }, () => { });
           const moreDataReq = httpTestingController.expectOne(
-            SAMPLE_QUERY + '&cursor=notempty');
-          moreDataReq.flush({search_cursor: null});
+            SAMPLE_QUERY + '&offset=notempty');
+          moreDataReq.flush({search_offset: null});
           flushMicrotasks();
           searchService.loadMoreData(successHandler, errorHandler);
 

@@ -16,14 +16,13 @@
 the same e2e test suites.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import os
 import re
 
-import python_utils
-import utils
+from core import python_utils
+from core import utils
 
 # These test suites are not present in CI. One is extra
 # (ie. (full: [*.js])) and other test suites are being run by CircleCI.
@@ -141,9 +140,7 @@ def main():
     """Test the CI config files and protractor.conf.js to have same
     e2e test suites.
     """
-    python_utils.PRINT(
-        'Checking all e2e test files are captured '
-        'in protractor.conf.js...')
+    print('Checking all e2e test files are captured in protractor.conf.js...')
     protractor_test_suite_files = get_e2e_test_filenames_from_protractor_dir()
     protractor_conf_test_suites = (
         get_e2e_test_filenames_from_protractor_conf_file())
@@ -152,10 +149,9 @@ def main():
         raise Exception(
             'One or more test file from protractor or protractor_desktop '
             'directory is missing from protractor.conf.js')
-    python_utils.PRINT('Done!')
+    print('Done!')
 
-    python_utils.PRINT(
-        'Checking e2e tests are captured in CI config files...')
+    print('Checking e2e tests are captured in CI config files...')
     protractor_test_suites = get_e2e_suite_names_from_protractor_file()
     ci_suite_names = get_e2e_suite_names_from_ci_config_file()
 
@@ -192,7 +188,7 @@ def main():
                 utils.compute_list_difference(
                     protractor_test_suites, ci_suite_names)))
 
-    python_utils.PRINT('Done!')
+    print('Done!')
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
