@@ -152,7 +152,8 @@ describe('create new subtopic modal', function() {
     expect(component.htmlData).toBe('working fine');
   });
 
-  it('should show Schema editor when showSchemaEditor called', () => {
+  it('should show Schema editor when user clicks' +
+    'on \"Give a description or explanation of the subtopic.\" button', () => {
     let SUBTOPIC_PAGE_SCHEMA = component.getSchema();
     expect(SUBTOPIC_PAGE_SCHEMA).toEqual(DefaultSubtopicPageSchema);
 
@@ -160,20 +161,19 @@ describe('create new subtopic modal', function() {
     expect(component.schemaEditorIsShown).toBe(true);
   });
 
-  it('should update file name when updateSubtopicThumbnailFilename called',
-    () => {
-      let newFileName = 'shivamOppiaFile';
-      spyOn(topicUpdateService, 'setSubtopicThumbnailFilename').and.stub();
-      component.updateSubtopicThumbnailFilename(newFileName);
+  it('should update editableThumbnailFilename when ' +
+  'filename updated in \"Thubmnail Image*\" modal', () => {
+    let newFileName = 'shivamOppiaFile';
+    spyOn(topicUpdateService, 'setSubtopicThumbnailFilename').and.stub();
+    component.updateSubtopicThumbnailFilename(newFileName);
 
-      expect(component.editableThumbnailFilename).toBe(newFileName);
-      expect(topicUpdateService.setSubtopicThumbnailFilename)
-        .toHaveBeenCalled();
-    });
+    expect(component.editableThumbnailFilename).toBe(newFileName);
+    expect(topicUpdateService.setSubtopicThumbnailFilename)
+      .toHaveBeenCalled();
+  });
 
   it('should update ThumbnailBgColor when ' +
-    'updateSubtopicThumbnailBgColor called',
-  () => {
+    'user select new color in \"Thubmnail Image*\" modal', () => {
     let newThumbnailBgColor = 'red';
     spyOn(topicUpdateService, 'setSubtopicThumbnailBgColor').and.stub();
     component.updateSubtopicThumbnailBgColor(newThumbnailBgColor);
@@ -182,39 +182,40 @@ describe('create new subtopic modal', function() {
     expect(topicUpdateService.setSubtopicThumbnailBgColor).toHaveBeenCalled();
   });
 
-  it('should reset errorMsg when resetErrorMsg called', () => {
+  it('should reset errorMsg when user' +
+  ' enter data in \"Title*\" input area', () => {
     component.resetErrorMsg();
 
     expect(component.errorMsg).toBe(null);
   });
 
-  it('should check whether subtopic is valid when isSubtopicValid fxn called',
-    () => {
-      component.editableThumbnailFilename = 'examplefilename';
-      component.subtopicTitle = 'title';
-      component.htmlData = 'data';
-      component.editableUrlFragment = 'url';
+  it('should check whether subtopic is valid when' +
+  ' \"Create Subtopic\" button clicked', () => {
+    component.editableThumbnailFilename = 'examplefilename';
+    component.subtopicTitle = 'title';
+    component.htmlData = 'data';
+    component.editableUrlFragment = 'url';
 
-      let isSubtopicValid = component.isSubtopicValid();
+    let isSubtopicValid = component.isSubtopicValid();
 
-      spyOn(subtopicValidationService, 'isUrlFragmentValid')
-        .and.returnValue(true);
-      expect(isSubtopicValid).toBe(true);
-    });
+    spyOn(subtopicValidationService, 'isUrlFragmentValid')
+      .and.returnValue(true);
+    expect(isSubtopicValid).toBe(true);
+  });
 
-  it('should call deleteSubtopicPage & deleteSubtopic functions' +
-    'when cancel fxn called', fakeAsync(() => {
-    spyOn(topicEditorStateService, 'deleteSubtopicPage');
-    spyOn(topicUpdateService, 'deleteSubtopic');
+  it('should not create subtopic when \"Cancel\" button clicked',
+    fakeAsync(() => {
+      spyOn(topicEditorStateService, 'deleteSubtopicPage');
+      spyOn(topicUpdateService, 'deleteSubtopic');
 
-    component.cancel();
+      component.cancel();
 
-    expect(topicEditorStateService.deleteSubtopicPage).toHaveBeenCalled();
-    expect(topicUpdateService.deleteSubtopic).toHaveBeenCalled();
-  }));
+      expect(topicEditorStateService.deleteSubtopicPage).toHaveBeenCalled();
+      expect(topicUpdateService.deleteSubtopic).toHaveBeenCalled();
+    }));
 
-  it('should check whether subtopicUrlFragmentExists ' +
-    'when checkSubtopicExistence called', () => {
+  it('should check whether subtopicUrlFragmentExists when user enter data' +
+  ' in \"Enter the url fragment for the subtopic*\" input area', () => {
     spyOn(subtopicValidationService, 'doesSubtopicWithUrlFragmentExist')
       .and.returnValue(true);
     component.checkSubtopicExistence();
@@ -222,7 +223,8 @@ describe('create new subtopic modal', function() {
     expect(component.subtopicUrlFragmentExists).toBe(true);
   });
 
-  it('should save subtoic when save function called', () => {
+  it('should save create new subtoic when' +
+  ' \"Create Subtopic\" button clicked', () => {
     component.subtopicId = 123;
     spyOn(subtopicValidationService, 'checkValidSubtopicName')
       .and.returnValue(true);
@@ -240,7 +242,8 @@ describe('create new subtopic modal', function() {
     expect(ngbActiveModal.close).toHaveBeenCalled();
   });
 
-  it('should not close modal if subtopic name is not valid', () => {
+  it('should not close modal if subtopic name is not valid' +
+  ' when \"Create Subtopic\" button clicked', () => {
     spyOn(ngbActiveModal, 'close');
 
     spyOn(subtopicValidationService, 'checkValidSubtopicName')
