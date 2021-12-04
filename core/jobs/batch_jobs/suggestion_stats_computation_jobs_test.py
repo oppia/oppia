@@ -136,6 +136,40 @@ class GenerateTranslationContributionStatsJobTests(job_test_utils.JobTestBase):
             [datetime.date.today()]
         )
 
+    def test_reports_failure_on_broken_model(self) -> None:
+        suggestion_model = self.create_model(
+            suggestion_models.GeneralSuggestionModel,
+            id='suggestion_id',
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            author_id=self.VALID_USER_ID_1,
+            change_cmd={
+                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                'state_name': 'state',
+                'content_id': 'content_id',
+                'language_code': 'lang',
+                'content_html': 111,
+                'translation_html': '111 222 333',
+                'data_format': 'html'
+            },
+            score_category='irelevant',
+            status=suggestion_models.STATUS_IN_REVIEW,
+            target_type='exploration',
+            target_id=self.EXP_1_ID,
+            target_version_at_submission=0,
+            language_code=self.LANG_1
+        )
+        suggestion_model.update_timestamps()
+        suggestion_model.put()
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stderr=(
+                    'ERROR: "suggestion_id: argument cannot be of \'int\' '
+                    'type, must be of text type": 1'
+                )
+            )
+        ])
+
     def test_creates_stats_model_from_one_suggestion_in_set_format(
         self
     ) -> None:
