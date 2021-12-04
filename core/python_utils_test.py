@@ -25,8 +25,6 @@ import os
 import sys
 import unittest
 import urllib
-import urllib.request as urlrequest
-
 
 from core import python_utils
 from core.tests import test_utils
