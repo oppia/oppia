@@ -5997,7 +5997,7 @@ export default {
     },
     "ABOUT_FOUNDATION": {
       "ROUTE": "about-foundation",
-      "TITLE": "About foundation | Oppia",
+      "TITLE": "About the Oppia Foundation | Oppia",
       "META": []
     },
     "CLASSROOM": {
