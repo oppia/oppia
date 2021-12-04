@@ -864,17 +864,15 @@ class InteractionInstance:
                 value.html = conversion_fn(value.html)
             return value
 
-        interaction_id = interaction_dict['id']
-
         # Convert the customization_args to a dictionary of customization arg
         # name to InteractionCustomizationArg, so that we can utilize
         # InteractionCustomizationArg helper functions.
         # Then, convert back to original dict format afterwards, at the end.
         customization_args = (
             InteractionInstance
-            .convert_customization_args_dict_to_customization_args(
-                interaction_id,
-                interaction_dict['customization_args'])
+            .convert_cust_args_dict_to_cust_args_based_on_specs(
+                interaction_dict['customization_args'],
+                ca_specs_dict)
         )
 
         for ca_spec in ca_specs_dict:
@@ -919,16 +917,43 @@ class InteractionInstance:
         if interaction_id is None:
             return {}
 
-        ca_specs = interaction_registry.Registry.get_interaction_by_id(
-            interaction_id).customization_arg_specs
-        customization_args = {
-            spec.name: InteractionCustomizationArg.from_customization_arg_dict(
-                customization_args_dict[spec.name],
-                spec.schema
-            ) for spec in ca_specs
-        }
+        ca_specs_dict = interaction_registry.Registry.get_interaction_by_id(
+            interaction_id).to_dict()['customization_arg_specs']
 
-        return customization_args
+        return (
+            InteractionInstance
+            .convert_cust_args_dict_to_cust_args_based_on_specs(
+                customization_args_dict, ca_specs_dict))
+
+    @staticmethod
+    def convert_cust_args_dict_to_cust_args_based_on_specs(
+        ca_dict,
+        ca_specs_dict
+    ):
+        """Converts customization arguments dictionary to customization
+        arguments. This is done by converting each customization argument to a
+        InteractionCustomizationArg domain object.
+
+        Args:
+            ca_dict: dict. A dictionary of customization
+                argument name to a customization argument dict, which is a dict
+                of the single key 'value' to the value of the customization
+                argument.
+            ca_specs_dict: dict. A dictionary of customization
+                argument specs.
+
+        Returns:
+            dict. A dictionary of customization argument names to the
+            InteractionCustomizationArg domain object's.
+        """
+        return {
+            spec['name']: (
+                InteractionCustomizationArg.from_customization_arg_dict(
+                    ca_dict[spec['name']],
+                    spec['schema']
+                )
+            ) for spec in ca_specs_dict
+        }
 
 
 class InteractionCustomizationArg:
@@ -3489,7 +3514,6 @@ class State:
                     state_schema_version
                 )[interaction_id]['customization_arg_specs']
             )
-            logging.error(ca_specs_dict)
             state_dict['interaction'] = (
                 InteractionInstance.convert_html_in_interaction(
                     state_dict['interaction'],

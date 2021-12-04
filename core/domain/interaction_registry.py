@@ -166,18 +166,22 @@ class Registry:
             Exception. No interaction specs json file found for the given state
                 schema version.
         """
-        file_name = (
-            'interaction_specs_state_v%i.json' % state_schema_version)
-        spec_file = os.path.join(
-            feconf.INTERACTIONS_LEGACY_SPECS_FILE_DIR, file_name)
+        if (state_schema_version not in
+                cls._state_schema_version_to_interaction_specs):
+            file_name = (
+                'interaction_specs_state_v%i.json' % state_schema_version)
+            spec_file = os.path.join(
+                feconf.INTERACTIONS_LEGACY_SPECS_FILE_DIR, file_name)
 
-        try:
-            with python_utils.open_file(spec_file, 'r') as f:
-                specs_from_json = json.loads(f.read())
-            cls._state_schema_version_to_interaction_specs[
-                state_schema_version] = specs_from_json
-            return cls._state_schema_version_to_interaction_specs[
-                state_schema_version]
-        except IOError:
-            logging.error('Error: got the latest specs not 48')
-            return cls.get_all_specs()
+            if os.path.isfile(spec_file):
+                with python_utils.open_file(spec_file, 'r') as f:
+                    specs_from_json = json.loads(f.read())
+                cls._state_schema_version_to_interaction_specs[
+                    state_schema_version] = specs_from_json
+                return cls._state_schema_version_to_interaction_specs[
+                    state_schema_version]
+            else:
+                return cls.get_all_specs()
+
+        return cls._state_schema_version_to_interaction_specs[
+            state_schema_version]
