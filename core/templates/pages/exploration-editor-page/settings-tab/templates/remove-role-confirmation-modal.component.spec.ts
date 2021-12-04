@@ -31,7 +31,7 @@ class MockActiveModal {
   }
 }
 
-describe('Remove Role Confirm Or Cancel Modal Component ', function() {
+describe('Remove role confirmation modal component', function() {
   let component: RemoveRoleConfirmationModalComponent;
   let fixture: ComponentFixture<RemoveRoleConfirmationModalComponent>;
 
@@ -56,7 +56,7 @@ describe('Remove Role Confirm Or Cancel Modal Component ', function() {
     fixture.detectChanges();
   });
 
-  it('should initialize properties after component is initialized', () => {
+  it('should check whether component is initialized', () => {
     expect(component).toBeDefined();
   });
 });

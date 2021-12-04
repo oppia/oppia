@@ -14,7 +14,7 @@
 
 
 /**
- * @fileoverview Unit tests for the delete exploration modal.
+ * @fileoverview Unit tests for the delete exploration modal component.
  */
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
@@ -32,7 +32,7 @@ class MockActiveModal {
   }
 }
 
-describe('Delete Exploration Modal', function() {
+describe('Delete Exploration Modal Component', function() {
   let component: DeleteExplorationModalComponent;
   let fixture: ComponentFixture<DeleteExplorationModalComponent>;
 
@@ -57,7 +57,7 @@ describe('Delete Exploration Modal', function() {
     fixture.detectChanges();
   });
 
-  it('should work when component is initialized', () => {
+  it('should check whether component is initialized', () => {
     expect(component).toBeDefined();
   });
 });

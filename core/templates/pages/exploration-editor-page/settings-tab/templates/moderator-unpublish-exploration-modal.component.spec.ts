@@ -31,7 +31,7 @@ class MockActiveModal {
   }
 }
 
-describe('Moderator Unpublish Exploration Modal Controller', function() {
+describe('Moderator Unpublish Exploration Modal', function() {
   let component: ModeratorUnpublishExplorationModalComponent;
   let fixture: ComponentFixture<ModeratorUnpublishExplorationModalComponent>;
   let ngbActiveModal: NgbActiveModal;
@@ -62,7 +62,7 @@ describe('Moderator Unpublish Exploration Modal Controller', function() {
     spyOn(ngbActiveModal, 'close');
   });
 
-  it('should initialize properties after component is initialized',
+  it('should initialize properties when component is initialized',
     () => {
       expect(component).toBeDefined();
       expect(component.willEmailBeSent).toBe(true);
@@ -79,7 +79,7 @@ describe('Moderator Unpublish Exploration Modal Controller', function() {
       expect(component.emailBody).toBe(newValue);
     });
 
-  it('should close modal after confirm fxn is called',
+  it('should close modal when \"Unpublish Exploration\" button is clicked',
     () => {
       component.emailBody = 'nothing';
       component.confirm(component.emailBody);

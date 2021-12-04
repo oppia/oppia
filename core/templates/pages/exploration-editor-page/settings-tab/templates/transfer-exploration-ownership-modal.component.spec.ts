@@ -32,7 +32,7 @@ class MockActiveModal {
   }
 }
 
-describe('Transfer Exploration Ownership Modal Component', function() {
+describe('Transfer Exploration Ownership Modal', function() {
   let component: TransferExplorationOwnershipModalComponent;
   let fixture: ComponentFixture<TransferExplorationOwnershipModalComponent>;
 
@@ -58,7 +58,7 @@ describe('Transfer Exploration Ownership Modal Component', function() {
     fixture.detectChanges();
   });
 
-  it('should initialized the component', () => {
+  it('should check whether component is initialized', () => {
     expect(component).toBeDefined();
   });
 });
