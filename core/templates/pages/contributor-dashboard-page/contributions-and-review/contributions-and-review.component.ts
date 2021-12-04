@@ -334,10 +334,21 @@ angular.module('oppia').component('contributionsAndReview', {
       ctrl.switchToTab = function(tabType, suggestionType) {
         ctrl.activeSuggestionType = suggestionType;
         ctrl.activeTabType = tabType;
+        ctrl.activeDropdownTabChoice =
+          ctrl.activeTabType + ' ' + ctrl.activeSuggestionType;
         ctrl.contributions = {};
         ContributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit();
       };
 
+      ctrl.switchToTabFromDropdownChoice = function() {
+        var dropdownChoiceArray = ctrl.activeDropdownTabChoice.split(' ');
+        ctrl.switchToTab(
+          dropdownChoiceArray[0] === ctrl.TAB_TYPE_CONTRIBUTIONS ?
+          ctrl.TAB_TYPE_CONTRIBUTIONS : ctrl.TAB_TYPE_REVIEWS,
+          dropdownChoiceArray[1] === SUGGESTION_TYPE_QUESTION ?
+          SUGGESTION_TYPE_QUESTION : SUGGESTION_TYPE_TRANSLATE
+        );
+      };
       ctrl.loadContributions = function() {
         if (!ctrl.activeTabType || !ctrl.activeSuggestionType) {
           return new Promise((resolve, reject) => {
@@ -362,6 +373,7 @@ angular.module('oppia').component('contributionsAndReview', {
         ctrl.userIsLoggedIn = false;
         ctrl.activeTabType = '';
         ctrl.activeSuggestionType = '';
+        ctrl.activeDropdownTabChoice = '';
         ctrl.reviewTabs = [];
         ctrl.contributionTabs = [
           {
@@ -423,6 +435,8 @@ angular.module('oppia').component('contributionsAndReview', {
                   ctrl.switchToTab(
                     ctrl.TAB_TYPE_CONTRIBUTIONS, SUGGESTION_TYPE_TRANSLATE);
                 }
+                ctrl.activeDropdownTabChoice =
+                  ctrl.activeTabType + ' ' + ctrl.activeSuggestionType;
                 // TODO(#8521): Remove the use of $rootScope.$apply()
                 // once the controller is migrated to angular.
                 $rootScope.$applyAsync();

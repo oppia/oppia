@@ -1,4 +1,25 @@
 <div class="oppia-contributions-show-review">
+  <div class="oppia-contributions-dropdown-container">
+    <label for="oppia-contributions-tasklist-dropdown">View: </label>
+    <select name="tasks"
+            id="oppia-contributions-tasklist-dropdown"
+            ng-model="$ctrl.activeDropdownTabChoice"
+            ng-change="$ctrl.switchToTabFromDropdownChoice()">
+      <optgroup ng-if="$ctrl.reviewTabs.length > 0" label="Available Tasks">
+        <option ng-repeat="tab in $ctrl.reviewTabs"
+                value="{{$ctrl.TAB_TYPE_REVIEWS + ' ' + tab.suggestionType}}">
+          {{tab.text}}
+        </option>
+      </optgroup>
+      <optgroup ng-if="$ctrl.userIsLoggedIn" label="Contributions">
+        <option ng-repeat="tab in $ctrl.contributionTabs"
+                ng-if="tab.enabled"
+                value="{{$ctrl.TAB_TYPE_CONTRIBUTIONS + ' ' + tab.suggestionType}}">
+          {{tab.text}}
+        </option>
+      </optgroup>
+    </select>
+  </div>
   <div class="oppia-contributions-show-review-side-navbar-container" >
     <div class="oppia-contributions-side-navbar-part" ng-if="$ctrl.reviewTabs.length > 0">
       <div class="oppia-contributions-navbar-items-list" navbar-label="Available Tasks">
@@ -47,9 +68,26 @@
 
   contributions-and-review .oppia-contributions-show-review-side-navbar-container {
     background-color: #009688;
-    display: flex;
-    flex-wrap: wrap;
     width: 25%;
+  }
+
+  contributions-and-review .oppia-contributions-dropdown-container {
+    background-color: white;
+    display: none;
+    font-size: 4vw;
+    font-weight: bold;
+    margin-bottom: 3%;
+    padding: 3%;
+    padding-inline: 5%;
+    width: 100%;
+  }
+
+  contributions-and-review #oppia-contributions-tasklist-dropdown {
+    background-color: white;
+    border: none;
+    box-shadow: 0.5px 0.5px 3px 0.5px slategray;
+    font-size: 4vw;
+    width: 60%;
   }
 
   contributions-and-review .oppia-contributions-show-review-container {
@@ -73,8 +111,7 @@
   }
 
   contributions-and-review .oppia-contributions-side-navbar-part {
-    height: 50%;
-    padding-top: 20%;
+    padding-top: 30%;
     width: 100%;
   }
 
@@ -123,7 +160,28 @@
     width: 100%;
   }
 
-  @media only screen and (max-width: 1500px) {
+  @media only screen and (max-width: 600px) {
+    contributions-and-review .oppia-contributions-dropdown-container {
+      display: flex;
+      justify-content: space-between;
+    }
+    contributions-and-review .oppia-contributions-show-review {
+      border-top: 1px solid slategray;
+      flex-direction: column;
+      align-items: center;
+      justify-content: start;
+      margin-top: 0;
+      width: 100%;
+    }
+    contributions-and-review .oppia-contributions-show-review-side-navbar-container {
+      display: none;
+    }
+    contributions-and-review .oppia-contributions-show-review-container {
+      width: 95%;
+    }
+  }
+
+  @media only screen and (min-width: 601px) and (max-width: 1500px) {
     contributions-and-review .oppia-contributions-navbar-button {
       font-size: 1.6vw;
     }
