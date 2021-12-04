@@ -23,6 +23,8 @@ from core import feconf
 from core import utils
 from core.platform import models
 
+from typing import Any, Dict, List, Union
+
 (classifier_models,) = models.Registry.import_models(
     [models.NAMES.classifier])
 
@@ -76,9 +78,18 @@ class ClassifierTrainingJob:
     """
 
     def __init__(
-            self, job_id, algorithm_id, interaction_id, exp_id,
-            exp_version, next_scheduled_check_time, state_name, status,
-            training_data, algorithm_version):
+            self,
+            job_id: str,
+            algorithm_id: str,
+            interaction_id: str,
+            exp_id: str,
+            exp_version: int,
+            next_scheduled_check_time: datetime.date,
+            state_name: str,
+            status: str,
+            training_data: List[Dict[str, Union[int, List[str]]]],
+            algorithm_version: int
+            ) -> None:
         """Constructs a ClassifierTrainingJob domain object.
 
         Args:
@@ -127,7 +138,7 @@ class ClassifierTrainingJob:
         self._algorithm_version = algorithm_version
 
     @property
-    def job_id(self):
+    def job_id(self) -> str:
         """Returns the job_id of the classifier training job.
 
         Returns:
@@ -136,7 +147,7 @@ class ClassifierTrainingJob:
         return self._job_id
 
     @property
-    def algorithm_id(self):
+    def algorithm_id(self) -> str:
         """Returns the algorithm_id of the algorithm used for generating
         the classifier.
 
@@ -146,7 +157,7 @@ class ClassifierTrainingJob:
         return self._algorithm_id
 
     @property
-    def interaction_id(self):
+    def interaction_id(self) -> str:
         """Returns the interaction_id to which the algorithm belongs.
 
         Returns:
@@ -155,7 +166,7 @@ class ClassifierTrainingJob:
         return self._interaction_id
 
     @property
-    def exp_id(self):
+    def exp_id(self) -> str:
         """Returns the exploration id for which the classifier will be
         generated.
 
@@ -166,7 +177,7 @@ class ClassifierTrainingJob:
         return self._exp_id
 
     @property
-    def exp_version(self):
+    def exp_version(self) -> int:
         """Returns the exploration version.
 
         Returns:
@@ -176,7 +187,7 @@ class ClassifierTrainingJob:
         return self._exp_version
 
     @property
-    def next_scheduled_check_time(self):
+    def next_scheduled_check_time(self) -> datetime.date:
         """Returns the next scheduled time to check the job.
 
         Returns:
@@ -185,7 +196,7 @@ class ClassifierTrainingJob:
         return self._next_scheduled_check_time
 
     @property
-    def state_name(self):
+    def state_name(self) -> str:
         """Returns the state_name for which the classifier will be generated.
 
         Returns:
@@ -195,7 +206,7 @@ class ClassifierTrainingJob:
         return self._state_name
 
     @property
-    def status(self):
+    def status(self) -> str:
         """Returns the status of the training job request.
 
         Returns:
@@ -206,7 +217,7 @@ class ClassifierTrainingJob:
         return self._status
 
     @property
-    def training_data(self):
+    def training_data(self) -> List[Dict[str, Union[int, List[str]]]]:
         """Returns the training data used for training the classifier.
 
         Returns:
@@ -228,7 +239,7 @@ class ClassifierTrainingJob:
         return self._training_data
 
     @property
-    def classifier_data_filename(self):
+    def classifier_data_filename(self) -> str:
         """Returns file name of the GCS file which stores classifier data
         for this training job.
 
@@ -238,7 +249,7 @@ class ClassifierTrainingJob:
         return '%s-classifier-data.pb.xz' % (self.job_id)
 
     @property
-    def algorithm_version(self):
+    def algorithm_version(self) -> int:
         """Returns the algorithm version of the classifier.
 
         Returns:
@@ -247,7 +258,7 @@ class ClassifierTrainingJob:
         """
         return self._algorithm_version
 
-    def update_status(self, status):
+    def update_status(self, status: str) -> None:
         """Updates the status attribute of the ClassifierTrainingJob domain
         object.
 
@@ -262,7 +273,7 @@ class ClassifierTrainingJob:
                     initial_status, status))
         self._status = status
 
-    def to_dict(self):
+    def to_dict(self) -> Dict[str, Any]:
         """Constructs a dict representation of training job domain object.
 
         Returns:
@@ -282,7 +293,7 @@ class ClassifierTrainingJob:
             'algorithm_version': self._algorithm_version
         }
 
-    def validate(self):
+    def validate(self) -> None:
         """Validates the training job before it is saved to storage."""
 
         algorithm_ids = []
@@ -387,7 +398,12 @@ class StateTrainingJobsMapping:
     """
 
     def __init__(
-            self, exp_id, exp_version, state_name, algorithm_ids_to_job_ids):
+            self,
+            exp_id: str,
+            exp_version: int,
+            state_name: str,
+            algorithm_ids_to_job_ids: Dict[str, str]
+            ) -> None:
         """Constructs a StateTrainingJobsMapping domain object.
 
         Args:
@@ -406,7 +422,7 @@ class StateTrainingJobsMapping:
         self._algorithm_ids_to_job_ids = algorithm_ids_to_job_ids
 
     @property
-    def exp_id(self):
+    def exp_id(self) -> str:
         """Returns the exploration id.
 
         Returns:
@@ -415,7 +431,7 @@ class StateTrainingJobsMapping:
         return self._exp_id
 
     @property
-    def exp_version(self):
+    def exp_version(self) -> int:
         """Returns the exploration version.
 
         Returns:
@@ -425,7 +441,7 @@ class StateTrainingJobsMapping:
         return self._exp_version
 
     @property
-    def state_name(self):
+    def state_name(self) -> str:
         """Returns the state_name to which the classifier belongs.
 
         Returns:
@@ -434,7 +450,7 @@ class StateTrainingJobsMapping:
         return self._state_name
 
     @property
-    def algorithm_ids_to_job_ids(self):
+    def algorithm_ids_to_job_ids(self) -> Dict[str, str]:
         """Returns the algorithm_ids_to_job_ids of the training jobs.
 
         Returns:
@@ -443,7 +459,7 @@ class StateTrainingJobsMapping:
         """
         return self._algorithm_ids_to_job_ids
 
-    def to_dict(self):
+    def to_dict(self) -> Dict[str, Union[str, int, Dict[str, str]]]:
         """Constructs a dict representation of StateTrainingJobsMapping
         domain object.
 
@@ -459,7 +475,7 @@ class StateTrainingJobsMapping:
             'algorithm_ids_to_job_ids': self._algorithm_ids_to_job_ids
         }
 
-    def validate(self):
+    def validate(self) -> None:
         """Validates the mapping before it is saved to storage."""
 
         if not isinstance(self.exp_id, str):
@@ -504,7 +520,12 @@ class OppiaMLAuthInfo:
         signature: str. The authentication signature signed by Oppia ML.
     """
 
-    def __init__(self, message, vm_id, signature):
+    def __init__(
+        self,
+        message: str,
+        vm_id: str,
+        signature: str
+        ) -> None:
         """Creates new OppiaMLAuthInfo object.
 
         Args:
@@ -517,16 +538,16 @@ class OppiaMLAuthInfo:
         self._signature = signature
 
     @property
-    def message(self):
+    def message(self) -> str:
         """Returns the message sent by OppiaML."""
         return self._message
 
     @property
-    def vm_id(self):
+    def vm_id(self) -> str:
         """Returns the vm_id of OppiaML VM."""
         return self._vm_id
 
     @property
-    def signature(self):
+    def signature(self) -> str:
         """Returns the signature sent by OppiaML."""
         return self._signature
