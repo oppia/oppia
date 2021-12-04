@@ -737,7 +737,8 @@ describe('Settings Tab Component', () => {
       expect(ctrl.isExplorationLockedForEditing()).toBe(false);
     });
 
-    it('should call closeRolesForm in reassignRole', fakeAsync(() => {
+    it('should check edit-modal has been open ' +
+    'when editRole function has been called', fakeAsync(() => {
       spyOn($uibModal, 'open').and.returnValue({
         result: Promise.resolve()
       });
