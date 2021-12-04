@@ -20,6 +20,7 @@ from __future__ import annotations
 
 from core import feconf
 from core import python_utils
+from core import utils
 from core.platform.email import mailgun_email_services
 from core.tests import test_utils
 
@@ -64,7 +65,7 @@ class EmailTests(test_utils.GenericTestBase):
         swapped_urlopen = lambda x: self.Response(x, expected_query_url)
         swapped_request = lambda *args: args
         swap_urlopen_context = self.swap(
-            python_utils, 'url_open', swapped_urlopen)
+            utils, 'url_open', swapped_urlopen)
         swap_request_context = self.swap(
             python_utils, 'url_request', swapped_request)
         swap_api = self.swap(feconf, 'MAILGUN_API_KEY', 'key')
@@ -93,7 +94,7 @@ class EmailTests(test_utils.GenericTestBase):
             {'Authorization': 'Basic YXBpOmtleQ=='})
         swapped_urlopen = lambda x: self.Response(x, expected_query_url)
         swap_urlopen_context = self.swap(
-            python_utils, 'url_open', swapped_urlopen)
+            utils, 'url_open', swapped_urlopen)
         swap_request_context = self.swap(
             python_utils, 'url_request', swapped_request)
         swap_api = self.swap(feconf, 'MAILGUN_API_KEY', 'key')
@@ -126,7 +127,7 @@ class EmailTests(test_utils.GenericTestBase):
             {'Authorization': 'Basic YXBpOmtleQ=='})
         swapped_urlopen = lambda x: self.Response(x, expected_query_url)
         swap_urlopen_context = self.swap(
-            python_utils, 'url_open', swapped_urlopen)
+            utils, 'url_open', swapped_urlopen)
         swap_request_context = self.swap(
             python_utils, 'url_request', swapped_request)
         swap_api = self.swap(feconf, 'MAILGUN_API_KEY', 'key')
@@ -157,7 +158,7 @@ class EmailTests(test_utils.GenericTestBase):
         swapped_urlopen = lambda x: self.Response(x, expected_query_url)
         swapped_request = lambda *args: args
         swap_urlopen_context = self.swap(
-            python_utils, 'url_open', swapped_urlopen)
+            utils, 'url_open', swapped_urlopen)
         swap_request_context = self.swap(
             python_utils, 'url_request', swapped_request)
         swap_api = self.swap(feconf, 'MAILGUN_API_KEY', 'key')
@@ -211,7 +212,7 @@ class EmailTests(test_utils.GenericTestBase):
         swapped_request = lambda *args: args
         swapped_urlopen = lambda x: self.Response(x, expected_query_url)
         swap_urlopen_context = self.swap(
-            python_utils, 'url_open', swapped_urlopen)
+            utils, 'url_open', swapped_urlopen)
         swap_request_context = self.swap(
             python_utils, 'url_request', swapped_request)
         swap_api = self.swap(feconf, 'MAILGUN_API_KEY', 'key')

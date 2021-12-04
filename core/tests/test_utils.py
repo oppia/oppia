@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import builtins
 import collections
 import contextlib
 import copy
@@ -991,8 +992,7 @@ class TestBase(unittest.TestCase):
         that calls the test.
         """
         # We are using the b' prefix as all the stdouts are in bytes.
-        python_utils.PRINT(
-            b'%s%s' % (LOG_LINE_PREFIX, line.encode()))
+        print(b'%s%s' % (LOG_LINE_PREFIX, line.encode()))
 
     def shortDescription(self):
         """Additional information logged during unit test invocation."""
@@ -1252,7 +1252,7 @@ class TestBase(unittest.TestCase):
                 ', '.join(itertools.chain(
                     (repr(a) for a in args),
                     ('%s=%r' % kwarg for kwarg in kwargs.items())))
-                for args, kwargs in python_utils.zip_longest(
+                for args, kwargs in itertools.zip_longest(
                     expected_args_iter, expected_kwargs_iter, fillvalue={})
             ]
             if pretty_unused_args:
@@ -3362,7 +3362,7 @@ class LinterTestBase(GenericTestBase):
         self.linter_stdout = []
 
         def mock_print(*args):
-            """Mock for python_utils.PRINT. Append the values to print to
+            """Mock for print. Append the values to print to
             linter_stdout list.
 
             Args:
@@ -3371,7 +3371,7 @@ class LinterTestBase(GenericTestBase):
             """
             self.linter_stdout.append(' '.join(str(arg) for arg in args))
 
-        self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
+        self.print_swap = self.swap(builtins, 'print', mock_print)
 
     def assert_same_list_elements(self, phrases, stdout):
         """Checks to see if all of the phrases appear in at least one of the

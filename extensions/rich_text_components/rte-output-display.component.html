@@ -1,0 +1,106 @@
+<ng-template #tree let-node>
+  <ng-container *ngFor="let childNode of node.children">
+    <ng-container>
+      <ng-template [cdkPortalOutlet]="childNode.portal"></ng-template>
+    </ng-container>
+  </ng-container>
+</ng-template>
+<ng-container *ngIf="show">
+  <ng-container *ngTemplateOutlet="tree; context:{ $implicit: node }"></ng-container>
+</ng-container>
+
+<!-- Native HTML elements used in CKEditor. -->
+<ng-template #p let-childNode>
+  <p>
+    <ng-container [ngTemplateOutlet]="tree" [ngTemplateOutletContext]="{ $implicit: childNode }">
+    </ng-container>
+  </p>
+</ng-template>
+<ng-template #span let-childNode>
+  <span>
+    <ng-container [ngTemplateOutlet]="tree" [ngTemplateOutletContext]="{ $implicit: childNode }">
+    </ng-container>
+  </span>
+</ng-template>
+<ng-template #ul let-childNode>
+  <ul>
+    <ng-container [ngTemplateOutlet]="tree" [ngTemplateOutletContext]="{ $implicit: childNode }">
+    </ng-container>
+  </ul>
+</ng-template>
+<ng-template #ol let-childNode>
+  <ol>
+    <ng-container [ngTemplateOutlet]="tree" [ngTemplateOutletContext]="{ $implicit: childNode }">
+    </ng-container>
+  </ol>
+</ng-template>
+<ng-template #li let-childNode>
+  <li>
+    <ng-container [ngTemplateOutlet]="tree" [ngTemplateOutletContext]="{ $implicit: childNode }">
+    </ng-container>
+  </li>
+</ng-template>
+<ng-template #pre let-childNode>
+  <pre>
+    <ng-container [ngTemplateOutlet]="tree" [ngTemplateOutletContext]="{ $implicit: childNode }">
+    </ng-container>
+  </pre>
+</ng-template>
+<ng-template #strong let-childNode>
+  <strong>
+    <ng-container [ngTemplateOutlet]="tree" [ngTemplateOutletContext]="{ $implicit: childNode }">
+    </ng-container>
+  </strong>
+</ng-template>
+<ng-template #blockquote let-childNode>
+  <blockquote>
+    <ng-container [ngTemplateOutlet]="tree" [ngTemplateOutletContext]="{ $implicit: childNode }">
+    </ng-container>
+  </blockquote>
+</ng-template>
+<ng-template #em let-childNode>
+  <em>
+    <ng-container [ngTemplateOutlet]="tree" [ngTemplateOutletContext]="{ $implicit: childNode }">
+    </ng-container>
+  </em>
+</ng-template>
+<ng-template #text let-childNode>
+  <ng-container [oppiaRteTextNode]="childNode.value"></ng-container>
+</ng-template>
+<!-- Oppia Non Interactive *. -->
+<ng-template #collapsible let-attrs>
+  <oppia-noninteractive-collapsible [headingWithValue]="attrs.headingWithValue" attr.heading-with-value="{{attrs.headingWithValue}}"
+                                    [contentWithValue]="attrs.contentWithValue" attr.content-with-value="{{attrs.contentWithValue}}">
+  </oppia-noninteractive-collapsible>
+</ng-template>
+<ng-template #image let-attrs>
+  <oppia-noninteractive-image [filepathWithValue]="attrs.filepathWithValue" attr.filepath-with-value="{{attrs.filepathWithValue}}"
+                              [altWithValue]="attrs.altWithValue" attr.alt-with-value="{{attrs.altWithValue}}"
+                              [captionWithValue]="attrs.captionWithValue" attr.caption-with-value="{{attrs.captionWithValue}}">
+  </oppia-noninteractive-image>
+</ng-template>
+<ng-template #link let-attrs>
+  <oppia-noninteractive-link [urlWithValue]="attrs.urlWithValue" attr.url-with-value="{{attrs.urlWithValue}}"
+                             [textWithValue]="attrs.textWithValue" attr.text-with-value="{{attrs.textWithValue}}">
+  </oppia-noninteractive-link>
+</ng-template>
+<ng-template #math let-attrs>
+  <oppia-noninteractive-math [mathContentWithValue]="attrs.mathContentWithValue" attr.math_content-with-value="{{attrs.mathContentWithValue}}">
+  </oppia-noninteractive-math>
+</ng-template>
+<ng-template #skillreview let-attrs>
+  <oppia-noninteractive-skillreview [skillIdWithValue]="attrs.skillIdWithValue" attr.skill_id-with-value="{{attrs.skillIdWithValue}}"
+                                    [textWithValue]="attrs.textWithValue" attr.text-with-value="{{attrs.textWithValue}}">
+  </oppia-noninteractive-skillreview>
+</ng-template>
+<ng-template #tabs let-attrs>
+  <oppia-noninteractive-tabs [tabContentsWithValue]="attrs.tabContentsWithValue" attr.tab_contents-with-value="{{attrs.tabContentsWithValue}}">
+  </oppia-noninteractive-tabs>
+</ng-template>
+<ng-template #video let-attrs>
+  <oppia-noninteractive-video [autoplayWithValue]="attrs.autoplayWithValue" attr.autoplay-with-value="{{attrs.autoplayWithValue}}"
+                              [endWithValue]="attrs.endWithValue" attr.end-with-value="{{attrs.endWithValue}}"
+                              [startWithValue]="attrs.startWithValue" attr.start-with-value="{{attrs.startWithValue}}"
+                              [videoIdWithValue]="attrs.videoIdWithValue" attr.video_id-with-value="{{attrs.videoIdWithValue}}">
+  </oppia-noninteractive-video>
+</ng-template>
