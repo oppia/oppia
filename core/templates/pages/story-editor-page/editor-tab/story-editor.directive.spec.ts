@@ -65,6 +65,7 @@ describe('Story editor Directive having two story nodes', function() {
     StoryEditorStateService = $injector.get('StoryEditorStateService');
     $q = $injector.get('$q');
 
+
     var sampleStoryBackendObject = {
       id: 'sample_story_id',
       title: 'Story title',
@@ -264,7 +265,7 @@ describe('Story editor Directive having two story nodes', function() {
     });
 
   it('should call StoryUpdateService to add destination node id',
-    fakeAsync(()  => {
+    fakeAsync(() => {
       var modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
         return ({
           componentInstance: NgbModalRef,
@@ -421,7 +422,6 @@ describe('Story editor Directive having one story node', function() {
   var $uibModal = null;
   var $scope = null;
   var ctrl = null;
-  var $q = null;
   var $rootScope = null;
   var directive = null;
   var story = null;
@@ -439,7 +439,6 @@ describe('Story editor Directive having one story node', function() {
     WindowDimensionsService = $injector.get('WindowDimensionsService');
     StoryObjectFactory = $injector.get('StoryObjectFactory');
     StoryEditorStateService = $injector.get('StoryEditorStateService');
-    $q = $injector.get('$q');
 
 
     var sampleStoryBackendObject = {
