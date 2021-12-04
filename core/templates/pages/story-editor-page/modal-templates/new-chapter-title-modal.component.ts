@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Co for new chapter title modal.
+ * @fileoverview Component for new chapter title modal.
  */
 
 import { Component, Input, OnInit } from '@angular/core';
@@ -83,10 +83,12 @@ export class CreateNewChapterModalComponent extends ConfirmOrCancelModal
       this.story, this.nodeId, newThumbnailBgColor);
     this.editableThumbnailBgColor = newThumbnailBgColor;
   }
+
   updateTitle(): void {
     this.storyUpdateService.setStoryNodeTitle(
       this.story, this.nodeId, this.title);
   }
+
   cancel(): void {
     this.storyUpdateService.deleteStoryNode(this.story, this.nodeId);
     this.ngbActiveModal.dismiss('cancel');
@@ -104,10 +106,9 @@ export class CreateNewChapterModalComponent extends ConfirmOrCancelModal
     }
     if (this.storyEditorStateService.isStoryPublished()) {
       this.explorationIdValidationService.isExpPublishedAsync(
-        this.explorationId).then(function(expIdIsValid) {
-        this.expIdIsValid = expIdIsValid;
-        if (this.expIdIsValid) {
-          this.soryUpdateService.setStoryNodeExplorationId(
+        this.explorationId).then((expIdIsValid) => {
+        if (expIdIsValid) {
+          this.storyUpdateService.setStoryNodeExplorationId(
             this.story, this.nodeId, this.explorationId);
           this.ngbActiveModal.close();
         } else {

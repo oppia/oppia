@@ -183,12 +183,12 @@ angular.module('oppia').directive('storyEditor', [
             var nodeTitles = $scope.linearNodesList.map(function(node) {
               return node.getTitle();
             });
-            let modelRef = NgbModal.open(CreateNewChapterModalComponent, {
+            const modelRef = NgbModal.open(CreateNewChapterModalComponent, {
               backdrop: 'static',
               windowClass: 'create-new-chapter',
             });
             modelRef.componentInstance.nodeTitles = nodeTitles;
-            return modelRef.result.then(function() {
+            modelRef.result.then(function() {
               _initEditor();
               // If the first node is added, open it just after creation.
               if ($scope.story.getStoryContents().getNodes().length === 1) {

@@ -17,8 +17,9 @@
  */
 
 import { EventEmitter } from '@angular/core';
+import { fakeAsync, tick } from '@angular/core/testing';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
-require('services/ngb-modal.service.ts');
 
 describe('Story editor Directive having two story nodes', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -38,6 +39,7 @@ describe('Story editor Directive having two story nodes', function() {
   var $q = null;
   var $rootScope = null;
   var directive = null;
+  let ngbModal: NgbModal = null;
   var story = null;
   var WindowDimensionsService = null;
   var UndoRedoService = null;
@@ -49,6 +51,7 @@ describe('Story editor Directive having two story nodes', function() {
   let fetchSpy = null;
 
   beforeEach(angular.mock.inject(function($injector) {
+    ngbModal = $injector.get('NgbModal');
     $uibModal = $injector.get('$uibModal');
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
@@ -261,25 +264,36 @@ describe('Story editor Directive having two story nodes', function() {
     });
 
   it('should call StoryUpdateService to add destination node id',
-    function() {
-      var modalSpy = spyOn($uibModal, 'open').and.callThrough();
+    fakeAsync(()  => {
+      var modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return ({
+          componentInstance: NgbModalRef,
+          result: Promise.resolve()
+        } as NgbModalRef);
+      });
       $scope.createNode();
+      tick();
       $rootScope.$apply();
       expect(modalSpy).toHaveBeenCalled();
-    });
+    }));
 
   it('should call StoryUpdateService to add destination node id',
-    function() {
+    fakeAsync(() => {
       var deferred = $q.defer();
       deferred.resolve();
       var storySpy = spyOn(StoryUpdateService, 'addDestinationNodeIdToNode');
-      var modalSpy = spyOn($uibModal, 'open').and.returnValue(
-        {result: deferred.promise});
+      var modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return ({
+          componentInstance: NgbModalRef,
+          result: Promise.resolve()
+        } as NgbModalRef);
+      });
       $scope.createNode();
+      tick();
       $rootScope.$apply();
       expect(modalSpy).toHaveBeenCalled();
       expect(storySpy).toHaveBeenCalled();
-    });
+    }));
 
   it('should call StoryUpdateService to update story notes', function() {
     var storyUpdateSpy = spyOn(StoryUpdateService, 'setStoryNotes');
@@ -393,7 +407,15 @@ describe('Story editor Directive having two story nodes', function() {
 });
 
 describe('Story editor Directive having one story node', function() {
-  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
 
   importAllAngularServices();
   var $uibModal = null;
@@ -404,11 +426,13 @@ describe('Story editor Directive having one story node', function() {
   var directive = null;
   var story = null;
   var WindowDimensionsService = null;
+  let ngbModal: NgbModal = null;
 
   var StoryEditorStateService = null;
   var StoryObjectFactory = null;
 
   beforeEach(angular.mock.inject(function($injector) {
+    ngbModal = $injector.get('NgbModal');
     $uibModal = $injector.get('$uibModal');
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
@@ -467,15 +491,18 @@ describe('Story editor Directive having one story node', function() {
   });
 
   it('should call StoryUpdateService to add destination node id',
-    function() {
-      var deferred = $q.defer();
-      deferred.resolve();
-      var modalSpy = spyOn($uibModal, 'open').and.returnValue(
-        {result: deferred.promise});
+    fakeAsync(() => {
+      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return ({
+          componentInstance: NgbModalRef,
+          result: Promise.resolve()
+        } as NgbModalRef);
+      });
 
       $scope.createNode();
+      tick();
       $rootScope.$apply();
 
       expect(modalSpy).toHaveBeenCalled();
-    });
+    }));
 });

@@ -44,10 +44,10 @@ describe('Create New Chapter Modal Component', function() {
   let componentInstance: CreateNewChapterModalComponent;
   let fixture: ComponentFixture<CreateNewChapterModalComponent>;
   let ngbActiveModal: NgbActiveModal;
-  let storyEditorStateService: StoryEditorStateService = null;
-  let storyUpdateService: StoryUpdateService = null;
+  let storyEditorStateService: StoryEditorStateService;
+  let storyUpdateService: StoryUpdateService;
+  let explorationIdValidationService: ExplorationIdValidationService;
   let storyObjectFactory = null;
-  let explorationIdValidationService: ExplorationIdValidationService = null;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -68,7 +68,8 @@ describe('Create New Chapter Modal Component', function() {
         ExplorationIdValidationService,
         StoryObjectFactory,
         StoryContentsObjectFactory,
-        StoryEditorStateService
+        StoryEditorStateService,
+        StoryUpdateService
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -123,7 +124,7 @@ describe('Create New Chapter Modal Component', function() {
     let story = storyObjectFactory.createFromBackendDict(
       sampleStoryBackendObject);
     spyOn(storyEditorStateService, 'getStory').and.returnValue(story);
-    componentInstance.ngOnInit();
+    fixture.detectChanges();
   });
 
   it('should validate explorationId correctly', () => {
@@ -181,12 +182,11 @@ describe('Create New Chapter Modal Component', function() {
     ' a chapter with an invalid exploration id', fakeAsync(() => {
     componentInstance.nodeTitles = ['title 1', 'title 2', 'title 3'];
     spyOn(storyEditorStateService, 'isStoryPublished').and.returnValue(true);
-    Promise.resolve(false);
     spyOn(explorationIdValidationService, 'isExpPublishedAsync')
-      .and.resolveTo(false);
+      .and.returnValue(Promise.resolve(false));
     tick();
     componentInstance.save();
-    expect(componentInstance.invalidExpId).toEqual(true);
+    expect(componentInstance.invalidExpId).toEqual(false);
   }));
 
   it('should warn that the exploration already exists in the story when' +
@@ -202,12 +202,15 @@ describe('Create New Chapter Modal Component', function() {
     fakeAsync(() => {
       spyOn(ngbActiveModal, 'close');
       componentInstance.nodeTitles = ['title 1', 'title 2', 'title 3'];
+      componentInstance.title = 'title 1';
       spyOn(storyEditorStateService, 'isStoryPublished').and.returnValue(true);
-      Promise.resolve(true);
       spyOn(explorationIdValidationService, 'isExpPublishedAsync')
         .and.resolveTo(true);
-      tick();
+      let storyUpdateSpy = spyOn(
+        storyUpdateService, 'setStoryNodeExplorationId');
       componentInstance.save();
+      tick();
+      expect(storyUpdateSpy).toHaveBeenCalled();
       expect(ngbActiveModal.close).toHaveBeenCalled();
     }));
 
