@@ -25,11 +25,12 @@ import os
 import sys
 import unittest
 import urllib
+import urllib.request as urlrequest
+
 
 from core import python_utils
 from core.tests import test_utils
 from core.tests.data import unicode_and_str_handler
-import urllib.request as urlrequest
 
 
 class PythonUtilsTests(test_utils.GenericTestBase):
@@ -65,7 +66,7 @@ class PythonUtilsTests(test_utils.GenericTestBase):
         self.assertEqual(response.url, 'http://www.google.com')
 
     def test_url_request(self):
-        response = urlrequest.Request('http://www.google.com', None, {})
+        response = python_utils.url_request('http://www.google.com', None, {})
         self.assertEqual(response.get_full_url(), 'http://www.google.com')
 
     def test_divide(self):
