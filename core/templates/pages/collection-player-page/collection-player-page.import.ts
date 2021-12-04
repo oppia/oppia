@@ -46,4 +46,4 @@ require(
 require(
   'pages/collection-player-page/collection-navbar/' +
   'collection-navbar.component.ts');
-require('pages/collection-player-page/collection-player-page.directive.ts');
+require('pages/collection-player-page/collection-player-page.component.ts');
