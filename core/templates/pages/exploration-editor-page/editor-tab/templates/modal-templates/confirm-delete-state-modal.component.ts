@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,22 +13,32 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for confirm delete state modal.
+ * @fileoverview Component for confirm delete state modal.
  */
 
-require(
-  'components/common-layout-directives/common-elements/' +
-  'confirm-or-cancel-modal.controller.ts');
+import { Component, Input, OnInit } from '@angular/core';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
-angular.module('oppia').controller('ConfirmDeleteStateModalController', [
-  '$controller', '$scope', '$uibModalInstance', 'deleteStateName',
-  function($controller, $scope, $uibModalInstance, deleteStateName) {
-    $controller('ConfirmOrCancelModalController', {
-      $scope: $scope,
-      $uibModalInstance: $uibModalInstance
-    });
-    $scope.deleteStateWarningText = (
-      'Are you sure you want to delete the card "' +
-      deleteStateName + '"?');
+@Component({
+  selector: 'oppia-topic-editor-save-modal',
+  templateUrl: './topic-editor-save-modal.component.html'
+})
+export class ConfirmDeleteStateModalComponent extends ConfirmOrCancelModal
+  implements OnInit {
+  @Input() deleteStateName: string;
+
+  deleteStateWarningText: string;
+
+  constructor(
+    private ngbActiveModal: NgbActiveModal,
+  ) {
+    super(ngbActiveModal);
   }
-]);
+
+  ngOnInit(): void {
+    this.deleteStateWarningText = (
+      'Are you sure you want to delete the card "' +
+      this.deleteStateName + '"?');
+  }
+}
