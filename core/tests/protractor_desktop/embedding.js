@@ -148,6 +148,7 @@ describe('Embedding', function() {
       await explorationPlayerPage.submitAnswer('TextInput', 'factorial');
       await explorationPlayerPage.clickThroughToNextCard();
       await explorationPlayerPage.expectExplorationToBeOver();
+      await general.checkForConsoleErrors(EMBEDDING_ERRORS_TO_IGNORE);
     };
 
     var PLAYTHROUGH_LOGS = [
