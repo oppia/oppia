@@ -126,7 +126,7 @@
   <div *ngIf="activeTab === 'myExplorations'">
     <div *ngIf="explorationsList.length === 0 && collectionsList.length === 0" class="oppia-dashboard-empty-text pt-1">
       <mat-card layout="row"
-               class="oppia-page-card oppia-dashboard-intro-card">
+                class="oppia-page-card oppia-dashboard-intro-card">
         <div>
           <p [innerHTML]="'I18N_DASHBOARD_EXPLORATIONS_EMPTY_MESSAGE' | translate"></p>
           <button type="button"
