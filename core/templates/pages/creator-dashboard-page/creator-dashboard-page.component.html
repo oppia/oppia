@@ -1,6 +1,17 @@
 <background-banner></background-banner>
 <div class="oppia-dashboard-container position-relative">
-  <div class="m-auto oppia-dashboard-aggregated-stats oppia-creator-dashboard-main-content"
+  <div class="oppia-dashboard-title"
+       [ngClass]="checkMobileView() ? 'oppia-dashboard-title-mobile-padding': 'oppia-dashboard-title-desktop-padding'">
+    <span class="float-left" [innerHTML]="'I18N_DASHBOARD_CREATOR_DASHBOARD' | translate"></span>
+    <button type="button"
+            class="oppia-creator-dashboard-intro-button oppia-transition-200 protractor-test-create-new-exploration-button oppia-autofocus"
+            [ngClass]="checkMobileView() ? 'oppia-creator-dashboard-button-mobile': 'oppia-creator-dashboard-button-desktop'"
+            (click)="createNewExploration()" autofocus>
+      + {{'I18N_CREATE_EXPLORATION' | translate}}
+    </button>
+  </div>
+
+  <div class="m-auto oppia-dashboard-aggregated-stats oppia-creator-dashboard-main-content pt-1"
        *ngIf="explorationsList?.length > 0 || collectionsList?.length > 0"
        [ngClass]="{'oppia-creator-dashboard-mobile-mode': checkMobileView()}">
     <mat-card layout="row" class="oppia-mat-card">
@@ -112,21 +123,12 @@
     </ul>
   </div>
 
-  <div *ngIf="explorationsList?.length === 0 && collectionsList?.length === 0">
-    <h2 class="oppia-dashboard-title" [innerHTML]="'I18N_DASHBOARD_CREATOR_DASHBOARD' | translate"></h2>
-  </div>
-
   <div *ngIf="activeTab === 'myExplorations'">
-    <div *ngIf="explorationsList?.length === 0 && collectionsList?.length === 0">
+    <div *ngIf="explorationsList.length === 0 && collectionsList.length === 0" class="oppia-dashboard-empty-text pt-1">
       <mat-card layout="row"
-                class="oppia-page-card oppia-dashboard-intro-card mt-0">
+               class="oppia-page-card oppia-dashboard-intro-card">
         <div>
           <p [innerHTML]="'I18N_DASHBOARD_EXPLORATIONS_EMPTY_MESSAGE' | translate"></p>
-          <button type="button"
-                  class="btn oppia-dashboard-intro-button oppia-transition-200 protractor-test-create-new-exploration-button oppia-autofocus"
-                  (click)="createNewExploration()"
-                  [innerHTML]="'I18N_CREATE_EXPLORATION' | translate" autofocus>
-          </button>
           <button type="button"
                   class="btn oppia-dashboard-intro-button oppia-transition-200 protractor-test-create-new-exploration-button"
                   (click)="showCreateQuestionModal()"
@@ -504,7 +506,7 @@
     text-decoration: none;
   }
   .oppia-dashboard-empty-text {
-    padding-top: 15px;
+    padding-top: 1em;
   }
   .oppia-dashboard-title {
     color: #01645c;
@@ -512,8 +514,13 @@
     font-size: 3em;
     margin-bottom: 25px;
     margin-top: 0;
-    padding-top: 78.5px;
     text-align: center;
+  }
+  .oppia-dashboard-title-desktop-padding {
+    padding-top: 78.5px;
+  }
+  .oppia-dashboard-title-mobile-padding {
+    padding-top: 15px;
   }
   .oppia-dashboard-tabs .list-card-view-toggle {
     margin-left: auto;
@@ -624,6 +631,25 @@
 
   .oppia-dashboard-table td {
     padding: 7px 3px;
+  }
+  .oppia-creator-dashboard-intro-button {
+    background-color: #00645c;
+    border-radius: 6px;
+    color: #fff;
+    font-family: "Roboto", Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.7px;
+    margin-top: 10px;
+    padding: 10px 12px;
+    text-transform: uppercase;
+    width: 200px;
+  }
+  .oppia-creator-dashboard-button-mobile {
+    transform: none;
+  }
+  .oppia-creator-dashboard-button-desktop {
+    transform: translate(70px, -15px);
   }
   .oppia-dashboard-intro-card {
     font-family: "Capriola", "Roboto", Arial, sans-serif;

@@ -178,6 +178,9 @@ export class CreatorDashboardPageComponent {
     if (
       this.currentSortType ===
         CreatorDashboardConstants.EXPLORATIONS_SORT_BY_KEYS.RATING) {
+      // TODO(sll): Find a better way to sort explorations according to
+      // average ratings. Currently there is no parameter as such
+      // average ratings in entities received by SortByPipe.
       return 'title';
     } else {
       return this.currentSortType;
