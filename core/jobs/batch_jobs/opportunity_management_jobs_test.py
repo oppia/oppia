@@ -101,47 +101,21 @@ class GenerateSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
     def setUp(self) -> None:
         super().setUp()
 
-        question_1_model = self.create_model(
-            question_models.QuestionModel,
-            id=self.QUESTION_1_ID,
-            question_state_data={},
-            language_code=constants.DEFAULT_LANGUAGE_CODE,
-            version=0,
-            linked_skill_ids=[self.SKILL_1_ID, self.SKILL_2_ID],
-            inapplicable_skill_misconception_ids=[],
-            question_state_data_schema_version=feconf
-                .CURRENT_STATE_SCHEMA_VERSION
-        )
-
-        question_2_model = self.create_model(
-            question_models.QuestionModel,
-            id=self.QUESTION_2_ID,
-            question_state_data={},
-            language_code=constants.DEFAULT_LANGUAGE_CODE,
-            version=0,
-            linked_skill_ids=[self.SKILL_1_ID, self.SKILL_2_ID],
-            inapplicable_skill_misconception_ids=[],
-            question_state_data_schema_version=feconf
-                .CURRENT_STATE_SCHEMA_VERSION
-        )
-        question_1_model.update_timestamps()
-        question_2_model.update_timestamps()
-
-        question_1_skilllinkmodel = self.create_model(
+        question_skill_link_model_1 = self.create_model(
             question_models.QuestionSkillLinkModel,
             question_id=self.QUESTION_1_ID,
             skill_id=self.SKILL_1_ID,
             skill_difficulty=1
         )
 
-        question_2_skilllinkmodel = self.create_model(
+        question_skill_link_model_2 = self.create_model(
             question_models.QuestionSkillLinkModel,
             question_id=self.QUESTION_2_ID,
             skill_id=self.SKILL_2_ID,
             skill_difficulty=1
         )
-        question_1_skilllinkmodel.update_timestamps()
-        question_2_skilllinkmodel.update_timestamps()
+        question_skill_link_model_1.update_timestamps()
+        question_skill_link_model_2.update_timestamps()
 
         skill_1_model = self.create_model(
             skill_models.SkillModel,
@@ -215,12 +189,12 @@ class GenerateSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
         skill_1_model.update_timestamps()
         skill_2_model.update_timestamps()
 
-        datastore_services.put_multi(
-            [skill_1_model, skill_2_model,
-             question_1_model, question_2_model,
-             question_1_skilllinkmodel,
-             question_2_skilllinkmodel]
-        )
+        datastore_services.put_multi([
+            skill_1_model,
+            skill_2_model,
+            question_skill_link_model_1,
+            question_skill_link_model_2
+        ])
 
     def test_generation_job_creates_new_models(self) -> None:
         all_opportunity_models = list(
@@ -302,14 +276,14 @@ class GenerateSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
             opportunity_models.SkillOpportunityModel.get_all())
         self.assertEqual(len(all_opportunity_models), 0)
 
-        question_1_skilllinkmodel = self.create_model(
+        question_skill_link_model_1 = self.create_model(
             question_models.QuestionSkillLinkModel,
             question_id=self.QUESTION_1_ID,
             skill_id=self.SKILL_2_ID,
             skill_difficulty=1
         )
-        question_1_skilllinkmodel.update_timestamps()
-        datastore_services.put_multi([question_1_skilllinkmodel])
+        question_skill_link_model_1.update_timestamps()
+        datastore_services.put_multi([question_skill_link_model_1])
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(stdout='SUCCESS'),

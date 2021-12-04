@@ -129,8 +129,9 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
 
     def count_unique_question_ids(
         self,
-        question_skill_link_models:
-            list[list[question_models.QuestionSkillLinkModel]]
+        question_skill_link_models: List[List[
+                question_models.QuestionSkillLinkModel
+            ]]
         ) -> int:
         """Counts the number of unique question ids.
 
@@ -148,7 +149,7 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
         return len(set(question_ids))
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        all_question_skill_link_models = (
+        question_skill_link_models = (
             self.pipeline
             | 'Get all non-deleted QuestionSkillLinkModels' >> (
                 ndb_io.GetModels(
@@ -159,7 +160,7 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
                 beam.GroupBy(lambda n: n.skill_id)
         )
 
-        all_skill_models = (
+        skills = (
             self.pipeline
             | 'Get all non-deleted SkillModels' >> (
                 ndb_io.GetModels(
@@ -169,10 +170,11 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
             | 'Group Skills by skill id' >> beam.GroupBy(lambda m: m.id)
         )
 
-        skills_with_question_counts = (({
-            'skills': all_skill_models,
-            'question_skill_links': all_question_skill_link_models
-        })
+        skills_with_question_counts = (
+            {
+                'skills': skills,
+                'question_skill_links': question_skill_link_models
+            }
             | 'Merge by skill id' >> beam.CoGroupByKey()
         )
 
