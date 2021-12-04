@@ -939,8 +939,7 @@ class InteractionInstance:
                 argument name to a customization argument dict, which is a dict
                 of the single key 'value' to the value of the customization
                 argument.
-            ca_specs_dict: dict. A dictionary of customization
-                argument specs.
+            ca_specs_dict: dict. A dictionary of customization argument specs.
 
         Returns:
             dict. A dictionary of customization argument names to the
