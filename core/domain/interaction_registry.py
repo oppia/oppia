@@ -22,6 +22,7 @@ import importlib
 import itertools
 import json
 import os
+import logging
 
 from core import feconf
 from core import python_utils
@@ -178,4 +179,5 @@ class Registry:
             return cls._state_schema_version_to_interaction_specs[
                 state_schema_version]
         except IOError:
+            logging.error('Error: got the latest specs not 48')
             return cls.get_all_specs()

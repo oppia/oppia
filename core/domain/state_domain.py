@@ -3489,6 +3489,7 @@ class State:
                     state_schema_version
                 )[interaction_id]['customization_arg_specs']
             )
+            logging.error(ca_specs_dict)
             state_dict['interaction'] = (
                 InteractionInstance.convert_html_in_interaction(
                     state_dict['interaction'],
