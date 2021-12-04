@@ -25,7 +25,7 @@ import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService }
 import { PretestQuestionBackendApiService }
   from 'domain/question/pretest-question-backend-api.service';
 import { QuestionBackendApiService } from 'domain/question/question-backend-api.service';
-import { QuestionBackendDict } from 'domain/question/QuestionObjectFactory';
+import { Question, QuestionBackendDict, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { ContextService } from 'services/context.service';
 import { UrlService } from 'services/contextual/url.service';
 import { ExplorationFeatures, ExplorationFeaturesBackendApiService }
@@ -60,7 +60,9 @@ describe('Exploration Player State Service', () => {
   let questionBackendApiService: QuestionBackendApiService;
   let pretestQuestionBackendApiService:
     PretestQuestionBackendApiService;
+  let questionObjectFactory: QuestionObjectFactory;
   let urlService: UrlService;
+  let questionObject: Question;
 
   let returnDict = {
     can_edit: true,
@@ -87,7 +89,116 @@ describe('Exploration Player State Service', () => {
 
   let questionBackendDict: QuestionBackendDict = {
     id: '',
-    question_state_data: null,
+    question_state_data: {
+      classifier_model_id: null,
+      param_changes: [],
+      next_content_id_index: 1,
+      solicit_answer_details: false,
+      content: {
+        content_id: '1',
+        html: 'Question 1'
+      },
+      written_translations: {
+        translations_mapping: {
+          1: {},
+          ca_placeholder_0: {},
+          feedback_id: {},
+          solution: {},
+          hint_1: {}
+        }
+      },
+      interaction: {
+        answer_groups: [{
+          outcome: {
+            dest: 'State 1',
+            feedback: {
+              content_id: 'feedback_1',
+              html: '<p>Try Again.</p>'
+            },
+            param_changes: [],
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null,
+            labelled_as_correct: true,
+          },
+          rule_specs: [{
+            rule_type: 'Equals',
+            inputs: {x: 0}
+          }],
+          training_data: null,
+          tagged_skill_misconception_id: null,
+        },
+        {
+          outcome: {
+            dest: 'State 2',
+            feedback: {
+              content_id: 'feedback_2',
+              html: '<p>Try Again.</p>'
+            },
+            param_changes: [],
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null,
+            labelled_as_correct: true,
+          },
+          rule_specs: [{
+            rule_type: 'Equals',
+            inputs: {x: 0}
+          }],
+          training_data: null,
+          tagged_skill_misconception_id: 'misconceptionId',
+        }],
+        default_outcome: {
+          dest: null,
+          labelled_as_correct: true,
+          missing_prerequisite_skill_id: null,
+          refresher_exploration_id: null,
+          param_changes: [],
+          feedback: {
+            content_id: 'feedback_id',
+            html: '<p>Dummy Feedback</p>'
+          }
+        },
+        id: 'TextInput',
+        customization_args: {
+          rows: {
+            value: 1
+          },
+          placeholder: {
+            value: {
+              unicode_str: '',
+              content_id: 'ca_placeholder_0'
+            }
+          }
+        },
+        confirmed_unclassified_answers: [],
+        hints: [
+          {
+            hint_content: {
+              content_id: 'hint_1',
+              html: '<p>This is a hint.</p>'
+            }
+          }
+        ],
+        solution: {
+          correct_answer: 'Solution',
+          explanation: {
+            content_id: 'solution',
+            html: '<p>This is a solution.</p>'
+          },
+          answer_is_exclusive: false
+        }
+      },
+      linked_skill_id: null,
+      card_is_checkpoint: true,
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          1: {},
+          ca_placeholder_0: {},
+          feedback_id: {},
+          solution: {},
+          hint_1: {}
+        }
+      }
+    },
     question_state_data_schema_version: 2,
     language_code: '',
     version: 1,
@@ -191,6 +302,9 @@ describe('Exploration Player State Service', () => {
     pretestQuestionBackendApiService = (
       pretestQuestionBackendApiService as unknown) as
       jasmine.SpyObj<PretestQuestionBackendApiService>;
+    questionObjectFactory = TestBed.inject(QuestionObjectFactory);
+    questionObject = questionObjectFactory.createFromBackendDict(
+      questionBackendDict);
     urlService = (TestBed.inject(UrlService) as unknown) as
       jasmine.SpyObj<UrlService>;
   });
@@ -230,11 +344,11 @@ describe('Exploration Player State Service', () => {
   it('should initialize pretest services', () => {
     spyOn(playerCorrectnessFeedbackEnabledService, 'init');
     spyOn(questionPlayerEngineService, 'init');
-    let pretestQuestionDicts = [];
+    let pretestQuestionObjects = [];
     let callback = () => {};
 
     explorationPlayerStateService.initializePretestServices(
-      pretestQuestionDicts, callback);
+      pretestQuestionObjects, callback);
     expect(playerCorrectnessFeedbackEnabledService.init)
       .toHaveBeenCalledWith(true);
     expect(questionPlayerEngineService.init).toHaveBeenCalled();
@@ -243,7 +357,8 @@ describe('Exploration Player State Service', () => {
   it('should initialize question player services', () => {
     spyOn(playerCorrectnessFeedbackEnabledService, 'init');
     spyOn(questionPlayerEngineService, 'init');
-    let questions = [];
+    let questions = [questionBackendDict];
+    let questionObjects = [questionObject];
     let successCallback = () => {};
     let errorCallback = () => {};
 
@@ -253,7 +368,7 @@ describe('Exploration Player State Service', () => {
     expect(playerCorrectnessFeedbackEnabledService.init)
       .toHaveBeenCalledWith(true);
     expect(questionPlayerEngineService.init).toHaveBeenCalledWith(
-      questions, successCallback, errorCallback);
+      questionObjects, successCallback, errorCallback);
   });
 
   it('should set exploration mode', () => {
@@ -358,7 +473,7 @@ describe('Exploration Player State Service', () => {
     spyOn(explorationFeaturesBackendApiService, 'fetchExplorationFeaturesAsync')
       .and.returnValue(Promise.resolve(explorationFeatures));
     spyOn(pretestQuestionBackendApiService, 'fetchPretestQuestionsAsync')
-      .and.returnValue(Promise.resolve([questionBackendDict]));
+      .and.returnValue(Promise.resolve([questionObject]));
     spyOn(explorationFeaturesService, 'init');
     spyOn(explorationPlayerStateService, 'initializePretestServices');
     spyOn(explorationPlayerStateService, 'setPretestMode');
