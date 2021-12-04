@@ -22,7 +22,6 @@ import importlib
 import itertools
 import json
 import os
-import logging
 
 from core import feconf
 from core import python_utils
