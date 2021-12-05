@@ -31,9 +31,11 @@ class MockActiveModal {
   }
 }
 
-fdescribe('Confirm Delete State Modal Component', function() {
+describe('Confirm Delete State Modal Component', function() {
   let component: ConfirmDeleteStateModalComponent;
   let fixture: ComponentFixture<ConfirmDeleteStateModalComponent>;
+  let ngbActiveModal: NgbActiveModal;
+  let deleteStateName = 'Introduction';
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -51,14 +53,14 @@ fdescribe('Confirm Delete State Modal Component', function() {
   beforeEach(() => {
     fixture = TestBed.createComponent(ConfirmDeleteStateModalComponent);
     component = fixture.componentInstance;
+    component.deleteStateName = deleteStateName;
 
-    TestBed.inject(NgbActiveModal);
+    ngbActiveModal = TestBed.inject(NgbActiveModal);
     fixture.detectChanges();
   });
 
   it('should initialize properties after component is initialized', () => {
-    component.deleteStateName = 'Introduction';
-    expect(this.deleteStateWarningText).toBe(
+    expect(component.deleteStateWarningText).toBe(
       'Are you sure you want to delete the card "Introduction"?');
   });
 });

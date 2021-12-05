@@ -21,8 +21,8 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
-  selector: 'oppia-topic-editor-save-modal',
-  templateUrl: './topic-editor-save-modal.component.html'
+  selector: 'oppia-confirm-delete-state-modal',
+  templateUrl: './confirm-delete-state-modal.component.html'
 })
 export class ConfirmDeleteStateModalComponent extends ConfirmOrCancelModal
   implements OnInit {

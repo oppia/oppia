@@ -19,6 +19,7 @@
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { ChangeListService } from './change-list.service';
 import { TestBed } from '@angular/core/testing';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 
 require(
@@ -26,15 +27,23 @@ require(
   'state-solicit-answer-details.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 
-describe('ExplorationStatesService', function() {
+fdescribe('ExplorationStatesService', function() {
   var $q = null;
   var $rootScope = null;
-  var $uibModal = null;
+  let ngbModal: NgbModal = null;
   let changeListService: ChangeListService = null;
   var ContextService = null;
   var ExplorationStatesService = null;
 
-  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
   importAllAngularServices();
 
   beforeEach(() => {
@@ -46,6 +55,7 @@ describe('ExplorationStatesService', function() {
   });
 
   beforeEach(() => {
+    ngbModal = TestBed.inject(NgbModal);
     changeListService = TestBed.inject(ChangeListService);
   });
 
@@ -54,7 +64,6 @@ describe('ExplorationStatesService', function() {
       _ExplorationStatesService_) {
     $q = _$q_;
     $rootScope = _$rootScope_;
-    $uibModal = _$uibModal_;
     ContextService = _ContextService_;
     ExplorationStatesService = _ExplorationStatesService_;
   }));
@@ -132,6 +141,12 @@ describe('ExplorationStatesService', function() {
   describe('Callback Registration', function() {
     describe('.registerOnStateAddedCallback', function() {
       it('should callback when a new state is added', function() {
+        spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+          return ({
+            componentInstance: NgbModalRef,
+            result: Promise.resolve()
+          } as NgbModalRef);
+        });
         var spy = jasmine.createSpy('callback');
         spyOn(changeListService, 'addState');
 
@@ -144,8 +159,10 @@ describe('ExplorationStatesService', function() {
 
     describe('.registerOnStateDeletedCallback', function() {
       it('should callback when a state is deleted', function(done) {
-        spyOn($uibModal, 'open').and.callFake(function() {
-          return {result: $q.resolve()};
+        spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+          return ({
+            result: Promise.resolve()
+          } as NgbModalRef);
         });
         spyOn(changeListService, 'deleteState');
 
