@@ -33,7 +33,7 @@ export class QuestionValidationService {
 
   isQuestionValid(
       question: Question,
-      misconceptionsBySkill: Misconception[]): boolean {
+      misconceptionsBySkill: Record<string, Misconception[]>): boolean {
     return !(
       question.getValidationErrorMessage() ||
       question.getUnaddressedMisconceptionNames(
