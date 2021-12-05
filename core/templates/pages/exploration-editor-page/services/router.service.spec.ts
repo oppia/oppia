@@ -198,7 +198,7 @@ describe('Router Service', () => {
     jQuerySpy.withArgs('.oppia-editor-cards-container').and.returnValue(
       $(document.createElement('div')));
     jQuerySpy.and.callThrough();
-    spyOn($.fn, 'fadeOut').and.callFake(cb => {
+    let fadeOutSpy = spyOn($.fn, 'fadeOut').and.callFake(cb => {
       cb();
       $timeout.flush(200);
       return null;
@@ -219,6 +219,7 @@ describe('Router Service', () => {
     flush();
 
     expect(RouterService.getActiveTabName()).toBe('main');
+    expect(fadeOutSpy).toHaveBeenCalled();
   }));
 
   it('should navigate to main tab when current location is not main', () => {
