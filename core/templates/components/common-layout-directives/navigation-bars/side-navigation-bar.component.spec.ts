@@ -98,12 +98,7 @@ describe('Side Navigation Bar Component', () => {
   });
 
   it('should initialize', () => {
-    const clickEvent = new CustomEvent('click');
-    spyOn(clickEvent, 'stopPropagation');
     componentInstance.ngOnInit();
-
-    expect(componentInstance.listSubmenu).not.toBeNull();
-    componentInstance.listSubmenu[0]?.dispatchEvent(clickEvent);
     expect(componentInstance.currentUrl).toEqual(currentUrl);
   });
 

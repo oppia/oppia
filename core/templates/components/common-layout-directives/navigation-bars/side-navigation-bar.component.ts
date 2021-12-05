@@ -42,7 +42,6 @@ export class SideNavigationBarComponent {
    CLASSROOM_PROMOS_ARE_ENABLED: boolean = false;
    getinvolvedSubmenuIsShown: boolean = false;
    learnSubmenuIsShown: boolean = true;
-   listSubmenu!: HTMLCollectionOf<Element>;
    userIsLoggedIn!: boolean;
 
    PAGES_REGISTERED_WITH_FRONTEND = (
@@ -62,16 +61,6 @@ export class SideNavigationBarComponent {
 
    ngOnInit(): void {
      this.currentUrl = this.windowRef.nativeWindow.location.pathname;
-
-     this.listSubmenu = document.getElementsByClassName(
-       'oppia-sidebar-expandable-list'
-     );
-     for (let i = 0; i < this.listSubmenu.length; i++) {
-       const element = this.listSubmenu[i];
-       element?.addEventListener('click', (event: Event) => {
-         event.stopPropagation();
-       });
-     }
 
      this.classroomBackendApiService.fetchClassroomDataAsync(
        'math').then((classroomData) => {
