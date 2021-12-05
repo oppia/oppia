@@ -271,7 +271,9 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     setTimeout(function() {
       that.truncateNavbar();
     }, 0);
+  }
 
+  ngAfterViewChecked(): void {
     if (this.CLASSROOM_PROMOS_ARE_ENABLED) {
       this.accessValidationBackendApiService.validateAccessToClassroomPage(
         'math').then(()=>{
@@ -281,9 +283,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
         });
       });
     }
-  }
 
-  ngAfterViewChecked(): void {
     this.learnDropdownOffset = this.getDropdownOffset(
       '.learn-tab', (this.CLASSROOM_PROMOS_ARE_ENABLED) ? 688 : 300);
     // https://stackoverflow.com/questions/34364880/expression-has-changed-after-it-was-checked
