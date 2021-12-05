@@ -251,43 +251,43 @@
     <div class="oppia-sidebar-expandable-list">
       <li class="oppia-sidebar-rows" *ngIf="!userIsLoggedIn">
         <div (click)="togglegetinvolvedSubmenu()" class="oppia-sidebar-expandalbe-button">
-        <span [ngClass]="{'oppia-sidebar-submenu-toggle': getinvolvedSubmenuIsShown}" class="text-uppercase">{{ 'I18N_SIDEBAR_GET_INVOLVED' | translate }}</span>
-        <i [ngClass]="{'oppia-sidebar-menu-icon-transition': getinvolvedSubmenuIsShown}" class="material-icons oppia-sidebar-menu-icon expand-icon">
-          expand_more
-        </i>
-      </div>
-      <div [hidden]="!getinvolvedSubmenuIsShown">
-        <div class="oppia-sidebar-submenu-upperborder">
-          <a href="/partnerships" [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.ROUTE">
-            <i class="material-icons oppia-sidebar-submenu-icon partnerships-icon">language</i>
-            <span>{{ 'I18N_SIDEBAR_PARTNERSHIPS' | translate }}</span>
-            <p class="oppia-sidebar-submenu-text">{{ 'I18N_SIDEBAR_PARTNERSHIPS_DESCRIPTION' | translate }}</p>
-          </a>
+          <span [ngClass]="{'oppia-sidebar-submenu-toggle': getinvolvedSubmenuIsShown}" class="text-uppercase">{{ 'I18N_SIDEBAR_GET_INVOLVED' | translate }}</span>
+          <i [ngClass]="{'oppia-sidebar-menu-icon-transition': getinvolvedSubmenuIsShown}" class="material-icons oppia-sidebar-menu-icon expand-icon">
+            expand_more
+          </i>
         </div>
-        <div class="oppia-sidebar-submenu-upperborder">
-          <a href="/volunteer" routerLink="/volunteer">
-            <i class="material-icons oppia-sidebar-submenu-icon volunteer-icon">people</i>
-            <span>{{ 'I18N_SIDEBAR_VOLUNTEER' | translate }}</span>
-            <p class="oppia-sidebar-submenu-text">{{ 'I18N_SIDEBAR_VOLUNTEER_DESCRIPTION' | translate }}</p>
-          </a>
+        <div [hidden]="!getinvolvedSubmenuIsShown">
+          <div class="oppia-sidebar-submenu-upperborder">
+            <a href="/partnerships" [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.ROUTE">
+              <i class="material-icons oppia-sidebar-submenu-icon partnerships-icon">language</i>
+              <span>{{ 'I18N_SIDEBAR_PARTNERSHIPS' | translate }}</span>
+              <p class="oppia-sidebar-submenu-text">{{ 'I18N_SIDEBAR_PARTNERSHIPS_DESCRIPTION' | translate }}</p>
+            </a>
+          </div>
+          <div class="oppia-sidebar-submenu-upperborder">
+            <a href="/volunteer" routerLink="/volunteer">
+              <i class="material-icons oppia-sidebar-submenu-icon volunteer-icon">people</i>
+              <span>{{ 'I18N_SIDEBAR_VOLUNTEER' | translate }}</span>
+              <p class="oppia-sidebar-submenu-text">{{ 'I18N_SIDEBAR_VOLUNTEER_DESCRIPTION' | translate }}</p>
+            </a>
+          </div>
+          <div class="oppia-sidebar-submenu-upperborder">
+            <a href="/donate" [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE">
+              <i class="material-icons oppia-sidebar-submenu-icon donate-icon">favorite</i>
+              <span>{{ 'I18N_SIDEBAR_DONATE' | translate }}</span>
+              <p class="oppia-sidebar-submenu-text">{{ 'I18N_SIDEBAR_DONATE_DESCRIPTION' | translate }}</p>
+            </a>
+          </div>
+          <div class="oppia-sidebar-submenu-upperborder">
+            <a href="/contact" [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.CONTACT.ROUTE">
+              <i class="material-icons oppia-sidebar-submenu-icon contact-icon">email</i>
+              <span>{{ 'I18N_SIDEBAR_CONTACT_US' | translate }}</span>
+              <p class="oppia-sidebar-submenu-text">{{ 'I18N_SIDEBAR_CONTACT_US_DESCRIPTION' | translate }}</p>
+            </a>
+          </div>
         </div>
-        <div class="oppia-sidebar-submenu-upperborder">
-          <a href="/donate" [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE">
-            <i class="material-icons oppia-sidebar-submenu-icon donate-icon">favorite</i>
-            <span>{{ 'I18N_SIDEBAR_DONATE' | translate }}</span>
-            <p class="oppia-sidebar-submenu-text">{{ 'I18N_SIDEBAR_DONATE_DESCRIPTION' | translate }}</p>
-          </a>
-        </div>
-        <div class="oppia-sidebar-submenu-upperborder">
-          <a href="/contact" [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.CONTACT.ROUTE">
-            <i class="material-icons oppia-sidebar-submenu-icon contact-icon">email</i>
-            <span>{{ 'I18N_SIDEBAR_CONTACT_US' | translate }}</span>
-            <p class="oppia-sidebar-submenu-text">{{ 'I18N_SIDEBAR_CONTACT_US_DESCRIPTION' | translate }}</p>
-          </a>
-        </div>
-      </div>
-    </li>
-  </div>
+      </li>
+    </div>
 
     <li [ngClass]="{'active': currentUrl === '/donate'}" class="oppia-sidebar-rows">
       <a href="/donate"
