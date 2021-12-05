@@ -290,6 +290,11 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     this.changeDetectorRef.detectChanges();
   }
 
+  // This function is required to shift the dropdown towards left if
+  // there isn't enough space on the right to fit the entire dropdown.
+  // This function compares the width of the dropdown with the space
+  // available on the right to calculate the offset. It returns zero if
+  // there is enough space to fit the content.
   getDropdownOffset(cssClass: string, width: number): number {
     var learnTab: HTMLElement | null = document.querySelector(cssClass);
     if (learnTab) {
