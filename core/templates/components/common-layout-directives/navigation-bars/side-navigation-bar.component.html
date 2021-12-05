@@ -139,7 +139,7 @@
     </li>
 
     <li>
-      <a href="/about-foundation" target="_blank" rel="noopener">
+      <a href="/about-foundation" rel="noopener">
         <picture>
           <source type="image/webp"
                   [srcset]="this.getStaticImageUrl('/sidebar/oppia-foundation-logo.webp')">
@@ -169,7 +169,6 @@
     <li>
       <a href="/volunteer"
          [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.VOLUNTEER.ROUTE"
-         target="_blank"
          rel="noopener">
         <i class="material-icons oppia-sidebar-menu-icon">&#xF233;</i>
         <span>{{ 'I18N_SIDEBAR_VOLUNTEER' | translate }}</span>
@@ -179,7 +178,6 @@
     <li>
       <a href="/partnerships"
          [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.ROUTE"
-         target="_blank"
          rel="noopener">
         <i class="material-icons oppia-sidebar-menu-icon">&#xE0Af;</i>
         <span>{{ 'I18N_SIDEBAR_PARTNERSHIPS' | translate }}</span>
