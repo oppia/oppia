@@ -1,5 +1,5 @@
 {
-	"I18N_ABOUT_FOUNDATION_PAGE_BREADCRUMB": "Text displayed in the About foundation page. - Text shown in the top left corner of the nav bar.",
+	"I18N_ABOUT_FOUNDATION_PAGE_BREADCRUMB": "Text displayed in the About the Oppia Foundation page. - Text shown in the top left corner of the nav bar.",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_CREATE": "Text shown at the bottom of the About section of Oppia's About page.",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_CREATE_TEXT": "Text shown at the bottom of the About section of Oppia's About page. - This text is a continuation of the Create Text, encouraging users to create new explorations.",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_FEEDBACK": "Text shown at the bottom of the About section of Oppia's About page.",
