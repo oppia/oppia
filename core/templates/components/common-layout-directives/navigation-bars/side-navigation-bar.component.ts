@@ -50,8 +50,8 @@ export class SideNavigationBarComponent {
    constructor(
      private classroomBackendApiService: ClassroomBackendApiService,
      private siteAnalyticsService: SiteAnalyticsService,
-     private urlInterpolationService: UrlInterpolationService,
      private userService: UserService,
+     private urlInterpolationService: UrlInterpolationService,
      private windowRef: WindowRef
    ) {}
 
