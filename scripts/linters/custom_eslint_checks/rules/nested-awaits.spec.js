@@ -26,9 +26,7 @@ var RuleTester = require('eslint').RuleTester;
 var ruleTester = new RuleTester();
 ruleTester.run('nested-awaits', rule, {
   valid: [
-    `// eslint-disable-next-line oppia/no-multiline-disable
-    /* eslint-disable func-style */
-    var alpha = async function () {
+    `var alpha = async function () {
       await (await browser.switchTo().activeElement()).sendKeys(explanation);
     }
     alpha();`
@@ -37,9 +35,7 @@ ruleTester.run('nested-awaits', rule, {
   invalid: [
     {
       code:
-      `// eslint-disable-next-line oppia/no-multiline-disable
-      /* eslint-disable func-style */
-      var alpha = async function () {
+      `var alpha = async function () {
         await (browser.switchTo().activeElement()).sendKeys(explanation);
       }
       alpha();`,
@@ -50,9 +46,7 @@ ruleTester.run('nested-awaits', rule, {
     },
     {
       code:
-      `// eslint-disable-next-line oppia/no-multiline-disable
-      /* eslint-disable func-style */
-      var alpha = async function () {
+      `var alpha = async function () {
         (await browser.switchTo().activeElement()).sendKeys(explanation);
       }
       alpha();`,
@@ -63,9 +57,7 @@ ruleTester.run('nested-awaits', rule, {
     },
     {
       code:
-      `// eslint-disable-next-line oppia/no-multiline-disable
-      /* eslint-disable func-style */
-      var alpha = async function () {
+      `var alpha = async function () {
         (browser.switchTo().activeElement()).sendKeys(explanation);
       }
       alpha();`,
@@ -76,4 +68,3 @@ ruleTester.run('nested-awaits', rule, {
     },
   ]
 });
-
