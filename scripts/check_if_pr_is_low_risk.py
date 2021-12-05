@@ -25,7 +25,7 @@ import argparse
 import json
 import re
 import sys
-import urllib.request as urlrequest
+import urllib
 
 from core import utils
 from scripts import common
@@ -138,7 +138,7 @@ def lookup_pr(owner, repo, pull_number):
         empty dictionary if the response code from the GitHub API is not
         200.
     """
-    request = urlrequest.Request(
+    request = urllib.request.Request(
         GITHUB_API_PR_ENDPOINT % (owner, repo, pull_number),
         None,
         {'Accept': 'application/vnd.github.v3+json'})
