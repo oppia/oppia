@@ -26,45 +26,48 @@ var RuleTester = require('eslint').RuleTester;
 var ruleTester = new RuleTester();
 ruleTester.run('nested-awaits', rule, {
   valid: [
-    `var alpha = async function () {
-      await (await browser.switchTo().activeElement()).sendKeys(explanation);
+    {
+      code:
+      `var alpha = async function () {
+        await (await browser.switchTo().activeElement()).sendKeys(explanation);
+      }
+      alpha();`
     }
-    alpha();`
   ],
 
   invalid: [
     {
       code:
-      `var alpha = async function () {
-        await (browser.switchTo().activeElement()).sendKeys(explanation);
-      }
-      alpha();`,
+        `var alpha = async function () {
+          await (browser.switchTo().activeElement()).sendKeys(explanation);
+        }
+        alpha();`,
       errors: [{
         message: `Please use nested awaits like "await (await 
-         browser.switchTo().activeElement()).sendKeys(explanation);"`
+          browser.switchTo().activeElement()).sendKeys(explanation);"`
       }]
     },
     {
       code:
-      `var alpha = async function () {
-        (await browser.switchTo().activeElement()).sendKeys(explanation);
-      }
-      alpha();`,
+        `var alpha = async function () {
+          (await browser.switchTo().activeElement()).sendKeys(explanation);
+        }
+        alpha();`,
       errors: [{
         message: `Please use nested awaits like "await (await 
-         browser.switchTo().activeElement()).sendKeys(explanation);"`
+          browser.switchTo().activeElement()).sendKeys(explanation);"`
       }]
     },
     {
       code:
-      `var alpha = async function () {
-        (browser.switchTo().activeElement()).sendKeys(explanation);
-      }
-      alpha();`,
+        `var alpha = async function () {
+          (browser.switchTo().activeElement()).sendKeys(explanation);
+        }
+        alpha();`,
       errors: [{
         message: `Please use nested awaits like "await (await 
-         browser.switchTo().activeElement()).sendKeys(explanation);"`
+          browser.switchTo().activeElement()).sendKeys(explanation);"`
       }]
-    },
+    }
   ]
 });
