@@ -31,6 +31,7 @@ import { PageTitleService } from 'services/page-title.service';
 import { UserInfo } from 'domain/user/user-info.model';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 
 class MockAssetsBackendApiService {
@@ -49,6 +50,7 @@ describe('Story Viewer Page component', () => {
   let userService: UserService = null;
   let pageTitleService = null;
   let windowRef: WindowRef;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
   let _samplePlaythroughObject = null;
   const UserInfoObject = {
     roles: ['USER_ROLE'],
@@ -79,12 +81,15 @@ describe('Story Viewer Page component', () => {
     pageTitleService = TestBed.get(PageTitleService);
     assetsBackendApiService = TestBed.get(AssetsBackendApiService);
     urlService = TestBed.get(UrlService);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     userService = TestBed.get(UserService);
     alertsService = TestBed.get(AlertsService);
     storyViewerBackendApiService = TestBed.get(StoryViewerBackendApiService);
     windowRef = TestBed.get(WindowRef);
     let fixture = TestBed.createComponent(StoryViewerPageComponent);
     component = fixture.componentInstance;
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true);
     spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
       location: {
         reload: ()=>{},
@@ -197,6 +202,9 @@ describe('Story Viewer Page component', () => {
     httpTestingController.verify();
   });
 
+  it('should get RTL language status correctly', () => {
+    expect(component.isLanguageRTL()).toEqual(true);
+  });
 
   it('should get complete exploration url when clicking on svg element',
     () => {

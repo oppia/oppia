@@ -20,6 +20,7 @@ import { Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 import { StorySummary } from 'domain/story/story-summary.model';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'stories-list',
@@ -32,7 +33,11 @@ export class StoriesListComponent {
   @Input() topicUrlFragment: string;
   @Input() topicName: string;
   @Input() topicDescription: string;
-  constructor() {}
+  constructor(private i18nLanguageCodeService: I18nLanguageCodeService) {}
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
+  }
 }
 angular.module('oppia').directive(
   'storiesList', downgradeComponent(

@@ -20,6 +20,7 @@ import { Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 import { Subtopic } from 'domain/topic/subtopic.model';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'subtopics-list',
@@ -32,7 +33,11 @@ export class SubtopicsListComponent {
   @Input() topicId: string;
   @Input() topicUrlFragment: string;
   @Input() topicName: string;
-  constructor() {}
+  constructor(private i18nLanguageCodeService: I18nLanguageCodeService) {}
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
+  }
 }
 
 angular.module('oppia').directive(

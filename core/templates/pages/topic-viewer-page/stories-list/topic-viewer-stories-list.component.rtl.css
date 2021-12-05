@@ -1,0 +1,33 @@
+.tab-title {
+  margin: .83em 0 0.1em 0;
+}
+
+.story-info-container {
+  padding-top: 4vh;
+}
+
+.topic-description {
+  border-bottom: 1px solid #7B7B7B;
+  font-size: 1.1em;
+  padding-bottom: 2vh;
+}
+
+.oppia-stories-list-container .oppia-page-card {
+  border-radius: 0.25em;
+  margin-top: 10em;
+  padding-bottom: 7.5vh;
+  width: 704px;
+}
+
+@media(max-width: 1024px) {
+  .oppia-stories-list-container .oppia-page-card {
+    width: 80vw;
+  }
+}
+
+@media(max-width: 500px) {
+  .oppia-stories-list-container .oppia-page-card {
+    padding: 15px 24px 64px 24px;
+    width: 90vw;
+  }
+}

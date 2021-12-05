@@ -23,6 +23,7 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { StorySummaryTileComponent } from './story-summary-tile.component';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 
 describe('StorySummaryTileComponent', () => {
@@ -30,6 +31,7 @@ describe('StorySummaryTileComponent', () => {
   let fixture: ComponentFixture<StorySummaryTileComponent>;
   let wds: WindowDimensionsService;
   let urlInterpolationService: UrlInterpolationService;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -46,6 +48,14 @@ describe('StorySummaryTileComponent', () => {
     component = fixture.componentInstance;
     wds = TestBed.inject(WindowDimensionsService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true);
+  });
+
+  it('should get RTL language status correctly', () => {
+    expect(component.isLanguageRTL()).toEqual(true);
   });
 
   it('should set properties on initialization', () => {

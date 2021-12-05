@@ -28,6 +28,7 @@ import { UrlService } from 'services/contextual/url.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { LoaderService } from 'services/loader.service';
 import { PageTitleService } from 'services/page-title.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'oppia-subtopic-viewer-page',
@@ -47,6 +48,7 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
   constructor(
     private alertsService: AlertsService,
     private contextService: ContextService,
+    private i18nLanguageCodeService: I18nLanguageCodeService,
     private loaderService: LoaderService,
     private pageTitleService: PageTitleService,
     private subtopicViewerBackendApiService: SubtopicViewerBackendApiService,
@@ -56,6 +58,10 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
 
   checkMobileView(): boolean {
     return (this.windowDimensionsService.getWidth() < 500);
+  }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   ngOnInit(): void {

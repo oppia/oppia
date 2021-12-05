@@ -1,0 +1,62 @@
+.oppia-page-card.oppia-long-text {
+  padding: 30px 40px 30px 30px;
+  width: 50vw;
+}
+
+.oppia-page-card {
+  margin-top: 10em;
+}
+
+.tab-title {
+  margin: .83em 0;
+}
+
+.subtopic-subheading {
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 1.2em;
+  margin-bottom: 2.5vh;
+}
+
+.subtopics-container {
+  display: grid;
+  grid-row-gap: 2vh;
+  grid-template-columns: 170px 170px 170px;
+  justify-content: space-between;
+  margin-right: 20px;
+}
+
+.subtopic-summary-tile {
+  margin-left: 2vw;
+}
+
+@media(max-width: 1024px) {
+  .subtopics-container {
+    grid-template-columns: 150px 150px 150px;
+    margin-right: 2vw;
+  }
+}
+
+@media(max-width: 680px) {
+  .subtopics-container {
+    grid-template-columns: 130px 130px 130px;
+    margin-right: 0;
+  }
+}
+
+@media(max-width: 500px) {
+  .subtopics-container {
+    display: grid;
+    grid-template-columns: 130px 130px;
+    justify-content: space-between;
+    margin-right: -10px;
+  }
+}
+
+@media(max-width: 350px) {
+  .subtopics-container {
+    display: grid;
+    grid-template-columns: 120px 120px;
+    justify-content: space-between;
+    margin-right: -10px;
+  }
+}

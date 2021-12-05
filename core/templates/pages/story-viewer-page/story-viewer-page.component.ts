@@ -30,6 +30,7 @@ import { PageTitleService } from 'services/page-title.service';
 import { AlertsService } from 'services/alerts.service';
 import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
 import { ReadOnlyStoryNode } from 'domain/story_viewer/read-only-story-node.model';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 interface IconParametersArray {
   thumbnailIconUrl: string;
@@ -60,6 +61,7 @@ export class StoryViewerPageComponent implements OnInit {
   iconUrl: string;
   constructor(
     private urlInterpolationService: UrlInterpolationService,
+    private i18nLanguageCodeService: I18nLanguageCodeService,
     private assetsBackendApiService: AssetsBackendApiService,
     private userService: UserService,
     private windowRef: WindowRef,
@@ -72,6 +74,10 @@ export class StoryViewerPageComponent implements OnInit {
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   showChapters(): boolean {

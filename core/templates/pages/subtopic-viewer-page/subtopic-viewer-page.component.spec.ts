@@ -30,6 +30,7 @@ import { UrlService } from 'services/contextual/url.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 describe('Subtopic viewer page', function() {
   let component: SubtopicViewerPageComponent;
@@ -41,6 +42,7 @@ describe('Subtopic viewer page', function() {
   let subtopicViewerBackendApiService: SubtopicViewerBackendApiService;
   let urlService: UrlService;
   let loaderService: LoaderService;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
 
   let topicName = 'Topic Name';
   let topicId = '1';
@@ -98,11 +100,19 @@ describe('Subtopic viewer page', function() {
     pageTitleService = TestBed.inject(PageTitleService);
     contextService = TestBed.inject(ContextService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     alertsService = TestBed.inject(AlertsService);
     subtopicViewerBackendApiService = TestBed.inject(
       SubtopicViewerBackendApiService);
     urlService = TestBed.inject(UrlService);
     loaderService = TestBed.inject(LoaderService);
+
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true);
+  });
+
+  it('should get RTL language status correctly', () => {
+    expect(component.isLanguageRTL()).toEqual(true);
   });
 
   it('should succesfully get subtopic data and set context', fakeAsync(() => {

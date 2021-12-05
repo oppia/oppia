@@ -25,6 +25,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { LoaderService } from 'services/loader.service';
 import { UserService } from 'services/user.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 export interface Testimonial {
   quote: string;
@@ -49,6 +50,7 @@ export class SplashPageComponent implements OnInit {
   userIsLoggedIn: boolean = null;
 
   constructor(
+    private i18nLanguageCodeService: I18nLanguageCodeService,
     private siteAnalyticsService: SiteAnalyticsService,
     private urlInterpolationService: UrlInterpolationService,
     private windowDimensionService: WindowDimensionsService,
@@ -59,6 +61,10 @@ export class SplashPageComponent implements OnInit {
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   onClickBrowseLessonsButton(): void {

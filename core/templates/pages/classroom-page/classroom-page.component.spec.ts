@@ -31,6 +31,7 @@ import { PageTitleService } from 'services/page-title.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { ClassroomPageComponent } from './classroom-page.component';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 class MockCapitalizePipe {
   transform(input: string): string {
@@ -49,6 +50,7 @@ describe('Classroom Page Component', () => {
   let siteAnalyticsService: SiteAnalyticsService;
   let alertsService: AlertsService;
   let accessValidationBackendApiService: AccessValidationBackendApiService;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -86,12 +88,20 @@ describe('Classroom Page Component', () => {
     pageTitleService = TestBed.inject(PageTitleService);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     alertsService = TestBed.inject(AlertsService);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     accessValidationBackendApiService = TestBed.inject(
       AccessValidationBackendApiService);
+
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true);
   });
 
   it('should create', () => {
     expect(component).toBeDefined();
+  });
+
+  it('should get RTL language status correctly', () => {
+    expect(component.isLanguageRTL()).toEqual(true);
   });
 
   it('should provide static image url', () => {

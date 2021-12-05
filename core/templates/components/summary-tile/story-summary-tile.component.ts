@@ -26,6 +26,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { AppConstants } from 'app.constants';
 import { StorySummary } from 'domain/story/story-summary.model';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'oppia-story-summary-tile',
@@ -57,6 +58,7 @@ export class StorySummaryTileComponent implements OnInit {
   EXPLORE_PAGE_PREFIX = '/explore/';
 
   constructor(
+    private i18nLanguageCodeService: I18nLanguageCodeService,
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
     private windowDimensionsService: WindowDimensionsService,
@@ -83,6 +85,10 @@ export class StorySummaryTileComponent implements OnInit {
 
   isChapterCompleted(title: string): boolean {
     return this.storySummary.isNodeCompleted(title);
+  }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   isPreviousChapterCompleted(index: number): boolean {

@@ -213,6 +213,10 @@ export class LibraryPageComponent {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
+  }
+
   ngOnInit(): void {
     this.loaderService.showLoadingScreen('I18N_LIBRARY_LOADING');
     this.bannerImageFilename = this.possibleBannerFilenames[

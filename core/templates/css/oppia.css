@@ -1022,6 +1022,13 @@ textarea {
   content: ">";
 }
 
+.oppia-navbar-breadcrumb-rtl-separator {
+  margin-left: 8px;
+}
+.oppia-navbar-breadcrumb-rtl-separator:after {
+  content: "<";
+}
+
 .oppia-navbar-breadcrumb-icon {
   height: 20px;
   margin: 0 12px 4px 12px;
@@ -3178,6 +3185,14 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-improvement-task-footer {
   padding: 24px 0 0 0;
   text-align: right;
+}
+
+/*
+  The following class is to be used for forcing right align in RTL languages,
+  hence the !important tag.
+*/
+.oppia-force-right-align {
+  text-align: right !important;
 }
 
 .oppia-lost-changes > li {

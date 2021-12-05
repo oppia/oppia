@@ -1,0 +1,56 @@
+.oppia-story-viewer-container a {
+  text-decoration: none;
+}
+
+.oppia-story-viewer-container a:hover, a:hover span {
+  color: #0844aa;
+}
+
+.oppia-story-description-text {
+  font-size: 20px;
+}
+
+.oppia-story-viewer-card-description-box {
+  margin-left: 10px;
+}
+
+.story-viewer-login-container {
+  background-color: rgba(255, 255, 255, 0.8);
+  bottom: 0;
+  padding: 2em;
+  position: sticky;
+  text-align: center;
+  width: 100%;
+}
+
+.story-viewer-login-container .md-raised {
+  font-size: 1.2em;
+  min-width: max-content;
+  padding: 1em;
+  width: 8em;
+}
+
+.story-viewer-login-container .oppia-login-button.mat-raised-button {
+  background-color: #00645C;
+  font-size: 19.2px;
+  height: 60px;
+  width: 154px;
+}
+
+.story-viewer-login-container .oppia-login-or-signup-text {
+  display: inline;
+  padding: 10px;
+}
+
+.story-viewer-login-container .oppia-sign-up-button.mat-raised-button {
+  background-color: #00609C;
+  font-size: 19.2px;
+  height: 60px;
+  width: 154px;
+}
+
+@media screen and (max-width: 450px) {
+  .story-viewer-login-container .oppia-login-or-signup-text {
+    display: block;
+  }
+}
