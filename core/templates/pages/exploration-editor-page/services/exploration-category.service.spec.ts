@@ -41,7 +41,7 @@ describe('Exploration Category Service', () => {
     service = TestBed.inject(ExplorationCategoryService);
   });
 
-  it('should test the Exploration Category Service working', () => {
+  it('should test the child object properties', () => {
     expect(service.propertyName).toBe('category');
     expect(service._isValid('Algorithms')).toBe(true);
     let NotNormalize = '   Exploration             Category Service     ';
