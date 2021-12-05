@@ -16,15 +16,16 @@
  * @fileoverview Component for the side navigation bar.
  */
 
-import { Component, Input } from '@angular/core';
+import { ChangeDetectorRef, Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
-import { ClassroomData } from 'domain/classroom/classroom-data.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UserService } from 'services/user.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
+import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
 
  @Component({
    selector: 'oppia-side-navigation-bar',
@@ -37,7 +38,7 @@ export class SideNavigationBarComponent {
    @Input() display!: boolean;
 
    currentUrl!: string;
-   classroomData!: ClassroomData;
+   classroomData: CreatorTopicSummary[] = [];
    topicSummariesLength: number = 0;
    CLASSROOM_PROMOS_ARE_ENABLED: boolean = false;
    getinvolvedSubmenuIsShown: boolean = false;
@@ -49,6 +50,9 @@ export class SideNavigationBarComponent {
 
    constructor(
      private classroomBackendApiService: ClassroomBackendApiService,
+     private accessValidationBackendApiService:
+      AccessValidationBackendApiService,
+     private changeDetectorRef: ChangeDetectorRef,
      private siteAnalyticsService: SiteAnalyticsService,
      private userService: UserService,
      private urlInterpolationService: UrlInterpolationService,
@@ -62,14 +66,6 @@ export class SideNavigationBarComponent {
    ngOnInit(): void {
      this.currentUrl = this.windowRef.nativeWindow.location.pathname;
 
-     this.classroomBackendApiService.fetchClassroomDataAsync(
-       'math').then((classroomData) => {
-       this.topicSummariesLength = classroomData.getTopicSummaries().length;
-       if (this.topicSummariesLength !== 0) {
-         this.classroomData = classroomData;
-       }
-     });
-
      let service = this.classroomBackendApiService;
      service.fetchClassroomPromosAreEnabledStatusAsync().then(
        classroomPromosAreEnabled => {
@@ -79,6 +75,24 @@ export class SideNavigationBarComponent {
      this.userService.getUserInfoAsync().then((userInfo) => {
        this.userIsLoggedIn = userInfo.isLoggedIn();
      });
+   }
+
+   ngAfterViewChecked(): void {
+     if (this.CLASSROOM_PROMOS_ARE_ENABLED) {
+       this.accessValidationBackendApiService.validateAccessToClassroomPage(
+         'math').then(()=>{
+         this.classroomBackendApiService.fetchClassroomDataAsync(
+           'math').then((classroomData) => {
+           this.classroomData = classroomData.getTopicSummaries();
+         });
+       });
+     }
+
+     this.changeDetectorRef.detectChanges();
+   }
+
+   stopclickfurther(event: Event): void {
+     event.stopPropagation();
    }
 
    togglelearnSubmenu(): void {

@@ -29,7 +29,8 @@ import { SideNavigationBarComponent } from './side-navigation-bar.component';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 import { UserService } from 'services/user.service';
 import { UserInfo } from 'domain/user/user-info.model';
-import { CreatorTopicSummaryBackendDict } from 'domain/topic/creator-topic-summary.model';
+import { CreatorTopicSummary, CreatorTopicSummaryBackendDict } from 'domain/topic/creator-topic-summary.model';
+import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
 
 class MockWindowRef {
   nativeWindow = {
@@ -43,6 +44,7 @@ class MockWindowRef {
 
 
 describe('Side Navigation Bar Component', () => {
+  let accessValidationBackendApiService: AccessValidationBackendApiService;
   let fixture: ComponentFixture<SideNavigationBarComponent>;
   let componentInstance: SideNavigationBarComponent;
   let currentUrl: string = '/test';
@@ -86,6 +88,8 @@ describe('Side Navigation Bar Component', () => {
   }));
 
   beforeEach(() => {
+    accessValidationBackendApiService = TestBed
+      .inject(AccessValidationBackendApiService);
     fixture = TestBed.createComponent(SideNavigationBarComponent);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     componentInstance = fixture.componentInstance;
@@ -100,6 +104,12 @@ describe('Side Navigation Bar Component', () => {
   it('should initialize', () => {
     componentInstance.ngOnInit();
     expect(componentInstance.currentUrl).toEqual(currentUrl);
+  });
+
+  it('should able to stop click propagation further', () => {
+    const clickEvent = new CustomEvent('click');
+    spyOn(clickEvent, 'stopPropagation');
+    componentInstance.stopclickfurther(clickEvent);
   });
 
   it('should toggle learn submenu', () => {
@@ -142,7 +152,7 @@ describe('Side Navigation Bar Component', () => {
       .toHaveBeenCalled();
   });
 
-  it('should check if classroom promos are enabled', fakeAsync(() => {
+  it('should check if ngoninit work as expected', fakeAsync(() => {
     let classroomData = ClassroomData.createFromBackendData(
       'Math',
       [{id: '123', name: 'asd'} as CreatorTopicSummaryBackendDict]
@@ -160,7 +170,22 @@ describe('Side Navigation Bar Component', () => {
     componentInstance.ngOnInit();
     tick();
 
-    expect(componentInstance.classroomData).toBe(classroomData);
     expect(componentInstance.CLASSROOM_PROMOS_ARE_ENABLED).toBe(true);
+  }));
+
+  it('should check if classroom data is fetched', fakeAsync(() => {
+    componentInstance.CLASSROOM_PROMOS_ARE_ENABLED = true;
+    spyOn(accessValidationBackendApiService, 'validateAccessToClassroomPage')
+      .and.returnValue(Promise.resolve());
+    let array: CreatorTopicSummary[] = [];
+    let classroomData = new ClassroomData('test', array, 'dummy', 'dummy');
+    spyOn(
+      classroomBackendApiService, 'fetchClassroomDataAsync')
+      .and.resolveTo(classroomData);
+
+    componentInstance.ngAfterViewChecked();
+    tick();
+
+    expect(componentInstance.classroomData).toEqual(array);
   }));
 });

@@ -183,8 +183,8 @@
   </div>
 
   <ul>
-    <li [ngClass]="{'active': currentUrl === '/learn/math'}" class="oppia-sidebar-expandable-list">
-      <div (click)="togglelearnSubmenu()" class="oppia-sidebar-expandalbe-button protractor-mobile-test-learn" >
+    <li [ngClass]="{'active': currentUrl === '/learn/math'}">
+      <div (click)="togglelearnSubmenu(); stopclickfurther($event)" class="oppia-sidebar-expandalbe-button protractor-mobile-test-learn" >
         <i class="material-icons oppia-sidebar-menu-icon expand-icon oppia-sidebar-menu-icon-transition"
           [ngClass]="{'oppia-sidebar-menu-icon-transition': learnSubmenuIsShown}">expand_more
         </i>
@@ -249,7 +249,7 @@
     </li>
 
     <li class="oppia-sidebar-rows" *ngIf="!userIsLoggedIn">
-      <div (click)="togglegetinvolvedSubmenu()" class="oppia-sidebar-expandalbe-button">
+      <div (click)="togglegetinvolvedSubmenu(); stopclickfurther($event)" class="oppia-sidebar-expandalbe-button">
         <span [ngClass]="{'oppia-sidebar-submenu-toggle': getinvolvedSubmenuIsShown}" class="text-uppercase">{{ 'I18N_SIDEBAR_GET_INVOLVED' | translate }}</span>
         <i [ngClass]="{'oppia-sidebar-menu-icon-transition': getinvolvedSubmenuIsShown}" class="material-icons oppia-sidebar-menu-icon expand-icon">
           expand_more
