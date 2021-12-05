@@ -25,6 +25,7 @@ import sys
 import unittest
 import urllib
 
+from core import python_utils
 from core.tests import test_utils
 from core.tests.data import unicode_and_str_handler
 
