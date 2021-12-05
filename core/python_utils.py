@@ -329,23 +329,6 @@ def url_open(source_url):
     return urlrequest.urlopen(source_url, context=context)
 
 
-def url_request(source_url, data, headers):
-    """This function provides an abstraction of a URL request. It uses
-    urllib2.Request if run under Python 2 and urllib.request.Request if
-    run under Python 3.
-
-    Args:
-        source_url: str. The URL.
-        data: str. Additional data to send to the server.
-        headers: dict. The request headers.
-
-    Returns:
-        Request. The 'Request' object.
-    """
-    import urllib.request as urlrequest
-    return urlrequest.Request(source_url, data, headers)
-
-
 def divide(number1, number2):
     """This function divides number1 by number2 in the Python 2 way, i.e it
     performs an integer division.
