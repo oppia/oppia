@@ -27,7 +27,6 @@ import re
 import sys
 import urllib.request as urlrequest
 
-from core import python_utils
 from core import utils
 from scripts import common
 

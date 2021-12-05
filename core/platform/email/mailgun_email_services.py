@@ -23,7 +23,6 @@ import urllib
 import urllib.request as urlrequest
 
 from core import feconf
-from core import python_utils
 from core import utils
 
 from typing import Dict, List, Optional, Union
