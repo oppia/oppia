@@ -242,49 +242,50 @@
       </a>
     </li>
 
-    <li class="oppia-sidebar-rows" *ngIf="userIsLoggedIn">
-      <a href="/learner-dashboard" routerLink="/learner-dashboard" class="text-uppercase">
-        <span >{{ 'I18N_SIDEBAR_HOME' | translate }}</span>
+    <li>
+      <a href="/about-foundation" rel="noopener">
+        <picture>
+          <source type="image/webp"
+                  [srcset]="this.getStaticImageUrl('/sidebar/oppia-foundation-logo.webp')">
+          <source type="image/png"
+                  [srcset]="this.getStaticImageUrl('/sidebar/oppia-foundation-logo.png')">
+          <img [src]="getStaticImageUrl('/sidebar/oppia-foundation-logo.png')"
+               class="oppia-sidebar-menu-icon"
+               alt="Oppia Foundation">
+        </picture>
+        <span>{{ 'I18N_SIDEBAR_OPPIA_FOUNDATION' | translate }}</span>
       </a>
     </li>
 
-    <li class="oppia-sidebar-rows" *ngIf="!userIsLoggedIn">
-      <div (click)="togglegetinvolvedSubmenu(); stopclickfurther($event)" class="oppia-sidebar-expandalbe-button">
-        <span [ngClass]="{'oppia-sidebar-submenu-toggle': getinvolvedSubmenuIsShown}" class="text-uppercase">{{ 'I18N_SIDEBAR_GET_INVOLVED' | translate }}</span>
-        <i [ngClass]="{'oppia-sidebar-menu-icon-transition': getinvolvedSubmenuIsShown}" class="material-icons oppia-sidebar-menu-icon expand-icon">
-          expand_more
-        </i>
-      </div>
-      <div [hidden]="!getinvolvedSubmenuIsShown">
-        <div class="oppia-sidebar-submenu-upperborder">
-          <a href="/partnerships" [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.ROUTE">
-            <i class="material-icons oppia-sidebar-submenu-icon partnerships-icon">language</i>
-            <span>{{ 'I18N_SIDEBAR_PARTNERSHIPS' | translate }}</span>
-            <p class="oppia-sidebar-submenu-text">{{ 'I18N_SIDEBAR_PARTNERSHIPS_DESCRIPTION' | translate }}</p>
-          </a>
-        </div>
-        <div class="oppia-sidebar-submenu-upperborder">
-          <a href="/volunteer" routerLink="/volunteer">
-            <i class="material-icons oppia-sidebar-submenu-icon volunteer-icon">people</i>
-            <span>{{ 'I18N_SIDEBAR_VOLUNTEER' | translate }}</span>
-            <p class="oppia-sidebar-submenu-text">{{ 'I18N_SIDEBAR_VOLUNTEER_DESCRIPTION' | translate }}</p>
-          </a>
-        </div>
-        <div class="oppia-sidebar-submenu-upperborder">
-          <a href="/donate" [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE">
-            <i class="material-icons oppia-sidebar-submenu-icon donate-icon">favorite</i>
-            <span>{{ 'I18N_SIDEBAR_DONATE' | translate }}</span>
-            <p class="oppia-sidebar-submenu-text">{{ 'I18N_SIDEBAR_DONATE_DESCRIPTION' | translate }}</p>
-          </a>
-        </div>
-        <div class="oppia-sidebar-submenu-upperborder">
-          <a href="/contact" [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.CONTACT.ROUTE">
-            <i class="material-icons oppia-sidebar-submenu-icon contact-icon">email</i>
-            <span>{{ 'I18N_SIDEBAR_CONTACT_US' | translate }}</span>
-            <p class="oppia-sidebar-submenu-text">{{ 'I18N_SIDEBAR_CONTACT_US_DESCRIPTION' | translate }}</p>
-          </a>
-        </div>
-      </div>
+    <li>
+      <a href="https://medium.com/oppia-org" target="_blank" rel="noopener">
+        <picture>
+          <source type="image/webp" [srcset]="getStaticImageUrl('/sidebar/medium.webp')">
+          <source type="image/png" [srcset]="getStaticImageUrl('/sidebar/medium.png')">
+          <img [src]="getStaticImageUrl('/sidebar/medium.png')"
+               class="oppia-sidebar-menu-icon"
+               alt="Oppia Blog">
+        </picture>
+        <span>{{ 'I18N_SIDEBAR_BLOG' | translate }}</span>
+      </a>
+    </li>
+
+    <li>
+      <a href="/volunteer"
+         [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.VOLUNTEER.ROUTE"
+         rel="noopener">
+        <i class="material-icons oppia-sidebar-menu-icon">&#xF233;</i>
+        <span>{{ 'I18N_SIDEBAR_VOLUNTEER' | translate }}</span>
+      </a>
+    </li>
+
+    <li>
+      <a href="/partnerships"
+         [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.ROUTE"
+         rel="noopener">
+        <i class="material-icons oppia-sidebar-menu-icon">&#xE0Af;</i>
+        <span>{{ 'I18N_SIDEBAR_PARTNERSHIPS' | translate }}</span>
+      </a>
     </li>
 
     <li [ngClass]="{'active': currentUrl === '/donate'}" class="oppia-sidebar-rows">

@@ -175,7 +175,6 @@
             <li class="nav-item">
               <a class="dropdown-item nav-link oppia-navbar-tab-content"
                  href="/about-foundation"
-                 (keydown)="onMenuKeypress($event, 'aboutMenu', {enter: ACTION_CLOSE})"
                  rel="noopener"
                  [innerHTML]="'I18N_TOPNAV_OPPIA_FOUNDATION' | translate">
               </a>
@@ -183,7 +182,6 @@
             <li class="nav-item">
               <a class="dropdown-item nav-link oppia-navbar-tab-content"
                  href="https://medium.com/oppia-org"
-                 (keydown)="onMenuKeypress($event, 'aboutMenu', {enter: ACTION_CLOSE})"
                  rel="noopener"
                  [innerHTML]="'I18N_TOPNAV_BLOG' | translate">
               </a>
@@ -211,64 +209,31 @@
               class="dropdown-menu oppia-navbar-dropdown get-involved-dropdown"
               (mouseover)="openSubmenu($event, 'getInvolvedMenu')"
               (mouseleave)="closeSubmenuIfNotMobile($event)">
-            <div class="d-flex flex-column">
-              <div class="top-section d-flex">
-                <a class="item item-border d-flex flex-column"
-                   (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_CLOSE})"
-                   href="/partnerships"
-                   [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.ROUTE"
-                   rel="noopener">
-                  <div class="heading">
-                    <span class="material-icons language">language</span>
-                    {{'I18N_TOPNAV_PARTNERSHIPS' | translate}}
-                  </div>
-                  <div class="des">
-                    {{'I18N_TOPNAV_PARTNERSHIPS_DESCRIPTION' | translate}}
-                  </div>
-                </a>
-                <a class="item d-flex flex-column"
-                   href="/volunteer"
-                   [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.VOLUNTEER.ROUTE"
-                   (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {enter: ACTION_CLOSE})"
-                   rel="noopener">
-                  <div class="heading">
-                    <span class="material-icons volunteer">supervisor_account</span>
-                    {{'I18N_HEADING_VOLUNTEER'| translate}}
-                  </div>
-                  <div class="des">
-                    {{'I18N_TOPNAV_VOLUNTEER_DESCRIPTION' | translate}}
-                  </div>
-                </a>
-              </div>
-              <div class="bottom-section d-flex">
-                <a class="item item-border d-flex flex-column"
-                   href="/contact"
-                   [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.CONTACT.ROUTE"
-                   (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {enter: ACTION_CLOSE})"
-                   rel="noopener">
-                  <div class="heading">
-                    <span class="material-icons contact">mail</span>
-                    {{'I18N_TOPNAV_CONTACT_US' | translate}}
-                  </div>
-                  <div class="des">
-                    {{'I18N_TOPNAV_CONTACT_US_DESCRIPTION' | translate}}
-                  </div>
-                </a>
-                <a class="item d-flex flex-column"
-                   href="/donate"
-                   [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE"
-                   (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {enter: ACTION_CLOSE})"
-                   rel="noopener">
-                  <div class="heading">
-                    <span class="material-icons fav">favorite</span>
-                    {{'I18N_TOPNAV_DONATE' | translate}}
-                  </div>
-                  <div class="des">
-                    {{'I18N_TOPNAV_DONATE_DESCRIPTION' | translate}}
-                  </div>
-                </a>
-              </div>
-            </div>
+            <li class="nav-item">
+              <a (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {shiftTab: ACTION_CLOSE})"
+                 class="dropdown-item nav-link oppia-navbar-tab-content protractor-test-about-link"
+                 href="/volunteer"
+                 [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.VOLUNTEER.ROUTE"
+                 rel="noopener"
+                 [innerHTML]="'I18N_HEADING_VOLUNTEER'| translate">
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="dropdown-item nav-link oppia-navbar-tab-content"
+                 href="/partnerships"
+                 [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.ROUTE"
+                 rel="noopener"
+                 [innerHTML]="'I18N_TOPNAV_PARTNERSHIPS' | translate">
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="dropdown-item nav-link oppia-navbar-tab-content"
+                 href="/donate"
+                 [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE"
+                 rel="noopener"
+                 [innerHTML]="'I18N_TOPNAV_DONATE' | translate">
+              </a>
+            </li>
           </ul>
         </li>
         <li [ngClass]="{'open': activeMenuName === 'donateMenu'}"
@@ -295,7 +260,6 @@
               <a class="dropdown-item nav-link oppia-navbar-tab-content oppia-navbar-tab-content-heading"
                  href="/donate"
                  [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE"
-                 (keydown)="onMenuKeypress($event, 'donateMenu', {enter: ACTION_CLOSE})"
                  rel="noopener"
               >
                 <i class="material-icons oppia-navbar-dropdown-heart-icon">&#xE87D;</i>
