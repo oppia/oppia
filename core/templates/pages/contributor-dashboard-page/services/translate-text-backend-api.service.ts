@@ -12,11 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// eslint-disable-next-line oppia/no-multiline-disable
-/* eslint-disable camelcase */
 /**
  * @fileoverview Service for handling user contributed translations.
  */
+
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
@@ -24,11 +23,11 @@ import { TranslatableTexts, TranslatableTextsBackendDict } from 'domain/opportun
 import { ImagesData } from 'services/image-local-storage.service';
 
 interface Data {
-  suggestion_type: string;
-  target_type: string;
+  'suggestion_type': string;
+  'target_type': string;
   description: string;
-  target_id: string;
-  target_version_at_submission: string;
+  'target_id': string;
+  'target_version_at_submission': string;
   change: object;
   files?: Record<string, unknown>;
 }
@@ -54,9 +53,10 @@ export class TranslateTextBackendApiService {
     return new Promise<unknown> ((resolve, reject)=> {
       const reader = new FileReader();
       reader.onload = () => {
-        // Read the Base64 data from restult.
+        // Read the base64 data from restult.
         const dataurl = reader.result as string;
-        // Remove the prefix of Data URL and just return Base64 string.
+        // Remove "data:mime/type;base64," prefix from data url.
+        // And just return base64 string.
         const base64 = dataurl.substring(dataurl.indexOf(',') + 1);
         resolve(base64);
       };
