@@ -218,3 +218,13 @@ def validate_suggestion_images(files):
     for filename, raw_image in files.items():
         image_validation_services.validate_image_and_filename(
             raw_image, filename)
+
+
+def validate_params_dict(params):
+    """validates params data type
+
+    Args:
+        params: dict. Data that needs to be validated.
+    """
+    if not isinstance(params, dict):
+        raise Exception('Excepted dict, received %s' % params)

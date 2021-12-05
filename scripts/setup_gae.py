@@ -23,7 +23,6 @@ import sys
 import tarfile
 import urllib.request as urlrequest
 
-from core import python_utils
 
 from . import common
 
@@ -50,12 +49,11 @@ def main(args=None):
                 filepath = os.path.join(directory, file_name)
                 os.remove(filepath)
 
-    python_utils.PRINT(
+    print(
         'Checking whether google-cloud-sdk is installed in %s'
         % common.GOOGLE_CLOUD_SDK_HOME)
     if not os.path.exists(common.GOOGLE_CLOUD_SDK_HOME):
-        python_utils.PRINT(
-            'Downloading Google Cloud SDK (this may take a little while)...')
+        print('Downloading Google Cloud SDK (this may take a little while)...')
         os.makedirs(common.GOOGLE_CLOUD_SDK_HOME)
         try:
             # If the google cloud version is updated here, the corresponding
@@ -66,9 +64,9 @@ def main(args=None):
                 'google-cloud-sdk-335.0.0-linux-x86_64.tar.gz',
                 filename='gcloud-sdk.tar.gz')
         except Exception:
-            python_utils.PRINT('Error downloading Google Cloud SDK. Exiting.')
+            print('Error downloading Google Cloud SDK. Exiting.')
             raise Exception('Error downloading Google Cloud SDK.')
-        python_utils.PRINT('Download complete. Installing Google Cloud SDK...')
+        print('Download complete. Installing Google Cloud SDK...')
         tar = tarfile.open(name='gcloud-sdk.tar.gz')
         tar.extractall(
             path=os.path.join(
