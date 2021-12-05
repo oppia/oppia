@@ -364,8 +364,10 @@ describe('Translation Suggestion Review Modal Controller', function() {
 
   describe('when viewing suggestion', function() {
     const reviewable = false;
-    let $httpBackend = null;
+    let $q = null;
+    let $rootScope = null;
     const subheading = 'subheading_title';
+    let ThreadDataBackendApiService = null;
 
     const suggestion1 = {
       suggestion_id: 'suggestion_1',
@@ -412,10 +414,12 @@ describe('Translation Suggestion Review Modal Controller', function() {
     };
 
     beforeEach(angular.mock.inject(function($injector, $controller) {
-      const $rootScope = $injector.get('$rootScope');
+      $rootScope = $injector.get('$rootScope');
       $uibModalInstance = jasmine.createSpyObj(
         '$uibModalInstance', ['close', 'dismiss']);
-      $httpBackend = $injector.get('$httpBackend');
+      $q = $injector.get('$q');
+      ThreadDataBackendApiService = $injector.get(
+        'ThreadDataBackendApiService');
 
       $scope = $rootScope.$new();
       $controller('TranslationSuggestionReviewModalController', {
@@ -439,7 +443,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
         // content_html.
         expect($scope.hasExplorationContentChanged()).toBe(true);
 
-        var messages = [{
+        const messages = [{
           author_username: '',
           created_om_msecs: 0,
           entity_type: '',
@@ -449,12 +453,112 @@ describe('Translation Suggestion Review Modal Controller', function() {
           updated_status: '',
           updated_subject: '',
         }];
-        $httpBackend.expect('GET', '/threadhandler/' + 'suggestion_1').respond({
-          messages: messages
-        });
-        $httpBackend.flush();
 
+        const fetchMessagesAsyncSpy = spyOn(
+          ThreadDataBackendApiService, 'fetchMessagesAsync')
+          .and.returnValue($q.resolve({
+            messages: messages
+          }));
+
+        $scope.init();
+        $rootScope.$apply();
+
+        expect(fetchMessagesAsyncSpy).toHaveBeenCalledWith('suggestion_1');
         expect($scope.reviewMessage).toBe('');
       });
+  });
+
+  describe('when reviewing suggestions' +
+    ' with deleted opportunites', function() {
+    const reviewable = false;
+    const subheading = 'subheading_title';
+
+    const suggestion1 = {
+      suggestion_id: 'suggestion_1',
+      target_id: '1',
+      suggestion_type: 'translate_content',
+      change: {
+        content_id: 'hint_1',
+        content_html: ['Translation1', 'Translation2'],
+        translation_html: 'Tradução',
+        state_name: 'StateName'
+      },
+      exploration_content_html: ['Translation1', 'Translation2 CHANGED'],
+      status: 'rejected'
+    };
+    const suggestion2 = {
+      suggestion_id: 'suggestion_2',
+      target_id: '2',
+      suggestion_type: 'translate_content',
+      change: {
+        content_id: 'hint_1',
+        content_html: 'Translation',
+        translation_html: 'Tradução',
+        state_name: 'StateName'
+      },
+      exploration_content_html: 'Translation'
+    };
+
+    const contribution1 = {
+      suggestion: suggestion1,
+      details: null
+    };
+
+    const deletedContribution = {
+      suggestion: suggestion2,
+      details: null
+    };
+
+    const suggestionIdToContribution = {
+      suggestion_1: contribution1,
+      suggestion_deleted: deletedContribution,
+    };
+
+    beforeEach(angular.mock.inject(function($injector, $controller) {
+      const $rootScope = $injector.get('$rootScope');
+      $uibModalInstance = jasmine.createSpyObj(
+        '$uibModalInstance', ['close', 'dismiss']);
+
+      $scope = $rootScope.$new();
+      $controller('TranslationSuggestionReviewModalController', {
+        $scope: $scope,
+        $uibModalInstance: $uibModalInstance,
+        initialSuggestionId: 'suggestion_1',
+        subheading: subheading,
+        reviewable: reviewable,
+        suggestionIdToContribution: angular.copy(suggestionIdToContribution)
+      });
+    }));
+
+    it('should reject suggestion in suggestion modal service when clicking ' +
+      'on reject and review next suggestion button', function() {
+      expect($scope.activeSuggestionId).toBe('suggestion_1');
+      expect($scope.activeSuggestion).toEqual(suggestion1);
+      expect($scope.reviewable).toBe(reviewable);
+      expect($scope.reviewMessage).toBe('');
+
+      spyOn(contributionAndReviewService, 'resolveSuggestionToExploration')
+        .and.callFake((
+            targetId, suggestionId, action, reviewMessage, commitMessage,
+            callback) => {
+          callback();
+        });
+      spyOn(
+        SiteAnalyticsService,
+        'registerContributorDashboardRejectSuggestion');
+      $scope.reviewMessage = 'Review message example';
+
+      $scope.rejectAndReviewNext();
+
+      expect(
+        SiteAnalyticsService.registerContributorDashboardRejectSuggestion)
+        .toHaveBeenCalledWith('Translation');
+      expect(contributionAndReviewService.resolveSuggestionToExploration)
+        .toHaveBeenCalledWith(
+          '1', 'suggestion_1', 'reject', 'Review message example',
+          'hint section of "StateName" card', $scope.showNextItemToReview);
+      expect($uibModalInstance.close).toHaveBeenCalledWith([
+        'suggestion_1']);
+    });
   });
 });

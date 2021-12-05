@@ -173,14 +173,14 @@ describe('VersionDiffVisualizationComponent', () => {
     ' difference graph', () => {
     class MockComponentInstance {
       compoenentInstance: {
-        newState: null,
-        newStateName: 'A',
-        oldState: null,
-        oldStateName: 'B',
+        newState: null;
+        newStateName: 'A';
+        oldState: null;
+        oldStateName: 'B';
         headers: {
-          leftPane: undefined,
-          rightPane: undefined,
-        }
+          leftPane: undefined;
+          rightPane: undefined;
+        };
       };
     }
 
@@ -222,14 +222,14 @@ describe('VersionDiffVisualizationComponent', () => {
 
     class MockComponentInstance {
       compoenentInstance: {
-        newState: {},
-        newStateName: 'A',
-        oldState: {},
-        oldStateName: 'B',
+        newState: {};
+        newStateName: 'A';
+        oldState: {};
+        oldStateName: 'B';
         headers: {
-          leftPane: undefined,
-          rightPane: undefined,
-        }
+          leftPane: undefined;
+          rightPane: undefined;
+        };
       };
     }
 

@@ -133,7 +133,6 @@
             <li class="nav-item">
               <a class="dropdown-item nav-link oppia-navbar-tab-content"
                  href="/about-foundation"
-                 target="_blank"
                  rel="noopener"
                  [innerHTML]="'I18N_TOPNAV_OPPIA_FOUNDATION' | translate">
               </a>
@@ -141,7 +140,6 @@
             <li class="nav-item">
               <a class="dropdown-item nav-link oppia-navbar-tab-content"
                  href="https://medium.com/oppia-org"
-                 target="_blank"
                  rel="noopener"
                  [innerHTML]="'I18N_TOPNAV_BLOG' | translate">
               </a>
@@ -173,7 +171,6 @@
                  class="dropdown-item nav-link oppia-navbar-tab-content protractor-test-about-link"
                  href="/volunteer"
                  [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.VOLUNTEER.ROUTE"
-                 target="_blank"
                  rel="noopener"
                  [innerHTML]="'I18N_HEADING_VOLUNTEER'| translate">
               </a>
@@ -182,7 +179,6 @@
               <a class="dropdown-item nav-link oppia-navbar-tab-content"
                  href="/partnerships"
                  [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.ROUTE"
-                 target="_blank"
                  rel="noopener"
                  [innerHTML]="'I18N_TOPNAV_PARTNERSHIPS' | translate">
               </a>
@@ -191,10 +187,44 @@
               <a class="dropdown-item nav-link oppia-navbar-tab-content"
                  href="/donate"
                  [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE"
-                 target="_blank"
                  rel="noopener"
                  [innerHTML]="'I18N_TOPNAV_DONATE' | translate">
               </a>
+            </li>
+          </ul>
+        </li>
+        <li [ngClass]="{'open': activeMenuName === 'donateMenu'}"
+            ngbDropdown
+            [hidden]="!navElementsVisibilityStatus.I18N_TOPNAV_DONATE"
+            class="nav-item oppia-navbar-clickable-dropdown protractor-test-about-oppia-list-item">
+          <a ngbDropdownToggle (keydown)="onMenuKeypress($event, 'donateMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
+             class="nav-link oppia-navbar-tab"
+             aria-haspopup="true"
+             aria-expanded="false"
+             tabindex="0"
+             (mouseover)="openSubmenu($event, 'donateMenu')"
+             (mouseleave)="closeSubmenuIfNotMobile($event)"
+             autofocus>
+            <span class="oppia-navbar-tab-content"
+                 [innerHTML]="'I18N_TOPNAV_DONATE' | translate">
+            </span>
+          </a>
+          <ul ngbDropdownMenu
+              class="dropdown-menu oppia-navbar-dropdown oppia-navbar-dropdown-right"
+              (mouseover)="openSubmenu($event, 'donateMenu')"
+              (mouseleave)="closeSubmenuIfNotMobile($event)">
+            <li class="nav-item oppia-navbar-dropdown-item">
+              <a class="dropdown-item nav-link oppia-navbar-tab-content oppia-navbar-tab-content-heading"
+                 href="/donate"
+                 [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE"
+                 rel="noopener"
+              >
+                <i class="material-icons oppia-navbar-dropdown-heart-icon">&#xE87D;</i>
+                <span [innerHTML]="'I18N_TOPNAV_DONATE' | translate"></span>
+              </a>
+              <span class="nav-link-desc oppia-navbar-tab-content-desc"
+                  [innerHTML]="'I18N_TOPNAV_DONATE_DESCRIPTION' | translate">
+              </span>
             </li>
           </ul>
         </li>
@@ -342,7 +372,6 @@
           <a class="dropdown-item nav-link"
              (click)="closeSubmenuIfNotMobile($event)"
              href="/moderator"
-             target="_blank"
              rel="noopener">
             <span [innerHTML]="'I18N_TOPNAV_MODERATOR_PAGE' | translate"></span>
           </a>
@@ -352,7 +381,6 @@
           <a class="dropdown-item nav-link protractor-test-admin-link"
              (click)="closeSubmenuIfNotMobile($event)"
              href="/admin"
-             target="_blank"
              rel="noopener">
             <span [innerHTML]="'I18N_TOPNAV_ADMIN_PAGE' | translate"></span>
           </a>
@@ -561,9 +589,47 @@
     padding: 0;
     width: 190px;
   }
+  .oppia-navbar-dropdown-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 30px;
+  }
+  .oppia-navbar-tab-content-heading {
+    color: #212121;
+    font-size: 16px;
+    font-weight: 500;
+    padding: 0;
+  }
+  .oppia-navbar-tab-content-heading:after {
+    border-style: solid;
+    border-width: 0 0 1.59px;
+    bottom: 1px;
+    content: '';
+    left: 28px;
+    position: absolute;
+    width: 50.5px;
+  }
+  .oppia-navbar-dropdown-heart-icon {
+    color: #EB5757;
+    font-size: 22px;
+    padding-right: 6px;
+  }
+  .oppia-navbar-tab-content-desc {
+    color: #767676;
+    line-height: 20px;
+    margin-left: 28px;
+    opacity: 0.9;
+  }
+  .oppia-navbar-dropdown-right {
+    left: 0;
+    min-width: 285px;
+    padding: 0;
+    right: auto;
+  }
   .oppia-navbar-profile .profile-dropdown:hover {
     background-color: #fff;
-   }
+  }
   @media screen and (max-width: 768px) {
     .nav-mobile-header-text-container {
       display: inline-block;

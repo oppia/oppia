@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import builtins
 import os
 import shutil
 import subprocess
@@ -92,7 +93,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             mock_collect_files_being_pushed)
         self.uncommitted_files_swap = self.swap(
             pre_push_hook, 'has_uncommitted_files', mock_has_uncommitted_files)
-        self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
+        self.print_swap = self.swap(builtins, 'print', mock_print)
         self.check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
         self.start_linter_swap = self.swap(

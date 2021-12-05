@@ -33,7 +33,7 @@ import { Subscription } from 'rxjs';
 })
 export class OpportunitiesListComponent {
   @Input() loadOpportunities: () => Promise<{
-    opportunitiesDicts: ExplorationOpportunity[], more: boolean}>;
+    opportunitiesDicts: ExplorationOpportunity[]; more: boolean; }>;
   @Input() labelRequired: boolean;
   @Input() progressBarRequired: boolean;
   @Input() loadMoreOpportunities;
@@ -92,6 +92,7 @@ export class OpportunitiesListComponent {
   }
 
   ngOnInit(): void {
+    this.loadingOpportunityData = true;
     this.loadOpportunities().then(({opportunitiesDicts, more}) => {
       // This ngZone run closure will not be required after \
       // migration is complete.
