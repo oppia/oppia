@@ -682,12 +682,13 @@ describe('Settings Tab Component', () => {
     it('should open voice artist edit roles form and edit username', () => {
       ctrl.openVoiceoverRolesForm();
       explorationRightsService.init(
-        ['owner'], [], [], [], '', false, false, true);
+        ['owner'], [], [], [], '', '', false, true);
 
       expect(ctrl.isVoiceoverFormOpen).toBe(true);
       expect(ctrl.newVoiceArtistUsername).toBe('');
 
-      spyOn(explorationRightsService, 'assignVoiceArtistRoleAsync');
+      spyOn(explorationRightsService, 'assignVoiceArtistRoleAsync')
+        .and.returnValue(Promise.resolve());
       ctrl.editVoiseArtist('Username1');
 
       expect(explorationRightsService.assignVoiceArtistRoleAsync)

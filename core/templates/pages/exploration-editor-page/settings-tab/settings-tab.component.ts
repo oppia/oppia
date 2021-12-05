@@ -360,7 +360,9 @@ angular.module('oppia').component('settingsTab', {
 
       ctrl.editVoiseArtist = function(newVoiceArtistUsername) {
         ExplorationRightsService.assignVoiceArtistRoleAsync(
-          newVoiceArtistUsername);
+          newVoiceArtistUsername).then(() => {
+          $rootScope.$applyAsync();
+        });
         ctrl.closeVoiceoverForm();
         return;
       };
@@ -380,7 +382,9 @@ angular.module('oppia').component('settingsTab', {
           controller: 'RemoveRoleConfirmationModalController'
         }).result.then(function() {
           ExplorationRightsService.removeVoiceArtistRoleAsync(
-            voiceArtistUsername);
+            voiceArtistUsername).then(() => {
+            $rootScope.$applyAsync();
+          });
           ctrl.closeVoiceoverForm();
         }, () => {
           // Note to developers:
