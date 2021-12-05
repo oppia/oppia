@@ -467,13 +467,13 @@
 
 
 # Beam jobs
-/setup.py @vojtechjelinek @brianrodri
-/MANIFEST.in @vojtechjelinek @brianrodri
+/setup.py @vojtechjelinek
+/MANIFEST.in @vojtechjelinek
 /core/jobs/ @vojtechjelinek
 /core/jobs/transforms @vojtechjelinek
 /core/jobs/types @vojtechjelinek
 /core/templates/domain/jobs/ @vojtechjelinek
-/core/controllers/beam_jobs*.py @brianrodri
+/core/controllers/beam_jobs*.py @vojtechjelinek
 
 # Infrastructure.
 /core/controllers/cron*.py @nithusha21
@@ -565,12 +565,14 @@
 /core/templates/services/autoplayed-videos.service*.ts @aks681
 /core/templates/services/external-save.service*.ts @srijanreddy98
 /core/templates/services/external-rte-save.service*.ts @srijanreddy98
+/core/templates/services/oppia-rte-parser.service*.ts @srijanreddy98 @aks681
 /core/templates/services/image-local-storage*.ts @DubeySandeep
 /core/templates/services/rte-helper.service*.ts @aks681
 /core/templates/services/rte-helper-modal.controller*.ts @aks681
 /core/domain/image_validation_services*.py @DubeySandeep
 /core/domain/rte_component_registry*.py @vojtechjelinek
 /extensions/ckeditor_plugins/ @aks681
+/extensions/rich_text_components/rte-output-display.component* @srijanreddy98 @aks681
 /extensions/rich_text_components/ @aks681
 /assets/rich_text_components_definitions.ts @aks681
 

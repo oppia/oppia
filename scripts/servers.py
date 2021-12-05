@@ -27,7 +27,7 @@ import sys
 import threading
 
 from core import feconf
-from core import python_utils
+from core import utils
 from scripts import common
 
 
@@ -73,13 +73,13 @@ def managed_process(
     command = ' '.join(non_empty_args) if shell else list(non_empty_args)
     human_readable_command = command if shell else ' '.join(command)
     msg = 'Starting new %s: %s' % (human_readable_name, human_readable_command)
-    python_utils.PRINT(msg)
+    print(msg)
     popen_proc = psutil.Popen(command, shell=shell, **popen_kwargs)
 
     try:
         yield popen_proc
     finally:
-        python_utils.PRINT('Stopping %s...' % get_proc_info(popen_proc))
+        print('Stopping %s...' % get_proc_info(popen_proc))
         procs_still_alive = [popen_proc]
         try:
             if popen_proc.is_running():
@@ -532,12 +532,12 @@ def managed_webdriver_server(chrome_version=None):
         installed_version_parts = b''.join(re.findall(rb'[0-9.]', output))
         installed_version = '.'.join(
             installed_version_parts.decode('utf-8').split('.')[:-1])
-        response = python_utils.url_open(
+        response = utils.url_open(
             'https://chromedriver.storage.googleapis.com/LATEST_RELEASE_%s' % (
                 installed_version))
         chrome_version = response.read().decode('utf-8')
 
-    python_utils.PRINT('\n\nCHROME VERSION: %s' % chrome_version)
+    print('\n\nCHROME VERSION: %s' % chrome_version)
     subprocess.check_call([
         common.NODE_BIN_PATH, common.WEBDRIVER_MANAGER_BIN_PATH, 'update',
         '--versions.chrome', chrome_version,

@@ -19,7 +19,6 @@
 from __future__ import annotations
 
 import io
-import itertools
 import os
 import pkgutil
 import sys
@@ -40,14 +39,10 @@ import builtins  # isort:skip  pylint: disable=wrong-import-position, wrong-impo
 import past.builtins  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 import past.utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
-import certifi  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-import ssl  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-
 
 MAP = builtins.map
 NEXT = builtins.next
 OBJECT = builtins.object
-PRINT = print
 ZIP = builtins.zip
 
 
@@ -107,24 +102,6 @@ def redirect_stdout(new_target):
     except ImportError:
         from contextlib2 import redirect_stdout as impl  # pylint: disable=import-only-modules
     return impl(new_target)
-
-
-def string_io(buffer_value=''):
-    """Returns StringIO from StringIO module if run under Python 2 and from io
-    module if run under Python 3.
-
-    Args:
-        buffer_value: str. A string that is to be converted to in-memory text
-            stream.
-
-    Returns:
-        StringIO.StringIO or io.StringIO. The StringIO object.
-    """
-    try:
-        from StringIO import StringIO  # pylint: disable=import-only-modules
-    except ImportError:
-        from io import StringIO  # pylint: disable=import-only-modules
-    return StringIO(buffer_value)  # pylint: disable=disallowed-function-calls
 
 
 def get_args_of_function_node(function_node, args_to_ignore):
@@ -195,25 +172,6 @@ def get_package_file_contents(package: str, filepath: str) -> str:
         return file.read()
     except FileNotFoundError:
         return pkgutil.get_data(package, filepath).decode('utf-8')
-
-
-def url_parse(urlstring):
-    """Parse a URL into six components using urlparse.urlparse if run under
-    Python 2 and urllib.parse.urlparse if run under Python 3. This corresponds
-    to the general structure of a URL:
-    scheme://netloc/path;parameters?query#fragment.
-
-    Args:
-        urlstring: str. The URL.
-
-    Returns:
-        tuple(str). The components of a URL.
-    """
-    try:
-        import urllib.parse as urlparse
-    except ImportError:
-        import urlparse
-    return urlparse.urlparse(urlstring)  # pylint: disable=disallowed-function-calls
 
 
 def url_unsplit(url_parts):
@@ -306,27 +264,6 @@ def url_encode(query, doseq=False):
     except ImportError:
         import urllib as urlparse
     return urlparse.urlencode(query, doseq=doseq)
-
-
-def url_open(source_url):
-    """Open a network object denoted by a URL for reading using
-    urllib2.urlopen if run under Python 2 and urllib.request.urlopen if
-    run under Python 3.
-
-    Args:
-        source_url: str. The URL.
-
-    Returns:
-        urlopen. The 'urlopen' object.
-    """
-    # TODO(#12912): Remove pylint disable after the arg-name-for-non-keyword-arg
-    # check is refactored.
-    context = ssl.create_default_context(cafile=certifi.where())  # pylint: disable=arg-name-for-non-keyword-arg
-    try:
-        import urllib.request as urlrequest
-    except ImportError:
-        import urllib2 as urlrequest
-    return urlrequest.urlopen(source_url, context=context)
 
 
 def url_request(source_url, data, headers):
@@ -432,23 +369,3 @@ def create_enum(*sequential):
             }
             _enums[name] = type('Enum', (), _value)
         return type('Enum', (), _enums)
-
-
-def zip_longest(*args, **kwargs):
-    """Creates an iterator that aggregates elements from each of the iterables.
-    If the iterables are of uneven length, missing values are
-    filled-in with fillvalue.
-
-    Args:
-        *args: list(*). Iterables that needs to be aggregated into an iterable.
-        **kwargs: dict. It contains fillvalue.
-
-    Returns:
-        iterable(iterable). A sequence of aggregates elements
-        from each of the iterables.
-    """
-    fillvalue = kwargs.get('fillvalue')
-    try:
-        return itertools.zip_longest(*args, fillvalue=fillvalue)
-    except AttributeError:
-        return itertools.izip_longest(*args, fillvalue=fillvalue)
