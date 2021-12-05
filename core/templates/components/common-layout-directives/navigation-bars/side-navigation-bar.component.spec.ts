@@ -122,8 +122,8 @@ describe('Side Navigation Bar Component', () => {
     expect(componentInstance.getStaticImageUrl('test')).toEqual(imageUrl);
   });
 
-  it('should navigate to classroom page when user clicks' +
-  ' on \'Basic Mathematics\'', fakeAsync(() => {
+  it('should navigate to classroom page when user clicks on' +
+  '\'Basic Mathematics\'', fakeAsync(() => {
     expect(mockWindowRef.nativeWindow.location.href).toBe('');
 
     componentInstance.navigateToClassroomPage('/classroom/url');
