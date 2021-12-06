@@ -1147,7 +1147,8 @@ class Question:
 
         state_domain.State.convert_html_fields_in_state(
             question_state_dict,
-            html_validation_service.fix_incorrectly_encoded_chars)
+            html_validation_service.fix_incorrectly_encoded_chars,
+            state_schema_version=48)
         return question_state_dict
 
     @classmethod
