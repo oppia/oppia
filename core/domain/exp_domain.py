@@ -1961,7 +1961,8 @@ class Exploration:
             if interaction_customisation_args:
                 state_domain.State.convert_html_fields_in_state(
                     state_dict,
-                    html_validation_service.fix_incorrectly_encoded_chars)
+                    html_validation_service.fix_incorrectly_encoded_chars,
+                    state_schema_version=48)
         return states_dict
 
     @classmethod
