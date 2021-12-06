@@ -20,7 +20,6 @@ from __future__ import annotations
 
 import ast
 import builtins
-import io
 import os
 import sys
 import unittest
@@ -58,11 +57,6 @@ class PythonUtilsTests(test_utils.GenericTestBase):
             with python_utils.open_file('invalid_file.py', 'r') as f:
                 f.readlines()
 
-    def test_url_open(self):
-        response = python_utils.url_open('http://www.google.com')
-        self.assertEqual(response.getcode(), 200)
-        self.assertEqual(response.url, 'http://www.google.com')
-
     def test_url_request(self):
         response = python_utils.url_request('http://www.google.com', None, {})
         self.assertEqual(response.get_full_url(), 'http://www.google.com')
@@ -84,10 +78,6 @@ class PythonUtilsTests(test_utils.GenericTestBase):
     def test_urllib_unquote(self):
         response = python_utils.urllib_unquote('/El%20Ni%C3%B1o/')
         self.assertEqual(response, '/El Niño/')
-
-    def test_url_parse(self):
-        response = python_utils.url_parse('http://www.google.com')
-        self.assertEqual(response.geturl(), 'http://www.google.com')
 
     def test_recursively_convert_to_str_with_dict(self):
         test_var_1_in_unicode = str('test_var_1')
@@ -175,26 +165,11 @@ class PythonUtilsTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(AttributeError, 'fourth'):
             getattr(enums, 'fourth')
 
-    def test_zip_longest(self):
-        self.assertEqual(
-            [list(g) for g in python_utils.zip_longest(
-                [0, 1, 2, 3], [4, 5, 6], [7, 8])],
-            [[0, 4, 7], [1, 5, 8], [2, 6, None], [3, None, None]])
-        # Zip longest with fillvalue.
-        self.assertEqual(
-            [''.join(g) for g in python_utils.zip_longest(
-                'ABC', 'DE', 'F', fillvalue='x')],
-            ['ADF', 'BEx', 'Cxx'])
-
 
 @unittest.skipUnless(
     sys.version[0] == '3', 'Test cases for ensuring Python 3 behavior only')
 class PythonUtilsForPython3Tests(test_utils.GenericTestBase):
     """Tests for feature detection utilities for Python 3."""
-
-    def test_string_io(self):
-        stdout = python_utils.string_io()
-        self.assertIsInstance(stdout, io.StringIO)
 
     def test_unicode_and_str_chars_in_file(self):
         self.assertIsInstance(unicode_and_str_handler.SOME_STR_TEXT, str)
