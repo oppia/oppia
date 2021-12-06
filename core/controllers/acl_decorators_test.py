@@ -2168,15 +2168,29 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
                 '/mock/exploration/%s' % self.published_exp_id_1, {})
         self.logout()
 
-    def test_assigning_voice_artist_for_unsupported_entity_type_raise_400(self):
+    def test_adding_voice_artist_to_unsupported_entity_type_raises_400(self):
         unsupported_entity_type = 'topic'
         self.login(self.VOICEOVER_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.post_json(
-                '/mock/%s/%s' % (
-                    unsupported_entity_type, self.published_exp_id_1),
+                '/mock/%s/abc' % unsupported_entity_type,
                 {}, csrf_token=csrf_token, expected_status_int=400)
+            self.assertEqual(
+                response['error'],
+                'Unsupported entity_type: topic')
+        self.logout()
+
+    def test_removing_voice_artist_from_unsupported_entity_type_raises_400(
+        self
+    ):
+        unsupported_entity_type = 'topic'
+        self.login(self.VOICEOVER_ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.delete_json(
+                '/mock/%s/abc' % unsupported_entity_type,
+                {}, expected_status_int=400
+            )
             self.assertEqual(
                 response['error'],
                 'Unsupported entity_type: topic')
