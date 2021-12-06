@@ -162,7 +162,7 @@ describe('create new subtopic modal', function() {
   });
 
   it('should update editableThumbnailFilename when ' +
-  'filename updated in \"Thubmnail Image*\" modal', () => {
+  'filename updated in \"Thubmnail Image\" modal', () => {
     let newFileName = 'shivamOppiaFile';
     spyOn(topicUpdateService, 'setSubtopicThumbnailFilename').and.stub();
     component.updateSubtopicThumbnailFilename(newFileName);
@@ -173,7 +173,7 @@ describe('create new subtopic modal', function() {
   });
 
   it('should update ThumbnailBgColor when ' +
-    'user select new color in \"Thubmnail Image*\" modal', () => {
+    'user select new color in \"Thubmnail Image\" modal', () => {
     let newThumbnailBgColor = 'red';
     spyOn(topicUpdateService, 'setSubtopicThumbnailBgColor').and.stub();
     component.updateSubtopicThumbnailBgColor(newThumbnailBgColor);
@@ -183,7 +183,7 @@ describe('create new subtopic modal', function() {
   });
 
   it('should reset errorMsg when user' +
-  ' enter data in \"Title*\" input area', () => {
+  ' enter data in \"Title\" input area', () => {
     component.resetErrorMsg();
 
     expect(component.errorMsg).toBe(null);
@@ -215,7 +215,7 @@ describe('create new subtopic modal', function() {
     }));
 
   it('should check whether subtopicUrlFragmentExists when user enter data' +
-  ' in \"Enter the url fragment for the subtopic*\" input area', () => {
+  ' in \"Enter the url fragment for the subtopic\" input area', () => {
     spyOn(subtopicValidationService, 'doesSubtopicWithUrlFragmentExist')
       .and.returnValue(true);
     component.checkSubtopicExistence();
