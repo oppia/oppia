@@ -642,7 +642,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         exp_services.save_new_exploration(self.user_id_a, exp)
 
         with self.assertRaisesRegexp(
-            Exception, 'Could not assign voice artist to unpublished activity.'
+            Exception, 'Could not assign voice artist to private activity.'
         ):
             rights_manager.assign_role_for_exploration(
                 self.user_voiceover_admin, self.EXP_ID, self.user_id_b,
