@@ -237,3 +237,16 @@ def validate_aggregated_stats(aggregated_stats):
     # The aggregated_stats parameter do not represents any domain class, hence
     # dict form of the data is returned from here.
     return aggregated_stats
+
+
+def validate_params_dict(params):
+    """validates params data type
+
+    Args:
+        params: dict. Data that needs to be validated.
+    """
+    if not isinstance(params, dict):
+        raise Exception('Excepted dict, received %s' % params)
+    # The params argument do not represent any domain class, hence dict form of
+    # the data is returned from here.
+    return params
