@@ -594,10 +594,12 @@ export class StateGraphLayoutService {
       graphWidth: number,
       graphHeight: number
   ): NodeDataDict {
-    var HORIZONTAL_NODE_PROPERTIES: ('x0' | 'width' | 'xLabel')[] =
-      ['x0', 'width', 'xLabel'];
-    var VERTICAL_NODE_PROPERTIES: ('y0' | 'height' | 'yLabel')[] =
-      ['y0', 'height', 'yLabel'];
+    var HORIZONTAL_NODE_PROPERTIES: ('x0' | 'width' | 'xLabel')[] = [
+      'x0', 'width', 'xLabel'
+    ];
+    var VERTICAL_NODE_PROPERTIES: ('y0' | 'height' | 'yLabel')[] = [
+      'y0', 'height', 'yLabel'
+    ];
 
     // Change the position values in nodeData to use pixels.
     for (var nodeId in nodeData) {
