@@ -780,7 +780,7 @@ def _assign_role(
                 committer, activity_rights)
         else:
             raise Exception(
-                'Could not assign voice artist to unpublished activity.')
+                'Could not assign voice artist to private activity.')
     else:
         user_can_assign_role = check_can_modify_core_activity_roles(
             committer, activity_rights)
