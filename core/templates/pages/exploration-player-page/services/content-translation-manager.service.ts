@@ -246,7 +246,9 @@ export class ContentTranslationManagerService {
       }
     }
 
-    const element = document.createElement(card.getInteractionHtml());
+    const element = new DOMParser().parseFromString(
+      card.getInteractionHtml(), 'text/html'
+    ).body;
     this.extensionTagAssemblerService.formatCustomizationArgAttrs(
       element, caValues);
     card.setInteractionHtml(element.outerHTML);

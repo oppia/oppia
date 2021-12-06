@@ -40,16 +40,16 @@ describe('Exploration Html Formatter Service', () => {
 
   it('should correctly set interaction HTML for a non migrated interaction ' +
      'when it is in editor mode', () => {
-    var interactionId = 'nonMigratedInteraction';
+    var interactionId = 'EndExploration';
     let custArgs = {
       placeholder: {value: new SubtitledUnicode('enter here', '')},
       rows: {value: 1}
     };
-    var expectedHtmlTag = '<oppia-interactive-non-migrated-interaction ' +
+    var expectedHtmlTag = '<oppia-interactive-end-exploration ' +
       'placeholder-with-value="{&amp;quot;unicode_str&amp;quot;:&amp;quot;' +
       'enter here&amp;quot;,&amp;quot;content_id&amp;quot;:&amp;quot;&amp;' +
       'quot;}" rows-with-value="1" last-answer="lastAnswer">' +
-      '</oppia-interactive-non-migrated-interaction>';
+      '</oppia-interactive-end-exploration>';
     expect(ehfs.getInteractionHtml(interactionId, custArgs, true, '', null))
       .toBe(expectedHtmlTag);
   });
@@ -89,11 +89,11 @@ describe('Exploration Html Formatter Service', () => {
 
   it('should correctly set interaction HTML when it is in player mode',
     () => {
-      var interactionId = 'nonMigratedInteraction';
+      var interactionId = 'EndExploration';
       var focusLabel = 'sampleLabel';
-      var expectedHtmlTag = '<oppia-interactive-non-migrated-interaction ' +
-        'label-for-focus-target="' + focusLabel + '" last-answer="null">' +
-        '</oppia-interactive-non-migrated-interaction>';
+      var expectedHtmlTag = '<oppia-interactive-end-exploration ' +
+        'label-for-focus-target="' + focusLabel + '">' +
+        '</oppia-interactive-end-exploration>';
       expect(
         ehfs.getInteractionHtml(interactionId, {}, false, focusLabel, null)
       ).toBe(expectedHtmlTag);
@@ -101,12 +101,12 @@ describe('Exploration Html Formatter Service', () => {
 
   it('should correctly set interaction HTML when solution has been provided',
     () => {
-      var interactionId = 'nonMigratedInteraction';
+      var interactionId = 'EndExploration';
       var focusLabel = 'sampleLabel';
-      var expectedHtmlTag = '<oppia-interactive-non-migrated-interaction ' +
-        'saved-solution="solution" ' +
-        'label-for-focus-target="' + focusLabel + '" last-answer="null">' +
-        '</oppia-interactive-non-migrated-interaction>';
+      var expectedHtmlTag = '<oppia-interactive-end-exploration ' +
+        'saved-solution="savedMemento()" ' +
+        'label-for-focus-target="' + focusLabel + '">' +
+        '</oppia-interactive-end-exploration>';
       expect(
         ehfs.getInteractionHtml(
           interactionId, {}, false, focusLabel, 'savedMemento()')
@@ -114,8 +114,8 @@ describe('Exploration Html Formatter Service', () => {
       interactionId = 'GraphInput';
       focusLabel = 'sampleLabel';
       expectedHtmlTag = '<oppia-interactive-graph-input ' +
-        '[saved-solution]="solution" ' +
-        'label-for-focus-target="' + focusLabel + '" [last-answer]="null">' +
+        'label-for-focus-target="' + focusLabel + '" ' +
+        '[saved-solution]="savedMemento()">' +
         '</oppia-interactive-graph-input>';
       expect(
         ehfs.getInteractionHtml(

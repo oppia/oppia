@@ -133,10 +133,10 @@ export class ExplorationHtmlFormatterService {
       const tagEnd = '></oppia-interactive-' + htmlInteractionId + '>';
       let interactionHtmlWithoutEnd = interactionHtml.replace(tagEnd, '');
       if (lastAnswerPropValue !== null) {
-        interactionHtmlWithoutEnd += `last-answer="${lastAnswerPropValue}"\n`;
+        interactionHtmlWithoutEnd += ` [last-answer]="${lastAnswerPropValue}"`;
       }
       if (savedSolution === 'savedMemento()') {
-        interactionHtmlWithoutEnd += `saved-solution="${savedSolution}"\n`;
+        interactionHtmlWithoutEnd += ` [saved-solution]="${savedSolution}"`;
       }
       return interactionHtmlWithoutEnd + tagEnd;
     }
