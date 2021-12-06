@@ -17,6 +17,7 @@
 """Tests for the Mailgun API wrapper."""
 
 from __future__ import annotations
+
 import urllib
 
 from core import feconf
