@@ -3306,7 +3306,7 @@ title: Title
             'exp_id', self.sample_yaml_content_for_proto)
 
         exploration_proto_size = exploration.get_proto_size()
-        self.assertEqual(exploration_proto_size, 4486)
+        self.assertEqual(exploration_proto_size, 4774)
 
 
 class ExplorationSummaryTests(test_utils.GenericTestBase):
