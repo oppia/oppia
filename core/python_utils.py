@@ -43,7 +43,6 @@ import past.utils  # isort:skip  pylint: disable=wrong-import-position, wrong-im
 MAP = builtins.map
 NEXT = builtins.next
 OBJECT = builtins.object
-PRINT = print
 ZIP = builtins.zip
 
 

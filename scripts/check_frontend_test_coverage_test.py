@@ -16,6 +16,7 @@
 
 from __future__ import annotations
 
+import builtins
 import os
 import subprocess
 import sys
@@ -67,7 +68,7 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
             python_utils, 'open_file', mock_open_file
         )
         self.exists_swap = self.swap(os.path, 'exists', mock_exists)
-        self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
+        self.print_swap = self.swap(builtins, 'print', mock_print)
         self.check_call_swap = self.swap(
             subprocess, 'check_call', mock_check_call
         )
