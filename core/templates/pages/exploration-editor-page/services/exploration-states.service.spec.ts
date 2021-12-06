@@ -18,7 +18,7 @@
 
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { ChangeListService } from './change-list.service';
-import { TestBed } from '@angular/core/testing';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 
@@ -27,8 +27,7 @@ require(
   'state-solicit-answer-details.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 
-fdescribe('ExplorationStatesService', function() {
-  var $q = null;
+describe('ExplorationStatesService', function() {
   var $rootScope = null;
   let ngbModal: NgbModal = null;
   let changeListService: ChangeListService = null;
@@ -62,7 +61,6 @@ fdescribe('ExplorationStatesService', function() {
   beforeEach(angular.mock.inject(function(
       _$q_, _$rootScope_, _$uibModal_, _ContextService_,
       _ExplorationStatesService_) {
-    $q = _$q_;
     $rootScope = _$rootScope_;
     ContextService = _ContextService_;
     ExplorationStatesService = _ExplorationStatesService_;
@@ -140,7 +138,7 @@ fdescribe('ExplorationStatesService', function() {
 
   describe('Callback Registration', function() {
     describe('.registerOnStateAddedCallback', function() {
-      it('should callback when a new state is added', function() {
+      it('should callback when a new state is added', fakeAsync(() => {
         spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
           return ({
             componentInstance: NgbModalRef,
@@ -154,11 +152,11 @@ fdescribe('ExplorationStatesService', function() {
         ExplorationStatesService.addState('Me Llamo');
 
         expect(spy).toHaveBeenCalledWith('Me Llamo');
-      });
+      }));
     });
 
     describe('.registerOnStateDeletedCallback', function() {
-      it('should callback when a state is deleted', function(done) {
+      it('should callback when a state is deleted', fakeAsync((done) => {
         spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
           return ({
             result: Promise.resolve()
@@ -168,12 +166,13 @@ fdescribe('ExplorationStatesService', function() {
 
         var spy = jasmine.createSpy('callback');
         ExplorationStatesService.registerOnStateDeletedCallback(spy);
+        tick();
 
         ExplorationStatesService.deleteState('Hola').then(function() {
           expect(spy).toHaveBeenCalledWith('Hola');
         }).then(done, done.fail);
         $rootScope.$digest();
-      });
+      }));
     });
 
     describe('.registerOnStateRenamedCallback', function() {
