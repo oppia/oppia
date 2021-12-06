@@ -57,7 +57,7 @@ class PlatformFeaturesEvaluationHandlerTest(test_utils.GenericTestBase):
         registry.Registry.update_platform_parameter(
             self.prod_feature.name, self.user_id, 'edit rules',
             [
-                {
+                param_domain.PlatformParameterRule.from_dict({
                     'filters': [
                         {
                             'type': 'server_mode',
@@ -67,7 +67,7 @@ class PlatformFeaturesEvaluationHandlerTest(test_utils.GenericTestBase):
                         }
                     ],
                     'value_when_matched': True
-                }
+                })
             ]
         )
 
@@ -193,13 +193,13 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
         feature_services.update_feature_flag_rules(
             param_list.PARAM_NAMES.dummy_feature.value, self.user_id,
             'update rule for testing purpose',
-            [{
+            [param_domain.PlatformParameterRule.from_dict({
                 'value_when_matched': is_enabled,
                 'filters': [{
                     'type': 'server_mode',
                     'conditions': [['=', mode.value]]
                 }]
-            }]
+            })]
         )
 
     def _mock_dummy_feature_stage(self, stage):

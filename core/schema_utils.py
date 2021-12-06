@@ -219,11 +219,12 @@ def normalize_against_schema(
             validate_class = schema[SCHEMA_KEY_OBJECT_CLASS]
             domain_object = validate_class.from_dict(obj)
             domain_object.validate()
+            normalized_obj = domain_object
         else:
             validation_method = schema[SCHEMA_KEY_VALIDATION_METHOD]
-            validation_method(obj)
+            normalized_obj = validation_method(obj)
 
-        normalized_obj = obj
+        return normalized_obj
     else:
         raise Exception('Invalid schema type: %s' % schema[SCHEMA_KEY_TYPE])
 

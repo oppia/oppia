@@ -150,31 +150,29 @@ class Registry:
 
     @classmethod
     def update_platform_parameter(
-            cls, name, committer_id, commit_message, new_rule_dicts):
+        cls, name, committer_id, commit_message, new_rules
+    ):
         """Updates the platform parameter with new rules.
 
         Args:
             name: str. The name of the platform parameter to update.
             committer_id: str. ID of the committer.
             commit_message: str. The commit message.
-            new_rule_dicts: list(dist). A list of dict mappings of all fields
-                of PlatformParameterRule object.
+            new_rules: list(PlatformParameterRule). A list of
+                PlatformParameterRule objects.
         """
         param = cls.get_platform_parameter(name)
 
         # Create a temporary param instance with new rules for validation,
         # if the new rules are invalid, an exception will be raised in
         # validate() method.
+        new_rule_dicts = [rules.to_dict() for rules in new_rules]
         param_dict = param.to_dict()
         param_dict['rules'] = new_rule_dicts
         updated_param = param.from_dict(param_dict)
         updated_param.validate()
 
         model_instance = cls._to_platform_parameter_model(param)
-
-        new_rules = [
-            platform_parameter_domain.PlatformParameterRule.from_dict(rule_dict)
-            for rule_dict in new_rule_dicts]
         param.set_rules(new_rules)
 
         model_instance.rules = [rule.to_dict() for rule in param.rules]

@@ -1113,6 +1113,41 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
             'Expected each playthrough_id to be a string')):
             self.exp_issue.validate()
 
+    def test_comparison_between_exploration_issues_returns_correctly(self):
+        expected_customization_args = {
+            'time_spent_in_exp_in_msecs': {
+                'value': 0
+            },
+            'state_name': {
+                'value': ''
+            }
+        }
+        exp_issue1 = stats_domain.ExplorationIssue(
+            'EarlyQuit',
+            expected_customization_args,
+            [],
+            1,
+            True
+        )
+        exp_issue2 = stats_domain.ExplorationIssue(
+            'EarlyQuit',
+            expected_customization_args,
+            [],
+            2,
+            True
+        )
+        exp_issue3 = stats_domain.ExplorationIssue(
+            'EarlyQuit',
+            expected_customization_args,
+            [],
+            1,
+            True
+        )
+
+        self.assertTrue(exp_issue1 == exp_issue3)
+        self.assertFalse(exp_issue2 == exp_issue3)
+        self.assertFalse(exp_issue1 == exp_issue2)
+
 
 class LearnerActionTests(test_utils.GenericTestBase):
     """Tests the LearnerAction domain object."""

@@ -1495,11 +1495,12 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
                     default_value = {arg: schema['default_value']}
                     default_value_schema = {arg: schema}
 
-                    _, errors = payload_validator.validate(
-                        default_value,
-                        default_value_schema,
-                        allowed_extra_args=True,
-                        allow_string_to_bool_conversion=False
+                    _, errors = (
+                        payload_validator.validate_arguments_against_schema(
+                            default_value,
+                            default_value_schema,
+                            allowed_extra_args=True,
+                            allow_string_to_bool_conversion=False)
                     )
                     if len(errors) == 0:
                         continue
