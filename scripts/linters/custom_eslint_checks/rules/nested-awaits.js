@@ -40,9 +40,9 @@ module.exports = {
   create: function(context) {
     return {
       CallExpression(node) {
-        if (node.callee.name === 'browser.switchTo().activeElement' || 
+        if(node.callee.name === 'browser.switchTo().activeElement' || 
           node.callee.name === '(await browser.switchTo().activeElement()).sendKeys') {
-          if (node.parent.type !== 'AwaitExpression') {
+          if(node.parent.type !== 'AwaitExpression') {
             context.report({
               node: node,
               message: `Please use nested awaits like "await (await 

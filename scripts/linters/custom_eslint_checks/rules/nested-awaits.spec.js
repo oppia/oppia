@@ -28,7 +28,7 @@ ruleTester.run('nested-awaits', rule, {
   valid: [
     {
       code:
-      `var alpha = async function () {
+     `var alpha = async function() {
         await (await browser.switchTo().activeElement()).sendKeys(explanation);
       }
       alpha();`
@@ -38,7 +38,7 @@ ruleTester.run('nested-awaits', rule, {
   invalid: [
     {
       code:
-        `var alpha = async function () {
+       `var alpha = async function() {
           await (browser.switchTo().activeElement()).sendKeys(explanation);
         }
         alpha();`,
@@ -49,7 +49,7 @@ ruleTester.run('nested-awaits', rule, {
     },
     {
       code:
-        `var alpha = async function () {
+       `var alpha = async function() {
           (await browser.switchTo().activeElement()).sendKeys(explanation);
         }
         alpha();`,
@@ -60,7 +60,7 @@ ruleTester.run('nested-awaits', rule, {
     },
     {
       code:
-        `var alpha = async function () {
+       `var alpha = async function() {
           (browser.switchTo().activeElement()).sendKeys(explanation);
         }
         alpha();`,
