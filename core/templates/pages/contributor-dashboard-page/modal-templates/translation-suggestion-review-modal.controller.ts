@@ -25,19 +25,24 @@ require('services/context.service.ts');
 require('services/site-analytics.service.ts');
 require('services/suggestion-modal.service.ts');
 require('services/validators.service.ts');
+require(
+  'pages/exploration-editor-page/feedback-tab/services/' +
+  'thread-data-backend-api.service.ts');
 
 angular.module('oppia').controller(
   'TranslationSuggestionReviewModalController', [
-    '$http', '$scope', '$uibModalInstance', 'AlertsService', 'ContextService',
+    '$scope', '$uibModalInstance', 'AlertsService', 'ContextService',
     'ContributionAndReviewService', 'ContributionOpportunitiesService',
-    'LanguageUtilService', 'SiteAnalyticsService', 'UrlInterpolationService',
+    'LanguageUtilService', 'SiteAnalyticsService',
+    'ThreadDataBackendApiService',
     'UserService', 'ValidatorsService', 'initialSuggestionId', 'reviewable',
     'subheading', 'suggestionIdToContribution', 'ACTION_ACCEPT_SUGGESTION',
     'ACTION_REJECT_SUGGESTION', 'IMAGE_CONTEXT', 'MAX_REVIEW_MESSAGE_LENGTH',
     function(
-        $http, $scope, $uibModalInstance, AlertsService, ContextService,
+        $scope, $uibModalInstance, AlertsService, ContextService,
         ContributionAndReviewService, ContributionOpportunitiesService,
-        LanguageUtilService, SiteAnalyticsService, UrlInterpolationService,
+        LanguageUtilService, SiteAnalyticsService,
+        ThreadDataBackendApiService,
         UserService, ValidatorsService, initialSuggestionId, reviewable,
         subheading, suggestionIdToContribution, ACTION_ACCEPT_SUGGESTION,
         ACTION_REJECT_SUGGESTION, IMAGE_CONTEXT, MAX_REVIEW_MESSAGE_LENGTH) {
@@ -113,17 +118,12 @@ angular.module('oppia').controller(
 
         return commitMessage;
       };
-
-      var _getThreadHandlerUrl = function(suggestionId) {
-        return UrlInterpolationService.interpolateUrl(
-          '/threadhandler/<suggestionId>', { suggestionId });
-      };
-
-      var _getThreadMessagesAsync = function(threadId) {
-        return $http.get(_getThreadHandlerUrl(threadId)).then((response) => {
-          let threadMessageBackendDicts = response.data.messages;
-          return threadMessageBackendDicts.map(
-            m => ThreadMessage.createFromBackendDict(m));
+      const _getThreadMessagesAsync = function(threadId) {
+        return ThreadDataBackendApiService.fetchMessagesAsync(
+          threadId).then((response) => {
+          const threadMessageBackendDicts = response.messages;
+          $scope.reviewMessage = threadMessageBackendDicts.map(
+            m => ThreadMessage.createFromBackendDict(m))[1].text;
         });
       };
 
@@ -175,11 +175,7 @@ angular.module('oppia').controller(
           $scope.suggestionIsRejected = (
             $scope.activeSuggestion.status === 'rejected');
           if ($scope.suggestionIsRejected) {
-            _getThreadMessagesAsync($scope.activeSuggestionId).then(
-              function(messageSummaries) {
-                $scope.reviewMessage = messageSummaries[1].text;
-              }
-            );
+            _getThreadMessagesAsync($scope.activeSuggestionId);
           }
         }
       };
