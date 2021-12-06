@@ -22,6 +22,7 @@ and appends it into index.yaml"""
 
 from __future__ import annotations
 
+import copy
 import os
 
 import yaml
@@ -42,18 +43,27 @@ def main() -> None:
     if web_inf_index_yaml_dict['indexes'] is None:
         return
 
+    temp_index_yaml_dict = copy.deepcopy(index_yaml_dict)
+    for kind in temp_index_yaml_dict['indexes']:
+        kind['properties'] = sorted(
+            kind['properties'], key=lambda x: x['name']
+    )
+
     new_kinds = []
-    for i in web_inf_index_yaml_dict['indexes']:
-        if i not in index_yaml_dict['indexes']:
-            new_kinds.append(i)
+    for kind in web_inf_index_yaml_dict['indexes']:
+        temp_web_inf_kind = copy.deepcopy(kind)
+        temp_web_inf_kind['properties'] = sorted(
+            temp_web_inf_kind['properties'], key=lambda x: x['name'])
+        if temp_web_inf_kind not in temp_index_yaml_dict['indexes']:
+            new_kinds.append(kind)
 
     if len(new_kinds) == 0:
         return
 
     index_yaml_dict['indexes'] += new_kinds
-    index_yaml_dict = yaml.safe_dump(
+    new_index_yaml_dict = yaml.safe_dump(
         index_yaml_dict, default_flow_style=False, sort_keys=False
     )
-    index_yaml_dict = index_yaml_dict.replace('- kind', '\n- kind')
+    index_yaml = new_index_yaml_dict.replace('- kind', '\n- kind')
     with open(INDEX_YAML_PATH, 'w', encoding='utf-8') as f:
-        f.write(index_yaml_dict)
+        f.write(index_yaml)
