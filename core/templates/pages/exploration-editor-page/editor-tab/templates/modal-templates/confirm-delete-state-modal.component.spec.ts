@@ -16,10 +16,10 @@
  * @fileoverview Unit tests for ConfirmDeleteStateModalComponent.
  */
 
-import { NO_ERRORS_SCHEMA } from "@angular/core";
-import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
-import { NgbActiveModal } from "@ng-bootstrap/ng-bootstrap";
-import { ConfirmDeleteStateModalComponent } from "./confirm-delete-state-modal.component";
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { ConfirmDeleteStateModalComponent } from './confirm-delete-state-modal.component';
 
 class MockActiveModal {
   close(): void {
@@ -34,7 +34,6 @@ class MockActiveModal {
 describe('Confirm Delete State Modal Component', function() {
   let component: ConfirmDeleteStateModalComponent;
   let fixture: ComponentFixture<ConfirmDeleteStateModalComponent>;
-  let ngbActiveModal: NgbActiveModal;
   let deleteStateName = 'Introduction';
 
   beforeEach(waitForAsync(() => {
@@ -55,7 +54,6 @@ describe('Confirm Delete State Modal Component', function() {
     component = fixture.componentInstance;
     component.deleteStateName = deleteStateName;
 
-    ngbActiveModal = TestBed.inject(NgbActiveModal);
     fixture.detectChanges();
   });
 
@@ -64,4 +62,3 @@ describe('Confirm Delete State Modal Component', function() {
       'Are you sure you want to delete the card "Introduction"?');
   });
 });
-  

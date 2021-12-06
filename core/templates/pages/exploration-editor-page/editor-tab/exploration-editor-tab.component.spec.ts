@@ -93,7 +93,7 @@ describe('Exploration editor tab component', function() {
       }
     });
   }));
-  
+
   importAllAngularServices();
 
   beforeEach(() => {

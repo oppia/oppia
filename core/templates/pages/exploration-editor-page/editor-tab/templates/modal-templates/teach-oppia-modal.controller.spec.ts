@@ -141,7 +141,7 @@ describe('Teach Oppia Modal Controller', function() {
       }
     });
   }));
-  
+
   beforeEach(function() {
     angularNameService = TestBed.get(AngularNameService);
     stateCustomizationArgsService = TestBed.get(StateCustomizationArgsService);
