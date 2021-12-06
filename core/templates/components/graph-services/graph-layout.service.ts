@@ -504,13 +504,11 @@ export class StateGraphLayoutService {
       topEdge = Math.min(
         nodeData[nodeId].y0 - BORDER_PADDING, topEdge);
       rightEdge = Math.max(
-        nodeData[nodeId].x0 +
-        BORDER_PADDING +
-        nodeData[nodeId].width, rightEdge);
+        nodeData[nodeId].x0 + BORDER_PADDING + nodeData[nodeId].width,
+        rightEdge);
       bottomEdge = Math.max(
-        nodeData[nodeId].y0 +
-        BORDER_PADDING +
-        nodeData[nodeId].height, bottomEdge);
+        nodeData[nodeId].y0 + BORDER_PADDING + nodeData[nodeId].height,
+        bottomEdge);
     }
 
     return {
@@ -555,7 +553,7 @@ export class StateGraphLayoutService {
         var dy = targety - sourcey;
 
         /* Fractional amount of truncation to be applied to the end of
-          each link. */
+           each link. */
         var startCutoff = (sourceWidth / 2) / Math.abs(dx);
         var endCutoff = (targetWidth / 2) / Math.abs(dx);
         if (dx === 0 || dy !== 0) {
