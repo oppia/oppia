@@ -205,7 +205,7 @@ def validate_aggregated_stats(aggregated_stats):
         aggregated_stats: dict. Data that needs to be validated.
 
     Returns:
-        aggregated_stats: dict. Data after validation.
+        dict. Data after validation.
 
     Raises:
         InvalidInputException. Property not in aggregated stats dict.
@@ -244,6 +244,9 @@ def validate_params_dict(params):
 
     Args:
         params: dict. Data that needs to be validated.
+
+    Returns:
+        dict. Returns the params argument in dict form.
     """
     if not isinstance(params, dict):
         raise Exception('Excepted dict, received %s' % params)
