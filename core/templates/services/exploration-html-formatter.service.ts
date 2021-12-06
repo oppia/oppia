@@ -104,10 +104,9 @@ export class ExplorationHtmlFormatterService {
       // TODO(#12292): Refactor this once all interactions have been migrated to
       // Angular 2+, such that we don't need to parse the string in the
       // interaction directives/components.
+      element.setAttribute('saved-solution', savedSolution);
       if (this.migratedInteractions.indexOf(interactionId) >= 0) {
-        element.setAttribute('[saved-solution]', savedSolution);
-      } else {
-        element.setAttribute('saved-solution', savedSolution);
+        element.removeAttribute('saved-solution');
       }
     }
     const alphabetRegex = new RegExp('[a-zA-Z]*');
@@ -116,15 +115,30 @@ export class ExplorationHtmlFormatterService {
     if (labelForFocusTarget && alphabetRegex.test(labelForFocusTarget)) {
       element.setAttribute('label-for-focus-target', labelForFocusTarget);
     }
-    let propValue = parentHasLastAnswerProperty ? 'lastAnswer' : null;
+    let lastAnswerPropValue = parentHasLastAnswerProperty ? 'lastAnswer' : null;
     // The setAttribute is safe because the only possible value is 'lastAnswer'
     // as per the line above.
-    if (propValue) {
+    if (lastAnswerPropValue !== null) {
+      element.setAttribute('last-answer', lastAnswerPropValue);
       if (this.migratedInteractions.indexOf(interactionId) >= 0) {
-        element.setAttribute('[last-answer]', propValue);
-      } else {
-        element.setAttribute('last-answer', propValue);
+        element.removeAttribute('last-answer');
       }
+    }
+
+    if (
+      this.migratedInteractions.indexOf(interactionId) >= 0 &&
+      (lastAnswerPropValue !== null || savedSolution === 'savedMemento()')
+    ) {
+      let interactionHtml = element.outerHTML;
+      const tagEnd = '></oppia-interactive-' + htmlInteractionId + '>';
+      let interactionHtmlWithoutEnd = interactionHtml.replace(tagEnd, '');
+      if (lastAnswerPropValue !== null) {
+        interactionHtmlWithoutEnd += `last-answer="${lastAnswerPropValue}"\n`;
+      }
+      if (savedSolution === 'savedMemento()') {
+        interactionHtmlWithoutEnd += `saved-solution="${savedSolution}"\n`;
+      }
+      return interactionHtmlWithoutEnd + tagEnd;
     }
     return element.outerHTML;
   }
