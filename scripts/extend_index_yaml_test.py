@@ -36,6 +36,30 @@ MOCK_WEB_INF_INDEX_YAML_PATH = os.path.join(
 class ExtendIndexYamlTest(test_utils.GenericTestBase):
     """Class for testing the extend_index_yaml script."""
 
+    def setUp(self) -> None:
+        super(ExtendIndexYamlTest, self).setUp()
+        self.index_yaml_file = tempfile.NamedTemporaryFile()
+        self.web_inf_index_yaml_file = tempfile.NamedTemporaryFile()
+        self.index_yaml_file_name = self.index_yaml_file.name
+        self.web_inf_index_yaml_file_name = self.web_inf_index_yaml_file.name
+        self.index_yaml_swap = self.swap(
+            extend_index_yaml, 'INDEX_YAML_PATH',
+            self.index_yaml_file.name)
+        self.web_inf_index_yaml_swap = self.swap(
+            extend_index_yaml, 'WEB_INF_INDEX_YAML_PATH',
+            self.web_inf_index_yaml_file.name)
+        self.open_index_yaml_r = open(
+            self.index_yaml_file.name, 'r', encoding='utf-8')
+        self.open_index_yaml_w = open(
+            self.index_yaml_file.name, 'w', encoding='utf-8')
+        self.open_web_inf_index_yaml = open(
+            self.web_inf_index_yaml_file.name, 'a', encoding='utf-8')
+
+    def tearDown(self) -> None:
+        super(ExtendIndexYamlTest, self).tearDown()
+        self.index_yaml_file.close()
+        self.web_inf_index_yaml_file.close()
+
     def test_extend_index_yaml_with_changes(self):
         index_yaml = """indexes:
 
@@ -77,26 +101,16 @@ class ExtendIndexYamlTest(test_utils.GenericTestBase):
   - name: status
   - name: next_scheduled_check_time
 """
-        index_yaml_file = tempfile.NamedTemporaryFile()
-        web_inf_index_yaml_file = tempfile.NamedTemporaryFile()
-        with self.swap(
-            extend_index_yaml, 'INDEX_YAML_PATH',
-            index_yaml_file.name):
-            with self.swap(
-                extend_index_yaml, 'WEB_INF_INDEX_YAML_PATH',
-                web_inf_index_yaml_file.name):
-                with open(index_yaml_file.name, 'w', encoding='utf-8') as f:
-                    f.write(index_yaml)
-                with open(
-                    web_inf_index_yaml_file.name, 'w', encoding='utf-8') as f:
-                    f.write(web_inf_index_yaml)
-                extend_index_yaml.main()
-                with open(index_yaml_file.name, 'r', encoding='utf-8') as f:
-                    actual_index_yaml = f.read()
-                self.assertEqual(actual_index_yaml, expected_index_yaml)
-        
-        index_yaml_file.close()
-        web_inf_index_yaml_file.close()
+
+        with self.index_yaml_swap, self.web_inf_index_yaml_swap:
+            with self.open_index_yaml_w as f:
+                f.write(index_yaml)
+            with self.open_web_inf_index_yaml as f:
+                f.write(web_inf_index_yaml)
+            extend_index_yaml.main()
+            with self.open_index_yaml_r as f:
+                actual_index_yaml = f.read()
+            self.assertEqual(actual_index_yaml, expected_index_yaml)
 
     def test_extend_index_yaml_without_changes(self):
         index_yaml = """indexes:
@@ -123,26 +137,15 @@ class ExtendIndexYamlTest(test_utils.GenericTestBase):
     direction: desc
 """
 
-        index_yaml_file = tempfile.NamedTemporaryFile()
-        web_inf_index_yaml_file = tempfile.NamedTemporaryFile()
-        with self.swap(
-            extend_index_yaml, 'INDEX_YAML_PATH',
-            index_yaml_file.name):
-            with self.swap(
-                extend_index_yaml, 'WEB_INF_INDEX_YAML_PATH',
-                web_inf_index_yaml_file.name):
-                with open(index_yaml_file.name, 'w', encoding='utf-8') as f:
-                    f.write(index_yaml)
-                with open(
-                    web_inf_index_yaml_file.name, 'w', encoding='utf-8') as f:
-                    f.write(web_inf_index_yaml)
-                extend_index_yaml.main()
-                with open(index_yaml_file.name, 'r', encoding='utf-8') as f:
-                    actual_index_yaml = f.read()
-                self.assertEqual(actual_index_yaml, index_yaml)
-
-        index_yaml_file.close()
-        web_inf_index_yaml_file.close()
+        with self.index_yaml_swap, self.web_inf_index_yaml_swap:
+            with self.open_index_yaml_w as f:
+                f.write(index_yaml)
+            with self.open_web_inf_index_yaml as f:
+                f.write(web_inf_index_yaml)
+            extend_index_yaml.main()
+            with self.open_index_yaml_r as f:
+                actual_index_yaml = f.read()
+            self.assertEqual(actual_index_yaml, index_yaml)
 
     def test_extend_index_yaml_with_empty_web_inf_ind_yaml(self):
         index_yaml = """indexes:
@@ -163,26 +166,15 @@ class ExtendIndexYamlTest(test_utils.GenericTestBase):
 
 """
 
-        index_yaml_file = tempfile.NamedTemporaryFile()
-        web_inf_index_yaml_file = tempfile.NamedTemporaryFile()
-        with self.swap(
-            extend_index_yaml, 'INDEX_YAML_PATH',
-            index_yaml_file.name):
-            with self.swap(
-                extend_index_yaml, 'WEB_INF_INDEX_YAML_PATH',
-                web_inf_index_yaml_file.name):
-                with open(index_yaml_file.name, 'w', encoding='utf-8') as f:
-                    f.write(index_yaml)
-                with open(
-                    web_inf_index_yaml_file.name, 'w', encoding='utf-8') as f:
-                    f.write(web_inf_index_yaml)
-                extend_index_yaml.main()
-                with open(index_yaml_file.name, 'r', encoding='utf-8') as f:
-                    actual_index_yaml = f.read()
-                self.assertEqual(actual_index_yaml, index_yaml)
-
-        index_yaml_file.close()
-        web_inf_index_yaml_file.close()
+        with self.index_yaml_swap, self.web_inf_index_yaml_swap:
+            with self.open_index_yaml_w as f:
+                f.write(index_yaml)
+            with self.open_web_inf_index_yaml as f:
+                f.write(web_inf_index_yaml)
+            extend_index_yaml.main()
+            with self.open_index_yaml_r as f:
+                actual_index_yaml = f.read()
+            self.assertEqual(actual_index_yaml, index_yaml)
 
     def test_extend_index_yaml_with_same_kind(self):
         index_yaml = """indexes:
@@ -238,26 +230,15 @@ class ExtendIndexYamlTest(test_utils.GenericTestBase):
   - name: next_scheduled_check_time
 """
 
-        index_yaml_file = tempfile.NamedTemporaryFile()
-        web_inf_index_yaml_file = tempfile.NamedTemporaryFile()
-        with self.swap(
-            extend_index_yaml, 'INDEX_YAML_PATH',
-            index_yaml_file.name):
-            with self.swap(
-                extend_index_yaml, 'WEB_INF_INDEX_YAML_PATH',
-                web_inf_index_yaml_file.name):
-                with open(index_yaml_file.name, 'w', encoding='utf-8') as f:
-                    f.write(index_yaml)
-                with open(
-                    web_inf_index_yaml_file.name, 'w', encoding='utf-8') as f:
-                    f.write(web_inf_index_yaml)
-                extend_index_yaml.main()
-                with open(index_yaml_file.name, 'r', encoding='utf-8') as f:
-                    actual_index_yaml = f.read()
-                self.assertEqual(actual_index_yaml, expected_index_yaml)
-
-        index_yaml_file.close()
-        web_inf_index_yaml_file.close()
+        with self.index_yaml_swap, self.web_inf_index_yaml_swap:
+            with self.open_index_yaml_w as f:
+                f.write(index_yaml)
+            with self.open_web_inf_index_yaml as f:
+                f.write(web_inf_index_yaml)
+            extend_index_yaml.main()
+            with self.open_index_yaml_r as f:
+                actual_index_yaml = f.read()
+            self.assertEqual(actual_index_yaml, expected_index_yaml)
 
     def test_extend_index_yaml_with_same_kind_in_web_inf(self):
         index_yaml = """indexes:
@@ -314,26 +295,15 @@ class ExtendIndexYamlTest(test_utils.GenericTestBase):
   - name: next_scheduled_check_time
 """
 
-        index_yaml_file = tempfile.NamedTemporaryFile()
-        web_inf_index_yaml_file = tempfile.NamedTemporaryFile()
-        with self.swap(
-            extend_index_yaml, 'INDEX_YAML_PATH',
-            index_yaml_file.name):
-            with self.swap(
-                extend_index_yaml, 'WEB_INF_INDEX_YAML_PATH',
-                web_inf_index_yaml_file.name):
-                with open(index_yaml_file.name, 'w', encoding='utf-8') as f:
-                    f.write(index_yaml)
-                with open(
-                    web_inf_index_yaml_file.name, 'w', encoding='utf-8') as f:
-                    f.write(web_inf_index_yaml)
-                extend_index_yaml.main()
-                with open(index_yaml_file.name, 'r', encoding='utf-8') as f:
-                    actual_index_yaml = f.read()
-                self.assertEqual(actual_index_yaml, expected_index_yaml)
-
-        index_yaml_file.close()
-        web_inf_index_yaml_file.close()
+        with self.index_yaml_swap, self.web_inf_index_yaml_swap:
+            with self.open_index_yaml_w as f:
+                f.write(index_yaml)
+            with self.open_web_inf_index_yaml as f:
+                f.write(web_inf_index_yaml)
+            extend_index_yaml.main()
+            with self.open_index_yaml_r as f:
+                actual_index_yaml = f.read()
+            self.assertEqual(actual_index_yaml, expected_index_yaml)
 
     def test_extend_index_yaml_with_same_kind_in_web_inf(self):
         index_yaml = """indexes:
@@ -399,23 +369,12 @@ class ExtendIndexYamlTest(test_utils.GenericTestBase):
   - name: next_scheduled_check_time
 """
 
-        index_yaml_file = tempfile.NamedTemporaryFile()
-        web_inf_index_yaml_file = tempfile.NamedTemporaryFile()
-        with self.swap(
-            extend_index_yaml, 'INDEX_YAML_PATH',
-            index_yaml_file.name):
-            with self.swap(
-                extend_index_yaml, 'WEB_INF_INDEX_YAML_PATH',
-                web_inf_index_yaml_file.name):
-                with open(index_yaml_file.name, 'w', encoding='utf-8') as f:
-                    f.write(index_yaml)
-                with open(
-                    web_inf_index_yaml_file.name, 'w', encoding='utf-8') as f:
-                    f.write(web_inf_index_yaml)
-                extend_index_yaml.main()
-                with open(index_yaml_file.name, 'r', encoding='utf-8') as f:
-                    actual_index_yaml = f.read()
-                self.assertEqual(actual_index_yaml, expected_index_yaml)
-
-        index_yaml_file.close()
-        web_inf_index_yaml_file.close()
+        with self.index_yaml_swap, self.web_inf_index_yaml_swap:
+            with self.open_index_yaml_w as f:
+                f.write(index_yaml)
+            with self.open_web_inf_index_yaml as f:
+                f.write(web_inf_index_yaml)
+            extend_index_yaml.main()
+            with self.open_index_yaml_r as f:
+                actual_index_yaml = f.read()
+            self.assertEqual(actual_index_yaml, expected_index_yaml)
