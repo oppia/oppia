@@ -111,7 +111,7 @@ LEGACY_HTML_FIELD_TYPES_TO_RULE_SPECS_EXTENSIONS_MODULE_DIR = os.path.join(
 # algorithms per interaction. Hence, whenever we find a secondary algorithm
 # candidate for any of the supported interactions, the logical functions to
 # support multiple algorithms need to be implemented.
-INTERACTION_CLASSIFIER_MAPPING = {
+INTERACTION_CLASSIFIER_MAPPING: Dict[str, Dict[str, Union[str, int]]] = {
     'TextInput': {
         'algorithm_id': 'TextClassifier',
         'algorithm_version': 1
@@ -125,7 +125,7 @@ TRAINING_JOB_STATUS_FAILED = 'FAILED'
 TRAINING_JOB_STATUS_NEW = 'NEW'
 TRAINING_JOB_STATUS_PENDING = 'PENDING'
 
-ALLOWED_TRAINING_JOB_STATUSES = [
+ALLOWED_TRAINING_JOB_STATUSES: List[str] = [
     TRAINING_JOB_STATUS_COMPLETE,
     TRAINING_JOB_STATUS_FAILED,
     TRAINING_JOB_STATUS_NEW,

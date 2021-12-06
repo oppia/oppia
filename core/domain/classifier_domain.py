@@ -23,7 +23,7 @@ from core import feconf
 from core import utils
 from core.platform import models
 
-from typing import Any, Dict, List, Union
+from typing import Dict, List, Union
 
 (classifier_models,) = models.Registry.import_models(
     [models.NAMES.classifier])
@@ -84,7 +84,7 @@ class ClassifierTrainingJob:
             interaction_id: str,
             exp_id: str,
             exp_version: int,
-            next_scheduled_check_time: datetime.date,
+            next_scheduled_check_time: datetime.datetime,
             state_name: str,
             status: str,
             training_data: List[Dict[str, Union[int, List[str]]]],
@@ -187,7 +187,7 @@ class ClassifierTrainingJob:
         return self._exp_version
 
     @property
-    def next_scheduled_check_time(self) -> datetime.date:
+    def next_scheduled_check_time(self) -> datetime.datetime:
         """Returns the next scheduled time to check the job.
 
         Returns:
@@ -273,7 +273,10 @@ class ClassifierTrainingJob:
                     initial_status, status))
         self._status = status
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(
+        self
+        ) -> Dict[str, Union[str, int, datetime.datetime,
+        List[Dict[str, Union[int, List[str]]]]]]:
         """Constructs a dict representation of training job domain object.
 
         Returns:
