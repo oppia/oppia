@@ -76,10 +76,8 @@ class NumericInput(base.BaseInteraction):
         """
         outcome_proto = default_outcome.to_proto()
         hints_proto_list = cls.get_hint_proto(cls, hints)
-        solution_proto = cls._to_solution_proto(
-            solution)
-        answer_groups_proto = cls._to_answer_groups_proto(
-            answer_groups)
+        solution_proto = cls._to_solution_proto(solution)
+        answer_groups_proto = cls._to_answer_groups_proto(answer_groups)
 
         return state_pb2.NumericInputInstance(
             default_outcome=outcome_proto,
@@ -100,7 +98,7 @@ class NumericInput(base.BaseInteraction):
         Returns:
             Solution. The proto object.
         """
-        solution_proto = None
+        solution_proto = {}
         if solution is not None:
             solution_proto = state_pb2.NumericInputInstance.Solution(
                 base_solution=solution.to_proto(),
@@ -127,10 +125,12 @@ class NumericInput(base.BaseInteraction):
             base_answer_group_proto = answer_group.to_proto()
             rules_spec_proto = cls._to_rule_specs_proto(
                 answer_group.rule_specs)
-            answer_group_proto = state_pb2.NumericInputInstance.AnswerGroup(
-                base_answer_group=base_answer_group_proto,
-                rule_specs=rules_spec_proto)
-            answer_group_list_proto.append(answer_group_proto)
+            answer_group_list_proto.append(
+                state_pb2.NumericInputInstance.AnswerGroup(
+                    base_answer_group=base_answer_group_proto,
+                    rule_specs=rules_spec_proto
+                )
+            )
 
         return answer_group_list_proto
 
@@ -145,7 +145,6 @@ class NumericInput(base.BaseInteraction):
             list. The RuleSpec proto object list.
         """
         rule_specs_list_proto = []
-        rules_specs_proto = {}
 
         rule_type_to_proto_fun_mapping = {
             'Equals': cls._to_numeric_equals_to_proto,
@@ -159,7 +158,7 @@ class NumericInput(base.BaseInteraction):
                 cls._to_numeric_is_inclusively_between_proto),
             'IsWithinTolerance': cls._to_numeric_is_within_tolerance_proto
         }
-        rule_typ_to_proto_mapping = {
+        rule_type_to_proto_mapping = {
             'Equals': lambda x: (
                 state_pb2.NumericInputInstance.RuleSpec(
                     equals=x)),
@@ -190,10 +189,9 @@ class NumericInput(base.BaseInteraction):
                     rule_spec.inputs
                 )
             )
-            rules_specs_proto = (
-                rule_typ_to_proto_mapping[rule_type](rule_proto)
+            rule_specs_list_proto.append(
+                rule_type_to_proto_mapping[rule_type](rule_proto)
             )
-            rule_specs_list_proto.append(rules_specs_proto)
 
         return rule_specs_list_proto
 
@@ -207,13 +205,11 @@ class NumericInput(base.BaseInteraction):
         Returns:
             EqualsSpec. The proto object.
         """
+        numeric_rule_spec = state_pb2.NumericInputInstance.RuleSpec
         equals_to_proto = {}
         x = inputs['x']
         if isinstance(x, (int, float)):
-            equals_to_proto = (
-                state_pb2.NumericInputInstance.RuleSpec.EqualsSpec(
-                    input=x)
-            )
+            equals_to_proto = numeric_rule_spec.EqualsSpec(input=x)
 
         return equals_to_proto
 
@@ -227,13 +223,11 @@ class NumericInput(base.BaseInteraction):
         Returns:
             IsLessThanSpec. The proto object.
         """
+        numeric_rule_spec = state_pb2.NumericInputInstance.RuleSpec
         is_less_than_proto = {}
         x = inputs['x']
         if isinstance(x, (int, float)):
-            is_less_than_proto = (
-                state_pb2.NumericInputInstance.RuleSpec.IsLessThanSpec(
-                    input=x)
-            )
+            is_less_than_proto = numeric_rule_spec.IsLessThanSpec(input=x)
 
         return is_less_than_proto
 
@@ -247,12 +241,12 @@ class NumericInput(base.BaseInteraction):
         Returns:
             IsGreaterThanSpec. The proto object.
         """
+        numeric_rule_spec = state_pb2.NumericInputInstance.RuleSpec
         is_greater_than_proto = {}
         x = inputs['x']
         if isinstance(x, (int, float)):
             is_greater_than_proto = (
-                state_pb2.NumericInputInstance.RuleSpec.IsGreaterThanSpec(
-                    input=x)
+                numeric_rule_spec.IsGreaterThanSpec(input=x)
             )
 
         return is_greater_than_proto
@@ -267,13 +261,12 @@ class NumericInput(base.BaseInteraction):
         Returns:
             IsLessThanOrEqualToSpec. The proto object.
         """
+        numeric_rule_spec = state_pb2.NumericInputInstance.RuleSpec
         is_less_than_or_equal_to_proto = {}
         x = inputs['x']
         if isinstance(x, (int, float)):
             is_less_than_or_equal_to_proto = (
-                state_pb2.NumericInputInstance
-                .RuleSpec.IsLessThanOrEqualToSpec(
-                    input=x)
+                numeric_rule_spec.IsLessThanOrEqualToSpec(input=x)
             )
 
         return is_less_than_or_equal_to_proto
@@ -288,13 +281,12 @@ class NumericInput(base.BaseInteraction):
         Returns:
             IsGreaterThanOrEqualToSpec. The proto object.
         """
+        numeric_rule_spec = state_pb2.NumericInputInstance.RuleSpec
         is_greater_than_or_equal_to_proto = {}
         x = inputs['x']
         if isinstance(x, (int, float)):
             is_greater_than_or_equal_to_proto = (
-                state_pb2.NumericInputInstance
-                .RuleSpec.IsGreaterThanOrEqualToSpec(
-                    input=x)
+                numeric_rule_spec.IsGreaterThanOrEqualToSpec(input=x)
             )
 
         return is_greater_than_or_equal_to_proto
@@ -309,13 +301,13 @@ class NumericInput(base.BaseInteraction):
         Returns:
             IsInclusivelyBetweenSpec. The proto object.
         """
+        numeric_rule_spec = state_pb2.NumericInputInstance.RuleSpec
         is_inclusively_between_proto = {}
         a = inputs['a']
         b = inputs['b']
         if (isinstance(a, (int, float))) and (isinstance(b, (int, float))):
             is_inclusively_between_proto = (
-                state_pb2.NumericInputInstance
-                .RuleSpec.IsInclusivelyBetweenSpec(
+                numeric_rule_spec.IsInclusivelyBetweenSpec(
                     inputLowerInclusive=a,
                     inputUpperInclusive=b)
             )
@@ -332,13 +324,13 @@ class NumericInput(base.BaseInteraction):
         Returns:
             IsWithinToleranceSpec. The proto object.
         """
+        numeric_rule_spec = state_pb2.NumericInputInstance.RuleSpec
         is_within_tolerance_proto = {}
         x = inputs['x']
         tol = inputs['tol']
         if (isinstance(x, (int, float))) and (isinstance(tol, (int, float))):
             is_within_tolerance_proto = (
-                state_pb2.NumericInputInstance
-                .RuleSpec.IsWithinToleranceSpec(
+                numeric_rule_spec.IsWithinToleranceSpec(
                     inputTolerance=tol,
                     inputComparedValue=x)
             )

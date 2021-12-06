@@ -98,14 +98,12 @@ class FractionInput(base.BaseInteraction):
             FractionInputInstance. The proto object.
         """
         customization_args_proto = (
-            cls._to_customization_args_proto(
-                customization_args)
+            cls._to_customization_args_proto(customization_args)
         )
         outcome_proto = default_outcome.to_proto()
         hints_proto_list = cls.get_hint_proto(cls, hints)
         solution_proto = cls._to_solution_proto(solution)
-        answer_groups_proto = cls._to_answer_groups_proto(
-            answer_groups)
+        answer_groups_proto = cls._to_answer_groups_proto(answer_groups)
 
         return state_pb2.FractionInputInstance(
             customization_args=customization_args_proto,
@@ -117,8 +115,7 @@ class FractionInput(base.BaseInteraction):
 
     @classmethod
     def _to_customization_args_proto(cls, customization_args):
-        """Creates a CustomizationArgs proto object
-        for FractionInputInstance.
+        """Creates a CustomizationArgs proto object for FractionInputInstance.
 
         Args:
             customization_args: dict. The customization dict. The keys are
@@ -131,6 +128,7 @@ class FractionInput(base.BaseInteraction):
         """
         placeholder_proto = (
             customization_args['customPlaceholder'].value.to_proto())
+
         return state_pb2.FractionInputInstance.CustomizationArgs(
             requires_simplest_form=(
                 customization_args['requireSimplestForm'].value
@@ -155,7 +153,7 @@ class FractionInput(base.BaseInteraction):
         Returns:
             Solution. The proto object.
         """
-        solution_proto = None
+        solution_proto = {}
         if solution is not None:
             solution_proto = state_pb2.FractionInputInstance.Solution(
                 base_solution=solution.to_proto(),
@@ -166,8 +164,7 @@ class FractionInput(base.BaseInteraction):
 
     @classmethod
     def _to_answer_groups_proto(cls, answer_groups):
-        """Creates a Solution proto object
-        for FractionInputInstance.
+        """Creates a Solution proto object for FractionInputInstance.
 
         Args:
             answer_groups: list(AnswerGroup). List of answer groups of the
@@ -177,16 +174,16 @@ class FractionInput(base.BaseInteraction):
             list. The AnswerGroup proto object list.
         """
         answer_group_list_proto = []
-
         for answer_group in answer_groups:
             base_answer_group_proto = answer_group.to_proto()
             rules_spec_proto = cls._to_fraction_rule_specs_proto(
                 answer_group.rule_specs)
-            answer_group_proto = state_pb2.FractionInputInstance.AnswerGroup(
-                base_answer_group=base_answer_group_proto,
-                rule_specs=rules_spec_proto
+            answer_group_list_proto.append(
+                state_pb2.FractionInputInstance.AnswerGroup(
+                    base_answer_group=base_answer_group_proto,
+                    rule_specs=rules_spec_proto
+                )
             )
-            answer_group_list_proto.append(answer_group_proto)
 
         return answer_group_list_proto
 
@@ -195,7 +192,7 @@ class FractionInput(base.BaseInteraction):
         """Creates a Fraction proto object.
 
         Args:
-            fraction: Fraction. The fraction domain object.
+            fraction: dict. The fraction domain dict.
 
         Returns:
             Fraction. The proto object.
@@ -217,7 +214,6 @@ class FractionInput(base.BaseInteraction):
             list. The RuleSpec proto object list.
         """
         rule_specs_list_proto = []
-        rules_specs_proto = {}
 
         rule_type_to_proto_func_mapping = {
             'IsExactlyEqualTo': cls._to_is_exactly_equal_to_proto,
@@ -273,10 +269,9 @@ class FractionInput(base.BaseInteraction):
                     rule_spec.inputs['f']
                 )
             )
-            rules_specs_proto = (
+            rule_specs_list_proto.append(
                 rule_type_to_proto_mapping[rule_type](rule_proto)
             )
-            rule_specs_list_proto.append(rules_specs_proto)
 
         return rule_specs_list_proto
 
@@ -290,7 +285,9 @@ class FractionInput(base.BaseInteraction):
         Returns:
             IsExactlyEqualToSpec. The proto object.
         """
-        return state_pb2.FractionInputInstance.RuleSpec.IsExactlyEqualToSpec(
+        fraction_rule_spec = state_pb2.FractionInputInstance.RuleSpec
+
+        return fraction_rule_spec.IsExactlyEqualToSpec(
             input=cls._to_fraction_proto(fraction)
         )
 
@@ -304,7 +301,9 @@ class FractionInput(base.BaseInteraction):
         Returns:
             IsEquivalentToSpec. The proto object.
         """
-        return state_pb2.FractionInputInstance.RuleSpec.IsEquivalentToSpec(
+        fraction_rule_spec = state_pb2.FractionInputInstance.RuleSpec
+
+        return fraction_rule_spec.IsEquivalentToSpec(
             input=cls._to_fraction_proto(fraction)
         )
 
@@ -318,7 +317,9 @@ class FractionInput(base.BaseInteraction):
         Returns:
             IsEquivalentToAndInSimplestFormSpec. The proto object.
         """
-        return state_pb2.FractionInputInstance.RuleSpec.IsEquivalentToAndInSimplestFormSpec( # pylint: disable=line-too-long
+        fraction_rule_spec = state_pb2.FractionInputInstance.RuleSpec
+
+        return fraction_rule_spec.IsEquivalentToAndInSimplestFormSpec(
             input=cls._to_fraction_proto(fraction)
         )
 
@@ -332,7 +333,9 @@ class FractionInput(base.BaseInteraction):
         Returns:
             IsLessThanSpec. The proto object.
         """
-        return state_pb2.FractionInputInstance.RuleSpec.IsLessThanSpec(
+        fraction_rule_spec = state_pb2.FractionInputInstance.RuleSpec
+
+        return fraction_rule_spec.IsLessThanSpec(
             input=cls._to_fraction_proto(fraction)
         )
 
@@ -346,7 +349,9 @@ class FractionInput(base.BaseInteraction):
         Returns:
             IsGreaterThanSpec. The proto object.
         """
-        return state_pb2.FractionInputInstance.RuleSpec.IsGreaterThanSpec(
+        fraction_rule_spec = state_pb2.FractionInputInstance.RuleSpec
+
+        return fraction_rule_spec.IsGreaterThanSpec(
             input=cls._to_fraction_proto(fraction)
         )
 
@@ -360,7 +365,9 @@ class FractionInput(base.BaseInteraction):
         Returns:
             HasNumeratorEqualToSpec. The proto object.
         """
-        return state_pb2.FractionInputInstance.RuleSpec.HasNumeratorEqualToSpec(
+        fraction_rule_spec = state_pb2.FractionInputInstance.RuleSpec
+
+        return fraction_rule_spec.HasNumeratorEqualToSpec(
             input=numerator
         )
 
@@ -374,7 +381,9 @@ class FractionInput(base.BaseInteraction):
         Returns:
             HasDenominatorEqualToSpec. The proto object.
         """
-        return state_pb2.FractionInputInstance.RuleSpec.HasDenominatorEqualToSpec( # pylint: disable=line-too-long
+        fraction_rule_spec = state_pb2.FractionInputInstance.RuleSpec
+
+        return fraction_rule_spec.HasDenominatorEqualToSpec(
             input=denominator
         )
 
@@ -388,7 +397,9 @@ class FractionInput(base.BaseInteraction):
         Returns:
             HasIntegerPartEqualToSpec. The proto object.
         """
-        return state_pb2.FractionInputInstance.RuleSpec.HasIntegerPartEqualToSpec( # pylint: disable=line-too-long
+        fraction_rule_spec = state_pb2.FractionInputInstance.RuleSpec
+
+        return fraction_rule_spec.HasIntegerPartEqualToSpec(
             input=interger_part
         )
 
@@ -402,7 +413,9 @@ class FractionInput(base.BaseInteraction):
         Returns:
             HasNoFractionalPartSpec. The proto object.
         """
-        return state_pb2.FractionInputInstance.RuleSpec.HasNoFractionalPartSpec() # pylint: disable=line-too-long
+        fraction_rule_spec = state_pb2.FractionInputInstance.RuleSpec
+
+        return fraction_rule_spec.HasNoFractionalPartSpec()
 
     @classmethod
     def _to_has_fractional_part_exactly_equal_to_proto(cls, fraction):
@@ -414,6 +427,8 @@ class FractionInput(base.BaseInteraction):
         Returns:
             HasFractionalPartExactlyEqualToSpec. The proto object.
         """
-        return state_pb2.FractionInputInstance.RuleSpec.HasFractionalPartExactlyEqualToSpec( # pylint: disable=line-too-long
+        fraction_rule_spec = state_pb2.FractionInputInstance.RuleSpec
+
+        return fraction_rule_spec.HasFractionalPartExactlyEqualToSpec(
             input=cls._to_fraction_proto(fraction)
         )

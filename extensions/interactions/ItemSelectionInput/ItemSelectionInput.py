@@ -113,15 +113,11 @@ class ItemSelectionInput(base.BaseInteraction):
             ItemSelectionInputInstance. The proto object.
         """
         customization_arg_proto = (
-            cls._to_customization_args_proto(
-                customization_args)
+            cls._to_customization_args_proto(customization_args)
         )
         outcome_proto = default_outcome.to_proto()
         hints_proto_list = cls.get_hint_proto(cls, hints)
-        answer_groups_proto = (
-            cls._to_answer_groups_proto(
-                answer_groups)
-        )
+        answer_groups_proto = cls._to_answer_groups_proto(answer_groups)
 
         return state_pb2.ItemSelectionInputInstance(
             customization_args=customization_arg_proto,
@@ -133,7 +129,7 @@ class ItemSelectionInput(base.BaseInteraction):
     @classmethod
     def _to_customization_args_proto(cls, customization_args):
         """Creates a CustomizationArgs proto object
-            for ItemSelectionInputInstance.
+        for ItemSelectionInputInstance.
 
         Args:
             customization_args: dict. The customization dict. The keys are
@@ -171,18 +167,16 @@ class ItemSelectionInput(base.BaseInteraction):
             list. The AnswerGroup proto object list.
         """
         answer_group_list_proto = []
-
         for answer_group in answer_groups:
             base_answer_group_proto = answer_group.to_proto()
             rules_spec_proto = cls._to_item_selection_rule_specs_proto(
                 answer_group.rule_specs)
-            answer_group_proto = (
+            answer_group_list_proto.append(
                 state_pb2.ItemSelectionInputInstance.AnswerGroup(
                     base_answer_group=base_answer_group_proto,
                     rule_specs=rules_spec_proto
                 )
             )
-            answer_group_list_proto.append(answer_group_proto)
 
         return answer_group_list_proto
 
@@ -197,7 +191,6 @@ class ItemSelectionInput(base.BaseInteraction):
             list. The RuleSpec proto object list.
         """
         rule_specs_list_proto = []
-        rules_specs_proto = {}
 
         rule_type_to_proto_func_mapping = {
             'Equals': cls._to_is_equal_to_proto,
@@ -209,8 +202,7 @@ class ItemSelectionInput(base.BaseInteraction):
 
         rule_type_to_proto_mapping = {
             'Equals': lambda x: (
-                state_pb2.ItemSelectionInputInstance.RuleSpec(
-                    equals=x)),
+                state_pb2.ItemSelectionInputInstance.RuleSpec(equals=x)),
             'ContainsAtLeastOneOf': lambda x: (
                 state_pb2.ItemSelectionInputInstance.RuleSpec(
                     contains_at_least_one_of=x)),
@@ -229,10 +221,9 @@ class ItemSelectionInput(base.BaseInteraction):
                     rule_spec.inputs['x']
                 )
             )
-            rules_specs_proto = (
+            rule_specs_list_proto.append(
                 rule_type_to_proto_mapping[rule_type](rule_proto)
             )
-            rule_specs_list_proto.append(rules_specs_proto)
 
         return rule_specs_list_proto
 
@@ -246,8 +237,11 @@ class ItemSelectionInput(base.BaseInteraction):
         Returns:
             EqualsSpec. The proto object.
         """
-        return state_pb2.ItemSelectionInputInstance.RuleSpec.EqualsSpec( # pylint: disable=line-too-long
-            input=cls._to_set_of_translatable_html_content_ids_proto(choice_list) # pylint: disable=line-too-long
+        item_rule_spec = state_pb2.ItemSelectionInputInstance.RuleSpec
+
+        return item_rule_spec.EqualsSpec(
+            input=cls._to_set_of_translatable_html_content_ids_proto(
+                choice_list)
         )
 
     @classmethod
@@ -260,8 +254,11 @@ class ItemSelectionInput(base.BaseInteraction):
         Returns:
             ContainsAtLeastOneOfSpec. The proto object.
         """
-        return state_pb2.ItemSelectionInputInstance.RuleSpec.ContainsAtLeastOneOfSpec( # pylint: disable=line-too-long
-            input=cls._to_set_of_translatable_html_content_ids_proto(choice_list) # pylint: disable=line-too-long
+        item_rule_spec = state_pb2.ItemSelectionInputInstance.RuleSpec
+
+        return item_rule_spec.ContainsAtLeastOneOfSpec(
+            input=cls._to_set_of_translatable_html_content_ids_proto(
+                choice_list)
         )
 
     @classmethod
@@ -274,8 +271,11 @@ class ItemSelectionInput(base.BaseInteraction):
         Returns:
             IsProperSubsetOfSpec. The proto object.
         """
-        return state_pb2.ItemSelectionInputInstance.RuleSpec.IsProperSubsetOfSpec( # pylint: disable=line-too-long
-            input=cls._to_set_of_translatable_html_content_ids_proto(choice_list) # pylint: disable=line-too-long
+        item_rule_spec = state_pb2.ItemSelectionInputInstance.RuleSpec
+
+        return item_rule_spec.IsProperSubsetOfSpec(
+            input=cls._to_set_of_translatable_html_content_ids_proto(
+                choice_list)
         )
 
     @classmethod
@@ -290,8 +290,11 @@ class ItemSelectionInput(base.BaseInteraction):
         Returns:
             DoesNotContainAtLeastOneOfSpec. The proto object.
         """
-        return state_pb2.ItemSelectionInputInstance.RuleSpec.DoesNotContainAtLeastOneOfSpec( # pylint: disable=line-too-long
-            input=cls._to_set_of_translatable_html_content_ids_proto(choice_list) # pylint: disable=line-too-long
+        item_rule_spec = state_pb2.ItemSelectionInputInstance.RuleSpec
+
+        return item_rule_spec.DoesNotContainAtLeastOneOfSpec(
+            input=cls._to_set_of_translatable_html_content_ids_proto(
+                choice_list)
         )
 
     @classmethod
@@ -307,13 +310,11 @@ class ItemSelectionInput(base.BaseInteraction):
         Returns:
             SetOfTranslatableHtmlContentIds. The proto object.
         """
-        content_id_lists_proto = []
-        for translatable_html_content_id in set_of_content_id:
-            translatable_html_content_id_proto = (
-                cls._to_translatable_html_content_id_proto(
-                    translatable_html_content_id)
-            )
-            content_id_lists_proto.append(translatable_html_content_id_proto) # pylint: disable=line-too-long
+        content_id_lists_proto = [
+            cls._to_translatable_html_content_id_proto(
+                translatable_html_content_id
+            ) for translatable_html_content_id in set_of_content_id
+        ]
 
         return objects_pb2.SetOfTranslatableHtmlContentIds(
             content_ids=content_id_lists_proto

@@ -153,9 +153,7 @@ class TextInputInteractionTests(test_utils.GenericTestBase):
         self.assertEqual(
             text_input_proto.default_outcome.feedback.text,
             '<p> Default Outcome </p>')
-        self.assertEqual(
-            text_input_proto.default_outcome.labelled_as_correct,
-            False)
+        self.assertFalse(text_input_proto.default_outcome.labelled_as_correct)
 
         text_input_answer_group = (
             text_input_proto.answer_groups[0]
@@ -163,9 +161,7 @@ class TextInputInteractionTests(test_utils.GenericTestBase):
         self.assertEqual(
             text_input_answer_group.destination_state,
             'Introduction')
-        self.assertEqual(
-            text_input_answer_group.labelled_as_correct,
-            False)
+        self.assertFalse(text_input_answer_group.labelled_as_correct)
         self.assertEqual(
             text_input_answer_group.feedback.content_id,
             'feedback_2')

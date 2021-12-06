@@ -144,9 +144,7 @@ class NumericInputInteractionTests(test_utils.GenericTestBase):
         self.assertEqual(
             numeric_input_default_outcome.feedback.text,
             '<p> Default Outcome </p>')
-        self.assertEqual(
-            numeric_input_default_outcome.labelled_as_correct,
-            False)
+        self.assertFalse(numeric_input_default_outcome.labelled_as_correct)
 
         self.assertEqual(
             numeric_input_proto.solution.base_solution.explanation.content_id,
@@ -164,9 +162,7 @@ class NumericInputInteractionTests(test_utils.GenericTestBase):
         self.assertEqual(
             numeric_input_answer_group.destination_state,
             'abc')
-        self.assertEqual(
-            numeric_input_answer_group.labelled_as_correct,
-            True)
+        self.assertTrue(numeric_input_answer_group.labelled_as_correct)
         self.assertEqual(
             numeric_input_answer_group.feedback.content_id,
             'feedback_2')

@@ -156,9 +156,7 @@ class ItemSelectionInputInteractionTests(test_utils.GenericTestBase):
         self.assertEqual(
             item_default_outcome.feedback.content_id,
             'feedback_1')
-        self.assertEqual(
-            item_default_outcome.labelled_as_correct,
-            True)
+        self.assertTrue(item_default_outcome.labelled_as_correct)
 
         self.assertEqual(
             item_selection_proto.hints[0].hint_content.content_id,
@@ -179,9 +177,7 @@ class ItemSelectionInputInteractionTests(test_utils.GenericTestBase):
         self.assertEqual(
             item_answer_group.destination_state,
             'abc')
-        self.assertEqual(
-            item_answer_group.labelled_as_correct,
-            True)
+        self.assertTrue(item_answer_group.labelled_as_correct)
         self.assertEqual(
             item_answer_group.feedback.content_id,
             'feedback_1')

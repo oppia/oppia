@@ -184,8 +184,8 @@ class FractionInputInteractionTests(test_utils.GenericTestBase):
             }
         }
         fraction_instance = (
-            interaction_registry.Registry.get_interaction_by_id(
-                'FractionInput'))
+            interaction_registry.Registry.get_interaction_by_id('FractionInput')
+        )
         interaction_domain = (
             state_domain.InteractionInstance.from_dict(interaction_dict))
         fraction_proto = fraction_instance.to_proto(
@@ -195,17 +195,13 @@ class FractionInputInteractionTests(test_utils.GenericTestBase):
             interaction_domain.solution,
             interaction_domain.answer_groups)
 
-        fraction_customization_args = (
-            fraction_proto.customization_args)
-        self.assertEqual(
-            fraction_customization_args.requires_simplest_form,
-            False)
-        self.assertEqual(
-            fraction_customization_args.allow_improper_fractions,
-            True)
-        self.assertEqual(
-            fraction_customization_args.allow_nonzero_integer_part,
-            True)
+        fraction_customization_args = (fraction_proto.customization_args)
+        self.assertFalse(
+            fraction_customization_args.requires_simplest_form)
+        self.assertTrue(
+            fraction_customization_args.allow_improper_fractions)
+        self.assertTrue(
+            fraction_customization_args.allow_nonzero_integer_part)
         self.assertEqual(
             fraction_customization_args.placeholder.content_id,
             'ca_customPlaceholder_2')
@@ -223,9 +219,8 @@ class FractionInputInteractionTests(test_utils.GenericTestBase):
         self.assertEqual(
             fraction_outcome.feedback.text,
             '<p> introduce </p>')
-        self.assertEqual(
-            fraction_outcome.labelled_as_correct,
-            False)
+        self.assertFalse(
+            fraction_outcome.labelled_as_correct)
 
         self.assertEqual(
             fraction_proto.hints[0].hint_content.content_id,
@@ -241,15 +236,10 @@ class FractionInputInteractionTests(test_utils.GenericTestBase):
             '<p>This is the second hint.</p>')
 
         fraction_correct_ans = fraction_proto.solution.correct_answer
-        self.assertEqual(
-            fraction_correct_ans.is_negative,
-            False)
-        self.assertEqual(
-            fraction_correct_ans.whole_number, 0)
-        self.assertEqual(
-            fraction_correct_ans.numerator, 2)
-        self.assertEqual(
-            fraction_correct_ans.denominator, 5)
+        self.assertFalse(fraction_correct_ans.is_negative)
+        self.assertEqual(fraction_correct_ans.whole_number, 0)
+        self.assertEqual(fraction_correct_ans.numerator, 2)
+        self.assertEqual(fraction_correct_ans.denominator, 5)
 
         self.assertEqual(
             fraction_proto.solution.base_solution.explanation.content_id,
@@ -263,9 +253,7 @@ class FractionInputInteractionTests(test_utils.GenericTestBase):
         self.assertEqual(
             fraction_answer_group.destination_state,
             'Number With Units')
-        self.assertEqual(
-            fraction_answer_group.labelled_as_correct,
-            False)
+        self.assertFalse(fraction_answer_group.labelled_as_correct)
         self.assertEqual(
             fraction_answer_group.feedback.content_id,
             'feedback_1')
@@ -276,12 +264,9 @@ class FractionInputInteractionTests(test_utils.GenericTestBase):
         fraction_mis_skill = (
             fraction_proto.answer_groups[0]
                 .base_answer_group.tagged_skill_misconception)
+        self.assertEqual(fraction_mis_skill.skill_id, 'skill_id')
         self.assertEqual(
-            fraction_mis_skill.skill_id,
-            'skill_id')
-        self.assertEqual(
-            fraction_mis_skill.misconception_id,
-            'misconception_id')
+            fraction_mis_skill.misconception_id, 'misconception_id')
 
         fraction_answer_group = fraction_proto.answer_groups[0]
         fraction_rule_specs = (
@@ -296,9 +281,7 @@ class FractionInputInteractionTests(test_utils.GenericTestBase):
         self.assertEqual(
             fraction_rule_specs.input.whole_number,
             0)
-        self.assertEqual(
-            fraction_rule_specs.input.is_negative,
-            False)
+        self.assertFalse(fraction_rule_specs.input.is_negative)
 
         fraction_rule_specs = (
             fraction_answer_group.rule_specs[1].is_equivalent_to)
@@ -311,9 +294,7 @@ class FractionInputInteractionTests(test_utils.GenericTestBase):
         self.assertEqual(
             fraction_rule_specs.input.whole_number,
             0)
-        self.assertEqual(
-            fraction_rule_specs.input.is_negative,
-            False)
+        self.assertFalse(fraction_rule_specs.input.is_negative)
 
         fraction_rule_specs = (
             fraction_answer_group.rule_specs[2]
@@ -327,9 +308,7 @@ class FractionInputInteractionTests(test_utils.GenericTestBase):
         self.assertEqual(
             fraction_rule_specs.input.whole_number,
             0)
-        self.assertEqual(
-            fraction_rule_specs.input.is_negative,
-            False)
+        self.assertFalse(fraction_rule_specs.input.is_negative)
 
         fraction_rule_specs = (
             fraction_answer_group.rule_specs[3].is_less_than)
@@ -342,9 +321,7 @@ class FractionInputInteractionTests(test_utils.GenericTestBase):
         self.assertEqual(
             fraction_rule_specs.input.whole_number,
             0)
-        self.assertEqual(
-            fraction_rule_specs.input.is_negative,
-            False)
+        self.assertFalse(fraction_rule_specs.input.is_negative)
 
         fraction_rule_specs = (
             fraction_answer_group.rule_specs[4].is_greater_than)
@@ -357,9 +334,7 @@ class FractionInputInteractionTests(test_utils.GenericTestBase):
         self.assertEqual(
             fraction_rule_specs.input.whole_number,
             0)
-        self.assertEqual(
-            fraction_rule_specs.input.is_negative,
-            False)
+        self.assertFalse(fraction_rule_specs.input.is_negative)
 
         self.assertEqual(
             fraction_answer_group.rule_specs[5]
@@ -388,6 +363,4 @@ class FractionInputInteractionTests(test_utils.GenericTestBase):
         self.assertEqual(
             fraction_rule_specs.input.whole_number,
             0)
-        self.assertEqual(
-            fraction_rule_specs.input.is_negative,
-            False)
+        self.assertFalse(fraction_rule_specs.input.is_negative)

@@ -132,9 +132,7 @@ class ImageClickInputInteractionTests(test_utils.GenericTestBase):
         self.assertEqual(
             image_input_answer_group.destination_state,
             'Image Region')
-        self.assertEqual(
-            image_input_answer_group.labelled_as_correct,
-            False)
+        self.assertFalse(image_input_answer_group.labelled_as_correct)
         self.assertEqual(
             image_input_answer_group.feedback.content_id,
             'feedback_1')

@@ -86,8 +86,7 @@ class RatioExpressionInput(base.BaseInteraction):
             RatioExpressionInputInstance. The proto object.
         """
         customization_args_proto = (
-            cls._to_customization_args_proto(
-                customization_args)
+            cls._to_customization_args_proto(customization_args)
         )
         outcome_proto = default_outcome.to_proto()
         hints_proto_list = cls.get_hint_proto(cls, hints)
@@ -116,17 +115,16 @@ class RatioExpressionInput(base.BaseInteraction):
             list. The AnswerGroup proto object list.
         """
         answer_group_list_proto = []
-
         for answer_group in answer_groups:
             base_answer_group_proto = answer_group.to_proto()
             rules_spec_proto = cls._to_rule_specs_proto(
                 answer_group.rule_specs)
-            answer_group_proto = (
+            answer_group_list_proto.append(
                 state_pb2.RatioExpressionInputInstance.AnswerGroup(
                     base_answer_group=base_answer_group_proto,
-                    rule_specs=rules_spec_proto)
+                    rule_specs=rules_spec_proto
                 )
-            answer_group_list_proto.append(answer_group_proto)
+            )
 
         return answer_group_list_proto
 
@@ -141,7 +139,6 @@ class RatioExpressionInput(base.BaseInteraction):
             list. The RuleSpec proto object list.
         """
         rule_specs_list_proto = []
-        rules_specs_proto = {}
 
         rule_type_to_proto_fun_mapping = {
             'Equals': cls._to_ratio_equals_to_proto,
@@ -151,7 +148,7 @@ class RatioExpressionInput(base.BaseInteraction):
             'HasSpecificTermEqualTo': (
                 cls._to_ratio_has_specific_terms_equal_to_proto)
         }
-        rule_typ_to_proto_mapping = {
+        rule_type_to_proto_mapping = {
             'Equals': lambda x: (
                 state_pb2.RatioExpressionInputInstance.RuleSpec(
                     equals=x)),
@@ -173,10 +170,9 @@ class RatioExpressionInput(base.BaseInteraction):
                     rule_spec.inputs['x']
                 )
             )
-            rules_specs_proto = (
-                rule_typ_to_proto_mapping[rule_type](rule_proto)
+            rule_specs_list_proto.append(
+                rule_type_to_proto_mapping[rule_type](rule_proto)
             )
-            rule_specs_list_proto.append(rules_specs_proto)
 
         return rule_specs_list_proto
 
@@ -190,7 +186,9 @@ class RatioExpressionInput(base.BaseInteraction):
         Returns:
             EqualsSpec. The proto object.
         """
-        return state_pb2.RatioExpressionInputInstance.RuleSpec.EqualsSpec(
+        ratio_rule_spec = state_pb2.RatioExpressionInputInstance.RuleSpec
+
+        return ratio_rule_spec.EqualsSpec(
             input=cls._to_ratio_expression_proto(ratio)
         )
 
@@ -204,7 +202,9 @@ class RatioExpressionInput(base.BaseInteraction):
         Returns:
             IsEquivalentSpec. The proto object.
         """
-        return state_pb2.RatioExpressionInputInstance.RuleSpec.IsEquivalentSpec(
+        ratio_rule_spec = state_pb2.RatioExpressionInputInstance.RuleSpec
+
+        return ratio_rule_spec.IsEquivalentSpec(
             input=cls._to_ratio_expression_proto(ratio)
         )
 
@@ -218,7 +218,9 @@ class RatioExpressionInput(base.BaseInteraction):
         Returns:
             HasNumberOfTermsEqualToSpec. The proto object.
         """
-        return state_pb2.RatioExpressionInputInstance.RuleSpec.HasNumberOfTermsEqualToSpec( # pylint: disable=line-too-long
+        ratio_rule_spec = state_pb2.RatioExpressionInputInstance.RuleSpec
+
+        return ratio_rule_spec.HasNumberOfTermsEqualToSpec(
             input_term_count=input_term_count
         )
 
@@ -234,7 +236,9 @@ class RatioExpressionInput(base.BaseInteraction):
         Returns:
             HasSpecificTermEqualToSpec. The proto object.
         """
-        return state_pb2.RatioExpressionInputInstance.RuleSpec.HasSpecificTermEqualToSpec( # pylint: disable=line-too-long
+        ratio_rule_spec = state_pb2.RatioExpressionInputInstance.RuleSpec
+
+        return ratio_rule_spec.HasSpecificTermEqualToSpec(
             input_term_index=input_dict[0],
             input_expected_term_value=input_dict[1]
         )
@@ -251,7 +255,7 @@ class RatioExpressionInput(base.BaseInteraction):
         Returns:
             Solution. The proto object.
         """
-        solution_proto = None
+        solution_proto = {}
         if solution is not None:
             solution_proto = (
                 state_pb2.RatioExpressionInputInstance.Solution(
@@ -275,13 +279,8 @@ class RatioExpressionInput(base.BaseInteraction):
         Returns:
             RatioExpression. The proto object.
         """
-        ratio_list_proto = []
-
-        for ratio in ratio_list:
-            ratio_list_proto.append(ratio)
-
         return objects_pb2.RatioExpression(
-            components=ratio_list_proto
+            components=list(ratio_list)
         )
 
     @classmethod

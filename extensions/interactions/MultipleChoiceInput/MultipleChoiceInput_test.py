@@ -122,9 +122,7 @@ class MultipleChoiceInputInteractionTests(test_utils.GenericTestBase):
         self.assertEqual(
             mutliple_choice_default_outcome.destination_state,
             'abc')
-        self.assertEqual(
-            mutliple_choice_default_outcome.labelled_as_correct,
-            False)
+        self.assertFalse(mutliple_choice_default_outcome.labelled_as_correct)
         self.assertEqual(
             mutliple_choice_default_outcome.feedback.content_id,
             'feedback_1')

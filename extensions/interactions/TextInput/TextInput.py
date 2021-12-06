@@ -115,8 +115,7 @@ class TextInput(base.BaseInteraction):
         outcome_proto = default_outcome.to_proto()
         hints_proto_list = cls.get_hint_proto(cls, hints)
         solution_proto = cls._to_solution_proto(solution)
-        answer_groups_proto = cls._to_answer_groups_proto(
-            answer_groups)
+        answer_groups_proto = cls._to_answer_groups_proto(answer_groups)
 
         return state_pb2.TextInputInstance(
             customization_args=customization_args_proto,
@@ -139,16 +138,17 @@ class TextInput(base.BaseInteraction):
             list. The AnswerGroup proto object list.
         """
         answer_group_list_proto = []
-
         for answer_group in answer_groups:
             base_answer_group_proto = answer_group.to_proto()
             rules_spec_proto = cls._to_text_input_rule_specs_proto(
                 answer_group.rule_specs)
-            answer_group_proto = state_pb2.TextInputInstance.AnswerGroup(
-                base_answer_group=base_answer_group_proto,
-                rule_specs=rules_spec_proto
+            answer_group_list_proto.append(
+                state_pb2.TextInputInstance.AnswerGroup(
+                    base_answer_group=base_answer_group_proto,
+                    rule_specs=rules_spec_proto
+                )
             )
-            answer_group_list_proto.append(answer_group_proto)
+
         return answer_group_list_proto
 
     @classmethod
@@ -162,7 +162,6 @@ class TextInput(base.BaseInteraction):
             list. The RuleSpec proto object list.
         """
         rule_specs_list_proto = []
-        rules_specs_proto = {}
 
         rule_type_to_proto_func_mapping = {
             'Equals': cls._to_equal_to_proto,
@@ -193,10 +192,9 @@ class TextInput(base.BaseInteraction):
                     rule_spec.inputs['x']
                 )
             )
-            rules_specs_proto = (
+            rule_specs_list_proto.append(
                 rule_type_to_proto_mapping[rule_type](rule_proto)
             )
-            rule_specs_list_proto.append(rules_specs_proto)
 
         return rule_specs_list_proto
 
@@ -210,8 +208,11 @@ class TextInput(base.BaseInteraction):
         Returns:
             EqualsSpec. The proto object.
         """
-        return state_pb2.TextInputInstance.RuleSpec.EqualsSpec( # pylint: disable=line-too-long
-            input=cls._to_translatable_normalized_string_set(input_dict) # pylint: disable=line-too-long
+        text_rule_spec = state_pb2.TextInputInstance.RuleSpec
+
+        return text_rule_spec.EqualsSpec(
+            input=cls._to_translatable_normalized_string_set(
+                input_dict)
         )
 
     @classmethod
@@ -224,8 +225,11 @@ class TextInput(base.BaseInteraction):
         Returns:
             StartsWithSpec. The proto object.
         """
-        return state_pb2.TextInputInstance.RuleSpec.StartsWithSpec( # pylint: disable=line-too-long
-            input=cls._to_translatable_normalized_string_set(input_dict) # pylint: disable=line-too-long
+        text_rule_spec = state_pb2.TextInputInstance.RuleSpec
+
+        return text_rule_spec.StartsWithSpec(
+            input=cls._to_translatable_normalized_string_set(
+                input_dict)
         )
 
     @classmethod
@@ -238,8 +242,11 @@ class TextInput(base.BaseInteraction):
         Returns:
             ContainsSpec. The proto object.
         """
-        return state_pb2.TextInputInstance.RuleSpec.ContainsSpec( # pylint: disable=line-too-long
-            input=cls._to_translatable_normalized_string_set(input_dict) # pylint: disable=line-too-long
+        text_rule_spec = state_pb2.TextInputInstance.RuleSpec
+
+        return text_rule_spec.ContainsSpec(
+            input=cls._to_translatable_normalized_string_set(
+                input_dict)
         )
 
     @classmethod
@@ -252,8 +259,11 @@ class TextInput(base.BaseInteraction):
         Returns:
             FuzzyEqualsSpec. The proto object.
         """
-        return state_pb2.TextInputInstance.RuleSpec.FuzzyEqualsSpec( # pylint: disable=line-too-long
-            input=cls._to_translatable_normalized_string_set(input_dict) # pylint: disable=line-too-long
+        text_rule_spec = state_pb2.TextInputInstance.RuleSpec
+
+        return text_rule_spec.FuzzyEqualsSpec(
+            input=cls._to_translatable_normalized_string_set(
+                input_dict)
         )
 
     @classmethod
@@ -268,10 +278,7 @@ class TextInput(base.BaseInteraction):
         Returns:
             TranslatableHtmlContentId. The proto object.
         """
-        normalized_strings_set = []
-
-        for item in input_dict['normalizedStrSet']:
-            normalized_strings_set.append(item)
+        normalized_strings_set = list(input_dict['normalizedStrSet'])
 
         return objects_pb2.TranslatableSetOfNormalizedString(
             content_id=input_dict['contentId'],
@@ -290,7 +297,7 @@ class TextInput(base.BaseInteraction):
         Returns:
             Solution. The proto object.
         """
-        solution_proto = None
+        solution_proto = {}
         if solution is not None:
             solution_proto = state_pb2.TextInputInstance.Solution(
                 base_solution=solution.to_proto(),

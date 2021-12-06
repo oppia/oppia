@@ -99,13 +99,11 @@ class MultipleChoiceInput(base.BaseInteraction):
             MultipleChoiceInputInstance. The proto object.
         """
         customization_args_proto = (
-            cls._to_customization_args_proto(
-                customization_args)
+            cls._to_customization_args_proto(customization_args)
         )
         outcome_proto = default_outcome.to_proto()
         hints_proto_list = cls.get_hint_proto(cls, hints)
-        answer_groups_proto = cls._to_answer_groups_proto(
-            answer_groups)
+        answer_groups_proto = cls._to_answer_groups_proto(answer_groups)
 
         return state_pb2.MultipleChoiceInputInstance(
             customization_args=customization_args_proto,
@@ -149,18 +147,16 @@ class MultipleChoiceInput(base.BaseInteraction):
             list. The AnswerGroup proto object list.
         """
         answer_group_list_proto = []
-
         for answer_group in answer_groups:
             base_answer_group_proto = answer_group.to_proto()
             rules_spec_proto = cls._to_multiple_input_specs_proto(
                 answer_group.rule_specs)
-            answer_group_proto = (
+            answer_group_list_proto.append(
                 state_pb2.MultipleChoiceInputInstance.AnswerGroup(
                     base_answer_group=base_answer_group_proto,
                     rule_specs=rules_spec_proto
                 )
             )
-            answer_group_list_proto.append(answer_group_proto)
 
         return answer_group_list_proto
 
@@ -175,7 +171,6 @@ class MultipleChoiceInput(base.BaseInteraction):
             list. The RuleSpec proto object list.
         """
         rule_specs_list_proto = []
-        rules_specs_proto = {}
 
         rule_type_to_proto_func_mapping = {
             'Equals': cls._to_equal_to_proto
@@ -193,10 +188,9 @@ class MultipleChoiceInput(base.BaseInteraction):
                     rule_spec.inputs['x']
                 )
             )
-            rules_specs_proto = (
+            rule_specs_list_proto.append(
                 rule_type_to_proto_mapping[rule_type](rule_proto)
             )
-            rule_specs_list_proto.append(rules_specs_proto)
 
         return rule_specs_list_proto
 

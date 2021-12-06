@@ -100,16 +100,13 @@ class DragAndDropSortInput(base.BaseInteraction):
             DragAndDropSortInputInstance. The proto object.
         """
         customization_args_proto = (
-            cls._to_customization_args_proto(
-                customization_args)
+            cls._to_customization_args_proto(customization_args)
         )
         outcome_proto = default_outcome.to_proto()
         hints_proto_list = cls.get_hint_proto(cls, hints)
-        solution_proto = cls._to_solution_proto(
-            solution)
+        solution_proto = cls._to_solution_proto(solution)
         answer_groups_proto = (
-            cls._to_answer_groups_proto(
-                answer_groups)
+            cls._to_answer_groups_proto(answer_groups)
         )
 
         return state_pb2.DragAndDropSortInputInstance(
@@ -135,15 +132,13 @@ class DragAndDropSortInput(base.BaseInteraction):
         answer_group_list_proto = []
         for answer_group in answer_groups:
             base_answer_group_proto = answer_group.to_proto()
-            rules_spec_proto = cls._to_rule_specs_proto(
-                answer_group.rule_specs)
-            answer_group_proto = (
+            rules_spec_proto = cls._to_rule_specs_proto(answer_group.rule_specs)
+            answer_group_list_proto.append(
                 state_pb2.DragAndDropSortInputInstance.AnswerGroup(
                     base_answer_group=base_answer_group_proto,
                     rule_specs=rules_spec_proto
                 )
             )
-            answer_group_list_proto.append(answer_group_proto)
 
         return answer_group_list_proto
 
@@ -158,16 +153,13 @@ class DragAndDropSortInput(base.BaseInteraction):
             list. The RuleSpec proto object list.
         """
         rule_specs_list_proto = []
-        rules_specs_proto = {}
 
         rule_type_to_proto_func_mapping = {
             'IsEqualToOrdering': cls._to_equal_to_proto,
             'IsEqualToOrderingWithOneItemAtIncorrectPosition': (
                 cls._to_equal_one_incorrect_to_proto),
-            'HasElementXAtPositionY': (
-                cls._to_has_element_x_at_proto),
-            'HasElementXBeforeElementY': (
-                cls._to_has_element_x_before_proto)
+            'HasElementXAtPositionY': cls._to_has_element_x_at_proto,
+            'HasElementXBeforeElementY': cls._to_has_element_x_before_proto
         }
 
         rule_type_to_proto_mapping = {
@@ -188,14 +180,11 @@ class DragAndDropSortInput(base.BaseInteraction):
         for rule_spec in rule_specs_list:
             rule_type = rule_spec.rule_type
             rule_proto = (
-                rule_type_to_proto_func_mapping[rule_type](
-                    rule_spec.inputs
-                )
+                rule_type_to_proto_func_mapping[rule_type](rule_spec.inputs)
             )
-            rules_specs_proto = (
+            rule_specs_list_proto.append(
                 rule_type_to_proto_mapping[rule_type](rule_proto)
             )
-            rule_specs_list_proto.append(rules_specs_proto)
 
         return rule_specs_list_proto
 
@@ -209,8 +198,11 @@ class DragAndDropSortInput(base.BaseInteraction):
         Returns:
             IsEqualToOrderingSpec. The proto object.
         """
-        return state_pb2.DragAndDropSortInputInstance.RuleSpec.IsEqualToOrderingSpec( # pylint: disable=line-too-long
-            input=cls._to_list_of_set_of_translatable_html_content_ids(input_dict['x']) # pylint: disable=line-too-long
+        drag_input_rule_spec = state_pb2.DragAndDropSortInputInstance.RuleSpec
+
+        return drag_input_rule_spec.IsEqualToOrderingSpec(
+            input=cls._to_list_of_set_of_translatable_html_content_ids(
+                input_dict['x'])
         )
 
     @classmethod
@@ -225,8 +217,11 @@ class DragAndDropSortInput(base.BaseInteraction):
             IsEqualToOrderingWithOneItemAtIncorrectPositionSpec.
             The proto object.
         """
-        return state_pb2.DragAndDropSortInputInstance.RuleSpec.IsEqualToOrderingWithOneItemAtIncorrectPositionSpec( # pylint: disable=line-too-long
-            input=cls._to_list_of_set_of_translatable_html_content_ids(input_dict['x']) # pylint: disable=line-too-long
+        drag_input_rule_spec = state_pb2.DragAndDropSortInputInstance.RuleSpec
+
+        return drag_input_rule_spec.IsEqualToOrderingWithOneItemAtIncorrectPositionSpec( # pylint: disable=line-too-long
+            input=cls._to_list_of_set_of_translatable_html_content_ids(
+                input_dict['x'])
         )
 
     @classmethod
@@ -239,8 +234,11 @@ class DragAndDropSortInput(base.BaseInteraction):
         Returns:
             IsEqualToOrderingSpec. The proto object.
         """
-        return state_pb2.DragAndDropSortInputInstance.RuleSpec.HasElementXAtPositionYSpec( # pylint: disable=line-too-long
-            element=cls._to_translatable_html_content_id_proto(input_dict['x']), # pylint: disable=line-too-long
+        drag_input_rule_spec = state_pb2.DragAndDropSortInputInstance.RuleSpec
+
+        return drag_input_rule_spec.HasElementXAtPositionYSpec(
+            element=cls._to_translatable_html_content_id_proto(
+                input_dict['x']),
             position=input_dict['y']
         )
 
@@ -254,9 +252,13 @@ class DragAndDropSortInput(base.BaseInteraction):
         Returns:
             IsEqualToOrderingSpec. The proto object.
         """
-        return state_pb2.DragAndDropSortInputInstance.RuleSpec.HasElementXBeforeElementYSpec( # pylint: disable=line-too-long
-            considered_element=cls._to_translatable_html_content_id_proto(input_dict['x']), # pylint: disable=line-too-long
-            later_element=cls._to_translatable_html_content_id_proto(input_dict['y']) # pylint: disable=line-too-long
+        drag_input_rule_spec = state_pb2.DragAndDropSortInputInstance.RuleSpec
+
+        return drag_input_rule_spec.HasElementXBeforeElementYSpec(
+            considered_element=cls._to_translatable_html_content_id_proto(
+                input_dict['x']),
+            later_element=cls._to_translatable_html_content_id_proto(
+                input_dict['y'])
         )
 
     @classmethod
@@ -271,7 +273,7 @@ class DragAndDropSortInput(base.BaseInteraction):
         Returns:
             Solution. The proto object.
         """
-        solution_proto = None
+        solution_proto = {}
         if solution is not None:
             solution_proto = (
                 state_pb2.DragAndDropSortInputInstance.Solution(
@@ -298,13 +300,11 @@ class DragAndDropSortInput(base.BaseInteraction):
         Returns:
             ListOfSetsOfTranslatableHtmlContentIds. The proto object.
         """
-        content_id_lists_proto = []
-        for set_of_content_id in correct_answer:
-            translatable_html_content_id_proto = (
-                cls._to_set_of_translatable_html_content_ids_proto(
-                    set_of_content_id)
-            )
-            content_id_lists_proto.append(translatable_html_content_id_proto)
+        content_id_lists_proto = [
+            cls._to_set_of_translatable_html_content_ids_proto(
+                set_of_content_id
+            ) for set_of_content_id in correct_answer
+        ]
 
         return objects_pb2.ListOfSetsOfTranslatableHtmlContentIds(
             content_id_sets=content_id_lists_proto
@@ -321,13 +321,11 @@ class DragAndDropSortInput(base.BaseInteraction):
         Returns:
             SetOfTranslatableHtmlContentIds. The proto object.
         """
-        content_id_lists_proto = []
-        for translatable_html_content_id in set_of_content_id:
-            translatable_html_content_id_proto = (
-                cls._to_translatable_html_content_id_proto(
-                    translatable_html_content_id)
-            )
-            content_id_lists_proto.append(translatable_html_content_id_proto)
+        content_id_lists_proto = [
+            cls._to_translatable_html_content_id_proto(
+                translatable_html_content_id
+            ) for translatable_html_content_id in set_of_content_id
+        ]
 
         return objects_pb2.SetOfTranslatableHtmlContentIds(
             content_ids=content_id_lists_proto

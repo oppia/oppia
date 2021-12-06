@@ -67,9 +67,7 @@ class Continue(base.BaseInteraction):
         """
         outcome_proto = default_outcome.to_proto()
         customization_args_proto = (
-            cls._to_customization_args_proto(
-                customization_args
-            )
+            cls._to_customization_args_proto(customization_args)
         )
 
         return state_pb2.ContinueInstance(

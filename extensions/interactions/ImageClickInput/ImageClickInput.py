@@ -87,13 +87,11 @@ class ImageClickInput(base.BaseInteraction):
             ImageClickInputInstance. The proto object.
         """
         customization_args_proto = (
-            cls._to_customization_args_proto(
-                customization_args)
+            cls._to_customization_args_proto(customization_args)
         )
         outcome_proto = default_outcome.to_proto()
         hints_proto_list = cls.get_hint_proto(cls, hints)
-        answer_groups_proto = cls._to_answer_groups_proto(
-            answer_groups)
+        answer_groups_proto = cls._to_answer_groups_proto(answer_groups)
 
         return state_pb2.ImageClickInputInstance(
             customization_args=customization_args_proto,
@@ -105,7 +103,7 @@ class ImageClickInput(base.BaseInteraction):
     @classmethod
     def _to_answer_groups_proto(cls, answer_groups):
         """Creates a AnswerGroup proto object
-            for ImageClickInputInstance.
+        for ImageClickInputInstance.
 
         Args:
             answer_groups: list(AnswerGroup). List of answer groups of the
@@ -115,16 +113,15 @@ class ImageClickInput(base.BaseInteraction):
             list. The AnswerGroup proto object list.
         """
         answer_group_list_proto = []
-
         for answer_group in answer_groups:
             base_answer_group_proto = answer_group.to_proto()
-            rules_spec_proto = cls._to_rule_specs_proto(
-                answer_group.rule_specs)
-            answer_group_proto = state_pb2.ImageClickInputInstance.AnswerGroup(
-                base_answer_group=base_answer_group_proto,
-                rule_specs=rules_spec_proto
+            rules_spec_proto = cls._to_rule_specs_proto(answer_group.rule_specs)
+            answer_group_list_proto.append(
+                state_pb2.ImageClickInputInstance.AnswerGroup(
+                    base_answer_group=base_answer_group_proto,
+                    rule_specs=rules_spec_proto
+                )
             )
-            answer_group_list_proto.append(answer_group_proto)
 
         return answer_group_list_proto
 
@@ -139,17 +136,26 @@ class ImageClickInput(base.BaseInteraction):
             list. The RuleSpec proto object list.
         """
         rule_specs_list_proto = []
-        rules_specs_proto = {}
+
+        rule_type_to_proto_func_mapping = {
+            'IsInRegion': cls._to_is_in_image_region_proto
+        }
+        rule_type_to_proto_mapping = {
+            'IsInRegion': lambda x: (
+                state_pb2.ImageClickInputInstance.RuleSpec(
+                    is_in_region=x))
+        }
 
         for rule_spec in rule_specs_list:
             rule_type = rule_spec.rule_type
-            if rule_type == 'IsInRegion':
-                is_in_region_proto = cls._to_is_in_image_region_proto(
-                    rule_spec.inputs['x'])
-                rules_specs_proto = state_pb2.ImageClickInputInstance.RuleSpec(
-                    is_in_region=is_in_region_proto)
-
-            rule_specs_list_proto.append(rules_specs_proto)
+            rule_proto = (
+                rule_type_to_proto_func_mapping[rule_type](
+                    rule_spec.inputs['x']
+                )
+            )
+            rule_specs_list_proto.append(
+                rule_type_to_proto_mapping[rule_type](rule_proto)
+            )
 
         return rule_specs_list_proto
 
@@ -165,7 +171,7 @@ class ImageClickInput(base.BaseInteraction):
         """
         return state_pb2.ImageClickInputInstance.RuleSpec.IsInRegionSpec(
             input_region=is_in_region
-    )
+        )
 
     @classmethod
     def _to_customization_args_proto(cls, customization_args):
@@ -220,13 +226,13 @@ class ImageClickInput(base.BaseInteraction):
             list. The LabeledRegion proto object list.
         """
         labeled_regions_list_proto = []
-
         for labeled_regions in labeled_regions_list:
-            labeled_region_proto = cls._to_labeled_region_proto(
-                labeled_regions['label'],
-                labeled_regions['region']['area'])
-
-            labeled_regions_list_proto.append(labeled_region_proto)
+            labeled_regions_list_proto.append(
+                cls._to_labeled_region_proto(
+                    labeled_regions['label'],
+                    labeled_regions['region']['area']
+                )
+            )
 
         return labeled_regions_list_proto
 

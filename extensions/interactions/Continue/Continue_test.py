@@ -60,6 +60,7 @@ class ContinueInteractionTests(test_utils.GenericTestBase):
         continue_proto = continue_instance.to_proto(
             interaction_domain.default_outcome,
             interaction_domain.customization_args)
+
         self.assertEqual(
             continue_proto.customization_args.button_text.content_id,
             'ca_placeholder_0')
@@ -69,9 +70,7 @@ class ContinueInteractionTests(test_utils.GenericTestBase):
         self.assertEqual(
             continue_proto.default_outcome.destination_state,
             'end_state_name')
-        self.assertEqual(
-            continue_proto.default_outcome.labelled_as_correct,
-            False)
+        self.assertFalse(continue_proto.default_outcome.labelled_as_correct)
         self.assertEqual(
             continue_proto.default_outcome.feedback.content_id,
             'default_outcome')

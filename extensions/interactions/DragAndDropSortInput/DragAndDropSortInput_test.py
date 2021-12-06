@@ -130,9 +130,7 @@ class DragAndDropSortInputInteractionTests(test_utils.GenericTestBase):
         self.assertEqual(
             drag_and_drop_proto.default_outcome.feedback.text,
             'Correct Answer')
-        self.assertEqual(
-            drag_and_drop_proto.default_outcome.labelled_as_correct,
-            True)
+        self.assertTrue(drag_and_drop_proto.default_outcome.labelled_as_correct)
 
         self.assertEqual(
             drag_and_drop_proto.hints[0].hint_content.content_id,
