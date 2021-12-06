@@ -5702,7 +5702,7 @@ title: Old Title
 
         updated_exploration = exp_fetchers.get_exploration_by_id(
             self.NEW_EXP_ID)
-        self.assertEqual(updated_exploration.proto_size_in_bytes, 302)
+        self.assertEqual(updated_exploration.proto_size_in_bytes, 308)
 
     def test_update_exploration_param_changes(self):
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
