@@ -18,19 +18,11 @@
 
 from __future__ import annotations
 
-import os
 import tempfile
 
 from core.tests import test_utils
 
 from . import extend_index_yaml
-
-INDEX_YAML_TEST_DIR = os.path.join('core', 'tests', 'data', '')
-
-MOCK_INDEX_YAML_PATH = os.path.join(
-    INDEX_YAML_TEST_DIR, 'index.yaml')
-MOCK_WEB_INF_INDEX_YAML_PATH = os.path.join(
-    INDEX_YAML_TEST_DIR, 'web-inf-index.yaml')
 
 
 class ExtendIndexYamlTest(test_utils.GenericTestBase):
@@ -305,7 +297,7 @@ class ExtendIndexYamlTest(test_utils.GenericTestBase):
                 actual_index_yaml = f.read()
             self.assertEqual(actual_index_yaml, expected_index_yaml)
 
-    def test_extend_index_yaml_with_same_kind_in_web_inf(self):
+    def test_extend_index_yaml_with_same_kind_different_order(self):
         index_yaml = """indexes:
 
 - kind: AppFeedbackReportModel
