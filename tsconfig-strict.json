@@ -216,6 +216,8 @@
     "core/templates/domain/skill/rubric.model.ts",
     "core/templates/domain/skill/short-skill-summary.model.ts",
     "core/templates/domain/skill/short-skill-summary.model.spec.ts",
+    "core/templates/domain/skill/skill-backend-api.service.ts",
+    "core/templates/domain/skill/skill-backend-api.service.spec.ts",
     "core/templates/domain/skill/skill-creation-backend-api.service.ts",
     "core/templates/domain/skill/skill-creation-backend-api.service.spec.ts",
     "core/templates/domain/skill/skill-domain.constants.ts",
