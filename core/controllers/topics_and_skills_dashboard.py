@@ -395,6 +395,19 @@ class NewSkillHandler(base.BaseHandler):
                         'object_class': skill_domain.Rubric
                     }
                 }
+            },
+            'image': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'thumbnail_filename': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_valid_filename'
+                    }]
+                }
             }
         }
     }
