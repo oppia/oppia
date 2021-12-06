@@ -485,7 +485,7 @@ export class StateGraphLayoutService {
     return nodeData;
   }
 
-  // It is expected to return null if we haven't executed the 
+  // It is expected to return null if we haven't executed the
   // computeLayout() function.
   getLastComputedArrangement(): NodeDataDict | null {
     return cloneDeep(this.lastComputedArrangement);
@@ -522,7 +522,7 @@ export class StateGraphLayoutService {
   }
 
   /* We are expecting it to return undefined when
-     State1.xLabel === State2.xLabel and State1.yLabel === State2.yLabel 
+     State1.xLabel === State2.xLabel and State1.yLabel === State2.yLabel
      where State1 and State2 refers to objects inside nodeData. */
   getAugmentedLinks(
       nodeData: NodeDataDict,
