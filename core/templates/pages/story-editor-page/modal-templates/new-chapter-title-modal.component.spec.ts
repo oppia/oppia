@@ -18,7 +18,7 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, flushMicrotasks, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ExplorationIdValidationService } from 'domain/exploration/exploration-id-validation.service';
 import { EditableStoryBackendApiService } from 'domain/story/editable-story-backend-api.service';
@@ -202,15 +202,12 @@ describe('Create New Chapter Modal Component', function() {
     fakeAsync(() => {
       spyOn(ngbActiveModal, 'close');
       componentInstance.nodeTitles = ['title 1', 'title 2', 'title 3'];
-      componentInstance.title = 'title 1';
       spyOn(storyEditorStateService, 'isStoryPublished').and.returnValue(true);
       spyOn(explorationIdValidationService, 'isExpPublishedAsync')
-        .and.resolveTo(true);
-      let storyUpdateSpy = spyOn(
-        storyUpdateService, 'setStoryNodeExplorationId');
+        .and.returnValue(Promise.resolve(true));
       componentInstance.save();
       tick();
-      expect(storyUpdateSpy).toHaveBeenCalled();
+      flushMicrotasks();
       expect(ngbActiveModal.close).toHaveBeenCalled();
     }));
 
