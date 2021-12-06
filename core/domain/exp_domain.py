@@ -2379,11 +2379,11 @@ class Exploration:
         """
         exp_dict = self.to_dict()
         exp_dict['schema_version'] = self.CURRENT_EXP_SCHEMA_VERSION
-        exp_dict['proto_size_in_bytes'] = self.get_proto_size()
 
         # The ID is the only property which should not be stored within the
         # YAML representation.
         del exp_dict['id']
+        del exp_dict['proto_size_in_bytes']
 
         return python_utils.yaml_from_dict(exp_dict)
 

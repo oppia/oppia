@@ -5276,7 +5276,6 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-proto_size_in_bytes: 300
 schema_version: 55
 states:
   (untitled state):
@@ -5530,7 +5529,6 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-proto_size_in_bytes: 386
 schema_version: 55
 states:
   (untitled state):
@@ -5756,7 +5754,6 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-proto_size_in_bytes: 228
 schema_version: 55
 states:
   (untitled state):

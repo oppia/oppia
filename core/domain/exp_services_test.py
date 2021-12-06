@@ -1842,7 +1842,6 @@ language_code: en
 objective: The objective
 param_changes: []
 param_specs: {}
-proto_size_in_bytes: %d
 schema_version: %d
 states:
   %s:
@@ -1933,7 +1932,7 @@ states_schema_version: %d
 tags: []
 title: A title
 """ % (
-    feconf.DEFAULT_INIT_STATE_NAME, 406,
+    feconf.DEFAULT_INIT_STATE_NAME,
     exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
     feconf.DEFAULT_INIT_STATE_NAME,
     feconf.DEFAULT_INIT_STATE_NAME,
@@ -1951,7 +1950,6 @@ language_code: en
 objective: The objective
 param_changes: []
 param_specs: {}
-proto_size_in_bytes: %d
 schema_version: %d
 states:
   %s:
@@ -2042,7 +2040,7 @@ states_schema_version: %d
 tags: []
 title: A title
 """ % (
-    feconf.DEFAULT_INIT_STATE_NAME, 414,
+    feconf.DEFAULT_INIT_STATE_NAME,
     exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
     feconf.DEFAULT_INIT_STATE_NAME,
     feconf.DEFAULT_INIT_STATE_NAME,
