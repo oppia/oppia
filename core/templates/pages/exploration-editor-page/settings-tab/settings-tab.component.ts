@@ -165,7 +165,9 @@ angular.module('oppia').component('settingsTab', {
           controller: 'ReassignRoleConfirmationModalController'
         }).result.then(function() {
           ExplorationRightsService.saveRoleChanges(
-            username, newRole);
+            username, newRole).then(() => {
+            $rootScope.$applyAsync();
+          });
           ctrl.closeRolesForm();
         }, () => {
           // Note to developers:
@@ -321,7 +323,9 @@ angular.module('oppia').component('settingsTab', {
         if (!ExplorationRightsService.checkUserAlreadyHasRoles(
           newMemberUsername)) {
           ExplorationRightsService.saveRoleChanges(
-            newMemberUsername, newMemberRole);
+            newMemberUsername, newMemberRole).then(() => {
+            $rootScope.$applyAsync();
+          });
           ctrl.closeRolesForm();
           return;
         }
@@ -356,7 +360,9 @@ angular.module('oppia').component('settingsTab', {
 
       ctrl.editVoiseArtist = function(newVoiceArtistUsername) {
         ExplorationRightsService.assignVoiceArtistRoleAsync(
-          newVoiceArtistUsername);
+          newVoiceArtistUsername).then(() => {
+          $rootScope.$applyAsync();
+        });
         ctrl.closeVoiceoverForm();
         return;
       };
@@ -376,7 +382,9 @@ angular.module('oppia').component('settingsTab', {
           controller: 'RemoveRoleConfirmationModalController'
         }).result.then(function() {
           ExplorationRightsService.removeVoiceArtistRoleAsync(
-            voiceArtistUsername);
+            voiceArtistUsername).then(() => {
+            $rootScope.$applyAsync();
+          });
           ctrl.closeVoiceoverForm();
         }, () => {
           // Note to developers:

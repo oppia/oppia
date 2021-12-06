@@ -16,32 +16,36 @@
  * @fileoverview Unit tests for the ExplorationCategoryService.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
-// ^^^ This block is to be removed.
+import { TestBed } from '@angular/core/testing';
+import { ExplorationCategoryService } from './exploration-category.service';
+import { ExplorationPropertyService } from './exploration-property.service';
+import { ExplorationRightsService } from './exploration-rights.service';
+import { ValidatorsService } from 'services/validators.service';
+import { NormalizeWhitespacePipe } from 'filters/string-utility-filters/normalize-whitespace.pipe';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
-require(
-  'pages/exploration-editor-page/services/exploration-category.service.ts');
+describe('Exploration Category Service', () => {
+  let service: ExplorationCategoryService;
 
-describe('Exploration Category Service', function() {
-  let ecs = null;
-
-  beforeEach(function() {
-    angular.mock.module('oppia');
-  });
-  importAllAngularServices();
-  beforeEach(function() {
-    angular.mock.inject(function($injector) {
-      ecs = $injector.get('ExplorationCategoryService');
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [
+        ExplorationRightsService,
+        ValidatorsService,
+        NormalizeWhitespacePipe,
+        ExplorationPropertyService
+      ]
     });
+
+    service = TestBed.inject(ExplorationCategoryService);
   });
 
-  it('should test the child object properties', function() {
-    expect(ecs.propertyName).toBe('category');
-    expect(ecs._isValid('Algorithms')).toBe(true);
+  it('should test the child object properties', () => {
+    expect(service.propertyName).toBe('category');
+    expect(service._isValid('Algorithms')).toBe(true);
     let NotNormalize = '   Exploration             Category Service     ';
     let Normalize = 'Exploration Category Service';
-    expect(ecs._normalize(NotNormalize)).toBe(Normalize);
+    expect(service._normalize(NotNormalize)).toBe(Normalize);
   });
 });
