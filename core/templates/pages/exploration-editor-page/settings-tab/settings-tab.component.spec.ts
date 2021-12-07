@@ -441,11 +441,14 @@ describe('Settings Tab Component', () => {
           result: Promise.resolve()
         } as NgbModalRef);
       });
-
+      spyOn(explorationRightsService, 'removeVoiceArtistRoleAsync')
+        .and.returnValue(Promise.resolve());
       ctrl.removeVoiceArtist('username');
       tick();
 
       expect(ngbModal.open).toHaveBeenCalled();
+      expect(explorationRightsService.removeVoiceArtistRoleAsync)
+        .toHaveBeenCalled();
     }));
 
     it('should remove voice artist when resolving remove-role-modal',
