@@ -434,6 +434,24 @@ describe('Settings Tab Component', () => {
           explorationRightsService.removeRoleAsync).not.toHaveBeenCalled();
       }));
 
+    it('should remove role when user accept remove-role-modal',
+      fakeAsync(() => {
+        spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+          return ({
+            componentInstance: NgbModalRef,
+            result: Promise.resolve()
+          } as NgbModalRef);
+        });
+        spyOn(explorationRightsService, 'removeRoleAsync')
+          .and.returnValue(Promise.resolve());
+
+        ctrl.removeRole('username1', 'editor');
+        tick();
+
+        expect(
+          explorationRightsService.removeRoleAsync).toHaveBeenCalled();
+      }));
+
     it('should open a modal when removeVoiceArtist is called', fakeAsync(() => {
       spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
         return ({
