@@ -25,6 +25,7 @@ import os
 from core.constants import constants
 
 from typing import Dict, List, Union
+from typing_extensions import TypedDict
 
 CommandType = (
     Dict[str, Union[str, List[str], Dict[str, Union[str, List[str]]]]])
@@ -111,7 +112,16 @@ LEGACY_HTML_FIELD_TYPES_TO_RULE_SPECS_EXTENSIONS_MODULE_DIR = os.path.join(
 # algorithms per interaction. Hence, whenever we find a secondary algorithm
 # candidate for any of the supported interactions, the logical functions to
 # support multiple algorithms need to be implemented.
-INTERACTION_CLASSIFIER_MAPPING: Dict[str, Dict[str, Union[str, int]]] = {
+
+
+class TextInputDict(TypedDict):
+    """A dictionary representation of TextInput vales."""
+
+    algorithm_id: str
+    algorithm_version: int
+
+
+INTERACTION_CLASSIFIER_MAPPING: Dict[str, TextInputDict] = {
     'TextInput': {
         'algorithm_id': 'TextClassifier',
         'algorithm_version': 1
