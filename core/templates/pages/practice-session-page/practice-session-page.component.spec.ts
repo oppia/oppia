@@ -87,15 +87,15 @@ describe('Practice session page', function() {
           i18nId: 'I18N_QUESTION_PLAYER_REVIEW_LOWEST_SCORED_SKILL'
         },
         {
+          type: 'DASHBOARD',
+          i18nId: 'I18N_QUESTION_PLAYER_MY_DASHBOARD',
+          url: '/learn/math/abbrev-topic'
+        },
+        {
           type: 'RETRY_SESSION',
           i18nId: 'I18N_QUESTION_PLAYER_NEW_SESSION',
           url: '/learn/math/abbrev-topic/practice/session?' +
           'selected_subtopic_ids=' + encodeURIComponent('["1","2","3","4","5"]')
-        },
-        {
-          type: 'DASHBOARD',
-          i18nId: 'I18N_QUESTION_PLAYER_MY_DASHBOARD',
-          url: '/learn/math/abbrev-topic'
         }
       ],
       skillList: ['skill_1', 'skill_2'],

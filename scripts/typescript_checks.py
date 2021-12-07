@@ -69,7 +69,7 @@ def compile_and_check_typescript(config_path):
     if os.path.exists(COMPILED_JS_DIR):
         shutil.rmtree(COMPILED_JS_DIR)
 
-    python_utils.PRINT('Compiling and testing typescript...')
+    print('Compiling and testing typescript...')
     cmd = [
         './node_modules/typescript/bin/tsc', '--project',
         config_path]
@@ -82,12 +82,12 @@ def compile_and_check_typescript(config_path):
     if os.path.exists(COMPILED_JS_DIR):
         shutil.rmtree(COMPILED_JS_DIR)
     if error_messages:
-        python_utils.PRINT('Errors found during compilation\n')
+        print('Errors found during compilation\n')
         for message in error_messages:
-            python_utils.PRINT(message, end='')
+            print(message, end='')
         sys.exit(1)
     else:
-        python_utils.PRINT('Compilation successful!')
+        print('Compilation successful!')
 
 
 def main(args=None):

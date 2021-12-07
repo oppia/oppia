@@ -42,7 +42,7 @@ interface StateData {
     newestStateName: string;
     originalStateName: string;
     stateProperty: string;
-  }
+  };
 }
 
 interface StateIds {
@@ -65,7 +65,7 @@ interface ProcessedStateIdsAndData {
 interface AdjMatrix {
   [state1: number]: {
     [state2: number]: boolean;
-  }
+  };
 }
 
 interface StateLink {

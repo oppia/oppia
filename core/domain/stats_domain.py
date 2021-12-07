@@ -875,6 +875,15 @@ class ExplorationIssue:
         self.schema_version = schema_version
         self.is_valid = is_valid
 
+    def __eq__(self, other):
+        return (
+            self.issue_type == other.issue_type and
+            self.issue_customization_args == other.issue_customization_args and
+            self.playthrough_ids == other.playthrough_ids and
+            self.schema_version == other.schema_version and
+            self.is_valid == other.is_valid
+        )
+
     def to_dict(self):
         """Returns a dict representation of the ExplorationIssue domain object.
 

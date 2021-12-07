@@ -47,7 +47,6 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 describe('History tab component', function() {
   var ctrl = null;
-  var $httpBackend = null;
   var $q = null;
   var $rootScope = null;
   var $scope = null;
@@ -57,6 +56,7 @@ describe('History tab component', function() {
   var csrfTokenService = null;
   var dateTimeFormatService = null;
   var windowRef = null;
+  var historyTabBackendApiService = null;
 
   var mockRefreshVersionHistoryEmitter = new EventEmitter();
 
@@ -131,13 +131,12 @@ describe('History tab component', function() {
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $httpBackend = $injector.get('$httpBackend');
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
     $uibModal = $injector.get('$uibModal');
     compareVersionsService = $injector.get('CompareVersionsService');
     csrfTokenService = $injector.get('CsrfTokenService');
-
+    historyTabBackendApiService = $injector.get('HistoryTabBackendApiService');
     spyOn(csrfTokenService, 'getTokenAsync')
       .and.returnValue($q.resolve('sample-csrf-token'));
     spyOn(dateTimeFormatService, 'getLocaleDateTimeHourString')
@@ -173,20 +172,19 @@ describe('History tab component', function() {
 
   it('should refresh version history when refreshVersionHistory flag is' +
     ' broadcasted and force refresh is true', function() {
-    $httpBackend.expect('GET', '/createhandler/snapshots/exp1').respond({
-      snapshots: snapshots
-    });
+    spyOn(
+      historyTabBackendApiService, 'getData')
+      .and.returnValue($q.resolve({
+        snapshots: snapshots
+      }));
+
     ctrl.refreshVersionHistory();
-    $scope.$apply();
-    $httpBackend.flush();
+    $rootScope.$apply();
 
     var data = {
       forceRefresh: true
     };
 
-    $httpBackend.expect('GET', '/createhandler/snapshots/exp1').respond({
-      snapshots: snapshots
-    });
     mockRefreshVersionHistoryEmitter.emit(data);
     $scope.$apply();
 
@@ -196,12 +194,14 @@ describe('History tab component', function() {
   });
 
   it('should compare selected versions successfully', function() {
-    $httpBackend.expect('GET', '/createhandler/snapshots/exp1').respond({
-      snapshots: snapshots
-    });
+    spyOn(
+      historyTabBackendApiService, 'getData')
+      .and.returnValue($q.resolve({
+        snapshots: snapshots
+      }));
+
     ctrl.refreshVersionHistory();
     $scope.$apply();
-    $httpBackend.flush();
 
     ctrl.changeSelectedVersions({
       committerId: 'committer_3',
@@ -262,11 +262,13 @@ describe('History tab component', function() {
       result: $q.resolve(1)
     });
 
-    $httpBackend.expectPOST('/createhandler/revert/exp1').respond(200);
-    ctrl.showRevertExplorationModal(1);
-    $scope.$apply();
-    $httpBackend.flush();
+    var spyObj = spyOn(
+      historyTabBackendApiService, 'postData'
+    ).and.returnValue($q.resolve());
 
+    ctrl.showRevertExplorationModal(1);
+    $rootScope.$apply();
+    expect(spyObj).toHaveBeenCalled();
     expect(windowRef.nativeWindow.location.reload).toHaveBeenCalled();
   });
 

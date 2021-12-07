@@ -29,6 +29,7 @@ import {
 } from 'domain/exploration/WrittenTranslationObjectFactory';
 
 export interface TranslatableItem {
+<<<<<<< HEAD
   translation: string | string[],
   status: Status,
   more: boolean
@@ -39,6 +40,16 @@ export interface TranslatableItem {
   // when interaction and ruletype is not selected.
   interactionId: string | null,
   ruleType: string | null
+=======
+  translation: string | string[];
+  status: Status;
+  text: string | string[];
+  more: boolean;
+  dataFormat: string;
+  contentType: string;
+  interactionId?: string;
+  ruleType?: string;
+>>>>>>> c57ed6420bc1467896e6410dcab4c4b66eaf528d
 }
 
 export type Status = 'pending' | 'submitted';
@@ -142,6 +153,7 @@ export class TranslateTextService {
       interactionId,
       ruleType
     }: {
+<<<<<<< HEAD
       dataFormat: string,
       contentType: string,
       // The following two properties are set to null
@@ -149,6 +161,13 @@ export class TranslateTextService {
       interactionId: string | null,
       ruleType: string | null
     } = this.stateAndContent[this.activeIndex];
+=======
+      dataFormat?: string;
+      contentType?: string;
+      interactionId?: string;
+      ruleType?: string;
+    } = this.stateAndContent[this.activeIndex] || {};
+>>>>>>> c57ed6420bc1467896e6410dcab4c4b66eaf528d
     return {
       text: text,
       more: more,
@@ -233,7 +252,7 @@ export class TranslateTextService {
   suggestTranslatedText(
       translation: string | string[], languageCode: string, imagesData:
       ImagesData[], dataFormat: string, successCallback: () => void,
-      errorCallback: () => void): void {
+      errorCallback: (reason: string) => void): void {
     this.translateTextBackedApiService.suggestTranslatedTextAsync(
       this.activeExpId,
       this.activeExpVersion,
@@ -250,7 +269,11 @@ export class TranslateTextService {
       this.stateAndContent[this.activeIndex].translation = (
         translation);
       successCallback();
-    }, errorCallback);
+    }, errorResponse => {
+      if (errorCallback) {
+        errorCallback(errorResponse.error.error);
+      }
+    });
   }
 }
 
