@@ -45,6 +45,7 @@ import { ExplorationPublishModalComponent } from 'pages/exploration-editor-page/
 import { EditorReloadingModalComponent } from './modal-templates/editor-reloading-modal.component';
 import { ConfirmDiscardChangesModalComponent } from './modal-templates/confirm-discard-changes-modal.component';
 import { CreateFeedbackThreadModalComponent } from './feedback-tab/templates/create-feedback-thread-modal.component';
+import { AddHintModalComponent } from './editor-tab/templates/modal-templates/add-hint-modal.component';
 
 @NgModule({
   imports: [
@@ -71,7 +72,8 @@ import { CreateFeedbackThreadModalComponent } from './feedback-tab/templates/cre
     ConfirmDiscardChangesModalComponent,
     ExplorationPublishModalComponent,
     EditorReloadingModalComponent,
-    CreateFeedbackThreadModalComponent
+    CreateFeedbackThreadModalComponent,
+    AddHintModalComponent
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -88,7 +90,8 @@ import { CreateFeedbackThreadModalComponent } from './feedback-tab/templates/cre
     ConfirmDiscardChangesModalComponent,
     ExplorationPublishModalComponent,
     EditorReloadingModalComponent,
-    CreateFeedbackThreadModalComponent
+    CreateFeedbackThreadModalComponent,
+    AddHintModalComponent
   ],
   providers: [
     {

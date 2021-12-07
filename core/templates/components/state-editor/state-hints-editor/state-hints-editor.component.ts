@@ -23,9 +23,6 @@ require(
 require('components/state-directives/hint-editor/hint-editor.component.ts');
 require(
   'components/state-directives/response-header/response-header.component.ts');
-require(
-  'pages/exploration-editor-page/editor-tab/templates/modal-templates/' +
-  'add-hint-modal.controller.ts');
 
 require('domain/exploration/HintObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
@@ -51,6 +48,8 @@ require('services/editability.service.ts');
 require('services/generate-content-id.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/external-save.service.ts');
+require('services/ngb-modal.service.ts');
+import { AddHintModalComponent } from "pages/exploration-editor-page/editor-tab/templates/modal-templates/add-hint-modal.component";
 
 angular.module('oppia').component('stateHintsEditor', {
   bindings: {
@@ -62,7 +61,7 @@ angular.module('oppia').component('stateHintsEditor', {
   template: require('./state-hints-editor.component.html'),
   controller: [
     '$filter', '$scope', '$uibModal', 'AlertsService',
-    'EditabilityService', 'ExternalSaveService',
+    'EditabilityService', 'ExternalSaveService', 'NgbModal',
     'StateEditorService', 'StateHintsService',
     'StateInteractionIdService', 'StateNextContentIdIndexService',
     'StateSolutionService',
@@ -70,7 +69,7 @@ angular.module('oppia').component('stateHintsEditor', {
     'INTERACTION_SPECS',
     function(
         $filter, $scope, $uibModal, AlertsService,
-        EditabilityService, ExternalSaveService,
+        EditabilityService, ExternalSaveService, NgbModal,
         StateEditorService, StateHintsService,
         StateInteractionIdService, StateNextContentIdIndexService,
         StateSolutionService,
@@ -130,14 +129,8 @@ angular.module('oppia').component('stateHintsEditor', {
         AlertsService.clearWarnings();
         ExternalSaveService.onExternalSave.emit();
 
-        $uibModal.open({
-          template: require(
-            'pages/exploration-editor-page/editor-tab/templates/' +
-            'modal-templates/add-hint-modal.template.html'),
-          backdrop: 'static',
-          resolve: {},
-          windowClass: 'add-hint-modal',
-          controller: 'AddHintModalController'
+        NgbModal.open(AddHintModalComponent, {
+          backdrop: 'static'
         }).result.then(function(result) {
           StateHintsService.displayed.push(result.hint);
           StateHintsService.saveDisplayedValue();
