@@ -513,6 +513,9 @@ describe('TopNavigationBarComponent', () => {
   it('should check if classroom data is fetched', fakeAsync(() => {
     spyOn(component, 'truncateNavbar').and.stub();
     component.CLASSROOM_PROMOS_ARE_ENABLED = true;
+    spyOn(
+      classroomBackendApiService, 'fetchClassroomPromosAreEnabledStatusAsync').
+      and.resolveTo(true);
     spyOn(accessValidationBackendApiService, 'validateAccessToClassroomPage')
       .and.returnValue(Promise.resolve());
     let array: CreatorTopicSummary[] = [];
@@ -521,7 +524,7 @@ describe('TopNavigationBarComponent', () => {
       classroomBackendApiService, 'fetchClassroomDataAsync')
       .and.resolveTo(classroomData);
 
-    component.ngAfterViewChecked();
+    component.ngOnInit();
     tick();
 
     expect(component.classroomData).toEqual(array);

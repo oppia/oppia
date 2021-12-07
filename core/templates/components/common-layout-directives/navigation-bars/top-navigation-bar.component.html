@@ -71,8 +71,8 @@
              (mouseover)="openSubmenu($event, 'learnMenu')"
              (mouseleave)="closeSubmenuIfNotMobile($event)"
              autofocus>
-            <span class="oppia-navbar-tab-content"
-                  [innerHTML]="'I18N_TOPNAV_LEARN' | translate">
+            <span class="oppia-navbar-tab-content">
+              {{ 'I18N_TOPNAV_LEARN' | translate }}
             </span>
           </a>
           <ul ngbDropdownMenu
