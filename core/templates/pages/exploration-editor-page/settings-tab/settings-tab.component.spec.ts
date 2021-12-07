@@ -723,13 +723,14 @@ describe('Settings Tab Component', () => {
     it('should open edit roles form and edit username and role', () => {
       ctrl.openEditRolesForm();
       explorationRightsService.init(
-        ['owner'], [], [], [], '', false, false, true);
+        ['owner'], [], [], [], '', '', false, true);
 
       expect(ctrl.isRolesFormOpen).toBe(true);
       expect(ctrl.newMemberUsername).toBe('');
       expect(ctrl.newMemberRole.value).toBe('owner');
 
-      spyOn(explorationRightsService, 'saveRoleChanges');
+      spyOn(explorationRightsService, 'saveRoleChanges').and.returnValue(
+        Promise.resolve());
       ctrl.editRole('Username1', 'editor');
 
       expect(explorationRightsService.saveRoleChanges).toHaveBeenCalledWith(
@@ -754,12 +755,13 @@ describe('Settings Tab Component', () => {
     it('should open voice artist edit roles form and edit username', () => {
       ctrl.openVoiceoverRolesForm();
       explorationRightsService.init(
-        ['owner'], [], [], [], '', false, false, true);
+        ['owner'], [], [], [], '', '', false, true);
 
       expect(ctrl.isVoiceoverFormOpen).toBe(true);
       expect(ctrl.newVoiceArtistUsername).toBe('');
 
-      spyOn(explorationRightsService, 'assignVoiceArtistRoleAsync');
+      spyOn(explorationRightsService, 'assignVoiceArtistRoleAsync')
+        .and.returnValue(Promise.resolve());
       ctrl.editVoiseArtist('Username1');
 
       expect(explorationRightsService.assignVoiceArtistRoleAsync)
@@ -808,6 +810,33 @@ describe('Settings Tab Component', () => {
       changeListSpy.and.returnValue(false);
       expect(ctrl.isExplorationLockedForEditing()).toBe(false);
     });
+
+    it('should check edit-modal has been open ' +
+    'when editRole function has been called', fakeAsync(() => {
+      spyOn($uibModal, 'open').and.returnValue({
+        result: Promise.resolve()
+      });
+
+      ctrl.openEditRolesForm();
+      expect(ctrl.isRolesFormOpen).toEqual(true);
+      tick();
+      explorationRightsService.init(
+        ['owner'], [], [], [], '', false, false, true);
+      tick();
+      spyOn(explorationRightsService, 'checkUserAlreadyHasRoles')
+        .and.returnValue(Promise.resolve());
+      spyOn(explorationRightsService, 'saveRoleChanges').and.returnValue(
+        Promise.resolve()
+      );
+      ctrl.editRole('Username1', 'editor');
+      tick();
+      ctrl.editRole('Username1', 'owner');
+      tick();
+
+      expect($uibModal.open).toHaveBeenCalled();
+      expect(explorationRightsService.saveRoleChanges).toHaveBeenCalled();
+      expect(ctrl.isRolesFormOpen).toEqual(false);
+    }));
 
     it('should update warnings when save param changes hook', () => {
       spyOn(explorationWarningsService, 'updateWarnings');

@@ -113,15 +113,16 @@ def is_feature_enabled(feature_name):
 
 
 def update_feature_flag_rules(
-        feature_name, committer_id, commit_message, new_rule_dicts):
+    feature_name, committer_id, commit_message, new_rules
+):
     """Updates the feature flag's rules.
 
     Args:
         feature_name: str. The name of the feature to update.
         committer_id: str. ID of the committer.
         commit_message: str. The commit message.
-        new_rule_dicts: list(dict). A list of dict mappings of all fields
-            of PlatformParameterRule object.
+        new_rules: list(PlatformParameterRule). A list of PlatformParameterRule
+            objects to update.
 
     Raises:
         FeatureFlagNotFoundException. The feature_name is not registered in
@@ -132,7 +133,7 @@ def update_feature_flag_rules(
             'Unknown feature flag: %s.' % feature_name)
 
     registry.Registry.update_platform_parameter(
-        feature_name, committer_id, commit_message, new_rule_dicts)
+        feature_name, committer_id, commit_message, new_rules)
 
 
 # TODO(#10211): Currently Oppia runs in either of the two modes:
