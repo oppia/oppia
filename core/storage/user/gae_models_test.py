@@ -1908,7 +1908,7 @@ class UserBulkEmailsModelTests(test_utils.GenericTestBase):
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             user_models.UserBulkEmailsModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP)
+            base_models.DELETION_POLICY.DELETE)
 
     def test_has_reference_to_user_id(self) -> None:
         self.assertTrue(
@@ -1923,6 +1923,18 @@ class UserBulkEmailsModelTests(test_utils.GenericTestBase):
             user_models.UserBulkEmailsModel
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
         )
+
+    def test_apply_deletion_policy_deletes_model_for_user(self) -> None:
+        user_models.UserBulkEmailsModel.apply_deletion_policy(
+            self.USER_ID_1)
+        self.assertIsNone(
+            user_models.UserBulkEmailsModel.get_by_id(self.USER_ID_1))
+
+    def test_apply_deletion_policy_raises_no_exception_for_nonexistent_user(
+        self
+    ) -> None:
+        user_models.UserBulkEmailsModel.apply_deletion_policy(
+            self.NONEXISTENT_USER_ID)
 
 
 class UserSkillMasteryModelTests(test_utils.GenericTestBase):

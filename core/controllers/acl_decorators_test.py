@@ -2092,13 +2092,24 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
                 }
             }
         }
-        HANDLER_ARGS_SCHEMAS = {'POST': {}}
+        HANDLER_ARGS_SCHEMAS = {
+            'POST': {},
+            'DELETE': {}
+        }
 
-        @acl_decorators.can_manage_voice_artist
+        @acl_decorators.can_add_voice_artist
         def post(self, entity_type, entity_id):
             self.render_json({
                 'entity_type': entity_type,
-                'entity_id': entity_id})
+                'entity_id': entity_id
+            })
+
+        @acl_decorators.can_remove_voice_artist
+        def delete(self, entity_type, entity_id):
+            self.render_json({
+                'entity_type': entity_type,
+                'entity_id': entity_id
+            })
 
     def setUp(self):
         super(VoiceArtistManagementTests, self).setUp()
@@ -2141,7 +2152,7 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
             self.voiceover_admin, self.published_exp_id_1, self.voice_artist_id,
             self.role)
 
-    def test_voiceover_admin_can_manage_voice_artist_in_public_exp(self):
+    def test_voiceover_admin_can_add_voice_artist_to_public_exp(self):
         self.login(self.VOICEOVER_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -2150,57 +2161,107 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
                 {}, csrf_token=csrf_token)
         self.logout()
 
-    def test_assigning_voice_artist_for_unsupported_entity_type_raise_400(self):
+    def test_voiceover_admin_can_remove_voice_artist_from_public_exp(self):
+        self.login(self.VOICEOVER_ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.delete_json(
+                '/mock/exploration/%s' % self.published_exp_id_1, {})
+        self.logout()
+
+    def test_adding_voice_artist_to_unsupported_entity_type_raises_400(self):
         unsupported_entity_type = 'topic'
         self.login(self.VOICEOVER_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.post_json(
-                '/mock/%s/%s' % (
-                    unsupported_entity_type, self.published_exp_id_1),
+                '/mock/%s/abc' % unsupported_entity_type,
                 {}, csrf_token=csrf_token, expected_status_int=400)
             self.assertEqual(
                 response['error'],
                 'Unsupported entity_type: topic')
         self.logout()
 
-    def test_voiceover_admin_cannot_assign_voice_artist_in_private_exp(self):
+    def test_removing_voice_artist_from_unsupported_entity_type_raises_400(
+        self
+    ):
+        unsupported_entity_type = 'topic'
+        self.login(self.VOICEOVER_ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.delete_json(
+                '/mock/%s/abc' % unsupported_entity_type,
+                {}, expected_status_int=400
+            )
+            self.assertEqual(
+                response['error'],
+                'Unsupported entity_type: topic')
+        self.logout()
+
+    def test_voiceover_admin_cannot_add_voice_artist_to_private_exp(self):
         self.login(self.VOICEOVER_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.post_json(
                 '/mock/exploration/%s' % self.private_exp_id_1, {},
-                csrf_token=csrf_token, expected_status_int=401)
+                csrf_token=csrf_token, expected_status_int=400
+            )
             self.assertEqual(
                 response['error'],
-                'You do not have credentials to manage voice artists.')
+                'Could not assign voice artist to private activity.')
         self.logout()
 
-    def test_owner_cannot_assign_voice_artist_in_public_exp(self):
+    def test_voiceover_admin_can_remove_voice_artist_from_private_exp(self):
+        self.login(self.VOICEOVER_ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.delete_json('/mock/exploration/%s' % self.private_exp_id_1, {})
+        self.logout()
+
+    def test_owner_cannot_add_voice_artist_to_public_exp(self):
         self.login(self.OWNER_EMAIL)
         csrf_token = self.get_new_csrf_token()
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.post_json(
-                '/mock/exploration/%s' % self.private_exp_id_1, {},
+                '/mock/exploration/%s' % self.published_exp_id_1, {},
                 csrf_token=csrf_token, expected_status_int=401)
             self.assertEqual(
                 response['error'],
                 'You do not have credentials to manage voice artists.')
         self.logout()
 
-    def test_random_user_cannot_assign_voice_artist_in_public_exp(self):
+    def test_owner_cannot_remove_voice_artist_in_public_exp(self):
+        self.login(self.OWNER_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.delete_json(
+                '/mock/exploration/%s' % self.private_exp_id_1, {},
+                expected_status_int=401)
+            self.assertEqual(
+                response['error'],
+                'You do not have credentials to manage voice artists.')
+        self.logout()
+
+    def test_random_user_cannot_add_voice_artist_to_public_exp(self):
         self.login(self.user_email)
         csrf_token = self.get_new_csrf_token()
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.post_json(
-                '/mock/exploration/%s' % self.private_exp_id_1, {},
+                '/mock/exploration/%s' % self.published_exp_id_1, {},
                 csrf_token=csrf_token, expected_status_int=401)
             self.assertEqual(
                 response['error'],
                 'You do not have credentials to manage voice artists.')
         self.logout()
 
-    def test_voiceover_admin_cannot_assign_voice_artist_in_invalid_exp(self):
+    def test_random_user_cannot_remove_voice_artist_from_public_exp(self):
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.delete_json(
+                '/mock/exploration/%s' % self.published_exp_id_1, {},
+                expected_status_int=401)
+            self.assertEqual(
+                response['error'],
+                'You do not have credentials to manage voice artists.')
+        self.logout()
+
+    def test_voiceover_admin_cannot_add_voice_artist_to_invalid_exp(self):
         self.login(self.VOICEOVER_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -2209,12 +2270,26 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
                 csrf_token=csrf_token, expected_status_int=404)
         self.logout()
 
-    def test_voiceover_admin_cannot_assign_voice_artist_without_login(self):
+    def test_voiceover_admin_cannot_remove_voice_artist_to_invalid_exp(self):
+        self.login(self.VOICEOVER_ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.delete_json(
+                '/mock/exploration/invalid_exp_id', {},
+                expected_status_int=404)
+        self.logout()
+
+    def test_voiceover_admin_cannot_add_voice_artist_without_login(self):
         csrf_token = self.get_new_csrf_token()
         with self.swap(self, 'testapp', self.mock_testapp):
             self.post_json(
                 '/mock/exploration/%s' % self.private_exp_id_1, {},
                 csrf_token=csrf_token, expected_status_int=401)
+
+    def test_voiceover_admin_cannot_remove_voice_artist_without_login(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.delete_json(
+                '/mock/exploration/%s' % self.private_exp_id_1, {},
+                expected_status_int=401)
 
 
 class EditExplorationTests(test_utils.GenericTestBase):

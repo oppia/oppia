@@ -136,7 +136,7 @@ class StartedTranslationTutorialEventHandler(base.BaseHandler):
 class VoiceArtistManagementHandler(base.BaseHandler):
     """Handles assignment of voice artists."""
 
-    @acl_decorators.can_manage_voice_artist
+    @acl_decorators.can_add_voice_artist
     def post(self, unused_entity_type, entity_id):
         """Handles Post requests."""
         voice_artist = self.payload.get('username')
@@ -151,7 +151,7 @@ class VoiceArtistManagementHandler(base.BaseHandler):
 
         self.render_json({})
 
-    @acl_decorators.can_manage_voice_artist
+    @acl_decorators.can_remove_voice_artist
     def delete(self, unused_entity_type, entity_id):
         """Handles Delete requests."""
         voice_artist = self.request.get('voice_artist')

@@ -284,9 +284,6 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
             self.assertEqual(
                 sent_email_model.html_body, 'body')
             self.assertEqual(
-                sorted(sent_email_model.recipient_ids),
-                sorted([self.user_a_id, self.user_b_id]))
-            self.assertEqual(
                 sent_email_model.sender_id, self.submitter_id)
             self.assertEqual(
                 sent_email_model.sender_email,

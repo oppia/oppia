@@ -628,13 +628,43 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         rights_manager.assign_role_for_exploration(
             self.user_voiceover_admin, self.EXP_ID, self.user_id_b,
             rights_domain.ROLE_VOICE_ARTIST)
-        exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
 
+        exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
         self.assertTrue(exp_rights.is_voice_artist(self.user_id_b))
 
         rights_manager.deassign_role_for_exploration(
             self.user_voiceover_admin, self.EXP_ID, self.user_id_b)
 
+        self.assertFalse(exp_rights.is_voice_artist(self.user_id_b))
+
+    def test_voice_artist_cannot_be_assigned_to_private_exploration(self):
+        exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
+        exp_services.save_new_exploration(self.user_id_a, exp)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Could not assign voice artist to private activity.'
+        ):
+            rights_manager.assign_role_for_exploration(
+                self.user_voiceover_admin, self.EXP_ID, self.user_id_b,
+                rights_domain.ROLE_VOICE_ARTIST)
+
+    def test_voice_artist_can_be_unassigned_from_private_exploration(self):
+        exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
+        exp_services.save_new_exploration(self.user_id_a, exp)
+        rights_manager.publish_exploration(self.user_a, self.EXP_ID)
+
+        rights_manager.assign_role_for_exploration(
+            self.user_voiceover_admin, self.EXP_ID, self.user_id_b,
+            rights_domain.ROLE_VOICE_ARTIST)
+
+        exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
+        self.assertTrue(exp_rights.is_voice_artist(self.user_id_b))
+
+        rights_manager.unpublish_exploration(self.user_moderator, self.EXP_ID)
+        rights_manager.deassign_role_for_exploration(
+            self.user_voiceover_admin, self.EXP_ID, self.user_id_b)
+
+        exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
         self.assertFalse(exp_rights.is_voice_artist(self.user_id_b))
 
     def test_owner_cannot_assign_voice_artist_to_core_role(self):
