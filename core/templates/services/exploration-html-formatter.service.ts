@@ -105,6 +105,9 @@ export class ExplorationHtmlFormatterService {
       // Angular 2+, such that we don't need to parse the string in the
       // interaction directives/components.
       element.setAttribute('saved-solution', savedSolution);
+      // If interaction is migrated, we only check whether the attribute can be
+      // added, since we cannot add it in proper Angular form using
+      // 'setAttribute'. The rest is done below using string concatenation.
       if (this.migratedInteractions.indexOf(interactionId) >= 0) {
         element.removeAttribute('saved-solution');
       }
@@ -120,11 +123,18 @@ export class ExplorationHtmlFormatterService {
     // as per the line above.
     if (lastAnswerPropValue !== null) {
       element.setAttribute('last-answer', lastAnswerPropValue);
+      // If interaction is migrated, we only check whether the attribute can be
+      // added, since we cannot add it in proper Angular form using
+      // 'setAttribute'. The rest is done below using string concatenation.
       if (this.migratedInteractions.indexOf(interactionId) >= 0) {
         element.removeAttribute('last-answer');
       }
     }
 
+    // This is done because 'setAttribute' doesn't allow some characters to be
+    // set as attribute keys (like '[' or ']'). So when interaction is migrated
+    // we first test whether the other parts of the attribute can be added
+    // (code above) and then we add the attribute using string concatenation.
     if (
       this.migratedInteractions.indexOf(interactionId) >= 0 &&
       (lastAnswerPropValue !== null || savedSolution === 'savedMemento()')
