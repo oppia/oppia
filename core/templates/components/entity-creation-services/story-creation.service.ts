@@ -65,7 +65,6 @@ export class StoryCreationService {
       this.storyCreationBackendApiService.createStoryAsync(
         newlyCreatedStory, imagesData, bgColor).then((response) => {
         this.storyCreationInProgress = false;
-        this.imageLocalStorageService.flushStoredImagesData();
         newTab.location.href = this.urlInterpolationService.interpolateUrl(
           this.STORY_EDITOR_URL_TEMPLATE, {
             story_id: response.storyId
@@ -73,6 +72,7 @@ export class StoryCreationService {
       }, (errorResponse) => {
         this.storyCreationInProgress = false;
         this.loaderService.hideLoadingScreen();
+        this.imageLocalStorageService.flushStoredImagesData();
         this.alertsService.addWarning(errorResponse.error);
       });
     }, () => {
