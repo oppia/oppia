@@ -97,7 +97,7 @@ export class LoginPageComponent implements OnInit {
   }
 
   private onSignInError(error: firebase.auth.Error): void {
-    if (error.code === 'auth/user-disabled') {
+    if (error?.code === 'auth/user-disabled') {
       this.redirectToPath('/pending-account-deletion');
       return;
     }
