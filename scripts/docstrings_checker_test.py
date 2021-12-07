@@ -21,10 +21,10 @@ from __future__ import annotations
 import contextlib
 import unittest
 
-import astroid  
-from pylint.checkers import utils 
+import astroid
+from pylint.checkers import utils
 
-from . import docstrings_checker  
+from . import docstrings_checker 
 
 
 class ASTDocstringsCheckerTest(unittest.TestCase):
