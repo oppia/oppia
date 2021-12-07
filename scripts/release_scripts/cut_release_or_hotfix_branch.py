@@ -257,6 +257,7 @@ def execute_branch_cut(target_version, hotfix_number):
     common.require_cwd_to_be_oppia()
     common.verify_local_repo_is_clean()
     common.verify_current_branch_name('develop')
+    common.update_branch_with_upstream()
 
     # Update the local repo.
     remote_alias = common.get_remote_alias(
