@@ -87,8 +87,8 @@ class MigrateStoryJob(base_jobs.JobBase):
             story_model: StoryModel. The story for which generate
                 the change objects.
 
-        Returns:
-            Iterable((str,StoryChange)). Iterable of story change objects.
+        Yields:
+            (str,StoryChange). Iterable of story change objects.
         """
         schema_version = story_model.story_contents_schema_version
         if schema_version < feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION:
@@ -97,7 +97,7 @@ class MigrateStoryJob(base_jobs.JobBase):
                 'from_version': story_model.story_contents_schema_version,
                 'to_version': feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION
             })
-            return (story_id, story_change)
+            yield (story_id, story_change)
 
     @staticmethod
     def _delete_story_from_cache(
@@ -123,14 +123,14 @@ class MigrateStoryJob(base_jobs.JobBase):
     def _update_story(
         story_model: story_models.StoryModel,
         migrated_story: story_domain.Story,
-        story_changes: Sequence[story_domain.StoryChange]
+        story_change: story_domain.StoryChange
     ) -> Sequence[base_models.BaseModel]:
         """Generates newly updated story models.
 
         Args:
             story_model: StoryModel. The story which should be updated.
             migrated_story: Story. The migrated story domain object.
-            story_changes: sequence(StoryChange). The story changes to apply.
+            story_change: StoryChange. The story change to apply.
 
         Returns:
             sequence(BaseModel). Sequence of models which should be put into
@@ -138,7 +138,7 @@ class MigrateStoryJob(base_jobs.JobBase):
         """
         updated_story_model = story_services.populate_story_model_with_story(
             story_model, migrated_story)
-        change_dicts = [change.to_dict() for change in story_changes]
+        change_dicts = [story_change.to_dict()]
         models_to_put = updated_story_model.compute_models_to_commit(
             feconf.MIGRATION_BOT_USERNAME,
             feconf.COMMIT_TYPE_EDIT,
@@ -169,7 +169,7 @@ class MigrateStoryJob(base_jobs.JobBase):
         story_summary = story_services.compute_summary_of_story(migrated_story)
         story_summary.version += 1
         updated_story_summary_model = (
-            story_services.populate_story_model_with_story(
+            story_services.populate_story_summary_model_with_story_summary(
                 story_summary_model, story_summary
             )
         )
@@ -216,12 +216,12 @@ class MigrateStoryJob(base_jobs.JobBase):
         migrated_story_job_run_results = (
             migrated_story_results
             | 'Generate results for migration' >> (
-                job_result_transforms.ResultsToJobRunResults('STORY MIGRATION'))
+                job_result_transforms.ResultsToJobRunResults('STORY PROCESSED'))
         )
 
         story_changes = (
             unmigrated_story_models
-            | 'Transform and migrate model' >> beam.MapTuple(
+            | 'Generate story changes' >> beam.FlatMapTuple(
                 self._generate_story_changes)
         )
 
@@ -240,7 +240,7 @@ class MigrateStoryJob(base_jobs.JobBase):
                     'story_model': objects['story_model'][0],
                     'story_summary_model': objects['story_summary_model'][0],
                     'story': objects['story'][0],
-                    'story_change': objects['story_change']
+                    'story_change': objects['story_change'][0]
                 })
         )
 
@@ -248,7 +248,7 @@ class MigrateStoryJob(base_jobs.JobBase):
             story_objects_list
             | 'Transform story objects into job run results' >> (
                 job_result_transforms.CountObjectsToJobRunResult(
-                    'SKILL MIGRATED'))
+                    'STORY MIGRATED'))
         )
 
         cache_deletion_job_run_results = (
@@ -266,7 +266,7 @@ class MigrateStoryJob(base_jobs.JobBase):
                 lambda story_objects: self._update_story(
                     story_objects['story_model'],
                     story_objects['story'],
-                    story_objects['story_changes'],
+                    story_objects['story_change'],
                 ))
         )
 

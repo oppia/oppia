@@ -21,6 +21,7 @@ from __future__ import annotations
 import datetime
 
 from core import feconf
+from core.domain import caching_services
 from core.domain import skill_domain
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import skill_migration_jobs
@@ -280,6 +281,44 @@ class MigrateSkillJobTests(job_test_utils.JobTestBase):
         migrated_skill_summary_model = skill_models.SkillSummaryModel.get(
             self.SKILL_1_ID)
         self.assertEqual(migrated_skill_summary_model.version, 2)
+
+    def test_broken_cache_is_reported(self) -> None:
+        cache_swap = self.swap_to_always_raise(
+            caching_services, 'delete_multi', Exception('cache deletion error'))
+
+        skill_model = self.create_model(
+            skill_models.SkillModel,
+            id=self.SKILL_1_ID,
+            description='description',
+            misconceptions_schema_version=(
+                feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION),
+            rubric_schema_version=4,
+            rubrics=self.latest_rubrics,
+            language_code='cs',
+            skill_contents_schema_version=(
+                feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION),
+            skill_contents=self.latest_skill_contents,
+            next_misconception_id=2,
+            all_questions_merged=False
+        )
+        skill_model.update_timestamps()
+        skill_model.commit(feconf.SYSTEM_COMMITTER_ID, 'Create skill', [{
+            'cmd': skill_domain.CMD_CREATE_NEW
+        }])
+
+        with cache_swap:
+            self.assert_job_output_is([
+                job_run_result.JobRunResult(stdout='SKILL MIGRATED SUCCESS: 1'),
+                job_run_result.JobRunResult(
+                    stdout='SKILL PROCESSED SUCCESS: 1'
+                ),
+                job_run_result.JobRunResult(
+                    stderr='CACHE DELETION ERROR: "cache deletion error": 1'
+                )
+            ])
+
+        migrated_skill_model = skill_models.SkillModel.get(self.SKILL_1_ID)
+        self.assertEqual(migrated_skill_model.version, 2)
 
     def test_broken_skill_is_not_migrated(self) -> None:
         skill_model = self.create_model(
