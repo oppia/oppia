@@ -786,8 +786,6 @@ def require_valid_filename(filename: str) -> None:
         if '.' not in filename:
             raise ValidationError(
                 'File name should include an extension.')
-    else:
-        raise ValidationError('No filename supplied')
 
 
 def require_valid_meta_tag_content(meta_tag_content: str) -> None:

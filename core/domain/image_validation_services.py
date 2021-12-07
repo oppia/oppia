@@ -117,6 +117,8 @@ def validate_image_and_filename(raw_image, filename):
 
     # Validate file name and raw image.
     validate_raw_image(raw_image)
+    if filename is None:
+        raise utils.ValidationError('No filename supplied')
     utils.require_valid_filename(filename)
 
     # Verify that the file type matches the supplied extension.

@@ -88,8 +88,7 @@ class TopicEditorStoryHandler(base.BaseHandler):
             'thumbnailBgColor': {
                 'schema': {
                     'type': 'basestring'
-                },
-                'default': None
+                }
             },
             'image': {
                 'schema': {
@@ -97,8 +96,7 @@ class TopicEditorStoryHandler(base.BaseHandler):
                     'validators': [{
                         'id': 'is_valid_image'
                     }]
-                },
-                'default': None
+                }
             },
             'story_url_fragment': constants.SCHEMA_FOR_STORY_URL_FRAGMENTS
         }
@@ -324,18 +322,16 @@ class EditableTopicDataHandler(base.BaseHandler):
             'topic_and_subtopic_page_change_dicts': {
                 'schema': {
                     'type': 'dict',
-                    'properties': [
-                        {
-                            'name': 'cmd',
-                            'schema': {
-                                'type': 'basestring',
-                                'validation_method': (
-                                    domain_objects_validator.
-                                    validate_topic_and_sub_topic_change
-                                )
-                            }
+                    'properties': [{
+                        'name': 'cmd',
+                        'schema': {
+                            'type': 'basestring',
+                            'validation_method': (
+                                domain_objects_validator.
+                                validate_topic_and_sub_topic_change
+                            )
                         }
-                    ]
+                    }]
                 }
             }
         },
@@ -665,10 +661,10 @@ class TopicNameHandler(base.BaseHandler):
         'topic_name': {
             'schema': {
                 'type': 'basestring',
-                    'validators': [{
-                        'id': 'has_length_at_most',
-                        'max_value': constants.MAX_CHARS_IN_TOPIC_NAME
-                    }]
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': constants.MAX_CHARS_IN_TOPIC_NAME
+                }]
             }
         }
     }
