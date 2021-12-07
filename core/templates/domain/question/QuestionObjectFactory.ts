@@ -42,6 +42,8 @@ export interface QuestionBackendDict {
 
 // Null will be temperory and will be updated once the question is saved.
 export class Question {
+  // A null '_id' indicates that the 'Question' has been created
+  // but not saved.
   _id: string | null;
   _stateData: State;
   _languageCode: string;
@@ -61,7 +63,8 @@ export class Question {
     this._inapplicableSkillMisconceptionIds = (
       inapplicableSkillMisconceptionIds);
   }
-
+  // Some methods have either string or null return value,
+  // because when we create default question their fields get null value.
   getId(): string | null {
     return this._id;
   }
@@ -103,10 +106,10 @@ export class Question {
     this._inapplicableSkillMisconceptionIds = (
       inapplicableSkillMisconceptionIds);
   }
-
-  // Null in return type depicts no validation errors.
+  // Returns 'null' when the message is valid.
   getValidationErrorMessage(): string | null {
     var interaction = this._stateData.interaction;
+    var interactionId = interaction.id as InteractionSpecsKey;
     var questionContent = this._stateData.content._html;
     if (questionContent.length === 0) {
       return 'Please enter a question.';
@@ -114,11 +117,11 @@ export class Question {
     if (interaction.id === null) {
       return 'An interaction must be specified';
     }
-
-    if (interaction.defaultOutcome?.feedback._html.length === 0) {
+    if (
+      interaction.defaultOutcome?.feedback._html.length === 0
+    ) {
       return 'Please enter a feedback for the default outcome.';
     }
-
     if (interaction.hints.length === 0) {
       return 'At least 1 hint should be specified';
     }
@@ -148,18 +151,25 @@ export class Question {
       misconceptionsBySkill: MisconceptionSkillMap = {}
   ): string[] {
     var answerGroups = this._stateData.interaction.answerGroups;
-    var taggedSkillMisconceptionIds: { [stateName: string]: boolean } = {};
+    var taggedSkillMisconceptionIds: Record<string, boolean> = {};
     for (var i = 0; i < answerGroups.length; i++) {
       if (!answerGroups[i].outcome.labelledAsCorrect &&
-          answerGroups[i].taggedSkillMisconceptionId !== null) {
-        taggedSkillMisconceptionIds[
-          // Typecasting is done just to deal with TS error.
-          String(answerGroups[i].taggedSkillMisconceptionId)] = true;
+        answerGroups[i].taggedSkillMisconceptionId !== null) {
+          type MisconceptionId = keyof typeof taggedSkillMisconceptionIds;
+          var misconceptionId = (
+            answerGroups[i].taggedSkillMisconceptionId as MisconceptionId
+          );
+          taggedSkillMisconceptionIds[misconceptionId] = true;
       }
     }
     var unaddressedMisconceptionNames: string[] = [];
     var self = this;
-    Object.keys(misconceptionsBySkill).forEach(function(skillId) {
+    type MisconceptionsBySkillKeys = (keyof typeof misconceptionsBySkill)[];
+    var misconceptionsBySkillKeys = (
+      Object.keys(misconceptionsBySkill) as MisconceptionsBySkillKeys
+    );
+
+    misconceptionsBySkillKeys.forEach(function(skillId) {
       for (var i = 0; i < misconceptionsBySkill[skillId].length; i++) {
         var skillMisconceptionIdIsNotApplicable = (
           self._inapplicableSkillMisconceptionIds.includes(
@@ -206,10 +216,9 @@ export class QuestionObjectFactory {
   constructor(
     private stateObject: StateObjectFactory) {}
 
-  /* Null in id denotes the a new question whose id is yet to be set,
-  this id is layer set in backend API service, same is with statename.
-  This function cannot be removed as it is used to create a temperory
-  default question in question editor until the question is once saved. */
+  // TODO(#14312): Remove the createDefaultQuestion so that full question can be
+  // created from start.
+  // Create a default question until the actual question is saved.
   createDefaultQuestion(skillIds: string[]): Question {
     return new Question(
       null, this.stateObject.createDefaultState(null),

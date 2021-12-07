@@ -45,6 +45,8 @@ _YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-5.1.2')
 sys.path.insert(0, _YAML_PATH)
 
 import yaml  # isort:skip  # pylint: disable=wrong-import-position
+import certifi  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+import ssl  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 DATETIME_FORMAT = '%m/%d/%Y, %H:%M:%S:%f'
 ISO_8601_DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%fz'
@@ -303,7 +305,7 @@ def convert_png_data_url_to_binary(image_data_url: str) -> bytes:
     """
     if image_data_url.startswith(PNG_DATA_URL_PREFIX):
         return base64.b64decode(
-            python_utils.urllib_unquote(
+            urllib.parse.unquote(
                 image_data_url[len(PNG_DATA_URL_PREFIX):]))
     else:
         raise Exception('The given string does not represent a PNG data URL.')
@@ -974,7 +976,7 @@ def unescape_encoded_uri_component(escaped_string: str) -> str:
     Returns:
         str. Decoded string that was initially encoded with encodeURIComponent.
     """
-    return python_utils.urllib_unquote(escaped_string)
+    return urllib.parse.unquote(escaped_string)
 
 
 def snake_case_to_camel_case(snake_str: str) -> str:
@@ -1179,3 +1181,20 @@ def quoted(s: str) -> str:
         str. The quoted string.
     """
     return json.dumps(s)
+
+
+def url_open(source_url: str) -> str:
+    """Opens a URL and returns the response.
+
+    Args:
+        source_url: str. The URL.
+
+    Returns:
+        urlopen. The 'urlopen' object.
+    """
+    # TODO(#12912): Remove pylint disable after the arg-name-for-non-keyword-arg
+    # check is refactored.
+    context = ssl.create_default_context(cafile=certifi.where())  # pylint: disable=arg-name-for-non-keyword-arg
+    # The type ignore is needed, because typestubs define the return type
+    # of 'urlopen' as 'Any' which is wrong.
+    return urllib.request.urlopen(source_url, context=context) # type: ignore[no-any-return]

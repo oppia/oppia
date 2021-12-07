@@ -61,6 +61,7 @@ export interface StateBackendDict {
 }
 
 export class State {
+  // Name is null before saving a state.
   name: string | null;
   classifierModelId: string | null;
   linkedSkillId: string | null;
@@ -167,6 +168,10 @@ export class StateObjectFactory {
     return constants.NEW_STATE_TEMPLATE as StateBackendDict;
   }
 
+  // TODO(#14313): Remove the createDefaultState so that full state can be
+  // created from start.
+  // Create a default state until the actual state is saved.
+  // Passes name as null before saving a state.
   createDefaultState(newStateName: string | null): State {
     var newStateTemplate = this.NEW_STATE_TEMPLATE;
     var newState = this.createFromBackendDict(newStateName, {
@@ -184,14 +189,15 @@ export class StateObjectFactory {
     if (newState.interaction.defaultOutcome !== null &&
         newStateName !== null) {
       let defaultOutcome = newState.interaction.defaultOutcome;
-      // Typecasting is done just to deal with TS error.
-      defaultOutcome.dest = String(newStateName);
+      defaultOutcome.dest = newStateName as string;
     }
     return newState;
   }
 
+  // Passes name as null before saving a state.
   createFromBackendDict(
-      stateName: string | null, stateDict: StateBackendDict): State {
+      stateName: string | null, stateDict: StateBackendDict
+  ): State {
     return new State(
       stateName,
       stateDict.classifier_model_id,
