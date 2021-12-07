@@ -75,10 +75,6 @@ class PythonUtilsTests(test_utils.GenericTestBase):
             'http://www.google.com?search=oppia')
         self.assertEqual(response, {'http://www.google.com?search': ['oppia']})
 
-    def test_urllib_unquote(self):
-        response = python_utils.urllib_unquote('/El%20Ni%C3%B1o/')
-        self.assertEqual(response, '/El Niño/')
-
     def test_recursively_convert_to_str_with_dict(self):
         test_var_1_in_unicode = str('test_var_1')
         test_var_2_in_unicode = str('test_var_2')
