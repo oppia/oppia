@@ -32,7 +32,7 @@ interface Answer {
 }
 
 // Viewed solution being undefined signifies that the solution
-// has not yet being viewed.
+// has not yet been viewed.
 interface QuestionPlayerState {
   [key: string]: {
     linkedSkillIds: string[];
