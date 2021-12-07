@@ -72,8 +72,8 @@ export class StoryCreationService {
       }, (errorResponse) => {
         this.storyCreationInProgress = false;
         this.loaderService.hideLoadingScreen();
-        this.alertsService.addWarning(errorResponse.error);
         this.imageLocalStorageService.flushStoredImagesData();
+        this.alertsService.addWarning(errorResponse.error);
       });
     }, () => {
       // Note to developers:
