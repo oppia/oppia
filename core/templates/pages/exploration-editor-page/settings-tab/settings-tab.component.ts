@@ -339,7 +339,9 @@ angular.module('oppia').component('settingsTab', {
 
         modalRef.result.then(function() {
           ExplorationRightsService.removeRoleAsync(
-            memberUsername);
+            memberUsername).then(() => {
+            $rootScope.$applyAsync();
+          });
           ctrl.closeRolesForm();
         }, () => {
           // Note to developers:
@@ -432,7 +434,9 @@ angular.module('oppia').component('settingsTab', {
         NgbModal.open(TransferExplorationOwnershipModalComponent, {
           backdrop: true,
         }).result.then(function() {
-          ExplorationRightsService.makeCommunityOwned();
+          ExplorationRightsService.makeCommunityOwned().then(() => {
+            $rootScope.$applyAsync();
+          });
         }, function() {
           AlertsService.clearWarnings();
         });
