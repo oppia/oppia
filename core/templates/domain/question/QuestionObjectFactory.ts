@@ -128,7 +128,7 @@ export class Question {
     if (
       !interaction.solution &&
       InteractionSpecsConstants.INTERACTION_SPECS[
-        interaction.id as InteractionSpecsKey
+        interactionId
       ].can_have_solution
     ) {
       return 'A solution must be specified';
