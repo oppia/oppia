@@ -3300,6 +3300,18 @@ title: Title
             Exception, 'Expected proto size to be a int, received 1'):
             exploration.validate()
 
+        exploration.proto_size_in_bytes = -2
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected proto size to be positive integer, received -2'):
+            exploration.validate()
+
+        exploration.proto_size_in_bytes = 0
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected proto size to be positive integer, received -2'):
+            exploration.validate()
+
     def test_proto_size_calculation_is_correct(self):
         """Test proto size calculation function."""
         exploration = exp_domain.Exploration.from_yaml(

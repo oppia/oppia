@@ -263,13 +263,14 @@ def move_all_proto_files_to_third_party():
     protobuf_dir = (
         pathlib.Path(
             oppia_proto_api_path).glob('**/*.proto'))
+
     for p in protobuf_dir:
         if p.suffix == '.proto':
-            source = p.absolute()
-            destination = oppia_proto_api_path
-            filename = os.path.basename(source)
-            dest = os.path.join(destination, filename)
-            shutil.move(str(source), str(dest))
+            shutil.move(
+                str(p.absolute()),
+                str(os.path.join(
+                    oppia_proto_api_path, os.path.basename(p.absolute()))))
+
     if os.path.exists(os.path.join(oppia_proto_api_path, 'org')):
         shutil.rmtree(oppia_proto_api_path + '/org')
 
