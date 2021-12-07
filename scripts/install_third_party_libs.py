@@ -90,7 +90,7 @@ PROTOC_DIR = os.path.join(BUF_DIR, 'protoc')
 PROTO_FILES_PATHS = [
     os.path.join(common.THIRD_PARTY_DIR, 'oppia-ml-proto-0.0.0'),
     os.path.join(
-        common.THIRD_PARTY_DIR, 'oppia-proto-api-introduce-proto-api-v1')]
+        common.THIRD_PARTY_DIR, 'oppia-proto-api-fcf4a601a214bbcaf8a89efba291e8212b4bfdd8')]
 # Path to typescript plugin required to compile ts compatible files from proto.
 PROTOC_GEN_TS_PATH = os.path.join(common.NODE_MODULES_PATH, 'protoc-gen-ts')
 
@@ -221,7 +221,7 @@ def rewrite_android_proto_files():
         pathlib.Path(
             os.path.join(
                 common.THIRD_PARTY_DIR,
-                'oppia-proto-api-introduce-proto-api-v1'))
+                'oppia-proto-api-fcf4a601a214bbcaf8a89efba291e8212b4bfdd8'))
             .glob('**/*.proto'))
     for p in protobuf_dir:
         if p.suffix == '.proto':
@@ -259,7 +259,7 @@ def move_all_proto_files_to_third_party():
     oppia_proto_api_path = (
         os.path.join(
             common.THIRD_PARTY_DIR,
-            'oppia-proto-api-introduce-proto-api-v1'))
+            'oppia-proto-api-fcf4a601a214bbcaf8a89efba291e8212b4bfdd8'))
     protobuf_dir = (
         pathlib.Path(
             oppia_proto_api_path).glob('**/*.proto'))

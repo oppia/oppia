@@ -11,9 +11,9 @@
       "oppiaAndroidProto": {
         "version": "",
         "downloadFormat": "zip",
-        "url": "https://github.com/oppia/oppia-proto-api/archive/refs/heads/introduce-proto-api-v1.zip",
-        "rootDirPrefix": "oppia-proto-api-introduce-proto-api-v1",
-        "targetDirPrefix": "oppia-proto-api-introduce-proto-api-v1"
+        "url": "https://github.com/oppia/oppia-proto-api/archive/fcf4a601a214bbcaf8a89efba291e8212b4bfdd8.zip",
+        "rootDirPrefix": "oppia-proto-api-fcf4a601a214bbcaf8a89efba291e8212b4bfdd8",
+        "targetDirPrefix": "oppia-proto-api-fcf4a601a214bbcaf8a89efba291e8212b4bfdd8"
       }
     },
     "frontend": {
