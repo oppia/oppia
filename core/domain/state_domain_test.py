@@ -4751,8 +4751,8 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
                         'needs_update': False
                     },
                     'fr': {
-                        'data_format': 'set_of_normalized_string',
-                        'translation': ['test1', 'test2'],
+                        'data_format': 'html',
+                        'translation': 'salut',
                         'needs_update': False
                     },
                 },
@@ -4768,8 +4768,8 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
                         'needs_update': False
                     },
                     'fr': {
-                        'data_format': 'set_of_normalized_string',
-                        'translation': ['test1', 'test2'],
+                        'data_format': 'html',
+                        'translation': 'salut',
                         'needs_update': False
                     }
                 }
@@ -5088,10 +5088,9 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
                         'needs_update': True
                     },
                     'fr': {
-                        'filename': 'abc.mp3',
-                        'file_size_bytes': 1234,
-                        'needs_update': False,
-                        'duration_secs': 1.3
+                        'data_format': 'html',
+                        'translation': '<p>French</p>',
+                        'needs_update': True
                     }
                 },
                 'feedback_1': {
@@ -5106,10 +5105,9 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
                         'needs_update': True
                     },
                     'fr': {
-                        'filename': 'abc.mp3',
-                        'file_size_bytes': 1234,
-                        'needs_update': False,
-                        'duration_secs': 1.3
+                        'data_format': 'unicode',
+                        'translation': '<p>French</p>',
+                        'needs_update': True
                     }
                 }
             }
