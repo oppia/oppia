@@ -73,7 +73,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/classifier_services_test.py',
     'core/domain/classifier_validators.py',
     'core/domain/classifier_validators_test.py',
-    'core/domain/classroom_domain.py',
     'core/domain/classroom_services.py',
     'core/domain/classroom_services_test.py',
     'core/domain/collection_domain.py',
