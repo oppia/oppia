@@ -4860,7 +4860,7 @@ export default {
     "description": "Bahasa Indonesia (Indonesian)",
     "direction": "ltr"
   }, {
-    "code": "igbo",
+    "code": "ig",
     "description": "Ásụ̀sụ́ Ìgbò (Igbo)",
     "direction": "ltr"
   }, {
@@ -5198,7 +5198,7 @@ export default {
     "relatedLanguages": ["id"],
     "direction": "ltr"
   }, {
-    "id": "igbo",
+    "id": "ig",
     "description": "Igbo",
     "relatedLanguages": ["igbo"],
     "direction": "ltr"
