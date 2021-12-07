@@ -1601,7 +1601,8 @@ def can_voiceover_exploration(handler):
 
 
 def can_add_voice_artist(handler):
-    """Decorator to check whether the user add manage voice artist to activity.
+    """Decorator to check whether the user can add voice artist to
+    the given activity.
 
     Args:
         handler: function. The function to be decorated.
@@ -1658,7 +1659,7 @@ def can_add_voice_artist(handler):
 
 def can_remove_voice_artist(handler):
     """Decorator to check whether the user can remove voice artist
-    from activity.
+    from the given activity.
 
     Args:
         handler: function. The function to be decorated.
