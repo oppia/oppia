@@ -54,6 +54,13 @@ describe('Exploration Html Formatter Service', () => {
       .toBe(expectedHtmlTag);
   });
 
+  it('should fail for unknown interaction', () => {
+    var interactionId = 'UnknownInteraction';
+    expect(() => {
+      ehfs.getInteractionHtml(interactionId, {}, true, '', null)
+    }).toThrowError('Invalid interaction id: UnknownInteraction.');
+  });
+  
   it('should correctly set [last-answer] for MigratedInteractions when it' +
   ' is in editor mode', () => {
     var interactionId = 'GraphInput';
