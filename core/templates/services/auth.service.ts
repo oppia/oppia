@@ -164,7 +164,7 @@ export class AuthService {
           email, password);
       }
     } catch (err: unknown) {
-      if ((err as firebase.auth.Error).code === 'auth/user-not-found') {
+      if ((err as firebase.auth.Error)?.code === 'auth/user-not-found') {
         if (this.angularFireAuth !== null) {
           this.creds =
            await this.angularFireAuth.createUserWithEmailAndPassword(
