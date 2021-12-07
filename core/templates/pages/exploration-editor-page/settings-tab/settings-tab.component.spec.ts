@@ -499,10 +499,9 @@ describe('Settings Tab Component', () => {
         ['owner'], [], [], [], '', false, false, true);
 
       spyOn(explorationRightsService, 'checkUserAlreadyHasRoles')
-        .and.returnValue({result: $q.resolve()});
-      spyOn(explorationRightsService, 'saveRoleChanges').and.returnValue({
-        result: $q.resolve()
-      });
+        .and.returnValue(Promise.resolve());
+      spyOn(explorationRightsService, 'saveRoleChanges').and.returnValue(
+        Promise.resolve());
       ctrl.editRole('Username1', 'editor');
       tick();
       ctrl.editRole('Username1', 'owner');
@@ -525,10 +524,10 @@ describe('Settings Tab Component', () => {
           ['owner'], [], [], [], '', false, false, true);
 
         spyOn(explorationRightsService, 'checkUserAlreadyHasRoles')
-          .and.returnValue({result: $q.resolve()});
-        spyOn(explorationRightsService, 'saveRoleChanges').and.returnValue({
-          result: $q.resolve()
-        });
+          .and.returnValue(Promise.resolve());
+        spyOn(explorationRightsService, 'saveRoleChanges').and.returnValue(
+          Promise.resolve());
+
         ctrl.editRole('Username1', 'editor');
         tick();
         $scope.$apply();
@@ -570,7 +569,9 @@ describe('Settings Tab Component', () => {
 
     it('should transfer exploration ownership when closing transfer ownership' +
     ' modal', fakeAsync(() => {
-      spyOn(explorationRightsService, 'makeCommunityOwned');
+      spyOn(explorationRightsService, 'makeCommunityOwned').and.returnValue(
+        Promise.resolve()
+      );
 
       ctrl.showTransferExplorationOwnershipModal();
       tick();
@@ -813,9 +814,10 @@ describe('Settings Tab Component', () => {
 
     it('should check edit-modal has been open ' +
     'when editRole function has been called', fakeAsync(() => {
-      spyOn($uibModal, 'open').and.returnValue({
+      spyOn(ngbModal, 'open').and.returnValue({
+        componentInstance: NgbModalRef,
         result: Promise.resolve()
-      });
+      } as NgbModalRef);
 
       ctrl.openEditRolesForm();
       expect(ctrl.isRolesFormOpen).toEqual(true);
@@ -833,7 +835,7 @@ describe('Settings Tab Component', () => {
       ctrl.editRole('Username1', 'owner');
       tick();
 
-      expect($uibModal.open).toHaveBeenCalled();
+      expect(ngbModal.open).toHaveBeenCalled();
       expect(explorationRightsService.saveRoleChanges).toHaveBeenCalled();
       expect(ctrl.isRolesFormOpen).toEqual(false);
     }));
