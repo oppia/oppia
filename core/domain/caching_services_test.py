@@ -50,7 +50,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         'states_schema_version': 45,
         'param_specs': {},
         'param_changes': [],
-        'proto_size_in_bytes': 0,
+        'proto_size_in_bytes': 334,
         'id': 'h51Bu72rDIqO',
         'created_on': '08/17/2020, 17:30:48:283600',
         'category': '',
@@ -185,7 +185,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         '_0": {}}}, "next_content_id_index": 5, "solicit_answer_details": false'
         '}}, "version": 0, "correctness_feedback_enabled": false, "language_cod'
         'e": "en", "objective": "", "init_state_name": "Introduction", "blurb":'
-        ' "", "proto_size_in_bytes": 0, "author_notes": ""}'
+        ' "", "proto_size_in_bytes": 334, "author_notes": ""}'
     )
 
     def test_retrieved_memory_profile_contains_correct_elements(self):

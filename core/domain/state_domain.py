@@ -110,10 +110,9 @@ class AnswerGroup:
         """Returns a proto representation of the answer group object.
 
         Returns:
-            BaseAnswerGroup. The BaseAnswerGroup proto object.
+            BaseAnswerGroup. The proto object.
         """
-        outcome_proto = self.outcome.to_proto()
-        misconception_proto = None
+        misconception_proto = {}
         if self.tagged_skill_misconception_id is not None:
             skill_id, misconception_id = (
                 self.tagged_skill_misconception_id.split('-'))
@@ -121,11 +120,10 @@ class AnswerGroup:
                 skill_id=skill_id,
                 misconception_id=misconception_id)
 
-        base_answer_proto = state_pb2.BaseAnswerGroup(
-            outcome=outcome_proto,
-            tagged_skill_misconception=misconception_proto)
-
-        return base_answer_proto
+        return state_pb2.BaseAnswerGroup(
+            outcome=self.outcome.to_proto(),
+            tagged_skill_misconception=misconception_proto
+        )
 
     def validate(self, interaction, exp_param_specs_dict):
         """Verifies that all rule classes are valid, and that the AnswerGroup
@@ -321,14 +319,9 @@ class Hint:
         """Returns a proto representation of the hint object.
 
         Returns:
-            Hint. The Hint proto object.
+            Hint. The proto object.
         """
-        hint_content_proto = (
-            self.hint_content.to_proto())
-        hint_proto = state_pb2.Hint(
-            hint_content=hint_content_proto)
-
-        return hint_proto
+        return state_pb2.Hint(hint_content=self.hint_content.to_proto())
 
     def validate(self):
         """Validates all properties of Hint."""
@@ -423,12 +416,9 @@ class Solution:
         """Returns a proto representation of the solution object.
 
         Returns:
-            BaseSolution. The BaseSolution proto object.
+            BaseSolution. The proto object.
         """
-        base_solution_proto = state_pb2.BaseSolution(
-            explanation=self.explanation.to_proto())
-
-        return base_solution_proto
+        return state_pb2.BaseSolution(explanation=self.explanation.to_proto())
 
     def validate(self, interaction_id):
         """Validates all properties of Solution.
@@ -598,8 +588,8 @@ class InteractionInstance:
         interaction_proto = {}
         if self.id is not None:
             interaction_instance = (
-                interaction_registry.Registry.get_interaction_by_id(
-                    self.id))
+                interaction_registry.Registry.get_interaction_by_id(self.id)
+            )
 
         if self.id == 'Continue':
             interaction_proto = state_pb2.InteractionInstance(
@@ -1393,15 +1383,13 @@ class Outcome:
         """Returns a proto representation of the outcome object.
 
         Returns:
-            Outcome. The Outcome proto object.
+            Outcome. The proto object.
         """
-        feedback_proto = self.feedback.to_proto()
-        outcome_proto = state_pb2.Outcome(
+        return state_pb2.Outcome(
             destination_state=self.dest,
-            feedback=feedback_proto,
-            labelled_as_correct=self.labelled_as_correct)
-
-        return outcome_proto
+            feedback=self.feedback.to_proto(),
+            labelled_as_correct=self.labelled_as_correct
+        )
 
     def __init__(
             self, dest, feedback, labelled_as_correct, param_changes,
@@ -1531,14 +1519,13 @@ class Voiceover:
         """Returns a proto representation of the voiceover object.
 
         Returns:
-            Voiceover. The voiceover proto object.
+            Voiceover. The proto object.
         """
-        voiceover_proto = languages_pb2.VoiceoverFile(
+        return languages_pb2.VoiceoverFile(
             filename=self.filename,
             file_size_bytes=self.file_size_bytes,
-            duration_secs=self.duration_secs)
-
-        return voiceover_proto
+            duration_secs=self.duration_secs
+        )
 
     def __init__(self, filename, file_size_bytes, needs_update, duration_secs):
         """Initializes a Voiceover domain object.
@@ -1697,9 +1684,9 @@ class WrittenTranslation:
         """Returns a proto representation of the written translation object.
 
         Returns:
-            WrittenTranslation. The written translation proto object.
+            WrittenTranslation. The proto object.
         """
-        written_translation_proto = None
+        written_translation_proto = {}
         if self.data_format == (
             WrittenTranslation.DATA_FORMAT_HTML) or self.data_format == (
                 WrittenTranslation.DATA_FORMAT_UNICODE_STRING):
@@ -1807,16 +1794,15 @@ class WrittenTranslations:
         """Returns a proto representation of the written translations object.
 
         Returns:
-            WrittenTranslations. The written translations proto object.
+            WrittenTranslations. The proto object.
         """
         translation_language_mapping_protos = (
             self._to_translation_language_mapping_proto(
                 self.translations_mapping))
 
-        written_translations_proto = languages_pb2.WrittenTranslations(
-            translation_language_mapping=translation_language_mapping_protos)
-
-        return written_translations_proto
+        return languages_pb2.WrittenTranslations(
+            translation_language_mapping=translation_language_mapping_protos
+        )
 
     @classmethod
     def _to_translation_language_mapping_proto(cls, translations_mapping):
@@ -1828,7 +1814,7 @@ class WrittenTranslations:
                 languages to WrittenTranslation objects.
 
         Returns:
-            WrittenTranslations. The written translations proto object.
+            list. The WrittenTranslationContentMapping protos list.
         """
         language_to_content_id_written_translation_map = (
             collections.defaultdict(dict))
@@ -1844,7 +1830,8 @@ class WrittenTranslations:
             'en': languages_pb2.LanguageType.ENGLISH,
             'hi-en': languages_pb2.LanguageType.HINGLISH,
             'ar': languages_pb2.LanguageType.ARABIC,
-            'hi': languages_pb2.LanguageType.HINDI
+            'hi': languages_pb2.LanguageType.HINDI,
+            'pt-br': languages_pb2.LanguageType.BRAZILIAN_PORTUGUESE
         }
         written_translation_content_mapping_protos_list = []
 
@@ -2161,16 +2148,15 @@ class RecordedVoiceovers:
         """Returns a proto representation of the recorded voiceovers object.
 
         Returns:
-            RecordedVoicovers. The recorded voiceovers proto object.
+            RecordedVoicovers. The proto object.
         """
         voiceover_content_mapping_protos = (
             self._to_voiceovers_content_mapping_protos(
                 self.voiceovers_mapping))
 
-        recorded_voiceover_proto = languages_pb2.RecordedVoiceovers(
-            voiceover_content_mapping=voiceover_content_mapping_protos)
-
-        return recorded_voiceover_proto
+        return languages_pb2.RecordedVoiceovers(
+            voiceover_content_mapping=voiceover_content_mapping_protos
+        )
 
     @classmethod
     def _to_voiceovers_content_mapping_protos(cls, voiceovers_mapping):
@@ -2182,7 +2168,7 @@ class RecordedVoiceovers:
                 languages to the Voiceover objects.
 
         Returns:
-            RecordedVoiceovers. The recorded voiceovers proto object.
+            list. The VoiceoverContentMapping protos list.
         """
         language_to_content_id_voiceover_file_map = (
             collections.defaultdict(dict))
@@ -2197,7 +2183,8 @@ class RecordedVoiceovers:
             'en': languages_pb2.LanguageType.ENGLISH,
             'hi-en': languages_pb2.LanguageType.HINGLISH,
             'ar': languages_pb2.LanguageType.ARABIC,
-            'hi': languages_pb2.LanguageType.HINDI
+            'hi': languages_pb2.LanguageType.HINDI,
+            'pt-br': languages_pb2.LanguageType.BRAZILIAN_PORTUGUESE
         }
         voiceover_content_mapping_protos_list = []
 
@@ -2566,13 +2553,12 @@ class SubtitledHtml:
         """Returns a proto representation of the subtitled html object.
 
         Returns:
-            SubtitledText. The subtitled text proto object.
+            SubtitledText. The proto object.
         """
-        subtitled_text_proto = languages_pb2.SubtitledText(
+        return languages_pb2.SubtitledText(
             content_id=self.content_id,
-            text=self.html)
-
-        return subtitled_text_proto
+            text=self.html
+        )
 
     def validate(self):
         """Validates properties of the SubtitledHtml, and cleans the html.
@@ -2652,13 +2638,12 @@ class SubtitledUnicode:
         """Returns a proto representation of the subtitled unicode object.
 
         Returns:
-            SubtitledText. The subtitled text proto object.
+            SubtitledText. The proto object.
         """
-        subtitled_text_proto = languages_pb2.SubtitledText(
+        return languages_pb2.SubtitledText(
             content_id=self.content_id,
-            text=self.unicode_str)
-
-        return subtitled_text_proto
+            text=self.unicode_str
+        )
 
     def validate(self):
         """Validates properties of the SubtitledUnicode.
@@ -2746,13 +2731,9 @@ class TranslatableItem:
             translation: str. The translated content.
 
         Returns:
-            WrittenTranslatableText. The written translatable text proto object.
+            WrittenTranslatableText. The proto object.
         """
-        written_translatable_text_proto = (
-            languages_pb2.WrittenTranslatableText(
-                translation=translation))
-
-        return written_translatable_text_proto
+        return languages_pb2.WrittenTranslatableText(translation=translation)
 
     @classmethod
     def to_written_translatable_set_proto(cls, translation):
@@ -2762,13 +2743,11 @@ class TranslatableItem:
             translation: list(str). The translated content.
 
         Returns:
-            WrittenTranslatableSet. The written translatable set proto object.
+            WrittenTranslatableSet. The proto object.
         """
-        written_translatable_set_proto = (
-            languages_pb2.SetOfWrittenTranslatableText(
-                translations=translation))
-
-        return written_translatable_set_proto
+        return languages_pb2.SetOfWrittenTranslatableText(
+            translations=translation
+        )
 
 
 class State:
@@ -3735,17 +3714,14 @@ class State:
         """Returns a proto representation of the state object.
 
         Returns:
-            State. The state proto object.
+            State. The proto object.
         """
-        state_proto = state_pb2.State(
+        return state_pb2.State(
             content=self.content.to_proto(),
-            recorded_voiceovers=(
-                self.recorded_voiceovers.to_proto()),
-            written_translations=(
-                self.written_translations.to_proto()),
-            interaction=self.interaction.to_proto())
-
-        return state_proto
+            recorded_voiceovers=self.recorded_voiceovers.to_proto(),
+            written_translations=self.written_translations.to_proto(),
+            interaction=self.interaction.to_proto()
+        )
 
     @classmethod
     def convert_html_fields_in_state(

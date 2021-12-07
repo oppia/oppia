@@ -783,11 +783,10 @@ class Exploration:
         exploration.last_updated = exploration_last_updated
 
         if exploration_dict.get('proto_size_in_bytes') is None:
-            exploration.proto_size_in_bytes = (
-                exploration.get_proto_size())
+            exploration.proto_size_in_bytes = exploration.get_proto_size()
         else:
-            exploration.proto_size_in_bytes = exploration_dict[
-                'proto_size_in_bytes']
+            exploration.proto_size_in_bytes = (
+                exploration_dict['proto_size_in_bytes'])
 
         return exploration
 
@@ -2530,19 +2529,17 @@ class Exploration:
             Exploration. The exploration proto object.
         """
         state_protos = {}
-        exploration_proto = {}
         for (state_name, state) in self.states.items():
             state_proto = state.to_proto()
             state_protos[state_name] = state_proto
 
-        exploration_proto = exploration_pb2.Exploration(
+        return exploration_pb2.Exploration(
             id=self.id,
             content_version=self.version,
             init_state_name=self.init_state_name,
             title=self.title,
-            states=state_protos)
-
-        return exploration_proto
+            states=state_protos
+        )
 
     def get_proto_size(self):
         """Calculate the byte size of the proto object.

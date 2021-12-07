@@ -36,6 +36,7 @@ from core.domain import rules_registry
 from core.domain import state_domain
 from core.domain import translatable_object_registry
 from core.tests import test_utils
+from proto_files import state_pb2
 
 
 class StateDomainUnitTests(test_utils.GenericTestBase):
@@ -4446,12 +4447,13 @@ class InteractionCustomizationArgDomainTests(test_utils.GenericTestBase):
 class InteractionInstanceDomainTests(test_utils.GenericTestBase):
 
     def test_to_proto(self):
+        interaction = state_domain.InteractionInstance
         subtitled_html = state_domain.SubtitledHtml(
             'default_outcome', '')
         default_outcome = state_domain.Outcome(
             'end_state_name', subtitled_html, False, [], None, None)
-        customization_args = (
-            state_domain.InteractionInstance.convert_customization_args_dict_to_customization_args( # pylint: disable=line-too-long
+        continue_customization_args = (
+            interaction.convert_customization_args_dict_to_customization_args(
                 'Continue',
                 {
                     'buttonText': {
@@ -4462,32 +4464,232 @@ class InteractionInstanceDomainTests(test_utils.GenericTestBase):
                     }
                 }
             ))
+
         continue_interaction = state_domain.InteractionInstance(
             'Continue',
-            customization_args,
-            [], default_outcome, [], [], None)
-        continue_interaction_proto = (
-            continue_interaction.to_proto())
-        continue_proto_instance = (
-            continue_interaction_proto.continue_instance)
+            continue_customization_args, [], default_outcome, [], [], None)
         self.assertEqual(
-            continue_proto_instance.customization_args.button_text.text,
-            'Click Me!')
+            type(continue_interaction.to_proto().continue_instance),
+            state_pb2.ContinueInstance
+        )
+
+        fraction_customization_args = (
+            interaction.convert_customization_args_dict_to_customization_args(
+                'FractionInput',
+                {
+                    'requireSimplestForm': {
+                        'value': False
+                    },
+                    'allowImproperFraction': {
+                        'value': True
+                    },
+                    'allowNonzeroIntegerPart': {
+                        'value': True
+                    },
+                    'customPlaceholder': {
+                        'value': {
+                            'content_id': 'ca_customPlaceholder_2',
+                            'unicode_str': '😍😍😍😍'
+                        }
+                    },
+                }
+            ))
+        fraction_interaction = state_domain.InteractionInstance(
+            'FractionInput',
+            fraction_customization_args, [], default_outcome, [], [], None)
         self.assertEqual(
-            continue_proto_instance.customization_args.button_text.content_id,
-            'ca_buttonText_1')
+            type(fraction_interaction.to_proto().fraction_input),
+            state_pb2.FractionInputInstance
+        )
+
+        item_customization_args = (
+            interaction.convert_customization_args_dict_to_customization_args(
+                'ItemSelectionInput',
+                {
+                    'choices': {
+                        'value': [{
+                            'content_id': 'ca_choices_2',
+                            'html': '<p>Choice 1</p>'
+                        }, {
+                            'content_id': 'ca_choices_3',
+                            'html': '<p>Choice 2</p>'
+                        }]
+                    },
+                    'maxAllowableSelectionCount': {
+                        'value': 2
+                    },
+                    'minAllowableSelectionCount': {
+                        'value': 1
+                    }
+                }
+            ))
+        item_interaction = state_domain.InteractionInstance(
+            'ItemSelectionInput',
+            item_customization_args, [], default_outcome, [], [], None)
         self.assertEqual(
-            continue_proto_instance.default_outcome.destination_state,
-            'end_state_name')
+            type(item_interaction.to_proto().item_selection_input),
+            state_pb2.ItemSelectionInputInstance
+        )
+
+        multi_customization_args = (
+            interaction.convert_customization_args_dict_to_customization_args(
+                'MultipleChoiceInput',
+                {
+                    'choices': {
+                        'value': [{
+                            'content_id': 'ca_choices_2',
+                            'html': '<p>Choice 1</p>'
+                        }, {
+                            'content_id': 'ca_choices_3',
+                            'html': '<p>Choice 2</p>'
+                        }]
+                    },
+                    'showChoicesInShuffledOrder': {'value': True}
+                }
+            ))
+        multi_interaction = state_domain.InteractionInstance(
+            'MultipleChoiceInput',
+            multi_customization_args, [], default_outcome, [], [], None)
+        self.assertEqual(
+            type(multi_interaction.to_proto().multiple_choice_input),
+            state_pb2.MultipleChoiceInputInstance
+        )
+
+        numeric_customization_args = (
+            interaction.convert_customization_args_dict_to_customization_args(
+                'NumericInput',
+                {
+                    'requireNonnegativeInput': {
+                        'value': False
+                    },
+                    'rows': {'value': 1}
+                }
+            ))
+        numeric_interaction = state_domain.InteractionInstance(
+            'NumericInput',
+            numeric_customization_args, [], default_outcome, [], [], None)
+        self.assertEqual(
+            type(numeric_interaction.to_proto().numeric_input),
+            state_pb2.NumericInputInstance
+        )
+
+        text_customization_args = (
+            interaction.convert_customization_args_dict_to_customization_args(
+                'TextInput',
+                {
+                    'rows': {
+                        'value': 1
+                    },
+                    'placeholder': {
+                        'value': {
+                            'content_id': 'ca_placeholder_0',
+                            'unicode_str': '😍😍😍😍'
+                        }
+                    }
+                }
+            ))
+        text_interaction = state_domain.InteractionInstance(
+            'TextInput',
+            text_customization_args, [], default_outcome, [], [], None)
+        self.assertEqual(
+            type(text_interaction.to_proto().text_input),
+            state_pb2.TextInputInstance
+        )
+
+        ratio_customization_args = (
+            interaction.convert_customization_args_dict_to_customization_args(
+                'RatioExpressionInput',
+                {
+                    'placeholder': {
+                        'value': {
+                            'content_id': 'ca_placeholder_0',
+                            'unicode_str': '😍😍😍😍'
+                        }
+                    },
+                    'numberOfTerms': {
+                        'value': 1
+                    }
+                }
+            ))
+        ratio_interaction = state_domain.InteractionInstance(
+            'RatioExpressionInput',
+            ratio_customization_args, [], default_outcome, [], [], None)
+        self.assertEqual(
+            type(ratio_interaction.to_proto().ratio_expression_input),
+            state_pb2.RatioExpressionInputInstance
+        )
+
+        drag_customization_args = (
+            interaction.convert_customization_args_dict_to_customization_args(
+                'DragAndDropSortInput',
+                {
+                    'allowMultipleItemsInSamePosition': {
+                        'value': True
+                    },
+                    'choices': {
+                        'value': [{
+                            'content_id': 'ca_choices_2',
+                            'html': '<p>Choice 1</p>'
+                        }, {
+                            'content_id': 'ca_choices_3',
+                            'html': '<p>Choice 2</p>'
+                        }]
+                    }
+                }
+            ))
+        drag_interaction = state_domain.InteractionInstance(
+            'DragAndDropSortInput',
+            drag_customization_args, [], default_outcome, [], [], None)
+        self.assertEqual(
+            type(drag_interaction.to_proto().drag_and_drop_sort_input),
+            state_pb2.DragAndDropSortInputInstance
+        )
+
+        image_customization_args = (
+            interaction.convert_customization_args_dict_to_customization_args(
+                'ImageClickInput',
+                {
+                    'highlightRegionsOnHover': {'value': True},
+                    'imageAndRegions': {
+                        'value': {
+                            'imagePath': 's1ImagePath.png',
+                            'labeledRegions': [{
+                                'label': 'classdef',
+                                'region': {
+                                    'area': [
+                                        [0.004291845493562232,
+                                            0.004692192192192192],
+                                        [0.40987124463519314,
+                                            0.05874624624624625]
+                                    ],
+                                    'regionType': 'Rectangle'
+                                }
+                            }]
+                        }
+                    }
+                }
+            ))
+        image_interaction = state_domain.InteractionInstance(
+            'ImageClickInput',
+            image_customization_args, [], default_outcome, [], [], None)
+        self.assertEqual(
+            type(image_interaction.to_proto().image_click_input),
+            state_pb2.ImageClickInputInstance
+        )
+
+        end_interaction = state_domain.InteractionInstance(
+            'EndExploration',
+            {}, [], default_outcome, [], [], None)
+        self.assertEqual(
+            type(end_interaction.to_proto().end_exploration),
+            state_pb2.EndExplorationInstance
+        )
 
 
 class SubtitledHtmlDomainUnitTests(test_utils.GenericTestBase):
     """Test SubtitledHtml domain object methods."""
 
     def test_to_proto(self):
-        """Test for to_proto."""
-        # Test html type content.
-
         subtitled_text_proto = state_domain.SubtitledHtml(
             'ca_placeholder_0', '<p>html</p>').to_proto()
         self.assertEqual(subtitled_text_proto.content_id, 'ca_placeholder_0')
@@ -4517,7 +4719,6 @@ class SubtitledUnicodeDomainUnitTests(test_utils.GenericTestBase):
         })
 
     def test_to_proto(self):
-        """Test for to_proto."""
         subtitled_text_proto = state_domain.SubtitledUnicode(
             'ca_placeholder_0', '😍😍😍😍').to_proto()
         self.assertEqual(subtitled_text_proto.content_id, 'ca_placeholder_0')
@@ -4885,6 +5086,12 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
                         'data_format': 'unicode',
                         'translation': '<p>Hindi</p>',
                         'needs_update': True
+                    },
+                    'fr': {
+                        'filename': 'abc.mp3',
+                        'file_size_bytes': 1234,
+                        'needs_update': False,
+                        'duration_secs': 1.3
                     }
                 },
                 'feedback_1': {
@@ -4897,6 +5104,12 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
                         'data_format': 'html',
                         'translation': '<p>English</p>',
                         'needs_update': True
+                    },
+                    'fr': {
+                        'filename': 'abc.mp3',
+                        'file_size_bytes': 1234,
+                        'needs_update': False,
+                        'duration_secs': 1.3
                     }
                 }
             }
@@ -4904,24 +5117,21 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
         written_translations = (
             state_domain.WrittenTranslations.from_dict(
             written_translations_dict))
-        written_translations_proto = (
-            written_translations.to_proto())
-        # Language at position zero should be same as item
-        # zero of LangaugeType enum.
+        written_translations_proto = written_translations.to_proto()
         self.assertEqual(
             written_translations_proto.translation_language_mapping[0].language,
             1)
-        # Language at position one should be same as item
-        # one of LangaugeType enum.
         self.assertEqual(
             written_translations_proto.translation_language_mapping[1].language,
             3)
+        self.assertEqual(
+            written_translations_proto.translation_language_mapping[2].language,
+            0)
 
 
 class WrittenTranslationDomainUnitTests(test_utils.GenericTestBase):
 
     def test_to_proto(self):
-
         written_translation_proto = (
             state_domain.WrittenTranslation('html', 'Test', False).to_proto())
         self.assertEqual(
@@ -5212,6 +5422,12 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
                         'file_size_bytes': 1234,
                         'needs_update': False,
                         'duration_secs': 1.3
+                    },
+                    'fr': {
+                        'filename': 'abc.mp3',
+                        'file_size_bytes': 1234,
+                        'needs_update': False,
+                        'duration_secs': 1.3
                     }
                 },
                 'feedback_1': {
@@ -5226,6 +5442,12 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
                         'file_size_bytes': 123,
                         'needs_update': False,
                         'duration_secs': 1.3
+                    },
+                    'fr': {
+                        'filename': 'abc.mp3',
+                        'file_size_bytes': 1234,
+                        'needs_update': False,
+                        'duration_secs': 1.3
                     }
                 }
             }
@@ -5233,14 +5455,12 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
         recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict(
             recorded_voiceovers_dict)
         recorded_voiceovers_proto = recorded_voiceovers.to_proto()
-        # Language at position zero should be same as item
-        # zero of LangaugeType enum.
         self.assertEqual(
             recorded_voiceovers_proto.voiceover_content_mapping[0].language, 1)
-        # Language at position one should be same as item
-        # one of LangaugeType enum.
         self.assertEqual(
             recorded_voiceovers_proto.voiceover_content_mapping[1].language, 3)
+        self.assertEqual(
+            recorded_voiceovers_proto.voiceover_content_mapping[2].language, 0)
 
 
 class VoiceoverDomainTests(test_utils.GenericTestBase):

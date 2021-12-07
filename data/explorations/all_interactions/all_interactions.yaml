@@ -11,7 +11,6 @@ param_specs: {}
 schema_version: 47
 states:
   Algebraic Expression Input:
-    card_is_checkpoint: true
     classifier_model_id: null
     content:
       content_id: content
@@ -55,7 +54,6 @@ states:
           html: <p>The area of a circle is related to a constant called "pi".</p>
       id: AlgebraicExpressionInput
       solution: null
-    linked_skill_id: null
     next_content_id_index: 2
     param_changes: []
     recorded_voiceovers:
