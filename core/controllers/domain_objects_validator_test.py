@@ -50,7 +50,7 @@ class ValidateExplorationChangeTests(test_utils.GenericTestBase):
             correct_change_dict)
 
 
-class ValidateExplorationOrQuestionChangeTests(test_utils.GenericTestBase):
+class ValidateSuggestionChangeTests(test_utils.GenericTestBase):
     """Tests to validate domain objects coming from frontend."""
 
     def test_incorrect_exp_domain_object_raises_exception(self) -> None:

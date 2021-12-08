@@ -1336,6 +1336,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     'translation_html': valid_html,
                     'data_format': 'html'
                 },
+                'files': {'file.svg': None},
                 'description': 'test'
             }, csrf_token=csrf_token, expected_status_int=400)
 

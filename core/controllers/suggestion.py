@@ -74,7 +74,7 @@ class SuggestionHandler(base.BaseHandler):
                    'type': 'object_dict',
                     'validation_method': (
                         domain_objects_validator.
-                        validate_exploration_or_question_change
+                        validate_suggestion_change
                     )
                }
             },
@@ -579,18 +579,8 @@ def _upload_suggestion_images(files, suggestion, filenames):
     # TODO(#10513): Find a way to save the images before the suggestion is
     # created.
     for filename in filenames:
-        image = files.get(filename) if files else None
-        if not image:
-            logging.exception(
-                'Image not provided for file with name %s when the '
-                ' suggestion with target id %s was created.' % (
-                    filename, suggestion.target_id))
-            raise base.BaseHandler.InvalidInputException(
-                'No image data provided for file with name %s.'
-                % (filename))
-        # TODO(#14204): Refactor this to use the normalized_payload files.
-        if utils.is_base64_encoded(image):
-            image = base64.decodebytes(image.encode('utf-8'))
+        image = files.get(filename)
+        image = base64.decodebytes(image.encode('utf-8'))
         file_format = (
             image_validation_services.validate_image_and_filename(
                 image, filename))

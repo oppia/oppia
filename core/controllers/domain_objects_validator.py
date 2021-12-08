@@ -33,7 +33,7 @@ from core.domain import state_domain
 from typing import Dict, Optional, Union
 
 
-def validate_exploration_or_question_change(obj):
+def validate_suggestion_change(obj):
     """Validates Exploration or Question change.
 
     Args:
