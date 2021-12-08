@@ -345,10 +345,13 @@ class BaseHandler(webapp2.RequestHandler):
         handler_class_name = self.__class__.__name__
         request_method = self.request.environ['REQUEST_METHOD']
         url_path_args = self.request.route_kwargs
-        handler_class_names_with_no_schema = (
-            handler_schema_constants.HANDLER_CLASS_NAMES_WITH_NO_SCHEMA)
 
-        if handler_class_name in handler_class_names_with_no_schema:
+        if (
+            handler_class_name in
+            handler_schema_constants.HANDLER_CLASS_NAMES_WITH_NO_SCHEMA
+        ):
+            # TODO(#13155): Remove this clause once all the handlers have had
+            # schema validation implemented.
             return
 
         handler_args = {}
@@ -391,7 +394,7 @@ class BaseHandler(webapp2.RequestHandler):
 
         schema_for_url_path_args = self.URL_PATH_ARGS_SCHEMAS
         self.request.route_kwargs, errors = (
-            payload_validator.validate(
+            payload_validator.validate_arguments_against_schema(
                 url_path_args, schema_for_url_path_args, extra_args_are_allowed)
         )
 
@@ -420,7 +423,7 @@ class BaseHandler(webapp2.RequestHandler):
 
         allow_string_to_bool_conversion = request_method in ['GET', 'DELETE']
         normalized_arg_values, errors = (
-            payload_validator.validate(
+            payload_validator.validate_arguments_against_schema(
                 handler_args, schema_for_request_method, extra_args_are_allowed,
                 allow_string_to_bool_conversion)
         )
