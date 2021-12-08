@@ -85,7 +85,8 @@ class SuggestionHandler(base.BaseHandler):
                 'schema': {
                     'type': 'object_dict',
                     'validation_method': (
-                        domain_objects_validator.validate_suggestion_images
+                        domain_objects_validator.
+                        validate_suggestion_images
                     )
                 },
                 'default_value': None
@@ -131,7 +132,7 @@ class SuggestionHandler(base.BaseHandler):
         # is not good, since when the user cancels a question suggestion after
         # adding an image, there is no method to remove the uploaded image.
         # See more - https://github.com/oppia/oppia/issues/14298
-        if self.payload.get(
+        if self.normalized_payload.get(
             'suggestion_type') != (feconf.SUGGESTION_TYPE_ADD_QUESTION):
             _upload_suggestion_images(
                 self.normalized_payload.get('files'),
