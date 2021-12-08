@@ -27,7 +27,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { NewlyCreatedStory } from 'domain/topic/newly-created-story.model';
 import { StoryCreationBackendApiService } from './story-creation-backend-api.service';
 
-fdescribe('Story Creation Service', () => {
+describe('Story Creation Service', () => {
   let storyCreationService: StoryCreationService;
   let ngbModal: NgbModal;
   let alertsService: AlertsService;
