@@ -27,7 +27,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { NewlyCreatedStory } from 'domain/topic/newly-created-story.model';
 import { StoryCreationBackendApiService } from './story-creation-backend-api.service';
 
-describe('Story Creation Service', () => {
+fdescribe('Story Creation Service', () => {
   let storyCreationService: StoryCreationService;
   let ngbModal: NgbModal;
   let alertsService: AlertsService;
@@ -81,7 +81,6 @@ describe('Story Creation Service', () => {
     spyOn(imageLocalStorageService, 'getStoredImagesData').and.returnValue([]);
     spyOn(imageLocalStorageService, 'getThumbnailBgColor').and.returnValue(
       'bgColor');
-    spyOn(imageLocalStorageService, 'flushStoredImagesData');
     spyOn(storyCreationBackendApiService, 'createStoryAsync').and.returnValue(
       Promise.resolve({ storyId: 'storyId' }));
     spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue('');
@@ -92,7 +91,6 @@ describe('Story Creation Service', () => {
     expect(alertsService.clearWarnings).toHaveBeenCalled();
     expect(imageLocalStorageService.getStoredImagesData).toHaveBeenCalled();
     expect(imageLocalStorageService.getThumbnailBgColor).toHaveBeenCalled();
-    expect(imageLocalStorageService.flushStoredImagesData).toHaveBeenCalled();
     expect(storyCreationBackendApiService.createStoryAsync).toHaveBeenCalled();
     expect(urlInterpolationService.interpolateUrl).toHaveBeenCalled();
   }));
