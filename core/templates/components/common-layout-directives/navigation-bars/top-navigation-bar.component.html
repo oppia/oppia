@@ -109,8 +109,8 @@
                   <div class="nav-item-bottom d-flex flex-column" *ngIf="!userIsLoggedIn">
                     <div *ngIf="classroomData.length > 0">
                       <div class="nav-item-links"  *ngFor="let topicSummary of classroomData.slice(0, 3)">
-                        <a (keydown)="onMenuKeypress($event, 'learnMenu', {shiftTab: ACTION_CLOSE})"
-                           (click)="navigateToClassroomPage('/learn/math/' + topicSummary.getUrlFragment())">
+                        <a (click)="navigateToClassroomPage('/learn/math/' + topicSummary.getUrlFragment())"
+                           tabindex="0">
                             {{ topicSummary.getName() }}
                         </a>
                       </div>
@@ -474,6 +474,17 @@
   </ul>
 </div>
 <style>
+  .nav-item-links a {
+    color: #212121;
+    text-decoration: none;
+  }
+  .nav-link:focus {
+    background-color: #fff;
+    color: #00645C;
+  }
+  .dropdown-menu a:focus {
+    text-decoration: underline;
+  }
   .rtl-navbar-header {
     display: flex;
     margin-left: -30px;
