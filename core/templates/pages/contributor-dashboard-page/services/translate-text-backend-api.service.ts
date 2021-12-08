@@ -53,7 +53,7 @@ export class TranslateTextBackendApiService {
     return new Promise<unknown> ((resolve, reject)=> {
       const reader = new FileReader();
       reader.onload = () => {
-        // Read the base64 data from restult.
+        // Read the base64 data from result.
         const dataurl = reader.result as string;
         // Remove "data:mime/type;base64," prefix from data url.
         // And just return base64 string.
