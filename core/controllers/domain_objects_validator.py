@@ -38,6 +38,7 @@ def validate_suggestion_change(obj):
 
     Args:
         obj: dict. Data that needs to be validated.
+
     Returns:
         dict. Returns suggestion change dict after validation.
     """
@@ -61,6 +62,7 @@ def validate_suggestion_change(obj):
             raise base.BaseHandler.InvalidInputException(
                 '%s cmd is not allowed.' % obj['cmd'])
     return obj
+
 
 def validate_exploration_change(obj):
     """Validates exploration change.
@@ -275,6 +277,10 @@ def validate_suggestion_images(files):
 
     Args:
         files: dict. Data that needs to be validated.
+
+    Returns:
+        dict. Returns the dict after validation.
+
     """
     for filename, raw_image in files.items():
         image_validation_services.validate_image_and_filename(
@@ -282,6 +288,7 @@ def validate_suggestion_images(files):
     # The files argument do not represent any domain class, hence dict form
     # of the data is returned from here.
     return files
+
 
 def validate_params_dict(params):
     """validates params data type
