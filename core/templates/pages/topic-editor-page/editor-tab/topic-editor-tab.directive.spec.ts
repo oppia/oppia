@@ -63,6 +63,15 @@ describe('Topic editor tab directive', function() {
     }
   };
 
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve('1')
+        };
+      }
+    });
+  }));
   beforeEach(angular.mock.inject(function($injector) {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
