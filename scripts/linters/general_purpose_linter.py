@@ -99,8 +99,8 @@ BAD_PATTERNS = {
 BAD_PATTERNS_REGEXP = [
     {
         'regexp': re.compile(r'TODO[^\(]*[^\)][^:]*[^A-Z]+[^\w]*$'),
-        'message': 'Please assign TODO comments to a user '
-                   'in the format TODO(username): XXX. ',
+        'message': 'Please link TODO comments to an issue '
+                   'in the format TODO(#issuenum): XXX. ',
         'excluded_files': (),
         'excluded_dirs': ()
     }
@@ -196,7 +196,8 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'message': 'Please do not use print statement.',
         'excluded_files': (
             'core/tests/test_utils.py',
-            'core/tests/performance_framework/perf_domain.py'),
+            'core/tests/performance_framework/perf_domain.py',
+            'core/tests/test_utils_test.py'),
         'excluded_dirs': ('scripts/',)
     },
     {
@@ -206,18 +207,6 @@ BAD_PATTERNS_PYTHON_REGEXP = [
                    'The id-to-message list can be seen '
                    'here->http://pylint-messages.wikidot.com/all-codes',
         'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'urllib(2)?\..*urlopen\('),
-        'message': 'Please use python_utils.url_open().',
-        'excluded_files': ('core/python_utils.py', 'core/python_utils_test.py'),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'urllib(2)?\..*Request\('),
-        'message': 'Please use python_utils.url_request().',
-        'excluded_files': ('core/python_utils.py', 'core/python_utils_test.py'),
         'excluded_dirs': ()
     },
 ]
@@ -363,7 +352,11 @@ class GeneralPurposeLinter:
         # found in the file.
         pattern_found_list = []
         error_messages = []
-        file_content = self.file_cache.readlines(filepath)
+
+        try:
+            file_content = self.file_cache.readlines(filepath)
+        except Exception as e:
+            raise Exception('%s %s' % (filepath, e))
         for index, regexp_to_check in enumerate(
                 pattern_list):
             if (any(filepath.endswith(
@@ -453,7 +446,7 @@ class GeneralPurposeLinter:
             total_error_count += temp_count
             error_messages.extend(bad_pattern_error_messages)
 
-            if filepath == 'constants.ts':
+            if filepath.endswith('constants.ts'):
                 for pattern, constants in BAD_STRINGS_CONSTANTS.items():
                     for line in file_content:
                         if pattern in line:

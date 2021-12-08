@@ -17,7 +17,7 @@
  */
 
 import { EventEmitter } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { TextInputRulesService } from
   'interactions/TextInput/directives/text-input-rules.service';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
@@ -38,7 +38,6 @@ import { AlertsService } from 'services/alerts.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { UserExplorationPermissionsService } from
   'pages/exploration-editor-page/services/user-exploration-permissions.service';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 import { ReadOnlyExplorationBackendApiService } from
@@ -60,7 +59,6 @@ class MockRouterService {
 }
 describe('Settings Tab Component', () => {
   let ctrl = null;
-  let $httpBackend = null;
   let $q = null;
   let $rootScope = null;
   let $scope = null;
@@ -84,6 +82,7 @@ describe('Settings Tab Component', () => {
   let userService = null;
   let windowRef = null;
   let routerService = null;
+  let settingTabBackendApiService = null;
 
   let testSubscriptipns = null;
   let refreshGraphSpy = null;
@@ -104,7 +103,6 @@ describe('Settings Tab Component', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
       providers: [
         {
           provide: ExplorationDataService,
@@ -165,12 +163,14 @@ describe('Settings Tab Component', () => {
 
   describe('when the device is narrow', () => {
     beforeEach(angular.mock.inject(($injector, $componentController) => {
-      $httpBackend = $injector.get('$httpBackend');
       $q = $injector.get('$q');
       $rootScope = $injector.get('$rootScope');
       $uibModal = $injector.get('$uibModal');
       explorationDataService = $injector.get('ExplorationDataService');
       contextService = $injector.get('ContextService');
+      settingTabBackendApiService = $injector.get(
+        'SettingTabBackendApiService');
+
       spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
       editableExplorationBackendApiService = $injector.get(
         'EditableExplorationBackendApiService');
@@ -561,12 +561,13 @@ describe('Settings Tab Component', () => {
 
     it('should open preview summary tile modal with $uibModal', () => {
       spyOn($uibModal, 'open').and.callThrough();
+      spyOn(
+        settingTabBackendApiService, 'getData')
+        .and.returnValue($q.resolve({
+          draft_email_body: 'Draf message'
+        }));
 
-      $httpBackend.expect('GET', '/moderatorhandler/email_draft').respond({
-        draft_email_body: 'Draf message'
-      });
       ctrl.unpublishExplorationAsModerator();
-      $httpBackend.flush();
       $scope.$apply();
 
       expect($uibModal.open).toHaveBeenCalled();
@@ -581,14 +582,15 @@ describe('Settings Tab Component', () => {
         .callFake((emailBody) => {
           return $q.resolve();
         });
+      spyOn(
+        settingTabBackendApiService, 'getData')
+        .and.returnValue($q.resolve({
+          draft_email_body: 'Draf message'
+        }));
+
       ctrl.canUnpublish = false;
       ctrl.canReleaseOwnership = false;
-
-      $httpBackend.expect('GET', '/moderatorhandler/email_draft').respond({
-        draft_email_body: 'Draf message'
-      });
       ctrl.unpublishExplorationAsModerator();
-      $httpBackend.flush();
       $scope.$apply();
 
       expect(explorationRightsService.saveModeratorChangeToBackendAsync)
@@ -605,12 +607,13 @@ describe('Settings Tab Component', () => {
           result: $q.reject()
         });
         spyOn(alertsService, 'clearWarnings');
+        spyOn(
+          settingTabBackendApiService, 'getData')
+          .and.returnValue($q.resolve({
+            draft_email_body: 'Draf message'
+          }));
 
-        $httpBackend.expect('GET', '/moderatorhandler/email_draft').respond({
-          draft_email_body: 'Draf message'
-        });
         ctrl.unpublishExplorationAsModerator();
-        $httpBackend.flush();
         $scope.$apply();
 
         expect(alertsService.clearWarnings).toHaveBeenCalled();
@@ -647,13 +650,14 @@ describe('Settings Tab Component', () => {
     it('should open edit roles form and edit username and role', () => {
       ctrl.openEditRolesForm();
       explorationRightsService.init(
-        ['owner'], [], [], [], '', false, false, true);
+        ['owner'], [], [], [], '', '', false, true);
 
       expect(ctrl.isRolesFormOpen).toBe(true);
       expect(ctrl.newMemberUsername).toBe('');
       expect(ctrl.newMemberRole.value).toBe('owner');
 
-      spyOn(explorationRightsService, 'saveRoleChanges');
+      spyOn(explorationRightsService, 'saveRoleChanges').and.returnValue(
+        Promise.resolve());
       ctrl.editRole('Username1', 'editor');
 
       expect(explorationRightsService.saveRoleChanges).toHaveBeenCalledWith(
@@ -678,12 +682,13 @@ describe('Settings Tab Component', () => {
     it('should open voice artist edit roles form and edit username', () => {
       ctrl.openVoiceoverRolesForm();
       explorationRightsService.init(
-        ['owner'], [], [], [], '', false, false, true);
+        ['owner'], [], [], [], '', '', false, true);
 
       expect(ctrl.isVoiceoverFormOpen).toBe(true);
       expect(ctrl.newVoiceArtistUsername).toBe('');
 
-      spyOn(explorationRightsService, 'assignVoiceArtistRoleAsync');
+      spyOn(explorationRightsService, 'assignVoiceArtistRoleAsync')
+        .and.returnValue(Promise.resolve());
       ctrl.editVoiseArtist('Username1');
 
       expect(explorationRightsService.assignVoiceArtistRoleAsync)
@@ -732,6 +737,33 @@ describe('Settings Tab Component', () => {
       changeListSpy.and.returnValue(false);
       expect(ctrl.isExplorationLockedForEditing()).toBe(false);
     });
+
+    it('should check edit-modal has been open ' +
+    'when editRole function has been called', fakeAsync(() => {
+      spyOn($uibModal, 'open').and.returnValue({
+        result: Promise.resolve()
+      });
+
+      ctrl.openEditRolesForm();
+      expect(ctrl.isRolesFormOpen).toEqual(true);
+      tick();
+      explorationRightsService.init(
+        ['owner'], [], [], [], '', false, false, true);
+      tick();
+      spyOn(explorationRightsService, 'checkUserAlreadyHasRoles')
+        .and.returnValue(Promise.resolve());
+      spyOn(explorationRightsService, 'saveRoleChanges').and.returnValue(
+        Promise.resolve()
+      );
+      ctrl.editRole('Username1', 'editor');
+      tick();
+      ctrl.editRole('Username1', 'owner');
+      tick();
+
+      expect($uibModal.open).toHaveBeenCalled();
+      expect(explorationRightsService.saveRoleChanges).toHaveBeenCalled();
+      expect(ctrl.isRolesFormOpen).toEqual(false);
+    }));
 
     it('should update warnings when save param changes hook', () => {
       spyOn(explorationWarningsService, 'updateWarnings');
@@ -869,7 +901,6 @@ describe('Settings Tab Component', () => {
       };
     });
     beforeEach(angular.mock.inject(($injector, $componentController) => {
-      $httpBackend = $injector.get('$httpBackend');
       $q = $injector.get('$q');
       $rootScope = $injector.get('$rootScope');
       $uibModal = $injector.get('$uibModal');
@@ -892,6 +923,8 @@ describe('Settings Tab Component', () => {
       explorationWarningsService = $injector.get('ExplorationWarningsService');
       userEmailPreferencesService = $injector.get(
         'UserEmailPreferencesService');
+      settingTabBackendApiService = $injector.get(
+        'SettingTabBackendApiService');
 
       spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
         .returnValue($q.resolve(userPermissions));
