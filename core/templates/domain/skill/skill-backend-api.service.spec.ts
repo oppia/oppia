@@ -297,7 +297,8 @@ describe('Skill backend API service', () => {
         });
 
       let req = httpTestingController.expectOne(
-        '/skill_data_handler/' + encodeURIComponent('1,2'));
+        '/skill_data_handler/' + encodeURIComponent(
+          JSON.stringify(['1', '2'])));
       expect(req.request.method).toEqual('GET');
       req.flush(backendResponse);
 
@@ -314,7 +315,8 @@ describe('Skill backend API service', () => {
         successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
-        '/skill_data_handler/' + encodeURIComponent('1,2'));
+        '/skill_data_handler/' + encodeURIComponent(
+          JSON.stringify(['1', '2'])));
       expect(req.request.method).toEqual('GET');
       req.flush({
         error: 'Some error in the backend.'

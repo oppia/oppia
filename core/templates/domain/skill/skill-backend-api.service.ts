@@ -104,7 +104,8 @@ export class SkillBackendApiService {
     return new Promise((resolve, reject) => {
       const skillDataUrl = this.urlInterpolationService.interpolateUrl(
         SkillDomainConstants.SKILL_DATA_URL_TEMPLATE, {
-          comma_separated_skill_ids: skillIds.join(',')
+          comma_separated_skill_ids:
+            encodeURIComponent(JSON.stringify(skillIds))
         }
       );
 
