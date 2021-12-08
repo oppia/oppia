@@ -19,10 +19,8 @@
 from __future__ import annotations
 
 import base64
-import logging
 
 from core import feconf
-from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
