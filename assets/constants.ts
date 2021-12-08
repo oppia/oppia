@@ -4836,6 +4836,10 @@ export default {
     "description": "ελληνικά (Greek)",
     "direction": "ltr"
   }, {
+    "code": "ha",
+    "description": "Halshen Hausa (Hausa)",
+    "direction": "ltr"
+  }, {
     "code": "he",
     "description": "עברית (Hebrew)",
     "direction": "rtl"
@@ -4854,6 +4858,10 @@ export default {
   }, {
     "code": "id",
     "description": "Bahasa Indonesia (Indonesian)",
+    "direction": "ltr"
+  }, {
+    "code": "ig",
+    "description": "Ásụ̀sụ́ Ìgbò (Igbo)",
     "direction": "ltr"
   }, {
     "code": "it",
@@ -4958,6 +4966,10 @@ export default {
   }, {
     "code": "vi",
     "description": "Tiếng Việt (Vietnamese)",
+    "direction": "ltr"
+  }, {
+    "code": "yo",
+    "description": "Èdè Yorùbá (Yoruba)",
     "direction": "ltr"
   }],
 
@@ -5156,6 +5168,11 @@ export default {
     "relatedLanguages": ["gaa"],
     "direction": "ltr"
   }, {
+    "id": "ha",
+    "description": "Hausa",
+    "relatedLanguages": ["ha"],
+    "direction": "ltr"
+  }, {
     "id": "he",
     "description": "Hebrew",
     "relatedLanguages": ["he"],
@@ -5179,6 +5196,11 @@ export default {
     "id": "id",
     "description": "Indonesian",
     "relatedLanguages": ["id"],
+    "direction": "ltr"
+  }, {
+    "id": "ig",
+    "description": "Igbo",
+    "relatedLanguages": ["igbo"],
     "direction": "ltr"
   }, {
     "id": "it",
@@ -5314,6 +5336,11 @@ export default {
     "id": "vi",
     "description": "Vietnamese",
     "relatedLanguages": ["vi"],
+    "direction": "ltr"
+  }, {
+    "id": "yo",
+    "description": "Yoruba",
+    "relatedLanguages": ["yo"],
     "direction": "ltr"
   }],
 
@@ -5997,7 +6024,7 @@ export default {
     },
     "ABOUT_FOUNDATION": {
       "ROUTE": "about-foundation",
-      "TITLE": "About foundation | Oppia",
+      "TITLE": "About the Oppia Foundation | Oppia",
       "META": []
     },
     "CLASSROOM": {
