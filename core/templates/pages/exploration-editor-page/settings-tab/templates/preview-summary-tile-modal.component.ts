@@ -51,7 +51,8 @@ export class PreviewSummaryTileModalComponent extends ConfirmOrCancelModal {
 
   getThumbnailIconUrl(): string {
     let category: string = this.explorationCategoryService.displayed;
-    if (AppConstants.ALL_CATEGORIES.indexOf(category) === -1) {
+    let allCategoryList: string[] = [...AppConstants.ALL_CATEGORIES];
+    if (allCategoryList.indexOf(category) === -1) {
       category = AppConstants.DEFAULT_CATEGORY_ICON;
     }
     return '/subjects/' + category + '.svg';
