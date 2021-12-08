@@ -38,7 +38,11 @@ import { TopicPreviewTabComponent } from './preview-tab/topic-preview-tab.compon
 import { TopicEditorNavbarBreadcrumbComponent } from './navbar/topic-editor-navbar-breadcrumb.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
+<<<<<<< HEAD
 import { TopicEditorSaveModalComponent } from './modal-templates/topic-editor-save-modal.component';
+=======
+import { CreateNewSubtopicModalComponent } from 'pages/topic-editor-page/modal-templates/create-new-subtopic-modal.component';
+>>>>>>> b591b7913a06e82db1221cc57964179a919b123f
 
 @NgModule({
   imports: [
@@ -56,6 +60,7 @@ import { TopicEditorSaveModalComponent } from './modal-templates/topic-editor-sa
     TopicPreviewTabComponent,
     TopicEditorNavbarBreadcrumbComponent,
     TopicEditorSaveModalComponent
+    CreateNewSubtopicModalComponent
   ],
   entryComponents: [
     StoriesListComponent,
@@ -64,6 +69,7 @@ import { TopicEditorSaveModalComponent } from './modal-templates/topic-editor-sa
     TopicPreviewTabComponent,
     TopicEditorNavbarBreadcrumbComponent,
     TopicEditorSaveModalComponent
+    CreateNewSubtopicModalComponent
   ],
   providers: [
     {
