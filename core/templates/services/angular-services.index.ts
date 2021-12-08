@@ -387,6 +387,11 @@ import { I18nService } from 'i18n/i18n.service';
 import { QuestionPlayerStateService } from 'components/question-directives/question-player/services/question-player-state.service';
 import { SettingTabBackendApiService } from 'pages/exploration-editor-page/services/setting-tab-backend-api.service';
 import { HistoryTabBackendApiService } from 'pages/exploration-editor-page/services/history-tab-backend-api.service';
+import { ExplorationRightsService } from 'pages/exploration-editor-page/services/exploration-rights.service';
+import { ExplorationRightsBackendApiService } from 'pages/exploration-editor-page/services/exploration-rights-backend-api.service';
+import { ExplorationCategoryService } from 'pages/exploration-editor-page/services/exploration-category.service';
+import { ExplorationObjectiveService } from 'pages/exploration-editor-page/services/exploration-objective.service';
+import { ExplorationTitleService } from 'pages/exploration-editor-page/services/exploration-title.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -483,6 +488,7 @@ export const angularServices: [string, Type<{}>][] = [
     EmailDashboardResultBackendApiService],
   ['EndExplorationRulesService', EndExplorationRulesService],
   ['EndExplorationValidationService', EndExplorationValidationService],
+  ['ExplorationCategoryService', ExplorationCategoryService],
   ['ExplorationCreationBackendApiService',
     ExplorationCreationBackendApiService],
   ['ExplorationCreationService',
@@ -490,6 +496,8 @@ export const angularServices: [string, Type<{}>][] = [
   ['ExplorationDataBackendApiService', ExplorationDataBackendApiService],
   ['ExplorationDataService', ExplorationDataService],
   ['ExplorationDiffService', ExplorationDiffService],
+  ['ExplorationRightsService', ExplorationRightsService],
+  ['ExplorationRightsBackendApiService', ExplorationRightsBackendApiService],
   ['ExplorationPropertyService', ExplorationPropertyService],
   ['ExplorationEngineService', ExplorationEngineService],
   ['ExplorationFeaturesBackendApiService',
@@ -504,6 +512,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ExplorationInitStateNameService', ExplorationInitStateNameService],
   ['ExplorationLanguageCodeService', ExplorationLanguageCodeService],
   ['ExplorationObjectFactory', ExplorationObjectFactory],
+  ['ExplorationObjectiveService', ExplorationObjectiveService],
   ['ExplorationPermissionsBackendApiService',
     ExplorationPermissionsBackendApiService],
   ['ExplorationPlayerStateService', ExplorationPlayerStateService],
@@ -514,6 +523,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ExplorationStatsService', ExplorationStatsService],
   ['ExplorationSummaryBackendApiService', ExplorationSummaryBackendApiService],
   ['ExplorationTagsService', ExplorationTagsService],
+  ['ExplorationTitleService', ExplorationTitleService],
   ['ExpressionEvaluatorService', ExpressionEvaluatorService],
   ['ExpressionInterpolationService', ExpressionInterpolationService],
   ['ExpressionParserService', ExpressionParserService],

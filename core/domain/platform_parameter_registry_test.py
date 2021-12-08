@@ -165,7 +165,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             feconf.SYSTEM_COMMITTER_ID,
             'commit message',
             [
-                {
+                parameter_domain.PlatformParameterRule.from_dict({
                     'filters': [
                         {
                             'type': 'server_mode',
@@ -173,7 +173,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                         }
                     ],
                     'value_when_matched': 'updated'
-                }
+                })
             ],
         )
         parameter_updated = registry.Registry.get_platform_parameter(
@@ -193,7 +193,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             feconf.SYSTEM_COMMITTER_ID,
             'commit message',
             [
-                {
+                parameter_domain.PlatformParameterRule.from_dict({
                     'filters': [
                         {
                             'type': 'server_mode',
@@ -201,7 +201,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                         }
                     ],
                     'value_when_matched': 'updated'
-                }
+                })
             ],
         )
         self.assertIsNone(
@@ -222,7 +222,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                 feconf.SYSTEM_COMMITTER_ID,
                 'commit message',
                 [
-                    {
+                    parameter_domain.PlatformParameterRule.from_dict({
                         'filters': [
                             {
                                 'type': 'server_mode',
@@ -230,7 +230,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                             }
                         ],
                         'value_when_matched': True
-                    }
+                    })
                 ],
             )
 
@@ -249,7 +249,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                 feconf.SYSTEM_COMMITTER_ID,
                 'commit message',
                 [
-                    {
+                    parameter_domain.PlatformParameterRule.from_dict({
                         'filters': [
                             {
                                 'type': 'server_mode',
@@ -257,7 +257,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                             }
                         ],
                         'value_when_matched': True
-                    }
+                    })
                 ],
             )
 
@@ -276,7 +276,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                 feconf.SYSTEM_COMMITTER_ID,
                 'commit message',
                 [
-                    {
+                    parameter_domain.PlatformParameterRule.from_dict({
                         'filters': [
                             {
                                 'type': 'server_mode',
@@ -284,7 +284,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                             }
                         ],
                         'value_when_matched': True
-                    }
+                    })
                 ],
             )
 
@@ -303,7 +303,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                 feconf.SYSTEM_COMMITTER_ID,
                 'commit message',
                 [
-                    {
+                    parameter_domain.PlatformParameterRule.from_dict({
                         'filters': [
                             {
                                 'type': 'server_mode',
@@ -311,7 +311,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                             }
                         ],
                         'value_when_matched': True
-                    }
+                    })
                 ],
             )
 
@@ -327,7 +327,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             feconf.SYSTEM_COMMITTER_ID,
             'commit message',
             [
-                {
+                parameter_domain.PlatformParameterRule.from_dict({
                     'filters': [
                         {
                             'type': 'server_mode',
@@ -335,7 +335,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                         }
                     ],
                     'value_when_matched': 'updated'
-                }
+                })
             ],
         )
 
