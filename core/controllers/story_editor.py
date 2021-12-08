@@ -19,7 +19,7 @@ from __future__ import annotations
 from core import feconf
 from core import utils
 from core.constants import constants
-from core.controllers import acl_decorators
+from core.controllers import acl_decorators, domain_objects_validator
 from core.controllers import base
 from core.domain import classroom_services
 from core.domain import skill_services
@@ -59,6 +59,49 @@ class EditableStoryDataHandler(base.BaseHandler):
     """A data handler for stories which support writing."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'story_id': {
+            'schema': {
+                'type': 'basestring'
+            },
+            'validators': [{
+                'id': 'has_length',
+                'value': constants.STORY_ID_LENGTH
+            }]
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'PUT': {
+            'version': {
+                'schema': {
+                    'type': 'int',
+                    'default_value': None
+                }
+            },
+            'commit_message': {
+                'schema': {
+                    'type': 'basestring',
+                    'default_value': None,
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_COMMIT_MESSAGE_LENGTH
+                    }]
+                }
+            },
+            'change_dicts': {
+                'schema': {
+                    'type': 'list',
+                    'items': {
+                        'type': 'object_dict',
+                        'validation_method': (
+                            domain_objects_validator.validate_story_change)
+                    }
+                }
+            }
+        },
+        'DELETE': {}
+    }
 
     def _require_valid_version(self, version_from_payload, story_version):
         """Check that the payload version matches the given story
@@ -200,6 +243,26 @@ class ValidateExplorationsHandler(base.BaseHandler):
     """A data handler for validating the explorations in a story."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'story_id': {
+            'schema': {
+                'type': 'basestring'
+            },
+            'validators': [{
+                'id': 'has_length',
+                'value': constants.STORY_ID_LENGTH
+            }]
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'comma_separated_exp_ids': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+    }
 
     @acl_decorators.can_edit_story
     def get(self, _):

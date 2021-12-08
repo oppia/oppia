@@ -27,8 +27,22 @@ from core.domain import collection_domain
 from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import state_domain
+from core.domain import story_domain
 
 from typing import Dict, Optional, Union
+
+def validate_story_change(obj):
+    """Validates story change.
+
+    Args:
+        obj: dict. Data that needs to be validated.
+
+    Returns:
+        StoryChange. Returns a StoryChange object.
+    """
+    # No explicit call to validate_dict method is necessary, because
+    # StoryChange calls validate method while initialization.
+    return story_domain.StoryChange(obj)
 
 
 def validate_exploration_change(obj):
