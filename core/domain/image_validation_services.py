@@ -43,7 +43,7 @@ def validate_image_and_filename(raw_image, filename):
     if not raw_image:
         raise utils.ValidationError(
             'No image data provided for file with name %s.'
-            %(filename))
+            % (filename))
     if utils.is_base64_encoded(raw_image):
         raw_image = base64.decodebytes(raw_image.encode('utf-8'))
     if len(raw_image) > hundred_kb_in_bytes:
