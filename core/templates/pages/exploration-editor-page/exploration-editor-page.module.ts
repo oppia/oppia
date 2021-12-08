@@ -47,6 +47,7 @@ import { ConfirmDiscardChangesModalComponent } from './modal-templates/confirm-d
 import { CreateFeedbackThreadModalComponent } from './feedback-tab/templates/create-feedback-thread-modal.component';
 import { ConfirmDeleteStateModalComponent } from './editor-tab/templates/modal-templates/confirm-delete-state-modal.component';
 
+
 @NgModule({
   imports: [
     BrowserModule,
@@ -92,6 +93,7 @@ import { ConfirmDeleteStateModalComponent } from './editor-tab/templates/modal-t
     EditorReloadingModalComponent,
     CreateFeedbackThreadModalComponent,
     ConfirmDeleteStateModalComponent
+
   ],
   providers: [
     {

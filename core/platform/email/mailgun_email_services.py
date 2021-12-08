@@ -22,7 +22,7 @@ import base64
 import urllib
 
 from core import feconf
-from core import python_utils
+from core import utils
 
 from typing import Dict, List, Optional, Union
 
@@ -125,8 +125,8 @@ def send_email_to_recipients(
         # also the docs recommend this approach:
         # https://docs.python.org/3.7/library/urllib.request.html#urllib-examples
         encoded_url = urllib.parse.urlencode(data).encode('ascii')
-        req = python_utils.url_request(server, encoded_url, header)
-        resp = python_utils.url_open(req)
+        req = urllib.request.Request(server, encoded_url, header)
+        resp = utils.url_open(req)
         # The function url_open returns a file_like object that can be queried
         # for the status code of the url query. If it is not 200, the mail query
         # failed so we return False (this function did not complete
