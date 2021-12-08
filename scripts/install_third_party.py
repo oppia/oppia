@@ -24,7 +24,7 @@ import os
 import subprocess
 import sys
 import tarfile
-import urllib.request as urlrequest
+import urllib
 import zipfile
 
 from core import python_utils
@@ -100,7 +100,7 @@ def download_files(source_url_root, target_dir, source_filenames):
     for filename in source_filenames:
         if not os.path.exists(os.path.join(target_dir, filename)):
             print('Downloading file %s to %s ...' % (filename, target_dir))
-            urlrequest.urlretrieve(
+            urllib.request.urlretrieve(
                 '%s/%s' % (source_url_root, filename),
                 filename=os.path.join(target_dir, filename))
 
@@ -131,7 +131,7 @@ def download_and_unzip_files(
             zip_root_name, target_parent_dir))
         common.ensure_directory_exists(target_parent_dir)
 
-        urlrequest.urlretrieve(source_url, filename=TMP_UNZIP_PATH)
+        urllib.request.urlretrieve(source_url, filename=TMP_UNZIP_PATH)
 
         try:
             with zipfile.ZipFile(TMP_UNZIP_PATH, 'r') as zfile:
@@ -142,7 +142,7 @@ def download_and_unzip_files(
                 os.remove(TMP_UNZIP_PATH)
 
             # Some downloads (like jqueryui-themes) may require a user-agent.
-            req = python_utils.url_request(source_url, None, {})
+            req = urllib.request.Request(source_url, None, {})
             req.add_header('User-agent', 'python')
             # This is needed to get a seekable filestream that can be used
             # by zipfile.ZipFile.
@@ -182,7 +182,7 @@ def download_and_untar_files(
             tar_root_name, target_parent_dir))
         common.ensure_directory_exists(target_parent_dir)
 
-        urlrequest.urlretrieve(source_url, filename=TMP_UNZIP_PATH)
+        urllib.request.urlretrieve(source_url, filename=TMP_UNZIP_PATH)
         with contextlib.closing(tarfile.open(
             name=TMP_UNZIP_PATH, mode='r:gz')) as tfile:
             tfile.extractall(target_parent_dir)
