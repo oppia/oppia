@@ -123,7 +123,7 @@
     },
     {
       "files": [
-        "core/tests/protractor_utils/*.js",
+        "core/tests/protractor_utils/*.js"
       ],
       "rules": {
         "oppia/check-element-selector-at-top": "error"

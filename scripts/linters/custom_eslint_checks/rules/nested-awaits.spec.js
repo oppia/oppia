@@ -28,36 +28,40 @@ ruleTester.run('nested-awaits', rule, {
   valid: [
     {
       code:
-        `async function alpha() {
-         await (await browser.switchTo().activeElement()).sendKeys(explanation);
-       }`
+       `var alpha = async function() {
+          await (await browser.switchTo().activeElement()).sendKeys(explanation);
+        };
+        `
     }
   ],
 
   invalid: [
     {
       code:
-        `async function alpha() {
+        `var alpha = async function() {
            await (browser.switchTo().activeElement()).sendKeys(explanation);
-         }`,
+         };
+         `,
       errors: [{
         message: `Please use nested awaits like: await (await browser.switchTo().activeElement()).sendKeys(explanation);`
       }]
     },
     {
       code:
-        `await function alpha() {
+        `var alpha = async function() {
            (await browser.switchTo().activeElement()).sendKeys(explanation);
-         }`,
+         };
+         `,
       errors: [{
         message: `Please use nested awaits like: await (await browser.switchTo().activeElement()).sendKeys(explanation);`
       }]
     },
     {
       code:
-        `function alpha() {
+        `var alpha = function() {
            (browser.switchTo().activeElement()).sendKeys(explanation);
-         }`,
+         };
+         `,
       errors: [{
         message: `Please use nested awaits like: await (await browser.switchTo().activeElement()).sendKeys(explanation);`
       }]
