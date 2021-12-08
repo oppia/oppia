@@ -84,9 +84,11 @@ describe('Story Creation Service', () => {
     spyOn(storyCreationBackendApiService, 'createStoryAsync').and.returnValue(
       Promise.resolve({ storyId: 'storyId' }));
     spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue('');
+
     storyCreationService.createNewCanonicalStory();
     tick();
     tick();
+
     expect(ngbModal.open).toHaveBeenCalled();
     expect(alertsService.clearWarnings).toHaveBeenCalled();
     expect(imageLocalStorageService.getStoredImagesData).toHaveBeenCalled();
@@ -98,7 +100,9 @@ describe('Story Creation Service', () => {
   it('should not create story if creation is already in process', () => {
     storyCreationService.storyCreationInProgress = true;
     spyOn(imageLocalStorageService, 'getStoredImagesData');
+
     storyCreationService.createNewCanonicalStory();
+
     expect(imageLocalStorageService.getStoredImagesData)
       .not.toHaveBeenCalled();
   });
@@ -116,6 +120,7 @@ describe('Story Creation Service', () => {
         }
       }
     } as NgbModalRef);
+
     expect(() => {
       storyCreationService.createNewCanonicalStory();
       tick();
@@ -137,9 +142,11 @@ describe('Story Creation Service', () => {
     spyOn(imageLocalStorageService, 'flushStoredImagesData');
     spyOn(storyCreationBackendApiService, 'createStoryAsync').and.returnValue(
       Promise.reject({ error }));
+
     storyCreationService.createNewCanonicalStory();
     tick();
     tick();
+
     expect(storyCreationService.storyCreationInProgress).toBeFalse();
     expect(alertsService.addWarning).toHaveBeenCalledWith(error);
   }));
@@ -151,8 +158,10 @@ describe('Story Creation Service', () => {
         result: Promise.reject()
       } as NgbModalRef);
       spyOn(alertsService, 'clearWarnings');
+
       storyCreationService.createNewCanonicalStory();
       tick();
+
       expect(ngbModal.open).toHaveBeenCalled();
     }));
 });

@@ -61,6 +61,7 @@ describe('Story creation backend api service', () => {
     storyCreationBackendApiService = TestBed.inject(
       StoryCreationBackendApiService);
     story = NewlyCreatedStory.createDefault();
+
     story.title = 'story-title';
     story.description = 'description';
     story.urlFragment = 'url-fragment';
@@ -80,16 +81,17 @@ describe('Story creation backend api service', () => {
     fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
+
       storyCreationBackendApiService.createStoryAsync(
         story, imagesData, thumbnailBgColor).then(
         successHandler);
       let req = httpTestingController.expectOne(
         '/story_editor_handler/create_new');
-      expect(req.request.method).toEqual('POST');
-
-      expect(req.request.body.get('payload')).toEqual(JSON.stringify(postData));
       let sampleFormData = new FormData();
       sampleFormData.append('image', imagesData[0].imageBlob);
+
+      expect(req.request.method).toEqual('POST');
+      expect(req.request.body.get('payload')).toEqual(JSON.stringify(postData));
       expect(
         req.request.body.get('image')).toEqual(sampleFormData.get('image'));
       req.flush(postData);
@@ -102,6 +104,7 @@ describe('Story creation backend api service', () => {
     fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
+
       storyCreationBackendApiService.createStoryAsync(
         story, imagesData, thumbnailBgColor).then(
         successHandler, failHandler);
@@ -113,10 +116,11 @@ describe('Story creation backend api service', () => {
       let req = httpTestingController.expectOne(
         '/story_editor_handler/create_new');
       req.error(new ErrorEvent('Error'), errorResponse);
-      expect(req.request.method).toEqual('POST');
-      expect(req.request.body.get('payload')).toEqual(JSON.stringify(postData));
       let sampleFormData = new FormData();
       sampleFormData.append('image', imagesData[0].imageBlob);
+
+      expect(req.request.method).toEqual('POST');
+      expect(req.request.body.get('payload')).toEqual(JSON.stringify(postData));
       expect(
         req.request.body.get('image')).toEqual(sampleFormData.get('image'));
       flushMicrotasks();
