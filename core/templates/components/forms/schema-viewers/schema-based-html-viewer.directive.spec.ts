@@ -41,4 +41,3 @@
      expect(ctrl).toBeDefined();
    });
  });
- 
