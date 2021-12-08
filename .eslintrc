@@ -106,7 +106,8 @@
         "excludedForTesting.js"
       ],
       "rules": {
-        "oppia/e2e-action": "error"
+        "oppia/e2e-action": "error",
+        "oppia/nested-awaits": "error"
       }
     },
     {
