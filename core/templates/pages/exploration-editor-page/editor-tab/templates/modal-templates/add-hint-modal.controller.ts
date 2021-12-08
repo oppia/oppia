@@ -53,8 +53,8 @@ angular.module('oppia').controller('AddHintModalController', [
     $scope.hintIndex = StateHintsService.displayed.length + 1;
 
     $scope.isHintLengthExceeded = function(tmpHint) {
-        // TODO(#13764): Edit this check after appropriate limits are found.
-        return (tmpHint.length > 10000);
+      // TODO(#13764): Edit this check after appropriate limits are found.
+      return (tmpHint.length > 10000);
     };
 
     $scope.saveHint = function() {
