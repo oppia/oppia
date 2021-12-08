@@ -18,8 +18,9 @@
 
 from __future__ import annotations
 
+import urllib
+
 from core import feconf
-from core import python_utils
 from core import utils
 from core.platform.email import mailgun_email_services
 from core.tests import test_utils
@@ -67,7 +68,7 @@ class EmailTests(test_utils.GenericTestBase):
         swap_urlopen_context = self.swap(
             utils, 'url_open', swapped_urlopen)
         swap_request_context = self.swap(
-            python_utils, 'url_request', swapped_request)
+            urllib.request, 'Request', swapped_request)
         swap_api = self.swap(feconf, 'MAILGUN_API_KEY', 'key')
         swap_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
         with swap_urlopen_context, swap_request_context, swap_api, swap_domain:
@@ -96,7 +97,7 @@ class EmailTests(test_utils.GenericTestBase):
         swap_urlopen_context = self.swap(
             utils, 'url_open', swapped_urlopen)
         swap_request_context = self.swap(
-            python_utils, 'url_request', swapped_request)
+            urllib.request, 'Request', swapped_request)
         swap_api = self.swap(feconf, 'MAILGUN_API_KEY', 'key')
         swap_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
         with swap_urlopen_context, swap_request_context, swap_api, swap_domain:
@@ -129,7 +130,7 @@ class EmailTests(test_utils.GenericTestBase):
         swap_urlopen_context = self.swap(
             utils, 'url_open', swapped_urlopen)
         swap_request_context = self.swap(
-            python_utils, 'url_request', swapped_request)
+            urllib.request, 'Request', swapped_request)
         swap_api = self.swap(feconf, 'MAILGUN_API_KEY', 'key')
         swap_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
         with swap_urlopen_context, swap_request_context, swap_api, swap_domain:
@@ -160,7 +161,7 @@ class EmailTests(test_utils.GenericTestBase):
         swap_urlopen_context = self.swap(
             utils, 'url_open', swapped_urlopen)
         swap_request_context = self.swap(
-            python_utils, 'url_request', swapped_request)
+            urllib.request, 'Request', swapped_request)
         swap_api = self.swap(feconf, 'MAILGUN_API_KEY', 'key')
         swap_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
         with swap_urlopen_context, swap_request_context, swap_api, swap_domain:
@@ -214,7 +215,7 @@ class EmailTests(test_utils.GenericTestBase):
         swap_urlopen_context = self.swap(
             utils, 'url_open', swapped_urlopen)
         swap_request_context = self.swap(
-            python_utils, 'url_request', swapped_request)
+            urllib.request, 'Request', swapped_request)
         swap_api = self.swap(feconf, 'MAILGUN_API_KEY', 'key')
         swap_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
         with swap_urlopen_context, swap_request_context, swap_api, swap_domain:
