@@ -236,7 +236,10 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
         json_response = self.post_json(
             feconf.SKILL_DASHBOARD_DATA_URL, {
                 'num_skills_to_fetch': 10,
-                'sort': 'Oldest Created'
+                'sort': 'Oldest Created',
+                'classroom_name': 'All',
+                'status': 'All',
+                'keywords': [],
             }, csrf_token=csrf_token)
 
         self.assertEqual(len(json_response['skill_summary_dicts']), 2)
@@ -251,7 +254,10 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
         json_response = self.post_json(
             feconf.SKILL_DASHBOARD_DATA_URL, {
                 'num_skills_to_fetch': 10,
-                'sort': 'Newly Created'
+                'sort': 'Newly Created',
+                'classroom_name': 'All',
+                'status': 'All',
+                'keywords': [],
             }, csrf_token=csrf_token)
 
         self.assertEqual(len(json_response['skill_summary_dicts']), 2)
@@ -264,7 +270,10 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
         json_response = self.post_json(
             feconf.SKILL_DASHBOARD_DATA_URL, {
                 'num_skills_to_fetch': 10,
-                'sort': 'Most Recently Updated'
+                'sort': 'Most Recently Updated',
+                'classroom_name': 'All',
+                'status': 'All',
+                'keywords': [],
             }, csrf_token=csrf_token)
 
         self.assertEqual(len(json_response['skill_summary_dicts']), 2)
@@ -283,7 +292,10 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
         json_response = self.post_json(
             feconf.SKILL_DASHBOARD_DATA_URL, {
                 'num_skills_to_fetch': 10,
-                'keywords': ['description']
+                'keywords': ['description'],
+                'sort': 'Newly Created',
+                'classroom_name': 'All',
+                'status': 'All',
             }, csrf_token=csrf_token)
 
         self.assertEqual(len(json_response['skill_summary_dicts']), 1)
@@ -298,7 +310,10 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
         json_response = self.post_json(
             feconf.SKILL_DASHBOARD_DATA_URL, {
                 'num_skills_to_fetch': 10,
-                'keywords': ['subtopic']
+                'keywords': ['subtopic'],
+                'sort': 'Newly Created',
+                'classroom_name': 'All',
+                'status': 'All',
             }, csrf_token=csrf_token)
 
         self.assertEqual(len(json_response['skill_summary_dicts']), 1)
@@ -318,7 +333,10 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
         json_response = self.post_json(
             feconf.SKILL_DASHBOARD_DATA_URL, {
                 'num_skills_to_fetch': 10,
-                'status': 'Assigned'
+                'status': 'Assigned',
+                'sort': 'Newly Created',
+                'classroom_name': 'All',
+                'keywords': []
             }, csrf_token=csrf_token)
 
         self.assertEqual(len(json_response['skill_summary_dicts']), 2)
@@ -328,7 +346,10 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
         json_response = self.post_json(
             feconf.SKILL_DASHBOARD_DATA_URL, {
                 'num_skills_to_fetch': 10,
-                'status': 'Unassigned'
+                'status': 'Unassigned',
+                'sort': 'Newly Created',
+                'classroom_name': 'All',
+                'keywords': []
             }, csrf_token=csrf_token)
 
         self.assertEqual(len(json_response['skill_summary_dicts']), 0)
@@ -345,6 +366,10 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
         json_response = self.post_json(
             feconf.SKILL_DASHBOARD_DATA_URL, {
                 'num_skills_to_fetch': 1,
+                'status': 'All',
+                'sort': 'Newly Created',
+                'classroom_name': 'All',
+                'keywords': []
             }, csrf_token=csrf_token)
 
         # Default sort is "Newly created first". So, the skill with id-skill_id
@@ -368,6 +393,10 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
             feconf.SKILL_DASHBOARD_DATA_URL, {
                 'num_skills_to_fetch': 1,
                 'next_cursor': next_cursor,
+                'status': 'All',
+                'sort': 'Newly Created',
+                'classroom_name': 'All',
+                'keywords': []
             }, csrf_token=csrf_token)
 
         self.assertEqual(len(json_response['skill_summary_dicts']), 1)
@@ -380,13 +409,22 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
         json_response = self.post_json(
             feconf.SKILL_DASHBOARD_DATA_URL, {
-                'num_skills_to_fetch': '1',
+                'num_skills_to_fetch': 'string',
+                'status': 'All',
+                'sort': 'Newly Created',
+                'classroom_name': 'All',
+                'keywords': [],
             }, csrf_token=csrf_token,
             expected_status_int=400)
 
+        expected_error = (
+            'Schema validation for \'num_skills_to_fetch\' '
+            'failed: Could not convert str to int: string'
+        )
+
         self.assertEqual(
             json_response['error'],
-            'Number of skills to fetch should be a number.')
+            expected_error)
 
     def test_fetch_filtered_skills_with_invalid_cursor_type(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
@@ -398,12 +436,21 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
         json_response = self.post_json(
             feconf.SKILL_DASHBOARD_DATA_URL, {
                 'num_skills_to_fetch': 1,
-                'next_cursor': 40
+                'next_cursor': 40,
+                'status': 'All',
+                'sort': 'Newly Created',
+                'classroom_name': 'All',
+                'keywords': []
             }, csrf_token=csrf_token,
             expected_status_int=400)
 
+        expected_error = (
+            'Schema validation for \'next_cursor\' failed: '
+            'Expected string, received 40'
+        )
+
         self.assertEqual(
-            json_response['error'], 'Next Cursor should be a string.')
+            json_response['error'], expected_error)
 
     def test_fetch_filtered_skills_with_invalid_cursor_value(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
@@ -415,7 +462,11 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
         self.post_json(
             feconf.SKILL_DASHBOARD_DATA_URL, {
                 'num_skills_to_fetch': 1,
-                'next_cursor': 'kfsdkam43k4334'
+                'next_cursor': 'kfsdkam43k4334',
+                'status': 'All',
+                'sort': 'Newly Created',
+                'classroom_name': 'All',
+                'keywords': []
             }, csrf_token=csrf_token,
             expected_status_int=500)
 
@@ -427,11 +478,19 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
             feconf.SKILL_DASHBOARD_DATA_URL, {
                 'num_skills_to_fetch': 10,
                 'classroom_name': 20,
+                'status': 'All',
+                'sort': 'Newly Created',
+                'keywords': [],
             }, csrf_token=csrf_token,
             expected_status_int=400)
 
+        expected_error = (
+            'Schema validation for \'classroom_name\' failed: '
+            'Expected string, received 20'
+        )
+
         self.assertEqual(
-            json_response['error'], 'Classroom name should be a string.')
+            json_response['error'], expected_error)
 
     def test_fetch_filtered_skills_with_invalid_keywords(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
@@ -441,21 +500,37 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
             feconf.SKILL_DASHBOARD_DATA_URL, {
                 'num_skills_to_fetch': 10,
                 'keywords': 20,
+                'classroom_name': 'All',
+                'status': 'All',
+                'sort': 'Newly Created',
             }, csrf_token=csrf_token,
             expected_status_int=400)
 
+        expected_error = (
+            'Schema validation for \'keywords\' failed: '
+            'Expected list, received 20'
+        )
+
         self.assertEqual(
-            json_response['error'], 'Keywords should be a list of strings.')
+            json_response['error'], expected_error)
 
         json_response = self.post_json(
             feconf.SKILL_DASHBOARD_DATA_URL, {
                 'num_skills_to_fetch': 10,
                 'keywords': ['apple', 20],
+                'classroom_name': 'All',
+                'status': 'All',
+                'sort': 'Newly Created',
             }, csrf_token=csrf_token,
             expected_status_int=400)
 
+        expected_error = (
+            'Schema validation for \'keywords\' failed: '
+            'Expected string, received 20'
+        )
+
         self.assertEqual(
-            json_response['error'], 'Keywords should be a list of strings.')
+            json_response['error'], expected_error)
 
     def test_fetch_filtered_skills_with_invalid_status(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
@@ -465,11 +540,19 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
             feconf.SKILL_DASHBOARD_DATA_URL, {
                 'num_skills_to_fetch': 10,
                 'status': 20,
+                'classroom_name': 'All',
+                'sort': 'Newly Created',
+                'keywords': []
             }, csrf_token=csrf_token,
             expected_status_int=400)
 
+        expected_error = (
+            'Schema validation for \'status\' failed: '
+            'Expected string, received 20'
+        )
+
         self.assertEqual(
-            json_response['error'], 'Status should be a string.')
+            json_response['error'], expected_error)
 
     def test_fetch_filtered_skills_with_invalid_sort(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
@@ -479,11 +562,19 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
             feconf.SKILL_DASHBOARD_DATA_URL, {
                 'num_skills_to_fetch': 10,
                 'sort': 20,
+                'classroom_name': 'All',
+                'status': 'All',
+                'keywords': []
             }, csrf_token=csrf_token,
             expected_status_int=400)
 
+        expected_error = (
+            'Schema validation for \'sort\' failed: '
+            'Expected string, received 20'
+        )
+
         self.assertEqual(
-            json_response['error'], 'The value of sort_by should be a string.')
+            json_response['error'], expected_error)
 
 
 class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):

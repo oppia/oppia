@@ -22,6 +22,7 @@ import logging
 
 from core import feconf
 from core import utils
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import config_domain
@@ -51,6 +52,10 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
     """Provides data for the user's topics and skills dashboard page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.can_access_topics_and_skills_dashboard
     def get(self):
@@ -165,6 +170,20 @@ class TopicAssignmentsHandler(base.BaseHandler):
     """Provides information about which topics contain the given skill."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'skill_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.can_access_topics_and_skills_dashboard
     def get(self, skill_id):
@@ -184,42 +203,62 @@ class SkillsDashboardPageDataHandler(base.BaseHandler):
     """Provides data for the user's skills dashboard page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'classroom_name': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'next_cursor': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
+            'keywords': {
+                'schema': {
+                    'type': 'list',
+                    'items': {
+                        'type': 'basestring'
+                    }
+                }
+            },
+            'num_skills_to_fetch': {
+                'schema': {
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 1
+                    }]
+                }
+            },
+            'sort': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'choices': constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS
+            },
+            'status': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'choices': constants.SKILL_STATUS_OPTIONS
+            }
+        }
+    }
 
     @acl_decorators.can_access_topics_and_skills_dashboard
     def post(self):
         """Handles POST requests."""
 
-        classroom_name = self.payload.get('classroom_name')
-        urlsafe_start_cursor = self.payload.get('next_cursor', None)
-        keywords = self.payload.get('keywords')
-        num_skills_to_fetch = self.payload.get('num_skills_to_fetch')
-        sort_by = self.payload.get('sort')
-        status = self.payload.get('status')
-
-        if (classroom_name is not None and not isinstance(classroom_name, str)):
-            raise self.InvalidInputException(
-                'Classroom name should be a string.')
-
-        if (urlsafe_start_cursor is not None and
-                not isinstance(urlsafe_start_cursor, str)):
-            raise self.InvalidInputException('Next Cursor should be a string.')
-
-        if (num_skills_to_fetch is None or
-                not isinstance(num_skills_to_fetch, int)):
-            raise self.InvalidInputException(
-                'Number of skills to fetch should be a number.')
-
-        if (keywords is not None and (not isinstance(keywords, list) or (
-                not all(isinstance(keyword, str) for keyword in keywords)))):
-            raise self.InvalidInputException(
-                'Keywords should be a list of strings.')
-
-        if (sort_by is not None and not isinstance(sort_by, str)):
-            raise self.InvalidInputException(
-                'The value of sort_by should be a string.')
-
-        if (status is not None and not isinstance(status, str)):
-            raise self.InvalidInputException('Status should be a string.')
+        classroom_name = self.normalized_payload.get('classroom_name')
+        urlsafe_start_cursor = self.normalized_payload.get('next_cursor')
+        keywords = self.normalized_payload.get('keywords')
+        num_skills_to_fetch = self.normalized_payload.get('num_skills_to_fetch')
+        sort_by = self.normalized_payload.get('sort')
+        status = self.normalized_payload.get('status')
 
         skill_summaries, next_cursor, more = (
             skill_services.get_filtered_skill_summaries(
