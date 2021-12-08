@@ -57,10 +57,6 @@ class PythonUtilsTests(test_utils.GenericTestBase):
             with python_utils.open_file('invalid_file.py', 'r') as f:
                 f.readlines()
 
-    def test_url_request(self):
-        response = python_utils.url_request('http://www.google.com', None, {})
-        self.assertEqual(response.get_full_url(), 'http://www.google.com')
-
     def test_divide(self):
         self.assertEqual(python_utils.divide(4, 2), 2)
         self.assertEqual(python_utils.divide(5, 2), 2)
