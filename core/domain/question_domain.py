@@ -16,8 +16,7 @@
 
 """Domain objects relating to questions."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import collections
 import copy
@@ -25,7 +24,6 @@ import datetime
 import re
 
 from core import feconf
-from core import python_utils
 from core import schema_utils
 from core import utils
 from core.constants import constants
@@ -131,7 +129,7 @@ class QuestionSuggestionChange(change_domain.BaseChange):
     ]
 
 
-class Question(python_utils.OBJECT):
+class Question:
     """Domain object for a question."""
 
     def __init__(
@@ -533,7 +531,7 @@ class Question(python_utils.OBJECT):
                 max_existing_content_id_index + 1)
             return question_state_dict
 
-        class ContentIdCounter(python_utils.OBJECT):
+        class ContentIdCounter:
             """This helper class is used to keep track of
             next_content_id_index and new_content_ids, and provides a
             function to generate new content_ids.
@@ -810,7 +808,7 @@ class Question(python_utils.OBJECT):
         Returns:
             dict. The converted question_state_dict.
         """
-        class ContentIdCounter(python_utils.OBJECT):
+        class ContentIdCounter:
             """This helper class is used to keep track of
             next_content_id_index and new_content_ids, and provides a
             function to generate new content_ids.
@@ -1210,7 +1208,7 @@ class Question(python_utils.OBJECT):
         question before it is finalized.
         """
 
-        if not isinstance(self.language_code, python_utils.BASESTRING):
+        if not isinstance(self.language_code, str):
             raise utils.ValidationError(
                 'Expected language_code to be a string, received %s' %
                 self.language_code)
@@ -1220,9 +1218,8 @@ class Question(python_utils.OBJECT):
                 'linked_skill_ids is either null or an empty list')
 
         if not (isinstance(self.linked_skill_ids, list) and (
-                all(isinstance(
-                    elem, python_utils.BASESTRING) for elem in (
-                        self.linked_skill_ids)))):
+                all(isinstance(elem, str) for elem in (
+                    self.linked_skill_ids)))):
             raise utils.ValidationError(
                 'Expected linked_skill_ids to be a list of strings, '
                 'received %s' % self.linked_skill_ids)
@@ -1233,8 +1230,7 @@ class Question(python_utils.OBJECT):
         inapplicable_skill_misconception_ids_is_list = isinstance(
             self.inapplicable_skill_misconception_ids, list)
         if not (inapplicable_skill_misconception_ids_is_list and (
-                all(isinstance(
-                    elem, python_utils.BASESTRING) for elem in (
+                all(isinstance(elem, str) for elem in (
                         self.inapplicable_skill_misconception_ids)))):
             raise utils.ValidationError(
                 'Expected inapplicable_skill_misconception_ids to be a list '
@@ -1311,7 +1307,7 @@ class Question(python_utils.OBJECT):
     def validate(self):
         """Validates the Question domain object before it is saved."""
 
-        if not isinstance(self.id, python_utils.BASESTRING):
+        if not isinstance(self.id, str):
             raise utils.ValidationError(
                 'Expected ID to be a string, received %s' % self.id)
 
@@ -1397,7 +1393,7 @@ class Question(python_utils.OBJECT):
         self.question_state_data = question_state_data
 
 
-class QuestionSummary(python_utils.OBJECT):
+class QuestionSummary:
     """Domain object for Question Summary."""
 
     def __init__(
@@ -1448,16 +1444,16 @@ class QuestionSummary(python_utils.OBJECT):
             ValidationError. One or more attributes of question summary are
                 invalid.
         """
-        if not isinstance(self.id, python_utils.BASESTRING):
+        if not isinstance(self.id, str):
             raise utils.ValidationError(
                 'Expected id to be a string, received %s' % self.id)
 
-        if not isinstance(self.question_content, python_utils.BASESTRING):
+        if not isinstance(self.question_content, str):
             raise utils.ValidationError(
                 'Expected question content to be a string, received %s' %
                 self.question_content)
 
-        if not isinstance(self.interaction_id, python_utils.BASESTRING):
+        if not isinstance(self.interaction_id, str):
             raise utils.ValidationError(
                 'Expected interaction id to be a string, received %s' %
                 self.interaction_id)
@@ -1473,14 +1469,14 @@ class QuestionSummary(python_utils.OBJECT):
                 self.last_updated)
 
         if not (isinstance(self.misconception_ids, list) and (
-                all(isinstance(elem, python_utils.BASESTRING) for elem in (
+                all(isinstance(elem, str) for elem in (
                     self.misconception_ids)))):
             raise utils.ValidationError(
                 'Expected misconception ids to be a list of '
                 'strings, received %s' % self.misconception_ids)
 
 
-class QuestionSkillLink(python_utils.OBJECT):
+class QuestionSkillLink:
     """Domain object for Question Skill Link.
 
     Attributes:
@@ -1520,7 +1516,7 @@ class QuestionSkillLink(python_utils.OBJECT):
         }
 
 
-class MergedQuestionSkillLink(python_utils.OBJECT):
+class MergedQuestionSkillLink:
     """Domain object for the Merged Question Skill Link object, returned to the
     editors.
 

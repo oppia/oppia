@@ -14,8 +14,7 @@
 
 """Tests for the domain_objects_validator."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 from core import utils
 from core.controllers import domain_objects_validator
@@ -224,3 +223,22 @@ class ValidateStateDictInStateYamlHandler(test_utils.GenericTestBase):
         # The error is representing the keyerror.
         with self.assertRaisesRegexp(Exception, 'content'): # type: ignore[no-untyped-call]
             domain_objects_validator.validate_state_dict(invalid_state_dict)
+
+
+class ValidateParamsDict(test_utils.GenericTestBase):
+    """Tests to validate the data type of params"""
+
+    def test_invalid_type_raises_exception(self):
+        incorrect_type = 13
+        with self.assertRaisesRegexp(
+            Exception, 'Excepted dict, received %s' % incorrect_type):
+            domain_objects_validator.validate_params_dict(incorrect_type)
+
+        incorrect_type = 'param1'
+        with self.assertRaisesRegexp(
+            Exception, 'Excepted dict, received %s' % incorrect_type):
+            domain_objects_validator.validate_params_dict(incorrect_type)
+
+    def test_valid_type_raises_no_exception(self):
+        correct_type = {}
+        domain_objects_validator.validate_params_dict(correct_type)

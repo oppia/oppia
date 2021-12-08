@@ -48,24 +48,24 @@ interface ExplorationCompletedData {
 }
 
 interface ExplorationResetData {
-  stateName: string
+  stateName: string;
 }
 
 interface MessageValidatorsType {
-  heightChange(payload: HeightChangeData): boolean;
-  explorationLoaded(): boolean;
-  stateTransition(payload: StateTransitionData): boolean;
-  explorationReset(payload: ExplorationResetData): boolean;
-  explorationCompleted(): boolean;
+  heightChange: (payload: HeightChangeData) => boolean;
+  explorationLoaded: () => boolean;
+  stateTransition: (payload: StateTransitionData) => boolean;
+  explorationReset: (payload: ExplorationResetData) => boolean;
+  explorationCompleted: () => boolean;
 }
 
 interface GetPayloadType {
-  heightChange(data: HeightChangeData): HeightChangeData;
-  explorationLoaded(data: ExplorationLoadedData): ExplorationLoadedData;
-  stateTransition(data: StateTransitionData): StateTransitionData;
-  explorationCompleted(
-    data: ExplorationCompletedData): ExplorationCompletedData;
-  explorationReset(data: string): ExplorationResetData;
+  heightChange: (data: HeightChangeData) => HeightChangeData;
+  explorationLoaded: (data: ExplorationLoadedData) => ExplorationLoadedData;
+  stateTransition: (data: StateTransitionData) => StateTransitionData;
+  explorationCompleted: (
+    data: ExplorationCompletedData) => ExplorationCompletedData;
+  explorationReset: (data: string) => ExplorationResetData;
 }
 
 type MessageTitles = typeof ServicesConstants.MESSENGER_PAYLOAD[
@@ -81,11 +81,11 @@ type PayloadType = (
 
 // The 'secret' and 'tagId' sent to the parent will be 'null' if the supported
 // hash version is not '0.0.0'. They are used to ensure backwards-compatibility.
-type HashDict = {
-  version: string,
-  secret: string | null,
-  tagid: string | null
-};
+interface HashDict {
+  version: string;
+  secret: string | null;
+  tagid: string | null;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -188,7 +188,7 @@ export class MessengerService {
 
         let separatorLocation = hashParts[i].indexOf('=');
         const _hashProp = (
-          <keyof HashDict> hashParts[i].substring(0, separatorLocation));
+          hashParts[i].substring(0, separatorLocation) as keyof HashDict);
         hashDict[_hashProp] = (
           hashParts[i].substring(separatorLocation + 1));
       }
@@ -206,34 +206,34 @@ export class MessengerService {
         switch (messageTitle) {
           case ServicesConstants.MESSENGER_PAYLOAD.EXPLORATION_COMPLETED:
             payload = this.getPayload.explorationCompleted(
-              <ExplorationCompletedData> messageData);
+              messageData as ExplorationCompletedData);
             isValidMessage = (
               this.MESSAGE_VALIDATORS.explorationCompleted());
             break;
           case ServicesConstants.MESSENGER_PAYLOAD.EXPLORATION_LOADED:
             payload = this.getPayload.explorationLoaded(
-              <ExplorationLoadedData> messageData);
+              messageData as ExplorationLoadedData);
             isValidMessage = (
               this.MESSAGE_VALIDATORS.explorationLoaded());
             break;
           case ServicesConstants.MESSENGER_PAYLOAD.EXPLORATION_RESET:
             payload = this.getPayload.explorationReset(
-              <string> messageData);
+              messageData as string);
             isValidMessage = (
               this.MESSAGE_VALIDATORS.explorationReset(payload));
             break;
           case ServicesConstants.MESSENGER_PAYLOAD.HEIGHT_CHANGE:
             payload = this.getPayload.heightChange(
-              <HeightChangeData> messageData);
+              messageData as HeightChangeData);
             isValidMessage = (
               this.MESSAGE_VALIDATORS.heightChange(payload));
             break;
           case ServicesConstants.MESSENGER_PAYLOAD.STATE_TRANSITION:
             payload = this.getPayload.stateTransition(
-              <StateTransitionData> messageData);
+              messageData as StateTransitionData);
             isValidMessage = (
               this.MESSAGE_VALIDATORS.stateTransition(
-                <StateTransitionData> payload));
+                payload as StateTransitionData));
             break;
         }
 
@@ -245,10 +245,10 @@ export class MessengerService {
         this.loggerService.info(payload.toString());
 
         let objToSendToParent: {
-          title: string,
-          payload: PayloadType
-          sourceTagId: string | null,
-          secret: string | null
+          title: string;
+          payload: PayloadType;
+          sourceTagId: string | null;
+          secret: string | null;
         } = {
           title: messageTitle,
           payload: payload,

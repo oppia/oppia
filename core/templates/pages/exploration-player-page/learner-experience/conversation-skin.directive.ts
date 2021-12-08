@@ -31,7 +31,7 @@ require(
   'pages/exploration-player-page/layout-directives/' +
   'correctness-footer.component.ts');
 require(
-  'pages/exploration-player-page/layout-directives/progress-nav.directive.ts');
+  'pages/exploration-player-page/layout-directives/progress-nav.component.ts');
 require(
   'pages/exploration-player-page/learner-experience/' +
   'learner-answer-info-card.component.ts');
@@ -39,7 +39,7 @@ require(
   'pages/exploration-player-page/learner-experience/' +
   'supplemental-card.component.ts');
 require(
-  'pages/exploration-player-page/learner-experience/tutor-card.directive.ts');
+  'pages/exploration-player-page/learner-experience/tutor-card.component.ts');
 require(
   'pages/exploration-player-page/services/learner-answer-info.service.ts');
 require('domain/collection/guest-collection-progress.service.ts');
@@ -1158,7 +1158,6 @@ angular.module('oppia').directive('conversationSkin', [
 
             $timeout(function() {
               FocusManagerService.setFocusIfOnDesktop(_nextFocusLabel);
-              scrollToTop();
             },
             TIME_FADEOUT_MSEC + TIME_HEIGHT_CHANGE_MSEC +
               0.5 * TIME_FADEIN_MSEC);
@@ -1174,6 +1173,7 @@ angular.module('oppia').directive('conversationSkin', [
 
           $scope.showUpcomingCard = function() {
             var currentIndex = PlayerPositionService.getDisplayedCardIndex();
+            scrollToTop();
             var conceptCardIsBeingShown = (
               $scope.displayedCard.getStateName() === null &&
               !ExplorationPlayerStateService.isInQuestionMode());
@@ -1308,6 +1308,10 @@ angular.module('oppia').directive('conversationSkin', [
               });
           };
 
+          $scope.isLanguageRTL = function() {
+            return I18nLanguageCodeService.isCurrentLanguageRTL();
+          };
+
           ctrl.$onInit = function() {
             questionPlayerConfig = $scope.getQuestionPlayerConfig();
             ctrl.directiveSubscriptions.add(
@@ -1426,6 +1430,12 @@ angular.module('oppia').directive('conversationSkin', [
               ContentTranslationManagerService
                 .onStateCardContentUpdate.subscribe(
                   () => $rootScope.$applyAsync())
+            );
+            ctrl.directiveSubscriptions.add(
+              PlayerPositionService.displayedCardIndexChangedEventEmitter
+                .subscribe(
+                  () => $rootScope.$applyAsync()
+                )
             );
             $window.addEventListener('beforeunload', function(e) {
               if ($scope.redirectToRefresherExplorationConfirmed) {

@@ -16,8 +16,7 @@
 
 """Tests for test_utils, mainly for the FunctionWrapper."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import logging
 import os
@@ -97,7 +96,7 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
         """Tests that FunctionWrapper also works for methods."""
         data = {}
 
-        class MockClass(python_utils.OBJECT):
+        class MockClass:
             def __init__(self, num1):
                 self.num1 = num1
 
@@ -116,7 +115,7 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
         """Tests that FunctionWrapper also works for class methods."""
         data = {}
 
-        class MockClass(python_utils.OBJECT):
+        class MockClass:
             str_attr = 'foo'
 
             @classmethod
@@ -134,7 +133,7 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
         """Tests that FunctionWrapper also works for static methods."""
         data = {}
 
-        class MockClass(python_utils.OBJECT):
+        class MockClass:
             @staticmethod
             def mock_staticmethod(num):
                 data['value'] = num
@@ -313,7 +312,7 @@ class CallCounterTests(test_utils.GenericTestBase):
 
         self.assertEqual(wrapped_function.times_called, 0)
 
-        for i in python_utils.RANGE(5):
+        for i in range(5):
             self.assertEqual(wrapped_function(i), i ** 2)
             self.assertEqual(wrapped_function.times_called, i + 1)
 
@@ -330,7 +329,7 @@ class FailingFunctionTests(test_utils.GenericTestBase):
             function, MockError('Dummy Exception'),
             test_utils.FailingFunction.INFINITY)
 
-        for i in python_utils.RANGE(20):
+        for i in range(20):
             with self.assertRaisesRegexp(MockError, 'Dummy Exception'):
                 failing_func(i)
 
@@ -404,7 +403,7 @@ class TestUtilsTests(test_utils.GenericTestBase):
             logging.debug('2')
             logging.warn('3')
             logging.error('4')
-            python_utils.PRINT('5')
+            print('5')
         logging.info('6')
 
         self.assertEqual(logs, ['1', '2', '3', '4'])
@@ -416,7 +415,7 @@ class TestUtilsTests(test_utils.GenericTestBase):
             logging.debug('2')
             logging.warn('3')
             logging.error('4')
-            python_utils.PRINT('5')
+            print('5')
         logging.error('6')
 
         self.assertEqual(logs, ['3', '4'])
@@ -449,7 +448,7 @@ class TestUtilsTests(test_utils.GenericTestBase):
                 obj.func()
             except Exception as e:
                 self.assertIs(type(e), Exception)
-                self.assertEqual(python_utils.UNICODE(e), '')
+                self.assertEqual(str(e), '')
             else:
                 self.fail(msg='obj.func() did not raise an Exception')
 
@@ -663,7 +662,7 @@ class EmailMockTests(test_utils.EmailTestBase):
         self.assertEqual(messages[0].bcc, 'c@c.com')
 
 
-class SwapWithCheckTestClass(python_utils.OBJECT):
+class SwapWithCheckTestClass:
     """Dummy class for testing check_with_swap. This class stores a few dummy
     functions.
     """

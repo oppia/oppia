@@ -16,16 +16,14 @@
 
 """Registry for calculations."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import inspect
 
-from core import python_utils
 from extensions.answer_summarizers import models
 
 
-class Registry(python_utils.OBJECT):
+class Registry:
     """Registry of all calculations for summarizing answers."""
 
     # Dict mapping calculation class names to their classes.
@@ -44,10 +42,8 @@ class Registry(python_utils.OBJECT):
 
             ancestor_names = [
                 base_class.__name__ for base_class in inspect.getmro(clazz)]
-            if 'BaseCalculation' not in ancestor_names:
-                continue
-
-            cls._calculations_dict[clazz.__name__] = clazz
+            if 'BaseCalculation' in ancestor_names:
+                cls._calculations_dict[clazz.__name__] = clazz
 
     @classmethod
     def get_calculation_by_id(cls, calculation_id):

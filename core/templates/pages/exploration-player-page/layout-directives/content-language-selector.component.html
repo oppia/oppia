@@ -1,6 +1,6 @@
 <div *ngIf="shouldDisplaySelector()" class="row oppia-content-language-selector-container">
   <i class="oppia-content-language-selector-icon fas fa-book-open"></i>
-  <span [innerHTML]="'I18N_PLAYER_AUDIO_LANGUAGE' | translate:{abc: xyz}"></span>
+  <span class="oppia-exploration-language" [innerHTML]="'I18N_PLAYER_AUDIO_LANGUAGE' | translate:{abc: xyz}"></span>
   <select #select
           class="oppia-content-language-selector"
           [ngModel]="selectedLanguageCode"
@@ -25,5 +25,8 @@
     font-size: 15px;
     margin-left: 5px;
     padding-left: 3px;
+  }
+  .oppia-exploration-language {
+    padding: 0 5px 0 5px;
   }
 </style>

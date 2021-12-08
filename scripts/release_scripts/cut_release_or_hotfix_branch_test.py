@@ -16,15 +16,15 @@
 
 """Unit tests for scripts/release_scripts/cut_release_or_hotfix_branch.py."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import argparse
+import builtins
 import json
 import subprocess
 import sys
 
-from core import python_utils
+from core import utils
 from core.tests import test_utils
 from scripts import common
 from scripts.release_scripts import cut_release_or_hotfix_branch
@@ -68,7 +68,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
             'ask_user_to_confirm_is_called': True
         }
 
-        class MockResponse(python_utils.OBJECT):
+        class MockResponse:
             def getcode(self):
                 """Mock getcode function for mock response object."""
 
@@ -110,7 +110,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
         def mock_ask_user_to_confirm(unused_msg):
             self.check_function_calls['ask_user_to_confirm_is_called'] = True
 
-        self.url_open_swap = self.swap(python_utils, 'url_open', mock_url_open)
+        self.url_open_swap = self.swap(utils, 'url_open', mock_url_open)
         self.verify_local_repo_swap = self.swap(
             common, 'verify_local_repo_is_clean',
             mock_verify_local_repo_is_clean)
@@ -135,7 +135,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
             mock_verify_hotfix_number)
         self.open_tab_swap = self.swap(
             common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
-        self.input_swap = self.swap(python_utils, 'INPUT', mock_input)
+        self.input_swap = self.swap(builtins, 'input', mock_input)
         self.ask_user_swap = self.swap(
             common, 'ask_user_to_confirm', mock_ask_user_to_confirm)
 
@@ -371,7 +371,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
         def mock_input():
             return 'n'
 
-        input_swap = self.swap(python_utils, 'INPUT', mock_input)
+        input_swap = self.swap(builtins, 'input', mock_input)
         with self.verify_local_repo_swap, self.verify_branch_name_swap:
             with self.verify_target_branch_swap:
                 with self.verify_target_version_swap, self.open_tab_swap:

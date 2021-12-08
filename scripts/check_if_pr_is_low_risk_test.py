@@ -14,10 +14,10 @@
 
 """Unit tests for scripts/check_if_pr_is_low_risk.py."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
-from core import python_utils
+import builtins
+from core import utils
 from core.tests import test_utils
 from scripts import check_if_pr_is_low_risk
 from scripts import common
@@ -99,7 +99,7 @@ class LoadDiffTests(test_utils.GenericTestBase):
                     '+++ b/modified\n'
                     '@@ -32,6 +32,7 @@ def hello():\n'
                     '-    print(s)\n'
-                    '+    python_utils.PRINT(s)\n'
+                    '+    print(s)\n'
                 )
             if tokens[-1] == 'old':
                 return (
@@ -109,7 +109,7 @@ class LoadDiffTests(test_utils.GenericTestBase):
                     '+++ /dev/null\n'
                     '@@ -32,6 +32,7 @@ def hello():\n'
                     '-    print(s)\n'
-                    '-    python_utils.PRINT(s)\n'
+                    '-    print(s)\n'
                 )
             if tokens[-1] == 'new':
                 return (
@@ -119,7 +119,7 @@ class LoadDiffTests(test_utils.GenericTestBase):
                     '+++ b/new\n'
                     '@@ -32,6 +32,7 @@ def hello():\n'
                     '+    print(s)\n'
-                    '+    python_utils.PRINT(s)\n'
+                    '+    print(s)\n'
                 )
             if tokens[-1] == 'added':
                 return (
@@ -129,7 +129,7 @@ class LoadDiffTests(test_utils.GenericTestBase):
                     '+++ b/added\n'
                     '@@ -32,6 +32,7 @@ def hello():\n'
                     '+    print(s)\n'
-                    '+    python_utils.PRINT(s)\n'
+                    '+    print(s)\n'
                 )
             raise AssertionError(
                 'Unknown args to mock_run_cmd: %s' % tokens)
@@ -171,19 +171,19 @@ class LoadDiffTests(test_utils.GenericTestBase):
         expected_file_diffs = {
             'modified': [
                 '-    print(s)',
-                '+    python_utils.PRINT(s)',
+                '+    print(s)',
             ],
             'old': [
                 '-    print(s)',
-                '-    python_utils.PRINT(s)',
+                '-    print(s)',
             ],
             'new': [
                 '+    print(s)',
-                '+    python_utils.PRINT(s)',
+                '+    print(s)',
             ],
             'added': [
                 '+    print(s)',
-                '+    python_utils.PRINT(s)',
+                '+    print(s)',
             ],
         }
         self.assertListEqual(diff_files, expected_diff_files)
@@ -207,7 +207,7 @@ class LoadDiffTests(test_utils.GenericTestBase):
                     'upstream/develop'],),
             ])
         print_swap = self.swap_with_checks(
-            python_utils, 'PRINT', mock_print,
+            builtins, 'print', mock_print,
             expected_args=[
                 ('Failed to parse diff --name-status line "A B C D"',),
             ])
@@ -248,7 +248,7 @@ class LoadDiffTests(test_utils.GenericTestBase):
                     'modified'],),
             ])
         print_swap = self.swap_with_checks(
-            python_utils, 'PRINT', mock_print,
+            builtins, 'print', mock_print,
             expected_args=[
                 ('Failed to find end of header in "modified" diff',),
             ])
@@ -282,7 +282,7 @@ class LookupPrTests(test_utils.GenericTestBase):
             return MockResponse(data=data)
 
         url_open_swap = self.swap(
-            python_utils, 'url_open', mock_url_open)
+            utils, 'url_open', mock_url_open)
 
         with url_open_swap:
             pr = check_if_pr_is_low_risk.lookup_pr(
@@ -300,7 +300,7 @@ class LookupPrTests(test_utils.GenericTestBase):
             return MockResponse(code=404)
 
         url_open_swap = self.swap(
-            python_utils, 'url_open', mock_url_open)
+            utils, 'url_open', mock_url_open)
 
         with url_open_swap:
             pr = check_if_pr_is_low_risk.lookup_pr(
@@ -638,7 +638,7 @@ class MainTests(test_utils.GenericTestBase):
             check_if_pr_is_low_risk, 'LOW_RISK_CHECKERS',
             mock_low_risk_checkers)
         print_swap = self.swap_with_checks(
-            python_utils, 'PRINT', python_utils.PRINT, expected_args=[
+            builtins, 'print', print, expected_args=[
                 (
                     'PR is not a low-risk PR of type changelog '
                     'because: Source branch does not indicate a '
@@ -731,7 +731,7 @@ class MainTests(test_utils.GenericTestBase):
             check_if_pr_is_low_risk, 'LOW_RISK_CHECKERS',
             mock_low_risk_checkers)
         print_swap = self.swap_with_checks(
-            python_utils, 'PRINT', python_utils.PRINT, expected_args=[
+            builtins, 'print', print, expected_args=[
                 (
                     'PR is not a low-risk PR of type translatewiki '
                     'because: Source branch does not indicate a '
@@ -824,7 +824,7 @@ class MainTests(test_utils.GenericTestBase):
             check_if_pr_is_low_risk, 'LOW_RISK_CHECKERS',
             mock_low_risk_checkers)
         print_swap = self.swap_with_checks(
-            python_utils, 'PRINT', python_utils.PRINT, expected_args=[
+            builtins, 'print', print, expected_args=[
                 (
                     'PR is not a low-risk PR of type translatewiki '
                     'because: Invalid change foo',
@@ -921,7 +921,7 @@ class MainTests(test_utils.GenericTestBase):
             check_if_pr_is_low_risk, 'LOW_RISK_CHECKERS',
             mock_low_risk_checkers)
         print_swap = self.swap_with_checks(
-            python_utils, 'PRINT', python_utils.PRINT, expected_args=[
+            builtins, 'print', print, expected_args=[
                 (
                     'PR is not a low-risk PR of type translatewiki '
                     'because: Source branch does not indicate a '

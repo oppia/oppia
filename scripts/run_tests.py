@@ -23,13 +23,10 @@ Note: The test scripts are arranged in increasing order of time taken. This
 enables a broken build to be detected as quickly as possible.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import argparse
 import subprocess
-
-from core import python_utils
 
 from . import run_backend_tests
 from . import run_frontend_tests
@@ -55,21 +52,20 @@ def main(args=None):
     setup_gae.main(args=[])
 
     # Run frontend unit tests.
-    python_utils.PRINT('Running frontend unit tests')
+    print('Running frontend unit tests')
     run_frontend_tests.main(args=[])
-    python_utils.PRINT('Frontend tests passed.')
+    print('Frontend tests passed.')
 
     # Run backend tests.
-    python_utils.PRINT('Running backend tests')
+    print('Running backend tests')
     run_backend_tests.main(args=[])
-    python_utils.PRINT('Backend tests passed.')
+    print('Backend tests passed.')
 
     # Run end-to-end tests.
-    python_utils.PRINT('Running end-to-end tests')
+    print('Running end-to-end tests')
     subprocess.Popen('bash scripts/run_e2e_tests.sh', shell=True)
 
-    python_utils.PRINT(
-        'SUCCESS    All frontend, backend and end-to-end tests passed!')
+    print('SUCCESS    All frontend, backend and end-to-end tests passed!')
 
 
 if __name__ == '__main__':

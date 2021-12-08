@@ -14,8 +14,7 @@
 
 """Tests for the contributor dashboard admin page controllers."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import datetime
 
@@ -243,9 +242,11 @@ class ContributionRightsHandlerTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             response['error'],
-            'Schema validation for \'category\' failed: Received invalid which '
-            'is not in the allowed range of choices: %s' % (
-                constants.CONTRIBUTION_RIGHT_CATEGORIES))
+            'At \'http://localhost/contributionrightshandler/invalid\' these '
+            'errors are happening:\nSchema validation for \'category\' failed: '
+            'Received invalid which is not in the allowed range of '
+            'choices: %s' % constants.CONTRIBUTION_RIGHT_CATEGORIES
+        )
 
     def test_remove_reviewer_with_invalid_username_raise_error(self):
         self.login(self.QUESTION_ADMIN_EMAIL)

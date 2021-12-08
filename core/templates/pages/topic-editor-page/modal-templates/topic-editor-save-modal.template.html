@@ -6,6 +6,7 @@
 </div>
 <div class="modal-body oppia-long-text">
   <p>
+    <span ng-if="!isTopicPublished">(Optional)</span>
     Please enter a brief description of what you have changed:
     <textarea rows="3" cols="50" maxlength="<[MAX_COMMIT_MESSAGE_LENGTH]>" ng-model="commitMessage" focus-on="saveChangesModalOpened" class="protractor-test-commit-message-input" autofocus></textarea>
   </p>

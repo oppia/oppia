@@ -21,20 +21,20 @@ objects they represent are stored. All methods and properties in this file
 should therefore be independent of the specific storage models used.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
-
-from core import python_utils
+from __future__ import annotations
 
 
-class MemoryCacheStats(python_utils.OBJECT):
+class MemoryCacheStats:
     """Domain object for an Oppia memory profile object that contains
     information about the memory cache.
     """
 
     def __init__(
-            self, total_allocated_in_bytes, peak_memory_usage_in_bytes,
-            total_number_of_keys_stored):
+        self,
+        total_allocated_in_bytes: int,
+        peak_memory_usage_in_bytes: int,
+        total_number_of_keys_stored: int
+    ) -> None:
         """Initializes a Memory Cache Stats domain object.
 
         Args:

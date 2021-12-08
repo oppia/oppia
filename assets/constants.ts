@@ -75,6 +75,8 @@ export default {
   // The default language code for an exploration.
   "DEFAULT_LANGUAGE_CODE": "en",
 
+  "RTL_LANGUAGE_CODES": ["ar"],
+
   "ALLOWED_THUMBNAIL_BG_COLORS": {
     "chapter": ["#F8BF74", "#D68F78", "#8EBBB6", "#B3D8F1"],
     "topic": ["#C6DCDA"],
@@ -4770,6 +4772,10 @@ export default {
     "description": "shqip (Albanian)",
     "direction": "ltr"
   }, {
+    "code": "az",
+    "description": "Azeri (Azerbaijani)",
+    "direction": "ltr"
+  }, {
     "code": "bg",
     "description": "български (Bulgarian)",
     "direction": "ltr"
@@ -4956,23 +4962,12 @@ export default {
   }],
 
   // NOTE TO DEVELOPERS: While adding another language, please ensure that the
-  // languages are in alphabetical order.
+  // languages are roughly in order of how much support we have for them in
+  // terms of lesson content translations.
   // List of supported site languages in which the platform is offered.
   "SUPPORTED_SITE_LANGUAGES": [{
-    "id": "id",
-    "text": "Bahasa Indonesia",
-    "direction": "ltr"
-  }, {
     "id": "en",
     "text": "English",
-    "direction": "ltr"
-  }, {
-    "id": "es",
-    "text": "Español",
-    "direction": "ltr"
-  }, {
-    "id": "fr",
-    "text": "français (French)",
     "direction": "ltr"
   }, {
     "id": "pt-br",
@@ -4982,6 +4977,38 @@ export default {
     "id": "ar",
     "text": "العربية",
     "direction": "rtl"
+  }, {
+    "id": "hi",
+    "text": "हिन्दी",
+    "direction": "ltr"
+  }, {
+    "id": "es",
+    "text": "Español",
+    "direction": "ltr"
+  }, {
+    "id": "bn",
+    "text": "বাংলা",
+    "direction": "ltr"
+  }, {
+    "id": "fr",
+    "text": "français (French)",
+    "direction": "ltr"
+  }, {
+    "id": "id",
+    "text": "Bahasa Indonesia",
+    "direction": "ltr"
+  }, {
+    "id": "uk",
+    "text": "украї́нська мо́ва (Ukrainian)",
+    "direction": "ltr"
+  }, {
+    "id": "sk",
+    "text": "slovenčina (Slovak)",
+    "direction": "ltr"
+  }, {
+    "id": "nl",
+    "text": "Nederlands (Dutch)",
+    "direction": "ltr"
   }, {
     "id": "kab",
     "text": "Taqbaylit (Kabyle)",
@@ -4993,14 +5020,6 @@ export default {
   }, {
     "id": "tr",
     "text": "Türkçe (Turkish)",
-    "direction": "ltr"
-  }, {
-    "id": "hi",
-    "text": "हिन्दी",
-    "direction": "ltr"
-  }, {
-    "id": "bn",
-    "text": "বাংলা",
     "direction": "ltr"
   }, {
     "id": "zh-hans",
@@ -5036,6 +5055,11 @@ export default {
     "description": "Arabic",
     "relatedLanguages": ["ar"],
     "direction": "rtl"
+  }, {
+    "id": "az",
+    "description": "Azerbaijani",
+    "relatedLanguages": ["az"],
+    "direction": "ltr"
   }, {
     "id": "bg",
     "description": "Bulgarian",
@@ -5590,6 +5614,7 @@ export default {
   "MAX_CHARS_IN_BLOG_POST_TITLE": 40,
   "MIN_CHARS_IN_BLOG_POST_TITLE": 5,
   "MAX_CHARS_IN_BLOG_POST_SUMMARY": 300,
+  "STORY_ID_LENGTH": 12,
   // This represents the maximum number of characters in the URL fragment for
   // story in the story page URL. E.g.
   // in /learn/math/fractions/story/bakery/..., 'bakery' is the
@@ -5606,6 +5631,7 @@ export default {
   // The recommended length for meta tag contents. Search engines will truncate
   // results greater than this limit.
   "MAX_CHARS_IN_META_TAG_CONTENT": 160,
+  "MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB": 5,
   "MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB": 50,
 
   "NEW_STATE_TEMPLATE": {
@@ -5667,6 +5693,11 @@ export default {
   "FIREBASE_CONFIG_MESSAGING_SENDER_ID": "",
   "FIREBASE_CONFIG_APP_ID": "",
   "FIREBASE_CONFIG_GOOGLE_CLIENT_ID": "",
+
+  // The name of the cookie Oppia will place the session cookie into. The name
+  // is arbitrary. If it is changed later on, then the cookie will live on in
+  // the users' browsers as garbage (although it'd expire eventually).
+  "FIREBASE_AUTH_SESSION_COOKIE_NAME": "session",
 
   "ALLOW_YAML_FILE_UPLOAD": false,
 
@@ -5797,9 +5828,10 @@ export default {
 
   // Placeholder texts for the math interactions.
   "MATH_INTERACTION_PLACEHOLDERS": {
-    "AlgebraicExpressionInput": "Type an expression here.",
-    "NumericExpressionInput": "Type an expression here, using only numbers.",
-    "MathEquationInput": "Type an equation here."
+    "AlgebraicExpressionInput": "I18N_INTERACTIONS_ALGEBRAIC_EXPR_INSTRUCTION",
+    "MathEquationInput": "I18N_INTERACTIONS_MATH_EQ_INSTRUCTION",
+    // The following is user editable and hence, is not translated.
+    "NumericExpressionInput": "Type an expression here, using only numbers."
   },
 
   // Unfinished features.
@@ -5818,12 +5850,6 @@ export default {
   "GCS_RESOURCE_BUCKET_NAME": "app_default_bucket",
 
   "ENABLE_EXP_FEEDBACK_FOR_LOGGED_OUT_USERS": true,
-
-  // Used to disable account removal until it is fully implemented.
-  "ENABLE_ACCOUNT_DELETION": true,
-
-  // Used to disable account data export until it is fully implemented.
-  "ENABLE_ACCOUNT_EXPORT": true,
 
   // Link to open when the Oppia avatar is clicked on any page.
   "OPPIA_AVATAR_LINK_URL": null,

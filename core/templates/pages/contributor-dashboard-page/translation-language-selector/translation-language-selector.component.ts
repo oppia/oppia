@@ -27,6 +27,7 @@ import { ContributionOpportunitiesBackendApiService } from
 import { FeaturedTranslationLanguage } from
   'domain/opportunity/featured-translation-language.model';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
+import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 
 @Component({
   selector: 'translation-language-selector',
@@ -37,9 +38,10 @@ export class TranslationLanguageSelectorComponent implements OnInit {
   @Output() setActiveLanguageCode: EventEmitter<string> = new EventEmitter();
   @ViewChild('dropdown', {'static': false}) dropdownRef;
 
-  options: {id: string, description: string}[];
+  options: { id: string; description: string }[];
   languageIdToDescription: {[id: string]: string} = {};
   featuredLanguages: FeaturedTranslationLanguage[] = [];
+  languageSelection: string;
 
   dropdownShown = false;
   explanationPopupShown = false;
@@ -49,10 +51,16 @@ export class TranslationLanguageSelectorComponent implements OnInit {
   constructor(
     private contributionOpportunitiesBackendApiService:
       ContributionOpportunitiesBackendApiService,
-    private languageUtilService: LanguageUtilService
+    private languageUtilService: LanguageUtilService,
+    private readonly translationLanguageService: TranslationLanguageService,
   ) {}
 
   ngOnInit(): void {
+    this.translationLanguageService.onActiveLanguageChanged.subscribe(
+      () => {
+        this.languageSelection = this.languageIdToDescription[
+          this.translationLanguageService.getActiveLanguageCode()];
+      });
     this.options = this.languageUtilService
       .getAllVoiceoverLanguageCodes().map(languageCode => {
         const description = this.languageUtilService
@@ -66,6 +74,12 @@ export class TranslationLanguageSelectorComponent implements OnInit {
       .then((featuredLanguages: FeaturedTranslationLanguage[]) => {
         this.featuredLanguages = featuredLanguages;
       });
+
+    this.languageSelection = (
+      this.activeLanguageCode ?
+      this.languageIdToDescription[this.activeLanguageCode] :
+      'Select a language...'
+    );
   }
 
   toggleDropdown(): void {
@@ -74,6 +88,8 @@ export class TranslationLanguageSelectorComponent implements OnInit {
 
   selectOption(activeLanguageCode: string): void {
     this.setActiveLanguageCode.emit(activeLanguageCode);
+    this.languageSelection = this.languageIdToDescription[
+      activeLanguageCode];
     this.dropdownShown = false;
   }
 

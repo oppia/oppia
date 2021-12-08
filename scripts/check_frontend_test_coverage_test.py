@@ -14,9 +14,9 @@
 
 """Unit tests for scripts/check_frontend_test_coverage.py."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
+import builtins
 import os
 import subprocess
 import sys
@@ -41,7 +41,7 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
         }
         self.printed_messages = []
 
-        class MockFile(python_utils.OBJECT):
+        class MockFile:
             def __init__(self, lcov_items_list):
                 self.lcov_items_list = lcov_items_list
 
@@ -68,7 +68,7 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
             python_utils, 'open_file', mock_open_file
         )
         self.exists_swap = self.swap(os.path, 'exists', mock_exists)
-        self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
+        self.print_swap = self.swap(builtins, 'print', mock_print)
         self.check_call_swap = self.swap(
             subprocess, 'check_call', mock_check_call
         )

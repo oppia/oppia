@@ -15,15 +15,14 @@
 Any callers must pass in a flag, either --accessibility or --performance.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import argparse
+import contextlib
 import os
 import subprocess
 import sys
 
-from core import python_utils
 from core.constants import constants
 from scripts import build
 from scripts import common
@@ -75,24 +74,23 @@ def run_lighthouse_puppeteer_script():
         bash_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
     if process.returncode == 0:
-        python_utils.PRINT(stdout)
+        print(stdout)
         for line in stdout.split(b'\n'):
             # Standard output is in bytes, we need to decode the line to
             # print it.
             export_url(line.decode('utf-8'))
-        python_utils.PRINT('Puppeteer script completed successfully.')
+        print('Puppeteer script completed successfully.')
     else:
-        python_utils.PRINT('Return code: %s' % process.returncode)
-        python_utils.PRINT('OUTPUT:')
+        print('Return code: %s' % process.returncode)
+        print('OUTPUT:')
         # Standard output is in bytes, we need to decode the line to
         # print it.
-        python_utils.PRINT(stdout.decode('utf-8'))
-        python_utils.PRINT('ERROR:')
+        print(stdout.decode('utf-8'))
+        print('ERROR:')
         # Error output is in bytes, we need to decode the line to
         # print it.
-        python_utils.PRINT(stderr.decode('utf-8'))
-        python_utils.PRINT(
-            'Puppeteer script failed. More details can be found above.')
+        print(stderr.decode('utf-8'))
+        print('Puppeteer script failed. More details can be found above.')
         sys.exit(1)
 
 
@@ -100,17 +98,17 @@ def run_webpack_compilation():
     """Runs webpack compilation."""
     max_tries = 5
     webpack_bundles_dir_name = 'webpack_bundles'
-    for _ in python_utils.RANGE(max_tries):
+    for _ in range(max_tries):
         try:
             with servers.managed_webpack_compiler() as proc:
                 proc.wait()
         except subprocess.CalledProcessError as error:
-            python_utils.PRINT(error.output)
+            print(error.output)
             sys.exit(error.returncode)
         if os.path.isdir(webpack_bundles_dir_name):
             break
     if not os.path.isdir(webpack_bundles_dir_name):
-        python_utils.PRINT('Failed to complete webpack compilation, exiting...')
+        print('Failed to complete webpack compilation, exiting...')
         sys.exit(1)
 
 
@@ -124,7 +122,7 @@ def export_url(line):
             environment.
     """
     url_parts = line.split('/')
-    python_utils.PRINT('Parsing and exporting entity ID in line: %s' % line)
+    print('Parsing and exporting entity ID in line: %s' % line)
     if 'collection_editor' in line:
         os.environ['collection_id'] = url_parts[5]
     elif 'create' in line:
@@ -158,19 +156,18 @@ def run_lighthouse_checks(lighthouse_mode, shard):
         bash_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
     if process.returncode == 0:
-        python_utils.PRINT('Lighthouse checks completed successfully.')
+        print('Lighthouse checks completed successfully.')
     else:
-        python_utils.PRINT('Return code: %s' % process.returncode)
-        python_utils.PRINT('OUTPUT:')
+        print('Return code: %s' % process.returncode)
+        print('OUTPUT:')
         # Standard output is in bytes, we need to decode the line to
         # print it.
-        python_utils.PRINT(stdout.decode('utf-8'))
-        python_utils.PRINT('ERROR:')
+        print(stdout.decode('utf-8'))
+        print('ERROR:')
         # Error output is in bytes, we need to decode the line to
         # print it.
-        python_utils.PRINT(stderr.decode('utf-8'))
-        python_utils.PRINT(
-            'Lighthouse checks failed. More details can be found above.')
+        print(stderr.decode('utf-8'))
+        print('Lighthouse checks failed. More details can be found above.')
         sys.exit(1)
 
 
@@ -190,17 +187,13 @@ def main(args=None):
             'from \'accessibility\' or \'performance\'' % parsed_args.mode)
 
     if lighthouse_mode == LIGHTHOUSE_MODE_PERFORMANCE:
-        python_utils.PRINT('Building files in production mode.')
+        print('Building files in production mode.')
         build.main(args=['--prod_env'])
     elif lighthouse_mode == LIGHTHOUSE_MODE_ACCESSIBILITY:
         build.main(args=[])
         run_webpack_compilation()
 
-    with python_utils.ExitStack() as stack:
-        stack.enter_context(common.inplace_replace_file_context(
-            common.CONSTANTS_FILE_PATH,
-            '"ENABLE_ACCOUNT_DELETION": .*',
-            '"ENABLE_ACCOUNT_DELETION": true,'))
+    with contextlib.ExitStack() as stack:
         stack.enter_context(servers.managed_redis_server())
         stack.enter_context(servers.managed_elasticsearch_dev_server())
 

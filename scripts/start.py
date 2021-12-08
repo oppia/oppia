@@ -17,8 +17,7 @@ missing third-party dependencies and starts up a local GAE development
 server.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import argparse
 import contextlib
@@ -35,8 +34,6 @@ from . import common # isort:skip  pylint: disable=wrong-import-position, wrong-
 from . import servers # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 from core.constants import constants # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-from core import python_utils # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-
 
 _PARSER = argparse.ArgumentParser(
     description="""
@@ -91,7 +88,7 @@ def alert_on_exit():
     try:
         yield
     finally:
-        python_utils.PRINT(
+        print(
             '\n\n'
             # ANSI escape sequence for bright yellow text color.
             '\033[93m'
@@ -107,7 +104,7 @@ def alert_on_exit():
 
 def notify_about_successful_shutdown():
     """Notifies developers that the servers have shutdown gracefully."""
-    python_utils.PRINT(
+    print(
         '\n\n'
         # ANSI escape sequence for bright green text color.
         '\033[92m'
@@ -134,7 +131,7 @@ def main(args=None):
     # NOTE: The ordering of alert_on_exit() is important because we want the
     # alert to be printed _before_ the ExitStack unwinds, hence its placement as
     # the "latter" context (context managers exit in reverse-order).
-    with python_utils.ExitStack() as stack, alert_on_exit():
+    with contextlib.ExitStack() as stack, alert_on_exit():
         # ExitStack unwinds in reverse-order, so this will be the final action.
         stack.callback(notify_about_successful_shutdown)
 

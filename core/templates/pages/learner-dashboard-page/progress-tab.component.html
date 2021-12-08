@@ -1,5 +1,5 @@
 <div class="progress-tab">
-  <div class="skill-proficiency" [ngClass]="{'empty-section': emptySkillProficiency}" [ngStyle]="{'margin-top': checkMobileView()? '35px': '64px'}" *ngIf="!checkMobileView() || (checkMobileView() && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.SKILL_PROFICIENCY)">
+  <div class="skill-proficiency" [ngClass]="{'empty-section': emptySkillProficiency}" [ngStyle]="{'margin-top': windowIsNarrow? '35px': '64px'}" *ngIf="!windowIsNarrow || (windowIsNarrow && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.SKILL_PROFICIENCY)">
     <div class="skill-proficiency-heading">
       <p class="skill-proficiency-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_SKILL_PROFICIENCY_SECTION' | translate">
       </p>
@@ -33,8 +33,15 @@
         </span>
       </a>
     </div>
-    <div *ngIf="emptySkillProficiency">
+    <div *ngIf="emptySkillProficiency" class="empty-skill-proficiency-section">
       <p class="empty-skill-proficiency" [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_SKILL_PROFICIENCY' | translate">
+      </p>
+      <a id="setting-a-goal-link" (click)="changeActiveSection()">
+        <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_SKILL_PROFICIENCY_SET_A_GOAL' | translate"
+           class="empty-skill-proficiency">
+        </p>
+      </a>
+      <p class="empty-skill-proficiency" [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_SKILL_PROFICIENCY_REASON_FOR_SETTING_A_GOAL' | translate">
       </p>
     </div>
     <div *ngIf="!emptySkillProficiency">
@@ -75,8 +82,8 @@
       </div>
     </div>
   </div>
-  <div class="completed-stories" [ngStyle]="checkMobileView() && {'margin-top': '35px'}"
-       *ngIf="(!checkMobileView() && completedStoriesList.length !== 0) || (checkMobileView() && completedStoriesList.length !== 0 && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.STORIES)">
+  <div class="completed-stories" [ngStyle]="windowIsNarrow && {'margin-top': '35px'}"
+       *ngIf="(!windowIsNarrow && completedStoriesList.length !== 0) || (windowIsNarrow && completedStoriesList.length !== 0 && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.STORIES)">
     <div class="completed-stories-heading">
       <p class="completed-stories-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_STORIES_COMPLETED_SECTION' | translate">
       </p>
@@ -86,7 +93,7 @@
       <img [src]="getStaticImageUrl('/learner_dashboard/star.svg')" alt="star image" class="oppia-svg-star-image">
     </div>
     <div class="scroll-content">
-      <div class="completed-stories-content" [ngStyle]="checkMobileView() && {'width': width + 'px'}">
+      <div class="completed-stories-content" [ngStyle]="windowIsNarrow && {'width': width + 'px'}">
         <div *ngFor="let tile of completedStoriesList" class="story-tile">
           <oppia-learner-story-summary-tile [storySummary]="tile"
                                             [displayArea]="progressTab">
@@ -95,8 +102,8 @@
       </div>
     </div>
   </div>
-  <div class="empty-completed-stories" [ngStyle]="checkMobileView() && {'margin-top': '35px'}"
-    *ngIf="checkMobileView() && completedStoriesList.length === 0 && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.STORIES">
+  <div class="empty-completed-stories" [ngStyle]="windowIsNarrow && {'margin-top': '35px'}"
+    *ngIf="windowIsNarrow && completedStoriesList.length === 0 && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.STORIES">
     <div class="completed-stories-heading">
       <p class="completed-stories-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_STORIES_COMPLETED_SECTION' | translate">
       </p>
@@ -132,10 +139,14 @@
     background-color: #fff;
     border-radius: 4px;
     box-shadow: 0 0 4px #0000001a;
-    min-height: 206px;
+    min-height: 220px;
     opacity: 1;
     padding: 0 0 30px 40px;
     width: 736px;
+  }
+  #setting-a-goal-link {
+    color: #00645C;
+    font-weight: bold;
   }
   .progress-tab .empty-section {
     padding: 0 113px 30px 40px;
@@ -154,9 +165,13 @@
   .progress-tab .empty-section .skill-proficiency-title {
     margin-bottom: 0;
   }
-  .progress-tab .empty-skill-proficiency {
-    color: #333;
+  .progress-tab .empty-skill-proficiency-section {
     font-size: 18px;
+  }
+  .progress-tab .empty-skill-proficiency {
+    display: inline;
+    font-size: 18px;
+    margin-bottom: 0;
     text-align: left;
   }
   .oppia-badge-image {
@@ -405,7 +420,12 @@
       overflow: hidden;
     }
     .progress-tab .empty-section {
-    padding: 0 50px 30px 40px;
+      padding: 0 50px 30px 40px;
+    }
   }
+  @media(max-width: 430px) {
+    .progress-tab .empty-completed-stories {
+      width: 355px;
+    }
   }
 </style>

@@ -16,15 +16,12 @@
 
 """Lint checks for Python files."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import io
 import os
 import re
 import sys
-
-from core import python_utils
 
 from . import linter_utils
 from .. import common
@@ -45,7 +42,7 @@ import isort.api  # isort:skip  pylint: disable=wrong-import-order, wrong-import
 import pycodestyle # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
 
 
-class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
+class ThirdPartyPythonLintChecksManager:
     """Manages all the third party Python linting functions."""
 
     def __init__(self, files_to_lint):
@@ -116,7 +113,7 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
             current_files_to_lint = files_to_lint[
                 current_batch_start_index: current_batch_end_index]
 
-            pylint_report = python_utils.string_io()
+            pylint_report = io.StringIO()
             pylinter = lint.Run(
                 current_files_to_lint + [config_pylint],
                 reporter=text.TextReporter(pylint_report),
@@ -163,7 +160,7 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
         error_messages = []
         files_to_check = self.all_filepaths
         failed = False
-        stdout = python_utils.string_io()
+        stdout = io.StringIO()
         with linter_utils.redirect_stdout(stdout):
             for filepath in files_to_check:
                 # This line prints the error message along with file path

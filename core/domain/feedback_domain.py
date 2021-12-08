@@ -14,15 +14,13 @@
 
 """Domain objects for feedback models."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
-from core import python_utils
 from core import utils
 from core.domain import user_services
 
 
-class FeedbackThread(python_utils.OBJECT):
+class FeedbackThread:
     """Domain object for a feedback thread.
 
     Attributes:
@@ -108,7 +106,7 @@ class FeedbackThread(python_utils.OBJECT):
         Returns:
             str. The full id corresponding to the given message id.
         """
-        return '.'.join([self.id, python_utils.UNICODE(message_id)])
+        return '.'.join([self.id, str(message_id)])
 
     def get_last_two_message_ids(self):
         """Returns the full message ids of the last two messages of the thread.
@@ -121,12 +119,11 @@ class FeedbackThread(python_utils.OBJECT):
         """
         return [
             self._get_full_message_id(i) if i >= 0 else None
-            for i in python_utils.RANGE(
-                self.message_count - 1, self.message_count - 3, -1)
+            for i in range(self.message_count - 1, self.message_count - 3, -1)
         ]
 
 
-class FeedbackMessage(python_utils.OBJECT):
+class FeedbackMessage:
     """Domain object for a feedback message.
 
     Attributes:
@@ -199,7 +196,7 @@ class FeedbackMessage(python_utils.OBJECT):
         }
 
 
-class FullyQualifiedMessageIdentifier(python_utils.OBJECT):
+class FullyQualifiedMessageIdentifier:
     """Domain object representing the full identifier of a message in a
     feedback thread.
 
@@ -213,7 +210,7 @@ class FullyQualifiedMessageIdentifier(python_utils.OBJECT):
         self.message_id = message_id
 
 
-class FeedbackAnalytics(python_utils.OBJECT):
+class FeedbackAnalytics:
     """Domain object representing feedback analytics for a specific entity.
 
     Attributes:
@@ -247,7 +244,7 @@ class FeedbackAnalytics(python_utils.OBJECT):
         }
 
 
-class FeedbackMessageReference(python_utils.OBJECT):
+class FeedbackMessageReference:
     """Domain object for feedback message references.
 
     Attributes:
@@ -278,7 +275,7 @@ class FeedbackMessageReference(python_utils.OBJECT):
         }
 
 
-class FeedbackThreadSummary(python_utils.OBJECT):
+class FeedbackThreadSummary:
     """Domain object for the summary of a particular thread.
 
     Attributes:

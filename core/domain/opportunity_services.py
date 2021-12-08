@@ -16,8 +16,7 @@
 
 """Commands that can be used to operate on opportunity models."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import logging
 
@@ -169,7 +168,7 @@ def _save_multi_exploration_opportunity_summary(
         exploration_opportunity_summary_model_list)
 
 
-def _create_exploration_opportunity_summary(topic, story, exploration):
+def create_exp_opportunity_summary(topic, story, exploration):
     """Create an ExplorationOpportunitySummary object with the given topic,
     story and exploration object.
 
@@ -272,7 +271,7 @@ def _create_exploration_opportunities(story, topic, exp_ids):
     exploration_opportunity_summary_list = []
     for exploration in explorations.values():
         exploration_opportunity_summary_list.append(
-            _create_exploration_opportunity_summary(
+            create_exp_opportunity_summary(
                 topic, story, exploration))
     _save_multi_exploration_opportunity_summary(
         exploration_opportunity_summary_list)
@@ -470,7 +469,7 @@ def delete_exp_opportunities_corresponding_to_story(story_id):
     exp_opprtunity_model_class.delete_multi(exp_opportunity_models)
 
 
-def get_translation_opportunities(language_code, cursor):
+def get_translation_opportunities(language_code, topic_name, cursor):
     """Returns a list of opportunities available for translation in a specific
     language.
 
@@ -480,6 +479,9 @@ def get_translation_opportunities(language_code, cursor):
             entities start from the beginning of the full list of entities.
         language_code: str. The language for which translation opportunities
             should be fetched.
+        topic_name: str or None. The topic for which translation opportunities
+            should be fetched. If topic_name is None or empty, fetch
+            translation opportunities from all topics.
 
     Returns:
         3-tuple(opportunities, cursor, more). where:
@@ -494,7 +496,7 @@ def get_translation_opportunities(language_code, cursor):
     exp_opportunity_summary_models, cursor, more = (
         opportunity_models
         .ExplorationOpportunitySummaryModel.get_all_translation_opportunities(
-            page_size, cursor, language_code))
+            page_size, cursor, language_code, topic_name))
     opportunities = []
     suggestion_ids = []
     opportunity_ids = []
@@ -881,7 +883,7 @@ def regenerate_opportunities_related_to_topic(
     for story in stories:
         for exp_id in story.story_contents.get_all_linked_exp_ids():
             exploration_opportunity_summary_list.append(
-                _create_exploration_opportunity_summary(
+                create_exp_opportunity_summary(
                     topic, story, exp_ids_to_exp[exp_id]))
 
     _save_multi_exploration_opportunity_summary(

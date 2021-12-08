@@ -26,6 +26,8 @@ import { UrlService } from 'services/contextual/url.service';
 import { AttributionService } from 'services/attribution.service';
 import { BrowserCheckerService } from 'domain/utilities/browser-checker.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 
 class MockAttributionService {
   init() {
@@ -82,6 +84,8 @@ class MockContextService {
 describe('Attribution Guide Component', function() {
   let component: AttributionGuideComponent;
   let fixture: ComponentFixture<AttributionGuideComponent>;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
+  let windowDimensionsService: WindowDimensionsService;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -93,7 +97,8 @@ describe('Attribution Guide Component', function() {
         { provide: AttributionService, useClass: MockAttributionService },
         { provide: BrowserCheckerService, useClass: MockBrowserCheckerService },
         { provide: UrlService, useClass: MockUrlService },
-        { provide: ContextService, useClass: MockContextService }
+        { provide: ContextService, useClass: MockContextService },
+        WindowDimensionsService
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -101,7 +106,30 @@ describe('Attribution Guide Component', function() {
 
   beforeEach(() => {
     fixture = TestBed.createComponent(AttributionGuideComponent);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+    windowDimensionsService = TestBed.inject(WindowDimensionsService);
+
     component = fixture.componentInstance;
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true);
+  });
+
+  it('should switch to mobile view if the window size is less than or equal' +
+    'to 1024px',
+  function() {
+    let widthSpy = spyOn(windowDimensionsService, 'getWidth');
+    widthSpy.and.returnValue(400);
+
+    expect(component.checkMobileView()).toBe(true);
+  });
+
+  it('should not switch to mobile view if the window size is less than or' +
+    ' equal to 1024px',
+  function() {
+    let widthSpy = spyOn(windowDimensionsService, 'getWidth');
+    widthSpy.and.returnValue(1025);
+
+    expect(component.checkMobileView()).toBe(false);
   });
 
   it('should initialize component properties correctly', () => {
@@ -145,6 +173,10 @@ describe('Attribution Guide Component', function() {
 
   it('should get exploration title', () => {
     expect(component.getExplorationTitle()).toEqual('Place Values');
+  });
+
+  it('should get RTL language status correctly', () => {
+    expect(component.isLanguageRTL()).toEqual(true);
   });
 
   it('should run the copy command and show a tooltip', () => {

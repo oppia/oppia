@@ -16,9 +16,9 @@
 
 """Unit tests for scripts/concurrent_task_utils.py."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
+import builtins
 import threading
 import time
 
@@ -41,16 +41,15 @@ class ConcurrentTaskUtilsTests(test_utils.GenericTestBase):
         self.task_stdout = []
 
         def mock_print(*args):
-            """Mock for python_utils.PRINT. Append the values to print to
+            """Mock for print. Append the values to print to
             task_stdout list.
 
             Args:
                 *args: list(*). Variable length argument list of values to print
                     in the same line of output.
             """
-            self.task_stdout.append(
-                ' '.join(python_utils.UNICODE(arg) for arg in args))
-        self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
+            self.task_stdout.append(' '.join(str(arg) for arg in args))
+        self.print_swap = self.swap(builtins, 'print', mock_print)
 
 
 class TaskResultTests(ConcurrentTaskUtilsTests):
@@ -115,7 +114,7 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
         )
 
     def test_task_thread_with_verbose_mode_enabled(self):
-        class HelperTests(python_utils.OBJECT):
+        class HelperTests:
             def test_show(self):
                 return concurrent_task_utils.TaskResult('name', True, [], [])
             def test_perform_all_check(self):
@@ -138,7 +137,7 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
             'name check failed')
 
     def test_task_thread_with_task_report_disabled(self):
-        class HelperTests(python_utils.OBJECT):
+        class HelperTests:
             def test_show(self):
                 return concurrent_task_utils.TaskResult(
                     None, None, None, ['msg'])
@@ -173,7 +172,7 @@ class ExecuteTasksTests(ConcurrentTaskUtilsTests):
 
     def test_execute_task_with_multiple_task(self):
         task_list = []
-        for _ in python_utils.RANGE(6):
+        for _ in range(6):
             task = concurrent_task_utils.create_task(
                 test_function('unused_arg'), False, self.semaphore)
             task_list.append(task)
@@ -184,7 +183,7 @@ class ExecuteTasksTests(ConcurrentTaskUtilsTests):
 
     def test_execute_task_with_exception(self):
         task_list = []
-        for _ in python_utils.RANGE(6):
+        for _ in range(6):
             task = concurrent_task_utils.create_task(
                 test_function, True, self.semaphore)
             task_list.append(task)

@@ -16,8 +16,7 @@
 
 """Classes for Rich Text Components in Oppia."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import os
 import re
@@ -31,7 +30,7 @@ from extensions.objects.models import objects
 import bs4
 
 
-class BaseRteComponent(python_utils.OBJECT):
+class BaseRteComponent:
     """Base Rte Component class.
 
     This is the superclass for rich text components in Oppia, such as

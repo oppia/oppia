@@ -16,15 +16,13 @@
 
 """Decorators for assigning DoFn types to specific storage models."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import collections
 import inspect
 import itertools
 import re
 
-from core import python_utils
 from core.jobs import job_utils
 from core.jobs.types import base_validation_errors
 from core.jobs.types import model_property
@@ -48,7 +46,7 @@ _MODEL_TYPES_BY_BASE_CLASS = {
 }
 
 
-class AuditsExisting(python_utils.OBJECT):
+class AuditsExisting:
     """Decorator for registering DoFns that audit storage models.
 
     DoFns registered by this decorator should assume that the models they
@@ -141,7 +139,7 @@ class AuditsExisting(python_utils.OBJECT):
         }
 
 
-class RelationshipsOf(python_utils.OBJECT):
+class RelationshipsOf:
     """Decorator for describing {Model.property: Model.ID} relationships.
 
     This decorator adds a domain-specific language (DSL) for defining the

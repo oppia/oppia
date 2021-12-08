@@ -173,22 +173,22 @@ describe('VersionDiffVisualizationComponent', () => {
     ' difference graph', () => {
     class MockComponentInstance {
       compoenentInstance: {
-        newState: null,
-        newStateName: 'A',
-        oldState: null,
-        oldStateName: 'B',
+        newState: null;
+        newStateName: 'A';
+        oldState: null;
+        oldStateName: 'B';
         headers: {
-          leftPane: undefined,
-          rightPane: undefined,
-        }
+          leftPane: undefined;
+          rightPane: undefined;
+        };
       };
     }
 
     let spyObj = spyOn(ngbModal, 'open').and.callFake(() => {
-      return <NgbModalRef>({
+      return ({
         componentInstance: MockComponentInstance,
         result: Promise.resolve()
-      });
+      }) as NgbModalRef;
     });
 
     ctrl.$onInit();
@@ -222,22 +222,22 @@ describe('VersionDiffVisualizationComponent', () => {
 
     class MockComponentInstance {
       compoenentInstance: {
-        newState: {},
-        newStateName: 'A',
-        oldState: {},
-        oldStateName: 'B',
+        newState: {};
+        newStateName: 'A';
+        oldState: {};
+        oldStateName: 'B';
         headers: {
-          leftPane: undefined,
-          rightPane: undefined,
-        }
+          leftPane: undefined;
+          rightPane: undefined;
+        };
       };
     }
 
     let spyObj = spyOn(ngbModal, 'open').and.callFake(() => {
-      return <NgbModalRef>({
+      return ({
         componentInstance: MockComponentInstance,
         result: Promise.resolve()
-      });
+      }) as NgbModalRef;
     });
 
     ctrl.$onInit();
@@ -249,10 +249,10 @@ describe('VersionDiffVisualizationComponent', () => {
 
   it('should close state diff modal when user clicks cancel', () => {
     let spyObj = spyOn(ngbModal, 'open').and.callFake(() => {
-      return <NgbModalRef>({
+      return ({
         componentInstance: {},
         result: Promise.reject()
-      });
+      }) as NgbModalRef;
     });
 
     ctrl.$onInit();

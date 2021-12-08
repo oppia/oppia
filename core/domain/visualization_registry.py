@@ -16,16 +16,14 @@
 
 """Registry for visualizations."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import inspect
 
-from core import python_utils
 from extensions.visualizations import models
 
 
-class Registry(python_utils.OBJECT):
+class Registry:
     """Registry of all visualizations."""
 
     # Dict mapping visualization class names to their classes.

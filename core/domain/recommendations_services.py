@@ -16,15 +16,14 @@
 
 """System for computing recommendations for explorations and users."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import csv
 import datetime
+import io
 import json
 
 from core import feconf
-from core import python_utils
 from core.domain import rights_domain
 from core.platform import models
 
@@ -185,7 +184,7 @@ def get_topic_similarities_as_csv():
     The first line is a list of the current topics. The next lines are an
     adjacency matrix of similarities.
     """
-    output = python_utils.string_io()
+    output = io.StringIO()
     writer = csv.writer(output)
     writer.writerow(RECOMMENDATION_CATEGORIES)
 
@@ -232,8 +231,8 @@ def validate_topic_similarities(data):
                 'does not match length of topic list: %s.' % (
                     len(topic_similarities_values[index]), topics_length))
 
-    for row_ind in python_utils.RANGE(topics_length):
-        for col_ind in python_utils.RANGE(topics_length):
+    for row_ind in range(topics_length):
+        for col_ind in range(topics_length):
             similarity = topic_similarities_values[row_ind][col_ind]
             try:
                 similarity = float(similarity)
@@ -247,8 +246,8 @@ def validate_topic_similarities(data):
                     'Expected similarity to be between 0.0 and '
                     '1.0, received %s' % similarity)
 
-    for row_ind in python_utils.RANGE(topics_length):
-        for col_ind in python_utils.RANGE(topics_length):
+    for row_ind in range(topics_length):
+        for col_ind in range(topics_length):
             if (topic_similarities_values[row_ind][col_ind] !=
                     topic_similarities_values[col_ind][row_ind]):
                 raise Exception('Expected topic similarities to be symmetric.')
