@@ -518,7 +518,7 @@ def _send_bulk_mail(
             cleaned_plaintext_body, cleaned_html_body)
 
         email_models.BulkEmailModel.create(
-            instance_id, recipient_ids, sender_id, sender_name_email, intent,
+            instance_id, sender_id, sender_name_email, intent,
             email_subject, cleaned_html_body, datetime.datetime.utcnow())
 
     _send_bulk_mail_transactional(instance_id)
