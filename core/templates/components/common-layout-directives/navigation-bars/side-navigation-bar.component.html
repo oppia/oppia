@@ -176,7 +176,7 @@
 </style>
 
 <nav class="oppia-sidebar-menu oppia-sidebar-menu-transition"
-  [ngClass]="{'oppia-sidebar-menu-open': display}">
+  [ngClass]="{'oppia-sidebar-menu-open': display}" (swipeleft)="closeSidebarOnSwipeleft()">
   <div class="oppia-sidebar-header">
     <div class="oppia-sidebar-logo-container">
     </div>

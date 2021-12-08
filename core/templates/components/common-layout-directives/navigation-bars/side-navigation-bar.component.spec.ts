@@ -29,6 +29,7 @@ import { SideNavigationBarComponent } from './side-navigation-bar.component';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 import { UserService } from 'services/user.service';
 import { UserInfo } from 'domain/user/user-info.model';
+import { SidebarStatusService } from 'services/sidebar-status.service';
 import { CreatorTopicSummary, CreatorTopicSummaryBackendDict } from 'domain/topic/creator-topic-summary.model';
 import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
 
@@ -51,6 +52,7 @@ describe('Side Navigation Bar Component', () => {
   let imageUrl: string = 'image_url';
   let mockWindowRef: MockWindowRef;
   let siteAnalyticsService: SiteAnalyticsService;
+  let sidebarStatusService: SidebarStatusService;
   let classroomBackendApiService: ClassroomBackendApiService;
   let userService: UserService;
 
@@ -91,6 +93,7 @@ describe('Side Navigation Bar Component', () => {
     accessValidationBackendApiService = TestBed
       .inject(AccessValidationBackendApiService);
     fixture = TestBed.createComponent(SideNavigationBarComponent);
+    sidebarStatusService = TestBed.inject(SidebarStatusService);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     componentInstance = fixture.componentInstance;
     classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
@@ -130,6 +133,12 @@ describe('Side Navigation Bar Component', () => {
 
   it('should get static image url', () => {
     expect(componentInstance.getStaticImageUrl('test')).toEqual(imageUrl);
+  });
+
+  it('should close sidebar on swipe left', () => {
+    spyOn(sidebarStatusService, 'closeSidebar');
+    componentInstance.closeSidebarOnSwipeleft();
+    expect(sidebarStatusService.closeSidebar).toHaveBeenCalled();
   });
 
   it('should navigate to classroom page when user clicks on' +

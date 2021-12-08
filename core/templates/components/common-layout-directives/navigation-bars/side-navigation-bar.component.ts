@@ -25,6 +25,7 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UserService } from 'services/user.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
+import { SidebarStatusService } from 'services/sidebar-status.service';
 import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
 
  @Component({
@@ -55,6 +56,7 @@ export class SideNavigationBarComponent {
      private changeDetectorRef: ChangeDetectorRef,
      private siteAnalyticsService: SiteAnalyticsService,
      private userService: UserService,
+     private sidebarStatusService: SidebarStatusService,
      private urlInterpolationService: UrlInterpolationService,
      private windowRef: WindowRef
    ) {}
@@ -93,6 +95,10 @@ export class SideNavigationBarComponent {
 
    stopclickfurther(event: Event): void {
      event.stopPropagation();
+   }
+
+   closeSidebarOnSwipeleft(): void {
+     this.sidebarStatusService.closeSidebar();
    }
 
    togglelearnSubmenu(): void {
