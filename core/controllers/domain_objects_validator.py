@@ -280,7 +280,6 @@ def validate_suggestion_images(files):
 
     Returns:
         dict. Returns the dict after validation.
-
     """
     for filename, raw_image in files.items():
         image_validation_services.validate_image_and_filename(
