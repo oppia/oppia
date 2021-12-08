@@ -27,7 +27,7 @@ import { FormsModule } from '@angular/forms';
 import { TopicEditorStateService } from '../services/topic-editor-state.service';
 import { AppConstants } from 'app.constants';
 
-fdescribe('Create New Story Modal Component', function() {
+describe('Create New Story Modal Component', function() {
   let componentInstance: CreateNewStoryModalComponent;
   let fixture: ComponentFixture<CreateNewStoryModalComponent>;
   let ngbActiveModal: NgbActiveModal;
