@@ -195,7 +195,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
         expect($scope.answerGroupHasNonEmptyRules).toBe(true);
         expect($scope.inputTemplate).toBe(
           '<oppia-interactive-text-input ' +
-          'label-for-focus-target="testInteractionInput"' +
+          'label-for-focus-target="testInteractionInput" [last-answer]="null"' +
           '></oppia-interactive-text-input>');
       });
 

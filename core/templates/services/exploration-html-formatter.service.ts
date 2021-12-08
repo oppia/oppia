@@ -118,17 +118,17 @@ export class ExplorationHtmlFormatterService {
     if (labelForFocusTarget && alphabetRegex.test(labelForFocusTarget)) {
       element.setAttribute('label-for-focus-target', labelForFocusTarget);
     }
-    let lastAnswerPropValue = parentHasLastAnswerProperty ? 'lastAnswer' : null;
+    let lastAnswerPropValue = (
+      parentHasLastAnswerProperty ? 'lastAnswer' : 'null'
+    );
     // The setAttribute is safe because the only possible value is 'lastAnswer'
     // as per the line above.
-    if (lastAnswerPropValue !== null) {
-      element.setAttribute('last-answer', lastAnswerPropValue);
-      // If interaction is migrated, we only check whether the attribute can be
-      // added, since we cannot add it in proper Angular form using
-      // 'setAttribute'. The rest is done below using string concatenation.
-      if (this.migratedInteractions.indexOf(interactionId) >= 0) {
-        element.removeAttribute('last-answer');
-      }
+    element.setAttribute('last-answer', lastAnswerPropValue);
+    // If interaction is migrated, we only check whether the attribute can be
+    // added, since we cannot add it in proper Angular form using
+    // 'setAttribute'. The rest is done below using string concatenation.
+    if (this.migratedInteractions.indexOf(interactionId) >= 0) {
+      element.removeAttribute('last-answer');
     }
 
     // This is done because 'setAttribute' doesn't allow some characters to be
@@ -142,12 +142,10 @@ export class ExplorationHtmlFormatterService {
       let interactionHtml = element.outerHTML;
       const tagEnd = '></oppia-interactive-' + htmlInteractionId + '>';
       let interactionHtmlWithoutEnd = interactionHtml.replace(tagEnd, '');
-      if (lastAnswerPropValue !== null) {
-        interactionHtmlWithoutEnd += ` [last-answer]="${lastAnswerPropValue}"`;
-      }
       if (savedSolution === 'savedMemento()') {
         interactionHtmlWithoutEnd += ` [saved-solution]="${savedSolution}"`;
       }
+      interactionHtmlWithoutEnd += ` [last-answer]="${lastAnswerPropValue}"`;
       return interactionHtmlWithoutEnd + tagEnd;
     }
     return element.outerHTML;
