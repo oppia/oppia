@@ -27,7 +27,7 @@ import { FormsModule } from '@angular/forms';
 import { TopicEditorStateService } from '../services/topic-editor-state.service';
 import { AppConstants } from 'app.constants';
 
-describe('Create New Story Modal Component', function() {
+fdescribe('Create New Story Modal Component', function() {
   let componentInstance: CreateNewStoryModalComponent;
   let fixture: ComponentFixture<CreateNewStoryModalComponent>;
   let ngbActiveModal: NgbActiveModal;
@@ -124,11 +124,12 @@ describe('Create New Story Modal Component', function() {
     spyOn(
       storyEditorStateService,
       'getStoryWithUrlFragmentExists').and.returnValue(true);
-    componentInstance.newlyCreatedStory.urlFragment = 'test-url';
-
-    componentInstance.onStoryUrlFragmentChange('test-url');
 
     expect(componentInstance.storyUrlFragmentExists).toBeFalse();
+
+    componentInstance.newlyCreatedStory.urlFragment = 'test-url';
+    componentInstance.onStoryUrlFragmentChange('test-url');
+
     expect(componentInstance.storyUrlFragmentExists).toBeTrue();
   });
 });

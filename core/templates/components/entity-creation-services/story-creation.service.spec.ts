@@ -151,7 +151,7 @@ describe('Story Creation Service', () => {
     expect(alertsService.addWarning).toHaveBeenCalledWith(error);
   }));
 
-  it('should do nothing when user cancels the topic creation modal',
+  it('should do nothing when user cancels the story creation modal',
     fakeAsync(() => {
       storyCreationService.storyCreationInProgress = false;
       spyOn(ngbModal, 'open').and.returnValue({
