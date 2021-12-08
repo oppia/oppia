@@ -31,6 +31,7 @@ from core.domain import story_domain
 
 from typing import Dict, Optional, Union
 
+
 def validate_story_change(obj):
     """Validates story change.
 
