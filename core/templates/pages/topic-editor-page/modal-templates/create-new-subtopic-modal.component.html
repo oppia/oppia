@@ -4,7 +4,7 @@
       Create New Subtopic
     </h3>
   </div>
-  <div ng-if="$ctrl.topic.getSubtopicById($ctrl.subtopicId)">
+  <div *ngIf="topic.getSubtopicById(this.subtopicId)">
     <div class="modal-body new-subtopic-editor protractor-test-new-subtopic-editor">
       <div class="create-new-subtopic-input-field">
         <div>
@@ -12,31 +12,31 @@
         </div>
         <input class="form-control oppia-new-subtopic-editable-field protractor-test-new-subtopic-title-field required"
                placeholder="Enter a brief description for the subtopic that students can easily understand, e.g. 'Adding Fractions'"
-               ng-model="$ctrl.subtopicTitle" ng-change="$ctrl.resetErrorMsg()" maxlength="<[$ctrl.MAX_CHARS_IN_SUBTOPIC_TITLE]>" autofocus>
+               [(ngModel)]="subtopicTitle" (change)="resetErrorMsg()" maxlength="{{MAX_CHARS_IN_SUBTOPIC_TITLE}}" autofocus>
         <span class="oppia-input-box-subtitle">
           <em>
-            Subtopic title should be at most <[$ctrl.MAX_CHARS_IN_SUBTOPIC_TITLE]> characters.
+            Subtopic title should be at most {{MAX_CHARS_IN_SUBTOPIC_TITLE}} characters.
           </em>
         </span>
-        <span class="form-text error-msg" ng-if="$ctrl.errorMsg">
-          <em><[$ctrl.errorMsg]></em>
+        <span class="form-text error-msg" *ngIf="errorMsg">
+          <em>{{errorMsg}}</em>
         </span>
       </div>
       <div>
         <strong>Enter the url fragment for the subtopic*</strong>
       </div>
       <input class="form-control oppia-new-subtopic-editable-field protractor-test-new-subtopic-url-fragment-field"
-             ng-class="{'is-invalid': $ctrl.editableUrlFragment && (!$ctrl.isUrlFragmentValid() || $ctrl.subtopicUrlFragmentExists)}"
+             [ngClass]="{'is-invalid': editableUrlFragment && (!isUrlFragmentValid() || subtopicUrlFragmentExists)}"
              placeholder="Enter a url fragment for the subtopic."
-             ng-model="$ctrl.editableUrlFragment" ng-change="$ctrl.checkSubtopicExistence()" maxlength="<[$ctrl.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT]>">
+             [(ngModel)]="editableUrlFragment" (change)="checkSubtopicExistence()" maxlength="{{MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT}}">
       <span class="oppia-input-box-subtitle">
         <em>
-          The subtopic URL fragment is used to uniquely access the subtopic viewer page. It should consist of one or more hyphen-separated words, all in lowercase, with at most <[$ctrl.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT]> characters in total and must be unique across the topic. Please use meaningful keywords, and avoid using words like "and", "of", or "the".
+          The subtopic URL fragment is used to uniquely access the subtopic viewer page. It should consist of one or more hyphen-separated words, all in lowercase, with at most {{MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT}} characters in total and must be unique across the topic. Please use meaningful keywords, and avoid using words like "and", "of", or "the".
           This subtopic can be accessed at the following URL:<br>
-          <[$ctrl.hostname]>/learn/<[$ctrl.classroomUrlFragment]>/<[$ctrl.topic.getUrlFragment()]>/revision/<[$ctrl.editableUrlFragment]>
+          {{hostname}}/learn/{{classroomUrlFragment}}/{{this.topic.getUrlFragment()}}/revision/{{editableUrlFragment}}
         </em>
       </span>
-      <div class="oppia-input-box-subtitle text-danger" ng-if="$ctrl.editableUrlFragment && $ctrl.subtopicUrlFragmentExists">
+      <div class="oppia-input-box-subtitle text-danger" *ngIf="editableUrlFragment && subtopicUrlFragmentExists">
         <em>The subtopic url fragment is not unique.</em>
       </div>
 
@@ -44,16 +44,16 @@
         <div>
           <strong>Explanation of the subtopic*</strong>
         </div>
-        <div class="description-editor protractor-test-subtopic-description-editor" ng-if="$ctrl.schemaEditorIsShown">
+        <div class="description-editor protractor-test-subtopic-description-editor" *ngIf="schemaEditorIsShown">
           <div class="oppia-editor-card-body" >
-            <schema-based-editor schema="$ctrl.SUBTOPIC_PAGE_SCHEMA"
+            <schema-based-editor [schema]="getSchema.bind(this)"
                                  class="protractor-test-create-subtopic-page-content"
-                                 local-value="$ctrl.htmlData">
+                                 (localValueChange)="localValueChange($event)">
             </schema-based-editor>
           </div>
         </div>
 
-        <div ng-if="!$ctrl.schemaEditorIsShown" ng-click="$ctrl.showSchemaEditor()" class="protractor-test-show-schema-editor">
+        <div *ngIf="!schemaEditorIsShown" (click)="showSchemaEditor()" class="protractor-test-show-schema-editor">
           <span class="oppia-placeholder">
               Give a description or explanation of the subtopic.
             <i class="fa fa-pen"></i>
@@ -61,24 +61,23 @@
         </div>
       </div>
 
-      <div class="thumbnail-editor protractor-test-thumbnail-editor create-new-subtopic-input-field">
+      <div class="thumbnail-editor protractor-test-subtopic-thumbnail protractor-test-photo-button create-new-subtopic-input-field">
         <strong>Thubmnail Image*</strong>
-        <oppia-thumbnail-uploader [filename]="$ctrl.editableThumbnailFilename"
-                                  (update-filename)="$ctrl.updateSubtopicThumbnailFilename($event)"
-                                  [bg-color]="$ctrl.editableThumbnailBgColor"
-                                  (update-bg-color)="$ctrl.updateSubtopicThumbnailBgColor($event)"
-                                  [allowed-bg-colors]="$ctrl.allowedBgColors"
-                                  [aspect-ratio]="'4:3'"
-                                  [preview-title]="$ctrl.subtopicTitle"
-                                  preview-description-bg-color="#BE563C">
+        <oppia-thumbnail-uploader (updateFilename)="updateSubtopicThumbnailFilename($event)"
+                                  [bgColor]="editableThumbnailBgColor"
+                                  (updateBgColor)="updateSubtopicThumbnailBgColor($event)"
+                                  [allowedBgColors]="allowedBgColors"
+                                  [aspectRatio]="'4:3'"
+                                  [previewTitle]="subtopicTitle"
+                                  previewDescriptionBgColor="#BE563C">
         </oppia-thumbnail-uploader>
       </div>
     </div>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-secondary" ng-click="$ctrl.cancel()" type="button">Cancel</button>
+    <button class="btn btn-secondary" (click)="cancel()" type="button">Cancel</button>
     <button class="btn btn-success protractor-test-confirm-subtopic-creation-button"
-            type="submit" ng-disabled="!$ctrl.isSubtopicValid() || $ctrl.subtopicUrlFragmentExists" ng-click="$ctrl.save()">
+            type="submit" [disabled]="!isSubtopicValid() || subtopicUrlFragmentExists" (click)="save()">
       Create Subtopic
     </button>
   </div>
