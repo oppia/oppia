@@ -174,6 +174,10 @@ describe('Settings Tab Component', () => {
     beforeEach(angular.mock.inject(($injector, $componentController) => {
       $q = $injector.get('$q');
       $rootScope = $injector.get('$rootScope');
+<<<<<<< HEAD
+=======
+      $uibModal = $injector.get('$uibModal');
+>>>>>>> upstream/develop
       ngbModal = $injector.get('NgbModal');
       explorationDataService = $injector.get('ExplorationDataService');
       contextService = $injector.get('ContextService');
