@@ -13,23 +13,23 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for Remove role confirm or cancel modal.
+ * @fileoverview Unit tests for Schema Based Bool Editor Directive
  */
 
-require(
-  'components/common-layout-directives/common-elements/' +
-  'confirm-or-cancel-modal.controller.ts');
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+require('./schema-based-bool-editor.directive');
 
-angular.module('oppia').controller(
-  'RemoveRoleConfirmationModalController', [
-    '$controller', '$scope', '$uibModalInstance', 'role', 'username',
-    function(
-        $controller, $scope, $uibModalInstance, role, username) {
-      $controller('ConfirmOrCancelModalController', {
-        $scope: $scope,
-        $uibModalInstance: $uibModalInstance
-      });
-      $scope.username = username;
-      $scope.role = role;
-    }
-  ]);
+describe('schema based bool editor directive', () => {
+  let directive = null;
+
+  beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
+  beforeEach(angular.mock.inject(function($injector, $rootScope) {
+    directive = $injector.get('schemaBasedBoolEditorDirective');
+    $rootScope.$new();
+  }));
+
+  it('should be defined', () => {
+    expect(directive).toBeDefined();
+  });
+});

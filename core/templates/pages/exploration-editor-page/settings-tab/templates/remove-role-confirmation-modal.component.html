@@ -3,12 +3,12 @@
 </div>
 
 <div class="modal-body oppia-remove-role-confirmation-modal-body">
-  <p>Are you sure you want to remove <strong><[username]></strong> from the role of <strong><[role]></strong>?</p>
+  <p>Are you sure you want to remove <strong>{{username}}</strong> from the role of <strong>{{role}}</strong>?</p>
 </div>
 
 <div class="modal-footer">
-  <button class="btn btn-secondary" ng-click="cancel()">Cancel</button>
-  <button class="btn btn-danger protractor-test-really-delete-exploration-button" ng-click="confirm()">Remove user</button>
+  <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
+  <button class="btn btn-danger protractor-test-really-delete-exploration-button" (click)="confirm()">Remove user</button>
 </div>
 
 <style>
