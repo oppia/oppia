@@ -5163,6 +5163,8 @@ class QueryStatusNotificationEmailTests(test_utils.EmailTestBase):
             self.assertEqual(
                 sent_email_model.subject, email_subject)
             self.assertEqual(
+                sent_email_model.recipient_ids, self.recipient_ids)
+            self.assertEqual(
                 sent_email_model.sender_id, self.sender_id)
             self.assertEqual(
                 sent_email_model.sender_email,
@@ -5428,6 +5430,8 @@ class BulkEmailsTests(test_utils.EmailTestBase):
             sent_email_model.subject, email_subject)
         self.assertEqual(
             sent_email_model.html_body, email_html_body)
+        self.assertEqual(
+            sent_email_model.recipient_ids, self.recipient_ids)
         self.assertEqual(
             sent_email_model.sender_id, self.sender_id)
         self.assertEqual(
