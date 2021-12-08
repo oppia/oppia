@@ -478,18 +478,34 @@ def _construct_exploration_suggestions(suggestions):
     Returns:
         list(dict). List of suggestion dicts with an additional
         exploration_content_html field representing the target
-        exploration's current content.
+        exploration's current content. If the given suggestion refers to an
+        invalid content ID in the current exploration (this can happen if that
+        content was deleted after the suggestion was made), the corresponding
+        suggestion dict will be omitted from the return value.
     """
     exp_ids = {suggestion.target_id for suggestion in suggestions}
     exp_id_to_exp = exp_fetchers.get_multiple_explorations_by_id(list(exp_ids))
 
     suggestion_dicts = []
     for suggestion in suggestions:
-        content_html = exp_id_to_exp[suggestion.target_id].get_content_html(
-            suggestion.change.state_name, suggestion.change.content_id)
-        suggestion_dict = suggestion.to_dict()
-        suggestion_dict['exploration_content_html'] = content_html
-        suggestion_dicts.append(suggestion_dict)
+        available_states = exp_id_to_exp[suggestion.target_id].states
+        content_id_exists = False
+
+        # Checks whether the state name within change object of the suggestion
+        # is actually available in the target entity being suggested to and
+        # then find the availability of the content ID in the translatable
+        # content. See more - https://github.com/oppia/oppia/issues/14339
+        if suggestion.change.state_name in available_states:
+            content_id_exists = available_states[
+                suggestion.change.state_name].has_content_id(
+                    suggestion.change.content_id)
+
+        if content_id_exists:
+            content_html = exp_id_to_exp[suggestion.target_id].get_content_html(
+                suggestion.change.state_name, suggestion.change.content_id)
+            suggestion_dict = suggestion.to_dict()
+            suggestion_dict['exploration_content_html'] = content_html
+            suggestion_dicts.append(suggestion_dict)
     return suggestion_dicts
 
 
