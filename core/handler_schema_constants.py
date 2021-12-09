@@ -80,7 +80,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'SiteLanguageHandler',
     'SkillDataHandler',
     'SkillDescriptionHandler',
-    'SkillMasteryDataHandler',
     'SkillsDashboardPageDataHandler',
     'StartedTranslationTutorialEventHandler',
     'StateCompleteEventHandler',

@@ -19,7 +19,7 @@ from __future__ import annotations
 from core import feconf
 from core import python_utils
 from core import utils
-from core.controllers import acl_decorators
+from core.controllers import acl_decorators, domain_objects_validator
 from core.controllers import base
 from core.domain import skill_domain
 from core.domain import skill_fetchers
@@ -33,6 +33,25 @@ class SkillMasteryDataHandler(base.BaseHandler):
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'comma_separated_exp_ids': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        },
+        'PUT': {
+            'mastery_change_per_skill': {
+                'schema': {
+                    'type': 'object_dict',
+                    'validation_method': (
+                        domain_objects_validator.validate_params_dict)
+                }
+            }
+        }
+    }
 
     @acl_decorators.can_access_learner_dashboard
     def get(self):
