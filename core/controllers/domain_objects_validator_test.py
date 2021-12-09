@@ -282,7 +282,7 @@ class ValidateSuggestionImagesTests(test_utils.GenericTestBase):
     def test_invalid_images_raises_exception(self) -> None:
         files = {'file.svg': None}
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-            Exception,'No image supplied'
+            Exception, 'No image supplied'
         ):
             domain_objects_validator.validate_suggestion_images(files)
 
