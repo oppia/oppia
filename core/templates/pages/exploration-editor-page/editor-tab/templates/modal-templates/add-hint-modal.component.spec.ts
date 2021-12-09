@@ -79,19 +79,19 @@ fdescribe('Add Hint Modal Controller', function() {
 
   it('should initialize the properties after component is initialized',
     () => {
-      expect(this.tmpHint).toBe('');
-      expect(this.addHintForm).toEqual({});
-      expect(this.hintIndex).toBe(5);
+      expect(component.tmpHint).toBe('');
+      expect(component.addHintForm).toEqual({});
+      expect(component.hintIndex).toBe(5);
     });
 
   it('should save hint when closing the modal', () => {
     let contentId = 'cont_1';
     let hintExpected = hintObjectFactory.createNew(contentId, '');
-
     spyOn(
       generateContentIdService, 'getNextStateId'
     ).and.returnValue(contentId);
-    this.saveHint();
+
+    component.saveHint();
 
     expect(ngbActiveModal.close).toHaveBeenCalledWith({
       hint: hintExpected,
@@ -102,9 +102,8 @@ fdescribe('Add Hint Modal Controller', function() {
   it('should check if hint length exceeded 500 characters', () => {
     let hint1 = 'This is a hint ';
     let hint2 = hint1.repeat(35);
-    expect(this.isHintLengthExceeded(hint1)).toBe(false);
-    expect(this.isHintLengthExceeded(hint2)).toBe(true);
+
+    expect(component.isHintLengthExceeded(hint1)).toBe(false);
+    expect(component.isHintLengthExceeded(hint2)).toBe(true);
   });
-
-
 })
