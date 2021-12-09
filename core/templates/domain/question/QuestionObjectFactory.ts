@@ -37,7 +37,6 @@ export interface QuestionBackendDict {
   'inapplicable_skill_misconception_ids': string[];
 }
 
-// Null will be temperory and will be updated once the question is saved.
 export class Question {
   // A null '_id' indicates that the 'Question' has been created
   // but not saved.
