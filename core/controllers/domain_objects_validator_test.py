@@ -65,7 +65,7 @@ class ValidateSuggestionChangeTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'Missing cmd key in change dict'
         ):
-            domain_objects_validator.validate_exploration_or_question_change(
+            domain_objects_validator.validate_suggestion_change(
                 incorrect_change_dict)
 
         incorrect_change_dict = {
@@ -80,7 +80,7 @@ class ValidateSuggestionChangeTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, '%s cmd is not allowed.' % incorrect_change_dict['cmd']
         ):
-            domain_objects_validator.validate_exploration_or_question_change(
+            domain_objects_validator.validate_suggestion_change(
                 incorrect_change_dict)
 
     def test_correct_exp_domain_object_do_not_raises_exception(self) -> None:
@@ -93,7 +93,7 @@ class ValidateSuggestionChangeTests(test_utils.GenericTestBase):
             'translation_html': '<p>In Hindi</p>',
             'data_format': 'html'
         }
-        domain_objects_validator.validate_exploration_or_question_change(
+        domain_objects_validator.validate_suggestion_change(
             correct_change_dict)
 
 
@@ -282,7 +282,7 @@ class ValidateSuggestionImagesTests(test_utils.GenericTestBase):
     def test_invalid_images_raises_exception(self) -> None:
         files = {'file.svg': None}
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-            Exception, 'No image supplied'
+            Exception, 'No image data provided for file with name file.svg.'
         ):
             domain_objects_validator.validate_suggestion_images(files)
 
