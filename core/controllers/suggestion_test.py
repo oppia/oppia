@@ -1340,9 +1340,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 'description': 'test'
             }, csrf_token=csrf_token, expected_status_int=400)
 
-        self.assertIn(
-            'No image data provided for file with name file.svg.',
-            response_dict['error'])
+        self.assertIn('No image supplied',response_dict['error'])
         self.logout()
 
     def test_suggestion_creation_when_images_are_not_valid(self):
