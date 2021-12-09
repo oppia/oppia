@@ -3,12 +3,12 @@
 </div>
 
 <div class="modal-body oppia-reassign-role-confirmation-modal-body">
-  <p>Are you sure you want to reassign <strong><[username]></strong> from <strong><[oldRole]></strong> to the role <strong><[newRole]></strong>?</p>
+  <p>Are you sure you want to reassign <strong>{{username}}</strong> from <strong>{{oldRole}}</strong> to the role <strong>{{newRole}}</strong>?</p>
 </div>
 
 <div class="modal-footer">
-  <button class="btn btn-secondary" ng-click="cancel()">Cancel</button>
-  <button class="btn btn-danger protractor-test-really-delete-exploration-button" ng-click="confirm()">Reassign user</button>
+  <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
+  <button class="btn btn-danger protractor-test-really-delete-exploration-button" (click)="confirm()">Reassign user</button>
 </div>
 
 <style>
