@@ -477,7 +477,7 @@ export class StateGraphLayoutService {
       WIDTH_OFFSET_CHECKPOINT_ICON;
     }
 
-    // here we are creating and initialize nodeData: NodeDataDict.
+    // Here we are creating and initialize nodeData: NodeDataDict.
     // Note: nodeData does not contain any 'null' value.
     var nodeData: NodeDataDict = {};
     for (var nodeId in nodeDataTemp) {
@@ -493,14 +493,27 @@ export class StateGraphLayoutService {
       nodeData[nodeId].depth = nodeDataTemp[nodeId].depth;
       nodeData[nodeId].offset = nodeDataTemp[nodeId].offset;
       nodeData[nodeId].reachable = nodeDataTemp[nodeId].reachable;
-      if (x0 !== null) {nodeData[nodeId].x0 = x0;}
-      if (y0 !== null) {nodeData[nodeId].y0 = y0;}
-      if (xLabel !== null) {nodeData[nodeId].xLabel = xLabel;}
-      if (yLabel !== null) {nodeData[nodeId].x0 = yLabel;}
-      if (id !== null) {nodeData[nodeId].id = id;}
-      if (label !== null) {nodeData[nodeId].label = label;}
-      if (height !== null) {nodeData[nodeId].height = height;}
-      if (width !== null) {nodeData[nodeId].width = width;}
+      if (
+        x0 !== null &&
+        y0 !== null &&
+        xLabel !== null &&
+        yLabel !== null &&
+        id !== null &&
+        label !== null &&
+        height !== null &&
+        width !== null
+      ) {
+        nodeData[nodeId].x0 = x0;
+        nodeData[nodeId].y0 = y0;
+        nodeData[nodeId].xLabel = xLabel;
+        nodeData[nodeId].x0 = yLabel;
+        nodeData[nodeId].id = id;
+        nodeData[nodeId].label = label;
+        nodeData[nodeId].height = height;
+        nodeData[nodeId].width = width;
+      } else {
+        throw new Error("Some values inside nodeData are null");
+      }
       nodeData[
         nodeId].reachableFromEnd = nodeDataTemp[nodeId].reachableFromEnd;
     }
