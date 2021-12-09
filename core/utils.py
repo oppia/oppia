@@ -305,7 +305,7 @@ def convert_png_data_url_to_binary(image_data_url: str) -> bytes:
     """
     if image_data_url.startswith(PNG_DATA_URL_PREFIX):
         return base64.b64decode(
-            python_utils.urllib_unquote(
+            urllib.parse.unquote(
                 image_data_url[len(PNG_DATA_URL_PREFIX):]))
     else:
         raise Exception('The given string does not represent a PNG data URL.')
@@ -976,7 +976,7 @@ def unescape_encoded_uri_component(escaped_string: str) -> str:
     Returns:
         str. Decoded string that was initially encoded with encodeURIComponent.
     """
-    return python_utils.urllib_unquote(escaped_string)
+    return urllib.parse.unquote(escaped_string)
 
 
 def snake_case_to_camel_case(snake_str: str) -> str:
