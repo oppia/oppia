@@ -359,8 +359,7 @@ class StorePlaythroughHandler(base.BaseHandler):
         issue_schema_version = self.normalized_payload.get(
             'issue_schema_version')
 
-        playthrough_data = self.normalized_payload.get('playthrough_data')
-        playthrough = stats_domain.Playthrough.from_dict(playthrough_data)
+        playthrough = self.normalized_payload.get('playthrough_data')
 
         exp_issues = stats_services.get_exp_issues(
             exploration_id, playthrough.exp_version)
