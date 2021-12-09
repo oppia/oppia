@@ -19,8 +19,9 @@ from __future__ import annotations
 from core import feconf
 from core import python_utils
 from core import utils
-from core.controllers import acl_decorators, domain_objects_validator
+from core.controllers import acl_decorators
 from core.controllers import base
+from core.controllers import domain_objects_validator
 from core.domain import skill_domain
 from core.domain import skill_fetchers
 from core.domain import skill_services
