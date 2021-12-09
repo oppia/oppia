@@ -512,7 +512,7 @@ export class StateGraphLayoutService {
         nodeData[nodeId].height = height;
         nodeData[nodeId].width = width;
       } else {
-        throw new Error("Some values inside nodeData are null");
+        throw new Error('Some values inside nodeData are null');
       }
       nodeData[
         nodeId].reachableFromEnd = nodeDataTemp[nodeId].reachableFromEnd;
