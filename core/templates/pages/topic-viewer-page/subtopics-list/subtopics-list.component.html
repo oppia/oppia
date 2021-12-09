@@ -42,8 +42,9 @@
 
   .subtopics-container {
     display: grid;
+    grid-gap: 20px;
     grid-row-gap: 2vh;
-    grid-template-columns: 170px 170px 170px;
+    grid-template-columns: 1fr 1fr 1fr;
     justify-content: space-between;
     margin-left: 20px;
   }
@@ -54,34 +55,35 @@
 
   @media(max-width: 1024px) {
     .oppia-page-card.oppia-long-text {
-      width: 60vw;
+      width: 65vw;
     }
 
     .subtopics-container {
-      grid-template-columns: 150px 150px 150px;
+      grid-template-columns: 1fr 1fr 1fr;
       margin-left: 2vw;
     }
   }
 
   @media(max-width: 680px) {
     .oppia-page-card.oppia-long-text {
-      width: 70vw;
+      width: 80vw;
     }
 
     .subtopics-container {
-      grid-template-columns: 130px 130px 130px;
+      grid-gap: 10px;
+      grid-template-columns: 1fr 1fr 1fr;
       margin-left: 0;
     }
   }
 
   @media(max-width: 500px) {
     .oppia-page-card.oppia-long-text {
-      width: 80vw;
+      width: 90vw;
     }
 
     .subtopics-container {
       display: grid;
-      grid-template-columns: 130px 130px;
+      grid-template-columns: 1fr 1fr;
       justify-content: space-between;
       margin-left: -10px;
     }
@@ -89,14 +91,7 @@
 
   @media(max-width: 350px) {
     .oppia-page-card.oppia-long-text {
-      width: 90vw;
-    }
-
-    .subtopics-container {
-      display: grid;
-      grid-template-columns: 120px 120px;
-      justify-content: space-between;
-      margin-left: -10px;
+      width: 95vw;
     }
   }
 </style>
