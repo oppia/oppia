@@ -276,7 +276,7 @@ var TopicEditorPage = function() {
     var richTextEditor = await forms.RichTextEditor(subtopicDescriptionEditor);
     await richTextEditor.appendPlainText(htmlContent);
     await workflow.submitImage(
-      topicThumbnailButton, thumbnailContainer, imgPath, false);
+      subtopicThumbnailButton, thumbnailContainer, imgPath, false);
 
     await action.click(
       'Confirm subtopic creation button', confirmSubtopicCreationButton);
