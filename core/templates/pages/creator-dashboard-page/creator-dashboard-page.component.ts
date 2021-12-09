@@ -181,7 +181,7 @@ export class CreatorDashboardPageComponent {
       // TODO(sll): Find a better way to sort explorations according to
       // average ratings. Currently there is no parameter as such
       // average ratings in entities received by SortByPipe.
-      return 'title';
+      return 'default';
     } else {
       return this.currentSortType;
     }

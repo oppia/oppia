@@ -21,7 +21,7 @@ import { CreatorDashboardStats } from 'domain/creator_dashboard/creator-dashboar
 import { CreatorExplorationSummary } from 'domain/summary/creator-exploration-summary.model';
 import { ProfileSummary } from 'domain/user/profile-summary.model';
 import { CreatorDashboardPageComponent } from './creator-dashboard-page.component';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, flushMicrotasks, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { AlertsService } from 'services/alerts.service';
 import { CreatorDashboardBackendApiService, CreatorDashboardData } from 'domain/creator_dashboard/creator-dashboard-backend-api.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
@@ -355,7 +355,7 @@ describe('Creator Dashboard Page Component', () => {
         component.setExplorationsSortingOptions('ratings');
         expect(component.currentSortType).toBe('ratings');
 
-        expect(component.sortByFunction()).toBe('title');
+        expect(component.sortByFunction()).toBe('default');
       });
 
       it('should sort exploration list by last updated when last updated' +
@@ -482,6 +482,7 @@ describe('Creator Dashboard Page Component', () => {
       spyOn(alertsService, 'addWarning').and.callThrough();
       component.ngOnInit();
       tick();
+      flushMicrotasks();
       expect(component.canCreateCollections).toBeNull();
       expect(creatorDashboardBackendApiService.fetchDashboardDataAsync)
         .toHaveBeenCalled();
