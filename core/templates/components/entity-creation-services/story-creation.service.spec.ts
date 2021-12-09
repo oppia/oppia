@@ -16,13 +16,14 @@
  * @fileoverview Unit test for Story Creation Service.
  */
 
-import { NgbModal, NgbModalModule, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { NgbModal, NgbModalModule, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+
 import { StoryCreationService } from './story-creation.service';
 import { AlertsService } from 'services/alerts.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { NewlyCreatedStory } from 'domain/topic/newly-created-story.model';
 import { StoryCreationBackendApiService } from './story-creation-backend-api.service';

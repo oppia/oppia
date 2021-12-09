@@ -16,9 +16,10 @@
  * @fileoverview Component for create new story modal.
  */
 
-import { NewlyCreatedStory } from 'domain/topic/newly-created-story.model';
 import { ChangeDetectorRef, Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+
+import { NewlyCreatedStory } from 'domain/topic/newly-created-story.model';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { StoryEditorStateService } from 'pages/story-editor-page/services/story-editor-state.service';
 import { TopicEditorStateService } from '../services/topic-editor-state.service';

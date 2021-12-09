@@ -18,11 +18,12 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AlertsService } from 'services/alerts.service';
+
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { LoaderService } from 'services/loader.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { CreateNewStoryModalComponent } from 'pages/topic-editor-page/modal-templates/create-new-story-modal.component';
 import { StoryCreationBackendApiService } from './story-creation-backend-api.service';

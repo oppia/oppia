@@ -17,15 +17,16 @@
  */
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { CreateNewStoryModalComponent } from './create-new-story-modal.component';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { FormsModule } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+
+import { AppConstants } from 'app.constants';
+import { CreateNewStoryModalComponent } from './create-new-story-modal.component';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { StoryEditorStateService } from 'pages/story-editor-page/services/story-editor-state.service';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { FormsModule } from '@angular/forms';
 import { TopicEditorStateService } from '../services/topic-editor-state.service';
-import { AppConstants } from 'app.constants';
 
 describe('Create New Story Modal Component', function() {
   let componentInstance: CreateNewStoryModalComponent;
