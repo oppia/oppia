@@ -109,8 +109,8 @@
       "popperJs": {
         "version": "1.15.0",
         "downloadFormat": "zip",
-        "url": "https://github.com/popperjs/popper-core/archive/v1.15.0.zip",
-        "rootDirPrefix": "popper-core-",
+        "url": "https://github.com/floating-ui/floating-ui/archive/v1.15.0.zip",
+        "rootDirPrefix": "floating-ui-",
         "targetDirPrefix": "popperJs-",
         "bundle": {
           "js": ["dist/umd/popper.js"]
