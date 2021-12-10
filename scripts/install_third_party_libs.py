@@ -35,6 +35,7 @@ PREREQUISITES = [
     ('six', '1.16.0', os.path.join('third_party', 'python_libs')),
     ('certifi', '2021.5.30', os.path.join(
         TOOLS_DIR, 'certifi-2021.5.30')),
+    ('typing-extensions', '4.0.1', os.path.join('third_party', 'python_libs')),
 ]
 
 for package_name, version_number, target_path in PREREQUISITES:
@@ -236,9 +237,6 @@ def main() -> None:
         ('psutil', common.PSUTIL_VERSION, common.OPPIA_TOOLS_DIR),
         ('pip-tools', common.PIP_TOOLS_VERSION, common.OPPIA_TOOLS_DIR),
         ('setuptools', common.SETUPTOOLS_VERSION, common.OPPIA_TOOLS_DIR),
-        (
-            'typing-extensions', common.TYPING_EXTENSIONS_VERSION,
-        common.OPPIA_TOOLS_DIR)
     ]
 
     for package, version, path in local_pip_dependencies:
