@@ -72,8 +72,8 @@ export class StateGraphLayoutService {
   MAX_INDENTATION_LEVEL = 2.5;
 
   // The last result of a call to computeLayout(). Used for determining the
-  // order in which to specify states in rules. 
-  // If we haven't called the computeLayout() function 
+  // order in which to specify states in rules.
+  // If we haven't called the computeLayout() function
   // then it is expected to stay null.
   lastComputedArrangement: NodeDataDict | null = null;
 
