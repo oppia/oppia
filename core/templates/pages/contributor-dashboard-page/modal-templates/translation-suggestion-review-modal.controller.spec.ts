@@ -48,7 +48,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
       .and.returnValue('audio_language_description');
   }));
 
-  fdescribe('when reviewing suggestion', function() {
+  describe('when reviewing suggestion', function() {
     const reviewable = true;
     const subheading = 'subheading_title';
     const suggestion1 = {
@@ -361,20 +361,20 @@ describe('Translation Suggestion Review Modal Controller', function() {
             jasmine.any(Function));
       });
 
-      describe('isHtmlContentEqual', function() {
-        it('should return true regardless of &nbsp; differences', function() {
-          expect($scope.isHtmlContentEqual(
-            '<p>content</p><p>&nbsp;&nbsp;</p>', '<p>content</p><p> </p>'))
-          .toBe(true);
-        });
-
-        it('should return true regardless of new line differences', function() {
-          expect($scope.isHtmlContentEqual(
-            '<p>content</p>\r\n\n<p>content2</p>',
-            '<p>content</p><p>content2</p>'))
-          .toBe(true);
-        });
+    describe('isHtmlContentEqual', function() {
+      it('should return true regardless of &nbsp; differences', function() {
+        expect($scope.isHtmlContentEqual(
+          '<p>content</p><p>&nbsp;&nbsp;</p>', '<p>content</p><p> </p>'))
+        .toBe(true);
       });
+
+      it('should return true regardless of new line differences', function() {
+        expect($scope.isHtmlContentEqual(
+          '<p>content</p>\r\n\n<p>content2</p>',
+          '<p>content</p><p>content2</p>'))
+        .toBe(true);
+      });
+    });
   });
 
   describe('when viewing suggestion', function() {
