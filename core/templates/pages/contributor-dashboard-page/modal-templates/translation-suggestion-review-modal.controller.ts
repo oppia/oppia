@@ -268,7 +268,7 @@ angular.module('oppia').controller(
           return (
             first.length === second.length &&
             first.every(
-              (val, index) => stripWhitespace(val) !== stripWhitespace(
+              (val, index) => stripWhitespace(val) === stripWhitespace(
                 second[index]))
           );
         }
