@@ -43,10 +43,10 @@ def main() -> None:
     if web_inf_index_yaml_dict['indexes'] is None:
         return
 
-    # There is a possibility that an index in index yaml may exist in
+    # There is a possibility that an index in index.yaml may exist in
     # ../cloud_datastore_emulator_cache/WEB-INF/index.yaml with different
-    # kind order. We don't need to append those indexes. So we will compare
-    # sorted dictionaries. Deepcopy is used here to avoid changing the
+    # order of properties. We don't need to append those indexes. So we will 
+    # compare sorted dictionaries. Deepcopy is used here to avoid changing the
     # order of index_yaml_dict after sorting temp_index_yaml_dict.
     temp_index_yaml_dict = copy.deepcopy(index_yaml_dict)
     for kind in temp_index_yaml_dict['indexes']:
