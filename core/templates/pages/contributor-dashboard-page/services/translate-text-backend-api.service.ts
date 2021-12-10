@@ -55,6 +55,10 @@ export class TranslateTextBackendApiService {
       reader.onload = () => {
         // Read the base64 data from result.
         const dataurl = reader.result as string;
+        const prefix = /^data:image\/(gif|png|jpeg|svg\+xml|jpg);base64,/;
+        if (!dataurl.match(prefix)) {
+          reject(new Error('No valid prefix found in data url'));
+        }
         // Remove "data:mime/type;base64," prefix from data url.
         // And just return base64 string.
         const base64 = dataurl.substring(dataurl.indexOf(',') + 1);

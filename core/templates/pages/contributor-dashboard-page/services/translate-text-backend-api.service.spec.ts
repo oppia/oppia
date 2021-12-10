@@ -99,7 +99,7 @@ describe('TranslateTextBackendApiService', () => {
 
   describe('suggestTranslatedTextAsync', () => {
     class MockReaderObject {
-    result = 'imageBlob1';
+    result = 'data:image/png;base64,imageBlob1';
     onload: () => string;
     constructor() {
       this.onload = () => {
@@ -115,12 +115,6 @@ describe('TranslateTextBackendApiService', () => {
     let failHandler: (error: HttpErrorResponse) => void;
     let imagesData: ImagesData[];
     beforeEach(() => {
-    // This throws "Argument of type 'mockReaderObject' is not assignable to
-    // parameter of type 'HTMLImageElement'.". We need to suppress this
-    // error because 'HTMLImageElement' has around 250 more properties.
-    // We have only defined the properties we need in 'mockReaderObject'.
-    // @ts-expect-error
-      spyOn(window, 'FileReader').and.returnValue(new MockReaderObject());
       successHandler = jasmine.createSpy('success');
       failHandler = jasmine.createSpy('error');
       imagesData = [{
@@ -130,6 +124,12 @@ describe('TranslateTextBackendApiService', () => {
     });
 
     it('should correctly submit a translation suggestion', fakeAsync(() => {
+    // This throws "Argument of type 'mockReaderObject' is not assignable to
+    // parameter of type 'HTMLImageElement'.". We need to suppress this
+    // error because 'HTMLImageElement' has around 250 more properties.
+    // We have only defined the properties we need in 'mockReaderObject'.
+    // @ts-expect-error
+      spyOn(window, 'FileReader').and.returnValue(new MockReaderObject());
       const expectedPayload = {
         suggestion_type: 'translate_content',
         target_type: 'exploration',
@@ -300,6 +300,25 @@ describe('TranslateTextBackendApiService', () => {
           imagesData,
           'html')
       ).toBeRejectedWithError('No image data found');
+    });
+
+    it('should throw error if prefix', async() => {
+      imagesData = [{
+        filename: 'imageFilename1',
+        imageBlob: new Blob(['data:random/xyz;base64,Blob1'], {type: 'image'})
+      }];
+      await expectAsync(
+        translateTextBackendApiService.suggestTranslatedTextAsync(
+          'activeExpId',
+          'activeExpVersion',
+          'activeContentId',
+          'activeStateName',
+          'languageCode',
+          'contentHtml',
+          'translationHtml',
+          imagesData,
+          'html')
+      ).toBeRejectedWithError('No valid prefix found in data url');
     });
   });
 });
