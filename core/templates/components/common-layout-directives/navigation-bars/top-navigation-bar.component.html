@@ -55,50 +55,89 @@
     <li>
       <ul *ngIf="!windowIsNarrow"
           class="nav oppia-navbar-tabs">
-        <li *ngIf="CLASSROOM_PROMOS_ARE_ENABLED"
-            [ngClass]="{'open' : activeMenuName === 'classroomMenu'}"
+        <li [ngClass]="{'open' : activeMenuName === 'learnMenu'}"
             ngbDropdown
-            [hidden]="!navElementsVisibilityStatus.I18N_TOPNAV_CLASSROOM"
+            [hidden]="!navElementsVisibilityStatus.I18N_TOPNAV_LEARN"
             aria-hidden="false"
             class="nav-item  dropdown oppia-navbar-clickable-dropdown protractor-test-classroom-oppia-list-item">
           <a ngbDropdownToggle
-             (keydown)="onMenuKeypress($event, 'classroomMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
-             class="nav-link oppia-navbar-tab dropdown-toggle"
+             (keydown)="onMenuKeypress($event, 'learnMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
+             class="nav-link oppia-navbar-tab dropdown-toggle learn-tab"
              role="menuitem"
              aria-haspopup="true"
              aria-expanded="false"
              aria-hidden="false"
              tabindex="0"
-             (mouseover)="openSubmenu($event, 'classroomMenu')"
+             (mouseover)="openSubmenu($event, 'learnMenu')"
              (mouseleave)="closeSubmenuIfNotMobile($event)"
              autofocus>
-            <span class="oppia-navbar-tab-content"
-                  [innerHTML]="'I18N_TOPNAV_CLASSROOM' | translate">
+            <span class="oppia-navbar-tab-content">
+              {{ 'I18N_TOPNAV_LEARN' | translate }}
             </span>
           </a>
           <ul ngbDropdownMenu
-              class="dropdown-menu dropdown-menu oppia-navbar-dropdown"
-              (mouseover)="openSubmenu($event, 'classroomMenu')"
+              [ngStyle]="{'left.px': learnDropdownOffset}"
+              [ngClass]="{'classroom-disabled': !CLASSROOM_PROMOS_ARE_ENABLED, 'classroom-enabled': CLASSROOM_PROMOS_ARE_ENABLED}"
+              class="dropdown-menu oppia-navbar-dropdown learn-dropdown-menu"
+              (mouseover)="openSubmenu($event, 'learnMenu')"
               (mouseleave)="closeSubmenuIfNotMobile($event)"
               role="menu"
               autofocus>
             <li class="nav-item">
-              <a (keydown)="onMenuKeypress($event, 'classroomMenu', {shiftTab: ACTION_CLOSE})"
-                 (click)="navigateToClassroomPage('/learn/math')"
-                 class="dropdown-item nav-link oppia-navbar-tab-content protractor-test-classroom-link"
-                 href="#"
-                 [innerHTML]="'I18N_TOPNAV_CLASSROOM_BASIC_MATHS' | translate">
-              </a>
+              <div class="nav-item-main d-flex">
+                <div *ngIf="CLASSROOM_PROMOS_ARE_ENABLED" class="nav-item-left d-flex flex-column justify-content-between">
+                  <div class="nav-item-top d-flex justify-content-between">
+                    <div class="nav-content d-flex flex-column">
+                      <a (keydown)="onMenuKeypress($event, 'learnMenu', {shiftTab: ACTION_CLOSE})"
+                         (click)="navigateToClassroomPage('/learn/math')"
+                         class="dropdown-item nav-link oppia-navbar-tab-content protractor-test-classroom-link nav-item-top-link"
+                         href="#">
+                          {{ 'I18N_TOPNAV_CLASSROOM_BASIC_MATHS' | translate }}
+                      </a>
+                      <div class="des">{{ 'I18N_TOPNAV_LEARN_DESCRIPTION_1' | translate }}</div>
+                    </div>
+                    <picture>
+                      <source type="image/png"
+                              [srcset]="getStaticImageUrl('/topnav/learn.png')">
+                      <source type="image/webp"
+                              [srcset]="getStaticImageUrl('/ltopnav/learn.webp')">
+                      <img [src]="getStaticImageUrl('/topnav/learn.png')"
+                           class="learn"
+                           alt="Learn">
+                    </picture>
+                  </div>
+                  <div class="nav-item-bottom d-flex flex-column" *ngIf="!userIsLoggedIn">
+                    <div *ngIf="classroomData.length > 0">
+                      <div class="nav-item-links"  *ngFor="let topicSummary of classroomData.slice(0, 3)">
+                        <a (click)="navigateToClassroomPage('/learn/math/' + topicSummary.getUrlFragment())"
+                           tabindex="0">
+                            {{ topicSummary.getName() }}
+                        </a>
+                      </div>
+                    </div>
+                    <a class="nav-item-bottom-link" href="/learn/math">
+                      <span>{{ 'I18N_TOPNAV_LEARN_LINK_1' | translate }} </span>
+                      <span class="material-icons">arrow_right_alt</span>
+                    </a>
+                  </div>
+                  <a *ngIf="userIsLoggedIn"
+                     class="nav-item-bottom-link-logged"
+                     href="/learn/math">
+                    <span>{{ 'I18N_TOPNAV_LEARN_LINK_2' | translate }} </span>
+                    <span class="material-icons">arrow_right_alt</span>
+                  </a>
+                </div>
+                <div class="nav-content nav-item-right d-flex flex-column">
+                  <div class="nav-item-right-head">{{ 'I18N_TOPNAV_LEARN_HEADING' | translate }}</div>
+                  <div class="des">{{ 'I18N_TOPNAV_LIBRARY_DESCRIPTION' | translate }}</div>
+                  <a class="nav-item-bottom-link" href="/community-library">
+                    <span>{{ 'I18N_TOPNAV_LIBRARY' | translate }} </span>
+                    <span class="material-icons">arrow_right_alt</span>
+                  </a>
+                </div>
+              </div>
             </li>
           </ul>
-        </li>
-        <li [hidden]="!navElementsVisibilityStatus.I18N_TOPNAV_LIBRARY"
-            class="nav-item oppia-clickable-navbar-element">
-          <a class="nav-link oppia-navbar-tab oppia-navbar-tab-content"
-             href="/community-library"
-             [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE"
-             [innerHTML]="'I18N_TOPNAV_LIBRARY' | translate">
-          </a>
         </li>
         <li [ngClass]="{'open': activeMenuName === 'aboutMenu'}"
             ngbDropdown
@@ -435,6 +474,17 @@
   </ul>
 </div>
 <style>
+  .nav-item-links a {
+    color: #212121;
+    text-decoration: none;
+  }
+  .nav-link:focus {
+    background-color: #fff;
+    color: #00645C;
+  }
+  .dropdown-menu a:focus {
+    text-decoration: underline;
+  }
   .rtl-navbar-header {
     display: flex;
     margin-left: -30px;
@@ -442,9 +492,86 @@
   .dropdown-toggle::after {
     margin-right: 0.255em;
   }
+  .learn-dropdown-menu {
+    border-radius: 3px;
+    /* left: 0 !important; */
+    padding: 0;
+  }
+  .classroom-enabled {
+    min-width: 688px;
+  }
+  .classroom-disabled {
+    min-width: 300px;
+  }
+  .learn {
+    height: 66.5px;
+  }
+  .learn-dropdown-menu .nav-item-top-link {
+    color: #333;
+    font-family: 'Roboto', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 18.75px;
+    padding: 0;
+    padding-bottom: 8px;
+  }
+  .learn-dropdown-menu .nav-item-right-head {
+    color: #333;
+    font-family: 'Roboto', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+    line-height: 14.06px;
+    padding: 0;
+    padding-bottom: 8px;
+    text-transform: uppercase;
+  }
+  .learn-dropdown-menu .nav-item-links {
+    color: #333;
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 16.41px;
+    padding: 0;
+    padding-top: 16px;
+    text-transform: capitalize;
+  }
+  .learn-dropdown-menu .nav-item-left {
+    border-right: 1px solid #0000000d;
+    padding: 32px;
+    width: 388px;
+  }
+  .learn-dropdown-menu .nav-item-right {
+    min-width: 300px;
+    padding: 32px;
+  }
+  .learn-dropdown-menu .nav-content {
+    color: #767676;
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 20px;
+    width: 224px;
+  }
+  .learn-dropdown-menu .nav-item-bottom-link {
+    color: #00645C;
+    font-family: 'Inter', 'Roboto', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 16.41px;
+    padding: 0;
+    padding-top: 16px;
+  }
+  .learn-dropdown-menu .nav-item-bottom-link-logged {
+    color: #00645C;
+    font-family: 'Inter', 'Roboto', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 16.41px;
+    padding: 0;
+  }
   .dropdown-menu {
     border-radius: 3px;
-    right: 0 !important;
   }
   .rtl-navbar-header .dropdown-menu {
     left: 0 !important;
