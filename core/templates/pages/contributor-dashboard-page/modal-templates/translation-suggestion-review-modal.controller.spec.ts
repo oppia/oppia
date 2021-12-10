@@ -365,14 +365,14 @@ describe('Translation Suggestion Review Modal Controller', function() {
       it('should return true regardless of &nbsp; differences', function() {
         expect($scope.isHtmlContentEqual(
           '<p>content</p><p>&nbsp;&nbsp;</p>', '<p>content</p><p> </p>'))
-        .toBe(true);
+          .toBe(true);
       });
 
       it('should return true regardless of new line differences', function() {
         expect($scope.isHtmlContentEqual(
           '<p>content</p>\r\n\n<p>content2</p>',
           '<p>content</p><p>content2</p>'))
-        .toBe(true);
+          .toBe(true);
       });
     });
   });
