@@ -72,7 +72,9 @@ export class StateGraphLayoutService {
   MAX_INDENTATION_LEVEL = 2.5;
 
   // The last result of a call to computeLayout(). Used for determining the
-  // order in which to specify states in rules.
+  // order in which to specify states in rules. 
+  // If we haven't called the computeLayout() function 
+  // then it is expected to stay null.
   lastComputedArrangement: NodeDataDict | null = null;
 
   getGraphAsAdjacencyLists(
@@ -264,8 +266,8 @@ export class StateGraphLayoutService {
         y0: null,
         xLabel: null,
         yLabel: null,
-        id: nodeId,
-        label: nodes[nodeId],
+        id: null,
+        label: null,
         height: null,
         width: null,
         reachableFromEnd: false,
@@ -475,6 +477,12 @@ export class StateGraphLayoutService {
         (1.0 - HORIZONTAL_EDGE_PADDING_FRACTION * 2) / totalColumns
       ) * (1.0 - GRID_NODE_X_PADDING_FRACTION * 2) +
       WIDTH_OFFSET_CHECKPOINT_ICON;
+    }
+
+    // Assign id and label to each node.
+    for (var nodeId in nodeData) {
+      nodeData[nodeId].id = nodeId;
+      nodeData[nodeId].label = nodes[nodeId];
     }
 
     // Here we are creating and initialize nodeData: NodeDataDict.
