@@ -36,6 +36,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { LearnerLocalNavComponent } from './layout-directives/learner-local-nav.component';
 import { FlagExplorationModalComponent } from './modals/flag-exploration-modal.component';
 import { FeedbackPopupComponent } from './layout-directives/feedback-popup.component';
+import { ExplorationPlayerSuggestionModalComponent } from './templates/exploration-player-suggestion-modal.component';
 import { ExplorationSuccessfullyFlaggedModalComponent } from './modals/exploration-successfully-flagged-modal.component';
 import { LearnerAnswerInfoCard } from './learner-experience/learner-answer-info-card.component';
 import { LearnerViewInfoComponent } from './layout-directives/learner-view-info.component';
@@ -62,6 +63,7 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
   declarations: [
     SwitchContentLanguageRefreshRequiredModalComponent,
     LearnerAnswerInfoCard,
+    ExplorationPlayerSuggestionModalComponent,
     ExplorationSuccessfullyFlaggedModalComponent,
     InformationCardModalComponent,
     FlagExplorationModalComponent,
@@ -72,6 +74,7 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
   ],
   entryComponents: [
     SwitchContentLanguageRefreshRequiredModalComponent,
+    ExplorationPlayerSuggestionModalComponent,
     ExplorationSuccessfullyFlaggedModalComponent,
     InformationCardModalComponent,
     FlagExplorationModalComponent,
