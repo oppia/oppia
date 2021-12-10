@@ -50,15 +50,31 @@ describe('Exploration Html Formatter Service', () => {
       'enter here&amp;quot;,&amp;quot;content_id&amp;quot;:&amp;quot;&amp;' +
       'quot;}" rows-with-value="1" last-answer="lastAnswer">' +
       '</oppia-interactive-end-exploration>';
-    expect(ehfs.getInteractionHtml(interactionId, custArgs, true, '', null))
+    expect(ehfs.getInteractionHtml(interactionId, custArgs, true, null, null))
       .toBe(expectedHtmlTag);
   });
 
   it('should fail for unknown interaction', () => {
-    var interactionId = 'UnknownInteraction';
     expect(() => {
-      ehfs.getInteractionHtml(interactionId, {}, true, '', null);
+      ehfs.getInteractionHtml('UnknownInteraction', {}, true, null, null);
     }).toThrowError('Invalid interaction id: UnknownInteraction.');
+  });
+
+  it('should fail for saved solution other than savedMemento()', () => {
+    expect(() => {
+      // This throws "Argument of type '"other"' is not assignable to parameter
+      // of type '"savedMemento()"'.". We need to suppress this error because
+      // we want to test if error is thrown.
+      // @ts-expect-error
+      ehfs.getInteractionHtml('GraphInput', {}, true, null, 'other');
+    }).toThrowError('Unexpected saved solution: other.');
+  });
+
+  it('should fail for non-alphabetic label for focus target', () => {
+    expect(() => {
+      ehfs.getInteractionHtml(
+        'GraphInput', {}, true, '<tag></tag>', 'savedMemento()');
+    }).toThrowError('Unexpected label for focus target: <tag></tag>.');
   });
 
   it('should correctly set [last-answer] for MigratedInteractions when it' +
@@ -73,8 +89,9 @@ describe('Exploration Html Formatter Service', () => {
       'enter here&amp;quot;,&amp;quot;content_id&amp;quot;:&amp;quot;&amp;' +
       'quot;}" rows-with-value="1" [last-answer]="lastAnswer">' +
       '</oppia-interactive-graph-input>';
-    expect(ehfs.getInteractionHtml(interactionId, custArgs, true, '', null))
-      .toBe(expectedHtmlTag);
+    expect(
+      ehfs.getInteractionHtml(interactionId, custArgs, true, null, null)
+    ).toBe(expectedHtmlTag);
   });
 
   it('should correctly set [last-answer] for MigratedInteractions when it' +
@@ -90,8 +107,8 @@ describe('Exploration Html Formatter Service', () => {
       'quot;}" rows-with-value="1" [last-answer]="lastAnswer">' +
       '</oppia-interactive-graph-input>';
     expect(ehfs.getInteractionHtml(
-      interactionId, custArgs, true, '', null))
-      .toBe(expectedHtmlTag);
+      interactionId, custArgs, true, null, null)
+    ).toBe(expectedHtmlTag);
   });
 
   it('should correctly set interaction HTML when it is in player mode',

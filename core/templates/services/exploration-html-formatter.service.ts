@@ -77,7 +77,7 @@ export class ExplorationHtmlFormatterService {
       interactionId: string,
       interactionCustomizationArgs: InteractionCustomizationArgs,
       parentHasLastAnswerProperty: boolean,
-      labelForFocusTarget: string,
+      labelForFocusTarget: string | null,
       savedSolution: 'savedMemento()' | null
   ): string {
     let availableInteractionIds = Array.prototype.concat.apply(
@@ -111,13 +111,20 @@ export class ExplorationHtmlFormatterService {
       if (this.migratedInteractions.indexOf(interactionId) >= 0) {
         element.removeAttribute('saved-solution');
       }
+    } else if (savedSolution !== null) {
+      throw new Error(`Unexpected saved solution: ${savedSolution}.`);
     }
-    const alphabetRegex = new RegExp('[a-zA-Z]*');
+
+    const alphanumericRegex = new RegExp('^[a-zA-Z0-9]+$');
     // The setAttribute is safe because we verify that the labelForFocusTarget
     // is only formed of alphabetical characters.
-    if (labelForFocusTarget && alphabetRegex.test(labelForFocusTarget)) {
+    if (labelForFocusTarget && alphanumericRegex.test(labelForFocusTarget)) {
       element.setAttribute('label-for-focus-target', labelForFocusTarget);
+    } else if (labelForFocusTarget !== null) {
+      throw new Error(
+        `Unexpected label for focus target: ${labelForFocusTarget}.`);
     }
+
     let lastAnswerPropValue = (
       parentHasLastAnswerProperty ? 'lastAnswer' : 'null'
     );
