@@ -374,6 +374,26 @@ describe('Translation Suggestion Review Modal Controller', function() {
           '<p>content</p><p>content2</p>'))
           .toBe(true);
       });
+
+      it('should return false if html content differ', function() {
+        expect($scope.isHtmlContentEqual(
+          '<p>content</p>', '<p>content CHANGED</p>'))
+          .toBe(false);
+      });
+
+      it('should return false if array contents differ', function() {
+        expect($scope.isHtmlContentEqual(
+          ['<p>content1</p>', '<p>content2</p>'],
+          ['<p>content1</p>', '<p>content2 CHANGED</p>']))
+          .toBe(false);
+      });
+
+      it('should return true if array contents are equal', function() {
+        expect($scope.isHtmlContentEqual(
+          ['<p>content1</p>', '<p>content2</p>'],
+          ['<p>content1</p>', '<p>content2</p>']))
+          .toBe(true);
+      });
     });
   });
 
