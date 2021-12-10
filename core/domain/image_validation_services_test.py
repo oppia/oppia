@@ -43,8 +43,7 @@ class ImageValidationServiceTests(test_utils.GenericTestBase):
                 image, filename)
 
     def test_image_validation_checks(self):
-        self._assert_validation_error(
-            None, 'image.png', 'No image supplied')
+        self._assert_validation_error(None, 'image.png', 'No image supplied')
         self._assert_validation_error(
             self.raw_image, None, 'No filename supplied')
 
