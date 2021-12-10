@@ -302,7 +302,7 @@ describe('TranslateTextBackendApiService', () => {
       ).toBeRejectedWithError('No image data found');
     });
 
-    it('should throw error if prefix', async() => {
+    it('should throw error if prefix is invalid', async() => {
       imagesData = [{
         filename: 'imageFilename1',
         imageBlob: new Blob(['data:random/xyz;base64,Blob1'], {type: 'image'})
