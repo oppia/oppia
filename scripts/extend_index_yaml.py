@@ -68,6 +68,9 @@ def main() -> None:
         return
 
     index_yaml_dict['indexes'] += new_kinds
+    # Yaml dump doesn't add new lines between kind's automatically
+    # So we are convert new_index_yaml_dict to string and
+    # add new lines manually.
     new_index_yaml_dict = yaml.safe_dump(
         index_yaml_dict, default_flow_style=False, sort_keys=False
     )
