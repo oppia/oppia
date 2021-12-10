@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2018 The Oppia Authors. All Rights Reserved.
+# Copyright 2021 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -46,6 +46,20 @@ class ExtendIndexYamlTest(test_utils.GenericTestBase):
             self.index_yaml_file.name, 'w', encoding='utf-8')
         self.open_web_inf_index_yaml = open(
             self.web_inf_index_yaml_file.name, 'a', encoding='utf-8')
+
+    def _run_test_for_extend_index_yaml(
+        self, index_yaml, web_inf_index_yaml, expected_index_yaml
+    ):
+        """Run tests for extend_index_yaml script."""
+        with self.index_yaml_swap, self.web_inf_index_yaml_swap:
+            with self.open_index_yaml_w as f:
+                f.write(index_yaml)
+            with self.open_web_inf_index_yaml as f:
+                f.write(web_inf_index_yaml)
+            extend_index_yaml.main()
+            with self.open_index_yaml_r as f:
+                actual_index_yaml = f.read()
+            self.assertEqual(actual_index_yaml, expected_index_yaml)
 
     def tearDown(self) -> None:
         super(ExtendIndexYamlTest, self).tearDown()
@@ -94,15 +108,8 @@ class ExtendIndexYamlTest(test_utils.GenericTestBase):
   - name: next_scheduled_check_time
 """
 
-        with self.index_yaml_swap, self.web_inf_index_yaml_swap:
-            with self.open_index_yaml_w as f:
-                f.write(index_yaml)
-            with self.open_web_inf_index_yaml as f:
-                f.write(web_inf_index_yaml)
-            extend_index_yaml.main()
-            with self.open_index_yaml_r as f:
-                actual_index_yaml = f.read()
-            self.assertEqual(actual_index_yaml, expected_index_yaml)
+        self._run_test_for_extend_index_yaml(
+            index_yaml, web_inf_index_yaml, expected_index_yaml)
 
     def test_extend_index_yaml_without_changes(self):
         index_yaml = """indexes:
@@ -129,15 +136,8 @@ class ExtendIndexYamlTest(test_utils.GenericTestBase):
     direction: desc
 """
 
-        with self.index_yaml_swap, self.web_inf_index_yaml_swap:
-            with self.open_index_yaml_w as f:
-                f.write(index_yaml)
-            with self.open_web_inf_index_yaml as f:
-                f.write(web_inf_index_yaml)
-            extend_index_yaml.main()
-            with self.open_index_yaml_r as f:
-                actual_index_yaml = f.read()
-            self.assertEqual(actual_index_yaml, index_yaml)
+        self._run_test_for_extend_index_yaml(
+            index_yaml, web_inf_index_yaml, index_yaml)
 
     def test_extend_index_yaml_with_empty_web_inf_ind_yaml(self):
         index_yaml = """indexes:
@@ -158,15 +158,8 @@ class ExtendIndexYamlTest(test_utils.GenericTestBase):
 
 """
 
-        with self.index_yaml_swap, self.web_inf_index_yaml_swap:
-            with self.open_index_yaml_w as f:
-                f.write(index_yaml)
-            with self.open_web_inf_index_yaml as f:
-                f.write(web_inf_index_yaml)
-            extend_index_yaml.main()
-            with self.open_index_yaml_r as f:
-                actual_index_yaml = f.read()
-            self.assertEqual(actual_index_yaml, index_yaml)
+        self._run_test_for_extend_index_yaml(
+            index_yaml, web_inf_index_yaml, index_yaml)
 
     def test_extend_index_yaml_with_same_kind(self):
         index_yaml = """indexes:
@@ -222,15 +215,8 @@ class ExtendIndexYamlTest(test_utils.GenericTestBase):
   - name: next_scheduled_check_time
 """
 
-        with self.index_yaml_swap, self.web_inf_index_yaml_swap:
-            with self.open_index_yaml_w as f:
-                f.write(index_yaml)
-            with self.open_web_inf_index_yaml as f:
-                f.write(web_inf_index_yaml)
-            extend_index_yaml.main()
-            with self.open_index_yaml_r as f:
-                actual_index_yaml = f.read()
-            self.assertEqual(actual_index_yaml, expected_index_yaml)
+        self._run_test_for_extend_index_yaml(
+            index_yaml, web_inf_index_yaml, expected_index_yaml)
 
     def test_extend_index_yaml_with_same_kind_in_web_inf(self):
         index_yaml = """indexes:
@@ -287,15 +273,8 @@ class ExtendIndexYamlTest(test_utils.GenericTestBase):
   - name: next_scheduled_check_time
 """
 
-        with self.index_yaml_swap, self.web_inf_index_yaml_swap:
-            with self.open_index_yaml_w as f:
-                f.write(index_yaml)
-            with self.open_web_inf_index_yaml as f:
-                f.write(web_inf_index_yaml)
-            extend_index_yaml.main()
-            with self.open_index_yaml_r as f:
-                actual_index_yaml = f.read()
-            self.assertEqual(actual_index_yaml, expected_index_yaml)
+        self._run_test_for_extend_index_yaml(
+            index_yaml, web_inf_index_yaml, expected_index_yaml)
 
     def test_extend_index_yaml_with_same_kind_different_order(self):
         index_yaml = """indexes:
@@ -361,12 +340,5 @@ class ExtendIndexYamlTest(test_utils.GenericTestBase):
   - name: next_scheduled_check_time
 """
 
-        with self.index_yaml_swap, self.web_inf_index_yaml_swap:
-            with self.open_index_yaml_w as f:
-                f.write(index_yaml)
-            with self.open_web_inf_index_yaml as f:
-                f.write(web_inf_index_yaml)
-            extend_index_yaml.main()
-            with self.open_index_yaml_r as f:
-                actual_index_yaml = f.read()
-            self.assertEqual(actual_index_yaml, expected_index_yaml)
+        self._run_test_for_extend_index_yaml(
+            index_yaml, web_inf_index_yaml, expected_index_yaml)
