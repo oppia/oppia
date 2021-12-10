@@ -104,7 +104,7 @@ export class PracticeTabComponent implements OnInit {
     this.questionsStatusCallIsComplete = false;
     for (let idx in subtopicIndices) {
       if (subtopicIndices[idx]) {
-        skillIds.push(this.availableSubtopics[idx].getSkillIds());
+        skillIds.push(...this.availableSubtopics[idx].getSkillIds());
       }
     }
     if (skillIds.length > 0) {
