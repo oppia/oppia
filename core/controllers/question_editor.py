@@ -240,11 +240,7 @@ class EditableQuestionDataHandler(base.BaseHandler):
     def put(self, question_id):
         """Updates properties of the given question."""
         commit_message = self.normalized_payload.get('commit_message')
-
-        change_list = [
-            question_domain.QuestionChange(change)
-            for change in self.normalized_payload.get('change_list')
-        ]
+        change_list = self.normalized_payload.get('change_list')
 
         for change in change_list:
             if (

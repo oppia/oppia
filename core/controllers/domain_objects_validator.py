@@ -245,10 +245,13 @@ def validate_question_change(obj):
 
     Args:
         obj: dict. Data that needs to be validated.
+
+    Returns:
+        QuestionChange. Returns an QuestionChange object.
     """
     # No explicit call to validate_dict method is necessary, because
     # QuestionChange calls validate method while initialization.
-    question_domain.QuestionChange(obj) # type: ignore[no-untyped-call]
+    return question_domain.QuestionChange(obj)
 
 
 def validate_params_dict(params):
