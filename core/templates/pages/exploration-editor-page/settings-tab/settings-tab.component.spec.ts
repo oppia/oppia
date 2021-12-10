@@ -17,7 +17,7 @@
  */
 
 import { EventEmitter } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { TextInputRulesService } from
   'interactions/TextInput/directives/text-input-rules.service';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
@@ -42,6 +42,7 @@ import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 import { ReadOnlyExplorationBackendApiService } from
   'domain/exploration/read-only-exploration-backend-api.service';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 import { Subscription } from 'rxjs';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
@@ -83,6 +84,7 @@ describe('Settings Tab Component', () => {
   let windowRef = null;
   let routerService = null;
   let settingTabBackendApiService = null;
+  let ngbModal: NgbModal = null;
 
   let testSubscriptipns = null;
   let refreshGraphSpy = null;
@@ -126,6 +128,7 @@ describe('Settings Tab Component', () => {
       TestBed.inject(UserExplorationPermissionsService));
     windowRef = TestBed.inject(WindowRef);
     routerService = new MockRouterService();
+    ngbModal = TestBed.inject(NgbModal);
     mockWindowDimensionsService = {
       isWindowNarrow: () => true
     };
@@ -155,6 +158,13 @@ describe('Settings Tab Component', () => {
     $provide.value(
       'ExplorationDataService',
       TestBed.inject(ExplorationDataService));
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
   }));
 
   afterEach(() => {
@@ -166,6 +176,7 @@ describe('Settings Tab Component', () => {
       $q = $injector.get('$q');
       $rootScope = $injector.get('$rootScope');
       $uibModal = $injector.get('$uibModal');
+      ngbModal = $injector.get('NgbModal');
       explorationDataService = $injector.get('ExplorationDataService');
       contextService = $injector.get('ContextService');
       settingTabBackendApiService = $injector.get(
@@ -339,10 +350,7 @@ describe('Settings Tab Component', () => {
       });
 
     it('should delete exploration when closing delete exploration modal',
-      () => {
-        spyOn($uibModal, 'open').and.returnValue({
-          result: $q.resolve()
-        });
+      fakeAsync(() => {
         spyOn(editableExplorationBackendApiService, 'deleteExplorationAsync')
           .and.returnValue($q.resolve());
         spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
@@ -352,15 +360,18 @@ describe('Settings Tab Component', () => {
         });
 
         ctrl.deleteExploration();
+        tick();
         $scope.$apply();
 
         expect(windowRef.nativeWindow.location).toBe('/creator-dashboard');
-      });
+      }));
 
     it('should not delete exploration when dismissing delete exploration modal',
-      () => {
-        spyOn($uibModal, 'open').and.returnValue({
-          result: $q.reject()
+      fakeAsync(() => {
+        spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+          return ({
+            result: Promise.reject()
+          } as NgbModalRef);
         });
         spyOn(alertsService, 'clearWarnings');
         spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
@@ -368,183 +379,255 @@ describe('Settings Tab Component', () => {
         });
 
         ctrl.deleteExploration();
+        tick();
         $scope.$apply();
 
         expect(alertsService.clearWarnings).toHaveBeenCalled();
         expect(windowRef.nativeWindow.location).toBe('');
+      }));
+
+    it('should open a modal when removeRole is called', fakeAsync(() => {
+      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return ({
+          componentInstance: NgbModalRef,
+          result: Promise.resolve()
+        } as NgbModalRef);
       });
 
-    it('should open a modal when removeRole is called', function() {
-      spyOn($uibModal, 'open').and.callThrough();
-
       ctrl.removeRole('username', 'editor');
+      tick();
 
-      expect($uibModal.open).toHaveBeenCalled();
-    });
+      expect(ngbModal.open).toHaveBeenCalled();
+    }));
 
-    it('should remove role when resolving remove-role-modal', () => {
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve()
+    it('should remove role when resolving remove-role-modal', fakeAsync(() => {
+      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return ({
+          componentInstance: NgbModalRef,
+          result: Promise.resolve()
+        } as NgbModalRef);
       });
       spyOn(explorationRightsService, 'removeRoleAsync').and
         .returnValue($q.resolve());
 
       ctrl.removeRole('username', 'editor');
-      $scope.$apply();
+      tick();
 
       expect(
         explorationRightsService.removeRoleAsync).toHaveBeenCalled();
-    });
+    }));
 
-    it('should not remove role when rejecting remove-role-modal', () => {
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.reject()
+    it('should not remove role when rejecting remove-role-modal',
+      fakeAsync(() => {
+        spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+          return ({
+            componentInstance: NgbModalRef,
+            result: Promise.reject()
+          } as NgbModalRef);
+        });
+        spyOn(explorationRightsService, 'removeRoleAsync');
+
+        ctrl.removeRole('username1', 'editor');
+        tick();
+
+        expect(
+          explorationRightsService.removeRoleAsync).not.toHaveBeenCalled();
+      }));
+
+    it('should remove role when user accept remove-role-modal',
+      fakeAsync(() => {
+        spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+          return ({
+            componentInstance: NgbModalRef,
+            result: Promise.resolve()
+          } as NgbModalRef);
+        });
+        spyOn(explorationRightsService, 'removeRoleAsync')
+          .and.returnValue(Promise.resolve());
+
+        ctrl.removeRole('username1', 'editor');
+        tick();
+
+        expect(
+          explorationRightsService.removeRoleAsync).toHaveBeenCalled();
+      }));
+
+    it('should open a modal when removeVoiceArtist is called', fakeAsync(() => {
+      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return ({
+          componentInstance: NgbModalRef,
+          result: Promise.resolve()
+        } as NgbModalRef);
       });
-      spyOn(explorationRightsService, 'removeRoleAsync');
-
-      ctrl.removeRole('username', 'editor');
-      $scope.$apply();
-
-      expect(
-        explorationRightsService.removeRoleAsync).not.toHaveBeenCalled();
-    });
-
-    it('should open a modal when removeVoiceArtist is called', function() {
-      spyOn($uibModal, 'open').and.callThrough();
-
+      spyOn(explorationRightsService, 'removeVoiceArtistRoleAsync')
+        .and.returnValue(Promise.resolve());
       ctrl.removeVoiceArtist('username');
+      tick();
 
-      expect($uibModal.open).toHaveBeenCalled();
-    });
+      expect(ngbModal.open).toHaveBeenCalled();
+      expect(explorationRightsService.removeVoiceArtistRoleAsync)
+        .toHaveBeenCalled();
+    }));
 
-    it('should remove voice artist when resolving remove-role-modal', () => {
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve('username', 'voice artist')
-      });
-      spyOn(explorationRightsService, 'removeVoiceArtistRoleAsync').and
-        .returnValue($q.resolve());
+    it('should remove voice artist when resolving remove-role-modal',
+      fakeAsync(() => {
+        spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+          return ({
+            componentInstance: NgbModalRef,
+            result: Promise.resolve()
+          } as NgbModalRef);
+        });
+        spyOn(explorationRightsService, 'removeVoiceArtistRoleAsync').and
+          .returnValue($q.resolve());
 
-      ctrl.removeVoiceArtist('username');
-      $scope.$apply();
+        ctrl.removeVoiceArtist('username');
+        tick();
 
-      expect(
-        explorationRightsService.removeVoiceArtistRoleAsync)
-        .toHaveBeenCalledWith('username');
-    });
+        expect(
+          explorationRightsService.removeVoiceArtistRoleAsync)
+          .toHaveBeenCalledWith('username');
+      }));
 
     it('should not remove voice artist when rejecting remove-role-modal',
-      () => {
-        spyOn($uibModal, 'open').and.returnValue({
-          result: $q.reject()
+      fakeAsync(() => {
+        spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+          return ({
+            componentInstance: NgbModalRef,
+            result: Promise.reject()
+          } as NgbModalRef);
         });
         spyOn(explorationRightsService, 'removeVoiceArtistRoleAsync');
 
         ctrl.removeVoiceArtist('username');
+        tick();
         $scope.$apply();
 
         expect(
           explorationRightsService.removeVoiceArtistRoleAsync)
           .not.toHaveBeenCalled();
-      });
+      }));
 
-    it('should open a modal when reassignRole is called', () => {
-      spyOn($uibModal, 'open').and.callThrough();
+    it('should open a modal when reassignRole is called', fakeAsync(() => {
+      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return ({
+          componentInstance: NgbModalRef,
+          result: Promise.resolve()
+        } as NgbModalRef);
+      });
 
       ctrl.openEditRolesForm();
       explorationRightsService.init(
         ['owner'], [], [], [], '', false, false, true);
 
       spyOn(explorationRightsService, 'checkUserAlreadyHasRoles')
-        .and.returnValue({result: $q.resolve()});
-      spyOn(explorationRightsService, 'saveRoleChanges').and.returnValue({
-        result: $q.resolve()
-      });
+        .and.returnValue(Promise.resolve());
+      spyOn(explorationRightsService, 'saveRoleChanges').and.returnValue(
+        Promise.resolve());
       ctrl.editRole('Username1', 'editor');
+      tick();
       ctrl.editRole('Username1', 'owner');
+      tick();
 
-      expect($uibModal.open).toHaveBeenCalled();
-    });
+      expect(ngbModal.open).toHaveBeenCalled();
+    }));
 
-    it('should reassign role when resolving reassign-role-modal', () => {
-      ctrl.openEditRolesForm();
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve()
-      });
-      explorationRightsService.init(
-        ['owner'], [], [], [], '', false, false, true);
+    it('should reassign role when resolving reassign-role-modal',
+      fakeAsync(() => {
+        spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+          return ({
+            componentInstance: NgbModalRef,
+            result: Promise.resolve()
+          } as NgbModalRef);
+        });
 
-      spyOn(explorationRightsService, 'checkUserAlreadyHasRoles')
-        .and.returnValue({result: $q.resolve()});
-      spyOn(explorationRightsService, 'saveRoleChanges').and.returnValue({
-        result: $q.resolve()
-      });
-      ctrl.editRole('Username1', 'editor');
-      $scope.$apply();
-      ctrl.editRole('Username1', 'owner');
-      $scope.$apply();
+        ctrl.openEditRolesForm();
+        explorationRightsService.init(
+          ['owner'], [], [], [], '', false, false, true);
 
-      expect(explorationRightsService.saveRoleChanges).toHaveBeenCalledWith(
-        'Username1', 'owner');
-    });
+        spyOn(explorationRightsService, 'checkUserAlreadyHasRoles')
+          .and.returnValue(Promise.resolve());
+        spyOn(explorationRightsService, 'saveRoleChanges').and.returnValue(
+          Promise.resolve());
 
-    it('should not reassign role when rejecting remove-role-modal', () => {
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.reject()
-      });
-      explorationRightsService.init(
-        ['owner'], [], [], [], '', false, false, true);
+        ctrl.editRole('Username1', 'editor');
+        tick();
+        $scope.$apply();
+        ctrl.editRole('Username1', 'owner');
+        $scope.$apply();
+        tick();
 
-      spyOn(explorationRightsService, 'checkUserAlreadyHasRoles')
-        .and.returnValue({result: $q.resolve()});
-      spyOn(explorationRightsService, 'saveRoleChanges').and.returnValue({
-        result: $q.resolve()
-      });
-      ctrl.editRole('Username1', 'editor');
-      $scope.$apply();
-      ctrl.editRole('Username1', 'owner');
-      $scope.$apply();
+        expect(explorationRightsService.saveRoleChanges).toHaveBeenCalledWith(
+          'Username1', 'owner');
+      }));
 
-      expect(
-        explorationRightsService.saveRoleChanges).not.toHaveBeenCalled();
-    });
+    it('should not reassign role when rejecting remove-role-modal', fakeAsync(
+      () => {
+        spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+          return ({
+            componentInstance: NgbModalRef,
+            result: Promise.reject()
+          } as NgbModalRef);
+        });
+
+        explorationRightsService.init(
+          ['owner'], [], [], [], '', false, false, true);
+
+        spyOn(explorationRightsService, 'checkUserAlreadyHasRoles')
+          .and.returnValue({result: $q.resolve()});
+        spyOn(explorationRightsService, 'saveRoleChanges').and.returnValue({
+          result: $q.resolve()
+        });
+        ctrl.editRole('Username1', 'editor');
+        tick();
+        $scope.$apply();
+        ctrl.editRole('Username1', 'owner');
+        tick();
+        $scope.$apply();
+
+        expect(
+          explorationRightsService.saveRoleChanges).not.toHaveBeenCalled();
+      }));
 
     it('should transfer exploration ownership when closing transfer ownership' +
-    ' modal', () => {
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve()
-      });
-      spyOn(explorationRightsService, 'makeCommunityOwned');
+    ' modal', fakeAsync(() => {
+      spyOn(explorationRightsService, 'makeCommunityOwned').and.returnValue(
+        Promise.resolve()
+      );
 
       ctrl.showTransferExplorationOwnershipModal();
+      tick();
       $scope.$apply();
 
       expect(explorationRightsService.makeCommunityOwned).toHaveBeenCalled();
-    });
+    }));
 
     it('should not transfer exploration ownership when dismissing transfer' +
-    ' ownership modal', () => {
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.reject()
+    ' ownership modal', fakeAsync(() => {
+      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return ({
+          componentInstance: NgbModalRef,
+          result: Promise.reject()
+        } as NgbModalRef);
       });
       spyOn(alertsService, 'clearWarnings');
 
       ctrl.showTransferExplorationOwnershipModal();
-      $scope.$apply();
+      tick();
 
       expect(alertsService.clearWarnings).toHaveBeenCalled();
-    });
+    }));
 
     it('should open preview summary tile modal with $uibModal',
-      () => {
+      fakeAsync(() => {
         spyOn($uibModal, 'open').and.returnValue({
-          result: $q.resolve()
+          result: Promise.resolve()
         });
 
         ctrl.previewSummaryTile();
-        $scope.$apply();
+        tick();
 
         expect($uibModal.open).toHaveBeenCalled();
-      });
+      }));
 
     it('should clear alerts warning when dismissing preview summary tile modal',
       () => {
@@ -559,65 +642,77 @@ describe('Settings Tab Component', () => {
         expect(alertsService.clearWarnings).toHaveBeenCalled();
       });
 
-    it('should open preview summary tile modal with $uibModal', () => {
-      spyOn($uibModal, 'open').and.callThrough();
-      spyOn(
-        settingTabBackendApiService, 'getData')
-        .and.returnValue($q.resolve({
-          draft_email_body: 'Draf message'
-        }));
+    it('should open preview summary tile modal with $uibModal',
+      fakeAsync(() => {
+        spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+          return ({
+            componentInstance: NgbModalRef,
+            result: Promise.resolve()
+          } as NgbModalRef);
+        });
+        spyOn(settingTabBackendApiService, 'getData')
+          .and.returnValue(Promise.resolve({
+            draft_email_body: 'Draf message'
+          }));
 
-      ctrl.unpublishExplorationAsModerator();
-      $scope.$apply();
+        ctrl.unpublishExplorationAsModerator();
+        tick();
 
-      expect($uibModal.open).toHaveBeenCalled();
-    });
+        expect(ngbModal.open).toHaveBeenCalled();
+      }));
 
     it('should save moderator changes to backend when closing preview summary' +
-    ' tile modal', () => {
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve('Email body')
+      ' tile modal', fakeAsync(() => {
+      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return ({
+          componentInstance: NgbModalRef,
+          result: Promise.resolve()
+        } as NgbModalRef);
       });
       spyOn(explorationRightsService, 'saveModeratorChangeToBackendAsync').and
         .callFake((emailBody) => {
-          return $q.resolve();
+          return Promise.resolve();
         });
       spyOn(
         settingTabBackendApiService, 'getData')
-        .and.returnValue($q.resolve({
+        .and.returnValue(Promise.resolve({
           draft_email_body: 'Draf message'
         }));
 
       ctrl.canUnpublish = false;
       ctrl.canReleaseOwnership = false;
       ctrl.unpublishExplorationAsModerator();
+      tick();
       $scope.$apply();
 
       expect(explorationRightsService.saveModeratorChangeToBackendAsync)
-        .toHaveBeenCalledWith('Email body');
+        .toHaveBeenCalled();
       expect(userExplorationPermissionsService.fetchPermissionsAsync)
         .toHaveBeenCalled();
       expect(ctrl.canUnpublish).toBe(true);
       expect(ctrl.canReleaseOwnership).toBe(true);
-    });
+    }));
 
     it('should clear alerts warning when dismissing preview summary tile modal',
-      () => {
-        spyOn($uibModal, 'open').and.returnValue({
-          result: $q.reject()
+      fakeAsync(() => {
+        spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+          return ({
+            componentInstance: NgbModalRef,
+            result: Promise.reject()
+          } as NgbModalRef);
         });
         spyOn(alertsService, 'clearWarnings');
         spyOn(
           settingTabBackendApiService, 'getData')
-          .and.returnValue($q.resolve({
+          .and.returnValue(Promise.resolve({
             draft_email_body: 'Draf message'
           }));
 
         ctrl.unpublishExplorationAsModerator();
-        $scope.$apply();
+        tick();
 
         expect(alertsService.clearWarnings).toHaveBeenCalled();
-      });
+      }));
 
     it('should toggle notifications', () => {
       let feedbackNotificationsSpy = spyOn(
@@ -650,13 +745,14 @@ describe('Settings Tab Component', () => {
     it('should open edit roles form and edit username and role', () => {
       ctrl.openEditRolesForm();
       explorationRightsService.init(
-        ['owner'], [], [], [], '', false, false, true);
+        ['owner'], [], [], [], '', '', false, true);
 
       expect(ctrl.isRolesFormOpen).toBe(true);
       expect(ctrl.newMemberUsername).toBe('');
       expect(ctrl.newMemberRole.value).toBe('owner');
 
-      spyOn(explorationRightsService, 'saveRoleChanges');
+      spyOn(explorationRightsService, 'saveRoleChanges').and.returnValue(
+        Promise.resolve());
       ctrl.editRole('Username1', 'editor');
 
       expect(explorationRightsService.saveRoleChanges).toHaveBeenCalledWith(
@@ -681,12 +777,13 @@ describe('Settings Tab Component', () => {
     it('should open voice artist edit roles form and edit username', () => {
       ctrl.openVoiceoverRolesForm();
       explorationRightsService.init(
-        ['owner'], [], [], [], '', false, false, true);
+        ['owner'], [], [], [], '', '', false, true);
 
       expect(ctrl.isVoiceoverFormOpen).toBe(true);
       expect(ctrl.newVoiceArtistUsername).toBe('');
 
-      spyOn(explorationRightsService, 'assignVoiceArtistRoleAsync');
+      spyOn(explorationRightsService, 'assignVoiceArtistRoleAsync')
+        .and.returnValue(Promise.resolve());
       ctrl.editVoiseArtist('Username1');
 
       expect(explorationRightsService.assignVoiceArtistRoleAsync)
@@ -735,6 +832,34 @@ describe('Settings Tab Component', () => {
       changeListSpy.and.returnValue(false);
       expect(ctrl.isExplorationLockedForEditing()).toBe(false);
     });
+
+    it('should check edit-modal has been open ' +
+    'when editRole function has been called', fakeAsync(() => {
+      spyOn(ngbModal, 'open').and.returnValue({
+        componentInstance: NgbModalRef,
+        result: Promise.resolve()
+      } as NgbModalRef);
+
+      ctrl.openEditRolesForm();
+      expect(ctrl.isRolesFormOpen).toEqual(true);
+      tick();
+      explorationRightsService.init(
+        ['owner'], [], [], [], '', false, false, true);
+      tick();
+      spyOn(explorationRightsService, 'checkUserAlreadyHasRoles')
+        .and.returnValue(Promise.resolve());
+      spyOn(explorationRightsService, 'saveRoleChanges').and.returnValue(
+        Promise.resolve()
+      );
+      ctrl.editRole('Username1', 'editor');
+      tick();
+      ctrl.editRole('Username1', 'owner');
+      tick();
+
+      expect(ngbModal.open).toHaveBeenCalled();
+      expect(explorationRightsService.saveRoleChanges).toHaveBeenCalled();
+      expect(ctrl.isRolesFormOpen).toEqual(false);
+    }));
 
     it('should update warnings when save param changes hook', () => {
       spyOn(explorationWarningsService, 'updateWarnings');
@@ -871,6 +996,7 @@ describe('Settings Tab Component', () => {
         isWindowNarrow: () => false
       };
     });
+
     beforeEach(angular.mock.inject(($injector, $componentController) => {
       $q = $injector.get('$q');
       $rootScope = $injector.get('$rootScope');
