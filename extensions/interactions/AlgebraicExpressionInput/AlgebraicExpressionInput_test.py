@@ -30,7 +30,7 @@ class AlgebraicExpressionInputInteractionTests(test_utils.GenericTestBase):
             'id': 'AlgebraicExpressionInput',
             'customization_args': {
                 'customOskLetters': {
-                     'value': [ '\u03C0', '\u03C0']
+                     'value': ['\u03C0', '\u03C0']
                 },
                 'useFractionForDivision': {
                     'value': False
@@ -72,7 +72,7 @@ class AlgebraicExpressionInputInteractionTests(test_utils.GenericTestBase):
                     'rule_type': 'MatchesWithGeneralForm',
                     'inputs': {
                         'x': 'pi*r^2',
-                        'y': [ 'pi*r^2', 'pi*r^2']
+                        'y': ['pi*r^2', 'pi*r^2']
                     }
                 }],
                 'training_data': [],

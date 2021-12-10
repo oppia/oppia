@@ -30,7 +30,7 @@ class MathEquationInputInteractionTests(test_utils.GenericTestBase):
             'id': 'MathEquationInput',
             'customization_args': {
                 'customOskLetters': {
-                     'value': [ '\u03C0', '\u03C0']
+                     'value': ['\u03C0', '\u03C0']
                 },
                 'useFractionForDivision': {
                     'value': False
@@ -75,7 +75,7 @@ class MathEquationInputInteractionTests(test_utils.GenericTestBase):
                     'rule_type': 'MatchesWithGeneralForm',
                     'inputs': {
                         'x': 'a+b=c',
-                        'y': [ 'a+b=c', 'a+b=c']
+                        'y': ['a+b=c', 'a+b=c']
                     }
                 }],
                 'training_data': [],

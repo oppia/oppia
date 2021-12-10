@@ -4682,7 +4682,7 @@ class InteractionInstanceDomainTests(test_utils.GenericTestBase):
                 'AlgebraicExpressionInput',
                 {
                     'customOskLetters': {
-                        'value': [ '\u03C0', '\u03C0']
+                        'value': ['\u03C0', '\u03C0']
                     },
                     'useFractionForDivision': {
                         'value': False
@@ -4702,7 +4702,7 @@ class InteractionInstanceDomainTests(test_utils.GenericTestBase):
                 'MathEquationInput',
                 {
                     'customOskLetters': {
-                        'value': [ '\u03C0', '\u03C0']
+                        'value': ['\u03C0', '\u03C0']
                     },
                     'useFractionForDivision': {
                         'value': False

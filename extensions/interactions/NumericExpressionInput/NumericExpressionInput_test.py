@@ -108,7 +108,8 @@ class NumericExpressionInputInteractionTests(test_utils.GenericTestBase):
             }
         }
         registery = interaction_registry.Registry
-        numeric_instance = registery.get_interaction_by_id('NumericExpressionInput')
+        numeric_instance = (
+            registery.get_interaction_by_id('NumericExpressionInput'))
 
         interaction_domain = (
             state_domain.InteractionInstance.from_dict(interaction_dict))
@@ -155,7 +156,9 @@ class NumericExpressionInputInteractionTests(test_utils.GenericTestBase):
             '<p>This is the second hint.</p>')
 
         numeric_solution = numeric_proto.solution
-        self.assertEqual(numeric_solution.correct_answer, '1000 + 200 + 30 + 4 + 0.5 + 0.06')
+        self.assertEqual(
+            numeric_solution.correct_answer,
+            '1000 + 200 + 30 + 4 + 0.5 + 0.06')
 
         self.assertEqual(
             numeric_proto.solution.base_solution.explanation.content_id,
@@ -183,7 +186,8 @@ class NumericExpressionInputInteractionTests(test_utils.GenericTestBase):
             numeric_mis_skill.misconception_id, 'misconception_id')
 
         numeric_answer_group = numeric_proto.answer_groups[0]
-        math_rule_specs = numeric_answer_group.rule_specs[0].matches_exactly_with
+        math_rule_specs = numeric_answer_group.rule_specs[0]
+            .matches_exactly_with
         self.assertEqual(
             math_rule_specs.numeric_expression,
             '1000 + 200 + 30 + 4 + 0.5 + 0.06')
