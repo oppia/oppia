@@ -17,13 +17,15 @@
  * @fileoverview Component for add hint modal.
  */
 
-import { Component, Input, OnInit } from "@angular/core";
-import { NgbActiveModal } from "@ng-bootstrap/ng-bootstrap";
-import { ConfirmOrCancelModal } from "components/common-layout-directives/common-elements/confirm-or-cancel-modal.component";
-import { StateHintsService } from "components/state-editor/state-editor-properties-services/state-hints.service";
-import { HintObjectFactory } from "domain/exploration/HintObjectFactory";
-import { ContextService } from "services/context.service";
-import { GenerateContentIdService } from "services/generate-content-id.service";
+import { Component, OnInit } from '@angular/core';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { AppConstants } from 'app.constants';
+
+import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import { StateHintsService } from 'components/state-editor/state-editor-properties-services/state-hints.service';
+import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
+import { ContextService } from 'services/context.service';
+import { GenerateContentIdService } from 'services/generate-content-id.service';
 
 interface HintFormSchema {
   type: string;
@@ -37,9 +39,9 @@ interface HintFormSchema {
 
 export class AddHintModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-  @Input() COMPONENT_NAME_HINT: string;
+  COMPONENT_NAME_HINT: string = AppConstants.COMPONENT_NAME_HINT;
   tmpHint: string = '';
-  addHintForm: object = {};
+  addHintForm = {};
   hintIndex: number;
   HINT_FORM_SCHEMA: HintFormSchema = {
     type: 'html',
@@ -75,9 +77,9 @@ export class AddHintModalComponent
       this.COMPONENT_NAME_HINT);
     // Close the modal and save it afterwards.
     this.ngbActiveModal.close({
-        hint: angular.copy(
-          this.hintObjectFactory.createNew(contentId, this.tmpHint)),
-        contentId: contentId
+      hint: angular.copy(
+        this.hintObjectFactory.createNew(contentId, this.tmpHint)),
+      contentId: contentId
     });
   }
 }

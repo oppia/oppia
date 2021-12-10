@@ -17,14 +17,15 @@
  * @fileoverview Unit tests for AddHintModalComponent.
  */
 
-import { NO_ERRORS_SCHEMA } from "@angular/core";
-import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
-import { NgbActiveModal } from "@ng-bootstrap/ng-bootstrap";
-import { StateHintsService } from "components/state-editor/state-editor-properties-services/state-hints.service";
-import { HintObjectFactory } from "domain/exploration/HintObjectFactory";
-import { ContextService } from "services/context.service";
-import { GenerateContentIdService } from "services/generate-content-id.service";
-import { AddHintModalComponent } from "./add-hint-modal.component";
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+
+import { StateHintsService } from 'components/state-editor/state-editor-properties-services/state-hints.service';
+import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
+import { ContextService } from 'services/context.service';
+import { GenerateContentIdService } from 'services/generate-content-id.service';
+import { AddHintModalComponent } from './add-hint-modal.component';
 
 class MockActiveModal {
   close(): void {
@@ -36,7 +37,7 @@ class MockActiveModal {
   }
 }
 
-fdescribe('Add Hint Modal Controller', function() {
+describe('Add Hint Modal Component', function() {
   let component: AddHintModalComponent;
   let fixture: ComponentFixture<AddHintModalComponent>;
   let ngbActiveModal: NgbActiveModal;
@@ -84,9 +85,15 @@ fdescribe('Add Hint Modal Controller', function() {
       expect(component.hintIndex).toBe(5);
     });
 
+  it('should get schema', () => {
+    expect(component.getSchema())
+      .toEqual(component.HINT_FORM_SCHEMA);
+  });
+
   it('should save hint when closing the modal', () => {
     let contentId = 'cont_1';
     let hintExpected = hintObjectFactory.createNew(contentId, '');
+    spyOn(ngbActiveModal, 'close');
     spyOn(
       generateContentIdService, 'getNextStateId'
     ).and.returnValue(contentId);
@@ -106,4 +113,4 @@ fdescribe('Add Hint Modal Controller', function() {
     expect(component.isHintLengthExceeded(hint1)).toBe(false);
     expect(component.isHintLengthExceeded(hint2)).toBe(true);
   });
-})
+});

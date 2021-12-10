@@ -10,7 +10,7 @@
       <strong>Hint #{{ hintIndex }} is...</strong>
       <schema-based-editor class="protractor-test-hint-text"
                            [schema]="getSchema.bind(this)"
-                           [localValue]="tmpHint">
+                           [localValue]="this.tmpHint">
       </schema-based-editor>
     </div>
   </form>
@@ -21,7 +21,7 @@
 
 <div class="modal-footer">
   <button class="btn btn-secondary protractor-test-cancel-hint" (click)="cancel()">Cancel</button>
-  <button class="btn btn-success protractor-test-save-hint" (click)="saveHint()" [disabled]="!tmpHint || isHintLengthExceeded(tmpHint)">Save Hint</button>
+  <button class="btn btn-success protractor-test-save-hint" (click)="saveHint()" [disabled]="!this.tmpHint || this.isHintLengthExceeded(this.tmpHint)">Save Hint</button>
 </div>
 
 <style>

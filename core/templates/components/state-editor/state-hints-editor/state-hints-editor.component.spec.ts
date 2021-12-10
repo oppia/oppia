@@ -12,17 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
-
 /**
  * @fileoverview Unit test for State Hints Editor Component.
  */
 
-describe('StateHintsEditorComponent', () => {
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+
+fdescribe('StateHintsEditorComponent', () => {
   let ctrl = null;
   let $rootScope = null;
   let $scope = null;
   let $uibModal = null;
+  let ngbModal: NgbModal = null;
   let $q = null;
 
   let WindowDimensionsService = null;
@@ -33,12 +36,22 @@ describe('StateHintsEditorComponent', () => {
   let StateSolutionService = null;
   let AlertsService = null;
 
-  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
+
   importAllAngularServices();
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
+    ngbModal = TestBed.inject(NgbModal);
     $uibModal = $injector.get('$uibModal');
     $q = $injector.get('$q');
 
@@ -242,40 +255,43 @@ describe('StateHintsEditorComponent', () => {
     expect($uibModal.open).not.toHaveBeenCalled();
   });
 
-  it('should open add hints modal when user clicks on add hint button', () => {
-    $scope.StateHintsService.displayed = [
-      {
-        hintContent: {
-          html: '<p> Hint </p>'
+  it('should open add hints modal when user clicks on add hint button',
+    fakeAsync(() => {
+      $scope.StateHintsService.displayed = [
+        {
+          hintContent: {
+            html: '<p> Hint </p>'
+          }
         }
-      }
-    ];
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.resolve({
-        hint: {
+      ];
+      spyOn(ngbModal, 'open').and.returnValue({
+        componentInstance: NgbModalRef,
+        result: Promise.resolve({
+          hint: {
+            hintContent: {
+              html: '<p> New hint </p>'
+            }
+          }
+        })
+      } as NgbModalRef);
+
+      $scope.openAddHintModal();
+      tick();
+      $scope.$apply();
+
+      expect(StateHintsService.displayed).toEqual([
+        {
+          hintContent: {
+            html: '<p> Hint </p>'
+          }
+        },
+        {
           hintContent: {
             html: '<p> New hint </p>'
           }
         }
-      })
-    });
-
-    $scope.openAddHintModal();
-    $scope.$apply();
-
-    expect(StateHintsService.displayed).toEqual([
-      {
-        hintContent: {
-          html: '<p> Hint </p>'
-        }
-      },
-      {
-        hintContent: {
-          html: '<p> New hint </p>'
-        }
-      }
-    ]);
-  });
+      ]);
+    }));
 
   it('should close add hint modal when user clicks cancel', () => {
     $scope.StateHintsService.displayed = [
