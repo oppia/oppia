@@ -39,7 +39,7 @@ interface HintFormSchema {
 
 export class AddHintModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-  COMPONENT_NAME_HINT: string= AppConstants.COMPONENT_NAME_HINT;;
+  COMPONENT_NAME_HINT: string= AppConstants.COMPONENT_NAME_HINT;
   tmpHint: string = '';
   addHintForm = {};
   hintIndex: number;
@@ -57,7 +57,6 @@ export class AddHintModalComponent
     private stateHintsService: StateHintsService,
     private generateContentIdService: GenerateContentIdService,
     private changeDetectorRef: ChangeDetectorRef
-    
   ) {
     super(ngbActiveModal);
   }
@@ -75,10 +74,10 @@ export class AddHintModalComponent
   }
 
   updateLocalHint($event: string): void {
-   if(this.tmpHint != $event){
-    this.tmpHint = $event;
-    this.changeDetectorRef.detectChanges();
-   }
+    if (this.tmpHint !== $event) {
+      this.tmpHint = $event;
+      this.changeDetectorRef.detectChanges();
+    }
   }
 
   saveHint(): void {

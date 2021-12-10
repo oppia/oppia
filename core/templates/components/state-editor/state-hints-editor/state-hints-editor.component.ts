@@ -49,7 +49,7 @@ require('services/generate-content-id.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/external-save.service.ts');
 require('services/ngb-modal.service.ts');
-import { AddHintModalComponent } from "pages/exploration-editor-page/editor-tab/templates/modal-templates/add-hint-modal.component";
+import { AddHintModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-hint-modal.component';
 
 angular.module('oppia').component('stateHintsEditor', {
   bindings: {

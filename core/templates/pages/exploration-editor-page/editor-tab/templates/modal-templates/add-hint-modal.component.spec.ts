@@ -37,7 +37,7 @@ class MockActiveModal {
   }
 }
 
-fdescribe('Add Hint Modal Component', function() {
+describe('Add Hint Modal Component', function() {
   let component: AddHintModalComponent;
   let fixture: ComponentFixture<AddHintModalComponent>;
   let ngbActiveModal: NgbActiveModal;
