@@ -480,7 +480,7 @@ export class StateGraphLayoutService {
     }
 
     // Assign id and label to each node.
-    for (var nodeId in nodeData) {
+    for (var nodeId in nodeDataTemp) {
       nodeData[nodeId].id = nodeId;
       nodeData[nodeId].label = nodes[nodeId];
     }
