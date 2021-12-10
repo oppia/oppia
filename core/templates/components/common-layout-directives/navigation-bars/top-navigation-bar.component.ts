@@ -37,6 +37,8 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { I18nService } from 'i18n/i18n.service';
+import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
+import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
 
 interface LanguageInfo {
   id: string;
@@ -58,6 +60,8 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   currentLanguageCode!: string;
   supportedSiteLanguages!: LanguageInfo[];
   currentLanguageText!: string;
+  classroomData: CreatorTopicSummary[] = [];
+  learnDropdownOffset: number = 0;
   isModerator: boolean = false;
   isCurriculumAdmin: boolean = false;
   isTopicManager: boolean = false;
@@ -116,7 +120,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   // The order of the elements in this array specifies the order in
   // which they will be hidden. Earlier elements will be hidden first.
   NAV_ELEMENTS_ORDER = [
-    'I18N_TOPNAV_DONATE', 'I18N_TOPNAV_CLASSROOM', 'I18N_TOPNAV_ABOUT',
+    'I18N_TOPNAV_DONATE', 'I18N_TOPNAV_LEARN', 'I18N_TOPNAV_ABOUT',
     'I18N_CREATE_EXPLORATION_CREATE', 'I18N_TOPNAV_LIBRARY'];
 
   CLASSROOM_PROMOS_ARE_ENABLED = false;
@@ -127,6 +131,8 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
 
   constructor(
+    private accessValidationBackendApiService:
+      AccessValidationBackendApiService,
     private changeDetectorRef: ChangeDetectorRef,
     private classroomBackendApiService: ClassroomBackendApiService,
     private contextService: ContextService,
@@ -159,7 +165,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
         return languageInfo;
       }
     );
-
     this.showLanguageSelector = (
       !this.contextService.getPageContext().endsWith('editor'));
 
@@ -178,6 +183,15 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     service.fetchClassroomPromosAreEnabledStatusAsync().then(
       (classroomPromosAreEnabled) => {
         this.CLASSROOM_PROMOS_ARE_ENABLED = classroomPromosAreEnabled;
+        if (classroomPromosAreEnabled) {
+          this.accessValidationBackendApiService.validateAccessToClassroomPage(
+            'math').then(()=>{
+            this.classroomBackendApiService.fetchClassroomDataAsync(
+              'math').then((classroomData) => {
+              this.classroomData = classroomData.getTopicSummaries();
+            });
+          });
+        }
       });
 
     // Inside a setTimeout function call, 'this' points to the global object.
@@ -271,19 +285,26 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
 
   ngAfterViewChecked(): void {
     this.getInvolvedMenuOffset = this
-      .getDropdownOffset('.get-involved', 574, 0);
+      .getDropdownOffset('.get-involved', 574);
+    this.learnDropdownOffset = this.getDropdownOffset(
+      '.learn-tab', (this.CLASSROOM_PROMOS_ARE_ENABLED) ? 688 : 300);
     // https://stackoverflow.com/questions/34364880/expression-has-changed-after-it-was-checked
     this.changeDetectorRef.detectChanges();
   }
 
-  getDropdownOffset(cssClass: string, width: number, fallback: number): number {
+  // This function is required to shift the dropdown towards left if
+  // there isn't enough space on the right to fit the entire dropdown.
+  // This function compares the width of the dropdown with the space
+  // available on the right to calculate the offset. It returns zero if
+  // there is enough space to fit the content.
+  getDropdownOffset(cssClass: string, width: number): number {
     var learnTab: HTMLElement | null = document.querySelector(cssClass);
     if (learnTab) {
       var leftOffset = learnTab.getBoundingClientRect().left;
       var space = window.innerWidth - leftOffset;
-      return (space < width) ? (Math.round(space - width)) : fallback;
+      return (space < width) ? (Math.round(space - width)) : 0;
     }
-    return fallback;
+    return 0;
   }
 
   async getProfileImageDataAsync(): Promise<void> {
