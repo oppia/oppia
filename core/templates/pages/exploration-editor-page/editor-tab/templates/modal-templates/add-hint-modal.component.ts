@@ -17,10 +17,10 @@
  * @fileoverview Component for add hint modal.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { AppConstants } from 'app.constants';
 
+import { AppConstants } from 'app.constants';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { StateHintsService } from 'components/state-editor/state-editor-properties-services/state-hints.service';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
@@ -39,7 +39,7 @@ interface HintFormSchema {
 
 export class AddHintModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-  COMPONENT_NAME_HINT: string = AppConstants.COMPONENT_NAME_HINT;
+  COMPONENT_NAME_HINT: string= AppConstants.COMPONENT_NAME_HINT;;
   tmpHint: string = '';
   addHintForm = {};
   hintIndex: number;
@@ -55,7 +55,9 @@ export class AddHintModalComponent
     private contextService: ContextService,
     private hintObjectFactory: HintObjectFactory,
     private stateHintsService: StateHintsService,
-    private generateContentIdService: GenerateContentIdService
+    private generateContentIdService: GenerateContentIdService,
+    private changeDetectorRef: ChangeDetectorRef
+    
   ) {
     super(ngbActiveModal);
   }
@@ -70,6 +72,13 @@ export class AddHintModalComponent
 
   isHintLengthExceeded(tmpHint: string): boolean {
     return Boolean(tmpHint.length > 500);
+  }
+
+  updateLocalHint($event: string): void {
+   if(this.tmpHint != $event){
+    this.tmpHint = $event;
+    this.changeDetectorRef.detectChanges();
+   }
   }
 
   saveHint(): void {

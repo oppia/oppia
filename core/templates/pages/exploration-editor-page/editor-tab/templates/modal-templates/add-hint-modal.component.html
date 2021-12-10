@@ -10,7 +10,8 @@
       <strong>Hint #{{ hintIndex }} is...</strong>
       <schema-based-editor class="protractor-test-hint-text"
                            [schema]="getSchema.bind(this)"
-                           [localValue]="this.tmpHint">
+                           [localValue]="this.tmpHint"
+                           (localValueChange)="this.updateLocalHint($event)">
       </schema-based-editor>
     </div>
   </form>

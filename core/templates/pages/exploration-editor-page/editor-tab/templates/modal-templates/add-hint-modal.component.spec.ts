@@ -17,7 +17,7 @@
  * @fileoverview Unit tests for AddHintModalComponent.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ChangeDetectorRef, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
@@ -37,7 +37,7 @@ class MockActiveModal {
   }
 }
 
-describe('Add Hint Modal Component', function() {
+fdescribe('Add Hint Modal Component', function() {
   let component: AddHintModalComponent;
   let fixture: ComponentFixture<AddHintModalComponent>;
   let ngbActiveModal: NgbActiveModal;
@@ -54,6 +54,7 @@ describe('Add Hint Modal Component', function() {
       providers: [
         ContextService,
         GenerateContentIdService,
+        ChangeDetectorRef,
         StateHintsService, {
           provide: NgbActiveModal,
           useClass: MockActiveModal
@@ -112,5 +113,13 @@ describe('Add Hint Modal Component', function() {
 
     expect(component.isHintLengthExceeded(hint1)).toBe(false);
     expect(component.isHintLengthExceeded(hint2)).toBe(true);
+  });
+
+  it('should update explanation', () => {
+    let hint = 'hint';
+    component.ngOnInit();
+    component.updateLocalHint(hint);
+
+    expect(component.tmpHint).toEqual(hint);
   });
 });

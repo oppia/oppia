@@ -20,7 +20,7 @@ import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-fdescribe('StateHintsEditorComponent', () => {
+describe('StateHintsEditorComponent', () => {
   let ctrl = null;
   let $rootScope = null;
   let $scope = null;
