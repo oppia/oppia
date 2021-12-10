@@ -186,8 +186,8 @@ class NumericExpressionInputInteractionTests(test_utils.GenericTestBase):
             numeric_mis_skill.misconception_id, 'misconception_id')
 
         numeric_answer_group = numeric_proto.answer_groups[0]
-        math_rule_specs = numeric_answer_group.rule_specs[0]
-            .matches_exactly_with
+        math_rule_specs = (
+            numeric_answer_group.rule_specs[0].matches_exactly_with)
         self.assertEqual(
             math_rule_specs.numeric_expression,
             '1000 + 200 + 30 + 4 + 0.5 + 0.06')
