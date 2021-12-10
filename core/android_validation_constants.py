@@ -34,7 +34,7 @@ VALID_INTERACTION_IDS = [
     'AlgebraicExpressionInput', 'Continue', 'DragAndDropSortInput',
     'EndExploration', 'FractionInput', 'ImageClickInput', 'ItemSelectionInput',
     'MathEquationInput', 'MultipleChoiceInput', 'NumericExpressionInput',
-    'NumericInput', 'NumberWithUnits', 'RatioExpressionInput', 'TextInput'
+    'NumericInput', 'RatioExpressionInput', 'TextInput'
 ]
 
 # This is linked to SUPPORTED_CONTENT_LANGUAGES_FOR_ANDROID in constants.ts.

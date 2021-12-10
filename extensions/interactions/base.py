@@ -273,4 +273,8 @@ class BaseInteraction:
         Returns:
             list. The list of hint proto object.
         """
-        return [hint.to_proto() for hint in hints]
+        hints_proto = {}
+        if hints is not None:
+            hints_proto = [hint.to_proto() for hint in hints]
+
+        return hints_proto

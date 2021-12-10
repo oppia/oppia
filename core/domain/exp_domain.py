@@ -2533,7 +2533,7 @@ class Exploration:
             state_proto = state.to_proto()
             state_protos[state_name] = state_proto
 
-        return exploration_pb2.Exploration(
+        return exploration_pb2.ExplorationDto(
             id=self.id,
             content_version=self.version,
             init_state_name=self.init_state_name,

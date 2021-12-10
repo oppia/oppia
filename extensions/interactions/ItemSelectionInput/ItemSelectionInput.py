@@ -119,7 +119,7 @@ class ItemSelectionInput(base.BaseInteraction):
         hints_proto_list = cls.get_hint_proto(cls, hints)
         answer_groups_proto = cls._to_answer_groups_proto(answer_groups)
 
-        return state_pb2.ItemSelectionInputInstance(
+        return state_pb2.ItemSelectionInputInstanceDto(
             customization_args=customization_arg_proto,
             default_outcome=outcome_proto,
             hints=hints_proto_list,
@@ -144,7 +144,7 @@ class ItemSelectionInput(base.BaseInteraction):
             value.to_proto() for value in customization_args['choices'].value
         ]
 
-        return state_pb2.ItemSelectionInputInstance.CustomizationArgs(
+        return state_pb2.ItemSelectionInputInstanceDto.CustomizationArgsDto(
             min_allowable_selection_count=(
                 customization_args['minAllowableSelectionCount'].value
             ),
@@ -172,7 +172,7 @@ class ItemSelectionInput(base.BaseInteraction):
             rules_spec_proto = cls._to_item_selection_rule_specs_proto(
                 answer_group.rule_specs)
             answer_group_list_proto.append(
-                state_pb2.ItemSelectionInputInstance.AnswerGroup(
+                state_pb2.ItemSelectionInputInstanceDto.AnswerGroupDto(
                     base_answer_group=base_answer_group_proto,
                     rule_specs=rules_spec_proto
                 )
@@ -202,15 +202,15 @@ class ItemSelectionInput(base.BaseInteraction):
 
         rule_type_to_proto_mapping = {
             'Equals': lambda x: (
-                state_pb2.ItemSelectionInputInstance.RuleSpec(equals=x)),
+                state_pb2.ItemSelectionInputInstanceDto.RuleSpecDto(equals=x)),
             'ContainsAtLeastOneOf': lambda x: (
-                state_pb2.ItemSelectionInputInstance.RuleSpec(
+                state_pb2.ItemSelectionInputInstanceDto.RuleSpecDto(
                     contains_at_least_one_of=x)),
             'DoesNotContainAtLeastOneOf': lambda x: (
-                state_pb2.ItemSelectionInputInstance.RuleSpec(
+                state_pb2.ItemSelectionInputInstanceDto.RuleSpecDto(
                     does_not_contain_at_least_one_of=x)),
             'IsProperSubsetOf': lambda x: (
-                state_pb2.ItemSelectionInputInstance.RuleSpec(
+                state_pb2.ItemSelectionInputInstanceDto.RuleSpecDto(
                     is_proper_subset_of=x))
         }
 
@@ -237,7 +237,7 @@ class ItemSelectionInput(base.BaseInteraction):
         Returns:
             EqualsSpec. The proto object.
         """
-        item_rule_spec = state_pb2.ItemSelectionInputInstance.RuleSpec
+        item_rule_spec = state_pb2.ItemSelectionInputInstanceDto.RuleSpecDto
 
         return item_rule_spec.EqualsSpec(
             input=cls._to_set_of_translatable_html_content_ids_proto(
@@ -254,7 +254,7 @@ class ItemSelectionInput(base.BaseInteraction):
         Returns:
             ContainsAtLeastOneOfSpec. The proto object.
         """
-        item_rule_spec = state_pb2.ItemSelectionInputInstance.RuleSpec
+        item_rule_spec = state_pb2.ItemSelectionInputInstanceDto.RuleSpecDto
 
         return item_rule_spec.ContainsAtLeastOneOfSpec(
             input=cls._to_set_of_translatable_html_content_ids_proto(
@@ -271,7 +271,7 @@ class ItemSelectionInput(base.BaseInteraction):
         Returns:
             IsProperSubsetOfSpec. The proto object.
         """
-        item_rule_spec = state_pb2.ItemSelectionInputInstance.RuleSpec
+        item_rule_spec = state_pb2.ItemSelectionInputInstanceDto.RuleSpecDto
 
         return item_rule_spec.IsProperSubsetOfSpec(
             input=cls._to_set_of_translatable_html_content_ids_proto(
@@ -290,7 +290,7 @@ class ItemSelectionInput(base.BaseInteraction):
         Returns:
             DoesNotContainAtLeastOneOfSpec. The proto object.
         """
-        item_rule_spec = state_pb2.ItemSelectionInputInstance.RuleSpec
+        item_rule_spec = state_pb2.ItemSelectionInputInstanceDto.RuleSpecDto
 
         return item_rule_spec.DoesNotContainAtLeastOneOfSpec(
             input=cls._to_set_of_translatable_html_content_ids_proto(

@@ -4470,7 +4470,7 @@ class InteractionInstanceDomainTests(test_utils.GenericTestBase):
             continue_customization_args, [], default_outcome, [], [], None)
         self.assertEqual(
             type(continue_interaction.to_proto().continue_instance),
-            state_pb2.ContinueInstance
+            state_pb2.ContinueInstanceDto
         )
 
         fraction_customization_args = (
@@ -4499,7 +4499,7 @@ class InteractionInstanceDomainTests(test_utils.GenericTestBase):
             fraction_customization_args, [], default_outcome, [], [], None)
         self.assertEqual(
             type(fraction_interaction.to_proto().fraction_input),
-            state_pb2.FractionInputInstance
+            state_pb2.FractionInputInstanceDto
         )
 
         item_customization_args = (
@@ -4528,7 +4528,7 @@ class InteractionInstanceDomainTests(test_utils.GenericTestBase):
             item_customization_args, [], default_outcome, [], [], None)
         self.assertEqual(
             type(item_interaction.to_proto().item_selection_input),
-            state_pb2.ItemSelectionInputInstance
+            state_pb2.ItemSelectionInputInstanceDto
         )
 
         multi_customization_args = (
@@ -4552,7 +4552,7 @@ class InteractionInstanceDomainTests(test_utils.GenericTestBase):
             multi_customization_args, [], default_outcome, [], [], None)
         self.assertEqual(
             type(multi_interaction.to_proto().multiple_choice_input),
-            state_pb2.MultipleChoiceInputInstance
+            state_pb2.MultipleChoiceInputInstanceDto
         )
 
         numeric_customization_args = (
@@ -4570,7 +4570,7 @@ class InteractionInstanceDomainTests(test_utils.GenericTestBase):
             numeric_customization_args, [], default_outcome, [], [], None)
         self.assertEqual(
             type(numeric_interaction.to_proto().numeric_input),
-            state_pb2.NumericInputInstance
+            state_pb2.NumericInputInstanceDto
         )
 
         text_customization_args = (
@@ -4593,7 +4593,7 @@ class InteractionInstanceDomainTests(test_utils.GenericTestBase):
             text_customization_args, [], default_outcome, [], [], None)
         self.assertEqual(
             type(text_interaction.to_proto().text_input),
-            state_pb2.TextInputInstance
+            state_pb2.TextInputInstanceDto
         )
 
         ratio_customization_args = (
@@ -4616,7 +4616,7 @@ class InteractionInstanceDomainTests(test_utils.GenericTestBase):
             ratio_customization_args, [], default_outcome, [], [], None)
         self.assertEqual(
             type(ratio_interaction.to_proto().ratio_expression_input),
-            state_pb2.RatioExpressionInputInstance
+            state_pb2.RatioExpressionInputInstanceDto
         )
 
         drag_customization_args = (
@@ -4642,7 +4642,7 @@ class InteractionInstanceDomainTests(test_utils.GenericTestBase):
             drag_customization_args, [], default_outcome, [], [], None)
         self.assertEqual(
             type(drag_interaction.to_proto().drag_and_drop_sort_input),
-            state_pb2.DragAndDropSortInputInstance
+            state_pb2.DragAndDropSortInputInstanceDto
         )
 
         image_customization_args = (
@@ -4674,7 +4674,70 @@ class InteractionInstanceDomainTests(test_utils.GenericTestBase):
             image_customization_args, [], default_outcome, [], [], None)
         self.assertEqual(
             type(image_interaction.to_proto().image_click_input),
-            state_pb2.ImageClickInputInstance
+            state_pb2.ImageClickInputInstanceDto
+        )
+
+        algebric_customization_args = (
+            interaction.convert_customization_args_dict_to_customization_args(
+                'AlgebraicExpressionInput',
+                {
+                    'customOskLetters': {
+                        'value': [ '\u03C0', '\u03C0']
+                    },
+                    'useFractionForDivision': {
+                        'value': False
+                    }
+                }
+            ))
+        algebric_interaction = state_domain.InteractionInstance(
+            'AlgebraicExpressionInput',
+            algebric_customization_args, [], default_outcome, [], [], None)
+        self.assertEqual(
+            type(algebric_interaction.to_proto().algebraic_expression_input),
+            state_pb2.AlgebraicExpressionInputInstanceDto
+        )
+
+        math_customization_args = (
+            interaction.convert_customization_args_dict_to_customization_args(
+                'MathEquationInput',
+                {
+                    'customOskLetters': {
+                        'value': [ '\u03C0', '\u03C0']
+                    },
+                    'useFractionForDivision': {
+                        'value': False
+                    }
+                }
+            ))
+        math_interaction = state_domain.InteractionInstance(
+            'MathEquationInput',
+            math_customization_args, [], default_outcome, [], [], None)
+        self.assertEqual(
+            type(math_interaction.to_proto().math_equation_input),
+            state_pb2.MathEquationInputInstanceDto
+        )
+
+        numeric_customization_args = (
+            interaction.convert_customization_args_dict_to_customization_args(
+                'NumericExpressionInput',
+                {
+                    'placeholder': {
+                        'value': {
+                            'content_id': 'ca_customPlaceholder_2',
+                            'unicode_str': '😍😍😍😍'
+                        }
+                    },
+                    'useFractionForDivision': {
+                        'value': False
+                    }
+                }
+            ))
+        numeric_interaction = state_domain.InteractionInstance(
+            'NumericExpressionInput',
+            numeric_customization_args, [], default_outcome, [], [], None)
+        self.assertEqual(
+            type(numeric_interaction.to_proto().numeric_expression_input),
+            state_pb2.NumericExpressionInputInstanceDto
         )
 
         end_interaction = state_domain.InteractionInstance(
@@ -4682,7 +4745,7 @@ class InteractionInstanceDomainTests(test_utils.GenericTestBase):
             {}, [], default_outcome, [], [], None)
         self.assertEqual(
             type(end_interaction.to_proto().end_exploration),
-            state_pb2.EndExplorationInstance
+            state_pb2.EndExplorationInstanceDto
         )
 
 

@@ -116,11 +116,11 @@ class AnswerGroup:
         if self.tagged_skill_misconception_id is not None:
             skill_id, misconception_id = (
                 self.tagged_skill_misconception_id.split('-'))
-            misconception_proto = state_pb2.Misconception(
+            misconception_proto = state_pb2.MisconceptionDto(
                 skill_id=skill_id,
                 misconception_id=misconception_id)
 
-        return state_pb2.BaseAnswerGroup(
+        return state_pb2.BaseAnswerGroupDto(
             outcome=self.outcome.to_proto(),
             tagged_skill_misconception=misconception_proto
         )
@@ -321,7 +321,7 @@ class Hint:
         Returns:
             Hint. The proto object.
         """
-        return state_pb2.Hint(hint_content=self.hint_content.to_proto())
+        return state_pb2.HintDto(hint_content=self.hint_content.to_proto())
 
     def validate(self):
         """Validates all properties of Hint."""
@@ -418,7 +418,9 @@ class Solution:
         Returns:
             BaseSolution. The proto object.
         """
-        return state_pb2.BaseSolution(explanation=self.explanation.to_proto())
+        return state_pb2.BaseSolutionDto(
+            explanation=self.explanation.to_proto()
+        )
 
     def validate(self, interaction_id):
         """Validates all properties of Solution.
@@ -592,51 +594,66 @@ class InteractionInstance:
             )
 
         if self.id == 'Continue':
-            interaction_proto = state_pb2.InteractionInstance(
+            interaction_proto = state_pb2.InteractionInstanceDto(
                 continue_instance=interaction_instance.to_proto(
                     self.default_outcome, self.customization_args))
         elif self.id == 'FractionInput':
-            interaction_proto = state_pb2.InteractionInstance(
+            interaction_proto = state_pb2.InteractionInstanceDto(
                 fraction_input=interaction_instance.to_proto(
                     self.default_outcome, self.customization_args,
                     self.hints, self.solution, self.answer_groups))
         elif self.id == 'ItemSelectionInput':
-            interaction_proto = state_pb2.InteractionInstance(
+            interaction_proto = state_pb2.InteractionInstanceDto(
                 item_selection_input=interaction_instance.to_proto(
                     self.default_outcome, self.customization_args,
                     self.hints, self.answer_groups))
         elif self.id == 'MultipleChoiceInput':
-            interaction_proto = state_pb2.InteractionInstance(
+            interaction_proto = state_pb2.InteractionInstanceDto(
                 multiple_choice_input=interaction_instance.to_proto(
                     self.default_outcome, self.customization_args,
                     self.hints, self.answer_groups))
         elif self.id == 'NumericInput':
-            interaction_proto = state_pb2.InteractionInstance(
+            interaction_proto = state_pb2.InteractionInstanceDto(
                 numeric_input=interaction_instance.to_proto(
                     self.default_outcome, self.solution,
                     self.hints, self.answer_groups))
         elif self.id == 'TextInput':
-            interaction_proto = state_pb2.InteractionInstance(
+            interaction_proto = state_pb2.InteractionInstanceDto(
                 text_input=interaction_instance.to_proto(
                     self.default_outcome, self.customization_args,
                     self.solution, self.hints, self.answer_groups))
         elif self.id == 'RatioExpressionInput':
-            interaction_proto = state_pb2.InteractionInstance(
+            interaction_proto = state_pb2.InteractionInstanceDto(
                 ratio_expression_input=interaction_instance.to_proto(
                     self.default_outcome, self.customization_args,
                     self.solution, self.hints, self.answer_groups))
         elif self.id == 'ImageClickInput':
-            interaction_proto = state_pb2.InteractionInstance(
+            interaction_proto = state_pb2.InteractionInstanceDto(
                 image_click_input=interaction_instance.to_proto(
                     self.default_outcome, self.customization_args,
                     self.hints, self.answer_groups))
         elif self.id == 'DragAndDropSortInput':
-            interaction_proto = state_pb2.InteractionInstance(
+            interaction_proto = state_pb2.InteractionInstanceDto(
                 drag_and_drop_sort_input=interaction_instance.to_proto(
                     self.default_outcome, self.customization_args,
                     self.solution, self.hints, self.answer_groups))
+        elif self.id == 'AlgebraicExpressionInput':
+            interaction_proto = state_pb2.InteractionInstanceDto(
+                algebraic_expression_input=interaction_instance.to_proto(
+                    self.default_outcome, self.customization_args,
+                    self.solution, self.hints, self.answer_groups))
+        elif self.id == 'MathEquationInput':
+            interaction_proto = state_pb2.InteractionInstanceDto(
+                math_equation_input=interaction_instance.to_proto(
+                    self.default_outcome, self.customization_args,
+                    self.solution, self.hints, self.answer_groups))
+        elif self.id == 'NumericExpressionInput':
+            interaction_proto = state_pb2.InteractionInstanceDto(
+                numeric_expression_input=interaction_instance.to_proto(
+                    self.default_outcome, self.customization_args,
+                    self.solution, self.hints, self.answer_groups))
         elif self.id == 'EndExploration':
-            interaction_proto = state_pb2.InteractionInstance(
+            interaction_proto = state_pb2.InteractionInstanceDto(
                 end_exploration=interaction_instance.to_proto())
 
         return interaction_proto
@@ -1385,7 +1402,7 @@ class Outcome:
         Returns:
             Outcome. The proto object.
         """
-        return state_pb2.Outcome(
+        return state_pb2.OutcomeDto(
             destination_state=self.dest,
             feedback=self.feedback.to_proto(),
             labelled_as_correct=self.labelled_as_correct
@@ -1521,7 +1538,7 @@ class Voiceover:
         Returns:
             Voiceover. The proto object.
         """
-        return languages_pb2.VoiceoverFile(
+        return languages_pb2.VoiceoverFileDto(
             filename=self.filename,
             file_size_bytes=self.file_size_bytes,
             duration_secs=self.duration_secs
@@ -1691,13 +1708,13 @@ class WrittenTranslation:
             WrittenTranslation.DATA_FORMAT_HTML) or self.data_format == (
                 WrittenTranslation.DATA_FORMAT_UNICODE_STRING):
             written_translation_proto = (
-                languages_pb2.WrittenTranslation(
+                languages_pb2.WrittenTranslationDto(
                     translatable_text=(
                         TranslatableItem.to_written_translatable_text_proto(
                             self.translation))))
         else:
             written_translation_proto = (
-                languages_pb2.WrittenTranslation(
+                languages_pb2.WrittenTranslationDto(
                     set_of_translatable_text=(
                         TranslatableItem.to_written_translatable_set_proto(
                             self.translation))))
@@ -1838,11 +1855,11 @@ class WrittenTranslations:
         for (language_code, written_translation_content_map) in (
             language_to_content_id_written_translation_map.items()):
             if language_code in language_code_to_enum_map:
-                proto = languages_pb2.WrittenTranslationContentMapping(
+                proto = languages_pb2.WrittenTranslationContentMappingDto(
                     language=language_code_to_enum_map[language_code],
                     translation_content_mapping=written_translation_content_map)
             else:
-                proto = languages_pb2.WrittenTranslationContentMapping(
+                proto = languages_pb2.WrittenTranslationContentMappingDto(
                     language=(
                         languages_pb2.LanguageType.LANGUAGE_CODE_UNSPECIFIED),
                     translation_content_mapping=written_translation_content_map)
@@ -2154,7 +2171,7 @@ class RecordedVoiceovers:
             self._to_voiceovers_content_mapping_protos(
                 self.voiceovers_mapping))
 
-        return languages_pb2.RecordedVoiceovers(
+        return languages_pb2.RecordedVoiceoversDto(
             voiceover_content_mapping=voiceover_content_mapping_protos
         )
 
@@ -2191,11 +2208,11 @@ class RecordedVoiceovers:
         for (language_code, voiceover_file_content_map) in (
             language_to_content_id_voiceover_file_map.items()):
             if language_code in language_code_to_enum_map:
-                proto = languages_pb2.VoiceoverContentMapping(
+                proto = languages_pb2.VoiceoverContentMappingDto(
                     language=language_code_to_enum_map[language_code],
                     voiceover_content_mapping=voiceover_file_content_map)
             else:
-                proto = languages_pb2.VoiceoverContentMapping(
+                proto = languages_pb2.VoiceoverContentMappingDto(
                     language=(
                         languages_pb2.LanguageType.LANGUAGE_CODE_UNSPECIFIED),
                     voiceover_content_mapping=voiceover_file_content_map)
@@ -2555,7 +2572,7 @@ class SubtitledHtml:
         Returns:
             SubtitledText. The proto object.
         """
-        return languages_pb2.SubtitledText(
+        return languages_pb2.SubtitledTextDto(
             content_id=self.content_id,
             text=self.html
         )
@@ -2640,7 +2657,7 @@ class SubtitledUnicode:
         Returns:
             SubtitledText. The proto object.
         """
-        return languages_pb2.SubtitledText(
+        return languages_pb2.SubtitledTextDto(
             content_id=self.content_id,
             text=self.unicode_str
         )
@@ -2733,7 +2750,7 @@ class TranslatableItem:
         Returns:
             WrittenTranslatableText. The proto object.
         """
-        return languages_pb2.WrittenTranslatableText(translation=translation)
+        return languages_pb2.WrittenTranslatableTextDto(translation=translation)
 
     @classmethod
     def to_written_translatable_set_proto(cls, translation):
@@ -2745,7 +2762,7 @@ class TranslatableItem:
         Returns:
             WrittenTranslatableSet. The proto object.
         """
-        return languages_pb2.SetOfWrittenTranslatableText(
+        return languages_pb2.SetOfWrittenTranslatableTextDto(
             translations=translation
         )
 
@@ -3716,7 +3733,7 @@ class State:
         Returns:
             State. The proto object.
         """
-        return state_pb2.State(
+        return state_pb2.StateDto(
             content=self.content.to_proto(),
             recorded_voiceovers=self.recorded_voiceovers.to_proto(),
             written_translations=self.written_translations.to_proto(),

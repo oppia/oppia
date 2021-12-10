@@ -105,7 +105,7 @@ class MultipleChoiceInput(base.BaseInteraction):
         hints_proto_list = cls.get_hint_proto(cls, hints)
         answer_groups_proto = cls._to_answer_groups_proto(answer_groups)
 
-        return state_pb2.MultipleChoiceInputInstance(
+        return state_pb2.MultipleChoiceInputInstanceDto(
             customization_args=customization_args_proto,
             default_outcome=outcome_proto,
             hints=hints_proto_list,
@@ -130,7 +130,7 @@ class MultipleChoiceInput(base.BaseInteraction):
             value.to_proto() for value in customization_args['choices'].value
         ]
 
-        return state_pb2.MultipleChoiceInputInstance.CustomizationArgs(
+        return state_pb2.MultipleChoiceInputInstanceDto.CustomizationArgsDto(
             choices=choices_list_proto
         )
 
@@ -152,7 +152,7 @@ class MultipleChoiceInput(base.BaseInteraction):
             rules_spec_proto = cls._to_multiple_input_specs_proto(
                 answer_group.rule_specs)
             answer_group_list_proto.append(
-                state_pb2.MultipleChoiceInputInstance.AnswerGroup(
+                state_pb2.MultipleChoiceInputInstanceDto.AnswerGroupDto(
                     base_answer_group=base_answer_group_proto,
                     rule_specs=rules_spec_proto
                 )
@@ -177,7 +177,7 @@ class MultipleChoiceInput(base.BaseInteraction):
         }
         rule_type_to_proto_mapping = {
              'Equals': lambda x: (
-                state_pb2.MultipleChoiceInputInstance.RuleSpec(
+                state_pb2.MultipleChoiceInputInstanceDto.RuleSpecDto(
                     equals=x))
         }
 
@@ -204,5 +204,6 @@ class MultipleChoiceInput(base.BaseInteraction):
         Returns:
             EqualsSpec. The proto object.
         """
-        return state_pb2.MultipleChoiceInputInstance.RuleSpec.EqualsSpec(
+        multiple_choice_dto = state_pb2.MultipleChoiceInputInstanceDto
+        return multiple_choice_dto.RuleSpecDto.EqualsSpecDto(
             input=equal)

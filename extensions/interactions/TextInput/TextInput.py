@@ -117,7 +117,7 @@ class TextInput(base.BaseInteraction):
         solution_proto = cls._to_solution_proto(solution)
         answer_groups_proto = cls._to_answer_groups_proto(answer_groups)
 
-        return state_pb2.TextInputInstance(
+        return state_pb2.TextInputInstanceDto(
             customization_args=customization_args_proto,
             default_outcome=outcome_proto,
             hints=hints_proto_list,
@@ -143,7 +143,7 @@ class TextInput(base.BaseInteraction):
             rules_spec_proto = cls._to_text_input_rule_specs_proto(
                 answer_group.rule_specs)
             answer_group_list_proto.append(
-                state_pb2.TextInputInstance.AnswerGroup(
+                state_pb2.TextInputInstanceDto.AnswerGroupDto(
                     base_answer_group=base_answer_group_proto,
                     rule_specs=rules_spec_proto
                 )
@@ -172,16 +172,16 @@ class TextInput(base.BaseInteraction):
         }
         rule_type_to_proto_mapping = {
             'Equals': lambda x: (
-                state_pb2.TextInputInstance.RuleSpec(
+                state_pb2.TextInputInstanceDto.RuleSpecDto(
                     equals=x)),
             'StartsWith': lambda x: (
-                state_pb2.TextInputInstance.RuleSpec(
+                state_pb2.TextInputInstanceDto.RuleSpecDto(
                     starts_with=x)),
             'Contains': lambda x: (
-                state_pb2.TextInputInstance.RuleSpec(
+                state_pb2.TextInputInstanceDto.RuleSpecDto(
                     contains=x)),
             'FuzzyEquals': lambda x: (
-                state_pb2.TextInputInstance.RuleSpec(
+                state_pb2.TextInputInstanceDto.RuleSpecDto(
                     fuzzy_equals=x))
         }
 
@@ -208,7 +208,7 @@ class TextInput(base.BaseInteraction):
         Returns:
             EqualsSpec. The proto object.
         """
-        text_rule_spec = state_pb2.TextInputInstance.RuleSpec
+        text_rule_spec = state_pb2.TextInputInstanceDto.RuleSpecDto
 
         return text_rule_spec.EqualsSpec(
             input=cls._to_translatable_normalized_string_set(
@@ -225,7 +225,7 @@ class TextInput(base.BaseInteraction):
         Returns:
             StartsWithSpec. The proto object.
         """
-        text_rule_spec = state_pb2.TextInputInstance.RuleSpec
+        text_rule_spec = state_pb2.TextInputInstanceDto.RuleSpecDto
 
         return text_rule_spec.StartsWithSpec(
             input=cls._to_translatable_normalized_string_set(
@@ -242,7 +242,7 @@ class TextInput(base.BaseInteraction):
         Returns:
             ContainsSpec. The proto object.
         """
-        text_rule_spec = state_pb2.TextInputInstance.RuleSpec
+        text_rule_spec = state_pb2.TextInputInstanceDto.RuleSpecDto
 
         return text_rule_spec.ContainsSpec(
             input=cls._to_translatable_normalized_string_set(
@@ -259,7 +259,7 @@ class TextInput(base.BaseInteraction):
         Returns:
             FuzzyEqualsSpec. The proto object.
         """
-        text_rule_spec = state_pb2.TextInputInstance.RuleSpec
+        text_rule_spec = state_pb2.TextInputInstanceDto.RuleSpecDto
 
         return text_rule_spec.FuzzyEqualsSpec(
             input=cls._to_translatable_normalized_string_set(
@@ -280,7 +280,7 @@ class TextInput(base.BaseInteraction):
         """
         normalized_strings_set = list(input_dict['normalizedStrSet'])
 
-        return objects_pb2.TranslatableSetOfNormalizedString(
+        return objects_pb2.TranslatableSetOfNormalizedStringDto(
             content_id=input_dict['contentId'],
             normalized_strings=normalized_strings_set
         )
@@ -299,7 +299,7 @@ class TextInput(base.BaseInteraction):
         """
         solution_proto = {}
         if solution is not None:
-            solution_proto = state_pb2.TextInputInstance.Solution(
+            solution_proto = state_pb2.TextInputInstanceDto.SolutionDto(
                 base_solution=solution.to_proto(),
                 correct_answer=solution.correct_answer
             )
@@ -323,7 +323,7 @@ class TextInput(base.BaseInteraction):
         placeholder_proto = (
             customization_args['placeholder'].value.to_proto())
 
-        return state_pb2.TextInputInstance.CustomizationArgs(
+        return state_pb2.TextInputInstanceDto.CustomizationArgsDto(
             placeholder=placeholder_proto,
             rows=customization_args['rows'].value
         )

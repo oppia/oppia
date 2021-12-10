@@ -94,7 +94,7 @@ class RatioExpressionInput(base.BaseInteraction):
         answer_groups_proto = cls._to_ratio_expression_answer_groups_proto(
             answer_groups)
 
-        return state_pb2.RatioExpressionInputInstance(
+        return state_pb2.RatioExpressionInputInstanceDto(
             customization_args=customization_args_proto,
             default_outcome=outcome_proto,
             solution=solution_proto,
@@ -120,7 +120,7 @@ class RatioExpressionInput(base.BaseInteraction):
             rules_spec_proto = cls._to_rule_specs_proto(
                 answer_group.rule_specs)
             answer_group_list_proto.append(
-                state_pb2.RatioExpressionInputInstance.AnswerGroup(
+                state_pb2.RatioExpressionInputInstanceDto.AnswerGroupDto(
                     base_answer_group=base_answer_group_proto,
                     rule_specs=rules_spec_proto
                 )
@@ -150,16 +150,16 @@ class RatioExpressionInput(base.BaseInteraction):
         }
         rule_type_to_proto_mapping = {
             'Equals': lambda x: (
-                state_pb2.RatioExpressionInputInstance.RuleSpec(
+                state_pb2.RatioExpressionInputInstanceDto.RuleSpecDto(
                     equals=x)),
             'IsEquivalent': lambda x: (
-                state_pb2.RatioExpressionInputInstance.RuleSpec(
+                state_pb2.RatioExpressionInputInstanceDto.RuleSpecDto(
                     is_equivalent=x)),
             'HasNumberOfTermsEqualTo': lambda x: (
-                state_pb2.RatioExpressionInputInstance.RuleSpec(
+                state_pb2.RatioExpressionInputInstanceDto.RuleSpecDto(
                     has_number_of_terms_equal_to=x)),
             'HasSpecificTermEqualTo': lambda x: (
-                state_pb2.RatioExpressionInputInstance.RuleSpec(
+                state_pb2.RatioExpressionInputInstanceDto.RuleSpecDto(
                     has_specific_term_equal_to=x))
         }
 
@@ -186,7 +186,7 @@ class RatioExpressionInput(base.BaseInteraction):
         Returns:
             EqualsSpec. The proto object.
         """
-        ratio_rule_spec = state_pb2.RatioExpressionInputInstance.RuleSpec
+        ratio_rule_spec = state_pb2.RatioExpressionInputInstanceDto.RuleSpecDto
 
         return ratio_rule_spec.EqualsSpec(
             input=cls._to_ratio_expression_proto(ratio)
@@ -202,7 +202,7 @@ class RatioExpressionInput(base.BaseInteraction):
         Returns:
             IsEquivalentSpec. The proto object.
         """
-        ratio_rule_spec = state_pb2.RatioExpressionInputInstance.RuleSpec
+        ratio_rule_spec = state_pb2.RatioExpressionInputInstanceDto.RuleSpecDto
 
         return ratio_rule_spec.IsEquivalentSpec(
             input=cls._to_ratio_expression_proto(ratio)
@@ -218,7 +218,7 @@ class RatioExpressionInput(base.BaseInteraction):
         Returns:
             HasNumberOfTermsEqualToSpec. The proto object.
         """
-        ratio_rule_spec = state_pb2.RatioExpressionInputInstance.RuleSpec
+        ratio_rule_spec = state_pb2.RatioExpressionInputInstanceDto.RuleSpecDto
 
         return ratio_rule_spec.HasNumberOfTermsEqualToSpec(
             input_term_count=input_term_count
@@ -236,7 +236,7 @@ class RatioExpressionInput(base.BaseInteraction):
         Returns:
             HasSpecificTermEqualToSpec. The proto object.
         """
-        ratio_rule_spec = state_pb2.RatioExpressionInputInstance.RuleSpec
+        ratio_rule_spec = state_pb2.RatioExpressionInputInstanceDto.RuleSpecDto
 
         return ratio_rule_spec.HasSpecificTermEqualToSpec(
             input_term_index=input_dict[0],
@@ -258,7 +258,7 @@ class RatioExpressionInput(base.BaseInteraction):
         solution_proto = {}
         if solution is not None:
             solution_proto = (
-                state_pb2.RatioExpressionInputInstance.Solution(
+                state_pb2.RatioExpressionInputInstanceDto.SolutionDto(
                     base_solution=solution.to_proto(),
                     correct_answer=(
                         cls._to_ratio_expression_proto(
@@ -279,7 +279,7 @@ class RatioExpressionInput(base.BaseInteraction):
         Returns:
             RatioExpression. The proto object.
         """
-        return objects_pb2.RatioExpression(
+        return objects_pb2.RatioExpressionDto(
             components=list(ratio_list)
         )
 
@@ -300,7 +300,7 @@ class RatioExpressionInput(base.BaseInteraction):
         placeholder_proto = (
             customization_args['placeholder'].value.to_proto())
 
-        return state_pb2.RatioExpressionInputInstance.CustomizationArgs(
+        return state_pb2.RatioExpressionInputInstanceDto.CustomizationArgsDto(
             placeholder=placeholder_proto,
             number_of_terms=customization_args['numberOfTerms'].value
         )
