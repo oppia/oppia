@@ -10,7 +10,7 @@
         "core.controllers.resources_test",
         "core.controllers.cron_test",
         "extensions.interactions.base_test",
-        "extensions.interactions.AlgebraicExpressionInput.AlgebraicExpressionInputInteraction_test",
+        "extensions.interactions.AlgebraicExpressionInput.AlgebraicExpressionInput_test",
         "extensions.interactions.Continue.Continue_test",
         "extensions.interactions.DragAndDropSortInput.DragAndDropSortInput_test",
         "extensions.interactions.FractionInput.FractionInput_test",
