@@ -160,8 +160,8 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
             self.pipeline
             | 'Get all non-deleted QuestionSkillLinkModels' >> (
                 ndb_io.GetModels(
-                    question_models.QuestionSkillLinkModel
-                    .get_all(include_deleted=False))
+                    question_models.QuestionSkillLinkModel.get_all(
+                        include_deleted=False))
                 )
             | 'Group QuestionSkillLinkModels by skill id' >>
                 beam.GroupBy(lambda n: n.skill_id)
