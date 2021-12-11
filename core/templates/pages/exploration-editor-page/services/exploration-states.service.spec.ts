@@ -18,9 +18,14 @@
 
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { ChangeListService } from './change-list.service';
-import { fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
+class MockNgbModalRef {
+  componentInstance = {
+    deleteStateName: null
+  };
+}
 
 require(
   'components/state-editor/state-editor-properties-services/' +
@@ -38,7 +43,8 @@ describe('ExplorationStatesService', function() {
     $provide.value('NgbModal', {
       open: () => {
         return {
-          result: Promise.resolve()
+          componentInstance: MockNgbModalRef,
+          result: Promise.resolve('Hola')
         };
       }
     });
@@ -156,21 +162,21 @@ describe('ExplorationStatesService', function() {
     });
 
     describe('.registerOnStateDeletedCallback', function() {
-      it('should callback when a state is deleted', fakeAsync((done) => {
+      it('should callback when a state is deleted', fakeAsync(() => {
         spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
           return ({
-            result: Promise.resolve()
+            componentInstance: MockNgbModalRef,
+            result: Promise.resolve('Hola')
           } as NgbModalRef);
         });
         spyOn(changeListService, 'deleteState');
 
         var spy = jasmine.createSpy('callback');
         ExplorationStatesService.registerOnStateDeletedCallback(spy);
-        tick();
+        ExplorationStatesService.deleteState('Hola');
+        flushMicrotasks();
 
-        ExplorationStatesService.deleteState('Hola').then(function() {
-          expect(spy).toHaveBeenCalledWith('Hola');
-        }).then(done, done.fail);
+        expect(spy).toHaveBeenCalledWith('Hola');
         $rootScope.$digest();
       }));
     });

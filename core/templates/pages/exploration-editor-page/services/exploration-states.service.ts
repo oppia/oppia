@@ -507,7 +507,7 @@ angular.module('oppia').factory('ExplorationStatesService', [
           return $q.reject(message);
         }
 
-        let modelRef = NgbModal.open(ConfirmDeleteStateModalComponent, {
+        const modelRef = NgbModal.open(ConfirmDeleteStateModalComponent, {
           backdrop: true,
         });
         modelRef.componentInstance.deleteStateName = deleteStateName;
