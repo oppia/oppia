@@ -149,6 +149,13 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
         return len(set(question_ids))
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        """Returns a PCollection of 'SUCCESS' or 'FAILURE' results from
+        generating SkillOpportunityModel.
+
+        Returns:
+            PCollection. A PCollection of 'SUCCESS' or 'FAILURE' results from
+            generating SkillOpportunityModel.
+        """
         question_skill_link_models = (
             self.pipeline
             | 'Get all non-deleted QuestionSkillLinkModels' >> (
