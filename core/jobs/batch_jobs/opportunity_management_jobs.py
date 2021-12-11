@@ -142,10 +142,12 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
             int. The number of unique question IDs.
         """
 
-        question_ids = [link.question_id
-                        for link_list in question_skill_link_models
-                        for link in link_list]
-        return len(set(question_ids))
+        question_ids = {
+            link.question_id
+            for link_list in question_skill_link_models 
+            for link in link_list
+        }
+        return len(question_ids)
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         question_skill_link_models = (
