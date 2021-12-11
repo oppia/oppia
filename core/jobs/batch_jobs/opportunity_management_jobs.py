@@ -97,6 +97,7 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
     NOTE: The DeleteSkillOpportunityModelJob must be run before this
     job.
     """
+
     @staticmethod
     def _count_unique_question_ids(
         question_skill_link_models: list[
@@ -125,8 +126,8 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
         """Transform skill opportunity objects into skill opportunity models.
 
         Args:
-            skills_and_links: dict. A dictionary mapping 'skill' to a SkillModel and
-                'question_skill_links' to a list of QuestionSkillLinkModel.
+            skills_and_links: dict. A dictionary mapping 'skill' to a SkillModel
+                and 'question_skill_links' to a list of QuestionSkillLinkModel.
 
         Returns:
             Result[opportunity_models.SkillOpportunityModel, Exception].
@@ -134,11 +135,11 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
             is successful and Exception when an exception occurs.
         """
         try:
-            skill_opportunity=opportunity_domain.SkillOpportunity( # type: ignore[no-untyped-call]
+            skill_opportunity = opportunity_domain.SkillOpportunity( # type: ignore[no-untyped-call]
                 skill_id=skills_and_links['skill'].id,
                 skill_description=skills_and_links['skill'].description,
-                question_count=
-                    GenerateSkillOpportunityModelJob._count_unique_question_ids(
+                question_count=GenerateSkillOpportunityModelJob
+                    ._count_unique_question_ids(
                         skills_and_links['question_skill_links']
             ))
             skill_opportunity.validate() # type: ignore[no-untyped-call]
@@ -190,7 +191,7 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
             | beam.Map(
                 lambda n: {
                     'skill': list(itertools.chain.from_iterable(n[1]['skill'])),
-                    'question_skill_links':list(itertools.chain.from_iterable(
+                    'question_skill_links': list(itertools.chain.from_iterable(
                         n[1]['question_skill_links']))
                 }
             )
