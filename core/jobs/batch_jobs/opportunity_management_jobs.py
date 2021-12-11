@@ -104,16 +104,15 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
     ) -> result.Result[
         opportunity_models.SkillOpportunityModel, Exception
     ]:
-        """Generate opportunities related to a skill.
+        """Transform skill opportunity objects into skill opportunity models.
 
         Args:
-            skill_opportunity: SkillOpportunity. A list of SkillOpportunity
-                domain objects.
+            skill_opportunity: SkillOpportunity. The domain object.
 
         Returns:
-            result.Result[opportunity_models.SkillOpportunityModel, Exception].
-            Metadata about the operation. Returns SkillOpportunityModel, or
-            Exception if an exception occurs.
+            Result[opportunity_models.SkillOpportunityModel, Exception].
+            Result object that contains SkillOpportunityModel when the operation
+            is successful and Exception when an exception occurs.
         """
         try:
             skill_opportunity.validate() # type: ignore[no-untyped-call]
