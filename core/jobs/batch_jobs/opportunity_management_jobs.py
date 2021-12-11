@@ -200,14 +200,10 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
 
         unused_put_result = (
             opportunities_results
-            | 'Filter the results with SUCCESS status' >> beam.Filter(
+            | 'Filter the results with OK status' >> beam.Filter(
                 lambda result: result.is_ok())
             | 'Fetch the models to be put' >> beam.FlatMap(
                 lambda result: result.unwrap())
-            | 'Add ID as a key' >> beam.WithKeys(lambda model: model.id)  # pylint: disable=no-value-for-parameter
-            | 'Allow only one item per key' >> (
-                beam.combiners.Sample.FixedSizePerKey(1))
-            | 'Remove the IDs' >> beam.Values()  # pylint: disable=no-value-for-parameter
             | 'Put models into the datastore' >> ndb_io.PutModels()
         )
 
