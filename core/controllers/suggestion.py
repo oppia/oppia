@@ -263,6 +263,22 @@ class ReviewableSuggestionsHandler(SuggestionsProviderHandler):
     suggestion type.
     """
 
+    URL_PATH_ARGS_SCHEMAS = {
+        'target_type': {
+            'schema': {
+                'type': 'basestring',
+            }
+        },
+        'suggestion_type': {
+            'schema': {
+                'type': 'basestring',
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
     @acl_decorators.can_view_reviewable_suggestions
     def get(self, target_type, suggestion_type):
         """Handles GET requests.
