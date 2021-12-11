@@ -717,7 +717,8 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
             'is_valid_algebraic_expression')
 
         self.assertTrue(is_valid_algebraic_expression('a+b*2'))
-        self.assertFalse(is_valid_algebraic_expression('3+4/2'))
+        self.assertTrue(is_valid_algebraic_expression('3+4/2'))
+        self.assertFalse(is_valid_algebraic_expression('3+4/a*'))
 
     def test_is_valid_numeric_expression_validator(self) -> None:
         """Tests for the is_valid_numeric_expression static method with
