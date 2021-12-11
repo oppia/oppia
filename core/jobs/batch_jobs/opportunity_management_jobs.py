@@ -132,14 +132,14 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
             question_models.QuestionSkillLinkModel
         ]]
     ) -> int:
-        """Counts the number of unique question ids.
+        """Counts the number of unique question IDs.
 
         Args:
-            question_skill_link_models: list[[list[QuestionSkillLinkModel]].
+            question_skill_link_models: list(list(questionSkillLinkModel)).
                 2D array of QuestionSkillLinkModels.
 
         Returns:
-            int. The number of unique question ids.
+            int. The number of unique question IDs.
         """
 
         question_ids = [link.question_id
