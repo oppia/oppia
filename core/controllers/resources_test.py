@@ -21,6 +21,7 @@ import os
 from core import feconf
 from core import python_utils
 from core.constants import constants
+from core.controllers import voice_artist
 from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import fs_services
@@ -526,9 +527,42 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
             'flac': ['audio/flac']
         }
 
+        #The HANDLER_ARGS_SCHEMA dict in AudioUploadHandler uses the
+        # ACCEPTED_AUDIO_EXTENSIONS as a key value in the 
+        #'should_end_with' validator. The dict needs to be swapped
+        #seperately as it is a class variable.
+        mock_audio_upload_handler_args_schema = {
+        'POST': {
+                'raw_audio_file': {
+                    'schema': {
+                        'type': 'basestring',
+                        'validators': [{
+                            'id': 'is_nonempty'
+                        }]
+                    }
+                },
+                'filename': {
+                    'schema': {
+                        'type': 'basestring',
+                        'validators': [{
+                            'id': 'is_regex_matched',
+                            'regex_pattern': r'^[A-Za-z0-9-]+[.][a-z0-9]+$'
+                        }, {
+                            'id': 'should_end_with',
+                            'choices': list(mock_accepted_audio_extensions.keys())
+                        }]
+                    }
+                }
+            }
+        }
+
         self.accepted_audio_extensions_swap = self.swap(
             feconf, 'ACCEPTED_AUDIO_EXTENSIONS',
             mock_accepted_audio_extensions)
+
+        self.handler_args_schema_swap = self.swap(
+            voice_artist.AudioUploadHandler, 'HANDLER_ARGS_SCHEMAS',
+            mock_audio_upload_handler_args_schema)
 
     def test_guest_can_not_upload(self):
         csrf_token = self.get_new_csrf_token()
@@ -601,7 +635,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
 
         self.assertFalse(fs.isfile('audio/%s' % self.TEST_AUDIO_FILE_FLAC))
 
-        with self.accepted_audio_extensions_swap:
+        with self.handler_args_schema_swap, self.accepted_audio_extensions_swap:
             self.post_json(
                 '%s/0' % self.AUDIO_UPLOAD_URL_PREFIX,
                 {'filename': self.TEST_AUDIO_FILE_FLAC},
@@ -627,7 +661,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         ) as f:
             raw_audio = f.read()
 
-        with self.accepted_audio_extensions_swap:
+        with self.handler_args_schema_swap, self.accepted_audio_extensions_swap:
             response_dict = self.post_json(
                 '%s/0' % self.AUDIO_UPLOAD_URL_PREFIX,
                 {'filename': mismatched_filename},
@@ -657,7 +691,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         ) as f:
             raw_audio = f.read()
 
-        with self.accepted_audio_extensions_swap:
+        with self.handler_args_schema_swap, self.accepted_audio_extensions_swap:
             response_dict = self.post_json(
                 '%s/0' % self.AUDIO_UPLOAD_URL_PREFIX,
                 {'filename': self.TEST_AUDIO_FILE_FLAC},
