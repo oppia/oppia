@@ -43,7 +43,6 @@ describe('Editor Navigation Component', function() {
   var $q = null;
   var $rootScope = null;
   var $scope = null;
-  var $uibModal = null;
   var $verifyNoPendingTasks = null;
   var contextService = null;
   var explorationFeaturesService = null;
@@ -115,7 +114,6 @@ describe('Editor Navigation Component', function() {
       $flushPendingTasks = $injector.get('$flushPendingTasks');
       $q = $injector.get('$q');
       $rootScope = $injector.get('$rootScope');
-      $uibModal = $injector.get('$uibModal');
       $verifyNoPendingTasks = $injector.get('$verifyNoPendingTasks');
       contextService = $injector.get('ContextService');
       explorationRightsService = $injector.get('ExplorationRightsService');
@@ -421,7 +419,6 @@ describe('Editor Navigation Component', function() {
       $flushPendingTasks = $injector.get('$flushPendingTasks');
       $q = $injector.get('$q');
       $rootScope = $injector.get('$rootScope');
-      $uibModal = $injector.get('$uibModal');
       $verifyNoPendingTasks = $injector.get('$verifyNoPendingTasks');
       contextService = $injector.get('ContextService');
       explorationFeaturesService = $injector.get('ExplorationFeaturesService');

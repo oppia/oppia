@@ -51,7 +51,7 @@ describe('Exploration Player Suggestion Modal Controller', function() {
     spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
   });
 
-  fit('should begin editor tutorial when closing the modal', function() {
+  it('should begin editor tutorial when closing the modal', function() {
     const closeSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
     const registerOpenTutorialFromHelpCenterEventSpy = spyOn(
       siteAnalyticsService, 'registerOpenTutorialFromHelpCenterEvent');
@@ -64,7 +64,7 @@ describe('Exploration Player Suggestion Modal Controller', function() {
     expect(closeSpy).toHaveBeenCalledWith('editor');
   });
 
-  fit('should begin translation tutorial when closing the modal', function() {
+  it('should begin translation tutorial when closing the modal', function() {
     const closeSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
     let registerOpenTutorialFromHelpCenterEventSpy = spyOn(
       siteAnalyticsService, 'registerOpenTutorialFromHelpCenterEvent');
@@ -77,7 +77,7 @@ describe('Exploration Player Suggestion Modal Controller', function() {
     expect(closeSpy).toHaveBeenCalledWith('translation');
   });
 
-  fit('should dismiss modal when changing to help center', function() {
+  it('should dismiss modal when changing to help center', function() {
     const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
     let registerVisitHelpCenterEventSpy = spyOn(
       siteAnalyticsService, 'registerVisitHelpCenterEvent');
