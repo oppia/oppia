@@ -149,26 +149,8 @@ class BulkEmailWebhookEndpoint(base.BaseHandler):
         self.render_json({})
 
 
-class ProfilePictureDataUrlHandler(base.BaseHandler):
-    """Provides data url for profile picture."""
-
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {},
-        'PUT': {
-            'update_type': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            },
-            'data': {
-                'schema': {
-                    'type': 'basestring',
-                },
-                'default_value': None
-            }
-        }
-    }
+class PreferencesHandler(base.BaseHandler):
+    """Provides data for the preferences page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
@@ -176,139 +158,26 @@ class ProfilePictureDataUrlHandler(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         user_settings = user_services.get_user_settings(self.user_id)
+        user_email_preferences = user_services.get_email_preferences(
+            self.user_id)
+
         creators_subscribed_to = subscription_services.get_all_creators_subscribed_to( # pylint: disable=line-too-long
             self.user_id)
         creators_settings = user_services.get_users_settings(
             creators_subscribed_to)
         subscription_list = []
-        for index, creators_settings in enumerate(creators_settings):
+
+        for index, creator_settings in enumerate(creators_settings):
             subscription_summary = {
                 'creator_picture_data_url': (
-                    creators_settings.profile_picture_data_url),
-                    'creator_username': creators_settings.username,
-                    'creator_impact': (
-                        user_services.get_user_impact_score(
-                            creators_subscribed_to[index]))
+                    creator_settings.profile_picture_data_url),
+                'creator_username': creator_settings.username,
+                'creator_impact': (
+                    user_services.get_user_impact_score(
+                        creators_subscribed_to[index]))
             }
 
             subscription_list.append(subscription_summary)
-
-        self.values.update({
-            'profile_picture_data_url': user_settings.profile_picture_data_url
-        })
-        self.render_json(self.values)
-
-    @acl_decorators.can_manage_own_account
-    def put(self):
-        """Handles PUT requests."""
-        update_type = self.normalized_payload.get('update_type')
-        data = self.normalized_payload.get('data')
-        if update_type == 'profile_picture_data_url':
-            user_services.update_profile_picture_data_url(self.user_id, data)
-
-
-class BulkEmailMessageHandler(base.BaseHandler):
-    """Provides bulk email signup messages."""
-
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {},
-        'PUT': {
-            'update_type': {
-                'schema': {
-                    'type': 'basestring',
-                }
-            },
-            'data': {
-                'schema': {
-                    'type': 'dict',
-                },
-                'default_value': False
-            }
-        }
-    }
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    @acl_decorators.can_manage_own_account
-    def get(self):
-        """Handles GET requests."""
-        user_email_preferences = user_services.get_email_preferences(
-            self.user_id)
-
-        self.values.update({
-            'can_receive_email_updates': (
-                user_email_preferences.can_receive_email_updates),
-            'can_receive_editor_role_email': (
-                user_email_preferences.can_receive_editor_role_email),
-            'can_receive_feedback_message_email': (
-                user_email_preferences.can_receive_feedback_message_email),
-            'can_receive_subscription_email': (
-                user_email_preferences.can_receive_subscription_email)
-        })
-        self.render_json(self.values)
-
-    @acl_decorators.can_manage_own_account
-    def put(self):
-        """Handles PUT requests."""
-        update_type = self.normalized_payload.get('update_type')
-        data = self.normalized_payload.get('data')
-        bulk_email_signup_message_should_be_shown = False
-        if update_type == 'email_preferences':
-            bulk_email_signup_message_should_be_shown = (
-                user_services.update_email_preferences(
-                    self.user_id, data['can_receive_email_updates'],
-                    data['can_receive_editor_role_email'],
-                    data['can_receive_feedback_message_email'],
-                    data['can_receive_subscription_email']))
-        self.render_json({
-            'bulk_email_signup_message_should_be_shown': (
-                bulk_email_signup_message_should_be_shown)
-        })
-
-
-class PreferencesHandler(base.BaseHandler):
-    """Provides data for the preferences page."""
-
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {},
-        'PUT': {
-            'update_type': {
-                'schema': {
-                    'type': 'basestring',
-                    'choices': [
-                        'user_bio',
-                        'subject_interests',
-                        'preferred_language_codes',
-                        'preferred_site_language_code',
-                        'preferred_audio_language_code',
-                        'default_dashboard'
-                    ]
-                }
-            },
-            'data': {
-                'schema': {
-                    'type': 'list',
-                    'items': {
-                        'type': 'unicode',
-                        'validators': [{
-                        'id': 'has_length_at_most',
-                        'max_value': feconf.MAX_BIO_LENGTH_IN_CHARS
-                        }]
-                    }
-                },
-                'default_value': None
-            }
-        }
-    }
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    @acl_decorators.can_manage_own_account
-    def get(self):
-        """Handles GET requests."""
-        user_settings = user_services.get_user_settings(self.user_id)
 
         self.values.update({
             'preferred_language_codes': user_settings.preferred_language_codes,
@@ -319,17 +188,32 @@ class PreferencesHandler(base.BaseHandler):
             'profile_picture_data_url': user_settings.profile_picture_data_url,
             'default_dashboard': user_settings.default_dashboard,
             'user_bio': user_settings.user_bio,
-            'subject_interests': user_settings.subject_interests
+            'subject_interests': user_settings.subject_interests,
+            'can_receive_email_updates': (
+                user_email_preferences.can_receive_email_updates),
+            'can_receive_editor_role_email': (
+                user_email_preferences.can_receive_editor_role_email),
+            'can_receive_feedback_message_email': (
+                user_email_preferences.can_receive_feedback_message_email),
+            'can_receive_subscription_email': (
+                user_email_preferences.can_receive_subscription_email),
+            'subscription_list': subscription_list
         })
         self.render_json(self.values)
 
     @acl_decorators.can_manage_own_account
     def put(self):
         """Handles PUT requests."""
-        update_type = self.normalized_payload.get('update_type')
-        data = self.normalized_payload.get('data')
+        update_type = self.payload.get('update_type')
+        data = self.payload.get('data')
+        bulk_email_signup_message_should_be_shown = False
         if update_type == 'user_bio':
-            user_services.update_user_bio(self.user_id, data)
+            if len(data) > feconf.MAX_BIO_LENGTH_IN_CHARS:
+                raise self.InvalidInputException(
+                    'User bio exceeds maximum character limit: %s'
+                    % feconf.MAX_BIO_LENGTH_IN_CHARS)
+            else:
+                user_services.update_user_bio(self.user_id, data)
         elif update_type == 'subject_interests':
             user_services.update_subject_interests(self.user_id, data)
         elif update_type == 'preferred_language_codes':
@@ -344,6 +228,21 @@ class PreferencesHandler(base.BaseHandler):
             user_services.update_profile_picture_data_url(self.user_id, data)
         elif update_type == 'default_dashboard':
             user_services.update_user_default_dashboard(self.user_id, data)
+        elif update_type == 'email_preferences':
+            bulk_email_signup_message_should_be_shown = (
+                user_services.update_email_preferences(
+                    self.user_id, data['can_receive_email_updates'],
+                    data['can_receive_editor_role_email'],
+                    data['can_receive_feedback_message_email'],
+                    data['can_receive_subscription_email']))
+        else:
+            raise self.InvalidInputException(
+                'Invalid update type: %s' % update_type)
+
+        self.render_json({
+            'bulk_email_signup_message_should_be_shown': (
+                bulk_email_signup_message_should_be_shown)
+        })
 
 
 class ProfilePictureHandler(base.BaseHandler):
