@@ -57,6 +57,7 @@ import { ChangeListService } from './services/change-list.service';
 import { ExplorationDataService } from './services/exploration-data.service';
 import { UserInfo } from 'domain/user/user-info.model';
 import { WelcomeModalComponent } from './modal-templates/welcome-modal.component';
+import { HelpModalComponent } from './modal-templates/help-modal.component';
 
 require('pages/exploration-editor-page/exploration-editor-page.component.ts');
 require(
@@ -207,7 +208,8 @@ describe('Exploration editor page component', function() {
       ],
       declarations: [
         LostChangesModalComponent,
-        WelcomeModalComponent
+        WelcomeModalComponent,
+        HelpModalComponent,
       ],
       providers: [
         AlertsService,
@@ -246,7 +248,10 @@ describe('Exploration editor page component', function() {
       schemas: [NO_ERRORS_SCHEMA]
     }).overrideModule(BrowserDynamicTestingModule, {
       set: {
-        entryComponents: [LostChangesModalComponent, WelcomeModalComponent]
+        entryComponents: [
+          LostChangesModalComponent,
+          WelcomeModalComponent,
+          HelpModalComponent]
       }
     });
 
@@ -505,21 +510,27 @@ describe('Exploration editor page component', function() {
     });
 
     it('should show the user help modal for editor tutorial', () => {
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve('editor')
-      });
+      spyOn(ngbModal, 'open').and.returnValue(
+        {
+          componentInstance: new MockNgbModalRef(),
+          result: $q.resolve('editor')
+        } as NgbModalRef
+      );
       ctrl.showUserHelpModal();
       $rootScope.$apply();
-      expect($uibModal.open).toHaveBeenCalled();
+      expect(ngbModal.open).toHaveBeenCalled();
     });
 
     it('should show the user help modal for editor tutorial', () => {
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve('translation')
-      });
+      spyOn(ngbModal, 'open').and.returnValue(
+        {
+          componentInstance: new MockNgbModalRef(),
+          result: $q.resolve('translation')
+        } as NgbModalRef
+      );
       ctrl.showUserHelpModal();
       $rootScope.$apply();
-      expect($uibModal.open).toHaveBeenCalled();
+      expect(ngbModal.open).toHaveBeenCalled();
     });
   });
 
