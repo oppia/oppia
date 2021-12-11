@@ -123,16 +123,16 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
     ) -> result.Result[
         opportunity_models.SkillOpportunityModel, Exception
     ]:
-        """Generate opportunities related to a skill.
+        """Transform skill opportunity objects into skill opportunity models.
 
         Args:
-            skills_and_links: dict. A dict mapping 'skill' to a SkillModel and 'question_skill_links'
-            to a list of QuestionSkillLinkModel.
+            skills_and_links: dict. A dictionary mapping 'skill' to a SkillModel and
+            'question_skill_links' to a list of QuestionSkillLinkModel.
 
         Returns:
-            result.Result[opportunity_models.SkillOpportunityModel, Exception].
-            Metadata about the operation. Returns SkillOpportunityModel, or
-            Exception if an exception occurs.
+            Result[opportunity_models.SkillOpportunityModel, Exception].
+            Result object that contains SkillOpportunityModel when the operation
+            is successful and Exception when an exception occurs.
         """
         try:
             skill_opportunity = opportunity_domain.SkillOpportunity( # type: ignore[no-untyped-call]
