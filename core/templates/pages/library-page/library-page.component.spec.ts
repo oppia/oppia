@@ -571,4 +571,16 @@ describe('Library Page Component', () => {
     componentInstance.scroll(1, false);
     expect(componentInstance.leftmostCardIndices).toEqual([]);
   });
+
+  it('should initialize the carousels after view is intialized',
+    fakeAsync(()=>{
+      spyOn(windowDimensionsService, 'getWidth').and.returnValue(700);
+      spyOn(componentInstance, 'initCarousels');
+
+      componentInstance.ngAfterViewInit();
+      tick();
+
+      expect(componentInstance.initCarousels).toHaveBeenCalled();
+      expect(componentInstance.libraryWindowIsNarrow).toEqual(false);
+    }));
 });

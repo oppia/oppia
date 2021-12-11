@@ -359,6 +359,15 @@ export class LibraryPageComponent {
       });
   }
 
+  ngAfterViewInit(): void {
+    let libraryWindowCutoffPx = 530;
+
+    this.initCarousels();
+
+    this.libraryWindowIsNarrow = (
+      this.windowDimensionsService.getWidth() <= libraryWindowCutoffPx);
+  }
+
   ngOnDestroy(): void {
     if (this.resizeSubscription) {
       this.resizeSubscription.unsubscribe();
