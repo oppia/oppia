@@ -22,6 +22,13 @@ import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { GuppyInitializationService, GuppyObject } from 'services/guppy-initialization.service';
 import { AlgebraicExpressionEditorComponent } from './algebraic-expression-editor.component';
+import { TranslateService } from '@ngx-translate/core';
+
+class MockTranslateService {
+  instant(key: string): string {
+    return key;
+  }
+}
 
 describe('AlgebraicExpressionEditor', () => {
   let component: AlgebraicExpressionEditorComponent;
@@ -68,7 +75,15 @@ describe('AlgebraicExpressionEditor', () => {
       {
         imports: [HttpClientTestingModule],
         declarations: [AlgebraicExpressionEditorComponent],
-        providers: [{provide: windowRef, useClass: MockWindowRef}]
+        providers: [
+          {
+            provide: windowRef,
+            useClass: MockWindowRef
+          }, {
+            provide: TranslateService,
+            useClass: MockTranslateService
+          }
+        ]
       }
     ).compileComponents();
   }));

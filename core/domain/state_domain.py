@@ -828,12 +828,17 @@ class InteractionInstance:
         return html_list
 
     @staticmethod
-    def convert_html_in_interaction(interaction_dict, conversion_fn):
+    def convert_html_in_interaction(
+        interaction_dict,
+        ca_specs_dict,
+        conversion_fn
+    ):
         """Checks for HTML fields in the interaction and converts it
         according to the conversion function.
 
         Args:
             interaction_dict: dict. The interaction dict.
+            ca_specs_dict: dict. The customization args dict.
             conversion_fn: function. The function to be used for converting the
                 HTML.
 
@@ -859,26 +864,22 @@ class InteractionInstance:
                 value.html = conversion_fn(value.html)
             return value
 
-        interaction_id = interaction_dict['id']
-
         # Convert the customization_args to a dictionary of customization arg
         # name to InteractionCustomizationArg, so that we can utilize
         # InteractionCustomizationArg helper functions.
         # Then, convert back to original dict format afterwards, at the end.
         customization_args = (
             InteractionInstance
-            .convert_customization_args_dict_to_customization_args(
-                interaction_id,
-                interaction_dict['customization_args'])
+            .convert_cust_args_dict_to_cust_args_based_on_specs(
+                interaction_dict['customization_args'],
+                ca_specs_dict)
         )
-        ca_specs = interaction_registry.Registry.get_interaction_by_id(
-            interaction_id).customization_arg_specs
 
-        for ca_spec in ca_specs:
-            ca_spec_name = ca_spec.name
+        for ca_spec in ca_specs_dict:
+            ca_spec_name = ca_spec['name']
             customization_args[ca_spec_name].value = (
                 InteractionCustomizationArg.traverse_by_schema_and_convert(
-                    ca_spec.schema,
+                    ca_spec['schema'],
                     customization_args[ca_spec_name].value,
                     wrapped_conversion_fn
                 )
@@ -916,16 +917,42 @@ class InteractionInstance:
         if interaction_id is None:
             return {}
 
-        ca_specs = interaction_registry.Registry.get_interaction_by_id(
-            interaction_id).customization_arg_specs
-        customization_args = {
-            spec.name: InteractionCustomizationArg.from_customization_arg_dict(
-                customization_args_dict[spec.name],
-                spec.schema
-            ) for spec in ca_specs
-        }
+        ca_specs_dict = interaction_registry.Registry.get_interaction_by_id(
+            interaction_id).to_dict()['customization_arg_specs']
 
-        return customization_args
+        return (
+            InteractionInstance
+            .convert_cust_args_dict_to_cust_args_based_on_specs(
+                customization_args_dict, ca_specs_dict))
+
+    @staticmethod
+    def convert_cust_args_dict_to_cust_args_based_on_specs(
+        ca_dict,
+        ca_specs_dict
+    ):
+        """Converts customization arguments dictionary to customization
+        arguments. This is done by converting each customization argument to a
+        InteractionCustomizationArg domain object.
+
+        Args:
+            ca_dict: dict. A dictionary of customization
+                argument name to a customization argument dict, which is a dict
+                of the single key 'value' to the value of the customization
+                argument.
+            ca_specs_dict: dict. A dictionary of customization argument specs.
+
+        Returns:
+            dict. A dictionary of customization argument names to the
+            InteractionCustomizationArg domain object's.
+        """
+        return {
+            spec['name']: (
+                InteractionCustomizationArg.from_customization_arg_dict(
+                    ca_dict[spec['name']],
+                    spec['schema']
+                )
+            ) for spec in ca_specs_dict
+        }
 
 
 class InteractionCustomizationArg:
@@ -1466,6 +1493,22 @@ class WrittenTranslation:
             'TranslatableSetOfNormalizedString'),
         DATA_FORMAT_SET_OF_UNICODE_STRING: 'TranslatableSetOfUnicodeString',
     }
+
+    @classmethod
+    def is_data_format_list(cls, data_format):
+        """Checks whether the content of translation with given format is of
+        a list type.
+
+        Args:
+            data_format: str. The format of the translation.
+
+        Returns:
+            bool. Whether the content of translation is a list.
+        """
+        return data_format in (
+            cls.DATA_FORMAT_SET_OF_NORMALIZED_STRING,
+            cls.DATA_FORMAT_SET_OF_UNICODE_STRING
+        )
 
     def __init__(self, data_format, translation, needs_update):
         """Initializes a WrittenTranslation domain object.
@@ -3241,6 +3284,21 @@ class State:
 
         return content_id_to_translatable_item
 
+    def has_content_id(self, content_id):
+        """Returns whether a given content ID is available in the translatable
+        content.
+
+        Args:
+            content_id: str. The content ID that needs to be checked for the
+                availability.
+
+        Returns:
+            bool. A boolean that indicates the availability of the content ID
+            in the translatable content.
+        """
+        available_translate_content = self._get_all_translatable_content()
+        return bool(content_id in available_translate_content)
+
     def get_content_id_mapping_needing_translations(self, language_code):
         """Returns all text html which can be translated in the given language.
 
@@ -3339,6 +3397,7 @@ class State:
     @classmethod
     def convert_html_fields_in_state(
             cls, state_dict, conversion_fn,
+            state_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
             state_uses_old_interaction_cust_args_schema=False,
             state_uses_old_rule_template_schema=False):
         """Applies a conversion function on all the html strings in a state
@@ -3348,6 +3407,7 @@ class State:
             state_dict: dict. The dict representation of State object.
             conversion_fn: function. The conversion function to be applied on
                 the states_dict.
+            state_schema_version: number. The state schema version.
             state_uses_old_interaction_cust_args_schema: bool. Whether the
                 interaction customization arguments contain SubtitledHtml
                 and SubtitledUnicode dicts (should be True if prior to state
@@ -3462,9 +3522,16 @@ class State:
                                     'choices']['value']
                         ])
         else:
+            ca_specs_dict = (
+                interaction_registry.Registry
+                .get_all_specs_for_state_schema_version_or_latest(
+                    state_schema_version
+                )[interaction_id]['customization_arg_specs']
+            )
             state_dict['interaction'] = (
                 InteractionInstance.convert_html_in_interaction(
                     state_dict['interaction'],
+                    ca_specs_dict,
                     conversion_fn
                 ))
 
