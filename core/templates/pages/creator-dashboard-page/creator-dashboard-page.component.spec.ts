@@ -21,8 +21,7 @@ import { CreatorDashboardStats } from 'domain/creator_dashboard/creator-dashboar
 import { CreatorExplorationSummary } from 'domain/summary/creator-exploration-summary.model';
 import { ProfileSummary } from 'domain/user/profile-summary.model';
 import { CreatorDashboardPageComponent } from './creator-dashboard-page.component';
-import { ComponentFixture, fakeAsync, flushMicrotasks, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { AlertsService } from 'services/alerts.service';
+import { ComponentFixture, fakeAsync, TestBed, waitForAsync } from '@angular/core/testing';
 import { CreatorDashboardBackendApiService, CreatorDashboardData } from 'domain/creator_dashboard/creator-dashboard-backend-api.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { UserService } from 'services/user.service';
@@ -32,7 +31,6 @@ import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { SortByPipe } from 'filters/string-utility-filters/sort-by.pipe';
-import { LoaderService } from 'services/loader.service';
 
 @Pipe({name: 'truncate'})
 class MockTruncatePipe {
@@ -44,7 +42,6 @@ class MockTruncatePipe {
 describe('Creator Dashboard Page Component', () => {
   let fixture: ComponentFixture<CreatorDashboardPageComponent>;
   let component: CreatorDashboardPageComponent;
-  let alertsService: AlertsService;
   let creatorDashboardBackendApiService: CreatorDashboardBackendApiService;
   let csrfService: CsrfTokenService;
   let userService: UserService;
@@ -52,7 +49,6 @@ describe('Creator Dashboard Page Component', () => {
   let userInfo = {
     canCreateCollections: () => true
   };
-  let loaderService: LoaderService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -71,13 +67,11 @@ describe('Creator Dashboard Page Component', () => {
   beforeEach(waitForAsync(() => {
     fixture = TestBed.createComponent(CreatorDashboardPageComponent);
     component = fixture.componentInstance;
-    alertsService = TestBed.inject(AlertsService);
     creatorDashboardBackendApiService = TestBed.inject(
       CreatorDashboardBackendApiService);
     csrfService = TestBed.inject(CsrfTokenService);
     explorationCreationService = TestBed.inject(ExplorationCreationService);
     userService = TestBed.inject(UserService);
-    loaderService = TestBed.inject(LoaderService);
 
     spyOn(csrfService, 'getTokenAsync').and.returnValue(
       Promise.resolve('sample-csrf-token'));
@@ -470,24 +464,5 @@ describe('Creator Dashboard Page Component', () => {
       component.setActiveTab('myCollections');
       expect(component.activeTab).toBe('myCollections');
     });
-  });
-
-  describe('when fetching dashboard fails', () => {
-    it('should use reject handler', fakeAsync(() => {
-      spyOn(loaderService, 'showLoadingScreen');
-      spyOn(creatorDashboardBackendApiService, 'fetchDashboardDataAsync')
-        .and.returnValue(Promise.reject({
-          status: 500
-        }));
-      spyOn(alertsService, 'addWarning').and.callThrough();
-      component.ngOnInit();
-      tick();
-      flushMicrotasks();
-      expect(component.canCreateCollections).toBeNull();
-      expect(creatorDashboardBackendApiService.fetchDashboardDataAsync)
-        .toHaveBeenCalled();
-      expect(alertsService.addWarning).toHaveBeenCalledWith(
-        'Failed to get dashboard data');
-    }));
   });
 });

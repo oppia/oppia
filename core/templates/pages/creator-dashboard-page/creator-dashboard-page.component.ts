@@ -192,7 +192,6 @@ export class CreatorDashboardPageComponent {
   }
 
   ngOnInit(): void {
-    this.canCreateCollections = null;
     this.loaderService.showLoadingScreen('Loading');
     let userInfoPromise = this.userService.getUserInfoAsync();
     userInfoPromise.then((userInfo) => {
@@ -240,12 +239,6 @@ export class CreatorDashboardPageComponent {
         } else {
           this.activeTab = 'myExplorations';
         }
-      },
-      (errorResponse) => {
-        if (AppConstants.FATAL_ERROR_CODES.indexOf(
-          errorResponse.status) !== -1) {
-          this.alertsService.addWarning('Failed to get dashboard data');
-        }
       }
     );
 
@@ -262,7 +255,7 @@ export class CreatorDashboardPageComponent {
 
     this.emptyDashboardImgUrl = this.urlInterpolationService
       .getStaticImageUrl('/general/empty_dashboard.svg');
-    this.canReviewActiveThread = null;
+    this.canReviewActiveThread = false;
     this.updatesGivenScreenWidth();
     angular.element(this.windowRef.nativeWindow).on('resize', () => {
       this.updatesGivenScreenWidth();
