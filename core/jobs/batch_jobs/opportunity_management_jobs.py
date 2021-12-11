@@ -209,8 +209,8 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
 
         return (
             opportunities_results
-            | 'Fetch the job results' >> beam.Map(
-                lambda result: result['job_result'])
+            | 'Transform Results to JobRunResults' >> (
+                job_result_transforms.ResultsToJobRunResults())
         )
 
 
