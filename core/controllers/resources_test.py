@@ -527,10 +527,10 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
             'flac': ['audio/flac']
         }
 
-        #The HANDLER_ARGS_SCHEMA dict in AudioUploadHandler uses the
-        # ACCEPTED_AUDIO_EXTENSIONS as a key value in the 
-        #'should_end_with' validator. The dict needs to be swapped
-        #seperately as it is a class variable.
+        # The HANDLER_ARGS_SCHEMA dict in AudioUploadHandler uses the
+        # ACCEPTED_AUDIO_EXTENSIONS as a key value in the
+        # 'should_end_with' validator. The dict needs to be swapped
+        # seperately as it is a class variable.
         mock_audio_upload_handler_args_schema = {
         'POST': {
                 'raw_audio_file': {
@@ -549,7 +549,8 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
                             'regex_pattern': r'^[A-Za-z0-9-]+[.][a-z0-9]+$'
                         }, {
                             'id': 'should_end_with',
-                            'choices': list(mock_accepted_audio_extensions.keys())
+                            'choices': list(
+                                mock_accepted_audio_extensions.keys())
                         }]
                     }
                 }
