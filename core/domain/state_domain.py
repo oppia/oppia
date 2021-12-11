@@ -1817,7 +1817,7 @@ class WrittenTranslations:
             self._to_translation_language_mapping_proto(
                 self.translations_mapping))
 
-        return languages_pb2.WrittenTranslations(
+        return languages_pb2.WrittenTranslationsDto(
             translation_language_mapping=translation_language_mapping_protos
         )
 
