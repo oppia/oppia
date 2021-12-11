@@ -171,10 +171,12 @@ export class MathInteractionsService {
         'Your answer contains an invalid term: ' + invalidIntegers[0]);
       return false;
     }
-    let invalidMultiTerms = expressionString.match(/([a-zA-Zα-ωΑ-Ω]\d+)/g);
+    let invalidMultiTerms = expressionString.match(/([a-zA-Z]+\d+)/g);
     if (invalidMultiTerms !== null) {
+      let firstNumberIndex = invalidMultiTerms[0].search(/\d/);
       let correctString = (
-        invalidMultiTerms[0].slice(1) + invalidMultiTerms[0][0]);
+        invalidMultiTerms[0].slice(firstNumberIndex) +
+        invalidMultiTerms[0].slice(0, firstNumberIndex));
       this.warningText = (
         'When multiplying, the variable should come after the number: ' +
         correctString + '. Please update your answer and try again.'

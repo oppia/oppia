@@ -227,9 +227,9 @@ describe('MathInteractionsService', () => {
       'Please update your answer and try again.');
 
     expect(mathInteractionsService.validateAlgebraicExpression(
-      'a * Ω34', ['a', 'Ω'])).toBeFalse();
+      'a * omega34', ['a', 'omega'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      'When multiplying, the variable should come after the number: 34Ω. ' +
+      'When multiplying, the variable should come after the number: 34omega. ' +
       'Please update your answer and try again.');
 
     expect(mathInteractionsService.validateAlgebraicExpression(
