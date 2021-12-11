@@ -18,15 +18,17 @@ from __future__ import annotations
 
 import argparse
 import contextlib
+import io
 import json
 import os
 import subprocess
 import sys
 import tarfile
-import urllib.request as urlrequest
+import urllib
 import zipfile
 
 from core import python_utils
+from core import utils
 
 from . import common
 from . import install_backend_python_libs
@@ -97,13 +99,12 @@ def download_files(source_url_root, target_dir, source_filenames):
     common.ensure_directory_exists(target_dir)
     for filename in source_filenames:
         if not os.path.exists(os.path.join(target_dir, filename)):
-            python_utils.PRINT(
-                'Downloading file %s to %s ...' % (filename, target_dir))
-            urlrequest.urlretrieve(
+            print('Downloading file %s to %s ...' % (filename, target_dir))
+            urllib.request.urlretrieve(
                 '%s/%s' % (source_url_root, filename),
                 filename=os.path.join(target_dir, filename))
 
-            python_utils.PRINT('Download of %s succeeded.' % filename)
+            print('Download of %s succeeded.' % filename)
 
 
 def download_and_unzip_files(
@@ -126,11 +127,11 @@ def download_and_unzip_files(
             renamed to in the local directory.
     """
     if not os.path.exists(os.path.join(target_parent_dir, target_root_name)):
-        python_utils.PRINT('Downloading and unzipping file %s to %s ...' % (
+        print('Downloading and unzipping file %s to %s ...' % (
             zip_root_name, target_parent_dir))
         common.ensure_directory_exists(target_parent_dir)
 
-        urlrequest.urlretrieve(source_url, filename=TMP_UNZIP_PATH)
+        urllib.request.urlretrieve(source_url, filename=TMP_UNZIP_PATH)
 
         try:
             with zipfile.ZipFile(TMP_UNZIP_PATH, 'r') as zfile:
@@ -141,12 +142,11 @@ def download_and_unzip_files(
                 os.remove(TMP_UNZIP_PATH)
 
             # Some downloads (like jqueryui-themes) may require a user-agent.
-            req = python_utils.url_request(source_url, None, {})
+            req = urllib.request.Request(source_url, None, {})
             req.add_header('User-agent', 'python')
             # This is needed to get a seekable filestream that can be used
             # by zipfile.ZipFile.
-            file_stream = python_utils.string_io(
-                buffer_value=python_utils.url_open(req).read())
+            file_stream = io.StringIO(utils.url_open(req).read())
             with zipfile.ZipFile(file_stream, 'r') as zfile:
                 zfile.extractall(path=target_parent_dir)
 
@@ -155,7 +155,7 @@ def download_and_unzip_files(
             os.path.join(target_parent_dir, zip_root_name),
             os.path.join(target_parent_dir, target_root_name))
 
-        python_utils.PRINT('Download of %s succeeded.' % zip_root_name)
+        print('Download of %s succeeded.' % zip_root_name)
 
 
 def download_and_untar_files(
@@ -178,11 +178,11 @@ def download_and_untar_files(
             renamed to in the local directory.
     """
     if not os.path.exists(os.path.join(target_parent_dir, target_root_name)):
-        python_utils.PRINT('Downloading and untarring file %s to %s ...' % (
+        print('Downloading and untarring file %s to %s ...' % (
             tar_root_name, target_parent_dir))
         common.ensure_directory_exists(target_parent_dir)
 
-        urlrequest.urlretrieve(source_url, filename=TMP_UNZIP_PATH)
+        urllib.request.urlretrieve(source_url, filename=TMP_UNZIP_PATH)
         with contextlib.closing(tarfile.open(
             name=TMP_UNZIP_PATH, mode='r:gz')) as tfile:
             tfile.extractall(target_parent_dir)
@@ -193,7 +193,7 @@ def download_and_untar_files(
             os.path.join(target_parent_dir, tar_root_name),
             os.path.join(target_parent_dir, target_root_name))
 
-        python_utils.PRINT('Download of %s succeeded.' % tar_root_name)
+        print('Download of %s succeeded.' % tar_root_name)
 
 
 def get_file_contents(filepath, mode='r'):
@@ -234,24 +234,24 @@ def test_dependencies_syntax(dependency_type, dependency_dict):
         dependency_type]['optional_key_pairs']
     for key in mandatory_keys:
         if key not in keys:
-            python_utils.PRINT('------------------------------------------')
-            python_utils.PRINT('There is syntax error in this dependency')
-            python_utils.PRINT(dependency_dict)
-            python_utils.PRINT('This key is missing or misspelled: "%s".' % key)
-            python_utils.PRINT('Exiting')
+            print('------------------------------------------')
+            print('There is syntax error in this dependency')
+            print(dependency_dict)
+            print('This key is missing or misspelled: "%s".' % key)
+            print('Exiting')
             sys.exit(1)
     if optional_key_pairs:
         for optional_keys in optional_key_pairs:
             optional_keys_in_dict = [
                 key for key in optional_keys if key in keys]
             if len(optional_keys_in_dict) != 1:
-                python_utils.PRINT('------------------------------------------')
-                python_utils.PRINT('There is syntax error in this dependency')
-                python_utils.PRINT(dependency_dict)
-                python_utils.PRINT(
+                print('------------------------------------------')
+                print('There is syntax error in this dependency')
+                print(dependency_dict)
+                print(
                     'Only one of these keys pair must be used: "%s".'
                     % ', '.join(optional_keys))
-                python_utils.PRINT('Exiting')
+                print('Exiting')
                 sys.exit(1)
 
     # Checks the validity of the URL corresponding to the file format.
@@ -264,12 +264,12 @@ def test_dependencies_syntax(dependency_type, dependency_dict):
             is_zip_file_format and not dependency_url.endswith('.zip') or
             dependency_url.endswith('.tar.gz') and not is_tar_file_format or
             is_tar_file_format and not dependency_url.endswith('.tar.gz')):
-        python_utils.PRINT('------------------------------------------')
-        python_utils.PRINT('There is syntax error in this dependency')
-        python_utils.PRINT(dependency_dict)
-        python_utils.PRINT('This url %s is invalid for %s file format.' % (
+        print('------------------------------------------')
+        print('There is syntax error in this dependency')
+        print(dependency_dict)
+        print('This url %s is invalid for %s file format.' % (
             dependency_url, dependency_type))
-        python_utils.PRINT('Exiting.')
+        print('Exiting.')
         sys.exit(1)
 
 
@@ -351,10 +351,10 @@ def install_elasticsearch_dev_server():
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
-        python_utils.PRINT('ElasticSearch is already installed.')
+        print('ElasticSearch is already installed.')
         return
     except OSError:
-        python_utils.PRINT('Installing ElasticSearch...')
+        print('Installing ElasticSearch...')
 
     if common.is_mac_os() or common.is_linux_os():
         file_ext = 'tar.gz'
@@ -380,7 +380,7 @@ def install_elasticsearch_dev_server():
         'elasticsearch-%s' % common.ELASTICSEARCH_VERSION,
         'elasticsearch-%s' % common.ELASTICSEARCH_VERSION
     )
-    python_utils.PRINT('ElasticSearch installed successfully.')
+    print('ElasticSearch installed successfully.')
 
 
 def install_redis_cli():
@@ -409,11 +409,11 @@ def install_redis_cli():
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
-        python_utils.PRINT('Redis-cli is already installed.')
+        print('Redis-cli is already installed.')
     except OSError:
         # The redis-cli is not installed, run the script to install it.
         # NOTE: We do the installation here since we need to use make.
-        python_utils.PRINT('Installing redis-cli...')
+        print('Installing redis-cli...')
 
         download_and_untar_files(
             ('https://download.redis.io/releases/redis-%s.tar.gz') %
@@ -442,7 +442,7 @@ def install_redis_cli():
         subprocess.call([
             'chmod', '+x', common.REDIS_CLI_PATH])
 
-        python_utils.PRINT('Redis-cli installed successfully.')
+        print('Redis-cli installed successfully.')
 
 
 def main(args=None):

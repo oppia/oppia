@@ -49,7 +49,8 @@
         "core.controllers.release_coordinator_test",
         "core.controllers.classifier_test",
         "core.controllers.suggestion_test",
-        "core.controllers.voice_artist_test"
+        "core.controllers.voice_artist_test",
+        "core.jobs.batch_jobs.email_deletion_jobs_test"
     ],
     "2": [
         "core.domain.rights_manager_test",
