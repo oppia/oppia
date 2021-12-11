@@ -48,7 +48,7 @@ export class ExplorationRightsBackendApiService {
 
     return this.http.put<ExplorationRightsBackendData>(requestUrl, {
       version: version,
-      make_communityOwned: makeCommunityOwned
+      make_community_owned: makeCommunityOwned
     }).toPromise();
   }
 
