@@ -97,18 +97,37 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
     NOTE: The DeleteSkillOpportunityModelJob must be run before this
     job.
     """
+    
+    @staticmethod
+    def _count_unique_question_ids(
+        question_skill_link_models: list[
+                question_models.QuestionSkillLinkModel
+            ]
+        ) -> int:
+        """Counts the number of unique question ids.
+
+        Args:
+            question_skill_link_models: list(QuestionSkillLinkModel).
+                Array of QuestionSkillLinkModels.
+
+        Returns:
+            int. The number of unique question ids.
+        """
+
+        question_ids = [link.question_id for link in question_skill_link_models]
+        return len(set(question_ids))
 
     @staticmethod
     def _create_skill_opportunity_model(
-        skill_opportunity: opportunity_domain.SkillOpportunity
+        skills_and_links: dict
     ) -> result.Result[
         opportunity_models.SkillOpportunityModel, Exception
     ]:
         """Generate opportunities related to a skill.
 
         Args:
-            skill_opportunity: SkillOpportunity. A list of SkillOpportunity
-                domain objects.
+            skills_and_links: dict. A dict mapping 'skill' to a SkillModel and 'question_skill_links'
+            to a list of QuestionSkillLinkModel.
 
         Returns:
             result.Result[opportunity_models.SkillOpportunityModel, Exception].
@@ -116,6 +135,12 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
             Exception if an exception occurs.
         """
         try:
+            skill_opportunity = opportunity_domain.SkillOpportunity( # type: ignore[no-untyped-call]
+                skill_id=skills_and_links['skill'].id,
+                skill_description=skills_and_links['skill'].description,
+                question_count=GenerateSkillOpportunityModelJob._count_unique_question_ids(
+                    skills_and_links['question_skill_links']
+            ))
             skill_opportunity.validate() # type: ignore[no-untyped-call]
             skill_opportunity_model = opportunity_models.SkillOpportunityModel(
                 id=skill_opportunity.id,
@@ -126,27 +151,6 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
             return result.Ok(skill_opportunity_model)
         except Exception as e:
             return result.Err(e)
-
-    def count_unique_question_ids(
-        self,
-        question_skill_link_models: List[List[
-                question_models.QuestionSkillLinkModel
-            ]]
-        ) -> int:
-        """Counts the number of unique question ids.
-
-        Args:
-            question_skill_link_models: list[[list[QuestionSkillLinkModel]].
-                2D array of QuestionSkillLinkModels.
-
-        Returns:
-            int. The number of unique question ids.
-        """
-
-        question_ids = [link.question_id
-                        for link_list in question_skill_link_models
-                        for link in link_list]
-        return len(set(question_ids))
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns a PCollection of 'SUCCESS' or 'FAILURE' results from
@@ -179,23 +183,23 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
 
         skills_with_question_counts = (
             {
-                'skills': skills,
+                'skill': skills,
                 'question_skill_links': question_skill_link_models
             }
             | 'Merge by skill id' >> beam.CoGroupByKey()
+            | beam.Map(
+                lambda n: { 
+                    'skill': list(itertools.chain.from_iterable(n[1]['skill'])),
+                    'question_skill_links':
+                        list(itertools.chain.from_iterable(n[1]['question_skill_links'])) }
+            )
         )
 
         opportunities_results = (
             skills_with_question_counts
             | beam.Map(
                 lambda n:
-                self._create_skill_opportunity_model(
-                    opportunity_domain.SkillOpportunity( # type: ignore[no-untyped-call]
-                        skill_id=n[1]['skills'][0][0].id,
-                        skill_description=n[1]['skills'][0][0].description,
-                        question_count=self.count_unique_question_ids(
-                            n[1]['question_skill_links']
-                        ))))
+                self._create_skill_opportunity_model(n[1]))
         )
 
         unused_put_result = (
