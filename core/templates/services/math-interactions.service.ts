@@ -99,7 +99,8 @@ export class MathInteractionsService {
   isParenRedundant(
       expressionString: string,
       openingInd: number,
-      closingInd: number): boolean {
+      closingInd: number
+  ): boolean {
     /*
     Assumes that expressionString is syntactically valid.
 
