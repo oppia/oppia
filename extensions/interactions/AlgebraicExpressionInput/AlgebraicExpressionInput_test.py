@@ -119,8 +119,8 @@ class AlgebraicExpressionInputInteractionTests(test_utils.GenericTestBase):
         algebric_proto = algebric_instance.to_proto(
             interaction_domain.default_outcome,
             interaction_domain.customization_args,
-            interaction_domain.hints,
             interaction_domain.solution,
+            interaction_domain.hints,
             interaction_domain.answer_groups)
 
         algebric_customization_args = algebric_proto.customization_args

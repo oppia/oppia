@@ -116,8 +116,8 @@ class NumericExpressionInputInteractionTests(test_utils.GenericTestBase):
         numeric_proto = numeric_instance.to_proto(
             interaction_domain.default_outcome,
             interaction_domain.customization_args,
-            interaction_domain.hints,
             interaction_domain.solution,
+            interaction_domain.hints,
             interaction_domain.answer_groups)
 
         numeric_customization_args = numeric_proto.customization_args

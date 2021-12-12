@@ -121,8 +121,8 @@ class MathEquationInputInteractionTests(test_utils.GenericTestBase):
         math_proto = math_instance.to_proto(
             interaction_domain.default_outcome,
             interaction_domain.customization_args,
-            interaction_domain.hints,
             interaction_domain.solution,
+            interaction_domain.hints,
             interaction_domain.answer_groups)
 
         math_customization_args = math_proto.customization_args
