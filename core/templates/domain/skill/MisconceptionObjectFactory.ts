@@ -24,6 +24,9 @@ export interface MisconceptionBackendDict {
   'name': string;
   'notes': string;
 }
+export interface MisconceptionSkillMap {
+  [skillName: string]: Misconception[];
+}
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
