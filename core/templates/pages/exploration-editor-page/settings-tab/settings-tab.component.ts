@@ -25,7 +25,6 @@ import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { Subscription } from 'rxjs';
 import { PreviewSummaryTileModalComponent } from './templates/preview-summary-tile-modal.component';
 
-
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
