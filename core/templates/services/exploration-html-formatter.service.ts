@@ -120,7 +120,7 @@ export class ExplorationHtmlFormatterService {
     // is only formed of alphanumeric characters.
     if (labelForFocusTarget && alphanumericRegex.test(labelForFocusTarget)) {
       element.setAttribute('label-for-focus-target', labelForFocusTarget);
-    } else if (labelForFocusTarget !== null) {
+    } else if (!labelForFocusTarget) {
       throw new Error(
         `Unexpected label for focus target: ${labelForFocusTarget}.`);
     }
