@@ -51,7 +51,6 @@ import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { ExternalSaveService } from 'services/external-save.service';
 import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
-
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 import $ from 'jquery';
