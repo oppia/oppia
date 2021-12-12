@@ -25,7 +25,6 @@ import site
 import subprocess
 import sys
 
-from core import python_utils
 from scripts import common
 from scripts import install_third_party_libs
 
@@ -51,8 +50,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/app_feedback_report_validators_test.py',
     'core/domain/audit_validators.py',
     'core/domain/audit_validators_test.py',
-    'core/domain/auth_domain.py',
-    'core/domain/auth_domain_test.py',
     'core/domain/auth_jobs_one_off.py',
     'core/domain/auth_jobs_one_off_test.py',
     'core/domain/auth_services.py',
@@ -63,13 +60,10 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/base_model_validators_test.py',
     'core/domain/beam_job_validators.py',
     'core/domain/beam_job_validators_test.py',
-    'core/domain/blog_domain.py',
-    'core/domain/blog_domain_test.py',
     'core/domain/blog_services.py',
     'core/domain/blog_services_test.py',
     'core/domain/blog_validators.py',
     'core/domain/blog_validators_test.py',
-    'core/domain/caching_domain.py',
     'core/domain/caching_services.py',
     'core/domain/caching_services_test.py',
     'core/domain/calculation_registry.py',
@@ -466,18 +460,16 @@ def main(args=None):
     install_third_party_libraries(parsed_args.skip_install)
     common.fix_third_party_imports()
 
-    python_utils.PRINT('Installing Mypy and stubs for third party libraries.')
+    print('Installing Mypy and stubs for third party libraries.')
     return_code, mypy_exec_path = install_mypy_prerequisites(
         parsed_args.install_globally)
     if return_code != 0:
-        python_utils.PRINT(
-            'Cannot install Mypy and stubs for third party libraries.')
+        print('Cannot install Mypy and stubs for third party libraries.')
         sys.exit(1)
 
-    python_utils.PRINT(
-        'Installed Mypy and stubs for third party libraries.')
+    print('Installed Mypy and stubs for third party libraries.')
 
-    python_utils.PRINT('Starting Mypy type checks.')
+    print('Starting Mypy type checks.')
     cmd = get_mypy_cmd(
         parsed_args.files, mypy_exec_path, parsed_args.install_globally)
 
@@ -491,12 +483,12 @@ def main(args=None):
     stdout, stderr = process.communicate()
     # Standard and error output is in bytes, we need to decode the line to
     # print it.
-    python_utils.PRINT(stdout.decode('utf-8'))
-    python_utils.PRINT(stderr.decode('utf-8'))
+    print(stdout.decode('utf-8'))
+    print(stderr.decode('utf-8'))
     if process.returncode == 0:
-        python_utils.PRINT('Mypy type checks successful.')
+        print('Mypy type checks successful.')
     else:
-        python_utils.PRINT(
+        print(
             'Mypy type checks unsuccessful. Please fix the errors. '
             'For more information, visit: '
             'https://github.com/oppia/oppia/wiki/Backend-Type-Annotations')

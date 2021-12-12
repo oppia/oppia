@@ -338,6 +338,7 @@ import { FeedbackPopupComponent } from 'pages/exploration-player-page/layout-dir
     SupplementalCardComponent,
     SmoothHeightAnimatorComponent,
     TakeBreakModalComponent,
+    ThreadTableComponent,
     ThumbnailDisplayComponent,
     ThumbnailUploaderComponent,
     EditThumbnailModalComponent,

@@ -44,6 +44,12 @@ import { PostPublishModalComponent } from './modal-templates/post-publish-modal.
 import { ExplorationPublishModalComponent } from 'pages/exploration-editor-page/modal-templates/exploration-publish-modal.component';
 import { EditorReloadingModalComponent } from './modal-templates/editor-reloading-modal.component';
 import { ConfirmDiscardChangesModalComponent } from './modal-templates/confirm-discard-changes-modal.component';
+import { CreateFeedbackThreadModalComponent } from './feedback-tab/templates/create-feedback-thread-modal.component';
+import { DeleteExplorationModalComponent } from './settings-tab/templates/delete-exploration-modal.component';
+import { RemoveRoleConfirmationModalComponent } from './settings-tab/templates/remove-role-confirmation-modal.component';
+import { ReassignRoleConfirmationModalComponent } from './settings-tab/templates/reassign-role-confirmation-modal.component';
+import { ModeratorUnpublishExplorationModalComponent } from './settings-tab/templates/moderator-unpublish-exploration-modal.component';
+import { TransferExplorationOwnershipModalComponent } from './settings-tab/templates/transfer-exploration-ownership-modal.component';
 
 @NgModule({
   imports: [
@@ -69,7 +75,13 @@ import { ConfirmDiscardChangesModalComponent } from './modal-templates/confirm-d
     PostPublishModalComponent,
     ConfirmDiscardChangesModalComponent,
     ExplorationPublishModalComponent,
-    EditorReloadingModalComponent
+    EditorReloadingModalComponent,
+    CreateFeedbackThreadModalComponent,
+    DeleteExplorationModalComponent,
+    RemoveRoleConfirmationModalComponent,
+    ReassignRoleConfirmationModalComponent,
+    ModeratorUnpublishExplorationModalComponent,
+    TransferExplorationOwnershipModalComponent
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -85,7 +97,13 @@ import { ConfirmDiscardChangesModalComponent } from './modal-templates/confirm-d
     PostPublishModalComponent,
     ConfirmDiscardChangesModalComponent,
     ExplorationPublishModalComponent,
-    EditorReloadingModalComponent
+    EditorReloadingModalComponent,
+    CreateFeedbackThreadModalComponent,
+    DeleteExplorationModalComponent,
+    RemoveRoleConfirmationModalComponent,
+    ReassignRoleConfirmationModalComponent,
+    ModeratorUnpublishExplorationModalComponent,
+    TransferExplorationOwnershipModalComponent
   ],
   providers: [
     {
