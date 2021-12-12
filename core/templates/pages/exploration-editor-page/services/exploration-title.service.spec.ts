@@ -25,7 +25,7 @@ import { NormalizeWhitespacePipe } from 'filters/string-utility-filters/normaliz
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('Exploration Title Service', function() {
-  let explorationTitleService: ExplorationTitleService = null;
+  let ets: ExplorationTitleService = null;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -38,19 +38,19 @@ describe('Exploration Title Service', function() {
       ]
     });
 
-    explorationTitleService = TestBed.inject(ExplorationTitleService);
+    ets = TestBed.inject(ExplorationTitleService);
   });
 
   it('should test the child object properties', function() {
-    expect(explorationTitleService.propertyName).toBe('title');
+    expect(ets.propertyName).toBe('title');
     let NotNormalize = '   Exploration         Title Service     ';
     let Normalize = 'Exploration Title Service';
     let Valid = 'exploration';
     let Empty = '';
     let Special = 'Explor%tion Title }service';
-    expect(explorationTitleService._normalize(NotNormalize)).toBe(Normalize);
-    expect(explorationTitleService._isValid(Valid)).toBe(true);
-    expect(explorationTitleService._isValid(Empty)).toBe(false);
-    expect(explorationTitleService._isValid(Special)).toBe(false);
+    expect(ets._normalize(NotNormalize)).toBe(Normalize);
+    expect(ets._isValid(Valid)).toBe(true);
+    expect(ets._isValid(Empty)).toBe(false);
+    expect(ets._isValid(Special)).toBe(false);
   });
 });
