@@ -238,4 +238,15 @@ describe('InputResponsePairComponent', () => {
       ExplorationPlayerConstants.AUDIO_HIGHLIGHT_CSS_CLASS
     );
   });
+
+  it('should get the css class for feedback audio highlight', () => {
+    spyOn(audioTranslationManagerService, 'getCurrentComponentName')
+      .and.returnValue(AppConstants.COMPONENT_NAME_FEEDBACK);
+    spyOn(audioPlayerService, 'isPlaying').and.returnValue(false);
+    component.isLastPair = true;
+
+    expect(component.getFeedbackAudioHighlightClass()).toBe(
+      ''
+    );
+  });
 });
