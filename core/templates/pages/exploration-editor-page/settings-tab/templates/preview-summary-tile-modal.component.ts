@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for preview summary tile modal.
+ * @fileoverview Component for preview summary tile modal.
  */
 
 import { Component } from '@angular/core';

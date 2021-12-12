@@ -33,18 +33,18 @@ import { NormalizeWhitespacePipe } from 'filters/string-utility-filters/normaliz
 export class ExplorationObjectiveService extends ExplorationPropertyService {
   propertyName: string = 'objective';
   constructor(
-    protected alertsService: AlertsService,
-    protected changeListService: ChangeListService,
-    protected loggerService: LoggerService,
     private validatorsService: ValidatorsService,
     private explorationRightsService: ExplorationRightsService,
-    private whitespaceNormalize: NormalizeWhitespacePipe
+    private whitespaceNormalizePipe: NormalizeWhitespacePipe,
+    protected alertsService: AlertsService,
+    protected changeListService: ChangeListService,
+    protected loggerService: LoggerService
   ) {
     super(alertsService, changeListService, loggerService);
   }
 
   _normalize(value: string): string {
-    return this.whitespaceNormalize.transform(value);
+    return this.whitespaceNormalizePipe.transform(value);
   }
 
   _isValid(value: string): boolean {

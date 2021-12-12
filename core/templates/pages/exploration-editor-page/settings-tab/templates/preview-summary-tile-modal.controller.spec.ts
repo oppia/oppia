@@ -64,7 +64,6 @@ describe('Preview Summary Tile Modal Controller', function() {
     fixture = TestBed.createComponent(PreviewSummaryTileModalComponent);
     component = fixture.componentInstance;
 
-    TestBed.inject(NgbActiveModal);
     explorationCategoryService = TestBed.inject(ExplorationCategoryService);
     explorationObjectiveService = TestBed.inject(ExplorationObjectiveService);
     explorationTitleService = TestBed.inject(ExplorationTitleService);
