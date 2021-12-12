@@ -322,6 +322,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     SupplementalCardComponent,
     SmoothHeightAnimatorComponent,
     TakeBreakModalComponent,
+    ThreadTableComponent,
     ThumbnailDisplayComponent,
     ThumbnailUploaderComponent,
     EditThumbnailModalComponent,
