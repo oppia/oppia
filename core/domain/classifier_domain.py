@@ -220,8 +220,10 @@ class ClassifierTrainingJob:
     @property
     def training_data(
         self
-        ) -> Union[Dict[str, Union[int, List[str]]],
-        List[Dict[str, Union[int, List[str]]]]]:
+    ) -> Union[
+        Dict[str, Union[int, List[str]]],
+        List[Dict[str, Union[int, List[str]]]]
+    ]:
         """Returns the training data used for training the classifier.
 
         Returns:
