@@ -46,6 +46,7 @@ import { EditorReloadingModalComponent } from './modal-templates/editor-reloadin
 import { ConfirmDiscardChangesModalComponent } from './modal-templates/confirm-discard-changes-modal.component';
 import { CreateFeedbackThreadModalComponent } from './feedback-tab/templates/create-feedback-thread-modal.component';
 import { WelcomeTranslationModalComponent } from './translation-tab/modal-templates/welcome-translation-modal.component';
+
 @NgModule({
   imports: [
     BrowserModule,
