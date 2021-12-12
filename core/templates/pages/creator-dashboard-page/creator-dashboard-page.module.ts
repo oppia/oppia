@@ -31,6 +31,7 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
 import { InteractionExtensionsModule } from 'interactions/interactions.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
+import { CreatorDashboardPageComponent } from './creator-dashboard-page.component';
 
 
 @NgModule({
@@ -41,6 +42,12 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     InteractionExtensionsModule,
     SharedComponentsModule,
     ToastrModule.forRoot(toastrConfig)
+  ],
+  declarations: [
+    CreatorDashboardPageComponent
+  ],
+  entryComponents: [
+    CreatorDashboardPageComponent
   ],
   providers: [
     {
