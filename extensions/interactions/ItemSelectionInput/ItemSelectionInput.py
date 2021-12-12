@@ -239,7 +239,7 @@ class ItemSelectionInput(base.BaseInteraction):
         """
         item_rule_spec = state_pb2.ItemSelectionInputInstanceDto.RuleSpecDto
 
-        return item_rule_spec.EqualsSpec(
+        return item_rule_spec.EqualsSpecDto(
             input=cls._to_set_of_translatable_html_content_ids_proto(
                 choice_list)
         )
@@ -256,7 +256,7 @@ class ItemSelectionInput(base.BaseInteraction):
         """
         item_rule_spec = state_pb2.ItemSelectionInputInstanceDto.RuleSpecDto
 
-        return item_rule_spec.ContainsAtLeastOneOfSpec(
+        return item_rule_spec.ContainsAtLeastOneOfSpecDto(
             input=cls._to_set_of_translatable_html_content_ids_proto(
                 choice_list)
         )
@@ -273,7 +273,7 @@ class ItemSelectionInput(base.BaseInteraction):
         """
         item_rule_spec = state_pb2.ItemSelectionInputInstanceDto.RuleSpecDto
 
-        return item_rule_spec.IsProperSubsetOfSpec(
+        return item_rule_spec.IsProperSubsetOfSpecDto(
             input=cls._to_set_of_translatable_html_content_ids_proto(
                 choice_list)
         )
@@ -292,7 +292,7 @@ class ItemSelectionInput(base.BaseInteraction):
         """
         item_rule_spec = state_pb2.ItemSelectionInputInstanceDto.RuleSpecDto
 
-        return item_rule_spec.DoesNotContainAtLeastOneOfSpec(
+        return item_rule_spec.DoesNotContainAtLeastOneOfSpecDto(
             input=cls._to_set_of_translatable_html_content_ids_proto(
                 choice_list)
         )
@@ -316,7 +316,7 @@ class ItemSelectionInput(base.BaseInteraction):
             ) for translatable_html_content_id in set_of_content_id
         ]
 
-        return objects_pb2.SetOfTranslatableHtmlContentIds(
+        return objects_pb2.SetOfTranslatableHtmlContentIdsDto(
             content_ids=content_id_lists_proto
         )
 
@@ -333,6 +333,6 @@ class ItemSelectionInput(base.BaseInteraction):
         Returns:
             TranslatableHtmlContentId. The proto object.
         """
-        return objects_pb2.TranslatableHtmlContentId(
+        return objects_pb2.TranslatableHtmlContentIdDto(
             content_id=translatable_html_content_id
         )

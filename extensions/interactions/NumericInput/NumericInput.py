@@ -209,7 +209,7 @@ class NumericInput(base.BaseInteraction):
         equals_to_proto = {}
         x = inputs['x']
         if isinstance(x, (int, float)):
-            equals_to_proto = numeric_rule_spec.EqualsSpec(input=x)
+            equals_to_proto = numeric_rule_spec.EqualsSpecDto(input=x)
 
         return equals_to_proto
 
@@ -227,7 +227,7 @@ class NumericInput(base.BaseInteraction):
         is_less_than_proto = {}
         x = inputs['x']
         if isinstance(x, (int, float)):
-            is_less_than_proto = numeric_rule_spec.IsLessThanSpec(input=x)
+            is_less_than_proto = numeric_rule_spec.IsLessThanSpecDto(input=x)
 
         return is_less_than_proto
 
@@ -246,7 +246,7 @@ class NumericInput(base.BaseInteraction):
         x = inputs['x']
         if isinstance(x, (int, float)):
             is_greater_than_proto = (
-                numeric_rule_spec.IsGreaterThanSpec(input=x)
+                numeric_rule_spec.IsGreaterThanSpecDto(input=x)
             )
 
         return is_greater_than_proto
@@ -266,7 +266,7 @@ class NumericInput(base.BaseInteraction):
         x = inputs['x']
         if isinstance(x, (int, float)):
             is_less_than_or_equal_to_proto = (
-                numeric_rule_spec.IsLessThanOrEqualToSpec(input=x)
+                numeric_rule_spec.IsLessThanOrEqualToSpecDto(input=x)
             )
 
         return is_less_than_or_equal_to_proto
@@ -286,7 +286,7 @@ class NumericInput(base.BaseInteraction):
         x = inputs['x']
         if isinstance(x, (int, float)):
             is_greater_than_or_equal_to_proto = (
-                numeric_rule_spec.IsGreaterThanOrEqualToSpec(input=x)
+                numeric_rule_spec.IsGreaterThanOrEqualToSpecDto(input=x)
             )
 
         return is_greater_than_or_equal_to_proto
@@ -307,7 +307,7 @@ class NumericInput(base.BaseInteraction):
         b = inputs['b']
         if (isinstance(a, (int, float))) and (isinstance(b, (int, float))):
             is_inclusively_between_proto = (
-                numeric_rule_spec.IsInclusivelyBetweenSpec(
+                numeric_rule_spec.IsInclusivelyBetweenSpecDto(
                     inputLowerInclusive=a,
                     inputUpperInclusive=b)
             )
@@ -330,7 +330,7 @@ class NumericInput(base.BaseInteraction):
         tol = inputs['tol']
         if (isinstance(x, (int, float))) and (isinstance(tol, (int, float))):
             is_within_tolerance_proto = (
-                numeric_rule_spec.IsWithinToleranceSpec(
+                numeric_rule_spec.IsWithinToleranceSpecDto(
                     inputTolerance=tol,
                     inputComparedValue=x)
             )

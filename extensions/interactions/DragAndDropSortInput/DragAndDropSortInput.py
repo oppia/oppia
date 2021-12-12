@@ -201,7 +201,7 @@ class DragAndDropSortInput(base.BaseInteraction):
         drag_input_rule_spec = (
             state_pb2.DragAndDropSortInputInstanceDto.RuleSpecDto)
 
-        return drag_input_rule_spec.IsEqualToOrderingSpec(
+        return drag_input_rule_spec.IsEqualToOrderingSpecDto(
             input=cls._to_list_of_set_of_translatable_html_content_ids(
                 input_dict['x'])
         )
@@ -221,7 +221,7 @@ class DragAndDropSortInput(base.BaseInteraction):
         drag_input_rule_spec = (
             state_pb2.DragAndDropSortInputInstanceDto.RuleSpecDto)
 
-        return drag_input_rule_spec.IsEqualToOrderingWithOneItemAtIncorrectPositionSpec( # pylint: disable=line-too-long
+        return drag_input_rule_spec.IsEqualToOrderingWithOneItemAtIncorrectPositionSpecDto( # pylint: disable=line-too-long
             input=cls._to_list_of_set_of_translatable_html_content_ids(
                 input_dict['x'])
         )
@@ -239,7 +239,7 @@ class DragAndDropSortInput(base.BaseInteraction):
         drag_input_rule_spec = (
             state_pb2.DragAndDropSortInputInstanceDto.RuleSpecDto)
 
-        return drag_input_rule_spec.HasElementXAtPositionYSpec(
+        return drag_input_rule_spec.HasElementXAtPositionYSpecDto(
             element=cls._to_translatable_html_content_id_proto(
                 input_dict['x']),
             position=input_dict['y']
@@ -258,7 +258,7 @@ class DragAndDropSortInput(base.BaseInteraction):
         drag_input_rule_spec = (
             state_pb2.DragAndDropSortInputInstanceDto.RuleSpecDto)
 
-        return drag_input_rule_spec.HasElementXBeforeElementYSpec(
+        return drag_input_rule_spec.HasElementXBeforeElementYSpecDto(
             considered_element=cls._to_translatable_html_content_id_proto(
                 input_dict['x']),
             later_element=cls._to_translatable_html_content_id_proto(

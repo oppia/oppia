@@ -287,7 +287,7 @@ class FractionInput(base.BaseInteraction):
         """
         fraction_rule_spec = state_pb2.FractionInputInstanceDto.RuleSpecDto
 
-        return fraction_rule_spec.IsExactlyEqualToSpec(
+        return fraction_rule_spec.IsExactlyEqualToSpecDto(
             input=cls._to_fraction_proto(fraction)
         )
 
@@ -303,7 +303,7 @@ class FractionInput(base.BaseInteraction):
         """
         fraction_rule_spec = state_pb2.FractionInputInstanceDto.RuleSpecDto
 
-        return fraction_rule_spec.IsEquivalentToSpec(
+        return fraction_rule_spec.IsEquivalentToSpecDto(
             input=cls._to_fraction_proto(fraction)
         )
 
@@ -319,7 +319,7 @@ class FractionInput(base.BaseInteraction):
         """
         fraction_rule_spec = state_pb2.FractionInputInstanceDto.RuleSpecDto
 
-        return fraction_rule_spec.IsEquivalentToAndInSimplestFormSpec(
+        return fraction_rule_spec.IsEquivalentToAndInSimplestFormSpecDto(
             input=cls._to_fraction_proto(fraction)
         )
 
@@ -335,7 +335,7 @@ class FractionInput(base.BaseInteraction):
         """
         fraction_rule_spec = state_pb2.FractionInputInstanceDto.RuleSpecDto
 
-        return fraction_rule_spec.IsLessThanSpec(
+        return fraction_rule_spec.IsLessThanSpecDto(
             input=cls._to_fraction_proto(fraction)
         )
 
@@ -351,7 +351,7 @@ class FractionInput(base.BaseInteraction):
         """
         fraction_rule_spec = state_pb2.FractionInputInstanceDto.RuleSpecDto
 
-        return fraction_rule_spec.IsGreaterThanSpec(
+        return fraction_rule_spec.IsGreaterThanSpecDto(
             input=cls._to_fraction_proto(fraction)
         )
 
@@ -367,7 +367,7 @@ class FractionInput(base.BaseInteraction):
         """
         fraction_rule_spec = state_pb2.FractionInputInstanceDto.RuleSpecDto
 
-        return fraction_rule_spec.HasNumeratorEqualToSpec(
+        return fraction_rule_spec.HasNumeratorEqualToSpecDto(
             input=numerator
         )
 
@@ -383,7 +383,7 @@ class FractionInput(base.BaseInteraction):
         """
         fraction_rule_spec = state_pb2.FractionInputInstanceDto.RuleSpecDto
 
-        return fraction_rule_spec.HasDenominatorEqualToSpec(
+        return fraction_rule_spec.HasDenominatorEqualToSpecDto(
             input=denominator
         )
 
@@ -399,7 +399,7 @@ class FractionInput(base.BaseInteraction):
         """
         fraction_rule_spec = state_pb2.FractionInputInstanceDto.RuleSpecDto
 
-        return fraction_rule_spec.HasIntegerPartEqualToSpec(
+        return fraction_rule_spec.HasIntegerPartEqualToSpecDto(
             input=interger_part
         )
 
@@ -415,7 +415,7 @@ class FractionInput(base.BaseInteraction):
         """
         fraction_rule_spec = state_pb2.FractionInputInstanceDto.RuleSpecDto
 
-        return fraction_rule_spec.HasNoFractionalPartSpec()
+        return fraction_rule_spec.HasNoFractionalPartSpecDto()
 
     @classmethod
     def _to_has_fractional_part_exactly_equal_to_proto(cls, fraction):
@@ -429,6 +429,6 @@ class FractionInput(base.BaseInteraction):
         """
         fraction_rule_spec = state_pb2.FractionInputInstanceDto.RuleSpecDto
 
-        return fraction_rule_spec.HasFractionalPartExactlyEqualToSpec(
+        return fraction_rule_spec.HasFractionalPartExactlyEqualToSpecDto(
             input=cls._to_fraction_proto(fraction)
         )

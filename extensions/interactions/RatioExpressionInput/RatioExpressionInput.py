@@ -188,7 +188,7 @@ class RatioExpressionInput(base.BaseInteraction):
         """
         ratio_rule_spec = state_pb2.RatioExpressionInputInstanceDto.RuleSpecDto
 
-        return ratio_rule_spec.EqualsSpec(
+        return ratio_rule_spec.EqualsSpecDto(
             input=cls._to_ratio_expression_proto(ratio)
         )
 
@@ -204,7 +204,7 @@ class RatioExpressionInput(base.BaseInteraction):
         """
         ratio_rule_spec = state_pb2.RatioExpressionInputInstanceDto.RuleSpecDto
 
-        return ratio_rule_spec.IsEquivalentSpec(
+        return ratio_rule_spec.IsEquivalentSpecDto(
             input=cls._to_ratio_expression_proto(ratio)
         )
 
@@ -220,7 +220,7 @@ class RatioExpressionInput(base.BaseInteraction):
         """
         ratio_rule_spec = state_pb2.RatioExpressionInputInstanceDto.RuleSpecDto
 
-        return ratio_rule_spec.HasNumberOfTermsEqualToSpec(
+        return ratio_rule_spec.HasNumberOfTermsEqualToSpecDto(
             input_term_count=input_term_count
         )
 
@@ -238,7 +238,7 @@ class RatioExpressionInput(base.BaseInteraction):
         """
         ratio_rule_spec = state_pb2.RatioExpressionInputInstanceDto.RuleSpecDto
 
-        return ratio_rule_spec.HasSpecificTermEqualToSpec(
+        return ratio_rule_spec.HasSpecificTermEqualToSpecDto(
             input_term_index=input_dict[0],
             input_expected_term_value=input_dict[1]
         )

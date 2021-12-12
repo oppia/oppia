@@ -210,7 +210,7 @@ class TextInput(base.BaseInteraction):
         """
         text_rule_spec = state_pb2.TextInputInstanceDto.RuleSpecDto
 
-        return text_rule_spec.EqualsSpec(
+        return text_rule_spec.EqualsSpecDto(
             input=cls._to_translatable_normalized_string_set(
                 input_dict)
         )
@@ -227,7 +227,7 @@ class TextInput(base.BaseInteraction):
         """
         text_rule_spec = state_pb2.TextInputInstanceDto.RuleSpecDto
 
-        return text_rule_spec.StartsWithSpec(
+        return text_rule_spec.StartsWithSpecDto(
             input=cls._to_translatable_normalized_string_set(
                 input_dict)
         )
@@ -244,7 +244,7 @@ class TextInput(base.BaseInteraction):
         """
         text_rule_spec = state_pb2.TextInputInstanceDto.RuleSpecDto
 
-        return text_rule_spec.ContainsSpec(
+        return text_rule_spec.ContainsSpecDto(
             input=cls._to_translatable_normalized_string_set(
                 input_dict)
         )
@@ -261,7 +261,7 @@ class TextInput(base.BaseInteraction):
         """
         text_rule_spec = state_pb2.TextInputInstanceDto.RuleSpecDto
 
-        return text_rule_spec.FuzzyEqualsSpec(
+        return text_rule_spec.FuzzyEqualsSpecDto(
             input=cls._to_translatable_normalized_string_set(
                 input_dict)
         )
