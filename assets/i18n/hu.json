@@ -275,7 +275,6 @@
 	"I18N_SIDEBAR_CONTACT_US": "Kapcsolatfelvétel",
 	"I18N_SIDEBAR_DONATE": "Adományozás",
 	"I18N_SIDEBAR_FORUM": "Fórum",
-	"I18N_SIDEBAR_GET_STARTED": "Kezdjük el",
 	"I18N_SIDEBAR_LIBRARY_LINK": "Könyvtár",
 	"I18N_SIDEBAR_TEACH_WITH_OPPIA": "Tanítás az Oppiával",
 	"I18N_SIGNUP_AGREE_LICENSE_DESCRIPTION": "A négyzet bejelölésével, a szöveg bal oldalán, elismered és elfogadod, hogy be fogod tartani az <[sitename]> Felhasználási feltételeit, amelyeket <a href=\"/terms\" target=\"_blank\">itt találsz meg</a>.",

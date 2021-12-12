@@ -2,7 +2,7 @@
      class="navbar-header protractor-test-navbar-header">
   <a *ngIf="windowIsNarrow"
      (click)="toggleSidebar()"
-     class="navbar-brand oppia-navbar-menu oppia-transition-200 protractor-mobile-test-navbar-button"
+     class="navbar-brand oppia-navbar-menu oppia-transition-200 protractor-mobile-test-navbar-button ml-0"
      tabindex="0">
     <i class="material-icons oppia-navbar-menu-icon"
        *ngIf="!isSidebarShown()"
@@ -15,11 +15,11 @@
        &#10005;
     </i>
   </a>
-  <a class="oppia-navbar-brand-name oppia-transition-200 protractor-test-oppia-main-logo d-none d-sm-block"
+  <a class="oppia-navbar-brand-name oppia-transition-200 protractor-test-oppia-main-logo d-sm-block"
      href="/"
      [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.SPLASH.ROUTE"
      [oppiaFocusOn]="labelForClearingFocus"
-     [ngClass]="windowIsNarrow ? 'oppia-logo-small' : 'oppia-logo-wide'">
+     [ngClass]="windowIsNarrow ? 'oppia-logo-small ml-0' : 'oppia-logo-wide'">
     <picture>
       <source type="image/webp"
               [srcset]="getStaticImageUrl('/logo/288x128_logo_white.webp')">
