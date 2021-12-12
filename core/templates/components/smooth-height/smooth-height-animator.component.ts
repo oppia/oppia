@@ -48,9 +48,12 @@ export class SmoothHeightAnimatorComponent implements OnChanges {
 
   ngOnChanges(): void {
     this.startHeight = this.element.nativeElement.clientHeight;
-    this.grow = {
-      value: this.trigger,
-      params: {startHeight: this.startHeight}
-    };
+    // Timeout delays the animation till the new content is rendered properly.
+    setTimeout(() => {
+      this.grow = {
+        value: this.trigger,
+        params: {startHeight: this.startHeight}
+      };
+    }, 100);
   }
 }
