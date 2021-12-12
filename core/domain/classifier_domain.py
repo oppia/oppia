@@ -78,19 +78,21 @@ class ClassifierTrainingJob:
     """
 
     def __init__(
-            self,
-            job_id: str,
-            algorithm_id: str,
-            interaction_id: str,
-            exp_id: str,
-            exp_version: int,
-            next_scheduled_check_time: datetime.datetime,
-            state_name: str,
-            status: str,
-            training_data: Union[Dict[str, Union[int, List[str]]],
-                            List[Dict[str, Union[int, List[str]]]]],
-            algorithm_version: int
-            ) -> None:
+        self,
+        job_id: str,
+        algorithm_id: str,
+        interaction_id: str,
+        exp_id: str,
+        exp_version: int,
+        next_scheduled_check_time: datetime.datetime,
+        state_name: str,
+        status: str,
+        training_data: Union[
+            Dict[str, Union[int, List[str]]], 
+            List[Dict[str, Union[int, List[str]]]]
+        ],
+        algorithm_version: int
+    ) -> None:
         """Constructs a ClassifierTrainingJob domain object.
 
         Args:
