@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the explaration player page.
+ * @fileoverview Component for the exploration player page.
  */
 
 import { Component } from '@angular/core';
