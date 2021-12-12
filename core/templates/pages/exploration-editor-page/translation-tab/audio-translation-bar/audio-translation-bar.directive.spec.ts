@@ -17,7 +17,7 @@
  */
 
 import { EventEmitter, NgZone } from '@angular/core';
-import { TestBed, waitForAsync } from '@angular/core/testing';
+import { fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { StateRecordedVoiceoversService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
@@ -34,6 +34,7 @@ import $ from 'jquery';
 // the code corresponding to the spec is upgraded to Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
+import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 // ^^^ This block is to be removed.
 
 require(
@@ -47,6 +48,7 @@ describe('Audio translation bar directive', function() {
   var $rootScope = null;
   var $scope = null;
   var $uibModal = null;
+  var ngbModal = null;
   var alertsService = null;
   var assetsBackendApiService = null;
   var audioPlayerService: AudioPlayerService = null;
@@ -94,6 +96,13 @@ describe('Audio translation bar directive', function() {
     $provide.value('ExternalSaveService', {
       onExternalSave: mockExternalSaveEventEmitter
     });
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
   }));
 
   beforeEach(angular.mock.inject(function($injector) {
@@ -102,6 +111,7 @@ describe('Audio translation bar directive', function() {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     $uibModal = $injector.get('$uibModal');
+    ngbModal = $injector.get('NgbModal');
     assetsBackendApiService = $injector.get('AssetsBackendApiService');
     audioPlayerService = $injector.get('AudioPlayerService');
     contextService = $injector.get('ContextService');
@@ -588,34 +598,36 @@ describe('Audio translation bar directive', function() {
   });
 
   it('should delete audio when closing delete audio translation modal',
-    function() {
+    fakeAsync(() => {
       spyOn(stateRecordedVoiceoversService.displayed, 'deleteVoiceover');
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve()
-      });
+      spyOn(ngbModal, 'open').and.returnValue({
+        result: Promise.resolve()
+      } as NgbModalRef);
 
       $scope.openDeleteAudioTranslationModal();
+      tick();
       $scope.$apply();
 
       expect(stateRecordedVoiceoversService.displayed.deleteVoiceover)
         .toHaveBeenCalled();
       expect(explorationStatesService.saveRecordedVoiceovers)
         .toHaveBeenCalled();
-    });
+    }));
 
   it('should not delete audio when dismissing delete audio translation' +
-    ' modal', function() {
+    ' modal', fakeAsync(() => {
     spyOn(stateRecordedVoiceoversService.displayed, 'deleteVoiceover');
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.reject()
-    });
+    spyOn(ngbModal, 'open').and.returnValue({
+      result: Promise.reject()
+    } as NgbModalRef);
 
     $scope.openDeleteAudioTranslationModal();
+    tick();
     $scope.$apply();
 
     expect(stateRecordedVoiceoversService.displayed.deleteVoiceover)
       .not.toHaveBeenCalled();
-  });
+  }));
 
   it('should add audio translation when closing add audio translation modal',
     function() {
