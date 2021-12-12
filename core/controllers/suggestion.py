@@ -211,13 +211,11 @@ class SuggestionsProviderHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    def _require_valid_suggestion_and_target_types(
-            self, target_type, suggestion_type):
+    def _require_valid_target_types(self, target_type):
         """Checks whether the given target_type and suggestion_type are valid.
 
         Args:
             target_type: str. The type of the suggestion target.
-            suggestion_type: str. The type of the suggestion.
 
         Raises:
             InvalidInputException. If the given target_type of suggestion_type
@@ -226,10 +224,6 @@ class SuggestionsProviderHandler(base.BaseHandler):
         if target_type not in feconf.SUGGESTION_TARGET_TYPE_CHOICES:
             raise self.InvalidInputException(
                 'Invalid target_type: %s' % target_type)
-
-        if suggestion_type not in feconf.SUGGESTION_TYPE_CHOICES:
-            raise self.InvalidInputException(
-                'Invalid suggestion_type: %s' % suggestion_type)
 
     def _render_suggestions(self, target_type, suggestions):
         """Renders retrieved suggestions.
@@ -271,8 +265,7 @@ class ReviewableSuggestionsHandler(SuggestionsProviderHandler):
             target_type: str. The type of the suggestion target.
             suggestion_type: str. The type of the suggestion.
         """
-        self._require_valid_suggestion_and_target_types(
-            target_type, suggestion_type)
+        self._require_valid_target_types(target_type)
         suggestions = suggestion_services.get_reviewable_suggestions(
             self.user_id, suggestion_type)
         self._render_suggestions(target_type, suggestions)
@@ -309,8 +302,7 @@ class UserSubmittedSuggestionsHandler(SuggestionsProviderHandler):
             target_type: str. The type of the suggestion target.
             suggestion_type: str. The type of the suggestion.
         """
-        self._require_valid_suggestion_and_target_types(
-            target_type, suggestion_type)
+        self._require_valid_target_types(target_type)
         suggestions = suggestion_services.get_submitted_suggestions(
             self.user_id, suggestion_type)
         self._render_suggestions(target_type, suggestions)
