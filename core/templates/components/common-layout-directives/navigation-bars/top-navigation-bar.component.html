@@ -315,18 +315,26 @@
     </li>
   </ul>
   <ul class="nav oppia-navbar-nav oppia-navbar-profile">
-    <li ngbDropdown class="nav-item oppia-navbar-clickable-dropdown dropdown" *ngIf="showLanguageSelector">
+    <li ngbDropdown class="nav-item oppia-navbar-clickable-dropdown dropdown" *ngIf="showLanguageSelector"
+        [ngClass]="{'open': activeMenuName === 'languageMenu'}"
+        (mouseover)="openSubmenu($event, 'languageMenu')"
+        (mouseleave)="closeSubmenuIfNotMobile($event)"
+        autofocus>
       <div class="oppia-navbar-button-container dropdown">
         <button ngbDropdownToggle
-                class="btn dropdown-toggle oppia-navbar-button protractor-test-language-dropdown">
+                class="btn dropdown-toggle oppia-navbar-button protractor-test-language-dropdown"
+                (keydown)="onMenuKeypress($event, 'languageMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})">
           <i class="material-icons language-icon"> &#xE894; </i>
           <span *ngIf="windowIsNarrow"> {{ currentLanguageCode }} </span>
           <span *ngIf="!windowIsNarrow"> {{ currentLanguageText }} </span>
         </button>
       </div>
-      <ul ngbDropdownMenu class="dropdown-menu oppia-navbar-dropdown" [style.margin-top]="userIsLoggedIn ? '-10px': '0'">
+      <ul ngbDropdownMenu class="dropdown-menu oppia-navbar-dropdown" [style.margin-top]="userIsLoggedIn ? '-10px': '0'"
+          (mouseover)="openSubmenu($event, 'languageMenu')"
+          (mouseleave)="closeSubmenuIfNotMobile($event)">
         <li class="nav-item" [ngClass]="'protractor-test-i18n-language-' + language.id" *ngFor="let language of supportedSiteLanguages">
-          <a (click)="changeLanguage(language.id)">
+          <a (click)="changeLanguage(language.id)" tabindex="0" (keydown.enter)="changeLanguage(language.id)"
+             (keydown)="onMenuKeypress($event, 'languageMenu', {enter: ACTION_CLOSE})">
             <div class="language-element oppia-nav-right-dropdown" [ngClass]="{'language-element-selected': currentLanguageCode === language.id}">
               <span *ngIf="currentLanguageCode === language.id">
                 <i class="material-icons"> &#xE876; </i>
