@@ -117,7 +117,7 @@ export class ExplorationHtmlFormatterService {
 
     const alphanumericRegex = new RegExp('^[a-zA-Z0-9]+$');
     // The setAttribute is safe because we verify that the labelForFocusTarget
-    // is only formed of alphabetical characters.
+    // is only formed of alphanumeric characters.
     if (labelForFocusTarget && alphanumericRegex.test(labelForFocusTarget)) {
       element.setAttribute('label-for-focus-target', labelForFocusTarget);
     } else if (labelForFocusTarget !== null) {
