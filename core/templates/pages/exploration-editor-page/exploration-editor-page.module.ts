@@ -51,6 +51,7 @@ import { ReassignRoleConfirmationModalComponent } from './settings-tab/templates
 import { ModeratorUnpublishExplorationModalComponent } from './settings-tab/templates/moderator-unpublish-exploration-modal.component';
 import { TransferExplorationOwnershipModalComponent } from './settings-tab/templates/transfer-exploration-ownership-modal.component';
 import { DeleteAudioTranslationModalComponent } from './translation-tab/modal-templates/delete-audio-translation-modal.component';
+import { TranslationTabBusyModalComponent } from './translation-tab/modal-templates/translation-tab-busy-modal.component';
 
 @NgModule({
   imports: [
@@ -83,7 +84,8 @@ import { DeleteAudioTranslationModalComponent } from './translation-tab/modal-te
     ReassignRoleConfirmationModalComponent,
     ModeratorUnpublishExplorationModalComponent,
     TransferExplorationOwnershipModalComponent,
-    DeleteAudioTranslationModalComponent
+    DeleteAudioTranslationModalComponent,
+    TranslationTabBusyModalComponent
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -106,7 +108,8 @@ import { DeleteAudioTranslationModalComponent } from './translation-tab/modal-te
     ReassignRoleConfirmationModalComponent,
     ModeratorUnpublishExplorationModalComponent,
     TransferExplorationOwnershipModalComponent,
-    DeleteAudioTranslationModalComponent
+    DeleteAudioTranslationModalComponent,
+    TranslationTabBusyModalComponent
   ],
   providers: [
     {

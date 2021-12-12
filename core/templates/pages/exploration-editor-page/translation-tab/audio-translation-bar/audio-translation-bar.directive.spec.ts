@@ -298,9 +298,9 @@ describe('Audio translation bar directive', function() {
   });
 
   it('should open translation busy modal on event', () => {
-    spyOn($uibModal, 'open').and.callThrough();
+    spyOn(ngbModal, 'open').and.callThrough();
     mockShowTranslationTabBusyModalEventEmitter.emit();
-    expect($uibModal.open).toHaveBeenCalled();
+    expect(ngbModal.open).toHaveBeenCalled();
   });
 
   it('should stop record when externalSave flag is broadcasted', function() {
@@ -518,13 +518,19 @@ describe('Audio translation bar directive', function() {
     });
 
   it('should open translation tab busy modal with $uibModal',
-    function() {
-      spyOn($uibModal, 'open').and.callThrough();
+    fakeAsync(() => {
+      spyOn(ngbModal, 'open').and.returnValue({
+        componentInstance: {
+          busyMessage: 'shivam thalwal'
+        },
+        result: Promise.resolve()
+      } as NgbModalRef);
 
       $scope.openTranslationTabBusyModal();
+      tick();
 
-      expect($uibModal.open).toHaveBeenCalled();
-    });
+      expect(ngbModal.open).toHaveBeenCalled();
+    }));
 
   it('should close translation tab busy modal with promise resolve',
     function() {
@@ -601,6 +607,9 @@ describe('Audio translation bar directive', function() {
     fakeAsync(() => {
       spyOn(stateRecordedVoiceoversService.displayed, 'deleteVoiceover');
       spyOn(ngbModal, 'open').and.returnValue({
+        componentInstance: {
+          busyMessage: 'busyMessage'
+        },
         result: Promise.resolve()
       } as NgbModalRef);
 

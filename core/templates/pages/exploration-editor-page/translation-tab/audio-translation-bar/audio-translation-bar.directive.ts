@@ -23,9 +23,6 @@ require('filters/format-timer.filter.ts');
 require(
   'pages/exploration-editor-page/translation-tab/modal-templates/' +
   'add-audio-translation-modal.controller.ts');
-require(
-  'pages/exploration-editor-page/translation-tab/modal-templates/' +
-  'translation-tab-busy-modal.controller.ts');
 
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
@@ -64,7 +61,7 @@ import WaveSurfer from 'wavesurfer.js';
 import { Subscription } from 'rxjs';
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { DeleteAudioTranslationModalComponent } from 'pages/exploration-editor-page/translation-tab/modal-templates/delete-audio-translation-modal.component';
-
+import { TranslationTabBusyModalComponent } from 'pages/exploration-editor-page/translation-tab/modal-templates/translation-tab-busy-modal.component';
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
@@ -373,16 +370,14 @@ angular.module('oppia').directive('audioTranslationBar', [
           };
 
           $scope.openTranslationTabBusyModal = function() {
-            $uibModal.open({
-              template: require(
-                'pages/exploration-editor-page/translation-tab/' +
-                'modal-templates/translation-tab-busy-modal.template.html'),
-              backdrop: true,
-              resolve: {
-                message: () => $scope.getTranslationTabBusyMessage()
-              },
-              controller: 'TranslationTabBusyModalController'
-            }).result.then(function() {}, function() {
+            const modalRef = NgbModal
+              .open(TranslationTabBusyModalComponent, {
+                backdrop: true,
+              });
+            modalRef.componentInstance.busyMessage =
+              $scope.getTranslationTabBusyMessage();
+
+            modalRef.result.then(function() {}, function() {
               // Note to developers:
               // This callback is triggered when the Cancel button is clicked.
               // No further action is needed.
