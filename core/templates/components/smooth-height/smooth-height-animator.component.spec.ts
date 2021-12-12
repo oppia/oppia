@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for Smooth Height animation component.
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { SmoothHeightAnimatorComponent } from './smooth-height-animator.component';
 
 describe('Smooth height animator component', () => {
@@ -38,10 +38,12 @@ describe('Smooth height animator component', () => {
     expect(componentInstance).toBeDefined();
   });
 
-  it('should trigger animation when trigger changes', () => {
+  it('should trigger animation when trigger changes', fakeAsync(() => {
     componentInstance.ngOnChanges();
+
+    tick(200);
 
     expect(componentInstance.startHeight).toBeDefined();
     expect(componentInstance.grow).toBeDefined();
-  });
+  }));
 });
