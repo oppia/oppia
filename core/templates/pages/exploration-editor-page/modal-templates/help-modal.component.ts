@@ -26,7 +26,7 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
   selector: 'oppia-help-modal',
   templateUrl: './help-modal.component.html'
 })
-export class HelpModalComponent implements OnInit{
+export class HelpModalComponent implements OnInit {
   EDITOR_TUTORIAL_MODE: string;
   TRANSLATION_TUTORIAL_MODE: string;
   explorationId: string;
@@ -41,26 +41,26 @@ export class HelpModalComponent implements OnInit{
     this.EDITOR_TUTORIAL_MODE = 'editor',
     this.TRANSLATION_TUTORIAL_MODE = 'translation';
     this.explorationId = (
-      this.contextService.getExplorationId())
+      this.contextService.getExplorationId());
   }
 
   beginEditorTutorial(): void {
     this.siteAnalyticsService
       .registerOpenTutorialFromHelpCenterEvent(
-        this.explorationId)
-    this.ngbActiveModal.close(this.EDITOR_TUTORIAL_MODE)
+        this.explorationId);
+    this.ngbActiveModal.close(this.EDITOR_TUTORIAL_MODE);
   }
 
   beginTranslationTutorial(): void {
     this.siteAnalyticsService
       .registerOpenTutorialFromHelpCenterEvent(
-        this.explorationId)
-    this.ngbActiveModal.close(this.TRANSLATION_TUTORIAL_MODE)
+        this.explorationId);
+    this.ngbActiveModal.close(this.TRANSLATION_TUTORIAL_MODE);
   }
 
   goToHelpCenter(): void {
     this.siteAnalyticsService.registerVisitHelpCenterEvent(
-      this.explorationId)
-    this.ngbActiveModal.dismiss('cancel')
+      this.explorationId);
+    this.ngbActiveModal.dismiss('cancel');
   }
 }

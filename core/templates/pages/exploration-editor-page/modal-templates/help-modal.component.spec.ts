@@ -52,9 +52,9 @@ describe('Help Modal Component', function() {
       providers: [{
         provide: NgbActiveModal,
         useClass: MockActiveModal
-       },
-        SiteAnalyticsService,
-        ContextService
+      },
+      SiteAnalyticsService,
+      ContextService
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -68,12 +68,12 @@ describe('Help Modal Component', function() {
     ngbActiveModal = TestBed.inject(NgbActiveModal);
 
     spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
-    
+
     fixture.detectChanges();
   });
 
   it('should begin editor tutorial when closing the modal', () => {
-    spyOn(ngbActiveModal,'close');
+    spyOn(ngbActiveModal, 'close');
     registerOpenTutorialFromHelpCenterEventSpy = spyOn(
       siteAnalyticsService, 'registerOpenTutorialFromHelpCenterEvent');
 
@@ -85,7 +85,7 @@ describe('Help Modal Component', function() {
   });
 
   it('should begin translation tutorial when closing the modal', () => {
-    spyOn(ngbActiveModal,'close');
+    spyOn(ngbActiveModal, 'close');
     registerOpenTutorialFromHelpCenterEventSpy = spyOn(
       siteAnalyticsService, 'registerOpenTutorialFromHelpCenterEvent');
 
@@ -97,9 +97,9 @@ describe('Help Modal Component', function() {
   });
 
   it('should dismiss modal when changing to help center', () => {
-    spyOn(ngbActiveModal,'dismiss');
+    spyOn(ngbActiveModal, 'dismiss');
     registerVisitHelpCenterEventSpy = spyOn(
-       siteAnalyticsService, 'registerVisitHelpCenterEvent');
+      siteAnalyticsService, 'registerVisitHelpCenterEvent');
 
     component.goToHelpCenter();
 

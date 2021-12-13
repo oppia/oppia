@@ -260,7 +260,7 @@ describe('StateHintsEditorComponent', () => {
     expect($uibModal.open).not.toHaveBeenCalled();
   });
 
-  fit('should open add hints modal when user clicks on add hint button',
+  it('should open add hints modal when user clicks on add hint button',
     fakeAsync(() => {
       $scope.StateHintsService.displayed = [
         {

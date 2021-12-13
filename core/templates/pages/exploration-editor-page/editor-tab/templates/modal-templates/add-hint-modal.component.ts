@@ -24,9 +24,9 @@ import { AppConstants } from 'app.constants';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { StateHintsService } from 'components/state-editor/state-editor-properties-services/state-hints.service';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
-import { cloneDeep } from 'lodash';
 import { ContextService } from 'services/context.service';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
+import cloneDeep from 'lodash/cloneDeep';
 
 interface HintFormSchema {
   type: string;
