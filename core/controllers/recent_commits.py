@@ -17,7 +17,6 @@
 from __future__ import annotations
 
 from core import feconf
-from core import python_utils
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import exp_services

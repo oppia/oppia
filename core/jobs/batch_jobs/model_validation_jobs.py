@@ -20,7 +20,6 @@ from __future__ import annotations
 
 import collections
 
-from core import python_utils
 from core.jobs import base_jobs
 from core.jobs import job_utils
 from core.jobs.io import ndb_io
