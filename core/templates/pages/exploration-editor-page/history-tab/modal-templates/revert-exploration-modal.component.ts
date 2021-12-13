@@ -16,11 +16,11 @@
  * @fileoverview Component for revert exploration modal.
  */
 
-import { Component, Input } from "@angular/core";
-import { NgbActiveModal } from "@ng-bootstrap/ng-bootstrap";
+import { Component, Input } from '@angular/core';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
-import { ConfirmOrCancelModal } from "components/common-layout-directives/common-elements/confirm-or-cancel-modal.component";
-import { ExplorationDataService } from "pages/exploration-editor-page/services/exploration-data.service";
+import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
 
 @Component({
   selector: 'oppia-revert-exploration-modal',
