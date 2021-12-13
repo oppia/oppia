@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Jobs that are run by CRON scheduler."""
+"""Jobs used for migrating the story models."""
 
 from __future__ import annotations
 
@@ -53,7 +53,7 @@ class MigrateStoryJob(base_jobs.JobBase):
     @staticmethod
     def _migrate_story(
         story_id: str, story_model: story_models.StoryModel
-    ) -> result.Result[story_domain.Story, Exception]:
+    ) -> result.Result[Tuple[str, story_domain.Story], Tuple[str, Exception]]:
         """Migrates story and transform story model into story object.
 
         Args:
@@ -61,8 +61,8 @@ class MigrateStoryJob(base_jobs.JobBase):
             story_model: StoryModel. The story model to migrate.
 
         Returns:
-            Result(Story,Exception). Story object when the migration
-            was successful or Exception when the migration failed.
+            Result((str, Story), (str, Exception)). Story object when
+            the migration was successful or Exception when the migration failed.
         """
         try:
             story = story_fetchers.get_story_from_model(story_model)
@@ -84,11 +84,11 @@ class MigrateStoryJob(base_jobs.JobBase):
 
         Args:
             story_id: str. The id of the story.
-            story_model: StoryModel. The story for which generate
+            story_model: StoryModel. The story for which to generate
                 the change objects.
 
         Yields:
-            (str,StoryChange). Iterable of story change objects.
+            (str, StoryChange). Iterable of story change objects.
         """
         schema_version = story_model.story_contents_schema_version
         if schema_version < feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION:
@@ -136,7 +136,7 @@ class MigrateStoryJob(base_jobs.JobBase):
             sequence(BaseModel). Sequence of models which should be put into
             the datastore.
         """
-        updated_story_model = story_services.populate_story_model_with_story(
+        updated_story_model = story_services.populate_story_model_fields(
             story_model, migrated_story)
         change_dicts = [story_change.to_dict()]
         models_to_put = updated_story_model.compute_models_to_commit(
@@ -169,7 +169,7 @@ class MigrateStoryJob(base_jobs.JobBase):
         story_summary = story_services.compute_summary_of_story(migrated_story)
         story_summary.version += 1
         updated_story_summary_model = (
-            story_services.populate_story_summary_model_with_story_summary(
+            story_services.populate_story_summary_model_fields(
                 story_summary_model, story_summary
             )
         )

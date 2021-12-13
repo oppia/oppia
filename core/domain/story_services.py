@@ -396,12 +396,13 @@ def validate_explorations_for_story(exp_ids, strict):
     return validation_error_messages
 
 
-def populate_story_model_with_story(story_model, story):
+def populate_story_model_fields(story_model, story):
     """Populate story model with the data from story object.
 
     Args:
         story_model: StoryModel. The model to populate.
-        story: Story. The object from which is the model populated.
+        story: Story. The story domain object which should be used to
+            populate the model.
 
     Returns:
         StoryModel. Populated model.
@@ -479,7 +480,7 @@ def _save_story(
             'which is too old. Please reload the page and try again.'
             % (story_model.version, story.version))
 
-    story_model = populate_story_model_with_story(story_model, story)
+    story_model = populate_story_model_fields(story_model, story)
     change_dicts = [change.to_dict() for change in change_list]
     story_model.commit(committer_id, commit_message, change_dicts)
     caching_services.delete_multi(
@@ -682,15 +683,13 @@ def create_story_summary(story_id):
     save_story_summary(story_summary)
 
 
-def populate_story_summary_model_with_story_summary(
-    story_summary_model, story_summary
-):
+def populate_story_summary_model_fields(story_summary_model, story_summary):
     """Populate story summary model with the data from story summary object.
 
     Args:
         story_summary_model: StorySummaryModel. The model to populate.
-        story_summary: StorySummary. The object from which is the model
-            populated.
+        story_summary: StorySummary. The story summary domain object which
+            should be used to populate the model.
 
     Returns:
         StorySummaryModel. Populated model.
@@ -729,7 +728,7 @@ def save_story_summary(story_summary):
     """
     existing_skill_summary_model = (
         story_models.StorySummaryModel.get_by_id(story_summary.id))
-    story_summary_model = populate_story_summary_model_with_story_summary(
+    story_summary_model = populate_story_summary_model_fields(
         existing_skill_summary_model, story_summary
     )
     story_summary_model.update_timestamps()

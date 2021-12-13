@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Jobs that are run by CRON scheduler."""
+"""Jobs used for migrating the skill models."""
 
 from __future__ import annotations
 
@@ -54,7 +54,7 @@ class MigrateSkillJob(base_jobs.JobBase):
     @staticmethod
     def _migrate_skill(
         skill_id: str, skill_model: skill_models.SkillModel
-    ) -> result.Result[skill_domain.Skill, Exception]:
+    ) -> result.Result[Tuple[str, skill_domain.Skill], Tuple[str, Exception]]:
         """Migrates skill and transform skill model into skill object.
 
         Args:
@@ -62,8 +62,8 @@ class MigrateSkillJob(base_jobs.JobBase):
             skill_model: SkillModel. The skill model to migrate.
 
         Returns:
-            Result(Skill,Exception). Skill object when the migration
-            was successful or Exception when the migration failed.
+            Result((str, Skill), (str, Exception)). Skill object when
+            the migration was successful or Exception when the migration failed.
         """
         try:
             skill = skill_fetchers.get_skill_from_model(skill_model)
@@ -83,11 +83,11 @@ class MigrateSkillJob(base_jobs.JobBase):
 
         Args:
             skill_id: str. The id of the skill.
-            skill_model: SkillModel. The skill for which generate
+            skill_model: SkillModel. The skill for which to generate
                 the change objects.
 
         Yields:
-            (str,SkillChange). Iterable of skill change objects.
+            (str, SkillChange). Iterable of skill change objects.
         """
         contents_version = skill_model.skill_contents_schema_version
         if contents_version < feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION:
@@ -159,7 +159,7 @@ class MigrateSkillJob(base_jobs.JobBase):
             the datastore.
         """
         updated_skill_model = (
-            skill_services.populate_skill_model_with_skill(
+            skill_services.populate_skill_model_fields(
                 skill_model, migrated_skill))
         commit_message = (
             'Update skill content schema version to %d and '
@@ -200,7 +200,7 @@ class MigrateSkillJob(base_jobs.JobBase):
         skill_summary = skill_services.compute_summary_of_skill(migrated_skill)
         skill_summary.version += 1
         updated_skill_summary_model = (
-            skill_services.populate_skill_summary_model_with_skill_summary(
+            skill_services.populate_skill_summary_model_fields(
                 skill_summary_model, skill_summary
             )
         )

@@ -727,12 +727,13 @@ def apply_change_list(skill_id, change_list, committer_id):
         raise e
 
 
-def populate_skill_model_with_skill(skill_model, skill):
+def populate_skill_model_fields(skill_model, skill):
     """Populate skill model with the data from skill object.
 
     Args:
         skill_model: SkillModel. The model to populate.
-        skill: Skill. The object from which is the model populated.
+        skill: Skill. The skill domain object which should be used to
+            populate the model.
 
     Returns:
         SkillModel. Populated model.
@@ -797,7 +798,7 @@ def _save_skill(committer_id, skill, commit_message, change_list):
             'which is too old. Please reload the page and try again.'
             % (skill_model.version, skill.version))
 
-    skill_model = populate_skill_model_with_skill(skill_model, skill)
+    skill_model = populate_skill_model_fields(skill_model, skill)
     change_dicts = [change.to_dict() for change in change_list]
     skill_model.commit(committer_id, commit_message, change_dicts)
     caching_services.delete_multi(
@@ -922,15 +923,13 @@ def create_skill_summary(skill_id):
     save_skill_summary(skill_summary)
 
 
-def populate_skill_summary_model_with_skill_summary(
-    skill_summary_model, skill_summary
-):
+def populate_skill_summary_model_fields(skill_summary_model, skill_summary):
     """Populate skill summary model with the data from skill summary object.
 
     Args:
         skill_summary_model: SkillSummaryModel. The model to populate.
-        skill_summary: SkillSummary. The object from which is the model
-            populated.
+        skill_summary: SkillSummary. The skill summary domain object which
+            should be used to populate the model.
 
     Returns:
         SkillSummaryModel. Populated model.
@@ -964,7 +963,7 @@ def save_skill_summary(skill_summary):
     """
     existing_skill_summary_model = (
         skill_models.SkillSummaryModel.get_by_id(skill_summary.id))
-    skill_summary_model = populate_skill_summary_model_with_skill_summary(
+    skill_summary_model = populate_skill_summary_model_fields(
         existing_skill_summary_model, skill_summary
     )
     skill_summary_model.update_timestamps()

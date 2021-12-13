@@ -910,8 +910,8 @@ class VersionedModel(BaseModel):
             instance_id, VERSION_DELIMITER, version_number)
 
     def _prepare_additional_models(self) -> Mapping[str, BaseModel]:
-        """Prepares additional models needed for the commit process. The dict
-        is empty by default  and this method should be overriden in models that
+        """Prepares additional models needed for the commit process. The return
+        value is empty dict and this method should be overriden in models that
         inherit from VersionedModel.
 
         Returns:
