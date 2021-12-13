@@ -295,7 +295,7 @@ describe('History tab component', function() {
       $rootScope.$apply();
       expect(spyObj).toHaveBeenCalled();
       expect(windowRef.nativeWindow.location.reload).toHaveBeenCalled();
-  }));
+    }));
 
   it('should not reload page when dismissing revert exploration modal',
     function() {

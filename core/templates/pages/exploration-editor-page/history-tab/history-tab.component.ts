@@ -43,12 +43,12 @@ require('services/ngb-modal.service.ts');
 angular.module('oppia').component('historyTab', {
   template: require('./history-tab.component.html'),
   controller: [
-    '$log', '$rootScope', '$uibModal', 'CompareVersionsService',
+    '$log', '$rootScope', 'CompareVersionsService',
     'DateTimeFormatService', 'EditabilityService', 'ExplorationDataService',
     'HistoryTabBackendApiService', 'LoaderService', 'NgbModal',
     'RouterService', 'VersionTreeService', 'WindowRef',
     function(
-        $log, $rootScope, $uibModal, CompareVersionsService,
+        $log, $rootScope, CompareVersionsService,
         DateTimeFormatService, EditabilityService, ExplorationDataService,
         HistoryTabBackendApiService, LoaderService, NgbModal,
         RouterService, VersionTreeService, WindowRef) {

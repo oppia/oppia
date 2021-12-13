@@ -46,15 +46,15 @@ describe('Revert Exploration Modal Component', function() {
     TestBed.configureTestingModule({
       declarations: [
         RevertExplorationModalComponent
-    ],
+      ],
       providers: [{
         provide: NgbActiveModal,
         useClass: MockActiveModal
-    },
-    {
+      },
+      {
         provide: ExplorationDataService,
         useClass: MockExplorationDataService
-    }],
+      }],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));
