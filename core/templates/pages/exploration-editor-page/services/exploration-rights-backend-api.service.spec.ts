@@ -45,11 +45,11 @@ describe('Exploration Rights Backend Api Service', () => {
     () => {
       let requestData = {
         version: 3,
-        make_communityOwned: true
+        make_community_owned: true
       };
 
       service.makeCommunityOwnedPutData(
-        'oppia12345', requestData.version, requestData.make_communityOwned
+        'oppia12345', requestData.version, requestData.make_community_owned
       ).then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
