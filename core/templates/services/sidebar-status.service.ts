@@ -55,13 +55,17 @@ export class SidebarStatusService {
     this._closeSidebar();
   }
 
-  hamburgerIconStatus(event: Event): void {
+  toggleHamburgerIconStatus(event: Event): void {
     if (!this.hamburgerIconClicked) {
       this.hamburgerIconClicked = true;
       event.stopPropagation();
     } else {
       this.hamburgerIconClicked = false;
     }
+  }
+
+  isHamburgerIconclicked(): boolean {
+    return this.hamburgerIconClicked;
   }
 
   toggleSidebar(): void {
