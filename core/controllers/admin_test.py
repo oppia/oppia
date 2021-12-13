@@ -63,8 +63,8 @@ from core.tests import test_utils
 BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
 BOTH_MODERATOR_AND_ADMIN_USERNAME = 'moderatorandadm1n'
 
-# TODO(#14419): Change naming style of Enum class and values.
 
+# TODO(#14419): Change naming style of Enum class and values.
 class PARAM_NAMES(enum.Enum): # pylint: disable=invalid-name
     """Enum for parameter names."""
 
