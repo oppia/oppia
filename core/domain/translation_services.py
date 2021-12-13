@@ -20,7 +20,6 @@ from __future__ import annotations
 
 import logging
 
-from core.domain import translation_fetchers
 from core.platform import models
 
 translate_services = models.Registry.import_translate_services()

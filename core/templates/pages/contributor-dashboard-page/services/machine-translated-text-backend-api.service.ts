@@ -46,7 +46,6 @@ export class MachineTranslatedTextBackendApiService {
           target_language_code: targetLanguageCode
         }
       }).toPromise().then(response => {
-        console.log(response.translated_texts)
       return response.translated_texts;
     });
   }
