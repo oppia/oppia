@@ -24,6 +24,7 @@ import { AppConstants } from 'app.constants';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { StateHintsService } from 'components/state-editor/state-editor-properties-services/state-hints.service';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
+import { cloneDeep } from 'lodash';
 import { ContextService } from 'services/context.service';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
 
@@ -85,7 +86,7 @@ export class AddHintModalComponent
       this.COMPONENT_NAME_HINT);
     // Close the modal and save it afterwards.
     this.ngbActiveModal.close({
-      hint: angular.copy(
+      hint: cloneDeep(
         this.hintObjectFactory.createNew(contentId, this.tmpHint)),
       contentId: contentId
     });

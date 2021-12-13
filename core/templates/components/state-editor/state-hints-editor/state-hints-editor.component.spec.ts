@@ -20,12 +20,16 @@ import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
+class MockNgbModalRef {
+  componentInstance = {};
+}
+
 describe('StateHintsEditorComponent', () => {
   let ctrl = null;
   let $rootScope = null;
   let $scope = null;
   let $uibModal = null;
-  let ngbModal: NgbModal = null;
+  let ngbModal: NgbModal;
   let $q = null;
 
   let WindowDimensionsService = null;
@@ -64,6 +68,7 @@ describe('StateHintsEditorComponent', () => {
     AlertsService = $injector.get('AlertsService');
 
     ctrl = $componentController('stateHintsEditor', {
+      NgbModal: ngbModal,
       $scope: $scope
     }, {
       onSaveHints: () => {},
@@ -255,7 +260,7 @@ describe('StateHintsEditorComponent', () => {
     expect($uibModal.open).not.toHaveBeenCalled();
   });
 
-  it('should open add hints modal when user clicks on add hint button',
+  fit('should open add hints modal when user clicks on add hint button',
     fakeAsync(() => {
       $scope.StateHintsService.displayed = [
         {
@@ -265,7 +270,7 @@ describe('StateHintsEditorComponent', () => {
         }
       ];
       spyOn(ngbModal, 'open').and.returnValue({
-        componentInstance: NgbModalRef,
+        componentInstance: new MockNgbModalRef(),
         result: Promise.resolve({
           hint: {
             hintContent: {
@@ -293,7 +298,7 @@ describe('StateHintsEditorComponent', () => {
       ]);
     }));
 
-  it('should close add hint modal when user clicks cancel', () => {
+  it('should close add hint modal when user clicks cancel', fakeAsync(() => {
     $scope.StateHintsService.displayed = [
       {
         hintContent: {
@@ -301,15 +306,17 @@ describe('StateHintsEditorComponent', () => {
         }
       }
     ];
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.reject()
-    });
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: new MockNgbModalRef(),
+      result: Promise.reject()
+    } as NgbModalRef);
 
     $scope.openAddHintModal();
+    tick();
     $scope.$apply();
 
-    expect($uibModal.open).toHaveBeenCalled();
-  });
+    expect(ngbModal.open).toHaveBeenCalled();
+  }));
 
   it('should open delete hint modal when user clicks on' +
     ' delete hint button', () => {
