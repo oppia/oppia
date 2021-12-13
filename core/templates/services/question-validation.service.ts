@@ -21,7 +21,7 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { Question } from 'domain/question/QuestionObjectFactory';
-import { Misconception } from 'domain/skill/MisconceptionObjectFactory';
+import { MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
 
 @Injectable({
   providedIn: 'root'
@@ -33,7 +33,7 @@ export class QuestionValidationService {
 
   isQuestionValid(
       question: Question,
-      misconceptionsBySkill: Record<string, Misconception[]>): boolean {
+      misconceptionsBySkill: MisconceptionSkillMap): boolean {
     return !(
       question.getValidationErrorMessage() ||
       question.getUnaddressedMisconceptionNames(

@@ -209,12 +209,6 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_files': (),
         'excluded_dirs': ()
     },
-    {
-        'regexp': re.compile(r'urllib(2)?\..*Request\('),
-        'message': 'Please use python_utils.url_request().',
-        'excluded_files': ('core/python_utils.py', 'core/python_utils_test.py'),
-        'excluded_dirs': ()
-    },
 ]
 
 BAD_PATTERNS_MAP = {
