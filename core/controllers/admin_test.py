@@ -70,7 +70,7 @@ class PARAM_NAMES(enum.Enum): # pylint: disable=invalid-name
     test_feature_1 = 'test_feature_1' # pylint: disable=invalid-name
 
 
-FEATURE_STAGES = platform_parameter_domain.FEATURE_STAGES # pylint: disable=invalid-name
+FEATURE_STAGES = platform_parameter_domain.FEATURE_STAGES
 
 
 class AdminIntegrationTest(test_utils.GenericTestBase):
