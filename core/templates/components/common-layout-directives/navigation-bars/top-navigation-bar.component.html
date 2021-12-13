@@ -1,7 +1,7 @@
 <div [ngClass]="{'rtl-navbar-header': isLanguageRTL(), 'float-right': isLanguageRTL(), 'float-left': !isLanguageRTL()}"
      class="navbar-header protractor-test-navbar-header">
   <a *ngIf="windowIsNarrow"
-     (click)="toggleSidebar()"
+     (click)="toggleSidebar($event)"
      class="navbar-brand oppia-navbar-menu oppia-transition-200 protractor-mobile-test-navbar-button ml-0"
      tabindex="0">
     <i class="material-icons oppia-navbar-menu-icon"
