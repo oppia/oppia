@@ -532,7 +532,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         # 'should_end_with' validator. The dict needs to be swapped
         # seperately as it is a class variable.
         mock_audio_upload_handler_args_schema = {
-        'POST': {
+            'POST': {
                 'raw_audio_file': {
                     'schema': {
                         'type': 'basestring',

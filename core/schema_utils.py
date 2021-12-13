@@ -706,6 +706,4 @@ class _Validators:
         if match_case is False:
             extension = extension.lower()
             choices = [choice.lower() for choice in choices]
-        if extension not in choices:
-            return False
-        return True
+        return extension in choices
