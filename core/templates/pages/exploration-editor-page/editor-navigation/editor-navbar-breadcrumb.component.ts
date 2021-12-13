@@ -29,11 +29,11 @@ import { Subscription } from 'rxjs';
 angular.module('oppia').component('editorNavbarBreadcrumb', {
   template: require('./editor-navbar-breadcrumb.component.html'),
   controller: [
-    '$rootScope', '$scope', 'ExplorationPropertyService',
+    '$rootScope', '$scope',
     'ExplorationTitleService', 'FocusManagerService', 'RouterService',
     'EXPLORATION_TITLE_INPUT_FOCUS_LABEL',
     function(
-        $rootScope, $scope, ExplorationPropertyService,
+        $rootScope, $scope,
         ExplorationTitleService, FocusManagerService, RouterService,
         EXPLORATION_TITLE_INPUT_FOCUS_LABEL) {
       var ctrl = this;
@@ -65,7 +65,7 @@ angular.module('oppia').component('editorNavbarBreadcrumb', {
       ctrl.$onInit = function() {
         $scope.navbarTitle = null;
         ctrl.directiveSubscriptions.add(
-          ExplorationPropertyService.onExplorationPropertyChanged.subscribe(
+          ExplorationTitleService.onExplorationPropertyChanged.subscribe(
             (propertyName) => {
               if (propertyName === ExplorationTitleService.propertyName) {
                 const _MAX_TITLE_LENGTH = 20;
