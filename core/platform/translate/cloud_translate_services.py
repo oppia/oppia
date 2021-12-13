@@ -30,9 +30,6 @@ CLIENT = translate.Client(
         auth.credentials.AnonymousCredentials()
         if constants.EMULATOR_MODE else auth.default()[0]))
 
-# List of languages with adequate Google Translate accuracy.
-LANGUAGE_CODE_ALLOWLIST = ('en', 'es', 'fr', 'zh', 'pt')
-
 
 def translate_text(
         text: str, source_language: str, target_language: str
@@ -57,9 +54,11 @@ def translate_text(
     Returns:
         str. The translated text.
     """
-    if source_language not in LANGUAGE_CODE_ALLOWLIST:
+    if source_language not in (
+            constants.ALLOWED_MACHINE_TRANSLATION_LANGUAGE_CODES):
         raise ValueError('Invalid source language code: %s' % source_language)
-    if target_language not in LANGUAGE_CODE_ALLOWLIST:
+    if target_language not in (
+            constants.ALLOWED_MACHINE_TRANSLATION_LANGUAGE_CODES):
         raise ValueError('Invalid target language code: %s' % target_language)
     if source_language == target_language:
         return text

@@ -217,6 +217,7 @@ import { ContributorDashboardAdminBackendApiService } from 'pages/contributor-da
 import { ContributionOpportunitiesService } from 'pages/contributor-dashboard-page/services/contribution-opportunities.service';
 import { TranslateTextBackendApiService } from 'pages/contributor-dashboard-page/services/translate-text-backend-api.service';
 import { TranslateTextService } from 'pages/contributor-dashboard-page/services/translate-text.service';
+import { MachineTranslatedTextBackendApiService } from 'pages/contributor-dashboard-page/services/machine-translated-text-backend-api.service';
 import { EmailDashboardDataService } from 'pages/email-dashboard-pages/email-dashboard-data.service';
 import { InteractionDetailsCacheService } from 'pages/exploration-editor-page/editor-tab/services/interaction-details-cache.service';
 import { ResponsesService } from 'pages/exploration-editor-page/editor-tab/services/responses.service';
@@ -594,6 +595,8 @@ export const angularServices: [string, Type<{}>][] = [
   ['LocalStorageService', LocalStorageService],
   ['LoggerService', LoggerService],
   ['LostChangeObjectFactory', LostChangeObjectFactory],
+  ['MachineTranslatedTextBackendApiService',
+    MachineTranslatedTextBackendApiService],
   ['MathEquationInputRulesService', MathEquationInputRulesService],
   ['MathEquationInputValidationService', MathEquationInputValidationService],
   ['MathInteractionsService', MathInteractionsService],

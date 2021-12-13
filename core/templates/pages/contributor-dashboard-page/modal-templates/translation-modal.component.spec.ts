@@ -23,8 +23,11 @@ import { ComponentFixture, fakeAsync, flushMicrotasks, TestBed, waitForAsync } f
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
 import { CkEditorCopyContentService } from 'components/ck-editor-helpers/ck-editor-copy-content.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { TranslationModalComponent, TranslationOpportunity } from 'pages/contributor-dashboard-page/modal-templates/translation-modal.component';
+import { TranslatableItem } from 'domain/opportunity/translatable-content.model';
+import { MachineTranslatedTextBackendDict } from 'pages/contributor-dashboard-page/services/machine-translated-text-backend-api.service';
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import { ContextService } from 'services/context.service';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
@@ -43,6 +46,7 @@ describe('Translation Modal Component', () => {
   let ckEditorCopyContentService: CkEditorCopyContentService;
   let siteAnalyticsService: SiteAnalyticsService;
   let imageLocalStorageService: ImageLocalStorageService;
+  let urlInterpolationService: UrlInterpolationService;
   let userService: UserService;
   let activeModal: NgbActiveModal;
   let httpTestingController: HttpTestingController;
@@ -100,6 +104,7 @@ describe('Translation Modal Component', () => {
     translateTextService = TestBed.inject(TranslateTextService);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
     translationLanguageService = TestBed.inject(TranslationLanguageService);
     translationLanguageService.setActiveLanguageCode('es');
     userService = TestBed.inject(UserService);
@@ -247,6 +252,49 @@ describe('Translation Modal Component', () => {
     });
   });
 
+  describe('with a machine translatable translation language', () => {
+    beforeEach(fakeAsync(() => {
+      translationLanguageService.setActiveLanguageCode('es');
+      component.ngOnInit();
+      const sampleStateWiseContentMapping = {
+        stateName1: {contentId1: 'Please continue'}
+      };
+
+      const req = httpTestingController.expectOne(
+        '/gettranslatabletexthandler?exp_id=1&language_code=es');
+      expect(req.request.method).toEqual('GET');
+      req.flush({
+        state_names_to_content_id_mapping: sampleStateWiseContentMapping,
+        version: 1
+      });
+      flushMicrotasks();
+    }));
+
+    it('should offer translation', () => {
+      expect(component.languageSupportsMachineTranslations).toBeTrue();
+    });
+
+    it('should not retrieve translation until dropdown chevron is clicked',
+      fakeAsync(() => {
+        expect(component.hideMachineTranslation).toBeTrue();
+        component.toggleMachineTranslation();
+        const sampleMachineTranslationResponse:
+        MachineTranslatedTextBackendDict = {
+          translated_texts: {contentId1: new TranslatableItem(
+            'Por favor continua.', 'html', 'content', null, null)}
+        };
+        const req = httpTestingController.expectOne(
+          '/machine_translated_state_texts_handler?exp_id=1&state_name=' +
+          'stateName1&content_ids=%5B%22contentId1%22%5D&' +
+          'target_language_code=es');
+        expect(req.request.method).toEqual('GET');
+        req.flush(sampleMachineTranslationResponse);
+        flushMicrotasks();
+        expect(component.hideMachineTranslation).toBeFalse();
+        expect(component.machineTranslatedText.content).toBe('Por favor continua.');
+      }));
+  });
+
   describe('when clicking on the translatable content', () => {
     const nonParagraphTarget: HTMLElement = document.createElement('div');
     const mathTarget: HTMLElement = document.createElement(
@@ -325,13 +373,19 @@ describe('Translation Modal Component', () => {
           version: 1
         });
         flushMicrotasks();
-        component.skipActiveTranslation();
       }));
 
 
       it('should retrieve remaining text and availability', () => {
+        component.skipActiveTranslation();
         expect(component.textToTranslate).toBe('text2');
         expect(component.moreAvailable).toBeFalse();
+      });
+
+      it('should hide the machine translation', () => {
+        component.hideMachineTranslation = false;
+        component.skipActiveTranslation();
+        expect(component.hideMachineTranslation).toBeTrue();
       });
     });
   });

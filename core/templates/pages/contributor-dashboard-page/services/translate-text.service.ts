@@ -23,12 +23,14 @@ import { ImagesData } from 'services/image-local-storage.service';
 
 import { TranslateTextBackendApiService } from './translate-text-backend-api.service';
 import { TranslatableTexts } from 'domain/opportunity/translatable-texts.model';
+import { TranslatableItem } from 'domain/opportunity/translatable-content.model';
+import { MachineTranslatedTextBackendApiService } from './machine-translated-text-backend-api.service';
 import {
   TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING,
   TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING
 } from 'domain/exploration/WrittenTranslationObjectFactory';
 
-export interface TranslatableItem {
+export interface TranslatableObject {
   translation: string | string[];
   status: Status;
   text: string | string[];
@@ -76,7 +78,9 @@ export class TranslateTextService {
 
   constructor(
     private translateTextBackedApiService:
-      TranslateTextBackendApiService
+      TranslateTextBackendApiService,
+    private machineTranslatedTextBackendApiService:
+      MachineTranslatedTextBackendApiService
   ) { }
 
   private _getNextText(): string | string[] {
@@ -125,7 +129,7 @@ export class TranslateTextService {
       more: boolean,
       status: Status,
       translation: string
-  ): TranslatableItem {
+  ): TranslatableObject {
     const {
       dataFormat,
       contentType,
@@ -201,7 +205,7 @@ export class TranslateTextService {
     return this.activeIndex;
   }
 
-  getTextToTranslate(): TranslatableItem {
+  getTextToTranslate(): TranslatableObject {
     const text = this._getNextText();
     const {
       status = this.PENDING,
@@ -211,7 +215,7 @@ export class TranslateTextService {
       text, this._isMoreTextAvailableForTranslation(), status, translation);
   }
 
-  getPreviousTextToTranslate(): TranslatableItem {
+  getPreviousTextToTranslate(): TranslatableObject {
     const text = this._getPreviousText();
     const {
       status = this.PENDING,
@@ -246,6 +250,18 @@ export class TranslateTextService {
         errorCallback(errorResponse.error.error);
       }
     });
+  }
+
+  getMachineTranslationAsync(languageCode: string): Promise<TranslatableItem> {
+    return this.machineTranslatedTextBackendApiService
+      .getMachineTranslatedStateTextsAsync(
+        this.activeExpId,
+        this.activeStateName,
+        [this.activeContentId],
+        languageCode
+      ).then(contentIdToContentMapping => {
+        return contentIdToContentMapping[this.activeContentId];
+      });
   }
 }
 

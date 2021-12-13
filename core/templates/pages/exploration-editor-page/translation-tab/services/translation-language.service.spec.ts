@@ -79,5 +79,20 @@ describe('Translation language service', () => {
           translationLanguageService.getActiveLanguageDescription())
           .toBeNull();
       });
+
+    it('should show if the active language is machine translatable', () => {
+      expect(
+        translationLanguageService.isActiveLanguageMachineTranslatable()
+      ).toBeFalse();
+      translationLanguageService.setActiveLanguageCode('es');
+      expect(
+        translationLanguageService.isActiveLanguageMachineTranslatable()
+      ).toBeTrue();
+      // Hindi (hi) is not an allowlisted language code.
+      translationLanguageService.setActiveLanguageCode('hi');
+      expect(
+        translationLanguageService.isActiveLanguageMachineTranslatable()
+      ).toBeFalse();
+    });
   });
 });

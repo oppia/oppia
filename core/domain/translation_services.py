@@ -51,8 +51,6 @@ def get_and_cache_machine_translation(
         target_language_code,
         source_text.strip()
     )
-    if translation is not None:
-        return translation.translated_text
 
     translated_text = None
     try:

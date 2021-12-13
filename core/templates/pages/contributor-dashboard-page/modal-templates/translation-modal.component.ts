@@ -27,8 +27,9 @@ import { CkEditorCopyContentService } from 'components/ck-editor-helpers/ck-edit
 import { ContextService } from 'services/context.service';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { Status, TranslatableItem, TranslateTextService } from 'pages/contributor-dashboard-page/services/translate-text.service';
+import { Status, TranslatableObject, TranslateTextService } from 'pages/contributor-dashboard-page/services/translate-text.service';
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { UserService } from 'services/user.service';
 import { AppConstants } from 'app.constants';
 import constants from 'assets/constants';
@@ -99,6 +100,9 @@ export class TranslationModalComponent {
   loadingData = true;
   moreAvailable = false;
   textToTranslate: string | string[] = '';
+  languageSupportsMachineTranslations = false;
+  hideMachineTranslation = true;
+  machineTranslatedText = null;
   languageDescription: string;
   activeStatus: Status;
   HTML_SCHEMA: {
@@ -135,6 +139,7 @@ export class TranslationModalComponent {
     private readonly siteAnalyticsService: SiteAnalyticsService,
     private readonly translateTextService: TranslateTextService,
     private readonly translationLanguageService: TranslationLanguageService,
+    private readonly urlInterpolationService: UrlInterpolationService,
     private readonly userService: UserService,
     private readonly changeDetectorRef: ChangeDetectorRef
   ) {
@@ -153,6 +158,8 @@ export class TranslationModalComponent {
     this.contextService.setImageSaveDestinationToLocalStorage();
     this.languageDescription = (
       this.translationLanguageService.getActiveLanguageDescription());
+    this.languageSupportsMachineTranslations = (
+      this.translationLanguageService.isActiveLanguageMachineTranslatable());
     this.translateTextService.init(
       this.opportunity.id,
       this.translationLanguageService.getActiveLanguageCode(),
@@ -210,7 +217,7 @@ export class TranslationModalComponent {
     return this.SET_OF_STRINGS_SCHEMA;
   }
 
-  updateActiveState(translatableItem: TranslatableItem): void {
+  updateActiveState(translatableItem: TranslatableObject): void {
     (
       {
         text: this.textToTranslate,
@@ -257,6 +264,17 @@ export class TranslationModalComponent {
     return target.localName === 'p' && !mathElementsIncluded;
   }
 
+  toggleMachineTranslation(): void {
+    this.hideMachineTranslation = !this.hideMachineTranslation;
+    if (!this.hideMachineTranslation) {
+      this.translateTextService.getMachineTranslationAsync(
+        this.activeLanguageCode
+      ).then(machineTranslatedText => {
+        this.machineTranslatedText = machineTranslatedText;
+      });
+    }
+  }
+
   isCopyModeActive(): boolean {
     return this.ckEditorCopyContentService.copyModeActive;
   }
@@ -278,6 +296,8 @@ export class TranslationModalComponent {
     this.updateActiveState(translatableItem);
     ({more: this.moreAvailable} = translatableItem);
     this.resetEditor();
+    this.hideMachineTranslation = true;
+    this.machineTranslatedText = null;
   }
 
   isSubmitted(): boolean {
@@ -350,6 +370,10 @@ export class TranslationModalComponent {
       descriptions: this.getElementAttributeTexts(
         htmlElements, 'caption-with-value')
     };
+  }
+
+  getStaticImageUrl(imagePath: string): string {
+    return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
   hasSomeDuplicateElements(

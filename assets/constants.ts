@@ -5352,6 +5352,8 @@ export default {
     "speechSynthesisCodeMobile": "en_US"
   }],
 
+  "ALLOWED_MACHINE_TRANSLATION_LANGUAGE_CODES": ["en", "es", "fr", "zh", "pt"],
+
   "TRANSLATION_TIPS": {
     // Arabic.
     "ar": [

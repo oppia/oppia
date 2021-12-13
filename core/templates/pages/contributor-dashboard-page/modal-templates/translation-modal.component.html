@@ -91,6 +91,32 @@
                                 class="oppia-rte-editor">
       </oppia-rte-output-display>
     </div>
+    <div *ngIf="languageSupportsMachineTranslations && !loadingData && !uploadingTranslation"
+         class="oppia-machine-translation-container">
+      <div class="machine-translation-header-bar">Computer-Generated Translation
+      <i class="fa fa-chevron-down oppia-toggle-chevron"
+         [hidden]="!hideMachineTranslation"
+         aria-hidden="true"
+         (click)="toggleMachineTranslation()">
+      </i>
+      <i class="fa fa-chevron-up oppia-toggle-chevron"
+         [hidden]="hideMachineTranslation"
+         aria-hidden="true"
+         (click)="toggleMachineTranslation()">
+      </i>
+    </div>
+    <div [hidden]="hideMachineTranslation">
+      <p [hidden]="machineTranslatedText">Loading translation...</p>
+      <angular-html-bind-wrapper [ngClass]="{'oppia-rte-editor-focused': isCopyModeActive()}"
+                                  (click)="onContentClick($event)"
+                                  [htmlData]="machineTranslatedText"
+                                  class="oppia-rte-editor"
+                                  *ngIf="machineTranslatedText">
+      </angular-html-bind-wrapper>
+      <img [src]="getStaticImageUrl('/google_translate_attribution/translated_by_google.svg')"
+           class="google-translate-attribution-logo">
+      </div>
+    </div>
     <div *ngIf="TRANSLATION_TIPS[activeLanguageCode]" class="oppia-translation-tips-container">
       <ul>
         <li *ngFor="let tip of TRANSLATION_TIPS[activeLanguageCode]">{{tip}}
@@ -160,9 +186,29 @@
     word-wrap: break-word;
   }
   .oppia-text-to-translate-container {
+    background-color: rgb(233, 247,246);
     border: 1px solid #ccc;
     margin: 15px 0;
     padding: 20px;
+  }
+  .oppia-machine-translation-container {
+    background-color: rgba(251, 251, 251);
+    margin: 0 0 15px 0;
+    padding: 20px;
+  }
+  .oppia-toggle-chevron {
+    float: right;
+    position: absolute;
+    right: 0;
+    top: 0.25em;
+  }
+  .machine-translation-header-bar {
+    color: rgb(4, 47, 152);
+    font-weight: bold;
+    position: relative;
+  }
+  .google-translate-attribution-logo {
+    padding-top: 20px;
   }
   .oppia-rules-to-translate-container {
     border: 1px solid #ccc;
