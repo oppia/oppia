@@ -139,14 +139,15 @@ class MigrateStoryJob(base_jobs.JobBase):
         updated_story_model = story_services.populate_story_model_fields(
             story_model, migrated_story)
         change_dicts = [story_change.to_dict()]
-        models_to_put = updated_story_model.compute_models_to_commit(
-            feconf.MIGRATION_BOT_USERNAME,
-            feconf.COMMIT_TYPE_EDIT,
-            'Update story contents schema version to %d.' % (
-                feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION),
-            change_dicts,
-            additional_models={}
-        ).values()
+        with datastore_services.get_ndb_context():
+            models_to_put = updated_story_model.compute_models_to_commit(
+                feconf.MIGRATION_BOT_USERNAME,
+                feconf.COMMIT_TYPE_EDIT,
+                'Update story contents schema version to %d.' % (
+                    feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION),
+                change_dicts,
+                additional_models={}
+            ).values()
         datastore_services.update_timestamps_multi(list(models_to_put))
         return models_to_put
 

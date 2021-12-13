@@ -171,13 +171,14 @@ class MigrateSkillJob(base_jobs.JobBase):
             feconf.CURRENT_RUBRIC_SCHEMA_VERSION
         )
         change_dicts = [change.to_dict() for change in skill_changes]
-        models_to_put = updated_skill_model.compute_models_to_commit(
-            feconf.MIGRATION_BOT_USERNAME,
-            feconf.COMMIT_TYPE_EDIT,
-            commit_message,
-            change_dicts,
-            additional_models={}
-        ).values()
+        with datastore_services.get_ndb_context():
+            models_to_put = updated_skill_model.compute_models_to_commit(
+                feconf.MIGRATION_BOT_USERNAME,
+                feconf.COMMIT_TYPE_EDIT,
+                commit_message,
+                change_dicts,
+                additional_models={}
+            ).values()
         datastore_services.update_timestamps_multi(list(models_to_put))
         return models_to_put
 
