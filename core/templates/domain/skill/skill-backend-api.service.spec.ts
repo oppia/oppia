@@ -24,8 +24,7 @@ import { AppConstants } from 'app.constants';
 import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
 import { SkillObjectFactory, SkillBackendDict } from 'domain/skill/SkillObjectFactory';
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Skill backend API service', () => {
+describe('Skill backend API service', () => {
   let httpTestingController: HttpTestingController;
   let skillBackendApiService: SkillBackendApiService;
   let skillBackendDict: SkillBackendDict;
