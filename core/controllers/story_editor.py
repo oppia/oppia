@@ -77,13 +77,11 @@ class EditableStoryDataHandler(base.BaseHandler):
             'version': {
                 'schema': {
                     'type': 'int',
-                    'default_value': None
                 }
             },
             'commit_message': {
                 'schema': {
                     'type': 'basestring',
-                    'default_value': None,
                     'validators': [{
                         'id': 'has_length_at_most',
                         'max_value': constants.MAX_COMMIT_MESSAGE_LENGTH
