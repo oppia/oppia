@@ -21,9 +21,7 @@ import json
 import re
 
 import enum as enum
-from typing import (
-    Any, Callable, Dict, Iterable, Iterator, List, Optional, Sequence,
-    Type, TypeVar, Tuple, Union, NoReturn)
+from typing import Any, Dict, List, Optional, Tuple
 from typing_extensions import TypedDict
 
 from core import feconf
@@ -112,7 +110,7 @@ class EvaluationContext:
 
     def __init__(
         self,
-        platform_type: Optional[str],
+        platform_type: Optional[str], # Optional[str] because it is used in get method
         browser_type: Optional[str],
         app_version: Optional[str],
         server_mode: SERVER_MODES
@@ -528,9 +526,9 @@ class PlatformParameterFilter:
         Returns:
             bool. True if the first flavor is smaller.
         """
-        return (#type: ignore[no-any-return]
+        return (bool(
             ALLOWED_APP_VERSION_FLAVORS.index(flavor_a) <
-            ALLOWED_APP_VERSION_FLAVORS.index(flavor_b)
+            ALLOWED_APP_VERSION_FLAVORS.index(flavor_b))
             )
 
 
@@ -754,15 +752,15 @@ class PlatformParameter:
             raise utils.ValidationError(
                 'Unsupported data type \'%s\'.' % self._data_type)
 
+        # Method predicate is not typed
         predicate = self.DATA_TYPE_PREDICATES_DICT[str(self.data_type)]
-        # erreur untyped-call vient de predicate
         if not predicate(self._default_value): # type: ignore[no-untyped-call]
             raise utils.ValidationError(
                 'Expected %s, received \'%s\' in default value.' % (
                     self._data_type, self._default_value))
         for rule in self._rules:
 
-            # erreur untyped-call vient de predicate
+            # Method predicate is not typed
             if not predicate(rule.value_when_matched): # type: ignore[no-untyped-call]
                 raise utils.ValidationError(
                     'Expected %s, received \'%s\' in value_when_matched.' % (

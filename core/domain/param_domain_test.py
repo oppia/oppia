@@ -20,6 +20,7 @@ from core import utils
 from core.domain import param_domain
 from core.tests import test_utils
 
+from __future__ import annotations
 
 class ParameterDomainUnitTests(test_utils.GenericTestBase):
     """Tests for parameter domain objects."""
