@@ -267,7 +267,15 @@ class ExplorationModel(base_models.VersionedModel):
         """Returns the total number of explorations."""
         return cls.get_all().count()
 
+    # We expect Mapping because we want to allow models that inherit
+    # from BaseModel as the values, if we used Dict this wouldn't be allowed.
     def _prepare_additional_models(self) -> Mapping[str, base_models.BaseModel]:
+        """Prepares additional models needed for the commit process.
+
+        Returns:
+            dict(str, BaseModel). Additional models needed for
+            the commit process. Contains the ExplorationRightsModel.
+        """
         return {
             'rights_model': ExplorationRightsModel.get_by_id(self.id)
         }
@@ -280,6 +288,9 @@ class ExplorationModel(base_models.VersionedModel):
         commit_type: str,
         commit_message: str,
         commit_cmds: List[Dict[str, Any]],
+        # We expect Mapping because we want to allow models that inherit
+        # from BaseModel as the values, if we used Dict this wouldn't
+        # be allowed.
         additional_models: Mapping[str, base_models.BaseModel]
     ) -> base_models.ModelsToPutDict:
         """Record the event to the commit log after the model commit.
@@ -729,6 +740,9 @@ class ExplorationRightsModel(base_models.VersionedModel):
         commit_type: str,
         commit_message: str,
         commit_cmds: List[Dict[str, Any]],
+        # We expect Mapping because we want to allow models that inherit
+        # from BaseModel as the values, if we used Dict this wouldn't
+        # be allowed.
         additional_models: Mapping[str, base_models.BaseModel]
     ) -> base_models.ModelsToPutDict:
         """Record the event to the commit log after the model commit.

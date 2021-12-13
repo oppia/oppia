@@ -269,7 +269,15 @@ class CollectionModel(base_models.VersionedModel):
             **CollectionModel.convert_to_valid_dict(snapshot_dict))
         return self
 
+    # We expect Mapping because we want to allow models that inherit
+    # from BaseModel as the values, if we used Dict this wouldn't be allowed.
     def _prepare_additional_models(self) -> Mapping[str, base_models.BaseModel]:
+        """Prepares additional models needed for the commit process.
+
+        Returns:
+            dict(str, BaseModel). Additional models needed for
+            the commit process. Contains the CollectionRightsModel.
+        """
         return {
             'rights_model': CollectionRightsModel.get_by_id(self.id)
         }
@@ -282,6 +290,9 @@ class CollectionModel(base_models.VersionedModel):
         commit_type: str,
         commit_message: str,
         commit_cmds: List[Dict[str, Any]],
+        # We expect Mapping because we want to allow models that inherit
+        # from BaseModel as the values, if we used Dict this wouldn't
+        # be allowed.
         additional_models: Mapping[str, base_models.BaseModel]
     ) -> base_models.ModelsToPutDict:
         """Record the event to the commit log after the model commit.
@@ -633,6 +644,9 @@ class CollectionRightsModel(base_models.VersionedModel):
         commit_type: str,
         commit_message: str,
         commit_cmds: List[Dict[str, Any]],
+        # We expect Mapping because we want to allow models that inherit
+        # from BaseModel as the values, if we used Dict this wouldn't
+        # be allowed.
         additional_models: Mapping[str, base_models.BaseModel]
     ) -> base_models.ModelsToPutDict:
         """Record the event to the commit log after the model commit.

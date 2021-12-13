@@ -180,6 +180,9 @@ class TopicModel(base_models.VersionedModel):
         commit_type: str,
         commit_message: str,
         commit_cmds: List[Dict[str, Any]],
+        # We expect Mapping because we want to allow models that inherit
+        # from BaseModel as the values, if we used Dict this wouldn't
+        # be allowed.
         additional_models: Mapping[str, base_models.BaseModel]
     ) -> base_models.ModelsToPutDict:
         """Record the event to the commit log after the model commit.
@@ -505,6 +508,9 @@ class TopicRightsModel(base_models.VersionedModel):
         commit_type: str,
         commit_message: str,
         commit_cmds: List[Dict[str, Any]],
+        # We expect Mapping because we want to allow models that inherit
+        # from BaseModel as the values, if we used Dict this wouldn't
+        # be allowed.
         additional_models: Mapping[str, base_models.BaseModel]
     ) -> base_models.ModelsToPutDict:
         """Record the event to the commit log after the model commit.

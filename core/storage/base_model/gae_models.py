@@ -909,6 +909,8 @@ class VersionedModel(BaseModel):
         return '%s%s%s' % (
             instance_id, VERSION_DELIMITER, version_number)
 
+    # We expect Mapping because we want to allow models that inherit
+    # from BaseModel as the values, if we used Dict this wouldn't be allowed.
     def _prepare_additional_models(self) -> Mapping[str, BaseModel]:
         """Prepares additional models needed for the commit process. The return
         value is empty dict and this method should be overriden in models that
@@ -928,6 +930,9 @@ class VersionedModel(BaseModel):
         commit_type: str,
         commit_message: str,
         commit_cmds: List[Dict[str, Any]],
+        # We expect Mapping because we want to allow models that inherit
+        # from BaseModel as the values, if we used Dict this wouldn't
+        # be allowed.
         unused_additional_models: Mapping[str, BaseModel]
     ) -> ModelsToPutDict:
         """Evaluates and executes commit. Main function for all commit types.
