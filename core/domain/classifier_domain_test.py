@@ -64,7 +64,7 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
     def _get_training_job_from_dict(
         self,
         training_job_dict: Dict[str, Any]
-        ) -> classifier_domain.ClassifierTrainingJob:
+    ) -> classifier_domain.ClassifierTrainingJob:
         """Returns the ClassifierTrainingJob object after receiving the content
         from the training_job_dict.
         """
