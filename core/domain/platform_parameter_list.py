@@ -27,6 +27,7 @@ Registry = registry.Registry
 FEATURE_STAGES = platform_parameter_domain.FEATURE_STAGES # pylint: disable=invalid-name
 DATA_TYPES = platform_parameter_domain.DATA_TYPES # pylint: disable=invalid-name
 
+# TODO(#14419): Change naming style of Enum class and values.
 
 class PARAM_NAMES(enum.Enum): # pylint: disable=invalid-name
     """Enum for parameter names."""

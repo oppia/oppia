@@ -28,6 +28,7 @@ from core import utils
 from core.constants import constants
 from core.domain import change_domain
 
+# TODO(#14419): Change naming style of Enum class and values.
 
 class SERVER_MODES(enum.Enum): # pylint: disable=invalid-name
     """Enum for server modes."""
@@ -39,6 +40,7 @@ class SERVER_MODES(enum.Enum): # pylint: disable=invalid-name
 
 FEATURE_STAGES = SERVER_MODES # pylint: disable=invalid-name
 
+# TODO(#14419): Change naming style of Enum class and values.
 
 class DATA_TYPES(enum.Enum): # pylint: disable=invalid-name
     """Enum for data types."""

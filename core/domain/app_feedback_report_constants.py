@@ -52,6 +52,7 @@ TICKET_ID_DELIMITER = '.'
 STATS_ID_DELIMITER = ':'
 ANDROID_VERSION_NAME_DELIMITER = '-'
 
+# TODO(#14419): Change naming style of Enum class and values.
 
 class REPORT_TYPE(enum.Enum): # pylint: disable=invalid-name
     """Enum for report types."""
@@ -60,6 +61,7 @@ class REPORT_TYPE(enum.Enum): # pylint: disable=invalid-name
     issue = 'issue' # pylint: disable=invalid-name
     crash = 'crash' # pylint: disable=invalid-name
 
+# TODO(#14419): Change naming style of Enum class and values.
 
 class CATEGORY(enum.Enum): # pylint: disable=invalid-name
     """Enum for categories."""
@@ -80,6 +82,7 @@ class CATEGORY(enum.Enum): # pylint: disable=invalid-name
     profile_page_crash = 'profile_page_crash' # pylint: disable=invalid-name
     other_crash = 'other_crash' # pylint: disable=invalid-name
 
+# TODO(#14419): Change naming style of Enum class and values.
 
 class ENTRY_POINT(enum.Enum): # pylint: disable=invalid-name
     """Enum for entry points."""
@@ -89,6 +92,7 @@ class ENTRY_POINT(enum.Enum): # pylint: disable=invalid-name
     revision_card = 'revision_card' # pylint: disable=invalid-name
     crash = 'crash' # pylint: disable=invalid-name
 
+# TODO(#14419): Change naming style of Enum class and values.
 
 class STATS_PARAMETER_NAMES(enum.Enum): # pylint: disable=invalid-name
     """Enum for stats parameter names."""
@@ -102,6 +106,7 @@ class STATS_PARAMETER_NAMES(enum.Enum): # pylint: disable=invalid-name
     android_sdk_version = 'android_sdk_version' # pylint: disable=invalid-name
     version_name = 'version_name' # pylint: disable=invalid-name
 
+# TODO(#14419): Change naming style of Enum class and values.
 
 class ANDROID_TEXT_SIZE(enum.Enum): # pylint: disable=invalid-name
     """Enum for android text sizes."""
@@ -112,6 +117,7 @@ class ANDROID_TEXT_SIZE(enum.Enum): # pylint: disable=invalid-name
     large_text_size = 'large_text_size' # pylint: disable=invalid-name
     extra_large_text_size = 'extra_large_text_size' # pylint: disable=invalid-name
 
+# TODO(#14419): Change naming style of Enum class and values.
 
 class ANDROID_NETWORK_TYPE(enum.Enum): # pylint: disable=invalid-name
     """Enum for android network types."""
