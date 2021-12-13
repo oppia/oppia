@@ -23,10 +23,28 @@ from core import feconf
 from core import utils
 from core.platform import models
 
-from typing import Any, Dict, List, Union
+from typing import Dict, List, Union
+from typing_extensions import TypedDict
 
 (classifier_models,) = models.Registry.import_models(
     [models.NAMES.classifier])
+TrainingDataType = Union[Dict[str, Union[int, List[str]]],
+                        List[Dict[str, Union[int, List[str]]]]]
+
+
+class ClassifierTrainingJobDict(TypedDict):
+    """Represents ClassifierTrainingJob Dict."""
+
+    job_id: str
+    algorithm_id: str
+    interaction_id: str
+    exp_id: str
+    exp_version: int
+    next_scheduled_check_time: datetime.datetime
+    state_name: str
+    status: str
+    training_data: TrainingDataType
+    algorithm_version: int
 
 
 class ClassifierTrainingJob:
@@ -87,10 +105,7 @@ class ClassifierTrainingJob:
         next_scheduled_check_time: datetime.datetime,
         state_name: str,
         status: str,
-        training_data: Union[
-            Dict[str, Union[int, List[str]]], 
-            List[Dict[str, Union[int, List[str]]]]
-        ],
+        training_data: TrainingDataType,
         algorithm_version: int
     ) -> None:
         """Constructs a ClassifierTrainingJob domain object.
@@ -222,10 +237,7 @@ class ClassifierTrainingJob:
     @property
     def training_data(
         self
-    ) -> Union[
-        Dict[str, Union[int, List[str]]],
-        List[Dict[str, Union[int, List[str]]]]
-    ]:
+    ) -> TrainingDataType:
         """Returns the training data used for training the classifier.
 
         Returns:
@@ -281,7 +293,7 @@ class ClassifierTrainingJob:
                     initial_status, status))
         self._status = status
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> ClassifierTrainingJobDict:
         """Constructs a dict representation of training job domain object.
 
         Returns:
@@ -382,6 +394,15 @@ class ClassifierTrainingJob:
                 self.algorithm_version)
 
 
+class StateTrainingJobsMappingDict(TypedDict):
+    """Represents StateTrainingJobsMapping Dict."""
+
+    exp_id: str
+    exp_version: int
+    state_name: str
+    algorithm_ids_to_job_ids: Dict[str, str]
+
+
 class StateTrainingJobsMapping:
     """Domain object for a state-to-training job mapping model.
 
@@ -406,12 +427,12 @@ class StateTrainingJobsMapping:
     """
 
     def __init__(
-            self,
-            exp_id: str,
-            exp_version: int,
-            state_name: str,
-            algorithm_ids_to_job_ids: Dict[str, str]
-            ) -> None:
+        self,
+        exp_id: str,
+        exp_version: int,
+        state_name: str,
+        algorithm_ids_to_job_ids: Dict[str, str]
+    ) -> None:
         """Constructs a StateTrainingJobsMapping domain object.
 
         Args:
@@ -467,7 +488,7 @@ class StateTrainingJobsMapping:
         """
         return self._algorithm_ids_to_job_ids
 
-    def to_dict(self) -> Dict[str, Union[str, int, Dict[str, str]]]:
+    def to_dict(self) -> StateTrainingJobsMappingDict:
         """Constructs a dict representation of StateTrainingJobsMapping
         domain object.
 
@@ -533,7 +554,7 @@ class OppiaMLAuthInfo:
         message: str,
         vm_id: str,
         signature: str
-        ) -> None:
+    ) -> None:
         """Creates new OppiaMLAuthInfo object.
 
         Args:

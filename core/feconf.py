@@ -114,14 +114,14 @@ LEGACY_HTML_FIELD_TYPES_TO_RULE_SPECS_EXTENSIONS_MODULE_DIR = os.path.join(
 # support multiple algorithms need to be implemented.
 
 
-class ClassifierTypedDict(TypedDict):
+class ClassifierDict(TypedDict):
     """Representing INTERACTION_CLASSIFIER_MAPPING dict values."""
 
     algorithm_id: str
     algorithm_version: int
 
 
-INTERACTION_CLASSIFIER_MAPPING: Dict[str, ClassifierTypedDict] = {
+INTERACTION_CLASSIFIER_MAPPING: Dict[str, ClassifierDict] = {
     'TextInput': {
         'algorithm_id': 'TextClassifier',
         'algorithm_version': 1

@@ -108,9 +108,12 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
         }
         observed_training_job = self._get_training_job_from_dict(
             expected_training_job_dict)
+        # In this test the expected typing is wrong.
+        # Here assertDictEquals expects any type of dictionry
+        # but we provide a dict very specific typing.
         self.assertDictEqual(
             expected_training_job_dict,
-            observed_training_job.to_dict())
+            observed_training_job.to_dict()) # type: ignore[arg-type]
 
     def test_validation_exp_id(self) -> None:
         self.training_job_dict['exp_id'] = 1
@@ -191,7 +194,8 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
             training_job.validate()
 
     def test_validation_training_data_with_invalid_answer_group_index_type(
-            self) -> None:
+        self
+    ) -> None:
         self.training_job_dict['training_data'] = [
             {
                 'answer_group_index': 'invalid_answer_group_index',
@@ -279,7 +283,7 @@ class StateTrainingJobsMappingDomainTests(test_utils.GenericTestBase):
     def _get_mapping_from_dict(
         self,
         mapping_dict: Dict[str, Any]
-        ) -> classifier_domain.StateTrainingJobsMapping:
+    ) -> classifier_domain.StateTrainingJobsMapping:
         """Returns the StateTrainingJobsMapping object after receiving the
         content from the mapping_dict.
         """
@@ -300,9 +304,12 @@ class StateTrainingJobsMappingDomainTests(test_utils.GenericTestBase):
         }
         observed_mapping = self._get_mapping_from_dict(
             expected_mapping_dict)
+        # In this test the expected typing is wrong.Here assertDictEquals
+        # expects any type of dictionry but we provide a dict very specific
+        # typing.To ignore the typing mismatch ignore[arg-type] is used here.
         self.assertDictEqual(
             expected_mapping_dict,
-            observed_mapping.to_dict())
+            observed_mapping.to_dict()) # type: ignore[arg-type]
 
     def test_validation_for_mapping_with_correct_data(self) -> None:
         mapping = self._get_mapping_from_dict(self.mapping_dict)
@@ -339,7 +346,7 @@ class StateTrainingJobsMappingDomainTests(test_utils.GenericTestBase):
 
     def test_validation_with_invalid_algorithm_id_in_algorithm_to_job_map(
         self
-        ) -> None:
+    ) -> None:
         self.mapping_dict['algorithm_ids_to_job_ids'] = {123: 'job_id'}
         mapping = self._get_mapping_from_dict(self.mapping_dict)
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
@@ -348,7 +355,7 @@ class StateTrainingJobsMappingDomainTests(test_utils.GenericTestBase):
 
     def test_validation_with_invalid_job_id_in_algorithm_to_job_map(
         self
-        ) -> None:
+    ) -> None:
         self.mapping_dict['algorithm_ids_to_job_ids'] = {'algorithm_id': 12}
         mapping = self._get_mapping_from_dict(self.mapping_dict)
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]

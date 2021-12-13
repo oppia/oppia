@@ -17,6 +17,7 @@
 """Domain objects for Classroom."""
 
 from __future__ import annotations
+
 from typing import List
 
 
@@ -24,13 +25,13 @@ class Classroom:
     """Domain object for a classroom."""
 
     def __init__(
-            self,
-            name: str,
-            url_fragment: str,
-            topic_ids: List[str],
-            course_details: str,
-            topic_list_intro: str
-            ) -> None:
+        self,
+        name: str,
+        url_fragment: str,
+        topic_ids: List[str],
+        course_details: str,
+        topic_list_intro: str
+    ) -> None:
         """Constructs a Classroom domain object.
 
         Args:
