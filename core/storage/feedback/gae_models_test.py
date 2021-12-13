@@ -508,19 +508,37 @@ class FeedbackAnalyticsModelTests(test_utils.GenericTestBase):
 class UnsentFeedbackEmailModelTest(test_utils.GenericTestBase):
     """Tests for FeedbackMessageEmailDataModel class."""
 
+    NONEXISTENT_USER_ID = 'id_x'
+    USER_ID_1 = 'id_1'
+
+    def setUp(self) -> None:
+        super().setUp()
+        feedback_models.UnsentFeedbackEmailModel(id='user_id').put()
+
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             feedback_models.UnsentFeedbackEmailModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP)
+            base_models.DELETION_POLICY.DELETE)
 
     def test_has_reference_to_user_id(self) -> None:
-        feedback_models.UnsentFeedbackEmailModel(id='user_id').put()
         self.assertTrue(
             feedback_models.UnsentFeedbackEmailModel
             .has_reference_to_user_id('user_id'))
         self.assertFalse(
             feedback_models.UnsentFeedbackEmailModel
             .has_reference_to_user_id('id_x'))
+
+    def test_apply_deletion_policy_deletes_model_for_user(self) -> None:
+        feedback_models.UnsentFeedbackEmailModel.apply_deletion_policy(
+            self.USER_ID_1)
+        self.assertIsNone(
+            feedback_models.UnsentFeedbackEmailModel.get_by_id(self.USER_ID_1))
+
+    def test_apply_deletion_policy_raises_no_exception_for_nonexistent_user(
+        self
+    ) -> None:
+        feedback_models.UnsentFeedbackEmailModel.apply_deletion_policy(
+            self.NONEXISTENT_USER_ID)
 
     def test_new_instances_stores_correct_data(self) -> None:
         user_id = 'A'
