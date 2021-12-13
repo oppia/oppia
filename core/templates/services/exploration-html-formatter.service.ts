@@ -120,7 +120,7 @@ export class ExplorationHtmlFormatterService {
     // is only formed of alphanumeric characters.
     if (labelForFocusTarget && alphanumericRegex.test(labelForFocusTarget)) {
       element.setAttribute('label-for-focus-target', labelForFocusTarget);
-    } else if (!labelForFocusTarget) {
+    } else if (labelForFocusTarget) {
       throw new Error(
         `Unexpected label for focus target: ${labelForFocusTarget}.`);
     }
@@ -138,6 +138,8 @@ export class ExplorationHtmlFormatterService {
       element.removeAttribute('last-answer');
     }
 
+    // TODO(#8472): Remove the following code after we migrate this part of
+    // the codebase into the Angular 2+.
     // This is done because 'setAttribute' doesn't allow some characters to be
     // set as attribute keys (like '[' or ']'). So when interaction is migrated
     // we first test whether the other parts of the attribute can be added
