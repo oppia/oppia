@@ -59,6 +59,8 @@ describe('Create New Story Modal Component', function() {
     ngbActiveModal = TestBed.inject(NgbActiveModal);
     imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
     storyEditorStateService = TestBed.inject(StoryEditorStateService);
+
+    fixture.detectChanges();
   });
 
   it('should create', () => {

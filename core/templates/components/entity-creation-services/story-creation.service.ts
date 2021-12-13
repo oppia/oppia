@@ -19,14 +19,15 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { AlertsService } from 'services/alerts.service';
 
+import { AlertsService } from 'services/alerts.service';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { LoaderService } from 'services/loader.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { CreateNewStoryModalComponent } from 'pages/topic-editor-page/modal-templates/create-new-story-modal.component';
 import { StoryCreationBackendApiService } from './story-creation-backend-api.service';
+import { ContextService } from 'services/context.service';
 
 @Injectable({
   providedIn: 'root'
@@ -39,6 +40,7 @@ export class StoryCreationService {
     private ngbModal: NgbModal,
     private windowRef: WindowRef,
     private alertsService: AlertsService,
+    private contextService: ContextService,
     private imageLocalStorageService: ImageLocalStorageService,
     private loaderService: LoaderService,
     private storyCreationBackendApiService: StoryCreationBackendApiService,
@@ -49,8 +51,10 @@ export class StoryCreationService {
     if (this.storyCreationInProgress) {
       return;
     }
+    this.contextService.setImageSaveDestinationToLocalStorage();
     let modalRef = this.ngbModal.open(CreateNewStoryModalComponent, {
-      backdrop: 'static'
+      backdrop: 'static',
+      windowClass: 'create-new-story',
     });
 
     modalRef.result.then((newlyCreatedStory) => {
@@ -66,6 +70,7 @@ export class StoryCreationService {
       this.storyCreationBackendApiService.createStoryAsync(
         newlyCreatedStory, imagesData, bgColor).then((response) => {
         this.storyCreationInProgress = false;
+        this.contextService.resetImageSaveDestination();
         newTab.location.href = this.urlInterpolationService.interpolateUrl(
           this.STORY_EDITOR_URL_TEMPLATE, {
             story_id: response.storyId

@@ -26,6 +26,7 @@ import { TopicEditorStateService } from '../services/topic-editor-state.service'
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { AppConstants } from 'app.constants';
+import { ContextService } from 'services/context.service';
 
 @Component({
   selector: 'oppia-create-new-story-modal',
@@ -49,6 +50,7 @@ export class CreateNewStoryModalComponent extends ConfirmOrCancelModal {
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
+    private contextService: ContextService,
     private imageLocalStorageService: ImageLocalStorageService,
     private storyEditorStateService: StoryEditorStateService,
     private topicEditorStateService: TopicEditorStateService,
@@ -56,6 +58,10 @@ export class CreateNewStoryModalComponent extends ConfirmOrCancelModal {
     private changeDetectorRef: ChangeDetectorRef
   ) {
     super(ngbActiveModal);
+  }
+
+  ngOnInit(): void {
+    this.contextService.setImageSaveDestinationToLocalStorage();
   }
 
   cancel(): void {
