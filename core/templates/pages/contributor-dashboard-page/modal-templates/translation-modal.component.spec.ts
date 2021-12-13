@@ -23,7 +23,6 @@ import { ComponentFixture, fakeAsync, flushMicrotasks, TestBed, waitForAsync } f
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
 import { CkEditorCopyContentService } from 'components/ck-editor-helpers/ck-editor-copy-content.service';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { TranslationModalComponent, TranslationOpportunity } from 'pages/contributor-dashboard-page/modal-templates/translation-modal.component';
 import { TranslatableItem } from 'domain/opportunity/translatable-content.model';
@@ -46,7 +45,6 @@ describe('Translation Modal Component', () => {
   let ckEditorCopyContentService: CkEditorCopyContentService;
   let siteAnalyticsService: SiteAnalyticsService;
   let imageLocalStorageService: ImageLocalStorageService;
-  let urlInterpolationService: UrlInterpolationService;
   let userService: UserService;
   let activeModal: NgbActiveModal;
   let httpTestingController: HttpTestingController;
@@ -104,7 +102,6 @@ describe('Translation Modal Component', () => {
     translateTextService = TestBed.inject(TranslateTextService);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
-    urlInterpolationService = TestBed.inject(UrlInterpolationService);
     translationLanguageService = TestBed.inject(TranslationLanguageService);
     translationLanguageService.setActiveLanguageCode('es');
     userService = TestBed.inject(UserService);
@@ -291,7 +288,8 @@ describe('Translation Modal Component', () => {
         req.flush(sampleMachineTranslationResponse);
         flushMicrotasks();
         expect(component.hideMachineTranslation).toBeFalse();
-        expect(component.machineTranslatedText.content).toBe('Por favor continua.');
+        expect(component.machineTranslatedText.content).toBe(
+          'Por favor continua.');
       }));
   });
 

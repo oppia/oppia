@@ -46,12 +46,6 @@ def get_and_cache_machine_translation(
     Returns:
         str|None. The translated text or None if no translation is found.
     """
-    translation = translation_fetchers.get_machine_translation(
-        source_language_code,
-        target_language_code,
-        source_text.strip()
-    )
-
     translated_text = None
     try:
         translated_text = translate_services.translate_text(

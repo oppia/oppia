@@ -22,7 +22,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { ContentIdToContentMapping } from 'domain/opportunity/translatable-texts.model';
 
 export interface MachineTranslatedTextBackendDict {
-  'translated_texts': ContentIdToContentMapping
+  'translated_texts': ContentIdToContentMapping;
 }
 
 @Injectable({
@@ -32,24 +32,24 @@ export class MachineTranslatedTextBackendApiService {
   constructor(private http: HttpClient) {}
 
   async getMachineTranslatedStateTextsAsync(
-    explorationId: string,
-    stateName: string,
-    contentIds: string[],
-    targetLanguageCode: string): Promise<ContentIdToContentMapping> {
-      return this.http.get<MachineTranslatedTextBackendDict>(
-        '/machine_translated_state_texts_handler',
-        {
-          params: {
-            exp_id: explorationId,
-            state_name: stateName,
-            content_ids: JSON.stringify(contentIds),
-            target_language_code: targetLanguageCode
-          }
-        }).toPromise().then(response => {
-          console.log(response.translated_texts)
-        return response.translated_texts;
-      });
-    }
+      explorationId: string,
+      stateName: string,
+      contentIds: string[],
+      targetLanguageCode: string): Promise<ContentIdToContentMapping> {
+    return this.http.get<MachineTranslatedTextBackendDict>(
+      '/machine_translated_state_texts_handler',
+      {
+        params: {
+          exp_id: explorationId,
+          state_name: stateName,
+          content_ids: JSON.stringify(contentIds),
+          target_language_code: targetLanguageCode
+        }
+      }).toPromise().then(response => {
+        console.log(response.translated_texts)
+      return response.translated_texts;
+    });
+  }
 }
 
 angular.module('oppia').factory(
