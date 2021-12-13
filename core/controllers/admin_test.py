@@ -70,7 +70,7 @@ class PARAM_NAMES(enum.Enum): # pylint: disable=invalid-name
     test_feature_1 = 'test_feature_1' # pylint: disable=invalid-name
 
 
-FEATURE_STAGES = platform_parameter_domain.FEATURE_STAGES
+FeatureStages = platform_parameter_domain.FEATURE_STAGES
 
 
 class AdminIntegrationTest(test_utils.GenericTestBase):
@@ -472,7 +472,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_get_handler_includes_all_feature_flags(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         feature = platform_parameter_registry.Registry.create_feature_flag(
-            PARAM_NAMES.test_feature_1, 'feature for test.', FEATURE_STAGES.dev)
+            PARAM_NAMES.test_feature_1, 'feature for test.', FeatureStages.dev)
 
         feature_list_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_LIST',
@@ -494,7 +494,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         feature = platform_parameter_registry.Registry.create_feature_flag(
-            PARAM_NAMES.test_feature_1, 'feature for test.', FEATURE_STAGES.dev)
+            PARAM_NAMES.test_feature_1, 'feature for test.', FeatureStages.dev)
         new_rule_dicts = [
             {
                 'filters': [
@@ -538,7 +538,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         feature = platform_parameter_registry.Registry.create_feature_flag(
-            PARAM_NAMES.test_feature_1, 'feature for test.', FEATURE_STAGES.dev)
+            PARAM_NAMES.test_feature_1, 'feature for test.', FeatureStages.dev)
         new_rule_dicts = [
             {
                 'filters': [
@@ -583,7 +583,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         feature = platform_parameter_registry.Registry.create_feature_flag(
-            PARAM_NAMES.test_feature_1, 'feature for test.', FEATURE_STAGES.dev)
+            PARAM_NAMES.test_feature_1, 'feature for test.', FeatureStages.dev)
         new_rule_dicts = [
             {
                 'filters': [
@@ -751,7 +751,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         feature = platform_parameter_registry.Registry.create_feature_flag(
-            PARAM_NAMES.test_feature_1, 'feature for test.', FEATURE_STAGES.dev)
+            PARAM_NAMES.test_feature_1, 'feature for test.', FeatureStages.dev)
         new_rule_dicts = [
             {
                 'filters': [
