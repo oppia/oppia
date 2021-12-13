@@ -267,12 +267,14 @@ class ReviewableSuggestionsHandler(SuggestionsProviderHandler):
         'target_type': {
             'schema': {
                 'type': 'basestring',
-            }
+            },
+            'choices': feconf.SUGGESTION_TARGET_TYPE_CHOICES
         },
         'suggestion_type': {
             'schema': {
                 'type': 'basestring',
-            }
+            },
+            'choices': feconf.SUGGESTION_TYPE_CHOICES
         }
     }
     HANDLER_ARGS_SCHEMAS = {
