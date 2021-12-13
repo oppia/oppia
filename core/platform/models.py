@@ -35,7 +35,6 @@ if MYPY: # pragma: no cover
 
 
 # TODO(#14419): Change naming style of Enum class and values.
-
 class NAMES(enum.Enum): # pylint: disable=invalid-name
     """Enum for valid model names."""
 

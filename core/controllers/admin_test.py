@@ -65,7 +65,6 @@ BOTH_MODERATOR_AND_ADMIN_USERNAME = 'moderatorandadm1n'
 
 
 # TODO(#14419): Change naming style of Enum class and values.
-
 class PARAM_NAMES(enum.Enum): # pylint: disable=invalid-name
     """Enum for parameter names."""
 

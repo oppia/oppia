@@ -44,7 +44,6 @@ GITHUB_REPO_CHOICES = PLATFORM_CHOICES
 
 
 # TODO(#14419): Change naming style of Enum class and values.
-
 # The model field names that can be filtered / sorted for when maintainers
 # triage feedback reports.
 class FILTER_FIELD_NAMES(enum.Enum): # pylint: disable=invalid-name

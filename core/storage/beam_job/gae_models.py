@@ -45,8 +45,6 @@ def _get_new_model_id(model_class: base_models.BaseModel) -> str:
         _MAX_ID_GENERATION_ATTEMPTS))
 
 
-# TODO(#14419): Change naming style of Enum class and values.
-
 class BeamJobState(enum.Enum):
     """Constants from an enum defined by Google Cloud Dataflow, which are thus
     outside of our control:

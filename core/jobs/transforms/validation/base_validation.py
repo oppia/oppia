@@ -47,7 +47,6 @@ MAX_CLOCK_SKEW_SECS = datetime.timedelta(seconds=1)
 
 
 # TODO(#14419): Change naming style of Enum class and values.
-
 class VALIDATION_MODES(enum.Enum): # pylint: disable=invalid-name
     """Enum for validation modes."""
 
