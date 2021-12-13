@@ -444,7 +444,6 @@ class NewSkillHandler(base.BaseHandler):
         explanation_dict = self.normalized_payload.get('explanation_dict')
         rubrics = self.normalized_payload.get('rubrics')
 
-        rubrics = [skill_domain.Rubric.from_dict(rubric) for rubric in rubrics]
         new_skill_id = skill_services.get_new_skill_id()
         if linked_topic_ids is not None:
             topics = topic_fetchers.get_topics_by_ids(linked_topic_ids)
@@ -461,8 +460,7 @@ class NewSkillHandler(base.BaseHandler):
         skill = skill_domain.Skill.create_default_skill(
             new_skill_id, description, rubrics)
 
-        skill.update_explanation(
-            state_domain.SubtitledHtml.from_dict(explanation_dict))
+        skill.update_explanation(explanation_dict)
 
         image_filenames = skill_services.get_image_filenames_from_skill(skill)
 

@@ -23,6 +23,7 @@ from core import python_utils
 from core.constants import constants
 from core.domain import config_services
 from core.domain import question_services
+from core.domain import skill_domain
 from core.domain import skill_fetchers
 from core.domain import skill_services
 from core.domain import state_domain
@@ -663,16 +664,14 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
     def test_skill_creation(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        rubrics = [{
-            'difficulty': constants.SKILL_DIFFICULTIES[0],
-            'explanations': ['Explanation 1']
-        }, {
-            'difficulty': constants.SKILL_DIFFICULTIES[1],
-            'explanations': ['Explanation 2']
-        }, {
-            'difficulty': constants.SKILL_DIFFICULTIES[2],
-            'explanations': ['Explanation 3']
-        }]
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']).to_dict(),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']).to_dict(),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3']).to_dict(),
+        ]
         json_response = self.post_json(
             self.url, {
                 'description': 'Skill Description',
@@ -751,16 +750,14 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
     def test_skill_creation_in_valid_topic(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        rubrics = [{
-            'difficulty': constants.SKILL_DIFFICULTIES[0],
-            'explanations': ['Explanation 1']
-        }, {
-            'difficulty': constants.SKILL_DIFFICULTIES[1],
-            'explanations': ['Explanation 2']
-        }, {
-            'difficulty': constants.SKILL_DIFFICULTIES[2],
-            'explanations': ['Explanation 3']
-        }]
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']).to_dict(),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']).to_dict(),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3']).to_dict(),
+        ]
         payload = {
             'description': 'Skill Description',
             'linked_topic_ids': [self.topic_id],
@@ -783,16 +780,14 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
     def test_skill_creation_in_duplicate_description(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        rubrics = [{
-            'difficulty': constants.SKILL_DIFFICULTIES[0],
-            'explanations': ['Explanation 1']
-        }, {
-            'difficulty': constants.SKILL_DIFFICULTIES[1],
-            'explanations': ['Explanation 2']
-        }, {
-            'difficulty': constants.SKILL_DIFFICULTIES[2],
-            'explanations': ['Explanation 3']
-        }]
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']).to_dict(),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']).to_dict(),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3']).to_dict(),
+        ]
         post_data = {
             'description': 'Duplicate Skill Description',
             'rubrics': rubrics,
