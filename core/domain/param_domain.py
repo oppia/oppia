@@ -19,7 +19,6 @@
 import re
 
 from typing_extensions import TypedDict
-
 from typing import Dict
 
 from core import feconf
