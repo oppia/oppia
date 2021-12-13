@@ -21,7 +21,6 @@ from __future__ import annotations
 import copy
 
 from core import feconf
-from core import python_utils
 from core.domain import caching_services
 from core.domain import skill_domain
 from core.platform import models

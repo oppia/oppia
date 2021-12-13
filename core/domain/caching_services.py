@@ -20,7 +20,6 @@ from __future__ import annotations
 
 import json
 
-from core import python_utils
 from core.domain import collection_domain
 from core.domain import exp_domain
 from core.domain import platform_parameter_domain

@@ -26,7 +26,6 @@ import re
 import urllib
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.domain import auth_domain

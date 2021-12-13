@@ -23,7 +23,6 @@ import itertools
 import operator
 
 from core import feconf
-from core import python_utils
 from core.domain import improvements_domain
 from core.platform import models
 

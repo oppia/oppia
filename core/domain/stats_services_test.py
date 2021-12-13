@@ -21,7 +21,6 @@ from __future__ import annotations
 import os
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.domain import event_services
 from core.domain import exp_domain

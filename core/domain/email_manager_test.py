@@ -21,7 +21,6 @@ import logging
 import types
 
 from core import feconf
-from core import python_utils
 from core.constants import constants
 from core.domain import config_domain
 from core.domain import config_services

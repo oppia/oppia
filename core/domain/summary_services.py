@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.domain import activity_services

@@ -22,7 +22,6 @@ import datetime
 import itertools
 
 from core import feconf
-from core import python_utils
 from core.domain import email_manager
 from core.domain import feedback_domain
 from core.domain import rights_manager

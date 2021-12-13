@@ -23,7 +23,6 @@ import hmac
 import logging
 
 from core import feconf
-from core import python_utils
 from core.domain import classifier_domain
 from core.domain import config_domain
 from core.domain import exp_fetchers

@@ -20,7 +20,6 @@ import collections
 import logging
 
 from core import feconf
-from core import python_utils
 from core.constants import constants
 from core.domain import caching_services
 from core.domain import config_domain

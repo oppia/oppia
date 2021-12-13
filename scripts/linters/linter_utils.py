@@ -28,8 +28,6 @@ import sys
 import tempfile
 import threading
 
-from core import python_utils
-
 
 def memoize(func):
     """Decorator which provides thread-safe, cached-access to the return values

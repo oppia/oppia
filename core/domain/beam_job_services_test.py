@@ -20,7 +20,6 @@ from __future__ import annotations
 
 import itertools
 
-from core import python_utils
 from core.domain import beam_job_domain
 from core.domain import beam_job_services
 from core.jobs import base_jobs
