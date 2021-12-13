@@ -64,7 +64,7 @@ class PythonUtilsTests(test_utils.GenericTestBase):
     def test_url_unsplit(self):
         response = urllib.parse.urlsplit('http://www.google.com')
         self.assertEqual(
-            urllib.unsplit(response), 'http://www.google.com')
+            urllib.parse.urlunsplit(response), 'http://www.google.com')
 
     def test_parse_query_string(self):
         response = python_utils.parse_query_string(
