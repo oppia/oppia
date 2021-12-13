@@ -42,6 +42,7 @@ PLATFORM_CHOICE_WEB = 'web'
 PLATFORM_CHOICES = [PLATFORM_CHOICE_ANDROID, PLATFORM_CHOICE_WEB]
 GITHUB_REPO_CHOICES = PLATFORM_CHOICES
 
+
 # TODO(#14419): Change naming style of Enum class and values.
 
 # The model field names that can be filtered / sorted for when maintainers

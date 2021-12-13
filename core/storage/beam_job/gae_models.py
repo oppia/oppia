@@ -44,6 +44,7 @@ def _get_new_model_id(model_class: base_models.BaseModel) -> str:
     raise RuntimeError('Failed to generate a unique ID after %d attempts' % (
         _MAX_ID_GENERATION_ATTEMPTS))
 
+
 # TODO(#14419): Change naming style of Enum class and values.
 
 class BeamJobState(enum.Enum):
