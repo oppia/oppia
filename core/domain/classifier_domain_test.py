@@ -108,9 +108,8 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
         }
         observed_training_job = self._get_training_job_from_dict(
             expected_training_job_dict)
-        # In this test the expected typing is wrong.
-        # Here assertDictEquals expects any type of dictionry
-        # but we provide a dict very specific typing.
+        # The 'assertDictEqual' expects 'Dict[Any, Any]' but we provide 
+        # 'TypedDict' thus we add an ignore.
         self.assertDictEqual(
             expected_training_job_dict,
             observed_training_job.to_dict()) # type: ignore[arg-type]
@@ -304,9 +303,8 @@ class StateTrainingJobsMappingDomainTests(test_utils.GenericTestBase):
         }
         observed_mapping = self._get_mapping_from_dict(
             expected_mapping_dict)
-        # In this test the expected typing is wrong.Here assertDictEquals
-        # expects any type of dictionry but we provide a dict very specific
-        # typing.To ignore the typing mismatch ignore[arg-type] is used here.
+        # The 'assertDictEqual' expects 'Dict[Any, Any]' but we provide 
+        # 'TypedDict' thus we add an ignore.
         self.assertDictEqual(
             expected_mapping_dict,
             observed_mapping.to_dict()) # type: ignore[arg-type]
