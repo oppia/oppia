@@ -76,7 +76,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   showLanguageSelector: boolean = false;
   standardNavIsShown: boolean = false;
   getInvolvedMenuOffset: number = 0;
-  donateMenuOffset: number = 0;
   ACTION_OPEN!: string;
   ACTION_CLOSE!: string;
   KEYBOARD_EVENT_TO_KEY_CODES!: {
@@ -292,8 +291,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   ngAfterViewChecked(): void {
     this.getInvolvedMenuOffset = this
       .getDropdownOffset('.get-involved', 574);
-    this.donateMenuOffset = this
-      .getDropdownOffset('.donate-tab', 286);
     this.learnDropdownOffset = this.getDropdownOffset(
       '.learn-tab', (this.CLASSROOM_PROMOS_ARE_ENABLED) ? 688 : 300);
     // https://stackoverflow.com/questions/34364880/expression-has-changed-after-it-was-checked
