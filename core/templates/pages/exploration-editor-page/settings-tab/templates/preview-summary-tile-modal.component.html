@@ -5,12 +5,12 @@
 <div class="modal-body text-center">
   This is how your activity will appear to learners in search results
   or the library.
-  <oppia-exploration-summary-tile [explorationTitle]="getExplorationTitle()"
+  <oppia-exploration-summary-tile class="protractor-test-exploration-summary-tile"
+                                  [explorationTitle]="getExplorationTitle()"
                                   [objective]="getExplorationObjective()"
                                   [category]="getExplorationCategory()"
                                   [thumbnailIconUrl]="getThumbnailIconUrl()"
-                                  [thumbnailBgColor]="getThumbnailBgColor()"
-                                  class="protractor-test-exploration-summary-tile">
+                                  [thumbnailBgColor]="getThumbnailBgColor()">
   </oppia-exploration-summary-tile>
 </div>
 
