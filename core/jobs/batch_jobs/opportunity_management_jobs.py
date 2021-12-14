@@ -199,9 +199,7 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
 
         opportunities_results = (
             skills_with_question_counts
-            | beam.Map(
-                lambda n:
-                self._create_skill_opportunity_model(n))
+            | beam.Map(self._create_skill_opportunity_model)
         )
 
         unused_put_result = (
