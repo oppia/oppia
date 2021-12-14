@@ -448,7 +448,7 @@ class UserSuppliedFeedbackDomainTests(test_utils.GenericTestBase):
         }
         self.assertDictEqual(
             expected_dict, self.user_supplied_feedback.to_dict())
-    
+
     def test_validation_invalid_report_type_fails(self) -> None:
         # Using type ignore[assignment] because the we assign type string to
         # type class report_type. This is done to test the validation of the
@@ -1523,9 +1523,10 @@ class AppFeedbackReportFilterDomainTests(test_utils.GenericTestBase):
             """Invalid field name."""
 
             INVALID_FILTER_FIELD = 'invalid_filter_field'
-        # Using type ignore[assignment] because we assign type "InvalidFieldName"
-        # to the class filter field name. This is done to make sure that the type
-        # checker does not complain about the type of the filter field name.
+        # Using type ignore[assignment] because we assign type
+        # "InvalidFieldName" to the class filter field name.
+        # This is done to make sure that the type checker does
+        # not complain about the type of the filter field name.
         self.filter.filter_field = InvalidFieldName.INVALID_FILTER_FIELD # type: ignore[assignment]
         self._assert_validation_error(
             self.filter,
