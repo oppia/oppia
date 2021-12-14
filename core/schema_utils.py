@@ -689,21 +689,20 @@ class _Validators:
         choices: List[str],
         match_case: Optional[bool] = False
     ) -> bool:
-        """Checks if the given obj (a string) is a filename with
-        valid audio extension.
+        """Checks if the given obj (a string) ends with any one
+        of the given choices.
 
         Args:
             obj: str. The string to verify.
-            choices: List[str]. All valid extensions.
+            choices: List[str]. All valid choices.
             match_case: bool. Whether the match is case sensitive.
 
         Returns:
             bool. Whether the given object is a filename with valid
             audio extension.
         """
-        dot_index = obj.rfind('.')
-        extension = obj[dot_index + 1:]
+        
         if match_case is False:
-            extension = extension.lower()
+            obj.lower()
             choices = [choice.lower() for choice in choices]
-        return extension in choices
+        return obj.endswith(tuple(choices))
