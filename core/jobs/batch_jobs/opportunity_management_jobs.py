@@ -201,14 +201,14 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
             skills_with_question_counts
             | beam.Map(
                 lambda n:
-                self._create_skill_opportunity_model(n[1]))
+                self._create_skill_opportunity_model(n))
         )
 
         unused_put_result = (
             opportunities_results
             | 'Filter the results with OK status' >> beam.Filter(
                 lambda result: result.is_ok())
-            | 'Fetch the models to be put' >> beam.FlatMap(
+            | 'Fetch the models to be put' >> beam.Map(
                 lambda result: result.unwrap())
             | 'Put models into the datastore' >> ndb_io.PutModels()
         )

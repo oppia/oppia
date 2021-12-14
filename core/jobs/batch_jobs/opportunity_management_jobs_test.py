@@ -78,7 +78,7 @@ class DeleteSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
         self.assertEqual(len(all_skill_opportunity_models), 2)
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS 2')
+            job_run_result.JobRunResult(stdout='SUCCESS: 2')
         ])
 
         all_skill_opportunity_models = list(
@@ -202,8 +202,7 @@ class GenerateSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
         self.assertEqual(len(all_opportunity_models), 0)
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS'),
-            job_run_result.JobRunResult(stdout='SUCCESS')
+            job_run_result.JobRunResult(stdout='SUCCESS: 2')
         ])
 
         opportunity_model_1 = (
@@ -246,8 +245,7 @@ class GenerateSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
         self.assertEqual(len(all_skill_link_models), 3)
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS'),
-            job_run_result.JobRunResult(stdout='SUCCESS')
+            job_run_result.JobRunResult(stdout='SUCCESS: 2')
         ])
 
         opportunity_model_1 = (
@@ -286,8 +284,7 @@ class GenerateSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
         datastore_services.put_multi([question_skill_link_model_1])
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS'),
-            job_run_result.JobRunResult(stdout='SUCCESS')
+            job_run_result.JobRunResult(stdout='SUCCESS: 2')
         ])
 
         opportunity_model_1 = (
