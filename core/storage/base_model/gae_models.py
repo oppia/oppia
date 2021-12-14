@@ -912,9 +912,9 @@ class VersionedModel(BaseModel):
     # We expect Mapping because we want to allow models that inherit
     # from BaseModel as the values, if we used Dict this wouldn't be allowed.
     def _prepare_additional_models(self) -> Mapping[str, BaseModel]:
-        """Prepares additional models needed for the commit process. The return
-        value is empty dict and this method should be overriden in models that
-        inherit from VersionedModel.
+        """Prepares additional models needed for the commit process.
+        The default return value is an empty dict; however, this method should
+        be overridden in models that inherit from VersionedModel.
 
         Returns:
             dict(str, BaseModel). Additional models needed for

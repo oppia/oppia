@@ -62,8 +62,10 @@ class MigrateSkillJob(base_jobs.JobBase):
             skill_model: SkillModel. The skill model to migrate.
 
         Returns:
-            Result((str, Skill), (str, Exception)). Skill object when
-            the migration was successful or Exception when the migration failed.
+            Result((str, Skill), (str, Exception)). Result containing tuple that
+            consists of skill ID and either skill object or Exception. Skill
+            object is returned when the migration was successful and Exception
+            is returned otherwise.
         """
         try:
             skill = skill_fetchers.get_skill_from_model(skill_model)
@@ -87,7 +89,8 @@ class MigrateSkillJob(base_jobs.JobBase):
                 the change objects.
 
         Yields:
-            (str, SkillChange). Iterable of skill change objects.
+            (str, SkillChange). Tuple containing skill ID and skill change
+            object.
         """
         contents_version = skill_model.skill_contents_schema_version
         if contents_version < feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION:

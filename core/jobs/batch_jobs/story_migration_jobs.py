@@ -34,7 +34,7 @@ from core.platform import models
 import apache_beam as beam
 import result
 
-from typing import Sequence, Tuple
+from typing import Iterable, Sequence, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -61,8 +61,10 @@ class MigrateStoryJob(base_jobs.JobBase):
             story_model: StoryModel. The story model to migrate.
 
         Returns:
-            Result((str, Story), (str, Exception)). Story object when
-            the migration was successful or Exception when the migration failed.
+            Result((str, Story), (str, Exception)). Result containing tuple that
+            consists of story ID and either story object or Exception. Story
+            object is returned when the migration was successful and Exception
+            is returned otherwise.
         """
         try:
             story = story_fetchers.get_story_from_model(story_model)
@@ -78,7 +80,7 @@ class MigrateStoryJob(base_jobs.JobBase):
     @staticmethod
     def _generate_story_changes(
         story_id: str, story_model: story_models.StoryModel
-    ) -> Tuple[str, story_domain.StoryChange]:
+    ) -> Iterable[Tuple[str, story_domain.StoryChange]]:
         """Generates story change objects. Story change object is generated when
         schema version for some field is lower than the latest schema version.
 
@@ -88,7 +90,8 @@ class MigrateStoryJob(base_jobs.JobBase):
                 the change objects.
 
         Yields:
-            (str, StoryChange). Iterable of story change objects.
+            (str, StoryChange). Tuple containing story ID and story change
+            object.
         """
         schema_version = story_model.story_contents_schema_version
         if schema_version < feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION:
