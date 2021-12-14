@@ -58,7 +58,7 @@ import { WelcomeTranslationModalComponent } from 'pages/exploration-editor-page/
 angular.module('oppia').component('translationTab', {
   template: require('./translation-tab.component.html'),
   controller: [
-    '$scope', '$templateCache',
+    '$rootScope', '$scope', '$templateCache',
     'ContextService', 'EditabilityService', 'ExplorationStatesService',
     'LoaderService', 'NgbModal', 'RouterService', 'SiteAnalyticsService',
     'StateEditorService', 'StateRecordedVoiceoversService',
@@ -66,7 +66,7 @@ angular.module('oppia').component('translationTab', {
     'TranslationTabActiveModeService',
     'UserExplorationPermissionsService',
     function(
-        $scope, $templateCache,
+        $rootScope, $scope, $templateCache,
         ContextService, EditabilityService, ExplorationStatesService,
         LoaderService, NgbModal, RouterService, SiteAnalyticsService,
         StateEditorService, StateRecordedVoiceoversService,
@@ -138,6 +138,7 @@ angular.module('oppia').component('translationTab', {
         }).result.then(function(explorationId) {
           SiteAnalyticsService.registerAcceptTutorialModalEvent(
             explorationId);
+          $rootScope.$applyAsync();
           $scope.startTutorial();
         }, function(explorationId) {
           SiteAnalyticsService.registerDeclineTutorialModalEvent(
