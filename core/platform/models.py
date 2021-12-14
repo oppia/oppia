@@ -34,7 +34,10 @@ if MYPY: # pragma: no cover
 # Valid model names.
 
 
-# TODO(#14419): Change naming style of Enum class and values.
+# TODO(#14419): Change naming style of Enum class from SCREAMING_SNAKE_CASE
+# to PascalCase and its values to UPPER_CASE. Because we want to be consistent
+# throughout the codebase according to the coding style guide.
+# https://github.com/oppia/oppia/wiki/Coding-style-guide
 class NAMES(enum.Enum): # pylint: disable=invalid-name
     """Enum for valid model names."""
 

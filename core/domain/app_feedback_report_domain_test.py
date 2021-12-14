@@ -448,14 +448,20 @@ class UserSuppliedFeedbackDomainTests(test_utils.GenericTestBase):
         }
         self.assertDictEqual(
             expected_dict, self.user_supplied_feedback.to_dict())
-
+    
     def test_validation_invalid_report_type_fails(self) -> None:
+        # Using type ignore[assignment] because the we assign type string to
+        # type class report_type. This is done to test the validation of the
+        # report_type.
         self.user_supplied_feedback.report_type = 'invalid_report_type' # type: ignore[assignment]
         self._assert_validation_error(
             self.user_supplied_feedback, 'Invalid report type ')
 
     def test_validation_invalid_report_category_fails(self) -> None:
         self.user_supplied_feedback.report_type = REPORT_TYPE_ISSUE
+        # Using type ignore[assignment] because the we assign type string to
+        # type class category. This is done to test the validation of the
+        # category.
         self.user_supplied_feedback.category = 'invalid_category' # type: ignore[assignment]
         self._assert_validation_error(
             self.user_supplied_feedback,
@@ -505,11 +511,17 @@ class UserSuppliedFeedbackDomainTests(test_utils.GenericTestBase):
             'Invalid input text, must be a string')
 
     def test_report_type_is_none_fails_validation(self) -> None:
+        # Using type ignore[assignment] because the we assign type None to
+        # type class report_type. This is done to test the validation of the
+        # report_type.
         self.user_supplied_feedback.report_type = None # type: ignore[assignment]
         self._assert_validation_error(
             self.user_supplied_feedback, 'No report_type supplied.')
 
     def test_report_category_is_none_fails_validation(self) -> None:
+        # Using type ignore[assignment] because the we assign type None to
+        # type class category. This is done to test the validation of the
+        # category.
         self.user_supplied_feedback.category = None # type: ignore[assignment]
         self._assert_validation_error(
             self.user_supplied_feedback, 'No category supplied.')
@@ -756,6 +768,8 @@ class NavigationDrawerEntryPointDomainTests(test_utils.GenericTestBase):
             expected_dict, self.entry_point.to_dict())
 
     def test_validation_name_is_none_fails(self) -> None:
+        # Using type ignore[assignment] because we assign type None to
+        # type str. This is done to test that the validation fails.
         self.entry_point.entry_point_name = None # type: ignore[assignment]
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError,
@@ -763,6 +777,8 @@ class NavigationDrawerEntryPointDomainTests(test_utils.GenericTestBase):
             self.entry_point.validate()
 
     def test_validation_name_not_a_string_fails(self) -> None:
+        # Using type ignore[assignment] because we assign type int to
+        # type str. This is done to test that the validation fails.
         self.entry_point.entry_point_name = 123 # type: ignore[assignment]
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError,
@@ -798,12 +814,16 @@ class LessonPlayerEntryPointDomainTests(test_utils.GenericTestBase):
             expected_dict, self.entry_point.to_dict())
 
     def test_validation_name_is_none_fails(self) -> None:
+        # Using type ignore[assignment] because we assign type None to
+        # type str. This is done to test that the validation fails.
         self.entry_point.entry_point_name = None # type: ignore[assignment]
         self._assert_validation_error(
             self.entry_point,
             'No entry point name supplied.')
 
     def test_validation_name_not_a_string_fails(self) -> None:
+        # Using type ignore[assignment] because we assign type int to
+        # type str. This is done to test that the validation fails.
         self.entry_point.entry_point_name = 123 # type: ignore[assignment]
         self._assert_validation_error(
             self.entry_point,
@@ -882,12 +902,16 @@ class RevisionCardEntryPointDomainTests(test_utils.GenericTestBase):
             expected_dict, self.entry_point.to_dict())
 
     def test_validation_name_is_none_fails(self) -> None:
+        # Using type ignore[assignment] because we assign type None to
+        # type str. This is done to test that the validation fails.
         self.entry_point.entry_point_name = None # type: ignore[assignment]
         self._assert_validation_error(
             self.entry_point,
             'No entry point name supplied.')
 
     def test_validation_name_not_a_string_fails(self) -> None:
+        # Using type ignore[assignment] because we assign type int to
+        # type str. This is done to test that the validation fails.
         self.entry_point.entry_point_name = 123 # type: ignore[assignment]
         self._assert_validation_error(
             self.entry_point,
@@ -946,6 +970,8 @@ class CrashEntryPointDomainTests(test_utils.GenericTestBase):
             expected_dict, self.entry_point.to_dict())
 
     def test_validation_name_is_none_fails(self) -> None:
+        # Using type ignore[assignment] because we assign type None to
+        # type str. This is done to test that the validation fails.
         self.entry_point.entry_point_name = None # type: ignore[assignment]
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError,
@@ -953,6 +979,8 @@ class CrashEntryPointDomainTests(test_utils.GenericTestBase):
             self.entry_point.validate()
 
     def test_validation_name_not_a_string_fails(self) -> None:
+        # Using type ignore[assignment] because we assign type int to
+        # type str. This is done to test that the validation fails.
         self.entry_point.entry_point_name = 123 # type: ignore[assignment]
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError,
@@ -1495,6 +1523,9 @@ class AppFeedbackReportFilterDomainTests(test_utils.GenericTestBase):
             """Invalid field name."""
 
             INVALID_FILTER_FIELD = 'invalid_filter_field'
+        # Using type ignore[assignment] because we assign type "InvalidFieldName"
+        # to the class filter field name. This is done to make sure that the type
+        # checker does not complain about the type of the filter field name.
         self.filter.filter_field = InvalidFieldName.INVALID_FILTER_FIELD # type: ignore[assignment]
         self._assert_validation_error(
             self.filter,
