@@ -40,6 +40,9 @@ describe('Delete Answer Group Modal Component', () => {
     componentInstance = fixture.componentInstance;
   });
 
+  // This component have no more frontend tests as it is a modal
+  // component with only confirm and cancel functionality. The tests
+  // are covered in the common-layout-directives tests.
   it('should create', () => {
     expect(componentInstance).toBeDefined();
   });
