@@ -33,11 +33,9 @@ PREREQUISITES = [
     ('pyyaml', '6.0', os.path.join(TOOLS_DIR, 'pyyaml-6.0')),
     ('future', '0.18.2', os.path.join('third_party', 'python_libs')),
     ('six', '1.16.0', os.path.join('third_party', 'python_libs')),
-    ('certifi', '2021.5.30', os.path.join(
-        TOOLS_DIR, 'certifi-2021.5.30')),
-    ('typing-extensions', '4.0.1', os.path.join('third_party', 'python_libs')),
     ('certifi', '2021.10.8', os.path.join(
         TOOLS_DIR, 'certifi-2021.10.8')),
+    ('typing-extensions', '4.0.1', os.path.join('third_party', 'python_libs')),
 ]
 
 for package_name, version_number, target_path in PREREQUISITES:
