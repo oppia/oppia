@@ -16,7 +16,7 @@
  * @fileoverview Component for the translation tab.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { ContextService } from 'services/context.service';
@@ -30,8 +30,8 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
 
 export class WelcomeTranslationModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-  explorationId: string;
-  translationWelcomeImgUrl: string;
+  @Input() explorationId: string;
+  @Input() translationWelcomeImgUrl: string;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
