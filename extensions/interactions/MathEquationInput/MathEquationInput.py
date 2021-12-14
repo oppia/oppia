@@ -72,12 +72,12 @@ class MathEquationInput(base.BaseInteraction):
             MathEquationInputInstanceDto. The proto object.
         """
         customization_args_proto = (
-            cls._to_customization_args_proto(customization_args)
+            cls._convert_customization_args_to_proto(customization_args)
         )
         outcome_proto = default_outcome.to_proto()
         hints_proto_list = cls.get_hint_proto(cls, hints)
-        solution_proto = cls._to_solution_proto(solution)
-        answer_groups_proto = cls._to_answer_groups_proto(answer_groups)
+        solution_proto = cls._convert_solution_to_proto(solution)
+        answer_groups_proto = cls._convert_answer_groups_to_proto(answer_groups)
 
         return state_pb2.MathEquationInputInstanceDto(
             customization_args=customization_args_proto,
@@ -88,8 +88,8 @@ class MathEquationInput(base.BaseInteraction):
         )
 
     @classmethod
-    def _to_customization_args_proto(cls, customization_args):
-        """Creates a CustomizationArgs proto object
+    def _convert_customization_args_to_proto(cls, customization_args):
+        """Creates a CustomizationArgsDto proto object
         for MathEquationInputInstanceDto.
 
         Args:
@@ -113,8 +113,8 @@ class MathEquationInput(base.BaseInteraction):
         )
 
     @classmethod
-    def _to_answer_groups_proto(cls, answer_groups):
-        """Creates a AnswerGroup proto object
+    def _convert_answer_groups_to_proto(cls, answer_groups):
+        """Creates a AnswerGroupDto proto object
         for MathEquationInputInstanceDto.
 
         Args:
@@ -122,12 +122,13 @@ class MathEquationInput(base.BaseInteraction):
                 interaction instance.
 
         Returns:
-            list. The AnswerGroup proto object list.
+            list. The AnswerGroupDto proto object list.
         """
         answer_group_list_proto = []
         for answer_group in answer_groups:
             base_answer_group_proto = answer_group.to_proto()
-            rules_spec_proto = cls._to_rule_specs_proto(answer_group.rule_specs)
+            rules_spec_proto = cls._convert_rule_specs_to_proto(
+                answer_group.rule_specs)
             answer_group_list_proto.append(
                 state_pb2.MathEquationInputInstanceDto.AnswerGroupDto(
                     base_answer_group=base_answer_group_proto,
@@ -138,23 +139,25 @@ class MathEquationInput(base.BaseInteraction):
         return answer_group_list_proto
 
     @classmethod
-    def _to_rule_specs_proto(cls, rule_specs_list):
-        """Creates a RuleSpec proto object.
+    def _convert_rule_specs_to_proto(cls, rule_specs_list):
+        """Creates a RuleSpecDto proto object.
 
         Args:
             rule_specs_list: list(RuleSpec). List of rule specifications.
 
         Returns:
-            list. The RuleSpec proto object list.
+            list. The RuleSpecDto proto object list.
         """
         rule_specs_list_proto = []
 
         rule_type_to_proto_func_mapping = {
-            'MatchesExactlyWith': cls._to_matches_exactly_to_proto,
-            'IsEquivalentTo': cls._to_is_equivalent_to_proto,
-            'ContainsSomeOf': cls._to_contains_some_proto,
-            'OmitsSomeOf': cls._to_omit_some_proto,
-            'MatchesWithGeneralForm': cls._to_matches_with_form_proto
+            'MatchesExactlyWith': (
+                cls._convert_matches_exactly_rule_spec_to_proto),
+            'IsEquivalentTo': cls._convert_is_equivalent_rule_spec_to_proto,
+            'ContainsSomeOf': cls._convert_contains_some_rule_spec_to_proto,
+            'OmitsSomeOf': cls._convert_omit_some_rule_spec_to_proto,
+            'MatchesWithGeneralForm': (
+                cls._convert_matches_with_form_rule_spec_to_proto)
         }
 
         rule_type_to_proto_mapping = {
@@ -189,7 +192,7 @@ class MathEquationInput(base.BaseInteraction):
         return rule_specs_list_proto
 
     @classmethod
-    def _to_matches_exactly_to_proto(cls, inputs):
+    def _convert_matches_exactly_rule_spec_to_proto(cls, inputs):
         """Creates a proto object for MatchesExactlyWithSpecDto.
 
         Args:
@@ -206,7 +209,7 @@ class MathEquationInput(base.BaseInteraction):
         )
 
     @classmethod
-    def _to_is_equivalent_to_proto(cls, inputs):
+    def _convert_is_equivalent_rule_spec_to_proto(cls, inputs):
         """Creates a proto object for IsEquivalentToSpecDto.
 
         Args:
@@ -222,7 +225,7 @@ class MathEquationInput(base.BaseInteraction):
         )
 
     @classmethod
-    def _to_contains_some_proto(cls, inputs):
+    def _convert_contains_some_rule_spec_to_proto(cls, inputs):
         """Creates a proto object for ContainsSomeOfSpecDto.
 
         Args:
@@ -239,7 +242,7 @@ class MathEquationInput(base.BaseInteraction):
         )
 
     @classmethod
-    def _to_omit_some_proto(cls, inputs):
+    def _convert_omit_some_rule_spec_to_proto(cls, inputs):
         """Creates a proto object for OmitsSomeOfSpecDto.
 
         Args:
@@ -256,7 +259,7 @@ class MathEquationInput(base.BaseInteraction):
         )
 
     @classmethod
-    def _to_matches_with_form_proto(cls, inputs):
+    def _convert_matches_with_form_rule_spec_to_proto(cls, inputs):
         """Creates a proto object for MatchesWithGeneralFormSpecDto.
 
         Args:
@@ -275,8 +278,8 @@ class MathEquationInput(base.BaseInteraction):
         )
 
     @classmethod
-    def _to_solution_proto(cls, solution):
-        """Creates a Solution proto object
+    def _convert_solution_to_proto(cls, solution):
+        """Creates a SolutionDto proto object
         for MathEquationInputInstanceDto.
 
         Args:

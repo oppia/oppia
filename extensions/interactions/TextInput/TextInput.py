@@ -97,7 +97,7 @@ class TextInput(base.BaseInteraction):
         cls, default_outcome, customization_args,
         solution, hints, answer_groups
     ):
-        """Creates a TextInputInstance proto object.
+        """Creates a TextInputInstanceDto proto object.
 
         Args:
             default_outcome: Outcome. The domain object.
@@ -107,15 +107,15 @@ class TextInput(base.BaseInteraction):
             answer_groups: AnswerGroups. The domain object.
 
         Returns:
-            TextInputInstance. The TextInputInstance proto object.
+            TextInputInstanceDto. The proto object.
         """
-        customization_args_proto = cls._to_customization_args_proto(
+        customization_args_proto = cls._convert_customization_args_to_proto(
             customization_args
         )
         outcome_proto = default_outcome.to_proto()
         hints_proto_list = cls.get_hint_proto(cls, hints)
-        solution_proto = cls._to_solution_proto(solution)
-        answer_groups_proto = cls._to_answer_groups_proto(answer_groups)
+        solution_proto = cls._convert_solution_to_proto(solution)
+        answer_groups_proto = cls._convert_answer_groups_to_proto(answer_groups)
 
         return state_pb2.TextInputInstanceDto(
             customization_args=customization_args_proto,
@@ -126,21 +126,21 @@ class TextInput(base.BaseInteraction):
         )
 
     @classmethod
-    def _to_answer_groups_proto(cls, answer_groups):
-        """Creates a AnswerGroup proto object
-        for TextInputInstance.
+    def _convert_answer_groups_to_proto(cls, answer_groups):
+        """Creates a AnswerGroupDto proto object
+        for TextInputInstanceDto.
 
         Args:
             answer_groups: list(AnswerGroup). List of answer groups of the
                 interaction instance.
 
         Returns:
-            list. The AnswerGroup proto object list.
+            list. The AnswerGroupDto proto object list.
         """
         answer_group_list_proto = []
         for answer_group in answer_groups:
             base_answer_group_proto = answer_group.to_proto()
-            rules_spec_proto = cls._to_text_input_rule_specs_proto(
+            rules_spec_proto = cls._convert_rule_specs_to_proto(
                 answer_group.rule_specs)
             answer_group_list_proto.append(
                 state_pb2.TextInputInstanceDto.AnswerGroupDto(
@@ -152,23 +152,23 @@ class TextInput(base.BaseInteraction):
         return answer_group_list_proto
 
     @classmethod
-    def _to_text_input_rule_specs_proto(cls, rule_specs_list):
-        """Creates a RuleSpec proto object.
+    def _convert_rule_specs_to_proto(cls, rule_specs_list):
+        """Creates a RuleSpecDto proto object.
 
         Args:
             rule_specs_list: list(RuleSpec). List of rule specifications.
 
         Returns:
-            list. The RuleSpec proto object list.
+            list. The RuleSpecDto proto object list.
         """
         rule_specs_list_proto = []
 
         rule_type_to_proto_func_mapping = {
-            'Equals': cls._to_equal_to_proto,
-            'StartsWith': cls._to_starts_with_to_proto,
+            'Equals': cls._convert_equals_rule_spec_to_proto,
+            'StartsWith': cls._convert_starts_with_rule_spec_to_proto,
             'Contains': (
                 cls._to_contains_proto),
-            'FuzzyEquals': cls._to_fuzzy_equals_proto
+            'FuzzyEquals': cls._convert_fuzzy_equals_rule_spec_to_proto
         }
         rule_type_to_proto_mapping = {
             'Equals': lambda x: (
@@ -199,84 +199,84 @@ class TextInput(base.BaseInteraction):
         return rule_specs_list_proto
 
     @classmethod
-    def _to_equal_to_proto(cls, input_dict):
-        """Creates a proto object for EqualsSpec.
+    def _convert_equals_rule_spec_to_proto(cls, input_dict):
+        """Creates a proto object for EqualsSpecDto.
 
         Args:
             input_dict: dict. The rule dict.
 
         Returns:
-            EqualsSpec. The proto object.
+            EqualsSpecDto. The proto object.
         """
         text_rule_spec = state_pb2.TextInputInstanceDto.RuleSpecDto
 
         return text_rule_spec.EqualsSpecDto(
-            input=cls._to_translatable_normalized_string_set(
+            input=cls._convert_translatable_normalized_string_set_to_proto(
                 input_dict)
         )
 
     @classmethod
-    def _to_starts_with_to_proto(cls, input_dict):
-        """Creates a proto object for StartsWithSpec.
+    def _convert_starts_with_rule_spec_to_proto(cls, input_dict):
+        """Creates a proto object for StartsWithSpecDto.
 
         Args:
             input_dict: dict. The rule dict.
 
         Returns:
-            StartsWithSpec. The proto object.
+            StartsWithSpecDto. The proto object.
         """
         text_rule_spec = state_pb2.TextInputInstanceDto.RuleSpecDto
 
         return text_rule_spec.StartsWithSpecDto(
-            input=cls._to_translatable_normalized_string_set(
+            input=cls._convert_translatable_normalized_string_set_to_proto(
                 input_dict)
         )
 
     @classmethod
     def _to_contains_proto(cls, input_dict):
-        """Creates a proto object for ContainsSpec.
+        """Creates a proto object for ContainsSpecDto.
 
         Args:
             input_dict: dict. The rule dict.
 
         Returns:
-            ContainsSpec. The proto object.
+            ContainsSpecDto. The proto object.
         """
         text_rule_spec = state_pb2.TextInputInstanceDto.RuleSpecDto
 
         return text_rule_spec.ContainsSpecDto(
-            input=cls._to_translatable_normalized_string_set(
+            input=cls._convert_translatable_normalized_string_set_to_proto(
                 input_dict)
         )
 
     @classmethod
-    def _to_fuzzy_equals_proto(cls, input_dict):
-        """Creates a proto object for FuzzyEqualsSpec.
+    def _convert_fuzzy_equals_rule_spec_to_proto(cls, input_dict):
+        """Creates a proto object for FuzzyEqualsSpecDto.
 
         Args:
             input_dict: dict. The rule dict.
 
         Returns:
-            FuzzyEqualsSpec. The proto object.
+            FuzzyEqualsSpecDto. The proto object.
         """
         text_rule_spec = state_pb2.TextInputInstanceDto.RuleSpecDto
 
         return text_rule_spec.FuzzyEqualsSpecDto(
-            input=cls._to_translatable_normalized_string_set(
+            input=cls._convert_translatable_normalized_string_set_to_proto(
                 input_dict)
         )
 
     @classmethod
-    def _to_translatable_normalized_string_set(
+    def _convert_translatable_normalized_string_set_to_proto(
         cls, input_dict
     ):
-        """Creates a TranslatableHtmlContentId proto object.
+        """Creates a TranslatableHtmlContentIdDto proto object.
 
         Args:
             input_dict: str. A TranslatableHtml content id.
 
         Returns:
-            TranslatableHtmlContentId. The proto object.
+            TranslatableHtmlContentIdDto. The proto object.
         """
         normalized_strings_set = list(input_dict['normalizedStrSet'])
 
@@ -286,16 +286,16 @@ class TextInput(base.BaseInteraction):
         )
 
     @classmethod
-    def _to_solution_proto(cls, solution):
-        """Creates a Solution proto object
-        for TextInputInstance.
+    def _convert_solution_to_proto(cls, solution):
+        """Creates a SolutionDto proto object
+        for TextInputInstanceDto.
 
         Args:
             solution: Solution. A possible solution
                 for the question asked in this interaction.
 
         Returns:
-            Solution. The proto object.
+            SolutionDto. The proto object.
         """
         solution_proto = {}
         if solution is not None:
@@ -307,8 +307,8 @@ class TextInput(base.BaseInteraction):
         return solution_proto
 
     @classmethod
-    def _to_customization_args_proto(cls, customization_args):
-        """Creates a CustomizationArgs proto object
+    def _convert_customization_args_to_proto(cls, customization_args):
+        """Creates a CustomizationArgsDto proto object
         for TextInputInstance.
 
         Args:
@@ -318,7 +318,7 @@ class TextInput(base.BaseInteraction):
                 the customization arg.
 
         Returns:
-            CustomizationArgs. The proto object.
+            CustomizationArgsDto. The proto object.
         """
         placeholder_proto = (
             customization_args['placeholder'].value.to_proto())

@@ -73,7 +73,7 @@ class RatioExpressionInput(base.BaseInteraction):
         cls, default_outcome, customization_args,
         solution, hints, answer_groups
     ):
-        """Creates a RatioExpressionInputInstance proto object.
+        """Creates a RatioExpressionInputInstanceDto proto object.
 
         Args:
             default_outcome: Outcome. The domain object.
@@ -83,15 +83,15 @@ class RatioExpressionInput(base.BaseInteraction):
             answer_groups: AnswerGroups. The domain object.
 
         Returns:
-            RatioExpressionInputInstance. The proto object.
+            RatioExpressionInputInstanceDto. The proto object.
         """
         customization_args_proto = (
-            cls._to_customization_args_proto(customization_args)
+            cls._convert_customization_args_to_proto(customization_args)
         )
         outcome_proto = default_outcome.to_proto()
         hints_proto_list = cls.get_hint_proto(cls, hints)
-        solution_proto = cls._to_solution_proto(solution)
-        answer_groups_proto = cls._to_ratio_expression_answer_groups_proto(
+        solution_proto = cls._convert_solution_to_proto(solution)
+        answer_groups_proto = cls._convert_answer_groups_to_proto(
             answer_groups)
 
         return state_pb2.RatioExpressionInputInstanceDto(
@@ -103,21 +103,21 @@ class RatioExpressionInput(base.BaseInteraction):
         )
 
     @classmethod
-    def _to_ratio_expression_answer_groups_proto(cls, answer_groups):
-        """Creates a AnswerGroup proto object
-        for RatioExpressionInputInstance.
+    def _convert_answer_groups_to_proto(cls, answer_groups):
+        """Creates a AnswerGroupDto proto object
+        for RatioExpressionInputInstanceDto.
 
         Args:
             answer_groups: list(AnswerGroup). List of answer groups of the
                 interaction instance.
 
         Returns:
-            list. The AnswerGroup proto object list.
+            list. The AnswerGroupDto proto object list.
         """
         answer_group_list_proto = []
         for answer_group in answer_groups:
             base_answer_group_proto = answer_group.to_proto()
-            rules_spec_proto = cls._to_rule_specs_proto(
+            rules_spec_proto = cls._convert_rule_specs_to_proto(
                 answer_group.rule_specs)
             answer_group_list_proto.append(
                 state_pb2.RatioExpressionInputInstanceDto.AnswerGroupDto(
@@ -129,24 +129,24 @@ class RatioExpressionInput(base.BaseInteraction):
         return answer_group_list_proto
 
     @classmethod
-    def _to_rule_specs_proto(cls, rule_specs_list):
-        """Creates a RuleSpec proto object list.
+    def _convert_rule_specs_to_proto(cls, rule_specs_list):
+        """Creates a RuleSpecDto proto object list.
 
         Args:
             rule_specs_list: list(RuleSpec). List of rule specifications.
 
         Returns:
-            list. The RuleSpec proto object list.
+            list. The RuleSpecDto proto object list.
         """
         rule_specs_list_proto = []
 
         rule_type_to_proto_fun_mapping = {
-            'Equals': cls._to_ratio_equals_to_proto,
-            'IsEquivalent': cls._to_ratio_is_equivalent_proto,
+            'Equals': cls._convert_equals_rule_spec_to_proto,
+            'IsEquivalent': cls._convert_is_equivalent_rule_spec_to_proto,
             'HasNumberOfTermsEqualTo': (
-                cls._to_ratio_has_numer_of_terms_equal_to_proto),
+                cls._convert_has_numer_of_terms_equal_rule_spec_to_proto),
             'HasSpecificTermEqualTo': (
-                cls._to_ratio_has_specific_terms_equal_to_proto)
+                cls._convert_has_specific_terms_equal_rule_spec_to_proto)
         }
         rule_type_to_proto_mapping = {
             'Equals': lambda x: (
@@ -177,14 +177,14 @@ class RatioExpressionInput(base.BaseInteraction):
         return rule_specs_list_proto
 
     @classmethod
-    def _to_ratio_equals_to_proto(cls, ratio):
-        """Creates a EqualsSpec proto object.
+    def _convert_equals_rule_spec_to_proto(cls, ratio):
+        """Creates a EqualsSpecDto proto object.
 
         Args:
             ratio: Ratio. The Ratio domain object.
 
         Returns:
-            EqualsSpec. The proto object.
+            EqualsSpecDto. The proto object.
         """
         ratio_rule_spec = state_pb2.RatioExpressionInputInstanceDto.RuleSpecDto
 
@@ -193,14 +193,14 @@ class RatioExpressionInput(base.BaseInteraction):
         )
 
     @classmethod
-    def _to_ratio_is_equivalent_proto(cls, ratio):
-        """Creates a IsEquivalentSpec proto object.
+    def _convert_is_equivalent_rule_spec_to_proto(cls, ratio):
+        """Creates a IsEquivalentSpecDto proto object.
 
         Args:
             ratio: Ratio. The Ratio domain object.
 
         Returns:
-            IsEquivalentSpec. The proto object.
+            IsEquivalentSpecDto. The proto object.
         """
         ratio_rule_spec = state_pb2.RatioExpressionInputInstanceDto.RuleSpecDto
 
@@ -209,14 +209,16 @@ class RatioExpressionInput(base.BaseInteraction):
         )
 
     @classmethod
-    def _to_ratio_has_numer_of_terms_equal_to_proto(cls, input_term_count):
-        """Creates a HasNumberOfTermsEqualToSpec proto object.
+    def _convert_has_numer_of_terms_equal_rule_spec_to_proto(
+        cls, input_term_count
+    ):
+        """Creates a HasNumberOfTermsEqualToSpecDto proto object.
 
         Args:
             input_term_count: int. The number of terms.
 
         Returns:
-            HasNumberOfTermsEqualToSpec. The proto object.
+            HasNumberOfTermsEqualToSpecDto. The proto object.
         """
         ratio_rule_spec = state_pb2.RatioExpressionInputInstanceDto.RuleSpecDto
 
@@ -225,16 +227,16 @@ class RatioExpressionInput(base.BaseInteraction):
         )
 
     @classmethod
-    def _to_ratio_has_specific_terms_equal_to_proto(
+    def _convert_has_specific_terms_equal_rule_spec_to_proto(
         cls, input_dict
     ):
-        """Creates a HasSpecificTermEqualToSpec proto object.
+        """Creates a HasSpecificTermEqualToSpecDto proto object.
 
         Args:
             input_dict: int. The number of terms.
 
         Returns:
-            HasSpecificTermEqualToSpec. The proto object.
+            HasSpecificTermEqualToSpecDto. The proto object.
         """
         ratio_rule_spec = state_pb2.RatioExpressionInputInstanceDto.RuleSpecDto
 
@@ -244,16 +246,16 @@ class RatioExpressionInput(base.BaseInteraction):
         )
 
     @classmethod
-    def _to_solution_proto(cls, solution):
+    def _convert_solution_to_proto(cls, solution):
         """Creates a Solution proto object
-            for RatioExpressionInputInstance.
+            for RatioExpressionInputInstanceDto.
 
         Args:
             solution: Solution. A possible solution
                 for the question asked in this interaction.
 
         Returns:
-            Solution. The proto object.
+            SolutionDto. The proto object.
         """
         solution_proto = {}
         if solution is not None:
@@ -271,21 +273,21 @@ class RatioExpressionInput(base.BaseInteraction):
 
     @classmethod
     def _to_ratio_expression_proto(cls, ratio_list):
-        """Creates a RatioExpression proto object.
+        """Creates a RatioExpressionDto proto object.
 
         Args:
             ratio_list: list. The list of ratios.
 
         Returns:
-            RatioExpression. The proto object.
+            RatioExpressionDto. The proto object.
         """
         return objects_pb2.RatioExpressionDto(
             components=list(ratio_list)
         )
 
     @classmethod
-    def _to_customization_args_proto(cls, customization_args):
-        """Creates a CustomizationArgs proto object
+    def _convert_customization_args_to_proto(cls, customization_args):
+        """Creates a CustomizationArgsDto proto object
         for RatioExpressionInputInstance.
 
         Args:
@@ -295,7 +297,7 @@ class RatioExpressionInput(base.BaseInteraction):
                 the customization arg.
 
         Returns:
-            CustomizationArgs. The proto object.
+            CustomizationArgsDto. The proto object.
         """
         placeholder_proto = (
             customization_args['placeholder'].value.to_proto())

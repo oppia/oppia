@@ -68,10 +68,10 @@ class EndExploration(base.BaseInteraction):
 
     @classmethod
     def to_proto(cls):
-        """Creates a EndExplorationInstance proto object.
+        """Creates a EndExplorationInstanceDto proto object.
 
         Returns:
-            EndExplorationInstance. The EndExplorationInstance proto object.
+            EndExplorationInstanceDto. The proto object.
         """
         end_exploration_proto = state_pb2.EndExplorationInstanceDto()
 

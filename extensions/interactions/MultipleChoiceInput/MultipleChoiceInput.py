@@ -87,7 +87,7 @@ class MultipleChoiceInput(base.BaseInteraction):
     def to_proto(
         cls, default_outcome, customization_args, hints, answer_groups
     ):
-        """Creates a MultipleChoiceInputInstance proto object.
+        """Creates a MultipleChoiceInputInstanceDto proto object.
 
         Args:
             default_outcome: Outcome. The domain object.
@@ -96,14 +96,14 @@ class MultipleChoiceInput(base.BaseInteraction):
             answer_groups: AnswerGroups. The domain object.
 
         Returns:
-            MultipleChoiceInputInstance. The proto object.
+            MultipleChoiceInputInstanceDto. The proto object.
         """
         customization_args_proto = (
-            cls._to_customization_args_proto(customization_args)
+            cls._convert_customization_args_to_proto(customization_args)
         )
         outcome_proto = default_outcome.to_proto()
         hints_proto_list = cls.get_hint_proto(cls, hints)
-        answer_groups_proto = cls._to_answer_groups_proto(answer_groups)
+        answer_groups_proto = cls._convert_answer_groups_to_proto(answer_groups)
 
         return state_pb2.MultipleChoiceInputInstanceDto(
             customization_args=customization_args_proto,
@@ -113,9 +113,9 @@ class MultipleChoiceInput(base.BaseInteraction):
         )
 
     @classmethod
-    def _to_customization_args_proto(cls, customization_args):
-        """Creates a CustomizationArgs proto object
-        for MultipleChoiceInputInstance.
+    def _convert_customization_args_to_proto(cls, customization_args):
+        """Creates a CustomizationArgsDto proto object
+        for MultipleChoiceInputInstanceDto.
 
         Args:
             customization_args: dict. The customization dict. The keys are
@@ -124,7 +124,7 @@ class MultipleChoiceInput(base.BaseInteraction):
                 the customization arg.
 
         Returns:
-            CustomizationArgs. The proto object.
+            CustomizationArgsDto. The proto object.
         """
         choices_list_proto = [
             value.to_proto() for value in customization_args['choices'].value
@@ -135,21 +135,21 @@ class MultipleChoiceInput(base.BaseInteraction):
         )
 
     @classmethod
-    def _to_answer_groups_proto(cls, answer_groups):
-        """Creates a AnswerGroup proto object
-        for MultipleChoiceInputInstance.
+    def _convert_answer_groups_to_proto(cls, answer_groups):
+        """Creates a AnswerGroupDto proto object
+        for MultipleChoiceInputInstanceDto.
 
         Args:
             answer_groups: list(AnswerGroup). List of answer groups of the
                 interaction instance.
 
         Returns:
-            list. The AnswerGroup proto object list.
+            list. The AnswerGroupDto proto object list.
         """
         answer_group_list_proto = []
         for answer_group in answer_groups:
             base_answer_group_proto = answer_group.to_proto()
-            rules_spec_proto = cls._to_multiple_input_specs_proto(
+            rules_spec_proto = cls._convert_rule_specs_to_proto(
                 answer_group.rule_specs)
             answer_group_list_proto.append(
                 state_pb2.MultipleChoiceInputInstanceDto.AnswerGroupDto(
@@ -161,19 +161,19 @@ class MultipleChoiceInput(base.BaseInteraction):
         return answer_group_list_proto
 
     @classmethod
-    def _to_multiple_input_specs_proto(cls, rule_specs_list):
-        """Creates a RuleSpec proto object.
+    def _convert_rule_specs_to_proto(cls, rule_specs_list):
+        """Creates a RuleSpecDto proto object.
 
         Args:
             rule_specs_list: list(RuleSpec). List of rule specifications.
 
         Returns:
-            list. The RuleSpec proto object list.
+            list. The RuleSpecDto proto object list.
         """
         rule_specs_list_proto = []
 
         rule_type_to_proto_func_mapping = {
-            'Equals': cls._to_equal_to_proto
+            'Equals': cls._convert_equals_rule_spec_to_proto
         }
         rule_type_to_proto_mapping = {
              'Equals': lambda x: (
@@ -195,15 +195,17 @@ class MultipleChoiceInput(base.BaseInteraction):
         return rule_specs_list_proto
 
     @classmethod
-    def _to_equal_to_proto(cls, equal):
-        """Creates a proto object for EqualsSpec.
+    def _convert_equals_rule_spec_to_proto(cls, equal):
+        """Creates a proto object for EqualsSpecDto.
 
         Args:
             equal: int. The input to match with.
 
         Returns:
-            EqualsSpec. The proto object.
+            EqualsSpecDto. The proto object.
         """
         multiple_choice_dto = state_pb2.MultipleChoiceInputInstanceDto
+
         return multiple_choice_dto.RuleSpecDto.EqualsSpecDto(
-            input=equal)
+            input=equal
+        )

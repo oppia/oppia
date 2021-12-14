@@ -56,18 +56,18 @@ class Continue(base.BaseInteraction):
 
     @classmethod
     def to_proto(cls, default_outcome, customization_args):
-        """Creates a ContinueInstance proto object.
+        """Creates a ContinueInstanceDto proto object.
 
         Args:
             default_outcome: Outcome. The domain object.
             customization_args: CustomizationArgs. The domain object.
 
         Returns:
-            ContinueInstance. The proto object.
+            ContinueInstanceDto. The proto object.
         """
         outcome_proto = default_outcome.to_proto()
         customization_args_proto = (
-            cls._to_customization_args_proto(customization_args)
+            cls._convert_customization_args_to_proto(customization_args)
         )
 
         return state_pb2.ContinueInstanceDto(
@@ -76,9 +76,9 @@ class Continue(base.BaseInteraction):
         )
 
     @classmethod
-    def _to_customization_args_proto(cls, customization_args):
-        """Creates a CustomizationArgs proto object
-        for ContinueInstance.
+    def _convert_customization_args_to_proto(cls, customization_args):
+        """Creates a CustomizationArgsDto proto object
+        for ContinueInstanceDto.
 
         Args:
             customization_args: dict. The customization dict. The keys are
@@ -87,7 +87,7 @@ class Continue(base.BaseInteraction):
                 the customization arg.
 
         Returns:
-            CustomizationArgs. The CustomizationArgs proto object.
+            CustomizationArgsDto. The proto object.
         """
         return state_pb2.ContinueInstanceDto.CustomizationArgsDto(
             button_text=customization_args['buttonText'].value.to_proto()

@@ -72,12 +72,12 @@ class NumericExpressionInput(base.BaseInteraction):
             NumericExpressionInputInstanceDto. The proto object.
         """
         customization_args_proto = (
-            cls._to_customization_args_proto(customization_args)
+            cls._convert_customization_args_to_proto(customization_args)
         )
         outcome_proto = default_outcome.to_proto()
         hints_proto_list = cls.get_hint_proto(cls, hints)
-        solution_proto = cls._to_solution_proto(solution)
-        answer_groups_proto = cls._to_answer_groups_proto(answer_groups)
+        solution_proto = cls._convert_solution_to_proto(solution)
+        answer_groups_proto = cls._convert_answer_groups_to_proto(answer_groups)
 
         return state_pb2.NumericExpressionInputInstanceDto(
             customization_args=customization_args_proto,
@@ -88,7 +88,7 @@ class NumericExpressionInput(base.BaseInteraction):
         )
 
     @classmethod
-    def _to_customization_args_proto(cls, customization_args):
+    def _convert_customization_args_to_proto(cls, customization_args):
         """Creates a CustomizationArgs proto object
         for NumericExpressionInputInstanceDto.
 
@@ -113,7 +113,7 @@ class NumericExpressionInput(base.BaseInteraction):
         )
 
     @classmethod
-    def _to_answer_groups_proto(cls, answer_groups):
+    def _convert_answer_groups_to_proto(cls, answer_groups):
         """Creates a AnswerGroup proto object
         for NumericExpressionInputInstanceDto.
 
@@ -127,7 +127,8 @@ class NumericExpressionInput(base.BaseInteraction):
         answer_group_list_proto = []
         for answer_group in answer_groups:
             base_answer_group_proto = answer_group.to_proto()
-            rules_spec_proto = cls._to_rule_specs_proto(answer_group.rule_specs)
+            rules_spec_proto = cls._convert_rule_specs_to_proto(
+                answer_group.rule_specs)
             answer_group_list_proto.append(
                 state_pb2.NumericExpressionInputInstanceDto.AnswerGroupDto(
                     base_answer_group=base_answer_group_proto,
@@ -138,7 +139,7 @@ class NumericExpressionInput(base.BaseInteraction):
         return answer_group_list_proto
 
     @classmethod
-    def _to_rule_specs_proto(cls, rule_specs_list):
+    def _convert_rule_specs_to_proto(cls, rule_specs_list):
         """Creates a RuleSpec proto object.
 
         Args:
@@ -150,10 +151,11 @@ class NumericExpressionInput(base.BaseInteraction):
         rule_specs_list_proto = []
 
         rule_type_to_proto_func_mapping = {
-            'MatchesExactlyWith': cls._to_matches_exactly_to_proto,
-            'IsEquivalentTo': cls._to_is_equivalent_to_proto,
-            'ContainsSomeOf': cls._to_contains_some_proto,
-            'OmitsSomeOf': cls._to_omit_some_proto
+            'MatchesExactlyWith': (
+                cls._convert_matches_exactly_rule_spec_to_proto),
+            'IsEquivalentTo': cls._convert_is_equivalent_rule_spec_to_proto,
+            'ContainsSomeOf': cls._convert_contains_some_rule_spec_to_proto,
+            'OmitsSomeOf': cls._convert_omit_some_rule_spec_to_proto
         }
 
         rule_type_to_proto_mapping = {
@@ -185,7 +187,7 @@ class NumericExpressionInput(base.BaseInteraction):
         return rule_specs_list_proto
 
     @classmethod
-    def _to_matches_exactly_to_proto(cls, numeric_expression):
+    def _convert_matches_exactly_rule_spec_to_proto(cls, numeric_expression):
         """Creates a proto object for MatchesExactlyWithSpecDto.
 
         Args:
@@ -201,7 +203,7 @@ class NumericExpressionInput(base.BaseInteraction):
         )
 
     @classmethod
-    def _to_is_equivalent_to_proto(cls, numeric_expression):
+    def _convert_is_equivalent_rule_spec_to_proto(cls, numeric_expression):
         """Creates a proto object for IsEquivalentToSpecDto.
 
         Args:
@@ -217,7 +219,7 @@ class NumericExpressionInput(base.BaseInteraction):
         )
 
     @classmethod
-    def _to_contains_some_proto(cls, numeric_expression):
+    def _convert_contains_some_rule_spec_to_proto(cls, numeric_expression):
         """Creates a proto object for ContainsSomeOfSpecDto.
 
         Args:
@@ -233,7 +235,7 @@ class NumericExpressionInput(base.BaseInteraction):
         )
 
     @classmethod
-    def _to_omit_some_proto(cls, numeric_expression):
+    def _convert_omit_some_rule_spec_to_proto(cls, numeric_expression):
         """Creates a proto object for OmitsSomeOfSpecDto.
 
         Args:
@@ -249,7 +251,7 @@ class NumericExpressionInput(base.BaseInteraction):
         )
 
     @classmethod
-    def _to_solution_proto(cls, solution):
+    def _convert_solution_to_proto(cls, solution):
         """Creates a Solution proto object
         for NumericExpressionInputInstanceDto.
 

@@ -110,7 +110,7 @@ class AnswerGroup:
         """Returns a proto representation of the answer group object.
 
         Returns:
-            BaseAnswerGroup. The proto object.
+            BaseAnswerGroupDto. The proto object.
         """
         misconception_proto = {}
         if self.tagged_skill_misconception_id is not None:
@@ -319,7 +319,7 @@ class Hint:
         """Returns a proto representation of the hint object.
 
         Returns:
-            Hint. The proto object.
+            HintDto. The proto object.
         """
         return state_pb2.HintDto(hint_content=self.hint_content.to_proto())
 
@@ -416,7 +416,7 @@ class Solution:
         """Returns a proto representation of the solution object.
 
         Returns:
-            BaseSolution. The proto object.
+            BaseSolutionDto. The proto object.
         """
         return state_pb2.BaseSolutionDto(
             explanation=self.explanation.to_proto()
@@ -1400,7 +1400,7 @@ class Outcome:
         """Returns a proto representation of the outcome object.
 
         Returns:
-            Outcome. The proto object.
+            OutcomeDto. The proto object.
         """
         return state_pb2.OutcomeDto(
             destination_state=self.dest,
@@ -1536,7 +1536,7 @@ class Voiceover:
         """Returns a proto representation of the voiceover object.
 
         Returns:
-            Voiceover. The proto object.
+            VoiceoverDto. The proto object.
         """
         return languages_pb2.VoiceoverFileDto(
             filename=self.filename,
@@ -1701,7 +1701,7 @@ class WrittenTranslation:
         """Returns a proto representation of the written translation object.
 
         Returns:
-            WrittenTranslation. The proto object.
+            WrittenTranslationDto. The proto object.
         """
         written_translation_proto = {}
         if self.data_format == (
@@ -1811,7 +1811,7 @@ class WrittenTranslations:
         """Returns a proto representation of the written translations object.
 
         Returns:
-            WrittenTranslations. The proto object.
+            WrittenTranslationsDto. The proto object.
         """
         translation_language_mapping_protos = (
             self._to_translation_language_mapping_proto(
@@ -2165,7 +2165,7 @@ class RecordedVoiceovers:
         """Returns a proto representation of the recorded voiceovers object.
 
         Returns:
-            RecordedVoicovers. The proto object.
+            RecordedVoicoversDto. The proto object.
         """
         voiceover_content_mapping_protos = (
             self._to_voiceovers_content_mapping_protos(
@@ -2570,7 +2570,7 @@ class SubtitledHtml:
         """Returns a proto representation of the subtitled html object.
 
         Returns:
-            SubtitledText. The proto object.
+            SubtitledTextDto. The proto object.
         """
         return languages_pb2.SubtitledTextDto(
             content_id=self.content_id,
@@ -2655,7 +2655,7 @@ class SubtitledUnicode:
         """Returns a proto representation of the subtitled unicode object.
 
         Returns:
-            SubtitledText. The proto object.
+            SubtitledTextDto. The proto object.
         """
         return languages_pb2.SubtitledTextDto(
             content_id=self.content_id,
@@ -2760,7 +2760,7 @@ class TranslatableItem:
             translation: list(str). The translated content.
 
         Returns:
-            WrittenTranslatableSet. The proto object.
+            WrittenTranslatableSetDto. The proto object.
         """
         return languages_pb2.SetOfWrittenTranslatableTextDto(
             translations=translation
@@ -3731,7 +3731,7 @@ class State:
         """Returns a proto representation of the state object.
 
         Returns:
-            State. The proto object.
+            StateDto. The proto object.
         """
         return state_pb2.StateDto(
             content=self.content.to_proto(),

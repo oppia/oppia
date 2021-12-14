@@ -101,7 +101,7 @@ class ItemSelectionInput(base.BaseInteraction):
     def to_proto(
         cls, default_outcome, customization_args, hints, answer_groups
     ):
-        """Creates a ItemSelectionInputInstance proto object.
+        """Creates a ItemSelectionInputInstanceDto proto object.
 
         Args:
             default_outcome: Outcome. The domain object.
@@ -110,14 +110,14 @@ class ItemSelectionInput(base.BaseInteraction):
             answer_groups: AnswerGroups. The domain object.
 
         Returns:
-            ItemSelectionInputInstance. The proto object.
+            ItemSelectionInputInstanceDto. The proto object.
         """
         customization_arg_proto = (
-            cls._to_customization_args_proto(customization_args)
+            cls._convert_customization_args_to_proto(customization_args)
         )
         outcome_proto = default_outcome.to_proto()
         hints_proto_list = cls.get_hint_proto(cls, hints)
-        answer_groups_proto = cls._to_answer_groups_proto(answer_groups)
+        answer_groups_proto = cls._convert_answer_groups_to_proto(answer_groups)
 
         return state_pb2.ItemSelectionInputInstanceDto(
             customization_args=customization_arg_proto,
@@ -127,9 +127,9 @@ class ItemSelectionInput(base.BaseInteraction):
         )
 
     @classmethod
-    def _to_customization_args_proto(cls, customization_args):
-        """Creates a CustomizationArgs proto object
-        for ItemSelectionInputInstance.
+    def _convert_customization_args_to_proto(cls, customization_args):
+        """Creates a CustomizationArgsDto proto object
+        for ItemSelectionInputInstanceDto.
 
         Args:
             customization_args: dict. The customization dict. The keys are
@@ -138,7 +138,7 @@ class ItemSelectionInput(base.BaseInteraction):
                 the customization arg.
 
         Returns:
-            CustomizationArgs. The proto object.
+            CustomizationArgsDto. The proto object.
         """
         choices_list_proto = [
             value.to_proto() for value in customization_args['choices'].value
@@ -155,21 +155,21 @@ class ItemSelectionInput(base.BaseInteraction):
         )
 
     @classmethod
-    def _to_answer_groups_proto(cls, answer_groups):
-        """Creates a AnswerGroup proto object
-        for ItemSelectionInputInstance.
+    def _convert_answer_groups_to_proto(cls, answer_groups):
+        """Creates a AnswerGroupDto proto object
+        for ItemSelectionInputInstanceDto.
 
         Args:
             answer_groups: list(AnswerGroup). List of answer groups of the
                 interaction instance.
 
         Returns:
-            list. The AnswerGroup proto object list.
+            list. The AnswerGroupDto proto object list.
         """
         answer_group_list_proto = []
         for answer_group in answer_groups:
             base_answer_group_proto = answer_group.to_proto()
-            rules_spec_proto = cls._to_item_selection_rule_specs_proto(
+            rules_spec_proto = cls._convert_rule_specs_to_proto(
                 answer_group.rule_specs)
             answer_group_list_proto.append(
                 state_pb2.ItemSelectionInputInstanceDto.AnswerGroupDto(
@@ -181,23 +181,25 @@ class ItemSelectionInput(base.BaseInteraction):
         return answer_group_list_proto
 
     @classmethod
-    def _to_item_selection_rule_specs_proto(cls, rule_specs_list):
-        """Creates a RuleSpec proto object.
+    def _convert_rule_specs_to_proto(cls, rule_specs_list):
+        """Creates a RuleSpecDto proto object.
 
         Args:
             rule_specs_list: list(RuleSpec). List of rule specifications.
 
         Returns:
-            list. The RuleSpec proto object list.
+            list. The RuleSpecDto proto object list.
         """
         rule_specs_list_proto = []
 
         rule_type_to_proto_func_mapping = {
-            'Equals': cls._to_is_equal_to_proto,
-            'ContainsAtLeastOneOf': cls._to_contains_at_least_one_of_to_proto,
-            'IsProperSubsetOf': cls._to_is_proper_subset_of_to_proto,
+            'Equals': cls._convert_equals_rule_spec_to_proto,
+            'ContainsAtLeastOneOf': (
+                cls._convert_contains_at_least_one_of_rule_spec_to_proto),
+            'IsProperSubsetOf': (
+                cls._convert_is_proper_subset_of_rule_spec_to_proto),
             'DoesNotContainAtLeastOneOf': (
-                cls._to_does_not_contains_at_least_one_of_to_proto),
+                cls._convert_does_not_contains_at_least_one_of_rule_spec_to_proto), # pylint: disable=line-too-long
         }
 
         rule_type_to_proto_mapping = {
@@ -228,90 +230,90 @@ class ItemSelectionInput(base.BaseInteraction):
         return rule_specs_list_proto
 
     @classmethod
-    def _to_is_equal_to_proto(cls, choice_list):
-        """Creates a proto object for EqualsSpec.
+    def _convert_equals_rule_spec_to_proto(cls, choice_list):
+        """Creates a proto object for EqualsSpecDto.
 
         Args:
             choice_list: list. Choice list to select from.
 
         Returns:
-            EqualsSpec. The proto object.
+            EqualsSpecDto. The proto object.
         """
         item_rule_spec = state_pb2.ItemSelectionInputInstanceDto.RuleSpecDto
 
         return item_rule_spec.EqualsSpecDto(
-            input=cls._to_set_of_translatable_html_content_ids_proto(
+            input=cls._convert_set_of_translatable_html_content_ids_to_proto(
                 choice_list)
         )
 
     @classmethod
-    def _to_contains_at_least_one_of_to_proto(cls, choice_list):
-        """Creates a proto object for ContainsAtLeastOneOfSpec.
+    def _convert_contains_at_least_one_of_rule_spec_to_proto(cls, choice_list):
+        """Creates a proto object for ContainsAtLeastOneOfSpecDto.
 
         Args:
             choice_list: list. Choice list to select from.
 
         Returns:
-            ContainsAtLeastOneOfSpec. The proto object.
+            ContainsAtLeastOneOfSpecDto. The proto object.
         """
         item_rule_spec = state_pb2.ItemSelectionInputInstanceDto.RuleSpecDto
 
         return item_rule_spec.ContainsAtLeastOneOfSpecDto(
-            input=cls._to_set_of_translatable_html_content_ids_proto(
+            input=cls._convert_set_of_translatable_html_content_ids_to_proto(
                 choice_list)
         )
 
     @classmethod
-    def _to_is_proper_subset_of_to_proto(cls, choice_list):
-        """Creates a proto object for IsProperSubsetOfSpec.
+    def _convert_is_proper_subset_of_rule_spec_to_proto(cls, choice_list):
+        """Creates a proto object for IsProperSubsetOfSpecDto.
 
         Args:
             choice_list: list. Choice list to select from.
 
         Returns:
-            IsProperSubsetOfSpec. The proto object.
+            IsProperSubsetOfSpecDto. The proto object.
         """
         item_rule_spec = state_pb2.ItemSelectionInputInstanceDto.RuleSpecDto
 
         return item_rule_spec.IsProperSubsetOfSpecDto(
-            input=cls._to_set_of_translatable_html_content_ids_proto(
+            input=cls._convert_set_of_translatable_html_content_ids_to_proto(
                 choice_list)
         )
 
     @classmethod
-    def _to_does_not_contains_at_least_one_of_to_proto(
+    def _convert_does_not_contains_at_least_one_of_rule_spec_to_proto(
         cls, choice_list
     ):
-        """Creates a proto object for DoesNotContainAtLeastOneOfSpec.
+        """Creates a proto object for DoesNotContainAtLeastOneOfSpecDto.
 
         Args:
             choice_list: list. Choice list to select from.
 
         Returns:
-            DoesNotContainAtLeastOneOfSpec. The proto object.
+            DoesNotContainAtLeastOneOfSpecDto. The proto object.
         """
         item_rule_spec = state_pb2.ItemSelectionInputInstanceDto.RuleSpecDto
 
         return item_rule_spec.DoesNotContainAtLeastOneOfSpecDto(
-            input=cls._to_set_of_translatable_html_content_ids_proto(
+            input=cls._convert_set_of_translatable_html_content_ids_to_proto(
                 choice_list)
         )
 
     @classmethod
-    def _to_set_of_translatable_html_content_ids_proto(
+    def _convert_set_of_translatable_html_content_ids_to_proto(
         cls, set_of_content_id
     ):
-        """Creates a SetOfTranslatableHtmlContentIds proto object.
+        """Creates a SetOfTranslatableHtmlContentIdsDto proto object.
 
         Args:
             set_of_content_id: list. A list of
                 TranslatableHtmlContentId.
 
         Returns:
-            SetOfTranslatableHtmlContentIds. The proto object.
+            SetOfTranslatableHtmlContentIdsDto. The proto object.
         """
         content_id_lists_proto = [
-            cls._to_translatable_html_content_id_proto(
+            cls._convert_translatable_html_content_id_to_proto(
                 translatable_html_content_id
             ) for translatable_html_content_id in set_of_content_id
         ]
@@ -321,17 +323,17 @@ class ItemSelectionInput(base.BaseInteraction):
         )
 
     @classmethod
-    def _to_translatable_html_content_id_proto(
+    def _convert_translatable_html_content_id_to_proto(
         cls, translatable_html_content_id
     ):
-        """Creates a TranslatableHtmlContentId proto object.
+        """Creates a TranslatableHtmlContentIdDto proto object.
 
         Args:
             translatable_html_content_id: str. A
                 TranslatableHtml content id.
 
         Returns:
-            TranslatableHtmlContentId. The proto object.
+            TranslatableHtmlContentIdDto. The proto object.
         """
         return objects_pb2.TranslatableHtmlContentIdDto(
             content_id=translatable_html_content_id

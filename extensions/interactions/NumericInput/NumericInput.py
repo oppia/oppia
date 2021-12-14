@@ -63,7 +63,7 @@ class NumericInput(base.BaseInteraction):
     def to_proto(
         cls, default_outcome, solution, hints, answer_groups
     ):
-        """Creates a NumericInputInstance proto object.
+        """Creates a NumericInputInstanceDto proto object.
 
         Args:
             default_outcome: Outcome. The domain object.
@@ -72,12 +72,12 @@ class NumericInput(base.BaseInteraction):
             answer_groups: AnswerGroups. The domain object.
 
         Returns:
-            NumericInputInstance. The proto object.
+            NumericInputInstanceDto. The proto object.
         """
         outcome_proto = default_outcome.to_proto()
         hints_proto_list = cls.get_hint_proto(cls, hints)
-        solution_proto = cls._to_solution_proto(solution)
-        answer_groups_proto = cls._to_answer_groups_proto(answer_groups)
+        solution_proto = cls._convert_solution_to_proto(solution)
+        answer_groups_proto = cls._convert_answer_groups_to_proto(answer_groups)
 
         return state_pb2.NumericInputInstanceDto(
             default_outcome=outcome_proto,
@@ -87,16 +87,16 @@ class NumericInput(base.BaseInteraction):
         )
 
     @classmethod
-    def _to_solution_proto(cls, solution):
-        """Creates a Solution proto object
-        for NumericInputInstance.
+    def _convert_solution_to_proto(cls, solution):
+        """Creates a SolutionDto proto object
+        for NumericInputInstanceDto.
 
         Args:
             solution: Solution. A possible solution
                 for the question asked in this interaction.
 
         Returns:
-            Solution. The proto object.
+            SolutionDto. The proto object.
         """
         solution_proto = {}
         if solution is not None:
@@ -108,22 +108,22 @@ class NumericInput(base.BaseInteraction):
         return solution_proto
 
     @classmethod
-    def _to_answer_groups_proto(cls, answer_groups):
-        """Creates a AnswerGroup proto object
-        for NumericInputInstance.
+    def _convert_answer_groups_to_proto(cls, answer_groups):
+        """Creates a AnswerGroupDto proto object
+        for NumericInputInstanceDto.
 
         Args:
             answer_groups: list(AnswerGroup). List of answer groups of the
                 interaction instance.
 
         Returns:
-            list. The AnswerGroup proto object list.
+            list. The AnswerGroupDto proto object list.
         """
         answer_group_list_proto = []
 
         for answer_group in answer_groups:
             base_answer_group_proto = answer_group.to_proto()
-            rules_spec_proto = cls._to_rule_specs_proto(
+            rules_spec_proto = cls._convert_rule_specs_to_proto(
                 answer_group.rule_specs)
             answer_group_list_proto.append(
                 state_pb2.NumericInputInstanceDto.AnswerGroupDto(
@@ -135,28 +135,29 @@ class NumericInput(base.BaseInteraction):
         return answer_group_list_proto
 
     @classmethod
-    def _to_rule_specs_proto(cls, rule_specs_list):
-        """Creates a RuleSpec proto object list.
+    def _convert_rule_specs_to_proto(cls, rule_specs_list):
+        """Creates a RuleSpecDto proto object list.
 
         Args:
             rule_specs_list: list(RuleSpec). List of rule specifications.
 
         Returns:
-            list. The RuleSpec proto object list.
+            list. The RuleSpecDto proto object list.
         """
         rule_specs_list_proto = []
 
         rule_type_to_proto_fun_mapping = {
-            'Equals': cls._to_numeric_equals_to_proto,
-            'IsLessThan': cls._to_numeric_is_less_than_proto,
-            'IsGreaterThan': cls._to_numeric_is_greater_than_proto,
+            'Equals': cls._convert_equals_rule_spec_to_proto,
+            'IsLessThan': cls._convert_is_less_than_rule_spec_to_proto,
+            'IsGreaterThan': cls._convert_is_greater_than_rule_spec_to_proto,
             'IsLessThanOrEqualTo': (
-                cls._to_numeric_is_less_than_or_equal_to_proto),
+                cls._convert_is_less_than_or_equal_rule_spec_to_proto),
             'IsGreaterThanOrEqualTo': (
-                cls._to_numeric_is_greater_than_or_equal_to_proto),
+                cls._convert_is_greater_than_or_equal_rule_spec_to_proto),
             'IsInclusivelyBetween': (
-                cls._to_numeric_is_inclusively_between_proto),
-            'IsWithinTolerance': cls._to_numeric_is_within_tolerance_proto
+                cls._convert_is_inclusively_between_rule_spec_to_proto),
+            'IsWithinTolerance': (
+                cls._convert_is_within_tolerance_rule_spec_to_proto)
         }
         rule_type_to_proto_mapping = {
             'Equals': lambda x: (
@@ -196,14 +197,14 @@ class NumericInput(base.BaseInteraction):
         return rule_specs_list_proto
 
     @classmethod
-    def _to_numeric_equals_to_proto(cls, inputs):
-        """Creates a EqualsSpec proto object.
+    def _convert_equals_rule_spec_to_proto(cls, inputs):
+        """Creates a EqualsSpecDto proto object.
 
         Args:
             inputs: list. The input list.
 
         Returns:
-            EqualsSpec. The proto object.
+            EqualsSpecDto. The proto object.
         """
         numeric_rule_spec = state_pb2.NumericInputInstanceDto.RuleSpecDto
         equals_to_proto = {}
@@ -214,14 +215,14 @@ class NumericInput(base.BaseInteraction):
         return equals_to_proto
 
     @classmethod
-    def _to_numeric_is_less_than_proto(cls, inputs):
-        """Creates a IsLessThanSpec proto object.
+    def _convert_is_less_than_rule_spec_to_proto(cls, inputs):
+        """Creates a IsLessThanSpecDto proto object.
 
         Args:
             inputs: list. The input list.
 
         Returns:
-            IsLessThanSpec. The proto object.
+            IsLessThanSpecDto. The proto object.
         """
         numeric_rule_spec = state_pb2.NumericInputInstanceDto.RuleSpecDto
         is_less_than_proto = {}
@@ -232,14 +233,14 @@ class NumericInput(base.BaseInteraction):
         return is_less_than_proto
 
     @classmethod
-    def _to_numeric_is_greater_than_proto(cls, inputs):
-        """Creates a IsGreaterThanSpec proto object.
+    def _convert_is_greater_than_rule_spec_to_proto(cls, inputs):
+        """Creates a IsGreaterThanSpecDto proto object.
 
         Args:
             inputs: list. The input list.
 
         Returns:
-            IsGreaterThanSpec. The proto object.
+            IsGreaterThanSpecDto. The proto object.
         """
         numeric_rule_spec = state_pb2.NumericInputInstanceDto.RuleSpecDto
         is_greater_than_proto = {}
@@ -252,14 +253,14 @@ class NumericInput(base.BaseInteraction):
         return is_greater_than_proto
 
     @classmethod
-    def _to_numeric_is_less_than_or_equal_to_proto(cls, inputs):
-        """Creates a IsLessThanOrEqualToSpec proto object.
+    def _convert_is_less_than_or_equal_rule_spec_to_proto(cls, inputs):
+        """Creates a IsLessThanOrEqualToSpecDto proto object.
 
         Args:
             inputs: list. The input list.
 
         Returns:
-            IsLessThanOrEqualToSpec. The proto object.
+            IsLessThanOrEqualToSpecDto. The proto object.
         """
         numeric_rule_spec = state_pb2.NumericInputInstanceDto.RuleSpecDto
         is_less_than_or_equal_to_proto = {}
@@ -272,14 +273,14 @@ class NumericInput(base.BaseInteraction):
         return is_less_than_or_equal_to_proto
 
     @classmethod
-    def _to_numeric_is_greater_than_or_equal_to_proto(cls, inputs):
-        """Creates a IsGreaterThanOrEqualToSpec proto object.
+    def _convert_is_greater_than_or_equal_rule_spec_to_proto(cls, inputs):
+        """Creates a IsGreaterThanOrEqualToSpecDto proto object.
 
         Args:
             inputs: list. The input list.
 
         Returns:
-            IsGreaterThanOrEqualToSpec. The proto object.
+            IsGreaterThanOrEqualToSpecDto. The proto object.
         """
         numeric_rule_spec = state_pb2.NumericInputInstanceDto.RuleSpecDto
         is_greater_than_or_equal_to_proto = {}
@@ -292,14 +293,14 @@ class NumericInput(base.BaseInteraction):
         return is_greater_than_or_equal_to_proto
 
     @classmethod
-    def _to_numeric_is_inclusively_between_proto(cls, inputs):
-        """Creates a IsInclusivelyBetweenSpec proto object.
+    def _convert_is_inclusively_between_rule_spec_to_proto(cls, inputs):
+        """Creates a IsInclusivelyBetweenSpecDto proto object.
 
         Args:
             inputs: list. The input list.
 
         Returns:
-            IsInclusivelyBetweenSpec. The proto object.
+            IsInclusivelyBetweenSpecDto. The proto object.
         """
         numeric_rule_spec = state_pb2.NumericInputInstanceDto.RuleSpecDto
         is_inclusively_between_proto = {}
@@ -315,14 +316,14 @@ class NumericInput(base.BaseInteraction):
         return is_inclusively_between_proto
 
     @classmethod
-    def _to_numeric_is_within_tolerance_proto(cls, inputs):
-        """Creates a IsWithinToleranceSpec proto object.
+    def _convert_is_within_tolerance_rule_spec_to_proto(cls, inputs):
+        """Creates a IsWithinToleranceSpecDto proto object.
 
         Args:
             inputs: list. The input list.
 
         Returns:
-            IsWithinToleranceSpec. The proto object.
+            IsWithinToleranceSpecDto. The proto object.
         """
         numeric_rule_spec = state_pb2.NumericInputInstanceDto.RuleSpecDto
         is_within_tolerance_proto = {}

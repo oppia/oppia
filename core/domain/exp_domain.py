@@ -782,11 +782,8 @@ class Exploration:
         exploration.created_on = exploration_created_on
         exploration.last_updated = exploration_last_updated
 
-        if exploration_dict.get('proto_size_in_bytes') is None:
-            exploration.proto_size_in_bytes = exploration.get_proto_size()
-        else:
-            exploration.proto_size_in_bytes = (
-                exploration_dict['proto_size_in_bytes'])
+        exploration.proto_size_in_bytes = (
+            exploration_dict['proto_size_in_bytes'])
 
         return exploration
 
@@ -936,7 +933,7 @@ class Exploration:
 
         if not isinstance(self.proto_size_in_bytes, int):
             raise utils.ValidationError(
-                'Expected proto size to be a int, received %s'
+                'Expected proto size to be an int, received %s'
                 % self.proto_size_in_bytes)
 
         if self.proto_size_in_bytes <= 0:
@@ -2246,8 +2243,8 @@ class Exploration:
 
     @classmethod
     def _convert_v54_dict_to_v55_dict(cls, exploration_dict, exploration_id):
-        """Converts a v54 exploration dict into a v54 exploration dict.
-        Version 55 contains exploration size.
+        """Converts a v54 exploration dict into a v55 exploration dict.
+        Version 55 contains the exploration size.
 
         Args:
             exploration_dict: dict. The dict representation of an exploration
@@ -2526,7 +2523,7 @@ class Exploration:
         """Returns a proto representation of the exploration object.
 
         Returns:
-            Exploration. The exploration proto object.
+            ExplorationDto. The proto object.
         """
         state_protos = {}
         for (state_name, state) in self.states.items():

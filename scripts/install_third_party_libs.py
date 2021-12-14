@@ -371,7 +371,7 @@ def main() -> None:
     # Compile protobuf files.
     print('Installing buf and protoc binary.')
     install_buf_and_protoc()
-    print('Updating android proto files.')
+    print('Updating oppia proto api files.')
     rewrite_android_proto_files()
     move_all_proto_files_to_third_party()
     print('Compiling protobuf files.')
