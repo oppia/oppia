@@ -135,7 +135,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
             }
             return ExplorationHtmlFormatterService.getInteractionHtml(
               StateInteractionIdService.savedMemento,
-              interactionCustomizationArgs, false, null);
+              interactionCustomizationArgs, false, null, null);
           };
 
           var _updateInteractionPreview = function() {

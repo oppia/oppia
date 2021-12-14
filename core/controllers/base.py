@@ -196,6 +196,11 @@ class BaseHandler(webapp2.RequestHandler):
             auth_services.destroy_auth_session(self.response)
             self.redirect(user_services.create_login_url(self.request.uri))
             return
+        except auth_domain.UserDisabledError:
+            auth_services.destroy_auth_session(self.response)
+            self.redirect(
+                '/logout?redirect_url=%s' % feconf.PENDING_ACCOUNT_DELETION_URL)
+            return
         except auth_domain.InvalidAuthSessionError:
             logging.exception('User session is invalid!')
             auth_services.destroy_auth_session(self.response)

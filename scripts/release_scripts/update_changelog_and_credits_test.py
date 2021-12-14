@@ -357,7 +357,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
 
     def test_removal_of_updates_with_unknown_object_exception(self):
         def mock_delete(unused_self):
-            raise github.UnknownObjectException(status='', data='')
+            raise github.UnknownObjectException(status='', data='', headers={})
         delete_swap = self.swap(
             github.GitRef.GitRef, 'delete', mock_delete)
         with self.run_cmd_swap, self.get_git_ref_swap, delete_swap:

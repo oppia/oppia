@@ -1225,7 +1225,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertItemsEqual(
             expected_user_settings_output, user_settings_models)
 
-    def test_mark_user_for_deletion_deletes_user_settings(self):
+    def test_mark_user_for_deletion_marks_user_settings_as_deleted(self):
         auth_id = 'test_id'
         username = 'testname'
         user_email = 'test@email.com'
@@ -1239,7 +1239,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_services.mark_user_for_deletion(user_id)
 
         user_settings = user_services.get_user_settings_by_auth_id(auth_id)
-        self.assertIsNone(user_settings)
+        self.assertTrue(user_settings.deleted)
 
     def test_mark_user_for_deletion_deletes_user_auth_details_entry(self):
         auth_id = 'test_id'
