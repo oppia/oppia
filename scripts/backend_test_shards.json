@@ -166,7 +166,8 @@
         "core.domain.learner_progress_services_test",
         "core.domain.config_services_test",
         "core.domain.subtopic_page_services_test",
-        "core.domain.calculation_registry_test"
+        "core.domain.calculation_registry_test",
+        "scripts.extend_index_yaml_test"
     ],
     "4": [
         "core.domain.question_fetchers_test",
