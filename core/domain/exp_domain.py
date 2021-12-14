@@ -2242,7 +2242,9 @@ class Exploration:
         return exploration_dict
 
     @classmethod
-    def _convert_v54_dict_to_v55_dict(cls, exploration_dict, exploration_id):
+    def _convert_v54_dict_to_v55_dict(
+        cls, exploration_dict, exploration_id, yaml_content
+    ):
         """Converts a v54 exploration dict into a v55 exploration dict.
         Version 55 contains the exploration size.
 
@@ -2250,6 +2252,7 @@ class Exploration:
             exploration_dict: dict. The dict representation of an exploration
                 with schema version v55.
             exploration_id: str. The exploration id.
+            yaml_content: str. The YAML representation of the exploration.
 
         Returns:
             dict. The dict representation of the Exploration domain object,
@@ -2257,9 +2260,9 @@ class Exploration:
         """
         exploration_dict['id'] = exploration_id
 
-        exploration = cls.from_dict(exploration_dict)
-        exploration_dict['proto_size_in_bytes'] = (
-            exploration.proto_size_in_bytes)
+        exploration = cls.from_yaml(exploration_id, yaml_content)
+        exploration_dict['proto_size_in_bytes'] = exploration.get_proto_size()
+
         return exploration_dict
 
     @classmethod
@@ -2341,7 +2344,7 @@ class Exploration:
 
         if exploration_schema_version == 54:
             exploration_dict = cls._convert_v54_dict_to_v55_dict(
-                exploration_dict, exploration_id)
+                exploration_dict, exploration_id, yaml_content)
             exploration_schema_version = 55
 
         return exploration_dict
