@@ -701,7 +701,7 @@ class _Validators:
             bool. Whether the given object is a filename with valid
             audio extension.
         """
-        
+
         if match_case is False:
             obj.lower()
             choices = [choice.lower() for choice in choices]
