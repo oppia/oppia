@@ -49,4 +49,8 @@ export class WelcomeTranslationModalComponent
     this.translationWelcomeImgUrl = this.urlInterpolationService
       .getStaticImageUrl('/general/editor_welcome.svg');
   }
+
+  cancel(): void {
+    this.ngbActiveModal.dismiss();
+  }
 }
