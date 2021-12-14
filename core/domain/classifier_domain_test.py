@@ -108,8 +108,8 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
         }
         observed_training_job = self._get_training_job_from_dict(
             expected_training_job_dict)
-        # The 'assertDictEqual' expects 'Dict[Any, Any]' but we provide
-        # 'TypedDict' thus we add an ignore.
+        # The 'assertDictEqual' expects 'Dict[Any, Any]' but we
+        # provide 'TypedDict' and thus we add an ignore.
         self.assertDictEqual(
             expected_training_job_dict,
             observed_training_job.to_dict()) # type: ignore[arg-type]
@@ -280,8 +280,7 @@ class StateTrainingJobsMappingDomainTests(test_utils.GenericTestBase):
         }
 
     def _get_mapping_from_dict(
-        self,
-        mapping_dict: Dict[str, Any]
+        self, mapping_dict: Dict[str, Any]
     ) -> classifier_domain.StateTrainingJobsMapping:
         """Returns the StateTrainingJobsMapping object after receiving the
         content from the mapping_dict.
@@ -303,8 +302,8 @@ class StateTrainingJobsMappingDomainTests(test_utils.GenericTestBase):
         }
         observed_mapping = self._get_mapping_from_dict(
             expected_mapping_dict)
-        # The 'assertDictEqual' expects 'Dict[Any, Any]' but we provide
-        # 'TypedDict' thus we add an ignore.
+        # The 'assertDictEqual' expects 'Dict[Any, Any]' but we
+        # provide 'TypedDict' and thus we add an ignore.
         self.assertDictEqual(
             expected_mapping_dict,
             observed_mapping.to_dict()) # type: ignore[arg-type]

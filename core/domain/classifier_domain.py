@@ -28,12 +28,14 @@ from typing_extensions import TypedDict
 
 (classifier_models,) = models.Registry.import_models(
     [models.NAMES.classifier])
-TrainingDataType = Union[Dict[str, Union[int, List[str]]],
-                        List[Dict[str, Union[int, List[str]]]]]
+
+TrainingDataType = Union[
+    Dict[str, Union[int, List[str]]], List[Dict[str, Union[int, List[str]]]]
+]
 
 
 class ClassifierTrainingJobDict(TypedDict):
-    """Represents ClassifierTrainingJob Dict."""
+    """Dictionary that represents ClassifierTrainingJob."""
 
     job_id: str
     algorithm_id: str
@@ -235,9 +237,7 @@ class ClassifierTrainingJob:
         return self._status
 
     @property
-    def training_data(
-        self
-    ) -> TrainingDataType:
+    def training_data(self) -> TrainingDataType:
         """Returns the training data used for training the classifier.
 
         Returns:
