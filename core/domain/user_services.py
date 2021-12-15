@@ -289,7 +289,9 @@ def get_user_settings_by_auth_id(auth_id, strict=False):
     Raises:
         Exception. The value of strict is True and given auth_id does not exist.
     """
-    user_id = auth_services.get_user_id_from_auth_id(auth_id)
+    user_id = auth_services.get_user_id_from_auth_id(
+        auth_id, include_deleted=True
+    )
     user_settings_model = (
         None if user_id is None else
         user_models.UserSettingsModel.get_by_id(user_id))
