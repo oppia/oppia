@@ -54,7 +54,8 @@ TICKET_ID = '%s.%s.%s' % (
     'random_hash', int(TICKET_CREATION_TIMESTAMP_MSEC), '16CharString1234')
 REPORT_TYPE_SUGGESTION = app_feedback_report_constants.REPORT_TYPE.suggestion
 REPORT_TYPE_ISSUE = app_feedback_report_constants.REPORT_TYPE.issue
-CATEGORY_SUGGESTION_OTHER = app_feedback_report_constants.CATEGORY.other_suggestion
+CATEGORY_SUGGESTION_OTHER = (
+    app_feedback_report_constants.CATEGORY.other_suggestion)
 CATEGORY_ISSUE_TOPICS = app_feedback_report_constants.CATEGORY.topics_issue
 ANDROID_PLATFORM_VERSION = '0.1-alpha-abcdef1234'
 COUNTRY_LOCALE_CODE_INDIA = 'in'
@@ -65,7 +66,8 @@ ENTRY_POINT_NAVIGATION_DRAWER = 'navigation_drawer'
 LANGUAGE_LOCALE_CODE_ENGLISH = 'en'
 ANDROID_PACKAGE_VERSION_CODE = 1
 NETWORK_WIFI = app_feedback_report_constants.ANDROID_NETWORK_TYPE.wifi
-ANDROID_TEXT_SIZE = app_feedback_report_constants.ANDROID_TEXT_SIZE.medium_text_size
+ANDROID_TEXT_SIZE = (
+    app_feedback_report_constants.ANDROID_TEXT_SIZE.medium_text_size)
 ANDROID_BUILD_FINGERPRINT = 'example_fingerprint_id'
 EVENT_LOGS = ['event1', 'event2']
 LOGCAT_LOGS = ['logcat1', 'logcat2']
@@ -299,7 +301,8 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
     def test_get_android_text_size_from_string_returns_expected_text_size(
             self) -> None:
         feedback_report = app_feedback_report_domain.AppFeedbackReport
-        for text_size in app_feedback_report_constants.ALLOWED_ANDROID_TEXT_SIZES:
+        for text_size in (
+            app_feedback_report_constants.ALLOWED_ANDROID_TEXT_SIZES):
             self.assertEqual(
                 feedback_report.get_android_text_size_from_string(
                     text_size.name), text_size)
@@ -736,8 +739,8 @@ class EntryPointDomainTests(test_utils.GenericTestBase):
         super(EntryPointDomainTests, self).setUp()
         self.entry_point = (
             app_feedback_report_domain.EntryPoint(
-                app_feedback_report_constants.ENTRY_POINT.navigation_drawer, 'topic_id', 'story_id',
-                'exploration_id', 'subtopic_id'))
+                app_feedback_report_constants.ENTRY_POINT.navigation_drawer,
+                'topic_id', 'story_id', 'exploration_id', 'subtopic_id'))
 
     def test_to_dict_raises_exception(self) -> None:
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
@@ -1225,7 +1228,8 @@ class AppFeedbackReportTicketDomainTests(test_utils.GenericTestBase):
             'The ticket name should be a string')
 
     def test_validation_ticket_name_too_long_fails(self) -> None:
-        long_name = 'too long' + 'x' * app_feedback_report_constants.MAXIMUM_TICKET_NAME_LENGTH
+        long_name = 'too long' + 'x' * (
+            app_feedback_report_constants.MAXIMUM_TICKET_NAME_LENGTH)
         self.ticket_obj.ticket_name = long_name
         self._assert_validation_error(
             self.ticket_obj,
@@ -1507,7 +1511,8 @@ class AppFeedbackReportFilterDomainTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super(AppFeedbackReportFilterDomainTests, self).setUp()
         self.filter = app_feedback_report_domain.AppFeedbackReportFilter(
-            app_feedback_report_constants.FILTER_FIELD_NAMES.platform, ['web', 'android'])
+            app_feedback_report_constants.FILTER_FIELD_NAMES.platform,
+            ['web', 'android'])
 
     def test_to_dict(self) -> None:
         app_feedback_report_constants.PLATFORM_CHOICES.sort()
