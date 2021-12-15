@@ -1644,7 +1644,8 @@ class AppFeedbackReportDailyStats:
                 'The parameter stats should be a dict, '
                 'received: %r' % param_stats)
         allowed_parameter_names = [
-            parameter.name for parameter in app_feedback_report_constants.ALLOWED_STATS_PARAMETERS]
+            parameter.name for parameter in (
+                app_feedback_report_constants.ALLOWED_STATS_PARAMETERS)]
         for (param_name, param_count_obj) in param_stats.items():
             if param_name not in allowed_parameter_names:
                 raise utils.ValidationError(
