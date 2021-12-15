@@ -20,7 +20,7 @@ from __future__ import annotations
 
 from core import feconf
 from core import utils
-from core.domain import app_feedback_report_constants as constants
+from core.domain import app_feedback_report_constants
 from core.domain import app_feedback_report_domain
 from core.platform import models
 
@@ -35,8 +35,8 @@ if MYPY: # pragma: no cover
     [models.NAMES.app_feedback_report])
 transaction_services = models.Registry.import_transaction_services()
 
-PLATFORM_ANDROID = constants.PLATFORM_CHOICE_ANDROID
-PLATFORM_WEB = constants.PLATFORM_CHOICE_WEB
+PLATFORM_ANDROID = app_feedback_report_constants.PLATFORM_CHOICE_ANDROID
+PLATFORM_WEB = app_feedback_report_constants.PLATFORM_CHOICE_WEB
 
 
 def get_report_models(
@@ -84,8 +84,8 @@ def store_incoming_report_stats(
             'implemented yet.')
 
     platform = PLATFORM_ANDROID
-    unticketed_id = constants.UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID
-    all_reports_id = constants.ALL_ANDROID_REPORTS_STATS_TICKET_ID
+    unticketed_id = app_feedback_report_constants.UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID
+    all_reports_id = app_feedback_report_constants.ALL_ANDROID_REPORTS_STATS_TICKET_ID
 
     stats_date = report_obj.submitted_on_timestamp.date()
     _update_report_stats_model_in_transaction(
@@ -134,25 +134,25 @@ def _update_report_stats_model_in_transaction( # type: ignore[no-untyped-def]
         # that we will want to splice aggregate stats by and they will each have
         # a count of 1 since this is the first report added for this entity.
         stats_dict = {
-            constants.STATS_PARAMETER_NAMES.report_type.name: {
+            app_feedback_report_constants.STATS_PARAMETER_NAMES.report_type.name: {
                 report_type: 1
             },
-            constants.STATS_PARAMETER_NAMES.country_locale_code.name: {
+            app_feedback_report_constants.STATS_PARAMETER_NAMES.country_locale_code.name: {
                 country_locale_code: 1
             },
-            constants.STATS_PARAMETER_NAMES.entry_point_name.name: {
+            app_feedback_report_constants.STATS_PARAMETER_NAMES.entry_point_name.name: {
                 entry_point_name: 1
             },
-            constants.STATS_PARAMETER_NAMES.text_language_code.name: {
+            app_feedback_report_constants.STATS_PARAMETER_NAMES.text_language_code.name: {
                 text_language_code: 1
             },
-            constants.STATS_PARAMETER_NAMES.audio_language_code.name: {
+            app_feedback_report_constants.STATS_PARAMETER_NAMES.audio_language_code.name: {
                 audio_language_code: 1
             },
-            constants.STATS_PARAMETER_NAMES.android_sdk_version.name: {
+            app_feedback_report_constants.STATS_PARAMETER_NAMES.android_sdk_version.name: {
                 sdk_version: 1
             },
-            constants.STATS_PARAMETER_NAMES.version_name.name: {
+            app_feedback_report_constants.STATS_PARAMETER_NAMES.version_name.name: {
                 version_name: 1
             }
         }
@@ -165,38 +165,38 @@ def _update_report_stats_model_in_transaction( # type: ignore[no-untyped-def]
         # Update existing stats model.
         stats_dict = stats_model.daily_param_stats
 
-        stats_dict[constants.STATS_PARAMETER_NAMES.report_type.name] = (
+        stats_dict[app_feedback_report_constants.STATS_PARAMETER_NAMES.report_type.name] = (
             calculate_new_stats_count_for_parameter(
-                stats_dict[constants.STATS_PARAMETER_NAMES.report_type.name],
+                stats_dict[app_feedback_report_constants.STATS_PARAMETER_NAMES.report_type.name],
                 report_type, delta))
-        stats_dict[constants.STATS_PARAMETER_NAMES.country_locale_code.name] = (
+        stats_dict[app_feedback_report_constants.STATS_PARAMETER_NAMES.country_locale_code.name] = (
             calculate_new_stats_count_for_parameter(
                 stats_dict[
-                    constants.STATS_PARAMETER_NAMES.country_locale_code.name],
+                    app_feedback_report_constants.STATS_PARAMETER_NAMES.country_locale_code.name],
                 country_locale_code, delta))
-        stats_dict[constants.STATS_PARAMETER_NAMES.entry_point_name.name] = (
+        stats_dict[app_feedback_report_constants.STATS_PARAMETER_NAMES.entry_point_name.name] = (
             calculate_new_stats_count_for_parameter(
                 stats_dict[
-                    constants.STATS_PARAMETER_NAMES.entry_point_name.name],
+                    app_feedback_report_constants.STATS_PARAMETER_NAMES.entry_point_name.name],
                 entry_point_name, delta))
-        stats_dict[constants.STATS_PARAMETER_NAMES.audio_language_code.name] = (
+        stats_dict[app_feedback_report_constants.STATS_PARAMETER_NAMES.audio_language_code.name] = (
             calculate_new_stats_count_for_parameter(
                 stats_dict[
-                    constants.STATS_PARAMETER_NAMES.audio_language_code.name],
+                    app_feedback_report_constants.STATS_PARAMETER_NAMES.audio_language_code.name],
                 audio_language_code, delta))
-        stats_dict[constants.STATS_PARAMETER_NAMES.text_language_code.name] = (
+        stats_dict[app_feedback_report_constants.STATS_PARAMETER_NAMES.text_language_code.name] = (
             calculate_new_stats_count_for_parameter(
                 stats_dict[
-                    constants.STATS_PARAMETER_NAMES.text_language_code.name],
+                    app_feedback_report_constants.STATS_PARAMETER_NAMES.text_language_code.name],
                 text_language_code, delta))
-        stats_dict[constants.STATS_PARAMETER_NAMES.android_sdk_version.name] = (
+        stats_dict[app_feedback_report_constants.STATS_PARAMETER_NAMES.android_sdk_version.name] = (
             calculate_new_stats_count_for_parameter(
                 stats_dict[
-                    constants.STATS_PARAMETER_NAMES.android_sdk_version.name],
+                    app_feedback_report_constants.STATS_PARAMETER_NAMES.android_sdk_version.name],
                 sdk_version, delta))
-        stats_dict[constants.STATS_PARAMETER_NAMES.version_name.name] = (
+        stats_dict[app_feedback_report_constants.STATS_PARAMETER_NAMES.version_name.name] = (
             calculate_new_stats_count_for_parameter(
-                stats_dict[constants.STATS_PARAMETER_NAMES.version_name.name],
+                stats_dict[app_feedback_report_constants.STATS_PARAMETER_NAMES.version_name.name],
                 version_name, delta))
 
     stats_model.daily_param_stats = stats_dict
@@ -538,7 +538,7 @@ def get_all_filter_options() -> List[
     """
     filter_list = []
     model_class = app_feedback_report_models.AppFeedbackReportModel
-    for filter_field in constants.ALLOWED_FILTERS:
+    for filter_field in app_feedback_report_constants.ALLOWED_FILTERS:
         filter_values = model_class.get_filter_options_for_field(filter_field)
         filter_list.append(app_feedback_report_domain.AppFeedbackReportFilter(
             filter_field, filter_values))
@@ -567,7 +567,7 @@ def reassign_ticket(
     old_ticket_id = report.ticket_id
     if old_ticket_id is None:
         _update_report_stats_model_in_transaction(
-            constants.UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID, platform,
+            app_feedback_report_constants.UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID, platform,
             stats_date, report, -1)
     else:
         # The report was ticketed so the report needs to be removed from its old
@@ -606,7 +606,7 @@ def reassign_ticket(
             old_ticket_id, platform, stats_date, report, -1)
 
     # Add the report to the new ticket.
-    new_ticket_id = constants.UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID
+    new_ticket_id = app_feedback_report_constants.UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID
     if new_ticket is not None:
         new_ticket_id = new_ticket.ticket_id
     new_ticket_model = (
