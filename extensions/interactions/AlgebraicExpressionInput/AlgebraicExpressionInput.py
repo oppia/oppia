@@ -72,10 +72,10 @@ class AlgebraicExpressionInput(base.BaseInteraction):
             AlgebraicExpressionInputInstanceDto. The proto object.
         """
         customization_args_proto = (
-            cls._to_customization_args_proto(customization_args)
+            cls._convert_customization_args_to_proto(customization_args)
         )
         outcome_proto = default_outcome.to_proto()
-        hints_proto_list = cls.get_hint_proto(cls, hints)
+        hints_proto_list = cls.get_hint_proto_list(cls, hints)
         solution_proto = cls._convert_solution_to_proto(solution)
         answer_groups_proto = cls._convert_answer_groups_to_proto(answer_groups)
 
@@ -152,7 +152,7 @@ class AlgebraicExpressionInput(base.BaseInteraction):
 
         rule_type_to_proto_func_mapping = {
             'MatchesExactlyWith': (
-                cls.convert_matches_exactly_rule_spec_to_proto),
+                cls._convert_matches_exactly_rule_spec_to_proto),
             'IsEquivalentTo': cls._convert_is_equivalent_rule_spec_to_proto,
             'ContainsSomeOf': cls._convert_contains_some_rule_spec_to_proto,
             'OmitsSomeOf': cls._convert_omit_some_rule_spec_to_proto,

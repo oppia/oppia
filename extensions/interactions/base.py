@@ -264,7 +264,7 @@ class BaseInteraction:
         raise Exception(
             'Rule %s has no param called %s' % (rule_name, rule_param_name))
 
-    def get_hint_proto(self, hints):
+    def get_hint_proto_list(self, hints):
         """Gets the list of HintDto proto for given hints domain object list.
 
         Args:

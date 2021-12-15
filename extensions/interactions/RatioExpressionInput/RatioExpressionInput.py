@@ -89,7 +89,7 @@ class RatioExpressionInput(base.BaseInteraction):
             cls._convert_customization_args_to_proto(customization_args)
         )
         outcome_proto = default_outcome.to_proto()
-        hints_proto_list = cls.get_hint_proto(cls, hints)
+        hints_proto_list = cls.get_hint_proto_list(cls, hints)
         solution_proto = cls._convert_solution_to_proto(solution)
         answer_groups_proto = cls._convert_answer_groups_to_proto(
             answer_groups)

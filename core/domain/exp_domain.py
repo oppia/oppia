@@ -2242,9 +2242,7 @@ class Exploration:
         return exploration_dict
 
     @classmethod
-    def _convert_v54_dict_to_v55_dict(
-        cls, exploration_dict, exploration_id, yaml_content
-    ):
+    def _convert_v54_dict_to_v55_dict(cls, exploration_dict, exploration_id):
         """Converts a v54 exploration dict into a v55 exploration dict.
         Version 55 contains the exploration size.
 
@@ -2260,8 +2258,26 @@ class Exploration:
         """
         exploration_dict['id'] = exploration_id
 
-        exploration = cls.from_yaml(exploration_id, yaml_content)
-        exploration_dict['proto_size_in_bytes'] = exploration.get_proto_size()
+        exploration = cls(
+            exploration_dict['id'],
+            exploration_dict['title'],
+            exploration_dict['category'],
+            exploration_dict['objective'],
+            exploration_dict['language_code'],
+            exploration_dict['tags'],
+            exploration_dict['blurb'],
+            exploration_dict['author_notes'],
+            exploration_dict['states_schema_version'],
+            exploration_dict['init_state_name'],
+            exploration_dict['states'],
+            exploration_dict['param_specs'],
+            exploration_dict['param_changes'],
+            exploration_dict['schema_version'],
+            exploration_dict['auto_tts_enabled'],
+            exploration_dict['correctness_feedback_enabled'])
+
+        exploration_dict['proto_size_in_bytes'] = (
+            exploration.proto_size_in_bytes)
 
         return exploration_dict
 
@@ -2344,7 +2360,7 @@ class Exploration:
 
         if exploration_schema_version == 54:
             exploration_dict = cls._convert_v54_dict_to_v55_dict(
-                exploration_dict, exploration_id, yaml_content)
+                exploration_dict, exploration_id)
             exploration_schema_version = 55
 
         return exploration_dict
@@ -2369,6 +2385,28 @@ class Exploration:
         exploration_dict = cls._migrate_to_latest_yaml_version(
             yaml_content, exploration_id)
         exploration_dict['id'] = exploration_id
+
+        exploration = cls(
+            exploration_dict['id'],
+            exploration_dict['title'],
+            exploration_dict['category'],
+            exploration_dict['objective'],
+            exploration_dict['language_code'],
+            exploration_dict['tags'],
+            exploration_dict['blurb'],
+            exploration_dict['author_notes'],
+            exploration_dict['states_schema_version'],
+            exploration_dict['init_state_name'],
+            exploration_dict['states'],
+            exploration_dict['param_specs'],
+            exploration_dict['param_changes'],
+            exploration_dict['schema_version'],
+            exploration_dict['auto_tts_enabled'],
+            exploration_dict['correctness_feedback_enabled'])
+
+        exploration_dict['proto_size_in_bytes'] = (
+            exploration.get_proto_size())
+
         return Exploration.from_dict(exploration_dict)
 
     def to_yaml(self):
