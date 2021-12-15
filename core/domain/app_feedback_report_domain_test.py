@@ -23,7 +23,7 @@ import enum
 
 from core import feconf
 from core import utils
-from core.domain import app_feedback_report_constants as constants
+from core.domain import app_feedback_report_constants
 from core.domain import app_feedback_report_domain
 from core.platform import models
 from core.tests import test_utils
@@ -47,15 +47,15 @@ TICKET_CREATION_TIMESTAMP = datetime.datetime.fromtimestamp(1616173836)
 TICKET_CREATION_TIMESTAMP_MSEC = utils.get_time_in_millisecs(
     TICKET_CREATION_TIMESTAMP)
 
-PLATFORM_ANDROID = constants.PLATFORM_CHOICE_ANDROID
-PLATFORM_WEB = constants.PLATFORM_CHOICE_WEB
+PLATFORM_ANDROID = app_feedback_report_constants.PLATFORM_CHOICE_ANDROID
+PLATFORM_WEB = app_feedback_report_constants.PLATFORM_CHOICE_WEB
 TICKET_NAME = 'ticket name'
 TICKET_ID = '%s.%s.%s' % (
     'random_hash', int(TICKET_CREATION_TIMESTAMP_MSEC), '16CharString1234')
-REPORT_TYPE_SUGGESTION = constants.REPORT_TYPE.suggestion
-REPORT_TYPE_ISSUE = constants.REPORT_TYPE.issue
-CATEGORY_SUGGESTION_OTHER = constants.CATEGORY.other_suggestion
-CATEGORY_ISSUE_TOPICS = constants.CATEGORY.topics_issue
+REPORT_TYPE_SUGGESTION = app_feedback_report_constants.REPORT_TYPE.suggestion
+REPORT_TYPE_ISSUE = app_feedback_report_constants.REPORT_TYPE.issue
+CATEGORY_SUGGESTION_OTHER = app_feedback_report_constants.CATEGORY.other_suggestion
+CATEGORY_ISSUE_TOPICS = app_feedback_report_constants.CATEGORY.topics_issue
 ANDROID_PLATFORM_VERSION = '0.1-alpha-abcdef1234'
 COUNTRY_LOCALE_CODE_INDIA = 'in'
 ANDROID_DEVICE_MODEL = 'Pixel 4a'
@@ -64,8 +64,8 @@ ENTRY_POINT_CRASH = 'crash'
 ENTRY_POINT_NAVIGATION_DRAWER = 'navigation_drawer'
 LANGUAGE_LOCALE_CODE_ENGLISH = 'en'
 ANDROID_PACKAGE_VERSION_CODE = 1
-NETWORK_WIFI = constants.ANDROID_NETWORK_TYPE.wifi
-ANDROID_TEXT_SIZE = constants.ANDROID_TEXT_SIZE.medium_text_size
+NETWORK_WIFI = app_feedback_report_constants.ANDROID_NETWORK_TYPE.wifi
+ANDROID_TEXT_SIZE = app_feedback_report_constants.ANDROID_TEXT_SIZE.medium_text_size
 ANDROID_BUILD_FINGERPRINT = 'example_fingerprint_id'
 EVENT_LOGS = ['event1', 'event2']
 LOGCAT_LOGS = ['logcat1', 'logcat2']
@@ -243,7 +243,7 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
 
     def test_report_timezone_offset_is_invalid_validation_fails(self) -> None:
         self.android_report_obj.local_timezone_offset_hrs = (
-            constants.TIMEZONE_MINIMUM_OFFSET - 1)
+            app_feedback_report_constants.TIMEZONE_MINIMUM_OFFSET - 1)
         self._assert_validation_error(
             self.android_report_obj,
             'Expected local timezone offset to be in')
@@ -264,7 +264,7 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
     def test_get_report_type_from_string_returns_expected_report_type(
             self) -> None:
         feedback_report = app_feedback_report_domain.AppFeedbackReport
-        for report_type in constants.REPORT_TYPE:
+        for report_type in app_feedback_report_constants.REPORT_TYPE:
             self.assertEqual(
                 feedback_report.get_report_type_from_string(
                     report_type.name), report_type)
@@ -281,7 +281,7 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
 
     def test_get_category_from_string_returns_expected_category(self) -> None:
         feedback_report = app_feedback_report_domain.AppFeedbackReport
-        for category in constants.ALLOWED_CATEGORIES:
+        for category in app_feedback_report_constants.ALLOWED_CATEGORIES:
             self.assertEqual(
                 feedback_report.get_category_from_string(
                     category.name), category)
@@ -299,7 +299,7 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
     def test_get_android_text_size_from_string_returns_expected_text_size(
             self) -> None:
         feedback_report = app_feedback_report_domain.AppFeedbackReport
-        for text_size in constants.ALLOWED_ANDROID_TEXT_SIZES:
+        for text_size in app_feedback_report_constants.ALLOWED_ANDROID_TEXT_SIZES:
             self.assertEqual(
                 feedback_report.get_android_text_size_from_string(
                     text_size.name), text_size)
@@ -327,7 +327,7 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
         }
 
         entry_point_json['entry_point_name'] = (
-            constants.ENTRY_POINT.navigation_drawer.name)
+            app_feedback_report_constants.ENTRY_POINT.navigation_drawer.name)
         navigation_drawer_obj = (
             feedback_report.get_entry_point_from_json(
                 entry_point_json))
@@ -337,7 +337,7 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
                 app_feedback_report_domain.NavigationDrawerEntryPoint))
 
         entry_point_json['entry_point_name'] = (
-            constants.ENTRY_POINT.lesson_player.name)
+            app_feedback_report_constants.ENTRY_POINT.lesson_player.name)
         lesson_player_obj = (
             feedback_report.get_entry_point_from_json(
                 entry_point_json))
@@ -347,7 +347,7 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
                 app_feedback_report_domain.LessonPlayerEntryPoint))
 
         entry_point_json['entry_point_name'] = (
-            constants.ENTRY_POINT.revision_card.name)
+            app_feedback_report_constants.ENTRY_POINT.revision_card.name)
         revision_card_obj = (
             feedback_report.get_entry_point_from_json(
                 entry_point_json))
@@ -357,7 +357,7 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
                 app_feedback_report_domain.RevisionCardEntryPoint))
 
         entry_point_json['entry_point_name'] = (
-            constants.ENTRY_POINT.crash.name)
+            app_feedback_report_constants.ENTRY_POINT.crash.name)
         crash_obj = (
             feedback_report.get_entry_point_from_json(
                 entry_point_json))
@@ -381,7 +381,7 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
     def test_get_android_network_type_from_string_returns_expected_network_type(
             self) -> None:
         feedback_report = app_feedback_report_domain.AppFeedbackReport
-        for network_type in constants.ANDROID_NETWORK_TYPE:
+        for network_type in app_feedback_report_constants.ANDROID_NETWORK_TYPE:
             self.assertEqual(
                 feedback_report.get_android_network_type_from_string(
                     network_type.name), network_type)
@@ -688,7 +688,7 @@ class AndroidDeviceSystemContextTests(test_utils.GenericTestBase):
 
     def test_validation_sdk_version_lower_than_minimum_fails(self) -> None:
         self.device_system_context.sdk_version = (
-            constants.MINIMUM_ANDROID_SDK_VERSION - 1)
+            app_feedback_report_constants.MINIMUM_ANDROID_SDK_VERSION - 1)
         self._assert_validation_error(
             self.device_system_context, 'Invalid SDK version')
 
@@ -736,7 +736,7 @@ class EntryPointDomainTests(test_utils.GenericTestBase):
         super(EntryPointDomainTests, self).setUp()
         self.entry_point = (
             app_feedback_report_domain.EntryPoint(
-                constants.ENTRY_POINT.navigation_drawer, 'topic_id', 'story_id',
+                app_feedback_report_constants.ENTRY_POINT.navigation_drawer, 'topic_id', 'story_id',
                 'exploration_id', 'subtopic_id'))
 
     def test_to_dict_raises_exception(self) -> None:
@@ -762,7 +762,7 @@ class NavigationDrawerEntryPointDomainTests(test_utils.GenericTestBase):
     def test_to_dict(self) -> None:
         expected_dict = {
             'entry_point_name': (
-                constants.ENTRY_POINT.navigation_drawer.name)
+                app_feedback_report_constants.ENTRY_POINT.navigation_drawer.name)
         }
         self.assertDictEqual(
             expected_dict, self.entry_point.to_dict())
@@ -790,7 +790,7 @@ class NavigationDrawerEntryPointDomainTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected entry point name %s' % (
-                constants.ENTRY_POINT.navigation_drawer.name)):
+                app_feedback_report_constants.ENTRY_POINT.navigation_drawer.name)):
             self.entry_point.validate()
 
 
@@ -805,7 +805,7 @@ class LessonPlayerEntryPointDomainTests(test_utils.GenericTestBase):
     def test_to_dict(self) -> None:
         expected_dict = {
             'entry_point_name': (
-                constants.ENTRY_POINT.lesson_player.name),
+                app_feedback_report_constants.ENTRY_POINT.lesson_player.name),
             'topic_id': 'topic_id',
             'story_id': 'story_id',
             'exploration_id': 'exploration_id'
@@ -834,7 +834,7 @@ class LessonPlayerEntryPointDomainTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             self.entry_point,
             'Expected entry point name %s' % (
-                constants.ENTRY_POINT.lesson_player.name))
+                app_feedback_report_constants.ENTRY_POINT.lesson_player.name))
 
     def test_validation_invalid_topic_id_fails(self) -> None:
         self.entry_point.topic_id = 'invalid_topic_id'
@@ -894,7 +894,7 @@ class RevisionCardEntryPointDomainTests(test_utils.GenericTestBase):
     def test_to_dict(self) -> None:
         expected_dict = {
             'entry_point_name': (
-                constants.ENTRY_POINT.revision_card.name),
+                app_feedback_report_constants.ENTRY_POINT.revision_card.name),
             'topic_id': 'topic_id',
             'subtopic_id': 'subtopic_id'
         }
@@ -922,7 +922,7 @@ class RevisionCardEntryPointDomainTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             self.entry_point,
             'Expected entry point name %s' % (
-                constants.ENTRY_POINT.revision_card.name))
+                app_feedback_report_constants.ENTRY_POINT.revision_card.name))
 
     def test_validation_invalid_topic_id_fails(self) -> None:
         self.entry_point.topic_id = 'invalid_topic_id'
@@ -964,7 +964,7 @@ class CrashEntryPointDomainTests(test_utils.GenericTestBase):
     def test_to_dict(self) -> None:
         expected_dict = {
             'entry_point_name': (
-                constants.ENTRY_POINT.crash.name)
+                app_feedback_report_constants.ENTRY_POINT.crash.name)
         }
         self.assertDictEqual(
             expected_dict, self.entry_point.to_dict())
@@ -992,7 +992,7 @@ class CrashEntryPointDomainTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected entry point name %s' % (
-                constants.ENTRY_POINT.crash.name)):
+                app_feedback_report_constants.ENTRY_POINT.crash.name)):
             self.entry_point.validate()
 
 
@@ -1011,7 +1011,7 @@ class AppContextDomainTests(test_utils.GenericTestBase):
         expected_dict = {
             'entry_point': {
                 'entry_point_name': (
-                    constants.ENTRY_POINT.navigation_drawer.name),
+                    app_feedback_report_constants.ENTRY_POINT.navigation_drawer.name),
             },
             'text_language_code': LANGUAGE_LOCALE_CODE_ENGLISH,
             'audio_language_code': LANGUAGE_LOCALE_CODE_ENGLISH
@@ -1042,7 +1042,7 @@ class AndroidAppContextDomainTests(test_utils.GenericTestBase):
         expected_dict = {
             'entry_point': {
                 'entry_point_name': (
-                    constants.ENTRY_POINT.navigation_drawer.name),
+                    app_feedback_report_constants.ENTRY_POINT.navigation_drawer.name),
             },
             'text_language_code': LANGUAGE_LOCALE_CODE_ENGLISH,
             'audio_language_code': LANGUAGE_LOCALE_CODE_ENGLISH,
@@ -1225,7 +1225,7 @@ class AppFeedbackReportTicketDomainTests(test_utils.GenericTestBase):
             'The ticket name should be a string')
 
     def test_validation_ticket_name_too_long_fails(self) -> None:
-        long_name = 'too long' + 'x' * constants.MAXIMUM_TICKET_NAME_LENGTH
+        long_name = 'too long' + 'x' * app_feedback_report_constants.MAXIMUM_TICKET_NAME_LENGTH
         self.ticket_obj.ticket_name = long_name
         self._assert_validation_error(
             self.ticket_obj,
@@ -1507,13 +1507,13 @@ class AppFeedbackReportFilterDomainTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super(AppFeedbackReportFilterDomainTests, self).setUp()
         self.filter = app_feedback_report_domain.AppFeedbackReportFilter(
-            constants.FILTER_FIELD_NAMES.platform, ['web', 'android'])
+            app_feedback_report_constants.FILTER_FIELD_NAMES.platform, ['web', 'android'])
 
     def test_to_dict(self) -> None:
-        constants.PLATFORM_CHOICES.sort()
+        app_feedback_report_constants.PLATFORM_CHOICES.sort()
         expected_dict = {
             'filter_field': 'platform',
-            'filter_options': constants.PLATFORM_CHOICES
+            'filter_options': app_feedback_report_constants.PLATFORM_CHOICES
         }
         self.assertDictEqual(
             expected_dict, self.filter.to_dict())
