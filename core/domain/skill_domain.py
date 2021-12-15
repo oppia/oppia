@@ -28,6 +28,11 @@ from core.domain import html_cleaner
 from core.domain import html_validation_service
 from core.domain import state_domain
 
+from typing import Dict, List, Set, Type, Callable,Union
+from typing_extensions import TypedDict
+import datetime
+from oppia.core.domain.state_domain import RecordedVoiceovers, SubtitledHtml, WrittenTranslation, WrittenTranslations
+
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
 SKILL_PROPERTY_DESCRIPTION = 'description'
@@ -176,12 +181,12 @@ class SkillChange(change_domain.BaseChange):
         'user_id_attribute_names': []
     }]
 
-
+misconception = TypedDict('misconception',{'id': int,'name': str,'notes': str,'feedback': str,'must_be_addressed': bool})
 class Misconception:
     """Domain object describing a skill misconception."""
 
     def __init__(
-            self, misconception_id, name, notes, feedback, must_be_addressed):
+            self, misconception_id: int, name: str, notes: str, feedback: str, must_be_addressed: bool) -> None:
         """Initializes a Misconception domain object.
 
         Args:
@@ -202,7 +207,8 @@ class Misconception:
         self.feedback = html_cleaner.clean(feedback)
         self.must_be_addressed = must_be_addressed
 
-    def to_dict(self):
+    
+    def to_dict(self) -> misconception:
         """Returns a dict representing this Misconception domain object.
 
         Returns:
@@ -217,7 +223,7 @@ class Misconception:
         }
 
     @classmethod
-    def from_dict(cls, misconception_dict):
+    def from_dict(cls, misconception_dict:misconception) ->Misconception:
         """Returns a Misconception domain object from a dict.
 
         Args:
@@ -235,7 +241,7 @@ class Misconception:
         return misconception
 
     @classmethod
-    def require_valid_misconception_id(cls, misconception_id):
+    def require_valid_misconception_id(cls, misconception_id:int)->None:
         """Validates the misconception id for a Misconception object.
 
         Args:
@@ -249,7 +255,7 @@ class Misconception:
                 'Expected misconception ID to be an integer, received %s' %
                 misconception_id)
 
-    def validate(self):
+    def validate(self)->None:
         """Validates various properties of the Misconception object.
 
         Raises:
@@ -284,11 +290,11 @@ class Misconception:
                 'Expected misconception feedback to be a string, received %s' %
                 self.feedback)
 
-
+rubric = TypedDict("rubric",{'difficulty':str,'explanations':List[str]})
 class Rubric:
     """Domain object describing a skill rubric."""
 
-    def __init__(self, difficulty, explanations):
+    def __init__(self, difficulty:str, explanations:list[str]):
         """Initializes a Rubric domain object.
 
         Args:
@@ -299,8 +305,8 @@ class Rubric:
         self.difficulty = difficulty
         self.explanations = [
             html_cleaner.clean(explanation) for explanation in explanations]
-
-    def to_dict(self):
+    
+    def to_dict(self)->rubric:
         """Returns a dict representing this Rubric domain object.
 
         Returns:
@@ -312,7 +318,7 @@ class Rubric:
         }
 
     @classmethod
-    def from_dict(cls, rubric_dict):
+    def from_dict(cls, rubric_dict:rubric)->Rubric:
         """Returns a Rubric domain object from a dict.
 
         Args:
@@ -326,7 +332,7 @@ class Rubric:
 
         return rubric
 
-    def validate(self):
+    def validate(self)->None:
         """Validates various properties of the Rubric object.
 
         Raises:
@@ -356,7 +362,7 @@ class Rubric:
 class WorkedExample:
     """Domain object for representing the worked_example dict."""
 
-    def __init__(self, question, explanation):
+    def __init__(self, question:SubtitledHtml, explanation:SubtitledHtml):
         """Constructs a WorkedExample domain object.
 
         Args:
@@ -367,7 +373,7 @@ class WorkedExample:
         self.question = question
         self.explanation = explanation
 
-    def validate(self):
+    def validate(self)->None:
         """Validates various properties of the WorkedExample object.
 
         Raises:
@@ -385,7 +391,7 @@ class WorkedExample:
                 'received %s' % self.question)
         self.explanation.validate()
 
-    def to_dict(self):
+    def to_dict(self)->dict[str,dict[str,SubtitledHtml]]:
         """Returns a dict representing this WorkedExample domain object.
 
         Returns:
@@ -397,7 +403,7 @@ class WorkedExample:
         }
 
     @classmethod
-    def from_dict(cls, worked_example_dict):
+    def from_dict(cls, worked_example_dict:dict[str,dict[str,SubtitledHtml]])->WorkedExample:
         """Return a WorkedExample domain object from a dict.
 
         Args:
@@ -420,13 +426,13 @@ class WorkedExample:
 
         return worked_example
 
-
+skillsContents = TypedDict('skillsContents',{'explanation':Dict[str,SubtitledHtml],'worked_examples':List[Dict[str,Dict[str,SubtitledHtml]]],'recorded_voiceovers':Dict[str,Dict[str,RecordedVoiceovers]],'written_translations':Dict[str,Dict[str,WrittenTranslations]]})
 class SkillContents:
     """Domain object representing the skill_contents dict."""
 
     def __init__(
-            self, explanation, worked_examples, recorded_voiceovers,
-            written_translations):
+            self, explanation:SubtitledHtml, worked_examples:list[WorkedExample], recorded_voiceovers:RecordedVoiceovers,
+            written_translations:WrittenTranslations)->None:
         """Constructs a SkillContents domain object.
 
         Args:
@@ -445,7 +451,7 @@ class SkillContents:
         self.recorded_voiceovers = recorded_voiceovers
         self.written_translations = written_translations
 
-    def validate(self):
+    def validate(self)->None:
         """Validates various properties of the SkillContents object.
 
         Raises:
@@ -483,7 +489,8 @@ class SkillContents:
         self.recorded_voiceovers.validate(available_content_ids)
         self.written_translations.validate(available_content_ids)
 
-    def to_dict(self):
+    
+    def to_dict(self)->skillsContents:
         """Returns a dict representing this SkillContents domain object.
 
         Returns:
@@ -498,7 +505,7 @@ class SkillContents:
         }
 
     @classmethod
-    def from_dict(cls, skill_contents_dict):
+    def from_dict(cls, skill_contents_dict:skillsContents)->SkillContents:
         """Return a SkillContents domain object from a dict.
 
         Args:
@@ -523,16 +530,19 @@ class SkillContents:
 
         return skill_contents
 
-
+skillDomain = TypedDict('skillDomain',{'id':str,'description':str,'misconceptions':List[misconception],'rubrics':List[rubric],'skill_contents':skillsContents,'language_code':str,'misconceptions_schema_version':int,'rubric_schema_version':int,'skill_contents_schema_version':int,'version':int,'next_misconception_id':int,'superseding_skill_id':Union[str,None],'all_questions_merged':bool,'prerequisite_skill_ids':List[str],'created_on':str,'last_updated':str})
+versioned_skill_Contents = TypedDict('versioned_skill_Contents',{'schema_version':str,'skill_contents':skillsContents})
+versioned_Misconceptions = TypedDict('versioned_Misconceptions',{'schema_version':str,'misconceptions':List[misconception]})
+versioned_Rubrics = TypedDict('versioned_Rubrics',{'schema_version':str,'rubrics':List[rubric]})
 class Skill:
     """Domain object for an Oppia Skill."""
 
     def __init__(
-            self, skill_id, description, misconceptions, rubrics,
-            skill_contents, misconceptions_schema_version,
-            rubric_schema_version, skill_contents_schema_version,
-            language_code, version, next_misconception_id, superseding_skill_id,
-            all_questions_merged, prerequisite_skill_ids,
+            self, skill_id:str, description:str, misconceptions:List[Misconception], rubrics:List[Rubric],
+            skill_contents:SkillContents, misconceptions_schema_version:int,
+            rubric_schema_version:int, skill_contents_schema_version:int,
+            language_code:str, version:int, next_misconception_id:int, superseding_skill_id:str|None,
+            all_questions_merged:bool, prerequisite_skill_ids:List[str],
             created_on=None, last_updated=None):
         """Constructs a Skill domain object.
 
@@ -587,7 +597,7 @@ class Skill:
         self.prerequisite_skill_ids = prerequisite_skill_ids
 
     @classmethod
-    def require_valid_skill_id(cls, skill_id):
+    def require_valid_skill_id(cls, skill_id:str)->None:
         """Checks whether the skill id is a valid one.
 
         Args:
@@ -600,7 +610,7 @@ class Skill:
             raise utils.ValidationError('Invalid skill id.')
 
     @classmethod
-    def require_valid_description(cls, description):
+    def require_valid_description(cls, description:str)->None:
         """Checks whether the description of the skill is a valid one.
 
         Args:
@@ -619,7 +629,7 @@ class Skill:
                 'Skill description should be less than %d chars, received %s'
                 % (description_length_limit, description))
 
-    def validate(self):
+    def validate(self)->None:
         """Validates various properties of the Skill object.
 
         Raises:
@@ -754,8 +764,8 @@ class Skill:
             raise utils.ValidationError(
                 'Expected a value for all_questions_merged when '
                 'superseding_skill_id is set.')
-
-    def to_dict(self):
+    
+    def to_dict(self)->skillDomain:
         """Returns a dict representing this Skill domain object.
 
         Returns:
@@ -778,10 +788,12 @@ class Skill:
             'next_misconception_id': self.next_misconception_id,
             'superseding_skill_id': self.superseding_skill_id,
             'all_questions_merged': self.all_questions_merged,
-            'prerequisite_skill_ids': self.prerequisite_skill_ids
+            'prerequisite_skill_ids': self.prerequisite_skill_ids,
+            'created_on':self.created_on,
+            'last_updated':self.last_updated
         }
 
-    def serialize(self):
+    def serialize(self)->str:
         """Returns the object serialized as a JSON string.
 
         Returns:
@@ -810,7 +822,7 @@ class Skill:
         return json.dumps(skill_dict)
 
     @classmethod
-    def deserialize(cls, json_string):
+    def deserialize(cls, json_string:str)->Skill:
         """Returns a Skill domain object decoded from a JSON string.
 
         Args:
@@ -840,8 +852,8 @@ class Skill:
 
     @classmethod
     def from_dict(
-            cls, skill_dict, skill_version=0, skill_created_on=None,
-            skill_last_updated=None):
+            cls, skill_dict:skillDomain, skill_version=0, skill_created_on=None,
+            skill_last_updated=None)->Skill:
         """Returns a Skill domain object from a dict.
 
         Args:
@@ -883,7 +895,7 @@ class Skill:
         return skill
 
     @classmethod
-    def create_default_skill(cls, skill_id, description, rubrics):
+    def create_default_skill(cls, skill_id:str, description:str, rubrics:List[Rubric])->Skill:
         """Returns a skill domain object with default values. This is for
         the frontend where a default blank skill would be shown to the user
         when the skill is created for the first time.
@@ -918,7 +930,7 @@ class Skill:
             feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
             constants.DEFAULT_LANGUAGE_CODE, 0, 0, None, False, [])
 
-    def generate_skill_misconception_id(self, misconception_id):
+    def generate_skill_misconception_id(self, misconception_id:int)->str:
         """Given a misconception id, it returns the skill-misconception-id.
         It is of the form <skill_id>-<misconception_id>.
 
@@ -934,7 +946,7 @@ class Skill:
 
     @classmethod
     def convert_html_fields_in_skill_contents(
-            cls, skill_contents_dict, conversion_fn):
+            cls, skill_contents_dict:skillsContents, conversion_fn:Callable[[SubtitledHtml],SubtitledHtml])->skillsContents:
         """Applies a conversion function on all the html strings in a skill
         to migrate them to a desired state.
 
@@ -964,7 +976,7 @@ class Skill:
         return skill_contents_dict
 
     @classmethod
-    def _convert_skill_contents_v1_dict_to_v2_dict(cls, skill_contents_dict):
+    def _convert_skill_contents_v1_dict_to_v2_dict(cls, skill_contents_dict:skillsContents)->skillsContents:
         """Converts v1 skill contents to the v2 schema. In the v2 schema,
         the new Math components schema is introduced.
 
@@ -979,7 +991,7 @@ class Skill:
             html_validation_service.add_math_content_to_math_rte_components)
 
     @classmethod
-    def _convert_skill_contents_v2_dict_to_v3_dict(cls, skill_contents_dict):
+    def _convert_skill_contents_v2_dict_to_v3_dict(cls, skill_contents_dict:skillsContents)->skillsContents:
         """Converts v2 skill contents to the v3 schema. The v3 schema
         deprecates oppia-noninteractive-svgdiagram tag and converts existing
         occurences of it to oppia-noninteractive-image tag.
@@ -995,7 +1007,7 @@ class Skill:
             html_validation_service.convert_svg_diagram_tags_to_image_tags)
 
     @classmethod
-    def _convert_skill_contents_v3_dict_to_v4_dict(cls, skill_contents_dict):
+    def _convert_skill_contents_v3_dict_to_v4_dict(cls, skill_contents_dict:skillsContents)->skillsContents:
         """Converts v3 skill contents to the v4 schema. The v4 schema
         fixes HTML encoding issues.
 
@@ -1011,7 +1023,7 @@ class Skill:
 
     @classmethod
     def update_skill_contents_from_model(
-            cls, versioned_skill_contents, current_version):
+            cls, versioned_skill_contents:versioned_skill_Contents, current_version:int)->None:
         """Converts the skill_contents blob contained in the given
         versioned_skill_contents dict from current_version to
         current_version + 1. Note that the versioned_skill_contents being
@@ -1035,7 +1047,7 @@ class Skill:
 
     @classmethod
     def update_misconceptions_from_model(
-            cls, versioned_misconceptions, current_version):
+            cls, versioned_misconceptions:versioned_Misconceptions, current_version:int)->None:
         """Converts the misconceptions blob contained in the given
         versioned_misconceptions dict from current_version to
         current_version + 1. Note that the versioned_misconceptions being
@@ -1062,7 +1074,7 @@ class Skill:
         versioned_misconceptions['misconceptions'] = updated_misconceptions
 
     @classmethod
-    def _convert_misconception_v1_dict_to_v2_dict(cls, misconception_dict):
+    def _convert_misconception_v1_dict_to_v2_dict(cls, misconception_dict:misconception)->misconception:
         """Converts v1 misconception schema to the v2 schema. In the v2 schema,
         the field must_be_addressed has been added.
 
@@ -1076,7 +1088,7 @@ class Skill:
         return misconception_dict
 
     @classmethod
-    def _convert_misconception_v2_dict_to_v3_dict(cls, misconception_dict):
+    def _convert_misconception_v2_dict_to_v3_dict(cls, misconception_dict:misconception)->misconception:
         """Converts v2 misconception schema to the v3 schema. In the v3 schema,
         the new Math components schema is introduced.
 
@@ -1095,7 +1107,7 @@ class Skill:
         return misconception_dict
 
     @classmethod
-    def _convert_misconception_v3_dict_to_v4_dict(cls, misconception_dict):
+    def _convert_misconception_v3_dict_to_v4_dict(cls, misconception_dict:misconception)->misconception:
         """Converts v3 misconception schema to the v4 schema. The v4 schema
         deprecates oppia-noninteractive-svgdiagram tag and converts existing
         occurences of it to oppia-noninteractive-image tag.
@@ -1115,7 +1127,7 @@ class Skill:
         return misconception_dict
 
     @classmethod
-    def _convert_misconception_v4_dict_to_v5_dict(cls, misconception_dict):
+    def _convert_misconception_v4_dict_to_v5_dict(cls, misconception_dict:misconception)->misconception:
         """Converts v4 misconception schema to the v5 schema. The v5 schema
         fixes HTML encoding issues.
 
@@ -1134,7 +1146,7 @@ class Skill:
         return misconception_dict
 
     @classmethod
-    def _convert_rubric_v1_dict_to_v2_dict(cls, rubric_dict):
+    def _convert_rubric_v1_dict_to_v2_dict(cls, rubric_dict)->rubric:
         """Converts v1 rubric schema to the v2 schema. In the v2 schema,
         multiple explanations have been added for each difficulty.
 
@@ -1150,7 +1162,7 @@ class Skill:
         return rubric_dict
 
     @classmethod
-    def _convert_rubric_v2_dict_to_v3_dict(cls, rubric_dict):
+    def _convert_rubric_v2_dict_to_v3_dict(cls, rubric_dict:rubric)->rubric:
         """Converts v2 rubric schema to the v3 schema. In the v3 schema,
         the new Math components schema is introduced.
 
@@ -1168,7 +1180,7 @@ class Skill:
         return rubric_dict
 
     @classmethod
-    def _convert_rubric_v3_dict_to_v4_dict(cls, rubric_dict):
+    def _convert_rubric_v3_dict_to_v4_dict(cls, rubric_dict:rubric)->rubric:
         """Converts v3 rubric schema to the v4 schema. The v4 schema
         deprecates oppia-noninteractive-svgdiagram tag and converts existing
         occurences of it to oppia-noninteractive-image tag.
@@ -1187,7 +1199,7 @@ class Skill:
         return rubric_dict
 
     @classmethod
-    def _convert_rubric_v4_dict_to_v5_dict(cls, rubric_dict):
+    def _convert_rubric_v4_dict_to_v5_dict(cls, rubric_dict:rubric)->rubric:
         """Converts v4 rubric schema to the v5 schema. The v4 schema
         fixes HTML encoding issues.
 
@@ -1205,7 +1217,7 @@ class Skill:
         return rubric_dict
 
     @classmethod
-    def update_rubrics_from_model(cls, versioned_rubrics, current_version):
+    def update_rubrics_from_model(cls, versioned_rubrics:versioned_Rubrics, current_version:int)->None:
         """Converts the rubrics blob contained in the given
         versioned_rubrics dict from current_version to
         current_version + 1. Note that the versioned_rubrics being
@@ -1231,7 +1243,7 @@ class Skill:
 
         versioned_rubrics['rubrics'] = updated_rubrics
 
-    def get_all_html_content_strings(self):
+    def get_all_html_content_strings(self)->list(str):
         """Returns all html strings that are part of the skill
         (or any of its subcomponents).
 
@@ -1254,7 +1266,7 @@ class Skill:
 
         return html_content_strings
 
-    def update_description(self, description):
+    def update_description(self, description:str)->None:
         """Updates the description of the skill.
 
         Args:
@@ -1262,7 +1274,7 @@ class Skill:
         """
         self.description = description
 
-    def update_language_code(self, language_code):
+    def update_language_code(self, language_code:str)->None:
         """Updates the language code of the skill.
 
         Args:
@@ -1270,7 +1282,7 @@ class Skill:
         """
         self.language_code = language_code
 
-    def update_superseding_skill_id(self, superseding_skill_id):
+    def update_superseding_skill_id(self, superseding_skill_id:str)->None:
         """Updates the superseding skill ID of the skill.
 
         Args:
@@ -1278,7 +1290,7 @@ class Skill:
         """
         self.superseding_skill_id = superseding_skill_id
 
-    def record_that_all_questions_are_merged(self, all_questions_merged):
+    def record_that_all_questions_are_merged(self, all_questions_merged:bool)->None:
         """Updates the flag value which indicates if all questions are merged.
 
         Args:
@@ -1287,7 +1299,7 @@ class Skill:
         """
         self.all_questions_merged = all_questions_merged
 
-    def update_explanation(self, explanation):
+    def update_explanation(self, explanation:SubtitledHtml)->None:
         """Updates the explanation of the skill.
 
         Args:
@@ -1302,7 +1314,7 @@ class Skill:
         new_content_ids = [self.skill_contents.explanation.content_id]
         self._update_content_ids_in_assets(old_content_ids, new_content_ids)
 
-    def update_worked_examples(self, worked_examples):
+    def update_worked_examples(self, worked_examples:List[WorkedExample])->None:
         """Updates the worked examples list of the skill by performing a copy
         of the provided list.
 
@@ -1324,7 +1336,7 @@ class Skill:
 
         self._update_content_ids_in_assets(old_content_ids, new_content_ids)
 
-    def _update_content_ids_in_assets(self, old_ids_list, new_ids_list):
+    def _update_content_ids_in_assets(self, old_ids_list:List[str], new_ids_list:List[str])->None:
         """Adds or deletes content ids in recorded_voiceovers and
         written_translations.
 
@@ -1349,7 +1361,7 @@ class Skill:
             recorded_voiceovers.add_content_id_for_voiceover(content_id)
             written_translations.add_content_id_for_translation(content_id)
 
-    def _find_misconception_index(self, misconception_id):
+    def _find_misconception_index(self, misconception_id:int)->int|None:
         """Returns the index of the misconception with the given misconception
         id, or None if it is not in the misconceptions list.
 
@@ -1365,7 +1377,7 @@ class Skill:
                 return ind
         return None
 
-    def add_misconception(self, misconception):
+    def add_misconception(self, misconception:Misconception)->None:
         """Adds a new misconception to the skill.
 
         Args:
@@ -1376,7 +1388,7 @@ class Skill:
         self.next_misconception_id = self.get_incremented_misconception_id(
             misconception.id)
 
-    def _find_prerequisite_skill_id_index(self, skill_id_to_find):
+    def _find_prerequisite_skill_id_index(self, skill_id_to_find:str)->int|None:
         """Returns the index of the skill_id in the prerequisite_skill_ids
         array.
 
@@ -1391,7 +1403,7 @@ class Skill:
                 return ind
         return None
 
-    def add_prerequisite_skill(self, skill_id):
+    def add_prerequisite_skill(self, skill_id:str)->None:
         """Adds a prerequisite skill to the skill.
 
         Args:
@@ -1404,7 +1416,7 @@ class Skill:
             raise ValueError('The skill is already a prerequisite skill.')
         self.prerequisite_skill_ids.append(skill_id)
 
-    def delete_prerequisite_skill(self, skill_id):
+    def delete_prerequisite_skill(self, skill_id:str)->None:
         """Removes a prerequisite skill from the skill.
 
         Args:
@@ -1418,7 +1430,7 @@ class Skill:
             raise ValueError('The skill to remove is not a prerequisite skill.')
         del self.prerequisite_skill_ids[index]
 
-    def update_rubric(self, difficulty, explanations):
+    def update_rubric(self, difficulty:str, explanations:List[str])->None:
         """Adds or updates the rubric of the given difficulty.
 
         Args:
@@ -1432,7 +1444,7 @@ class Skill:
         raise ValueError(
             'There is no rubric for the given difficulty.')
 
-    def get_incremented_misconception_id(self, misconception_id):
+    def get_incremented_misconception_id(self, misconception_id:int)->int:
         """Returns the incremented misconception id.
 
         Args:
@@ -1444,7 +1456,7 @@ class Skill:
         """
         return misconception_id + 1
 
-    def delete_misconception(self, misconception_id):
+    def delete_misconception(self, misconception_id:int)->None:
         """Removes a misconception with the given id.
 
         Args:
@@ -1459,7 +1471,7 @@ class Skill:
                 'There is no misconception with the given id.')
         del self.misconceptions[index]
 
-    def update_misconception_name(self, misconception_id, name):
+    def update_misconception_name(self, misconception_id:int, name:str)->None:
         """Updates the name of the misconception with the given id.
 
         Args:
@@ -1476,7 +1488,7 @@ class Skill:
         self.misconceptions[index].name = name
 
     def update_misconception_must_be_addressed(
-            self, misconception_id, must_be_addressed):
+            self, misconception_id:int, must_be_addressed:bool)->None:
         """Updates the must_be_addressed value of the misconception with the
         given id.
 
@@ -1497,7 +1509,7 @@ class Skill:
                 'There is no misconception with the given id.')
         self.misconceptions[index].must_be_addressed = must_be_addressed
 
-    def update_misconception_notes(self, misconception_id, notes):
+    def update_misconception_notes(self, misconception_id:int, notes:str)->None:
         """Updates the notes of the misconception with the given id.
 
         Args:
@@ -1513,7 +1525,7 @@ class Skill:
                 'There is no misconception with the given id.')
         self.misconceptions[index].notes = notes
 
-    def update_misconception_feedback(self, misconception_id, feedback):
+    def update_misconception_feedback(self, misconception_id:int, feedback:str)->None:
         """Updates the feedback of the misconception with the given id.
 
         Args:
@@ -1530,14 +1542,14 @@ class Skill:
                 'There is no misconception with the given id.')
         self.misconceptions[index].feedback = feedback
 
-
+skillSummary = TypedDict('skillSummary',{'id':str,'description':str,'language_code':str,'version':int,'misconception_count':int,'worked_examples_count':int,'skill_model_created_on':datetime.datetime,'skill_model_last_updated':datetime.datetime})
 class SkillSummary:
     """Domain object for Skill Summary."""
 
     def __init__(
-            self, skill_id, description, language_code, version,
-            misconception_count, worked_examples_count, skill_model_created_on,
-            skill_model_last_updated):
+            self, skill_id:str, description:str, language_code:str, version:int,
+            misconception_count:int, worked_examples_count:int, skill_model_created_on:datetime.datetime,
+            skill_model_last_updated:datetime.datetime)->None:
         """Constructs a SkillSummary domain object.
 
         Args:
@@ -1563,7 +1575,7 @@ class SkillSummary:
         self.skill_model_created_on = skill_model_created_on
         self.skill_model_last_updated = skill_model_last_updated
 
-    def validate(self):
+    def validate(self)->None:
         """Validates various properties of the Skill Summary object.
 
         Raises:
@@ -1604,7 +1616,7 @@ class SkillSummary:
                 'Expected worked_examples_count to be non-negative, '
                 'received \'%s\'' % self.worked_examples_count)
 
-    def to_dict(self):
+    def to_dict(self)->skillSummary:
         """Returns a dictionary representation of this domain object.
 
         Returns:
@@ -1623,7 +1635,16 @@ class SkillSummary:
                 self.skill_model_last_updated)
         }
 
-
+augmentedSkillSummary = TypedDict('augmentedSkillSummary',{'id': str,
+            'description': str,
+            'language_code': str,
+            'version': int,
+            'misconception_count': int,
+            'worked_examples_count': int,
+            'topic_names': List[str],
+            'classroom_names': List[str],
+            'skill_model_created_on': datetime.datetime,
+            'skill_model_last_updated': datetime.datetime})
 class AugmentedSkillSummary:
     """Domain object for Augmented Skill Summary, which has all the properties
     of SkillSummary along with the topic names to which the skill is assigned
@@ -1631,9 +1652,9 @@ class AugmentedSkillSummary:
     """
 
     def __init__(
-            self, skill_id, description, language_code, version,
-            misconception_count, worked_examples_count, topic_names,
-            classroom_names, skill_model_created_on, skill_model_last_updated):
+            self, skill_id:str, description:str, language_code:str, version:int,
+            misconception_count:int, worked_examples_count:int, topic_names:List[str],
+            classroom_names:List[str], skill_model_created_on:datetime.datetime, skill_model_last_updated:datetime.datetime)->None:
         """Constructs an AugmentedSkillSummary domain object.
 
         Args:
@@ -1665,7 +1686,7 @@ class AugmentedSkillSummary:
         self.topic_names = topic_names
         self.classroom_names = classroom_names
 
-    def to_dict(self):
+    def to_dict(self)->augmentedSkillSummary:
         """Returns a dictionary representation of this domain object.
 
         Returns:
@@ -1686,7 +1707,7 @@ class AugmentedSkillSummary:
                 self.skill_model_last_updated)
         }
 
-
+topicAssignment = TypedDict('topicAssignment',{'topic_id':str, 'topic_name':str, 'topic_version':int, 'subtopic_id':Union[str,None]})
 class TopicAssignment:
     """Domain object for Topic Assignment, which provides the details of a
     single topic (and, if applicable, the subtopic within that topic) to which
@@ -1694,7 +1715,7 @@ class TopicAssignment:
     """
 
     def __init__(
-            self, topic_id, topic_name, topic_version, subtopic_id):
+            self, topic_id:str, topic_name:str, topic_version:int, subtopic_id:str|None)->None:
         """Constructs a TopicAssignment domain object.
 
         Args:
@@ -1711,7 +1732,7 @@ class TopicAssignment:
         self.topic_version = topic_version
         self.subtopic_id = subtopic_id
 
-    def to_dict(self):
+    def to_dict(self)->topicAssignment:
         """Returns a dictionary representation of this domain object.
 
         Returns:
@@ -1724,11 +1745,12 @@ class TopicAssignment:
             'subtopic_id': self.subtopic_id,
         }
 
-
+skillMastery = TypedDict('skillMastery',{'user_id': str,'skill_id': str,
+            'degree_of_mastery': float})
 class UserSkillMastery:
     """Domain object for a user's mastery of a particular skill."""
 
-    def __init__(self, user_id, skill_id, degree_of_mastery):
+    def __init__(self, user_id:str, skill_id:str, degree_of_mastery:float)->None:
         """Constructs a SkillMastery domain object for a user.
 
         Args:
@@ -1741,7 +1763,7 @@ class UserSkillMastery:
         self.skill_id = skill_id
         self.degree_of_mastery = degree_of_mastery
 
-    def to_dict(self):
+    def to_dict(self)->skillMastery:
         """Returns a dictionary representation of this domain object.
 
         Returns:
@@ -1754,7 +1776,7 @@ class UserSkillMastery:
         }
 
     @classmethod
-    def from_dict(cls, skill_mastery_dict):
+    def from_dict(cls, skill_mastery_dict:skillMastery)->UserSkillMastery:
         """Returns a UserSkillMastery domain object from the given dict.
 
         Args:
