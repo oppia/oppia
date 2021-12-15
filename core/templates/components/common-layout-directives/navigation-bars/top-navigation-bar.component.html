@@ -47,12 +47,6 @@
   <ul class="nav oppia-navbar-nav"
       *ngIf="standardNavIsShown">
     <li>
-      <ul *ngIf="windowIsNarrow && !inClassroomPage"
-          class="nav oppia-navbar-tabs-narrow">
-        <li><oppia-create-activity-button></oppia-create-activity-button></li>
-      </ul>
-    </li>
-    <li>
       <ul *ngIf="!windowIsNarrow"
           class="nav oppia-navbar-tabs">
         <li [ngClass]="{'open' : activeMenuName === 'homeMenu'}"
@@ -286,10 +280,6 @@
               </span>
             </li>
           </ul>
-        </li>
-        <li *ngIf="!inClassroomPage">
-          <oppia-create-activity-button [hidden]="!navElementsVisibilityStatus.I18N_CREATE_EXPLORATION_CREATE">
-          </oppia-create-activity-button>
         </li>
       </ul>
     </li>
