@@ -16,6 +16,10 @@
 
 from __future__ import annotations
 
+import os
+
+from core import feconf
+from core import python_utils
 from core import utils
 from core.controllers import domain_objects_validator
 from core.tests import test_utils
@@ -43,6 +47,53 @@ class ValidateExplorationChangeTests(test_utils.GenericTestBase):
             'property_name': 'title'
         }
         domain_objects_validator.validate_exploration_change(
+            correct_change_dict)
+
+
+class ValidateSuggestionChangeTests(test_utils.GenericTestBase):
+    """Tests to validate domain objects coming from frontend."""
+
+    def test_incorrect_exp_domain_object_raises_exception(self) -> None:
+        incorrect_change_dict = {
+            'state_name': 'State 3',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '<p>old content html</p>',
+            'translation_html': '<p>In Hindi</p>',
+            'data_format': 'html'
+        }
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+            Exception, 'Missing cmd key in change dict'
+        ):
+            domain_objects_validator.validate_suggestion_change(
+                incorrect_change_dict)
+
+        incorrect_change_dict = {
+            'cmd': 'add_subtopic',
+            'state_name': 'State 3',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '<p>old content html</p>',
+            'translation_html': '<p>In Hindi</p>',
+            'data_format': 'html'
+        }
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+            Exception, '%s cmd is not allowed.' % incorrect_change_dict['cmd']
+        ):
+            domain_objects_validator.validate_suggestion_change(
+                incorrect_change_dict)
+
+    def test_correct_exp_domain_object_do_not_raises_exception(self) -> None:
+        correct_change_dict = {
+            'cmd': 'add_written_translation',
+            'state_name': 'State 3',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '<p>old content html</p>',
+            'translation_html': '<p>In Hindi</p>',
+            'data_format': 'html'
+        }
+        domain_objects_validator.validate_suggestion_change(
             correct_change_dict)
 
 
@@ -223,6 +274,27 @@ class ValidateStateDictInStateYamlHandler(test_utils.GenericTestBase):
         # The error is representing the keyerror.
         with self.assertRaisesRegexp(Exception, 'content'): # type: ignore[no-untyped-call]
             domain_objects_validator.validate_state_dict(invalid_state_dict)
+
+
+class ValidateSuggestionImagesTests(test_utils.GenericTestBase):
+    """Tests to validate suggestion images coming from frontend."""
+
+    def test_invalid_images_raises_exception(self) -> None:
+        files = {'file.svg': None}
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+            Exception, 'No image supplied'
+        ):
+            domain_objects_validator.validate_suggestion_images(files)
+
+    def test_valid_images_do_not_raises_exception(self) -> None:
+        files = {'img.png': None, 'test2_svg.svg': None}
+        for filename in files:
+            with python_utils.open_file(
+                os.path.join(feconf.TESTS_DATA_DIR, filename), 'rb',
+                encoding=None
+            ) as f:
+                files[filename] = f.read()
+        domain_objects_validator.validate_suggestion_images(files)
 
 
 class ValidateParamsDict(test_utils.GenericTestBase):
