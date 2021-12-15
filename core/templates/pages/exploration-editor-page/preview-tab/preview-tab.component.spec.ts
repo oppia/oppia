@@ -33,7 +33,7 @@ class MockNgbModalRef {
   };
 }
 
-describe('Preview Tab Component', function() {
+fdescribe('Preview Tab Component', function() {
   importAllAngularServices();
 
   var ctrl = null;
@@ -277,7 +277,7 @@ describe('Preview Tab Component', function() {
       expect(ctrl.isExplorationPopulated).toBeTrue();
     }));
 
-    it('should go to main tab when dismissing set params modal', fakeAsync(() => {
+    fit('should go to main tab when dismissing set params modal', fakeAsync(() => {
       spyOn(ngbModal, 'open').and.callFake(() => {
         return ({
           componentInstance: {},
