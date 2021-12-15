@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for previewTab.
  */
 
-import { fakeAsync, flushMicrotasks, TestBed, tick } from '@angular/core/testing';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
@@ -268,6 +268,7 @@ describe('Preview Tab Component', function() {
           stateName);
         // Get data from exploration data service and resolve promise in open
         // modal.
+        $scope.$apply();
         tick();
         $scope.$apply();
 
@@ -293,6 +294,7 @@ describe('Preview Tab Component', function() {
 
         // Get data from exploration data service and resolve promise in open
         // modal.
+        $scope.$apply();
         tick();
         $scope.$apply();
 

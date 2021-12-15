@@ -55,11 +55,9 @@ describe('Preview Set Parameters Modal Component', function() {
     component = fixture.componentInstance;
 
     TestBed.inject(NgbActiveModal);
-    component.manualParamChanges = [];
   });
 
-  it('should initialize $scope properties after controller is initialized',
-    () => {
-      expect(component.manualParamChanges).toEqual([]);
-    });
+  it('should create', () => {
+    expect(component).toBeDefined();
+  });
 });
