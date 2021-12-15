@@ -295,11 +295,6 @@ class NewTopicHandler(base.BaseHandler):
                     }]
                 }
             },
-            'abbreviatedName': {
-                'schema': {
-                    'type': 'basestring',
-                }
-            },
             'url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
             'description': {
                 'schema': {
