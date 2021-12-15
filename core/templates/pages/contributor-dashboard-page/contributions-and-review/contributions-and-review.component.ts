@@ -340,12 +340,6 @@ angular.module('oppia').component('contributionsAndReview', {
         ContributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit();
       };
 
-      ctrl.switchToTabFromDropdownChoice = function() {
-        var dropdownChoiceStringArray = ctrl.activeDropdownTabChoice.split(' ');
-        ctrl.switchToTab(
-          dropdownChoiceStringArray[0], dropdownChoiceStringArray[1]
-        );
-      };
       ctrl.loadContributions = function() {
         if (!ctrl.activeTabType || !ctrl.activeSuggestionType) {
           return new Promise((resolve, reject) => {
@@ -432,8 +426,6 @@ angular.module('oppia').component('contributionsAndReview', {
                   ctrl.switchToTab(
                     ctrl.TAB_TYPE_CONTRIBUTIONS, SUGGESTION_TYPE_TRANSLATE);
                 }
-                ctrl.activeDropdownTabChoice =
-                  ctrl.activeTabType + ' ' + ctrl.activeSuggestionType;
                 // TODO(#8521): Remove the use of $rootScope.$apply()
                 // once the controller is migrated to angular.
                 $rootScope.$applyAsync();
