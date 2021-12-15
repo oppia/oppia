@@ -302,6 +302,61 @@ class SuggestionListHandler(base.BaseHandler):
     """Handles list operations on suggestions."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'suggestion_type': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'choices': feconf.SUGGESTION_TYPE_CHOICES,
+                'default_value': None
+            },
+            'target_type': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'choices': feconf.SUGGESTION_TARGET_TYPE_CHOICES,
+                'default_value': None
+            },
+            'target_id': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
+            'status': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
+            'author_id': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
+            'final_reviewer_id': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
+            'score_category': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
+            'language_code': {
+                'schema': {
+                    'type': 'basestring',
+                },
+                'default_value': None
+            }
+        }
+    }
 
     @acl_decorators.open_access
     def get(self):
@@ -312,7 +367,7 @@ class SuggestionListHandler(base.BaseHandler):
         # request.GET.items() parses the params from the url into the above
         # format. So in the url, the query should be passed as:
         # ?field1=value1&field2=value2...fieldN=valueN.
-        query_fields_and_values = list(self.request.GET.items())
+        query_fields_and_values = list(self.normalized_request.items())
 
         for query in query_fields_and_values:
             if query[0] not in feconf.ALLOWED_SUGGESTION_QUERY_FIELDS:

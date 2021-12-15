@@ -89,7 +89,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'SubtopicViewerPage',
     'SuggestionEmailHandler',
     'SuggestionHandler',
-    'SuggestionListHandler',
     'SuggestionToExplorationActionHandler',
     'SuggestionToSkillActionHandler',
     'SuggestionsProviderHandler',
