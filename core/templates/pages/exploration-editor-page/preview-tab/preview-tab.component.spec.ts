@@ -262,8 +262,7 @@ describe('Preview Tab Component', function() {
             result: Promise.resolve()
           } as NgbModalRef
         );
-        spyOn(explorationEngineService,
-          'initSettingsFromEditor').and.returnValue(null);
+        spyOn(explorationEngineService,'initSettingsFromEditor');
         spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
           stateName);
         // Get data from exploration data service and resolve promise in open
@@ -278,7 +277,7 @@ describe('Preview Tab Component', function() {
           explorationEngineService.initSettingsFromEditor).toHaveBeenCalledWith(
           stateName, expectedParamChanges);
         expect(ctrl.isExplorationPopulated).toBeTrue();
-    }));
+      }));
 
     it('should go to main tab when dismissing set params modal',
       fakeAsync(() => {
@@ -288,7 +287,7 @@ describe('Preview Tab Component', function() {
             result: Promise.reject()
           } as NgbModalRef
         ));
-        spyOn(routerService, 'navigateToMainTab').and.returnValue(null);
+        spyOn(routerService, 'navigateToMainTab');
         spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
           stateName);
 
@@ -299,7 +298,7 @@ describe('Preview Tab Component', function() {
         $scope.$apply();
 
         expect(routerService.navigateToMainTab).toHaveBeenCalled();
-    }));
+      }));
   });
 
   describe('when there are no manual param changes', function() {
