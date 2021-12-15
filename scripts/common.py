@@ -37,29 +37,28 @@ AFFIRMATIVE_CONFIRMATIONS = ['y', 'ye', 'yes']
 CURRENT_PYTHON_BIN = sys.executable
 
 # Versions of libraries used in devflow.
-COVERAGE_VERSION = '5.3'
+COVERAGE_VERSION = '6.1.2'
 ESPRIMA_VERSION = '4.0.1'
-ISORT_VERSION = '5.8.0'
-PYCODESTYLE_VERSION = '2.6.0'
+ISORT_VERSION = '5.10.1'
+PYCODESTYLE_VERSION = '2.8.0'
 PSUTIL_VERSION = '5.8.0'
-PYLINT_VERSION = '2.8.3'
-PYLINT_QUOTES_VERSION = '0.1.9'
-PYGITHUB_VERSION = '1.45'
-WEBTEST_VERSION = '2.0.35'
-PIP_TOOLS_VERSION = '6.0.1'
-GRPCIO_VERSION = '1.38.0'
-ENUM_VERSION = '1.1.10'
+PYLINT_VERSION = '2.11.1'
+PYLINT_QUOTES_VERSION = '0.2.3'
+PYGITHUB_VERSION = '1.55'
+WEBTEST_VERSION = '3.0.0'
+PIP_TOOLS_VERSION = '6.4.0'
+GRPCIO_VERSION = '1.41.1'
 PROTOBUF_VERSION = '3.13.0'
-SETUPTOOLS_VERSION = '36.6.0'
+SETUPTOOLS_VERSION = '58.5.3'
 
 # Node version.
-NODE_VERSION = '14.15.0'
+NODE_VERSION = '16.13.0'
 
 # NB: Please ensure that the version is consistent with the version in .yarnrc.
-YARN_VERSION = '1.22.10'
+YARN_VERSION = '1.22.15'
 
 # Versions of libraries used in backend.
-PILLOW_VERSION = '6.2.2'
+PILLOW_VERSION = '8.4.0'
 
 # Buf version.
 BUF_VERSION = '0.29.0'
@@ -92,7 +91,7 @@ OPPIA_TOOLS_DIR_ABS_PATH = os.path.abspath(OPPIA_TOOLS_DIR)
 THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
 THIRD_PARTY_PYTHON_LIBS_DIR = os.path.join(THIRD_PARTY_DIR, 'python_libs')
 GOOGLE_CLOUD_SDK_HOME = os.path.join(
-    OPPIA_TOOLS_DIR_ABS_PATH, 'google-cloud-sdk-335.0.0', 'google-cloud-sdk')
+    OPPIA_TOOLS_DIR_ABS_PATH, 'google-cloud-sdk-364.0.0', 'google-cloud-sdk')
 GOOGLE_APP_ENGINE_SDK_HOME = os.path.join(
     GOOGLE_CLOUD_SDK_HOME, 'platform', 'google_appengine')
 GOOGLE_CLOUD_SDK_BIN = os.path.join(GOOGLE_CLOUD_SDK_HOME, 'bin')
