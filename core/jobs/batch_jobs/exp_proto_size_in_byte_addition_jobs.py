@@ -18,9 +18,12 @@
 
 from __future__ import annotations
 
-from core import feconf
+from core.domain import exp_domain
 from core.jobs import base_jobs
+from core.jobs import job_utils
 from core.jobs.io import ndb_io
+from core.jobs.types import job_run_result
+from core.platform import models
 
 import apache_beam as beam
 
@@ -29,6 +32,8 @@ if MYPY: # pragma: no cover
     from mypy_imports import exp_models
 
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
+
+datastore_services = models.Registry.import_datastore_services()
 
 
 class AddProtoSizeInBytesToExplorationJob(base_jobs.JobBase):
@@ -57,9 +62,13 @@ class AddProtoSizeInBytesToExplorationJob(base_jobs.JobBase):
 
 
 class MigrateExplorationToVersion55(beam.DoFn):
+    """DoFn to update exploration model to version 55."""
 
     def process(self, input_model):
-        if input_model.schema_version < exp_models.ExplorationModel.get_all(include_deleted=False): # pylint: disable=line-too-long
-            model = job_utils.clone_model(input_model)
-            # Migrate the model here.
-            yield model
+        if input_model.schema_version < (
+            exp_models.ExplorationModel.get_all(include_deleted=False)):
+            input_model.proto_size_in_bytes = (
+                exp_domain.Exploration.get_proto_size())
+            input_model.ExplorationModel.put_multi([input_model])
+            input_model.update_timestamps(update_last_updated_time=False)
+            yield input_model
