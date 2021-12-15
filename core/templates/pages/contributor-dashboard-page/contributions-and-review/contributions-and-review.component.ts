@@ -341,12 +341,9 @@ angular.module('oppia').component('contributionsAndReview', {
       };
 
       ctrl.switchToTabFromDropdownChoice = function() {
-        var dropdownChoiceArray = ctrl.activeDropdownTabChoice.split(' ');
+        var dropdownChoiceStringArray = ctrl.activeDropdownTabChoice.split(' ');
         ctrl.switchToTab(
-          dropdownChoiceArray[0] === ctrl.TAB_TYPE_CONTRIBUTIONS ?
-          ctrl.TAB_TYPE_CONTRIBUTIONS : ctrl.TAB_TYPE_REVIEWS,
-          dropdownChoiceArray[1] === SUGGESTION_TYPE_QUESTION ?
-          SUGGESTION_TYPE_QUESTION : SUGGESTION_TYPE_TRANSLATE
+          dropdownChoiceStringArray[0], dropdownChoiceStringArray[1]
         );
       };
       ctrl.loadContributions = function() {
