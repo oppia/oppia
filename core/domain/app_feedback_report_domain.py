@@ -189,7 +189,7 @@ class AppFeedbackReport:
             ValidationError. No schema version supplied.
             ValidationError. The schema version is not supported.
         """
-        assert platform == constants.PLATFORM_CHOICE_ANDROID
+        assert platform == app_feedback_report_constants.PLATFORM_CHOICE_ANDROID
         minimum_schema = feconf.MINIMUM_ANDROID_REPORT_SCHEMA_VERSION
         current_schema = feconf.CURRENT_ANDROID_REPORT_SCHEMA_VERSION
         if not isinstance(schema_version, int) or schema_version <= 0:
@@ -236,7 +236,8 @@ class AppFeedbackReport:
             AppFeedbackReport. The corresponding AppFeedbackReport domain
             object.
         """
-        if report_dict['platform_type'] == app_feedback_report_constants.PLATFORM_CHOICE_ANDROID:
+        if report_dict['platform_type'] == (
+            app_feedback_report_constants.PLATFORM_CHOICE_ANDROID):
             return cls.get_android_report_from_dict(report_dict)
         else:
             raise NotImplementedError(
@@ -326,7 +327,8 @@ class AppFeedbackReport:
             'The given report type %s is invalid.' % report_type_name)
 
     @classmethod
-    def get_category_from_string(cls, category_name: str) -> app_feedback_report_constants.CATEGORY:
+    def get_category_from_string(cls, category_name: str) -> (
+        app_feedback_report_constants.CATEGORY):
         """Determines the category based on the JSON value.
 
         Args:
@@ -353,7 +355,8 @@ class AppFeedbackReport:
         Returns:
             ANDROID_TEXT_SIZE. The enum representing the text size.
         """
-        for text_size_type in app_feedback_report_constants.ALLOWED_ANDROID_TEXT_SIZES:
+        for text_size_type in (
+            app_feedback_report_constants.ALLOWED_ANDROID_TEXT_SIZES):
             if text_size_name == text_size_type.name:
                 return text_size_type
         raise utils.InvalidInputException(
@@ -376,18 +379,22 @@ class AppFeedbackReport:
             InvalidInputException. The given entry point is invalid.
         """
         entry_point_name = entry_point_json['entry_point_name']
-        if entry_point_name == app_feedback_report_constants.ENTRY_POINT.navigation_drawer.name:
+        if entry_point_name == (
+            app_feedback_report_constants.ENTRY_POINT.navigation_drawer.name):
             return NavigationDrawerEntryPoint()
-        elif entry_point_name == app_feedback_report_constants.ENTRY_POINT.lesson_player.name:
+        elif entry_point_name == (
+            app_feedback_report_constants.ENTRY_POINT.lesson_player.name):
             return LessonPlayerEntryPoint(
                 entry_point_json['entry_point_topic_id'],
                 entry_point_json['entry_point_story_id'],
                 entry_point_json['entry_point_exploration_id'])
-        elif entry_point_name == app_feedback_report_constants.ENTRY_POINT.revision_card.name:
+        elif entry_point_name == (
+            app_feedback_report_constants.ENTRY_POINT.revision_card.name):
             return RevisionCardEntryPoint(
                 entry_point_json['entry_point_topic_id'],
                 entry_point_json['entry_point_subtopic_id'])
-        elif entry_point_name == app_feedback_report_constants.ENTRY_POINT.crash.name:
+        elif entry_point_name == (
+            app_feedback_report_constants.ENTRY_POINT.crash.name):
             return CrashEntryPoint()
         else:
             raise utils.InvalidInputException(
@@ -405,7 +412,8 @@ class AppFeedbackReport:
         Returns:
             ANDROID_NETWORK_TYPE. The enum representing the network type.
         """
-        for network_type in app_feedback_report_constants.ALLOWED_ANDROID_NETWORK_TYPES:
+        for network_type in (
+            app_feedback_report_constants.ALLOWED_ANDROID_NETWORK_TYPES):
             if network_type_name == network_type.name:
                 return network_type
         raise utils.InvalidInputException(
@@ -490,7 +498,8 @@ class UserSuppliedFeedback:
         """
         if report_type is None:
             raise utils.ValidationError('No report_type supplied.')
-        if report_type not in app_feedback_report_constants.ALLOWED_REPORT_TYPES:
+        if report_type not in (
+            app_feedback_report_constants.ALLOWED_REPORT_TYPES):
             raise utils.ValidationError(
                 'Invalid report type %s, must be one of %s.' % (
                     report_type,
@@ -538,7 +547,8 @@ class UserSuppliedFeedback:
             ValidationError. The given selection items and text input for the
                 category are not valid.
         """
-        if category in app_feedback_report_constants.ALLOWED_SELECTION_ITEMS_CATEGORIES:
+        if category in (
+            app_feedback_report_constants.ALLOWED_SELECTION_ITEMS_CATEGORIES):
             # If the report category enables users to select checkbox options,
             # validate the options selected by the user.
             cls.require_valid_selected_items_for_category(selected_items)
@@ -546,7 +556,8 @@ class UserSuppliedFeedback:
         # If the report category only allows users to provide input text,
         # validate that the user_feedback_selected_items is None and that
         # there is a user_feedback_other_text_input.
-        if category in app_feedback_report_constants.ALLOWED_ONLY_INPUT_TEXT_CATEGORIES:
+        if category in (
+            app_feedback_report_constants.ALLOWED_ONLY_INPUT_TEXT_CATEGORIES):
             if len(selected_items) != 0:
                 raise utils.ValidationError(
                     'Report cannot have selection options for category %r.' % (
@@ -731,7 +742,7 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
             raise utils.ValidationError(
                 'Version name must be a string, received: %r.' % version_name)
         if len(version_name.split(
-                app_feedback_report_constants.ANDROID_VERSION_NAME_DELIMITER)) != 3:
+                app_feedback_report_constants.ANDROID_VERSION_NAME_DELIMITER)) != 3: # pylint: disable=line-too-long
             raise utils.ValidationError(
                 'The version name is not a valid string format, received: '
                 '%s.' % version_name)
@@ -1063,7 +1074,8 @@ class AndroidAppContext(AppContext):
         """
         if text_size is None:
             raise utils.ValidationError('No text size supplied.')
-        if text_size not in app_feedback_report_constants.ALLOWED_ANDROID_TEXT_SIZES:
+        if text_size not in (
+            app_feedback_report_constants.ALLOWED_ANDROID_TEXT_SIZES):
             raise utils.ValidationError(
                 'App text size should be one of %s, received: %s' % (
                     app_feedback_report_constants.ALLOWED_ANDROID_TEXT_SIZES,
@@ -1231,8 +1243,8 @@ class LessonPlayerEntryPoint(EntryPoint):
                 user is playing when intiating the report.
         """
         super(LessonPlayerEntryPoint, self).__init__(
-            app_feedback_report_constants.ENTRY_POINT.lesson_player, topic_id=topic_id,
-            story_id=story_id, exploration_id=exploration_id)
+            app_feedback_report_constants.ENTRY_POINT.lesson_player,
+            topic_id=topic_id, story_id=story_id, exploration_id=exploration_id)
 
     def to_dict(self) -> Dict[str, Any]:
         """Returns a dict representing this LessonPlayerEntryPoint domain
@@ -1256,7 +1268,8 @@ class LessonPlayerEntryPoint(EntryPoint):
                 LessonPlayerEntryPoint are not valid.
         """
         self.require_valid_entry_point_name(
-            self.entry_point_name, app_feedback_report_constants.ENTRY_POINT.lesson_player)
+            self.entry_point_name,
+            app_feedback_report_constants.ENTRY_POINT.lesson_player)
         topic_domain.Topic.require_valid_topic_id(self.topic_id) # type: ignore[no-untyped-call]
         story_domain.Story.require_valid_story_id(self.story_id) # type: ignore[no-untyped-call]
         self.require_valid_entry_point_exploration(
@@ -1445,7 +1458,8 @@ class AppFeedbackReportTicket:
             raise utils.ValidationError(
                 'The ticket id should be a string, received: %s' % (
                     ticket_id))
-        if len(ticket_id.split(app_feedback_report_constants.TICKET_ID_DELIMITER)) != 3:
+        if len(ticket_id.split(
+            app_feedback_report_constants.TICKET_ID_DELIMITER)) != 3:
             raise utils.ValidationError('The ticket id %s is invalid' % (
                 ticket_id))
 
@@ -1465,7 +1479,8 @@ class AppFeedbackReportTicket:
             raise utils.ValidationError(
                 'The ticket name should be a string, received: %s' % (
                     ticket_name))
-        if len(ticket_name) > app_feedback_report_constants.MAXIMUM_TICKET_NAME_LENGTH:
+        if len(ticket_name) > (
+            app_feedback_report_constants.MAXIMUM_TICKET_NAME_LENGTH):
             raise utils.ValidationError(
                 'The ticket name is too long, has %d characters but only '
                 'allowed %d characters' % (
@@ -1607,7 +1622,8 @@ class AppFeedbackReportDailyStats:
         if not isinstance(stats_id, str):
             raise utils.ValidationError(
                 'The stats id should be a string, received: %r' % stats_id)
-        if len(stats_id.split(app_feedback_report_constants.STATS_ID_DELIMITER)) != 3:
+        if len(stats_id.split(
+            app_feedback_report_constants.STATS_ID_DELIMITER)) != 3:
             raise utils.ValidationError('The stats id %s is invalid' % stats_id)
 
     @classmethod
@@ -1723,10 +1739,12 @@ class AppFeedbackReportFilter:
             ValidationError. One or more attributes of the
                 AppFeedbackReportFilter are not valid.
         """
-        if self.filter_field not in app_feedback_report_constants.ALLOWED_FILTERS:
+        if self.filter_field not in (
+            app_feedback_report_constants.ALLOWED_FILTERS):
             raise utils.ValidationError(
                 'The filter field should be one of %s, received: %s' % (
-                    [item.name for item in app_feedback_report_constants.ALLOWED_FILTERS],
+                    [item.name for item in (
+                        app_feedback_report_constants.ALLOWED_FILTERS)],
                     self.filter_field.name))
         if not isinstance(self.filter_options, list):
             raise utils.ValidationError(
