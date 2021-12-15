@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import base64
 import os
 
 from core import feconf
@@ -741,10 +742,14 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                         '</oppia-noninteractive-image>'),
                     'data_format': 'html'
                 },
-            }, csrf_token=csrf_token,
-            upload_files=(
-                ('translation_image.png', 'translation_image.png', raw_image), )
-            )
+                'description': 'test',
+                'files': {
+                    'translation_image.png': (
+                        base64.b64encode(raw_image).decode('utf-8'))
+                 },
+            },
+            csrf_token=csrf_token
+        )
 
         fs = fs_domain.AbstractFileSystem(
             fs_domain.GcsFileSystem(
@@ -981,7 +986,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             suggestion.suggestion_id), {
                 'question_state_data': question_state_data,
                 'skill_difficulty': 0.6
-            }, csrf_token=csrf_token, upload_files=(
+            },
+            csrf_token=csrf_token, upload_files=(
                 ('img.png', 'img.png', raw_image),))
 
         updated_suggestion = suggestion_services.get_suggestion_by_id(
@@ -1330,11 +1336,11 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     'translation_html': valid_html,
                     'data_format': 'html'
                 },
+                'files': {'file.svg': None},
+                'description': 'test'
             }, csrf_token=csrf_token, expected_status_int=400)
 
-        self.assertIn(
-            'No image data provided for file with name file.svg.',
-            response_dict['error'])
+        self.assertIn('No image supplied', response_dict['error'])
         self.logout()
 
     def test_suggestion_creation_when_images_are_not_valid(self):
@@ -1405,10 +1411,10 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     'translation_html': valid_html,
                     'data_format': 'html'
                 },
-            }, csrf_token=csrf_token,
-            upload_files=(
-                 ('file.svg', 'file.svg', large_image),),
-            expected_status_int=400)
+                'description': 'test',
+                'files': {'file.svg': large_image},
+            }, csrf_token=csrf_token, expected_status_int=400,
+        )
 
         self.assertIn(
             'Image exceeds file size limit of 100 KB.',
@@ -1742,8 +1748,8 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             response['error'],
-            'Expected target_version_at_submission to be an int, '
-            'received <class \'str\'>'
+            'Schema validation for \'target_version_at_submission\' failed: '
+            'Could not convert str to int: invalid_target_version'
         )
         self.assertEqual(len(suggestions), 1)
         self.logout()
@@ -1793,9 +1799,12 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                     'skill_id': self.SKILL_ID,
                     'skill_difficulty': 0.3
                 },
-                'description': 'Add new question to skill'
-            }, csrf_token=csrf_token, upload_files=(
-                ('file.svg', 'file.svg', raw_image), ))
+                'description': 'Add new question to skill',
+                'files': {
+                    'file.svg': (
+                        base64.b64encode(raw_image).decode('utf-8'))
+                }
+            }, csrf_token=csrf_token,)
         self.logout()
 
 

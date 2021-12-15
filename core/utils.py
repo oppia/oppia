@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import base64
+import binascii
 import collections
 import datetime
 import hashlib
@@ -329,6 +330,22 @@ def convert_png_binary_to_data_url(content: bytes) -> str:
         )
     else:
         raise Exception('The given string does not represent a PNG image.')
+
+
+def is_base64_encoded(content: str) -> bool:
+    """Checks if a string is base64 encoded.
+
+    Args:
+        content: str. String to check.
+
+    Returns:
+        bool. True if a string is base64 encoded, False otherwise.
+    """
+    try:
+        base64.b64decode(content, validate=True)
+        return True
+    except binascii.Error:
+        return False
 
 
 def convert_png_to_data_url(filepath: str) -> str:
