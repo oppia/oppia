@@ -22,6 +22,7 @@ from core.domain import exp_domain
 from core.jobs import base_jobs
 from core.jobs import job_utils
 from core.jobs.io import ndb_io
+from core.jobs.transforms import job_result_transforms
 from core.jobs.types import job_run_result
 from core.platform import models
 
@@ -56,8 +57,10 @@ class AddProtoSizeInBytesToExplorationJob(base_jobs.JobBase):
             | 'Get all non-deleted models' >> (
                 ndb_io.GetModels(
                     exp_models.ExplorationModel.get_all(include_deleted=False)))
-            | MigrateExplorationToVersion55()
-            | 'Write updated model to Datastore'
+            | 'Migrate exploration' >> beam.ParDo(
+                MigrateExplorationToVersion55())
+            | 'Write updated model to Datastore' >> (
+                job_result_transforms.ResultsToJobRunResults())
         )
 
 
@@ -69,6 +72,11 @@ class MigrateExplorationToVersion55(beam.DoFn):
             exp_models.ExplorationModel.get_all(include_deleted=False)):
             input_model.proto_size_in_bytes = (
                 exp_domain.Exploration.get_proto_size())
-            input_model.ExplorationModel.put_multi([input_model])
-            input_model.update_timestamps(update_last_updated_time=False)
-            yield input_model
+            try:
+                input_model.ExplorationModel.put_multi([input_model])
+                input_model.update_timestamps(update_last_updated_time=False)
+                print('input_modelinput_modelinput_model')
+                print(input_model)
+                yield result.Ok()
+            except:
+                yield result.Err()
