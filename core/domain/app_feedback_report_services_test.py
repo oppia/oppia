@@ -471,10 +471,12 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         stats_id = (
             app_feedback_report_models.AppFeedbackReportStatsModel.calculate_id(
                 app_feedback_report_constants.PLATFORM_CHOICE_ANDROID,
-                self.android_ticket_id, self.android_report_obj.submitted_on_timestamp))
+                self.android_ticket_id,
+                self.android_report_obj.submitted_on_timestamp))
         app_feedback_report_models.AppFeedbackReportStatsModel.create(
             stats_id, app_feedback_report_constants.PLATFORM_CHOICE_ANDROID,
-            self.android_ticket_id, self.android_report_obj.submitted_on_timestamp, 1,
+            self.android_ticket_id,
+            self.android_report_obj.submitted_on_timestamp, 1,
             self.REPORT_STATS)
         stats_model = (
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
@@ -1151,7 +1153,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         old_all_report_stats_id = (
             app_feedback_report_models.AppFeedbackReportStatsModel.calculate_id(
                 self.android_report_obj.platform,
-                app_feedback_report_constants.ALL_ANDROID_REPORTS_STATS_TICKET_ID,
+                app_feedback_report_constants.ALL_ANDROID_REPORTS_STATS_TICKET_ID, # pylint: disable=line-too-long
                 self.android_report_obj.submitted_on_timestamp.date()))
         old_all_reports_stats_model = (
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
