@@ -85,7 +85,7 @@ def store_incoming_report_stats(
 
     platform = PLATFORM_ANDROID
     unticketed_id = (
-        app_feedback_report_constants.UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID)
+        app_feedback_report_constants.UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID) # pylint: disable=line-too-long
     all_reports_id = (
         app_feedback_report_constants.ALL_ANDROID_REPORTS_STATS_TICKET_ID)
 
@@ -168,46 +168,46 @@ def _update_report_stats_model_in_transaction( # type: ignore[no-untyped-def]
         stats_dict = stats_model.daily_param_stats
 
         stats_dict[
-            app_feedback_report_constants.STATS_PARAMETER_NAMES.report_type.name] = (
+            app_feedback_report_constants.STATS_PARAMETER_NAMES.report_type.name] = ( # pylint: disable=line-too-long
             calculate_new_stats_count_for_parameter(
                 stats_dict[
-                    app_feedback_report_constants.STATS_PARAMETER_NAMES.report_type.name],
+                    app_feedback_report_constants.STATS_PARAMETER_NAMES.report_type.name], # pylint: disable=line-too-long
                 report_type, delta))
         stats_dict[
-            app_feedback_report_constants.STATS_PARAMETER_NAMES.country_locale_code.name] = (
+            app_feedback_report_constants.STATS_PARAMETER_NAMES.country_locale_code.name] = ( # pylint: disable=line-too-long
             calculate_new_stats_count_for_parameter(
                 stats_dict[
-                    app_feedback_report_constants.STATS_PARAMETER_NAMES.country_locale_code.name],
+                    app_feedback_report_constants.STATS_PARAMETER_NAMES.country_locale_code.name], # pylint: disable=line-too-long
                 country_locale_code, delta))
         stats_dict[
-            app_feedback_report_constants.STATS_PARAMETER_NAMES.entry_point_name.name] = (
+            app_feedback_report_constants.STATS_PARAMETER_NAMES.entry_point_name.name] = ( # pylint: disable=line-too-long
             calculate_new_stats_count_for_parameter(
                 stats_dict[
-                    app_feedback_report_constants.STATS_PARAMETER_NAMES.entry_point_name.name],
+                    app_feedback_report_constants.STATS_PARAMETER_NAMES.entry_point_name.name], # pylint: disable=line-too-long
                 entry_point_name, delta))
         stats_dict[
-            app_feedback_report_constants.STATS_PARAMETER_NAMES.audio_language_code.name] = (
+            app_feedback_report_constants.STATS_PARAMETER_NAMES.audio_language_code.name] = ( # pylint: disable=line-too-long
             calculate_new_stats_count_for_parameter(
                 stats_dict[
-                    app_feedback_report_constants.STATS_PARAMETER_NAMES.audio_language_code.name],
+                    app_feedback_report_constants.STATS_PARAMETER_NAMES.audio_language_code.name], # pylint: disable=line-too-long
                 audio_language_code, delta))
         stats_dict[
-            app_feedback_report_constants.STATS_PARAMETER_NAMES.text_language_code.name] = (
+            app_feedback_report_constants.STATS_PARAMETER_NAMES.text_language_code.name] = ( # pylint: disable=line-too-long
             calculate_new_stats_count_for_parameter(
                 stats_dict[
-                    app_feedback_report_constants.STATS_PARAMETER_NAMES.text_language_code.name],
+                    app_feedback_report_constants.STATS_PARAMETER_NAMES.text_language_code.name], # pylint: disable=line-too-long
                 text_language_code, delta))
         stats_dict[
-            app_feedback_report_constants.STATS_PARAMETER_NAMES.android_sdk_version.name] = (
+            app_feedback_report_constants.STATS_PARAMETER_NAMES.android_sdk_version.name] = ( # pylint: disable=line-too-long
             calculate_new_stats_count_for_parameter(
                 stats_dict[
-                    app_feedback_report_constants.STATS_PARAMETER_NAMES.android_sdk_version.name],
+                    app_feedback_report_constants.STATS_PARAMETER_NAMES.android_sdk_version.name], # pylint: disable=line-too-long
                 sdk_version, delta))
         stats_dict[
-            app_feedback_report_constants.STATS_PARAMETER_NAMES.version_name.name] = (
+            app_feedback_report_constants.STATS_PARAMETER_NAMES.version_name.name] = ( # pylint: disable=line-too-long
             calculate_new_stats_count_for_parameter(
                 stats_dict[
-                    app_feedback_report_constants.STATS_PARAMETER_NAMES.version_name.name],
+                    app_feedback_report_constants.STATS_PARAMETER_NAMES.version_name.name], # pylint: disable=line-too-long
                 version_name, delta))
 
     stats_model.daily_param_stats = stats_dict
@@ -578,7 +578,7 @@ def reassign_ticket(
     old_ticket_id = report.ticket_id
     if old_ticket_id is None:
         _update_report_stats_model_in_transaction(
-            app_feedback_report_constants.UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID,
+            app_feedback_report_constants.UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID, # pylint: disable=line-too-long
             platform, stats_date, report, -1)
     else:
         # The report was ticketed so the report needs to be removed from its old
@@ -618,7 +618,7 @@ def reassign_ticket(
 
     # Add the report to the new ticket.
     new_ticket_id = (
-        app_feedback_report_constants.UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID)
+        app_feedback_report_constants.UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID) # pylint: disable=line-too-long
     if new_ticket is not None:
         new_ticket_id = new_ticket.ticket_id
     new_ticket_model = (
