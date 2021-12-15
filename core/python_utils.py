@@ -174,18 +174,6 @@ def get_package_file_contents(package: str, filepath: str) -> str:
         return pkgutil.get_data(package, filepath).decode('utf-8')
 
 
-def url_parse(urlstring):
-    """Parse a URL into six components using urlparse.urlparse if run under
-    Python 2 and urllib.parse.urlparse if run under Python 3. This corresponds
-    to the general structure of a URL:
-    scheme://netloc/path;parameters?query#fragment.
-    
-    Args:
-        urlstring: str. The URL.
-
-    Returns:
-        tuple(str). The components of a URL.
-    """
 def url_unsplit(url_parts):
     """Combine the elements of a tuple as returned by urlsplit() into a complete
     URL as a string using urlparse.urlunsplit if run under Python 2 and
@@ -201,8 +189,6 @@ def url_unsplit(url_parts):
         import urllib.parse as urlparse
     except ImportError:
         import urlparse
-    return urlparse.urlparse(urlstring)  # pylint: disable=disallowed-function-calls
-
     return urlparse.urlunsplit(url_parts)  # pylint: disable=disallowed-function-calls
 
 
