@@ -184,6 +184,7 @@ describe('Contributions and review component', function() {
       ' initialized', function() {
       expect(ctrl.activeTabType).toBe('reviews');
       expect(ctrl.activeSuggestionType).toBe('add_question');
+      expect(ctrl.activeDropdownTabChoice).toBe('reviews add_question');
       expect(ctrl.userIsLoggedIn).toBe(true);
       expect(ctrl.userDetailsLoading).toBe(false);
       expect(ctrl.reviewTabs.length).toEqual(2);
@@ -734,6 +735,7 @@ describe('Contributions and review component', function() {
       ' initialized', function() {
       expect(ctrl.activeTabType).toBe('contributions');
       expect(ctrl.activeSuggestionType).toBe('add_question');
+      expect(ctrl.activeDropdownTabChoice).toBe('contributions add_question');
       expect(ctrl.userIsLoggedIn).toBe(true);
       expect(ctrl.userDetailsLoading).toBe(false);
       expect(ctrl.reviewTabs.length).toEqual(0);
