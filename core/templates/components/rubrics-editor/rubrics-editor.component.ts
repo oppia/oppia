@@ -113,9 +113,13 @@ export class RubricsEditorComponent {
 
   hasReachedExplanationCountLimit(): boolean {
     let totalExplanations: number = 0;
-    let totalEasyExplanations = this.editableExplanations['Easy'].length;
-    let totalMediumExplanations = this.editableExplanations['Medium'].length;
-    let totalHardExplanations = this.editableExplanations['Hard'].length;
+    let easyDifficulty = 'Easy';
+    let mediumDifficulty = 'Medium';
+    let hardDifficulty = 'Hard';
+
+    let totalEasyExplanations = this.editableExplanations[easyDifficulty].length;
+    let totalMediumExplanations = this.editableExplanations[mediumDifficulty].length;
+    let totalHardExplanations = this.editableExplanations[hardDifficulty].length;
 
     totalExplanations = totalEasyExplanations + totalMediumExplanations +
     totalHardExplanations;
