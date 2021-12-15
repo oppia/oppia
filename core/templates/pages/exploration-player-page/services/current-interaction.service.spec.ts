@@ -27,7 +27,6 @@ import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
 import { StateCard } from 'domain/state_card/state-card.model';
 import { ContextService } from 'services/context.service';
-import { Subject } from 'rxjs';
 
 describe('Current Interaction Service', () => {
   let urlService: UrlService = null;
@@ -154,11 +153,9 @@ describe('Current Interaction Service', () => {
   });
 
   it('should update view with new answer', () => {
-    let testSubject = new Subject<void>();
-    let testObservable = testSubject.asObservable();
-
+    expect(currentInteractionService.updateViewWithNewAnswer).toBeDefined();
     currentInteractionService.updateViewWithNewAnswer();
 
-    expect(currentInteractionService.onAnswerChanged$).toEqual(testObservable);
+    expect(currentInteractionService.onAnswerChanged$).toBeDefined();
   });
 });
