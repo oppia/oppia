@@ -2250,7 +2250,6 @@ class Exploration:
             exploration_dict: dict. The dict representation of an exploration
                 with schema version v55.
             exploration_id: str. The exploration id.
-            yaml_content: str. The YAML representation of the exploration.
 
         Returns:
             dict. The dict representation of the Exploration domain object,
