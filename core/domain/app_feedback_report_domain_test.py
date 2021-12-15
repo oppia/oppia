@@ -765,7 +765,7 @@ class NavigationDrawerEntryPointDomainTests(test_utils.GenericTestBase):
     def test_to_dict(self) -> None:
         expected_dict = {
             'entry_point_name': (
-                app_feedback_report_constants.ENTRY_POINT.navigation_drawer.name)
+                app_feedback_report_constants.ENTRY_POINT.navigation_drawer.name) # pylint: disable=line-too-long
         }
         self.assertDictEqual(
             expected_dict, self.entry_point.to_dict())
@@ -793,7 +793,7 @@ class NavigationDrawerEntryPointDomainTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected entry point name %s' % (
-                app_feedback_report_constants.ENTRY_POINT.navigation_drawer.name)):
+                app_feedback_report_constants.ENTRY_POINT.navigation_drawer.name)): # pylint: disable=line-too-long
             self.entry_point.validate()
 
 
@@ -1014,7 +1014,7 @@ class AppContextDomainTests(test_utils.GenericTestBase):
         expected_dict = {
             'entry_point': {
                 'entry_point_name': (
-                    app_feedback_report_constants.ENTRY_POINT.navigation_drawer.name),
+                    app_feedback_report_constants.ENTRY_POINT.navigation_drawer.name), # pylint: disable=line-too-long
             },
             'text_language_code': LANGUAGE_LOCALE_CODE_ENGLISH,
             'audio_language_code': LANGUAGE_LOCALE_CODE_ENGLISH
@@ -1045,7 +1045,7 @@ class AndroidAppContextDomainTests(test_utils.GenericTestBase):
         expected_dict = {
             'entry_point': {
                 'entry_point_name': (
-                    app_feedback_report_constants.ENTRY_POINT.navigation_drawer.name),
+                    app_feedback_report_constants.ENTRY_POINT.navigation_drawer.name), # pylint: disable=line-too-long
             },
             'text_language_code': LANGUAGE_LOCALE_CODE_ENGLISH,
             'audio_language_code': LANGUAGE_LOCALE_CODE_ENGLISH,
