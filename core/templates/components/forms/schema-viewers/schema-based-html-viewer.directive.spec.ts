@@ -16,28 +16,28 @@
  * @fileoverview Unit tests for Schema Based Html Viewer Directive
  */
 
- import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
- describe('Schema Based Html Viewer Directive', () => {
-   let ctrl = null;
-   let $rootScope = null;
-   let $scope = null;
-   let directive = null;
- 
-   beforeEach(angular.mock.module('oppia'));
-   importAllAngularServices();
- 
-   beforeEach(angular.mock.inject(function($injector) {
-     $rootScope = $injector.get('$rootScope');
-     $scope = $rootScope.$new();
- 
-     directive = $injector.get('schemaBasedHtmlViewerDirective')[0];
-     ctrl = $injector.instantiate(directive.controller, {
-       $scope: $scope
-     });
-   }));
- 
-   it('should initialize directive', () => {
-     expect(ctrl).toBeDefined();
-   });
- });
+describe('Schema Based Html Viewer Directive', () => {
+  let ctrl = null;
+  let $rootScope = null;
+  let $scope = null;
+  let directive = null;
+
+  beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
+
+  beforeEach(angular.mock.inject(function($injector) {
+    $rootScope = $injector.get('$rootScope');
+    $scope = $rootScope.$new();
+
+    directive = $injector.get('schemaBasedHtmlViewerDirective')[0];
+    ctrl = $injector.instantiate(directive.controller, {
+      $scope: $scope
+    });
+  }));
+
+  it('should initialize directive', () => {
+    expect(ctrl).toBeDefined();
+  });
+});
