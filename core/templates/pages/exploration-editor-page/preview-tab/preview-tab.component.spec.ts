@@ -254,7 +254,7 @@ describe('Preview Tab Component', function() {
       expect(ngbModal.open).toHaveBeenCalled();
     }));
 
-    fit('should load preview state when closing set params modal',
+    it('should load preview state when closing set params modal',
       fakeAsync(() => {
         spyOn(ngbModal, 'open').and.returnValue(
           {
@@ -279,7 +279,7 @@ describe('Preview Tab Component', function() {
         expect(ctrl.isExplorationPopulated).toBeTrue();
     }));
 
-    fit('should go to main tab when dismissing set params modal',
+    it('should go to main tab when dismissing set params modal',
       fakeAsync(() => {
         spyOn(ngbModal, 'open').and.callFake(() =>(
           {
