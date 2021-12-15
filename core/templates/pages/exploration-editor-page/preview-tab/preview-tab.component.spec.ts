@@ -262,7 +262,7 @@ describe('Preview Tab Component', function() {
             result: Promise.resolve()
           } as NgbModalRef
         );
-        spyOn(explorationEngineService,'initSettingsFromEditor');
+        spyOn(explorationEngineService, 'initSettingsFromEditor');
         spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
           stateName);
         // Get data from exploration data service and resolve promise in open
