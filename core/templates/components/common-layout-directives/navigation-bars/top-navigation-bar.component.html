@@ -55,6 +55,26 @@
     <li>
       <ul *ngIf="!windowIsNarrow"
           class="nav oppia-navbar-tabs">
+        <li [ngClass]="{'open' : activeMenuName === 'homeMenu'}"
+            *ngIf="userIsLoggedIn"
+            [hidden]="!navElementsVisibilityStatus.I18N_TOPNAV_HOME"
+            aria-hidden="false"
+            class="nav-item  oppia-navbar-clickable-dropdown protractor-test-home-oppia-list-item">
+          <a (keydown)="onMenuKeypress($event, 'homeMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
+             class="nav-link oppia-navbar-tab"
+             role="menuitem"
+             aria-haspopup="true"
+             aria-expanded="false"
+             aria-hidden="false"
+             tabindex="0"
+             href="/"
+             [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.SPLASH.ROUTE"
+             autofocus>
+            <span class="oppia-navbar-tab-content">
+              {{ 'I18N_TOPNAV_HOME' | translate }}
+            </span>
+          </a>
+        </li>
         <li [ngClass]="{'open' : activeMenuName === 'learnMenu'}"
             ngbDropdown
             [hidden]="!navElementsVisibilityStatus.I18N_TOPNAV_LEARN"

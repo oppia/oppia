@@ -381,7 +381,8 @@ describe('TopNavigationBarComponent', () => {
       I18N_TOPNAV_LEARN: true,
       I18N_TOPNAV_ABOUT: true,
       I18N_CREATE_EXPLORATION_CREATE: true,
-      I18N_TOPNAV_LIBRARY: true
+      I18N_TOPNAV_LIBRARY: true,
+      I18N_TOPNAV_HOME: true
     };
 
     component.truncateNavbar();
@@ -393,7 +394,8 @@ describe('TopNavigationBarComponent', () => {
         I18N_TOPNAV_LEARN: true,
         I18N_TOPNAV_ABOUT: true,
         I18N_CREATE_EXPLORATION_CREATE: true,
-        I18N_TOPNAV_LIBRARY: true
+        I18N_TOPNAV_LIBRARY: true,
+        I18N_TOPNAV_HOME: true
       });
     });
   }));
