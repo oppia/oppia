@@ -31,9 +31,6 @@ from core.domain import state_domain
 from typing import Dict, List, Callable, Union
 from typing_extensions import TypedDict
 import datetime
-#from core.domain.state_domain import RecordedVoiceovers
-#from core.domain.state_domain import SubtitledHtml
-#from core.domain.state_domain import WrittenTranslations
 
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
@@ -376,7 +373,9 @@ class Rubric:
 class WorkedExample:
     """Domain object for representing the worked_example dict."""
 
-    def __init__(self, question: state_domain.SubtitledHtml, explanation: state_domain.SubtitledHtml):
+    def __init__(
+        self, question: state_domain.SubtitledHtml,
+        explanation: state_domain.SubtitledHtml):
         """Constructs a WorkedExample domain object.
 
         Args:
@@ -447,8 +446,10 @@ skillsContents = TypedDict(
     'skillsContents',
     {'explanation': Dict[str, state_domain.SubtitledHtml],
     'worked_examples': List[Dict[str, Dict[str, state_domain.SubtitledHtml]]],
-    'recorded_voiceovers': Dict[str, Dict[str, state_domain.RecordedVoiceovers]],
-    'written_translations': Dict[str, Dict[str, state_domain.WrittenTranslations]]})
+    'recorded_voiceovers': Dict[str, Dict[str,
+    state_domain.RecordedVoiceovers]],
+    'written_translations': Dict[str, Dict[str,
+    state_domain.WrittenTranslations]]})
 
 
 class SkillContents:
@@ -1373,7 +1374,8 @@ class Skill:
         """
         self.all_questions_merged = all_questions_merged
 
-    def update_explanation(self, explanation: state_domain.SubtitledHtml) -> None:
+    def update_explanation(
+        self, explanation: state_domain.SubtitledHtml) -> None:
         """Updates the explanation of the skill.
 
         Args:
