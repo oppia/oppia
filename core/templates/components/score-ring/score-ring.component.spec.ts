@@ -18,7 +18,7 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA, SimpleChanges } from '@angular/core';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { ScoreRingComponent } from './score-ring.component';
 
@@ -45,6 +45,28 @@ describe('Score Ring Component', () => {
     component = fixture.componentInstance;
     component.score = 35;
   });
+
+  it('should retry calling document.querySelector if the element ' +
+  'doesn\'t exist yet', fakeAsync(() => {
+    component.score = 35;
+    spyOn(component, 'setScore');
+    spyOn(document, 'querySelector').and.returnValue(null);
+
+    component.ngOnInit();
+    tick(161);
+
+    expect(component.setScore).not.toHaveBeenCalled();
+
+    document.querySelector = jasmine.createSpy().and.returnValue({
+      r: {
+        baseVal: {
+          value: 125
+        }
+      },
+      style: { }
+    });
+    tick(160);
+  }));
 
   it('should set component properties on initialization', () => {
     component.score = 35;
