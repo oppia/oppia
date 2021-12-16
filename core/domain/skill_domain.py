@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import copy
+import datetime
 import json
 
 from core import android_validation_constants
@@ -28,9 +29,8 @@ from core.domain import html_cleaner
 from core.domain import html_validation_service
 from core.domain import state_domain
 
-from typing import Dict, List, Callable, Union
+from typing import Callable, Dict, List, Union
 from typing_extensions import TypedDict
-import datetime
 
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
