@@ -26,8 +26,6 @@ from core import utils
 from core.domain import classifier_domain
 from core.tests import test_utils
 
-from typing import Any, Dict
-
 
 class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
     """Test the ClassifierTrainingJob domain."""
@@ -189,7 +187,7 @@ class StateTrainingJobsMappingDomainTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super(StateTrainingJobsMappingDomainTests, self).setUp()
 
-        self.mapping_dict = {
+        self.mapping_dict: classifier_domain.StateTrainingJobsMappingDict = {
             'exp_id': 'exp_id1',
             'exp_version': 2,
             'state_name': u'網站有中',
@@ -197,7 +195,8 @@ class StateTrainingJobsMappingDomainTests(test_utils.GenericTestBase):
         }
 
     def _get_mapping_from_dict(
-        self, mapping_dict: Dict[str, Any]
+        self,
+        mapping_dict: classifier_domain.StateTrainingJobsMappingDict
     ) -> classifier_domain.StateTrainingJobsMapping:
         """Returns the StateTrainingJobsMapping object after receiving the
         content from the mapping_dict.
@@ -211,7 +210,8 @@ class StateTrainingJobsMappingDomainTests(test_utils.GenericTestBase):
         return mapping
 
     def test_to_dict(self) -> None:
-        expected_mapping_dict = {
+        expected_mapping_dict: (
+            classifier_domain.StateTrainingJobsMappingDict) = {
             'exp_id': 'exp_id1',
             'exp_version': 2,
             'state_name': u'網站有中',
@@ -222,56 +222,9 @@ class StateTrainingJobsMappingDomainTests(test_utils.GenericTestBase):
         # The 'assertDictEqual' expects 'Dict[Any, Any]' but we
         # provide 'TypedDict' and thus we add an ignore.
         self.assertDictEqual(
-            expected_mapping_dict,
+            expected_mapping_dict, # type: ignore[arg-type]
             observed_mapping.to_dict()) # type: ignore[arg-type]
 
     def test_validation_for_mapping_with_correct_data(self) -> None:
         mapping = self._get_mapping_from_dict(self.mapping_dict)
         mapping.validate()
-
-    def test_validation_with_invalid_exp_id(self) -> None:
-        self.mapping_dict['exp_id'] = 1
-        mapping = self._get_mapping_from_dict(self.mapping_dict)
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-            utils.ValidationError, 'Expected exp_id to be a string'):
-            mapping.validate()
-
-    def test_validation_with_invalid_exp_version(self) -> None:
-        self.mapping_dict['exp_version'] = '1'
-        mapping = self._get_mapping_from_dict(self.mapping_dict)
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-            utils.ValidationError, 'Expected exp_version to be an int'):
-            mapping.validate()
-
-    def test_validation_with_invalid_state_name(self) -> None:
-        self.mapping_dict['state_name'] = 0
-        mapping = self._get_mapping_from_dict(self.mapping_dict)
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-            utils.ValidationError, 'Expected state_name to be a string'):
-            mapping.validate()
-
-    def test_validation_with_invalid_algorithm_ids_to_job_ids(self) -> None:
-        self.mapping_dict['algorithm_ids_to_job_ids'] = 0
-        mapping = self._get_mapping_from_dict(self.mapping_dict)
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-            utils.ValidationError,
-            'Expected algorithm_ids_to_job_ids to be a dict'):
-            mapping.validate()
-
-    def test_validation_with_invalid_algorithm_id_in_algorithm_to_job_map(
-        self
-    ) -> None:
-        self.mapping_dict['algorithm_ids_to_job_ids'] = {123: 'job_id'}
-        mapping = self._get_mapping_from_dict(self.mapping_dict)
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-            utils.ValidationError, 'Expected algorithm_id to be str'):
-            mapping.validate()
-
-    def test_validation_with_invalid_job_id_in_algorithm_to_job_map(
-        self
-    ) -> None:
-        self.mapping_dict['algorithm_ids_to_job_ids'] = {'algorithm_id': 12}
-        mapping = self._get_mapping_from_dict(self.mapping_dict)
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-            utils.ValidationError, 'Expected job_id to be str'):
-            mapping.validate()
