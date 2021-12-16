@@ -763,7 +763,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                 self.assertEqual(
                     filter_obj.filter_options[0], self.ANDROID_PLATFORM_VERSION)
             elif filter_obj.filter_field == (
-                    report_filter_field_names.android_device_country_locale_code):
+                    report_filter_field_names.android_device_country_locale_code): # pylint: disable=line-too-long
                 self.assertEqual(
                     filter_obj.filter_options[0],
                     self.COUNTRY_LOCALE_CODE_INDIA)
