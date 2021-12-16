@@ -1,5 +1,5 @@
 {
-	"I18N_ABOUT_FOUNDATION_PAGE_BREADCRUMB": "Tietoja säätiöstä",
+	"I18N_ABOUT_FOUNDATION_PAGE_BREADCRUMB": "Tietoja Oppia Foundationista",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_CREATE": "Luo tutkimus",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_CREATE_TEXT": "aiheesta josta välität.",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_FEEDBACK": "Ansaitse palautetta",
@@ -643,7 +643,7 @@
 	"I18N_TOPNAV_MODERATOR_PAGE": "Moderaattorisivu",
 	"I18N_TOPNAV_OPPIA_FOUNDATION": "Oppia Foundation",
 	"I18N_TOPNAV_PARTICIPATION_PLAYBOOK": "Myötävaikutuksen pelikirja",
-	"I18N_TOPNAV_PARTNERSHIPS": "Kumppanuudet",
+	"I18N_TOPNAV_PARTNERSHIPS": "Koulut ja järjestöt",
 	"I18N_TOPNAV_PREFERENCES": "Asetukset",
 	"I18N_TOPNAV_SIGN_IN": "Kirjaudu sisään",
 	"I18N_TOPNAV_SIGN_IN_WITH_GOOGLE": "Kirjaudu sisään Googlella",
