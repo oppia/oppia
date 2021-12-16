@@ -18,11 +18,12 @@
 
 from __future__ import annotations
 
+from core import feconf
+from core.domain import caching_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.jobs import base_jobs
-from core.jobs import job_utils
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
 from core.jobs.types import job_run_result
@@ -42,7 +43,6 @@ if MYPY: # pragma: no cover
 (base_models, exp_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.exploration
 ])
-
 datastore_services = models.Registry.import_datastore_services()
 
 
@@ -76,7 +76,7 @@ class AddProtoSizeInBytesToExplorationJob(base_jobs.JobBase):
 
     @staticmethod
     def _update_exploration(
-        exploration_model: exploration_models.ExplorationModel,
+        exploration_model: exp_models.ExplorationModel,
         migrated_exploration: exp_domain.Exploration,
         exploration_changes: Sequence[exp_domain.ExplorationChange]
     ) -> Sequence[base_models.BaseModel]:
@@ -112,6 +112,33 @@ class AddProtoSizeInBytesToExplorationJob(base_jobs.JobBase):
         return models_to_put
 
     @staticmethod
+    def _update_exploration_summary(
+        migrated_exploration: exp_domain.Exploration,
+        exploration_summary_model: exp_models.ExpSummaryModel
+    ) -> exp_models.ExpSummaryModel:
+        """Generates newly updated exploration summary model.
+
+        Args:
+            migrated_exploration: Exploration. The migrated exploration domain object.
+            exploration_summary_model: ExpSummaryModel. The exploration summary model
+                to update.
+
+        Returns:
+            ExpSummaryModel. The updated exploration summary model to put into
+            the datastore.
+        """
+        exploration_summary = exp_services.compute_summary_of_exploration(
+            migrated_exploration)
+        exploration_summary.version += 1
+        updated_exploration_summary_model = (
+            exp_services.populate_exploration_summary_model_fields(
+                exploration_summary_model, exploration_summary
+            )
+        )
+        return updated_exploration_summary_model
+
+
+    @staticmethod
     def _generate_exploration_changes(
         exp_id: str, exp_model: exp_models.ExplorationModel
     ) -> Iterable[Tuple[str, exp_domain.ExplorationChange]]:
@@ -128,11 +155,11 @@ class AddProtoSizeInBytesToExplorationJob(base_jobs.JobBase):
             object.
         """
         if exp_model.version < exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION:
+            exp = exp_fetchers.get_exploration_from_model(exp_model)
             exp_change = exp_domain.ExplorationChange({
-                'cmd': (
-                    exp_domain.CMD_EDIT_EXPLORATION_PROPERTY),
-                'from_version': exp_model.version,
-                'to_version': 55
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'proto_size_in_bytes',
+                'new_value': exp.proto_size_in_bytes
             })
             yield (exp_id, exp_change)
 
@@ -141,8 +168,10 @@ class AddProtoSizeInBytesToExplorationJob(base_jobs.JobBase):
         exploration: exp_domain.Exploration
     ) -> result.Result[str, Exception]:
         """Deletes exploration from cache.
+
         Args:
             exploration: Exploration. The exploration which should be deleted from cache.
+
         Returns:
             Result(str, Exception). The id of the exploration when the deletion
             was successful or Exception when the deletion failed.
@@ -166,8 +195,17 @@ class AddProtoSizeInBytesToExplorationJob(base_jobs.JobBase):
                 ndb_io.GetModels(exp_models.ExplorationModel.get_all(include_deleted=False)))
             # Pylint disable is needed because pylint is not able to correctly
             # detect that the value is passed through the pipe.
-            | 'Add exploration model ID' >> beam.WithKeys( # pylint: disable=no-value-for-parameter
-                lambda exp_model: exp_model.id)
+            | 'Add exploration ID' >> beam.WithKeys( # pylint: disable=no-value-for-parameter
+                lambda exploration_model: exploration_model.id)
+        )
+        exploration_summary_models = (
+            self.pipeline
+            | 'Get all non-deleted exploration summary models' >> (
+                ndb_io.GetModels(exp_models.ExpSummaryModel.get_all()))
+            # Pylint disable is needed because pylint is not able to correctly
+            # detect that the value is passed through the pipe.
+            | 'Add exploration summary ID' >> beam.WithKeys( # pylint: disable=no-value-for-parameter
+                lambda exploration_summary_model: exploration_summary_model.id)
         )
 
         migrated_exploration_results = (
@@ -197,6 +235,7 @@ class AddProtoSizeInBytesToExplorationJob(base_jobs.JobBase):
         exploration_objects_list = (
             {
                 'exp_model': unmigrated_exploration_models,
+                'exploration_summary_model': exploration_summary_models,
                 'exploration': migrated_explorations,
                 'exploration_changes': exploration_changes
             }
@@ -206,6 +245,7 @@ class AddProtoSizeInBytesToExplorationJob(base_jobs.JobBase):
                 lambda x: len(x['exploration_changes']) > 0 and len(x['exploration']) > 0)
             | 'Reorganize the exploration objects' >> beam.Map(lambda objects: {
                     'exp_model': objects['exp_model'][0],
+                    'exploration_summary_model': objects['exploration_summary_model'][0],
                     'exploration': objects['exploration'][0],
                     'exploration_changes': objects['exploration_changes']
                 })
@@ -237,8 +277,17 @@ class AddProtoSizeInBytesToExplorationJob(base_jobs.JobBase):
                 ))
         )
 
+        exploration_summary_models_to_put = (
+            exploration_objects_list
+            | 'Generate exploration summary models to put' >> beam.Map(
+                lambda exp_objects: self._update_exploration_summary(
+                    exp_objects['exploration'],
+                    exp_objects['exploration_summary_model']
+                ))
+        )
+
         unused_put_results = (
-            (exp_models_to_put)
+            (exp_models_to_put, exploration_summary_models_to_put)
             | 'Merge models' >> beam.Flatten()
             | 'Put models into the datastore' >> ndb_io.PutModels()
         )

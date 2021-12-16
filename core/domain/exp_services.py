@@ -551,6 +551,9 @@ def apply_change_list(exploration_id, change_list):
                 elif change.property_name == 'correctness_feedback_enabled':
                     exploration.update_correctness_feedback_enabled(
                         change.new_value)
+                elif change.property_name == 'proto_size_in_bytes':
+                    exploration.update_proto_size_in_bytes(
+                        change.new_value)
             elif (change.cmd ==
                   exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION):
                 # Loading the exploration model from the datastore into an
@@ -735,8 +738,7 @@ def _create_exploration(
         param_specs=exploration.param_specs_dict,
         param_changes=exploration.param_change_dicts,
         auto_tts_enabled=exploration.auto_tts_enabled,
-        correctness_feedback_enabled=exploration.correctness_feedback_enabled,
-        proto_size_in_bytes=exploration.proto_size_in_bytes
+        correctness_feedback_enabled=exploration.correctness_feedback_enabled
     )
     commit_cmds_dict = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
     model.commit(committer_id, commit_message, commit_cmds_dict)
@@ -1207,7 +1209,7 @@ def regenerate_exploration_summary_with_new_contributor(
             the exploration summary.
     """
     exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-    exp_summary = _compute_summary_of_exploration(exploration)
+    exp_summary = compute_summary_of_exploration(exploration)
     exp_summary.add_contribution_by_user(contributor_id)
     save_exploration_summary(exp_summary)
 
@@ -1221,13 +1223,13 @@ def regenerate_exploration_and_contributors_summaries(exploration_id):
         exploration_id: str. ID of the exploration.
     """
     exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-    exp_summary = _compute_summary_of_exploration(exploration)
+    exp_summary = compute_summary_of_exploration(exploration)
     exp_summary.contributors_summary = (
         compute_exploration_contributors_summary(exp_summary.id))
     save_exploration_summary(exp_summary)
 
 
-def _compute_summary_of_exploration(exploration):
+def compute_summary_of_exploration(exploration):
     """Create an ExplorationSummary domain object for a given Exploration
     domain object and return it.
 
@@ -1313,13 +1315,21 @@ def compute_exploration_contributors_summary(exploration_id):
 
     return contributors_summary
 
-
-def save_exploration_summary(exp_summary):
-    """Save an exploration summary domain object as an ExpSummaryModel entity
-    in the datastore.
+def populate_exploration_summary_model_fields(
+    exp_summary_model, exp_summary
+):
+    """Populate exploration summary model with the data
+    from exploration summary object.
 
     Args:
-        exp_summary: ExplorationSummary. The exploration summary to save.
+        exp_summary_model: ExplorationSummaryModel. The
+            model to populate.
+        exp_summary: ExplorationSummary. The
+            exploration summary domain object which should be used
+            to populate the model.
+
+    Returns:
+        ExplorationSummaryModel. Populated model.
     """
     exp_summary_dict = {
         'title': exp_summary.title,
@@ -1345,17 +1355,28 @@ def save_exploration_summary(exp_summary):
         'first_published_msec': (
             exp_summary.first_published_msec)
     }
-
-    exp_summary_model = (exp_models.ExpSummaryModel.get_by_id(exp_summary.id))
     if exp_summary_model is not None:
         exp_summary_model.populate(**exp_summary_dict)
-        exp_summary_model.update_timestamps()
-        exp_summary_model.put()
     else:
         exp_summary_dict['id'] = exp_summary.id
-        model = exp_models.ExpSummaryModel(**exp_summary_dict)
-        model.update_timestamps()
-        model.put()
+        exp_summary_model = exp_models.ExpSummaryModel(**exp_summary_dict)
+
+    return exp_summary_model
+
+def save_exploration_summary(exp_summary):
+    """Save an exploration summary domain object as an ExpSummaryModel entity
+    in the datastore.
+
+    Args:
+        exp_summary: ExplorationSummary. The exploration summary to save.
+    """
+    exp_summary_model = (exp_models.ExpSummaryModel.get_by_id(exp_summary.id))
+    exp_summary_model = (
+        populate_exploration_summary_model_fields(
+            exp_summary_model, exp_summary))
+
+    exp_summary_model.update_timestamps()
+    exp_summary_model.put()
 
     # The index should be updated after saving the exploration
     # summary instead of after saving the exploration since the
