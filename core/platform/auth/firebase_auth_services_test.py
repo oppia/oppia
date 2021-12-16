@@ -1181,6 +1181,24 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
                 lambda: firebase_auth_services.get_auth_claims_from_request(
                     self.create_request(session_cookie=cookie)))
 
+    def test_raises_user_disabled_error_when_user_is_disabled(self) -> None:
+        cookie = firebase_auth.create_session_cookie(
+            self.firebase_sdk_stub.create_user(
+                self.AUTH_ID, email=self.EMAIL, disabled=True
+            ),
+            feconf.FIREBASE_SESSION_COOKIE_MAX_AGE
+        )
+
+        always_raise_expired_session_cookie_error = self.swap_to_always_raise(
+            firebase_auth, 'verify_session_cookie',
+            error=firebase_auth.UserDisabledError('uh-oh'))
+
+        with always_raise_expired_session_cookie_error, self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+                auth_domain.UserDisabledError, 'user is being deleted'
+        ):
+            firebase_auth_services.get_auth_claims_from_request(
+                self.create_request(session_cookie=cookie))
+
     def test_raises_auth_session_error_when_cookie_is_invalid(self) -> None:
         cookie = firebase_auth.create_session_cookie(
             self.firebase_sdk_stub.create_user(self.AUTH_ID, email=self.EMAIL),
