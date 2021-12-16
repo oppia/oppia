@@ -6439,7 +6439,7 @@ export default {
     }
   },
 
-  "DEV_MODE": true,
+  "DEV_MODE": false,
   "EMULATOR_MODE": true,
   "ASSET_TYPE_AUDIO": "audio",
   "ASSET_TYPE_IMAGE": "image",
