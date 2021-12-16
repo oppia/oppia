@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the translation tab.
+ * @fileoverview Component for the welcome translation modal.
  */
 
 import { Component, OnInit } from '@angular/core';
@@ -44,8 +44,8 @@ export class WelcomeTranslationModalComponent
 
   ngOnInit(): void {
     this.explorationId = this.contextService.getExplorationId();
-    this.siteAnalyticsService
-      .registerTutorialModalOpenEvent(this.explorationId);
+    this.siteAnalyticsService.registerTutorialModalOpenEvent(
+      this.explorationId);
     this.translationWelcomeImgUrl = this.urlInterpolationService
       .getStaticImageUrl('/general/editor_welcome.svg');
   }
