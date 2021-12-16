@@ -33,20 +33,22 @@ require('pages/topic-editor-page/services/topic-editor-routing.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('services/alerts.service.ts');
 require('services/contextual/url.service.ts');
+require('services/ngb-modal.service.ts');
 
 import { Subscription } from 'rxjs';
+import { TopicEditorSendMailComponent } from '../modal-templates/topic-editor-send-mail-modal.component';
 
 angular.module('oppia').component('topicEditorNavbar', {
   template: require('./topic-editor-navbar.component.html'),
   controller: [
     '$rootScope', '$scope', '$uibModal', '$window', 'AlertsService',
-    'TopicEditorRoutingService', 'TopicEditorStateService',
+    'NgbModal', 'TopicEditorRoutingService', 'TopicEditorStateService',
     'TopicRightsBackendApiService', 'UndoRedoService',
     'UrlInterpolationService', 'UrlService',
     'TOPIC_VIEWER_URL_TEMPLATE',
     function(
         $rootScope, $scope, $uibModal, $window, AlertsService,
-        TopicEditorRoutingService, TopicEditorStateService,
+        NgbModal, TopicEditorRoutingService, TopicEditorStateService,
         TopicRightsBackendApiService, UndoRedoService,
         UrlInterpolationService, UrlService,
         TOPIC_VIEWER_URL_TEMPLATE) {
@@ -78,12 +80,8 @@ angular.module('oppia').component('topicEditorNavbar', {
 
       $scope.publishTopic = function() {
         if (!$scope.topicRights.canPublishTopic()) {
-          $uibModal.open({
-            templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-              '/pages/topic-editor-page/modal-templates/' +
-                  'topic-editor-send-mail-modal.template.html'),
-            backdrop: true,
-            controller: 'ConfirmOrCancelModalController'
+          NgbModal.open(TopicEditorSendMailComponent, {
+            backdrop: true
           }).result.then(function() {
             TopicRightsBackendApiService.sendMailAsync(
               $scope.topicId, $scope.topicName).then(function() {

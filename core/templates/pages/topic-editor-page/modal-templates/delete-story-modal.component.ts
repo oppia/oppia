@@ -13,20 +13,18 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for topic save pending changes modal.
+ * @fileoverview Component for delete story modal.
  */
-
 import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
-  selector: 'oppia-topic-editor-send-mail-modal',
-  templateUrl: './topic-editor-send-mail-modal.component.html'
+  selector: 'oppia-delete-story-modal',
+  templateUrl: './delete-story-modal.component.html'
 })
-export class TopicSavePendingChangesComponent 
-  extends ConfirmOrCancelModal {
+export class DeleteStoryModalComponent extends ConfirmOrCancelModal {
 
   constructor(
     private ngbActiveModal: NgbActiveModal

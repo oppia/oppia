@@ -21,16 +21,16 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
-import { TopicSavePendingChangesComponent } from './topic-save-pending-changes-modal.component';
+import { DeleteStoryModalComponent } from './delete-story-modal.component';
 
-describe('Topic Save Pending Changes Component', function() {
-  let component: TopicSavePendingChangesComponent;
-  let fixture: ComponentFixture<TopicSavePendingChangesComponent>;
+describe('Delete Story Modal Component', function() {
+  let component: DeleteStoryModalComponent;
+  let fixture: ComponentFixture<DeleteStoryModalComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
-        TopicSavePendingChangesComponent
+        DeleteStoryModalComponent
       ],
       providers: [{
         provide: NgbActiveModal
@@ -40,7 +40,7 @@ describe('Topic Save Pending Changes Component', function() {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(TopicSavePendingChangesComponent);
+    fixture = TestBed.createComponent(DeleteStoryModalComponent);
     component = fixture.componentInstance;
 
     TestBed.inject(NgbActiveModal);
