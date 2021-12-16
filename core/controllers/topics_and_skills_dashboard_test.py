@@ -936,60 +936,6 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
         self.logout()
 
-    def test_skill_creation_with_invalid_images(self):
-        self.login(self.CURRICULUM_ADMIN_EMAIL)
-        csrf_token = self.get_new_csrf_token()
-        explanation_html = (
-            '<oppia-noninteractive-image filepath-with-value='
-            '"&quot;img.svg&quot;" caption-with-value="&quot;&quot;" '
-            'alt-with-value="&quot;Image&quot;"></oppia-noninteractive-image>'
-        )
-        rubrics = [
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']).to_dict(),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']).to_dict(),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], ['Explanation 3']).to_dict(),
-        ]
-        post_data = {
-            'description': 'Skill Description',
-            'rubrics': rubrics,
-            'explanation_dict': state_domain.SubtitledHtml(
-                '1', explanation_html).to_dict(),
-            'linked_topic_ids': []
-        }
-
-        response_dict = self.post_json(
-            self.url, post_data,
-            csrf_token=csrf_token,
-            expected_status_int=400)
-
-        self.assertIn(
-            'No image data provided for file with name img.svg',
-            response_dict['error'])
-
-        large_image = '<svg><path d="%s" /></svg>' % (
-            'M150 0 L75 200 L225 200 Z ' * 4000)
-        post_data = {
-            'description': 'Skill Description 2',
-            'rubrics': rubrics,
-            'explanation_dict': state_domain.SubtitledHtml(
-                '1', explanation_html).to_dict(),
-            'linked_topic_ids': []
-        }
-        response_dict = self.post_json(
-            self.url, post_data,
-            csrf_token=csrf_token,
-            upload_files=(
-                ('img.svg', 'img.svg', large_image),
-            ), expected_status_int=400)
-
-        self.assertIn(
-            'Image exceeds file size limit of 100 KB.',
-            response_dict['error'])
-        self.logout()
-
 
 class MergeSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
