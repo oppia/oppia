@@ -18,13 +18,13 @@
 
 from __future__ import annotations
 
-import logging
+import base64
 
 from core import feconf
-from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.controllers import domain_objects_validator
 from core.domain import exp_fetchers
 from core.domain import fs_services
 from core.domain import html_cleaner
@@ -38,23 +38,78 @@ from core.domain import suggestion_services
 class SuggestionHandler(base.BaseHandler):
     """"Handles operations relating to suggestions."""
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'suggestion_type': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': feconf.SUGGESTION_TYPE_CHOICES
+                }
+            },
+            'target_type': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': feconf.SUGGESTION_TARGET_TYPE_CHOICES
+                }
+            },
+            'target_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'target_version_at_submission': {
+                'schema': {
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 1
+                    }]
+                }
+            },
+            'change': {
+               'schema': {
+                   'type': 'object_dict',
+                    'validation_method': (
+                        domain_objects_validator.
+                        validate_suggestion_change
+                    )
+               }
+            },
+            'description': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'files': {
+                'schema': {
+                    'type': 'object_dict',
+                    'validation_method': (
+                        domain_objects_validator.
+                        validate_suggestion_images
+                    )
+                },
+                'default_value': None
+            }
+        }
+    }
+
     @acl_decorators.can_suggest_changes
     def post(self):
         """Handles POST requests."""
-        if (self.payload.get('suggestion_type') ==
+        if (self.normalized_payload.get('suggestion_type') ==
                 feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT):
             raise self.InvalidInputException(
                 'Content suggestion submissions are no longer supported.')
 
-        try:
-            suggestion = suggestion_services.create_suggestion(
-                self.payload.get('suggestion_type'),
-                self.payload.get('target_type'), self.payload.get('target_id'),
-                self.payload.get('target_version_at_submission'),
-                self.user_id, self.payload.get('change'),
-                self.payload.get('description'))
-        except utils.ValidationError as e:
-            raise self.InvalidInputException(e)
+        suggestion = suggestion_services.create_suggestion(
+            self.normalized_payload.get('suggestion_type'),
+            self.normalized_payload.get('target_type'),
+            self.normalized_payload.get('target_id'),
+            self.normalized_payload.get('target_version_at_submission'),
+            self.user_id,
+            self.normalized_payload.get('change'),
+            self.normalized_payload.get('description'))
 
         suggestion_change = suggestion.change
         if (
@@ -77,10 +132,10 @@ class SuggestionHandler(base.BaseHandler):
         # is not good, since when the user cancels a question suggestion after
         # adding an image, there is no method to remove the uploaded image.
         # See more - https://github.com/oppia/oppia/issues/14298
-        if self.payload.get(
+        if self.normalized_payload.get(
             'suggestion_type') != (feconf.SUGGESTION_TYPE_ADD_QUESTION):
             _upload_suggestion_images(
-                self.request,
+                self.normalized_payload.get('files'),
                 suggestion,
                 suggestion.get_new_image_filenames_added_in_suggestion())
 
@@ -262,6 +317,24 @@ class ReviewableSuggestionsHandler(SuggestionsProviderHandler):
     """Provides all suggestions which can be reviewed by the user for a given
     suggestion type.
     """
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'target_type': {
+            'schema': {
+                'type': 'basestring',
+            },
+            'choices': feconf.SUGGESTION_TARGET_TYPE_CHOICES
+        },
+        'suggestion_type': {
+            'schema': {
+                'type': 'basestring',
+            },
+            'choices': feconf.SUGGESTION_TYPE_CHOICES
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.can_view_reviewable_suggestions
     def get(self, target_type, suggestion_type):
@@ -509,11 +582,11 @@ def _construct_exploration_suggestions(suggestions):
     return suggestion_dicts
 
 
-def _upload_suggestion_images(request, suggestion, filenames):
+def _upload_suggestion_images(files, suggestion, filenames):
     """Saves a suggestion's images to storage.
 
     Args:
-        request: webapp2.Request. Request object containing a mapping of image
+        files: dict. Files containing a mapping of image
             filename to image blob.
         suggestion: BaseSuggestion. The suggestion for which images are being
             uploaded.
@@ -523,21 +596,11 @@ def _upload_suggestion_images(request, suggestion, filenames):
     # TODO(#10513): Find a way to save the images before the suggestion is
     # created.
     for filename in filenames:
-        image = request.get(filename)
-        if not image:
-            logging.exception(
-                'Image not provided for file with name %s when the '
-                ' suggestion with target id %s was created.' % (
-                    filename, suggestion.target_id))
-            raise base.BaseHandler.InvalidInputException(
-                'No image data provided for file with name %s.'
-                % (filename))
-        try:
-            file_format = (
-                image_validation_services.validate_image_and_filename(
-                    image, filename))
-        except utils.ValidationError as e:
-            raise base.BaseHandler.InvalidInputException('%s' % (e))
+        image = files.get(filename)
+        image = base64.decodebytes(image.encode('utf-8'))
+        file_format = (
+            image_validation_services.validate_image_and_filename(
+                image, filename))
         image_is_compressible = (
             file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
         fs_services.save_original_and_compressed_versions_of_image(
