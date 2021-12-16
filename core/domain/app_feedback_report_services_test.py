@@ -614,28 +614,28 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
                 unticketed_stats_id))
 
-        ReportStatsParameterNames = (
+        report_stats_parameter_names = (
             app_feedback_report_constants.STATS_PARAMETER_NAMES)
         expected_json = {
-            ReportStatsParameterNames.report_type.name: {
+            report_stats_parameter_names.report_type.name: {
                 self.REPORT_TYPE_SUGGESTION.name: 2
             },
-            ReportStatsParameterNames.country_locale_code.name: {
+            report_stats_parameter_names.country_locale_code.name: {
                 self.COUNTRY_LOCALE_CODE_INDIA: 2
             },
-            ReportStatsParameterNames.entry_point_name.name: {
+            report_stats_parameter_names.entry_point_name.name: {
                 self.ENTRY_POINT_NAVIGATION_DRAWER.name: 2
             },
-            ReportStatsParameterNames.text_language_code.name: {
+            report_stats_parameter_names.text_language_code.name: {
                 self.TEXT_LANGUAGE_CODE_ENGLISH: 2
             },
-            ReportStatsParameterNames.audio_language_code.name: {
+            report_stats_parameter_names.audio_language_code.name: {
                 self.AUDIO_LANGUAGE_CODE_ENGLISH: 2
             },
-            ReportStatsParameterNames.android_sdk_version.name: {
+            report_stats_parameter_names.android_sdk_version.name: {
                 str(self.ANDROID_SDK_VERSION): 2
             },
-            ReportStatsParameterNames.version_name.name: {
+            report_stats_parameter_names.version_name.name: {
                 self.ANDROID_PLATFORM_VERSION: 2
             }
         }
@@ -666,28 +666,28 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
                 all_report_stats_id))
 
-        ReportStatsParameterNames = (
+        report_stats_parameter_names = (
             app_feedback_report_constants.STATS_PARAMETER_NAMES)
         expected_json = {
-            ReportStatsParameterNames.report_type.name: {
+            report_stats_parameter_names.report_type.name: {
                 self.REPORT_TYPE_SUGGESTION.name: 2
             },
-            ReportStatsParameterNames.country_locale_code.name: {
+            report_stats_parameter_names.country_locale_code.name: {
                 self.COUNTRY_LOCALE_CODE_INDIA: 2
             },
-            ReportStatsParameterNames.entry_point_name.name: {
+            report_stats_parameter_names.entry_point_name.name: {
                 self.ENTRY_POINT_NAVIGATION_DRAWER.name: 2
             },
-            ReportStatsParameterNames.text_language_code.name: {
+            report_stats_parameter_names.text_language_code.name: {
                 self.TEXT_LANGUAGE_CODE_ENGLISH: 2
             },
-            ReportStatsParameterNames.audio_language_code.name: {
+            report_stats_parameter_names.audio_language_code.name: {
                 self.AUDIO_LANGUAGE_CODE_ENGLISH: 2
             },
-            ReportStatsParameterNames.android_sdk_version.name: {
+            report_stats_parameter_names.android_sdk_version.name: {
                 str(self.ANDROID_SDK_VERSION): 2
             },
-            ReportStatsParameterNames.version_name.name: {
+            report_stats_parameter_names.version_name.name: {
                 self.ANDROID_PLATFORM_VERSION: 2
             }
         }
@@ -888,28 +888,28 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
                 new_stats_id))
 
-        ReportStatsParameterNames = (
+        report_stats_parameter_names = (
             app_feedback_report_constants.STATS_PARAMETER_NAMES)
         expected_json = {
-            ReportStatsParameterNames.report_type.name: {
+            report_stats_parameter_names.report_type.name: {
                 self.REPORT_TYPE_SUGGESTION.name: 1
             },
-            ReportStatsParameterNames.country_locale_code.name: {
+            report_stats_parameter_names.country_locale_code.name: {
                 self.COUNTRY_LOCALE_CODE_INDIA: 1
             },
-            ReportStatsParameterNames.entry_point_name.name: {
+            report_stats_parameter_names.entry_point_name.name: {
                 self.ENTRY_POINT_NAVIGATION_DRAWER.name: 1
             },
-            ReportStatsParameterNames.text_language_code.name: {
+            report_stats_parameter_names.text_language_code.name: {
                 self.TEXT_LANGUAGE_CODE_ENGLISH: 1
             },
-            ReportStatsParameterNames.audio_language_code.name: {
+            report_stats_parameter_names.audio_language_code.name: {
                 self.AUDIO_LANGUAGE_CODE_ENGLISH: 1
             },
-            ReportStatsParameterNames.android_sdk_version.name: {
+            report_stats_parameter_names.android_sdk_version.name: {
                 str(self.ANDROID_SDK_VERSION): 1
             },
-            ReportStatsParameterNames.version_name.name: {
+            report_stats_parameter_names.version_name.name: {
                 self.ANDROID_PLATFORM_VERSION: 1
             }
         }
@@ -951,28 +951,28 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
                 old_stats_id))
 
-        ReportStatsParameterNames = (
+        report_stats_parameter_names = (
             app_feedback_report_constants.STATS_PARAMETER_NAMES)
         expected_json = {
-            ReportStatsParameterNames.report_type.name: {
+            report_stats_parameter_names.report_type.name: {
                 self.REPORT_TYPE_SUGGESTION.name: 0
             },
-            ReportStatsParameterNames.country_locale_code.name: {
+            report_stats_parameter_names.country_locale_code.name: {
                 self.COUNTRY_LOCALE_CODE_INDIA: 0
             },
-            ReportStatsParameterNames.entry_point_name.name: {
+            report_stats_parameter_names.entry_point_name.name: {
                 self.ENTRY_POINT_NAVIGATION_DRAWER.name: 0
             },
-            ReportStatsParameterNames.text_language_code.name: {
+            report_stats_parameter_names.text_language_code.name: {
                 self.TEXT_LANGUAGE_CODE_ENGLISH: 0
             },
-            ReportStatsParameterNames.audio_language_code.name: {
+            report_stats_parameter_names.audio_language_code.name: {
                 self.AUDIO_LANGUAGE_CODE_ENGLISH: 0
             },
-            ReportStatsParameterNames.android_sdk_version.name: {
+            report_stats_parameter_names.android_sdk_version.name: {
                 str(self.ANDROID_SDK_VERSION): 0
             },
-            ReportStatsParameterNames.version_name.name: {
+            report_stats_parameter_names.version_name.name: {
                 self.ANDROID_PLATFORM_VERSION: 0
             }
         }
@@ -1006,28 +1006,28 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
                 old_stats_id))
 
-        ReportStatsParameterNames = (
+        report_stats_parameter_names = (
             app_feedback_report_constants.STATS_PARAMETER_NAMES)
         expected_json = {
-            ReportStatsParameterNames.report_type.name: {
+            report_stats_parameter_names.report_type.name: {
                 self.REPORT_TYPE_SUGGESTION.name: 0
             },
-            ReportStatsParameterNames.country_locale_code.name: {
+            report_stats_parameter_names.country_locale_code.name: {
                 self.COUNTRY_LOCALE_CODE_INDIA: 0
             },
-            ReportStatsParameterNames.entry_point_name.name: {
+            report_stats_parameter_names.entry_point_name.name: {
                 self.ENTRY_POINT_NAVIGATION_DRAWER.name: 0
             },
-            ReportStatsParameterNames.text_language_code.name: {
+            report_stats_parameter_names.text_language_code.name: {
                 self.TEXT_LANGUAGE_CODE_ENGLISH: 0
             },
-            ReportStatsParameterNames.audio_language_code.name: {
+            report_stats_parameter_names.audio_language_code.name: {
                 self.AUDIO_LANGUAGE_CODE_ENGLISH: 0
             },
-            ReportStatsParameterNames.android_sdk_version.name: {
+            report_stats_parameter_names.android_sdk_version.name: {
                 str(self.ANDROID_SDK_VERSION): 0
             },
-            ReportStatsParameterNames.version_name.name: {
+            report_stats_parameter_names.version_name.name: {
                 self.ANDROID_PLATFORM_VERSION: 0
             }
         }
