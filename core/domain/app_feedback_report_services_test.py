@@ -717,53 +717,53 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         filter_fields = [
             filter_obj.filter_field for filter_obj in filter_options]
 
-        reportFilterFieldNames = (
+        report_filter_field_names = (
             app_feedback_report_constants.FILTER_FIELD_NAMES)
         for filter_obj in filter_options:
             self.assertTrue(filter_obj.filter_field in filter_fields)
             if filter_obj.filter_field == (
-                    reportFilterFieldNames.report_type):
+                    report_filter_field_names.report_type):
                 self.assertEqual(
                     filter_obj.filter_options[0],
                     self.REPORT_TYPE_SUGGESTION.name)
             elif filter_obj.filter_field == (
-                    reportFilterFieldNames.platform):
+                    report_filter_field_names.platform):
                 self.assertEqual(
                     filter_obj.filter_options[0], self.PLATFORM_ANDROID)
             elif filter_obj.filter_field == (
-                    reportFilterFieldNames.entry_point):
+                    report_filter_field_names.entry_point):
                 self.assertEqual(
                     filter_obj.filter_options[0],
                     self.ENTRY_POINT_NAVIGATION_DRAWER.name)
             elif filter_obj.filter_field == (
-                    reportFilterFieldNames.submitted_on):
+                    report_filter_field_names.submitted_on):
                 self.assertEqual(
                     filter_obj.filter_options[0],
                     self.REPORT_SUBMITTED_TIMESTAMP.date())
             elif filter_obj.filter_field == (
-                    reportFilterFieldNames.android_device_model):
+                    report_filter_field_names.android_device_model):
                 self.assertEqual(
                     filter_obj.filter_options[0], self.ANDROID_DEVICE_MODEL)
             elif filter_obj.filter_field == (
-                    reportFilterFieldNames.android_sdk_version):
+                    report_filter_field_names.android_sdk_version):
                 self.assertEqual(
                     filter_obj.filter_options[0], self.ANDROID_SDK_VERSION)
             elif filter_obj.filter_field == (
-                    reportFilterFieldNames.text_language_code):
+                    report_filter_field_names.text_language_code):
                 self.assertEqual(
                     filter_obj.filter_options[0],
                     self.TEXT_LANGUAGE_CODE_ENGLISH)
             elif filter_obj.filter_field == (
-                    reportFilterFieldNames.audio_language_code):
+                    report_filter_field_names.audio_language_code):
                 self.assertEqual(
                     filter_obj.filter_options[0],
                     self.AUDIO_LANGUAGE_CODE_ENGLISH)
             elif filter_obj.filter_field == (
-                    reportFilterFieldNames.platform_version):
+                    report_filter_field_names.platform_version):
                 self.assertEqual(
                     filter_obj.filter_options[0], self.ANDROID_PLATFORM_VERSION)
             elif filter_obj.filter_field == (
-                    reportFilterFieldNames.android_device_country_locale_code):
+                    report_filter_field_names.android_device_country_locale_code):
                 self.assertEqual(
                     filter_obj.filter_options[0],
                     self.COUNTRY_LOCALE_CODE_INDIA)
