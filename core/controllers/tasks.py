@@ -18,6 +18,8 @@ from __future__ import annotations
 
 import json
 
+from core import constants
+from core import feconf
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import email_manager
@@ -145,6 +147,42 @@ class FlagExplorationEmailHandler(base.BaseHandler):
     """Handles task of sending emails about flagged explorations
     to moderators.
     """
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'exploration_id': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.constants.ENTITY_ID_REGEX
+                    }]
+                },
+                'default_value': None
+            },
+            'report_text': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
+            'reporter_id': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_regex_matched',
+                        'regex_pattern': feconf.USER_ID_REGEX
+                    },
+                    {
+                    'id': 'has_length',
+                    'value': feconf.USER_ID_LENGTH
+                    }]
+                },
+                'default_value': None
+            }
+        }
+    }
 
     @acl_decorators.can_perform_tasks_in_taskqueue
     def post(self):
