@@ -106,7 +106,15 @@ describe('State Graph Visualization directive', function() {
       reachableFromEnd: false
     }
   };
-  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
 
   importAllAngularServices();
 

@@ -77,7 +77,15 @@ describe('Translation tab component', function() {
   var refreshTranslationTabEmitter = new EventEmitter();
   var enterTranslationForTheFirstTimeEmitter = new EventEmitter();
 
-  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
   importAllAngularServices();
 
   beforeEach(function() {

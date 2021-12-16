@@ -20,9 +20,6 @@
 
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 
-require(
-  'pages/exploration-editor-page/editor-tab/templates/' +
-  'modal-templates/confirm-delete-state-modal.controller.ts');
 require('domain/exploration/StatesObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('filters/string-utility-filters/normalize-whitespace.filter.ts');
@@ -46,19 +43,20 @@ require('services/context.service.ts');
 require('services/validators.service.ts');
 
 import { EventEmitter } from '@angular/core';
+import { ConfirmDeleteStateModalComponent } from '../editor-tab/templates/modal-templates/confirm-delete-state-modal.component';
 
 angular.module('oppia').factory('ExplorationStatesService', [
-  '$filter', '$injector', '$location', '$q', '$rootScope', '$uibModal',
+  '$filter', '$injector', '$location', '$q', '$rootScope',
   'AlertsService', 'AngularNameService', 'AnswerClassificationService',
   'ChangeListService', 'ContextService', 'ExplorationInitStateNameService',
-  'SolutionValidityService', 'StateEditorRefreshService', 'StateEditorService',
-  'StatesObjectFactory', 'ValidatorsService',
+  'NgbModal', 'SolutionValidityService', 'StateEditorRefreshService',
+  'StateEditorService', 'StatesObjectFactory', 'ValidatorsService',
   function(
-      $filter, $injector, $location, $q, $rootScope, $uibModal,
+      $filter, $injector, $location, $q, $rootScope,
       AlertsService, AngularNameService, AnswerClassificationService,
       ChangeListService, ContextService, ExplorationInitStateNameService,
-      SolutionValidityService, StateEditorRefreshService, StateEditorService,
-      StatesObjectFactory, ValidatorsService) {
+      NgbModal, SolutionValidityService, StateEditorRefreshService,
+      StateEditorService, StatesObjectFactory, ValidatorsService) {
     var _states = null;
 
     var stateAddedCallbacks = [];
@@ -509,16 +507,11 @@ angular.module('oppia').factory('ExplorationStatesService', [
           return $q.reject(message);
         }
 
-        return $uibModal.open({
-          template: require(
-            'pages/exploration-editor-page/editor-tab/templates/' +
-            'modal-templates/confirm-delete-state-modal.template.html'),
+        const modelRef = NgbModal.open(ConfirmDeleteStateModalComponent, {
           backdrop: true,
-          resolve: {
-            deleteStateName: () => deleteStateName
-          },
-          controller: 'ConfirmDeleteStateModalController'
-        }).result.then(function() {
+        });
+        modelRef.componentInstance.deleteStateName = deleteStateName;
+        return modelRef.result.then(function() {
           _states.deleteState(deleteStateName);
 
           ChangeListService.deleteState(deleteStateName);

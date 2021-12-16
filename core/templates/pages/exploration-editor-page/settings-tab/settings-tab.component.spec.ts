@@ -103,6 +103,16 @@ describe('Settings Tab Component', () => {
 
   importAllAngularServices();
 
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [

@@ -69,6 +69,16 @@ describe('State Name Editor component', function() {
 
   importAllAngularServices();
 
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
+
   beforeEach(angular.mock.module('directiveTemplates'));
 
   beforeEach(function() {

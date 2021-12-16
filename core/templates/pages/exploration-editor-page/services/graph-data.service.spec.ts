@@ -27,7 +27,15 @@ describe('Graph Data Service', function() {
   var ExplorationInitStateNameService;
   var ExplorationStatesService;
 
-  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
   importAllAngularServices();
   beforeEach(angular.mock.inject(function($injector) {
     GraphDataService = $injector.get('GraphDataService');

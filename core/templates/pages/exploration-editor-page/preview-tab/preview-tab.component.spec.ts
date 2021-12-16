@@ -72,6 +72,15 @@ describe('Preview Tab Component', function() {
     paramName: 'paramName2'
   }];
 
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
   beforeEach(function() {
     paramChangeObjectFactory = TestBed.inject(ParamChangeObjectFactory);
     stateObjectFactory = TestBed.inject(StateObjectFactory);

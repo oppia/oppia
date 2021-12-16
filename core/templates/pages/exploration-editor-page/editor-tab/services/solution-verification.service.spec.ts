@@ -34,6 +34,15 @@ describe('Solution Verification Service', () => {
   let mockInteractionState;
   importAllAngularServices();
 
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
   beforeEach(() => {
     mockInteractionState = {
       TextInput: {
