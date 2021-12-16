@@ -31,6 +31,7 @@ import time
 
 from core import constants
 from core import python_utils
+from typing import Iterator, Union, Any, List, Optional, cast, NoReturn, Generator
 
 AFFIRMATIVE_CONFIRMATIONS = ['y', 'ye', 'yes']
 
@@ -140,7 +141,7 @@ RELEASE_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)$'
 RELEASE_MAINTENANCE_BRANCH_REGEX = r'release-maintenance-(\d+\.\d+\.\d+)$'
 HOTFIX_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)-hotfix-[1-9]+$'
 TEST_BRANCH_REGEX = r'test-[A-Za-z0-9-]*$'
-USER_PREFERENCES = {'open_new_tab_in_browser': None}
+USER_PREFERENCES = {'open_new_tab_in_browser': Optional[str]}
 
 FECONF_PATH = os.path.join('core', 'feconf.py')
 CONSTANTS_FILE_PATH = os.path.join('assets', 'constants.ts')
@@ -199,22 +200,22 @@ DIRS_TO_ADD_TO_SYS_PATH = [
 ]
 
 
-def is_windows_os():
+def is_windows_os() -> bool:
     """Check if the running system is Windows."""
     return OS_NAME == 'Windows'
 
 
-def is_mac_os():
+def is_mac_os() -> bool:
     """Check if the running system is MacOS."""
     return OS_NAME == 'Darwin'
 
 
-def is_linux_os():
+def is_linux_os() -> bool:
     """Check if the running system is Linux."""
     return OS_NAME == 'Linux'
 
 
-def is_x64_architecture():
+def is_x64_architecture() -> bool:
     """Check if the architecture is on X64."""
     # https://docs.python.org/2/library/platform.html#platform.architecture
     return sys.maxsize > 2**32
@@ -231,7 +232,7 @@ os.environ['PATH'] = os.pathsep.join([
 ])
 
 
-def run_cmd(cmd_tokens):
+def run_cmd(cmd_tokens: list[str]) -> str:
     """Runs the command and returns the output.
     Raises subprocess.CalledProcessError upon failure.
 
@@ -245,13 +246,13 @@ def run_cmd(cmd_tokens):
         cmd_tokens, stderr=subprocess.STDOUT, encoding='utf-8').strip()
 
 
-def ensure_directory_exists(d):
+def ensure_directory_exists(d: str | bytes | os.PathLike[str] | os.PathLike[bytes]) -> None:
     """Creates the given directory if it does not already exist."""
     if not os.path.exists(d):
         os.makedirs(d)
 
 
-def require_cwd_to_be_oppia(allow_deploy_dir=False):
+def require_cwd_to_be_oppia(allow_deploy_dir: bool = False) -> None:
     """Ensures that the current working directory ends in 'oppia'.
 
     If allow_deploy_dir is True, this also allows the cwd to be a directory
@@ -270,7 +271,7 @@ def require_cwd_to_be_oppia(allow_deploy_dir=False):
     raise Exception('Please run this script from the oppia/ directory.')
 
 
-def open_new_tab_in_browser_if_possible(url):
+def open_new_tab_in_browser_if_possible(url: str) -> None:
     """Opens the given URL in a new browser tab, if possible."""
     if USER_PREFERENCES['open_new_tab_in_browser'] is None:
         python_utils.PRINT(
@@ -302,7 +303,7 @@ def open_new_tab_in_browser_if_possible(url):
     input()
 
 
-def get_remote_alias(remote_url):
+def get_remote_alias(remote_url: str) -> str:
     """Finds the correct alias for the given remote repository URL."""
     git_remote_output = subprocess.check_output(
         ['git', 'remote', '-v']).decode('utf-8').split('\n')
@@ -318,7 +319,7 @@ def get_remote_alias(remote_url):
     return remote_alias
 
 
-def verify_local_repo_is_clean():
+def verify_local_repo_is_clean() -> Any:
     """Checks that the local Git repo is clean."""
     git_status_output = subprocess.check_output(
         ['git', 'status']
@@ -333,7 +334,7 @@ def verify_local_repo_is_clean():
             'ERROR: This script should be run from a clean branch.')
 
 
-def get_current_branch_name():
+def get_current_branch_name() -> str:
     """Get the current branch name.
 
     Returns:
@@ -348,7 +349,7 @@ def get_current_branch_name():
     return git_status_first_line[len(branch_message_prefix):]
 
 
-def get_current_release_version_number(release_branch_name):
+def get_current_release_version_number(release_branch_name: str) -> str:
     """Gets the release version given a release branch name.
 
     Args:
@@ -372,7 +373,7 @@ def get_current_release_version_number(release_branch_name):
         raise Exception('Invalid branch name: %s.' % release_branch_name)
 
 
-def is_current_branch_a_hotfix_branch():
+def is_current_branch_a_hotfix_branch() -> bool:
     """Checks if the current branch is a hotfix branch.
 
     Returns:
@@ -383,7 +384,7 @@ def is_current_branch_a_hotfix_branch():
         re.match(HOTFIX_BRANCH_REGEX, current_branch_name))
 
 
-def is_current_branch_a_release_branch():
+def is_current_branch_a_release_branch() -> bool:
     """Returns whether the current branch is a release branch.
 
     Returns:
@@ -398,7 +399,7 @@ def is_current_branch_a_release_branch():
     return release_match or release_maintenance_match or hotfix_match
 
 
-def is_current_branch_a_test_branch():
+def is_current_branch_a_test_branch() -> bool:
     """Returns whether the current branch is a test branch for deployment.
 
     Returns:
@@ -408,7 +409,7 @@ def is_current_branch_a_test_branch():
     return bool(re.match(TEST_BRANCH_REGEX, current_branch_name))
 
 
-def verify_current_branch_name(expected_branch_name):
+def verify_current_branch_name(expected_branch_name: str) -> Any:
     """Checks that the user is on the expected branch."""
     if get_current_branch_name() != expected_branch_name:
         raise Exception(
@@ -416,7 +417,7 @@ def verify_current_branch_name(expected_branch_name):
             expected_branch_name)
 
 
-def is_port_in_use(port):
+def is_port_in_use(port: int) -> bool:
     """Checks if a process is listening to the port.
 
     Args:
@@ -430,7 +431,7 @@ def is_port_in_use(port):
         return bool(not s.connect_ex(('localhost', port)))
 
 
-def recursive_chown(path, uid, gid):
+def recursive_chown(path: str, uid: int, gid: int) -> None:
     """Changes the owner and group id of all files in a path to the numeric
     uid and gid.
 
@@ -447,7 +448,7 @@ def recursive_chown(path, uid, gid):
             os.chown(os.path.join(root, filename), uid, gid)
 
 
-def recursive_chmod(path, mode):
+def recursive_chmod(path: str, mode: int) -> None:
     """Changes the mode of path to the passed numeric mode.
 
     Args:
@@ -462,7 +463,7 @@ def recursive_chmod(path, mode):
             os.chmod(os.path.join(root, filename), mode)
 
 
-def print_each_string_after_two_new_lines(strings):
+def print_each_string_after_two_new_lines(strings: list[str]) -> None:
     """Prints the given strings, separating adjacent strings with two newlines.
 
     Args:
@@ -472,7 +473,7 @@ def print_each_string_after_two_new_lines(strings):
         python_utils.PRINT('%s\n' % string)
 
 
-def install_npm_library(library_name, version, path):
+def install_npm_library(library_name: str, version: str, path: str) -> None:
     """Installs the npm library after ensuring its not already installed.
 
     Args:
@@ -488,7 +489,7 @@ def install_npm_library(library_name, version, path):
             'yarn', 'add', '%s@%s' % (library_name, version)])
 
 
-def ask_user_to_confirm(message):
+def ask_user_to_confirm(message: str) -> None:
     """Asks user to perform a task and confirm once they are done.
 
     Args:
@@ -505,7 +506,7 @@ def ask_user_to_confirm(message):
             return
 
 
-def get_personal_access_token():
+def get_personal_access_token() -> str:
     """"Returns the personal access token for the GitHub id of user.
 
     Returns:
@@ -527,7 +528,7 @@ def get_personal_access_token():
     return personal_access_token
 
 
-def check_prs_for_current_release_are_released(repo):
+def check_prs_for_current_release_are_released(repo) -> Any:
     """Checks that all pull requests for current release have a
     'PR: released' label.
 
@@ -555,7 +556,7 @@ def check_prs_for_current_release_are_released(repo):
                 'released before release summary generation.')
 
 
-def convert_to_posixpath(file_path):
+def convert_to_posixpath(file_path: str) -> str:
     """Converts a Windows style filepath to posixpath format. If the operating
     system is not Windows, this function does nothing.
 
@@ -570,7 +571,7 @@ def convert_to_posixpath(file_path):
     return file_path.replace('\\', '/')
 
 
-def create_readme(dir_path, readme_content):
+def create_readme(dir_path: str, readme_content: str) -> None:
     """Creates a readme in a given dir path with the specified
     readme content.
 
@@ -584,11 +585,11 @@ def create_readme(dir_path, readme_content):
 
 
 def inplace_replace_file(
-    filename,
-    regex_pattern,
-    replacement_string,
-    expected_number_of_replacements=None
-):
+    filename: str,
+    regex_pattern: str,
+    replacement_string: str,
+    expected_number_of_replacements: int | None = None
+) -> Any:
     """Replace the file content in-place with regex pattern. The pattern is used
     to replace the file's content line by line.
 
@@ -641,7 +642,7 @@ def inplace_replace_file(
 
 
 @contextlib.contextmanager
-def inplace_replace_file_context(filename, regex_pattern, replacement_string):
+def inplace_replace_file_context(filename: str, regex_pattern: str, replacement_string: str) -> Generator[Any, Any, None]:
     """Context manager in which the file's content is replaced according to the
     given regex pattern. This function should only be used with files that are
     processed line by line.
@@ -672,7 +673,7 @@ def inplace_replace_file_context(filename, regex_pattern, replacement_string):
             shutil.move(backup_filename, filename)
 
 
-def wait_for_port_to_be_in_use(port_number):
+def wait_for_port_to_be_in_use(port_number: int) -> None:
     """Wait until the port is in use and exit if port isn't open after
     MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS seconds.
 
@@ -696,7 +697,7 @@ def wait_for_port_to_be_in_use(port_number):
         sys.exit(1)
 
 
-def wait_for_port_to_not_be_in_use(port_number):
+def wait_for_port_to_not_be_in_use(port_number: int) -> bool:
     """Wait until the port is closed or
     MAX_WAIT_TIME_FOR_PORT_TO_CLOSE_SECS seconds.
 
@@ -751,20 +752,20 @@ def fix_third_party_imports() -> None:
 class CD:
     """Context manager for changing the current working directory."""
 
-    def __init__(self, new_path):
+    def __init__(self, new_path: str) -> None:
         self.new_path = new_path
         self.saved_path = None
 
-    def __enter__(self):
+    def __enter__(self) -> None:
         self.saved_path = os.getcwd()
         os.chdir(self.new_path)
 
-    def __exit__(self, etype, value, traceback):
+    def __exit__(self, etype: Any, value: Any, traceback: Any) -> None:
         os.chdir(self.saved_path)
 
 
 @contextlib.contextmanager
-def swap_env(key, value):
+def swap_env(key: str, value: str) -> Generator[str | None, Any, None]:
     """Context manager that temporarily changes the value of os.environ[key].
 
     Args:
@@ -786,7 +787,7 @@ def swap_env(key, value):
             os.environ[key] = old_value
 
 
-def write_stdout_safe(string):
+def write_stdout_safe(string: str | bytes) -> None:
     """Tries to write the input string to stdout in a non-blocking way.
 
     https://stackoverflow.com/a/44961052/4859885

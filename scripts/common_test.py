@@ -31,9 +31,11 @@ import sys
 import tempfile
 import time
 
+from io import TextIOWrapper
 from core import constants
 from core import python_utils
 from core.tests import test_utils
+from typing import Iterator, Union, Any, List, Optional, cast, NoReturn
 
 from . import common
 
@@ -49,7 +51,7 @@ class CommonTests(test_utils.GenericTestBase):
     """Test the methods which handle common functionalities."""
 
     @contextlib.contextmanager
-    def open_tcp_server_port(self):
+    def open_tcp_server_port(self) -> Iterator[int]:
         """Context manager for starting and stoping an HTTP TCP server.
 
         Yields:
@@ -64,65 +66,74 @@ class CommonTests(test_utils.GenericTestBase):
         finally:
             server.server_close()
 
-    def test_is_x64_architecture_in_x86(self):
+    def test_is_x64_architecture_in_x86(self) -> None:
         maxsize_swap = self.swap(sys, 'maxsize', 1)
         with maxsize_swap:
             self.assertFalse(common.is_x64_architecture())
 
-    def test_is_x64_architecture_in_x64(self):
+    def test_is_x64_architecture_in_x64(self) -> None:
         maxsize_swap = self.swap(sys, 'maxsize', 2**32 + 1)
         with maxsize_swap:
             self.assertTrue(common.is_x64_architecture())
 
-    def test_run_cmd(self):
+    def test_run_cmd(self) -> None:
         self.assertEqual(
             common.run_cmd(('echo Test for common.py ').split(' ')),
             'Test for common.py')
 
-    def test_ensure_directory_exists_with_existing_dir(self):
+    def test_ensure_directory_exists_with_existing_dir(self) -> None:
         check_function_calls = {
             'makedirs_gets_called': False
         }
-        def mock_makedirs(unused_dirpath):
+
+        def mock_makedirs(unused_dirpath: Any) -> None:
             check_function_calls['makedirs_gets_called'] = True
+
         with self.swap(os, 'makedirs', mock_makedirs):
             common.ensure_directory_exists('assets')
         self.assertEqual(check_function_calls, {'makedirs_gets_called': False})
 
-    def test_ensure_directory_exists_with_non_existing_dir(self):
+    def test_ensure_directory_exists_with_non_existing_dir(self) -> None:
         check_function_calls = {
             'makedirs_gets_called': False
         }
-        def mock_makedirs(unused_dirpath):
+
+        def mock_makedirs(unused_dirpath: Any) -> None:
             check_function_calls['makedirs_gets_called'] = True
+
         with self.swap(os, 'makedirs', mock_makedirs):
             common.ensure_directory_exists('test-dir')
         self.assertEqual(check_function_calls, {'makedirs_gets_called': True})
 
     def test_require_cwd_to_be_oppia_with_correct_cwd_and_unallowed_deploy_dir(
-            self):
+            self) -> None:
         common.require_cwd_to_be_oppia()
 
     def test_require_cwd_to_be_oppia_with_correct_cwd_and_allowed_deploy_dir(
-            self):
+            self) -> None:
         common.require_cwd_to_be_oppia(allow_deploy_dir=True)
 
     def test_require_cwd_to_be_oppia_with_wrong_cwd_and_unallowed_deploy_dir(
-            self):
-        def mock_getcwd():
+            self) -> None:
+
+        def mock_getcwd() -> str:
             return 'invalid'
+
         getcwd_swap = self.swap(os, 'getcwd', mock_getcwd)
         with getcwd_swap, self.assertRaisesRegexp(
             Exception, 'Please run this script from the oppia/ directory.'):
             common.require_cwd_to_be_oppia()
 
     def test_require_cwd_to_be_oppia_with_wrong_cwd_and_allowed_deploy_dir(
-            self):
-        def mock_getcwd():
+            self) -> None:
+
+        def mock_getcwd() -> str:
             return 'invalid'
-        def mock_basename(unused_dirpath):
+
+        def mock_basename(unused_dirpath: Any) -> str:
             return 'deploy-dir'
-        def mock_isdir(unused_dirpath):
+
+        def mock_isdir(unused_dirpath: Any) -> bool:
             return True
         getcwd_swap = self.swap(os, 'getcwd', mock_getcwd)
         basename_swap = self.swap(os.path, 'basename', mock_basename)
@@ -131,7 +142,7 @@ class CommonTests(test_utils.GenericTestBase):
             common.require_cwd_to_be_oppia(allow_deploy_dir=True)
 
     def test_open_new_tab_in_browser_if_possible_with_user_manually_opening_url(
-            self):
+            self) -> None:
         try:
             check_function_calls = {
                 'input_gets_called': 0,
@@ -141,11 +152,14 @@ class CommonTests(test_utils.GenericTestBase):
                 'input_gets_called': 1,
                 'check_call_gets_called': False
             }
-            def mock_call(unused_cmd_tokens):
+
+            def mock_call(unused_cmd_tokens: Any) -> int:
                 return 0
-            def mock_check_call(unused_cmd_tokens):
+
+            def mock_check_call(unused_cmd_tokens: Any) -> None:
                 check_function_calls['check_call_gets_called'] = True
-            def mock_input():
+
+            def mock_input() -> str:
                 check_function_calls['input_gets_called'] += 1
                 return 'n'
             call_swap = self.swap(subprocess, 'call', mock_call)
@@ -160,7 +174,7 @@ class CommonTests(test_utils.GenericTestBase):
             common.USER_PREFERENCES['open_new_tab_in_browser'] = None
 
     def test_open_new_tab_in_browser_if_possible_with_url_opening_correctly(
-            self):
+            self) -> None:
         try:
             check_function_calls = {
                 'input_gets_called': 0,
@@ -170,13 +184,17 @@ class CommonTests(test_utils.GenericTestBase):
                 'input_gets_called': 1,
                 'check_call_gets_called': True
             }
-            def mock_call(unused_cmd_tokens):
+
+            def mock_call(unused_cmd_tokens: Any) -> int:
                 return 0
-            def mock_check_call(unused_cmd_tokens):
+
+            def mock_check_call(unused_cmd_tokens: Any) -> None:
                 check_function_calls['check_call_gets_called'] = True
-            def mock_input():
+
+            def mock_input() -> str:
                 check_function_calls['input_gets_called'] += 1
                 return 'y'
+
             call_swap = self.swap(subprocess, 'call', mock_call)
             check_call_swap = self.swap(
                 subprocess, 'check_call', mock_check_call)
@@ -189,7 +207,7 @@ class CommonTests(test_utils.GenericTestBase):
             common.USER_PREFERENCES['open_new_tab_in_browser'] = None
 
     def test_open_new_tab_in_browser_if_possible_with_url_not_opening_correctly(
-            self):
+            self) -> None:
         try:
             check_function_calls = {
                 'input_gets_called': 0,
@@ -199,13 +217,17 @@ class CommonTests(test_utils.GenericTestBase):
                 'input_gets_called': 2,
                 'check_call_gets_called': False
             }
-            def mock_call(unused_cmd_tokens):
+
+            def mock_call(unused_cmd_tokens: Any) -> int:
                 return 1
-            def mock_check_call(unused_cmd_tokens):
+
+            def mock_check_call(unused_cmd_tokens: Any) -> None:
                 check_function_calls['check_call_gets_called'] = True
-            def mock_input():
+
+            def mock_input() -> str:
                 check_function_calls['input_gets_called'] += 1
                 return 'y'
+
             call_swap = self.swap(subprocess, 'call', mock_call)
             check_call_swap = self.swap(
                 subprocess, 'check_call', mock_check_call)
@@ -217,16 +239,16 @@ class CommonTests(test_utils.GenericTestBase):
         finally:
             common.USER_PREFERENCES['open_new_tab_in_browser'] = None
 
-    def test_get_remote_alias_with_correct_alias(self):
-        def mock_check_output(unused_cmd_tokens):
+    def test_get_remote_alias_with_correct_alias(self) -> None:
+        def mock_check_output(unused_cmd_tokens: Any) -> bytes:
             return b'remote1 url1\nremote2 url2'
         with self.swap(
             subprocess, 'check_output', mock_check_output
         ):
             self.assertEqual(common.get_remote_alias('url1'), 'remote1')
 
-    def test_get_remote_alias_with_incorrect_alias(self):
-        def mock_check_output(unused_cmd_tokens):
+    def test_get_remote_alias_with_incorrect_alias(self) -> None:
+        def mock_check_output(unused_cmd_tokens: Any) -> bytes:
             return b'remote1 url1\nremote2 url2'
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
@@ -236,16 +258,16 @@ class CommonTests(test_utils.GenericTestBase):
         ):
             common.get_remote_alias('url3')
 
-    def test_verify_local_repo_is_clean_with_clean_repo(self):
-        def mock_check_output(unused_cmd_tokens):
+    def test_verify_local_repo_is_clean_with_clean_repo(self) -> None:
+        def mock_check_output(unused_cmd_tokens: Any) -> bytes:
             return b'nothing to commit, working directory clean'
         with self.swap(
             subprocess, 'check_output', mock_check_output
         ):
             common.verify_local_repo_is_clean()
 
-    def test_verify_local_repo_is_clean_with_unclean_repo(self):
-        def mock_check_output(unused_cmd_tokens):
+    def test_verify_local_repo_is_clean_with_unclean_repo(self) -> None:
+        def mock_check_output(unused_cmd_tokens: Any) -> bytes:
             return b'invalid'
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
@@ -254,97 +276,108 @@ class CommonTests(test_utils.GenericTestBase):
         ):
             common.verify_local_repo_is_clean()
 
-    def test_get_current_branch_name(self):
-        def mock_check_output(unused_cmd_tokens):
+    def test_get_current_branch_name(self) -> None:
+        def mock_check_output(unused_cmd_tokens: Any) -> bytes:
             return b'On branch test'
         with self.swap(
-            subprocess, 'check_output', mock_check_output):
+            subprocess, 'check_output', mock_check_output
+        ):
             self.assertEqual(common.get_current_branch_name(), 'test')
 
-    def test_get_current_release_version_number_with_non_hotfix_branch(self):
+    def test_get_current_release_version_number_with_non_hotfix_branch(self) -> None:
         self.assertEqual(
             common.get_current_release_version_number('release-1.2.3'), '1.2.3')
 
-    def test_get_current_release_version_number_with_hotfix_branch(self):
+    def test_get_current_release_version_number_with_hotfix_branch(self) -> None:
         self.assertEqual(
             common.get_current_release_version_number('release-1.2.3-hotfix-1'),
             '1.2.3')
 
-    def test_get_current_release_version_number_with_maintenance_branch(self):
+    def test_get_current_release_version_number_with_maintenance_branch(self) -> None:
         self.assertEqual(
             common.get_current_release_version_number(
                 'release-maintenance-1.2.3'), '1.2.3')
 
-    def test_get_current_release_version_number_with_invalid_branch(self):
+    def test_get_current_release_version_number_with_invalid_branch(self) -> None:
         with self.assertRaisesRegexp(
-            Exception, 'Invalid branch name: invalid-branch.'):
+            Exception, 'Invalid branch name: invalid-branch.'
+        ):
             common.get_current_release_version_number('invalid-branch')
 
-    def test_is_current_branch_a_hotfix_branch_with_non_hotfix_branch(self):
-        def mock_check_output(unused_cmd_tokens):
+    def test_is_current_branch_a_hotfix_branch_with_non_hotfix_branch(self) -> None:
+        def mock_check_output(unused_cmd_tokens: Any) -> bytes:
             return b'On branch release-1.2.3'
         with self.swap(
-            subprocess, 'check_output', mock_check_output):
+            subprocess, 'check_output', mock_check_output
+        ):
             self.assertEqual(common.is_current_branch_a_hotfix_branch(), False)
 
-    def test_is_current_branch_a_hotfix_branch_with_hotfix_branch(self):
-        def mock_check_output(unused_cmd_tokens):
+    def test_is_current_branch_a_hotfix_branch_with_hotfix_branch(self) -> None:
+        def mock_check_output(unused_cmd_tokens: Any) -> bytes:
             return b'On branch release-1.2.3-hotfix-1'
         with self.swap(
-            subprocess, 'check_output', mock_check_output):
+            subprocess, 'check_output', mock_check_output
+        ):
             self.assertEqual(common.is_current_branch_a_hotfix_branch(), True)
 
-    def test_is_current_branch_a_release_branch_with_release_branch(self):
-        def mock_check_output(unused_cmd_tokens):
+    def test_is_current_branch_a_release_branch_with_release_branch(self) -> None:
+        def mock_check_output(unused_cmd_tokens: Any) -> bytes:
             return b'On branch release-1.2.3'
         with self.swap(
-            subprocess, 'check_output', mock_check_output):
+            subprocess, 'check_output', mock_check_output
+        ):
             self.assertEqual(common.is_current_branch_a_release_branch(), True)
 
-    def test_is_current_branch_a_release_branch_with_hotfix_branch(self):
-        def mock_check_output(unused_cmd_tokens):
+    def test_is_current_branch_a_release_branch_with_hotfix_branch(self) -> None:
+        def mock_check_output(unused_cmd_tokens: Any) -> bytes:
             return b'On branch release-1.2.3-hotfix-1'
         with self.swap(
-            subprocess, 'check_output', mock_check_output):
+            subprocess, 'check_output', mock_check_output
+        ):
             self.assertEqual(common.is_current_branch_a_release_branch(), True)
 
-    def test_is_current_branch_a_release_branch_with_maintenance_branch(self):
-        def mock_check_output(unused_cmd_tokens):
+    def test_is_current_branch_a_release_branch_with_maintenance_branch(self) -> None:
+        def mock_check_output(unused_cmd_tokens: Any) -> bytes:
             return b'On branch release-maintenance-1.2.3'
         with self.swap(
-            subprocess, 'check_output', mock_check_output):
+            subprocess, 'check_output', mock_check_output
+        ):
             self.assertEqual(common.is_current_branch_a_release_branch(), True)
 
-    def test_is_current_branch_a_release_branch_with_non_release_branch(self):
-        def mock_check_output(unused_cmd_tokens):
+    def test_is_current_branch_a_release_branch_with_non_release_branch(self) -> None:
+        def mock_check_output(unused_cmd_tokens: Any) -> bytes:
             return b'On branch test'
         with self.swap(
-            subprocess, 'check_output', mock_check_output):
+            subprocess, 'check_output', mock_check_output
+        ):
             self.assertEqual(common.is_current_branch_a_release_branch(), False)
 
-    def test_is_current_branch_a_test_branch_with_test_branch(self):
-        def mock_check_output(unused_cmd_tokens):
+    def test_is_current_branch_a_test_branch_with_test_branch(self) -> None:
+        def mock_check_output(unused_cmd_tokens: Any) -> bytes:
             return b'On branch test-common'
         with self.swap(
-            subprocess, 'check_output', mock_check_output):
+            subprocess, 'check_output', mock_check_output
+        ):
             self.assertEqual(common.is_current_branch_a_test_branch(), True)
 
-    def test_is_current_branch_a_test_branch_with_non_test_branch(self):
-        def mock_check_output(unused_cmd_tokens):
+    def test_is_current_branch_a_test_branch_with_non_test_branch(self) -> None:
+        def mock_check_output(unused_cmd_tokens: Any) -> bytes:
             return b'On branch invalid-test'
         with self.swap(
-            subprocess, 'check_output', mock_check_output):
+            subprocess, 'check_output', mock_check_output
+        ):
             self.assertEqual(common.is_current_branch_a_test_branch(), False)
 
-    def test_verify_current_branch_name_with_correct_branch(self):
-        def mock_check_output(unused_cmd_tokens):
+    def test_verify_current_branch_name_with_correct_branch(self) -> None:
+        def mock_check_output(unused_cmd_tokens: Any) -> bytes:
             return b'On branch test'
         with self.swap(
-            subprocess, 'check_output', mock_check_output):
+            subprocess, 'check_output', mock_check_output
+        ):
             common.verify_current_branch_name('test')
 
-    def test_verify_current_branch_name_with_incorrect_branch(self):
-        def mock_check_output(unused_cmd_tokens):
+    def test_verify_current_branch_name_with_incorrect_branch(self) -> None:
+        def mock_check_output(unused_cmd_tokens: Any) -> bytes:
             return b'On branch invalid'
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
@@ -354,15 +387,16 @@ class CommonTests(test_utils.GenericTestBase):
         ):
             common.verify_current_branch_name('test')
 
-    def test_is_port_in_use(self):
+    def test_is_port_in_use(self) -> None:
         with self.open_tcp_server_port() as port:
             self.assertTrue(common.is_port_in_use(port))
         self.assertFalse(common.is_port_in_use(port))
 
-    def test_wait_for_port_to_not_be_in_use_port_never_closes(self):
-        def mock_sleep(unused_seconds):
+    def test_wait_for_port_to_not_be_in_use_port_never_closes(self) -> None:
+        def mock_sleep(unused_seconds: Any) -> None:
             return
-        def mock_is_port_in_use(unused_port_number):
+
+        def mock_is_port_in_use(unused_port_number: Any) -> bool:
             return True
 
         sleep_swap = self.swap_with_checks(
@@ -374,10 +408,11 @@ class CommonTests(test_utils.GenericTestBase):
             success = common.wait_for_port_to_not_be_in_use(9999)
         self.assertFalse(success)
 
-    def test_wait_for_port_to_not_be_in_use_port_closes(self):
-        def mock_sleep(unused_seconds):
+    def test_wait_for_port_to_not_be_in_use_port_closes(self) -> Any:
+        def mock_sleep(unused_seconds: Any) -> NoReturn:
             raise AssertionError('mock_sleep should not be called.')
-        def mock_is_port_in_use(unused_port_number):
+
+        def mock_is_port_in_use(unused_port_number: Any) -> bool:
             return False
 
         sleep_swap = self.swap(
@@ -389,7 +424,7 @@ class CommonTests(test_utils.GenericTestBase):
             success = common.wait_for_port_to_not_be_in_use(9999)
         self.assertTrue(success)
 
-    def test_permissions_of_file(self):
+    def test_permissions_of_file(self) -> None:
         root_temp_dir = tempfile.mkdtemp()
         temp_dirpath = tempfile.mkdtemp(dir=root_temp_dir)
         temp_file = tempfile.NamedTemporaryFile(dir=temp_dirpath)
@@ -425,9 +460,9 @@ class CommonTests(test_utils.GenericTestBase):
         temp_file.close()
         shutil.rmtree(root_temp_dir)
 
-    def test_print_each_string_after_two_new_lines(self):
+    def test_print_each_string_after_two_new_lines(self) -> None:
         @contextlib.contextmanager
-        def _redirect_stdout(new_target):
+        def _redirect_stdout(new_target: TextIOWrapper) -> Iterator[TextIOWrapper]:
             """Redirect stdout to the new target.
 
             Args:
@@ -452,9 +487,9 @@ class CommonTests(test_utils.GenericTestBase):
         self.assertEqual(
             target_stdout.getvalue(), 'These\n\nare\n\nsample\n\nstrings.\n\n')
 
-    def test_install_npm_library(self):
+    def test_install_npm_library(self) -> None:
 
-        def _mock_subprocess_check_call(unused_command):
+        def _mock_subprocess_check_call(unused_command: Any) -> None:
             """Mocks subprocess.check_call() to create a temporary file instead
             of the actual npm library.
             """
@@ -476,20 +511,20 @@ class CommonTests(test_utils.GenericTestBase):
 
         self.assertFalse(os.path.exists('temp_file'))
 
-    def test_ask_user_to_confirm(self):
-        def mock_input():
+    def test_ask_user_to_confirm(self) -> None:
+        def mock_input() -> str:
             return 'Y'
         with self.swap(builtins, 'input', mock_input):
             common.ask_user_to_confirm('Testing')
 
-    def test_get_personal_access_token_with_valid_token(self):
-        def mock_getpass(prompt):  # pylint: disable=unused-argument
+    def test_get_personal_access_token_with_valid_token(self) -> None:
+        def mock_getpass(prompt: Any) -> str:  # pylint: disable=unused-argument
             return 'token'
         with self.swap(getpass, 'getpass', mock_getpass):
             self.assertEqual(common.get_personal_access_token(), 'token')
 
-    def test_get_personal_access_token_with_token_as_none(self):
-        def mock_getpass(prompt):  # pylint: disable=unused-argument
+    def test_get_personal_access_token_with_token_as_none(self) -> None:
+        def mock_getpass(prompt: Any) -> None:  # pylint: disable=unused-argument
             return None
         getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
         with getpass_swap, self.assertRaisesRegexp(
@@ -500,7 +535,7 @@ class CommonTests(test_utils.GenericTestBase):
             common.get_personal_access_token()
 
     def test_check_prs_for_current_release_are_released_with_no_unreleased_prs(
-            self):
+            self) -> None:
         mock_repo = github.Repository.Repository(
             requester='', headers='', attributes={}, completed='')
         label_for_released_prs = (
@@ -526,9 +561,11 @@ class CommonTests(test_utils.GenericTestBase):
             attributes={
                 'name': label_for_current_release_prs},
             completed='')
-        def mock_get_issues(unused_self, state, labels):  # pylint: disable=unused-argument
+
+        def mock_get_issues(unused_self: Any, state: str, labels: list) -> list:  # pylint: disable=unused-argument
             return [pull1, pull2]
-        def mock_get_label(unused_self, unused_name):
+
+        def mock_get_label(unused_self: Any, unused_name: str) -> list:
             return [label]
 
         get_issues_swap = self.swap(
@@ -539,11 +576,13 @@ class CommonTests(test_utils.GenericTestBase):
             common.check_prs_for_current_release_are_released(mock_repo)
 
     def test_check_prs_for_current_release_are_released_with_unreleased_prs(
-            self):
+            self) -> None:
         mock_repo = github.Repository.Repository(
             requester='', headers='', attributes={}, completed='')
-        def mock_open_tab(unused_url):
+
+        def mock_open_tab(unused_url: Any) -> None:
             pass
+
         label_for_released_prs = (
             constants.release_constants.LABEL_FOR_RELEASED_PRS)
         label_for_current_release_prs = (
@@ -566,9 +605,11 @@ class CommonTests(test_utils.GenericTestBase):
             attributes={
                 'name': label_for_current_release_prs},
             completed='')
-        def mock_get_issues(unused_self, state, labels):  # pylint: disable=unused-argument
+
+        def mock_get_issues(unused_self: Any, state: str, labels: list) -> list:  # pylint: disable=unused-argument
             return [pull1, pull2]
-        def mock_get_label(unused_self, unused_name):
+
+        def mock_get_label(unused_self: Any, unused_name: str) -> list:
             return [label]
 
         get_issues_swap = self.swap(
@@ -587,7 +628,7 @@ class CommonTests(test_utils.GenericTestBase):
                         constants.release_constants.LABEL_FOR_RELEASED_PRS)):
                 common.check_prs_for_current_release_are_released(mock_repo)
 
-    def test_inplace_replace_file(self):
+    def test_inplace_replace_file(self) -> None:
         origin_file = os.path.join(
             'core', 'tests', 'data', 'inplace_replace_test.json')
         backup_file = os.path.join(
@@ -601,7 +642,7 @@ class CommonTests(test_utils.GenericTestBase):
             '}\n'
         ]
 
-        def mock_remove(unused_file):
+        def mock_remove(unused_file: str) -> None:
             return
 
         remove_swap = self.swap_with_checks(
@@ -622,7 +663,7 @@ class CommonTests(test_utils.GenericTestBase):
 
     def test_inplace_replace_file_with_expected_number_of_replacements_raises(
             self
-    ):
+    ) -> None:
         origin_file = os.path.join(
             'core', 'tests', 'data', 'inplace_replace_test.json')
         backup_file = os.path.join(
@@ -644,7 +685,7 @@ class CommonTests(test_utils.GenericTestBase):
             new_content = f.readlines()
         self.assertEqual(origin_content, new_content)
 
-    def test_inplace_replace_file_with_exception_raised(self):
+    def test_inplace_replace_file_with_exception_raised(self) -> Any:
         origin_file = os.path.join(
             'core', 'tests', 'data', 'inplace_replace_test.json')
         backup_file = os.path.join(
@@ -652,7 +693,7 @@ class CommonTests(test_utils.GenericTestBase):
         with python_utils.open_file(origin_file, 'r') as f:
             origin_content = f.readlines()
 
-        def mock_compile(unused_arg):
+        def mock_compile(unused_arg: Any) -> NoReturn:
             raise ValueError('Exception raised from compile()')
 
         compile_swap = self.swap_with_checks(re, 'compile', mock_compile)
@@ -667,7 +708,7 @@ class CommonTests(test_utils.GenericTestBase):
             new_content = f.readlines()
         self.assertEqual(origin_content, new_content)
 
-    def test_inplace_replace_file_context(self):
+    def test_inplace_replace_file_context(self) -> None:
         file_path = (
             os.path.join('core', 'tests', 'data', 'inplace_replace_test.json'))
         backup_file_path = '%s.bak' % file_path
@@ -712,8 +753,8 @@ class CommonTests(test_utils.GenericTestBase):
             os.remove(backup_file_path)
             raise
 
-    def test_convert_to_posixpath_on_windows(self):
-        def mock_is_windows():
+    def test_convert_to_posixpath_on_windows(self) -> None:
+        def mock_is_windows() -> bool:
             return True
 
         is_windows_swap = self.swap(common, 'is_windows_os', mock_is_windows)
@@ -722,8 +763,8 @@ class CommonTests(test_utils.GenericTestBase):
             actual_file_path = common.convert_to_posixpath(original_filepath)
         self.assertEqual(actual_file_path, 'c:/path/to/a/file.js')
 
-    def test_convert_to_posixpath_on_platform_other_than_windows(self):
-        def mock_is_windows():
+    def test_convert_to_posixpath_on_platform_other_than_windows(self) -> None:
+        def mock_is_windows() -> bool:
             return False
 
         is_windows_swap = self.swap(common, 'is_windows_os', mock_is_windows)
@@ -732,7 +773,7 @@ class CommonTests(test_utils.GenericTestBase):
             actual_file_path = common.convert_to_posixpath(original_filepath)
         self.assertEqual(actual_file_path, original_filepath)
 
-    def test_create_readme(self):
+    def test_create_readme(self) -> None:
         try:
             os.makedirs('readme_test_dir')
             common.create_readme('readme_test_dir', 'Testing readme.')
@@ -742,28 +783,29 @@ class CommonTests(test_utils.GenericTestBase):
             if os.path.exists('readme_test_dir'):
                 shutil.rmtree('readme_test_dir')
 
-    def test_fix_third_party_imports_correctly_sets_up_imports(self):
+    def test_fix_third_party_imports_correctly_sets_up_imports(self) -> None:
         common.fix_third_party_imports()
         # Asserts that imports from problematic modules do not error.
         from google.cloud import tasks_v2  # pylint: disable=unused-import
 
-    def test_swap_env_when_var_had_a_value(self):
+    def test_swap_env_when_var_had_a_value(self) -> None:
         os.environ['ABC'] = 'Hard as Rocket Science'
         with common.swap_env('ABC', 'Easy as 123') as old_value:
             self.assertEqual(old_value, 'Hard as Rocket Science')
             self.assertEqual(os.environ['ABC'], 'Easy as 123')
         self.assertEqual(os.environ['ABC'], 'Hard as Rocket Science')
 
-    def test_swap_env_when_var_did_not_exist(self):
+    def test_swap_env_when_var_did_not_exist(self) -> None:
         self.assertNotIn('DEF', os.environ)
         with common.swap_env('DEF', 'Easy as 123') as old_value:
             self.assertIsNone(old_value)
             self.assertEqual(os.environ['DEF'], 'Easy as 123')
         self.assertNotIn('DEF', os.environ)
 
-    def test_write_stdout_safe_with_repeat_oserror_repeats_call_to_write(self):
+    def test_write_stdout_safe_with_repeat_oserror_repeats_call_to_write(self) -> Any:
         raised_once = False
-        def write_raise_oserror(unused_fileno, bytes_to_write):
+
+        def write_raise_oserror(unused_fileno: int, bytes_to_write: bytes) -> int:
             self.assertEqual(bytes_to_write, 'test'.encode('utf-8'))
 
             nonlocal raised_once
@@ -789,7 +831,7 @@ class CommonTests(test_utils.GenericTestBase):
 
         self.assertTrue(raised_once)
 
-    def test_write_stdout_safe_with_oserror(self):
+    def test_write_stdout_safe_with_oserror(self) -> None:
         write_swap = self.swap_to_always_raise(os, 'write', OSError('OS error'))
         with write_swap, self.assertRaisesRegexp(OSError, 'OS error'):
             common.write_stdout_safe('test')
