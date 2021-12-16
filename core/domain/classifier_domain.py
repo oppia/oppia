@@ -395,7 +395,7 @@ class ClassifierTrainingJob:
 
 
 class StateTrainingJobsMappingDict(TypedDict):
-    """Represents StateTrainingJobsMapping Dict."""
+    """Dictionary that represents StateTrainingJobsMapping."""
 
     exp_id: str
     exp_version: int

@@ -35,7 +35,7 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super(ClassifierTrainingJobDomainTests, self).setUp()
 
-        self.training_data = [
+        self.training_data: classifier_domain.TrainingDataType = [
             {
                 'answer_group_index': 1,
                 'answers': ['a1', 'a2']
@@ -46,7 +46,7 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
             }
         ]
 
-        self.training_job_dict = {
+        self.training_job_dict: classifier_domain.ClassifierTrainingJobDict = {
             'job_id': 'exp_id1.SOME_RANDOM_STRING',
             'exp_id': 'exp_id1',
             'exp_version': 1,
@@ -63,7 +63,7 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
 
     def _get_training_job_from_dict(
         self,
-        training_job_dict: Dict[str, Any]
+        training_job_dict: classifier_domain.ClassifierTrainingJobDict
     ) -> classifier_domain.ClassifierTrainingJob:
         """Returns the ClassifierTrainingJob object after receiving the content
         from the training_job_dict.
@@ -83,7 +83,8 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
         return training_job
 
     def test_to_dict(self) -> None:
-        expected_training_job_dict = {
+        expected_training_job_dict: (
+            classifier_domain.ClassifierTrainingJobDict) = {
             'job_id': 'exp_id1.SOME_RANDOM_STRING',
             'algorithm_id': 'TextClassifier',
             'interaction_id': 'TextInput',
@@ -111,22 +112,8 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
         # The 'assertDictEqual' expects 'Dict[Any, Any]' but we
         # provide 'TypedDict' and thus we add an ignore.
         self.assertDictEqual(
-            expected_training_job_dict,
+            expected_training_job_dict, # type: ignore[arg-type]
             observed_training_job.to_dict()) # type: ignore[arg-type]
-
-    def test_validation_exp_id(self) -> None:
-        self.training_job_dict['exp_id'] = 1
-        training_job = self._get_training_job_from_dict(self.training_job_dict)
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-            utils.ValidationError, 'Expected exp_id to be a string'):
-            training_job.validate()
-
-    def test_validation_state_name(self) -> None:
-        self.training_job_dict['state_name'] = 0
-        training_job = self._get_training_job_from_dict(self.training_job_dict)
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-            utils.ValidationError, 'Expected state to be a string'):
-            training_job.validate()
 
     def test_validation_status(self) -> None:
         self.training_job_dict['status'] = 'invalid_status'
@@ -138,33 +125,11 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
                 % (feconf.ALLOWED_TRAINING_JOB_STATUSES))):
             training_job.validate()
 
-    def test_validation_interaction_id_type(self) -> None:
-        self.training_job_dict['interaction_id'] = 0
-        training_job = self._get_training_job_from_dict(self.training_job_dict)
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-            utils.ValidationError, 'Expected interaction_id to be a string'):
-            training_job.validate()
-
     def test_validation_interaction_id(self) -> None:
         self.training_job_dict['interaction_id'] = 'invalid_interaction_id'
         training_job = self._get_training_job_from_dict(self.training_job_dict)
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, 'Invalid interaction id'):
-            training_job.validate()
-
-    def test_validation_algorithm_id(self) -> None:
-        self.training_job_dict['algorithm_id'] = 0
-        training_job = self._get_training_job_from_dict(self.training_job_dict)
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-            utils.ValidationError, 'Expected algorithm_id to be a string'):
-            training_job.validate()
-
-    def test_validation_algorithm_version(self) -> None:
-        self.training_job_dict['algorithm_version'] = (
-            'invalid_algorithm_version')
-        training_job = self._get_training_job_from_dict(self.training_job_dict)
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-            utils.ValidationError, 'Expected algorithm_version to be an int'):
             training_job.validate()
 
     def test_validation_training_data_without_answer_group_index(self) -> None:
@@ -192,57 +157,9 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
             'Expected answers to be a key in training_data list item'):
             training_job.validate()
 
-    def test_validation_training_data_with_invalid_answer_group_index_type(
-        self
-    ) -> None:
-        self.training_job_dict['training_data'] = [
-            {
-                'answer_group_index': 'invalid_answer_group_index',
-                'answers': ['a1', 'a2']
-            }
-        ]
-        training_job = self._get_training_job_from_dict(self.training_job_dict)
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-            utils.ValidationError, 'Expected answer_group_index to be an int'):
-            training_job.validate()
-
-    def test_validation_training_data_with_invalid_answers_type(self) -> None:
-        self.training_job_dict['training_data'] = [
-            {
-                'answer_group_index': 1,
-                'answers': 'invalid_answers'
-            }
-        ]
-        training_job = self._get_training_job_from_dict(self.training_job_dict)
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-            utils.ValidationError, 'Expected answers to be a list'):
-            training_job.validate()
-
     def test_validation_for_training_job_with_correct_data(self) -> None:
         training_job = self._get_training_job_from_dict(self.training_job_dict)
         training_job.validate()
-
-    def test_validation_with_invalid_job_id(self) -> None:
-        self.training_job_dict['job_id'] = 1
-        training_job = self._get_training_job_from_dict(self.training_job_dict)
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-            utils.ValidationError, 'Expected id to be a string'):
-            training_job.validate()
-
-    def test_validation_with_invalid_exp_version(self) -> None:
-        self.training_job_dict['exp_version'] = 'abc'
-        training_job = self._get_training_job_from_dict(self.training_job_dict)
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-            utils.ValidationError, 'Expected exp_version to be an int'):
-            training_job.validate()
-
-    def test_validation_with_invalid_next_scheduled_check_time(self) -> None:
-        self.training_job_dict['next_scheduled_check_time'] = 'abc'
-        training_job = self._get_training_job_from_dict(self.training_job_dict)
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-            utils.ValidationError,
-            'Expected next_scheduled_check_time to be datetime'):
-            training_job.validate()
 
     def test_validation_with_invalid_state_name(self) -> None:
         self.training_job_dict['state_name'] = 'A string #'
