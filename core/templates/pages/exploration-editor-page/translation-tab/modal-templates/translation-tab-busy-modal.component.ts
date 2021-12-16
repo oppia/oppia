@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for translation tab busy modal.
+ * @fileoverview Component for translation tab busy modal.
  */
 
 import { Component, Input } from '@angular/core';
