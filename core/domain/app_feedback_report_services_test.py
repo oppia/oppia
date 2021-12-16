@@ -613,7 +613,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         unticketed_stats_model = (
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
                 unticketed_stats_id))
-        
+
         ReportStatsParameterNames = (
             app_feedback_report_constants.STATS_PARAMETER_NAMES)
         expected_json = {
@@ -717,53 +717,53 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         filter_fields = [
             filter_obj.filter_field for filter_obj in filter_options]
 
-        ReportFilterFieldNames = (
+        reportFilterFieldNames = (
             app_feedback_report_constants.FILTER_FIELD_NAMES)
         for filter_obj in filter_options:
             self.assertTrue(filter_obj.filter_field in filter_fields)
             if filter_obj.filter_field == (
-                    ReportFilterFieldNames.report_type):
+                    reportFilterFieldNames.report_type):
                 self.assertEqual(
                     filter_obj.filter_options[0],
                     self.REPORT_TYPE_SUGGESTION.name)
             elif filter_obj.filter_field == (
-                    ReportFilterFieldNames.platform):
+                    reportFilterFieldNames.platform):
                 self.assertEqual(
                     filter_obj.filter_options[0], self.PLATFORM_ANDROID)
             elif filter_obj.filter_field == (
-                    ReportFilterFieldNames.entry_point):
+                    reportFilterFieldNames.entry_point):
                 self.assertEqual(
                     filter_obj.filter_options[0],
                     self.ENTRY_POINT_NAVIGATION_DRAWER.name)
             elif filter_obj.filter_field == (
-                    ReportFilterFieldNames.submitted_on):
+                    reportFilterFieldNames.submitted_on):
                 self.assertEqual(
                     filter_obj.filter_options[0],
                     self.REPORT_SUBMITTED_TIMESTAMP.date())
             elif filter_obj.filter_field == (
-                    ReportFilterFieldNames.android_device_model):
+                    reportFilterFieldNames.android_device_model):
                 self.assertEqual(
                     filter_obj.filter_options[0], self.ANDROID_DEVICE_MODEL)
             elif filter_obj.filter_field == (
-                    ReportFilterFieldNames.android_sdk_version):
+                    reportFilterFieldNames.android_sdk_version):
                 self.assertEqual(
                     filter_obj.filter_options[0], self.ANDROID_SDK_VERSION)
             elif filter_obj.filter_field == (
-                    ReportFilterFieldNames.text_language_code):
+                    reportFilterFieldNames.text_language_code):
                 self.assertEqual(
                     filter_obj.filter_options[0],
                     self.TEXT_LANGUAGE_CODE_ENGLISH)
             elif filter_obj.filter_field == (
-                    ReportFilterFieldNames.audio_language_code):
+                    reportFilterFieldNames.audio_language_code):
                 self.assertEqual(
                     filter_obj.filter_options[0],
                     self.AUDIO_LANGUAGE_CODE_ENGLISH)
             elif filter_obj.filter_field == (
-                    ReportFilterFieldNames.platform_version):
+                    reportFilterFieldNames.platform_version):
                 self.assertEqual(
                     filter_obj.filter_options[0], self.ANDROID_PLATFORM_VERSION)
             elif filter_obj.filter_field == (
-                    ReportFilterFieldNames.android_device_country_locale_code): 
+                    reportFilterFieldNames.android_device_country_locale_code):
                 self.assertEqual(
                     filter_obj.filter_options[0],
                     self.COUNTRY_LOCALE_CODE_INDIA)
@@ -1005,7 +1005,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         decremented_stats_model = (
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
                 old_stats_id))
-        
+
         ReportStatsParameterNames = (
             app_feedback_report_constants.STATS_PARAMETER_NAMES)
         expected_json = {
