@@ -182,7 +182,7 @@ class SkillChange(change_domain.BaseChange):
     }]
 
 
-misconception_dict = TypedDict('misconception', {'id': int, 'name': str, 'notes': str, 'feedback': str, 'must_be_addressed': bool})
+misconception_struct = TypedDict('misconception', {'id': int, 'name': str, 'notes': str, 'feedback': str, 'must_be_addressed': bool})
 
 
 class Misconception:
@@ -210,7 +210,7 @@ class Misconception:
         self.feedback = html_cleaner.clean(feedback)
         self.must_be_addressed = must_be_addressed
     
-    def to_dict(self) -> misconception_dict:
+    def to_dict(self) -> misconception_struct:
         """Returns a dict representing this Misconception domain object.
 
         Returns:
@@ -225,7 +225,7 @@ class Misconception:
         }
 
     @classmethod
-    def from_dict(cls, misconception_dict: misconception_dict) -> Misconception:
+    def from_dict(cls, misconception_dict: misconception_struct) -> Misconception:
         """Returns a Misconception domain object from a dict.
 
         Args:
@@ -293,7 +293,7 @@ class Misconception:
                 self.feedback)
 
 
-rubric_dict = TypedDict("rubric", {'difficulty': str, 'explanations': List[str]})
+rubric_struct = TypedDict("rubric", {'difficulty': str, 'explanations': List[str]})
 
 
 class Rubric:
@@ -311,7 +311,7 @@ class Rubric:
         self.explanations = [
             html_cleaner.clean(explanation) for explanation in explanations]
 
-    def to_dict(self) -> rubric_dict:
+    def to_dict(self) -> rubric_struct:
         """Returns a dict representing this Rubric domain object.
 
         Returns:
@@ -323,7 +323,7 @@ class Rubric:
         }
 
     @classmethod
-    def from_dict(cls, rubric_dict: rubric_dict) -> Rubric:
+    def from_dict(cls, rubric_dict: rubric_struct) -> Rubric:
         """Returns a Rubric domain object from a dict.
 
         Args:
@@ -537,10 +537,10 @@ class SkillContents:
 
         return skill_contents
 
-skillDomain = TypedDict('skillDomain', {'id': str, 'description': str, 'misconceptions': List[misconception_dict], 'rubrics': List[rubric_dict], 'skill_contents': skillsContents, 'language_code': str, 'misconceptions_schema_version': int, 'rubric_schema_version': int, 'skill_contents_schema_version': int, 'version': int, 'next_misconception_id': int, 'superseding_skill_id': Union[str, None], 'all_questions_merged': bool, 'prerequisite_skill_ids': List[str], 'created_on': str, 'last_updated': str})
+skillDomain = TypedDict('skillDomain', {'id': str, 'description': str, 'misconceptions': List[misconception_struct], 'rubrics': List[rubric_struct], 'skill_contents': skillsContents, 'language_code': str, 'misconceptions_schema_version': int, 'rubric_schema_version': int, 'skill_contents_schema_version': int, 'version': int, 'next_misconception_id': int, 'superseding_skill_id': Union[str, None], 'all_questions_merged': bool, 'prerequisite_skill_ids': List[str], 'created_on': str, 'last_updated': str})
 versioned_skill_Contents = TypedDict('versioned_skill_Contents', {'schema_version': str, 'skill_contents': skillsContents})
-versioned_Misconceptions = TypedDict('versioned_Misconceptions', {'schema_version': str, 'misconceptions': List[misconception_dict]})
-versioned_Rubrics = TypedDict('versioned_Rubrics', {'schema_version': str, 'rubrics': List[rubric_dict]})
+versioned_Misconceptions = TypedDict('versioned_Misconceptions', {'schema_version': str, 'misconceptions': List[misconception_struct]})
+versioned_Rubrics = TypedDict('versioned_Rubrics', {'schema_version': str, 'rubrics': List[rubric_struct]})
 
 
 class Skill:
@@ -1083,7 +1083,7 @@ class Skill:
         versioned_misconceptions['misconceptions'] = updated_misconceptions
 
     @classmethod
-    def _convert_misconception_v1_dict_to_v2_dict(cls, misconception_dict: misconception_dict) -> misconception_dict:
+    def _convert_misconception_v1_dict_to_v2_dict(cls, misconception_dict: misconception_struct) -> misconception_struct:
         """Converts v1 misconception schema to the v2 schema. In the v2 schema,
         the field must_be_addressed has been added.
 
@@ -1097,7 +1097,7 @@ class Skill:
         return misconception_dict
 
     @classmethod
-    def _convert_misconception_v2_dict_to_v3_dict(cls, misconception_dict: misconception_dict) -> misconception_dict:
+    def _convert_misconception_v2_dict_to_v3_dict(cls, misconception_dict: misconception_struct) -> misconception_struct:
         """Converts v2 misconception schema to the v3 schema. In the v3 schema,
         the new Math components schema is introduced.
 
@@ -1116,7 +1116,7 @@ class Skill:
         return misconception_dict
 
     @classmethod
-    def _convert_misconception_v3_dict_to_v4_dict(cls, misconception_dict: misconception_dict) -> misconception_dict:
+    def _convert_misconception_v3_dict_to_v4_dict(cls, misconception_dict: misconception_struct) -> misconception_struct:
         """Converts v3 misconception schema to the v4 schema. The v4 schema
         deprecates oppia-noninteractive-svgdiagram tag and converts existing
         occurences of it to oppia-noninteractive-image tag.
@@ -1136,7 +1136,7 @@ class Skill:
         return misconception_dict
 
     @classmethod
-    def _convert_misconception_v4_dict_to_v5_dict(cls, misconception_dict: misconception_dict) -> misconception_dict:
+    def _convert_misconception_v4_dict_to_v5_dict(cls, misconception_dict: misconception_struct) -> misconception_struct:
         """Converts v4 misconception schema to the v5 schema. The v5 schema
         fixes HTML encoding issues.
 
@@ -1155,7 +1155,7 @@ class Skill:
         return misconception_dict
 
     @classmethod
-    def _convert_rubric_v1_dict_to_v2_dict(cls, rubric_dict) -> rubric_dict:
+    def _convert_rubric_v1_dict_to_v2_dict(cls, rubric_dict) -> rubric_struct:
         """Converts v1 rubric schema to the v2 schema. In the v2 schema,
         multiple explanations have been added for each difficulty.
 
@@ -1171,7 +1171,7 @@ class Skill:
         return rubric_dict
 
     @classmethod
-    def _convert_rubric_v2_dict_to_v3_dict(cls, rubric_dict: rubric_dict) -> rubric_dict:
+    def _convert_rubric_v2_dict_to_v3_dict(cls, rubric_dict: rubric_struct) -> rubric_struct:
         """Converts v2 rubric schema to the v3 schema. In the v3 schema,
         the new Math components schema is introduced.
 
@@ -1189,7 +1189,7 @@ class Skill:
         return rubric_dict
 
     @classmethod
-    def _convert_rubric_v3_dict_to_v4_dict(cls, rubric_dict: rubric_dict) -> rubric_dict:
+    def _convert_rubric_v3_dict_to_v4_dict(cls, rubric_dict: rubric_struct) -> rubric_struct:
         """Converts v3 rubric schema to the v4 schema. The v4 schema
         deprecates oppia-noninteractive-svgdiagram tag and converts existing
         occurences of it to oppia-noninteractive-image tag.
@@ -1208,7 +1208,7 @@ class Skill:
         return rubric_dict
 
     @classmethod
-    def _convert_rubric_v4_dict_to_v5_dict(cls, rubric_dict: rubric_dict) -> rubric_dict:
+    def _convert_rubric_v4_dict_to_v5_dict(cls, rubric_dict: rubric_struct) -> rubric_struct:
         """Converts v4 rubric schema to the v5 schema. The v4 schema
         fixes HTML encoding issues.
 
