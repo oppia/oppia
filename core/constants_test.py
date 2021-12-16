@@ -122,3 +122,9 @@ class ConstantsTests(test_utils.GenericTestBase):
             set(rtl_audio_languages) & set(ltr_content_languages)
         )
         self.assertFalse(conflicts)
+
+    def test_constants_attr_can_be_changed(self) -> None:
+        """Test that constants may be changed through assignment."""
+        self.assertEqual(constants.constants.DEFAULT_LANGUAGE_CODE, 'en')
+        constants.constants.DEFAULT_LANGUAGE_CODE = 'zh'
+        self.assertEqual(constants.constants.DEFAULT_LANGUAGE_CODE, 'zh')
