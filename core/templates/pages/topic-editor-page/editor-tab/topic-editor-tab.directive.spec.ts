@@ -20,6 +20,7 @@
 import { EventEmitter } from '@angular/core';
 import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { Subtopic } from 'domain/topic/subtopic.model';
+import constants from 'assets/constants';
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
@@ -386,14 +387,14 @@ describe('Topic editor tab directive', function() {
     expect(topicPracticeTabSpy).not.toHaveBeenCalled();
   });
   
-  it('should set the practice tab as displayed if there are at least 10 '+
-  'practice questions in the topic', function () {
-    $scope.skillQuestionCountDict = {"skill1": 3, "skill2": 6};
+  it('should set the practice tab as displayed if there are the defined '+
+  'minimum of practice questions in the topic', function () {
+    $scope.skillQuestionCountDict = {"skill1": 3, "skill2": constants.TOPIC_MINIMUM_QUESTIONS_TO_PRACTICE - 4};
     var topicPracticeTabSpy = (
       spyOn(TopicUpdateService, 'setPracticeTabIsDisplayed'));
     $scope.updatePracticeTabIsDisplayed(true);
     expect(topicPracticeTabSpy).not.toHaveBeenCalled();
-    $scope.skillQuestionCountDict = {"skill1": 3, "skill2": 7};
+    $scope.skillQuestionCountDict = {"skill1": 3, "skill2": constants.TOPIC_MINIMUM_QUESTIONS_TO_PRACTICE - 3};
     $scope.updatePracticeTabIsDisplayed(true);
     expect(topicPracticeTabSpy).toHaveBeenCalled();
   })
