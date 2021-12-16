@@ -99,6 +99,7 @@
     "style-loader": "^2.0.0",
     "stylelint": "^14.1.0",
     "stylelint-config-standard": "^24.0.0",
+    "stylelint-config-html": "^1.0.0",
     "stylelint-order": "^5.0.0",
     "thread-loader": "^3.0.0",
     "ts-loader": "^8.0.0",

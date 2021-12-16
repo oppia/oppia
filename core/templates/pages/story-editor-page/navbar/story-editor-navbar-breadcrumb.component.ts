@@ -39,44 +39,48 @@ export class StoryEditorNavbarBreadcrumbComponent {
      private windowRef: WindowRef,
      private urlInterpolationService: UrlInterpolationService
   ) {}
-   topicName: string;
-   story: Story;
-   directiveSubscriptions = new Subscription();
-   TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topicId>';
 
-   returnToTopicEditorPage(): void {
-     if (this.undoRedoService.getChangeCount() > 0) {
-       this.ngbModal.open(
-         StorySavePendingChangesModalComponent,
-         { backdrop: true },
-       ).result.then(() => {}, () => {
-         // Note to developers:
-         // This callback is triggered when the Cancel button is clicked.
-         // No further action is needed.
-       });
-     } else {
-       this.windowRef.nativeWindow.open(
-         this.urlInterpolationService.interpolateUrl(
-           this.TOPIC_EDITOR_URL_TEMPLATE, {
-             topicId: this.story.getCorrespondingTopicId()
-           }
-         ), '_self');
-     }
-   }
+  topicName: string;
+  story: Story;
+  directiveSubscriptions = new Subscription();
+  TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topicId>';
 
-   ngOnInit(): void {
-     this.directiveSubscriptions.add(
-       this.storyEditorStateService.onStoryInitialized.subscribe(
-         () => {
-           this.topicName = this.storyEditorStateService.getTopicName();
-           this.story = this.storyEditorStateService.getStory();
-         }
-       ));
-   }
+  returnToTopicEditorPage(): void {
+    if (this.undoRedoService.getChangeCount() > 0) {
+      this.ngbModal.open(
+        StorySavePendingChangesModalComponent,
+        { backdrop: true },
+      ).result.then(() => {}, () => {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
+      });
+    } else {
+      this.windowRef.nativeWindow.open(
+        this.urlInterpolationService.interpolateUrl(
+          this.TOPIC_EDITOR_URL_TEMPLATE, {
+            topicId: this.story.getCorrespondingTopicId()
+          }
+        ),
+        '_self'
+      );
+    }
+  }
 
-   ngOnDestroy(): void {
-     this.directiveSubscriptions.unsubscribe();
-   }
+  ngOnInit(): void {
+    this.directiveSubscriptions.add(
+      this.storyEditorStateService.onStoryInitialized.subscribe(
+        () => {
+          this.topicName = this.storyEditorStateService.getTopicName();
+          this.story = this.storyEditorStateService.getStory();
+        }
+      )
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
+  }
 }
 
 angular.module('oppia').directive('oppiaStoryEditorNavbarBreadcrumb',

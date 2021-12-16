@@ -1,5 +1,5 @@
 {
-  "extends": "stylelint-config-recommended",
+  "extends": ["stylelint-config-recommended", "stylelint-config-html"],
   "processors": ["@mapbox/stylelint-processor-arbitrary-tags"],
   "plugins": [
     "stylelint-order"
