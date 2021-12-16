@@ -93,7 +93,8 @@ class TaskEntryTests(test_utils.GenericTestBase):
             'resolved_on_msecs': utils.get_time_in_millisecs(self.MOCK_DATE),
         })
 
-    def test_to_dict_with_non_existing_resolver_id_raises_exception(self) -> None:
+    def test_to_dict_with_non_existing_resolver_id_raises_exception(
+        self) -> None:
         invalid_resolver_id = 'non_existing_user_id'
         task_entry = improvements_domain.TaskEntry(
             improvements_models.TASK_ENTITY_TYPE_EXPLORATION, self.exp_id, 1,
@@ -163,7 +164,8 @@ class TaskEntryTests(test_utils.GenericTestBase):
         self.assertEqual(task_entry.resolver_id, self.owner_id)
         self.assertEqual(task_entry.resolved_on, self.MOCK_DATE)
 
-    def test_constructor_ignores_resolution_args_when_task_is_open(self) -> None:
+    def test_constructor_ignores_resolution_args_when_task_is_open(
+        self) -> None:
         task_entry = improvements_domain.TaskEntry(
             improvements_models.TASK_ENTITY_TYPE_EXPLORATION, self.exp_id, 1,
             improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
@@ -182,7 +184,8 @@ class TaskEntryTests(test_utils.GenericTestBase):
         self.assertIsNone(task_entry.resolver_id)
         self.assertIsNone(task_entry.resolved_on)
 
-    def test_constructor_ignores_resolution_args_when_task_is_obsolete(self) -> None:
+    def test_constructor_ignores_resolution_args_when_task_is_obsolete(
+        self) -> None:
         task_entry = improvements_domain.TaskEntry(
             improvements_models.TASK_ENTITY_TYPE_EXPLORATION, self.exp_id, 1,
             improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,

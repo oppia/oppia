@@ -15,13 +15,14 @@
 """Domain objects for feedback models."""
 
 from __future__ import annotations
-from typing import Optional, List, Dict
-from typing_extensions import TypedDict
+
+import datetime
 
 from core import utils
 from core.domain import user_services
 
-import datetime
+from typing import Optional, List, Dict
+from typing_extensions import TypedDict
 
 
 class FeedbackThreadDict(TypedDict):
@@ -38,6 +39,7 @@ class FeedbackThreadDict(TypedDict):
     last_nonempty_message_text: Optional[str]
     last_nonempty_message_author: Optional[str]
 
+
 class FeedbackMessageDict(TypedDict):
     """Dict for FeedbackMessage object"""
 
@@ -49,6 +51,7 @@ class FeedbackMessageDict(TypedDict):
     text: str
     updated_status: str
     updated_subject: str
+
 
 class FeedbackThreadSummaryDict(TypedDict):
     """Dict for FeedbackThreadSummary object"""
@@ -323,7 +326,8 @@ class FeedbackMessageReference:
         message_id: str. The ID of the feedback thread message.
     """
 
-    def __init__(self,
+    def __init__(
+    self,
     entity_type: str,
     entity_id: str,
     thread_id: str,

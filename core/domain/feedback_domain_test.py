@@ -17,12 +17,13 @@
 from __future__ import annotations
 
 import datetime
-from typing import Dict
 
 from core import feconf
 from core import utils
 from core.domain import feedback_domain
 from core.tests import test_utils
+
+from typing import Dict
 
 
 class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
@@ -60,7 +61,8 @@ class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
         self.assertDictEqual(
             expected_thread_dict, observed_thread.to_dict()) # type: ignore[arg-type]
 
-    def test_get_last_two_message_ids_from_thread_with_many_messages(self) -> None:
+    def test_get_last_two_message_ids_from_thread_with_many_messages(
+        self) -> None:
         fake_date = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
         thread = feedback_domain.FeedbackThread(
             self.THREAD_ID, feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID,
@@ -73,7 +75,8 @@ class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
             thread.get_last_two_message_ids(),
             ['exp0.thread0.4', 'exp0.thread0.3'])
 
-    def test_get_last_two_message_ids_from_thread_with_only_one_message(self) -> None:
+    def test_get_last_two_message_ids_from_thread_with_only_one_message(
+        self) -> None:
         fake_date = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
         thread = feedback_domain.FeedbackThread(
             self.THREAD_ID, feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID,
@@ -96,6 +99,7 @@ class FeedbackMessageDomainUnitTests(test_utils.GenericTestBase):
         super(FeedbackMessageDomainUnitTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL) # type: ignore[no-untyped-call]
+
     def test_to_dict(self) -> None:
         fake_date = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
         expected_message_dict: feedback_domain.FeedbackMessageDict = {
