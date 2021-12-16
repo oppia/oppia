@@ -21,7 +21,7 @@ import datetime
 from core import utils
 from core.domain import user_services
 
-from typing import Optional, List, Dict
+from typing import Dict, List, Optional
 from typing_extensions import TypedDict
 
 

@@ -37,6 +37,7 @@ if MYPY: # pragma: no cover
 
 class TaskEntryDict(TypedDict):
     """Dict for TaskEntry object"""
+
     entity_type: str
     entity_id: str
     entity_version: int
@@ -48,6 +49,7 @@ class TaskEntryDict(TypedDict):
     resolver_username: Optional[str]
     resolver_profile_picture_data_url: Optional[str]
     resolved_on_msecs: Union[datetime.datetime, float, None]
+
 
 class TaskEntry:
     """Domain object representing an actionable task from the improvements tab.
