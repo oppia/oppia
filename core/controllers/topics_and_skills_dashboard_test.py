@@ -23,7 +23,6 @@ from core import python_utils
 from core.constants import constants
 from core.domain import config_services
 from core.domain import question_services
-from core.domain import skill_domain
 from core.domain import skill_fetchers
 from core.domain import skill_services
 from core.domain import state_domain
