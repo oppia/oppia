@@ -661,23 +661,27 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
     def test_skill_creation(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        rubrics = [
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']).to_dict(),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']).to_dict(),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], ['Explanation 3']).to_dict(),
-        ]
+        rubrics = [{
+            'difficulty': constants.SKILL_DIFFICULTIES[0],
+            'explanations': ['Explanation 1']
+        }, {
+            'difficulty': constants.SKILL_DIFFICULTIES[1],
+            'explanations': ['Explanation 2']
+        }, {
+            'difficulty': constants.SKILL_DIFFICULTIES[2],
+            'explanations': ['Explanation 3']
+        }]
         json_response = self.post_json(
             self.url, {
                 'description': 'Skill Description',
                 'rubrics': rubrics,
                 'explanation_dict': state_domain.SubtitledHtml(
                     '1', '<p>Explanation</p>').to_dict(),
-                'linked_topic_ids': []
+                'thumbnail_filename': 'image.svg'
             },
-            csrf_token=csrf_token)
+            csrf_token=csrf_token,
+            upload_files=((
+                'image', 'unused_filename', self.original_image_content),))
         skill_id = json_response['skillId']
         self.assertEqual(len(skill_id), 12)
         self.assertIsNotNone(
@@ -693,11 +697,121 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'rubrics': [],
             'explanation_dict': state_domain.SubtitledHtml(
                 '1', '<p>Explanation</p>').to_dict(),
+            'thumbnail_filename': 'image.svg'
         }
         json_response = self.post_json(
             self.url, payload, csrf_token=csrf_token,
-            expected_status_int=400)
+            expected_status_int=400,
+            upload_files=((
+                'image', 'unused_filename', self.original_image_content),))
         self.assertEqual(json_response['status_code'], 400)
+        self.logout()
+
+    def test_skill_creation_with_invalid_images(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        explanation_html = (
+            '<oppia-noninteractive-image filepath-with-value='
+            '"&quot;img.svg&quot;" caption-with-value="&quot;&quot;" '
+            'alt-with-value="&quot;Image&quot;"></oppia-noninteractive-image>'
+        )
+        rubrics = [{
+            'difficulty': constants.SKILL_DIFFICULTIES[0],
+            'explanations': ['Explanation 1']
+        }, {
+            'difficulty': constants.SKILL_DIFFICULTIES[1],
+            'explanations': ['Explanation 2']
+        }, {
+            'difficulty': constants.SKILL_DIFFICULTIES[2],
+            'explanations': ['Explanation 3']
+        }]
+        post_data = {
+            'description': 'Skill Description',
+            'rubrics': rubrics,
+            'explanation_dict': state_domain.SubtitledHtml(
+                '1', explanation_html).to_dict(),
+            'thumbnail_filename': 'image.svg'
+        }
+
+        response_dict = self.post_json(
+            self.url, post_data,
+            csrf_token=csrf_token,
+            expected_status_int=400)
+
+        self.assertIn(
+            'No image data provided for file with name img.svg',
+            response_dict['error'])
+
+        large_image = '<svg><path d="%s" /></svg>' % (
+            'M150 0 L75 200 L225 200 Z ' * 4000)
+        post_data = {
+            'description': 'Skill Description 2',
+            'rubrics': rubrics,
+            'explanation_dict': state_domain.SubtitledHtml(
+                '1', explanation_html).to_dict(),
+            'thumbnail_filename': 'image.svg'
+        }
+        response_dict = self.post_json(
+            self.url, post_data,
+            csrf_token=csrf_token,
+            upload_files=(
+                ('img.svg', 'img.svg', large_image),
+            ), expected_status_int=400)
+
+        self.assertIn(
+            'Image exceeds file size limit of 100 KB.',
+            response_dict['error'])
+        self.logout()
+
+    def test_skill_creation_with_valid_images(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        filename = 'img.png'
+        filename_2 = 'img_2.png'
+        explanation_html = (
+            '<oppia-noninteractive-image filepath-with-value='
+            '"&quot;img.png&quot;" caption-with-value="&quot;&quot;" '
+            'alt-with-value="&quot;Image&quot;"></oppia-noninteractive-image>'
+        )
+        explanation_html_2 = (
+            '<oppia-noninteractive-image filepath-with-value='
+            '"&quot;img_2.png&quot;" caption-with-value="&quot;&quot;" '
+            'alt-with-value="&quot;Image 2&quot;"></oppia-noninteractive-image>'
+        )
+        rubrics = [{
+            'difficulty': constants.SKILL_DIFFICULTIES[0],
+            'explanations': ['Explanation 1', explanation_html_2]
+        }, {
+            'difficulty': constants.SKILL_DIFFICULTIES[1],
+            'explanations': ['Explanation 2']
+        }, {
+            'difficulty': constants.SKILL_DIFFICULTIES[2],
+            'explanations': ['Explanation 3']
+        }]
+        post_data = {
+            'description': 'Skill Description',
+            'rubrics': rubrics,
+            'explanation_dict': state_domain.SubtitledHtml(
+                '1', explanation_html).to_dict(),
+            'thumbnail_filename': 'image.svg'
+        }
+
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
+            'rb', encoding=None
+        ) as f:
+            raw_image = f.read()
+
+        json_response = self.post_json(
+            self.url, post_data,
+            csrf_token=csrf_token,
+            upload_files=(
+                (filename, filename, raw_image),
+                (filename_2, filename_2, raw_image),)
+        )
+        skill_id = json_response['skillId']
+        self.assertIsNotNone(
+            skill_fetchers.get_skill_by_id(skill_id, strict=False))
         self.logout()
 
     def test_skill_creation_in_invalid_rubrics(self):
@@ -707,12 +821,13 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'description': 'Skill Description',
             'linked_topic_ids': [self.topic_id],
             'rubrics': 'invalid',
-            'explanation_dict': state_domain.SubtitledHtml(
-                '1', '<p>Explanation</p>').to_dict()
+            'thumbnail_filename': 'image.svg'
         }
         json_response = self.post_json(
             self.url, payload, csrf_token=csrf_token,
-            expected_status_int=400)
+            expected_status_int=400,
+            upload_files=((
+                'image', 'unused_filename', self.original_image_content),))
         self.assertEqual(json_response['status_code'], 400)
         self.logout()
 
@@ -723,11 +838,14 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'description': 'Skill Description',
             'linked_topic_ids': [self.topic_id],
             'rubrics': [],
-            'explanation_dict': 'explanation'
+            'explanation_dict': 'explanation',
+            'thumbnail_filename': 'image.svg'
         }
         json_response = self.post_json(
             self.url, payload, csrf_token=csrf_token,
-            expected_status_int=400)
+            expected_status_int=400,
+            upload_files=((
+                'image', 'unused_filename', self.original_image_content),))
         self.assertEqual(json_response['status_code'], 400)
 
         payload = {
@@ -736,7 +854,8 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'rubrics': [],
             'explanation_dict': {
                 'explanation': 'Explanation'
-            }
+            },
+            'thumbnail_filename': 'image.svg'
         }
         json_response = self.post_json(
             self.url, payload, csrf_token=csrf_token,
@@ -747,23 +866,28 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
     def test_skill_creation_in_valid_topic(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        rubrics = [
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']).to_dict(),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']).to_dict(),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], ['Explanation 3']).to_dict(),
-        ]
+        rubrics = [{
+            'difficulty': constants.SKILL_DIFFICULTIES[0],
+            'explanations': ['Explanation 1']
+        }, {
+            'difficulty': constants.SKILL_DIFFICULTIES[1],
+            'explanations': ['Explanation 2']
+        }, {
+            'difficulty': constants.SKILL_DIFFICULTIES[2],
+            'explanations': ['Explanation 3']
+        }]
         payload = {
             'description': 'Skill Description',
             'linked_topic_ids': [self.topic_id],
             'rubrics': rubrics,
             'explanation_dict': state_domain.SubtitledHtml(
-                '1', '<p>Explanation</p>').to_dict()
+                '1', '<p>Explanation</p>').to_dict(),
+            'thumbnail_filename': 'image.svg'
         }
         json_response = self.post_json(
-            self.url, payload, csrf_token=csrf_token)
+            self.url, payload, csrf_token=csrf_token,
+            upload_files=((
+                'image', 'unused_filename', self.original_image_content),))
         skill_id = json_response['skillId']
         self.assertEqual(len(skill_id), 12)
         self.assertIsNotNone(
@@ -777,30 +901,34 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
     def test_skill_creation_in_duplicate_description(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        rubrics = [
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']).to_dict(),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']).to_dict(),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], ['Explanation 3']).to_dict(),
-        ]
+        rubrics = [{
+            'difficulty': constants.SKILL_DIFFICULTIES[0],
+            'explanations': ['Explanation 1']
+        }, {
+            'difficulty': constants.SKILL_DIFFICULTIES[1],
+            'explanations': ['Explanation 2']
+        }, {
+            'difficulty': constants.SKILL_DIFFICULTIES[2],
+            'explanations': ['Explanation 3']
+        }]
         post_data = {
             'description': 'Duplicate Skill Description',
             'rubrics': rubrics,
             'explanation_dict': state_domain.SubtitledHtml(
                 '1', '<p>Explanation</p>').to_dict(),
-            'linked_topic_ids': []
+            'thumbnail_filename': 'image.svg'
         }
 
         # No errors when we publish the skill description for the first time.
         response_dict = self.post_json(
-            self.url, post_data, csrf_token=csrf_token)
+            self.url, post_data,
+            csrf_token=csrf_token)
         self.assertTrue('error' not in response_dict)
 
         # Error when we publish the same skill description again.
         response_dict = self.post_json(
-            self.url, post_data, csrf_token=csrf_token,
+            self.url, post_data,
+            csrf_token=csrf_token,
             expected_status_int=400)
         self.assertIn(
             'Skill description should not be a duplicate',

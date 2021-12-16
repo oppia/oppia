@@ -384,61 +384,29 @@ class NewTopicHandler(base.BaseHandler):
 class NewSkillHandler(base.BaseHandler):
     """Creates a new skill."""
 
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {},
-        'POST': {
-            'description': {
-                'schema': {
-                    'type': 'basestring',
-                    'validators': [{
-                        'id': 'is_nonempty'
-                    }, {
-                        'id': 'has_length_at_most',
-                        'max_value': (
-                            android_validation_constants
-                            .MAX_CHARS_IN_SKILL_DESCRIPTION
-                        )
-                    }]
-                }
-            },
-            'linked_topic_ids': {
-                'schema': {
-                    'type': 'list',
-                    'items': {
-                        'type': 'basestring',
-                        'validators': [{
-                            'id': 'is_regex_matched',
-                            'regex_pattern': constants.ENTITY_ID_REGEX
-                        }]
-                    }
-                }
-            },
-            'explanation_dict': {
-                'schema': {
-                    'type': 'object_dict',
-                    'object_class': state_domain.SubtitledHtml
-                }
-            },
-            'rubrics': {
-                'schema': {
-                    'type': 'list',
-                    'items': {
-                        'type': 'object_dict',
-                        'object_class': skill_domain.Rubric
-                    }
-                }
-            }
-        }
-    }
-
     @acl_decorators.can_create_skill
     def post(self):
-        description = self.normalized_payload.get('description')
-        linked_topic_ids = self.normalized_payload.get('linked_topic_ids')
-        explanation_dict = self.normalized_payload.get('explanation_dict')
-        rubrics = self.normalized_payload.get('rubrics')
+        description = self.payload.get('description')
+        linked_topic_ids = self.payload.get('linked_topic_ids')
+        explanation_dict = self.payload.get('explanation_dict')
+        rubrics = self.payload.get('rubrics')
 
+        if not isinstance(rubrics, list):
+            raise self.InvalidInputException('Rubrics should be a list.')
+
+        if not isinstance(explanation_dict, dict):
+            raise self.InvalidInputException(
+                'Explanation should be a dict.')
+
+        try:
+            subtitled_html = (
+                state_domain.SubtitledHtml.from_dict(explanation_dict))
+            subtitled_html.validate()
+        except:
+            raise self.InvalidInputException(
+                'Explanation should be a valid SubtitledHtml dict.')
+
+        rubrics = [skill_domain.Rubric.from_dict(rubric) for rubric in rubrics]
         new_skill_id = skill_services.get_new_skill_id()
         if linked_topic_ids is not None:
             topics = topic_fetchers.get_topics_by_ids(linked_topic_ids)
@@ -448,6 +416,8 @@ class NewSkillHandler(base.BaseHandler):
                 topic_services.add_uncategorized_skill(
                     self.user_id, topic.id, new_skill_id)
 
+        skill_domain.Skill.require_valid_description(description)
+
         if skill_services.does_skill_with_description_exist(description):
             raise self.InvalidInputException(
                 'Skill description should not be a duplicate.')
@@ -455,7 +425,8 @@ class NewSkillHandler(base.BaseHandler):
         skill = skill_domain.Skill.create_default_skill(
             new_skill_id, description, rubrics)
 
-        skill.update_explanation(explanation_dict)
+        skill.update_explanation(
+            state_domain.SubtitledHtml.from_dict(explanation_dict))
 
         image_filenames = skill_services.get_image_filenames_from_skill(skill)
 
