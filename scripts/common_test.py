@@ -859,15 +859,13 @@ class CommonTests(test_utils.GenericTestBase):
             common.write_stdout_safe('test')
 
     def test_write_stdout_safe_with_unsupportedoperation(self):
-        def mock_stdout_write(unused_string):
-            pass
+        mock_stdout = io.StringIO()
 
         write_swap = self.swap_to_always_raise(
             os, 'write',
             io.UnsupportedOperation('unsupported operation'))
-        stdout_write_swap = self.swap_with_checks(
-            sys.stdout, 'write', mock_stdout_write,
-            expected_args=[('test',)])
+        stdout_write_swap = self.swap(sys, 'stdout', mock_stdout)
 
         with write_swap, stdout_write_swap:
             common.write_stdout_safe('test')
+        self.assertEquals(mock_stdout.getvalue(), 'test')
