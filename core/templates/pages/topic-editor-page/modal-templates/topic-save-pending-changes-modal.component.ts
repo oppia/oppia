@@ -25,9 +25,8 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
   selector: 'oppia-topic-editor-send-mail-modal',
   templateUrl: './topic-editor-send-mail-modal.component.html'
 })
-export class TopicSavePendingChangesComponent 
+export class TopicSavePendingChangesComponent
   extends ConfirmOrCancelModal {
-
   constructor(
     private ngbActiveModal: NgbActiveModal
   ) {

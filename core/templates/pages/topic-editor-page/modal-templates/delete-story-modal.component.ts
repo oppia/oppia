@@ -25,7 +25,6 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
   templateUrl: './delete-story-modal.component.html'
 })
 export class DeleteStoryModalComponent extends ConfirmOrCancelModal {
-
   constructor(
     private ngbActiveModal: NgbActiveModal
   ) {

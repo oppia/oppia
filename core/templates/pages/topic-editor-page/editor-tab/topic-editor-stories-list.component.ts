@@ -26,9 +26,9 @@ require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('services/contextual/url.service.ts');
 require('services/ngb-modal.service.ts');
 
-import { DeleteStoryModalComponent } from "../modal-templates/delete-story-modal.component";
-import { TopicSavePendingChangesComponent } from 
-  "../modal-templates/topic-save-pending-changes-modal.component";
+import { DeleteStoryModalComponent } from '../modal-templates/delete-story-modal.component';
+import { TopicSavePendingChangesComponent } from
+  '../modal-templates/topic-save-pending-changes-modal.component';
 
 angular.module('oppia').component('topicEditorStoriesList', {
   bindings: {

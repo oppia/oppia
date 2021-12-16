@@ -54,7 +54,7 @@ require('base-components/loading-message.component.ts');
 require('services/ngb-modal.service.ts');
 
 import { Subscription } from 'rxjs';
-import { TopicSavePendingChangesComponent } from 
+import { TopicSavePendingChangesComponent } from
   '../modal-templates/topic-save-pending-changes-modal.component';
 
 // TODO(#9186): Change variable name to 'constants' once this file

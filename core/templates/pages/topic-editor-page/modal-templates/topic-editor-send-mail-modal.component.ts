@@ -26,7 +26,6 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
   templateUrl: './topic-editor-send-mail-modal.component.html'
 })
 export class TopicEditorSendMailComponent extends ConfirmOrCancelModal {
-
   constructor(
     private ngbActiveModal: NgbActiveModal
   ) {
