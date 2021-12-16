@@ -31,9 +31,9 @@ from core.domain import state_domain
 from typing import Dict, List, Callable, Union
 from typing_extensions import TypedDict
 import datetime
-from oppia.core.domain.state_domain import RecordedVoiceovers
-from oppia.core.domain.state_domain import SubtitledHtml
-from oppia.core.domain.state_domain import WrittenTranslations
+#from core.domain.state_domain import RecordedVoiceovers
+#from core.domain.state_domain import SubtitledHtml
+#from core.domain.state_domain import WrittenTranslations
 
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
@@ -376,7 +376,7 @@ class Rubric:
 class WorkedExample:
     """Domain object for representing the worked_example dict."""
 
-    def __init__(self, question: SubtitledHtml, explanation: SubtitledHtml):
+    def __init__(self, question: state_domain.SubtitledHtml, explanation: state_domain.SubtitledHtml):
         """Constructs a WorkedExample domain object.
 
         Args:
@@ -405,7 +405,7 @@ class WorkedExample:
                 'received %s' % self.question)
         self.explanation.validate()
 
-    def to_dict(self) -> dict[str, dict[str, SubtitledHtml]]:
+    def to_dict(self) -> dict[str, dict[str, state_domain.SubtitledHtml]]:
         """Returns a dict representing this WorkedExample domain object.
 
         Returns:
@@ -419,7 +419,7 @@ class WorkedExample:
     @classmethod
     def from_dict(
         cls, worked_example_dict:
-        dict[str, dict[str, SubtitledHtml]]) -> WorkedExample:
+        dict[str, dict[str, state_domain.SubtitledHtml]]) -> WorkedExample:
         """Return a WorkedExample domain object from a dict.
 
         Args:
@@ -445,20 +445,20 @@ class WorkedExample:
 
 skillsContents = TypedDict(
     'skillsContents',
-    {'explanation': Dict[str, SubtitledHtml],
-    'worked_examples': List[Dict[str, Dict[str, SubtitledHtml]]],
-    'recorded_voiceovers': Dict[str, Dict[str, RecordedVoiceovers]],
-    'written_translations': Dict[str, Dict[str, WrittenTranslations]]})
+    {'explanation': Dict[str, state_domain.SubtitledHtml],
+    'worked_examples': List[Dict[str, Dict[str, state_domain.SubtitledHtml]]],
+    'recorded_voiceovers': Dict[str, Dict[str, state_domain.RecordedVoiceovers]],
+    'written_translations': Dict[str, Dict[str, state_domain.WrittenTranslations]]})
 
 
 class SkillContents:
     """Domain object representing the skill_contents dict."""
 
     def __init__(
-            self, explanation: SubtitledHtml,
+            self, explanation: state_domain.SubtitledHtml,
             worked_examples: list[WorkedExample],
-            recorded_voiceovers: RecordedVoiceovers,
-            written_translations: WrittenTranslations) -> None:
+            recorded_voiceovers: state_domain.RecordedVoiceovers,
+            written_translations: state_domain.WrittenTranslations) -> None:
         """Constructs a SkillContents domain object.
 
         Args:
@@ -1002,8 +1002,8 @@ class Skill:
     @classmethod
     def convert_html_fields_in_skill_contents(
             cls, skill_contents_dict: skillsContents,
-            conversion_fn: Callable[[SubtitledHtml],
-            SubtitledHtml]) -> skillsContents:
+            conversion_fn: Callable[[state_domain.SubtitledHtml],
+            state_domain.SubtitledHtml]) -> skillsContents:
         """Applies a conversion function on all the html strings in a skill
         to migrate them to a desired state.
 
@@ -1373,7 +1373,7 @@ class Skill:
         """
         self.all_questions_merged = all_questions_merged
 
-    def update_explanation(self, explanation: SubtitledHtml) -> None:
+    def update_explanation(self, explanation: state_domain.SubtitledHtml) -> None:
         """Updates the explanation of the skill.
 
         Args:
@@ -1752,7 +1752,7 @@ class AugmentedSkillSummary:
             language_code: str, version: int,
             misconception_count: int, worked_examples_count: int,
             topic_names: List[str],
-            classroom_names: List[str], 
+            classroom_names: List[str],
             skill_model_created_on: datetime.datetime,
             skill_model_last_updated: datetime.datetime) -> None:
         """Constructs an AugmentedSkillSummary domain object.
