@@ -613,27 +613,29 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         unticketed_stats_model = (
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
                 unticketed_stats_id))
-
+        
+        ReportStatsParameterNames = (
+            app_feedback_report_constants.STATS_PARAMETER_NAMES)
         expected_json = {
-            app_feedback_report_constants.STATS_PARAMETER_NAMES.report_type.name: { # pylint: disable=line-too-long
+            ReportStatsParameterNames.report_type.name: {
                 self.REPORT_TYPE_SUGGESTION.name: 2
             },
-            app_feedback_report_constants.STATS_PARAMETER_NAMES.country_locale_code.name: { # pylint: disable=line-too-long
+            ReportStatsParameterNames.country_locale_code.name: {
                 self.COUNTRY_LOCALE_CODE_INDIA: 2
             },
-            app_feedback_report_constants.STATS_PARAMETER_NAMES.entry_point_name.name: { # pylint: disable=line-too-long
+            ReportStatsParameterNames.entry_point_name.name: {
                 self.ENTRY_POINT_NAVIGATION_DRAWER.name: 2
             },
-            app_feedback_report_constants.STATS_PARAMETER_NAMES.text_language_code.name: { # pylint: disable=line-too-long
+            ReportStatsParameterNames.text_language_code.name: {
                 self.TEXT_LANGUAGE_CODE_ENGLISH: 2
             },
-            app_feedback_report_constants.STATS_PARAMETER_NAMES.audio_language_code.name: { # pylint: disable=line-too-long
+            ReportStatsParameterNames.audio_language_code.name: {
                 self.AUDIO_LANGUAGE_CODE_ENGLISH: 2
             },
-            app_feedback_report_constants.STATS_PARAMETER_NAMES.android_sdk_version.name: { # pylint: disable=line-too-long
+            ReportStatsParameterNames.android_sdk_version.name: {
                 str(self.ANDROID_SDK_VERSION): 2
             },
-            app_feedback_report_constants.STATS_PARAMETER_NAMES.version_name.name: { # pylint: disable=line-too-long
+            ReportStatsParameterNames.version_name.name: {
                 self.ANDROID_PLATFORM_VERSION: 2
             }
         }
@@ -664,26 +666,28 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
                 all_report_stats_id))
 
+        ReportStatsParameterNames = (
+            app_feedback_report_constants.STATS_PARAMETER_NAMES)
         expected_json = {
-            app_feedback_report_constants.STATS_PARAMETER_NAMES.report_type.name: { # pylint: disable=line-too-long
+            ReportStatsParameterNames.report_type.name: {
                 self.REPORT_TYPE_SUGGESTION.name: 2
             },
-            app_feedback_report_constants.STATS_PARAMETER_NAMES.country_locale_code.name: { # pylint: disable=line-too-long
+            ReportStatsParameterNames.country_locale_code.name: {
                 self.COUNTRY_LOCALE_CODE_INDIA: 2
             },
-            app_feedback_report_constants.STATS_PARAMETER_NAMES.entry_point_name.name: { # pylint: disable=line-too-long
+            ReportStatsParameterNames.entry_point_name.name: {
                 self.ENTRY_POINT_NAVIGATION_DRAWER.name: 2
             },
-            app_feedback_report_constants.STATS_PARAMETER_NAMES.text_language_code.name: { # pylint: disable=line-too-long
+            ReportStatsParameterNames.text_language_code.name: {
                 self.TEXT_LANGUAGE_CODE_ENGLISH: 2
             },
-            app_feedback_report_constants.STATS_PARAMETER_NAMES.audio_language_code.name: { # pylint: disable=line-too-long
+            ReportStatsParameterNames.audio_language_code.name: {
                 self.AUDIO_LANGUAGE_CODE_ENGLISH: 2
             },
-            app_feedback_report_constants.STATS_PARAMETER_NAMES.android_sdk_version.name: { # pylint: disable=line-too-long
+            ReportStatsParameterNames.android_sdk_version.name: {
                 str(self.ANDROID_SDK_VERSION): 2
             },
-            app_feedback_report_constants.STATS_PARAMETER_NAMES.version_name.name: { # pylint: disable=line-too-long
+            ReportStatsParameterNames.version_name.name: {
                 self.ANDROID_PLATFORM_VERSION: 2
             }
         }
@@ -713,51 +717,53 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         filter_fields = [
             filter_obj.filter_field for filter_obj in filter_options]
 
+        ReportFilterFieldNames = (
+            app_feedback_report_constants.FILTER_FIELD_NAMES)
         for filter_obj in filter_options:
             self.assertTrue(filter_obj.filter_field in filter_fields)
             if filter_obj.filter_field == (
-                    app_feedback_report_constants.FILTER_FIELD_NAMES.report_type): # pylint: disable=line-too-long
+                    ReportFilterFieldNames.report_type):
                 self.assertEqual(
                     filter_obj.filter_options[0],
                     self.REPORT_TYPE_SUGGESTION.name)
             elif filter_obj.filter_field == (
-                    app_feedback_report_constants.FILTER_FIELD_NAMES.platform): # pylint: disable=line-too-long
+                    ReportFilterFieldNames.platform):
                 self.assertEqual(
                     filter_obj.filter_options[0], self.PLATFORM_ANDROID)
             elif filter_obj.filter_field == (
-                    app_feedback_report_constants.FILTER_FIELD_NAMES.entry_point): # pylint: disable=line-too-long
+                    ReportFilterFieldNames.entry_point):
                 self.assertEqual(
                     filter_obj.filter_options[0],
                     self.ENTRY_POINT_NAVIGATION_DRAWER.name)
             elif filter_obj.filter_field == (
-                    app_feedback_report_constants.FILTER_FIELD_NAMES.submitted_on): # pylint: disable=line-too-long
+                    ReportFilterFieldNames.submitted_on):
                 self.assertEqual(
                     filter_obj.filter_options[0],
                     self.REPORT_SUBMITTED_TIMESTAMP.date())
             elif filter_obj.filter_field == (
-                    app_feedback_report_constants.FILTER_FIELD_NAMES.android_device_model): # pylint: disable=line-too-long
+                    ReportFilterFieldNames.android_device_model):
                 self.assertEqual(
                     filter_obj.filter_options[0], self.ANDROID_DEVICE_MODEL)
             elif filter_obj.filter_field == (
-                    app_feedback_report_constants.FILTER_FIELD_NAMES.android_sdk_version): # pylint: disable=line-too-long
+                    ReportFilterFieldNames.android_sdk_version):
                 self.assertEqual(
                     filter_obj.filter_options[0], self.ANDROID_SDK_VERSION)
             elif filter_obj.filter_field == (
-                    app_feedback_report_constants.FILTER_FIELD_NAMES.text_language_code): # pylint: disable=line-too-long
+                    ReportFilterFieldNames.text_language_code):
                 self.assertEqual(
                     filter_obj.filter_options[0],
                     self.TEXT_LANGUAGE_CODE_ENGLISH)
             elif filter_obj.filter_field == (
-                    app_feedback_report_constants.FILTER_FIELD_NAMES.audio_language_code): # pylint: disable=line-too-long
+                    ReportFilterFieldNames.audio_language_code):
                 self.assertEqual(
                     filter_obj.filter_options[0],
                     self.AUDIO_LANGUAGE_CODE_ENGLISH)
             elif filter_obj.filter_field == (
-                    app_feedback_report_constants.FILTER_FIELD_NAMES.platform_version): # pylint: disable=line-too-long
+                    ReportFilterFieldNames.platform_version):
                 self.assertEqual(
                     filter_obj.filter_options[0], self.ANDROID_PLATFORM_VERSION)
             elif filter_obj.filter_field == (
-                    app_feedback_report_constants.FILTER_FIELD_NAMES.android_device_country_locale_code):  # pylint: disable=line-too-long
+                    ReportFilterFieldNames.android_device_country_locale_code): 
                 self.assertEqual(
                     filter_obj.filter_options[0],
                     self.COUNTRY_LOCALE_CODE_INDIA)
@@ -882,26 +888,28 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
                 new_stats_id))
 
+        ReportStatsParameterNames = (
+            app_feedback_report_constants.STATS_PARAMETER_NAMES)
         expected_json = {
-            app_feedback_report_constants.STATS_PARAMETER_NAMES.report_type.name: { # pylint: disable=line-too-long
+            ReportStatsParameterNames.report_type.name: {
                 self.REPORT_TYPE_SUGGESTION.name: 1
             },
-            app_feedback_report_constants.STATS_PARAMETER_NAMES.country_locale_code.name: { # pylint: disable=line-too-long
+            ReportStatsParameterNames.country_locale_code.name: {
                 self.COUNTRY_LOCALE_CODE_INDIA: 1
             },
-            app_feedback_report_constants.STATS_PARAMETER_NAMES.entry_point_name.name: { # pylint: disable=line-too-long
+            ReportStatsParameterNames.entry_point_name.name: {
                 self.ENTRY_POINT_NAVIGATION_DRAWER.name: 1
             },
-            app_feedback_report_constants.STATS_PARAMETER_NAMES.text_language_code.name: { # pylint: disable=line-too-long
+            ReportStatsParameterNames.text_language_code.name: {
                 self.TEXT_LANGUAGE_CODE_ENGLISH: 1
             },
-            app_feedback_report_constants.STATS_PARAMETER_NAMES.audio_language_code.name: { # pylint: disable=line-too-long
+            ReportStatsParameterNames.audio_language_code.name: {
                 self.AUDIO_LANGUAGE_CODE_ENGLISH: 1
             },
-            app_feedback_report_constants.STATS_PARAMETER_NAMES.android_sdk_version.name: { # pylint: disable=line-too-long
+            ReportStatsParameterNames.android_sdk_version.name: {
                 str(self.ANDROID_SDK_VERSION): 1
             },
-            app_feedback_report_constants.STATS_PARAMETER_NAMES.version_name.name: { # pylint: disable=line-too-long
+            ReportStatsParameterNames.version_name.name: {
                 self.ANDROID_PLATFORM_VERSION: 1
             }
         }
@@ -943,26 +951,28 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
                 old_stats_id))
 
+        ReportStatsParameterNames = (
+            app_feedback_report_constants.STATS_PARAMETER_NAMES)
         expected_json = {
-            app_feedback_report_constants.STATS_PARAMETER_NAMES.report_type.name: { # pylint: disable=line-too-long
+            ReportStatsParameterNames.report_type.name: {
                 self.REPORT_TYPE_SUGGESTION.name: 0
             },
-            app_feedback_report_constants.STATS_PARAMETER_NAMES.country_locale_code.name: { # pylint: disable=line-too-long
+            ReportStatsParameterNames.country_locale_code.name: {
                 self.COUNTRY_LOCALE_CODE_INDIA: 0
             },
-            app_feedback_report_constants.STATS_PARAMETER_NAMES.entry_point_name.name: { # pylint: disable=line-too-long
+            ReportStatsParameterNames.entry_point_name.name: {
                 self.ENTRY_POINT_NAVIGATION_DRAWER.name: 0
             },
-            app_feedback_report_constants.STATS_PARAMETER_NAMES.text_language_code.name: { # pylint: disable=line-too-long
+            ReportStatsParameterNames.text_language_code.name: {
                 self.TEXT_LANGUAGE_CODE_ENGLISH: 0
             },
-            app_feedback_report_constants.STATS_PARAMETER_NAMES.audio_language_code.name: { # pylint: disable=line-too-long
+            ReportStatsParameterNames.audio_language_code.name: {
                 self.AUDIO_LANGUAGE_CODE_ENGLISH: 0
             },
-            app_feedback_report_constants.STATS_PARAMETER_NAMES.android_sdk_version.name: { # pylint: disable=line-too-long
+            ReportStatsParameterNames.android_sdk_version.name: {
                 str(self.ANDROID_SDK_VERSION): 0
             },
-            app_feedback_report_constants.STATS_PARAMETER_NAMES.version_name.name: { # pylint: disable=line-too-long
+            ReportStatsParameterNames.version_name.name: {
                 self.ANDROID_PLATFORM_VERSION: 0
             }
         }
@@ -995,27 +1005,29 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         decremented_stats_model = (
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
                 old_stats_id))
-
+        
+        ReportStatsParameterNames = (
+            app_feedback_report_constants.STATS_PARAMETER_NAMES)
         expected_json = {
-            app_feedback_report_constants.STATS_PARAMETER_NAMES.report_type.name: { # pylint: disable=line-too-long
+            ReportStatsParameterNames.report_type.name: {
                 self.REPORT_TYPE_SUGGESTION.name: 0
             },
-            app_feedback_report_constants.STATS_PARAMETER_NAMES.country_locale_code.name: { # pylint: disable=line-too-long
+            ReportStatsParameterNames.country_locale_code.name: {
                 self.COUNTRY_LOCALE_CODE_INDIA: 0
             },
-            app_feedback_report_constants.STATS_PARAMETER_NAMES.entry_point_name.name: { # pylint: disable=line-too-long
+            ReportStatsParameterNames.entry_point_name.name: {
                 self.ENTRY_POINT_NAVIGATION_DRAWER.name: 0
             },
-            app_feedback_report_constants.STATS_PARAMETER_NAMES.text_language_code.name: { # pylint: disable=line-too-long
+            ReportStatsParameterNames.text_language_code.name: {
                 self.TEXT_LANGUAGE_CODE_ENGLISH: 0
             },
-            app_feedback_report_constants.STATS_PARAMETER_NAMES.audio_language_code.name: { # pylint: disable=line-too-long
+            ReportStatsParameterNames.audio_language_code.name: {
                 self.AUDIO_LANGUAGE_CODE_ENGLISH: 0
             },
-            app_feedback_report_constants.STATS_PARAMETER_NAMES.android_sdk_version.name: { # pylint: disable=line-too-long
+            ReportStatsParameterNames.android_sdk_version.name: {
                 str(self.ANDROID_SDK_VERSION): 0
             },
-            app_feedback_report_constants.STATS_PARAMETER_NAMES.version_name.name: { # pylint: disable=line-too-long
+            ReportStatsParameterNames.version_name.name: {
                 self.ANDROID_PLATFORM_VERSION: 0
             }
         }
