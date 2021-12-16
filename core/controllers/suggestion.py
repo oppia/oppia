@@ -321,7 +321,11 @@ class SuggestionListHandler(base.BaseHandler):
             },
             'target_id': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX
+                    }]
                 },
                 'default_value': None
             },
@@ -329,17 +333,34 @@ class SuggestionListHandler(base.BaseHandler):
                 'schema': {
                     'type': 'basestring'
                 },
+                'choices': suggestion_services.suggestion_models.STATUS_CHOICES,
                 'default_value': None
             },
             'author_id': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_regex_matched',
+                        'regex_pattern': feconf.USER_ID_REGEX
+                    },
+                    {
+                    'id': 'has_length',
+                    'value': feconf.USER_ID_LENGTH
+                    }]
                 },
                 'default_value': None
             },
             'final_reviewer_id': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_regex_matched',
+                        'regex_pattern': feconf.USER_ID_REGEX
+                    },
+                    {
+                    'id': 'has_length',
+                    'value': feconf.USER_ID_LENGTH
+                    }]
                 },
                 'default_value': None
             },
@@ -352,6 +373,9 @@ class SuggestionListHandler(base.BaseHandler):
             'language_code': {
                 'schema': {
                     'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_supported_language_code'
+                    }]
                 },
                 'default_value': None
             }
