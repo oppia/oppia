@@ -31,7 +31,9 @@ from core.domain import state_domain
 from typing import Dict, List, Callable, Union
 from typing_extensions import TypedDict
 import datetime
-from oppia.core.domain.state_domain import RecordedVoiceovers, SubtitledHtml, WrittenTranslations
+from oppia.core.domain.state_domain import RecordedVoiceovers
+from oppia.core.domain.state_domain import SubtitledHtml
+from oppia.core.domain.state_domain import WrittenTranslations
 
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
@@ -300,7 +302,7 @@ class Misconception:
 
 
 rubric_struct = TypedDict(
-    "rubric", {'difficulty': str, 'explanations': List[str]})
+    'rubric', {'difficulty': str, 'explanations': List[str]})
 
 
 class Rubric:
@@ -552,6 +554,7 @@ class SkillContents:
         skill_contents.explanation.validate()
 
         return skill_contents
+
 
 skillDomain = TypedDict(
     'skillDomain',
@@ -1749,7 +1752,8 @@ class AugmentedSkillSummary:
             language_code: str, version: int,
             misconception_count: int, worked_examples_count: int,
             topic_names: List[str],
-            classroom_names: List[str], skill_model_created_on: datetime.datetime,
+            classroom_names: List[str], 
+            skill_model_created_on: datetime.datetime,
             skill_model_last_updated: datetime.datetime) -> None:
         """Constructs an AugmentedSkillSummary domain object.
 
