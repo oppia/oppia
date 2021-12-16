@@ -57,11 +57,11 @@ describe('Translation Suggestion Review Modal Controller', function() {
       suggestion_type: 'translate_content',
       change: {
         content_id: 'hint_1',
-        content_html: 'Translation',
+        content_html: '<p>content</p><p>&nbsp;</p>',
         translation_html: 'Tradução',
         state_name: 'StateName'
       },
-      exploration_content_html: 'Translation'
+      exploration_content_html: '<p>content</p><p>&nbsp;</p>'
     };
     const suggestion2 = {
       suggestion_id: 'suggestion_2',
@@ -69,11 +69,11 @@ describe('Translation Suggestion Review Modal Controller', function() {
       suggestion_type: 'translate_content',
       change: {
         content_id: 'hint_1',
-        content_html: 'Translation',
+        content_html: '<p>content</p>',
         translation_html: 'Tradução',
         state_name: 'StateName'
       },
-      exploration_content_html: 'Translation CHANGED'
+      exploration_content_html: '<p>content CHANGED</p>'
     };
 
     const contribution1 = {
@@ -360,6 +360,41 @@ describe('Translation Suggestion Review Modal Controller', function() {
             jasmine.any(Function),
             jasmine.any(Function));
       });
+
+    describe('isHtmlContentEqual', function() {
+      it('should return true regardless of &nbsp; differences', function() {
+        expect($scope.isHtmlContentEqual(
+          '<p>content</p><p>&nbsp;&nbsp;</p>', '<p>content</p><p> </p>'))
+          .toBe(true);
+      });
+
+      it('should return true regardless of new line differences', function() {
+        expect($scope.isHtmlContentEqual(
+          '<p>content</p>\r\n\n<p>content2</p>',
+          '<p>content</p><p>content2</p>'))
+          .toBe(true);
+      });
+
+      it('should return false if html content differ', function() {
+        expect($scope.isHtmlContentEqual(
+          '<p>content</p>', '<p>content CHANGED</p>'))
+          .toBe(false);
+      });
+
+      it('should return false if array contents differ', function() {
+        expect($scope.isHtmlContentEqual(
+          ['<p>content1</p>', '<p>content2</p>'],
+          ['<p>content1</p>', '<p>content2 CHANGED</p>']))
+          .toBe(false);
+      });
+
+      it('should return true if array contents are equal', function() {
+        expect($scope.isHtmlContentEqual(
+          ['<p>content1</p>', '<p>content2</p>'],
+          ['<p>content1</p>', '<p>content2</p>']))
+          .toBe(true);
+      });
+    });
   });
 
   describe('when viewing suggestion', function() {
