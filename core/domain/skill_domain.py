@@ -1764,7 +1764,8 @@ class TopicAssignment:
         }
 
 
-skillMastery = TypedDict('skillMastery', {'user_id': str, 'skill_id': str, 
+skillMastery = TypedDict(
+    'skillMastery', {'user_id': str, 'skill_id': str, 
             'degree_of_mastery': float})
 
 
