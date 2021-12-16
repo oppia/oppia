@@ -56,6 +56,15 @@ export class ScoreRingComponent implements OnInit, OnChanges {
     }
   }
 
+  getScoreRing(): boolean {
+    if (document.querySelector('.score-ring-circle')) {
+      this.circle = (
+        document.querySelector('.score-ring-circle') as SVGCircleElement);
+      return true;
+    }
+    return false;
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
     if (
       changes.score &&
@@ -67,13 +76,45 @@ export class ScoreRingComponent implements OnInit, OnChanges {
   }
 
   ngOnInit(): void {
-    this.circle = (
-      document.querySelector('.score-ring-circle') as SVGCircleElement);
+    // In certain case(s), such as when the results page is reloaded,
+    // document.querySelector() attempts to grab the required element before
+    // it even exists in the view causing it to return null,
+    // thus breaking the score-ring. Checking for the existence of
+    // the element before retrieving it fixes this problem.
+    // ngOnInit() (and hence getScoreRing() too) is called recursively until
+    // the circle element is returned by document.querySelector()
+
+    if (!this.getScoreRing()) {
+      let that = this;
+      setTimeout(function() {
+        that.ngOnInit();
+      }, 160);
+      return;
+    }
     this.radius = this.circle.r.baseVal.value;
     this.circumference = (this.radius * 2 * Math.PI);
+    // The default stroke-dashoffset value for an svg-element is 0
+    // (visually, this renders the score-ring as filled 100%). To initialize
+    // the score-ring as filled 0%, the stroke-dashoffset value is set to the
+    // circumference of the circle. However, since transition-duration is 5s,
+    // the ring can be caught animating down to 0%.
+    // To instantly render the score-ring as 0% filled, transition-duration is
+    // temporarily set to 0s until stroke-dashoffset has been set, and then
+    // reverted back to 5s so subsequent animations can play out as intended.
+
+    this.circle.style.transitionDuration = '0s';
+    this.circle.style.transitionDelay = '0s';
     this.circle.style.strokeDasharray = (
       `${this.circumference} ${this.circumference}`);
     this.circle.style.strokeDashoffset = this.circumference.toString();
+    // A reflow needs to be triggered so that the browser picks up the
+    // assigned starting values before reverting back the transition-duration
+    // and transition-delay values. clientHeight property triggers a reflow.
+
+    this.circle.clientHeight;
+    this.circle.style.transitionDuration = '5s';
+    this.circle.style.transitionDelay = '2s';
+    this.setScore(this.score);
   }
 }
 
