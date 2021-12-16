@@ -450,9 +450,11 @@ export class Topic {
       subtopicId: number, fromIndex: number, toIndex: number): void {
     const subtopic = this.getSubtopicById(subtopicId);
     if (subtopic !== null) {
-      const skillToMove = cloneDeep(subtopic.getSkillSummaries()[fromIndex]);
-      subtopic._skillSummaries.splice(fromIndex, 1);
-      subtopic._skillSummaries.splice(toIndex, 0, skillToMove);
+      const skillToMove = cloneDeep(subtopic?.getSkillSummaries()[fromIndex]);
+      subtopic?._skillSummaries.splice(fromIndex, 1);
+      if (skillToMove) {
+        subtopic._skillSummaries.splice(toIndex, 0, skillToMove);
+      }
     }
   }
 
@@ -633,9 +635,9 @@ export class TopicObjectFactory {
   // the actual topic is fetched from the backend.
   createInterstitialTopic(): Topic {
     return new Topic(
-      null, 'Topic name loading', 'Abbrev. name loading',
+      '', 'Topic name loading', 'Abbrev. name loading',
       'Url Fragment loading', 'Topic description loading', 'en',
-      [], [], [], 1, 1, [], null, '', {},
+      [], [], [], 1, 1, [], '', '', {},
       this.storyReferenceObjectFactory, false, '', ''
     );
   }

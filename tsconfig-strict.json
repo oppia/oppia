@@ -262,6 +262,8 @@
     "core/templates/domain/subtopic_viewer/subtopic-viewer-domain.constants.ts",
     "core/templates/domain/topic/StoryReferenceObjectFactory.ts",
     "core/templates/domain/topic/StoryReferenceObjectFactorySpec.ts",
+    "core/templates/domain/topic/TopicObjectFactory.ts",
+    "core/templates/domain/topic/TopicObjectFactorySpec.ts",
     "core/templates/domain/topic/creator-topic-summary.model.ts",
     "core/templates/domain/topic/creator-topic-summary.model.spec.ts",
     "core/templates/domain/topic/subtopic-page-contents.model.ts",
