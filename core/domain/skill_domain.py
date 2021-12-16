@@ -31,7 +31,7 @@ from core.domain import state_domain
 from typing import Dict, List, Callable, Union
 from typing_extensions import TypedDict
 import datetime
-from oppia.core.domain.state_domain import RecordedVoiceovers, SubtitledHtml, WrittenTranslation, WrittenTranslations
+from oppia.core.domain.state_domain import RecordedVoiceovers, SubtitledHtml, WrittenTranslations
 
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
@@ -183,9 +183,9 @@ class SkillChange(change_domain.BaseChange):
 
 
 misconception = TypedDict('misconception', {'id': int, 'name': str, 'notes': str, 'feedback': str, 'must_be_addressed': bool})
+
+
 class Misconception:
-
-
     """Domain object describing a skill misconception."""
 
     def __init__(
@@ -209,6 +209,7 @@ class Misconception:
         self.notes = html_cleaner.clean(notes)
         self.feedback = html_cleaner.clean(feedback)
         self.must_be_addressed = must_be_addressed
+    
     def to_dict(self) -> misconception:
         """Returns a dict representing this Misconception domain object.
 
@@ -292,10 +293,10 @@ class Misconception:
                 self.feedback)
 
 
-rubric = TypedDict("rubric", {'difficulty':str, 'explanations': List[str]})
+rubric = TypedDict("rubric", {'difficulty': str, 'explanations': List[str]})
+
+
 class Rubric:
-
-
     """Domain object describing a skill rubric."""
 
     def __init__(self, difficulty: str, explanations: list[str]):
@@ -430,10 +431,11 @@ class WorkedExample:
 
         return worked_example
 
+
 skillsContents = TypedDict('skillsContents', {'explanation': Dict[str, SubtitledHtml], 'worked_examples': List[Dict[str, Dict[str, SubtitledHtml]]], 'recorded_voiceovers': Dict[str, Dict[str, RecordedVoiceovers]], 'written_translations': Dict[str, Dict[str, WrittenTranslations]]})
+
+
 class SkillContents:
-
-
     """Domain object representing the skill_contents dict."""
 
     def __init__(
@@ -494,6 +496,7 @@ class SkillContents:
 
         self.recorded_voiceovers.validate(available_content_ids)
         self.written_translations.validate(available_content_ids)
+    
     def to_dict(self) -> skillsContents:
         """Returns a dict representing this SkillContents domain object.
 
@@ -534,13 +537,13 @@ class SkillContents:
 
         return skill_contents
 
-skillDomain = TypedDict('skillDomain', {'id': str, 'description': str, 'misconceptions': List[misconception], 'rubrics': List[rubric], 'skill_contents': skillsContents, 'language_code': str, 'misconceptions_schema_version': int, 'rubric_schema_version': int, 'skill_contents_schema_version': int, 'version': int, 'next_misconception_id': int, 'superseding_skill_id': Union[str,None], 'all_questions_merged': bool, 'prerequisite_skill_ids': List[str], 'created_on': str, 'last_updated': str})
+skillDomain = TypedDict('skillDomain', {'id': str, 'description': str, 'misconceptions': List[misconception], 'rubrics': List[rubric], 'skill_contents': skillsContents, 'language_code': str, 'misconceptions_schema_version': int, 'rubric_schema_version': int, 'skill_contents_schema_version': int, 'version': int, 'next_misconception_id': int, 'superseding_skill_id': Union[str, None], 'all_questions_merged': bool, 'prerequisite_skill_ids': List[str], 'created_on': str, 'last_updated': str})
 versioned_skill_Contents = TypedDict('versioned_skill_Contents', {'schema_version': str, 'skill_contents': skillsContents})
 versioned_Misconceptions = TypedDict('versioned_Misconceptions', {'schema_version': str, 'misconceptions': List[misconception]})
 versioned_Rubrics = TypedDict('versioned_Rubrics', {'schema_version': str, 'rubrics': List[rubric]})
+
+
 class Skill:
-
-
     """Domain object for an Oppia Skill."""
 
     def __init__(
@@ -1548,10 +1551,11 @@ class Skill:
                 'There is no misconception with the given id.')
         self.misconceptions[index].feedback = feedback
 
+
 skillSummary = TypedDict('skillSummary', {'id': str, 'description': str, 'language_code': str, 'version': int, 'misconception_count': int, 'worked_examples_count': int, 'skill_model_created_on': datetime.datetime, 'skill_model_last_updated': datetime.datetime})
+
+
 class SkillSummary:
-
-
     """Domain object for Skill Summary."""
 
     def __init__(
@@ -1654,9 +1658,9 @@ augmentedSkillSummary = TypedDict('augmentedSkillSummary', {'id': str,
             'classroom_names': List[str],
             'skill_model_created_on': datetime.datetime,
             'skill_model_last_updated': datetime.datetime})
+
+
 class AugmentedSkillSummary:
-
-
     """Domain object for Augmented Skill Summary, which has all the properties
     of SkillSummary along with the topic names to which the skill is assigned
     and the classroom names to which the topics are assigned.
@@ -1719,10 +1723,10 @@ class AugmentedSkillSummary:
         }
 
 
-topicAssignment = TypedDict('topicAssignment', {'topic_id': str, 'topic_name': str, 'topic_version': int, 'subtopic_id': Union[str,None]})
+topicAssignment = TypedDict('topicAssignment', {'topic_id': str, 'topic_name': str, 'topic_version': int, 'subtopic_id': Union[str, None]})
+
+
 class TopicAssignment:
-
-
     """Domain object for Topic Assignment, which provides the details of a
     single topic (and, if applicable, the subtopic within that topic) to which
     the skill is assigned.
@@ -1760,11 +1764,11 @@ class TopicAssignment:
         }
 
 
-skillMastery = TypedDict('skillMastery', {'user_id': str,'skill_id': str, 
+skillMastery = TypedDict('skillMastery', {'user_id': str, 'skill_id': str, 
             'degree_of_mastery': float})
+
+
 class UserSkillMastery:
-
-
     """Domain object for a user's mastery of a particular skill."""
 
     def __init__(self, user_id: str, skill_id: str, degree_of_mastery: float) -> None:
