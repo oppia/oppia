@@ -31,6 +31,15 @@ describe('Editor Navbar Breadcrumb directive', function() {
 
   var mockExplorationPropertyChangedEventEmitter = new EventEmitter();
 
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
   importAllAngularServices();
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $rootScope = $injector.get('$rootScope');
