@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for RouterService.
  */
 
-import { fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import { fakeAsync, flush, flushMicrotasks } from '@angular/core/testing';
 import $ from 'jquery';
 import { Subscription } from 'rxjs';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
@@ -40,6 +40,15 @@ describe('Router Service', () => {
   var refreshVersionHistorySpy = null;
   var refreshStateEditorSpy = null;
 
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
   importAllAngularServices();
   beforeEach(angular.mock.inject($injector => {
     RouterService = $injector.get('RouterService');
@@ -193,79 +202,34 @@ describe('Router Service', () => {
     testSubscriptions.unsubscribe();
   });
 
-  it('should navigate to main tab when tab is already on main', done => {
-    var applyAsyncSpy = spyOn($rootScope, '$applyAsync').and.callThrough();
-
+  it('should not navigate to main tab when already there', fakeAsync(() => {
     var jQuerySpy = spyOn(window, '$');
     jQuerySpy.withArgs('.oppia-editor-cards-container').and.returnValue(
       $(document.createElement('div')));
     jQuerySpy.and.callThrough();
+    let fadeOutSpy = spyOn($.fn, 'fadeOut').and.callFake(cb => {
+      cb();
+      $timeout.flush(200);
+      return null;
+    });
 
     expect(RouterService.getActiveTabName()).toBe('main');
     RouterService.navigateToMainTab('newState');
-    // To $watch the first $location.path call.
+
     $rootScope.$apply();
+    flush();
 
-    // Function setTimeout is being used here to not conflict with
-    // $timeout.flush for fadeIn Jquery method. This first setTimeout is to wait
-    // the default time for fadeOut Jquery method to complete, which is 400
-    // miliseconds.
-    // Ref: https://api.jquery.com/fadeout/
-    setTimeout(() => {
-      // Waiting for $applyAsync be called, which can take ~10 miliseconds
-      // according to this ref: https://docs.angularjs.org/api/ng/type/$rootScope.Scope#$applyAsync
-      setTimeout(() => {
-        expect(externalSaveSpy).toHaveBeenCalled();
-        expect(RouterService.getActiveTabName()).toBe('main');
+    expect(externalSaveSpy).toHaveBeenCalled();
+    expect(RouterService.getActiveTabName()).toBe('main');
 
-        $interval.flush(300);
+    RouterService.navigateToMainTab('newState');
 
-        expect(applyAsyncSpy).toHaveBeenCalled();
-        done();
-      }, 20);
-      $timeout.flush(150);
-    }, 400);
-  });
-
-  it('should not navigate to main tab when already there', done => {
-    var applyAsyncSpy = spyOn($rootScope, '$applyAsync').and.callThrough();
-
-    var jQuerySpy = spyOn(window, '$');
-    jQuerySpy.withArgs('.oppia-editor-cards-container').and.returnValue(
-      $(document.createElement('div')));
-    jQuerySpy.and.callThrough();
+    $rootScope.$apply();
+    flush();
 
     expect(RouterService.getActiveTabName()).toBe('main');
-    RouterService.navigateToMainTab('newState');
-    // To $watch the first $location.path call.
-    $rootScope.$apply();
-
-    // Function setTimeout is being used here to not conflict with
-    // $timeout.flush for fadeIn Jquery method. This first setTimeout is to wait
-    // the default time for fadeOut Jquery method to complete, which is 400
-    // miliseconds.
-    // Ref: https://api.jquery.com/fadeout/
-    setTimeout(() => {
-      // Waiting for $applyAsync be called, which can take ~10 miliseconds
-      // according to this ref: https://docs.angularjs.org/api/ng/type/$rootScope.Scope#$applyAsync
-      setTimeout(() => {
-        expect(externalSaveSpy).toHaveBeenCalled();
-        expect(RouterService.getActiveTabName()).toBe('main');
-
-        $interval.flush(300);
-
-        expect(applyAsyncSpy).toHaveBeenCalled();
-
-        RouterService.navigateToMainTab('newState');
-        $timeout.flush();
-        $rootScope.$apply();
-
-        expect(RouterService.getActiveTabName()).toBe('main');
-        done();
-      }, 20);
-      $timeout.flush(150);
-    }, 400);
-  });
+    expect(fadeOutSpy).toHaveBeenCalled();
+  }));
 
   it('should navigate to main tab when current location is not main', () => {
     // Go to stats tab.
