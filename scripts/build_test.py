@@ -28,6 +28,7 @@ import subprocess
 import tempfile
 import threading
 
+import psutil as psutil
 from core import python_utils
 from core.tests import test_utils
 
@@ -35,6 +36,8 @@ from . import build
 from . import common
 from . import scripts_test_utils
 from . import servers
+
+from typing import Iterator, Union, Any, List, Optional, cast, NoReturn, Generator
 
 TEST_DIR = os.path.join('core', 'tests', 'build', '')
 TEST_SOURCE_DIR = os.path.join('core', 'tests', 'build_sources')
@@ -58,12 +61,12 @@ EMPTY_DIR = os.path.join(TEST_DIR, 'empty', '')
 class BuildTests(test_utils.GenericTestBase):
     """Test the build methods."""
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         super(BuildTests, self).tearDown()
         build.safe_delete_directory_tree(TEST_DIR)
         build.safe_delete_directory_tree(EMPTY_DIR)
 
-    def test_minify(self):
+    def test_minify(self) -> None:
         """Tests _minify with an invalid filepath."""
         with self.assertRaisesRegexp(
             subprocess.CalledProcessError,
@@ -72,7 +75,7 @@ class BuildTests(test_utils.GenericTestBase):
         # `returncode` is the exit status of the child process.
         self.assertEqual(called_process.exception.returncode, 1)
 
-    def test_minify_and_create_sourcemap(self):
+    def test_minify_and_create_sourcemap(self) -> None:
         """Tests _minify_and_create_sourcemap with an invalid filepath."""
         with self.assertRaisesRegexp(
             subprocess.CalledProcessError,
@@ -82,7 +85,7 @@ class BuildTests(test_utils.GenericTestBase):
         # `returncode` is the exit status of the child process.
         self.assertEqual(called_process.exception.returncode, 1)
 
-    def test_ensure_files_exist(self):
+    def test_ensure_files_exist(self) -> None:
         """Test _ensure_files_exist raises exception with a non-existent
         filepath.
         """
@@ -98,7 +101,7 @@ class BuildTests(test_utils.GenericTestBase):
             OSError, error_message):
             build._ensure_files_exist(non_existent_filepaths)  # pylint: disable=protected-access
 
-    def test_join_files(self):
+    def test_join_files(self) -> None:
         """Determine third_party.js contains the content of the first 10 JS
         files in /third_party/static.
         """
@@ -120,11 +123,11 @@ class BuildTests(test_utils.GenericTestBase):
                     self.assertIn(line, third_party_js_stream.getvalue())
             counter += 1
 
-    def test_generate_copy_tasks_for_fonts(self):
+    def test_generate_copy_tasks_for_fonts(self) -> None:
         """Test _generate_copy_tasks_for_fonts ensures that the number of copy
         tasks matches the number of font files.
         """
-        copy_tasks = collections.deque()
+        copy_tasks: collections.deque = collections.deque()
         # Get all filepaths from dependencies.json.
         dependency_filepaths = build.get_dependencies_filepaths()
         # Setup a sandbox folder for copying fonts.
@@ -136,7 +139,7 @@ class BuildTests(test_utils.GenericTestBase):
         # Asserting the same number of copy tasks and number of font files.
         self.assertEqual(len(copy_tasks), len(dependency_filepaths['fonts']))
 
-    def test_insert_hash(self):
+    def test_insert_hash(self) -> None:
         """Test _insert_hash returns correct filenames with provided hashes."""
         self.assertEqual(
             build._insert_hash('file.js', '123456'), 'file.123456.js')  # pylint: disable=protected-access
@@ -149,7 +152,7 @@ class BuildTests(test_utils.GenericTestBase):
             build._insert_hash(  # pylint: disable=protected-access
                 'path/to/file.min.js', 'fedcba'), 'path/to/file.min.fedcba.js')
 
-    def test_get_file_count(self):
+    def test_get_file_count(self) -> None:
         """Test get_file_count returns the correct number of files, excluding
         file with extensions in FILE_EXTENSIONS_TO_IGNORE and files that should
         not be built.
@@ -168,7 +171,7 @@ class BuildTests(test_utils.GenericTestBase):
             all_inclusive_file_count - ignored_file_count,
             build.get_file_count(MOCK_EXTENSIONS_DEV_DIR))
 
-    def test_compare_file_count(self):
+    def test_compare_file_count(self) -> None:
         """Test _compare_file_count raises exception when there is a
         mismatched file count between 2 dirs list.
         """
@@ -201,7 +204,7 @@ class BuildTests(test_utils.GenericTestBase):
         # Reset EMPTY_DIRECTORY to clean state.
         build.safe_delete_directory_tree(EMPTY_DIR)
 
-    def test_verify_filepath_hash(self):
+    def test_verify_filepath_hash(self) -> None:
         """Test _verify_filepath_hash raises exception:
             1) When there is an empty hash dict.
             2) When a filename is expected to contain hash but does not.
@@ -209,7 +212,7 @@ class BuildTests(test_utils.GenericTestBase):
                 hash dict.
         """
         # Final filepath example: base.240933e7564bd72a4dde42ee23260c5f.html.
-        file_hashes = {}
+        file_hashes: dict = {}
         base_filename = 'base.html'
         with self.assertRaisesRegexp(ValueError, 'Hash dict is empty'):
             build._verify_filepath_hash(base_filename, file_hashes)  # pylint: disable=protected-access
@@ -237,7 +240,7 @@ class BuildTests(test_utils.GenericTestBase):
             hashed_base_filename):
             build._verify_filepath_hash(hashed_base_filename, file_hashes)  # pylint: disable=protected-access
 
-    def test_process_html(self):
+    def test_process_html(self) -> None:
         """Test process_html removes whitespaces."""
         base_html_source_path = (
             os.path.join(MOCK_TEMPLATES_DEV_DIR, 'base.html'))
@@ -266,7 +269,7 @@ class BuildTests(test_utils.GenericTestBase):
             msg='All white spaces must be removed from %s' %
             base_html_source_path)
 
-    def test_should_file_be_built(self):
+    def test_should_file_be_built(self) -> None:
         """Test should_file_be_built returns the correct boolean value for
         filepath that should be built.
         """
@@ -295,7 +298,7 @@ class BuildTests(test_utils.GenericTestBase):
             build, 'JS_FILENAME_SUFFIXES_TO_IGNORE', ('Service.js',)):
             self.assertTrue(build.should_file_be_built(spec_js_filepath))
 
-    def test_hash_should_be_inserted(self):
+    def test_hash_should_be_inserted(self) -> None:
         """Test hash_should_be_inserted returns the correct boolean value
         for filepath that should be hashed.
         """
@@ -318,7 +321,7 @@ class BuildTests(test_utils.GenericTestBase):
             self.assertFalse(build.hash_should_be_inserted(
                 'extensions/domain.py'))
 
-    def test_generate_copy_tasks_to_copy_from_source_to_target(self):
+    def test_generate_copy_tasks_to_copy_from_source_to_target(self) -> None:
         """Test generate_copy_tasks_to_copy_from_source_to_target queues up
         the same number of copy tasks as the number of files in the directory.
         """
@@ -331,7 +334,7 @@ class BuildTests(test_utils.GenericTestBase):
             MOCK_ASSETS_DEV_DIR, MOCK_ASSETS_OUT_DIR, assets_hashes)
         self.assertEqual(len(copy_tasks), total_file_count)
 
-    def test_is_file_hash_provided_to_frontend(self):
+    def test_is_file_hash_provided_to_frontend(self) -> None:
         """Test is_file_hash_provided_to_frontend returns the correct boolean
         value for filepath that should be provided to frontend.
         """
@@ -358,7 +361,7 @@ class BuildTests(test_utils.GenericTestBase):
             self.assertFalse(
                 build.is_file_hash_provided_to_frontend('bad_end.css'))
 
-    def test_get_filepaths_by_extensions(self):
+    def test_get_filepaths_by_extensions(self) -> None:
         """Test get_filepaths_by_extensions only returns filepaths in
         directory with given extensions.
         """
@@ -386,7 +389,7 @@ class BuildTests(test_utils.GenericTestBase):
             MOCK_ASSETS_DEV_DIR, extensions)
         self.assertEqual(len(filepaths), 0)
 
-    def test_get_file_hashes(self):
+    def test_get_file_hashes(self) -> None:
         """Test get_file_hashes gets hashes of all files in directory,
         excluding file with extensions in FILE_EXTENSIONS_TO_IGNORE.
         """
@@ -403,7 +406,7 @@ class BuildTests(test_utils.GenericTestBase):
                 self.assertTrue(os.path.isfile(abs_filepath))
                 self.assertFalse(filepath.endswith('.html'))
 
-    def test_filter_hashes(self):
+    def test_filter_hashes(self) -> None:
         """Test filter_hashes filters the provided hash correctly."""
         # Set constant to provide everything to frontend.
         with self.swap(build, 'FILEPATHS_PROVIDED_TO_FRONTEND', ('*',)):
@@ -432,7 +435,7 @@ class BuildTests(test_utils.GenericTestBase):
             self.assertNotIn('/path/path/file.js', filtered_hashes)
             self.assertNotIn('/file.html', filtered_hashes)
 
-    def test_save_hashes_to_file(self):
+    def test_save_hashes_to_file(self) -> None:
         """Test save_hashes_to_file saves provided hash dict correctly to
         JSON file.
         """
@@ -455,7 +458,7 @@ class BuildTests(test_utils.GenericTestBase):
                         {'/file.min.js': '654321', '/file.js': '123456'})
                 os.remove(hashes_path)
 
-    def test_execute_tasks(self):
+    def test_execute_tasks(self) -> None:
         """Test _execute_tasks joins all threads after executing all tasks."""
         build_tasks = collections.deque()
         task_count = 2
@@ -475,7 +478,7 @@ class BuildTests(test_utils.GenericTestBase):
         # Assert that all threads are joined.
         self.assertEqual(threading.active_count(), 1)
 
-    def test_generate_build_tasks_to_build_all_files_in_directory(self):
+    def test_generate_build_tasks_to_build_all_files_in_directory(self) -> None:
         """Test generate_build_tasks_to_build_all_files_in_directory queues up
         the same number of build tasks as the number of files in the source
         directory.
@@ -489,7 +492,7 @@ class BuildTests(test_utils.GenericTestBase):
         total_file_count = build.get_file_count(MOCK_ASSETS_DEV_DIR)
         self.assertEqual(len(tasks), total_file_count)
 
-    def test_generate_build_tasks_to_build_files_from_filepaths(self):
+    def test_generate_build_tasks_to_build_files_from_filepaths(self) -> None:
         """Test generate_build_tasks_to_build_files_from_filepaths queues up a
         corresponding number of build tasks to the number of file changes.
         """
@@ -515,7 +518,7 @@ class BuildTests(test_utils.GenericTestBase):
             MOCK_ASSETS_DEV_DIR, MOCK_ASSETS_OUT_DIR, svg_filepaths)
         self.assertEqual(len(build_tasks), len(svg_filepaths))
 
-    def test_generate_build_tasks_to_build_directory(self):
+    def test_generate_build_tasks_to_build_directory(self) -> None:
         """Test generate_build_tasks_to_build_directory queues up a
         corresponding number of build tasks according to the given scenario.
         """
@@ -577,7 +580,7 @@ class BuildTests(test_utils.GenericTestBase):
 
         build.safe_delete_directory_tree(TEST_DIR)
 
-    def test_re_build_recently_changed_files_at_dev_dir(self):
+    def test_re_build_recently_changed_files_at_dev_dir(self) -> None:
         temp_file = tempfile.NamedTemporaryFile()
         temp_file_name = '%ssome_file.js' % MOCK_EXTENSIONS_DEV_DIR
         temp_file.name = temp_file_name
@@ -637,7 +640,7 @@ class BuildTests(test_utils.GenericTestBase):
             # On Windows system, occasionally this temp file is not deleted.
             os.remove(temp_file_name)
 
-    def test_get_recently_changed_filenames(self):
+    def test_get_recently_changed_filenames(self) -> None:
         """Test get_recently_changed_filenames detects file recently added."""
         # Create an empty folder.
         build.ensure_directory_exists(EMPTY_DIR)
@@ -656,7 +659,7 @@ class BuildTests(test_utils.GenericTestBase):
 
         build.safe_delete_directory_tree(EMPTY_DIR)
 
-    def test_generate_delete_tasks_to_remove_deleted_files(self):
+    def test_generate_delete_tasks_to_remove_deleted_files(self) -> None:
         """Test generate_delete_tasks_to_remove_deleted_files queues up the
         same number of deletion task as the number of deleted files.
         """
@@ -670,7 +673,7 @@ class BuildTests(test_utils.GenericTestBase):
         self.assertEqual(
             len(delete_tasks), build.get_file_count(MOCK_TEMPLATES_DEV_DIR))
 
-    def test_generate_app_yaml_with_deploy_mode(self):
+    def test_generate_app_yaml_with_deploy_mode(self) -> None:
         mock_dev_yaml_filepath = 'mock_app_dev.yaml'
         mock_yaml_filepath = 'mock_app.yaml'
         app_dev_yaml_filepath_swap = self.swap(
@@ -711,7 +714,7 @@ class BuildTests(test_utils.GenericTestBase):
         app_dev_yaml_temp_file.close()
 
     def test_generate_app_yaml_with_deploy_mode_with_nonexistent_var_raises(
-            self):
+            self) -> None:
         mock_dev_yaml_filepath = 'mock_app_dev.yaml'
         mock_yaml_filepath = 'mock_app.yaml'
         app_dev_yaml_filepath_swap = self.swap(
@@ -753,7 +756,7 @@ class BuildTests(test_utils.GenericTestBase):
         app_yaml_temp_file.close()
         app_dev_yaml_temp_file.close()
 
-    def test_modify_constants(self):
+    def test_modify_constants(self) -> None:
         mock_constants_path = 'mock_app_dev.yaml'
         mock_feconf_path = 'mock_app.yaml'
         constants_path_swap = self.swap(
@@ -803,7 +806,7 @@ class BuildTests(test_utils.GenericTestBase):
         constants_temp_file.close()
         feconf_temp_file.close()
 
-    def test_set_constants_to_default(self):
+    def test_set_constants_to_default(self) -> None:
         mock_constants_path = 'mock_app_dev.yaml'
         mock_feconf_path = 'mock_app.yaml'
         constants_path_swap = self.swap(
@@ -840,7 +843,7 @@ class BuildTests(test_utils.GenericTestBase):
         constants_temp_file.close()
         feconf_temp_file.close()
 
-    def test_safe_delete_file(self):
+    def test_safe_delete_file(self) -> None:
         temp_file = tempfile.NamedTemporaryFile()
         temp_file.name = 'some_file.txt'
         with python_utils.open_file('some_file.txt', 'w') as tmp:
@@ -850,9 +853,9 @@ class BuildTests(test_utils.GenericTestBase):
         build.safe_delete_file('some_file.txt')
         self.assertFalse(os.path.isfile('some_file.txt'))
 
-    def test_minify_third_party_libs(self):
+    def test_minify_third_party_libs(self) -> None:
 
-        def _mock_safe_delete_file(unused_filepath):
+        def _mock_safe_delete_file(unused_filepath: str) -> None:
             """Mocks build.safe_delete_file()."""
             pass
 
@@ -889,7 +892,7 @@ class BuildTests(test_utils.GenericTestBase):
         build.safe_delete_file(
             'core/tests/data/third_party/js/third_party.min.js.map')
 
-    def test_build_with_prod_env(self):
+    def test_build_with_prod_env(self) -> None:
         check_function_calls = {
             'build_using_webpack_gets_called': False,
             'ensure_files_exist_gets_called': False,
@@ -907,20 +910,20 @@ class BuildTests(test_utils.GenericTestBase):
 
         expected_config_path = build.WEBPACK_PROD_CONFIG
 
-        def mock_build_using_webpack(config_path):
+        def mock_build_using_webpack(config_path: str) -> None:
             self.assertEqual(config_path, expected_config_path)
             check_function_calls['build_using_webpack_gets_called'] = True
 
-        def mock_ensure_files_exist(unused_filepaths):
+        def mock_ensure_files_exist(unused_filepaths: list[str]) -> None:
             check_function_calls['ensure_files_exist_gets_called'] = True
 
-        def mock_modify_constants(prod_env, emulator_mode, maintenance_mode):  # pylint: disable=unused-argument
+        def mock_modify_constants(prod_env: bool, emulator_mode: bool, maintenance_mode: bool):  # pylint: disable=unused-argument
             check_function_calls['modify_constants_gets_called'] = True
 
-        def mock_compare_file_count(unused_first_dir, unused_second_dir):
+        def mock_compare_file_count(unused_first_dir: list[str], unused_second_dir: list[str]) -> None:
             check_function_calls['compare_file_count_gets_called'] = True
 
-        def mock_generate_python_package():
+        def mock_generate_python_package() -> None:
             check_function_calls['generate_python_package_called'] = True
 
         ensure_files_exist_swap = self.swap(
@@ -941,7 +944,7 @@ class BuildTests(test_utils.GenericTestBase):
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
-    def test_build_with_prod_source_maps(self):
+    def test_build_with_prod_source_maps(self) -> None:
         check_function_calls = {
             'build_using_webpack_gets_called': False,
             'ensure_files_exist_gets_called': False,
@@ -957,17 +960,17 @@ class BuildTests(test_utils.GenericTestBase):
 
         expected_config_path = build.WEBPACK_PROD_SOURCE_MAPS_CONFIG
 
-        def mock_build_using_webpack(config_path):
+        def mock_build_using_webpack(config_path: str) -> None:
             self.assertEqual(config_path, expected_config_path)
             check_function_calls['build_using_webpack_gets_called'] = True
 
-        def mock_ensure_files_exist(unused_filepaths):
+        def mock_ensure_files_exist(unused_filepaths: list[str]) -> None:
             check_function_calls['ensure_files_exist_gets_called'] = True
 
-        def mock_modify_constants(prod_env, emulator_mode, maintenance_mode):  # pylint: disable=unused-argument
+        def mock_modify_constants(prod_env: bool, emulator_mode: bool, maintenance_mode: bool) -> None:  # pylint: disable=unused-argument
             check_function_calls['modify_constants_gets_called'] = True
 
-        def mock_compare_file_count(unused_first_dir, unused_second_dir):
+        def mock_compare_file_count(unused_first_dir: list[str], unused_second_dir: list[str]) -> None:
             check_function_calls['compare_file_count_gets_called'] = True
 
         ensure_files_exist_swap = self.swap(
@@ -985,7 +988,7 @@ class BuildTests(test_utils.GenericTestBase):
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
-    def test_build_with_watcher(self):
+    def test_build_with_watcher(self) -> None:
         check_function_calls = {
             'ensure_files_exist_gets_called': False,
             'modify_constants_gets_called': False,
@@ -995,10 +998,10 @@ class BuildTests(test_utils.GenericTestBase):
             'modify_constants_gets_called': True,
         }
 
-        def mock_ensure_files_exist(unused_filepaths):
+        def mock_ensure_files_exist(unused_filepaths: list[str]) -> None:
             check_function_calls['ensure_files_exist_gets_called'] = True
 
-        def mock_modify_constants(prod_env, emulator_mode, maintenance_mode):  # pylint: disable=unused-argument
+        def mock_modify_constants(prod_env: bool, emulator_mode: bool, maintenance_mode: bool) -> None:  # pylint: disable=unused-argument
             check_function_calls['modify_constants_gets_called'] = True
 
         ensure_files_exist_swap = self.swap(
@@ -1010,14 +1013,14 @@ class BuildTests(test_utils.GenericTestBase):
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
-    def test_cannot_maintenance_mode_in_dev_mode(self):
+    def test_cannot_maintenance_mode_in_dev_mode(self) -> None:
         assert_raises_regexp_context_manager = self.assertRaisesRegexp(
             Exception,
             'maintenance_mode should only be enabled in prod build.')
         with assert_raises_regexp_context_manager:
             build.main(args=['--maintenance_mode'])
 
-    def test_cannot_minify_third_party_libs_in_dev_mode(self):
+    def test_cannot_minify_third_party_libs_in_dev_mode(self) -> None:
         check_function_calls = {
             'ensure_files_exist_gets_called': False,
         }
@@ -1025,7 +1028,7 @@ class BuildTests(test_utils.GenericTestBase):
             'ensure_files_exist_gets_called': True,
         }
 
-        def mock_ensure_files_exist(unused_filepaths):
+        def mock_ensure_files_exist(unused_filepaths: list[str]) -> None:
             check_function_calls['ensure_files_exist_gets_called'] = True
 
         ensure_files_exist_swap = self.swap(
@@ -1038,7 +1041,7 @@ class BuildTests(test_utils.GenericTestBase):
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
-    def test_only_minify_third_party_libs_in_dev_mode(self):
+    def test_only_minify_third_party_libs_in_dev_mode(self) -> None:
         check_function_calls = {
             'ensure_files_exist_gets_called': False,
             'ensure_modify_constants_gets_called': False,
@@ -1048,10 +1051,10 @@ class BuildTests(test_utils.GenericTestBase):
             'ensure_modify_constants_gets_called': False,
         }
 
-        def mock_ensure_files_exist(unused_filepaths):
+        def mock_ensure_files_exist(unused_filepaths: list[str]) -> None:
             check_function_calls['ensure_files_exist_gets_called'] = True
 
-        def mock_modify_constants(unused_prod_env, maintenance_mode):  # pylint: disable=unused-argument
+        def mock_modify_constants(unused_prod_env: bool, maintenance_mode: bool) -> None:  # pylint: disable=unused-argument
             check_function_calls['ensure_modify_constants_gets_called'] = True
 
         ensure_files_exist_swap = self.swap(
@@ -1063,10 +1066,10 @@ class BuildTests(test_utils.GenericTestBase):
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
-    def test_build_using_webpack_command(self):
+    def test_build_using_webpack_command(self) -> None:
 
         @contextlib.contextmanager
-        def mock_managed_webpack_compiler(config_path, max_old_space_size):
+        def mock_managed_webpack_compiler(config_path: str | None, max_old_space_size: int | None) -> Generator[psutil.Process]:
             self.assertEqual(config_path, build.WEBPACK_PROD_CONFIG)
             self.assertEqual(max_old_space_size, 4096)
             yield scripts_test_utils.PopenStub()
