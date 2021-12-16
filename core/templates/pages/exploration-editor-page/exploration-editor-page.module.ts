@@ -52,6 +52,7 @@ import { ModeratorUnpublishExplorationModalComponent } from './settings-tab/temp
 import { TransferExplorationOwnershipModalComponent } from './settings-tab/templates/transfer-exploration-ownership-modal.component';
 import { DeleteAudioTranslationModalComponent } from './translation-tab/modal-templates/delete-audio-translation-modal.component';
 import { TranslationTabBusyModalComponent } from './translation-tab/modal-templates/translation-tab-busy-modal.component';
+import { ConfirmDeleteStateModalComponent } from './editor-tab/templates/modal-templates/confirm-delete-state-modal.component';
 
 @NgModule({
   imports: [
@@ -85,7 +86,8 @@ import { TranslationTabBusyModalComponent } from './translation-tab/modal-templa
     ModeratorUnpublishExplorationModalComponent,
     TransferExplorationOwnershipModalComponent,
     DeleteAudioTranslationModalComponent,
-    TranslationTabBusyModalComponent
+    TranslationTabBusyModalComponent,
+    ConfirmDeleteStateModalComponent
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -109,7 +111,8 @@ import { TranslationTabBusyModalComponent } from './translation-tab/modal-templa
     ModeratorUnpublishExplorationModalComponent,
     TransferExplorationOwnershipModalComponent,
     DeleteAudioTranslationModalComponent,
-    TranslationTabBusyModalComponent
+    TranslationTabBusyModalComponent,
+    ConfirmDeleteStateModalComponent
   ],
   providers: [
     {

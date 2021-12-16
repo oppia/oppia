@@ -98,6 +98,19 @@ describe('TranslateTextBackendApiService', () => {
   });
 
   describe('suggestTranslatedTextAsync', () => {
+    class MockReaderObject {
+    result = 'data:image/png;base64,imageBlob1';
+    onload: () => string;
+    constructor() {
+      this.onload = () => {
+        return 'Fake onload executed';
+      };
+    }
+    readAsDataURL(file: Blob) {
+      this.onload();
+      return 'The file is loaded';
+    }
+    }
     let successHandler: jasmine.Spy<jasmine.Func>;
     let failHandler: (error: HttpErrorResponse) => void;
     let imagesData: ImagesData[];
@@ -106,14 +119,17 @@ describe('TranslateTextBackendApiService', () => {
       failHandler = jasmine.createSpy('error');
       imagesData = [{
         filename: 'imageFilename',
-        imageBlob: {
-          size: 0,
-          type: 'imageBlob'
-        } as Blob
+        imageBlob: new Blob(['imageBlob1'], {type: 'image'})
       }];
     });
 
     it('should correctly submit a translation suggestion', fakeAsync(() => {
+    // This throws "Argument of type 'mockReaderObject' is not assignable to
+    // parameter of type 'HTMLImageElement'.". We need to suppress this
+    // error because 'HTMLImageElement' has around 250 more properties.
+    // We have only defined the properties we need in 'mockReaderObject'.
+    // @ts-expect-error
+      spyOn(window, 'FileReader').and.returnValue(new MockReaderObject());
       const expectedPayload = {
         suggestion_type: 'translate_content',
         target_type: 'exploration',
@@ -128,6 +144,9 @@ describe('TranslateTextBackendApiService', () => {
           content_html: 'contentHtml',
           translation_html: 'translationHtml',
           data_format: 'html'
+        },
+        files: {
+          imageFilename: 'imageBlob1'
         }
       };
 
@@ -141,6 +160,7 @@ describe('TranslateTextBackendApiService', () => {
         'translationHtml',
         imagesData,
         'html').then(successHandler, failHandler);
+      flushMicrotasks();
       const req = httpTestingController.expectOne(
         '/suggestionhandler/');
       expect(req.request.method).toEqual('POST');
@@ -153,6 +173,8 @@ describe('TranslateTextBackendApiService', () => {
     }));
 
     it('should append image data to form data', fakeAsync(() => {
+      spyOn(translateTextBackendApiService, 'blobtoBase64').and.returnValue(
+        Promise.resolve('imageBlob'));
       translateTextBackendApiService.suggestTranslatedTextAsync(
         'activeExpId',
         'activeExpVersion',
@@ -163,13 +185,13 @@ describe('TranslateTextBackendApiService', () => {
         'translationHtml',
         imagesData,
         'html').then(successHandler, failHandler);
+      flushMicrotasks();
       const req = httpTestingController.expectOne(
         '/suggestionhandler/');
+      const files = JSON.parse(req.request.body.getAll('payload')[0]).files;
+      const images = Object.values(files);
       expect(req.request.method).toEqual('POST');
-      expect(req.request.body.getAll('imageFilename')[0]).toContain([{
-        size: 0,
-        type: 'imageBlob'
-      }]);
+      expect(images).toContain('imageBlob');
       req.flush({});
       flushMicrotasks();
 
@@ -201,6 +223,9 @@ describe('TranslateTextBackendApiService', () => {
           type: 'imageBlob2'
         } as Blob
       }];
+      spyOn(translateTextBackendApiService, 'blobtoBase64').and.returnValue(
+        Promise.resolve(['imageBlob1', 'imageBlob2'])
+      );
       translateTextBackendApiService.suggestTranslatedTextAsync(
         'activeExpId',
         'activeExpVersion',
@@ -211,41 +236,33 @@ describe('TranslateTextBackendApiService', () => {
         'translationHtml',
         imagesData,
         'html').then(successHandler, failHandler);
+      flushMicrotasks();
       const req = httpTestingController.expectOne(
         '/suggestionhandler/');
       expect(req.request.method).toEqual('POST');
-      const filename1Blobs = req.request.body.getAll('imageFilename1')[0];
-      const filename2Blobs = req.request.body.getAll('imageFilename2')[0];
-      const filename3Blobs = req.request.body.getAll('imageFilename1')[1];
-      const filename4Blobs = req.request.body.getAll('imageFilename2')[1];
-      expect(filename1Blobs).toContain([{
-        size: 0,
-        type: 'imageBlob1'
-      }]);
-      expect(filename2Blobs).toContain([{
-        size: 0,
-        type: 'imageBlob1'
-      }]);
-      expect(filename3Blobs).toContain([{
-        size: 0,
-        type: 'imageBlob2'
-      }]);
-      expect(filename4Blobs).toContain([{
-        size: 0,
-        type: 'imageBlob2'
-      }]);
+      const files = JSON.parse(req.request.body.getAll('payload')[0]).files;
+      const filename1Blobs = files.imageFilename1[0];
+      const filename2Blobs = files.imageFilename2[0];
+      const filename3Blobs = files.imageFilename1[1];
+      const filename4Blobs = files.imageFilename2[1];
+      expect(filename1Blobs).toContain('imageBlob1');
+      expect(filename2Blobs).toContain('imageBlob1');
+      expect(filename3Blobs).toContain('imageBlob2');
+      expect(filename4Blobs).toContain('imageBlob2');
       req.flush({});
       flushMicrotasks();
 
       expect(successHandler).toHaveBeenCalled();
     }));
 
+
     it('should call the failhandler on error response', fakeAsync(() => {
       const errorEvent = new ErrorEvent('error');
       failHandler = (error: HttpErrorResponse) => {
         expect(error.error).toBe(errorEvent);
       };
-
+      spyOn(translateTextBackendApiService, 'blobtoBase64').and.returnValue(
+        Promise.resolve('imageBlob'));
       translateTextBackendApiService.suggestTranslatedTextAsync(
         'activeExpId',
         'activeExpVersion',
@@ -256,6 +273,7 @@ describe('TranslateTextBackendApiService', () => {
         'translationHtml',
         imagesData,
         'html').then(successHandler, failHandler);
+      flushMicrotasks();
       const req = httpTestingController.expectOne(
         '/suggestionhandler/');
       expect(req.request.method).toEqual('POST');
@@ -282,6 +300,25 @@ describe('TranslateTextBackendApiService', () => {
           imagesData,
           'html')
       ).toBeRejectedWithError('No image data found');
+    });
+
+    it('should throw error if prefix is invalid', async() => {
+      imagesData = [{
+        filename: 'imageFilename1',
+        imageBlob: new Blob(['data:random/xyz;base64,Blob1'], {type: 'image'})
+      }];
+      await expectAsync(
+        translateTextBackendApiService.suggestTranslatedTextAsync(
+          'activeExpId',
+          'activeExpVersion',
+          'activeContentId',
+          'activeStateName',
+          'languageCode',
+          'contentHtml',
+          'translationHtml',
+          imagesData,
+          'html')
+      ).toBeRejectedWithError('No valid prefix found in data url');
     });
   });
 });
