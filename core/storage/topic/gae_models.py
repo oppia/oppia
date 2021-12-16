@@ -22,7 +22,7 @@ from core import feconf
 from core.constants import constants
 from core.platform import models
 
-from typing import Any, Dict, List, Optional, Sequence
+from typing import Any, Dict, List, Mapping, Optional, Sequence, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -174,13 +174,17 @@ class TopicModel(base_models.VersionedModel):
 
     # TODO(#13523): Change 'commit_cmds' to TypedDict/Domain Object
     # to remove Any used below.
-    def _trusted_commit(
-            self,
-            committer_id: str,
-            commit_type: str,
-            commit_message: str,
-            commit_cmds: List[Dict[str, Any]]
-    ) -> None:
+    def compute_models_to_commit(
+        self,
+        committer_id: str,
+        commit_type: str,
+        commit_message: str,
+        commit_cmds: List[Dict[str, Any]],
+        # We expect Mapping because we want to allow models that inherit
+        # from BaseModel as the values, if we used Dict this wouldn't
+        # be allowed.
+        additional_models: Mapping[str, base_models.BaseModel]
+    ) -> base_models.ModelsToPutDict:
         """Record the event to the commit log after the model commit.
 
         Note that this extends the superclass method.
@@ -196,11 +200,32 @@ class TopicModel(base_models.VersionedModel):
                 reconstruct the commit. Each dict always contains:
                     cmd: str. Unique command.
                 and then additional arguments for that command.
-        """
-        super(TopicModel, self)._trusted_commit(
-            committer_id, commit_type, commit_message, commit_cmds)
+            additional_models: dict(str, BaseModel). Additional models that are
+                needed for the commit process.
 
-        topic_rights = TopicRightsModel.get_by_id(self.id)
+        Returns:
+            ModelsToPutDict. A dict of models that should be put into
+            the datastore.
+        """
+        models_to_put = super().compute_models_to_commit(
+            committer_id,
+            commit_type,
+            commit_message,
+            commit_cmds,
+            additional_models
+        )
+
+        if (
+                isinstance(additional_models, dict) and
+                'rights_model' in additional_models
+        ):
+            topic_rights = cast(
+                TopicRightsModel,
+                additional_models['exploration_rights_model']
+            )
+        else:
+            topic_rights = TopicRightsModel.get_by_id(self.id)
+
         if topic_rights.topic_is_published:
             status = constants.ACTIVITY_STATUS_PUBLIC
         else:
@@ -211,8 +236,12 @@ class TopicModel(base_models.VersionedModel):
             commit_message, commit_cmds, status, False
         )
         topic_commit_log_entry.topic_id = self.id
-        topic_commit_log_entry.update_timestamps()
-        topic_commit_log_entry.put()
+        return {
+            'snapshot_metadata_model': models_to_put['snapshot_metadata_model'],
+            'snapshot_content_model': models_to_put['snapshot_content_model'],
+            'commit_log_model': topic_commit_log_entry,
+            'versioned_model': models_to_put['versioned_model'],
+        }
 
     @classmethod
     def get_by_name(cls, topic_name: str) -> Optional[TopicModel]:
@@ -473,13 +502,17 @@ class TopicRightsModel(base_models.VersionedModel):
 
     # TODO(#13523): Change 'commit_cmds' to TypedDict/Domain Object
     # to remove Any used below.
-    def _trusted_commit(
-            self,
-            committer_id: str,
-            commit_type: str,
-            commit_message: str,
-            commit_cmds: List[Dict[str, Any]]
-    ) -> None:
+    def compute_models_to_commit(
+        self,
+        committer_id: str,
+        commit_type: str,
+        commit_message: str,
+        commit_cmds: List[Dict[str, Any]],
+        # We expect Mapping because we want to allow models that inherit
+        # from BaseModel as the values, if we used Dict this wouldn't
+        # be allowed.
+        additional_models: Mapping[str, base_models.BaseModel]
+    ) -> base_models.ModelsToPutDict:
         """Record the event to the commit log after the model commit.
 
         Note that this extends the superclass method.
@@ -495,17 +528,27 @@ class TopicRightsModel(base_models.VersionedModel):
                 reconstruct the commit. Each dict always contains:
                     cmd: str. Unique command.
                 and then additional arguments for that command.
-        """
-        super(TopicRightsModel, self)._trusted_commit(
-            committer_id, commit_type, commit_message, commit_cmds)
+            additional_models: dict(str, BaseModel). Additional models that are
+                needed for the commit process.
 
-        topic_rights = TopicRightsModel.get_by_id(self.id)
-        if topic_rights.topic_is_published:
+        Returns:
+            ModelsToPutDict. A dict of models that should be put into
+            the datastore.
+        """
+        models_to_put = super().compute_models_to_commit(
+            committer_id,
+            commit_type,
+            commit_message,
+            commit_cmds,
+            additional_models
+        )
+
+        if self.topic_is_published:
             status = constants.ACTIVITY_STATUS_PUBLIC
         else:
             status = constants.ACTIVITY_STATUS_PRIVATE
 
-        TopicCommitLogEntryModel(
+        topic_commit_log = TopicCommitLogEntryModel(
             id=('rights-%s-%s' % (self.id, self.version)),
             user_id=committer_id,
             topic_id=self.id,
@@ -515,14 +558,10 @@ class TopicRightsModel(base_models.VersionedModel):
             version=None,
             post_commit_status=status,
             post_commit_community_owned=False,
-            post_commit_is_private=not topic_rights.topic_is_published
-        ).put()
+            post_commit_is_private=not self.topic_is_published
+        )
 
-        snapshot_metadata_model = self.SNAPSHOT_METADATA_CLASS.get(
-            self.get_snapshot_id(self.id, self.version))
-
-        # Ruling out the possibility of None for mypy type checking.
-        assert snapshot_metadata_model is not None
+        snapshot_metadata_model = models_to_put['snapshot_metadata_model']
         snapshot_metadata_model.content_user_ids = list(sorted(set(
             self.manager_ids)))
 
@@ -538,8 +577,12 @@ class TopicRightsModel(base_models.VersionedModel):
         snapshot_metadata_model.commit_cmds_user_ids = list(
             sorted(commit_cmds_user_ids))
 
-        snapshot_metadata_model.update_timestamps()
-        snapshot_metadata_model.put()
+        return {
+            'snapshot_metadata_model': models_to_put['snapshot_metadata_model'],
+            'snapshot_content_model': models_to_put['snapshot_content_model'],
+            'commit_log_model': topic_commit_log,
+            'versioned_model': models_to_put['versioned_model'],
+        }
 
     @staticmethod
     def get_model_association_to_user(

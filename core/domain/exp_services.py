@@ -580,6 +580,40 @@ def apply_change_list(exploration_id, change_list):
         raise e
 
 
+def populate_exploration_model_fields(exploration_model, exploration):
+    """Populate exploration model with the data from exploration object.
+
+    Args:
+        exploration_model: ExplorationModel. The model to populate.
+        exploration: Exploration. The exploration domain object which should be used to
+            populate the model.
+
+    Returns:
+        ExplorationModel. Populated model.
+    """
+    exploration_model.category = exploration.category
+    exploration_model.title = exploration.title
+    exploration_model.objective = exploration.objective
+    exploration_model.language_code = exploration.language_code
+    exploration_model.tags = exploration.tags
+    exploration_model.blurb = exploration.blurb
+    exploration_model.author_notes = exploration.author_notes
+
+    exploration_model.states_schema_version = exploration.states_schema_version
+    exploration_model.init_state_name = exploration.init_state_name
+    exploration_model.states = {
+        state_name: state.to_dict()
+        for (state_name, state) in exploration.states.items()}
+    exploration_model.param_specs = exploration.param_specs_dict
+    exploration_model.param_changes = exploration.param_change_dicts
+    exploration_model.auto_tts_enabled = exploration.auto_tts_enabled
+    exploration_model.proto_size_in_bytes = exploration.proto_size_in_bytes
+    exploration_model.correctness_feedback_enabled = (
+        exploration.correctness_feedback_enabled)
+
+    return exploration_model
+
+
 def _save_exploration(committer_id, exploration, commit_message, change_list):
     """Validates an exploration and commits it to persistent storage.
 
@@ -618,24 +652,8 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
 
     old_states = exp_fetchers.get_exploration_from_model(
         exploration_model).states
-    exploration_model.category = exploration.category
-    exploration_model.title = exploration.title
-    exploration_model.objective = exploration.objective
-    exploration_model.language_code = exploration.language_code
-    exploration_model.tags = exploration.tags
-    exploration_model.blurb = exploration.blurb
-    exploration_model.author_notes = exploration.author_notes
 
-    exploration_model.states_schema_version = exploration.states_schema_version
-    exploration_model.init_state_name = exploration.init_state_name
-    exploration_model.states = {
-        state_name: state.to_dict()
-        for (state_name, state) in exploration.states.items()}
-    exploration_model.param_specs = exploration.param_specs_dict
-    exploration_model.param_changes = exploration.param_change_dicts
-    exploration_model.auto_tts_enabled = exploration.auto_tts_enabled
-    exploration_model.correctness_feedback_enabled = (
-        exploration.correctness_feedback_enabled)
+    populate_exploration_model_fields(exploration_model, exploration)
 
     change_list_dict = [change.to_dict() for change in change_list]
     exploration_model.commit(committer_id, commit_message, change_list_dict)

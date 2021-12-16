@@ -125,7 +125,10 @@ def run_job(
     with _job_bookkeeping_context(job_name) as run_model:
         _ = job.run() | job_io.PutResults(run_model.id)
 
+        print('run_resultrun_resultrun_result')
         run_result = pipeline.run()
+        
+        pritn(run_result)
 
         if sync:
             run_result.wait_until_finish()
