@@ -237,11 +237,13 @@ def does_story_exist_with_url_fragment(url_fragment):
 
 
 def validate_prerequisite_skills_in_story_contents(
-        corresponding_topic_id, story_contents):
+    skill_ids_in_corresponding_topic, story_contents
+):
     """Validates the prerequisites skills in the story contents.
 
     Args:
-        corresponding_topic_id: str. The corresponding topic id of the story.
+        skill_ids_in_corresponding_topic: list(str). List of skill IDs in
+            the corresponding topic of the story.
         story_contents: StoryContents. The story contents.
 
     Raises:
@@ -290,12 +292,9 @@ def validate_prerequisite_skills_in_story_contents(
                 raise utils.ValidationError(
                     'Loops are not allowed in stories.')
             destination_node = story_contents.nodes[node_index]
-            skill_ids_present_in_topic = (
-                topic_fetchers.get_topic_by_id(
-                    corresponding_topic_id).get_all_skill_ids())
             # Include only skill ids relevant to the topic for validation.
             topic_relevant_skill_ids = list(
-                set(skill_ids_present_in_topic).intersection(
+                set(skill_ids_in_corresponding_topic).intersection(
                     set(destination_node.prerequisite_skill_ids)))
             if not (
                     set(
@@ -450,8 +449,10 @@ def _save_story(
             'save story %s: %s' % (story.id, change_list))
 
     story.validate()
+    corresponding_topic = (
+        topic_fetchers.get_topic_by_id(story.corresponding_topic_id))
     validate_prerequisite_skills_in_story_contents(
-        story.corresponding_topic_id, story.story_contents)
+        corresponding_topic.get_all_skill_ids(), story.story_contents)
 
     if story_is_published:
         exp_ids = []

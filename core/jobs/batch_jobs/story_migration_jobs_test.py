@@ -31,9 +31,13 @@ from core.platform import models
 
 MYPY = False
 if MYPY:
+    from mypy_imports import datastore_services
     from mypy_imports import story_models
 
-(story_models,) = models.Registry.import_models([models.NAMES.story])
+(story_models, topic_models) = models.Registry.import_models([
+    models.NAMES.story, models.NAMES.topic
+])
+datastore_services = models.Registry.import_datastore_services()
 
 
 class MigrateStoryJobTests(job_test_utils.JobTestBase):
@@ -41,6 +45,7 @@ class MigrateStoryJobTests(job_test_utils.JobTestBase):
     JOB_CLASS = story_migration_jobs.MigrateStoryJob
 
     STORY_1_ID = 'story_1_id'
+    TOPIC_1_ID = 'topic_1_id'
 
     def setUp(self):
         super().setUp()
@@ -56,8 +61,24 @@ class MigrateStoryJobTests(job_test_utils.JobTestBase):
             story_model_created_on=datetime.datetime.utcnow(),
             version=1
         )
-        story_summary_model.update_timestamps()
-        story_summary_model.put()
+        topic_model = self.create_model(
+            topic_models.TopicModel,
+            id=self.TOPIC_1_ID,
+            name='topic title',
+            canonical_name='topic title',
+            story_reference_schema_version=1,
+            subtopic_schema_version=1,
+            next_subtopic_id=1,
+            language_code='cs',
+            url_fragment='topic',
+            canonical_story_references=[{
+                'story_id': self.STORY_1_ID,
+                'story_is_published': False
+            }]
+        )
+        datastore_services.update_timestamps_multi([
+            topic_model, story_summary_model])
+        datastore_services.put_multi([topic_model, story_summary_model])
         self.latest_contents = {
             'nodes': [{
                 'id': 'node_1111',
@@ -95,7 +116,7 @@ class MigrateStoryJobTests(job_test_utils.JobTestBase):
             notes='notes',
             description='description',
             story_contents=self.unmigrated_contents,
-            corresponding_topic_id='topic_id',
+            corresponding_topic_id=self.TOPIC_1_ID,
             url_fragment='urlfragment',
         )
         story_model.update_timestamps()
@@ -127,7 +148,7 @@ class MigrateStoryJobTests(job_test_utils.JobTestBase):
             notes='notes',
             description='description',
             story_contents=self.broken_contents,
-            corresponding_topic_id='topic_id',
+            corresponding_topic_id=self.TOPIC_1_ID,
             url_fragment='urlfragment',
         )
         story_model.update_timestamps()
@@ -160,7 +181,7 @@ class MigrateStoryJobTests(job_test_utils.JobTestBase):
             notes='notes',
             description='description',
             story_contents=self.latest_contents,
-            corresponding_topic_id='topic_id',
+            corresponding_topic_id=self.TOPIC_1_ID,
             url_fragment='urlfragment',
         )
         story_model.update_timestamps()
@@ -193,7 +214,7 @@ class MigrateStoryJobTests(job_test_utils.JobTestBase):
             notes='notes',
             description='description',
             story_contents=self.latest_contents,
-            corresponding_topic_id='topic_id',
+            corresponding_topic_id=self.TOPIC_1_ID,
             url_fragment='urlfragment',
         )
         story_model.update_timestamps()

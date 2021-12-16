@@ -25,6 +25,8 @@ from core.domain import caching_services
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_services
+from core.domain import topic_domain
+from core.domain import topic_fetchers
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
@@ -34,16 +36,17 @@ from core.platform import models
 import apache_beam as beam
 import result
 
-from typing import Iterable, Sequence, Tuple
+from typing import Dict, Iterable, Optional, Sequence, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import datastore_services
     from mypy_imports import story_models
+    from mypy_imports import topic_models
 
-(base_models, story_models,) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.story])
+(base_models, story_models, topic_models) = models.Registry.import_models([
+    models.NAMES.base_model, models.NAMES.story, models.NAMES.topic])
 datastore_services = models.Registry.import_datastore_services()
 
 
@@ -52,13 +55,19 @@ class MigrateStoryJob(base_jobs.JobBase):
 
     @staticmethod
     def _migrate_story(
-        story_id: str, story_model: story_models.StoryModel
+        story_id: str,
+        story_model: story_models.StoryModel,
+        # This must have a default value of None. Otherwise, Beam won't
+        # execute this code.
+        topic_id_to_topic: Optional[Dict[str, topic_domain.Topic]] = None
     ) -> result.Result[Tuple[str, story_domain.Story], Tuple[str, Exception]]:
         """Migrates story and transform story model into story object.
 
         Args:
             story_id: str. The id of the story.
             story_model: StoryModel. The story model to migrate.
+            topic_id_to_topic: dict(str, Topic). The mapping from topic ID
+                to topic.
 
         Returns:
             Result((str, Story), (str, Exception)). Result containing tuple that
@@ -69,8 +78,11 @@ class MigrateStoryJob(base_jobs.JobBase):
         try:
             story = story_fetchers.get_story_from_model(story_model)
             story.validate()
+            assert topic_id_to_topic is not None
             story_services.validate_prerequisite_skills_in_story_contents(
-                story.corresponding_topic_id, story.story_contents)
+                topic_id_to_topic[story.corresponding_topic_id],
+                story.story_contents
+            )
         except Exception as e:
             logging.exception(e)
             return result.Err((story_id, e))
@@ -204,11 +216,23 @@ class MigrateStoryJob(base_jobs.JobBase):
             | 'Add story summary keys' >> beam.WithKeys( # pylint: disable=no-value-for-parameter
                 lambda story_summary_model: story_summary_model.id)
         )
+        topics = (
+            self.pipeline
+            | 'Get all non-deleted topic models' >> (
+                ndb_io.GetModels(topic_models.TopicModel.get_all()))
+            | 'Transform model into domain object' >> beam.Map(
+                topic_fetchers.get_topic_from_model)
+            # Pylint disable is needed because pylint is not able to correctly
+            # detect that the value is passed through the pipe.
+            | 'Add topic keys' >> beam.WithKeys( # pylint: disable=no-value-for-parameter
+                lambda topic: topic.id)
+        )
+        topic_id_to_topic = beam.pvalue.AsDict(topics)
 
         migrated_story_results = (
             unmigrated_story_models
             | 'Transform and migrate model' >> beam.MapTuple(
-                self._migrate_story)
+                self._migrate_story, topic_id_to_topic=topic_id_to_topic)
         )
         migrated_stories = (
             migrated_story_results
