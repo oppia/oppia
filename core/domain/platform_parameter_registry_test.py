@@ -18,8 +18,9 @@
 
 from __future__ import annotations
 
+import enum
+
 from core import feconf
-from core import python_utils
 from core import utils
 from core.domain import caching_services
 from core.domain import platform_parameter_domain as parameter_domain
@@ -32,7 +33,12 @@ from core.tests import test_utils
 
 DATA_TYPES = parameter_domain.DATA_TYPES # pylint: disable=invalid-name
 FEATURE_STAGES = parameter_domain.FEATURE_STAGES # pylint: disable=invalid-name
-PARAM_NAMES = python_utils.create_enum('parameter_a')  # pylint: disable=invalid-name
+
+
+class ParamNames(enum.Enum):
+    """Enum for parameter names."""
+
+    PARAMETER_A = 'parameter_a'
 
 
 class PlatformParameterRegistryTests(test_utils.GenericTestBase):
@@ -81,16 +87,19 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
 
     def test_create_platform_parameter(self):
         parameter = registry.Registry.create_platform_parameter(
-            PARAM_NAMES.parameter_a, 'test', registry.DATA_TYPES.bool)
+            ParamNames.PARAMETER_A, 'test', registry.DATA_TYPES.bool)
         self.assertIsInstance(parameter, parameter_domain.PlatformParameter)
         parameter.validate()
 
     def test_create_platform_parameter_with_invalid_type_failure(self):
-        _data_type = python_utils.create_enum('invalid')
+        class DataType(enum.Enum):
+            """Enum for data type."""
+
+            INVALID = 'invalid'
         with self.assertRaisesRegexp(
             Exception, 'Unsupported data type \'invalid\''):
             registry.Registry.create_platform_parameter(
-                PARAM_NAMES.parameter_a, 'test', _data_type.invalid)
+                ParamNames.PARAMETER_A, 'test', DataType.INVALID)
 
     def test_create_platform_parameter_with_the_same_name_failure(self):
         param_name = 'parameter_a'
@@ -101,7 +110,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
 
     def test_create_feature_flag(self):
         feature = registry.Registry.create_feature_flag(
-            PARAM_NAMES.parameter_a, 'test feature', FEATURE_STAGES.dev)
+            ParamNames.PARAMETER_A, 'test feature', FEATURE_STAGES.dev)
         self.assertEqual(feature.data_type, registry.DATA_TYPES.bool.value)
         self.assertTrue(feature.is_feature)
         self.assertEqual(feature.feature_stage, FEATURE_STAGES.dev.value)
@@ -109,19 +118,19 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
 
     def test_default_value_of_bool_platform_parameter(self):
         parameter = registry.Registry.create_platform_parameter(
-            PARAM_NAMES.parameter_a, 'test feature', registry.DATA_TYPES.bool)
+            ParamNames.PARAMETER_A, 'test feature', registry.DATA_TYPES.bool)
         parameter.validate()
         self.assertEqual(parameter.default_value, False)
 
     def test_default_value_of_string_platform_parameter(self):
         parameter = registry.Registry.create_platform_parameter(
-            PARAM_NAMES.parameter_a, 'test', DATA_TYPES.string)
+            ParamNames.PARAMETER_A, 'test', DATA_TYPES.string)
         parameter.validate()
         self.assertEqual(parameter.default_value, '')
 
     def test_default_value_of_number_platform_parameter(self):
         parameter = registry.Registry.create_platform_parameter(
-            PARAM_NAMES.parameter_a, 'test', DATA_TYPES.number)
+            ParamNames.PARAMETER_A, 'test', DATA_TYPES.number)
         parameter.validate()
         self.assertEqual(parameter.default_value, 0)
 
@@ -238,7 +247,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             self):
         parameter_name = 'parameter_a'
         registry.Registry.create_feature_flag(
-            PARAM_NAMES.parameter_a, 'dev feature', FEATURE_STAGES.dev)
+            ParamNames.PARAMETER_A, 'dev feature', FEATURE_STAGES.dev)
 
         with self.assertRaisesRegexp(
             utils.ValidationError,
@@ -265,7 +274,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             self):
         parameter_name = 'parameter_a'
         registry.Registry.create_feature_flag(
-            PARAM_NAMES.parameter_a, 'dev feature', FEATURE_STAGES.dev)
+            ParamNames.PARAMETER_A, 'dev feature', FEATURE_STAGES.dev)
 
         with self.assertRaisesRegexp(
             utils.ValidationError,
@@ -292,7 +301,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             self):
         parameter_name = 'parameter_a'
         registry.Registry.create_feature_flag(
-            PARAM_NAMES.parameter_a, 'dev feature', FEATURE_STAGES.test)
+            ParamNames.PARAMETER_A, 'dev feature', FEATURE_STAGES.test)
 
         with self.assertRaisesRegexp(
             utils.ValidationError,

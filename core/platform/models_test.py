@@ -209,7 +209,10 @@ class RegistryUnitTest(test_utils.TestBase):
     def test_import_models_invalid(self) -> None:
         """Tests import_models function with an invalid option."""
         with self.assertRaisesRegexp(Exception, 'Invalid model name: '): # type: ignore[no-untyped-call]
-            self.registry_instance.import_models([''])
+            # Using type ignore[list-item] because list item 0 is a string.
+            # expected type class names. This is done to test the function
+            # with invalid model names.
+            self.registry_instance.import_models(['']) # type: ignore[list-item]
 
     def test_get_storage_model_classes(self) -> None:
         """Tests get_all_storage_model_classes."""

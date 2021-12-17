@@ -17,10 +17,10 @@
 from __future__ import annotations
 
 import datetime
+import enum
 import types
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.platform import models
 from core.tests import test_utils
@@ -291,17 +291,23 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
     def test_get_filter_options_with_invalid_field_throws_exception(
             self) -> None:
         model_class = app_feedback_report_models.AppFeedbackReportModel
-        invalid_filter = python_utils.create_enum('invalid_field') # type: ignore[no-untyped-call]
+        class InvalidFilter(enum.Enum):
+            """Invalid filter."""
+
+            INVALID_FIELD = 'invalid_field'
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.InvalidInputException,
             'The field %s is not a valid field to filter reports on' % (
-                invalid_filter.invalid_field.name)
+                InvalidFilter.INVALID_FIELD.name)
         ):
             with self.swap(
                 model_class, 'query',
                 self._mock_query_filters_returns_empy_list):
+                # Using type ignore[arg-type] because we passes arg of type
+                # InvalidFilter to type class filter_field_names. This is done
+                # to ensure that InvalidInputException is thrown.
                 model_class.get_filter_options_for_field(
-                    invalid_filter.invalid_field)
+                    InvalidFilter.INVALID_FIELD) # type: ignore[arg-type]
 
     def _mock_query_filters_returns_empy_list(
             self, projection: bool, distinct: bool) -> List[Any]: # pylint: disable=unused-argument
