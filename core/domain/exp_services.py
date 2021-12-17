@@ -610,7 +610,6 @@ def populate_exploration_model_fields(exploration_model, exploration):
     exploration_model.param_specs = exploration.param_specs_dict
     exploration_model.param_changes = exploration.param_change_dicts
     exploration_model.auto_tts_enabled = exploration.auto_tts_enabled
-    exploration_model.proto_size_in_bytes = exploration.proto_size_in_bytes
     exploration_model.correctness_feedback_enabled = (
         exploration.correctness_feedback_enabled)
 

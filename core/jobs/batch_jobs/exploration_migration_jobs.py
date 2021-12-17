@@ -247,7 +247,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
                     'exp_model': objects['exp_model'][0],
                     'exploration_summary_model': objects['exploration_summary_model'][0],
                     'exploration': objects['exploration'][0],
-                    'exploration_changes': objects['exploration_changes'][0]
+                    'exploration_changes': objects['exploration_changes']
                 })
         )
 
@@ -277,18 +277,8 @@ class MigrateExplorationJob(base_jobs.JobBase):
                 ))
         )
 
-        exploration_summary_models_to_put = (
-            exploration_objects_list
-            | 'Generate exploration summary models to put' >> beam.FlatMap(
-                lambda exp_objects: self._update_exploration_summary(
-                    exp_objects['exploration'],
-                    exp_objects['exploration_changes'],
-                ))
-        )
-
         unused_put_results = (
-            (exp_models_to_put, exploration_summary_models_to_put)
-            | 'Merge models' >> beam.Flatten()
+            exp_models_to_put
             | 'Put models into the datastore' >> ndb_io.PutModels()
         )
 

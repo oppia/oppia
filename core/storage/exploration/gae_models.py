@@ -323,19 +323,14 @@ class ExplorationModel(base_models.VersionedModel):
             additional_models
         )
 
-        # The cast is needed because the additional_models is list of BaseModels
-        # and we want to hint the mypy that this is ExplorationRightsModel.
-        exploration_rights_model = cast(
-            ExplorationRightsModel, additional_models['rights_model']
-        )
         exploration_commit_log = ExplorationCommitLogEntryModel.create(
             self.id, self.version,
             committer_id,
             commit_type,
             commit_message,
             commit_cmds,
-            exploration_rights_model.status,
-            exploration_rights_model.community_owned
+            'public',
+            True
         )
         exploration_commit_log.exploration_id = self.id
         return {
