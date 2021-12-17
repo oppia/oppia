@@ -271,7 +271,7 @@ describe('StateHintsEditorComponent', () => {
       ];
       spyOn(ngbModal, 'open').and.returnValue({
         componentInstance: new MockNgbModalRef(),
-        result: Promise.resolve({
+        result: $q.resolve({
           hint: {
             hintContent: {
               html: '<p> New hint </p>'
