@@ -204,7 +204,9 @@ def generate_app_yaml(deploy_mode: bool =False):
 
 
 def modify_constants(
-        prod_env: bool = False, emulator_mode: bool = True, maintenance_mode: bool = False):
+        prod_env: bool = False,
+        emulator_mode: bool = True,
+        maintenance_mode: bool = False):
     """Modify constants.ts and feconf.py.
 
     Args:
