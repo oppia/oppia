@@ -18,7 +18,7 @@
 
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { AddHintModalComponent } from './add-hint-modal.component';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ChangeDetectorRef, NO_ERRORS_SCHEMA } from '@angular/core';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { StateHintsService } from
   // eslint-disable-next-line max-len
@@ -26,6 +26,10 @@ import { StateHintsService } from
 import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { ContextService } from 'services/context.service';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+
+class MockChangeDetectorRef {
+  detectChanges(): void {}
+}
 
 describe('Add Hint Modal Controller', function() {
   let component: AddHintModalComponent;
@@ -35,6 +39,7 @@ describe('Add Hint Modal Controller', function() {
   let generateContentIdService: GenerateContentIdService;
   let contextService: ContextService;
   let ngbActiveModal: NgbActiveModal;
+  let changeDetectorRef: MockChangeDetectorRef = new MockChangeDetectorRef();
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -46,6 +51,10 @@ describe('Add Hint Modal Controller', function() {
         GenerateContentIdService,
         ContextService,
         NgbActiveModal,
+        {
+          provide: ChangeDetectorRef,
+          useValue: changeDetectorRef
+        }
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -71,7 +80,23 @@ describe('Add Hint Modal Controller', function() {
       expect(component.tmpHint).toBe('');
       expect(component.addHintForm).toEqual({});
       expect(component.hintIndex).toBe(5);
+      expect(component.HINT_FORM_SCHEMA).toEqual({
+        type: 'html',
+        ui_config: {
+          hide_complex_extensions: true,
+        }
+      });
     });
+
+  it('should get schema', () => {
+    component.ngOnInit();
+    expect(component.getSchema()).toEqual({
+      type: 'html',
+      ui_config: {
+        hide_complex_extensions: true
+      }
+    });
+  });
 
   it('should save hint when closing the modal', function() {
     let contentId = 'cont_1';
@@ -96,5 +121,20 @@ describe('Add Hint Modal Controller', function() {
     let hint2 = hint1.repeat(35);
     expect(component.isHintLengthExceeded(hint1)).toBe(false);
     expect(component.isHintLengthExceeded(hint2)).toBe(true);
+  });
+
+  fit('should invoke change detection when html is updated', () => {
+    component.tmpHint = 'old';
+    spyOn(changeDetectorRef, 'detectChanges').and.callThrough();
+    component.updateValue('new');
+    expect(component.tmpHint).toEqual('new');
+  });
+
+  fit('should not invoke change detection when html is not updated', () => {
+    component.tmpHint = 'old';
+    spyOn(changeDetectorRef, 'detectChanges').and.callThrough();
+    component.updateValue('old');
+    expect(component.tmpHint).toEqual('old');
+    expect(changeDetectorRef.detectChanges).toHaveBeenCalledTimes(0);
   });
 });
