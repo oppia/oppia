@@ -22,7 +22,6 @@ import ast
 import collections
 import contextlib
 import os
-import psutil
 import random
 import re
 import subprocess
@@ -31,7 +30,10 @@ import threading
 
 from core import python_utils
 from core.tests import test_utils
+
+import psutil
 from typing import Generator
+
 from . import build
 from . import common
 from . import scripts_test_utils
