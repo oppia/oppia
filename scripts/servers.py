@@ -25,7 +25,6 @@ import signal
 import subprocess
 import sys
 import threading
-import psutil
 
 from typing import Generator, Any
 
