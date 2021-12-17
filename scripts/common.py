@@ -31,7 +31,7 @@ import time
 
 from core import constants
 from core import python_utils
-from typing import Iterator, Union, Any, List, Optional, cast, NoReturn, Generator
+from typing import Any, Optional, Generator
 
 AFFIRMATIVE_CONFIRMATIONS = ['y', 'ye', 'yes']
 
@@ -643,7 +643,10 @@ def inplace_replace_file(
 
 
 @contextlib.contextmanager
-def inplace_replace_file_context(filename: str, regex_pattern: str, replacement_string: str) -> Generator[Any, Any, None]:
+def inplace_replace_file_context(
+        filename: str,
+        regex_pattern: str,
+        replacement_string: str) -> Generator[Any, Any, None]:
     """Context manager in which the file's content is replaced according to the
     given regex pattern. This function should only be used with files that are
     processed line by line.

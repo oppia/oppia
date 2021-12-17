@@ -918,10 +918,10 @@ class BuildTests(test_utils.GenericTestBase):
             check_function_calls['ensure_files_exist_gets_called'] = True
 
         def mock_modify_constants(
-                prod_env: bool, # pylint: disable=unused-argument
-                emulator_mode: bool, # pylint: disable=unused-argument
-                maintenance_mode: bool # pylint: disable=unused-argument
-        ) -> None:  # pylint: disable=unused-argument
+                prod_env: bool,  # pylint: disable=unused-argument
+                emulator_mode: bool,  # pylint: disable=unused-argument
+                maintenance_mode: bool  # pylint: disable=unused-argument
+        ) -> None:
             check_function_calls['modify_constants_gets_called'] = True
 
         def mock_compare_file_count(
@@ -974,10 +974,10 @@ class BuildTests(test_utils.GenericTestBase):
             check_function_calls['ensure_files_exist_gets_called'] = True
 
         def mock_modify_constants(
-                prod_env: bool,
-                emulator_mode: bool,
-                maintenance_mode: bool
-        ) -> None:  # pylint: disable=unused-argument
+                prod_env: bool,   # pylint: disable=unused-argument
+                emulator_mode: bool,   # pylint: disable=unused-argument
+                maintenance_mode: bool   # pylint: disable=unused-argument
+        ) -> None:
             check_function_calls['modify_constants_gets_called'] = True
 
         def mock_compare_file_count(
@@ -1014,10 +1014,10 @@ class BuildTests(test_utils.GenericTestBase):
             check_function_calls['ensure_files_exist_gets_called'] = True
 
         def mock_modify_constants(
-                prod_env: bool,
-                emulator_mode: bool,
-                maintenance_mode: bool
-        ) -> None:  # pylint: disable=unused-argument
+                prod_env: bool,   # pylint: disable=unused-argument
+                emulator_mode: bool,   # pylint: disable=unused-argument
+                maintenance_mode: bool   # pylint: disable=unused-argument
+        ) -> None:
             check_function_calls['modify_constants_gets_called'] = True
 
         ensure_files_exist_swap = self.swap(
