@@ -26,11 +26,11 @@ import subprocess
 import sys
 import threading
 
-from typing import Generator, Any
-
 from core import feconf
 from core import python_utils
 from scripts import common
+
+from typing import Any, Generator
 
 
 @contextlib.contextmanager
@@ -39,7 +39,7 @@ def managed_process(
         human_readable_name: str = 'Process',
         shell: bool = False,
         timeout_secs: int = 60,
-        **popen_kwargs: dict()) -> Generator[subprocess.Popen, Any, None]:
+        **popen_kwargs: {}) -> Generator[subprocess.Popen, Any, None]:
     """Context manager for starting and stopping a process gracefully.
 
     Args:
@@ -183,7 +183,8 @@ def managed_dev_appserver(
 
 
 @contextlib.contextmanager
-def managed_firebase_auth_emulator(recover_users: bool = False) -> Generator[Any, Any, None]:
+def managed_firebase_auth_emulator(
+        recover_users: bool = False) -> Generator[Any, Any, None]:
     """Returns a context manager to manage the Firebase auth emulator.
 
     Args:
@@ -241,7 +242,8 @@ def managed_elasticsearch_dev_server() -> Generator[Any, Any, None]:
 
 
 @contextlib.contextmanager
-def managed_cloud_datastore_emulator(clear_datastore=False) -> Generator[Any, Any, None]:
+def managed_cloud_datastore_emulator(
+        clear_datastore: bool = False) -> Generator[Any, Any, None]:
     """Returns a context manager for the Cloud Datastore emulator.
 
     Args:
@@ -331,7 +333,8 @@ def managed_redis_server() -> Generator:
             subprocess.check_call([common.REDIS_CLI_PATH, 'shutdown', 'nosave'])
 
 
-def create_managed_web_browser(port: int) -> Generator[subprocess.Popen, Any, None] | None:
+def create_managed_web_browser(
+        port: int) -> Generator[subprocess.Popen, Any, None] | None:
     """Returns a context manager for a web browser targeting the given port on
     localhost. If a web browser cannot be opened on the current system by Oppia,
     then returns None instead.
@@ -360,8 +363,11 @@ def create_managed_web_browser(port: int) -> Generator[subprocess.Popen, Any, No
 
 @contextlib.contextmanager
 def managed_webpack_compiler(
-        config_path: str | None = None, use_prod_env: bool = False, use_source_maps: bool = False,
-        watch_mode: bool = False, max_old_space_size: int | None = None) -> Generator:
+        config_path: str | None = None,
+        use_prod_env: bool = False,
+        use_source_maps: bool = False,
+        watch_mode: bool = False,
+        max_old_space_size: int | None = None) -> Generator:
     """Returns context manager to start/stop the webpack compiler gracefully.
 
     Args:

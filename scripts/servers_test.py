@@ -35,9 +35,8 @@ from scripts import common
 from scripts import scripts_test_utils
 from scripts import servers
 
-from typing import Generator, Any
-
 import psutil
+from typing import Any, Generator
 
 
 class ManagedProcessTests(test_utils.TestBase):
