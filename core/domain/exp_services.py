@@ -1315,6 +1315,7 @@ def compute_exploration_contributors_summary(exploration_id):
 
     return contributors_summary
 
+
 def populate_exploration_summary_model_fields(
     exp_summary_model, exp_summary
 ):
@@ -1363,6 +1364,7 @@ def populate_exploration_summary_model_fields(
 
     return exp_summary_model
 
+
 def save_exploration_summary(exp_summary):
     """Save an exploration summary domain object as an ExpSummaryModel entity
     in the datastore.
@@ -1371,9 +1373,8 @@ def save_exploration_summary(exp_summary):
         exp_summary: ExplorationSummary. The exploration summary to save.
     """
     exp_summary_model = (exp_models.ExpSummaryModel.get_by_id(exp_summary.id))
-    exp_summary_model = (
-        populate_exploration_summary_model_fields(
-            exp_summary_model, exp_summary))
+    exp_summary_model = populate_exploration_summary_model_fields(
+        exp_summary_model, exp_summary)
 
     exp_summary_model.update_timestamps()
     exp_summary_model.put()

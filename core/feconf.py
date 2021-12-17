@@ -263,6 +263,9 @@ EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION = 41
 # executed.
 CURRENT_STATE_SCHEMA_VERSION = 49
 
+# The current version of the exploration.
+CURRENT_EXP_SCHEMA_VERSION = 55
+
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
 # changes are made to any of the blob schemas in the data store, this version

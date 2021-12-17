@@ -215,17 +215,10 @@ class TopicModel(base_models.VersionedModel):
             additional_models
         )
 
-        if (
-                isinstance(additional_models, dict) and
-                'rights_model' in additional_models
-        ):
-            topic_rights = cast(
-                TopicRightsModel,
-                additional_models['exploration_rights_model']
-            )
-        else:
-            topic_rights = TopicRightsModel.get_by_id(self.id)
-
+        topic_rights = cast(
+            TopicRightsModel,
+            additional_models['exploration_rights_model']
+        )
         if topic_rights.topic_is_published:
             status = constants.ACTIVITY_STATUS_PUBLIC
         else:

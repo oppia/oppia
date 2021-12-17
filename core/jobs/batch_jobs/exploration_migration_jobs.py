@@ -46,7 +46,7 @@ if MYPY: # pragma: no cover
 datastore_services = models.Registry.import_datastore_services()
 
 
-class AddProtoSizeInBytesToExplorationJob(base_jobs.JobBase):
+class MigrateExplorationJob(base_jobs.JobBase):
     """Job that add the proto_size_in_bytes attribute."""
 
     @staticmethod
@@ -76,14 +76,14 @@ class AddProtoSizeInBytesToExplorationJob(base_jobs.JobBase):
 
     @staticmethod
     def _update_exploration(
-        exploration_model: exp_models.ExplorationModel,
+        exp_model: exp_models.ExplorationModel,
         migrated_exploration: exp_domain.Exploration,
         exploration_changes: Sequence[exp_domain.ExplorationChange]
     ) -> Sequence[base_models.BaseModel]:
         """Generates newly updated exploration models.
 
         Args:
-            exploration_model: ExplorationModel. The exploration which should be updated.
+            exp_model: ExplorationModel. The exploration which should be updated.
             migrated_exploration: Exploration. The migrated exploration domain object.
             exploration_changes: sequence(ExplorationChange). The exploration changes to apply.
 
@@ -93,11 +93,11 @@ class AddProtoSizeInBytesToExplorationJob(base_jobs.JobBase):
         """
         updated_exploration_model = (
             exp_services.populate_exploration_model_fields(
-                exploration_model, migrated_exploration))
+                exp_model, migrated_exploration))
         commit_message = (
             'Update exploration content schema version to %d.'
         ) % (
-            exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION
+            feconf.CURRENT_EXP_SCHEMA_VERSION
         )
         change_dicts = [change.to_dict() for change in exploration_changes]
         with datastore_services.get_ndb_context():
@@ -130,12 +130,12 @@ class AddProtoSizeInBytesToExplorationJob(base_jobs.JobBase):
         exploration_summary = exp_services.compute_summary_of_exploration(
             migrated_exploration)
         exploration_summary.version += 1
-        updated_exploration_summary_model = (
+
+        return (
             exp_services.populate_exploration_summary_model_fields(
                 exploration_summary_model, exploration_summary
             )
         )
-        return updated_exploration_summary_model
 
 
     @staticmethod
@@ -154,7 +154,7 @@ class AddProtoSizeInBytesToExplorationJob(base_jobs.JobBase):
             (str, ExplorationChange). Tuple containing exploration ID and exploration change
             object.
         """
-        if exp_model.version < exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION:
+        if exp_model.version < feconf.CURRENT_EXP_SCHEMA_VERSION:
             exp = exp_fetchers.get_exploration_from_model(exp_model)
             exp_change = exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
@@ -195,16 +195,16 @@ class AddProtoSizeInBytesToExplorationJob(base_jobs.JobBase):
                 ndb_io.GetModels(exp_models.ExplorationModel.get_all(include_deleted=False)))
             # Pylint disable is needed because pylint is not able to correctly
             # detect that the value is passed through the pipe.
-            | 'Add exploration ID' >> beam.WithKeys( # pylint: disable=no-value-for-parameter
-                lambda exploration_model: exploration_model.id)
+            | 'Add exploration keys' >> beam.WithKeys( # pylint: disable=no-value-for-parameter
+                lambda exp_model: exp_model.id)
         )
         exploration_summary_models = (
             self.pipeline
             | 'Get all non-deleted exploration summary models' >> (
-                ndb_io.GetModels(exp_models.ExpSummaryModel.get_all()))
+                ndb_io.GetModels(exp_models.ExpSummaryModel.get_all(include_deleted=False)))
             # Pylint disable is needed because pylint is not able to correctly
             # detect that the value is passed through the pipe.
-            | 'Add exploration summary ID' >> beam.WithKeys( # pylint: disable=no-value-for-parameter
+            | 'Add exploration summary keys' >> beam.WithKeys( # pylint: disable=no-value-for-parameter
                 lambda exploration_summary_model: exploration_summary_model.id)
         )
 
@@ -247,7 +247,7 @@ class AddProtoSizeInBytesToExplorationJob(base_jobs.JobBase):
                     'exp_model': objects['exp_model'][0],
                     'exploration_summary_model': objects['exploration_summary_model'][0],
                     'exploration': objects['exploration'][0],
-                    'exploration_changes': objects['exploration_changes']
+                    'exploration_changes': objects['exploration_changes'][0]
                 })
         )
 
@@ -279,10 +279,10 @@ class AddProtoSizeInBytesToExplorationJob(base_jobs.JobBase):
 
         exploration_summary_models_to_put = (
             exploration_objects_list
-            | 'Generate exploration summary models to put' >> beam.Map(
+            | 'Generate exploration summary models to put' >> beam.FlatMap(
                 lambda exp_objects: self._update_exploration_summary(
                     exp_objects['exploration'],
-                    exp_objects['exploration_summary_model']
+                    exp_objects['exploration_changes'],
                 ))
         )
 
