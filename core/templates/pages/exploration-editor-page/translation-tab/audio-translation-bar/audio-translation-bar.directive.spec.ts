@@ -527,11 +527,11 @@ describe('Audio translation bar directive', function() {
         'It was not possible to save the recorded audio');
     });
 
-  it('should open translation tab busy modal with $uibModal',
+  it('should open translation tab busy modal with NgbModal',
     fakeAsync(() => {
       spyOn(ngbModal, 'open').and.returnValue({
         componentInstance: {
-          busyMessage: 'shivam thalwal'
+          busyMessage: 'xyz'
         },
         result: Promise.resolve()
       } as NgbModalRef);
@@ -541,32 +541,6 @@ describe('Audio translation bar directive', function() {
 
       expect(ngbModal.open).toHaveBeenCalled();
     }));
-
-  it('should close translation tab busy modal with promise resolve',
-    function() {
-      spyOn($q, 'resolve').and.callThrough();
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve()
-      });
-
-      mockShowTranslationTabBusyModalEventEmitter.emit();
-      $scope.$apply();
-
-      expect($q.resolve).toHaveBeenCalled();
-    });
-
-  it('should dismiss translation tab busy modal with promise reject',
-    function() {
-      spyOn($q, 'reject').and.callThrough();
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.reject()
-      });
-
-      mockShowTranslationTabBusyModalEventEmitter.emit();
-      $scope.$apply();
-
-      expect($q.reject).toHaveBeenCalled();
-    });
 
   it('should play a loaded audio translation', function() {
     spyOn(audioPlayerService, 'isPlaying').and.returnValue(false);

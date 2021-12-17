@@ -58,6 +58,7 @@ describe('Delete Exploration Modal Component', function() {
   });
 
   it('should check whether component is initialized', () => {
+    // Confirm and cancel functions tested in ConfirmOrCancelModal.
     expect(component).toBeDefined();
   });
 });

@@ -57,6 +57,7 @@ describe('Translation Tab Busy Modal Component ', () => {
 
   it('should initialize component properties when component is initialized',
     function() {
+      // Confirm and cancel functions tested in ConfirmOrCancelModal.
       expect(component).toBeDefined();
     });
 });
