@@ -316,16 +316,14 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
             user_settings.default_dashboard, constants.DASHBOARD_TYPE_CREATOR)
         self.logout()
 
-    def test_that_produces_400_error(self):
+    def test_update_preferences_with_invalid_update_type_raises_exception(self):
         self.login(self.OWNER_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        response_dict = self.put_json(
-            feconf.PREFERENCES_DATA_URL,
-            payload=None,
-            csrf_token=csrf_token, expected_status_int=400)
-        self.assertIn(
-            'Missing key in handler args: update_type.',
-        response_dict['error'])
+        with self.assertRaisesRegexp(Exception, 'Invalid update type:'):
+            self.put_json(
+                feconf.PREFERENCES_DATA_URL,
+                {'update_type': 'invalid_update_type'},
+                csrf_token=csrf_token)
         self.logout()
 
 
@@ -362,7 +360,7 @@ class LongUserBioHandlerTests(test_utils.GenericTestBase):
             csrf_token=csrf_token, expected_status_int=400)
         self.assertEqual(user_bio_response['status_code'], 400)
         self.assertIn(
-            'Schema validation for \'data\' failed: ',
+            'User bio exceeds maximum character limit: 2000',
             user_bio_response['error'])
         self.logout()
 
@@ -711,10 +709,10 @@ class SignupTests(test_utils.GenericTestBase):
             feconf.SIGNUP_DATA_URL,
             {'username': '', 'agreed_to_terms': True},
             csrf_token=csrf_token, expected_status_int=400)
-        validator_name = 'Validation failed: is_valid_username_string ({})'
+        error_msg = 'Validation failed: is_valid_username_string ({})'
         self.assertIn(
             'Schema validation for \'username\' failed: %s for object'
-            % validator_name,
+            % error_msg,
             response_dict['error'])
 
         response_dict = self.post_json(
@@ -723,7 +721,7 @@ class SignupTests(test_utils.GenericTestBase):
             csrf_token=csrf_token, expected_status_int=400)
         self.assertIn(
             'Schema validation for \'username\' failed: %s for object !a!'
-            % validator_name,
+            % error_msg,
             response_dict['error'])
 
         response_dict = self.post_json(
@@ -732,7 +730,7 @@ class SignupTests(test_utils.GenericTestBase):
             csrf_token=csrf_token, expected_status_int=400)
         self.assertIn(
             'Schema validation for \'username\' failed: %s for object %s'
-            % (validator_name, self.UNICODE_TEST_STRING),
+            % (error_msg, self.UNICODE_TEST_STRING),
             response_dict['error'])
 
         response_dict = self.post_json(
