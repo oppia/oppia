@@ -588,8 +588,8 @@ def populate_exploration_model_fields(exploration_model, exploration):
 
     Args:
         exploration_model: ExplorationModel. The model to populate.
-        exploration: Exploration. The exploration domain object which should be used to
-            populate the model.
+        exploration: Exploration. The exploration domain object
+            which should be used to populate the model.
 
     Returns:
         ExplorationModel. Populated model.

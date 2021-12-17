@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for jobs.batch_jobs.exp_recommendation_computation_jobs."""
+"""Unit tests for jobs.batch_jobs.exploration_migration_jobs."""
 
 from __future__ import annotations
 
@@ -88,10 +88,10 @@ class MigrateExplorationJobTests(job_test_utils.JobTestBase):
 
         with cache_swap:
             self.assert_job_output_is([
-                job_run_result.JobRunResult(stdout='EXPLORATION MIGRATED SUCCESS: 1'),
                 job_run_result.JobRunResult(
-                    stdout='EXPLORATION PROCESSED SUCCESS: 1'
-                ),
+                    stdout='EXPLORATION MIGRATED SUCCESS: 1'),
+                job_run_result.JobRunResult(
+                    stdout='EXPLORATION PROCESSED SUCCESS: 1'),
                 job_run_result.JobRunResult(
                     stderr='CACHE DELETION ERROR: "cache deletion error": 1'
                 )
