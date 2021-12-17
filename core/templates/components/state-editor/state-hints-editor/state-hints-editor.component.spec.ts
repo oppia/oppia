@@ -168,9 +168,11 @@ describe('StateHintsEditorComponent', () => {
   it('should open delete last hint modal if only one hint exists while' +
     ' changing active hint index', () => {
     spyOn(StateHintsService, 'getActiveHintIndex').and.returnValue(0);
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.resolve()
-    });
+    spyOn(ngbModal, 'open').and.returnValue(
+      {
+        result: $q.resolve()
+      } as NgbModalRef
+    );
     StateHintsService.displayed = [
       {
         hintContent: {
@@ -189,9 +191,11 @@ describe('StateHintsEditorComponent', () => {
 
   it('should close delete last hint modal when user clicks cancel', () => {
     spyOn(StateHintsService, 'getActiveHintIndex').and.returnValue(0);
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.reject()
-    });
+    spyOn(ngbModal, 'open').and.returnValue(
+      {
+        result: $q.reject()
+      } as NgbModalRef
+    );
     StateHintsService.displayed = [
       {
         hintContent: {
@@ -204,7 +208,7 @@ describe('StateHintsEditorComponent', () => {
     $scope.changeActiveHintIndex(0);
     $scope.$apply();
 
-    expect($uibModal.open).toHaveBeenCalled();
+    expect(ngbModal.open).toHaveBeenCalled();
   });
 
   it('should delete empty hint when changing active hint index', () => {

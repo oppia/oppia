@@ -13,21 +13,21 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for Delete Hint Modal.
+ * @fileoverview Unit tests for Delete Interaction Modal.
  */
 
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { DeleteHintModalComponent } from './delete-hint-modal.component';
+import { DeleteInteractionModalComponent } from './delete-interaction-modal.component';
 
 describe('Delete Hint Modal Component', () => {
-  let fixture: ComponentFixture<DeleteHintModalComponent>;
-  let componentInstance: DeleteHintModalComponent;
+  let fixture: ComponentFixture<DeleteInteractionModalComponent>;
+  let componentInstance: DeleteInteractionModalComponent;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
-        DeleteHintModalComponent
+        DeleteInteractionModalComponent
       ],
       providers: [
         NgbActiveModal
@@ -36,7 +36,7 @@ describe('Delete Hint Modal Component', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(DeleteHintModalComponent);
+    fixture = TestBed.createComponent(DeleteInteractionModalComponent);
     componentInstance = fixture.componentInstance;
   });
 

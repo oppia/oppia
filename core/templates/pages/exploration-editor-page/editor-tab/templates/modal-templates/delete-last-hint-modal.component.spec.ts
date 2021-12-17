@@ -13,21 +13,21 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for Delete Hint Modal.
+ * @fileoverview Unit tests for Delete Last Hint Modal.
  */
 
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { DeleteHintModalComponent } from './delete-hint-modal.component';
+import { DeleteLastHintModalComponent } from './delete-last-hint-modal.component';
 
 describe('Delete Hint Modal Component', () => {
-  let fixture: ComponentFixture<DeleteHintModalComponent>;
-  let componentInstance: DeleteHintModalComponent;
+  let fixture: ComponentFixture<DeleteLastHintModalComponent>;
+  let componentInstance: DeleteLastHintModalComponent;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
-        DeleteHintModalComponent
+        DeleteLastHintModalComponent
       ],
       providers: [
         NgbActiveModal
@@ -36,7 +36,7 @@ describe('Delete Hint Modal Component', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(DeleteHintModalComponent);
+    fixture = TestBed.createComponent(DeleteLastHintModalComponent);
     componentInstance = fixture.componentInstance;
   });
 

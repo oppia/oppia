@@ -20,6 +20,7 @@ import { TestBed } from '@angular/core/testing';
 import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 describe('StateSolutionEditorComponent', () => {
   let ctrl = null;
@@ -29,6 +30,7 @@ describe('StateSolutionEditorComponent', () => {
   let $q = null;
   let sof: SolutionObjectFactory;
   let solution;
+  let ngbModal: NgbModal = null;
 
   let ExplorationHtmlFormatterService = null;
   let WindowDimensionsService = null;
@@ -48,11 +50,22 @@ describe('StateSolutionEditorComponent', () => {
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
 
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
+
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     $uibModal = $injector.get('$uibModal');
     $q = $injector.get('$q');
+    ngbModal = $injector.get('NgbModal');
 
     ExplorationHtmlFormatterService = $injector.get(
       'ExplorationHtmlFormatterService');
@@ -111,10 +124,12 @@ describe('StateSolutionEditorComponent', () => {
     expect($scope.solutionCardIsShown).toBe(true);
   });
 
-  it('should open delete solution modal when user clicks on delete', () => {
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.resolve()
-    });
+  fit('should open delete solution modal when user clicks on delete', () => {
+    spyOn(ngbModal, 'open').and.returnValue(
+      {
+        result: $q.resolve()
+      } as NgbModalRef
+    );
     spyOn(StateEditorService, 'deleteCurrentSolutionValidity');
     spyOn(StateSolutionService, 'saveDisplayedValue');
 
@@ -125,15 +140,17 @@ describe('StateSolutionEditorComponent', () => {
     expect(StateSolutionService.saveDisplayedValue).toHaveBeenCalled();
   });
 
-  it('should close delete solution modal when user clicks cancel', () => {
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.reject()
-    });
+  fit('should close delete solution modal when user clicks cancel', () => {
+    spyOn(ngbModal, 'open').and.returnValue(
+      {
+        result: $q.reject()
+      } as NgbModalRef
+    );
 
     $scope.deleteSolution(0, new Event(''));
     $scope.$apply();
 
-    expect($uibModal.open).toHaveBeenCalled();
+    expect(ngbModal.open).toHaveBeenCalled();
   });
 
   it('should get invalid solution tooltip text', () => {
