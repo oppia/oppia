@@ -736,12 +736,12 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
         Raises:
             ValidationError. The given app version name is not valid.
         """
-        delimiter = app_feedback_report_constants.ANDROID_VERSION_NAME_DELIMITER
         if version_name is None:
             raise utils.ValidationError('No version name supplied.')
         if not isinstance(version_name, str):
             raise utils.ValidationError(
                 'Version name must be a string, received: %r.' % version_name)
+        delimiter = app_feedback_report_constants.ANDROID_VERSION_NAME_DELIMITER
         if len(version_name.split(delimiter)) != 3:
             raise utils.ValidationError(
                 'The version name is not a valid string format, received: '

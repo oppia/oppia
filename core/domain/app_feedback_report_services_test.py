@@ -614,28 +614,28 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
                 unticketed_stats_id))
 
-        report_stats_parameter_names = (
+        stats_parameter_names = (
             app_feedback_report_constants.STATS_PARAMETER_NAMES)
         expected_json = {
-            report_stats_parameter_names.report_type.name: {
+            stats_parameter_names.report_type.name: {
                 self.REPORT_TYPE_SUGGESTION.name: 2
             },
-            report_stats_parameter_names.country_locale_code.name: {
+            stats_parameter_names.country_locale_code.name: {
                 self.COUNTRY_LOCALE_CODE_INDIA: 2
             },
-            report_stats_parameter_names.entry_point_name.name: {
+            stats_parameter_names.entry_point_name.name: {
                 self.ENTRY_POINT_NAVIGATION_DRAWER.name: 2
             },
-            report_stats_parameter_names.text_language_code.name: {
+            stats_parameter_names.text_language_code.name: {
                 self.TEXT_LANGUAGE_CODE_ENGLISH: 2
             },
-            report_stats_parameter_names.audio_language_code.name: {
+            stats_parameter_names.audio_language_code.name: {
                 self.AUDIO_LANGUAGE_CODE_ENGLISH: 2
             },
-            report_stats_parameter_names.android_sdk_version.name: {
+            stats_parameter_names.android_sdk_version.name: {
                 str(self.ANDROID_SDK_VERSION): 2
             },
-            report_stats_parameter_names.version_name.name: {
+            stats_parameter_names.version_name.name: {
                 self.ANDROID_PLATFORM_VERSION: 2
             }
         }
@@ -666,28 +666,28 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
                 all_report_stats_id))
 
-        report_stats_parameter_names = (
+        stats_parameter_names = (
             app_feedback_report_constants.STATS_PARAMETER_NAMES)
         expected_json = {
-            report_stats_parameter_names.report_type.name: {
+            stats_parameter_names.report_type.name: {
                 self.REPORT_TYPE_SUGGESTION.name: 2
             },
-            report_stats_parameter_names.country_locale_code.name: {
+            stats_parameter_names.country_locale_code.name: {
                 self.COUNTRY_LOCALE_CODE_INDIA: 2
             },
-            report_stats_parameter_names.entry_point_name.name: {
+            stats_parameter_names.entry_point_name.name: {
                 self.ENTRY_POINT_NAVIGATION_DRAWER.name: 2
             },
-            report_stats_parameter_names.text_language_code.name: {
+            stats_parameter_names.text_language_code.name: {
                 self.TEXT_LANGUAGE_CODE_ENGLISH: 2
             },
-            report_stats_parameter_names.audio_language_code.name: {
+            stats_parameter_names.audio_language_code.name: {
                 self.AUDIO_LANGUAGE_CODE_ENGLISH: 2
             },
-            report_stats_parameter_names.android_sdk_version.name: {
+            stats_parameter_names.android_sdk_version.name: {
                 str(self.ANDROID_SDK_VERSION): 2
             },
-            report_stats_parameter_names.version_name.name: {
+            stats_parameter_names.version_name.name: {
                 self.ANDROID_PLATFORM_VERSION: 2
             }
         }
@@ -717,53 +717,53 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         filter_fields = [
             filter_obj.filter_field for filter_obj in filter_options]
 
-        report_filter_field_names = (
+        filter_field_names = (
             app_feedback_report_constants.FILTER_FIELD_NAMES)
         for filter_obj in filter_options:
             self.assertTrue(filter_obj.filter_field in filter_fields)
             if filter_obj.filter_field == (
-                    report_filter_field_names.report_type):
+                    filter_field_names.report_type):
                 self.assertEqual(
                     filter_obj.filter_options[0],
                     self.REPORT_TYPE_SUGGESTION.name)
             elif filter_obj.filter_field == (
-                    report_filter_field_names.platform):
+                    filter_field_names.platform):
                 self.assertEqual(
                     filter_obj.filter_options[0], self.PLATFORM_ANDROID)
             elif filter_obj.filter_field == (
-                    report_filter_field_names.entry_point):
+                    filter_field_names.entry_point):
                 self.assertEqual(
                     filter_obj.filter_options[0],
                     self.ENTRY_POINT_NAVIGATION_DRAWER.name)
             elif filter_obj.filter_field == (
-                    report_filter_field_names.submitted_on):
+                    filter_field_names.submitted_on):
                 self.assertEqual(
                     filter_obj.filter_options[0],
                     self.REPORT_SUBMITTED_TIMESTAMP.date())
             elif filter_obj.filter_field == (
-                    report_filter_field_names.android_device_model):
+                    filter_field_names.android_device_model):
                 self.assertEqual(
                     filter_obj.filter_options[0], self.ANDROID_DEVICE_MODEL)
             elif filter_obj.filter_field == (
-                    report_filter_field_names.android_sdk_version):
+                    filter_field_names.android_sdk_version):
                 self.assertEqual(
                     filter_obj.filter_options[0], self.ANDROID_SDK_VERSION)
             elif filter_obj.filter_field == (
-                    report_filter_field_names.text_language_code):
+                    filter_field_names.text_language_code):
                 self.assertEqual(
                     filter_obj.filter_options[0],
                     self.TEXT_LANGUAGE_CODE_ENGLISH)
             elif filter_obj.filter_field == (
-                    report_filter_field_names.audio_language_code):
+                    filter_field_names.audio_language_code):
                 self.assertEqual(
                     filter_obj.filter_options[0],
                     self.AUDIO_LANGUAGE_CODE_ENGLISH)
             elif filter_obj.filter_field == (
-                    report_filter_field_names.platform_version):
+                    filter_field_names.platform_version):
                 self.assertEqual(
                     filter_obj.filter_options[0], self.ANDROID_PLATFORM_VERSION)
             elif filter_obj.filter_field == (
-                    report_filter_field_names.android_device_country_locale_code): # pylint: disable=line-too-long
+                    filter_field_names.android_device_country_locale_code): # pylint: disable=line-too-long
                 self.assertEqual(
                     filter_obj.filter_options[0],
                     self.COUNTRY_LOCALE_CODE_INDIA)
@@ -888,28 +888,28 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
                 new_stats_id))
 
-        report_stats_parameter_names = (
+        stats_parameter_names = (
             app_feedback_report_constants.STATS_PARAMETER_NAMES)
         expected_json = {
-            report_stats_parameter_names.report_type.name: {
+            stats_parameter_names.report_type.name: {
                 self.REPORT_TYPE_SUGGESTION.name: 1
             },
-            report_stats_parameter_names.country_locale_code.name: {
+            stats_parameter_names.country_locale_code.name: {
                 self.COUNTRY_LOCALE_CODE_INDIA: 1
             },
-            report_stats_parameter_names.entry_point_name.name: {
+            stats_parameter_names.entry_point_name.name: {
                 self.ENTRY_POINT_NAVIGATION_DRAWER.name: 1
             },
-            report_stats_parameter_names.text_language_code.name: {
+            stats_parameter_names.text_language_code.name: {
                 self.TEXT_LANGUAGE_CODE_ENGLISH: 1
             },
-            report_stats_parameter_names.audio_language_code.name: {
+            stats_parameter_names.audio_language_code.name: {
                 self.AUDIO_LANGUAGE_CODE_ENGLISH: 1
             },
-            report_stats_parameter_names.android_sdk_version.name: {
+            stats_parameter_names.android_sdk_version.name: {
                 str(self.ANDROID_SDK_VERSION): 1
             },
-            report_stats_parameter_names.version_name.name: {
+            stats_parameter_names.version_name.name: {
                 self.ANDROID_PLATFORM_VERSION: 1
             }
         }
@@ -951,28 +951,28 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
                 old_stats_id))
 
-        report_stats_parameter_names = (
+        stats_parameter_names = (
             app_feedback_report_constants.STATS_PARAMETER_NAMES)
         expected_json = {
-            report_stats_parameter_names.report_type.name: {
+            stats_parameter_names.report_type.name: {
                 self.REPORT_TYPE_SUGGESTION.name: 0
             },
-            report_stats_parameter_names.country_locale_code.name: {
+            stats_parameter_names.country_locale_code.name: {
                 self.COUNTRY_LOCALE_CODE_INDIA: 0
             },
-            report_stats_parameter_names.entry_point_name.name: {
+            stats_parameter_names.entry_point_name.name: {
                 self.ENTRY_POINT_NAVIGATION_DRAWER.name: 0
             },
-            report_stats_parameter_names.text_language_code.name: {
+            stats_parameter_names.text_language_code.name: {
                 self.TEXT_LANGUAGE_CODE_ENGLISH: 0
             },
-            report_stats_parameter_names.audio_language_code.name: {
+            stats_parameter_names.audio_language_code.name: {
                 self.AUDIO_LANGUAGE_CODE_ENGLISH: 0
             },
-            report_stats_parameter_names.android_sdk_version.name: {
+            stats_parameter_names.android_sdk_version.name: {
                 str(self.ANDROID_SDK_VERSION): 0
             },
-            report_stats_parameter_names.version_name.name: {
+            stats_parameter_names.version_name.name: {
                 self.ANDROID_PLATFORM_VERSION: 0
             }
         }
@@ -1006,28 +1006,28 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
                 old_stats_id))
 
-        report_stats_parameter_names = (
+        stats_parameter_names = (
             app_feedback_report_constants.STATS_PARAMETER_NAMES)
         expected_json = {
-            report_stats_parameter_names.report_type.name: {
+            stats_parameter_names.report_type.name: {
                 self.REPORT_TYPE_SUGGESTION.name: 0
             },
-            report_stats_parameter_names.country_locale_code.name: {
+            stats_parameter_names.country_locale_code.name: {
                 self.COUNTRY_LOCALE_CODE_INDIA: 0
             },
-            report_stats_parameter_names.entry_point_name.name: {
+            stats_parameter_names.entry_point_name.name: {
                 self.ENTRY_POINT_NAVIGATION_DRAWER.name: 0
             },
-            report_stats_parameter_names.text_language_code.name: {
+            stats_parameter_names.text_language_code.name: {
                 self.TEXT_LANGUAGE_CODE_ENGLISH: 0
             },
-            report_stats_parameter_names.audio_language_code.name: {
+            stats_parameter_names.audio_language_code.name: {
                 self.AUDIO_LANGUAGE_CODE_ENGLISH: 0
             },
-            report_stats_parameter_names.android_sdk_version.name: {
+            stats_parameter_names.android_sdk_version.name: {
                 str(self.ANDROID_SDK_VERSION): 0
             },
-            report_stats_parameter_names.version_name.name: {
+            stats_parameter_names.version_name.name: {
                 self.ANDROID_PLATFORM_VERSION: 0
             }
         }

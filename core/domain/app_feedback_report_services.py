@@ -131,33 +131,33 @@ def _update_report_stats_model_in_transaction( # type: ignore[no-untyped-def]
         app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
             stats_id))
 
-    report_stats_parameter_names = (
-                app_feedback_report_constants.STATS_PARAMETER_NAMES)
+    stats_parameter_names = (
+        app_feedback_report_constants.STATS_PARAMETER_NAMES)
     if stats_model is None:
         assert delta > 0
         # Create new stats model entity. These are the individual report fields
         # that we will want to splice aggregate stats by and they will each have
         # a count of 1 since this is the first report added for this entity.
         stats_dict = {
-            report_stats_parameter_names.report_type.name: {
+            stats_parameter_names.report_type.name: {
                 report_type: 1
             },
-            report_stats_parameter_names.country_locale_code.name: {
+            stats_parameter_names.country_locale_code.name: {
                 country_locale_code: 1
             },
-            report_stats_parameter_names.entry_point_name.name: {
+            stats_parameter_names.entry_point_name.name: {
                 entry_point_name: 1
             },
-            report_stats_parameter_names.text_language_code.name: {
+            stats_parameter_names.text_language_code.name: {
                 text_language_code: 1
             },
-            report_stats_parameter_names.audio_language_code.name: {
+            stats_parameter_names.audio_language_code.name: {
                 audio_language_code: 1
             },
-            report_stats_parameter_names.android_sdk_version.name: {
+            stats_parameter_names.android_sdk_version.name: {
                 sdk_version: 1
             },
-            report_stats_parameter_names.version_name.name: {
+            stats_parameter_names.version_name.name: {
                 version_name: 1
             }
         }
@@ -171,46 +171,46 @@ def _update_report_stats_model_in_transaction( # type: ignore[no-untyped-def]
         stats_dict = stats_model.daily_param_stats
 
         stats_dict[
-            report_stats_parameter_names.report_type.name] = (
+            stats_parameter_names.report_type.name] = (
             calculate_new_stats_count_for_parameter(
                 stats_dict[
-                    report_stats_parameter_names.report_type.name],
+                    stats_parameter_names.report_type.name],
                 report_type, delta))
         stats_dict[
-            report_stats_parameter_names.country_locale_code.name] = (
+            stats_parameter_names.country_locale_code.name] = (
             calculate_new_stats_count_for_parameter(
                 stats_dict[
-                    report_stats_parameter_names.country_locale_code.name],
+                    stats_parameter_names.country_locale_code.name],
                 country_locale_code, delta))
         stats_dict[
-            report_stats_parameter_names.entry_point_name.name] = (
+            stats_parameter_names.entry_point_name.name] = (
             calculate_new_stats_count_for_parameter(
                 stats_dict[
-                    report_stats_parameter_names.entry_point_name.name],
+                    stats_parameter_names.entry_point_name.name],
                 entry_point_name, delta))
         stats_dict[
-            report_stats_parameter_names.audio_language_code.name] = (
+            stats_parameter_names.audio_language_code.name] = (
             calculate_new_stats_count_for_parameter(
                 stats_dict[
-                    report_stats_parameter_names.audio_language_code.name],
+                    stats_parameter_names.audio_language_code.name],
                 audio_language_code, delta))
         stats_dict[
-            report_stats_parameter_names.text_language_code.name] = (
+            stats_parameter_names.text_language_code.name] = (
             calculate_new_stats_count_for_parameter(
                 stats_dict[
-                    report_stats_parameter_names.text_language_code.name],
+                    stats_parameter_names.text_language_code.name],
                 text_language_code, delta))
         stats_dict[
-            report_stats_parameter_names.android_sdk_version.name] = (
+            stats_parameter_names.android_sdk_version.name] = (
             calculate_new_stats_count_for_parameter(
                 stats_dict[
-                    report_stats_parameter_names.android_sdk_version.name],
+                    stats_parameter_names.android_sdk_version.name],
                 sdk_version, delta))
         stats_dict[
-            report_stats_parameter_names.version_name.name] = (
+            stats_parameter_names.version_name.name] = (
             calculate_new_stats_count_for_parameter(
                 stats_dict[
-                    report_stats_parameter_names.version_name.name],
+                    stats_parameter_names.version_name.name],
                 version_name, delta))
 
     stats_model.daily_param_stats = stats_dict
