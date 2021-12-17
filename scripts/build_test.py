@@ -22,22 +22,20 @@ import ast
 import collections
 import contextlib
 import os
+import psutil
 import random
 import re
 import subprocess
 import tempfile
 import threading
-import psutil
 
 from core import python_utils
 from core.tests import test_utils
-
+from typing import Generator
 from . import build
 from . import common
 from . import scripts_test_utils
 from . import servers
-
-from typing import Generator
 
 TEST_DIR = os.path.join('core', 'tests', 'build', '')
 TEST_SOURCE_DIR = os.path.join('core', 'tests', 'build_sources')
