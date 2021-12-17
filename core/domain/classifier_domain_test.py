@@ -82,7 +82,8 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
 
     def test_to_dict(self) -> None:
         expected_training_job_dict: (
-            classifier_domain.ClassifierTrainingJobDict) = {
+            classifier_domain.ClassifierTrainingJobDict
+        ) = {
             'job_id': 'exp_id1.SOME_RANDOM_STRING',
             'algorithm_id': 'TextClassifier',
             'interaction_id': 'TextInput',
@@ -211,7 +212,8 @@ class StateTrainingJobsMappingDomainTests(test_utils.GenericTestBase):
 
     def test_to_dict(self) -> None:
         expected_mapping_dict: (
-            classifier_domain.StateTrainingJobsMappingDict) = {
+            classifier_domain.StateTrainingJobsMappingDict
+        ) = {
             'exp_id': 'exp_id1',
             'exp_version': 2,
             'state_name': u'網站有中',
