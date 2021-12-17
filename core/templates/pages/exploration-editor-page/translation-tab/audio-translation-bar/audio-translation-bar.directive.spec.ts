@@ -73,7 +73,15 @@ describe('Audio translation bar directive', function() {
   var mockActiveLanguageChangedEventEmitter = new EventEmitter();
   var mockShowTranslationTabBusyModalEventEmitter = new EventEmitter();
 
-  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
 
   beforeEach(angular.mock.module('directiveTemplates'));
   importAllAngularServices();
