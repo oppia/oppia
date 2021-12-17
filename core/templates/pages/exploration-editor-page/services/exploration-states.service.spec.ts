@@ -18,8 +18,14 @@
 
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { ChangeListService } from './change-list.service';
-import { TestBed } from '@angular/core/testing';
+import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
+class MockNgbModalRef {
+  componentInstance = {
+    deleteStateName: null
+  };
+}
 
 require(
   'components/state-editor/state-editor-properties-services/' +
@@ -27,14 +33,22 @@ require(
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 
 describe('ExplorationStatesService', function() {
-  var $q = null;
   var $rootScope = null;
-  var $uibModal = null;
+  let ngbModal: NgbModal = null;
   let changeListService: ChangeListService = null;
   var ContextService = null;
   var ExplorationStatesService = null;
 
-  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          componentInstance: MockNgbModalRef,
+          result: Promise.resolve('Hola')
+        };
+      }
+    });
+  }));
   importAllAngularServices();
 
   beforeEach(() => {
@@ -46,15 +60,14 @@ describe('ExplorationStatesService', function() {
   });
 
   beforeEach(() => {
+    ngbModal = TestBed.inject(NgbModal);
     changeListService = TestBed.inject(ChangeListService);
   });
 
   beforeEach(angular.mock.inject(function(
       _$q_, _$rootScope_, _$uibModal_, _ContextService_,
       _ExplorationStatesService_) {
-    $q = _$q_;
     $rootScope = _$rootScope_;
-    $uibModal = _$uibModal_;
     ContextService = _ContextService_;
     ExplorationStatesService = _ExplorationStatesService_;
   }));
@@ -131,7 +144,13 @@ describe('ExplorationStatesService', function() {
 
   describe('Callback Registration', function() {
     describe('.registerOnStateAddedCallback', function() {
-      it('should callback when a new state is added', function() {
+      it('should callback when a new state is added', fakeAsync(() => {
+        spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+          return ({
+            componentInstance: NgbModalRef,
+            result: Promise.resolve()
+          } as NgbModalRef);
+        });
         var spy = jasmine.createSpy('callback');
         spyOn(changeListService, 'addState');
 
@@ -139,24 +158,27 @@ describe('ExplorationStatesService', function() {
         ExplorationStatesService.addState('Me Llamo');
 
         expect(spy).toHaveBeenCalledWith('Me Llamo');
-      });
+      }));
     });
 
     describe('.registerOnStateDeletedCallback', function() {
-      it('should callback when a state is deleted', function(done) {
-        spyOn($uibModal, 'open').and.callFake(function() {
-          return {result: $q.resolve()};
+      it('should callback when a state is deleted', fakeAsync(() => {
+        spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+          return ({
+            componentInstance: MockNgbModalRef,
+            result: Promise.resolve('Hola')
+          } as NgbModalRef);
         });
         spyOn(changeListService, 'deleteState');
 
         var spy = jasmine.createSpy('callback');
         ExplorationStatesService.registerOnStateDeletedCallback(spy);
+        ExplorationStatesService.deleteState('Hola');
+        flushMicrotasks();
 
-        ExplorationStatesService.deleteState('Hola').then(function() {
-          expect(spy).toHaveBeenCalledWith('Hola');
-        }).then(done, done.fail);
+        expect(spy).toHaveBeenCalledWith('Hola');
         $rootScope.$digest();
-      });
+      }));
     });
 
     describe('.registerOnStateRenamedCallback', function() {
