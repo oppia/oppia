@@ -16,158 +16,200 @@
  * @fileoverview Service for fetching and resolving suggestions.
  */
 
-require('domain/feedback_thread/FeedbackThreadObjectFactory.ts');
-require('domain/suggestion/suggestion.model.ts');
-require('domain/suggestion/SuggestionThreadObjectFactory.ts');
-require('pages/exploration-editor-page/services/exploration-data.service.ts');
-require('services/alerts.service.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+import { AppConstants } from 'app.constants';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { HttpClient } from '@angular/common/http';
+import { SuggestionBackendDict } from 'domain/suggestion/suggestion.model';
+import { StateBackendDict } from 'domain/state/StateObjectFactory';
+import { ImagesData } from 'services/image-local-storage.service';
 
-require(
-  'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
+interface OpportunityDict {
+  'skill_id': string;
+  'skill_description': string;
+}
 
-angular.module('oppia').factory('ContributionAndReviewService', [
-  '$http', 'UrlInterpolationService', 'ACTION_ACCEPT_SUGGESTION',
-  function(
-      $http, UrlInterpolationService, ACTION_ACCEPT_SUGGESTION) {
-    var _SUBMITTED_SUGGESTION_LIST_HANDLER_URL = (
-      '/getsubmittedsuggestions/<target_type>/<suggestion_type>');
-    var _REVIEWABLE_SUGGESTIONS_HANDLER_URL = (
-      '/getreviewablesuggestions/<target_type>/<suggestion_type>');
-    var _SUGGESTION_TO_EXPLORATION_ACTION_HANDLER_URL = (
-      '/suggestionactionhandler/exploration/<exp_id>/<suggestion_id>');
-    var _SUGGESTION_TO_SKILL_ACTION_HANDLER_URL = (
-      '/suggestionactionhandler/skill/<skill_id>/<suggestion_id>');
-    var _UPDATE_TRANSLATION_HANDLER_URL = (
-      '/updatetranslationsuggestionhandler/<suggestion_id>'
+interface FetchSuggestionsResponse {
+  'target_id_to_opportunity_dict': {
+    [propName: string]: OpportunityDict;
+  };
+  suggestions: SuggestionBackendDict[];
+}
+
+interface FetchSuggestionsReturn {
+  [propName: string]: {
+    suggestion: SuggestionBackendDict;
+    details: OpportunityDict;
+  };
+}
+
+@Injectable({
+  providedIn: 'root',
+})
+export class ContributionAndReviewService {
+  _SUBMITTED_SUGGESTION_LIST_HANDLER_URL = (
+    '/getsubmittedsuggestions/<target_type>/<suggestion_type>');
+  _REVIEWABLE_SUGGESTIONS_HANDLER_URL = (
+    '/getreviewablesuggestions/<target_type>/<suggestion_type>');
+  _SUGGESTION_TO_EXPLORATION_ACTION_HANDLER_URL = (
+    '/suggestionactionhandler/exploration/<exp_id>/<suggestion_id>');
+  _SUGGESTION_TO_SKILL_ACTION_HANDLER_URL = (
+    '/suggestionactionhandler/skill/<skill_id>/<suggestion_id>');
+  _UPDATE_TRANSLATION_HANDLER_URL = (
+    '/updatetranslationsuggestionhandler/<suggestion_id>');
+  _UPDATE_QUESTION_HANDLER_URL = (
+    '/updatequestionsuggestionhandler/<suggestion_id>');
+
+  constructor(
+    private http: HttpClient,
+    private urlInterpolationService: UrlInterpolationService
+  ) {}
+
+  async _fetchSuggestionsAsync(url: string): Promise<FetchSuggestionsReturn> {
+    return (
+      this.http.get<FetchSuggestionsResponse>(url)
+        .toPromise().then((data) => {
+          var suggestionIdToSuggestions: FetchSuggestionsReturn = {};
+          var targetIdToDetails = data.target_id_to_opportunity_dict;
+          data.suggestions.forEach(function(suggestion) {
+            suggestionIdToSuggestions[suggestion.suggestion_id] = {
+              suggestion: suggestion,
+              details: targetIdToDetails[suggestion.target_id]
+            };
+          });
+          return suggestionIdToSuggestions;
+        })
     );
-    var _UPDATE_QUESTION_HANDLER_URL = (
-      '/updatequestionsuggestionhandler/<suggestion_id>'
-    );
-
-    var _fetchSuggestionsAsync = async function(url) {
-      return $http.get(url).then(function(res) {
-        var suggestionIdToSuggestions = {};
-        var targetIdToDetails = res.data.target_id_to_opportunity_dict;
-        res.data.suggestions.forEach(function(suggestion) {
-          suggestionIdToSuggestions[suggestion.suggestion_id] = {
-            suggestion: suggestion,
-            details: targetIdToDetails[suggestion.target_id]
-          };
-        });
-        return suggestionIdToSuggestions;
-      });
-    };
-
-    return {
-      getUserCreatedQuestionSuggestionsAsync: async function() {
-        var url = UrlInterpolationService.interpolateUrl(
-          _SUBMITTED_SUGGESTION_LIST_HANDLER_URL, {
-            target_type: 'skill',
-            suggestion_type: 'add_question'
-          });
-        return _fetchSuggestionsAsync(url);
-      },
-      getReviewableQuestionSuggestionsAsync: async function() {
-        var url = UrlInterpolationService.interpolateUrl(
-          _REVIEWABLE_SUGGESTIONS_HANDLER_URL, {
-            target_type: 'skill',
-            suggestion_type: 'add_question'
-          });
-        return _fetchSuggestionsAsync(url);
-      },
-      getUserCreatedTranslationSuggestionsAsync: async function(onSuccess) {
-        var url = UrlInterpolationService.interpolateUrl(
-          _SUBMITTED_SUGGESTION_LIST_HANDLER_URL, {
-            target_type: 'exploration',
-            suggestion_type: 'translate_content'
-          });
-        return _fetchSuggestionsAsync(url);
-      },
-      getReviewableTranslationSuggestionsAsync: async function(onSuccess) {
-        var url = UrlInterpolationService.interpolateUrl(
-          _REVIEWABLE_SUGGESTIONS_HANDLER_URL, {
-            target_type: 'exploration',
-            suggestion_type: 'translate_content'
-          });
-        return _fetchSuggestionsAsync(url);
-      },
-      resolveSuggestionToExploration: function(
-          targetId, suggestionId, action, reviewMessage, commitMessage,
-          onSuccess, onFailure) {
-        var url = UrlInterpolationService.interpolateUrl(
-          _SUGGESTION_TO_EXPLORATION_ACTION_HANDLER_URL, {
-            exp_id: targetId,
-            suggestion_id: suggestionId
-          });
-        return $http.put(url, {
-          action: action,
-          review_message: reviewMessage,
-          commit_message: (
-            action === ACTION_ACCEPT_SUGGESTION ?
-            commitMessage : null
-          )
-        }).then(function() {
-          onSuccess(suggestionId);
-        }, (error) => onFailure && onFailure(error));
-      },
-      resolveSuggestiontoSkill: function(
-          targetId, suggestionId, action, reviewMessage, skillDifficulty,
-          onSuccess, onFailure) {
-        var url = UrlInterpolationService.interpolateUrl(
-          _SUGGESTION_TO_SKILL_ACTION_HANDLER_URL, {
-            skill_id: targetId,
-            suggestion_id: suggestionId
-          });
-        return $http.put(url, {
-          action: action,
-          review_message: reviewMessage,
-          skill_difficulty: skillDifficulty
-        }).then(function() {
-          onSuccess(suggestionId);
-        }, () => onFailure && onFailure(suggestionId));
-      },
-      updateTranslationSuggestionAsync: async function(
-          suggestionId, translationHtml,
-          onSuccess, onFailure) {
-        var url = UrlInterpolationService.interpolateUrl(
-          _UPDATE_TRANSLATION_HANDLER_URL, {
-            suggestion_id: suggestionId
-          });
-        return $http.put(url, {
-          translation_html: translationHtml
-        }).then(function() {
-          onSuccess();
-        }, (error) => onFailure && onFailure(error));
-      },
-      updateQuestionSuggestionAsync: async function(
-          suggestionId, skillDifficulty, questionStateData, imagesData,
-          onSuccess, onFailure) {
-        var url = UrlInterpolationService.interpolateUrl(
-          _UPDATE_QUESTION_HANDLER_URL, {
-            suggestion_id: suggestionId
-          });
-        const payload = {
-          skill_difficulty: skillDifficulty,
-          question_state_data: questionStateData
-        };
-        const body = new FormData();
-        body.append('payload', JSON.stringify(payload));
-        imagesData.forEach(obj => {
-          if (obj.imageBlob !== null) {
-            body.append(obj.filename, obj.imageBlob);
-          }
-        });
-        return $http({
-          method: 'POST',
-          url,
-          data: body,
-          headers: {
-            'Content-Type': undefined
-          },
-        }).then(function() {
-          onSuccess(suggestionId);
-        }, () => onFailure && onFailure(suggestionId));
-      }
-    };
   }
-]);
+
+  async getUserCreatedQuestionSuggestionsAsync():
+    Promise<FetchSuggestionsReturn> {
+    let url = this.urlInterpolationService.interpolateUrl(
+      this._SUBMITTED_SUGGESTION_LIST_HANDLER_URL, {
+        target_type: 'skill',
+        suggestion_type: 'add_question'
+      });
+    return this._fetchSuggestionsAsync(url);
+  }
+
+  async getUserCreatedTranslationSuggestionsAsync():
+    Promise<FetchSuggestionsReturn> {
+    var url = this.urlInterpolationService.interpolateUrl(
+      this._SUBMITTED_SUGGESTION_LIST_HANDLER_URL, {
+        target_type: 'exploration',
+        suggestion_type: 'translate_content'
+      });
+    return this._fetchSuggestionsAsync(url);
+  }
+
+  async getReviewableTranslationSuggestionsAsync():
+    Promise<FetchSuggestionsReturn> {
+    var url = this.urlInterpolationService.interpolateUrl(
+      this._REVIEWABLE_SUGGESTIONS_HANDLER_URL, {
+        target_type: 'exploration',
+        suggestion_type: 'translate_content'
+      });
+    return this._fetchSuggestionsAsync(url);
+  }
+
+  resolveSuggestionToExploration(
+      targetId: string, suggestionId: string, action: string,
+      reviewMessage: string, commitMessage: string,
+      onSuccess: (suggestionId: string) => void,
+      onFailure: (error) => void
+  ): Promise<void> {
+    let url = this.urlInterpolationService.interpolateUrl(
+      this._SUGGESTION_TO_EXPLORATION_ACTION_HANDLER_URL, {
+        exp_id: targetId,
+        suggestion_id: suggestionId
+      });
+
+    return this.http.put(url, {
+      action: action,
+      review_message: reviewMessage,
+      commit_message: (
+        action === AppConstants.ACTION_ACCEPT_SUGGESTION ?
+        commitMessage : null
+      )
+    }).toPromise().then(() => {
+      onSuccess(suggestionId);
+    }, (error) => {
+      onFailure && onFailure(error);
+    });
+  }
+
+  resolveSuggestiontoSkill(
+      targetId: string, suggestionId: string, action: string,
+      reviewMessage: string, skillDifficulty: string,
+      onSuccess: (suggestionId: string) => void,
+      onFailure: () => void
+  ): Promise<void> {
+    let url = this.urlInterpolationService.interpolateUrl(
+      this._SUGGESTION_TO_SKILL_ACTION_HANDLER_URL, {
+        skill_id: targetId,
+        suggestion_id: suggestionId
+      });
+
+    return this.http.put(url, {
+      action: action,
+      review_message: reviewMessage,
+      skill_difficulty: skillDifficulty
+    }).toPromise().then(() => {
+      onSuccess(suggestionId);
+    }, () => {
+      onFailure && onFailure();
+    });
+  }
+
+  async updateTranslationSuggestionAsync(
+      suggestionId: string, translationHtml: string,
+      onSuccess: () => void,
+      onFailure: (error) => void
+  ): Promise<void> {
+    let url = this.urlInterpolationService.interpolateUrl(
+      this._UPDATE_TRANSLATION_HANDLER_URL, {
+        suggestion_id: suggestionId
+      });
+
+    return this.http.put(url, {
+      translation_html: translationHtml
+    }).toPromise().then(() => {
+      onSuccess();
+    }, (error) => onFailure && onFailure(error));
+  }
+
+  async updateQuestionSuggestionAsync(
+      suggestionId: string, skillDifficulty: string,
+      questionStateData: StateBackendDict, imagesData: ImagesData[],
+      onSuccess: (suggestionId: string) => void,
+      onFailure: (suggestionId: string) => void
+  ): Promise<void> {
+    let url = this.urlInterpolationService.interpolateUrl(
+      this._UPDATE_QUESTION_HANDLER_URL, {
+        suggestion_id: suggestionId
+      });
+    const payload = {
+      skill_difficulty: skillDifficulty,
+      question_state_data: questionStateData
+    };
+    const body = new FormData();
+    body.append('payload', JSON.stringify(payload));
+    imagesData.forEach(obj => {
+      if (obj.imageBlob !== null) {
+        body.append(obj.filename, obj.imageBlob);
+      }
+    });
+
+    return this.http.post(url, body, {
+      headers: { 'Content-Type': undefined }
+    }).toPromise().then(() => {
+      onSuccess(suggestionId);
+    }, () => onFailure && onFailure(suggestionId));
+  }
+}
+
+angular.module('oppia').factory(
+  'ContributionAndReviewService',
+  downgradeInjectable(ContributionAndReviewService)
+);
