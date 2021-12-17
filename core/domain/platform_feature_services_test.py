@@ -18,7 +18,8 @@
 
 from __future__ import annotations
 
-from core import python_utils
+import enum
+
 from core import utils
 from core.constants import constants
 from core.domain import caching_services
@@ -27,9 +28,16 @@ from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_registry as registry
 from core.tests import test_utils
 
-PARAM_NAMES = python_utils.create_enum('feature_a', 'feature_b')  # pylint: disable=invalid-name
-SERVER_MODES = platform_parameter_domain.SERVER_MODES
-FEATURE_STAGES = platform_parameter_domain.FEATURE_STAGES
+
+class ParamNames(enum.Enum):
+    """Enum for parameter names."""
+
+    FEATURE_A = 'feature_a'
+    FEATURE_B = 'feature_b'
+
+
+SERVER_MODES = platform_parameter_domain.SERVER_MODES # pylint: disable=invalid-name
+FEATURE_STAGES = platform_parameter_domain.FEATURE_STAGES # pylint: disable=invalid-name
 
 
 class PlatformFeatureServiceTest(test_utils.GenericTestBase):
@@ -44,16 +52,16 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         registry.Registry.parameter_registry.clear()
         # Parameter names that might be used in following tests.
         param_names = ['feature_a', 'feature_b']
-        param_name_enums = [PARAM_NAMES.feature_a, PARAM_NAMES.feature_b]
+        param_name_enums = [ParamNames.FEATURE_A, ParamNames.FEATURE_B]
         caching_services.delete_multi(
             caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER, None,
             param_names)
 
         self.dev_feature = registry.Registry.create_feature_flag(
-            PARAM_NAMES.feature_a, 'a feature in dev stage',
+            ParamNames.FEATURE_A, 'a feature in dev stage',
             platform_parameter_domain.FEATURE_STAGES.dev)
         self.prod_feature = registry.Registry.create_feature_flag(
-            PARAM_NAMES.feature_b, 'a feature in prod stage',
+            ParamNames.FEATURE_B, 'a feature in prod stage',
             platform_parameter_domain.FEATURE_STAGES.prod)
         registry.Registry.update_platform_parameter(
             self.dev_feature.name, self.user_id, 'edit rules',
