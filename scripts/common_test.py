@@ -31,11 +31,10 @@ import sys
 import tempfile
 import time
 
-from io import TextIOWrapper
 from core import constants
 from core import python_utils
 from core.tests import test_utils
-from typing import Iterator, Any, NoReturn
+from typing import Any, NoReturn, Generator
 
 from . import common
 
@@ -51,7 +50,7 @@ class CommonTests(test_utils.GenericTestBase):
     """Test the methods which handle common functionalities."""
 
     @contextlib.contextmanager
-    def open_tcp_server_port(self) -> Iterator[int]:
+    def open_tcp_server_port(self) -> Generator[int]:
         """Context manager for starting and stoping an HTTP TCP server.
 
         Yields:
@@ -472,7 +471,7 @@ class CommonTests(test_utils.GenericTestBase):
     def test_print_each_string_after_two_new_lines(self) -> None:
         @contextlib.contextmanager
         def _redirect_stdout(
-                new_target: TextIOWrapper) -> Iterator[TextIOWrapper]:
+                new_target: Any) -> Generator[Any, Any, None]:
             """Redirect stdout to the new target.
 
             Args:

@@ -855,7 +855,9 @@ class BuildTests(test_utils.GenericTestBase):
 
     def test_minify_third_party_libs(self) -> None:
 
-        def _mock_safe_delete_file(unused_filepath: str) -> None:
+        def _mock_safe_delete_file(
+                unused_filepath: str  # pylint: disable=unused-argument
+        ) -> None:
             """Mocks build.safe_delete_file()."""
             pass
 
@@ -914,7 +916,9 @@ class BuildTests(test_utils.GenericTestBase):
             self.assertEqual(config_path, expected_config_path)
             check_function_calls['build_using_webpack_gets_called'] = True
 
-        def mock_ensure_files_exist(unused_filepaths: list[str]) -> None:
+        def mock_ensure_files_exist(
+                unused_filepaths: list[str]  # pylint: disable=unused-argument
+                                    ) -> None:
             check_function_calls['ensure_files_exist_gets_called'] = True
 
         def mock_modify_constants(
@@ -925,8 +929,9 @@ class BuildTests(test_utils.GenericTestBase):
             check_function_calls['modify_constants_gets_called'] = True
 
         def mock_compare_file_count(
-                unused_first_dir: list[str],
-                unused_second_dir: list[str]) -> None:
+                unused_first_dir: list[str],  # pylint: disable=unused-argument
+                unused_second_dir: list[str]  # pylint: disable=unused-argument
+        ) -> None:
             check_function_calls['compare_file_count_gets_called'] = True
 
         def mock_generate_python_package() -> None:
@@ -970,7 +975,9 @@ class BuildTests(test_utils.GenericTestBase):
             self.assertEqual(config_path, expected_config_path)
             check_function_calls['build_using_webpack_gets_called'] = True
 
-        def mock_ensure_files_exist(unused_filepaths: list[str]) -> None:
+        def mock_ensure_files_exist(
+                unused_filepaths: list[str]  # pylint: disable=unused-argument
+        ) -> None:
             check_function_calls['ensure_files_exist_gets_called'] = True
 
         def mock_modify_constants(
@@ -981,8 +988,9 @@ class BuildTests(test_utils.GenericTestBase):
             check_function_calls['modify_constants_gets_called'] = True
 
         def mock_compare_file_count(
-                unused_first_dir: list[str],
-                unused_second_dir: list[str]) -> None:
+                unused_first_dir: list[str],  # pylint: disable=unused-argument
+                unused_second_dir: list[str]  # pylint: disable=unused-argument
+        ) -> None:
             check_function_calls['compare_file_count_gets_called'] = True
 
         ensure_files_exist_swap = self.swap(
@@ -1010,7 +1018,9 @@ class BuildTests(test_utils.GenericTestBase):
             'modify_constants_gets_called': True,
         }
 
-        def mock_ensure_files_exist(unused_filepaths: list[str]) -> None:
+        def mock_ensure_files_exist(
+                unused_filepaths: list[str]  # pylint: disable=unused-argument
+        ) -> None:
             check_function_calls['ensure_files_exist_gets_called'] = True
 
         def mock_modify_constants(
@@ -1044,7 +1054,9 @@ class BuildTests(test_utils.GenericTestBase):
             'ensure_files_exist_gets_called': True,
         }
 
-        def mock_ensure_files_exist(unused_filepaths: list[str]) -> None:
+        def mock_ensure_files_exist(
+                unused_filepaths: list[str]  # pylint: disable=unused-argument
+        ) -> None:
             check_function_calls['ensure_files_exist_gets_called'] = True
 
         ensure_files_exist_swap = self.swap(
@@ -1067,13 +1079,15 @@ class BuildTests(test_utils.GenericTestBase):
             'ensure_modify_constants_gets_called': False,
         }
 
-        def mock_ensure_files_exist(unused_filepaths: list[str]) -> None:
+        def mock_ensure_files_exist(
+                unused_filepaths: list[str]  # pylint: disable=unused-argument
+        ) -> None:
             check_function_calls['ensure_files_exist_gets_called'] = True
 
         def mock_modify_constants(
-                unused_prod_env: bool,
-                maintenance_mode: bool
-        ) -> None:  # pylint: disable=unused-argument
+                unused_prod_env: bool,  # pylint: disable=unused-argument
+                maintenance_mode: bool  # pylint: disable=unused-argument
+        ) -> None:
             check_function_calls['ensure_modify_constants_gets_called'] = True
 
         ensure_files_exist_swap = self.swap(
