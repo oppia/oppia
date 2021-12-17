@@ -36,7 +36,7 @@ if MYPY: # pragma: no cover
 
 
 class TaskEntryDict(TypedDict):
-    """Dict for TaskEntry object"""
+    """Dict for TaskEntry object."""
 
     entity_type: str
     entity_id: str

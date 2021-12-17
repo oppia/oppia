@@ -26,7 +26,7 @@ from typing_extensions import TypedDict
 
 
 class FeedbackThreadDict(TypedDict):
-    """Dict for FeedbackThread object"""
+    """Dict for FeedbackThread object."""
 
     last_updated_msecs: float
     original_author_username: Optional[str]
@@ -41,7 +41,7 @@ class FeedbackThreadDict(TypedDict):
 
 
 class FeedbackMessageDict(TypedDict):
-    """Dict for FeedbackMessage object"""
+    """Dict for FeedbackMessage object."""
 
     author_username: Optional[str]
     created_on_msecs: float
@@ -54,7 +54,7 @@ class FeedbackMessageDict(TypedDict):
 
 
 class FeedbackThreadSummaryDict(TypedDict):
-    """Dict for FeedbackThreadSummary object"""
+    """Dict for FeedbackThreadSummary object."""
 
     status: str
     original_author_id: str
