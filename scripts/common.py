@@ -32,7 +32,7 @@ import time
 from core import constants
 from core import python_utils
 
-from typing import Any, Optional, Generator
+from typing import Any, Generator, Optional
 
 AFFIRMATIVE_CONFIRMATIONS = ['y', 'ye', 'yes']
 
