@@ -204,7 +204,7 @@ def generate_app_yaml(deploy_mode: bool =False):
 
 
 def modify_constants(
-        prod_env:bool=False, emulator_mode:bool=True, maintenance_mode:bool=False):
+        prod_env: bool = False, emulator_mode: bool = True, maintenance_mode: bool = False):
     """Modify constants.ts and feconf.py.
 
     Args:
@@ -293,7 +293,7 @@ def _join_files(source_paths: list[str] | str, target_file_stream):
             write_to_file_stream(target_file_stream, source_file.read())
 
 
-def _minify_and_create_sourcemap(source_path:str, target_file_path:str):
+def _minify_and_create_sourcemap(source_path: str, target_file_path: str):
     """Minifies and generates source map for a JS file. This function is only
     meant to be used with third_party.min.js.
 
@@ -309,7 +309,9 @@ def _minify_and_create_sourcemap(source_path:str, target_file_path:str):
     subprocess.check_call(cmd, shell=True)
 
 
-def _generate_copy_tasks_for_fonts(source_paths: list[str] | str, target_path: str) -> collections.deque[threading.Thread]:
+def _generate_copy_tasks_for_fonts(
+        source_paths: list[str] | str,
+        target_path: str) -> collections.deque[threading.Thread]:
     """Queue up a copy task for each font file.
 
     Args:
@@ -466,7 +468,7 @@ def process_html(source_file_stream, target_file_stream):
         target_file_stream, REMOVE_WS(' ', source_file_stream.read()))
 
 
-def get_dependency_directory(dependency: dict[str,str]) -> str:
+def get_dependency_directory(dependency: dict[str, str]) -> str:
     """Get dependency directory from dependency dictionary.
 
     Args:
@@ -483,7 +485,9 @@ def get_dependency_directory(dependency: dict[str,str]) -> str:
     return os.path.join(THIRD_PARTY_STATIC_DIR, dependency_dir)
 
 
-def get_css_filepaths(dependency_bundle: dict[str, list[str] | str], dependency_dir: str) -> list[str]:
+def get_css_filepaths(
+        dependency_bundle: dict[str, list[str] | str],
+        dependency_dir: str) -> list[str]:
     """Gets dependency css filepaths.
 
     Args:
@@ -502,7 +506,9 @@ def get_css_filepaths(dependency_bundle: dict[str, list[str] | str], dependency_
     return [os.path.join(dependency_dir, css_file) for css_file in css_files]
 
 
-def get_js_filepaths(dependency_bundle: dict[str, list[str] | str], dependency_dir: str) -> list[str]:
+def get_js_filepaths(
+        dependency_bundle: dict[str, list[str] | str],
+        dependency_dir: str) -> list[str]:
     """Gets dependency js filepaths.
 
     Args:
@@ -521,7 +527,9 @@ def get_js_filepaths(dependency_bundle: dict[str, list[str] | str], dependency_d
     return [os.path.join(dependency_dir, js_file) for js_file in js_files]
 
 
-def get_font_filepaths(dependency_bundle: dict[str, list[str] | str], dependency_dir: str) -> list[str]:
+def get_font_filepaths(
+        dependency_bundle: dict[str, list[str] | str],
+        dependency_dir: str) -> list[str]:
     """Gets dependency font filepaths.
 
     Args:
@@ -703,7 +711,9 @@ def should_file_be_built(filepath: str) -> bool:
 
 
 def generate_copy_tasks_to_copy_from_source_to_target(
-        source: str, target: str, file_hashes: dict[str,str]) -> collections.deque(threading.Thread):
+        source: str,
+        target: str,
+        file_hashes: dict[str, str]) -> collections.deque(threading.Thread):
     """Generate copy task for each file in source directory, excluding files
     with extensions in FILE_EXTENSIONS_TO_IGNORE. Insert hash from hash dict
     into the destination filename.
@@ -750,7 +760,7 @@ def generate_copy_tasks_to_copy_from_source_to_target(
     return copy_tasks
 
 
-def is_file_hash_provided_to_frontend(filepath:str) -> bool:
+def is_file_hash_provided_to_frontend(filepath: str) -> bool:
     """Returns if the hash for the filepath should be provided to the frontend.
 
     Args:
@@ -783,7 +793,9 @@ def generate_md5_hash(filepath: str) -> str:
     return m.hexdigest()
 
 
-def get_filepaths_by_extensions(source_dir: str, file_extensions: tuple(str)) -> list[str]:
+def get_filepaths_by_extensions(
+        source_dir: str,
+        file_extensions: tuple(str)) -> list[str]:
     """Return list of filepaths in a directory with certain extensions,
     excluding filepaths that should not be built.
 
@@ -840,7 +852,7 @@ def get_file_hashes(directory_path: str) -> dict[str, str]:
     return file_hashes
 
 
-def filter_hashes(file_hashes: dict[str, str]) -> dict[str,str]:
+def filter_hashes(file_hashes: dict[str, str]) -> dict[str, str]:
     """Filters hashes that should be provided to the frontend
     and prefixes "/" in front of the keys.
 
@@ -879,7 +891,7 @@ def save_hashes_to_file(file_hashes: dict[str, str]) -> str:
         hashes_json_file.write(u'\n')
 
 
-def minify_func(source_path, target_path, filename:str):
+def minify_func(source_path, target_path, filename: str):
     """Call the appropriate functions to handle different types of file
     formats:
         - HTML files: Remove whitespaces, interpolates paths in HTML to include
@@ -926,7 +938,9 @@ def _execute_tasks(tasks, batch_size=24):
                 raise OSError('threads can only be started once')
 
 
-def generate_build_tasks_to_build_all_files_in_directory(source: str, target: str) -> collections.deque[threading.Thread]:
+def generate_build_tasks_to_build_all_files_in_directory(
+        source: str,
+        target: str) -> collections.deque[threading.Thread]:
     """This function queues up tasks to build all files in a directory,
     excluding files that should not be built.
 
@@ -961,7 +975,9 @@ def generate_build_tasks_to_build_all_files_in_directory(source: str, target: st
 
 
 def generate_build_tasks_to_build_files_from_filepaths(
-        source_path: str, target_path: str, filepaths: list[str]) -> collections.deque[threading.Thread]:
+        source_path: str,
+        target_path: str,
+        filepaths: list[str]) -> collections.deque[threading.Thread]:
     """This function queues up build tasks to build files from a list of
     filepaths, excluding files that should not be built.
 
@@ -991,7 +1007,8 @@ def generate_build_tasks_to_build_files_from_filepaths(
 
 
 def generate_delete_tasks_to_remove_deleted_files(
-        source_dir_hashes: dict[str, str], staging_directory: str) -> collections.deque[threading.Thread]:
+        source_dir_hashes: dict[str, str],
+        staging_directory: str) -> collections.deque[threading.Thread]:
     """This function walks the staging directory and queues up deletion tasks to
     remove files that are not in the hash dict i.e. remaining files in staging
     directory that have since been deleted from source directory. Files with
@@ -1034,7 +1051,9 @@ def generate_delete_tasks_to_remove_deleted_files(
     return delete_tasks
 
 
-def get_recently_changed_filenames(source_dir_hashes: dict[str,str], out_dir:str) -> list[str]:
+def get_recently_changed_filenames(
+        source_dir_hashes: dict[str, str],
+        out_dir: str) -> list[str]:
     """Compare hashes of source files and built files. Return a list of
     filenames that were recently changed. Skips files that are not supposed to
     built or already built.
@@ -1053,7 +1072,7 @@ def get_recently_changed_filenames(source_dir_hashes: dict[str,str], out_dir:str
     # If a file gets edited, a different MD5 hash is generated.
     recently_changed_filenames = []
     # Currently, Python files and HTML files are always re-built.
-    file_extensions_not_to_track = ('.html', '.py',)
+    file_extensions_not_to_track = ('.html', '.py')
     for filename, md5_hash in source_dir_hashes.items():
         # Skip files that are already built or should not be built.
         if should_file_be_built(filename) and not any(
@@ -1071,7 +1090,8 @@ def get_recently_changed_filenames(source_dir_hashes: dict[str,str], out_dir:str
     return recently_changed_filenames
 
 
-def generate_build_tasks_to_build_directory(dirnames_dict: dict[str,str]) -> collections.deque[threading.Thread]:
+def generate_build_tasks_to_build_directory(
+        dirnames_dict: dict[str, str]) -> collections.deque[threading.Thread]:
     """This function queues up build tasks to build all files in source
     directory if there is no existing staging directory. Otherwise, selectively
     queue up build tasks to build recently changed files.
@@ -1138,7 +1158,7 @@ def generate_build_tasks_to_build_directory(dirnames_dict: dict[str,str]) -> col
     return build_tasks
 
 
-def _verify_filepath_hash(relative_filepath: str, file_hashes: dict[str,str]):
+def _verify_filepath_hash(relative_filepath: str, file_hashes: dict[str, str]):
     """Ensure that hashes in filepaths match with the hash entries in hash
     dict.
 
@@ -1176,7 +1196,7 @@ def _verify_filepath_hash(relative_filepath: str, file_hashes: dict[str,str]):
             relative_filepath)
 
 
-def _verify_hashes(output_dirnames: list[str], file_hashes: dict[str,str]):
+def _verify_hashes(output_dirnames: list[str], file_hashes: dict[str, str]):
     """Verify a few metrics after build process finishes:
         1) The hashes in filenames belongs to the hash dict.
         2) hashes.json, third_party.min.css and third_party.min.js are built and

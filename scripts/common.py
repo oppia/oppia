@@ -246,7 +246,8 @@ def run_cmd(cmd_tokens: list[str]) -> str:
         cmd_tokens, stderr=subprocess.STDOUT, encoding='utf-8').strip()
 
 
-def ensure_directory_exists(d: str | bytes | os.PathLike[str] | os.PathLike[bytes]) -> None:
+def ensure_directory_exists(
+        d: str | bytes) -> None:
     """Creates the given directory if it does not already exist."""
     if not os.path.exists(d):
         os.makedirs(d)

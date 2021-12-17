@@ -31,11 +31,10 @@ import sys
 import tempfile
 import time
 
-from io import TextIOWrapper
 from core import constants
 from core import python_utils
 from core.tests import test_utils
-from typing import Iterator, Union, Any, List, Optional, cast, NoReturn
+from typing import Iterator, Any, NoReturn
 
 from . import common
 
@@ -284,27 +283,32 @@ class CommonTests(test_utils.GenericTestBase):
         ):
             self.assertEqual(common.get_current_branch_name(), 'test')
 
-    def test_get_current_release_version_number_with_non_hotfix_branch(self) -> None:
+    def test_get_current_release_version_number_with_non_hotfix_branch(
+            self) -> None:
         self.assertEqual(
             common.get_current_release_version_number('release-1.2.3'), '1.2.3')
 
-    def test_get_current_release_version_number_with_hotfix_branch(self) -> None:
+    def test_get_current_release_version_number_with_hotfix_branch(
+            self) -> None:
         self.assertEqual(
             common.get_current_release_version_number('release-1.2.3-hotfix-1'),
             '1.2.3')
 
-    def test_get_current_release_version_number_with_maintenance_branch(self) -> None:
+    def test_get_current_release_version_number_with_maintenance_branch(
+            self) -> None:
         self.assertEqual(
             common.get_current_release_version_number(
                 'release-maintenance-1.2.3'), '1.2.3')
 
-    def test_get_current_release_version_number_with_invalid_branch(self) -> None:
+    def test_get_current_release_version_number_with_invalid_branch(
+            self) -> None:
         with self.assertRaisesRegexp(
             Exception, 'Invalid branch name: invalid-branch.'
         ):
             common.get_current_release_version_number('invalid-branch')
 
-    def test_is_current_branch_a_hotfix_branch_with_non_hotfix_branch(self) -> None:
+    def test_is_current_branch_a_hotfix_branch_with_non_hotfix_branch(
+            self) -> None:
         def mock_check_output(unused_cmd_tokens: Any) -> bytes:
             return b'On branch release-1.2.3'
         with self.swap(
@@ -320,7 +324,8 @@ class CommonTests(test_utils.GenericTestBase):
         ):
             self.assertEqual(common.is_current_branch_a_hotfix_branch(), True)
 
-    def test_is_current_branch_a_release_branch_with_release_branch(self) -> None:
+    def test_is_current_branch_a_release_branch_with_release_branch(
+            self) -> None:
         def mock_check_output(unused_cmd_tokens: Any) -> bytes:
             return b'On branch release-1.2.3'
         with self.swap(
@@ -328,7 +333,8 @@ class CommonTests(test_utils.GenericTestBase):
         ):
             self.assertEqual(common.is_current_branch_a_release_branch(), True)
 
-    def test_is_current_branch_a_release_branch_with_hotfix_branch(self) -> None:
+    def test_is_current_branch_a_release_branch_with_hotfix_branch(
+            self) -> None:
         def mock_check_output(unused_cmd_tokens: Any) -> bytes:
             return b'On branch release-1.2.3-hotfix-1'
         with self.swap(
@@ -336,7 +342,8 @@ class CommonTests(test_utils.GenericTestBase):
         ):
             self.assertEqual(common.is_current_branch_a_release_branch(), True)
 
-    def test_is_current_branch_a_release_branch_with_maintenance_branch(self) -> None:
+    def test_is_current_branch_a_release_branch_with_maintenance_branch(
+            self) -> None:
         def mock_check_output(unused_cmd_tokens: Any) -> bytes:
             return b'On branch release-maintenance-1.2.3'
         with self.swap(
@@ -344,7 +351,8 @@ class CommonTests(test_utils.GenericTestBase):
         ):
             self.assertEqual(common.is_current_branch_a_release_branch(), True)
 
-    def test_is_current_branch_a_release_branch_with_non_release_branch(self) -> None:
+    def test_is_current_branch_a_release_branch_with_non_release_branch(
+            self) -> None:
         def mock_check_output(unused_cmd_tokens: Any) -> bytes:
             return b'On branch test'
         with self.swap(
@@ -462,7 +470,8 @@ class CommonTests(test_utils.GenericTestBase):
 
     def test_print_each_string_after_two_new_lines(self) -> None:
         @contextlib.contextmanager
-        def _redirect_stdout(new_target: TextIOWrapper) -> Iterator[TextIOWrapper]:
+        def _redirect_stdout(
+                new_target: TextIOWrapper) -> Iterator[TextIOWrapper]:
             """Redirect stdout to the new target.
 
             Args:
@@ -662,8 +671,7 @@ class CommonTests(test_utils.GenericTestBase):
         shutil.move(backup_file, origin_file)
 
     def test_inplace_replace_file_with_expected_number_of_replacements_raises(
-            self
-    ) -> None:
+            self) -> None:
         origin_file = os.path.join(
             'core', 'tests', 'data', 'inplace_replace_test.json')
         backup_file = os.path.join(
@@ -802,10 +810,13 @@ class CommonTests(test_utils.GenericTestBase):
             self.assertEqual(os.environ['DEF'], 'Easy as 123')
         self.assertNotIn('DEF', os.environ)
 
-    def test_write_stdout_safe_with_repeat_oserror_repeats_call_to_write(self) -> Any:
+    def test_write_stdout_safe_with_repeat_oserror_repeats_call_to_write(
+            self) -> Any:
         raised_once = False
 
-        def write_raise_oserror(unused_fileno: int, bytes_to_write: bytes) -> int:
+        def write_raise_oserror(
+                unused_fileno: int,
+                bytes_to_write: bytes) -> int:
             self.assertEqual(bytes_to_write, 'test'.encode('utf-8'))
 
             nonlocal raised_once

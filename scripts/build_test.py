@@ -37,7 +37,7 @@ from . import common
 from . import scripts_test_utils
 from . import servers
 
-from typing import Iterator, Union, Any, List, Optional, cast, NoReturn, Generator
+from typing import Generator
 
 TEST_DIR = os.path.join('core', 'tests', 'build', '')
 TEST_SOURCE_DIR = os.path.join('core', 'tests', 'build_sources')
@@ -917,10 +917,16 @@ class BuildTests(test_utils.GenericTestBase):
         def mock_ensure_files_exist(unused_filepaths: list[str]) -> None:
             check_function_calls['ensure_files_exist_gets_called'] = True
 
-        def mock_modify_constants(prod_env: bool, emulator_mode: bool, maintenance_mode: bool):  # pylint: disable=unused-argument
+        def mock_modify_constants(
+                prod_env: bool,
+                emulator_mode: bool,
+                maintenance_mode: bool
+        ) -> None: # pylint: disable=unused-argument
             check_function_calls['modify_constants_gets_called'] = True
 
-        def mock_compare_file_count(unused_first_dir: list[str], unused_second_dir: list[str]) -> None:
+        def mock_compare_file_count(
+                unused_first_dir: list[str],
+                unused_second_dir: list[str]) -> None:
             check_function_calls['compare_file_count_gets_called'] = True
 
         def mock_generate_python_package() -> None:
@@ -967,10 +973,16 @@ class BuildTests(test_utils.GenericTestBase):
         def mock_ensure_files_exist(unused_filepaths: list[str]) -> None:
             check_function_calls['ensure_files_exist_gets_called'] = True
 
-        def mock_modify_constants(prod_env: bool, emulator_mode: bool, maintenance_mode: bool) -> None:  # pylint: disable=unused-argument
+        def mock_modify_constants(
+                prod_env: bool,
+                emulator_mode: bool,
+                maintenance_mode: bool
+        ) -> None:  # pylint: disable=unused-argument
             check_function_calls['modify_constants_gets_called'] = True
 
-        def mock_compare_file_count(unused_first_dir: list[str], unused_second_dir: list[str]) -> None:
+        def mock_compare_file_count(
+                unused_first_dir: list[str],
+                unused_second_dir: list[str]) -> None:
             check_function_calls['compare_file_count_gets_called'] = True
 
         ensure_files_exist_swap = self.swap(
@@ -1001,7 +1013,11 @@ class BuildTests(test_utils.GenericTestBase):
         def mock_ensure_files_exist(unused_filepaths: list[str]) -> None:
             check_function_calls['ensure_files_exist_gets_called'] = True
 
-        def mock_modify_constants(prod_env: bool, emulator_mode: bool, maintenance_mode: bool) -> None:  # pylint: disable=unused-argument
+        def mock_modify_constants(
+                prod_env: bool,
+                emulator_mode: bool,
+                maintenance_mode: bool
+        ) -> None:  # pylint: disable=unused-argument
             check_function_calls['modify_constants_gets_called'] = True
 
         ensure_files_exist_swap = self.swap(
@@ -1054,7 +1070,10 @@ class BuildTests(test_utils.GenericTestBase):
         def mock_ensure_files_exist(unused_filepaths: list[str]) -> None:
             check_function_calls['ensure_files_exist_gets_called'] = True
 
-        def mock_modify_constants(unused_prod_env: bool, maintenance_mode: bool) -> None:  # pylint: disable=unused-argument
+        def mock_modify_constants(
+                unused_prod_env: bool,
+                maintenance_mode: bool
+        ) -> None:  # pylint: disable=unused-argument
             check_function_calls['ensure_modify_constants_gets_called'] = True
 
         ensure_files_exist_swap = self.swap(
@@ -1069,7 +1088,9 @@ class BuildTests(test_utils.GenericTestBase):
     def test_build_using_webpack_command(self) -> None:
 
         @contextlib.contextmanager
-        def mock_managed_webpack_compiler(config_path: str | None, max_old_space_size: int | None) -> Generator[psutil.Process]:
+        def mock_managed_webpack_compiler(
+                config_path: str | None,
+                max_old_space_size: int | None) -> Generator[psutil.Process]:
             self.assertEqual(config_path, build.WEBPACK_PROD_CONFIG)
             self.assertEqual(max_old_space_size, 4096)
             yield scripts_test_utils.PopenStub()
