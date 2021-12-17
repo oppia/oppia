@@ -22,6 +22,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { SharedComponentsModule } from 'components/shared-component.module';
+import { AddHintModalComponent } from './editor-tab/templates/modal-templates/add-hint-modal.component';
 import { CkEditorCopyToolbarComponent } from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
@@ -62,6 +63,7 @@ import { ConfirmDeleteStateModalComponent } from './editor-tab/templates/modal-t
     ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
+    AddHintModalComponent,
     CkEditorCopyToolbarComponent,
     DeleteStateSkillModalComponent,
     ParamChangesEditorDirective,
@@ -86,6 +88,7 @@ import { ConfirmDeleteStateModalComponent } from './editor-tab/templates/modal-t
     ConfirmDeleteStateModalComponent
   ],
   entryComponents: [
+    AddHintModalComponent,
     CkEditorCopyToolbarComponent,
     DeleteStateSkillModalComponent,
     StateParamChangesEditorComponent,

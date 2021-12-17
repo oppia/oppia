@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 /**
  * @fileoverview Unit test for State Hints Editor Component.
@@ -24,6 +25,7 @@ describe('StateHintsEditorComponent', () => {
   let $scope = null;
   let $uibModal = null;
   let $q = null;
+  let ngbModal: NgbModal = null;
 
   let WindowDimensionsService = null;
   let EditabilityService = null;
@@ -36,11 +38,22 @@ describe('StateHintsEditorComponent', () => {
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
 
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
+
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     $uibModal = $injector.get('$uibModal');
     $q = $injector.get('$q');
+    ngbModal = $injector.get('NgbModal');
 
     WindowDimensionsService = $injector.get('WindowDimensionsService');
     EditabilityService = $injector.get('EditabilityService');
@@ -250,15 +263,17 @@ describe('StateHintsEditorComponent', () => {
         }
       }
     ];
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.resolve({
-        hint: {
-          hintContent: {
-            html: '<p> New hint </p>'
+    spyOn(ngbModal, 'open').and.returnValue(
+      {
+        result: $q.resolve({
+          hint: {
+            hintContent: {
+              html: '<p> New hint </p>'
+            }
           }
-        }
-      })
-    });
+        })
+      } as NgbModalRef
+    );
 
     $scope.openAddHintModal();
     $scope.$apply();
@@ -285,14 +300,16 @@ describe('StateHintsEditorComponent', () => {
         }
       }
     ];
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.reject()
-    });
+    spyOn(ngbModal, 'open').and.returnValue(
+      {
+        result: $q.reject()
+      } as NgbModalRef
+    );
 
     $scope.openAddHintModal();
     $scope.$apply();
 
-    expect($uibModal.open).toHaveBeenCalled();
+    expect(ngbModal.open).toHaveBeenCalled();
   });
 
   it('should open delete hint modal when user clicks on' +
