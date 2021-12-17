@@ -57,8 +57,10 @@ describe('Delete Exploration Modal Component', function() {
     fixture.detectChanges();
   });
 
+  // Confirm and cancel functions tested in ConfirmOrCancelModal spec file.
+  // So only Component is defined need to be tested in this file.
+
   it('should check whether component is initialized', () => {
-    // Confirm and cancel functions tested in ConfirmOrCancelModal.
     expect(component).toBeDefined();
   });
 });
