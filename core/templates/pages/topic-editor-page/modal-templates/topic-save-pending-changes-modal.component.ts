@@ -22,8 +22,8 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
-  selector: 'oppia-topic-editor-send-mail-modal',
-  templateUrl: './topic-editor-send-mail-modal.component.html'
+  selector: 'oppia-topic-save-pending-changes-modal',
+  templateUrl: './topic-save-pending-changes-modal.component.html'
 })
 export class TopicSavePendingChangesComponent
   extends ConfirmOrCancelModal {

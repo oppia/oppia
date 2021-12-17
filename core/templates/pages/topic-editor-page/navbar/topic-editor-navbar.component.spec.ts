@@ -18,6 +18,7 @@
 
 import { EventEmitter } from '@angular/core';
 import { fakeAsync, tick } from '@angular/core/testing';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { Subtopic } from 'domain/topic/subtopic.model';
 import { TopicRights } from 'domain/topic/topic-rights.model';
@@ -37,12 +38,22 @@ describe('topicEditorNavbar', () => {
   let AlertsService = null;
   let TopicEditorRoutingService = null;
   let TopicRightsBackendApiService = null;
+  let ngbModal: NgbModal = null;
   let topicInitializedEventEmitter = new EventEmitter();
   let topicReinitializedEventEmitter = new EventEmitter();
   let undoRedoChangeAppliedEventEmitter = new EventEmitter();
 
   importAllAngularServices();
-  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
+
   beforeEach(angular.mock.module('oppia', function($provide) {
     let mockWindow = {
       location: '',
@@ -62,6 +73,7 @@ describe('topicEditorNavbar', () => {
     TopicRightsBackendApiService =
       $injector.get('TopicRightsBackendApiService');
     $uibModal = $injector.get('$uibModal');
+    ngbModal = $injector.get('NgbModal');
 
     var subtopic = Subtopic.createFromTitle(1, 'subtopic1');
     subtopic._skillIds = ['skill_1'];
@@ -326,9 +338,11 @@ describe('topicEditorNavbar', () => {
   ' clicks the \'publish\' button and then cancels', fakeAsync(() => {
     spyOn(TopicRightsBackendApiService, 'sendMailAsync').and.returnValue(
       Promise.resolve());
-    spyOn($uibModal, 'open').and.returnValue({
-      result: Promise.reject()
-    });
+      spyOn(ngbModal, 'open').and.returnValue(
+        {
+          result: Promise.reject()
+        } as NgbModalRef
+      );
     spyOn(AlertsService, 'addSuccessMessage');
     $scope.topicRights = TopicRights.createFromBackendDict({
       published: false,

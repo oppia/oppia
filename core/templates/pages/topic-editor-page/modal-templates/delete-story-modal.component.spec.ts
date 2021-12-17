@@ -12,9 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
- * @fileoverview Unit tests for the TopicEditorSendMailComponent.
+ * @fileoverview Unit tests for the DeleteStoryModalComponent.
  */
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
@@ -46,10 +45,9 @@ describe('Delete Story Modal Component', function() {
     TestBed.inject(NgbActiveModal);
   });
 
-  // This only contains one test case because this modal component
-  // have only confirm and cancel functionality. It inherits the
-  // ngbActiveModal class and it doesn't add any additional
-  // functionalities to it.
+  // This component have no more frontend tests as it inherits the
+  // ConfirmOrCancelModalComponent and doesn't have any additional
+  // functionality. Please see the ConfirmOrCancelModalComponent for more tests.
   it('should create', () => {
     expect(component).toBeDefined();
   });
