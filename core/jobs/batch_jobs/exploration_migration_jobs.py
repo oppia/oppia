@@ -18,6 +18,8 @@
 
 from __future__ import annotations
 
+import logging
+
 from core import feconf
 from core.domain import caching_services
 from core.domain import exp_domain
@@ -52,17 +54,19 @@ class MigrateExplorationJob(base_jobs.JobBase):
     @staticmethod
     def _migrate_exploration(
         exp_id: str, exp_model: exp_models.ExplorationModel
-    ) -> result.Result[Tuple[str, exp_domain.Exploration], Tuple[str, Exception]]:
-        """Migrates exploration and transform exploration model into exploration object.
+    ) -> result.Result[Tuple[str, exp_domain.Exploration], Tuple[str, Exception]]: # pylint: disable=line-too-long
+        """Migrates exploration and transform exploration model
+        into exploration object.
 
         Args:
             exp_id: str. The id of the exploration.
             exp_model: ExplorationModel. The exploration model to migrate.
 
         Returns:
-            Result((str, Exploration), (str, Exception)). Result containing tuple that
-            consists of exploration ID and either exploration object or Exception. Exploration
-            object is returned when the migration was successful and Exception
+            Result((str, Exploration), (str, Exception)). Result
+            containing tuple that consists of exploration ID and either
+            exploration object or Exception. Exploration object is
+            returned when the migration was successful and Exception
             is returned otherwise.
         """
         try:
@@ -83,9 +87,12 @@ class MigrateExplorationJob(base_jobs.JobBase):
         """Generates newly updated exploration models.
 
         Args:
-            exp_model: ExplorationModel. The exploration which should be updated.
-            migrated_exploration: Exploration. The migrated exploration domain object.
-            exploration_changes: sequence(ExplorationChange). The exploration changes to apply.
+            exp_model: ExplorationModel. The exploration which
+                should be updated.
+            migrated_exploration: Exploration. The migrated exploration
+                domain object.
+            exploration_changes: sequence(ExplorationChange). The
+                exploration changes to apply.
 
         Returns:
             sequence(BaseModel). Sequence of models which should be put into
@@ -119,9 +126,10 @@ class MigrateExplorationJob(base_jobs.JobBase):
         """Generates newly updated exploration summary model.
 
         Args:
-            migrated_exploration: Exploration. The migrated exploration domain object.
-            exploration_summary_model: ExpSummaryModel. The exploration summary model
-                to update.
+            migrated_exploration: Exploration. The migrated exploration
+                domain object.
+            exploration_summary_model: ExpSummaryModel. The exploration
+                summary model to update.
 
         Returns:
             ExpSummaryModel. The updated exploration summary model to put into
@@ -137,13 +145,13 @@ class MigrateExplorationJob(base_jobs.JobBase):
             )
         )
 
-
     @staticmethod
     def _generate_exploration_changes(
         exp_id: str, exp_model: exp_models.ExplorationModel
     ) -> Iterable[Tuple[str, exp_domain.ExplorationChange]]:
-        """Generates exploration change objects. Exploration change object is generated when
-        schema version for some field is lower than the latest schema version.
+        """Generates exploration change objects. Exploration
+        change object is generated when schema version for some field
+        is lower than the latest schema version.
 
         Args:
             exp_id: str. The id of the exploration.
@@ -151,8 +159,8 @@ class MigrateExplorationJob(base_jobs.JobBase):
                 the change objects.
 
         Yields:
-            (str, ExplorationChange). Tuple containing exploration ID and exploration change
-            object.
+            (str, ExplorationChange). Tuple containing exploration
+            ID and exploration change object.
         """
         if exp_model.version < feconf.CURRENT_EXP_SCHEMA_VERSION:
             exp = exp_fetchers.get_exploration_from_model(exp_model)
@@ -170,7 +178,8 @@ class MigrateExplorationJob(base_jobs.JobBase):
         """Deletes exploration from cache.
 
         Args:
-            exploration: Exploration. The exploration which should be deleted from cache.
+            exploration: Exploration. The exploration
+                which should be deleted from cache.
 
         Returns:
             Result(str, Exception). The id of the exploration when the deletion
@@ -178,7 +187,10 @@ class MigrateExplorationJob(base_jobs.JobBase):
         """
         try:
             caching_services.delete_multi(
-                caching_services.CACHE_NAMESPACE_EXPLORATION, None, [exploration.id])
+                caching_services.CACHE_NAMESPACE_EXPLORATION,
+                None,
+                [exploration.id]
+            )
             return result.Ok(exploration.id)
         except Exception as e:
             return result.Err(e)
@@ -187,12 +199,17 @@ class MigrateExplorationJob(base_jobs.JobBase):
         """Returns a PCollection of results from the exploration migration.
 
         Returns:
-            PCollection. A PCollection of results from the exploration migration.
+            PCollection. A PCollection of results from the
+            exploration migration.
         """
         unmigrated_exploration_models = (
             self.pipeline
             | 'Get all non-deleted exploration models' >> (
-                ndb_io.GetModels(exp_models.ExplorationModel.get_all(include_deleted=False)))
+                ndb_io.GetModels(
+                    exp_models.ExplorationModel.get_all(
+                        include_deleted=False)
+                    )
+                )
             # Pylint disable is needed because pylint is not able to correctly
             # detect that the value is passed through the pipe.
             | 'Add exploration keys' >> beam.WithKeys( # pylint: disable=no-value-for-parameter
@@ -201,7 +218,11 @@ class MigrateExplorationJob(base_jobs.JobBase):
         exploration_summary_models = (
             self.pipeline
             | 'Get all non-deleted exploration summary models' >> (
-                ndb_io.GetModels(exp_models.ExpSummaryModel.get_all(include_deleted=False)))
+                ndb_io.GetModels(
+                    exp_models.ExpSummaryModel.get_all(
+                        include_deleted=False)
+                    )
+                )
             # Pylint disable is needed because pylint is not able to correctly
             # detect that the value is passed through the pipe.
             | 'Add exploration summary keys' >> beam.WithKeys( # pylint: disable=no-value-for-parameter
@@ -223,7 +244,8 @@ class MigrateExplorationJob(base_jobs.JobBase):
         migrated_exploration_job_run_results = (
             migrated_exploration_results
             | 'Generate results for migration' >> (
-                job_result_transforms.ResultsToJobRunResults('EXPLORATION PROCESSED'))
+                job_result_transforms.ResultsToJobRunResults(
+                    'EXPLORATION PROCESSED'))
         )
 
         exploration_changes = (
@@ -242,10 +264,11 @@ class MigrateExplorationJob(base_jobs.JobBase):
             | 'Merge objects' >> beam.CoGroupByKey()
             | 'Get rid of ID' >> beam.Values()  # pylint: disable=no-value-for-parameter
             | 'Remove unmigrated exploration' >> beam.Filter(
-                lambda x: len(x['exploration_changes']) > 0 and len(x['exploration']) > 0)
+                lambda x: len(x['exploration_changes']) > 0 and len(x['exploration']) > 0) # pylint: disable=line-too-long
             | 'Reorganize the exploration objects' >> beam.Map(lambda objects: {
                     'exp_model': objects['exp_model'][0],
-                    'exploration_summary_model': objects['exploration_summary_model'][0],
+                    'exploration_summary_model': (
+                        objects['exploration_summary_model'][0]),
                     'exploration': objects['exploration'][0],
                     'exploration_changes': objects['exploration_changes']
                 })
@@ -261,8 +284,9 @@ class MigrateExplorationJob(base_jobs.JobBase):
         cache_deletion_job_run_results = (
             exploration_objects_list
             | 'Delete exploration from cache' >> beam.Map(
-                lambda exploration_object: self._delete_exploration_from_cache(
-                    exploration_object['exploration']))
+                lambda exploration_object: (
+                    self._delete_exploration_from_cache(
+                        exploration_object['exploration'])))
             | 'Generate results for cache deletion' >> (
                 job_result_transforms.ResultsToJobRunResults('CACHE DELETION'))
         )
