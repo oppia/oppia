@@ -124,7 +124,7 @@ describe('StateSolutionEditorComponent', () => {
     expect($scope.solutionCardIsShown).toBe(true);
   });
 
-  fit('should open delete solution modal when user clicks on delete', () => {
+  it('should open delete solution modal when user clicks on delete', () => {
     spyOn(ngbModal, 'open').and.returnValue(
       {
         result: $q.resolve()
@@ -140,7 +140,7 @@ describe('StateSolutionEditorComponent', () => {
     expect(StateSolutionService.saveDisplayedValue).toHaveBeenCalled();
   });
 
-  fit('should close delete solution modal when user clicks cancel', () => {
+  it('should close delete solution modal when user clicks cancel', () => {
     spyOn(ngbModal, 'open').and.returnValue(
       {
         result: $q.reject()
