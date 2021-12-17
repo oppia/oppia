@@ -129,11 +129,7 @@ export class AudioPlayerService {
     if (!this._currentTrack) {
       return;
     }
-    this._lastPauseOrSeekPos = 0;
-    this.setCurrentTime(0);
-    this._currentTrack.stop();
     this._stopIntervalSubject.next();
-
     this._currentTrack = null;
     this._currentTrackFilename = null;
     this._lastPauseOrSeekPos = null;
