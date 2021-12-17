@@ -35,6 +35,8 @@ from scripts import common
 from scripts import scripts_test_utils
 from scripts import servers
 
+from typing import Generator, Any
+
 import psutil
 
 
@@ -44,18 +46,22 @@ class ManagedProcessTests(test_utils.TestBase):
     POPEN_CALL = (
         collections.namedtuple('POPEN_CALL', ['program_args', 'kwargs']))
 
-    def setUp(self):
+    def setUp(self) -> None:
         super(ManagedProcessTests, self).setUp()
         self.exit_stack = contextlib.ExitStack()
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         try:
             self.exit_stack.close()
         finally:
             super(ManagedProcessTests, self).tearDown()
 
     @contextlib.contextmanager
-    def swap_popen(self, unresponsive=False, num_children=0, outputs=()):
+    def swap_popen(
+            self,
+            unresponsive: bool = False,
+            num_children: int = 0,
+            outputs: list(bytes) = ()) -> Generator[list, Any, None]:
         """Returns values for inspecting and mocking calls to psutil.Popen.
 
         Args:

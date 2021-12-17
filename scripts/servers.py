@@ -25,6 +25,9 @@ import signal
 import subprocess
 import sys
 import threading
+import psutil
+
+from typing import Generator, Any
 
 from core import feconf
 from core import python_utils
@@ -33,8 +36,11 @@ from scripts import common
 
 @contextlib.contextmanager
 def managed_process(
-        command_args, human_readable_name='Process', shell=False,
-        timeout_secs=60, **popen_kwargs):
+        command_args: list(int | str),
+        human_readable_name: str = 'Process',
+        shell: bool = False,
+        timeout_secs: int = 60,
+        **popen_kwargs: dict()) -> Generator[subprocess.Popen, Any, None]:
     """Context manager for starting and stopping a process gracefully.
 
     Args:
@@ -113,10 +119,16 @@ def managed_process(
 
 @contextlib.contextmanager
 def managed_dev_appserver(
-        app_yaml_path, env=None, log_level='info',
-        host='0.0.0.0', port=8080, admin_host='0.0.0.0', admin_port=8000,
-        enable_host_checking=True, automatic_restart=False,
-        skip_sdk_update_check=False):
+        app_yaml_path: str,
+        env: dict[str, str] = None,
+        log_level: str = 'info',
+        host: str = '0.0.0.0',
+        port: int = 8080,
+        admin_host: str = '0.0.0.0',
+        admin_port: int = 8000,
+        enable_host_checking: bool = True,
+        automatic_restart: bool = False,
+        skip_sdk_update_check: bool = False) -> Generator[Any, Any, None]:
     """Returns a context manager to start up and shut down a GAE dev appserver.
 
     Args:
@@ -172,7 +184,7 @@ def managed_dev_appserver(
 
 
 @contextlib.contextmanager
-def managed_firebase_auth_emulator(recover_users=False):
+def managed_firebase_auth_emulator(recover_users: bool = False) -> Generator[Any, Any, None]:
     """Returns a context manager to manage the Firebase auth emulator.
 
     Args:
@@ -203,7 +215,7 @@ def managed_firebase_auth_emulator(recover_users=False):
 
 
 @contextlib.contextmanager
-def managed_elasticsearch_dev_server():
+def managed_elasticsearch_dev_server() -> Generator[Any, Any, None]:
     """Returns a context manager for ElasticSearch server for running tests
     in development mode and running a local dev server. This is only required
     in a development environment.
@@ -230,7 +242,7 @@ def managed_elasticsearch_dev_server():
 
 
 @contextlib.contextmanager
-def managed_cloud_datastore_emulator(clear_datastore=False):
+def managed_cloud_datastore_emulator(clear_datastore=False) -> Generator[Any, Any, None]:
     """Returns a context manager for the Cloud Datastore emulator.
 
     Args:
@@ -293,7 +305,7 @@ def managed_cloud_datastore_emulator(clear_datastore=False):
 
 
 @contextlib.contextmanager
-def managed_redis_server():
+def managed_redis_server() -> Generator:
     """Run the redis server within a context manager that ends it gracefully."""
     if common.is_windows_os():
         raise Exception(
@@ -320,7 +332,7 @@ def managed_redis_server():
             subprocess.check_call([common.REDIS_CLI_PATH, 'shutdown', 'nosave'])
 
 
-def create_managed_web_browser(port):
+def create_managed_web_browser(port: int) -> Generator[subprocess.Popen, Any, None] | None:
     """Returns a context manager for a web browser targeting the given port on
     localhost. If a web browser cannot be opened on the current system by Oppia,
     then returns None instead.
@@ -349,8 +361,8 @@ def create_managed_web_browser(port):
 
 @contextlib.contextmanager
 def managed_webpack_compiler(
-        config_path=None, use_prod_env=False, use_source_maps=False,
-        watch_mode=False, max_old_space_size=None):
+        config_path: str | None = None, use_prod_env: bool = False, use_source_maps: bool = False,
+        watch_mode: bool = False, max_old_space_size: int | None = None) -> Generator:
     """Returns context manager to start/stop the webpack compiler gracefully.
 
     Args:
@@ -411,7 +423,7 @@ def managed_webpack_compiler(
                 # raise an error because a build hasn't finished successfully.
                 raise IOError('First build never completed')
 
-        def print_proc_output():
+        def print_proc_output() -> None:
             """Prints the proc's output until it is exhausted."""
             for line in iter(lambda: proc.stdout.readline() or None, None):
                 common.write_stdout_safe(line)
@@ -425,7 +437,7 @@ def managed_webpack_compiler(
 
 
 @contextlib.contextmanager
-def managed_portserver():
+def managed_portserver() -> Generator:
     """Returns context manager to start/stop the portserver gracefully.
 
     The portserver listens at PORTSERVER_SOCKET_FILEPATH and allocates free
