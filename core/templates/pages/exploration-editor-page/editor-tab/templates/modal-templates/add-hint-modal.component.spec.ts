@@ -74,7 +74,7 @@ describe('Add Hint Modal Controller', function() {
     stateHintsService.init('State1', new Array(4));
   });
 
-  it('should initialize $scope properties after controller is initialized',
+  it('should initialize component properties after component is initialized',
     function() {
       component.ngOnInit();
       expect(component.tmpHint).toBe('');
@@ -123,14 +123,14 @@ describe('Add Hint Modal Controller', function() {
     expect(component.isHintLengthExceeded(hint2)).toBe(true);
   });
 
-  fit('should invoke change detection when html is updated', () => {
+  it('should invoke change detection when html is updated', () => {
     component.tmpHint = 'old';
     spyOn(changeDetectorRef, 'detectChanges').and.callThrough();
     component.updateValue('new');
     expect(component.tmpHint).toEqual('new');
   });
 
-  fit('should not invoke change detection when html is not updated', () => {
+  it('should not invoke change detection when html is not updated', () => {
     component.tmpHint = 'old';
     spyOn(changeDetectorRef, 'detectChanges').and.callThrough();
     component.updateValue('old');
