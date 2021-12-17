@@ -54,6 +54,7 @@ import { RemoveRoleConfirmationModalComponent } from './settings-tab/templates/r
 import { ReassignRoleConfirmationModalComponent } from './settings-tab/templates/reassign-role-confirmation-modal.component';
 import { ModeratorUnpublishExplorationModalComponent } from './settings-tab/templates/moderator-unpublish-exploration-modal.component';
 import { TransferExplorationOwnershipModalComponent } from './settings-tab/templates/transfer-exploration-ownership-modal.component';
+import { ConfirmDeleteStateModalComponent } from './editor-tab/templates/modal-templates/confirm-delete-state-modal.component';
 
 @NgModule({
   imports: [
@@ -89,7 +90,8 @@ import { TransferExplorationOwnershipModalComponent } from './settings-tab/templ
     RemoveRoleConfirmationModalComponent,
     ReassignRoleConfirmationModalComponent,
     ModeratorUnpublishExplorationModalComponent,
-    TransferExplorationOwnershipModalComponent
+    TransferExplorationOwnershipModalComponent,
+    ConfirmDeleteStateModalComponent
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -115,7 +117,8 @@ import { TransferExplorationOwnershipModalComponent } from './settings-tab/templ
     RemoveRoleConfirmationModalComponent,
     ReassignRoleConfirmationModalComponent,
     ModeratorUnpublishExplorationModalComponent,
-    TransferExplorationOwnershipModalComponent
+    TransferExplorationOwnershipModalComponent,
+    ConfirmDeleteStateModalComponent
   ],
   providers: [
     {
