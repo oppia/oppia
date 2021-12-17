@@ -336,7 +336,8 @@ NOT_FULLY_COVERED_FILES = [
     'core/jobs',
     'core/python_utils.py',
     'core/python_utils_test.py',
-    'extensions/'
+    'extensions/',
+    'scripts/'
 ]
 
 
