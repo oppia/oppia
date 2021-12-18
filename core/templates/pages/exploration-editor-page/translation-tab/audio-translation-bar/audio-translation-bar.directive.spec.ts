@@ -531,13 +531,14 @@ describe('Audio translation bar directive', function() {
     fakeAsync(() => {
       spyOn(ngbModal, 'open').and.returnValue({
         componentInstance: {
-          busyMessage: 'xyz'
+          busyMessage: ''
         },
         result: Promise.resolve()
       } as NgbModalRef);
 
       $scope.openTranslationTabBusyModal();
       tick();
+      $rootScope.$applyAsync();
 
       expect(ngbModal.open).toHaveBeenCalled();
     }));
