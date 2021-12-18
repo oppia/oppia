@@ -39,6 +39,7 @@ var ExplorationEditorPage =
   require('../protractor_utils/ExplorationEditorPage.js');
 var Constants = require('../protractor_utils/ProtractorConstants.js');
 var SkillEditorPage = require('../protractor_utils/SkillEditorPage.js');
+import constants from 'assets/constants';
 
 describe('Learner dashboard functionality', function() {
   var explorationPlayerPage = null;
@@ -351,7 +352,9 @@ describe('Learner dashboard functionality', function() {
     await skillEditorPage.get(skillId);
 
     await skillEditorPage.moveToQuestionsTab();
-    await skillEditorPage.clickCreateQuestionButton();
+    for (var i = 1; i <= constants.TOPIC_MINIMUM_QUESTIONS_TO_PRACTICE; i++) {
+      await skillEditorPage.clickCreateQuestionButton();
+    }
     await explorationEditorMainTab.setContent(
       await forms.toRichText('Question 1'));
     await explorationEditorMainTab.setInteraction(
@@ -372,7 +375,7 @@ describe('Learner dashboard functionality', function() {
     await skillEditorPage.saveQuestion();
     await skillEditorPage.get(skillId);
     await skillEditorPage.moveToQuestionsTab();
-    await skillEditorPage.expectNumberOfQuestionsToBe(1);
+    await skillEditorPage.expectNumberOfQuestionsToBe(constants.TOPIC_MINIMUM_QUESTIONS_TO_PRACTICE);
     await general.closeCurrentTabAndSwitchTo(handle);
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.navigateToSkillsTab();
