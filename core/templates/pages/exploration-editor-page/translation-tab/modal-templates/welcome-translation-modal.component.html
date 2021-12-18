@@ -10,20 +10,20 @@
       </p>
 
       <button type="button"
-              class="btn oppia-welcome-modal-button oppia-transition-200 protractor-test-translation-tab-start-tutorial oppia-autofocus"
-              ng-click="confirm(explorationId)" autofocus>
+              class="btn oppia-welcome-modal-button oppia-transition-200 protractor-test-translation-tab-start-tutorial oppia-autofocus oppia-welcome-modal-left-button"
+              (click)="confirm(explorationId)" autofocus>
         Yes, please!
       </button>
 
       <button type="button"
               class="btn oppia-welcome-modal-button oppia-transition-200 protractor-test-translation-tab-dismiss-welcome-modal"
-              ng-click="cancel(explorationId)">
+              (click)="cancel(explorationId)">
         Nope, I'm good.
       </button>
     </div>
 
     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-5">
-      <img class="oppia-welcome-modal-img" ng-src="<[translationWelcomeImgUrl]>">
+      <img class="oppia-welcome-modal-img" [src]="translationWelcomeImgUrl">
     </div>
   </div>
 </div>
