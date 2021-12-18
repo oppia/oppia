@@ -37,12 +37,15 @@ import { Interaction } from 'domain/exploration/InteractionObjectFactory';
   templateUrl: './input-response-pair.component.html'
 })
 export class InputResponsePairComponent {
+  // This property is initialized using component interactions
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() data!: InputResponsePair;
-  @Output() dataChange: EventEmitter<InputResponsePair> = new EventEmitter();
   @Input() oppiaAvatarImageUrl!: string;
   @Input() profilePicture!: string;
   @Input() inputResponsePairId!: string;
   @Input() isLastPair!: boolean;
+  @Output() dataChange: EventEmitter<InputResponsePair> = new EventEmitter();
   OPPIA_AVATAR_LINK_URL: string | undefined;
   decodedProfilePicture: string | undefined;
   @ViewChild('popover') popover!: NgbPopover;
@@ -100,8 +103,7 @@ export class InputResponsePairComponent {
       this.data && interaction.id &&
         InteractionSpecsConstants.INTERACTION_SPECS[
           interaction.id as InteractionSpecsKey
-        ].needs_summary
-          .needs_summary) {
+        ].needs_summary) {
       shortAnswerHtml = (
         this.explorationHtmlFormatterService.getShortAnswerHtml(
           this.data.learnerInput, interaction.id,

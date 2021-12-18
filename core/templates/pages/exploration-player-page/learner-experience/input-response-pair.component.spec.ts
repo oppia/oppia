@@ -239,7 +239,7 @@ describe('InputResponsePairComponent', () => {
     );
   });
 
-  it('should get the css class for feedback audio highlight', () => {
+  it('should return empty css class for feedback audio highlight', () => {
     spyOn(audioTranslationManagerService, 'getCurrentComponentName')
       .and.returnValue(AppConstants.COMPONENT_NAME_FEEDBACK);
     spyOn(audioPlayerService, 'isPlaying').and.returnValue(false);
