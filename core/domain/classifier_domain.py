@@ -317,47 +317,14 @@ class ClassifierTrainingJob:
         """Validates the training job before it is saved to storage."""
 
         algorithm_ids = []
-        if not isinstance(self.job_id, str):
-            raise utils.ValidationError(
-                'Expected id to be a string, received %s' % self.job_id)
-
-        if not isinstance(self.exp_id, str):
-            raise utils.ValidationError(
-                'Expected exp_id to be a string, received %s' % self.exp_id)
-
-        if not isinstance(self.exp_version, int):
-            raise utils.ValidationError(
-                'Expected exp_version to be an int, received %s' %
-                self.exp_version)
-
-        if not isinstance(self.next_scheduled_check_time, datetime.datetime):
-            raise utils.ValidationError(
-                'Expected next_scheduled_check_time to be datetime,' +
-                ' received %s' % self.next_scheduled_check_time)
-
-        if not isinstance(self.state_name, str):
-            raise utils.ValidationError(
-                'Expected state to be a string, received %s' % self.state_name)
-        utils.require_valid_name(self.state_name, 'the state name')
-
         if self.status not in feconf.ALLOWED_TRAINING_JOB_STATUSES:
             raise utils.ValidationError(
                 'Expected status to be in %s, received %s'
                 % (feconf.ALLOWED_TRAINING_JOB_STATUSES, self.status))
 
-        if not isinstance(self.interaction_id, str):
-            raise utils.ValidationError(
-                'Expected interaction_id to be a string, received %s' %
-                self.interaction_id)
-
         if self.interaction_id not in feconf.INTERACTION_CLASSIFIER_MAPPING:
             raise utils.ValidationError(
                 'Invalid interaction id: %s' % self.interaction_id)
-
-        if not isinstance(self.algorithm_id, str):
-            raise utils.ValidationError(
-                'Expected algorithm_id to be a string, received %s' %
-                self.algorithm_id)
 
         algorithm_ids = [
             classifier_details['algorithm_id'] for classifier_details in
@@ -379,19 +346,6 @@ class ClassifierTrainingJob:
             if 'answers' not in grouped_answers:
                 raise utils.ValidationError(
                     'Expected answers to be a key in training_data list item')
-            if not isinstance(grouped_answers['answer_group_index'], int):
-                raise utils.ValidationError(
-                    'Expected answer_group_index to be an int, received %s' %
-                    grouped_answers['answer_group_index'])
-            if not isinstance(grouped_answers['answers'], list):
-                raise utils.ValidationError(
-                    'Expected answers to be a list, received %s' %
-                    grouped_answers['answers'])
-
-        if not isinstance(self.algorithm_version, int):
-            raise utils.ValidationError(
-                'Expected algorithm_version to be an int, received %s' %
-                self.algorithm_version)
 
 
 class StateTrainingJobsMappingDict(TypedDict):
@@ -503,40 +457,6 @@ class StateTrainingJobsMapping:
             'state_name': self.state_name,
             'algorithm_ids_to_job_ids': self._algorithm_ids_to_job_ids
         }
-
-    def validate(self) -> None:
-        """Validates the mapping before it is saved to storage."""
-
-        if not isinstance(self.exp_id, str):
-            raise utils.ValidationError(
-                'Expected exp_id to be a string, received %s' % self.exp_id)
-
-        if not isinstance(self.exp_version, int):
-            raise utils.ValidationError(
-                'Expected exp_version to be an int, received %s' % (
-                    self.exp_version))
-
-        if not isinstance(self.state_name, str):
-            raise utils.ValidationError(
-                'Expected state_name to be a string, received %s' % (
-                    self.state_name))
-
-        if not isinstance(self.algorithm_ids_to_job_ids, dict):
-            raise utils.ValidationError(
-                'Expected algorithm_ids_to_job_ids to be a dict, '
-                'received %s' % (
-                    self.algorithm_ids_to_job_ids))
-
-        for algorithm_id in self.algorithm_ids_to_job_ids:
-            if not isinstance(algorithm_id, str):
-                raise utils.ValidationError(
-                    'Expected algorithm_id to be str, received %s' % (
-                        algorithm_id))
-
-            if not isinstance(self.algorithm_ids_to_job_ids[algorithm_id], str):
-                raise utils.ValidationError(
-                    'Expected job_id to be str, received %s' % (
-                        self.algorithm_ids_to_job_ids[algorithm_id]))
 
 
 class OppiaMLAuthInfo:
