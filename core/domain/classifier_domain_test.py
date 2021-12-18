@@ -226,7 +226,3 @@ class StateTrainingJobsMappingDomainTests(test_utils.GenericTestBase):
         self.assertDictEqual(
             expected_mapping_dict, # type: ignore[arg-type]
             observed_mapping.to_dict()) # type: ignore[arg-type]
-
-    def test_validation_for_mapping_with_correct_data(self) -> None:
-        mapping = self._get_mapping_from_dict(self.mapping_dict)
-        mapping.validate()
