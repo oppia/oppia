@@ -18,11 +18,11 @@
 
 from __future__ import annotations
 
+import enum
 import inspect
 from types import ModuleType  # pylint: disable=import-only-modules
 
 from core import feconf
-from core import python_utils
 from core.constants import constants
 
 from typing import List, Tuple, Type
@@ -32,19 +32,47 @@ if MYPY: # pragma: no cover
     from mypy_imports import base_models  # pylint: disable=unused-import
 
 # Valid model names.
-NAMES = python_utils.create_enum( # type: ignore[no-untyped-call]
-    'activity', 'app_feedback_report', 'audit', 'base_model', 'beam_job',
-    'blog', 'classifier', 'collection', 'config', 'email', 'exploration',
-    'feedback', 'improvements', 'job', 'opportunity', 'question',
-    'recommendations', 'skill', 'statistics', 'activity', 'audit', 'auth',
-    'base_model', 'classifier', 'collection', 'config', 'email', 'exploration',
-    'feedback', 'improvements', 'job', 'opportunity', 'question',
-    'recommendations', 'skill', 'statistics', 'story', 'subtopic', 'suggestion',
-    'topic', 'translation', 'user')
+
+
+# TODO(#14419): Change naming style of Enum class from SCREAMING_SNAKE_CASE
+# to PascalCase and its values to UPPER_CASE. Because we want to be consistent
+# throughout the codebase according to the coding style guide.
+# https://github.com/oppia/oppia/wiki/Coding-style-guide
+class NAMES(enum.Enum): # pylint: disable=invalid-name
+    """Enum for valid model names."""
+
+    activity = 'activity' # pylint: disable=invalid-name
+    app_feedback_report = 'app_feedback_report' # pylint: disable=invalid-name
+    audit = 'audit' # pylint: disable=invalid-name
+    base_model = 'base_model' # pylint: disable=invalid-name
+    beam_job = 'beam_job' # pylint: disable=invalid-name
+    blog = 'blog' # pylint: disable=invalid-name
+    classifier = 'classifier' # pylint: disable=invalid-name
+    collection = 'collection' # pylint: disable=invalid-name
+    config = 'config' # pylint: disable=invalid-name
+    email = 'email' # pylint: disable=invalid-name
+    exploration = 'exploration' # pylint: disable=invalid-name
+    feedback = 'feedback' # pylint: disable=invalid-name
+    improvements = 'improvements' # pylint: disable=invalid-name
+    job = 'job' # pylint: disable=invalid-name
+    opportunity = 'opportunity' # pylint: disable=invalid-name
+    question = 'question' # pylint: disable=invalid-name
+    recommendations = 'recommendations' # pylint: disable=invalid-name
+    skill = 'skill' # pylint: disable=invalid-name
+    statistics = 'statistics' # pylint: disable=invalid-name
+    auth = 'auth' # pylint: disable=invalid-name
+    story = 'story' # pylint: disable=invalid-name
+    subtopic = 'subtopic' # pylint: disable=invalid-name
+    suggestion = 'suggestion' # pylint: disable=invalid-name
+    topic = 'topic' # pylint: disable=invalid-name
+    translation = 'translation' # pylint: disable=invalid-name
+    user = 'user' # pylint: disable=invalid-name
 
 # Types of deletion policies. The pragma comment is needed because Enums are
 # evaluated as classes in Python and they should use PascalCase, but using
 # UPPER_CASE seems more appropriate here.
+
+
 MODULES_WITH_PSEUDONYMIZABLE_CLASSES = (  # pylint: disable=invalid-name
     NAMES.app_feedback_report, NAMES.blog, NAMES.collection, NAMES.config,
     NAMES.exploration, NAMES.feedback, NAMES.question, NAMES.skill, NAMES.story,
@@ -59,7 +87,7 @@ class Platform:
 
     @classmethod
     def import_models(
-            cls, unused_model_names: List[str]
+            cls, unused_model_names: List[NAMES]
     ) -> Tuple[ModuleType, ...]:
         """An abstract method that should be implemented on inherited
         classes.
@@ -81,7 +109,7 @@ class _Gae(Platform):
     # doesn't match with BaseModel.delete_multi().
     # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     @classmethod
-    def import_models(cls, model_names: List[str]) -> Tuple[ModuleType, ...]:
+    def import_models(cls, model_names: List[NAMES]) -> Tuple[ModuleType, ...]:
         """Imports and returns the storage modules listed in model_names.
 
         Args:
@@ -193,7 +221,7 @@ class _Gae(Platform):
 
     @classmethod
     def get_storage_model_classes(
-            cls, model_names: List[str]
+            cls, model_names: List[NAMES]
     ) -> List[base_models.BaseModel]:
         """Get the storage model classes that are in the modules listed in
         model_names.
@@ -411,7 +439,7 @@ class Registry:
         return klass
 
     @classmethod
-    def import_models(cls, model_names: List[str]) -> Tuple[ModuleType, ...]:
+    def import_models(cls, model_names: List[NAMES]) -> Tuple[ModuleType, ...]:
         """Imports and returns the storage modules listed in model_names.
 
         Args:
@@ -424,7 +452,7 @@ class Registry:
 
     @classmethod
     def get_storage_model_classes(
-            cls, model_names: List[str]
+            cls, model_names: List[NAMES]
     ) -> List[base_models.BaseModel]:
         """Get the storage model classes that are in the modules listed in
         model_names.
