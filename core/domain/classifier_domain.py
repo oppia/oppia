@@ -458,6 +458,9 @@ class StateTrainingJobsMapping:
             'algorithm_ids_to_job_ids': self._algorithm_ids_to_job_ids
         }
 
+    def validate(self) -> None:
+        """Validates the mapping before it is saved to storage."""
+
 
 class OppiaMLAuthInfo:
     """Domain object containing information necessary for authentication
