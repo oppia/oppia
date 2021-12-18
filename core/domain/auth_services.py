@@ -178,17 +178,20 @@ def get_multi_auth_ids_from_user_ids(user_ids):
     return platform_auth_services.get_multi_auth_ids_from_user_ids(user_ids)
 
 
-def get_user_id_from_auth_id(auth_id):
+def get_user_id_from_auth_id(auth_id, include_deleted=False):
     """Returns the user ID associated with the given auth ID.
 
     Args:
         auth_id: str. The auth ID.
+        include_deleted: bool. Whether to return the ID of models marked for
+            deletion.
 
     Returns:
         str|None. The user ID associated with the given auth ID, or None if no
         association exists.
     """
-    return platform_auth_services.get_user_id_from_auth_id(auth_id)
+    return platform_auth_services.get_user_id_from_auth_id(
+        auth_id, include_deleted=include_deleted)
 
 
 def get_multi_user_ids_from_auth_ids(auth_ids):
