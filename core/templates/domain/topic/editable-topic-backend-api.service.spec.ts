@@ -331,8 +331,7 @@ describe('Editable topic backend API service', () => {
 
     flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalledWith(
-      sampleDataResults.topic_dict.canonical_story_summary_dicts);
+    expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
