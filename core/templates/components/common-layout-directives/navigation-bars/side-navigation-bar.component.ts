@@ -72,7 +72,7 @@ export class SideNavigationBarComponent {
      service.fetchClassroomPromosAreEnabledStatusAsync().then(
        classroomPromosAreEnabled => {
          this.CLASSROOM_PROMOS_ARE_ENABLED = classroomPromosAreEnabled;
-         if (this.CLASSROOM_PROMOS_ARE_ENABLED) {
+         if (classroomPromosAreEnabled) {
            this.accessValidationBackendApiService.validateAccessToClassroomPage(
              this.DEFAULT_CLASSROOM_URL_FRAGMENT).then(()=>{
              this.classroomBackendApiService.fetchClassroomDataAsync(

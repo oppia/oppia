@@ -513,7 +513,9 @@ describe('TopNavigationBarComponent', () => {
     tick();
 
     expect(component.learnDropdownOffset).toBe(-10);
-    component.CLASSROOM_PROMOS_ARE_ENABLED = true;
+  }));
+
+  it('should check if classroom data is fetched', fakeAsync(() => {
     spyOn(
       classroomBackendApiService, 'fetchClassroomPromosAreEnabledStatusAsync').
       and.resolveTo(true);
@@ -524,10 +526,12 @@ describe('TopNavigationBarComponent', () => {
     spyOn(
       classroomBackendApiService, 'fetchClassroomDataAsync')
       .and.resolveTo(classroomData);
+    spyOn(siteAnalyticsService, 'registerClassroomPageViewed');
 
     component.ngOnInit();
     tick();
 
     expect(component.classroomData).toEqual(array);
+    expect(siteAnalyticsService.registerClassroomPageViewed).toHaveBeenCalled();
   }));
 });

@@ -178,19 +178,21 @@ describe('Side Navigation Bar Component', () => {
       expect(componentInstance.CLASSROOM_PROMOS_ARE_ENABLED).toBe(true);
     }));
 
-  it('should check if classroom data is fetched when classroom promos enabled',
-    fakeAsync(() => {
-      componentInstance.CLASSROOM_PROMOS_ARE_ENABLED = true;
-      spyOn(accessValidationBackendApiService, 'validateAccessToClassroomPage')
-        .and.returnValue(Promise.resolve());
-      let array: CreatorTopicSummary[] = [];
-      let classroomData = new ClassroomData('test', array, 'dummy', 'dummy');
-      spyOn(
-        classroomBackendApiService, 'fetchClassroomDataAsync')
-        .and.resolveTo(classroomData);
-
-      componentInstance.ngOnInit();
-      tick();
-      expect(componentInstance.classroomData).toEqual(array);
-    }));
+  it('should check if classroom data is fetched', fakeAsync(() => {
+    spyOn(
+      classroomBackendApiService, 'fetchClassroomPromosAreEnabledStatusAsync').
+      and.resolveTo(true);
+    spyOn(accessValidationBackendApiService, 'validateAccessToClassroomPage')
+      .and.returnValue(Promise.resolve());
+    let array: CreatorTopicSummary[] = [];
+    let classroomData = new ClassroomData('test', array, 'dummy', 'dummy');
+    spyOn(
+      classroomBackendApiService, 'fetchClassroomDataAsync')
+      .and.resolveTo(classroomData);
+    spyOn(siteAnalyticsService, 'registerClassroomPageViewed');
+    componentInstance.ngOnInit();
+    tick();
+    expect(componentInstance.classroomData).toEqual(array);
+    expect(siteAnalyticsService.registerClassroomPageViewed).toHaveBeenCalled();
+  }));
 });
