@@ -280,12 +280,15 @@ describe('TopNavigationBarComponent', () => {
   });
 
   it('should toggle side bar', () => {
+    const clickEvent = new CustomEvent('click');
     spyOn(sidebarStatusService, 'isSidebarShown').and.returnValues(false, true);
     spyOn(wds, 'isWindowNarrow').and.returnValue(true);
+    spyOn(sidebarStatusService, 'toggleHamburgerIconStatus');
+    spyOn(clickEvent, 'stopPropagation');
+
     expect(component.isSidebarShown()).toBe(false);
-
-    component.toggleSidebar();
-
+    component.toggleSidebar(clickEvent);
+    expect(sidebarStatusService.toggleHamburgerIconStatus).toHaveBeenCalled();
     expect(component.isSidebarShown()).toBe(true);
   });
 
