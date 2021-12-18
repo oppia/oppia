@@ -280,12 +280,15 @@ describe('TopNavigationBarComponent', () => {
   });
 
   it('should toggle side bar', () => {
+    const clickEvent = new CustomEvent('click');
     spyOn(sidebarStatusService, 'isSidebarShown').and.returnValues(false, true);
     spyOn(wds, 'isWindowNarrow').and.returnValue(true);
+    spyOn(sidebarStatusService, 'toggleHamburgerIconStatus');
+    spyOn(clickEvent, 'stopPropagation');
+
     expect(component.isSidebarShown()).toBe(false);
-
-    component.toggleSidebar();
-
+    component.toggleSidebar(clickEvent);
+    expect(sidebarStatusService.toggleHamburgerIconStatus).toHaveBeenCalled();
     expect(component.isSidebarShown()).toBe(true);
   });
 
@@ -477,7 +480,7 @@ describe('TopNavigationBarComponent', () => {
     expect(component.profilePageUrl).toBe('/profile/username1');
   }));
 
-  it('should return proper offset for learn dropdown', ()=>{
+  it('should return proper offset for dropdown', ()=>{
     var dummyElement = document.createElement('div');
     spyOn(document, 'querySelector').and.returnValue(dummyElement);
 
@@ -496,21 +499,20 @@ describe('TopNavigationBarComponent', () => {
       expect(component.getDropdownOffset('.dummy', 0)).toBe(0);
     });
 
-  it('should check if navbar dropdown offsets are updated', fakeAsync (()=>{
+  it('should check if dropdown offsets are updated', fakeAsync (()=>{
     spyOn(component, 'truncateNavbar').and.stub();
     spyOn(component, 'getDropdownOffset')
       .withArgs('.learn-tab', 688).and.returnValue(-10)
-      .withArgs('.learn-tab', 300).and.returnValue(-10);
+      .withArgs('.learn-tab', 300).and.returnValue(-10)
+      .withArgs('.get-involved', 574).and.returnValue(-10);
 
     expect(component.learnDropdownOffset).toBe(0);
+    expect(component.getInvolvedMenuOffset).toBe(0);
 
     component.ngAfterViewChecked();
     tick();
 
     expect(component.learnDropdownOffset).toBe(-10);
-  }));
-
-  it('should check if classroom data is fetched', fakeAsync(() => {
     spyOn(component, 'truncateNavbar').and.stub();
     component.CLASSROOM_PROMOS_ARE_ENABLED = true;
     spyOn(
