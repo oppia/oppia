@@ -189,7 +189,7 @@ describe('Side Navigation Bar Component', () => {
         classroomBackendApiService, 'fetchClassroomDataAsync')
         .and.resolveTo(classroomData);
 
-      componentInstance.ngAfterViewChecked();
+      componentInstance.ngOnInit();
       tick();
       expect(componentInstance.classroomData).toEqual(array);
     }));
