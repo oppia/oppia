@@ -513,7 +513,6 @@ describe('TopNavigationBarComponent', () => {
     tick();
 
     expect(component.learnDropdownOffset).toBe(-10);
-    spyOn(component, 'truncateNavbar').and.stub();
     component.CLASSROOM_PROMOS_ARE_ENABLED = true;
     spyOn(
       classroomBackendApiService, 'fetchClassroomPromosAreEnabledStatusAsync').
