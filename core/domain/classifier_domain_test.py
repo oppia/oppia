@@ -230,3 +230,10 @@ class StateTrainingJobsMappingDomainTests(test_utils.GenericTestBase):
     def test_validation_for_mapping_with_correct_data(self) -> None:
         mapping = self._get_mapping_from_dict(self.mapping_dict)
         mapping.validate()
+
+    def test_exp_version_with_invalid_data(self) -> None:
+        self.mapping_dict['exp_version'] = -2
+        mapping = self._get_mapping_from_dict(self.mapping_dict)
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+            utils.ValidationError, 'Expected version to be greater than 0'):
+            mapping.validate()

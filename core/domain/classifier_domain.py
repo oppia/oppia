@@ -317,6 +317,7 @@ class ClassifierTrainingJob:
         """Validates the training job before it is saved to storage."""
 
         algorithm_ids = []
+        utils.require_valid_name(self.state_name, 'the state name')
         if self.status not in feconf.ALLOWED_TRAINING_JOB_STATUSES:
             raise utils.ValidationError(
                 'Expected status to be in %s, received %s'
@@ -460,6 +461,10 @@ class StateTrainingJobsMapping:
 
     def validate(self) -> None:
         """Validates the mapping before it is saved to storage."""
+
+        if not self.exp_version > 0:
+            raise utils.ValidationError(
+                    'Expected version to be greater than 0')
 
 
 class OppiaMLAuthInfo:
