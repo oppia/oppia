@@ -703,6 +703,6 @@ class _Validators:
         """
 
         if match_case is False:
-            obj.lower()
+            obj = obj.lower()
             choices = [choice.lower() for choice in choices]
         return obj.endswith(tuple(choices))
