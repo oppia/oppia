@@ -513,6 +513,7 @@ describe('TopNavigationBarComponent', () => {
     tick();
 
     expect(component.learnDropdownOffset).toBe(-10);
+    expect(component.getInvolvedMenuOffset).toBe(-10);
   }));
 
   it('should check if classroom data is fetched', fakeAsync(() => {
