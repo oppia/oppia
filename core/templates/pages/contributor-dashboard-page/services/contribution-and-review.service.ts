@@ -20,17 +20,18 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import { AppConstants } from 'app.constants';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { HttpClient } from '@angular/common/http';
+import { ContributionAndReviewBackendApiService }
+  from './contribution-and-review-backend-api.service';
 import { SuggestionBackendDict } from 'domain/suggestion/suggestion.model';
 import { StateBackendDict } from 'domain/state/StateObjectFactory';
 import { ImagesData } from 'services/image-local-storage.service';
 
-interface OpportunityDict {
+export interface OpportunityDict {
   'skill_id': string;
   'skill_description': string;
 }
 
-interface FetchSuggestionsResponse {
+export interface FetchSuggestionsResponse {
   'target_id_to_opportunity_dict': {
     [propName: string]: OpportunityDict;
   };
@@ -62,24 +63,23 @@ export class ContributionAndReviewService {
     '/updatequestionsuggestionhandler/<suggestion_id>');
 
   constructor(
-    private http: HttpClient,
+    private carbas: ContributionAndReviewBackendApiService,
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
   async _fetchSuggestionsAsync(url: string): Promise<FetchSuggestionsReturn> {
     return (
-      this.http.get<FetchSuggestionsResponse>(url)
-        .toPromise().then((data) => {
-          var suggestionIdToSuggestions: FetchSuggestionsReturn = {};
-          var targetIdToDetails = data.target_id_to_opportunity_dict;
-          data.suggestions.forEach(function(suggestion) {
-            suggestionIdToSuggestions[suggestion.suggestion_id] = {
-              suggestion: suggestion,
-              details: targetIdToDetails[suggestion.target_id]
-            };
-          });
-          return suggestionIdToSuggestions;
-        })
+      this.carbas.fetchSuggestions(url).then((data) => {
+        var suggestionIdToSuggestions: FetchSuggestionsReturn = {};
+        var targetIdToDetails = data.target_id_to_opportunity_dict;
+        data.suggestions.forEach(function(suggestion) {
+          suggestionIdToSuggestions[suggestion.suggestion_id] = {
+            suggestion: suggestion,
+            details: targetIdToDetails[suggestion.target_id]
+          };
+        });
+        return suggestionIdToSuggestions;
+      })
     );
   }
 
@@ -87,6 +87,16 @@ export class ContributionAndReviewService {
     Promise<FetchSuggestionsReturn> {
     let url = this.urlInterpolationService.interpolateUrl(
       this._SUBMITTED_SUGGESTION_LIST_HANDLER_URL, {
+        target_type: 'skill',
+        suggestion_type: 'add_question'
+      });
+    return this._fetchSuggestionsAsync(url);
+  }
+
+  async getReviewableQuestionSuggestionsAsync():
+    Promise<FetchSuggestionsReturn> {
+    var url = this.urlInterpolationService.interpolateUrl(
+      this._REVIEWABLE_SUGGESTIONS_HANDLER_URL, {
         target_type: 'skill',
         suggestion_type: 'add_question'
       });
@@ -124,15 +134,16 @@ export class ContributionAndReviewService {
         exp_id: targetId,
         suggestion_id: suggestionId
       });
-
-    return this.http.put(url, {
+    let data = {
       action: action,
       review_message: reviewMessage,
       commit_message: (
         action === AppConstants.ACTION_ACCEPT_SUGGESTION ?
         commitMessage : null
       )
-    }).toPromise().then(() => {
+    };
+
+    return this.carbas.resolveToExploration(url, data).then(() => {
       onSuccess(suggestionId);
     }, (error) => {
       onFailure && onFailure(error);
@@ -150,12 +161,13 @@ export class ContributionAndReviewService {
         skill_id: targetId,
         suggestion_id: suggestionId
       });
-
-    return this.http.put(url, {
+    let data = {
       action: action,
       review_message: reviewMessage,
       skill_difficulty: skillDifficulty
-    }).toPromise().then(() => {
+    };
+
+    return this.carbas.resolveToSkill(url, data).then(() => {
       onSuccess(suggestionId);
     }, () => {
       onFailure && onFailure();
@@ -171,10 +183,11 @@ export class ContributionAndReviewService {
       this._UPDATE_TRANSLATION_HANDLER_URL, {
         suggestion_id: suggestionId
       });
-
-    return this.http.put(url, {
+    let data = {
       translation_html: translationHtml
-    }).toPromise().then(() => {
+    };
+
+    return this.carbas.updateTranslationSuggestion(url, data).then(() => {
       onSuccess();
     }, (error) => onFailure && onFailure(error));
   }
@@ -201,9 +214,7 @@ export class ContributionAndReviewService {
       }
     });
 
-    return this.http.post(url, body, {
-      headers: { 'Content-Type': undefined }
-    }).toPromise().then(() => {
+    return this.carbas.updateQuestionSuggestion(url, body).then(() => {
       onSuccess(suggestionId);
     }, () => onFailure && onFailure(suggestionId));
   }
