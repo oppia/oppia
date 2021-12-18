@@ -17,7 +17,7 @@
  */
 
 import { EventEmitter, NgZone } from '@angular/core';
-import { fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { StateRecordedVoiceoversService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
@@ -75,18 +75,9 @@ describe('Audio translation bar directive', function() {
   var mockActiveLanguageChangedEventEmitter = new EventEmitter();
   var mockShowTranslationTabBusyModalEventEmitter = new EventEmitter();
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('NgbModal', {
-      open: () => {
-        return {
-          result: Promise.resolve()
-        };
-      }
-    });
-  }));
+  importAllAngularServices();
 
   beforeEach(angular.mock.module('directiveTemplates'));
-  importAllAngularServices();
   beforeEach(() => {
     alertsService = TestBed.inject(AlertsService);
     editabilityService = TestBed.inject(EditabilityService);
@@ -144,6 +135,13 @@ describe('Audio translation bar directive', function() {
     spyOn(explorationStatesService, 'saveRecordedVoiceovers').and
       .callFake(function() {});
 
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: {
+        busyMessage: ''
+      },
+      result: Promise.resolve()
+    } as NgbModalRef);
+
     spyOnProperty(
       translationTabActiveContentIdService,
       'onActiveContentIdChanged').and.returnValue(
@@ -181,6 +179,10 @@ describe('Audio translation bar directive', function() {
     ctrl.$onInit();
     $scope.getVoiceoverRecorder();
   }));
+
+  afterEach(() => {
+    ctrl.$onDestroy();
+  });
 
   it('should evaluate $scope properties after audio bar initialization',
     function() {
@@ -301,7 +303,6 @@ describe('Audio translation bar directive', function() {
   });
 
   it('should open translation busy modal on event', () => {
-    spyOn(ngbModal, 'open').and.callThrough();
     mockShowTranslationTabBusyModalEventEmitter.emit();
     expect(ngbModal.open).toHaveBeenCalled();
   });
@@ -349,12 +350,6 @@ describe('Audio translation bar directive', function() {
 
   it('should play and pause unsaved audio when wave surfer calls on method' +
     ' callback', fakeAsync(() => {
-    spyOn(ngbModal, 'open').and.returnValue({
-      componentInstance: {
-        busyMessage: 'shivam thalwal'
-      },
-      result: Promise.resolve()
-    } as NgbModalRef);
     spyOn($scope.voiceoverRecorder, 'getMp3Data').and.returnValue(
       $q.resolve([]));
     var waveSurferObjSpy = {
@@ -529,13 +524,6 @@ describe('Audio translation bar directive', function() {
 
   it('should open translation tab busy modal with NgbModal',
     fakeAsync(() => {
-      spyOn(ngbModal, 'open').and.returnValue({
-        componentInstance: {
-          busyMessage: ''
-        },
-        result: Promise.resolve()
-      } as NgbModalRef);
-
       $scope.openTranslationTabBusyModal();
       tick();
       $rootScope.$applyAsync();
@@ -588,15 +576,9 @@ describe('Audio translation bar directive', function() {
     expect(setCurrentTimeSpy).toHaveBeenCalledWith(100);
   });
 
-  it('should delete audio when closing delete audio translation modal',
+ it('should delete audio when closing delete audio translation modal',
     fakeAsync(() => {
       spyOn(stateRecordedVoiceoversService.displayed, 'deleteVoiceover');
-      spyOn(ngbModal, 'open').and.returnValue({
-        componentInstance: {
-          busyMessage: 'busyMessage'
-        },
-        result: Promise.resolve()
-      } as NgbModalRef);
 
       $scope.openDeleteAudioTranslationModal();
       tick();
@@ -611,7 +593,7 @@ describe('Audio translation bar directive', function() {
   it('should not delete audio when dismissing delete audio translation' +
     ' modal', fakeAsync(() => {
     spyOn(stateRecordedVoiceoversService.displayed, 'deleteVoiceover');
-    spyOn(ngbModal, 'open').and.returnValue({
+    ngbModal.open = jasmine.createSpy().and.returnValue({
       result: Promise.reject()
     } as NgbModalRef);
 
@@ -633,12 +615,6 @@ describe('Audio translation bar directive', function() {
           durationSecs: 100
         })
       });
-      spyOn(ngbModal, 'open').and.returnValue({
-        componentInstance: {
-          busyMessage: 'busy message'
-        },
-        result: Promise.resolve()
-      } as NgbModalRef);
 
       $scope.openAddAudioTranslationModal();
       tick();
@@ -663,10 +639,12 @@ describe('Audio translation bar directive', function() {
     expect(alertsService.clearWarnings).toHaveBeenCalled();
   });
 
-  it('should apply changed when view update emits', waitForAsync(() => {
+  it('should apply changed when view update emits', fakeAsync(() => {
     const applyAsyncSpy = spyOn($scope, '$applyAsync');
     audioPlayerService.viewUpdate.emit();
     audioPlayerService.onAudioStop.next();
+    tick();
+    $rootScope.$applyAsync();
     expect(applyAsyncSpy).toHaveBeenCalled();
   }));
 
