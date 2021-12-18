@@ -20,6 +20,7 @@ import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { Rule } from 'domain/exploration/RuleObjectFactory';
 import { MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 /**
  * @fileoverview Unit tests for StateResponsesComponent.
@@ -46,6 +47,7 @@ describe('StateResponsesComponent', () => {
   let ExternalSaveService = null;
   let StateSolicitAnswerDetailsService = null;
   let AlertsService = null;
+  let ngbModal: NgbModal = null;
 
   let defaultsOutcomesToSuppressWarnings = [
     {
@@ -80,7 +82,18 @@ describe('StateResponsesComponent', () => {
     outcomeObjectFactory = TestBed.get(OutcomeObjectFactory);
     answerGroupObjectFactory = TestBed.get(AnswerGroupObjectFactory);
     misconceptionObjectFactory = TestBed.get(MisconceptionObjectFactory);
+    ngbModal = TestBed.inject(NgbModal);
   });
+
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
 
   beforeEach(angular.mock.inject(
     function($injector, $componentController) {
@@ -88,6 +101,7 @@ describe('StateResponsesComponent', () => {
       $scope = $rootScope.$new();
       $uibModal = $injector.get('$uibModal');
       $q = $injector.get('$q');
+      ngbModal = $injector.get('NgbModal');
 
       WindowDimensionsService = $injector.get('WindowDimensionsService');
       StateEditorService = $injector.get('StateEditorService');
@@ -771,11 +785,11 @@ describe('StateResponsesComponent', () => {
 
   it('should open delete answer group modal when user clicks' +
     ' on delete button', () => {
-    spyOn($uibModal, 'open').and.callThrough();
+    spyOn(ngbModal, 'open').and.callThrough();
 
     $scope.deleteAnswerGroup(0, new Event(''));
 
-    expect($uibModal.open).toHaveBeenCalled();
+    expect(ngbModal.open).toHaveBeenCalled();
   });
 
   it('should delete answer group after modal is opened', () => {
@@ -784,22 +798,26 @@ describe('StateResponsesComponent', () => {
         callback();
       }
     );
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.resolve()
-    });
+    spyOn(ngbModal, 'open').and.returnValue(
+      {
+        result: $q.resolve()
+      } as NgbModalRef
+    );
 
     $scope.deleteAnswerGroup(0, new Event(''));
     $scope.$apply();
 
-    expect($uibModal.open).toHaveBeenCalled();
+    expect(ngbModal.open).toHaveBeenCalled();
     expect(ResponsesService.deleteAnswerGroup).toHaveBeenCalled();
   });
 
   it('should clear warnings when delete answer group modal is closed', () => {
     spyOn(AlertsService, 'clearWarnings');
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.reject()
-    });
+    spyOn(ngbModal, 'open').and.returnValue(
+      {
+        result: $q.reject()
+      } as NgbModalRef
+    );
 
     $scope.deleteAnswerGroup(0, new Event(''));
     $scope.$apply();

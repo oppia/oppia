@@ -29,6 +29,7 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { StateParamChangesEditorComponent } from './editor-tab/state-param-changes-editor/state-param-changes-editor.component';
+import { DeleteAnswerGroupModalComponent } from './editor-tab/templates/modal-templates/delete-answer-group-modal.component';
 import { DeleteStateSkillModalComponent } from './editor-tab/templates/modal-templates/delete-state-skill-modal.component';
 import { ParamChangesEditorDirective } from './param-changes-editor/param-changes-editor.component';
 import { SwitchContentLanguageRefreshRequiredModalComponent } from 'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
@@ -63,6 +64,7 @@ import { ConfirmDeleteStateModalComponent } from './editor-tab/templates/modal-t
   ],
   declarations: [
     CkEditorCopyToolbarComponent,
+    DeleteAnswerGroupModalComponent,
     DeleteStateSkillModalComponent,
     ParamChangesEditorDirective,
     StateParamChangesEditorComponent,
@@ -87,6 +89,7 @@ import { ConfirmDeleteStateModalComponent } from './editor-tab/templates/modal-t
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
+    DeleteAnswerGroupModalComponent,
     DeleteStateSkillModalComponent,
     StateParamChangesEditorComponent,
     SwitchContentLanguageRefreshRequiredModalComponent,
