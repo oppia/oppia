@@ -576,7 +576,7 @@ describe('Audio translation bar directive', function() {
     expect(setCurrentTimeSpy).toHaveBeenCalledWith(100);
   });
 
- it('should delete audio when closing delete audio translation modal',
+  it('should delete audio when closing delete audio translation modal',
     fakeAsync(() => {
       spyOn(stateRecordedVoiceoversService.displayed, 'deleteVoiceover');
 
