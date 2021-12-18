@@ -270,17 +270,19 @@ class AdminHandler(base.BaseHandler):
                 }
             elif action == 'update_feature_flag_rules':
                 feature_name = self.normalized_payload.get('feature_name')
-                new_rule_dicts = self.normalized_payload.get('new_rules')
+                new_rules = self.normalized_payload.get('new_rules')
                 commit_message = self.normalized_payload.get('commit_message')
 
                 try:
                     feature_services.update_feature_flag_rules(
                         feature_name, self.user_id, commit_message,
-                        new_rule_dicts)
+                        new_rules)
                 except (
                         utils.ValidationError,
                         feature_services.FeatureFlagNotFoundException) as e:
                     raise self.InvalidInputException(e)
+
+                new_rule_dicts = [rules.to_dict() for rules in new_rules]
                 logging.info(
                     '[ADMIN] %s updated feature %s with new rules: '
                     '%s.' % (self.user_id, feature_name, new_rule_dicts))

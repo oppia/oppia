@@ -47,7 +47,15 @@ describe('Improvements tab', function() {
   let $ctrl, $scope, explorationImprovementsService, routerService;
 
   let taskRegistryService: ExplorationImprovementsTaskRegistryService;
-
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
   importAllAngularServices();
 
   beforeEach(angular.mock.inject(function(

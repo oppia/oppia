@@ -1200,29 +1200,6 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
         self.check_normalization(
             schema, mappings, invalid_values_with_error_messages)
 
-    def test_object_dict_schema_with_object_class_key(self) -> None:
-        schema = {
-            'type': SCHEMA_TYPE_OBJECT_DICT,
-            'object_class': ValidateClassForTesting
-        }
-
-        mappings = [
-            ({
-                'arg_a': 'arbitary_argument_a',
-                'arg_b': 'arbitary_argument_b'
-            }, {
-                'arg_a': 'arbitary_argument_a',
-                'arg_b': 'arbitary_argument_b'
-            })
-        ]
-
-        # Type Any used because its passed as an argument to check_normalization
-        # method defined above.
-        invalid_values_with_error_messages: List[Tuple[Any, str]] = []
-
-        self.check_normalization(
-            schema, mappings, invalid_values_with_error_messages)
-
     def test_notification_user_ids_list_validator(self) -> None:
         schema = email_manager.NOTIFICATION_USER_IDS_LIST_SCHEMA
         valid_user_id_list = [
@@ -1331,18 +1308,41 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
             sanitize_url('www.oppia.org')
 
 
-# We are only concerned with dictionary keys here and the method should work
-# regardless of dictionary value type, hence using type Any for it.
-def validation_method_for_testing(obj: Dict[str, Any]) -> None:
+class ValidateArgumentHavingSpecificClass(test_utils.GenericTestBase):
+    """Test class is to validate the arguments which have a corresponding domain
+    class representation in the codebase. This test class is written uniquely
+    because it returns an object which is different from all other cases.
+    """
+
+    def test_object_dict_schema_with_object_class_key(self) -> None:
+        schema = {
+            'type': SCHEMA_TYPE_OBJECT_DICT,
+            'object_class': ValidateClassForTesting
+        }
+
+        sample_dict = {
+            'arg_a': 'arbitary_argument_a',
+            'arg_b': 'arbitary_argument_b'
+        }
+        arg1 = schema_utils.normalize_against_schema(sample_dict, schema)
+        arg2 = ValidateClassForTesting.from_dict(sample_dict)
+        self.assertEqual(arg1.arg_a, arg2.arg_a)
+
+
+def validation_method_for_testing(obj: Dict[str, str]) -> Dict[str, str]:
     """Method to test 'validation_method' key of schema.
 
     Args:
         obj: dict. Dictionary form of the argument.
+
+    Returns:
+        dict(str, str). Returns a dict value after validation.
     """
     if 'arg_a' not in obj:
         raise Exception('Missing arg_a in argument.')
     if 'arg_b' not in obj:
         raise Exception('Missing arg_b in argument.')
+    return obj
 
 
 class ValidateClassForTesting:
