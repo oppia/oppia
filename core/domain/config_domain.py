@@ -17,6 +17,7 @@
 """Domain objects for configuration properties."""
 
 from __future__ import annotations
+from typing import Any, Dict, List
 
 from core import feconf
 from core import schema_utils
@@ -208,7 +209,13 @@ class ConfigProperty:
     - whitelisted_email_senders.
     """
 
-    def __init__(self, name, schema, description, default_value):
+    def __init__(
+        self,
+        name: str,
+        schema: Dict[str, Any],
+        description: str,
+        default_value: Any
+    ) -> None:
         if Registry.get_config_property(name):
             raise Exception('Property with name %s already exists' % name)
 
@@ -220,31 +227,31 @@ class ConfigProperty:
         Registry.init_config_property(self.name, self)
 
     @property
-    def name(self):
+    def name(self) -> str:
         """Returns the name of the configuration property."""
 
         return self._name
 
     @property
-    def schema(self):
+    def schema(self) -> Dict[str, Any]:
         """Returns the schema of the configuration property."""
 
         return self._schema
 
     @property
-    def description(self):
+    def description(self) -> str:
         """Returns the description of the configuration property."""
 
         return self._description
 
     @property
-    def default_value(self):
+    def default_value(self) -> Any:
         """Returns the default value of the configuration property."""
 
         return self._default_value
 
     @property
-    def value(self):
+    def value(self) -> Any:
         """Get the latest value from memcache, datastore, or use default."""
 
         memcached_items = caching_services.get_multi(
@@ -252,7 +259,7 @@ class ConfigProperty:
         if self.name in memcached_items:
             return memcached_items[self.name]
 
-        datastore_item = config_models.ConfigPropertyModel.get(
+        datastore_item = config_models.ConfigPropertyModel.get( # type: ignore[attr-defined]
             self.name, strict=False)
         if datastore_item is not None:
             caching_services.set_multi(
@@ -264,17 +271,17 @@ class ConfigProperty:
 
         return self.default_value
 
-    def set_value(self, committer_id, raw_value):
+    def set_value(self, committer_id: str, raw_value: str) -> None:
         """Sets the value of the property. In general, this should not be
         called directly -- use config_services.set_property() instead.
         """
         value = self.normalize(raw_value)
 
         # Set value in datastore.
-        model_instance = config_models.ConfigPropertyModel.get(
+        model_instance = config_models.ConfigPropertyModel.get( # type: ignore[attr-defined]
             self.name, strict=False)
         if model_instance is None:
-            model_instance = config_models.ConfigPropertyModel(
+            model_instance = config_models.ConfigPropertyModel( # type: ignore[attr-defined]
                 id=self.name)
         model_instance.value = value
         model_instance.commit(
@@ -290,7 +297,7 @@ class ConfigProperty:
                 model_instance.id: model_instance.value
             })
 
-    def normalize(self, value):
+    def normalize(self, value: str) -> Any:
         """Validates the given object using the schema and normalizes if
         necessary.
 
@@ -310,10 +317,10 @@ class Registry:
 
     # The keys of _config_registry are the property names, and the values are
     # ConfigProperty instances.
-    _config_registry = {}
+    _config_registry: Dict[str, ConfigProperty] = {}
 
     @classmethod
-    def init_config_property(cls, name, instance):
+    def init_config_property(cls, name: str, instance: ConfigProperty) -> None:
         """Initializes _config_registry with keys as the property names and
         values as instances of the specified property.
 
@@ -324,7 +331,7 @@ class Registry:
         cls._config_registry[name] = instance
 
     @classmethod
-    def get_config_property(cls, name):
+    def get_config_property(cls, name: str) -> ConfigProperty:
         """Returns the instance of the specified name of the configuration
         property.
 
@@ -337,7 +344,7 @@ class Registry:
         return cls._config_registry.get(name)
 
     @classmethod
-    def get_config_property_schemas(cls):
+    def get_config_property_schemas(cls) -> Dict[str, Dict[str, Any]]:
         """Return a dict of editable config property schemas.
 
         The keys of the dict are config property names. The values are dicts
@@ -355,7 +362,7 @@ class Registry:
         return schemas_dict
 
     @classmethod
-    def get_all_config_property_names(cls):
+    def get_all_config_property_names(cls) -> List[str]:
         """Return a list of all the config property names.
 
         Returns:
@@ -490,7 +497,7 @@ ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW = ConfigProperty(
         'Enable sending admins email notifications if there are Contributor '
         'Dashboard suggestions that have been waiting for a review for more '
         'than %s days. The default value is false.' % (
-            suggestion_models.SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS)
+            suggestion_models.SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS) # type: ignore[attr-defined]
     ), False)
 
 ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE = ConfigProperty(

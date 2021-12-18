@@ -19,9 +19,11 @@
 from __future__ import annotations
 
 import json
+from typing import Any, Dict, List
 
 from core import python_utils
 from core.domain import collection_domain
+from core.domain import caching_domain
 from core.domain import exp_domain
 from core.domain import platform_parameter_domain
 from core.domain import skill_domain
@@ -104,7 +106,7 @@ SERIALIZATION_FUNCTIONS = {
 }
 
 
-def _get_memcache_key(namespace, sub_namespace, obj_id):
+def _get_memcache_key(namespace: str, sub_namespace: str | None, obj_id: str) -> str:
     """Returns a memcache key for the class under the corresponding
     namespace and sub_namespace.
 
@@ -134,12 +136,14 @@ def _get_memcache_key(namespace, sub_namespace, obj_id):
         sub_namespace_key_string, MEMCACHE_KEY_DELIMITER, obj_id)
 
 
-def flush_memory_caches():
+def flush_memory_caches() -> None:
     """Flushes the memory caches by wiping all of the data."""
     memory_cache_services.flush_caches()
 
 
-def get_multi(namespace, sub_namespace, obj_ids):
+def get_multi(
+        namespace: str, sub_namespace: str | None, obj_ids: List[str]
+    ) -> Dict[str, Any]:
     """Get a dictionary of the {id, value} pairs from the memory cache.
 
     Args:
@@ -163,7 +167,7 @@ def get_multi(namespace, sub_namespace, obj_ids):
         dict(str, Exploration|Skill|Story|Topic|Collection|str). Dictionary of
         decoded (id, value) pairs retrieved from the platform caching service.
     """
-    result_dict = {}
+    result_dict: Dict[str, Any] = {}
     if len(obj_ids) == 0:
         return result_dict
 
@@ -180,7 +184,9 @@ def get_multi(namespace, sub_namespace, obj_ids):
     return result_dict
 
 
-def set_multi(namespace, sub_namespace, id_value_mapping):
+def set_multi(
+        namespace: str, sub_namespace: str | None, id_value_mapping: Dict[str, Any]
+    ) -> bool:
     """Set multiple id values at once to the cache, where the values are all
     of a specific namespace type or a Redis compatible type (more details here:
     https://redis.io/topics/data-types).
@@ -218,7 +224,7 @@ def set_multi(namespace, sub_namespace, id_value_mapping):
     return memory_cache_services.set_multi(memory_cache_id_value_mapping)
 
 
-def delete_multi(namespace, sub_namespace, obj_ids):
+def delete_multi(namespace: str, sub_namespace: str | None, obj_ids: List[str]) -> bool:
     """Deletes multiple ids in the cache.
 
     Args:
@@ -250,7 +256,7 @@ def delete_multi(namespace, sub_namespace, obj_ids):
     return memory_cache_services.delete_multi(memcache_keys) == len(obj_ids)
 
 
-def get_memory_cache_stats():
+def get_memory_cache_stats() -> caching_domain.MemoryCacheStats:
     """Get a memory profile of the cache in a dictionary dependent on how the
     caching service profiles its own cache.
 

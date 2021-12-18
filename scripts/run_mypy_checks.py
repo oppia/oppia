@@ -86,8 +86,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/collection_services_test.py',
     'core/domain/collection_validators.py',
     'core/domain/collection_validators_test.py',
-    'core/domain/config_domain.py',
-    'core/domain/config_domain_test.py',
     'core/domain/config_services.py',
     'core/domain/config_services_test.py',
     'core/domain/config_validators.py',
