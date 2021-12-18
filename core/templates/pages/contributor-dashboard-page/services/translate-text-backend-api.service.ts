@@ -15,12 +15,22 @@
 /**
  * @fileoverview Service for handling user contributed translations.
  */
+
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { TranslatableTexts, TranslatableTextsBackendDict } from 'domain/opportunity/translatable-texts.model';
 import { ImagesData } from 'services/image-local-storage.service';
 
+interface Data {
+  'suggestion_type': string;
+  'target_type': string;
+  description: string;
+  'target_id': string;
+  'target_version_at_submission': string;
+  change: object;
+  files?: Record<string, unknown>;
+}
 @Injectable({
   providedIn: 'root'
 })
@@ -39,13 +49,32 @@ export class TranslateTextBackendApiService {
       return TranslatableTexts.createFromBackendDict(backendDict);
     });
   }
-
+  async blobtoBase64(blob: Blob): Promise<unknown> {
+    return new Promise<unknown> ((resolve, reject)=> {
+      const reader = new FileReader();
+      reader.onload = () => {
+        // Read the base64 data from result.
+        const dataurl = reader.result as string;
+        const prefixRegex = /^data:image\/(gif|png|jpeg|svg\+xml|jpg);base64,/;
+        if (!dataurl.match(prefixRegex)) {
+          reject(new Error('No valid prefix found in data url'));
+        }
+        // Remove "data:mime/type;base64," prefix from data url.
+        // And just return base64 string.
+        const base64 = dataurl.replace(prefixRegex, '');
+        resolve(base64);
+      };
+      // Read image blob and store the result.
+      reader.readAsDataURL(blob);
+      reader.onerror = error => reject(error);
+    });
+  }
   async suggestTranslatedTextAsync(
       expId: string, expVersion: string, contentId: string, stateName: string,
       languageCode: string, contentHtml: string | string[],
       translationHtml: string | string[], imagesData: ImagesData[],
       dataFormat: string): Promise<unknown> {
-    const postData = {
+    const postData: Data = {
       suggestion_type: 'translate_content',
       target_type: 'exploration',
       description: 'Adds translation',
@@ -61,15 +90,18 @@ export class TranslateTextBackendApiService {
         data_format: dataFormat
       }
     };
-
     const body = new FormData();
-    body.append('payload', JSON.stringify(postData));
-    imagesData.forEach(obj => {
-      if (obj.imageBlob === null) {
-        throw new Error('No image data found');
+    if (imagesData.length > 0) {
+      postData.files = {};
+      for await (const obj of imagesData) {
+        if (obj.imageBlob === null) {
+          throw new Error('No image data found');
+        }
+        const image = await this.blobtoBase64(obj.imageBlob);
+        postData.files[obj.filename] = image;
       }
-      body.append(obj.filename, obj.imageBlob);
-    });
+    }
+    body.append('payload', JSON.stringify(postData));
     return this.http.post(
       '/suggestionhandler/', body).toPromise();
   }
