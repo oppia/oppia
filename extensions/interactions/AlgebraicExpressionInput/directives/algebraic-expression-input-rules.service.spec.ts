@@ -129,10 +129,35 @@ describe('Algebraic expression input rules service', () => {
     expect(algebraicRulesService.MatchesExactlyWith(
       '3*x(3*x-2)+1', {x: inputString})).toBeFalse();
 
+
     inputString = '6-(-4)';
 
     expect(algebraicRulesService.MatchesExactlyWith(
       '6-(-4)', {x: inputString})).toBeTrue();
+
+
+    inputString = 'z-a-z';
+
+    expect(algebraicRulesService.MatchesExactlyWith(
+      'z-a-z', {x: inputString})).toBeTrue();
+
+    expect(algebraicRulesService.MatchesExactlyWith(
+      'a', {x: inputString})).toBeFalse();
+    expect(algebraicRulesService.MatchesExactlyWith(
+      'a+z-z', {x: inputString})).toBeFalse();
+    expect(algebraicRulesService.MatchesExactlyWith(
+      'z+(a-z)', {x: inputString})).toBeFalse();
+
+
+    inputString = '5*z-w';
+
+    expect(algebraicRulesService.MatchesExactlyWith(
+      '5*z-w', {x: inputString})).toBeTrue();
+    expect(algebraicRulesService.MatchesExactlyWith(
+      '5z-w', {x: inputString})).toBeTrue();
+
+    expect(algebraicRulesService.MatchesExactlyWith(
+      '-w+5z', {x: inputString})).toBeFalse();
   });
 
   it('should have a correct IsEquivalentTo rule', () => {
