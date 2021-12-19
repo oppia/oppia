@@ -52,8 +52,8 @@ var testSuite = [{
   interactionArguments: ['Type an expression here, using only numbers.'],
   ruleArguments: ['MatchesExactlyWith', '6-(-4)'],
   expectedInteractionDetails: ['Type an expression here, using only numbers.'],
-  wrongAnswers: ['10', '3*2-(-4)'],
-  correctAnswers: ['6-(-4)', '-(-4)+6', '6+4']
+  wrongAnswers: ['10', '3*2-(-4)', '-(-4)+6', '6+4'],
+  correctAnswers: ['6-(-4)']
 }, {
   interactionArguments: [
     'Type an expression here, using numbers and the addition sign.'],
