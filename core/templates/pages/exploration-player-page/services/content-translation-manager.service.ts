@@ -246,10 +246,12 @@ export class ContentTranslationManagerService {
       }
     }
 
-    const element = $(card.getInteractionHtml());
+    const element = new DOMParser().parseFromString(
+      card.getInteractionHtml(), 'text/html'
+    ).body;
     this.extensionTagAssemblerService.formatCustomizationArgAttrs(
       element, caValues);
-    card.setInteractionHtml(element.get(0).outerHTML);
+    card.setInteractionHtml(element.outerHTML);
   }
 
   _swapContentInRules(card: StateCard, languageCode: string): void {

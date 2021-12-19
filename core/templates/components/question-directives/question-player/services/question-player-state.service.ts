@@ -21,7 +21,7 @@ import { EventEmitter, Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Question } from 'domain/question/QuestionObjectFactory';
 
-interface UsedHint {
+interface UsedHintOrSolution {
   timestamp: number;
 }
 
@@ -31,14 +31,14 @@ interface Answer {
   taggedSkillMisconceptionId: string;
 }
 
+// Viewed solution being undefined signifies that the solution
+// has not yet been viewed.
 interface QuestionPlayerState {
   [key: string]: {
     linkedSkillIds: string[];
     answers: Answer[];
-    usedHints: UsedHint[];
-    viewedSolution: {
-      timestamp: number;
-    };
+    usedHints: UsedHintOrSolution[];
+    viewedSolution: UsedHintOrSolution | undefined;
   };
 }
 
@@ -62,23 +62,23 @@ export class QuestionPlayerStateService {
       linkedSkillIds: linkedSkillIds,
       answers: [],
       usedHints: [],
-      viewedSolution: null
+      viewedSolution: undefined
     };
   }
 
   hintUsed(question: Question): void {
-    let questionId = question.getId();
+    let questionId = question.getId() as string;
     if (!this.questionPlayerState[questionId]) {
       this._createNewQuestionPlayerState(
         questionId, question.getLinkedSkillIds());
     }
-    this.questionPlayerState[questionId].usedHints.push(
-      {timestamp: this._getCurrentTime()}
-    );
+    this.questionPlayerState[questionId].usedHints.push({
+      timestamp: this._getCurrentTime()
+    });
   }
 
   solutionViewed(question: Question): void {
-    let questionId = question.getId();
+    let questionId = question.getId() as string;
     if (!this.questionPlayerState[questionId]) {
       this._createNewQuestionPlayerState(
         questionId, question.getLinkedSkillIds());
@@ -92,7 +92,7 @@ export class QuestionPlayerStateService {
       question: Question,
       isCorrect: boolean,
       taggedSkillMisconceptionId: string): void {
-    let questionId = question.getId();
+    let questionId = question.getId() as string;
     if (!this.questionPlayerState[questionId]) {
       this._createNewQuestionPlayerState(
         questionId, question.getLinkedSkillIds());
