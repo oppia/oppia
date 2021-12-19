@@ -18,7 +18,8 @@
 
 from __future__ import annotations
 
-from core import python_utils
+import enum
+
 from core.platform import models
 
 MYPY = False
@@ -51,24 +52,99 @@ TICKET_ID_DELIMITER = '.'
 STATS_ID_DELIMITER = ':'
 ANDROID_VERSION_NAME_DELIMITER = '-'
 
-# Ignoring the untyped call error because python_utils is untyped.
-REPORT_TYPE = python_utils.create_enum('suggestion', 'issue', 'crash') # type: ignore[no-untyped-call]
-CATEGORY = python_utils.create_enum( # type: ignore[no-untyped-call]
-    'feature_suggestion', 'language_suggestion', 'other_suggestion',
-    'lesson_question_issue', 'language_general_issue', 'language_audio_issue',
-    'language_text_issue', 'topics_issue', 'profile_issue', 'other_issue',
-    'lesson_player_crash', 'practice_questions_crash', 'options_page_crash',
-    'profile_page_crash', 'other_crash')
-ENTRY_POINT = python_utils.create_enum( # type: ignore[no-untyped-call]
-    'navigation_drawer', 'lesson_player', 'revision_card', 'crash')
-STATS_PARAMETER_NAMES = python_utils.create_enum( # type: ignore[no-untyped-call]
-    'platform', 'report_type', 'country_locale_code',
-    'entry_point_name', 'text_language_code', 'audio_language_code',
-    'android_sdk_version', 'version_name')
-ANDROID_TEXT_SIZE = python_utils.create_enum( # type: ignore[no-untyped-call]
-    'text_size_unspecified', 'small_text_size', 'medium_text_size',
-    'large_text_size', 'extra_large_text_size')
-ANDROID_NETWORK_TYPE = python_utils.create_enum('wifi', 'cellular', 'none') # type: ignore[no-untyped-call]
+
+# TODO(#14419): Change naming style of Enum class from SCREAMING_SNAKE_CASE
+# to PascalCase and its values to UPPER_CASE. Because we want to be consistent
+# throughout the codebase according to the coding style guide.
+# https://github.com/oppia/oppia/wiki/Coding-style-guide
+class REPORT_TYPE(enum.Enum): # pylint: disable=invalid-name
+    """Enum for report types."""
+
+    suggestion = 'suggestion' # pylint: disable=invalid-name
+    issue = 'issue' # pylint: disable=invalid-name
+    crash = 'crash' # pylint: disable=invalid-name
+
+
+# TODO(#14419): Change naming style of Enum class from SCREAMING_SNAKE_CASE
+# to PascalCase and its values to UPPER_CASE. Because we want to be consistent
+# throughout the codebase according to the coding style guide.
+# https://github.com/oppia/oppia/wiki/Coding-style-guide
+class CATEGORY(enum.Enum): # pylint: disable=invalid-name
+    """Enum for categories."""
+
+    feature_suggestion = 'feature_suggestion' # pylint: disable=invalid-name
+    language_suggestion = 'language_suggestion' # pylint: disable=invalid-name
+    other_suggestion = 'other_suggestion' # pylint: disable=invalid-name
+    lesson_question_issue = 'lesson_question_issue' # pylint: disable=invalid-name
+    language_general_issue = 'language_general_issue' # pylint: disable=invalid-name
+    language_audio_issue = 'language_audio_issue' # pylint: disable=invalid-name
+    language_text_issue = 'language_text_issue' # pylint: disable=invalid-name
+    topics_issue = 'topics_issue' # pylint: disable=invalid-name
+    profile_issue = 'profile_issue' # pylint: disable=invalid-name
+    other_issue = 'other_issue' # pylint: disable=invalid-name
+    lesson_player_crash = 'lesson_player_crash' # pylint: disable=invalid-name
+    practice_questions_crash = 'practice_questions_crash' # pylint: disable=invalid-name
+    options_page_crash = 'options_page_crash' # pylint: disable=invalid-name
+    profile_page_crash = 'profile_page_crash' # pylint: disable=invalid-name
+    other_crash = 'other_crash' # pylint: disable=invalid-name
+
+
+# TODO(#14419): Change naming style of Enum class from SCREAMING_SNAKE_CASE
+# to PascalCase and its values to UPPER_CASE. Because we want to be consistent
+# throughout the codebase according to the coding style guide.
+# https://github.com/oppia/oppia/wiki/Coding-style-guide
+class ENTRY_POINT(enum.Enum): # pylint: disable=invalid-name
+    """Enum for entry points."""
+
+    navigation_drawer = 'navigation_drawer' # pylint: disable=invalid-name
+    lesson_player = 'lesson_player' # pylint: disable=invalid-name
+    revision_card = 'revision_card' # pylint: disable=invalid-name
+    crash = 'crash' # pylint: disable=invalid-name
+
+
+# TODO(#14419): Change naming style of Enum class from SCREAMING_SNAKE_CASE
+# to PascalCase and its values to UPPER_CASE. Because we want to be consistent
+# throughout the codebase according to the coding style guide.
+# https://github.com/oppia/oppia/wiki/Coding-style-guide
+class STATS_PARAMETER_NAMES(enum.Enum): # pylint: disable=invalid-name
+    """Enum for stats parameter names."""
+
+    platform = 'platform' # pylint: disable=invalid-name
+    report_type = 'report_type' # pylint: disable=invalid-name
+    country_locale_code = 'country_locale_code' # pylint: disable=invalid-name
+    entry_point_name = 'entry_point_name' # pylint: disable=invalid-name
+    text_language_code = 'text_language_code' # pylint: disable=invalid-name
+    audio_language_code = 'audio_language_code' # pylint: disable=invalid-name
+    android_sdk_version = 'android_sdk_version' # pylint: disable=invalid-name
+    version_name = 'version_name' # pylint: disable=invalid-name
+
+
+# TODO(#14419): Change naming style of Enum class from SCREAMING_SNAKE_CASE
+# to PascalCase and its values to UPPER_CASE. Because we want to be consistent
+# throughout the codebase according to the coding style guide.
+# https://github.com/oppia/oppia/wiki/Coding-style-guide
+class ANDROID_TEXT_SIZE(enum.Enum): # pylint: disable=invalid-name
+    """Enum for android text sizes."""
+
+    text_size_unspecified = 'text_size_unspecified' # pylint: disable=invalid-name
+    small_text_size = 'small_text_size' # pylint: disable=invalid-name
+    medium_text_size = 'medium_text_size' # pylint: disable=invalid-name
+    large_text_size = 'large_text_size' # pylint: disable=invalid-name
+    extra_large_text_size = 'extra_large_text_size' # pylint: disable=invalid-name
+
+
+# TODO(#14419): Change naming style of Enum class from SCREAMING_SNAKE_CASE
+# to PascalCase and its values to UPPER_CASE. Because we want to be consistent
+# throughout the codebase according to the coding style guide.
+# https://github.com/oppia/oppia/wiki/Coding-style-guide
+class ANDROID_NETWORK_TYPE(enum.Enum): # pylint: disable=invalid-name
+    """Enum for android network types."""
+
+    wifi = 'wifi' # pylint: disable=invalid-name
+    cellular = 'cellular' # pylint: disable=invalid-name
+    none = 'none' # pylint: disable=invalid-name
+
+
 FILTER_FIELD_NAMES = app_feedback_report_models.FILTER_FIELD_NAMES
 
 ANDROID_ENTRY_POINT = [
