@@ -238,38 +238,39 @@ export class StateGraphLayoutService {
     var SENTINEL_DEPTH = -1;
     var SENTINEL_OFFSET = -1;
 
+    var nodeData: NodeDataDict = {};
     // Creating a temporary nodeData, just to initialize
     // x0 , y0, yLabel, xLabel, height, width, id and label with null.
-    var nodeDataTemp: {
-      [nodeId: string]: {
-        depth: number;
-        offset: number;
-        reachable: boolean;
-        y0: number | null;
-        x0: number | null;
-        yLabel: number | null;
-        xLabel: number | null;
-        height: number | null;
-        width: number | null;
-        id: string | null;
-        label: string | null;
-        reachableFromEnd: boolean;
-      };
-    } = {};
+    // var nodeDataTemp: {
+    //   [nodeId: string]: {
+    //     depth: number;
+    //     offset: number;
+    //     reachable: boolean;
+    //     y0: number | null;
+    //     x0: number | null;
+    //     yLabel: number | null;
+    //     xLabel: number | null;
+    //     height: number | null;
+    //     width: number | null;
+    //     id: string | null;
+    //     label: string | null;
+    //     reachableFromEnd: boolean;
+    //   };
+    // } = {};
 
     for (var nodeId in nodes) {
-      nodeDataTemp[nodeId] = {
+      nodeData[nodeId] = {
         depth: SENTINEL_DEPTH,
         offset: SENTINEL_OFFSET,
         reachable: false,
-        x0: null,
-        y0: null,
-        xLabel: null,
-        yLabel: null,
-        id: null,
-        label: null,
-        height: null,
-        width: null,
+        x0: 0,
+        y0: 0,
+        xLabel: 0,
+        yLabel: 0,
+        id: '',
+        label: '',
+        height: 0,
+        width: 0,
         reachableFromEnd: false,
       };
     }
@@ -282,9 +283,9 @@ export class StateGraphLayoutService {
       adjacencyLists, bestPath);
 
     for (var i = 0; i < bestPath.length; i++) {
-      nodeDataTemp[bestPath[i]].depth = maxDepth;
-      nodeDataTemp[bestPath[i]].offset = trunkNodesIndentationLevels[i];
-      nodeDataTemp[bestPath[i]].reachable = true;
+      nodeData[bestPath[i]].depth = maxDepth;
+      nodeData[bestPath[i]].offset = trunkNodesIndentationLevels[i];
+      nodeData[bestPath[i]].reachable = true;
       maxOffsetInEachLevel[maxDepth] = trunkNodesIndentationLevels[i];
       maxDepth++;
     }
@@ -298,7 +299,7 @@ export class StateGraphLayoutService {
       var currNodeId = queue[0];
       queue.shift();
 
-      nodeDataTemp[currNodeId].reachable = true;
+      nodeData[currNodeId].reachable = true;
 
       for (var i = 0; i < adjacencyLists[currNodeId].length; i++) {
         var linkTarget = adjacencyLists[currNodeId][i];
@@ -307,8 +308,8 @@ export class StateGraphLayoutService {
         // depth to process now, we ignore it for now and stick it back in
         // the queue to be processed later.
         if (bestPath.indexOf(linkTarget) !== -1 &&
-          nodeDataTemp[
-            linkTarget].depth !== nodeDataTemp[currNodeId].depth + 1) {
+          nodeData[
+            linkTarget].depth !== nodeData[currNodeId].depth + 1) {
           if (seenNodes.indexOf(linkTarget) === -1 &&
               queue.indexOf(linkTarget) === -1) {
             queue.push(linkTarget);
@@ -321,15 +322,15 @@ export class StateGraphLayoutService {
         if (seenNodes.indexOf(linkTarget) === -1) {
           seenNodes.push(linkTarget);
 
-          if (nodeDataTemp[linkTarget].depth === SENTINEL_DEPTH) {
-            nodeDataTemp[linkTarget].depth = nodeDataTemp[currNodeId].depth + 1;
-            nodeDataTemp[linkTarget].offset = (
-              nodeDataTemp[linkTarget].depth in maxOffsetInEachLevel ?
-              maxOffsetInEachLevel[nodeDataTemp[linkTarget].depth] + 1 : 0);
+          if (nodeData[linkTarget].depth === SENTINEL_DEPTH) {
+            nodeData[linkTarget].depth = nodeData[currNodeId].depth + 1;
+            nodeData[linkTarget].offset = (
+              nodeData[linkTarget].depth in maxOffsetInEachLevel ?
+              maxOffsetInEachLevel[nodeData[linkTarget].depth] + 1 : 0);
 
-            maxDepth = Math.max(maxDepth, nodeDataTemp[linkTarget].depth);
-            maxOffsetInEachLevel[nodeDataTemp[linkTarget].depth] = (
-              nodeDataTemp[linkTarget].offset);
+            maxDepth = Math.max(maxDepth, nodeData[linkTarget].depth);
+            maxOffsetInEachLevel[nodeData[linkTarget].depth] = (
+              nodeData[linkTarget].offset);
           }
 
           if (queue.indexOf(linkTarget) === -1) {
@@ -343,11 +344,11 @@ export class StateGraphLayoutService {
     maxOffsetInEachLevel[maxDepth + 1] = 0;
     maxDepth += 1;
     var orphanedNodesExist = false;
-    for (var nodeId in nodeDataTemp) {
-      if (nodeDataTemp[nodeId].depth === SENTINEL_DEPTH) {
+    for (var nodeId in nodeData) {
+      if (nodeData[nodeId].depth === SENTINEL_DEPTH) {
         orphanedNodesExist = true;
-        nodeDataTemp[nodeId].depth = maxDepth;
-        nodeDataTemp[nodeId].offset = maxOffsetInEachLevel[maxDepth];
+        nodeData[nodeId].depth = maxDepth;
+        nodeData[nodeId].offset = maxOffsetInEachLevel[maxDepth];
         maxOffsetInEachLevel[maxDepth] += 1;
       }
     }
@@ -361,11 +362,11 @@ export class StateGraphLayoutService {
     for (var i = 0; i <= maxDepth; i++) {
       nodePositionsToIds.push([]);
     }
-    for (var nodeId in nodeDataTemp) {
-      if (nodeDataTemp[nodeId].depth !== SENTINEL_DEPTH) {
-        nodePositionsToIds[nodeDataTemp[nodeId].depth].push({
+    for (var nodeId in nodeData) {
+      if (nodeData[nodeId].depth !== SENTINEL_DEPTH) {
+        nodePositionsToIds[nodeData[nodeId].depth].push({
           nodeId: nodeId,
-          offset: nodeDataTemp[nodeId].offset
+          offset: nodeData[nodeId].offset
         });
       }
     }
@@ -398,9 +399,9 @@ export class StateGraphLayoutService {
             currentLeftOffset = computedOffset;
           }
 
-          nodeDataTemp[
+          nodeData[
             nodePositionsToIds[i][j].nodeId].depth = currentDepth;
-          nodeDataTemp[nodePositionsToIds[i][j].nodeId].offset = (
+          nodeData[nodePositionsToIds[i][j].nodeId].offset = (
             currentLeftOffset);
 
           currentLeftOffset += 1;
@@ -458,73 +459,73 @@ export class StateGraphLayoutService {
         fractionalGridHeight * offsetInGridRectangles);
     };
 
-    for (var nodeId in nodeDataTemp) {
-      nodeDataTemp[nodeId].y0 = getVerticalPosition(
-        nodeDataTemp[nodeId].depth + GRID_NODE_Y_PADDING_FRACTION);
-      nodeDataTemp[nodeId].x0 = getHorizontalPosition(
-        nodeDataTemp[nodeId].offset + GRID_NODE_X_PADDING_FRACTION);
+    for (var nodeId in nodeData) {
+      nodeData[nodeId].y0 = getVerticalPosition(
+        nodeData[nodeId].depth + GRID_NODE_Y_PADDING_FRACTION);
+      nodeData[nodeId].x0 = getHorizontalPosition(
+        nodeData[nodeId].offset + GRID_NODE_X_PADDING_FRACTION);
 
-      nodeDataTemp[nodeId].yLabel = getVerticalPosition(
-        nodeDataTemp[nodeId].depth + 0.5);
-      nodeDataTemp[nodeId].xLabel = getHorizontalPosition(
-        nodeDataTemp[nodeId].offset + 0.5) +
+      nodeData[nodeId].yLabel = getVerticalPosition(
+        nodeData[nodeId].depth + 0.5);
+      nodeData[nodeId].xLabel = getHorizontalPosition(
+        nodeData[nodeId].offset + 0.5) +
         X_LABEL_OFFSET_CHECKPOINT_ICON;
 
-      nodeDataTemp[nodeId].height = (
+      nodeData[nodeId].height = (
         (1.0 - VERTICAL_EDGE_PADDING_FRACTION * 2) / totalRows
       ) * (1.0 - GRID_NODE_Y_PADDING_FRACTION * 2);
-      nodeDataTemp[nodeId].width = (
+      nodeData[nodeId].width = (
         (1.0 - HORIZONTAL_EDGE_PADDING_FRACTION * 2) / totalColumns
       ) * (1.0 - GRID_NODE_X_PADDING_FRACTION * 2) +
       WIDTH_OFFSET_CHECKPOINT_ICON;
     }
 
     // Assign id and label to each node.
-    for (var nodeId in nodeDataTemp) {
+    for (var nodeId in nodeData) {
       nodeData[nodeId].id = nodeId;
       nodeData[nodeId].label = nodes[nodeId];
     }
 
     // Here we are creating and initialize nodeData: NodeDataDict.
     // Note: nodeData does not contain any 'null' value.
-    var nodeData: NodeDataDict = {};
-    for (var nodeId in nodeDataTemp) {
-      var x0 = nodeDataTemp[nodeId].x0;
-      var y0 = nodeDataTemp[nodeId].y0;
-      var xLabel = nodeDataTemp[nodeId].xLabel;
-      var yLabel = nodeDataTemp[nodeId].yLabel;
-      var id = nodeDataTemp[nodeId].id;
-      var label = nodeDataTemp[nodeId].label;
-      var height = nodeDataTemp[nodeId].height;
-      var width = nodeDataTemp[nodeId].width;
+    // var nodeData: NodeDataDict = {};
+    // for (var nodeId in nodeData) {
+    //   var x0 = nodeDataTemp[nodeId].x0;
+    //   var y0 = nodeDataTemp[nodeId].y0;
+    //   var xLabel = nodeDataTemp[nodeId].xLabel;
+    //   var yLabel = nodeDataTemp[nodeId].yLabel;
+    //   var id = nodeDataTemp[nodeId].id;
+    //   var label = nodeDataTemp[nodeId].label;
+    //   var height = nodeDataTemp[nodeId].height;
+    //   var width = nodeDataTemp[nodeId].width;
 
-      nodeData[nodeId].depth = nodeDataTemp[nodeId].depth;
-      nodeData[nodeId].offset = nodeDataTemp[nodeId].offset;
-      nodeData[nodeId].reachable = nodeDataTemp[nodeId].reachable;
-      if (
-        x0 !== null &&
-        y0 !== null &&
-        xLabel !== null &&
-        yLabel !== null &&
-        id !== null &&
-        label !== null &&
-        height !== null &&
-        width !== null
-      ) {
-        nodeData[nodeId].x0 = x0;
-        nodeData[nodeId].y0 = y0;
-        nodeData[nodeId].xLabel = xLabel;
-        nodeData[nodeId].x0 = yLabel;
-        nodeData[nodeId].id = id;
-        nodeData[nodeId].label = label;
-        nodeData[nodeId].height = height;
-        nodeData[nodeId].width = width;
-      } else {
-        throw new Error('Some values inside nodeData are null');
-      }
-      nodeData[
-        nodeId].reachableFromEnd = nodeDataTemp[nodeId].reachableFromEnd;
-    }
+    //   nodeData[nodeId].depth = nodeDataTemp[nodeId].depth;
+    //   nodeData[nodeId].offset = nodeDataTemp[nodeId].offset;
+    //   nodeData[nodeId].reachable = nodeDataTemp[nodeId].reachable;
+    //   if (
+    //     x0 !== null &&
+    //     y0 !== null &&
+    //     xLabel !== null &&
+    //     yLabel !== null &&
+    //     id !== null &&
+    //     label !== null &&
+    //     height !== null &&
+    //     width !== null
+    //   ) {
+    //     nodeData[nodeId].x0 = x0;
+    //     nodeData[nodeId].y0 = y0;
+    //     nodeData[nodeId].xLabel = xLabel;
+    //     nodeData[nodeId].x0 = yLabel;
+    //     nodeData[nodeId].id = id;
+    //     nodeData[nodeId].label = label;
+    //     nodeData[nodeId].height = height;
+    //     nodeData[nodeId].width = width;
+    //   } else {
+    //     throw new Error('Some values inside nodeData are null');
+    //   }
+    //   nodeData[
+    //     nodeId].reachableFromEnd = nodeDataTemp[nodeId].reachableFromEnd;
+    // }
 
     // Mark nodes that are reachable from any end state via backward links.
     queue = finalNodeIds;
