@@ -29,6 +29,7 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { StateParamChangesEditorComponent } from './editor-tab/state-param-changes-editor/state-param-changes-editor.component';
+import { DeleteAnswerGroupModalComponent } from './editor-tab/templates/modal-templates/delete-answer-group-modal.component';
 import { DeleteStateSkillModalComponent } from './editor-tab/templates/modal-templates/delete-state-skill-modal.component';
 import { ParamChangesEditorDirective } from './param-changes-editor/param-changes-editor.component';
 import { SwitchContentLanguageRefreshRequiredModalComponent } from 'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
@@ -45,6 +46,7 @@ import { ExplorationPublishModalComponent } from 'pages/exploration-editor-page/
 import { EditorReloadingModalComponent } from './modal-templates/editor-reloading-modal.component';
 import { ConfirmDiscardChangesModalComponent } from './modal-templates/confirm-discard-changes-modal.component';
 import { CreateFeedbackThreadModalComponent } from './feedback-tab/templates/create-feedback-thread-modal.component';
+import { WelcomeTranslationModalComponent } from './translation-tab/modal-templates/welcome-translation-modal.component';
 import { DeleteExplorationModalComponent } from './settings-tab/templates/delete-exploration-modal.component';
 import { RemoveRoleConfirmationModalComponent } from './settings-tab/templates/remove-role-confirmation-modal.component';
 import { ReassignRoleConfirmationModalComponent } from './settings-tab/templates/reassign-role-confirmation-modal.component';
@@ -64,6 +66,7 @@ import { RevertExplorationModalComponent } from './history-tab/modal-templates/r
   ],
   declarations: [
     CkEditorCopyToolbarComponent,
+    DeleteAnswerGroupModalComponent,
     DeleteStateSkillModalComponent,
     ParamChangesEditorDirective,
     StateParamChangesEditorComponent,
@@ -85,10 +88,13 @@ import { RevertExplorationModalComponent } from './history-tab/modal-templates/r
     ModeratorUnpublishExplorationModalComponent,
     TransferExplorationOwnershipModalComponent,
     ConfirmDeleteStateModalComponent,
-    RevertExplorationModalComponent
+    RevertExplorationModalComponent,
+    WelcomeTranslationModalComponent,
+    ConfirmDeleteStateModalComponent
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
+    DeleteAnswerGroupModalComponent,
     DeleteStateSkillModalComponent,
     StateParamChangesEditorComponent,
     SwitchContentLanguageRefreshRequiredModalComponent,
@@ -109,7 +115,9 @@ import { RevertExplorationModalComponent } from './history-tab/modal-templates/r
     ModeratorUnpublishExplorationModalComponent,
     TransferExplorationOwnershipModalComponent,
     ConfirmDeleteStateModalComponent,
-    RevertExplorationModalComponent
+    RevertExplorationModalComponent,
+    WelcomeTranslationModalComponent,
+    ConfirmDeleteStateModalComponent
   ],
   providers: [
     {
