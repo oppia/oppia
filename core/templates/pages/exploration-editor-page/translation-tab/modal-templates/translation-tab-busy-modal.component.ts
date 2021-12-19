@@ -13,20 +13,24 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for translation tab busy modal.
+ * @fileoverview Component for translation tab busy modal.
  */
 
-require(
-  'components/common-layout-directives/common-elements/' +
-  'confirm-or-cancel-modal.controller.ts');
+import { Component, Input } from '@angular/core';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
-angular.module('oppia').controller('TranslationTabBusyModalController', [
-  '$controller', '$scope', '$uibModalInstance', 'message',
-  function($controller, $scope, $uibModalInstance, message) {
-    $controller('ConfirmOrCancelModalController', {
-      $scope: $scope,
-      $uibModalInstance: $uibModalInstance
-    });
-    $scope.busyMessage = message;
+@Component({
+  selector: 'oppia-translation-tab-busy-modal',
+  templateUrl: './translation-tab-busy-modal.component.html'
+})
+export class TranslationTabBusyModalComponent
+  extends ConfirmOrCancelModal {
+  @Input() busyMessage: string;
+
+  constructor(
+    private ngbActiveModal: NgbActiveModal,
+  ) {
+    super(ngbActiveModal);
   }
-]);
+}
