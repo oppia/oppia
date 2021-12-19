@@ -16,10 +16,15 @@
  * @fileoverview Tests for ExplorationStatesService.
  */
 
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { ChangeListService } from './change-list.service';
 import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { ContextService } from 'services/context.service';
+import { ExplorationStatesService } from './exploration-states.service';
+import { Outcome, OutcomeBackendDict } from 'domain/exploration/OutcomeObjectFactory';
+import { AnswerGroupBackendDict } from 'domain/exploration/AnswerGroupObjectFactory';
+import { InteractionBackendDict } from 'domain/exploration/InteractionObjectFactory';
+import { StateBackendDict } from 'domain/state/StateObjectFactory';
 
 class MockNgbModalRef {
   componentInstance = {
@@ -27,56 +32,43 @@ class MockNgbModalRef {
   };
 }
 
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-solicit-answer-details.service.ts');
-require('pages/exploration-editor-page/services/exploration-states.service.ts');
+class MockNgbModal {
+  open() {
+    return {
+      componentInstance: MockNgbModalRef,
+      result: Promise.resolve('Hola')
+    };
+  }
+}
 
-describe('ExplorationStatesService', function() {
-  var $rootScope = null;
-  let ngbModal: NgbModal = null;
-  let changeListService: ChangeListService = null;
-  var ContextService = null;
-  var ExplorationStatesService = null;
-
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('NgbModal', {
-      open: () => {
-        return {
-          componentInstance: MockNgbModalRef,
-          result: Promise.resolve('Hola')
-        };
-      }
-    });
-  }));
-  importAllAngularServices();
+describe('ExplorationStatesService', () => {
+  let ngbModal: MockNgbModal;
+  let changeListService: ChangeListService;
+  let contextService: ContextService;
+  let explorationStatesService: ExplorationStatesService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
-        ChangeListService
+        ChangeListService,
+        {
+          provide: NgbModal,
+          useClass: MockNgbModal
+        }
       ]
     });
   });
 
   beforeEach(() => {
-    ngbModal = TestBed.inject(NgbModal);
+    ngbModal = (TestBed.inject(NgbModal) as unknown) as MockNgbModal;
     changeListService = TestBed.inject(ChangeListService);
   });
 
-  beforeEach(angular.mock.inject(function(
-      _$q_, _$rootScope_, _$uibModal_, _ContextService_,
-      _ExplorationStatesService_) {
-    $rootScope = _$rootScope_;
-    ContextService = _ContextService_;
-    ExplorationStatesService = _ExplorationStatesService_;
-  }));
+  beforeEach(() => {
+    let EXP_ID = '7';
+    spyOn(contextService, 'getExplorationId').and.returnValue(EXP_ID);
 
-  beforeEach(function() {
-    this.EXP_ID = '7';
-    spyOn(ContextService, 'getExplorationId').and.returnValue(this.EXP_ID);
-
-    ExplorationStatesService.init({
+    explorationStatesService.init({
       Hola: {
         content: {content_id: 'content', html: ''},
         recorded_voiceovers: {
@@ -92,10 +84,12 @@ describe('ExplorationStatesService', function() {
           answer_groups: [{
             rule_specs: [{
               rule_type: 'Contains',
-              inputs: {x: {
-                contentId: 'rule_input',
-                normalizedStrSet: ['hola']
-              }}
+              inputs: {
+                x: {
+                  contentId: 'rule_input',
+                  normalizedStrSet: ['hola']
+                }
+              }
             }],
             outcome: {
               dest: 'Me Llamo',
@@ -104,8 +98,8 @@ describe('ExplorationStatesService', function() {
                 html: 'buen trabajo!',
               },
               labelled_as_correct: true,
-            },
-          }],
+            } as unknown as Outcome
+          } as unknown as AnswerGroupBackendDict],
           customization_args: {
             placeholder: {
               value: {
@@ -122,11 +116,11 @@ describe('ExplorationStatesService', function() {
               html: 'try again!',
             },
             labelled_as_correct: false,
-          },
+          } as OutcomeBackendDict,
           hints: [],
           id: 'TextInput',
           solution: null,
-        },
+        } as unknown as InteractionBackendDict,
         linked_skill_id: null,
         solicit_answer_details: false,
         written_translations: {
@@ -137,33 +131,33 @@ describe('ExplorationStatesService', function() {
             rule_input: {}
           },
         },
-        classifier_model_id: 0,
-      },
+        classifier_model_id: '0',
+      } as unknown as StateBackendDict,
     });
   });
 
-  describe('Callback Registration', function() {
-    describe('.registerOnStateAddedCallback', function() {
+  describe('Callback Registration', () => {
+    describe('.registerOnStateAddedCallback', () => {
       it('should callback when a new state is added', fakeAsync(() => {
-        spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        spyOn(ngbModal, 'open').and.callFake(() => {
           return ({
             componentInstance: NgbModalRef,
             result: Promise.resolve()
           } as NgbModalRef);
         });
-        var spy = jasmine.createSpy('callback');
+        let spy = jasmine.createSpy('callback');
         spyOn(changeListService, 'addState');
 
-        ExplorationStatesService.registerOnStateAddedCallback(spy);
-        ExplorationStatesService.addState('Me Llamo');
+        explorationStatesService.registerOnStateAddedCallback(spy);
+        explorationStatesService.addState('Me Llamo', () => {});
 
         expect(spy).toHaveBeenCalledWith('Me Llamo');
       }));
     });
 
-    describe('.registerOnStateDeletedCallback', function() {
+    describe('.registerOnStateDeletedCallback', () => {
       it('should callback when a state is deleted', fakeAsync(() => {
-        spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        spyOn(ngbModal, 'open').and.callFake(() => {
           return ({
             componentInstance: MockNgbModalRef,
             result: Promise.resolve('Hola')
@@ -171,52 +165,52 @@ describe('ExplorationStatesService', function() {
         });
         spyOn(changeListService, 'deleteState');
 
-        var spy = jasmine.createSpy('callback');
-        ExplorationStatesService.registerOnStateDeletedCallback(spy);
-        ExplorationStatesService.deleteState('Hola');
+        let spy = jasmine.createSpy('callback');
+        explorationStatesService.registerOnStateDeletedCallback(spy);
+        explorationStatesService.deleteState('Hola');
         flushMicrotasks();
 
         expect(spy).toHaveBeenCalledWith('Hola');
-        $rootScope.$digest();
+        flushMicrotasks();
       }));
     });
 
-    describe('.registerOnStateRenamedCallback', function() {
-      it('should callback when a state is renamed', function() {
-        var spy = jasmine.createSpy('callback');
+    describe('.registerOnStateRenamedCallback', () => {
+      it('should callback when a state is renamed', () => {
+        let spy = jasmine.createSpy('callback');
         spyOn(changeListService, 'renameState');
 
-        ExplorationStatesService.registerOnStateRenamedCallback(spy);
-        ExplorationStatesService.renameState('Hola', 'Bonjour');
+        explorationStatesService.registerOnStateRenamedCallback(spy);
+        explorationStatesService.renameState('Hola', 'Bonjour');
 
         expect(spy).toHaveBeenCalledWith('Hola', 'Bonjour');
       });
     });
 
-    describe('.registerOnStateInteractionSaved', function() {
+    describe('.registerOnStateInteractionSaved', () => {
       it('should callback when answer groups of a state are saved',
-        function() {
-          var spy = jasmine.createSpy('callback');
+        () => {
+          let spy = jasmine.createSpy('callback');
           spyOn(changeListService, 'editStateProperty');
 
-          ExplorationStatesService.registerOnStateInteractionSavedCallback(spy);
-          ExplorationStatesService.saveInteractionAnswerGroups('Hola', []);
+          explorationStatesService.registerOnStateInteractionSavedCallback(spy);
+          explorationStatesService.saveInteractionAnswerGroups('Hola', '');
 
           expect(spy)
-            .toHaveBeenCalledWith(ExplorationStatesService.getState('Hola'));
+            .toHaveBeenCalledWith(explorationStatesService.getState('Hola'));
         });
     });
   });
 
-  it('should save the solicitAnswerDetails correctly', function() {
+  it('should save the solicitAnswerDetails correctly', () => {
     expect(
-      ExplorationStatesService.getSolicitAnswerDetailsMemento(
-        'Hola', 'solicit_answer_details')).toEqual(false);
+      explorationStatesService.getSolicitAnswerDetailsMemento(
+        'Hola')).toEqual(false);
     const changeListSpy = spyOn(changeListService, 'editStateProperty');
-    ExplorationStatesService.saveSolicitAnswerDetails('Hola', true);
+    explorationStatesService.saveSolicitAnswerDetails('Hola', '');
     expect(changeListSpy).toHaveBeenCalledWith(
       'Hola', 'solicit_answer_details', true, false);
-    expect(ExplorationStatesService.getSolicitAnswerDetailsMemento(
-      'Hola', 'solicit_answer_details')).toEqual(true);
+    expect(explorationStatesService.getSolicitAnswerDetailsMemento(
+      'Hola')).toEqual(true);
   });
 });
