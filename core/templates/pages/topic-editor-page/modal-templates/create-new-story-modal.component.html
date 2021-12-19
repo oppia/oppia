@@ -67,13 +67,16 @@
       </div>
     </div>
 
-    <div class="story-input story-input-thumbnail protractor-test-thumbnail-editor protractor-test-photo-button protractor-test-photo-upload-input">
-      <label class="story-input-header">Thumbnail Image*</label>
+    <div class="story-input story-input-thumbnail">
+      <div class="story-input-header">
+        <span>Thumbnail Image*</span>
+      </div>
       <oppia-thumbnail-uploader [previewTitle]="newlyCreatedStory.title"
                                 [aspectRatio]="'4:3'"
                                 [disabled]="false"
                                 [useLocalStorage]="true"
                                 [allowedBgColors]="allowedBgColors"
+                                [thumbnailBg-Color]="newlyCreatedStory.getThumbnailBgColor()"
                                 previewDescriptionBgColor="#2F6687">
       </oppia-thumbnail-uploader>
     </div>
