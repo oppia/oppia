@@ -246,7 +246,7 @@ def yaml_from_dict(dictionary: Dict[str, Any], width: int = 80) -> str:
     # The type ignore is needed, because typestubs define the return type
     # of 'dump' as 'Any' which is wrong.
     return yaml.dump( # type: ignore[no-any-return]
-           dictionary, allow_unicode=True, width=width
+        dictionary, allow_unicode=True, width=width
     )
 
 
