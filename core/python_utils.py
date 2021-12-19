@@ -33,8 +33,6 @@ _CERTIFI_PATH = os.path.join(
     os.getcwd(), '..', 'oppia_tools', 'certifi-2021.10.8')
 sys.path.insert(0, _CERTIFI_PATH)
 
-import yaml  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-
 import builtins  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 import past.builtins  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 import past.utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order

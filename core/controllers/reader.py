@@ -26,6 +26,7 @@ from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.controllers import domain_objects_validator
+from core.controllers import editor
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import event_services
@@ -358,8 +359,7 @@ class StorePlaythroughHandler(base.BaseHandler):
         issue_schema_version = self.normalized_payload.get(
             'issue_schema_version')
 
-        playthrough_data = self.normalized_payload.get('playthrough_data')
-        playthrough = stats_domain.Playthrough.from_dict(playthrough_data)
+        playthrough = self.normalized_payload.get('playthrough_data')
 
         exp_issues = stats_services.get_exp_issues(
             exploration_id, playthrough.exp_version)
@@ -566,6 +566,47 @@ class ExplorationStartEventHandler(base.BaseHandler):
     """Tracks a learner starting an exploration."""
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'params': {
+                'schema': {
+                    'type': 'dict',
+                    'properties': []
+                }
+            },
+            'session_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'state_name': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'version': {
+                'schema': {
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 1
+                    }]
+                }
+            },
+        }
+    }
 
     @acl_decorators.can_play_exploration
     def post(self, exploration_id):
@@ -574,14 +615,12 @@ class ExplorationStartEventHandler(base.BaseHandler):
         Args:
             exploration_id: str. The ID of the exploration.
         """
-        if self.payload.get('version') is None:
-            raise self.InvalidInputException(
-                'NONE EXP VERSION: Exploration start')
         event_services.StartExplorationEventHandler.record(
-            exploration_id, self.payload.get('version'),
-            self.payload.get('state_name'),
-            self.payload.get('session_id'),
-            self.payload.get('params'),
+            exploration_id,
+            self.normalized_payload.get('version'),
+            self.normalized_payload.get('state_name'),
+            self.normalized_payload.get('session_id'),
+            self.normalized_payload.get('params'),
             feconf.PLAY_TYPE_NORMAL)
         self.render_json({})
 
@@ -592,34 +631,103 @@ class ExplorationActualStartEventHandler(base.BaseHandler):
     """
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'exploration_version': {
+                'schema': {
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 1
+                    }]
+                }
+            },
+            'state_name': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'session_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+        }
+    }
 
     @acl_decorators.can_play_exploration
     def post(self, exploration_id):
         """Handles POST requests."""
-        if self.payload.get('exploration_version') is None:
-            raise self.InvalidInputException(
-                'NONE EXP VERSION: Actual Start')
         event_services.ExplorationActualStartEventHandler.record(
-            exploration_id, self.payload.get('exploration_version'),
-            self.payload.get('state_name'), self.payload.get('session_id'))
+            exploration_id,
+            self.normalized_payload.get('exploration_version'),
+            self.normalized_payload.get('state_name'),
+            self.normalized_payload.get('session_id'))
         self.render_json({})
 
 
 class SolutionHitEventHandler(base.BaseHandler):
     """Tracks a learner clicking on the 'View Solution' button."""
 
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': editor.SCHEMA_FOR_EXPLORATION_ID
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'exploration_version': {
+                'schema': editor.SCHEMA_FOR_VERSION
+            },
+            'state_name': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_STATE_NAME_LENGTH
+                    }]
+                }
+            },
+            'session_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'time_spent_in_state_secs': {
+                'schema': {
+                    'type': 'float',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 0
+                    }]
+                }
+            }
+        }
+    }
+
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
     @acl_decorators.can_play_exploration
     def post(self, exploration_id):
         """Handles POST requests."""
-        if self.payload.get('exploration_version') is None:
-            raise self.InvalidInputException(
-                'NONE EXP VERSION: Solution hit')
         event_services.SolutionHitEventHandler.record(
-            exploration_id, self.payload.get('exploration_version'),
-            self.payload.get('state_name'), self.payload.get('session_id'),
-            self.payload.get('time_spent_in_state_secs'))
+            exploration_id,
+            self.normalized_payload.get('exploration_version'),
+            self.normalized_payload.get('state_name'),
+            self.normalized_payload.get('session_id'),
+            self.normalized_payload.get('time_spent_in_state_secs'))
         self.render_json({})
 
 
@@ -628,6 +736,59 @@ class ExplorationCompleteEventHandler(base.BaseHandler):
 
     The state name recorded should be a state with a terminal interaction.
     """
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': editor.SCHEMA_FOR_EXPLORATION_ID
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'collection_id': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX
+                    }]
+                },
+                'default_value': None
+            },
+            'version': {
+                'schema': editor.SCHEMA_FOR_VERSION
+            },
+            'state_name': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_STATE_NAME_LENGTH
+                    }]
+                }
+            },
+            'session_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'client_time_spent_in_secs': {
+                'schema': {
+                    'type': 'float',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 0
+                    }]
+                }
+            },
+            'params': {
+                'schema': {
+                    'type': 'object_dict',
+                    'validation_method': (
+                        domain_objects_validator.validate_params_dict),
+                }
+            }
+        }
+    }
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
@@ -641,19 +802,16 @@ class ExplorationCompleteEventHandler(base.BaseHandler):
 
         # This will be None if the exploration is not being played within the
         # context of a collection.
-        collection_id = self.payload.get('collection_id')
+        collection_id = self.normalized_payload.get('collection_id')
         user_id = self.user_id
 
-        if self.payload.get('version') is None:
-            raise self.InvalidInputException(
-                'NONE EXP VERSION: Exploration complete')
         event_services.CompleteExplorationEventHandler.record(
             exploration_id,
-            self.payload.get('version'),
-            self.payload.get('state_name'),
-            self.payload.get('session_id'),
-            self.payload.get('client_time_spent_in_secs'),
-            self.payload.get('params'),
+            self.normalized_payload.get('version'),
+            self.normalized_payload.get('state_name'),
+            self.normalized_payload.get('session_id'),
+            self.normalized_payload.get('client_time_spent_in_secs'),
+            self.normalized_payload.get('params'),
             feconf.PLAY_TYPE_NORMAL)
 
         if user_id:
@@ -683,6 +841,59 @@ class ExplorationMaybeLeaveHandler(base.BaseHandler):
     The state name recorded should be a state with a non-terminal interaction.
     """
 
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': editor.SCHEMA_FOR_EXPLORATION_ID
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'version': {
+                'schema': editor.SCHEMA_FOR_VERSION
+            },
+            'state_name': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_STATE_NAME_LENGTH
+                    }]
+                }
+            },
+            'collection_id': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX
+                    }]
+                },
+                'default_value': None
+            },
+            'session_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'client_time_spent_in_secs': {
+                'schema': {
+                    'type': 'float',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 0
+                    }]
+                }
+            },
+            'params': {
+                'schema': {
+                    'type': 'object_dict',
+                    'validation_method': (
+                        domain_objects_validator.validate_params_dict),
+                }
+            }
+        }
+    }
+
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
     @acl_decorators.can_play_exploration
@@ -692,13 +903,10 @@ class ExplorationMaybeLeaveHandler(base.BaseHandler):
         Args:
             exploration_id: str. The ID of the exploration.
         """
-        version = self.payload.get('version')
-        if version is None:
-            raise self.InvalidInputException(
-                'NONE EXP VERSION: Maybe quit')
-        state_name = self.payload.get('state_name')
+        version = self.normalized_payload.get('version')
+        state_name = self.normalized_payload.get('state_name')
         user_id = self.user_id
-        collection_id = self.payload.get('collection_id')
+        collection_id = self.normalized_payload.get('collection_id')
         story_id = exp_services.get_story_id_linked_to_exploration(
             exploration_id)
 
@@ -729,9 +937,9 @@ class ExplorationMaybeLeaveHandler(base.BaseHandler):
             exploration_id,
             version,
             state_name,
-            self.payload.get('session_id'),
-            self.payload.get('client_time_spent_in_secs'),
-            self.payload.get('params'),
+            self.normalized_payload.get('session_id'),
+            self.normalized_payload.get('client_time_spent_in_secs'),
+            self.normalized_payload.get('params'),
             feconf.PLAY_TYPE_NORMAL)
         self.render_json(self.values)
 
@@ -740,6 +948,32 @@ class LearnerIncompleteActivityHandler(base.BaseHandler):
     """Handles operations related to the activities in the incomplete list of
     the user.
     """
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'activity_type': {
+            'schema': {
+                'type': 'basestring',
+                'choices': [
+                    constants.ACTIVITY_TYPE_EXPLORATION,
+                    constants.ACTIVITY_TYPE_COLLECTION,
+                    constants.ACTIVITY_TYPE_STORY,
+                    constants.ACTIVITY_TYPE_LEARN_TOPIC
+                ]
+            }
+        },
+        'activity_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'DELETE': {}
+    }
 
     @acl_decorators.can_access_learner_dashboard
     def delete(self, activity_type, activity_id):
@@ -774,6 +1008,29 @@ class RatingHandler(base.BaseHandler):
     exploration.
     """
 
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'PUT': {
+            'user_rating': {
+                'schema': {
+                    'type': 'int',
+                    'choices': [1, 2, 3, 4, 5]
+                }
+            }
+        }
+    }
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_play_exploration
@@ -794,7 +1051,7 @@ class RatingHandler(base.BaseHandler):
         """Handles PUT requests for submitting ratings at the end of an
         exploration.
         """
-        user_rating = self.payload.get('user_rating')
+        user_rating = self.normalized_payload.get('user_rating')
         rating_services.assign_rating_to_exploration(
             self.user_id, exploration_id, user_rating)
         self.render_json({})
@@ -867,6 +1124,27 @@ class RecommendationsHandler(base.BaseHandler):
 class FlagExplorationHandler(base.BaseHandler):
     """Handles operations relating to learner flagging of explorations."""
 
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'report_text': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+    }
+
     @acl_decorators.can_flag_exploration
     def post(self, exploration_id):
         """Handles POST requests.
@@ -876,7 +1154,7 @@ class FlagExplorationHandler(base.BaseHandler):
         """
         moderator_services.enqueue_flag_exploration_email_task(
             exploration_id,
-            self.payload.get('report_text'),
+            self.normalized_payload.get('report_text'),
             self.user_id)
         self.render_json(self.values)
 

@@ -33,7 +33,7 @@ import { Subscription } from 'rxjs';
 })
 export class OpportunitiesListComponent {
   @Input() loadOpportunities: () => Promise<{
-    opportunitiesDicts: ExplorationOpportunity[], more: boolean}>;
+    opportunitiesDicts: ExplorationOpportunity[]; more: boolean; }>;
   @Input() labelRequired: boolean;
   @Input() progressBarRequired: boolean;
   @Input() loadMoreOpportunities;
@@ -50,6 +50,7 @@ export class OpportunitiesListComponent {
   directiveSubscriptions = new Subscription();
   activePageNumber: number = 1;
   OPPORTUNITIES_PAGE_SIZE = constants.OPPORTUNITIES_PAGE_SIZE;
+  more: boolean = false;
 
   constructor(
     private zone: NgZone,
@@ -91,11 +92,13 @@ export class OpportunitiesListComponent {
   }
 
   ngOnInit(): void {
+    this.loadingOpportunityData = true;
     this.loadOpportunities().then(({opportunitiesDicts, more}) => {
       // This ngZone run closure will not be required after \
       // migration is complete.
       this.zone.run(() => {
         this.opportunities = opportunitiesDicts;
+        this.more = more;
         this.visibleOpportunities = this.opportunities.slice(
           0, this.OPPORTUNITIES_PAGE_SIZE);
         this.lastPageNumber = more ? this.lastPageNumber : Math.ceil(
@@ -108,11 +111,14 @@ export class OpportunitiesListComponent {
   gotoPage(pageNumber: number): void {
     const startIndex = (pageNumber - 1) * this.OPPORTUNITIES_PAGE_SIZE;
     const endIndex = pageNumber * this.OPPORTUNITIES_PAGE_SIZE;
-    if (startIndex >= this.opportunities.length) {
+    // Load new opportunities based on endIndex as the backend can return
+    // opportunities greater than the page size. See issue #14004.
+    if (endIndex >= this.opportunities.length && this.more) {
       this.visibleOpportunities = [];
       this.loadingOpportunityData = true;
       this.loadMoreOpportunities().then(
         ({opportunitiesDicts, more}) => {
+          this.more = more;
           this.opportunities = this.opportunities.concat(opportunitiesDicts);
           this.visibleOpportunities = this.opportunities.slice(
             startIndex, endIndex);
@@ -121,8 +127,8 @@ export class OpportunitiesListComponent {
           this.loadingOpportunityData = false;
         });
     } else {
-      this.visibleOpportunities =
-        this.opportunities.slice(startIndex, endIndex);
+      this.visibleOpportunities = this.opportunities.slice(
+        startIndex, endIndex);
     }
     this.activePageNumber = pageNumber;
   }

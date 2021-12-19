@@ -646,10 +646,9 @@ class SuggestionTranslateContent(BaseSuggestion):
         # If the translation is for a set of strings, we don't want to process
         # the HTML strings for images.
         if (
-                hasattr(self.change, 'data_format') and (
-                    self.change.data_format == 'set_of_normalized_string' or
-                    self.change.data_format == 'set_of_unicode_string'
-                )
+                hasattr(self.change, 'data_format') and
+                state_domain.WrittenTranslation.is_data_format_list(
+                    self.change.data_format)
         ):
             exp_services.update_exploration(
                 self.final_reviewer_id, self.target_id, [self.change],
@@ -896,6 +895,16 @@ class SuggestionAddQuestion(BaseSuggestion):
         # Images need to be stored in the storage path corresponding to the
         # question.
         new_image_filenames = self.get_new_image_filenames_added_in_suggestion()
+
+        # Image for interaction with Image Region is not included as an html
+        # string. This image is included in the imagePath in customization args.
+        # Other interactions such as Item Selection, Multiple Choice, Drag and
+        # Drop Sort have ck editor that includes the images of the interactions
+        # so that references for those images are included as html strings.
+        if question.question_state_data.interaction.id == 'ImageClickInput':
+            new_image_filenames.append(
+                question.question_state_data.interaction.customization_args[
+                    'imageAndRegions'].value['imagePath'])
         fs_services.copy_images(
             self.image_context, self.target_id, feconf.ENTITY_TYPE_QUESTION,
             question_dict['id'], new_image_filenames)
