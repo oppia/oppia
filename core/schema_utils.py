@@ -603,13 +603,14 @@ class _Validators:
         if not lhs_is_valid or not rhs_is_valid:
             return False
 
-        lhs_contains_variable = expression_parser.contains_at_least_one_variable(lhs)
-        rhs_contains_variable = expression_parser.contains_at_least_one_variable(rhs)
+        lhs_contains_variable = (
+            expression_parser.contains_at_least_one_variable(lhs))
+        rhs_contains_variable = (
+            expression_parser.contains_at_least_one_variable(rhs))
 
         if not lhs_contains_variable and not rhs_contains_variable:
             return False
         return True
-
 
     @staticmethod
     def is_supported_audio_language_code(obj: str) -> bool:
