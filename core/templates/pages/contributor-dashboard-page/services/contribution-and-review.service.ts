@@ -49,17 +49,17 @@ interface FetchSuggestionsReturn {
   providedIn: 'root',
 })
 export class ContributionAndReviewService {
-  _SUBMITTED_SUGGESTION_LIST_HANDLER_URL = (
+  private _SUBMITTED_SUGGESTION_LIST_HANDLER_URL = (
     '/getsubmittedsuggestions/<target_type>/<suggestion_type>');
-  _REVIEWABLE_SUGGESTIONS_HANDLER_URL = (
+  private _REVIEWABLE_SUGGESTIONS_HANDLER_URL = (
     '/getreviewablesuggestions/<target_type>/<suggestion_type>');
-  _SUGGESTION_TO_EXPLORATION_ACTION_HANDLER_URL = (
+  private _SUGGESTION_TO_EXPLORATION_ACTION_HANDLER_URL = (
     '/suggestionactionhandler/exploration/<exp_id>/<suggestion_id>');
-  _SUGGESTION_TO_SKILL_ACTION_HANDLER_URL = (
+  private _SUGGESTION_TO_SKILL_ACTION_HANDLER_URL = (
     '/suggestionactionhandler/skill/<skill_id>/<suggestion_id>');
-  _UPDATE_TRANSLATION_HANDLER_URL = (
+  private _UPDATE_TRANSLATION_HANDLER_URL = (
     '/updatetranslationsuggestionhandler/<suggestion_id>');
-  _UPDATE_QUESTION_HANDLER_URL = (
+  private _UPDATE_QUESTION_HANDLER_URL = (
     '/updatequestionsuggestionhandler/<suggestion_id>');
 
   constructor(
@@ -67,7 +67,8 @@ export class ContributionAndReviewService {
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
-  async _fetchSuggestionsAsync(url: string): Promise<FetchSuggestionsReturn> {
+  private async _fetchSuggestionsAsync(
+      url: string): Promise<FetchSuggestionsReturn> {
     return (
       this.carbas.fetchSuggestions(url).then((data) => {
         var suggestionIdToSuggestions: FetchSuggestionsReturn = {};
