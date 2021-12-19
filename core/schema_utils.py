@@ -604,9 +604,9 @@ class _Validators:
             return False
 
         lhs_contains_variable = (
-            expression_parser.contains_at_least_one_variable(lhs))
+            expression_parser.contains_at_least_one_variable(lhs)) # type: ignore[no-untyped-call]
         rhs_contains_variable = (
-            expression_parser.contains_at_least_one_variable(rhs))
+            expression_parser.contains_at_least_one_variable(rhs)) # type: ignore[no-untyped-call]
 
         if not lhs_contains_variable and not rhs_contains_variable:
             return False
