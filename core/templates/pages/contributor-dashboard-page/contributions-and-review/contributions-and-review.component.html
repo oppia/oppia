@@ -7,14 +7,14 @@
             ng-change="$ctrl.switchToTabFromDropdownChoice()">
       <optgroup ng-if="$ctrl.reviewTabs.length > 0" label="Available Tasks">
         <option ng-repeat="tab in $ctrl.reviewTabs"
-                value="{{$ctrl.TAB_TYPE_REVIEWS + ' ' + tab.suggestionType}}">
+                value="{{ tab.dropdownOptionValue }}">
           {{tab.text}}
         </option>
       </optgroup>
       <optgroup ng-if="$ctrl.userIsLoggedIn" label="Contributions">
         <option ng-repeat="tab in $ctrl.contributionTabs"
                 ng-if="tab.enabled"
-                value="{{$ctrl.TAB_TYPE_CONTRIBUTIONS + ' ' + tab.suggestionType}}">
+                value="{{ tab.dropdownOptionValue }}">
           {{tab.text}}
         </option>
       </optgroup>

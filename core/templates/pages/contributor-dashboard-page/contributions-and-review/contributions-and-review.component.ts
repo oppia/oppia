@@ -376,12 +376,16 @@ angular.module('oppia').component('contributionsAndReview', {
           {
             suggestionType: SUGGESTION_TYPE_QUESTION,
             text: 'Questions',
-            enabled: false
+            enabled: false,
+            dropdownOptionValue: ctrl.TAB_TYPE_CONTRIBUTIONS + ' ' +
+              SUGGESTION_TYPE_QUESTION
           },
           {
             suggestionType: SUGGESTION_TYPE_TRANSLATE,
             text: 'Translations',
-            enabled: true
+            enabled: true,
+            dropdownOptionValue: ctrl.TAB_TYPE_CONTRIBUTIONS + ' ' +
+              SUGGESTION_TYPE_TRANSLATE
           }
         ];
 
@@ -409,7 +413,9 @@ angular.module('oppia').component('contributionsAndReview', {
                 if (userCanReviewQuestionSuggestions) {
                   ctrl.reviewTabs.push({
                     suggestionType: SUGGESTION_TYPE_QUESTION,
-                    text: 'Review Questions'
+                    text: 'Review Questions',
+                    dropdownOptionValue: ctrl.TAB_TYPE_REVIEWS + ' ' +
+                      SUGGESTION_TYPE_QUESTION
                   });
                   userReviewableSuggestionTypes.push(SUGGESTION_TYPE_QUESTION);
                 }
@@ -418,7 +424,9 @@ angular.module('oppia').component('contributionsAndReview', {
                     .length > 0) {
                   ctrl.reviewTabs.push({
                     suggestionType: SUGGESTION_TYPE_TRANSLATE,
-                    text: 'Review Translations'
+                    text: 'Review Translations',
+                    dropdownOptionValue: ctrl.TAB_TYPE_REVIEWS + ' ' +
+                      SUGGESTION_TYPE_TRANSLATE
                   });
                   userReviewableSuggestionTypes.push(SUGGESTION_TYPE_TRANSLATE);
                 }
