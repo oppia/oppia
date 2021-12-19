@@ -430,7 +430,9 @@ describe('MathInteractionsService', () => {
     expect(mathInteractionsService.insertMultiplicationSigns(
       'ab/2')).toBe('a*b/2');
     expect(mathInteractionsService.insertMultiplicationSigns(
-      'alpha+ax^2')).toBe('alpha+a*x^2');
+      '5ab/2')).toBe('5*a*b/2');
+    expect(mathInteractionsService.insertMultiplicationSigns(
+      '3alpha+ax^2')).toBe('3*alpha+a*x^2');
     expect(mathInteractionsService.insertMultiplicationSigns(
       'sqrt(xyz)')).toBe('sqrt(x*y*z)');
     expect(mathInteractionsService.insertMultiplicationSigns(

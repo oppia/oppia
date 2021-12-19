@@ -395,6 +395,12 @@ export class MathInteractionsService {
       expressionString = expressionString.replace(new RegExp(
         '([a-zA-Z0-9\)])' + functionName, 'g'), '$1*' + functionName);
     }
+
+    // Inserting multiplication signs between digit and variable.
+    // For eg. 5w - z => 5*w - z.
+    expressionString = expressionString.replace(new RegExp(
+      '([0-9])([a-zA-Z])', 'g'), '$1*$2');
+
     // Inserting multiplication signs after closing parens.
     expressionString = expressionString.replace(/\)([^\*\+\/\-\^\)])/g, ')*$1');
     // Inserting multiplication signs before opening parens.
