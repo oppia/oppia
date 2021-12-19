@@ -242,18 +242,11 @@
       </a>
     </li>
 
-    <li>
-      <a href="/about-foundation" rel="noopener">
-        <picture>
-          <source type="image/webp"
-                  [srcset]="this.getStaticImageUrl('/sidebar/oppia-foundation-logo.webp')">
-          <source type="image/png"
-                  [srcset]="this.getStaticImageUrl('/sidebar/oppia-foundation-logo.png')">
-          <img [src]="getStaticImageUrl('/sidebar/oppia-foundation-logo.png')"
-               class="oppia-sidebar-menu-icon"
-               alt="Oppia Foundation">
-        </picture>
-        <span>{{ 'I18N_SIDEBAR_OPPIA_FOUNDATION' | translate }}</span>
+    <li class="oppia-sidebar-rows" *ngIf="userIsLoggedIn">
+      <a href="/"
+         [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.SPLASH.ROUTE"
+         class="text-uppercase">
+        <span >{{ 'I18N_SIDEBAR_HOME' | translate }}</span>
       </a>
     </li>
 
