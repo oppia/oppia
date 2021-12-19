@@ -120,7 +120,7 @@ describe('Ratings and recommendations component', () => {
 
     // Using feedback popover directly here breaks the principle of
     // independent unit tests. Hence, mock is used here.
-    // The mock  don't allow us to check its final state.
+    // The mock don't allow us to check its final state.
     // So, using a spy on function toggle instead.
     expect(componentInstance.feedbackPopOver.toggle).toHaveBeenCalled();
   });
