@@ -551,9 +551,6 @@ def apply_change_list(exploration_id, change_list):
                 elif change.property_name == 'correctness_feedback_enabled':
                     exploration.update_correctness_feedback_enabled(
                         change.new_value)
-                elif change.property_name == 'proto_size_in_bytes':
-                    exploration.update_proto_size_in_bytes(
-                        change.new_value)
             elif (change.cmd ==
                   exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION):
                 # Loading the exploration model from the datastore into an
@@ -572,6 +569,8 @@ def apply_change_list(exploration_id, change_list):
                         'version %s, received %s' % (
                             feconf.CURRENT_STATE_SCHEMA_VERSION,
                             change.to_version))
+
+        exploration.update_proto_size_in_bytes()
         return exploration
 
     except Exception as e:
@@ -714,9 +713,10 @@ def _create_exploration(
             changes made in this model, which should give sufficient information
             to reconstruct the commit.
     """
+    exploration.update_proto_size_in_bytes()
+
     # This line is needed because otherwise a rights object will be created,
     # but the creation of an exploration object will fail.
-    exploration.update_proto_size_in_bytes(exploration.get_proto_size())
     exploration.validate()
     rights_manager.create_new_exploration_rights(exploration.id, committer_id)
 
@@ -1170,8 +1170,6 @@ def update_exploration(
     if get_story_id_linked_to_exploration(exploration_id) is not None:
         validate_exploration_for_story(updated_exploration, True)
 
-    updated_exploration.update_proto_size_in_bytes(
-        updated_exploration.get_proto_size())
     _save_exploration(
         committer_id, updated_exploration, commit_message, change_list)
 

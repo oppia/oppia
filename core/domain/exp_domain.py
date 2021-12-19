@@ -662,8 +662,6 @@ class Exploration:
             init_state_name, states_dict, {}, [], 0,
             feconf.DEFAULT_AUTO_TTS_ENABLED, False)
 
-        exploration.proto_size_in_bytes = exploration.get_proto_size()
-
         return exploration
 
     @classmethod
@@ -937,9 +935,14 @@ class Exploration:
                 'Expected proto size to be an int, received %s'
                 % self.proto_size_in_bytes)
 
-        if self.proto_size_in_bytes <= 0:
+        if self.proto_size_in_bytes < 0:
             raise utils.ValidationError(
-                'Expected proto size to be positive integer, received %s'
+                'Expected proto size to be a positive integer, received %s'
+                % self.proto_size_in_bytes)
+
+        if self.proto_size_in_bytes == 0:
+            raise utils.ValidationError(
+                'Expected proto size to be an int, received 0'
                 % self.proto_size_in_bytes)
 
         for param_name in self.param_specs:
@@ -1453,14 +1456,14 @@ class Exploration:
         """
         self.correctness_feedback_enabled = correctness_feedback_enabled
 
-    def update_proto_size_in_bytes(self, proto_size_in_bytes):
+    def update_proto_size_in_bytes(self):
         """Update exploration's size in proto.
 
         Args:
             proto_size_in_bytes: int. The byte size of the exploration
                 proto object.
         """
-        self.proto_size_in_bytes = proto_size_in_bytes
+        self.proto_size_in_bytes = self.get_proto_size()
 
     # Methods relating to states.
     def add_states(self, state_names):
@@ -2256,30 +2259,9 @@ class Exploration:
             dict. The dict representation of the Exploration domain object,
             following schema version v55.
         """
-        exploration_dict['id'] = exploration_id
-
-        exploration = cls(
-            exploration_dict['id'],
-            exploration_dict['title'],
-            exploration_dict['category'],
-            exploration_dict['objective'],
-            exploration_dict['language_code'],
-            exploration_dict['tags'],
-            exploration_dict['blurb'],
-            exploration_dict['author_notes'],
-            exploration_dict['states_schema_version'],
-            exploration_dict['init_state_name'],
-            exploration_dict['states'],
-            exploration_dict['param_specs'],
-            exploration_dict['param_changes'],
-            exploration_dict['schema_version'],
-            exploration_dict['auto_tts_enabled'],
-            exploration_dict['correctness_feedback_enabled'])
-
-        exploration_dict['proto_size_in_bytes'] = (
-            exploration.proto_size_in_bytes)
-
-        return exploration_dict
+        return cls.add_id_and_proto_size_in_bytes_to_dict(
+            exploration_dict, exploration_id
+        )
 
     @classmethod
     def _migrate_to_latest_yaml_version(cls, yaml_content, exploration_id):
@@ -2384,8 +2366,31 @@ class Exploration:
         """
         exploration_dict = cls._migrate_to_latest_yaml_version(
             yaml_content, exploration_id)
+        exploration_dict = cls.add_id_and_proto_size_in_bytes_to_dict(
+            exploration_dict, exploration_id)
+
+        return Exploration.from_dict(exploration_dict)
+
+    def add_id_and_proto_size_in_bytes_to_dict(
+        cls, exploration_dict, exploration_id
+    ):
+        """Add id and proto_size_in_bytes to the exploration dict.
+
+        Args:
+            exploration_dict: dict. The dict representation of Exploration
+                object.
+            exploration_id: str. The exploration id.
+
+        Returns:
+            exploration_dict: dict. The updated dict representation of
+                Exploration object.
+        """
         exploration_dict['id'] = exploration_id
 
+        # Creating a exploration domain object to calcualte the
+        # proto size of it. If there is any discrepancy between
+        # the backend-computed size and the dict size then we need
+        # to move the proto_size_in_bytes argument to the constrcutor.
         exploration = cls(
             exploration_dict['id'],
             exploration_dict['title'],
@@ -2404,10 +2409,12 @@ class Exploration:
             exploration_dict['auto_tts_enabled'],
             exploration_dict['correctness_feedback_enabled'])
 
+        # Construcotr calculates the proto_size_in_bytes and add it to the
+        # domain object. Accessing the argument directly and adding to the dict.
         exploration_dict['proto_size_in_bytes'] = (
-            exploration.get_proto_size())
+            exploration.proto_size_in_bytes)
 
-        return Exploration.from_dict(exploration_dict)
+        return exploration_dict
 
     def to_yaml(self):
         """Convert the exploration domain object into YAML string.
@@ -2418,8 +2425,8 @@ class Exploration:
         exp_dict = self.to_dict()
         exp_dict['schema_version'] = self.CURRENT_EXP_SCHEMA_VERSION
 
-        # The ID is the only property which should not be stored within the
-        # YAML representation.
+        # The ID and the proto_size_in_bytes are the properties that should not
+        # be stored within the YAML representation.
         del exp_dict['id']
         del exp_dict['proto_size_in_bytes']
 
@@ -2568,8 +2575,7 @@ class Exploration:
         """
         state_protos = {}
         for (state_name, state) in self.states.items():
-            state_proto = state.to_proto()
-            state_protos[state_name] = state_proto
+            state_protos[state_name] = state.to_proto()
 
         return exploration_pb2.ExplorationDto(
             id=self.id,

@@ -4446,7 +4446,7 @@ class InteractionCustomizationArgDomainTests(test_utils.GenericTestBase):
 
 class InteractionInstanceDomainTests(test_utils.GenericTestBase):
 
-    def test_to_proto(self):
+    def test_interactions_converted_to_proto_correctly(self):
         interaction = state_domain.InteractionInstance
         subtitled_html = state_domain.SubtitledHtml(
             'default_outcome', '')
@@ -4747,6 +4747,41 @@ class InteractionInstanceDomainTests(test_utils.GenericTestBase):
             type(end_interaction.to_proto().end_exploration),
             state_pb2.EndExplorationInstanceDto
         )
+
+        numer_with_units_interaction = state_domain.InteractionInstance(
+            'NumerWithUnits',
+            {}, [], default_outcome, [], [], None)
+        self.assertFalse(numer_with_units_interaction.to_proto())
+
+        code_repl_interaction = state_domain.InteractionInstance(
+            'CodeRepl',
+            {}, [], default_outcome, [], [], None)
+        self.assertFalse(code_repl_interaction.to_proto())
+
+        graph_input_interaction = state_domain.InteractionInstance(
+            'GraphInput',
+            {}, [], default_outcome, [], [], None)
+        self.assertFalse(graph_input_interaction.to_proto())
+
+        interactive_map_interaction = state_domain.InteractionInstance(
+            'InteractiveMap',
+            {}, [], default_outcome, [], [], None)
+        self.assertFalse(interactive_map_interaction.to_proto())
+
+        music_notes_input_interaction = state_domain.InteractionInstance(
+            'MusicNotesInput',
+            {}, [], default_outcome, [], [], None)
+        self.assertFalse(music_notes_input_interaction.to_proto())
+
+        pencil_code_editor_interaction = state_domain.InteractionInstance(
+            'PencilCodeEditor',
+            {}, [], default_outcome, [], [], None)
+        self.assertFalse(pencil_code_editor_interaction.to_proto())
+
+        set_input_interaction = state_domain.InteractionInstance(
+            'SetInput',
+            {}, [], default_outcome, [], [], None)
+        self.assertFalse(set_input_interaction.to_proto())
 
 
 class SubtitledHtmlDomainUnitTests(test_utils.GenericTestBase):
