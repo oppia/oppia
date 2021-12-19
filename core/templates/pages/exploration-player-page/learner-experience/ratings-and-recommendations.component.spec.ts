@@ -118,7 +118,9 @@ describe('Ratings and recommendations component', () => {
 
     componentInstance.togglePopover();
 
-    // Using a mock for popover don't allow us to check its final state.
+    // Using feedback popover directly here breaks the principle of
+    // indpendent unit tests. Hence, mock is used here.
+    // The for popover don't allow us to check its final state.
     // So, using a spy on function toggle instead.
     expect(componentInstance.feedbackPopOver.toggle).toHaveBeenCalled();
   });
@@ -128,8 +130,10 @@ describe('Ratings and recommendations component', () => {
 
     componentInstance.closePopover();
 
-    // Using a mock for popover don't allow us to check its final state.
-    // So, using a spy on function close instead.
+    // Using feedback popover directly here breaks the principle of
+    // indpendent unit tests. Hence, mock is used here.
+    // The for popover don't allow us to check its final state.
+    // So, using a spy on function toggle instead.
     expect(componentInstance.feedbackPopOver.close).toHaveBeenCalled();
   });
 
