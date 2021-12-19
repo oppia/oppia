@@ -846,12 +846,37 @@ describe('Contributions and review component', function() {
       ctrl.isActiveTab(ctrl.TAB_TYPE_CONTRIBUTIONS, 'add_question');
     });
 
+    it('should get option value using tab type ' +
+      'and suggestion type', function() {
+      spyOn(ctrl, 'activeDropdownTabChoice');
+      ctrl.activeDropdownTabChoice =
+        ctrl.getOptionValueFromTabAndSuggestionTypes(
+          ctrl.TAB_TYPE_CONTRIBUTIONS, 'add_question');
+
+      expect(ctrl.activeDropdownTabChoice).toBe(
+        ctrl.TAB_TYPE_CONTRIBUTIONS + ' ' + 'add_question');
+    });
+
+    it('should obtain tab type and suggestion type ' +
+      'from option value', function() {
+      ctrl.activeDropdownTabChoice =
+        ctrl.getOptionValueFromTabAndSuggestionTypes(
+          ctrl.TAB_TYPE_CONTRIBUTIONS, 'add_question');
+
+      var [tabType, suggestionType] =
+        ctrl.getTabAndSuggestionTypesFromDropdownOption();
+
+      expect(tabType).toBe(ctrl.TAB_TYPE_CONTRIBUTIONS);
+      expect(suggestionType).toBe('add_question');
+    });
+
     it('should switch tabs when a dropdown selection is made', function() {
       spyOn(ctrl, 'switchToTab').and.callThrough();
       spyOn(ctrl, 'isActiveTab').and.callThrough();
 
-      ctrl.activeDropdownTabChoice = ctrl.TAB_TYPE_CONTRIBUTIONS + ' ' +
-        'add_question';
+      ctrl.activeDropdownTabChoice =
+        ctrl.getOptionValueFromTabAndSuggestionTypes(
+          ctrl.TAB_TYPE_CONTRIBUTIONS, 'add_question');
       ctrl.switchToTabFromDropdownChoice();
 
       expect(ctrl.switchToTab).toHaveBeenCalledWith(
