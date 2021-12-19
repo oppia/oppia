@@ -340,6 +340,12 @@ angular.module('oppia').component('contributionsAndReview', {
         ContributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit();
       };
 
+      ctrl.switchToTabFromDropdownChoice = function() {
+        var [dropdownTabType, dropdownSuggestionType] =
+          ctrl.activeDropdownTabChoice.split(' ');
+        ctrl.switchToTab(dropdownTabType, dropdownSuggestionType);
+      };
+
       ctrl.loadContributions = function() {
         if (!ctrl.activeTabType || !ctrl.activeSuggestionType) {
           return new Promise((resolve, reject) => {

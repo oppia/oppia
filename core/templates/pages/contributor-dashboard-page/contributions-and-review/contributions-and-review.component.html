@@ -4,7 +4,7 @@
     <select name="oppia-contribution-tasks"
             id="oppia-contributions-tasklist-dropdown"
             ng-model="$ctrl.activeDropdownTabChoice"
-            ng-change="$ctrl.switchToTab($ctrl.activeDropdownTabChoice.split(' ')[0], $ctrl.activeDropdownTabChoice.split(' ')[1])">
+            ng-change="$ctrl.switchToTabFromDropdownChoice()">
       <optgroup ng-if="$ctrl.reviewTabs.length > 0" label="Available Tasks">
         <option ng-repeat="tab in $ctrl.reviewTabs"
                 value="{{$ctrl.TAB_TYPE_REVIEWS + ' ' + tab.suggestionType}}">
