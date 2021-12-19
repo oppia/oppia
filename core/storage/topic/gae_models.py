@@ -172,6 +172,19 @@ class TopicModel(base_models.VersionedModel):
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
+    # We expect Mapping because we want to allow models that inherit
+    # from BaseModel as the values, if we used Dict this wouldn't be allowed.
+    def _prepare_additional_models(self) -> Mapping[str, base_models.BaseModel]:
+        """Prepares additional models needed for the commit process.
+
+        Returns:
+            dict(str, BaseModel). Additional models needed for
+            the commit process. Contains the TopicRightsModel.
+        """
+        return {
+            'rights_model': TopicRightsModel.get_by_id(self.id)
+        }
+
     # TODO(#13523): Change 'commit_cmds' to TypedDict/Domain Object
     # to remove Any used below.
     def compute_models_to_commit(
@@ -216,8 +229,7 @@ class TopicModel(base_models.VersionedModel):
         )
 
         topic_rights = cast(
-            TopicRightsModel,
-            additional_models['exploration_rights_model']
+            TopicRightsModel, additional_models['rights_model']
         )
         if topic_rights.topic_is_published:
             status = constants.ACTIVITY_STATUS_PUBLIC
