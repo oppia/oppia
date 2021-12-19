@@ -354,27 +354,27 @@ describe('Learner dashboard functionality', function() {
     await skillEditorPage.moveToQuestionsTab();
     for (var i = 1; i <= constants.TOPIC_MINIMUM_QUESTIONS_TO_PRACTICE; i++) {
       await skillEditorPage.clickCreateQuestionButton();
+      await explorationEditorMainTab.setContent(
+        await forms.toRichText('Question 1'));
+      await explorationEditorMainTab.setInteraction(
+        'TextInput', 'Placeholder', 5);
+      await explorationEditorMainTab.addResponse(
+        'TextInput', await forms.toRichText('Correct Answer'), null, false,
+        'FuzzyEquals', ['correct']);
+      var responseEditor = await explorationEditorMainTab.getResponseEditor(0);
+      await responseEditor.markAsCorrect();
+      await (
+        await explorationEditorMainTab.getResponseEditor('default')
+      ).setFeedback(await forms.toRichText('Try again'));
+      await explorationEditorMainTab.addHint('Hint 1');
+      await explorationEditorMainTab.addSolution('TextInput', {
+        correctAnswer: 'correct',
+        explanation: 'It is correct'
+      });
+      await skillEditorPage.saveQuestion();
+      await skillEditorPage.get(skillId);
+      await skillEditorPage.moveToQuestionsTab();
     }
-    await explorationEditorMainTab.setContent(
-      await forms.toRichText('Question 1'));
-    await explorationEditorMainTab.setInteraction(
-      'TextInput', 'Placeholder', 5);
-    await explorationEditorMainTab.addResponse(
-      'TextInput', await forms.toRichText('Correct Answer'), null, false,
-      'FuzzyEquals', ['correct']);
-    var responseEditor = await explorationEditorMainTab.getResponseEditor(0);
-    await responseEditor.markAsCorrect();
-    await (
-      await explorationEditorMainTab.getResponseEditor('default')
-    ).setFeedback(await forms.toRichText('Try again'));
-    await explorationEditorMainTab.addHint('Hint 1');
-    await explorationEditorMainTab.addSolution('TextInput', {
-      correctAnswer: 'correct',
-      explanation: 'It is correct'
-    });
-    await skillEditorPage.saveQuestion();
-    await skillEditorPage.get(skillId);
-    await skillEditorPage.moveToQuestionsTab();
     await skillEditorPage.expectNumberOfQuestionsToBe(constants.TOPIC_MINIMUM_QUESTIONS_TO_PRACTICE);
     await general.closeCurrentTabAndSwitchTo(handle);
     await topicsAndSkillsDashboardPage.get();
