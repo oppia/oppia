@@ -4692,7 +4692,7 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
     def test_get_next_page_of_all_non_private_commits(self):
         all_commits = (
             exp_services.get_next_page_of_all_non_private_commits()[0])
-        self.assertEqual(len(all_commits), 1)
+        self.assertEqual(len(all_commits), 7)
         commit_dicts = [commit.to_dict() for commit in all_commits]
         self.assertDictContainsSubset(
             self.COMMIT_ALBERT_PUBLISH_EXP_2, commit_dicts[0])
