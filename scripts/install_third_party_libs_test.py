@@ -297,11 +297,6 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
                 Exception, 'Error compiling proto files at mock_path'):
                 install_third_party_libs.compile_protobuf_files(['mock_path'])
 
-    def test_move_all_proto_files_to_third_party_folder(self):
-        with self.Popen_swap:
-            install_third_party_libs.move_all_proto_files_to_third_party()
-        self.assertTrue(self.check_function_calls['check_call_is_called'])
-
     def test_ensure_pip_library_is_installed(self):
         check_function_calls = {
             'pip_install_is_called': False

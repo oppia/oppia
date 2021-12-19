@@ -2340,19 +2340,19 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         exploration.proto_size_in_bytes = '1'
         with self.assertRaisesRegexp(
-            Exception, 'Expected proto size to be a int, received 1'):
+            Exception, 'Expected proto size to be an int, received 1'):
             exploration.validate()
 
         exploration.proto_size_in_bytes = -2
         with self.assertRaisesRegexp(
             Exception,
-            'Expected proto size to be positive integer, received -2'):
+            'Expected proto size to be an int, received -2'):
             exploration.validate()
 
         exploration.proto_size_in_bytes = 0
         with self.assertRaisesRegexp(
             Exception,
-            'Expected proto size to be positive integer, received 0'):
+            'Expected proto size to be an int, received 0'):
             exploration.validate()
 
     def test_proto_size_calculation_is_correct(self):
