@@ -99,7 +99,8 @@ class ConfigPropertyRegistryTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(# type: ignore[no-untyped-call]
             Exception, 'Property with name promo_bar_enabled already exists'):
             config_domain.ConfigProperty(
-                'promo_bar_enabled', config_domain.BOOL_SCHEMA, 'description', False)
+                'promo_bar_enabled', config_domain.BOOL_SCHEMA, 'description',
+                False)
 
     def test_config_property_with_new_config_property_model(self) -> None:
         config_model = config_models.ConfigPropertyModel(# type: ignore[attr-defined]
