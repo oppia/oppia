@@ -335,15 +335,24 @@ angular.module('oppia').component('contributionsAndReview', {
         ctrl.activeSuggestionType = suggestionType;
         ctrl.activeTabType = tabType;
         ctrl.activeDropdownTabChoice =
-          ctrl.activeTabType + ' ' + ctrl.activeSuggestionType;
+          ctrl.getOptionValueFromTabAndSuggestionTypes(tabType, suggestionType);
         ctrl.contributions = {};
         ContributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit();
       };
 
+      ctrl.getTabAndSuggestionTypesFromDropdownOption = function() {
+        return ctrl.activeDropdownTabChoice.split(' ');
+      };
+
+      ctrl.getOptionValueFromTabAndSuggestionTypes = function(
+          tabType, suggestionType) {
+        return tabType + ' ' + suggestionType;
+      };
+
       ctrl.switchToTabFromDropdownChoice = function() {
-        var [dropdownTabType, dropdownSuggestionType] =
-          ctrl.activeDropdownTabChoice.split(' ');
-        ctrl.switchToTab(dropdownTabType, dropdownSuggestionType);
+        var [tabType, suggestionType] =
+          ctrl.getTabAndSuggestionTypesFromDropdownOption();
+        ctrl.switchToTab(tabType, suggestionType);
       };
 
       ctrl.loadContributions = function() {
@@ -377,15 +386,15 @@ angular.module('oppia').component('contributionsAndReview', {
             suggestionType: SUGGESTION_TYPE_QUESTION,
             text: 'Questions',
             enabled: false,
-            dropdownOptionValue: ctrl.TAB_TYPE_CONTRIBUTIONS + ' ' +
-              SUGGESTION_TYPE_QUESTION
+            dropdownOptionValue: ctrl.getOptionValueFromTabAndSuggestionTypes(
+              ctrl.TAB_TYPE_CONTRIBUTIONS, SUGGESTION_TYPE_QUESTION)
           },
           {
             suggestionType: SUGGESTION_TYPE_TRANSLATE,
             text: 'Translations',
             enabled: true,
-            dropdownOptionValue: ctrl.TAB_TYPE_CONTRIBUTIONS + ' ' +
-              SUGGESTION_TYPE_TRANSLATE
+            dropdownOptionValue: ctrl.getOptionValueFromTabAndSuggestionTypes(
+              ctrl.TAB_TYPE_CONTRIBUTIONS, SUGGESTION_TYPE_TRANSLATE)
           }
         ];
 
@@ -414,8 +423,9 @@ angular.module('oppia').component('contributionsAndReview', {
                   ctrl.reviewTabs.push({
                     suggestionType: SUGGESTION_TYPE_QUESTION,
                     text: 'Review Questions',
-                    dropdownOptionValue: ctrl.TAB_TYPE_REVIEWS + ' ' +
-                      SUGGESTION_TYPE_QUESTION
+                    dropdownOptionValue:
+                      ctrl.getOptionValueFromTabAndSuggestionTypes(
+                        ctrl.TAB_TYPE_REVIEWS, SUGGESTION_TYPE_QUESTION)
                   });
                   userReviewableSuggestionTypes.push(SUGGESTION_TYPE_QUESTION);
                 }
@@ -425,8 +435,9 @@ angular.module('oppia').component('contributionsAndReview', {
                   ctrl.reviewTabs.push({
                     suggestionType: SUGGESTION_TYPE_TRANSLATE,
                     text: 'Review Translations',
-                    dropdownOptionValue: ctrl.TAB_TYPE_REVIEWS + ' ' +
-                      SUGGESTION_TYPE_TRANSLATE
+                    dropdownOptionValue:
+                      ctrl.getOptionValueFromTabAndSuggestionTypes(
+                        ctrl.TAB_TYPE_REVIEWS, SUGGESTION_TYPE_TRANSLATE)
                   });
                   userReviewableSuggestionTypes.push(SUGGESTION_TYPE_TRANSLATE);
                 }
