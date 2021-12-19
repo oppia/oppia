@@ -106,7 +106,11 @@ SERIALIZATION_FUNCTIONS = {
 }
 
 
-def _get_memcache_key(namespace: str, sub_namespace: str | None, obj_id: str) -> str:
+def _get_memcache_key(
+        namespace: str,
+        sub_namespace: str | None,
+        obj_id: str
+    ) -> str:
     """Returns a memcache key for the class under the corresponding
     namespace and sub_namespace.
 
@@ -185,7 +189,9 @@ def get_multi(
 
 
 def set_multi(
-        namespace: str, sub_namespace: str | None, id_value_mapping: Dict[str, Any]
+        namespace: str,
+        sub_namespace: str | None,
+        id_value_mapping: Dict[str, Any]
     ) -> bool:
     """Set multiple id values at once to the cache, where the values are all
     of a specific namespace type or a Redis compatible type (more details here:
