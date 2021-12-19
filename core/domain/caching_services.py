@@ -19,7 +19,6 @@
 from __future__ import annotations
 
 import json
-from typing import Any, Dict, List
 
 from core import python_utils
 from core.domain import collection_domain
@@ -30,6 +29,8 @@ from core.domain import skill_domain
 from core.domain import story_domain
 from core.domain import topic_domain
 from core.platform import models
+
+from typing import Any, Dict, List
 
 memory_cache_services = models.Registry.import_cache_services()
 
@@ -230,7 +231,11 @@ def set_multi(
     return memory_cache_services.set_multi(memory_cache_id_value_mapping)
 
 
-def delete_multi(namespace: str, sub_namespace: str | None, obj_ids: List[str]) -> bool:
+def delete_multi(
+    namespace: str,
+    sub_namespace: str | None,
+    obj_ids: List[str]
+    ) -> bool:
     """Deletes multiple ids in the cache.
 
     Args:

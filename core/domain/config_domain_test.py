@@ -40,7 +40,8 @@ class ConfigPropertyChangeTests(test_utils.GenericTestBase):
             utils.ValidationError, 'Command invalid is not allowed'):
             config_domain.ConfigPropertyChange({'cmd': 'invalid'})
 
-    def test_config_property_change_object_with_missing_attribute_in_cmd(self) -> None:
+    def test_config_property_change_object_with_missing_attribute_in_cmd(
+        self) -> None:
         with self.assertRaisesRegexp(# type: ignore[no-untyped-call]
             utils.ValidationError, (
                 'The following required attributes are missing: '
@@ -49,7 +50,8 @@ class ConfigPropertyChangeTests(test_utils.GenericTestBase):
                 'cmd': 'change_property_value'
             })
 
-    def test_config_property_change_object_with_extra_attribute_in_cmd(self) -> None:
+    def test_config_property_change_object_with_extra_attribute_in_cmd(
+        self) -> None:
         with self.assertRaisesRegexp(# type: ignore[no-untyped-call]
             utils.ValidationError, (
                 'The following extra attributes are present: invalid')):
@@ -59,7 +61,8 @@ class ConfigPropertyChangeTests(test_utils.GenericTestBase):
                 'invalid': 'invalid'
             })
 
-    def test_config_property_change_object_with_change_property_value(self) -> None:
+    def test_config_property_change_object_with_change_property_value(
+        self) -> None:
         config_property_change_object = config_domain.ConfigPropertyChange({
             'cmd': 'change_property_value',
             'new_value': 'new_value'
