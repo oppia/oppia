@@ -39,13 +39,13 @@ import { TopicEditorSaveModalComponent } from '../modal-templates/topic-editor-s
 angular.module('oppia').component('topicEditorNavbar', {
   template: require('./topic-editor-navbar.component.html'),
   controller: [
-    '$rootScope', '$scope', '$uibModal', '$window', 'AlertsService',
+    '$rootScope', '$scope', '$window', 'AlertsService',
     'NgbModal', 'TopicEditorRoutingService',
     'TopicEditorStateService', 'TopicRightsBackendApiService',
     'UndoRedoService', 'UrlInterpolationService',
     'UrlService', 'TOPIC_VIEWER_URL_TEMPLATE',
     function(
-        $rootScope, $scope, $uibModal, $window, AlertsService,
+        $rootScope, $scope, $window, AlertsService,
         NgbModal, TopicEditorRoutingService, TopicEditorStateService,
         TopicRightsBackendApiService, UndoRedoService,
         UrlInterpolationService, UrlService,
