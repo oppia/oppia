@@ -3,7 +3,15 @@
   <button type="button"
           class="oppia-creator-dashboard-intro-button oppia-transition-200 protractor-test-create-activity oppia-autofocus"
           [ngClass]="checkMobileView() ? 'oppia-creator-dashboard-button-mobile': 'oppia-creator-dashboard-button-desktop'"
-          (click)="createNewExploration()">
+          (click)="onRedirectToLogin('/creator-dashboard?mode=create')" *ngIf="userIsLoggedIn === false">
+          <!-- "userIsLoggedIn === false" is needed because we want to show the button when we know that user is not logged in
+                when userIsLoggedIn is undefined or null we don't want to show the button thus we can't use ""userIsLoggedIn"!-->
+          + {{'I18N_CREATE_EXPLORATION' | translate}}
+  </button>
+  <button type="button"
+          class="oppia-creator-dashboard-intro-button oppia-transition-200 protractor-test-create-activity oppia-autofocus"
+          [ngClass]="checkMobileView() ? 'oppia-creator-dashboard-button-mobile': 'oppia-creator-dashboard-button-desktop'"
+          (click)="initCreationProcess()" *ngIf="userIsLoggedIn">
           + {{'I18N_CREATE_EXPLORATION' | translate}}
   </button>
   <button class="btn nav-link oppia-navbar-button oppia-navbar-hide-on-small-width oppia-transition-200"
