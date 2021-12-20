@@ -22,7 +22,7 @@ import logging
 import re
 import zipfile
 
-from core import feconf
+from core import constants, feconf
 from core import utils
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -346,8 +346,8 @@ class SignupHandler(base.BaseHandler):
                 'schema': {
                     'type': 'basestring',
                     'choices': [
-                        'learner',
-                        'creator'
+                        constants.DASHBOARD_TYPE_CREATOR,
+                        constants.DASHBOARD_TYPE_LEARNER
                     ]
                 },
                 'default_value': None
