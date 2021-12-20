@@ -26,14 +26,13 @@ import { AlertsService } from 'services/alerts.service';
 import { StoryEditorStateService } from '../services/story-editor-state.service';
 import { StoryEditorSaveModalComponent } from '../modal-templates/story-editor-save-modal.component';
 import { StoryEditorUnpublishModalComponent } from '../modal-templates/story-editor-unpublish-modal.component';
-import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { StoryEditorNavigationService } from '../services/story-editor-navigation.service';
 
 @Component({
   selector: 'oppia-story-editor-navbar',
-  templateUrl: './story-editor-navbar.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  templateUrl: './story-editor-navbar.component.html'
 })
 export class StoryEditorNavbarComponent implements OnInit {
   @Input() commitMessage;
@@ -46,6 +45,10 @@ export class StoryEditorNavbarComponent implements OnInit {
   showNavigationOptions: boolean;
   showStoryEditOptions: boolean;
   activeTab: string;
+  storyIsSavable: boolean = false;
+  changeListLength: number;
+  warningsCount: number;
+  totalWarningsCount: number;
   constructor(
     private storyEditorStateService: StoryEditorStateService,
     private undoRedoService: UndoRedoService,
@@ -252,6 +255,30 @@ export class StoryEditorNavbarComponent implements OnInit {
     this.directiveSubscriptions.add(
       this.undoRedoService.getUndoRedoChangeEventEmitter().subscribe(
         () => this._validateStory()
+      )
+    );
+    this.storyIsSavable = this.isStorySaveable();
+    this.directiveSubscriptions.add(
+     this.undoRedoService.getUndoRedoChangeEventEmitter().subscribe(
+       () => this.isStorySaveable()
+     )
+    );
+    this.changeListLength = this.getChangeListLength();
+    this.directiveSubscriptions.add(
+      this.undoRedoService.getUndoRedoChangeEventEmitter().subscribe(
+        () => this.getChangeListLength()
+      )
+    );
+    this.warningsCount = this.getWarningsCount();
+    this.directiveSubscriptions.add(
+      this.undoRedoService.getUndoRedoChangeEventEmitter().subscribe(
+        () => this.getWarningsCount()
+      )
+    );
+    this.totalWarningsCount = this.getTotalWarningsCount();
+    this.directiveSubscriptions.add(
+      this.undoRedoService.getUndoRedoChangeEventEmitter().subscribe(
+        () => this.getTotalWarningsCount()
       )
     );
   }
