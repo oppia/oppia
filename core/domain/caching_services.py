@@ -108,9 +108,7 @@ SERIALIZATION_FUNCTIONS = {
 
 
 def _get_memcache_key(
-        namespace: str,
-        sub_namespace: str | None,
-        obj_id: str
+        namespace: str, sub_namespace: str | None, obj_id: str
     ) -> str:
     """Returns a memcache key for the class under the corresponding
     namespace and sub_namespace.
@@ -143,11 +141,11 @@ def _get_memcache_key(
 
 def flush_memory_caches() -> None:
     """Flushes the memory caches by wiping all of the data."""
-    memory_cache_services.flush_caches()
+    memory_cache_services.flush_caches() # type: ignore[attr-defined]
 
 
 def get_multi(
-        namespace: str, sub_namespace: str | None, obj_ids: List[str]
+    namespace: str, sub_namespace: str | None, obj_ids: List[str]
     ) -> Dict[str, Any]:
     """Get a dictionary of the {id, value} pairs from the memory cache.
 
@@ -182,17 +180,15 @@ def get_multi(
     memcache_keys = [
         _get_memcache_key(namespace, sub_namespace, obj_id)
         for obj_id in obj_ids]
-    values = memory_cache_services.get_multi(memcache_keys)
+    values = memory_cache_services.get_multi(memcache_keys) # type: ignore[attr-defined]
     for obj_id, value in python_utils.ZIP(obj_ids, values):
         if value:
-            result_dict[obj_id] = DESERIALIZATION_FUNCTIONS[namespace](value)
+            result_dict[obj_id] = DESERIALIZATION_FUNCTIONS[namespace](value) # type: ignore[operator]
     return result_dict
 
 
 def set_multi(
-        namespace: str,
-        sub_namespace: str | None,
-        id_value_mapping: Dict[str, Any]
+    namespace: str, sub_namespace: str | None, id_value_mapping: Dict[str, Any]
     ) -> bool:
     """Set multiple id values at once to the cache, where the values are all
     of a specific namespace type or a Redis compatible type (more details here:
@@ -225,16 +221,14 @@ def set_multi(
 
     memory_cache_id_value_mapping = {
         _get_memcache_key(namespace, sub_namespace, obj_id):
-        SERIALIZATION_FUNCTIONS[namespace](value)
+        SERIALIZATION_FUNCTIONS[namespace](value) # type: ignore[operator]
         for obj_id, value in id_value_mapping.items()
     }
-    return memory_cache_services.set_multi(memory_cache_id_value_mapping)
+    return bool(memory_cache_services.set_multi(memory_cache_id_value_mapping)) # type: ignore[attr-defined]
 
 
 def delete_multi(
-    namespace: str,
-    sub_namespace: str | None,
-    obj_ids: List[str]
+    namespace: str, sub_namespace: str | None, obj_ids: List[str]
     ) -> bool:
     """Deletes multiple ids in the cache.
 
@@ -264,7 +258,7 @@ def delete_multi(
     memcache_keys = [
         _get_memcache_key(namespace, sub_namespace, obj_id)
         for obj_id in obj_ids]
-    return memory_cache_services.delete_multi(memcache_keys) == len(obj_ids)
+    return bool(memory_cache_services.delete_multi(memcache_keys) == len(obj_ids)) # type: ignore[attr-defined]
 
 
 def get_memory_cache_stats() -> caching_domain.MemoryCacheStats:
@@ -276,4 +270,4 @@ def get_memory_cache_stats() -> caching_domain.MemoryCacheStats:
         memory in bytes, peak memory usage in bytes, and the total number of
         keys stored as values.
     """
-    return memory_cache_services.get_memory_cache_stats()
+    return memory_cache_services.get_memory_cache_stats() # type: ignore[attr-defined, no-any-return]

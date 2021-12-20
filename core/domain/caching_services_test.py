@@ -187,14 +187,14 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         ' "", "author_notes": ""}'
     )
 
-    def test_retrieved_memory_profile_contains_correct_elements(self):
+    def test_retrieved_memory_profile_contains_correct_elements(self) -> None:
         memory_profile = caching_services.get_memory_cache_stats()
         self.assertIsInstance(memory_profile, caching_domain.MemoryCacheStats)
         self.assertIsNotNone(memory_profile.total_allocated_in_bytes)
         self.assertIsNotNone(memory_profile.peak_memory_usage_in_bytes)
         self.assertIsNotNone(memory_profile.total_number_of_keys_stored)
 
-    def test_flush_cache_wipes_cache_clean(self):
+    def test_flush_cache_wipes_cache_clean(self) -> None:
         """Tests whether flushing the cache removes the elements in the
         cache.
         """
@@ -237,7 +237,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 [exploration_id]),
             {})
 
-    def test_serialization_and_deserialization_returns_the_same_object(self):
+    def test_serialization_and_deserialization_returns_the_same_object(
+        self) -> None:
         deserialize = (
             caching_services.DESERIALIZATION_FUNCTIONS['exploration'])
         serialize = (
@@ -250,7 +251,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             default_exploration.to_dict(),
             deserialize(serialize(default_exploration)).to_dict())
 
-    def test_invalid_namespace_raises_error(self):
+    def test_invalid_namespace_raises_error(self) -> None:
         invalid_namespace = 'invalid'
         key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
 
@@ -282,7 +283,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 caching_services.CACHE_NAMESPACE_DEFAULT,
                 invalid_sub_namespace, ['a', 'b', 'c'])
 
-    def test_get_multi_correctly_retrieves_cache_elements(self):
+    def test_get_multi_correctly_retrieves_cache_elements(self) -> None:
         """Testing that querying the cache for elements where either all of the
         ids exist or don't exist in the cache returns reasonable output.
         """
@@ -338,7 +339,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             default_exploration.to_dict(),
             exp_ids_to_explorations[exploration_id].to_dict())
 
-    def test_partial_fetches_returns_correct_elements(self):
+    def test_partial_fetches_returns_correct_elements(self) -> None:
         """Testing that querying the cache returns reasonable output for
         elements where only a subsection of the queried ids exist in the cache.
         """
@@ -393,7 +394,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertFalse(nonexistent_exploration_id in result)
 
-    def test_queries_to_wrong_namespace_returns_none(self):
+    def test_queries_to_wrong_namespace_returns_none(self) -> None:
         exploration_id = 'id'
         default_exploration = (
             exp_domain.Exploration.create_default_exploration(
@@ -412,7 +413,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 '0',
                 [exploration_id]), {})
 
-    def test_queries_to_wrong_sub_namespace_returns_none(self):
+    def test_queries_to_wrong_sub_namespace_returns_none(self) -> None:
         exploration_id = 'id'
         default_exploration = (
             exp_domain.Exploration.create_default_exploration(
@@ -439,7 +440,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             existent_result.get(exploration_id).to_dict(),
             default_exploration.to_dict())
 
-    def test_set_multi_returns_true_for_successful_insert_into_cache(self):
+    def test_set_multi_returns_true_for_successful_insert_into_cache(
+        self) -> None:
         key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
         cache_strings_response = caching_services.set_multi(
             caching_services.CACHE_NAMESPACE_DEFAULT, None, key_value_mapping)
@@ -461,7 +463,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             caching_services.CACHE_NAMESPACE_DEFAULT, None, {})
         self.assertTrue(cache_empty_list_response)
 
-    def test_delete_multi_returns_true_when_all_ids_exist(self):
+    def test_delete_multi_returns_true_when_all_ids_exist(self) -> None:
         key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
 
         self.assertFalse(
@@ -513,7 +515,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 '0', [exploration_id]),
             {})
 
-    def test_delete_multi_returns_false_when_not_all_ids_exist(self):
+    def test_delete_multi_returns_false_when_not_all_ids_exist(self) -> None:
         """Tests that deleting keys that don't exist returns False."""
         key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
 
@@ -525,7 +527,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 caching_services.CACHE_NAMESPACE_DEFAULT, None,
                 ['a', 'e', 'f']))
 
-    def test_delete_multi_returns_false_when_namespace_incorrect(self):
+    def test_delete_multi_returns_false_when_namespace_incorrect(self) -> None:
         key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
 
         caching_services.set_multi(
@@ -536,7 +538,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 caching_services.CACHE_NAMESPACE_EXPLORATION, None,
                 ['a', 'b', 'c']))
 
-    def test_delete_multi_returns_false_when_sub_namespace_incorrect(self):
+    def test_delete_multi_returns_false_when_sub_namespace_incorrect(
+        self) -> None:
         key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
 
         caching_services.set_multi(
@@ -547,7 +550,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 caching_services.CACHE_NAMESPACE_DEFAULT,
                 'invalid_sub_namespace', ['a', 'b', 'c']))
 
-    def test_all_namespace_strings_are_valid(self):
+    def test_all_namespace_strings_are_valid(self) -> None:
         """Tests SERIALIZATION_FUNCTIONS and DESERIALIZATION FUNCTIONS does not
         contain any keys with the MEMCACHE_KEY_DELIMITER and that the namespaces
         in both dictionaries are identical.
@@ -559,7 +562,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             self.assertNotIn(caching_services.MEMCACHE_KEY_DELIMITER, namespace)
 
     def test_config_properties_identically_cached_in_dev_and_test_environment(
-            self):
+            self) -> None:
         """Test to make sure that caching in the test environment is in sync
         with caching in the main development server. More specifically, when a
         config property is created with fields that contain unicode characters,
@@ -567,7 +570,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         server should be the same as the string that is set to the testing cache
         on the testing server.
         """
-        def mock_memory_cache_services_set_multi(id_value_mapping):
+        def mock_memory_cache_services_set_multi(id_value_mapping) -> None:
             # This mock asserts that for the same config domain attribute
             # containing unicode characters, the string that is set to the cache
             # in the testing environment is the same as the string set to the
@@ -625,7 +628,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             })
 
     def test_explorations_identically_cached_in_dev_and_test_environment(
-            self):
+            self) -> None:
         """Test to make sure that caching in the test environment is in sync
         with caching in the main development server. More specifically, when an
         exploration is created with fields that contain unicode characters, the
@@ -645,7 +648,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         default_exploration = exp_domain.Exploration.from_dict(
             self.exploration_dict_with_unicode_characters)
 
-        def mock_memory_cache_services_set_multi(id_value_mapping):
+        def mock_memory_cache_services_set_multi(id_value_mapping) -> None:
             # The json encoded string is the string that is set to the cache
             # when an exploration is created in the development server. This
             # mock asserts that for the same exploration, the string
@@ -669,7 +672,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 })
 
     def test_unicode_characters_are_set_and_get_correctly_in_default_namespace(
-            self):
+            self) -> None:
         """Test to make sure that default namespace values (ints, floats,
         strings, boolean, lists, and dicts) can be set to the cache without
         errors and retrieved from the cache without any alterations.
@@ -697,7 +700,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             })
 
     def test_explorations_with_unicode_characters_are_set_and_get_correctly(
-            self):
+            self) -> None:
         """Test to make sure that a default explorations initialized with
         unicode characters is set to the cache without errors and retrieved from
         the cache without any alterations (in an identical state to when it was
@@ -731,7 +734,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             exp_ids_to_explorations[exploration_id].to_dict())
 
     def test_collections_with_unicode_characters_are_set_and_get_correctly(
-            self):
+            self) -> None:
         """Test to make sure that a default collection initialized with unicode
         characters is set to the cache without errors and retrieved from the
         cache without any alterations (in an identical state to when it was
@@ -766,7 +769,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             collections[collection_id].to_dict())
 
     def test_skills_with_unicode_characters_are_set_and_get_correctly(
-            self):
+            self) -> None:
         """Test to make sure that a default skill initialized with unicode
         characters is set to the cache without errors and retrieved from the
         cache without any alterations (in an identical state to when it was
@@ -812,7 +815,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             skills[skill_id].to_dict())
 
     def test_topics_with_unicode_characters_are_set_and_get_correctly(
-            self):
+            self) -> None:
         """Test to make sure that a default topic initialized with unicode
         characters is set to the cache without errors and retrieved from the
         cache without any alterations (in an identical state to when it was
@@ -848,7 +851,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             topics[topic_id].to_dict())
 
     def test_stories_with_unicode_characters_are_set_and_get_correctly(
-            self):
+            self) -> None:
         """Test to make sure that a default story initialized with unicode
         characters is set to the cache without errors and retrieved from the
         cache without any alterations (in an identical state to when it was
@@ -886,7 +889,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             stories[story_id].to_dict())
 
     def test_platform_parameters_with_unicode_are_set_and_get_correctly(
-            self):
+            self) -> None:
         """Test to make sure that a default platform parameter initialized with
         unicode characters is set to the cache without errors and retrieved from
         the cache without any alterations (in an identical state to when it was
