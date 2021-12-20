@@ -46,7 +46,6 @@ export class InputResponsePairComponent {
   @Input() inputResponsePairId!: string;
   @Input() isLastPair!: boolean;
   @Output() dataChange: EventEmitter<InputResponsePair> = new EventEmitter();
-  OPPIA_AVATAR_LINK_URL: string | undefined;
   decodedProfilePicture: string | undefined;
   @ViewChild('popover') popover!: NgbPopover;
 
@@ -64,9 +63,11 @@ export class InputResponsePairComponent {
     this.decodedProfilePicture = decodeURIComponent(this.profilePicture);
   }
 
-  isVideoRteElementPresentInResponse(): boolean | undefined {
+  isVideoRteElementPresentInResponse(): boolean {
     if (this.data.oppiaResponse) {
       return this.data.oppiaResponse.includes('oppia-noninteractive-video');
+    } else {
+      return false;
     }
   }
 
@@ -103,7 +104,8 @@ export class InputResponsePairComponent {
       this.data && interaction.id &&
         InteractionSpecsConstants.INTERACTION_SPECS[
           interaction.id as InteractionSpecsKey
-        ].needs_summary) {
+        ].needs_summary
+    ) {
       shortAnswerHtml = (
         this.explorationHtmlFormatterService.getShortAnswerHtml(
           this.data.learnerInput, interaction.id,

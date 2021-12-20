@@ -159,6 +159,17 @@ describe('InputResponsePairComponent', () => {
     expect(component.isVideoRteElementPresentInResponse()).toBe(true);
   });
 
+  it('should return false if input response does not contains ' +
+      'video rte element', () => {
+    component.data = {
+      learnerInput: '',
+      oppiaResponse: null,
+      isHint: true
+    };
+
+    expect(component.isVideoRteElementPresentInResponse()).toBe(false);
+  });
+
   it('should get RTL language status correctly', () => {
     expect(component.isLanguageRTL()).toEqual(true);
   });

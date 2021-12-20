@@ -162,7 +162,7 @@ export class ExplorationHtmlFormatterService {
 
   getAnswerHtml(
       answer: string,
-      interactionId: string,
+      interactionId: string | null,
       interactionCustomizationArgs: InteractionCustomizationArgs
   ): string {
     var element = document.createElement(
