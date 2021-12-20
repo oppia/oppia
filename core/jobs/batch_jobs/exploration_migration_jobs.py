@@ -49,13 +49,15 @@ datastore_services = models.Registry.import_datastore_services()
 
 
 class MigrateExplorationJob(base_jobs.JobBase):
-    """Job that add the proto_size_in_bytes attribute."""
+    """Job that migrates exploration models."""
 
     @staticmethod
     def _migrate_exploration(
         exp_id: str, exp_model: exp_models.ExplorationModel
-    ) -> result.Result[Tuple[str, exp_domain.Exploration], Tuple[str, Exception]]: # pylint: disable=line-too-long
-        """Migrates exploration and transform exploration model
+    ) -> result.Result[
+        Tuple[str, exp_domain.Exploration], Tuple[str, Exception]
+    ]:
+        """Migrates exploration and transforms exploration model
         into exploration object.
 
         Args:
@@ -103,9 +105,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
                 exp_model, migrated_exploration))
         commit_message = (
             'Update exploration content schema version to %d.'
-        ) % (
-            feconf.CURRENT_EXP_SCHEMA_VERSION
-        )
+        ) % (feconf.CURRENT_EXP_SCHEMA_VERSION)
         change_dicts = [change.to_dict() for change in exploration_changes]
         with datastore_services.get_ndb_context():
             models_to_put = updated_exploration_model.compute_models_to_commit(
@@ -138,7 +138,6 @@ class MigrateExplorationJob(base_jobs.JobBase):
         exploration_summary = exp_services.compute_summary_of_exploration(
             migrated_exploration)
         exploration_summary.version += 1
-
         return (
             exp_services.populate_exploration_summary_model_fields(
                 exploration_summary_model, exploration_summary
@@ -165,9 +164,9 @@ class MigrateExplorationJob(base_jobs.JobBase):
         if exp_model.version < feconf.CURRENT_EXP_SCHEMA_VERSION:
             exp = exp_fetchers.get_exploration_from_model(exp_model)
             exp_change = exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                'property_name': 'proto_size_in_bytes',
-                'new_value': exp.proto_size_in_bytes
+                'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
+                'from_version': exp_model.version,
+                'to_version': str(feconf.CURRENT_EXP_SCHEMA_VERSION)
             })
             yield (exp_id, exp_change)
 
@@ -301,8 +300,18 @@ class MigrateExplorationJob(base_jobs.JobBase):
                 ))
         )
 
+        exp_summary_models_to_put = (
+            exploration_objects_list
+            | 'Generate exploration summary models to put' >> beam.Map(
+                lambda exp_objects: self._update_exploration_summary(
+                    exp_objects['exploration'],
+                    exp_objects['exploration_summary_model']
+                ))
+        )
+
         unused_put_results = (
-            exp_models_to_put
+            (exp_models_to_put, exp_summary_models_to_put)
+            | 'Merge models' >> beam.Flatten()
             | 'Put models into the datastore' >> ndb_io.PutModels()
         )
 

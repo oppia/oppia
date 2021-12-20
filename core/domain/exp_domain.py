@@ -2259,7 +2259,7 @@ class Exploration:
             dict. The dict representation of the Exploration domain object,
             following schema version v55.
         """
-        return cls.add_id_and_proto_size_in_bytes_to_dict(
+        return cls._add_id_and_proto_size_in_bytes_to_dict(
             exploration_dict, exploration_id
         )
 
@@ -2366,12 +2366,13 @@ class Exploration:
         """
         exploration_dict = cls._migrate_to_latest_yaml_version(
             yaml_content, exploration_id)
-        exploration_dict = cls.add_id_and_proto_size_in_bytes_to_dict(
+        exploration_dict = cls._add_id_and_proto_size_in_bytes_to_dict(
             exploration_dict, exploration_id)
 
         return Exploration.from_dict(exploration_dict)
 
-    def add_id_and_proto_size_in_bytes_to_dict(
+    @classmethod
+    def _add_id_and_proto_size_in_bytes_to_dict(
         cls, exploration_dict, exploration_id
     ):
         """Add id and proto_size_in_bytes to the exploration dict.
