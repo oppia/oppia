@@ -162,7 +162,6 @@ class MigrateExplorationJob(base_jobs.JobBase):
             ID and exploration change object.
         """
         if exp_model.version < feconf.CURRENT_EXP_SCHEMA_VERSION:
-            exp = exp_fetchers.get_exploration_from_model(exp_model)
             exp_change = exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
                 'from_version': exp_model.version,

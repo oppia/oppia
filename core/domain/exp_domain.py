@@ -942,8 +942,7 @@ class Exploration:
 
         if self.proto_size_in_bytes == 0:
             raise utils.ValidationError(
-                'Expected proto size to be an int, received 0'
-                % self.proto_size_in_bytes)
+                'Expected proto size to be an int, received 0')
 
         for param_name in self.param_specs:
             if not isinstance(param_name, str):
@@ -1457,12 +1456,7 @@ class Exploration:
         self.correctness_feedback_enabled = correctness_feedback_enabled
 
     def update_proto_size_in_bytes(self):
-        """Update exploration's size in proto.
-
-        Args:
-            proto_size_in_bytes: int. The byte size of the exploration
-                proto object.
-        """
+        """Update exploration's size in proto."""
         self.proto_size_in_bytes = self.get_proto_size()
 
     # Methods relating to states.
