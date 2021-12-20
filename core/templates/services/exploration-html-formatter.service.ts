@@ -165,6 +165,11 @@ export class ExplorationHtmlFormatterService {
       interactionId: string | null,
       interactionCustomizationArgs: InteractionCustomizationArgs
   ): string {
+    // TODO(#14464): Remove this check interactionId null value is
+    //  removed as an option.
+    if (interactionId === null) {
+      throw new Error('InteractionId cannot be null');
+    }
     var element = document.createElement(
       `oppia-response-${this.camelCaseToHyphens.transform(interactionId)}`);
     element.setAttribute('answer', this.htmlEscaper.objToEscapedJson(answer));
