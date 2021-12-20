@@ -797,6 +797,7 @@
 	"I18N_TOPNAV_FORUM": "Text displayed inside drop-down menu. - The list is shown after the user hovers over the I18N_TOPNAV_ABOUT button. When the option is clicked, the external forum page is loaded.\n{{Identical|Forum}}",
 	"I18N_TOPNAV_GET_INVOLVED": "Text displayed inside a drop-down menu. - The list is shown after the user hovers over the I18N_TOPNAV_ABOUT button. When the option is clicked, the Get Involved page on the Oppia Foundation website is loaded.",
 	"I18N_TOPNAV_GET_STARTED": "Text displayed inside a drop-down menu. - The list is shown after the user hovers over the I18N_TOPNAV_ABOUT button. When the option is clicked, the Get Started page is loaded.\n{{Identical|Get started}}",
+	"I18N_TOPNAV_HOME": "Text displayed in the navigation bar. - When the user clicks the button, the home page is loaded based on user preferences set.\n{{Identical|Home}}",
 	"I18N_TOPNAV_LEARN": "Text displayed inside the navigation bar. - When the user hovers over the button, a list with several classroom pages is displayed.",
 	"I18N_TOPNAV_LEARNER_DASHBOARD": "Text displayed in the navigation bar when the learner dashboard page is loaded.",
 	"I18N_TOPNAV_LEARN_DESCRIPTION_1": "Text displayed inside drop-down menu. - The list is shown after the user hovers over the I18N_TOPNAV_LEARN button.",
