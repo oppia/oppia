@@ -259,9 +259,9 @@ export class StoryEditorNavbarComponent implements OnInit {
     );
     this.storyIsSavable = this.isStorySaveable();
     this.directiveSubscriptions.add(
-     this.undoRedoService.getUndoRedoChangeEventEmitter().subscribe(
-       () => this.isStorySaveable()
-     )
+      this.undoRedoService.getUndoRedoChangeEventEmitter().subscribe(
+        () => this.isStorySaveable()
+      )
     );
     this.changeListLength = this.getChangeListLength();
     this.directiveSubscriptions.add(

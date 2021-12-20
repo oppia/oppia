@@ -36,7 +36,7 @@ class MockNgbModalRef {
   };
 }
 
-describe('Story editor navbar component', () => {
+fdescribe('Story editor navbar component', () => {
   let component: StoryEditorNavbarComponent;
   let fixture: ComponentFixture<StoryEditorNavbarComponent>;
   let story: Story;
@@ -540,5 +540,10 @@ describe('Story editor navbar component', () => {
   it('should return change list length', () => {
     spyOn(undoRedoService, 'getChangeCount').and.returnValue(10);
     expect(component.getChangeListLength()).toEqual(10);
+  });
+
+  it('should retun false when story is published', () => {
+    spyOn(storyEditorStateService, 'isStoryPublished').and.returnValue(true);
+    expect(component.isStorySaveable()).toEqual(false);
   });
 });
