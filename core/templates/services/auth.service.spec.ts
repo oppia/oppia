@@ -22,14 +22,14 @@ import { md5 } from 'hash-wasm';
 
 import { AuthService } from 'services/auth.service';
 import { AuthBackendApiService } from 'services/auth-backend-api.service';
-import firebase from 'firebase';
+import { OperationType, UserCredential } from 'firebase/auth';
 
 describe('Auth service', function() {
   let authService: AuthService;
   let email: string;
   let password: string;
   let idToken: string;
-  let creds: firebase.auth.UserCredential;
+  let creds: UserCredential;
   let authBackendApiService: jasmine.SpyObj<AuthBackendApiService>;
   let angularFireAuth: jasmine.SpyObj<AngularFireAuth>;
 
@@ -60,8 +60,8 @@ describe('Auth service', function() {
     idToken = 'TKN';
     creds = {
       user: jasmine.createSpyObj({getIdToken: Promise.resolve(idToken)}),
-      credential: null,
-      additionalUserInfo: null,
+      providerId: null,
+      operationType: OperationType.SIGN_IN
     };
   });
 
@@ -159,8 +159,8 @@ describe('Auth service', function() {
       idToken = 'TKN';
       creds = {
         user: jasmine.createSpyObj({getIdToken: Promise.resolve(idToken)}),
-        credential: null,
-        additionalUserInfo: null,
+        providerId: null,
+        operationType: OperationType.SIGN_IN
       };
 
       authService = new AuthService(angularFireAuth, authBackendApiService);

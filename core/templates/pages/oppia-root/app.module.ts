@@ -36,7 +36,7 @@ import { ToastrModule } from 'ngx-toastr';
 import { AngularFireAuth, AngularFireAuthModule, USE_EMULATOR } from '@angular/fire/auth';
 import { AngularFireModule } from '@angular/fire';
 import { AuthService } from 'services/auth.service';
-import firebase from 'firebase/app';
+import { FirebaseError } from 'firebase/app';
 import * as hammer from 'hammerjs';
 
 class FirebaseErrorFilterHandler extends ErrorHandler {
@@ -61,7 +61,7 @@ class FirebaseErrorFilterHandler extends ErrorHandler {
     'auth/user-not-found',
   ];
 
-  handleError(error: firebase.auth.Error): void {
+  handleError(error: FirebaseError): void {
     if (FirebaseErrorFilterHandler.EXPECTED_ERROR_CODES.includes(error.code)) {
       return;
     }

@@ -20,16 +20,15 @@ import { Injectable, Optional } from '@angular/core';
 import { FirebaseOptions } from '@angular/fire';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { downgradeInjectable } from '@angular/upgrade/static';
-import firebase from 'firebase/app';
-import 'firebase/auth';
+import { FirebaseError } from 'firebase/app';
+import { GoogleAuthProvider, UserCredential } from 'firebase/auth';
 import { md5 } from 'hash-wasm';
 
 import { AppConstants } from 'app.constants';
 import { AuthBackendApiService } from 'services/auth-backend-api.service';
 
 abstract class AuthServiceImpl {
-  abstract getRedirectResultAsync():
-   Promise<firebase.auth.UserCredential | null>;
+  abstract getRedirectResultAsync(): Promise<UserCredential | null>;
   abstract signInWithRedirectAsync(): Promise<void>;
   abstract signOutAsync(): Promise<void>;
 }
@@ -41,7 +40,7 @@ class NullAuthServiceImpl extends AuthServiceImpl {
     throw this.error;
   }
 
-  async getRedirectResultAsync(): Promise<firebase.auth.UserCredential> {
+  async getRedirectResultAsync(): Promise<UserCredential> {
     throw this.error;
   }
 
@@ -58,7 +57,7 @@ class DevAuthServiceImpl extends AuthServiceImpl {
   async signInWithRedirectAsync(): Promise<void> {
   }
 
-  async getRedirectResultAsync(): Promise<firebase.auth.UserCredential | null> {
+  async getRedirectResultAsync(): Promise<UserCredential | null> {
     return null;
   }
 
@@ -68,11 +67,11 @@ class DevAuthServiceImpl extends AuthServiceImpl {
 }
 
 class ProdAuthServiceImpl extends AuthServiceImpl {
-  private provider: firebase.auth.GoogleAuthProvider;
+  private provider: GoogleAuthProvider;
 
   constructor(private angularFireAuth: AngularFireAuth) {
     super();
-    this.provider = new firebase.auth.GoogleAuthProvider();
+    this.provider = new GoogleAuthProvider();
     // Oppia only needs an email address for account management.
     this.provider.addScope('email');
     // Always prompt the user to select an account, even when they only own one.
@@ -84,7 +83,7 @@ class ProdAuthServiceImpl extends AuthServiceImpl {
     return this.angularFireAuth.signInWithRedirect(this.provider);
   }
 
-  async getRedirectResultAsync(): Promise<firebase.auth.UserCredential> {
+  async getRedirectResultAsync(): Promise<UserCredential> {
     return this.angularFireAuth.getRedirectResult();
   }
 
@@ -98,7 +97,7 @@ class ProdAuthServiceImpl extends AuthServiceImpl {
 })
 export class AuthService {
   private authServiceImpl: AuthServiceImpl;
-  creds!: firebase.auth.UserCredential;
+  creds!: UserCredential;
 
   constructor(
       @Optional() private angularFireAuth: AngularFireAuth | null,
@@ -164,7 +163,7 @@ export class AuthService {
           email, password);
       }
     } catch (err: unknown) {
-      if ((err as firebase.auth.Error).code === 'auth/user-not-found') {
+      if ((err as FirebaseError).code === 'auth/user-not-found') {
         if (this.angularFireAuth !== null) {
           this.creds =
            await this.angularFireAuth.createUserWithEmailAndPassword(

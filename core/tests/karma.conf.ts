@@ -12,7 +12,7 @@ if (argv.prodEnv) {
 module.exports = function(config) {
   config.set({
     basePath: '../../',
-    frameworks: ['jasmine', 'webpack'],
+    frameworks: ['jasmine'],
     files: [
       // Constants must be loaded before everything else.
       // Since jquery, angular-mocks and math-expressions

@@ -16,8 +16,9 @@
   "overrides": [
     {
       // We exclude test files from dependency injection format checks because
-      // they are never minified.
-      "files": ["*Spec.js", "*Spec.ts"],
+      // they are never minified. Also, we exclude no-loss-of-precision check as
+      // it is only relevant for non-test files.
+      "files": ["*Spec.js", "*Spec.ts", "*.spec.ts"],
       "rules": {
         "angular/di": "off",
         "no-loss-of-precision": "off"

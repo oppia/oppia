@@ -60,7 +60,7 @@ export class InteractionAttributesExtractorService {
         interactionId].customization_arg_specs);
     caSpecs.forEach(caSpec => {
       const caName = caSpec.name;
-      const attributesKey = `${caName}WithValue` as keyof typeof attributes;
+      const attributesKey = `${caName}WithValue`;
       Object.defineProperty(caBackendDict, caName, {
         value: {
           value: this.htmlEscaperService.escapedJsonToObj(
