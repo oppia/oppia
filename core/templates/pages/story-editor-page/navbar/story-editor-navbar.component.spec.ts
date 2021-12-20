@@ -36,7 +36,7 @@ class MockNgbModalRef {
   };
 }
 
-fdescribe('Story editor navbar component', () => {
+describe('Story editor navbar component', () => {
   let component: StoryEditorNavbarComponent;
   let fixture: ComponentFixture<StoryEditorNavbarComponent>;
   let story: Story;
