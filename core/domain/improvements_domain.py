@@ -75,17 +75,18 @@ class TaskEntry:
     """
 
     def __init__(
-            self,
-            entity_type: str,
-            entity_id: str,
-            entity_version: int,
-            task_type: str,
-            target_type: str,
-            target_id: str,
-            issue_description: Optional[str],
-            status: str,
-            resolver_id: Optional[str] = None,
-            resolved_on: Optional[datetime.datetime] = None) -> None:
+        self,
+        entity_type: str,
+        entity_id: str,
+        entity_version: int,
+        task_type: str,
+        target_type: str,
+        target_id: str,
+        issue_description: Optional[str],
+        status: str,
+        resolver_id: Optional[str] = None,
+        resolved_on: Optional[datetime.datetime] = None
+    ) -> None:
         """Initializes a new TaskEntry domain object from the given values.
 
         Args:

@@ -100,21 +100,22 @@ class FeedbackThread:
     """
 
     def __init__(
-            self,
-            thread_id: str,
-            entity_type: str,
-            entity_id: str,
-            state_name: str,
-            original_author_id: str,
-            status: str,
-            subject: str,
-            summary: str,
-            has_suggestion: bool,
-            message_count: int,
-            created_on: datetime.datetime,
-            last_updated: datetime.datetime,
-            last_nonempty_message_text: Optional[str] = None,
-            last_nonempty_message_author_id: Optional[str] = None) -> None:
+        self,
+        thread_id: str,
+        entity_type: str,
+        entity_id: str,
+        state_name: str,
+        original_author_id: str,
+        status: str,
+        subject: str,
+        summary: str,
+        has_suggestion: bool,
+        message_count: int,
+        created_on: datetime.datetime,
+        last_updated: datetime.datetime,
+        last_nonempty_message_text: Optional[str] = None,
+        last_nonempty_message_author_id: Optional[str] = None
+    ) -> None:
         """Initializes a FeedbackThread object."""
 
         self.id = thread_id
@@ -204,17 +205,18 @@ class FeedbackMessage:
     """
 
     def __init__(
-            self,
-            full_message_id: str,
-            thread_id: str,
-            message_id: str,
-            author_id: str,
-            updated_status: str,
-            updated_subject: str,
-            text: str,
-            created_on: datetime.datetime,
-            last_updated: datetime.datetime,
-            received_via_email: bool) -> None:
+        self,
+        full_message_id: str,
+        thread_id: str,
+        message_id: str,
+        author_id: str,
+        updated_status: str,
+        updated_subject: str,
+        text: str,
+        created_on: datetime.datetime,
+        last_updated: datetime.datetime,
+        received_via_email: bool
+    ) -> None:
         self.id = full_message_id
         self.thread_id = thread_id
         self.message_id = message_id
@@ -274,7 +276,11 @@ class FullyQualifiedMessageIdentifier:
         message_id: int. The ID of a message beloning to the thread.
     """
 
-    def __init__(self, thread_id: str, message_id: int):
+    def __init__(
+        self,
+        thread_id: str,
+        message_id: int
+    ) -> None:
         self.thread_id = thread_id
         self.message_id = message_id
 
@@ -292,10 +298,12 @@ class FeedbackAnalytics:
     """
 
     def __init__(
-            self, entity_type: str,
-            entity_id: str,
-            num_open_threads: int,
-            num_total_threads: int) -> None:
+        self,
+        entity_type: str,
+        entity_id: str,
+        num_open_threads: int,
+        num_total_threads: int
+    ) -> None:
         """Initializes a FeedbackAnalytics object."""
 
         self.id = entity_id
@@ -327,11 +335,12 @@ class FeedbackMessageReference:
     """
 
     def __init__(
-    self,
-    entity_type: str,
-    entity_id: str,
-    thread_id: str,
-    message_id: str) -> None:
+        self,
+        entity_type: str,
+        entity_id: str,
+        thread_id: str,
+        message_id: str
+    ) -> None:
         """Initializes FeedbackMessageReference object."""
         self.entity_type = entity_type
         self.entity_id = entity_id
@@ -375,19 +384,20 @@ class FeedbackThreadSummary:
     """
 
     def __init__(
-            self,
-            status: str,
-            original_author_id: str,
-            last_updated: datetime.datetime,
-            last_message_text: str,
-            total_message_count: int,
-            last_message_is_read: bool,
-            second_last_message_is_read: bool,
-            author_last_message: str,
-            author_second_last_message: str,
-            exploration_title: str,
-            exploration_id: str,
-            thread_id: str) -> None:
+        self,
+        status: str,
+        original_author_id: str,
+        last_updated: datetime.datetime,
+        last_message_text: str,
+        total_message_count: int,
+        last_message_is_read: bool,
+        second_last_message_is_read: bool,
+        author_last_message: str,
+        author_second_last_message: str,
+        exploration_title: str,
+        exploration_id: str,
+        thread_id: str
+    ) -> None:
         self.status = status
         self.original_author_id = original_author_id
         self.last_updated = last_updated
