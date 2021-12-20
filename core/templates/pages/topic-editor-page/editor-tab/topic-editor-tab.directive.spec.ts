@@ -386,18 +386,20 @@ describe('Topic editor tab directive', function() {
     $scope.updatePracticeTabIsDisplayed(true);
     expect(topicPracticeTabSpy).not.toHaveBeenCalled();
   });
-  
-  it('should set the practice tab as displayed if there are the defined '+
-  'minimum of practice questions in the topic', function () {
-    $scope.skillQuestionCountDict = {"skill1": 3, "skill2": constants.TOPIC_MINIMUM_QUESTIONS_TO_PRACTICE - 4};
+
+  it('should set the practice tab as displayed if there are the defined ' +
+  'minimum of practice questions in the topic', function() {
+    $scope.skillQuestionCountDict = {'skill1': 3,
+     'skill2': constants.TOPIC_MINIMUM_QUESTIONS_TO_PRACTICE - 4};
     var topicPracticeTabSpy = (
       spyOn(TopicUpdateService, 'setPracticeTabIsDisplayed'));
     $scope.updatePracticeTabIsDisplayed(true);
     expect(topicPracticeTabSpy).not.toHaveBeenCalled();
-    $scope.skillQuestionCountDict = {"skill1": 3, "skill2": constants.TOPIC_MINIMUM_QUESTIONS_TO_PRACTICE - 3};
+    $scope.skillQuestionCountDict = {'skill1': 3,
+     'skill2': constants.TOPIC_MINIMUM_QUESTIONS_TO_PRACTICE - 3};
     $scope.updatePracticeTabIsDisplayed(true);
     expect(topicPracticeTabSpy).toHaveBeenCalled();
-  })
+  });
 
   it('should call the TopicUpdateService if skill is deleted from topic',
     function() {

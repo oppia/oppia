@@ -375,7 +375,8 @@ describe('Learner dashboard functionality', function() {
       await skillEditorPage.get(skillId);
       await skillEditorPage.moveToQuestionsTab();
     }
-    await skillEditorPage.expectNumberOfQuestionsToBe(constants.TOPIC_MINIMUM_QUESTIONS_TO_PRACTICE);
+    await skillEditorPage.expectNumberOfQuestionsToBe(
+      constants.TOPIC_MINIMUM_QUESTIONS_TO_PRACTICE);
     await general.closeCurrentTabAndSwitchTo(handle);
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.navigateToSkillsTab();
