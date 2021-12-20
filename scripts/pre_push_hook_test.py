@@ -45,7 +45,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
                 stderr=subprocess.PIPE):
             return process
         def mock_get_remote_name():
-            return 'remote'
+            return b'remote'
         def mock_get_refs():
             return ['ref1', 'ref2']
         def mock_collect_files_being_pushed(unused_refs, unused_remote):
@@ -280,8 +280,9 @@ class PrePushHookTests(test_utils.GenericTestBase):
 
         with subprocess_swap, git_diff_swap, get_merge_base_swap:
             self.assertEqual(
-                pre_push_hook.compare_to_remote(b'remote', b'local branch'),
-                'Test')
+                pre_push_hook.compare_to_remote('remote', 'local branch'),
+                'Test'
+            )
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_get_merge_base_reports_error(self):
@@ -303,7 +304,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
         }
         def mock_start_subprocess_for_result(unused_cmd_tokens):
             check_function_calls['start_subprocess_for_result_is_called'] = True
-            return 'Test', None
+            return b'Test', None
         subprocess_swap = self.swap(
             pre_push_hook, 'start_subprocess_for_result',
             mock_start_subprocess_for_result)
@@ -341,7 +342,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             common, 'get_current_branch_name', mock_get_branch)
         with get_branch_swap:
             self.assertEqual(
-                pre_push_hook.get_parent_branch_name_for_diff(), b'develop')
+                pre_push_hook.get_parent_branch_name_for_diff(), 'develop')
 
     def test_get_parent_branch_name_for_diff_with_non_release_branch(self):
         def mock_get_branch():
@@ -350,7 +351,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             common, 'get_current_branch_name', mock_get_branch)
         with get_branch_swap:
             self.assertEqual(
-                pre_push_hook.get_parent_branch_name_for_diff(), b'develop')
+                pre_push_hook.get_parent_branch_name_for_diff(), 'develop')
 
     def test_collect_files_being_pushed_with_empty_ref_list(self):
         def mock_get_branch():
