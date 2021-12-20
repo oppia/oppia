@@ -347,8 +347,8 @@ class SignupHandler(base.BaseHandler):
                 'schema': {
                     'type': 'basestring',
                     'choices': [
-                        constants.DASHBOARD_TYPE_CREATOR,
-                        constants.DASHBOARD_TYPE_LEARNER
+                        constants.DASHBOARD_TYPE_LEARNER,
+                        constants.DASHBOARD_TYPE_CREATOR
                     ]
                 },
                 'default_value': None
