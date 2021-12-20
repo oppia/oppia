@@ -51,7 +51,7 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.LinterTestBase):
         lint_task_report = third_party_linter.lint_css_files()
         print(lint_task_report.get_report())
         self.assert_same_list_elements(
-            ['19:16  ✖  Unexpected whitespace before ":"'],
+            ['19:16', 'Unexpected whitespace before ":"'],
             lint_task_report.get_report())
         self.assertEqual('Stylelint', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)

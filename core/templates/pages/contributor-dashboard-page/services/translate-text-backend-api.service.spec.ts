@@ -99,13 +99,10 @@ describe('TranslateTextBackendApiService', () => {
 
   describe('suggestTranslatedTextAsync', () => {
     let successHandler: jasmine.Spy<jasmine.Func>;
-    let failHandler: (error: HttpErrorResponse) => void;
-
     let imagesData: ImagesData[];
 
     beforeEach(() => {
       successHandler = jasmine.createSpy('success');
-      failHandler = jasmine.createSpy('error');
       imagesData = [{
         filename: 'imageFilename',
         imageBlob: {
@@ -132,6 +129,7 @@ describe('TranslateTextBackendApiService', () => {
           data_format: 'html'
         }
       };
+      let failHandler = jasmine.createSpy('error');
 
       translateTextBackendApiService.suggestTranslatedTextAsync(
         'activeExpId',
@@ -142,7 +140,8 @@ describe('TranslateTextBackendApiService', () => {
         'contentHtml',
         'translationHtml',
         imagesData,
-        'html').then(successHandler, failHandler);
+        'html'
+      ).then(successHandler, failHandler);
       const req = httpTestingController.expectOne(
         '/suggestionhandler/');
       expect(req.request.method).toEqual('POST');
@@ -155,6 +154,7 @@ describe('TranslateTextBackendApiService', () => {
     }));
 
     it('should append image data to form data', fakeAsync(() => {
+      let failHandler = jasmine.createSpy('error');
       translateTextBackendApiService.suggestTranslatedTextAsync(
         'activeExpId',
         'activeExpVersion',
@@ -164,7 +164,8 @@ describe('TranslateTextBackendApiService', () => {
         'contentHtml',
         'translationHtml',
         imagesData,
-        'html').then(successHandler, failHandler);
+        'html'
+      ).then(successHandler, failHandler);
       const req = httpTestingController.expectOne(
         '/suggestionhandler/');
       expect(req.request.method).toEqual('POST');
@@ -177,6 +178,7 @@ describe('TranslateTextBackendApiService', () => {
 
       expect(successHandler).toHaveBeenCalled();
     }));
+
     it('should handle multiple image blobs per filename', fakeAsync(() => {
       imagesData = [{
         filename: 'imageFilename1',
@@ -203,6 +205,7 @@ describe('TranslateTextBackendApiService', () => {
           type: 'imageBlob2'
         } as Blob
       }];
+      let failHandler = jasmine.createSpy('error');
       translateTextBackendApiService.suggestTranslatedTextAsync(
         'activeExpId',
         'activeExpVersion',
@@ -212,7 +215,8 @@ describe('TranslateTextBackendApiService', () => {
         'contentHtml',
         'translationHtml',
         imagesData,
-        'html').then(successHandler, failHandler);
+        'html'
+      ).then(successHandler, failHandler);
       const req = httpTestingController.expectOne(
         '/suggestionhandler/');
       expect(req.request.method).toEqual('POST');
@@ -244,7 +248,7 @@ describe('TranslateTextBackendApiService', () => {
 
     it('should call the failhandler on error response', fakeAsync(() => {
       const errorEvent = new ErrorEvent('error');
-      failHandler = (error: HttpErrorResponse) => {
+      let failHandler = (error: HttpErrorResponse) => {
         expect(error.error).toBe(errorEvent);
       };
 
@@ -257,7 +261,8 @@ describe('TranslateTextBackendApiService', () => {
         'contentHtml',
         'translationHtml',
         imagesData,
-        'html').then(successHandler, failHandler);
+        'html'
+      ).then(successHandler, failHandler);
       const req = httpTestingController.expectOne(
         '/suggestionhandler/');
       expect(req.request.method).toEqual('POST');
@@ -282,7 +287,8 @@ describe('TranslateTextBackendApiService', () => {
           'contentHtml',
           'translationHtml',
           imagesData,
-          'html')
+          'html'
+        )
       ).toBeRejectedWithError('No image data found');
     });
   });
