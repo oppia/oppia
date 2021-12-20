@@ -100,7 +100,9 @@ describe('TranslateTextBackendApiService', () => {
   describe('suggestTranslatedTextAsync', () => {
     let successHandler: jasmine.Spy<jasmine.Func>;
     let failHandler: (error: HttpErrorResponse) => void;
+
     let imagesData: ImagesData[];
+
     beforeEach(() => {
       successHandler = jasmine.createSpy('success');
       failHandler = jasmine.createSpy('error');

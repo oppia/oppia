@@ -19,7 +19,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { FirebaseError } from 'firebase/app';
+import firebase from 'firebase/app';
+import 'firebase/auth';
 
 import { AppConstants } from 'app.constants';
 import { AlertsService } from 'services/alerts.service';
@@ -63,7 +64,7 @@ export class LoginPageComponent implements OnInit {
       try {
         authSucceeded = await this.authService.handleRedirectResultAsync();
       } catch (error: unknown) {
-        this.onSignInError(error as FirebaseError);
+        this.onSignInError(error as firebase.auth.Error);
         return;
       }
 
@@ -75,7 +76,7 @@ export class LoginPageComponent implements OnInit {
       try {
         await this.authService.signInWithRedirectAsync();
       } catch (error: unknown) {
-        this.onSignInError(error as FirebaseError);
+        this.onSignInError(error as firebase.auth.Error);
       }
     },
     error => {
@@ -89,14 +90,14 @@ export class LoginPageComponent implements OnInit {
     try {
       await this.authService.signInWithEmail(email);
     } catch (error: unknown) {
-      this.onSignInError(error as FirebaseError);
+      this.onSignInError(error as firebase.auth.Error);
       return;
     }
 
     this.redirectToSignUp();
   }
 
-  private onSignInError(error: FirebaseError): void {
+  private onSignInError(error: firebase.auth.Error): void {
     if (error.code === 'auth/user-disabled') {
       this.redirectToPath('/pending-account-deletion');
       return;

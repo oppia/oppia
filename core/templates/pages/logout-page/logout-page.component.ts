@@ -18,7 +18,8 @@
 
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { FirebaseError } from 'firebase/app';
+import firebase from 'firebase/app';
+import 'firebase/auth';
 
 import { AlertsService } from 'services/alerts.service';
 import { AuthService } from 'services/auth.service';
@@ -50,7 +51,7 @@ export class LogoutPageComponent implements OnInit {
       this.utilsService.getSafeReturnUrl(redirectUrl));
   }
 
-  private onSignOutError(error: FirebaseError): void {
+  private onSignOutError(error: firebase.auth.Error): void {
     this.loaderService.hideLoadingScreen();
     this.alertsService.addWarning(error.message);
     setTimeout(() => this.redirect(), 3000);

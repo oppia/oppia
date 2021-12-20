@@ -49,10 +49,10 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.LinterTestBase):
         third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
             CONFIG_PATH, [INVALID_CSS_FILEPATH])
         lint_task_report = third_party_linter.lint_css_files()
-        self.assert_same_list_elements([
-            '19:16',
-            'Unexpected whitespace before \":\"   declaration-colon-space-'
-            'before'], lint_task_report.get_report())
+        print(lint_task_report.get_report())
+        self.assert_same_list_elements(
+            ['19:16  ✖  Unexpected whitespace before ":"'],
+            lint_task_report.get_report())
         self.assertEqual('Stylelint', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
