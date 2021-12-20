@@ -22,9 +22,9 @@ import logging
 import re
 import zipfile
 
-from core import constants
 from core import feconf
 from core import utils
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import email_manager
