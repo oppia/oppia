@@ -66,9 +66,8 @@ export class InputResponsePairComponent {
   isVideoRteElementPresentInResponse(): boolean {
     if (this.data.oppiaResponse) {
       return this.data.oppiaResponse.includes('oppia-noninteractive-video');
-    } else {
-      return false;
     }
+    return false;
   }
 
   isCurrentCardAtEndOfTranscript(): boolean {
@@ -102,9 +101,9 @@ export class InputResponsePairComponent {
         .answerDetails;
     } else if (
       this.data && interaction.id &&
-        InteractionSpecsConstants.INTERACTION_SPECS[
-          interaction.id as InteractionSpecsKey
-        ].needs_summary
+      InteractionSpecsConstants.INTERACTION_SPECS[
+        interaction.id as InteractionSpecsKey
+      ].needs_summary
     ) {
       shortAnswerHtml = (
         this.explorationHtmlFormatterService.getShortAnswerHtml(
