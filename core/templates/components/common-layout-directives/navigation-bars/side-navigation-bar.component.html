@@ -243,7 +243,9 @@
     </li>
 
     <li class="oppia-sidebar-rows" *ngIf="userIsLoggedIn">
-      <a href="/learner-dashboard" routerLink="/learner-dashboard" class="text-uppercase">
+      <a href="/"
+         [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.SPLASH.ROUTE"
+         class="text-uppercase">
         <span >{{ 'I18N_SIDEBAR_HOME' | translate }}</span>
       </a>
     </li>

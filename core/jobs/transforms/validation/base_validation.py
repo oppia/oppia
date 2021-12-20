@@ -28,10 +28,10 @@ with the result of the super function.
 from __future__ import annotations
 
 import datetime
+import enum
 import re
 
 from core import feconf
-from core import python_utils
 from core.jobs import job_utils
 from core.jobs.decorators import validation_decorators
 from core.jobs.types import base_validation_errors
@@ -45,7 +45,17 @@ import apache_beam as beam
 BASE_MODEL_ID_PATTERN = r'^[A-Za-z0-9-_]{1,%s}$' % base_models.ID_LENGTH
 MAX_CLOCK_SKEW_SECS = datetime.timedelta(seconds=1)
 
-VALIDATION_MODES = python_utils.create_enum('neutral', 'strict', 'non_strict') # pylint: disable=invalid-name
+
+# TODO(#14419): Change naming style of Enum class from SCREAMING_SNAKE_CASE
+# to PascalCase and its values to UPPER_CASE. Because we want to be consistent
+# throughout the codebase according to the coding style guide.
+# https://github.com/oppia/oppia/wiki/Coding-style-guide
+class VALIDATION_MODES(enum.Enum): # pylint: disable=invalid-name
+    """Enum for validation modes."""
+
+    neutral = 'neutral' # pylint: disable=invalid-name
+    strict = 'strict' # pylint: disable=invalid-name
+    non_strict = 'non_strict' # pylint: disable=invalid-name
 
 
 class ValidateDeletedModel(beam.DoFn):
