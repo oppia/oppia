@@ -39,7 +39,7 @@ var ExplorationEditorPage =
   require('../protractor_utils/ExplorationEditorPage.js');
 var Constants = require('../protractor_utils/ProtractorConstants.js');
 var SkillEditorPage = require('../protractor_utils/SkillEditorPage.js');
-import constants from 'assets/constants';
+var constants = require('assets/constants');
 
 describe('Learner dashboard functionality', function() {
   var explorationPlayerPage = null;
