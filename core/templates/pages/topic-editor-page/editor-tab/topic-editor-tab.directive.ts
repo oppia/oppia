@@ -331,20 +331,20 @@ angular.module('oppia').directive('topicEditorTab', [
               newPracticeTabIsDisplayed) {
             if (
               newPracticeTabIsDisplayed !==
-              $scope.topic.getPracticeTabIsDisplayed() 
-              && $scope.topicHasMinimumPracticeQuestions()) {
+              $scope.topic.getPracticeTabIsDisplayed() &&
+              $scope.topicHasMinimumPracticeQuestions()) {
               TopicUpdateService.setPracticeTabIsDisplayed(
                 $scope.topic, newPracticeTabIsDisplayed);
             }
           };
 
           $scope.topicHasMinimumPracticeQuestions = function() {
-            let skillQuestionCounts = 
+            let skillQuestionCounts =
             Object.values($scope.skillQuestionCountDict);
-            let numberOfPracticeQuestions = 
+            let numberOfPracticeQuestions =
             skillQuestionCounts.reduce((a: number, b: number) => a + b, 0);
-            return numberOfPracticeQuestions 
-            >= topicConstants.TOPIC_MINIMUM_QUESTIONS_TO_PRACTICE;
+            return numberOfPracticeQuestions >=
+            topicConstants.TOPIC_MINIMUM_QUESTIONS_TO_PRACTICE;
           };
 
           $scope.deleteUncategorizedSkillFromTopic = function(skillSummary) {
