@@ -79,8 +79,10 @@ class MigrateStoryJob(base_jobs.JobBase):
             story = story_fetchers.get_story_from_model(story_model)
             story.validate()
             assert topic_id_to_topic is not None
+            corresponding_topic = (
+                topic_id_to_topic[story.corresponding_topic_id])
             story_services.validate_prerequisite_skills_in_story_contents(
-                topic_id_to_topic[story.corresponding_topic_id],
+                corresponding_topic.get_all_skill_ids(),
                 story.story_contents
             )
         except Exception as e:
