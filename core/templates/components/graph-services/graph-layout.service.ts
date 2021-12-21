@@ -57,7 +57,7 @@ interface NodeData {
   height: number;
   width: number;
   // 'id' and 'label' are null for a newly
-  // initialized node. 
+  // initialized node.
   id: string | null;
   label: string | null;
   reachableFromEnd: boolean;
@@ -238,8 +238,9 @@ export class StateGraphLayoutService {
     var SENTINEL_DEPTH = -1;
     var SENTINEL_OFFSET = -1;
 
-    var nodeData: NodeDataDict = {};
+    var nodeData: NodeDataDict = {}
     for (var nodeId in nodes) {
+      nodeData[nodeId] = {} as NodeData;
       nodeData[nodeId].depth = SENTINEL_DEPTH;
       nodeData[nodeId].offset = SENTINEL_OFFSET;
     }
