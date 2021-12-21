@@ -55,20 +55,7 @@ class ThirdPartyCSSLintChecksManager:
         Returns:
             str. A string with the trimmed error messages.
         """
-        trimmed_error_messages = []
-        # We need to extract messages from the list and split them line by
-        # line so we can loop through them.
-        css_output_lines = css_lint_output.split('\n')
-        print(css_output_lines)
-        for line in css_output_lines:
-            # Stylelint messages starts with line numbers and then a
-            # "x"(\u2716) and a message-id in the end. We are capturing these
-            # and then replacing them with empty string('').
-            if re.search(r'^\d+:\d+', line.lstrip()):
-                error_message = line.replace(u'\u2716 ', '')
-            else:
-                error_message = line
-            trimmed_error_messages.append(error_message)
+        trimmed_error_messages = css_lint_output.split('\n')
         return '\n'.join(trimmed_error_messages) + '\n'
 
     def lint_css_files(self):
