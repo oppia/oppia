@@ -236,6 +236,7 @@ def _get_linters_for_file_extension(file_extension_to_lint, namespace, files):
         general_files_to_lint, file_cache)
     custom_linters.append(custom_linter)
 
+    config_path_for_css = os.path.join(parent_dir, 'oppia', '.stylelintrc')
     if file_extension_type_js_ts:
         custom_linter, third_party_linter = js_ts_linter.get_linters(
             files['.js'], files['.ts'], file_cache)
@@ -248,18 +249,13 @@ def _get_linters_for_file_extension(file_extension_to_lint, namespace, files):
         custom_linters.append(custom_linter)
         third_party_linters.append(third_party_linter)
 
-        config_path_for_css_in_html = os.path.join(
-            parent_dir, 'oppia', '.stylelintrc')
-        print(files['.html'])
         custom_linter, third_party_linter = css_linter.get_linters(
-            config_path_for_css_in_html, files['.html'])
+            config_path_for_css, files['.html'])
         third_party_linters.append(third_party_linter)
 
     elif file_extension_to_lint == 'css':
-        config_path_for_oppia_css = os.path.join(
-            parent_dir, 'oppia', 'core', 'templates', 'css', '.stylelintrc')
         custom_linter, third_party_linter = css_linter.get_linters(
-            config_path_for_oppia_css, files['.css'])
+            config_path_for_css, files['.css'])
         third_party_linters.append(third_party_linter)
 
     elif file_extension_to_lint == 'py':

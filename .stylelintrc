@@ -21,9 +21,18 @@
     "color-hex-length": "short",
     "declaration-colon-space-after": "always",
     "declaration-colon-space-before": "never",
-    "indentation": 2,
-    "no-descending-specificity": true,
+    "no-descending-specificity": null,
     "order/properties-alphabetical-order": true,
     "length-zero-no-unit": true
-  }
+  },
+
+  "overrides": [
+    {
+      "files": ["*.css"],
+      "rules": {
+        "indentation": 2,
+        "no-descending-specificity": true
+      }
+    }
+  ]
 }
