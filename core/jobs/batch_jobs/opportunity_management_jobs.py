@@ -187,12 +187,13 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
                 'skill': skills,
                 'question_skill_links': question_skill_link_models
             }
-            | 'Merge by skill id' >> beam.CoGroupByKey()
+            | 'Merge by skill ID' >> beam.CoGroupByKey()
+            | 'Remove skill IDs' >> beam.Values()
             | beam.Map(
-                lambda n: {
-                    'skill': n[1]['skill'][0][0],
+                lambda object: {
+                    'skill': object['skill'][0][0],
                     'question_skill_links': list(itertools.chain.from_iterable(
-                        n[1]['question_skill_links']))
+                        object['question_skill_links']))
                 }
             )
         )
