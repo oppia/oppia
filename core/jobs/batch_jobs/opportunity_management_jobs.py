@@ -51,11 +51,11 @@ if MYPY: # pragma: no cover
     from mypy_imports import topic_models
 
 (
-    exp_models, opportunity_models, story_models,
-    topic_models, skill_models, question_models
+    exp_models, opportunity_models, question_models,
+    skill_models, story_models, topic_models 
 ) = models.Registry.import_models([
-    models.NAMES.exploration, models.NAMES.opportunity, models.NAMES.story,
-    models.NAMES.topic, models.NAMES.skill, models.NAMES.question
+    models.NAMES.exploration, models.NAMES.opportunity, models.NAMES.question,
+    models.NAMES.skill, models.NAMES.story, models.NAMES.topic
 ])
 datastore_services = models.Registry.import_datastore_services()
 
@@ -108,7 +108,7 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
 
         Args:
             question_skill_link_models: list(QuestionSkillLinkModel).
-                Array of QuestionSkillLinkModels.
+                List of QuestionSkillLinkModels.
 
         Returns:
             int. The number of unique question ids.
@@ -119,15 +119,19 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
 
     @staticmethod
     def _create_skill_opportunity_model(
-        skills_and_links: dict
+        skill: skill_models.SkillModel,
+        question_skill_links: List[question_models.QuestionSkillLinkModel]
     ) -> result.Result[
         opportunity_models.SkillOpportunityModel, Exception
     ]:
-        """Transform skill opportunity objects into skill opportunity models.
+        """Transforms a skill object and a list of QuestionSkillLink objects
+        into a skill opportunity model.
 
         Args:
-            skills_and_links: dict. A dictionary mapping 'skill' to a SkillModel
-                and 'question_skill_links' to a list of QuestionSkillLinkModel.
+            skill: skill_models.SkillModel. The skill to create the opportunity
+                for.
+            question_skill_links: list(question_models.QuestionSkillLinkModel).
+                The list of QuestionSkillLinkModel for the given skill.
 
         Returns:
             Result[opportunity_models.SkillOpportunityModel, Exception].
@@ -136,12 +140,11 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
         """
         try:
             skill_opportunity = opportunity_domain.SkillOpportunity( # type: ignore[no-untyped-call]
-                skill_id=skills_and_links['skill'].id,
-                skill_description=skills_and_links['skill'].description,
+                skill_id=skill.id,
+                skill_description=skill.description,
                 question_count=GenerateSkillOpportunityModelJob
-                    ._count_unique_question_ids(
-                        skills_and_links['question_skill_links']
-            ))
+                    ._count_unique_question_ids(question_skill_links)
+            )
             skill_opportunity.validate() # type: ignore[no-untyped-call]
             skill_opportunity_model = opportunity_models.SkillOpportunityModel(
                 id=skill_opportunity.id,
@@ -168,7 +171,7 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
                     question_models.QuestionSkillLinkModel.get_all(
                         include_deleted=False))
                 )
-            | 'Group QuestionSkillLinkModels by skill id' >>
+            | 'Group QuestionSkillLinkModels by skill ID' >>
                 beam.GroupBy(lambda n: n.skill_id)
         )
 
@@ -177,9 +180,9 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
             | 'Get all non-deleted SkillModels' >> (
                 ndb_io.GetModels(
                     skill_models.SkillModel.get_all(include_deleted=False)))
-            | 'Get skill from model' >> beam.Map(
+            | 'Get skill object from model' >> beam.Map(
                 skill_fetchers.get_skill_from_model)
-            | 'Group Skills by skill id' >> beam.GroupBy(lambda m: m.id)
+            | 'Group skill objects by skill ID' >> beam.GroupBy(lambda m: m.id)
         )
 
         skills_with_question_counts = (
@@ -187,8 +190,8 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
                 'skill': skills,
                 'question_skill_links': question_skill_link_models
             }
-            | 'Merge by skill id' >> beam.CoGroupByKey()
-            | beam.Map(
+            | 'Merge by skill ID' >> beam.CoGroupByKey()
+            | 'Flatten skill and question_skill_links' >> beam.Map(
                 lambda n: {
                     'skill': n[1]['skill'][0][0],
                     'question_skill_links': list(itertools.chain.from_iterable(
@@ -199,7 +202,12 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
 
         opportunities_results = (
             skills_with_question_counts
-            | beam.Map(self._create_skill_opportunity_model)
+            | beam.Map(
+                lambda object:
+                    self._create_skill_opportunity_model(
+                        object['skill'],
+                        object['question_skill_links']
+            ))
         )
 
         unused_put_result = (
