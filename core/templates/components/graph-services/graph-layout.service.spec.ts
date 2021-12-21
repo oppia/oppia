@@ -522,7 +522,7 @@ describe('Graph Layout Service', () => {
       }
     ];
 
-    expect(sgls.getAugmentedLinks(nodeData, links)).toBeUndefined();
+    expect(sgls.getAugmentedLinks(nodeData, links)).toEqual([]);
   });
 
   it('should get correct graph width and height', () => {
@@ -759,7 +759,7 @@ describe('Graph Layout Service', () => {
     let initNodeId: string = 'State1';
     let finalNodeIds: string[] = ['State4'];
 
-    expect(sgls.getLastComputedArrangement()).toBe(null);
+    expect(sgls.getLastComputedArrangement()).toBeUndefined();
 
     let computedLayout = sgls.computeLayout(
       nodes, links1, initNodeId, finalNodeIds);
