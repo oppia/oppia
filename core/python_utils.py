@@ -26,11 +26,11 @@ import sys
 _THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party', 'python_libs')
 sys.path.insert(0, _THIRD_PARTY_PATH)
 
-_YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-5.4.1')
+_YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-6.0')
 sys.path.insert(0, _YAML_PATH)
 
 _CERTIFI_PATH = os.path.join(
-    os.getcwd(), '..', 'oppia_tools', 'certifi-2021.5.30')
+    os.getcwd(), '..', 'oppia_tools', 'certifi-2021.10.8')
 sys.path.insert(0, _CERTIFI_PATH)
 
 import yaml  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
@@ -305,29 +305,3 @@ def yaml_from_dict(dictionary, width=80):
     """
     dictionary = _recursively_convert_to_str(dictionary)
     return yaml.safe_dump(dictionary, default_flow_style=False, width=width)
-
-
-def create_enum(*sequential):
-    """Creates a enumerated constant.
-
-    Args:
-        *sequential: *. Sequence List to generate the enumerations.
-
-    Returns:
-        dict. Dictionary containing the enumerated constants.
-    """
-    enum_values = dict(ZIP(sequential, sequential))
-    try:
-        from enum import Enum  # pylint: disable=import-only-modules
-
-        # The type() of argument 1 in Enum must be str, not unicode.
-        return Enum(str('Enum'), enum_values)  # pylint: disable=disallowed-function-calls
-    except ImportError:
-        _enums = {}
-        for name, value in enum_values.items():
-            _value = {
-                'name': name,
-                'value': value
-            }
-            _enums[name] = type('Enum', (), _value)
-        return type('Enum', (), _enums)
