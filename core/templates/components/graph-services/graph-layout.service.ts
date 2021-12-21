@@ -243,8 +243,6 @@ export class StateGraphLayoutService {
     for (var nodeId in nodes) {
       nodeData[nodeId].depth = SENTINEL_DEPTH;
       nodeData[nodeId].offset = SENTINEL_OFFSET;
-      nodeData[nodeId].reachable = false;
-      nodeData[nodeId].reachableFromEnd = false;
     }
 
     var maxDepth = 0;
