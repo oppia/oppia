@@ -34,7 +34,7 @@ import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { DeleteMisconceptionModalComponent } from 'pages/skill-editor-page/modal-templates/delete-misconception-modal.component';
 import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
 
-fdescribe('Skill Misconception Editor Directive', function() {
+describe('Skill Misconception Editor Directive', function() {
   let $scope = null;
   let ctrl = null;
   let $rootScope = null;
