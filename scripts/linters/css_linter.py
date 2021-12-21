@@ -59,6 +59,7 @@ class ThirdPartyCSSLintChecksManager:
         # We need to extract messages from the list and split them line by
         # line so we can loop through them.
         css_output_lines = css_lint_output.split('\n')
+        print(css_output_lines)
         for line in css_output_lines:
             # Stylelint messages starts with line numbers and then a
             # "x"(\u2716) and a message-id in the end. We are capturing these
