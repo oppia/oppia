@@ -27,6 +27,8 @@ from core import utils
 from core.constants import constants
 from core.domain import change_domain
 
+from typing import Any, Dict
+
 SERVER_MODES = python_utils.create_enum('dev', 'test', 'prod') # pylint: disable=invalid-name
 FEATURE_STAGES = SERVER_MODES # pylint: disable=invalid-name
 DATA_TYPES = python_utils.create_enum('bool', 'string', 'number') # pylint: disable=invalid-name
@@ -756,7 +758,7 @@ class PlatformParameter:
                             'production environment.')
 
     @classmethod
-    def from_dict(cls, param_dict):
+    def from_dict(cls, param_dict: Dict[str, Any]):
         """Returns an PlatformParameter object from a dict.
 
         Args:

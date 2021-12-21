@@ -33,6 +33,8 @@ from core.domain import topic_domain
 from core.platform import models
 from core.tests import test_utils
 
+from typing import Any, Dict
+
 memory_cache_services = models.Registry.import_cache_services()
 
 
@@ -249,34 +251,34 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 'exp_id_1', title='A title', category='A category'))
         self.assertEqual(
             default_exploration.to_dict(),
-            deserialize(serialize(default_exploration)).to_dict())
+            deserialize(serialize(default_exploration)).to_dict()) # type: ignore[operator]
 
     def test_invalid_namespace_raises_error(self) -> None:
         invalid_namespace = 'invalid'
         key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegexp(# type: ignore[no-untyped-call]
             ValueError,
             'Invalid namespace: %s.' % invalid_namespace):
             caching_services.set_multi(
                 invalid_namespace, None,
                 key_value_mapping)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegexp(# type: ignore[no-untyped-call]
             ValueError,
             'Invalid namespace: %s.' % invalid_namespace):
             caching_services.get_multi(
                 invalid_namespace, None,
                 ['a', 'b', 'c'])
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegexp(# type: ignore[no-untyped-call]
             ValueError,
             'Invalid namespace: %s.' % invalid_namespace):
             caching_services.delete_multi(
                 invalid_namespace, None, ['a', 'b', 'c'])
 
         invalid_sub_namespace = 'sub:namespace'
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegexp(# type: ignore[no-untyped-call]
             ValueError,
             'Sub-namespace %s cannot contain \':\'.' % invalid_sub_namespace):
             caching_services.get_multi(
@@ -390,7 +392,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             default_exploration.to_dict(),
-            result.get(exploration_id).to_dict())
+            result.get(exploration_id).to_dict()) # type: ignore[union-attr]
 
         self.assertFalse(nonexistent_exploration_id in result)
 
@@ -437,7 +439,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             '1',
             [exploration_id])
         self.assertEqual(
-            existent_result.get(exploration_id).to_dict(),
+            existent_result.get(exploration_id).to_dict(),# type: ignore[union-attr]
             default_exploration.to_dict())
 
     def test_set_multi_returns_true_for_successful_insert_into_cache(
@@ -570,7 +572,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         server should be the same as the string that is set to the testing cache
         on the testing server.
         """
-        def mock_memory_cache_services_set_multi(id_value_mapping) -> None:
+        def mock_memory_cache_services_set_multi(
+            id_value_mapping: Dict[str, str]) -> None:
             # This mock asserts that for the same config domain attribute
             # containing unicode characters, the string that is set to the cache
             # in the testing environment is the same as the string set to the
@@ -648,7 +651,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         default_exploration = exp_domain.Exploration.from_dict(
             self.exploration_dict_with_unicode_characters)
 
-        def mock_memory_cache_services_set_multi(id_value_mapping) -> None:
+        def mock_memory_cache_services_set_multi(
+            id_value_mapping: Dict[str, Any]) -> None:
             # The json encoded string is the string that is set to the cache
             # when an exploration is created in the development server. This
             # mock asserts that for the same exploration, the string

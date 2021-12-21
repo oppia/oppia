@@ -303,10 +303,11 @@ class Collection:
 
     @classmethod
     def create_default_collection(
-            cls, collection_id, title=feconf.DEFAULT_COLLECTION_TITLE,
-            category=feconf.DEFAULT_COLLECTION_CATEGORY,
-            objective=feconf.DEFAULT_COLLECTION_OBJECTIVE,
-            language_code=constants.DEFAULT_LANGUAGE_CODE):
+            cls, collection_id: str,
+            title: str =feconf.DEFAULT_COLLECTION_TITLE,
+            category: str =feconf.DEFAULT_COLLECTION_CATEGORY,
+            objective: str =feconf.DEFAULT_COLLECTION_OBJECTIVE,
+            language_code: str =constants.DEFAULT_LANGUAGE_CODE):
         """Returns a Collection domain object with default values.
 
         Args:

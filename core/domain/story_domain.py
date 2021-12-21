@@ -31,6 +31,8 @@ from core.domain import fs_services
 from core.domain import html_cleaner
 from core.domain import html_validation_service
 
+from typing import Any, Dict
+
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
 STORY_PROPERTY_TITLE = 'title'
@@ -861,7 +863,7 @@ class Story:
                 return True
         return False
 
-    def to_dict(self):
+    def to_dict(self) -> Dict[str, Any]:
         """Returns a dict representing this Story domain object.
 
         Returns:
@@ -976,8 +978,9 @@ class Story:
 
     @classmethod
     def create_default_story(
-            cls, story_id, title, description, corresponding_topic_id,
-            url_fragment):
+            cls, story_id: str, title: str,
+            description: str, corresponding_topic_id: str,
+            url_fragment: str) -> Story:
         """Returns a story domain object with default values. This is for
         the frontend where a default blank story would be shown to the user
         when the story is created for the first time.
