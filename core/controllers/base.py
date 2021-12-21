@@ -326,7 +326,7 @@ class BaseHandler(webapp2.RequestHandler):
 
         schema_validation_succeeded = True
         try:
-            self.vaidate_and_normalize_args()
+            self.validate_and_normalize_args()
         except (
                 self.InvalidInputException, NotImplementedError,
                 self.InternalErrorException) as e:
