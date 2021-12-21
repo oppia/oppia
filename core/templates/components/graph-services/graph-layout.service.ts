@@ -259,20 +259,10 @@ export class StateGraphLayoutService {
     // } = {};
 
     for (var nodeId in nodes) {
-      nodeData[nodeId] = {
-        depth: SENTINEL_DEPTH,
-        offset: SENTINEL_OFFSET,
-        reachable: false,
-        x0: 0,
-        y0: 0,
-        xLabel: 0,
-        yLabel: 0,
-        id: '',
-        label: '',
-        height: 0,
-        width: 0,
-        reachableFromEnd: false,
-      };
+      nodeData[nodeId].depth = SENTINEL_DEPTH;
+      nodeData[nodeId].offset = SENTINEL_OFFSET;
+      nodeData[nodeId].reachable = false;
+      nodeData[nodeId].reachableFromEnd = false;
     }
 
     var maxDepth = 0;
@@ -485,47 +475,6 @@ export class StateGraphLayoutService {
       nodeData[nodeId].id = nodeId;
       nodeData[nodeId].label = nodes[nodeId];
     }
-
-    // Here we are creating and initialize nodeData: NodeDataDict.
-    // Note: nodeData does not contain any 'null' value.
-    // var nodeData: NodeDataDict = {};
-    // for (var nodeId in nodeData) {
-    //   var x0 = nodeDataTemp[nodeId].x0;
-    //   var y0 = nodeDataTemp[nodeId].y0;
-    //   var xLabel = nodeDataTemp[nodeId].xLabel;
-    //   var yLabel = nodeDataTemp[nodeId].yLabel;
-    //   var id = nodeDataTemp[nodeId].id;
-    //   var label = nodeDataTemp[nodeId].label;
-    //   var height = nodeDataTemp[nodeId].height;
-    //   var width = nodeDataTemp[nodeId].width;
-
-    //   nodeData[nodeId].depth = nodeDataTemp[nodeId].depth;
-    //   nodeData[nodeId].offset = nodeDataTemp[nodeId].offset;
-    //   nodeData[nodeId].reachable = nodeDataTemp[nodeId].reachable;
-    //   if (
-    //     x0 !== null &&
-    //     y0 !== null &&
-    //     xLabel !== null &&
-    //     yLabel !== null &&
-    //     id !== null &&
-    //     label !== null &&
-    //     height !== null &&
-    //     width !== null
-    //   ) {
-    //     nodeData[nodeId].x0 = x0;
-    //     nodeData[nodeId].y0 = y0;
-    //     nodeData[nodeId].xLabel = xLabel;
-    //     nodeData[nodeId].x0 = yLabel;
-    //     nodeData[nodeId].id = id;
-    //     nodeData[nodeId].label = label;
-    //     nodeData[nodeId].height = height;
-    //     nodeData[nodeId].width = width;
-    //   } else {
-    //     throw new Error('Some values inside nodeData are null');
-    //   }
-    //   nodeData[
-    //     nodeId].reachableFromEnd = nodeDataTemp[nodeId].reachableFromEnd;
-    // }
 
     // Mark nodes that are reachable from any end state via backward links.
     queue = finalNodeIds;
