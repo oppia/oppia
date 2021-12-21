@@ -21,6 +21,7 @@ from __future__ import annotations
 import enum
 import json
 import re
+from typing import Any, Dict
 
 from core import feconf
 from core import python_utils
@@ -28,7 +29,6 @@ from core import utils
 from core.constants import constants
 from core.domain import change_domain
 
-from typing import Any, Dict
 
 # TODO(#14419): Change naming style of Enum class from SCREAMING_SNAKE_CASE
 # to PascalCase and its values to UPPER_CASE. Because we want to be consistent
