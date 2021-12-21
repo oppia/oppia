@@ -2379,7 +2379,8 @@ class Exploration:
         exploration_dict['id'] = exploration_id
 
         # If the proto_size_in_bytes of the dict is wrong, it will be
-        # overwritten with the correct value calculated from the exploration object
+        # overwritten with the correct value calculated from the
+        # exploration object.
         exploration = cls(
             exploration_dict['id'],
             exploration_dict['title'],

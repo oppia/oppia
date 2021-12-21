@@ -19,8 +19,8 @@ from extensions.interactions import base
 from proto_files import objects_pb2
 from proto_files import state_pb2
 
-
 RULE_SPEC_DTO = state_pb2.DragAndDropSortInputInstanceDto.RuleSpecDto
+
 
 class DragAndDropSortInput(base.BaseInteraction):
     """Interaction for Drag and Drop Sorting."""

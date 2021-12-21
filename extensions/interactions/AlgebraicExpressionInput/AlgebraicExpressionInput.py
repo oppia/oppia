@@ -21,8 +21,8 @@ from __future__ import annotations
 from extensions.interactions import base
 from proto_files import state_pb2
 
-
 RULE_SPEC_DTO = state_pb2.AlgebraicExpressionInputInstanceDto.RuleSpecDto
+
 
 class AlgebraicExpressionInput(base.BaseInteraction):
     """Interaction for algebraic expression input."""
