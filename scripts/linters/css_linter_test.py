@@ -27,8 +27,7 @@ from scripts import scripts_test_utils
 from . import css_linter
 
 PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-CONFIG_PATH = os.path.join(
-    PARENT_DIR, 'oppia', 'core', 'templates', 'css', '.stylelintrc')
+CONFIG_PATH = os.path.join(PARENT_DIR, 'oppia', '.stylelintrc')
 
 LINTER_TESTS_DIR = os.path.join(os.getcwd(), 'scripts', 'linters', 'test_files')
 VALID_CSS_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'valid.css')
