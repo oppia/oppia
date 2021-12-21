@@ -85,7 +85,7 @@ export class ContributionAndReviewService {
   }
 
   async getUserCreatedQuestionSuggestionsAsync():
-    Promise<FetchSuggestionsReturn> {
+  Promise<FetchSuggestionsReturn> {
     let url = this.urlInterpolationService.interpolateUrl(
       this._SUBMITTED_SUGGESTION_LIST_HANDLER_URL, {
         target_type: 'skill',
@@ -95,7 +95,7 @@ export class ContributionAndReviewService {
   }
 
   async getReviewableQuestionSuggestionsAsync():
-    Promise<FetchSuggestionsReturn> {
+  Promise<FetchSuggestionsReturn> {
     var url = this.urlInterpolationService.interpolateUrl(
       this._REVIEWABLE_SUGGESTIONS_HANDLER_URL, {
         target_type: 'skill',
@@ -105,7 +105,7 @@ export class ContributionAndReviewService {
   }
 
   async getUserCreatedTranslationSuggestionsAsync():
-    Promise<FetchSuggestionsReturn> {
+  Promise<FetchSuggestionsReturn> {
     var url = this.urlInterpolationService.interpolateUrl(
       this._SUBMITTED_SUGGESTION_LIST_HANDLER_URL, {
         target_type: 'exploration',
