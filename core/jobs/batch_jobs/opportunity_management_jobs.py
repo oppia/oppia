@@ -52,7 +52,7 @@ if MYPY: # pragma: no cover
 
 (
     exp_models, opportunity_models, question_models,
-    skill_models, story_models, topic_models 
+    skill_models, story_models, topic_models
 ) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.opportunity, models.NAMES.question,
     models.NAMES.skill, models.NAMES.story, models.NAMES.topic
