@@ -25,7 +25,7 @@ from core.tests import test_utils
 
 class TextInputInteractionTests(test_utils.GenericTestBase):
 
-    def test_to_proto(self):
+    def test_text_input_converted_to_proto_correctly(self):
         interaction_dict = {
             'hints': [{
                 'hint_content': {

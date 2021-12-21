@@ -281,9 +281,7 @@ class RatioExpressionInput(base.BaseInteraction):
         Returns:
             RatioExpressionDto. The proto object.
         """
-        return objects_pb2.RatioExpressionDto(
-            components=list(ratio_list)
-        )
+        return objects_pb2.RatioExpressionDto(components=list(ratio_list))
 
     @classmethod
     def _convert_customization_args_to_proto(cls, customization_args):

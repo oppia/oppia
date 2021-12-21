@@ -25,7 +25,7 @@ from core.tests import test_utils
 
 class FractionInputInteractionTests(test_utils.GenericTestBase):
 
-    def test_to_proto(self):
+    def test_fraction_input_converted_to_proto_correctly(self):
         interaction_dict = {
             'id': 'FractionInput',
             'customization_args': {
@@ -273,94 +273,73 @@ class FractionInputInteractionTests(test_utils.GenericTestBase):
             fraction_answer_group.rule_specs[0]
                 .is_exactly_equal_to)
         self.assertEqual(
-            fraction_rule_specs.input.denominator,
-            5)
+            fraction_rule_specs.input.denominator, 5)
         self.assertEqual(
-            fraction_rule_specs.input.numerator,
-            2)
+            fraction_rule_specs.input.numerator, 2)
         self.assertEqual(
-            fraction_rule_specs.input.whole_number,
-            0)
+            fraction_rule_specs.input.whole_number, 0)
         self.assertFalse(fraction_rule_specs.input.is_negative)
 
         fraction_rule_specs = (
             fraction_answer_group.rule_specs[1].is_equivalent_to)
         self.assertEqual(
-            fraction_rule_specs.input.denominator,
-            5)
+            fraction_rule_specs.input.denominator, 5)
         self.assertEqual(
-            fraction_rule_specs.input.numerator,
-            2)
+            fraction_rule_specs.input.numerator, 2)
         self.assertEqual(
-            fraction_rule_specs.input.whole_number,
-            0)
+            fraction_rule_specs.input.whole_number, 0)
         self.assertFalse(fraction_rule_specs.input.is_negative)
 
         fraction_rule_specs = (
             fraction_answer_group.rule_specs[2]
                 .is_equivalent_to_and_in_simplest_form)
         self.assertEqual(
-            fraction_rule_specs.input.denominator,
-            5)
+            fraction_rule_specs.input.denominator, 5)
         self.assertEqual(
-            fraction_rule_specs.input.numerator,
-            2)
+            fraction_rule_specs.input.numerator, 2)
         self.assertEqual(
-            fraction_rule_specs.input.whole_number,
-            0)
+            fraction_rule_specs.input.whole_number, 0)
         self.assertFalse(fraction_rule_specs.input.is_negative)
 
         fraction_rule_specs = (
             fraction_answer_group.rule_specs[3].is_less_than)
         self.assertEqual(
-            fraction_rule_specs.input.denominator,
-            5)
+            fraction_rule_specs.input.denominator, 5)
         self.assertEqual(
-            fraction_rule_specs.input.numerator,
-            2)
+            fraction_rule_specs.input.numerator, 2)
         self.assertEqual(
-            fraction_rule_specs.input.whole_number,
-            0)
+            fraction_rule_specs.input.whole_number, 0)
         self.assertFalse(fraction_rule_specs.input.is_negative)
 
         fraction_rule_specs = (
             fraction_answer_group.rule_specs[4].is_greater_than)
         self.assertEqual(
-            fraction_rule_specs.input.denominator,
-            5)
+            fraction_rule_specs.input.denominator, 5)
         self.assertEqual(
-            fraction_rule_specs.input.numerator,
-            2)
+            fraction_rule_specs.input.numerator, 2)
         self.assertEqual(
-            fraction_rule_specs.input.whole_number,
-            0)
+            fraction_rule_specs.input.whole_number, 0)
         self.assertFalse(fraction_rule_specs.input.is_negative)
 
         self.assertEqual(
             fraction_answer_group.rule_specs[5]
-                .has_numerator_equal_to.input,
-            5)
+                .has_numerator_equal_to.input, 5)
 
         self.assertEqual(
             fraction_answer_group.rule_specs[6]
-                .has_denominator_equal_to.input,
-            10)
+                .has_denominator_equal_to.input, 10)
 
         self.assertEqual(
             fraction_answer_group.rule_specs[7]
-                .has_integer_part_equal_to.input,
-            10)
+                .has_integer_part_equal_to.input, 10)
 
         fraction_rule_specs = (
             fraction_answer_group.rule_specs[9]
                 .has_fractional_part_exactly_equal_to)
         self.assertEqual(
-            fraction_rule_specs.input.denominator,
-            5)
+            fraction_rule_specs.input.denominator, 5)
         self.assertEqual(
-            fraction_rule_specs.input.numerator,
-            2)
+            fraction_rule_specs.input.numerator, 2)
         self.assertEqual(
-            fraction_rule_specs.input.whole_number,
-            0)
+            fraction_rule_specs.input.whole_number, 0)
         self.assertFalse(fraction_rule_specs.input.is_negative)

@@ -166,23 +166,18 @@ class TextInput(base.BaseInteraction):
         rule_type_to_proto_func_mapping = {
             'Equals': cls._convert_equals_rule_spec_to_proto,
             'StartsWith': cls._convert_starts_with_rule_spec_to_proto,
-            'Contains': (
-                cls._to_contains_proto),
+            'Contains': cls._to_contains_proto,
             'FuzzyEquals': cls._convert_fuzzy_equals_rule_spec_to_proto
         }
         rule_type_to_proto_mapping = {
             'Equals': lambda x: (
-                state_pb2.TextInputInstanceDto.RuleSpecDto(
-                    equals=x)),
+                state_pb2.TextInputInstanceDto.RuleSpecDto(equals=x)),
             'StartsWith': lambda x: (
-                state_pb2.TextInputInstanceDto.RuleSpecDto(
-                    starts_with=x)),
+                state_pb2.TextInputInstanceDto.RuleSpecDto(starts_with=x)),
             'Contains': lambda x: (
-                state_pb2.TextInputInstanceDto.RuleSpecDto(
-                    contains=x)),
+                state_pb2.TextInputInstanceDto.RuleSpecDto(contains=x)),
             'FuzzyEquals': lambda x: (
-                state_pb2.TextInputInstanceDto.RuleSpecDto(
-                    fuzzy_equals=x))
+                state_pb2.TextInputInstanceDto.RuleSpecDto(fuzzy_equals=x))
         }
 
         for rule_spec in rule_specs_list:

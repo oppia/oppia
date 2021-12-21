@@ -935,14 +935,10 @@ class Exploration:
                 'Expected proto size to be an int, received %s'
                 % self.proto_size_in_bytes)
 
-        if self.proto_size_in_bytes < 0:
+        if self.proto_size_in_bytes <= 0:
             raise utils.ValidationError(
                 'Expected proto size to be a positive integer, received %s'
                 % self.proto_size_in_bytes)
-
-        if self.proto_size_in_bytes == 0:
-            raise utils.ValidationError(
-                'Expected proto size to be an int, received 0')
 
         for param_name in self.param_specs:
             if not isinstance(param_name, str):
@@ -2382,10 +2378,8 @@ class Exploration:
         """
         exploration_dict['id'] = exploration_id
 
-        # Creating a exploration domain object to calcualte the
-        # proto size of it. If there is any discrepancy between
-        # the backend-computed size and the dict size then we need
-        # to move the proto_size_in_bytes argument to the constrcutor.
+        # If the proto_size_in_bytes of the dict is wrong, it will be
+        # overwritten with the correct value calculated from the exploration object
         exploration = cls(
             exploration_dict['id'],
             exploration_dict['title'],
@@ -2404,8 +2398,8 @@ class Exploration:
             exploration_dict['auto_tts_enabled'],
             exploration_dict['correctness_feedback_enabled'])
 
-        # Construcotr calculates the proto_size_in_bytes and add it to the
-        # domain object. Accessing the argument directly and adding to the dict.
+        # The constructor calculates the proto_size_in_bytes and adds it to the
+        # domain object. So, we add that value directly to the dict.
         exploration_dict['proto_size_in_bytes'] = (
             exploration.proto_size_in_bytes)
 

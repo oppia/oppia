@@ -25,7 +25,7 @@ from core.tests import test_utils
 
 class ImageClickInputInteractionTests(test_utils.GenericTestBase):
 
-    def test_to_proto(self):
+    def test_image_click_input_converted_to_proto_correctly(self):
         interaction_dict = {
             'answer_groups': [{
                 'outcome': {
@@ -58,10 +58,13 @@ class ImageClickInputInteractionTests(test_utils.GenericTestBase):
                             'label': 'classdef',
                             'region': {
                                 'area': [
-                                    [0.004291845493562232,
-                                        0.004692192192192192],
-                                    [0.40987124463519314,
-                                        0.05874624624624625]
+                                    [
+                                        0.004291845493562232,
+                                        0.004692192192192192
+                                    ], [
+                                        0.40987124463519314,
+                                        0.05874624624624625
+                                    ]
                                 ],
                                 'regionType': 'Rectangle'
                             }

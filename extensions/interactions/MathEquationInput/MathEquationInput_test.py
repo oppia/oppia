@@ -25,7 +25,7 @@ from core.tests import test_utils
 
 class MathEquationInputInteractionTests(test_utils.GenericTestBase):
 
-    def test_to_proto(self):
+    def test_math_equation_input_converted_to_proto_correctly(self):
         interaction_dict = {
             'id': 'MathEquationInput',
             'customization_args': {

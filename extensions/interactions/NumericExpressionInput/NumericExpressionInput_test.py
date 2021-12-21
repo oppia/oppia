@@ -25,7 +25,7 @@ from core.tests import test_utils
 
 class NumericExpressionInputInteractionTests(test_utils.GenericTestBase):
 
-    def test_to_proto(self):
+    def test_numeric_expression_input_converted_to_proto_correctly(self):
         interaction_dict = {
             'id': 'NumericExpressionInput',
             'customization_args': {

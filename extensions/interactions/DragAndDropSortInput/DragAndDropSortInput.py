@@ -20,6 +20,8 @@ from proto_files import objects_pb2
 from proto_files import state_pb2
 
 
+RULE_SPEC_DTO = state_pb2.DragAndDropSortInputInstanceDto.RuleSpecDto
+
 class DragAndDropSortInput(base.BaseInteraction):
     """Interaction for Drag and Drop Sorting."""
 
@@ -100,14 +102,11 @@ class DragAndDropSortInput(base.BaseInteraction):
             DragAndDropSortInputInstanceDto. The proto object.
         """
         customization_args_proto = (
-            cls._convert_customization_args_to_proto(customization_args)
-        )
+            cls._convert_customization_args_to_proto(customization_args))
         outcome_proto = default_outcome.to_proto()
         hints_proto_list = cls.get_hint_proto_list(cls, hints)
         solution_proto = cls._convert_solution_to_proto(solution)
-        answer_groups_proto = (
-            cls._convert_answer_groups_to_proto(answer_groups)
-        )
+        answer_groups_proto = cls._convert_answer_groups_to_proto(answer_groups)
 
         return state_pb2.DragAndDropSortInputInstanceDto(
             customization_args=customization_args_proto,
@@ -201,10 +200,7 @@ class DragAndDropSortInput(base.BaseInteraction):
         Returns:
             IsEqualToOrderingSpecDto. The proto object.
         """
-        drag_input_rule_spec = (
-            state_pb2.DragAndDropSortInputInstanceDto.RuleSpecDto)
-
-        return drag_input_rule_spec.IsEqualToOrderingSpecDto(
+        return RULE_SPEC_DTO.IsEqualToOrderingSpecDto(
             input=cls._convert_list_of_set_of_translatable_html_content_ids_to_proto( # pylint: disable=line-too-long
                 input_dict['x'])
         )
@@ -221,10 +217,7 @@ class DragAndDropSortInput(base.BaseInteraction):
             IsEqualToOrderingWithOneItemAtIncorrectPositionSpecDto.
             The proto object.
         """
-        drag_input_rule_spec = (
-            state_pb2.DragAndDropSortInputInstanceDto.RuleSpecDto)
-
-        return drag_input_rule_spec.IsEqualToOrderingWithOneItemAtIncorrectPositionSpecDto( # pylint: disable=line-too-long
+        return RULE_SPEC_DTO.IsEqualToOrderingWithOneItemAtIncorrectPositionSpecDto( # pylint: disable=line-too-long
             input=cls._convert_list_of_set_of_translatable_html_content_ids_to_proto( # pylint: disable=line-too-long
                 input_dict['x'])
         )
@@ -239,10 +232,7 @@ class DragAndDropSortInput(base.BaseInteraction):
         Returns:
             IsEqualToOrderingSpecDto. The proto object.
         """
-        drag_input_rule_spec = (
-            state_pb2.DragAndDropSortInputInstanceDto.RuleSpecDto)
-
-        return drag_input_rule_spec.HasElementXAtPositionYSpecDto(
+        return RULE_SPEC_DTO.HasElementXAtPositionYSpecDto(
             element=cls._convert_translatable_html_content_id_to_proto(
                 input_dict['x']),
             position=input_dict['y']
@@ -258,10 +248,7 @@ class DragAndDropSortInput(base.BaseInteraction):
         Returns:
             IsEqualToOrderingSpecDto. The proto object.
         """
-        drag_input_rule_spec = (
-            state_pb2.DragAndDropSortInputInstanceDto.RuleSpecDto)
-
-        return drag_input_rule_spec.HasElementXBeforeElementYSpecDto(
+        return RULE_SPEC_DTO.HasElementXBeforeElementYSpecDto(
             considered_element=(
                 cls._convert_translatable_html_content_id_to_proto(
                     input_dict['x'])),
@@ -302,8 +289,7 @@ class DragAndDropSortInput(base.BaseInteraction):
         """Creates a ListOfSetsOfTranslatableHtmlContentIdsDto proto object.
 
         Args:
-            correct_answer: list. A list of set of
-                TranslatableHtmlContentId.
+            correct_answer: list. A list of set of TranslatableHtmlContentId.
 
         Returns:
             ListOfSetsOfTranslatableHtmlContentIdsDto. The proto object.

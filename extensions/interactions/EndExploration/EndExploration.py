@@ -73,6 +73,4 @@ class EndExploration(base.BaseInteraction):
         Returns:
             EndExplorationInstanceDto. The proto object.
         """
-        end_exploration_proto = state_pb2.EndExplorationInstanceDto()
-
-        return end_exploration_proto
+        return state_pb2.EndExplorationInstanceDto()

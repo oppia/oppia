@@ -23,6 +23,8 @@ from proto_files import objects_pb2
 from proto_files import state_pb2
 
 
+RULE_SPEC_DTO = state_pb2.ItemSelectionInputInstanceDto.RuleSpecDto
+
 class ItemSelectionInput(base.BaseInteraction):
     """Interaction for item selection input."""
 
@@ -239,9 +241,7 @@ class ItemSelectionInput(base.BaseInteraction):
         Returns:
             EqualsSpecDto. The proto object.
         """
-        item_rule_spec = state_pb2.ItemSelectionInputInstanceDto.RuleSpecDto
-
-        return item_rule_spec.EqualsSpecDto(
+        return RULE_SPEC_DTO.EqualsSpecDto(
             input=cls._convert_set_of_translatable_html_content_ids_to_proto(
                 choice_list)
         )
@@ -256,9 +256,7 @@ class ItemSelectionInput(base.BaseInteraction):
         Returns:
             ContainsAtLeastOneOfSpecDto. The proto object.
         """
-        item_rule_spec = state_pb2.ItemSelectionInputInstanceDto.RuleSpecDto
-
-        return item_rule_spec.ContainsAtLeastOneOfSpecDto(
+        return RULE_SPEC_DTO.ContainsAtLeastOneOfSpecDto(
             input=cls._convert_set_of_translatable_html_content_ids_to_proto(
                 choice_list)
         )
@@ -273,9 +271,7 @@ class ItemSelectionInput(base.BaseInteraction):
         Returns:
             IsProperSubsetOfSpecDto. The proto object.
         """
-        item_rule_spec = state_pb2.ItemSelectionInputInstanceDto.RuleSpecDto
-
-        return item_rule_spec.IsProperSubsetOfSpecDto(
+        return RULE_SPEC_DTO.IsProperSubsetOfSpecDto(
             input=cls._convert_set_of_translatable_html_content_ids_to_proto(
                 choice_list)
         )
@@ -292,9 +288,7 @@ class ItemSelectionInput(base.BaseInteraction):
         Returns:
             DoesNotContainAtLeastOneOfSpecDto. The proto object.
         """
-        item_rule_spec = state_pb2.ItemSelectionInputInstanceDto.RuleSpecDto
-
-        return item_rule_spec.DoesNotContainAtLeastOneOfSpecDto(
+        return RULE_SPEC_DTO.DoesNotContainAtLeastOneOfSpecDto(
             input=cls._convert_set_of_translatable_html_content_ids_to_proto(
                 choice_list)
         )

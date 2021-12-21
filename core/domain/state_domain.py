@@ -1839,20 +1839,16 @@ class WrittenTranslations:
                 language_to_content_id_map[content_id] = (
                     written_translation_proto)
 
-        language_code_to_enum_map = {
-            'en': languages_pb2.LanguageType.ENGLISH,
-            'hi-en': languages_pb2.LanguageType.HINGLISH,
-            'ar': languages_pb2.LanguageType.ARABIC,
-            'hi': languages_pb2.LanguageType.HINDI,
-            'pt-br': languages_pb2.LanguageType.BRAZILIAN_PORTUGUESE
-        }
         written_translation_content_mapping_protos_list = []
+
+        language_code = (
+            android_validation_constants.LANGAUGE_CODE_TO_ENUM_MAP)
 
         for (lang_code, written_translation_content_map) in (
             language_to_content_id_written_translation_map.items()):
             if lang_code in language_code_to_enum_map:
                 proto = languages_pb2.WrittenTranslationContentMappingDto(
-                    language=language_code_to_enum_map[lang_code],
+                    language=language_code[lang_code],
                     translation_content_mapping=written_translation_content_map)
             else:
                 proto = languages_pb2.WrittenTranslationContentMappingDto(
@@ -2187,20 +2183,16 @@ class RecordedVoiceovers:
                     language_to_content_id_voiceover_file_map[language_code])
                 language_to_content_id_map[content_id] = voiceover_proto
 
-        language_code_to_enum_map = {
-            'en': languages_pb2.LanguageType.ENGLISH,
-            'hi-en': languages_pb2.LanguageType.HINGLISH,
-            'ar': languages_pb2.LanguageType.ARABIC,
-            'hi': languages_pb2.LanguageType.HINDI,
-            'pt-br': languages_pb2.LanguageType.BRAZILIAN_PORTUGUESE
-        }
+        language_code = (
+            android_validation_constants.LANGAUGE_CODE_TO_ENUM_MAP)
+
         voiceover_content_mapping_protos_list = []
 
-        for (language_code, voiceover_file_content_map) in (
+        for (lang_code, voiceover_file_content_map) in (
             language_to_content_id_voiceover_file_map.items()):
-            if language_code in language_code_to_enum_map:
+            if lang_code in language_code_to_enum_map:
                 proto = languages_pb2.VoiceoverContentMappingDto(
-                    language=language_code_to_enum_map[language_code],
+                    language=language_code[lang_code],
                     voiceover_content_mapping=voiceover_file_content_map)
             else:
                 proto = languages_pb2.VoiceoverContentMappingDto(

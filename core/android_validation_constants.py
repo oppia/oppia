@@ -22,6 +22,7 @@ from __future__ import annotations
 import re
 
 from core.constants import constants
+from proto_files import languages_pb2
 
 
 # These are the valid interactions that are allowed in an exploration
@@ -38,7 +39,15 @@ VALID_INTERACTION_IDS = [
 ]
 
 # This is linked to SUPPORTED_CONTENT_LANGUAGES_FOR_ANDROID in constants.ts.
-SUPPORTED_LANGUAGES = ['en']
+SUPPORTED_LANGUAGES = ['en', 'hi-en', 'ar', 'hi', 'pt-br']
+
+LANGAUGE_CODE_TO_ENUM_MAP = {
+    'en': languages_pb2.LanguageType.ENGLISH,
+    'hi-en': languages_pb2.LanguageType.HINGLISH,
+    'ar': languages_pb2.LanguageType.ARABIC,
+    'hi': languages_pb2.LanguageType.HINDI,
+    'pt-br': languages_pb2.LanguageType.BRAZILIAN_PORTUGUESE
+}
 
 # This is linked to VALID_RTE_COMPONENTS_FOR_ANDROID in constants.ts.
 VALID_RTE_COMPONENTS = ['image', 'link', 'math', 'skillreview']

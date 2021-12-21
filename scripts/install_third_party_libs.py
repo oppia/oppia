@@ -271,6 +271,11 @@ def move_all_proto_files_to_third_party():
                 str(os.path.join(
                     oppia_proto_api_path, os.path.basename(p.absolute()))))
 
+    # If there is any subfolder in the root folder from the
+    # oppia_proto_api repository in the third_party directory,
+    # then delete it. We are keeping all the proto files under
+    # the root fodler directly to solve the proto compilation issue.
+    # See: https://github.com/protocolbuffers/protobuf/issues/1491
     if os.path.exists(os.path.join(oppia_proto_api_path, 'org')):
         shutil.rmtree(oppia_proto_api_path + '/org')
 

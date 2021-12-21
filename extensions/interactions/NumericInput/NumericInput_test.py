@@ -25,7 +25,7 @@ from core.tests import test_utils
 
 class NumericInputInteractionTests(test_utils.GenericTestBase):
 
-    def test_to_proto(self):
+    def test_numeric_input_converted_to_proto_correctly(self):
         interaction_dict = {
             'answer_groups': [{
                 'outcome': {

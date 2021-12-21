@@ -25,7 +25,7 @@ from core.tests import test_utils
 
 class ContinueInteractionTests(test_utils.GenericTestBase):
 
-    def test_to_proto(self):
+    def test_continue_interaction_converted_to_proto_correctly(self):
         interaction_dict = {
             'answer_groups': [],
             'confirmed_unclassified_answers': [],
@@ -53,8 +53,7 @@ class ContinueInteractionTests(test_utils.GenericTestBase):
             'solution': None,
         }
         continue_instance = (
-            interaction_registry.Registry.get_interaction_by_id(
-                'Continue'))
+            interaction_registry.Registry.get_interaction_by_id('Continue'))
         interaction_domain = (
             state_domain.InteractionInstance.from_dict(interaction_dict))
         continue_proto = continue_instance.to_proto(

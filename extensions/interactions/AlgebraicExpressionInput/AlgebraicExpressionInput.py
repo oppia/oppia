@@ -22,6 +22,8 @@ from extensions.interactions import base
 from proto_files import state_pb2
 
 
+RULE_SPEC_DTO = state_pb2.AlgebraicExpressionInputInstanceDto.RuleSpecDto
+
 class AlgebraicExpressionInput(base.BaseInteraction):
     """Interaction for algebraic expression input."""
 
@@ -103,10 +105,9 @@ class AlgebraicExpressionInput(base.BaseInteraction):
         """
         custom_osk_letters_proto = (
             list(customization_args['customOskLetters'].value))
-
         frac_for_division = customization_args['useFractionForDivision'].value
-
         algebric_expression_dto = state_pb2.AlgebraicExpressionInputInstanceDto
+
         return algebric_expression_dto.CustomizationArgsDto(
             custom_osk_letters=custom_osk_letters_proto,
             use_fraction_for_division=frac_for_division
@@ -181,10 +182,7 @@ class AlgebraicExpressionInput(base.BaseInteraction):
         for rule_spec in rule_specs_list:
             rule_type = rule_spec.rule_type
             rule_proto = (
-                rule_type_to_proto_func_mapping[rule_type](
-                    rule_spec.inputs
-                )
-            )
+                rule_type_to_proto_func_mapping[rule_type](rule_spec.inputs))
             rule_specs_list_proto.append(
                 rule_type_to_proto_mapping[rule_type](rule_proto)
             )
@@ -201,9 +199,7 @@ class AlgebraicExpressionInput(base.BaseInteraction):
         Returns:
             MatchesExactlyWithSpecDto. The proto object.
         """
-        rule_spec = state_pb2.AlgebraicExpressionInputInstanceDto.RuleSpecDto
-
-        return rule_spec.MatchesExactlyWithSpecDto(
+        return RULE_SPEC_DTO.MatchesExactlyWithSpecDto(
             algebraic_expression=inputs['x']
         )
 
@@ -217,9 +213,7 @@ class AlgebraicExpressionInput(base.BaseInteraction):
         Returns:
             IsEquivalentToSpecDto. The proto object.
         """
-        rule_spec = state_pb2.AlgebraicExpressionInputInstanceDto.RuleSpecDto
-
-        return rule_spec.IsEquivalentToSpecDto(
+        return RULE_SPEC_DTO.IsEquivalentToSpecDto(
             algebraic_expression=inputs['x']
         )
 
@@ -233,9 +227,7 @@ class AlgebraicExpressionInput(base.BaseInteraction):
         Returns:
             ContainsSomeOfSpecDto. The proto object.
         """
-        rule_spec = state_pb2.AlgebraicExpressionInputInstanceDto.RuleSpecDto
-
-        return rule_spec.ContainsSomeOfSpecDto(
+        return RULE_SPEC_DTO.ContainsSomeOfSpecDto(
             algebraic_expression=inputs['x']
         )
 
@@ -249,9 +241,7 @@ class AlgebraicExpressionInput(base.BaseInteraction):
         Returns:
             OmitsSomeOfSpecDto. The proto object.
         """
-        rule_spec = state_pb2.AlgebraicExpressionInputInstanceDto.RuleSpecDto
-
-        return rule_spec.OmitsSomeOfSpecDto(
+        return RULE_SPEC_DTO.OmitsSomeOfSpecDto(
             algebraic_expression=inputs['x']
         )
 
@@ -265,13 +255,9 @@ class AlgebraicExpressionInput(base.BaseInteraction):
         Returns:
             MatchesWithGeneralFormSpecDto. The proto object.
         """
-        rule_spec = state_pb2.AlgebraicExpressionInputInstanceDto.RuleSpecDto
-
-        set_of_algebraic_identifier = list(inputs['y'])
-
-        return rule_spec.MatchesWithGeneralFormSpecDto(
+        return RULE_SPEC_DTO.MatchesWithGeneralFormSpecDto(
             algebraic_expression=inputs['x'],
-            set_of_algebraic_identifier=set_of_algebraic_identifier
+            set_of_algebraic_identifier=list(inputs['y'])
         )
 
     @classmethod

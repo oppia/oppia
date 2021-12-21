@@ -25,7 +25,7 @@ from core.tests import test_utils
 
 class DragAndDropSortInputInteractionTests(test_utils.GenericTestBase):
 
-    def test_to_proto(self):
+    def test_drag_and_drop_sort_input_converted_to_proto_correctly(self):
         answer_group = {
             'outcome': {
                 'dest': 'abc',

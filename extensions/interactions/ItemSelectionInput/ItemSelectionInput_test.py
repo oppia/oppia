@@ -25,7 +25,7 @@ from core.tests import test_utils
 
 class ItemSelectionInputInteractionTests(test_utils.GenericTestBase):
 
-    def test_to_proto(self):
+    def test_item_selection_input_converted_to_proto_correctly(self):
         interaction_dict = {
             'answer_groups': [{
                 'outcome': {
@@ -128,11 +128,9 @@ class ItemSelectionInputInteractionTests(test_utils.GenericTestBase):
         item_customization_args = (
             item_selection_proto.customization_args)
         self.assertEqual(
-            item_customization_args.max_allowable_selection_count,
-            2)
+            item_customization_args.max_allowable_selection_count, 2)
         self.assertEqual(
-            item_customization_args.min_allowable_selection_count,
-            1)
+            item_customization_args.min_allowable_selection_count, 1)
         self.assertEqual(
             item_customization_args.choices[0].content_id,
             'ca_choices_2')
@@ -148,22 +146,17 @@ class ItemSelectionInputInteractionTests(test_utils.GenericTestBase):
 
         item_default_outcome = item_selection_proto.default_outcome
         self.assertEqual(
-            item_default_outcome.destination_state,
-            'abc')
+            item_default_outcome.destination_state, 'abc')
         self.assertEqual(
-            item_default_outcome.feedback.text,
-            'Correct Answer')
+            item_default_outcome.feedback.text, 'Correct Answer')
         self.assertEqual(
-            item_default_outcome.feedback.content_id,
-            'feedback_1')
+            item_default_outcome.feedback.content_id, 'feedback_1')
         self.assertTrue(item_default_outcome.labelled_as_correct)
 
         self.assertEqual(
-            item_selection_proto.hints[0].hint_content.content_id,
-            'hint_1')
+            item_selection_proto.hints[0].hint_content.content_id, 'hint_1')
         self.assertEqual(
-            item_selection_proto.hints[1].hint_content.content_id,
-            'hint_2')
+            item_selection_proto.hints[1].hint_content.content_id, 'hint_2')
         self.assertEqual(
             item_selection_proto.hints[0].hint_content.text,
             '<p>This is a first hint.</p>')
@@ -175,8 +168,7 @@ class ItemSelectionInputInteractionTests(test_utils.GenericTestBase):
             item_selection_proto.answer_groups[0]
                 .base_answer_group.outcome)
         self.assertEqual(
-            item_answer_group.destination_state,
-            'abc')
+            item_answer_group.destination_state, 'abc')
         self.assertTrue(item_answer_group.labelled_as_correct)
         self.assertEqual(
             item_answer_group.feedback.content_id,

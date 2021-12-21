@@ -24,6 +24,7 @@ import logging
 import os
 import re
 
+from core import android_validation_constants
 from core import feconf
 from core import schema_utils
 from core import utils
@@ -4452,6 +4453,21 @@ class InteractionInstanceDomainTests(test_utils.GenericTestBase):
             'default_outcome', '')
         default_outcome = state_domain.Outcome(
             'end_state_name', subtitled_html, False, [], None, None)
+
+        for interaction_id in (
+            android_validation_constants.VALID_INTERACTION_IDS):
+            interaction_obj = state_domain.InteractionInstance(
+                interaction_id,
+                {}, [], default_outcome, [], [], None)
+            if interaction_obj.is_supported_on_android_app():
+                self.assertTrue(
+                    hasattr(interaction_obj, 'to_proto')
+                )
+            else:
+                self.assertFalse(
+                    hasattr(interaction_obj, 'to_proto')
+                )
+
         continue_customization_args = (
             interaction.convert_customization_args_dict_to_customization_args(
                 'Continue',
@@ -4749,7 +4765,7 @@ class InteractionInstanceDomainTests(test_utils.GenericTestBase):
         )
 
         numer_with_units_interaction = state_domain.InteractionInstance(
-            'NumerWithUnits',
+            'NumberWithUnits',
             {}, [], default_outcome, [], [], None)
         self.assertFalse(numer_with_units_interaction.to_proto())
 
@@ -4787,7 +4803,7 @@ class InteractionInstanceDomainTests(test_utils.GenericTestBase):
 class SubtitledHtmlDomainUnitTests(test_utils.GenericTestBase):
     """Test SubtitledHtml domain object methods."""
 
-    def test_to_proto(self):
+    def test_subtitled_html_converted_to_proto_correctly(self):
         subtitled_text_proto = state_domain.SubtitledHtml(
             'ca_placeholder_0', '<p>html</p>').to_proto()
         self.assertEqual(subtitled_text_proto.content_id, 'ca_placeholder_0')
@@ -4816,7 +4832,7 @@ class SubtitledUnicodeDomainUnitTests(test_utils.GenericTestBase):
             'unicode_str': ''
         })
 
-    def test_to_proto(self):
+    def test_subtitled_unicode_converted_to_proto_correctly(self):
         subtitled_text_proto = state_domain.SubtitledUnicode(
             'ca_placeholder_0', '😍😍😍😍').to_proto()
         self.assertEqual(subtitled_text_proto.content_id, 'ca_placeholder_0')
@@ -5171,7 +5187,7 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             written_translations.get_content_ids_that_are_correctly_translated(
                 'hi'), [])
 
-    def test_to_proto(self):
+    def test_written_translations_converted_to_proto_correctly(self):
         written_translations_dict = {
             'translations_mapping': {
                 'content1': {
@@ -5227,7 +5243,7 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
 
 class WrittenTranslationDomainUnitTests(test_utils.GenericTestBase):
 
-    def test_to_proto(self):
+    def test_written_translation_converted_to_proto_correctly(self):
         written_translation_proto = (
             state_domain.WrittenTranslation('html', 'Test', False).to_proto())
         self.assertEqual(
@@ -5503,7 +5519,7 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
                 'content ids [\'invalid_content\']')):
             recorded_voiceovers.validate(['invalid_content'])
 
-    def test_to_proto(self):
+    def test_recorded_voiceovers_converted_to_proto_correctly(self):
         recorded_voiceovers_dict = {
             'voiceovers_mapping': {
                 'content1': {
@@ -5632,7 +5648,7 @@ class VoiceoverDomainTests(test_utils.GenericTestBase):
             'or zero if not yet specified'):
             self.voiceover.validate()
 
-    def test_to_proto(self):
+    def test_voiceover_converted_to_proto_correctly(self):
         voiceover_proto = state_domain.Voiceover(
             'filename.mp3', 10, False, 15.0).to_proto()
         self.assertEqual(voiceover_proto.filename, 'filename.mp3')
@@ -5642,7 +5658,7 @@ class VoiceoverDomainTests(test_utils.GenericTestBase):
 
 class OutcomeDomainTests(test_utils.GenericTestBase):
 
-    def test_to_proto(self):
+    def test_outcome_converted_to_proto_correctly(self):
         subtitled_html_feedback = state_domain.SubtitledHtml(
             'content_id', '<p>html</p>')
         outcome_proto = state_domain.Outcome(
@@ -5655,7 +5671,7 @@ class OutcomeDomainTests(test_utils.GenericTestBase):
 
 class AnswerGroupDomainTests(test_utils.GenericTestBase):
 
-    def test_to_proto(self):
+    def test_answer_group_converted_to_proto_correctly(self):
         answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 'Second', state_domain.SubtitledHtml(
@@ -5687,7 +5703,7 @@ class AnswerGroupDomainTests(test_utils.GenericTestBase):
 
 class HintDomainTests(test_utils.GenericTestBase):
 
-    def test_to_proto(self):
+    def test_hint_converted_to_proto_correctly(self):
         hint_1 = state_domain.Hint(
             state_domain.SubtitledHtml(
                     'hint_id_1', '<p>Hint 1</p>'))
@@ -5700,7 +5716,7 @@ class HintDomainTests(test_utils.GenericTestBase):
 
 class SolutionDomainTests(test_utils.GenericTestBase):
 
-    def test_to_proto(self):
+    def test_solution_converted_to_proto_correctly(self):
         solution = state_domain.Solution(
             'TextInput', False, 'Solution', state_domain.SubtitledHtml(
                 'solution', '<p>This is a solution.</p>'))
