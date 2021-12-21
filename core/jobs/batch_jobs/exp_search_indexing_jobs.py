@@ -63,6 +63,7 @@ class IndexExplorationsInSearchJob(base_jobs.JobBase):
                 max_batch_size=self.MAX_BATCH_SIZE)
             | 'Index batches of models' >> beam.ParDo(
                 IndexExplorationSummaries())
+            | 'Index batches of models' >> beam.Filter(False)
             | 'Count the output' >> (
                 job_result_transforms.ResultsToJobRunResults())
         )
