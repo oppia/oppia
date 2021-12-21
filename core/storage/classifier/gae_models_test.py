@@ -383,10 +383,10 @@ class StateTrainingJobsMappingModelUnitTests(test_utils.GenericTestBase):
         state_training_jobs_mappings: List[
             classifier_domain.StateTrainingJobsMapping] = []
         state_training_jobs_mappings.append(
-            classifier_domain.StateTrainingJobsMapping( # type: ignore[no-untyped-call]
+            classifier_domain.StateTrainingJobsMapping(
                 u'1', 1, 'Home', {'algorithm_id': 'job_id1'}))
         state_training_jobs_mappings.append(
-            classifier_domain.StateTrainingJobsMapping( # type: ignore[no-untyped-call]
+            classifier_domain.StateTrainingJobsMapping(
                 u'1', 2, 'Home', {'algorithm_id': 'job_id2'}))
 
         state_training_jobs_mappings_model = cast(

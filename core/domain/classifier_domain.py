@@ -23,8 +23,30 @@ from core import feconf
 from core import utils
 from core.platform import models
 
+from typing import Dict, List, Union
+from typing_extensions import TypedDict
+
 (classifier_models,) = models.Registry.import_models(
     [models.NAMES.classifier])
+
+TrainingDataType = Union[
+    Dict[str, Union[int, List[str]]], List[Dict[str, Union[int, List[str]]]]
+]
+
+
+class ClassifierTrainingJobDict(TypedDict):
+    """Dictionary that represents ClassifierTrainingJob."""
+
+    job_id: str
+    algorithm_id: str
+    interaction_id: str
+    exp_id: str
+    exp_version: int
+    next_scheduled_check_time: datetime.datetime
+    state_name: str
+    status: str
+    training_data: TrainingDataType
+    algorithm_version: int
 
 
 class ClassifierTrainingJob:
@@ -76,9 +98,18 @@ class ClassifierTrainingJob:
     """
 
     def __init__(
-            self, job_id, algorithm_id, interaction_id, exp_id,
-            exp_version, next_scheduled_check_time, state_name, status,
-            training_data, algorithm_version):
+        self,
+        job_id: str,
+        algorithm_id: str,
+        interaction_id: str,
+        exp_id: str,
+        exp_version: int,
+        next_scheduled_check_time: datetime.datetime,
+        state_name: str,
+        status: str,
+        training_data: TrainingDataType,
+        algorithm_version: int
+    ) -> None:
         """Constructs a ClassifierTrainingJob domain object.
 
         Args:
@@ -127,7 +158,7 @@ class ClassifierTrainingJob:
         self._algorithm_version = algorithm_version
 
     @property
-    def job_id(self):
+    def job_id(self) -> str:
         """Returns the job_id of the classifier training job.
 
         Returns:
@@ -136,7 +167,7 @@ class ClassifierTrainingJob:
         return self._job_id
 
     @property
-    def algorithm_id(self):
+    def algorithm_id(self) -> str:
         """Returns the algorithm_id of the algorithm used for generating
         the classifier.
 
@@ -146,7 +177,7 @@ class ClassifierTrainingJob:
         return self._algorithm_id
 
     @property
-    def interaction_id(self):
+    def interaction_id(self) -> str:
         """Returns the interaction_id to which the algorithm belongs.
 
         Returns:
@@ -155,7 +186,7 @@ class ClassifierTrainingJob:
         return self._interaction_id
 
     @property
-    def exp_id(self):
+    def exp_id(self) -> str:
         """Returns the exploration id for which the classifier will be
         generated.
 
@@ -166,7 +197,7 @@ class ClassifierTrainingJob:
         return self._exp_id
 
     @property
-    def exp_version(self):
+    def exp_version(self) -> int:
         """Returns the exploration version.
 
         Returns:
@@ -176,7 +207,7 @@ class ClassifierTrainingJob:
         return self._exp_version
 
     @property
-    def next_scheduled_check_time(self):
+    def next_scheduled_check_time(self) -> datetime.datetime:
         """Returns the next scheduled time to check the job.
 
         Returns:
@@ -185,7 +216,7 @@ class ClassifierTrainingJob:
         return self._next_scheduled_check_time
 
     @property
-    def state_name(self):
+    def state_name(self) -> str:
         """Returns the state_name for which the classifier will be generated.
 
         Returns:
@@ -195,7 +226,7 @@ class ClassifierTrainingJob:
         return self._state_name
 
     @property
-    def status(self):
+    def status(self) -> str:
         """Returns the status of the training job request.
 
         Returns:
@@ -206,7 +237,7 @@ class ClassifierTrainingJob:
         return self._status
 
     @property
-    def training_data(self):
+    def training_data(self) -> TrainingDataType:
         """Returns the training data used for training the classifier.
 
         Returns:
@@ -228,7 +259,7 @@ class ClassifierTrainingJob:
         return self._training_data
 
     @property
-    def classifier_data_filename(self):
+    def classifier_data_filename(self) -> str:
         """Returns file name of the GCS file which stores classifier data
         for this training job.
 
@@ -238,7 +269,7 @@ class ClassifierTrainingJob:
         return '%s-classifier-data.pb.xz' % (self.job_id)
 
     @property
-    def algorithm_version(self):
+    def algorithm_version(self) -> int:
         """Returns the algorithm version of the classifier.
 
         Returns:
@@ -247,7 +278,7 @@ class ClassifierTrainingJob:
         """
         return self._algorithm_version
 
-    def update_status(self, status):
+    def update_status(self, status: str) -> None:
         """Updates the status attribute of the ClassifierTrainingJob domain
         object.
 
@@ -262,7 +293,7 @@ class ClassifierTrainingJob:
                     initial_status, status))
         self._status = status
 
-    def to_dict(self):
+    def to_dict(self) -> ClassifierTrainingJobDict:
         """Constructs a dict representation of training job domain object.
 
         Returns:
@@ -282,51 +313,19 @@ class ClassifierTrainingJob:
             'algorithm_version': self._algorithm_version
         }
 
-    def validate(self):
+    def validate(self) -> None:
         """Validates the training job before it is saved to storage."""
 
         algorithm_ids = []
-        if not isinstance(self.job_id, str):
-            raise utils.ValidationError(
-                'Expected id to be a string, received %s' % self.job_id)
-
-        if not isinstance(self.exp_id, str):
-            raise utils.ValidationError(
-                'Expected exp_id to be a string, received %s' % self.exp_id)
-
-        if not isinstance(self.exp_version, int):
-            raise utils.ValidationError(
-                'Expected exp_version to be an int, received %s' %
-                self.exp_version)
-
-        if not isinstance(self.next_scheduled_check_time, datetime.datetime):
-            raise utils.ValidationError(
-                'Expected next_scheduled_check_time to be datetime,' +
-                ' received %s' % self.next_scheduled_check_time)
-
-        if not isinstance(self.state_name, str):
-            raise utils.ValidationError(
-                'Expected state to be a string, received %s' % self.state_name)
         utils.require_valid_name(self.state_name, 'the state name')
-
         if self.status not in feconf.ALLOWED_TRAINING_JOB_STATUSES:
             raise utils.ValidationError(
                 'Expected status to be in %s, received %s'
                 % (feconf.ALLOWED_TRAINING_JOB_STATUSES, self.status))
 
-        if not isinstance(self.interaction_id, str):
-            raise utils.ValidationError(
-                'Expected interaction_id to be a string, received %s' %
-                self.interaction_id)
-
         if self.interaction_id not in feconf.INTERACTION_CLASSIFIER_MAPPING:
             raise utils.ValidationError(
                 'Invalid interaction id: %s' % self.interaction_id)
-
-        if not isinstance(self.algorithm_id, str):
-            raise utils.ValidationError(
-                'Expected algorithm_id to be a string, received %s' %
-                self.algorithm_id)
 
         algorithm_ids = [
             classifier_details['algorithm_id'] for classifier_details in
@@ -348,19 +347,15 @@ class ClassifierTrainingJob:
             if 'answers' not in grouped_answers:
                 raise utils.ValidationError(
                     'Expected answers to be a key in training_data list item')
-            if not isinstance(grouped_answers['answer_group_index'], int):
-                raise utils.ValidationError(
-                    'Expected answer_group_index to be an int, received %s' %
-                    grouped_answers['answer_group_index'])
-            if not isinstance(grouped_answers['answers'], list):
-                raise utils.ValidationError(
-                    'Expected answers to be a list, received %s' %
-                    grouped_answers['answers'])
 
-        if not isinstance(self.algorithm_version, int):
-            raise utils.ValidationError(
-                'Expected algorithm_version to be an int, received %s' %
-                self.algorithm_version)
+
+class StateTrainingJobsMappingDict(TypedDict):
+    """Dictionary that represents StateTrainingJobsMapping."""
+
+    exp_id: str
+    exp_version: int
+    state_name: str
+    algorithm_ids_to_job_ids: Dict[str, str]
 
 
 class StateTrainingJobsMapping:
@@ -387,7 +382,12 @@ class StateTrainingJobsMapping:
     """
 
     def __init__(
-            self, exp_id, exp_version, state_name, algorithm_ids_to_job_ids):
+        self,
+        exp_id: str,
+        exp_version: int,
+        state_name: str,
+        algorithm_ids_to_job_ids: Dict[str, str]
+    ) -> None:
         """Constructs a StateTrainingJobsMapping domain object.
 
         Args:
@@ -406,7 +406,7 @@ class StateTrainingJobsMapping:
         self._algorithm_ids_to_job_ids = algorithm_ids_to_job_ids
 
     @property
-    def exp_id(self):
+    def exp_id(self) -> str:
         """Returns the exploration id.
 
         Returns:
@@ -415,7 +415,7 @@ class StateTrainingJobsMapping:
         return self._exp_id
 
     @property
-    def exp_version(self):
+    def exp_version(self) -> int:
         """Returns the exploration version.
 
         Returns:
@@ -425,7 +425,7 @@ class StateTrainingJobsMapping:
         return self._exp_version
 
     @property
-    def state_name(self):
+    def state_name(self) -> str:
         """Returns the state_name to which the classifier belongs.
 
         Returns:
@@ -434,7 +434,7 @@ class StateTrainingJobsMapping:
         return self._state_name
 
     @property
-    def algorithm_ids_to_job_ids(self):
+    def algorithm_ids_to_job_ids(self) -> Dict[str, str]:
         """Returns the algorithm_ids_to_job_ids of the training jobs.
 
         Returns:
@@ -443,7 +443,7 @@ class StateTrainingJobsMapping:
         """
         return self._algorithm_ids_to_job_ids
 
-    def to_dict(self):
+    def to_dict(self) -> StateTrainingJobsMappingDict:
         """Constructs a dict representation of StateTrainingJobsMapping
         domain object.
 
@@ -459,39 +459,12 @@ class StateTrainingJobsMapping:
             'algorithm_ids_to_job_ids': self._algorithm_ids_to_job_ids
         }
 
-    def validate(self):
+    def validate(self) -> None:
         """Validates the mapping before it is saved to storage."""
 
-        if not isinstance(self.exp_id, str):
+        if not self.exp_version > 0:
             raise utils.ValidationError(
-                'Expected exp_id to be a string, received %s' % self.exp_id)
-
-        if not isinstance(self.exp_version, int):
-            raise utils.ValidationError(
-                'Expected exp_version to be an int, received %s' % (
-                    self.exp_version))
-
-        if not isinstance(self.state_name, str):
-            raise utils.ValidationError(
-                'Expected state_name to be a string, received %s' % (
-                    self.state_name))
-
-        if not isinstance(self.algorithm_ids_to_job_ids, dict):
-            raise utils.ValidationError(
-                'Expected algorithm_ids_to_job_ids to be a dict, '
-                'received %s' % (
-                    self.algorithm_ids_to_job_ids))
-
-        for algorithm_id in self.algorithm_ids_to_job_ids:
-            if not isinstance(algorithm_id, str):
-                raise utils.ValidationError(
-                    'Expected algorithm_id to be str, received %s' % (
-                        algorithm_id))
-
-            if not isinstance(self.algorithm_ids_to_job_ids[algorithm_id], str):
-                raise utils.ValidationError(
-                    'Expected job_id to be str, received %s' % (
-                        self.algorithm_ids_to_job_ids[algorithm_id]))
+                    'Expected version to be greater than 0')
 
 
 class OppiaMLAuthInfo:
@@ -504,7 +477,12 @@ class OppiaMLAuthInfo:
         signature: str. The authentication signature signed by Oppia ML.
     """
 
-    def __init__(self, message, vm_id, signature):
+    def __init__(
+        self,
+        message: str,
+        vm_id: str,
+        signature: str
+    ) -> None:
         """Creates new OppiaMLAuthInfo object.
 
         Args:
@@ -517,16 +495,16 @@ class OppiaMLAuthInfo:
         self._signature = signature
 
     @property
-    def message(self):
+    def message(self) -> str:
         """Returns the message sent by OppiaML."""
         return self._message
 
     @property
-    def vm_id(self):
+    def vm_id(self) -> str:
         """Returns the vm_id of OppiaML VM."""
         return self._vm_id
 
     @property
-    def signature(self):
+    def signature(self) -> str:
         """Returns the signature sent by OppiaML."""
         return self._signature
