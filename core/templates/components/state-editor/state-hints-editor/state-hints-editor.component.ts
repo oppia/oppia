@@ -60,7 +60,7 @@ angular.module('oppia').component('stateHintsEditor', {
   },
   template: require('./state-hints-editor.component.html'),
   controller: [
-    '$filter', '$scope', '$uibModal', 'AlertsService',
+    '$filter', '$rootScope', '$scope', '$uibModal', 'AlertsService',
     'EditabilityService', 'ExternalSaveService', 'NgbModal',
     'StateEditorService', 'StateHintsService',
     'StateInteractionIdService', 'StateNextContentIdIndexService',
@@ -68,7 +68,7 @@ angular.module('oppia').component('stateHintsEditor', {
     'UrlInterpolationService', 'WindowDimensionsService',
     'INTERACTION_SPECS',
     function(
-        $filter, $scope, $uibModal, AlertsService,
+        $filter, $rootScope, $scope, $uibModal, AlertsService,
         EditabilityService, ExternalSaveService, NgbModal,
         StateEditorService, StateHintsService,
         StateInteractionIdService, StateNextContentIdIndexService,
@@ -138,6 +138,7 @@ angular.module('oppia').component('stateHintsEditor', {
           StateNextContentIdIndexService.saveDisplayedValue();
           ctrl.onSaveNextContentIdIndex(
             StateNextContentIdIndexService.displayed);
+          $rootScope.$apply();
         }, function() {
           AlertsService.clearWarnings();
         });
