@@ -89,7 +89,6 @@ class FindDuplicateBlogPostSummaryTitlesJob(base_jobs.JobBase):
                 ])
         )
 
-#Owner id get email -> collections, collection rights model.
 
 class FindDuplicateBlogPostSummaryUrlsJob(base_jobs.JobBase):
     """Validates that all the Blog Post Summary Model have unique url."""

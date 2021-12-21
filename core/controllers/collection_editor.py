@@ -30,7 +30,6 @@ from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import summary_services
 
-# can disble from here 
 
 def _require_valid_version(version_from_payload, collection_version):
     """Check that the payload version matches the given collection version."""
@@ -197,7 +196,6 @@ class CollectionRightsHandler(CollectionEditorHandler):
 
 
 class CollectionPublishHandler(base.BaseHandler):
-    # this is the one -> return an error is user tries to publish or make change
     """Handles the publication of the given collection."""
 
     URL_PATH_ARGS_SCHEMAS = {
