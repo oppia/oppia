@@ -22,6 +22,7 @@
     "color-hex-length": "short",
     "declaration-colon-space-after": "always",
     "declaration-colon-space-before": "never",
+    "indentation": 2,
     "order/properties-alphabetical-order": true,
     "length-zero-no-unit": true
   }

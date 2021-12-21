@@ -250,6 +250,7 @@ def _get_linters_for_file_extension(file_extension_to_lint, namespace, files):
 
         config_path_for_css_in_html = os.path.join(
             parent_dir, 'oppia', '.stylelintrc')
+        print(files['.html'])
         custom_linter, third_party_linter = css_linter.get_linters(
             config_path_for_css_in_html, files['.html'])
         third_party_linters.append(third_party_linter)
