@@ -134,14 +134,15 @@ describe('Skill Misconception Editor Directive', function() {
   });
 
   it('should open add misconception modal when clicking on add ' +
-    'button', fakeAsync(function() {
+    'button', fakeAsync(() => {
     $scope.skill = sampleSkill;
-    let deferred = $q.defer();
-    deferred.resolve({
-      misconception: sampleMisconception
+    let modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return ({
+        result: Promise.resolve({
+          misconception: sampleMisconception
+        })
+      }) as NgbModalRef;
     });
-    let modalSpy = spyOn($uibModal, 'open').and.returnValue(
-      {result: deferred.promise});
     let addMisconceptionSpy = spyOn(
       skillUpdateService, 'addMisconception').and.returnValue(null);
 
@@ -155,11 +156,12 @@ describe('Skill Misconception Editor Directive', function() {
   }));
 
   it('should close add misconception modal when clicking on close ' +
-    'button', function() {
-    let deferred = $q.defer();
-    deferred.reject();
-    let modalSpy = spyOn($uibModal, 'open').and.returnValue(
-      {result: deferred.promise});
+    'button', fakeAsync(() => {
+    let modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return ({
+        result: Promise.reject()
+      }) as NgbModalRef;
+    });
     let addMisconceptionSpy = spyOn(
       skillUpdateService, 'addMisconception').and.returnValue(null);
 
@@ -168,7 +170,7 @@ describe('Skill Misconception Editor Directive', function() {
 
     expect(modalSpy).toHaveBeenCalled();
     expect(addMisconceptionSpy).not.toHaveBeenCalled();
-  });
+  }));
 
   it('should open delete misconception modal when clicking on delete ' +
     'button', fakeAsync(function() {
