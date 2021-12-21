@@ -149,6 +149,7 @@ class BaseHandler(webapp2.RequestHandler):
     POST_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     PUT_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     DELETE_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    HEAD_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     # Using Dict[str, Any] here because the following schema can have a
     # recursive structure and currently mypy doesn't support recursive type
@@ -326,11 +327,12 @@ class BaseHandler(webapp2.RequestHandler):
         schema_validation_succeeded = True
         try:
             self.vaidate_and_normalize_args()
-        except (self.InvalidInputException, NotImplementedError,
+        except (
+                self.InvalidInputException, NotImplementedError,
                 self.InternalErrorException) as e:
             self.handle_exception(e, self.app.debug)
             schema_validation_succeeded = False
-        # TODO(#13155): Remove this clause once all the handlers have had
+        # TODO(#13155): Remove this clause once all the handlers have had.
         if not schema_validation_succeeded:
             return
 
@@ -347,7 +349,10 @@ class BaseHandler(webapp2.RequestHandler):
         request_method = self.request.environ['REQUEST_METHOD']
         url_path_args = self.request.route_kwargs
 
-        if handler_class_name in handler_schema_constants.HANDLER_CLASS_NAMES_WITH_NO_SCHEMA:
+        if (
+                handler_class_name in
+                handler_schema_constants.HANDLER_CLASS_NAMES_WITH_NO_SCHEMA
+        ):
             if self.URL_PATH_ARGS_SCHEMAS or self.HANDLER_ARGS_SCHEMAS:
                 raise self.InternalErrorException(
                     'Remove handler from '
@@ -646,6 +651,9 @@ class BaseHandler(webapp2.RequestHandler):
         elif method == 'DELETE':
             self._render_exception_json_or_html(
                 self.DELETE_HANDLER_ERROR_RETURN_TYPE, values)
+        elif method == 'HEAD':
+            self._render_exception_json_or_html(
+                self.HEAD_HANDLER_ERROR_RETURN_TYPE, values)
         else:
             logging.warning('Not a recognized request method.')
             self._render_exception_json_or_html(None, values)
