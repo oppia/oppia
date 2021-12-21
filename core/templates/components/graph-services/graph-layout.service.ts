@@ -239,25 +239,7 @@ export class StateGraphLayoutService {
     var SENTINEL_OFFSET = -1;
 
     var nodeData: NodeDataDict = {};
-    // Creating a temporary nodeData, just to initialize
-    // x0 , y0, yLabel, xLabel, height, width, id and label with null.
-    // var nodeDataTemp: {
-    //   [nodeId: string]: {
-    //     depth: number;
-    //     offset: number;
-    //     reachable: boolean;
-    //     y0: number | null;
-    //     x0: number | null;
-    //     yLabel: number | null;
-    //     xLabel: number | null;
-    //     height: number | null;
-    //     width: number | null;
-    //     id: string | null;
-    //     label: string | null;
-    //     reachableFromEnd: boolean;
-    //   };
-    // } = {};
-
+    
     for (var nodeId in nodes) {
       nodeData[nodeId].depth = SENTINEL_DEPTH;
       nodeData[nodeId].offset = SENTINEL_OFFSET;
