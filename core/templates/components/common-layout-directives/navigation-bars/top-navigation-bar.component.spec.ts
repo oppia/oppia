@@ -280,12 +280,15 @@ describe('TopNavigationBarComponent', () => {
   });
 
   it('should toggle side bar', () => {
+    const clickEvent = new CustomEvent('click');
     spyOn(sidebarStatusService, 'isSidebarShown').and.returnValues(false, true);
     spyOn(wds, 'isWindowNarrow').and.returnValue(true);
+    spyOn(sidebarStatusService, 'toggleHamburgerIconStatus');
+    spyOn(clickEvent, 'stopPropagation');
+
     expect(component.isSidebarShown()).toBe(false);
-
-    component.toggleSidebar();
-
+    component.toggleSidebar(clickEvent);
+    expect(sidebarStatusService.toggleHamburgerIconStatus).toHaveBeenCalled();
     expect(component.isSidebarShown()).toBe(true);
   });
 
@@ -380,8 +383,8 @@ describe('TopNavigationBarComponent', () => {
       I18N_TOPNAV_DONATE: true,
       I18N_TOPNAV_LEARN: true,
       I18N_TOPNAV_ABOUT: true,
-      I18N_CREATE_EXPLORATION_CREATE: true,
-      I18N_TOPNAV_LIBRARY: true
+      I18N_TOPNAV_LIBRARY: true,
+      I18N_TOPNAV_HOME: true
     };
 
     component.truncateNavbar();
@@ -392,8 +395,8 @@ describe('TopNavigationBarComponent', () => {
         I18N_TOPNAV_DONATE: false,
         I18N_TOPNAV_LEARN: true,
         I18N_TOPNAV_ABOUT: true,
-        I18N_CREATE_EXPLORATION_CREATE: true,
-        I18N_TOPNAV_LIBRARY: true
+        I18N_TOPNAV_LIBRARY: true,
+        I18N_TOPNAV_HOME: true
       });
     });
   }));

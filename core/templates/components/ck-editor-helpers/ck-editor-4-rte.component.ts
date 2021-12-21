@@ -234,7 +234,11 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
       return html;
     }
     return html.replace(this.componentRe, (match, p1, p2, p3) => {
-      if (this.rteHelperService.isInlineComponent(p3)) {
+      // Here we remove the 'ckeditor' part of the string p3 to get the name
+      // of the RTE Component.
+      let rteComponentName = p3.split('-')[1];
+
+      if (this.rteHelperService.isInlineComponent(rteComponentName)) {
         return `<span type="oppia-noninteractive-${p3}">${match}</span>`;
       } else {
         return (

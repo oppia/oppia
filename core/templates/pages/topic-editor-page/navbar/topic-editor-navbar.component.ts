@@ -22,9 +22,6 @@ require(
 require(
   'components/common-layout-directives/common-elements/' +
   'loading-dots.component.ts');
-require(
-  'pages/topic-editor-page/modal-templates/' +
-  'topic-editor-save-modal.controller.ts');
 
 require('domain/classroom/classroom-domain.constants.ajs.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
@@ -33,20 +30,22 @@ require('pages/topic-editor-page/services/topic-editor-routing.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('services/alerts.service.ts');
 require('services/contextual/url.service.ts');
+require('services/ngb-modal.service.ts');
 
 import { Subscription } from 'rxjs';
+import { TopicEditorSaveModalComponent } from '../modal-templates/topic-editor-save-modal.component';
 
 angular.module('oppia').component('topicEditorNavbar', {
   template: require('./topic-editor-navbar.component.html'),
   controller: [
     '$rootScope', '$scope', '$uibModal', '$window', 'AlertsService',
-    'TopicEditorRoutingService', 'TopicEditorStateService',
-    'TopicRightsBackendApiService', 'UndoRedoService',
-    'UrlInterpolationService', 'UrlService',
-    'TOPIC_VIEWER_URL_TEMPLATE',
+    'NgbModal', 'TopicEditorRoutingService',
+    'TopicEditorStateService', 'TopicRightsBackendApiService',
+    'UndoRedoService', 'UrlInterpolationService',
+    'UrlService', 'TOPIC_VIEWER_URL_TEMPLATE',
     function(
         $rootScope, $scope, $uibModal, $window, AlertsService,
-        TopicEditorRoutingService, TopicEditorStateService,
+        NgbModal, TopicEditorRoutingService, TopicEditorStateService,
         TopicRightsBackendApiService, UndoRedoService,
         UrlInterpolationService, UrlService,
         TOPIC_VIEWER_URL_TEMPLATE) {
@@ -147,16 +146,11 @@ angular.module('oppia').component('topicEditorNavbar', {
 
       $scope.saveChanges = function() {
         var topicIsPublished = $scope.topicRights.isPublished();
-        $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/topic-editor-page/modal-templates/' +
-                'topic-editor-save-modal.template.html'),
+        let modelRef = NgbModal.open(TopicEditorSaveModalComponent, {
           backdrop: 'static',
-          resolve: {
-            topicIsPublished: () => topicIsPublished
-          },
-          controller: 'TopicEditorSaveModalController'
-        }).result.then(function(commitMessage) {
+        });
+        modelRef.componentInstance.topicIsPublished = topicIsPublished;
+        modelRef.result.then(function(commitMessage) {
           TopicEditorStateService.saveTopic(commitMessage, () => {
             AlertsService.addSuccessMessage('Changes Saved.');
             $rootScope.$applyAsync();
