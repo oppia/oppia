@@ -325,16 +325,12 @@ class BaseHandler(webapp2.RequestHandler):
 
         schema_validation_succeeded = True
         try:
-            self.validate_and_normalize_args()
-        except self.InvalidInputException as e:
+            self.vaidate_and_normalize_args()
+        except (self.InvalidInputException, NotImplementedError,
+                self.InternalErrorException) as e:
             self.handle_exception(e, self.app.debug)
             schema_validation_succeeded = False
         # TODO(#13155): Remove this clause once all the handlers have had
-        # schema validation implemented.
-        except NotImplementedError as e:
-            self.handle_exception(e, self.app.debug)
-            schema_validation_succeeded = False
-
         if not schema_validation_succeeded:
             return
 
@@ -351,12 +347,11 @@ class BaseHandler(webapp2.RequestHandler):
         request_method = self.request.environ['REQUEST_METHOD']
         url_path_args = self.request.route_kwargs
 
-        if (
-            handler_class_name in
-            handler_schema_constants.HANDLER_CLASS_NAMES_WITH_NO_SCHEMA
-        ):
-            # TODO(#13155): Remove this clause once all the handlers have had
-            # schema validation implemented.
+        if handler_class_name in handler_schema_constants.HANDLER_CLASS_NAMES_WITH_NO_SCHEMA:
+            if self.URL_PATH_ARGS_SCHEMAS or self.HANDLER_ARGS_SCHEMAS:
+                raise self.InternalErrorException(
+                    'Remove handler from '
+                    'HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS')
             return
 
         handler_args = {}
@@ -413,7 +408,7 @@ class BaseHandler(webapp2.RequestHandler):
         # This check ensures that if a request method is not defined
         # in the handler class then schema validation will not raise
         # NotImplementedError for that corresponding request method.
-        if request_method in ['GET', 'POST', 'PUT', 'DELETE'] and (
+        if request_method in ['GET', 'POST', 'PUT', 'DELETE', 'HEAD'] and (
                 getattr(self.__class__, request_method.lower()) ==
                 getattr(BaseHandler, request_method.lower())):
             return
@@ -508,6 +503,14 @@ class BaseHandler(webapp2.RequestHandler):
 
     def delete(self, *args):  # pylint: disable=unused-argument
         """Base method to handle DELETE requests.
+
+        Raises:
+            PageNotFoundException. Page not found error (error code 404).
+        """
+        raise self.PageNotFoundException
+
+    def head(self, *args):  # pylint: disable=unused-argument
+        """Base method to handle HEAD requests.
 
         Raises:
             PageNotFoundException. Page not found error (error code 404).

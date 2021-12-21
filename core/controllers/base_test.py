@@ -1025,6 +1025,11 @@ class CheckAllHandlersHaveDecoratorTests(test_utils.GenericTestBase):
                 handlers_checked.append(
                     (handler.__name__, 'DELETE', handler_is_decorated))
 
+            if handler.head != base.BaseHandler.head:
+                handler_is_decorated = hasattr(handler.delete, '__wrapped__')
+                handlers_checked.append(
+                    (handler.__name__, 'HEAD', handler_is_decorated))
+
         self.log_line('Verifying decorators for handlers .... ')
         for (name, method, handler_is_decorated) in handlers_checked:
             self.log_line('%s %s method: %s' % (
@@ -1812,6 +1817,52 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
         with self.swap(self, 'testapp', self.mock_testapp4):
             self.put_json('/mock_play_exploration', {}, csrf_token=csrf_token)
         self.logout()
+
+
+class HandlerClassWithSchemaInStillNeedsSchemaListRaiseErrorTest(
+        test_utils.GenericTestBase):
+    """This test ensures that, InternalServerError is raised for
+    the request with handler class which has schema but is still in
+    HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS.
+    """
+
+    class MockHandler(base.BaseHandler):
+        """Mock handler with schema.
+        """
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {
+            'POST': {
+                'arg_a': {
+                    'schema': {
+                        'type': 'basestring'
+                    }
+                }
+            }
+        }
+
+        def post(self):
+            return self.render_json({})
+
+    def setUp(self):
+        super(HandlerClassWithSchemaInStillNeedsSchemaListRaiseErrorTest,
+              self).setUp()
+        user_id = user_services.get_user_id_from_username('learneruser')
+        self.csrf_token = base.CsrfTokenManager.create_csrf_token(user_id)
+        self.payload = {'arg_a': 'val'}
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock', self.MockHandler, name='MockHandler')],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_post_request_raise_internal_server_error(self):
+        test_app_ctx = self.swap(self, 'testapp', self.testapp)
+        handler_class_still_needs_schema_list_ctx = self.swap(
+            payload_validator, 'HANDLER_CLASS_NAMES_WITH_NO_SCHEMA',
+            ['MockHandler'])
+        with test_app_ctx, handler_class_still_needs_schema_list_ctx:
+            self.post_json(
+                '/mock', self.payload, csrf_token=self.csrf_token,
+                expected_status_int=500)
 
 
 class RequestMethodNotInHandlerClassDoNotRaiseMissingSchemaErrorTest(
