@@ -73,9 +73,9 @@ describe('Add Misconception Modal Component', function() {
     ngbActiveModal = TestBed.inject(NgbActiveModal);
 
     let misconceptionDict1 = {
-        id: '2',
-        name: 'test name 2',
-        notes: 'test notes',
+      id: '2',
+      name: 'test name 2',
+      notes: 'test notes',
       feedback: 'test feedback',
       must_be_addressed: true
     };
@@ -119,17 +119,17 @@ describe('Add Misconception Modal Component', function() {
   });
 
   it('should initialize $scope properties after controller is initialized',
-  () => {
-    expect(component.skill).toEqual(skillObject);
-    expect(component.misconceptionName).toBe('');
-    expect(component.misconceptionNotes).toBe('');
-    expect(component.misconceptionFeedback).toBe('');
-    expect(component.misconceptionMustBeAddressed).toBe(true);
-    expect(component.misconceptionNameIsDuplicate).toBe(false);
-    expect(component.existingMisconceptionNames).toEqual(
-      ['test name 2', 'test name 3']
-    );
-  });
+    () => {
+      expect(component.skill).toEqual(skillObject);
+      expect(component.misconceptionName).toBe('');
+      expect(component.misconceptionNotes).toBe('');
+      expect(component.misconceptionFeedback).toBe('');
+      expect(component.misconceptionMustBeAddressed).toBe(true);
+      expect(component.misconceptionNameIsDuplicate).toBe(false);
+      expect(component.existingMisconceptionNames).toEqual(
+        ['test name 2', 'test name 3']
+      );
+    });
 
   it('should save misconception when closing the modal', () => {
     spyOn(ngbActiveModal, 'close');

@@ -26,7 +26,7 @@ import { Skill } from 'domain/skill/SkillObjectFactory';
 import { SkillEditorStateService } from '../services/skill-editor-state.service';
 
 interface MisconceptionFormSchema {
-  type: 'html',
+  type: 'html';
   'ui_config': object;
 }
 
@@ -49,13 +49,13 @@ export class AddMisconceptionModalComponent
     type: 'html',
     ui_config: {
       startupFocusEnabled: false
-    }}
+    }};
   MISCONCEPTION_FEEDBACK_PROPERTY_FORM_SCHEMA: MisconceptionFormSchema = {
     type: 'html',
     ui_config: {
       hide_complex_extensions: true,
       startupFocusEnabled: false
-    }}
+    }};
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -65,7 +65,7 @@ export class AddMisconceptionModalComponent
   ) {
     super(ngbActiveModal);
   }
-  
+
   ngOnInit(): void {
     this.misconceptionName = '';
     this.misconceptionNotes = '';
@@ -112,12 +112,12 @@ export class AddMisconceptionModalComponent
         this.misconceptionNotes,
         this.misconceptionFeedback,
         this.misconceptionMustBeAddressed)
-    })
+    });
   }
 
   checkIfMisconceptionNameIsDuplicate(): void {
     this.misconceptionNameIsDuplicate = (
       this.existingMisconceptionNames.includes(this.misconceptionName)
-    )
+    );
   }
 }
