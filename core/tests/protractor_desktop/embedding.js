@@ -148,24 +148,6 @@ describe('Embedding', function() {
       await explorationPlayerPage.submitAnswer('TextInput', 'factorial');
       await explorationPlayerPage.clickThroughToNextCard();
       await explorationPlayerPage.expectExplorationToBeOver();
-      await general.checkForConsoleErrors([
-        'http:\/\/localhost:9001\/assets\/scripts\/' +
-        'embedding_tests_dev_i18n_0.0.1.html - Refused to display ' +
-        '\'http:\/\/localhost:9001\/\' in a frame because it set ' +
-        '\'X-Frame-Options\' to \'deny\'.',
-        'chrome-error:\/\/chromewebdata\/ - Failed to load resource: the server ' +
-        'responded with a status of 400 ()',
-        'chrome-error:\/\/chromewebdata\/ - Failed to load resource: the server ' +
-        'responded with a status of 404 ()',
-        'http:\/\/localhost:9001\/assets\/scripts\/' +
-        'embedding_tests_dev_0.0.1.min.html - Refused to display ' +
-        '\'http:\/\/localhost:9001\/\' in a frame because it set ' +
-        '\'X-Frame-Options\' to \'deny\'.',
-        'http:\/\/localhost:9001\/assets\/scripts\/' +
-        'embedding_tests_dev_0.0.2.min.html - Refused to display ' +
-        '\'http:\/\/localhost:9001\/\' in a frame because it set ' +
-        '\'X-Frame-Options\' to \'deny\'.',
-      ]);
     };
 
     var PLAYTHROUGH_LOGS = [
@@ -230,6 +212,7 @@ describe('Embedding', function() {
     // functions in the outer page; these send logs to the console which we
     // now check to ensure that the hooks work correctly.
     var browserLogs = await browser.manage().logs().get('browser');
+    debugger;
     var embeddingLogs = [];
     for (var i = 0; i < browserLogs.length; i++) {
       // We ignore all logs that are not of the desired form.
