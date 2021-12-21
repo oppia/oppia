@@ -70,7 +70,11 @@ def compile_and_check_typescript(config_path):
     print('Compiling and testing typescript...')
     cmd = ['./node_modules/typescript/bin/tsc', '--project', config_path]
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE, encoding='utf-8')
-    error_messages = [line for line in iter(process.stdout.readline, '')]
+
+    if os.path.exists(COMPILED_JS_DIR):
+        shutil.rmtree(COMPILED_JS_DIR)
+
+    error_messages = list(iter(process.stdout.readline, ''))
     if error_messages:
         print('Errors found during compilation\n')
         print('\n'.join(error_messages))
