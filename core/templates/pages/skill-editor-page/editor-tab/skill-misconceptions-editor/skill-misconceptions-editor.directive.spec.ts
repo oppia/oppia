@@ -34,7 +34,7 @@ import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { DeleteMisconceptionModalComponent } from 'pages/skill-editor-page/modal-templates/delete-misconception-modal.component';
 import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
 
-describe('Skill Misconception Editor Directive', function() {
+fdescribe('Skill Misconception Editor Directive', function() {
   let $scope = null;
   let ctrl = null;
   let $rootScope = null;
@@ -45,7 +45,6 @@ describe('Skill Misconception Editor Directive', function() {
   let windowDimensionsService: WindowDimensionsService = null;
   let ngbModal: NgbModal;
   let $uibModal = null;
-  let $q = null;
 
   let sampleSkill: Skill = null;
   let sampleMisconception: Misconception = null;
@@ -72,7 +71,6 @@ describe('Skill Misconception Editor Directive', function() {
     misconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
     windowDimensionsService = $injector.get('WindowDimensionsService');
     $uibModal = $injector.get('$uibModal');
-    $q = $injector.get('$q');
     ngbModal = TestBed.inject(NgbModal);
 
     sampleSkill = new Skill(

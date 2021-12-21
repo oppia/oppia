@@ -46,10 +46,10 @@ angular.module('oppia').directive('skillMisconceptionsEditor', [
         '/pages/skill-editor-page/editor-tab/skill-misconceptions-editor/' +
         'skill-misconceptions-editor.directive.html'),
       controller: [
-        '$rootScope', '$scope', '$uibModal', 'NgbModal',
+        '$rootScope', '$scope', 'NgbModal',
         'WindowDimensionsService',
         function(
-            $rootScope, $scope, $uibModal, NgbModal,
+            $rootScope, $scope, NgbModal,
             WindowDimensionsService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
