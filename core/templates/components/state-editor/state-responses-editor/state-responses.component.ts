@@ -16,6 +16,9 @@
  * @fileoverview Directive for managing the state responses in the state
  * editor.
  */
+import { DeleteAnswerGroupModalComponent } from
+  // eslint-disable-next-line max-len
+  'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-answer-group-modal.component';
 
 require(
   'components/common-layout-directives/common-elements/' +
@@ -88,6 +91,7 @@ require('services/html-escaper.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/external-save.service.ts');
 require('pages/interaction-specs.constants.ajs.ts');
+require('services/ngb-modal.service.ts');
 
 import { Misconception } from 'domain/skill/MisconceptionObjectFactory';
 import { Subscription } from 'rxjs';
@@ -109,7 +113,7 @@ angular.module('oppia').component('stateResponses', {
   controller: [
     '$filter', '$scope', '$uibModal', 'AlertsService',
     'AnswerGroupObjectFactory',
-    'EditabilityService', 'ExternalSaveService', 'ResponsesService',
+    'EditabilityService', 'ExternalSaveService', 'NgbModal', 'ResponsesService',
     'StateCustomizationArgsService', 'StateEditorService',
     'StateInteractionIdService', 'StateNextContentIdIndexService',
     'StateSolicitAnswerDetailsService',
@@ -121,7 +125,7 @@ angular.module('oppia').component('stateResponses', {
     function(
         $filter, $scope, $uibModal, AlertsService,
         AnswerGroupObjectFactory,
-        EditabilityService, ExternalSaveService, ResponsesService,
+        EditabilityService, ExternalSaveService, NgbModal, ResponsesService,
         StateCustomizationArgsService, StateEditorService,
         StateInteractionIdService, StateNextContentIdIndexService,
         StateSolicitAnswerDetailsService,
@@ -354,12 +358,8 @@ angular.module('oppia').component('stateResponses', {
         evt.stopPropagation();
 
         AlertsService.clearWarnings();
-        $uibModal.open({
-          template: require(
-            'pages/exploration-editor-page/editor-tab/templates/' +
-            'modal-templates/delete-answer-group-modal.template.html'),
+        NgbModal.open(DeleteAnswerGroupModalComponent, {
           backdrop: true,
-          controller: 'ConfirmOrCancelModalController'
         }).result.then(function() {
           ResponsesService.deleteAnswerGroup(
             index, function(newAnswerGroups) {
