@@ -366,10 +366,6 @@ angular.module('oppia').component('contributionsAndReview', {
             .getReviewableTranslationSuggestionsAsync()
             .then(_handleLoadContribution);
         }
-
-        return new Promise((resolve, reject) => {
-          resolve({opportunitiesDicts: [], more: false});
-        });
       };
 
       ctrl.$onInit = function() {
