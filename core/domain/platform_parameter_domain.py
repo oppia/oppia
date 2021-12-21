@@ -34,6 +34,8 @@ from typing import Any, Dict
 # to PascalCase and its values to UPPER_CASE. Because we want to be consistent
 # throughout the codebase according to the coding style guide.
 # https://github.com/oppia/oppia/wiki/Coding-style-guide
+
+
 class SERVER_MODES(enum.Enum): # pylint: disable=invalid-name
     """Enum for server modes."""
 
