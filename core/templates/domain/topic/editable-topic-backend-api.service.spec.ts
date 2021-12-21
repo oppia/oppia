@@ -37,12 +37,6 @@ describe('Editable topic backend API service', () => {
         story_id: 'story_1',
         story_is_published: true
       }],
-      canonical_story_summary_dicts: [{
-        id: '0',
-        title: 'Title',
-        node_count: 1,
-        story_is_published: false
-      }],
       additional_story_references: [{
         story_id: 'story_2',
         story_is_published: true
@@ -51,6 +45,12 @@ describe('Editable topic backend API service', () => {
       subtopics: [],
       language_code: 'en'
     },
+    canonical_story_summary_dicts: [{
+      id: '0',
+      title: 'Title',
+      node_count: 1,
+      story_is_published: false
+    }],
     grouped_skill_summary_dicts: {},
     skill_id_to_description_dict: {
       skill_id_1: 'Description 1'
@@ -188,6 +188,9 @@ describe('Editable topic backend API service', () => {
     fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
+      // 'topic' is initialized before it's value is fetched from backend,
+      // hence we need to do non-null assertion, for more information see
+      // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
       let topic!: TopicBackendDict;
 
       // Loading a topic the first time should fetch it from the backend.
@@ -331,7 +334,8 @@ describe('Editable topic backend API service', () => {
 
     flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalled();
+    expect(successHandler).toHaveBeenCalledWith(
+      sampleDataResults.canonical_story_summary_dicts);
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
