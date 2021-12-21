@@ -43,6 +43,7 @@ describe('Add Misconception Modal Component', function() {
   let misconceptionObjectFactory: MisconceptionObjectFactory;
   let skillEditorStateService: SkillEditorStateService;
   let skillObjectFactory: SkillObjectFactory;
+  let skillObject: SkillObject;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -68,7 +69,46 @@ describe('Add Misconception Modal Component', function() {
     skillObjectFactory = TestBed.inject(SkillObjectFactory);
     ngbActiveModal = TestBed.inject(NgbActiveModal);
 
-    fixture.detectChanges();
+    let misconceptionDict1 = {
+        id: '2',
+        name: 'test name 2',
+        notes: 'test notes',
+      feedback: 'test feedback',
+      must_be_addressed: true
+    };
+    let misconceptionDict2 = {
+      id: '3',
+      name: 'test name 3',
+      notes: 'test notes',
+      feedback: 'test feedback',
+      must_be_addressed: true
+    };
+    let rubricDict = {
+      difficulty: 'easy',
+      explanations: ['explanation']
+    };
+    let skillContentsDict = {
+      explanation: {
+        html: 'test explanation',
+        content_id: 'explanation',
+      },
+      worked_examples: [],
+      recorded_voiceovers: {
+        voiceovers_mapping: {}
+      }
+    };
+    skillObject = skillObjectFactory.createFromBackendDict({
+      id: 'skill1',
+      description: 'test description 1',
+      misconceptions: [misconceptionDict1, misconceptionDict2],
+      rubrics: [rubricDict],
+      skill_contents: skillContentsDict,
+      language_code: 'en',
+      version: 3,
+      next_misconception_id: '3',
+      prerequisite_skill_ids: ['skill_1']
+    });
+   fixture.detectChanges();
   });
 
 });

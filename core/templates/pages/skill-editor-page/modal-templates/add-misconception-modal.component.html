@@ -64,7 +64,7 @@
     <button class="btn btn-secondary" (click)="cancel()" type="button">Cancel</button>
     <button class="btn btn-success protractor-test-confirm-add-misconception-button"
             (click)="saveMisconception()"
-            [disabled]="!this.misconceptionName || this.misconceptionNameIsDuplicate || this.misconceptionFeedback.length === 0"
+            [disabled]="!misconceptionName || misconceptionNameIsDuplicate || misconceptionFeedback.length === 0"
     >Save</button>
   </div>
 </div>
