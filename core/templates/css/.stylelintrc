@@ -9,7 +9,7 @@
     "selector-type-no-unknown": [
       true,
       {
-        ignore: ["custom-elements"]
+        "ignore": ["custom-elements"]
       }
     ],
     "block-closing-brace-newline-after": "always",

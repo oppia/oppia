@@ -1,6 +1,5 @@
 {
   "extends": ["stylelint-config-recommended", "stylelint-config-html"],
-  "processors": ["@mapbox/stylelint-processor-arbitrary-tags"],
   "plugins": [
     "stylelint-order"
   ],
@@ -23,6 +22,7 @@
     "declaration-colon-space-after": "always",
     "declaration-colon-space-before": "never",
     "indentation": 2,
+    "no-descending-specificity": true,
     "order/properties-alphabetical-order": true,
     "length-zero-no-unit": true
   }
