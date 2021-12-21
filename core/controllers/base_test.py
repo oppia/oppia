@@ -1857,7 +1857,7 @@ class HandlerClassWithSchemaInStillNeedsSchemaListRaiseErrorTest(
     def test_post_request_raise_internal_server_error(self):
         test_app_ctx = self.swap(self, 'testapp', self.testapp)
         handler_class_still_needs_schema_list_ctx = self.swap(
-            payload_validator, 'HANDLER_CLASS_NAMES_WITH_NO_SCHEMA',
+            handler_schema_constants, 'HANDLER_CLASS_NAMES_WITH_NO_SCHEMA',
             ['MockHandler'])
         with test_app_ctx, handler_class_still_needs_schema_list_ctx:
             self.post_json(
