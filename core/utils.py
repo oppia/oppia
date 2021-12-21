@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import base64
+import binascii
 import collections
 import datetime
 import hashlib
@@ -305,7 +306,7 @@ def convert_png_data_url_to_binary(image_data_url: str) -> bytes:
     """
     if image_data_url.startswith(PNG_DATA_URL_PREFIX):
         return base64.b64decode(
-            python_utils.urllib_unquote(
+            urllib.parse.unquote(
                 image_data_url[len(PNG_DATA_URL_PREFIX):]))
     else:
         raise Exception('The given string does not represent a PNG data URL.')
@@ -329,6 +330,22 @@ def convert_png_binary_to_data_url(content: bytes) -> str:
         )
     else:
         raise Exception('The given string does not represent a PNG image.')
+
+
+def is_base64_encoded(content: str) -> bool:
+    """Checks if a string is base64 encoded.
+
+    Args:
+        content: str. String to check.
+
+    Returns:
+        bool. True if a string is base64 encoded, False otherwise.
+    """
+    try:
+        base64.b64decode(content, validate=True)
+        return True
+    except binascii.Error:
+        return False
 
 
 def convert_png_to_data_url(filepath: str) -> str:
@@ -976,7 +993,7 @@ def unescape_encoded_uri_component(escaped_string: str) -> str:
     Returns:
         str. Decoded string that was initially encoded with encodeURIComponent.
     """
-    return python_utils.urllib_unquote(escaped_string)
+    return urllib.parse.unquote(escaped_string)
 
 
 def snake_case_to_camel_case(snake_str: str) -> str:
