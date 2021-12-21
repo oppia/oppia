@@ -335,6 +335,10 @@ angular.module('oppia').component('contributionsAndReview', {
           });
         }
 
+        // This function was refactored because after migrating the
+        // contribution-and-review service, its functions were not
+        // getting called properly using the previous method
+        // i.e. fetchFunction().
         if (ctrl.activeSuggestionType === SUGGESTION_TYPE_QUESTION &&
             ctrl.activeTabType === ctrl.TAB_TYPE_CONTRIBUTIONS) {
           return ContributionAndReviewService
