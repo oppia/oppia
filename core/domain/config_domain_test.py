@@ -24,6 +24,7 @@ from core import utils
 from core.domain import config_domain
 from core.platform import models
 from core.tests import test_utils
+from mypy_imports import config_models
 
 (config_models,) = models.Registry.import_models([models.NAMES.config])
 
@@ -103,7 +104,7 @@ class ConfigPropertyRegistryTests(test_utils.GenericTestBase):
                 False)
 
     def test_config_property_with_new_config_property_model(self) -> None:
-        config_model = config_models.ConfigPropertyModel(# type: ignore[attr-defined]
+        config_model = config_models.ConfigPropertyModel(
             id='config_model', value='new_value')
         config_model.commit(feconf.SYSTEM_COMMITTER_ID, [])
         retrieved_model = config_domain.ConfigProperty(

@@ -27,6 +27,9 @@ from core.platform import models
 
 from typing import Any, Dict, List
 
+from mypy_imports import config_models
+from mypy_imports import suggestion_models
+
 (config_models, suggestion_models,) = models.Registry.import_models(
     [models.NAMES.config, models.NAMES.suggestion])
 
@@ -260,7 +263,7 @@ class ConfigProperty:
         if self.name in memcached_items:
             return memcached_items[self.name]
 
-        datastore_item = config_models.ConfigPropertyModel.get( # type: ignore[attr-defined]
+        datastore_item = config_models.ConfigPropertyModel.get(
             self.name, strict=False)
         if datastore_item is not None:
             caching_services.set_multi(
@@ -279,10 +282,10 @@ class ConfigProperty:
         value = self.normalize(raw_value)
 
         # Set value in datastore.
-        model_instance = config_models.ConfigPropertyModel.get( # type: ignore[attr-defined]
+        model_instance = config_models.ConfigPropertyModel.get(
             self.name, strict=False)
         if model_instance is None:
-            model_instance = config_models.ConfigPropertyModel( # type: ignore[attr-defined]
+            model_instance = config_models.ConfigPropertyModel(
                 id=self.name)
         model_instance.value = value
         model_instance.commit(
@@ -498,7 +501,7 @@ ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW = ConfigProperty(
         'Enable sending admins email notifications if there are Contributor '
         'Dashboard suggestions that have been waiting for a review for more '
         'than %s days. The default value is false.' % (
-            suggestion_models.SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS) # type: ignore[attr-defined]
+            suggestion_models.SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS)
     ), False)
 
 ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE = ConfigProperty(
