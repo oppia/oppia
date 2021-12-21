@@ -30,6 +30,7 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { StateParamChangesEditorComponent } from './editor-tab/state-param-changes-editor/state-param-changes-editor.component';
+import { DeleteAnswerGroupModalComponent } from './editor-tab/templates/modal-templates/delete-answer-group-modal.component';
 import { DeleteStateSkillModalComponent } from './editor-tab/templates/modal-templates/delete-state-skill-modal.component';
 import { ParamChangesEditorDirective } from './param-changes-editor/param-changes-editor.component';
 import { SwitchContentLanguageRefreshRequiredModalComponent } from 'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
@@ -46,12 +47,16 @@ import { ExplorationPublishModalComponent } from 'pages/exploration-editor-page/
 import { EditorReloadingModalComponent } from './modal-templates/editor-reloading-modal.component';
 import { ConfirmDiscardChangesModalComponent } from './modal-templates/confirm-discard-changes-modal.component';
 import { CreateFeedbackThreadModalComponent } from './feedback-tab/templates/create-feedback-thread-modal.component';
+import { WelcomeTranslationModalComponent } from './translation-tab/modal-templates/welcome-translation-modal.component';
 import { DeleteExplorationModalComponent } from './settings-tab/templates/delete-exploration-modal.component';
 import { RemoveRoleConfirmationModalComponent } from './settings-tab/templates/remove-role-confirmation-modal.component';
 import { ReassignRoleConfirmationModalComponent } from './settings-tab/templates/reassign-role-confirmation-modal.component';
 import { ModeratorUnpublishExplorationModalComponent } from './settings-tab/templates/moderator-unpublish-exploration-modal.component';
 import { TransferExplorationOwnershipModalComponent } from './settings-tab/templates/transfer-exploration-ownership-modal.component';
+import { DeleteAudioTranslationModalComponent } from './translation-tab/modal-templates/delete-audio-translation-modal.component';
+import { TranslationTabBusyModalComponent } from './translation-tab/modal-templates/translation-tab-busy-modal.component';
 import { ConfirmDeleteStateModalComponent } from './editor-tab/templates/modal-templates/confirm-delete-state-modal.component';
+import { RevertExplorationModalComponent } from './history-tab/modal-templates/revert-exploration-modal.component';
 
 @NgModule({
   imports: [
@@ -65,6 +70,7 @@ import { ConfirmDeleteStateModalComponent } from './editor-tab/templates/modal-t
   declarations: [
     AddHintModalComponent,
     CkEditorCopyToolbarComponent,
+    DeleteAnswerGroupModalComponent,
     DeleteStateSkillModalComponent,
     ParamChangesEditorDirective,
     StateParamChangesEditorComponent,
@@ -85,11 +91,19 @@ import { ConfirmDeleteStateModalComponent } from './editor-tab/templates/modal-t
     ReassignRoleConfirmationModalComponent,
     ModeratorUnpublishExplorationModalComponent,
     TransferExplorationOwnershipModalComponent,
-    ConfirmDeleteStateModalComponent
+    ConfirmDeleteStateModalComponent,
+    RevertExplorationModalComponent,
+    WelcomeTranslationModalComponent,
+    ConfirmDeleteStateModalComponent,
+    DeleteAudioTranslationModalComponent,
+    ConfirmDeleteStateModalComponent,
+    TranslationTabBusyModalComponent,
+    WelcomeTranslationModalComponent
   ],
   entryComponents: [
     AddHintModalComponent,
     CkEditorCopyToolbarComponent,
+    DeleteAnswerGroupModalComponent,
     DeleteStateSkillModalComponent,
     StateParamChangesEditorComponent,
     SwitchContentLanguageRefreshRequiredModalComponent,
@@ -109,7 +123,14 @@ import { ConfirmDeleteStateModalComponent } from './editor-tab/templates/modal-t
     ReassignRoleConfirmationModalComponent,
     ModeratorUnpublishExplorationModalComponent,
     TransferExplorationOwnershipModalComponent,
-    ConfirmDeleteStateModalComponent
+    ConfirmDeleteStateModalComponent,
+    RevertExplorationModalComponent,
+    WelcomeTranslationModalComponent,
+    ConfirmDeleteStateModalComponent,
+    DeleteAudioTranslationModalComponent,
+    ConfirmDeleteStateModalComponent,
+    TranslationTabBusyModalComponent,
+    WelcomeTranslationModalComponent
   ],
   providers: [
     {
