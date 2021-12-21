@@ -280,7 +280,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             observed_log_messages.append(msg)
 
         with self.swap(logging, 'warning', mock_logging_function):
-            self.testapp.head('/mock', status=500)
+            self.testapp.options('/mock', status=500)
             self.assertEqual(len(observed_log_messages), 2)
             self.assertEqual(
                 observed_log_messages[0],
@@ -1845,7 +1845,7 @@ class HandlerClassWithSchemaInStillNeedsSchemaListRaiseErrorTest(
 
     def setUp(self):
         super(HandlerClassWithSchemaInStillNeedsSchemaListRaiseErrorTest,
-              self).setUp()
+            self).setUp()
         user_id = user_services.get_user_id_from_username('learneruser')
         self.csrf_token = base.CsrfTokenManager.create_csrf_token(user_id)
         self.payload = {'arg_a': 'val'}

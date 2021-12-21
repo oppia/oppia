@@ -327,12 +327,14 @@ class BaseHandler(webapp2.RequestHandler):
         schema_validation_succeeded = True
         try:
             self.validate_and_normalize_args()
-        except (
-                self.InvalidInputException, NotImplementedError,
-                self.InternalErrorException) as e:
+        except self.InvalidInputException as e:
             self.handle_exception(e, self.app.debug)
             schema_validation_succeeded = False
-        # TODO(#13155): Remove this clause once all the handlers have had.
+            # TODO(#13155): Remove this clause once all the handlers have had
+            #  schema validation implemented.
+        except (NotImplementedError, self.InternalErrorException) as e:
+            self.handle_exception(e, self.app.debug)
+            schema_validation_succeeded = False
         if not schema_validation_succeeded:
             return
 
@@ -350,8 +352,8 @@ class BaseHandler(webapp2.RequestHandler):
         url_path_args = self.request.route_kwargs
 
         if (
-                handler_class_name in
-                handler_schema_constants.HANDLER_CLASS_NAMES_WITH_NO_SCHEMA
+            handler_class_name in
+            handler_schema_constants.HANDLER_CLASS_NAMES_WITH_NO_SCHEMA
         ):
             if self.URL_PATH_ARGS_SCHEMAS or self.HANDLER_ARGS_SCHEMAS:
                 raise self.InternalErrorException(
@@ -390,7 +392,7 @@ class BaseHandler(webapp2.RequestHandler):
         # needed for analytics).
         extra_args_are_allowed = (
             self.GET_HANDLER_ERROR_RETURN_TYPE == feconf.HANDLER_TYPE_HTML and
-            request_method == 'GET')
+            request_method in ['GET', 'HEAD'])
 
         if self.URL_PATH_ARGS_SCHEMAS is None:
             raise NotImplementedError(
@@ -426,7 +428,8 @@ class BaseHandler(webapp2.RequestHandler):
                 'Missing schema for %s method in %s handler class.' % (
                     request_method, handler_class_name))
 
-        allow_string_to_bool_conversion = request_method in ['GET', 'DELETE']
+        allow_string_to_bool_conversion = request_method in [
+            'GET', 'DELETE', 'HEAD']
         normalized_arg_values, errors = (
             payload_validator.validate_arguments_against_schema(
                 handler_args, schema_for_request_method, extra_args_are_allowed,
@@ -450,7 +453,7 @@ class BaseHandler(webapp2.RequestHandler):
         # Populate the payload/request with the default args before passing
         # execution onwards to the handler.
         for arg in keys_that_correspond_to_default_values:
-            if request_method in ['GET', 'DELETE']:
+            if request_method in ['GET', 'DELETE', 'HEAD']:
                 self.normalized_request[arg] = normalized_arg_values.get(arg)
             else:
                 self.normalized_payload[arg] = normalized_arg_values.get(arg)
