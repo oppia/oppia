@@ -62,7 +62,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
         self.STORY_ID = story_services.get_new_story_id()
         self.TOPIC_ID = topic_fetchers.get_new_topic_id()
-        self.save_new_topic(
+        self.topic = self.save_new_topic(
             self.TOPIC_ID, self.USER_ID, name='Topic',
             abbreviated_name='topic-one', url_fragment='topic-one',
             description='A new topic',
@@ -392,7 +392,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             utils.ValidationError, expected_error_string):
             story_services.validate_prerequisite_skills_in_story_contents(
-                self.story.corresponding_topic_id, self.story.story_contents)
+                self.topic.get_all_skill_ids(), self.story.story_contents)
 
     def test_story_with_loop(self):
         self.story.story_contents.next_node_id = 'node_4'
@@ -450,7 +450,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             utils.ValidationError, expected_error_string):
             story_services.validate_prerequisite_skills_in_story_contents(
-                self.story.corresponding_topic_id, self.story.story_contents)
+                self.topic.get_all_skill_ids(), self.story.story_contents)
 
     def test_does_story_exist_with_url_fragment(self):
         story_id_1 = story_services.get_new_story_id()

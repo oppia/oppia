@@ -237,11 +237,13 @@ def does_story_exist_with_url_fragment(url_fragment):
 
 
 def validate_prerequisite_skills_in_story_contents(
-        corresponding_topic_id, story_contents):
+    skill_ids_in_corresponding_topic, story_contents
+):
     """Validates the prerequisites skills in the story contents.
 
     Args:
-        corresponding_topic_id: str. The corresponding topic id of the story.
+        skill_ids_in_corresponding_topic: list(str). List of skill IDs in
+            the corresponding topic of the story.
         story_contents: StoryContents. The story contents.
 
     Raises:
@@ -290,12 +292,9 @@ def validate_prerequisite_skills_in_story_contents(
                 raise utils.ValidationError(
                     'Loops are not allowed in stories.')
             destination_node = story_contents.nodes[node_index]
-            skill_ids_present_in_topic = (
-                topic_fetchers.get_topic_by_id(
-                    corresponding_topic_id).get_all_skill_ids())
             # Include only skill ids relevant to the topic for validation.
             topic_relevant_skill_ids = list(
-                set(skill_ids_present_in_topic).intersection(
+                set(skill_ids_in_corresponding_topic).intersection(
                     set(destination_node.prerequisite_skill_ids)))
             if not (
                     set(
@@ -396,8 +395,37 @@ def validate_explorations_for_story(exp_ids, strict):
     return validation_error_messages
 
 
+def populate_story_model_fields(story_model, story):
+    """Populate story model with the data from story object.
+
+    Args:
+        story_model: StoryModel. The model to populate.
+        story: Story. The story domain object which should be used to
+            populate the model.
+
+    Returns:
+        StoryModel. Populated model.
+    """
+    story_model.description = story.description
+    story_model.title = story.title
+    story_model.thumbnail_bg_color = story.thumbnail_bg_color
+    story_model.thumbnail_filename = story.thumbnail_filename
+    story_model.thumbnail_size_in_bytes = story.thumbnail_size_in_bytes
+    story_model.notes = story.notes
+    story_model.language_code = story.language_code
+    story_model.story_contents_schema_version = (
+        story.story_contents_schema_version)
+    story_model.story_contents = story.story_contents.to_dict()
+    story_model.corresponding_topic_id = story.corresponding_topic_id
+    story_model.version = story.version
+    story_model.url_fragment = story.url_fragment
+    story_model.meta_tag_content = story.meta_tag_content
+    return story_model
+
+
 def _save_story(
-        committer_id, story, commit_message, change_list, story_is_published):
+    committer_id, story, commit_message, change_list, story_is_published
+):
     """Validates a story and commits it to persistent storage. If
     successful, increments the version number of the incoming story domain
     object by 1.
@@ -421,8 +449,10 @@ def _save_story(
             'save story %s: %s' % (story.id, change_list))
 
     story.validate()
+    corresponding_topic = (
+        topic_fetchers.get_topic_by_id(story.corresponding_topic_id))
     validate_prerequisite_skills_in_story_contents(
-        story.corresponding_topic_id, story.story_contents)
+        corresponding_topic.get_all_skill_ids(), story.story_contents)
 
     if story_is_published:
         exp_ids = []
@@ -451,20 +481,7 @@ def _save_story(
             'which is too old. Please reload the page and try again.'
             % (story_model.version, story.version))
 
-    story_model.description = story.description
-    story_model.title = story.title
-    story_model.thumbnail_bg_color = story.thumbnail_bg_color
-    story_model.thumbnail_filename = story.thumbnail_filename
-    story_model.thumbnail_size_in_bytes = story.thumbnail_size_in_bytes
-    story_model.notes = story.notes
-    story_model.language_code = story.language_code
-    story_model.story_contents_schema_version = (
-        story.story_contents_schema_version)
-    story_model.story_contents = story.story_contents.to_dict()
-    story_model.corresponding_topic_id = story.corresponding_topic_id
-    story_model.version = story.version
-    story_model.url_fragment = story.url_fragment
-    story_model.meta_tag_content = story.meta_tag_content
+    story_model = populate_story_model_fields(story_model, story)
     change_dicts = [change.to_dict() for change in change_list]
     story_model.commit(committer_id, commit_message, change_dicts)
     caching_services.delete_multi(
@@ -667,13 +684,16 @@ def create_story_summary(story_id):
     save_story_summary(story_summary)
 
 
-def save_story_summary(story_summary):
-    """Save a story summary domain object as a StorySummaryModel
-    entity in the datastore.
+def populate_story_summary_model_fields(story_summary_model, story_summary):
+    """Populate story summary model with the data from story summary object.
 
     Args:
-        story_summary: StorySummary. The story summary object to be saved in the
-            datastore.
+        story_summary_model: StorySummaryModel. The model to populate.
+        story_summary: StorySummary. The story summary domain object which
+            should be used to populate the model.
+
+    Returns:
+        StorySummaryModel. Populated model.
     """
     story_summary_dict = {
         'title': story_summary.title,
@@ -689,18 +709,31 @@ def save_story_summary(story_summary):
         'story_model_created_on': (
             story_summary.story_model_created_on)
     }
-
-    story_summary_model = (
-        story_models.StorySummaryModel.get_by_id(story_summary.id))
     if story_summary_model is not None:
         story_summary_model.populate(**story_summary_dict)
-        story_summary_model.update_timestamps()
-        story_summary_model.put()
     else:
         story_summary_dict['id'] = story_summary.id
-        model = story_models.StorySummaryModel(**story_summary_dict)
-        model.update_timestamps()
-        model.put()
+        story_summary_model = story_models.StorySummaryModel(
+            **story_summary_dict)
+
+    return story_summary_model
+
+
+def save_story_summary(story_summary):
+    """Save a story summary domain object as a StorySummaryModel
+    entity in the datastore.
+
+    Args:
+        story_summary: StorySummary. The story summary object to be saved in the
+            datastore.
+    """
+    existing_skill_summary_model = (
+        story_models.StorySummaryModel.get_by_id(story_summary.id))
+    story_summary_model = populate_story_summary_model_fields(
+        existing_skill_summary_model, story_summary
+    )
+    story_summary_model.update_timestamps()
+    story_summary_model.put()
 
 
 def record_completed_node_in_story_context(user_id, story_id, node_id):

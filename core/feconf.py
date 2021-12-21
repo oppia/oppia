@@ -1488,3 +1488,9 @@ CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES = [
 # '/access_validation_handler/<handler_name>'
 # example '/access_validation_handler/validate_access_to_splash_page'.
 ACCESS_VALIDATION_HANDLER_PREFIX = '/access_validation_handler'
+
+# The possible commit types.
+COMMIT_TYPE_CREATE = 'create'
+COMMIT_TYPE_REVERT = 'revert'
+COMMIT_TYPE_EDIT = 'edit'
+COMMIT_TYPE_DELETE = 'delete'
