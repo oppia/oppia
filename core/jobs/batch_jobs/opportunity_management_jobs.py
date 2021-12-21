@@ -100,10 +100,10 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
 
     @staticmethod
     def _count_unique_question_ids(
-        question_skill_link_models: list[
-                question_models.QuestionSkillLinkModel
-            ]
-        ) -> int:
+        question_skill_link_models: List[
+            question_models.QuestionSkillLinkModel
+        ]
+    ) -> int:
         """Counts the number of unique question ids.
 
         Args:
