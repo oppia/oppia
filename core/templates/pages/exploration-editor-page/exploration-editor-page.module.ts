@@ -56,6 +56,7 @@ import { DeleteAudioTranslationModalComponent } from './translation-tab/modal-te
 import { TranslationTabBusyModalComponent } from './translation-tab/modal-templates/translation-tab-busy-modal.component';
 import { ConfirmDeleteStateModalComponent } from './editor-tab/templates/modal-templates/confirm-delete-state-modal.component';
 import { PreviewSetParametersModalComponent } from './preview-tab/templates/preview-set-parameters-modal.component';
+import { RevertExplorationModalComponent } from './history-tab/modal-templates/revert-exploration-modal.component';
 
 @NgModule({
   imports: [
@@ -91,6 +92,7 @@ import { PreviewSetParametersModalComponent } from './preview-tab/templates/prev
     TransferExplorationOwnershipModalComponent,
     ConfirmDeleteStateModalComponent,
     PreviewSetParametersModalComponent,
+    RevertExplorationModalComponent,
     WelcomeTranslationModalComponent,
     ConfirmDeleteStateModalComponent,
     DeleteAudioTranslationModalComponent,
@@ -122,6 +124,7 @@ import { PreviewSetParametersModalComponent } from './preview-tab/templates/prev
     TransferExplorationOwnershipModalComponent,
     ConfirmDeleteStateModalComponent,
     PreviewSetParametersModalComponent,
+    RevertExplorationModalComponent,
     WelcomeTranslationModalComponent,
     ConfirmDeleteStateModalComponent,
     DeleteAudioTranslationModalComponent,
