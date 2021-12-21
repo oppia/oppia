@@ -30,6 +30,7 @@ import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
 import { AppConstants } from 'app.constants';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 describe('Skill Editor Navbar Directive', function() {
   let $scope = null;
@@ -38,6 +39,7 @@ describe('Skill Editor Navbar Directive', function() {
   let directive = null;
   let $uibModal = null;
   let $q = null;
+  let ngbModal: NgbModal = null;
   let skillEditorRoutingService = null;
   let skillEditorStateService: SkillEditorStateService = null;
   let undoRedoService: UndoRedoService = null;
@@ -56,12 +58,22 @@ describe('Skill Editor Navbar Directive', function() {
     });
   });
 
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
 
   beforeEach(angular.mock.inject(function($injector) {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     $uibModal = $injector.get('$uibModal');
     $q = $injector.get('$q');
+    ngbModal = $injector.get('NgbModal');
     directive = $injector.get('skillEditorNavbarDirective')[0];
     skillEditorStateService = $injector.get('SkillEditorStateService');
     skillEditorRoutingService = $injector.get('SkillEditorRoutingService');
@@ -246,9 +258,11 @@ describe('Skill Editor Navbar Directive', function() {
 
   it('should not save changes if save changes modal is opened and cancel ' +
     'button is clicked', fakeAsync(function() {
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.reject()
-    });
+    spyOn(ngbModal, 'open').and.returnValue(
+      {
+        result: $q.reject()
+      } as NgbModalRef
+    );
     let saveSkillSpy = spyOn(skillEditorStateService, 'saveSkill')
       .and.returnValue(null);
 

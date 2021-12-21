@@ -16,6 +16,8 @@
  * @fileoverview Directive for the navbar of the skill editor.
  */
 
+import { SkillEditorSaveModalComponent } from '../modal-templates/skill-editor-save-modal.component';
+
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
@@ -29,6 +31,7 @@ require('pages/skill-editor-page/services/skill-editor-routing.service.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 require('services/alerts.service.ts');
 require('services/contextual/url.service.ts');
+require('services/ngb-modal.service.ts');
 
 require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
 
@@ -42,11 +45,11 @@ angular.module('oppia').directive('skillEditorNavbar', [
         '/pages/skill-editor-page/navbar/skill-editor-navbar.directive.html'),
       controller: [
         '$rootScope', '$scope', '$uibModal', 'AlertsService',
-        'SkillEditorRoutingService', 'SkillEditorStateService',
+        'NgbModal', 'SkillEditorRoutingService', 'SkillEditorStateService',
         'UndoRedoService', 'UrlService',
         function(
             $rootScope, $scope, $uibModal, AlertsService,
-            SkillEditorRoutingService, SkillEditorStateService,
+            NgbModal, SkillEditorRoutingService, SkillEditorStateService,
             UndoRedoService, UrlService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
@@ -86,12 +89,8 @@ angular.module('oppia').directive('skillEditorNavbar', [
           };
 
           $scope.saveChanges = function() {
-            $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/skill-editor-page/modal-templates/' +
-                'skill-editor-save-modal.directive.html'),
+            NgbModal.open(SkillEditorSaveModalComponent, {
               backdrop: 'static',
-              controller: 'ConfirmOrCancelModalController'
             }).result.then(function(commitMessage) {
               SkillEditorStateService.saveSkill(commitMessage, () => {
                 AlertsService.addSuccessMessage('Changes Saved.');
