@@ -212,7 +212,6 @@ describe('Embedding', function() {
     // functions in the outer page; these send logs to the console which we
     // now check to ensure that the hooks work correctly.
     var browserLogs = await browser.manage().logs().get('browser');
-    debugger;
     var embeddingLogs = [];
     for (var i = 0; i < browserLogs.length; i++) {
       // We ignore all logs that are not of the desired form.
