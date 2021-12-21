@@ -23,7 +23,7 @@ import { GraphLink, GraphNodes } from 'services/compute-graph.service';
 import { StateGraphLayoutService } from './graph-layout.service';
 
 describe('Graph Layout Service', () => {
-  let sgls: StateGraphLayoutService = null;
+  let sgls: StateGraphLayoutService;
 
   // Represents the nodes of a graph, with node labels as keys, and the
   // following structure:

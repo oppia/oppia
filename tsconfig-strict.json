@@ -38,6 +38,8 @@
     }
   },
   "files": [
+    "core/templates/components/graph-services/graph-layout.service.ts",
+    "core/templates/components/graph-services/graph-layout.service.spec.ts",
     "core/templates/app.constants.ts",
     "core/templates/base-components/base-content.component.ts",
     "core/templates/base-components/base-content.component.spec.ts",

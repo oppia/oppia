@@ -56,8 +56,10 @@ interface NodeData {
   xLabel: number;
   height: number;
   width: number;
-  id: string;
-  label: string;
+  // 'id' and 'label' are null for a newly
+  // initialized node. 
+  id: string | null;
+  label: string | null;
   reachableFromEnd: boolean;
 }
 
@@ -73,11 +75,11 @@ export class StateGraphLayoutService {
 
   // The last result of a call to computeLayout(). Used for determining the
   // order in which to specify states in rules.
-  lastComputedArrangement: NodeDataDict = null;
+  lastComputedArrangement!: NodeDataDict;
 
   getGraphAsAdjacencyLists(
       nodes: GraphNodes, links: GraphLink[]): GraphAdjacencyLists {
-    var adjacencyLists = {};
+    var adjacencyLists: GraphAdjacencyLists = {};
 
     for (var nodeId in nodes) {
       adjacencyLists[nodeId] = [];
@@ -94,7 +96,7 @@ export class StateGraphLayoutService {
 
   getIndentationLevels(
       adjacencyLists: GraphAdjacencyLists, trunkNodeIds: string[]): number[] {
-    var indentationLevels = [];
+    var indentationLevels: number[] = [];
 
     // Recursively find and indent the longest shortcut for the segment of
     // nodes ranging from trunkNodeIds[startInd] to trunkNodeIds[endInd]
@@ -183,7 +185,7 @@ export class StateGraphLayoutService {
     var bestPath = [initNodeId];
     // Note that this is a 'global variable' for the purposes of the
     // backtracking computation.
-    var currentPath = [];
+    var currentPath: string[] = [];
 
     var backtrack = (currentNodeId: string) => {
       currentPath.push(currentNodeId);
@@ -242,20 +244,20 @@ export class StateGraphLayoutService {
         depth: SENTINEL_DEPTH,
         offset: SENTINEL_OFFSET,
         reachable: false,
-        x0: null,
-        y0: null,
-        xLabel: null,
-        yLabel: null,
+        x0: 0,
+        y0: 0,
+        xLabel: 0,
+        yLabel: 0,
         id: null,
         label: null,
-        height: null,
-        width: null,
+        height: 0,
+        width: 0,
         reachableFromEnd: false
       };
     }
 
     var maxDepth = 0;
-    var maxOffsetInEachLevel = {
+    var maxOffsetInEachLevel: Record<number, number> = {
       0: 0
     };
     var trunkNodesIndentationLevels = this.getIndentationLevels(
@@ -539,7 +541,7 @@ export class StateGraphLayoutService {
 
         if (sourcex === targetx && sourcey === targety) {
           // TODO(sll): Investigate why this happens.
-          return;
+          return [];
         }
 
         var sourceWidth = link.source.width;
@@ -588,20 +590,16 @@ export class StateGraphLayoutService {
   modifyPositionValues(
       nodeData: NodeDataDict, graphWidth: number,
       graphHeight: number): NodeDataDict {
-    var HORIZONTAL_NODE_PROPERTIES = ['x0', 'width', 'xLabel'];
-    var VERTICAL_NODE_PROPERTIES = ['y0', 'height', 'yLabel'];
-
     // Change the position values in nodeData to use pixels.
-    for (var nodeId in nodeData) {
-      for (var i = 0; i < HORIZONTAL_NODE_PROPERTIES.length; i++) {
-        nodeData[nodeId][HORIZONTAL_NODE_PROPERTIES[i]] = (
-          graphWidth *
-          nodeData[nodeId][HORIZONTAL_NODE_PROPERTIES[i]]);
-        nodeData[nodeId][VERTICAL_NODE_PROPERTIES[i]] = (
-          graphHeight *
-          nodeData[nodeId][VERTICAL_NODE_PROPERTIES[i]]);
-      }
-    }
+    Object.keys(nodeData).forEach(nodeId => {
+      let tempNode = nodeData[nodeId];
+      tempNode.x0 *= graphWidth;
+      tempNode.width *= graphWidth;
+      tempNode.xLabel *= graphWidth;
+      tempNode.y0 *= graphHeight;
+      tempNode.height *= graphHeight;
+      tempNode.yLabel *= graphHeight;
+    });
     return nodeData;
   }
 
