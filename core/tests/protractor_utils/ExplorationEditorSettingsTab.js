@@ -110,7 +110,6 @@ var ExplorationEditorSettingsTab = function() {
     await waitFor.invisibilityOf(
       explorationSummaryTile, 'Summary Tile takes too long to disappear');
     await action.click('Neutral element', neutralElement);
-    expect(await explorationSummaryTile.isPresent()).toBeFalsy();
   };
 
   this.setCategory = async function(category) {
