@@ -239,7 +239,7 @@ export class StateGraphLayoutService {
     var SENTINEL_OFFSET = -1;
 
     var nodeData: NodeDataDict = {};
-    
+
     for (var nodeId in nodes) {
       nodeData[nodeId].depth = SENTINEL_DEPTH;
       nodeData[nodeId].offset = SENTINEL_OFFSET;
@@ -280,8 +280,7 @@ export class StateGraphLayoutService {
         // depth to process now, we ignore it for now and stick it back in
         // the queue to be processed later.
         if (bestPath.indexOf(linkTarget) !== -1 &&
-          nodeData[
-            linkTarget].depth !== nodeData[currNodeId].depth + 1) {
+          nodeData[linkTarget].depth !== nodeData[currNodeId].depth + 1) {
           if (seenNodes.indexOf(linkTarget) === -1 &&
               queue.indexOf(linkTarget) === -1) {
             queue.push(linkTarget);
@@ -371,8 +370,7 @@ export class StateGraphLayoutService {
             currentLeftOffset = computedOffset;
           }
 
-          nodeData[
-            nodePositionsToIds[i][j].nodeId].depth = currentDepth;
+          nodeData[nodePositionsToIds[i][j].nodeId].depth = currentDepth;
           nodeData[nodePositionsToIds[i][j].nodeId].offset = (
             currentLeftOffset);
 
@@ -440,8 +438,7 @@ export class StateGraphLayoutService {
       nodeData[nodeId].yLabel = getVerticalPosition(
         nodeData[nodeId].depth + 0.5);
       nodeData[nodeId].xLabel = getHorizontalPosition(
-        nodeData[nodeId].offset + 0.5) +
-        X_LABEL_OFFSET_CHECKPOINT_ICON;
+        nodeData[nodeId].offset + 0.5) + X_LABEL_OFFSET_CHECKPOINT_ICON;
 
       nodeData[nodeId].height = (
         (1.0 - VERTICAL_EDGE_PADDING_FRACTION * 2) / totalRows
