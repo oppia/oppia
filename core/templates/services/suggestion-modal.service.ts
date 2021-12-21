@@ -18,6 +18,7 @@
 
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 export interface ParamDict {
   action: string;
@@ -65,9 +66,9 @@ export class SuggestionModalService {
    * - reviewMessage: review message for the suggestion.
    */
   acceptSuggestion(
-      $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance,
+      ngbActiveModal: NgbActiveModal,
       paramDict: ParamDict): void {
-    $uibModalInstance.close(paramDict);
+    ngbActiveModal.close(paramDict);
   }
 
   /**
@@ -91,9 +92,9 @@ export class SuggestionModalService {
    * - reviewMessage: review message for the suggestion.
    */
   rejectSuggestion(
-      $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance,
+      ngbActiveModal: NgbActiveModal,
       paramDict: ParamDict): void {
-    $uibModalInstance.close(paramDict);
+    ngbActiveModal.close(paramDict);
   }
 
   /**
@@ -110,8 +111,8 @@ export class SuggestionModalService {
    *    animation completes.
    */
   cancelSuggestion(
-      $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance): void {
-    $uibModalInstance.dismiss('cancel');
+      ngbActiveModal: NgbActiveModal): void {
+    ngbActiveModal.dismiss('cancel');
   }
 }
 
