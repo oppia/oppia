@@ -110,8 +110,8 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         def get(self):
             self.render_template('invalid_page.html')
 
-        def head(self):
-            """Do a HEAD request. This is an unrecognized request method in our
+        def options(self):
+            """Do a OPTIONS request. This is an unrecognized request method in our
             codebase.
             """
             self.render_template({'invalid_page.html'})
