@@ -191,7 +191,6 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
                 'question_skill_links': question_skill_link_models
             }
             | 'Merge by skill ID' >> beam.CoGroupByKey()
-            | 'Remove skill IDs' >> beam.Values()
             | 'Flatten skill and question_skill_links' >> beam.Map(
                 lambda object: {
                     'skill': object['skill'][0][0],
