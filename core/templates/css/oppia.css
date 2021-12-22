@@ -2578,6 +2578,10 @@ oppia-parameter {
   width: 70%;
 }
 
+.oppia-help-modal .modal-dialog {
+  height: 330px;
+}
+
 .modal.in .modal-dialog {
   -webkit-transform: translate(0,0);
   -ms-transform: translate(0,0);
@@ -3122,6 +3126,11 @@ md-card.preview-conversation-skin-supplemental-card {
   border-radius: 0;
   height: 100%;
   min-height: 450px;
+}
+
+.oppia-help-modal .modal-content {
+  border-radius: 0;
+  height: 100%;
 }
 
 .oppia-modal-information-card .modal-dialog .modal-content {
@@ -4856,15 +4865,6 @@ div.oppia-issues-learner-action {
   height: 100%;
   margin: 5% auto;
   width: 90%;
-}
-
-.oppia-help-modal .modal-content {
-  border-radius: 0;
-  height: 100%;
-}
-
-.oppia-help-modal .modal-dialog {
-  height: 330px;
 }
 
 .oppia-help-modal .oppia-help-modal-button {
