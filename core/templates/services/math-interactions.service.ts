@@ -108,7 +108,7 @@ export class MathInteractionsService {
     the outer pair of parens are considered as redundant.
     */
     if (closingInd + 2 < expressionString.length &&
-        expressionString[closingInd + 2] === "^") {
+        expressionString[closingInd + 2] === '^') {
       // Guppy adds redundant parens while using exponents, so we need to ignore
       // them.
       return false;

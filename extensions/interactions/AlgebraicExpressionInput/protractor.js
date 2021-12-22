@@ -67,7 +67,7 @@ var testSuite = [{
   ruleArguments: ['MatchesExactlyWith', '((x^2)-x)/z'],
   expectedInteractionDetails: [],
   wrongAnswers: [
-    '((x^3)-x)/z', 'x(x-1)/z', '((x^2)/z)-x/z', , '((x*x)-x)*z^(-1)'],
+    '((x^3)-x)/z', 'x(x-1)/z', '((x^2)/z)-x/z', '((x*x)-x)*z^(-1)'],
   correctAnswers: ['((x^2)-x)/z']
 }, {
   interactionArguments: [['π', 'r']],
