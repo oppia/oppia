@@ -31,6 +31,7 @@ import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UserService } from 'services/user.service';
 import { TranslateTextService } from '../services/translate-text.service';
+import {TranslateTextBackendApiService} from '../services/translate-text-backend-api.service';
 
 class MockChangeDetectorRef {
   detectChanges(): void {}
@@ -43,6 +44,7 @@ describe('Translation Modal Component', () => {
   let ckEditorCopyContentService: CkEditorCopyContentService;
   let siteAnalyticsService: SiteAnalyticsService;
   let imageLocalStorageService: ImageLocalStorageService;
+  let translateTextBackendApiService: TranslateTextBackendApiService;
   let userService: UserService;
   let activeModal: NgbActiveModal;
   let httpTestingController: HttpTestingController;
@@ -100,6 +102,8 @@ describe('Translation Modal Component', () => {
     translateTextService = TestBed.inject(TranslateTextService);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
+    translateTextBackendApiService = TestBed.
+      inject(TranslateTextBackendApiService);
     translationLanguageService = TestBed.inject(TranslationLanguageService);
     translationLanguageService.setActiveLanguageCode('es');
     userService = TestBed.inject(UserService);
@@ -393,6 +397,7 @@ describe('Translation Modal Component', () => {
 
       component.suggestTranslatedText();
 
+      flushMicrotasks();
       const req = httpTestingController.expectOne(
         '/suggestionhandler/');
       expect(component.hadCopyParagraphError).toEqual(false);
@@ -406,6 +411,7 @@ describe('Translation Modal Component', () => {
     it('should correctly submit a translation suggestion', fakeAsync(() => {
       component.suggestTranslatedText();
 
+      flushMicrotasks();
       const req = httpTestingController.expectOne(
         '/suggestionhandler/');
       expect(req.request.method).toEqual('POST');
@@ -577,12 +583,17 @@ describe('Translation Modal Component', () => {
         spyOn(imageLocalStorageService, 'getStoredImagesData').and.returnValue(
           imagesData
         );
+        spyOn(translateTextBackendApiService, 'blobtoBase64').and.returnValue(
+          Promise.resolve(['imageBlob1', 'imageBlob2'])
+        );
         component.suggestTranslatedText();
+        flushMicrotasks();
         const req = httpTestingController.expectOne(
           '/suggestionhandler/');
+        const files = JSON.parse(req.request.body.getAll('payload')[0]).files;
         expect(req.request.method).toEqual('POST');
-        const filename1Blobs = req.request.body.getAll('imageFilename1');
-        const filename2Blobs = req.request.body.getAll('imageFilename2');
+        const filename1Blobs = files.imageFilename1;
+        const filename2Blobs = files.imageFilename2;
         expect(filename1Blobs).toContain('imageBlob1');
         expect(filename1Blobs).toContain('imageBlob2');
         expect(filename2Blobs).toContain('imageBlob1');

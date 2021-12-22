@@ -491,7 +491,7 @@ class CommonTests(test_utils.GenericTestBase):
             finally:
                 sys.stdout = old_target
 
-        target_stdout = python_utils.string_io()
+        target_stdout = io.StringIO()
         with _redirect_stdout(target_stdout):
             common.print_each_string_after_two_new_lines([
                 'These', 'are', 'sample', 'strings.'])
