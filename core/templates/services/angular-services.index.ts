@@ -391,6 +391,8 @@ import { ExplorationRightsService } from 'pages/exploration-editor-page/services
 import { ExplorationRightsBackendApiService } from 'pages/exploration-editor-page/services/exploration-rights-backend-api.service';
 import { ExplorationCategoryService } from 'pages/exploration-editor-page/services/exploration-category.service';
 import { ExplorationCorrectnessFeedbackService } from 'pages/exploration-editor-page/services/exploration-correctness-feedback.service';
+import { ExplorationParamSpecsService } from 'pages/exploration-editor-page/services/exploration-param-specs.service';
+import { ExplorationParamChangesService } from 'pages/exploration-editor-page/services/exploration-param-changes.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -516,6 +518,8 @@ export const angularServices: [string, Type<{}>][] = [
   ['ExplorationPermissionsBackendApiService',
     ExplorationPermissionsBackendApiService],
   ['ExplorationPlayerStateService', ExplorationPlayerStateService],
+  ['ExplorationParamSpecsService', ExplorationParamSpecsService],
+  ['ExplorationParamChangesService', ExplorationParamChangesService],
   ['ExplorationRecommendationsBackendApiService',
     ExplorationRecommendationsBackendApiService],
   ['ExplorationRecommendationsService', ExplorationRecommendationsService],

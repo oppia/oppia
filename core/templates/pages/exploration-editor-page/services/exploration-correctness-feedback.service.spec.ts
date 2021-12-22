@@ -16,13 +16,13 @@
  * @fileoverview Unit tests for ExplorationCorrectnessFeedbackService
  */
 
-import { fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
+import { destroyPlatform } from '@angular/core';
 import { ExplorationCorrectnessFeedbackService } from './/exploration-correctness-feedback.service';
 import { ExplorationPropertyService } from './exploration-property.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Exploration Correctness Feedback Service', () => {
+describe('Exploration Correctness Feedback Service', () => {
   let ecfs: ExplorationCorrectnessFeedbackService;
 
   beforeEach(() => {
@@ -35,26 +35,23 @@ fdescribe('Exploration Correctness Feedback Service', () => {
 
     ecfs = TestBed.inject(ExplorationCorrectnessFeedbackService);
   });
-  it('should my test', fakeAsync(() => {
-    expect(ecfs._isValid("work")).toBe(true);
-    expect(ecfs._isValid("")).toBe(false);
-  }));
-  // it('should toggle correctness feedback display', fakeAsync(() => {
-  //   var isValidSpy = spyOn(
-  //     ecfs, '_isValid').and.callThrough();
 
-  //   // Function isEnabled() returns undefined in the first time.
-  //   expect(ecfs.isEnabled()).toBeFalsy();
+  afterEach(() => destroyPlatform());
 
-  //   ecfs.toggleCorrectnessFeedback();
-  //   ecfs.isEnabled();
-  //   tick();
-  //   expect(ecfs.isEnabled()).toBe(true);
+  it('should toggle correctness feedback display', () => {
+    var isValidSpy = spyOn(
+      ecfs, '_isValid').and.callThrough();
 
-  //   ecfs.toggleCorrectnessFeedback();
-  //   tick();
-  //   expect(ecfs.isEnabled()).toBe(false);
+    // Function isEnabled() returns undefined in the first time.
+    expect(ecfs.isEnabled()).toBeFalsy();
 
-  //   expect(isValidSpy).toHaveBeenCalledTimes(2);
-  // }));
+    ecfs.toggleCorrectnessFeedback();
+    ecfs.isEnabled();
+    expect(ecfs.isEnabled()).toBe(true);
+
+    ecfs.toggleCorrectnessFeedback();
+    expect(ecfs.isEnabled()).toBe(false);
+
+    expect(isValidSpy).toHaveBeenCalled();
+  });
 });

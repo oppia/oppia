@@ -23,7 +23,6 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { AlertsService } from 'services/alerts.service';
 import { ChangeListService } from './change-list.service';
 import { LoggerService } from 'services/contextual/logger.service';
-import { AnyFieldType } from 'google-protobuf';
 
 @Injectable({
   providedIn: 'root'
@@ -40,16 +39,17 @@ export class ExplorationCorrectnessFeedbackService extends
 
   propertyName: string = 'correctness_feedback_enabled';
 
-  _isValid(value: string): boolean {
-    return (typeof value === 'boolean');
-  }
-
   isEnabled(): boolean {
     return Boolean(this.savedMemento);
   }
 
   toggleCorrectnessFeedback(): void {
-    this.displayed = String(!this.displayed);
+    if (Boolean(this.displayed) === false) {
+      this.displayed = 'true';
+    } else {
+      this.displayed = null;
+    }
+
     this.saveDisplayedValue();
   }
 }
