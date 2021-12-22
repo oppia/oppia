@@ -2,9 +2,9 @@
   <li class="oppia-dropdown-menu-container">
     <div ngbDropdown>
       <button class="btn btn-light dropdown oppia-save-changes-button float-left protractor-test-save-story-button"
-              [ngClass]="{'btn-success': storyIsSavable}"
+              [ngClass]="{'btn-success': isStorySaveable()}"
               (click)="saveChanges()"
-              [disabled]="!storyIsSavable">
+              [disabled]="!isStorySaveable()">
         <span *ngIf="!isSaveInProgress()">
           <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
              alt="Save Story">
@@ -14,8 +14,8 @@
             Save Draft
           </span>
           <span class="d-none d-md-block float-left oppia-changes-count"
-                *ngIf="changeListLength > 0">
-            ({{ changeListLength }})
+                *ngIf="getChangeListLength() > 0">
+            ({{ getChangeListLength() }})
           </span>
         </span>
 
@@ -28,16 +28,16 @@
       </button>
       <button type="button"
               class="btn btn-light dropdown-toggle oppia-dropdown-toggle protractor-test-show-discard-option"
-              [disabled]="!changeListLength"
+              [disabled]="!getChangeListLength()"
               aria-label="Dropdown toggle"
               ngbDropdownToggle>
       </button>
       <ul ngbDropdownMenu
           class="oppia-dropdown-menu dropdown-menu"
-          [ngStyle]="{ width: changeListLength ? '150px' : '120px' }">
+          [ngStyle]="{ width: getChangeListLength() ? '150px' : '120px' }">
         <li title="Discard all pending changes">
           <a (click)="discardChanges()"
-             [ngClass]="{'oppia-disabled-link': !changeListLength}"
+             [ngClass]="{'oppia-disabled-link': !getChangeListLength()}"
              class="dropdown-item protractor-test-discard-story-changes">
              Discard Draft
           </a>
@@ -50,8 +50,8 @@
             *ngIf="!isStoryPublished()"
             class="btn btn-secondary oppia-editor-publish-button protractor-test-publish-story-button"
             (click)="publishStory()"
-            [ngClass]="{'btn-success': !storyIsSavable && warningsCount === 0 && validationIssues.length === 0 && explorationValidationIssues.length === 0 && prepublishValidationIssues.length === 0}"
-            [disabled]="storyIsSavable || warningsCount > 0 || validationIssues.length > 0 || explorationValidationIssues.length > 0 || prepublishValidationIssues.length > 0">
+            [ngClass]="{'btn-success': !isStorySaveable() && getWarningsCount() === 0 && validationIssues.length === 0 && explorationValidationIssues.length === 0 && prepublishValidationIssues.length === 0}"
+            [disabled]="isStorySaveable() || getWarningsCount() > 0 || validationIssues.length > 0 || explorationValidationIssues.length > 0 || prepublishValidationIssues.length > 0">
       <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
          alt="Publish to Oppia Library">
         &#xE2C3;
@@ -64,7 +64,7 @@
             (click)="unpublishStory()"
             *ngIf="isStoryPublished()"
             class="btn btn-secondary protractor-test-unpublish-story-button"
-            [disabled]="storyIsSavable">
+            [disabled]="isStorySaveable()">
       Unpublish Story
     </button>
   </li>
@@ -102,12 +102,12 @@
       </div>
       <div class="story-nav-dropdown-content">
         <div class="story-nav-dropdown-text" (click)="toggleWarningText()">
-          <i *ngIf="!totalWarningsCount" class="material-icons">
+          <i *ngIf="!getTotalWarningsCount()" class="material-icons">
             &#xE254;
           </i>
           <span>{{ activeTab }}</span>
-          <span *ngIf="totalWarningsCount">
-            ({{ totalWarningsCount }} <i class="fa fa-exclamation-triangle error-icon"></i>)
+          <span *ngIf="getTotalWarningsCount()">
+            ({{ getTotalWarningsCount() }} <i class="fa fa-exclamation-triangle error-icon"></i>)
           </span>
         </div>
         <div class="story-nav-dropdown-icon"
@@ -127,13 +127,13 @@
         <div class="story-nav-dropdown-option">
           <div *ngIf="!isStoryPublished()"
                (click)="publishStory()"
-               [attr.disabled]="storyIsSavable || warningsCount > 0 || prepublishValidationIssues.length > 0">
+               [attr.disabled]="isStorySaveable() || getWarningsCount() > 0 || prepublishValidationIssues.length > 0">
             <i class="material-icons">&#xE254;</i>
             <span>Publish Story</span>
           </div>
           <div (click)="unpublishStory()"
                *ngIf="isStoryPublished()"
-               [attr.disabled]="storyIsSavable">
+               [attr.disabled]="isStorySaveable()">
             <i class="material-icons">&#xE254;</i>
             <span>Unpublish Story</span>
           </div>
@@ -141,7 +141,7 @@
       </div>
       <div class="story-nav-dropdown-content right-container">
         <div class="story-nav-dropdown-text"
-             [attr.disabled]="!storyIsSavable"
+             [attr.disabled]="!isStorySaveable()"
              (click)="saveChanges()">
           <span *ngIf="isSaveInProgress()">
             <span>Saving</span>
@@ -149,8 +149,8 @@
           <span *ngIf="!isSaveInProgress()">
             Save Changes
           </span>
-          <span *ngIf="changeListLength > 0">
-            ({{ changeListLength }})
+          <span *ngIf="getChangeListLength() > 0">
+            ({{ getChangeListLength() }})
           </span>
         </div>
         <div class="story-nav-dropdown-icon"

@@ -130,7 +130,7 @@ export class Story {
     return this._version;
   }
 
-  getStoryContents(): StoryContents | null {
+  getStoryContents(): StoryContents {
     return this._storyContents;
   }
 
