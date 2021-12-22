@@ -23,7 +23,12 @@
 var rule = require('./nested-awaits');
 var RuleTester = require('eslint').RuleTester;
 
-var ruleTester = new RuleTester();
+const ruleTester = new RuleTester({
+  parserOptions: {
+      ecmaVersion: 2018
+  }
+});
+
 ruleTester.run('nested-awaits', rule, {
   valid: [
     {
