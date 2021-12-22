@@ -194,8 +194,8 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
             # Pylint disable is needed because pylint is not able to correctly
             # detect that the value is passed through the pipe.
             | 'Remove skill IDs' >> beam.Values() # pylint: disable=no-value-for-parameter
-            # We are using itertools.chain.from_iterable to flatten question_skill_links
-            # from a 2D list into a 1D list.
+            # We are using itertools.chain.from_iterable to flatten
+            # question_skill_links from a 2D list into a 1D list.
             | 'Flatten skill and question_skill_links' >> beam.Map(
                 lambda object: {
                     'skill': object['skill'][0][0],
