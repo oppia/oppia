@@ -88,7 +88,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
 
   isSearchButtonActive(): boolean {
     this.searchButtonIsActive = this.classroomPageIsActive ||
-      (this.windowDimensionsService.getWidth() <= 500);
+      (this.windowDimensionsService.getWidth() <= 766);
     return this.searchButtonIsActive;
   }
 
