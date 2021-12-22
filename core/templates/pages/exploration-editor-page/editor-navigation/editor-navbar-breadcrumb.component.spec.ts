@@ -25,6 +25,7 @@ describe('Editor Navbar Breadcrumb directive', function() {
   var $rootScope = null;
   var $scope = null;
   var ExplorationTitleService = null;
+  var ExplorationPropertyService = null;
   var FocusManagerService = null;
   var RouterService = null;
 
@@ -43,13 +44,14 @@ describe('Editor Navbar Breadcrumb directive', function() {
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $rootScope = $injector.get('$rootScope');
     ExplorationTitleService = $injector.get('ExplorationTitleService');
+    ExplorationPropertyService = $injector.get('ExplorationPropertyService');
     FocusManagerService = $injector.get('FocusManagerService');
     RouterService = $injector.get('RouterService');
 
     ExplorationTitleService.init('Exploration Title Example Very Long');
 
     spyOnProperty(
-      ExplorationTitleService,
+      ExplorationPropertyService,
       'onExplorationPropertyChanged').and.returnValue(
       mockExplorationPropertyChangedEventEmitter);
 
