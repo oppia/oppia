@@ -17,13 +17,29 @@
  * the specification of the parameters.
  */
 
-require(
-  'pages/exploration-editor-page/services/exploration-property.service.ts');
+import { ExplorationPropertyService } from 'pages/exploration-editor-page/services/exploration-property.service';
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { AlertsService } from 'services/alerts.service';
+import { ChangeListService } from './change-list.service';
+import { LoggerService } from 'services/contextual/logger.service';
 
-angular.module('oppia').factory('ExplorationParamSpecsService', [
-  'ExplorationPropertyService', function(ExplorationPropertyService) {
-    var child = Object.create(ExplorationPropertyService);
-    child.propertyName = 'param_specs';
-    return child;
+@Injectable({
+  providedIn: 'root'
+})
+export class ExplorationParamSpecsService extends
+  ExplorationPropertyService {
+  constructor(
+    protected alertsService: AlertsService,
+    protected changeListService: ChangeListService,
+    protected loggerService: LoggerService
+  ) {
+    super(alertsService, changeListService, loggerService);
   }
-]);
+
+  propertyName: string = 'param_specs';
+}
+
+angular.module('oppia').factory('ExplorationParamSpecsService',
+  downgradeInjectable(ExplorationParamSpecsService));
+
