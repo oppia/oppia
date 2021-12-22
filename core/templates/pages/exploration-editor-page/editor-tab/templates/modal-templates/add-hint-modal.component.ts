@@ -12,14 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * @fileoverview Component for add hint modal.
  */
 
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-
 import { AppConstants } from 'app.constants';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { StateHintsService } from 'components/state-editor/state-editor-properties-services/state-hints.service';
@@ -40,7 +38,7 @@ interface HintFormSchema {
 
 export class AddHintModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-  COMPONENT_NAME_HINT: string= AppConstants.COMPONENT_NAME_HINT;
+  COMPONENT_NAME_HINT: string = AppConstants.COMPONENT_NAME_HINT;
   tmpHint: string = '';
   addHintForm = {};
   hintIndex: number;
@@ -52,12 +50,12 @@ export class AddHintModalComponent
     }};
 
   constructor(
-    private ngbActiveModal: NgbActiveModal,
+    private changeDetectorRef: ChangeDetectorRef,
     private contextService: ContextService,
-    private hintObjectFactory: HintObjectFactory,
-    private stateHintsService: StateHintsService,
     private generateContentIdService: GenerateContentIdService,
-    private changeDetectorRef: ChangeDetectorRef
+    private hintObjectFactory: HintObjectFactory,
+    private ngbActiveModal: NgbActiveModal,
+    private stateHintsService: StateHintsService
   ) {
     super(ngbActiveModal);
   }

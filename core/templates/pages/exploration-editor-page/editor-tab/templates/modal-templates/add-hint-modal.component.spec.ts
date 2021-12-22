@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * @fileoverview Unit tests for AddHintModalComponent.
  */
@@ -20,7 +19,6 @@
 import { ChangeDetectorRef, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-
 import { StateHintsService } from 'components/state-editor/state-editor-properties-services/state-hints.service';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { ContextService } from 'services/context.service';
