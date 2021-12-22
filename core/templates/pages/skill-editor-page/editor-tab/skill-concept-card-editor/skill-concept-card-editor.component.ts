@@ -43,6 +43,7 @@ require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
 
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { AddWorkedExampleModalComponent } from 'pages/skill-editor-page/modal-templates/add-worked-example.component';
+import { DeleteWorkedExampleComponent } from 'pages/skill-editor-page/modal-templates/delete-worked-example-modal.component';
 import { Subscription } from 'rxjs';
 
 angular.module('oppia').component('skillConceptCardEditor', {
@@ -100,12 +101,8 @@ angular.module('oppia').component('skillConceptCardEditor', {
       };
 
       $scope.deleteWorkedExample = function(index, evt) {
-        $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/skill-editor-page/modal-templates/' +
-            'delete-worked-example-modal.directive.html'),
-          backdrop: 'static',
-          controller: 'ConfirmOrCancelModalController'
+        NgbModal.open(DeleteWorkedExampleComponent, {
+          backdrop: 'static'
         }).result.then(function() {
           SkillUpdateService.deleteWorkedExample($scope.skill, index);
           $scope.bindableFieldsDict.displayedWorkedExamples =
@@ -124,7 +121,7 @@ angular.module('oppia').component('skillConceptCardEditor', {
 
       $scope.openAddWorkedExampleModal = function() {
         NgbModal.open(AddWorkedExampleModalComponent, {
-          backdrop: 'static',
+          backdrop: 'static'
         }).result.then(function(result) {
           var newExample = WorkedExampleObjectFactory.create(
             SubtitledHtml.createDefault(
