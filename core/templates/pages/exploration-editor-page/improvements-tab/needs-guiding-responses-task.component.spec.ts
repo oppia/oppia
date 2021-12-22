@@ -34,6 +34,15 @@ describe('NeedsGuidingResponsesTask component', function() {
   let task = {targetId: stateName};
   let stats = {answerStats: [], stateStats: {totalAnswersCount}};
 
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
   importAllAngularServices();
 
   beforeEach(angular.mock.inject(function(
