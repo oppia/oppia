@@ -85,8 +85,10 @@ export class StateGraphLayoutService {
       adjacencyLists[nodeId] = [];
     }
     for (var i = 0; i < links.length; i++) {
-      if (links[i].source !== links[i].target &&
-          adjacencyLists[links[i].source].indexOf(links[i].target) === -1) {
+      if (
+        links[i].source !== links[i].target &&
+        adjacencyLists[links[i].source].indexOf(links[i].target) === -1
+      ) {
         adjacencyLists[links[i].source].push(links[i].target);
       }
     }
@@ -279,10 +281,14 @@ export class StateGraphLayoutService {
         // If the target node is a trunk node, but isn't at the correct
         // depth to process now, we ignore it for now and stick it back in
         // the queue to be processed later.
-        if (bestPath.indexOf(linkTarget) !== -1 &&
-          nodeData[linkTarget].depth !== nodeData[currNodeId].depth + 1) {
-          if (seenNodes.indexOf(linkTarget) === -1 &&
-              queue.indexOf(linkTarget) === -1) {
+        if (
+          bestPath.indexOf(linkTarget) !== -1 &&
+          nodeData[linkTarget].depth !== nodeData[currNodeId].depth + 1
+        ) {
+          if (
+            seenNodes.indexOf(linkTarget) === -1 &&
+            queue.indexOf(linkTarget) === -1
+          ) {
             queue.push(linkTarget);
           }
           continue;
