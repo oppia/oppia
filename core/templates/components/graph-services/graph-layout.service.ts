@@ -239,10 +239,12 @@ export class StateGraphLayoutService {
     var SENTINEL_OFFSET = -1;
 
     var nodeData: NodeDataDict = {};
-
     for (var nodeId in nodes) {
+      nodeData[nodeId] = {} as NodeData;
       nodeData[nodeId].depth = SENTINEL_DEPTH;
       nodeData[nodeId].offset = SENTINEL_OFFSET;
+      nodeData[nodeId].reachable = false;
+      nodeData[nodeId].reachableFromEnd = false;
     }
 
     var maxDepth = 0;
@@ -588,24 +590,14 @@ export class StateGraphLayoutService {
       graphWidth: number,
       graphHeight: number
   ): NodeDataDict {
-    var HORIZONTAL_NODE_PROPERTIES: ('x0' | 'width' | 'xLabel')[] = [
-      'x0', 'width', 'xLabel'
-    ];
-    var VERTICAL_NODE_PROPERTIES: ('y0' | 'height' | 'yLabel')[] = [
-      'y0', 'height', 'yLabel'
-    ];
-
-    // Change the position values in nodeData to use pixels.
-    for (var nodeId in nodeData) {
-      for (var i = 0; i < HORIZONTAL_NODE_PROPERTIES.length; i++) {
-        nodeData[nodeId][HORIZONTAL_NODE_PROPERTIES[i]] = (
-          graphWidth *
-          nodeData[nodeId][HORIZONTAL_NODE_PROPERTIES[i]]);
-        nodeData[nodeId][VERTICAL_NODE_PROPERTIES[i]] = (
-          graphHeight *
-          nodeData[nodeId][VERTICAL_NODE_PROPERTIES[i]]);
-      }
-    }
+    Object.keys(nodeData).forEach(nodeId => {
+      nodeData[nodeId].x0 *= graphWidth;
+      nodeData[nodeId].width *= graphWidth;
+      nodeData[nodeId].xLabel *= graphWidth;
+      nodeData[nodeId].y0 *= graphHeight;
+      nodeData[nodeId].height *= graphHeight;
+      nodeData[nodeId].yLabel *= graphHeight;
+    });
     return nodeData;
   }
 
