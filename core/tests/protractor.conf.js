@@ -376,10 +376,10 @@ exports.config = {
         ' because it\'s on CircleCI');
     }
 
-    // Screenshots will only run on CircleCI, since we don't have videos here.
-    // We don't need these on Github Actions since we have videos.
+    // Screenshots will only run on the develop branch of "oppia/oppia", since
+    // currently we don't run videos due to memory issues.
 
-    if (process.env.CIRCLECI) {
+    if (process.env.REPOSITORY == 'oppia/oppia' && process.env.GITHUB_REF == 'refs/heads/develop') {
       // This takes screenshots of failed tests. For more information see
       // https://www.npmjs.com/package/protractor-jasmine2-screenshot-reporter
       jasmine.getEnv().addReporter(new HtmlScreenshotReporter({
