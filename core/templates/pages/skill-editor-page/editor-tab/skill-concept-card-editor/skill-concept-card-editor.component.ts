@@ -25,9 +25,6 @@ require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require('directives/angular-html-bind.directive.ts');
 require(
-  'pages/skill-editor-page/editor-tab/skill-concept-card-editor/' +
-  'worked-example-editor.directive.ts');
-require(
   'pages/skill-editor-page/editor-tab/skill-preview-modal.controller.ts');
 require(
   'pages/skill-editor-page/modal-templates/' +
@@ -45,6 +42,7 @@ require('services/generate-content-id.service.ts');
 require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
 
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import { AddWorkedExampleModalComponent } from 'pages/skill-editor-page/modal-templates/add-worked-example.component';
 import { Subscription } from 'rxjs';
 
 angular.module('oppia').component('skillConceptCardEditor', {
@@ -52,13 +50,14 @@ angular.module('oppia').component('skillConceptCardEditor', {
   template: require('./skill-concept-card-editor.component.html'),
   controller: [
     '$filter', '$scope', '$uibModal', 'GenerateContentIdService',
-    'PageTitleService', 'SkillEditorStateService',
+    'NgbModal', 'PageTitleService', 'SkillEditorStateService',
     'SkillUpdateService', 'UrlInterpolationService',
     'WindowDimensionsService', 'WorkedExampleObjectFactory',
     'COMPONENT_NAME_WORKED_EXAMPLE',
     function(
         $filter, $scope, $uibModal,
-        GenerateContentIdService, PageTitleService, SkillEditorStateService,
+        GenerateContentIdService, NgbModal, PageTitleService,
+        SkillEditorStateService,
         SkillUpdateService, UrlInterpolationService,
         WindowDimensionsService, WorkedExampleObjectFactory,
         COMPONENT_NAME_WORKED_EXAMPLE) {
@@ -124,12 +123,8 @@ angular.module('oppia').component('skillConceptCardEditor', {
       };
 
       $scope.openAddWorkedExampleModal = function() {
-        $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/skill-editor-page/modal-templates/' +
-            'add-worked-example-modal.directive.html'),
+        NgbModal.open(AddWorkedExampleModalComponent, {
           backdrop: 'static',
-          controller: 'AddWorkedExampleModalController'
         }).result.then(function(result) {
           var newExample = WorkedExampleObjectFactory.create(
             SubtitledHtml.createDefault(
