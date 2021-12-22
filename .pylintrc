@@ -2,9 +2,6 @@
 #
 #   pylint core --rcfile=.pylintrc -i y
 
-[GENERAL]
-init-hook='import sys; sys.path.append("../oppia_tools/google_appengine_1.9.67/google_appengine")'
-
 [MASTER]
 init-hook='import sys; sys.path.append(".")'
 
@@ -65,18 +62,28 @@ indent-string='    '
 
 allowed-comment-prefixes=int,str,float,bool,v
 forbidden-imports=
-    core.controllers:core.platform|core.storage,
-    core.domain:core.controllers,
-    core.storage:core.domain
+    core\.controllers:
+        import core\.platform|
+        import core\.storage,
+    core\.domain:
+        import core\.controllers,
+    core\.storage:
+        import core\.domain,
+    core\.domain\..*domain:
+        from .*_service import core\.domain|
+        from .*_cleaner import core\.domain|
+        from .*_registry import core\.domain|
+        from .*_fetchers import core\.domain|
+        from .*_manager import core\.domain
 
 disallowed-functions-and-replacements-str=
-  assertEquals=>self.assertEqual,
-  now=>datetime.datetime.utcnow,
-  beam.CombineValues=>beam.CombinePerKey
+    assertEquals=>self.assertEqual,
+    now=>datetime.datetime.utcnow,
+    beam.CombineValues=>beam.CombinePerKey
 
 disallowed-functions-and-replacements-regex=
-  \.put_async\(=>put,
-  \.put_multi_async\(=>put_multi
+    \.put_async\(=>put,
+    \.put_multi_async\(=>put_multi
 
 [SIMILARITIES]
 

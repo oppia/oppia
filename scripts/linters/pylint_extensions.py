@@ -1520,12 +1520,22 @@ class RestrictedImportChecker(checkers.BaseChecker):
             forbidden_import.strip().split(':')
             for forbidden_import in self.config.forbidden_imports
         ]
-        self._module_to_forbidden_imports = list(
-            (
-                forbidden_imports[0].strip(),
-                [import_.strip() for import_ in forbidden_imports[1].split('|')]
-            ) for forbidden_imports in splitted_module_to_forbidden_imports
-        )
+        self._module_to_forbidden_imports = []
+        for module_regex, forbidden_imports in splitted_module_to_forbidden_imports:
+            processed_forbidden_imports = []
+            for forbidden_import in forbidden_imports.split('|'):
+                if forbidden_import.startswith('from'):
+                    from_part, import_part = (
+                        forbidden_import.strip()[4:].split(' import '))
+                    processed_forbidden_imports.append(
+                        (from_part.strip(), import_part.strip()))
+                else:
+                    processed_forbidden_imports.append(
+                        (forbidden_import.strip()[7:], None))
+            self._module_to_forbidden_imports.append((
+                module_regex.strip(),
+                processed_forbidden_imports
+            ))
 
     def _iterate_forbidden_imports(self, node):
         """Yields pairs of module name and forbidden imports.
@@ -1535,30 +1545,34 @@ class RestrictedImportChecker(checkers.BaseChecker):
                 in the AST.
 
         Yields:
-            tuple(str, str). Yields pair of module name and forbidden import.
+            tuple(str, tuple(str, None)). Yields pair of module name and
+            forbidden import.
         """
         modnode = node.root()
-        for module_name, forbidden_imports in self._module_to_forbidden_imports:
+        print(self._module_to_forbidden_imports)
+        for module_regex, forbidden_imports in self._module_to_forbidden_imports:
             for forbidden_import in forbidden_imports:
-                if module_name in modnode.name and not '_test' in modnode.name:
-                    yield module_name, forbidden_import
+                if (
+                        re.compile(module_regex).match(modnode.name) and
+                        not '_test' in modnode.name
+                ):
+                    yield module_regex, forbidden_import
 
-    def _add_invalid_import_message(self, node, module_name, forbidden_import):
+    def _add_invalid_import_message(
+        self, node, module_regex, forbidden_import_regex
+    ):
         """Adds pylint message about the invalid import.
 
         Args:
             node: astroid.node_classes.Import. Node for a import statement
                 in the AST.
-            module_name: str. The module that was checked.
-            forbidden_import: str. The import that was invalid.
+            module_regex: str. The module that was checked.
+            forbidden_import_regex: str. The import that was invalid.
         """
         self.add_message(
             'invalid-import',
             node=node,
-            args=(
-                forbidden_import.split('.')[-1],
-                module_name.split('.')[-1]
-            ),
+            args=(forbidden_import_regex, module_regex)
         )
 
     def visit_import(self, node):
@@ -1569,11 +1583,14 @@ class RestrictedImportChecker(checkers.BaseChecker):
                 in the AST.
         """
         names = [name for name, _ in node.names]
-        for module_name, forbidden_import in self._iterate_forbidden_imports(
-                node):
-            if any(forbidden_import in name for name in names):
+        forbidden_imports = self._iterate_forbidden_imports(node)
+        for module_regex, forbidden_import_regex in forbidden_imports:
+            if any(
+                    re.compile(forbidden_import_regex[0]).match(name)
+                    for name in names
+            ):
                 self._add_invalid_import_message(
-                    node, module_name, forbidden_import)
+                    node, module_regex, forbidden_import_regex)
 
     def visit_importfrom(self, node):
         """Visits all import-from statements in a python file and checks that
@@ -1583,11 +1600,18 @@ class RestrictedImportChecker(checkers.BaseChecker):
             node: astroid.node_classes.ImportFrom. Node for a import-from
                 statement in the AST.
         """
-        for module_name, forbidden_import in self._iterate_forbidden_imports(
-                node):
-            if forbidden_import in node.modname:
-                self._add_invalid_import_message(
-                    node, module_name, forbidden_import)
+        forbidden_imports = self._iterate_forbidden_imports(node)
+        for module_regex, forbidden_import_regex in forbidden_imports:
+            from_regex = re.compile(forbidden_import_regex[0])
+
+            if from_regex.match(node.modname):
+                if forbidden_import_regex[1] is None:
+                    self._add_invalid_import_message(
+                        node, module_regex, forbidden_import_regex)
+                import_regex = re.compile(forbidden_import_regex[1])
+                if any(import_regex.match(name[0]) for name in node.names):
+                    self._add_invalid_import_message(
+                        node, module_regex, forbidden_import_regex)
 
 
 class SingleCharAndNewlineAtEOFChecker(checkers.BaseChecker):
