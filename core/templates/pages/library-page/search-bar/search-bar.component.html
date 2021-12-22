@@ -1,7 +1,7 @@
 <div class="oppia-same-row-container">
   <form class="navbar-form float-left oppia-search-bar-form" role="search">
     <div class="form-group">
-      <div class="input-group oppia-input-group" [ngClass]="{'classroom-page-input-group': classroomPageIsActive}">
+      <div class="input-group oppia-input-group" [ngClass]="{'classroom-page-input-group': isSearchButtonActive()}">
         <div class="input-group-addon oppia-search-bar-icon">
           <i class="material-icons oppia-translate-icon-down md-18" *ngIf="!isSearchInProgress()">&#xE8B6;</i>
           <span *ngIf="isSearchInProgress()">
@@ -12,7 +12,7 @@
                class="form-control oppia-search-bar-input oppia-search-bar-text-input protractor-test-search-input"
                [placeholder]="searchBarPlaceholder"
                [(ngModel)]="searchQuery"
-               (ngModelChange)="classroomPageIsActive ? null : onSearchQueryChangeExec()"
+               (ngModelChange)="searchButtonIsActive ? null : onSearchQueryChangeExec()"
                [ngModelOptions]="{ updateOn: 'blur', standalone:'true' }"
                aria-label="Search bar"
                (keydown.enter)="$event.target.blur()"
@@ -131,7 +131,7 @@
 </div>
 <div class="oppia-same-row-container">
   <div class="float-left oppia-navbar-button-container">
-    <div *ngIf="classroomPageIsActive"
+    <div *ngIf="searchButtonIsActive"
          class="oppia-search-button protractor-test-search-button"
          (click)="onSearchQueryChangeExec()"
          title="Click here to search">
