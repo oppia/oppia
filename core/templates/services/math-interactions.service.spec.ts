@@ -61,6 +61,13 @@ describe('MathInteractionsService', () => {
     expect(mathInteractionsService.validateAlgebraicExpression(
       'a^(b-c)', ['a', 'b', 'c'])).toBeTrue();
 
+    // We need to ignore redundant parens here since guppy auto adds extra
+    // parens while using exponents.
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      '((a+b))^(2)', ['a', 'b'])).toBeTrue();
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      '((x)^(2))', ['x'])).toBeTrue();
+
     expect(mathInteractionsService.validateAlgebraicExpression(
       'a+(-b+c)', ['a', 'b', 'c'])).toBeTrue();
 
@@ -270,6 +277,12 @@ describe('MathInteractionsService', () => {
 
     expect(mathInteractionsService.validateNumericExpression(
       '5^100')).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'Your expression contains an exponent with value greater than 5 ' +
+      'which is not supported.');
+
+    expect(mathInteractionsService.validateNumericExpression(
+      '((x)^(6))')).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'Your expression contains an exponent with value greater than 5 ' +
       'which is not supported.');

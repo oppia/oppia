@@ -107,6 +107,12 @@ export class MathInteractionsService {
     Multiple consecutive parens are considered redundant. eg: for ((a - b))
     the outer pair of parens are considered as redundant.
     */
+    if (closingInd + 2 < expressionString.length &&
+        expressionString[closingInd + 2] === "^") {
+      // Guppy adds redundant parens while using exponents, so we need to ignore
+      // them.
+      return false;
+    }
     let leftParenIsRedundant = (
       openingInd - 1 >= 0 && expressionString[openingInd - 1] === '(');
     let rightParenIsRedundant = (
@@ -203,7 +209,7 @@ export class MathInteractionsService {
       return false;
     }
 
-    let exponents = expressionString.match(/\^((\([^\(]*\))|(\w+))/g);
+    let exponents = expressionString.match(/\^((\([^\(\)]*\))|(\w+))/g);
     if (exponents !== null) {
       for (let exponent of exponents) {
         exponent = exponent.replace(/^\^/g, '');

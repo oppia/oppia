@@ -58,7 +58,7 @@ var answerObjectType = 'AlgebraicExpression';
 
 var testSuite = [{
   interactionArguments: [['a', 'b']],
-  ruleArguments: ['MatchesExactlyWith', '(a+b)^(2)'],
+  ruleArguments: ['MatchesExactlyWith', '(a+b)^2'],
   expectedInteractionDetails: [],
   wrongAnswers: ['(a-b)^2', '(a-b)^3', 'a^2+2*a*b+b^2'],
   correctAnswers: ['(a+b)^2']
