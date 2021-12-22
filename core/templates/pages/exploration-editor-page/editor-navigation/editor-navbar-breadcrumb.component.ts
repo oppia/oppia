@@ -29,11 +29,11 @@ import { Subscription } from 'rxjs';
 angular.module('oppia').component('editorNavbarBreadcrumb', {
   template: require('./editor-navbar-breadcrumb.component.html'),
   controller: [
-    '$rootScope', '$scope',
+    '$rootScope', '$scope', 'ExplorationPropertyService',
     'ExplorationTitleService', 'FocusManagerService', 'RouterService',
     'EXPLORATION_TITLE_INPUT_FOCUS_LABEL',
     function(
-        $rootScope, $scope,
+        $rootScope, $scope, ExplorationPropertyService,
         ExplorationTitleService, FocusManagerService, RouterService,
         EXPLORATION_TITLE_INPUT_FOCUS_LABEL) {
       var ctrl = this;
@@ -65,16 +65,18 @@ angular.module('oppia').component('editorNavbarBreadcrumb', {
       ctrl.$onInit = function() {
         $scope.navbarTitle = null;
         ctrl.directiveSubscriptions.add(
-          ExplorationTitleService.onExplorationPropertyChanged.subscribe(
+          ExplorationPropertyService.onExplorationPropertyChanged.subscribe(
             (propertyName) => {
-              const _MAX_TITLE_LENGTH = 20;
-              $scope.navbarTitle = ExplorationTitleService.savedMemento;
-              if ($scope.navbarTitle.length > _MAX_TITLE_LENGTH) {
-                $scope.navbarTitle = (
-                  $scope.navbarTitle.substring(
-                    0, _MAX_TITLE_LENGTH - 3) + '...');
+              if (propertyName === ExplorationTitleService.propertyName) {
+                const _MAX_TITLE_LENGTH = 20;
+                $scope.navbarTitle = ExplorationTitleService.savedMemento;
+                if ($scope.navbarTitle.length > _MAX_TITLE_LENGTH) {
+                  $scope.navbarTitle = (
+                    $scope.navbarTitle.substring(
+                      0, _MAX_TITLE_LENGTH - 3) + '...');
+                }
+                $rootScope.$applyAsync();
               }
-              $rootScope.$applyAsync();
             }
           )
         );
