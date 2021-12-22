@@ -114,8 +114,7 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
             int. The number of unique question ids.
         """
 
-        question_ids = [link.question_id for link in question_skill_link_models]
-        return len(set(question_ids))
+        return len({link.question_id for link in question_skill_link_models})
 
     @staticmethod
     def _create_skill_opportunity_model(
@@ -142,8 +141,9 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
             skill_opportunity = opportunity_domain.SkillOpportunity( # type: ignore[no-untyped-call]
                 skill_id=skill.id,
                 skill_description=skill.description,
-                question_count=GenerateSkillOpportunityModelJob
-                    ._count_unique_question_ids(question_skill_links)
+                question_count=(
+                    GenerateSkillOpportunityModelJob._count_unique_question_ids(
+                        question_skill_links))
             )
             skill_opportunity.validate() # type: ignore[no-untyped-call]
             skill_opportunity_model = opportunity_models.SkillOpportunityModel(
@@ -191,6 +191,11 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
                 'question_skill_links': question_skill_link_models
             }
             | 'Merge by skill ID' >> beam.CoGroupByKey()
+            # Pylint disable is needed because pylint is not able to correctly
+            # detect that the value is passed through the pipe.
+            | 'Remove skill IDs' >> beam.Values() # pylint: disable=no-value-for-parameter
+            # We are using itertools.chain.from_iterable to flatten question_skill_links
+            # from a 2D list into a 1D list.
             | 'Flatten skill and question_skill_links' >> beam.Map(
                 lambda object: {
                     'skill': object['skill'][0][0],
