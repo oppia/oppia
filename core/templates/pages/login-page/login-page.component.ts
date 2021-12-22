@@ -20,7 +20,6 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { downgradeComponent } from '@angular/upgrade/static';
 import firebase from 'firebase/app';
-import 'firebase/auth';
 
 import { AppConstants } from 'app.constants';
 import { AlertsService } from 'services/alerts.service';

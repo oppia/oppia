@@ -19,7 +19,6 @@
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import firebase from 'firebase/app';
-import 'firebase/auth';
 
 import { AlertsService } from 'services/alerts.service';
 import { AuthService } from 'services/auth.service';

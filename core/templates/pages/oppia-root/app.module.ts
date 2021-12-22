@@ -37,7 +37,6 @@ import { AngularFireAuth, AngularFireAuthModule, USE_EMULATOR } from '@angular/f
 import { AngularFireModule } from '@angular/fire';
 import { AuthService } from 'services/auth.service';
 import firebase from 'firebase/app';
-import 'firebase/auth';
 import * as hammer from 'hammerjs';
 
 class FirebaseErrorFilterHandler extends ErrorHandler {
