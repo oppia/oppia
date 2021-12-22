@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -42,6 +42,9 @@ describe('Skill editor save modal component', () => {
     componentInstance = fixture.componentInstance;
   });
 
+  // This component have no more frontend tests as it inherits the
+  // ConfirmOrCancelModalComponent and doesn't have any additional
+  // functionality. Please see the ConfirmOrCancelModalComponent for more tests.
   it('should create', () => {
     expect(componentInstance).toBeDefined();
   });
