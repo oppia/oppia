@@ -122,7 +122,7 @@ describe('Skill editor page', function() {
     expect(routingSpy).toHaveBeenCalled();
   });
 
-  fit('should open save changes modal with ngbModal when unsaved changes are' +
+  it('should open save changes modal with ngbModal when unsaved changes are' +
     ' present', function() {
     spyOn(UndoRedoService, 'getChangeCount').and.returnValue(1);
     var modalSpy = spyOn(ngbModal, 'open').and.callThrough();

@@ -272,7 +272,7 @@ describe('Skill Editor Navbar Directive', function() {
   }));
 
   describe('on navigating to questions tab ', function() {
-    fit('should open undo changes modal if there are unsaved ' +
+    it('should open undo changes modal if there are unsaved ' +
       'changes', fakeAsync(function() {
       // Setting unsaved changes to be two.
       spyOn(undoRedoService, 'getChangeCount')
