@@ -48,7 +48,6 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.LinterTestBase):
         third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
             CONFIG_PATH, [INVALID_CSS_FILEPATH])
         lint_task_report = third_party_linter.lint_css_files()
-        self.assertTrue(False)
         self.assert_same_list_elements(
             ['19:16', 'Unexpected whitespace before ":"'],
             lint_task_report.get_report())
