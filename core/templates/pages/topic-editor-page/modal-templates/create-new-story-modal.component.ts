@@ -16,7 +16,7 @@
  * @fileoverview Component for create new story modal.
  */
 
-import { ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { NewlyCreatedStory } from 'domain/topic/newly-created-story.model';
@@ -32,21 +32,18 @@ import { ContextService } from 'services/context.service';
   selector: 'oppia-create-new-story-modal',
   templateUrl: './create-new-story-modal.component.html'
 })
-export class CreateNewStoryModalComponent extends ConfirmOrCancelModal {
-  allowedBgColors = AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.story;
+export class CreateNewStoryModalComponent extends ConfirmOrCancelModal
+  implements OnInit {
+  storyUrlFragmentExists: boolean;
+  hostname: string;
+  classroomUrlFragment: string;
+  topicUrlFragment: string;
+  MAX_CHARS_IN_STORY_TITLE: number;
+  MAX_CHARS_IN_STORY_URL_FRAGMENT: number;
+  MAX_CHARS_IN_STORY_DESCRIPTION: number;
+  allowedBgColors: readonly string[];
   validUrlFragmentRegex = new RegExp(AppConstants.VALID_URL_FRAGMENT_REGEX);
   newlyCreatedStory: NewlyCreatedStory = NewlyCreatedStory.createDefault();
-  storyUrlFragmentExists: boolean = false;
-  hostname: string = this.windowRef.nativeWindow.location.hostname;
-  classroomUrlFragment = (
-    this.topicEditorStateService.getClassroomUrlFragment());
-  topicUrlFragment = (
-    this.topicEditorStateService.getTopic().getUrlFragment());
-  MAX_CHARS_IN_STORY_TITLE: number = AppConstants.MAX_CHARS_IN_STORY_TITLE;
-  MAX_CHARS_IN_STORY_URL_FRAGMENT: number = (
-    AppConstants.MAX_CHARS_IN_STORY_URL_FRAGMENT);
-  MAX_CHARS_IN_STORY_DESCRIPTION: number = (
-    AppConstants.MAX_CHARS_IN_STORY_DESCRIPTION);
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -61,6 +58,18 @@ export class CreateNewStoryModalComponent extends ConfirmOrCancelModal {
   }
 
   ngOnInit(): void {
+    this.storyUrlFragmentExists = false;
+    this.hostname = this.windowRef.nativeWindow.location.hostname;
+    this.classroomUrlFragment = (
+      this.topicEditorStateService.getClassroomUrlFragment());
+    this.topicUrlFragment = (
+      this.topicEditorStateService.getTopic().getUrlFragment());
+    this.allowedBgColors = AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.story;
+    this.MAX_CHARS_IN_STORY_TITLE = AppConstants.MAX_CHARS_IN_STORY_TITLE;
+    this.MAX_CHARS_IN_STORY_URL_FRAGMENT = (
+      AppConstants.MAX_CHARS_IN_STORY_URL_FRAGMENT);
+    this.MAX_CHARS_IN_STORY_DESCRIPTION = (
+      AppConstants.MAX_CHARS_IN_STORY_DESCRIPTION);
     this.contextService.setImageSaveDestinationToLocalStorage();
   }
 
