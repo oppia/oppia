@@ -12,17 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { fakeAsync, tick } from '@angular/core/testing';
+import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 /**
  * @fileoverview Unit test for State Hints Editor Component.
  */
 
-describe('StateHintsEditorComponent', () => {
+// eslint-disable-next-line oppia/no-test-blockers
+fdescribe('StateHintsEditorComponent', () => {
   let ctrl = null;
   let $rootScope = null;
   let $scope = null;
   let $uibModal = null;
+  let ngbModal = null;
   let $q = null;
 
   let WindowDimensionsService = null;
@@ -36,6 +40,16 @@ describe('StateHintsEditorComponent', () => {
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
 
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
+
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
@@ -48,6 +62,7 @@ describe('StateHintsEditorComponent', () => {
     ExternalSaveService = $injector.get('ExternalSaveService');
     StateInteractionIdService = $injector.get('StateInteractionIdService');
     StateSolutionService = $injector.get('StateSolutionService');
+    ngbModal = $injector.get('NgbModal');
     AlertsService = $injector.get('AlertsService');
 
     ctrl = $componentController('stateHintsEditor', {
@@ -236,46 +251,48 @@ describe('StateHintsEditorComponent', () => {
   it('should not open add hints modal if number of hint is greater than' +
     ' or equal to 5', () => {
     $scope.StateHintsService.displayed = ['a', 'b', 'c', 'd', 'e'];
-    spyOn($uibModal, 'open');
+    spyOn(ngbModal, 'open');
 
     expect($scope.openAddHintModal()).toBe(undefined);
-    expect($uibModal.open).not.toHaveBeenCalled();
+    expect(ngbModal.open).not.toHaveBeenCalled();
   });
 
-  it('should open add hints modal when user clicks on add hint button', () => {
-    $scope.StateHintsService.displayed = [
-      {
-        hintContent: {
-          html: '<p> Hint </p>'
+  // eslint-disable-next-line oppia/no-test-blockers
+  fit('should open add hints modal when user clicks on add hint button',
+    () => {
+      $scope.StateHintsService.displayed = [
+        {
+          hintContent: {
+            html: '<p> Hint </p>'
+          }
         }
-      }
-    ];
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.resolve({
-        hint: {
+      ];
+      spyOn(ngbModal, 'open').and.returnValue({
+        result: Promise.resolve({
+          hint: {
+            hintContent: {
+              html: '<p> New hint </p>'
+            }
+          }
+        })
+      } as NgbModalRef);
+
+      $scope.openAddHintModal();
+      $scope.$apply();
+
+      expect(StateHintsService.displayed).toEqual([
+        {
+          hintContent: {
+            html: '<p> Hint </p>'
+          }
+        },
+        {
           hintContent: {
             html: '<p> New hint </p>'
           }
         }
-      })
+      ]);
     });
-
-    $scope.openAddHintModal();
-    $scope.$apply();
-
-    expect(StateHintsService.displayed).toEqual([
-      {
-        hintContent: {
-          html: '<p> Hint </p>'
-        }
-      },
-      {
-        hintContent: {
-          html: '<p> New hint </p>'
-        }
-      }
-    ]);
-  });
 
   it('should close add hint modal when user clicks cancel', () => {
     $scope.StateHintsService.displayed = [
@@ -285,19 +302,26 @@ describe('StateHintsEditorComponent', () => {
         }
       }
     ];
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.reject()
+    spyOn(ngbModal, 'open').and.returnValue({
+      result: Promise.reject()
     });
 
     $scope.openAddHintModal();
     $scope.$apply();
 
-    expect($uibModal.open).toHaveBeenCalled();
+    expect(ngbModal.open).toHaveBeenCalled();
   });
 
   it('should open delete hint modal when user clicks on' +
-    ' delete hint button', () => {
+    ' delete hint button', fakeAsync(() => {
     spyOn(StateHintsService, 'getActiveHintIndex').and.returnValue(0);
+    spyOn($uibModal, 'open').and.returnValue({
+      result: $q.resolve()
+    });
+    spyOn(ngbModal, 'open').and.returnValue({
+      result: Promise.resolve()
+    });
+
     StateSolutionService.savedMemento = 'A';
     StateHintsService.displayed = [
       {
@@ -307,19 +331,17 @@ describe('StateHintsEditorComponent', () => {
       }
     ];
     StateHintsService.savedMemento = StateHintsService.displayed;
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.resolve()
-    });
 
     $scope.deleteHint(0, new Event(''));
+    tick();
     $scope.$apply();
 
-    expect($uibModal.open).toHaveBeenCalled();
+    expect(ngbModal.open).toHaveBeenCalled();
     expect(StateHintsService.displayed).toEqual([]);
-  });
+  }));
 
   it('should delete hint when user clicks on' +
-    ' delete hint button', () => {
+    ' delete hint button', fakeAsync(() => {
     spyOn(StateHintsService, 'getActiveHintIndex').and.returnValue(0);
     StateSolutionService.savedMemento = 'A';
     StateHintsService.displayed = [
@@ -335,11 +357,12 @@ describe('StateHintsEditorComponent', () => {
       }
     ];
     StateHintsService.savedMemento = StateHintsService.displayed;
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.resolve()
+    spyOn(ngbModal, 'open').and.returnValue({
+      result: Promise.resolve()
     });
 
     $scope.deleteHint(0, new Event(''));
+    tick();
     $scope.$apply();
 
     expect(StateHintsService.displayed).toEqual([
@@ -349,16 +372,16 @@ describe('StateHintsEditorComponent', () => {
         }
       }
     ]);
-  });
+  }));
 
   it('should close delete hint modal when user clicks on cancel', () => {
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.reject()
+    spyOn(ngbModal, 'open').and.returnValue({
+      result: Promise.reject()
     });
 
     $scope.deleteHint(0, new Event(''));
     $scope.$apply();
 
-    expect($uibModal.open).toHaveBeenCalled();
+    expect(ngbModal.open).toHaveBeenCalled();
   });
 });
