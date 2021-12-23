@@ -49,6 +49,7 @@ require('services/generate-content-id.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/external-save.service.ts');
 require('services/ngb-modal.service.ts');
+
 import { AddHintModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-hint-modal.component';
 
 angular.module('oppia').component('stateHintsEditor', {
@@ -130,7 +131,8 @@ angular.module('oppia').component('stateHintsEditor', {
         ExternalSaveService.onExternalSave.emit();
 
         NgbModal.open(AddHintModalComponent, {
-          backdrop: 'static'
+          backdrop: 'static',
+          windowClass: 'add-hint-modal'
         }).result.then(function(result) {
           StateHintsService.displayed.push(result.hint);
           StateHintsService.saveDisplayedValue();
