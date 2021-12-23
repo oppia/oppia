@@ -27,7 +27,6 @@ require('components/state-directives/hint-editor/hint-editor.component.ts');
 require(
   'components/state-directives/response-header/response-header.component.ts');
 
-
 require('domain/exploration/HintObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require(
