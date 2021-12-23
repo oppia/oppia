@@ -373,6 +373,7 @@ import { NavigationService } from './navigation.service';
 import { OppiaRteParserService } from './oppia-rte-parser.service';
 import { TopicEditorStateService } from 'pages/topic-editor-page/services/topic-editor-state.service';
 import { ExplorationTagsService } from 'pages/exploration-editor-page/services/exploration-tags.service';
+import { ExplorationTitleService } from 'pages/exploration-editor-page/services/exploration-title.service';
 import { ExplorationLanguageCodeService } from 'pages/exploration-editor-page/services/exploration-language-code.service';
 import { ExplorationInitStateNameService } from 'pages/exploration-editor-page/services/exploration-init-state-name.service';
 import { LibraryPageBackendApiService } from 'pages/library-page/services/library-page-backend-api.service';
@@ -520,6 +521,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ExplorationStatsService', ExplorationStatsService],
   ['ExplorationSummaryBackendApiService', ExplorationSummaryBackendApiService],
   ['ExplorationTagsService', ExplorationTagsService],
+  ['ExplorationTitleService', ExplorationTitleService],
   ['ExpressionEvaluatorService', ExpressionEvaluatorService],
   ['ExpressionInterpolationService', ExpressionInterpolationService],
   ['ExpressionParserService', ExpressionParserService],

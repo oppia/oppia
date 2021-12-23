@@ -16,34 +16,41 @@
  * @fileoverview Unit tests for the ExplorationTitleService.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
-// ^^^ This block is to be removed.
+import { TestBed } from '@angular/core/testing';
+import { ExplorationTitleService } from './exploration-title.service';
+import { ExplorationPropertyService } from './exploration-property.service';
+import { ExplorationRightsService } from './exploration-rights.service';
+import { ValidatorsService } from 'services/validators.service';
+import { NormalizeWhitespacePipe } from 'filters/string-utility-filters/normalize-whitespace.pipe';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
-require(
-  'pages/exploration-editor-page/services/exploration-title.service.ts');
+describe('Exploration Title Service', () => {
+  let service: ExplorationTitleService;
 
-describe('Exploration Title Service', function() {
-  let ets = null;
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [
+        ExplorationRightsService,
+        ValidatorsService,
+        NormalizeWhitespacePipe,
+        ExplorationPropertyService
+      ]
+    });
 
-  beforeEach(angular.mock.module('oppia'));
-  importAllAngularServices();
+    service = TestBed.inject(ExplorationTitleService);
+  });
 
-  beforeEach(angular.mock.inject(function($injector) {
-    ets = $injector.get('ExplorationTitleService');
-  }));
-
-  it('should test the child object properties', function() {
-    expect(ets.propertyName).toBe('title');
+  it('should test the child object properties', () => {
+    expect(service.propertyName).toBe('title');
     let NotNormalize = '   Exploration         Title Service     ';
     let Normalize = 'Exploration Title Service';
     let Valid = 'exploration';
     let Empty = '';
     let Special = 'Explor%tion Title }service';
-    expect(ets._normalize(NotNormalize)).toBe(Normalize);
-    expect(ets._isValid(Valid)).toBe(true);
-    expect(ets._isValid(Empty)).toBe(false);
-    expect(ets._isValid(Special)).toBe(false);
+    expect(service._normalize(NotNormalize)).toBe(Normalize);
+    expect(service._isValid(Valid)).toBe(true);
+    expect(service._isValid(Empty)).toBe(false);
+    expect(service._isValid(Special)).toBe(false);
   });
 });
