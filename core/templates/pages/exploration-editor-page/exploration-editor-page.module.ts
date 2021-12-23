@@ -56,6 +56,8 @@ import { DeleteAudioTranslationModalComponent } from './translation-tab/modal-te
 import { TranslationTabBusyModalComponent } from './translation-tab/modal-templates/translation-tab-busy-modal.component';
 import { ConfirmDeleteStateModalComponent } from './editor-tab/templates/modal-templates/confirm-delete-state-modal.component';
 import { RevertExplorationModalComponent } from './history-tab/modal-templates/revert-exploration-modal.component';
+import { AddHintModalComponent } from './editor-tab/templates/modal-templates/add-hint-modal.component';
+import { DeleteHintModalComponent } from './editor-tab/templates/modal-templates/delete-hint-modal.component';
 
 @NgModule({
   imports: [
@@ -96,7 +98,9 @@ import { RevertExplorationModalComponent } from './history-tab/modal-templates/r
     DeleteAudioTranslationModalComponent,
     ConfirmDeleteStateModalComponent,
     TranslationTabBusyModalComponent,
-    WelcomeTranslationModalComponent
+    WelcomeTranslationModalComponent,
+    AddHintModalComponent,
+    DeleteHintModalComponent
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -127,7 +131,9 @@ import { RevertExplorationModalComponent } from './history-tab/modal-templates/r
     DeleteAudioTranslationModalComponent,
     ConfirmDeleteStateModalComponent,
     TranslationTabBusyModalComponent,
-    WelcomeTranslationModalComponent
+    WelcomeTranslationModalComponent,
+    AddHintModalComponent,
+    DeleteHintModalComponent
   ],
   providers: [
     {

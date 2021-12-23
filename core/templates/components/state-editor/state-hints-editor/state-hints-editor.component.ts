@@ -17,15 +17,16 @@
  * editor.
  */
 
+import { AddHintModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-hint-modal.component';
+import { DeleteHintModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-hint-modal.component';
+
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 require('components/state-directives/hint-editor/hint-editor.component.ts');
 require(
   'components/state-directives/response-header/response-header.component.ts');
-require(
-  'pages/exploration-editor-page/editor-tab/templates/modal-templates/' +
-  'add-hint-modal.controller.ts');
+
 
 require('domain/exploration/HintObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
@@ -51,6 +52,7 @@ require('services/editability.service.ts');
 require('services/generate-content-id.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/external-save.service.ts');
+require('services/ngb-modal.service.ts');
 
 angular.module('oppia').component('stateHintsEditor', {
   bindings: {
@@ -62,7 +64,7 @@ angular.module('oppia').component('stateHintsEditor', {
   template: require('./state-hints-editor.component.html'),
   controller: [
     '$filter', '$scope', '$uibModal', 'AlertsService',
-    'EditabilityService', 'ExternalSaveService',
+    'EditabilityService', 'ExternalSaveService', 'NgbModal',
     'StateEditorService', 'StateHintsService',
     'StateInteractionIdService', 'StateNextContentIdIndexService',
     'StateSolutionService',
@@ -70,7 +72,7 @@ angular.module('oppia').component('stateHintsEditor', {
     'INTERACTION_SPECS',
     function(
         $filter, $scope, $uibModal, AlertsService,
-        EditabilityService, ExternalSaveService,
+        EditabilityService, ExternalSaveService, NgbModal,
         StateEditorService, StateHintsService,
         StateInteractionIdService, StateNextContentIdIndexService,
         StateSolutionService,
@@ -130,14 +132,9 @@ angular.module('oppia').component('stateHintsEditor', {
         AlertsService.clearWarnings();
         ExternalSaveService.onExternalSave.emit();
 
-        $uibModal.open({
-          template: require(
-            'pages/exploration-editor-page/editor-tab/templates/' +
-            'modal-templates/add-hint-modal.template.html'),
+        NgbModal.open(AddHintModalComponent, {
           backdrop: 'static',
-          resolve: {},
           windowClass: 'add-hint-modal',
-          controller: 'AddHintModalController'
         }).result.then(function(result) {
           StateHintsService.displayed.push(result.hint);
           StateHintsService.saveDisplayedValue();
@@ -178,12 +175,8 @@ angular.module('oppia').component('stateHintsEditor', {
         evt.stopPropagation();
 
         AlertsService.clearWarnings();
-        $uibModal.open({
-          template: require(
-            'pages/exploration-editor-page/editor-tab/templates/' +
-            'modal-templates/delete-hint-modal.template.html'),
-          backdrop: true,
-          controller: 'ConfirmOrCancelModalController'
+        NgbModal.open(DeleteHintModalComponent, {
+          backdrop: true
         }).result.then(function() {
           if (StateSolutionService.savedMemento &&
             StateHintsService.savedMemento.length === 1) {

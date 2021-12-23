@@ -82,9 +82,9 @@ class ConfigPropertyModel(base_models.VersionedModel):
     # doesn't match with VersionedModel.commit().
     # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     def commit( # type: ignore[override]
-            self,
-            committer_id: str,
-            commit_cmds: List[Dict[str, Any]]
+        self,
+        committer_id: str,
+        commit_cmds: List[Dict[str, Any]]
     ) -> None:
         super(ConfigPropertyModel, self).commit(committer_id, '', commit_cmds)
 
