@@ -33,7 +33,7 @@ export class AddWorkedExampleModalComponent
   extends ConfirmOrCancelModal implements OnInit {
   tmpWorkedExampleQuestionHtml: string;
   tmpWorkedExampleExplanationHtml: string;
-  WORKED_EXAMPLE_FORM_SCHEMA: HtmlFormSchema ={
+  WORKED_EXAMPLE_FORM_SCHEMA: HtmlFormSchema = {
     type: 'html',
     ui_config: {}
   }
@@ -45,13 +45,27 @@ export class AddWorkedExampleModalComponent
     super(ngbActiveModal);
   }
 
+  ngOnInit(): void {
+    this.tmpWorkedExampleQuestionHtml = '';
+    this.tmpWorkedExampleExplanationHtml = '';
+  }
+
   getSchema(): HtmlFormSchema {
     return this.WORKED_EXAMPLE_FORM_SCHEMA;
   }
 
-  ngOnInit(): void {
-    this.tmpWorkedExampleQuestionHtml = '';
-    this.tmpWorkedExampleExplanationHtml = '';
+  updateLocalQues($event: string): void {
+    if (this.tmpWorkedExampleQuestionHtml !== $event) {
+      this.tmpWorkedExampleQuestionHtml = $event;
+      this.changeDetectorRef.detectChanges();
+    }
+  }
+
+  updateLocalExp($event: string): void {
+    if (this.tmpWorkedExampleExplanationHtml !== $event) {
+      this.tmpWorkedExampleExplanationHtml = $event;
+      this.changeDetectorRef.detectChanges();
+    }
   }
 
   saveWorkedExample(): void {

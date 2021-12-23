@@ -28,7 +28,7 @@
 <button class="btn btn-secondary" (click)="cancel()" type="button">Cancel</button>
 <button class="btn btn-success protractor-test-save-worked-example-button"
         (click)="saveWorkedExample()"
-        (disabled)="!(tmpWorkedExampleQuestionHtml && tmpWorkedExampleExplanationHtml)">
+        [disabled]="!(tmpWorkedExampleQuestionHtml && tmpWorkedExampleExplanationHtml)">
   Save
   </button>
 </div>

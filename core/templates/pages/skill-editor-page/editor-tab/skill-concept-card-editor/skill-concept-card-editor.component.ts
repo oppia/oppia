@@ -26,9 +26,6 @@ require(
 require('directives/angular-html-bind.directive.ts');
 require(
   'pages/skill-editor-page/editor-tab/skill-preview-modal.controller.ts');
-require(
-  'pages/skill-editor-page/modal-templates/' +
-  'add-worked-example-modal.controller.ts');
 
 require('domain/skill/skill-update.service.ts');
 require('domain/skill/WorkedExampleObjectFactory.ts');
@@ -50,13 +47,14 @@ angular.module('oppia').component('skillConceptCardEditor', {
   bindings: {},
   template: require('./skill-concept-card-editor.component.html'),
   controller: [
-    '$filter', '$scope', '$uibModal', 'GenerateContentIdService',
+    '$filter', '$rootScope', '$scope', '$uibModal',
+    'GenerateContentIdService',
     'NgbModal', 'PageTitleService', 'SkillEditorStateService',
     'SkillUpdateService', 'UrlInterpolationService',
     'WindowDimensionsService', 'WorkedExampleObjectFactory',
     'COMPONENT_NAME_WORKED_EXAMPLE',
     function(
-        $filter, $scope, $uibModal,
+        $filter, $rootScope, $scope, $uibModal,
         GenerateContentIdService, NgbModal, PageTitleService,
         SkillEditorStateService,
         SkillUpdateService, UrlInterpolationService,
@@ -108,6 +106,7 @@ angular.module('oppia').component('skillConceptCardEditor', {
           $scope.bindableFieldsDict.displayedWorkedExamples =
             $scope.skill.getConceptCard().getWorkedExamples();
           $scope.activeWorkedExampleIndex = null;
+          $rootScope.$apply();
         }, function() {
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.
@@ -141,6 +140,7 @@ angular.module('oppia').component('skillConceptCardEditor', {
             $scope.skill, newExample);
           $scope.bindableFieldsDict.displayedWorkedExamples =
             $scope.skill.getConceptCard().getWorkedExamples();
+          // $rootScope.$apply();
         }, function() {
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.

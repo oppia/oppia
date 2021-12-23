@@ -60,9 +60,9 @@ describe('Add Worked Example Modal Controller', function() {
     ngbActiveModal = TestBed.inject(NgbActiveModal);
 
     fixture.detectChanges();
-   });
+  });
 
-   it('should initialize $scope properties after controller is initialized',
+  it('should initialize properties after component is initialized',
     () => {
       expect(component.tmpWorkedExampleQuestionHtml).toEqual('');
       expect(component.tmpWorkedExampleExplanationHtml).toBe('');
@@ -74,5 +74,26 @@ describe('Add Worked Example Modal Controller', function() {
       workedExampleQuestionHtml: '',
       workedExampleExplanationHtml: ''
     });
+  });
+
+  it('should get schema', () => {
+    expect(component.getSchema())
+      .toEqual(component.WORKED_EXAMPLE_FORM_SCHEMA);
+  });
+
+  it('should update tmpWorkedExampleQuestionHtml', () => {
+    let ques = 'ques';
+    component.ngOnInit();
+    component.updateLocalQues(ques);
+
+    expect(component.tmpWorkedExampleQuestionHtml).toEqual(ques);
+  });
+
+  it('should update tmpWorkedExampleExplanationHtml', () => {
+    let exp = 'exp';
+    component.ngOnInit();
+    component.updateLocalExp(exp);
+
+    expect(component.tmpWorkedExampleExplanationHtml).toEqual(exp);
   });
 });
