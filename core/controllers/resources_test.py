@@ -522,7 +522,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
 
         mock_accepted_audio_extensions = {
-            'mp3': ['audio/mp3'],
+            'mp3': ['audio/mpeg'],
             'flac': ['audio/flac']
         }
 
