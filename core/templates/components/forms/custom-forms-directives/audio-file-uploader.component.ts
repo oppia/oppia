@@ -35,7 +35,7 @@ export class AudioFileUploaderComponent {
   // be called until the input form and file input views are initialized.
   @ViewChild('fileInput') fileInputRef!: ElementRef;
   @ViewChild('inputForm') inputFormRef!: ElementRef;
-  ALLOWED_AUDIO_FILE_TYPES = ['audio/mp3', 'audio/mpeg'];
+  ALLOWED_AUDIO_FILE_TYPES = ['audio/mpeg'];
   // 'null' implies not displaying an error message.
   errorMessage: string | null = null;
   licenseUrl = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LICENSE.ROUTE;
