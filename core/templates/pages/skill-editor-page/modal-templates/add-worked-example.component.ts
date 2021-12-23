@@ -36,7 +36,7 @@ export class AddWorkedExampleModalComponent
   WORKED_EXAMPLE_FORM_SCHEMA: HtmlFormSchema = {
     type: 'html',
     ui_config: {}
-  }
+  };
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
@@ -74,6 +74,6 @@ export class AddWorkedExampleModalComponent
         this.tmpWorkedExampleQuestionHtml,
       workedExampleExplanationHtml:
         this.tmpWorkedExampleExplanationHtml
-    })
+    });
   }
 }

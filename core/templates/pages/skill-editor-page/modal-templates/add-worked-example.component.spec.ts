@@ -69,7 +69,7 @@ describe('Add Worked Example Modal Component', function() {
     });
 
   it('should close modal when saving worked example', () => {
-    spyOn(ngbActiveModal,'close');
+    spyOn(ngbActiveModal, 'close');
 
     component.saveWorkedExample();
 
