@@ -24,10 +24,13 @@ from core.constants import constants
 from core.domain import caching_services
 from core.domain import change_domain
 from core.platform import models
-from mypy_imports import config_models
-from mypy_imports import suggestion_models
 
 from typing import Any, Dict, List
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import config_models
+    from mypy_imports import suggestion_models
 
 (config_models, suggestion_models,) = models.Registry.import_models(
     [models.NAMES.config, models.NAMES.suggestion])

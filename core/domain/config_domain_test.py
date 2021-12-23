@@ -24,7 +24,10 @@ from core import utils
 from core.domain import config_domain
 from core.platform import models
 from core.tests import test_utils
-from mypy_imports import config_models
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import config_models
 
 (config_models,) = models.Registry.import_models([models.NAMES.config])
 
@@ -42,7 +45,8 @@ class ConfigPropertyChangeTests(test_utils.GenericTestBase):
             config_domain.ConfigPropertyChange({'cmd': 'invalid'})
 
     def test_config_property_change_object_with_missing_attribute_in_cmd(
-        self) -> None:
+        self
+    ) -> None:
         with self.assertRaisesRegexp(# type: ignore[no-untyped-call]
             utils.ValidationError, (
                 'The following required attributes are missing: '
@@ -52,7 +56,8 @@ class ConfigPropertyChangeTests(test_utils.GenericTestBase):
             })
 
     def test_config_property_change_object_with_extra_attribute_in_cmd(
-        self) -> None:
+        self
+    ) -> None:
         with self.assertRaisesRegexp(# type: ignore[no-untyped-call]
             utils.ValidationError, (
                 'The following extra attributes are present: invalid')):
@@ -63,7 +68,8 @@ class ConfigPropertyChangeTests(test_utils.GenericTestBase):
             })
 
     def test_config_property_change_object_with_change_property_value(
-        self) -> None:
+        self
+    ) -> None:
         config_property_change_object = config_domain.ConfigPropertyChange({
             'cmd': 'change_property_value',
             'new_value': 'new_value'
@@ -96,7 +102,8 @@ class ConfigPropertyRegistryTests(test_utils.GenericTestBase):
             schema_utils_test.validate_schema(schema)
 
     def test_get_exception_creating_new_config_property_with_existing_name(
-            self) -> None:
+        self
+    ) -> None:
         with self.assertRaisesRegexp(# type: ignore[no-untyped-call]
             Exception, 'Property with name promo_bar_enabled already exists'):
             config_domain.ConfigProperty(

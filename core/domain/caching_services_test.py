@@ -240,7 +240,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             {})
 
     def test_serialization_and_deserialization_returns_the_same_object(
-        self) -> None:
+        self
+    ) -> None:
         deserialize = (
             caching_services.DESERIALIZATION_FUNCTIONS['exploration'])
         serialize = (
@@ -443,7 +444,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             default_exploration.to_dict())
 
     def test_set_multi_returns_true_for_successful_insert_into_cache(
-        self) -> None:
+        self
+    ) -> None:
         key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
         cache_strings_response = caching_services.set_multi(
             caching_services.CACHE_NAMESPACE_DEFAULT, None, key_value_mapping)
@@ -541,7 +543,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 ['a', 'b', 'c']))
 
     def test_delete_multi_returns_false_when_sub_namespace_incorrect(
-        self) -> None:
+        self
+    ) -> None:
         key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
 
         caching_services.set_multi(
@@ -564,7 +567,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             self.assertNotIn(caching_services.MEMCACHE_KEY_DELIMITER, namespace)
 
     def test_config_properties_identically_cached_in_dev_and_test_environment(
-            self) -> None:
+            self
+    ) -> None:
         """Test to make sure that caching in the test environment is in sync
         with caching in the main development server. More specifically, when a
         config property is created with fields that contain unicode characters,
@@ -573,7 +577,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         on the testing server.
         """
         def mock_memory_cache_services_set_multi(
-            id_value_mapping: Dict[str, str]) -> None:
+            id_value_mapping: Dict[str, str]
+        ) -> None:
             # This mock asserts that for the same config domain attribute
             # containing unicode characters, the string that is set to the cache
             # in the testing environment is the same as the string set to the
@@ -631,7 +636,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             })
 
     def test_explorations_identically_cached_in_dev_and_test_environment(
-            self) -> None:
+        self
+    ) -> None:
         """Test to make sure that caching in the test environment is in sync
         with caching in the main development server. More specifically, when an
         exploration is created with fields that contain unicode characters, the
@@ -652,7 +658,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             self.exploration_dict_with_unicode_characters)
 
         def mock_memory_cache_services_set_multi(
-            id_value_mapping: Dict[str, Any]) -> None:
+            id_value_mapping: Dict[str, Any]
+        ) -> None:
             # The json encoded string is the string that is set to the cache
             # when an exploration is created in the development server. This
             # mock asserts that for the same exploration, the string
@@ -676,7 +683,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 })
 
     def test_unicode_characters_are_set_and_get_correctly_in_default_namespace(
-            self) -> None:
+        self
+    ) -> None:
         """Test to make sure that default namespace values (ints, floats,
         strings, boolean, lists, and dicts) can be set to the cache without
         errors and retrieved from the cache without any alterations.
@@ -704,7 +712,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             })
 
     def test_explorations_with_unicode_characters_are_set_and_get_correctly(
-            self) -> None:
+        self
+    ) -> None:
         """Test to make sure that a default explorations initialized with
         unicode characters is set to the cache without errors and retrieved from
         the cache without any alterations (in an identical state to when it was
@@ -738,7 +747,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             exp_ids_to_explorations[exploration_id].to_dict())
 
     def test_collections_with_unicode_characters_are_set_and_get_correctly(
-            self) -> None:
+        self
+    ) -> None:
         """Test to make sure that a default collection initialized with unicode
         characters is set to the cache without errors and retrieved from the
         cache without any alterations (in an identical state to when it was
@@ -773,7 +783,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             collections[collection_id].to_dict())
 
     def test_skills_with_unicode_characters_are_set_and_get_correctly(
-            self) -> None:
+        self
+    ) -> None:
         """Test to make sure that a default skill initialized with unicode
         characters is set to the cache without errors and retrieved from the
         cache without any alterations (in an identical state to when it was
@@ -819,7 +830,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             skills[skill_id].to_dict())
 
     def test_topics_with_unicode_characters_are_set_and_get_correctly(
-            self) -> None:
+        self
+    ) -> None:
         """Test to make sure that a default topic initialized with unicode
         characters is set to the cache without errors and retrieved from the
         cache without any alterations (in an identical state to when it was
@@ -855,7 +867,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             topics[topic_id].to_dict())
 
     def test_stories_with_unicode_characters_are_set_and_get_correctly(
-            self) -> None:
+        self
+    ) -> None:
         """Test to make sure that a default story initialized with unicode
         characters is set to the cache without errors and retrieved from the
         cache without any alterations (in an identical state to when it was
@@ -893,7 +906,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             stories[story_id].to_dict())
 
     def test_platform_parameters_with_unicode_are_set_and_get_correctly(
-            self) -> None:
+        self
+    ) -> None:
         """Test to make sure that a default platform parameter initialized with
         unicode characters is set to the cache without errors and retrieved from
         the cache without any alterations (in an identical state to when it was
