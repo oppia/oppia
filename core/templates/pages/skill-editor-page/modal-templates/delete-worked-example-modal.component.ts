@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for delete story modal.
+ * @fileoverview Component for delete worked example modal.
  */
 
 import { Component } from '@angular/core';

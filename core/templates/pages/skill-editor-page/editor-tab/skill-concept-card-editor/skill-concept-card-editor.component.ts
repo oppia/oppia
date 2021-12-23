@@ -25,6 +25,9 @@ require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require('directives/angular-html-bind.directive.ts');
 require(
+  'pages/skill-editor-page/editor-tab/skill-concept-card-editor/' +
+  'worked-example-editor.directive.ts');
+require(
   'pages/skill-editor-page/editor-tab/skill-preview-modal.controller.ts');
 
 require('domain/skill/skill-update.service.ts');
@@ -140,7 +143,7 @@ angular.module('oppia').component('skillConceptCardEditor', {
             $scope.skill, newExample);
           $scope.bindableFieldsDict.displayedWorkedExamples =
             $scope.skill.getConceptCard().getWorkedExamples();
-          // $rootScope.$apply();
+          $rootScope.$apply();
         }, function() {
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.
