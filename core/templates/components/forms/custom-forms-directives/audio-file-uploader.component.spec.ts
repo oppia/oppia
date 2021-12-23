@@ -52,7 +52,7 @@ describe('Audio File Uploader Component', () => {
         type: 'audio/mpeg',
       }),
       new File(['bar'], 'audio.mp3', {
-        type: 'audio/mp3',
+        type: 'audio/mpeg',
       })
     ];
     spyOn(component.fileChange, 'emit');
