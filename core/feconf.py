@@ -427,7 +427,7 @@ COMPRESSIBLE_IMAGE_FORMATS = [IMAGE_FORMAT_JPEG, IMAGE_FORMAT_PNG]
 # An array containing the accepted audio extensions for uploaded files and
 # the corresponding MIME types.
 ACCEPTED_AUDIO_EXTENSIONS = {
-    'mp3': ['audio/mp3']
+    'mp3': ['audio/mpeg']
 }
 
 # Prefix for data sent from the server to the client via JSON.
