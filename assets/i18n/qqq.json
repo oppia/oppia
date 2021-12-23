@@ -358,7 +358,7 @@
 	"I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_STATUS_CHANGE_MESSAGE": "Text that appears in the feedback thread of the learner dashboard. It indicates that the status of the feedback thread has been changed by a creator.",
 	"I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_WARNING": "This message appears when a feedback thread is opened in the learner dashboard. It warns the user against divulging private information on a publicly viewable discussion.",
 	"I18N_LEARNER_DASHBOARD_GOALS_SECTION": "Text for the goals section in the learner dashboard.",
-	"I18N_LEARNER_DASHBOARD_GOLD_BADGE": "Text for the gold badge in the learner dashboard.",
+	"I18N_LEARNER_DASHBOARD_GOLD_BADGE": "Text for the gold badge in the learner dashboard.\n\n{{Identical|Gold}}",
 	"I18N_LEARNER_DASHBOARD_HOME_SECTION": "Text for the home section in the learner dashboard.",
 	"I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION": "Text for the incomplete section in the learner dashboard.",
 	"I18N_LEARNER_DASHBOARD_INTRO_MESSAGE_PART_ONE": "First part of the introductory message that appears on the learner dashboard when there is no activity.",
