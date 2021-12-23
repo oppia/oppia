@@ -17,13 +17,14 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-import { destroyPlatform } from '@angular/core';
-import { ExplorationCorrectnessFeedbackService } from './/exploration-correctness-feedback.service';
+import { ExplorationCorrectnessFeedbackService } from './exploration-correctness-feedback.service';
 import { ExplorationPropertyService } from './exploration-property.service';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
 
 describe('Exploration Correctness Feedback Service', () => {
   let ecfs: ExplorationCorrectnessFeedbackService;
+  let httpTestingController: HttpTestingController;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -32,11 +33,13 @@ describe('Exploration Correctness Feedback Service', () => {
         ExplorationPropertyService
       ]
     });
-
+    httpTestingController = TestBed.inject(HttpTestingController);
     ecfs = TestBed.inject(ExplorationCorrectnessFeedbackService);
   });
 
-  afterEach(() => destroyPlatform());
+  afterEach(() => {
+    httpTestingController.verify();
+  });
 
   it('should toggle correctness feedback display', () => {
     var isValidSpy = spyOn(
