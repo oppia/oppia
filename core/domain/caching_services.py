@@ -228,7 +228,7 @@ def set_multi(
         SERIALIZATION_FUNCTIONS[namespace](value) # type: ignore[operator]
         for obj_id, value in id_value_mapping.items()
     }
-    return bool(memory_cache_services.set_multi(memory_cache_id_value_mapping))
+    return memory_cache_services.set_multi(memory_cache_id_value_mapping)
 
 
 def delete_multi(
@@ -262,8 +262,7 @@ def delete_multi(
     memcache_keys = [
         _get_memcache_key(namespace, sub_namespace, obj_id)
         for obj_id in obj_ids]
-    return bool(
-        memory_cache_services.delete_multi(memcache_keys) == len(obj_ids))
+    return memory_cache_services.delete_multi(memcache_keys) == len(obj_ids)
 
 
 def get_memory_cache_stats() -> caching_domain.MemoryCacheStats:
