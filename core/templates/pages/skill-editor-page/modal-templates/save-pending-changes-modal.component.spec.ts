@@ -40,6 +40,9 @@ describe('Delete Topic Modal Component', () => {
     componentInstance = fixture.componentInstance;
   });
 
+  // This component have no more frontend tests as it inherits the
+  // ConfirmOrCancelModalComponent and doesn't have any additional
+  // functionality. Please see the ConfirmOrCancelModalComponent for more tests.
   it('should create', () => {
     expect(componentInstance).toBeDefined();
   });
