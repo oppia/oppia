@@ -68,10 +68,8 @@ describe('Contribution and review service', () => {
   describe('getUserCreatedQuestionSuggestionsAsync', () => {
     it('should return available question suggestions and opportunity details',
       () => {
-        spyOn(carbas, 'fetchSuggestions').and.returnValue(
+        spyOn(carbas, 'fetchSuggestionsAsync').and.returnValue(
           Promise.resolve(testSuggestionsBackendObject));
-
-        const url = '/getsubmittedsuggestions/skill/add_question';
 
         cars.getUserCreatedQuestionSuggestionsAsync()
           .then((suggestionIdToSuggestions) => {
@@ -79,17 +77,15 @@ describe('Contribution and review service', () => {
               .toEqual(expectedSuggestionDict);
           });
 
-        expect(carbas.fetchSuggestions).toHaveBeenCalledWith(url);
+        expect(carbas.fetchSuggestionsAsync).toHaveBeenCalled();
       });
   });
 
   describe('getReviewableQuestionSuggestionsAsync', () => {
     it('should return available question suggestions and opportunity details',
       () => {
-        spyOn(carbas, 'fetchSuggestions').and.returnValue(
+        spyOn(carbas, 'fetchSuggestionsAsync').and.returnValue(
           Promise.resolve(testSuggestionsBackendObject));
-
-        const url = '/getreviewablesuggestions/skill/add_question';
 
         cars.getReviewableQuestionSuggestionsAsync()
           .then((suggestionIdToSuggestions) => {
@@ -97,17 +93,15 @@ describe('Contribution and review service', () => {
               .toEqual(expectedSuggestionDict);
           });
 
-        expect(carbas.fetchSuggestions).toHaveBeenCalledWith(url);
+        expect(carbas.fetchSuggestionsAsync).toHaveBeenCalled();
       });
   });
 
   describe('getUserCreatedTranslationSuggestionsAsync', () => {
     it('should return translation suggestions and opportunity details',
       () => {
-        spyOn(carbas, 'fetchSuggestions').and.returnValue(
+        spyOn(carbas, 'fetchSuggestionsAsync').and.returnValue(
           Promise.resolve(testSuggestionsBackendObject));
-
-        const url = '/getsubmittedsuggestions/exploration/translate_content';
 
         cars.getUserCreatedTranslationSuggestionsAsync()
           .then((suggestionIdToSuggestions) => {
@@ -115,17 +109,15 @@ describe('Contribution and review service', () => {
               .toEqual(expectedSuggestionDict);
           });
 
-        expect(carbas.fetchSuggestions).toHaveBeenCalledWith(url);
+        expect(carbas.fetchSuggestionsAsync).toHaveBeenCalled();
       });
   });
 
   describe('getReviewableTranslationSuggestionsAsync', () => {
     it('should return translation suggestions and opportunity details',
       () => {
-        spyOn(carbas, 'fetchSuggestions').and.returnValue(
+        spyOn(carbas, 'fetchSuggestionsAsync').and.returnValue(
           Promise.resolve(testSuggestionsBackendObject));
-
-        const url = '/getreviewablesuggestions/exploration/translate_content';
 
         cars.getReviewableTranslationSuggestionsAsync()
           .then((suggestionIdToSuggestions) => {
@@ -133,13 +125,11 @@ describe('Contribution and review service', () => {
               .toEqual(expectedSuggestionDict);
           });
 
-        expect(carbas.fetchSuggestions).toHaveBeenCalledWith(url);
+        expect(carbas.fetchSuggestionsAsync).toHaveBeenCalled();
       });
   });
 
   describe('resolveSuggestionToExploration', () => {
-    let url = '/suggestionactionhandler/exploration/abc/pqr';
-
     let data = {
       action: 'accept',
       review_message: 'review message',
@@ -157,7 +147,8 @@ describe('Contribution and review service', () => {
 
     it('should call onSuccess function on' +
     'resolving suggestion to exploration correctly', fakeAsync(() => {
-      spyOn(carbas, 'resolveToExploration').and.returnValue(Promise.resolve());
+      spyOn(carbas, 'resolveToExplorationAsync')
+        .and.returnValue(Promise.resolve());
 
       cars.resolveSuggestionToExploration(
         'abc', 'pqr', 'accept', 'review message', 'commit message',
@@ -165,14 +156,15 @@ describe('Contribution and review service', () => {
       );
       tick();
 
-      expect(carbas.resolveToExploration).toHaveBeenCalledWith(url, data);
+      expect(carbas.resolveToExplorationAsync).toHaveBeenCalledWith(
+        'abc', 'pqr', data);
       expect(onSuccess).toHaveBeenCalledWith('pqr');
       expect(onFailure).not.toHaveBeenCalled();
     }));
 
     it('should call onFailure function when' +
     'resolving suggestion to exploration fails', fakeAsync(() => {
-      spyOn(carbas, 'resolveToExploration').and
+      spyOn(carbas, 'resolveToExplorationAsync').and
         .returnValue(Promise.reject());
 
       cars.resolveSuggestionToExploration(
@@ -181,15 +173,14 @@ describe('Contribution and review service', () => {
       );
       tick();
 
-      expect(carbas.resolveToExploration).toHaveBeenCalledWith(url, data);
+      expect(carbas.resolveToExplorationAsync).toHaveBeenCalledWith(
+        'abc', 'pqr', data);
       expect(onSuccess).not.toHaveBeenCalled();
       expect(onFailure).toHaveBeenCalled();
     }));
   });
 
   describe('resolveSuggestiontoSkill', () => {
-    let url = '/suggestionactionhandler/skill/abc/pqr';
-
     let data = {
       action: 'accept',
       review_message: 'review message',
@@ -207,34 +198,34 @@ describe('Contribution and review service', () => {
 
     it('should call onSuccess function on' +
     'resolving suggestion to skill correctly', fakeAsync(() => {
-      spyOn(carbas, 'resolveToSkill').and.returnValue(Promise.resolve());
+      spyOn(carbas, 'resolveToSkillAsync').and.returnValue(Promise.resolve());
 
       cars.resolveSuggestiontoSkill(
         'abc', 'pqr', 'accept', 'review message', 'easy', onSuccess, onFailure);
       tick();
 
-      expect(carbas.resolveToSkill).toHaveBeenCalledWith(url, data);
+      expect(carbas.resolveToSkillAsync)
+        .toHaveBeenCalledWith('abc', 'pqr', data);
       expect(onSuccess).toHaveBeenCalledWith('pqr');
       expect(onFailure).not.toHaveBeenCalled();
     }));
 
     it('should call onFailure function when' +
     'resolving suggestion to skill fails', fakeAsync(() => {
-      spyOn(carbas, 'resolveToSkill').and.returnValue(Promise.reject());
+      spyOn(carbas, 'resolveToSkillAsync').and.returnValue(Promise.reject());
 
       cars.resolveSuggestiontoSkill(
         'abc', 'pqr', 'accept', 'review message', 'easy', onSuccess, onFailure);
       tick();
 
-      expect(carbas.resolveToSkill).toHaveBeenCalledWith(url, data);
+      expect(carbas.resolveToSkillAsync)
+        .toHaveBeenCalledWith('abc', 'pqr', data);
       expect(onSuccess).not.toHaveBeenCalled();
       expect(onFailure).toHaveBeenCalled();
     }));
   });
 
   describe('updateTranslationSuggestionAsync', () => {
-    let url = '/updatetranslationsuggestionhandler/pqr';
-
     let data = {
       translation_html: '<p>In English</p>'
     };
@@ -250,38 +241,36 @@ describe('Contribution and review service', () => {
 
     it('should call onSuccess function when' +
     'updateTranslationSuggestionAsync succeeds', fakeAsync(() => {
-      spyOn(carbas, 'updateTranslationSuggestion').and
+      spyOn(carbas, 'updateTranslationSuggestionAsync').and
         .returnValue(Promise.resolve());
 
       cars.updateTranslationSuggestionAsync(
         'pqr', '<p>In English</p>', onSuccess, onFailure);
       tick();
 
-      expect(carbas.updateTranslationSuggestion)
-        .toHaveBeenCalledWith(url, data);
+      expect(carbas.updateTranslationSuggestionAsync)
+        .toHaveBeenCalledWith('pqr', data);
       expect(onSuccess).toHaveBeenCalled();
       expect(onFailure).not.toHaveBeenCalled();
     }));
 
     it('should call onFailure function when' +
     'updateTranslationSuggestionAsync fails', fakeAsync(() => {
-      spyOn(carbas, 'updateTranslationSuggestion').and
+      spyOn(carbas, 'updateTranslationSuggestionAsync').and
         .returnValue(Promise.reject());
 
       cars.updateTranslationSuggestionAsync(
         'pqr', '<p>In English</p>', onSuccess, onFailure);
       tick();
 
-      expect(carbas.updateTranslationSuggestion)
-        .toHaveBeenCalledWith(url, data);
+      expect(carbas.updateTranslationSuggestionAsync)
+        .toHaveBeenCalledWith('pqr', data);
       expect(onSuccess).not.toHaveBeenCalled();
       expect(onFailure).toHaveBeenCalled();
     }));
   });
 
   describe('updateQuestionSuggestionAsync', () => {
-    let url = '/updatequestionsuggestionhandler/pqr';
-
     let testQuestionStateData = {
       classifier_model_id: null,
       content: {
@@ -371,7 +360,7 @@ describe('Contribution and review service', () => {
 
     it('should call onSuccess function when' +
     'updateQuestionSuggestionAsync succeeds', fakeAsync(() =>{
-      spyOn(carbas, 'updateQuestionSuggestion').and
+      spyOn(carbas, 'updateQuestionSuggestionAsync').and
         .returnValue(Promise.resolve());
 
       cars.updateQuestionSuggestionAsync(
@@ -379,15 +368,15 @@ describe('Contribution and review service', () => {
         testImagesData, onSuccess, onFailure);
       tick();
 
-      expect(carbas.updateQuestionSuggestion)
-        .toHaveBeenCalledWith(url, testBody);
+      expect(carbas.updateQuestionSuggestionAsync)
+        .toHaveBeenCalledWith('pqr', testBody);
       expect(onSuccess).toHaveBeenCalledWith('pqr');
       expect(onFailure).not.toHaveBeenCalled();
     }));
 
     it('should call onFailure function when' +
     'updateQuestionSuggestionAsync fails', fakeAsync(() =>{
-      spyOn(carbas, 'updateQuestionSuggestion').and
+      spyOn(carbas, 'updateQuestionSuggestionAsync').and
         .returnValue(Promise.reject());
 
       cars.updateQuestionSuggestionAsync(
@@ -395,8 +384,8 @@ describe('Contribution and review service', () => {
         testImagesData, onSuccess, onFailure);
       tick();
 
-      expect(carbas.updateQuestionSuggestion)
-        .toHaveBeenCalledWith(url, testBody);
+      expect(carbas.updateQuestionSuggestionAsync)
+        .toHaveBeenCalledWith('pqr', testBody);
       expect(onSuccess).not.toHaveBeenCalled();
       expect(onFailure).toHaveBeenCalledWith('pqr');
     }));

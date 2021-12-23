@@ -44,7 +44,9 @@ describe('Contribution and review backend API service', () => {
 
     const url = '/getsubmittedsuggestions/skill/add_question';
 
-    carbas.fetchSuggestions(url).then(successHandler, failureHandler);
+    carbas.fetchSuggestionsAsync(
+      'SUBMITTED_SUGGESTION_LIST_HANDLER_URL', 'skill', 'add_question'
+    ).then(successHandler, failureHandler);
 
     const req = http.expectOne(url);
     expect(req.request.method).toEqual('GET');
@@ -84,7 +86,8 @@ describe('Contribution and review backend API service', () => {
       commit_message: 'test commit message'
     };
 
-    carbas.resolveToExploration(url, data).then(successHandler, failureHandler);
+    carbas.resolveToExplorationAsync('abc', 'pqr', data)
+      .then(successHandler, failureHandler);
 
     const req = http.expectOne(url);
     expect(req.request.method).toEqual('PUT');
@@ -107,7 +110,8 @@ describe('Contribution and review backend API service', () => {
       skill_difficulty: 'easy'
     };
 
-    carbas.resolveToSkill(url, data).then(successHandler, failureHandler);
+    carbas.resolveToSkillAsync('abc', 'pqr', data)
+      .then(successHandler, failureHandler);
 
     const req = http.expectOne(url);
     expect(req.request.method).toEqual('PUT');
@@ -128,7 +132,7 @@ describe('Contribution and review backend API service', () => {
       translation_html: '<p>In English</p>'
     };
 
-    carbas.updateTranslationSuggestion(url, data)
+    carbas.updateTranslationSuggestionAsync('abc', data)
       .then(successHandler, failureHandler);
 
     const req = http.expectOne(url);
@@ -213,7 +217,7 @@ describe('Contribution and review backend API service', () => {
     const body = new FormData();
     body.append('payload', JSON.stringify(payload));
 
-    carbas.updateQuestionSuggestion(url, body)
+    carbas.updateQuestionSuggestionAsync('abc', body)
       .then(successHandler, failureHandler);
 
     const req = http.expectOne(url);

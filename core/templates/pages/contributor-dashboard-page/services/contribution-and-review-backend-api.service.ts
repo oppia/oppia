@@ -19,6 +19,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FetchSuggestionsResponse } from './contribution-and-review.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 
 interface ResolveToExplorationData {
   action: string;
@@ -40,35 +41,81 @@ interface UpdateTranslationData {
   providedIn: 'root',
 })
 export class ContributionAndReviewBackendApiService {
+  private urls = {
+    SUBMITTED_SUGGESTION_LIST_HANDLER_URL: (
+      '/getsubmittedsuggestions/<target_type>/<suggestion_type>'),
+    REVIEWABLE_SUGGESTIONS_HANDLER_URL: (
+      '/getreviewablesuggestions/<target_type>/<suggestion_type>'),
+    SUGGESTION_TO_EXPLORATION_ACTION_HANDLER_URL: (
+      '/suggestionactionhandler/exploration/<exp_id>/<suggestion_id>'),
+    SUGGESTION_TO_SKILL_ACTION_HANDLER_URL: (
+      '/suggestionactionhandler/skill/<skill_id>/<suggestion_id>'),
+    UPDATE_TRANSLATION_HANDLER_URL: (
+      '/updatetranslationsuggestionhandler/<suggestion_id>'),
+    UPDATE_QUESTION_HANDLER_URL: (
+      '/updatequestionsuggestionhandler/<suggestion_id>')
+  };
+
   constructor(
-    private http: HttpClient
+    private http: HttpClient,
+    private urlInterpolationService: UrlInterpolationService
   ) {}
 
-  async fetchSuggestions(url: string): Promise<FetchSuggestionsResponse> {
+  async fetchSuggestionsAsync(
+      urlName: string, targetType: string, suggestionType: string
+  ): Promise<FetchSuggestionsResponse> {
+    let url = this.urlInterpolationService.interpolateUrl(
+      this.urls[urlName], {
+        target_type: targetType,
+        suggestion_type: suggestionType
+      }
+    );
     return this.http.get<FetchSuggestionsResponse>(url).toPromise();
   }
 
-  async resolveToExploration(
-      url: string, data: ResolveToExplorationData
+  async resolveToExplorationAsync(
+      expId: string, suggestionId: string, data: ResolveToExplorationData
   ): Promise<void> {
+    let url = this.urlInterpolationService.interpolateUrl(
+      this.urls.SUGGESTION_TO_EXPLORATION_ACTION_HANDLER_URL, {
+        exp_id: expId,
+        suggestion_id: suggestionId
+      }
+    );
     return this.http.put<void>(url, data).toPromise();
   }
 
-  async resolveToSkill(
-      url: string, data: ResolveToSkillData
+  async resolveToSkillAsync(
+      skillId: string, suggestionId: string, data: ResolveToSkillData
   ): Promise<void> {
+    let url = this.urlInterpolationService.interpolateUrl(
+      this.urls.SUGGESTION_TO_SKILL_ACTION_HANDLER_URL, {
+        skill_id: skillId,
+        suggestion_id: suggestionId
+      }
+    );
     return this.http.put<void>(url, data).toPromise();
   }
 
-  async updateTranslationSuggestion(
-      url: string, data: UpdateTranslationData
+  async updateTranslationSuggestionAsync(
+      suggestionId: string, data: UpdateTranslationData
   ): Promise<void> {
+    let url = this.urlInterpolationService.interpolateUrl(
+      this.urls.UPDATE_TRANSLATION_HANDLER_URL, {
+        suggestion_id: suggestionId
+      }
+    );
     return this.http.put<void>(url, data).toPromise();
   }
 
-  async updateQuestionSuggestion(
-      url: string, body: FormData
+  async updateQuestionSuggestionAsync(
+      suggestionId: string, body: FormData
   ): Promise<void> {
+    let url = this.urlInterpolationService.interpolateUrl(
+      this.urls.UPDATE_QUESTION_HANDLER_URL, {
+        suggestion_id: suggestionId
+      }
+    );
     return this.http.post<void>(url, body, {
       headers: { 'Content-Type': undefined }
     }).toPromise();

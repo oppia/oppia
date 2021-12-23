@@ -19,7 +19,6 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import { AppConstants } from 'app.constants';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { ContributionAndReviewBackendApiService }
   from './contribution-and-review-backend-api.service';
 import { SuggestionBackendDict } from 'domain/suggestion/suggestion.model';
@@ -49,28 +48,17 @@ interface FetchSuggestionsReturn {
   providedIn: 'root',
 })
 export class ContributionAndReviewService {
-  private _SUBMITTED_SUGGESTION_LIST_HANDLER_URL = (
-    '/getsubmittedsuggestions/<target_type>/<suggestion_type>');
-  private _REVIEWABLE_SUGGESTIONS_HANDLER_URL = (
-    '/getreviewablesuggestions/<target_type>/<suggestion_type>');
-  private _SUGGESTION_TO_EXPLORATION_ACTION_HANDLER_URL = (
-    '/suggestionactionhandler/exploration/<exp_id>/<suggestion_id>');
-  private _SUGGESTION_TO_SKILL_ACTION_HANDLER_URL = (
-    '/suggestionactionhandler/skill/<skill_id>/<suggestion_id>');
-  private _UPDATE_TRANSLATION_HANDLER_URL = (
-    '/updatetranslationsuggestionhandler/<suggestion_id>');
-  private _UPDATE_QUESTION_HANDLER_URL = (
-    '/updatequestionsuggestionhandler/<suggestion_id>');
-
   constructor(
-    private carbas: ContributionAndReviewBackendApiService,
-    private urlInterpolationService: UrlInterpolationService
+    private carbas: ContributionAndReviewBackendApiService
   ) {}
 
   private async _fetchSuggestionsAsync(
-      url: string): Promise<FetchSuggestionsReturn> {
+      urlName: string, targetType: string, suggestionType: string
+  ): Promise<FetchSuggestionsReturn> {
     return (
-      this.carbas.fetchSuggestions(url).then((data) => {
+      this.carbas.fetchSuggestionsAsync(
+        urlName, targetType, suggestionType
+      ).then((data) => {
         var suggestionIdToSuggestions: FetchSuggestionsReturn = {};
         var targetIdToDetails = data.target_id_to_opportunity_dict;
         data.suggestions.forEach(function(suggestion) {
@@ -86,42 +74,31 @@ export class ContributionAndReviewService {
 
   async getUserCreatedQuestionSuggestionsAsync():
   Promise<FetchSuggestionsReturn> {
-    let url = this.urlInterpolationService.interpolateUrl(
-      this._SUBMITTED_SUGGESTION_LIST_HANDLER_URL, {
-        target_type: 'skill',
-        suggestion_type: 'add_question'
-      });
-    return this._fetchSuggestionsAsync(url);
+    return this._fetchSuggestionsAsync(
+      'SUBMITTED_SUGGESTION_LIST_HANDLER_URL', 'skill', 'add_question'
+    );
   }
 
   async getReviewableQuestionSuggestionsAsync():
   Promise<FetchSuggestionsReturn> {
-    var url = this.urlInterpolationService.interpolateUrl(
-      this._REVIEWABLE_SUGGESTIONS_HANDLER_URL, {
-        target_type: 'skill',
-        suggestion_type: 'add_question'
-      });
-    return this._fetchSuggestionsAsync(url);
+    return this._fetchSuggestionsAsync(
+      'REVIEWABLE_SUGGESTIONS_HANDLER_URL', 'skill', 'add_question'
+    );
   }
 
   async getUserCreatedTranslationSuggestionsAsync():
   Promise<FetchSuggestionsReturn> {
-    var url = this.urlInterpolationService.interpolateUrl(
-      this._SUBMITTED_SUGGESTION_LIST_HANDLER_URL, {
-        target_type: 'exploration',
-        suggestion_type: 'translate_content'
-      });
-    return this._fetchSuggestionsAsync(url);
+    return this._fetchSuggestionsAsync(
+      'SUBMITTED_SUGGESTION_LIST_HANDLER_URL',
+      'exploration', 'translate_content'
+    );
   }
 
   async getReviewableTranslationSuggestionsAsync():
     Promise<FetchSuggestionsReturn> {
-    var url = this.urlInterpolationService.interpolateUrl(
-      this._REVIEWABLE_SUGGESTIONS_HANDLER_URL, {
-        target_type: 'exploration',
-        suggestion_type: 'translate_content'
-      });
-    return this._fetchSuggestionsAsync(url);
+    return this._fetchSuggestionsAsync(
+      'REVIEWABLE_SUGGESTIONS_HANDLER_URL', 'exploration', 'translate_content'
+    );
   }
 
   resolveSuggestionToExploration(
@@ -130,11 +107,6 @@ export class ContributionAndReviewService {
       onSuccess: (suggestionId: string) => void,
       onFailure: (error) => void
   ): Promise<void> {
-    let url = this.urlInterpolationService.interpolateUrl(
-      this._SUGGESTION_TO_EXPLORATION_ACTION_HANDLER_URL, {
-        exp_id: targetId,
-        suggestion_id: suggestionId
-      });
     let data = {
       action: action,
       review_message: reviewMessage,
@@ -144,7 +116,9 @@ export class ContributionAndReviewService {
       )
     };
 
-    return this.carbas.resolveToExploration(url, data).then(() => {
+    return this.carbas.resolveToExplorationAsync(
+      targetId, suggestionId, data
+    ).then(() => {
       onSuccess(suggestionId);
     }, (error) => {
       onFailure && onFailure(error);
@@ -157,18 +131,15 @@ export class ContributionAndReviewService {
       onSuccess: (suggestionId: string) => void,
       onFailure: () => void
   ): Promise<void> {
-    let url = this.urlInterpolationService.interpolateUrl(
-      this._SUGGESTION_TO_SKILL_ACTION_HANDLER_URL, {
-        skill_id: targetId,
-        suggestion_id: suggestionId
-      });
     let data = {
       action: action,
       review_message: reviewMessage,
       skill_difficulty: skillDifficulty
     };
 
-    return this.carbas.resolveToSkill(url, data).then(() => {
+    return this.carbas.resolveToSkillAsync(
+      targetId, suggestionId, data
+    ).then(() => {
       onSuccess(suggestionId);
     }, () => {
       onFailure && onFailure();
@@ -180,15 +151,13 @@ export class ContributionAndReviewService {
       onSuccess: () => void,
       onFailure: (error) => void
   ): Promise<void> {
-    let url = this.urlInterpolationService.interpolateUrl(
-      this._UPDATE_TRANSLATION_HANDLER_URL, {
-        suggestion_id: suggestionId
-      });
     let data = {
       translation_html: translationHtml
     };
 
-    return this.carbas.updateTranslationSuggestion(url, data).then(() => {
+    return this.carbas.updateTranslationSuggestionAsync(
+      suggestionId, data
+    ).then(() => {
       onSuccess();
     }, (error) => onFailure && onFailure(error));
   }
@@ -199,10 +168,6 @@ export class ContributionAndReviewService {
       onSuccess: (suggestionId: string) => void,
       onFailure: (suggestionId: string) => void
   ): Promise<void> {
-    let url = this.urlInterpolationService.interpolateUrl(
-      this._UPDATE_QUESTION_HANDLER_URL, {
-        suggestion_id: suggestionId
-      });
     const payload = {
       skill_difficulty: skillDifficulty,
       question_state_data: questionStateData
@@ -215,7 +180,9 @@ export class ContributionAndReviewService {
       }
     });
 
-    return this.carbas.updateQuestionSuggestion(url, body).then(() => {
+    return this.carbas.updateQuestionSuggestionAsync(
+      suggestionId, body
+    ).then(() => {
       onSuccess(suggestionId);
     }, () => onFailure && onFailure(suggestionId));
   }
