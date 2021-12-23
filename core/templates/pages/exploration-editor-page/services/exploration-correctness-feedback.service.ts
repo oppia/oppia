@@ -44,12 +44,7 @@ export class ExplorationCorrectnessFeedbackService extends
   }
 
   toggleCorrectnessFeedback(): void {
-    if (Boolean(this.displayed) === false) {
-      this.displayed = 'true';
-    } else {
-      this.displayed = null;
-    }
-
+    this.displayed = !this.displayed;
     this.saveDisplayedValue();
   }
 }
