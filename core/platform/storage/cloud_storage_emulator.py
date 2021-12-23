@@ -65,12 +65,6 @@ class EmulatorBlob:
                 if guessed_content_type
                 else 'application/octet-stream'
             )
-        # TODO(#13480): In some places we set 'audio/mp3' as content type, but
-        # it is not a valid MIME type. This needs to be fixed in our codebase
-        # and we need to validate that existing files in storage do not have
-        # this set. Only then can this exception be removed.
-        elif content_type == 'audio/mp3':
-            self._content_type = content_type
         else:
             if mimetypes.guess_extension(content_type) is None:
                 raise Exception('Content type contains unknown MIME type.')
