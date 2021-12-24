@@ -18,41 +18,43 @@
 
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { AppConstants } from 'app.constants';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { StateCustomizationArgsService } from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
 import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
 import { InteractionAnswer } from 'interactions/answer-defs';
-import { cloneDeep } from 'lodash';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { Subscription } from 'rxjs';
 import { ContextService } from 'services/context.service';
 import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
+import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 
 interface HtmlFormSchema {
   type: 'html';
   'ui_config': object;
 }
 
-interface EMPTY_SOLUTION_DATA {
+interface SolutionInterface {
   'answerIsExclusive': boolean,
   'correctAnswer': string,
   'explanationHtml': string,
-  'explanationContentId': string
+  'explanationContentId': string,
+  'explanation'?: string,
 }
 
 @Component({
-  selector: 'oppia-add-misconception-modal',
-  templateUrl: './add-misconception-modal.component.html'
+  selector: 'oppia-add-or-update-solution-modal',
+  templateUrl: './add-or-update-solution-modal.component.html'
 })
 export class AddOrUpdateSolutionModalComponent
   extends ConfirmOrCancelModal implements OnInit {
   directiveSubscriptions: Subscription = new Subscription();
   answerIsValid: boolean;
-  data: EMPTY_SOLUTION_DATA;
+  data: SolutionInterface;
+  isSubmitButtonDisabled: boolean;
   COMPONENT_NAME_SOLUTION: string;
+  EMPTY_SOLUTION_DATA: object;
   SOLUTION_EDITOR_FOCUS_LABEL: string = (
     'currentCorrectAnswerEditorHtmlForSolutionEditor');
   EXPLANATION_FORM_SCHEMA: HtmlFormSchema = {
@@ -95,10 +97,7 @@ export class AddOrUpdateSolutionModalComponent
     this.currentInteractionService.submitAnswer();
   }
 
-  isSubmitButtonDisabled = (
-    this.currentInteractionService.isSubmitButtonDisabled);
-
-  shouldAdditionalSubmitButtonBeShown(): string {
+  shouldAdditionalSubmitButtonBeShown(): boolean {
     let interactionSpecs = INTERACTION_SPECS[
       this.stateInteractionIdService.savedMemento];
     return interactionSpecs.show_generic_submit_button;
@@ -109,16 +108,27 @@ export class AddOrUpdateSolutionModalComponent
       return Boolean(solExplanation.length > 3000);
   }
 
+  getSchema(): HtmlFormSchema {
+    return this.EXPLANATION_FORM_SCHEMA;
+  }
+
+  updateLocalHtml($event: string): void {
+    if(this.data.explanationHtml !== $event){
+      this.data.explanationHtml = $event;
+    }
+    this.changeDetectorRef.detectChanges();
+  }
+
   saveSolution(): void {
     if (typeof this.data.answerIsExclusive === 'boolean' &&
        this.data.correctAnswer !== null &&
         this.data.explanation !== '') {
-      $uibModalInstance.close({
-        solution: SolutionObjectFactory.createNew(
-          $scope.data.answerIsExclusive,
-          $scope.data.correctAnswer,
-          $scope.data.explanationHtml,
-          $scope.data.explanationContentId)
+      this.ngbActiveModal.close({
+        solution: this.solutionObjectFactory.createNew(
+          this.data.answerIsExclusive,
+          this.data.correctAnswer,
+          this.data.explanationHtml,
+          this.data.explanationContentId)
       });
     } else {
       throw new Error('Cannot save invalid solution');
@@ -126,23 +136,23 @@ export class AddOrUpdateSolutionModalComponent
   };
 
   ngOnInit(): void {
-    this.answerIsValid = false;
-    this.EMPTY_SOLUTION_DATA = {
-      answerIsExclusive: false,
-      correctAnswer: null,
-      explanationHtml: '',
-      explanationContentId: this.COMPONENT_NAME_SOLUTION
+    if(this.stateSolutionService.savedMemento){
+      this.data.answerIsExclusive = (
+        this.stateSolutionService.savedMemento.answerIsExclusive);
+      this.data.explanationHtml = (
+        this.stateSolutionService.savedMemento.explanation.html);
+      this.data.explanationContentId = (
+        this.stateSolutionService.savedMemento.explanation.contentId);
     }
-    this.data = this.stateSolutionService.savedMemento ? {
-        answerIsExclusive: (
-          this.stateSolutionService.savedMemento.answerIsExclusive),
-        correctAnswer: null,
-        explanationHtml: (
-          this.stateSolutionService.savedMemento.explanation.html),
-        explanationContentId: (
-          this.stateSolutionService.savedMemento.explanation
-            .contentId)
-    }: cloneDeep(this.EMPTY_SOLUTION_DATA);
+    else {
+      this.data.answerIsExclusive = false;
+      this.data.explanationHtml = '';
+      this.data.explanationContentId = this.COMPONENT_NAME_SOLUTION;
+    }
+    this.data.correctAnswer = null;
+    this.answerIsValid = false;
+    this.isSubmitButtonDisabled = (
+      this.currentInteractionService.isSubmitButtonDisabled());
     this.currentInteractionService.setOnSubmitFn((answer: string) => {
         this.data.correctAnswer = answer;
     })

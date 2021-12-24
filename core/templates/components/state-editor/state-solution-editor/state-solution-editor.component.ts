@@ -24,9 +24,6 @@ require(
   'components/state-directives/response-header/response-header.component.ts');
 require(
   'components/state-directives/solution-editor/solution-editor.component.ts');
-require(
-  'pages/exploration-editor-page/editor-tab/templates/modal-templates/' +
-  'add-or-update-solution-modal.controller.ts');
 
 require('domain/exploration/SolutionObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
@@ -66,6 +63,10 @@ require('services/exploration-html-formatter.service.ts');
 require('components/state-editor/state-editor.constants.ajs.ts');
 require('services/contextual/window-dimensions.service');
 require('services/external-save.service.ts');
+require('services/ngb-modal.service.ts');
+
+import { AddOrUpdateSolutionModalComponent } from
+  'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-or-update-solution-modal.component';
 
 angular.module('oppia').component('stateSolutionEditor', {
   bindings: {
@@ -77,7 +78,7 @@ angular.module('oppia').component('stateSolutionEditor', {
   controller: [
     '$filter', '$scope', '$uibModal', 'AlertsService', 'EditabilityService',
     'ExplorationHtmlFormatterService', 'ExternalSaveService',
-    'SolutionValidityService', 'SolutionVerificationService',
+    'NgbModal', 'SolutionValidityService', 'SolutionVerificationService',
     'StateCustomizationArgsService', 'StateEditorService',
     'StateHintsService', 'StateInteractionIdService',
     'StateSolutionService',
@@ -88,7 +89,7 @@ angular.module('oppia').component('stateSolutionEditor', {
     function(
         $filter, $scope, $uibModal, AlertsService, EditabilityService,
         ExplorationHtmlFormatterService, ExternalSaveService,
-        SolutionValidityService, SolutionVerificationService,
+        NgbModal, SolutionValidityService, SolutionVerificationService,
         StateCustomizationArgsService, StateEditorService,
         StateHintsService, StateInteractionIdService,
         StateSolutionService,
@@ -138,12 +139,8 @@ angular.module('oppia').component('stateSolutionEditor', {
         AlertsService.clearWarnings();
         ExternalSaveService.onExternalSave.emit();
         $scope.inlineSolutionEditorIsActive = false;
-        $uibModal.open({
-          template: require(
-            'pages/exploration-editor-page/editor-tab/templates/' +
-            'modal-templates/add-or-update-solution-modal.template.html'),
-          backdrop: 'static',
-          controller: 'AddOrUpdateSolutionModalController'
+        NgbModal.open(AddOrUpdateSolutionModalComponent, {
+          backdrop: 'static'
         }).result.then(function(result) {
           StateSolutionService.displayed = result.solution;
           StateSolutionService.saveDisplayedValue();
