@@ -393,6 +393,7 @@ import { ExplorationCategoryService } from 'pages/exploration-editor-page/servic
 import { ExplorationCorrectnessFeedbackService } from 'pages/exploration-editor-page/services/exploration-correctness-feedback.service';
 import { ExplorationParamSpecsService } from 'pages/exploration-editor-page/services/exploration-param-specs.service';
 import { ExplorationParamChangesService } from 'pages/exploration-editor-page/services/exploration-param-changes.service';
+import { ExplorationObjectiveService } from 'pages/exploration-editor-page/services/exploration-objective.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -514,6 +515,7 @@ export const angularServices: [string, Type<{}>][] = [
     ExplorationImprovementsTaskRegistryService],
   ['ExplorationInitStateNameService', ExplorationInitStateNameService],
   ['ExplorationLanguageCodeService', ExplorationLanguageCodeService],
+  ['ExplorationObjectiveService', ExplorationObjectiveService],
   ['ExplorationObjectFactory', ExplorationObjectFactory],
   ['ExplorationPermissionsBackendApiService',
     ExplorationPermissionsBackendApiService],

@@ -16,23 +16,24 @@
  * @fileoverview Unit tests for the ExplorationObjectiveService.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
-// ^^^ This block is to be removed.
-
-require(
-  'pages/exploration-editor-page/services/exploration-objective.service.ts');
+import { TestBed } from '@angular/core/testing';
+import { ExplorationObjectiveService } from './exploration-objective.service';
+import { ExplorationPropertyService } from './exploration-property.service';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('Exploration Objective Service', function() {
-  let eos = null;
+  let eos: ExplorationObjectiveService;
 
-  beforeEach(angular.mock.module('oppia'));
-  importAllAngularServices();
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [
+        ExplorationPropertyService
+      ]
+    });
 
-  beforeEach(angular.mock.inject(function($injector) {
-    eos = $injector.get('ExplorationObjectiveService');
-  }));
+    eos = TestBed.inject(ExplorationObjectiveService);
+  });
 
   it('should test the child object properties', function() {
     expect(eos.propertyName).toBe('objective');
