@@ -46,6 +46,11 @@ export class ExplorationCorrectnessFeedbackService extends
   }
 
   toggleCorrectnessFeedback(): void {
+    // Earlier we were using this.displayed = !this.displayed this is wrong.
+    // Because we the variable displayed is string type and we were storing
+    // boolean init by using !, To overcome this problem JSON.parse('true')
+    // and correctnessFeedbackIsEnabled is used.
+
     this.correctnessFeedbackIsEnabled = !this.correctnessFeedbackIsEnabled;
     if (this.correctnessFeedbackIsEnabled) {
       this.displayed = JSON.parse('true');
