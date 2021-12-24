@@ -74,6 +74,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   inClassroomPage: boolean = false;
   showLanguageSelector: boolean = false;
   standardNavIsShown: boolean = false;
+  getInvolvedMenuOffset: number = 0;
   ACTION_OPEN!: string;
   ACTION_CLOSE!: string;
   KEYBOARD_EVENT_TO_KEY_CODES!: {
@@ -119,8 +120,9 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   // The order of the elements in this array specifies the order in
   // which they will be hidden. Earlier elements will be hidden first.
   NAV_ELEMENTS_ORDER = [
-    'I18N_TOPNAV_DONATE', 'I18N_TOPNAV_LEARN', 'I18N_TOPNAV_ABOUT',
-    'I18N_CREATE_EXPLORATION_CREATE', 'I18N_TOPNAV_LIBRARY'];
+    'I18N_TOPNAV_DONATE', 'I18N_TOPNAV_LEARN',
+    'I18N_TOPNAV_ABOUT', 'I18N_TOPNAV_LIBRARY',
+    'I18N_TOPNAV_HOME'];
 
   CLASSROOM_PROMOS_ARE_ENABLED = false;
   googleSignInIconUrl = this.urlInterpolationService.getStaticImageUrl(
@@ -296,6 +298,8 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   }
 
   ngAfterViewChecked(): void {
+    this.getInvolvedMenuOffset = this
+      .getDropdownOffset('.get-involved', 574);
     this.learnDropdownOffset = this.getDropdownOffset(
       '.learn-tab', (this.CLASSROOM_PROMOS_ARE_ENABLED) ? 688 : 300);
     // https://stackoverflow.com/questions/34364880/expression-has-changed-after-it-was-checked
@@ -399,8 +403,9 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     return this.sidebarStatusService.isSidebarShown();
   }
 
-  toggleSidebar(): void {
+  toggleSidebar(event: Event): void {
     this.sidebarStatusService.toggleSidebar();
+    this.sidebarStatusService.toggleHamburgerIconStatus(event);
   }
 
   navigateToClassroomPage(classroomUrl: string): void {
