@@ -23,6 +23,7 @@ import { DeleteHintModalComponent } from
 import { DeleteLastHintModalComponent } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-last-hint-modal.component';
+
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
