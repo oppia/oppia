@@ -17,29 +17,47 @@
  * that it can be displayed and edited in multiple places in the UI.
  */
 
-require('filters/string-utility-filters/normalize-whitespace.filter.ts');
-require(
-  'pages/exploration-editor-page/services/exploration-property.service.ts');
-require('pages/exploration-editor-page/services/exploration-rights.service.ts');
-require('services/validators.service.ts');
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { NormalizeWhitespacePipe } from 'filters/string-utility-filters/normalize-whitespace.pipe';
+import { ExplorationPropertyService } from 'pages/exploration-editor-page/services/exploration-property.service';
+import { AlertsService } from 'services/alerts.service';
+import { ChangeListService } from './change-list.service';
+import { LoggerService } from 'services/contextual/logger.service';
+import { ExplorationRightsService } from 'pages/exploration-editor-page/services/exploration-rights.service';
+import { ValidatorsService } from 'services/validators.service';
 
-angular.module('oppia').factory('ExplorationTitleService', [
-  '$filter', 'ExplorationPropertyService', 'ExplorationRightsService',
-  'ValidatorsService',
-  function(
-      $filter, ExplorationPropertyService, ExplorationRightsService,
-      ValidatorsService) {
-    var child = Object.create(ExplorationPropertyService);
-    child.propertyName = 'title';
-    child._normalize = $filter('normalizeWhitespace');
-    /**
-     * @param {string} value - The input to be validated.
-     * @returns {boolean} - True if title name is valid.
-     */
-    child._isValid = function(value) {
-      return ValidatorsService.isValidEntityName(
-        value, true, ExplorationRightsService.isPrivate());
-    };
-    return child;
+@Injectable({
+  providedIn: 'root'
+})
+export class ExplorationTitleService extends ExplorationPropertyService {
+  propertyName: string = 'title';
+
+  constructor(
+    protected alertsService: AlertsService,
+    protected changeListService: ChangeListService,
+    protected loggerService: LoggerService,
+    private normalizeWhitespacePipe: NormalizeWhitespacePipe,
+    private explorationRightsService: ExplorationRightsService,
+    private validatorsService: ValidatorsService
+  ) {
+    super(alertsService, changeListService, loggerService);
   }
-]);
+
+  _normalize(value: string): string {
+    return this.normalizeWhitespacePipe.transform(value);
+  }
+
+  /**
+   * @param {string} value - The input to be validated.
+   * @returns {boolean} - True if title name is valid.
+   */
+
+  _isValid(value: string): boolean {
+    return this.validatorsService.isValidEntityName(
+      value, true, this.explorationRightsService.isPrivate());
+  }
+}
+
+angular.module('oppia').factory('ExplorationTitleService',
+  downgradeInjectable(ExplorationTitleService));
