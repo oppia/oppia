@@ -141,6 +141,7 @@ angular.module('oppia').component('stateHintsEditor', {
           StateNextContentIdIndexService.saveDisplayedValue();
           ctrl.onSaveNextContentIdIndex(
             StateNextContentIdIndexService.displayed);
+          $scope.$apply();
         }, function() {
           AlertsService.clearWarnings();
         });
