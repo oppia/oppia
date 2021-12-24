@@ -34,7 +34,6 @@ var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
-
 describe('Enable correctness feedback and set correctness', function() {
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
@@ -304,7 +303,8 @@ describe('Enable correctness feedback and set correctness', function() {
 });
 
 
-describe('Core exploration functionality', function() {
+// eslint-disable-next-line oppia/no-test-blockers
+fdescribe('Core exploration functionality', function() {
   var explorationPlayerPage = null;
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
