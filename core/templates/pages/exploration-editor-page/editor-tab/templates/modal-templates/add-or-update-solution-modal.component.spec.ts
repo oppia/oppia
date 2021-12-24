@@ -50,8 +50,7 @@ fdescribe('Add Or Update Solution Modal Component', function() {
   let stateCustomizationArgsService: StateCustomizationArgsService;
   let stateInteractionIdService: StateInteractionIdService;
   let stateSolutionService: StateSolutionService;
-  let answerEditorHtml: Solution;
-  let inter: InteractionRulesService;
+  let answerEditorHtml; Solution;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -94,10 +93,17 @@ fdescribe('Add Or Update Solution Modal Component', function() {
       contextService = TestBed.inject(ContextService);
       
       spyOn(contextService, 'getEntityType').and.returnValue('question');
-      spyOn(explorationHtmlFormatterService, 'getInteractionHtml').and
-        .returnValue(null);
 
-      fixture.detectChanges();
+      answerEditorHtml = {
+        answerIsExclusive: true,
+        explanation: SubtitledHtml.createDefault(
+          'Explanation html', 'cont_1')
+      };
+
+      stateSolutionService.init('', answerEditorHtml);
+
+      component.ngOnInit();
+      currentInteractionService.updateViewWithNewAnswer();
     });
 
     it('should initialize $scope properties after controller is initialized',
@@ -115,12 +121,12 @@ fdescribe('Add Or Update Solution Modal Component', function() {
 
     it('should update correct answer when submitting current interaction',
       () => {
-        currentInteractionService.onSubmit('answer',inter);
+        currentInteractionService.onSubmit('answer', null);
 
         expect(component.data.correctAnswer).toEqual('answer');
       });
 
-    it('should submit answer when clicking on submit button', function() {
+    it('should submit answer when clicking on submit button', () => {
       spyOn(currentInteractionService, 'submitAnswer');
 
       component.onSubmitFromSubmitButton();
@@ -142,7 +148,7 @@ fdescribe('Add Or Update Solution Modal Component', function() {
 
     it('should save solution when closing the modal', () => {
       stateSolutionService.init('', answerEditorHtml);
-      currentInteractionService.onSubmit('answer', inter);
+      currentInteractionService.onSubmit('answer', null);
       component.saveSolution();
 
       expect(ngbActiveModal.close).toHaveBeenCalledWith({
@@ -168,8 +174,6 @@ fdescribe('Add Or Update Solution Modal Component', function() {
         contextService = TestBed.inject(ContextService);
     
         spyOn(contextService, 'getEntityType').and.returnValue('question');
-        spyOn(explorationHtmlFormatterService, 'getInteractionHtml').and
-        .returnValue(answerEditorHtml);
 
         fixture.detectChanges();
     });

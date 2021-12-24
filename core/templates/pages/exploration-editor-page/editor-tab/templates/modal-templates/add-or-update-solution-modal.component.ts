@@ -52,6 +52,7 @@ export class AddOrUpdateSolutionModalComponent
   directiveSubscriptions: Subscription = new Subscription();
   answerIsValid: boolean;
   data: SolutionInterface;
+  tempAnsOption: string;
   isSubmitButtonDisabled: boolean;
   COMPONENT_NAME_SOLUTION: string;
   EMPTY_SOLUTION_DATA: object;
@@ -112,6 +113,15 @@ export class AddOrUpdateSolutionModalComponent
     return this.EXPLANATION_FORM_SCHEMA;
   }
 
+  onAnswerChange(): void {
+    if(this.tempAnsOption === 'The only'){
+      this.data.answerIsExclusive = true;
+    }
+    else{
+      this.data.answerIsExclusive = false;
+    }
+  }
+
   updateLocalHtml($event: string): void {
     if(this.data.explanationHtml !== $event){
       this.data.explanationHtml = $event;
@@ -136,7 +146,7 @@ export class AddOrUpdateSolutionModalComponent
   };
 
   ngOnInit(): void {
-    if(this.stateSolutionService.savedMemento){
+    if(this.savedMemento()){
       this.data.answerIsExclusive = (
         this.stateSolutionService.savedMemento.answerIsExclusive);
       this.data.explanationHtml = (

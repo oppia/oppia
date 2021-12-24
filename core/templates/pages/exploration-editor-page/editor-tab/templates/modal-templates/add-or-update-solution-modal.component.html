@@ -7,8 +7,11 @@
         class="form-inline">
     <div class="oppia-rule-details-header">
       <select class="protractor-test-answer-is-exclusive-select"
-              [(ngModel)]="data.answerIsExclusive"
-              [ngOptions]="(item ? 'The only' : 'One') for item in [true, false]">
+              [(ngModel)]="tempAnsOption"
+              (ngModelChange)="onAnswerChange()">
+              <option *ngFor="let item of ['The only', 'One']">
+                {{ item }}
+              </option>
       </select> <strong>solution is...</strong>
       <br>
       <br>
