@@ -23,7 +23,6 @@ import unittest
 
 import astroid
 from pylint.checkers import utils
-
 from . import docstrings_checker
 
 
