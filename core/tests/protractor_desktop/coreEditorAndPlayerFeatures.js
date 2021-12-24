@@ -302,9 +302,7 @@ describe('Enable correctness feedback and set correctness', function() {
   });
 });
 
-
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Core exploration functionality', function() {
+describe('Core exploration functionality', function() {
   var explorationPlayerPage = null;
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
