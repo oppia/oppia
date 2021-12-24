@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for ExplorationCorrectnessFeedbackService
  */
 
-import { TestBed } from '@angular/core/testing';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { ExplorationCorrectnessFeedbackService } from './exploration-correctness-feedback.service';
 import { ExplorationPropertyService } from './exploration-property.service';
 import { HttpClientTestingModule, HttpTestingController } from
@@ -41,20 +41,19 @@ describe('Exploration Correctness Feedback Service', () => {
     httpTestingController.verify();
   });
 
-  it('should toggle correctness feedback display', () => {
-    var isValidSpy = spyOn(
-      ecfs, '_isValid').and.callThrough();
+  it('should toggle correctness feedback display', fakeAsync(() => {
+    ecfs.correctnessFeedbackIsEnabled = false;
 
     // Function isEnabled() returns undefined in the first time.
     expect(ecfs.isEnabled()).toBeFalsy();
 
     ecfs.toggleCorrectnessFeedback();
-    ecfs.isEnabled();
-    expect(ecfs.isEnabled()).toBe(true);
+    tick();
+    expect(ecfs.correctnessFeedbackIsEnabled).toBeTrue();
 
     ecfs.toggleCorrectnessFeedback();
+    tick();
+    expect(ecfs.correctnessFeedbackIsEnabled).toBeFalse();
     expect(ecfs.isEnabled()).toBe(false);
-
-    expect(isValidSpy).toHaveBeenCalled();
-  });
+  }));
 });

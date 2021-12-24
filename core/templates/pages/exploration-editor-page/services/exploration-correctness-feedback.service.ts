@@ -29,6 +29,8 @@ import { LoggerService } from 'services/contextual/logger.service';
 })
 export class ExplorationCorrectnessFeedbackService extends
   ExplorationPropertyService {
+  correctnessFeedbackIsEnabled: boolean = false;
+
   constructor(
     protected alertsService: AlertsService,
     protected changeListService: ChangeListService,
@@ -44,8 +46,10 @@ export class ExplorationCorrectnessFeedbackService extends
   }
 
   toggleCorrectnessFeedback(): void {
-    this.displayed = !this.displayed;
-    this.saveDisplayedValue();
+    this.correctnessFeedbackIsEnabled = !this.correctnessFeedbackIsEnabled;
+    if (this.correctnessFeedbackIsEnabled) {
+      this.saveDisplayedValue();
+    }
   }
 }
 
