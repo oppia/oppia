@@ -190,6 +190,7 @@ angular.module('oppia').component('stateHintsEditor', {
           if (index === StateHintsService.getActiveHintIndex()) {
             StateHintsService.setActiveHintIndex(null);
           }
+          $scope.$apply();
         }, function() {
           AlertsService.clearWarnings();
         });
