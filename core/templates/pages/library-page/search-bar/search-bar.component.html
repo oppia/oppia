@@ -137,7 +137,7 @@
          class="oppia-search-button protractor-test-search-button"
          (click)="onSearchQueryChangeExec()"
          title="Click here to search">
-         <i class="material-icons md-18 search-button-icon">&#xe8b6;</i>
+      <i class="material-icons md-18 search-button-icon">&#xe8b6;</i>
     </div>
   </div>
 </div>
@@ -280,15 +280,15 @@
       width: 17em;
     }
     .oppia-search-bar-text-input {
-      border-top-right-radius: 0;
-      border-bottom-right-radius: 0;
       border: 3px solid #257D76;
+      border-bottom-right-radius: 0;
+      border-top-right-radius: 0;
       height: 45px;
       padding-top: 8px;
     }
     .oppia-input-group input {
-      border-top-left-radius: 10px;
       border-bottom-left-radius: 10px;
+      border-top-left-radius: 10px;
     }
     .oppia-search-bar-input::-webkit-input-placeholder {
       color: #999;
@@ -303,17 +303,17 @@
       color: #999;
     }
     .oppia-search-bar-input.btn {
+      background-color: #257D76;
       border-left: 1px solid #257D76;
+      border-radius: 10px;
+      color: #fff;
+      height: 40px;
       margin-left: 10px;
       margin-top: -64px;
-      height: 40px;
+      max-width: none;
       padding-top: 6px;
-      border-radius: 10px;
       text-align: center;
       width: 159px;
-      max-width: none;
-      background-color: #257D76;
-      color: #fff;
     }
     .oppia-search-bar-input.btn:hover,
     .oppia-search-bar-input.btn:focus {
@@ -349,15 +349,15 @@
       top: -35px;
     }
     .dropdown-menu {
-      width: 130px;
       margin-top: 1px;
+      width: 130px;
     }
     .oppia-translate-icon-down {
       transform: translate(0,6px);
     }
     .oppia-search-button {
-      border-top-right-radius: 10px;
       border-bottom-right-radius: 10px;
+      border-top-right-radius: 10px;
     }
     .oppia-search-bar-icon {
       display: none;
