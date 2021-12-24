@@ -72,7 +72,8 @@ describe('StateHintsEditorComponent', () => {
       $scope: $scope
     }, {
       onSaveHints: () => {},
-      onSaveSolution: () => {}
+      onSaveSolution: () => {},
+      onSaveNextContentIdIndex: () =>{}
     });
 
     spyOn(WindowDimensionsService, 'isWindowNarrow').and.returnValue(true);
@@ -271,7 +272,7 @@ describe('StateHintsEditorComponent', () => {
       ];
       spyOn(ngbModal, 'open').and.returnValue({
         componentInstance: new MockNgbModalRef(),
-        result: $q.resolve({
+        result: Promise.resolve({
           hint: {
             hintContent: {
               html: '<p> New hint </p>'
@@ -282,7 +283,6 @@ describe('StateHintsEditorComponent', () => {
 
       $scope.openAddHintModal();
       tick();
-      $scope.$apply();
 
       expect(StateHintsService.displayed).toEqual([
         {
@@ -313,7 +313,6 @@ describe('StateHintsEditorComponent', () => {
 
     $scope.openAddHintModal();
     tick();
-    $scope.$apply();
 
     expect(ngbModal.open).toHaveBeenCalled();
   }));

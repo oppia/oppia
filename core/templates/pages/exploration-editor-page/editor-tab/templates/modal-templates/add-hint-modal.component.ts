@@ -63,6 +63,8 @@ export class AddHintModalComponent
     this.hintIndex = this.stateHintsService.displayed.length + 1;
   }
 
+  // Remove this function when schema-based-editor is
+  // migrated to Angular2+.
   getSchema(): HintFormSchema {
     return this.HINT_FORM_SCHEMA;
   }
