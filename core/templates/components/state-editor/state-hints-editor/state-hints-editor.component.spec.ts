@@ -20,8 +20,7 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
  * @fileoverview Unit test for State Hints Editor Component.
  */
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('StateHintsEditorComponent', () => {
+describe('StateHintsEditorComponent', () => {
   let ctrl = null;
   let $rootScope = null;
   let $scope = null;
@@ -257,8 +256,7 @@ fdescribe('StateHintsEditorComponent', () => {
     expect(ngbModal.open).not.toHaveBeenCalled();
   });
 
-  // eslint-disable-next-line oppia/no-test-blockers
-  fit('should open add hints modal when user clicks on add hint button',
+  it('should open add hints modal when user clicks on add hint button',
     () => {
       $scope.StateHintsService.displayed = [
         {
