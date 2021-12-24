@@ -48,7 +48,10 @@ export class ExplorationCorrectnessFeedbackService extends
   toggleCorrectnessFeedback(): void {
     this.correctnessFeedbackIsEnabled = !this.correctnessFeedbackIsEnabled;
     if (this.correctnessFeedbackIsEnabled) {
+      this.displayed = 'true';
       this.saveDisplayedValue();
+    } else {
+      this.savedMemento = null;
     }
   }
 }

@@ -16,11 +16,12 @@
  * @fileoverview Unit tests for ExplorationCorrectnessFeedbackService
  */
 
-import { fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { fakeAsync, flush, TestBed, tick } from '@angular/core/testing';
 import { ExplorationCorrectnessFeedbackService } from './exploration-correctness-feedback.service';
 import { ExplorationPropertyService } from './exploration-property.service';
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
+import { ExplorationDataService } from './exploration-data.service';
 
 describe('Exploration Correctness Feedback Service', () => {
   let ecfs: ExplorationCorrectnessFeedbackService;
@@ -30,10 +31,20 @@ describe('Exploration Correctness Feedback Service', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [
-        ExplorationPropertyService
+        ExplorationPropertyService,
+        {
+          provide: ExplorationDataService,
+          useValue: {
+            explorationId: 0,
+            autosaveChangeListAsync() {
+              return;
+            }
+          }
+        }
       ]
     });
     httpTestingController = TestBed.inject(HttpTestingController);
+    TestBed.inject(ExplorationDataService);
     ecfs = TestBed.inject(ExplorationCorrectnessFeedbackService);
   });
 
@@ -50,10 +61,13 @@ describe('Exploration Correctness Feedback Service', () => {
     ecfs.toggleCorrectnessFeedback();
     tick();
     expect(ecfs.correctnessFeedbackIsEnabled).toBeTrue();
+    expect(ecfs.isEnabled()).toBeTrue();
 
     ecfs.toggleCorrectnessFeedback();
     tick();
     expect(ecfs.correctnessFeedbackIsEnabled).toBeFalse();
-    expect(ecfs.isEnabled()).toBe(false);
+    expect(ecfs.isEnabled()).toBeFalse();
+
+    flush();
   }));
 });
