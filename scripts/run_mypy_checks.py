@@ -33,6 +33,7 @@ EXCLUDED_DIRECTORIES = [
     'proto_files/',
     'scripts/linters/test_files/',
     'third_party/',
+    'venv/'
 ]
 
 # List of files who should be type-annotated but are not.
