@@ -73,7 +73,7 @@ describe('StateHintsEditorComponent', () => {
     }, {
       onSaveHints: () => {},
       onSaveSolution: () => {},
-      onSaveNextContentIdIndex: () =>{}
+      onSaveNextContentIdIndex: () => {}
     });
 
     spyOn(WindowDimensionsService, 'isWindowNarrow').and.returnValue(true);
