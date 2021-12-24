@@ -50,6 +50,8 @@
         "core.controllers.classifier_test",
         "core.controllers.suggestion_test",
         "core.controllers.voice_artist_test",
+        "core.jobs.batch_jobs.skill_migration_jobs_test",
+        "core.jobs.batch_jobs.story_migration_jobs_test",
         "core.jobs.batch_jobs.email_deletion_jobs_test"
     ],
     "2": [
@@ -166,7 +168,8 @@
         "core.domain.learner_progress_services_test",
         "core.domain.config_services_test",
         "core.domain.subtopic_page_services_test",
-        "core.domain.calculation_registry_test"
+        "core.domain.calculation_registry_test",
+        "scripts.extend_index_yaml_test"
     ],
     "4": [
         "core.domain.question_fetchers_test",
