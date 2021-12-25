@@ -334,8 +334,7 @@ class SignupHandler(base.BaseHandler):
                     'validators': [{
                         'id': 'is_valid_username_string'
                     }]
-                },
-                'default_value': None
+                }
             },
             'agreed_to_terms': {
                 'schema': {

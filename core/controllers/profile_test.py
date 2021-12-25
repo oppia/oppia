@@ -678,13 +678,14 @@ class SignupTests(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         response_dict = self.post_json(
-            feconf.SIGNUP_DATA_URL, {'agreed_to_terms': False},
+            feconf.SIGNUP_DATA_URL,
+            {'username': self.EDITOR_USERNAME, 'agreed_to_terms': False},
             csrf_token=csrf_token, expected_status_int=400)
         self.assertIn('you will need to accept', response_dict['error'])
 
         response_dict = self.post_json(
             feconf.SIGNUP_DATA_URL,
-            {'agreed_to_terms': False},
+            {'username': self.EDITOR_USERNAME, 'agreed_to_terms': False},
             csrf_token=csrf_token, expected_status_int=400)
         self.assertIn('you will need to accept', response_dict['error'])
 
@@ -703,7 +704,9 @@ class SignupTests(test_utils.GenericTestBase):
         response_dict = self.post_json(
             feconf.SIGNUP_DATA_URL, {'agreed_to_terms': True},
             csrf_token=csrf_token, expected_status_int=400)
-        self.assertIn('Empty username supplied', response_dict['error'])
+        self.assertIn(
+            'Missing key in handler args: username.',
+            response_dict['error'])
 
         response_dict = self.post_json(
             feconf.SIGNUP_DATA_URL,
