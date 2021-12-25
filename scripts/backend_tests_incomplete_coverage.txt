@@ -46,7 +46,6 @@ core.controllers.blog_homepage_test
 core.domain.learner_goals_services_test
 core.utils_test
 scripts.install_backend_python_libs_test
-scripts.common_test
 core.domain.subtopic_page_domain_test
 core.domain.event_services_test
 core.domain.user_services_test
@@ -96,7 +95,6 @@ core.storage.blog.gae_models_test
 main_test
 core.storage.recommendations.gae_models_test
 core.storage.feedback.gae_models_test
-core.storage.activity.gae_models_test
 core.storage.subtopic.gae_models_test
 core.domain.user_domain_test
 core.storage.opportunity.gae_models_test
