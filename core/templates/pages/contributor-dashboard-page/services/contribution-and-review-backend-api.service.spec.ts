@@ -45,7 +45,7 @@ describe('Contribution and review backend API service', () => {
     const url = '/getsubmittedsuggestions/skill/add_question';
 
     carbas.fetchSuggestionsAsync(
-      'SUBMITTED_SUGGESTION_LIST_HANDLER_URL', 'skill', 'add_question'
+      '_SUBMITTED_SUGGESTION_LIST_HANDLER_URL', 'skill', 'add_question'
     ).then(successHandler, failureHandler);
 
     const req = http.expectOne(url);
