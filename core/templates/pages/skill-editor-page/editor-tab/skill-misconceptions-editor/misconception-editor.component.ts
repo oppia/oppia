@@ -31,16 +31,16 @@ interface MisconceptionFormSchema {
 
 interface Container {
   'misconceptionName': string;
-  'misconceptionNotes': string,
-  'misconceptionFeedback': string,
-  'misconceptionMustBeAddressed': boolean,
+  'misconceptionNotes': string;
+  'misconceptionFeedback': string;
+  'misconceptionMustBeAddressed': boolean;
 }
 
 @Component({
   selector: 'oppia-misconception-editor',
   templateUrl: './misconception-editor.component.html'
 })
-export class MisconceptionEditorComponent implements OnInit{
+export class MisconceptionEditorComponent implements OnInit {
   @Input() getIndex: string;
   @Input() isEditable: boolean;
   @Input() misconception;
@@ -56,13 +56,13 @@ export class MisconceptionEditorComponent implements OnInit{
   NOTES_FORM_SCHEMA: MisconceptionFormSchema = {
     type: 'html',
     ui_config: {}
-  }
+  };
   FEEDBACK_FORM_SCHEMA: MisconceptionFormSchema = {
     type: 'html',
     ui_config: {
       hide_complex_extensions: 'true'
     }
-  }
+  };
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
@@ -83,7 +83,7 @@ export class MisconceptionEditorComponent implements OnInit{
       misconceptionNotes: this.misconception.getNotes(),
       misconceptionFeedback: this.misconception.getFeedback(),
       misconceptionMustBeAddressed: this.misconception.isMandatory()
-    }
+    };
   }
 
   // Remove these function when the schema-based editor
@@ -158,7 +158,7 @@ export class MisconceptionEditorComponent implements OnInit{
 
     if (notesHasChanged) {
       this.skillUpdateService.updateMisconceptionNotes(
-    this.skill,
+        this.skill,
         this.misconception.getId(),
         this.notesMemento,
         this.container.misconceptionNotes);
@@ -196,7 +196,7 @@ export class MisconceptionEditorComponent implements OnInit{
     this.nameEditorIsOpen = false;
   }
 
-  cancelEditNotes() : void {
+  cancelEditNotes(): void {
     this.container.misconceptionNotes = this.notesMemento;
     this.notesMemento = null;
     this.notesEditorIsOpen = false;
