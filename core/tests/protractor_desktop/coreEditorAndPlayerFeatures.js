@@ -34,7 +34,6 @@ var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
-
 describe('Enable correctness feedback and set correctness', function() {
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
@@ -302,7 +301,6 @@ describe('Enable correctness feedback and set correctness', function() {
     await general.checkForConsoleErrors([]);
   });
 });
-
 
 describe('Core exploration functionality', function() {
   var explorationPlayerPage = null;
