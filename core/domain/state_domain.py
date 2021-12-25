@@ -258,7 +258,7 @@ class AnswerGroup:
         return answer_group_dict
 
     @staticmethod
-    def update_image_sizes_in_bytes_in_answer_group(
+    def update_image_sizes_in_bytes(
             answer_group_dict, entity_type, entity_id):
         """Checks for HTML fields in an answer group dict and introduces a new
         attribute image_sizes_in_bytes which holds the mapping of all the rich
@@ -504,7 +504,7 @@ class Solution:
         return solution_dict
 
     @staticmethod
-    def update_image_sizes_in_bytes_in_solution(
+    def update_image_sizes_in_bytes(
             interaction_id, solution_dict, entity_type, entity_id):
         """Updates the image_sizes_in_bytes dict with the mappings from rich
         text images in the html to their sizes.
@@ -968,8 +968,9 @@ class InteractionInstance:
         return interaction_dict
 
     @staticmethod
-    def update_image_sizes_in_bytes_in_interaction(
-            interaction_dict,
+    def update_image_sizes_in_bytes_in_customization_args(
+            interaction_id,
+            cust_arg_dict,
             entity_type,
             entity_id):
         """Checks for the HTML fields in the interaction, updates the
@@ -977,28 +978,27 @@ class InteractionInstance:
         contained in the html to their sizes in bytes.
 
         Args:
-            interaction_dict: dict. The interaction dict.
+            interaction_id: str. The ID of the interaction.
+            cust_arg_dict: dict. The customization arguments dict.
             entity_type: str. The type of the entity.
             entity_id: str. The ID of the entity.
 
         Returns:
-            dict. The updated interaction dict.
+            dict. The updated customization args dict.
         """
-        interaction_id = interaction_dict['id']
-
         customization_args = (
             InteractionInstance
             .convert_customization_args_dict_to_customization_args(
                 interaction_id,
-                interaction_dict['customization_args']))
+                cust_arg_dict))
         ca_specs = interaction_registry.Registry.get_interaction_by_id(
             interaction_id).customization_arg_specs
 
         for ca_spec in ca_specs:
             ca_spec_name = ca_spec.name
             customization_args[ca_spec_name].value = (
-                InteractionCustomizationArg.
-                    traverse_by_schema_and_update_image_sizes_in_bytes(
+                InteractionCustomizationArg
+                    .traverse_by_schema_and_update_image_sizes_in_bytes(
                     ca_spec.schema,
                     customization_args[ca_spec_name].value,
                     entity_type,
@@ -1011,8 +1011,9 @@ class InteractionInstance:
             customization_args_dict[ca_name] = (
                 customization_args[ca_name].to_customization_arg_dict())
 
-        interaction_dict['customization_args'] = customization_args_dict
-        return interaction_dict
+        cust_arg_dict = customization_args_dict
+
+        return cust_arg_dict
 
     @staticmethod
     def convert_customization_args_dict_to_customization_args(
@@ -1134,7 +1135,9 @@ class InteractionCustomizationArg:
 
             if schema_obj_type == schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML:
                 return SubtitledHtml(
-                    ca_value['content_id'], ca_value['html'], {})
+                    ca_value['content_id'],
+                    ca_value['html'],
+                    ca_value['image_sizes_in_bytes'])
 
         ca_value = InteractionCustomizationArg.traverse_by_schema_and_convert(
             ca_schema,
@@ -1171,7 +1174,7 @@ class InteractionCustomizationArg:
         )
 
     def get_content_ids(self):
-        """Get all content_ids from SubtitledHtml and SubtitledUnicode in the
+        """Get all content_ids from SubtitledHtml and SubtitledUnicode in
         customization argument.
 
         Returns:
@@ -1292,13 +1295,13 @@ class InteractionCustomizationArg:
             dict. The converted customization dict.
         """
         is_subtitled_html_spec = (
-            schema['type'] == schema_utils.SCHEMA_TYPE_CUSTOM and
-            schema['obj_type'] ==
-            schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML)
+                schema['type'] == schema_utils.SCHEMA_TYPE_CUSTOM and
+                schema['obj_type'] ==
+                schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML)
         is_subtitled_unicode_spec = (
-            schema['type'] == schema_utils.SCHEMA_TYPE_CUSTOM and
-            schema['obj_type'] ==
-            schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE)
+                schema['type'] == schema_utils.SCHEMA_TYPE_CUSTOM and
+                schema['obj_type'] ==
+                schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE)
 
         if is_subtitled_html_spec or is_subtitled_unicode_spec:
             value = conversion_fn(value, schema['obj_type'])
@@ -1317,7 +1320,8 @@ class InteractionCustomizationArg:
                     InteractionCustomizationArg.traverse_by_schema_and_convert(
                         property_spec['schema'],
                         value[name],
-                        conversion_fn)
+                        conversion_fn
+                    )
                 )
 
         return value
@@ -1516,7 +1520,7 @@ class Outcome:
         return outcome_dict
 
     @staticmethod
-    def update_image_sizes_in_bytes_in_outcome(
+    def update_image_sizes_in_bytes(
             outcome_dict, entity_type, entity_id):
         """Updates the image_sizes_in_bytes dict with the images in the
         outcome html.
@@ -2038,7 +2042,7 @@ class WrittenTranslations:
         return written_translations_dict
 
     @staticmethod
-    def update_image_sizes_in_bytes_in_written_translations(
+    def update_image_sizes_in_bytes(
             written_translations_dict, entity_type, entity_id):
         """Updates the image_sizes_in_bytes dict with the mappings from rich
         text images in the html to their sizes.
@@ -3140,11 +3144,10 @@ class State:
             customization_args_dict: dict. The new customization_args to set.
         """
         customization_args = (
-            InteractionInstance.
-            convert_customization_args_dict_to_customization_args(
-                self.interaction.id,
-                customization_args_dict)
-        )
+            InteractionInstance
+                .convert_customization_args_dict_to_customization_args(
+                    self.interaction.id, customization_args_dict))
+
         for ca_name in customization_args:
             customization_args[ca_name].validate_subtitled_html()
 
@@ -3731,8 +3734,7 @@ class State:
 
     @classmethod
     def update_image_sizes_in_bytes_in_state(
-            cls, state_dict, entity_type, entity_id,
-            state_uses_old_interaction_cust_args_schema=False):
+            cls, state_dict, entity_type, entity_id):
         """Updates the image_sizes_in_bytes dict for all the SubtitledHtml
         and WrittenTranslation contents within a states dict.
 
@@ -3742,17 +3744,13 @@ class State:
                 part of.
             entity_id: str. The ID of the entity of which the state_dict is
                 part of.
-            state_uses_old_interaction_cust_args_schema: bool. Whether the
-                interaction customization arguments contain SubtitledHtml
-                and SubtitledUnicode dicts (should be True if prior to state
-                schema v36).
 
         Returns:
             dict. The updated state_dict, which includes the mapping of all
             rich text images to its size in bytes.
         """
 
-        # Update image_sizes_in_bytes for content.
+        # Update image_sizes_in_bytes for content html.
         state_dict['content']['image_sizes_in_bytes'] = (
             html_cleaner.get_image_sizes_in_bytes_from_html(
                 state_dict['content']['html'],
@@ -3762,21 +3760,21 @@ class State:
         # For interactions - default outcome.
         if state_dict['interaction']['default_outcome']:
             state_dict['interaction']['default_outcome'] = (
-                Outcome.update_image_sizes_in_bytes_in_outcome(
+                Outcome.update_image_sizes_in_bytes(
                     state_dict['interaction']['default_outcome'],
                     entity_type, entity_id))
 
         for answer_group_index, answer_group in enumerate(
                 state_dict['interaction']['answer_groups']):
             state_dict['interaction']['answer_groups'][answer_group_index] = (
-                AnswerGroup.update_image_sizes_in_bytes_in_answer_group(
+                AnswerGroup.update_image_sizes_in_bytes(
                     answer_group, entity_type, entity_id))
 
         # For written translations.
         if 'written_translations' in state_dict.keys():
             state_dict['written_translations'] = (
                 WrittenTranslations
-                .update_image_sizes_in_bytes_in_written_translations(
+                .update_image_sizes_in_bytes(
                     state_dict['written_translations'],
                     entity_type,
                     entity_id))
@@ -3805,39 +3803,18 @@ class State:
         # Interactions solution.
         if state_dict['interaction']['solution']:
             state_dict['interaction']['solution'] = (
-                Solution.update_image_sizes_in_bytes_in_solution(
+                Solution.update_image_sizes_in_bytes(
                     interaction_id,
                     state_dict['interaction']['solution'],
                     entity_type,
                     entity_id))
 
-        # Interactions - customization args to be done.
-        if state_uses_old_interaction_cust_args_schema:
-            ca_specs = (
-                interaction_registry.Registry
-                .get_all_specs_for_state_schema_version(35)[
-                    interaction_id]['customization_arg_specs'])
-
-            interaction_customization_arg_has_html = False
-            for customization_arg_sepc in ca_specs:
-                schema = customization_arg_sepc['schema']
-                if (schema['type'] == schema_utils.SCHEMA_TYPE_LIST and
-                        schema['items']['type'] ==
-                        schema_utils.SCHEMA_TYPE_HTML):
-                    interaction_customization_arg_has_html = True
-
-            if interaction_customization_arg_has_html:
-                if 'choices' in (
-                        state_dict['interaction']['customization_args'].keys()):
-                    for val in state_dict['interaction']['customization_args'][
-                        'choices']['value']:
-                        val['image_sizes_in_bytes'] = (
-                            html_cleaner.get_image_sizes_in_bytes_from_html(
-                                val['html'], entity_type, entity_id))
-        else:
-            state_dict['interaction'] = (
-                InteractionInstance.update_image_sizes_in_bytes_in_interaction(
-                    state_dict['interaction'],
+        # Interactions - customization args.
+        state_dict['interaction']['customization_args'] = (
+            InteractionInstance
+                .update_image_sizes_in_bytes_in_customization_args(
+                    interaction_id,
+                    state_dict['interaction']['customization_args'],
                     entity_type,
                     entity_id))
 

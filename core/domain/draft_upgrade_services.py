@@ -271,7 +271,7 @@ class DraftUpgradeUtil:
                       new_value is not None):
                     new_value = (
                         state_domain.Outcome.
-                            update_image_sizes_in_bytes_in_outcome(
+                            update_image_sizes_in_bytes(
                             new_value,
                             entity_type,
                             entity_id))
@@ -295,7 +295,7 @@ class DraftUpgradeUtil:
                       exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
                     new_value = [
                         state_domain.AnswerGroup.
-                            update_image_sizes_in_bytes_in_answer_group(
+                            update_image_sizes_in_bytes(
                             answer_group,
                             entity_type,
                             entity_id

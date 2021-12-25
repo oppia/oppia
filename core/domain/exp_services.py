@@ -399,14 +399,33 @@ def apply_change_list(exploration_id, change_list):
                     state.update_linked_skill_id(change.new_value)
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
+                    change.new_value = (
+                        state_domain.InteractionInstance
+                            .update_image_sizes_in_bytes_in_customization_args(
+                            state.interaction.id,
+                            change.new_value,
+                            feconf.ENTITY_TYPE_EXPLORATION,
+                            exploration_id))
                     state.update_interaction_customization_args(
-                        change.new_value)
+                        change.new_value,
+                        feconf.ENTITY_TYPE_EXPLORATION,
+                        exploration_id)
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_INTERACTION_HANDLERS):
                     raise utils.InvalidInputException(
                         'Editing interaction handlers is no longer supported')
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
+
+                    for answer_group_index, answer_group in enumerate(
+                            change.new_value):
+                        change.new_value[answer_group_index] = (
+                            state_domain.AnswerGroup
+                                .update_image_sizes_in_bytes(
+                                    answer_group,
+                                    feconf.ENTITY_TYPE_EXPLORATION,
+                                    exploration_id))
+
                     new_answer_groups = [
                         state_domain.AnswerGroup.from_dict(answer_groups)
                         for answer_groups in change.new_value
@@ -414,6 +433,12 @@ def apply_change_list(exploration_id, change_list):
                     state.update_interaction_answer_groups(new_answer_groups)
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):
+                    if 'feedback' in change.new_value:
+                        change.new_value = (
+                            state_domain.Outcome.update_image_sizes_in_bytes(
+                                change.new_value,
+                                feconf.ENTITY_TYPE_EXPLORATION,
+                                exploration_id))
                     new_outcome = None
                     if change.new_value:
                         new_outcome = state_domain.Outcome.from_dict(
@@ -430,6 +455,15 @@ def apply_change_list(exploration_id, change_list):
                         raise Exception(
                             'Expected hints_list to be a list,'
                             ' received %s' % change.new_value)
+
+                    for hint_index, hint_dict in enumerate(change.new_value):
+                        change.new_value[hint_index] = (
+                            state_domain.Hint
+                                .update_image_sizes_in_bytes_in_hint(
+                                    hint_dict,
+                                    feconf.ENTITY_TYPE_EXPLORATION,
+                                    exploration_id))
+
                     new_hints_list = [
                         state_domain.Hint.from_dict(hint_dict)
                         for hint_dict in change.new_value
@@ -437,8 +471,16 @@ def apply_change_list(exploration_id, change_list):
                     state.update_interaction_hints(new_hints_list)
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
+                    change.new_value = (
+                            state_domain.Solution.update_image_sizes_in_bytes(
+                            state.interaction.id,
+                            change.new_value,
+                            feconf.ENTITY_TYPE_EXPLORATION,
+                            exploration_id))
+
                     new_solution = None
                     if change.new_value is not None:
+
                         new_solution = state_domain.Solution.from_dict(
                             state.interaction.id, change.new_value)
                     state.update_interaction_solution(new_solution)
@@ -488,6 +530,12 @@ def apply_change_list(exploration_id, change_list):
                         raise Exception(
                             'Expected written_translations to be a dict, '
                             'received %s' % change.new_value)
+                    change.new_value = (
+                        state_domain.WrittenTranslations
+                            .update_image_sizes_in_bytes(
+                            change.new_value,
+                            feconf.ENTITY_TYPE_EXPLORATION,
+                            exploration_id))
                     cleaned_written_translations_dict = (
                         state_domain.WrittenTranslations
                         .convert_html_in_written_translations(
