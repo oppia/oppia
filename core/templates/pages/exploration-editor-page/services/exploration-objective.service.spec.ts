@@ -19,15 +19,21 @@
 import { TestBed } from '@angular/core/testing';
 import { ExplorationObjectiveService } from './exploration-objective.service';
 import { ExplorationPropertyService } from './exploration-property.service';
+import { ExplorationRightsService } from './exploration-rights.service';
+import { ValidatorsService } from 'services/validators.service';
+import { NormalizeWhitespacePipe } from 'filters/string-utility-filters/normalize-whitespace.pipe';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
-describe('Exploration Objective Service', function() {
+describe('Exploration Objective Service', () => {
   let eos: ExplorationObjectiveService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [
+        ExplorationRightsService,
+        ValidatorsService,
+        NormalizeWhitespacePipe,
         ExplorationPropertyService
       ]
     });

@@ -518,6 +518,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ExplorationLanguageCodeService', ExplorationLanguageCodeService],
   ['ExplorationObjectiveService', ExplorationObjectiveService],
   ['ExplorationObjectFactory', ExplorationObjectFactory],
+  ['ExplorationObjectiveService', ExplorationObjectiveService],
   ['ExplorationPermissionsBackendApiService',
     ExplorationPermissionsBackendApiService],
   ['ExplorationPlayerStateService', ExplorationPlayerStateService],
