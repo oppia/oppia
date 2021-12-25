@@ -236,7 +236,7 @@ describe('Learner dashboard functionality', function() {
       TOPIC_NAME, TOPIC_URL_FRAGMENT_NAME, TOPIC_DESCRIPTION, false);
     await topicEditorPage.expectNumberOfStoriesToBe(0);
     await topicEditorPage.createStory(
-      'Story Title', 'story-one', 'Story description',
+      'Story Title', 'storyone', 'Story description',
       '../data/test_svg.svg');
     await storyEditorPage.returnToTopic();
 
@@ -403,7 +403,7 @@ describe('Learner dashboard functionality', function() {
     await topicsAndSkillsDashboardPage.editTopic(TOPIC_NAME);
     await topicEditorPage.expectNumberOfStoriesToBe(0);
     await topicEditorPage.createStory(
-      'Story 2', 'story-two',
+      'Story 2', 'storytwo',
       'Story description', Constants.TEST_SVG_PATH);
     await storyEditorPage.updateMetaTagContent('story meta tag');
     for (var i = 0; i < 3; i++) {

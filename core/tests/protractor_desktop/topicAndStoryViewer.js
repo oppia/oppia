@@ -135,7 +135,7 @@ describe('Topic and Story viewer functionality', function() {
     await topicEditorPage.publishTopic();
     await topicsAndSkillsDashboardPage.editTopic('Topic TASV1');
     await topicEditorPage.createStory(
-      'Story TASV1', 'story-player-tasv-one', 'Story description',
+      'Story TASV1', 'storyplayertasvone', 'Story description',
       Constants.TEST_SVG_PATH);
     await storyEditorPage.updateMetaTagContent('story meta tag');
     for (var i = 0; i < 3; i++) {
