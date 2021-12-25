@@ -143,7 +143,7 @@ export class AddOrUpdateSolutionModalComponent
     } else {
       throw new Error('Cannot save invalid solution');
     }
-  };
+  }
 
   ngOnInit(): void {
     if(this.savedMemento()){

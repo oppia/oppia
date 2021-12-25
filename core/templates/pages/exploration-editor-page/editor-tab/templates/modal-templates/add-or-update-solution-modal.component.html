@@ -16,15 +16,15 @@
       <br>
       <br>
       <div>
-        <angular-html-bind class="protractor-test-interaction-html"
+        <angular-html-bind-wrapper class="protractor-test-interaction-html"
                            [htmlData]="correctAnswerEditorHtml">
-        </angular-html-bind>
+        </angular-html-bind-wrapper>
       </div>
       <br>
       <md-button class="oppia-learner-confirm-button protractor-test-submit-answer-button"
                  (click)="onSubmitFromSubmitButton()"
                  *ngIf="data.correctAnswer === null && shouldAdditionalSubmitButtonBeShown()"
-                 [disabled]="isSubmitButtonDisabled()">
+                 [disabled]="isSubmitButtonDisabled">
         Submit
       </md-button>
       <br>
@@ -47,7 +47,7 @@
   <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
   <button class="btn btn-success protractor-test-submit-solution-button"
           (click)="saveSolution()"
-          [disabled]="data.correctAnswer === null || !data.explanationHtml || isSubmitButtonDisabled() || isSolutionExplanationLengthExceeded(data.explanationHtml)"
+          [disabled]="data.correctAnswer === null || !data.explanationHtml || isSubmitButtonDisabled || isSolutionExplanationLengthExceeded(data.explanationHtml)"
           title="Check if the solution corresponds to a correct answer and save it.">
     Check and Save Solution
   </button>
