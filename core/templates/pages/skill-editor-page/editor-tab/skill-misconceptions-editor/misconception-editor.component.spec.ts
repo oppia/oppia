@@ -19,7 +19,6 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ChangeDetectorRef, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
 import { MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
 import { SkillUpdateService } from 'domain/skill/skill-update.service';
@@ -33,9 +32,7 @@ describe('Misconception Editor Component', function() {
   let skillEditorStateService: SkillEditorStateService;
   let skillUpdateService: SkillUpdateService;
   let misconceptionObjectFactory: MisconceptionObjectFactory;
-
-  let sampleSkill = null;
-  let sampleMisconception = null;
+  let sampleSkill: Skill;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -62,29 +59,41 @@ describe('Misconception Editor Component', function() {
     sampleSkill = new Skill(
       'id1', 'description', [], [], {} as ConceptCard, 'en',
       1, 0, 'id1', false, []);
-    sampleMisconception = misconceptionObjectFactory.create(
-      'misconceptionId', 'name', 'notes', 'feedback', false);
     spyOn(skillEditorStateService, 'getSkill').and.returnValue(sampleSkill);
     
     component.isEditable = true;
-    component.container = {
-        misconceptionName: 'name',
-        misconceptionNotes: 'notes',
-        misconceptionFeedback: 'feedback',
-        misconceptionMustBeAddressed: false
-    }
+    component.misconception = {
+      getId(): string {
+        return 'misconceptionId';
+      },
 
+      getName(): string {
+        return 'name';
+      },
+
+      getNotes(): string {
+        return 'notes';
+      },
+
+      getFeedback(): string {
+        return 'feedback';
+      },
+
+      isMandatory(): boolean {
+        return false;
+      }
+    }
     component.ngOnInit();
   });
 
-  it('should set properties when initialized', function() {
+  it('should set properties when initialized', () => {
     expect(component.nameEditorIsOpen).toEqual(false);
     expect(component.notesEditorIsOpen).toEqual(false);
     expect(component.feedbackEditorIsOpen).toEqual(false);
     expect(component.skill).toEqual(sampleSkill);
   });
 
-  it('should open name editor when clicking on edit button', function() {
+  it('should open name editor when clicking on edit button', () => {
     expect(component.nameEditorIsOpen).toBe(false);
 
     component.openNameEditor();
@@ -92,7 +101,7 @@ describe('Misconception Editor Component', function() {
     expect(component.nameEditorIsOpen).toBe(true);
   });
 
-  it('should open notes editor when clicking on edit button', function() {
+  it('should open notes editor when clicking on edit button', () => {
     expect(component.notesEditorIsOpen).toBe(false);
 
     component.openNotesEditor();
@@ -100,7 +109,7 @@ describe('Misconception Editor Component', function() {
     expect(component.notesEditorIsOpen).toBe(true);
   });
 
-  it('should open feedback editor when clicking on edit button', function() {
+  it('should open feedback editor when clicking on edit button', () => {
     expect(component.feedbackEditorIsOpen).toBe(false);
 
     component.openFeedbackEditor();
@@ -108,7 +117,7 @@ describe('Misconception Editor Component', function() {
     expect(component.feedbackEditorIsOpen).toBe(true);
   });
 
-  it('should save name when clicking on save button', function() {
+  it('should save name when clicking on save button', () => {
     let updateNameSpy = spyOn(
       skillUpdateService, 'updateMisconceptionName').and.returnValue(null);
 
@@ -120,7 +129,7 @@ describe('Misconception Editor Component', function() {
     expect(updateNameSpy).toHaveBeenCalled();
   });
 
-  it('should save notes when clicking on save button', function() {
+  it('should save notes when clicking on save button', () => {
     let updateNotesSpy = spyOn(
       skillUpdateService, 'updateMisconceptionNotes').and.returnValue(null);
 
@@ -132,7 +141,7 @@ describe('Misconception Editor Component', function() {
     expect(updateNotesSpy).toHaveBeenCalled();
   });
 
-  it('should save feedback when clicking on save button', function() {
+  it('should save feedback when clicking on save button', () => {
     let updateFeedbackSpy = spyOn(
       skillUpdateService, 'updateMisconceptionFeedback').and.returnValue(null);
 
@@ -145,7 +154,7 @@ describe('Misconception Editor Component', function() {
       sampleSkill, 'misconceptionId', 'feedback', 'newFeedback');
   });
 
-  it('should close name editor when clicking on cancel button', function() {
+  it('should close name editor when clicking on cancel button', () => {
     expect(component.nameEditorIsOpen).toBe(false);
 
     component.openNameEditor();
@@ -155,7 +164,7 @@ describe('Misconception Editor Component', function() {
     expect(component.nameEditorIsOpen).toBe(false);
   });
 
-  it('should close notes editor when clicking on cancel button', function() {
+  it('should close notes editor when clicking on cancel button', () => {
     expect(component.notesEditorIsOpen).toBe(false);
     component.openNotesEditor();
 
@@ -165,7 +174,7 @@ describe('Misconception Editor Component', function() {
     expect(component.notesEditorIsOpen).toBe(false);
   });
 
-  it('should close feedback editor when clicking on cancel button', function() {
+  it('should close feedback editor when clicking on cancel button', () => {
     expect(component.feedbackEditorIsOpen).toBe(false);
     component.openFeedbackEditor();
 
@@ -175,7 +184,7 @@ describe('Misconception Editor Component', function() {
     expect(component.feedbackEditorIsOpen).toBe(false);
   });
 
-  it('should address the misconception\'s updates', function() {
+  it('should address the misconception\'s updates', () => {
     let updatesSpy = spyOn(
       skillUpdateService, 'updateMisconceptionMustBeAddressed')
       .and.returnValue(null);
@@ -197,16 +206,14 @@ describe('Misconception Editor Component', function() {
   });
 
   it('should update misconceptionNotes', () => {
-    let notes = 'notes';
-    component.ngOnInit();
+    let notes = 'notes1';
     component.updateLocalNotes(notes);
 
     expect(component.container.misconceptionNotes).toEqual(notes);
   });
 
   it('should update misconceptionFeedback', () => {
-    let feedback = 'feedback';
-    component.ngOnInit();
+    let feedback = 'feedback1';
     component.updateLocalFeedback(feedback);
 
     expect(component.container.misconceptionFeedback).toEqual(feedback);

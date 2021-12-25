@@ -19,10 +19,10 @@
 import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import cloneDeep from 'lodash/cloneDeep';
-
 import { AppConstants } from 'app.constants';
 import { SkillUpdateService } from 'domain/skill/skill-update.service';
 import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
+import { Skill } from 'domain/skill/SkillObjectFactory';
 
 interface MisconceptionFormSchema {
   type: 'html';
@@ -41,14 +41,14 @@ interface Container {
   templateUrl: './misconception-editor.component.html'
 })
 export class MisconceptionEditorComponent implements OnInit{
+  @Input() getIndex: string;
+  @Input() isEditable: boolean;
   @Input() misconception;
-  @Input() getIndex;
-  @Input() isEditable;
-  nameMemento;
-  notesMemento;
-  feedbackMemento;
+  nameMemento: string;
+  notesMemento: string;
+  feedbackMemento: string;
   container: Container;
-  skill;
+  skill: Skill;
   MAX_CHARS_IN_MISCONCEPTION_NAME: number;
   nameEditorIsOpen: boolean;
   notesEditorIsOpen: boolean;
@@ -128,7 +128,7 @@ export class MisconceptionEditorComponent implements OnInit{
 
   openFeedbackEditor(): void {
     if (this.isEditable) {
-      this.feedbackMemento = angular.copy(
+      this.feedbackMemento = cloneDeep(
         this.container.misconceptionFeedback);
       this.feedbackEditorIsOpen = true;
     }

@@ -11,10 +11,10 @@
          class="h-100"
          title="Misconception Name">
       <div class="oppia-readonly-rule-tile"
-           [ngClass]="{'oppia-editable-section': isEditable()}">
+           [ngClass]="{'oppia-editable-section': isEditable}">
         <div class="oppia-rule-preview">
           <div class="oppia-click-to-start-editing" (click)="openNameEditor()">
-            <i *ngIf="isEditable()"
+            <i *ngIf="isEditable"
                class="material-icons oppia-editor-edit-icon float-right"
                title="Edit Misconception Name">&#xE254;
             </i>
@@ -28,7 +28,7 @@
       </div>
     </div>
 
-    <div *ngIf="isEditable() && nameEditorIsOpen">
+    <div *ngIf="isEditable && nameEditorIsOpen">
       <div class="oppia-rule-details-header">
         <strong>Misconception Name</strong>
         <input class="form-control" type="text" [(ngModel)]="container.misconceptionName" maxlength="{{ MAX_CHARS_IN_MISCONCEPTION_NAME }}">
@@ -61,10 +61,10 @@
          class="h-100"
          title="Misconception Notes">
       <div class="oppia-readonly-rule-tile"
-           [ngClass]="{'oppia-editable-section': isEditable()}">
+           [ngClass]="{'oppia-editable-section': isEditable}">
         <div class="oppia-rule-preview">
           <div class="oppia-click-to-start-editing" (click)="openNotesEditor()">
-            <i *ngIf="isEditable()"
+            <i *ngIf="isEditable"
                class="material-icons oppia-editor-edit-icon float-right"
                title="Edit Misconception Notes">&#xE254;
             </i>
@@ -83,7 +83,7 @@
       </div>
     </div>
 
-    <div *ngIf="notesEditorIsOpen && isEditable()">
+    <div *ngIf="notesEditorIsOpen && isEditable">
       <div class="oppia-rule-details-header">
         <strong>Notes for Creator</strong>
         <schema-based-editor [schema]="getSchemaNotes.bind(this)"
@@ -115,10 +115,10 @@
          class="h-100"
          title="Misconception Feedback">
       <div class="oppia-readonly-rule-tile"
-           [ngClass]="{'oppia-editable-section': isEditable()}">
+           [ngClass]="{'oppia-editable-section': isEditable}">
         <div class="oppia-rule-preview">
           <div class="oppia-click-to-start-editing" (click)="openFeedbackEditor()">
-            <i *ngIf="isEditable()"
+            <i *ngIf="isEditable"
                class="material-icons oppia-editor-edit-icon float-right"
                title="Edit Misconception Feedback">&#xE254;
             </i>
@@ -130,7 +130,7 @@
       </div>
     </div>
 
-    <div *ngIf="feedbackEditorIsOpen && isEditable()">
+    <div *ngIf="feedbackEditorIsOpen && isEditable">
       <div class="oppia-rule-details-header">
         <strong>Feedback for Learner</strong>
         <schema-based-editor [schema]="getSchemaFeedback.bind(this)"
