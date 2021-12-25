@@ -20,9 +20,6 @@ import { DeleteMisconceptionModalComponent } from 'pages/skill-editor-page/modal
 
 
 require(
-  'pages/skill-editor-page/editor-tab/skill-misconceptions-editor/' +
-  'misconception-editor.directive.ts');
-require(
   'pages/skill-editor-page/modal-templates/' +
   'add-misconception-modal.controller.ts');
 
