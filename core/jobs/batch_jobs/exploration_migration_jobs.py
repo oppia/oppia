@@ -135,9 +135,10 @@ class MigrateExplorationJob(base_jobs.JobBase):
             ExpSummaryModel. The updated exploration summary model to put into
             the datastore.
         """
-        exploration_summary = exp_services.compute_summary_of_exploration(
-            migrated_exploration)
-        exploration_summary.version += 1
+        with datastore_services.get_ndb_context():
+            exploration_summary = exp_services.compute_summary_of_exploration(
+                migrated_exploration)
+            exploration_summary.version += 1
         return (
             exp_services.populate_exploration_summary_model_fields(
                 exploration_summary_model, exploration_summary

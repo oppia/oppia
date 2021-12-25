@@ -20,8 +20,4 @@ python_linter_test. This file has merge conflict.
 
 from __future__ import annotations
 
-<<<<<<< HEAD
-'this is some content to mess with content to append.'
-=======
 'totally different content to merge later.'
->>>>>>> new_branch_to_merge_later

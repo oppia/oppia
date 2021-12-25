@@ -48,11 +48,13 @@ from core.jobs.batch_jobs import email_deletion_jobs                # pylint: di
 from core.jobs.batch_jobs import (                                  # pylint: disable=unused-import  # isort: skip
     exp_recommendation_computation_jobs)
 from core.jobs.batch_jobs import exploration_migration_jobs         # pylint: disable=unused-import  # isort: skip
-from core.jobs.batch_jobs import exp_search_indexing_jobs           # pylint: disable=unused-import  # isort: skip
-from core.jobs.batch_jobs import model_validation_jobs              # pylint: disable=unused-import  # isort: skip
-from core.jobs.batch_jobs import opportunity_management_jobs        # pylint: disable=unused-import  # isort: skip
-from core.jobs.batch_jobs import suggestion_stats_computation_jobs  # pylint: disable=unused-import  # isort: skip
-from core.jobs.batch_jobs import user_stats_computation_jobs        # pylint: disable=unused-import  # isort: skip
+from core.jobs.batch_jobs import exp_search_indexing_jobs            # pylint: disable=unused-import  # isort: skip
+from core.jobs.batch_jobs import model_validation_jobs               # pylint: disable=unused-import  # isort: skip
+from core.jobs.batch_jobs import opportunity_management_jobs         # pylint: disable=unused-import  # isort: skip
+from core.jobs.batch_jobs import skill_migration_jobs                # pylint: disable=unused-import  # isort: skip
+from core.jobs.batch_jobs import story_migration_jobs                # pylint: disable=unused-import  # isort: skip
+from core.jobs.batch_jobs import suggestion_stats_computation_jobs   # pylint: disable=unused-import  # isort: skip
+from core.jobs.batch_jobs import user_stats_computation_jobs         # pylint: disable=unused-import  # isort: skip
 
 
 def get_all_jobs() -> List[Type[base_jobs.JobBase]]:

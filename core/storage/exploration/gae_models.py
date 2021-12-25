@@ -329,8 +329,8 @@ class ExplorationModel(base_models.VersionedModel):
             commit_type,
             commit_message,
             commit_cmds,
-            'public',
-            True
+            constants.ACTIVITY_STATUS_PUBLIC,
+            False
         )
         exploration_commit_log.exploration_id = self.id
         return {
