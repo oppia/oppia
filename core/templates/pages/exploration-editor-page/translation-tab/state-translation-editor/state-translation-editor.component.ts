@@ -28,14 +28,14 @@ require('services/ngb-modal.service.ts');
 angular.module('oppia').component('stateTranslationEditor', {
   template: require('./state-translation-editor.component.html'),
   controller: [
-    '$rootScope', '$scope', 'EditabilityService',
+    '$scope', 'EditabilityService',
     'ExplorationStatesService', 'ExternalSaveService', 'NgbModal',
     'StateEditorService', 'StateWrittenTranslationsService',
     'TranslationLanguageService', 'TranslationStatusService',
     'TranslationTabActiveContentIdService',
     'WrittenTranslationObjectFactory',
     function(
-        $rootScope, $scope, EditabilityService,
+        $scope, EditabilityService,
         ExplorationStatesService, ExternalSaveService, NgbModal,
         StateEditorService, StateWrittenTranslationsService,
         TranslationLanguageService, TranslationStatusService,
@@ -63,13 +63,11 @@ angular.module('oppia').component('stateTranslationEditor', {
               contentId, languageCode);
             ExplorationStatesService.saveRecordedVoiceovers(
               stateName, recordedVoiceovers);
-            $rootScope.$applyAsync();
           }, function() {
             // Note to developers:
             // This callback is triggered when the Cancel button is clicked.
             // No further action is needed.
           });
-          $rootScope.$applyAsync();
         }
       };
       var contentId = null;
