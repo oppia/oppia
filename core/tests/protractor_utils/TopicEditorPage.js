@@ -28,8 +28,6 @@ var TopicEditorPage = function() {
   var EDITOR_URL_PREFIX = '/topic_editor/';
   var createStoryButton = element(
     by.css('.protractor-test-create-story-button'));
-  var submitStoryUrlFragmentButton = element(
-    by.css('.protractor-test-submit-story-url-fragment-button'));
   var newStoryTitleField = element(
     by.css('.protractor-test-new-story-title-field'));
   var newStoryUrlFragmentField = element(
@@ -471,8 +469,6 @@ var TopicEditorPage = function() {
     await action.sendKeys(
       'Create new story url fragment', newStoryUrlFragmentField,
       storyUrlFragment);
-    await action.click(
-      'Submit story url fragment button', submitStoryUrlFragmentButton);
 
     await workflow.submitImage(
       storyThumbnailButton, thumbnailContainer, imgPath, false);

@@ -56,20 +56,7 @@ angular.module('oppia').controller('CreateNewStoryModalController', [
       TopicEditorStateService.getClassroomUrlFragment());
     $scope.topicUrlFragment = (
       TopicEditorStateService.getTopic().getUrlFragment());
-    $scope.unsubmittedUrlFragment = '';
-    $scope.updateView = function() {
-      $scope.$applyAsync();
-    };
-
-    $scope.isValid = function() {
-      return Boolean(
-        $scope.story.isValid() &&
-        ImageLocalStorageService.getStoredImagesData().length > 0 &&
-        !$scope.storyUrlFragmentExists);
-    };
-
-    $scope.assignUrlFragment = function() {
-      $scope.story.urlFragment = $scope.unsubmittedUrlFragment;
+    $scope.onStoryUrlFragmentChange = function() {
       if (!$scope.story.urlFragment) {
         return;
       }
@@ -79,6 +66,17 @@ angular.module('oppia').controller('CreateNewStoryModalController', [
             StoryEditorStateService.getStoryWithUrlFragmentExists());
           $rootScope.$applyAsync();
         });
+    };
+
+    $scope.updateView = function() {
+      $scope.$applyAsync();
+    };
+
+    $scope.isValid = function() {
+      return Boolean(
+        $scope.story.isValid() &&
+        ImageLocalStorageService.getStoredImagesData().length > 0 &&
+        !$scope.storyUrlFragmentExists);
     };
   }
 ]);
