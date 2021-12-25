@@ -49,19 +49,20 @@ interface FetchSuggestionsReturn {
 })
 export class ContributionAndReviewService {
   constructor(
-    private carbas: ContributionAndReviewBackendApiService
+    private contributionAndReviewBackendApiService:
+      ContributionAndReviewBackendApiService
   ) {}
 
   private async _fetchSuggestionsAsync(
       urlName: string, targetType: string, suggestionType: string
   ): Promise<FetchSuggestionsReturn> {
     return (
-      this.carbas.fetchSuggestionsAsync(
+      this.contributionAndReviewBackendApiService.fetchSuggestionsAsync(
         urlName, targetType, suggestionType
       ).then((data) => {
-        var suggestionIdToSuggestions: FetchSuggestionsReturn = {};
-        var targetIdToDetails = data.target_id_to_opportunity_dict;
-        data.suggestions.forEach(function(suggestion) {
+        let suggestionIdToSuggestions: FetchSuggestionsReturn = {};
+        let targetIdToDetails = data.target_id_to_opportunity_dict;
+        data.suggestions.forEach((suggestion) => {
           suggestionIdToSuggestions[suggestion.suggestion_id] = {
             suggestion: suggestion,
             details: targetIdToDetails[suggestion.target_id]
@@ -75,21 +76,21 @@ export class ContributionAndReviewService {
   async getUserCreatedQuestionSuggestionsAsync():
   Promise<FetchSuggestionsReturn> {
     return this._fetchSuggestionsAsync(
-      'SUBMITTED_SUGGESTION_LIST_HANDLER_URL', 'skill', 'add_question'
+      '_SUBMITTED_SUGGESTION_LIST_HANDLER_URL', 'skill', 'add_question'
     );
   }
 
   async getReviewableQuestionSuggestionsAsync():
   Promise<FetchSuggestionsReturn> {
     return this._fetchSuggestionsAsync(
-      'REVIEWABLE_SUGGESTIONS_HANDLER_URL', 'skill', 'add_question'
+      '_REVIEWABLE_SUGGESTIONS_HANDLER_URL', 'skill', 'add_question'
     );
   }
 
   async getUserCreatedTranslationSuggestionsAsync():
   Promise<FetchSuggestionsReturn> {
     return this._fetchSuggestionsAsync(
-      'SUBMITTED_SUGGESTION_LIST_HANDLER_URL',
+      '_SUBMITTED_SUGGESTION_LIST_HANDLER_URL',
       'exploration', 'translate_content'
     );
   }
@@ -97,7 +98,7 @@ export class ContributionAndReviewService {
   async getReviewableTranslationSuggestionsAsync():
     Promise<FetchSuggestionsReturn> {
     return this._fetchSuggestionsAsync(
-      'REVIEWABLE_SUGGESTIONS_HANDLER_URL', 'exploration', 'translate_content'
+      '_REVIEWABLE_SUGGESTIONS_HANDLER_URL', 'exploration', 'translate_content'
     );
   }
 
@@ -116,13 +117,14 @@ export class ContributionAndReviewService {
       )
     };
 
-    return this.carbas.resolveToExplorationAsync(
-      targetId, suggestionId, data
-    ).then(() => {
-      onSuccess(suggestionId);
-    }, (error) => {
-      onFailure && onFailure(error);
-    });
+    return this.contributionAndReviewBackendApiService
+      .resolveToExplorationAsync(
+        targetId, suggestionId, data
+      ).then(() => {
+        onSuccess(suggestionId);
+      }, (error) => {
+        onFailure && onFailure(error);
+      });
   }
 
   resolveSuggestiontoSkill(
@@ -137,7 +139,7 @@ export class ContributionAndReviewService {
       skill_difficulty: skillDifficulty
     };
 
-    return this.carbas.resolveToSkillAsync(
+    return this.contributionAndReviewBackendApiService.resolveToSkillAsync(
       targetId, suggestionId, data
     ).then(() => {
       onSuccess(suggestionId);
@@ -155,11 +157,12 @@ export class ContributionAndReviewService {
       translation_html: translationHtml
     };
 
-    return this.carbas.updateTranslationSuggestionAsync(
-      suggestionId, data
-    ).then(() => {
-      onSuccess();
-    }, (error) => onFailure && onFailure(error));
+    return this.contributionAndReviewBackendApiService
+      .updateTranslationSuggestionAsync(
+        suggestionId, data
+      ).then(() => {
+        onSuccess();
+      }, (error) => onFailure && onFailure(error));
   }
 
   async updateQuestionSuggestionAsync(
@@ -180,15 +183,14 @@ export class ContributionAndReviewService {
       }
     });
 
-    return this.carbas.updateQuestionSuggestionAsync(
-      suggestionId, body
-    ).then(() => {
-      onSuccess(suggestionId);
-    }, () => onFailure && onFailure(suggestionId));
+    return this.contributionAndReviewBackendApiService
+      .updateQuestionSuggestionAsync(
+        suggestionId, body
+      ).then(() => {
+        onSuccess(suggestionId);
+      }, () => onFailure && onFailure(suggestionId));
   }
 }
 
-angular.module('oppia').factory(
-  'ContributionAndReviewService',
-  downgradeInjectable(ContributionAndReviewService)
-);
+angular.module('oppia').factory('ContributionAndReviewService',
+  downgradeInjectable(ContributionAndReviewService));
