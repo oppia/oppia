@@ -42,11 +42,11 @@ VALID_INTERACTION_IDS = [
 SUPPORTED_LANGUAGES = ['en', 'hi-en', 'ar', 'hi', 'pt-br']
 
 LANGAUGE_CODE_TO_ENUM_MAP = {
-    'en': languages_pb2.LanguageType.ENGLISH,
-    'hi-en': languages_pb2.LanguageType.HINGLISH,
-    'ar': languages_pb2.LanguageType.ARABIC,
-    'hi': languages_pb2.LanguageType.HINDI,
-    'pt-br': languages_pb2.LanguageType.BRAZILIAN_PORTUGUESE
+    'en': languages_pb2.LanguageType.Value('ENGLISH'),
+    'ar': languages_pb2.LanguageType.Value('ARABIC'),
+    'hi': languages_pb2.LanguageType.Value('HINDI'),
+    'hi-en': languages_pb2.LanguageType.Value('HINGLISH'),
+    'pt-br': languages_pb2.LanguageType.Value('BRAZILIAN_PORTUGUESE')
 }
 
 # This is linked to VALID_RTE_COMPONENTS_FOR_ANDROID in constants.ts.
