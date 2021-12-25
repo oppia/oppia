@@ -2374,7 +2374,7 @@ class Exploration:
 
         Returns:
             exploration_dict: dict. The updated dict representation of
-                Exploration object.
+            Exploration object.
         """
         exploration_dict['id'] = exploration_id
 
