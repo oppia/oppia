@@ -25,9 +25,6 @@ require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require('directives/angular-html-bind.directive.ts');
 require(
-  'pages/skill-editor-page/editor-tab/skill-concept-card-editor/' +
-  'worked-example-editor.directive.ts');
-require(
   'pages/skill-editor-page/editor-tab/skill-preview-modal.controller.ts');
 require(
   'pages/skill-editor-page/modal-templates/' +
