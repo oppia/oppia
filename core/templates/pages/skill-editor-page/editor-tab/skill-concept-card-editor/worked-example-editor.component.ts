@@ -20,6 +20,7 @@ import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import cloneDeep from 'lodash/cloneDeep';
 import { SkillUpdateService } from 'domain/skill/skill-update.service';
 import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
+import { downgradeComponent } from '@angular/upgrade/static';
 
 interface HtmlFormSchema {
   type: 'html';
@@ -142,3 +143,6 @@ export class WorkedExampleEditorComponent implements OnInit {
     this.explanationEditorIsOpen = false;
   }
 }
+
+angular.module('oppia').directive('oppiaWorkedExampleEditor',
+  downgradeComponent({component: WorkedExampleEditorComponent}));
