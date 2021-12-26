@@ -244,7 +244,7 @@ describe('Interactions', function() {
     await explorationEditorMainTab.moveToState('MathExp');
     await explorationEditorMainTab.setContent(async function(richTextEditor) {
       await richTextEditor.appendPlainText(
-        'Please simplify the following expression: 16x^{12}/4x^2');
+        'Please simplify the following expression: 16x^{4}/4x^2');
     });
 
     await explorationEditorMainTab.setInteraction(
@@ -252,8 +252,8 @@ describe('Interactions', function() {
     // Proper Latex styling for rule spec is required.
     await explorationEditorMainTab.addResponse(
       'AlgebraicExpressionInput', await forms.toRichText('Good job!'), 'End',
-      true, 'IsEquivalentTo', '(16(x^12))/(4x^2)');
-    // Expecting answer to be 4x^10.
+      true, 'IsEquivalentTo', '(16(x^4))/(4x^2)');
+    // Expecting answer to be 4x^2.
     var responseEditor = await explorationEditorMainTab.getResponseEditor(
       'default');
     await responseEditor.setFeedback(await forms.toRichText(
