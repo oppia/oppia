@@ -32,7 +32,7 @@ class MockActiveModal {
   }
 }
 
-describe('Add Worked Example Modal Component', function() {
+fdescribe('Add Worked Example Modal Component', function() {
   let component: AddWorkedExampleModalComponent;
   let fixture: ComponentFixture<AddWorkedExampleModalComponent>;
   let ngbActiveModal: NgbActiveModal;
@@ -71,11 +71,13 @@ describe('Add Worked Example Modal Component', function() {
   it('should close modal when saving worked example', () => {
     spyOn(ngbActiveModal, 'close');
 
+    component.updateLocalQues('question');
+    component.updateLocalExp('explanation');
     component.saveWorkedExample();
 
     expect(ngbActiveModal.close).toHaveBeenCalledWith({
-      workedExampleQuestionHtml: '',
-      workedExampleExplanationHtml: ''
+      workedExampleQuestionHtml: 'question',
+      workedExampleExplanationHtml: 'explanation'
     });
   });
 
