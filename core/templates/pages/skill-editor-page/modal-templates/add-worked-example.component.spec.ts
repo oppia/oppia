@@ -32,7 +32,7 @@ class MockActiveModal {
   }
 }
 
-fdescribe('Add Worked Example Modal Component', function() {
+describe('Add Worked Example Modal Component', function() {
   let component: AddWorkedExampleModalComponent;
   let fixture: ComponentFixture<AddWorkedExampleModalComponent>;
   let ngbActiveModal: NgbActiveModal;
