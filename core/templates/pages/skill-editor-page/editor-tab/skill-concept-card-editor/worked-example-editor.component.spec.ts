@@ -47,7 +47,7 @@ describe('Worked example editor component', function() {
     skillUpdateService = TestBed.inject(SkillUpdateService);
 
     component.isEditable = true;
-    component.getIndex = 2;
+    component.index = 2;
     component.workedExample = {
       getQuestion(): object {
         return {

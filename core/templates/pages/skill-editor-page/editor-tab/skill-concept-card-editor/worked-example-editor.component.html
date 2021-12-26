@@ -22,10 +22,8 @@
   </div>
 
   <div *ngIf="isEditable && questionEditorIsOpen">
-    <form role="form"
-          class="form-inline"
-          name="editWorkedExampleForm"
-          (submit)="saveWorkedExample()">
+    <form class="form-inline"
+          name="editWorkedExampleForm">
       <div class="oppia-rule-details-header">
         <strong>Example Question</strong>
         <schema-based-editor  [schema]="getSchema.bind(this)"
@@ -44,7 +42,7 @@
         </button>
         <button type="button"
                 class="btn btn-success"
-                [disabled]="!container.workedExampleQuestionHtml || editWorkedExampleForm.$invalid"
+                [disabled]="!container.workedExampleQuestionHtml || editWorkedExampleForm"
                 (click)="saveWorkedExample(true)">
           Save
         </button>
@@ -76,10 +74,8 @@
   </div>
 
   <div *ngIf="isEditable && explanationEditorIsOpen" class="worked-example-explanation-section">
-    <form role="form"
-          class="form-inline"
-          name="editWorkedExampleForm"
-          (submit)="saveWorkedExample()">
+    <form class="form-inline"
+          name="editWorkedExampleForm">
       <div class="oppia-rule-details-header">
         <strong>Example Explanation</strong>
         <schema-based-editor [schema]="getSchema.bind(this)"
@@ -98,7 +94,7 @@
         </button>
         <button type="button"
                 class="btn btn-success"
-                [disabled]="!container.workedExampleExplanationHtml || editWorkedExampleForm.$invalid"
+                [disabled]="!container.workedExampleExplanationHtml || editWorkedExampleForm"
                 (click)="saveWorkedExample(false)">
           Save
         </button>

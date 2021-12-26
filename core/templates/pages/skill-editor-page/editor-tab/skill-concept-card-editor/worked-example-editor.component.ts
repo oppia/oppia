@@ -36,7 +36,7 @@ interface Container {
   templateUrl: './worked-example-editor.component.html'
 })
 export class WorkedExampleEditorComponent implements OnInit {
-  @Input() getIndex: number;
+  @Input() index: number;
   @Input() isEditable: boolean;
   @Input() workedExample;
   container: Container;
@@ -60,12 +60,10 @@ export class WorkedExampleEditorComponent implements OnInit {
   ngOnInit(): void {
     this.questionEditorIsOpen = false;
     this.explanationEditorIsOpen = false;
-    this.container = {
-      workedExampleQuestionHtml:
-      this.workedExample.getQuestion().html,
-      workedExampleExplanationHtml:
-      this.workedExample.getExplanation().html
-    };
+    this.container.workedExampleExplanationHtml = (
+      this.workedExample.getQuestion().html);
+    this.container.workedExampleExplanationHtml = (
+      this.workedExample.getExplanation().html);
   }
 
   // Remove this function when the schema-based editor
@@ -122,7 +120,7 @@ export class WorkedExampleEditorComponent implements OnInit {
     if (contentHasChanged) {
       this.skillUpdateService.updateWorkedExample(
         this.skillEditorStateService.getSkill(),
-        this.getIndex,
+        this.index,
         this.container.workedExampleQuestionHtml,
         this.container.workedExampleExplanationHtml);
     }
