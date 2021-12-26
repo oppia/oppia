@@ -31,15 +31,25 @@ import { AppConstants } from 'app.constants';
 })
 export class AdminNavbarComponent implements OnInit {
   profilePictureDataUrl: string = '';
+
   imagePath: string;
+
   username: string = '';
+
   isModerator: boolean = null;
+
   isSuperAdmin: boolean = null;
+
   profileUrl: string = '';
+
   ADMIN_TAB_URLS = AdminPageConstants.ADMIN_TAB_URLS;
+
   logoutUrl = '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LOGOUT.ROUTE;
+
   profileDropdownIsActive = false;
+
   dropdownMenuIsActive = false;
+
   PAGES_REGISTERED_WITH_FRONTEND = (
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
 

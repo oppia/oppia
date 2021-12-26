@@ -29,6 +29,7 @@ export interface ParamSpecBackendDict {
 
 export class ParamSpec {
   _objType: ParamType;
+
   /**
    * @constructor
    * @param {!ParamType} objType - The type of the parameter.
@@ -56,6 +57,7 @@ export class ParamSpec {
 })
 export class ParamSpecObjectFactory {
   constructor(private paramTypeObjectFactory: ParamTypeObjectFactory) {}
+
   /**
    * @param {!{obj_type: String}} paramSpecBackendDict - Basic dict from
    *    backend.

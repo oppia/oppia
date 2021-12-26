@@ -44,9 +44,13 @@ export class AudioSliderComponent {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() value!: number;
+
   @Input() max!: number;
+
   @Input() thumbLabel = false;
+
   @Output() valueChange = new EventEmitter<{ value: number }>();
+
   constructor() { }
 
   setDuration(event: {value: number}): void {

@@ -31,6 +31,7 @@ export interface HintBackendDict {
 
 export class Hint {
   hintContent: SubtitledHtml;
+
   constructor(hintContent: SubtitledHtml) {
     this.hintContent = hintContent;
   }

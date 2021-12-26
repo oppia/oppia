@@ -30,7 +30,9 @@ export class PredictionResult {
    *   answer belongs to predicted answer group.
    */
   predictionLabel: number;
+
   predictionConfidence: number;
+
   constructor(label: number, confidence: number) {
     this.predictionLabel = label;
     this.predictionConfidence = confidence;
@@ -39,6 +41,7 @@ export class PredictionResult {
   getLabel(): number {
     return this.predictionLabel;
   }
+
   getConfidence(): number {
     return this.predictionConfidence;
   }

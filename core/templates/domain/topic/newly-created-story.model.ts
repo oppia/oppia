@@ -19,8 +19,11 @@ import constants from 'assets/constants';
 
 export class NewlyCreatedStory {
   title: string;
+
   description: string;
+
   urlFragment: string;
+
   /**
    * @param {String} title - title of the story.
    * @param {String} description - description of the story.

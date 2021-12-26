@@ -27,12 +27,19 @@ import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
 })
 export class ConceptCardComponent implements OnInit {
   @Input() skillIds!: string[];
+
   @Input() index!: number;
+
   conceptsCards: ConceptCard[] = [];
+
   currentConceptCard: ConceptCard;
+
   numberOfWorkedExamplesShown: number = 0;
+
   loadingMessage: string;
+
   skillDeletedMessage: string;
+
   explanationIsShown: boolean;
 
 

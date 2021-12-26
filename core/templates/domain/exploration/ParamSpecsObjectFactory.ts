@@ -34,6 +34,7 @@ interface ParamDict {
 
 export class ParamSpecs {
   _paramDict: ParamDict;
+
   _paramSpecObjectFactory: ParamSpecObjectFactory;
 
   /**

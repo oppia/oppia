@@ -61,23 +61,41 @@ export class Topic {
   // The 'id' and 'thumbnailFilename' is 'null' for an interstitial
   // topic until the actual is fetched from the backend.
   _id: string | null;
+
   _name: string;
+
   _abbreviatedName: string;
+
   _description: string;
+
   _languageCode: string;
+
   _canonicalStoryReferences: StoryReference[];
+
   _additionalStoryReferences: StoryReference[];
+
   _uncategorizedSkillSummaries: ShortSkillSummary[];
+
   _nextSubtopicId: number;
+
   _version: number;
+
   _subtopics: Subtopic[];
+
   _thumbnailFilename: string | null;
+
   _thumbnailBgColor: string;
+
   _urlFragment: string;
+
   _practiceTabIsDisplayed: boolean;
+
   _metaTagContent: string;
+
   _pageTitleFragmentForWeb: string;
+
   storyReferenceObjectFactory: StoryReferenceObjectFactory;
+
   constructor(
       id: string | null,
       name: string,
@@ -589,6 +607,7 @@ export class Topic {
 export class TopicObjectFactory {
   constructor(
       private storyReferenceObjectFactory: StoryReferenceObjectFactory) {}
+
   create(
       topicBackendDict: TopicBackendDict,
       skillIdToDescriptionDict: SkillIdToDescriptionMap): Topic {

@@ -31,10 +31,13 @@ import { ContributionOpportunitiesBackendApiService } from
 })
 export class TranslationTopicSelectorComponent implements OnInit {
   @Input() activeTopicName: string;
+
   @Output() setActiveTopicName: EventEmitter<string> = new EventEmitter();
+
   @ViewChild('dropdown', {'static': false}) dropdownRef;
 
   options: string[];
+
   dropdownShown = false;
 
   constructor(

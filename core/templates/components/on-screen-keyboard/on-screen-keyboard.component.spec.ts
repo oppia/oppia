@@ -33,28 +33,51 @@ describe('On Screen Keyboard', () => {
 
   class MockGuppy implements Guppy {
     asciimath!: () => string;
+
     configure!: () => void;
+
     deactivate!: () => void;
+
     doc!: () => Object;
+
     equations!: () => Object[];
+
     evaluate!: (evaluators?: Object) => Object;
+
     event!: (name: string, handler: Function) => void;
+
     func!: (evaluators?: Object) => Function;
+
     'import_latex': (text: string) => void;
+
     'import_syntax_tree': (tree: Object) => void;
+
     'import_text': (text: string) => void;
+
     'import_xml': (xml: string) => void;
+
     'is_changed': () => boolean;
+
     latex!: () => string;
+
     'recompute_locations_paths': () => void;
+
     render!: (updated?: boolean) => void;
+
     'render_node': (t: string) => string;
+
     'select_to': (x: number, y: number, mouse: Object) => void;
+
     'symbols_used': (groups?: string[]) => string[];
+
     'syntax_tree': () => Object;
+
     text!: () => string;
+
     vars!: () => string[];
+
     xml!: () => string;
+
     engine = {
       insert_string: (_: string) => {},
       insert_symbol: (_: string) => {},

@@ -46,6 +46,7 @@ export interface PlatformParameterFilterBackendDict {
 
 export class PlatformParameterFilter {
   type: PlatformParameterFilterType;
+
   conditions: [string, string][];
 
   constructor(

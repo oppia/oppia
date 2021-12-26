@@ -33,6 +33,7 @@ import { ImageLocalStorageService } from 'services/image-local-storage.service';
 })
 export class TopicCreationService {
   TOPIC_EDITOR_URL_TEMPLATE: string = '/topic_editor/<topic_id>';
+
   topicCreationInProgress: boolean = false;
 
   constructor(

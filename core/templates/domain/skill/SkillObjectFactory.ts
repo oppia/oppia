@@ -44,16 +44,27 @@ import constants from 'assets/constants';
 
 export class Skill {
   _id: string;
+
   _description: string;
+
   _misconceptions: Misconception[];
+
   _rubrics: Rubric[];
+
   _conceptCard: ConceptCard;
+
   _languageCode: string;
+
   _version: number;
+
   _nextMisconceptionId: number;
+
   _supersedingSkillId: string;
+
   _allQuestionsMerged: boolean;
+
   _prerequisiteSkillIds: string[];
+
   SKILL_DIFFICULTIES: readonly string[] = constants.SKILL_DIFFICULTIES;
 
   constructor(
@@ -80,6 +91,7 @@ export class Skill {
     this._supersedingSkillId = supersedingSkillId;
     this._prerequisiteSkillIds = prerequisiteSkillIds;
   }
+
   copyFromSkill(skill: Skill): void {
     this._id = skill.getId();
     this._description = skill.getDescription();
@@ -234,6 +246,7 @@ export class Skill {
       prerequisite_skill_ids: this._prerequisiteSkillIds
     };
   }
+
   getValidationIssues(): string[] {
     var issues = [];
     if (this.getConceptCard().getExplanation().html === '') {

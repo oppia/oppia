@@ -34,10 +34,15 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
 })
 export class AttributionGuideComponent implements OnInit {
   deviceUsedIsMobile: boolean = false;
+
   iframed: boolean = false;
+
   generateAttibutionIsAllowed: boolean = false;
+
   maskIsShown: boolean = false;
+
   printAttributionLink: string = '';
+
   constructor(
     private attributionService: AttributionService,
     private browserCheckerService: BrowserCheckerService,

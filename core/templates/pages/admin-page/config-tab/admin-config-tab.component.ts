@@ -30,6 +30,7 @@ import { AdminTaskManagerService } from '../services/admin-task-manager.service'
 })
 export class AdminConfigTabComponent {
   @Output() setStatusMessage: EventEmitter<string> = new EventEmitter();
+
   configProperties: ConfigPropertiesBackendResponse = {};
 
   constructor(

@@ -31,10 +31,15 @@ import { ClassroomDomainConstants } from 'domain/classroom/classroom-domain.cons
 })
 export class LearnerTopicSummaryTileComponent implements OnInit {
   @Input() topicSummary: LearnerTopicSummary;
+
   thumbnailUrl: string = null;
+
   topicLink: string;
+
   totalPublishedNodeCount: number;
+
   topicTitle: string;
+
   thumbnailBgColor: string;
 
   constructor(

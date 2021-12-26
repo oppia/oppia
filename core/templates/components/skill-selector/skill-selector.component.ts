@@ -38,17 +38,29 @@ export class SkillSelectorComponent implements OnInit {
   // have the initial 'countOfSkillsToPrioritize' entries of skills with
   // the same priority.
   @Input() sortedSkillSummaries: GroupedSkillSummaries;
+
   @Input() selectedSkillId: string;
+
   @Input() countOfSkillsToPrioritize: number;
+
   @Input() categorizedSkills: CategorizedSkills;
+
   @Input() untriagedSkillSummaries: SkillSummary[];
+
   @Input() allowSkillsFromOtherTopics: boolean;
+
   @Output() selectedSkillIdChange: EventEmitter<string> = new EventEmitter();
+
   currCategorizedSkills: CategorizedSkills = null;
+
   selectedSkill: string = null;
+
   skillFilterText: string = '';
+
   topicFilterList: { topicName: string ; checked: boolean }[] = [];
+
   subTopicFilterDict: SubTopicFilterDict = {};
+
   initialSubTopicFilterDict: SubTopicFilterDict = {};
 
   constructor(

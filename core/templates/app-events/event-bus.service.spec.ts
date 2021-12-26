@@ -32,6 +32,7 @@ abstract class EventWithMessage<T> extends BaseEvent {
 
 class CustomEvent extends EventWithMessage<string> {
   static readonly type = 'CustomEvent';
+
   public readonly type = CustomEvent.type;
 }
 

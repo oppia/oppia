@@ -29,6 +29,7 @@ export interface EmailDashboardQueryResultsBackendDict {
 
 export class EmailDashboardQueryResults {
   cursor: string;
+
   recentQueries: EmailDashboardQuery[];
 
   constructor(cursor: string, recentQueries: EmailDashboardQuery[]) {

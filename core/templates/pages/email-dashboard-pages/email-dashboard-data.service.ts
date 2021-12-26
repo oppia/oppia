@@ -30,13 +30,16 @@ import { EmailDashboardQuery } from
 export class EmailDashboardDataService {
   // No. of query results to display on a single page.
   QUERIES_PER_PAGE: number = 10;
+
   // Store latest cursor value for fetching next query page.
   // 'latestCursor' will be 'null' when there are no more query results
   // or when the returned result starts from the beginning of the full
   // list of results.
   latestCursor: string | null = null;
+
   // Array containing all fetched queries.
   queries: EmailDashboardQuery[] = [];
+
   // Index of currently-shown page of query results.
   currentPageIndex: number = -1;
 

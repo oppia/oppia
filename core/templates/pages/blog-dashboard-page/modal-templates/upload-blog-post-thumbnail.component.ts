@@ -31,15 +31,25 @@ require('cropperjs/dist/cropper.min.css');
 })
 export class UploadBlogPostThumbnailComponent implements OnInit {
   uploadedImage: SafeResourceUrl;
+
   cropppedImageDataUrl: string = '';
+
   invalidImageWarningIsShown: boolean = false;
+
   allowedImageFormats: readonly string[] = AppConstants.ALLOWED_IMAGE_FORMATS;
+
   croppedFilename: string;
+
   windowIsNarrow: boolean;
+
   cropper;
+
   @ViewChild('croppableImage') croppableImageRef: ElementRef;
+
   @Output() imageLocallySaved: EventEmitter<string> = new EventEmitter();
+
   @Output() cancelThumbnailUpload: EventEmitter<void> = new EventEmitter();
+
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
     private imageLocalStorageService: ImageLocalStorageService,

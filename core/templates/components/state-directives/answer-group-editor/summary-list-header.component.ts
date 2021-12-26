@@ -33,13 +33,20 @@ export class SummaryListHeaderComponent {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() disableSorting: boolean = false;
+
   @Input() index!: number;
+
   @Input() summary!: string;
+
   @Input() shortSummary!: string;
+
   @Input() isActive: boolean = false;
+
   @Output() summaryDelete:
     EventEmitter<DeleteSummaryEventData> = (new EventEmitter());
+
   @Input() isDeleteAvailable: boolean = false;
+
   @Input() numItems!: number;
 
   deleteItem(evt: Event): void {

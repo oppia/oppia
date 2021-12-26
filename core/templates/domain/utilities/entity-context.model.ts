@@ -19,6 +19,7 @@
 
 export class EntityContext {
   _id: string;
+
   _type: string;
 
   constructor(id: string, type: string) {

@@ -25,10 +25,15 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 })
 export class CollectionEditorRoutingService {
   private _EDIT_TAB = 'edit';
+
   private _HISTORY_TAB = 'history';
+
   private _SETTINGS_TAB = 'settings';
+
   private _STATS_TAB = 'stats';
+
   private _updateViewEventEmitter: EventEmitter<void> = new EventEmitter();
+
   private _activeTabName: string;
 
   constructor(

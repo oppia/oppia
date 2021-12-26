@@ -43,8 +43,11 @@ type CurrencyUnitsKeys = (keyof typeof ObjectsDomainConstants.CURRENCY_UNITS)[];
       unit is a sub unit else assign it 'null' value.*/
 export class NumberWithUnits {
   type: string;
+
   real: number;
+
   fraction: Fraction;
+
   units: Unit[];
 
   constructor(
@@ -131,6 +134,7 @@ export class NumberWithUnits {
 })
 export class NumberWithUnitsObjectFactory {
   constructor(private unitsFactory: UnitsObjectFactory) {}
+
   createCurrencyUnits(): void {
     try {
       this.unitsFactory.createCurrencyUnits();

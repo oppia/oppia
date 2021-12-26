@@ -39,15 +39,25 @@ export interface SuggestionBackendDict {
 
 export class Suggestion {
   suggestionType: string;
+
   suggestionId: string;
+
   threadId: string;
+
   targetType: string;
+
   targetId: string;
+
   status: string;
+
   authorName: string;
+
   stateName: string;
+
   newValue: SuggestionChangeValue;
+
   oldValue: SuggestionChangeValue;
+
   lastUpdatedMsecs: number;
 
   constructor(
@@ -84,6 +94,7 @@ export class Suggestion {
       suggestionBackendDict.change.old_value,
       suggestionBackendDict.last_updated_msecs);
   }
+
   getThreadId(): string {
     return this.threadId;
   }

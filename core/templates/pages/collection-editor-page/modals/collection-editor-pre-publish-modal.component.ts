@@ -32,12 +32,19 @@ import { CollectionEditorStateService } from '../services/collection-editor-stat
 export class CollectionEditorPrePublishModalComponent
   extends ConfirmOrCancelModal {
   private _collection: Collection;
+
   requireTitleToBeSpecified: boolean;
+
   requireObjectiveToBeSpecified: boolean;
+
   requireCategoryToBeSpecified: boolean;
+
   newTitle: string;
+
   newObjective: string;
+
   newCategory: string;
+
   CATEGORY_LIST = AppConstants.ALL_CATEGORIES;
 
   constructor(

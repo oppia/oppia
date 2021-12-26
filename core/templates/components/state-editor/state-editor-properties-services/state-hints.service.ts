@@ -30,6 +30,7 @@ import { UtilsService } from 'services/utils.service';
 export class StateHintsService extends StatePropertyService<Hint[]> {
   // 'activeHintIndex' is initialized with null when no hints exist.
   private activeHintIndex!: number | null;
+
   constructor(alertsService: AlertsService, utilsService: UtilsService) {
     super(alertsService, utilsService);
     this.setterMethodKey = 'saveHints';

@@ -32,11 +32,17 @@ export interface ExplorationOpportunitySummaryBackendDict {
 
 export class ExplorationOpportunitySummary {
   id: string;
+
   topicName: string;
+
   storyTitle: string;
+
   chapterTitle: string;
+
   contentCount: number;
+
   translationCounts: TranslationCountsDict;
+
   translationInReviewCount: TranslationCountsDict;
 
   constructor(

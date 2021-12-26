@@ -30,24 +30,35 @@ import { map, startWith } from 'rxjs/operators';
 })
 export class MultiSelectionFieldComponent {
   @Input() selections: string[] = [];
+
   @Output() selectionsChange: EventEmitter<string[]> = (
     new EventEmitter());
+
   @Input() label!: string;
+
   @Input() placeholder!: string;
+
   @Input() selectable = true;
+
   @Input() removable = true;
+
   @Input() separatorKeysCodes: number[] = [ENTER];
+
   @Input() validationErrorMessage = '';
+
   @Input() allowLowercaseOnly: boolean = false;
 
   formCtrl = new FormControl();
+
   filteredSelections: Observable<string[] | string[]>;
+
   readOnlySelections: string[] = [];
 
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @ViewChild('chipList') chipList!: MatChipList;
+
   @ViewChild('newSelectionInput') newSelectionInput!:
   ElementRef<HTMLInputElement>;
 

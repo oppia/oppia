@@ -31,9 +31,13 @@ export interface FractionDict {
 
 export class Fraction {
   isNegative: boolean;
+
   wholeNumber: number;
+
   numerator: number;
+
   denominator: number;
+
   constructor(
       isNegative: boolean, wholeNumber: number, numerator: number,
       denominator: number) {

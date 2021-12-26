@@ -34,22 +34,35 @@ import { Subscription } from 'rxjs';
 export class OpportunitiesListComponent {
   @Input() loadOpportunities: () => Promise<{
     opportunitiesDicts: ExplorationOpportunity[]; more: boolean; }>;
+
   @Input() labelRequired: boolean;
+
   @Input() progressBarRequired: boolean;
+
   @Input() loadMoreOpportunities;
+
   @Output() clickActionButton: EventEmitter<string> = (
     new EventEmitter()
   );
+
   @Input() opportunityHeadingTruncationLength: number;
+
   @Input() opportunityType: string;
 
   loadingOpportunityData: boolean = true;
+
   lastPageNumber: number = 1000;
+
   opportunities: ExplorationOpportunity[] = [];
+
   visibleOpportunities = [];
+
   directiveSubscriptions = new Subscription();
+
   activePageNumber: number = 1;
+
   OPPORTUNITIES_PAGE_SIZE = constants.OPPORTUNITIES_PAGE_SIZE;
+
   more: boolean = false;
 
   constructor(

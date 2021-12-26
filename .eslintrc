@@ -351,6 +351,7 @@
     // "@typescript-eslint/no-extra-semi".
     "no-extra-semi": "off",
     "semi-spacing": "error",
+    "lines-between-class-members": "off",
     "space-before-blocks": [
       "error",
       "always"
@@ -456,6 +457,7 @@
         "before": false,
         "after": true
       }
-    ]
+    ],
+    "@typescript-eslint/lines-between-class-members": ["error"]
   }
 }

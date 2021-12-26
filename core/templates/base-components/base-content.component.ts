@@ -37,11 +37,17 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 })
 export class BaseContentComponent {
   loadingMessage: string = '';
+
   mobileNavOptionsAreShown: boolean = false;
+
   iframed: boolean = false;
+
   DEV_MODE = AppConstants.DEV_MODE;
+
   COOKIE_NAME_COOKIES_ACKNOWLEDGED = 'OPPIA_COOKIES_ACKNOWLEDGED';
+
   ONE_YEAR_IN_MSECS = 31536000000;
+
   directiveSubscriptions = new Subscription();
 
   constructor(

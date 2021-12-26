@@ -37,11 +37,17 @@ import { CollectionEditorSaveModalComponent } from '../modals/collection-editor-
 })
 export class CollectionEditorNavbarComponent {
   directiveSubscriptions = new Subscription();
+
   collectionRights: CollectionRights;
+
   validationIssues: string[];
+
   collection: Collection;
+
   collectionId: string;
+
   editButtonHovering: boolean = false;
+
   playerButtonHovering: boolean = false;
 
   constructor(

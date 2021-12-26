@@ -49,27 +49,45 @@ export class EditThumbnailModalComponent implements OnInit {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() bgColor!: string;
+
   // 'uploadedImage' will be null when an invalid image has
   // been uploaded.
   @Input() uploadedImage!: string | null;
+
   @Input() aspectRatio!: string;
+
   @Input() previewDescription!: string;
+
   @Input() previewDescriptionBgColor!: string;
+
   @Input() previewFooter!: string;
+
   @Input() previewTitle!: string;
+
   @Input() allowedBgColors!: string[];
+
   @Input() tempBgColor!: string;
+
   @Input() dimensions!: Dimensions;
+
   @Input() uploadedImageMimeType!: string;
+
   @Input() openInUploadMode: boolean = false;
+
   tags!: string[];
+
   attrs!: string[];
+
   imgSrc!: string;
+
   invalidTagsAndAttributes!: InvalidTagsAndAttributes;
 
   invalidImageWarningIsShown = false;
+
   invalidFilenameWarningIsShown = false;
+
   thumbnailHasChanged = false;
+
   allowedImageFormats = ['svg'];
 
   constructor(

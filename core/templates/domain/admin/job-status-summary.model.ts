@@ -23,6 +23,7 @@ export interface JobStatusSummaryBackendDict {
 
 export class JobStatusSummary {
   jobType: string;
+
   isQueuedOrRunning: boolean;
 
   constructor(jobType: string, isQueuedOrRunning: boolean) {

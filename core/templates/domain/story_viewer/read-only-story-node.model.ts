@@ -40,17 +40,29 @@ export interface StoryNodeBackendDict {
 
 export class ReadOnlyStoryNode {
   id: string;
+
   title: string;
+
   description: string;
+
   destinationNodeIds: string[];
+
   prerequisiteSkillIds: string[];
+
   acquiredSkillIds: string[];
+
   outline: string;
+
   outlineIsFinalized: boolean;
+
   explorationId: string;
+
   explorationSummary: LearnerExplorationSummary;
+
   completed: boolean;
+
   thumbnailBgColor: string;
+
   thumbnailFilename: string;
 
   constructor(

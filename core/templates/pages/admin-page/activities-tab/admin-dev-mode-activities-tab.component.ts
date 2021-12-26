@@ -31,11 +31,17 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 })
 export class AdminDevModeActivitiesTabComponent implements OnInit {
   @Output() setStatusMessage = new EventEmitter<string>();
+
   reloadingAllExplorationPossible: boolean = false;
+
   demoExplorationIds: string[] = [];
+
   numDummyExpsToPublish: number = 0;
+
   numDummyExpsToGenerate: number = 0;
+
   DEMO_COLLECTIONS: string[][] = [[]];
+
   DEMO_EXPLORATIONS: string[][] = [[]];
 
   constructor(

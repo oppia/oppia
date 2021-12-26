@@ -30,8 +30,11 @@ import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 })
 export class TopicSummaryTileComponent {
   @Input() topicSummary: CreatorTopicSummary;
+
   @Input() classroomUrlFragment: string;
+
   @Input() isPublished: boolean;
+
   thumbnailUrl: string = '';
 
   constructor(

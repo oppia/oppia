@@ -23,6 +23,7 @@ import { Injectable } from '@angular/core';
 })
 export class StateNameService {
   private stateNameEditorIsShown: boolean = false;
+
   private savedMemento: string | null = null;
 
   /**

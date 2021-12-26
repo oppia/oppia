@@ -33,11 +33,17 @@ interface CodeMirrorMergeViewOptions {
 })
 export class CodeMirrorComponent implements AfterViewInit, OnChanges {
   @Input() options!: CodeMirrorMergeViewOptions;
+
   @Input() value!: string;
+
   @Input() refresh: boolean = false;
+
   @Input() readOnly = false;
+
   @Output() valueChange = new EventEmitter();
+
   @Output() onLoad = new EventEmitter();
+
   // NOTE TO DEVELOPERS: It can be the case sometimes that actual codeMirror
   // file (https://github.com/scttcper/ngx-codemirror/blob/d7701404d188046bc
   // 9fa27edfd6b4baa50179749/src/lib/codemirror.component.ts#L89)
@@ -45,7 +51,9 @@ export class CodeMirrorComponent implements AfterViewInit, OnChanges {
   // properties undefined.
   @ViewChild(CodemirrorComponent) codemirrorComponent:
    CodemirrorComponent | undefined;
+
   codemirror: CodeMirror.Editor | undefined;
+
   autoFocus = false;
 
   constructor() { }

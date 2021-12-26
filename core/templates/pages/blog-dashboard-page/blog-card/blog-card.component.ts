@@ -32,10 +32,15 @@ export class BlogCardComponent implements OnInit {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() blogPostSummary!: BlogPostSummary;
+
   @Input() authorProfilePicDataUrl!: string;
+
   authorProfilePictureUrl!: string;
+
   DEFAULT_PROFILE_PICTURE_URL: string = '';
+
   thumbnailUrl: string = '';
+
   publishedDateString: string = '';
 
   constructor(

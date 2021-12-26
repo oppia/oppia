@@ -29,8 +29,11 @@ export interface AnswerStatsBackendDict {
 
 export class AnswerStats {
   answer: InteractionAnswer;
+
   answerHtml: string;
+
   frequency: number;
+
   isAddressed: boolean;
 
   /**

@@ -29,11 +29,15 @@ import { AlertsService } from 'services/alerts.service';
 })
 export class TopicManagerRoleEditorModalComponent implements OnInit {
   @Input() managedTopicIds;
+
   @Input() topicIdToName;
+
   @Input() username;
 
   newTopicId = null;
+
   topicIdsForSelection = [];
+
   topicIdInUpdate = null;
 
   constructor(

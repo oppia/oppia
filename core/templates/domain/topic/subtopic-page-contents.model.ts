@@ -36,7 +36,9 @@ export interface SubtopicPageContentsBackendDict {
 
 export class SubtopicPageContents {
   _subtitledHtml: SubtitledHtml;
+
   _recordedVoiceovers: RecordedVoiceovers;
+
   constructor(
       subtitledHtml: SubtitledHtml, recordedVoiceovers: RecordedVoiceovers) {
     this._subtitledHtml = subtitledHtml;
@@ -73,6 +75,7 @@ export class SubtopicPageContents {
       recorded_voiceovers: this._recordedVoiceovers.toBackendDict()
     };
   }
+
   static createDefault(): SubtopicPageContents {
     var recordedVoiceovers = RecordedVoiceovers.createEmpty();
     recordedVoiceovers.addContentId('content');

@@ -78,15 +78,25 @@ export interface LostChangeBackendDict {
 // received at LostChangeBackendDict.
 export class LostChange {
   cmd: string;
+
   stateName?: string;
+
   newStateName?: string;
+
   oldStateName?: string;
+
   newValue?: LostChangeValue | null;
+
   oldValue?: LostChangeValue | null;
+
   propertyName?: string;
+
   contentId?: string;
+
   languageCode?: string;
+
   translationHTML?: string;
+
   utilsService: UtilsService;
 
   constructor(

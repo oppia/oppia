@@ -27,7 +27,9 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 })
 export class DeleteAccountModalComponent implements OnInit {
     expectedUsername: string;
+
     username: string;
+
     constructor(
       private userService: UserService,
       private ngbActiveModal: NgbActiveModal,

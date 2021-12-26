@@ -33,9 +33,13 @@ import { Injectable } from '@angular/core';
 
 export class Misconception {
   _id: string;
+
   _name: string;
+
   _notes: string;
+
   _feedback: string;
+
   _mustBeAddressed: boolean;
 
   constructor(
@@ -108,6 +112,7 @@ export class MisconceptionObjectFactory {
       misconceptionBackendDict.feedback,
       misconceptionBackendDict.must_be_addressed);
   }
+
   create(
       id: string, name: string, notes: string,
       feedback: string, mustBeAddressed: boolean): Misconception {

@@ -36,16 +36,27 @@ export interface StoryNodeBackendDict {
 
 export class StoryNode {
   _id: string;
+
   _title: string;
+
   _description: string;
+
   _destinationNodeIds: string[];
+
   _prerequisiteSkillIds: string[];
+
   _acquiredSkillIds: string[];
+
   _outline: string;
+
   _outlineIsFinalized: boolean;
+
   _explorationId: string | null;
+
   _thumbnailBgColor: string | null;
+
   _thumbnailFilename: string | null;
+
   constructor(
       id: string, title: string, description: string,
       destinationNodeIds: string[], prerequisiteSkillIds: string[],

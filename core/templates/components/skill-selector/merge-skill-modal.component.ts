@@ -29,10 +29,15 @@ import { SkillsCategorizedByTopics } from 'pages/topics-and-skills-dashboard-pag
 })
 export class MergeSkillModalComponent extends ConfirmOrCancelModal {
   categorizedSkills: SkillsCategorizedByTopics;
+
   skill: AugmentedSkillSummary;
+
   skillSummaries: AugmentedSkillSummary[];
+
   untriagedSkillSummaries: SkillSummary[];
+
   allowSkillsFromOtherTopics: boolean = true;
+
   selectedSkillId: string;
 
   constructor(

@@ -26,8 +26,11 @@ export interface QuestionSummaryBackendDict {
 
 export class QuestionSummary {
   _questionId: string;
+
   _questionContent: string;
+
   _interactionId: string;
+
   _misconceptionIds: string[];
 
   constructor(

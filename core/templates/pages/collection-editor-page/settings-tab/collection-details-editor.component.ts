@@ -34,16 +34,26 @@ import { CollectionEditorStateService } from '../services/collection-editor-stat
 })
 export class CollectionDetailsEditorComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
+
   collection: Collection;
+
   COLLECTION_TITLE_INPUT_FOCUS_LABEL = (
     CollectionEditorPageConstants.COLLECTION_TITLE_INPUT_FOCUS_LABEL);
+
   CATEGORY_LIST: string[] = [...AppConstants.ALL_CATEGORIES];
+
   languageListForSelect = AppConstants.SUPPORTED_CONTENT_LANGUAGES;
+
   TAG_REGEX = AppConstants.TAG_REGEX;
+
   displayedCollectionTitle: string;
+
   displayedCollectionObjective: string;
+
   displayedCollectionCategory: string;
+
   displayedCollectionLanguage: string;
+
   displayedCollectionTags: string[] = [];
 
   constructor(

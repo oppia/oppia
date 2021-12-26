@@ -31,16 +31,25 @@ export interface UserInfoBackendDict {
 
 export class UserInfo {
   _roles: string[];
+
   _isModerator: boolean;
+
   _isCurriculumAdmin: boolean;
+
   _isTopicManager: boolean;
+
   _isSuperAdmin: boolean;
+
   _canCreateCollections: boolean;
+
   // The following three properties are set to null when the
   // user is not logged in.
   _preferredSiteLanguageCode: string | null;
+
   _username: string | null;
+
   _email: string | null;
+
   _isLoggedIn: boolean;
 
   constructor(
@@ -68,6 +77,7 @@ export class UserInfo {
       data.preferred_site_language_code, data.username,
       data.email, data.user_is_logged_in);
   }
+
   static createDefault(): UserInfo {
     return new UserInfo(
       ['GUEST'], false, false, false, false, false, null, null, null, false);

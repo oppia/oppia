@@ -29,7 +29,9 @@ import { CollectionNode } from
 })
 export class CollectionNodeListComponent {
   @Input() collectionId: string;
+
   @Input() collectionNodes: CollectionNode[];
+
   constructor() {}
 }
 

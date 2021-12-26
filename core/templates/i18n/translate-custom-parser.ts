@@ -22,6 +22,7 @@ import MessageFormat from 'messageformat';
 
 export class TranslateCustomParser extends TranslateParser {
   private _messageFormat: MessageFormat;
+
   constructor(
     private translateDefaultParser: TranslateDefaultParser
   ) {

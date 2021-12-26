@@ -31,14 +31,23 @@ export interface JobDataBackendDict {
 
 export class Job {
   humanReadableTimeFinished: string;
+
   timeFinishedMsec: number;
+
   jobType: string;
+
   statusCode: string;
+
   error: string | null;
+
   canBeCanceled: boolean;
+
   isCancelable: boolean;
+
   id: string;
+
   timeStartedMsec: number;
+
   humanReadableTimeStarted: string;
 
   constructor(

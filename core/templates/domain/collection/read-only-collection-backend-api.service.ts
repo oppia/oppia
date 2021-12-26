@@ -60,8 +60,11 @@ export class ReadOnlyCollectionBackendApiService {
   constructor(
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService) {}
+
   private _collectionCache: CollectionCache = {};
+
   private _collectionDetailsCache: CollectionDetailsCache = {};
+
   private _collectionLoadedEventEmitter = new EventEmitter<void>();
 
   private _fetchCollection(

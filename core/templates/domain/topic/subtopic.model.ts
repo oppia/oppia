@@ -36,14 +36,21 @@ export interface SkillIdToDescriptionMap {
 
 export class Subtopic {
   _id: number;
+
   _title: string;
+
   _skillSummaries: ShortSkillSummary[];
+
   _skillIds: string[];
+
   // The thumbnail and URL fragment might not be set,
   // then they will be 'null'.
   _thumbnailFilename: string | null;
+
   _thumbnailBgColor: string | null;
+
   _urlFragment: string | null;
+
   constructor(
       subtopicId: number, title: string, skillIds: string[],
       skillIdToDescriptionMap: SkillIdToDescriptionMap,

@@ -19,6 +19,7 @@
 
 export class ThreadMessageSummary {
   authorUsername: string;
+
   text: string = '';
 
   constructor(authorUsername: string, text: string) {

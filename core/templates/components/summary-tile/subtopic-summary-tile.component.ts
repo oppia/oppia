@@ -34,11 +34,17 @@ export class SubtopicSummaryTileComponent implements OnInit {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() classroomUrlFragment!: string;
+
   @Input() subtopic!: Subtopic;
+
   @Input() topicId!: string;
+
   @Input() topicUrlFragment!: string;
+
   thumbnailUrl!: string;
+
   thumbnailBgColor!: string;
+
   subtopicTitle !: string;
 
   constructor(

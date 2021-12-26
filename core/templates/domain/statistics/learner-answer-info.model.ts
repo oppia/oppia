@@ -25,8 +25,11 @@ export interface LearnerAnswerInfoBackendDict {
 
 export class LearnerAnswerInfo {
   _id: string;
+
   _answer: string;
+
   _answerDetails: string;
+
   _createdOn: number;
 
   constructor(

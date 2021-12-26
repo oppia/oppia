@@ -34,22 +34,37 @@ export class CollectionSummaryTileComponent implements OnInit {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() getCollectionId!: string;
+
   @Input() getCollectionTitle!: string;
+
   @Input() getLastUpdatedMsec!: number;
+
   @Input() getObjective!: string;
+
   @Input() getNodeCount!: string;
+
   @Input() getCategory!: string;
+
   @Input() getThumbnailIconUrl!: string;
+
   @Input() getThumbnailBgColor!: string;
+
   @Input() isPlaylistTile: boolean = false;
+
   @Input() isLinkedToEditorPage: boolean = false;
+
   @Input() showLearnerDashboardIconsIfPossible!: string;
+
   @Input() isContainerNarrow: boolean = false;
+
   @Input() isOwnedByCurrentUser: boolean = false;
 
   userIsLoggedIn: boolean = false;
+
   collectionIsCurrentlyHoveredOver: boolean = false;
+
   defaultEmptyTitle!: string;
+
   activityTypeCollection!: string;
 
   constructor(

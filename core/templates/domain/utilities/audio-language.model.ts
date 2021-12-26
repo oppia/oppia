@@ -24,7 +24,9 @@ export interface AudioLanguageBackendDict {
 
 export class AudioLanguage {
   id: string;
+
   description: string;
+
   relatedLanguages: readonly string[];
 
   constructor(

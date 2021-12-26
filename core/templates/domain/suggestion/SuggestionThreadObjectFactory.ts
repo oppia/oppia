@@ -31,16 +31,25 @@ import { FeedbackThreadBackendDict } from
 
 export class SuggestionThread {
   status: string;
+
   subject: string;
+
   summary: string;
+
   originalAuthorName: string;
+
   lastUpdatedMsecs: number;
+
   messageCount: number;
+
   threadId: string;
+
   // A suggestion only exists for the type 'edit_exploration_state_content' and
   // null otherwise.
   suggestion: Suggestion | null;
+
   lastNonemptyMessageSummary: ThreadMessageSummary;
+
   messages: ThreadMessage[] = [];
 
   constructor(

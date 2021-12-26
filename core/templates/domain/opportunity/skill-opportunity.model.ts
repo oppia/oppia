@@ -25,8 +25,11 @@ export interface SkillOpportunityBackendDict {
 
 export class SkillOpportunity {
   id: string;
+
   skillDescription: string;
+
   topicName: string;
+
   questionCount: number;
 
   constructor(

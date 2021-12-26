@@ -60,18 +60,31 @@ export class StateAndContent {
 })
 export class TranslateTextService {
   STARTING_INDEX = -1;
+
   PENDING = 'pending';
+
   SUBMITTED = 'submitted';
+
   stateWiseContents = {};
+
   stateWiseContentIds = {};
+
   stateNamesList = [];
+
   stateAndContent = [];
+
   activeIndex = this.STARTING_INDEX;
+
   activeExpId;
+
   activeExpVersion;
+
   activeContentId;
+
   activeStateName: string;
+
   activeContentText: string;
+
   activeContentStatus: Status;
 
   constructor(

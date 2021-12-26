@@ -36,7 +36,9 @@ interface RegistryType {
 
 export class ParamType {
   _name: string;
+
   valueIsValid: (arg0: Object) => boolean;
+
   defaultValue: Object;
 
   /**

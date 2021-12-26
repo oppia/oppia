@@ -24,7 +24,9 @@ export interface SkillDifficultyBackendDict {
 
 export class SkillDifficulty {
   _id: string;
+
   _description: string;
+
   _difficulty: number;
 
   constructor(id: string, description: string, difficulty: number) {

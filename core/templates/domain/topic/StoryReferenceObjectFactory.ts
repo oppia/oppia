@@ -27,7 +27,9 @@ export interface StoryReferenceBackendDict {
 
 export class StoryReference {
   _storyId: string;
+
   _storyIsPublished: boolean;
+
   constructor(storyId: string, storyIsPublished: boolean) {
     this._storyId = storyId;
     this._storyIsPublished = storyIsPublished;

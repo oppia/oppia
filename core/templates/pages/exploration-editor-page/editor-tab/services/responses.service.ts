@@ -44,19 +44,29 @@ import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 })
 export class ResponsesService {
   private _answerGroupsMemento: AnswerGroup[] = null;
+
   private _defaultOutcomeMemento: Outcome = null;
+
   private _confirmedUnclassifiedAnswersMemento: readonly InteractionAnswer[] = (
     null);
+
   // Represents the current selected answer group, starting at index 0. If the
   // index equal to the number of answer groups (answerGroups.length), then it
   // is referring to the default outcome.
   private _activeAnswerGroupIndex: number = null;
+
   private _activeRuleIndex: number = -1;
+
   private _answerGroups = null;
+
   private _defaultOutcome: Outcome = null;
+
   private _confirmedUnclassifiedAnswers: readonly InteractionAnswer[] = null;
+
   private _answerChoices: AnswerChoice[] = null;
+
   private _answerGroupsChangedEventEmitter = new EventEmitter();
+
   private _initializeAnswerGroupsEventEmitter = new EventEmitter();
 
   constructor(
@@ -224,6 +234,7 @@ export class ResponsesService {
     this._activeAnswerGroupIndex = -1;
     this._activeRuleIndex = 0;
   }
+
   getAnswerGroups(): AnswerGroup[] {
     return cloneDeep(this._answerGroups);
   }
@@ -231,24 +242,31 @@ export class ResponsesService {
   getAnswerGroup(index: number): AnswerGroup {
     return cloneDeep(this._answerGroups[index]);
   }
+
   getAnswerGroupCount(): number {
     return this._answerGroups.length;
   }
+
   getDefaultOutcome(): Outcome {
     return cloneDeep(this._defaultOutcome);
   }
+
   getConfirmedUnclassifiedAnswers(): readonly InteractionAnswer[] {
     return cloneDeep(this._confirmedUnclassifiedAnswers);
   }
+
   getAnswerChoices(): AnswerChoice[] {
     return cloneDeep(this._answerChoices);
   }
+
   getActiveRuleIndex(): number {
     return this._activeRuleIndex;
   }
+
   getActiveAnswerGroupIndex(): number {
     return this._activeAnswerGroupIndex;
   }
+
   onInteractionIdChanged(
       newInteractionId: string,
       callback: (value: AnswerGroup[], value2: Outcome) => void
@@ -289,6 +307,7 @@ export class ResponsesService {
       callback(this._answerGroupsMemento, this._defaultOutcomeMemento);
     }
   }
+
   changeActiveAnswerGroupIndex(newIndex: number): void {
     // If the current group is being clicked on again, close it.
     if (newIndex === this._activeAnswerGroupIndex) {
@@ -299,9 +318,11 @@ export class ResponsesService {
 
     this._activeRuleIndex = -1;
   }
+
   changeActiveRuleIndex(newIndex: number): void {
     this._activeRuleIndex = newIndex;
   }
+
   updateAnswerGroup(
       index: number,
       updates: AnswerGroup,
@@ -309,6 +330,7 @@ export class ResponsesService {
   ): void {
     this._updateAnswerGroup(index, updates, callback);
   }
+
   deleteAnswerGroup(
       index: number,
       callback: (value: AnswerGroup[]) => void
@@ -319,12 +341,14 @@ export class ResponsesService {
     this._saveAnswerGroups(this._answerGroups);
     callback(this._answerGroupsMemento);
   }
+
   updateActiveAnswerGroup(
       updates: AnswerGroup,
       callback: (value: AnswerGroup) => void
   ): void {
     this._updateAnswerGroup(this._activeAnswerGroupIndex, updates, callback);
   }
+
   updateDefaultOutcome(
       updates: Outcome,
       callback: (value: Outcome) => void
@@ -348,17 +372,20 @@ export class ResponsesService {
     this._saveDefaultOutcome(outcome);
     callback(this._defaultOutcomeMemento);
   }
+
   updateConfirmedUnclassifiedAnswers(
       confirmedUnclassifiedAnswers: InteractionAnswer[]
   ): void {
     this._saveConfirmedUnclassifiedAnswers(confirmedUnclassifiedAnswers);
   }
+
   // Updates answer choices when the interaction is initialized or deleted.
   // For example, the rules for multiple choice need to refer to the
   // multiple choice interaction's customization arguments.
   updateAnswerChoices(newAnswerChoices: AnswerChoice[]): void {
     this._updateAnswerChoices(newAnswerChoices);
   }
+
   // Handles changes to custom args by updating the answer choices
   // accordingly.
   handleCustomArgsUpdate(
@@ -500,6 +527,7 @@ export class ResponsesService {
       }
     }
   }
+
   // This registers the change to the handlers in the list of changes.
   save(
       newAnswerGroups: AnswerGroup[],

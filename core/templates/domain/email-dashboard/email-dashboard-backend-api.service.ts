@@ -36,6 +36,7 @@ export type QueryData = Record<string, boolean | number | null>;
 })
 export class EmailDashboardBackendApiService {
   QUERY_DATA_URL: string = '/emaildashboarddatahandler';
+
   QUERY_STATUS_CHECK_URL: string = '/querystatuscheck';
 
   constructor(

@@ -35,12 +35,19 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 })
 export class HintAndSolutionButtonsComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
+
   private _editorPreviewMode: boolean;
+
   hintIndexes: number[] = [];
+
   activeHintIndex: number;
+
   solutionModalIsActive: boolean = false;
+
   displayedCard: StateCard;
+
   currentlyOnLatestCard: boolean = true;
+
   isVisible: boolean = true;
 
   constructor(

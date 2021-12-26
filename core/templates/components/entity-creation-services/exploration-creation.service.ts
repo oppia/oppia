@@ -34,7 +34,9 @@ import { ExplorationCreationBackendApiService } from './exploration-creation-bac
  })
 export class ExplorationCreationService {
   CREATE_NEW_EXPLORATION_URL_TEMPLATE = '/create/<exploration_id>';
+
   explorationCreationInProgress: boolean = false;
+
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private csrfTokenService: CsrfTokenService,
@@ -73,6 +75,7 @@ export class ExplorationCreationService {
         this.explorationCreationInProgress = false;
       });
   }
+
   showUploadExplorationModal(): void {
     this.alertsService.clearWarnings();
     this.ngbModal.open(

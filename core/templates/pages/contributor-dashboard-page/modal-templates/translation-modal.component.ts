@@ -43,8 +43,11 @@ const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
 class UiConfig {
   'hide_complex_extensions': boolean;
+
   'startupFocusEnabled'?: boolean;
+
   'language'?: string;
+
   'languageDirection'?: string;
 }
 export interface TranslationOpportunity {
@@ -75,9 +78,11 @@ export class TranslationError {
   get hasDuplicateDescriptions(): boolean {
     return this._hasDuplicateDescriptions;
   }
+
   get hasDuplicateAltTexts(): boolean {
     return this._hasDuplicateAltTexts;
   }
+
   get hasUntranslatedElements(): boolean {
     return this._hasUntranslatedElements;
   }
@@ -89,36 +94,59 @@ export class TranslationError {
 })
 export class TranslationModalComponent {
   @Input() opportunity: TranslationOpportunity;
+
   activeDataFormat: string;
+
   activeWrittenTranslation: string | string[] = '';
+
   activeContentType: string;
+
   activeRuleDescription: string;
+
   uploadingTranslation = false;
+
   subheading: string;
+
   heading: string;
+
   loadingData = true;
+
   moreAvailable = false;
+
   textToTranslate: string | string[] = '';
+
   languageDescription: string;
+
   activeStatus: Status;
+
   HTML_SCHEMA: {
     'type': string;
     'ui_config': UiConfig;
   };
+
   UNICODE_SCHEMA: UnicodeSchema = { type: 'unicode' };
+
   SET_OF_STRINGS_SCHEMA: ListSchema = {
     type: 'list',
     items: {
       type: 'unicode'
     }
   };
+
   TRANSLATION_TIPS = constants.TRANSLATION_TIPS;
+
   activeLanguageCode: string;
+
   isActiveLanguageReviewer: boolean = false;
+
   hadCopyParagraphError = false;
+
   hasImgTextError = false;
+
   hasIncompleteTranslationError = false;
+
   editorIsShown = true;
+
   ALLOWED_CUSTOM_TAGS_IN_TRANSLATION_SUGGESTION = [
     'oppia-noninteractive-image',
     'oppia-noninteractive-link',

@@ -40,6 +40,7 @@ export interface PlatformParameterRuleBackendDict {
  */
 export class PlatformParameterRule {
   filters: PlatformParameterFilter[];
+
   valueWhenMatched: PlatformParameterValue;
 
   constructor(

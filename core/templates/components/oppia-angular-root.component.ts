@@ -125,20 +125,33 @@ const componentMap = {
 export class OppiaAngularRootComponent implements AfterViewInit {
   @Output()
     public initialized: EventEmitter<void> = new EventEmitter();
+
   direction: string = 'ltr';
 
   static classroomBackendApiService: ClassroomBackendApiService;
+
   static contextService: ContextService;
+
   static i18nLanguageCodeService: I18nLanguageCodeService;
+
   static ngZone: NgZone;
+
   static pageTitleService: PageTitleService;
+
   static profilePageBackendApiService: ProfilePageBackendApiService;
+
   static rteElementsAreInitialized: boolean = false;
+
   static rteHelperService;
+
   static ratingComputationService: RatingComputationService;
+
   static reviewTestBackendApiService: ReviewTestBackendApiService;
+
   static storyViewerBackendApiService: StoryViewerBackendApiService;
+
   static ajsValueProvider: (string, unknown) => void;
+
   static injector: Injector;
 
   constructor(

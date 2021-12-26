@@ -40,10 +40,15 @@ interface CustomizationArgSpec {
 })
 export class EmailDashboardPageComponent {
   data!: QueryData;
+
   currentPageOfQueries!: EmailDashboardQuery[];
+
   showSuccessMessage: boolean = false;
+
   username!: string | null;
+
   customizationArgSpecs = AppConstants.EMAIL_DASHBOARD_PREDICATE_DEFINITION;
+
   isRequired: boolean = false;
 
   constructor(

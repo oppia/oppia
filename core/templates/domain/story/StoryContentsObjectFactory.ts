@@ -40,8 +40,11 @@ export class StoryContents {
   // then the value '_initialNodeId' needs to be changed to null.
   // See 'deleteNode' function below in this file for more details.
   _initialNodeId: string | null;
+
   _nodes: StoryNode[];
+
   _nextNodeId: string;
+
   constructor(
       initialNodeId: string, nodes: StoryNode[], nextNodeId: string) {
     this._initialNodeId = initialNodeId;
@@ -321,6 +324,7 @@ export class StoryContents {
 })
 export class StoryContentsObjectFactory {
   constructor() {}
+
   createFromBackendDict(
       storyContentsBackendObject: StoryContentsBackendDict): StoryContents {
     var nodes = [];

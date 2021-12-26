@@ -28,17 +28,27 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 })
 export class RolesAndActionsVisualizerComponent implements OnInit {
   @Input() roleToActions;
+
   @Input() viewableRoles;
+
   @Input() humanReadableRoles;
 
   TAB_ACTIONS: string = 'TAB_ACTIONS';
+
   TAB_ASSIGNED_USERS: string = 'TAB_ASSIGNED_USERS';
+
   activeRole: string;
+
   activeTab: string;
+
   avatarPictureUrl: string;
+
   loadingAssignedUsernames: boolean;
+
   roles: string[];
+
   roleToReadableActions = {};
+
   assignUsersToActiveRole: string[];
 
   constructor(

@@ -54,20 +54,31 @@ interface SkillDescriptionStatusValuesInterface {
 })
 export class RubricsEditorComponent {
   @Input() rubrics: Rubric[];
+
   @Input() newSkillBeingCreated: boolean;
+
   @Output() saveRubric: EventEmitter<unknown> = (
     new EventEmitter());
+
   skillDescriptionStatusValues: SkillDescriptionStatusValuesInterface = (
     TopicsAndSkillsDashboardPageConstants.SKILL_DESCRIPTION_STATUS_VALUES);
+
   skillDifficultyMedium: string = (
     constants.SKILL_DIFFICULTY_MEDIUM);
+
   explanationsMemento: object = {};
+
   explanationEditorIsOpen: object = {};
+
   editableExplanations: Explanation = {};
+
   selectedRubricIndex: number;
+
   EXPLANATION_FORM_SCHEMA: ExplanationFormSchema = {type: 'html',
     ui_config: {}};
+
   rubricsOptions: RubricsOptions[];
+
   rubric: Rubric;
 
   constructor(

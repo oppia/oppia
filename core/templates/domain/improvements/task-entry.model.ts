@@ -69,15 +69,25 @@ export interface TaskEntryPayloadDict<TaskType = string> {
  */
 export class TaskEntry<TaskType = string> {
   public readonly entityType: string;
+
   public readonly entityId: string;
+
   public readonly entityVersion: number;
+
   public readonly taskType: TaskType;
+
   public readonly targetType: string;
+
   public readonly targetId: string;
+
   public readonly resolverUsername: string | null;
+
   public readonly resolverProfilePictureDataUrl: string | null;
+
   public readonly resolvedOnMsecs: number | null;
+
   protected issueDescription: string | null;
+
   private taskStatus: string;
 
   constructor(backendDict: TaskEntryBackendDict<TaskType>) {

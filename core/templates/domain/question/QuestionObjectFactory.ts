@@ -41,10 +41,15 @@ export class Question {
   // A null '_id' indicates that the 'Question' has been created
   // but not saved.
   _id: string | null;
+
   _stateData: State;
+
   _languageCode: string;
+
   _version: number;
+
   _linkedSkillIds: string[];
+
   _inapplicableSkillMisconceptionIds: string[];
 
   constructor(
@@ -59,6 +64,7 @@ export class Question {
     this._inapplicableSkillMisconceptionIds = (
       inapplicableSkillMisconceptionIds);
   }
+
   // Some methods have either string or null return value,
   // because when we create default question their fields get null value.
   getId(): string | null {
@@ -102,6 +108,7 @@ export class Question {
     this._inapplicableSkillMisconceptionIds = (
       inapplicableSkillMisconceptionIds);
   }
+
   // Returns 'null' when the message is valid.
   getValidationErrorMessage(): string | null {
     var interaction = this._stateData.interaction;

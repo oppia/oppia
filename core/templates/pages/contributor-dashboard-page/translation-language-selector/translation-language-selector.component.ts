@@ -35,17 +35,25 @@ import { TranslationLanguageService } from 'pages/exploration-editor-page/transl
 })
 export class TranslationLanguageSelectorComponent implements OnInit {
   @Input() activeLanguageCode: string;
+
   @Output() setActiveLanguageCode: EventEmitter<string> = new EventEmitter();
+
   @ViewChild('dropdown', {'static': false}) dropdownRef;
 
   options: { id: string; description: string }[];
+
   languageIdToDescription: {[id: string]: string} = {};
+
   featuredLanguages: FeaturedTranslationLanguage[] = [];
+
   languageSelection: string;
 
   dropdownShown = false;
+
   explanationPopupShown = false;
+
   explanationPopupPxOffsetY = 0;
+
   explanationPopupContent = '';
 
   constructor(

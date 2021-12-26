@@ -47,8 +47,11 @@ export class StatePropertyService<StatePropertyType> {
   // The name of the setter method in ExplorationStatesService for this
   // property. THIS MUST BE SPECIFIED BY SUBCLASSES.
   setterMethodKey!: string | null;
+
   displayed!: StatePropertyType;
+
   stateName!: string;
+
   savedMemento!: StatePropertyType;
 
   constructor(

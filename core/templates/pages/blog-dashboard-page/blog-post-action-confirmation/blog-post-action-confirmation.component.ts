@@ -30,6 +30,7 @@ import { BlogDashboardPageConstants } from 'pages/blog-dashboard-page/blog-dashb
 export class BlogPostActionConfirmationModalComponent
   extends ConfirmOrCancelModal implements OnInit {
   blogPostAction: string;
+
   constructor(
       ngbActiveModal: NgbActiveModal,
       private blogDashboardPageService: BlogDashboardPageService,

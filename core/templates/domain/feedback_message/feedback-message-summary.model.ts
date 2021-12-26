@@ -32,16 +32,24 @@ export interface FeedbackMessageSummaryBackendDict {
 
 export class FeedbackMessageSummary {
   messageId: number;
+
   text: string;
+
   // These properties are 'null' when a learner initially gives a
   // feedback for an exploration since the learner feedback contains
   // only a text message.
   updatedStatus: string | null;
+
   suggestionHtml: string | null;
+
   currentContentHtml: string | null;
+
   description: string | null;
+
   authorUsername: string;
+
   authorPictureDataUrl: string;
+
   createdOnMsecs: number;
 
   constructor(

@@ -57,19 +57,30 @@ export class StateEditorService {
   constructor(private solutionValidityService: SolutionValidityService) {}
 
   private _stateEditorInitializedEventEmitter = new EventEmitter<State>();
+
   private _stateEditorDirectiveInitializedEventEmitter =
     new EventEmitter<void>();
+
   private _interactionEditorInitializedEventEmitter = new EventEmitter<void>();
+
   private _showTranslationTabBusyModalEventEmitter = new EventEmitter<void>();
+
   private _refreshStateTranslationEventEmitter = new EventEmitter<void>();
+
   private _updateAnswerChoicesEventEmitter = new EventEmitter<AnswerChoice[]>();
+
   private _saveOutcomeDestDetailsEventEmitter = new EventEmitter<void>();
+
   private _handleCustomArgsUpdateEventEmitter =
     new EventEmitter<AnswerChoice[]>();
+
   private _stateNamesChangedEventEmitter = new EventEmitter<void>();
+
   private _objectFormValidityChangeEventEmitter = new EventEmitter<boolean>();
 
+
   activeStateName: string | null = null;
+
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -78,21 +89,37 @@ export class StateEditorService {
   // service, the given solutions would be automatically verified for the set
   // interaction.
   interaction!: Interaction;
+
   linkedSkillId!: string;
+
   stateNames: string[] = [];
+
   correctnessFeedbackEnabled: boolean = false;
+
   inQuestionMode: boolean = false;
+
   misconceptionsBySkill: {} = {};
+
   explorationIsWhitelisted: boolean = false;
+
   solicitAnswerDetails: boolean = false;
+
   cardIsCheckpoint: boolean = false;
+
   stateContentEditorInitialised: boolean = false;
+
   stateInteractionEditorInitialised: boolean = false;
+
   stateResponsesInitialised: boolean = false;
+
   stateHintsEditorInitialised: boolean = false;
+
   stateSolutionEditorInitialised: boolean = false;
+
   stateEditorDirectiveInitialised: boolean = false;
+
   currentRuleInputIsValid: boolean = false;
+
   inapplicableSkillMisconceptionIds: string[] = [];
 
   updateStateContentEditorInitialised(): void {

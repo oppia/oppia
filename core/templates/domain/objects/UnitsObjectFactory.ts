@@ -36,6 +36,7 @@ type CurrencyUnitsKeys = (
 
 export class Units {
   units: Unit[];
+
   constructor(unitsList: Unit[]) {
     this.units = unitsList;
   }

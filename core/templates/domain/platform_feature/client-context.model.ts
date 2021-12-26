@@ -27,6 +27,7 @@ export interface ClientContextBackendDict {
  */
 export class ClientContext {
   readonly platformType: string;
+
   readonly browserType: string;
 
   constructor(platformType: string, browserType: string) {

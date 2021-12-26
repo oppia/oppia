@@ -21,8 +21,11 @@ import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 
 export class AnswerClassificationResult {
   outcome: Outcome;
+
   answerGroupIndex: number;
+
   ruleIndex: number;
+
   classificationCategorization: string;
 
   constructor(

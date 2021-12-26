@@ -29,7 +29,9 @@ import { AdminRouterService } from './services/admin-router.service';
 })
 export class AdminPageComponent {
   statusMessage = '';
+
   inDevMode = AppConstants.DEV_MODE;
+
   adminPageTabChange: EventEmitter<string> = new EventEmitter();
 
   constructor(

@@ -32,9 +32,13 @@ import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
 export class BlogCardPreviewModalComponent
   extends ConfirmOrCancelModal implements OnInit {
     blogPostData: BlogPostData;
+
     blogPostSummary: BlogPostSummary;
+
     summaryContent: string;
+
     profilePicUrl: string;
+
     constructor(
         ngbActiveModal: NgbActiveModal,
         private blogDashboardPageService: BlogDashboardPageService,

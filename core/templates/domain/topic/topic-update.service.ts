@@ -49,6 +49,7 @@ type SubtopicUpdateReverse = (
 })
 export class TopicUpdateService {
   constructor(private undoRedoService: UndoRedoService) {}
+
   // Creates a change using an apply function, reverse function, a change
   // command and related parameters. The change is applied to a given
   // topic.
@@ -242,6 +243,7 @@ export class TopicUpdateService {
         topic.setUrlFragment(oldUrlFragment);
       });
   }
+
   /**
    * Changes the thumbnail filename of a topic and records the change in the
    * undo/redo service.

@@ -22,6 +22,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 @Pipe({name: 'truncateAtFirstEllipsis'})
 export class TruncateAtFirstEllipsisPipe implements PipeTransform {
     pattern = /\.\.\./g;
+
     transform(input: string): string {
       if (!input) {
         return '';

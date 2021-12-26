@@ -38,11 +38,17 @@ export interface OutcomeBackendDict {
 
 export class Outcome {
   dest: string;
+
   feedback: SubtitledHtml;
+
   labelledAsCorrect: boolean;
+
   paramChanges: readonly ParamChangeBackendDict[];
+
   refresherExplorationId: string | null;
+
   missingPrerequisiteSkillId: string | null;
+
   constructor(
       dest: string, feedback: SubtitledHtml, labelledAsCorrect: boolean,
       paramChanges: readonly ParamChangeBackendDict[],

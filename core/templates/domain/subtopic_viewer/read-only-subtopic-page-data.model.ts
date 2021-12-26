@@ -34,9 +34,13 @@ export interface SubtopicDataBackendDict {
 
 export class ReadOnlySubtopicPageData {
   parentTopicId: string;
+
   parentTopicName: string;
+
   subtopicTitle: string;
+
   pageContents: SubtopicPageContents;
+
   nextSubtopic: Subtopic | null;
 
   constructor(

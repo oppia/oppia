@@ -75,8 +75,11 @@ export const ScopeProvider = {
 })
 export class AngularHtmlBindWrapperDirective extends UpgradeComponent {
   @Input() htmlData: string;
+
   @Input() parentScope;
+
   @Input() classStr = '';
+
   constructor(elementRef: ElementRef, injector: Injector) {
     super('angularHtmlBindWrapper', elementRef, injector);
   }

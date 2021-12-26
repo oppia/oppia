@@ -46,15 +46,22 @@ export class ContributionOpportunitiesService {
       private readonly modalService: NgbModal) {}
 
   private _reloadOpportunitiesEventEmitter = new EventEmitter<void>();
+
   private _removeOpportunitiesEventEmitter = new EventEmitter<string[]>();
+
   // These properties are initialized using async methods
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   private _skillOpportunitiesCursor!: string;
+
   private _translationOpportunitiesCursor!: string;
+
   private _voiceoverOpportunitiesCursor!: string;
+
   private _moreSkillOpportunitiesAvailable: boolean = true;
+
   private _moreTranslationOpportunitiesAvailable: boolean = true;
+
   private _moreVoiceoverOpportunitiesAvailable: boolean = true;
 
   private async _getSkillOpportunitiesAsync(cursor: string):
@@ -145,6 +152,7 @@ export class ContributionOpportunitiesService {
         languageCode, this._voiceoverOpportunitiesCursor);
     }
   }
+
   async getAllTopicNamesAsync(): Promise<string[]> {
     return this._getAllTopicNamesAsync();
   }

@@ -30,27 +30,47 @@ import { AdminTaskManagerService } from '../services/admin-task-manager.service'
 })
 export class AdminMiscTabComponent {
   @Output() setStatusMessage: EventEmitter<string> = new EventEmitter();
+
   DATA_EXTRACTION_QUERY_HANDLER_URL: string = (
     '/explorationdataextractionhandler');
+
   irreversibleActionMessage: string = (
     'This action is irreversible. Are you sure?');
+
   MAX_USERNAME_LENGTH: number = AppConstants.MAX_USERNAME_LENGTH;
+
   showDataExtractionQueryStatus: boolean;
+
   dataExtractionQueryStatusMessage: string;
+
   oldUsername: string;
+
   newUsername: string;
+
   usernameToGrant: string;
+
   usernameToRevoke: string;
+
   userIdToGet: string;
+
   userIdToDelete: string;
+
   usernameToDelete: string;
+
   expVersion: number;
+
   stateName: string;
+
   numAnswers: number;
+
   expId: string;
+
   topicIdForRegeneratingOpportunities: string;
+
   blogPostId: string;
+
   authorUsername: string;
+
   publishedOn: string;
 
   constructor(

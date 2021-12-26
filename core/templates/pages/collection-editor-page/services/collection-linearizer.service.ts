@@ -40,7 +40,9 @@ interface SwapFunction {
 })
 export class CollectionLinearizerService {
   explorationIds: string[];
+
   explorationId: number;
+
   constructor(
       private collectionUpdateService: CollectionUpdateService
   ) {}

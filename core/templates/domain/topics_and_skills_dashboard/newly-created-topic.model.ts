@@ -21,8 +21,11 @@ import { AppConstants } from 'app.constants';
 
 export class NewlyCreatedTopic {
   name: string;
+
   description: string;
+
   urlFragment: string;
+
   /**
    * @param {String} name - name of the topic.
    * @param {String} description - description of the topic.
@@ -33,6 +36,7 @@ export class NewlyCreatedTopic {
     this.description = description;
     this.urlFragment = urlFragment;
   }
+
   /**
    * @returns {Boolean} - A boolean indicating if the topic is valid.
    */

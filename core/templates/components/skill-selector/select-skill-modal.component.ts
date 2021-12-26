@@ -27,10 +27,15 @@ import { SkillsCategorizedByTopics } from 'pages/topics-and-skills-dashboard-pag
 })
 export class SelectSkillModalComponent extends ConfirmOrCancelModal {
   categorizedSkills: SkillsCategorizedByTopics;
+
   skillsInSameTopicCount: number;
+
   skillSummaries: SkillSummaryBackendDict[];
+
   untriagedSkillSummaries: SkillSummary[];
+
   allowSkillsFromOtherTopics: boolean;
+
   selectedSkillId: string = null;
 
   constructor(

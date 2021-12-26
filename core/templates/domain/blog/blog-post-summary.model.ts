@@ -31,14 +31,23 @@ export interface BlogPostSummaryBackendDict {
 
 export class BlogPostSummary {
   _id: string;
+
   _authorUsername: string;
+
   _title: string;
+
   _summary: string;
+
   _tags: string[];
+
   _thumbnailFilename: string | null;
+
   _urlFragment: string;
+
   _lastUpdated?: string;
+
   _publishedOn?: string;
+
   constructor(
       id: string,
       authorUsername: string,

@@ -39,9 +39,13 @@ export interface AnswerGroupBackendDict {
 
 export class AnswerGroup {
   rules: Rule[];
+
   outcome: Outcome;
+
   trainingData: readonly InteractionAnswer[];
+
   taggedSkillMisconceptionId: string | null;
+
   constructor(
       rules: Rule[], outcome: Outcome,
       trainingData: readonly InteractionAnswer[],

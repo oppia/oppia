@@ -29,7 +29,9 @@ import { BlogDashboardPageService } from 'pages/blog-dashboard-page/services/blo
 export class BlogPostEditorNavbarPreLogoActionComponent
 implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
+
   activeTab: string;
+
   constructor(
     private blogDashboardPageService: BlogDashboardPageService,
   ) {}

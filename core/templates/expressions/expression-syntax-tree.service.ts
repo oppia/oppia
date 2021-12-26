@@ -79,8 +79,11 @@ export class ExpressionSyntaxTreeService {
   constructor(private expressionParserService: ExpressionParserService) {}
 
   public ExpressionError = ExpressionError;
+
   public ExprUndefinedVarError = ExprUndefinedVarError;
+
   public ExprWrongNumArgsError = ExprWrongNumArgsError;
+
   public ExprWrongArgTypeError = ExprWrongArgTypeError;
 
   public getParamsUsedInExpression(expression: string): string[] {

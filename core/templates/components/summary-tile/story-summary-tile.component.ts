@@ -37,23 +37,41 @@ export class StorySummaryTileComponent implements OnInit {
   // for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() classroomUrlFragment!: string;
+
   @Input() storySummary!: StorySummary;
+
   @Input() topicUrlFragment!: string;
+
   initialCount!: number;
+
   chaptersDisplayed!: number;
+
   nodeCount!: number;
+
   completedStoriesCount!: number;
+
   storyProgress!: number;
+
   storyTitle!: string;
+
   strokeDashArrayValues!: string | number;
+
   completedStrokeDashArrayValues!: string;
+
   thumbnailBgColor!: string;
+
   nodeTitles!: string[];
+
   storyLink!: string;
+
   thumbnailUrl: string | null = null;
+
   showButton: boolean = false;
+
   circumference = (20 * 2 * Math.PI);
+
   gapLength = 5;
+
   EXPLORE_PAGE_PREFIX = '/explore/';
 
   constructor(

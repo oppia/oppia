@@ -645,9 +645,11 @@ export type DomainObject = (
 
 export class Change {
   _backendChangeObject: BackendChangeObject;
+
   _applyChangeToObject: (
     backendChangeObject: BackendChangeObject,
     domainObject: DomainObject) => void;
+
   _reverseChangeToObject: (
     backendChangeObject: BackendChangeObject,
     domainObject: DomainObject) => void;

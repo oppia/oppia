@@ -63,15 +63,25 @@ export interface StateBackendDict {
 export class State {
   // Name is null before saving a state.
   name: string | null;
+
   classifierModelId: string | null;
+
   linkedSkillId: string | null;
+
   content: SubtitledHtml;
+
   interaction: Interaction;
+
   paramChanges: ParamChange[];
+
   recordedVoiceovers: RecordedVoiceovers;
+
   solicitAnswerDetails: boolean;
+
   cardIsCheckpoint: boolean;
+
   writtenTranslations: WrittenTranslations;
+
   nextContentIdIndex: number;
 
   constructor(
@@ -93,6 +103,7 @@ export class State {
     this.writtenTranslations = writtenTranslations;
     this.nextContentIdIndex = nextContentIdIndex;
   }
+
   setName(newName: string): void {
     this.name = newName;
   }

@@ -32,11 +32,16 @@ import { AlertsService } from 'services/alerts.service';
 })
 export class CollectionEditorStateService {
   private _collection: Collection = Collection.createEmptyCollection();
+
   private _collectionRights: CollectionRights =
   CollectionRights.createEmptyCollectionRights();
+
   private _collectionIsInitialized: boolean = false;
+
   private _collectionIsLoading: boolean = false;
+
   private _collectionIsBeingSaved: boolean = false;
+
   private _collectionInitializedEventEmitter: EventEmitter<void> = (
   new EventEmitter());
 

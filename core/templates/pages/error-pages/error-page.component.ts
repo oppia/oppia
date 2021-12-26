@@ -30,6 +30,7 @@ import { PageTitleService } from 'services/page-title.service';
 })
 export class ErrorPageComponent implements OnInit {
   @Input() statusCode: string;
+
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private pageTitleService: PageTitleService) {}

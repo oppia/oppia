@@ -70,27 +70,49 @@ export interface CollectionHandler {
 })
 export class CollectionPlayerPageComponent implements OnInit {
   collection!: Collection;
+
   collectionPlaythrough;
+
   currentExplorationId!: string;
+
   summaryToPreview!: LearnerExplorationSummaryBackendDict;
+
   pathSvgParameters!: string;
+
   pathIconParameters!: IconParametersArray[];
+
   svgHeight!: number;
+
   MIN_HEIGHT_FOR_PATH_SVG_PX!: number;
+
   EVEN_SVG_HEIGHT_OFFSET_PX!: number;
+
   ODD_SVG_HEIGHT_OFFSET_PX!: number;
+
   y!: number;
+
   ICON_X_MIDDLE_PX!: number;
+
   ICON_Y_INITIAL_PX!: number;
+
   ICON_Y_INCREMENT_PX!: number;
+
   ICON_X_LEFT_PX!: number;
+
   ICON_X_RIGHT_PX!: number;
+
   collectionId!: string;
+
   nextExplorationId!: string;
+
   whitelistedCollectionIdsForGuestProgress;
+
   collectionSummary;
+
   isLoggedIn: boolean = false;
+
   explorationCardIsShown: boolean = false;
+
   elementToScrollTo: string;
 
   constructor(

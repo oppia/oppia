@@ -28,9 +28,11 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 class MockRouterService {
   private refreshSettingsTabEventEmitter: EventEmitter<void>;
+
   get onRefreshSettingsTab() {
     return this.refreshSettingsTabEventEmitter;
   }
+
   set refreshSettingsTabEmitter(val) {
     this.refreshSettingsTabEventEmitter = val;
   }

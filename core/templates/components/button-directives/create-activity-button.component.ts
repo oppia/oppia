@@ -33,8 +33,11 @@ import { AppConstants } from 'app.constants';
  })
 export class CreateActivityButtonComponent implements OnInit {
   creationInProgress: boolean = false;
+
   canCreateCollections: boolean = false;
+
   allowYamlFileUpload: boolean = false;
+
   userIsLoggedIn: boolean = false;
 
   constructor(

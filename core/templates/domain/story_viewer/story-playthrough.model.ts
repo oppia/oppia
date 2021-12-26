@@ -32,10 +32,15 @@ export interface StoryPlaythroughBackendDict {
 
 export class StoryPlaythrough {
   id: string;
+
   nodes: ReadOnlyStoryNode[];
+
   title: string;
+
   description: string;
+
   topicName: string;
+
   metaTagContent: string;
 
   constructor(

@@ -44,15 +44,25 @@ export interface InputResponsePair {
 
 export class StateCard {
   _stateName: string;
+
   _contentHtml: string;
+
   _interactionHtml: string;
+
   _interaction: Interaction;
+
   _inputResponsePairs: InputResponsePair[];
+
   _recordedVoiceovers: RecordedVoiceovers;
+
   _writtenTranslations: WrittenTranslations;
+
   _contentId: string;
+
   _completed: boolean;
+
   audioTranslationLanguageService: AudioTranslationLanguageService;
+
   constructor(
       stateName: string, contentHtml: string,
       interactionHtml: string, interaction: Interaction,

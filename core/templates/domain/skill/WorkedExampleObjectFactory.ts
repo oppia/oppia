@@ -30,6 +30,7 @@ export interface WorkedExampleBackendDict {
 
 export class WorkedExample {
   _question: SubtitledHtml;
+
   _explanation: SubtitledHtml;
 
   constructor(question: SubtitledHtml, explanation: SubtitledHtml) {

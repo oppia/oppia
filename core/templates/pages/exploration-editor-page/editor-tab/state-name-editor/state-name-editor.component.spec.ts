@@ -35,6 +35,7 @@ import { ExplorationDataService } from 'pages/exploration-editor-page/services/e
 
 class MockExplorationDataService {
   explorationId: 0;
+
   autosaveChangeListAsync() {
     return;
   }

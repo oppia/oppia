@@ -23,6 +23,7 @@ export interface SkillRightsBackendDict {
 
 export class SkillRights {
   _skillId: string;
+
   _canEditSkillDescription: boolean;
 
   constructor(skillId: string, canEditSkillDescription: boolean) {

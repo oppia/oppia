@@ -27,6 +27,7 @@ import parser from 'expressions/parser';
 })
 export class ExpressionParserService {
   parse = parser.parse;
+
   SyntaxError = parser.SyntaxError;
 }
 

@@ -30,24 +30,38 @@ import { AlertsService } from 'services/alerts.service';
 })
 export class AdminRolesTabComponent implements OnInit {
   UPDATABLE_ROLES = null;
+
   VIEWABLE_ROLES = null;
+
   HUMAN_READABLE_ROLES = null;
+
   topicSummaries = null;
+
   roleToActions = null;
+
   rolesFetched = false;
 
   roleSelectorIsShown = false;
+
   username = '';
+
   userRoles = [];
+
   possibleRolesToAdd = [];
+
   managedTopicIds = [];
+
   // The roleCurrentlyBeingUpdatedInBackend holds the role which is either being
   // removed or added to user roles. This value is used to present a progress
   // spinner next to the role which is currently being updated in the backend.
   roleCurrentlyBeingUpdatedInBackend = null;
+
   errorMessage = null;
+
   bannedStatusChangeInProgress = false;
+
   userIsBanned = false;
+
   roleIsCurrentlyBeingEdited = false;
 
   constructor(

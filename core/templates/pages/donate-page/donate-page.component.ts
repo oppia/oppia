@@ -35,7 +35,9 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 })
 export class DonatePageComponent implements OnInit {
   windowIsNarrow: boolean = false;
+
   donateImgUrl: string = '';
+
   constructor(
     private pageTitleService: PageTitleService,
     private siteAnalyticsService: SiteAnalyticsService,
@@ -43,6 +45,7 @@ export class DonatePageComponent implements OnInit {
     private windowDimensionService: WindowDimensionsService,
     private windowRef: WindowRef
   ) {}
+
   ngOnInit(): void {
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
     this.donateImgUrl = this.urlInterpolationService.getStaticImageUrl(

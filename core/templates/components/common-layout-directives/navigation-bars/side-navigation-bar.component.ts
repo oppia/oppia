@@ -39,11 +39,17 @@ export class SideNavigationBarComponent {
    @Input() display!: boolean;
 
    currentUrl!: string;
+
    classroomData: CreatorTopicSummary[] = [];
+
    topicSummariesLength: number = 0;
+
    CLASSROOM_PROMOS_ARE_ENABLED: boolean = false;
+
    getinvolvedSubmenuIsShown: boolean = false;
+
    learnSubmenuIsShown: boolean = true;
+
    userIsLoggedIn!: boolean;
 
    PAGES_REGISTERED_WITH_FRONTEND = (

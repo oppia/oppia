@@ -35,14 +35,23 @@ export class BlogPostData {
   // blog post that is displayed in the editor until the actual
   // is fetched from the backend.
   _id: string | null;
+
   _authorUsername: string;
+
   _title: string;
+
   _content: string;
+
   _tags: string[];
+
   _thumbnailFilename: string | null;
+
   _urlFragment: string;
+
   _lastUpdated?: string;
+
   _publishedOn?: string;
+
   constructor(
       id: string | null,
       authorUsername: string,
@@ -177,6 +186,7 @@ export class BlogPostData {
     }
     return issues;
   }
+
   static createFromBackendDict(
       blogPostBackendDict: BlogPostBackendDict): BlogPostData {
     return new BlogPostData (

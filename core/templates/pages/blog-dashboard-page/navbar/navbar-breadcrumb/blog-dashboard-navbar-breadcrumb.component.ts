@@ -28,11 +28,15 @@ import { BlogDashboardPageService } from 'pages/blog-dashboard-page/services/blo
 export class BlogDashboardNavbarBreadcrumbComponent
 implements OnInit, OnDestroy {
   activeTab: string;
+
   title: string;
+
   directiveSubscriptions = new Subscription();
+
   constructor(
     private blogDashboardPageService: BlogDashboardPageService,
   ) {}
+
   ngOnInit(): void {
     this.activeTab = this.blogDashboardPageService.activeTab;
     this.directiveSubscriptions.add(

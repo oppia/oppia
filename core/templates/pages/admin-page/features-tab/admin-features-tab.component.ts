@@ -117,6 +117,7 @@ export class AdminFeaturesTabComponent implements OnInit {
     });
 
   featureFlags: PlatformParameter[] = [];
+
   featureFlagNameToBackupMap: Map<string, PlatformParameter>;
 
   isDummyApiEnabled: boolean = false;

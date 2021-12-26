@@ -66,19 +66,30 @@ interface RteConfig extends CKEDITOR.config {
 export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
     OnDestroy, OnInit {
   @Input() uiConfig: UiConfig;
+
   @Input() value;
+
   @Input() headersEnabled = false;
+
   @Output() valueChange: EventEmitter<string> = new EventEmitter();
+
   rteHelperService;
+
   ck: CKEDITOR.editor;
+
   currentValue: string;
+
   connectedToInternet = true;
+
   componentsThatRequireInternet: string[] = [];
+
   subscriptions: Subscription;
   // A RegExp for matching rich text components.
+
   componentRe = (
     /(<(oppia-noninteractive-(.+?))\b[^>]*>)[\s\S]*?<\/\2>/g
   );
+
   constructor(
     private ckEditorCopyContentService: CkEditorCopyContentService,
     private contextService: ContextService,
@@ -102,6 +113,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
           }
         }));
   }
+
   ngOnChanges(changes: SimpleChanges): void {
     // Ckeditor 'change' event gets triggered when a user types. In the
     // change listener, value is set and it triggers the ngOnChanges
@@ -504,6 +516,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
       }
     });
   }
+
   enableRTEicons(): void {
     this.componentsThatRequireInternet.forEach((name) => {
       let buttons = this.elementRef.nativeElement.getElementsByClassName(

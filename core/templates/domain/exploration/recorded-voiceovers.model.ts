@@ -37,6 +37,7 @@ import { VoiceoverBackendDict, Voiceover } from
   'domain/exploration/voiceover.model';
 export class RecordedVoiceovers {
   voiceoversMapping: VoiceoverMapping;
+
   constructor(
       voiceoversMapping: VoiceoverMapping) {
     this.voiceoversMapping = voiceoversMapping;

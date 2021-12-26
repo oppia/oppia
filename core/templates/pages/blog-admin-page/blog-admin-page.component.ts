@@ -56,10 +56,15 @@ export class BlogAdminPageComponent implements OnInit {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   roleToActions!: RoleToActionsBackendResponse;
+
   formData!: FormData;
+
   UPDATABLE_ROLES = {};
+
   statusMessage: string = '';
+
   configProperties: ConfigPropertiesBackendResponse = {};
+
   constructor(
     private backendApiService: BlogAdminBackendApiService,
     private blogAdminDataService: BlogAdminDataService,

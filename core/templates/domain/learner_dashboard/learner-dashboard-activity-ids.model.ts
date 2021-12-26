@@ -34,16 +34,27 @@ export interface LearnerDashboardActivityIdsDict {
 
 export class LearnerDashboardActivityIds {
   incompleteExplorationIds: string[];
+
   incompleteCollectionIds: string[];
+
   partiallyLearntTopicIds: string[];
+
   completedExplorationIds: string[];
+
   completedCollectionIds: string[];
+
   completedStoryIds: string[];
+
   learntTopicIds: string[];
+
   topicIdsToLearn: string[];
+
   allTopicIds: string[];
+
   untrackedTopicIds: string[];
+
   explorationPlaylistIds: string[];
+
   collectionPlaylistIds: string[];
 
   constructor(

@@ -34,12 +34,19 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
 })
 export class BlogDashboardPageComponent implements OnInit, OnDestroy {
   activeTab: string;
+
   activeView: string = 'gridView';
+
   authorProfilePictureUrl: string;
+
   blogDashboardData: BlogDashboardData;
+
   directiveSubscriptions = new Subscription();
+
   windowIsNarrow: boolean;
+
   DEFAULT_PROFILE_PICTURE_URL: string = '';
+
   constructor(
     private alertsService: AlertsService,
     private blogDashboardBackendService: BlogDashboardBackendApiService,

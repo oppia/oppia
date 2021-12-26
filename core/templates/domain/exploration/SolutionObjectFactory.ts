@@ -66,9 +66,13 @@ export interface ShortAnswerResponse {
 
 export class Solution {
   ehfs: ExplorationHtmlFormatterService;
+
   answerIsExclusive: boolean;
+
   correctAnswer: InteractionAnswer;
+
   explanation: SubtitledHtml;
+
   constructor(
       ehfs: ExplorationHtmlFormatterService,
       answerIsExclusive: boolean, correctAnswer: InteractionAnswer,
@@ -161,6 +165,7 @@ export class Solution {
 export class SolutionObjectFactory {
   constructor(
     private ehfs: ExplorationHtmlFormatterService) {}
+
   createFromBackendDict(solutionBackendDict: SolutionBackendDict): Solution {
     return new Solution(
       this.ehfs,

@@ -44,35 +44,60 @@ import { CreatorDashboardStats } from 'domain/creator_dashboard/creator-dashboar
 })
 export class CreatorDashboardPageComponent {
   activeTab: string;
+
   myExplorationsView: string;
+
   publishText: string;
+
   currentSortType: string;
+
   isCurrentSortDescending: boolean;
+
   currentSubscribersSortType: string;
+
   isCurrentSubscriptionSortDescending: boolean;
+
   canReviewActiveThread: boolean;
+
   EXPLORATION_DROPDOWN_STATS;
+
   canCreateCollections: boolean;
+
   explorationsList: CreatorExplorationSummary[];
+
   collectionsList: CollectionSummary[];
+
   subscribersList: ProfileSummary[];
+
   lastWeekStats: { totalPlays: number};
+
   dashboardStats: CreatorDashboardStats;
+
   relativeChangeInTotalPlays: number;
+
   getLocaleAbbreviatedDatetimeString: (millisSinceEpoch: number) => string;
+
   getHumanReadableStatus: (status: string) => string;
+
   emptyDashboardImgUrl: string;
+
   getAverageRating: (
     (ratingFrequencies: ExplorationRatings) => number | null);
+
   SUBSCRIPTION_SORT_BY_KEYS =
     CreatorDashboardConstants.SUBSCRIPTION_SORT_BY_KEYS;
+
   EXPLORATIONS_SORT_BY_KEYS =
     CreatorDashboardConstants.EXPLORATIONS_SORT_BY_KEYS;
+
   DEFAULT_EMPTY_TITLE = 'Untitled';
+
   HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS =
     CreatorDashboardConstants.HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS;
+
   HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS =
     CreatorDashboardConstants.HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS;
+
   DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD =
     AppConstants.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR;
 

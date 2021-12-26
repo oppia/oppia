@@ -30,6 +30,7 @@ import { StateParamChangesService } from
 })
 export class StateParamChangesEditorComponent implements OnInit {
   spcs: StateParamChangesService;
+
   constructor(public stateParamChangesService: StateParamChangesService) {}
 
   ngOnInit(): void {

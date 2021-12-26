@@ -34,16 +34,27 @@ export interface FeedbackThreadSummaryBackendDict {
 
 export class FeedbackThreadSummary {
   status: string;
+
   originalAuthorId: string;
+
   lastUpdatedMsecs: number;
+
   lastMessageText: string;
+
   totalMessageCount: number;
+
   lastMessageIsRead: boolean;
+
   secondLastMessageIsRead: boolean;
+
   authorLastMessage: string;
+
   authorSecondLastMessage: string;
+
   explorationTitle: string;
+
   explorationId: string;
+
   threadId: string;
 
   constructor(

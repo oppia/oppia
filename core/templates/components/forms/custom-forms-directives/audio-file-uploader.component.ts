@@ -29,15 +29,22 @@ export class AudioFileUploaderComponent {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() droppedFile!: FileList;
+
   @Output() fileChange: EventEmitter<File> = new EventEmitter<File>();
+
   @Output() fileClear: EventEmitter<void> = new EventEmitter<void>();
+
   // The following properties are used in function 'addAudio' which cannot
   // be called until the input form and file input views are initialized.
   @ViewChild('fileInput') fileInputRef!: ElementRef;
+
   @ViewChild('inputForm') inputFormRef!: ElementRef;
+
   ALLOWED_AUDIO_FILE_TYPES = ['audio/mp3', 'audio/mpeg'];
+
   // 'null' implies not displaying an error message.
   errorMessage: string | null = null;
+
   licenseUrl = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LICENSE.ROUTE;
 
   // Returns 'null' when the uploaded file is valid.

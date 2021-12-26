@@ -31,13 +31,16 @@ import { UrlService } from 'services/contextual/url.service';
 })
 export class CollectionFooterComponent implements OnInit {
   collectionId: string = '';
+
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService) {
   }
+
   ngOnInit(): void {
     this.collectionId = this.urlService.getCollectionIdFromUrl();
   }
+
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }

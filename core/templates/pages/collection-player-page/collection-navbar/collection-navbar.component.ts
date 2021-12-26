@@ -31,6 +31,7 @@ import { UrlService } from 'services/contextual/url.service';
 })
 export class CollectionNavbarComponent implements OnInit, OnDestroy {
   collectionTitle: string = '';
+
   directiveSubscriptions = new Subscription();
 
   constructor(

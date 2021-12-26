@@ -50,16 +50,27 @@ export interface ReadOnlyTopicBackendDict {
 
 export class ReadOnlyTopic {
   _topicName: string;
+
   _topicId: string;
+
   _topicDescription: string;
+
   _canonicalStorySummaries: StorySummary[];
+
   _additionalStorySummaries: StorySummary[];
+
   _uncategorizedSkillSummaries: ShortSkillSummary[];
+
   _subtopics: Subtopic[];
+
   _degreesOfMastery: DegreesOfMastery;
+
   _skillDescriptions: SkillIdToDescriptionMap;
+
   _practiceTabIsDisplayed: boolean;
+
   _metaTagContent: string;
+
   _pageTitleFragmentForWeb: string;
 
   constructor(

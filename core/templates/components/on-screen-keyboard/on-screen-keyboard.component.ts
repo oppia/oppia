@@ -1,3 +1,4 @@
+
 // Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -40,17 +41,28 @@ export class OnScreenKeyboardComponent {
     right: () => void;
     end: () => void;
   };
+
   guppyInstance!: Guppy;
+
   interactionType!: string;
+
   customLetters!: string[];
+
   functionsTab: string = constants.OSK_FUNCTIONS_TAB;
+
   lettersTab: string = constants.OSK_LETTERS_TAB;
+
   mainTab: string = constants.OSK_MAIN_TAB;
+
   greekSymbols: string[] = Object.values(
     constants.GREEK_LETTER_NAMES_TO_SYMBOLS);
+
   greekLetters: string[] = Object.keys(constants.GREEK_LETTER_NAMES_TO_SYMBOLS);
+
   currentTab: string = this.mainTab;
+
   lettersInKeyboardLayout: string[] = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
+
   functions: string[] = [
     'log', 'ln', 'sin', 'cos', 'tan', 'sec', 'csc', 'cot', 'arcsin',
     'arccos', 'arctan', 'sinh', 'cosh', 'tanh'];

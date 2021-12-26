@@ -54,29 +54,51 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() headerText!: string;
+
   @Input() subheaderText!: string;
 
   url!: URL;
+
   currentLanguageCode!: string;
+
   supportedSiteLanguages!: LanguageInfo[];
+
   currentLanguageText!: string;
+
   classroomData: CreatorTopicSummary[] = [];
+
   learnDropdownOffset: number = 0;
+
   isModerator: boolean = false;
+
   isCurriculumAdmin: boolean = false;
+
   isTopicManager: boolean = false;
+
   isSuperAdmin: boolean = false;
+
   isBlogAdmin: boolean = false;
+
   isBlogPostEditor: boolean = false;
+
   userIsLoggedIn: boolean = false;
+
   currentUrl!: string;
+
   userMenuIsShown: boolean = false;
+
   inClassroomPage: boolean = false;
+
   showLanguageSelector: boolean = false;
+
   standardNavIsShown: boolean = false;
+
   getInvolvedMenuOffset: number = 0;
+
   ACTION_OPEN!: string;
+
   ACTION_CLOSE!: string;
+
   KEYBOARD_EVENT_TO_KEY_CODES!: {
     enter: {
         shiftKeyIsPressed: boolean;
@@ -91,8 +113,11 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       keyCode: number;
       };
     };
+
   labelForClearingFocus!: string;
+
   sidebarIsShown: boolean = false;
+
   windowIsNarrow: boolean = false;
 
   // The 'username', 'profilePageUrl' and 'profilePictureDataUrl' properties
@@ -101,7 +126,9 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   // Until the response object is received and the method returns,
   // these properties remain undefined.
   username: string | undefined;
+
   profilePageUrl: string | undefined;
+
   profilePictureDataUrl: string | undefined;
 
   // The 'activeMenuName' property is not initialized in the constructor
@@ -111,12 +138,16 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   activeMenuName: string | undefined;
 
   directiveSubscriptions = new Subscription();
+
   NAV_MODE_SIGNUP = 'signup';
+
   NAV_MODES_WITH_CUSTOM_LOCAL_NAV = [
     'create', 'explore', 'collection', 'collection_editor',
     'topics_and_skills_dashboard', 'topic_editor', 'skill_editor',
     'story_editor', 'blog-dashboard'];
+
   currentWindowWidth = this.windowDimensionsService.getWidth();
+
   // The order of the elements in this array specifies the order in
   // which they will be hidden. Earlier elements will be hidden first.
   NAV_ELEMENTS_ORDER = [
@@ -125,9 +156,12 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     'I18N_TOPNAV_HOME'];
 
   CLASSROOM_PROMOS_ARE_ENABLED = false;
+
   googleSignInIconUrl = this.urlInterpolationService.getStaticImageUrl(
     '/google_signin_buttons/google_signin.svg');
+
   navElementsVisibilityStatus: Record<string, boolean> = {};
+
   PAGES_REGISTERED_WITH_FRONTEND = (
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
 

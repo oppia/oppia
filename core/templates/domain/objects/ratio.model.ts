@@ -25,6 +25,7 @@ type GreatestCommonDivisor = (x: number, y: number) => number;
 
 export class Ratio {
   components: number[];
+
   constructor(numbersList: number[]) {
     this.components = numbersList;
   }

@@ -23,8 +23,11 @@ import {
 
 export class ClassroomData {
   _name: string;
+
   _topicSummaries: CreatorTopicSummary[];
+
   _courseDetails: string;
+
   _topicListIntro: string;
 
   constructor(

@@ -23,9 +23,13 @@ import { InteractionCustomizationArgs } from
 
 export class LearnerAnswerDetails {
   expId: string;
+
   stateName: string;
+
   interactionId: string;
+
   customizationArgs: InteractionCustomizationArgs;
+
   learnerAnswerInfoData: LearnerAnswerInfo[];
 
   constructor(

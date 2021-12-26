@@ -26,6 +26,7 @@ import { ImprovementsConstants } from 'domain/improvements/improvements.constant
 })
 export class CompletionGraphComponent implements OnInit {
   @Input() completionRate: number;
+
   completionBarStyle: {
     'stroke-dasharray': number;
     'stroke-dashoffset': number;

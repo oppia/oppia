@@ -30,9 +30,13 @@ export interface EmailDashboardQueryBackendDict {
 
 export class EmailDashboardQuery {
   id: string;
+
   status: string;
+
   numQualifiedUsers: number;
+
   submitterUsername: string;
+
   createdOn: string;
 
   constructor(

@@ -88,6 +88,7 @@ angular.module('oppia').factory(
 */
 export class EventBusGroup {
   private eventBus: EventBusService;
+
   private subscriptions: Subscription;
 
   constructor(eventBus: EventBusService) {

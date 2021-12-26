@@ -33,8 +33,11 @@ interface CkEditorCopyEvent {
 })
 export class CkEditorCopyContentService {
   private readonly OUTPUT_VIEW_TAG_NAME = 'ANGULAR-HTML-BIND';
+
   private readonly OUTPUT_NG_TAG_NAME = 'OPPIA-RTE-OUTPUT-DISPLAY';
+
   private readonly NON_INTERACTIVE_TAG = '-noninteractive-';
+
   private readonly ALLOWLISTED_WIDGETS = new Set([
     'oppia-noninteractive-collapsible',
     'oppia-noninteractive-image',
@@ -46,6 +49,7 @@ export class CkEditorCopyContentService {
   ]);
 
   private copyEventEmitter = new EventEmitter<CkEditorCopyEvent>();
+
   private ckEditorIdToSubscription: {[id: string]: Subscription} = {};
 
   copyModeActive = false;

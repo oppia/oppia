@@ -36,17 +36,25 @@ interface ImageTypeMapping {
 })
 export class ImageUploaderComponent {
   @Output() fileChanged: EventEmitter<File> = new EventEmitter();
+
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() allowedImageFormats!: string[];
+
   @Input() isBlogPostThumbnailUploader!: boolean;
+
   @ViewChild('dropArea') dropAreaRef!: ElementRef;
+
   @ViewChild('imageInput') imageInputRef!: ElementRef;
+
   fileInputClassName!: string;
+
   // The errorMessage will be null if the uploaded file is valid .
   errorMessage!: string | null;
+
   backgroundWhileUploading: boolean = false;
+
   licenseUrl = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LICENSE.ROUTE;
 
   constructor(

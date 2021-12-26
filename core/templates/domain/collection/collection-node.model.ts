@@ -29,6 +29,7 @@ export interface CollectionNodeBackendDict {
 
 export class CollectionNode {
   _explorationId: string;
+
   _explorationSummaryObject: LearnerExplorationSummaryBackendDict | null;
 
   constructor(collectionNodeBackendObject: CollectionNodeBackendDict) {

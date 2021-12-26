@@ -39,15 +39,25 @@ export class SharingLinksComponent implements OnInit {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() layoutType!: string;
+
   @Input() layoutAlignType!: string;
+
   @Input() shareType!: ShareType;
+
   @Input() explorationId!: string;
+
   @Input() collectionId!: string;
+
   @Input() smallFont!: boolean;
+
   classroomUrl!: string;
+
   activityId!: string;
+
   activityUrlFragment!: string;
+
   serverName!: string;
+
   escapedTwitterText!: string;
 
   constructor(

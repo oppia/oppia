@@ -29,12 +29,19 @@ export interface ExplorationPermissionsBackendDict {
 
 export class ExplorationPermissions {
   canUnpublish: boolean;
+
   canReleaseOwnership: boolean;
+
   canPublish: boolean;
+
   canVoiceover: boolean;
+
   canDelete: boolean;
+
   canModifyRoles: boolean;
+
   canEdit: boolean;
+
   canManageVoiceArtist: boolean;
 
   constructor(

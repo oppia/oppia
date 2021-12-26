@@ -26,11 +26,17 @@ import { QuestionPlayerConstants } from '../question-directives/question-player/
 })
 export class ScoreRingComponent implements OnInit, OnChanges {
   constructor() {}
+
   @Input() score;
+
   @Input() testIsPassed: boolean;
+
   circle: SVGCircleElement;
+
   radius: number;
+
   circumference: number;
+
   COLORS_FOR_PASS_FAIL_MODE = QuestionPlayerConstants.COLORS_FOR_PASS_FAIL_MODE;
 
   setScore(percent: number): void {

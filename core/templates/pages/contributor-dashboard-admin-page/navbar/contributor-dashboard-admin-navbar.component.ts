@@ -30,13 +30,20 @@ import { AppConstants } from 'app.constants';
 })
 export class ContributorDashboardAdminNavbarComponent implements OnInit {
   profilePictureDataUrl: string;
+
   username: string;
+
   profileUrl: string;
+
   logoutUrl: string = (
     '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LOGOUT.ROUTE);
+
   profileDropdownIsActive: boolean = false;
+
   logoWebpImageSrc: string;
+
   logoPngImageSrc: string;
+
   PAGES_REGISTERED_WITH_FRONTEND = (
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
 

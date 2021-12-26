@@ -40,47 +40,76 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() collectionId!: string;
+
   @Input() explorationId!: string;
+
   @Input() explorationTitle!: string;
+
   @Input() storyNodeId!: string;
+
   @Input() lastUpdatedMsec!: number;
+
   @Input() numViews!: string;
+
   @Input() objective!: string;
+
   @Input() category!: string;
+
   @Input() ratings!: ExplorationRatings;
+
   @Input() contributorsSummary!: HumanReadableContributorsSummary;
+
   @Input() thumbnailIconUrl!: string;
+
   @Input() thumbnailBgColor!: string;
+
   // If this is not null, the new exploration opens in a new window when
   // the summary tile is clicked.
   @Input() openInNewWindow!: string;
+
   @Input() parentExplorationIds!: string;
+
   // If the screen width is below the threshold defined here, the mobile
   // version of the summary tile is displayed. This attribute is optional:
   // if it is not specified, it is treated as 0, which means that the
   // desktop version of the summary tile is always displayed.
   @Input() mobileCutoffPx!: number;
+
   @Input() isCommunityOwned: boolean = false;
+
   // If this is true, collection preview tile for mobile
   // will be displayed.
   @Input() isCollectionPreviewTile: boolean = false;
+
   @Input() isPlaylistTile: boolean = false;
+
   @Input() showLearnerDashboardIconsIfPossible!: string;
+
   @Input() isContainerNarrow: boolean = false;
+
   @Input() isOwnedByCurrentUser: boolean = false;
 
   activityType!: string;
+
   resizeSubscription!: Subscription;
+
   explorationIsCurrentlyHoveredOver: boolean = false;
+
   isWindowLarge: boolean = false;
+
   userIsLoggedIn: boolean = false;
+
   isRefresherExploration: boolean = false;
+
   contributors!: object;
+
   // A null value for 'lastUpdatedDateTime' indicates that lastUpdatedMsecs
   // received after component interactions is empty or does not exist.
   lastUpdatedDateTime: string | null = null;
+
   // 'avgRating' will be null if the exploration has no ratings.
   avgRating!: number | null;
+
   thumbnailIcon!: string;
 
   constructor(

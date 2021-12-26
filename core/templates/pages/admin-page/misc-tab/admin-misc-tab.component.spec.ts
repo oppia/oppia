@@ -46,12 +46,15 @@ class MockWindowRef {
 
 class MockReaderObject {
   result = null;
+
   onload = null;
+
   constructor() {
     this.onload = ($evt) => {
       return 'Fake onload executed';
     };
   }
+
   readAsText(file) {
     this.onload({target: {result: 'result'}});
     return 'The file is loaded';

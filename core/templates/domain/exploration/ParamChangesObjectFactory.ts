@@ -31,6 +31,7 @@ import {
 })
 export class ParamChangesObjectFactory {
   constructor(private paramChangeObjectFactory: ParamChangeObjectFactory) {}
+
   createFromBackendList(
       paramChangeBackendList: readonly ParamChangeBackendDict[]
   ): ParamChange[] {

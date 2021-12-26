@@ -19,7 +19,9 @@
 
 export class Classifier {
   algorithmId: string;
+
   classifierData: ArrayBuffer;
+
   algorithmVersion: number;
 
   constructor(

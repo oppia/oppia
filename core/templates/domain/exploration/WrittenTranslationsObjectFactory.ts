@@ -49,7 +49,9 @@ interface WrittenTranslationsMapping {
 
 export class WrittenTranslations {
   translationsMapping: WrittenTranslationsMapping;
+
   _writtenTranslationObjectFactory: WrittenTranslationObjectFactory;
+
   constructor(
       translationsMapping: WrittenTranslationsMapping,
       writtenTranslationObjectFactory: WrittenTranslationObjectFactory) {

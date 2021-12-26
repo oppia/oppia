@@ -25,6 +25,7 @@ export interface CollectionPlaythroughBackendDict {
 
 export class CollectionPlaythrough {
   _nextExplorationId: string | null;
+
   _completedExplorationIds: string[];
 
   // Stores information about a current playthrough of a collection for a

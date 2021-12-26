@@ -56,6 +56,7 @@ describe('I18n service', () => {
 
   class MockTranslateCacheService {
     init(): void {}
+
     getCachedLanguage(): string {
       return 'cached_lang';
     }

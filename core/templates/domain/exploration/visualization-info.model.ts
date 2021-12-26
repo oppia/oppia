@@ -46,8 +46,11 @@ export interface VisualizationInfoBackendDict {
 
 export class VisualizationInfo {
   addressedInfoIsSupported: boolean;
+
   data: AnswerStats[];
+
   id: string;
+
   options: {
     [name: string]: Object;
   };

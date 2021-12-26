@@ -26,6 +26,7 @@ import cloneDeep from 'lodash/cloneDeep';
 
 export class Rubric {
   _difficulty: string;
+
   _explanations: string[];
 
   constructor(difficulty: string, explanations: string[]) {

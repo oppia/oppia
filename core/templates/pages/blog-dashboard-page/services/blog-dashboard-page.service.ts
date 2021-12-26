@@ -32,14 +32,22 @@ import { BlogPostData } from 'domain/blog/blog-post.model';
 })
 export class BlogDashboardPageService {
   private _blogPostId: string = '';
+
   private _authorPictureUrl: string = '';
+
   private _blogPostData: null | BlogPostData = null;
+
   private _BLOG_POST_EDITOR_URL_TEMPLATE = (
     BlogDashboardPageConstants.BLOG_DASHBOARD_TAB_URLS.BLOG_POST_EDITOR);
+
   private _activeTab = 'main';
+
   private _blogPostAction: string = '';
+
   private _updateViewEventEmitter = new EventEmitter<void>();
+
   private _updateNavTitleEventEmitter = new EventEmitter<string>();
+
   private _imageUploaderIsNarrow: boolean = false;
 
   constructor(

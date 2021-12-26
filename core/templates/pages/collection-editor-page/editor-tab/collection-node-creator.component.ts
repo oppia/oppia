@@ -34,8 +34,11 @@ import { CollectionLinearizerService } from '../services/collection-linearizer.s
 })
 export class CollectionNodeCreatorComponent {
   collection: Collection;
+
   newExplorationId: string = '';
+
   newExplorationTitle: string = '';
+
   searchQueryHasError: boolean = false;
 
   constructor(

@@ -38,14 +38,23 @@ export interface FeedbackThreadBackendDict {
 
 export class FeedbackThread {
   status: string;
+
   subject: string;
+
   summary: string;
+
   originalAuthorName: string;
+
   lastUpdatedMsecs: number;
+
   messageCount: number;
+
   stateName: string;
+
   threadId: string;
+
   lastNonemptyMessageSummary: ThreadMessageSummary;
+
   messages: ThreadMessage[] = [];
 
   constructor(

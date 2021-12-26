@@ -36,13 +36,21 @@ export interface ThreadMessageBackendDict {
 
 export class ThreadMessage {
   authorUsername: string;
+
   createdOnMsecs: number;
+
   entityType: string;
+
   entityId: string;
+
   messageId: number;
+
   text: string = '';
+
   updatedStatus: string | null = null;
+
   updatedSubject: string | null = null;
+
   summary: ThreadMessageSummary;
 
   constructor(

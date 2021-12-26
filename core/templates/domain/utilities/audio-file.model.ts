@@ -18,6 +18,7 @@
 
 export class AudioFile {
   filename: string;
+
   data: Blob;
 
   constructor(filename: string, data: Blob) {

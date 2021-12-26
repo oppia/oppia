@@ -26,7 +26,9 @@ import { EmailData } from './email-dashboard-result.component';
 })
 export class EmailDashboardResultBackendApiService {
   RESULT_HANDLER_URL = '/emaildashboardresult/<query_id>';
+
   CANCEL_EMAIL_HANDLER_URL = '/emaildashboardcancelresult/<query_id>';
+
   TEST_BULK_EMAIL_URL = '/emaildashboardtestbulkemailhandler/<query_id>';
 
   constructor(

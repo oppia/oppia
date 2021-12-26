@@ -50,12 +50,15 @@ describe('Edit Thumbnail Modal Component', () => {
 
   class MockReaderObject {
     result = null;
+
     onload: () => string;
+
     constructor() {
       this.onload = () => {
         return 'Fake onload executed';
       };
     }
+
     readAsDataURL(file: File) {
       this.onload();
       return 'The file is loaded';
@@ -64,12 +67,15 @@ describe('Edit Thumbnail Modal Component', () => {
 
   class MockImageObject {
     source = null;
+
     onload: () => string;
+
     constructor() {
       this.onload = () => {
         return 'Fake onload executed';
       };
     }
+
     set src(url: string) {
       this.onload();
     }

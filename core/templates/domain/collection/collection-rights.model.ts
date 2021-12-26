@@ -28,9 +28,13 @@ export interface CollectionRightsBackendDict {
 
 export class CollectionRights {
   _collectionId: string | null;
+
   _canEdit: boolean | null;
+
   _canUnpublish: boolean | null;
+
   _isPrivate: boolean | null;
+
   _ownerNames: string[];
 
   constructor(collectionRightsObject: CollectionRightsBackendDict) {

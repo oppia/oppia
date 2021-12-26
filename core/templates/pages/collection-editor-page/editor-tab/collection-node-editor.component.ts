@@ -32,9 +32,13 @@ import { CollectionLinearizerService } from '../services/collection-linearizer.s
 })
 export class CollectionNodeEditorComponent implements OnInit {
   @Input() collectionNode: CollectionNode;
+
   @Input() linearIndex: number;
+
   explorationId: string;
+
   collection: Collection;
+
   hrefUrl: string;
 
   constructor(

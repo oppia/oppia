@@ -35,9 +35,12 @@ export class QuestionDifficultySelectorComponent {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() skillIdToRubricsObject!: Record<string, Rubric>;
+
   @Input() skillWithDifficulty!: SkillDifficulty;
+
   @Output() skillWithDifficultyChange: EventEmitter<SkillDifficulty> = (
     new EventEmitter());
+
   availableDifficultyValues: number[] = [];
 
   ngOnInit(): void {

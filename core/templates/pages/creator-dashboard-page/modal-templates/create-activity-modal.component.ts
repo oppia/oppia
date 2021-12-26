@@ -32,8 +32,11 @@ export class CreateActivityModalComponent implements OnInit {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   explorationImageUrl!: string;
+
   collectionImageUrl!: string;
+
   canCreateCollections: boolean = false;
+
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private userService: UserService,

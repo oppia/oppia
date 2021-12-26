@@ -31,12 +31,18 @@ import { UserService } from 'services/user.service';
 })
 export class BlogAdminNavbarComponent implements OnInit {
   profilePictureDataUrl: string;
+
   username: string;
+
   profileUrl: string;
+
   PAGES_REGISTERED_WITH_FRONTEND = (
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
+
   profileDropdownIsActive: boolean = false;
+
   logoWebpImageSrc: string;
+
   logoPngImageSrc: string;
 
   constructor(

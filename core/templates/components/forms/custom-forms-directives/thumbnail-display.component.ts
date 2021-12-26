@@ -32,12 +32,18 @@ export class ThumbnailDisplayComponent implements OnInit, OnChanges {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() imgSrc!: string;
+
   @Input() aspectRatio!: string;
+
   @Input() classes!: string[];
+
   @Input() background!: string;
+
   // This property will be null when the SVG uploaded is not valid.
   imageSourceInView: SafeResourceUrl | null = null;
+
   height = '180px';
+
   width = '320px';
 
   constructor(private svgSanitizerService: SvgSanitizerService) {}

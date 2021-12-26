@@ -25,8 +25,11 @@ export interface VoiceoverBackendDict {
 
 export class Voiceover {
   filename: string;
+
   fileSizeBytes: number;
+
   needsUpdate: boolean;
+
   durationSecs: number;
 
   constructor(

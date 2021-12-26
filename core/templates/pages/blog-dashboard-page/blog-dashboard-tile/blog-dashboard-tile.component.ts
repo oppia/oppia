@@ -30,11 +30,17 @@ import { AlertsService } from 'services/alerts.service';
 })
 export class BlogDashboardTileComponent implements OnInit {
   @Input() blogPostSummary!: BlogPostSummary;
+
   @Input() blogPostIsPublished: boolean;
+
   @Input() activeView: string;
+
   lastUpdatedDateString: string = '';
+
   @Output() unpublisedBlogPost: EventEmitter<void> = new EventEmitter();
+
   @Output() deletedBlogPost: EventEmitter<void> = new EventEmitter();
+
   constructor(
     private blogDashboardPageService: BlogDashboardPageService,
     private blogPostEditorBackendService: BlogPostEditorBackendApiService,

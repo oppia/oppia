@@ -67,12 +67,19 @@ export interface ExplorationBackendDict {
 
 export class Exploration {
   initStateName: string;
+
   paramChanges: ParamChange[];
+
   paramSpecs: ParamSpecs;
+
   states: States;
+
   title: string;
+
   languageCode: string;
+
   logger: LoggerService;
+
   urlInterpolationService: UrlInterpolationService;
 
   constructor(
@@ -171,6 +178,7 @@ export class Exploration {
         INTERACTION_SPECS[interactionId].display_mode ===
         AppConstants.INTERACTION_DISPLAY_MODE_INLINE);
   }
+
   getStates(): States {
     return cloneDeep(this.states);
   }

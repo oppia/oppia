@@ -32,18 +32,31 @@ import { UrlService } from 'services/contextual/url.service';
 })
 export class LearnerStorySummaryTileComponent implements OnInit {
   @Input() storySummary: StorySummary;
+
   @Input() displayArea: string;
+
   @Input() topicName?: string;
+
   nodeCount: number;
+
   completedNodeCount: number;
+
   storyProgress: number;
+
   thumbnailUrl: string = null;
+
   storyLink: string;
+
   storyTitle: string;
+
   nextIncompleteNodeTitle: string;
+
   storyCompleted: boolean = false;
+
   thumbnailBgColor: string;
+
   starImageUrl: string = '';
+
   cardIsHovered: boolean = false;
 
   constructor(

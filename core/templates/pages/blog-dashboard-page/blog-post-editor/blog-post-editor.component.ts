@@ -47,24 +47,43 @@ import { PreventPageUnloadEventService } from 'services/prevent-page-unload-even
 })
 export class BlogPostEditorComponent implements OnInit {
   blogPostData: BlogPostData;
+
   blogPostId: string;
+
   authorProfilePictureUrl: string;
+
   uploadedImageDataUrl: string;
+
   DEFAULT_PROFILE_PICTURE_URL: string = '';
+
   dateTimeLastSaved: string = '';
+
   authorUsername: string = '';
+
   title: string;
+
   windowIsNarrow: boolean;
+
   defaultTagsList: string[];
+
   maxAllowedTags: number;
+
   contentEditorIsActive: boolean = true;
+
   localEditedContent: string;
+
   thumbnailDataUrl: string;
+
   invalidImageWarningIsShown: boolean = false;
+
   newChangesAreMade: boolean = false;
+
   lastChangesWerePublished: boolean = false;
+
   MAX_CHARS_IN_BLOG_POST_TITLE: number;
+
   MIN_CHARS_IN_BLOG_POST_TITLE: number;
+
   HTML_SCHEMA: EditorSchema = {
     type: 'html',
     ui_config: {

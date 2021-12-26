@@ -37,15 +37,21 @@ export class RatingDisplayComponent {
   //    changed.
   //  - ratingValue: an integer 1-5 giving the rating.
   @Input() isEditable: boolean;
+
   @Output() edit = new EventEmitter<number>();
+
   @Input() ratingValue: number;
 
   stars: StarDict[] = [];
+
   status: string;
 
   POSSIBLE_RATINGS = [1, 2, 3, 4, 5];
+
   STATUS_ACTIVE = 'active';
+
   STATUS_INACTIVE = 'inactive';
+
   STATUS_RATING_SET = 'rating_set';
 
   ngOnInit(): void {

@@ -48,17 +48,29 @@ export class Story {
   // Because we are assigning null to those fields when we create
   // interstitial story.
   _id: string | null;
+
   _title: string;
+
   _description: string;
+
   _notes: string;
+
   _storyContents: StoryContents | null;
+
   _languageCode: string;
+
   _version: number;
+
   _correspondingTopicId: string | null;
+
   _thumbnailFilename: string | null;
+
   _thumbnailBgColor: string | null;
+
   _urlFragment: string | null;
+
   _metaTagContent: string;
+
   constructor(
       id: string | null, title: string, description: string,
       notes: string, storyContents: StoryContents | null, languageCode: string,
@@ -232,6 +244,7 @@ export class Story {
 })
 export class StoryObjectFactory {
   constructor(private storyContentsObjectFactory: StoryContentsObjectFactory) {}
+
   createFromBackendDict(storyBackendDict: StoryBackendDict): Story {
     return new Story(
       storyBackendDict.id, storyBackendDict.title,

@@ -100,12 +100,15 @@ describe('TranslateTextBackendApiService', () => {
   describe('suggestTranslatedTextAsync', () => {
     class MockReaderObject {
     result = 'data:image/png;base64,imageBlob1';
+
     onload: () => string;
+
     constructor() {
       this.onload = () => {
         return 'Fake onload executed';
       };
     }
+
     readAsDataURL(file: Blob) {
       this.onload();
       return 'The file is loaded';

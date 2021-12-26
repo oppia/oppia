@@ -48,12 +48,19 @@ export interface PlatformParameterBackendDict {
  */
 export class PlatformParameter {
   readonly name: string;
+
   readonly description: string;
+
   readonly dataType: string;
+
   readonly ruleSchemaVersion: number;
+
   readonly defaultValue: PlatformParameterValue;
+
   readonly isFeature: boolean;
+
   readonly featureStage: FeatureStage | null;
+
   rules: PlatformParameterRule[];
 
   constructor(

@@ -34,8 +34,11 @@ export interface QuestionSummaryForOneSkillBackendDict {
 
 export class QuestionSummaryForOneSkill {
   _skillId: string;
+
   _skillDescription: string;
+
   _skillDifficulty: number;
+
   _questionSummary: QuestionSummary;
 
   constructor(

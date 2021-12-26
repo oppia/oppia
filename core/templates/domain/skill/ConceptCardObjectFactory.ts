@@ -41,7 +41,9 @@ export interface ConceptCardBackendDict {
 
 export class ConceptCard {
   _explanation: SubtitledHtml;
+
   _workedExamples: WorkedExample[];
+
   _recordedVoiceovers: RecordedVoiceovers;
 
   constructor(

@@ -85,6 +85,7 @@ interface TopicNamesBackendDict {
 })
 export class ContributionOpportunitiesBackendApiService {
   urlTemplate = '/opportunitiessummaryhandler/<opportunityType>';
+
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private http: HttpClient,

@@ -22,9 +22,13 @@ import { ExplorationEditorPageConstants } from
 
 export class ParamMetadata {
   action: string;
+
   paramName: string;
+
   source: string;
+
   sourceInd: string;
+
   /**
    * @private @constructor
    * Provide metadata when a parameter is changed by a GET or SET action

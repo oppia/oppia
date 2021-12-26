@@ -35,35 +35,63 @@ import { EditThumbnailModalComponent } from './edit-thumbnail-modal.component';
 })
 export class ThumbnailUploaderComponent implements OnInit, OnChanges {
   @Input() disabled: boolean;
+
   @Input() useLocalStorage: boolean;
+
   @Input() allowedBgColors: string[];
+
   @Input() aspectRatio: string;
+
   @Input() bgColor: string;
+
   @Input() filename: string;
+
   @Input() previewDescription: string;
+
   @Input() previewDescriptionBgColor: string;
+
   @Input() previewFooter: string;
+
   @Input() previewTitle: string;
+
   @Output() updateBgColor: EventEmitter<string> = new EventEmitter() ;
+
   @Output() updateFilename: EventEmitter<string> = new EventEmitter();
+
   @Output() imageSave: EventEmitter<void> = new EventEmitter();
+
   openInUploadMode: boolean;
+
   tempBgColor: string;
+
   tempImageName: string;
+
   uploadedImage: string;
+
   uploadedImageMimeType: string;
+
   dimensions: { height: number; width: number };
+
   resampledFile: Blob;
+
   newThumbnailDataUrl: string;
+
   localStorageBgcolor: string;
+
   imageUploadUrlTemplate: string;
+
   hidePlaceholder = true;
+
   placeholderImageUrl = (
     this.urlInterpolationService.getStaticImageUrl(
       '/icons/story-image-icon.png'));
+
   editableThumbnailDataUrl: string;
+
   transformedData: string;
+
   parsedResponse;
+
   encodedImageURI: string;
 
   constructor(
@@ -75,9 +103,11 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
     private urlInterpolationService: UrlInterpolationService,
     private assetsBackendApiService: AssetsBackendApiService
   ) {}
+
   placeholderImageDataUrl = (
     this.urlInterpolationService.getStaticImageUrl(
       '/icons/story-image-icon.png'));
+
   thumbnailIsLoading = true;
 
   ngOnInit(): void {

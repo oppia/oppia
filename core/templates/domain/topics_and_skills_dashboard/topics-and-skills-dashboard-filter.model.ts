@@ -26,8 +26,11 @@ import {
 
 export class TopicsAndSkillsDashboardFilter {
   classroom: string;
+
   keywords: string[];
+
   sort: ETopicSortOptions;
+
   status: ETopicPublishedOptions;
 
   /**
@@ -45,6 +48,7 @@ export class TopicsAndSkillsDashboardFilter {
     this.sort = sort;
     this.status = status;
   }
+
   /**
    * Resets the filter object values
    */

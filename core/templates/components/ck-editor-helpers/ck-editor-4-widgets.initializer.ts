@@ -51,6 +51,7 @@ import { Injectable } from '@angular/core';
 })
 export class CkEditorInitializerService {
   static initialized = true;
+
   static ckEditorInitializer(
       rteHelperService: RteHelperService,
       htmlEscaperService: HtmlEscaperService,

@@ -25,7 +25,9 @@ import { TopicsAndSkillsDashboardPageConstants } from 'pages/topics-and-skills-d
 })
 export class SkillCreationService {
   CREATE_NEW_SKILL_URL_TEMPLATE: string = '/skill_editor/<skill_id>';
+
   skillCreationInProgress: boolean = false;
+
   skillDescriptionStatusMarker: string = (
     TopicsAndSkillsDashboardPageConstants
       .SKILL_DESCRIPTION_STATUS_VALUES.STATUS_UNCHANGED);

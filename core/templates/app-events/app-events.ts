@@ -52,5 +52,6 @@ export interface ObjectFormValidityChangeEventMessage {
 export class ObjectFormValidityChangeEvent
   extends EventWithMessage<ObjectFormValidityChangeEventMessage> {
   static readonly type = 'ObjectFormValidityChangeEvent';
+
   public readonly type = ObjectFormValidityChangeEvent.type;
 }

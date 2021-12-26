@@ -26,14 +26,21 @@ import Headroom from 'headroom.js';
 })
 export class HeadroomDirective implements OnDestroy {
   @Input() tolerance?: Headroom.Tolerance;
+
   @Output() toleranceChange: EventEmitter<Headroom.Tolerance> = (
     new EventEmitter());
+
   @Input() offset?: number;
+
   @Output() offsetChange?: number;
+
   @Input() classes?: { [key: string]: string };
+
   @Output() classesChange: EventEmitter<{ [key: string]: string }> = (
     new EventEmitter());
+
   @Input() scroller?: ElementRef;
+
   headroom: Headroom;
 
   constructor(

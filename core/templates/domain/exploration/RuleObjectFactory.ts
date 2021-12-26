@@ -40,7 +40,9 @@ export interface RuleInputTypes {
 
 export class Rule {
   type: string;
+
   inputs: RuleInputs;
+
   inputTypes: RuleInputTypes;
 
   constructor(type: string, inputs: RuleInputs, inputTypes: RuleInputTypes) {

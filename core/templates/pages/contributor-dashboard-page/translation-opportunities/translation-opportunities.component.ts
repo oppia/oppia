@@ -39,13 +39,18 @@ export class TranslationOpportunitiesComponent {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   OPPIA_AVATAR_IMAGE_URL!: string;
+
   // This constant is defined as null at AppConstants.
   OPPIA_AVATAR_LINK_URL!: string | null;
 
   allOpportunities: {[id: string]: TranslationOpportunity} = {};
+
   userIsLoggedIn = false;
+
   opportunityType = 'translation';
+
   languageSelected = false;
+
   constructor(
     private readonly contextService: ContextService,
     private readonly contributionOpportunitiesService:
