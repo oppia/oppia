@@ -17,7 +17,7 @@
  */
 
 import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 import { SkillUpdateService } from 'domain/skill/skill-update.service';
 import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
 
