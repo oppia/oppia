@@ -25,7 +25,7 @@ from core import utils
 from core.constants import constants
 
 from typing import List, TypeVar, Type, Optional
-from datetime import datetime
+import datetime
 
 T = TypeVar('T', bound='UserQuery')
 
@@ -48,7 +48,7 @@ class UserQuery:
         query_status: str,
         user_ids: List[str],
         sent_email_model_id: Optional[str] = None,
-        created_on: Optional[datetime] = None,
+        created_on: Optional[datetime.datetime] = None,
         deleted: bool = False
     ) -> None:
         """Create user query domain object.
