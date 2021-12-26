@@ -60,10 +60,12 @@ export class WorkedExampleEditorComponent implements OnInit {
   ngOnInit(): void {
     this.questionEditorIsOpen = false;
     this.explanationEditorIsOpen = false;
-    this.container.workedExampleExplanationHtml = (
-      this.workedExample.getQuestion().html);
-    this.container.workedExampleExplanationHtml = (
-      this.workedExample.getExplanation().html);
+    this.container = {
+      workedExampleQuestionHtml:
+      this.workedExample.getQuestion().html,
+      workedExampleExplanationHtml:
+      this.workedExample.getExplanation().html 
+    };
   }
 
   // Remove this function when the schema-based editor
