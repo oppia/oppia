@@ -421,10 +421,7 @@ class SignupHandler(base.BaseHandler):
             user_services.record_agreement_to_terms(self.user_id)
 
         if not user_services.get_username(self.user_id):
-            try:
-                user_services.set_username(self.user_id, username)
-            except utils.ValidationError as e:
-                raise self.InvalidInputException(e)
+            user_services.set_username(self.user_id, username)
 
         # Note that an email is only sent when the user registers for the first
         # time.
