@@ -38,14 +38,22 @@ export class CreateNewSkillModalComponent {
     Rubric.create(constants.SKILL_DIFFICULTIES[0], []),
     Rubric.create(constants.SKILL_DIFFICULTIES[1], ['']),
     Rubric.create(constants.SKILL_DIFFICULTIES[2], [])];
+
   newSkillDescription: string = '';
+
   errorMsg: string = '';
+
   skillDescriptionExists: boolean = true;
+
   conceptCardExplanationEditorIsShown: boolean = false;
+
   bindableDict = {displayedConceptCardExplanation: ''};
+
   HTML_SCHEMA: {type: string} = { type: 'html' };
+
   MAX_CHARS_IN_SKILL_DESCRIPTION = (
     constants.MAX_CHARS_IN_SKILL_DESCRIPTION);
+
   newExplanationObject = null;
 
   constructor(
@@ -96,6 +104,7 @@ export class CreateNewSkillModalComponent {
     this.skillDescriptionExists = skillDescriptionExists;
     this.setErrorMessageIfNeeded();
   }
+
   updateSkillDescriptionAndCheckIfExists(): void {
     this.resetErrorMsg();
 

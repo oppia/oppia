@@ -59,14 +59,18 @@ interface FeatureFlagsCacheItem {
 })
 export class PlatformFeatureService {
   private static SESSION_STORAGE_KEY = 'SAVED_FEATURE_FLAGS';
+
   // 12 hours.
   private static SESSION_STORAGE_CACHE_TTL_MSECS = 12 * 60 * 60 * 1000;
 
   // The following attributes are made static to avoid potential inconsistencies
   // caused by multi-instantiation of the service.
   static featureStatusSummary: FeatureStatusSummary;
+
   static initializationPromise: Promise<void>;
+
   static _isInitializedWithError = false;
+
   static _isSkipped = false;
 
   constructor(

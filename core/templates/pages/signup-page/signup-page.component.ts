@@ -36,19 +36,33 @@ import { SignupPageBackendApiService } from './services/signup-page-backend-api.
 })
 export class SignupPageComponent {
   MAX_USERNAME_LENGTH = AppConstants.MAX_USERNAME_LENGTH;
+
   warningI18nCode = '';
+
   siteName = AppConstants.SITE_NAME;
+
   submissionInProcess = false;
+
   usernameCheckIsInProgress = false;
+
   showEmailSignupLink = false;
+
   emailSignupLink = AppConstants.BULK_EMAIL_SERVICE_SIGNUP_URL;
+
   username: string;
+
   hasEverRegistered: boolean;
+
   hasAgreedToLatestTerms: boolean;
+
   showEmailPreferencesForm: boolean;
+
   hasUsername: boolean;
+
   blurredAtLeastOnce = false;
+
   canReceiveEmailUpdates: boolean;
+
   emailPreferencesWarningText: string;
 
   constructor(

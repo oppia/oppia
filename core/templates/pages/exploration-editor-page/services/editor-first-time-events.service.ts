@@ -28,10 +28,13 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 })
 export class EditorFirstTimeEventsService {
   constructor(private siteAnalyticsService: SiteAnalyticsService) {}
+
     // The other functions cannot be called until 'initRegisterEvents'
     // is called, 'initRegisterEvents' initializes 'explorationId'.
     explorationId: string = '';
+
     shouldRegisterEvents: boolean = false;
+
     alreadyRegisteredEvents = {
       EditorFirstEntryEvent: false,
       FirstOpenContentBoxEvent: false,

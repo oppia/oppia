@@ -35,6 +35,7 @@ import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 class MockI18nLanguageCodeService {
   codeChangeEventEmitter = new EventEmitter<string>();
+
   getCurrentI18nLanguageCode() {
     return 'en';
   }

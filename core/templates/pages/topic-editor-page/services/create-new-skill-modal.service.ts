@@ -32,6 +32,7 @@ import { ImageLocalStorageService } from 'services/image-local-storage.service';
 })
 export class CreateNewSkillModalService {
   skillCreationInProgress: boolean = false;
+
   CREATE_NEW_SKILL_URL_TEMPLATE: string = '/skill_editor/<skill_id>';
 
   constructor(

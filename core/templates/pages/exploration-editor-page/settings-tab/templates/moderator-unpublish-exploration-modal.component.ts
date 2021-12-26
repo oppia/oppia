@@ -29,7 +29,9 @@ export class ModeratorUnpublishExplorationModalComponent
   @Input() draftEmailBody: string;
 
   EMAIL_BODY_SCHEMA: object;
+
   willEmailBeSent: boolean;
+
   emailBody: string;
 
   constructor(

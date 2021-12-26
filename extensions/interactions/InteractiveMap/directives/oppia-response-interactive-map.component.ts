@@ -37,14 +37,20 @@ export class ResponseInteractiveMapComponent implements OnInit {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() answer!: string;
+
   mapOptions!: MapOptions;
+
   mapMarkers!: Marker;
+
   private _attribution = '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+
   private _optionsUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+
   optionsSpec = {
     layers: [{ url: this._optionsUrl, attribution: this._attribution }],
     zoom: 0
   };
+
   constructor(
     private htmlEscaperService: HtmlEscaperService,
     private urlInterpolationService: UrlInterpolationService

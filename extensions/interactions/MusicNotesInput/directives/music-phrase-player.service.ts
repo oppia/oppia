@@ -30,7 +30,9 @@ export interface Note {
 })
 export class MusicPhrasePlayerService {
   _MIDI_CHANNEL: number = 0;
+
   _MIDI_VELOCITY: number = 127;
+
   _SECS_TO_MILLISECS: number = 1000.0;
 
   _playNote(

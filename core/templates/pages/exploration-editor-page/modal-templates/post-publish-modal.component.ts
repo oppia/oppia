@@ -33,10 +33,15 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
 export class PostPublishModalComponent
   extends ConfirmOrCancelModal implements OnInit {
   number = '1';
+
   congratsImgUrl: string;
+
   explorationLinkCopied: boolean;
+
   explorationLink: string;
+
   explorationId: string;
+
   constructor(
     private ngbActiveModal: NgbActiveModal,
     private urlInterpolationService: UrlInterpolationService,
@@ -45,6 +50,7 @@ export class PostPublishModalComponent
   ) {
     super(ngbActiveModal);
   }
+
   ngOnInit(): void {
     this.congratsImgUrl = this.urlInterpolationService.getStaticImageUrl(
       '/general/congrats.svg');
@@ -55,9 +61,11 @@ export class PostPublishModalComponent
       this.windowRef.nativeWindow.location.host +
        '/explore/' + this.explorationId;
   }
+
   cancel(): void {
     this.ngbActiveModal.dismiss();
   }
+
   selectText(event: MouseEvent): void {
     let codeDiv = event.currentTarget;
     let range = document.createRange();

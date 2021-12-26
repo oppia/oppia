@@ -28,6 +28,7 @@ import { AppConstants } from 'app.constants';
 })
 export class MathInteractionsService {
   private warningText = '';
+
   private mathFunctionNames = AppConstants.MATH_FUNCTION_NAMES;
 
   private cleanErrorMessage(

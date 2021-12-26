@@ -30,6 +30,7 @@ interface LearnerViewRatingBackendResponse {
 })
 export class LearnerViewRatingBackendApiService {
   explorationId: string;
+
   ratingsUrl: string;
 
   constructor(

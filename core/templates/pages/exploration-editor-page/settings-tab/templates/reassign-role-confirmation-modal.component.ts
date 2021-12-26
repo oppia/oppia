@@ -28,7 +28,9 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
 export class ReassignRoleConfirmationModalComponent
   extends ConfirmOrCancelModal {
   @Input() username!: string;
+
   @Input() newRole!: string;
+
   @Input() oldRole!: string;
 
   constructor(

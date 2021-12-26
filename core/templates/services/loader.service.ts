@@ -28,6 +28,7 @@ export class LoaderService {
   // created by our hybrid app (one for Angular, the other for AngularJS) can
   // refer to the same objects.
   static loadingMessageChangedEventEmitter = new EventEmitter<string>();
+
   get onLoadingMessageChange(): EventEmitter<string> {
     // TODO(#9154): Change LoaderService to "this".
     return LoaderService.loadingMessageChangedEventEmitter;

@@ -48,16 +48,20 @@ export class AlertsService {
   // created by our hybrid app (one for Angular, the other for AngularJS) can
   // refer to the same objects.
   private static warnings: Warning[] = [];
+
   get warnings(): Warning[] {
     return AlertsService.warnings;
   }
+
   private static messages: Message[] = [];
+
   get messages(): Message[] {
     return AlertsService.messages;
   }
 
   // This is to prevent infinite loops.
   MAX_TOTAL_WARNINGS: number = 10;
+
   MAX_TOTAL_MESSAGES: number = 10;
 
   constructor(private log: LoggerService) {

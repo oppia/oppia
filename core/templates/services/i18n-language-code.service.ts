@@ -34,7 +34,9 @@ export class I18nLanguageCodeService {
    * complete.
    */
   static languageCodeChangeEventEmitter = new EventEmitter<string> ();
+
   static languageCode: string = AppConstants.DEFAULT_LANGUAGE_CODE;
+
   static rtlLanguageCodes: readonly string[] = AppConstants.RTL_LANGUAGE_CODES;
 
   private _preferredLanguageCodesLoadedEventEmitter =

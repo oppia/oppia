@@ -47,9 +47,13 @@ export class SetOfAlgebraicIdentifierEditorComponent implements OnInit {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() modalId!: symbol;
+
   @Input() value!: string[];
+
   SCHEMA!: SetOfAlgebraicIdentifierEditorSchema;
+
   @Output() valueChanged = new EventEmitter();
+
   PLACEHOLDER_INFO = (
     'NOTE: This rule will consider each side of the equation ' +
     'independently and won\'t allow reordering of terms ' +

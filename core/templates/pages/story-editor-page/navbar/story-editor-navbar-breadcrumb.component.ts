@@ -39,9 +39,13 @@ export class StoryEditorNavbarBreadcrumbComponent {
      private windowRef: WindowRef,
      private urlInterpolationService: UrlInterpolationService
   ) {}
+
    topicName: string;
+
    story: Story;
+
    directiveSubscriptions = new Subscription();
+
    TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topicId>';
 
    returnToTopicEditorPage(): void {

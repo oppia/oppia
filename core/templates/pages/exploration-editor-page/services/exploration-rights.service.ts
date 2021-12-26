@@ -31,12 +31,19 @@ import { ExplorationRightsBackendData } from './exploration-rights-backend-api.s
 })
 export class ExplorationRightsService {
   ownerNames: string[];
+
   editorNames: string[];
+
   voiceArtistNames: string[];
+
   viewerNames: string[];
+
   private _status: string;
+
   private _clonedFrom: string;
+
   private _isCommunityOwned: boolean;
+
   private _viewableIfPrivate: boolean;
 
   constructor(

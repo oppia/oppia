@@ -79,15 +79,20 @@ interface StateLink {
 })
 export class ExplorationDiffService {
   STATE_PROPERTY_ADDED = 'added';
+
   STATE_PROPERTY_DELETED = 'deleted';
+
   STATE_PROPERTY_CHANGED = 'changed';
+
   STATE_PROPERTY_UNCHANGED = 'unchanged';
+
   _maxId = 0;
 
   // Functions to assign ids to states.
   _resetMaxId(): void {
     this._maxId = 0;
   }
+
   _generateNewId(): number {
     this._maxId++;
     return this._maxId;

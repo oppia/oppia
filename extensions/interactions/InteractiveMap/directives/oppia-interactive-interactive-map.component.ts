@@ -39,26 +39,40 @@ import { downgradeComponent } from '@angular/upgrade/static';
 })
 export class InteractiveInteractiveMapComponent implements OnInit, OnDestroy {
   @Input() lastAnswer;
+
   @Input() latitudeWithValue: string;
+
   @Input() longitudeWithValue: string;
+
   @Input() zoomWithValue: string;
+
   private _attribution = '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+
   private _optionsUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+
   optionsSpec = {
     layers: [{ url: this._optionsUrl, attribution: this._attribution }],
     zoom: 0
   };
+
   directiveSubscriptions = new Subscription();
+
   coords: [number, number];
+
   zoomLevel: number;
+
   overlayStyle: {
     'background-color'?: string;
     opacity?: number;
     'z-index'?: number;
   };
+
   zoom: number;
+
   interactionIsActive: boolean;
+
   mapMarkers;
+
   mapOptions: {center: LatLng; layers: TileLayer[]; zoom: number};
 
   constructor(

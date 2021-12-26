@@ -29,7 +29,9 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 })
 export class EditabilityService {
   static isEditable: boolean = false;
+
   static isTranslatable: boolean = false;
+
   static inTutorialMode: boolean = false;
 
   /**

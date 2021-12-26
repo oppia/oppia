@@ -31,6 +31,7 @@ import { HtmlEscaperService } from 'services/html-escaper.service';
 })
 export class ResponseAlgebraicExpressionInputComponent implements OnInit {
   @Input() answer: string = '';
+
   escapedAnswer: string = '';
 
   constructor(private htmlEscaperService: HtmlEscaperService) {}

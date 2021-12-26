@@ -40,19 +40,26 @@ export class BeamJobsTabComponent implements OnInit, OnDestroy {
   static readonly BEAM_JOB_RUNS_REFRESH_INTERVAL_MSECS = 15000;
 
   public dataFailedToLoad = false;
+
   readonly jobRunTableColumns: readonly string[] = [
     'run_status', 'job_name', 'started_on', 'updated_on', 'action'];
 
   jobNameControl = new FormControl('');
 
   dataIsReady = false;
+
   beamJobs: BeamJob[] = null;
+
   selectedJob: BeamJob = null;
 
   jobNames = new BehaviorSubject<string[]>([]);
+
   beamJobRuns = new BehaviorSubject<BeamJobRun[]>([]);
+
   filteredJobNames: Observable<string[]>;
+
   filteredBeamJobRuns: Observable<BeamJobRun[]>;
+
   beamJobRunsRefreshIntervalSubscription: Subscription;
 
   constructor(

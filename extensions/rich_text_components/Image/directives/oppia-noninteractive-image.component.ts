@@ -57,18 +57,31 @@ interface Dimension {
 })
 export class NoninteractiveImage implements OnInit, OnChanges {
   @Input() filepathWithValue: string;
+
   @Input() altWithValue: string = '';
+
   @Input() captionWithValue: string = '';
+
   filepath: string;
+
   imageUrl: SafeResourceUrl | string = '';
+
   imageAltText: string = '';
+
   imageCaption: string = '';
+
   loadingIndicatorUrl;
+
   isLoadingIndicatorShown: boolean = false;
+
   isTryAgainShown: boolean = false;
+
   dimensions: ImageDimensions;
+
   imageContainerStyle: Dimension;
+
   loadingIndicatorStyle: Dimension;
+
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
     private contextService: ContextService,

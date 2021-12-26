@@ -43,9 +43,13 @@ export class AudioTranslationLanguageService {
     private languageUtilService: LanguageUtilService) {}
 
   _currentAudioLanguageCode: string | null = null;
+
   _allAudioLanguageCodesInExploration: string[] = [];
+
   _explorationLanguageCode: string | null = null;
+
   _automaticTextToSpeechEnabled: boolean = false;
+
   _languagesInExploration: ExplorationLanguageInfo[] = [];
 
   attemptToSetAudioLanguageToExplorationLanguage(): void {

@@ -34,6 +34,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 })
 export class LoginPageComponent implements OnInit {
   email = new FormControl('', [Validators.email]);
+
   formGroup = new FormGroup({email: this.email});
 
   constructor(

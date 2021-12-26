@@ -62,7 +62,9 @@ interface ImageContainerStyle {
 })
 export class NoninteractiveMath implements OnInit, OnChanges {
   @Input() mathContentWithValue: string;
+
   imageContainerStyle: ImageContainerStyle;
+
   imageUrl: string | ArrayBuffer | SafeResourceUrl;
 
   constructor(

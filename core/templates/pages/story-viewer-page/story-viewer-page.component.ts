@@ -44,20 +44,35 @@ interface IconParametersArray {
 })
 export class StoryViewerPageComponent implements OnInit {
   storyPlaythroughObject: StoryPlaythrough;
+
   storyId: string;
+
   storyIsLoaded: boolean;
+
   isLoggedIn: boolean;
+
   topicUrlFragment: string;
+
   classroomUrlFragment: string;
+
   storyUrlFragment: string;
+
   storyTitle: string;
+
   storyDescription: string;
+
   pathIconParameters: IconParametersArray[];
+
   topicName: string;
+
   thumbnailFilename: string;
+
   thumbnailBgColor: string;
+
   storyNodes: ReadOnlyStoryNode[];
+
   iconUrl: string;
+
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private assetsBackendApiService: AssetsBackendApiService,

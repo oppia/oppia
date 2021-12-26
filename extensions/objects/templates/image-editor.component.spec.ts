@@ -324,12 +324,15 @@ describe('ImageEditor', () => {
 
   class MockReaderObject {
     onload = null;
+
     result = null;
+
     constructor() {
       this.onload = () => {
         return 'Fake onload executed';
       };
     }
+
     readAsDataURL(file) {
       this.onload();
       return 'The file is loaded';
@@ -338,15 +341,19 @@ describe('ImageEditor', () => {
 
   class MockImageObject {
     source = null;
+
     onload = null;
+
     constructor() {
       this.onload = () => {
         return 'Fake onload executed';
       };
     }
+
     set src(url) {
       this.onload();
     }
+
     addEventListener(txt, func, bool) {
       func();
     }

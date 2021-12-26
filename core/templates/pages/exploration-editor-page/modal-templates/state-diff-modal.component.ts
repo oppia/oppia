@@ -44,14 +44,20 @@ interface mergeviewOptions {
 export class StateDiffModalComponent
   extends ConfirmOrCancelModal implements OnInit {
     newState: State | null;
+
     oldState: State | null;
+
     newStateName: string;
+
     oldStateName: string;
+
     headers: headersAndYamlStrs;
+
     yamlStrs: headersAndYamlStrs = {
       leftPane: '',
       rightPane: '',
     };
+
     CODEMIRROR_MERGEVIEW_OPTIONS: mergeviewOptions = {
       lineNumbers: true,
       readOnly: true,

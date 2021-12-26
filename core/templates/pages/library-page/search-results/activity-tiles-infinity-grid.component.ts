@@ -29,10 +29,15 @@ import { SearchService } from 'services/search.service';
 })
 export class ActivityTilesInfinityGridComponent {
   loadingMessage: string = '';
+
   endOfPageIsReached: boolean = false;
+
   searchResultsAreLoading: boolean;
+
   allActivitiesInOrder;
+
   directiveSubscriptions = new Subscription();
+
   libraryWindowIsNarrow: boolean;
 
   constructor(

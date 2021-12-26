@@ -45,6 +45,7 @@ export class VersionTreeService {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   private _snapshots!: ExplorationSnapshots;
+
   private _treeParents!: Record<number, number>;
 
   init(snapshotsData: ExplorationSnapshot[]): void {

@@ -35,7 +35,9 @@ interface StateClassifierMapping {
 })
 export class StateClassifierMappingService {
   _explorationId!: string;
+
   _explorationVersion!: number;
+
   stateClassifierMapping!: StateClassifierMapping;
 
   constructor(

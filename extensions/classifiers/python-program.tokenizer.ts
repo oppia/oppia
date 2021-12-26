@@ -39,6 +39,7 @@ import { LoggerService } from 'services/contextual/logger.service';
 export class PythonProgramTokenizer {
   private PythonProgramTokenType = (
     ClassifiersExtensionConstants.PythonProgramTokenType);
+
   constructor(private loggerService: LoggerService) {}
 
   private groupOfRegEx(...params: (string | string[])[]): string {
@@ -54,35 +55,54 @@ export class PythonProgramTokenizer {
   }
 
   private whitespace = '[ \\f\\t]*';
+
   private comment = '#[^\\r\\n]*';
+
   private ignore = this.whitespace + this.repeatedRegEx(
     '\\\\\\r?\\n' + this.whitespace) + this.regExMayBePresent(this.comment);
+
   private name = '[a-zA-Z_]\\w*';
 
   private hexnumber = '0[xX][\\da-fA-F]+[lL]?';
+
   private octnumber = '(0[oO][0-7]+)|(0[0-7]*)[lL]?';
+
   private binnumber = '0[bB][01]+[lL]?';
+
   private decnumber = '[1-9]\\d*[lL]?';
+
   private intnumber = this.groupOfRegEx(
     this.hexnumber, this.binnumber, this.octnumber, this.decnumber);
+
   private exponent = '[eE][-+]?\\d+';
+
   private pointfloat = this.groupOfRegEx(
     '\\d+\\.\\d*', '\\\\d+\\\\.\\\\d*') + this.regExMayBePresent(this.exponent);
+
   private expfloat = '\\d+' + this.exponent;
+
   private floatnumber = this.groupOfRegEx(this.pointfloat, this.expfloat);
+
   private imagnumber = this.groupOfRegEx(
     '\\d+[jJ]', this.floatnumber + '[jJ]');
+
   private num = this.groupOfRegEx(
     this.imagnumber, this.floatnumber, this.intnumber);
+
   // Tail end of ' string.
   private single = '[^\'\\\\]*(?:\\\\.[^\'\\\\]*)*\'';
+
   // Tail end of " string.
   private doubleQuote = '[^"\\\\]*(?:\\\\.[^"\\\\]*)*"';
+
   // Tail end of ''' string.
   private single3 = "[^'\\\\]*(?:(?:\\\\.|'(?!''))[^'\\\\]*)*'''";
+
   // Tail end of """ string.
   private double3 = '[^"\\\\]*(?:(?:\\\\.|"(?!""))[^"\\\\]*)*"""';
+
   private triple = this.groupOfRegEx("[uUbB]?[rR]?'''", '[uUbB]?[rR]?"""');
+
   // Single-line ' or " string.
   private str = this.groupOfRegEx(
     "[uUbB]?[rR]?'[^\\n'\\\\]*(?:\\\\.[^\\n'\\\\]*)*'",
@@ -95,11 +115,14 @@ export class PythonProgramTokenizer {
     '\\*\\*=?', '>>=?', '<<=?', '<>', '!=', '//=?', '[+\\-*/%&|^=<>]=?', '~');
 
   private bracket = '[(){}]';
+
   private special = this.groupOfRegEx('\\r?\\n', '[:;.,\\`@]');
+
   private funny = this.groupOfRegEx(this.operator, this.bracket, this.special);
 
   private plaintoken = this.groupOfRegEx(
     this.num, this.funny, this.str, this.name);
+
   private token = this.ignore + this.plaintoken;
 
   // First (or only) line of ' or " string.
@@ -108,15 +131,20 @@ export class PythonProgramTokenizer {
     this.groupOfRegEx("'", '\\\\\\r?\\n'),
     '[uUbB]?[rR]?"[^\\n"\\\\]*(?:\\\\.[^\\n"\\\\]*)*' +
     this.groupOfRegEx('"', '\\\\\\r?\\n'));
+
   private pseudoextras = this.groupOfRegEx(
     '\\\\\\r?\\n|\\Z', this.comment, this.triple);
+
   private pseudotoken = this.whitespace + this.groupOfRegEx(
     this.pseudoextras, this.num, this.funny, this.contStr, this.name);
 
   // Regular Expression object.
   private tokenprog = new RegExp(this.token);
+
   private pseudoprog = new RegExp(this.pseudotoken);
+
   private single3prog = new RegExp(this.single3);
+
   private double3prog = new RegExp(this.double3);
 
   private endprogs: Record<string, RegExp | null> = {

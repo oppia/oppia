@@ -37,10 +37,15 @@ interface IconsArray {
 })
 export class StoryPreviewTabComponent implements OnInit, OnDestroy {
   story: Story;
+
   storyId: string;
+
   storyContents: StoryContents;
+
   nodes: StoryNode[];
+
   pathIconParameters: IconsArray[];
+
   constructor(
     private storyEditorStateService: StoryEditorStateService,
     private assetsBackendApiService: AssetsBackendApiService,
@@ -48,6 +53,7 @@ export class StoryPreviewTabComponent implements OnInit, OnDestroy {
   ) {}
 
   directiveSubscriptions = new Subscription();
+
   initEditor(): void {
     this.story = this.storyEditorStateService.getStory();
     this.storyId = this.story.getId();

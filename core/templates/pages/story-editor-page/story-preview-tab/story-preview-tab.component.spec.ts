@@ -28,9 +28,13 @@ import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 class MockStoryEditorNavigationService {
   activeTab: 'story_preview';
+
   getActiveTab: () => string;
+
   getChapterId: () => 'node_1';
+
   getChapterIndex: () => null;
+
   navigateToStoryEditor: () => {
     return;
   };

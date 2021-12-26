@@ -36,19 +36,33 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 })
 export class PracticeTabComponent implements OnInit {
   @Input() topicName: string;
+
   @Input() startButtonIsDisabled: boolean = false;
+
   @Input() subtopicsList: Subtopic[];
+
   @Input() displayArea: string = 'topicViewer';
+
   @Input() topicUrlFragment: string = '';
+
   @Input() classroomUrlFragment: string = '';
+
   @Input() subtopicMastery: Record<string, number> = {};
+
   selectedSubtopics: Subtopic[] = [];
+
   availableSubtopics: Subtopic[] = [];
+
   selectedSubtopicIndices: boolean[] = [];
+
   questionsAreAvailable: boolean = false;
+
   subtopicIds: number[] = [];
+
   clientWidth: number;
+
   subtopicMasteryArray: number[] = [];
+
   questionsStatusCallIsComplete: boolean = true;
 
   constructor(

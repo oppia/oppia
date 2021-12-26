@@ -87,6 +87,7 @@ class MockNavigationService {
   openSubmenu(evt: KeyboardEvent, menuName: string): void {}
 
   ACTION_OPEN: string = 'open';
+
   ACTION_CLOSE: string = 'close';
 }
 

@@ -37,20 +37,34 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 })
 export class SupplementalCardComponent implements OnInit, OnDestroy {
   @Output() clickContinueButton: EventEmitter<void> = new EventEmitter();
+
   @Input() isLearnAgainButton: boolean;
+
   @Input() displayedCard: StateCard;
+
   @ViewChild('helpCard') helpCard: ElementRef;
+
   @ViewChild('interactionContainer') interactionContainer: ElementRef;
+
   currentDisplayedCard: StateCard;
+
   directiveSubscriptions = new Subscription();
+
   lastAnswer = null;
+
   maxHelpCardHeightSeen: number = 0;
+
   helpCardHtml: string;
+
   helpCardHasContinueButton: boolean = false;
+
   OPPIA_AVATAR_IMAGE_URL: string;
+
   OPPIA_AVATAR_LINK_URL: string = AppConstants.OPPIA_AVATAR_LINK_URL;
+
   CONTINUE_BUTTON_FOCUS_LABEL: string = (
     ExplorationPlayerConstants.CONTINUE_BUTTON_FOCUS_LABEL);
+
   helpCardBottomPosition: number = 0;
 
   constructor(

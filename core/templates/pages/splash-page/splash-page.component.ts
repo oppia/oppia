@@ -41,11 +41,17 @@ export interface Testimonial {
 })
 export class SplashPageComponent implements OnInit {
   isWindowNarrow: boolean = false;
+
   classroomUrlFragment: string;
+
   classroomUrl: string;
+
   displayedTestimonialId: number;
+
   testimonialCount: number;
+
   testimonials = [];
+
   userIsLoggedIn: boolean = null;
 
   constructor(
@@ -75,6 +81,7 @@ export class SplashPageComponent implements OnInit {
     this.siteAnalyticsService.registerClickStartTeachingButtonEvent();
     this.windowRef.nativeWindow.location.href = ('/creator-guidelines');
   }
+
   // TODO(#11657): Extract the testimonials code into a separate component.
   // The 2 functions below are to cycle between values:
   // 0 to (testimonialCount - 1) for displayedTestimonialId.

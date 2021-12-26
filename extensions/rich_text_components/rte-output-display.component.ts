@@ -31,27 +31,48 @@ type PortalTree = (TemplatePortal<unknown> | PortalTree) [];
 export class RteOutputDisplayComponent implements AfterViewInit {
   // Native HTML elements.
   @ViewChild('p') pTagPortal: TemplateRef<unknown>;
+
   @ViewChild('span') spanTagPortal: TemplateRef<unknown>;
+
   @ViewChild('ol') olTagPortal: TemplateRef<unknown>;
+
   @ViewChild('li') liTagPortal: TemplateRef<unknown>;
+
   @ViewChild('ul') ulTagPortal: TemplateRef<unknown>;
+
   @ViewChild('pre') preTagPortal: TemplateRef<unknown>;
+
   @ViewChild('strong') strongTagPortal: TemplateRef<unknown>;
+
   @ViewChild('blockquote') blockquoteTagPortal: TemplateRef<unknown>;
+
   @ViewChild('em') emTagPortal: TemplateRef<unknown>;
+
   @ViewChild('text') textTagPortal: TemplateRef<unknown>;
+
   // Oppia Non interactive.
   @ViewChild('collapsible') collapsibleTagPortal: TemplateRef<unknown>;
+
   @ViewChild('image') imageTagPortal: TemplateRef<unknown>;
+
   @ViewChild('link') linkTagPortal: TemplateRef<unknown>;
+
   @ViewChild('math') mathTagPortal: TemplateRef<unknown>;
+
   @ViewChild('skillreview') skillreviewTagPortal: TemplateRef<unknown>;
+
   @ViewChild('svgdiagram') svgdiagramTagPortal: TemplateRef<unknown>;
+
   @ViewChild('tabs') tabsTagPortal: TemplateRef<unknown>;
+
   @ViewChild('video') videoTagPortal: TemplateRef<unknown>;
+
   @Input() rteString: string;
+
   node: OppiaRteNode | string = '';
+
   show = false;
+
   portalTree: PortalTree = [];
 
   constructor(
@@ -199,7 +220,9 @@ export class OppiaRteTextNodeDirective implements AfterViewInit {
   constructor(
     private elementRef: ElementRef
   ) { }
+
   @Input() oppiaRteTextNode: string = '';
+
   ngAfterViewInit(): void {
     // Creating a text node makes it safe from any XSS attacks.
     const node = document.createTextNode(this.oppiaRteTextNode);

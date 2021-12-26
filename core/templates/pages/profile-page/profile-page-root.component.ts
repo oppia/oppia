@@ -29,6 +29,7 @@ import { PageHeadService } from 'services/page-head.service';
 })
 export class ProfilePageRootComponent {
   pageIsShown: boolean = false;
+
   errorPageIsShown: boolean = false;
 
   constructor(

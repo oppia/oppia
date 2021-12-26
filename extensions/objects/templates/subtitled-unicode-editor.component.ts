@@ -28,10 +28,13 @@ export class SubtitledUnicodeEditorComponent {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() value!: { _unicode: string };
+
   @Output() valueChanged = new EventEmitter();
+
   schema: { type: string } ={
     type: 'unicode',
   };
+
   constructor(private changeDetectorRef: ChangeDetectorRef) { }
 
   updateValue(val: string): void {

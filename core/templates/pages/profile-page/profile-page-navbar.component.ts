@@ -30,7 +30,9 @@ export class ProfilePageNavbarComponent implements OnInit {
   constructor(
     private urlService: UrlService
   ) {}
+
   username: string = '';
+
   ngOnInit(): void {
     this.username = this.urlService.getUsernameFromProfileUrl();
   }

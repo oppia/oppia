@@ -33,25 +33,44 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
  })
 export class ProgressTabComponent implements OnInit {
   @Output() setActiveSection: EventEmitter<string> = new EventEmitter();
+
   @Input() completedStoriesList: StorySummary[];
+
   @Input() partiallyLearntTopicsList: LearnerTopicSummary[] = [];
+
   @Input() activeSubsection?: string;
+
   @Input() learntTopicsList: LearnerTopicSummary[] = [];
+
   topicsInSkillProficiency: LearnerTopicSummary[] = [];
+
   emptySkillProficiency: boolean = true;
+
   displaySkills: boolean[];
+
   widthConst: number = 233;
+
   subtopicMastery: Record<string, SubtopicMasterySummaryBackendDict> = {};
+
   topicIdsInSkillProficiency: string[] = [];
+
   goldBadgeImageUrl: string = '';
+
   bronzeBadgeImageUrl: string = '';
+
   silverBadgeImageUrl: string = '';
+
   emptyBadgeImageUrl: string = '';
+
   topicMastery: [number, LearnerTopicSummary][] = [];
+
   width: number;
+
   LEARNER_DASHBOARD_SUBSECTION_I18N_IDS = (
     LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS);
+
   windowIsNarrow: boolean = false;
+
   directiveSubscriptions = new Subscription();
 
   constructor(

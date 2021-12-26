@@ -30,9 +30,11 @@ import { ReadOnlyExplorationBackendApiService } from
 
 class MockRouterService {
   private refreshStatisticsTabEventEmitter: EventEmitter<void>;
+
   get onRefreshStatisticsTab() {
     return this.refreshStatisticsTabEventEmitter;
   }
+
   set refreshStatisticsTabEmitter(val) {
     this.refreshStatisticsTabEventEmitter = val;
   }

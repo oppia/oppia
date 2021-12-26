@@ -34,10 +34,15 @@ import { PlayerTranscriptService } from '../services/player-transcript.service';
 })
 export class DisplayHintModalComponent {
   index: number;
+
   COMPONENT_NAME_HINT: string;
+
   hint: SubtitledHtml;
+
   displayedCard: StateCard;
+
   recordedVoiceovers: RecordedVoiceovers;
+
   hintContentId: string;
 
   constructor(

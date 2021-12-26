@@ -50,8 +50,10 @@ export class ContentTranslationManagerService {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   private explorationLanguageCode!: string;
+
   private onStateCardContentUpdateEmitter: EventEmitter<void> = (
     new EventEmitter());
+
   // The 'originalTranscript' is a copy of the transcript in the exploration
   // language in it's initial state.
   private originalTranscript: StateCard[] = [];

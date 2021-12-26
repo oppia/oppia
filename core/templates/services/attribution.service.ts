@@ -28,8 +28,11 @@ import { ContextService } from 'services/context.service';
 })
 export class AttributionService {
   attributionModalIsShown: boolean = false;
+
   authors: string[] = [];
+
   explorationTitle: string = '';
+
   constructor(
     private applicationRef: ApplicationRef,
     private contextService: ContextService,

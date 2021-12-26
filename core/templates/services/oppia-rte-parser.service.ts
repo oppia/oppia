@@ -38,15 +38,20 @@ const selectorToComponentClassMap = {
 
 export class TextNode {
   portal: undefined | TemplatePortal;
+
   constructor(public value: string) {}
 }
 
 
 export class OppiaRteNode {
   children: (OppiaRteNode | TextNode)[] = [];
+
   parent: OppiaRteNode | null = null;
+
   nodeType: '' | 'component';
+
   portal: TemplatePortal;
+
   constructor(
     public readonly selector: string,
     public attrs: Record<string, string> = {}
@@ -67,7 +72,9 @@ export class OppiaRteNode {
 })
 export class OppiaRteParserService {
   NON_INTERACTIVE_PREFIX = 'oppia-noninteractive-';
+
   domparser = new DOMParser();
+
   private _convertKebabCaseToCamelCase(key: string): string {
     let arr = key.replace(/_/g, '-').split('-');
     let capital = arr.map((item, index) => {

@@ -48,8 +48,10 @@ export class AssetsBackendApiService {
 
   /** List of audio files that have been requested but have not returned. */
   private audioFileDownloadRequests: FileDownloadRequest[] = [];
+
   /** List of image files that have been requested but have not returned. */
   private imageFileDownloadRequests: FileDownloadRequest[] = [];
+
   /** Map from asset filename to asset blob. */
   private assetsCache: Map<string, Blob> = new Map();
 
@@ -71,6 +73,7 @@ export class AssetsBackendApiService {
   static get EMULATOR_MODE(): boolean {
     return AppConstants.EMULATOR_MODE;
   }
+
   static get GCS_RESOURCE_BUCKET_NAME(): string {
     return AppConstants.GCS_RESOURCE_BUCKET_NAME;
   }

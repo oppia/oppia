@@ -35,8 +35,11 @@ import { MultipleChoiceInputRulesService } from './multiple-choice-input-rules.s
 })
 export class InteractiveMultipleChoiceInputComponent implements OnInit {
   @Input() choicesWithValue: string;
+
   @Input() showChoicesInShuffledOrderWithValue: string;
+
   choices;
+
   answer;
 
   constructor(

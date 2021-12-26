@@ -52,16 +52,27 @@ interface MergeModalResult {
 })
 export class SkillsListComponent {
   @Input() skillSummaries: AugmentedSkillSummary[];
+
   @Input() pageNumber: number;
+
   @Input() itemsPerPage: number;
+
   @Input() editableTopicSummaries: CreatorTopicSummary[];
+
   @Input() mergeableSkillSummaries: SkillSummary[];
+
   @Input() untriagedSkillSummaries: SkillSummary[];
+
   @Input() userCanDeleteSkill: boolean;
+
   @Input() userCanCreateSkill: boolean;
+
   @Input() skillsCategorizedByTopics: SkillsCategorizedByTopics;
+
   directiveSubscriptions: Subscription = new Subscription();
+
   selectedIndex: string;
+
   SKILL_HEADINGS: string[] = [
     'index', 'description', 'worked_examples_count',
     'misconception_count', 'status'];

@@ -46,32 +46,57 @@ export class PreferencesPageComponent {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   subjectInterests!: string;
+
   preferredLanguageCodes!: string[];
+
   preferredSiteLanguageCode!: string;
+
   preferredAudioLanguageCode!: string;
+
   profilePictureDataUrl!: string;
+
   AUDIO_LANGUAGE_CHOICES!: AudioLangaugeChoice[];
+
   userBio!: string;
+
   defaultDashboard!: string;
+
   subscriptionList!: SubscriptionSummary[];
+
   TAG_REGEX_STRING!: string;
+
   LANGUAGE_CHOICES!: LanguageIdAndText[];
+
   // The following two properties are set to null when the
   // user is not logged in.
   username!: string | null;
+
   email!: string | null;
+
   SITE_LANGUAGE_CHOICES!: typeof AppConstants.SUPPORTED_SITE_LANGUAGES;
+
   DASHBOARD_TYPE_CREATOR = AppConstants.DASHBOARD_TYPE_CREATOR;
+
   DASHBOARD_TYPE_LEARNER = AppConstants.DASHBOARD_TYPE_LEARNER;
+
   subjectInterestsChangeAtLeastOnce: boolean = false;
+
   exportingData: boolean = false;
+
   hasPageLoaded: boolean = false;
+
   canReceiveEmailUpdates: boolean = false;
+
   canReceiveEditorRoleEmail: boolean = false;
+
   canReceiveSubscriptionEmail: boolean = false;
+
   canReceiveFeedbackMessageEmail: boolean = false;
+
   showEmailSignupLink: boolean = false;
+
   emailSignupLink: string = AppConstants.BULK_EMAIL_SERVICE_SIGNUP_URL;
+
   PAGES_REGISTERED_WITH_FRONTEND = (
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
 

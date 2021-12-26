@@ -42,9 +42,13 @@ export interface DraftAutoSaveResponse {
 })
 export class ExplorationDataService {
   draftChangeListId: number | null = null;
+
   explorationDraftAutosaveUrl: string;
+
   explorationId: string;
+
   resolvedAnswersUrlPrefix: string;
+
   data: ExplorationBackendDict;
 
   constructor(
@@ -189,6 +193,7 @@ export class ExplorationDataService {
       return response.exploration;
     });
   }
+
   /**
    * Saves the exploration to the backend, and, on a success callback,
    * updates the local copy of the exploration data.

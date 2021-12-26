@@ -38,12 +38,19 @@ export class DisplaySolutionModalComponent {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   COMPONENT_NAME_SOLUTION!: string;
+
   solution!: Solution;
+
   solutionContentId!: string;
+
   displayedCard!: StateCard;
+
   recordedVoiceovers!: RecordedVoiceovers;
+
   interaction!: Interaction;
+
   shortAnswerHtml!: ShortAnswerResponse;
+
   solutionExplanationHtml!: string;
 
   constructor(

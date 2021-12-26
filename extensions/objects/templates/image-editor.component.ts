@@ -94,11 +94,17 @@ interface GifshotCallbackObject {
 })
 export class ImageEditorComponent implements OnInit, OnChanges {
   @Input() modalId;
+
   @Input() value;
+
   @Output() valueChanged = new EventEmitter();
+
   @Output() validityChange = new EventEmitter<Record<'empty', boolean>>();
+
   MODE_EMPTY = 1;
+
   MODE_UPLOADED = 2;
+
   MODE_SAVED = 3;
 
   // We only use PNG format since that is what canvas can export to in
@@ -109,44 +115,72 @@ export class ImageEditorComponent implements OnInit, OnChanges {
   };
 
   MIME_TYPE_GIF = 'data:image/gif';
+
   CROP_AREA_BORDER_IN_PX = 3;
 
   OUTPUT_IMAGE_MAX_WIDTH_PX = 490;
 
   CROP_BORDER_MARGIN_PX = 10;
+
   CROP_AREA_MIN_WIDTH_PX = 40;
+
   CROP_AREA_MIN_HEIGHT_PX = 40;
 
   // Categorize mouse positions with respect to the crop area.
   MOUSE_TOP_LEFT = 1;
+
   MOUSE_TOP = 2;
+
   MOUSE_TOP_RIGHT = 3;
+
   MOUSE_RIGHT = 4;
+
   MOUSE_BOTTOM_RIGHT = 5;
+
   MOUSE_BOTTOM = 6;
+
   MOUSE_BOTTOM_LEFT = 7;
+
   MOUSE_LEFT = 8;
+
   MOUSE_INSIDE = 9;
 
   // Define the cursors for the crop area.
   CROP_CURSORS: Record<string, string> = {};
+
   imageContainerStyle = {};
+
   allowedImageFormats = AppConstants.ALLOWED_IMAGE_FORMATS;
+
   HUNDRED_KB_IN_BYTES: number = 100 * 1024;
+
   imageResizeRatio: number;
+
   cropArea: { x1: number; y1: number; x2: number; y2: number };
+
   mousePositionWithinCropArea: null | number;
+
   mouseLastKnownCoordinates: { x: number; y: number };
+
   lastMouseDownEventCoordinates: { x: number; y: number };
+
   userIsDraggingCropArea: boolean = false;
+
   cropAreaResizeDirection: null | number;
+
   userIsResizingCropArea: boolean = false;
+
   invalidTagsAndAttributes: { tags: string[]; attrs: string[] };
+
   processedImageIsTooLarge: boolean;
+
   entityId: string;
+
   entityType: string;
+
   // Check the note before imports and after fileoverview.
   private imgData;
+
   // Check the note before imports and after fileoverview.
   private _data: FilepathData;
 
@@ -154,11 +188,14 @@ export class ImageEditorComponent implements OnInit, OnChanges {
   get data(): FilepathData {
     return this._data;
   }
+
   set data(value: FilepathData) {
     this._data = value;
     this.validate(this._data);
   }
+
   cropAreaXWhenLastDown: number;
+
   cropAreaYWhenLastDown: number;
 
   constructor(

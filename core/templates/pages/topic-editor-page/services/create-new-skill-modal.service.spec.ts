@@ -56,7 +56,9 @@ describe('Create New Skill Modal Service', () => {
 
   class MockSkillCreationBackendApiService {
     throwError: boolean = false;
+
     message: string;
+
     createSkillAsync(
         description: string,
         rubrics,

@@ -49,21 +49,37 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 })
 export class TutorCardComponent {
   @Input() displayedCard: StateCard;
+
   @Input() startCardChangeAnimation: boolean;
+
   @Input() avatarImageIsShown: boolean;
+
   directiveSubscriptions = new Subscription();
+
   private _editorPreviewMode: boolean;
+
   arePreviousResponsesShown: boolean = false;
+
   lastAnswer: string;
+
   conceptCardIsBeingShown: boolean;
+
   interactionIsActive: boolean;
+
   waitingForOppiaFeedback: boolean = false;
+
   interactionInstructions: string;
+
   contentAudioTranslations: BindableVoiceovers;
+
   isIframed: boolean;
+
   getCanAskLearnerForAnswerInfo: () => boolean;
+
   OPPIA_AVATAR_IMAGE_URL: string;
+
   OPPIA_AVATAR_LINK_URL: string;
+
   profilePicture: string;
 
   constructor(

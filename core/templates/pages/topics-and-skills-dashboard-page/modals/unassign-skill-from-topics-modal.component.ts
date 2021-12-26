@@ -42,9 +42,13 @@ export class UnassignSkillFromTopicsModalComponent
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   skillId!: string;
+
   topicsAssignments!: TopicAssignments;
+
   topicsAssignmentsAreFetched: boolean = false;
+
   selectedTopicNames: string[] = [];
+
   selectedTopics: TopicAssignmentsSummary[] = [];
 
   constructor(
@@ -83,6 +87,7 @@ export class UnassignSkillFromTopicsModalComponent
       this.selectedTopicNames.push(topicId);
     }
   }
+
   close(): void {
     for (let index in this.selectedTopicNames) {
       this.selectedTopics.push(

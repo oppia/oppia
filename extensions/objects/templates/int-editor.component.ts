@@ -38,8 +38,11 @@ export class IntEditorComponent implements OnInit {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() modalId!: symbol;
+
   @Input() value!: number;
+
   @Input() valueChanged: EventEmitter<number> = new EventEmitter<number>();
+
   SCHEMA: IntValidatorSchema = {
     type: 'int',
     validators: [{

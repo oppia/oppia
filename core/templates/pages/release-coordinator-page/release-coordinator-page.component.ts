@@ -41,13 +41,19 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   statusMessage!: string;
+
   activeTab!: string;
+
   memoryCacheProfile!: MemoryCacheProfile;
+
   promoBarConfigForm!: FormGroup;
+
   memoryCacheDataFetched: boolean = false;
+
   submitButtonDisabled: boolean = false;
 
   TAB_ID_BEAM_JOBS: string = ReleaseCoordinatorPageConstants.TAB_ID_BEAM_JOBS;
+
   TAB_ID_MISC: string = ReleaseCoordinatorPageConstants.TAB_ID_MISC;
 
   constructor(

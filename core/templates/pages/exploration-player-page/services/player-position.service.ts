@@ -35,18 +35,25 @@ export class PlayerPositionService {
   constructor(private playerTranscriptService: PlayerTranscriptService) {}
 
   private _activeCardChangedEventEmitter = new EventEmitter<void>();
+
   private _currentQuestionChangedEventEmitter = new EventEmitter<number>();
+
   private _newCardAvailableEventEmitter = new EventEmitter<void>();
+
   private _helpCardAvailableEventEmitter =
     new EventEmitter<HelpCardEventResponse>();
+
   private _newCardOpenedEventEmitter = new EventEmitter<StateCard>();
+
   private _displayedCardIndexChangedEventEmitter = new EventEmitter<number>();
 
   // The following property is initialized using the class methods.
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   displayedCardIndex!: number;
+
   onChangeCallback!: Function;
+
   learnerJustSubmittedAnAnswer = false;
 
   init(callback: Function): void {

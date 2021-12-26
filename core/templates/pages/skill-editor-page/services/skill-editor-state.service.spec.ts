@@ -115,7 +115,9 @@ class FakeSkillBackendApiService {
   };
 
   newBackendSkillObject = null;
+
   skillObject = null;
+
   failure = null;
 
   async fetchSkillAsync() {

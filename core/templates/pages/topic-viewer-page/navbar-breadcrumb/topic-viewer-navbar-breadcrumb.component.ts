@@ -32,10 +32,12 @@ import { UrlService } from 'services/contextual/url.service';
 })
 export class TopicViewerNavbarBreadcrumbComponent implements OnInit {
   topicName: string = '';
+
   constructor(
     private topicViewerBackendApiService: TopicViewerBackendApiService,
     private urlService: UrlService
   ) {}
+
   ngOnInit(): void {
     this.topicViewerBackendApiService.fetchTopicDataAsync(
       this.urlService.getTopicUrlFragmentFromLearnerUrl(),

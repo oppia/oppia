@@ -41,35 +41,53 @@ import { TopicDeleteCanonicalStoryChange, TopicDeleteAdditionalStoryChange }
 })
 export class TopicEditorStateService {
   private _topic: Topic;
+
   private _topicRights: TopicRights;
+
   // The array that caches all the subtopic pages loaded by the user.
   private _cachedSubtopicPages: SubtopicPage[] = [];
+
   // The array that stores all the ids of the subtopic pages that were not
   // loaded from the backend i.e those that correspond to newly created
   // subtopics (and not loaded from the backend).
   private _newSubtopicPageIds: string[] = [];
+
   private _subtopicPage: SubtopicPage;
+
   private _topicIsInitialized: boolean = false;
+
   private _topicIsLoading: boolean = false;
+
   private _topicIsBeingSaved: boolean = false;
+
   private _topicWithNameExists: boolean = false;
+
   private _topicWithUrlFragmentExists: boolean = false;
+
   private _canonicalStorySummaries: StorySummary[] = [];
+
   private _skillIdToRubricsObject = {};
+
   private _skillQuestionCountDict = {};
+
   private _groupedSkillSummaries = {
     current: [],
     others: []
   };
+
   private _skillCreationIsAllowed: boolean = false;
+
   private _classroomUrlFragment: string = 'staging';
+
   private _storySummariesInitializedEventEmitter: EventEmitter<void> = (
     new EventEmitter());
+
   private _subtopicPageLoadedEventEmitter: EventEmitter<void> = (
     new EventEmitter());
 
   private _topicInitializedEventEmitter: EventEmitter<void> = (
     new EventEmitter());
+
   private _topicReinitializedEventEmitter: EventEmitter<void> = (
     new EventEmitter());
 
@@ -520,6 +538,7 @@ export class TopicEditorStateService {
   get onTopicReinitialized(): EventEmitter<void> {
     return this._topicReinitializedEventEmitter;
   }
+
   /**
    * Returns the classroom name for the topic.
    */

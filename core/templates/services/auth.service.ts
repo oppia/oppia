@@ -98,6 +98,7 @@ class ProdAuthServiceImpl extends AuthServiceImpl {
 })
 export class AuthService {
   private authServiceImpl: AuthServiceImpl;
+
   creds!: firebase.auth.UserCredential;
 
   constructor(

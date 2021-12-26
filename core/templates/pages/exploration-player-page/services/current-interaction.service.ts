@@ -53,10 +53,15 @@ export class CurrentInteractionService {
     private contextService: ContextService,
     private playerPositionService: PlayerPositionService,
     private playerTranscriptService: PlayerTranscriptService) {}
+
   private static submitAnswerFn: SubmitAnswerFn = null;
+
   private static onSubmitFn: OnSubmitFn = null;
+
   private static validityCheckFn: ValidityCheckFn = null;
+
   private static presubmitHooks: PresubmitHookFn[] = [];
+
   private static answerChangedSubject: Subject<void> = new Subject<void>();
 
   setOnSubmitFn(onSubmit: OnSubmitFn): void {

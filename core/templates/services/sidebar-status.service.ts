@@ -29,6 +29,7 @@ export class SidebarStatusService {
   constructor(private wds: WindowDimensionsService) {}
 
   private sidebarIsShown: boolean = false;
+
   private hamburgerIconClicked: boolean = false;
 
   private _openSidebar(): void {

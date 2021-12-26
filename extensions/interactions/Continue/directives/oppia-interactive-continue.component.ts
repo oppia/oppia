@@ -36,11 +36,16 @@ import { ContinueRulesService } from './continue-rules.service';
 })
 export class OppiaInteractiveContinue implements OnInit {
   @Input() buttonTextWithValue: string;
+
   buttonText: string = '';
+
   isInEditorMode: boolean = false;
+
   readonly DEFAULT_BUTTON_TEXT: string = 'Continue';
+
   readonly DEFAULT_HUMAN_READABLE_ANSWER: string = (
     'Please continue.');
+
   constructor(
     private continueRulesService: ContinueRulesService,
     private contextService: ContextService,

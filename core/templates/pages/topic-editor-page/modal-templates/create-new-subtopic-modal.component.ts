@@ -35,21 +35,37 @@ import { SubtopicValidationService } from 'pages/topic-editor-page/services/subt
 export class CreateNewSubtopicModalComponent
   extends ConfirmOrCancelModal implements OnInit {
   hostname: string;
+
   classroomUrlFragment: string;
+
   topic: Topic;
+
   SUBTOPIC_PAGE_SCHEMA!: object;
+
   htmlData: string;
+
   schemaEditorIsShown: boolean;
+
   editableThumbnailFilename: string;
+
   editableThumbnailBgColor: string;
+
   editableUrlFragment: string;
+
   allowedBgColors: readonly string[];
+
   subtopicId: number;
+
   subtopicTitle: string;
+
   errorMsg: string;
+
   subtopicUrlFragmentExists: boolean;
+
   subtopicPage: SubtopicPage;
+
   MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT: number;
+
   MAX_CHARS_IN_SUBTOPIC_TITLE: number;
 
   constructor(

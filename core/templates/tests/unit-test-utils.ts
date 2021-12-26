@@ -44,9 +44,13 @@ export class MockTranslateDirective {
 
 export class MockI18nService {
   directionChangeEventEmitter = new EventEmitter<string>();
+
   initialize(): void {}
+
   updateViewToUserPreferredSiteLanguage(): void {}
+
   removeUrlLangParam(): void {}
+
   updateUserPreferredLanguage(newLangCode: string): void {}
 }
 

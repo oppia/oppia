@@ -36,29 +36,39 @@ export class CustomOskLettersEditorComponent implements OnInit {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() value!: string[];
+
   @Output() valueChanged = new EventEmitter();
+
   latinLowerCase = [
     'qwertyuiop'.split(''), 'asdfghjkl'.split(''), 'zxcvbnm'.split('')];
+
   latinUpperCase = this.latinLowerCase.map((x) => x.map(y => y.toUpperCase()));
+
   private greekSymbolsLowercase = Object.values(
     AppConstants.GREEK_LETTER_NAMES_TO_SYMBOLS).slice(0, 23);
+
   greekLowerCase = [
     this.greekSymbolsLowercase.slice(0, 8),
     this.greekSymbolsLowercase.slice(8, 16),
     this.greekSymbolsLowercase.slice(16, 23),
   ];
+
   private greekSymbolsUppercase = Object.values(
     AppConstants.GREEK_LETTER_NAMES_TO_SYMBOLS).slice(23, 33);
+
   greekUpperCase = [
     this.greekSymbolsUppercase.slice(0, 5),
     this.greekSymbolsUppercase.slice(5, 10)
   ];
 
   latinTab = AppConstants.CUSTOM_LETTERS_LATIN_TAB;
+
   greekTab = AppConstants.CUSTOM_LETTERS_GREEK_TAB;
 
   alwaysEditable = true;
+
   lettersAreLowercase = true;
+
   currentTab = this.latinTab;
 
   constructor(

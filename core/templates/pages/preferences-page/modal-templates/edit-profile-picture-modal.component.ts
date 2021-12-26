@@ -32,13 +32,18 @@ require('cropperjs/dist/cropper.min.css');
 export class EditProfilePictureModalComponent extends ConfirmOrCancelModal {
   // 'uploadedImage' will be null if the uploaded svg is invalid or not trusted.
   uploadedImage: SafeResourceUrl | null = null;
+
   cropppedImageDataUrl: string = '';
+
   invalidImageWarningIsShown: boolean = false;
+
   allowedImageFormats: readonly string[] = AppConstants.ALLOWED_IMAGE_FORMATS;
+
   // 'cropper' is initialized before it is to be used, hence we need to do
   // non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   cropper!: Cropper;
+
   @ViewChild('croppableImage') croppableImageRef!: ElementRef;
 
   constructor(

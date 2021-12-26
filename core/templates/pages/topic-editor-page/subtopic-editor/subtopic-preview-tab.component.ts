@@ -33,17 +33,29 @@ import { TopicEditorStateService } from '../services/topic-editor-state.service'
 })
 export class SubtopicPreviewTab {
   directiveSubscriptions = new Subscription();
+
   topic: Topic;
+
   subtopicId: number;
+
   subtopic: Subtopic;
+
   editableTitle: string;
+
   editableThumbnailFilename: string;
+
   editableThumbnailBgColor: string;
+
   subtopicPage: SubtopicPage;
+
   pageContents: SubtopicPageContents;
+
   htmlData: string;
+
   THUMBNAIL: string = 'thumbnail';
+
   CONTENT: string = 'content';
+
   thumbnailIsShown: boolean;
 
   constructor(

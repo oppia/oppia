@@ -31,13 +31,21 @@ import constants from 'assets/constants';
 })
 export class FeedbackPopupComponent {
   feedbackUrl: string;
+
   feedbackText: string = '';
+
   isSubmitterAnonymized: boolean = false;
+
   isLoggedIn: boolean;
+
   feedbackPopoverId: string;
+
   feedbackTitle: string;
+
   feedbackSubmitted: boolean = false;
+
   MAX_REVIEW_MESSAGE_LENGTH = constants.MAX_REVIEW_MESSAGE_LENGTH;
+
   @Output() closePopover: EventEmitter<void> = new EventEmitter();
 
   constructor(

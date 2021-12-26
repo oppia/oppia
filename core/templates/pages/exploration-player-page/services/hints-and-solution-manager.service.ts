@@ -33,24 +33,35 @@ export class HintsAndSolutionManagerService {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   solutionForLatestCard!: Solution;
+
   // The following are set to null when the timeouts are cleared
   // or when the service is reset.
   timeout: NodeJS.Timeout | null = null;
+
   tooltipTimeout: NodeJS.Timeout | null = null;
 
   ACCELERATED_HINT_WAIT_TIME_MSEC: number = 10000;
+
   WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC: number = 20000;
 
   _solutionViewedEventEmitter = new EventEmitter();
+
   private _timeoutElapsedEventEmitter = new EventEmitter();
+
   onTimeoutElapsed$ = this._timeoutElapsedEventEmitter.asObservable();
 
   numHintsReleased: number = 0;
+
   numHintsConsumed: number = 0;
+
   solutionReleased: boolean = false;
+
   solutionConsumed: boolean = false;
+
   hintsForLatestCard: Hint[] = [];
+
   wrongAnswersSinceLastHintConsumed: number = 0;
+
   correctAnswerSubmitted: boolean = false;
 
   _hintConsumedEventEmitter = new EventEmitter();
@@ -58,6 +69,7 @@ export class HintsAndSolutionManagerService {
   // Variable tooltipIsOpen is a flag which says that the tooltip is currently
   // visible to the learner.
   tooltipIsOpen: boolean = false;
+
   // This is set to true as soon as a hint/solution is clicked or when the
   // tooltip has been triggered.
   hintsDiscovered: boolean = false;
@@ -97,10 +109,12 @@ export class HintsAndSolutionManagerService {
     }
     this._timeoutElapsedEventEmitter.next();
   }
+
   releaseSolution(): void {
     this.solutionReleased = true;
     this._timeoutElapsedEventEmitter.next();
   }
+
   accelerateHintRelease(): void {
     this.enqueueTimeout(this.releaseHint, this.ACCELERATED_HINT_WAIT_TIME_MSEC);
   }
@@ -108,6 +122,7 @@ export class HintsAndSolutionManagerService {
   areAllHintsExhausted(): boolean {
     return this.numHintsReleased === this.hintsForLatestCard.length;
   }
+
   isAHintWaitingToBeViewed(): boolean {
     return this.numHintsConsumed < this.numHintsReleased;
   }
@@ -160,6 +175,7 @@ export class HintsAndSolutionManagerService {
         ExplorationPlayerConstants.WAIT_FOR_FIRST_HINT_MSEC);
     }
   }
+
   // WARNING: This method has a side-effect. If the retrieved hint is a
   // pending hint that's being viewed, it starts the timer for the next
   // hint.

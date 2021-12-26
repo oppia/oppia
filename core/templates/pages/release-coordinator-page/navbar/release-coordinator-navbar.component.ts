@@ -32,18 +32,28 @@ import { UserService } from 'services/user.service';
 })
 export class ReleaseCoordinatorNavbarComponent implements OnInit {
   @Input() activeTab: string;
+
   @Output() activeTabChange = new EventEmitter();
 
   TAB_ID_BEAM_JOBS: string = ReleaseCoordinatorPageConstants.TAB_ID_BEAM_JOBS;
+
   TAB_ID_MISC: string = ReleaseCoordinatorPageConstants.TAB_ID_MISC;
+
   profilePictureDataUrl: string;
+
   username: string;
+
   profileUrl: string;
+
   logoutUrl: string = (
     '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LOGOUT.ROUTE);
+
   profileDropdownIsActive: boolean = false;
+
   logoWebpImageSrc: string;
+
   logoPngImageSrc: string;
+
   PAGES_REGISTERED_WITH_FRONTEND = (
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
 

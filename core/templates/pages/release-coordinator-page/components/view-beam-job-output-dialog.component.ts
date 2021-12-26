@@ -34,7 +34,9 @@ import { AlertsService } from 'services/alerts.service';
 })
 export class ViewBeamJobOutputDialogComponent implements OnInit, OnDestroy {
   selectedTab = new FormControl(0);
+
   output: BeamJobRunResult = null;
+
   subscription: Subscription = null;
 
   constructor(

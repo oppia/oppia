@@ -33,6 +33,7 @@ import { AppConstants } from 'app.constants';
 })
 export class StartNewBeamJobDialogComponent {
   readonly DEV_MODE: boolean = AppConstants.DEV_MODE;
+
   isRunning = false;
 
   constructor(

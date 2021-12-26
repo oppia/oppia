@@ -45,7 +45,9 @@ class MockWindowRef {
 
 class PendingPromise<T = void> {
   public readonly promise: Promise<T>;
+
   public readonly resolve: (_: T | PromiseLike<T>) => void;
+
   public readonly reject: (_?: Object) => void;
 
   constructor() {

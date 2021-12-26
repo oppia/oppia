@@ -34,25 +34,37 @@ export interface EmailData {
 })
 export class EmailDashboardResultComponent {
   EMAIL_DASHBOARD_PAGE = '/emaildashboard';
+
   emailBody: string = '';
+
   invalid = {
     subject: false,
     body: false,
     maxRecipients: false
   };
+
   emailSubject: string = '';
+
   maxRecipients!: number;
+
   emailOption: string = 'all';
+
   submitIsInProgress: boolean = false;
+
   POSSIBLE_EMAIL_INTENTS = [
     'bulk_email_marketing', 'bulk_email_improve_exploration',
     'bulk_email_create_exploration',
     'bulk_email_creator_reengagement',
     'bulk_email_learner_reengagement'];
+
   emailIntent = this.POSSIBLE_EMAIL_INTENTS[0];
+
   emailSubmitted: boolean = false;
+
   errorHasOccurred: boolean = false;
+
   emailCancelled: boolean = false;
+
   testEmailSentSuccesfully: boolean = false;
 
   constructor(

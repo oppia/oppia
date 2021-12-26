@@ -30,17 +30,29 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
  })
 export class HomeTabComponent {
   @Output() setActiveSection: EventEmitter<string> = new EventEmitter();
+
   @Input() currentGoals: LearnerTopicSummary[];
+
   @Input() partiallyLearntTopicsList: LearnerTopicSummary[];
+
   @Input() untrackedTopics: Record<string, LearnerTopicSummary[]>;
+
   @Input() username: string;
+
   CLASSROOM_LINK_URL_TEMPLATE = '/learn/<classroom_url_fragment>';
+
   classroomUrlFragment: string;
+
   nextIncompleteNodeTitles: string[] = [];
+
   widthConst: number = 233;
+
   width: number;
+
   continueWhereYouLeftOffList: LearnerTopicSummary[] = [];
+
   windowIsNarrow: boolean = false;
+
   directiveSubscriptions = new Subscription();
 
   constructor(

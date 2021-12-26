@@ -32,15 +32,23 @@ import { ImageLocalStorageService } from 'services/image-local-storage.service';
 })
 export class CreateNewTopicModalComponent extends ConfirmOrCancelModal {
   allowedBgColors: object = AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.topic;
+
   validUrlFragmentRegex = new RegExp(AppConstants.VALID_URL_FRAGMENT_REGEX);
+
   newlyCreatedTopic: NewlyCreatedTopic = NewlyCreatedTopic.createDefault();
+
   hostname: string = this.windowRef.nativeWindow.location.hostname;
+
   MAX_CHARS_IN_TOPIC_NAME: number = AppConstants.MAX_CHARS_IN_TOPIC_NAME;
+
   MAX_CHARS_IN_TOPIC_DESCRIPTION: number = (
     AppConstants.MAX_CHARS_IN_TOPIC_DESCRIPTION);
+
   MAX_CHARS_IN_TOPIC_URL_FRAGMENT = (
     AppConstants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT);
+
   topicUrlFragmentExists: boolean = false;
+
   topicNameExists: boolean = false;
 
   constructor(

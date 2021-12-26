@@ -33,11 +33,16 @@ export class NumberWithUnitsEditorComponent implements OnInit {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() modalId!: symbol;
+
   // 'value' will be null if user has not input any value.
   @Input() value!: NumberWithUnitsAnswer | null;
+
   @Output() valueChanged = new EventEmitter();
+
   numberWithUnitsString!: string;
+
   errorMessage: string = '';
+
   eventBusGroup: EventBusGroup;
 
   constructor(

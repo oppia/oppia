@@ -27,6 +27,7 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
 
 export class RemoveRoleConfirmationModalComponent extends ConfirmOrCancelModal {
   @Input() username!: string;
+
   @Input() role!: string;
 
   constructor(

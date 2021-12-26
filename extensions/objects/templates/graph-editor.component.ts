@@ -31,9 +31,13 @@ import { GraphAnswer } from 'interactions/answer-defs';
 })
 export class GraphEditorComponent {
   @Input() modalId!: symbol;
+
   @Input() value!: GraphAnswer;
+
   @Output() valueChanged: EventEmitter<GraphAnswer> = new EventEmitter();
+
   alwaysEditable = true;
+
   updateValue(graph: GraphAnswer): void {
     this.value = graph;
     this.valueChanged.emit(graph);

@@ -28,19 +28,23 @@ import { icon, latLng, LeafletEvent, LeafletMouseEvent, MapOptions, Marker, mark
 })
 export class CoordTwoDimEditorComponent implements OnInit {
   private _attribution = '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+
   private _optionsUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 
   @Input() value!: number[];
+
   @Output() valueChanged: EventEmitter<[number, number]> =
     new EventEmitter<[number, number]>();
 
   // Class Marker is of type Marker<P=any> therefore type
   // cannot be determined.
   mapMarkers!: Marker<unknown>;
+
   optionsSpec = {
     layers: [{ url: this._optionsUrl, attribution: this._attribution }],
     zoom: 0
   };
+
   options!: MapOptions;
 
   constructor(private urlInterpolationService: UrlInterpolationService) {}

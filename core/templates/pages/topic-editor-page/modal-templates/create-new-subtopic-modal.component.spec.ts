@@ -48,16 +48,20 @@ class MockActiveModal {
 class MockTopicEditorStateService {
   getTopic() {
   }
+
   getClassroomUrlFragment() {
     return 'non';
   }
+
   deleteSubtopicPage() {
   }
+
   get onTopicReinitialized(): EventEmitter<void> {
     let topicReinitializedEventEmitter: EventEmitter<void> = (
       new EventEmitter());
     return topicReinitializedEventEmitter;
   }
+
   setSubtopicPage() {
   }
 }

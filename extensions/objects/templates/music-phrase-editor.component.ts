@@ -43,6 +43,7 @@ interface MusicPhraseSchema {
 })
 export class MusicPhraseEditorComponent implements OnInit {
   @Input() modalId!: symbol;
+
   @Input() value!: unknown;
 
   @Output() valueChanged = new EventEmitter();
@@ -54,12 +55,15 @@ export class MusicPhraseEditorComponent implements OnInit {
   get localValue(): string[] {
     return this._proxy;
   }
+
   set localValue(val: string[]) {
     this._localValue = val;
     this._createProxy();
   }
+
   // The maximum number of notes allowed in a music phrase.
   _MAX_NOTES_IN_PHRASE = 8;
+
   schema: MusicPhraseSchema = {
     type: 'list',
     items: {
@@ -77,6 +81,7 @@ export class MusicPhraseEditorComponent implements OnInit {
       max_value: this._MAX_NOTES_IN_PHRASE
     }]
   };
+
   constructor(private alertsService: AlertsService) {
     this._createProxy();
   }

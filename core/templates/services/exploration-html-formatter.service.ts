@@ -56,6 +56,7 @@ export class ExplorationHtmlFormatterService {
       private extensionTagAssembler: ExtensionTagAssemblerService,
       private htmlEscaper: HtmlEscaperService
   ) {}
+
   /**
    * @param {string} interactionId - The interaction id.
    * @param {object} interactionCustomizationArgs - The various

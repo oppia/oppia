@@ -39,29 +39,47 @@ import { SchemaFormSubmittedService } from 'services/schema-form-submitted.servi
 })
 export class ProgressNavComponent {
   @Input() isLearnAgainButton: () => void;
+
   @Input() displayedCard: StateCard;
+
   @Input() submitButtonIsShown: boolean;
+
   @Input() submitButtonIsDisabled: boolean;
+
   @Output() submit: EventEmitter<void> = (
     new EventEmitter());
+
   @Output() clickContinueButton: EventEmitter<void> = (
     new EventEmitter());
 
   directiveSubscriptions = new Subscription();
+
   transcriptLength = 0;
+
   interactionIsInline = true;
+
   CONTINUE_BUTTON_FOCUS_LABEL = (
     ExplorationPlayerConstants.CONTINUE_BUTTON_FOCUS_LABEL);
+
   SHOW_SUBMIT_INTERACTIONS_ONLY_FOR_MOBILE = [
     'ItemSelectionInput', 'MultipleChoiceInput'];
+
   displayedCardIndex: number;
+
   hasPrevious: boolean;
+
   hasNext: boolean;
+
   conceptCardIsBeingShown: boolean;
+
   interactionCustomizationArgs;
+
   interactionId: string;
+
   helpCardHasContinueButton: boolean;
+
   isIframed: boolean;
+
   lastDisplayedCard: StateCard;
 
   constructor(

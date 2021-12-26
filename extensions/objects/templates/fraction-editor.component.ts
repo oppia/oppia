@@ -34,11 +34,17 @@ export class FractionEditorComponent implements OnInit {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() modalId!: symbol;
+
   @Input() value!: FractionAnswer;
+
   @Output() valueChanged = new EventEmitter();
+
   errorMessage: string = '';
+
   fractionString: string = '0';
+
   currentFractionValueIsValid = false;
+
   eventBus: EventBusGroup;
 
   constructor(

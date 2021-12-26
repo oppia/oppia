@@ -28,8 +28,11 @@ import { ServerConnectionBackendApiService } from './server-connection-backend-a
 })
 export class InternetConnectivityService {
   private INTERNET_CONNECTIVITY_CHECK_INTERVAL_MILLISECS: number = 3500;
+
   private MAX_MILLISECS_TO_WAIT_UNTIL_NEXT_CONNECTIVITY_CHECK: number = 7000;
+
   private _internetAccessible: boolean = true;
+
   private _connectedToNetwork: boolean;
 
   private _connectionStateChangeEventEmitter = (

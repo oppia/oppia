@@ -40,26 +40,43 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 })
 export class InteractiveGraphInput implements OnInit, OnDestroy {
   @Input() graphWithValue: string;
+
   @Input() canAddVertexWithValue: string;
+
   @Input() canDeleteVertexWithValue: string;
+
   @Input() canMoveVertexWithValue: string;
+
   @Input() canEditVertexLabelWithValue: string;
+
   @Input() canAddEdgeWithValue: string;
+
   @Input() canDeleteEdgeWithValue: string;
+
   @Input() canEditEdgeWeightWithValue: string;
+
   @Input() lastAnswer: null | GraphAnswer = null;
 
   graph: GraphAnswer;
+
   canAddVertex: boolean = false;
+
   canDeleteVertex: boolean = false;
+
   canMoveVertex: boolean = true;
+
   canEditVertexLabel: boolean = false;
+
   canAddEdge: boolean = true;
+
   canDeleteEdge: boolean = true;
+
   canEditEdgeWeight: boolean = false;
 
   componentSubscriptions = new Subscription();
+
   interactionIsActive: boolean = false;
+
   errorMessage: string = '';
 
   constructor(

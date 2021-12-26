@@ -31,7 +31,9 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
 export class SaveVersionMismatchModalComponent
   extends ConfirmOrCancelModal implements OnInit {
   MSECS_TO_REFRESH: number = 20;
+
   hasLostChanges: boolean;
+
   @Input() lostChanges: LostChange[];
 
   constructor(

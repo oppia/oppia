@@ -26,12 +26,15 @@ import { waitForAsync } from '@angular/core/testing';
 
 class MockReaderObject {
   result = null;
+
   onload = null;
+
   constructor() {
     this.onload = () => {
       return 'Fake onload executed';
     };
   }
+
   readAsDataURL(file) {
     this.onload();
     return 'The file is loaded';

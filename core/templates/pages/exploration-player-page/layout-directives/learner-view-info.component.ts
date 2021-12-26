@@ -41,11 +41,17 @@ import { InformationCardModalComponent } from '../templates/information-card-mod
 })
 export class LearnerViewInfoComponent {
   explorationId: string;
+
   directiveSubscriptions: Subscription = new Subscription();
+
   explorationTitle: string;
+
   isLinkedToTopic: boolean;
+
   storyPlaythroughObject: StoryPlaythrough;
+
   topicName: string;
+
   expInfo: LearnerExplorationSummaryBackendDict;
 
   constructor(

@@ -35,14 +35,23 @@ interface Choice {
 })
 export class ListOfSetsOfTranslatableHtmlContentIdsEditorComponent {
   @Input() modalId: symbol;
+
   @Input() initArgs;
+
   @Input() value;
+
   @Output() valueChanged = new EventEmitter;
+
   errorMessage = '';
+
   validOrdering = true;
+
   choices: Choice[];
+
   initValues: unknown[];
+
   eventBusGroup: EventBusGroup;
+
   constructor(private eventBusService: EventBusService) {
     this.eventBusGroup = new EventBusGroup(this.eventBusService);
   }

@@ -47,24 +47,33 @@ import { StatsReportingService } from './stats-reporting.service';
  })
 export class ExplorationEngineService {
    private _explorationId: string;
+
    private _editorPreviewMode: boolean;
+
    private _questionPlayerMode: boolean;
+
    private _updateActiveStateIfInEditorEventEmitter: EventEmitter<string> =
      (new EventEmitter());
 
    answerIsBeingProcessed: boolean = false;
+
    alwaysAskLearnersForAnswerDetails: boolean = false;
+
    exploration: Exploration;
 
    // This list may contain duplicates. A state name is added to it each time
    // the learner moves to a new card.
    visitedStateNames: string[] = [];
+
    currentStateName: string;
+
    nextStateName: string;
 
    // Param changes to be used ONLY in editor preview mode.
    manualParamChanges: ParamChange[];
+
    initStateName: string;
+
    version: number;
 
    constructor(

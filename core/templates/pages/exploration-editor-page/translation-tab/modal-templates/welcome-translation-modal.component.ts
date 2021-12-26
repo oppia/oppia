@@ -31,6 +31,7 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
 export class WelcomeTranslationModalComponent
   extends ConfirmOrCancelModal implements OnInit {
   explorationId: string;
+
   translationWelcomeImgUrl: string;
 
   constructor(

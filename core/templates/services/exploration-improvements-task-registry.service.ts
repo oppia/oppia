@@ -76,9 +76,13 @@ type MisPlaythroughIssue = MultipleIncorrectSubmissionsPlaythroughIssue;
  */
 export class SupportingStateStats {
   public readonly stateStats: StateStats;
+
   public readonly answerStats: readonly AnswerStats[];
+
   public readonly cstPlaythroughIssues: readonly CstPlaythroughIssue[];
+
   public readonly eqPlaythroughIssues: readonly EqPlaythroughIssue[];
+
   public readonly misPlaythroughIssues: readonly MisPlaythroughIssue[];
 
   constructor(
@@ -104,10 +108,15 @@ export class SupportingStateStats {
  */
 export class StateTasks implements Iterable<ExplorationTask> {
   public readonly stateName: string;
+
   public readonly hbrTask: HighBounceRateTask;
+
   public readonly iflTask: IneffectiveFeedbackLoopTask;
+
   public readonly ngrTask: NeedsGuidingResponsesTask;
+
   public readonly siaTask: SuccessiveIncorrectAnswersTask;
+
   public readonly length: number = 4;
 
   public readonly supportingStats: SupportingStateStats;
@@ -166,8 +175,11 @@ export class StateTasks implements Iterable<ExplorationTask> {
 @Injectable({providedIn: 'root'})
 export class ExplorationImprovementsTaskRegistryService {
   private config: ExplorationImprovementsConfig;
+
   private expStats: ExplorationStats;
+
   private tasksByState: Map<string, StateTasks>;
+
   private openTasksByType: ReadonlyMap<ExplorationTaskType, ExplorationTask[]>;
 
   initialize(

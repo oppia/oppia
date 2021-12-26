@@ -32,17 +32,24 @@ export class SetOfTranslatableHtmlContentIdsEditorComponent implements OnInit {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() initArgs!: { choices: Choice[] };
+
   @Input() modalId!: symbol;
+
   @Input() value!: string[];
+
   @Output() valueChanged = new EventEmitter();
+
   choices!: Choice[];
+
   selections!: boolean[];
+
   SCHEMA = {
     type: 'list',
     items: {
       type: 'html'
     }
   };
+
   constructor() { }
 
   ngOnInit(): void {

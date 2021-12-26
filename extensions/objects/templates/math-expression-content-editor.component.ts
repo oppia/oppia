@@ -47,13 +47,21 @@ export class MathExpressionContentEditorComponent implements OnInit {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() modalId!: symbol;
+
   @Input() alwaysEditable: boolean = false;
+
   @Input() value!: MathExpression;
+
   @Output() valueChanged = new EventEmitter();
+
   numberOfElementsInQueue!: number;
+
   svgString!: string;
+
   placeholderText = '\\frac{x}{y}';
+
   active: boolean = false;
+
   localValue: { label: string } = { label: '' };
 
   constructor(
@@ -98,6 +106,7 @@ export class MathExpressionContentEditorComponent implements OnInit {
   }
 
   directiveSubscriptions = new Subscription();
+
   // TODO(#10197): Upgrade to MathJax 3, after proper investigation
   // and testing. MathJax 3 provides a faster and more cleaner way to
   // convert a LaTeX string to an SVG.
@@ -137,6 +146,7 @@ export class MathExpressionContentEditorComponent implements OnInit {
       }
     });
   }
+
   // This method cleans the SVG string and generates a filename before
   // the SVG can be saved to the backend in the RteHelperModalController.
   // The method doesn't save the SVG to the backend, it just updates

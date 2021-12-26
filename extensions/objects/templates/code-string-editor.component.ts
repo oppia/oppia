@@ -32,9 +32,13 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 })
 export class CodeStringEditorComponent implements OnInit {
   @Input() alwaysEditable: boolean = false;
+
   @Input() value!: string | string[];
+
   @Output() valueChanged: EventEmitter<string> = new EventEmitter<string>();
+
   debounceInputSubject: Subject<string> = new Subject<string>();
+
   warningText: string = '';
 
   ngOnInit(): void {

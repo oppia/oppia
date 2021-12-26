@@ -37,11 +37,15 @@ import { InternetConnectivityService } from 'services/internet-connectivity.serv
 export class ChangeListService {
   // Temporary buffer for changes made to the exploration.
   explorationChangeList: ExplorationChange[] = [];
+
   undoneChangeStack: ExplorationChange[] = [];
+
   // Stack for storing undone changes. The last element is the most recently
   // undone change.
   ndoneChangeStack = [];
+
   loadingMessage: string = '';
+
   // Temporary list of the changes made to the exploration when offline.
   temporaryListOfChanges: ExplorationChange[] = [];
 
@@ -82,6 +86,7 @@ export class ChangeListService {
   };
 
   changeListAddedTimeoutId = null;
+
   DEFAULT_WAIT_FOR_AUTOSAVE_MSEC = 200;
 
   constructor(

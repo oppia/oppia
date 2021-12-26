@@ -52,10 +52,15 @@ export class ImagePreloaderService {
       private svgSanitizerService: SvgSanitizerService) {}
 
   private filenamesOfImageCurrentlyDownloading: string[] = [];
+
   private filenamesOfImageToBeDownloaded: string[] = [];
+
   private filenamesOfImageFailedToDownload: string[] = [];
+
   private exploration: Exploration = null;
+
   private imagePreloaderServiceHasStarted: boolean = false;
+
   // Variable imageLoadedCallback is an object of objects (identified by the
   // filenames which are being downloaded at the time they are required by the
   // directive).The object contains the resolve method of the promise

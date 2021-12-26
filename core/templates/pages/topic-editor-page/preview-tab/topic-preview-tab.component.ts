@@ -30,13 +30,21 @@ import { TopicEditorStateService } from '../services/topic-editor-state.service'
 })
 export class TopicPreviewTabComponent {
   private _TAB_STORY: string = 'story';
+
   private _TAB_SUBTOPIC: string = 'subtopic';
+
   private _TAB_PRACTICE: string = 'practice';
+
   topic: Topic;
+
   topicName: string;
+
   subtopics: Subtopic[];
+
   activeTab: string = this._TAB_STORY;
+
   cannonicalStorySummaries: StorySummary[];
+
   chapterCount: number = 0;
 
   constructor(

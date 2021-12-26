@@ -37,55 +37,91 @@ export class CommunityLessonsTabComponent {
       LearnerDashboardActivityBackendApiService),
     private windowDimensionService: WindowDimensionsService) {
   }
+
   @Input() incompleteExplorationsList: LearnerExplorationSummary[];
+
   @Input() incompleteCollectionsList: CollectionSummary[];
+
   @Input() completedExplorationsList: LearnerExplorationSummary[];
+
   @Input() completedCollectionsList: CollectionSummary[];
+
   @Input() explorationPlaylist: LearnerExplorationSummary[];
+
   @Input() collectionPlaylist: CollectionSummary[];
+
   @Input() subscriptionsList: ProfileSummary[];
+
   @Input() completedToIncompleteCollections: string[];
+
   noCommunityLessonActivity: boolean;
+
   noPlaylistActivity: boolean;
+
   totalIncompleteLessonsList: (
     LearnerExplorationSummary | CollectionSummary)[] = [];
+
   totalCompletedLessonsList: (
     LearnerExplorationSummary | CollectionSummary)[] = [];
+
   totalLessonsInPlaylist: (
     LearnerExplorationSummary | CollectionSummary)[] = [];
+
   allCommunityLessons: (
     LearnerExplorationSummary | CollectionSummary)[] = [];
+
   displayIncompleteLessonsList: (
     LearnerExplorationSummary | CollectionSummary)[] = [];
+
   displayCompletedLessonsList: (
     LearnerExplorationSummary | CollectionSummary)[] = [];
+
   displayLessonsInPlaylist: (
     LearnerExplorationSummary | CollectionSummary)[] = [];
+
   displayInCommunityLessons: (
     LearnerExplorationSummary | CollectionSummary)[] = [];
+
   selectedSection: string;
+
   completed: string = 'Completed';
+
   incomplete: string = 'Incomplete';
+
   all: string = 'All';
+
   moveToPrevPage: string = 'MOVE_TO_PREV_PAGE';
+
   moveToNextPage: string = 'MOVE_TO_NEXT_PAGE';
+
   dropdownEnabled: boolean;
+
   showMoreInSection = {
     incomplete: false,
     completed: false,
     playlist: false,
     subscriptions: false
   };
+
   pageNumberInCommunityLessons: number = 1;
+
   pageSize: number = 3;
+
   startIndexInCommunityLessons: number = 0;
+
   endIndexInCommunityLessons: number = 3;
+
   pageNumberInPlaylist: number = 1;
+
   startIndexInPlaylist: number = 0;
+
   endIndexInPlaylist: number = 3;
+
   communityLibraryUrl = (
     '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE);
+
   windowIsNarrow: boolean = false;
+
   directiveSubscriptions = new Subscription();
 
   ngOnInit(): void {

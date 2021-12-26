@@ -39,8 +39,10 @@ import { Stopwatch } from 'domain/utilities/stopwatch.model';
 class CyclicStateTransitionsTracker {
   /** A path of visited states without any repeats. */
   private pathOfVisitedStates: string[];
+
   /** The most recently discovered cycle of visited states. */
   private cycleOfVisitedStates: string[];
+
   private numLoops: number;
 
   constructor(initStateName: string) {
@@ -115,6 +117,7 @@ class CyclicStateTransitionsTracker {
 
 class EarlyQuitTracker {
   private stateName: string = null;
+
   private expDurationInSecs: number = null;
 
   foundAnIssue(): boolean {
@@ -138,6 +141,7 @@ class EarlyQuitTracker {
 
 class MultipleIncorrectAnswersTracker {
   private currStateName: string;
+
   private numTries: number;
 
   constructor(initStateName: string) {
@@ -172,14 +176,21 @@ class MultipleIncorrectAnswersTracker {
 })
 export class PlaythroughService {
   private explorationId: string = null;
+
   private explorationVersion: number = null;
+
   private learnerIsInSamplePopulation: boolean = null;
 
   private eqTracker: EarlyQuitTracker = null;
+
   private cstTracker: CyclicStateTransitionsTracker = null;
+
   private misTracker: MultipleIncorrectAnswersTracker = null;
+
   private recordedLearnerActions: LearnerAction[] = null;
+
   private playthroughStopwatch: Stopwatch = null;
+
   private playthroughDurationInSecs: number = null;
 
   constructor(

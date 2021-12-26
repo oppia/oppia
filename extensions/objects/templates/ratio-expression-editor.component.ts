@@ -32,10 +32,15 @@ export class RatioExpressionEditorComponent implements OnInit {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() modalId!: symbol;
+
   @Input() value!: number[];
+
   @Output() valueChanged = new EventEmitter();
+
   localValue!: { label: string };
+
   warningText: string = '';
+
   eventBusGroup: EventBusGroup;
 
   constructor(private eventBusService: EventBusService) {

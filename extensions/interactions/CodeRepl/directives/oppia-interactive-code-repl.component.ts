@@ -40,21 +40,37 @@ import { CodeReplRulesService } from './code-repl-rules.service';
 export class InteractiveCodeReplComponent implements
     OnInit, AfterViewInit, OnDestroy {
   @Input() lastAnswer;
+
   @Input() languageWithValue;
+
   @Input() placeholderWithValue;
+
   @Input() preCodeWithValue;
+
   @Input() postCodeWithValue;
+
   @ViewChild(CodemirrorComponent) codeMirrorComponent: CodemirrorComponent;
+
   componentSubscriptions = new Subscription();
+
   hasLoaded: boolean = true;
+
   code: string;
+
   evaluation: string;
+
   fullError: string;
+
   output: string;
+
   interactionIsActive: boolean;
+
   language: string;
+
   placeholder: string;
+
   preCode: string;
+
   postCode: string;
 
   editorOptions = {
@@ -177,6 +193,7 @@ export class InteractiveCodeReplComponent implements
       this.sendResponse(evaluation, err);
     });
   }
+
   private submitAnswer() {
     this.runAndSubmitCode(this.code);
   }

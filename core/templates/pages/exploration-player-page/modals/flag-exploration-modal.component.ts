@@ -34,8 +34,11 @@ export interface FlagExplorationModalResult {
 })
 export class FlagExplorationModalComponent extends ConfirmOrCancelModal {
   flagMessageTextareaIsShown: boolean = false;
+
   stateName: string;
+
   flag: boolean;
+
   flagMessage: string;
 
   constructor(

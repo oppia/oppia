@@ -40,8 +40,11 @@ import { AudioTranslationLanguageService } from
 })
 export class QuestionPlayerEngineService {
   private answerIsBeingProcessed: boolean = false;
+
   private questions: Question[] = [];
+
   private currentIndex: number = null;
+
   private nextIndex: number = null;
 
   constructor(

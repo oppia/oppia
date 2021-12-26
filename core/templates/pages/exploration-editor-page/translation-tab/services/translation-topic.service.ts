@@ -32,6 +32,7 @@ import { LoggerService } from 'services/contextual/logger.service';
 })
 export class TranslationTopicService {
   private activeTopicName: string = null;
+
   private _activeTopicChangedEventEmitter = new EventEmitter<void>();
 
   constructor(

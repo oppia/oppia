@@ -38,9 +38,13 @@ export interface RequestParams {
 })
 export class UserEmailPreferencesService {
   MESSAGE_TYPE_SUGGESTION = 'suggestion';
+
   MESSAGE_TYPE_FEEDBACK = 'feedback';
+
   feedbackNotificationsMuted: boolean;
+
   suggestionNotificationsMuted: boolean;
+
   constructor(
     private alertsService: AlertsService,
     private userEmailPreferencesBackendApiService:

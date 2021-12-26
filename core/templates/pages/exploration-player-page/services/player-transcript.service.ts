@@ -34,6 +34,7 @@ import { StateCard } from 'domain/state_card/state-card.model';
 })
 export class PlayerTranscriptService {
   constructor(private log: LoggerService) {}
+
   // Each element of this array represents a 'StateCard' domain object.
   //
   // Note that every card in this transcript is visible on the screen. The
@@ -42,6 +43,7 @@ export class PlayerTranscriptService {
   // -- this happens if the current card offers feedback to the learner before
   // they carry on.
   transcript: StateCard[] = [];
+
   numAnswersSubmitted = 0;
 
   restore(oldTranscript: StateCard[]): void {
@@ -65,6 +67,7 @@ export class PlayerTranscriptService {
       return transcriptItem.getStateName() === stateName;
     });
   }
+
   addNewCard(newCard: StateCard): void {
     this.transcript.push(newCard);
     this.numAnswersSubmitted = 0;

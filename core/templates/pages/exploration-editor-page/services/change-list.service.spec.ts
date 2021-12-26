@@ -55,6 +55,7 @@ class MockWindowRef {
       onLine: true
     }
   };
+
   get nativeWindow() {
     return this._window;
   }
@@ -62,12 +63,14 @@ class MockWindowRef {
 
 class MockExplorationDataService1 {
   explorationId: 0;
+
   autosaveChangeListAsync(changeList, successCb, errorCb) {
     successCb({
       changes_are_mergeable: true,
       is_version_of_draft_valid: false,
     });
   }
+
   discardDraftAsync() {
     return;
   }
@@ -75,12 +78,14 @@ class MockExplorationDataService1 {
 
 class MockExplorationDataService2 {
   explorationId: 0;
+
   autosaveChangeListAsync(changeList, successCb, errorCb) {
     successCb({
       changes_are_mergeable: false,
       is_version_of_draft_valid: false,
     });
   }
+
   discardDraftAsync() {
     return;
   }
@@ -88,9 +93,11 @@ class MockExplorationDataService2 {
 
 class MockExplorationDataService3 {
   explorationId: 0;
+
   autosaveChangeListAsync(changeList, successCb, errorCb) {
     errorCb();
   }
+
   discardDraftAsync() {
     return;
   }

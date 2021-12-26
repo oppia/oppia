@@ -89,58 +89,97 @@ export class LearnerDashboardPageComponent implements OnInit {
 
   FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS = (
     LearnerDashboardPageConstants.FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS);
+
   LEARNER_DASHBOARD_SECTION_I18N_IDS = (
     LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS);
+
   LEARNER_DASHBOARD_SUBSECTION_I18N_IDS = (
     LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS);
+
   username: string = '';
+
   PAGES_REGISTERED_WITH_FRONTEND = (
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
 
   isCurrentFeedbackSortDescending: boolean;
+
   currentFeedbackThreadsSortType: string;
 
   completedExplorationsList: LearnerExplorationSummary[];
+
   completedCollectionsList: CollectionSummary[];
+
   completedStoriesList: StorySummary[];
+
   learntTopicsList: LearnerTopicSummary[];
+
   partiallyLearntTopicsList: LearnerTopicSummary[];
+
   incompleteExplorationsList: LearnerExplorationSummary[];
+
   incompleteCollectionsList: CollectionSummary[];
+
   topicsToLearn: LearnerTopicSummary[];
+
   allTopics: LearnerTopicSummary[];
+
   untrackedTopics: Record<string, LearnerTopicSummary[]>;
+
   subscriptionsList: ProfileSummary[];
+
   communtiyLessonsDataLoaded: boolean = false;
 
   completedToIncompleteCollections: string[];
+
   learntToPartiallyLearntTopics: string[];
+
   threadSummaries: FeedbackThreadSummary[];
+
   numberOfUnreadThreads: number;
+
   explorationPlaylist: LearnerExplorationSummary[];
+
   collectionPlaylist: CollectionSummary[];
+
   activeSection: string;
+
   activeSubsection: string;
+
   feedbackThreadActive: boolean;
 
   messageSendingInProgress: boolean;
+
   profilePictureDataUrl: SafeResourceUrl;
+
   newMessage: {
     'text': string;
   };
+
   loadingFeedbacks: boolean;
+
   explorationTitle: string;
+
   threadStatus: string;
+
   explorationId: string;
+
   threadId: string;
+
   messageSummaries: FeedbackMessageSummary[];
+
   threadSummary: FeedbackThreadSummary;
+
   communityLibraryUrl = (
     '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE);
+
   homeImageUrl: string = '';
+
   todolistImageUrl: string = '';
+
   progressImageUrl: string = '';
+
   windowIsNarrow: boolean = false;
+
   directiveSubscriptions = new Subscription();
 
   constructor(

@@ -37,13 +37,21 @@ export class LearnerAnswerInfoService {
       LearnerAnswerDetailsBackendApiService) {}
 
   private submittedAnswerInfoCount = 0;
+
   private currentEntityId: string = null;
+
   private stateName: string = null;
+
   private interactionId = null;
+
   private currentAnswer: string = null;
+
   private currentInteractionRulesService: InteractionRulesService = null;
+
   private canAskLearnerForAnswerInfo = false;
+
   private visitedStates: string[] = [];
+
   private probabilityIndexes = {
     // The probability that a request for explanation of the answer that is
     // submitted by the learner. There are three different probabilities

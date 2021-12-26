@@ -40,34 +40,59 @@ export class GoalsTabComponent implements OnInit {
       LearnerDashboardActivityBackendApiService),
     private deviceInfoService: DeviceInfoService) {
   }
+
   @Input() currentGoals: LearnerTopicSummary[];
+
   @Input() editGoals: LearnerTopicSummary[];
+
   @Input() completedGoals: LearnerTopicSummary[];
+
   @Input() untrackedTopics: Record<string, LearnerTopicSummary[]>;
+
   @Input() partiallyLearntTopicsList: LearnerTopicSummary[];
+
   @Input() learntToPartiallyLearntTopics: string[];
+
   learnerDashboardActivityIds: LearnerDashboardActivityIds;
+
   MAX_CURRENT_GOALS_LENGTH: number;
+
   pawImageUrl: string = '';
+
   bookImageUrl: string = '';
+
   starImageUrl: string = '';
+
   currentGoalsStoryIsShown: boolean[];
+
   topicBelongToCurrentGoals: boolean[] = [];
+
   topicIdsInCompletedGoals: string[] = [];
+
   topicIdsInCurrentGoals: string[] = [];
+
   topicIdsInEditGoals: string[] = [];
+
   topicIdsInPartiallyLearntTopics: string[] = [];
+
   topicToIndexMapping = {
     CURRENT: 0,
     COMPLETED: 1,
     NEITHER: 2
   };
+
   activityType: string = constants.ACTIVITY_TYPE_LEARN_TOPIC;
+
   editGoalsTopicPageUrl: string[] = [];
+
   completedGoalsTopicPageUrl: string[] = [];
+
   editGoalsTopicClassification: number[] = [];
+
   editGoalsTopicBelongToLearntToPartiallyLearntTopic: boolean[] = [];
+
   windowIsNarrow: boolean = false;
+
   directiveSubscriptions = new Subscription();
 
   ngOnInit(): void {

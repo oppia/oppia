@@ -27,13 +27,21 @@ import { PageTitleService } from 'services/page-title.service';
 })
 export class TopicEditorRoutingService {
   private _MAIN_TAB = 'main';
+
   private _SUBTOPIC_EDITOR_TAB = 'subtopic_editor';
+
   private _SUBTOPIC_PREVIEW_TAB = 'subtopic_preview';
+
   private _TOPIC_PREVIEW_TAB = 'topic_preview';
+
   private _QUESTIONS_TAB = 'questions';
+
   private _lastTabVisited = 'main';
+
   private _lastSubtopicId = null;
+
   private _activeTabName = this._MAIN_TAB;
+
   private _updateViewEventEmitter: EventEmitter<void> = new EventEmitter();
 
   constructor(
@@ -71,6 +79,7 @@ export class TopicEditorRoutingService {
   getLastTabVisited(): string {
     return this._lastTabVisited;
   }
+
   getLastSubtopicIdVisited(): number {
     return this._lastSubtopicId;
   }

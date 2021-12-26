@@ -33,14 +33,22 @@ import { DeleteTopicModalComponent } from '../modals/delete-topic-modal.componen
 })
 export class TopicsListComponent {
   @Input() topicSummaries: CreatorTopicSummary[];
+
   @Input() pageNumber: number;
+
   @Input() itemsPerPage: number;
+
   @Input() userCanDeleteTopic: boolean;
+
   @Input() selectedTopicIds: string;
+
   @Output() selectedTopicIdsChange: EventEmitter<string> = (
     new EventEmitter());
+
   directiveSubscriptions: Subscription = new Subscription();
+
   selectedIndex: string = null;
+
   TOPIC_HEADINGS: string[] = [
     'index', 'name', 'canonical_story_count', 'subtopic_count',
     'skill_count', 'topic_status'

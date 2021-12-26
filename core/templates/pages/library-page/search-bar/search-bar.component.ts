@@ -51,20 +51,35 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   searchBarPlaceholder!: string;
+
   categoryButtonText!: string;
+
   languageButtonText!: string;
+
   ACTION_OPEN!: string;
+
   ACTION_CLOSE!: string;
+
   SUPPORTED_CONTENT_LANGUAGES!: LanguageIdAndText[];
+
   selectionDetails!: SelectionDetails;
+
   SEARCH_DROPDOWN_CATEGORIES!: SearchDropDownCategories[];
+
   KEYBOARD_EVENT_TO_KEY_CODES!: {};
+
   directiveSubscriptions: Subscription = new Subscription();
+
   classroomPageIsActive: boolean = false;
+
   searchQuery: string = '';
+
   searchQueryChanged: Subject<string> = new Subject<string>();
+
   translationData: Record<string, number> = {};
+
   activeMenuName: string = '';
+
   @Input() enableDropup: boolean = false;
 
   constructor(

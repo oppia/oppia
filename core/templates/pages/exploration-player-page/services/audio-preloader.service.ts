@@ -31,10 +31,13 @@ import { ContextService } from 'services/context.service';
 })
 export class AudioPreloaderService {
   private filenamesOfAudioCurrentlyDownloading: string[] = [];
+
   private filenamesOfAudioToBeDownloaded: string[] = [];
 
   private exploration: Exploration = null;
+
   private audioLoadedCallback: (_: string) => void = null;
+
   private mostRecentlyRequestedAudioFilename: string = null;
 
   constructor(

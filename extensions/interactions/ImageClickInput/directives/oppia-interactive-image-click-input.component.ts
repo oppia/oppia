@@ -53,24 +53,43 @@ interface ImagePoint {
 })
 export class InteractiveImageClickInput implements OnInit, OnDestroy {
   @Input() imageAndRegionsWithValue: string;
+
   @Input() highlightRegionsOnHoverWithValue: string;
+
   @Input() lastAnswer: ImageClickAnswer;
+
   imageAndRegions: ImageWithRegions;
+
   highlightRegionsOnHover: boolean = false;
+
   componentSubscriptions = new Subscription();
+
   currentlyHoveredRegions: string[] = [];
+
   filepath: string;
+
   imageUrl: string;
+
   mouseX: number;
+
   mouseY: number;
+
   interactionIsActive: boolean;
+
   loadingIndicatorUrl: string;
+
   isLoadingIndicatorShown: boolean;
+
   isTryAgainShown: boolean;
+
   dimensions: ImageDimensions;
+
   imageContainerStyle: { height: string; width?: string };
+
   loadingIndicatorStyle: { height: string; width?: string };
+
   allRegions: LabeledRegion[];
+
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
     private contextService: ContextService,

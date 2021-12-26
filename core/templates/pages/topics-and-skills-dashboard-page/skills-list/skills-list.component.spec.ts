@@ -69,7 +69,9 @@ describe('Skills List Component', () => {
 
   class MockNgbModal {
     modal: string;
+
     success: boolean = true;
+
     open(content, options) {
       if (this.modal === 'delete_skill') {
         return {
@@ -161,6 +163,7 @@ describe('Skills List Component', () => {
 
   class MockSkillBackendApiService {
     doesNotHaveSkillLinked: boolean = false;
+
     deleteSkillAsync(skillId: string) {
       return {
         then: (callb: () => void) => {
@@ -181,8 +184,10 @@ describe('Skills List Component', () => {
 
   class MockTopicsAndSkillsDashboardBackendApiService {
     error: boolean = false;
+
     onTopicsAndSkillsDashboardReinitialized: EventEmitter<boolean> =
     new EventEmitter();
+
     mergeSkillsAsync(skillId: string, supersedingSkillId: string) {
       return {
         then: (

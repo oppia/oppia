@@ -37,18 +37,31 @@ interface ExplorationTagSummary {
 export class InformationCardModalComponent extends ConfirmOrCancelModal {
   DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER = (
     AppConstants.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR);
+
   averageRating: number;
+
   contributorsSummary = {};
+
   contributorNames: string[];
+
   expInfo: LearnerExplorationSummaryBackendDict;
+
   explorationId: string;
+
   explorationTags: ExplorationTagSummary;
+
   explorationTitle: string;
+
   infoCardBackgroundCss: { 'background-color': string };
+
   infoCardBackgroundImageUrl: string;
+
   lastUpdatedString: string;
+
   numViews: number;
+
   objective: string;
+
   explorationIsPrivate: boolean;
 
   constructor(

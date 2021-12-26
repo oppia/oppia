@@ -38,6 +38,7 @@ export class ExplorationFeaturesService {
    * Variable to keep track of whether the service has been initialised.
    */
   static serviceIsInitialized = false;
+
   static settings = {
     areParametersEnabled: false,
     isPlaythroughRecordingEnabled: false

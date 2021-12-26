@@ -80,10 +80,14 @@ export class UserBackendApiService {
     private http: HttpClient) {}
 
   private USER_INFO_URL = '/userinfohandler';
+
   private PROFILE_PICTURE_URL = '/preferenceshandler/profile_picture';
+
   private PREFERENCES_DATA_URL = '/preferenceshandler/data';
+
   private USER_CONTRIBUTION_RIGHTS_DATA_URL = (
     '/usercontributionrightsdatahandler');
+
   private SITE_LANGUAGE_URL = '/save_site_language';
 
   async getUserInfoAsync(): Promise<UserInfo> {

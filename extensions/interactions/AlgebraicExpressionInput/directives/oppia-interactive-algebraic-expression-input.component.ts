@@ -41,10 +41,15 @@ import { TranslateService } from '@ngx-translate/core';
 })
 export class AlgebraicExpressionInputInteractionComponent implements OnInit {
   value: string = '';
+
   hasBeenTouched = false;
+
   warningText: string = '';
+
   @Input() customOskLettersWithValue: string = '';
+
   @Input() savedSolution: InteractionAnswer;
+
   @Input() useFractionForDivisionWithValue: string;
 
   constructor(

@@ -51,27 +51,45 @@ export class PolyPoint {
 })
 export class SvgEditorComponent implements OnInit {
   @Input() value: string;
+
   @Output() valueChanged = new EventEmitter();
+
   @Output() validityChange = new EventEmitter<Record<'empty', boolean>>();
+
   // These constants are used to identify the tool that is currently being
   // used so that other tools can be disabled accordingly.
   STATUS_EDITING = 'editing';
+
   STATUS_SAVED = 'saved';
+
   DRAW_MODE_POLY = 'polygon';
+
   DRAW_MODE_PENCIL = 'pencil';
+
   DRAW_MODE_BEZIER = 'bezier';
+
   DRAW_MODE_PIECHART = 'piechart';
+
   DRAW_MODE_SVG_UPLOAD = 'svgupload';
+
   DRAW_MODE_NONE = 'none';
+
   OPEN_POLYGON_MODE = 'open';
+
   CLOSED_POLYGON_MODE = 'closed';
+
   // The canvas height and width were determined based on the initial
   // modal dimensions.
   CANVAS_WIDTH = 494;
+
   CANVAS_HEIGHT = 368;
+
   drawMode = this.DRAW_MODE_NONE;
+
   polygonMode = this.CLOSED_POLYGON_MODE;
+
   isTouchDevice = this.deviceInfoService.hasTouchEvents();
+
   // The polyOptions is used to store the points of the polygon in the
   // open and closed polygon tool.
   polyOptions = {
@@ -82,10 +100,12 @@ export class SvgEditorComponent implements OnInit {
     lineCounter: 0,
     shape: null
   };
+
   // These sizes are used in the strokeWidth options dropdown.
   sizes = [
     '1px', '2px', '3px', '5px', '9px', '10px', '12px',
     '14px', '18px', '24px', '30px', '36px'];
+
   // These fonts are used in the font family options dropdown.
   fontFamily = [
     'Arial',
@@ -102,42 +122,67 @@ export class SvgEditorComponent implements OnInit {
     'Plaster',
     'Engagement'
   ];
+
   // Dynamically assign a unique id to each lc editor to avoid clashes
   // when there are multiple RTEs in the same page.
   randomId = Math.floor(Math.random() * 100000).toString();
+
   // The canvasId is used to identify the fabric js
   // canvas element in the editor.
   canvasID = 'canvas' + this.randomId;
+
   // The following picker variables are used to store the objects returned
   // from the vanilla color picker.
   fillPicker = null;
+
   strokePicker = null;
+
   bgPicker = null;
+
   diagramWidth = 450;
+
   currentDiagramWidth = 450;
+
   diagramHeight = 350;
+
   currentDiagramHeight = 350;
+
   // The data variable is used to store the saved svg data
   // and the filename.
   data: {
     savedSvgUrl?: SafeResourceUrl | string;
     savedSvgFileName?: string;
   } = {};
+
   // The diagramStatus stores the mode of the tool that is being used.
   diagramStatus = this.STATUS_EDITING;
+
   displayFontStyles = false;
+
   objectUndoStack = [];
+
   objectRedoStack = [];
+
   canvasObjects = [];
+
   undoFlag = false;
+
   isRedo = false;
+
   undoLimit = 5;
+
   savedSvgDiagram = '';
+
   entityId: string;
+
   entityType: string;
+
   imageSaveDestination: string;
+
   svgContainerStyle = {};
+
   layerNum = 0;
+
   fabricjsOptions = {
     stroke: 'rgba(0, 0, 0, 1)',
     fill: 'rgba(0, 0, 0, 0)',
@@ -147,9 +192,13 @@ export class SvgEditorComponent implements OnInit {
     bold: false,
     italic: false
   };
+
   objectIsSelected = false;
+
   pieChartDataLimit = 10;
+
   groupCount = 0;
+
   pieChartDataInput = [{
     name: 'Data name 1',
     data: 10,
@@ -162,21 +211,32 @@ export class SvgEditorComponent implements OnInit {
     color: '#00ff00',
     angle: 0
   }];
+
   allowedImageFormats = ['svg'];
+
   uploadedSvgDataUrl: {
     safeUrl: SafeResourceUrl;
     unsafeUrl: string;
   } = null;
+
   loadType = 'group';
+
   defaultTopCoordinate = 50;
+
   defaultLeftCoordinate = 50;
+
   defaultRadius = 30;
 
   canvas: fabric.Canvas;
+
   filepath: string;
+
   loadingIndicatorIsShown: boolean;
+
   x: number;
+
   y: number;
+
   constructor(
     private alertsService: AlertsService,
     private assetsBackendApiService: AssetsBackendApiService,

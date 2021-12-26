@@ -31,10 +31,15 @@ import { UrlService } from 'services/contextual/url.service';
 })
 export class StoryViewerNavbarBreadcrumbComponent implements OnInit, OnDestroy {
   topicName: string;
+
   storyTitle: string;
+
   topicUrlFragment: string;
+
   classroomUrlFragment: string;
+
   storyUrlFragment: string;
+
   constructor(
     private storyViewerBackendApiService: StoryViewerBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
@@ -42,6 +47,7 @@ export class StoryViewerNavbarBreadcrumbComponent implements OnInit, OnDestroy {
   ) {}
 
   directiveSubscriptions = new Subscription();
+
   getTopicUrl(): string {
     return this.urlInterpolationService.interpolateUrl(
       ClassroomDomainConstants.TOPIC_VIEWER_STORY_URL_TEMPLATE, {
@@ -67,6 +73,7 @@ export class StoryViewerNavbarBreadcrumbComponent implements OnInit, OnDestroy {
         this.storyTitle = storyDataObject.title;
       });
   }
+
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
   }

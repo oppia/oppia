@@ -30,6 +30,7 @@ require('domain/story/story-update.service.ts');
 
 class MockEditableStoryBackendApiService {
   newBackendStoryObject = null;
+
   failure = null;
 
   async fetchStoryAsync() {

@@ -35,11 +35,14 @@ import { ActivityIdTypeDict, CommitMessage,
 })
 export class ModeratorPageComponent {
   allCommits: CommitMessage[] = [];
+
   allFeedbackMessages: ThreadMessage[] = [];
+
   // Map of exploration ids to objects containing a single key: title.
   explorationData: ExplorationDict[] = [];
 
   displayedFeaturedActivityReferences: ActivityIdTypeDict[] = [];
+
   lastSavedFeaturedActivityReferences: ActivityIdTypeDict[] = [];
 
   FEATURED_ACTIVITY_REFERENCES_SCHEMA: Schema = {

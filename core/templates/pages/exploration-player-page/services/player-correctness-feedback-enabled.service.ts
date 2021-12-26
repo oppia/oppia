@@ -25,6 +25,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 })
 export class PlayerCorrectnessFeedbackEnabledService {
   static _correctnessFeedbackIsEnabled: boolean = false;
+
   static _init(correctnessFeedbackIsEnabled: boolean): void {
     PlayerCorrectnessFeedbackEnabledService._correctnessFeedbackIsEnabled = (
       correctnessFeedbackIsEnabled);

@@ -36,15 +36,25 @@ import { StoryEditorNavigationService } from '../services/story-editor-navigatio
 })
 export class StoryEditorNavbarComponent implements OnInit {
   @Input() commitMessage;
+
   validationIssues: string[];
+
   prepublishValidationIssues: string | string[];
+
   story: Story;
+
   forceValidateExplorations: boolean;
+
   storyIsPublished: boolean;
+
   warningsAreShown: boolean;
+
   showNavigationOptions: boolean;
+
   showStoryEditOptions: boolean;
+
   activeTab: string;
+
   constructor(
     private storyEditorStateService: StoryEditorStateService,
     private undoRedoService: UndoRedoService,
@@ -56,8 +66,11 @@ export class StoryEditorNavbarComponent implements OnInit {
   ) {}
 
   EDITOR = 'Editor';
+
   PREVIEW = 'Preview';
+
   directiveSubscriptions = new Subscription();
+
   explorationValidationIssues = [];
 
   isStoryPublished(): boolean {

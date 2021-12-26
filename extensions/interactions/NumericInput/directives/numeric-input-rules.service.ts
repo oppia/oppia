@@ -35,26 +35,31 @@ export class NumericInputRulesService {
       inputs: NumericInputEqualRuleInputs): boolean {
     return answer === inputs.x;
   }
+
   IsLessThan(
       answer: NumericInputAnswer,
       inputs: NumericInputEqualRuleInputs): boolean {
     return answer < inputs.x;
   }
+
   IsGreaterThan(
       answer: NumericInputAnswer,
       inputs: NumericInputEqualRuleInputs): boolean {
     return answer > inputs.x;
   }
+
   IsLessThanOrEqualTo(
       answer: NumericInputAnswer,
       inputs: NumericInputEqualRuleInputs): boolean {
     return answer <= inputs.x;
   }
+
   IsGreaterThanOrEqualTo(
       answer: NumericInputAnswer,
       inputs: NumericInputEqualRuleInputs): boolean {
     return answer >= inputs.x;
   }
+
   IsInclusivelyBetween(
       answer: NumericInputAnswer,
       inputs: NumericInputIsInclusivelyBetweenRuleInputs): boolean {
@@ -62,6 +67,7 @@ export class NumericInputRulesService {
     // inputs.a <= inputs.b.
     return answer >= inputs.a && answer <= inputs.b;
   }
+
   IsWithinTolerance(
       answer: NumericInputAnswer,
       inputs: NumericInputIsWithinToleranceRuleInputs): boolean {

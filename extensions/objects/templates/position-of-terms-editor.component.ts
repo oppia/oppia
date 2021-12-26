@@ -38,11 +38,17 @@ export class PositionOfTermsEditorComponent implements OnInit {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() modalId!: symbol;
+
   @Input() value!: string;
+
   localValue!: PositionOfTerm;
+
   @Output() valueChanged = new EventEmitter();
+
   alwaysEditable = true;
+
   positionOfTerms = AppConstants.POSITION_OF_TERMS_MAPPING;
+
   constructor() { }
 
   ngOnInit(): void {
@@ -57,6 +63,7 @@ export class PositionOfTermsEditorComponent implements OnInit {
       this.valueChanged.emit(this.value);
     }
   }
+
   onChangePosition(name: string): void {
     this.value = name;
     this.valueChanged.emit(this.value);

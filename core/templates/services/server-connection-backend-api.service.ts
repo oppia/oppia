@@ -30,6 +30,7 @@ export interface ConnectionCheckResponse {
 })
 export class ServerConnectionBackendApiService {
     private checkConnectionUrl: string = '/internetconnectivityhandler';
+
     constructor(private http: HttpClient) {}
 
     async fetchConnectionCheckResultAsync(): Promise<ConnectionCheckResponse> {

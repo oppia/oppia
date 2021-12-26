@@ -36,10 +36,15 @@ import { LearnerLocalNavBackendApiService } from '../services/learner-local-nav-
 })
 export class LearnerLocalNavComponent implements OnInit {
   explorationId: string = null;
+
   canEdit: boolean = null;
+
   version: number = null;
+
   username: string = '';
+
   feedbackOptionIsShown: boolean = true;
+
   @ViewChild('feedbackPopOver') feedbackPopOver: NgbPopover;
 
   constructor(

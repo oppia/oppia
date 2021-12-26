@@ -109,6 +109,7 @@ describe('Exploration Recommendations Service', () => {
 
     class MockExplorationSummary {
       id?: string;
+
       constructor(id?: string) {
         this.id = id;
       }

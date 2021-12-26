@@ -37,13 +37,21 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 })
 export class InputResponsePairComponent {
   @Input() data: InputResponsePair;
+
   @Output() dataChange: EventEmitter<InputResponsePair> = new EventEmitter();
+
   @Input() oppiaAvatarImageUrl: string;
+
   @Input() profilePicture: string;
+
   @Input() inputResponsePairId: string;
+
   @Input() isLastPair: boolean;
+
   OPPIA_AVATAR_LINK_URL: string;
+
   decodedProfilePicture: string;
+
   @ViewChild('popover') popover: NgbPopover;
 
   constructor(

@@ -35,11 +35,13 @@ export interface ImagesData {
 })
 export class ImageLocalStorageService {
   storedImageFilenames: string[] = [];
+
   // According to https://en.wikipedia.org/wiki/Web_storage, 5MB is the
   // minimum limit, for all browsers, per hostname, that can be stored in
   // sessionStorage and 100kB is the max size limit for uploaded images, hence
   // the limit below.
   MAX_IMAGES_STORABLE: number = 5 * 1024 / 100;
+
   // 'null' value here represents that either image is not present in local
   // storage or ImageData has been flushed.
   thumbnailBgColor: string | null = null;

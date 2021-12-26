@@ -49,34 +49,61 @@ export class ImageWithRegionsEditorComponent implements OnInit {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() modalId!: symbol;
+
   @Input() value!: { labeledRegions: Region[]; imagePath: string };
+
   @Output() valueChanged = new EventEmitter();
+
   errorText!: string;
+
   SCHEMA!: { type: string; 'obj_type': string };
+
   mouseX!: number;
+
   mouseY!: number;
+
   originalMouseX!: number;
+
   originalMouseY!: number;
+
   originalRectArea!: { x: number; y: number; width: number; height: number };
+
   rectX!: number;
+
   rectY!: number;
+
   rectWidth!: number;
+
   rectHeight!: number;
+
   xDirection!: number;
+
   yDirection!: number;
+
   resizableBorderWidthPx!: number;
+
   originalImageWidth!: number;
+
   originalImageHeight!: number;
+
   yDirectionToggled: boolean = false;
+
   xDirectionToggled: boolean = false;
+
   movedOutOfRegion: boolean = false;
+
   userIsCurrentlyDrawing: boolean = false;
+
   userIsCurrentlyDragging: boolean = false;
+
   userIsCurrentlyResizing: boolean = false;
+
   alwaysEditable: boolean = false;
+
   // Hovered Region will be the index of region that the mouse is currently in.
   // It will be null if the mouse is not in a region.
   hoveredRegion: number | null = null;
+
   // Selected Region will be null if no region is selected.
   selectedRegion: number | null = null;
 
@@ -122,6 +149,7 @@ export class ImageWithRegionsEditorComponent implements OnInit {
   private convertCoordsToFraction(coords: number[], dimensions: number[]) {
     return [coords[0] / dimensions[0], coords[1] / dimensions[1]];
   }
+
   // Convert to and from region area (which is stored as a fraction of
   // image width and height) and actual width and height.
   private regionAreaFromCornerAndDimensions(
@@ -304,11 +332,13 @@ export class ImageWithRegionsEditorComponent implements OnInit {
     // Message to displayed when there is an error.
     this.errorText = '';
   }
+
   // Use these two functions to get the calculated image width and
   // height.
   getImageWidth(): number {
     return this._calculateImageDimensions().width;
   }
+
   getImageHeight(): number {
     return this._calculateImageDimensions().height;
   }

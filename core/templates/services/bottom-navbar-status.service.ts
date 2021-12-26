@@ -29,6 +29,7 @@ import { WindowDimensionsService } from
 })
 export class BottomNavbarStatusService {
   bottomNavbarIsEnabled: boolean = false;
+
   constructor(private windowDimensionsService: WindowDimensionsService) {}
 
   markBottomNavbarStatus(status: boolean): void {

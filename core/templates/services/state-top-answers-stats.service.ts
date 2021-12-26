@@ -42,10 +42,13 @@ export class AnswerStatsEntry {
 })
 export class StateTopAnswersStatsService {
   private initializationHasStarted: boolean;
+
   private topAnswersStatsByStateName: Map<string, AnswerStatsEntry>;
 
   private resolveInitPromise: () => void;
+
   private rejectInitPromise: (_) => void;
+
   private initPromise: Promise<void>;
 
   constructor(

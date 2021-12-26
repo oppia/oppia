@@ -41,11 +41,16 @@ export class ResponseGraphInput {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() answer!: string;
+
   graph!: GraphAnswer;
+
   VERTEX_RADIUS!: number;
+
   EDGE_WIDTH!: number;
+
   GRAPH_INPUT_LEFT_MARGIN = (
     InteractionsExtensionsConstants.GRAPH_INPUT_LEFT_MARGIN);
+
   constructor(
     private graphDetailService: GraphDetailService,
     private htmlEscaperService: HtmlEscaperService,

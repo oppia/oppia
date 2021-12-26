@@ -50,22 +50,39 @@ export class StatsReportingService {
   }
 
   explorationId: string = null;
+
   explorationTitle: string = null;
+
   explorationVersion: number = null;
+
   sessionId: string = null;
+
   stateStopwatch: Stopwatch = null;
+
   optionalCollectionId: string = null;
+
   statesVisited: Set<string> = new Set();
+
   explorationStarted: boolean = false;
+
   explorationActuallyStarted: boolean = false;
+
   explorationIsComplete: boolean = false;
+
   currentStateName: string = null;
+
   nextExpId: string = null;
+
   previousStateName: string = null;
+
   nextStateName: string = null;
+
   topicName: string = null;
+
   private editorPreviewMode: boolean = null;
+
   private questionPlayerMode: boolean = null;
+
   private MINIMUM_NUMBER_OF_VISITED_STATES = 3;
 
   // The following dict will contain all stats data accumulated over the

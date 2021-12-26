@@ -39,12 +39,18 @@ export class AudioPlayerService {
   // 'currentTrackFilename','currentTrack' and 'lastPauseOrSeekPos'
   // will be 'null' when the track is not selected or ended.
   private _currentTrackFilename: string | null = null;
+
   private _currentTrack: Howl | null = null;
+
   private _lastPauseOrSeekPos: number | null = null;
+
   private _updateViewEventEmitter = new EventEmitter<void>();
+
   private _autoplayAudioEventEmitter = (
     new EventEmitter<void | AutoPlayAudioEvent>());
+
   private _stopIntervalSubject = new Subject<void>();
+
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
     private audioTranslationManagerService: AudioTranslationManagerService,

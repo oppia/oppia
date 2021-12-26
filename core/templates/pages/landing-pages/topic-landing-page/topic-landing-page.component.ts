@@ -54,10 +54,15 @@ interface TopicData {
 })
 export class TopicLandingPageComponent implements OnInit {
   backgroundBannerUrl: string = null;
+
   lessonInDevicesPngImageSrc: string = null;
+
   lessonInDevicesWebpImageSrc: string = null;
+
   lessonsQualities: LessonsQuality[] = null;
+
   topicData: TopicData = null;
+
   topicTitle: string = null;
 
   constructor(

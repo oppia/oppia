@@ -37,13 +37,21 @@ import { PlayerPositionService } from '../services/player-position.service';
 })
 export class AudioBarComponent {
   lastScrollTop: number = 0;
+
   isPaused: boolean = true;
+
   directiveSubscriptions: Subscription = new Subscription();
+
   languagesInExploration: ExplorationLanguageInfo[];
+
   audioBarIsExpanded: boolean;
+
   progressBarIsShown: boolean;
+
   audioLoadingIndicatorIsShown: boolean = false;
+
   explorationPlayerModeIsActive: boolean;
+
   selectedLanguage: { value: string };
 
   constructor(

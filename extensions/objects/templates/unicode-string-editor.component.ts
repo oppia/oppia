@@ -41,12 +41,19 @@ export class UnicodeStringEditorComponent implements
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() initArgs!: UnicodeStringEditorArguments;
+
   @Input() value!: string;
+
   @Input() alwaysEditable: boolean = false;
+
   @Output() valueChanged = new EventEmitter();
+
   componentSubscriptions = new Subscription();
+
   active: boolean = false;
+
   largeInput = false;
+
   constructor(private externalSaveService: ExternalSaveService) { }
 
   ngOnInit(): void {

@@ -73,30 +73,47 @@ interface GraphOption {
 })
 export class GraphVizComponent implements OnInit, AfterViewInit {
   @Input() graph: GraphAnswer;
+
   @Input() canAddVertex: boolean;
+
   @Input() canDeleteVertex: boolean;
+
   @Input() canMoveVertex: boolean;
+
   @Input() canEditVertexLabel: boolean;
+
   @Input() canAddEdge: boolean;
+
   @Input() canDeleteEdge: boolean;
+
   @Input() canEditEdgeWeight: boolean;
+
   @Input() interactionIsActive: boolean;
+
   @Input() canEditOptions: boolean;
 
   @Output() graphChange: EventEmitter<GraphAnswer> = new EventEmitter();
+
   isMobile: boolean = false;
+
   helpText: string = '';
+
   _MODES = {
     MOVE: 0,
     ADD_EDGE: 1,
     ADD_VERTEX: 2,
     DELETE: 3
   };
+
   // Styling functions.
   DELETE_COLOR = 'red';
+
   HOVER_COLOR = 'aqua';
+
   SELECT_COLOR = 'orange';
+
   DEFAULT_COLOR = 'black';
+
   state = {
     currentMode: this._MODES.MOVE,
     // Vertex, edge, mode button, label currently being hovered over.
@@ -122,16 +139,27 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     mouseDragStartX: 0,
     mouseDragStartY: 0
   };
+
   selectedEdgeWeightValue: number | string;
+
   buttons: GraphButton[] = [];
+
   private vizContainer: SVGSVGElement[];
+
   componentSubscriptions: Subscription = new Subscription();
+
   shouldShowWrongWeightWarning: boolean;
+
   VERTEX_RADIUS: number;
+
   EDGE_WIDTH: number;
+
   vizWidth: SVGAnimatedLength;
+
   graphOptions: GraphOption[];
+
   svgViewBox: string;
+
   constructor(
     private deviceInfoService: DeviceInfoService,
     private element: ElementRef,
@@ -491,6 +519,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
       this.beginEditEdgeWeight(index);
     }
   }
+
   onClickEdgeWeight(index: number): void {
     if (this.graph.isWeighted && this.canEditEdgeWeight) {
       this.beginEditEdgeWeight(index);

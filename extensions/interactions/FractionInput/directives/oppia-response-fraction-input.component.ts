@@ -28,6 +28,7 @@ import { HtmlEscaperService } from 'services/html-escaper.service';
 })
 export class ResponseFractionInput {
   @Input() answer: string = '';
+
   escapedAnswer: string = '';
 
   constructor(

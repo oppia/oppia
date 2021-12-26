@@ -32,9 +32,13 @@ import { downgradeComponent } from '@angular/upgrade/static';
 export class StoryViewerNavbarPreLogoActionComponent
 implements OnInit, OnDestroy {
   topicName: string;
+
   topicUrlFragment: string;
+
   classroomUrlFragment: string;
+
   storyUrlFragment: string;
+
   constructor(
     private storyViewerBackendApiService: StoryViewerBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
@@ -42,6 +46,7 @@ implements OnInit, OnDestroy {
   ) {}
 
   directiveSubscriptions = new Subscription();
+
   getTopicUrl(): string {
     return this.urlInterpolationService.interpolateUrl(
       ClassroomDomainConstants.TOPIC_VIEWER_STORY_URL_TEMPLATE, {
@@ -65,6 +70,7 @@ implements OnInit, OnDestroy {
         this.topicName = storyDataObject.topicName;
       });
   }
+
   ngOnDestroy(): void {
     return this.directiveSubscriptions.unsubscribe();
   }

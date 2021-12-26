@@ -41,12 +41,19 @@ interface NumericInputFormSchema {
 })
 export class InteractiveNumericInput implements OnInit {
   @Input() requireNonnegativeInputWithValue: string = '';
+
   @Input() savedSolution;
+
   @Input() labelForFocusTarget;
+
   errorString = '';
+
   requireNonnegativeInput: boolean = false;
+
   answer = null;
+
   NUMERIC_INPUT_FORM_SCHEMA: NumericInputFormSchema;
+
   constructor(
     private currentInteractionService: CurrentInteractionService,
     private numericInputRulesService: NumericInputRulesService,

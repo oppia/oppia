@@ -39,10 +39,15 @@ import constants from 'assets/constants';
 })
 export class InteractiveMathEquationInput implements OnInit {
   value: string = '';
+
   hasBeenTouched: boolean = false;
+
   warningText: string = '';
+
   @Input() savedSolution: InteractionAnswer;
+
   @Input() useFractionForDivisionWithValue;
+
   @Input() customOskLettersWithValue;
 
   constructor(

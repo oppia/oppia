@@ -28,6 +28,7 @@ import { LearnerViewRatingBackendApiService } from './learner-view-rating-backen
 })
 export class LearnerViewRatingService {
   userRating: number;
+
   private _ratingUpdatedEventEmitter: EventEmitter<void> = new EventEmitter();
 
   constructor(

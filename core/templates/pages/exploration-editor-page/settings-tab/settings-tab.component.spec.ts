@@ -51,9 +51,11 @@ import { ExplorationDataService } from '../services/exploration-data.service';
 
 class MockRouterService {
   private refreshSettingsTabEventEmitter: EventEmitter<void>;
+
   get onRefreshSettingsTab() {
     return this.refreshSettingsTabEventEmitter;
   }
+
   set refreshSettingsTabEmitter(val) {
     this.refreshSettingsTabEventEmitter = val;
   }

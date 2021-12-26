@@ -31,12 +31,19 @@ import { ContextService } from 'services/context.service';
 })
 export class SkillSelectorEditorComponent implements OnInit, OnDestroy {
   @Input() modalId;
+
   @Input() value;
+
   @Output() valueChanged = new EventEmitter();
+
   skills: SkillBackendDict[] = [];
+
   showLoading = false;
+
   skillsToShow: SkillBackendDict[] = [];
+
   eventBusGroup: EventBusGroup;
+
   constructor(
     private contextService: ContextService,
     private eventBusService: EventBusService,

@@ -56,8 +56,11 @@ export class NavigationService {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   activeMenuName!: string;
+
   ACTION_OPEN: string = 'open';
+
   ACTION_CLOSE: string = 'close';
+
   KEYBOARD_EVENT_TO_KEY_CODES: KeyboardEventToCodes = {
     enter: {
       shiftKeyIsPressed: false,
@@ -89,6 +92,7 @@ export class NavigationService {
   closeSubmenu(evt: KeyboardEvent): void {
     this.activeMenuName = '';
   }
+
   /**
    * Handles keydown events on menus.
    * @param {object} evt

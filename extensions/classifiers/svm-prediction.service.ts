@@ -36,6 +36,7 @@ import { PredictionResult } from 'domain/classifier/prediction-result.model';
 })
 export class SVMPredictionService {
   constructor() {}
+
   kernel(
       kernelParams: KernelParams, supportVectors: number[][],
       input: number[]): number[] {
@@ -62,6 +63,7 @@ export class SVMPredictionService {
     }
     return kvalues;
   }
+
   // Find multiclass probabilities.
   // NOTE: This function is implemented as it is given in LibSVM.
   // For more information on exact approach used, read following paper:

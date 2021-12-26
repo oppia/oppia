@@ -28,10 +28,15 @@ import { Subtopic } from 'domain/topic/subtopic.model';
 })
 export class SubtopicsListComponent {
   @Input() classroomUrlFragment: string;
+
   @Input() subtopicsList: Subtopic[];
+
   @Input() topicId: string;
+
   @Input() topicUrlFragment: string;
+
   @Input() topicName: string;
+
   constructor() {}
 }
 

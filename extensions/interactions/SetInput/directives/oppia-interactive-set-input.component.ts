@@ -36,9 +36,13 @@ import { downgradeComponent } from '@angular/upgrade/static';
 })
 export class InteractiveSetInputComponent implements OnInit {
   @Input() buttonTextWithValue: string;
+
   @Input() savedSolution;
+
   errorMessage: string;
+
   answer;
+
   schema: {
     type: string;
     items: {
@@ -48,6 +52,7 @@ export class InteractiveSetInputComponent implements OnInit {
       'add_element_text': string;
     };
   };
+
   buttonText: string;
 
   constructor(

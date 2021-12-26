@@ -42,12 +42,19 @@ interface TextInputSchema {
 })
 export class InteractiveTextInputComponent implements OnInit {
   @Input() placeholderWithValue;
+
   @Input() rowsWithValue;
+
   @Input() savedSolution;
+
   @Input() labelForFocusTarget: string;
+
   answer: string;
+
   placeholder: string;
+
   schema: TextInputSchema;
+
   rows: number;
 
   constructor(

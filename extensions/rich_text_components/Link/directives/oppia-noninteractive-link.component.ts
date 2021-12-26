@@ -49,11 +49,17 @@ export class NoninteractiveLink implements OnInit, OnChanges {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() urlWithValue!: string;
+
   @Input() textWithValue!: string;
+
   url!: string;
+
   text: string = '';
+
   showUrlInTooltip: boolean = false;
+
   tabIndexVal: number = 0;
+
   constructor(
     private contextService: ContextService,
     private htmlEscaperService: HtmlEscaperService) {}

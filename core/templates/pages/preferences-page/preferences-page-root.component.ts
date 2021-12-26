@@ -28,6 +28,7 @@ import { PageHeadService } from 'services/page-head.service';
 })
 export class PreferencesPageRootComponent {
   pageIsShown: boolean = false;
+
   errorPageIsShown: boolean = false;
 
   constructor(

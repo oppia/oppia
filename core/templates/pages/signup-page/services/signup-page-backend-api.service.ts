@@ -46,6 +46,7 @@ export interface UpdateUsernameRequestParams {
 })
 export class SignupPageBackendApiService {
   SIGNUP_DATA_URL = '/signuphandler/data';
+
   USERNAME_HANDLER = '/usernamehandler/data';
 
   constructor(private http: HttpClient) {}

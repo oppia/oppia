@@ -91,6 +91,7 @@ describe('Topic questions tab', function() {
 
   class MockTopicsAndSkillsDashboardBackendApiService {
     success: boolean = true;
+
     fetchDashboardDataAsync() {
       return {
         then: (callback: (resp) => void) => {

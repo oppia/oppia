@@ -39,11 +39,15 @@ import { NumericExpressionInputRulesService } from './numeric-expression-input-r
 })
 export class InteractiveNumericExpressionInput implements OnInit {
   @Input() placeholderWithValue: string;
+
   @Input() savedSolution: InteractionAnswer;
+
   @Input() useFractionForDivisionWithValue: string;
 
   value: string = '';
+
   hasBeenTouched: boolean = false;
+
   warningText: string = '';
 
   constructor(

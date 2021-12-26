@@ -38,17 +38,26 @@ export class LearnerDashboardIconsComponent implements OnInit {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() activityType!: string;
+
   @Input() activityId!: string;
+
   @Input() activityTitle!: string;
+
   @Input() isContainerNarrow: boolean = false;
+
   @Input() isAddToPlaylistIconShown: boolean = false;
+
   learnerDashboardActivityIds!: LearnerDashboardActivityIds;
+
   activityIsCurrentlyHoveredOver: boolean = true;
+
   playlistTooltipIsEnabled: boolean = false;
+
   @Input()
   get activityActive(): boolean {
     return this.activityIsCurrentlyHoveredOver;
   }
+
   set activityActive(hoverState: boolean) {
     this.activityIsCurrentlyHoveredOver = hoverState;
   }

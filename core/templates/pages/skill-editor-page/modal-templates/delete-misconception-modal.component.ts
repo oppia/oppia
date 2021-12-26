@@ -29,6 +29,7 @@ import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-
 }) export class DeleteMisconceptionModalComponent
   extends ConfirmOrCancelModal implements OnInit {
   skill: Skill;
+
   index: number;
 
   constructor(

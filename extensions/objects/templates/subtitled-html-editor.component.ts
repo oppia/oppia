@@ -33,9 +33,13 @@ export class SubtitledHtmlEditorComponent implements OnInit {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() modalId!: symbol;
+
   @Input() schema!: { 'replacement_ui_config': unknown | {} };
+
   @Input() value!: { _html: unknown };
+
   @Output() valueChanged = new EventEmitter();
+
   SCHEMA!: SubtitledHtmlEditorSchema;
 
   constructor(private changeDetectorRef: ChangeDetectorRef) { }

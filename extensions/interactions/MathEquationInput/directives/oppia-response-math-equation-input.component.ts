@@ -30,6 +30,7 @@ import { HtmlEscaperService } from 'services/html-escaper.service';
 })
 export class ResponseMathEquationInput implements OnInit {
   @Input() answer: string;
+
   displayAnswer: Object;
 
   constructor(

@@ -41,15 +41,20 @@ export class ContextService {
   // it (using the appropriate reset fn) initially. Since these are static,
   // depending on the order of tests, values may be retained across tests.
   static customEntityContext: EntityContext | null = null;
+
   static imageSaveDestination: string = (
     AppConstants.IMAGE_SAVE_DESTINATION_SERVER);
 
   // Page Context is null initially when no shared service exist.
   pageContext: string | null = null;
+
   // Null ExplorationId implies that no exploration has been created.
   explorationId: string | null = null;
+
   explorationIsLinkedToStory: boolean = false;
+
   questionPlayerIsManuallySet: boolean = false;
+
   // Context of the editor is null until initialized by init fuctions
   // at respective editors.
   editorContext: string | null = null;
@@ -59,6 +64,7 @@ export class ContextService {
   init(editorName: string): void {
     this.editorContext = editorName;
   }
+
   // Following method helps to know the whether the context of editor is
   // question editor or exploration editor. The variable editorContext is
   // set from the init function that is called upon initialization in the
@@ -66,6 +72,7 @@ export class ContextService {
   getEditorContext(): string | null {
     return this.editorContext;
   }
+
   // Returns a string representing the current tab of the editor (either
   // 'editor' or 'preview'), or null if the current tab is neither of these,
   // or the current page is not the editor.
@@ -79,6 +86,7 @@ export class ContextService {
       return null;
     }
   }
+
   // Returns a string representing the context of the current page.
   // This is PAGE_CONTEXT.EXPLORATION_EDITOR or
   // PAGE_CONTEXT.EXPLORATION_PLAYER or PAGE_CONTEXT.QUESTION_EDITOR.
@@ -136,6 +144,7 @@ export class ContextService {
       return ServicesConstants.PAGE_CONTEXT.OTHER;
     }
   }
+
   // This is required in cases like when we need to access question player
   // from the skill editor preview tab.
   setQuestionPlayerIsOpen(): void {

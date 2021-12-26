@@ -31,6 +31,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 export class LostChangesModalComponent
   extends ConfirmOrCancelModal implements OnInit {
   @Input() lostChanges: LostChange[];
+
   hasLostChanges: boolean;
 
   constructor(

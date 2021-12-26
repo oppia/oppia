@@ -28,6 +28,7 @@ import { PageHeadService } from 'services/page-head.service';
 })
 export class ReleaseCoordinatorPageRootComponent {
   errorPageIsShown: boolean = false;
+
   pageIsShown: boolean = false;
 
   constructor(

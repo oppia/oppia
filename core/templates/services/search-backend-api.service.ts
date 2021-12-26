@@ -24,6 +24,7 @@ import { ServicesConstants } from './services.constants';
 
 export class SearchResponseBackendDict {
   'search_offset': number;
+
   'activity_list': ExplorationSummaryDict[];
 }
 

@@ -30,6 +30,7 @@ export class TopicEditorSaveModalComponent extends ConfirmOrCancelModal
   @Input() topicIsPublished: boolean;
 
   MAX_COMMIT_MESSAGE_LENGTH: number;
+
   isTopicPublished: boolean;
 
   constructor(

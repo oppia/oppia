@@ -47,17 +47,29 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 })
 export class TopicViewerPageComponent implements OnInit {
   activeTab: string = '';
+
   canonicalStorySummaries: StorySummary[] = [];
+
   topicUrlFragment: string = '';
+
   classroomUrlFragment: string = '';
+
   topicIsLoading: boolean = true;
+
   topicId: string = '';
+
   topicName: string = '';
+
   topicDescription: string = '';
+
   chapterCount: number = 0;
+
   degreesOfMastery: DegreesOfMastery = {};
+
   subtopics: Subtopic[] = [];
+
   skillDescriptions: SkillIdToDescriptionMap = {};
+
   practiceTabIsDisplayed: boolean = false;
 
   constructor(

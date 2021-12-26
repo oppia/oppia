@@ -30,13 +30,21 @@ export class PreviewThumbnailComponent {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() bgColor!: string;
+
   @Input() filename!: string;
+
   @Input() name!: string;
+
   @Input() aspectRatio!: string;
+
   @Input() description!: string;
+
   @Input() previewFooter!: string;
+
   @Input() thumbnailBgColor!: string;
+
   @Input() previewTitle!: string;
+
   editableThumbnailDataUrl!: string;
 
   constructor(

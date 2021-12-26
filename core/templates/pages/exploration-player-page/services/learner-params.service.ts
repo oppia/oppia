@@ -31,6 +31,7 @@ export interface ExplorationParams {
 })
 export class LearnerParamsService {
   private _paramDict: ExplorationParams = {};
+
   // TODO(sll): Forbid use of 'answer', 'choices' as possible keys.
   init(initParamSpecs: ExplorationParams): void {
     // The initParamSpecs arg is a dict mapping the parameter names used in

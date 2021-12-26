@@ -31,10 +31,13 @@ export class LearnerPlaylistModalComponent implements OnInit {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() activityId!: string;
+
   @Input() activityTitle!: string;
+
   @Input() activityType!: string;
 
   sectionNameI18nId!: string;
+
   removeFromLearnerPlaylistUrl!: string;
 
   constructor(

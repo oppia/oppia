@@ -34,9 +34,13 @@ import { UrlInterpolationService } from
 })
 export class VolunteerPageComponent implements OnInit {
   mapImgPath = '';
+
   art = {};
+
   development = {};
+
   learnerFeedback = {};
+
   lessonCreation = {};
 
   constructor(

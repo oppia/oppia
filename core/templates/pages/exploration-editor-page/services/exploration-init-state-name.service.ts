@@ -33,6 +33,7 @@ import { ContextService } from 'services/context.service';
 export class ExplorationInitStateNameService
   extends ExplorationPropertyService {
   propertyName: string = 'init_state_name';
+
   constructor(
     private contextService: ContextService,
     protected alertsService: AlertsService,

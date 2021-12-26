@@ -27,11 +27,15 @@ import { TakeBreakModalComponent } from 'pages/exploration-player-page/templates
 })
 export class FatigueDetectionService {
   private submissionTimesMsec: number[] = [];
+
   private SPAM_COUNT_THRESHOLD: number = 4;
+
   private SPAM_WINDOW_MSEC: number = 10000;
+
   // Function shift return result type T | undefined
   // so WindowStartTime can be undefined.
   private windowStartTime!: number | undefined;
+
   private windowEndTime!: number;
 
   constructor(
@@ -40,6 +44,7 @@ export class FatigueDetectionService {
   recordSubmissionTimestamp(): void {
     this.submissionTimesMsec.push((new Date()).getTime());
   }
+
   isSubmittingTooFast(): boolean {
     if (this.submissionTimesMsec.length >= this.SPAM_COUNT_THRESHOLD) {
       this.windowStartTime = this.submissionTimesMsec.shift();

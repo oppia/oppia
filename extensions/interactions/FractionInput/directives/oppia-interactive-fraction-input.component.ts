@@ -39,25 +39,42 @@ import { FractionAnswer, InteractionAnswer } from 'interactions/answer-defs';
 })
 export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
   @Input() requireSimplestFormWithValue: string = '';
+
   @Input() allowImproperFractionWithValue: string = '';
+
   @Input() allowNonzeroIntegerPartWithValue: string = '';
+
   @Input() customPlaceholderWithValue: string = '';
+
   @Input() labelForFocusTarget: string;
+
   @Input() savedSolution: InteractionAnswer;
+
   componentSubscriptions: Subscription = new Subscription();
+
   requireSimplestForm: boolean = false;
+
   allowImproperFraction: boolean = true;
+
   allowNonzeroIntegerPart: boolean = true;
+
   customPlaceholder: string = '';
+
   FORM_ERROR_TYPE: string = 'FRACTION_FORMAT_ERROR';
+
   errorMessage: string = '';
+
   answer: string = '';
+
   isValid: boolean = true;
+
   answerChanged: Subject<string> = new Subject<string>();
+
   FRACTION_INPUT_FORM_SCHEMA = {
     type: 'unicode',
     ui_config: {}
   };
+
   constructor(
     private currentInteractionService: CurrentInteractionService,
     private fractionInputRulesService: FractionInputRulesService,

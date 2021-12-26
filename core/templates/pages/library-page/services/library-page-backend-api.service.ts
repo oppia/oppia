@@ -78,7 +78,9 @@ export interface LibraryGroupData {
 })
 export class LibraryPageBackendApiService {
   LIBRARY_INDEX_HANDLER: string = '/libraryindexhandler';
+
   CREATOR_DASHBOARD_HANDLER: string = '/creatordashboardhandler/data';
+
   LIBRARY_GROUP_HANDLER: string = '/librarygrouphandler';
 
   constructor(

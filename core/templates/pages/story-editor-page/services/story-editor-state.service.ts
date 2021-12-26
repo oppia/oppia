@@ -39,20 +39,33 @@ export class StoryEditorStateService {
     private undoRedoService: UndoRedoService) {}
 
   _story: Story = this.storyObjectFactory.createInterstitialStory();
+
   _storyIsInitialized: boolean = false;
+
   _storyIsLoading: boolean = false;
+
   _storyIsBeingSaved: boolean = false;
+
   _topicName: string = null;
+
   _storyIsPublished: boolean = false;
+
   _skillSummaries: SkillSummaryBackendDict[] = [];
+
   _expIdsChanged: boolean = false;
+
   _storyWithUrlFragmentExists: boolean = false;
+
   _classroomUrlFragment: string = null;
+
   _topicUrlFragment: string = null;
 
   _storyInitializedEventEmitter = new EventEmitter();
+
   _storyReinitializedEventEmitter = new EventEmitter();
+
   _viewStoryNodeEditorEventEmitter = new EventEmitter();
+
   _recalculateAvailableNodesEventEmitter = new EventEmitter();
 
   private _setStory(story: Story): void {
@@ -282,6 +295,7 @@ export class StoryEditorStateService {
   get onRecalculateAvailableNodes(): EventEmitter<unknown> {
     return this._recalculateAvailableNodesEventEmitter;
   }
+
   /**
    * Returns whether the story URL fragment already exists on the server.
    */

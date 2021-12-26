@@ -36,12 +36,19 @@ import { PageTitleService } from 'services/page-title.service';
 })
 export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
   nextSubtopicSummaryIsShown: boolean = false;
+
   topicUrlFragment: string;
+
   classroomUrlFragment: string;
+
   subtopicUrlFragment: string;
+
   pageContents: SubtopicPageContents;
+
   subtopicTitle: string;
+
   parentTopicId: string;
+
   nextSubtopic: Subtopic;
 
   constructor(

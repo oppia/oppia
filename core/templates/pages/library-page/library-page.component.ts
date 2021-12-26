@@ -42,30 +42,48 @@ import { ActivityDict,
 export class LibraryPageComponent {
   possibleBannerFilenames = [
     'banner1.svg', 'banner2.svg', 'banner3.svg', 'banner4.svg'];
+
   // If the value below is changed, the following CSS values in
   // oppia.css must be changed:
   // - .oppia-exp-summary-tiles-container: max-width
   // - .oppia-library-carousel: max-width.
   MAX_NUM_TILES_PER_ROW: number = 4;
+
   isAnyCarouselCurrentlyScrolling: boolean = false;
+
   CLASSROOM_PROMOS_ARE_ENABLED: boolean = false;
+
   tileDisplayCount: number = 0;
+
   activeGroupIndex: number;
+
   libraryGroups: SummaryDict[];
+
   leftmostCardIndices: number[] = [];
+
   currentPath: string;
+
   pageMode: string;
+
   LIBRARY_PAGE_MODES = LibraryPageConstants.LIBRARY_PAGE_MODES;
+
   bannerImageFilename: string;
+
   bannerImageFileUrl: string;
+
   groupName: string;
+
   activityList: ActivityDict[];
+
   groupHeaderI18nId: string;
+
   activitiesOwned = {
     explorations: {},
     collections: {}
   };
+
   libraryWindowIsNarrow: boolean;
+
   resizeSubscription: Subscription;
 
   constructor(

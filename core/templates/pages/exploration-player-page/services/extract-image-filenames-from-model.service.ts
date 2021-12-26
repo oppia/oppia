@@ -49,8 +49,11 @@ export class ExtractImageFilenamesFromModelService {
   ) {}
 
     INTERACTION_TYPE_MULTIPLE_CHOICE = 'MultipleChoiceInput';
+
     INTERACTION_TYPE_ITEM_SELECTION = 'ItemSelectionInput';
+
     INTERACTION_TYPE_IMAGE_CLICK_INPUT = 'ImageClickInput';
+
     INTERACTION_TYPE_DRAG_AND_DROP_SORT = 'DragAndDropSortInput';
 
     filenamesInState = [];
@@ -311,6 +314,7 @@ export class ExtractImageFilenamesFromModelService {
     }
 
     getImageFilenamesInSkill = this._getImageFilenamesInSkill;
+
     getImageFilenamesInState = this._getImageFilenamesInState;
 }
 

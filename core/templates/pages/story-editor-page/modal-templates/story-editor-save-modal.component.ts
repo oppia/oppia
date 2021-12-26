@@ -25,6 +25,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 })
 export class StoryEditorSaveModalComponent {
   bindedMessage;
+
   constructor(
      private activeModal: NgbActiveModal
   ) {}

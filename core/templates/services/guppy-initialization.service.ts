@@ -26,7 +26,9 @@ export class GuppyObject {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   divId!: string;
+
   guppyInstance!: Guppy;
+
   constructor(divId: string, guppyInstance: Guppy) {
     this.divId = divId;
     this.guppyInstance = guppyInstance;
@@ -38,8 +40,11 @@ export class GuppyObject {
 })
 export class GuppyInitializationService {
   private guppyInstances: GuppyObject[] = [];
+
   private onScreenKeyboardShown = false;
+
   static interactionType: string;
+
   private static customOskLetters: string[] = [];
 
   init(guppyDivClassName: string, placeholderText: string, initialValue = ''):

@@ -29,6 +29,7 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 export class WelcomeModalComponent
   extends ConfirmOrCancelModal implements OnInit {
   @Input() explorationId: string;
+
   @Input() editorWelcomeImgUrl: string;
 
   constructor(
