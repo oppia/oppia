@@ -36,7 +36,15 @@ describe('Exploration Warnings Service', function() {
   var StateTopAnswersStatsService = null;
   var StateTopAnswersStatsBackendApiService = null;
 
-  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
 
   importAllAngularServices();
   describe('when exploration param changes has jinja values', function() {

@@ -41,6 +41,15 @@ describe('Learner Action Render Service', function() {
   let learnerActionObjectFactory: LearnerActionObjectFactory = null;
   let learnerActionRenderService = null;
 
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
   importAllAngularServices();
   beforeEach(angular.mock.inject(function($injector) {
     explorationStatesService = $injector.get('ExplorationStatesService');

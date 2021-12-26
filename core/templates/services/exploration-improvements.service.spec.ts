@@ -46,6 +46,7 @@ import { StateTopAnswersStatsService } from
 // TODO(#7222): Remove usage of UpgradedServices once upgraded to Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { ChangeListService } from 'pages/exploration-editor-page/services/change-list.service';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 /**
  * @fileoverview Tests for ExplorationImprovementsService.
@@ -55,6 +56,7 @@ describe('ExplorationImprovementsService', function() {
   let explorationImprovementsService;
 
   let $uibModal;
+  let ngbModal: NgbModal = null;
   let changeListService: ChangeListService;
   let explorationStatesService;
   let explorationRightsService;
@@ -152,6 +154,16 @@ describe('ExplorationImprovementsService', function() {
 
   importAllAngularServices();
 
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
@@ -162,6 +174,7 @@ describe('ExplorationImprovementsService', function() {
 
   beforeEach(angular.mock.inject($injector => {
     $uibModal = $injector.get('$uibModal');
+    ngbModal = $injector.get('NgbModal');
     contextService = $injector.get('ContextService');
     explorationImprovementsBackendApiService = (
       $injector.get('ExplorationImprovementsBackendApiService'));
@@ -582,6 +595,12 @@ describe('ExplorationImprovementsService', function() {
     }));
 
     it('should respond to state deletions', fakeAsync(() => {
+      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return ({
+          componentInstance: NgbModalRef,
+          result: Promise.resolve()
+        } as NgbModalRef);
+      });
       let onStateDeletedSpy = (
         spyOn(explorationImprovementsTaskRegistryService, 'onStateDeleted'));
 

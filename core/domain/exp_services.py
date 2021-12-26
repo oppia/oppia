@@ -151,12 +151,20 @@ def get_exploration_ids_matching_query(
             it is empty, no language code filter is applied to the results. If
             it is not empty, then a result is considered valid if it matches at
             least one of these language codes.
-        offset: str or None. Optional offset from which to start the search
+        offset: int or None. Optional offset from which to start the search
             query. If no offset is supplied, the first N results matching
             the query are returned.
 
     Returns:
-        list(str). A list of exploration ids matching the given search query.
+        2-tuple of (returned_exploration_ids, search_offset). Where:
+            returned_exploration_ids : list(str). A list with all
+                exploration ids matching the given search query string,
+                as well as a search offset for future fetches.
+                The list contains exactly feconf.SEARCH_RESULTS_PAGE_SIZE
+                results if there are at least that many, otherwise it
+                contains all remaining results. (If this behaviour does
+                not occur, an error will be logged.)
+            search_offset: int. Search offset for future fetches.
     """
     returned_exploration_ids = []
     search_offset = offset

@@ -197,7 +197,7 @@ describe('Content translation manager service', () => {
           interaction.id as string,
           interaction.customizationArgs,
           true,
-          '',
+          null,
           null
         ),
         interaction,
@@ -474,7 +474,7 @@ describe('Content translation manager service', () => {
           newInteraction.id as string,
           newInteraction.customizationArgs,
           true,
-          '',
+          null,
           null),
         newInteraction,
         RecordedVoiceovers.createEmpty(),
