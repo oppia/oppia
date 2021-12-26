@@ -33,7 +33,7 @@ class UserQueryTests(test_utils.GenericTestBase):
         super(UserQueryTests, self).setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL) # type: ignore[no-untyped-call]  
-        self.user_query_params = user_query_domain.UserQueryParams( # type: ignore
+        self.user_query_params = user_query_domain.UserQueryParams( # type: ignore[call-arg]
             inactive_in_last_n_days=20 
         )
         self.user_query = user_query_domain.UserQuery(
@@ -63,7 +63,8 @@ class UserQueryTests(test_utils.GenericTestBase):
             self.user_query.validate()
 
     def test_validate_query_with_invalid_type_submitter_id_raises(
-            self) -> None:
+            self
+        ) -> None:
         self.user_query.submitter_id = 1 #type: ignore
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, 'Expected submitter ID to be a string'
@@ -71,7 +72,8 @@ class UserQueryTests(test_utils.GenericTestBase):
             self.user_query.validate()
 
     def test_validate_query_with_invalid_user_id_submitter_id_raises(
-            self) -> None:
+            self
+        ) -> None:
         self.user_query.submitter_id = 'aaabbc'
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, 'Expected submitter ID to be a valid user ID'
@@ -100,7 +102,8 @@ class UserQueryTests(test_utils.GenericTestBase):
             self.user_query.validate()
 
     def test_validate_query_with_invalid_type_of_values_in_user_ids_raises(
-            self) -> None:
+            self
+        ) -> None:
         self.user_query.user_ids = [1] #type: ignore
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError,
@@ -117,7 +120,8 @@ class UserQueryTests(test_utils.GenericTestBase):
             self.user_query.validate()
 
     def test_validate_query_with_invalid_type_of_sent_email_model_id_raises(
-            self) -> None:
+            self
+        ) -> None:
         self.user_query.sent_email_model_id = 1 #type: ignore
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError,

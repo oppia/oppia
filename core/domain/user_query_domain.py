@@ -140,7 +140,7 @@ class UserQuery:
         query_id: str,
         query_params: UserQueryParams,
         submitter_id: str
-    ) -> T:
+    ) -> UserQuery:
         """Create default user query.
 
         Args:
