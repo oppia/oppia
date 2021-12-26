@@ -1,5 +1,3 @@
-# coding: utf-8
-#
 # Copyright 2020 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,7 +26,7 @@ from core.tests import test_utils
 from platform_parameter_domain import (EvaluationContext,
 Filter_dict, PlatformParameterRule_dict)
 
-SERVER_MODES = parameter_domain.SERVER_MODES
+ServerModes = parameter_domain.ServerModes
 
 
 class PlatformParameterChangeTests(test_utils.GenericTestBase):
@@ -123,7 +121,7 @@ class PlatformParameterChangeTests(test_utils.GenericTestBase):
 class EvaluationContextTests(test_utils.GenericTestBase) :
     """Test for the EvaluationContext."""
 
-    # 'server_mode' is type SERVER_MODES. A SERVER_MODE is an Enum and contains member 'dev'.
+    # 'server_mode' is type ServerModes. A SERVER_MODE is an Enum and contains member 'dev'.
     def test_create_context_from_dict_returns_correct_instance(self) -> None:
         context = parameter_domain.EvaluationContext.from_dict(
             {
@@ -148,7 +146,7 @@ class EvaluationContextTests(test_utils.GenericTestBase) :
                 'app_version': '1.0.0',
             },
             {
-                'server_mode': SERVER_MODES.dev,
+                'server_mode': ServerModes.dev,
             },
         )
         self.assertFalse(context.is_valid)
@@ -161,7 +159,7 @@ class EvaluationContextTests(test_utils.GenericTestBase) :
                 'app_version': '1.0.0',
             },
             {
-                'server_mode': SERVER_MODES.dev,
+                'server_mode': ServerModes.dev,
             },
         )
         self.assertTrue(context.is_valid)
@@ -173,7 +171,7 @@ class EvaluationContextTests(test_utils.GenericTestBase) :
                 'browser_type': 'Chrome',
             },
             {
-                'server_mode': SERVER_MODES.dev,
+                'server_mode': ServerModes.dev,
             },
         )
         self.assertTrue(context.is_valid)
@@ -185,7 +183,7 @@ class EvaluationContextTests(test_utils.GenericTestBase) :
                 'app_version': '3.0.0',
             },
             {
-                'server_mode': SERVER_MODES.dev,
+                'server_mode': ServerModes.dev,
             },
         )
         self.assertTrue(context.is_valid)
@@ -198,7 +196,7 @@ class EvaluationContextTests(test_utils.GenericTestBase) :
                 'app_version': '1.0.0',
             },
             {
-                'server_mode': SERVER_MODES.dev,
+                'server_mode': ServerModes.dev,
             },
         )
         context.validate()
@@ -211,7 +209,7 @@ class EvaluationContextTests(test_utils.GenericTestBase) :
                 'app_version': '1.0.0',
             },
             {
-                'server_mode': SERVER_MODES.dev,
+                'server_mode': ServerModes.dev,
             },
         )
         # No exception should be raised since invalid platform types are
@@ -226,7 +224,7 @@ class EvaluationContextTests(test_utils.GenericTestBase) :
                 'app_version': '1.0.0',
             },
             {
-                'server_mode': SERVER_MODES.dev,
+                'server_mode': ServerModes.dev,
             },
         )
         # TODO(XXXX): Remove the type ignore[no-untyped-call]
@@ -243,7 +241,7 @@ class EvaluationContextTests(test_utils.GenericTestBase) :
                 'app_version': 'a.a.a',
             },
             {
-                'server_mode': SERVER_MODES.dev,
+                'server_mode': ServerModes.dev,
             },
         )
         # TODO(#test_utils): Remove the type ignore[no-untyped-call] 
@@ -261,7 +259,7 @@ class EvaluationContextTests(test_utils.GenericTestBase) :
                 'app_version': '1.0.0.0',
             },
             {
-                'server_mode': SERVER_MODES.dev,
+                'server_mode': ServerModes.dev,
             },
         )
         # TODO(#test_utils): Remove the type ignore[no-untyped-call] 
@@ -278,7 +276,7 @@ class EvaluationContextTests(test_utils.GenericTestBase) :
                 'app_version': '1.0.0-abcedef-invalid',
             },
             {
-                'server_mode': SERVER_MODES.dev,
+                'server_mode': ServerModes.dev,
             },
         )
         # TODO(#test_utils): Remove the type ignore[no-untyped-call] 
@@ -312,11 +310,11 @@ class EvaluationContextTests(test_utils.GenericTestBase) :
 class PlatformParameterFilterTests(test_utils.GenericTestBase):
     """Test for the PlatformParameterFilter."""
 
-    # 'mode' is type SERVER_MODES. A SERVER_MODE is an Enum and its values are str.
+    # 'mode' is type ServerModes. A SERVER_MODE is an Enum and its values are str.
     def _create_example_context(
             self, platform_type: Optional[str] ='Android', browser_type: 
             Optional[str] = None, app_version: Optional[str] ='1.2.3',
-            mode: SERVER_MODES ='dev' ) -> EvaluationContext: # type: ignore[assignment]
+            mode: ServerModes ='dev' ) -> EvaluationContext: # type: ignore[assignment]
         """Creates and returns an EvaluationContext using the given
         arguments.
         """
@@ -327,7 +325,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
                 'app_version': app_version,
             },
             {
-                'server_mode': getattr(SERVER_MODES, mode), # type: ignore[arg-type]
+                'server_mode': getattr(ServerModes, mode), # type: ignore[arg-type]
             },
         )
 
@@ -376,7 +374,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
 
         self.assertEqual(filter_domain.to_dict(), filter_dict)
 
-    # 'mode' is type SERVER_MODES. A SERVER_MODE is an Enum and its values are str.
+    # 'mode' is type ServerModes. A SERVER_MODE is an Enum and its values are str.
     def test_evaluate_dev_server_mode_filter_with_dev_env_returns_true(self)-> None:
         filter_dict: Filter_dict = {'type': 'server_mode', 'conditions': [('=', 'dev')]}
         filter_domain = (
@@ -1089,7 +1087,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
         self._test_flavor_relation_does_not_hold(
             '1.0.0-abcdef', '>=', 'release')
 
-    # 'mode' is type SERVER_MODES. A SERVER_MODE is an Enum and its values are str.
+    # 'mode' is type ServerModes. A SERVER_MODE is an Enum and its values are str.
     def test_evaluate_multi_value_filter_with_one_matched_returns_true(self)-> None:
         filter_dict: Filter_dict = {
             'type': 'server_mode',
@@ -1102,7 +1100,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
         dev_context = self._create_example_context(mode='dev') # type: ignore[arg-type]
         self.assertTrue(filter_domain.evaluate(dev_context))
 
-    # 'mode' is type SERVER_MODES. A SERVER_MODE is an Enum and its values are str.
+    # 'mode' is type ServerModes. A SERVER_MODE is an Enum and its values are str.
     def test_evaluate_multi_value_filter_with_none_matched_returns_true(self)-> None:
         filter_dict: Filter_dict = {
             'type': 'server_mode',
@@ -1286,7 +1284,7 @@ class PlatformParameterRuleTests(test_utils.GenericTestBase):
         )
         self.assertFalse(rule.has_server_mode_filter())
 
-    # 'mode' is type SERVER_MODES. A SERVER_MODE is an Enum and its values are str.
+    # 'mode' is type ServerModes. A SERVER_MODE is an Enum and its values are str.
     def test_evaluation_with_matching_context_returns_true(self)-> None:
         rule = parameter_domain.PlatformParameterRule.from_dict(
             {
@@ -1309,7 +1307,7 @@ class PlatformParameterRuleTests(test_utils.GenericTestBase):
         )
         self.assertTrue(rule.evaluate(context))
 
-    # 'mode' is type SERVER_MODES. A SERVER_MODE is an Enum and its values are str.
+    # 'mode' is type ServerModes. A SERVER_MODE is an Enum and its values are str.
     def test_evaluation_with_unmatching_context_returns_false(self)-> None:
         rule = parameter_domain.PlatformParameterRule.from_dict(
             {
@@ -1684,7 +1682,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                 'app_version': '1.2.3',
             },
             {
-                'server_mode': SERVER_MODES.dev,
+                'server_mode': ServerModes.dev,
             },
         )
         self.assertEqual(parameter.evaluate(dev_context), '222')
@@ -1719,7 +1717,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                 'app_version': '1.2.3',
             },
             {
-                'server_mode': SERVER_MODES.prod,
+                'server_mode': ServerModes.prod,
             },
         )
         self.assertEqual(parameter.evaluate(prod_context), '111')
@@ -1754,12 +1752,12 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                 'app_version': '1.2.3',
             },
             {
-                'server_mode': SERVER_MODES.dev,
+                'server_mode': ServerModes.dev,
             },
         )
         self.assertEqual(parameter.evaluate(dev_context), '111')
 
-    # 'mode' is type SERVER_MODES. A SERVER_MODE is an Enum and its values are str.
+    # 'mode' is type ServerModes. A SERVER_MODE is an Enum and its values are str.
     def test_evaluate_matching_feature_missing_platform_type_returns_def(self)-> None:
         parameter = parameter_domain.PlatformParameter.from_dict({
             'name': 'parameter_a',

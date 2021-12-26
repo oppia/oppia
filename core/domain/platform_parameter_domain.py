@@ -1,5 +1,3 @@
-# coding: utf-8
-#
 # Copyright 2020 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,20 +29,20 @@ from core.constants import constants
 from core.domain import change_domain
 
 
-class SERVER_MODES(enum.Enum):
+class ServerModes(enum.Enum):
     dev = 'dev'
     test = 'test'
     prod = 'prod'
 
 
-class DATA_TYPES(enum.Enum):
+class DataTypes(enum.Enum):
     bool = 'bool'
     string = 'string'
     number = 'number'
 
 
 class ServerContextDict(TypedDict):
-    server_mode: SERVER_MODES
+    server_mode: ServerModes
 
 
 class FilterDict(TypedDict):
@@ -54,25 +52,25 @@ class FilterDict(TypedDict):
 
 class PlatformParameterRuleDict(TypedDict):
     filters: List[FilterDict]
-    # value_when_matched is * so its type is Any
+    # value_when_matched is * which represent every Types possibles so its type is Any
     value_when_matched: Any
 
 
 class PlatformParameterDict(TypedDict):
     name: str
     description: str
-    data_type: DATA_TYPES
+    data_type: DataTypes
     rules: List[PlatformParameterRuleDict]
     rule_schema_version: int
     default_value: Any
     is_feature: bool
-    feature_stage: SERVER_MODES
+    feature_stage: ServerModes
 
 
-FEATURE_STAGES = SERVER_MODES # pylint: disable=invalid-name
+FEATURE_STAGES = ServerModes # pylint: disable=invalid-name
 
-ALLOWED_SERVER_MODES = [
-    SERVER_MODES.dev.value, SERVER_MODES.test.value, SERVER_MODES.prod.value]
+ALLOWED_ServerModes = [
+    ServerModes.dev.value, ServerModes.test.value, ServerModes.prod.value]
 ALLOWED_FEATURE_STAGES = [
     FEATURE_STAGES.dev.value,
     FEATURE_STAGES.test.value,
@@ -110,10 +108,10 @@ class EvaluationContext:
 
     def __init__(
         self,
-        platform_type: Optional[str], # Optional[str] because it is used in get method
+        platform_type: Optional[str], # Optional[str] because it is used in get method which requires an optional type 
         browser_type: Optional[str],
         app_version: Optional[str],
-        server_mode: SERVER_MODES
+        server_mode: ServerModes
     ) -> None:
         self._platform_type = platform_type
         self._browser_type = browser_type
@@ -152,11 +150,11 @@ class EvaluationContext:
         return self._app_version
 
     @property
-    def server_mode(self) -> SERVER_MODES:
+    def server_mode(self) -> ServerModes:
         """Returns the server mode of Oppia.
 
         Returns:
-            Enum(SERVER_MODES). The server mode of Oppia,
+            Enum(ServerModes). The server mode of Oppia,
             must be one of the following: dev, test, prod.
         """
         return self._server_mode
@@ -203,10 +201,10 @@ class EvaluationContext:
                     ' specified.' % (
                         match.group(2), ALLOWED_APP_VERSION_FLAVORS))
 
-        if self._server_mode.value not in ALLOWED_SERVER_MODES:
+        if self._server_mode.value not in ALLOWED_ServerModes:
             raise utils.ValidationError(
                 'Invalid server mode \'%s\', must be one of %s.' % (
-                    self._server_mode.value, ALLOWED_SERVER_MODES))
+                    self._server_mode.value, ALLOWED_ServerModes))
 
     @classmethod
     def from_dict(
@@ -231,7 +229,7 @@ class EvaluationContext:
             client_context_dict.get('browser_type'),
             client_context_dict.get('app_version'),
             # Type ignore because key server_mode can not be None
-            server_context_dict.get('server_mode'), # type: ignore[arg-type]
+            server_context_dict['server_mode'],
         )
 
 
@@ -253,7 +251,7 @@ class PlatformParameterFilter:
 
     def __init__(
         self, filter_type: str, conditions: List[Tuple[str, str]]
-        ) -> None:
+    ) -> None:
         self._type = filter_type
         self._conditions = conditions
 
@@ -295,7 +293,7 @@ class PlatformParameterFilter:
     def _evaluate_single_value(
         self, op: str, value: str,
         context: EvaluationContext
-        ) -> bool:
+    ) -> bool:
         """Tries to match the given context with the filter against the
         given value.
 
@@ -346,11 +344,11 @@ class PlatformParameterFilter:
             for _, mode in self._conditions:
                 if not any(
                         mode == server_mode
-                        for server_mode in ALLOWED_SERVER_MODES
+                        for server_mode in ALLOWED_ServerModes
                 ):
                     raise utils.ValidationError(
                         'Invalid server mode \'%s\', must be one of %s.' % (
-                            mode, ALLOWED_SERVER_MODES))
+                            mode, ALLOWED_ServerModes))
         elif self._type == 'platform_type':
             for _, platform_type in self._conditions:
                 if platform_type not in ALLOWED_PLATFORM_TYPES:
@@ -400,7 +398,7 @@ class PlatformParameterFilter:
 
     def _match_version_expression( #type:ignore[return]
         self, op: str, value: str, client_version: Optional[str]
-        ) -> bool:
+    ) -> bool:
         """Tries to match the version expression against the client version.
 
         Args:
@@ -416,7 +414,7 @@ class PlatformParameterFilter:
 
         match = APP_VERSION_WITH_HASH_REGEXP.match(client_version)
 
-        # Type ignore because if match is None then method stops
+        # Type ignore because if match is None with Mypy then method gets an error 
         # line 393 with a False return
         client_version_without_hash = match.group(1) #type: ignore[union-attr]
 
@@ -455,7 +453,8 @@ class PlatformParameterFilter:
         version_b_list = version_b.split('.')
 
         for sub_version_a, sub_version_b in python_utils.ZIP(
-                version_a_list, version_a_list):
+                version_a_list, version_a_list
+	):
             if int(sub_version_a) < int(sub_version_b):
                 return True
             elif int(sub_version_a) > int(sub_version_b):
@@ -487,8 +486,8 @@ class PlatformParameterFilter:
             return False
 
         match = APP_VERSION_WITH_HASH_REGEXP.match(client_version)
-        #Type ignore because if match is None then
-        #method stops line 463 with a False return
+        #Type ignore because if match is None  with mypy test then
+        #the method stops line 463 with a False return and its get an error 
         client_flavor = match.group(2) #type: ignore[union-attr]
 
         # An unspecified client flavor means no flavor-based filters should
@@ -631,9 +630,9 @@ class PlatformParameter:
     """Domain object for platform parameters."""
 
     DATA_TYPE_PREDICATES_DICT = {
-        DATA_TYPES.bool.value: lambda x: isinstance(x, bool),
-        DATA_TYPES.string.value: lambda x: isinstance(x, str),
-        DATA_TYPES.number.value: lambda x: isinstance(x, (float, int)),
+        DataTypes.bool.value: lambda x: isinstance(x, bool),
+        DataTypes.string.value: lambda x: isinstance(x, str),
+        DataTypes.number.value: lambda x: isinstance(x, (float, int)),
     }
 
     PARAMETER_NAME_REGEXP = r'^[A-Za-z0-9_]{1,100}$'
@@ -642,12 +641,12 @@ class PlatformParameter:
         self,
         name: str,
         description: str,
-        data_type: DATA_TYPES,
+        data_type: DataTypes,
         rules: List[PlatformParameterRule],
         rule_schema_version: int,
         default_value: Any,
         is_feature: bool,
-        feature_stage: SERVER_MODES
+        feature_stage: ServerModes
     ) -> None:
         self._name = name
         self._description = description
@@ -677,11 +676,11 @@ class PlatformParameter:
         return self._description
 
     @property
-    def data_type(self) -> DATA_TYPES:
+    def data_type(self) -> DataTypes:
         """Returns the data type of the platform parameter.
 
         Returns:
-            DATA_TYPES. The data type of the platform parameter.
+            DataTypes. The data type of the platform parameter.
         """
         return self._data_type
 
@@ -713,7 +712,7 @@ class PlatformParameter:
         return self._rule_schema_version
 
     @property
-    # default_value returns *. so its type is Any
+    # default_value is * which represent every Types possibles so its type is Any
     def default_value(self) -> Any:
         """Returns the default value of the platform parameter.
 
@@ -773,7 +772,7 @@ class PlatformParameter:
         if self._is_feature:
             self._validate_feature_flag()
 
-    # default_value is *. so its type is Any
+    # default_value is * which represent every Types possibles so its type is Any
     def evaluate(self, context: EvaluationContext) -> Any:
         """Evaluates the value of the platform parameter in the given context.
         The value of first matched rule is returned as the result.
@@ -817,7 +816,7 @@ class PlatformParameter:
         """Validates the PlatformParameter domain object that is a feature
         flag.
         """
-        if str(self._data_type) != DATA_TYPES.bool.value:
+        if str(self._data_type) != DataTypes.bool.value:
             raise utils.ValidationError(
                 'Data type of feature flags must be bool, got \'%s\' '
                 'instead.' % self._data_type)
@@ -839,13 +838,13 @@ class PlatformParameter:
                     value for _, value in server_mode_filter.conditions]
                 if str(self._feature_stage) == FEATURE_STAGES.dev.value:
                     if (
-                            SERVER_MODES.test.value in server_modes or
-                            SERVER_MODES.prod.value in server_modes):
+                            ServerModes.test.value in server_modes or
+                            ServerModes.prod.value in server_modes):
                         raise utils.ValidationError(
                             'Feature in dev stage cannot be enabled in test or'
                             ' production environments.')
                 elif str(self._feature_stage) == FEATURE_STAGES.test.value:
-                    if SERVER_MODES.prod.value in server_modes:
+                    if ServerModes.prod.value in server_modes:
                         raise utils.ValidationError(
                             'Feature in test stage cannot be enabled in '
                             'production environment.')

@@ -396,7 +396,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             'Expected all answer groups to have destination as None.')
 
     def test_validate_invalid_format_of_inapplicable_skill_misconception_ids(
-            self) -> None:
+            self
+	) -> None:
         """Test to verify that the validation fails when
         inapplicable_skill_misconception_ids value is an invalid format i.e.
         it is not of the form <skill-id>-<misconception-id>.

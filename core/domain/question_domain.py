@@ -1,5 +1,3 @@
-# coding: utf-8
-#
 # Copyright 2017 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -1592,4 +1590,3 @@ class MergedQuestionSkillLink:
             'skill_descriptions': self.skill_descriptions,
             'skill_difficulties': self.skill_difficulties,
         }
-
