@@ -96,7 +96,7 @@ export class WorkedExampleEditorComponent implements OnInit {
     }
   }
 
-  openExplanationEditor = function() {
+  openExplanationEditor(): void {
     if (this.isEditable) {
       this.workedExampleExplanationMemento =
         cloneDeep(this.container.workedExampleExplanationHtml);
