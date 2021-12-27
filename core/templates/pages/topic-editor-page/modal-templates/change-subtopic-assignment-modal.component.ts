@@ -16,7 +16,7 @@
  * @fileoverview Component for change subtopic assignment modal.
  */
 
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { Subtopic } from 'domain/topic/subtopic.model';
@@ -28,7 +28,7 @@ import { Subtopic } from 'domain/topic/subtopic.model';
 
 export class ChangeSubtopicAssignmentModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-    @Input() subtopics: Subtopic[];
+    subtopics: Subtopic[];
     selectedSubtopicId: number;
     constructor(
       private ngbActiveModal: NgbActiveModal,
