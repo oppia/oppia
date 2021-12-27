@@ -153,6 +153,13 @@ describe('Current Interaction Service', () => {
   });
 
   it('should update view with new answer', () => {
+    // Here, toBeDefined is used instead of testing with a value
+    // because currentInteractionService.onAnswerChanged$ returns
+    // observable of answerChangedSubject which is a private static
+    // member of the class CurrentInteractionService and hence cannot
+    // be accessed from outside. And the first toBeDefined is used
+    // just to verify that updateViewWithNewAnswer is a defined function.
+
     expect(currentInteractionService.updateViewWithNewAnswer).toBeDefined();
     currentInteractionService.updateViewWithNewAnswer();
 
