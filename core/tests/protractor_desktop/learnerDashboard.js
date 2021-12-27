@@ -421,19 +421,19 @@ describe('Learner dashboard functionality', function() {
     await storyEditorPage.returnToTopic();
     await topicEditorPage.expectNumberOfStoriesToBe(1);
     await topicAndStoryViewerPage.get(
-      'math', TOPIC_URL_FRAGMENT_NAME, 'story-two');
+      'math', TOPIC_URL_FRAGMENT_NAME, 'storytwo');
     await topicAndStoryViewerPage.expectCompletedLessonCountToBe(0);
     await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(3);
     await topicAndStoryViewerPage.goToChapterIndex(0);
     await explorationPlayerPage.submitAnswer('Continue', null);
     await topicAndStoryViewerPage.get(
-      'math', TOPIC_URL_FRAGMENT_NAME, 'story-two');
+      'math', TOPIC_URL_FRAGMENT_NAME, 'storytwo');
     await topicAndStoryViewerPage.expectCompletedLessonCountToBe(1);
     await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(2);
     await topicAndStoryViewerPage.goToChapterIndex(1);
     await explorationPlayerPage.submitAnswer('Continue', null);
     await topicAndStoryViewerPage.get(
-      'math', TOPIC_URL_FRAGMENT_NAME, 'story-two');
+      'math', TOPIC_URL_FRAGMENT_NAME, 'storytwo');
     await topicAndStoryViewerPage.expectCompletedLessonCountToBe(2);
     await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(1);
     await topicAndStoryViewerPage.goToChapterIndex(2);
@@ -447,7 +447,7 @@ describe('Learner dashboard functionality', function() {
      * skill in it named Learner Dashboard Skill 2.
     */
     await topicAndStoryViewerPage.get(
-      'math', TOPIC_URL_FRAGMENT_NAME, 'story-two');
+      'math', TOPIC_URL_FRAGMENT_NAME, 'storytwo');
     await topicAndStoryViewerPage.expectCompletedLessonCountToBe(3);
     await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(0);
     await learnerDashboardPage.get();

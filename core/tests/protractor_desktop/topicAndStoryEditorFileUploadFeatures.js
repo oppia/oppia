@@ -54,7 +54,7 @@ describe('Topic editor functionality', function() {
   it('should edit topic name, thumbnail and description ' +
     'correctly', async function() {
     var TOPIC_NAME = 'TASEFUF_1';
-    var TOPIC_URL_FRAGMENT_NAME = 'tasefuf-one';
+    var TOPIC_URL_FRAGMENT_NAME = 'tasefufone';
     var TOPIC_DESCRIPTION = 'TASEFUF_1 description';
     var EDITED_TOPIC_NAME = 'TASEFUF_1 edited';
     var NEW_TOPIC_NAME = EDITED_TOPIC_NAME;
@@ -82,7 +82,7 @@ describe('Topic editor functionality', function() {
 
   it('should edit subtopic page contents correctly', async function() {
     var TOPIC_NAME = 'TASEFUF_2';
-    var TOPIC_URL_FRAGMENT_NAME = 'tasefuf-two';
+    var TOPIC_URL_FRAGMENT_NAME = 'tasefuftwo';
     var TOPIC_DESCRIPTION = 'TASEFUF_2 description';
 
     await topicsAndSkillsDashboardPage.createTopic(
