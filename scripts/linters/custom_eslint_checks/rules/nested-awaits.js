@@ -56,7 +56,8 @@ module.exports = {
         if (node && node.callee && node.callee.property &&
           node.callee.property.name === 'sendKeys' &&
           node.callee.object.type === 'AwaitExpression' &&
-          node.callee.object.argument.callee.property.name === 'activeElement' &&
+          node.callee.object.argument.callee.property.name ===
+          'activeElement' &&
           node.callee.object.argument.callee.object.callee.property.name ===
           'switchTo' &&
           node.callee.object.argument.callee.object.callee.object.name ===
