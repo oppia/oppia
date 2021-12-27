@@ -504,6 +504,7 @@ describe('TopNavigationBarComponent', () => {
     spyOn(component, 'getDropdownOffset')
       .withArgs('.learn-tab', 688).and.returnValue(-10)
       .withArgs('.learn-tab', 300).and.returnValue(-10)
+      .withArgs('.donate-tab', 286).and.returnValue(-10)
       .withArgs('.get-involved', 574).and.returnValue(-10);
 
     expect(component.learnDropdownOffset).toBe(0);
