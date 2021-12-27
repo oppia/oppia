@@ -65,7 +65,7 @@ export class WorkedExampleEditorComponent implements OnInit {
       workedExampleQuestionHtml:
       this.workedExample.getQuestion().html,
       workedExampleExplanationHtml:
-      this.workedExample.getExplanation().html 
+      this.workedExample.getExplanation().html
     };
   }
 
