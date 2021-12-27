@@ -12,41 +12,58 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { EventEmitter } from '@angular/core';
-import { Rubric } from 'domain/skill/rubric.model';
-import { SkillUpdateService } from 'domain/skill/skill-update.service';
-import { SkillBackendDict, SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
-import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
-
 /**
- * @fileoverview Unit tests for the skill rubric editor.
+ * @fileoverview Unit tests for SkillRubricsEditorComponent
  */
 
-describe('skillRubricsEditor', function() {
-  var $scope = null;
-  var ctrl = null;
-  var $rootScope = null;
-  let skillEditorStateService: SkillEditorStateService = null;
-  let skillObjectFactory: SkillObjectFactory = null;
-  let skillUpdateService: SkillUpdateService = null;
-  let windowDimensionsService: WindowDimensionsService = null;
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { SkillUpdateService } from 'domain/skill/skill-update.service';
+import { Skill, SkillBackendDict, SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
+import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
+import { EventEmitter } from '@angular/core';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { SkillRubricsEditorComponent } from './skill-rubrics-editor.component';
+import { Rubric } from 'domain/skill/rubric.model';
+
+fdescribe('Skill Rubrics Editor Component', function() {
+  let component: SkillRubricsEditorComponent;
+  let fixture: ComponentFixture<SkillRubricsEditorComponent>;
+  let skillEditorStateService: SkillEditorStateService;
+  let skillObjectFactory: SkillObjectFactory;
+  let skillUpdateService: SkillUpdateService;
+  let windowDimensionsService: WindowDimensionsService;
   let mockEventEmitter = new EventEmitter();
   let skillBackendDict: SkillBackendDict;
+  let sampleSkill: Skill;
 
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      declarations: [
+        SkillRubricsEditorComponent
+      ],
+      providers: [
+        SkillUpdateService,
+        SkillEditorStateService,
+        {
+          provide: WindowDimensionsService,
+          useValue: {
+            isWindowNarrow: () => true,
+          }
+        }
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
+  }));
 
-  let sampleSkill = null;
-
-  importAllAngularServices();
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    skillEditorStateService = $injector.get('SkillEditorStateService');
-    skillObjectFactory = $injector.get('SkillObjectFactory');
-    skillUpdateService = $injector.get('SkillUpdateService');
-    windowDimensionsService = $injector.get('WindowDimensionsService');
-    $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
+  beforeEach(() => {
+    fixture = TestBed.createComponent(SkillRubricsEditorComponent);
+    component = fixture.componentInstance;
+    skillUpdateService = TestBed.inject(SkillUpdateService);
+    skillEditorStateService = TestBed.inject(SkillEditorStateService);
+    windowDimensionsService = TestBed.inject(WindowDimensionsService);
 
     const skillContentsDict = {
       explanation: {
@@ -77,15 +94,12 @@ describe('skillRubricsEditor', function() {
       prerequisite_skill_ids: ['skill_1']
     };
     sampleSkill = skillObjectFactory.createFromBackendDict(skillBackendDict);
+    
+    fixture.detectChanges();
+  });
 
-    ctrl = $componentController('skillRubricsEditor', {
-      $scope: $scope
-    });
-  }));
-
-  afterEach(function() {
-    // eslint-disable-next-line oppia/disallow-angularjs-properties
-    $rootScope.$broadcast('$destroy');
+  afterEach(() => {
+    component.ngOnDestroy();
   });
 
   describe('when user\'s window is narrow', () => {
@@ -95,47 +109,47 @@ describe('skillRubricsEditor', function() {
       spyOnProperty(skillEditorStateService, 'onSkillChange')
         .and.returnValue(mockEventEmitter);
 
-      ctrl.$onInit();
+      component.ngOnInit();
     });
 
     it('should initialise component when user open skill rubrics editor',
-      () => {
-        expect($scope.skill).toEqual(sampleSkill);
-        expect($scope.rubricsListIsShown).toBeFalse();
-      });
+    () => {
+      expect(component.skill).toEqual(sampleSkill);
+      expect(component.rubricsListIsShown).toBeFalse();
+    });
 
     it('should fetch rubrics when skill changes', () => {
-      $scope.skill._rubrics = [Rubric.createFromBackendDict({
+      component.skill._rubrics = [Rubric.createFromBackendDict({
         difficulty: 'Easy',
         explanations: ['explanation'],
       })];
-
-      expect($scope.rubrics).toBeUndefined();
-
+  
+      expect(component.rubrics).toBeUndefined();
+  
       mockEventEmitter.emit();
-
-      expect($scope.rubrics).toEqual([Rubric.createFromBackendDict({
+  
+      expect(component.rubrics).toEqual([Rubric.createFromBackendDict({
         difficulty: 'Easy',
         explanations: ['explanation'],
       })]);
     });
 
     it('should show toggle rubrics list when user\'s window is narrow', () => {
-      expect($scope.rubricsListIsShown).toBeFalse();
-
-      $scope.toggleRubricsList();
-
-      expect($scope.rubricsListIsShown).toBeTrue();
-
-      $scope.toggleRubricsList();
-
-      expect($scope.rubricsListIsShown).toBeFalse();
+      expect(component.rubricsListIsShown).toBeFalse();
+  
+      component.toggleRubricsList();
+  
+      expect(component.rubricsListIsShown).toBeTrue();
+  
+      component.toggleRubricsList();
+  
+      expect(component.rubricsListIsShown).toBeFalse();
     });
 
     it('should update skill rubrics when user saves', () => {
       spyOn(skillUpdateService, 'updateRubricForDifficulty');
-
-      $scope.onSaveRubric('Easy', [
+  
+      component.onSaveRubric('Easy', [
         'new explanation 1',
         'new explanation 2',
       ]);
@@ -145,7 +159,7 @@ describe('skillRubricsEditor', function() {
           'new explanation 1',
           'new explanation 2',
         ]);
-    });
+     });
   });
 
   describe('when user\'s window is not narrow', () => {
@@ -153,20 +167,20 @@ describe('skillRubricsEditor', function() {
       spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
       spyOn(skillEditorStateService, 'getSkill').and.returnValue(sampleSkill);
 
-      ctrl.$onInit();
+      component.ngOnInit();
     });
 
     it('should display rubrics list when editor loads', () => {
-      expect($scope.skill).toEqual(sampleSkill);
-      expect($scope.rubricsListIsShown).toBeTrue();
+      expect(component.skill).toEqual(sampleSkill);
+      expect(component.rubricsListIsShown).toBeTrue();
     });
 
     it('should not display toggle option when user has a wide screen', () => {
-      expect($scope.rubricsListIsShown).toBeTrue();
+      expect(component.rubricsListIsShown).toBeTrue();
 
-      $scope.toggleRubricsList();
+      component.toggleRubricsList();
 
-      expect($scope.rubricsListIsShown).toBeTrue();
+      expect(component.rubricsListIsShown).toBeTrue();
     });
   });
 });
