@@ -508,12 +508,14 @@ describe('TopNavigationBarComponent', () => {
 
     expect(component.learnDropdownOffset).toBe(0);
     expect(component.getInvolvedMenuOffset).toBe(0);
+    expect(component.donateMenuOffset).toBe(0);
 
     component.ngAfterViewChecked();
     tick();
 
     expect(component.learnDropdownOffset).toBe(-10);
     expect(component.getInvolvedMenuOffset).toBe(-10);
+    expect(component.donateMenuOffset).toBe(-10);
   }));
 
   it('should check if classroom data is fetched', fakeAsync(() => {
