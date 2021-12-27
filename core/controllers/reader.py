@@ -434,18 +434,12 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
     }
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
-            'params': {
-                'schema': {
-                    'type': 'dict',
-                    'properties': []
-                }
-            },
             'session_id': {
                 'schema': {
                     'type': 'basestring'
                 }
             },
-            'state_name': {
+            'old_state_name': {
                 'schema': {
                     'type': 'basestring'
                 }
@@ -477,7 +471,8 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
                         'id': 'is_at_least',
                         'min_value': 1
                     }]
-                }
+                },
+                'default_value': None
             },
             'classification_categorization': {
                 'schema': {
