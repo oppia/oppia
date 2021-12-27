@@ -16,6 +16,8 @@
  * @fileoverview Directive for the navbar of the topic editor.
  */
 
+import { TopicEditorSendMailModalComponent } from '../modal-templates/topic-editor-send-mail-modal.component';
+
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
@@ -38,13 +40,13 @@ import { TopicEditorSaveModalComponent } from '../modal-templates/topic-editor-s
 angular.module('oppia').component('topicEditorNavbar', {
   template: require('./topic-editor-navbar.component.html'),
   controller: [
-    '$rootScope', '$scope', '$uibModal', '$window', 'AlertsService',
+    '$rootScope', '$scope', '$window', 'AlertsService',
     'NgbModal', 'TopicEditorRoutingService',
     'TopicEditorStateService', 'TopicRightsBackendApiService',
     'UndoRedoService', 'UrlInterpolationService',
     'UrlService', 'TOPIC_VIEWER_URL_TEMPLATE',
     function(
-        $rootScope, $scope, $uibModal, $window, AlertsService,
+        $rootScope, $scope, $window, AlertsService,
         NgbModal, TopicEditorRoutingService, TopicEditorStateService,
         TopicRightsBackendApiService, UndoRedoService,
         UrlInterpolationService, UrlService,
@@ -77,12 +79,8 @@ angular.module('oppia').component('topicEditorNavbar', {
 
       $scope.publishTopic = function() {
         if (!$scope.topicRights.canPublishTopic()) {
-          $uibModal.open({
-            templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-              '/pages/topic-editor-page/modal-templates/' +
-                  'topic-editor-send-mail-modal.template.html'),
+          NgbModal.open(TopicEditorSendMailModalComponent, {
             backdrop: true,
-            controller: 'ConfirmOrCancelModalController'
           }).result.then(function() {
             TopicRightsBackendApiService.sendMailAsync(
               $scope.topicId, $scope.topicName).then(function() {

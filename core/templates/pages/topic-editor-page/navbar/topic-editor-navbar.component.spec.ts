@@ -337,9 +337,11 @@ describe('topicEditorNavbar', () => {
   ' clicks the \'publish\' button and then cancels', fakeAsync(() => {
     spyOn(TopicRightsBackendApiService, 'sendMailAsync').and.returnValue(
       Promise.resolve());
-    spyOn($uibModal, 'open').and.returnValue({
-      result: Promise.reject()
-    });
+    spyOn(ngbModal, 'open').and.returnValue(
+      {
+        result: Promise.reject()
+      } as NgbModalRef
+    );
     spyOn(AlertsService, 'addSuccessMessage');
     $scope.topicRights = TopicRights.createFromBackendDict({
       published: false,

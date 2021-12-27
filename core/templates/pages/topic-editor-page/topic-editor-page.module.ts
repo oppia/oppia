@@ -34,6 +34,9 @@ import { StoriesListComponent } from
 import { SubtopicsListComponent } from
   'pages/topic-viewer-page/subtopics-list/subtopics-list.component';
 import { SubtopicPreviewTab } from './subtopic-editor/subtopic-preview-tab.component';
+import { DeleteStoryModalComponent } from './modal-templates/delete-story-modal.component';
+import { TopicEditorSendMailModalComponent } from './modal-templates/topic-editor-send-mail-modal.component';
+import { TopicSavePendingChangesModalComponent } from './modal-templates/topic-save-pending-changes-modal.component';
 import { TopicPreviewTabComponent } from './preview-tab/topic-preview-tab.component';
 import { TopicEditorNavbarBreadcrumbComponent } from './navbar/topic-editor-navbar-breadcrumb.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -51,18 +54,24 @@ import { TopicEditorSaveModalComponent } from './modal-templates/topic-editor-sa
     ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
+    DeleteStoryModalComponent,
     StoriesListComponent,
     SubtopicsListComponent,
     SubtopicPreviewTab,
+    TopicEditorSendMailModalComponent,
+    TopicSavePendingChangesModalComponent,
     TopicPreviewTabComponent,
     TopicEditorNavbarBreadcrumbComponent,
     CreateNewSubtopicModalComponent,
     TopicEditorSaveModalComponent
   ],
   entryComponents: [
+    DeleteStoryModalComponent,
     StoriesListComponent,
     SubtopicsListComponent,
     SubtopicPreviewTab,
+    TopicEditorSendMailModalComponent,
+    TopicSavePendingChangesModalComponent,
     TopicPreviewTabComponent,
     TopicEditorNavbarBreadcrumbComponent,
     CreateNewSubtopicModalComponent,
