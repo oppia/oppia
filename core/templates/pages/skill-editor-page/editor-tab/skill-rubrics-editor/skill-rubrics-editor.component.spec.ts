@@ -16,18 +16,19 @@
  * @fileoverview Unit tests for SkillRubricsEditorComponent
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { SkillUpdateService } from 'domain/skill/skill-update.service';
-import { Skill, SkillBackendDict, SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
-import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
 import { EventEmitter } from '@angular/core';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+
+import { SkillUpdateService } from 'domain/skill/skill-update.service';
+import { Skill, SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
+import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { SkillRubricsEditorComponent } from './skill-rubrics-editor.component';
 import { Rubric } from 'domain/skill/rubric.model';
 
-fdescribe('Skill Rubrics Editor Component', function() {
+describe('Skill Rubrics Editor Component', () => {
   let component: SkillRubricsEditorComponent;
   let fixture: ComponentFixture<SkillRubricsEditorComponent>;
   let skillEditorStateService: SkillEditorStateService;
@@ -35,7 +36,6 @@ fdescribe('Skill Rubrics Editor Component', function() {
   let skillUpdateService: SkillUpdateService;
   let windowDimensionsService: WindowDimensionsService;
   let mockEventEmitter = new EventEmitter();
-  let skillBackendDict: SkillBackendDict;
   let sampleSkill: Skill;
 
   beforeEach(waitForAsync(() => {
@@ -61,6 +61,7 @@ fdescribe('Skill Rubrics Editor Component', function() {
   beforeEach(() => {
     fixture = TestBed.createComponent(SkillRubricsEditorComponent);
     component = fixture.componentInstance;
+    skillObjectFactory = TestBed.inject(SkillObjectFactory);
     skillUpdateService = TestBed.inject(SkillUpdateService);
     skillEditorStateService = TestBed.inject(SkillEditorStateService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
@@ -80,7 +81,7 @@ fdescribe('Skill Rubrics Editor Component', function() {
       }
     };
 
-    skillBackendDict = {
+    sampleSkill = skillObjectFactory.createFromBackendDict({
       id: '1',
       description: 'test description',
       misconceptions: [],
@@ -92,8 +93,7 @@ fdescribe('Skill Rubrics Editor Component', function() {
       superseding_skill_id: '2',
       all_questions_merged: false,
       prerequisite_skill_ids: ['skill_1']
-    };
-    sampleSkill = skillObjectFactory.createFromBackendDict(skillBackendDict);
+    });
     
     fixture.detectChanges();
   });

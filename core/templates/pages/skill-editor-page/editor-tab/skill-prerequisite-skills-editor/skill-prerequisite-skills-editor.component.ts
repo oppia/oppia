@@ -19,12 +19,16 @@
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
+
+import { GroupedSkillSummaries, SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
 import { SkillUpdateService } from 'domain/skill/skill-update.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { SelectSkillModalComponent } from 'components/skill-selector/select-skill-modal.component';
 import { AlertsService } from 'services/alerts.service';
+import { Skill } from 'domain/skill/SkillObjectFactory';
+import { CategorizedSkills } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+import { SkillSummary } from 'domain/skill/skill-summary.model';
 
 @Component({
   selector: 'oppia-skill-prerequisite-skills-editor',
@@ -32,12 +36,12 @@ import { AlertsService } from 'services/alerts.service';
 })
 export class SkillPrerequisiteSkillsEditorComponent
   implements OnInit {
-  categorizedSkills;
-  untriagedSkillSummaries;
-  groupedSkillSummaries;
+  categorizedSkills: CategorizedSkills;
+  groupedSkillSummaries: GroupedSkillSummaries;
   prerequisiteSkillsAreShown: boolean;
-  skill;
-  skillIdToSummaryMap;
+  skill: Skill;
+  skillIdToSummaryMap: object;
+  untriagedSkillSummaries: SkillSummary[];
 
   constructor(
     private alertsService: AlertsService,

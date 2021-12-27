@@ -13,16 +13,16 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the skill rubric editor.
+ * @fileoverview Component for the skill rubrics editor.
  */
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { Subscription } from 'rxjs';
 import { Rubric } from 'domain/skill/rubric.model';
 import { SkillUpdateService } from 'domain/skill/skill-update.service';
 import { Skill } from 'domain/skill/SkillObjectFactory';
 import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
-import { Subscription } from 'rxjs';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 
 @Component({

@@ -17,9 +17,11 @@
  * @fileoverview Unit tests for the skill editor main tab component.
  */
 
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+
 import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
 import { Skill, SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
@@ -28,7 +30,6 @@ import { AlertsService } from 'services/alerts.service';
 import { SkillPrerequisiteSkillsEditorComponent } from './skill-prerequisite-skills-editor.component';
 import { SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('Skill editor main tab component', () => {
   let component: SkillPrerequisiteSkillsEditorComponent;
@@ -51,8 +52,16 @@ describe('Skill editor main tab component', () => {
       imports: [HttpClientTestingModule],
       declarations: [SkillPrerequisiteSkillsEditorComponent],
       providers: [
+        AlertsService,
         SkillUpdateService,
-        SkillEditorStateService
+        SkillEditorStateService,
+        {
+          provide: WindowDimensionsService,
+          useValue: {
+            isWindowNarrow: () => true,
+          }
+        },
+        TopicsAndSkillsDashboardBackendApiService
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
