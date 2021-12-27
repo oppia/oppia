@@ -20,11 +20,18 @@
 import { EventEmitter } from '@angular/core';
 import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { Subtopic } from 'domain/topic/subtopic.model';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 // ^^^ This block is to be removed.
+
+class MockNgbModalRef {
+  componentInstance: {
+    subtopics: null;
+  };
+}
 
 describe('Topic editor tab directive', function() {
   beforeEach(angular.mock.module('oppia'));
@@ -36,6 +43,7 @@ describe('Topic editor tab directive', function() {
   var $rootScope = null;
   var topic = null;
   var $q = null;
+  let ngbModal: NgbModal = null;
   var skillSummary = null;
   var story1 = null;
   var story2 = null;
@@ -77,6 +85,7 @@ describe('Topic editor tab directive', function() {
     $scope = $rootScope.$new();
     $uibModalInstance = $injector.get('$uibModal');
     $q = $injector.get('$q');
+    ngbModal = $injector.get('NgbModal');
     directive = $injector.get('topicEditorTabDirective')[0];
     TopicEditorStateService = $injector.get('TopicEditorStateService');
     TopicObjectFactory = $injector.get('TopicObjectFactory');
@@ -514,7 +523,16 @@ describe('Topic editor tab directive', function() {
 
   it('should open ChangeSubtopicAssignment modal when change ' +
       'subtopic assignment is called', function() {
-    var modalSpy = spyOn($uibModalInstance, 'open').and.callThrough();
+    var deferred = $q.defer();
+    deferred.resolve(1);
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      setTimeout(opt.beforeDismiss);
+      return (
+        {
+          componentInstance: MockNgbModalRef,
+          result: deferred.promise
+        } as NgbModalRef);
+    });
     $scope.changeSubtopicAssignment(1, skillSummary);
     expect(modalSpy).toHaveBeenCalled();
   });
@@ -523,8 +541,12 @@ describe('Topic editor tab directive', function() {
     function() {
       var deferred = $q.defer();
       deferred.resolve(1);
-      spyOn($uibModalInstance, 'open').and.returnValue(
-        {result: deferred.promise});
+      spyOn(ngbModal, 'open').and.returnValue(
+        {
+          componentInstance: MockNgbModalRef,
+          result: deferred.promise
+        } as NgbModalRef
+      );
       var moveSkillUpdateSpy = spyOn(
         TopicUpdateService, 'moveSkillToSubtopic');
       $scope.changeSubtopicAssignment(null, skillSummary);
@@ -536,8 +558,12 @@ describe('Topic editor tab directive', function() {
     function() {
       var deferred = $q.defer();
       deferred.resolve(1);
-      spyOn($uibModalInstance, 'open').and.returnValue(
-        {result: deferred.promise});
+      spyOn(ngbModal, 'open').and.returnValue(
+        {
+          componentInstance: MockNgbModalRef,
+          result: deferred.promise
+        } as NgbModalRef
+      );
       var moveSkillSpy = (
         spyOn(TopicUpdateService, 'moveSkillToSubtopic'));
       $scope.changeSubtopicAssignment(1, skillSummary);
