@@ -139,6 +139,11 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
     }
   }
 
+  showMobileStyleCard(): boolean {
+    let currentPageUrl = this.urlService.getPathname();
+    return (currentPageUrl === '/community-library');
+  }
+
   setHoverState(hoverState: boolean): void {
     this.explorationIsCurrentlyHoveredOver = hoverState;
   }

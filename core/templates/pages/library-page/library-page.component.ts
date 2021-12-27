@@ -92,6 +92,10 @@ export class LibraryPageComponent {
   }
 
   initCarousels(): void {
+    if (this.libraryWindowIsNarrow) {
+      return;
+    }
+
     // This prevents unnecessary execution of this method immediately
     // after a window resize event is fired.
     if (!this.libraryGroups) {
@@ -214,6 +218,10 @@ export class LibraryPageComponent {
   }
 
   ngOnInit(): void {
+    let libraryWindowCutoffPx = 536;
+    this.libraryWindowIsNarrow = (
+      this.windowDimensionsService.getWidth() <= libraryWindowCutoffPx);
+
     this.loaderService.showLoadingScreen('I18N_LIBRARY_LOADING');
     this.bannerImageFilename = this.possibleBannerFilenames[
       Math.floor(Math.random() * this.possibleBannerFilenames.length)];
@@ -345,10 +353,6 @@ export class LibraryPageComponent {
           }
         });
     }
-
-    let libraryWindowCutoffPx = 530;
-    this.libraryWindowIsNarrow = (
-      this.windowDimensionsService.getWidth() <= libraryWindowCutoffPx);
 
     this.resizeSubscription = this.windowDimensionsService.getResizeEvent()
       .subscribe(evt => {
