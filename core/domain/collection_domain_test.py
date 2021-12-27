@@ -393,28 +393,28 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(notdemo2.is_demo, False)
 
     def test_update_title(self):
-        """Test update_title"""
+        """Test update_title."""
         self.assertEqual(self.collection.title, 'Title')
         self.collection.update_title('new title')
         self.assertEqual(self.collection.title, 'new title')
 
     def test_update_category(self):
-        """Test update_category"""
+        """Test update_category."""
         self.collection.update_category('new category')
         self.assertEqual(self.collection.category, 'new category')
 
     def test_update_objective(self):
-        """Test update_objective"""
+        """Test update_objective."""
         self.collection.update_objective('new objective')
         self.assertEqual(self.collection.objective, 'new objective')
 
     def test_update_language_code(self):
-        """Test update_language_code"""
+        """Test update_language_code."""
         self.collection.update_language_code('en')
         self.assertEqual(self.collection.language_code, 'en')
 
     def test_update_tags(self):
-        """Test update_tags"""
+        """Test update_tags."""
         self.assertEqual(self.collection.tags, [])
         self.collection.update_tags(['abc', 'def'])
         self.assertEqual(self.collection.tags, ['abc', 'def'])
