@@ -455,11 +455,6 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
                     'type': 'basestring'
                 }
             },
-            'session_id': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            },
             'client_time_spent_in_secs': {
                 'schema': {
                     'type': 'int'
