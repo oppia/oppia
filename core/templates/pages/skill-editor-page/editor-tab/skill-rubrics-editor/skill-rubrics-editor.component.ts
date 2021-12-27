@@ -16,7 +16,7 @@
  * @fileoverview Component for the skill rubric editor.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { Rubric } from 'domain/skill/rubric.model';
 import { SkillUpdateService } from 'domain/skill/skill-update.service';
@@ -29,7 +29,7 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
   selector: 'oppia-skill-rubrics-editor',
   templateUrl: './skill-rubrics-editor.component.html'
 })
-export class SkillRubricsEditorComponent implements OnInit {
+export class SkillRubricsEditorComponent implements OnInit, OnDestroy {
   skill: Skill;
   rubrics: Rubric[];
   rubricsListIsShown: boolean;
