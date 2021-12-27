@@ -37,28 +37,30 @@ module.exports = {
     },
   },
 
-  create: function (context) {
+  create: function(context) {
     return {
       CallExpression(node) {
-        if (node && node.callee && node.callee.property && node.callee.property.name === 'activeElement' &&
-          node.callee.object.callee.property.name === 'switchTo' &&
-          node.callee.object.callee.object.name === 'browser') {
+        if(node && node.callee && node.callee.property && node.callee.property.name
+           === 'activeElement' && node.callee.object.callee.property.name 
+           === 'switchTo' && node.callee.object.callee.object.name === 'browser') {
           if (node.parent.type !== 'AwaitExpression') {
             context.report({
               node: node,
-              message: `Please use nested awaits like: await (await browser.switchTo().activeElement()).sendKeys(explanation);`
+              message: 'Please use nested awaits like: '+
+              'await (await browser.switchTo().activeElement()).sendKeys(explanation);'
             });
           }
         }
-        if (node && node.callee && node.callee.property && node.callee.property.name === 'sendKeys' &&
-          node.callee.object.type === 'AwaitExpression' &&
+        if (node && node.callee && node.callee.property && node.callee.property.name 
+          === 'sendKeys' && node.callee.object.type === 'AwaitExpression' &&
           node.callee.object.argument.callee.property.name === 'activeElement' &&
-          node.callee.object.argument.callee.object.callee.property.name === 'switchTo' &&
-          node.callee.object.argument.callee.object.callee.object.name === 'browser') {
+          node.callee.object.argument.callee.object.callee.property.name === 'switchTo' 
+          && node.callee.object.argument.callee.object.callee.object.name === 'browser') {
           if (node.parent.type !== 'AwaitExpression') {
             context.report({
               node: node,
-              message: `Please use nested awaits like: await (await browser.switchTo().activeElement()).sendKeys(explanation);`
+              message: 'Please use nested awaits like: '+
+              'await (await browser.switchTo().activeElement()).sendKeys(explanation);'
             });
           }
         }

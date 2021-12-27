@@ -25,7 +25,7 @@ var RuleTester = require('eslint').RuleTester;
 
 const ruleTester = new RuleTester({
   parserOptions: {
-      ecmaVersion: 2018
+    ecmaVersion: 2018
   }
 });
 
@@ -33,10 +33,10 @@ ruleTester.run('nested-awaits', rule, {
   valid: [
     {
       code:
-       `var alpha = async function() {
-          await (await browser.switchTo().activeElement()).sendKeys(explanation);
-        };
-        `
+      `var alpha = async function() {
+        await (await browser.switchTo().activeElement()).sendKeys(explanation);
+      };
+      `
     }
   ],
 
@@ -48,7 +48,8 @@ ruleTester.run('nested-awaits', rule, {
          };
          `,
       errors: [{
-        message: `Please use nested awaits like: await (await browser.switchTo().activeElement()).sendKeys(explanation);`
+        message: 'Please use nested awaits like: '+
+        'await (await browser.switchTo().activeElement()).sendKeys(explanation);'
       }]
     },
     {
@@ -58,7 +59,8 @@ ruleTester.run('nested-awaits', rule, {
          };
          `,
       errors: [{
-        message: `Please use nested awaits like: await (await browser.switchTo().activeElement()).sendKeys(explanation);`
+        message: 'Please use nested awaits like: '+
+        'await (await browser.switchTo().activeElement()).sendKeys(explanation);'
       }]
     },
     {
@@ -68,7 +70,8 @@ ruleTester.run('nested-awaits', rule, {
          };
          `,
       errors: [{
-        message: `Please use nested awaits like: await (await browser.switchTo().activeElement()).sendKeys(explanation);`
+        message: 'Please use nested awaits like: '+
+        'await (await browser.switchTo().activeElement()).sendKeys(explanation);'
       }]
     }
   ]
