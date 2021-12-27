@@ -1252,7 +1252,7 @@ class CollectionSummary:
                 'Expected contributors_summary to be dict, received %s' % (
                     self.contributors_summary))
 
-    def is_editable_by(self, user_id=None):
+    def is_editable_by(self, user_id):
         """Checks if a given user may edit the collection.
 
         Args:
@@ -1261,7 +1261,7 @@ class CollectionSummary:
         Returns:
             bool. Whether the given user may edit the collection.
         """
-        return user_id is not None and (
+        return (
             user_id in self.editor_ids
             or user_id in self.owner_ids
             or self.community_owned)
