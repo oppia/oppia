@@ -335,8 +335,8 @@
                 class="btn dropdown-toggle oppia-navbar-button protractor-test-language-dropdown"
                 (keydown)="onMenuKeypress($event, 'languageMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})">
           <i class="material-icons language-icon"> &#xE894; </i>
-          <span *ngIf="windowIsNarrow"> {{ currentLanguageCode }} </span>
-          <span *ngIf="!windowIsNarrow"> {{ currentLanguageText }} </span>
+          <span class="mobile-view-language-code" *ngIf="windowIsNarrow"> {{ currentLanguageCode }} </span>
+          <span class="desktop-view-language-code" *ngIf="!windowIsNarrow"> {{ currentLanguageText }} </span>
         </button>
       </div>
       <ul ngbDropdownMenu class="dropdown-menu oppia-navbar-dropdown" [style.margin-top]="userIsLoggedIn ? '-10px': '0'"
@@ -875,6 +875,15 @@
   .oppia-navbar-profile .profile-dropdown:hover {
     background-color: #fff;
   }
+  @media screen and (max-width: 850px) {
+    .desktop-view-language-code{
+      display: none;
+    }
+    .oppia-logo-wide {
+      margin-left: 0px;
+    }
+  }
+
   @media screen and (max-width: 768px) {
     .nav-mobile-header-text-container {
       display: inline-block;
