@@ -292,15 +292,6 @@ class SignupPage(base.BaseHandler):
 
     REDIRECT_UNFINISHED_SIGNUPS = False
 
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {
-            'return_url': {
-                'type': 'basestring'
-            }
-        }
-    }
-
     @acl_decorators.require_user_id_else_redirect_to_homepage
     def get(self):
         """Handles GET requests."""
