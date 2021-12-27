@@ -46,6 +46,7 @@ import { ExplorationPublishModalComponent } from 'pages/exploration-editor-page/
 import { EditorReloadingModalComponent } from './modal-templates/editor-reloading-modal.component';
 import { ConfirmDiscardChangesModalComponent } from './modal-templates/confirm-discard-changes-modal.component';
 import { CreateFeedbackThreadModalComponent } from './feedback-tab/templates/create-feedback-thread-modal.component';
+import { PreviewSummaryTileModalComponent } from './settings-tab/templates/preview-summary-tile-modal.component';
 import { WelcomeTranslationModalComponent } from './translation-tab/modal-templates/welcome-translation-modal.component';
 import { DeleteExplorationModalComponent } from './settings-tab/templates/delete-exploration-modal.component';
 import { RemoveRoleConfirmationModalComponent } from './settings-tab/templates/remove-role-confirmation-modal.component';
@@ -85,6 +86,7 @@ import { RevertExplorationModalComponent } from './history-tab/modal-templates/r
     ExplorationPublishModalComponent,
     EditorReloadingModalComponent,
     CreateFeedbackThreadModalComponent,
+    PreviewSummaryTileModalComponent,
     DeleteExplorationModalComponent,
     RemoveRoleConfirmationModalComponent,
     ReassignRoleConfirmationModalComponent,
@@ -117,6 +119,7 @@ import { RevertExplorationModalComponent } from './history-tab/modal-templates/r
     ExplorationPublishModalComponent,
     EditorReloadingModalComponent,
     CreateFeedbackThreadModalComponent,
+    PreviewSummaryTileModalComponent,
     DeleteExplorationModalComponent,
     RemoveRoleConfirmationModalComponent,
     ReassignRoleConfirmationModalComponent,
