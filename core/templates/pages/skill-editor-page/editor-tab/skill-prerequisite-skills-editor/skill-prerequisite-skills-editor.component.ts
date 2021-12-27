@@ -34,8 +34,7 @@ import { SkillSummary } from 'domain/skill/skill-summary.model';
   selector: 'oppia-skill-prerequisite-skills-editor',
   templateUrl: './skill-prerequisite-skills-editor.component.html'
 })
-export class SkillPrerequisiteSkillsEditorComponent
-  implements OnInit {
+export class SkillPrerequisiteSkillsEditorComponent implements OnInit {
   categorizedSkills: CategorizedSkills;
   groupedSkillSummaries: GroupedSkillSummaries;
   prerequisiteSkillsAreShown: boolean;
@@ -68,7 +67,7 @@ export class SkillPrerequisiteSkillsEditorComponent
     for (let name in this.groupedSkillSummaries) {
       let skillSummaries = this.groupedSkillSummaries[name];
       for (let idx in skillSummaries) {
-       this.skillIdToSummaryMap[skillSummaries[idx].id] =
+        this.skillIdToSummaryMap[skillSummaries[idx].id] =
         skillSummaries[idx].description;
       }
     }
@@ -106,7 +105,7 @@ export class SkillPrerequisiteSkillsEditorComponent
       this.untriagedSkillSummaries);
     modalRef.result.then((summary) => {
       let skillId = summary.id;
-      if (skillId ===this.skill.getId()) {
+      if (skillId === this.skill.getId()) {
         this.alertsService.addInfoMessage(
           'A skill cannot be a prerequisite of itself', 5000);
         return;
@@ -128,7 +127,7 @@ export class SkillPrerequisiteSkillsEditorComponent
 
   togglePrerequisiteSkills(): void {
     if (this.windowDimensionsService.isWindowNarrow()) {
-     this.prerequisiteSkillsAreShown = (
+      this.prerequisiteSkillsAreShown = (
         !this.prerequisiteSkillsAreShown);
     }
   }

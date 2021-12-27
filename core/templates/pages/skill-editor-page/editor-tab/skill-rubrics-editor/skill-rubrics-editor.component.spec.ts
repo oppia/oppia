@@ -94,7 +94,7 @@ describe('Skill Rubrics Editor Component', () => {
       all_questions_merged: false,
       prerequisite_skill_ids: ['skill_1']
     });
-    
+
     fixture.detectChanges();
   });
 
@@ -113,21 +113,21 @@ describe('Skill Rubrics Editor Component', () => {
     });
 
     it('should initialise component when user open skill rubrics editor',
-    () => {
-      expect(component.skill).toEqual(sampleSkill);
-      expect(component.rubricsListIsShown).toBeFalse();
-    });
+      () => {
+        expect(component.skill).toEqual(sampleSkill);
+        expect(component.rubricsListIsShown).toBeFalse();
+      });
 
     it('should fetch rubrics when skill changes', () => {
       component.skill._rubrics = [Rubric.createFromBackendDict({
         difficulty: 'Easy',
         explanations: ['explanation'],
       })];
-  
+
       expect(component.rubrics).toBeUndefined();
-  
+
       mockEventEmitter.emit();
-  
+
       expect(component.rubrics).toEqual([Rubric.createFromBackendDict({
         difficulty: 'Easy',
         explanations: ['explanation'],
@@ -136,19 +136,19 @@ describe('Skill Rubrics Editor Component', () => {
 
     it('should show toggle rubrics list when user\'s window is narrow', () => {
       expect(component.rubricsListIsShown).toBeFalse();
-  
+
       component.toggleRubricsList();
-  
+
       expect(component.rubricsListIsShown).toBeTrue();
-  
+
       component.toggleRubricsList();
-  
+
       expect(component.rubricsListIsShown).toBeFalse();
     });
 
     it('should update skill rubrics when user saves', () => {
       spyOn(skillUpdateService, 'updateRubricForDifficulty');
-  
+
       component.onSaveRubric('Easy', [
         'new explanation 1',
         'new explanation 2',
@@ -159,7 +159,7 @@ describe('Skill Rubrics Editor Component', () => {
           'new explanation 1',
           'new explanation 2',
         ]);
-     });
+      });
   });
 
   describe('when user\'s window is not narrow', () => {
