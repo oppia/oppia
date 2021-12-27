@@ -189,6 +189,7 @@ export class ExplorationDataService {
       return response.exploration;
     });
   }
+
   /**
    * Saves the exploration to the backend, and, on a success callback,
    * updates the local copy of the exploration data.

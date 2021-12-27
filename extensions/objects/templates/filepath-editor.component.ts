@@ -50,13 +50,16 @@ export class FilepathEditorComponent implements OnInit {
   valueHasChanged(event: string): void {
     this.valueChanged.emit(event);
   }
+
   validityHasChanged(event: Record<'empty', boolean>): void {
     this.validityChange.emit(event);
   }
+
   onClickCreateImage(): void {
     this.svgEditorIsShown = true;
     this.imageEditorIsShown = false;
   }
+
   onClickUploadImage(): void {
     this.imageEditorIsShown = true;
     this.svgEditorIsShown = false;

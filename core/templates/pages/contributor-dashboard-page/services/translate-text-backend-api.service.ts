@@ -49,6 +49,7 @@ export class TranslateTextBackendApiService {
       return TranslatableTexts.createFromBackendDict(backendDict);
     });
   }
+
   async blobtoBase64(blob: Blob): Promise<unknown> {
     return new Promise<unknown> ((resolve, reject)=> {
       const reader = new FileReader();
@@ -69,6 +70,7 @@ export class TranslateTextBackendApiService {
       reader.onerror = error => reject(error);
     });
   }
+
   async suggestTranslatedTextAsync(
       expId: string, expVersion: string, contentId: string, stateName: string,
       languageCode: string, contentHtml: string | string[],

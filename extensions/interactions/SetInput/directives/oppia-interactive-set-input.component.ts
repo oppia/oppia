@@ -48,6 +48,7 @@ export class InteractiveSetInputComponent implements OnInit {
       'add_element_text': string;
     };
   };
+
   buttonText: string;
 
   constructor(

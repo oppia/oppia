@@ -71,6 +71,7 @@ export class AssetsBackendApiService {
   static get EMULATOR_MODE(): boolean {
     return AppConstants.EMULATOR_MODE;
   }
+
   static get GCS_RESOURCE_BUCKET_NAME(): string {
     return AppConstants.GCS_RESOURCE_BUCKET_NAME;
   }

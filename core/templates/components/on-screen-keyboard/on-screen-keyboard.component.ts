@@ -40,6 +40,7 @@ export class OnScreenKeyboardComponent {
     right: () => void;
     end: () => void;
   };
+
   guppyInstance!: Guppy;
   interactionType!: string;
   customLetters!: string[];
@@ -48,6 +49,7 @@ export class OnScreenKeyboardComponent {
   mainTab: string = constants.OSK_MAIN_TAB;
   greekSymbols: string[] = Object.values(
     constants.GREEK_LETTER_NAMES_TO_SYMBOLS);
+
   greekLetters: string[] = Object.keys(constants.GREEK_LETTER_NAMES_TO_SYMBOLS);
   currentTab: string = this.mainTab;
   lettersInKeyboardLayout: string[] = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];

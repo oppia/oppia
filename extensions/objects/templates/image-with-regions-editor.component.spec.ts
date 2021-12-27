@@ -43,6 +43,7 @@ describe('ImageWithRegionsEditorComponent', () => {
         return 'Fake onload executed';
       };
     }
+
     set src(url: string) {
       this.onload();
     }

@@ -42,6 +42,7 @@ import { ActivityDict,
 export class LibraryPageComponent {
   possibleBannerFilenames = [
     'banner1.svg', 'banner2.svg', 'banner3.svg', 'banner4.svg'];
+
   // If the value below is changed, the following CSS values in
   // oppia.css must be changed:
   // - .oppia-exp-summary-tiles-container: max-width
@@ -65,6 +66,7 @@ export class LibraryPageComponent {
     explorations: {},
     collections: {}
   };
+
   libraryWindowIsNarrow: boolean;
   resizeSubscription: Subscription;
 

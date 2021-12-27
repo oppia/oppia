@@ -44,6 +44,7 @@ export class ProgressNavComponent {
   @Input() submitButtonIsDisabled: boolean;
   @Output() submit: EventEmitter<void> = (
     new EventEmitter());
+
   @Output() clickContinueButton: EventEmitter<void> = (
     new EventEmitter());
 
@@ -52,8 +53,10 @@ export class ProgressNavComponent {
   interactionIsInline = true;
   CONTINUE_BUTTON_FOCUS_LABEL = (
     ExplorationPlayerConstants.CONTINUE_BUTTON_FOCUS_LABEL);
+
   SHOW_SUBMIT_INTERACTIONS_ONLY_FOR_MOBILE = [
     'ItemSelectionInput', 'MultipleChoiceInput'];
+
   displayedCardIndex: number;
   hasPrevious: boolean;
   hasNext: boolean;

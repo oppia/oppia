@@ -145,6 +145,7 @@ export class ContributionOpportunitiesService {
         languageCode, this._voiceoverOpportunitiesCursor);
     }
   }
+
   async getAllTopicNamesAsync(): Promise<string[]> {
     return this._getAllTopicNamesAsync();
   }

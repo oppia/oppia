@@ -29,6 +29,7 @@ import { StateRecordedVoiceoversService } from 'components/state-editor/state-ed
 export class TranslationTabActiveContentIdService {
   constructor(
     private _stateRecordedVoiceoversService: StateRecordedVoiceoversService) {}
+
   // 'activeContentId' and 'activeDataFormat' will be 'null' if active content
   // has not been set.
   activeContentId: string | null = null;

@@ -29,9 +29,11 @@ export class SelectTopicsComponent {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() topicSummaries!:
     { id: string; name: string; isSelected: boolean }[];
+
   @Input() selectedTopicIds!: string[];
   @Output() selectedTopicIdsChange: EventEmitter<string[]> = (
     new EventEmitter());
+
   topicsSelected: string[] = [];
   topicFilterText: string = '';
   filteredTopics: { id: string; name: string; isSelected: boolean }[] = [];

@@ -152,6 +152,7 @@ describe('ThumbnailUploaderComponent', () => {
         newThumbnailDataUrl: 'data:image/png;base64,xyz',
         newBgColor: '#newcol'
       });
+
       componentInstance = {
         bgColor: null,
         allowedBgColors: null,
@@ -219,6 +220,7 @@ describe('ThumbnailUploaderComponent', () => {
         newThumbnailDataUrl: 'data:image/png;base64,xyz',
         newBgColor: '#newcol'
       });
+
       componentInstance = {
         bgColor: null,
         allowedBgColors: null,
@@ -273,6 +275,7 @@ describe('ThumbnailUploaderComponent', () => {
         newThumbnailDataUrl: 'data:image/png;base64,xyz',
         newBgColor: '#newcol'
       });
+
       componentInstance = {
         bgColor: null,
         allowedBgColors: null,

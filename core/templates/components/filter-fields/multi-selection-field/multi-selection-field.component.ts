@@ -32,6 +32,7 @@ export class MultiSelectionFieldComponent {
   @Input() selections: string[] = [];
   @Output() selectionsChange: EventEmitter<string[]> = (
     new EventEmitter());
+
   @Input() label!: string;
   @Input() placeholder!: string;
   @Input() selectable = true;

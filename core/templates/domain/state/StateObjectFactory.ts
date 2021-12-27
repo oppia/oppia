@@ -93,6 +93,7 @@ export class State {
     this.writtenTranslations = writtenTranslations;
     this.nextContentIdIndex = nextContentIdIndex;
   }
+
   setName(newName: string): void {
     this.name = newName;
   }

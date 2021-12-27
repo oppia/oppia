@@ -369,6 +369,7 @@ describe('Image preloader service', () => {
         return 'Fake onload executed';
       };
     }
+
     readAsDataURL(file) {
       this.onloadend();
       return 'The file is loaded';

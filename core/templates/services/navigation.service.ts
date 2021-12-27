@@ -89,6 +89,7 @@ export class NavigationService {
   closeSubmenu(evt: KeyboardEvent): void {
     this.activeMenuName = '';
   }
+
   /**
    * Handles keydown events on menus.
    * @param {object} evt

@@ -82,6 +82,7 @@ export class TeachPageComponent implements OnInit {
         this.isWindowNarrow = this.windowDimensionService.isWindowNarrow();
       }));
   }
+
   // TODO(#11657): Extract the testimonials code into a separate component.
   // The 2 functions below are to cycle between values:
   // 0 to (testimonialCount - 1) for displayedTestimonialId.
@@ -101,6 +102,7 @@ export class TeachPageComponent implements OnInit {
       this.displayedTestimonialId + this.testimonialCount - 1) %
       this.testimonialCount;
   }
+
   getTestimonials(): [Testimonial, Testimonial, Testimonial] {
     return [{
       quote: 'I18N_TEACH_TESTIMONIAL_1',

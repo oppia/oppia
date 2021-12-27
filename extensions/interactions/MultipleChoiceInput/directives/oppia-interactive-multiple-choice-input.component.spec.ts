@@ -46,6 +46,7 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
     onSubmit(answer, rulesService) {
       expect(answer).toBe(1);
     }
+
     registerCurrentInteraction(submitAnswerFn, validateExpressionFn) {
       submitAnswerFn();
       validateExpressionFn();

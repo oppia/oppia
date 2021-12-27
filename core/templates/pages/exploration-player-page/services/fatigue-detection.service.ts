@@ -40,6 +40,7 @@ export class FatigueDetectionService {
   recordSubmissionTimestamp(): void {
     this.submissionTimesMsec.push((new Date()).getTime());
   }
+
   isSubmittingTooFast(): boolean {
     if (this.submissionTimesMsec.length >= this.SPAM_COUNT_THRESHOLD) {
       this.windowStartTime = this.submissionTimesMsec.shift();

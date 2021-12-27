@@ -69,6 +69,7 @@ export class LocalStorageService {
   isStorageAvailable(): boolean {
     return Boolean(this.storage);
   }
+
   /**
    * Save the given changeList to localStorage along with its
    * draftChangeListId
@@ -92,6 +93,7 @@ export class LocalStorageService {
         JSON.stringify(draftDict));
     }
   }
+
   /**
    * Retrieve the local save of the changeList associated with the given
    * exploration id.
@@ -115,6 +117,7 @@ export class LocalStorageService {
     }
     return null;
   }
+
   /**
    * Remove the local save of the changeList associated with the given
    * exploration id.
@@ -144,6 +147,7 @@ export class LocalStorageService {
         this.LAST_SELECTED_TRANSLATION_LANGUAGE_KEY, languageCode);
     }
   }
+
   /**
    * Retrieve the local save of the last selected language for translation.
    * @returns {String} The local save of the last selected language for

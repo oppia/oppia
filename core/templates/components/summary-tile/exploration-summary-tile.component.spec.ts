@@ -92,6 +92,7 @@ class MockWindowRef {
       this.location._hashChange = val;
     }
   };
+
   get nativeWindow() {
     return this._window;
   }

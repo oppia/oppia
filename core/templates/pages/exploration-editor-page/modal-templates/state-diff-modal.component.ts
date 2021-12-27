@@ -52,6 +52,7 @@ export class StateDiffModalComponent
       leftPane: '',
       rightPane: '',
     };
+
     CODEMIRROR_MERGEVIEW_OPTIONS: mergeviewOptions = {
       lineNumbers: true,
       readOnly: true,

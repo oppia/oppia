@@ -50,6 +50,7 @@ export class NonnegativeIntEditorComponent implements OnInit {
       id: 'is_integer'
     }]
   };
+
   constructor(private changeDetectorRef: ChangeDetectorRef) { }
 
   ngOnInit(): void {

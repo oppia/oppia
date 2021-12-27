@@ -47,6 +47,7 @@ export class AboutPageComponent {
     i18nDescription: 'I18N_ABOUT_PAGE_LANGUAGE_FEATURE',
     imageFilename: '/about/language_icon.svg'
   }];
+
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private windowRef: WindowRef,

@@ -40,6 +40,7 @@ export class GoalsTabComponent implements OnInit {
       LearnerDashboardActivityBackendApiService),
     private deviceInfoService: DeviceInfoService) {
   }
+
   @Input() currentGoals: LearnerTopicSummary[];
   @Input() editGoals: LearnerTopicSummary[];
   @Input() completedGoals: LearnerTopicSummary[];
@@ -62,6 +63,7 @@ export class GoalsTabComponent implements OnInit {
     COMPLETED: 1,
     NEITHER: 2
   };
+
   activityType: string = constants.ACTIVITY_TYPE_LEARN_TOPIC;
   editGoalsTopicPageUrl: string[] = [];
   completedGoalsTopicPageUrl: string[] = [];

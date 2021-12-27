@@ -125,6 +125,7 @@ const componentMap = {
 export class OppiaAngularRootComponent implements AfterViewInit {
   @Output()
     public initialized: EventEmitter<void> = new EventEmitter();
+
   direction: string = 'ltr';
 
   static classroomBackendApiService: ClassroomBackendApiService;

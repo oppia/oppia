@@ -34,12 +34,14 @@ import { Subscription } from 'rxjs';
 export class OpportunitiesListComponent {
   @Input() loadOpportunities: () => Promise<{
     opportunitiesDicts: ExplorationOpportunity[]; more: boolean; }>;
+
   @Input() labelRequired: boolean;
   @Input() progressBarRequired: boolean;
   @Input() loadMoreOpportunities;
   @Output() clickActionButton: EventEmitter<string> = (
     new EventEmitter()
   );
+
   @Input() opportunityHeadingTruncationLength: number;
   @Input() opportunityType: string;
 

@@ -89,10 +89,13 @@ export class LearnerDashboardPageComponent implements OnInit {
 
   FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS = (
     LearnerDashboardPageConstants.FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS);
+
   LEARNER_DASHBOARD_SECTION_I18N_IDS = (
     LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS);
+
   LEARNER_DASHBOARD_SUBSECTION_I18N_IDS = (
     LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS);
+
   username: string = '';
   PAGES_REGISTERED_WITH_FRONTEND = (
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
@@ -128,6 +131,7 @@ export class LearnerDashboardPageComponent implements OnInit {
   newMessage: {
     'text': string;
   };
+
   loadingFeedbacks: boolean;
   explorationTitle: string;
   threadStatus: string;
@@ -137,6 +141,7 @@ export class LearnerDashboardPageComponent implements OnInit {
   threadSummary: FeedbackThreadSummary;
   communityLibraryUrl = (
     '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE);
+
   homeImageUrl: string = '';
   todolistImageUrl: string = '';
   progressImageUrl: string = '';

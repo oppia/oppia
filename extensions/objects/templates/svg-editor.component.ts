@@ -82,10 +82,12 @@ export class SvgEditorComponent implements OnInit {
     lineCounter: 0,
     shape: null
   };
+
   // These sizes are used in the strokeWidth options dropdown.
   sizes = [
     '1px', '2px', '3px', '5px', '9px', '10px', '12px',
     '14px', '18px', '24px', '30px', '36px'];
+
   // These fonts are used in the font family options dropdown.
   fontFamily = [
     'Arial',
@@ -102,6 +104,7 @@ export class SvgEditorComponent implements OnInit {
     'Plaster',
     'Engagement'
   ];
+
   // Dynamically assign a unique id to each lc editor to avoid clashes
   // when there are multiple RTEs in the same page.
   randomId = Math.floor(Math.random() * 100000).toString();
@@ -123,6 +126,7 @@ export class SvgEditorComponent implements OnInit {
     savedSvgUrl?: SafeResourceUrl | string;
     savedSvgFileName?: string;
   } = {};
+
   // The diagramStatus stores the mode of the tool that is being used.
   diagramStatus = this.STATUS_EDITING;
   displayFontStyles = false;
@@ -147,6 +151,7 @@ export class SvgEditorComponent implements OnInit {
     bold: false,
     italic: false
   };
+
   objectIsSelected = false;
   pieChartDataLimit = 10;
   groupCount = 0;
@@ -162,11 +167,13 @@ export class SvgEditorComponent implements OnInit {
     color: '#00ff00',
     angle: 0
   }];
+
   allowedImageFormats = ['svg'];
   uploadedSvgDataUrl: {
     safeUrl: SafeResourceUrl;
     unsafeUrl: string;
   } = null;
+
   loadType = 'group';
   defaultTopCoordinate = 50;
   defaultLeftCoordinate = 50;

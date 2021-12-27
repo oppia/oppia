@@ -51,6 +51,7 @@ export class PositiveIntEditorComponent implements OnInit {
       id: 'is_integer'
     }]
   };
+
   constructor(private changeDetectorRef: ChangeDetectorRef) {}
 
   ngOnInit(): void {

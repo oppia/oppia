@@ -161,6 +161,7 @@ export class Solution {
 export class SolutionObjectFactory {
   constructor(
     private ehfs: ExplorationHtmlFormatterService) {}
+
   createFromBackendDict(solutionBackendDict: SolutionBackendDict): Solution {
     return new Solution(
       this.ehfs,

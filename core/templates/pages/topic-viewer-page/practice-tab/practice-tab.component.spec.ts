@@ -46,6 +46,7 @@ class MockWindowRef {
       reload: (val) => val
     },
   };
+
   get nativeWindow() {
     return this._window;
   }

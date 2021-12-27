@@ -177,6 +177,7 @@ export class BlogPostData {
     }
     return issues;
   }
+
   static createFromBackendDict(
       blogPostBackendDict: BlogPostBackendDict): BlogPostData {
     return new BlogPostData (

@@ -350,6 +350,7 @@
     // The following must be off so that we can enable
     // "@typescript-eslint/no-extra-semi".
     "no-extra-semi": "off",
+    "lines-between-class-members": "off",
     "semi-spacing": "error",
     "space-before-blocks": [
       "error",
@@ -455,6 +456,13 @@
       {
         "before": false,
         "after": true
+      }
+    ],
+    "@typescript-eslint/lines-between-class-members": [
+      "error",
+      "always",
+      {
+        "exceptAfterSingleLine": true
       }
     ]
   }

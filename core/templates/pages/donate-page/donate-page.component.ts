@@ -43,6 +43,7 @@ export class DonatePageComponent implements OnInit {
     private windowDimensionService: WindowDimensionsService,
     private windowRef: WindowRef
   ) {}
+
   ngOnInit(): void {
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
     this.donateImgUrl = this.urlInterpolationService.getStaticImageUrl(

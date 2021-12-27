@@ -36,6 +36,7 @@ export class PreferredLanguagesComponent {
   @Input() choices!: LanguageIdAndText[];
   @Output() preferredLanguagesChange: EventEmitter<string[]> = (
     new EventEmitter());
+
   selectable = true;
   removable = true;
   separatorKeysCodes: number[] = [ENTER];

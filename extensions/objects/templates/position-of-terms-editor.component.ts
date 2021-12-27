@@ -57,6 +57,7 @@ export class PositionOfTermsEditorComponent implements OnInit {
       this.valueChanged.emit(this.value);
     }
   }
+
   onChangePosition(name: string): void {
     this.value = name;
     this.valueChanged.emit(this.value);

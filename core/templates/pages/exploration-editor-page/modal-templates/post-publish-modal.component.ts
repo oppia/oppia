@@ -45,6 +45,7 @@ export class PostPublishModalComponent
   ) {
     super(ngbActiveModal);
   }
+
   ngOnInit(): void {
     this.congratsImgUrl = this.urlInterpolationService.getStaticImageUrl(
       '/general/congrats.svg');
@@ -55,9 +56,11 @@ export class PostPublishModalComponent
       this.windowRef.nativeWindow.location.host +
        '/explore/' + this.explorationId;
   }
+
   cancel(): void {
     this.ngbActiveModal.dismiss();
   }
+
   selectText(event: MouseEvent): void {
     let codeDiv = event.currentTarget;
     let range = document.createRange();

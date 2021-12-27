@@ -46,6 +46,7 @@ export class ResponseGraphInput {
   EDGE_WIDTH!: number;
   GRAPH_INPUT_LEFT_MARGIN = (
     InteractionsExtensionsConstants.GRAPH_INPUT_LEFT_MARGIN);
+
   constructor(
     private graphDetailService: GraphDetailService,
     private htmlEscaperService: HtmlEscaperService,

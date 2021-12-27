@@ -282,6 +282,7 @@ export class StoryEditorStateService {
   get onRecalculateAvailableNodes(): EventEmitter<unknown> {
     return this._recalculateAvailableNodesEventEmitter;
   }
+
   /**
    * Returns whether the story URL fragment already exists on the server.
    */

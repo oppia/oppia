@@ -37,6 +37,7 @@ interface SubmitAnswerEventDataInterface {
 export class LearnerAnswerInfoCard {
   @Output() submitAnswer: EventEmitter<SubmitAnswerEventDataInterface> = (
     new EventEmitter());
+
   interaction: Interaction;
   answerDetails: string;
 

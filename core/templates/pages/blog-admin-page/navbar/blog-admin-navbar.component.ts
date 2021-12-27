@@ -35,6 +35,7 @@ export class BlogAdminNavbarComponent implements OnInit {
   profileUrl: string;
   PAGES_REGISTERED_WITH_FRONTEND = (
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
+
   profileDropdownIsActive: boolean = false;
   logoWebpImageSrc: string;
   logoPngImageSrc: string;
