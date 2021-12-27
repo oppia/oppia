@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,62 +14,63 @@
 
 
 /**
- * @fileoverview Unit tests for the skill editor main tab directive.
+ * @fileoverview Unit tests for the skill editor main tab component.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
-import { fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
-import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
+import { Skill, SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { SkillUpdateService } from 'domain/skill/skill-update.service';
 import { AlertsService } from 'services/alerts.service';
-// ^^^ This block is to be removed.
+import { SkillPrerequisiteSkillsEditorComponent } from './skill-prerequisite-skills-editor.component';
+import { SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
-describe('Skill editor main tab directive', function() {
-  let $scope = null;
-  let ctrl = null;
-  let $rootScope = null;
-  let ngbModal: NgbModal = null;
-  let skillEditorStateService: SkillEditorStateService = null;
-  let skillObjectFactory: SkillObjectFactory = null;
+describe('Skill editor main tab component', () => {
+  let component: SkillPrerequisiteSkillsEditorComponent;
+  let fixture: ComponentFixture<SkillPrerequisiteSkillsEditorComponent>;
+  let ngbModal: NgbModal;
+  let skillEditorStateService: SkillEditorStateService;
+  let skillObjectFactory: SkillObjectFactory;
   let topicsAndSkillsDashboardBackendApiService:
-    TopicsAndSkillsDashboardBackendApiService = null;
-  let skillUpdateService: SkillUpdateService = null;
-  let alertsService: AlertsService = null;
+    TopicsAndSkillsDashboardBackendApiService;
+  let skillUpdateService: SkillUpdateService;
+  let windowDimensionsService: WindowDimensionsService;
+  let alertsService: AlertsService;
 
-  let sampleSkill = null;
-  let skillSummaryDict = null;
+  let sampleSkill: Skill = null;
+  let skillSummaryDict: SkillSummaryBackendDict = null;
   let topicAndSkillsDashboardDataBackendDict = null;
-  let windowDimensionsService = null;
-
-  beforeEach(angular.mock.module('oppia'));
-  importAllAngularServices();
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
-    });
+      imports: [HttpClientTestingModule],
+      declarations: [SkillPrerequisiteSkillsEditorComponent],
+      providers: [
+        SkillUpdateService,
+        SkillEditorStateService
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   });
 
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
-    ngbModal = TestBed.inject(NgbModal);
+  beforeEach(() => {
+    fixture = TestBed.createComponent(SkillPrerequisiteSkillsEditorComponent);
+    component = fixture.componentInstance;
 
-    skillEditorStateService = $injector.get('SkillEditorStateService');
-    skillObjectFactory = $injector.get('SkillObjectFactory');
-    topicsAndSkillsDashboardBackendApiService = $injector.get(
-      'TopicsAndSkillsDashboardBackendApiService');
-    skillUpdateService = $injector.get('SkillUpdateService');
-    windowDimensionsService = $injector.get(
-      'WindowDimensionsService');
-    alertsService = $injector.get('AlertsService');
+    skillUpdateService = TestBed.inject(SkillUpdateService);
+    ngbModal = TestBed.inject(NgbModal);
+    skillEditorStateService = TestBed.inject(SkillEditorStateService);
+    skillObjectFactory = TestBed.inject(SkillObjectFactory);
+    windowDimensionsService = TestBed.inject(WindowDimensionsService);
+    alertsService = TestBed.inject(AlertsService);
+    topicsAndSkillsDashboardBackendApiService = TestBed.inject(
+      TopicsAndSkillsDashboardBackendApiService);
 
     let misconceptionDict1 = {
       id: '2',
@@ -227,16 +228,10 @@ describe('Skill editor main tab directive', function() {
       ],
       can_delete_topic: true,
     };
+    fixture.detectChanges();
+  });
 
-    ctrl = $componentController('skillPrerequisiteSkillsEditor', {
-      $rootScope: $scope,
-      $scope: $scope,
-      NgbModal: ngbModal
-    });
-    ctrl.$onInit();
-  }));
-
-  it('should fetch skill when initialized', function() {
+  it('should fetch skill when initialized', () => {
     spyOn(
       skillEditorStateService, 'getGroupedSkillSummaries').and.returnValue({
       current: [],
@@ -245,43 +240,43 @@ describe('Skill editor main tab directive', function() {
     spyOn(skillEditorStateService, 'getSkill').and.returnValue(sampleSkill);
     spyOn(topicsAndSkillsDashboardBackendApiService, 'fetchDashboardDataAsync')
       .and.resolveTo(topicAndSkillsDashboardDataBackendDict);
-    ctrl.$onInit();
+    component.ngOnInit();
 
-    expect($scope.skill).toEqual(sampleSkill);
+    expect(component.skill).toEqual(sampleSkill);
   });
 
-  it('should remove skill id when calling \'removeSkillId\'', function() {
+  it('should remove skill id when calling \'removeSkillId\'', () => {
     let deleteSpy = spyOn(skillUpdateService, 'deletePrerequisiteSkill')
       .and.returnValue(null);
 
-    $scope.removeSkillId();
+    component.removeSkillId('BBB6dzfb5pPt');
 
     expect(deleteSpy).toHaveBeenCalled();
   });
 
   it('should return skill editor url when calling ' +
-    '\'getSkillEditorUrl\'', function() {
-    let result = $scope.getSkillEditorUrl('skillId');
+    '\'getSkillEditorUrl\'', () => {
+    let result = component.getSkillEditorUrl('skillId');
 
     expect(result).toBe('/skill_editor/skillId');
   });
 
   it('should toggle prerequisite skills ' +
-    '\'togglePrerequisiteSkills\'', function() {
-    $scope.prerequisiteSkillsAreShown = false;
+    '\'togglePrerequisiteSkills\'', () => {
+    component.prerequisiteSkillsAreShown = false;
     spyOn(windowDimensionsService, 'isWindowNarrow')
       .and.returnValue(true);
 
-    $scope.togglePrerequisiteSkills();
-    expect($scope.prerequisiteSkillsAreShown).toBe(true);
+    component.togglePrerequisiteSkills();
+    expect(component.prerequisiteSkillsAreShown).toBe(true);
 
-    $scope.togglePrerequisiteSkills();
-    expect($scope.prerequisiteSkillsAreShown).toBe(false);
+    component.togglePrerequisiteSkills();
+    expect(component.prerequisiteSkillsAreShown).toBe(false);
   });
 
-  describe('while adding a skill', function() {
+  describe('while adding a skill', () => {
     it('should show info message if we try ' +
-      'to add a prerequisite skill to itself', fakeAsync(function() {
+      'to add a prerequisite skill to itself', fakeAsync(() => {
       spyOn(ngbModal, 'open').and.callFake(() => {
         return ({
           componentInstance: {},
@@ -293,8 +288,8 @@ describe('Skill editor main tab directive', function() {
       let alertsSpy = spyOn(alertsService, 'addInfoMessage')
         .and.returnValue(null);
 
-      $scope.skill = sampleSkill;
-      $scope.addSkill();
+      component.skill = sampleSkill;
+      component.addSkill();
       tick();
 
       expect(alertsSpy).toHaveBeenCalledWith(
@@ -302,7 +297,7 @@ describe('Skill editor main tab directive', function() {
     }));
 
     it('should show info message if we try to add a prerequisite ' +
-      'skill which has already been added', fakeAsync(function() {
+      'skill which has already been added', fakeAsync(() => {
       spyOn(ngbModal, 'open').and.callFake(() => {
         return ({
           componentInstance: {},
@@ -314,8 +309,8 @@ describe('Skill editor main tab directive', function() {
       let alertsSpy = spyOn(alertsService, 'addInfoMessage')
         .and.returnValue(null);
 
-      $scope.skill = sampleSkill;
-      $scope.addSkill();
+      component.skill = sampleSkill;
+      component.addSkill();
       tick();
 
       expect(alertsSpy).toHaveBeenCalledWith(
@@ -323,7 +318,7 @@ describe('Skill editor main tab directive', function() {
     }));
 
     it('should add skill sucessfully when calling ' +
-      '\'addSkill\'', fakeAsync(function() {
+      '\'addSkill\'', fakeAsync(() => {
       let modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
         return ({
           componentInstance: {},
@@ -332,8 +327,8 @@ describe('Skill editor main tab directive', function() {
           })
         }) as NgbModalRef;
       });
-      $scope.skill = sampleSkill;
-      $scope.addSkill();
+      component.skill = sampleSkill;
+      component.addSkill();
       tick();
 
       expect(modalSpy).toHaveBeenCalled();

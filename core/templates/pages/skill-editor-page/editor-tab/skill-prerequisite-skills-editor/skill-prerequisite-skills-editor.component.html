@@ -20,7 +20,7 @@
             <span class="remove-skill-icon" (click)="removeSkillId(skillId)" aria-hidden="true">
               <i class="material-icons md-18">&#xE14C;</i>
             </span>
-            <!-- <a [href]="{{ getSkillEditorUrl(skillId) }}" target="_blank" rel="noopener">{{ skillIdToSummaryMap[skillId] }}</a> -->
+            <a [href]="getSkillEditorUrl(skillId)" target="_blank" rel="noopener">{{ skillIdToSummaryMap[skillId] }}</a>
           </div>
         </mat-card>
         <button class="btn skill-editor-add-btn oppia-add-prerequisite-skill-button" (click)="addSkill()">+ ADD PREREQUISITE SKILL</button>
