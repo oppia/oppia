@@ -159,7 +159,7 @@ describe('Skill Rubrics Editor Component', () => {
           'new explanation 1',
           'new explanation 2',
         ]);
-      });
+    });
   });
 
   describe('when user\'s window is not narrow', () => {
