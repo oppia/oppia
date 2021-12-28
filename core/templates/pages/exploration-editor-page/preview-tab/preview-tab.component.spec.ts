@@ -246,22 +246,23 @@ describe('Preview Tab Component', function() {
       expect(ctrl.showParameterSummary()).toBe(true);
     });
 
-    it('should open set params modal', fakeAsync(() => {
-      spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
-        stateName);
-      spyOn(ngbModal, 'open').and.returnValue(
-        {
-          componentInstance: new MockNgbModalRef(),
-          result: Promise.resolve()
-        } as NgbModalRef
-      );
+    it('should open set params modal when opening preview tab', 
+      fakeAsync(() => {
+        spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
+          stateName);
+        spyOn(ngbModal, 'open').and.returnValue(
+          {
+            componentInstance: new MockNgbModalRef(),
+            result: Promise.resolve()
+          } as NgbModalRef
+        );
 
-      // Get data from exploration data service.
-      tick();
-      $scope.$apply();
+        // Get data from exploration data service.
+        tick();
+        $scope.$apply();
 
-      expect(ngbModal.open).toHaveBeenCalled();
-    }));
+        expect(ngbModal.open).toHaveBeenCalled();
+      }));
 
     it('should load preview state when closing set params modal',
       fakeAsync(() => {
