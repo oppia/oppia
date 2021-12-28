@@ -17,29 +17,42 @@
  * that it can be displayed and edited in multiple places in the UI.
  */
 
-require('filters/string-utility-filters/normalize-whitespace.filter.ts');
-require(
-  'pages/exploration-editor-page/services/exploration-property.service.ts');
-require('pages/exploration-editor-page/services/exploration-rights.service.ts');
-require('services/validators.service.ts');
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { ExplorationPropertyService } from './exploration-property.service';
+import { AlertsService } from 'services/alerts.service';
+import { ChangeListService } from './change-list.service';
+import { LoggerService } from 'services/contextual/logger.service';
+import { ExplorationRightsService } from './exploration-rights.service';
+import { ValidatorsService } from 'services/validators.service';
+import { NormalizeWhitespacePipe } from 'filters/string-utility-filters/normalize-whitespace.pipe';
 
-angular.module('oppia').factory('ExplorationTitleService', [
-  '$filter', 'ExplorationPropertyService', 'ExplorationRightsService',
-  'ValidatorsService',
-  function(
-      $filter, ExplorationPropertyService, ExplorationRightsService,
-      ValidatorsService) {
-    var child = Object.create(ExplorationPropertyService);
-    child.propertyName = 'title';
-    child._normalize = $filter('normalizeWhitespace');
-    /**
-     * @param {string} value - The input to be validated.
-     * @returns {boolean} - True if title name is valid.
-     */
-    child._isValid = function(value) {
-      return ValidatorsService.isValidEntityName(
-        value, true, ExplorationRightsService.isPrivate());
-    };
-    return child;
+@Injectable({
+  providedIn: 'root'
+})
+export class ExplorationTitleService extends ExplorationPropertyService {
+  propertyName: string = 'title';
+
+  constructor(
+    private validatorService: ValidatorsService,
+    private explorationRightsService: ExplorationRightsService,
+    private whitespaceNormalizePipe: NormalizeWhitespacePipe,
+    protected alertsService: AlertsService,
+    protected changeListService: ChangeListService,
+    protected loggerService: LoggerService,
+  ) {
+    super(alertsService, changeListService, loggerService);
   }
-]);
+
+  _normalize(value: string): string {
+    return this.whitespaceNormalizePipe.transform(value);
+  }
+
+  _isValid(value: string): boolean {
+    return this.validatorService.isValidEntityName(
+      value, true, this.explorationRightsService.isPrivate());
+  }
+}
+
+angular.module('oppia').factory('ExplorationTitleService',
+  downgradeInjectable(ExplorationTitleService));

@@ -20,7 +20,7 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
-import { TestBed } from '@angular/core/testing';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 // ^^^ This block is to be removed.
@@ -91,6 +91,16 @@ describe('Skill editor main tab directive', function() {
     spyOn(SkillEditorStateService, 'hasLoadedSkill').and.returnValue(true);
     expect($scope.hasLoadedSkill()).toBe(true);
   });
+
+  it('should update publish button when data changes on prerequisite skills',
+    fakeAsync(() => {
+      let spyApply = spyOn($scope, '$apply');
+
+      $scope.updateViewPublishButton();
+      tick();
+
+      expect(spyApply).toHaveBeenCalled();
+    }));
 
   it('should open save changes modal with $uibModal when unsaved changes are' +
   ' present', function() {

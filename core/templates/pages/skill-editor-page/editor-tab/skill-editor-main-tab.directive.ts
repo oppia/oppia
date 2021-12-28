@@ -83,6 +83,10 @@ angular.module('oppia').directive('skillEditorMainTab', [
             return $scope.subtopicName;
           };
 
+          $scope.updateViewPublishButton = function() {
+            $scope.$apply();
+          };
+
           $scope.getAssignedSkillTopicData = function() {
             if (!$scope.topicName && $scope.assignedSkillTopicData) {
               $scope.topicName = Object.keys($scope.assignedSkillTopicData)[0];
