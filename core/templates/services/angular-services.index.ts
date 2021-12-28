@@ -390,8 +390,6 @@ import { HistoryTabBackendApiService } from 'pages/exploration-editor-page/servi
 import { ExplorationRightsService } from 'pages/exploration-editor-page/services/exploration-rights.service';
 import { ExplorationRightsBackendApiService } from 'pages/exploration-editor-page/services/exploration-rights-backend-api.service';
 import { ExplorationCategoryService } from 'pages/exploration-editor-page/services/exploration-category.service';
-import { ContributionAndReviewService } from 'pages/contributor-dashboard-page/services/contribution-and-review.service';
-import { ContributionAndReviewBackendApiService } from 'pages/contributor-dashboard-page/services/contribution-and-review-backend-api.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -455,9 +453,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['ContextService', ContextService],
   ['ContinueRulesService', ContinueRulesService],
   ['ContinueValidationService', ContinueValidationService],
-  ['ContributionAndReviewService', ContributionAndReviewService],
-  ['ContributionAndReviewBackendApiService',
-    ContributionAndReviewBackendApiService],
   ['ContributionOpportunitiesService', ContributionOpportunitiesService],
   ['ContributionOpportunitiesBackendApiService',
     ContributionOpportunitiesBackendApiService],
