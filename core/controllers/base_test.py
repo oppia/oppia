@@ -1257,6 +1257,7 @@ class SignUpTests(test_utils.GenericTestBase):
             'Your session has expired, and unfortunately your '
             'changes cannot be saved. Please refresh the page.')
 
+
 class CsrfTokenHandlerTests(test_utils.GenericTestBase):
 
     def test_valid_token_is_returned(self):
