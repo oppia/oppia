@@ -103,7 +103,7 @@ describe('Skill editor main tab directive', function() {
       skill_contents: skillContentsDict,
       language_code: 'en',
       version: 3,
-      next_misconception_id: 3,
+      next_misconception_id: '3',
       prerequisite_skill_ids: ['skill_1'],
       superseding_skill_id: 'skill0',
       all_questions_merged: true

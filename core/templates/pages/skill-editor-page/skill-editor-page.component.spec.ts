@@ -139,7 +139,7 @@ describe('Skill editor page', function() {
       })
     );
     ctrl.skill = new Skill(
-      'id1', 'description', [], [], conceptCard, 'en', 1, 0, 'id1', false, []
+      'id1', 'description', [], [], conceptCard, 'en', 1, '0', 'id1', false, []
     );
     expect(ctrl.getWarningsCount()).toEqual(1);
   });

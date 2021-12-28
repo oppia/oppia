@@ -71,7 +71,7 @@ describe('skillRubricsEditor', function() {
       skill_contents: skillContentsDict,
       language_code: 'en',
       version: 3,
-      next_misconception_id: 6,
+      next_misconception_id: '6',
       superseding_skill_id: '2',
       all_questions_merged: false,
       prerequisite_skill_ids: ['skill_1']

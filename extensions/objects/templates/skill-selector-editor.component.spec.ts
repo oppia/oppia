@@ -34,7 +34,7 @@ describe('SkillSelectorEditorComponent', () => {
 
   let skills = [{
     misconceptions_schema_version: 3,
-    next_misconception_id: 0,
+    next_misconception_id: '0',
     description: 'skill 2',
     rubrics: [
       {
@@ -80,7 +80,7 @@ describe('SkillSelectorEditorComponent', () => {
     }
   }, {
     misconceptions_schema_version: 3,
-    next_misconception_id: 0,
+    next_misconception_id: '0',
     description: 'Derive a ratio from a description or a picture.',
     rubrics: [
       {
