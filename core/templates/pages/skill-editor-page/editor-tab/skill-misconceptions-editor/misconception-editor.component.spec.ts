@@ -25,7 +25,7 @@ import { Skill } from 'domain/skill/SkillObjectFactory';
 import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
 import { MisconceptionEditorComponent } from './misconception-editor.component';
 
-describe('Misconception Editor Component', function() {
+describe('Misconception Editor Component', () => {
   let component: MisconceptionEditorComponent;
   let fixture: ComponentFixture<MisconceptionEditorComponent>;
   let skillEditorStateService: SkillEditorStateService;
@@ -117,10 +117,10 @@ describe('Misconception Editor Component', function() {
   it('should save name when clicking on save button', () => {
     let updateNameSpy = spyOn(
       skillUpdateService, 'updateMisconceptionName').and.returnValue(null);
-
     component.openNameEditor();
     // Setting new name.
     component.container.misconceptionName = 'newName';
+
     component.saveName();
 
     expect(updateNameSpy).toHaveBeenCalled();
@@ -129,10 +129,10 @@ describe('Misconception Editor Component', function() {
   it('should save notes when clicking on save button', () => {
     let updateNotesSpy = spyOn(
       skillUpdateService, 'updateMisconceptionNotes').and.returnValue(null);
-
     component.openNotesEditor();
     // Setting new notes content.
     component.container.misconceptionNotes = 'newNotes';
+
     component.saveNotes();
 
     expect(updateNotesSpy).toHaveBeenCalled();
@@ -141,10 +141,10 @@ describe('Misconception Editor Component', function() {
   it('should save feedback when clicking on save button', () => {
     let updateFeedbackSpy = spyOn(
       skillUpdateService, 'updateMisconceptionFeedback').and.returnValue(null);
-
     component.openFeedbackEditor();
     // Setting new feedback content.
     component.container.misconceptionFeedback = 'newFeedback';
+
     component.saveFeedback();
 
     expect(updateFeedbackSpy).toHaveBeenCalledWith(
@@ -152,30 +152,24 @@ describe('Misconception Editor Component', function() {
   });
 
   it('should close name editor when clicking on cancel button', () => {
-    expect(component.nameEditorIsOpen).toBe(false);
-
     component.openNameEditor();
-    expect(component.nameEditorIsOpen).toBe(true);
 
     component.cancelEditName();
+
     expect(component.nameEditorIsOpen).toBe(false);
   });
 
   it('should close notes editor when clicking on cancel button', () => {
-    expect(component.notesEditorIsOpen).toBe(false);
     component.openNotesEditor();
 
-    expect(component.notesEditorIsOpen).toBe(true);
     component.cancelEditNotes();
 
     expect(component.notesEditorIsOpen).toBe(false);
   });
 
   it('should close feedback editor when clicking on cancel button', () => {
-    expect(component.feedbackEditorIsOpen).toBe(false);
     component.openFeedbackEditor();
 
-    expect(component.feedbackEditorIsOpen).toBe(true);
     component.cancelEditFeedback();
 
     expect(component.feedbackEditorIsOpen).toBe(false);
