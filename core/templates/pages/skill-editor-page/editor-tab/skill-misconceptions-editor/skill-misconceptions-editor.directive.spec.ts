@@ -75,7 +75,7 @@ describe('Skill Misconception Editor Directive', function() {
 
     sampleSkill = new Skill(
       'id1', 'description', [], [], {} as ConceptCard, 'en',
-      1, 0, 'id1', false, []);
+      1, '0', 'id1', false, []);
     sampleMisconception = misconceptionObjectFactory.create(
       'misconceptionId', 'misconceptionName', 'notes', 'feedback', false);
     sampleSkill._misconceptions = [sampleMisconception];
