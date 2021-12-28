@@ -82,6 +82,7 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   // 'avgRating' will be null if the exploration has no ratings.
   avgRating!: number | null;
   thumbnailIcon!: string;
+  mobileCardToBeShown: boolean = false;
 
   constructor(
     private ratingComputationService: RatingComputationService,
@@ -94,6 +95,7 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    this.checkIfMobileCardToBeShown();
     this.userService.getUserInfoAsync().then(userInfo => {
       this.userIsLoggedIn = userInfo.isLoggedIn();
     });
@@ -127,6 +129,7 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
       subscribe(evt => {
         this.isWindowLarge = (
           this.windowDimensionsService.getWidth() >= this.mobileCutoffPx);
+        this.checkIfMobileCardToBeShown();
       });
     this.lastUpdatedDateTime = this.getLastUpdatedDatetime();
     this.avgRating = this.getAverageRating();
@@ -139,9 +142,11 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
     }
   }
 
-  showMobileStyleCard(): boolean {
+  checkIfMobileCardToBeShown(): void {
+    let mobileViewActive = this.windowDimensionsService.getWidth() <= 536;
     let currentPageUrl = this.urlService.getPathname();
-    return (currentPageUrl === '/community-library');
+    this.mobileCardToBeShown = (
+      mobileViewActive && (currentPageUrl === '/community-library'));
   }
 
   setHoverState(hoverState: boolean): void {

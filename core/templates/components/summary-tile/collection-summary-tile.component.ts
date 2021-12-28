@@ -16,7 +16,7 @@
  * @fileoverview Component for a collection summary tile.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 import constants from 'assets/constants';
@@ -24,12 +24,15 @@ import { CollectionSummaryTileConstants } from 'components/summary-tile/collecti
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { UserService } from 'services/user.service';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { UrlService } from 'services/contextual/url.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'oppia-collection-summary-tile',
   templateUrl: './collection-summary-tile.component.html',
 })
-export class CollectionSummaryTileComponent implements OnInit {
+export class CollectionSummaryTileComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -51,19 +54,39 @@ export class CollectionSummaryTileComponent implements OnInit {
   collectionIsCurrentlyHoveredOver: boolean = false;
   defaultEmptyTitle!: string;
   activityTypeCollection!: string;
+  mobileCardToBeShown: boolean = false;
+  resizeSubscription: Subscription;
 
   constructor(
     private dateTimeFormatService: DateTimeFormatService,
     private userService: UserService,
-    private urlInterpolationService: UrlInterpolationService
+    private urlInterpolationService: UrlInterpolationService,
+    private windowDimensionsService: WindowDimensionsService,
+    private urlService: UrlService
   ) {}
 
   ngOnInit(): void {
+    this.checkIfMobileCardToBeShown();
     this.userService.getUserInfoAsync().then(userInfo => {
       this.userIsLoggedIn = userInfo.isLoggedIn();
     });
     this.defaultEmptyTitle = CollectionSummaryTileConstants.DEFAULT_EMPTY_TITLE;
     this.activityTypeCollection = constants.ACTIVITY_TYPE_COLLECTION;
+    this.resizeSubscription = this.windowDimensionsService.getResizeEvent()
+      .subscribe(event => {
+        this.checkIfMobileCardToBeShown();
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.resizeSubscription.unsubscribe();
+  }
+
+  checkIfMobileCardToBeShown(): void {
+    let mobileViewActive = this.windowDimensionsService.getWidth() <= 536;
+    let currentPageUrl = this.urlService.getPathname();
+    this.mobileCardToBeShown = (
+      mobileViewActive && (currentPageUrl === '/community-library'));
   }
 
   getLastUpdatedDatetime(): string {

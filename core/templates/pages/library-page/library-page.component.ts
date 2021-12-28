@@ -337,7 +337,8 @@ export class LibraryPageComponent {
           setTimeout(() => {
             let actualWidth = $('oppia-exploration-summary-tile').width();
             if (actualWidth &&
-              actualWidth !== AppConstants.LIBRARY_TILE_WIDTH_PX) {
+              actualWidth !== AppConstants.LIBRARY_TILE_WIDTH_PX &&
+              !this.libraryWindowIsNarrow) {
               this.loggerService.error(
                 'The actual width of tile is different than the ' +
                 'expected width. Actual size: ' + actualWidth +
