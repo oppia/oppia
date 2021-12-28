@@ -22,7 +22,7 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { SkillUpdateService } from 'domain/skill/skill-update.service';
 import { WorkedExampleEditorComponent } from './worked-example-editor.component';
 
-describe('Worked example editor component', function() {
+describe('Worked example editor component', () => {
   let component: WorkedExampleEditorComponent;
   let fixture: ComponentFixture<WorkedExampleEditorComponent>;
   let skillUpdateService: SkillUpdateService;
@@ -75,60 +75,54 @@ describe('Worked example editor component', function() {
     });
   });
 
-  it('should open question editor when clicking on edit button',
-    () => {
-      expect(component.questionEditorIsOpen).toBe(false);
+  it('should open question editor when clicking on edit button', () => {
+    expect(component.questionEditorIsOpen).toBe(false);
 
-      component.openQuestionEditor();
+    component.openQuestionEditor();
 
-      expect(component.questionEditorIsOpen).toBe(true);
+    expect(component.questionEditorIsOpen).toBe(true);
   });
 
-  it('should open explanation editor wclicking on edit button',
-    () => {
-      expect(component.explanationEditorIsOpen).toBe(false);
+  it('should open explanation editor wclicking on edit button', () => {
+    expect(component.explanationEditorIsOpen).toBe(false);
 
-      component.openExplanationEditor();
+    component.openExplanationEditor();
 
-      expect(component.explanationEditorIsOpen).toBe(true);
+    expect(component.explanationEditorIsOpen).toBe(true);
   });
 
-  it('should close question editor when clicking on cancel button',
-    () => {
-      component.openQuestionEditor();
+  it('should close question editor when clicking on cancel button', () => {
+    component.openQuestionEditor();
 
-      component.cancelEditQuestion();
+    component.cancelEditQuestion();
 
-      expect(component.questionEditorIsOpen).toBe(false);
+    expect(component.questionEditorIsOpen).toBe(false);
   });
 
-  it('should close explanation editor when clicking on cancel button',
-    () => {
-      component.openExplanationEditor();
+  it('should close explanation editor when clicking on cancel button', () => {
+    component.openExplanationEditor();
 
-      component.cancelEditExplanation();
+    component.cancelEditExplanation();
 
-      expect(component.explanationEditorIsOpen).toBe(false);
+    expect(component.explanationEditorIsOpen).toBe(false);
   });
 
-  it('should save worked example when clicking on save button',
-    () => {
-      let skillUpdateSpy = spyOn(skillUpdateService, 'updateWorkedExample')
-        .and.returnValue(null);
+  it('should save worked example when clicking on save button', () => {
+    let skillUpdateSpy = spyOn(skillUpdateService, 'updateWorkedExample')
+      .and.returnValue(null);
 
-      component.saveWorkedExample(true);
+    component.saveWorkedExample(true);
 
-      expect(skillUpdateSpy).toHaveBeenCalled();
+    expect(skillUpdateSpy).toHaveBeenCalled();
   });
 
-  it('should save worked example when clicking on save button',
-    () => {
-      let skillUpdateSpy = spyOn(skillUpdateService, 'updateWorkedExample')
-        .and.returnValue(null);
+  it('should save worked example when clicking on save button', () => {
+    let skillUpdateSpy = spyOn(skillUpdateService, 'updateWorkedExample')
+      .and.returnValue(null);
 
-      component.saveWorkedExample(false);
+    component.saveWorkedExample(false);
 
-      expect(skillUpdateSpy).toHaveBeenCalled();
+    expect(skillUpdateSpy).toHaveBeenCalled();
   });
 
   it('should get schema', () => {
