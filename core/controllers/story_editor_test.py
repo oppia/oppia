@@ -579,6 +579,8 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
             json_response['error'],
             'Expected description to be a string, received 0')
 
+        self.logout()
+
     def test_check_url_fragment_exists_or_not(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
 
