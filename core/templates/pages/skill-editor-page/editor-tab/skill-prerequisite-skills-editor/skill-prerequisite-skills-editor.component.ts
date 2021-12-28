@@ -32,7 +32,7 @@ import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
-  selector: 'skill-prerequisite-skills-editor-component',
+  selector: 'oppia-skill-prerequisite-skills-editor',
   templateUrl: './skill-prerequisite-skills-editor.component.html'
 })
 export class SkillPrerequisiteSkillsEditorComponent
@@ -160,6 +160,6 @@ implements OnInit {
 }
 
 angular.module('oppia').directive(
-  'skillPrerequisiteSkillsEditorComponent', downgradeComponent({
+  'oppiaSkillPrerequisiteSkillsEditor', downgradeComponent({
     component: SkillPrerequisiteSkillsEditorComponent
   }) as angular.IDirectiveFactory);
