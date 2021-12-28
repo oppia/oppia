@@ -35,7 +35,7 @@ class MockActiveModal {
   }
 }
 
-describe('Add Hint Modal Component', function() {
+describe('Add Hint Modal Component', () => {
   let component: AddHintModalComponent;
   let fixture: ComponentFixture<AddHintModalComponent>;
   let ngbActiveModal: NgbActiveModal;
@@ -105,17 +105,22 @@ describe('Add Hint Modal Component', function() {
     });
   });
 
+  it('should check if hint length is under 500 characters', () => {
+    let hint1 = 'This is a hint ';
+
+    expect(component.isHintLengthExceeded(hint1)).toBe(false);
+  });
+
   it('should check if hint length exceeded 500 characters', () => {
     let hint1 = 'This is a hint ';
     let hint2 = hint1.repeat(35);
 
-    expect(component.isHintLengthExceeded(hint1)).toBe(false);
     expect(component.isHintLengthExceeded(hint2)).toBe(true);
   });
 
   it('should update explanation', () => {
     let hint = 'hint';
-    component.ngOnInit();
+
     component.updateLocalHint(hint);
 
     expect(component.tmpHint).toEqual(hint);
