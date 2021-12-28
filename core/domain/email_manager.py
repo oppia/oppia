@@ -392,13 +392,13 @@ def require_sender_id_is_valid(intent, sender_id):
 
     if intent not in SENDER_VALIDATORS:
         raise Exception('Invalid email intent string: %s' % intent)
-    else:
-        if not SENDER_VALIDATORS[intent](sender_id):
-            logging.error(
-                'Invalid sender_id %s for email with intent \'%s\'' %
-                (sender_id, intent))
-            raise Exception(
-                'Invalid sender_id for email with intent \'%s\'' % intent)
+
+    if not SENDER_VALIDATORS[intent](sender_id):
+        logging.error(
+            'Invalid sender_id %s for email with intent \'%s\'' %
+            (sender_id, intent))
+        raise Exception(
+            'Invalid sender_id for email with intent \'%s\'' % intent)
 
 
 def _send_email(

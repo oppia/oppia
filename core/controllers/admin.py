@@ -230,9 +230,9 @@ class AdminHandler(base.BaseHandler):
                 if num_dummy_exps_to_generate < num_dummy_exps_to_publish:
                     raise self.InvalidInputException(
                         'Generate count cannot be less than publish count')
-                else:
-                    self._generate_dummy_explorations(
-                        num_dummy_exps_to_generate, num_dummy_exps_to_publish)
+
+                self._generate_dummy_explorations(
+                    num_dummy_exps_to_generate, num_dummy_exps_to_publish)
             elif action == 'clear_search_index':
                 search_services.clear_collection_search_index()
                 search_services.clear_exploration_search_index()
