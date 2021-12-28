@@ -260,7 +260,7 @@ class BuildTests(test_utils.GenericTestBase):
             build.process_html(source_base_file, minified_html_file_stream)
 
         minified_html_file_content = minified_html_file_stream.getvalue()
-        self.assertNotRegexpMatches(
+        self.assertNotRegex(
             minified_html_file_content, r'\s{2,}',
             msg='All white spaces must be removed from %s' %
             base_html_source_path)

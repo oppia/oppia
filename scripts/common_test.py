@@ -868,4 +868,4 @@ class CommonTests(test_utils.GenericTestBase):
 
         with write_swap, stdout_write_swap:
             common.write_stdout_safe('test')
-        self.assertEquals(mock_stdout.getvalue(), 'test')
+        self.assertEqual(mock_stdout.getvalue(), 'test')
