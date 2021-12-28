@@ -54,11 +54,11 @@ export class ContributionAndReviewService {
   ) {}
 
   private async _fetchSuggestionsAsync(
-      urlName: string, targetType: string, suggestionType: string
+      url: string, targetType: string, suggestionType: string
   ): Promise<FetchSuggestionsReturn> {
     return (
       this.contributionAndReviewBackendApiService.fetchSuggestionsAsync(
-        urlName, targetType, suggestionType
+        url, targetType, suggestionType
       ).then((data) => {
         let suggestionIdToSuggestions: FetchSuggestionsReturn = {};
         let targetIdToDetails = data.target_id_to_opportunity_dict;

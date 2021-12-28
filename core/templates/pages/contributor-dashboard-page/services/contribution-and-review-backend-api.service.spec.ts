@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for contribution and review backend API service.
+ * @fileoverview Unit tests for contribution and review backend api service.
  */
 
 import { HttpClientTestingModule, HttpTestingController }
