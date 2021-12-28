@@ -205,7 +205,7 @@ describe('Skill object factory', () => {
 
     var misconceptionToAdd1 = misconceptionObjectFactory
       .createFromBackendDict({
-        id: JSON.stringify(skill.getNextMisconceptionId()),
+        id: skill.getNextMisconceptionId(),
         name: 'test name',
         notes: 'test notes',
         feedback: 'test feedback',
