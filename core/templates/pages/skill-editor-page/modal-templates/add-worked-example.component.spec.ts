@@ -32,7 +32,7 @@ class MockActiveModal {
   }
 }
 
-describe('Add Worked Example Modal Component', function() {
+describe('Add Worked Example Modal Component', () => {
   let component: AddWorkedExampleModalComponent;
   let fixture: ComponentFixture<AddWorkedExampleModalComponent>;
   let ngbActiveModal: NgbActiveModal;
@@ -70,9 +70,9 @@ describe('Add Worked Example Modal Component', function() {
 
   it('should close modal when saving worked example', () => {
     spyOn(ngbActiveModal, 'close');
-
     component.updateLocalQues('question');
     component.updateLocalExp('explanation');
+
     component.saveWorkedExample();
 
     expect(ngbActiveModal.close).toHaveBeenCalledWith({
@@ -88,7 +88,7 @@ describe('Add Worked Example Modal Component', function() {
 
   it('should update tmpWorkedExampleQuestionHtml', () => {
     let ques = 'ques';
-    component.ngOnInit();
+
     component.updateLocalQues(ques);
 
     expect(component.tmpWorkedExampleQuestionHtml).toEqual(ques);
@@ -96,7 +96,7 @@ describe('Add Worked Example Modal Component', function() {
 
   it('should update tmpWorkedExampleExplanationHtml', () => {
     let exp = 'exp';
-    component.ngOnInit();
+
     component.updateLocalExp(exp);
 
     expect(component.tmpWorkedExampleExplanationHtml).toEqual(exp);
