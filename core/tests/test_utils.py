@@ -1012,7 +1012,7 @@ class TestBase(unittest.TestCase):
 
     def _assert_validation_error(self, item, error_substring):
         """Checks that the given item passes default validation."""
-        with self.assertRaisesRegexp(utils.ValidationError, error_substring):
+        with self.assertRaisesRegex(utils.ValidationError, error_substring):
             item.validate()
 
     def log_line(self, line):
@@ -1306,9 +1306,9 @@ class TestBase(unittest.TestCase):
     def assertRaises(self, *args, **kwargs):
         raise NotImplementedError(
             'self.assertRaises should not be used in these tests. Please use '
-            'self.assertRaisesRegexp instead.')
+            'self.assertRaisesRegex instead.')
 
-    def assertRaisesRegexp(  # pylint: disable=invalid-name
+    def assertRaisesRegex(  # pylint: disable=invalid-name
             self, expected_exception, expected_regex, *args, **kwargs):
         """Asserts that the message in a raised exception matches a regex.
         This is a wrapper around assertRaisesRegex in unittest that enforces
@@ -1330,7 +1330,7 @@ class TestBase(unittest.TestCase):
                 'Please provide a sufficiently strong regexp string to '
                 'validate that the correct error is being raised.')
 
-        return super(TestBase, self).assertRaisesRegexp(
+        return super(TestBase, self).assertRaisesRegex(
             expected_exception, expected_regex, *args, **kwargs)
 
     def assertItemsEqual(self, *args, **kwargs):  # pylint: disable=invalid-name
@@ -3673,7 +3673,9 @@ class FunctionWrapper:
         if self._instance is not None:
             args = [self._instance] + list(args)
 
-        args_dict = inspect.getcallargs(self._func, *args, **kwargs)
+        sig = inspect.signature(self._func)
+
+        args_dict = sig.bind_partial(*args, **kwargs)
 
         self.pre_call_hook(args_dict)
 

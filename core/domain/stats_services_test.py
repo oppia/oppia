@@ -158,7 +158,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             }
         }
 
-        with self.assertRaisesRegexp(Exception, 'id="nullid.1" does not exist'):
+        with self.assertRaisesRegex(Exception, 'id="nullid.1" does not exist'):
             stats_services.update_stats('nullid', 1, aggregated_stats)
 
     def test_update_stats_throws_if_model_is_missing_state_stats(self):
@@ -194,7 +194,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             }
         }
 
-        with self.assertRaisesRegexp(Exception, 'does not exist'):
+        with self.assertRaisesRegex(Exception, 'does not exist'):
             stats_services.update_stats('exp_id1', 1, aggregated_stats)
 
     def test_update_stats_returns_if_state_name_is_undefined(self):
@@ -259,7 +259,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             }
         }
 
-        with self.assertRaisesRegexp(Exception, 'does not exist'):
+        with self.assertRaisesRegex(Exception, 'does not exist'):
             stats_services.update_stats('exp_id1', 1, aggregated_stats)
 
     def test_calls_to_stats_methods(self):
@@ -1988,7 +1988,7 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
     def test_get_state_reference_for_exp_raises_error_for_fake_exp_id(self):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.get_user_id_from_email(self.OWNER_EMAIL)
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Entity .* not found'):
             stats_services.get_state_reference_for_exploration(
                 'fake_exp', 'state_name')
@@ -2000,7 +2000,7 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
         exploration = self.save_new_default_exploration(
             self.exp_id, owner_id)
         self.assertEqual(list(exploration.states.keys()), ['Introduction'])
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.InvalidInputException,
             'No state with the given state name was found'):
             stats_services.get_state_reference_for_exploration(
@@ -2018,7 +2018,7 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
         self.assertEqual(state_reference, 'exp_id1:Introduction')
 
     def test_get_state_reference_for_question_with_invalid_question_id(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.InvalidInputException,
             'No question with the given question id exists'):
             stats_services.get_state_reference_for_question(
@@ -2087,7 +2087,7 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
             len(learner_answer_details.learner_answer_info_list), 0)
 
     def test_delete_learner_answer_info_with_invalid_input(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.InvalidInputException,
             'No learner answer details found with the given state reference'):
             stats_services.delete_learner_answer_info(
@@ -2109,7 +2109,7 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
         self.assertEqual(
             len(learner_answer_details.learner_answer_info_list), 1)
         learner_answer_info_id = 'id_1'
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Learner answer info with the given id not found'):
             stats_services.delete_learner_answer_info(
                 feconf.ENTITY_TYPE_EXPLORATION,
@@ -2150,7 +2150,7 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
             len(learner_answer_details.learner_answer_info_list), 1)
 
     def test_update_with_invalid_input_raises_exception(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.InvalidInputException,
             'No learner answer details found with the given state reference'):
             stats_services.update_state_reference(

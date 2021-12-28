@@ -902,7 +902,7 @@ class EstablishFirebaseConnectionTests(test_utils.TestBase):
             raises=Exception('unexpected call'))
 
         with get_app_swap as get_app_counter, init_app_swap as init_app_counter:
-            with self.assertRaisesRegexp(ValueError, 'uh-oh!'): # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex(ValueError, 'uh-oh!'): # type: ignore[no-untyped-call]
                 firebase_auth_services.establish_firebase_connection()
 
         self.assertEqual(get_app_counter.times_called, 1)
@@ -915,7 +915,7 @@ class EstablishFirebaseConnectionTests(test_utils.TestBase):
             firebase_admin, 'initialize_app', raises=ValueError('uh-oh!'))
 
         with get_app_swap as get_app_counter, init_app_swap as init_app_counter:
-            with self.assertRaisesRegexp(ValueError, 'uh-oh!'): # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex(ValueError, 'uh-oh!'): # type: ignore[no-untyped-call]
                 firebase_auth_services.establish_firebase_connection()
 
         self.assertEqual(get_app_counter.times_called, 1)
@@ -1019,11 +1019,11 @@ class SuperAdminPrivilegesTests(FirebaseAuthServicesTestBase):
     def test_raises_error_when_user_does_not_exist(self) -> None:
         auth_models.UserAuthDetailsModel(id='uid', firebase_auth_id=None).put()
 
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
                 ValueError, 'user_id=uid has no Firebase account'):
             firebase_auth_services.grant_super_admin_privileges('uid')
 
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
                 ValueError, 'user_id=uid has no Firebase account'):
             firebase_auth_services.revoke_super_admin_privileges('uid')
 
@@ -1039,7 +1039,7 @@ class SuperAdminPrivilegesTests(FirebaseAuthServicesTestBase):
 
         firebase_auth_services.grant_super_admin_privileges('uid')
 
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
                 firebase_auth.RevokedSessionCookieError, 'invalid'):
             firebase_auth.verify_session_cookie(cookie, check_revoked=True)
 
@@ -1057,7 +1057,7 @@ class SuperAdminPrivilegesTests(FirebaseAuthServicesTestBase):
 
         firebase_auth_services.revoke_super_admin_privileges('uid')
 
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
                 firebase_auth.RevokedSessionCookieError, 'invalid'):
             firebase_auth.verify_session_cookie(cookie, check_revoked=True)
 
@@ -1094,7 +1094,7 @@ class EstablishAuthSessionTests(FirebaseAuthServicesTestBase):
         req = self.create_request()
         res = self.create_response()
 
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
                 firebase_auth.InvalidIdTokenError, 'missing id_token'):
             firebase_auth_services.establish_auth_session(req, res)
 
@@ -1158,7 +1158,7 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
             firebase_auth, 'verify_session_cookie',
             error=firebase_auth.ExpiredSessionCookieError('uh-oh', None))
 
-        with always_raise_expired_session_cookie_error, self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with always_raise_expired_session_cookie_error, self.assertRaisesRegex( # type: ignore[no-untyped-call]
                 auth_domain.StaleAuthSessionError, 'expired'
         ):
             firebase_auth_services.get_auth_claims_from_request(
@@ -1176,7 +1176,7 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
             error=firebase_auth.RevokedSessionCookieError('uh-oh'))
 
         with always_raise_revoked_session_cookie_error:
-            self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+            self.assertRaisesRegex( # type: ignore[no-untyped-call]
                 auth_domain.StaleAuthSessionError, 'revoked',
                 lambda: firebase_auth_services.get_auth_claims_from_request(
                     self.create_request(session_cookie=cookie)))
@@ -1193,7 +1193,7 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
             firebase_auth, 'verify_session_cookie',
             error=firebase_auth.UserDisabledError('uh-oh'))
 
-        with always_raise_expired_session_cookie_error, self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with always_raise_expired_session_cookie_error, self.assertRaisesRegex( # type: ignore[no-untyped-call]
                 auth_domain.UserDisabledError, 'user is being deleted'
         ):
             firebase_auth_services.get_auth_claims_from_request(
@@ -1209,7 +1209,7 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
             error=firebase_exceptions.UnknownError('uh-oh'))
 
         with always_raise_unknown_error:
-            self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+            self.assertRaisesRegex( # type: ignore[no-untyped-call]
                 auth_domain.InvalidAuthSessionError, 'uh-oh',
                 lambda: firebase_auth_services.get_auth_claims_from_request(
                     self.create_request(session_cookie=cookie)))
@@ -1278,7 +1278,7 @@ class GenericAssociationTests(FirebaseAuthServicesTestBase):
         firebase_auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid', 'uid'))
 
-        with self.assertRaisesRegexp(Exception, 'already associated'): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'already associated'): # type: ignore[no-untyped-call]
             firebase_auth_services.associate_auth_id_with_user_id(
                 auth_domain.AuthIdUserIdPair('aid', 'uid'))
 
@@ -1288,7 +1288,7 @@ class GenericAssociationTests(FirebaseAuthServicesTestBase):
         # Erase the user_id collision, but leave the auth_id collision.
         auth_models.UserIdByFirebaseAuthIdModel.delete_by_id('aid')
 
-        with self.assertRaisesRegexp(Exception, 'already associated'): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'already associated'): # type: ignore[no-untyped-call]
             firebase_auth_services.associate_auth_id_with_user_id(
                 auth_domain.AuthIdUserIdPair('aid', 'uid'))
 
@@ -1308,7 +1308,7 @@ class GenericAssociationTests(FirebaseAuthServicesTestBase):
         firebase_auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid1', 'uid1'))
 
-        with self.assertRaisesRegexp(Exception, 'already associated'): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'already associated'): # type: ignore[no-untyped-call]
             firebase_auth_services.associate_multi_auth_ids_with_user_ids(
                 [auth_domain.AuthIdUserIdPair('aid1', 'uid1'),
                  auth_domain.AuthIdUserIdPair('aid2', 'uid2'),
@@ -1320,7 +1320,7 @@ class GenericAssociationTests(FirebaseAuthServicesTestBase):
         # Erase the user_id collision, but leave the auth_id collision.
         auth_models.UserIdByFirebaseAuthIdModel.delete_by_id('aid1')
 
-        with self.assertRaisesRegexp(Exception, 'already associated'): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'already associated'): # type: ignore[no-untyped-call]
             firebase_auth_services.associate_multi_auth_ids_with_user_ids(
                 [auth_domain.AuthIdUserIdPair('aid1', 'uid1'),
                  auth_domain.AuthIdUserIdPair('aid2', 'uid2'),

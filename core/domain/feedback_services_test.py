@@ -87,7 +87,7 @@ class FeedbackServicesUnitTests(test_utils.EmailTestBase):
             r'Thread belonging to the GeneralFeedbackThreadModel class '
             r'with id:\[%s\] was not found.' % (thread_id)
         )
-        with self.assertRaisesRegexp(Exception, expected_exception_regexp):
+        with self.assertRaisesRegex(Exception, expected_exception_regexp):
             feedback_services.create_message(
                 thread_id, self.user_id, None, None, 'Hello')
 
@@ -99,7 +99,7 @@ class FeedbackServicesUnitTests(test_utils.EmailTestBase):
             r'Threads belonging to the GeneralFeedbackThreadModel class '
             r'with ids:\[%s\] were not found.' % (' '.join(thread_ids))
         )
-        with self.assertRaisesRegexp(Exception, expected_exception_regexp):
+        with self.assertRaisesRegex(Exception, expected_exception_regexp):
             feedback_services.create_messages(
                 thread_ids, self.user_id, None, None, 'Hello')
 
@@ -107,7 +107,7 @@ class FeedbackServicesUnitTests(test_utils.EmailTestBase):
             self):
         repeated_thread_ids = ['thread_id', 'thread_id']
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Thread ids must be distinct when calling create_messsages.'):
             feedback_services.create_messages(

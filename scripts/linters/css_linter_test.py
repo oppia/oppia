@@ -64,7 +64,7 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.LinterTestBase):
 
         third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
             CONFIG_PATH, [INVALID_CSS_FILEPATH])
-        with self.print_swap, join_swap, self.assertRaisesRegexp(
+        with self.print_swap, join_swap, self.assertRaisesRegex(
             Exception,
             'ERROR    Please run start.sh first to install node-eslint or '
             'node-stylelint and its dependencies.'):
@@ -78,7 +78,7 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.LinterTestBase):
 
         third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
             CONFIG_PATH, [VALID_CSS_FILEPATH])
-        with self.print_swap, popen_swap, self.assertRaisesRegexp(
+        with self.print_swap, popen_swap, self.assertRaisesRegex(
             Exception, 'True'
         ):
             third_party_linter.perform_all_lint_checks()
