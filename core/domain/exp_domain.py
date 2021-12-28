@@ -25,7 +25,6 @@ from __future__ import annotations
 
 import collections
 import copy
-import datetime
 import json
 import re
 import string
@@ -623,13 +622,11 @@ class Exploration:
 
     @classmethod
     def create_default_exploration(
-            cls, exploration_id: str,
-            title: str=feconf.DEFAULT_EXPLORATION_TITLE,
-            init_state_name: str=feconf.DEFAULT_INIT_STATE_NAME,
-            category: str=feconf.DEFAULT_EXPLORATION_CATEGORY,
-            objective: str=feconf.DEFAULT_EXPLORATION_OBJECTIVE,
-            language_code: str=constants.DEFAULT_LANGUAGE_CODE
-            ) -> Exploration:
+            cls, exploration_id, title=feconf.DEFAULT_EXPLORATION_TITLE,
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            category=feconf.DEFAULT_EXPLORATION_CATEGORY,
+            objective=feconf.DEFAULT_EXPLORATION_OBJECTIVE,
+            language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Returns a Exploration domain object with default values.
 
         'title', 'init_state_name', 'category', 'objective' if not provided are
@@ -666,11 +663,9 @@ class Exploration:
 
     @classmethod
     def from_dict(
-            cls, exploration_dict: Dict[str, Any],
-            exploration_version: int =0,
-            exploration_created_on: datetime.datetime=None,
-            exploration_last_updated: datetime.datetime=None
-            ) -> Exploration:
+            cls, exploration_dict,
+            exploration_version=0, exploration_created_on=None,
+            exploration_last_updated=None):
         """Return a Exploration domain object from a dict.
 
         Args:

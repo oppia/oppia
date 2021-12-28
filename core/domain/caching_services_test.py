@@ -33,7 +33,7 @@ from core.domain import topic_domain
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Any, Dict
+from typing import Any, Dict, cast
 
 memory_cache_services = models.Registry.import_cache_services()
 
@@ -205,7 +205,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             caching_services.CACHE_NAMESPACE_DEFAULT, None, key_value_mapping)
         exploration_id = 'id'
         default_exploration = (
-            exp_domain.Exploration.create_default_exploration(
+            exp_domain.Exploration.create_default_exploration( # type: ignore[no-untyped-call]
                 'exp_id_1', title='A title', category='A category'))
         caching_services.set_multi(
             caching_services.CACHE_NAMESPACE_EXPLORATION,
@@ -248,7 +248,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             caching_services.SERIALIZATION_FUNCTIONS['exploration']
         )
         default_exploration = (
-            exp_domain.Exploration.create_default_exploration(
+            exp_domain.Exploration.create_default_exploration( # type: ignore[no-untyped-call]
                 'exp_id_1', title='A title', category='A category'))
         self.assertEqual(
             default_exploration.to_dict(),
@@ -315,7 +315,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         caching_services.set_multi(
             caching_services.CACHE_NAMESPACE_DEFAULT, None, key_value_mapping)
         default_exploration = (
-            exp_domain.Exploration.create_default_exploration(
+            exp_domain.Exploration.create_default_exploration( # type: ignore[no-untyped-call]
                 'exp_id_1', title='A title', category='A category'))
         caching_services.set_multi(
             caching_services.CACHE_NAMESPACE_EXPLORATION,
@@ -350,7 +350,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         exploration_id = 'id'
         nonexistent_exploration_id = 'id2'
         default_exploration = (
-            exp_domain.Exploration.create_default_exploration(
+            exp_domain.Exploration.create_default_exploration( # type: ignore[no-untyped-call]
                 'exp_id_1', title='A title', category='A category'))
 
         self.assertEqual(
@@ -391,16 +391,22 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             '0',
             [exploration_id, nonexistent_exploration_id])
 
+        # Using a cast here because the return value of get_multi method is
+        # Dict[str, Any] and mypy will assume result.get() to be Any otherwise.
+        result_exploration = cast(
+            exp_domain.Exploration,
+            result.get(exploration_id))
+
         self.assertEqual(
             default_exploration.to_dict(),
-            result.get(exploration_id).to_dict()) # type: ignore[union-attr]
+            result_exploration.to_dict())
 
         self.assertFalse(nonexistent_exploration_id in result)
 
     def test_queries_to_wrong_namespace_returns_none(self) -> None:
         exploration_id = 'id'
         default_exploration = (
-            exp_domain.Exploration.create_default_exploration(
+            exp_domain.Exploration.create_default_exploration( # type: ignore[no-untyped-call]
                 'exp_id_1', title='A title', category='A category'))
 
         caching_services.set_multi(
@@ -419,7 +425,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
     def test_queries_to_wrong_sub_namespace_returns_none(self) -> None:
         exploration_id = 'id'
         default_exploration = (
-            exp_domain.Exploration.create_default_exploration(
+            exp_domain.Exploration.create_default_exploration( # type: ignore[no-untyped-call]
                 'exp_id_1', title='A title', category='A category'))
 
         self.assertEqual(
@@ -439,8 +445,15 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             caching_services.CACHE_NAMESPACE_EXPLORATION,
             '1',
             [exploration_id])
+
+        # Using a cast here because the return value of get_multi method is
+        # Dict[str, Any] and mypy will assume result.get() to be Any otherwise.
+        result_exploration = cast(
+            exp_domain.Exploration,
+            existent_result.get(exploration_id))
+
         self.assertEqual(
-            existent_result.get(exploration_id).to_dict(),# type: ignore[union-attr]
+            result_exploration.to_dict(),
             default_exploration.to_dict())
 
     def test_set_multi_returns_true_for_successful_insert_into_cache(
@@ -453,7 +466,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
         exploration_id = 'id'
         default_exploration = (
-            exp_domain.Exploration.create_default_exploration(
+            exp_domain.Exploration.create_default_exploration( # type: ignore[no-untyped-call]
                 'exp_id_1', title='A title', category='A category'))
         cache_exploration_response = caching_services.set_multi(
             caching_services.CACHE_NAMESPACE_EXPLORATION,
@@ -480,7 +493,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
         exploration_id = 'id'
         default_exploration = (
-            exp_domain.Exploration.create_default_exploration(
+            exp_domain.Exploration.create_default_exploration( # type: ignore[no-untyped-call]
                 'exp_id_1', title='A title', category='A category'))
         caching_services.set_multi(
             caching_services.CACHE_NAMESPACE_EXPLORATION,
@@ -567,7 +580,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             self.assertNotIn(caching_services.MEMCACHE_KEY_DELIMITER, namespace)
 
     def test_config_properties_identically_cached_in_dev_and_test_environment(
-            self
+        self
     ) -> None:
         """Test to make sure that caching in the test environment is in sync
         with caching in the main development server. More specifically, when a
@@ -654,7 +667,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 [exploration_id]),
             {})
 
-        default_exploration = exp_domain.Exploration.from_dict(
+        default_exploration = exp_domain.Exploration.from_dict( # type: ignore[no-untyped-call]
             self.exploration_dict_with_unicode_characters)
 
         def mock_memory_cache_services_set_multi(
@@ -728,7 +741,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 [exploration_id]),
             {})
 
-        default_exploration = exp_domain.Exploration.from_dict(
+        default_exploration = exp_domain.Exploration.from_dict( # type: ignore[no-untyped-call]
             self.exploration_dict_with_unicode_characters)
 
         caching_services.set_multi(
@@ -764,7 +777,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             {})
 
         default_collection = (
-            collection_domain.Collection.create_default_collection(
+            collection_domain.Collection.create_default_collection( # type: ignore[no-untyped-call]
                 collection_id))
 
         caching_services.set_multi(
@@ -800,18 +813,18 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             {})
 
         rubrics = [
-            skill_domain.Rubric(
+            skill_domain.Rubric( # type: ignore[no-untyped-call]
                 constants.SKILL_DIFFICULTIES[0],
                 ['<p>[NOTE: Creator should fill this in]</p> 😍']),
-            skill_domain.Rubric(
+            skill_domain.Rubric( # type: ignore[no-untyped-call]
                 constants.SKILL_DIFFICULTIES[1],
                 ['<p>[NOTE: Creator should fill this in]</p> 😍']),
-            skill_domain.Rubric(
+            skill_domain.Rubric( # type: ignore[no-untyped-call]
                 constants.SKILL_DIFFICULTIES[2],
                 ['<p>[NOTE: Creator should fill this in]</p> 😍'])]
 
         default_skill = (
-            skill_domain.Skill.create_default_skill(
+            skill_domain.Skill.create_default_skill( # type: ignore[no-untyped-call]
                 skill_id, 'Description 😍', rubrics))
 
         caching_services.set_multi(
@@ -847,7 +860,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             {})
 
         default_topic = (
-            topic_domain.Topic.create_default_topic(
+            topic_domain.Topic.create_default_topic( # type: ignore[no-untyped-call]
                 topic_id, 'Name 😍', 'abbrev 😍',
                 'description 😍'))
 
@@ -885,7 +898,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             {})
 
         default_story = (
-            story_domain.Story.create_default_story(
+            story_domain.Story.create_default_story( # type: ignore[no-untyped-call]
                 story_id, 'Title 😍',
                 'Description 😍', topic_id,
                 'title 😍'))
@@ -922,7 +935,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 [platform_parameter_id]),
             {})
 
-        default_parameter = parameter_domain.PlatformParameter.from_dict({
+        default_parameter = parameter_domain.PlatformParameter.from_dict({ # type: ignore[no-untyped-call]
             'name': 'parameter_a 😍',
             'description': '😍😍😍😍',
             'data_type': 'bool',

@@ -28,8 +28,6 @@ from core.domain import html_cleaner
 from core.domain import html_validation_service
 from core.domain import state_domain
 
-from typing import Any, Dict, List
-
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
 SKILL_PROPERTY_DESCRIPTION = 'description'
@@ -290,7 +288,7 @@ class Misconception:
 class Rubric:
     """Domain object describing a skill rubric."""
 
-    def __init__(self, difficulty: str, explanations: List[str]):
+    def __init__(self, difficulty, explanations):
         """Initializes a Rubric domain object.
 
         Args:
@@ -757,7 +755,7 @@ class Skill:
                 'Expected a value for all_questions_merged when '
                 'superseding_skill_id is set.')
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self):
         """Returns a dict representing this Skill domain object.
 
         Returns:
@@ -886,8 +884,7 @@ class Skill:
 
     @classmethod
     def create_default_skill(
-        cls, skill_id: str, description: str, rubrics: List[Rubric]
-        ) -> Skill:
+        cls, skill_id, description, rubrics):
         """Returns a skill domain object with default values. This is for
         the frontend where a default blank skill would be shown to the user
         when the skill is created for the first time.

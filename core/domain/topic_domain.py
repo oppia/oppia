@@ -33,8 +33,6 @@ from core.domain import fs_services
 from core.domain import subtopic_page_domain
 from core.domain import user_services
 
-from typing import Any, Dict
-
 CMD_CREATE_NEW = feconf.CMD_CREATE_NEW
 CMD_CHANGE_ROLE = feconf.CMD_CHANGE_ROLE
 CMD_REMOVE_MANAGER_ROLE = feconf.CMD_REMOVE_MANAGER_ROLE
@@ -563,7 +561,7 @@ class Topic:
         self.practice_tab_is_displayed = practice_tab_is_displayed
         self.page_title_fragment_for_web = page_title_fragment_for_web
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self):
         """Returns a dict representing this Topic domain object.
 
         Returns:
@@ -1134,8 +1132,7 @@ class Topic:
 
     @classmethod
     def create_default_topic(
-            cls, topic_id: str, name: str, url_fragment: str, description: str
-            ) -> Topic:
+            cls, topic_id, name, url_fragment, description):
         """Returns a topic domain object with default values. This is for
         the frontend where a default blank topic would be shown to the user
         when the topic is created for the first time.

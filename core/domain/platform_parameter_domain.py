@@ -28,8 +28,6 @@ from core import utils
 from core.constants import constants
 from core.domain import change_domain
 
-from typing import Any, Dict
-
 # TODO(#14419): Change naming style of Enum class from SCREAMING_SNAKE_CASE
 # to PascalCase and its values to UPPER_CASE. Because we want to be consistent
 # throughout the codebase according to the coding style guide.
@@ -784,7 +782,7 @@ class PlatformParameter:
                             'production environment.')
 
     @classmethod
-    def from_dict(cls, param_dict: Dict[str, Any]):
+    def from_dict(cls, param_dict):
         """Returns an PlatformParameter object from a dict.
 
         Args:
