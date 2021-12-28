@@ -20,11 +20,18 @@
 import { EventEmitter } from '@angular/core';
 import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { Subtopic } from 'domain/topic/subtopic.model';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 // ^^^ This block is to be removed.
+
+class MockNgbModalRef {
+  componentInstance: {
+    savePendingChangesBody: 'xyz';
+  };
+}
 
 describe('Topic editor tab directive', function() {
   beforeEach(angular.mock.module('oppia'));
@@ -32,6 +39,7 @@ describe('Topic editor tab directive', function() {
 
   var $scope = null;
   var $uibModalInstance = null;
+  let ngbModal: NgbModal = null;
   var ctrl = null;
   var $rootScope = null;
   var topic = null;
@@ -78,6 +86,7 @@ describe('Topic editor tab directive', function() {
     $uibModalInstance = $injector.get('$uibModal');
     $q = $injector.get('$q');
     directive = $injector.get('topicEditorTabDirective')[0];
+    ngbModal = $injector.get('NgbModal');
     TopicEditorStateService = $injector.get('TopicEditorStateService');
     TopicObjectFactory = $injector.get('TopicObjectFactory');
     var MockContextSerivce = {
@@ -228,9 +237,14 @@ describe('Topic editor tab directive', function() {
   it('should open save changes warning modal before creating skill',
     function() {
       spyOn(UndoRedoService, 'getChangeCount').and.returnValue(1);
-      var uibModalSpy = spyOn($uibModalInstance, 'open').and.callThrough();
+      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return (
+          { componentInstance: MockNgbModalRef,
+            result: Promise.resolve()
+          }) as NgbModalRef;
+      });
       $scope.createSkill();
-      expect(uibModalSpy).toHaveBeenCalled();
+      expect(modalSpy).toHaveBeenCalled();
     });
 
   it('should call TopicEditorStateService to load topic when ' +
@@ -451,9 +465,14 @@ describe('Topic editor tab directive', function() {
 
   it('should open save pending changes modal if changes are made', function() {
     spyOn(UndoRedoService, 'getChangeCount').and.returnValue(1);
-    var uibModalSpy = spyOn($uibModalInstance, 'open').and.callThrough();
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return (
+        { componentInstance: MockNgbModalRef,
+          result: Promise.resolve()
+        }) as NgbModalRef;
+    });
     $scope.createCanonicalStory();
-    expect(uibModalSpy).toHaveBeenCalled();
+    expect(modalSpy).toHaveBeenCalled();
   });
 
   it('should call TopicRoutingService to navigate to subtopic', function() {

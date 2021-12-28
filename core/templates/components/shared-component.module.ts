@@ -92,6 +92,7 @@ import { TutorCardComponent } from 'pages/exploration-player-page/learner-experi
 import { ContentLanguageSelectorComponent } from 'pages/exploration-player-page/layout-directives/content-language-selector.component';
 import { RatingDisplayComponent } from './ratings/rating-display/rating-display.component';
 import { SupplementalCardComponent } from 'pages/exploration-player-page/learner-experience/supplemental-card.component';
+import { SavePendingChangesModalComponent } from './save-pending-changes/save-pending-changes-modal.component';
 
 
 // Pipes.
@@ -200,7 +201,8 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     UploadActivityModalComponent,
     SortByPipe,
     LearnerDashboardIconsComponent,
-    PreviewThumbnailComponent
+    PreviewThumbnailComponent,
+    SavePendingChangesModalComponent
   ],
 
   entryComponents: [
@@ -258,7 +260,8 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     LearnerDashboardIconsComponent,
-    PreviewThumbnailComponent
+    PreviewThumbnailComponent,
+    SavePendingChangesModalComponent
   ],
 
   exports: [
@@ -331,6 +334,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     TruncatePipe,
     SummarizeNonnegativeNumberPipe,
     SortByPipe,
+    SavePendingChangesModalComponent,
     LearnerDashboardIconsComponent,
   ],
 })

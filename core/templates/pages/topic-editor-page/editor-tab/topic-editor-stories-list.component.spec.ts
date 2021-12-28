@@ -18,6 +18,13 @@
 
 import { StorySummary } from 'domain/story/story-summary.model';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+
+class MockNgbModalRef {
+  componentInstance: {
+    savePendingChangesBody: 'xyz';
+  };
+}
 
 describe('topicEditorStoriesList', () => {
   let ctrl = null;
@@ -25,6 +32,7 @@ describe('topicEditorStoriesList', () => {
   let $scope = null;
   let $q = null;
   let $uibModal = null;
+  let ngbModal: NgbModal = null;
   let $window = null;
   let storySummaries = null;
   let topicUpdateService = null;
@@ -32,11 +40,23 @@ describe('topicEditorStoriesList', () => {
 
   importAllAngularServices();
   beforeEach(angular.mock.module('oppia'));
+
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
+
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     topicUpdateService = $injector.get('TopicUpdateService');
     undoRedoService = $injector.get('UndoRedoService');
     $window = $injector.get('$window');
     $uibModal = $injector.get('$uibModal');
+    ngbModal = $injector.get('NgbModal');
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
@@ -153,27 +173,33 @@ describe('topicEditorStoriesList', () => {
 
   it('should open save changes modal when user tries to open story editor' +
   ' without saving changes', () => {
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.resolve()
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return (
+        { componentInstance: MockNgbModalRef,
+          result: Promise.resolve()
+        }) as NgbModalRef;
     });
     spyOn(undoRedoService, 'getChangeCount').and.returnValue(1);
 
     $scope.openStoryEditor('storyId');
     $scope.$apply();
 
-    expect($uibModal.open).toHaveBeenCalled();
+    expect(modalSpy).toHaveBeenCalled();
   });
 
   it('should close save changes modal when closes the saves changes' +
   ' modal', () => {
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.reject()
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return (
+        { componentInstance: MockNgbModalRef,
+          result: Promise.reject()
+        }) as NgbModalRef;
     });
     spyOn(undoRedoService, 'getChangeCount').and.returnValue(1);
 
     $scope.openStoryEditor('storyId');
     $scope.$apply();
 
-    expect($uibModal.open).toHaveBeenCalled();
+    expect(modalSpy).toHaveBeenCalled();
   });
 });

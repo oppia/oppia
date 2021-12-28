@@ -13,12 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for story editor save modal.
+ * @fileoverview Unit tests for Save Pending Changes Modal Component.
  */
 
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { StorySavePendingChangesModalComponent } from './story-save-pending-changes-modal.component';
+import { SavePendingChangesModalComponent } from './save-pending-changes-modal.component';
 
 class MockActiveModal {
   dismiss(): void {
@@ -30,12 +30,12 @@ class MockActiveModal {
 }
 
 describe('Story Editor Save Modal Component', () => {
-  let component: StorySavePendingChangesModalComponent;
-  let ngbActiveModal: NgbActiveModal;
-  let fixture: ComponentFixture<StorySavePendingChangesModalComponent>;
+  let component: SavePendingChangesModalComponent;
+  let fixture: ComponentFixture<SavePendingChangesModalComponent>;
+
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [StorySavePendingChangesModalComponent],
+      declarations: [SavePendingChangesModalComponent],
       providers: [
         {
           provide: NgbActiveModal,
@@ -46,14 +46,11 @@ describe('Story Editor Save Modal Component', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(StorySavePendingChangesModalComponent);
+    fixture = TestBed.createComponent(SavePendingChangesModalComponent);
     component = fixture.componentInstance;
-    ngbActiveModal = TestBed.inject(NgbActiveModal);
   });
 
-  it('should close modal on clicking the OK button', () => {
-    const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
-    component.cancel();
-    expect(dismissSpy).toHaveBeenCalled();
+  it('should check if component is defined or not', () => {
+    expect(component).toBeDefined();
   });
 });

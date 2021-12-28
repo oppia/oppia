@@ -13,21 +13,25 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the Oppia splash page.
+ * @fileoverview Component for the Save Pending Changes Modal Component.
  */
-import { Component } from '@angular/core';
+
+import { Component, Input } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
-  selector: 'oppia-story-save-pending-changes-modal',
-  templateUrl: './story-save-pending-changes-modal.component.html'
+  selector: 'oppia-save-pending-changes',
+  templateUrl: './save-pending-changes-modal.component.html'
 })
-export class StorySavePendingChangesModalComponent {
-  constructor(
-      private activeModal: NgbActiveModal
-  ) {}
 
-  cancel(): void {
-    this.activeModal.dismiss();
+export class SavePendingChangesModalComponent extends
+  ConfirmOrCancelModal {
+  @Input() savePendingChangesBody: string;
+
+  constructor(
+    private ngbActiveModal: NgbActiveModal
+  ) {
+    super(ngbActiveModal);
   }
 }
