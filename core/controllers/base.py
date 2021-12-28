@@ -367,7 +367,7 @@ class BaseHandler(webapp2.RequestHandler):
                 # 'csrf_token' has been already validated in the
                 # dispatch method.
                 continue
-            elif arg == 'source':
+            if arg == 'source':
                 source_url = self.request.get('source')
                 regex_pattern = (
                     r'http[s]?://(?:[a-zA-Z]|[0-9]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+' # pylint: disable=line-too-long
