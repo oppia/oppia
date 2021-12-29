@@ -34,6 +34,93 @@ if MYPY: # pragma: no cover
 datastore_services = models.Registry.import_datastore_services()
 
 
+class EntityTranslationsModel(base_models.BaseModel):
+    """Model for storing entity translations."""
+    entity_id = datastore_services.StringProperty(required=True, indexed=True)
+    entity_type = datastore_services.StringProperty(required=True, indexed=True)
+    entity_version = datastore_services.IntegerProperty(
+        required=True, indexed=True)
+    language_code = datastore_services.StringProperty(
+        required=True, indexed=True)
+    translations = datastore_services.JsonProperty(required=True)
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model is not associated with users."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """Model is not associated with users."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model is not associated with users."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'entity_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'entity_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'entity_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'translations': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+        })
+
+    @staticmethod
+    def _generate_id(
+        entity_type: str,
+        entity_id: str,
+        entity_version: str,
+        language_code: str
+    ):
+        return "%s-%s-%s-%s" %(
+            entity_type, entity_id, entity_version, language_code)
+
+    @classmethod
+    def get(
+        cls,
+        entity_type: str,
+        entity_id: str,
+        entity_version: str,
+        language_code: str
+    ):
+        model_id = cls._generate_id(
+            entity_type, entity_id, entity_version, language_code)
+        return cls.get_by_id(model_id)
+
+    @classmethod
+    def get_all_for_entity(
+        cls,
+        entity_type: str,
+        entity_id: str,
+        entity_version: str
+    ):
+        return cls.query(
+            cls.entity_type == entity_type,
+            cls.entity_id == entity_id,
+            cls.entity_version == entity_version
+        ).fetch()
+
+    @classmethod
+    def create_new(
+        cls,
+        entity_type: str,
+        entity_id: str,
+        entity_version: str,
+        language_code: str,
+        translations: Dict[str, Dict[str, Any]]
+    ):
+        return cls(
+            id = cls._generate_id(
+                entity_type, entity_id, entity_version, language_code),
+            entity_type=entity_type,
+            entity_id=entity_id,
+            entity_version=entity_version,
+            language_code=language_code,
+            translations=translations
+        )
+
+
 class MachineTranslationModel(base_models.BaseModel):
     """Model for storing machine generated translations for the purpose of
     preventing duplicate generation. Machine translations are used for reference
