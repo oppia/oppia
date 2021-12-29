@@ -198,8 +198,8 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
         )
         with self.assertRaisesRegexp(Exception, expected_exception_regexp): # type: ignore[no-untyped-call]
             feedback_models.GeneralFeedbackMessageModel.create(
-                feedback_domain.FullyQualifiedMessageIdentifier( # type: ignore[no-untyped-call]
-                    thread_id, '0')
+                feedback_domain.FullyQualifiedMessageIdentifier(
+                    thread_id, 0)
             )
 
     def test_get_all_messages(self) -> None:
