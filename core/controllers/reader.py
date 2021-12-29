@@ -491,22 +491,22 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
         """
         old_state_name = self.payload.get('old_state_name')
         # The reader's answer.
-        answer = self.payload.get('answer')
+        answer = self.normalized_payload.get('answer')
         # Parameters associated with the learner.
-        params = self.payload.get('params', {})
+        params = self.normalized_payload.get('params', {})
         # The version of the exploration.
-        version = self.payload.get('version')
+        version = self.normalized_payload.get('version')
         if version is None:
             raise self.InvalidInputException(
                 'NONE EXP VERSION: Answer Submit')
-        session_id = self.payload.get('session_id')
-        client_time_spent_in_secs = self.payload.get(
+        session_id = self.normalized_payload.get('session_id')
+        client_time_spent_in_secs = self.normalized_payload.get(
             'client_time_spent_in_secs')
         # The answer group and rule spec indexes, which will be used to get
         # the rule spec string.
-        answer_group_index = self.payload.get('answer_group_index')
-        rule_spec_index = self.payload.get('rule_spec_index')
-        classification_categorization = self.payload.get(
+        answer_group_index = self.normalized_payload.get('answer_group_index')
+        rule_spec_index = self.normalized_payload.get('rule_spec_index')
+        classification_categorization = self.normalized_payload.get(
             'classification_categorization')
 
         exploration = exp_fetchers.get_exploration_by_id(
