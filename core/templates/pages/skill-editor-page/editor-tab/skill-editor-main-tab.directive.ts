@@ -15,6 +15,9 @@
 /**
  * @fileoverview Controller for the main tab of the skill editor.
  */
+
+import { SavePendingChangesModalComponent } from '../modal-templates/save-pending-changes-modal.component';
+
 require('services/stateful/focus-manager.service.ts');
 require(
   'pages/skill-editor-page/editor-tab/skill-description-editor/' +
@@ -35,6 +38,7 @@ require('components/rubrics-editor/rubrics-editor.component.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/skill-editor-page/services/question-creation.service.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
+require('services/ngb-modal.service.ts');
 angular.module('oppia').directive('skillEditorMainTab', [
   'UrlInterpolationService',
   function(UrlInterpolationService) {
@@ -45,12 +49,12 @@ angular.module('oppia').directive('skillEditorMainTab', [
         '/pages/skill-editor-page/editor-tab/' +
         'skill-editor-main-tab.directive.html'),
       controller: [
-        '$scope', '$timeout', '$uibModal', 'FocusManagerService',
+        '$scope', '$timeout', 'FocusManagerService', 'NgbModal',
         'PageTitleService',
         'SkillEditorRoutingService', 'SkillEditorStateService',
         'UndoRedoService',
         function(
-            $scope, $timeout, $uibModal, FocusManagerService,
+            $scope, $timeout, FocusManagerService, NgbModal,
             PageTitleService,
             SkillEditorRoutingService, SkillEditorStateService,
             UndoRedoService) {
@@ -62,12 +66,8 @@ angular.module('oppia').directive('skillEditorMainTab', [
             // discarded, the misconceptions won't be saved, but there will be
             // some questions with these now non-existent misconceptions.
             if (UndoRedoService.getChangeCount() > 0) {
-              $uibModal.open({
-                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/pages/skill-editor-page/modal-templates/' +
-                  'save-pending-changes-modal.directive.html'),
+              NgbModal.open(SavePendingChangesModalComponent, {
                 backdrop: true,
-                controller: 'ConfirmOrCancelModalController'
               }).result.then(null, function() {
                 // Note to developers:
                 // This callback is triggered when the Cancel button is clicked.
