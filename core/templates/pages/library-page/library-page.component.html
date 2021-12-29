@@ -152,44 +152,44 @@
           </div>
 
           <div class="oppia-activity-cards-container limit-cards-shown"
-                id="card-container-{{idx}}"
-                *ngIf="libraryWindowIsNarrow && leftmostCardIndices">
+               id="card-container-{{idx}}"
+               *ngIf="libraryWindowIsNarrow && leftmostCardIndices">
             <div class="oppia-library-mobile-tile" *ngFor="let activity of group.activity_summary_dicts">
               <oppia-collection-summary-tile *ngIf="activity.activity_type == 'collection'"
-                                               [getCollectionId]="activity.id"
-                                               [getCollectionTitle]="activity.title"
-                                               [getLastUpdatedMsec]="activity.last_updated_msec"
-                                               [getObjective]="activity.objective"
-                                               [getNodeCount]="activity.node_count"
-                                               [getCategory]="activity.category"
-                                               [getThumbnailIconUrl]="activity.thumbnail_icon_url"
-                                               [getThumbnailBgColor]="activity.thumbnail_bg_color"
-                                               [showLearnerDashboardIconsIfPossible]="true"
-                                               [isContainerNarrow]="true"
-                                               [mobileCutoffPx]="537">
+                                             [getCollectionId]="activity.id"
+                                             [getCollectionTitle]="activity.title"
+                                             [getLastUpdatedMsec]="activity.last_updated_msec"
+                                             [getObjective]="activity.objective"
+                                             [getNodeCount]="activity.node_count"
+                                             [getCategory]="activity.category"
+                                             [getThumbnailIconUrl]="activity.thumbnail_icon_url"
+                                             [getThumbnailBgColor]="activity.thumbnail_bg_color"
+                                             [showLearnerDashboardIconsIfPossible]="true"
+                                             [isContainerNarrow]="true"
+                                             [mobileCutoffPx]="537">
               </oppia-collection-summary-tile>
               <oppia-exploration-summary-tile *ngIf="activity.activity_type == 'exploration'"
-                                                [explorationId]="activity.id"
-                                                [explorationTitle]="activity.title"
-                                                [lastUpdatedMsec]="activity.last_updated_msec"
-                                                [objective]="activity.objective"
-                                                [category]="activity.category"
-                                                [ratings]="activity.ratings"
-                                                [numViews]="activity.num_views"
-                                                [thumbnailIconUrl]="activity.thumbnail_icon_url"
-                                                [thumbnailBgColor]="activity.thumbnail_bg_color"
-                                                class="protractor-test-exp-summary-tile"
-                                                [showLearnerDashboardIconsIfPossible]="true"
-                                                [isContainerNarrow]="true"
-                                                [mobileCutoffPx]="537">
+                                              [explorationId]="activity.id"
+                                              [explorationTitle]="activity.title"
+                                              [lastUpdatedMsec]="activity.last_updated_msec"
+                                              [objective]="activity.objective"
+                                              [category]="activity.category"
+                                              [ratings]="activity.ratings"
+                                              [numViews]="activity.num_views"
+                                              [thumbnailIconUrl]="activity.thumbnail_icon_url"
+                                              [thumbnailBgColor]="activity.thumbnail_bg_color"
+                                              class="protractor-test-exp-summary-tile"
+                                              [showLearnerDashboardIconsIfPossible]="true"
+                                              [isContainerNarrow]="true"
+                                              [mobileCutoffPx]="537">
               </oppia-exploration-summary-tile>
             </div>
           </div>
           <div class="height-toggle-btn-container">
             <button class="card-container-height-toggle-btn"
-              id="height-toggle-btn-{{idx}}"
-              *ngIf="libraryWindowIsNarrow && group.activity_summary_dicts.length > 3"
-              (click)="toggleCardContainerHeightInMobileView($event)">
+                    id="height-toggle-btn-{{idx}}"
+                    *ngIf="libraryWindowIsNarrow && group.activity_summary_dicts.length > 3"
+                    (click)="toggleCardContainerHeightInMobileView($event)">
               See More
             </button>
           </div>
@@ -359,17 +359,17 @@
     max-height: 294px;
   }
   .card-container-height-toggle-btn {
-    color: #fff;
     background: #04857c;
     border: none;
     border-radius: 8px;
-    padding: 8px 20px 5px 20px;
+    color: #fff;
     font-size: 18px;
+    padding: 8px 20px 5px 20px;
   }
   .height-toggle-btn-container {
-    margin-top: 12px;
     display: flex;
     justify-content: center;
+    margin-top: 12px;
   }
   .oppia-library-carousel {
     float: left;
@@ -466,17 +466,17 @@
   }
   @media (max-width: 536px) {
     .oppia-library-group-header {
-      width: 80%;
-      margin-left: 7%;
       font-size: 1.2em;
+      margin-left: 7%;
+      width: 80%;
     }
     .oppia-search-bar-container {
       margin-bottom: 90px;
     }
     .oppia-library-group {
+      border-top: 3px solid white;
       height: auto;
       width: 100%;
-      border-top: 3px solid white;
     }
     .oppia-library-mobile-tile {
       display: flex;
