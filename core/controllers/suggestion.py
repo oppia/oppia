@@ -114,13 +114,10 @@ class SuggestionHandler(base.BaseHandler):
         suggestion_change = suggestion.change
         if (
                 suggestion_change.cmd == 'add_written_translation' and
+                suggestion_change.data_format in
                 (
-                    suggestion_change.data_format ==
-                    state_domain.WrittenTranslation
-                    .DATA_FORMAT_SET_OF_NORMALIZED_STRING or
-                    suggestion_change.data_format ==
-                    state_domain.WrittenTranslation
-                    .DATA_FORMAT_SET_OF_UNICODE_STRING
+                    state_domain.WrittenTranslation.DATA_FORMAT_SET_OF_NORMALIZED_STRING, # pylint: disable=line-too-long
+                    state_domain.WrittenTranslation.DATA_FORMAT_SET_OF_UNICODE_STRING # pylint: disable=line-too-long
                 )
         ):
             self.render_json(self.values)

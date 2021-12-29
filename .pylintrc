@@ -130,7 +130,6 @@ disable=abstract-method,
         unnecessary-pass,
         useless-object-inheritance,
         consider-using-f-string,
-        consider-using-in,
 # TODO(#14322): Reinstate this.
         missing-type-doc
 
