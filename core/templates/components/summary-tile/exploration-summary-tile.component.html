@@ -19,10 +19,10 @@
         </h3>
       </div>
       <div *ngIf="!isPlaylistTile" class="title-section-mask"
-          (mouseenter)="setHoverState(true)" (mouseleave)="setHoverState(false)">
+           (mouseenter)="setHoverState(true)" (mouseleave)="setHoverState(false)">
       </div>
       <div class="summary-section"
-          section="{isWindowLarge?undefined:'right-section'}">
+           section="{isWindowLarge?undefined:'right-section'}">
         <div *ngIf="isWindowLarge" class="objective protractor-test-exp-summary-tile-objective" [innerHTML]="objective | truncateAndCapitalize:95">
         </div>
         <div *ngIf="!objective" class="objective">
@@ -148,42 +148,42 @@
   }
 
   .mobile-exploration-card {
-    width: 350px;
+    box-shadow: slategrey 2px 4px 4px 0;
     height: 85px;
     margin-bottom: 13px;
     padding: 0 0 0 0;
-    box-shadow: slategrey 2px 4px 4px 0px;
+    width: 350px;
   }
 
   .mobile-exploration-card a {
-    height: 100%;
-    width: 100%;
     display: flex;
+    height: 100%;
     justify-content: space-evenly;
     padding-left: 10px;
+    width: 100%;
   }
-  
+
   .mobile-exploration-card-image-container {
-    width: 63px;
     align-self: center;
+    width: 63px;
   }
-  
+
   .mobile-exploration-card-image {
     height: 100%;
     width: auto;
   }
 
   .mobile-exploration-card-details {
-    width: 270px;
-    padding: 15px 15px 15px 15px;
     display: flex;
     flex-direction: column;
+    padding: 15px 15px 15px 15px;
+    width: 270px;
   }
 
   .mobile-exploration-card-details h3 {
     font-size: 1em;
-    margin-top: 0;
     margin-bottom: auto;
+    margin-top: 0;
   }
 
   .mobile-exploration-card-summary-section {
@@ -191,13 +191,13 @@
     color: black;
     width: 100%;
   }
-  
+
   .mobile-exploration-card-summary-elements {
-    width: 100%;
-    display: flex;
     align-items: flex-end;
+    display: flex;
     margin-bottom: -5px;
     padding-left: 0;
+    width: 100%;
   }
 
   .eye-icon {
@@ -206,7 +206,7 @@
 
   .bullet-separator {
     font-size: 10px;
-    margin: -3px 13px 0px 16px;
+    margin: -3px 13px 0 16px;
     opacity: 30%;
   }
 

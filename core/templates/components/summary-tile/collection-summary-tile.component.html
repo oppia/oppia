@@ -36,7 +36,7 @@
         </ul>
       </div>
       <div *ngIf="!isPlaylistTile" class="title-section-mask"
-          (mouseenter)="setHoverState(true)" (mouseleave)="setHoverState(false)">
+           (mouseenter)="setHoverState(true)" (mouseleave)="setHoverState(false)">
       </div>
     </a>
   </mat-card>
@@ -57,7 +57,7 @@
           <img class="mobile-collection-card-image" [src]="getCompleteThumbnailIconUrl()" alt="{{ getCategory }}">
         </div>
       </div>
-      
+
       <div class="mobile-collection-card-details">
         <h3 class="mobile-collection-title protractor-test-collection-summary-tile-title">{{ getCollectionTitle || defaultEmptyTitle }}</h3>
         <div class="mobile-collection-card-summary-section">
@@ -105,30 +105,30 @@
   }
 
   .mobile-collection-card {
+    box-shadow: slategrey 2px 4px 4px 0;
     height: 85px;
-    width: 350px;
     margin-bottom: 13px;
     padding: 0 0 0 0;
-    box-shadow: slategrey 2px 4px 4px 0px;
+    width: 350px;
   }
 
   .mobile-collection-card a {
-    height: 100%;
-    width: 100%;
     display: flex;
+    height: 100%;
     justify-content: space-evenly;
     padding-left: 10px;
+    width: 100%;
   }
 
   .mobile-collection-card-cascading-images-container {
-    height: 63px;
-    width: 63px;
     align-self: center;
+    height: 63px;
     position: relative;
+    width: 63px;
   }
 
   .mobile-collection-card-image-container {
-    box-shadow: slategrey -1px 3px 4px 0px;
+    box-shadow: slategrey -1px 3px 4px 0;
     position: absolute;
     width: 55px;
   }
@@ -151,16 +151,16 @@
   }
 
   .mobile-collection-card-details {
-    width: 270px;
-    padding: 15px 15px 15px 15px;
     display: flex;
     flex-direction: column;
+    padding: 15px 15px 15px 15px;
+    width: 270px;
   }
 
   .mobile-collection-card-details h3 {
     font-size: 1em;
-    margin-top: 0;
     margin-bottom: auto;
+    margin-top: 0;
   }
 
   .mobile-collection-card-summary-section {
@@ -168,22 +168,22 @@
     color: black;
     width: 100%;
   }
-  
+
   .mobile-collection-card-summary-elements {
-    width: 100%;
-    display: flex;
     align-items: flex-end;
+    display: flex;
     margin-bottom: -5px;
     padding-left: 0;
+    width: 100%;
   }
 
   .bullet-separator {
     font-size: 10px;
-    margin: -3px 13px 0px 16px;
+    margin: -3px 13px 0 16px;
     opacity: 30%;
   }
 
   .mobile-collection-card-summary-elements li::marker {
-    color:transparent;
+    color: transparent;
   }
 </style>
