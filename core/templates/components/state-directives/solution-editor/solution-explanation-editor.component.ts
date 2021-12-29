@@ -53,8 +53,9 @@ angular.module('oppia').component('solutionExplanationEditor', {
       };
 
       ctrl.isSolutionExplanationLengthExceeded = function() {
+        // TODO(#13764): Edit this check after appropriate limits are found.
         return (
-          StateSolutionService.displayed.explanation.html.length > 3000);
+          StateSolutionService.displayed.explanation.html.length > 100000);
       };
 
       ctrl.saveThisExplanation = function() {
