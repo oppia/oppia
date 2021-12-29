@@ -31,7 +31,7 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 class MockNgbModalRef {
   componentInstance: {
-    savePendingChangesBody: 'xyz';
+    body: 'xyz';
   };
 }
 

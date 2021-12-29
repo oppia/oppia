@@ -28,7 +28,7 @@ require('pages/story-editor-page/story-editor-page.component.ts');
 
 class MockNgbModalRef {
   componentInstance: {
-    savePendingChangesBody: 'xyz';
+    body: 'xyz';
   };
 }
 

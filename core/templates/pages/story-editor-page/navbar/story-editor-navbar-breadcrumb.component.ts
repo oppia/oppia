@@ -51,7 +51,7 @@ export class StoryEditorNavbarBreadcrumbComponent {
         backdrop: true
       });
 
-      modalRef.componentInstance.savePendingChangesBody =
+      modalRef.componentInstance.body =
         'Please save all pending changes before returning to the topic.';
 
       modalRef.result.then(() => {}, () => {

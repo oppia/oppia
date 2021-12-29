@@ -211,7 +211,7 @@ angular.module('oppia').directive('topicEditorTab', [
                   backdrop: true
                 });
 
-              modalRef.componentInstance.savePendingChangesBody =
+              modalRef.componentInstance.body =
                 'Please save all pending changes ' +
                 'before exiting the topic editor.';
 
@@ -232,7 +232,7 @@ angular.module('oppia').directive('topicEditorTab', [
                   backdrop: true
                 });
 
-              modalRef.componentInstance.savePendingChangesBody =
+              modalRef.componentInstance.body =
                 'Please save all pending changes ' +
                 'before exiting the topic editor.';
 

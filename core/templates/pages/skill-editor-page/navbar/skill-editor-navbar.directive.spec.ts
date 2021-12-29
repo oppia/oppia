@@ -34,7 +34,7 @@ import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 class MockNgbModalRef {
   componentInstance: {
-    savePendingChangesBody: 'xyz';
+    body: 'xyz';
   };
 }
 

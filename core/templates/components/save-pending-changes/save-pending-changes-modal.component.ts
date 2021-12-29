@@ -27,7 +27,7 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
 
 export class SavePendingChangesModalComponent extends
   ConfirmOrCancelModal {
-  @Input() savePendingChangesBody: string;
+  @Input() body: string;
 
   constructor(
     private ngbActiveModal: NgbActiveModal

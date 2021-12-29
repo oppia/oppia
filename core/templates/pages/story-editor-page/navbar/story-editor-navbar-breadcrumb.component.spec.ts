@@ -29,7 +29,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 class MockNgbModalRef {
   componentInstance: {
-    savePendingChangesBody: 'xyz';
+    body: 'xyz';
   };
 }
 

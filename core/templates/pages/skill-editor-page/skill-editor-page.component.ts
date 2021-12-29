@@ -80,7 +80,7 @@ angular.module('oppia').component('skillEditorPage', {
             backdrop: true
           });
 
-          modalRef.componentInstance.savePendingChangesBody =
+          modalRef.componentInstance.body =
             'Please save all pending changes ' +
             'before viewing the questions list.';
 
