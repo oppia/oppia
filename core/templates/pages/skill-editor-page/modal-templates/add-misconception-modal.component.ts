@@ -107,7 +107,7 @@ export class AddMisconceptionModalComponent
     let newMisconceptionId = this.skill.getNextMisconceptionId();
     this.ngbActiveModal.close({
       misconception: this.misconceptionObjectFactory.create(
-        newMisconceptionId,
+        JSON.stringify(newMisconceptionId),
         this.misconceptionName,
         this.misconceptionNotes,
         this.misconceptionFeedback,

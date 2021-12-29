@@ -72,7 +72,7 @@ const skillDict: SkillBackendDict = {
   prerequisite_skill_ids: [],
   all_questions_merged: true,
   superseding_skill_id: '2',
-  next_misconception_id: '3',
+  next_misconception_id: 3,
 };
 
 const skillDict2: SkillBackendDict = {
@@ -95,7 +95,7 @@ const skillDict2: SkillBackendDict = {
   prerequisite_skill_ids: [],
   all_questions_merged: true,
   superseding_skill_id: '2',
-  next_misconception_id: '3',
+  next_misconception_id: 3,
 };
 
 class FakeSkillBackendApiService {

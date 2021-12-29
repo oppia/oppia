@@ -22,7 +22,7 @@ export interface SkillBackendDict {
   id: string;
   'language_code': string;
   misconceptions: MisconceptionBackendDict[];
-  'next_misconception_id': string;
+  'next_misconception_id': number;
   'prerequisite_skill_ids': string[];
   rubrics: RubricBackendDict[];
   'skill_contents': ConceptCardBackendDict;
@@ -50,7 +50,7 @@ export class Skill {
   _conceptCard: ConceptCard;
   _languageCode: string;
   _version: number;
-  _nextMisconceptionId: string;
+  _nextMisconceptionId: number;
   _supersedingSkillId: string;
   _allQuestionsMerged: boolean;
   _prerequisiteSkillIds: string[];
@@ -64,7 +64,7 @@ export class Skill {
       conceptCard: ConceptCard,
       languageCode: string,
       version: number,
-      nextMisconceptionId: string,
+      nextMisconceptionId: number,
       supersedingSkillId: string,
       allQuestionsMerged: boolean,
       prerequisiteSkillIds: string[]) {
@@ -148,12 +148,12 @@ export class Skill {
     return this._version;
   }
 
-  getNextMisconceptionId(): string {
+  getNextMisconceptionId(): number {
     return this._nextMisconceptionId;
   }
 
-  getIncrementedMisconceptionId(id: string): string {
-    return (parseInt(id) + 1).toString();
+  getIncrementedMisconceptionId(id: string): number {
+    return (parseInt(id) + 1);
   }
 
   getSupersedingSkillId(): string {

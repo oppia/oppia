@@ -58,7 +58,7 @@ describe('Skill question tab directive', function() {
     sampleSkill = new Skill(
       null, 'Skill description loading',
       [], [], null,
-      'en', 1, '0', null, false, []);
+      'en', 1, 0, null, false, []);
     fetchSkillSpy = spyOn(skillEditorStateService, 'getSkill')
       .and.returnValue(sampleSkill);
 

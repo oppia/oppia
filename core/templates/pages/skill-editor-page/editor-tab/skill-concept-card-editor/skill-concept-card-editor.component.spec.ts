@@ -91,7 +91,7 @@ describe('Skill editor main tab Component', function() {
       })
     );
     sampleSkill = new Skill(
-      'id1', 'description', [], [], conceptCard, 'en', 1, '0', 'id1', false, []
+      'id1', 'description', [], [], conceptCard, 'en', 1, 0, 'id1', false, []
     );
     spyOn(skillEditorStateService, 'getSkill').and.returnValue(sampleSkill);
     spyOnProperty(skillEditorStateService, 'onSkillChange')

@@ -108,7 +108,7 @@ describe('Add Misconception Modal Component', function() {
       skill_contents: skillContentsDict,
       language_code: 'en',
       version: 3,
-      next_misconception_id: '3',
+      next_misconception_id: 3,
       prerequisite_skill_ids: ['skill_1'],
       all_questions_merged: true,
       superseding_skill_id: 'skill',
