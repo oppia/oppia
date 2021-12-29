@@ -2306,7 +2306,7 @@ Developer UX
 * Added '--disable_host_checking' flag to startup script (#9884)
 * Fix #9874: Fixed pycodestyle error (#9882)
 * Fixes issues with e2e script (#9880)
-* Fix part of #8423: Added lint check to forbid usage of assertRaises and to use assertRaisesRegex instead (#9860)
+* Fix part of #8423: Added lint check to forbid usage of assertRaises and to use assertRaisesRegexp instead (#9860)
 * Upgrade version of wavesurfer and use type defs from DefinitelyTyped (#9831)
 * Fix part of #8423: Add lint check for unused imports (#9826)
 * Routine upgrade of libs (#9823)
