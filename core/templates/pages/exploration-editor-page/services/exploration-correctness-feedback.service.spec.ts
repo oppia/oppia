@@ -44,7 +44,6 @@ describe('Exploration Correctness Feedback Service', () => {
       ]
     });
     httpTestingController = TestBed.inject(HttpTestingController);
-    TestBed.inject(ExplorationDataService);
     ecfs = TestBed.inject(ExplorationCorrectnessFeedbackService);
   });
 

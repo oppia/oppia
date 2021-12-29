@@ -29,6 +29,8 @@ import { LoggerService } from 'services/contextual/logger.service';
 })
 export class ExplorationParamChangesService extends
   ExplorationPropertyService {
+  propertyName: string = 'param_changes';
+
   constructor(
     protected alertsService: AlertsService,
     protected changeListService: ChangeListService,
@@ -36,8 +38,6 @@ export class ExplorationParamChangesService extends
   ) {
     super(alertsService, changeListService, loggerService);
   }
-
-  propertyName: string = 'param_changes';
 }
 
 angular.module('oppia').factory('ExplorationParamChangesService',
