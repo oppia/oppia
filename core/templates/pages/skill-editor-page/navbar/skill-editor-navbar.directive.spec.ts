@@ -279,9 +279,11 @@ describe('Skill Editor Navbar Directive', function() {
       // Setting unsaved changes to be two.
       spyOn(undoRedoService, 'getChangeCount')
         .and.returnValue(2);
-      let $uibModalSpy = spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve()
-      });
+      let ngbModalSpy = spyOn(ngbModal, 'open').and.returnValue(
+        {
+          result: $q.resolve()
+        } as NgbModalRef
+      );
       let navigateToQuestionsTabSpy = spyOn(
         skillEditorRoutingService, 'navigateToQuestionsTab')
         .and.returnValue(null);
@@ -290,7 +292,7 @@ describe('Skill Editor Navbar Directive', function() {
       tick();
       $scope.$apply();
 
-      expect($uibModalSpy).toHaveBeenCalled();
+      expect(ngbModalSpy).toHaveBeenCalled();
       expect(navigateToQuestionsTabSpy).not.toHaveBeenCalled();
     }));
 
