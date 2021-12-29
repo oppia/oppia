@@ -217,6 +217,26 @@ export class LibraryPageComponent {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
+  getCorrespondingContainerIDForButtonClick(buttonID: string): string {
+    let containerIDValue = buttonID.split('-')[3];
+    return '#card-container-' + containerIDValue;
+  }
+
+  toggleCardContainerHeightInMobileView(click: Event): void {
+    let buttonElement = click.target as HTMLElement;
+    let containerID = this.getCorrespondingContainerIDForButtonClick(
+      buttonElement.id);
+    let containerElement = (
+      document.querySelector(containerID) as HTMLElement);
+
+    if (containerElement.classList.contains('limit-cards-shown')) {
+      buttonElement.textContent = 'Collapse Section';
+    } else {
+      buttonElement.textContent = 'See More';
+    }
+    containerElement.classList.toggle('limit-cards-shown');
+  }
+
   ngOnInit(): void {
     let libraryWindowCutoffPx = 536;
     this.libraryWindowIsNarrow = (
