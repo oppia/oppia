@@ -17,9 +17,9 @@
  * exploration.
  */
 
-import { ExplorationPropertyService } from 'pages/exploration-editor-page/services/exploration-property.service';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { ExplorationPropertyService } from 'pages/exploration-editor-page/services/exploration-property.service';
 import { AlertsService } from 'services/alerts.service';
 import { ChangeListService } from './change-list.service';
 import { LoggerService } from 'services/contextual/logger.service';
@@ -30,6 +30,7 @@ import { LoggerService } from 'services/contextual/logger.service';
 export class ExplorationCorrectnessFeedbackService extends
   ExplorationPropertyService {
   correctnessFeedbackIsEnabled: boolean = false;
+  propertyName: string = 'correctness_feedback_enabled';
 
   constructor(
     protected alertsService: AlertsService,
@@ -39,10 +40,8 @@ export class ExplorationCorrectnessFeedbackService extends
     super(alertsService, changeListService, loggerService);
   }
 
-  propertyName: string = 'correctness_feedback_enabled';
-
-  isEnabled(): boolean {
-    return Boolean(this.savedMemento);
+  isEnabled(): string {
+    return this.savedMemento;
   }
 
   toggleCorrectnessFeedback(): void {
