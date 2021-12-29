@@ -78,6 +78,7 @@ angular.module('oppia').component('editorNavigation', {
             StateTutorialFirstTimeService.onOpenEditorTutorial.emit();
           } else if (mode === TRANSLATION_TUTORIAL_MODE) {
             StateTutorialFirstTimeService.onOpenTranslationTutorial.emit();
+            $rootScope.$applyAsync();
           }
         }, () => {
           // Note to developers:

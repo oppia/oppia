@@ -59,8 +59,8 @@ describe('Exploration Player Suggestion Modal Controller', function() {
     const closeSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
     const registerOpenTutorialFromHelpCenterEventSpy = spyOn(
       siteAnalyticsService, 'registerOpenTutorialFromHelpCenterEvent');
-
     component.ngOnInit();
+
     component.beginEditorTutorial();
 
     expect(registerOpenTutorialFromHelpCenterEventSpy)
@@ -72,8 +72,8 @@ describe('Exploration Player Suggestion Modal Controller', function() {
     const closeSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
     let registerOpenTutorialFromHelpCenterEventSpy = spyOn(
       siteAnalyticsService, 'registerOpenTutorialFromHelpCenterEvent');
-
     component.ngOnInit();
+
     component.beginTranslationTutorial();
 
     expect(registerOpenTutorialFromHelpCenterEventSpy)
@@ -85,8 +85,8 @@ describe('Exploration Player Suggestion Modal Controller', function() {
     const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
     let registerVisitHelpCenterEventSpy = spyOn(
       siteAnalyticsService, 'registerVisitHelpCenterEvent');
-
     component.ngOnInit();
+
     component.goToHelpCenter();
 
     expect(registerVisitHelpCenterEventSpy).toHaveBeenCalledWith(explorationId);
