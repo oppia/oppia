@@ -6327,7 +6327,7 @@ Machine Learning system:
 * Fix #3297: Renaming Classifier Registry method (#3298)
 * Fix #3045: Introduce end to end test for classifyHandler (#3255)
 * Fix #2986: Add helper functions to classifier_services.py (#3070)
-* Updated tests with assertRaisesRegex and test to test type of elements in LDAStringClassifier
+* Updated tests with assertRaisesRegexp and test to test type of elements in LDAStringClassifier
 * Added tests to LDAStringClassifier and added comments in classifier_domain_tests
 * Fix #3180: Fix the "interactionRulesService" not found error in teachOppiaModal. (#3181)
 * Fix #3169: Fix the alignment of the submit button in teachOppiaModal (#3171)
