@@ -25,7 +25,7 @@ class MockNgbModalRef {
   componentInstance = {};
 }
 
-describe('StateHintsEditorComponent', () => {
+fdescribe('StateHintsEditorComponent', () => {
   let ctrl = null;
   let $rootScope = null;
   let $scope = null;
@@ -40,16 +40,6 @@ describe('StateHintsEditorComponent', () => {
   let StateInteractionIdService = null;
   let StateSolutionService = null;
   let AlertsService = null;
-
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('NgbModal', {
-      open: () => {
-        return {
-          result: Promise.resolve()
-        };
-      }
-    });
-  }));
 
   importAllAngularServices();
 
@@ -66,7 +56,6 @@ describe('StateHintsEditorComponent', () => {
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
-    ngbModal = TestBed.inject(NgbModal);
     $uibModal = $injector.get('$uibModal');
     $q = $injector.get('$q');
     ngbModal = $injector.get('NgbModal');

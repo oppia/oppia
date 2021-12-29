@@ -17,37 +17,39 @@
  * editor.
  */
 
-import { DeleteHintModalComponent } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-hint-modal.component';
+ import { DeleteHintModalComponent } from
+ // eslint-disable-next-line max-len
+ 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-hint-modal.component';
 import { DeleteLastHintModalComponent } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-last-hint-modal.component';
+ // eslint-disable-next-line max-len
+ 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-last-hint-modal.component';
 
 require(
-  'components/common-layout-directives/common-elements/' +
-  'confirm-or-cancel-modal.controller.ts');
+ 'components/common-layout-directives/common-elements/' +
+ 'confirm-or-cancel-modal.controller.ts');
 require('components/state-directives/hint-editor/hint-editor.component.ts');
 require(
-  'components/state-directives/response-header/response-header.component.ts');
-
+ 'components/state-directives/response-header/response-header.component.ts');
+require(
+ 'pages/exploration-editor-page/editor-tab/templates/modal-templates/' +
+ 'add-hint-modal.controller.ts');
 require('domain/exploration/HintObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-editor.service.ts');
+ 'components/state-editor/state-editor-properties-services/' +
+ 'state-editor.service.ts');
 require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-hints.service.ts');
+ 'components/state-editor/state-editor-properties-services/' +
+ 'state-hints.service.ts');
 require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-interaction-id.service.ts');
+ 'components/state-editor/state-editor-properties-services/' +
+ 'state-interaction-id.service.ts');
 require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-next-content-id-index.service');
+ 'components/state-editor/state-editor-properties-services/' +
+ 'state-next-content-id-index.service');
 require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-solution.service.ts');
+ 'components/state-editor/state-editor-properties-services/' +
+ 'state-solution.service.ts');
 require('filters/format-rte-preview.filter.ts');
 require('services/alerts.service.ts');
 require('services/context.service.ts');
@@ -68,7 +70,7 @@ angular.module('oppia').component('stateHintsEditor', {
   },
   template: require('./state-hints-editor.component.html'),
   controller: [
-    '$filter', '$rootScope', '$scope', '$uibModal', 'AlertsService',
+    '$filter', '$rootScope', '$scope', 'AlertsService',
     'EditabilityService', 'ExternalSaveService', 'NgbModal',
     'StateEditorService', 'StateHintsService',
     'StateInteractionIdService', 'StateNextContentIdIndexService',
