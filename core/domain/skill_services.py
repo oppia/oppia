@@ -792,6 +792,7 @@ def _save_skill(committer_id, skill, commit_message, change_list):
             'Unexpected error: trying to update version %s of skill '
             'from version %s. Please reload the page and try again.'
             % (skill_model.version, skill.version))
+    
     if skill.version < skill_model.version:
         raise Exception(
             'Trying to update version %s of skill from version %s, '

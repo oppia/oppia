@@ -89,6 +89,7 @@ def validate_arguments_against_schema(
                 if arg_schema['default_value'] is None:
                     # Skip validation because the argument is optional.
                     continue
+                
                 if arg_schema['default_value'] is not None:
                     handler_args[arg_key] = arg_schema['default_value']
             else:
