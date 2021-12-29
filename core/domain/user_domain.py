@@ -212,7 +212,7 @@ class UserSettings:
                     'Expected PIN to be a string, received %s' %
                     self.pin
                 )
-            
+
             if (
                     len(self.pin) != feconf.FULL_USER_PIN_LENGTH and
                     len(self.pin) != feconf.PROFILE_USER_PIN_LENGTH

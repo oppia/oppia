@@ -117,7 +117,7 @@ def is_source_mailchimp(handler):
         """
         if feconf.MAILCHIMP_WEBHOOK_SECRET is None:
             raise self.PageNotFoundException
-        
+
         if secret != feconf.MAILCHIMP_WEBHOOK_SECRET:
             logging.error(
                 'Invalid Mailchimp webhook request received with secret: %s'

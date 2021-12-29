@@ -760,7 +760,7 @@ def _save_collection(committer_id, collection, commit_message, change_list):
             'Unexpected error: trying to update version %s of collection '
             'from version %s. Please reload the page and try again.'
             % (collection_model.version, collection.version))
-    
+
     if collection.version < collection_model.version:
         raise Exception(
             'Trying to update version %s of collection from version %s, '

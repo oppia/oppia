@@ -1651,7 +1651,7 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
                 'There were no suggestions to recommend to the reviewer with '
                 'user id: %s.' % reviewer_id)
             continue
-        
+
         if not reviewer_emails[index]:
             log_new_error(
                 'There was no email for the given reviewer id: %s.' % (

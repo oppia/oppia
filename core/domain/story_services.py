@@ -475,7 +475,7 @@ def _save_story(
             'Unexpected error: trying to update version %s of story '
             'from version %s. Please reload the page and try again.'
             % (story_model.version, story.version))
-    
+
     if story.version < story_model.version:
         raise Exception(
             'Trying to update version %s of story from version %s, '

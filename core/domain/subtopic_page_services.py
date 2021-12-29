@@ -195,7 +195,7 @@ def save_subtopic_page(
                 'Unexpected error: trying to update version %s of topic '
                 'from version %s. Please reload the page and try again.'
                 % (subtopic_page_model.version, subtopic_page.version))
-        
+
         if subtopic_page.version < subtopic_page_model.version:
             raise Exception(
                 'Trying to update version %s of topic from version %s, '
