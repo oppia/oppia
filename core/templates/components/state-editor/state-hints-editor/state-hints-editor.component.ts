@@ -17,6 +17,13 @@
  * editor.
  */
 
+import { DeleteHintModalComponent } from
+  // eslint-disable-next-line max-len
+  'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-hint-modal.component';
+import { DeleteLastHintModalComponent } from
+  // eslint-disable-next-line max-len
+  'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-last-hint-modal.component';
+
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
@@ -69,7 +76,7 @@ angular.module('oppia').component('stateHintsEditor', {
     'UrlInterpolationService', 'WindowDimensionsService',
     'INTERACTION_SPECS',
     function(
-        $filter, $rootScope, $scope, $uibModal, AlertsService,
+        $filter, $rootScope, $scope, AlertsService,
         EditabilityService, ExternalSaveService, NgbModal,
         StateEditorService, StateHintsService,
         StateInteractionIdService, StateNextContentIdIndexService,
@@ -149,12 +156,8 @@ angular.module('oppia').component('stateHintsEditor', {
       var openDeleteLastHintModal = function() {
         AlertsService.clearWarnings();
 
-        $uibModal.open({
-          template: require(
-            'pages/exploration-editor-page/editor-tab/templates/' +
-            'modal-templates/delete-last-hint-modal.template.html'),
+        NgbModal.open(DeleteLastHintModalComponent, {
           backdrop: true,
-          controller: 'ConfirmOrCancelModalController'
         }).result.then(function() {
           StateSolutionService.displayed = null;
           StateSolutionService.saveDisplayedValue();
@@ -174,12 +177,8 @@ angular.module('oppia').component('stateHintsEditor', {
         evt.stopPropagation();
 
         AlertsService.clearWarnings();
-        $uibModal.open({
-          template: require(
-            'pages/exploration-editor-page/editor-tab/templates/' +
-            'modal-templates/delete-hint-modal.template.html'),
+        NgbModal.open(DeleteHintModalComponent, {
           backdrop: true,
-          controller: 'ConfirmOrCancelModalController'
         }).result.then(function() {
           if (StateSolutionService.savedMemento &&
             StateHintsService.savedMemento.length === 1) {
