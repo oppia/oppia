@@ -246,7 +246,7 @@ describe('Preview Tab Component', function() {
       expect(ctrl.showParameterSummary()).toBe(true);
     });
 
-    it('should open set params modal when opening preview tab', 
+    it('should open set params modal when opening preview tab',
       fakeAsync(() => {
         spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
           stateName);
