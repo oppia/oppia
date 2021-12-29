@@ -163,7 +163,8 @@
                                                [getThumbnailIconUrl]="activity.thumbnail_icon_url"
                                                [getThumbnailBgColor]="activity.thumbnail_bg_color"
                                                [showLearnerDashboardIconsIfPossible]="true"
-                                               [isContainerNarrow]="true">
+                                               [isContainerNarrow]="true"
+                                               [mobileCutoffPx]="537">
               </oppia-collection-summary-tile>
               <oppia-exploration-summary-tile *ngIf="activity.activity_type == 'exploration'"
                                                 [explorationId]="activity.id"
@@ -177,7 +178,8 @@
                                                 [thumbnailBgColor]="activity.thumbnail_bg_color"
                                                 class="protractor-test-exp-summary-tile"
                                                 [showLearnerDashboardIconsIfPossible]="true"
-                                                [isContainerNarrow]="true">
+                                                [isContainerNarrow]="true"
+                                                [mobileCutoffPx]="537">
               </oppia-exploration-summary-tile>
             </div>
           </div>

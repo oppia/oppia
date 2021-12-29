@@ -49,6 +49,7 @@ export class CollectionSummaryTileComponent implements OnInit, OnDestroy {
   @Input() showLearnerDashboardIconsIfPossible!: string;
   @Input() isContainerNarrow: boolean = false;
   @Input() isOwnedByCurrentUser: boolean = false;
+  @Input() mobileCutoffPx!: number;
 
   userIsLoggedIn: boolean = false;
   collectionIsCurrentlyHoveredOver: boolean = false;
@@ -66,10 +67,13 @@ export class CollectionSummaryTileComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.checkIfMobileCardToBeShown();
     this.userService.getUserInfoAsync().then(userInfo => {
       this.userIsLoggedIn = userInfo.isLoggedIn();
     });
+    if (!this.mobileCutoffPx) {
+      this.mobileCutoffPx = 0;
+    }
+    this.checkIfMobileCardToBeShown();
     this.defaultEmptyTitle = CollectionSummaryTileConstants.DEFAULT_EMPTY_TITLE;
     this.activityTypeCollection = constants.ACTIVITY_TYPE_COLLECTION;
     this.resizeSubscription = this.windowDimensionsService.getResizeEvent()
@@ -83,7 +87,8 @@ export class CollectionSummaryTileComponent implements OnInit, OnDestroy {
   }
 
   checkIfMobileCardToBeShown(): void {
-    let mobileViewActive = this.windowDimensionsService.getWidth() <= 536;
+    let mobileViewActive =
+      this.windowDimensionsService.getWidth() < this.mobileCutoffPx;
     let currentPageUrl = this.urlService.getPathname();
     this.mobileCardToBeShown = (
       mobileViewActive && (currentPageUrl === '/community-library'));

@@ -95,7 +95,6 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.checkIfMobileCardToBeShown();
     this.userService.getUserInfoAsync().then(userInfo => {
       this.userIsLoggedIn = userInfo.isLoggedIn();
     });
@@ -124,6 +123,7 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
     }
     this.isWindowLarge = (
       this.windowDimensionsService.getWidth() >= this.mobileCutoffPx);
+    this.checkIfMobileCardToBeShown();
 
     this.resizeSubscription = this.windowDimensionsService.getResizeEvent().
       subscribe(evt => {
@@ -143,10 +143,9 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   }
 
   checkIfMobileCardToBeShown(): void {
-    let mobileViewActive = this.windowDimensionsService.getWidth() <= 536;
     let currentPageUrl = this.urlService.getPathname();
     this.mobileCardToBeShown = (
-      mobileViewActive && (currentPageUrl === '/community-library'));
+      !this.isWindowLarge && (currentPageUrl === '/community-library'));
   }
 
   setHoverState(hoverState: boolean): void {
