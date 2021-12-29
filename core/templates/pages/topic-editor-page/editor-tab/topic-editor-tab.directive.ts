@@ -51,8 +51,11 @@ require(
   'domain/topics_and_skills_dashboard/' +
   'topics-and-skills-dashboard-backend-api.service.ts');
 require('base-components/loading-message.component.ts');
+require('services/ngb-modal.service.ts');
 
 import { Subscription } from 'rxjs';
+import { TopicSavePendingChangesComponent } from
+  '../modal-templates/topic-save-pending-changes-modal.component';
 
 // TODO(#9186): Change variable name to 'constants' once this file
 // is migrated to Angular.
@@ -68,7 +71,7 @@ angular.module('oppia').directive('topicEditorTab', [
       controller: [
         '$rootScope', '$scope', '$uibModal', 'ContextService',
         'EntityCreationService', 'FocusManagerService',
-        'ImageUploadHelperService',
+        'ImageUploadHelperService', 'NgbModal',
         'PageTitleService', 'StoryCreationService',
         'TopicEditorRoutingService', 'TopicEditorStateService',
         'TopicUpdateService', 'TopicsAndSkillsDashboardBackendApiService',
@@ -81,7 +84,7 @@ angular.module('oppia').directive('topicEditorTab', [
         function(
             $rootScope, $scope, $uibModal, ContextService,
             EntityCreationService, FocusManagerService,
-            ImageUploadHelperService,
+            ImageUploadHelperService, NgbModal,
             PageTitleService, StoryCreationService,
             TopicEditorRoutingService, TopicEditorStateService,
             TopicUpdateService, TopicsAndSkillsDashboardBackendApiService,
@@ -203,12 +206,8 @@ angular.module('oppia').directive('topicEditorTab', [
 
           $scope.createCanonicalStory = function() {
             if (UndoRedoService.getChangeCount() > 0) {
-              $uibModal.open({
-                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/pages/topic-editor-page/modal-templates/' +
-                  'topic-save-pending-changes-modal.template.html'),
-                backdrop: true,
-                controller: 'ConfirmOrCancelModalController'
+              NgbModal.open(TopicSavePendingChangesComponent, {
+                backdrop: true
               }).result.then(function() {}, function() {
                 // Note to developers:
                 // This callback is triggered when the Cancel button is clicked.
@@ -221,12 +220,8 @@ angular.module('oppia').directive('topicEditorTab', [
 
           $scope.createSkill = function() {
             if (UndoRedoService.getChangeCount() > 0) {
-              $uibModal.open({
-                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/pages/topic-editor-page/modal-templates/' +
-                    'topic-save-pending-changes-modal.template.html'),
-                backdrop: true,
-                controller: 'ConfirmOrCancelModalController'
+              NgbModal.open(TopicSavePendingChangesComponent, {
+                backdrop: true
               }).result.then(function() {}, function() {
                 // Note to developers:
                 // This callback is triggered when the Cancel button is clicked.

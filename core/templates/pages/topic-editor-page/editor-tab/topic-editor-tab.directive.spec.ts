@@ -18,6 +18,7 @@
  */
 
 import { EventEmitter } from '@angular/core';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { Subtopic } from 'domain/topic/subtopic.model';
 
@@ -48,6 +49,7 @@ describe('Topic editor tab directive', function() {
   var StoryCreationService = null;
   var StoryReferenceObjectFactory = null;
   var UndoRedoService = null;
+  let ngbModal: NgbModal = null;
   var TopicEditorRoutingService = null;
   var mockStorySummariesInitializedEventEmitter = new EventEmitter();
 
@@ -76,6 +78,7 @@ describe('Topic editor tab directive', function() {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     $uibModalInstance = $injector.get('$uibModal');
+    ngbModal = $injector.get('NgbModal');
     $q = $injector.get('$q');
     directive = $injector.get('topicEditorTabDirective')[0];
     TopicEditorStateService = $injector.get('TopicEditorStateService');
@@ -228,9 +231,13 @@ describe('Topic editor tab directive', function() {
   it('should open save changes warning modal before creating skill',
     function() {
       spyOn(UndoRedoService, 'getChangeCount').and.returnValue(1);
-      var uibModalSpy = spyOn($uibModalInstance, 'open').and.callThrough();
+      spyOn(ngbModal, 'open').and.returnValue(
+        {
+          result: $q.resolve()
+        } as NgbModalRef
+      );
       $scope.createSkill();
-      expect(uibModalSpy).toHaveBeenCalled();
+      expect(ngbModal.open).toHaveBeenCalled();
     });
 
   it('should call TopicEditorStateService to load topic when ' +
@@ -451,9 +458,13 @@ describe('Topic editor tab directive', function() {
 
   it('should open save pending changes modal if changes are made', function() {
     spyOn(UndoRedoService, 'getChangeCount').and.returnValue(1);
-    var uibModalSpy = spyOn($uibModalInstance, 'open').and.callThrough();
+    spyOn(ngbModal, 'open').and.returnValue(
+      {
+        result: $q.resolve()
+      } as NgbModalRef
+    );
     $scope.createCanonicalStory();
-    expect(uibModalSpy).toHaveBeenCalled();
+    expect(ngbModal.open).toHaveBeenCalled();
   });
 
   it('should call TopicRoutingService to navigate to subtopic', function() {

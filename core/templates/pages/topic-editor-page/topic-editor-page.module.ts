@@ -39,6 +39,9 @@ import { TopicEditorNavbarBreadcrumbComponent } from './navbar/topic-editor-navb
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
 import { CreateNewSubtopicModalComponent } from 'pages/topic-editor-page/modal-templates/create-new-subtopic-modal.component';
+import { DeleteStoryModalComponent } from './modal-templates/delete-story-modal.component';
+import { TopicSavePendingChangesComponent } from './modal-templates/topic-save-pending-changes-modal.component';
+import { TopicEditorSendMailComponent } from './modal-templates/topic-editor-send-mail-modal.component';
 import { TopicEditorSaveModalComponent } from './modal-templates/topic-editor-save-modal.component';
 
 @NgModule({
@@ -57,6 +60,9 @@ import { TopicEditorSaveModalComponent } from './modal-templates/topic-editor-sa
     TopicPreviewTabComponent,
     TopicEditorNavbarBreadcrumbComponent,
     CreateNewSubtopicModalComponent,
+    DeleteStoryModalComponent,
+    TopicSavePendingChangesComponent,
+    TopicEditorSendMailComponent,
     TopicEditorSaveModalComponent
   ],
   entryComponents: [
@@ -66,6 +72,9 @@ import { TopicEditorSaveModalComponent } from './modal-templates/topic-editor-sa
     TopicPreviewTabComponent,
     TopicEditorNavbarBreadcrumbComponent,
     CreateNewSubtopicModalComponent,
+    DeleteStoryModalComponent,
+    TopicSavePendingChangesComponent,
+    TopicEditorSendMailComponent,
     TopicEditorSaveModalComponent
   ],
   providers: [
