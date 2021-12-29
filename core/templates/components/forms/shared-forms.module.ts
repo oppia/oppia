@@ -47,9 +47,9 @@ import { MarkAudioAsNeedingUpdateModalComponent } from 'components/forms/forms-t
   ],
   declarations: [
     AudioSliderComponent,
-    SchemaBasedEditorDirective,
     MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent,
-    MarkAudioAsNeedingUpdateModalComponent
+    MarkAudioAsNeedingUpdateModalComponent,
+    SchemaBasedEditorDirective,
   ],
   entryComponents: [
     AudioSliderComponent,

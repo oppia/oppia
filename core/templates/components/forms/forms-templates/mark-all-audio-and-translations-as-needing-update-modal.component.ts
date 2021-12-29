@@ -26,7 +26,6 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
   // eslint-disable-next-line max-len
   templateUrl: './mark-all-audio-and-translations-as-needing-update-modal.component.html'
 })
-
 export class MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent
   extends ConfirmOrCancelModal {
   constructor(

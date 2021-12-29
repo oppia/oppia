@@ -32,7 +32,7 @@ class MockActiveModal {
   }
 }
 
-describe('Delete Exploration Modal Component works', function() {
+describe('Delete Exploration Modal Component', () => {
   let component: MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent;
   let fixture: ComponentFixture<
     MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent>;
@@ -48,19 +48,12 @@ describe('Delete Exploration Modal Component works', function() {
       }],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
-  }));
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(
       MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent);
     component = fixture.componentInstance;
-
-    TestBed.inject(NgbActiveModal);
     fixture.detectChanges();
-  });
-
-  // Confirm and cancel functions tested in ConfirmOrCancelModal spec file.
-  // So only Component is defined need to be tested in this file.
+  }));
 
   it('should check whether component is initialized', () => {
     expect(component).toBeDefined();
