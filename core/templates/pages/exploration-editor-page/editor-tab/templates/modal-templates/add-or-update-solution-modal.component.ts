@@ -55,6 +55,8 @@ export class AddOrUpdateSolutionModalComponent
   tempAnsOption: string;
   isSubmitButtonDisabled: boolean;
   COMPONENT_NAME_SOLUTION: string;
+  correctAnswerEditorHtml;
+  savedMemento;
   EMPTY_SOLUTION_DATA: object;
   SOLUTION_EDITOR_FOCUS_LABEL: string = (
     'currentCorrectAnswerEditorHtmlForSolutionEditor');
@@ -80,19 +82,6 @@ export class AddOrUpdateSolutionModalComponent
   ) {
     super(ngbActiveModal);
   }
-  
-  savedMemento(): InteractionAnswer {
-    return this.stateSolutionService.savedMemento?.correctAnswer;
-  }
-
-  correctAnswerEditorHtml = (
-    this.explorationHtmlFormatterService.getInteractionHtml(
-      this.stateInteractionIdService.savedMemento,
-      this.stateCustomizationArgsService.savedMemento,
-      false,
-      this.SOLUTION_EDITOR_FOCUS_LABEL,
-      this.savedMemento() ? 'savedMemento()' : null)
-    )
 
   onSubmitFromSubmitButton(): void {
     this.currentInteractionService.submitAnswer();
@@ -146,9 +135,22 @@ export class AddOrUpdateSolutionModalComponent
   }
 
   ngOnInit(): void {
-    if(this.savedMemento()){
+    this.savedMemento = () => {
+      return this.stateSolutionService.savedMemento?.correctAnswer;
+    }
+    this.correctAnswerEditorHtml = (
+      this.explorationHtmlFormatterService.getInteractionHtml(
+        this.stateInteractionIdService.savedMemento,
+        this.stateCustomizationArgsService.savedMemento,
+        false,
+        this.SOLUTION_EDITOR_FOCUS_LABEL,
+        this.savedMemento() ? 'savedMemento()' : null)
+      )
+    this.answerIsValid = false;
+    if(this.stateSolutionService.savedMemento){
       this.data.answerIsExclusive = (
         this.stateSolutionService.savedMemento.answerIsExclusive);
+      this.data.correctAnswer = null;
       this.data.explanationHtml = (
         this.stateSolutionService.savedMemento.explanation.html);
       this.data.explanationContentId = (
@@ -156,15 +158,25 @@ export class AddOrUpdateSolutionModalComponent
     }
     else {
       this.data.answerIsExclusive = false;
+      this.data.correctAnswer = null;
       this.data.explanationHtml = '';
       this.data.explanationContentId = this.COMPONENT_NAME_SOLUTION;
+    
     }
-    this.data.correctAnswer = null;
-    this.answerIsValid = false;
     this.isSubmitButtonDisabled = (
       this.currentInteractionService.isSubmitButtonDisabled());
-    this.currentInteractionService.setOnSubmitFn((answer: string) => {
-        this.data.correctAnswer = answer;
+    this.currentInteractionService.setOnSubmitFn((answer) => {
+      this.data.correctAnswer = answer;
     })
+    this.directiveSubscriptions.add(
+      this.currentInteractionService.onAnswerChanged$.subscribe(() => {
+       this.changeDetectorRef.detectChanges();
+      })
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
   }
 }
+

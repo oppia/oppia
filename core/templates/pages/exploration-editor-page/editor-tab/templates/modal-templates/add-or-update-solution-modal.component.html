@@ -21,12 +21,12 @@
         </angular-html-bind-wrapper>
       </div>
       <br>
-      <md-button class="oppia-learner-confirm-button protractor-test-submit-answer-button"
+      <button class="oppia-learner-confirm-button protractor-test-submit-answer-button"
                  (click)="onSubmitFromSubmitButton()"
                  *ngIf="data.correctAnswer === null && shouldAdditionalSubmitButtonBeShown()"
                  [disabled]="isSubmitButtonDisabled">
         Submit
-      </md-button>
+      </button>
       <br>
       <div [hidden]="!data.correctAnswer !== null">
         <strong>Explanation:</strong>
