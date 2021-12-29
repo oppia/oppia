@@ -56,7 +56,7 @@ export class CollectionSummaryTileComponent implements OnInit, OnDestroy {
   defaultEmptyTitle!: string;
   activityTypeCollection!: string;
   mobileCardToBeShown: boolean = false;
-  resizeSubscription: Subscription;
+  resizeSubscription!: Subscription;
 
   constructor(
     private dateTimeFormatService: DateTimeFormatService,
@@ -83,7 +83,9 @@ export class CollectionSummaryTileComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.resizeSubscription.unsubscribe();
+    if (this.resizeSubscription) {
+      this.resizeSubscription.unsubscribe();
+    }
   }
 
   checkIfMobileCardToBeShown(): void {
