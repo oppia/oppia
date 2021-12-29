@@ -53,6 +53,7 @@ describe('Skill editor main tab directive', function() {
       imports: [HttpClientTestingModule]
     });
     focusManagerService = TestBed.get(FocusManagerService);
+    ngbModal = TestBed.inject(NgbModal);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
