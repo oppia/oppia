@@ -2787,8 +2787,7 @@ class State:
                     'The content_id %s does not exist in written_translations.'
                     % content_id)
 
-            self.recorded_voiceovers.delete_content_id_for_voiceover(
-                content_id)
+            self.recorded_voiceovers.delete_content_id_for_voiceover(content_id)
             self.written_translations.delete_content_id_for_translation(
                 content_id)
 
@@ -2802,10 +2801,8 @@ class State:
                     'The content_id %s already exists in written_translations.'
                     % content_id)
 
-            self.recorded_voiceovers.add_content_id_for_voiceover(
-                content_id)
-            self.written_translations.add_content_id_for_translation(
-                content_id)
+            self.recorded_voiceovers.add_content_id_for_voiceover(content_id)
+            self.written_translations.add_content_id_for_translation(content_id)
 
     def add_translation(self, content_id, language_code, translation_html):
         """Adds translation to a given content id in a specific language.

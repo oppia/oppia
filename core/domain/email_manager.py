@@ -1665,10 +1665,12 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
                     reviewer_suggestion_email_info))
 
         email_body = email_body_template % (
-            reviewer_usernames[index], feconf.OPPIA_SITE_URL,
-            feconf.CONTRIBUTOR_DASHBOARD_URL, ''.join(
-                suggestion_descriptions),
-            EMAIL_FOOTER.value)
+            reviewer_usernames[index],
+            feconf.OPPIA_SITE_URL,
+            feconf.CONTRIBUTOR_DASHBOARD_URL,
+            ''.join(suggestion_descriptions),
+            EMAIL_FOOTER.value
+        )
 
         _send_email(
             reviewer_id, feconf.SYSTEM_COMMITTER_ID,

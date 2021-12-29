@@ -212,8 +212,10 @@ class UserSettings:
                     'Expected PIN to be a string, received %s' %
                     self.pin
                 )
-            if (len(self.pin) != feconf.FULL_USER_PIN_LENGTH and
-                  len(self.pin) != feconf.PROFILE_USER_PIN_LENGTH):
+            if (
+                    len(self.pin) != feconf.FULL_USER_PIN_LENGTH and
+                    len(self.pin) != feconf.PROFILE_USER_PIN_LENGTH
+            ):
                 raise utils.ValidationError(
                     'User PIN can only be of length %s or %s' %
                     (
@@ -398,12 +400,12 @@ class UserSettings:
 
         # Disallow usernames that contain the system usernames or the
         # strings "admin" or "oppia".
-        reserved_usernames = set(feconf.SYSTEM_USERS.values()) | set([
-            'admin', 'oppia'])
+        reserved_usernames = (
+            set(feconf.SYSTEM_USERS.values()) | {'admin', 'oppia'}
+        )
         for reserved_username in reserved_usernames:
             if reserved_username in username.lower().strip():
-                raise utils.ValidationError(
-                    'This username is not available.')
+                raise utils.ValidationError('This username is not available.')
 
     def mark_banned(self):
         """Marks a user banned."""

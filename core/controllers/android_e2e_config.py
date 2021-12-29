@@ -90,7 +90,7 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
                     'The topic is already published.')
 
             raise self.InvalidInputException(
-                    'The topic exists but is not published.')
+                'The topic exists but is not published.')
         exp_id = '26'
         user_id = feconf.SYSTEM_COMMITTER_ID
         # Generate new Structure id for topic, story, skill and question.
