@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit Test for MarkAudioAsNeedingUpdateModalComponent.
+ * @fileoverview Unit Test for Mark Audio As Needing Update Modal Component.
  */
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';

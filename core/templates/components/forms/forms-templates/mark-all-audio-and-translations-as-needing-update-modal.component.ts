@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Component for
- *  MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent.
+ *  Marking all audio and translations as needing update modal component.
  */
 
 import { Component } from '@angular/core';

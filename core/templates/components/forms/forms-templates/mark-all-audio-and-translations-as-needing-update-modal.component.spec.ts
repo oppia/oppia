@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Unit Test for
- *  MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent.
+ *  Mark all audio and translations as needing update modal Component.
  */
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';

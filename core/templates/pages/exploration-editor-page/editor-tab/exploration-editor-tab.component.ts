@@ -68,8 +68,8 @@ require('services/exploration-features.service.ts');
 require('services/site-analytics.service.ts');
 require('services/ngb-modal.service.ts');
 
-import { MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent } from 'components/forms/forms-templates/mark-all-audio-and-translations-as-needing-update-modal.component';
 import { Subscription } from 'rxjs';
+import { MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent } from 'components/forms/forms-templates/mark-all-audio-and-translations-as-needing-update-modal.component';
 
 angular.module('oppia').component('explorationEditorTab', {
   bindings: {
