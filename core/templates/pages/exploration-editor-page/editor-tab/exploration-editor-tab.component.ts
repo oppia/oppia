@@ -77,7 +77,7 @@ angular.module('oppia').component('explorationEditorTab', {
   },
   template: require('./exploration-editor-tab.component.html'),
   controller: [
-    '$rootScope', '$scope', '$templateCache', '$timeout', 'EditabilityService',
+    '$scope', '$templateCache', '$timeout', 'EditabilityService',
     'ExplorationCorrectnessFeedbackService', 'ExplorationFeaturesService',
     'ExplorationInitStateNameService', 'ExplorationStatesService',
     'ExplorationWarningsService', 'FocusManagerService', 'GraphDataService',
@@ -87,7 +87,7 @@ angular.module('oppia').component('explorationEditorTab', {
     'StateTutorialFirstTimeService',
     'UserExplorationPermissionsService',
     function(
-        $rootScope, $scope, $templateCache, $timeout, EditabilityService,
+        $scope, $templateCache, $timeout, EditabilityService,
         ExplorationCorrectnessFeedbackService, ExplorationFeaturesService,
         ExplorationInitStateNameService, ExplorationStatesService,
         ExplorationWarningsService, FocusManagerService, GraphDataService,
@@ -316,7 +316,6 @@ angular.module('oppia').component('explorationEditorTab', {
             // This callback is triggered when the Cancel button is
             // clicked. No further action is needed.
           });
-          $rootScope.$applyAsync();
         }
       };
 
