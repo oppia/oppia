@@ -201,7 +201,9 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
       let generatedImageFilename =
        this.imageUploadHelperService.generateImageFilename(
          data.dimensions.height, data.dimensions.width, 'svg');
-      this.newThumbnailDataUrl = data.newThumbnailDataUrl;
+        setTimeout(()=>{
+          this.newThumbnailDataUrl = data.newThumbnailDataUrl;
+        },0)
       this.hidePlaceholder = false;
       if (!this.useLocalStorage) {
         if (data.openInUploadMode) {
