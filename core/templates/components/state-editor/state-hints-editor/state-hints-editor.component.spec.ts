@@ -25,7 +25,7 @@ class MockNgbModalRef {
   componentInstance = {};
 }
 
-fdescribe('StateHintsEditorComponent', () => {
+describe('StateHintsEditorComponent', () => {
   let ctrl = null;
   let $rootScope = null;
   let $scope = null;
