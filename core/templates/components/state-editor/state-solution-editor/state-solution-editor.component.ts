@@ -17,6 +17,10 @@
  * state editor.
  */
 
+import { DeleteSolutionModalComponent } from
+  // eslint-disable-next-line max-len
+  'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-solution-modal.component';
+
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
@@ -66,6 +70,7 @@ require('services/exploration-html-formatter.service.ts');
 require('components/state-editor/state-editor.constants.ajs.ts');
 require('services/contextual/window-dimensions.service');
 require('services/external-save.service.ts');
+require('services/ngb-modal.service.ts');
 
 angular.module('oppia').component('stateSolutionEditor', {
   bindings: {
@@ -76,7 +81,7 @@ angular.module('oppia').component('stateSolutionEditor', {
   template: require('./state-solution-editor.component.html'),
   controller: [
     '$filter', '$scope', '$uibModal', 'AlertsService', 'EditabilityService',
-    'ExplorationHtmlFormatterService', 'ExternalSaveService',
+    'ExplorationHtmlFormatterService', 'ExternalSaveService', 'NgbModal',
     'SolutionValidityService', 'SolutionVerificationService',
     'StateCustomizationArgsService', 'StateEditorService',
     'StateHintsService', 'StateInteractionIdService',
@@ -87,7 +92,7 @@ angular.module('oppia').component('stateSolutionEditor', {
     'INTERACTION_SPECS',
     function(
         $filter, $scope, $uibModal, AlertsService, EditabilityService,
-        ExplorationHtmlFormatterService, ExternalSaveService,
+        ExplorationHtmlFormatterService, ExternalSaveService, NgbModal,
         SolutionValidityService, SolutionVerificationService,
         StateCustomizationArgsService, StateEditorService,
         StateHintsService, StateInteractionIdService,
@@ -175,12 +180,8 @@ angular.module('oppia').component('stateSolutionEditor', {
         evt.stopPropagation();
 
         AlertsService.clearWarnings();
-        $uibModal.open({
-          template: require(
-            'pages/exploration-editor-page/editor-tab/templates/' +
-            'modal-templates/delete-solution-modal.template.html'),
+        NgbModal.open(DeleteSolutionModalComponent, {
           backdrop: true,
-          controller: 'ConfirmOrCancelModalController'
         }).result.then(function() {
           StateSolutionService.displayed = null;
           StateSolutionService.saveDisplayedValue();
