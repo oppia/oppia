@@ -295,35 +295,35 @@ class JsTsLintChecksManager:
                                 parsed_node, components_to_check))
                         if not expression:
                             continue
-                        else:
-                            # The following block populates a set to
-                            # store constants for the Angular-AngularJS
-                            # constants file consistency check.
-                            angularjs_constants_name = (
-                                expression.arguments[0].value)
+
+                        # The following block populates a set to
+                        # store constants for the Angular-AngularJS
+                        # constants file consistency check.
+                        angularjs_constants_name = (
+                            expression.arguments[0].value)
+                        angularjs_constants_value = (
+                            expression.arguments[1])
+                        # Check if const is declared outside the
+                        # class.
+                        if angularjs_constants_value.property:
                             angularjs_constants_value = (
-                                expression.arguments[1])
-                            # Check if const is declared outside the
-                            # class.
-                            if angularjs_constants_value.property:
-                                angularjs_constants_value = (
-                                    angularjs_constants_value.property.name)
-                            if angularjs_constants_value != (
-                                    angularjs_constants_name):
-                                failed = True
-                                error_messages.append(
-                                    '%s --> Please ensure that the '
-                                    'constant %s is initialized '
-                                    'from the value from the '
-                                    'corresponding Angular constants'
-                                    ' file (the *.constants.ts '
-                                    'file). Please create one in the'
-                                    ' Angular constants file if it '
-                                    'does not exist there.' % (
-                                        filepath,
-                                        angularjs_constants_name))
-                            angularjs_constants_list.append(
-                                angularjs_constants_name)
+                                angularjs_constants_value.property.name)
+                        if angularjs_constants_value != (
+                                angularjs_constants_name):
+                            failed = True
+                            error_messages.append(
+                                '%s --> Please ensure that the '
+                                'constant %s is initialized '
+                                'from the value from the '
+                                'corresponding Angular constants'
+                                ' file (the *.constants.ts '
+                                'file). Please create one in the'
+                                ' Angular constants file if it '
+                                'does not exist there.' % (
+                                    filepath,
+                                    angularjs_constants_name))
+                        angularjs_constants_list.append(
+                            angularjs_constants_name)
 
             # Check if the constant has multiple declarations which is
             # prohibited.
@@ -335,22 +335,22 @@ class JsTsLintChecksManager:
                     parsed_node, components_to_check)
                 if not expression:
                     continue
+
+                constant_name = expression.arguments[0].raw
+                if constant_name in constants_to_source_filepaths_dict:
+                    failed = True
+                    error_message = (
+                        '%s --> The constant %s is already declared '
+                        'in %s. Please import the file where the '
+                        'constant is declared or rename the constant'
+                        '.' % (
+                            filepath, constant_name,
+                            constants_to_source_filepaths_dict[
+                                constant_name]))
+                    error_messages.append(error_message)
                 else:
-                    constant_name = expression.arguments[0].raw
-                    if constant_name in constants_to_source_filepaths_dict:
-                        failed = True
-                        error_message = (
-                            '%s --> The constant %s is already declared '
-                            'in %s. Please import the file where the '
-                            'constant is declared or rename the constant'
-                            '.' % (
-                                filepath, constant_name,
-                                constants_to_source_filepaths_dict[
-                                    constant_name]))
-                        error_messages.append(error_message)
-                    else:
-                        constants_to_source_filepaths_dict[
-                            constant_name] = filepath
+                    constants_to_source_filepaths_dict[
+                        constant_name] = filepath
 
         return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
