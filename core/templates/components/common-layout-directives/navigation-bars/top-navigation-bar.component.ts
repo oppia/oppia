@@ -56,6 +56,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   @Input() headerText!: string;
   @Input() subheaderText!: string;
 
+  DEFAULT_CLASSROOM_URL_FRAGMENT = AppConstants.DEFAULT_CLASSROOM_URL_FRAGMENT;
   url!: URL;
   currentLanguageCode!: string;
   supportedSiteLanguages!: LanguageInfo[];
@@ -186,11 +187,14 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
         this.CLASSROOM_PROMOS_ARE_ENABLED = classroomPromosAreEnabled;
         if (classroomPromosAreEnabled) {
           this.accessValidationBackendApiService.validateAccessToClassroomPage(
-            'math').then(()=>{
+            this.DEFAULT_CLASSROOM_URL_FRAGMENT).then(()=>{
             this.classroomBackendApiService.fetchClassroomDataAsync(
-              'math').then((classroomData) => {
-              this.classroomData = classroomData.getTopicSummaries();
-            });
+              this.DEFAULT_CLASSROOM_URL_FRAGMENT)
+              .then((classroomData) => {
+                this.classroomData = classroomData.getTopicSummaries();
+                this.classroomBackendApiService.onInitializeTranslation.emit();
+                this.siteAnalyticsService.registerClassroomPageViewed();
+              });
           });
         }
       });
