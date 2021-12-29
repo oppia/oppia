@@ -21,7 +21,7 @@ from __future__ import annotations
 from core import utils
 from core.platform import models
 
-from typing import Dict, Optional
+from typing import Any, Dict, List, Optional, Sequence
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -70,20 +70,20 @@ class EntityTranslationsModel(base_models.BaseModel):
     def _generate_id(
         entity_type: str,
         entity_id: str,
-        entity_version: str,
+        entity_version: int,
         language_code: str
-    ):
-        return "%s-%s-%s-%s" %(
+    ) -> str:
+        return '%s-%s-%s-%s' %(
             entity_type, entity_id, entity_version, language_code)
 
     @classmethod
-    def get(
+    def get_model(
         cls,
         entity_type: str,
         entity_id: str,
-        entity_version: str,
+        entity_version: int,
         language_code: str
-    ):
+    ) -> EntityTranslationsModel:
         model_id = cls._generate_id(
             entity_type, entity_id, entity_version, language_code)
         return cls.get_by_id(model_id)
@@ -93,8 +93,8 @@ class EntityTranslationsModel(base_models.BaseModel):
         cls,
         entity_type: str,
         entity_id: str,
-        entity_version: str
-    ):
+        entity_version: int
+    ) -> Sequence[Optional[EntityTranslationsModel]]:
         return cls.query(
             cls.entity_type == entity_type,
             cls.entity_id == entity_id,
@@ -106,10 +106,10 @@ class EntityTranslationsModel(base_models.BaseModel):
         cls,
         entity_type: str,
         entity_id: str,
-        entity_version: str,
+        entity_version: int,
         language_code: str,
         translations: Dict[str, Dict[str, Any]]
-    ):
+    ) -> EntityTranslationsModel:
         return cls(
             id = cls._generate_id(
                 entity_type, entity_id, entity_version, language_code),

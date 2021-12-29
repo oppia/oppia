@@ -20,7 +20,7 @@ from __future__ import annotations
 
 from core import utils
 
-from typing import Dict, List, Union
+from typing import Any, Dict, List, Union
 
 
 TRANSLATABLE_CONTENT_FORMAT_HTML = 'html'
@@ -35,7 +35,7 @@ class BaseTranslatableObject:
     """Base class for all translatable objects."""
 
     # Private field to track translatable contents in a BaseTranslatableObject.
-    _translatable_contents: Dict(str, TranslatableContent) = {}
+    _translatable_contents: Dict[str, TranslatableContent] = {}
 
     def _register_all_translatable_fields(
         self
@@ -54,7 +54,7 @@ class BaseTranslatableObject:
         self,
         field_type: str,
         content_id: str,
-        value: str|list(str)
+        value: str|List[str]
     ) -> None:
         """Base method to register a translatable field in an entity.
 
@@ -72,7 +72,7 @@ class BaseTranslatableObject:
 
     def _register_translatable_object(
         self,
-        value: str|list(str)
+        value: BaseTranslatableObject
     ) -> None:
         """Base method to register translatable field in a
         BaseTranslatableObject.
@@ -118,7 +118,7 @@ class BaseTranslatableObject:
                 continue
             if (
                 not translatable_item.content_id in
-                entityTranslations.translations
+                entityTranslations.translations.keys()
             ):
                 contents_which_need_translation.append(translatable_item)
             if (
@@ -127,7 +127,7 @@ class BaseTranslatableObject:
             ):
                 contents_which_need_translation.append(translatable_item)
 
-            return contents_which_need_translation
+        return contents_which_need_translation
 
 
 class EntityTranslations:
@@ -148,9 +148,9 @@ class EntityTranslations:
         self,
         entity_id: str,
         entity_type: str,
-        entity_version: str,
+        entity_version: int,
         language_code: str,
-        translations: TranslatedContent
+        translations: Dict[str, TranslatedContent]
     ):
         self.entity_id = entity_id
         self.entity_type = entity_type
@@ -171,10 +171,10 @@ class TranslatableContent:
 
     def __init__(
         self,
-        content_id,
-        content,
-        content_type
-    ):
+        content_id: str,
+        content: str|List[str],
+        content_type: str
+    ) -> None:
         self.content_id = content_id
         self.content = content
         self.type = content_type
@@ -182,8 +182,8 @@ class TranslatableContent:
     @classmethod
     def from_dict(
         cls,
-        translatable_content_dict
-    ):
+        translatable_content_dict: Dict[str, Any]
+    ) -> TranslatableContent:
         """Returns a TranslatableContent object from its dict representation.
 
         Args:
@@ -204,7 +204,7 @@ class TranslatableContent:
 
     def to_dict(
         self
-    ):
+    ) -> Dict[str, Any]:
         """Returns the dict representation of TranslatableContent object.
 
         Returns:
@@ -231,14 +231,14 @@ class TranslatedContent:
         self,
         content: str|List[str],
         needs_update: bool
-    ):
+    ) -> None:
         self.content = content
         self.needs_update = needs_update
 
     @classmethod
     def from_dict(
         cls,
-        translated_contents_dict: Dict[Union[str, List[str]], bool]
+        translated_contents_dict: Dict[str, Any]
     ) -> TranslatedContent:
         """Returns a TranslatedContent object from its dict representation.
 
@@ -259,7 +259,7 @@ class TranslatedContent:
 
     def to_dict(
         self
-    ) -> Dict[Union[str, List[str]], bool]:
+    ) -> Dict[str, Any]:
         """Returns the dict representation of TranslatedContent object.
 
         Returns:

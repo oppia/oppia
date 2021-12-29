@@ -58,14 +58,14 @@ class EntityTranslationsModelTest(test_utils.GenericTestBase):
         translation_models.EntityTranslationsModel.create_new(
             'exploration', 'exp_id', 1, 'hi', translated_content).put()
         enitity_translation_model = (
-            translation_models.EntityTranslationsModel.get(
+            translation_models.EntityTranslationsModel.get_model(
                 'exploration', 'exp_id', 1, 'hi'))
         self.assertEqual(enitity_translation_model.entity_type, 'exploration')
         self.assertEqual(enitity_translation_model.entity_id, 'exp_id')
         self.assertEqual(enitity_translation_model.entity_version, 1)
         self.assertEqual(enitity_translation_model.language_code, 'hi')
 
-    def test_get_all_for_entity_returns_models(self):
+    def test_get_all_for_entity_returns_models(self) -> None:
         translated_content1 = {
             '123': {
                 'content': 'Hey I am Jhon.',
