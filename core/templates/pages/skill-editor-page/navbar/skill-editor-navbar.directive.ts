@@ -45,11 +45,11 @@ angular.module('oppia').directive('skillEditorNavbar', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/skill-editor-page/navbar/skill-editor-navbar.directive.html'),
       controller: [
-        '$rootScope', '$scope', '$uibModal', 'AlertsService', 'NgbModal',
+        '$rootScope', '$scope', 'AlertsService', 'NgbModal',
         'SkillEditorRoutingService', 'SkillEditorStateService',
         'UndoRedoService', 'UrlService',
         function(
-            $rootScope, $scope, $uibModal, AlertsService, NgbModal,
+            $rootScope, $scope, AlertsService, NgbModal,
             SkillEditorRoutingService, SkillEditorStateService,
             UndoRedoService, UrlService) {
           var ctrl = this;
