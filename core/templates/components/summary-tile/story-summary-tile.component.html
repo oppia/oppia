@@ -67,8 +67,8 @@
           <text x="25"
                 y="-20"
                 text-anchor="middle"
-                stroke="#000"
-                stroke-width="0.5"
+                stroke="#4e4d4d9e"
+                stroke-width="0.3"
                 font-size="0.9em"
                 transform="rotate(90)">
             {{ storyProgress }}%
@@ -311,6 +311,19 @@
       box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.2);
       display: inherit;
       width: 100%;
+    }
+
+    .story-progress-circle {
+    fill-opacity: 0;
+    stroke-width: 3;
+    }
+
+    .completed-circle {
+    stroke: #3cb8be;
+    }
+
+    .total-circle {
+    stroke:#4e4d4d9e;
     }
 
     .chapter-title {
