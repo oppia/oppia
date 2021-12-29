@@ -59,11 +59,13 @@ describe('Exploration Correctness Feedback Service', () => {
 
     ecfs.toggleCorrectnessFeedback();
     tick();
+
     expect(ecfs.correctnessFeedbackIsEnabled).toBeTrue();
     expect(ecfs.isEnabled()).toBeTrue();
 
     ecfs.toggleCorrectnessFeedback();
     tick();
+
     expect(ecfs.correctnessFeedbackIsEnabled).toBeFalse();
     expect(ecfs.isEnabled()).toBeFalse();
 
