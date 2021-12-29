@@ -213,7 +213,7 @@ describe('Search bar component', () => {
     fixture.detectChanges();
   });
 
-  it('should determine is mobile view is active', () => {
+  it('should determine if mobile view is active', () => {
     spyOn(windowDimensionsService, 'getWidth').and.returnValue(766);
     expect(component.isMobileViewActive()).toBe(true);
   });
