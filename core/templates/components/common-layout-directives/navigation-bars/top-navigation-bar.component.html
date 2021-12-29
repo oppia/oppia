@@ -103,7 +103,7 @@
                   <div class="nav-item-top d-flex justify-content-between">
                     <div class="nav-content d-flex flex-column">
                       <a (keydown)="onMenuKeypress($event, 'learnMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_CLOSE})"
-                         (click)="navigateToClassroomPage('/learn/math')"
+                         (click)="navigateToClassroomPage('/learn/' + DEFAULT_CLASSROOM_URL_FRAGMENT)"
                          class="dropdown-item nav-link oppia-navbar-tab-content protractor-test-classroom-link nav-item-top-link"
                          href="#">
                           {{ 'I18N_TOPNAV_CLASSROOM_BASIC_MATHS' | translate }}
@@ -124,14 +124,14 @@
                     <div *ngIf="classroomData.length > 0">
                       <div class="nav-item-links"  *ngFor="let topicSummary of classroomData.slice(0, 3)">
                         <a (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})"
-                           (click)="navigateToClassroomPage('/learn/math/' + topicSummary.getUrlFragment())"
+                           (click)="navigateToClassroomPage('/learn/' + DEFAULT_CLASSROOM_URL_FRAGMENT + '/' + topicSummary.getUrlFragment())"
                            tabindex="0"
-                           href="/learn/math/{{topicSummary.getUrlFragment()}}">
+                           href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}/{{topicSummary.getUrlFragment()}}">
                             {{ topicSummary.getName() }}
                         </a>
                       </div>
                     </div>
-                    <a (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})" class="nav-item-bottom-link" href="/learn/math">
+                    <a (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})" class="nav-item-bottom-link" href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}">
                       <span>{{ 'I18N_TOPNAV_LEARN_LINK_1' | translate }} </span>
                       <span class="material-icons">arrow_right_alt</span>
                     </a>
@@ -139,7 +139,7 @@
                   <a *ngIf="userIsLoggedIn"
                      (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})"
                      class="nav-item-bottom-link-logged"
-                     href="/learn/math">
+                     href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}">
                     <span>{{ 'I18N_TOPNAV_LEARN_LINK_2' | translate }} </span>
                     <span class="material-icons">arrow_right_alt</span>
                   </a>

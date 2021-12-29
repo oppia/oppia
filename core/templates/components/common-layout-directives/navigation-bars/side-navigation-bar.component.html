@@ -183,7 +183,7 @@
   </div>
 
   <ul>
-    <li [ngClass]="{'active': currentUrl === '/learn/math'}">
+    <li [ngClass]="{'active': currentUrl === '/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}'}">
       <div (click)="togglelearnSubmenu(); stopclickfurther($event)" class="oppia-sidebar-expandalbe-button protractor-mobile-test-learn" >
         <i class="material-icons oppia-sidebar-menu-icon expand-icon oppia-sidebar-menu-icon-transition"
           [ngClass]="{'oppia-sidebar-menu-icon-transition': learnSubmenuIsShown}">expand_more
@@ -204,21 +204,21 @@
                  alt="learn-math-logo">
           </picture>
         </div>
-        <a href="/learn/math" routerLink="/learn/math" class="protractor-mobile-test-mathematics-link">
+        <a href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}" routerLink="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}" class="protractor-mobile-test-mathematics-link">
           <span>{{ 'I18N_SIDEBAR_MATH_FOUNDATIONS' | translate }}</span>
           <p class="oppia-sidebar-learn-subtext">{{ 'I18N_SIDEBAR_MATH_FOUNDATIONS_DESCRIPTION' | translate }}</p>
         </a>
-        <div *ngIf="!userIsLoggedIn && topicSummariesLength">
-          <div *ngFor="let topicSummary of classroomData.getTopicSummaries().slice(0, 3)">
+        <div *ngIf="!userIsLoggedIn && classroomData.length > 0">
+          <div *ngFor="let topicSummary of classroomData.slice(0, 3)">
             <div class="submenu-notop-margin">
-              <a (click)="navigateToClassroomPage('/learn/math/' + topicSummary.getUrlFragment())">
+              <a (click)="navigateToClassroomPage('/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}/' + topicSummary.getUrlFragment())">
                 <span>{{ topicSummary.getName() }}</span>
               </a>
             </div>
           </div>
         </div>
         <div class="submenu-notop-margin">
-          <a href="/learn/math" routerLink="/learn/math" class="protractor-mobile-test-mathematics-link">
+          <a href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}" routerLink="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}" class="protractor-mobile-test-mathematics-link">
             <span class="learn-submenu-links" *ngIf="!userIsLoggedIn">{{ 'I18N_SIDEBAR_SUBMENU_SEE_ALL_LESSONS' | translate }}</span>
             <span class="learn-submenu-links" *ngIf="userIsLoggedIn">Continue learning</span>
             <i class="material-icons oppia-sidebar-menu-icon float-none learn-submenu-links">arrow_forward</i>
