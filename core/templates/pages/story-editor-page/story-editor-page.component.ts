@@ -16,6 +16,7 @@
  * @fileoverview Component for the story editor page.
  */
 
+import { Subscription } from 'rxjs';
 import { SavePendingChangesModalComponent } from 'components/save-pending-changes/save-pending-changes-modal.component';
 
 require('objects/objectComponentsRequires.ts');
@@ -47,8 +48,6 @@ require('services/page-title.service.ts');
 require('services/loader.service.ts');
 require('services/ngb-modal.service.ts');
 require('services/prevent-page-unload-event.service.ts');
-
-import { Subscription } from 'rxjs';
 
 angular.module('oppia').component('storyEditorPage', {
   template: require('./story-editor-page.component.html'),
