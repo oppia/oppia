@@ -83,7 +83,7 @@ angular.module('oppia').directive('skillEditorMainTab', [
             return $scope.subtopicName;
           };
 
-          $scope.updateViewPublishButton = function() {
+          $scope.detectNewChanges = function() {
             $scope.$apply();
           };
 

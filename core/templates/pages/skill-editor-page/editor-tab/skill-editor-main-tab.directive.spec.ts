@@ -107,7 +107,7 @@ describe('Skill editor main tab directive', function() {
     fakeAsync(() => {
       let spyApply = spyOn($scope, '$apply');
 
-      $scope.updateViewPublishButton();
+      $scope.detectNewChanges();
       tick();
 
       expect(spyApply).toHaveBeenCalled();

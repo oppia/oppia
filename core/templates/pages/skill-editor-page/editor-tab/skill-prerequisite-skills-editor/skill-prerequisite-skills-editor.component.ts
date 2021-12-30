@@ -44,7 +44,7 @@ implements OnInit {
   prerequisiteSkillsAreShown: boolean;
   skill: Skill;
   allAvailableSkills: SkillSummary[] = [];
-  @Output() updateView = new EventEmitter();
+  @Output() onSkillIdsChanged = new EventEmitter();
 
   constructor(
     private skillUpdateService: SkillUpdateService,
@@ -58,7 +58,7 @@ implements OnInit {
 
   removeSkillId(skillId: string): void {
     this.skillUpdateService.deletePrerequisiteSkill(this.skill, skillId);
-    this.updateView.emit();
+    this.onSkillIdsChanged.emit();
   }
 
   getSkillEditorUrl(skillId: string): string {
@@ -105,7 +105,7 @@ implements OnInit {
         }
       }
       this.skillUpdateService.addPrerequisiteSkill(this.skill, skillId);
-      this.updateView.emit();
+      this.onSkillIdsChanged.emit();
     };
 
     modalRef.result.then(function(summary) {
@@ -119,8 +119,8 @@ implements OnInit {
 
   togglePrerequisiteSkills(): void {
     if (this.windowDimensionsService.isWindowNarrow()) {
-      this.prerequisiteSkillsAreShown =
-        !this.prerequisiteSkillsAreShown;
+      this.prerequisiteSkillsAreShown = (
+        !this.prerequisiteSkillsAreShown);
     }
   }
 
