@@ -34,37 +34,37 @@ import { EditThumbnailModalComponent } from './edit-thumbnail-modal.component';
   templateUrl: './thumbnail-uploader.component.html'
 })
 export class ThumbnailUploaderComponent implements OnInit, OnChanges {
-  @Input() disabled: boolean;
-  @Input() useLocalStorage: boolean;
-  @Input() allowedBgColors: string[];
-  @Input() aspectRatio: string;
-  @Input() bgColor: string;
-  @Input() filename: string;
-  @Input() previewDescription: string;
-  @Input() previewDescriptionBgColor: string;
-  @Input() previewFooter: string;
-  @Input() previewTitle: string;
-  @Output() updateBgColor: EventEmitter<string> = new EventEmitter() ;
+  @Input() disabled!: boolean;
+  @Input() useLocalStorage!: boolean;
+  @Input() allowedBgColors!: string[];
+  @Input() aspectRatio!: string;
+  @Input() bgColor!: string;
+  @Input() filename!: string;
+  @Input() previewDescription!: string;
+  @Input() previewDescriptionBgColor!: string;
+  @Input() previewFooter!: string;
+  @Input() previewTitle!: string;
+  @Output() updateBgColor: EventEmitter<string> = new EventEmitter();
   @Output() updateFilename: EventEmitter<string> = new EventEmitter();
   @Output() imageSave: EventEmitter<void> = new EventEmitter();
-  openInUploadMode: boolean;
-  tempBgColor: string;
-  tempImageName: string;
-  uploadedImage: string;
-  uploadedImageMimeType: string;
-  dimensions: { height: number; width: number };
-  resampledFile: Blob;
-  newThumbnailDataUrl: string;
-  localStorageBgcolor: string;
-  imageUploadUrlTemplate: string;
+  openInUploadMode: boolean | undefined;
+  tempBgColor: string | undefined;
+  tempImageName: string | undefined;
+  uploadedImage: string | undefined;
+  uploadedImageMimeType: string | undefined;
+  dimensions: { height: number; width: number } | undefined;
+  resampledFile: Blob | undefined;
+  newThumbnailDataUrl: string | undefined;
+  localStorageBgcolor: string | undefined;
+  imageUploadUrlTemplate: string | undefined;
   hidePlaceholder = true;
   placeholderImageUrl = (
     this.urlInterpolationService.getStaticImageUrl(
       '/icons/story-image-icon.png'));
-  editableThumbnailDataUrl: string;
-  transformedData: string;
-  parsedResponse;
-  encodedImageURI: string;
+  editableThumbnailDataUrl: string | undefined;
+  transformedData: string | undefined;
+  parsedResponse: unknown;
+  encodedImageURI: string | undefined;
 
   constructor(
     private imageUploadHelperService: ImageUploadHelperService,
@@ -74,7 +74,7 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
     private ngbModal: NgbModal,
     private urlInterpolationService: UrlInterpolationService,
     private assetsBackendApiService: AssetsBackendApiService
-  ) {}
+  ) { }
   placeholderImageDataUrl = (
     this.urlInterpolationService.getStaticImageUrl(
       '/icons/story-image-icon.png'));
@@ -82,13 +82,13 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {
     if (this.filename !== null &&
-        this.filename !== undefined &&
-        this.filename !== '') {
+      this.filename !== undefined &&
+      this.filename !== '') {
       this.hidePlaceholder = false;
       this.editableThumbnailDataUrl = (
         this.imageUploadHelperService.getTrustedResourceUrlForThumbnailFilename(
           this.filename,
-          this.contextService.getEntityType(),
+          (this.contextService.getEntityType() || ''),
           this.contextService.getEntityId()));
       this.uploadedImage = this.editableThumbnailDataUrl;
     }
@@ -119,7 +119,7 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
         this.imageUploadHelperService
           .getTrustedResourceUrlForThumbnailFilename(
             newFilename,
-            this.contextService.getEntityType(),
+            (this.contextService.getEntityType() || ''),
             this.contextService.getEntityId()));
       this.uploadedImage = this.editableThumbnailDataUrl;
     }
@@ -134,10 +134,10 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
   }
 
   saveThumbnailImageData(imageURI: string, callback: () => void): void {
-    this.resampledFile = null;
+    const x = {} as Blob;
     this.resampledFile = (
       this.imageUploadHelperService.convertImageDataToImageFile(
-        imageURI));
+        imageURI) || x);
     this.encodedImageURI = imageURI;
     if (this.resampledFile === null) {
       this.alertsService.addWarning('Could not get resampled file.');
@@ -150,12 +150,15 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
     let entityType = this.contextService.getEntityType();
     let entityId = this.contextService.getEntityId();
     const result = this.assetsBackendApiService.postThumbnailFile(
-      resampledFile, this.tempImageName, entityType, entityId).toPromise();
+      resampledFile,
+      (this.tempImageName || ''),
+      (entityType || ''),
+      (entityId || '')).toPromise();
     result.then((data) => {
       this.editableThumbnailDataUrl = (
         this.imageUploadHelperService
           .getTrustedResourceUrlForThumbnailFilename(
-            data.filename, this.contextService.getEntityType(),
+            data.filename, (this.contextService.getEntityType() || ''),
             this.contextService.getEntityId()));
       callback();
     });
@@ -179,28 +182,28 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
     };
     const modalRef = this.ngbModal.open(
       EditThumbnailModalComponent,
-      {backdrop: 'static'});
+      { backdrop: 'static' });
     modalRef.componentInstance.bgColor = this.tempBgColor;
     modalRef.componentInstance.allowedBgColors = this.allowedBgColors;
     modalRef.componentInstance.aspectRatio = this.aspectRatio;
     modalRef.componentInstance.dimensions = this.dimensions;
     modalRef.componentInstance.previewDescription =
-     this.previewDescription;
+      this.previewDescription;
     modalRef.componentInstance.previewDescriptionBgColor =
-       this.previewDescriptionBgColor;
+      this.previewDescriptionBgColor;
     modalRef.componentInstance.previewFooter = this.previewFooter;
     modalRef.componentInstance.previewTitle = this.previewTitle;
     modalRef.componentInstance.openInUploadMode = this.openInUploadMode;
     modalRef.componentInstance.uploadedImage = this.uploadedImage;
     modalRef.componentInstance.uploadedImageMimeType =
-     this.uploadedImageMimeType;
+      this.uploadedImageMimeType;
     modalRef.componentInstance.tempBgColor = this.tempBgColor;
 
     modalRef.result.then((data) => {
       this.thumbnailIsLoading = true;
       let generatedImageFilename =
-       this.imageUploadHelperService.generateImageFilename(
-         data.dimensions.height, data.dimensions.width, 'svg');
+        this.imageUploadHelperService.generateImageFilename(
+          data.dimensions.height, data.dimensions.width, 'svg');
       this.newThumbnailDataUrl = data.newThumbnailDataUrl;
       this.hidePlaceholder = false;
       if (!this.useLocalStorage) {
@@ -235,4 +238,4 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
 
 angular.module('oppia').directive(
   'oppiaThumbnailUploader', downgradeComponent(
-    {component: ThumbnailUploaderComponent}));
+    { component: ThumbnailUploaderComponent }));
