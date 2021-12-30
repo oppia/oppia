@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the Save Pending Changes Modal Component.
+ * @fileoverview Component for the Save Pending Changes Modal.
  */
 
 import { Component, Input } from '@angular/core';
@@ -21,7 +21,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
-  selector: 'oppia-save-pending-changes',
+  selector: 'oppia-save-pending-changes-modal',
   templateUrl: './save-pending-changes-modal.component.html'
 })
 

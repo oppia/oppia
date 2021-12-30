@@ -139,7 +139,6 @@ describe('Skill editor page', function() {
     });
 
     ctrl.selectQuestionsTab();
-
     expect(modalSpy).toHaveBeenCalled();
   });
 
