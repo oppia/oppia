@@ -20,15 +20,6 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { SavePendingChangesModalComponent } from './save-pending-changes-modal.component';
 
-class MockActiveModal {
-  dismiss(): void {
-    return;
-  }
-  close(): void {
-    return;
-  }
-}
-
 describe('Story Editor Save Modal Component', () => {
   let component: SavePendingChangesModalComponent;
   let fixture: ComponentFixture<SavePendingChangesModalComponent>;
@@ -37,10 +28,7 @@ describe('Story Editor Save Modal Component', () => {
     TestBed.configureTestingModule({
       declarations: [SavePendingChangesModalComponent],
       providers: [
-        {
-          provide: NgbActiveModal,
-          useClass: MockActiveModal
-        }
+        NgbActiveModal
       ]
     }).compileComponents();
   }));

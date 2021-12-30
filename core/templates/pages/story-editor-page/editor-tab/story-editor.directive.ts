@@ -248,9 +248,9 @@ angular.module('oppia').directive('storyEditor', [
                   backdrop: true
                 });
 
-              modalRef.componentInstance.body =
+              modalRef.componentInstance.body = (
                 'Please save all pending changes ' +
-                'before returning to the topic.';
+                'before returning to the topic.');
 
               modalRef.result.then(function() {}, function() {
                 // Note to developers:
