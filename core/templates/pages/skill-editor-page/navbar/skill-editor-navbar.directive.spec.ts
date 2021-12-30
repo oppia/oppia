@@ -30,6 +30,7 @@ import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
 import { AppConstants } from 'app.constants';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 describe('Skill Editor Navbar Directive', function() {
   let $scope = null;
@@ -38,6 +39,7 @@ describe('Skill Editor Navbar Directive', function() {
   let directive = null;
   let $uibModal = null;
   let $q = null;
+  let ngbModal: NgbModal = null;
   let skillEditorRoutingService = null;
   let skillEditorStateService: SkillEditorStateService = null;
   let undoRedoService: UndoRedoService = null;
@@ -56,12 +58,22 @@ describe('Skill Editor Navbar Directive', function() {
     });
   });
 
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
 
   beforeEach(angular.mock.inject(function($injector) {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     $uibModal = $injector.get('$uibModal');
     $q = $injector.get('$q');
+    ngbModal = $injector.get('NgbModal');
     directive = $injector.get('skillEditorNavbarDirective')[0];
     skillEditorStateService = $injector.get('SkillEditorStateService');
     skillEditorRoutingService = $injector.get('SkillEditorRoutingService');
@@ -265,9 +277,11 @@ describe('Skill Editor Navbar Directive', function() {
       // Setting unsaved changes to be two.
       spyOn(undoRedoService, 'getChangeCount')
         .and.returnValue(2);
-      let $uibModalSpy = spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve()
-      });
+      let ngbModalSpy = spyOn(ngbModal, 'open').and.returnValue(
+        {
+          result: $q.resolve()
+        } as NgbModalRef
+      );
       let navigateToQuestionsTabSpy = spyOn(
         skillEditorRoutingService, 'navigateToQuestionsTab')
         .and.returnValue(null);
@@ -276,7 +290,7 @@ describe('Skill Editor Navbar Directive', function() {
       tick();
       $scope.$apply();
 
-      expect($uibModalSpy).toHaveBeenCalled();
+      expect(ngbModalSpy).toHaveBeenCalled();
       expect(navigateToQuestionsTabSpy).not.toHaveBeenCalled();
     }));
 
