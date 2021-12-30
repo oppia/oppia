@@ -319,32 +319,32 @@ def main(args=None):
                 break
 
             # Check whether we should rerun based on this suite's policy.
-            test_is_flaky, rerun = flake_checker.is_test_output_flaky(
+            test_is_flaky, rerun_override = flake_checker.is_test_output_flaky(
                 output, parsed_args.suite)
-            if rerun != flake_checker.RERUN_UNKNOWN:
-                if rerun == flake_checker.RERUN_YES:
-                    print(
-                        'Rerunning as per instructions from logging '
-                        'server.')
-                else:
-                    assert rerun == flake_checker.RERUN_NO
-                    print(
-                        'Not rerunning as per instructions from '
-                        'logging server.')
-                    break
-            else:
-                if policy == RERUN_POLICY_NEVER:
-                    print(
-                        'Not rerunning because the policy is to never '
-                        'rerun the {} suite'.format(parsed_args.suite))
-                    break
-                if policy == RERUN_POLICY_KNOWN_FLAKES and not test_is_flaky:
-                    print((
-                        'Not rerunning because the policy is to only '
-                        'rerun the %s suite on known flakes, and this '
-                        'failure did not match any known flakes')
-                        % parsed_args.suite)
-                    break
+            if rerun_override == flake_checker.RERUN_YES:
+                print(
+                    'Rerunning as per instructions from logging '
+                    'server.')
+            elif rerun_override == flake_checker.RERUN_NO:
+                print(
+                    'Not rerunning as per instructions from '
+                    'logging server.')
+                break
+            # No rerun override, so follow rerun policies.
+            elif policy == RERUN_POLICY_NEVER:
+                print(
+                    'Not rerunning because the policy is to never '
+                    'rerun the {} suite'.format(parsed_args.suite))
+                break
+            elif policy == RERUN_POLICY_KNOWN_FLAKES and not test_is_flaky:
+                print((
+                    'Not rerunning because the policy is to only '
+                    'rerun the %s suite on known flakes, and this '
+                    'failure did not match any known flakes')
+                    % parsed_args.suite)
+                break
+            # Else rerun policy is either always or we had a known flake
+            # with a known flakes rerun policy, so rerun.
 
     sys.exit(return_code)
 
