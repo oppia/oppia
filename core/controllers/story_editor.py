@@ -21,7 +21,6 @@ from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.controllers import domain_objects_validator
 from core.domain import classroom_services
 from core.domain import skill_services
 from core.domain import story_domain
@@ -94,7 +93,7 @@ class EditableStoryDataHandler(base.BaseHandler):
                     'items': {
                         'type': 'object_dict',
                         'validation_method': (
-                            domain_objects_validator.validate_story_change)
+                            story_domain.StoryChange)
                     }
                 }
             }
