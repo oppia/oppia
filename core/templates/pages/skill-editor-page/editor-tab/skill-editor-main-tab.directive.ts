@@ -83,6 +83,8 @@ angular.module('oppia').directive('skillEditorMainTab', [
             return $scope.subtopicName;
           };
 
+          // TODO: Remove this function when we migrate this
+          // Directive to Angular.
           $scope.detectNewChanges = function() {
             $scope.$apply();
           };
