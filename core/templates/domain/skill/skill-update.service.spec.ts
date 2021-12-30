@@ -59,7 +59,7 @@ describe('Skill update service', () => {
     workedExampleObjectFactory = TestBed.get(WorkedExampleObjectFactory);
 
     const misconceptionDict1 = {
-      id: '2',
+      id: 2,
       name: 'test name',
       notes: 'test notes',
       feedback: 'test feedback',
@@ -67,7 +67,7 @@ describe('Skill update service', () => {
     };
 
     const misconceptionDict2 = {
-      id: '4',
+      id: 4,
       name: 'test name',
       notes: 'test notes',
       feedback: 'test feedback',
@@ -187,7 +187,7 @@ describe('Skill update service', () => {
   it('should add a misconception', () => {
     const skill = skillObjectFactory.createFromBackendDict(skillDict);
     const aNewMisconceptionDict = {
-      id: '7',
+      id: 7,
       name: 'test name 3',
       notes: 'test notes 3',
       feedback: 'test feedback 3',
@@ -213,11 +213,11 @@ describe('Skill update service', () => {
   it('should delete a misconception', () => {
     const skill = skillObjectFactory.createFromBackendDict(skillDict);
 
-    skillUpdateService.deleteMisconception(skill, '2');
+    skillUpdateService.deleteMisconception(skill, 2);
     expect(undoRedoService.getCommittableChangeList()).toEqual([
       {
         cmd: 'delete_skill_misconception',
-        misconception_id: '2',
+        misconception_id: 2,
       },
     ]);
     expect(skill.getMisconceptions().length).toEqual(1);
@@ -305,8 +305,8 @@ describe('Skill update service', () => {
 
     skillUpdateService.updateMisconceptionName(
       skill,
-      '2',
-      skill.findMisconceptionById('2').getName(),
+      2,
+      skill.findMisconceptionById(2).getName(),
       'new name'
     );
     expect(undoRedoService.getCommittableChangeList()).toEqual([
@@ -315,13 +315,13 @@ describe('Skill update service', () => {
         property_name: 'name',
         old_value: 'test name',
         new_value: 'new name',
-        misconception_id: '2',
+        misconception_id: 2,
       },
     ]);
-    expect(skill.findMisconceptionById('2').getName()).toEqual('new name');
+    expect(skill.findMisconceptionById(2).getName()).toEqual('new name');
 
     undoRedoService.undoChange(skill);
-    expect(skill.findMisconceptionById('2').getName()).toEqual('test name');
+    expect(skill.findMisconceptionById(2).getName()).toEqual('test name');
   });
 
   it('should update the notes of a misconception', () => {
@@ -329,8 +329,8 @@ describe('Skill update service', () => {
 
     skillUpdateService.updateMisconceptionNotes(
       skill,
-      '2',
-      skill.findMisconceptionById('2').getNotes(),
+      2,
+      skill.findMisconceptionById(2).getNotes(),
       'new notes'
     );
     expect(undoRedoService.getCommittableChangeList()).toEqual([
@@ -339,13 +339,13 @@ describe('Skill update service', () => {
         property_name: 'notes',
         old_value: 'test notes',
         new_value: 'new notes',
-        misconception_id: '2',
+        misconception_id: 2,
       },
     ]);
-    expect(skill.findMisconceptionById('2').getNotes()).toEqual('new notes');
+    expect(skill.findMisconceptionById(2).getNotes()).toEqual('new notes');
 
     undoRedoService.undoChange(skill);
-    expect(skill.findMisconceptionById('2').getNotes()).toEqual('test notes');
+    expect(skill.findMisconceptionById(2).getNotes()).toEqual('test notes');
   });
 
   it('should update the feedback of a misconception', () => {
@@ -353,8 +353,8 @@ describe('Skill update service', () => {
 
     skillUpdateService.updateMisconceptionFeedback(
       skill,
-      '2',
-      skill.findMisconceptionById('2').getFeedback(),
+      2,
+      skill.findMisconceptionById(2).getFeedback(),
       'new feedback'
     );
     expect(undoRedoService.getCommittableChangeList()).toEqual([
@@ -363,15 +363,15 @@ describe('Skill update service', () => {
         property_name: 'feedback',
         old_value: 'test feedback',
         new_value: 'new feedback',
-        misconception_id: '2',
+        misconception_id: 2,
       },
     ]);
-    expect(skill.findMisconceptionById('2').getFeedback()).toEqual(
+    expect(skill.findMisconceptionById(2).getFeedback()).toEqual(
       'new feedback'
     );
 
     undoRedoService.undoChange(skill);
-    expect(skill.findMisconceptionById('2').getFeedback()).toEqual(
+    expect(skill.findMisconceptionById(2).getFeedback()).toEqual(
       'test feedback'
     );
   });
@@ -381,8 +381,8 @@ describe('Skill update service', () => {
 
     skillUpdateService.updateMisconceptionMustBeAddressed(
       skill,
-      '2',
-      skill.findMisconceptionById('2').isMandatory(),
+      2,
+      skill.findMisconceptionById(2).isMandatory(),
       false
     );
     expect(undoRedoService.getCommittableChangeList()).toEqual([
@@ -391,13 +391,13 @@ describe('Skill update service', () => {
         property_name: 'must_be_addressed',
         old_value: true,
         new_value: false,
-        misconception_id: '2',
+        misconception_id: 2,
       },
     ]);
-    expect(skill.findMisconceptionById('2').isMandatory()).toEqual(false);
+    expect(skill.findMisconceptionById(2).isMandatory()).toEqual(false);
 
     undoRedoService.undoChange(skill);
-    expect(skill.findMisconceptionById('2').isMandatory()).toEqual(true);
+    expect(skill.findMisconceptionById(2).isMandatory()).toEqual(true);
   });
 
   it('should add a worked example', () => {

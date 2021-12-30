@@ -152,8 +152,8 @@ export class Skill {
     return this._nextMisconceptionId;
   }
 
-  getIncrementedMisconceptionId(id: string): number {
-    return (parseInt(id) + 1);
+  getIncrementedMisconceptionId(id: number): number {
+    return (id + 1);
   }
 
   getSupersedingSkillId(): string {
@@ -164,7 +164,7 @@ export class Skill {
     return this._allQuestionsMerged;
   }
 
-  findMisconceptionById(id: string): Misconception {
+  findMisconceptionById(id: number): Misconception {
     for (var idx in this._misconceptions) {
       if (this._misconceptions[idx].getId() === id) {
         return this._misconceptions[idx];
@@ -173,7 +173,7 @@ export class Skill {
     throw new Error('Could not find misconception with ID: ' + id);
   }
 
-  deleteMisconception(id: string): void {
+  deleteMisconception(id: number): void {
     this._misconceptions.forEach((misc: Misconception) => {
       if (misc.getId() === id) {
         this._misconceptions.splice(this._misconceptions.indexOf(misc), 1);
@@ -197,7 +197,7 @@ export class Skill {
     );
   }
 
-  getMisconceptionId(index: number): string {
+  getMisconceptionId(index: number): number {
     return this._misconceptions[index].getId();
   }
 

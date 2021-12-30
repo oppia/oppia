@@ -16,15 +16,13 @@
  * @fileoverview Directive for the skill misconceptions editor.
  */
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { AddMisconceptionModalComponent } from 'pages/skill-editor-page/modal-templates/add-misconception-modal.component';
 import { DeleteMisconceptionModalComponent } from 'pages/skill-editor-page/modal-templates/delete-misconception-modal.component';
 
 
 require(
   'pages/skill-editor-page/editor-tab/skill-misconceptions-editor/' +
   'misconception-editor.directive.ts');
-require(
-  'pages/skill-editor-page/modal-templates/' +
-  'add-misconception-modal.controller.ts');
 
 require('domain/skill/MisconceptionObjectFactory.ts');
 require('domain/skill/skill-update.service.ts');
@@ -48,10 +46,10 @@ angular.module('oppia').directive('skillMisconceptionsEditor', [
         '/pages/skill-editor-page/editor-tab/skill-misconceptions-editor/' +
         'skill-misconceptions-editor.directive.html'),
       controller: [
-        '$rootScope', '$scope', '$uibModal', 'NgbModal',
+        '$rootScope', '$scope', 'NgbModal',
         'WindowDimensionsService',
         function(
-            $rootScope, $scope, $uibModal, NgbModal,
+            $rootScope, $scope, NgbModal,
             WindowDimensionsService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
@@ -90,16 +88,13 @@ angular.module('oppia').directive('skillMisconceptionsEditor', [
           };
 
           $scope.openAddMisconceptionModal = function() {
-            $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/skill-editor-page/modal-templates/' +
-                'add-misconception-modal.directive.html'),
-              backdrop: 'static',
-              controller: 'AddMisconceptionModalController'
+            NgbModal.open(AddMisconceptionModalComponent, {
+              backdrop: 'static'
             }).result.then(function(result) {
               SkillUpdateService.addMisconception(
                 $scope.skill, result.misconception);
               $scope.misconceptions = $scope.skill.getMisconceptions();
+              $rootScope.$apply();
             }, function() {
               // Note to developers:
               // This callback is triggered when the Cancel button is clicked.

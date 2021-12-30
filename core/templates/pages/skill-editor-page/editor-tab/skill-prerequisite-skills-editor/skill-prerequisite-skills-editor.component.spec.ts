@@ -72,7 +72,7 @@ describe('Skill editor main tab directive', function() {
     alertsService = $injector.get('AlertsService');
 
     let misconceptionDict1 = {
-      id: '2',
+      id: 2,
       name: 'test name',
       notes: 'test notes',
       feedback: 'test feedback',

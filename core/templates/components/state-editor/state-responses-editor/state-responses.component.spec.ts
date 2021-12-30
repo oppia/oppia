@@ -415,7 +415,7 @@ describe('StateResponsesComponent', () => {
     spyOn(StateEditorService, 'getMisconceptionsBySkill')
       .and.returnValue({
         skill1: [misconceptionObjectFactory.create(
-          'm1', 'Misconception 1', 'note', '', false)]
+          1, 'Misconception 1', 'note', '', false)]
       });
 
     expect($scope.misconceptionsBySkill).toBe(undefined);
@@ -426,7 +426,7 @@ describe('StateResponsesComponent', () => {
 
     expect($scope.misconceptionsBySkill).toEqual({
       skill1: [misconceptionObjectFactory.create(
-        'm1', 'Misconception 1', 'note', '', false)]
+        1, 'Misconception 1', 'note', '', false)]
     });
     expect($scope.containsOptionalMisconceptions).toBe(true);
 
@@ -1021,9 +1021,9 @@ describe('StateResponsesComponent', () => {
     $scope.misconceptionsBySkill = {
       skill1: [
         misconceptionObjectFactory.create(
-          'm1', 'Misconception 1', 'note', '', false),
+          1, 'Misconception 1', 'note', '', false),
         misconceptionObjectFactory.create(
-          'm2', 'Misconception 2', 'note', '', true)
+          2, 'Misconception 2', 'note', '', true)
       ]
     };
 
