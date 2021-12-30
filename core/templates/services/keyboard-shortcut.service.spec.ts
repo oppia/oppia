@@ -99,7 +99,7 @@ describe('Keyboard Shortcuts', () => {
     mockWindow.location.href = '';
     expect(windowRef.nativeWindow.location.href).toBe('');
 
-    Mousetrap.trigger('ctrl+0');
+    Mousetrap.trigger('ctrl+6');
     expect(windowRef.nativeWindow.location.href).toEqual('/get-started');
     mockWindow.location.href = '';
     expect(windowRef.nativeWindow.location.href).toBe('');
