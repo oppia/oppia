@@ -290,7 +290,7 @@
             [hidden]="!navElementsVisibilityStatus.I18N_TOPNAV_DONATE"
             class="nav-item oppia-navbar-clickable-dropdown protractor-test-about-oppia-list-item">
           <a ngbDropdownToggle (keydown)="onMenuKeypress($event, 'donateMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
-             class="nav-link oppia-navbar-tab"
+             class="nav-link oppia-navbar-tab dropdown-toggle donate-tab"
              aria-haspopup="true"
              aria-expanded="false"
              tabindex="0"
@@ -302,6 +302,7 @@
             </span>
           </a>
           <ul ngbDropdownMenu
+              [ngStyle]="{'left.px': donateMenuOffset}"
               class="dropdown-menu oppia-navbar-dropdown oppia-navbar-dropdown-right"
               (mouseover)="openSubmenu($event, 'donateMenu')"
               (mouseleave)="closeSubmenuIfNotMobile($event)">
@@ -335,8 +336,8 @@
                 class="btn dropdown-toggle oppia-navbar-button protractor-test-language-dropdown"
                 (keydown)="onMenuKeypress($event, 'languageMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})">
           <i class="material-icons language-icon"> &#xE894; </i>
-          <span *ngIf="windowIsNarrow"> {{ currentLanguageCode }} </span>
-          <span *ngIf="!windowIsNarrow"> {{ currentLanguageText }} </span>
+          <span class="mobile-view-language-code" *ngIf="windowIsNarrow"> {{ currentLanguageCode }} </span>
+          <span class="desktop-view-language-code" *ngIf="!windowIsNarrow"> {{ currentLanguageText }} </span>
         </button>
       </div>
       <ul ngbDropdownMenu class="dropdown-menu oppia-navbar-dropdown" [style.margin-top]="userIsLoggedIn ? '-10px': '0'"
@@ -875,6 +876,19 @@
   .oppia-navbar-profile .profile-dropdown:hover {
     background-color: #fff;
   }
+
+  @media screen and (max-width: 880px) {
+    .oppia-logo-wide {
+      margin-left: 0;
+    }
+  }
+
+  @media screen and (max-width: 840px) {
+    .desktop-view-language-code {
+      display: none;
+    }
+  }
+
   @media screen and (max-width: 768px) {
     .nav-mobile-header-text-container {
       display: inline-block;
