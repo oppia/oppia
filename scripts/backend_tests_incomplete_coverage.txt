@@ -1,4 +1,3 @@
-core.controllers.base_test
 core.controllers.editor_test
 core.controllers.resources_test
 extensions.interactions.base_test
