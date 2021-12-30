@@ -300,7 +300,7 @@ describe('QuestionsListComponent', () => {
     ctrl.$onInit();
     $scope.$apply();
 
-    expect(ctrl.misconceptionIdsForSelectedSkill).toEqual(['2']);
+    expect(ctrl.misconceptionIdsForSelectedSkill).toEqual([2]);
   });
 
   it('should start creating question on navigating to question editor', () => {
