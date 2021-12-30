@@ -61,8 +61,8 @@ export class CreateNewChapterModalComponent extends ConfirmOrCancelModal
     this.invalidExpId = false;
     this.errorMsg = null;
     this.invalidExpErrorString = 'Please enter a valid exploration id.';
-    this.MAX_CHARS_IN_EXPLORATION_TITLE =
-      AppConstants.MAX_CHARS_IN_EXPLORATION_TITLE;
+    this.MAX_CHARS_IN_EXPLORATION_TITLE = (
+      AppConstants.MAX_CHARS_IN_EXPLORATION_TITLE);
     this.story = this.storyEditorStateService.getStory();
     this.nodeId = this.story.getStoryContents().getNextNodeId();
     this.editableThumbnailFilename = '';
@@ -91,7 +91,7 @@ export class CreateNewChapterModalComponent extends ConfirmOrCancelModal
 
   cancel(): void {
     this.storyUpdateService.deleteStoryNode(this.story, this.nodeId);
-    this.ngbActiveModal.dismiss('cancel');
+    this.ngbActiveModal.dismiss();
   }
 
   updateExplorationId(): void {
@@ -129,8 +129,8 @@ export class CreateNewChapterModalComponent extends ConfirmOrCancelModal
   }
 
   validateExplorationId(): boolean {
-    return this.validatorsService.isValidExplorationId(
-      this.explorationId, false);
+    return Boolean(this.validatorsService.isValidExplorationId(
+      this.explorationId, false));
   }
 
   isValid(): boolean {
