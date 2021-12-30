@@ -133,4 +133,10 @@ describe('Player position service', () => {
     let mockHelpCardAvailableEvent = new EventEmitter();
     expect(pps.onHelpCardAvailable).toEqual(mockHelpCardAvailableEvent);
   });
+
+  it('should fetch EventEmitter when displayed card index change', () => {
+    let mockDisplayedCardIndexChangedEventEmitter = new EventEmitter();
+    expect(pps.displayedCardIndexChangedEventEmitter).toEqual(
+      mockDisplayedCardIndexChangedEventEmitter);
+  });
 });
