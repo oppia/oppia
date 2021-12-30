@@ -4845,8 +4845,8 @@ div.oppia-issues-learner-action {
 
 @media (max-width: 780px) {
   /* Prevents misalignment of subtopic card in smaller screen sizes */
-  .subtopics-list .subtopic-card {
-    width: 100% !important;
+  .subtopics-list .subtopics-container .subtopic-card {
+    width: 100%;
   }
 }
 
