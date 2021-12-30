@@ -17,6 +17,7 @@
  */
 
 import { SavePendingChangesModalComponent } from 'components/save-pending-changes/save-pending-changes-modal.component';
+import { DeleteStoryModalComponent } from '../modal-templates/delete-story-modal.component';
 
 require(
   'components/common-layout-directives/common-elements/' +
@@ -36,11 +37,11 @@ angular.module('oppia').component('topicEditorStoriesList', {
   template: require(
     './topic-editor-stories-list.component.html'),
   controller: [
-    '$scope', '$uibModal', '$window',
+    '$scope', '$window',
     'NgbModal', 'TopicUpdateService',
     'UndoRedoService', 'UrlInterpolationService',
     function(
-        $scope, $uibModal, $window,
+        $scope, $window,
         NgbModal, TopicUpdateService,
         UndoRedoService, UrlInterpolationService) {
       var ctrl = this;
@@ -71,12 +72,8 @@ angular.module('oppia').component('topicEditorStoriesList', {
       };
 
       $scope.deleteCanonicalStory = function(storyId) {
-        $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/topic-editor-page/modal-templates/' +
-                'delete-story-modal.template.html'),
-          backdrop: true,
-          controller: 'ConfirmOrCancelModalController'
+        NgbModal.open(DeleteStoryModalComponent, {
+          backdrop: true
         }).result.then(function() {
           TopicUpdateService.removeCanonicalStory(
             ctrl.getTopic(), storyId);

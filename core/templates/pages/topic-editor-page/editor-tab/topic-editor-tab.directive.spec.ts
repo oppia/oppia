@@ -84,6 +84,7 @@ describe('Topic editor tab directive', function() {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     $uibModalInstance = $injector.get('$uibModal');
+    ngbModal = $injector.get('NgbModal');
     $q = $injector.get('$q');
     directive = $injector.get('topicEditorTabDirective')[0];
     ngbModal = $injector.get('NgbModal');

@@ -17,6 +17,11 @@
  */
 
 import { SavePendingChangesModalComponent } from 'components/save-pending-changes/save-pending-changes-modal.component';
+import { Subscription } from 'rxjs';
+
+// TODO(#9186): Change variable name to 'constants' once this file
+// is migrated to Angular.
+import topicConstants from 'assets/constants';
 
 require(
   'components/common-layout-directives/common-elements/' +
@@ -54,12 +59,6 @@ require(
   'topics-and-skills-dashboard-backend-api.service.ts');
 require('base-components/loading-message.component.ts');
 require('services/ngb-modal.service.ts');
-
-import { Subscription } from 'rxjs';
-
-// TODO(#9186): Change variable name to 'constants' once this file
-// is migrated to Angular.
-import topicConstants from 'assets/constants';
 
 angular.module('oppia').directive('topicEditorTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {

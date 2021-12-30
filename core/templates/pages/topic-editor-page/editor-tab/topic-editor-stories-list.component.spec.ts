@@ -31,7 +31,6 @@ describe('topicEditorStoriesList', () => {
   let $rootScope = null;
   let $scope = null;
   let $q = null;
-  let $uibModal = null;
   let ngbModal: NgbModal = null;
   let $window = null;
   let storySummaries = null;
@@ -55,7 +54,6 @@ describe('topicEditorStoriesList', () => {
     topicUpdateService = $injector.get('TopicUpdateService');
     undoRedoService = $injector.get('UndoRedoService');
     $window = $injector.get('$window');
-    $uibModal = $injector.get('$uibModal');
     ngbModal = $injector.get('NgbModal');
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
@@ -134,9 +132,11 @@ describe('topicEditorStoriesList', () => {
   });
 
   it('should delete story when user deletes story', () => {
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.resolve()
-    });
+    spyOn(ngbModal, 'open').and.returnValue(
+      {
+        result: $q.resolve()
+      } as NgbModalRef
+    );
     spyOn(topicUpdateService, 'removeCanonicalStory');
     ctrl.storySummaries = storySummaries;
 
@@ -145,21 +145,22 @@ describe('topicEditorStoriesList', () => {
     $scope.deleteCanonicalStory('storyId');
     $scope.$apply();
 
-    expect($uibModal.open).toHaveBeenCalled();
+    expect(ngbModal.open).toHaveBeenCalled();
     expect(topicUpdateService.removeCanonicalStory).toHaveBeenCalled();
     expect(ctrl.storySummaries.length).toBe(1);
     expect(ctrl.storySummaries[0].getId()).toBe('storyId2');
   });
 
   it('should close modal when user click cancel button', () => {
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.reject()
-    });
-
+    spyOn(ngbModal, 'open').and.returnValue(
+      {
+        result: $q.reject()
+      } as NgbModalRef
+    );
     $scope.deleteCanonicalStory('storyId');
     $scope.$apply();
 
-    expect($uibModal.open).toHaveBeenCalled();
+    expect(ngbModal.open).toHaveBeenCalled();
   });
 
   it('should open story editor when user clicks a story', () => {
