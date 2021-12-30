@@ -24,7 +24,6 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
   selector: 'oppia-mark-audio-as-needing-update-modal',
   templateUrl: './mark-audio-as-needing-update-modal.component.html'
 })
-
 export class MarkAudioAsNeedingUpdateModalComponent
   extends ConfirmOrCancelModal {
   constructor(

@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit Test for
- *  Mark all audio and translations as needing update modal Component.
+ * @fileoverview Unit Test for modal which marks all audio and
+ * translations as needing update.
  */
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
