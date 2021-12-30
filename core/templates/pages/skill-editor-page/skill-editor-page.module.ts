@@ -22,6 +22,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RequestInterceptor } from 'services/request-interceptor.service';
+import { SavePendingChangesModalComponent } from './modal-templates/save-pending-changes-modal.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
@@ -34,6 +35,7 @@ import { SkillDescriptionEditorComponent } from './editor-tab/skill-description-
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
 import { DeleteWorkedExampleComponent } from './modal-templates/delete-worked-example-modal.component';
 import { AddWorkedExampleModalComponent } from './modal-templates/add-worked-example.component';
+import { AddMisconceptionModalComponent } from './modal-templates/add-misconception-modal.component';
 
 @NgModule({
   imports: [
@@ -46,17 +48,21 @@ import { AddWorkedExampleModalComponent } from './modal-templates/add-worked-exa
   ],
   declarations: [
     DeleteMisconceptionModalComponent,
+    SavePendingChangesModalComponent,
     SkillEditorNavbarBreadcrumbComponent,
     SkillDescriptionEditorComponent,
     AddWorkedExampleModalComponent,
-    DeleteWorkedExampleComponent
+    DeleteWorkedExampleComponent,
+    AddMisconceptionModalComponent
   ],
   entryComponents: [
     DeleteMisconceptionModalComponent,
+    SavePendingChangesModalComponent,
     SkillEditorNavbarBreadcrumbComponent,
     SkillDescriptionEditorComponent,
     AddWorkedExampleModalComponent,
-    DeleteWorkedExampleComponent
+    DeleteWorkedExampleComponent,
+    AddMisconceptionModalComponent
   ],
   providers: [
     {

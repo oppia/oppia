@@ -2613,6 +2613,11 @@ oppia-parameter {
   .modal-lg {
     width: 900px;
   }
+
+  /* Prevents misalignment of subtopic card in smaller screen sizes */
+  .subtopics-list .subtopic-card {
+    width: 150px;
+  }
 }
 
 .oppia-large-modal-window .modal-body {
@@ -4837,6 +4842,14 @@ div.oppia-issues-learner-action {
     width: 95%;
   }
 }
+
+@media (max-width: 780px) {
+  /* Prevents misalignment of subtopic card in smaller screen sizes */
+  .subtopics-list .subtopics-container .subtopic-card {
+    width: 100%;
+  }
+}
+
 @media (min-width: 576px) {
   .oppia-welcome-modal .modal-dialog {
     margin: 1.75rem auto;
