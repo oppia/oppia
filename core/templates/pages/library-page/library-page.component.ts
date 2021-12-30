@@ -222,6 +222,14 @@ export class LibraryPageComponent {
     return '#card-container-' + containerIDValue;
   }
 
+  toggleButtonText(container: HTMLElement, button: HTMLElement): void {
+    if (container.classList.contains('limit-cards-shown')) {
+      button.textContent = 'Collapse Section';
+    } else {
+      button.textContent = 'See More';
+    }
+  }
+
   toggleCardContainerHeightInMobileView(click: Event): void {
     let buttonElement = click.target as HTMLElement;
     let containerID = this.getCorrespondingContainerIDForButtonClick(
@@ -229,11 +237,7 @@ export class LibraryPageComponent {
     let containerElement = (
       document.querySelector(containerID) as HTMLElement);
 
-    if (containerElement.classList.contains('limit-cards-shown')) {
-      buttonElement.textContent = 'Collapse Section';
-    } else {
-      buttonElement.textContent = 'See More';
-    }
+    this.toggleButtonText(containerElement, buttonElement);
     containerElement.classList.toggle('limit-cards-shown');
   }
 
