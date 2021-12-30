@@ -107,7 +107,6 @@ describe('Progress nav component', () => {
     spyOn(urlService, 'isIframed').and.returnValue(isIframed);
     spyOn(componentInstance, 'updateDisplayedCardInfo');
     spyOn(componentInstance.submit, 'emit');
-    spyOnProperty(
     spyOnProperty(playerPositionService, 'onHelpCardAvailable')
       .and.returnValue(mockOnHelpCardAvailableEventEmitter);
     spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(0);
