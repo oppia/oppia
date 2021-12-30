@@ -339,7 +339,7 @@
           <span *ngIf="!windowIsNarrow"> {{ currentLanguageText }} </span>
         </button>
       </div>
-      <ul ngbDropdownMenu class="dropdown-menu oppia-navbar-dropdown" [style.margin-top]="userIsLoggedIn ? '-10px': '0'"
+      <ul ngbDropdownMenu class="dropdown-menu oppia-navbar-dropdown language-dropdown" [style.margin-top]="userIsLoggedIn ? '-10px': '0'"
           (mouseover)="openSubmenu($event, 'languageMenu')"
           (mouseleave)="closeSubmenuIfNotMobile($event)">
         <li class="nav-item" [ngClass]="'protractor-test-i18n-language-' + language.id" *ngFor="let language of supportedSiteLanguages">
@@ -612,7 +612,6 @@
   }
   .learn-dropdown-menu {
     border-radius: 3px;
-    /* left: 0 !important; */
     padding: 0;
   }
   .classroom-enabled {
@@ -621,6 +620,12 @@
   .classroom-disabled {
     min-width: 300px;
   }
+
+  .language-dropdown {
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+
   .learn {
     height: 66.5px;
   }
