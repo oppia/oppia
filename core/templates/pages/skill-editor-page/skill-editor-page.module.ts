@@ -34,6 +34,7 @@ import { DeleteMisconceptionModalComponent } from './modal-templates/delete-misc
 import { SkillDescriptionEditorComponent } from './editor-tab/skill-description-editor/skill-description-editor.component';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
 import { SkillPrerequisiteSkillsEditorComponent } from './editor-tab/skill-prerequisite-skills-editor/skill-prerequisite-skills-editor.component';
+import { AddMisconceptionModalComponent } from './modal-templates/add-misconception-modal.component';
 
 @NgModule({
   imports: [
@@ -49,14 +50,16 @@ import { SkillPrerequisiteSkillsEditorComponent } from './editor-tab/skill-prere
     SavePendingChangesModalComponent,
     SkillEditorNavbarBreadcrumbComponent,
     SkillDescriptionEditorComponent,
-    SkillPrerequisiteSkillsEditorComponent
+    SkillPrerequisiteSkillsEditorComponent,
+    AddMisconceptionModalComponent
   ],
   entryComponents: [
     DeleteMisconceptionModalComponent,
     SavePendingChangesModalComponent,
     SkillEditorNavbarBreadcrumbComponent,
     SkillDescriptionEditorComponent,
-    SkillPrerequisiteSkillsEditorComponent
+    SkillPrerequisiteSkillsEditorComponent,
+    AddMisconceptionModalComponent
   ],
   providers: [
     {

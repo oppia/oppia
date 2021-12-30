@@ -89,6 +89,14 @@ describe('Skill editor main tab Component', () => {
       skill_model_last_updated: 1593138898626.193
     };
 
+    let misconceptionDict1 = {
+      id: 2,
+      name: 'test name',
+      notes: 'test notes',
+      feedback: 'test feedback',
+      must_be_addressed: true
+    };
+
     const rubricDict = {
       difficulty: 'medium',
       explanations: ['explanation']
@@ -103,14 +111,6 @@ describe('Skill editor main tab Component', () => {
       recorded_voiceovers: {
         voiceovers_mapping: {}
       }
-    };
-
-    const misconceptionDict1 = {
-      id: '2',
-      name: 'test name',
-      notes: 'test notes',
-      feedback: 'test feedback',
-      must_be_addressed: true
     };
 
     sampleSkill = skillObjectFactory.createFromBackendDict({
