@@ -63,7 +63,7 @@ describe('Misconception Editor Directive', function() {
       'id1', 'description', [], [], {} as ConceptCard, 'en',
       1, 0, 'id1', false, []);
     sampleMisconception = misconceptionObjectFactory.create(
-      'misconceptionId', 'name', 'notes', 'feedback', false);
+      1, 'name', 'notes', 'feedback', false);
 
     spyOn(skillEditorStateService, 'getSkill').and.returnValue(sampleSkill);
 
@@ -143,7 +143,7 @@ describe('Misconception Editor Directive', function() {
     $scope.saveFeedback();
 
     expect(updateFeedbackSpy).toHaveBeenCalledWith(
-      sampleSkill, 'misconceptionId', 'feedback', 'newFeedback');
+      sampleSkill, 1, 'feedback', 'newFeedback');
   });
 
   it('should close name editor when clicking on cancel button', function() {
@@ -184,6 +184,6 @@ describe('Misconception Editor Directive', function() {
     $scope.updateMustBeAddressed();
 
     expect(updatesSpy).toHaveBeenCalledWith(
-      sampleSkill, 'misconceptionId', true, false);
+      sampleSkill, 1, true, false);
   });
 });
