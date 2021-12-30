@@ -76,6 +76,7 @@ class EditableStoryDataHandler(base.BaseHandler):
             'version': {
                 'schema': {
                     'type': 'int',
+                    'default_value': 1
                 }
             },
             'commit_message': {
