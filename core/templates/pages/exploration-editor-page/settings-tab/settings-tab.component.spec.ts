@@ -63,7 +63,6 @@ describe('Settings Tab Component', () => {
   let $q = null;
   let $rootScope = null;
   let $scope = null;
-  let $uibModal = null;
   let alertsService = null;
   let changeListService = null;
   let explorationDataService = null;
@@ -102,6 +101,16 @@ describe('Settings Tab Component', () => {
   };
 
   importAllAngularServices();
+
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -175,7 +184,6 @@ describe('Settings Tab Component', () => {
     beforeEach(angular.mock.inject(($injector, $componentController) => {
       $q = $injector.get('$q');
       $rootScope = $injector.get('$rootScope');
-      $uibModal = $injector.get('$uibModal');
       ngbModal = $injector.get('NgbModal');
       explorationDataService = $injector.get('ExplorationDataService');
       contextService = $injector.get('ContextService');
@@ -617,23 +625,22 @@ describe('Settings Tab Component', () => {
       expect(alertsService.clearWarnings).toHaveBeenCalled();
     }));
 
-    it('should open preview summary tile modal with $uibModal',
+    it('should open preview summary tile modal with ngbModal',
       fakeAsync(() => {
-        spyOn($uibModal, 'open').and.returnValue({
+        spyOn(ngbModal, 'open').and.returnValue({
           result: Promise.resolve()
-        });
-
+        } as NgbModalRef);
         ctrl.previewSummaryTile();
         tick();
 
-        expect($uibModal.open).toHaveBeenCalled();
+        expect(ngbModal.open).toHaveBeenCalled();
       }));
 
     it('should clear alerts warning when dismissing preview summary tile modal',
       () => {
-        spyOn($uibModal, 'open').and.returnValue({
-          result: $q.reject()
-        });
+        spyOn(ngbModal, 'open').and.returnValue({
+          result: Promise.reject()
+        } as NgbModalRef);
         spyOn(alertsService, 'clearWarnings');
 
         ctrl.previewSummaryTile();
@@ -642,7 +649,7 @@ describe('Settings Tab Component', () => {
         expect(alertsService.clearWarnings).toHaveBeenCalled();
       });
 
-    it('should open preview summary tile modal with $uibModal',
+    it('should open preview summary tile modal with ngbModal',
       fakeAsync(() => {
         spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
           return ({
@@ -1000,7 +1007,6 @@ describe('Settings Tab Component', () => {
     beforeEach(angular.mock.inject(($injector, $componentController) => {
       $q = $injector.get('$q');
       $rootScope = $injector.get('$rootScope');
-      $uibModal = $injector.get('$uibModal');
       contextService = $injector.get('ContextService');
       spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
       editableExplorationBackendApiService = $injector.get(
