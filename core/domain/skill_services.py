@@ -727,6 +727,39 @@ def apply_change_list(skill_id, change_list, committer_id):
         raise e
 
 
+def populate_skill_model_fields(skill_model, skill):
+    """Populate skill model with the data from skill object.
+
+    Args:
+        skill_model: SkillModel. The model to populate.
+        skill: Skill. The skill domain object which should be used to
+            populate the model.
+
+    Returns:
+        SkillModel. Populated model.
+    """
+    skill_model.description = skill.description
+    skill_model.language_code = skill.language_code
+    skill_model.superseding_skill_id = skill.superseding_skill_id
+    skill_model.all_questions_merged = skill.all_questions_merged
+    skill_model.prerequisite_skill_ids = skill.prerequisite_skill_ids
+    skill_model.misconceptions_schema_version = (
+        skill.misconceptions_schema_version)
+    skill_model.rubric_schema_version = (
+        skill.rubric_schema_version)
+    skill_model.skill_contents_schema_version = (
+        skill.skill_contents_schema_version)
+    skill_model.skill_contents = skill.skill_contents.to_dict()
+    skill_model.misconceptions = [
+        misconception.to_dict() for misconception in skill.misconceptions
+    ]
+    skill_model.rubrics = [
+        rubric.to_dict() for rubric in skill.rubrics
+    ]
+    skill_model.next_misconception_id = skill.next_misconception_id
+    return skill_model
+
+
 def _save_skill(committer_id, skill, commit_message, change_list):
     """Validates a skill and commits it to persistent storage. If
     successful, increments the version number of the incoming skill domain
@@ -765,25 +798,7 @@ def _save_skill(committer_id, skill, commit_message, change_list):
             'which is too old. Please reload the page and try again.'
             % (skill_model.version, skill.version))
 
-    skill_model.description = skill.description
-    skill_model.language_code = skill.language_code
-    skill_model.superseding_skill_id = skill.superseding_skill_id
-    skill_model.all_questions_merged = skill.all_questions_merged
-    skill_model.prerequisite_skill_ids = skill.prerequisite_skill_ids
-    skill_model.misconceptions_schema_version = (
-        skill.misconceptions_schema_version)
-    skill_model.rubric_schema_version = (
-        skill.rubric_schema_version)
-    skill_model.skill_contents_schema_version = (
-        skill.skill_contents_schema_version)
-    skill_model.skill_contents = skill.skill_contents.to_dict()
-    skill_model.misconceptions = [
-        misconception.to_dict() for misconception in skill.misconceptions
-    ]
-    skill_model.rubrics = [
-        rubric.to_dict() for rubric in skill.rubrics
-    ]
-    skill_model.next_misconception_id = skill.next_misconception_id
+    skill_model = populate_skill_model_fields(skill_model, skill)
     change_dicts = [change.to_dict() for change in change_list]
     skill_model.commit(committer_id, commit_message, change_dicts)
     caching_services.delete_multi(
@@ -908,6 +923,36 @@ def create_skill_summary(skill_id):
     save_skill_summary(skill_summary)
 
 
+def populate_skill_summary_model_fields(skill_summary_model, skill_summary):
+    """Populate skill summary model with the data from skill summary object.
+
+    Args:
+        skill_summary_model: SkillSummaryModel. The model to populate.
+        skill_summary: SkillSummary. The skill summary domain object which
+            should be used to populate the model.
+
+    Returns:
+        SkillSummaryModel. Populated model.
+    """
+    skill_summary_dict = {
+        'description': skill_summary.description,
+        'language_code': skill_summary.language_code,
+        'version': skill_summary.version,
+        'misconception_count': skill_summary.misconception_count,
+        'worked_examples_count': skill_summary.worked_examples_count,
+        'skill_model_last_updated': skill_summary.skill_model_last_updated,
+        'skill_model_created_on': skill_summary.skill_model_created_on
+    }
+    if skill_summary_model is not None:
+        skill_summary_model.populate(**skill_summary_dict)
+    else:
+        skill_summary_dict['id'] = skill_summary.id
+        skill_summary_model = skill_models.SkillSummaryModel(
+            **skill_summary_dict)
+
+    return skill_summary_model
+
+
 def save_skill_summary(skill_summary):
     """Save a skill summary domain object as a SkillSummaryModel
     entity in the datastore.
@@ -916,29 +961,13 @@ def save_skill_summary(skill_summary):
         skill_summary: SkillSummaryModel. The skill summary object to be saved
             in the datastore.
     """
-    skill_summary_dict = {
-        'description': skill_summary.description,
-        'language_code': skill_summary.language_code,
-        'version': skill_summary.version,
-        'misconception_count': skill_summary.misconception_count,
-        'worked_examples_count': skill_summary.worked_examples_count,
-        'skill_model_last_updated': (
-            skill_summary.skill_model_last_updated),
-        'skill_model_created_on': (
-            skill_summary.skill_model_created_on)
-    }
-
-    skill_summary_model = (
+    existing_skill_summary_model = (
         skill_models.SkillSummaryModel.get_by_id(skill_summary.id))
-    if skill_summary_model is not None:
-        skill_summary_model.populate(**skill_summary_dict)
-        skill_summary_model.update_timestamps()
-        skill_summary_model.put()
-    else:
-        skill_summary_dict['id'] = skill_summary.id
-        model = skill_models.SkillSummaryModel(**skill_summary_dict)
-        model.update_timestamps()
-        model.put()
+    skill_summary_model = populate_skill_summary_model_fields(
+        existing_skill_summary_model, skill_summary
+    )
+    skill_summary_model.update_timestamps()
+    skill_summary_model.put()
 
 
 def create_user_skill_mastery(user_id, skill_id, degree_of_mastery):
