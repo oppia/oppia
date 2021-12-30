@@ -20,7 +20,7 @@ from __future__ import annotations
 
 from core import utils
 
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List
 
 
 TRANSLATABLE_CONTENT_FORMAT_HTML = 'html'
@@ -28,7 +28,6 @@ TRANSLATABLE_CONTENT_FORMAT_UNICODE_STRING = 'unicode'
 TRANSLATABLE_CONTENT_FORMAT_SET_OF_NORMALIZED_STRING = (
     'set_of_normalized_string')
 TRANSLATABLE_CONTENT_FORMAT_SET_OF_UNICODE_STRING = 'set_of_unicode_string'
-TRANSLATABLE_CONTENT_FORMAT_OBJECT = 'object'
 
 
 class BaseTranslatableObject:
@@ -46,9 +45,11 @@ class BaseTranslatableObject:
             NotImplementedError. The derived child class must implement the
                 necessary logic to register all translatable fields in an
                 entity.
-
         """
-        raise NotImplementedError
+
+        raise NotImplementedError(
+            'Translatable object is not registered, '
+            'by using `_register_all_translatable_fields` method.')
 
     def _register_translatable_field(
         self,
@@ -121,7 +122,7 @@ class BaseTranslatableObject:
                 entityTranslations.translations.keys()
             ):
                 contents_which_need_translation.append(translatable_item)
-            if (
+            elif (
                 entityTranslations.translations[
                 translatable_item.content_id].needs_update
             ):
@@ -193,14 +194,10 @@ class TranslatableContent:
         Returns:
             TranslatableContent. The TranslatableContent object.
         """
-        try:
-            return cls(
-                translatable_content_dict['content_id'],
-                translatable_content_dict['content'],
-                translatable_content_dict['content_type'])
-        except KeyError:
-            raise utils.ValidationError(
-                'Invalid translatable content key(s) present.')
+        return cls(
+            translatable_content_dict['content_id'],
+            translatable_content_dict['content'],
+            translatable_content_dict['type'])
 
     def to_dict(
         self
@@ -249,13 +246,9 @@ class TranslatedContent:
         Returns:
             TranslatedContent. The TranslatedContent object.
         """
-        try:
-            return cls(
-                translated_contents_dict['content'],
-                translated_contents_dict['needs_update'])
-        except KeyError:
-            raise utils.ValidationError(
-                'Invalid translated content key(s) present.')
+        return cls(
+            translated_contents_dict['content'],
+            translated_contents_dict['needs_update'])
 
     def to_dict(
         self
