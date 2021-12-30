@@ -129,14 +129,6 @@ export class TutorCardComponent {
     }
 
     this.directiveSubscriptions.add(
-      this.playerPositionService.onActiveCardChanged.subscribe(
-        () => {
-          this.updateDisplayedCard();
-        }
-      )
-    );
-
-    this.directiveSubscriptions.add(
       this.explorationPlayerStateService.onOppiaFeedbackAvailable.subscribe(
         () => {
           this.waitingForOppiaFeedback = false;
@@ -152,7 +144,6 @@ export class TutorCardComponent {
         }
       )
     );
-    this.updateDisplayedCard();
   }
 
   ngOnDestroy(): void {

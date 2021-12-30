@@ -33,7 +33,7 @@ import { animate, style, transition, trigger } from '@angular/animations';
     trigger('grow', [
       transition('void <=> *', []),
       transition('* <=> *', [
-        style({height: '{{startHeight}}px', opacity: 0}),
+        style({height: '{{startHeight}}px'}),
         animate('.5s ease'),
       ], {params: {startHeight: 0}})
     ])

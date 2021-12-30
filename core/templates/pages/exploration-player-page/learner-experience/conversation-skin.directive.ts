@@ -584,6 +584,7 @@ angular.module('oppia').directive('conversationSkin', [
           var _navigateToDisplayedCard = function() {
             var index = PlayerPositionService.getDisplayedCardIndex();
             $scope.displayedCard = PlayerTranscriptService.getCard(index);
+            $rootScope.$applyAsync();
 
             PlayerPositionService.onActiveCardChanged.emit();
 
@@ -1363,12 +1364,6 @@ angular.module('oppia').directive('conversationSkin', [
               ContentTranslationManagerService
                 .onStateCardContentUpdate.subscribe(
                   () => $rootScope.$applyAsync())
-            );
-            ctrl.directiveSubscriptions.add(
-              PlayerPositionService.displayedCardIndexChangedEventEmitter
-                .subscribe(
-                  () => $rootScope.$applyAsync()
-                )
             );
             $window.addEventListener('beforeunload', function(e) {
               if ($scope.redirectToRefresherExplorationConfirmed) {
