@@ -19,7 +19,7 @@ import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
  * @fileoverview Unit test for State Hints Editor Component.
  */
 
-import { fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { fakeAsync, tick } from '@angular/core/testing';
 
 class MockNgbModalRef {
   componentInstance = {};
