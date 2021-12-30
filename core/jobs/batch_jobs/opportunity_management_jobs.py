@@ -146,12 +146,13 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
                         question_skill_links))
             )
             skill_opportunity.validate() # type: ignore[no-untyped-call]
-            skill_opportunity_model = opportunity_models.SkillOpportunityModel(
-                id=skill_opportunity.id,
-                skill_description=skill_opportunity.skill_description,
-                question_count=skill_opportunity.question_count
-            )
-            skill_opportunity_model.update_timestamps()
+            with datastore_services.get_ndb_context():
+                skill_opportunity_model = opportunity_models.SkillOpportunityModel(
+                    id=skill_opportunity.id,
+                    skill_description=skill_opportunity.skill_description,
+                    question_count=skill_opportunity.question_count
+                )
+                skill_opportunity_model.update_timestamps()
             return result.Ok(skill_opportunity_model)
         except Exception as e:
             return result.Err(e)
