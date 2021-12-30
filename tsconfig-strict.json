@@ -41,6 +41,7 @@
     "core/templates/app.constants.ts",
     "core/templates/base-components/base-content.component.ts",
     "core/templates/base-components/base-content.component.spec.ts",
+    "core/templates/base-components/base.module.ts",
     "core/templates/base-components/loading-message.component.ts",
     "core/templates/base-components/warnings-and-alerts.component.ts",
     "core/templates/base-components/warnings-and-alerts.component.spec.ts",
