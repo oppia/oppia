@@ -3673,8 +3673,10 @@ class FunctionWrapper:
         if self._instance is not None:
             args = [self._instance] + list(args)
 
+        # Creates a mapping from positional and keyword arguments to parameters
+        # and binds them to the call signature of the method. Serves as a
+        # replacement for inspect.getcallargs() in python versions >= 3.5.
         sig = inspect.signature(self._func)
-
         args_dict = sig.bind_partial(*args, **kwargs)
 
         self.pre_call_hook(args_dict)
