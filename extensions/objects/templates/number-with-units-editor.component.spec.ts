@@ -19,6 +19,7 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { NumberWithUnitsEditorComponent } from './number-with-units-editor.component';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 describe('NumberWithUnitsEditorComponent', () => {
   let component: NumberWithUnitsEditorComponent;
@@ -26,7 +27,7 @@ describe('NumberWithUnitsEditorComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [NumberWithUnitsEditorComponent],
+      declarations: [MockTranslatePipe, NumberWithUnitsEditorComponent],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));

@@ -161,11 +161,9 @@ describe('Schema Based Float Editor Directive', () => {
 
   it('should generate error for wrong input', () => {
     ctrl.localValue = null;
-
     ctrl.generateErrors();
 
     expect(ctrl.errorString)
-      .toBe(
-        'The answer can contain at most 15 digits (0-9) or symbols (. or -).');
+      .toBe('I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_2');
   });
 });

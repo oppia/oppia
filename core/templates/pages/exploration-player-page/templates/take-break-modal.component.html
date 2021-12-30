@@ -1,21 +1,21 @@
 <div class="modal-header">
   <h3>
-    Time for a break?
+    {{ 'I18N_TIME_FOR_BREAK_TITLE' | translate }}
   </h3>
 </div>
 
 <div class="modal-body">
   <p>
-    You seem to be submitting answers very quickly. Are you starting to get tired?
+    {{ 'I18N_TIME_FOR_BREAK_BODY_1' | translate }}
   </p>
   <br>
   <p>
-    If so, consider taking a break! You can come back later.
+    {{ 'I18N_TIME_FOR_BREAK_BODY_2' | translate }}
   </p>
 </div>
 
 <div class="modal-footer">
-  <button class="btn btn-success" (click)="confirm()">I'm ready to continue the lesson</button>
+  <button class="btn btn-success" (click)="confirm()">{{ 'I18N_TIME_FOR_BREAK_FOOTER' | translate }}</button>
 </div>
 
 <style>

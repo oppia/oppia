@@ -72,7 +72,7 @@ import { SubtitledUnicodeEditorComponent } from './templates/subtitled-unicode-e
 import { TranslatableHtmlContentIdEditorComponent } from './templates/translatable-html-content-id.component';
 import { TranslatableSetOfNormalizedStringEditorComponent } from './templates/translatable-set-of-normalized-string-editor.component';
 import { TranslatableSetOfUnicodeStringEditorComponent } from './templates/translatable-set-of-unicode-string-editor.component';
-
+import { TranslateModule } from '@ngx-translate/core';
 
 @NgModule({
   imports: [
@@ -89,7 +89,8 @@ import { TranslatableSetOfUnicodeStringEditorComponent } from './templates/trans
     MatCheckboxModule,
     NgbModalModule,
     NgbTooltipModule,
-    NgxTrimDirectiveModule
+    NgxTrimDirectiveModule,
+    TranslateModule
   ],
   declarations: [
     AlgebraicExpressionEditorComponent,

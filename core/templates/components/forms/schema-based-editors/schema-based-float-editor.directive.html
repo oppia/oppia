@@ -9,7 +9,7 @@
              ng-change="$ctrl.generateErrors()">
 
       <span class="oppia-form-error oppia-numeric-input-error" ng-if="$ctrl.errorString">
-        <[$ctrl.errorString]>
+        <[$ctrl.errorString | translate]>
       </span>
       <span ng-if="$ctrl.hasLoaded && !$ctrl.isUserCurrentlyTyping && $ctrl.hasFocusedAtLeastOnce"
             class="position-absolute oppia-form-container"

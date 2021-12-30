@@ -54,7 +54,7 @@ export class FractionEditorComponent implements OnInit {
 
   validateFraction(newFraction: string): void {
     if (newFraction.length === 0) {
-      this.errorMessage = 'Please enter a non-empty fraction value.';
+      this.errorMessage = 'I18N_INTERACTIONS_FRACTIONS_NON_EMPTY';
       this.currentFractionValueIsValid = false;
       return;
     }

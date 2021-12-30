@@ -19,6 +19,7 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { FractionEditorComponent } from './fraction-editor.component';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 describe('FractionEditorComponent', () => {
   let component: FractionEditorComponent;
@@ -26,7 +27,7 @@ describe('FractionEditorComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [FractionEditorComponent],
+      declarations: [MockTranslatePipe, FractionEditorComponent],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));
@@ -74,7 +75,7 @@ describe('FractionEditorComponent', () => {
 
       expect(component.currentFractionValueIsValid).toBeFalse();
       expect(component.errorMessage).toBe(
-        'Please only use numerical digits, spaces or forward slashes (/)'
+        'I18N_INTERACTIONS_FRACTIONS_INVALID_CHARS'
       );
       expect(component.eventBus.emit).toHaveBeenCalledWith(
         jasmine.objectContaining({
@@ -91,7 +92,7 @@ describe('FractionEditorComponent', () => {
 
     expect(component.currentFractionValueIsValid).toBeFalse();
     expect(component.errorMessage).toBe(
-      'Please enter a non-empty fraction value.'
+      'I18N_INTERACTIONS_FRACTIONS_NON_EMPTY'
     );
   });
 });

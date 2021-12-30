@@ -36,7 +36,6 @@ import { Warning } from 'interactions/base-interaction-validation.service';
 describe('NumericInputValidationService', () => {
   let validatorService: NumericInputValidationService;
   let WARNING_TYPES: typeof AppConstants.WARNING_TYPES;
-
   let currentState: string;
   let answerGroups: AnswerGroup[], goodDefaultOutcome: Outcome,
     customizationArgs: NumericInputCustomizationArgs;
@@ -337,9 +336,9 @@ describe('NumericInputValidationService', () => {
 
   it('should generate errors in the given input', () => {
     expect(validatorService.getErrorString(1200000000E+27, false)).toEqual(
-      'The answer can contain at most 15 digits (0-9) or symbols (. or -).');
+      'I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_2');
     expect(validatorService.getErrorString(1200000000E-27, false)).toEqual(
-      'The answer can contain at most 15 digits (0-9) or symbols (. or -).');
+      'I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_2');
     expect(validatorService.getErrorString(999999999999999, false)).toEqual(
       undefined);
     expect(validatorService.getErrorString(99.9999999999999, false)).toEqual(
@@ -352,7 +351,6 @@ describe('NumericInputValidationService', () => {
     expect(validatorService.getErrorString(99999999999999, true)).toEqual(
       undefined);
     expect(validatorService.getErrorString(9999999999999999, true)).toEqual(
-      'The answer should be greater than or equal to zero and can contain' +
-      ' at most 15 digits (0-9) or symbols(.).');
+      'I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_1');
   });
 });
