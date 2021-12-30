@@ -60,8 +60,8 @@ describe('Misconception Editor Component', () => {
 
     component.isEditable = true;
     component.misconception = {
-      getId(): string {
-        return 'misconceptionId';
+      getId(): number {
+        return 1;
       },
 
       getName(): string {
@@ -148,7 +148,7 @@ describe('Misconception Editor Component', () => {
     component.saveFeedback();
 
     expect(updateFeedbackSpy).toHaveBeenCalledWith(
-      sampleSkill, 'misconceptionId', 'feedback', 'newFeedback');
+      sampleSkill, 1, 'feedback', 'newFeedback');
   });
 
   it('should close name editor when clicking on cancel button', () => {
@@ -183,7 +183,7 @@ describe('Misconception Editor Component', () => {
     component.updateMustBeAddressed();
 
     expect(updatesSpy).toHaveBeenCalledWith(
-      sampleSkill, 'misconceptionId', true, false);
+      sampleSkill, 1, true, false);
   });
 
   it('should get schema for editing notes', () => {
