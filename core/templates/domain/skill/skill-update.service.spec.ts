@@ -59,7 +59,7 @@ describe('Skill update service', () => {
     workedExampleObjectFactory = TestBed.get(WorkedExampleObjectFactory);
 
     const misconceptionDict1 = {
-      id: '2',
+      id: 2,
       name: 'test name',
       notes: 'test notes',
       feedback: 'test feedback',
@@ -67,7 +67,7 @@ describe('Skill update service', () => {
     };
 
     const misconceptionDict2 = {
-      id: '4',
+      id: 4,
       name: 'test name',
       notes: 'test notes',
       feedback: 'test feedback',
