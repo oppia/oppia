@@ -64,7 +64,7 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
   editableThumbnailDataUrl: string | undefined;
   transformedData: string | undefined;
   parsedResponse: unknown;
-  encodedImageURI: string | undefined;
+  encodedImageURI: string | null=null;
 
   constructor(
     private imageUploadHelperService: ImageUploadHelperService,
@@ -133,7 +133,7 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
     }
   }
 
-  saveThumbnailImageData(imageURI: string, callback: () => void): void {
+  saveThumbnailImageData(imageURI: string | null, callback: () => void): void {
     const x = {} as Blob;
     this.resampledFile = (
       this.imageUploadHelperService.convertImageDataToImageFile(
