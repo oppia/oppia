@@ -133,6 +133,7 @@ export class ConversationSkinComponent {
   questionSessionCompleted: boolean;
   moveToExploration: boolean;
   upcomingInteractionInstructions;
+  submitButtonIsDisabled: boolean;
 
   ngOnInit(): void {
     this._editorPreviewMode = this.contextService.isInExplorationEditorPage();
@@ -279,6 +280,14 @@ export class ConversationSkinComponent {
         }
       );
     }
+
+    this.updateSubmitButtonVisibility();
+    this.directiveSubscriptions.add(
+      this.playerPositionService.displayedCardIndexChangedEventEmitter
+        .subscribe(() => {
+          this.updateSubmitButtonVisibility();
+        })
+    );
   }
 
   constructor(
@@ -1174,7 +1183,7 @@ export class ConversationSkinComponent {
       this.explorationId);
   }
 
-  isSubmitButtonDisabled(): boolean {
+  updateSubmitButtonVisibility(): void {
     let currentIndex = this.playerPositionService.getDisplayedCardIndex();
     // This check is added because it was observed that when returning
     // to current card after navigating through previous cards, using
@@ -1183,9 +1192,10 @@ export class ConversationSkinComponent {
     // card, this additional check doesn't interfere with its normal
     // working.
     if (!this.playerTranscriptService.isLastCard(currentIndex)) {
-      return false;
+      this.submitButtonIsDisabled = false;
     }
-    return this.currentInteractionService.isSubmitButtonDisabled();
+    this.submitButtonIsDisabled = (
+      this.currentInteractionService.isSubmitButtonDisabled());
   }
 
   submitAnswerFromProgressNav(): void {

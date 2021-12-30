@@ -24,7 +24,7 @@
       <div *ngIf="!getCanAskLearnerForAnswerInfo()">
         <oppia-progress-nav (submit)="submitAnswerFromProgressNav()"
                             [isLearnAgainButton]="isLearnAgainButton"
-                            [submitButtonIsDisabled]="isSubmitButtonDisabled()"
+                            [submitButtonIsDisabled]="submitButtonIsDisabled"
                             [displayedCard]="displayedCard"
                             [submitButtonIsShown]="!answerIsBeingProcessed"
                             (clickContinueButton)="showUpcomingCard()">
@@ -58,7 +58,7 @@
                   class="oppia-learner-confirm-button protractor-test-submit-answer-button conversation-skin-supplemental-nav-submit-button"
                   (click)="submitAnswerFromProgressNav()"
                   [ngStyle]="isLanguageRTL() ? {'left': '8px', 'right': 'auto'} : {'right': '8px', 'left': 'auto'}"
-                  [disabled]="isSubmitButtonDisabled()"
+                  [disabled]="submitButtonIsDisabled"
                   translate="I18N_INTERACTIONS_SUBMIT">
           </button>
         </div>
