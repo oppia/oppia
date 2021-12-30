@@ -146,7 +146,7 @@ describe('Exploration save and publish buttons component', function() {
       }));
     spyOnProperty(ics, 'onInternetStateChange').and.returnValue(
       mockConnectionServiceEmitter);
-    spyOn(explorationSaveService, 'saveChanges').and
+    spyOn(explorationSaveService, 'saveChangesAsync').and
       .callFake((showCallback, hideCallback) => {
         showCallback();
         hideCallback();
@@ -183,7 +183,7 @@ describe('Exploration save and publish buttons component', function() {
     });
 
   it('should save exploration when saving changes', function() {
-    $scope.saveChanges();
+    $scope.saveChangesAsync();
 
     expect($scope.saveIsInProcess).toBe(true);
 
@@ -336,14 +336,14 @@ describe('Exploration save and publish buttons component', function() {
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.resolve()
     });
-    spyOn($scope, 'saveChanges');
+    spyOn($scope, 'saveChangesAsync');
     $scope.saveIsInProcess = false;
 
     $scope.getChangeListLength();
     $scope.$apply();
 
     expect($uibModal.open).toHaveBeenCalled();
-    expect($scope.saveChanges).toHaveBeenCalled();
+    expect($scope.saveChangesAsync).toHaveBeenCalled();
   });
 
   it('should open a exploration save prompt modal only once',
@@ -352,18 +352,18 @@ describe('Exploration save and publish buttons component', function() {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.reject()
       });
-      spyOn($scope, 'saveChanges');
+      spyOn($scope, 'saveChangesAsync');
       $scope.saveIsInProcess = false;
 
       $scope.getChangeListLength();
       $scope.$apply();
       expect($uibModal.open).toHaveBeenCalledTimes(1);
-      expect($scope.saveChanges).not.toHaveBeenCalled();
+      expect($scope.saveChangesAsync).not.toHaveBeenCalled();
       $scope.getChangeListLength();
       $scope.$apply();
 
       expect($uibModal.open).toHaveBeenCalledTimes(1);
-      expect($scope.saveChanges).not.toHaveBeenCalled();
+      expect($scope.saveChangesAsync).not.toHaveBeenCalled();
     });
 
   it('should open a confirmation modal with rejection', function() {
@@ -371,14 +371,14 @@ describe('Exploration save and publish buttons component', function() {
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.reject()
     });
-    spyOn($scope, 'saveChanges');
+    spyOn($scope, 'saveChangesAsync');
     $scope.saveIsInProcess = false;
 
     $scope.getChangeListLength();
     $scope.$apply();
 
     expect($uibModal.open).toHaveBeenCalled();
-    expect($scope.saveChanges).not.toHaveBeenCalled();
+    expect($scope.saveChangesAsync).not.toHaveBeenCalled();
   });
 
   it('should open a confirmation modal when save is in progress', function() {
@@ -386,14 +386,14 @@ describe('Exploration save and publish buttons component', function() {
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.reject()
     });
-    spyOn($scope, 'saveChanges');
+    spyOn($scope, 'saveChangesAsync');
     $scope.saveIsInProcess = true;
 
     $scope.getChangeListLength();
     $scope.$apply();
 
     expect($uibModal.open).not.toHaveBeenCalled();
-    expect($scope.saveChanges).not.toHaveBeenCalled();
+    expect($scope.saveChangesAsync).not.toHaveBeenCalled();
   });
 
   it('should change connnection status to ONLINE when internet is connected',

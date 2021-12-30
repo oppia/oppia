@@ -294,7 +294,7 @@ angular.module('oppia').directive('audioTranslationBar', [
           const waveSurferOnFinishCb = () => {
             $scope.unsavedAudioIsPlaying = false;
             $scope.$applyAsync();
-          }
+          };
 
           // Play and pause for unsaved recording.
           $scope.playAndPauseUnsavedAudio = function() {

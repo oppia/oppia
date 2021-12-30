@@ -79,7 +79,7 @@ angular.module('oppia').component('oppiaInteractiveRatioExpressionInput', {
       ctrl.isAnswerValid = function() {
         if (
           ctrl.RatioExpressionInputForm === undefined ||
-          ctrl.RatioExpressionInputForm.answer ===  undefined
+          ctrl.RatioExpressionInputForm.answer === undefined
         ) {
           return true;
         }

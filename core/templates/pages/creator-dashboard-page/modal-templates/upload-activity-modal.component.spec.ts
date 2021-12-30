@@ -64,7 +64,7 @@ describe('Upload Activity Modal Component', () => {
   }));
 
   it('should close modal when saving activity', fakeAsync(() => {
-    const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
+    const dismissSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
 
     let file = {
       size: 100,

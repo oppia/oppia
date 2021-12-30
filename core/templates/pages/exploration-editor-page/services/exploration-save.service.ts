@@ -336,9 +336,9 @@ angular.module('oppia').factory('ExplorationSaveService', [
         return whenModalsClosed.promise;
       },
 
-      saveChangesAsync: async function (
-        onStartLoadingCallback,
-        onEndLoadingCallback
+      saveChangesAsync: async function(
+          onStartLoadingCallback,
+          onEndLoadingCallback
       ) {
         // This is marked as resolved after modal is closed, so we can change
         // controller 'saveIsInProgress' back to false.
