@@ -73,14 +73,14 @@ describe('Add Misconception Modal Component', function() {
     ngbActiveModal = TestBed.inject(NgbActiveModal);
 
     let misconceptionDict1 = {
-      id: '2',
+      id: 2,
       name: 'test name 2',
       notes: 'test notes',
       feedback: 'test feedback',
       must_be_addressed: true
     };
     let misconceptionDict2 = {
-      id: '3',
+      id: 3,
       name: 'test name 3',
       notes: 'test notes',
       feedback: 'test feedback',
@@ -138,7 +138,7 @@ describe('Add Misconception Modal Component', function() {
 
     expect(ngbActiveModal.close).toHaveBeenCalledWith({
       misconception: misconceptionObjectFactory.create(
-        '3', '', '', '', true)
+        3, '', '', '', true)
     });
   });
 
