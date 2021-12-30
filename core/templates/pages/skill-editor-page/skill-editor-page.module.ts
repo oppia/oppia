@@ -33,6 +33,7 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
 import { DeleteMisconceptionModalComponent } from './modal-templates/delete-misconception-modal.component';
 import { SkillDescriptionEditorComponent } from './editor-tab/skill-description-editor/skill-description-editor.component';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
+import { AddMisconceptionModalComponent } from './modal-templates/add-misconception-modal.component';
 
 @NgModule({
   imports: [
@@ -47,13 +48,15 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     DeleteMisconceptionModalComponent,
     SavePendingChangesModalComponent,
     SkillEditorNavbarBreadcrumbComponent,
-    SkillDescriptionEditorComponent
+    SkillDescriptionEditorComponent,
+    AddMisconceptionModalComponent
   ],
   entryComponents: [
     DeleteMisconceptionModalComponent,
     SavePendingChangesModalComponent,
     SkillEditorNavbarBreadcrumbComponent,
-    SkillDescriptionEditorComponent
+    SkillDescriptionEditorComponent,
+    AddMisconceptionModalComponent
   ],
   providers: [
     {
