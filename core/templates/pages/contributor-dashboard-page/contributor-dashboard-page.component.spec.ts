@@ -117,9 +117,9 @@ describe('Contributor dashboard page', function() {
       expect(ctrl.userIsLoggedIn).toBe(true);
       expect(ctrl.username).toBe('username1');
       expect(ctrl.userCanReviewTranslationSuggestionsInLanguages).toEqual([
-        'English', 'Portuguese', 'Hindi']);
+        'English', 'português (Portuguese)', 'हिन्दी (Hindi)']);
       expect(ctrl.userCanReviewVoiceoverSuggestionsInLanguages).toEqual([
-        'English', 'Portuguese', 'Hindi']);
+        'English', 'português (Portuguese)', 'हिन्दी (Hindi)']);
       expect(ctrl.userCanReviewQuestions).toBe(true);
       expect(ctrl.userIsReviewer).toBe(true);
       expect(ctrl.profilePictureDataUrl).toBe(userProfileImage);
