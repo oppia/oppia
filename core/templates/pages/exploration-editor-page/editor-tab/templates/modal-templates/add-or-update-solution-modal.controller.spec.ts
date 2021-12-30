@@ -181,10 +181,11 @@ describe('Add Or Update Solution Modal Controller', function() {
       }).toThrowError('Cannot save invalid solution');
     });
 
-    it('should show solution explanation length validation error',
+    it('should check if solution explanation length exceeds 100000 characters',
       function() {
-        var solutionExplanation = 'Solution explanation'.repeat(180);
-        expect($scope.isSolutionExplanationLengthExceeded(solutionExplanation))
+        expect($scope.isSolutionExplanationLengthExceeded('a'.repeat(100000)))
+          .toBe(false);
+        expect($scope.isSolutionExplanationLengthExceeded('a'.repeat(100001)))
           .toBe(true);
       });
   });
