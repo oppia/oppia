@@ -21,10 +21,10 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
-  selector: 'oppia-confirm-question-modal-e',
-  templateUrl: './delete-worked-example-modal.component.html'
+  selector: 'oppia-confirm-question-exit-modal',
+  templateUrl: './confirm-question-exit-modal.component.html'
 })
-export class DeleteWorkedExampleComponent extends ConfirmOrCancelModal {
+export class ConfirmQuestionExitComponent extends ConfirmOrCancelModal {
   constructor(
     private ngbActiveModal: NgbActiveModal
   ) {

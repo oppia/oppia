@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { ConfirmQuestionExitComponent } from "components/question-directives/modal-templates/confirm-question-exit-modal.component";
+
 /**
  * @fileoverview Controller for question suggestion editor modal.
  */
@@ -32,7 +34,7 @@ require('services/site-analytics.service.ts');
 angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
   '$rootScope', '$scope', '$uibModal', '$uibModalInstance', 'AlertsService',
   'ContextService', 'ContributionAndReviewService', 'ImageLocalStorageService',
-  'QuestionSuggestionBackendApiService', 'QuestionUndoRedoService',
+  'NgbModal', 'QuestionSuggestionBackendApiService', 'QuestionUndoRedoService',
   'QuestionValidationService', 'SiteAnalyticsService',
   'UrlInterpolationService', 'question', 'questionId', 'questionStateData',
   'skill', 'skillDifficulty', 'suggestionId', 'SKILL_DIFFICULTY_LABEL_TO_FLOAT',
@@ -40,7 +42,7 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
   function(
       $rootScope, $scope, $uibModal, $uibModalInstance, AlertsService,
       ContextService, ContributionAndReviewService, ImageLocalStorageService,
-      QuestionSuggestionBackendApiService, QuestionUndoRedoService,
+      NgbModal, QuestionSuggestionBackendApiService, QuestionUndoRedoService,
       QuestionValidationService, SiteAnalyticsService,
       UrlInterpolationService, question, questionId, questionStateData,
       skill, skillDifficulty, suggestionId, SKILL_DIFFICULTY_LABEL_TO_FLOAT,
@@ -134,13 +136,8 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
     };
     $scope.cancel = function() {
       if (QuestionUndoRedoService.hasChanges()) {
-        $uibModal.open({
-          templateUrl:
-            UrlInterpolationService.getDirectiveTemplateUrl(
-              '/components/question-directives/modal-templates/' +
-              'confirm-question-modal-exit-modal.directive.html'),
+        NgbModal.open(ConfirmQuestionExitComponent, {
           backdrop: true,
-          controller: 'ConfirmOrCancelModalController'
         }).result.then(function() {
           $uibModalInstance.dismiss('cancel');
           ImageLocalStorageService.flushStoredImagesData();

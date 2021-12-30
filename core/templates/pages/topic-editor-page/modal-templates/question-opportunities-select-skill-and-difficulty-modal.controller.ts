@@ -106,4 +106,4 @@ angular.module('oppia').controller(
         $uibModalInstance.close(result);
       };
     }
-  ]);
+]);
