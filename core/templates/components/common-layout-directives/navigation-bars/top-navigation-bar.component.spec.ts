@@ -504,16 +504,19 @@ describe('TopNavigationBarComponent', () => {
     spyOn(component, 'getDropdownOffset')
       .withArgs('.learn-tab', 688).and.returnValue(-10)
       .withArgs('.learn-tab', 300).and.returnValue(-10)
+      .withArgs('.donate-tab', 286).and.returnValue(-10)
       .withArgs('.get-involved', 574).and.returnValue(-10);
 
     expect(component.learnDropdownOffset).toBe(0);
     expect(component.getInvolvedMenuOffset).toBe(0);
+    expect(component.donateMenuOffset).toBe(0);
 
     component.ngAfterViewChecked();
     tick();
 
     expect(component.learnDropdownOffset).toBe(-10);
     expect(component.getInvolvedMenuOffset).toBe(-10);
+    expect(component.donateMenuOffset).toBe(-10);
   }));
 
   it('should fetch classroom data when classroomPromos are enabled',
