@@ -33,7 +33,7 @@ import { animate, style, transition, trigger } from '@angular/animations';
     trigger('grow', [
       transition('void <=> *', []),
       transition('* <=> *', [
-        style({height: '{{startHeight}}px', opacity: 0}),
+        style({height: '{{startHeight}}px'}),
         animate('.5s ease'),
       ], {params: {startHeight: 0}})
     ])
@@ -49,11 +49,9 @@ export class SmoothHeightAnimatorComponent implements OnChanges {
   ngOnChanges(): void {
     this.startHeight = this.element.nativeElement.clientHeight;
     // Timeout delays the animation till the new content is rendered properly.
-    setTimeout(() => {
-      this.grow = {
-        value: this.trigger,
-        params: {startHeight: this.startHeight}
-      };
-    }, 100);
+    this.grow = {
+      value: this.trigger,
+      params: {startHeight: this.startHeight}
+    };
   }
 }
