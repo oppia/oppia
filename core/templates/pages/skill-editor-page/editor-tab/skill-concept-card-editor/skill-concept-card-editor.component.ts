@@ -109,6 +109,8 @@ angular.module('oppia').component('skillConceptCardEditor', {
           $scope.bindableFieldsDict.displayedWorkedExamples =
             $scope.skill.getConceptCard().getWorkedExamples();
           $scope.activeWorkedExampleIndex = null;
+          // TODO(#8521): Remove the use of $rootScope.$apply()
+          // once the controller is migrated to angular.
           $rootScope.$apply();
         }, function() {
           // Note to developers:
@@ -143,6 +145,8 @@ angular.module('oppia').component('skillConceptCardEditor', {
             $scope.skill, newExample);
           $scope.bindableFieldsDict.displayedWorkedExamples =
             $scope.skill.getConceptCard().getWorkedExamples();
+          // TODO(#8521): Remove the use of $rootScope.$apply()
+          // once the controller is migrated to angular.
           $rootScope.$apply();
         }, function() {
           // Note to developers:
