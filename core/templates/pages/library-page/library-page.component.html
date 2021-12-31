@@ -82,13 +82,13 @@
              (mouseenter)="setActiveGroup(idx)"
              (mouseleave)="clearActiveGroup()">
           <div class="oppia-library-group-header-container">
-            <h2 [ngClass]="{'active': activeGroupIndex === idx}" class="oppia-library-group-header">
+            <h2 [ngClass]="{'active': !libraryWindowIsNarrow && activeGroupIndex === idx}" class="oppia-library-group-header">
               <a *ngIf="group.has_full_results_page"
                  class="protractor-test-library-{{group.protractor_id}}"
                  (click)="showFullResultsPage(group.categories, group.full_results_url)"
                  tabindex="0">
                 <span [translate]="group.header_i18n_id"></span>
-                <span *ngIf="activeGroupIndex === idx"><i class="material-icons md-32">&#xE315;</i></span>
+                <span *ngIf="!libraryWindowIsNarrow && activeGroupIndex === idx"><i class="material-icons md-32">&#xE315;</i></span>
               </a>
               <span *ngIf="!group.has_full_results_page" [translate]="group.header_i18n_id">
               </span>
