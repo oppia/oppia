@@ -16,6 +16,86 @@
  * @fileoverview Component for the voiceover opportunities.
  */
 
+
+// import { Component, OnDestroy, OnInit } from '@angular/core';
+// import { downgradeInjectable } from '@angular/upgrade/static';
+// import { Subscription } from 'rxjs';
+// import { ContributionOpportunitiesService } from 'pages/contributor-dashboard-page/services/contribution-opportunities.service';
+// import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
+
+// @Component({
+//   selector: 'oppia-voiceover-opportunities',
+//   templateUrl: './voiceover-opportunities.component.html'
+// })
+// export class VoiceoverOpportunitiesComponent implements OnInit, OnDestroy {
+//   directiveSubscriptions = new Subscription();
+//   opportunities: any;
+//   opportunitiesAreLoading: boolean;
+//   moreOpportunitiesAvailable: boolean;
+//   progressBarRequired: boolean;
+
+//   constructor(
+//     private contributionOpportunitiesService: ContributionOpportunitiesService,
+//     private translationLanguageService: TranslationLanguageService,
+//   ) {}
+
+//   onLoadMoreOpportunities(): void {
+//     if (
+//       !this.opportunitiesAreLoading &&
+//       this.moreOpportunitiesAvailable) {
+//       this.opportunitiesAreLoading = true;
+//       this.contributionOpportunitiesService.getMoreVoiceoverOpportunitiesAsync(
+//         this.translationLanguageService.getActiveLanguageCode(),
+//         updateWithNewOpportunities);
+//     }
+//   }
+
+//   updateWithNewOpportunities(opportunities, more): void {
+//     for (var index in opportunities) {
+//       var opportunity = opportunities[index];
+//       var subheading = opportunity.getOpportunitySubheading();
+//       var heading = opportunity.getOpportunityHeading();
+
+//       this.opportunities.push({
+//         heading: heading,
+//         subheading: subheading,
+//         actionButtonTitle: 'Request to Voiceover'
+//       });
+//     }
+//     this.moreOpportunitiesAvailable = more;
+//     this.opportunitiesAreLoading = false;
+//   }
+
+//   ngOnInit(): void {
+//     this.directiveSubscriptions.add(
+//       this.translationLanguageService.onActiveLanguageChanged.subscribe(
+//         () => {
+//           this.opportunities = [];
+//           this.opportunitiesAreLoading = true;
+//           this.contributionOpportunitiesService.getVoiceoverOpportunitiesAsync(
+//             this.translationLanguageService.getActiveLanguageCode(),
+//             updateWithNewOpportunities);
+//         }
+//       )
+//     );
+//     this.opportunities = [];
+//     this.opportunitiesAreLoading = true;
+//     this.moreOpportunitiesAvailable = true;
+//     this.progressBarRequired = false;
+//     this.contributionOpportunitiesService.getVoiceoverOpportunitiesAsync(
+//       this.translationLanguageService.getActiveLanguageCode(),
+//       updateWithNewOpportunities);
+//   }
+
+//   ngOnDestroy(): void {
+//     this.directiveSubscriptions.unsubscribe();
+//   }
+// }
+
+// angular.module('oppia').factory(
+//   'oppiaVoiceoverOpportunities',
+//   downgradeInjectable(VoiceoverOpportunitiesComponent));
+
 require(
   'pages/contributor-dashboard-page/opportunities-list/' +
   'opportunities-list.component.ts');
