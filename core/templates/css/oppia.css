@@ -4866,3 +4866,65 @@ div.oppia-issues-learner-action {
   min-width: max-content;
   width: 30%;
 }
+
+.conversation-skin-oppia-avatar, .conversation-skin-learner-answer-container,
+.conversation-skin-user-avatar {
+  height: 36px;
+  position: absolute;
+  top: 0;
+  width: 36px;
+  z-index: 1;
+}
+
+.conversation-skin-oppia-feedback-container .conversation-skin-oppia-avatar {
+  height: 100px;
+  left: -87px;
+  top: -20px;
+  width: 100px;
+}
+
+.conversation-skin-oppia-feedback-content,
+.conversation-skin-learner-answer-content {
+  margin-bottom: 12px;
+  overflow: auto;
+  padding: 8px 12px;
+  word-wrap: break-word;
+}
+
+.conversation-skin-oppia-feedback-content,
+.conversation-skin-help-card-content {
+  background-color: rgba(224,242,241,1);
+  border-top-left-radius: 0;
+}
+
+.conversation-skin-help-card-content {
+  padding: 12px;
+}
+
+.conversation-skin-learner-answer-content {
+  background-color: rgba(236,239,241,1);
+  border-bottom-right-radius: 0;
+}
+
+
+/*
+    This CSS block is for ensuring that only a response from a multi-line text input preserves newlines.
+    Leveraging the parent class ".conversation-skin-learner-answer-content" will render newlines in the
+    other interactions (ie; Multiple Choice, Item Selection) which is not necessary.
+*/
+oppia-response-text-input {
+  white-space: pre-wrap;
+}
+
+@media screen and (max-width: 959px) {
+  .conversation-skin-user-avatar,
+  .conversation-skin-oppia-avatar {
+    display: none;
+  }
+
+  .oppia-learner-view-card {
+    margin-left: 0;
+    padding-bottom: 0;
+    padding-left: 0;
+  }
+}

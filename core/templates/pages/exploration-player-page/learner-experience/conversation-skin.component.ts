@@ -19,7 +19,7 @@
 import { Subscription } from 'rxjs';
 import { StateCard } from 'domain/state_card/state-card.model';
 import { ServicesConstants } from 'services/services.constants';
-import { Component, Input, ViewEncapsulation } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 // eslint-disable-next-line oppia/disallow-httpclient
 import { HttpClient } from '@angular/common/http';
@@ -80,7 +80,6 @@ const TIME_NUM_CARDS_CHANGE_MSEC = 500;
 @Component({
   selector: 'oppia-conversation-skin',
   templateUrl: './conversation-skin.component.html',
-  encapsulation: ViewEncapsulation.None
 })
 export class ConversationSkinComponent {
   @Input() questionPlayerConfig;

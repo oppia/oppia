@@ -93,6 +93,11 @@ import { ContentLanguageSelectorComponent } from 'pages/exploration-player-page/
 import { RatingDisplayComponent } from './ratings/rating-display/rating-display.component';
 import { SupplementalCardComponent } from 'pages/exploration-player-page/learner-experience/supplemental-card.component';
 import { SmoothHeightAnimatorComponent } from './smooth-height/smooth-height-animator.component';
+import { ConversationSkinComponent } from 'pages/exploration-player-page/learner-experience/conversation-skin.component';
+import { RatingsAndRecommendationsComponent } from 'pages/exploration-player-page/learner-experience/ratings-and-recommendations.component';
+import { LearnerAnswerInfoCard } from 'pages/exploration-player-page/learner-experience/learner-answer-info-card.component';
+import { FeedbackPopupComponent } from 'pages/exploration-player-page/layout-directives/feedback-popup.component';
+import { ConversationSkinEmbedComponent } from 'pages/exploration-player-page/learner-experience/conversation-skin-embed.component';
 
 // Pipes.
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
@@ -108,10 +113,6 @@ import { AuthService } from 'services/auth.service';
 
 // Miscellaneous.
 import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
-import { ConversationSkinComponent } from 'pages/exploration-player-page/learner-experience/conversation-skin.component';
-import { RatingsAndRecommendationsComponent } from 'pages/exploration-player-page/learner-experience/ratings-and-recommendations.component';
-import { LearnerAnswerInfoCard } from 'pages/exploration-player-page/learner-experience/learner-answer-info-card.component';
-import { FeedbackPopupComponent } from 'pages/exploration-player-page/layout-directives/feedback-popup.component';
 
 @NgModule({
   imports: [
@@ -154,6 +155,7 @@ import { FeedbackPopupComponent } from 'pages/exploration-player-page/layout-dir
     ContinueButtonComponent,
     ContentLanguageSelectorComponent,
     ConversationSkinComponent,
+    ConversationSkinEmbedComponent,
     CreateNewSkillModalComponent,
     CreateActivityModalComponent,
     DisplaySolutionModalComponent,
@@ -222,6 +224,7 @@ import { FeedbackPopupComponent } from 'pages/exploration-player-page/layout-dir
     ConceptCardComponent,
     ContentLanguageSelectorComponent,
     ConversationSkinComponent,
+    ConversationSkinEmbedComponent,
     CreateNewSkillModalComponent,
     CreateActivityModalComponent,
     ExplorationFooterComponent,
@@ -298,6 +301,7 @@ import { FeedbackPopupComponent } from 'pages/exploration-player-page/layout-dir
     ContinueButtonComponent,
     ContentLanguageSelectorComponent,
     ConversationSkinComponent,
+    ConversationSkinEmbedComponent,
     CreateNewSkillModalComponent,
     CreateActivityModalComponent,
     DisplaySolutionModalComponent,

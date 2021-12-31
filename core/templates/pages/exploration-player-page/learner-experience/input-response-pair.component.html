@@ -83,4 +83,52 @@
     max-height: 300px;
     overflow-y: scroll;
   }
+
+  .conversation-skin-feedback-dot-one,
+  .conversation-skin-feedback-dot-two,
+  .conversation-skin-feedback-dot-three {
+    background-color: #666;
+    display: inline-block;
+    height: 2px;
+    width: 2px;
+  }
+
+  .conversation-skin-feedback-dot-one {
+    -webkit-animation: dot 1.0s infinite;
+    -moz-animation: dot 1.0s infinite;
+    animation: dot 1.0s infinite;
+    -webkit-animation-delay: 0.0s;
+    -moz-animation-delay: 0.0s;
+    animation-delay: 0.0s;
+    opacity: 0;
+  }
+
+  .conversation-skin-feedback-dot-two {
+    -webkit-animation: dot 1.0s infinite;
+    -moz-animation: dot 1.0s infinite;
+    animation: dot 1.0s infinite;
+    -webkit-animation-delay: 0.2s;
+    -moz-animation-delay: 0.2s;
+    animation-delay: 0.2s;
+    opacity: 0;
+  }
+
+  .conversation-skin-feedback-dot-three {
+    -webkit-animation: dot 1.0s infinite;
+    -moz-animation: dot 1.0s infinite;
+    animation: dot 1.0s infinite;
+    -webkit-animation-delay: 0.4s;
+    -moz-animation-delay: 0.4s;
+    animation-delay: 0.4s;
+    opacity: 0;
+  }
+
+  .conversation-skin-oppia-feedback.ng-enter {
+    opacity: 0;
+    -webkit-transition: all .5s;
+    transition: all .5s;
+  }
+  .conversation-skin-oppia-feedback.ng-enter.ng-enter-active {
+    opacity: 1;
+  }
 </style>

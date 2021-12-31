@@ -21,6 +21,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { ContextService } from 'services/context.service';
 import { MetaTagCustomizationService } from 'services/contextual/meta-tag-customization.service';
+import { UrlService } from 'services/contextual/url.service';
 import { KeyboardShortcutService } from 'services/keyboard-shortcut.service';
 import { PageTitleService } from 'services/page-title.service';
 
@@ -31,13 +32,16 @@ require('interactions/interactionsRequires.ts');
   templateUrl: './exploration-player-page.component.html'
 })
 export class ExplorationPlayerPageComponent {
+  pageIsIframed: boolean = false;
+
   constructor(
     private contextService: ContextService,
     private keyboardShortcutService: KeyboardShortcutService,
     private metaTagCustomizationService: MetaTagCustomizationService,
     private pageTitleService: PageTitleService,
     private readOnlyExplorationBackendApiService:
-    ReadOnlyExplorationBackendApiService
+    ReadOnlyExplorationBackendApiService,
+    private urlService: UrlService
   ) {}
 
   ngOnInit(): void {
@@ -71,6 +75,7 @@ export class ExplorationPlayerPageComponent {
       ]);
     });
 
+    this.pageIsIframed = this.urlService.isIframed();
     this.keyboardShortcutService.bindExplorationPlayerShortcuts();
   }
 }
