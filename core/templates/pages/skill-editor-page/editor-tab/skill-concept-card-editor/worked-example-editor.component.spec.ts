@@ -19,13 +19,18 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ChangeDetectorRef, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
 import { SkillUpdateService } from 'domain/skill/skill-update.service';
+import { Skill } from 'domain/skill/SkillObjectFactory';
+import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
 import { WorkedExampleEditorComponent } from './worked-example-editor.component';
 
 describe('Worked example editor component', () => {
   let component: WorkedExampleEditorComponent;
   let fixture: ComponentFixture<WorkedExampleEditorComponent>;
+  let skillEditorStateService: SkillEditorStateService;
   let skillUpdateService: SkillUpdateService;
+  let sampleSkill: Skill;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -35,6 +40,7 @@ describe('Worked example editor component', () => {
       ],
       providers: [
         ChangeDetectorRef,
+        SkillEditorStateService,
         SkillUpdateService
       ],
       schemas: [NO_ERRORS_SCHEMA]
@@ -44,7 +50,13 @@ describe('Worked example editor component', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(WorkedExampleEditorComponent);
     component = fixture.componentInstance;
+    skillEditorStateService = TestBed.inject(SkillEditorStateService);
     skillUpdateService = TestBed.inject(SkillUpdateService);
+
+    sampleSkill = new Skill(
+      'id1', 'description', [], [], {} as ConceptCard, 'en',
+      1, 0, 'id1', false, []);
+    spyOn(skillEditorStateService, 'getSkill').and.returnValue(sampleSkill);
 
     component.isEditable = true;
     component.index = 2;
@@ -122,8 +134,10 @@ describe('Worked example editor component', () => {
     component.saveWorkedExample(true);
 
     expect(skillUpdateSpy).toHaveBeenCalledWith(
-      undefined, 2, 'worked example question 1', 'worked example explanation 1'
-    );
+      sampleSkill,
+      2,
+      'worked example question 1',
+      'worked example explanation 1');
   });
 
   it('should save worked example when clicking on save button', () => {
@@ -133,8 +147,10 @@ describe('Worked example editor component', () => {
     component.saveWorkedExample(false);
 
     expect(skillUpdateSpy).toHaveBeenCalledWith(
-      undefined, 2, 'worked example question 1', 'worked example explanation 1'
-    );
+      sampleSkill,
+      2,
+      'worked example question 1',
+      'worked example explanation 1');
   });
 
   it('should get schema', () => {
