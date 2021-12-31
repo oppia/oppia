@@ -17,6 +17,7 @@
  */
 
 import { EventEmitter } from '@angular/core';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
@@ -25,7 +26,7 @@ describe('QuestionEditorComponent', () => {
   let ctrl = null;
   let $rootScope = null;
   let $scope = null;
-  let $uibModal = null;
+  var ngbModal: NgbModal;
   let $q = null;
 
   let QuestionObjectFactory: QuestionObjectFactory;
@@ -37,12 +38,23 @@ describe('QuestionEditorComponent', () => {
   let question = null;
 
   beforeEach(angular.mock.module('oppia'));
+
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
+
   importAllAngularServices();
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
-    $uibModal = $injector.get('$uibModal');
+    ngbModal = $injector.get('NgbModal');
     $q = $injector.get('$q');
 
     QuestionObjectFactory = $injector.get('QuestionObjectFactory');
@@ -371,9 +383,9 @@ describe('QuestionEditorComponent', () => {
 
   it('should show mark all audio needing update modal and mark all unflagged' +
     ' voiceovers and translations as needing update', () => {
-    spyOn($uibModal, 'open').and.returnValue({
+    spyOn(ngbModal, 'open').and.returnValue({
       result: $q.resolve()
-    });
+    } as NgbModalRef);
 
     expect(
       ctrl.questionStateData.recordedVoiceovers
