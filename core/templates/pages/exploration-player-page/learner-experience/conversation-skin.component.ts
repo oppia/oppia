@@ -964,7 +964,7 @@ export class ConversationSkinComponent {
             if (refresherExplorationId) {
               // TODO(bhenning): Add tests to verify the event is
               // properly recorded.
-              let confirmRedirection = function() {
+              let confirmRedirection = () => {
                 this.redirectToRefresherExplorationConfirmed = true;
                 this._recordLeaveForRefresherExp(refresherExplorationId);
               };
