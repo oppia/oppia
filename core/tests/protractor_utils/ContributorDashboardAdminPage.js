@@ -80,9 +80,9 @@ var ContributorDashboardAdminPage = function() {
     await action.click('Submit assign reviewer button', submitButton);
 
     await waitFor.textToBePresentInElement(
-      statusMessage, 'Successfully added', (
-        'Status message for assigning ' + category + ' reviewer takes ' +
-        'too long to appear'));
+      statusMessage, 'Success', (
+        'Status message for adding contribution rights takes too long to' +
+        ' appear'));
   };
 
   var _getUserContributionRightsElement = async function(username, category) {

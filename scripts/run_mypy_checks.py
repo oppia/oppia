@@ -25,7 +25,6 @@ import site
 import subprocess
 import sys
 
-from core import python_utils
 from scripts import common
 from scripts import install_third_party_libs
 
@@ -34,6 +33,7 @@ EXCLUDED_DIRECTORIES = [
     'proto_files/',
     'scripts/linters/test_files/',
     'third_party/',
+    'venv/'
 ]
 
 # List of files who should be type-annotated but are not.
@@ -51,8 +51,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/app_feedback_report_validators_test.py',
     'core/domain/audit_validators.py',
     'core/domain/audit_validators_test.py',
-    'core/domain/auth_domain.py',
-    'core/domain/auth_domain_test.py',
     'core/domain/auth_jobs_one_off.py',
     'core/domain/auth_jobs_one_off_test.py',
     'core/domain/auth_services.py',
@@ -63,25 +61,19 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/base_model_validators_test.py',
     'core/domain/beam_job_validators.py',
     'core/domain/beam_job_validators_test.py',
-    'core/domain/blog_domain.py',
-    'core/domain/blog_domain_test.py',
     'core/domain/blog_services.py',
     'core/domain/blog_services_test.py',
     'core/domain/blog_validators.py',
     'core/domain/blog_validators_test.py',
-    'core/domain/caching_domain.py',
     'core/domain/caching_services.py',
     'core/domain/caching_services_test.py',
     'core/domain/calculation_registry.py',
     'core/domain/calculation_registry_test.py',
     'core/domain/change_domain.py',
-    'core/domain/classifier_domain.py',
-    'core/domain/classifier_domain_test.py',
     'core/domain/classifier_services.py',
     'core/domain/classifier_services_test.py',
     'core/domain/classifier_validators.py',
     'core/domain/classifier_validators_test.py',
-    'core/domain/classroom_domain.py',
     'core/domain/classroom_services.py',
     'core/domain/classroom_services_test.py',
     'core/domain/collection_domain.py',
@@ -127,8 +119,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/exploration_validators_test.py',
     'core/domain/expression_parser.py',
     'core/domain/expression_parser_test.py',
-    'core/domain/feedback_domain.py',
-    'core/domain/feedback_domain_test.py',
     'core/domain/feedback_jobs_one_off.py',
     'core/domain/feedback_jobs_one_off_test.py',
     'core/domain/feedback_services.py',
@@ -147,8 +137,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/image_services_test.py',
     'core/domain/image_validation_services.py',
     'core/domain/image_validation_services_test.py',
-    'core/domain/improvements_domain.py',
-    'core/domain/improvements_domain_test.py',
     'core/domain/improvements_services.py',
     'core/domain/improvements_services_test.py',
     'core/domain/improvements_validators.py',
@@ -169,8 +157,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/moderator_services_test.py',
     'core/domain/object_registry.py',
     'core/domain/object_registry_test.py',
-    'core/domain/opportunity_domain.py',
-    'core/domain/opportunity_domain_test.py',
     'core/domain/opportunity_jobs_one_off.py',
     'core/domain/opportunity_jobs_one_off_test.py',
     'core/domain/opportunity_services.py',
@@ -208,8 +194,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/recommendations_services_test.py',
     'core/domain/recommendations_validators.py',
     'core/domain/recommendations_validators_test.py',
-    'core/domain/rights_domain.py',
-    'core/domain/rights_domain_test.py',
     'core/domain/rights_manager.py',
     'core/domain/rights_manager_test.py',
     'core/domain/role_services.py',
@@ -271,7 +255,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/suggestion_validators_test.py',
     'core/domain/summary_services.py',
     'core/domain/summary_services_test.py',
-    'core/domain/takeout_domain.py',
     'core/domain/takeout_service.py',
     'core/domain/takeout_service_test.py',
     'core/domain/taskqueue_services.py',
@@ -288,8 +271,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/topic_validators_test.py',
     'core/domain/translatable_object_registry.py',
     'core/domain/translatable_object_registry_test.py',
-    'core/domain/translation_domain.py',
-    'core/domain/translation_domain_test.py',
     'core/domain/translation_fetchers.py',
     'core/domain/translation_fetchers_test.py',
     'core/domain/translation_services.py',
@@ -310,14 +291,10 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/user_services_test.py',
     'core/domain/user_validators.py',
     'core/domain/user_validators_test.py',
-    'core/domain/value_generators_domain.py',
-    'core/domain/value_generators_domain_test.py',
     'core/domain/visualization_registry.py',
     'core/domain/visualization_registry_test.py',
     'core/domain/voiceover_services.py',
     'core/domain/voiceover_services_test.py',
-    'core/domain/wipeout_domain.py',
-    'core/domain/wipeout_domain_test.py',
     'core/domain/wipeout_jobs_one_off.py',
     'core/domain/wipeout_jobs_one_off_test.py',
     'core/domain/wipeout_service.py',
@@ -477,18 +454,16 @@ def main(args=None):
     install_third_party_libraries(parsed_args.skip_install)
     common.fix_third_party_imports()
 
-    python_utils.PRINT('Installing Mypy and stubs for third party libraries.')
+    print('Installing Mypy and stubs for third party libraries.')
     return_code, mypy_exec_path = install_mypy_prerequisites(
         parsed_args.install_globally)
     if return_code != 0:
-        python_utils.PRINT(
-            'Cannot install Mypy and stubs for third party libraries.')
+        print('Cannot install Mypy and stubs for third party libraries.')
         sys.exit(1)
 
-    python_utils.PRINT(
-        'Installed Mypy and stubs for third party libraries.')
+    print('Installed Mypy and stubs for third party libraries.')
 
-    python_utils.PRINT('Starting Mypy type checks.')
+    print('Starting Mypy type checks.')
     cmd = get_mypy_cmd(
         parsed_args.files, mypy_exec_path, parsed_args.install_globally)
 
@@ -502,12 +477,12 @@ def main(args=None):
     stdout, stderr = process.communicate()
     # Standard and error output is in bytes, we need to decode the line to
     # print it.
-    python_utils.PRINT(stdout.decode('utf-8'))
-    python_utils.PRINT(stderr.decode('utf-8'))
+    print(stdout.decode('utf-8'))
+    print(stderr.decode('utf-8'))
     if process.returncode == 0:
-        python_utils.PRINT('Mypy type checks successful.')
+        print('Mypy type checks successful.')
     else:
-        python_utils.PRINT(
+        print(
             'Mypy type checks unsuccessful. Please fix the errors. '
             'For more information, visit: '
             'https://github.com/oppia/oppia/wiki/Backend-Type-Annotations')

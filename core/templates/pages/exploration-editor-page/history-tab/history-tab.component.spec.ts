@@ -35,7 +35,7 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
-import { TestBed } from '@angular/core/testing';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { ExplorationDiffService } from '../services/exploration-diff.service';
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { CsrfTokenService } from 'services/csrf-token.service';
@@ -44,19 +44,26 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { ReadOnlyExplorationBackendApiService } from
   'domain/exploration/read-only-exploration-backend-api.service';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+
+class MockNgbModalRef {
+  componentInstance: {
+    version: null;
+  };
+}
 
 describe('History tab component', function() {
   var ctrl = null;
-  var $httpBackend = null;
   var $q = null;
   var $rootScope = null;
   var $scope = null;
-  var $uibModal = null;
+  let ngbModal: NgbModal;
   var compareVersionsService = null;
   var editabilityService = null;
   var csrfTokenService = null;
   var dateTimeFormatService = null;
   var windowRef = null;
+  var historyTabBackendApiService = null;
 
   var mockRefreshVersionHistoryEmitter = new EventEmitter();
 
@@ -128,16 +135,22 @@ describe('History tab component', function() {
     $provide.value(
       'ReadOnlyExplorationBackendApiService',
       TestBed.get(ReadOnlyExplorationBackendApiService));
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $httpBackend = $injector.get('$httpBackend');
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
-    $uibModal = $injector.get('$uibModal');
+    ngbModal = $injector.get('NgbModal');
     compareVersionsService = $injector.get('CompareVersionsService');
     csrfTokenService = $injector.get('CsrfTokenService');
-
+    historyTabBackendApiService = $injector.get('HistoryTabBackendApiService');
     spyOn(csrfTokenService, 'getTokenAsync')
       .and.returnValue($q.resolve('sample-csrf-token'));
     spyOn(dateTimeFormatService, 'getLocaleDateTimeHourString')
@@ -145,6 +158,7 @@ describe('History tab component', function() {
 
     $scope = $rootScope.$new();
     ctrl = $componentController('historyTab', {
+      NgbModal: ngbModal,
       $scope: $scope,
       DateTimeFormatService: dateTimeFormatService,
       EditabilityService: editabilityService,
@@ -173,20 +187,19 @@ describe('History tab component', function() {
 
   it('should refresh version history when refreshVersionHistory flag is' +
     ' broadcasted and force refresh is true', function() {
-    $httpBackend.expect('GET', '/createhandler/snapshots/exp1').respond({
-      snapshots: snapshots
-    });
+    spyOn(
+      historyTabBackendApiService, 'getData')
+      .and.returnValue($q.resolve({
+        snapshots: snapshots
+      }));
+
     ctrl.refreshVersionHistory();
-    $scope.$apply();
-    $httpBackend.flush();
+    $rootScope.$apply();
 
     var data = {
       forceRefresh: true
     };
 
-    $httpBackend.expect('GET', '/createhandler/snapshots/exp1').respond({
-      snapshots: snapshots
-    });
     mockRefreshVersionHistoryEmitter.emit(data);
     $scope.$apply();
 
@@ -196,12 +209,14 @@ describe('History tab component', function() {
   });
 
   it('should compare selected versions successfully', function() {
-    $httpBackend.expect('GET', '/createhandler/snapshots/exp1').respond({
-      snapshots: snapshots
-    });
+    spyOn(
+      historyTabBackendApiService, 'getData')
+      .and.returnValue($q.resolve({
+        snapshots: snapshots
+      }));
+
     ctrl.refreshVersionHistory();
     $scope.$apply();
-    $httpBackend.flush();
 
     ctrl.changeSelectedVersions({
       committerId: 'committer_3',
@@ -234,7 +249,7 @@ describe('History tab component', function() {
         ' This is the commit message 2');
   });
 
-  it('should open a new tab for download exploration with version', function() {
+  it('should open a new tab for download exploration with version', () => {
     spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
       open: jasmine.createSpy('open', () => {})
     });
@@ -244,31 +259,43 @@ describe('History tab component', function() {
       '/createhandler/download/exp1?v=1', '&output_format=zip');
   });
 
-  it('should open revert exploration modal', function() {
-    spyOn($uibModal, 'open').and.callThrough();
+  it('should open revert exploration modal', () => {
+    spyOn(ngbModal, 'open').and.returnValue(
+      {
+        componentInstance: new MockNgbModalRef(),
+        result: Promise.resolve()
+      } as NgbModalRef
+    );
 
     ctrl.showRevertExplorationModal();
 
-    expect($uibModal.open).toHaveBeenCalled();
+    expect(ngbModal.open).toHaveBeenCalled();
   });
 
-  it('should reload page when closing revert exploration modal', function() {
-    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
-      location: {
-        reload: jasmine.createSpy('reload', () => {})
-      }
-    });
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.resolve(1)
-    });
+  it('should reload page when closing revert exploration modal',
+    fakeAsync(() => {
+      spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
+        location: {
+          reload: jasmine.createSpy('reload', () => {})
+        }
+      });
+      spyOn(ngbModal, 'open').and.returnValue(
+        {
+          componentInstance: new MockNgbModalRef(),
+          result: Promise.resolve(1)
+        } as NgbModalRef
+      );
 
-    $httpBackend.expectPOST('/createhandler/revert/exp1').respond(200);
-    ctrl.showRevertExplorationModal(1);
-    $scope.$apply();
-    $httpBackend.flush();
+      var spyObj = spyOn(
+        historyTabBackendApiService, 'postData'
+      ).and.returnValue(Promise.resolve());
 
-    expect(windowRef.nativeWindow.location.reload).toHaveBeenCalled();
-  });
+      ctrl.showRevertExplorationModal(1);
+      tick();
+      $rootScope.$apply();
+      expect(spyObj).toHaveBeenCalled();
+      expect(windowRef.nativeWindow.location.reload).toHaveBeenCalled();
+    }));
 
   it('should not reload page when dismissing revert exploration modal',
     function() {
@@ -277,9 +304,12 @@ describe('History tab component', function() {
           reload: jasmine.createSpy('reload', () => {})
         }
       });
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.reject()
-      });
+      spyOn(ngbModal, 'open').and.returnValue(
+        {
+          componentInstance: new MockNgbModalRef(),
+          result: Promise.reject()
+        } as NgbModalRef
+      );
 
       ctrl.showRevertExplorationModal(1);
       $scope.$apply();

@@ -109,7 +109,6 @@ var ExplorationEditorSettingsTab = function() {
       closePreviewSummaryButton);
     await waitFor.invisibilityOf(
       explorationSummaryTile, 'Summary Tile takes too long to disappear');
-    expect(await explorationSummaryTile.isPresent()).toBeFalsy();
     await action.click('Neutral element', neutralElement);
   };
 
@@ -153,7 +152,6 @@ var ExplorationEditorSettingsTab = function() {
   };
 
   this.setTitle = async function(title) {
-    await action.click('Neutral element', neutralElement);
     await action.waitForAutosave();
     await general.scrollToTop();
     await action.clear('Exploration Title Input', explorationTitleInput);

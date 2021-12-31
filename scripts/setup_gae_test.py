@@ -18,11 +18,11 @@
 
 from __future__ import annotations
 
+import builtins
 import os
 import tarfile
 import urllib.request as urlrequest
 
-from core import python_utils
 from core.tests import test_utils
 
 from . import common
@@ -68,7 +68,7 @@ class SetupGaeTests(test_utils.GenericTestBase):
         self.walk_swap = self.swap(os, 'walk', mock_walk)
         self.remove_swap = self.swap(os, 'remove', mock_remove)
         self.makedirs_swap = self.swap(os, 'makedirs', mock_makedirs)
-        self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
+        self.print_swap = self.swap(builtins, 'print', mock_print)
         self.url_retrieve_swap = self.swap(
             urlrequest, 'urlretrieve', mock_url_retrieve)
 

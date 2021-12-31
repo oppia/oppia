@@ -51,8 +51,11 @@ require(
   'domain/topics_and_skills_dashboard/' +
   'topics-and-skills-dashboard-backend-api.service.ts');
 require('base-components/loading-message.component.ts');
+require('services/ngb-modal.service.ts');
 
 import { Subscription } from 'rxjs';
+import { TopicSavePendingChangesComponent } from
+  '../modal-templates/topic-save-pending-changes-modal.component';
 
 // TODO(#9186): Change variable name to 'constants' once this file
 // is migrated to Angular.
@@ -68,7 +71,7 @@ angular.module('oppia').directive('topicEditorTab', [
       controller: [
         '$rootScope', '$scope', '$uibModal', 'ContextService',
         'EntityCreationService', 'FocusManagerService',
-        'ImageUploadHelperService',
+        'ImageUploadHelperService', 'NgbModal',
         'PageTitleService', 'StoryCreationService',
         'TopicEditorRoutingService', 'TopicEditorStateService',
         'TopicUpdateService', 'TopicsAndSkillsDashboardBackendApiService',
@@ -77,10 +80,11 @@ angular.module('oppia').directive('topicEditorTab', [
         'MAX_CHARS_IN_META_TAG_CONTENT',
         'MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB',
         'MAX_CHARS_IN_TOPIC_DESCRIPTION', 'MAX_CHARS_IN_TOPIC_NAME',
+        'MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB',
         function(
             $rootScope, $scope, $uibModal, ContextService,
             EntityCreationService, FocusManagerService,
-            ImageUploadHelperService,
+            ImageUploadHelperService, NgbModal,
             PageTitleService, StoryCreationService,
             TopicEditorRoutingService, TopicEditorStateService,
             TopicUpdateService, TopicsAndSkillsDashboardBackendApiService,
@@ -88,7 +92,8 @@ angular.module('oppia').directive('topicEditorTab', [
             WindowDimensionsService, WindowRef,
             MAX_CHARS_IN_META_TAG_CONTENT,
             MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB,
-            MAX_CHARS_IN_TOPIC_DESCRIPTION, MAX_CHARS_IN_TOPIC_NAME) {
+            MAX_CHARS_IN_TOPIC_DESCRIPTION, MAX_CHARS_IN_TOPIC_NAME,
+            MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           $scope.MAX_CHARS_IN_TOPIC_URL_FRAGMENT = (
@@ -99,6 +104,8 @@ angular.module('oppia').directive('topicEditorTab', [
           $scope.MAX_CHARS_IN_META_TAG_CONTENT = MAX_CHARS_IN_META_TAG_CONTENT;
           $scope.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB = (
             MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB);
+          $scope.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB = (
+            MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB);
           ctrl.initEditor = function() {
             $scope.skillCreationIsAllowed = (
               TopicEditorStateService.isSkillCreationAllowed());
@@ -199,12 +206,8 @@ angular.module('oppia').directive('topicEditorTab', [
 
           $scope.createCanonicalStory = function() {
             if (UndoRedoService.getChangeCount() > 0) {
-              $uibModal.open({
-                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/pages/topic-editor-page/modal-templates/' +
-                  'topic-save-pending-changes-modal.template.html'),
-                backdrop: true,
-                controller: 'ConfirmOrCancelModalController'
+              NgbModal.open(TopicSavePendingChangesComponent, {
+                backdrop: true
               }).result.then(function() {}, function() {
                 // Note to developers:
                 // This callback is triggered when the Cancel button is clicked.
@@ -217,12 +220,8 @@ angular.module('oppia').directive('topicEditorTab', [
 
           $scope.createSkill = function() {
             if (UndoRedoService.getChangeCount() > 0) {
-              $uibModal.open({
-                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/pages/topic-editor-page/modal-templates/' +
-                    'topic-save-pending-changes-modal.template.html'),
-                backdrop: true,
-                controller: 'ConfirmOrCancelModalController'
+              NgbModal.open(TopicSavePendingChangesComponent, {
+                backdrop: true
               }).result.then(function() {}, function() {
                 // Note to developers:
                 // This callback is triggered when the Cancel button is clicked.
@@ -288,6 +287,7 @@ angular.module('oppia').directive('topicEditorTab', [
             }
             TopicUpdateService.setTopicThumbnailFilename(
               $scope.topic, newThumbnailFilename);
+            $scope.$applyAsync();
           };
 
           $scope.updateTopicThumbnailBgColor = function(newThumbnailBgColor) {
