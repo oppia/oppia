@@ -35,6 +35,7 @@ import { SkillDescriptionEditorComponent } from './editor-tab/skill-description-
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
 import { DeleteWorkedExampleComponent } from './modal-templates/delete-worked-example-modal.component';
 import { AddWorkedExampleModalComponent } from './modal-templates/add-worked-example.component';
+import { SkillRubricsEditorComponent } from './editor-tab/skill-rubrics-editor/skill-rubrics-editor.component';
 import { AddMisconceptionModalComponent } from './modal-templates/add-misconception-modal.component';
 
 @NgModule({
@@ -53,6 +54,7 @@ import { AddMisconceptionModalComponent } from './modal-templates/add-misconcept
     SkillDescriptionEditorComponent,
     AddWorkedExampleModalComponent,
     DeleteWorkedExampleComponent,
+    SkillRubricsEditorComponent,
     AddMisconceptionModalComponent
   ],
   entryComponents: [
@@ -62,6 +64,7 @@ import { AddMisconceptionModalComponent } from './modal-templates/add-misconcept
     SkillDescriptionEditorComponent,
     AddWorkedExampleModalComponent,
     DeleteWorkedExampleComponent,
+    SkillRubricsEditorComponent,
     AddMisconceptionModalComponent
   ],
   providers: [

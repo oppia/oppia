@@ -87,16 +87,18 @@ describe('Add Worked Example Modal Component', () => {
   });
 
   it('should update tmpWorkedExampleQuestionHtml', () => {
-    let ques = 'ques';
+    component.tmpWorkedExampleQuestionHtml = 'ques';
 
+    let ques = 'new ques';
     component.updateLocalQues(ques);
 
     expect(component.tmpWorkedExampleQuestionHtml).toEqual(ques);
   });
 
   it('should update tmpWorkedExampleExplanationHtml', () => {
-    let exp = 'exp';
+    component.tmpWorkedExampleExplanationHtml = 'exp';
 
+    let exp = 'new exp';
     component.updateLocalExp(exp);
 
     expect(component.tmpWorkedExampleExplanationHtml).toEqual(exp);
