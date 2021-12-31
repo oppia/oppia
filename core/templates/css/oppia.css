@@ -4867,8 +4867,7 @@ div.oppia-issues-learner-action {
   width: 30%;
 }
 
-.conversation-skin-oppia-avatar, .conversation-skin-learner-answer-container,
-.conversation-skin-user-avatar {
+.conversation-skin-oppia-avatar, .conversation-skin-user-avatar {
   height: 36px;
   position: absolute;
   top: 0;
