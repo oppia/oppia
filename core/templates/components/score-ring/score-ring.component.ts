@@ -35,10 +35,9 @@ export class ScoreRingComponent implements AfterViewInit, OnChanges {
   COLORS_FOR_PASS_FAIL_MODE = QuestionPlayerConstants.COLORS_FOR_PASS_FAIL_MODE;
 
   setScore(percent: number): void {
-    let that = this;
-    setTimeout(function() {
-      const offset = that.circumference - percent / 100 * that.circumference;
-      that.circle.style.strokeDashoffset = offset.toString();
+    setTimeout(() => {
+      const offset = this.circumference - percent / 100 * this.circumference;
+      this.circle.style.strokeDashoffset = offset.toString();
     }, 2000);
   }
 
