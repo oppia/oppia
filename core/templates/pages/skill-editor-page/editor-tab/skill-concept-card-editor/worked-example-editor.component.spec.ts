@@ -92,7 +92,11 @@ describe('Worked example editor component', () => {
   });
 
   it('should close question editor when clicking on cancel button', () => {
+    expect(component.questionEditorIsOpen).toBe(false);
+
     component.openQuestionEditor();
+
+    expect(component.questionEditorIsOpen).toBe(true);
 
     component.cancelEditQuestion();
 
@@ -100,7 +104,11 @@ describe('Worked example editor component', () => {
   });
 
   it('should close explanation editor when clicking on cancel button', () => {
+    expect(component.explanationEditorIsOpen).toBe(false);
+
     component.openExplanationEditor();
+
+    expect(component.explanationEditorIsOpen).toBe(true);
 
     component.cancelEditExplanation();
 
@@ -113,7 +121,8 @@ describe('Worked example editor component', () => {
 
     component.saveWorkedExample(true);
 
-    expect(skillUpdateSpy).toHaveBeenCalled();
+    expect(skillUpdateSpy).toHaveBeenCalledWith(
+      undefined, 2, 'worked example question 1', 'worked example explanation 1');
   });
 
   it('should save worked example when clicking on save button', () => {
@@ -122,7 +131,8 @@ describe('Worked example editor component', () => {
 
     component.saveWorkedExample(false);
 
-    expect(skillUpdateSpy).toHaveBeenCalled();
+    expect(skillUpdateSpy).toHaveBeenCalledWith(
+      undefined, 2, 'worked example question 1', 'worked example explanation 1');
   });
 
   it('should get schema', () => {
