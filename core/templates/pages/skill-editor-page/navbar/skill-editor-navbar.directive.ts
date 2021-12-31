@@ -16,6 +16,8 @@
  * @fileoverview Directive for the navbar of the skill editor.
  */
 
+import { SavePendingChangesModalComponent } from '../modal-templates/save-pending-changes-modal.component';
+
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
@@ -29,6 +31,7 @@ require('pages/skill-editor-page/services/skill-editor-routing.service.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 require('services/alerts.service.ts');
 require('services/contextual/url.service.ts');
+require('services/ngb-modal.service.ts');
 
 require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
 
@@ -41,11 +44,11 @@ angular.module('oppia').directive('skillEditorNavbar', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/skill-editor-page/navbar/skill-editor-navbar.directive.html'),
       controller: [
-        '$rootScope', '$scope', '$uibModal', 'AlertsService',
+        '$rootScope', '$scope', '$uibModal', 'AlertsService', 'NgbModal',
         'SkillEditorRoutingService', 'SkillEditorStateService',
         'UndoRedoService', 'UrlService',
         function(
-            $rootScope, $scope, $uibModal, AlertsService,
+            $rootScope, $scope, $uibModal, AlertsService, NgbModal,
             SkillEditorRoutingService, SkillEditorStateService,
             UndoRedoService, UrlService) {
           var ctrl = this;
@@ -125,12 +128,8 @@ angular.module('oppia').directive('skillEditorNavbar', [
             // discarded, the misconceptions won't be saved, but there will be
             // some questions with these now non-existent misconceptions.
             if (UndoRedoService.getChangeCount() > 0) {
-              $uibModal.open({
-                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/pages/skill-editor-page/modal-templates/' +
-                    'save-pending-changes-modal.directive.html'),
+              NgbModal.open(SavePendingChangesModalComponent, {
                 backdrop: true,
-                controller: 'ConfirmOrCancelModalController'
               }).result.then(null, function() {
                 // Note to developers:
                 // This callback is triggered when the Cancel button is clicked.
