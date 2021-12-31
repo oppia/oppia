@@ -401,7 +401,7 @@ describe('Library Page Component', () => {
     // This throws "Type '{ textContent: string; }' is missing the following
     // properties from type 'HTMLElement': accessKey, accessKeyLabel,
     // autocapitalize, dir, and 274 more." We need to suppress this error
-    // because only textContent is required for testing, and the it is
+    // because only textContent is required for testing, and it is
     // unnecessary to provide the remaining properties.
     // @ts-expect-error
     let button: HTMLElement = {
@@ -421,15 +421,22 @@ describe('Library Page Component', () => {
       }
     };
 
-    componentInstance.toggleButtonText(container, button);
+    const containsMethodSpy =
+      spyOn(container.classList, 'contains').and.returnValue(false);
 
+    componentInstance.toggleButtonText(container, button);
     expect(button.textContent).toBe('See More');
+
+    containsMethodSpy.and.returnValue(true);
+
+    componentInstance.toggleButtonText(container, button);
+    expect(button.textContent).toBe('Collapse Section');
   });
 
   it('should toggle the corresponding container\'s max-height', () => {
     spyOn(componentInstance, 'getCorrespondingContainerIDForButtonClick')
       .and.returnValue('#dummy-container-id');
-    let element = {
+    let dummyContainerElement = {
       classList: {
         length: 2,
         contains: (): boolean => {
@@ -440,7 +447,7 @@ describe('Library Page Component', () => {
         }
       }
     };
-    spyOn(element.classList, 'toggle').and.returnValue(false);
+    spyOn(dummyContainerElement.classList, 'toggle').and.returnValue(false);
     // This throws "Argument of type '{ classList: { length: number; contains:
     // () => boolean; toggle: () => boolean; }; }' is not assignable to
     // parameter of type 'Element'.
@@ -452,7 +459,7 @@ describe('Library Page Component', () => {
     // in the element object are required for testing and it is unnecessary
     // to provide the rest.
     // @ts-expect-error
-    spyOn(document, 'querySelector').and.returnValue(element);
+    spyOn(document, 'querySelector').and.returnValue(dummyContainerElement);
     let click: Event = {
       target: {
         // This throws "Type '{ id: string; textContent: string; }' is not
@@ -471,7 +478,8 @@ describe('Library Page Component', () => {
     expect(componentInstance.getCorrespondingContainerIDForButtonClick)
       .toHaveBeenCalledWith('height-toggle-btn-6');
     expect(document.querySelector).toHaveBeenCalledWith('#dummy-container-id');
-    expect(element.classList.toggle).toHaveBeenCalledWith('limit-cards-shown');
+    expect(dummyContainerElement.classList.toggle)
+      .toHaveBeenCalledWith('limit-cards-shown');
   });
 
   it('should show full results page when full results url is available',

@@ -284,6 +284,12 @@ describe('Exploration Summary Tile Component', () => {
 
     expect(urlPathSpy).toHaveBeenCalled();
     expect(component.mobileCardToBeShown).toBe(true);
+
+    urlPathSpy.and.returnValue('/not-community-library');
+
+    component.checkIfMobileCardToBeShown();
+
+    expect(component.mobileCardToBeShown).toBe(false);
   });
 
   it('should set the hover state to true', () => {

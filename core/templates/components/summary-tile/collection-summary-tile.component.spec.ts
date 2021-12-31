@@ -190,6 +190,12 @@ describe('Collection Summary Tile Component', () => {
     expect(urlServiceSpy).toHaveBeenCalled();
     expect(windowWidthSpy).toHaveBeenCalled();
     expect(component.mobileCardToBeShown).toBe(true);
+
+    urlServiceSpy.and.returnValue('/not-community-library');
+
+    component.checkIfMobileCardToBeShown();
+
+    expect(component.mobileCardToBeShown).toBe(false);
   });
 
   it('should get the last updated Date & time', () => {
