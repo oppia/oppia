@@ -269,10 +269,10 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
                 {
                     'tab_contents-with-value': [{
                         'content': (
-                            '<oppia-noninteractive-collapsible content-with-value='
-                            '"&amp;quot;&amp;lt;p&amp;gt;Hello&amp;lt;/p&amp;gt;&amp;'
-                            'quot;" heading-with-value="&amp;quot;SubCollapsible&amp;'
-                            'quot;"></oppia-noninteractive-collapsible><p>&nbsp;</p>'
+                            '<oppia-noninteractive-collapsible content-with-value=' # pylint: disable=line-too-long
+                            '"&amp;quot;&amp;lt;p&amp;gt;Hello&amp;lt;/p&amp;gt;&amp;' # pylint: disable=line-too-long
+                            'quot;" heading-with-value="&amp;quot;SubCollapsible&amp;' # pylint: disable=line-too-long
+                            'quot;"></oppia-noninteractive-collapsible><p>&nbsp;</p>' # pylint: disable=line-too-long
                         ),
                         'title': 'Collapsible'
                     }]
