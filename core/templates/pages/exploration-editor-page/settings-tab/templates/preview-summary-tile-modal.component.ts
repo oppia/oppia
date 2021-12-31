@@ -37,20 +37,20 @@ export class PreviewSummaryTileModalComponent extends ConfirmOrCancelModal {
   ) {
     super(ngbActiveModal);
   }
-  getExplorationTitle(): string {
+  getExplorationTitle(): string | boolean {
     return this.explorationTitleService.displayed;
   }
 
-  getExplorationObjective(): string {
+  getExplorationObjective(): string | boolean {
     return this.explorationObjectiveService.displayed;
   }
 
-  getExplorationCategory(): string {
+  getExplorationCategory(): string | boolean {
     return this.explorationCategoryService.displayed;
   }
 
   getThumbnailIconUrl(): string {
-    let category: string = this.explorationCategoryService.displayed;
+    let category = this.explorationCategoryService.displayed as string;
     let allCategoryList: string[] = [...AppConstants.ALL_CATEGORIES];
     if (allCategoryList.indexOf(category) === -1) {
       category = AppConstants.DEFAULT_CATEGORY_ICON;
@@ -59,7 +59,7 @@ export class PreviewSummaryTileModalComponent extends ConfirmOrCancelModal {
   }
 
   getThumbnailBgColor(): string {
-    let category = this.explorationCategoryService.displayed;
+    let category = this.explorationCategoryService.displayed as string;
     let color = null;
     if (!AppConstants.CATEGORIES_TO_COLORS.hasOwnProperty(category)) {
       color = AppConstants.DEFAULT_COLOR;
