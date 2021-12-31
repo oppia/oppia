@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview marking audio as needing update.
+ * @fileoverview Modal for marking audio as needing update.
  */
 
 import { Component } from '@angular/core';
