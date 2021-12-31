@@ -282,12 +282,6 @@ export class ConversationSkinComponent {
     }
 
     this.updateSubmitButtonVisibility();
-    this.directiveSubscriptions.add(
-      this.playerPositionService.displayedCardIndexChangedEventEmitter
-        .subscribe(() => {
-          this.updateSubmitButtonVisibility();
-        })
-    );
   }
 
   constructor(
