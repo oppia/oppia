@@ -82,7 +82,6 @@ export class ScoreRingComponent implements AfterViewInit, OnChanges {
     // setting the transition-duration value to '5s', else the ring can be seen
     // animating down to the starting position.
     // clientHeight property triggers a reflow.
-
     this.circle.clientHeight;
     this.circle.style.transitionDuration = '5s';
     this.setScore(this.score);
