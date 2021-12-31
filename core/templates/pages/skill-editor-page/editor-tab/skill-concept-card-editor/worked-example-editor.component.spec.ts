@@ -159,16 +159,18 @@ describe('Worked example editor component', () => {
   });
 
   it('should update tmpWorkedExampleQuestionHtml', () => {
-    let ques = 'ques';
+    component.container.workedExampleQuestionHtml = 'ques';
 
+    let ques = 'new ques';
     component.updateLocalQues(ques);
 
     expect(component.container.workedExampleQuestionHtml).toEqual(ques);
   });
 
   it('should update tmpWorkedExampleExplanationHtml', () => {
-    let exp = 'exp';
+    component.container.workedExampleExplanationHtml = 'exp';
 
+    let exp = 'new exp';
     component.updateLocalExp(exp);
 
     expect(component.container.workedExampleExplanationHtml).toEqual(exp);
