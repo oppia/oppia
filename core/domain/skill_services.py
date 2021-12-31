@@ -662,17 +662,39 @@ def apply_change_list(skill_id, change_list, committer_id):
             elif change.cmd == skill_domain.CMD_UPDATE_SKILL_CONTENTS_PROPERTY:
                 if (change.property_name ==
                         skill_domain.SKILL_CONTENTS_PROPERTY_EXPLANATION):
+                    change.new_value['image_sizes_in_bytes'] = (
+                        html_cleaner.get_image_sizes_in_bytes_from_html(
+                            change.new_value['html'],
+                            feconf.ENTITY_TYPE_SKILL,
+                            skill.id))
                     explanation = (
                         state_domain.SubtitledHtml.from_dict(change.new_value))
                     explanation.validate()
                     skill.update_explanation(explanation)
                 elif (change.property_name ==
                       skill_domain.SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES):
-                    worked_examples_list = [
-                        skill_domain.WorkedExample.from_dict(worked_example)
-                        for worked_example in change.new_value]
+                    worked_examples_list = []
+                    for worked_example in change.new_value:
+                        worked_example['question']['image_sizes_in_bytes'] = (
+                            html_cleaner.get_image_sizes_in_bytes_from_html(
+                                worked_example['question']['html'],
+                                feconf.ENTITY_TYPE_SKILL,
+                                skill.id))
+                        worked_example['explanation']['image_sizes_in_bytes'] = (
+                            html_cleaner.get_image_sizes_in_bytes_from_html(
+                                worked_example['explanation']['html'],
+                                feconf.ENTITY_TYPE_SKILL,
+                                skill.id))
+                        worked_examples_list.append(
+                            skill_domain.WorkedExample.from_dict(worked_example))
                     skill.update_worked_examples(worked_examples_list)
             elif change.cmd == skill_domain.CMD_ADD_SKILL_MISCONCEPTION:
+                change.new_misconception_dict['image_sizes_in_bytes'] = (
+                    html_cleaner.get_image_sizes_in_bytes_from_html(
+                        change.new_misconception_dict['notes'] +
+                        change.new_misconception_dict['feedback'],
+                        feconf.ENTITY_TYPE_SKILL,
+                        skill.id))
                 misconception = skill_domain.Misconception.from_dict(
                     change.new_misconception_dict)
                 skill.add_misconception(misconception)
@@ -683,8 +705,15 @@ def apply_change_list(skill_id, change_list, committer_id):
             elif change.cmd == skill_domain.CMD_DELETE_PREREQUISITE_SKILL:
                 skill.delete_prerequisite_skill(change.skill_id)
             elif change.cmd == skill_domain.CMD_UPDATE_RUBRICS:
+                change.image_sizes_in_bytes = {}
+                for explanation in change.explanations:
+                    change.image_sizes_in_bytes.update(
+                        html_cleaner.get_image_sizes_in_bytes_from_html(
+                            explanation,
+                            feconf.ENTITY_TYPE_SKILL,
+                            skill.id))
                 skill.update_rubric(
-                    change.difficulty, change.explanations)
+                    change.difficulty, change.explanations, change.image_sizes_in_bytes)
             elif (change.cmd ==
                   skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY):
                 if (change.property_name ==

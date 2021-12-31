@@ -117,7 +117,8 @@ def get_skill_from_model(skill_model):
     # Migrate the skill if it is not using the latest schema version.
     if (skill_model.skill_contents_schema_version !=
             feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION):
-        _migrate_skill_contents_to_latest_schema(versioned_skill_contents)
+        _migrate_skill_contents_to_latest_schema(
+            versioned_skill_contents, skill_model.id)
 
     if (skill_model.misconceptions_schema_version !=
             feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION):
@@ -162,7 +163,8 @@ def get_skill_by_description(description):
     return get_skill_from_model(skill_model) if skill_model else None
 
 
-def _migrate_skill_contents_to_latest_schema(versioned_skill_contents):
+def _migrate_skill_contents_to_latest_schema(
+        versioned_skill_contents, skill_id):
     """Holds the responsibility of performing a step-by-step, sequential update
     of the skill contents structure based on the schema version of the input
     skill contents dictionary. If the current skill_contents schema changes, a
@@ -174,6 +176,7 @@ def _migrate_skill_contents_to_latest_schema(versioned_skill_contents):
             - schema_version: int. The schema version for the skill_contents
                 dict.
             - skill_contents: dict. The dict comprising the skill contents.
+        skill_id. str. The ID of the skill.
 
     Raises:
         Exception. The schema version of the skill_contents is outside of what
@@ -189,7 +192,7 @@ def _migrate_skill_contents_to_latest_schema(versioned_skill_contents):
     while (skill_contents_schema_version <
            feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION):
         skill_domain.Skill.update_skill_contents_from_model(
-            versioned_skill_contents, skill_contents_schema_version)
+            versioned_skill_contents, skill_contents_schema_version, skill_id)
         skill_contents_schema_version += 1
 
 

@@ -181,7 +181,8 @@ class Misconception:
     """Domain object describing a skill misconception."""
 
     def __init__(
-            self, misconception_id, name, notes, feedback, must_be_addressed):
+            self, misconception_id, name, notes, feedback,
+            must_be_addressed, image_sizes_in_bytes):
         """Initializes a Misconception domain object.
 
         Args:
@@ -195,12 +196,15 @@ class Misconception:
                 should be an html string.
             must_be_addressed: bool. Whether the misconception should
                 necessarily be addressed in all questions linked to the skill.
+            image_sizes_in_bytes: dict. Mapping for each image filename to its
+                sizes in bytes.
         """
         self.id = misconception_id
         self.name = name
         self.notes = html_cleaner.clean(notes)
         self.feedback = html_cleaner.clean(feedback)
         self.must_be_addressed = must_be_addressed
+        self.image_sizes_in_bytes = image_sizes_in_bytes
 
     def to_dict(self):
         """Returns a dict representing this Misconception domain object.
@@ -213,7 +217,8 @@ class Misconception:
             'name': self.name,
             'notes': self.notes,
             'feedback': self.feedback,
-            'must_be_addressed': self.must_be_addressed
+            'must_be_addressed': self.must_be_addressed,
+            'image_sizes_in_bytes': self.image_sizes_in_bytes
         }
 
     @classmethod
@@ -230,7 +235,8 @@ class Misconception:
         misconception = cls(
             misconception_dict['id'], misconception_dict['name'],
             misconception_dict['notes'], misconception_dict['feedback'],
-            misconception_dict['must_be_addressed'])
+            misconception_dict['must_be_addressed'],
+            misconception_dict['image_sizes_in_bytes'])
 
         return misconception
 
@@ -288,17 +294,20 @@ class Misconception:
 class Rubric:
     """Domain object describing a skill rubric."""
 
-    def __init__(self, difficulty, explanations):
+    def __init__(self, difficulty, explanations, image_sizes_in_bytes):
         """Initializes a Rubric domain object.
 
         Args:
             difficulty: str. The question difficulty that this rubric addresses.
             explanations: list(str). The different explanations for the
                 corresponding difficulty.
+            image_sizes_in_bytes: dict. The mappings of image filename to its
+                size in bytes.
         """
         self.difficulty = difficulty
         self.explanations = [
             html_cleaner.clean(explanation) for explanation in explanations]
+        self.image_sizes_in_bytes = image_sizes_in_bytes
 
     def to_dict(self):
         """Returns a dict representing this Rubric domain object.
@@ -308,7 +317,8 @@ class Rubric:
         """
         return {
             'difficulty': self.difficulty,
-            'explanations': self.explanations
+            'explanations': self.explanations,
+            'image_sizes_in_bytes': self.image_sizes_in_bytes
         }
 
     @classmethod
@@ -322,7 +332,8 @@ class Rubric:
             Rubric. The corresponding Rubric domain object.
         """
         rubric = cls(
-            rubric_dict['difficulty'], rubric_dict['explanations'])
+            rubric_dict['difficulty'], rubric_dict['explanations'],
+            rubric_dict['image_sizes_in_bytes'])
 
         return rubric
 
@@ -410,10 +421,12 @@ class WorkedExample:
         worked_example = cls(
             state_domain.SubtitledHtml(
                 worked_example_dict['question']['content_id'],
-                worked_example_dict['question']['html'], {}),
+                worked_example_dict['question']['html'],
+                worked_example_dict['question']['image_sizes_in_bytes']),
             state_domain.SubtitledHtml(
                 worked_example_dict['explanation']['content_id'],
-                worked_example_dict['explanation']['html'], {})
+                worked_example_dict['explanation']['html'],
+                worked_example_dict['explanation']['image_sizes_in_bytes'])
         )
         worked_example.question.validate()
         worked_example.explanation.validate()
@@ -1012,8 +1025,41 @@ class Skill:
             html_validation_service.fix_incorrectly_encoded_chars)
 
     @classmethod
+    def _convert_skill_contents_v4_dict_to_v5_dict(
+            cls, skill_contents_dict, skill_id):
+        """Converts v4 skill contents to the v5 schema. The v5 schema
+        introduces new attribute image_sizes_in_bytes to store mapping of
+        rich text images to their sizes.
+
+        Args:
+            skill_contents_dict: dict. The v3 skill_contents_dict.
+
+        Returns:
+            dict. The converted skill_contents_dict.
+        """
+        skill_contents_dict['explanation']['image_sizes_in_bytes'] = (
+            html_cleaner.get_image_sizes_in_bytes_from_html(
+                skill_contents_dict['explanation']['html'],
+                feconf.ENTITY_TYPE_SKILL,
+                skill_id))
+
+        for worked_example in skill_contents_dict['worked_examples']:
+            worked_example['question']['image_sizes_in_bytes'] = (
+                html_cleaner.get_image_sizes_in_bytes_from_html(
+                    worked_example['question']['html'],
+                    feconf.ENTITY_TYPE_SKILL,
+                    skill_id))
+            worked_example['explanation']['image_sizes_in_bytes'] = (
+                html_cleaner.get_image_sizes_in_bytes_from_html(
+                    worked_example['explanation']['html'],
+                    feconf.ENTITY_TYPE_SKILL,
+                    skill_id))
+
+        return skill_contents_dict
+
+    @classmethod
     def update_skill_contents_from_model(
-            cls, versioned_skill_contents, current_version):
+            cls, versioned_skill_contents, current_version, skill_id = None):
         """Converts the skill_contents blob contained in the given
         versioned_skill_contents dict from current_version to
         current_version + 1. Note that the versioned_skill_contents being
@@ -1026,12 +1072,16 @@ class Skill:
                 - skill_contents: dict. The dict comprising the skill
                     contents.
             current_version: int. The current schema version of skill_contents.
+            skill_id: str. The ID of the skill.
         """
         versioned_skill_contents['schema_version'] = current_version + 1
 
         conversion_fn = getattr(
             cls, '_convert_skill_contents_v%s_dict_to_v%s_dict' % (
                 current_version, current_version + 1))
+        if current_version == 4:
+            versioned_skill_contents['skill_contents'] = conversion_fn(
+                skill_id, versioned_skill_contents['states'])
         versioned_skill_contents['skill_contents'] = conversion_fn(
             versioned_skill_contents['skill_contents'])
 
@@ -1420,16 +1470,19 @@ class Skill:
             raise ValueError('The skill to remove is not a prerequisite skill.')
         del self.prerequisite_skill_ids[index]
 
-    def update_rubric(self, difficulty, explanations):
+    def update_rubric(self, difficulty, explanations, image_sizes_in_bytes):
         """Adds or updates the rubric of the given difficulty.
 
         Args:
             difficulty: str. The difficulty of the rubric.
             explanations: list(str). The explanations for the rubric.
+            image_sizes_in_bytes: dict. The mappings for image filenames in
+                rubric to its size in bytes.
         """
         for rubric in self.rubrics:
             if rubric.difficulty == difficulty:
                 rubric.explanations = copy.deepcopy(explanations)
+                rubric.image_sizes_in_bytes = image_sizes_in_bytes
                 return
         raise ValueError(
             'There is no rubric for the given difficulty.')
@@ -1514,6 +1567,12 @@ class Skill:
             raise ValueError(
                 'There is no misconception with the given id.')
         self.misconceptions[index].notes = notes
+        self.misconceptions[index].image_sizes_in_bytes = (
+            html_cleaner.get_image_sizes_in_bytes_from_html(
+                self.misconceptions[index].feedback +
+                self.misconceptions[index].notes,
+                feconf.ENTITY_TYPE_SKILL,
+                self.id))
 
     def update_misconception_feedback(self, misconception_id, feedback):
         """Updates the feedback of the misconception with the given id.
@@ -1531,6 +1590,12 @@ class Skill:
             raise ValueError(
                 'There is no misconception with the given id.')
         self.misconceptions[index].feedback = feedback
+        self.misconceptions[index].image_sizes_in_bytes = (
+            html_cleaner.get_image_sizes_in_bytes_from_html(
+                self.misconceptions[index].feedback +
+                self.misconceptions[index].notes,
+                feconf.ENTITY_TYPE_SKILL,
+                self.id))
 
 
 class SkillSummary:

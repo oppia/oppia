@@ -25,7 +25,7 @@ from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import config_domain
+from core.domain import config_domain, html_cleaner
 from core.domain import fs_services
 from core.domain import image_validation_services
 from core.domain import question_services
@@ -355,6 +355,8 @@ class NewSkillHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Explanation should be a valid SubtitledHtml dict.')
 
+        for rubric in rubrics:
+            rubric['image_sizes_in_bytes'] = {}
         rubrics = [skill_domain.Rubric.from_dict(rubric) for rubric in rubrics]
         new_skill_id = skill_services.get_new_skill_id()
         if linked_topic_ids is not None:
@@ -374,6 +376,11 @@ class NewSkillHandler(base.BaseHandler):
         skill = skill_domain.Skill.create_default_skill(
             new_skill_id, description, rubrics)
 
+        explanation_dict['image_sizes_in_bytes'] = (
+            html_cleaner.get_image_sizes_in_bytes_from_html(
+                explanation_dict['html'],
+                feconf.ENTITY_TYPE_SKILL,
+                new_skill_id))
         skill.update_explanation(
             state_domain.SubtitledHtml.from_dict(explanation_dict))
 
