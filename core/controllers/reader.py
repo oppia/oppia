@@ -434,6 +434,13 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
     }
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
+            'params': {
+                'schema': {
+                    'type': 'dict',
+                    'properties': []
+                },
+                'default_value': {}
+            },
             'session_id': {
                 'schema': {
                     'type': 'basestring'
@@ -489,7 +496,7 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
         Args:
             exploration_id: str. The ID of the exploration.
         """
-        old_state_name = self.payload.get('old_state_name')
+        old_state_name = self.normalized_payload.get('old_state_name')
         # The reader's answer.
         answer = self.normalized_payload.get('answer')
         # Parameters associated with the learner.
