@@ -23,7 +23,7 @@
       </div>
       <div *ngIf="!getCanAskLearnerForAnswerInfo()">
         <oppia-progress-nav (submit)="submitAnswerFromProgressNav()"
-                            [isLearnAgainButton]="isLearnAgainButton"
+                            [isLearnAgainButton]="isLearnAgainButton()"
                             [submitButtonIsDisabled]="isSubmitButtonDisabled()"
                             [displayedCard]="displayedCard"
                             [submitButtonIsShown]="!answerIsBeingProcessed"

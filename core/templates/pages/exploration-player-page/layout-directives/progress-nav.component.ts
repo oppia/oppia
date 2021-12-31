@@ -38,7 +38,7 @@ import { SchemaFormSubmittedService } from 'services/schema-form-submitted.servi
   templateUrl: './progress-nav.component.html'
 })
 export class ProgressNavComponent {
-  @Input() isLearnAgainButton: () => void;
+  @Input() isLearnAgainButton: boolean;
   @Input() displayedCard: StateCard;
   @Input() submitButtonIsShown: boolean;
   @Input() submitButtonIsDisabled: boolean;
