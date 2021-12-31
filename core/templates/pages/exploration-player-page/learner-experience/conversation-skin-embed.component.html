@@ -187,14 +187,6 @@ directive. -->
     Additional CSS for the conversation_v1 skin.
     All classes below should start with .conversation-skin
   */
-
-  .conversation-skin-learner-answer-container {
-      height: 36px;
-      position: absolute;
-      top: 0;
-      width: 36px;
-      z-index: 1;
-    }
   .conversation-skin-oppia-avatar {
     left: -20px;
   }
@@ -402,8 +394,12 @@ directive. -->
   }
 
   .conversation-skin-learner-answer-container {
+    height: 36px;
+    position: absolute;
     text-align: right;
-    width: auto;
+    top: 0;
+    width: 36px;
+    z-index: 1;
   }
 
   .conversation-skin-tutor-card-middle-section .conversation-skin-learner-answer-content {
