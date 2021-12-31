@@ -38,6 +38,7 @@ import { NgBootstrapModule } from 'modules/ng-boostrap.module';
 
 // Components.
 import { AudioBarComponent } from 'pages/exploration-player-page/layout-directives/audio-bar.component';
+import { DeleteAnswerGroupModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-answer-group-modal.component';
 import { ExplorationEmbedButtonModalComponent } from './button-directives/exploration-embed-button-modal.component';
 import { BackgroundBannerComponent } from './common-layout-directives/common-elements/background-banner.component';
 import { AttributionGuideComponent } from './common-layout-directives/common-elements/attribution-guide.component';
@@ -158,6 +159,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     ConversationSkinEmbedComponent,
     CreateNewSkillModalComponent,
     CreateActivityModalComponent,
+    DeleteAnswerGroupModalComponent,
     DisplaySolutionModalComponent,
     DisplaySolutionInterstititalModalComponent,
     DisplayHintModalComponent,
@@ -241,6 +243,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     OppiaAngularRootComponent,
     ProfileLinkImageComponent, ProfileLinkTextComponent,
     // These elements will remain here even after migration.
+    DeleteAnswerGroupModalComponent,
     DisplaySolutionModalComponent,
     DisplaySolutionInterstititalModalComponent,
     DisplayHintModalComponent,
@@ -304,6 +307,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     ConversationSkinEmbedComponent,
     CreateNewSkillModalComponent,
     CreateActivityModalComponent,
+    DeleteAnswerGroupModalComponent,
     DisplaySolutionModalComponent,
     DisplaySolutionInterstititalModalComponent,
     DisplayHintModalComponent,
