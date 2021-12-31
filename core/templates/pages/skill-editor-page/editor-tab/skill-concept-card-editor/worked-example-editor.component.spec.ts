@@ -122,7 +122,8 @@ describe('Worked example editor component', () => {
     component.saveWorkedExample(true);
 
     expect(skillUpdateSpy).toHaveBeenCalledWith(
-      undefined, 2, 'worked example question 1', 'worked example explanation 1');
+      undefined, 2, 'worked example question 1', 'worked example explanation 1'
+    );
   });
 
   it('should save worked example when clicking on save button', () => {
@@ -132,7 +133,8 @@ describe('Worked example editor component', () => {
     component.saveWorkedExample(false);
 
     expect(skillUpdateSpy).toHaveBeenCalledWith(
-      undefined, 2, 'worked example question 1', 'worked example explanation 1');
+      undefined, 2, 'worked example question 1', 'worked example explanation 1'
+    );
   });
 
   it('should get schema', () => {
