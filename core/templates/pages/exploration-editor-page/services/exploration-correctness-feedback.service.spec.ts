@@ -51,22 +51,18 @@ describe('Exploration Correctness Feedback Service', () => {
     httpTestingController.verify();
   });
 
-  it('should toggle correctness feedback display', fakeAsync(() => {
-    ecfs.correctnessFeedbackIsEnabled = false;
-
+  it('should toggl correctness feedback display', fakeAsync(() => {
     // Function isEnabled() returns undefined in the first time.
     expect(ecfs.isEnabled()).toBeFalsy();
 
     ecfs.toggleCorrectnessFeedback();
     tick();
 
-    expect(ecfs.correctnessFeedbackIsEnabled).toBeTrue();
     expect(ecfs.isEnabled()).toBeTrue();
 
     ecfs.toggleCorrectnessFeedback();
     tick();
 
-    expect(ecfs.correctnessFeedbackIsEnabled).toBeFalse();
     expect(ecfs.isEnabled()).toBeFalse();
 
     flush();
