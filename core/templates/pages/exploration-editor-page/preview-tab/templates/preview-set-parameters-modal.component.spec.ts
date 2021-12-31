@@ -57,6 +57,9 @@ describe('Preview Set Parameters Modal Component', function() {
     TestBed.inject(NgbActiveModal);
   });
 
+  // This component have no more frontend tests as it inherits the
+  // ConfirmOrCancelModalComponent and doesn't have any additional
+  // functionality. Please see the ConfirmOrCancelModalComponent for more tests.
   it('should create', () => {
     expect(component).toBeDefined();
   });
