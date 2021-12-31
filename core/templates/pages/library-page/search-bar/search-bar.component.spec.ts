@@ -214,15 +214,22 @@ describe('Search bar component', () => {
   });
 
   it('should determine if mobile view is active', () => {
-    spyOn(windowDimensionsService, 'getWidth').and.returnValue(766);
+    const windowWidthSpy =
+      spyOn(windowDimensionsService, 'getWidth').and.returnValue(766);
     expect(component.isMobileViewActive()).toBe(true);
+    windowWidthSpy.and.returnValue(1000);
+    expect(component.isMobileViewActive()).toBe(false);
   });
 
   it('should determine if search button should be present', () => {
-    spyOn(component, 'isMobileViewActive').and.returnValue(true);
-    component.classroomPageIsActive = false;
+    spyOn(component, 'isMobileViewActive').and.returnValue(false);
+    component.classroomPageIsActive = true;
     component.isSearchButtonActive();
     expect(component.searchButtonIsActive).toBe(true);
+
+    component.classroomPageIsActive = false;
+    component.isSearchButtonActive();
+    expect(component.searchButtonIsActive).toBe(false);
   });
 
   it('should update selection details if selected languages' +
