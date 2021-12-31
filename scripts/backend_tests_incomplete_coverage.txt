@@ -5,7 +5,6 @@ core.controllers.domain_objects_validator_test
 extensions.rich_text_components.components_test
 core.controllers.profile_test
 core.controllers.story_editor_test
-core.controllers.questions_list_test
 core.constants_test
 core.controllers.library_test
 core.controllers.reader_test
