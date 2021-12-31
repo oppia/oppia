@@ -24,7 +24,7 @@
       <div *ngIf="!getCanAskLearnerForAnswerInfo()">
         <oppia-progress-nav (submit)="submitAnswerFromProgressNav()"
                             [isLearnAgainButton]="isLearnAgainButton"
-                            [submitButtonIsDisabled]="submitButtonIsDisabled"
+                            [submitButtonIsDisabled]="isSubmitButtonDisabled()"
                             [displayedCard]="displayedCard"
                             [submitButtonIsShown]="!answerIsBeingProcessed"
                             (clickContinueButton)="showUpcomingCard()">
@@ -37,7 +37,7 @@
         </div>
         <div>
           <a [href]="getExplorationLink()" target="{{ openInNewWindow ? '_blank' : '_self' }}">
-            <button #matButton class="md-raised oppia-button-raised">
+            <button mat-button class="md-raised oppia-button-raised">
               <i class="material-icons oppia-vcenter oppia-button-icon" aria-hidden="true">&#xE5C8;</i>
             </button>
           </a>
@@ -53,13 +53,13 @@
                                  [isLearnAgainButton]="isLearnAgainButton()">
         </oppia-supplemental-card>
         <div class="conversation-skin-supplemental-nav" *ngIf="isSupplementalNavShown() && !getCanAskLearnerForAnswerInfo()">
-          <button #matButton
+          <button mat-button
                   type="submit"
                   class="oppia-learner-confirm-button protractor-test-submit-answer-button conversation-skin-supplemental-nav-submit-button"
                   (click)="submitAnswerFromProgressNav()"
                   [ngStyle]="isLanguageRTL() ? {'left': '8px', 'right': 'auto'} : {'right': '8px', 'left': 'auto'}"
-                  [disabled]="submitButtonIsDisabled"
-                  translate="I18N_INTERACTIONS_SUBMIT">
+                  [disabled]="isSubmitButtonDisabled()">
+            {{ 'I18N_INTERACTIONS_SUBMIT' | translate }}
           </button>
         </div>
       </div>
@@ -274,7 +274,8 @@ otherwise they will interfere with the iframed conversation skin directive.
     position: relative;
   }
 
-  .conversation-skin-supplemental-nav-submit-button {
+  .conversation-skin-supplemental-nav-submit-button,
+  .conversation-skin-supplemental-nav-submit-button.mat-button {
     margin-right: 10px;
     position: absolute;
     right: 8px;

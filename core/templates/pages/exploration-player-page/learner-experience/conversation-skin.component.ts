@@ -133,7 +133,6 @@ export class ConversationSkinComponent {
   questionSessionCompleted: boolean;
   moveToExploration: boolean;
   upcomingInteractionInstructions;
-  submitButtonIsDisabled: boolean;
 
   ngOnInit(): void {
     this._editorPreviewMode = this.contextService.isInExplorationEditorPage();
@@ -280,8 +279,6 @@ export class ConversationSkinComponent {
         }
       );
     }
-
-    this.updateSubmitButtonVisibility();
   }
 
   constructor(
@@ -330,6 +327,20 @@ export class ConversationSkinComponent {
     private userService: UserService,
     private windowDimensionsService: WindowDimensionsService
   ) {}
+
+  isSubmitButtonDisabled(): boolean {
+    let currentIndex = this.playerPositionService.getDisplayedCardIndex();
+    // This check is added because it was observed that when returning
+    // to current card after navigating through previous cards, using
+    // the arrows, the Submit button was sometimes falsely disabled.
+    // Also, since a learner's answers would always be in the current
+    // card, this additional check doesn't interfere with its normal
+    // working.
+    if (!this.playerTranscriptService.isLastCard(currentIndex)) {
+      return false;
+    }
+    return this.currentInteractionService.isSubmitButtonDisabled();
+  }
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
@@ -634,7 +645,7 @@ export class ConversationSkinComponent {
       this.canWindowShowTwoCards() &&
       previousSupplementalCardIsNonempty &&
       !nextSupplementalCardIsNonempty) {
-      this.animateToOneCard(function() {
+      this.animateToOneCard(() => {
         this.playerPositionService.setDisplayedCardIndex(totalNumCards - 1);
       });
     } else {
@@ -1175,21 +1186,6 @@ export class ConversationSkinComponent {
   onNavigateFromIframe(): void {
     this.siteAnalyticsService.registerVisitOppiaFromIframeEvent(
       this.explorationId);
-  }
-
-  updateSubmitButtonVisibility(): void {
-    let currentIndex = this.playerPositionService.getDisplayedCardIndex();
-    // This check is added because it was observed that when returning
-    // to current card after navigating through previous cards, using
-    // the arrows, the Submit button was sometimes falsely disabled.
-    // Also, since a learner's answers would always be in the current
-    // card, this additional check doesn't interfere with its normal
-    // working.
-    if (!this.playerTranscriptService.isLastCard(currentIndex)) {
-      this.submitButtonIsDisabled = false;
-    }
-    this.submitButtonIsDisabled = (
-      this.currentInteractionService.isSubmitButtonDisabled());
   }
 
   submitAnswerFromProgressNav(): void {

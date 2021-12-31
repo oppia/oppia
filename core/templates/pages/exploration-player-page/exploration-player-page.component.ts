@@ -24,6 +24,8 @@ import { MetaTagCustomizationService } from 'services/contextual/meta-tag-custom
 import { KeyboardShortcutService } from 'services/keyboard-shortcut.service';
 import { PageTitleService } from 'services/page-title.service';
 
+require('interactions/interactionsRequires.ts');
+
 @Component({
   selector: 'oppia-exploration-player-page',
   templateUrl: './exploration-player-page.component.html'
