@@ -3277,11 +3277,11 @@ title: Title
         else:
             skill.rubrics = [
                 skill_domain.Rubric(
-                    constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
+                    constants.SKILL_DIFFICULTIES[0], ['Explanation 1'], {}),
                 skill_domain.Rubric(
-                    constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
+                    constants.SKILL_DIFFICULTIES[1], ['Explanation 2'], {}),
                 skill_domain.Rubric(
-                    constants.SKILL_DIFFICULTIES[2], ['Explanation 3']),
+                    constants.SKILL_DIFFICULTIES[2], ['Explanation 3'], {}),
             ]
         skill.language_code = language_code
         skill.version = 0

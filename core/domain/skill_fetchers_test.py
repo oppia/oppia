@@ -58,7 +58,7 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
         )
         misconceptions = [skill_domain.Misconception(
             self.MISCONCEPTION_ID_1, 'name', '<p>description</p>',
-            '<p>default_feedback</p>', True)]
+            '<p>default_feedback</p>', True, {})]
         self.SKILL_ID = skill_services.get_new_skill_id()
 
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)

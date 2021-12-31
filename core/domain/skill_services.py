@@ -680,13 +680,15 @@ def apply_change_list(skill_id, change_list, committer_id):
                                 worked_example['question']['html'],
                                 feconf.ENTITY_TYPE_SKILL,
                                 skill.id))
-                        worked_example['explanation']['image_sizes_in_bytes'] = (
+                        worked_example['explanation'][
+                            'image_sizes_in_bytes'] = (
                             html_cleaner.get_image_sizes_in_bytes_from_html(
                                 worked_example['explanation']['html'],
                                 feconf.ENTITY_TYPE_SKILL,
                                 skill.id))
                         worked_examples_list.append(
-                            skill_domain.WorkedExample.from_dict(worked_example))
+                            skill_domain.
+                                WorkedExample.from_dict(worked_example))
                     skill.update_worked_examples(worked_examples_list)
             elif change.cmd == skill_domain.CMD_ADD_SKILL_MISCONCEPTION:
                 change.new_misconception_dict['image_sizes_in_bytes'] = (
@@ -713,7 +715,9 @@ def apply_change_list(skill_id, change_list, committer_id):
                             feconf.ENTITY_TYPE_SKILL,
                             skill.id))
                 skill.update_rubric(
-                    change.difficulty, change.explanations, change.image_sizes_in_bytes)
+                    change.difficulty,
+                    change.explanations,
+                    change.image_sizes_in_bytes)
             elif (change.cmd ==
                   skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY):
                 if (change.property_name ==

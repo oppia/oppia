@@ -1033,13 +1033,11 @@ class Skill:
 
         Args:
             skill_contents_dict: dict. The v3 skill_contents_dict.
+            skill_id: str. The ID of the skill.
 
         Returns:
             dict. The converted skill_contents_dict.
         """
-        print()
-        print(skill_contents_dict)
-        print()
         skill_contents_dict['explanation']['image_sizes_in_bytes'] = (
             html_cleaner.get_image_sizes_in_bytes_from_html(
                 skill_contents_dict['explanation']['html'],
@@ -1062,7 +1060,7 @@ class Skill:
 
     @classmethod
     def update_skill_contents_from_model(
-            cls, versioned_skill_contents, current_version, skill_id = None):
+            cls, versioned_skill_contents, current_version, skill_id):
         """Converts the skill_contents blob contained in the given
         versioned_skill_contents dict from current_version to
         current_version + 1. Note that the versioned_skill_contents being
@@ -1104,6 +1102,7 @@ class Skill:
                 - misconceptions: list(dict). The list of dicts comprising the
                     misconceptions of the skill.
             current_version: int. The current schema version of misconceptions.
+            skill_id: int. The ID of the skill.
         """
         versioned_misconceptions['schema_version'] = current_version + 1
 
@@ -1203,6 +1202,7 @@ class Skill:
 
         Args:
             misconception_dict: dict. The v5 misconception dict.
+            skill_id: str. The ID of the skill.
 
         Returns:
             dict. The converted misconception_dict.
@@ -1325,6 +1325,7 @@ class Skill:
                 - rubrics: list(dict). The list of dicts comprising the
                     rubrics of the skill.
             current_version: int. The current schema version of rubrics.
+            skill_id: str. The ID of the skill.
         """
         versioned_rubrics['schema_version'] = current_version + 1
 

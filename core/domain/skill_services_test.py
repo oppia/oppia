@@ -67,7 +67,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         )
         misconceptions = [skill_domain.Misconception(
             self.MISCONCEPTION_ID_1, 'name', '<p>description</p>',
-            '<p>default_feedback</p>', True)]
+            '<p>default_feedback</p>', True, {})]
         self.num_queries_to_fetch = 10
         self.SKILL_ID = skill_services.get_new_skill_id()
         self.SKILL_ID2 = skill_services.get_new_skill_id()
@@ -261,13 +261,13 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill_rubrics, {
                 'skill_id_1': [
                     skill_domain.Rubric(
-                        constants.SKILL_DIFFICULTIES[0], ['Explanation 1']
+                        constants.SKILL_DIFFICULTIES[0], ['Explanation 1'], {}
                     ).to_dict(),
                     skill_domain.Rubric(
-                        constants.SKILL_DIFFICULTIES[1], ['Explanation 2']
+                        constants.SKILL_DIFFICULTIES[1], ['Explanation 2'], {}
                     ).to_dict(),
                     skill_domain.Rubric(
-                        constants.SKILL_DIFFICULTIES[2], ['Explanation 3']
+                        constants.SKILL_DIFFICULTIES[2], ['Explanation 3'], {}
                     ).to_dict()],
                 'skill_id_2': None
             }

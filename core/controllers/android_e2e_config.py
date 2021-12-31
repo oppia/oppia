@@ -319,11 +319,11 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
         """
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1'], {}),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2'], {}),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'], {})]
         skill = skill_domain.Skill.create_default_skill(
             skill_id, skill_description, rubrics)
         skill.update_explanation(

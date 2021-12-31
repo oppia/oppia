@@ -54,14 +54,14 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         )
         misconceptions = [skill_domain.Misconception(
             self.MISCONCEPTION_ID, 'name', '<p>notes</p>',
-            '<p>default_feedback</p>', True)]
+            '<p>default_feedback</p>', True, {})]
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], ['<p>Explanation 1</p>']),
+                constants.SKILL_DIFFICULTIES[0], ['<p>Explanation 1</p>'], {}),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], ['<p>Explanation 2</p>']),
+                constants.SKILL_DIFFICULTIES[1], ['<p>Explanation 2</p>'], {}),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], ['<p>Explanation 3</p>'])]
+                constants.SKILL_DIFFICULTIES[2], ['<p>Explanation 3</p>'], {})]
         self.skill = skill_domain.Skill(
             self.SKILL_ID, 'Description', misconceptions, rubrics,
             skill_contents, feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
@@ -131,19 +131,21 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
 
         self.skill.rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], ['<p>Explanation</p>']),
+                constants.SKILL_DIFFICULTIES[0], ['<p>Explanation</p>'], {}),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], ['<p>Another Explanation</p>'])
+                constants.SKILL_DIFFICULTIES[0], ['<p>Another Explanation</p>'],
+                {})
         ]
         self._assert_validation_error('Duplicate rubric found')
 
     def test_valid_rubric_difficulty(self):
         self.skill.rubrics = [skill_domain.Rubric(
-            'invalid_difficulty', ['<p>Explanation</p>'])]
+            'invalid_difficulty', ['<p>Explanation</p>'], {})]
         self._assert_validation_error('Invalid difficulty received for rubric')
 
     def test_valid_rubric_difficulty_type(self):
-        self.skill.rubrics = [skill_domain.Rubric(10, ['<p>Explanation</p>'])]
+        self.skill.rubrics = [skill_domain.Rubric(
+            10, ['<p>Explanation</p>'], {})]
         self._assert_validation_error('Expected difficulty to be a string')
 
     def test_valid_rubric_explanation(self):
@@ -158,9 +160,9 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self.skill.validate()
         self.skill.rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], ['<p>Explanation 1</p>']),
+                constants.SKILL_DIFFICULTIES[0], ['<p>Explanation 1</p>'], {}),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], ['<p>Explanation 2</p>'])
+                constants.SKILL_DIFFICULTIES[1], ['<p>Explanation 2</p>'], {})
         ]
         self._assert_validation_error(
             'All 3 difficulties should be addressed in rubrics')
@@ -168,11 +170,11 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
     def test_order_of_rubrics(self):
         self.skill.rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], ['<p>Explanation 1</p>']),
+                constants.SKILL_DIFFICULTIES[1], ['<p>Explanation 1</p>'], {}),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], ['<p>Explanation 2</p>']),
+                constants.SKILL_DIFFICULTIES[2], ['<p>Explanation 2</p>'], {}),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], ['<p>Explanation 3</p>'])
+                constants.SKILL_DIFFICULTIES[0], ['<p>Explanation 3</p>'], {})
         ]
         self._assert_validation_error(
             'The difficulties should be ordered as follows')
@@ -298,10 +300,10 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self.skill.misconceptions = [
             skill_domain.Misconception(
                 self.MISCONCEPTION_ID, 'name', '<p>notes</p>',
-                '<p>default_feedback</p>', True),
+                '<p>default_feedback</p>', True, {}),
             skill_domain.Misconception(
                 self.MISCONCEPTION_ID, 'name 2', '<p>notes 2</p>',
-                '<p>default_feedback</p>', True)]
+                '<p>default_feedback</p>', True, {})]
         self._assert_validation_error('Duplicate misconception ID found')
 
     def test_skill_migration_validation(self):
@@ -321,13 +323,13 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         rubrics = [
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[0],
-                ['<p>[NOTE: Creator should fill this in]</p>']),
+                ['<p>[NOTE: Creator should fill this in]</p>'], {}),
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[1],
-                ['<p>[NOTE: Creator should fill this in]</p>']),
+                ['<p>[NOTE: Creator should fill this in]</p>'], {}),
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[2],
-                ['<p>[NOTE: Creator should fill this in]</p>'])]
+                ['<p>[NOTE: Creator should fill this in]</p>'], {})]
         skill = skill_domain.Skill.create_default_skill(
             self.SKILL_ID, 'Description', rubrics)
         expected_skill_dict = {
@@ -398,13 +400,13 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
 
         misconceptions = skill_domain.Misconception(
             self.MISCONCEPTION_ID, 'Tag Name', '<p>Description</p>',
-            '<p>Feedback</p>', True)
+            '<p>Feedback</p>', True, {})
         misconceptions_dict = misconceptions.to_dict()
         misconceptions_from_dict = skill_domain.Misconception.from_dict(
             misconceptions_dict)
 
         rubric = skill_domain.Rubric(
-            constants.SKILL_DIFFICULTIES[0], ['<p>Explanation</p>'])
+            constants.SKILL_DIFFICULTIES[0], ['<p>Explanation</p>'], {})
         rubric_dict = rubric.to_dict()
         rubric_from_dict = skill_domain.Rubric.from_dict(rubric_dict)
         self.assertEqual(
@@ -510,7 +512,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             ]
         }
 
-        skill_domain.Skill.update_rubrics_from_model(versioned_rubrics, 1)
+        skill_domain.Skill.update_rubrics_from_model(versioned_rubrics, 1, {})
 
         self.assertEqual(versioned_rubrics, {
             'schema_version': 2,

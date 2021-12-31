@@ -177,7 +177,7 @@ def _migrate_skill_contents_to_latest_schema(
             - schema_version: int. The schema version for the skill_contents
                 dict.
             - skill_contents: dict. The dict comprising the skill contents.
-        skill_id. str. The ID of the skill.
+        skill_id: str. The ID of the skill.
 
     Raises:
         Exception. The schema version of the skill_contents is outside of what
@@ -197,7 +197,8 @@ def _migrate_skill_contents_to_latest_schema(
         skill_contents_schema_version += 1
 
 
-def _migrate_misconceptions_to_latest_schema(versioned_misconceptions, skill_id):
+def _migrate_misconceptions_to_latest_schema(
+        versioned_misconceptions, skill_id):
     """Holds the responsibility of performing a step-by-step, sequential update
     of the misconceptions structure based on the schema version of the input
     misconceptions dictionary. If the current misconceptions schema changes, a
@@ -210,6 +211,7 @@ def _migrate_misconceptions_to_latest_schema(versioned_misconceptions, skill_id)
                 dict.
             - misconceptions: list(dict). The list of dicts comprising the skill
                 misconceptions.
+        skill_id: str. The ID of the skill.
 
     Raises:
         Exception. The schema version of misconceptions is outside of what
@@ -241,6 +243,7 @@ def _migrate_rubrics_to_latest_schema(versioned_rubrics, skill_id):
             - schema_version: int. The schema version for the rubrics dict.
             - rubrics: list(dict). The list of dicts comprising the skill
                 rubrics.
+        skill_id: str. The ID of the skill.
 
     Raises:
         Exception. The schema version of rubrics is outside of what is supported
