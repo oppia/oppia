@@ -29,7 +29,6 @@ import { LoggerService } from 'services/contextual/logger.service';
 })
 export class ExplorationCorrectnessFeedbackService extends
   ExplorationPropertyService {
-  correctnessFeedbackIsEnabled: boolean = false;
   propertyName: string = 'correctness_feedback_enabled';
 
   constructor(
@@ -40,23 +39,13 @@ export class ExplorationCorrectnessFeedbackService extends
     super(alertsService, changeListService, loggerService);
   }
 
-  isEnabled(): string {
+  isEnabled(): string | boolean {
     return this.savedMemento;
   }
 
   toggleCorrectnessFeedback(): void {
-    // Earlier we were using this.displayed = !this.displayed this is wrong.
-    // Because we the variable displayed is string type and we were storing
-    // boolean init by using !, To overcome this problem JSON.parse('true')
-    // and correctnessFeedbackIsEnabled is used.
-
-    this.correctnessFeedbackIsEnabled = !this.correctnessFeedbackIsEnabled;
-    if (this.correctnessFeedbackIsEnabled) {
-      this.displayed = JSON.parse('true');
-      this.saveDisplayedValue();
-    } else {
-      this.savedMemento = JSON.parse('false');
-    }
+    this.displayed = !this.displayed;
+    this.saveDisplayedValue();
   }
 }
 
