@@ -48,7 +48,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'collection-player-page.component.ts',
     'collection.model.ts',
     'contribution-and-review.service.ts',
-    'conversation-skin.component.ts',
     'exploration-states.service.ts',
     'expression-evaluator.service.ts',
     'expression-interpolation.service.ts',
