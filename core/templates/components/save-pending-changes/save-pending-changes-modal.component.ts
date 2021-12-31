@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the Save Pending Changes Modal.
+ * @fileoverview Component for the save pending changes modal.
  */
 
 import { Component, Input } from '@angular/core';

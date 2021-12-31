@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for Save Pending Changes Modal Component.
+ * @fileoverview Unit tests for save pending changes modal component.
  */
 
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
