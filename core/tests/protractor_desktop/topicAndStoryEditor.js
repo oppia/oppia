@@ -137,7 +137,7 @@ describe('Topic editor functionality', function() {
   it('should add a canonical story to topic correctly', async function() {
     await topicEditorPage.expectNumberOfStoriesToBe(0);
     await topicEditorPage.createStory(
-      'Story Title', 'topicandstoryeditorone', 'Story description',
+      'Story Title', 'topicAndStoryEditorOne', 'Story description',
       Constants.TEST_SVG_PATH);
     await storyEditorPage.returnToTopic();
 
@@ -297,7 +297,7 @@ describe('Chapter editor functionality', function() {
     await topicsAndSkillsDashboardPage.createTopic(
       topicName, topicUrlFragment, 'Description', false);
     await topicEditorPage.createStory(
-      storyName, 'topicandstoryeditortwo', 'Story description',
+      storyName, 'topicAndStoryEditorTwo', 'Story description',
       Constants.TEST_SVG_PATH);
     await general.closeCurrentTabAndSwitchTo(handle);
     dummySkills = await createDummySkills(2);
