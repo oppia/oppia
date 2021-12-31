@@ -21,7 +21,7 @@ from __future__ import annotations
 from core import utils
 from core.platform import models
 
-from typing import Any, Dict, List, Optional, Sequence
+from typing import Any, Dict, Optional, Sequence
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -35,7 +35,8 @@ datastore_services = models.Registry.import_datastore_services()
 
 
 class EntityTranslationsModel(base_models.BaseModel):
-    """Model for storing entity translations."""
+    """Model for storing entity translations ."""
+
     entity_id = datastore_services.StringProperty(required=True, indexed=True)
     entity_type = datastore_services.StringProperty(required=True, indexed=True)
     entity_version = datastore_services.IntegerProperty(
@@ -73,7 +74,20 @@ class EntityTranslationsModel(base_models.BaseModel):
         entity_version: int,
         language_code: str
     ) -> str:
-        return '%s-%s-%s-%s' %(
+        """The method use to generate unique id for entity translations model.
+
+        Args:
+            entity_type: str. Type of an entity.
+            entity_id: str. Id of an entity.
+            entity_version: int. Version of an entity.
+            language_code: str. Language code for a given entity.
+
+        Returns:
+            str. Returns a unique id of the form
+            [entity_type]-[entity_id]-[entity_version]-[language_code].
+        """
+
+        return '%s-%s-%s-%s' % (
             entity_type, entity_id, entity_version, language_code)
 
     @classmethod
@@ -84,6 +98,21 @@ class EntityTranslationsModel(base_models.BaseModel):
         entity_version: int,
         language_code: str
     ) -> EntityTranslationsModel:
+        """Gets EntityTranslationsModel by help of entity_type, entity_id,
+        entity_version and language_code.
+
+        Args:
+            entity_type: str. Type of an entity.
+            entity_id: str. Id of an entity.
+            entity_version: int. Version of an entity.
+            language_code: str. Language code for a given entity.
+
+        Returns:
+            EntityTranslationsModel|None. The EntityTranslationsModel
+            instance corresponding to the given inputs, if such a translation
+            exists, or None if no translation is found.
+        """
+
         model_id = cls._generate_id(
             entity_type, entity_id, entity_version, language_code)
         return cls.get_by_id(model_id)
@@ -95,6 +124,20 @@ class EntityTranslationsModel(base_models.BaseModel):
         entity_id: str,
         entity_version: int
     ) -> Sequence[Optional[EntityTranslationsModel]]:
+        """Gets EntityTranslationsModels by help of entity_type, entity_id,
+        entity_version.
+
+        Args:
+            entity_type: str. Type of an entity.
+            entity_id: str. Id of an entity.
+            entity_version: int. Version of an entity.
+
+        Returns:
+            list(EntityTranslationsModel|None). The EntityTranslationsModel
+            instances corresponding to the given inputs, if such a translation
+            exists, or None if no translation is found.
+        """
+
         return cls.query(
             cls.entity_type == entity_type,
             cls.entity_id == entity_id,
@@ -108,10 +151,24 @@ class EntityTranslationsModel(base_models.BaseModel):
         entity_id: str,
         entity_version: int,
         language_code: str,
-        translations: Dict[str, Dict[str, Any]]
+        translations: Dict[str, Any]
     ) -> EntityTranslationsModel:
+        """Creates and returns a new EntityTranslationsModel instance.
+
+        Args:
+            entity_type: str. Type of an entity.
+            entity_id: str. Id of an entity.
+            entity_version: int. Version of an entity.
+            language_code: str. Language code for a given entity.
+            translations: dict(str, TranslatedContent). The contents which are
+                already translated.
+
+        Returns:
+            EntityTranslationsModel. Returns a new EntityTranslationsModel.
+        """
+
         return cls(
-            id = cls._generate_id(
+            id=cls._generate_id(
                 entity_type, entity_id, entity_version, language_code),
             entity_type=entity_type,
             entity_id=entity_id,

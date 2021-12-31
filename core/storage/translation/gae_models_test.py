@@ -31,6 +31,8 @@ if MYPY: # pragma: no cover
 
 
 class EntityTranslationsModelTest(test_utils.GenericTestBase):
+    """Unit tests for EntityTranslationsModel class."""
+
     def test_create_new_model(self) -> None:
         translated_content = {
             '123': {
@@ -118,7 +120,7 @@ class EntityTranslationsModelTest(test_utils.GenericTestBase):
 
     def test_get_deletion_policy_not_applicable(self) -> None:
         self.assertEqual(
-            translation_models.MachineTranslationModel.get_deletion_policy(),
+            translation_models.EntityTranslationsModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_get_model_association_to_user_not_corresponding_to_user(
