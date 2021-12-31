@@ -118,9 +118,10 @@ describe('Add Hint Modal Component', () => {
     expect(component.isHintLengthExceeded(hint2)).toBe(true);
   });
 
-  it('should update explanation', () => {
-    let hint = 'hint';
+  it('should update hint', () => {
+    component.tmpHint = 'hint';
 
+    let hint = 'new hint';
     component.updateLocalHint(hint);
 
     expect(component.tmpHint).toEqual(hint);
