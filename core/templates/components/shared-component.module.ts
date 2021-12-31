@@ -93,7 +93,7 @@ import { TutorCardComponent } from 'pages/exploration-player-page/learner-experi
 import { ContentLanguageSelectorComponent } from 'pages/exploration-player-page/layout-directives/content-language-selector.component';
 import { RatingDisplayComponent } from './ratings/rating-display/rating-display.component';
 import { SupplementalCardComponent } from 'pages/exploration-player-page/learner-experience/supplemental-card.component';
-
+import { SmoothHeightAnimatorComponent } from './smooth-height/smooth-height-animator.component';
 
 // Pipes.
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
@@ -181,6 +181,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     SelectSkillModalComponent,
     SearchBarComponent,
     SharingLinksComponent,
+    SmoothHeightAnimatorComponent,
     SkillSelectorComponent,
     SkillMasteryViewerComponent,
     StateSkillEditorComponent,
@@ -253,6 +254,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     SubtopicSummaryTileComponent,
     SummaryListHeaderComponent,
     SupplementalCardComponent,
+    SmoothHeightAnimatorComponent,
     ThumbnailDisplayComponent,
     TutorCardComponent,
     ThumbnailUploaderComponent,
@@ -322,6 +324,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     SubtopicSummaryTileComponent,
     SummaryListHeaderComponent,
     SupplementalCardComponent,
+    SmoothHeightAnimatorComponent,
     TakeBreakModalComponent,
     ThreadTableComponent,
     ThumbnailDisplayComponent,

@@ -119,9 +119,6 @@ describe('Conversation skin directive', function() {
   let onHintConsumedEventEmitter = new EventEmitter();
   let onSolutionViewedEventEmitter = new EventEmitter();
   let onPlayerStateChangeEventEmitter = new EventEmitter();
-  let onRatingUpdatedEventEmitter = new EventEmitter();
-  let onStateCardContentUpdateEventEmitter = new EventEmitter();
-  let alertSuccessSpy = null;
   let alertWarningSpy = null;
   let questionPlayerSpy = null;
   let sampleCollection = null;
@@ -652,8 +649,6 @@ describe('Conversation skin directive', function() {
     spyOn(learnerViewRatingService, 'init').and.callFake((cb) => {
       cb('userRating');
     });
-    alertSuccessSpy = spyOn(
-      alertsService, 'addSuccessMessage').and.returnValue(null);
     alertWarningSpy = spyOn(
       alertsService, 'addWarning').and.returnValue(null);
 
@@ -677,17 +672,6 @@ describe('Conversation skin directive', function() {
   });
 
   describe('on initalization', function() {
-    it('should set user rating', function() {
-      spyOnProperty(currentInteractionService, 'onAnswerChanged$')
-        .and.returnValue(onAnswerChangedEventEmitter);
-      expect($scope.userRating).toBe(undefined);
-
-      ctrl.$onInit();
-      onAnswerChangedEventEmitter.emit();
-
-      expect($scope.userRating).toBe('userRating');
-    });
-
     it('should show user that hint has been used ' +
       'if it has already been used', function() {
       spyOnProperty(hintsAndSolutionManagerService, 'onHintConsumed')
@@ -725,22 +709,6 @@ describe('Conversation skin directive', function() {
       ctrl.$onInit();
 
       expect($scope.collectionTitle).toBe(null);
-    });
-
-    it('should call success alert message when ' +
-      'rating is updated successfully', function() {
-      spyOnProperty(
-        learnerViewRatingService, 'onRatingUpdated')
-        .and.returnValue(onRatingUpdatedEventEmitter);
-      spyOnProperty(
-        contentTranslationManagerService, 'onStateCardContentUpdate')
-        .and.returnValue(onStateCardContentUpdateEventEmitter);
-
-      ctrl.$onInit();
-      onRatingUpdatedEventEmitter.emit();
-      onStateCardContentUpdateEventEmitter.emit();
-
-      expect(alertSuccessSpy).toHaveBeenCalledWith('Rating saved!', 1000);
     });
 
     it('should send request to backend to fetch collection summary ' +
@@ -1013,17 +981,6 @@ describe('Conversation skin directive', function() {
       expect(guestUserSpy).toHaveBeenCalled();
     });
   });
-
-  it('should open sign in page if user is not signed in' +
-    'when clicking on sign in button', fakeAsync(function() {
-    let loginSpy = spyOn(
-      userService, 'getLoginUrlAsync').and.resolveTo('loginUrl');
-
-    $scope.signIn();
-    tick();
-
-    expect(loginSpy).toHaveBeenCalled();
-  }));
 
   it('should be able to submit answer from progress navbar ' +
     'when calling \'submitAnswerFromProgressNav\'', fakeAsync(function() {
@@ -1380,16 +1337,6 @@ describe('Conversation skin directive', function() {
     let result = $scope.getContentFocusLabel('2');
 
     expect(result).toBe('contentLabel2');
-  });
-
-  it('should get feedback popover url when' +
-    'calling \'getFeedbackPopoverUrl\'', function() {
-    spyOn(urlInterpolationService, 'getDirectiveTemplateUrl')
-      .and.returnValue('/directiveTemplateUrl');
-
-    let result = $scope.getFeedbackPopoverUrl();
-
-    expect(result).toBe('/directiveTemplateUrl');
   });
 
   it('should check whether a learner can ask for answer info', function() {
@@ -1898,16 +1845,6 @@ describe('Conversation skin directive', function() {
     $scope.returnToExplorationAfterConceptCard();
 
     expect(displayCardSpy).toHaveBeenCalled();
-  });
-
-  it('should submit user rating given rating value ' +
-    'when calling \'submitUserRating\'', function() {
-    let ratingSpy = spyOn(learnerViewRatingService, 'submitUserRating')
-      .and.returnValue(null);
-
-    $scope.submitUserRating(1);
-
-    expect(ratingSpy).toHaveBeenCalledWith(1);
   });
 
   describe('on submitting answer ', function() {
