@@ -1037,6 +1037,9 @@ class Skill:
         Returns:
             dict. The converted skill_contents_dict.
         """
+        print()
+        print(skill_contents_dict)
+        print()
         skill_contents_dict['explanation']['image_sizes_in_bytes'] = (
             html_cleaner.get_image_sizes_in_bytes_from_html(
                 skill_contents_dict['explanation']['html'],
@@ -1081,13 +1084,14 @@ class Skill:
                 current_version, current_version + 1))
         if current_version == 4:
             versioned_skill_contents['skill_contents'] = conversion_fn(
-                skill_id, versioned_skill_contents['states'])
-        versioned_skill_contents['skill_contents'] = conversion_fn(
-            versioned_skill_contents['skill_contents'])
+                versioned_skill_contents['skill_contents'], skill_id)
+        else:
+            versioned_skill_contents['skill_contents'] = conversion_fn(
+                versioned_skill_contents['skill_contents'])
 
     @classmethod
     def update_misconceptions_from_model(
-            cls, versioned_misconceptions, current_version):
+            cls, versioned_misconceptions, current_version, skill_id):
         """Converts the misconceptions blob contained in the given
         versioned_misconceptions dict from current_version to
         current_version + 1. Note that the versioned_misconceptions being
@@ -1108,8 +1112,13 @@ class Skill:
                 current_version, current_version + 1))
 
         updated_misconceptions = []
-        for misconception in versioned_misconceptions['misconceptions']:
-            updated_misconceptions.append(conversion_fn(misconception))
+        if current_version == 5:
+            for misconception in versioned_misconceptions['misconceptions']:
+                updated_misconceptions.append(conversion_fn(
+                    misconception, skill_id))
+        else:
+            for misconception in versioned_misconceptions['misconceptions']:
+                updated_misconceptions.append(conversion_fn(misconception))
 
         versioned_misconceptions['misconceptions'] = updated_misconceptions
 
@@ -1186,6 +1195,27 @@ class Skill:
         return misconception_dict
 
     @classmethod
+    def _convert_misconception_v5_dict_to_v6_dict(
+            cls, misconception_dict, skill_id):
+        """Converts v5 misconception schema to the v6 schema. The v6 schema
+        introduces a new attribute image_sizes_in_bytes which holds the mapping
+        of all rich text images to its sizes in bytes.
+
+        Args:
+            misconception_dict: dict. The v5 misconception dict.
+
+        Returns:
+            dict. The converted misconception_dict.
+        """
+        misconception_dict['image_sizes_in_bytes'] = (
+            html_cleaner.get_image_sizes_in_bytes_from_html(
+                misconception_dict['notes'] + misconception_dict['feedback'],
+                feconf.ENTITY_TYPE_SKILL,
+                skill_id))
+
+        return misconception_dict
+
+    @classmethod
     def _convert_rubric_v1_dict_to_v2_dict(cls, rubric_dict):
         """Converts v1 rubric schema to the v2 schema. In the v2 schema,
         multiple explanations have been added for each difficulty.
@@ -1257,7 +1287,32 @@ class Skill:
         return rubric_dict
 
     @classmethod
-    def update_rubrics_from_model(cls, versioned_rubrics, current_version):
+    def _convert_rubric_v5_dict_to_v6_dict(cls, rubric_dict, skill_id):
+        """Converts v5 rubric schema to the v6 schema. The v6 schema
+        introduces a new attribute image_sizes_in_bytes which holds the mapping
+        of all rich text images to its sizes in bytes.
+
+        Args:
+            rubric_dict: dict. The v5 rubric dict.
+            skill_id: str. The ID of the skill.
+
+        Returns:
+            dict. The converted rubric_dict.
+        """
+        image_sizes_in_bytes = {}
+        for explanation in rubric_dict['explanations']:
+            image_sizes_in_bytes.update(
+                html_cleaner.get_image_sizes_in_bytes_from_html(
+                    explanation,
+                    feconf.ENTITY_TYPE_SKILL,
+                    skill_id))
+        rubric_dict['image_sizes_in_bytes'] = image_sizes_in_bytes
+
+        return rubric_dict
+
+    @classmethod
+    def update_rubrics_from_model(
+            cls, versioned_rubrics, current_version, skill_id):
         """Converts the rubrics blob contained in the given
         versioned_rubrics dict from current_version to
         current_version + 1. Note that the versioned_rubrics being
@@ -1278,8 +1333,12 @@ class Skill:
                 current_version, current_version + 1))
 
         updated_rubrics = []
-        for rubric in versioned_rubrics['rubrics']:
-            updated_rubrics.append(conversion_fn(rubric))
+        if current_version == 5:
+            for rubric in versioned_rubrics['rubrics']:
+                updated_rubrics.append(conversion_fn(rubric, skill_id))
+        else:
+            for rubric in versioned_rubrics['rubrics']:
+                updated_rubrics.append(conversion_fn(rubric))
 
         versioned_rubrics['rubrics'] = updated_rubrics
 

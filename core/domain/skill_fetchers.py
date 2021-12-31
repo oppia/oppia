@@ -122,11 +122,12 @@ def get_skill_from_model(skill_model):
 
     if (skill_model.misconceptions_schema_version !=
             feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION):
-        _migrate_misconceptions_to_latest_schema(versioned_misconceptions)
+        _migrate_misconceptions_to_latest_schema(
+            versioned_misconceptions, skill_model.id)
 
     if (skill_model.rubric_schema_version !=
             feconf.CURRENT_RUBRIC_SCHEMA_VERSION):
-        _migrate_rubrics_to_latest_schema(versioned_rubrics)
+        _migrate_rubrics_to_latest_schema(versioned_rubrics, skill_model.id)
 
     return skill_domain.Skill(
         skill_model.id, skill_model.description,
@@ -196,7 +197,7 @@ def _migrate_skill_contents_to_latest_schema(
         skill_contents_schema_version += 1
 
 
-def _migrate_misconceptions_to_latest_schema(versioned_misconceptions):
+def _migrate_misconceptions_to_latest_schema(versioned_misconceptions, skill_id):
     """Holds the responsibility of performing a step-by-step, sequential update
     of the misconceptions structure based on the schema version of the input
     misconceptions dictionary. If the current misconceptions schema changes, a
@@ -224,11 +225,11 @@ def _migrate_misconceptions_to_latest_schema(versioned_misconceptions):
     while (misconception_schema_version <
            feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION):
         skill_domain.Skill.update_misconceptions_from_model(
-            versioned_misconceptions, misconception_schema_version)
+            versioned_misconceptions, misconception_schema_version, skill_id)
         misconception_schema_version += 1
 
 
-def _migrate_rubrics_to_latest_schema(versioned_rubrics):
+def _migrate_rubrics_to_latest_schema(versioned_rubrics, skill_id):
     """Holds the responsibility of performing a step-by-step, sequential update
     of the rubrics structure based on the schema version of the input
     rubrics dictionary. If the current rubrics schema changes, a
@@ -255,5 +256,5 @@ def _migrate_rubrics_to_latest_schema(versioned_rubrics):
     while (rubric_schema_version <
            feconf.CURRENT_RUBRIC_SCHEMA_VERSION):
         skill_domain.Skill.update_rubrics_from_model(
-            versioned_rubrics, rubric_schema_version)
+            versioned_rubrics, rubric_schema_version, skill_id)
         rubric_schema_version += 1
