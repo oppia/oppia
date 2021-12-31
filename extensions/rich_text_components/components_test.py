@@ -264,6 +264,20 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
                 },
                 re.escape(
                     'Missing keys: [\'title\'], Extra keys: [\'tab-title\']')
+            ),
+            (
+                {
+                    'tab_contents-with-value': [{
+                        'content': (
+                            '<oppia-noninteractive-collapsible content-with-value='
+                            '"&amp;quot;&amp;lt;p&amp;gt;Hello&amp;lt;/p&amp;gt;&amp;'
+                            'quot;" heading-with-value="&amp;quot;SubCollapsible&amp;'
+                            'quot;"></oppia-noninteractive-collapsible><p>&nbsp;</p>'
+                        ),
+                        'title': 'Collapsible'
+                    }]
+                },
+                'Nested tabs and collapsible'
             )
         ]
 
