@@ -152,7 +152,11 @@ describe('Misconception Editor Component', () => {
   });
 
   it('should close name editor when clicking on cancel button', () => {
+    expect(component.nameEditorIsOpen).toBe(false);
+
     component.openNameEditor();
+
+    expect(component.nameEditorIsOpen).toBe(true);
 
     component.cancelEditName();
 
@@ -160,7 +164,11 @@ describe('Misconception Editor Component', () => {
   });
 
   it('should close notes editor when clicking on cancel button', () => {
+    expect(component.notesEditorIsOpen).toBe(false);
+
     component.openNotesEditor();
+
+    expect(component.notesEditorIsOpen).toBe(true);
 
     component.cancelEditNotes();
 
@@ -168,7 +176,11 @@ describe('Misconception Editor Component', () => {
   });
 
   it('should close feedback editor when clicking on cancel button', () => {
+    expect(component.feedbackEditorIsOpen).toBe(false);
+
     component.openFeedbackEditor();
+
+    expect(component.feedbackEditorIsOpen).toBe(true);
 
     component.cancelEditFeedback();
 
@@ -197,14 +209,18 @@ describe('Misconception Editor Component', () => {
   });
 
   it('should update misconceptionNotes', () => {
-    let notes = 'notes1';
+    component.container.misconceptionNotes = 'new note';
+
+    let notes = 'new note1';
     component.updateLocalNotes(notes);
 
     expect(component.container.misconceptionNotes).toEqual(notes);
   });
 
   it('should update misconceptionFeedback', () => {
-    let feedback = 'feedback1';
+    component.container.misconceptionFeedback = 'new feedback';
+
+    let feedback = 'new feedback1';
     component.updateLocalFeedback(feedback);
 
     expect(component.container.misconceptionFeedback).toEqual(feedback);
