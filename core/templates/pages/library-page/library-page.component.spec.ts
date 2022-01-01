@@ -341,9 +341,10 @@ describe('Library Page Component', () => {
       expect(pageTitleService.setDocumentTitle).toHaveBeenCalled();
       expect(userService.getUserInfoAsync).toHaveBeenCalled();
       expect(loggerService.error).toHaveBeenCalledWith(
-        'The actual width of tile is different than the ' +
-        'expected width. Actual size: ' + actualWidth +
-        ', Expected size: ' + AppConstants.LIBRARY_TILE_WIDTH_PX
+        'The actual width of tile is different than either of the ' +
+        'expected widths. Actual size: ' + actualWidth +
+        ', Expected sizes: ' + AppConstants.LIBRARY_TILE_WIDTH_PX +
+        '/' + AppConstants.LIBRARY_MOBILE_TILE_WIDTH_PX
       );
     }));
 
