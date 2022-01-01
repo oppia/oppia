@@ -22,6 +22,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RequestInterceptor } from 'services/request-interceptor.service';
+import { SavePendingChangesModalComponent } from './modal-templates/save-pending-changes-modal.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
@@ -32,6 +33,8 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
 import { DeleteMisconceptionModalComponent } from './modal-templates/delete-misconception-modal.component';
 import { SkillDescriptionEditorComponent } from './editor-tab/skill-description-editor/skill-description-editor.component';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
+import { SkillRubricsEditorComponent } from './editor-tab/skill-rubrics-editor/skill-rubrics-editor.component';
+import { AddMisconceptionModalComponent } from './modal-templates/add-misconception-modal.component';
 
 @NgModule({
   imports: [
@@ -44,13 +47,19 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
   ],
   declarations: [
     DeleteMisconceptionModalComponent,
+    SavePendingChangesModalComponent,
     SkillEditorNavbarBreadcrumbComponent,
-    SkillDescriptionEditorComponent
+    SkillDescriptionEditorComponent,
+    SkillRubricsEditorComponent,
+    AddMisconceptionModalComponent
   ],
   entryComponents: [
     DeleteMisconceptionModalComponent,
+    SavePendingChangesModalComponent,
     SkillEditorNavbarBreadcrumbComponent,
-    SkillDescriptionEditorComponent
+    SkillDescriptionEditorComponent,
+    SkillRubricsEditorComponent,
+    AddMisconceptionModalComponent
   ],
   providers: [
     {

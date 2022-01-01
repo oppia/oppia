@@ -33,6 +33,7 @@ EXCLUDED_DIRECTORIES = [
     'proto_files/',
     'scripts/linters/test_files/',
     'third_party/',
+    'venv/'
 ]
 
 # List of files who should be type-annotated but are not.
@@ -69,13 +70,10 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/calculation_registry.py',
     'core/domain/calculation_registry_test.py',
     'core/domain/change_domain.py',
-    'core/domain/classifier_domain.py',
-    'core/domain/classifier_domain_test.py',
     'core/domain/classifier_services.py',
     'core/domain/classifier_services_test.py',
     'core/domain/classifier_validators.py',
     'core/domain/classifier_validators_test.py',
-    'core/domain/classroom_domain.py',
     'core/domain/classroom_services.py',
     'core/domain/classroom_services_test.py',
     'core/domain/collection_domain.py',
@@ -121,8 +119,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/exploration_validators_test.py',
     'core/domain/expression_parser.py',
     'core/domain/expression_parser_test.py',
-    'core/domain/feedback_domain.py',
-    'core/domain/feedback_domain_test.py',
     'core/domain/feedback_jobs_one_off.py',
     'core/domain/feedback_jobs_one_off_test.py',
     'core/domain/feedback_services.py',
@@ -141,8 +137,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/image_services_test.py',
     'core/domain/image_validation_services.py',
     'core/domain/image_validation_services_test.py',
-    'core/domain/improvements_domain.py',
-    'core/domain/improvements_domain_test.py',
     'core/domain/improvements_services.py',
     'core/domain/improvements_services_test.py',
     'core/domain/improvements_validators.py',

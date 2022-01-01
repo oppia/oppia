@@ -51,9 +51,12 @@ angular.module('oppia').controller('AddHintModalController', [
     $scope.tmpHint = '';
     $scope.addHintForm = {};
     $scope.hintIndex = StateHintsService.displayed.length + 1;
+
     $scope.isHintLengthExceeded = function(tmpHint) {
-      return (tmpHint.length > 500);
+      // TODO(#13764): Edit this check after appropriate limits are found.
+      return (tmpHint.length > 10000);
     };
+
     $scope.saveHint = function() {
       var contentId = GenerateContentIdService.getNextStateId(
         COMPONENT_NAME_HINT);
