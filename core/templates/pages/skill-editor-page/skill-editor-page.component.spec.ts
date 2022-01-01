@@ -22,6 +22,7 @@ import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
 import { Skill } from 'domain/skill/SkillObjectFactory';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // Skill editor page is upgraded to Angular 8.
@@ -36,18 +37,28 @@ describe('Skill editor page', function() {
   var SkillEditorRoutingService = null;
   var SkillEditorStateService = null;
   var UndoRedoService = null;
-  var $uibModal = null;
+  let ngbModal: NgbModal = null;
   var UrlService = null;
   var $rootScope = null;
   var mockOnSkillChangeEmitter = new EventEmitter();
 
   importAllAngularServices();
 
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
+
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     PreventPageUnloadEventService = $injector.get(
       'PreventPageUnloadEventService');
     SkillEditorRoutingService = $injector.get('SkillEditorRoutingService');
-    $uibModal = $injector.get('$uibModal');
+    ngbModal = $injector.get('NgbModal');
     SkillEditorStateService = $injector.get('SkillEditorStateService');
     UndoRedoService = $injector.get('UndoRedoService');
     UrlService = $injector.get('UrlService');
@@ -111,10 +122,10 @@ describe('Skill editor page', function() {
     expect(routingSpy).toHaveBeenCalled();
   });
 
-  it('should open save changes modal with $uibModal when unsaved changes are' +
+  it('should open save changes modal with ngbModal when unsaved changes are' +
     ' present', function() {
     spyOn(UndoRedoService, 'getChangeCount').and.returnValue(1);
-    var modalSpy = spyOn($uibModal, 'open').and.callThrough();
+    var modalSpy = spyOn(ngbModal, 'open').and.callThrough();
     ctrl.selectQuestionsTab();
     expect(modalSpy).toHaveBeenCalled();
   });
