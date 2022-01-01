@@ -105,13 +105,13 @@ describe('Add Hint Modal Component', () => {
     });
   });
 
-  it('should check if hint length is under 500 characters', () => {
+  it('should check if hint length is valid', () => {
     let hint1 = 'This is a hint ';
 
     expect(component.isHintLengthExceeded(hint1)).toBe(false);
   });
 
-  it('should check if hint length exceeded 500 characters', () => {
+  it('should check if hint length is not valid', () => {
     let hint1 = 'This is a hint ';
     let hint2 = hint1.repeat(35);
 
