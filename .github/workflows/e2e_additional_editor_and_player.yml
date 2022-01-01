@@ -46,7 +46,7 @@ jobs:
       - name: Run Additional Editor E2E Test
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --suite="additionalEditorFeatures" --prod_env
-        env:
+        env: 
           VIDEO_RECORDING_IS_ENABLED: 0
       - name: Run Additional Editor Modals E2E Test
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
@@ -56,7 +56,7 @@ jobs:
       - name: Run Additional Player E2E Test
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-build --skip-install --suite="additionalPlayerFeatures" --prod_env
-        env:
+        env: 
           VIDEO_RECORDING_IS_ENABLED: 0
       - name: Uploading protractor-video as Artifacts
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 && always() }}
