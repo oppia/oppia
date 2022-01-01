@@ -17,7 +17,7 @@
  */
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { StoryNode } from 'domain/story/story-node.model';
 import { StoryContents } from 'domain/story/StoryContentsObjectFactory';
 import { Story } from 'domain/story/StoryObjectFactory';

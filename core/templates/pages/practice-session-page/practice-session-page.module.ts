@@ -18,7 +18,7 @@
 
 import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
 import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
-import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 
 import { RequestInterceptor } from 'services/request-interceptor.service';

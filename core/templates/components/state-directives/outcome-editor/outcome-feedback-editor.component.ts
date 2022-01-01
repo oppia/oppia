@@ -17,7 +17,7 @@
  */
 
 import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { ContextService } from 'services/context.service';
 

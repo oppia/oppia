@@ -22,7 +22,7 @@ import { TopicViewerDomainConstants } from 'domain/topic_viewer/topic-viewer-dom
 import { Input } from '@angular/core';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { AppConstants } from 'app.constants';
 import { StorySummary } from 'domain/story/story-summary.model';

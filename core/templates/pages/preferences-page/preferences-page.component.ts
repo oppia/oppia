@@ -17,7 +17,7 @@
  */
 
 import { Component } from '@angular/core';
-import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
 import { LanguageIdAndText, LanguageUtilService } from 'domain/utilities/language-util.service';

@@ -21,7 +21,7 @@
  */
 
 import { Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { InteractionAnswer } from 'interactions/answer-defs';
 import { CurrentInteractionService, InteractionRulesService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';

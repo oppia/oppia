@@ -17,7 +17,7 @@
  */
 
 import { ChangeDetectorRef, Component, Directive } from '@angular/core';
-import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { CookieService } from 'ngx-cookie';
 import { Subscription } from 'rxjs';

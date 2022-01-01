@@ -17,7 +17,7 @@
  */
 
 import { Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
+import { downgradeComponent } from '@angular/upgrade/static';
 
 import constants from 'assets/constants';
 import { CollectionSummaryTileConstants } from 'components/summary-tile/collection-summary-tile.constants';

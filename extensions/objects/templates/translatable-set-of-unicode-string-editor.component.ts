@@ -17,7 +17,7 @@
  */
 
 import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
-import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
+import { downgradeComponent } from '@angular/upgrade/static';
 
 import { TranslatableSetOfStringSchema } from './translatable-set-of-normalized-string-editor.component';
 

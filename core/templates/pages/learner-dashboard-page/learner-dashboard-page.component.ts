@@ -18,7 +18,7 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { SafeResourceUrl } from '@angular/platform-browser';
 import { trigger, state, style, transition,
   animate, group } from '@angular/animations';

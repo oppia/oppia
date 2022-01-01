@@ -19,7 +19,7 @@
 import { Component, OnInit } from '@angular/core';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
+import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
   selector: 'background-banner',

@@ -17,7 +17,7 @@
  */
 
 import { Component, Input, EventEmitter, Output } from '@angular/core';
-import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service';
 import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';

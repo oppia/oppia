@@ -28,7 +28,7 @@ import { InteractionRulesService } from 'pages/exploration-player-page/services/
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 
 import { FractionInputRulesService } from './fraction-input-rules.service';
-import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { FractionAnswer, InteractionAnswer } from 'interactions/answer-defs';
 

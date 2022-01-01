@@ -22,7 +22,7 @@ interface EditorSchema {
 }
 
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { AlertsService } from 'services/alerts.service';
 import { BlogPostEditorData, BlogPostEditorBackendApiService } from 'domain/blog/blog-post-editor-backend-api.service';
 import { BlogPostUpdateService } from 'domain/blog/blog-post-update.service';

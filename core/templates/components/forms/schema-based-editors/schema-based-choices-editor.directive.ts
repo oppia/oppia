@@ -16,7 +16,7 @@
  * @fileoverview Directive for a schema-based editor for multiple choice.
  */
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
+import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
   selector: 'schema-based-choices-editor',

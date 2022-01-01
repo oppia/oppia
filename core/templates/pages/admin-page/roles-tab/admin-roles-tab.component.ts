@@ -18,7 +18,7 @@
 
 import { Component, OnInit } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { AdminDataService } from '../services/admin-data.service';
 import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
 import { TopicManagerRoleEditorModalComponent } from './topic-manager-role-editor-modal.component';

@@ -22,7 +22,7 @@
 //
 // This component is based on the UnicodeString directive.
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
+import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
   selector: 'html-editor',

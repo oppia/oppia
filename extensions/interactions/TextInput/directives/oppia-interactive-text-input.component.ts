@@ -21,7 +21,7 @@
  */
 
 import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { TextInputCustomizationArgs } from 'interactions/customization-args-defs';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
 import { InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';

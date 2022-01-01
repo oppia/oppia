@@ -27,7 +27,7 @@ import { StoryEditorStateService } from '../services/story-editor-state.service'
 import { StoryEditorSaveModalComponent } from '../modal-templates/story-editor-save-modal.component';
 import { StoryEditorUnpublishModalComponent } from '../modal-templates/story-editor-unpublish-modal.component';
 import { Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { StoryEditorNavigationService } from '../services/story-editor-navigation.service';
 
 @Component({

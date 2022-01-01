@@ -17,7 +17,7 @@
  */
 
 import { Component } from '@angular/core';
-import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { AlertsService, Message, Warning } from 'services/alerts.service';
 
 @Component({

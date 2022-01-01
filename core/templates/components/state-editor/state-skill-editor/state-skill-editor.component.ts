@@ -30,7 +30,7 @@ import {WindowDimensionsService } from 'services/contextual/window-dimensions.se
 import { StateLinkedSkillIdService } from '../state-editor-properties-services/state-skill.service';
 import { SkillsCategorizedByTopics } from 'pages/topics-and-skills-dashboard-page/skills-list/skills-list.component';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
+import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
   selector: 'state-skill-editor',

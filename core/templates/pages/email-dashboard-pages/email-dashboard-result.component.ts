@@ -17,7 +17,7 @@
  */
 
 import { Component } from '@angular/core';
-import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { EmailDashboardResultBackendApiService } from './email-dashboard-result-backend-api.service';
 

@@ -18,7 +18,7 @@
  */
 
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { SuggestionThread } from 'domain/suggestion/SuggestionThreadObjectFactory';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { ThreadStatusDisplayService } from '../services/thread-status-display.service';

@@ -21,7 +21,7 @@
  */
 
 import { Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { BrowserCheckerService } from 'domain/utilities/browser-checker.service';
 import { MultipleChoiceInputCustomizationArgs } from 'interactions/customization-args-defs';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';

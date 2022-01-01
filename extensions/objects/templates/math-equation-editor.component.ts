@@ -20,7 +20,7 @@
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
-import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { ObjectFormValidityChangeEvent } from 'app-events/app-events';
 import { EventBusGroup, EventBusService } from 'app-events/event-bus.service';
 import { AppConstants } from 'app.constants';

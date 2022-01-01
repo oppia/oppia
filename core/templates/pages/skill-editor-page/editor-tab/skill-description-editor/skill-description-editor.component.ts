@@ -21,7 +21,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { SkillUpdateService } from 'domain/skill/skill-update.service';
 import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
 import { Skill, SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
-import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { SkillRights } from 'domain/skill/skill-rights.model';
 

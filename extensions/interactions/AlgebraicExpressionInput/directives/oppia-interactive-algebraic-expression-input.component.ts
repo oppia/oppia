@@ -30,7 +30,7 @@ import { MathInteractionsService } from 'services/math-interactions.service';
 import { AlgebraicExpressionInputRulesService } from './algebraic-expression-input-rules.service';
 import constants from 'assets/constants';
 import { InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
-import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { InteractionAnswer } from 'interactions/answer-defs';
 import { TranslateService } from '@ngx-translate/core';
 

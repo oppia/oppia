@@ -21,7 +21,7 @@
 // in via initArgs.
 
 import { Component, EventEmitter, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
+import { downgradeComponent } from '@angular/upgrade/static';
 
 interface IntValidatorSchema {
   type: string;

@@ -17,7 +17,7 @@
  */
 
 import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
-import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
+import { downgradeComponent } from '@angular/upgrade/static';
 import constants from 'assets/constants';
 import { SkillCreationService } from 'components/entity-creation-services/skill-creation.service';
 import { Rubric } from 'domain/skill/rubric.model';

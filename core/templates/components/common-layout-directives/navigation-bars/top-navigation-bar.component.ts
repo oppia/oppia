@@ -34,7 +34,7 @@ import { EventToCodes, NavigationService } from 'services/navigation.service';
 import { AppConstants } from 'app.constants';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { I18nService } from 'i18n/i18n.service';
 import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';

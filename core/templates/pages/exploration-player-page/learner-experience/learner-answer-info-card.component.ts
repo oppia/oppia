@@ -17,7 +17,7 @@
  */
 
 import { Component, EventEmitter, Output } from '@angular/core';
-import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
 import { InteractionRulesService } from '../services/answer-classification.service';

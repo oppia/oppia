@@ -18,7 +18,7 @@
 
 import { Component, EventEmitter, forwardRef, Input, Output } from '@angular/core';
 import { AbstractControl, ControlValueAccessor, NG_VALUE_ACCESSOR, ValidationErrors, Validator } from '@angular/forms';
-import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
+import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
   selector: 'schema-based-custom-editor',

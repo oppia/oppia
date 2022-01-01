@@ -21,7 +21,7 @@
  */
 
 import { AfterViewInit, ChangeDetectorRef, Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
+import { downgradeComponent } from '@angular/upgrade/static';
 
 import { CodemirrorComponent } from '@ctrl/ngx-codemirror';
 import { Subscription } from 'rxjs';

@@ -20,7 +20,7 @@
 // available in the context in which it is used.
 
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { ExplorationParamSpecsService } from 'pages/exploration-editor-page/services/exploration-param-specs.service';
 
 @Component({
@@ -43,8 +43,8 @@ export class ParameterNameEditorComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.availableParamNames =
-              this.explorationParamSpecsService.savedMemento.getParamNames();
+    this.availableParamNames = (
+      this.explorationParamSpecsService.savedMemento.getParamNames());
 
     if (this.availableParamNames.length === 0) {
       this.value = null;

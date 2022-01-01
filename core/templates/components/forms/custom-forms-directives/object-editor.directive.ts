@@ -62,7 +62,7 @@ import { IntEditorComponent } from 'objects/templates/int-editor.component';
 import { LoggerService } from 'services/contextual/logger.service';
 import { ComponentRef } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
+import { downgradeComponent } from '@angular/upgrade/static';
 const EDITORS = {
   'algebraic-expression': AlgebraicExpressionEditorComponent,
   'boolean': BooleanEditorComponent,

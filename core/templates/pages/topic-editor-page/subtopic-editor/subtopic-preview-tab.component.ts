@@ -17,7 +17,7 @@
  */
 
 import { Component } from '@angular/core';
-import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { SubtopicPageContents } from 'domain/topic/subtopic-page-contents.model';
 import { SubtopicPage } from 'domain/topic/subtopic-page.model';
 import { Subtopic } from 'domain/topic/subtopic.model';

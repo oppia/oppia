@@ -21,7 +21,7 @@ import { Subject } from 'rxjs';
 import constants from 'assets/constants';
 import { EventToCodes, NavigationService } from 'services/navigation.service';
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { SearchService, SelectionDetails } from 'services/search.service';

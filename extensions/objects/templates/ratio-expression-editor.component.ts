@@ -20,7 +20,7 @@ import { Ratio } from 'domain/objects/ratio.model';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { EventBusGroup, EventBusService } from 'app-events/event-bus.service';
 import { ObjectFormValidityChangeEvent } from 'app-events/app-events';
-import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
+import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
   selector: 'ratio-expression-editor',

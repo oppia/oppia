@@ -17,7 +17,7 @@
  */
 
 import { Component, Input } from '@angular/core';
-import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { ToastrService } from 'ngx-toastr';
 import { AlertsService } from 'services/alerts.service';
 require('ngx-toastr/toastr.css');

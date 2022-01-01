@@ -17,7 +17,7 @@
  */
 
 import { Component, EventEmitter, Output } from '@angular/core';
-import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
 import { WindowRef } from 'services/contextual/window-ref.service';

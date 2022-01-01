@@ -18,7 +18,7 @@
 
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { MatRadioChange } from '@angular/material/radio';
-import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { Rubric } from 'domain/skill/rubric.model';
 import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';

@@ -17,7 +17,7 @@
  * playing the exploration in each node.
  */
 import { Component, Input } from '@angular/core';
-import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
+import { downgradeComponent } from '@angular/upgrade/static';
 
 import { CollectionNode } from
   'domain/collection/collection-node.model';

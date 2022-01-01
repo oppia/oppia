@@ -18,7 +18,7 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { StateParamChangesService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-param-changes.service';

@@ -20,7 +20,7 @@ import { Component, OnInit } from '@angular/core';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { TopicViewerDomainConstants } from 'domain/topic_viewer/topic-viewer-domain.constants';
 import { Input } from '@angular/core';
-import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { AppConstants } from 'app.constants';
 import { StorySummary } from 'domain/story/story-summary.model';

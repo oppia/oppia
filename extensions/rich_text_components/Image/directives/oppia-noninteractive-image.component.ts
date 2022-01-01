@@ -42,7 +42,7 @@ import { ContextService } from 'services/context.service';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { AppConstants } from 'app.constants';
-import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 import { SafeResourceUrl } from '@angular/platform-browser';
 

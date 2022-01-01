@@ -28,7 +28,7 @@ import eq from 'lodash/eq';
 import { InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
 import { SetInputCustomizationArgs } from 'interactions/customization-args-defs';
 import { Schema } from 'services/schema-default-value.service';
-import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
+import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
   selector: 'oppia-interactive-set-input',

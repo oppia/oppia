@@ -17,7 +17,7 @@
  */
 
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { StateCard } from 'domain/state_card/state-card.model';
 import { BrowserCheckerService } from 'domain/utilities/browser-checker.service';
 import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';

@@ -17,7 +17,7 @@
  */
 
 import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
-import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
 import { InputResponsePair } from 'domain/state_card/state-card.model';

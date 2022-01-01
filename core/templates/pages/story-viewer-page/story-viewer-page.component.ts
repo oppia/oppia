@@ -20,7 +20,7 @@ import { Component, OnInit } from '@angular/core';
 import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { UrlService } from 'services/contextual/url.service';
-import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { UserService } from 'services/user.service';
 import { AppConstants } from 'app.constants';
