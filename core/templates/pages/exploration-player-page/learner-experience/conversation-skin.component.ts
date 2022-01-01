@@ -340,6 +340,14 @@ export class ConversationSkinComponent {
     return this.currentInteractionService.isSubmitButtonDisabled();
   }
 
+  changeCard(index: number): void {
+    this.playerPositionService.recordNavigationButtonClick();
+    this.playerPositionService.setDisplayedCardIndex(index);
+    this.explorationEngineService.onUpdateActiveStateIfInEditor.emit(
+      this.playerPositionService.getCurrentStateName());
+    this.playerPositionService.changeCurrentQuestion(index);
+  }
+
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
   }

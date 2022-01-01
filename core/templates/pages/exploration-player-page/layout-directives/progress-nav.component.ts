@@ -26,7 +26,6 @@ import { UrlService } from 'services/contextual/url.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { ExplorationPlayerConstants } from '../exploration-player-page.constants';
-import { ExplorationEngineService } from '../services/exploration-engine.service';
 import { ExplorationPlayerStateService } from '../services/exploration-player-state.service';
 import { PlayerPositionService } from '../services/player-position.service';
 import { PlayerTranscriptService } from '../services/player-transcript.service';
@@ -46,6 +45,7 @@ export class ProgressNavComponent {
     new EventEmitter());
   @Output() clickContinueButton: EventEmitter<void> = (
     new EventEmitter());
+  @Output() changeCard: EventEmitter<number> = new EventEmitter();
 
   directiveSubscriptions = new Subscription();
   transcriptLength = 0;
@@ -66,7 +66,6 @@ export class ProgressNavComponent {
 
   constructor(
     private browserCheckerService: BrowserCheckerService,
-    private explorationEngineService: ExplorationEngineService,
     private explorationPlayerStateService: ExplorationPlayerStateService,
     private focusManagerService: FocusManagerService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
@@ -171,13 +170,9 @@ export class ProgressNavComponent {
     }
   }
 
-  changeCard(index: number): void {
+  validateIndexAndChangeCard(index: number): void {
     if (index >= 0 && index < this.transcriptLength) {
-      this.playerPositionService.recordNavigationButtonClick();
-      this.playerPositionService.setDisplayedCardIndex(index);
-      this.explorationEngineService.onUpdateActiveStateIfInEditor.emit(
-        this.playerPositionService.getCurrentStateName());
-      this.playerPositionService.changeCurrentQuestion(index);
+      this.changeCard.emit(index);
     } else {
       throw new Error('Target card index out of bounds.');
     }

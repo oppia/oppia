@@ -27,7 +27,8 @@
                             [submitButtonIsDisabled]="isSubmitButtonDisabled()"
                             [displayedCard]="displayedCard"
                             [submitButtonIsShown]="!answerIsBeingProcessed"
-                            (clickContinueButton)="showUpcomingCard()">
+                            (clickContinueButton)="showUpcomingCard()"
+                            (changeCard)="changeCard($event)">
         </oppia-progress-nav>
       </div>
       <div *ngIf="recommendedExplorationSummaries && recommendedExplorationSummaries.length > 0 && (inStoryMode  || (collectionSummary && isOnTerminalCard() && isCurrentCardAtEndOfTranscript()))" class="conversation-skin-next-lesson-wrapper">
