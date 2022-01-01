@@ -553,6 +553,9 @@ angular.module('oppia').component('questionPlayer', {
             (result) => {
               $location.hash(
                 HASH_PARAM + encodeURIComponent(JSON.stringify(result)));
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the controller is migrated to angular.
+              $rootScope.$applyAsync();
             })
         );
 
