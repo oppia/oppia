@@ -16,8 +16,8 @@
  * @fileoverview Component for the supplemental card.
  */
 
-import { Component, Output, EventEmitter, Input, OnInit, OnDestroy, ElementRef, ViewChild, ChangeDetectorRef } from '@angular/core';
-import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
+import { Component, Output, EventEmitter, Input, OnInit, OnDestroy, ElementRef, ViewChild, ChangeDetectorRef, SimpleChanges } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { StateCard } from 'domain/state_card/state-card.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -97,6 +97,13 @@ export class SupplementalCardComponent implements OnInit, OnDestroy {
       )
     );
     this.updateDisplayedCard();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.displayedCard) {
+      this.displayedCard = changes.displayedCard.currentValue;
+      this.updateDisplayedCard();
+    }
   }
 
   ngOnDestroy(): void {

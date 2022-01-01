@@ -29,6 +29,7 @@ import re
 import types
 
 from core import feconf
+from core import handler_schema_constants
 from core import python_utils
 from core import utils
 from core.constants import constants
@@ -42,6 +43,7 @@ from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import taskqueue_services
 from core.domain import user_services
+from core.domain import wipeout_service
 from core.platform import models
 from core.tests import test_utils
 import main
@@ -156,11 +158,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         # Create user that is scheduled for deletion.
         self.signup(self.DELETED_USER_EMAIL, self.DELETED_USER_USERNAME)
         deleted_user_id = self.get_user_id_from_email(self.DELETED_USER_EMAIL)
-        deleted_user_model = (
-            user_models.UserSettingsModel.get_by_id(deleted_user_id))
-        deleted_user_model.deleted = True
-        deleted_user_model.update_timestamps()
-        deleted_user_model.put()
+        wipeout_service.pre_delete_user(deleted_user_id)
 
         # Create a new user but do not submit their registration form.
         user_services.create_new_user(
@@ -331,6 +329,17 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             self.post_json('/frontend_errors', {'error': 'errors'})
 
         self.assertEqual(observed_log_messages, ['Frontend error: errors'])
+
+    def test_redirect_when_user_is_disabled(self):
+        get_auth_claims_from_request_swap = self.swap_to_always_raise(
+            auth_services,
+            'get_auth_claims_from_request',
+            auth_domain.UserDisabledError
+        )
+        with get_auth_claims_from_request_swap:
+            response = self.get_html_response('/', expected_status_int=302)
+            self.assertIn(
+                'pending-account-deletion', response.headers['location'])
 
     def test_redirect_oppia_test_server(self):
         # The old demo server redirects to the new demo server.
@@ -1230,6 +1239,24 @@ class SignUpTests(test_utils.GenericTestBase):
 
         self.get_html_response('/community-library')
 
+    def test_error_is_raised_during_signup_using_invalid_token(self):
+        """Test that error is raised if user tries to signup
+        using invalid CSRF token.
+        """
+        self.login('abc@example.com')
+        self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
+
+        response = self.post_json(
+            feconf.SIGNUP_DATA_URL, {
+                'username': 'abc',
+                'agreed_to_terms': True
+            }, csrf_token='invalid_token', expected_status_int=401,
+        )
+
+        self.assertEqual(response['error'],
+            'Your session has expired, and unfortunately your '
+            'changes cannot be saved. Please refresh the page.')
+
 
 class CsrfTokenHandlerTests(test_utils.GenericTestBase):
 
@@ -1336,7 +1363,7 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
     architecture.
     """
     handler_class_names_with_no_schema = (
-        payload_validator.HANDLER_CLASS_NAMES_WITH_NO_SCHEMA)
+        handler_schema_constants.HANDLER_CLASS_NAMES_WITH_NO_SCHEMA)
     wiki_page_link = (
         'https://github.com/oppia/oppia/wiki/Writing-schema-for-handler-args')
 
@@ -1494,11 +1521,12 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
                     default_value = {arg: schema['default_value']}
                     default_value_schema = {arg: schema}
 
-                    _, errors = payload_validator.validate(
-                        default_value,
-                        default_value_schema,
-                        allowed_extra_args=True,
-                        allow_string_to_bool_conversion=False
+                    _, errors = (
+                        payload_validator.validate_arguments_against_schema(
+                            default_value,
+                            default_value_schema,
+                            allowed_extra_args=True,
+                            allow_string_to_bool_conversion=False)
                     )
                     if len(errors) == 0:
                         continue
@@ -1522,13 +1550,13 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
 
     def test_handlers_with_schemas_are_not_in_handler_schema_todo_list(self):
         """This test ensures that the
-        HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS list in payload validator
+        HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS list in handler_schema_constants
         only contains handler class names which require schemas.
         """
 
         list_of_handlers_to_be_removed = []
         handler_names_which_require_schemas = (
-            payload_validator.HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS)
+        handler_schema_constants.HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS)
         list_of_routes_which_need_schemas = (
             self._get_list_of_routes_which_need_schemas())
 
@@ -1551,7 +1579,7 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
 
         error_msg = (
             'Handlers to be removed from schema requiring list in '
-            'payload validator file: [ %s ].' % (
+            'handler_schema_constants file: [ %s ].' % (
                 ', '.join(list_of_handlers_to_be_removed)))
 
         self.assertEqual(list_of_handlers_to_be_removed, [], error_msg)
@@ -1984,3 +2012,53 @@ class ImageUploadHandlerTest(test_utils.GenericTestBase):
             )
             filename = response_dict['filename']
         self.logout()
+
+
+class UrlPathNormalizationTest(test_utils.GenericTestBase):
+    """Tests that ensure url path arguments are normalized"""
+
+    class MockHandler(base.BaseHandler):
+        URL_PATH_ARGS_SCHEMAS = {
+            'mock_list': {
+                'schema': {
+                    'type': 'custom',
+                    'obj_type': 'JsonEncodedInString'
+                }
+            },
+            'mock_int': {
+                'schema': {
+                    'type': 'int'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {
+            'GET': {}
+        }
+
+        def get(self, mock_list, mock_int):
+            if not isinstance(mock_list, list):
+                raise self.InvalidInputException(
+                    'Expected arg mock_list to be a list. Was type %s' %
+                    type(mock_list))
+            if not isinstance(mock_int, int):
+                raise self.InvalidInputException(
+                    'Expected arg mock_int to be a int. Was type %s' %
+                    type(mock_int))
+            self.render_json({'mock_list': mock_list, 'mock_int': mock_int})
+
+    def setUp(self):
+        super(UrlPathNormalizationTest, self).setUp()
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock_normalization/<mock_int>/<mock_list>',
+            self.MockHandler, name='MockHandler')],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_url_path_arg_normalization_is_successful(self):
+        list_string = '["id1", "id2", "id3"]'
+        int_string = '1'
+
+        with self.swap(self, 'testapp', self.testapp):
+            self.get_json(
+                '/mock_normalization/%s/%s' % (int_string, list_string),
+                expected_status_int=200)

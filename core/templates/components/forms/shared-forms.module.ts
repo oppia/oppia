@@ -41,6 +41,8 @@ import { SchemaBasedCustomEditorComponent } from './schema-based-editors/schema-
 import { SchemaBasedDictEditorComponent } from './schema-based-editors/schema-based-dict-editor.directive';
 import { SchemaBasedHtmlEditorComponent } from './schema-based-editors/schema-based-html-editor.directive';
 import { OppiaCkEditor4Module } from 'components/ck-editor-helpers/ckeditor4.module';
+import { MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent } from 'components/forms/forms-templates/mark-all-audio-and-translations-as-needing-update-modal.component';
+import { MarkAudioAsNeedingUpdateModalComponent } from 'components/forms/forms-templates/mark-audio-as-needing-update-modal.component';
 
 @NgModule({
   imports: [
@@ -80,7 +82,10 @@ import { OppiaCkEditor4Module } from 'components/ck-editor-helpers/ckeditor4.mod
     SchemaBasedFloatEditorComponent,
     SchemaBasedHtmlEditorComponent,
     SchemaBasedIntEditorComponent,
-    ObjectEditorComponent
+    ObjectEditorComponent,
+    MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent,
+    MarkAudioAsNeedingUpdateModalComponent,
+    SchemaBasedEditorDirective,
   ],
   exports: [
     AudioSliderComponent,

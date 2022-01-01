@@ -35,11 +35,11 @@ import { WrittenTranslations } from
 import { InteractionSpecsConstants, InteractionSpecsKey } from 'pages/interaction-specs.constants';
 
 export interface InputResponsePair {
-  learnerInput: string,
+  learnerInput: string;
   // 'oppiaResponse' is null when the response for the input has
   // not been received yet.
-  oppiaResponse: string | null,
-  isHint: boolean
+  oppiaResponse: string | null;
+  isHint: boolean;
 }
 
 export class StateCard {

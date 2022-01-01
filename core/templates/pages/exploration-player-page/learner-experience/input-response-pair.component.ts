@@ -39,6 +39,7 @@ export class InputResponsePairComponent {
   @Input() data: InputResponsePair;
   @Output() dataChange: EventEmitter<InputResponsePair> = new EventEmitter();
   @Input() oppiaAvatarImageUrl: string;
+  @Input() bottomSection: boolean;
   @Input() profilePicture: string;
   @Input() inputResponsePairId: string;
   @Input() isLastPair: boolean;

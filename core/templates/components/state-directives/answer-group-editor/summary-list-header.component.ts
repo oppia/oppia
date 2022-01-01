@@ -20,8 +20,8 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
 
 interface DeleteSummaryEventData {
-  index: number,
-  event: Event
+  index: number;
+  event: Event;
 }
 
 @Component({

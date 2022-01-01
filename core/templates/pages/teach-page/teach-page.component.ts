@@ -29,11 +29,11 @@ import { UserService } from 'services/user.service';
 import { Subscription } from 'rxjs';
 
 export interface Testimonial {
-  quote: string,
-  studentDetails: string,
-  imageUrl: string,
-  imageUrlWebp: string,
-  borderPresent: boolean
+  quote: string;
+  studentDetails: string;
+  imageUrl: string;
+  imageUrlWebp: string;
+  borderPresent: boolean;
 }
 
 @Component({

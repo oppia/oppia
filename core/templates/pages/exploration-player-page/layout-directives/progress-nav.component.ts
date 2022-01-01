@@ -31,6 +31,7 @@ import { ExplorationPlayerStateService } from '../services/exploration-player-st
 import { PlayerPositionService } from '../services/player-position.service';
 import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
 
 @Component({
   selector: 'oppia-progress-nav',
@@ -72,6 +73,7 @@ export class ProgressNavComponent {
     private playerPositionService: PlayerPositionService,
     private playerTranscriptService: PlayerTranscriptService,
     private urlService: UrlService,
+    private schemaFormSubmittedService: SchemaFormSubmittedService,
     private windowDimensionsService: WindowDimensionsService
   ) {}
 
@@ -88,12 +90,6 @@ export class ProgressNavComponent {
 
   ngOnInit(): void {
     this.isIframed = this.urlService.isIframed();
-    this.directiveSubscriptions.add(
-      this.playerPositionService.displayedCardIndexChangedEventEmitter
-        .subscribe((index) => {
-          this.updateDisplayedCardInfo();
-        })
-    );
 
     this.directiveSubscriptions.add(
       this.playerPositionService.onHelpCardAvailable.subscribe(
@@ -102,10 +98,13 @@ export class ProgressNavComponent {
         }
       )
     );
-
-    if (this.playerPositionService.getDisplayedCardIndex() > -1) {
-      this.updateDisplayedCardInfo();
-    }
+    this.directiveSubscriptions.add(
+      this.schemaFormSubmittedService.onSubmittedSchemaBasedForm.subscribe(
+        () => {
+          this.submit.emit();
+        }
+      )
+    );
   }
 
   ngOnDestroy(): void {

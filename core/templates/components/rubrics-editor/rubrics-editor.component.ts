@@ -24,28 +24,28 @@ import { Rubric } from 'domain/skill/rubric.model';
 import { TopicsAndSkillsDashboardPageConstants } from 'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
 
 interface Explanation {
-  [key: string]: string[]
+  [key: string]: string[];
 }
 
 interface ExplanationFormSchema {
-  type: string,
-  'ui_config': object
+  type: string;
+  'ui_config': object;
 }
 
 interface RubricsOptions {
-  id: number,
-  difficulty: string
+  id: number;
+  difficulty: string;
 }
 
 interface RubricData {
-  difficulty: string,
-  data: string[]
+  difficulty: string;
+  data: string[];
 }
 
 interface SkillDescriptionStatusValuesInterface {
-  STATUS_CHANGED: string,
-  STATUS_UNCHANGED: string,
-  STATUS_DISABLED: string
+  STATUS_CHANGED: string;
+  STATUS_UNCHANGED: string;
+  STATUS_DISABLED: string;
 }
 
 @Component({

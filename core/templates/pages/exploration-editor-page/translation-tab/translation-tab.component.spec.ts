@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for translationTab.
  */
 
-import { TestBed } from '@angular/core/testing';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { EventEmitter } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
@@ -51,6 +51,7 @@ import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { ExternalSaveService } from 'services/external-save.service';
 import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
+import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 import $ from 'jquery';
 
@@ -63,7 +64,7 @@ describe('Translation tab component', function() {
   var ctrl = null;
   var $q = null;
   var $scope = null;
-  var $uibModal = null;
+  var ngbModal = null;
   var contextService = null;
   var editabilityService = null;
   var explorationStatesService = null;
@@ -77,7 +78,15 @@ describe('Translation tab component', function() {
   var refreshTranslationTabEmitter = new EventEmitter();
   var enterTranslationForTheFirstTimeEmitter = new EventEmitter();
 
-  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
   importAllAngularServices();
 
   beforeEach(function() {
@@ -121,16 +130,23 @@ describe('Translation tab component', function() {
     $provide.value(
       'ReadOnlyExplorationBackendApiService',
       TestBed.get(ReadOnlyExplorationBackendApiService));
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $q = $injector.get('$q');
     var $rootScope = $injector.get('$rootScope');
-    $uibModal = $injector.get('$uibModal');
     editabilityService = $injector.get('EditabilityService');
     explorationStatesService = $injector.get('ExplorationStatesService');
     routerService = $injector.get('RouterService');
     stateEditorService = $injector.get('StateEditorService');
+    ngbModal = $injector.get('NgbModal');
     stateTutorialFirstTimeService = $injector.get(
       'StateTutorialFirstTimeService');
 
@@ -367,7 +383,7 @@ describe('Translation tab component', function() {
     });
 
   it('should start tutorial when welcome translation modal is closed',
-    function() {
+    fakeAsync(() => {
       spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
         .returnValue($q.resolve({
           canVoiceover: true
@@ -377,30 +393,32 @@ describe('Translation tab component', function() {
       $scope.$apply();
 
       spyOn(siteAnalyticsService, 'registerAcceptTutorialModalEvent');
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve('exp1')
-      });
+      spyOn(ngbModal, 'open').and.returnValue({
+        result: Promise.resolve('exp1')
+      } as NgbModalRef);
       enterTranslationForTheFirstTimeEmitter.emit();
+      tick();
       $scope.$apply();
 
       expect(siteAnalyticsService.registerAcceptTutorialModalEvent)
         .toHaveBeenCalled();
-    });
+    }));
 
   it('should finish translation tutorial when welcome translation modal is' +
-    ' dismissed', function() {
+    ' dismissed', fakeAsync(() => {
     ctrl.$onInit();
 
     spyOn(stateTutorialFirstTimeService, 'markTranslationTutorialFinished');
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.reject('exp1')
-    });
+    spyOn(ngbModal, 'open').and.returnValue({
+      result: Promise.reject('exp1')
+    } as NgbModalRef);
     enterTranslationForTheFirstTimeEmitter.emit();
+    tick();
     $scope.$apply();
 
     expect(stateTutorialFirstTimeService.markTranslationTutorialFinished)
       .toHaveBeenCalled();
-  });
+  }));
 
   describe('TRANSLATION_TUTORIAL_OPTIONS', function() {
     it('should animate html and body to 0px top when calling function' +

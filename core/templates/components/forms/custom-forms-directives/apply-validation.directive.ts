@@ -33,7 +33,7 @@ interface InteractionValidator {
 interface ApplyValidationCustomScope extends ng.IScope {
   $ctrl: {
     validators: () => InteractionValidator[];
-  }
+  };
 }
 
 @Directive({

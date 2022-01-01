@@ -17,8 +17,8 @@
  */
 
 interface EditorSchema {
-  type: string,
-  'ui_config': object
+  type: string;
+  'ui_config': object;
 }
 
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';

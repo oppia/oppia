@@ -21,7 +21,7 @@ import { downgradeComponent } from 'static/@oppia-angular/upgrade/static';
 
 interface SubtitledHtmlEditorSchema {
   type: string;
-  'ui_config': unknown | {}
+  'ui_config': unknown | {};
 }
 
 @Component({

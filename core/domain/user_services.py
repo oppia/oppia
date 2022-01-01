@@ -174,7 +174,9 @@ def get_users_settings(user_ids, strict=False, include_marked_deleted=False):
                 roles=[
                     feconf.ROLE_ID_FULL_USER,
                     feconf.ROLE_ID_CURRICULUM_ADMIN,
-                    feconf.ROLE_ID_MODERATOR],
+                    feconf.ROLE_ID_MODERATOR,
+                    feconf.ROLE_ID_VOICEOVER_ADMIN
+                ],
                 banned=False,
                 username='admin',
                 last_agreed_to_terms=datetime.datetime.utcnow()
@@ -287,7 +289,9 @@ def get_user_settings_by_auth_id(auth_id, strict=False):
     Raises:
         Exception. The value of strict is True and given auth_id does not exist.
     """
-    user_id = auth_services.get_user_id_from_auth_id(auth_id)
+    user_id = auth_services.get_user_id_from_auth_id(
+        auth_id, include_deleted=True
+    )
     user_settings_model = (
         None if user_id is None else
         user_models.UserSettingsModel.get_by_id(user_id))

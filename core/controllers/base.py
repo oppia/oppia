@@ -28,6 +28,7 @@ import time
 import urllib
 
 from core import feconf
+from core import handler_schema_constants
 from core import python_utils
 from core import utils
 from core.controllers import payload_validator
@@ -195,6 +196,11 @@ class BaseHandler(webapp2.RequestHandler):
             auth_services.destroy_auth_session(self.response)
             self.redirect(user_services.create_login_url(self.request.uri))
             return
+        except auth_domain.UserDisabledError:
+            auth_services.destroy_auth_session(self.response)
+            self.redirect(
+                '/logout?redirect_url=%s' % feconf.PENDING_ACCOUNT_DELETION_URL)
+            return
         except auth_domain.InvalidAuthSessionError:
             logging.exception('User session is invalid!')
             auth_services.destroy_auth_session(self.response)
@@ -344,10 +350,13 @@ class BaseHandler(webapp2.RequestHandler):
         handler_class_name = self.__class__.__name__
         request_method = self.request.environ['REQUEST_METHOD']
         url_path_args = self.request.route_kwargs
-        handler_class_names_with_no_schema = (
-            payload_validator.HANDLER_CLASS_NAMES_WITH_NO_SCHEMA)
 
-        if handler_class_name in handler_class_names_with_no_schema:
+        if (
+            handler_class_name in
+            handler_schema_constants.HANDLER_CLASS_NAMES_WITH_NO_SCHEMA
+        ):
+            # TODO(#13155): Remove this clause once all the handlers have had
+            # schema validation implemented.
             return
 
         handler_args = {}
@@ -389,8 +398,8 @@ class BaseHandler(webapp2.RequestHandler):
                     handler_class_name))
 
         schema_for_url_path_args = self.URL_PATH_ARGS_SCHEMAS
-        normalized_arg_values, errors = (
-            payload_validator.validate(
+        self.request.route_kwargs, errors = (
+            payload_validator.validate_arguments_against_schema(
                 url_path_args, schema_for_url_path_args, extra_args_are_allowed)
         )
 
@@ -419,7 +428,7 @@ class BaseHandler(webapp2.RequestHandler):
 
         allow_string_to_bool_conversion = request_method in ['GET', 'DELETE']
         normalized_arg_values, errors = (
-            payload_validator.validate(
+            payload_validator.validate_arguments_against_schema(
                 handler_args, schema_for_request_method, extra_args_are_allowed,
                 allow_string_to_bool_conversion)
         )
