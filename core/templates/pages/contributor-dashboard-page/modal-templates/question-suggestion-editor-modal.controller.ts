@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
 import { ConfirmQuestionExitComponent } from "components/question-directives/modal-templates/confirm-question-exit-modal.component";
+import { QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent } from "pages/topic-editor-page/modal-templates/question-opportunities-select-skill-and-difficulty-modal.component";
 
 /**
  * @fileoverview Controller for question suggestion editor modal.
@@ -113,17 +115,11 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
     };
     $scope.skillId = $scope.skill.getId();
     $scope.onClickChangeDifficulty = function() {
-      $uibModal.open({
-        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/topic-editor-page/modal-templates/' +
-          'select-skill-and-difficulty-modal.template.html'),
+      let modalRef: NgbModalRef = NgbModal.open(QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent, {
         backdrop: true,
-        resolve: {
-          skillId: () => $scope.skillId
-        },
-        controller: (
-          'QuestionsOpportunitiesSelectSkillAndDifficultyModalController')
-      }).result.then(function(result) {
+      })
+      modalRef.componentInstance.skillId = $scope.skillId;
+      modalRef.result.then(function(result) {
         if (AlertsService.warnings.length === 0) {
           $scope.skillDifficulty = result.skillDifficulty;
           $scope.setDifficultyString($scope.skillDifficulty);

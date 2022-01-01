@@ -164,6 +164,11 @@ export class AssetsBackendApiService {
     this.abortAllCurrentDownloads(constants.ASSET_TYPE_IMAGE);
   }
 
+  fetchFiles(entityType: string, entityId: string, filename: string,
+    assetType: string): void {
+    this.fetchFile(entityType, entityId, filename, assetType);
+  }
+
   getAssetsFilesCurrentlyBeingRequested(): (
     {[assetType: string]: readonly FileDownloadRequest[]}) {
     return {

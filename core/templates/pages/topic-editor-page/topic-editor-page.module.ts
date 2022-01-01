@@ -40,6 +40,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
 import { CreateNewSubtopicModalComponent } from 'pages/topic-editor-page/modal-templates/create-new-subtopic-modal.component';
 import { TopicEditorSaveModalComponent } from './modal-templates/topic-editor-save-modal.component';
+import { QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent } from './modal-templates/question-opportunities-select-skill-and-difficulty-modal.component';
 
 @NgModule({
   imports: [
@@ -51,15 +52,17 @@ import { TopicEditorSaveModalComponent } from './modal-templates/topic-editor-sa
     ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
+    QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent,
     StoriesListComponent,
     SubtopicsListComponent,
     SubtopicPreviewTab,
     TopicPreviewTabComponent,
     TopicEditorNavbarBreadcrumbComponent,
     CreateNewSubtopicModalComponent,
-    TopicEditorSaveModalComponent
+    TopicEditorSaveModalComponent,
   ],
   entryComponents: [
+    QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent,
     StoriesListComponent,
     SubtopicsListComponent,
     SubtopicPreviewTab,
