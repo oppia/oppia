@@ -82,11 +82,7 @@ class ExplorationEmbedPage(base.BaseHandler):
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
             'schema': {
-                'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': constants.ENTITY_ID_REGEX
-                }]
+                'type': 'basestring'
             }
         }
     }
@@ -104,11 +100,7 @@ class ExplorationEmbedPage(base.BaseHandler):
             },
             'collection_id': {
                 'schema': {
-                    'type': 'basestring',
-                    'validators': [{
-                        'id': 'is_regex_matched',
-                        'regex_pattern': constants.ENTITY_ID_REGEX
-                    }]
+                    'type': 'basestring'
                 },
                 'default_value': None
             },
