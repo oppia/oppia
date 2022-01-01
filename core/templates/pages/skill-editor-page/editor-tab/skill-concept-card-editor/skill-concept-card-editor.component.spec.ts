@@ -20,7 +20,7 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
-import { TestBed } from '@angular/core/testing';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { Skill } from 'domain/skill/SkillObjectFactory';
@@ -32,7 +32,12 @@ import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
 import { AppConstants } from 'app.constants';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 // ^^^ This block is to be removed.
+
+class MockNgbModalRef {
+  componentInstance = {};
+}
 
 describe('Skill editor main tab Component', function() {
   let $scope = null;
@@ -40,6 +45,7 @@ describe('Skill editor main tab Component', function() {
   let $rootScope = null;
   let $q = null;
   let $uibModal = null;
+  let ngbModal: NgbModal;
   let skillEditorStateService: SkillEditorStateService = null;
   let skillUpdateService: SkillUpdateService = null;
   let windowDimensionsService: WindowDimensionsService = null;
@@ -61,7 +67,16 @@ describe('Skill editor main tab Component', function() {
 
   let sampleSkill: Skill = null;
 
-  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
+
   importAllAngularServices();
 
   beforeEach(() => {
@@ -75,6 +90,7 @@ describe('Skill editor main tab Component', function() {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     $uibModal = $injector.get('$uibModal');
+    ngbModal = TestBed.inject(NgbModal);
     $q = $injector.get('$q');
     skillEditorStateService = $injector.get('SkillEditorStateService');
     skillUpdateService = $injector.get('SkillUpdateService');
@@ -99,7 +115,8 @@ describe('Skill editor main tab Component', function() {
 
     ctrl = $componentController('skillConceptCardEditor', {
       $rootScope: $scope,
-      $scope: $scope
+      $scope: $scope,
+      NgbModal: ngbModal,
     });
   }));
 
@@ -163,65 +180,68 @@ describe('Skill editor main tab Component', function() {
   });
 
   it('should open delete worked example modal when ' +
-    'clicking on delete button', function() {
-    let deferred = $q.defer();
-    deferred.resolve();
-    let modalSpy = spyOn($uibModal, 'open').and.returnValue(
-      {result: deferred.promise});
+    'clicking on delete button', fakeAsync(() => {
+    let modalSpy = spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: new MockNgbModalRef(),
+      result: $q.resolve()
+    } as NgbModalRef);
     let deleteWorkedExampleSpy = spyOn(
       skillUpdateService, 'deleteWorkedExample').and.returnValue(null);
 
     ctrl.$onInit();
     $scope.deleteWorkedExample();
+    tick();
     $rootScope.$apply();
 
     expect(modalSpy).toHaveBeenCalled();
     expect(deleteWorkedExampleSpy).toHaveBeenCalled();
-  });
+  }));
 
   it('should close delete worked example modal when ' +
-    'clicking on cancel button', function() {
-    let deferred = $q.defer();
-    deferred.reject();
-    let modalSpy = spyOn($uibModal, 'open').and.returnValue(
-      {result: deferred.promise});
+    'clicking on cancel button', fakeAsync(() => {
+    let modalSpy = spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: new MockNgbModalRef(),
+      result: Promise.reject()
+    } as NgbModalRef);
     let deleteWorkedExampleSpy = spyOn(
       skillUpdateService, 'deleteWorkedExample').and.returnValue(null);
 
     ctrl.$onInit();
     $scope.deleteWorkedExample();
+    tick();
     $rootScope.$apply();
 
     expect(modalSpy).toHaveBeenCalled();
     expect(deleteWorkedExampleSpy).not.toHaveBeenCalled();
-  });
+  }));
 
   it('should open add worked example modal when ' +
-    'clicking on add button', function() {
-    let deferred = $q.defer();
-    deferred.resolve({
-      workedExampleQuestionHtml: 'questionHtml',
-      workedExampleExplanationHtml: 'explanationHtml'
-    });
-    let modalSpy = spyOn($uibModal, 'open').and.returnValue(
-      {result: deferred.promise});
+    'clicking on add button', fakeAsync(() => {
+    let modalSpy = spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: new MockNgbModalRef(),
+      result: $q.resolve({
+        workedExampleQuestionHtml: 'questionHtml',
+        workedExampleExplanationHtml: 'explanationHtml'
+      })
+    } as NgbModalRef);
     let addWorkedExampleSpy = spyOn(
       skillUpdateService, 'addWorkedExample').and.returnValue(null);
 
     ctrl.$onInit();
     $scope.openAddWorkedExampleModal();
+    tick();
     $rootScope.$apply();
 
     expect(modalSpy).toHaveBeenCalled();
     expect(addWorkedExampleSpy).toHaveBeenCalled();
-  });
+  }));
 
   it('should close add worked example modal when ' +
-    'clicking on cancel button', function() {
-    let deferred = $q.defer();
-    deferred.reject();
-    let modalSpy = spyOn($uibModal, 'open').and.returnValue(
-      {result: deferred.promise});
+    'clicking on cancel button', fakeAsync(() => {
+    let modalSpy = spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: new MockNgbModalRef(),
+      result: Promise.reject()
+    } as NgbModalRef);
     let addWorkedExampleSpy = spyOn(
       skillUpdateService, 'addWorkedExample').and.returnValue(null);
 
@@ -231,7 +251,7 @@ describe('Skill editor main tab Component', function() {
 
     expect(modalSpy).toHaveBeenCalled();
     expect(addWorkedExampleSpy).not.toHaveBeenCalled();
-  });
+  }));
 
   it('should open show skill preview modal when ' +
     'clicking on preview button', function() {
