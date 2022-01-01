@@ -18,10 +18,13 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ChangeDetectorRef, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
+import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
+import { AudioFile } from 'domain/utilities/audio-file.model';
+import { ImageFile } from 'domain/utilities/image-file.model';
 import { ExtractImageFilenamesFromModelService } from 'pages/exploration-player-page/services/extract-image-filenames-from-model.service';
 import { AlertsService } from 'services/alerts.service';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
@@ -56,12 +59,14 @@ describe(
   () => {
     let component: QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent;
     let fixture: ComponentFixture<QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent>;  
-    let ngbActiveModal: NgbActiveModal;
     let alertsService: AlertsService;
+    let assetsBackendApiService: AssetsBackendApiService;
+    let ngbActiveModal: NgbActiveModal;
     let skillBackendApiService: SkillBackendApiService;
     let skillObjectFactory: SkillObjectFactory;
     let extractImageFilenamesFromModelService: ExtractImageFilenamesFromModelService;
-    let assetsBackendApiService: AssetsBackendApiService;
+    let mockImageFile: ImageFile;
+    let mockBlob: Blob;
 
     let skillId = 'skill_1';
     let skill = null;
@@ -86,5 +91,111 @@ describe(
       }).compileComponents();
     }));
 
+    describe('when fetching skill successfully', () => {
+      beforeEach(() => {
+        fixture = TestBed.createComponent(QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent);
+        component = fixture.componentInstance;
+        alertsService = TestBed.inject(AlertsService);
+        assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
+        ngbActiveModal = TestBed.inject(NgbActiveModal);
+        skillBackendApiService = TestBed.inject(SkillBackendApiService);
+        skillObjectFactory = TestBed.inject(SkillObjectFactory);
+        extractImageFilenamesFromModelService = TestBed.inject(ExtractImageFilenamesFromModelService);
+        let skillDifficulties = TestBed.inject(SkillDifficulty);
+        
+        let misconceptionDict1 = {
+          id: 2,
+          name: 'test name',
+          notes: 'test notes',
+          feedback: 'test feedback',
+          must_be_addressed: true
+        };
+        let rubricDict = {
+          difficulty: skillDifficulties[0],
+          explanations: ['explanation']
+        };
+        let skillContentsDict = {
+          explanation: {
+            html: 'test explanation',
+            content_id: 'explanation',
+          },
+          worked_examples: [],
+          recorded_voiceovers: {
+            voiceovers_mapping: {}
+          }
+        };
+        skill = {
+          id: skillId,
+          description: 'Skill 1 description',
+          misconceptions: [misconceptionDict1],
+          rubrics: [rubricDict],
+          skill_contents: skillContentsDict,
+          language_code: 'en',
+          version: 1,
+          next_misconception_id: 3,
+          prerequisite_skill_ids: []
+        };
 
+        spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
+          Promise.resolve({
+            skill: skillObjectFactory.createFromBackendDict(skill),
+            assignedSkillTopicData: {},
+            groupedSkillSummaries: {},
+        }));
+        mockImageFile = new ImageFile('dummyImg.png', mockBlob);
+        spyOn(
+          extractImageFilenamesFromModelService,
+          'getImageFilenamesInSkill').and.returnValue(['dummyImg.png']);
+        spyOn(assetsBackendApiService, 'fetchFiles').and.returnValue(
+          Promise.resolve(mockImageFile));
+        // This throws "Argument of type 'MockReaderObject' is not assignable
+        // to parameter of type 'FileReader'.". We need to suppress this error
+        // because 'FileReader' has around 15 more properties. We have only
+        // defined the properties we need in 'MockReaderObject'.
+        // @ts-expect-error
+        spyOn(window, 'FileReader').and.returnValue(new MockReaderObject());
+        fixture.detectChanges();
+      });
+
+      it('should initialize properties after component is' +
+        ' initialized', () => {
+        expect(component.skill).toEqual(skillObjectFactory.createFromBackendDict(
+          skill));
+        expect(component.linkedSkillsWithDifficulty).toEqual(
+          [SkillDifficulty.create(
+            skillId, 'Skill 1 description', 0.3)]);
+        expect(component.skillIdToRubricsObject[skillId].length).toBe(1);
+      });
+
+      it('should create a question and select its difficulty when closing' +
+        ' the modal', () => {
+        component.startQuestionCreation();
+
+        expect(ngbActiveModal.close).toHaveBeenCalledWith({
+          skill: skillObjectFactory.createFromBackendDict(skill),
+          skillDifficulty: 0.3
+        });
+      });
+    });
+
+    describe('when fetching skill fails', () => {
+      beforeEach(() => {
+        fixture = TestBed.createComponent(QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent);
+        component = fixture.componentInstance;
+        alertsService = TestBed.inject(AlertsService);
+        ngbActiveModal = TestBed.inject(NgbActiveModal);
+        skillBackendApiService = TestBed.inject(SkillBackendApiService);
+       
+        spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
+            Promise.reject('It was not possible to fetch the skill'));
+        fixture.detectChanges();
+      });
+
+      it('should shows a warning error', fakeAsync(() => {
+        let addWarningSpy = spyOn(alertsService, 'addWarning');
+
+        expect(addWarningSpy.calls.allArgs()[0]).toEqual(
+          ['Error populating skill: It was not possible to fetch the skill.']);
+      }));
+    });
 });
