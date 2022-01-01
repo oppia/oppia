@@ -40,7 +40,6 @@ export class ProgressNavComponent {
   @Input() isLearnAgainButton: boolean;
   @Input() displayedCard: StateCard;
   @Input() submitButtonIsShown: boolean;
-  @Input() submitButtonIsDisabled: boolean;
   @Output() submit: EventEmitter<void> = (
     new EventEmitter());
   @Output() clickContinueButton: EventEmitter<void> = (
