@@ -239,7 +239,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/story_validators_test.py',
     'core/domain/subscription_services.py',
     'core/domain/subscription_services_test.py',
-    'core/domain/subtopic_page_domain.py',
     'core/domain/subtopic_page_domain_test.py',
     'core/domain/subtopic_page_services.py',
     'core/domain/subtopic_page_services_test.py',
