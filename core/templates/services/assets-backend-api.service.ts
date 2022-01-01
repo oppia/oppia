@@ -165,8 +165,8 @@ export class AssetsBackendApiService {
   }
 
   fetchFiles(entityType: string, entityId: string, filename: string,
-    assetType: string): void {
-    this.fetchFile(entityType, entityId, filename, assetType);
+    assetType: string):  Promise<AudioFile | ImageFile> {
+    return this.fetchFile(entityType, entityId, filename, assetType);
   }
 
   getAssetsFilesCurrentlyBeingRequested(): (
