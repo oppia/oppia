@@ -522,6 +522,15 @@ p:last-child {
 .open > a {
   outline: 0;
 }
+
+.mobile-activity-summary-card a {
+  display: flex;
+  height: 100%;
+  justify-content: space-evenly;
+  padding-left: 10px;
+  width: 100%;
+}
+
 .oppia-share-dropdown-menu li > a {
   font-weight: bolder;
   padding: 10px;
@@ -3738,14 +3747,6 @@ oppia-noninteractive-link {
   height: 85px;
   margin-bottom: 13px;
   width: 350px;
-}
-
-.mobile-activity-summary-card a {
-  display: flex;
-  height: 100%;
-  justify-content: space-evenly;
-  padding-left: 10px;
-  width: 100%;
 }
 
 .mobile-activity-card-details {
