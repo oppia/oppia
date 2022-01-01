@@ -361,12 +361,13 @@ export class LibraryPageComponent {
           setTimeout(() => {
             let actualWidth = $('oppia-exploration-summary-tile').width();
             if (actualWidth &&
-              actualWidth !== AppConstants.LIBRARY_TILE_WIDTH_PX &&
-              !this.libraryWindowIsNarrow) {
+              (actualWidth !== AppConstants.LIBRARY_TILE_WIDTH_PX &&
+               actualWidth !== AppConstants.LIBRARY_MOBILE_TILE_WIDTH_PX)) {
               this.loggerService.error(
-                'The actual width of tile is different than the ' +
-                'expected width. Actual size: ' + actualWidth +
-                ', Expected size: ' + AppConstants.LIBRARY_TILE_WIDTH_PX);
+                'The actual width of tile is different than either of the ' +
+                'expected widths. Actual size: ' + actualWidth +
+                ', Expected sizes: ' + AppConstants.LIBRARY_TILE_WIDTH_PX +
+                '/' + AppConstants.LIBRARY_MOBILE_TILE_WIDTH_PX);
             }
           }, 3000);
           // The following initializes the tracker to have all
