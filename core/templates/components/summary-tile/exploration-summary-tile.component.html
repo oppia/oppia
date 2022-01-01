@@ -75,17 +75,17 @@
   </button>
 </div>
 <div *ngIf="mobileCardToBeShown">
-  <mat-card class="mobile-exploration-card protractor-test-exploration-dashboard-card" *ngIf="!isRefresherExploration">
+  <mat-card class="mobile-activity-summary-card" *ngIf="!isRefresherExploration">
     <a [href]="getExplorationLink()" target="{{ openInNewWindow ? '_blank' : '_self' }}">
       <div class="mobile-exploration-card-image-container" [ngStyle]="{'background-color': thumbnailBgColor}">
         <img class="mobile-exploration-card-image" [src]="thumbnailIcon" alt="{{ category }}">
       </div>
-      <div class="mobile-exploration-card-details">
+      <div class="mobile-activity-card-details">
         <h3 class="mobile-exploration-title protractor-test-exp-summary-tile-title">
           <span>{{ explorationTitle | truncate:40 }}</span>
         </h3>
-        <div class="mobile-exploration-card-summary-section">
-          <ul *ngIf="!isCollectionPreviewTile" class="mobile-exploration-card-summary-elements">
+        <div class="mobile-activity-card-summary-section">
+          <ul *ngIf="!isCollectionPreviewTile" class="mobile-activity-card-summary-elements">
             <li>
               <span class="far fa-eye eye-icon" ngbTooltip="I18N_LIBRARY_VIEWS_TOOLTIP' | translate" placement="top" container="body">
                 <span class="oppia-icon-accessibility-label" [innerHTML]="'I18N_LIBRARY_VIEWS_TOOLTIP' | translate"> </span>
@@ -147,20 +147,9 @@
     padding: 6px 12px;
   }
 
-  .mobile-exploration-card {
+  .mobile-activity-summary-card {
     box-shadow: slategrey 2px 4px 4px 0;
-    height: 85px;
-    margin-bottom: 13px;
     padding: 0 0 0 0;
-    width: 350px;
-  }
-
-  .mobile-exploration-card a {
-    display: flex;
-    height: 100%;
-    justify-content: space-evenly;
-    padding-left: 10px;
-    width: 100%;
   }
 
   .mobile-exploration-card-image-container {
@@ -173,44 +162,7 @@
     width: auto;
   }
 
-  .mobile-exploration-card-details {
-    display: flex;
-    flex-direction: column;
-    padding: 15px 15px 15px 15px;
-    width: 270px;
-  }
-
-  .mobile-exploration-card-details h3 {
-    font-size: 1em;
-    margin-bottom: auto;
-    margin-top: 0;
-  }
-
-  .mobile-exploration-card-summary-section {
-    align-self: flex-end;
-    color: black;
-    width: 100%;
-  }
-
-  .mobile-exploration-card-summary-elements {
-    align-items: flex-end;
-    display: flex;
-    margin-bottom: -5px;
-    padding-left: 0;
-    width: 100%;
-  }
-
   .eye-icon {
     margin-right: 10px;
-  }
-
-  .bullet-separator {
-    font-size: 10px;
-    margin: -3px 13px 0 16px;
-    opacity: 30%;
-  }
-
-  .mobile-exploration-card-summary-elements li::marker {
-    color: transparent;
   }
 </style>
