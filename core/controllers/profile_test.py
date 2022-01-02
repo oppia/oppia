@@ -42,49 +42,78 @@ class ProfilePageTests(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         response = self.get_html_response('/profile/%s' % self.OWNER_USERNAME)
         self.assertIn(b'<oppia-root></oppia-root>', response.body)
-    
-    def test_PageNotFound(self):
+
+    def test_page_not_found(self):
         def mock_false_function(*_):
             """Mocks a function that returns False."""
             return False
-        error={'error': 'Could not find the page http://localhost/profilehandler/data/editor.', 'status_code': 404}
-        with self.swap(user_services, 'get_user_settings_from_username', mock_false_function):
+        sm1 = 'Could not find the page '
+        sm2 = 'http://localhost/profilehandler/data/%s.' % self.EDITOR_USERNAME
+        message = sm1 + sm2
+        error = {
+            'error': message,
+            'status_code': 404
+            }
+        with self.swap(
+            user_services, 'get_user_settings_from_username',
+            mock_false_function
+            ):
             self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
             self.login(self.EDITOR_EMAIL)
             csrf_token = self.get_new_csrf_token()
             self.put_json(
-                '/preferenceshandler/data',
-                {'update_type': 'user_bio', 'data': 'Bio data of the editor'},
+                '/preferenceshandler/data', {
+                    'update_type': 'user_bio',
+                    'data': 'Bio data of the editor'
+                },
                 csrf_token=csrf_token)
             self.put_json(
-                '/preferenceshandler/data',
-                {'update_type': 'subject_interests', 'data': ['editor', 'writing']},
+                '/preferenceshandler/data', {
+                    'update_type': 'subject_interests',
+                    'data': ['editor', 'writing']
+                    },
                 csrf_token=csrf_token)
             self.logout()
             self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
             self.login(self.VIEWER_EMAIL)
             response = self.get_json(
-                '/profilehandler/data/%s' % self.EDITOR_USERNAME, expected_status_int=404)
+                '/profilehandler/data/%s' % self.EDITOR_USERNAME,
+                expected_status_int=404
+                )
             self.assertEqual(response, error)
             self.logout()
             response = self.get_json(
-                '/profilehandler/data/%s' % self.EDITOR_USERNAME, expected_status_int=404)
+                '/profilehandler/data/%s' % self.EDITOR_USERNAME,
+                expected_status_int=404
+                )
             self.assertEqual(response, error)
 
     def test_user_does_have_fully_registered_account(self):
         def _mock_true_function(*_):
-            """Mocks a function that returns True"""
+            """Mocks a function that returns True."""
             return True
-        with self.swap(user_services, 'has_fully_registered_account', _mock_true_function):
+        with self.swap(
+            user_services,
+            'has_fully_registered_account',
+            _mock_true_function
+            ):
             self.login(self.EDITOR_EMAIL)
-            self.get_html_response(feconf.SIGNUP_URL + '?return_url=/', expected_status_int=302)
+            self.get_html_response(
+                feconf.SIGNUP_URL + '?return_url=/',
+                expected_status_int=302
+                )
             csrf_token = self.get_new_csrf_token()
             response = self.post_json(
                 feconf.SIGNUP_DATA_URL,
-                {'username': self.EDITOR_USERNAME, 'agreed_to_terms': True, 'can_recieve_email_updates': None},
+                {
+                    'username': self.EDITOR_USERNAME,
+                    'agreed_to_terms': True,
+                    'can_recieve_email_updates': None
+                },
                 csrf_token=csrf_token)
             self.assertEqual(response, {})
             self.logout()
+
 
 class ProfileDataHandlerTests(test_utils.GenericTestBase):
 
@@ -509,17 +538,22 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
             self.assertEqual(
                 email_preferences.can_receive_subscription_email,
                 feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
-            
+
     def test_send_post_signup_email(self):
         def _mock_false_func(*_):
-            """Acts a mock function for the tests that return False"""
+            """Acts a mock function for the tests that return False."""
             return False
         self.login(self.EDITOR_EMAIL)
         self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
         csrf_token = self.get_new_csrf_token()
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
-            with self.swap(user_services, 'has_ever_registered', _mock_false_func):
-                json_response = self.post_json(feconf.SIGNUP_DATA_URL,
+            with self.swap(
+                user_services,
+                'has_ever_registered',
+                _mock_false_func
+                ):
+                json_response = self.post_json(
+                    feconf.SIGNUP_DATA_URL,
                 {
                     'username': self.EDITOR_USERNAME,
                     'agreed_to_terms': True,
@@ -1244,7 +1278,10 @@ class UrlHandlerTests(test_utils.GenericTestBase):
         self.assertTrue(response['login_url'].endswith('random_url'))
 
     def test_invalid_input_exception(self):
-        response=self.get_json(
+        response = self.get_json(
             '/url_handler', expected_status_int=400)
-        error= {"error": "Incomplete or empty GET parameters passed", "status_code": 400}
-        self.assertEqual(response,error)
+        error = {
+            'error': 'Incomplete or empty GET parameters passed',
+            'status_code': 400
+            }
+        self.assertEqual(response, error)
