@@ -3407,7 +3407,7 @@ class State:
             state_dict: dict. The dict representation of State object.
             conversion_fn: function. The conversion function to be applied on
                 the states_dict.
-            state_schema_version: number. The state schema version.
+            state_schema_version: int. The state schema version.
             state_uses_old_interaction_cust_args_schema: bool. Whether the
                 interaction customization arguments contain SubtitledHtml
                 and SubtitledUnicode dicts (should be True if prior to state

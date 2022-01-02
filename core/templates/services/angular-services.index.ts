@@ -392,6 +392,8 @@ import { StoryCreationBackendApiService } from 'components/entity-creation-servi
 import { ExplorationRightsService } from 'pages/exploration-editor-page/services/exploration-rights.service';
 import { ExplorationRightsBackendApiService } from 'pages/exploration-editor-page/services/exploration-rights-backend-api.service';
 import { ExplorationCategoryService } from 'pages/exploration-editor-page/services/exploration-category.service';
+import { ExplorationObjectiveService } from 'pages/exploration-editor-page/services/exploration-objective.service';
+import { ExplorationTitleService } from 'pages/exploration-editor-page/services/exploration-title.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -512,6 +514,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ExplorationInitStateNameService', ExplorationInitStateNameService],
   ['ExplorationLanguageCodeService', ExplorationLanguageCodeService],
   ['ExplorationObjectFactory', ExplorationObjectFactory],
+  ['ExplorationObjectiveService', ExplorationObjectiveService],
   ['ExplorationPermissionsBackendApiService',
     ExplorationPermissionsBackendApiService],
   ['ExplorationPlayerStateService', ExplorationPlayerStateService],
@@ -522,6 +525,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ExplorationStatsService', ExplorationStatsService],
   ['ExplorationSummaryBackendApiService', ExplorationSummaryBackendApiService],
   ['ExplorationTagsService', ExplorationTagsService],
+  ['ExplorationTitleService', ExplorationTitleService],
   ['ExpressionEvaluatorService', ExpressionEvaluatorService],
   ['ExpressionInterpolationService', ExpressionInterpolationService],
   ['ExpressionParserService', ExpressionParserService],
