@@ -165,7 +165,8 @@ export class ExplorationHtmlFormatterService {
       interactionId: string | null,
       interactionCustomizationArgs: InteractionCustomizationArgs
   ): string {
-    // TODO(#14464): Remove this check once interaction ID is not allowed to be null.
+    // TODO(#14464): Remove this check once interaction ID is
+    //  not allowed to be null.
     if (interactionId === null) {
       throw new Error('InteractionId cannot be null');
     }
