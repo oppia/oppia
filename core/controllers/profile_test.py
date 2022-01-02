@@ -42,7 +42,34 @@ class ProfilePageTests(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         response = self.get_html_response('/profile/%s' % self.OWNER_USERNAME)
         self.assertIn(b'<oppia-root></oppia-root>', response.body)
-
+    
+    def test_PageNotFound(self):
+        def mock_false_function(*_):
+            """Mocks a function that returns False."""
+            return False
+        error={'error': 'Could not find the page http://localhost/profilehandler/data/editor.', 'status_code': 404}
+        with self.swap(user_services, 'get_user_settings_from_username', mock_false_function):
+            self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+            self.login(self.EDITOR_EMAIL)
+            csrf_token = self.get_new_csrf_token()
+            self.put_json(
+                '/preferenceshandler/data',
+                {'update_type': 'user_bio', 'data': 'Bio data of the editor'},
+                csrf_token=csrf_token)
+            self.put_json(
+                '/preferenceshandler/data',
+                {'update_type': 'subject_interests', 'data': ['editor', 'writing']},
+                csrf_token=csrf_token)
+            self.logout()
+            self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+            self.login(self.VIEWER_EMAIL)
+            response = self.get_json(
+                '/profilehandler/data/%s' % self.EDITOR_USERNAME, expected_status_int=404)
+            self.assertEqual(response, error)
+            self.logout()
+            response = self.get_json(
+                '/profilehandler/data/%s' % self.EDITOR_USERNAME, expected_status_int=404)
+            self.assertEqual(response, error)
 
 class ProfileDataHandlerTests(test_utils.GenericTestBase):
 
