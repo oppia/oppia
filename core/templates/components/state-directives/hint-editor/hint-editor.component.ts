@@ -54,8 +54,10 @@ angular.module('oppia').component('hintEditor', {
           ctrl.hintEditorIsOpen = true;
         }
       };
+
       ctrl.isHintLengthExceeded = function() {
-        return (ctrl.hint.hintContent._html.length > 500);
+        // TODO(#13764): Edit this check after appropriate limits are found.
+        return (ctrl.hint.hintContent._html.length > 10000);
       };
 
       ctrl.saveThisHint = function() {
