@@ -131,6 +131,7 @@ angular.module('oppia').directive('skillEditorMainTab', [
             $timeout(function() {
               FocusManagerService.setFocus('newQuestionBtn');
             }, 0);
+
             ctrl.directiveSubscriptions.add(
               SkillUpdateService.onPrerequisiteSkillChange.subscribe(
                 () => {
@@ -138,6 +139,10 @@ angular.module('oppia').directive('skillEditorMainTab', [
                 }
               )
             );
+          };
+
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

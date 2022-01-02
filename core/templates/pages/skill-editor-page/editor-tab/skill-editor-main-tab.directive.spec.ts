@@ -24,6 +24,8 @@ import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { EventEmitter } from '@angular/core';
+import { SkillUpdateService } from 'domain/skill/skill-update.service';
 // ^^^ This block is to be removed.
 
 describe('Skill editor main tab directive', function() {
@@ -33,11 +35,13 @@ describe('Skill editor main tab directive', function() {
   let $timeout = null;
   var directive = null;
   var UndoRedoService = null;
+  let skillUpdateService: SkillUpdateService;
   let ngbModal: NgbModal = null;
   var SkillEditorRoutingService = null;
   var SkillEditorStateService = null;
   var focusManagerService = null;
   var assignedSkillTopicData = {topic1: 'subtopic1', topic2: 'subtopic2'};
+  var mockPrerequisiteSkillChangeEventEmitter = new EventEmitter();
 
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
@@ -48,6 +52,7 @@ describe('Skill editor main tab directive', function() {
     });
     focusManagerService = TestBed.get(FocusManagerService);
     ngbModal = TestBed.inject(NgbModal);
+    skillUpdateService = TestBed.inject(SkillUpdateService);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -70,18 +75,33 @@ describe('Skill editor main tab directive', function() {
     SkillEditorStateService = $injector.get('SkillEditorStateService');
     SkillEditorRoutingService = $injector.get('SkillEditorRoutingService');
     focusManagerService = $injector.get('FocusManagerService');
+    $rootScope = $injector.get('$rootScope');
 
     ctrl = $injector.instantiate(directive.controller, {
       $rootScope: $scope,
       $scope: $scope
     });
+
     ctrl.$onInit();
   }));
 
-  it('should initialize the variables', function() {
+  afterEach(angular.mock.inject(function($injector) {
+    ctrl.$onDestroy();
+  }));
+
+  it('should initialize the variables', fakeAsync(() => {
+    spyOnProperty(skillUpdateService, 'onPrerequisiteSkillChange').and.
+      returnValue(mockPrerequisiteSkillChangeEventEmitter);
+    spyOn($scope, '$apply').and.callThrough();
+
+    ctrl.$onInit();
+    mockPrerequisiteSkillChangeEventEmitter.emit();
+    tick();
+
     expect($scope.selectedTopic).toEqual(null);
     expect($scope.subtopicName).toEqual(null);
-  });
+    expect($scope.$apply).toHaveBeenCalled();
+  }));
 
   it('should navigate to questions tab when unsaved changes are not present',
     function() {
@@ -102,16 +122,6 @@ describe('Skill editor main tab directive', function() {
     spyOn(SkillEditorStateService, 'hasLoadedSkill').and.returnValue(true);
     expect($scope.hasLoadedSkill()).toBe(true);
   });
-
-  it('should update publish button when data changes on prerequisite skills',
-    fakeAsync(() => {
-      let spyApply = spyOn($scope, '$apply');
-
-      $scope.detectNewChanges();
-      tick();
-
-      expect(spyApply).toHaveBeenCalled();
-    }));
 
   it('should open save changes modal with $uibModal when unsaved changes are' +
   ' present', function() {
