@@ -111,7 +111,7 @@ angular.module('oppia').component('stateResponses', {
   },
   template: require('./state-responses.component.html'),
   controller: [
-    '$filter', '$scope', '$uibModal', 'AlertsService',
+    '$filter', '$rootScope', '$scope', '$uibModal', 'AlertsService',
     'AnswerGroupObjectFactory',
     'EditabilityService', 'ExternalSaveService', 'NgbModal', 'ResponsesService',
     'StateCustomizationArgsService', 'StateEditorService',
@@ -123,7 +123,7 @@ angular.module('oppia').component('stateResponses', {
     'PLACEHOLDER_OUTCOME_DEST', 'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
     'SHOW_TRAINABLE_UNRESOLVED_ANSWERS',
     function(
-        $filter, $scope, $uibModal, AlertsService,
+        $filter, $rootScope, $scope, $uibModal, AlertsService,
         AnswerGroupObjectFactory,
         EditabilityService, ExternalSaveService, NgbModal, ResponsesService,
         StateCustomizationArgsService, StateEditorService,
@@ -366,6 +366,7 @@ angular.module('oppia').component('stateResponses', {
               ctrl.onSaveInteractionAnswerGroups(newAnswerGroups);
               ctrl.refreshWarnings()();
             });
+          $rootScope.$apply();
         }, function() {
           AlertsService.clearWarnings();
         });
