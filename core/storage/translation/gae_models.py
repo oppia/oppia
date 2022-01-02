@@ -94,7 +94,6 @@ class EntityTranslationsModel(base_models.BaseModel):
             str. Returns a unique id of the form
             [entity_type]-[entity_id]-[entity_version]-[language_code].
         """
-
         return '%s-%s-%s-%s' % (
             entity_type, entity_id, entity_version, language_code)
 
@@ -120,7 +119,6 @@ class EntityTranslationsModel(base_models.BaseModel):
             instance corresponding to the given inputs, if such a translation
             exists, or None if no translation is found.
         """
-
         model_id = cls._generate_id(
             entity_type, entity_id, entity_version, language_code)
         return cls.get_by_id(model_id)
@@ -145,7 +143,6 @@ class EntityTranslationsModel(base_models.BaseModel):
             instances corresponding to the given inputs, if such a translation
             exists, or None if no translation is found.
         """
-
         return cls.query(
             cls.entity_type == entity_type,
             cls.entity_id == entity_id,
@@ -174,7 +171,6 @@ class EntityTranslationsModel(base_models.BaseModel):
         Returns:
             EntityTranslationsModel. Returns a new EntityTranslationsModel.
         """
-
         return cls(
             id=cls._generate_id(
                 entity_type, entity_id, entity_version, language_code),

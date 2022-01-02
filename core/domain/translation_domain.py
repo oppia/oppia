@@ -208,9 +208,7 @@ class TranslatableContent:
             translatable_content_dict['content'],
             translatable_content_dict['content_type'])
 
-    def to_dict(
-        self
-    ) -> TranslatableContentDict:
+    def to_dict(self) -> TranslatableContentDict:
         """Returns the dict representation of TranslatableContent object.
 
         Returns:
