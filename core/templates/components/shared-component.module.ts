@@ -94,6 +94,7 @@ import { ContentLanguageSelectorComponent } from 'pages/exploration-player-page/
 import { RatingDisplayComponent } from './ratings/rating-display/rating-display.component';
 import { SupplementalCardComponent } from 'pages/exploration-player-page/learner-experience/supplemental-card.component';
 import { SmoothHeightAnimatorComponent } from './smooth-height/smooth-height-animator.component';
+import { ConfirmQuestionExitComponent } from './question-directives/modal-templates/confirm-question-exit-modal.component';
 
 // Pipes.
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
@@ -148,6 +149,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     BackgroundBannerComponent,
     CompletionGraphComponent,
     CorrectnessFooterComponent,
+    ConfirmQuestionExitComponent,
     ContinueButtonComponent,
     ContentLanguageSelectorComponent,
     CreateNewSkillModalComponent,
@@ -212,6 +214,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     BackgroundBannerComponent,
     CompletionGraphComponent,
     CorrectnessFooterComponent,
+    ConfirmQuestionExitComponent,
     ContinueButtonComponent,
     ConceptCardComponent,
     ContentLanguageSelectorComponent,
@@ -286,6 +289,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     BackgroundBannerComponent,
     CompletionGraphComponent,
     CorrectnessFooterComponent,
+    ConfirmQuestionExitComponent,
     ContinueButtonComponent,
     ContentLanguageSelectorComponent,
     CreateNewSkillModalComponent,

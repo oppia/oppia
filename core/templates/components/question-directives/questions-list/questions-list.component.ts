@@ -66,6 +66,7 @@ require('services/stateful/focus-manager.service.ts');
 import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
 import { Subscription } from 'rxjs';
+import { ConfirmQuestionExitComponent } from '../modal-templates/confirm-question-exit-modal.component';
 
 angular.module('oppia').component('questionsList', {
   bindings: {
@@ -252,14 +253,8 @@ angular.module('oppia').component('questionsList', {
       };
 
       ctrl.cancel = function() {
-        $uibModal.open({
-          templateUrl:
-              UrlInterpolationService.getDirectiveTemplateUrl(
-                '/components/question-directives' +
-                  '/modal-templates/' +
-                  'confirm-question-modal-exit-modal.directive.html'),
+        NgbModal.open(ConfirmQuestionExitComponent, {
           backdrop: true,
-          controller: 'ConfirmOrCancelModalController'
         }).result.then(function() {
           ContextService.resetImageSaveDestination();
           ctrl.editorIsOpen = false;

@@ -20,14 +20,14 @@
       </div>
       <div class="skill-summary-container">
         <a class="list-group-item protractor-test-skill-item"
-           *ngFor="let skillSummary of skillSummariesInitial | filter:skillFilterText"
+           *ngFor="let skillSummary of skillSummariesInitial"
            (click)="selectOrDeselectSkill(skillSummary)"
            [ngClass]="{'list-group-item-success': (isSkillSelected(skillSummary.id))}">
           <label class="list-group-item-heading">{{ skillSummary.description }}</label>
         </a>
         <hr *ngIf="skillSummariesInitial.length > 0">
         <a class="list-group-item protractor-test-skill-item"
-           *ngFor="skillSummary in skillSummariesFinal | filter:skillFilterText"
+           *ngFor="let skillSummary of skillSummariesFinal"
            (click)="selectOrDeselectSkill(skillSummary)"
            [ngClass]="{'list-group-item-success': (isSkillSelected(skillSummary.id))}">
           <label class="list-group-item-heading">{{ skillSummary.description }}</label>

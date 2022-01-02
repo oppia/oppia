@@ -22,6 +22,7 @@ require(
   'confirm-or-cancel-modal.controller.ts');
 import { SelectSkillModalComponent } from 'components/skill-selector/select-skill-modal.component';
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { ConfirmQuestionExitComponent } from './confirm-question-exit-modal.component';
 
 require(
   'components/state-editor/state-editor-properties-services/' +
@@ -192,13 +193,8 @@ angular.module('oppia').controller('QuestionEditorModalController', [
 
     $scope.cancel = function() {
       if (QuestionUndoRedoService.hasChanges()) {
-        $uibModal.open({
-          templateUrl:
-            UrlInterpolationService.getDirectiveTemplateUrl(
-              '/components/question-directives/modal-templates/' +
-              'confirm-question-modal-exit-modal.directive.html'),
+        NgbModal.open(ConfirmQuestionExitComponent, {
           backdrop: true,
-          controller: 'ConfirmOrCancelModalController'
         }).result.then(function() {
           ContextService.resetImageSaveDestination();
           ImageLocalStorageService.flushStoredImagesData();
