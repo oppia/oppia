@@ -380,6 +380,30 @@ describe('Exploration Summary Tile Component', () => {
     expect(dateTime).toBeNull();
   });
 
+  it('should get relative last updated Date & time', () => {
+    const dateTimeSpy = spyOn(dateTimeFormatService, 'getRelativeTimeFromNow')
+      .and.returnValue('a few seconds ago');
+
+    component.lastUpdatedMsec = new Date().getUTCMilliseconds();
+    let relativeLastUpdatedDateTime =
+      component.getRelativeLastUpdatedDateTime();
+    fixture.detectChanges();
+
+    expect(dateTimeSpy).toHaveBeenCalled();
+    expect(relativeLastUpdatedDateTime).toBe('a few seconds ago');
+  });
+
+  it('should fail to get relative last updated Date & time', () => {
+    const dateTimeSpy = spyOn(dateTimeFormatService, 'getRelativeTimeFromNow');
+
+    let relativeLastUpdatedDateTime =
+      component.getRelativeLastUpdatedDateTime();
+    fixture.detectChanges();
+
+    expect(dateTimeSpy).not.toHaveBeenCalled();
+    expect(relativeLastUpdatedDateTime).toBeNull();
+  });
+
   it('should get the thumbnail url', () => {
     const urlSpy = spyOn(
       urlInterpolationService, 'getStaticImageUrl')

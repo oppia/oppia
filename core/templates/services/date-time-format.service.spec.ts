@@ -101,4 +101,16 @@ describe('datetimeformatter', () => {
     expect((new Date(NaN).toLocaleDateString())).toBe(
       df.getLocaleDateString(NaN));
   });
+
+  it('should provide relative time from a given timestamp', () => {
+    let timeAFewSecondsAgo = NOW_MILLIS - 5 * 1000;
+    let timeAnHourAgo = NOW_MILLIS - 60 * 60 * 1000;
+    let timeADayAgo = NOW_MILLIS - 24 * 60 * 60 * 1000;
+    expect(df.getRelativeTimeFromNow(timeAFewSecondsAgo))
+      .toBe('a few seconds ago');
+    expect(df.getRelativeTimeFromNow(timeAnHourAgo))
+      .toBe('an hour ago');
+    expect(df.getRelativeTimeFromNow(timeADayAgo))
+      .toBe('a day ago');
+  });
 });

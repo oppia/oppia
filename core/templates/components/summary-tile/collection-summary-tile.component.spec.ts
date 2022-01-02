@@ -209,6 +209,31 @@ describe('Collection Summary Tile Component', () => {
     expect(dateTimeSpy).toHaveBeenCalled();
   });
 
+  it('should get relative last updated Date & time', () => {
+    const dateTimeSpy = spyOn(dateTimeFormatService, 'getRelativeTimeFromNow')
+      .and.returnValue('a few seconds ago');
+
+    component.getLastUpdatedMsec = new Date().getUTCMilliseconds();
+    let relativeLastUpdatedDateTime =
+      component.getRelativeLastUpdatedDateTime();
+    fixture.detectChanges();
+
+    expect(dateTimeSpy).toHaveBeenCalled();
+    expect(relativeLastUpdatedDateTime).toBe('a few seconds ago');
+  });
+
+  it('should fail to get relative last updated Date & time', () => {
+    const dateTimeSpy = spyOn(dateTimeFormatService, 'getRelativeTimeFromNow');
+    component.getLastUpdatedMsec = null;
+
+    let relativeLastUpdatedDateTime =
+      component.getRelativeLastUpdatedDateTime();
+    fixture.detectChanges();
+
+    expect(dateTimeSpy).not.toHaveBeenCalled();
+    expect(relativeLastUpdatedDateTime).toBeNull();
+  });
+
   it('should get the collection link url for editor page', () => {
     const urlSpy = spyOn(
       urlInterpolationService, 'interpolateUrl')
