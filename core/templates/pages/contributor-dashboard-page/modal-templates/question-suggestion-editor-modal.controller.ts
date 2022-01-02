@@ -24,7 +24,6 @@ require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 require('domain/editor/undo_redo/question-undo-redo.service.ts');
-require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/contributor-dashboard-page/services/' +
   'question-suggestion-backend-api.service.ts');
@@ -34,19 +33,19 @@ require('services/image-local-storage.service.ts');
 require('services/site-analytics.service.ts');
 
 angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
-  '$rootScope', '$scope', '$uibModal', '$uibModalInstance', 'AlertsService',
+  '$rootScope', '$scope', '$uibModalInstance', 'AlertsService',
   'ContextService', 'ContributionAndReviewService', 'ImageLocalStorageService',
   'NgbModal', 'QuestionSuggestionBackendApiService', 'QuestionUndoRedoService',
   'QuestionValidationService', 'SiteAnalyticsService',
-  'UrlInterpolationService', 'question', 'questionId', 'questionStateData',
+  'question', 'questionId', 'questionStateData',
   'skill', 'skillDifficulty', 'suggestionId', 'SKILL_DIFFICULTY_LABEL_TO_FLOAT',
   'IMAGE_CONTEXT',
   function(
-      $rootScope, $scope, $uibModal, $uibModalInstance, AlertsService,
+      $rootScope, $scope, $uibModalInstance, AlertsService,
       ContextService, ContributionAndReviewService, ImageLocalStorageService,
       NgbModal, QuestionSuggestionBackendApiService, QuestionUndoRedoService,
       QuestionValidationService, SiteAnalyticsService,
-      UrlInterpolationService, question, questionId, questionStateData,
+      question, questionId, questionStateData,
       skill, skillDifficulty, suggestionId, SKILL_DIFFICULTY_LABEL_TO_FLOAT,
       IMAGE_CONTEXT) {
     $scope.canEditQuestion = true;

@@ -22,6 +22,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { QuestionsListConstants } from 'components/question-directives/questions-list/questions-list.constants';
+import { Rubric } from 'domain/skill/rubric.model';
 import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
 import { Skill } from 'domain/skill/SkillObjectFactory';
 import { ExtractImageFilenamesFromModelService } from 'pages/exploration-player-page/services/extract-image-filenames-from-model.service';
@@ -37,7 +38,7 @@ export class QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent
   extends ConfirmOrCancelModal implements OnInit {
   @Input() skillId;
   instructionMessage: string;
-  currentMode;
+  currentMode: string;
   skillDifficulty;
   skillIdToRubricsObject;
   linkedSkillsWithDifficulty;
