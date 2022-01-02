@@ -1242,3 +1242,9 @@ class UrlHandlerTests(test_utils.GenericTestBase):
         response = self.get_json(
             '/url_handler', params={'current_url': 'random_url'})
         self.assertTrue(response['login_url'].endswith('random_url'))
+
+    def test_invalid_input_exception(self):
+        response=self.get_json(
+            '/url_handler', expected_status_int=400)
+        error= {"error": "Incomplete or empty GET parameters passed", "status_code": 400}
+        self.assertEqual(response,error)
