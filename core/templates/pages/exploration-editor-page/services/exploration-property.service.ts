@@ -56,7 +56,7 @@ export class ExplorationPropertyService {
     },
   };
 
-  init(value: string): void {
+  init(value: string | boolean): void {
     if (!this.propertyName) {
       throw new Error('Exploration property name cannot be null.');
     }
