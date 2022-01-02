@@ -131,20 +131,50 @@
     </div>
     <attribution-guide></attribution-guide>
     <div *ngIf="!isLoggedIn"  class="story-viewer-login-container">
-      <h2>Learn More about {{ storyPlaythroughObject.topicName }}</h2>
-      <div class="mt-2">
-        <button class="mat-raised-button oppia-login-button text-light protractor-test-login-button" (click)="signIn()">
+      <h2 class="login-text">Save your progress</h2>
+      <div class="mt-5">
+        <button class="btn mat-raised-button oppia-login-button text-light protractor-test-login-button" (click)="signIn()">
           LOG IN
         </button>
-        <span class="m-2 oppia-login-or-signup-text">or</span>
-        <button class="mat-raised-button oppia-sign-up-button text-light" (click)="signIn()">
+        <span class="m-3 oppia-login-or-signup-text">or</span>
+        <button class="btn mat-raised-button oppia-sign-up-button text-light" (click)="signIn()">
           SIGN UP
         </button>
+      </div>
+      <div class="skip-container d-flex justify-content-end">
+        <button class="btn skip-btn px-5">SKIP</button>
       </div>
     </div>
   </div>
 </div>
 <style>
+  .skip-container {
+    margin-top: 50px;
+  }
+
+  .skip-btn {
+    border: 1px solid #EEE;
+    color: #FFF;
+    font-weight: bold;
+  }
+
+  .skip-btn:focus, .skip-btn:hover {
+    background-color: #444;
+  }
+
+  .skip-btn:focus {
+    border: 2px solid #FFF;
+  }
+
+  .login-text {
+    color: #FFF;
+    font-weight: bold;
+  }
+
+  .oppia-login-or-signup-text {
+    font-weight: bold;
+  }
+
   .oppia-story-viewer-container a {
     text-decoration: none;
   }
@@ -162,8 +192,9 @@
   }
 
   .story-viewer-login-container {
-    background-color: rgba(255, 255, 255, 0.8);
+    background-color: #000000e1;
     bottom: 0;
+    color: #FFF;
     padding: 2em;
     position: sticky;
     text-align: center;
