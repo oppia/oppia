@@ -39,6 +39,11 @@ require('domain/utilities/url-interpolation.service.ts');
 require('pages/skill-editor-page/services/question-creation.service.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 require('services/ngb-modal.service.ts');
+require('domain/skill/skill-update.service.ts');
+
+import { Subscription } from 'rxjs';
+
+
 angular.module('oppia').directive('skillEditorMainTab', [
   'UrlInterpolationService',
   function(UrlInterpolationService) {
@@ -52,13 +57,17 @@ angular.module('oppia').directive('skillEditorMainTab', [
         '$scope', '$timeout', 'FocusManagerService', 'NgbModal',
         'PageTitleService',
         'SkillEditorRoutingService', 'SkillEditorStateService',
+        'SkillUpdateService',
         'UndoRedoService',
         function(
             $scope, $timeout, FocusManagerService, NgbModal,
             PageTitleService,
             SkillEditorRoutingService, SkillEditorStateService,
+            SkillUpdateService,
             UndoRedoService) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
+
           $scope.createQuestion = function() {
             // This check is needed because if a skill has unsaved changes to
             // misconceptions, then these will be reflected in the questions
@@ -81,12 +90,6 @@ angular.module('oppia').directive('skillEditorMainTab', [
 
           $scope.getSubtopicName = function() {
             return $scope.subtopicName;
-          };
-
-          // TODO(#14313): Remove this function when we migrate this
-          // Directive to Angular.
-          $scope.detectNewChanges = function() {
-            $scope.$apply();
           };
 
           $scope.getAssignedSkillTopicData = function() {
@@ -128,6 +131,13 @@ angular.module('oppia').directive('skillEditorMainTab', [
             $timeout(function() {
               FocusManagerService.setFocus('newQuestionBtn');
             }, 0);
+            ctrl.directiveSubscriptions.add(
+              SkillUpdateService.onPrerequisiteSkillChange.subscribe(
+                () => {
+                  $scope.$apply();
+                }
+              )
+            );
           };
         }
       ]

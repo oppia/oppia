@@ -28,7 +28,7 @@ import { AlertsService } from 'services/alerts.service';
 import { TopicsAndSkillsDashboardBackendApiService, TopicsAndSkillDashboardData } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
@@ -44,7 +44,6 @@ implements OnInit {
   prerequisiteSkillsAreShown: boolean;
   skill: Skill;
   allAvailableSkills: SkillSummary[] = [];
-  @Output() onSkillIdsChanged = new EventEmitter();
 
   constructor(
     private skillUpdateService: SkillUpdateService,
@@ -58,7 +57,6 @@ implements OnInit {
 
   removeSkillId(skillId: string): void {
     this.skillUpdateService.deletePrerequisiteSkill(this.skill, skillId);
-    this.onSkillIdsChanged.emit();
   }
 
   getSkillEditorUrl(skillId: string): string {
@@ -105,7 +103,6 @@ implements OnInit {
         }
       }
       this.skillUpdateService.addPrerequisiteSkill(this.skill, skillId);
-      this.onSkillIdsChanged.emit();
     };
 
     modalRef.result.then(function(summary) {
