@@ -45,7 +45,6 @@ describe('Skill Description Editor Component', () => {
       declarations: [SkillDescriptionEditorComponent],
       providers: [
         SkillUpdateService,
-        SkillEditorStateService,
         SkillEditorStateService
       ],
       schemas: [NO_ERRORS_SCHEMA]
