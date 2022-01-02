@@ -11,8 +11,7 @@
       <input class="protractor-test-new-story-title-field required"
              [(ngModel)]="newlyCreatedStory.title"
              [ngModelOptions]="{standalone: true}"
-             [maxlength]="{{ MAX_CHARS_IN_STORY_TITLE }}"
-             (change)="onStoryTitleChange()" autofocus>
+             [maxlength]="MAX_CHARS_IN_STORY_TITLE" autofocus>
       <div class="oppia-input-box-subtitle">
         <em>
           Story title should be at most {{ MAX_CHARS_IN_STORY_TITLE }} characters.
@@ -23,7 +22,7 @@
       <div><span class="create-new-story-input-label">Description*</span></div>
       <textarea class="protractor-test-new-story-description-field required"
                 rows="3" cols="50" placeholder="Enter description"
-                [maxlength]="{{ MAX_CHARS_IN_STORY_DESCRIPTION }}"
+                [maxlength]="MAX_CHARS_IN_STORY_DESCRIPTION"
                 [(ngModel)]="newlyCreatedStory.description"
                 [ngModelOptions]="{standalone: true}">
       </textarea>
@@ -38,9 +37,9 @@
       <input class="protractor-test-new-story-url-fragment-field required"
              [(ngModel)]="newlyCreatedStory.urlFragment"
              [ngModelOptions]="{standalone: true}"
-             [maxlength]="{{ MAX_CHARS_IN_STORY_URL_FRAGMENT }}"
+             [maxlength]="MAX_CHARS_IN_STORY_URL_FRAGMENT"
              [ngClass]="{'invalid-field': storyUrlFragmentExists || !validUrlFragmentRegex.test(newlyCreatedStory.urlFragment)}"
-             (change)="onStoryUrlFragmentChange($event)">
+             (ngModelChange)="onStoryUrlFragmentChange($event)">
       <div>
         <span class="oppia-input-box-subtitle">
           <em>
