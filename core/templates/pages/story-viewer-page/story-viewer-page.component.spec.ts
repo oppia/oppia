@@ -481,4 +481,12 @@ describe('Story Viewer Page component', () => {
       expect(component.thumbnailFilename === '');
       expect(component.iconUrl === '');
     }));
+
+  it('should close the login overlay', ()=>{
+    spyOn(component, 'hideLoginOverlay');
+
+    component.hideLoginOverlay();
+
+    expect(component.showLoginOverlay).toEqual(false);
+  });
 });

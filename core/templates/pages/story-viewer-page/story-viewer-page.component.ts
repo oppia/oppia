@@ -43,6 +43,7 @@ interface IconParametersArray {
   templateUrl: './story-viewer-page.component.html'
 })
 export class StoryViewerPageComponent implements OnInit {
+  showLoginOverlay: boolean = true;
   storyPlaythroughObject: StoryPlaythrough;
   storyId: string;
   storyIsLoaded: boolean;
@@ -104,6 +105,10 @@ export class StoryViewerPageComponent implements OnInit {
       });
     }
     return iconParametersArray;
+  }
+
+  hideLoginOverlay(): void {
+    this.showLoginOverlay = false;
   }
 
   signIn(): void {
