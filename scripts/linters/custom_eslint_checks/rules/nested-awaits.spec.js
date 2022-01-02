@@ -49,7 +49,7 @@ ruleTester.run('nested-awaits', rule, {
          `,
       errors: [{
         message: 'Please use nested awaits like: ' +
-        'await(await browser.switchTo().activeElement()).sendKeys(explanation);'
+        'await (await browser.switchTo().activeElement()).sendKeys(explanation);'
       }]
     },
     {
@@ -60,7 +60,7 @@ ruleTester.run('nested-awaits', rule, {
          `,
       errors: [{
         message: 'Please use nested awaits like: ' +
-        'await(await browser.switchTo().activeElement()).sendKeys(explanation);'
+        'await (await browser.switchTo().activeElement()).sendKeys(explanation);'
       }]
     },
     {
@@ -71,7 +71,7 @@ ruleTester.run('nested-awaits', rule, {
          `,
       errors: [{
         message: 'Please use nested awaits like: ' +
-        'await(await browser.switchTo().activeElement()).sendKeys(explanation);'
+        'await (await browser.switchTo().activeElement()).sendKeys(explanation);'
       }]
     }
   ]
