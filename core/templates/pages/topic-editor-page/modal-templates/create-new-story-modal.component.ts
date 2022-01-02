@@ -42,8 +42,8 @@ export class CreateNewStoryModalComponent extends ConfirmOrCancelModal
   MAX_CHARS_IN_STORY_URL_FRAGMENT: number;
   MAX_CHARS_IN_STORY_DESCRIPTION: number;
   allowedBgColors: readonly string[];
+  newlyCreatedStory: NewlyCreatedStory;
   validUrlFragmentRegex = new RegExp(AppConstants.VALID_URL_FRAGMENT_REGEX);
-  newlyCreatedStory: NewlyCreatedStory = NewlyCreatedStory.createDefault();
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -70,7 +70,12 @@ export class CreateNewStoryModalComponent extends ConfirmOrCancelModal
       AppConstants.MAX_CHARS_IN_STORY_URL_FRAGMENT);
     this.MAX_CHARS_IN_STORY_DESCRIPTION = (
       AppConstants.MAX_CHARS_IN_STORY_DESCRIPTION);
+    this.newlyCreatedStory = NewlyCreatedStory.createDefault();
     this.contextService.setImageSaveDestinationToLocalStorage();
+  }
+
+  save(): void {
+    this.ngbActiveModal.close(this.newlyCreatedStory);
   }
 
   cancel(): void {
@@ -88,7 +93,6 @@ export class CreateNewStoryModalComponent extends ConfirmOrCancelModal
       this.newlyCreatedStory.urlFragment, () => {
         this.storyUrlFragmentExists = (
           this.storyEditorStateService.getStoryWithUrlFragmentExists());
-        this.changeDetectorRef.detectChanges();
       });
   }
 

@@ -67,6 +67,12 @@ describe('Create New Story Modal Component', function() {
     expect(componentInstance).toBeDefined();
   });
 
+  it('should save new story', () => {
+    spyOn(ngbActiveModal, 'close');
+    componentInstance.save();
+    expect(ngbActiveModal.close).toHaveBeenCalled();
+  });
+
   it('should cancel', () => {
     spyOn(ngbActiveModal, 'dismiss');
 
@@ -85,7 +91,7 @@ describe('Create New Story Modal Component', function() {
     expect(componentInstance.isValid()).toBeTrue();
   });
 
-  it('should update topic url fragment', () => {
+  it('should update story url fragment', () => {
     componentInstance.newlyCreatedStory.urlFragment = 'not-empty';
     spyOn(storyEditorStateService, 'updateExistenceOfStoryUrlFragment')
       .and.callFake((urlFragment: string, callb: () => void) => {
@@ -102,7 +108,7 @@ describe('Create New Story Modal Component', function() {
       .toHaveBeenCalled();
   });
 
-  it('should not update topic url fragment if not provided by user', () => {
+  it('should not update story url fragment if not provided by user', () => {
     componentInstance.newlyCreatedStory.urlFragment = '';
     spyOn(storyEditorStateService, 'updateExistenceOfStoryUrlFragment');
 
