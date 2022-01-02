@@ -1,21 +1,23 @@
 <div class="modal-body oppia-preview-set-params-modal">
   <p>Please enter values for the following parameters:</p>
   <table class="oppia-preview-set-params-modal-table">
-    <tr ng-repeat="paramChange in manualParamChanges">
+    <tr *ngFor="let paramChange of manualParamChanges">
       <td class="oppia-preview-set-params-modal-td">
-        <[paramChange.name]>
+        {{ paramChange.name }}
       </td>
       <td class="oppia-preview-set-params-modal-td">
-        <input type="text" ng-model="paramChange.customizationArgs.value">
+        <input type="text" [(ngModel)]="paramChange.customizationArgs.value">
       </td>
     </tr>
   </table>
-  <button class="btn btn-success" ng-click="confirm()">
-    OK
-  </button>
-  <button class="btn btn-danger" ng-click="cancel()">
-    Cancel
-  </button>
+  <div class="modal-footer">
+    <button class="btn btn-success" (click)="confirm()">
+      OK
+    </button>
+    <button class="btn btn-danger" (click)="cancel()">
+      Cancel
+    </button>
+  </div>
 </div>
 
 <style>
