@@ -75,6 +75,18 @@ class CommonTests(test_utils.GenericTestBase):
         with maxsize_swap:
             self.assertTrue(common.is_x64_architecture())
 
+    def test_is_mac_os(self):
+        with self.swap(common, 'OS_NAME', 'Darwin'):
+            self.assertTrue(common.is_mac_os())
+        with self.swap(common, 'OS_NAME', 'Linux'):
+            self.assertFalse(common.is_mac_os())
+
+    def test_is_linux_os(self):
+        with self.swap(common, 'OS_NAME', 'Linux'):
+            self.assertTrue(common.is_linux_os())
+        with self.swap(common, 'OS_NAME', 'Windows'):
+            self.assertFalse(common.is_linux_os())
+
     def test_run_cmd(self):
         self.assertEqual(
             common.run_cmd(('echo Test for common.py ').split(' ')),
@@ -389,6 +401,40 @@ class CommonTests(test_utils.GenericTestBase):
         with sleep_swap, is_port_in_use_swap:
             success = common.wait_for_port_to_not_be_in_use(9999)
         self.assertTrue(success)
+
+    def test_wait_for_port_to_be_in_use_port_never_opens(self):
+        def mock_sleep(unused_seconds):
+            return
+        def mock_is_port_in_use(unused_port_number):
+            return False
+        def mock_exit(unused_code):
+            pass
+
+        sleep_swap = self.swap_with_checks(
+            time, 'sleep', mock_sleep, expected_args=[(1,)] * 60 * 5)
+        is_port_in_use_swap = self.swap(
+            common, 'is_port_in_use', mock_is_port_in_use)
+        exit_swap = self.swap_with_checks(
+            sys, 'exit', mock_exit, expected_args=[(1,)])
+
+        with sleep_swap, is_port_in_use_swap, exit_swap:
+            common.wait_for_port_to_be_in_use(9999)
+
+    def test_wait_for_port_to_be_in_use_port_opens(self):
+        def mock_sleep(unused_seconds):
+            raise AssertionError('mock_sleep should not be called.')
+        def mock_is_port_in_use(unused_port_number):
+            return True
+        def mock_exit(unused_code):
+            raise AssertionError('mock_exit should not be called.')
+
+        sleep_swap = self.swap(time, 'sleep', mock_sleep)
+        is_port_in_use_swap = self.swap(
+            common, 'is_port_in_use', mock_is_port_in_use)
+        exit_swap = self.swap(sys, 'exit', mock_exit)
+
+        with sleep_swap, is_port_in_use_swap, exit_swap:
+            common.wait_for_port_to_be_in_use(9999)
 
     def test_permissions_of_file(self):
         root_temp_dir = tempfile.mkdtemp()
@@ -748,6 +794,23 @@ class CommonTests(test_utils.GenericTestBase):
         # Asserts that imports from problematic modules do not error.
         from google.cloud import tasks_v2  # pylint: disable=unused-import
 
+    def test_cd(self):
+        def mock_chdir(unused_path):
+            pass
+        def mock_getcwd():
+            return '/old/path'
+
+        chdir_swap = self.swap_with_checks(
+            os, 'chdir', mock_chdir, expected_args=[
+                ('/new/path',),
+                ('/old/path',),
+            ])
+        getcwd_swap = self.swap(os, 'getcwd', mock_getcwd)
+
+        with chdir_swap, getcwd_swap:
+            with common.CD('/new/path'):
+                pass
+
     def test_swap_env_when_var_had_a_value(self):
         os.environ['ABC'] = 'Hard as Rocket Science'
         with common.swap_env('ABC', 'Easy as 123') as old_value:
@@ -794,3 +857,15 @@ class CommonTests(test_utils.GenericTestBase):
         write_swap = self.swap_to_always_raise(os, 'write', OSError('OS error'))
         with write_swap, self.assertRaisesRegexp(OSError, 'OS error'):
             common.write_stdout_safe('test')
+
+    def test_write_stdout_safe_with_unsupportedoperation(self):
+        mock_stdout = io.StringIO()
+
+        write_swap = self.swap_to_always_raise(
+            os, 'write',
+            io.UnsupportedOperation('unsupported operation'))
+        stdout_write_swap = self.swap(sys, 'stdout', mock_stdout)
+
+        with write_swap, stdout_write_swap:
+            common.write_stdout_safe('test')
+        self.assertEquals(mock_stdout.getvalue(), 'test')

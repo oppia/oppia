@@ -27,6 +27,10 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import improvements_models
+
 (improvements_models,) = (
     models.Registry.import_models([models.NAMES.improvements]))
 
@@ -36,15 +40,15 @@ class TaskEntryTests(test_utils.GenericTestBase):
 
     MOCK_DATE = datetime.datetime(2020, 6, 15, 9, 0, 0, 123456)
 
-    def setUp(self):
+    def setUp(self) -> None:
         super(TaskEntryTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL) # type: ignore[no-untyped-call]
         self.exp_id = 'eid'
-        self.save_new_valid_exploration(self.exp_id, self.owner_id)
-        self.maxDiff = None
+        self.save_new_valid_exploration(self.exp_id, self.owner_id) # type: ignore[no-untyped-call]
+        self.maxDiff = 0
 
-    def test_task_id_has_expected_value(self):
+    def test_task_id_has_expected_value(self) -> None:
         task_entry = improvements_domain.TaskEntry(
             improvements_models.TASK_ENTITY_TYPE_EXPLORATION, self.exp_id, 1,
             improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
@@ -56,7 +60,7 @@ class TaskEntryTests(test_utils.GenericTestBase):
             task_entry.task_id,
             'exploration.eid.1.high_bounce_rate.state.Introduction')
 
-    def test_composite_entity_id_has_expected_value(self):
+    def test_composite_entity_id_has_expected_value(self) -> None:
         task_entry = improvements_domain.TaskEntry(
             improvements_models.TASK_ENTITY_TYPE_EXPLORATION, self.exp_id, 1,
             improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
@@ -66,7 +70,7 @@ class TaskEntryTests(test_utils.GenericTestBase):
             self.MOCK_DATE)
         self.assertEqual(task_entry.composite_entity_id, 'exploration.eid.1')
 
-    def test_to_dict_has_expected_value(self):
+    def test_to_dict_has_expected_value(self) -> None:
         task_entry = improvements_domain.TaskEntry(
             improvements_models.TASK_ENTITY_TYPE_EXPLORATION, self.exp_id, 1,
             improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
@@ -89,7 +93,9 @@ class TaskEntryTests(test_utils.GenericTestBase):
             'resolved_on_msecs': utils.get_time_in_millisecs(self.MOCK_DATE),
         })
 
-    def test_to_dict_with_non_existing_resolver_id_raises_exception(self):
+    def test_to_dict_with_non_existing_resolver_id_raises_exception(
+        self
+    ) -> None:
         invalid_resolver_id = 'non_existing_user_id'
         task_entry = improvements_domain.TaskEntry(
             improvements_models.TASK_ENTITY_TYPE_EXPLORATION, self.exp_id, 1,
@@ -98,10 +104,10 @@ class TaskEntryTests(test_utils.GenericTestBase):
             feconf.DEFAULT_INIT_STATE_NAME, 'issue description',
             improvements_models.TASK_STATUS_RESOLVED, invalid_resolver_id,
             self.MOCK_DATE)
-        with self.assertRaisesRegexp(Exception, 'User not found'):
+        with self.assertRaisesRegexp(Exception, 'User not found'): # type: ignore[no-untyped-call]
             task_entry.to_dict()
 
-    def test_can_create_open_task_with_corresponding_values(self):
+    def test_can_create_open_task_with_corresponding_values(self) -> None:
         task_entry = improvements_domain.TaskEntry(
             improvements_models.TASK_ENTITY_TYPE_EXPLORATION, self.exp_id, 1,
             improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
@@ -120,7 +126,7 @@ class TaskEntryTests(test_utils.GenericTestBase):
         self.assertIsNone(task_entry.resolver_id)
         self.assertIsNone(task_entry.resolved_on)
 
-    def test_can_create_obsolete_task_with_corresponding_values(self):
+    def test_can_create_obsolete_task_with_corresponding_values(self) -> None:
         task_entry = improvements_domain.TaskEntry(
             improvements_models.TASK_ENTITY_TYPE_EXPLORATION, self.exp_id, 1,
             improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
@@ -139,7 +145,7 @@ class TaskEntryTests(test_utils.GenericTestBase):
         self.assertIsNone(task_entry.resolver_id)
         self.assertIsNone(task_entry.resolved_on)
 
-    def test_can_create_resolved_task_with_corresponding_value(self):
+    def test_can_create_resolved_task_with_corresponding_value(self) -> None:
         task_entry = improvements_domain.TaskEntry(
             improvements_models.TASK_ENTITY_TYPE_EXPLORATION, self.exp_id, 1,
             improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
@@ -159,7 +165,9 @@ class TaskEntryTests(test_utils.GenericTestBase):
         self.assertEqual(task_entry.resolver_id, self.owner_id)
         self.assertEqual(task_entry.resolved_on, self.MOCK_DATE)
 
-    def test_constructor_ignores_resolution_args_when_task_is_open(self):
+    def test_constructor_ignores_resolution_args_when_task_is_open(
+        self
+    ) -> None:
         task_entry = improvements_domain.TaskEntry(
             improvements_models.TASK_ENTITY_TYPE_EXPLORATION, self.exp_id, 1,
             improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
@@ -178,7 +186,9 @@ class TaskEntryTests(test_utils.GenericTestBase):
         self.assertIsNone(task_entry.resolver_id)
         self.assertIsNone(task_entry.resolved_on)
 
-    def test_constructor_ignores_resolution_args_when_task_is_obsolete(self):
+    def test_constructor_ignores_resolution_args_when_task_is_obsolete(
+        self
+    ) -> None:
         task_entry = improvements_domain.TaskEntry(
             improvements_models.TASK_ENTITY_TYPE_EXPLORATION, self.exp_id, 1,
             improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,

@@ -44,6 +44,7 @@ export class InputResponsePairComponent {
   @Input() oppiaAvatarImageUrl!: string;
   @Input() profilePicture!: string;
   @Input() inputResponsePairId!: string;
+  @Input() bottomSection: boolean;
   @Input() isLastPair!: boolean;
   @Output() dataChange: EventEmitter<InputResponsePair> = new EventEmitter();
   decodedProfilePicture: string | undefined;
