@@ -21,7 +21,8 @@ from __future__ import annotations
 from core import utils
 from core.platform import models
 
-from typing import Any, Dict, Optional, Sequence
+from typing import Dict, List, Optional, Sequence
+from typing_extensions import TypedDict
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -32,6 +33,13 @@ if MYPY: # pragma: no cover
     [models.NAMES.base_model])
 
 datastore_services = models.Registry.import_datastore_services()
+
+
+class TranslatedContentDict(TypedDict):
+    """Dict type for TranslatedContent object."""
+
+    content: str|List[str]
+    needs_update: bool
 
 
 class EntityTranslationsModel(base_models.BaseModel):
@@ -108,7 +116,7 @@ class EntityTranslationsModel(base_models.BaseModel):
             language_code: str. Language code for a given entity.
 
         Returns:
-            EntityTranslationsModel|None. The EntityTranslationsModel
+            EntityTranslationsModel. The EntityTranslationsModel
             instance corresponding to the given inputs, if such a translation
             exists, or None if no translation is found.
         """
@@ -151,7 +159,7 @@ class EntityTranslationsModel(base_models.BaseModel):
         entity_id: str,
         entity_version: int,
         language_code: str,
-        translations: Dict[str, Any]
+        translations: Dict[str, TranslatedContentDict]
     ) -> EntityTranslationsModel:
         """Creates and returns a new EntityTranslationsModel instance.
 
@@ -160,8 +168,8 @@ class EntityTranslationsModel(base_models.BaseModel):
             entity_id: str. Id of an entity.
             entity_version: int. Version of an entity.
             language_code: str. Language code for a given entity.
-            translations: dict(str, TranslatedContent). The contents which are
-                already translated.
+            translations: dict(str, TranslatedContentDict). The contents which
+                are already translated.
 
         Returns:
             EntityTranslationsModel. Returns a new EntityTranslationsModel.

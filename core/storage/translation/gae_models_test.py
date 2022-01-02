@@ -34,31 +34,35 @@ class EntityTranslationsModelTest(test_utils.GenericTestBase):
     """Unit tests for EntityTranslationsModel class."""
 
     def test_create_new_model(self) -> None:
-        translated_content = {
-            '123': {
-                'content': 'Hello world!',
-                'needs_update': False
-            }
-        }
         enitity_translation_model = (
             translation_models.EntityTranslationsModel.create_new(
-                'exploration', 'exp_id', 1, 'hi', translated_content))
+                'exploration', 'exp_id', 1, 'hi', {
+                    '123': {
+                        'content': 'Hello world!',
+                        'needs_update': False
+                    }
+                })
+        )
         self.assertEqual(enitity_translation_model.entity_type, 'exploration')
         self.assertEqual(enitity_translation_model.entity_id, 'exp_id')
         self.assertEqual(enitity_translation_model.entity_version, 1)
         self.assertEqual(enitity_translation_model.language_code, 'hi')
         self.assertEqual(
-            enitity_translation_model.translations, translated_content)
+            enitity_translation_model.translations['123']['content'],
+            'Hello world!')
+        self.assertEqual(
+            enitity_translation_model.translations['123']['needs_update'],
+            False)
 
-    def test_get_method_returns_model(self) -> None:
-        translated_content = {
-            '123': {
-                'content': 'Hello world!',
-                'needs_update': False
-            }
-        }
+    def test_get_model_method_returns_correctly(self) -> None:
         translation_models.EntityTranslationsModel.create_new(
-            'exploration', 'exp_id', 1, 'hi', translated_content).put()
+            'exploration', 'exp_id', 1, 'hi', {
+                '123': {
+                    'content': 'Hello world!',
+                    'needs_update': False
+                }
+            }
+        ).put()
         enitity_translation_model = (
             translation_models.EntityTranslationsModel.get_model(
                 'exploration', 'exp_id', 1, 'hi'))
@@ -66,32 +70,38 @@ class EntityTranslationsModelTest(test_utils.GenericTestBase):
         self.assertEqual(enitity_translation_model.entity_id, 'exp_id')
         self.assertEqual(enitity_translation_model.entity_version, 1)
         self.assertEqual(enitity_translation_model.language_code, 'hi')
+        self.assertEqual(
+            enitity_translation_model.translations['123']['content'],
+            'Hello world!')
+        self.assertEqual(
+            enitity_translation_model.translations['123']['needs_update'],
+            False)
 
-    def test_get_all_for_entity_returns_models(self) -> None:
-        translated_content1 = {
-            '123': {
-                'content': 'Hey I am Jhon.',
-                'needs_update': False
-            }
-        }
+    def test_get_all_for_entity_returns_correctly(self) -> None:
         translation_models.EntityTranslationsModel.create_new(
-            'exploration', 'exp_id', 1, 'en', translated_content1).put()
-        translated_content2 = {
-            '123': {
-                'content': 'Hello world!',
-                'needs_update': False
+            'exploration', 'exp_id', 1, 'en', {
+                '123': {
+                    'content': 'Hey I am Jhon.',
+                    'needs_update': False
+                }
             }
-        }
+        ).put()
         translation_models.EntityTranslationsModel.create_new(
-            'exploration', 'exp_id2', 2, 'hi', translated_content2).put()
-        translated_content3 = {
-            '123': {
-                'conent': 'Hey I am Nikhil.',
-                'needs_update': False
+            'exploration', 'exp_id2', 2, 'hi', {
+                '123': {
+                    'content': 'Hello world!',
+                    'needs_update': False
+                }
             }
-        }
+        ).put()
         translation_models.EntityTranslationsModel.create_new(
-            'exploration', 'exp_id', 1, 'hi', translated_content3).put()
+            'exploration', 'exp_id', 1, 'hi', {
+                '123': {
+                    'content': 'Hey I am Nikhil.',
+                    'needs_update': False
+                }
+            }
+        ).put()
 
         enitity_translation_models = (
             translation_models.EntityTranslationsModel.get_all_for_entity(

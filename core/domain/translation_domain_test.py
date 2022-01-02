@@ -152,17 +152,17 @@ class BaseTranslatableObjectUnitTest(test_utils.GenericTestBase):
             'My name is jack.', 'My name is jhon.')
 
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-            Exception, 'Already registered as a translatable content.'):
+            Exception,
+            'A translatable field is already registered with the '
+            'same content id: content_id_2'):
             translatable_object.get_translatable_fields()
 
     def test_unregistered_translatable_object_raises_exception(self) -> None:
         translatable_object = TranslatableObject4(
             'My name is jack.', 'My name is jhon.')
 
-        error_msg = (
-            'Translatable object is not registered, '
-            'by using `_register_all_translatable_fields` method.')
-        with self.assertRaisesRegexp(Exception, error_msg): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+            Exception, 'Must be implemented in subclasses.'):
             translatable_object.get_translatable_fields()
 
     def test_get_all_contents_which_needs_translations_method(self) -> None:
@@ -170,7 +170,7 @@ class BaseTranslatableObjectUnitTest(test_utils.GenericTestBase):
             'content_id_3': translation_domain.TranslatedContent(
                 'My name is Nikhil.', True)
         }
-        entity_translations = translation_domain.EntityTranslations(
+        entity_translations = translation_domain.EntityTranslation(
             'exp_id', 'exploration', 1, 'en', translation_dict)
 
         translatable_object = TranslatableObject5(
@@ -194,14 +194,14 @@ class BaseTranslatableObjectUnitTest(test_utils.GenericTestBase):
 
 
 class EntityTranslationsUnitTests(test_utils.GenericTestBase):
-    """Test class for EntityTranslations."""
+    """Test class for EntityTranslation."""
 
-    def test_successfully_creates_entity_translations_object(self) -> None:
+    def test_creation_of_object(self) -> None:
         translation_dict = {
             'content_id_1': translation_domain.TranslatedContent(
                 'My name is Nikhil.', False)
         }
-        entity_translations = translation_domain.EntityTranslations(
+        entity_translations = translation_domain.EntityTranslation(
             'exp_id', 'exploration', 1, 'en', translation_dict)
 
         self.assertEqual(entity_translations.entity_id, 'exp_id')
@@ -229,7 +229,7 @@ class TranslatableContentUnitTests(test_utils.GenericTestBase):
         self.assertEqual(translatable_content.content_id, 'content_id_1')
         self.assertEqual(translatable_content.content, 'My name is Jhon.')
         self.assertEqual(
-            translatable_content.type,
+            translatable_content.content_type,
             translation_domain.TRANSLATABLE_CONTENT_FORMAT_HTML)
 
     def test_from_dict_method_of_translatable_content_class(self) -> None:
@@ -237,21 +237,22 @@ class TranslatableContentUnitTests(test_utils.GenericTestBase):
                 translation_domain.TranslatableContent.from_dict({
                 'content_id': 'content_id_1',
                 'content': 'My name is Jhon.',
-                'type': translation_domain.TRANSLATABLE_CONTENT_FORMAT_HTML
+                'content_type': translation_domain
+                .TRANSLATABLE_CONTENT_FORMAT_HTML
             })
         )
 
         self.assertEqual(translatable_content.content_id, 'content_id_1')
         self.assertEqual(translatable_content.content, 'My name is Jhon.')
         self.assertEqual(
-            translatable_content.type,
+            translatable_content.content_type,
             translation_domain.TRANSLATABLE_CONTENT_FORMAT_HTML)
 
     def test_to_dict_method_of_translatable_content_class(self) -> None:
         translatable_content_dict = {
             'content_id': 'content_id_1',
             'content': 'My name is Jhon.',
-            'type': translation_domain.TRANSLATABLE_CONTENT_FORMAT_HTML
+            'content_type': translation_domain.TRANSLATABLE_CONTENT_FORMAT_HTML
         }
         translatable_content = translation_domain.TranslatableContent(
             'content_id_1',
@@ -268,7 +269,7 @@ class TranslatableContentUnitTests(test_utils.GenericTestBase):
 class TranslatedContentUnitTests(test_utils.GenericTestBase):
     """Test class for TranslatedContent."""
 
-    def test_successfully_creates_translated_content_object(self) -> None:
+    def test_creation_of_object(self) -> None:
         translated_content = translation_domain.TranslatedContent(
             'My name is Nikhil.', False)
 
@@ -276,12 +277,10 @@ class TranslatedContentUnitTests(test_utils.GenericTestBase):
         self.assertEqual(translated_content.needs_update, False)
 
     def test_from_dict_method_of_translated_content_class(self) -> None:
-        translated_content_dict = {
+        translated_content = translation_domain.TranslatedContent.from_dict({
             'content': 'My name is Nikhil.',
             'needs_update': False
-        }
-        translated_content = translation_domain.TranslatedContent.from_dict(
-            translated_content_dict)
+        })
 
         self.assertEqual(translated_content.content, 'My name is Nikhil.')
         self.assertEqual(translated_content.needs_update, False)
