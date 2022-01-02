@@ -71,6 +71,21 @@ class ProfilePageTests(test_utils.GenericTestBase):
                 '/profilehandler/data/%s' % self.EDITOR_USERNAME, expected_status_int=404)
             self.assertEqual(response, error)
 
+    def test_user_does_have_fully_registered_account(self):
+        def _mock_true_function(*_):
+            """Mocks a function that returns True"""
+            return True
+        with self.swap(user_services, 'has_fully_registered_account', _mock_true_function):
+            self.login(self.EDITOR_EMAIL)
+            self.get_html_response(feconf.SIGNUP_URL + '?return_url=/', expected_status_int=302)
+            csrf_token = self.get_new_csrf_token()
+            response = self.post_json(
+                feconf.SIGNUP_DATA_URL,
+                {'username': self.EDITOR_USERNAME, 'agreed_to_terms': True, 'can_recieve_email_updates': None},
+                csrf_token=csrf_token)
+            self.assertEqual(response, {})
+            self.logout()
+
 class ProfileDataHandlerTests(test_utils.GenericTestBase):
 
     def test_preference_page_updates(self):
