@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for storyViewerPage.
  */
 
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import { TestBed, fakeAsync, flushMicrotasks, tick } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { StoryNode } from 'domain/story/story-node.model';
 import { StoryPlaythrough, StoryPlaythroughBackendDict } from 'domain/story_viewer/story-playthrough.model';
@@ -482,11 +482,14 @@ describe('Story Viewer Page component', () => {
       expect(component.iconUrl === '');
     }));
 
-  it('should close the login overlay', ()=>{
-    spyOn(component, 'hideLoginOverlay');
+  it('should close the login overlay', fakeAsync(()=>{
+    spyOn(component, 'hideLoginOverlay').and.callThrough();
+
+    expect(component.showLoginOverlay).toEqual(true);
 
     component.hideLoginOverlay();
+    tick();
 
     expect(component.showLoginOverlay).toEqual(false);
-  });
+  }));
 });
