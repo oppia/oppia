@@ -509,6 +509,23 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
             self.assertEqual(
                 email_preferences.can_receive_subscription_email,
                 feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
+            
+    def test_send_post_signup_email(self):
+        def _mock_false_func(*_):
+            """Acts a mock function for the tests that return False"""
+            return False
+        self.login(self.EDITOR_EMAIL)
+        self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
+        csrf_token = self.get_new_csrf_token()
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+            with self.swap(user_services, 'has_ever_registered', _mock_false_func):
+                json_response = self.post_json(feconf.SIGNUP_DATA_URL,
+                {
+                    'username': self.EDITOR_USERNAME,
+                    'agreed_to_terms': True,
+                    'can_receive_email_updates': None
+                }, csrf_token=csrf_token)
+                self.assertTrue(json_response, {})
 
     def test_user_cannot_be_added_to_bulk_email_mailing_list(self):
         self.login(self.EDITOR_EMAIL)
