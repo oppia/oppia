@@ -224,7 +224,7 @@ describe('Collection Summary Tile Component', () => {
 
   it('should fail to get relative last updated Date & time', () => {
     const dateTimeSpy = spyOn(dateTimeFormatService, 'getRelativeTimeFromNow');
-    component.getLastUpdatedMsec = undefined;
+    component.getLastUpdatedMsec = 0;
 
     let relativeLastUpdatedDateTime =
       component.getRelativeLastUpdatedDateTime();
