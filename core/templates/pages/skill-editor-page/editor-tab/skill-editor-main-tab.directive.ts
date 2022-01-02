@@ -16,6 +16,7 @@
  * @fileoverview Controller for the main tab of the skill editor.
  */
 
+import { Subscription } from 'rxjs';
 import { SavePendingChangesModalComponent } from '../modal-templates/save-pending-changes-modal.component';
 
 require('services/stateful/focus-manager.service.ts');
@@ -41,9 +42,6 @@ require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 require('services/ngb-modal.service.ts');
 require('domain/skill/skill-update.service.ts');
 
-import { Subscription } from 'rxjs';
-
-
 angular.module('oppia').directive('skillEditorMainTab', [
   'UrlInterpolationService',
   function(UrlInterpolationService) {
@@ -57,14 +55,12 @@ angular.module('oppia').directive('skillEditorMainTab', [
         '$scope', '$timeout', 'FocusManagerService', 'NgbModal',
         'PageTitleService',
         'SkillEditorRoutingService', 'SkillEditorStateService',
-        'SkillUpdateService',
-        'UndoRedoService',
+        'SkillUpdateService', 'UndoRedoService',
         function(
             $scope, $timeout, FocusManagerService, NgbModal,
             PageTitleService,
             SkillEditorRoutingService, SkillEditorStateService,
-            SkillUpdateService,
-            UndoRedoService) {
+            SkillUpdateService, UndoRedoService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
 
