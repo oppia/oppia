@@ -75,13 +75,11 @@ describe('Skill editor main tab directive', function() {
     SkillEditorStateService = $injector.get('SkillEditorStateService');
     SkillEditorRoutingService = $injector.get('SkillEditorRoutingService');
     focusManagerService = $injector.get('FocusManagerService');
-    $rootScope = $injector.get('$rootScope');
 
     ctrl = $injector.instantiate(directive.controller, {
       $rootScope: $scope,
       $scope: $scope
     });
-
     ctrl.$onInit();
   }));
 
