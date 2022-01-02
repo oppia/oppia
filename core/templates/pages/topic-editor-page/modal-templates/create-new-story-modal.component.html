@@ -75,12 +75,15 @@
   </div>
 </form>
 <style>
+  .create-new-story-modal-header h3 {
+    font-size: 28px;
+  }
   .create-new-story-form .ng-touched.invalid-field,
   .create-new-story-form .ng-touched.ng-empty.required {
      outline: 1px solid #F00;
   }
   .create-new-story-form .create-new-story-input-field {
-     margin: 10px 0;
+     padding: 10px 10px 16px;
   }
   .create-new-story-form .create-new-story-input-field input, .create-new-story-input-field textarea,.create-new-story-input-field select {
     border: 1px solid #b9b5b5;
@@ -91,6 +94,9 @@
   }
   .create-new-story-modal-header .modal-close-button {
     display: none;
+  }
+  .create-new-story-input-field  input {
+    width: 70%;
   }
 
   @media screen and (max-width: 768px) {

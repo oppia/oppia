@@ -110,7 +110,7 @@ var StoryEditorPage = function() {
   var storyThumbnailImageElement = element(
     by.css('.protractor-test-story-thumbnail .protractor-test-custom-photo'));
   var storyThumbnailButton = element(
-    by.css('.protractor-test-story-thumbnail .protractor-test-photo-button'));
+    by.css('.protractor-test-photo-button'));
   var chapterThumbnailImageElement = element(
     by.css(
       '.protractor-test-story-node-thumbnail .protractor-test-custom-photo'));

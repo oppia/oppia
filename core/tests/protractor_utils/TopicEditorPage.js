@@ -104,7 +104,7 @@ var TopicEditorPage = function() {
   var newStoryDescriptionField = element(
     by.css('.protractor-test-new-story-description-field'));
   var storyThumbnailButton = element(
-    by.css('.protractor-test-thumbnail-editor .protractor-test-photo-button'));
+    by.css('.protractor-test-photo-button'));
   var topicMetaTagContentField = element(
     by.css('.protractor-test-topic-meta-tag-content-field'));
   var topicMetaTagContentLabel = element(
