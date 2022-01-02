@@ -104,7 +104,7 @@
             <li>
               <span *ngIf="lastUpdatedDateTime">
                 <span class="oppia-icon-accessibility-label">Last Updated</span>
-                {{ lastUpdatedDateTime }}
+                {{ relativeLastUpdatedDateTime }}
               </span>
               <span *ngIf="!lastUpdatedDateTime" [innerHTML]="'I18N_LIBRARY_N/A' | translate" class="oppia-inactive-summary-tile-attribute">
               </span>

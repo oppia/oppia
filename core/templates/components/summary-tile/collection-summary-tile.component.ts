@@ -57,6 +57,10 @@ export class CollectionSummaryTileComponent implements OnInit, OnDestroy {
   activityTypeCollection!: string;
   mobileCardToBeShown: boolean = false;
   resizeSubscription!: Subscription;
+  // A null value for 'relativeLastUpdatedDateTime' indicates that
+  // getLastUpdatedMsecs received after component interactions
+  // is empty or does not exist.
+  relativeLastUpdatedDateTime: string | null = null;
 
   constructor(
     private dateTimeFormatService: DateTimeFormatService,
@@ -80,6 +84,7 @@ export class CollectionSummaryTileComponent implements OnInit, OnDestroy {
       .subscribe(event => {
         this.checkIfMobileCardToBeShown();
       });
+    this.relativeLastUpdatedDateTime = this.getRelativeLastUpdatedDateTime();
   }
 
   ngOnDestroy(): void {
@@ -99,6 +104,14 @@ export class CollectionSummaryTileComponent implements OnInit, OnDestroy {
   getLastUpdatedDatetime(): string {
     return this.dateTimeFormatService.getLocaleAbbreviatedDatetimeString(
       this.getLastUpdatedMsec);
+  }
+
+  getRelativeLastUpdatedDateTime(): string | null {
+    if (this.getLastUpdatedMsec) {
+      return this.dateTimeFormatService.getRelativeTimeFromNow(
+        this.getLastUpdatedMsec);
+    }
+    return null;
   }
 
   getCollectionLink(): string | null {
