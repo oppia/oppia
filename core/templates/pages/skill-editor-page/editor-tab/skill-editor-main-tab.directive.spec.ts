@@ -20,12 +20,10 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
-import { fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { EventEmitter } from '@angular/core';
-import { SkillUpdateService } from 'domain/skill/skill-update.service';
 // ^^^ This block is to be removed.
 
 describe('Skill editor main tab directive', function() {
@@ -35,13 +33,11 @@ describe('Skill editor main tab directive', function() {
   let $timeout = null;
   var directive = null;
   var UndoRedoService = null;
-  let skillUpdateService: SkillUpdateService;
   let ngbModal: NgbModal = null;
   var SkillEditorRoutingService = null;
   var SkillEditorStateService = null;
   var focusManagerService = null;
   var assignedSkillTopicData = {topic1: 'subtopic1', topic2: 'subtopic2'};
-  var mockPrerequisiteSkillChangeEventEmitter = new EventEmitter();
 
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
@@ -52,7 +48,6 @@ describe('Skill editor main tab directive', function() {
     });
     focusManagerService = TestBed.get(FocusManagerService);
     ngbModal = TestBed.inject(NgbModal);
-    skillUpdateService = TestBed.inject(SkillUpdateService);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -83,23 +78,10 @@ describe('Skill editor main tab directive', function() {
     ctrl.$onInit();
   }));
 
-  afterEach(angular.mock.inject(function($injector) {
-    ctrl.$onDestroy();
-  }));
-
-  it('should initialize the variables', fakeAsync(() => {
-    spyOnProperty(skillUpdateService, 'onPrerequisiteSkillChange').and.
-      returnValue(mockPrerequisiteSkillChangeEventEmitter);
-    spyOn($scope, '$apply').and.callThrough();
-
-    ctrl.$onInit();
-    mockPrerequisiteSkillChangeEventEmitter.emit();
-    tick();
-
+  it('should initialize the variables', () => {
     expect($scope.selectedTopic).toEqual(null);
     expect($scope.subtopicName).toEqual(null);
-    expect($scope.$apply).toHaveBeenCalled();
-  }));
+  });
 
   it('should navigate to questions tab when unsaved changes are not present',
     function() {

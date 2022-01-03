@@ -46,11 +46,11 @@ angular.module('oppia').directive('skillEditorNavbar', [
       controller: [
         '$rootScope', '$scope', '$uibModal', 'AlertsService', 'NgbModal',
         'SkillEditorRoutingService', 'SkillEditorStateService',
-        'UndoRedoService', 'UrlService',
+        'SkillUpdateService', 'UndoRedoService', 'UrlService',
         function(
             $rootScope, $scope, $uibModal, AlertsService, NgbModal,
             SkillEditorRoutingService, SkillEditorStateService,
-            UndoRedoService, UrlService) {
+            SkillUpdateService, UndoRedoService, UrlService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           var ACTIVE_TAB_EDITOR = 'Editor';
@@ -148,7 +148,13 @@ angular.module('oppia').directive('skillEditorNavbar', [
                 () => {
                   ctrl.skill = SkillEditorStateService.getSkill();
                   $rootScope.$applyAsync();
-                }));
+                }),
+              SkillUpdateService.onPrerequisiteSkillChange.subscribe(
+                () => {
+                  $scope.$apply();
+                }
+              )
+            );
           };
         }]
     };

@@ -55,12 +55,12 @@ angular.module('oppia').directive('skillEditorMainTab', [
         '$scope', '$timeout', 'FocusManagerService', 'NgbModal',
         'PageTitleService',
         'SkillEditorRoutingService', 'SkillEditorStateService',
-        'SkillUpdateService', 'UndoRedoService',
+        'UndoRedoService',
         function(
             $scope, $timeout, FocusManagerService, NgbModal,
             PageTitleService,
             SkillEditorRoutingService, SkillEditorStateService,
-            SkillUpdateService, UndoRedoService) {
+            UndoRedoService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
 
@@ -127,18 +127,6 @@ angular.module('oppia').directive('skillEditorMainTab', [
             $timeout(function() {
               FocusManagerService.setFocus('newQuestionBtn');
             }, 0);
-
-            ctrl.directiveSubscriptions.add(
-              SkillUpdateService.onPrerequisiteSkillChange.subscribe(
-                () => {
-                  $scope.$apply();
-                }
-              )
-            );
-          };
-
-          ctrl.$onDestroy = function() {
-            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]
