@@ -13,21 +13,29 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for confirm question exit modal.
+ * @fileoverview Component for question editor save modal.
  */
 
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { AppConstants } from 'app.constants';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
-  selector: 'oppia-confirm-question-exit-modal',
-  templateUrl: './confirm-question-exit-modal.component.html'
+  selector: 'oppia-question-editor-save-modal',
+  templateUrl: './question-editor-save-modal.component.html'
 })
-export class ConfirmQuestionExitComponent extends ConfirmOrCancelModal {
+export class QuestionEditorSaveModalComponent extends ConfirmOrCancelModal
+  implements OnInit {
+  MAX_COMMIT_MESSAGE_LENGTH: number;
+
   constructor(
-    private ngbActiveModal: NgbActiveModal
+    private ngbActiveModal: NgbActiveModal,
   ) {
     super(ngbActiveModal);
+  }
+
+  ngOnInit(): void {
+    this.MAX_COMMIT_MESSAGE_LENGTH = AppConstants.MAX_COMMIT_MESSAGE_LENGTH;
   }
 }

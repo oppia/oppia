@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import { EventEmitter } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { QuestionSummary } from 'domain/question/question-summary-object.model';
 import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
@@ -62,7 +62,15 @@ describe('QuestionsListComponent', () => {
   let questionStateData = null;
   let skill = null;
 
-  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
   importAllAngularServices();
 
   beforeEach(() => {
@@ -552,41 +560,48 @@ describe('QuestionsListComponent', () => {
   });
 
   it('should show \'confirm question modal exit\' modal when user ' +
-    'clicks cancel', () => {
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.resolve()
+    'clicks cancel', fakeAsync(() => {
+    spyOn(ngbModal, 'open');
+    spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return ({
+        result: Promise.resolve()
+      } as NgbModalRef);
     });
-
     ctrl.cancel();
+    tick();
     $scope.$apply();
 
-    expect($uibModal.open).toHaveBeenCalled();
-  });
+    expect(ngbModal.open).toHaveBeenCalled();
+  }));
 
   it('should reset image save destination when user clicks confirm on' +
-    ' \'confirm question modal exit\' modal', () => {
-    spyOn($uibModal, 'open').and.returnValue({
+    ' \'confirm question modal exit\' modal', fakeAsync(() => {
+    spyOn(ngbModal, 'open').and.returnValue({
       result: $q.resolve('confirm')
-    });
+    } as NgbModalRef);
     spyOn(ContextService, 'resetImageSaveDestination');
 
     ctrl.cancel();
     $scope.$apply();
 
     expect(ContextService.resetImageSaveDestination).toHaveBeenCalled();
-  });
+  }));
 
   it('should close \'confirm question modal exit\' modal when user clicks' +
-    ' cancel', () => {
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.reject('close')
+    ' cancel', fakeAsync(() => {
+    spyOn(ngbModal, 'open');
+    spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return ({
+        result: Promise.reject()
+      } as NgbModalRef);
     });
 
     ctrl.cancel();
+    tick();
     $scope.$apply();
 
-    expect($uibModal.open).toHaveBeenCalled();
-  });
+    expect(ngbModal.open).toHaveBeenCalled();
+  }));
 
   it('should update skill difficulty when user selects a difficulty', () => {
     let skill = SkillDifficulty.create('skillId1', '', 0.9);

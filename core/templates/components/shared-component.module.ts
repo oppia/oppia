@@ -110,6 +110,7 @@ import { AuthService } from 'services/auth.service';
 
 // Miscellaneous.
 import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
+import { QuestionEditorSaveModalComponent } from './question-directives/modal-templates/question-editor-save-modal.component';
 
 @NgModule({
   imports: [
@@ -177,6 +178,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     ProfileLinkTextComponent,
     ProgressNavComponent,
     QuestionDifficultySelectorComponent,
+    QuestionEditorSaveModalComponent,
     RatingDisplayComponent,
     RubricsEditorComponent,
     ScoreRingComponent,
@@ -225,6 +227,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     FilteredChoicesFieldComponent,
     MultiSelectionFieldComponent,
     PracticeTabComponent,
+    QuestionEditorSaveModalComponent,
     CollectionSummaryTileComponent,
     SharingLinksComponent,
     SkillMasteryViewerComponent, AttributionGuideComponent,
@@ -319,6 +322,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     ProgressNavComponent,
     SearchBarComponent,
     QuestionDifficultySelectorComponent,
+    QuestionEditorSaveModalComponent,
     ScoreRingComponent,
     StateSkillEditorComponent,
     SelectSkillModalComponent,
