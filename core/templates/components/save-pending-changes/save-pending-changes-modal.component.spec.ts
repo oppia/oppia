@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for save pending changes modal component.
+ * @fileoverview Unit tests for Save Pending Changes Modal.
  */
 
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
@@ -21,7 +21,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { SavePendingChangesModalComponent } from './save-pending-changes-modal.component';
 
 describe('Save pending changes modal', () => {
-  let component: SavePendingChangesModalComponent;
+  let componentInstance: SavePendingChangesModalComponent;
   let fixture: ComponentFixture<SavePendingChangesModalComponent>;
 
   beforeEach(waitForAsync(() => {
@@ -35,10 +35,10 @@ describe('Save pending changes modal', () => {
 
   beforeEach(() => {
     fixture = TestBed.createComponent(SavePendingChangesModalComponent);
-    component = fixture.componentInstance;
+    componentInstance = fixture.componentInstance;
   });
 
   it('should check if component is defined or not', () => {
-    expect(component).toBeDefined();
+    expect(componentInstance).toBeDefined();
   });
 });

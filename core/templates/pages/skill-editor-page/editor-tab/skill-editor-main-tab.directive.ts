@@ -50,13 +50,13 @@ angular.module('oppia').directive('skillEditorMainTab', [
         '/pages/skill-editor-page/editor-tab/' +
         'skill-editor-main-tab.directive.html'),
       controller: [
-        '$scope', '$timeout', 'FocusManagerService',
-        'NgbModal', 'PageTitleService',
+        '$scope', '$timeout', 'FocusManagerService', 'NgbModal',
+        'PageTitleService',
         'SkillEditorRoutingService', 'SkillEditorStateService',
         'UndoRedoService',
         function(
-            $scope, $timeout, FocusManagerService,
-            NgbModal, PageTitleService,
+            $scope, $timeout, FocusManagerService, NgbModal,
+            PageTitleService,
             SkillEditorRoutingService, SkillEditorStateService,
             UndoRedoService) {
           var ctrl = this;
