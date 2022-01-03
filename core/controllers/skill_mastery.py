@@ -48,7 +48,7 @@ class SkillMasteryDataHandler(base.BaseHandler):
                 'schema': {
                     'type': 'object_dict',
                     'validation_method': (
-                        domain_objects_validator.validate_mastery_change_per_skill)
+                        domain_objects_validator.validate_mastery_change)
                 }
             }
         }

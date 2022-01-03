@@ -32,7 +32,7 @@ from core.domain import state_domain
 from typing import Dict, Optional, Union
 
 
-def validate_mastery_change_per_skill(mastery_change_per_skill):
+def validate_mastery_change(mastery_change_per_skill):
     """Validates user skill mastery changes.
 
     Args:
