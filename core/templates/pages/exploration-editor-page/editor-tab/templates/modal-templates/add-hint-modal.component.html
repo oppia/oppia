@@ -1,27 +1,28 @@
 <div class="modal-header protractor-test-hint-modal">
   <h3>Add Hint</h3>
-  <i class="fa fa-times" ng-click="cancel()"></i>
+  <i class="fa fa-times" (click)="cancel()"></i>
 </div>
 
 <div class="modal-body">
   <form name="addHintForm.hintTextForm"
         class="form-inline">
     <div class="oppia-rule-details-header">
-      <strong>Hint #<[hintIndex]> is...</strong>
+      <strong>Hint #{{ hintIndex }} is...</strong>
       <schema-based-editor class="protractor-test-hint-text"
-                           schema="HINT_FORM_SCHEMA"
-                           local-value="tmpHint">
+                           [schema]="getSchema.bind(this)"
+                           [localValue]="this.tmpHint"
+                           (localValueChange)="this.updateLocalHint($event)">
       </schema-based-editor>
     </div>
   </form>
-  <div ng-if="isHintLengthExceeded(tmpHint)" class="oppia-length-validation-error">
+  <div *ngIf="isHintLengthExceeded(tmpHint)" class="oppia-length-validation-error">
     The hint length is too long. Please use at most 500 characters.
   </div>
 </div>
 
 <div class="modal-footer">
-  <button class="btn btn-secondary protractor-test-cancel-hint" ng-click="cancel()">Cancel</button>
-  <button class="btn btn-success protractor-test-save-hint" ng-click="saveHint()" ng-disabled="!tmpHint || isHintLengthExceeded(tmpHint)">Save Hint</button>
+  <button class="btn btn-secondary protractor-test-cancel-hint" (click)="cancel()">Cancel</button>
+  <button class="btn btn-success protractor-test-save-hint" (click)="saveHint()" [disabled]="!this.tmpHint || this.isHintLengthExceeded(this.tmpHint)">Save Hint</button>
 </div>
 
 <style>
