@@ -26,9 +26,29 @@ from core.domain import blog_domain
 from core.domain import collection_domain
 from core.domain import config_domain
 from core.domain import exp_domain
+from core.domain import skill_domain
 from core.domain import state_domain
 
 from typing import Dict, Optional, Union
+
+
+def validate_mastery_change_per_skill(mastery_change_per_skill):
+    """Validates user skill mastery changes.
+
+    Args:
+        mastery_change_per_skill: dict. Data that needs to be validated.
+
+    Returns:
+        dict(str, float). Returns mastery_change_per_skill after validation.
+    """
+    for (skill_id, mastery) in mastery_change_per_skill:
+        skill_domain.Skill.require_valid_skill_id(skill_id)
+        if not isinstance(mastery, float):
+            raise Exception(
+                'degree of mastery change should be a float, received'
+                ': %s' % mastery)
+
+    return mastery_change_per_skill
 
 
 def validate_exploration_change(obj):
