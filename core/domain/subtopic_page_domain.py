@@ -348,7 +348,7 @@ class SubtopicPage:
         bytes.
 
         Args:
-            page_contents_dict: dict. A dict used to intialize a SubtopicPage
+            page_contents_dict: dict. A dict used to initialize a SubtopicPage
                 domain object.
             topic_id: str. The ID of the topic.
 
