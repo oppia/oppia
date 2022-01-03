@@ -901,3 +901,17 @@ class PromoBarHandlerTest(test_utils.GenericTestBase):
             })
 
         self.logout()
+
+
+class ValueGeneratorHandlerTests(test_utils.GenericTestBase):
+
+    def test_value_generated_error(self):
+        dummy_id = 'someID'
+        response = self.get_json(
+            '/value_generator_handler/%s' % dummy_id,
+            expected_status_int=404
+            )
+        sm1 = 'Could not find the page http://localhost'
+        sm2 = '/value_generator_handler/%s.' % dummy_id
+        error_message = sm1 + sm2
+        self.assertEqual(response['error'], error_message)
