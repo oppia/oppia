@@ -171,7 +171,7 @@ describe('InputResponsePairComponent', () => {
       isHint: true
     };
 
-    expect(component.isVideoRteElementPresentInResponse()).toBe(false);
+    expect(component.isVideoRteElementPresentInResponse()).toBeFalse();
   });
 
   it('should get RTL language status correctly', () => {
@@ -262,8 +262,7 @@ describe('InputResponsePairComponent', () => {
     component.isLastPair = true;
 
     expect(component.getFeedbackAudioHighlightClass()).toBe(
-      ''
-    );
+      '');
   });
 
   it('should return empty css class for feedback audio highlight ' +
@@ -274,8 +273,7 @@ describe('InputResponsePairComponent', () => {
     component.isLastPair = true;
 
     expect(component.getFeedbackAudioHighlightClass()).toBe(
-      ''
-    );
+      '');
   });
 
   it('should return empty css class for feedback audio highlight ' +
@@ -286,7 +284,6 @@ describe('InputResponsePairComponent', () => {
     component.isLastPair = true;
 
     expect(component.getFeedbackAudioHighlightClass()).toBe(
-      ''
-    );
+      '');
   });
 });
