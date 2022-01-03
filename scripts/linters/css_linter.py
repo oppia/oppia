@@ -34,7 +34,6 @@ class ThirdPartyCSSLintChecksManager:
         """Constructs a ThirdPartyCSSLintChecksManager object.
 
         Args:
-            config_path: str. Path to the configuration file.
             files_to_lint: list(str). A list of filepaths to lint.
         """
         super(ThirdPartyCSSLintChecksManager, self).__init__()
@@ -128,6 +127,4 @@ def get_linters(files_to_lint):
         tuple(None, ThirdPartyCSSLintChecksManager). A 2-tuple of custom and
         third_party linter objects.
     """
-    third_party_linter = ThirdPartyCSSLintChecksManager(files_to_lint)
-
-    return None, third_party_linter
+    return None, ThirdPartyCSSLintChecksManager(files_to_lint)
