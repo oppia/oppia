@@ -35,6 +35,9 @@ import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-a
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { I18nService } from 'i18n/i18n.service';
 import { CookieService } from 'ngx-cookie';
+import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
+import { ClassroomData } from 'domain/classroom/classroom-data.model';
+import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
 
 class MockWindowRef {
   nativeWindow = {
@@ -52,12 +55,13 @@ class MockWindowRef {
     },
     gtag: () => {},
     history: {
-      pushState(data, title: string, url?: string | null) {}
+      pushState(data: object, title: string, url?: string | null) {}
     }
   };
 }
 
 describe('TopNavigationBarComponent', () => {
+  let accessValidationBackendApiService: AccessValidationBackendApiService;
   let fixture: ComponentFixture<TopNavigationBarComponent>;
   let component: TopNavigationBarComponent;
   let mockWindowRef: MockWindowRef;
@@ -125,6 +129,8 @@ describe('TopNavigationBarComponent', () => {
     i18nService = TestBed.inject(I18nService);
     classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+    accessValidationBackendApiService = TestBed
+      .inject(AccessValidationBackendApiService);
 
     spyOn(searchService, 'onSearchBarLoaded')
       .and.returnValue(new EventEmitter<string>());
@@ -231,10 +237,10 @@ describe('TopNavigationBarComponent', () => {
     spyOn(navigationService, 'openSubmenu');
     spyOn(deviceInfoService, 'isMobileDevice').and.returnValue(false);
 
-    component.openSubmenu(mouseoverEvent, 'classroomMenu');
+    component.openSubmenu(mouseoverEvent, 'learnMenu');
 
     expect(navigationService.openSubmenu).toHaveBeenCalledWith(
-      mouseoverEvent, 'classroomMenu');
+      mouseoverEvent, 'learnMenu');
   });
 
   it('should close submenu when user moves the mouse away' +
@@ -274,12 +280,15 @@ describe('TopNavigationBarComponent', () => {
   });
 
   it('should toggle side bar', () => {
+    const clickEvent = new CustomEvent('click');
     spyOn(sidebarStatusService, 'isSidebarShown').and.returnValues(false, true);
     spyOn(wds, 'isWindowNarrow').and.returnValue(true);
+    spyOn(sidebarStatusService, 'toggleHamburgerIconStatus');
+    spyOn(clickEvent, 'stopPropagation');
+
     expect(component.isSidebarShown()).toBe(false);
-
-    component.toggleSidebar();
-
+    component.toggleSidebar(clickEvent);
+    expect(sidebarStatusService.toggleHamburgerIconStatus).toHaveBeenCalled();
     expect(component.isSidebarShown()).toBe(true);
   });
 
@@ -346,8 +355,7 @@ describe('TopNavigationBarComponent', () => {
   ' complete', fakeAsync(() => {
     spyOn(wds, 'isWindowNarrow').and.returnValues(false, true);
     spyOn(document, 'querySelector').and.stub();
-
-    component.checkIfI18NCompleted = null;
+    spyOn(component, 'checkIfI18NCompleted').and.returnValue(false);
 
     component.truncateNavbar();
     tick(101);
@@ -373,10 +381,10 @@ describe('TopNavigationBarComponent', () => {
 
     component.navElementsVisibilityStatus = {
       I18N_TOPNAV_DONATE: true,
-      I18N_TOPNAV_CLASSROOM: true,
+      I18N_TOPNAV_LEARN: true,
       I18N_TOPNAV_ABOUT: true,
-      I18N_CREATE_EXPLORATION_CREATE: true,
-      I18N_TOPNAV_LIBRARY: true
+      I18N_TOPNAV_LIBRARY: true,
+      I18N_TOPNAV_HOME: true
     };
 
     component.truncateNavbar();
@@ -385,10 +393,10 @@ describe('TopNavigationBarComponent', () => {
     fixture.whenStable().then(() => {
       expect(component.navElementsVisibilityStatus).toEqual({
         I18N_TOPNAV_DONATE: false,
-        I18N_TOPNAV_CLASSROOM: true,
+        I18N_TOPNAV_LEARN: true,
         I18N_TOPNAV_ABOUT: true,
-        I18N_CREATE_EXPLORATION_CREATE: true,
-        I18N_TOPNAV_LIBRARY: true
+        I18N_TOPNAV_LIBRARY: true,
+        I18N_TOPNAV_HOME: true
       });
     });
   }));
@@ -452,11 +460,11 @@ describe('TopNavigationBarComponent', () => {
     spyOn(i18nLanguageCodeService, 'getCurrentI18nLanguageCode')
       .and.returnValue('en');
 
-    expect(component.isModerator).toBe(undefined);
-    expect(component.isCurriculumAdmin).toBe(undefined);
-    expect(component.isTopicManager).toBe(undefined);
-    expect(component.isSuperAdmin).toBe(undefined);
-    expect(component.userIsLoggedIn).toBe(undefined);
+    expect(component.isModerator).toBe(false);
+    expect(component.isCurriculumAdmin).toBe(false);
+    expect(component.isTopicManager).toBe(false);
+    expect(component.isSuperAdmin).toBe(false);
+    expect(component.userIsLoggedIn).toBe(false);
     expect(component.username).toBe(undefined);
     expect(component.profilePageUrl).toBe(undefined);
 
@@ -471,4 +479,77 @@ describe('TopNavigationBarComponent', () => {
     expect(component.username).toBe('username1');
     expect(component.profilePageUrl).toBe('/profile/username1');
   }));
+
+  it('should return proper offset for dropdown', ()=>{
+    var dummyElement = document.createElement('div');
+    spyOn(document, 'querySelector').and.returnValue(dummyElement);
+
+    spyOn(Element.prototype, 'getBoundingClientRect').and.callFake(
+      jasmine.createSpy('getBoundingClientRect').and
+        .returnValue({ top: 1, height: 100, left: 0, width: 200, right: 202 })
+    );
+
+    expect(component.getDropdownOffset('.dummy', 0)).toBe(0);
+  });
+
+  it('should return proper offset for learn dropdown when element is undefined',
+    ()=>{
+      spyOn(document, 'querySelector').and.returnValue(null);
+
+      expect(component.getDropdownOffset('.dummy', 0)).toBe(0);
+    });
+
+  it('should check if dropdown offsets are updated', fakeAsync (()=>{
+    spyOn(component, 'truncateNavbar').and.stub();
+    spyOn(component, 'getDropdownOffset')
+      .withArgs('.learn-tab', 688).and.returnValue(-10)
+      .withArgs('.learn-tab', 300).and.returnValue(-10)
+      .withArgs('.donate-tab', 286).and.returnValue(-10)
+      .withArgs('.get-involved', 574).and.returnValue(-10);
+
+    expect(component.learnDropdownOffset).toBe(0);
+    expect(component.getInvolvedMenuOffset).toBe(0);
+    expect(component.donateMenuOffset).toBe(0);
+
+    component.ngAfterViewChecked();
+    tick();
+
+    expect(component.learnDropdownOffset).toBe(-10);
+    expect(component.getInvolvedMenuOffset).toBe(-10);
+    expect(component.donateMenuOffset).toBe(-10);
+  }));
+
+  it('should fetch classroom data when classroomPromos are enabled',
+    fakeAsync(() => {
+      spyOn(
+        classroomBackendApiService,
+        'fetchClassroomPromosAreEnabledStatusAsync').
+        and.resolveTo(true);
+      spyOn(accessValidationBackendApiService, 'validateAccessToClassroomPage')
+        .and.returnValue(Promise.resolve());
+
+      let cData1: CreatorTopicSummary = new CreatorTopicSummary(
+        'dummy', 'addition', 3, 3, 3, 3, 1,
+        'en', 'dummy', 1, 1, 1, 1, true,
+        true, 'math', 'public/img.webp', 'red', 'add');
+      let cData2: CreatorTopicSummary = new CreatorTopicSummary(
+        'dummy2', 'division', 2, 2, 3, 3, 0,
+        'es', 'dummy2', 1, 1, 1, 1, true,
+        true, 'math', 'public/img1.png', 'green', 'div');
+
+      let array: CreatorTopicSummary[] = [cData1, cData2];
+      let classroomData = new ClassroomData('test', array, 'dummy', 'dummy');
+      spyOn(
+        classroomBackendApiService, 'fetchClassroomDataAsync')
+        .and.resolveTo(classroomData);
+      spyOn(siteAnalyticsService, 'registerClassroomPageViewed');
+
+      component.ngOnInit();
+
+      tick();
+
+      expect(component.classroomData).toEqual(array);
+      expect(siteAnalyticsService.registerClassroomPageViewed)
+        .toHaveBeenCalled();
+    }));
 });

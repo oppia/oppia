@@ -36,13 +36,15 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
   'QuestionValidationService', 'SiteAnalyticsService',
   'UrlInterpolationService', 'question', 'questionId', 'questionStateData',
   'skill', 'skillDifficulty', 'suggestionId', 'SKILL_DIFFICULTY_LABEL_TO_FLOAT',
+  'IMAGE_CONTEXT',
   function(
       $rootScope, $scope, $uibModal, $uibModalInstance, AlertsService,
       ContextService, ContributionAndReviewService, ImageLocalStorageService,
       QuestionSuggestionBackendApiService, QuestionUndoRedoService,
       QuestionValidationService, SiteAnalyticsService,
       UrlInterpolationService, question, questionId, questionStateData,
-      skill, skillDifficulty, suggestionId, SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
+      skill, skillDifficulty, suggestionId, SKILL_DIFFICULTY_LABEL_TO_FLOAT,
+      IMAGE_CONTEXT) {
     $scope.canEditQuestion = true;
     $scope.newQuestionIsBeingCreated = true;
     $scope.question = question;
@@ -54,7 +56,10 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
     $scope.misconceptionsBySkill = {};
     $scope.misconceptionsBySkill[$scope.skill.getId()] = (
       $scope.skill.getMisconceptions());
-    ContextService.setImageSaveDestinationToLocalStorage();
+    ContextService.setCustomEntityContext(
+      IMAGE_CONTEXT.QUESTION_SUGGESTIONS,
+      $scope.skill.getId()
+    );
     $scope.setDifficultyString = function(skillDifficulty) {
       $scope.skillDifficultyString = Object.entries(
         SKILL_DIFFICULTY_LABEL_TO_FLOAT).find(

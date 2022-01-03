@@ -1,5 +1,7 @@
 {
     "1": [
+        "core.jobs.transforms.job_result_transforms_test",
+        "scripts.linters.pre_commit_linter_test",
         "core.controllers.base_test",
         "core.controllers.collection_editor_test",
         "core.controllers.editor_test",
@@ -48,36 +50,11 @@
         "core.controllers.classifier_test",
         "core.controllers.suggestion_test",
         "core.controllers.voice_artist_test",
-        "extensions.domain_test",
-        "core.controllers.learner_dashboard_test"
+        "core.jobs.batch_jobs.skill_migration_jobs_test",
+        "core.jobs.batch_jobs.story_migration_jobs_test",
+        "core.jobs.batch_jobs.email_deletion_jobs_test"
     ],
     "2": [
-        "core.platform.storage.cloud_storage_emulator_test",
-        "core.platform.storage.dev_mode_storage_services_test",
-        "core.platform.storage.cloud_storage_services_test",
-        "core.controllers.collection_viewer_test",
-        "core.domain.rating_services_test",
-        "core.domain.classifier_services_test",
-        "core.controllers.recent_commits_test",
-        "core.domain.search_services_test",
-        "core.domain.role_services_test",
-        "core.controllers.contributor_dashboard_test",
-        "core.controllers.creator_dashboard_test",
-        "core.domain.expression_parser_test",
-        "core.domain.improvements_services_test",
-        "core.domain.suggestion_registry_test",
-        "core.controllers.feedback_test",
-        "core.controllers.moderator_test",
-        "core.domain.rte_component_registry_test",
-        "core.controllers.pages_test",
-        "core.domain.topic_domain_test",
-        "core.controllers.acl_decorators_test",
-        "core.domain.question_domain_test",
-        "core.platform.bulk_email.mailchimp_bulk_email_services_test",
-        "core.platform.bulk_email.dev_mode_bulk_email_services_test",
-        "core.jobs.io.job_io_test"
-    ],
-    "3": [
         "core.domain.rights_manager_test",
         "core.domain.skill_services_test",
         "core.domain.story_domain_test",
@@ -104,9 +81,7 @@
         "core.domain.feedback_services_test",
         "core.domain.classroom_services_test",
         "core.domain.visualization_registry_test",
-        "core.domain.exp_services_test"
-    ],
-    "4": [
+        "core.domain.exp_services_test",
         "core.domain.app_feedback_report_services_test",
         "core.controllers.learner_goals_test",
         "core.domain.beam_job_domain_test",
@@ -129,9 +104,7 @@
         "scripts.linters.python_linter_test",
         "core.platform.auth.firebase_auth_services_test",
         "scripts.install_backend_python_libs_test",
-        "scripts.common_test"
-    ],
-    "5": [
+        "scripts.common_test",
         "core.controllers.beam_jobs_test",
         "core.controllers.contributor_dashboard_admin_test",
         "core.controllers.oppia_root_test",
@@ -152,18 +125,9 @@
         "core.platform.app_identity.gae_app_identity_services_test",
         "core.storage.topic.gae_models_test",
         "scripts.release_scripts.cut_release_or_hotfix_branch_test",
-        "scripts.linters.css_linter_test",
-        "core.platform.email.dev_mode_email_services_test",
-        "core.jobs.types.blog_validation_errors_test",
-        "core.jobs.batch_jobs.blog_validation_jobs_test",
-        "core.jobs.transforms.validation.blog_validation_test",
-        "core.jobs.transforms.validation.skill_validation_test",
-        "core.jobs.transforms.validation.story_validation_test",
-        "core.tests.load_tests.feedback_thread_summaries_test",
-        "core.tests.test_utils_test",
-        "core.tests.gae_suite_test"
+        "scripts.linters.css_linter_test"
     ],
-    "6": [
+    "3": [
         "core.controllers.incoming_app_feedback_report_test",
         "core.domain.app_feedback_report_domain_test",
         "core.domain.object_registry_test",
@@ -180,9 +144,7 @@
         "core.storage.job.gae_models_test",
         "core.storage.base_model.gae_models_test",
         "core.jobs.jobs_manager_test",
-        "core.schema_utils_test"
-    ],
-    "7": [
+        "core.schema_utils_test",
         "core.domain.story_services_test",
         "core.domain.fs_domain_test",
         "core.domain.taskqueue_services_test",
@@ -206,9 +168,10 @@
         "core.domain.learner_progress_services_test",
         "core.domain.config_services_test",
         "core.domain.subtopic_page_services_test",
-        "core.domain.calculation_registry_test"
+        "core.domain.calculation_registry_test",
+        "scripts.extend_index_yaml_test"
     ],
-    "8": [
+    "4": [
         "core.domain.question_fetchers_test",
         "core.domain.exp_domain_test",
         "core.domain.customization_args_util_test",
@@ -227,16 +190,13 @@
         "scripts.linters.pylint_extensions_test",
         "core.domain.html_cleaner_test",
         "core.platform.taskqueue.dev_mode_taskqueue_services_test",
-        "scripts.linters.pre_commit_linter_test",
         "scripts.create_topological_sort_of_all_services_test",
         "core.storage.suggestion.gae_models_test",
         "core.storage.auth.gae_models_test",
         "scripts.linters.html_linter_test",
         "scripts.script_import_test",
         "scripts.setup_gae_test",
-        "scripts.linters.general_purpose_linter_test"
-    ],
-    "9": [
+        "scripts.linters.general_purpose_linter_test",
         "core.storage.app_feedback_report.gae_models_test",
         "core.jobs.batch_jobs.model_validation_jobs_test",
         "core.jobs.base_jobs_test",
@@ -264,9 +224,7 @@
         "core.jobs.types.topic_validation_errors_test",
         "core.jobs.types.user_validation_errors_test",
         "core.jobs.types.feedback_validation_errors_test",
-        "core.jobs.types.improvements_validation_errors_test"
-    ],
-    "10": [
+        "core.jobs.types.improvements_validation_errors_test",
         "core.domain.moderator_services_test",
         "core.jobs.batch_jobs.exp_recommendation_computation_jobs_test",
         "core.jobs.batch_jobs.exp_search_indexing_jobs_test",
@@ -286,9 +244,7 @@
         "core.domain.user_query_domain_test",
         "core.storage.blog.gae_models_test",
         "core.controllers.access_validators_test",
-        "main_test"
-    ],
-    "11": [
+        "main_test",
         "core.platform.taskqueue.cloud_taskqueue_services_test",
         "core.platform.translate.cloud_translate_services_test",
         "core.platform.translate.dev_mode_translate_services_test",
@@ -315,6 +271,41 @@
         "core.storage.statistics.gae_models_test",
         "core.storage.exploration.gae_models_test",
         "scripts.release_scripts.repo_specific_changes_fetcher_test",
-        "scripts.docstrings_checker_test"
+        "scripts.docstrings_checker_test",
+        "extensions.domain_test",
+        "core.controllers.learner_dashboard_test",
+        "core.platform.storage.cloud_storage_emulator_test",
+        "core.platform.storage.dev_mode_storage_services_test",
+        "core.platform.storage.cloud_storage_services_test",
+        "core.controllers.collection_viewer_test",
+        "core.domain.rating_services_test",
+        "core.domain.classifier_services_test",
+        "core.controllers.recent_commits_test",
+        "core.domain.search_services_test",
+        "core.domain.role_services_test",
+        "core.controllers.contributor_dashboard_test",
+        "core.platform.email.dev_mode_email_services_test",
+        "core.jobs.types.blog_validation_errors_test",
+        "core.jobs.batch_jobs.blog_validation_jobs_test",
+        "core.jobs.transforms.validation.blog_validation_test",
+        "core.jobs.transforms.validation.skill_validation_test",
+        "core.jobs.transforms.validation.story_validation_test",
+        "core.tests.load_tests.feedback_thread_summaries_test",
+        "core.tests.test_utils_test",
+        "core.tests.gae_suite_test",
+        "core.controllers.creator_dashboard_test",
+        "core.domain.expression_parser_test",
+        "core.domain.improvements_services_test",
+        "core.domain.suggestion_registry_test",
+        "core.controllers.feedback_test",
+        "core.controllers.moderator_test",
+        "core.domain.rte_component_registry_test",
+        "core.controllers.pages_test",
+        "core.domain.topic_domain_test",
+        "core.controllers.acl_decorators_test",
+        "core.domain.question_domain_test",
+        "core.platform.bulk_email.mailchimp_bulk_email_services_test",
+        "core.platform.bulk_email.dev_mode_bulk_email_services_test",
+        "core.jobs.io.job_io_test"
     ]
 }

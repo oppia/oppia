@@ -1537,7 +1537,7 @@ class SkillSummary:
 
     def __init__(
             self, skill_id, description, language_code, version,
-            misconception_count, worked_examples_count, proto_size_in_bytes,
+            misconception_count, worked_examples_count,
             skill_model_created_on, skill_model_last_updated):
         """Constructs a SkillSummary domain object.
 
@@ -1550,7 +1550,6 @@ class SkillSummary:
                 with the skill.
             worked_examples_count: int. The number of worked examples in the
                 skill.
-            proto_size_in_bytes: int. Proto size of topic.
             skill_model_created_on: datetime.datetime. Date and time when
                 the skill model is created.
             skill_model_last_updated: datetime.datetime. Date and time
@@ -1562,9 +1561,9 @@ class SkillSummary:
         self.version = version
         self.misconception_count = misconception_count
         self.worked_examples_count = worked_examples_count
-        self.proto_size_in_bytes = proto_size_in_bytes
         self.skill_model_created_on = skill_model_created_on
         self.skill_model_last_updated = skill_model_last_updated
+        self.proto_size_in_bytes = self.get_proto_size()
 
     def validate(self):
         """Validates various properties of the Skill Summary object.
@@ -1609,7 +1608,12 @@ class SkillSummary:
 
         if not isinstance(self.proto_size_in_bytes, int):
             raise utils.ValidationError(
-                'Expected proto size to be a int, received %s'
+                'Expected proto size to be an int, received %s'
+                % self.proto_size_in_bytes)
+
+        if self.proto_size_in_bytes <= 0:
+            raise utils.ValidationError(
+                'Expected proto size to be a positive integer, received %s'
                 % self.proto_size_in_bytes)
 
     def to_dict(self):
@@ -1625,29 +1629,31 @@ class SkillSummary:
             'version': self.version,
             'misconception_count': self.misconception_count,
             'worked_examples_count': self.worked_examples_count,
-            'proto_size_in_bytes': self.proto_size_in_bytes,
             'skill_model_created_on': utils.get_time_in_millisecs(
                 self.skill_model_created_on),
             'skill_model_last_updated': utils.get_time_in_millisecs(
                 self.skill_model_last_updated)
         }
 
-    @classmethod
-    def to_proto(cls, skill):
+    def to_proto(self):
         """Returns a Skill proto object from its respective items.
 
-        Args:
-            skill: Skill. The skill domain object.
+        Returns:
+            SkillSummaryDto. The proto object.
+        """
+        return topic_summary_pb2.SkillSummaryDto(
+            id=self.id,
+            name=self.description,
+            content_version=self.version
+        )
+
+    def get_proto_size(self):
+        """Calculate the byte size of the proto object.
 
         Returns:
-            Proto Object. The skill summary proto object.
+            int. The byte size of the proto object.
         """
-        skill_summary_proto = topic_summary_pb2.SkillSummary(
-            id=skill.id,
-            name=skill.description,
-            content_version=skill.version)
-
-        return skill_summary_proto
+        return int(self.to_proto().ByteSize())
 
 
 class AugmentedSkillSummary:

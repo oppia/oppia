@@ -25,6 +25,7 @@ import os
 from core.constants import constants
 
 from typing import Dict, List, Union
+from typing_extensions import TypedDict
 
 CommandType = (
     Dict[str, Union[str, List[str], Dict[str, Union[str, List[str]]]]])
@@ -111,7 +112,16 @@ LEGACY_HTML_FIELD_TYPES_TO_RULE_SPECS_EXTENSIONS_MODULE_DIR = os.path.join(
 # algorithms per interaction. Hence, whenever we find a secondary algorithm
 # candidate for any of the supported interactions, the logical functions to
 # support multiple algorithms need to be implemented.
-INTERACTION_CLASSIFIER_MAPPING = {
+
+
+class ClassifierDict(TypedDict):
+    """Representing INTERACTION_CLASSIFIER_MAPPING dict values."""
+
+    algorithm_id: str
+    algorithm_version: int
+
+
+INTERACTION_CLASSIFIER_MAPPING: Dict[str, ClassifierDict] = {
     'TextInput': {
         'algorithm_id': 'TextClassifier',
         'algorithm_version': 1
@@ -125,7 +135,7 @@ TRAINING_JOB_STATUS_FAILED = 'FAILED'
 TRAINING_JOB_STATUS_NEW = 'NEW'
 TRAINING_JOB_STATUS_PENDING = 'PENDING'
 
-ALLOWED_TRAINING_JOB_STATUSES = [
+ALLOWED_TRAINING_JOB_STATUSES: List[str] = [
     TRAINING_JOB_STATUS_COMPLETE,
     TRAINING_JOB_STATUS_FAILED,
     TRAINING_JOB_STATUS_NEW,
@@ -149,7 +159,7 @@ ANSWER_TYPE_SET_OF_HTML = 'SetOfHtmlString'
 # The maximum number of characters allowed for userbio length.
 MAX_BIO_LENGTH_IN_CHARS = 2000
 
-ALLOWED_TRAINING_JOB_STATUS_CHANGES = {
+ALLOWED_TRAINING_JOB_STATUS_CHANGES: Dict[str, List[str]] = {
     TRAINING_JOB_STATUS_COMPLETE: [],
     TRAINING_JOB_STATUS_NEW: [TRAINING_JOB_STATUS_PENDING],
     TRAINING_JOB_STATUS_PENDING: [TRAINING_JOB_STATUS_COMPLETE,
@@ -206,6 +216,10 @@ DEFAULT_CLASSIFIER_LABEL = '_default'
 
 # The maximum number of results to retrieve in a datastore query.
 DEFAULT_QUERY_LIMIT = 1000
+
+# The maximum number of results to retrieve in a datastore query
+# for suggestions.
+DEFAULT_SUGGESTION_QUERY_LIMIT = 1000
 
 # The maximum number of results to retrieve in a datastore query
 # for top rated published explorations in /library page.
@@ -496,7 +510,7 @@ GOOGLE_APP_ENGINE_REGION = 'us-central1'
 DATAFLOW_TEMP_LOCATION = 'gs://todo/todo'
 DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
 
-OPPIA_VERSION = '3.1.4'
+OPPIA_VERSION = '3.2.1'
 OPPIA_PYTHON_PACKAGE_PATH = './build/oppia-beam-job-%s.tar.gz' % OPPIA_VERSION
 
 # Committer id for system actions. The username for the system committer
@@ -1484,3 +1498,9 @@ CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES = [
 # '/access_validation_handler/<handler_name>'
 # example '/access_validation_handler/validate_access_to_splash_page'.
 ACCESS_VALIDATION_HANDLER_PREFIX = '/access_validation_handler'
+
+# The possible commit types.
+COMMIT_TYPE_CREATE = 'create'
+COMMIT_TYPE_REVERT = 'revert'
+COMMIT_TYPE_EDIT = 'edit'
+COMMIT_TYPE_DELETE = 'delete'

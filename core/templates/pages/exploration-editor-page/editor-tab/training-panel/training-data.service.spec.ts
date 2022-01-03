@@ -39,6 +39,16 @@ require(
 describe('TrainingDataService', function() {
   var siis, ecs, rs, tds, ess, oof;
 
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [

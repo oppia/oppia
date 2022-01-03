@@ -332,22 +332,17 @@ class StoryNode:
 
         return node
 
-    @classmethod
-    def to_proto(cls, story_node):
+    def to_proto(self):
         """Returns a StoryNode proto object from its respective items.
 
-        Args:
-            story_node: StoryNode. The StoryNode domain object.
-
         Returns:
-            Proto Object. The chapter summary proto object.
+            ChapterSummaryDto. The proto object.
         """
-        story_node_proto = topic_summary_pb2.ChapterSummary(
-            title=story_node.title,
-            exploration_id=story_node.exploration_id,
-            content_version=story_node.version)
-
-        return story_node_proto
+        return topic_summary_pb2.ChapterSummaryDto(
+            title=self.title,
+            exploration_id=self.exploration_id,
+            content_version=self.version
+        )
 
     @classmethod
     def create_default_story_node(cls, node_id, title):
@@ -992,29 +987,23 @@ class Story:
 
         return story
 
-    @classmethod
-    def to_proto(cls, story_domain):
+    def to_proto(self):
         """Returns a Story proto object from its respective items.
 
-        Args:
-            story_domain: Story. The Story domain object.
-
         Returns:
-            Proto Object. The story summary proto object.
+            StorySummaryDto. The proto object.
         """
         chapters_list = []
-        for node in story_domain.story_contents.nodes:
-            story_node_proto = StoryNode.to_proto(node)
-            chapters_list.append(story_node_proto)
+        for node in self.story_contents.nodes:
+            chapters_list.append(StoryNode.to_proto(node))
 
-        story_proto = topic_summary_pb2.StorySummary(
-            id=story_domain.id,
-            title=story_domain.title,
-            description=story_domain.description,
+        return topic_summary_pb2.StorySummaryDto(
+            id=self.id,
+            title=self.title,
+            description=self.description,
             chapters=chapters_list,
-            content_version=story_domain.version)
-
-        return story_proto
+            content_version=self.version
+        )
 
     @classmethod
     def create_default_story(

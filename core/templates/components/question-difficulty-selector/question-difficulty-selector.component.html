@@ -1,5 +1,6 @@
 <mat-radio-group [ngModel]="skillWithDifficulty.getDifficulty()"
-                 (change)="updateSkillWithDifficulty($event)">
+                 (change)="updateSkillWithDifficulty($event)"
+                 class="mat-radio-group-questions">
   <ng-container *ngFor="let rubric of skillIdToRubricsObject[skillWithDifficulty.getId()]; index as idx">
     <mat-radio-button *ngIf="rubric.getExplanations().length > 0"
                       [value]="availableDifficultyValues[idx]"
@@ -39,5 +40,6 @@
     font-weight: 400;
     margin-left: 30px;
     white-space: normal;
+    word-break: break-word;
   }
 </style>

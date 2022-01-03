@@ -1229,36 +1229,6 @@ textarea {
   background-color: #eee;
 }
 
-.oppia-exp-summary-tiles-container {
-  display: block;
-  height: 100%;
-  margin-left: auto;
-  margin-right: auto;
-  max-width: 928px;
-  min-height: 300px;
-  padding-bottom: 24px;
-  padding-top: 24px;
-  width: 100vw;
-}
-
-/* Ensure that the summary tiles tiles remain centered. Note that these values
-   would need to be updated if the summary tiles are changed. */
-@media (max-width: 844px) {
-  .oppia-exp-summary-tiles-container {
-    margin-left: 5vw;
-    margin-right: 5vw;
-    max-width: 89vw;
-    width: initial;
-  }
-}
-@media (max-width: 632px) {
-  .oppia-exp-summary-tiles-container {
-    margin-left: 2vw;
-    margin-right: 2vw;
-    max-width: 96vw;
-  }
-}
-
 .oppia-story-tile {
   display: block;
   height: 100%;
@@ -2612,6 +2582,11 @@ oppia-parameter {
 @media(min-width: 1024px) {
   .modal-lg {
     width: 900px;
+  }
+
+  /* Prevents misalignment of subtopic card in smaller screen sizes */
+  .subtopics-list .subtopic-card {
+    width: 150px;
   }
 }
 
@@ -4647,6 +4622,19 @@ div.oppia-issues-learner-action {
   padding-top: 0;
 }
 
+/*
+ For issue #12165 The following style is required so as to prevent long
+ description texts for questions getting overflowed in the editor because
+ of fixed height given which exceeds after word-break and breaks the view.
+*/
+.mat-radio-group-questions .mat-radio-button .mat-radio-label {
+  align-items: flex-start;
+}
+
+.mat-radio-group-questions .mat-radio-button .mat-radio-label .mat-list-item {
+  height: auto;
+}
+
 /* For issue #1867 (https://github.com/oppia/oppia/issues/1867)
   Added "overflow: hidden;" to this class to fix a problem with the screen
   flickering between 2 and 3 columns when someone hovered over either
@@ -4824,6 +4812,14 @@ div.oppia-issues-learner-action {
     width: 95%;
   }
 }
+
+@media (max-width: 780px) {
+  /* Prevents misalignment of subtopic card in smaller screen sizes */
+  .subtopics-list .subtopics-container .subtopic-card {
+    width: 100%;
+  }
+}
+
 @media (min-width: 576px) {
   .oppia-welcome-modal .modal-dialog {
     margin: 1.75rem auto;
@@ -4841,4 +4837,22 @@ div.oppia-issues-learner-action {
  */
 .cdk-global-overlay-wrapper, .cdk-overlay-container {
   z-index: 10000 !important;
+}
+
+.oppia-exploration-summary-tile {
+  margin-left: 10px;
+}
+
+.oppia-login-button {
+  background-color: #00645C;
+  font-size: 1em;
+  min-width: max-content;
+  width: 30%;
+}
+
+.oppia-sign-up-button {
+  background-color: #00609C;
+  font-size: 1em;
+  min-width: max-content;
+  width: 30%;
 }
