@@ -88,7 +88,7 @@ def memoize(func):
     # In order to allow calls to functions with default arguments to use the
     # same hash as calls which explicitly supply them, we fetch those default
     # values and use them to build the kwargs that func will actually see.
-    arg_names, _, _, defaults = inspect.getargspec(func)
+    arg_names, _, _, defaults, _, _, _ = inspect.getfullargspec(func)
     defaults = defaults if defaults is not None else ()
     default_func_kwargs = dict(
         python_utils.ZIP(arg_names[-len(defaults):], defaults))
