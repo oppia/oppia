@@ -17,12 +17,13 @@
 """Domain object for changes made to domain objects of storage models."""
 
 from __future__ import annotations
-from typing import Any, Dict, List
 
 import copy
 
 from core import utils
 from core.platform import models
+
+from typing import Any, Dict, List
 
 MYPY = False
 if MYPY:  # pragma: no cover
