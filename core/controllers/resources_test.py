@@ -915,3 +915,10 @@ class ValueGeneratorHandlerTests(test_utils.GenericTestBase):
         sm2 = '/value_generator_handler/%s.' % dummy_id
         error_message = sm1 + sm2
         self.assertEqual(response['error'], error_message)
+
+    def test_html_response(self):
+        copier_id = 'Copier'
+        response = self.get_html_response(
+            '/value_generator_handler/' + copier_id
+            )
+        self.assertIn(b'<object-editor obj-type="<[objType]>"', response.body)
