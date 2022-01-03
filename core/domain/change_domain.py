@@ -17,10 +17,9 @@
 """Domain object for changes made to domain objects of storage models."""
 
 from __future__ import annotations
-from typing import Dict, Any, List, Union, Optional
+from typing import Any, Dict, List
 
 import copy
-from typing_extensions import TypedDict
 
 from core import utils
 from core.platform import models
@@ -32,7 +31,8 @@ if MYPY:  # pragma: no cover
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 
-def validate_cmd(cmd_name: str, valid_cmd_attribute_specs: Dict[str, Any], actual_cmd_attributes: Dict[str, str])-> None:
+def validate_cmd(cmd_name: str, valid_cmd_attribute_specs: Dict[str, Any], 
+actual_cmd_attributes: Dict[str, str]) -> None:
     """Validates that the attributes of a command contain all the required
     attributes and some/all of optional attributes. It also checks that
     the values of attributes belong to a set of allowed values if any.
@@ -159,7 +159,7 @@ class BaseChange:
         for attribute_name in cmd_attribute_names:
             setattr(self, attribute_name, change_dict.get(attribute_name))
 
-    def validate_dict(self, change_dict: Dict[str, str])-> None:
+    def validate_dict(self, change_dict: Dict[str, str]) -> None:
         """Checks that the command in change dict is valid for the domain
         object.
 
@@ -203,7 +203,7 @@ class BaseChange:
         validate_cmd(
             cmd_name, valid_cmd_attribute_specs, actual_cmd_attributes)
 
-    def to_dict(self)-> Dict[str, str]:
+    def to_dict(self) -> Dict[str, str]:
         """Returns a dict representing the BaseChange domain object.
 
         Returns:
