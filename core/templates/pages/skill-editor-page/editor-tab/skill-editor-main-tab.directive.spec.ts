@@ -23,6 +23,7 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 // ^^^ This block is to be removed.
 
 describe('Skill editor main tab directive', function() {
@@ -32,7 +33,7 @@ describe('Skill editor main tab directive', function() {
   let $timeout = null;
   var directive = null;
   var UndoRedoService = null;
-  var $uibModal = null;
+  let ngbModal: NgbModal = null;
   var SkillEditorRoutingService = null;
   var SkillEditorStateService = null;
   var focusManagerService = null;
@@ -46,14 +47,24 @@ describe('Skill editor main tab directive', function() {
       imports: [HttpClientTestingModule]
     });
     focusManagerService = TestBed.get(FocusManagerService);
+    ngbModal = TestBed.inject(NgbModal);
   });
 
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
 
   beforeEach(angular.mock.inject(function($injector) {
     $rootScope = $injector.get('$rootScope');
     $timeout = $injector.get('$timeout');
     $scope = $rootScope.$new();
-    $uibModal = $injector.get('$uibModal');
+    ngbModal = $injector.get('NgbModal');
     UndoRedoService = $injector.get('UndoRedoService');
     directive = $injector.get('skillEditorMainTabDirective')[0];
     SkillEditorStateService = $injector.get('SkillEditorStateService');
@@ -92,10 +103,10 @@ describe('Skill editor main tab directive', function() {
     expect($scope.hasLoadedSkill()).toBe(true);
   });
 
-  it('should open save changes modal with $uibModal when unsaved changes are' +
+  it('should open save changes modal with ngbModal when unsaved changes are' +
   ' present', function() {
     spyOn(UndoRedoService, 'getChangeCount').and.returnValue(1);
-    var modalSpy = spyOn($uibModal, 'open').and.callThrough();
+    var modalSpy = spyOn(ngbModal, 'open').and.callThrough();
     $scope.createQuestion(),
     expect(modalSpy).toHaveBeenCalled();
   });
