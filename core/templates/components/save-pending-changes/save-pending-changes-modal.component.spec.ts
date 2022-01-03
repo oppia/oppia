@@ -38,7 +38,10 @@ describe('Save pending changes modal', () => {
     componentInstance = fixture.componentInstance;
   });
 
-  it('should check if component is defined or not', () => {
+  // This component have no more frontend tests as it inherits the
+  // ConfirmOrCancelModalComponent and doesn't have any additional
+  // functionality. Please see the ConfirmOrCancelModalComponent for more tests.
+  it('should create', () => {
     expect(componentInstance).toBeDefined();
   });
 });
