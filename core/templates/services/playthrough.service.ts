@@ -45,7 +45,7 @@ class CyclicStateTransitionsTracker {
 
   constructor(initStateName: string) {
     this.pathOfVisitedStates = [initStateName];
-    this.cycleOfVisitedStates = null;
+    this.cycleOfVisitedStates = [] ;
     this.numLoops = 0;
   }
 
@@ -114,8 +114,8 @@ class CyclicStateTransitionsTracker {
 }
 
 class EarlyQuitTracker {
-  private stateName: string = null;
-  private expDurationInSecs: number = null;
+  private stateName: string = " ";
+  private expDurationInSecs: number | null = null;
 
   foundAnIssue(): boolean {
     return (
@@ -123,15 +123,15 @@ class EarlyQuitTracker {
       this.expDurationInSecs < ServicesConstants.EARLY_QUIT_THRESHOLD_IN_SECS);
   }
 
-  recordExplorationQuit(stateName: string, expDurationInSecs: number): void {
+  recordExplorationQuit(stateName:string , expDurationInSecs: number | null): void {
     this.stateName = stateName;
     this.expDurationInSecs = expDurationInSecs;
   }
 
   generateIssueCustomizationArgs(): EarlyQuitCustomizationArgs {
     return {
-      state_name: {value: this.stateName},
-      time_spent_in_exp_in_msecs: {value: this.expDurationInSecs * 1000},
+      state_name!: {value: this.stateName},
+      time_spent_in_exp_in_msecs: {value: this.expDurationInSecs! * 1000},
     };
   }
 }
@@ -171,16 +171,16 @@ class MultipleIncorrectAnswersTracker {
   providedIn: 'root'
 })
 export class PlaythroughService {
-  private explorationId: string = null;
-  private explorationVersion: number = null;
-  private learnerIsInSamplePopulation: boolean = null;
+  private explorationId: string = " ";
+  private explorationVersion: number | null = null;
+  private learnerIsInSamplePopulation: boolean | null = null;
 
-  private eqTracker: EarlyQuitTracker = null;
-  private cstTracker: CyclicStateTransitionsTracker = null;
-  private misTracker: MultipleIncorrectAnswersTracker = null;
-  private recordedLearnerActions: LearnerAction[] = null;
-  private playthroughStopwatch: Stopwatch = null;
-  private playthroughDurationInSecs: number = null;
+  private eqTracker: EarlyQuitTracker | null = null;
+  private cstTracker: CyclicStateTransitionsTracker | null = null;
+  private misTracker: MultipleIncorrectAnswersTracker | null = null;
+  private recordedLearnerActions: LearnerAction[] | null = null;
+  private playthroughStopwatch: Stopwatch | null = null;
+  private playthroughDurationInSecs: number | null = null;
 
   constructor(
       private explorationFeaturesService: ExplorationFeaturesService,
@@ -189,11 +189,11 @@ export class PlaythroughService {
       private playthroughObjectFactory: PlaythroughObjectFactory) {}
 
   initSession(
-      explorationId: string, explorationVersion: number,
+      explorationId: string, explorationVersion: number | null,
       sampleSizePopulationProportion: number): void {
     this.explorationId = explorationId;
-    this.explorationVersion = explorationVersion;
-    this.learnerIsInSamplePopulation = (
+    this.explorationVersion!= explorationVersion;
+    this.learnerIsInSamplePopulation! = (
       Math.random() < sampleSizePopulationProportion);
   }
 
@@ -224,7 +224,7 @@ export class PlaythroughService {
       return;
     }
 
-    this.recordedLearnerActions.push(
+    this.recordedLearnerActions!.push(
       this.learnerActionObjectFactory.createNewAnswerSubmitAction({
         state_name: {value: stateName},
         dest_state_name: {value: destStateName},
@@ -234,8 +234,8 @@ export class PlaythroughService {
         time_spent_state_in_msecs: {value: 1000 * timeSpentInStateSecs}
       }));
 
-    this.misTracker.recordStateTransition(destStateName);
-    this.cstTracker.recordStateTransition(destStateName);
+    this.misTracker!.recordStateTransition(destStateName);
+    this.cstTracker!.recordStateTransition(destStateName);
   }
 
   recordExplorationQuitAction(
@@ -244,14 +244,14 @@ export class PlaythroughService {
       return;
     }
 
-    this.recordedLearnerActions.push(
+    this.recordedLearnerActions!.push(
       this.learnerActionObjectFactory.createNewExplorationQuitAction({
         state_name: {value: stateName},
         time_spent_in_state_in_msecs: {value: 1000 * timeSpentInStateSecs}
       }));
 
-    this.playthroughDurationInSecs = this.playthroughStopwatch.getTimeInSecs();
-    this.eqTracker.recordExplorationQuit(
+    this.playthroughDurationInSecs = this.playthroughStopwatch!.getTimeInSecs();
+    this.eqTracker!.recordExplorationQuit(
       stateName, this.playthroughDurationInSecs);
   }
 
@@ -277,21 +277,21 @@ export class PlaythroughService {
     if (this.misTracker && this.misTracker.foundAnIssue()) {
       return this.playthroughObjectFactory
         .createNewMultipleIncorrectSubmissionsPlaythrough(
-          this.explorationId, this.explorationVersion,
+          this.explorationId, this.explorationVersion!,
           this.misTracker.generateIssueCustomizationArgs(),
-          this.recordedLearnerActions);
+          this.recordedLearnerActions!);
     } else if (this.cstTracker && this.cstTracker.foundAnIssue()) {
       return this.playthroughObjectFactory
         .createNewCyclicStateTransitionsPlaythrough(
-          this.explorationId, this.explorationVersion,
+          this.explorationId, this.explorationVersion!,
           this.cstTracker.generateIssueCustomizationArgs(),
-          this.recordedLearnerActions);
+          this.recordedLearnerActions!);
     } else if (this.eqTracker && this.eqTracker.foundAnIssue()) {
       return this.playthroughObjectFactory
         .createNewEarlyQuitPlaythrough(
-          this.explorationId, this.explorationVersion,
+          this.explorationId, this.explorationVersion!,
           this.eqTracker.generateIssueCustomizationArgs(),
-          this.recordedLearnerActions);
+          this.recordedLearnerActions!);
     }
     return null;
   }
@@ -311,8 +311,8 @@ export class PlaythroughService {
   private hasRecordingFinished(): boolean {
     return (
       this.hasRecordingBegun() &&
-      this.recordedLearnerActions.length > 1 &&
-      this.recordedLearnerActions[this.recordedLearnerActions.length - 1]
+      this.recordedLearnerActions!.length > 1 &&
+      this.recordedLearnerActions![this.recordedLearnerActions!.length - 1]
         .actionType === AppConstants.ACTION_TYPE_EXPLORATION_QUIT);
   }
 
@@ -321,10 +321,10 @@ export class PlaythroughService {
       // Playthroughs are only helpful in their entirety.
       this.hasRecordingFinished() &&
       // Playthroughs are only helpful if learners have attempted an answer.
-      this.recordedLearnerActions.some(
+      this.recordedLearnerActions!.some(
         a => a.actionType === AppConstants.ACTION_TYPE_ANSWER_SUBMIT) &&
       // Playthroughs are only helpful if learners have invested enough time.
-      this.playthroughDurationInSecs >=
+      this.playthroughDurationInSecs! >=
           ServicesConstants.MIN_PLAYTHROUGH_DURATION_IN_SECS);
   }
 }
