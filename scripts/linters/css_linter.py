@@ -54,7 +54,7 @@ class ThirdPartyCSSLintChecksManager:
         Returns:
             str. A string with the trimmed error messages.
         """
-        return '%s\n' % css_lint_output.split('\n')
+        return '%s\n' % css_lint_output
 
     def lint_css_files(self):
         """Prints a list of lint errors in the given list of CSS files.
