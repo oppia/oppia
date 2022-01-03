@@ -28,6 +28,7 @@ from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import skill_domain
 from core.domain import state_domain
+from core.domain import skill_domain
 
 from typing import Dict, Optional, Union
 
