@@ -17,16 +17,22 @@
 """Domain object for changes made to domain objects of storage models."""
 
 from __future__ import annotations
+from typing import Dict, Any, List, Union, Optional
 
 import copy
+from typing_extensions import TypedDict
 
 from core import utils
 from core.platform import models
 
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import base_models
+
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 
-def validate_cmd(cmd_name, valid_cmd_attribute_specs, actual_cmd_attributes):
+def validate_cmd(cmd_name: str, valid_cmd_attribute_specs: Dict[str, Any], actual_cmd_attributes: Dict[str, str])-> None:
     """Validates that the attributes of a command contain all the required
     attributes and some/all of optional attributes. It also checks that
     the values of attributes belong to a set of allowed values if any.
@@ -108,13 +114,13 @@ class BaseChange:
     # dict with key as attribute name and value as deprecated values
     # for the attribute.
     # This list can be overriden by subclasses, if needed.
-    ALLOWED_COMMANDS = []
+    ALLOWED_COMMANDS: List[Dict[str, Any]] = []
 
     # The list of deprecated commands of a change domain object. Each item
     # is a command that has been deprecated but these commands are yet to be
     # removed from the server data. Thus, once these commands are removed using
     # a migration job, we can remove the command from this list.
-    DEPRECATED_COMMANDS = []
+    DEPRECATED_COMMANDS: List[str] = []
 
     # This is a list of common commands which is valid for all subclasses.
     # This should not be overriden by subclasses.
@@ -125,7 +131,7 @@ class BaseChange:
         'user_id_attribute_names': []
     }]
 
-    def __init__(self, change_dict):
+    def __init__(self, change_dict: Dict[str, str]):
         """Initializes a BaseChange object from a dict.
 
         Args:
@@ -153,7 +159,7 @@ class BaseChange:
         for attribute_name in cmd_attribute_names:
             setattr(self, attribute_name, change_dict.get(attribute_name))
 
-    def validate_dict(self, change_dict):
+    def validate_dict(self, change_dict: Dict[str, str])-> None:
         """Checks that the command in change dict is valid for the domain
         object.
 
@@ -197,7 +203,7 @@ class BaseChange:
         validate_cmd(
             cmd_name, valid_cmd_attribute_specs, actual_cmd_attributes)
 
-    def to_dict(self):
+    def to_dict(self)-> Dict[str, str]:
         """Returns a dict representing the BaseChange domain object.
 
         Returns:
@@ -223,7 +229,7 @@ class BaseChange:
 
         return base_change_dict
 
-    def __getattr__(self, name: str) -> str:
+    def __getattr__(self, name: str) -> Any:
         # AttributeError needs to be thrown in order to make
         # instances of this class picklable.
         try:
