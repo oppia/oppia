@@ -24,11 +24,13 @@ import subprocess
 from .. import common
 from .. import concurrent_task_utils
 
+STYLELINT_CONFIG = os.path.join('.stylelintrc')
+
 
 class ThirdPartyCSSLintChecksManager:
     """Manages all the third party Python linting functions."""
 
-    def __init__(self, config_path, files_to_lint):
+    def __init__(self, files_to_lint):
         """Constructs a ThirdPartyCSSLintChecksManager object.
 
         Args:
@@ -36,7 +38,6 @@ class ThirdPartyCSSLintChecksManager:
             files_to_lint: list(str). A list of filepaths to lint.
         """
         super(ThirdPartyCSSLintChecksManager, self).__init__()
-        self.config_path = config_path
         self.files_to_lint = files_to_lint
 
     @property
@@ -54,8 +55,7 @@ class ThirdPartyCSSLintChecksManager:
         Returns:
             str. A string with the trimmed error messages.
         """
-        trimmed_error_messages = css_lint_output.split('\n')
-        return '\n'.join(trimmed_error_messages) + '\n'
+        return '%s\n' % css_lint_output.split('\n')
 
     def lint_css_files(self):
         """Prints a list of lint errors in the given list of CSS files.
@@ -78,7 +78,7 @@ class ThirdPartyCSSLintChecksManager:
         name = 'Stylelint'
 
         stylelint_cmd_args = [
-            node_path, stylelint_path, '--config=' + self.config_path]
+            node_path, stylelint_path, '--config=' + STYLELINT_CONFIG]
         proc_args = stylelint_cmd_args + self.all_filepaths
         proc = subprocess.Popen(
             proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -118,18 +118,16 @@ class ThirdPartyCSSLintChecksManager:
         return [self.lint_css_files()]
 
 
-def get_linters(config_path, files_to_lint):
+def get_linters(files_to_lint):
     """Creates ThirdPartyCSSLintChecksManager and returns it.
 
     Args:
-        config_path: str. Path to the configuration file.
         files_to_lint: list(str). A list of filepaths to lint.
 
     Returns:
         tuple(None, ThirdPartyCSSLintChecksManager). A 2-tuple of custom and
         third_party linter objects.
     """
-    third_party_linter = ThirdPartyCSSLintChecksManager(
-        config_path, files_to_lint)
+    third_party_linter = ThirdPartyCSSLintChecksManager(files_to_lint)
 
     return None, third_party_linter

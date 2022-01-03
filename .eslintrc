@@ -17,7 +17,8 @@
     {
       // We exclude test files from dependency injection format checks because
       // they are never minified. Also, we exclude no-loss-of-precision check as
-      // it is only relevant for non-test files.
+      // it is only relevant for non-test files, since when running
+      // frontend tests there is no loss of precision.
       "files": ["*Spec.js", "*Spec.ts", "*.spec.ts"],
       "rules": {
         "angular/di": "off",
