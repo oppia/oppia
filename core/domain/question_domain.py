@@ -35,6 +35,7 @@ from core.domain import html_cleaner
 from core.domain import html_validation_service
 from core.domain import interaction_registry
 from core.domain import state_domain
+from core.domain import translation_domain
 from core.platform import models
 from extensions import domain
 
@@ -129,7 +130,7 @@ class QuestionSuggestionChange(change_domain.BaseChange):
     ]
 
 
-class Question:
+class Question(translation_domain.BaseTranslatableObject):
     """Domain object for a question."""
 
     def __init__(
@@ -170,6 +171,11 @@ class Question:
             inapplicable_skill_misconception_ids)
         self.created_on = created_on
         self.last_updated = last_updated
+
+    def _register_all_translatable_fields(self) -> None:
+        """Registration of all translatable field for Question."""
+
+        self._register_translatable_object(self.question_state_data)
 
     def to_dict(self):
         """Returns a dict representing this Question domain object.

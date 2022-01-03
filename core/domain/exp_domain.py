@@ -39,6 +39,7 @@ from core.domain import html_cleaner
 from core.domain import html_validation_service
 from core.domain import param_domain
 from core.domain import state_domain
+from core.domain import translation_domain
 from core.platform import models
 
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
@@ -547,7 +548,7 @@ class VersionedExplorationInteractionIdsMapping:
         self.state_interaction_ids_dict = state_interaction_ids_dict
 
 
-class Exploration:
+class Exploration(translation_domain.BaseTranslatableObject):
     """Domain object for an Oppia exploration."""
 
     def __init__(
@@ -617,6 +618,12 @@ class Exploration:
         self.last_updated = last_updated
         self.auto_tts_enabled = auto_tts_enabled
         self.correctness_feedback_enabled = correctness_feedback_enabled
+
+    def _register_all_translatable_fields(self) -> None:
+        """Registration of translatable fields for exploration."""
+
+        for state in self.states.values():
+            self._register_translatable_object(state)
 
     @classmethod
     def create_default_exploration(
