@@ -16,8 +16,7 @@
  * @fileoverview Component for the skill editor page.
  */
 
-import { SavePendingChangesModalComponent } from
-  'components/save-pending-changes/save-pending-changes-modal.component';
+import { SavePendingChangesModalComponent } from 'components/save-pending-changes/save-pending-changes-modal.component';
 
 require('interactions/interactionsQuestionsRequires.ts');
 require('objects/objectComponentsRequires.ts');

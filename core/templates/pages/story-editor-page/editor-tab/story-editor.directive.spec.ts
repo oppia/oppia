@@ -351,10 +351,10 @@ describe('Story editor Directive having two story nodes', function() {
   it('should show modal if there are unsaved changes on leaving', function() {
     spyOn(UndoRedoService, 'getChangeCount').and.returnValue(10);
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return (
-        { componentInstance: MockNgbModalRef,
-          result: Promise.resolve()
-        }) as NgbModalRef;
+      return ({
+        componentInstance: MockNgbModalRef,
+        result: Promise.resolve()
+      }) as NgbModalRef;
     });
     $scope.returnToTopicEditorPage();
     expect(modalSpy).toHaveBeenCalled();

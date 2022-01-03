@@ -285,10 +285,10 @@ describe('Skill Editor Navbar Directive', function() {
       spyOn(undoRedoService, 'getChangeCount')
         .and.returnValue(2);
       const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        return (
-            { componentInstance: MockNgbModalRef,
-              result: Promise.resolve()
-            }) as NgbModalRef;
+        return ({
+          componentInstance: MockNgbModalRef,
+          result: Promise.resolve()
+        }) as NgbModalRef;
       });
       let navigateToQuestionsTabSpy = spyOn(
         skillEditorRoutingService, 'navigateToQuestionsTab')

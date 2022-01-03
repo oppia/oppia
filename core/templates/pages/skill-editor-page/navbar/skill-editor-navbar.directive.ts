@@ -35,7 +35,6 @@ require('services/contextual/url.service.ts');
 require('services/ngb-modal.service.ts');
 
 require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
-require('services/ngb-modal.service.ts');
 
 angular.module('oppia').directive('skillEditorNavbar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
