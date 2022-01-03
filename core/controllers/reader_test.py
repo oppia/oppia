@@ -2419,7 +2419,7 @@ class ExplorationEmbedPageTests(test_utils.GenericTestBase):
             '%s/invalid_exp_id' % (feconf.EXPLORATION_URL_EMBED_PREFIX),
             params={
                 'collection_id': self.COL_ID
-            }, expected_status_int=404
+            }, expected_status_int=400
         )
 
         self.logout()
@@ -2434,7 +2434,7 @@ class ExplorationEmbedPageTests(test_utils.GenericTestBase):
             params={
                 'v': exploration.version,
                 'collection_id': 'invalid_collection_id'
-            }, expected_status_int=404
+            }, expected_status_int=400
         )
 
         self.logout()

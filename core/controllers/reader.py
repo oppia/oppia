@@ -81,9 +81,7 @@ class ExplorationEmbedPage(base.BaseHandler):
 
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
-            'schema': {
-                'type': 'basestring'
-            }
+            'schema': editor.SCHEMA_FOR_EXPLORATION_ID
         }
     }
     HANDLER_ARGS_SCHEMAS = {
@@ -100,7 +98,11 @@ class ExplorationEmbedPage(base.BaseHandler):
             },
             'collection_id': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX
+                    }]
                 },
                 'default_value': None
             },
@@ -108,7 +110,7 @@ class ExplorationEmbedPage(base.BaseHandler):
                 'schema': {
                     'type': 'bool'
                 },
-                'default_value': None
+                'default_value': False
             },
         }
     }
@@ -120,19 +122,19 @@ class ExplorationEmbedPage(base.BaseHandler):
         Args:
             exploration_id: str. The ID of the exploration.
         """
-        version_str = self.request.get('v')
+        version_str = self.normalized_request.get('v')
         version = int(version_str) if version_str else None
 
         # Note: this is an optional argument and will be None when the
         # exploration is being played outside the context of a collection.
-        collection_id = self.request.get('collection_id')
+        collection_id = self.normalized_request.get('collection_id')
 
         # This check is needed in order to show the correct page when a 404
         # error is raised. The self.request.get('iframed') part of the check is
         # needed for backwards compatibility with older versions of the
         # embedding script.
         if (feconf.EXPLORATION_URL_EMBED_PREFIX in self.request.uri or
-                self.request.get('iframed')):
+                self.normalized_request.get('iframed')):
             self.iframed = True
 
         if not _does_exploration_exist(exploration_id, version, collection_id):
