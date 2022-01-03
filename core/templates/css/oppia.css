@@ -4009,7 +4009,7 @@ oppia-noninteractive-link {
   display: none;
 }
 .oppia-on-off-switch-label {
-  border: 2px solid #999999;
+  border: 2px solid #999;
   border-radius: 20px;
   cursor: pointer;
   display: block;
