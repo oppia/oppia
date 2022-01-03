@@ -1524,14 +1524,15 @@ class RestrictedImportChecker(checkers.BaseChecker):
         for module_regex, forbidden_imports in splitted_module_to_forbidden_imports:
             processed_forbidden_imports = []
             for forbidden_import in forbidden_imports.split('|'):
-                if forbidden_import.startswith('from'):
+                stripped_forbidden_import = forbidden_import.strip()
+                if stripped_forbidden_import.startswith('from'):
                     from_part, import_part = (
-                        forbidden_import.strip()[4:].split(' import '))
+                        stripped_forbidden_import[4:].split(' import '))
                     processed_forbidden_imports.append(
                         (from_part.strip(), import_part.strip()))
                 else:
                     processed_forbidden_imports.append(
-                        (forbidden_import.strip()[7:], None))
+                        (None, stripped_forbidden_import[7:]))
             self._module_to_forbidden_imports.append((
                 module_regex.strip(),
                 processed_forbidden_imports
@@ -1586,7 +1587,7 @@ class RestrictedImportChecker(checkers.BaseChecker):
         forbidden_imports = self._iterate_forbidden_imports(node)
         for module_regex, forbidden_import_regex in forbidden_imports:
             if any(
-                    re.compile(forbidden_import_regex[0]).match(name)
+                    re.compile(forbidden_import_regex[1]).match(name)
                     for name in names
             ):
                 self._add_invalid_import_message(
@@ -1602,13 +1603,13 @@ class RestrictedImportChecker(checkers.BaseChecker):
         """
         forbidden_imports = self._iterate_forbidden_imports(node)
         for module_regex, forbidden_import_regex in forbidden_imports:
-            from_regex = re.compile(forbidden_import_regex[0])
+            from_regex = re.compile(forbidden_import_regex[1])
 
             if from_regex.match(node.modname):
-                if forbidden_import_regex[1] is None:
+                if forbidden_import_regex[0] is None:
                     self._add_invalid_import_message(
                         node, module_regex, forbidden_import_regex)
-                import_regex = re.compile(forbidden_import_regex[1])
+                import_regex = re.compile(forbidden_import_regex[0])
                 if any(import_regex.match(name[0]) for name in node.names):
                     self._add_invalid_import_message(
                         node, module_regex, forbidden_import_regex)
