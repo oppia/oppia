@@ -31,7 +31,6 @@ from core.domain import change_domain
 from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import skill_fetchers
-from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import subtopic_page_domain
 from core.domain import user_services
@@ -359,6 +358,7 @@ class Subtopic:
         self.thumbnail_bg_color = thumbnail_bg_color
         self.thumbnail_size_in_bytes = thumbnail_size_in_bytes
         self.url_fragment = url_fragment
+        self.proto_size_in_bytes = self.get_proto_size()
 
     def to_dict(self):
         """Returns a dict representing this Subtopic domain object.
@@ -373,7 +373,8 @@ class Subtopic:
             'thumbnail_filename': self.thumbnail_filename,
             'thumbnail_bg_color': self.thumbnail_bg_color,
             'thumbnail_size_in_bytes': self.thumbnail_size_in_bytes,
-            'url_fragment': self.url_fragment
+            'url_fragment': self.url_fragment,
+            'proto_size_in_bytes': self.proto_size_in_bytes
         }
 
     @classmethod
@@ -392,6 +393,9 @@ class Subtopic:
             subtopic_dict['thumbnail_bg_color'],
             subtopic_dict['thumbnail_size_in_bytes'],
             subtopic_dict['url_fragment'])
+
+        subtopic.proto_size_in_bytes = subtopic['proto_size_in_bytes']
+
         return subtopic
 
     def to_proto(self):
@@ -403,13 +407,13 @@ class Subtopic:
         skill_summaries_list = []
 
         for skill_id in self.skill_ids:
-            skill = skill_fetchers.get_skill_by_id(skill_id, strict=False)
-            skill_summaries_list.append(self.SkillSummary.to_proto(skill))
+            skill = skill_fetchers.get_skill_by_id(
+                skill_id, strict=False)
+            skill_summaries_list.append(skill.to_proto())
 
         return topic_summary_pb2.SubtopicSummaryDto(
-            index=self.subtopic_id,
-            skill_summaries=skill_summaries_list,
-            content_version=1
+            index=self.id,
+            skill_summaries=skill_summaries_list
         )
 
     @classmethod
@@ -620,7 +624,8 @@ class Topic:
                 self.story_reference_schema_version),
             'meta_tag_content': self.meta_tag_content,
             'practice_tab_is_displayed': self.practice_tab_is_displayed,
-            'page_title_fragment_for_web': self.page_title_fragment_for_web
+            'page_title_fragment_for_web': self.page_title_fragment_for_web,
+            'proto_size_in_bytes': self.proto_size_in_bytes
         }
 
     def serialize(self):
@@ -1203,20 +1208,20 @@ class Topic:
                 story = story_fetchers.get_story_by_id(
                     reference.story_id, strict=False)
                 story_summaries_proto_list.append(
-                    story_domain.Story.to_proto(story))
+                    story.to_proto())
 
         if self.subtopics is not None:
             for subtopic in self.subtopics:
                 subtopic_summaries_proto_list.append(
-                    Subtopic.to_proto(subtopic))
+                    subtopic.to_proto())
 
         return topic_summary_pb2.DownloadableTopicSummaryDto(
-            id=self.topic_id,
-            name=self.topic_name,
-            description=self.topic_description,
+            id=self.id,
+            name=self.name,
+            description=self.description,
             story_summaries=story_summaries_proto_list,
             subtopic_summaries=subtopic_summaries_proto_list,
-            content_version=self.topic_version)
+            content_version=self.version)
 
     def update_proto_size_in_bytes(self):
         """Update the proto size of topic object."""

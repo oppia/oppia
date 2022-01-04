@@ -135,6 +135,9 @@ class StoryModel(base_models.VersionedModel):
     # The content of the meta tag in the Story viewer page.
     meta_tag_content = datastore_services.StringProperty(
         indexed=True, default='')
+    # Size in bytes of Android Proto representation.
+    proto_size_in_bytes = datastore_services.IntegerProperty(
+        default=0, indexed=True)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -218,7 +221,8 @@ class StoryModel(base_models.VersionedModel):
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'corresponding_topic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'url_fragment': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'meta_tag_content': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'meta_tag_content': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'proto_size_in_bytes': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod

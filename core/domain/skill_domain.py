@@ -586,6 +586,7 @@ class Skill:
         self.superseding_skill_id = superseding_skill_id
         self.all_questions_merged = all_questions_merged
         self.prerequisite_skill_ids = prerequisite_skill_ids
+        self.proto_size_in_bytes = self.get_proto_size()
 
     @classmethod
     def require_valid_skill_id(cls, skill_id):
@@ -781,6 +782,26 @@ class Skill:
             'all_questions_merged': self.all_questions_merged,
             'prerequisite_skill_ids': self.prerequisite_skill_ids
         }
+
+    def to_proto(self):
+        """Returns a Skill proto object from its respective items.
+
+        Returns:
+            SkillSummaryDto. The proto object.
+        """
+        return topic_summary_pb2.SkillSummaryDto(
+            id=self.id,
+            name=self.description,
+            content_version=self.version
+        )
+
+    def get_proto_size(self):
+        """Calculate the byte size of the proto object.
+
+        Returns:
+            int. The byte size of the proto object.
+        """
+        return int(self.to_proto().ByteSize())
 
     def serialize(self):
         """Returns the object serialized as a JSON string.
@@ -1563,7 +1584,6 @@ class SkillSummary:
         self.worked_examples_count = worked_examples_count
         self.skill_model_created_on = skill_model_created_on
         self.skill_model_last_updated = skill_model_last_updated
-        self.proto_size_in_bytes = self.get_proto_size()
 
     def validate(self):
         """Validates various properties of the Skill Summary object.
@@ -1634,26 +1654,6 @@ class SkillSummary:
             'skill_model_last_updated': utils.get_time_in_millisecs(
                 self.skill_model_last_updated)
         }
-
-    def to_proto(self):
-        """Returns a Skill proto object from its respective items.
-
-        Returns:
-            SkillSummaryDto. The proto object.
-        """
-        return topic_summary_pb2.SkillSummaryDto(
-            id=self.id,
-            name=self.description,
-            content_version=self.version
-        )
-
-    def get_proto_size(self):
-        """Calculate the byte size of the proto object.
-
-        Returns:
-            int. The byte size of the proto object.
-        """
-        return int(self.to_proto().ByteSize())
 
 
 class AugmentedSkillSummary:

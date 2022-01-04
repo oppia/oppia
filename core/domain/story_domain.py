@@ -340,8 +340,7 @@ class StoryNode:
         """
         return topic_summary_pb2.ChapterSummaryDto(
             title=self.title,
-            exploration_id=self.exploration_id,
-            content_version=self.version
+            exploration_id=self.exploration_id
         )
 
     @classmethod
@@ -995,14 +994,14 @@ class Story:
         """
         chapters_list = []
         for node in self.story_contents.nodes:
-            chapters_list.append(StoryNode.to_proto(node))
+            chapters_list.append(node.to_proto())
 
         return topic_summary_pb2.StorySummaryDto(
             id=self.id,
             title=self.title,
             description=self.description,
             chapters=chapters_list,
-            content_version=self.version
+            content_version=self.story_contents_schema_version
         )
 
     @classmethod
