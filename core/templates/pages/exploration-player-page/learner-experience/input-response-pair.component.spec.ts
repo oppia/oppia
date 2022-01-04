@@ -163,7 +163,7 @@ describe('InputResponsePairComponent', () => {
     expect(component.isVideoRteElementPresentInResponse()).toBe(true);
   });
 
-  it('should return false if input response does not contains ' +
+  it('should return false if input response does not contain ' +
     'video rte element', () => {
     component.data = {
       learnerInput: '',
