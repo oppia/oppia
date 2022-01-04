@@ -25,7 +25,7 @@ from core.domain import caching_services
 from core.domain import change_domain
 from core.platform import models
 
-from typing import Any, Dict, List, cast
+from typing import Any, Dict, List
 
 MYPY = False
 if MYPY: # pragma: no cover

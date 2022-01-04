@@ -252,7 +252,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 'exp_id_1', title='A title', category='A category'))
         self.assertEqual(
             default_exploration.to_dict(),
-            deserialize(serialize(default_exploration)).to_dict()) # type: ignore[operator]
+            deserialize(serialize(default_exploration)).to_dict()) # type: ignore[no-untyped-call, operator]
 
     def test_invalid_namespace_raises_error(self) -> None:
         invalid_namespace = 'invalid'
@@ -398,7 +398,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             default_exploration.to_dict(),
-            result_exploration.to_dict())
+            result_exploration.to_dict()) # type: ignore[no-untyped-call]
 
         self.assertFalse(nonexistent_exploration_id in result)
 
@@ -451,7 +451,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             exp_domain.Exploration, existent_result.get(exploration_id))
 
         self.assertEqual(
-            result_exploration.to_dict(),
+            result_exploration.to_dict(), # type: ignore[no-untyped-call]
             default_exploration.to_dict())
 
     def test_set_multi_returns_true_for_successful_insert_into_cache(

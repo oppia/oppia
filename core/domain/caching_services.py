@@ -30,7 +30,7 @@ from core.domain import story_domain
 from core.domain import topic_domain
 from core.platform import models
 
-from typing import Any, Dict, List
+from typing import Any, Callable, Dict, List
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -87,7 +87,9 @@ CACHE_NAMESPACE_CONFIG = 'config'
 # and Hashes. More details can be found at: https://redis.io/topics/data-types.
 CACHE_NAMESPACE_DEFAULT = 'default'
 
-DESERIALIZATION_FUNCTIONS = {
+DESERIALIZATION_FUNCTIONS: Dict[str, Callable[[str],
+        collection_domain.Collection | exp_domain.Exploration |
+        skill_domain.Skill | story_domain.Story | topic_domain.Topic]] = {
     CACHE_NAMESPACE_COLLECTION: collection_domain.Collection.deserialize,
     CACHE_NAMESPACE_EXPLORATION: exp_domain.Exploration.deserialize,
     CACHE_NAMESPACE_SKILL: skill_domain.Skill.deserialize,
@@ -187,7 +189,7 @@ def get_multi(
     values = memory_cache_services.get_multi(memcache_keys)
     for obj_id, value in python_utils.ZIP(obj_ids, values):
         if value:
-            result_dict[obj_id] = DESERIALIZATION_FUNCTIONS[namespace](value) # type: ignore[operator]
+            result_dict[obj_id] = DESERIALIZATION_FUNCTIONS[namespace](value)
     return result_dict
 
 
