@@ -922,4 +922,3 @@ class ValueGeneratorHandlerTests(test_utils.GenericTestBase):
             '/value_generator_handler/' + copier_id
         )
         self.assertIn(b'<object-editor obj-type="<[objType]>"', response.body)
-
