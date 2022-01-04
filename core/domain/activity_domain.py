@@ -63,7 +63,7 @@ class ActivityReference:
         if (self.type not in (
                 constants.ACTIVITY_TYPE_EXPLORATION,
                 constants.ACTIVITY_TYPE_COLLECTION
-            )):
+        )):
             raise Exception('Invalid activity type: %s' % self.type)
         if not isinstance(self.id, str):
             raise Exception(
