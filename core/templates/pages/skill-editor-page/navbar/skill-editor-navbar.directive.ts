@@ -16,6 +16,7 @@
  * @fileoverview Directive for the navbar of the skill editor.
  */
 
+import { Subscription } from 'rxjs';
 import { SavePendingChangesModalComponent } from '../modal-templates/save-pending-changes-modal.component';
 
 require(
@@ -34,8 +35,6 @@ require('services/contextual/url.service.ts');
 require('services/ngb-modal.service.ts');
 
 require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
-
-import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('skillEditorNavbar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -151,7 +150,7 @@ angular.module('oppia').directive('skillEditorNavbar', [
                 }),
               SkillUpdateService.onPrerequisiteSkillChange.subscribe(
                 () => {
-                  $scope.$apply();
+                  $scope.$applyAsync();
                 }
               )
             );
