@@ -107,7 +107,10 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.subtopic_page.get_subtopic_id_from_subtopic_page_id(), 1)
 
-    def _assert_validation_error(self, expected_error_substring: str) -> None:
+    def _assert_validation_error( # type: ignore[override]
+        self,
+        expected_error_substring: str
+        ) -> None:
         """Checks that the topic passes strict validation."""
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
