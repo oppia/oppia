@@ -39,6 +39,7 @@ require('domain/utilities/url-interpolation.service.ts');
 require('pages/skill-editor-page/services/question-creation.service.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 require('services/ngb-modal.service.ts');
+
 angular.module('oppia').directive('skillEditorMainTab', [
   'UrlInterpolationService',
   function(UrlInterpolationService) {
@@ -59,6 +60,7 @@ angular.module('oppia').directive('skillEditorMainTab', [
             SkillEditorRoutingService, SkillEditorStateService,
             UndoRedoService) {
           var ctrl = this;
+
           $scope.createQuestion = function() {
             // This check is needed because if a skill has unsaved changes to
             // misconceptions, then these will be reflected in the questions
