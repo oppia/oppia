@@ -112,14 +112,14 @@ describe('Skill Editor Navbar Directive', function() {
 
   it('should set properties when initialized', function() {
     expect($scope.activeTab).toBe(undefined);
-    spyOn($scope, '$apply').and.callThrough();
+    spyOn($scope, '$applyAsync').and.callThrough();
 
     ctrl.$onInit();
     mockEventEmitter.emit();
     mockPrerequisiteSkillChangeEventEmitter.emit();
 
     expect($scope.activeTab).toBe('Editor');
-    expect($scope.$apply).toHaveBeenCalled();
+    expect($scope.$applyAsync).toHaveBeenCalled();
   });
 
   it('should get current active tab name when ' +
