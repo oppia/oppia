@@ -62,7 +62,7 @@ export class ProfileLinkImageComponent implements OnInit {
     this.profilePicture = DEFAULT_PROFILE_IMAGE_PATH;
     this.profileUrl = (
       '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PROFILE.ROUTE.replace(
-        '::username_fragment', this.username
+        ':username_fragment', this.username
       )
     );
 
