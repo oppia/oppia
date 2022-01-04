@@ -436,8 +436,9 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
         'POST': {
             'params': {
                 'schema': {
-                    'type': 'dict',
-                    'properties': []
+                    'type': 'object_dict',
+                    'validation_method': (
+                        domain_objects_validator.validate_params_dict),
                 },
                 'default_value': {}
             },
@@ -448,7 +449,11 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
             },
             'old_state_name': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_STATE_NAME_LENGTH
+                    }]
                 }
             },
             'answer': {
@@ -458,7 +463,11 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
             },
             'client_time_spent_in_secs': {
                 'schema': {
-                    'type': 'int'
+                    'type': 'float',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 0
+                    }]
                 }
             },
             'answer_group_index': {
@@ -472,14 +481,7 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
                 }
             },
             'version': {
-                'schema': {
-                    'type': 'int',
-                    'validators': [{
-                        'id': 'is_at_least',
-                        'min_value': 1
-                    }]
-                },
-                'default_value': None
+                'schema': editor.SCHEMA_FOR_VERSION
             },
             'classification_categorization': {
                 'schema': {

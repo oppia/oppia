@@ -1956,7 +1956,7 @@ class AnswerSubmittedEventHandlerTest(test_utils.GenericTestBase):
                     exp_domain.EXPLICIT_CLASSIFICATION),
             }, expected_status_int=400
         )
-        self.assertEqual(response['error'], 'NONE EXP VERSION: Answer Submit')
+        self.assertEqual(response['error'], 'Missing key in handler args: version.')
 
 
 class StateHitEventHandlerTests(test_utils.GenericTestBase):
