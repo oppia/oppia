@@ -16,6 +16,12 @@
  * @fileoverview Controller for the main story editor.
  */
 
+import { Subscription } from 'rxjs';
+import { SavePendingChangesModalComponent } from 'components/save-pending-changes/save-pending-changes-modal.component';
+// TODO(#9186): Change variable name to 'constants' once this file
+// is migrated to Angular.
+import storyConstants from 'assets/constants';
+
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
@@ -38,11 +44,7 @@ require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 require(
   'pages/topic-editor-page/modal-templates/preview-thumbnail.component.ts');
 require('services/stateful/focus-manager.service.ts');
-import { Subscription } from 'rxjs';
-
-// TODO(#9186): Change variable name to 'constants' once this file
-// is migrated to Angular.
-import storyConstants from 'assets/constants';
+require('services/ngb-modal.service.ts');
 
 angular.module('oppia').directive('storyEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -53,7 +55,7 @@ angular.module('oppia').directive('storyEditor', [
         '/pages/story-editor-page/editor-tab/story-editor.directive.html'),
       controller: [
         '$rootScope', '$scope', '$uibModal', 'AlertsService',
-        'FocusManagerService',
+        'FocusManagerService', 'NgbModal',
         'StoryEditorNavigationService', 'StoryEditorStateService',
         'StoryUpdateService', 'UndoRedoService', 'WindowDimensionsService',
         'WindowRef', 'MAX_CHARS_IN_META_TAG_CONTENT',
@@ -61,7 +63,7 @@ angular.module('oppia').directive('storyEditor', [
         'MAX_CHARS_IN_STORY_TITLE', 'MAX_CHARS_IN_STORY_URL_FRAGMENT',
         function(
             $rootScope, $scope, $uibModal, AlertsService,
-            FocusManagerService,
+            FocusManagerService, NgbModal,
             StoryEditorNavigationService, StoryEditorStateService,
             StoryUpdateService, UndoRedoService, WindowDimensionsService,
             WindowRef, MAX_CHARS_IN_META_TAG_CONTENT,
@@ -242,13 +244,16 @@ angular.module('oppia').directive('storyEditor', [
 
           $scope.returnToTopicEditorPage = function() {
             if (UndoRedoService.getChangeCount() > 0) {
-              $uibModal.open({
-                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/pages/story-editor-page/modal-templates/' +
-                    'story-save-pending-changes-modal.template.html'),
-                backdrop: true,
-                controller: 'ConfirmOrCancelModalController'
-              }).result.then(function() {}, function() {
+              const modalRef = NgbModal.open(
+                SavePendingChangesModalComponent, {
+                  backdrop: true
+                });
+
+              modalRef.componentInstance.body = (
+                'Please save all pending changes ' +
+                'before returning to the topic.');
+
+              modalRef.result.then(function() {}, function() {
                 // Note to developers:
                 // This callback is triggered when the Cancel button is clicked.
                 // No further action is needed.

@@ -33,6 +33,12 @@ import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { SkillUpdateService } from 'domain/skill/skill-update.service';
 
+class MockNgbModalRef {
+  componentInstance: {
+    body: 'xyz';
+  };
+}
+
 describe('Skill Editor Navbar Directive', function() {
   let $scope = null;
   let ctrl = null;
@@ -75,6 +81,7 @@ describe('Skill Editor Navbar Directive', function() {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     $uibModal = $injector.get('$uibModal');
+    ngbModal = $injector.get('NgbModal');
     $q = $injector.get('$q');
     ngbModal = $injector.get('NgbModal');
     directive = $injector.get('skillEditorNavbarDirective')[0];
@@ -287,11 +294,12 @@ describe('Skill Editor Navbar Directive', function() {
       // Setting unsaved changes to be two.
       spyOn(undoRedoService, 'getChangeCount')
         .and.returnValue(2);
-      let ngbModalSpy = spyOn(ngbModal, 'open').and.returnValue(
-        {
-          result: $q.resolve()
-        } as NgbModalRef
-      );
+      const ngbModalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return ({
+          componentInstance: MockNgbModalRef,
+          result: Promise.resolve()
+        }) as NgbModalRef;
+      });
       let navigateToQuestionsTabSpy = spyOn(
         skillEditorRoutingService, 'navigateToQuestionsTab')
         .and.returnValue(null);

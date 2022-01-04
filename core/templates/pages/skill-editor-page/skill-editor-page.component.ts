@@ -16,7 +16,7 @@
  * @fileoverview Component for the skill editor page.
  */
 
-import { SavePendingChangesModalComponent } from '../skill-editor-page/modal-templates/save-pending-changes-modal.component';
+import { SavePendingChangesModalComponent } from 'components/save-pending-changes/save-pending-changes-modal.component';
 
 require('interactions/interactionsQuestionsRequires.ts');
 require('objects/objectComponentsRequires.ts');
@@ -75,9 +75,15 @@ angular.module('oppia').component('skillEditorPage', {
         // discarded, the misconceptions won't be saved, but there will be
         // some questions with these now non-existent misconceptions.
         if (UndoRedoService.getChangeCount() > 0) {
-          NgbModal.open(SavePendingChangesModalComponent, {
-            backdrop: true,
-          }).result.then(null, function() {
+          const modalRef = NgbModal.open(SavePendingChangesModalComponent, {
+            backdrop: true
+          });
+
+          modalRef.componentInstance.body = (
+            'Please save all pending changes ' +
+            'before viewing the questions list.');
+
+          modalRef.result.then(function() {}, function() {
             // Note to developers:
             // This callback is triggered when the Cancel button is clicked.
             // No further action is needed.

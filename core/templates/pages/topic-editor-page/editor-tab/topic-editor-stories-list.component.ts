@@ -16,6 +16,9 @@
  * @fileoverview Controller for the stories list viewer.
  */
 
+import { SavePendingChangesModalComponent } from 'components/save-pending-changes/save-pending-changes-modal.component';
+import { DeleteStoryModalComponent } from '../modal-templates/delete-story-modal.component';
+
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
@@ -26,10 +29,6 @@ require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('services/contextual/url.service.ts');
 require('services/ngb-modal.service.ts');
 
-import { DeleteStoryModalComponent } from '../modal-templates/delete-story-modal.component';
-import { TopicSavePendingChangesComponent } from
-  '../modal-templates/topic-save-pending-changes-modal.component';
-
 angular.module('oppia').component('topicEditorStoriesList', {
   bindings: {
     storySummaries: '=',
@@ -38,18 +37,27 @@ angular.module('oppia').component('topicEditorStoriesList', {
   template: require(
     './topic-editor-stories-list.component.html'),
   controller: [
-    '$scope', '$window', 'NgbModal', 'TopicUpdateService',
+    '$scope', '$window',
+    'NgbModal', 'TopicUpdateService',
     'UndoRedoService', 'UrlInterpolationService',
     function(
-        $scope, $window, NgbModal, TopicUpdateService,
+        $scope, $window,
+        NgbModal, TopicUpdateService,
         UndoRedoService, UrlInterpolationService) {
       var ctrl = this;
       var STORY_EDITOR_URL_TEMPLATE = '/story_editor/<story_id>';
       $scope.openStoryEditor = function(storyId) {
         if (UndoRedoService.getChangeCount() > 0) {
-          NgbModal.open(TopicSavePendingChangesComponent, {
-            backdrop: true
-          }).result.then(function() {}, function() {
+          const modalRef = NgbModal.open(
+            SavePendingChangesModalComponent, {
+              backdrop: true
+            });
+
+          modalRef.componentInstance.body = (
+            'Please save all pending changes ' +
+            'before exiting the topic editor.');
+
+          modalRef.result.then(function() {}, function() {
             // Note to developers:
             // This callback is triggered when the Cancel button is clicked.
             // No further action is needed.

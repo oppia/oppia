@@ -17,17 +17,23 @@
  */
 
 import { EventEmitter } from '@angular/core';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
 import { Skill } from 'domain/skill/SkillObjectFactory';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // Skill editor page is upgraded to Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 // ^^^ This block is to be removed.
+
+class MockNgbModalRef {
+  componentInstance: {
+    body: 'xyz';
+  };
+}
 
 require('pages/skill-editor-page/skill-editor-page.component.ts');
 
@@ -125,7 +131,13 @@ describe('Skill editor page', function() {
   it('should open save changes modal with ngbModal when unsaved changes are' +
     ' present', function() {
     spyOn(UndoRedoService, 'getChangeCount').and.returnValue(1);
-    var modalSpy = spyOn(ngbModal, 'open').and.callThrough();
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return ({
+        componentInstance: MockNgbModalRef,
+        result: Promise.resolve()
+      }) as NgbModalRef;
+    });
+
     ctrl.selectQuestionsTab();
     expect(modalSpy).toHaveBeenCalled();
   });
