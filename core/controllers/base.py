@@ -357,7 +357,7 @@ class BaseHandler(webapp2.RequestHandler):
         ):
             if self.URL_PATH_ARGS_SCHEMAS or self.HANDLER_ARGS_SCHEMAS:
                 raise self.InternalErrorException(
-                    'Remove handler from '
+                    'Remove handler class name from '
                     'HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS')
             return
 
