@@ -113,10 +113,10 @@ describe('Skill editor main tab directive', function() {
   ' present', function() {
     spyOn(UndoRedoService, 'getChangeCount').and.returnValue(1);
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return (
-        { componentInstance: MockNgbModalRef,
-          result: Promise.resolve()
-        }) as NgbModalRef;
+      return ({
+        componentInstance: MockNgbModalRef,
+        result: Promise.resolve()
+      }) as NgbModalRef;
     });
 
     $scope.createQuestion(),
