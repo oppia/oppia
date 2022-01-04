@@ -63,4 +63,12 @@ describe('Learner View Rating Service', () => {
 
     expect(userRatingSpy).toHaveBeenCalled();
   }));
+
+  it('should test getters', () => {
+    let userRating = 4;
+    learnerViewRatingService.userRating = userRating;
+
+    expect(learnerViewRatingService.getUserRating()).toEqual(userRating);
+    expect(learnerViewRatingService.onRatingUpdated).toBeDefined();
+  });
 });

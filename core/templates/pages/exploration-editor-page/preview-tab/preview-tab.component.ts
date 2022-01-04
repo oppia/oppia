@@ -17,10 +17,6 @@
  * editor page.
  */
 
-require(
-  'pages/exploration-editor-page/preview-tab/templates/' +
-  'preview-set-parameters-modal.controller.ts');
-
 require('domain/exploration/editable-exploration-backend-api.service.ts');
 require('domain/exploration/ParamChangeObjectFactory.ts');
 require('domain/exploration/ParamChangesObjectFactory.ts');
@@ -53,30 +49,32 @@ require('services/exploration-features.service.ts');
 
 require(
   'pages/exploration-player-page/services/exploration-player-state.service.ts');
+require('services/ngb-modal.service.ts');
 
 import { Subscription } from 'rxjs';
+import { PreviewSetParametersModalComponent } from './templates/preview-set-parameters-modal.component';
 
 angular.module('oppia').component('previewTab', {
   template: require('./preview-tab.component.html'),
   controller: [
-    '$q', '$rootScope', '$timeout', '$uibModal', 'ContextService',
+    '$q', '$rootScope', '$timeout', 'ContextService',
     'EditableExplorationBackendApiService',
     'ExplorationDataService', 'ExplorationEngineService',
     'ExplorationFeaturesService', 'ExplorationInitStateNameService',
     'ExplorationParamChangesService', 'ExplorationPlayerStateService',
     'ExplorationStatesService', 'GraphDataService', 'LearnerParamsService',
-    'NumberAttemptsService', 'ParamChangeObjectFactory',
+    'NgbModal', 'NumberAttemptsService', 'ParamChangeObjectFactory',
     'ParamChangesObjectFactory', 'ParameterMetadataService',
     'PlayerCorrectnessFeedbackEnabledService', 'RouterService',
     'StateEditorService',
     function(
-        $q, $rootScope, $timeout, $uibModal, ContextService,
+        $q, $rootScope, $timeout, ContextService,
         EditableExplorationBackendApiService,
         ExplorationDataService, ExplorationEngineService,
         ExplorationFeaturesService, ExplorationInitStateNameService,
         ExplorationParamChangesService, ExplorationPlayerStateService,
         ExplorationStatesService, GraphDataService, LearnerParamsService,
-        NumberAttemptsService, ParamChangeObjectFactory,
+        NgbModal, NumberAttemptsService, ParamChangeObjectFactory,
         ParamChangesObjectFactory, ParameterMetadataService,
         PlayerCorrectnessFeedbackEnabledService, RouterService,
         StateEditorService) {
@@ -115,17 +113,12 @@ angular.module('oppia').component('previewTab', {
       };
 
       ctrl.showSetParamsModal = function(manualParamChanges, callback) {
-        $uibModal.open({
-          template: require(
-            'pages/exploration-editor-page/preview-tab/templates/' +
-            'preview-set-parameters-modal.template.html'),
+        const modalRef = NgbModal.open(PreviewSetParametersModalComponent, {
           backdrop: 'static',
           windowClass: 'oppia-preview-set-params-modal',
-          resolve: {
-            manualParamChanges: () => manualParamChanges
-          },
-          controller: 'PreviewSetParametersModalController'
-        }).result.then(function() {
+        });
+        modalRef.componentInstance.manualParamChanges = manualParamChanges;
+        modalRef.result.then(function() {
           if (callback) {
             callback();
           }

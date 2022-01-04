@@ -30,6 +30,8 @@ import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
 import { AppConstants } from 'app.constants';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { SkillUpdateService } from 'domain/skill/skill-update.service';
 
 describe('Skill Editor Navbar Directive', function() {
   let $scope = null;
@@ -38,13 +40,16 @@ describe('Skill Editor Navbar Directive', function() {
   let directive = null;
   let $uibModal = null;
   let $q = null;
+  let ngbModal: NgbModal = null;
   let skillEditorRoutingService = null;
   let skillEditorStateService: SkillEditorStateService = null;
   let undoRedoService: UndoRedoService = null;
   let urlService: UrlService = null;
+  let skillUpdateService: SkillUpdateService = null;
 
   let sampleSkill: Skill = null;
   let mockEventEmitter = new EventEmitter();
+  let mockPrerequisiteSkillChangeEventEmitter = new EventEmitter();
 
 
   beforeEach(angular.mock.module('oppia'));
@@ -56,17 +61,28 @@ describe('Skill Editor Navbar Directive', function() {
     });
   });
 
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
 
   beforeEach(angular.mock.inject(function($injector) {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     $uibModal = $injector.get('$uibModal');
     $q = $injector.get('$q');
+    ngbModal = $injector.get('NgbModal');
     directive = $injector.get('skillEditorNavbarDirective')[0];
     skillEditorStateService = $injector.get('SkillEditorStateService');
     skillEditorRoutingService = $injector.get('SkillEditorRoutingService');
     undoRedoService = $injector.get('UndoRedoService');
     urlService = $injector.get('UrlService');
+    skillUpdateService = TestBed.inject(SkillUpdateService);
 
     const conceptCard = new ConceptCard(
       SubtitledHtml.createDefault(
@@ -81,9 +97,12 @@ describe('Skill Editor Navbar Directive', function() {
     sampleSkill = new Skill(
       'id1', 'description', [], [], conceptCard, 'en', 1, 0, 'id1', false, []
     );
+
     spyOn(skillEditorStateService, 'getSkill').and.returnValue(sampleSkill);
     spyOnProperty(skillEditorStateService, 'onSkillChange')
       .and.returnValue(mockEventEmitter);
+    spyOnProperty(skillUpdateService, 'onPrerequisiteSkillChange').and.
+      returnValue(mockPrerequisiteSkillChangeEventEmitter);
 
     ctrl = $injector.instantiate(directive.controller, {
       $rootScope: $scope,
@@ -93,11 +112,14 @@ describe('Skill Editor Navbar Directive', function() {
 
   it('should set properties when initialized', function() {
     expect($scope.activeTab).toBe(undefined);
+    spyOn($scope, '$applyAsync').and.callThrough();
 
     ctrl.$onInit();
     mockEventEmitter.emit();
+    mockPrerequisiteSkillChangeEventEmitter.emit();
 
     expect($scope.activeTab).toBe('Editor');
+    expect($scope.$applyAsync).toHaveBeenCalled();
   });
 
   it('should get current active tab name when ' +
@@ -265,9 +287,11 @@ describe('Skill Editor Navbar Directive', function() {
       // Setting unsaved changes to be two.
       spyOn(undoRedoService, 'getChangeCount')
         .and.returnValue(2);
-      let $uibModalSpy = spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve()
-      });
+      let ngbModalSpy = spyOn(ngbModal, 'open').and.returnValue(
+        {
+          result: $q.resolve()
+        } as NgbModalRef
+      );
       let navigateToQuestionsTabSpy = spyOn(
         skillEditorRoutingService, 'navigateToQuestionsTab')
         .and.returnValue(null);
@@ -276,7 +300,7 @@ describe('Skill Editor Navbar Directive', function() {
       tick();
       $scope.$apply();
 
-      expect($uibModalSpy).toHaveBeenCalled();
+      expect(ngbModalSpy).toHaveBeenCalled();
       expect(navigateToQuestionsTabSpy).not.toHaveBeenCalled();
     }));
 
