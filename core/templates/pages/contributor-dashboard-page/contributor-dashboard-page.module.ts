@@ -37,6 +37,7 @@ import { LoginRequiredModalContent } from './modal-templates/login-required-moda
 
 import { OpportunitiesListItemComponent } from './opportunities-list-item/opportunities-list-item.component';
 import { OpportunitiesListComponent } from './opportunities-list/opportunities-list.component';
+import { TranslationSuggestionReviewModalComponent } from './modal-templates/translation-suggestion-review-modal.component';
 import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
@@ -64,6 +65,7 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     OpportunitiesListComponent,
     TranslationLanguageSelectorComponent,
     TranslationOpportunitiesComponent,
+    TranslationSuggestionReviewModalComponent,
     TranslationTopicSelectorComponent,
     TranslationModalComponent
   ],
@@ -75,6 +77,7 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     OpportunitiesListComponent,
     TranslationLanguageSelectorComponent,
     TranslationOpportunitiesComponent,
+    TranslationSuggestionReviewModalComponent,
     TranslationTopicSelectorComponent,
     TranslationModalComponent
   ],
