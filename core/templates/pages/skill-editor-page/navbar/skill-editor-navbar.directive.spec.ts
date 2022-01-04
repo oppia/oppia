@@ -45,8 +45,8 @@ describe('Skill Editor Navbar Directive', function() {
   let $rootScope = null;
   let directive = null;
   let $uibModal = null;
-  let ngbModal: NgbModal = null;
   let $q = null;
+  let ngbModal: NgbModal = null;
   let skillEditorRoutingService = null;
   let skillEditorStateService: SkillEditorStateService = null;
   let undoRedoService: UndoRedoService = null;
@@ -294,7 +294,7 @@ describe('Skill Editor Navbar Directive', function() {
       // Setting unsaved changes to be two.
       spyOn(undoRedoService, 'getChangeCount')
         .and.returnValue(2);
-      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      const ngbModalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
         return ({
           componentInstance: MockNgbModalRef,
           result: Promise.resolve()
@@ -308,7 +308,7 @@ describe('Skill Editor Navbar Directive', function() {
       tick();
       $scope.$apply();
 
-      expect(modalSpy).toHaveBeenCalled();
+      expect(ngbModalSpy).toHaveBeenCalled();
       expect(navigateToQuestionsTabSpy).not.toHaveBeenCalled();
     }));
 

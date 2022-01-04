@@ -16,9 +16,9 @@
  * @fileoverview Unit tests for the stories list viewer.
  */
 
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { StorySummary } from 'domain/story/story-summary.model';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 class MockNgbModalRef {
   componentInstance: {
@@ -31,11 +31,11 @@ describe('topicEditorStoriesList', () => {
   let $rootScope = null;
   let $scope = null;
   let $q = null;
-  let ngbModal: NgbModal = null;
   let $window = null;
   let storySummaries = null;
   let topicUpdateService = null;
   let undoRedoService = null;
+  let ngbModal: NgbModal = null;
 
   importAllAngularServices();
   beforeEach(angular.mock.module('oppia'));

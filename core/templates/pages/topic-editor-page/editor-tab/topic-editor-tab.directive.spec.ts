@@ -18,9 +18,9 @@
  */
 
 import { EventEmitter } from '@angular/core';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { Subtopic } from 'domain/topic/subtopic.model';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
@@ -39,7 +39,6 @@ describe('Topic editor tab directive', function() {
 
   var $scope = null;
   var $uibModalInstance = null;
-  let ngbModal: NgbModal = null;
   var ctrl = null;
   var $rootScope = null;
   var topic = null;
@@ -56,6 +55,7 @@ describe('Topic editor tab directive', function() {
   var StoryCreationService = null;
   var StoryReferenceObjectFactory = null;
   var UndoRedoService = null;
+  let ngbModal: NgbModal = null;
   var TopicEditorRoutingService = null;
   var mockStorySummariesInitializedEventEmitter = new EventEmitter();
 
