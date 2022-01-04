@@ -31,7 +31,6 @@ from core.domain import fs_services
 from core.domain import html_cleaner
 from core.domain import html_validation_service
 
-
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
 STORY_PROPERTY_TITLE = 'title'

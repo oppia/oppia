@@ -394,8 +394,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         # Using a cast here because the return value of get_multi method is
         # Dict[str, Any] and mypy will assume result.get() to be Any otherwise.
         result_exploration = cast(
-            exp_domain.Exploration,
-            result.get(exploration_id))
+            exp_domain.Exploration, result.get(exploration_id))
 
         self.assertEqual(
             default_exploration.to_dict(),
@@ -449,8 +448,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         # Using a cast here because the return value of get_multi method is
         # Dict[str, Any] and mypy will assume result.get() to be Any otherwise.
         result_exploration = cast(
-            exp_domain.Exploration,
-            existent_result.get(exploration_id))
+            exp_domain.Exploration, existent_result.get(exploration_id))
 
         self.assertEqual(
             result_exploration.to_dict(),

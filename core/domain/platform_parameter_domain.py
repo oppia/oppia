@@ -28,12 +28,11 @@ from core import utils
 from core.constants import constants
 from core.domain import change_domain
 
+
 # TODO(#14419): Change naming style of Enum class from SCREAMING_SNAKE_CASE
 # to PascalCase and its values to UPPER_CASE. Because we want to be consistent
 # throughout the codebase according to the coding style guide.
 # https://github.com/oppia/oppia/wiki/Coding-style-guide
-
-
 class SERVER_MODES(enum.Enum): # pylint: disable=invalid-name
     """Enum for server modes."""
 

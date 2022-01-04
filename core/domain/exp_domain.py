@@ -41,8 +41,6 @@ from core.domain import param_domain
 from core.domain import state_domain
 from core.platform import models
 
-from typing import Any, Dict
-
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
 
@@ -2329,7 +2327,7 @@ class Exploration:
 
         return python_utils.yaml_from_dict(exp_dict)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self):
         """Returns a copy of the exploration as a dictionary. It includes all
         necessary information to represent the exploration.
 
