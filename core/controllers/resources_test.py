@@ -815,9 +815,8 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         self.logout()
         self.assertEqual(response_dict['status_code'], 400)
         error_msg = (
-            'Schema validation for \'filename\' failed: Validation failed: '
-            'is_regex_matched ({\'regex_pattern\': \'^[A-Za-z0-9-]+[.][a-z'
-            '0-9]+$\'}) for object test'
+            'Schema validation for \'filename\' failed: should_end_with '
+            '({\'choices\': [\'mp3\']}) for object test'
         )
         self.assertEqual(response_dict['error'], error_msg)
 
