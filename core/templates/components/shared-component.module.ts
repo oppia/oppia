@@ -93,6 +93,7 @@ import { TutorCardComponent } from 'pages/exploration-player-page/learner-experi
 import { ContentLanguageSelectorComponent } from 'pages/exploration-player-page/layout-directives/content-language-selector.component';
 import { RatingDisplayComponent } from './ratings/rating-display/rating-display.component';
 import { SupplementalCardComponent } from 'pages/exploration-player-page/learner-experience/supplemental-card.component';
+import { AddHintModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-hint-modal.component';
 import { SmoothHeightAnimatorComponent } from './smooth-height/smooth-height-animator.component';
 
 // Pipes.
@@ -203,7 +204,8 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     UploadActivityModalComponent,
     SortByPipe,
     LearnerDashboardIconsComponent,
-    PreviewThumbnailComponent
+    PreviewThumbnailComponent,
+    AddHintModalComponent
   ],
 
   entryComponents: [
@@ -263,7 +265,8 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     LearnerDashboardIconsComponent,
-    PreviewThumbnailComponent
+    PreviewThumbnailComponent,
+    AddHintModalComponent
   ],
 
   exports: [
