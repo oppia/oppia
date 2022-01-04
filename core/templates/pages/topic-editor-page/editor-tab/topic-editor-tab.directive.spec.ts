@@ -239,10 +239,10 @@ describe('Topic editor tab directive', function() {
     function() {
       spyOn(UndoRedoService, 'getChangeCount').and.returnValue(1);
       const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        return ({
-          componentInstance: MockNgbModalRef,
-          result: Promise.resolve()
-        }) as NgbModalRef;
+        return (
+          { componentInstance: MockNgbModalRef,
+            result: Promise.resolve()
+          }) as NgbModalRef;
       });
       $scope.createSkill();
       expect(modalSpy).toHaveBeenCalled();

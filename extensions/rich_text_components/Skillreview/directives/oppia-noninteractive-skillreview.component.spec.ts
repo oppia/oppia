@@ -107,10 +107,10 @@ describe('NoninteractiveSkillreview', () => {
 
     ckEditorCopyContentService.copyModeActive = false;
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return ({
-          componentInstance: MockNgbModalRef,
-          result: Promise.resolve()
-        }) as NgbModalRef;
+      return (
+          { componentInstance: MockNgbModalRef,
+            result: Promise.resolve()
+          }) as NgbModalRef;
     });
 
     component.openConceptCard(e);
