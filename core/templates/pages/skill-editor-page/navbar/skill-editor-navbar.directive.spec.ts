@@ -31,6 +31,7 @@ import { AppConstants } from 'app.constants';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { SkillUpdateService } from 'domain/skill/skill-update.service';
 
 describe('Skill Editor Navbar Directive', function() {
   let $scope = null;
@@ -44,9 +45,11 @@ describe('Skill Editor Navbar Directive', function() {
   let skillEditorStateService: SkillEditorStateService = null;
   let undoRedoService: UndoRedoService = null;
   let urlService: UrlService = null;
+  let skillUpdateService: SkillUpdateService = null;
 
   let sampleSkill: Skill = null;
   let mockEventEmitter = new EventEmitter();
+  let mockPrerequisiteSkillChangeEventEmitter = new EventEmitter();
 
 
   beforeEach(angular.mock.module('oppia'));
@@ -79,6 +82,7 @@ describe('Skill Editor Navbar Directive', function() {
     skillEditorRoutingService = $injector.get('SkillEditorRoutingService');
     undoRedoService = $injector.get('UndoRedoService');
     urlService = $injector.get('UrlService');
+    skillUpdateService = TestBed.inject(SkillUpdateService);
 
     const conceptCard = new ConceptCard(
       SubtitledHtml.createDefault(
@@ -93,9 +97,12 @@ describe('Skill Editor Navbar Directive', function() {
     sampleSkill = new Skill(
       'id1', 'description', [], [], conceptCard, 'en', 1, 0, 'id1', false, []
     );
+
     spyOn(skillEditorStateService, 'getSkill').and.returnValue(sampleSkill);
     spyOnProperty(skillEditorStateService, 'onSkillChange')
       .and.returnValue(mockEventEmitter);
+    spyOnProperty(skillUpdateService, 'onPrerequisiteSkillChange').and.
+      returnValue(mockPrerequisiteSkillChangeEventEmitter);
 
     ctrl = $injector.instantiate(directive.controller, {
       $rootScope: $scope,
@@ -105,11 +112,14 @@ describe('Skill Editor Navbar Directive', function() {
 
   it('should set properties when initialized', function() {
     expect($scope.activeTab).toBe(undefined);
+    spyOn($scope, '$applyAsync').and.callThrough();
 
     ctrl.$onInit();
     mockEventEmitter.emit();
+    mockPrerequisiteSkillChangeEventEmitter.emit();
 
     expect($scope.activeTab).toBe('Editor');
+    expect($scope.$applyAsync).toHaveBeenCalled();
   });
 
   it('should get current active tab name when ' +
