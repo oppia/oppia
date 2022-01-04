@@ -364,10 +364,10 @@ describe('Story editor Directive having two story nodes', function() {
     function() {
       spyOn(UndoRedoService, 'getChangeCount').and.returnValue(10);
       const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        return (
-          { componentInstance: MockNgbModalRef,
-            result: Promise.reject()
-          }) as NgbModalRef;
+        return ({
+          componentInstance: MockNgbModalRef,
+          result: Promise.reject()
+        }) as NgbModalRef;
       });
 
       $scope.returnToTopicEditorPage();
