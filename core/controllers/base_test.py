@@ -226,6 +226,8 @@ class BaseHandlerTests(test_utils.GenericTestBase):
 
         self.delete_json('/community-library/data', expected_status_int=404)
 
+        self.testapp.head('/community-library/extra', status=404)
+
     def test_html_requests_have_no_store_cache_policy(self):
         response = self.get_html_response('/community-library')
         # We set 'no-store' and 'must-revalidate', but webapp
