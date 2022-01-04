@@ -135,7 +135,7 @@ class SubtopicPageContents:
             dict. A dict, mapping all fields of SubtopicPageContents instance.
         """
         return {
-            'subtitled_html': self.subtitled_html.to_dict(), # type: ignore[no-untyped-call] 
+            'subtitled_html': self.subtitled_html.to_dict(), # type: ignore[no-untyped-call]
             'recorded_voiceovers': self.recorded_voiceovers.to_dict(), # type: ignore[no-untyped-call]
             'written_translations': self.written_translations.to_dict() # type: ignore[no-untyped-call]
         }

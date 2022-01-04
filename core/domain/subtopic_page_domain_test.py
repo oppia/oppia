@@ -107,8 +107,8 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.subtopic_page.get_subtopic_id_from_subtopic_page_id(), 1)
 
-    # We have ignored [override] here because Signature of "_assert_validation_error" 
-    # is incompatible with supertype "TestBase"
+    # We have ignored [override] here because Signature of
+    # "_assert_validation_error" is incompatible with supertype "TestBase"
     # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     def _assert_validation_error( # type: ignore[override]
         self,
