@@ -252,7 +252,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 'exp_id_1', title='A title', category='A category'))
         self.assertEqual(
             default_exploration.to_dict(),
-            deserialize(serialize(default_exploration)).to_dict()) # type: ignore[no-untyped-call, operator]
+            deserialize(serialize(default_exploration)).to_dict())
 
     def test_invalid_namespace_raises_error(self) -> None:
         invalid_namespace = 'invalid'

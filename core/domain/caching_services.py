@@ -30,7 +30,7 @@ from core.domain import story_domain
 from core.domain import topic_domain
 from core.platform import models
 
-from typing import Any, Callable, Dict, List
+from typing import Any, Callable, Dict, List, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -87,9 +87,12 @@ CACHE_NAMESPACE_CONFIG = 'config'
 # and Hashes. More details can be found at: https://redis.io/topics/data-types.
 CACHE_NAMESPACE_DEFAULT = 'default'
 
-DESERIALIZATION_FUNCTIONS: Dict[str, Callable[[str],
-        collection_domain.Collection | exp_domain.Exploration |
-        skill_domain.Skill | story_domain.Story | topic_domain.Topic]] = {
+# Dict DESERIALIZATION_FUNCTIONS has key-value pair of string and
+# functions respectively. Every function accept one argument which is string
+# and returns corresponding object, which can be any of the type Collection,
+# Exploration, Skill, Story, Topic, PlatformParameter and simple python object.
+# So, Any was assigned as a type for return value of function.
+DESERIALIZATION_FUNCTIONS: Dict[str, Callable[[str], Any]] = {
     CACHE_NAMESPACE_COLLECTION: collection_domain.Collection.deserialize,
     CACHE_NAMESPACE_EXPLORATION: exp_domain.Exploration.deserialize,
     CACHE_NAMESPACE_SKILL: skill_domain.Skill.deserialize,
@@ -101,13 +104,19 @@ DESERIALIZATION_FUNCTIONS: Dict[str, Callable[[str],
     CACHE_NAMESPACE_DEFAULT: json.loads
 }
 
-SERIALIZATION_FUNCTIONS = {
-    CACHE_NAMESPACE_COLLECTION: lambda x: x.serialize(),
-    CACHE_NAMESPACE_EXPLORATION: lambda x: x.serialize(),
-    CACHE_NAMESPACE_SKILL: lambda x: x.serialize(),
-    CACHE_NAMESPACE_STORY: lambda x: x.serialize(),
-    CACHE_NAMESPACE_TOPIC: lambda x: x.serialize(),
-    CACHE_NAMESPACE_PLATFORM_PARAMETER: lambda x: x.serialize(),
+# Dict SERIALIZATION_FUNCTIONS has key as string and lambda function as value.
+# Every function accept one argument which is a specific object of type from
+# Collection, Exploration, Skill, Story, Topic, PlatformParameter and
+# simple python object. So, Any was assigned as a type for argument value of
+# function. Function returns JSON-encoded string encoding all of the information
+# composing the object.
+SERIALIZATION_FUNCTIONS: Dict[str, Callable[[Any], str]] = {
+    CACHE_NAMESPACE_COLLECTION: lambda x: cast(str, x.serialize()),
+    CACHE_NAMESPACE_EXPLORATION: lambda x: cast(str, x.serialize()),
+    CACHE_NAMESPACE_SKILL: lambda x: cast(str, x.serialize()),
+    CACHE_NAMESPACE_STORY: lambda x: cast(str, x.serialize()),
+    CACHE_NAMESPACE_TOPIC: lambda x: cast(str, x.serialize()),
+    CACHE_NAMESPACE_PLATFORM_PARAMETER: lambda x: cast(str, x.serialize()),
     CACHE_NAMESPACE_CONFIG: json.dumps,
     CACHE_NAMESPACE_DEFAULT: json.dumps
 }
@@ -227,7 +236,7 @@ def set_multi(
 
     memory_cache_id_value_mapping = {
         _get_memcache_key(namespace, sub_namespace, obj_id):
-        SERIALIZATION_FUNCTIONS[namespace](value) # type: ignore[operator]
+        SERIALIZATION_FUNCTIONS[namespace](value)
         for obj_id, value in id_value_mapping.items()
     }
     return memory_cache_services.set_multi(memory_cache_id_value_mapping)

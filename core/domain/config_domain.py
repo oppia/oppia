@@ -216,10 +216,10 @@ class ConfigProperty:
     """
 
     # General structure of schemas are like {string : (string, dict, list[dict],
-    # variables defined in other modules)}. so, Any type has to be
+    # variables defined in other modules)}. So, Any type has to be
     # used in constructor for the type of schema.
     # default_value of configuration property can be any of type
-    # List, bool, int, string, list(dict[str, any]). so, Any was
+    # List, bool, int, string, list(dict[str, any]). So, Any was
     # assigned as a type for default value.
     def __init__(
         self,
@@ -259,7 +259,7 @@ class ConfigProperty:
         return self._description
 
     # Default value of property can be of type List, bool, int, string,
-    # list(dict[str, any]) and etc. so, This function returns default value
+    # list(dict[str, any]) and etc. So, This function returns default value
     # of configuration property and default value can be of Any type.
     @property
     def default_value(self) -> Any:
