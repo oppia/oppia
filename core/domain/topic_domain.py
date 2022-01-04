@@ -394,7 +394,7 @@ class Subtopic:
             subtopic_dict['thumbnail_size_in_bytes'],
             subtopic_dict['url_fragment'])
 
-        subtopic.proto_size_in_bytes = subtopic['proto_size_in_bytes']
+        subtopic.proto_size_in_bytes = subtopic_dict['proto_size_in_bytes']
 
         return subtopic
 
