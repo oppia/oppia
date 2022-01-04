@@ -84,10 +84,10 @@ class SubtopicPageContents:
     """Domain object for the contents on a subtopic page."""
 
     def __init__(
-            self,
-            subtitled_html: state_domain.SubtitledHtml,
-            recorded_voiceovers: state_domain.RecordedVoiceovers,
-            written_translations: state_domain.WrittenTranslations):
+        self,
+        subtitled_html: state_domain.SubtitledHtml,
+        recorded_voiceovers: state_domain.RecordedVoiceovers,
+        written_translations: state_domain.WrittenTranslations):
         """Constructs a SubtopicPageContents domain object.
 
         Args:
@@ -107,16 +107,13 @@ class SubtopicPageContents:
         """Validates the SubtopicPageContentsObject, verifying that all
         fields are of the correct type.
         """
-        self.subtitled_html.validate( # type: ignore[no-untyped-call]
-        )
+        self.subtitled_html.validate() # type: ignore[no-untyped-call]
         content_ids = set([self.subtitled_html.content_id])
-        self.recorded_voiceovers.validate( # type: ignore[no-untyped-call]
-        content_ids)
-        self.written_translations.validate( # type: ignore[no-untyped-call]
-        content_ids)
+        self.recorded_voiceovers.validate(content_ids) # type: ignore[no-untyped-call]
+        self.written_translations.validate(content_ids) # type: ignore[no-untyped-call]
 
     @classmethod
-    def create_default_subtopic_page_contents(cls) -> 'SubtopicPageContents':
+    def create_default_subtopic_page_contents(cls) -> SubtopicPageContents:
         """Creates a default subtopic page contents object.
 
         Returns:
@@ -138,19 +135,16 @@ class SubtopicPageContents:
             dict. A dict, mapping all fields of SubtopicPageContents instance.
         """
         return {
-            'subtitled_html': self.subtitled_html.to_dict( # type: ignore[no-untyped-call]
-            ),
-            'recorded_voiceovers': self.recorded_voiceovers.to_dict( # type: ignore[no-untyped-call]
-            ),
-            'written_translations': self.written_translations.to_dict( # type: ignore[no-untyped-call]
-            )
+            'subtitled_html': self.subtitled_html.to_dict(), # type: ignore[no-untyped-call] 
+            'recorded_voiceovers': self.recorded_voiceovers.to_dict(), # type: ignore[no-untyped-call]
+            'written_translations': self.written_translations.to_dict() # type: ignore[no-untyped-call]
         }
 
     @classmethod
     def from_dict(
         cls,
         page_contents_dict: Dict[str, object]
-        ) -> 'SubtopicPageContents':
+    ) -> SubtopicPageContents:
         """Creates a subtopic page contents object from a dictionary.
 
         Args:
@@ -166,8 +160,7 @@ class SubtopicPageContents:
         return cls(
             page_contents,
             state_domain.RecordedVoiceovers.from_dict( # type: ignore[no-untyped-call]
-            page_contents_dict[
-                'recorded_voiceovers']),
+            page_contents_dict['recorded_voiceovers']),
             state_domain.WrittenTranslations.from_dict( # type: ignore[no-untyped-call]
             page_contents_dict[
                 'written_translations']))
@@ -195,13 +188,15 @@ class SubtopicPage:
     """Domain object for a Subtopic page."""
 
     def __init__(
-            self,
-            subtopic_page_id: str,
-            topic_id: str,
-            page_contents: SubtopicPageContents,
-            page_contents_schema_version: int,
-            language_code: str,
-            version: int):
+        self,
+        subtopic_page_id: str,
+        topic_id: str,
+        page_contents: SubtopicPageContents,
+        page_contents_schema_version: int,
+        language_code: str,
+        version: int
+    ):
+
         """Constructs a SubtopicPage domain object.
 
         Args:
@@ -255,7 +250,7 @@ class SubtopicPage:
         cls,
         subtopic_id: int,
         topic_id: str
-        ) -> 'SubtopicPage':
+    ) -> SubtopicPage:
         """Creates a SubtopicPage object with default values.
 
         Args:
@@ -276,10 +271,10 @@ class SubtopicPage:
 
     @classmethod
     def convert_html_fields_in_subtopic_page_contents(
-            cls,
-            subtopic_page_contents_dict: SubtopicPageContentsDict,
-            conversion_fn: Callable[..., None]
-            ) -> SubtopicPageContentsDict:
+        cls,
+        subtopic_page_contents_dict: SubtopicPageContentsDict,
+        conversion_fn: Callable[..., None]
+    ) -> SubtopicPageContentsDict:
         """Applies a conversion function on all the html strings in subtopic
         page contents to migrate them to a desired state.
 
@@ -307,7 +302,7 @@ class SubtopicPage:
     def _convert_page_contents_v1_dict_to_v2_dict(
         cls,
         page_contents_dict: SubtopicPageContentsDict
-        ) -> SubtopicPageContentsDict:
+    ) -> SubtopicPageContentsDict:
         """Converts v1 SubtopicPage Contents schema to the v2 schema.
         v2 schema introduces the new schema for Math components.
 
@@ -363,10 +358,10 @@ class SubtopicPage:
 
     @classmethod
     def update_page_contents_from_model(
-            cls,
-            versioned_page_contents: VersionedPageContentsDict,
-            current_version: int
-            ) -> None:
+        cls,
+        versioned_page_contents: VersionedPageContentsDict,
+        current_version: int
+    ) -> None:
         """Converts the page_contents blob contained in the given
         versioned_page_contents dict from current_version to
         current_version + 1. Note that the versioned_page_contents being
@@ -422,9 +417,10 @@ class SubtopicPage:
 
     def update_page_contents_written_translations(
             self,
-            new_page_written_translations_dict:
-            Dict[str, Dict[str, Dict[str, Dict[str, object]]]]
-            ) -> None:
+            new_page_written_translations_dict: Dict[
+                str, Dict[str, Dict[str, Dict[str, object]]]
+            ]
+        ) -> None:
         """The new value for the written_translations data field.
 
         Args:

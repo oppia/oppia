@@ -107,25 +107,17 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.subtopic_page.get_subtopic_id_from_subtopic_page_id(), 1)
 
+    # We have ignored [override] here because Signature of "_assert_validation_error" 
+    # is incompatible with supertype "TestBase"
+    # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     def _assert_validation_error( # type: ignore[override]
         self,
         expected_error_substring: str
-        ) -> None:
+    ) -> None:
         """Checks that the topic passes strict validation."""
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             self.subtopic_page.validate()
-
-    def test_subtopic_topic_id_validation(self) -> None:
-        self.subtopic_page.topic_id = 1 # type: ignore[assignment]
-        self._assert_validation_error('Expected topic_id to be a string')
-
-    def test_language_code_validation(self) -> None:
-        self.subtopic_page.language_code = 0 # type: ignore[assignment]
-        self._assert_validation_error('Expected language code to be a string')
-
-        self.subtopic_page.language_code = 'xz'
-        self._assert_validation_error('Invalid language code')
 
     def test_update_audio(self) -> None:
         recorded_voiceovers_dict = {
@@ -192,8 +184,7 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
             'version': 0
         }
         self.subtopic_page.update_page_contents_html(
-            state_domain.SubtitledHtml.from_dict( # type: ignore[no-untyped-call]
-                {
+            state_domain.SubtitledHtml.from_dict({ # type: ignore[no-untyped-call]
                 'html': '<p>hello world</p>',
                 'content_id': 'content'
             }))
@@ -247,8 +238,8 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
         })
 
         self.assertEqual(
-            subtopic_page_change_object.to_dict( # type: ignore[no-untyped-call]
-            ), {
+            subtopic_page_change_object.to_dict(), # type: ignore[no-untyped-call]
+            {
                 'cmd': subtopic_page_domain.CMD_CREATE_NEW,
                 'topic_id': self.topic_id,
                 'subtopic_id': 'subtopic_id'
