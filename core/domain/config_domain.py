@@ -25,7 +25,7 @@ from core.domain import caching_services
 from core.domain import change_domain
 from core.platform import models
 
-from typing import Any, Dict, List
+from typing import Any, Dict, List, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -364,7 +364,7 @@ class Registry:
         Returns:
             instance. The instance of the specified configuration property.
         """
-        return cls._config_registry[name]
+        return cast(ConfigProperty, cls._config_registry.get(name))
 
     # This function returns Dict with property_name as key and every value
     # is a Dict of properties of that particular property_name.
