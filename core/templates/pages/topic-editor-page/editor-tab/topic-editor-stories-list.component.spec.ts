@@ -175,10 +175,10 @@ describe('topicEditorStoriesList', () => {
   it('should open save changes modal when user tries to open story editor' +
   ' without saving changes', () => {
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return (
-        { componentInstance: MockNgbModalRef,
-          result: Promise.resolve()
-        }) as NgbModalRef;
+      return ({
+        componentInstance: MockNgbModalRef,
+        result: Promise.resolve()
+      }) as NgbModalRef;
     });
     spyOn(undoRedoService, 'getChangeCount').and.returnValue(1);
 
@@ -191,10 +191,10 @@ describe('topicEditorStoriesList', () => {
   it('should close save changes modal when closes the saves changes' +
   ' modal', () => {
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return (
-        { componentInstance: MockNgbModalRef,
-          result: Promise.reject()
-        }) as NgbModalRef;
+      return ({
+        componentInstance: MockNgbModalRef,
+        result: Promise.reject()
+      }) as NgbModalRef;
     });
     spyOn(undoRedoService, 'getChangeCount').and.returnValue(1);
 
