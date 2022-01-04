@@ -1824,7 +1824,7 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
 class HandlerClassWithSchemaInStillNeedsSchemaListRaiseErrorTest(
         test_utils.GenericTestBase):
     """This test ensures that, InternalServerError is raised for
-    the request with handler class which has schema but is still in
+    the request with handler class which has schema but class name is still in
     HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS.
     """
 
