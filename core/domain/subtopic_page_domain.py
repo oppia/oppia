@@ -161,7 +161,7 @@ class SubtopicPageContents:
 class VersionedPageContentsDict(TypedDict):
     """Dictionary representing the VersionedPageContents object."""
 
-    schema_version: str
+    schema_version: int
     page_contents: SubtopicPageContentsDict
 
 
@@ -231,11 +231,11 @@ class SubtopicPage:
         return '%s-%s' % (topic_id, subtopic_id)
 
     @classmethod
-    def create_default_subtopic_page(cls, subtopic_id: str, topic_id: str) -> SubtopicPage:
+    def create_default_subtopic_page(cls, subtopic_id: int, topic_id: str) -> SubtopicPage:
         """Creates a SubtopicPage object with default values.
 
         Args:
-            subtopic_id: str. ID of the subtopic.
+            subtopic_id: int. ID of the subtopic.
             topic_id: str. The Id of the topic to which this page is linked
                 with.
 
@@ -334,7 +334,7 @@ class SubtopicPage:
 
         Args:
             versioned_page_contents: dict. A dict with two keys:
-                - schema_version: str. The schema version for the
+                - schema_version: int. The schema version for the
                     page_contents dict.
                 - page_contents: dict. The dict comprising the subtopic page
                     contents.
