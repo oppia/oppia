@@ -32,7 +32,7 @@ export class ProfileLinkTextComponent {
   @Input() username!: string;
   profileUrl = (
     '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PROFILE.ROUTE.replace(
-      "::username_fragment", this.username
+      ':username_fragment', this.username
     )
   );
 
