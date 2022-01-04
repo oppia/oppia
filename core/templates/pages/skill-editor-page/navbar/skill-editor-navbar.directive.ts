@@ -16,6 +16,7 @@
  * @fileoverview Directive for the navbar of the skill editor.
  */
 
+import { Subscription } from 'rxjs';
 import { SkillEditorSaveModalComponent } from '../modal-templates/skill-editor-save-modal.component';
 import { SavePendingChangesModalComponent } from '../modal-templates/save-pending-changes-modal.component';
 
@@ -36,8 +37,6 @@ require('services/ngb-modal.service.ts');
 
 require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
 
-import { Subscription } from 'rxjs';
-
 angular.module('oppia').directive('skillEditorNavbar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
@@ -47,11 +46,11 @@ angular.module('oppia').directive('skillEditorNavbar', [
       controller: [
         '$rootScope', '$scope', 'AlertsService', 'NgbModal',
         'SkillEditorRoutingService', 'SkillEditorStateService',
-        'UndoRedoService', 'UrlService',
+        'SkillUpdateService', 'UndoRedoService', 'UrlService',
         function(
             $rootScope, $scope, AlertsService, NgbModal,
             SkillEditorRoutingService, SkillEditorStateService,
-            UndoRedoService, UrlService) {
+            SkillUpdateService, UndoRedoService, UrlService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           var ACTIVE_TAB_EDITOR = 'Editor';
@@ -145,7 +144,13 @@ angular.module('oppia').directive('skillEditorNavbar', [
                 () => {
                   ctrl.skill = SkillEditorStateService.getSkill();
                   $rootScope.$applyAsync();
-                }));
+                }),
+              SkillUpdateService.onPrerequisiteSkillChange.subscribe(
+                () => {
+                  $scope.$applyAsync();
+                }
+              )
+            );
           };
         }]
     };
