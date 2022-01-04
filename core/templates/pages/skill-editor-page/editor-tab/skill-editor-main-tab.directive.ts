@@ -60,6 +60,7 @@ angular.module('oppia').directive('skillEditorMainTab', [
             SkillEditorRoutingService, SkillEditorStateService,
             UndoRedoService) {
           var ctrl = this;
+
           $scope.createQuestion = function() {
             // This check is needed because if a skill has unsaved changes to
             // misconceptions, then these will be reflected in the questions
