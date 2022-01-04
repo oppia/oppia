@@ -572,7 +572,8 @@ class CategoryConfigTests(test_utils.GenericTestBase):
 
 
 class LibraryRedirectPageTest(test_utils.GenericTestBase):
-    """Test for redirecting the old 'gallery' page URL to the library index page."""
+    """Test for redirecting the old 'gallery' page URL to the
+    library index page."""
 
     def test_old_gallery_page_url(self):
         """Test to validate that the old gallery page url redirects
