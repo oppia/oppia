@@ -910,15 +910,16 @@ class ValueGeneratorHandlerTests(test_utils.GenericTestBase):
         response = self.get_json(
             '/value_generator_handler/%s' % dummy_id,
             expected_status_int=404
-            )
-        sm1 = 'Could not find the page http://localhost'
-        sm2 = '/value_generator_handler/%s.' % dummy_id
-        error_message = sm1 + sm2
+        )
+        error_message = 'Could not find the page http://localhost/{}{}.'.format(
+            'value_generator_handler/', dummy_id
+        )
         self.assertEqual(response['error'], error_message)
 
     def test_html_response(self):
         copier_id = 'Copier'
         response = self.get_html_response(
             '/value_generator_handler/' + copier_id
-            )
+        )
         self.assertIn(b'<object-editor obj-type="<[objType]>"', response.body)
+
