@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for ExplorationCorrectnessFeedbackService
  */
 
-import { fakeAsync, flush, TestBed, tick } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { ExplorationCorrectnessFeedbackService } from './exploration-correctness-feedback.service';
 import { ExplorationPropertyService } from './exploration-property.service';
 import { HttpClientTestingModule, HttpTestingController } from
@@ -51,20 +51,14 @@ describe('Exploration Correctness Feedback Service', () => {
     httpTestingController.verify();
   });
 
-  it('should toggl correctness feedback display', fakeAsync(() => {
+  it('should toggl correctness feedback display', () => {
     // Function isEnabled() returns undefined in the first time.
     expect(ecfs.isEnabled()).toBeFalsy();
 
     ecfs.toggleCorrectnessFeedback();
-    tick();
-
     expect(ecfs.isEnabled()).toBeTrue();
 
     ecfs.toggleCorrectnessFeedback();
-    tick();
-
     expect(ecfs.isEnabled()).toBeFalse();
-
-    flush();
-  }));
+  });
 });
