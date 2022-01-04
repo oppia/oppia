@@ -33,8 +33,10 @@ if MYPY:  # pragma: no cover
 
 
 def validate_cmd(
-    cmd_name: str, valid_cmd_attribute_specs: Dict[str, Any],
-    actual_cmd_attributes: Dict[str, str]) -> None:
+    cmd_name: str, 
+    valid_cmd_attribute_specs: Dict[str, Any],
+    actual_cmd_attributes: Dict[str, str]
+) -> None:
     """Validates that the attributes of a command contain all the required
     attributes and some/all of optional attributes. It also checks that
     the values of attributes belong to a set of allowed values if any.
