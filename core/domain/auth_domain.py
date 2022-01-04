@@ -21,7 +21,6 @@ from __future__ import annotations
 import collections
 
 from core import utils
-from core.domain import user_services
 
 from typing import Any, Dict, Optional, Union
 from typing_extensions import TypedDict

@@ -19,8 +19,11 @@
 from __future__ import annotations
 
 from core import utils
-from core.domain import user_services
-from core.platform import models
+from core.domain import user_services  # pylint: disable=invalid-import-from # isort:skip
+from core.platform import models  # pylint: disable=invalid-import-from # isort:skip
+
+# TODO(#14537): Refactor this file and remove imports marked
+# with 'invalid-import-from'.
 
 (improvements_models,) = (
     models.Registry.import_models([models.NAMES.improvements]))

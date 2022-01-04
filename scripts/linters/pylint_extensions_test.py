@@ -2010,9 +2010,26 @@ class RestrictedImportCheckerTests(unittest.TestCase):
         # The spaces are included on purpose so that we properly test
         # the input sanitization.
         self.checker_test_object.checker.config.forbidden_imports = (
-            '  core.storage: core.domain  ',
-            'core.domain  : core.controllers',
-            'core.controllers: core.platform  |  core.storage '
+            (
+                '*core.controllers*:\n'
+                '    import core.platform   |  \n'
+                '    import core.storage\n'
+            ),
+            (
+                '*core.domain*:import core.controllers'
+            ),
+            (
+                '   *core.storage*:import    core.domain   '
+            ),
+            (
+                '*core.domain.*_domain:\n'
+                '    from core.domain    import    *_service*   |\n'
+                '    from   core.domain import *_cleaner|\n'
+                '      from core.domain import *_registry |\n'
+                '    from core.domain import *_fetchers  |\n'
+                '    from core.domain import *_manager |\n'
+                '       from core.platform import   models'
+            )
         )
         self.checker_test_object.checker.open()
 
@@ -2020,7 +2037,8 @@ class RestrictedImportCheckerTests(unittest.TestCase):
         node_err_import = astroid.extract_node(
             """
             import core.domain.activity_domain #@
-        """)
+            """
+        )
         node_err_import.root().name = 'oppia.core.storage.topic'
         with self.checker_test_object.assertAddsMessages(
             testutils.Message(
@@ -2094,13 +2112,14 @@ class RestrictedImportCheckerTests(unittest.TestCase):
         node_err_importfrom = astroid.extract_node(
             """
             from core.controllers import acl_decorators #@
-        """)
+            """
+        )
         node_err_importfrom.root().name = 'oppia.core.domain'
         with self.checker_test_object.assertAddsMessages(
             testutils.Message(
                 msg_id='invalid-import',
                 node=node_err_importfrom,
-                args=('controllers', 'domain'),
+                args=('core.controllers', '*core.domain*'),
             )
         ):
             self.checker_test_object.checker.visit_importfrom(

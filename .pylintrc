@@ -62,19 +62,20 @@ indent-string='    '
 
 allowed-comment-prefixes=int,str,float,bool,v
 forbidden-imports=
-    core\.controllers:
-        import core\.platform|
-        import core\.storage,
-    core\.domain:
-        import core\.controllers,
-    core\.storage:
-        import core\.domain,
-    core\.domain\..*domain:
-        from .*_service import core\.domain|
-        from .*_cleaner import core\.domain|
-        from .*_registry import core\.domain|
-        from .*_fetchers import core\.domain|
-        from .*_manager import core\.domain
+    *core.controllers*:
+        import core.platform|
+        import core.storage,
+    *core.domain*:
+        import core.controllers,
+    *core.storage*:
+        import core.domain,
+    *core.domain.*_domain:
+        from core.domain import *_service*|
+        from core.domain import *_cleaner|
+        from core.domain import *_registry|
+        from core.domain import *_fetchers|
+        from core.domain import *_manager|
+        from core.platform import models
 
 disallowed-functions-and-replacements-str=
     assertEquals=>self.assertEqual,
@@ -92,6 +93,7 @@ ignore-imports=yes
 [MESSAGES CONTROL]
 
 disable=abstract-method,
+        ungrouped-imports,
         arguments-differ,
         broad-except,
         consider-using-ternary,
