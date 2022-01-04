@@ -39,7 +39,7 @@ describe('Skill editor main tab directive', function() {
   let $timeout = null;
   var directive = null;
   var UndoRedoService = null;
-  let ngbModal: NgbModal = null;
+  var ngbModal: NgbModal = null;
   var SkillEditorRoutingService = null;
   var SkillEditorStateService = null;
   var focusManagerService = null;
