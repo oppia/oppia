@@ -1957,7 +1957,7 @@ class AnswerSubmittedEventHandlerTest(test_utils.GenericTestBase):
             }, expected_status_int=400
         )
         self.assertEqual(
-            response['error'],'Missing key in handler args: version.'
+            response['error'], 'Missing key in handler args: version.'
         )
 
 
