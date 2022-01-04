@@ -18,7 +18,7 @@
 
 from __future__ import annotations
 from tkinter.constants import NO
-from typing import Any, Dict
+from typing import Any, Callable, Dict
 
 from core import feconf
 from core import utils
@@ -231,7 +231,7 @@ class SubtopicPage:
         return '%s-%s' % (topic_id, subtopic_id)
 
     @classmethod
-    def create_default_subtopic_page(cls, subtopic_id: int, topic_id: str) -> SubtopicPage:
+    def create_default_subtopic_page(cls, subtopic_id: str, topic_id: str) -> SubtopicPage:
         """Creates a SubtopicPage object with default values.
 
         Args:
@@ -243,7 +243,7 @@ class SubtopicPage:
             SubtopicPage. A subtopic object with given id, topic_id and default
             page contents field.
         """
-        subtopic_page_id = int(cls.get_subtopic_page_id(topic_id, subtopic_id))
+        subtopic_page_id = cls.get_subtopic_page_id(topic_id, subtopic_id)
         return cls(
             subtopic_page_id, topic_id,
             SubtopicPageContents.create_default_subtopic_page_contents(),
@@ -252,7 +252,7 @@ class SubtopicPage:
 
     @classmethod
     def convert_html_fields_in_subtopic_page_contents(
-            cls, subtopic_page_contents_dict, conversion_fn):
+            cls, subtopic_page_contents_dict: SubtopicPageContentsDict, conversion_fn: Callable[..., None]) -> SubtopicPageContentsDict:
         """Applies a conversion function on all the html strings in subtopic
         page contents to migrate them to a desired state.
 
@@ -270,9 +270,9 @@ class SubtopicPage:
             convert_html_in_written_translations(
                 subtopic_page_contents_dict['written_translations'],
                 conversion_fn))
-        subtopic_page_contents_dict['subtitled_html']['html'] = (
+        (subtopic_page_contents_dict['subtitled_html'].to_dict())['html'] = (
             conversion_fn(
-                subtopic_page_contents_dict['subtitled_html']['html']))
+                (subtopic_page_contents_dict['subtitled_html'].to_dict())['html']))
         return subtopic_page_contents_dict
 
     @classmethod
