@@ -349,8 +349,7 @@ class SignupHandler(base.BaseHandler):
                         constants.DASHBOARD_TYPE_LEARNER,
                         constants.DASHBOARD_TYPE_CREATOR
                     ]
-                },
-                'default_value': None
+                }
             },
             'can_receive_email_updates': {
                 'schema': {
