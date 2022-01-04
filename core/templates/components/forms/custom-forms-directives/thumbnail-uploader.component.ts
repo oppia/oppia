@@ -34,6 +34,9 @@ import { EditThumbnailModalComponent } from './edit-thumbnail-modal.component';
   templateUrl: './thumbnail-uploader.component.html'
 })
 export class ThumbnailUploaderComponent implements OnInit, OnChanges {
+  // This property is initialized using component interactions
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() disabled!: boolean;
   @Input() useLocalStorage!: boolean;
   @Input() allowedBgColors!: string[];
@@ -74,7 +77,7 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
     private ngbModal: NgbModal,
     private urlInterpolationService: UrlInterpolationService,
     private assetsBackendApiService: AssetsBackendApiService
-  ) { }
+  ) {}
   placeholderImageDataUrl = (
     this.urlInterpolationService.getStaticImageUrl(
       '/icons/story-image-icon.png'));
@@ -158,7 +161,7 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
       this.editableThumbnailDataUrl = (
         this.imageUploadHelperService
           .getTrustedResourceUrlForThumbnailFilename(
-            data.filename, (this.contextService.getEntityType() || ''),
+            data.filename, (this.contextService.getEntityType() || undefined),
             this.contextService.getEntityId()));
       callback();
     });
@@ -182,7 +185,7 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
     };
     const modalRef = this.ngbModal.open(
       EditThumbnailModalComponent,
-      { backdrop: 'static' });
+      {backdrop: 'static'});
     modalRef.componentInstance.bgColor = this.tempBgColor;
     modalRef.componentInstance.allowedBgColors = this.allowedBgColors;
     modalRef.componentInstance.aspectRatio = this.aspectRatio;
@@ -238,4 +241,4 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
 
 angular.module('oppia').directive(
   'oppiaThumbnailUploader', downgradeComponent(
-    { component: ThumbnailUploaderComponent }));
+    {component: ThumbnailUploaderComponent}));
