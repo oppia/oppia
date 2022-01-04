@@ -162,11 +162,11 @@ class MigrateExplorationJob(base_jobs.JobBase):
             (str, ExplorationChange). Tuple containing exploration
             ID and exploration change object.
         """
-        if exp_model.version < feconf.CURRENT_EXP_SCHEMA_VERSION:
+        if exp_model.version < exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION:
             exp_change = exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
-                'from_version': exp_model.version,
-                'to_version': str(feconf.CURRENT_EXP_SCHEMA_VERSION)
+                'from_version': str(exp_model.version),
+                'to_version': str(exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION)
             })
             yield (exp_id, exp_change)
 

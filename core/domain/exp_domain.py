@@ -656,13 +656,11 @@ class Exploration:
             init_state_name: init_state_dict
         }
 
-        exploration = cls(
+        return cls(
             exploration_id, title, category, objective, language_code, [], '',
             '', feconf.CURRENT_STATE_SCHEMA_VERSION,
             init_state_name, states_dict, {}, [], 0,
             feconf.DEFAULT_AUTO_TTS_ENABLED, False)
-
-        return exploration
 
     @classmethod
     def from_dict(
