@@ -24,6 +24,11 @@ require('domain/topic/topic-update.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('services/contextual/url.service.ts');
+require('services/ngb-modal.service.ts');
+
+import { DeleteStoryModalComponent } from '../modal-templates/delete-story-modal.component';
+import { TopicSavePendingChangesComponent } from
+  '../modal-templates/topic-save-pending-changes-modal.component';
 
 angular.module('oppia').component('topicEditorStoriesList', {
   bindings: {
@@ -33,21 +38,17 @@ angular.module('oppia').component('topicEditorStoriesList', {
   template: require(
     './topic-editor-stories-list.component.html'),
   controller: [
-    '$scope', '$uibModal', '$window', 'TopicUpdateService',
+    '$scope', '$window', 'NgbModal', 'TopicUpdateService',
     'UndoRedoService', 'UrlInterpolationService',
     function(
-        $scope, $uibModal, $window, TopicUpdateService,
+        $scope, $window, NgbModal, TopicUpdateService,
         UndoRedoService, UrlInterpolationService) {
       var ctrl = this;
       var STORY_EDITOR_URL_TEMPLATE = '/story_editor/<story_id>';
       $scope.openStoryEditor = function(storyId) {
         if (UndoRedoService.getChangeCount() > 0) {
-          $uibModal.open({
-            templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-              '/pages/topic-editor-page/modal-templates/' +
-                  'topic-save-pending-changes-modal.template.html'),
-            backdrop: true,
-            controller: 'ConfirmOrCancelModalController'
+          NgbModal.open(TopicSavePendingChangesComponent, {
+            backdrop: true
           }).result.then(function() {}, function() {
             // Note to developers:
             // This callback is triggered when the Cancel button is clicked.
@@ -63,12 +64,8 @@ angular.module('oppia').component('topicEditorStoriesList', {
       };
 
       $scope.deleteCanonicalStory = function(storyId) {
-        $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/topic-editor-page/modal-templates/' +
-                'delete-story-modal.template.html'),
-          backdrop: true,
-          controller: 'ConfirmOrCancelModalController'
+        NgbModal.open(DeleteStoryModalComponent, {
+          backdrop: true
         }).result.then(function() {
           TopicUpdateService.removeCanonicalStory(
             ctrl.getTopic(), storyId);
