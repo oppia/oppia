@@ -45,7 +45,7 @@ export interface CollectionSummary {
   'is_admin': boolean;
   'summaries': string[];
   'user_email': string;
-  'is_topic_manager': false;
+  'is_topic_manager': boolean;
   'username': boolean;
 }
 
