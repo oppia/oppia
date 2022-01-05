@@ -33,7 +33,11 @@ if MYPY:  # pragma: no cover
 
 
 def validate_cmd(
+<<<<<<< HEAD
     cmd_name: str,
+=======
+    cmd_name: str, 
+>>>>>>> bdd6a09e70a7ca652ac24d201a208bff8da50d09
     valid_cmd_attribute_specs: Dict[str, Any],
     actual_cmd_attributes: Dict[str, str]
 ) -> None:
