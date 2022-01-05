@@ -28,7 +28,7 @@ import { PlaythroughService } from 'services/playthrough.service';
 import { PlaythroughBackendApiService } from
   'domain/statistics/playthrough-backend-api.service';
 import { Stopwatch } from 'domain/utilities/stopwatch.model';
-import { analyzeAndValidateNgModules } from '@angular/compiler';
+
 
 describe('PlaythroughService', () => {
   let explorationFeaturesService: ExplorationFeaturesService;
@@ -60,7 +60,7 @@ describe('PlaythroughService', () => {
 
   const recordIncorrectAnswers = (stateName: string, times: number) => {
     for (let i = 0; i < times; ++i) {
-      playthroughService!.recordAnswerSubmitAction(
+      playthroughService.recordAnswerSubmitAction(
         stateName, stateName, 'TextInput', 'Hello', 'Wrong', 30);
     }
   };
@@ -70,7 +70,7 @@ describe('PlaythroughService', () => {
     for (let i = 0; i < numAnswerSubmitActions; ++i) {
       const fromState = stateNames[i % stateNames.length];
       const destState = stateNames[(i + 1) % stateNames.length];
-      playthroughService!.recordAnswerSubmitAction(
+      playthroughService.recordAnswerSubmitAction(
         fromState, destState, 'TextInput', 'Hello', 'Correct', 30);
     }
   };
@@ -83,12 +83,12 @@ describe('PlaythroughService', () => {
     spyOn(Stopwatch, 'create').and.returnValue(mockStopwatch);
   };
 
-  const spyOnStorePlaythrough = (callback: (p: Playthrough)=> void = null )=> {
+  const spyOnStorePlaythrough = (callback: (p: Playthrough) => void = null) => {
     if (callback) {
-      spyOn(playthroughBackendApiService, 'storePlaythroughAsync')
+      return spyOn(playthroughBackendApiService, 'storePlaythroughAsync')
         .and.callFake(async(p: Playthrough, _: number) => callback(p));
     } else {
-      spyOn(
+      return spyOn(
         playthroughBackendApiService, 'storePlaythroughAsync').and.stub();
     }
   };
@@ -113,10 +113,10 @@ describe('PlaythroughService', () => {
       it('should record actions', () => {
         const storePlaythroughSpy = spyOnStorePlaythrough(playthrough => {
           expect(playthrough.actions).toEqual([
-            learnerActionObjectFactory!.createNewExplorationStartAction({
+            learnerActionObjectFactory.createNewExplorationStartAction({
               state_name: {value: 'A'},
             }),
-            learnerActionObjectFactory!.createNewAnswerSubmitAction({
+            learnerActionObjectFactory.createNewAnswerSubmitAction({
               state_name: {value: 'A'},
               dest_state_name: {value: 'B'},
               interaction_id: {value: 'TextInput'},
@@ -124,7 +124,7 @@ describe('PlaythroughService', () => {
               feedback: {value: 'Wrong!'},
               time_spent_state_in_msecs: {value: 30000},
             }),
-            learnerActionObjectFactory!.createNewExplorationQuitAction({
+            learnerActionObjectFactory.createNewExplorationQuitAction({
               state_name: {value: 'B'},
               time_spent_in_state_in_msecs: {value: 40000},
             }),
@@ -132,11 +132,11 @@ describe('PlaythroughService', () => {
         });
 
         mockTimedExplorationDurationInSecs(70);
-        playthroughService!.recordExplorationStartAction('A');
-        playthroughService!.recordAnswerSubmitAction(
+        playthroughService.recordExplorationStartAction('A');
+        playthroughService.recordAnswerSubmitAction(
           'A', 'B', 'TextInput', 'Hello', 'Wrong!', 30);
-        playthroughService!.recordExplorationQuitAction('B', 40);
-        playthroughService!.storePlaythrough();
+        playthroughService.recordExplorationQuitAction('B', 40);
+        playthroughService.storePlaythrough();
 
         expect(storePlaythroughSpy).toHaveBeenCalled();
       });
