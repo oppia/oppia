@@ -109,7 +109,7 @@ class Registry:
     def get_all_specs_for_state_schema_version(
         cls,
         state_schema_version,
-        can_fetch_latest_specs = False):
+        can_fetch_latest_specs=False):
         """Returns a dict containing the full specs of each interaction for the
         given state schema version, if available else return all specs or an
         error depending on can_fetch_latest_specs.

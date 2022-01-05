@@ -3526,7 +3526,7 @@ class State:
                 interaction_registry.Registry
                 .get_all_specs_for_state_schema_version(
                     state_schema_version,
-                    can_fetch_latest_specs = True
+                    can_fetch_latest_specs=True
                 )[interaction_id]['customization_arg_specs']
             )
             state_dict['interaction'] = (
