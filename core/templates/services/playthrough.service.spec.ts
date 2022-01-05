@@ -31,10 +31,10 @@ import { Stopwatch } from 'domain/utilities/stopwatch.model';
 import { analyzeAndValidateNgModules } from '@angular/compiler';
 
 describe('PlaythroughService', () => {
-  let explorationFeaturesService: ExplorationFeaturesService ;
-  let learnerActionObjectFactory: LearnerActionObjectFactory ;
-  let playthroughBackendApiService: PlaythroughBackendApiService ;
-  let playthroughService: PlaythroughService ;
+  let explorationFeaturesService: ExplorationFeaturesService;
+  let learnerActionObjectFactory: LearnerActionObjectFactory;
+  let playthroughBackendApiService: PlaythroughBackendApiService;
+  let playthroughService: PlaythroughService;
 
   // NOTE TO DEVELOPERS: For the following 3 "record" functions, it is the test
   // writer's responsibility to create a "sensible" set of transitions.
