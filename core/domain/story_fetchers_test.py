@@ -24,6 +24,7 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
+from core import feconf
 
 (story_models, user_models) = models.Registry.import_models(
     [models.NAMES.story, models.NAMES.user])
@@ -96,6 +97,34 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(story_summary.thumbnail_bg_color, None)
         self.assertEqual(story_summary.thumbnail_filename, None)
 
+    def test_migrate_story_contents(self):
+        story_id = self.STORY_ID
+        story_model = story_models.StoryModel.get(story_id)
+        versioned_story_contents = {
+        'schema_version': story_model.story_contents_schema_version,
+        'story_contents': story_model.story_contents
+        }
+        story_fetchers._migrate_story_contents_to_latest_schema(
+            versioned_story_contents, story_id)
+        versioned_story_contents[
+            'schema_version'
+        ] = feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION - 1
+        story_fetchers._migrate_story_contents_to_latest_schema(
+                versioned_story_contents, story_id
+        )
+        versioned_story_contents['schema_version'] = 6
+        with self.assertRaisesRegex(
+            Exception,
+            'Sorry, we can only process v1-v%d story schemas at '
+            'present.' % feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION
+            ):
+            story_fetchers._migrate_story_contents_to_latest_schema(
+                versioned_story_contents, story_id
+            )
+
+    def test_get_story_by_url_fragment(self):
+        print()
+
     def test_get_story_by_id_with_valid_ids_returns_correct_dict(self):
         expected_story = self.story.to_dict()
         story = story_fetchers.get_story_by_id(self.STORY_ID)
@@ -117,6 +146,12 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(stories[1], None)
 
     def test_get_story_summary_by_id(self):
+        class mock_story_function(self):
+            """Mock class that returns None"""
+            class StorySummaryModel(self):
+                def get(story_id, strict):
+                    return None;
+
         story_summary = story_fetchers.get_story_summary_by_id(self.STORY_ID)
 
         self.assertEqual(story_summary.id, self.STORY_ID)
@@ -125,6 +160,9 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(story_summary.node_titles, ['Title 1'])
         self.assertEqual(story_summary.thumbnail_bg_color, None)
         self.assertEqual(story_summary.thumbnail_filename, None)
+        with self.swap(story_fetchers, 'story_models', mock_story_function):
+            story_summary = story_fetchers.get_story_summary_by_id('fake_dummy_id')
+            self.assertEqual(story_summary, None)
 
     def test_get_node_index_by_story_id_and_node_id(self):
         # Tests correct node index should be returned when story and node exist.
