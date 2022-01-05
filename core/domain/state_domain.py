@@ -282,11 +282,10 @@ class Hint(translation_domain.BaseTranslatableObject):
     def _register_all_translatable_fields(self) -> None:
         """Registration of all the fields for Hint."""
 
-        if self.hint_content.html != '':
-            self._register_translatable_field(
-                translation_domain.TRANSLATABLE_CONTENT_FORMAT_HTML,
-                self.hint_content.content_id,
-                self.hint_content.html)
+        self._register_translatable_field(
+            translation_domain.TRANSLATABLE_CONTENT_FORMAT_HTML,
+            self.hint_content.content_id,
+            self.hint_content.html)
 
     def to_dict(self):
         """Returns a dict representing this Hint domain object.
@@ -371,11 +370,10 @@ class Solution(translation_domain.BaseTranslatableObject):
     def _register_all_translatable_fields(self) -> None:
         """Registration of all the fields for Solution."""
 
-        if self.explanation.html != '':
-            self._register_translatable_field(
-                translation_domain.TRANSLATABLE_CONTENT_FORMAT_HTML,
-                self.explanation.content_id,
-                self.explanation.html)
+        self._register_translatable_field(
+            translation_domain.TRANSLATABLE_CONTENT_FORMAT_HTML,
+            self.explanation.content_id,
+            self.explanation.html)
 
     def to_dict(self):
         """Returns a dict representing this Solution domain object.
