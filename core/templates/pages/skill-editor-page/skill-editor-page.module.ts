@@ -22,7 +22,6 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RequestInterceptor } from 'services/request-interceptor.service';
-import { SavePendingChangesModalComponent } from './modal-templates/save-pending-changes-modal.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
@@ -53,7 +52,6 @@ import { AddMisconceptionModalComponent } from './modal-templates/add-misconcept
   ],
   declarations: [
     DeleteMisconceptionModalComponent,
-    SavePendingChangesModalComponent,
     SkillEditorNavbarBreadcrumbComponent,
     SkillDescriptionEditorComponent,
     SkillEditorSaveModalComponent,
@@ -67,7 +65,6 @@ import { AddMisconceptionModalComponent } from './modal-templates/add-misconcept
   ],
   entryComponents: [
     DeleteMisconceptionModalComponent,
-    SavePendingChangesModalComponent,
     SkillEditorNavbarBreadcrumbComponent,
     SkillDescriptionEditorComponent,
     SkillEditorSaveModalComponent,
