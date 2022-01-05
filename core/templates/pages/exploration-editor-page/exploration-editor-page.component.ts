@@ -488,6 +488,7 @@ angular.module('oppia').component('explorationEditorPage', {
           } else if (mode === TRANSLATION_TUTORIAL_MODE) {
             StateTutorialFirstTimeService.onOpenTranslationTutorial.emit();
           }
+          $rootScope.$applyAsync();
         }, () => {
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.
