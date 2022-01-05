@@ -63,7 +63,7 @@ class ProfilePageTests(test_utils.GenericTestBase):
                     'data': 'Bio data of the editor'
                 },
                 csrf_token=csrf_token
-                )
+            )
             self.put_json(
                 '/preferenceshandler/data',
                 {
