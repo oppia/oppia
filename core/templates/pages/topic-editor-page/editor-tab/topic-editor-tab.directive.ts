@@ -59,12 +59,6 @@ require(
 require('base-components/loading-message.component.ts');
 require('services/ngb-modal.service.ts');
 
-import { Subscription } from 'rxjs';
-
-// TODO(#9186): Change variable name to 'constants' once this file
-// is migrated to Angular.
-import topicConstants from 'assets/constants';
-
 angular.module('oppia').directive('topicEditorTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
