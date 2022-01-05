@@ -1,9 +1,7 @@
-core.controllers.base_test
 core.controllers.editor_test
 core.controllers.resources_test
 extensions.interactions.base_test
 core.controllers.domain_objects_validator_test
-extensions.rich_text_components.components_test
 core.controllers.profile_test
 core.controllers.story_editor_test
 core.controllers.questions_list_test
@@ -95,7 +93,6 @@ core.storage.blog.gae_models_test
 main_test
 core.storage.recommendations.gae_models_test
 core.storage.feedback.gae_models_test
-core.storage.activity.gae_models_test
 core.storage.subtopic.gae_models_test
 core.domain.user_domain_test
 core.storage.opportunity.gae_models_test
