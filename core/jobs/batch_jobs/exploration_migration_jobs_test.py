@@ -24,6 +24,7 @@ from core import feconf
 from core.constants import constants
 from core.domain import caching_services
 from core.domain import exp_domain
+from core.domain import rights_domain
 from core.domain import state_domain
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import exploration_migration_jobs
@@ -40,6 +41,9 @@ if MYPY: # pragma: no cover
 class MigrateExplorationJobTests(job_test_utils.JobTestBase):
 
     EXP_1_ID = 'exp_1_id'
+    USER_ID_1 = 'id_1'
+    USER_ID_2 = 'id_2'
+    USER_ID_COMMITTER = 'id_committer'
 
     JOB_CLASS = exploration_migration_jobs.MigrateExplorationJob
 
@@ -59,6 +63,20 @@ class MigrateExplorationJobTests(job_test_utils.JobTestBase):
         )
         exp_summary.update_timestamps()
         exp_summary.put()
+
+        exp_models.ExplorationRightsModel(
+            id=self.EXP_1_ID,
+            owner_ids=[self.USER_ID_1],
+            editor_ids=[self.USER_ID_1],
+            voice_artist_ids=[self.USER_ID_1],
+            viewer_ids=[self.USER_ID_2],
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            viewable_if_private=False,
+            first_published_msec=0.1
+        ).save(
+            self.USER_ID_COMMITTER, 'Created new exploration right',
+            [{'cmd': rights_domain.CMD_CREATE_NEW}])
 
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty()
@@ -80,7 +98,8 @@ class MigrateExplorationJobTests(job_test_utils.JobTestBase):
                 'state': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
                     'state', is_initial_state=True
                 ).to_dict()
-        })
+            }
+        )
         exp_model.update_timestamps()
         exp_model.commit(feconf.SYSTEM_COMMITTER_ID, 'Create exploration', [{
             'cmd': exp_domain.CMD_CREATE_NEW
@@ -114,7 +133,8 @@ class MigrateExplorationJobTests(job_test_utils.JobTestBase):
                 'state': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
                     'state', is_initial_state=True
                 ).to_dict()
-        })
+            }
+        )
         exp_model.update_timestamps()
         exp_model.commit(feconf.SYSTEM_COMMITTER_ID, 'Create exploration', [{
             'cmd': exp_domain.CMD_CREATE_NEW
@@ -129,6 +149,70 @@ class MigrateExplorationJobTests(job_test_utils.JobTestBase):
                 stdout='CACHE DELETION SUCCESS: 1')
         ])
 
-        migrated_exp_model = (
-            exp_models.ExplorationModel.get(self.EXP_1_ID))
+        migrated_exp_model = exp_models.ExplorationModel.get(self.EXP_1_ID)
         self.assertEqual(migrated_exp_model.version, 2)
+
+    def test_broken_exploration_is_not_migrated(self) -> None:
+        exp_model = self.create_model(
+            exp_models.ExplorationModel,
+            id=self.EXP_1_ID,
+            title='exploration title',
+            category='category',
+            objective='objective',
+            language_code=1,
+            init_state_name='state',
+            states_schema_version=48,
+            states={
+                'state': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
+                    'state', is_initial_state=True
+                ).to_dict()
+            }
+        )
+        exp_model.update_timestamps()
+        exp_model.commit(feconf.SYSTEM_COMMITTER_ID, 'Create exploration', [{
+            'cmd': exp_domain.CMD_CREATE_NEW
+        }])
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stderr=(
+                    'EXPLORATION PROCESSED ERROR: "(\'exp_1\','
+                    'ValidationError('
+                    '\'Expected language_code to be a string, received 1\'))": '
+                    '1'
+                )
+            )
+        ])
+
+        migrated_exp_model = exp_models.ExplorationModel.get(self.EXP_1_ID)
+        self.assertEqual(migrated_exp_model.version, 1)
+
+    def test_migrated_exploration_is_not_migrated(self) -> None:
+        exp_model = self.create_model(
+            exp_models.ExplorationModel,
+            id=self.EXP_1_ID,
+            title='exploration title',
+            category='category',
+            objective='objective',
+            language_code='cs',
+            init_state_name='state',
+            states_schema_version=48,
+            states={
+                'state': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
+                    'state', is_initial_state=True
+                ).to_dict()
+            }
+        )
+        exp_model.update_timestamps()
+        exp_model.commit(feconf.SYSTEM_COMMITTER_ID, 'Create exploration', [{
+            'cmd': exp_domain.CMD_CREATE_NEW
+        }])
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stdout='EXPLORATION PROCESSED SUCCESS: 1')
+        ])
+
+        unmigrated_exploration_model = exp_models.ExplorationModel.get(
+            self.EXP_1_ID)
+        self.assertEqual(unmigrated_exploration_model.version, 1)

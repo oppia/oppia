@@ -105,7 +105,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
                 exp_model, migrated_exploration))
         commit_message = (
             'Update exploration content schema version to %d.'
-        ) % (feconf.CURRENT_EXP_SCHEMA_VERSION)
+        ) % (exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION)
         change_dicts = [change.to_dict() for change in exploration_changes]
         with datastore_services.get_ndb_context():
             models_to_put = updated_exploration_model.compute_models_to_commit(
@@ -139,11 +139,13 @@ class MigrateExplorationJob(base_jobs.JobBase):
             exploration_summary = exp_services.compute_summary_of_exploration(
                 migrated_exploration)
             exploration_summary.version += 1
-        return (
+        updated_exploration_summary_model = (
             exp_services.populate_exploration_summary_model_fields(
                 exploration_summary_model, exploration_summary
             )
         )
+
+        return updated_exploration_summary_model
 
     @staticmethod
     def _generate_exploration_changes(
@@ -162,11 +164,13 @@ class MigrateExplorationJob(base_jobs.JobBase):
             (str, ExplorationChange). Tuple containing exploration
             ID and exploration change object.
         """
-        if exp_model.version < exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION:
+        if exp_model.version < (
+            exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION):
             exp_change = exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
                 'from_version': str(exp_model.version),
-                'to_version': str(exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION)
+                'to_version': (
+                    str(exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION))
             })
             yield (exp_id, exp_change)
 
