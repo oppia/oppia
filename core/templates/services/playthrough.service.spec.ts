@@ -83,7 +83,7 @@ describe('PlaythroughService', () => {
     spyOn(Stopwatch, 'create').and.returnValue(mockStopwatch);
   };
 
-  const spyOnStorePlaythrough = (callback: (p: Playthrough)=> any = undefined )=> {
+  const spyOnStorePlaythrough = (callback: (p: Playthrough)=> void = null )=> {
     if (callback) {
       spyOn(playthroughBackendApiService, 'storePlaythroughAsync')
         .and.callFake(async(p: Playthrough, _: number) => callback(p));
@@ -104,7 +104,7 @@ describe('PlaythroughService', () => {
 
   describe('Recording playthroughs', () => {
     beforeEach(() => {
-      playthroughService!.initSession('expId', 1, 1.0);
+      playthroughService.initSession('expId', 1, 1.0);
       spyOn(explorationFeaturesService, 'isPlaythroughRecordingEnabled')
         .and.returnValue(true);
     });
