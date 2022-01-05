@@ -80,7 +80,7 @@ class UtilsTests(test_utils.GenericTestBase):
             utils.InvalidInputException,
             'while parsing a flow node\n'
             'expected the node content, but found \'<stream end>\'\n'):
-            yaml_str = utils.dict_from_yaml('{')  # type: ignore
+            yaml_str = utils.dict_from_yaml('{')
 
     def test_recursively_remove_key_for_empty_dict(self) -> None:
         """Test recursively_remove_key method for an empty dict."""
