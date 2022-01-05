@@ -736,7 +736,7 @@ describe('Exploration save service ' +
     expect(focusSpy).toHaveBeenCalled();
   }));
 
-  fit('should not open exploration save modal in case of ' +
+  it('should not open exploration save modal in case of ' +
     'backend error', fakeAsync(function() {
     let startLoadingCb = jasmine.createSpy('startLoadingCb');
     let endLoadingCb = jasmine.createSpy('endLoadingCb');
