@@ -392,6 +392,33 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
             'abcd')
         self.assertEqual(notdemo2.is_demo, False)
 
+    def test_update_title(self):
+        """Test update_title."""
+        self.assertEqual(self.collection.title, 'Title')
+        self.collection.update_title('new title')
+        self.assertEqual(self.collection.title, 'new title')
+
+    def test_update_category(self):
+        """Test update_category."""
+        self.collection.update_category('new category')
+        self.assertEqual(self.collection.category, 'new category')
+
+    def test_update_objective(self):
+        """Test update_objective."""
+        self.collection.update_objective('new objective')
+        self.assertEqual(self.collection.objective, 'new objective')
+
+    def test_update_language_code(self):
+        """Test update_language_code."""
+        self.collection.update_language_code('en')
+        self.assertEqual(self.collection.language_code, 'en')
+
+    def test_update_tags(self):
+        """Test update_tags."""
+        self.assertEqual(self.collection.tags, [])
+        self.collection.update_tags(['abc', 'def'])
+        self.assertEqual(self.collection.tags, ['abc', 'def'])
+
     def test_collection_export_import(self):
         """Test that to_dict and from_dict preserve all data within an
         collection.
@@ -456,6 +483,13 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
             versioned_collection_contents, 1)
 
         self.assertEqual(versioned_collection_contents['schema_version'], 2)
+        self.assertEqual(
+            versioned_collection_contents['collection_contents'], {})
+
+        collection_domain.Collection.update_collection_contents_from_model(
+            versioned_collection_contents, 2)
+
+        self.assertEqual(versioned_collection_contents['schema_version'], 3)
         self.assertEqual(
             versioned_collection_contents['collection_contents'], {})
 
@@ -1133,6 +1167,16 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
             datetime.datetime.utcnow(), datetime.datetime.utcnow())
         self.assertFalse(self.collection_summary.is_private())
 
+    def test_is_editable_by(self):
+        self.assertTrue(self.collection_summary.is_editable_by('editor_id'))
+        self.assertTrue(self.collection_summary.is_editable_by('other_id'))
+        self.collection_summary = collection_domain.CollectionSummary(
+            'col_id', 'title', 'category', 'objective', 'en', [],
+            constants.ACTIVITY_STATUS_PUBLIC, False, ['owner_id'],
+            ['editor_id'], ['viewer_id'], ['contributor_id'], {}, 1, 1,
+            datetime.datetime.utcnow(), datetime.datetime.utcnow())
+        self.assertFalse(self.collection_summary.is_editable_by('other_id'))
+
     def test_is_solely_owned_by_user_one_owner(self):
         self.assertTrue(
             self.collection_summary.is_solely_owned_by_user('owner_id'))
@@ -1170,6 +1214,17 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
             self.collection_summary.is_solely_owned_by_user('viewer_id'))
         self.assertFalse(
             self.collection_summary.is_solely_owned_by_user('contributor_id'))
+
+    def test_does_user_have_any_role(self):
+        self.assertTrue(
+            self.collection_summary.does_user_have_any_role('owner_id')
+        )
+        self.assertTrue(
+            self.collection_summary.does_user_have_any_role('viewer_id')
+        )
+        self.assertFalse(
+            self.collection_summary.does_user_have_any_role('other_id')
+        )
 
     def test_add_new_contribution_for_user_adds_user_to_contributors(self):
         self.collection_summary.add_contribution_by_user('user_id')
