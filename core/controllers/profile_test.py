@@ -52,7 +52,7 @@ class ProfilePageTests(test_utils.GenericTestBase):
         }
         with self.swap_to_always_return(
             user_services, 'get_user_settings_from_username', False
-            ):
+        ):
             self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
             self.login(self.EDITOR_EMAIL)
             csrf_token = self.get_new_csrf_token()
