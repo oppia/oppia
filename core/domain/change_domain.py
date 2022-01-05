@@ -33,8 +33,10 @@ if MYPY:  # pragma: no cover
 
 
 def validate_cmd(
-    cmd_name: str, valid_cmd_attribute_specs: Dict[str, Any],
-    actual_cmd_attributes: Dict[str, str]) -> None:
+    cmd_name: str,
+    valid_cmd_attribute_specs: Dict[str, Any],
+    actual_cmd_attributes: Dict[str, str]
+) -> None:
     """Validates that the attributes of a command contain all the required
     attributes and some/all of optional attributes. It also checks that
     the values of attributes belong to a set of allowed values if any.
@@ -231,9 +233,10 @@ class BaseChange:
 
         return base_change_dict
 
-    def __getattr__(self, name: str) -> Any:
+    def __getattr__(self, name: str) -> str:
         # AttributeError needs to be thrown in order to make
         # instances of this class picklable.
+        assert (isinstance(name, str) and isinstance(getattr, str))
         try:
             return self.__dict__[name]
         except KeyError:

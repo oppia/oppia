@@ -262,12 +262,12 @@ class ExplorationRightsChangeTests(test_utils.GenericTestBase):
     def test_exploration_rights_change_object_with_missing_cmd(self) -> None:
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, 'Missing cmd key in change dict'):
-            rights_domain.ExplorationRightsChange({'invalid': 'data'}) # type: ignore[no-untyped-call]
+            rights_domain.ExplorationRightsChange({'invalid': 'data'})
 
     def test_exploration_rights_change_object_with_invalid_cmd(self) -> None:
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, 'Command invalid is not allowed'):
-            rights_domain.ExplorationRightsChange({'cmd': 'invalid'}) # type: ignore[no-untyped-call]
+            rights_domain.ExplorationRightsChange({'cmd': 'invalid'})
 
     def test_exploration_rights_change_object_with_missing_attribute_in_cmd(
         self
@@ -276,7 +276,7 @@ class ExplorationRightsChangeTests(test_utils.GenericTestBase):
             utils.ValidationError, (
                 'The following required attributes are missing: '
                 'new_role, old_role')):
-            rights_domain.ExplorationRightsChange({ # type: ignore[no-untyped-call]
+            rights_domain.ExplorationRightsChange({
                 'cmd': 'change_role',
                 'assignee_id': 'assignee_id',
             })
@@ -287,7 +287,7 @@ class ExplorationRightsChangeTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, (
                 'The following extra attributes are present: invalid')):
-            rights_domain.ExplorationRightsChange({ # type: ignore[no-untyped-call]
+            rights_domain.ExplorationRightsChange({
                 'cmd': 'change_private_viewability',
                 'old_viewable_if_private': 'old_viewable_if_private',
                 'new_viewable_if_private': 'new_viewable_if_private',
@@ -299,7 +299,7 @@ class ExplorationRightsChangeTests(test_utils.GenericTestBase):
             utils.ValidationError, (
                 'Value for new_role in cmd change_role: '
                 'invalid is not allowed')):
-            rights_domain.ExplorationRightsChange({ # type: ignore[no-untyped-call]
+            rights_domain.ExplorationRightsChange({
                 'cmd': 'change_role',
                 'assignee_id': 'assignee_id',
                 'old_role': rights_domain.ROLE_OWNER,
@@ -311,7 +311,7 @@ class ExplorationRightsChangeTests(test_utils.GenericTestBase):
             utils.ValidationError, (
                 'Value for new_status in cmd change_exploration_status: '
                 'invalid is not allowed')):
-            rights_domain.ExplorationRightsChange({ # type: ignore[no-untyped-call]
+            rights_domain.ExplorationRightsChange({
                 'cmd': 'change_exploration_status',
                 'old_status': rights_domain.ACTIVITY_STATUS_PRIVATE,
                 'new_status': 'invalid'
@@ -319,13 +319,13 @@ class ExplorationRightsChangeTests(test_utils.GenericTestBase):
 
     def test_exploration_rights_change_object_with_create_new(self) -> None:
         exploration_rights_change_object = (
-            rights_domain.ExplorationRightsChange({'cmd': 'create_new'})) # type: ignore[no-untyped-call]
+            rights_domain.ExplorationRightsChange({'cmd': 'create_new'}))
 
         self.assertEqual(exploration_rights_change_object.cmd, 'create_new')
 
     def test_exploration_rights_change_object_with_change_role(self) -> None:
         exploration_rights_change_object = (
-            rights_domain.ExplorationRightsChange({ # type: ignore[no-untyped-call]
+            rights_domain.ExplorationRightsChange({
                 'cmd': 'change_role',
                 'assignee_id': 'assignee_id',
                 'old_role': rights_domain.ROLE_OWNER,
@@ -349,7 +349,7 @@ class ExplorationRightsChangeTests(test_utils.GenericTestBase):
         self
     ) -> None:
         exploration_rights_change_object = (
-            rights_domain.ExplorationRightsChange( # type: ignore[no-untyped-call]
+            rights_domain.ExplorationRightsChange(
                 {'cmd': 'release_ownership'}
             )
         )
@@ -361,7 +361,7 @@ class ExplorationRightsChangeTests(test_utils.GenericTestBase):
         self
     ) -> None:
         exploration_rights_change_object = (
-            rights_domain.ExplorationRightsChange({ # type: ignore[no-untyped-call]
+            rights_domain.ExplorationRightsChange({
                 'cmd': 'change_private_viewability',
                 'old_viewable_if_private': 'old_viewable_if_private',
                 'new_viewable_if_private': 'new_viewable_if_private'
@@ -381,7 +381,7 @@ class ExplorationRightsChangeTests(test_utils.GenericTestBase):
         self
     ) -> None:
         exploration_rights_change_object = (
-            rights_domain.ExplorationRightsChange({ # type: ignore[no-untyped-call]
+            rights_domain.ExplorationRightsChange({
                 'cmd': 'update_first_published_msec',
                 'old_first_published_msec': 'old_first_published_msec',
                 'new_first_published_msec': 'new_first_published_msec'
@@ -401,7 +401,7 @@ class ExplorationRightsChangeTests(test_utils.GenericTestBase):
         self
     ) -> None:
         exploration_rights_change_object = (
-            rights_domain.ExplorationRightsChange({ # type: ignore[no-untyped-call]
+            rights_domain.ExplorationRightsChange({
                 'cmd': 'change_exploration_status',
                 'old_status': rights_domain.ACTIVITY_STATUS_PRIVATE,
                 'new_status': rights_domain.ACTIVITY_STATUS_PUBLIC
@@ -424,10 +424,10 @@ class ExplorationRightsChangeTests(test_utils.GenericTestBase):
             'new_viewable_if_private': 'new_viewable_if_private'
         }
         exploration_rights_change_object = (
-            rights_domain.ExplorationRightsChange( # type: ignore[no-untyped-call]
+            rights_domain.ExplorationRightsChange(
                 exploration_rights_change_dict))
         self.assertEqual(
-            exploration_rights_change_object.to_dict(), # type: ignore[no-untyped-call]
+            exploration_rights_change_object.to_dict(),
             exploration_rights_change_dict)
 
 
@@ -436,12 +436,12 @@ class CollectionRightsChangeTests(test_utils.GenericTestBase):
     def test_collection_rights_change_object_with_missing_cmd(self) -> None:
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, 'Missing cmd key in change dict'):
-            rights_domain.CollectionRightsChange({'invalid': 'data'}) # type: ignore[no-untyped-call]
+            rights_domain.CollectionRightsChange({'invalid': 'data'})
 
     def test_collection_rights_change_object_with_invalid_cmd(self) -> None:
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, 'Command invalid is not allowed'):
-            rights_domain.CollectionRightsChange({'cmd': 'invalid'}) # type: ignore[no-untyped-call]
+            rights_domain.CollectionRightsChange({'cmd': 'invalid'})
 
     def test_collection_rights_change_object_with_missing_attribute_in_cmd(
         self
@@ -450,7 +450,7 @@ class CollectionRightsChangeTests(test_utils.GenericTestBase):
             utils.ValidationError, (
                 'The following required attributes are missing: '
                 'new_role, old_role')):
-            rights_domain.CollectionRightsChange({ # type: ignore[no-untyped-call]
+            rights_domain.CollectionRightsChange({
                 'cmd': 'change_role',
                 'assignee_id': 'assignee_id',
             })
@@ -461,7 +461,7 @@ class CollectionRightsChangeTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, (
                 'The following extra attributes are present: invalid')):
-            rights_domain.CollectionRightsChange({ # type: ignore[no-untyped-call]
+            rights_domain.CollectionRightsChange({
                 'cmd': 'change_private_viewability',
                 'old_viewable_if_private': 'old_viewable_if_private',
                 'new_viewable_if_private': 'new_viewable_if_private',
@@ -473,7 +473,7 @@ class CollectionRightsChangeTests(test_utils.GenericTestBase):
             utils.ValidationError, (
                 'Value for new_role in cmd change_role: '
                 'invalid is not allowed')):
-            rights_domain.CollectionRightsChange({ # type: ignore[no-untyped-call]
+            rights_domain.CollectionRightsChange({
                 'cmd': 'change_role',
                 'assignee_id': 'assignee_id',
                 'old_role': rights_domain.ROLE_OWNER,
@@ -485,21 +485,21 @@ class CollectionRightsChangeTests(test_utils.GenericTestBase):
             utils.ValidationError, (
                 'Value for new_status in cmd change_collection_status: '
                 'invalid is not allowed')):
-            rights_domain.CollectionRightsChange({ # type: ignore[no-untyped-call]
+            rights_domain.CollectionRightsChange({
                 'cmd': 'change_collection_status',
                 'old_status': rights_domain.ACTIVITY_STATUS_PRIVATE,
                 'new_status': 'invalid'
             })
 
     def test_collection_rights_change_object_with_create_new(self) -> None:
-        collection_rights_change_object = rights_domain.CollectionRightsChange({ # type: ignore[no-untyped-call]
+        collection_rights_change_object = rights_domain.CollectionRightsChange({
             'cmd': 'create_new'
         })
 
         self.assertEqual(collection_rights_change_object.cmd, 'create_new')
 
     def test_collection_rights_change_object_with_change_role(self) -> None:
-        collection_rights_change_object = rights_domain.CollectionRightsChange({ # type: ignore[no-untyped-call]
+        collection_rights_change_object = rights_domain.CollectionRightsChange({
             'cmd': 'change_role',
             'assignee_id': 'assignee_id',
             'old_role': rights_domain.ROLE_OWNER,
@@ -517,7 +517,7 @@ class CollectionRightsChangeTests(test_utils.GenericTestBase):
     def test_collection_rights_change_object_with_release_ownership(
         self
     ) -> None:
-        collection_rights_change_object = rights_domain.CollectionRightsChange({ # type: ignore[no-untyped-call]
+        collection_rights_change_object = rights_domain.CollectionRightsChange({
             'cmd': 'release_ownership'
         })
 
@@ -527,7 +527,7 @@ class CollectionRightsChangeTests(test_utils.GenericTestBase):
     def test_collection_rights_change_object_with_change_private_viewability(
         self
     ) -> None:
-        collection_rights_change_object = rights_domain.CollectionRightsChange({ # type: ignore[no-untyped-call]
+        collection_rights_change_object = rights_domain.CollectionRightsChange({
             'cmd': 'change_private_viewability',
             'old_viewable_if_private': 'old_viewable_if_private',
             'new_viewable_if_private': 'new_viewable_if_private'
@@ -545,7 +545,7 @@ class CollectionRightsChangeTests(test_utils.GenericTestBase):
     def test_collection_rights_change_object_with_update_first_published_msec(
         self
     ) -> None:
-        collection_rights_change_object = rights_domain.CollectionRightsChange({ # type: ignore[no-untyped-call]
+        collection_rights_change_object = rights_domain.CollectionRightsChange({
             'cmd': 'update_first_published_msec',
             'old_first_published_msec': 'old_first_published_msec',
             'new_first_published_msec': 'new_first_published_msec'
@@ -564,7 +564,7 @@ class CollectionRightsChangeTests(test_utils.GenericTestBase):
         self
     ) -> None:
         collection_rights_change_object = (
-            rights_domain.CollectionRightsChange({ # type: ignore[no-untyped-call]
+            rights_domain.CollectionRightsChange({
                 'cmd': 'change_collection_status',
                 'old_status': rights_domain.ACTIVITY_STATUS_PRIVATE,
                 'new_status': rights_domain.ACTIVITY_STATUS_PUBLIC
@@ -586,8 +586,8 @@ class CollectionRightsChangeTests(test_utils.GenericTestBase):
             'old_viewable_if_private': 'old_viewable_if_private',
             'new_viewable_if_private': 'new_viewable_if_private'
         }
-        collection_rights_change_object = rights_domain.CollectionRightsChange( # type: ignore[no-untyped-call]
+        collection_rights_change_object = rights_domain.CollectionRightsChange(
             collection_rights_change_dict)
         self.assertEqual(
-            collection_rights_change_object.to_dict(), # type: ignore[no-untyped-call]
+            collection_rights_change_object.to_dict(),
             collection_rights_change_dict)
