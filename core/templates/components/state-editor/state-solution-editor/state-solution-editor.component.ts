@@ -186,7 +186,7 @@ angular.module('oppia').component('stateSolutionEditor', {
           ctrl.onSaveSolution(StateSolutionService.displayed);
           StateEditorService.deleteCurrentSolutionValidity();
           ctrl.refreshWarnings()();
-          $rootScope.$apply();
+          $rootScope.$applyAsync();
         }, function() {
           AlertsService.clearWarnings();
         });

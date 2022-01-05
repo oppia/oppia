@@ -281,7 +281,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
               $scope.recomputeGraph();
               _updateInteractionPreview();
               _updateAnswerChoices();
-              $rootScope.$apply();
+              $rootScope.$applyAsync();
             }, function() {
               AlertsService.clearWarnings();
             });
