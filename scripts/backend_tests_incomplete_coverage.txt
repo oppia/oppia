@@ -2,7 +2,6 @@ core.controllers.editor_test
 core.controllers.resources_test
 extensions.interactions.base_test
 core.controllers.domain_objects_validator_test
-extensions.rich_text_components.components_test
 core.controllers.profile_test
 core.controllers.story_editor_test
 core.controllers.questions_list_test
