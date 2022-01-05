@@ -215,48 +215,6 @@ angular.module('oppia').animation(
   });
 
 angular.module('oppia').animation(
-  '.conversation-skin-animate-tutor-card-content', function() {
-    var animateCardChange = function(element, className, done) {
-      if (className !== 'animate-card-change') {
-        return;
-      }
-
-      var currentHeight = element.height();
-      var expectedNextHeight = $(
-        '.conversation-skin-future-tutor-card ' +
-        '.oppia-learner-view-card-content'
-      ).height();
-
-      // Fix the current card height, so that it does not change during the
-      // animation, even though its contents might.
-      element.css('height', currentHeight);
-
-      jQuery(element).animate({
-        opacity: 0
-      }, TIME_FADEOUT_MSEC).animate({
-        height: expectedNextHeight
-      }, TIME_HEIGHT_CHANGE_MSEC).animate({
-        opacity: 1
-      }, TIME_FADEIN_MSEC, function() {
-        element.css('height', '');
-        done();
-      });
-
-      return function(cancel) {
-        if (cancel) {
-          element.css('opacity', '1.0');
-          element.css('height', '');
-          element.stop();
-        }
-      };
-    };
-
-    return {
-      addClass: animateCardChange
-    };
-  });
-
-angular.module('oppia').animation(
   '.conversation-skin-animate-cards', function() {
     // This removes the newly-added class once the animation is finished.
     var animateCards = function(element, className, done) {
@@ -362,7 +320,7 @@ angular.module('oppia').directive('conversationSkin', [
         'FocusManagerService', 'GuestCollectionProgressService',
         'HintsAndSolutionManagerService', 'I18nLanguageCodeService',
         'ImagePreloaderService', 'LearnerAnswerInfoService',
-        'LearnerParamsService', 'LearnerViewRatingService', 'LoaderService',
+        'LearnerParamsService', 'LoaderService',
         'MessengerService', 'NumberAttemptsService',
         'PlayerCorrectnessFeedbackEnabledService', 'PlayerPositionService',
         'PlayerTranscriptService', 'QuestionPlayerEngineService',
@@ -376,7 +334,7 @@ angular.module('oppia').directive('conversationSkin', [
         'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES',
         'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE',
         'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
-        'FEEDBACK_POPOVER_PATH', 'INTERACTION_SPECS',
+        'INTERACTION_SPECS',
         'REVIEW_TESTS_URL_TEMPLATE',
         'STORY_PROGRESS_URL_TEMPLATE', 'STORY_VIEWER_URL_TEMPLATE',
         'SUPPORTED_SITE_LANGUAGES', 'TWO_CARD_THRESHOLD_PX',
@@ -393,7 +351,7 @@ angular.module('oppia').directive('conversationSkin', [
             FocusManagerService, GuestCollectionProgressService,
             HintsAndSolutionManagerService, I18nLanguageCodeService,
             ImagePreloaderService, LearnerAnswerInfoService,
-            LearnerParamsService, LearnerViewRatingService, LoaderService,
+            LearnerParamsService, LoaderService,
             MessengerService, NumberAttemptsService,
             PlayerCorrectnessFeedbackEnabledService, PlayerPositionService,
             PlayerTranscriptService, QuestionPlayerEngineService,
@@ -407,7 +365,7 @@ angular.module('oppia').directive('conversationSkin', [
             ENABLE_NEW_STRUCTURE_VIEWER_UPDATES,
             ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE,
             EXPLORATION_SUMMARY_DATA_URL_TEMPLATE,
-            FEEDBACK_POPOVER_PATH, INTERACTION_SPECS,
+            INTERACTION_SPECS,
             REVIEW_TESTS_URL_TEMPLATE,
             STORY_PROGRESS_URL_TEMPLATE, STORY_VIEWER_URL_TEMPLATE,
             SUPPORTED_SITE_LANGUAGES, TWO_CARD_THRESHOLD_PX,
@@ -419,12 +377,6 @@ angular.module('oppia').directive('conversationSkin', [
           var TIME_PADDING_MSEC = 250;
           var TIME_SCROLL_MSEC = 600;
           var MIN_CARD_LOADING_DELAY_MSEC = 950;
-          var questionPlayerConfig = null;
-
-          $scope.getFeedbackPopoverUrl = function() {
-            return UrlInterpolationService.getDirectiveTemplateUrl(
-              FEEDBACK_POPOVER_PATH);
-          };
 
           var alwaysAskLearnerForAnswerDetails = function() {
             return ExplorationEngineService.getAlwaysAskLearnerForAnswerDetails(
@@ -632,6 +584,7 @@ angular.module('oppia').directive('conversationSkin', [
           var _navigateToDisplayedCard = function() {
             var index = PlayerPositionService.getDisplayedCardIndex();
             $scope.displayedCard = PlayerTranscriptService.getCard(index);
+            $rootScope.$applyAsync();
 
             PlayerPositionService.onActiveCardChanged.emit();
 
@@ -889,9 +842,9 @@ angular.module('oppia').directive('conversationSkin', [
             hasInteractedAtLeastOnce = false;
             $scope.recommendedExplorationSummaries = [];
             PlayerPositionService.init(_navigateToDisplayedCard);
-            if (questionPlayerConfig) {
+            if ($scope.questionPlayerConfig) {
               ExplorationPlayerStateService.initializeQuestionPlayer(
-                questionPlayerConfig, _initializeDirectiveComponents,
+                $scope.questionPlayerConfig, _initializeDirectiveComponents,
                 showQuestionAreNotAvailable);
             } else {
               ExplorationPlayerStateService.initializePlayer(
@@ -1255,10 +1208,6 @@ angular.module('oppia').directive('conversationSkin', [
             });
           };
 
-          $scope.submitUserRating = function(ratingValue) {
-            LearnerViewRatingService.submitUserRating(ratingValue);
-          };
-
           // Returns whether the screen is wide enough to fit two
           // cards (e.g., the tutor and supplemental cards) side-by-side.
           $scope.canWindowShowTwoCards = function() {
@@ -1300,20 +1249,12 @@ angular.module('oppia').directive('conversationSkin', [
             CurrentInteractionService.submitAnswer();
           };
 
-          $scope.signIn = function() {
-            UserService.getLoginUrlAsync().then(
-              loginUrl => {
-                loginUrl ? $window.location = loginUrl : (
-                  $window.location.reload());
-              });
-          };
-
           $scope.isLanguageRTL = function() {
             return I18nLanguageCodeService.isCurrentLanguageRTL();
           };
 
           ctrl.$onInit = function() {
-            questionPlayerConfig = $scope.getQuestionPlayerConfig();
+            $scope.questionPlayerConfig = $scope.getQuestionPlayerConfig();
             ctrl.directiveSubscriptions.add(
               // TODO(#11996): Remove when migrating to Angular2+.
               CurrentInteractionService.onAnswerChanged$.subscribe(() => {
@@ -1420,22 +1361,9 @@ angular.module('oppia').directive('conversationSkin', [
               )
             );
             ctrl.directiveSubscriptions.add(
-              LearnerViewRatingService.onRatingUpdated.subscribe(() => {
-                $scope.userRating = LearnerViewRatingService.getUserRating();
-                AlertsService.addSuccessMessage('Rating saved!', 1000);
-                $rootScope.$applyAsync();
-              })
-            );
-            ctrl.directiveSubscriptions.add(
               ContentTranslationManagerService
                 .onStateCardContentUpdate.subscribe(
                   () => $rootScope.$applyAsync())
-            );
-            ctrl.directiveSubscriptions.add(
-              PlayerPositionService.displayedCardIndexChangedEventEmitter
-                .subscribe(
-                  () => $rootScope.$applyAsync()
-                )
             );
             $window.addEventListener('beforeunload', function(e) {
               if ($scope.redirectToRefresherExplorationConfirmed) {
@@ -1464,11 +1392,6 @@ angular.module('oppia').directive('conversationSkin', [
             CurrentInteractionService.setOnSubmitFn($scope.submitAnswer);
             $scope.startCardChangeAnimation = false;
             $scope.initializePage();
-            if (!questionPlayerConfig) {
-              LearnerViewRatingService.init(function(userRating) {
-                $scope.userRating = userRating;
-              });
-            }
 
             $scope.collectionSummary = null;
 
