@@ -18,16 +18,22 @@
 
 import { TestBed } from '@angular/core/testing';
 import { ContextService } from 'services/context.service';
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { ExplorationPropertyService } from './exploration-property.service';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ExplorationLanguageCodeService } from './exploration-language-code.service';
 
 describe('Exploration Language Code Service', () => {
   let elcs: ExplorationLanguageCodeService = null;
   let cs: ContextService = null;
 
-  importAllAngularServices();
-
   beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [
+        ExplorationPropertyService
+      ]
+    });
+
     elcs = TestBed.inject(ExplorationLanguageCodeService);
     cs = TestBed.inject(ContextService);
   });
