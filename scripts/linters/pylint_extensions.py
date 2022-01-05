@@ -1539,7 +1539,7 @@ class RestrictedImportChecker(checkers.BaseChecker):
                         (from_part.strip(), import_part.strip()))
                 else:
                     processed_forbidden_imports.append(
-                        (stripped_forbidden_import[7:], None))
+                        (stripped_forbidden_import[7:].strip(), None))
             self._module_to_forbidden_imports.append((
                 module_regex.strip(),
                 processed_forbidden_imports
@@ -1566,29 +1566,29 @@ class RestrictedImportChecker(checkers.BaseChecker):
                     yield module_name, forbidden_import
 
     def _add_invalid_import_message(
-        self, node, module_name, forbidden_import_regex
+        self, node, module_name, forbidden_import_name
     ):
         """Adds pylint message about the invalid import.
 
         Args:
             node: astroid.node_classes.Import. Node for a import statement
                 in the AST.
-            module_regex: str. The module that was checked.
-            forbidden_import_regex: str. The import that was invalid.
+            module_name: str. The module that was checked.
+            forbidden_import_name: (str, str|None). The import that was invalid.
         """
-        if forbidden_import_regex[1] is None:
+        if forbidden_import_name[1] is None:
             self.add_message(
                 'invalid-import',
                 node=node,
-                args=(forbidden_import_regex[0], module_name)
+                args=(forbidden_import_name[0], module_name)
             )
         else:
             self.add_message(
                 'invalid-import-from',
                 node=node,
                 args=(
-                    forbidden_import_regex[1],
-                    forbidden_import_regex[0],
+                    forbidden_import_name[1],
+                    forbidden_import_name[0],
                     module_name
                 )
             )
@@ -1603,10 +1603,14 @@ class RestrictedImportChecker(checkers.BaseChecker):
         names = [name for name, _ in node.names]
         forbidden_imports = self._iterate_forbidden_imports(node)
         for module_name, forbidden_import_names in forbidden_imports:
-            if any(
-                    fnmatch.fnmatch(name, forbidden_import_names[0])
-                    for name in names
-            ):
+            if forbidden_import_names[1] is not None:
+                import_to_check = '%s.%s' % (
+                    forbidden_import_names[0],
+                    forbidden_import_names[1]
+                )
+            else:
+                import_to_check = forbidden_import_names[0]
+            if any(fnmatch.fnmatch(name, import_to_check) for name in names):
                 self._add_invalid_import_message(
                     node, module_name, forbidden_import_names)
 
