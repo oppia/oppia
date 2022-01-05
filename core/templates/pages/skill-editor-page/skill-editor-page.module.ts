@@ -31,6 +31,7 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 import { DeleteMisconceptionModalComponent } from './modal-templates/delete-misconception-modal.component';
 import { SkillDescriptionEditorComponent } from './editor-tab/skill-description-editor/skill-description-editor.component';
+import { SkillEditorSaveModalComponent } from './modal-templates/skill-editor-save-modal.component';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
 import { SkillPrerequisiteSkillsEditorComponent } from './editor-tab/skill-prerequisite-skills-editor/skill-prerequisite-skills-editor.component';
 import { WorkedExampleEditorComponent } from './editor-tab/skill-concept-card-editor/worked-example-editor.component';
@@ -53,6 +54,7 @@ import { AddMisconceptionModalComponent } from './modal-templates/add-misconcept
     DeleteMisconceptionModalComponent,
     SkillEditorNavbarBreadcrumbComponent,
     SkillDescriptionEditorComponent,
+    SkillEditorSaveModalComponent,
     SkillPrerequisiteSkillsEditorComponent,
     WorkedExampleEditorComponent,
     MisconceptionEditorComponent,
@@ -65,6 +67,7 @@ import { AddMisconceptionModalComponent } from './modal-templates/add-misconcept
     DeleteMisconceptionModalComponent,
     SkillEditorNavbarBreadcrumbComponent,
     SkillDescriptionEditorComponent,
+    SkillEditorSaveModalComponent,
     SkillPrerequisiteSkillsEditorComponent,
     WorkedExampleEditorComponent,
     MisconceptionEditorComponent,
