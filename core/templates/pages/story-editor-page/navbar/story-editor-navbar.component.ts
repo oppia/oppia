@@ -26,16 +26,15 @@ import { AlertsService } from 'services/alerts.service';
 import { StoryEditorStateService } from '../services/story-editor-state.service';
 import { StoryEditorSaveModalComponent } from '../modal-templates/story-editor-save-modal.component';
 import { StoryEditorUnpublishModalComponent } from '../modal-templates/story-editor-unpublish-modal.component';
-import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { StoryEditorNavigationService } from '../services/story-editor-navigation.service';
 
 @Component({
   selector: 'oppia-story-editor-navbar',
-  templateUrl: './story-editor-navbar.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  templateUrl: './story-editor-navbar.component.html'
 })
-export class StoryEditorNavbarComponent implements OnInit {
+export class StoryEditorNavbarComponent implements OnInit, AfterViewInit {
   @Input() commitMessage;
   validationIssues: string[];
   prepublishValidationIssues: string | string[];
@@ -46,6 +45,9 @@ export class StoryEditorNavbarComponent implements OnInit {
   showNavigationOptions: boolean;
   showStoryEditOptions: boolean;
   activeTab: string;
+  totalWarningCount: number;
+  changeListLength: number;
+  warningCount: number;
   constructor(
     private storyEditorStateService: StoryEditorStateService,
     private undoRedoService: UndoRedoService,
@@ -53,13 +55,21 @@ export class StoryEditorNavbarComponent implements OnInit {
     private editableStoryBackendApiService: EditableStoryBackendApiService,
     private ngbModal: NgbModal,
     private alertsService: AlertsService,
-    private storyEditorNavigationService: StoryEditorNavigationService
+    private storyEditorNavigationService: StoryEditorNavigationService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   EDITOR = 'Editor';
   PREVIEW = 'Preview';
   directiveSubscriptions = new Subscription();
   explorationValidationIssues = [];
+
+  ngAfterViewInit() {
+    this.changeListLength = this.getChangeListLength();
+    this.totalWarningCount = this.getTotalWarningsCount();
+    this.warningCount = this.getWarningsCount();
+    this.cdr.detectChanges();
+  }
 
   isStoryPublished(): boolean {
     return this.storyEditorStateService.isStoryPublished();
@@ -87,12 +97,12 @@ export class StoryEditorNavbarComponent implements OnInit {
   isStorySaveable(): boolean {
     if (this.storyEditorStateService.isStoryPublished()) {
       return (
-        this.getChangeListLength() > 0 &&
-        this.getTotalWarningsCount() === 0);
+        this.changeListLength > 0 &&
+        this.totalWarningCount === 0);
     }
     return (
-      this.getChangeListLength() > 0 &&
-      this.getWarningsCount() === 0);
+      this.changeListLength > 0 &&
+      this.warningCount === 0);
   }
 
   discardChanges(): void {
