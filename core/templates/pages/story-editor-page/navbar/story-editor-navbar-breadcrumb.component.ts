@@ -24,7 +24,7 @@ import { Story } from 'domain/story/StoryObjectFactory';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { Subscription } from 'rxjs';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { StorySavePendingChangesModalComponent } from '../modal-templates/story-save-pending-changes-modal.component';
+import { SavePendingChangesModalComponent } from 'components/save-pending-changes/save-pending-changes-modal.component';
 import { StoryEditorStateService } from '../services/story-editor-state.service';
 
  @Component({
@@ -47,10 +47,15 @@ export class StoryEditorNavbarBreadcrumbComponent {
 
   returnToTopicEditorPage(): void {
     if (this.undoRedoService.getChangeCount() > 0) {
-      this.ngbModal.open(
-        StorySavePendingChangesModalComponent,
-        { backdrop: true },
-      ).result.then(() => {}, () => {
+      const modalRef = this.ngbModal.open(
+        SavePendingChangesModalComponent,
+        {backdrop: true}
+      );
+
+      modalRef.componentInstance.body = (
+        'Please save all pending changes before returning to the topic.');
+
+      modalRef.result.then(() => {}, () => {
         // Note to developers:
         // This callback is triggered when the Cancel button is clicked.
         // No further action is needed.
