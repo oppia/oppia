@@ -13,21 +13,25 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the Oppia splash page.
+ * @fileoverview Component for preview set parameters modal.
  */
-import { Component } from '@angular/core';
+
+import { Component, Input } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
-@Component({
-  selector: 'oppia-story-save-pending-changes-modal',
-  templateUrl: './story-save-pending-changes-modal.component.html'
-})
-export class StorySavePendingChangesModalComponent {
-  constructor(
-      private activeModal: NgbActiveModal
-  ) {}
+import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
-  cancel(): void {
-    this.activeModal.dismiss();
+@Component({
+  selector: 'oppia-preview-set-parameters-modal',
+  templateUrl: './preview-set-parameters-modal.component.html'
+})
+
+export class PreviewSetParametersModalComponent extends ConfirmOrCancelModal {
+  @Input() manualParamChanges: string[];
+
+  constructor(
+    private ngbActiveModal: NgbActiveModal,
+  ) {
+    super(ngbActiveModal);
   }
 }

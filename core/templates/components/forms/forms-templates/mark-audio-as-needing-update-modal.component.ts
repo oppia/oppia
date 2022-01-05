@@ -13,22 +13,21 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for topic save pending changes modal.
+ * @fileoverview Modal for marking audio as needing update.
  */
 
 import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
-  selector: 'oppia-topic-save-pending-changes-modal',
-  templateUrl: './topic-save-pending-changes-modal.component.html'
+  selector: 'oppia-mark-audio-as-needing-update-modal',
+  templateUrl: './mark-audio-as-needing-update-modal.component.html'
 })
-export class TopicSavePendingChangesComponent
+export class MarkAudioAsNeedingUpdateModalComponent
   extends ConfirmOrCancelModal {
   constructor(
-    private ngbActiveModal: NgbActiveModal
+    private ngbActiveModal: NgbActiveModal,
   ) {
     super(ngbActiveModal);
   }

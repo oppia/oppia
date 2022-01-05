@@ -29,6 +29,8 @@ import { TranslateModule } from '@ngx-translate/core';
 import { CustomFormsComponentsModule } from './custom-forms-directives/custom-form-components.module';
 import { SchemaBasedEditorDirective } from './schema-based-editors/schema-based-editor.directive';
 import { AudioSliderComponent } from './slider/audio-slider.component';
+import { MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent } from 'components/forms/forms-templates/mark-all-audio-and-translations-as-needing-update-modal.component';
+import { MarkAudioAsNeedingUpdateModalComponent } from 'components/forms/forms-templates/mark-audio-as-needing-update-modal.component';
 
 @NgModule({
   imports: [
@@ -45,10 +47,14 @@ import { AudioSliderComponent } from './slider/audio-slider.component';
   ],
   declarations: [
     AudioSliderComponent,
-    SchemaBasedEditorDirective
+    MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent,
+    MarkAudioAsNeedingUpdateModalComponent,
+    SchemaBasedEditorDirective,
   ],
   entryComponents: [
-    AudioSliderComponent
+    AudioSliderComponent,
+    MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent,
+    MarkAudioAsNeedingUpdateModalComponent
   ],
   exports: [
     AudioSliderComponent,
