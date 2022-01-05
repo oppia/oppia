@@ -20,7 +20,13 @@ import { EventEmitter } from '@angular/core';
 import { fakeAsync, tick } from '@angular/core/testing';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
+class MockNgbModalRef {
+  componentInstance: {
+    body: 'xyz';
+  };
+}
 describe('Story editor Directive having two story nodes', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('NgbModal', {
@@ -34,6 +40,7 @@ describe('Story editor Directive having two story nodes', function() {
 
   importAllAngularServices();
   var $uibModal = null;
+  let ngbModal: NgbModal = null;
   var $scope = null;
   var ctrl = null;
   var $q = null;
@@ -50,9 +57,20 @@ describe('Story editor Directive having two story nodes', function() {
   var WindowRef = null;
   let fetchSpy = null;
 
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
+
   beforeEach(angular.mock.inject(function($injector) {
     ngbModal = $injector.get('NgbModal');
     $uibModal = $injector.get('$uibModal');
+    ngbModal = $injector.get('NgbModal');
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     WindowDimensionsService = $injector.get('WindowDimensionsService');
@@ -355,10 +373,29 @@ describe('Story editor Directive having two story nodes', function() {
 
   it('should show modal if there are unsaved changes on leaving', function() {
     spyOn(UndoRedoService, 'getChangeCount').and.returnValue(10);
-    var modalSpy = spyOn($uibModal, 'open').and.callThrough();
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return ({
+        componentInstance: MockNgbModalRef,
+        result: Promise.resolve()
+      }) as NgbModalRef;
+    });
     $scope.returnToTopicEditorPage();
     expect(modalSpy).toHaveBeenCalled();
   });
+
+  it('should show modal if there are unsaved changes and click reject',
+    function() {
+      spyOn(UndoRedoService, 'getChangeCount').and.returnValue(10);
+      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return ({
+          componentInstance: MockNgbModalRef,
+          result: Promise.reject()
+        }) as NgbModalRef;
+      });
+
+      $scope.returnToTopicEditorPage();
+      expect(modalSpy).toHaveBeenCalled();
+    });
 
   it('should call Windowref to open a tab', function() {
     spyOn(UndoRedoService, 'getChangeCount').and.returnValue(0);
@@ -431,11 +468,22 @@ describe('Story editor Directive having one story node', function() {
   var StoryEditorStateService = null;
   var StoryObjectFactory = null;
 
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
+
   beforeEach(angular.mock.inject(function($injector) {
     ngbModal = $injector.get('NgbModal');
     $uibModal = $injector.get('$uibModal');
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
+    $injector.get('NgbModal');
     WindowDimensionsService = $injector.get('WindowDimensionsService');
     StoryObjectFactory = $injector.get('StoryObjectFactory');
     StoryEditorStateService = $injector.get('StoryEditorStateService');

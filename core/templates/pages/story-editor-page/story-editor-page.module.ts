@@ -29,7 +29,6 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 import { StoryEditorNavbarComponent } from './navbar/story-editor-navbar.component';
 import { StoryEditorNavbarBreadcrumbComponent } from './navbar/story-editor-navbar-breadcrumb.component';
-import { StorySavePendingChangesModalComponent } from './modal-templates/story-save-pending-changes-modal.component';
 import { StoryEditorSaveModalComponent } from './modal-templates/story-editor-save-modal.component';
 import { StoryEditorUnpublishModalComponent } from './modal-templates/story-editor-unpublish-modal.component';
 import { StoryPreviewTabComponent } from './story-preview-tab/story-preview-tab.component';
@@ -47,7 +46,6 @@ import { CreateNewChapterModalComponent } from './modal-templates/new-chapter-ti
   ],
   declarations: [
     StoryEditorNavbarBreadcrumbComponent,
-    StorySavePendingChangesModalComponent,
     StoryEditorSaveModalComponent,
     StoryEditorUnpublishModalComponent,
     StoryEditorNavbarComponent,
@@ -56,7 +54,6 @@ import { CreateNewChapterModalComponent } from './modal-templates/new-chapter-ti
   ],
   entryComponents: [
     StoryEditorNavbarBreadcrumbComponent,
-    StorySavePendingChangesModalComponent,
     StoryEditorSaveModalComponent,
     StoryEditorUnpublishModalComponent,
     StoryEditorNavbarComponent,

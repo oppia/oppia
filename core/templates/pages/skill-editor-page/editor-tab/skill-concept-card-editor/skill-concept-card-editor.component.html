@@ -76,10 +76,10 @@
               </a>
               <div ng-if="activeWorkedExampleIndex === $index">
                 <div class="oppia-editor-card-section">
-                  <worked-example-editor worked-example="workedExample"
-                                         index="$index"
-                                         is-editable="isEditable">
-                  </worked-example-editor>
+                  <oppia-worked-example-editor [worked-example]="workedExample"
+                                               [index]="$index"
+                                               [is-editable]="isEditable">
+                  </oppia-worked-example-editor>
                 </div>
               </div>
             </li>

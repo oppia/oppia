@@ -279,6 +279,19 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
           }
         })
     );
+
+    let langCode = this.i18nLanguageCodeService.getCurrentI18nLanguageCode();
+
+    if (this.currentLanguageCode !== langCode) {
+      this.currentLanguageCode = langCode;
+      this.supportedSiteLanguages.forEach(element => {
+        if (element.id === this.currentLanguageCode) {
+          this.currentLanguageText = element.text;
+        }
+      });
+      this.changeDetectorRef.detectChanges();
+    }
+
     // The function needs to be run after i18n. A timeout of 0 appears
     // to run after i18n in Chrome, but not other browsers. The
     // will check if i18n is complete and set a new timeout if it is
