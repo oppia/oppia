@@ -36,7 +36,7 @@ class ParamNames(enum.Enum):
     FEATURE_B = 'feature_b'
 
 
-SERVER_MODES = platform_parameter_domain.SERVER_MODES # pylint: disable=invalid-name
+SERVER_MODES = platform_parameter_domain.ServerModes # pylint: disable=invalid-name
 FEATURE_STAGES = platform_parameter_domain.FEATURE_STAGES # pylint: disable=invalid-name
 
 
