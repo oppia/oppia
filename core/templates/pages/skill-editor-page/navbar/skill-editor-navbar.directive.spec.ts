@@ -275,9 +275,11 @@ describe('Skill Editor Navbar Directive', function() {
 
   it('should not save changes if save changes modal is opened and cancel ' +
     'button is clicked', fakeAsync(function() {
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.reject()
-    });
+    spyOn(ngbModal, 'open').and.returnValue(
+      {
+        result: $q.reject()
+      } as NgbModalRef
+    );
     let saveSkillSpy = spyOn(skillEditorStateService, 'saveSkill')
       .and.returnValue(null);
 
