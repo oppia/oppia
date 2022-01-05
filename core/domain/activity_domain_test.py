@@ -76,6 +76,16 @@ class ActivityReferenceDomainUnitTests(test_utils.GenericTestBase):
             }
         )
 
+    def test_from_dict(self) -> None:
+        sample_dict = {
+            'type': 'exploration',
+            'id': '1234'
+        }
+        sample_activity_object = activity_domain.ActivityReference.from_dict(sample_dict) # pylint: disable=line-too-long
+        self.assertEqual(
+            sample_dict,
+            sample_activity_object.to_dict()
+        )
 
 class ActivityReferencesDomainUnitTests(test_utils.GenericTestBase):
     """Tests for ActivityReferences domain class."""
