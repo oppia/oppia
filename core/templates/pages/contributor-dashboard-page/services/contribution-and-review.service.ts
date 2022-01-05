@@ -32,13 +32,13 @@ export interface OpportunityDict {
 
 export interface FetchSuggestionsResponse {
   'target_id_to_opportunity_dict': {
-    [propName: string]: OpportunityDict;
+    [targetId: string]: OpportunityDict;
   };
   suggestions: SuggestionBackendDict[];
 }
 
-interface FetchSuggestionsReturn {
-  [propName: string]: {
+interface FetchSuggestions {
+  [targetId: string]: {
     suggestion: SuggestionBackendDict;
     details: OpportunityDict;
   };
@@ -54,13 +54,13 @@ export class ContributionAndReviewService {
   ) {}
 
   private async _fetchSuggestionsAsync(
-      url: string, targetType: string, suggestionType: string
-  ): Promise<FetchSuggestionsReturn> {
+      fetchType: string
+  ): Promise<FetchSuggestions> {
     return (
       this.contributionAndReviewBackendApiService.fetchSuggestionsAsync(
-        url, targetType, suggestionType
+        fetchType
       ).then((data) => {
-        let suggestionIdToSuggestions: FetchSuggestionsReturn = {};
+        let suggestionIdToSuggestions: FetchSuggestions = {};
         let targetIdToDetails = data.target_id_to_opportunity_dict;
         data.suggestions.forEach((suggestion) => {
           suggestionIdToSuggestions[suggestion.suggestion_id] = {
@@ -73,33 +73,20 @@ export class ContributionAndReviewService {
     );
   }
 
-  async getUserCreatedQuestionSuggestionsAsync():
-  Promise<FetchSuggestionsReturn> {
-    return this._fetchSuggestionsAsync(
-      '_SUBMITTED_SUGGESTION_LIST_HANDLER_URL', 'skill', 'add_question'
-    );
+  async getUserCreatedQuestionSuggestionsAsync(): Promise<FetchSuggestions> {
+    return this._fetchSuggestionsAsync('SUBMITTED_QUESTION_SUGGESTIONS');
   }
 
-  async getReviewableQuestionSuggestionsAsync():
-  Promise<FetchSuggestionsReturn> {
-    return this._fetchSuggestionsAsync(
-      '_REVIEWABLE_SUGGESTIONS_HANDLER_URL', 'skill', 'add_question'
-    );
+  async getReviewableQuestionSuggestionsAsync(): Promise<FetchSuggestions> {
+    return this._fetchSuggestionsAsync('REVIEWABLE_QUESTION_SUGGESTIONS');
   }
 
-  async getUserCreatedTranslationSuggestionsAsync():
-  Promise<FetchSuggestionsReturn> {
-    return this._fetchSuggestionsAsync(
-      '_SUBMITTED_SUGGESTION_LIST_HANDLER_URL',
-      'exploration', 'translate_content'
-    );
+  async getUserCreatedTranslationSuggestionsAsync(): Promise<FetchSuggestions> {
+    return this._fetchSuggestionsAsync('SUBMITTED_TRANSLATION_SUGGESTIONS');
   }
 
-  async getReviewableTranslationSuggestionsAsync():
-    Promise<FetchSuggestionsReturn> {
-    return this._fetchSuggestionsAsync(
-      '_REVIEWABLE_SUGGESTIONS_HANDLER_URL', 'exploration', 'translate_content'
-    );
+  async getReviewableTranslationSuggestionsAsync(): Promise<FetchSuggestions> {
+    return this._fetchSuggestionsAsync('REVIEWABLE_TRANSLATION_SUGGESTIONS');
   }
 
   resolveSuggestionToExploration(

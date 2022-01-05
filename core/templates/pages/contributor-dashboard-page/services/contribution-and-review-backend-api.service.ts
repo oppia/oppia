@@ -54,21 +54,58 @@ export class ContributionAndReviewBackendApiService {
   private _UPDATE_QUESTION_HANDLER_URL = (
     '/updatequestionsuggestionhandler/<suggestion_id>');
 
+  private SUBMITTED_QUESTION_SUGGESTIONS = (
+    'SUBMITTED_QUESTION_SUGGESTIONS');
+  private REVIEWABLE_QUESTION_SUGGESTIONS = (
+    'REVIEWABLE_QUESTION_SUGGESTIONS');
+  private SUBMITTED_TRANSLATION_SUGGESTIONS = (
+    'SUBMITTED_TRANSLATION_SUGGESTIONS');
+  private REVIEWABLE_TRANSLATION_SUGGESTIONS = (
+    'REVIEWABLE_TRANSLATION_SUGGESTIONS');
+
   constructor(
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
   async fetchSuggestionsAsync(
-      url: string, targetType: string, suggestionType: string
+      fetchType: string,
   ): Promise<FetchSuggestionsResponse> {
-    let interpolatedUrl = this.urlInterpolationService.interpolateUrl(
-      this[url], {
+    if (fetchType === this.SUBMITTED_QUESTION_SUGGESTIONS) {
+      return this.fetchSubmittedSuggestionsAsync('skill', 'add_question');
+    } else if (fetchType === this.SUBMITTED_TRANSLATION_SUGGESTIONS) {
+      return this.fetchSubmittedSuggestionsAsync(
+        'exploration', 'translate_content');
+    } else if (fetchType === this.REVIEWABLE_QUESTION_SUGGESTIONS) {
+      return this.fetchReviewableSuggestionsAsync('skill', 'add_question');
+    } else if (fetchType === this.REVIEWABLE_TRANSLATION_SUGGESTIONS) {
+      return this.fetchReviewableSuggestionsAsync(
+        'exploration', 'translate_content');
+    }
+  }
+
+  async fetchSubmittedSuggestionsAsync(
+      targetType: string, suggestionType: string
+  ): Promise<FetchSuggestionsResponse> {
+    let url = this.urlInterpolationService.interpolateUrl(
+      this._SUBMITTED_SUGGESTION_LIST_HANDLER_URL, {
         target_type: targetType,
         suggestion_type: suggestionType
       }
     );
-    return this.http.get<FetchSuggestionsResponse>(interpolatedUrl).toPromise();
+    return this.http.get<FetchSuggestionsResponse>(url).toPromise();
+  }
+
+  async fetchReviewableSuggestionsAsync(
+      targetType: string, suggestionType: string
+  ): Promise<FetchSuggestionsResponse> {
+    let url = this.urlInterpolationService.interpolateUrl(
+      this._REVIEWABLE_SUGGESTIONS_HANDLER_URL, {
+        target_type: targetType,
+        suggestion_type: suggestionType
+      }
+    );
+    return this.http.get<FetchSuggestionsResponse>(url).toPromise();
   }
 
   async resolveToExplorationAsync(

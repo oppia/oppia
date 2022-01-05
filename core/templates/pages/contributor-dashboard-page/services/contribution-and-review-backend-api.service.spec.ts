@@ -26,6 +26,23 @@ describe('Contribution and review backend API service', () => {
   let carbas: ContributionAndReviewBackendApiService;
   let http: HttpTestingController;
 
+  let suggestion1 = {
+    suggestion_id: 'suggestion_id_1',
+    target_id: 'skill_id_1',
+  };
+  let opportunityDict1 = {
+    skill_id: 'skill_id_1',
+    skill_description: 'skill_description_1',
+  };
+  let testSuggestionsBackendObject = {
+    suggestions: [
+      suggestion1
+    ],
+    target_id_to_opportunity_dict: {
+      skill_id_1: opportunityDict1,
+    },
+  };
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
@@ -38,42 +55,99 @@ describe('Contribution and review backend API service', () => {
     http.verify();
   });
 
-  it('should correctly fetch suggestions from the backend', fakeAsync(() => {
-    const successHandler = jasmine.createSpy('success');
-    const failureHandler = jasmine.createSpy('failure');
+  describe('fetching suggestions from the backend', () => {
+    let successHandler: jasmine.Spy<jasmine.Func>;
+    let failureHandler: jasmine.Spy<jasmine.Func>;
 
-    const url = '/getsubmittedsuggestions/skill/add_question';
+    beforeEach(() => {
+      successHandler = jasmine.createSpy('success');
+      failureHandler = jasmine.createSpy('failure');
+    });
 
-    carbas.fetchSuggestionsAsync(
-      '_SUBMITTED_SUGGESTION_LIST_HANDLER_URL', 'skill', 'add_question'
-    ).then(successHandler, failureHandler);
+    it('should fetch submitted question suggestions', fakeAsync(() => {
+      spyOn(carbas, 'fetchSubmittedSuggestionsAsync').and.callThrough();
+      const url = '/getsubmittedsuggestions/skill/add_question';
 
-    const req = http.expectOne(url);
-    expect(req.request.method).toEqual('GET');
+      carbas.fetchSuggestionsAsync(
+        'SUBMITTED_QUESTION_SUGGESTIONS'
+      ).then(successHandler, failureHandler);
 
-    const suggestion1 = {
-      suggestion_id: 'suggestion_id_1',
-      target_id: 'skill_id_1',
-    };
-    const opportunityDict1 = {
-      skill_id: 'skill_id_1',
-      skill_description: 'skill_description_1',
-    };
-    const testSuggestionsBackendObject = {
-      suggestions: [
-        suggestion1
-      ],
-      target_id_to_opportunity_dict: {
-        skill_id_1: opportunityDict1,
-      },
-    };
-    req.flush(testSuggestionsBackendObject);
+      const req = http.expectOne(url);
+      expect(req.request.method).toEqual('GET');
 
-    flushMicrotasks();
+      req.flush(testSuggestionsBackendObject);
 
-    expect(successHandler).toHaveBeenCalled();
-    expect(failureHandler).not.toHaveBeenCalled();
-  }));
+      flushMicrotasks();
+
+      expect(carbas.fetchSubmittedSuggestionsAsync)
+        .toHaveBeenCalledWith('skill', 'add_question');
+      expect(successHandler).toHaveBeenCalled();
+      expect(failureHandler).not.toHaveBeenCalled();
+    }));
+
+    it('should fetch submitted translation suggestions', fakeAsync(() => {
+      spyOn(carbas, 'fetchSubmittedSuggestionsAsync').and.callThrough();
+      const url = '/getsubmittedsuggestions/exploration/translate_content';
+
+      carbas.fetchSuggestionsAsync(
+        'SUBMITTED_TRANSLATION_SUGGESTIONS'
+      ).then(successHandler, failureHandler);
+
+      const req = http.expectOne(url);
+      expect(req.request.method).toEqual('GET');
+
+      req.flush(testSuggestionsBackendObject);
+
+      flushMicrotasks();
+
+      expect(carbas.fetchSubmittedSuggestionsAsync)
+        .toHaveBeenCalledWith('exploration', 'translate_content');
+      expect(successHandler).toHaveBeenCalled();
+      expect(failureHandler).not.toHaveBeenCalled();
+    }));
+
+    it('should fetch reviewable question suggestions', fakeAsync(() => {
+      spyOn(carbas, 'fetchReviewableSuggestionsAsync').and.callThrough();
+      const url = '/getreviewablesuggestions/skill/add_question';
+
+      carbas.fetchSuggestionsAsync(
+        'REVIEWABLE_QUESTION_SUGGESTIONS'
+      ).then(successHandler, failureHandler);
+
+      const req = http.expectOne(url);
+      expect(req.request.method).toEqual('GET');
+
+      req.flush(testSuggestionsBackendObject);
+
+      flushMicrotasks();
+
+      expect(carbas.fetchReviewableSuggestionsAsync)
+        .toHaveBeenCalledWith('skill', 'add_question');
+      expect(successHandler).toHaveBeenCalled();
+      expect(failureHandler).not.toHaveBeenCalled();
+    }));
+
+    it('should fetch reviewable translation suggestions', fakeAsync(() => {
+      spyOn(carbas, 'fetchReviewableSuggestionsAsync').and.callThrough();
+      const url = '/getreviewablesuggestions/exploration/translate_content';
+
+      carbas.fetchSuggestionsAsync(
+        'REVIEWABLE_TRANSLATION_SUGGESTIONS'
+      ).then(successHandler, failureHandler);
+
+      const req = http.expectOne(url);
+      expect(req.request.method).toEqual('GET');
+
+      req.flush(testSuggestionsBackendObject);
+
+      flushMicrotasks();
+
+      expect(carbas.fetchReviewableSuggestionsAsync)
+        .toHaveBeenCalledWith('exploration', 'translate_content');
+      expect(successHandler).toHaveBeenCalled();
+      expect(failureHandler).not.toHaveBeenCalled();
+    }));
+  });
 
   it('should correctly resolve suggestion to exploration', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');

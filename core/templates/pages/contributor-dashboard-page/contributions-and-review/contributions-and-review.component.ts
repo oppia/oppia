@@ -344,23 +344,17 @@ angular.module('oppia').component('contributionsAndReview', {
           return ContributionAndReviewService
             .getUserCreatedQuestionSuggestionsAsync()
             .then(_handleLoadContribution);
-        }
-
-        if (ctrl.activeSuggestionType === SUGGESTION_TYPE_QUESTION &&
+        } else if (ctrl.activeSuggestionType === SUGGESTION_TYPE_QUESTION &&
             ctrl.activeTabType === ctrl.TAB_TYPE_REVIEWS) {
           return ContributionAndReviewService
             .getReviewableQuestionSuggestionsAsync()
             .then(_handleLoadContribution);
-        }
-
-        if (ctrl.activeSuggestionType === SUGGESTION_TYPE_TRANSLATE &&
+        } else if (ctrl.activeSuggestionType === SUGGESTION_TYPE_TRANSLATE &&
             ctrl.activeTabType === ctrl.TAB_TYPE_CONTRIBUTIONS) {
           return ContributionAndReviewService
             .getUserCreatedTranslationSuggestionsAsync()
             .then(_handleLoadContribution);
-        }
-
-        if (ctrl.activeSuggestionType === SUGGESTION_TYPE_TRANSLATE &&
+        } else if (ctrl.activeSuggestionType === SUGGESTION_TYPE_TRANSLATE &&
             ctrl.activeTabType === ctrl.TAB_TYPE_REVIEWS) {
           return ContributionAndReviewService
             .getReviewableTranslationSuggestionsAsync()
