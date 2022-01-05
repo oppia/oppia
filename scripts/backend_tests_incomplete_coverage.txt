@@ -64,7 +64,6 @@ core.domain.story_services_test
 core.domain.taskqueue_services_test
 core.domain.html_validation_service_test
 core.domain.exp_fetchers_test
-core.domain.collection_domain_test
 core.domain.topic_fetchers_test
 core.domain.stats_domain_test
 core.domain.email_manager_test
