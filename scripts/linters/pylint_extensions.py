@@ -1566,7 +1566,7 @@ class RestrictedImportChecker(checkers.BaseChecker):
                     yield module_name, forbidden_import
 
     def _add_invalid_import_message(
-        self, node, module_name, forbidden_import_name
+        self, node, module_name, forbidden_import_names
     ):
         """Adds pylint message about the invalid import.
 
@@ -1574,21 +1574,22 @@ class RestrictedImportChecker(checkers.BaseChecker):
             node: astroid.node_classes.Import. Node for a import statement
                 in the AST.
             module_name: str. The module that was checked.
-            forbidden_import_name: (str, str|None). The import that was invalid.
+            forbidden_import_names: tuple(str, str|None). The import that
+                was invalid.
         """
-        if forbidden_import_name[1] is None:
+        if forbidden_import_names[1] is None:
             self.add_message(
                 'invalid-import',
                 node=node,
-                args=(forbidden_import_name[0], module_name)
+                args=(forbidden_import_names[0], module_name)
             )
         else:
             self.add_message(
                 'invalid-import-from',
                 node=node,
                 args=(
-                    forbidden_import_name[1],
-                    forbidden_import_name[0],
+                    forbidden_import_names[1],
+                    forbidden_import_names[0],
                     module_name
                 )
             )

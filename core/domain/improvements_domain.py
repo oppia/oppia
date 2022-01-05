@@ -22,14 +22,14 @@ import datetime
 
 from core import utils
 
+from typing import Optional
+from typing_extensions import TypedDict
+
 from core.domain import user_services  # pylint: disable=invalid-import-from # isort:skip
 from core.platform import models  # pylint: disable=invalid-import-from # isort:skip
 
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
-
-from typing import Optional
-from typing_extensions import TypedDict
 
 MYPY = False
 if MYPY: # pragma: no cover
