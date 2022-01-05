@@ -20,7 +20,6 @@ import { EventEmitter } from '@angular/core';
 import { fakeAsync, tick } from '@angular/core/testing';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 class MockNgbModalRef {
   componentInstance: {
@@ -46,7 +45,6 @@ describe('Story editor Directive having two story nodes', function() {
   var $q = null;
   var $rootScope = null;
   var directive = null;
-  let ngbModal: NgbModal = null;
   var story = null;
   var WindowDimensionsService = null;
   var UndoRedoService = null;
