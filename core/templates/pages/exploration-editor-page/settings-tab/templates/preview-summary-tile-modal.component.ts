@@ -38,15 +38,15 @@ export class PreviewSummaryTileModalComponent extends ConfirmOrCancelModal {
     super(ngbActiveModal);
   }
   getExplorationTitle(): string {
-    return this.explorationTitleService.displayed.toString();
+    return String(this.explorationTitleService.displayed);
   }
 
   getExplorationObjective(): string {
-    return this.explorationObjectiveService.displayed.toString();
+    return String(this.explorationObjectiveService.displayed);
   }
 
   getExplorationCategory(): string {
-    return this.explorationCategoryService.displayed.toString();
+    return String(this.explorationCategoryService.displayed);
   }
 
   getThumbnailIconUrl(): string {
