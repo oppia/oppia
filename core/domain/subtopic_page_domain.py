@@ -321,7 +321,7 @@ class SubtopicPage:
     def _convert_page_contents_v2_dict_to_v3_dict(
         cls,
         page_contents_dict: SubtopicPageContentsDict
-        ) -> SubtopicPageContentsDict:
+    ) -> SubtopicPageContentsDict:
         """Converts v2 SubtopicPage Contents schema to the v3 schema.
         v3 schema deprecates oppia-noninteractive-svgdiagram tag and converts
         existing occurences of it to oppia-noninteractive-image tag.
@@ -341,7 +341,7 @@ class SubtopicPage:
     def _convert_page_contents_v3_dict_to_v4_dict(
         cls,
         page_contents_dict: SubtopicPageContentsDict
-        ) -> SubtopicPageContentsDict:
+    ) -> SubtopicPageContentsDict:
         """Converts v3 SubtopicPage Contents schema to the v4 schema.
         v4 schema fixes HTML encoding issues.
 
@@ -394,7 +394,7 @@ class SubtopicPage:
     def update_page_contents_html(
         self,
         new_page_contents_html: state_domain.SubtitledHtml
-        ) -> None:
+    ) -> None:
         """The new value for the html data field.
 
         Args:
@@ -406,7 +406,7 @@ class SubtopicPage:
     def update_page_contents_audio(
         self,
         new_page_contents_audio: state_domain.RecordedVoiceovers
-        ) -> None:
+    ) -> None:
         """The new value for the recorded_voiceovers data field.
 
         Args:

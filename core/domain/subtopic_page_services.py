@@ -28,7 +28,9 @@ from core.platform import models
 datastore_services = models.Registry.import_datastore_services()
 
 
-def _migrate_page_contents_to_latest_schema(versioned_page_contents):
+def _migrate_page_contents_to_latest_schema(
+    versioned_page_contents: subtopic_page_domain.VersionedPageContentsDict
+    ):
     """Holds the responsibility of performing a step-by-step, sequential update
     of the page contents structure based on the schema version of the input
     page contents dictionary. If the current page_contents schema changes, a
