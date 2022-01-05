@@ -88,7 +88,7 @@ describe('PlaythroughService', () => {
       spyOn(playthroughBackendApiService, 'storePlaythroughAsync')
         .and.callFake(async(p: Playthrough, _: number) => callback(p));
     } else {
-        spyOn(
+      spyOn(
         playthroughBackendApiService, 'storePlaythroughAsync').and.stub();
     }
   };
