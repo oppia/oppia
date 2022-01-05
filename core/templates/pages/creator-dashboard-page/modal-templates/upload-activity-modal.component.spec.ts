@@ -26,6 +26,10 @@ class MockActiveModal {
   dismiss(): void {
     return;
   }
+
+  close(): void {
+    return;
+  }
 }
 
 class MockAlertsService {

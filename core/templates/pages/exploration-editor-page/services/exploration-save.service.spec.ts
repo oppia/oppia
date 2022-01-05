@@ -736,7 +736,7 @@ describe('Exploration save service ' +
     expect(focusSpy).toHaveBeenCalled();
   }));
 
-  it('should not open exploration save modal in case of ' +
+  fit('should not open exploration save modal in case of ' +
     'backend error', fakeAsync(function() {
     let startLoadingCb = jasmine.createSpy('startLoadingCb');
     let endLoadingCb = jasmine.createSpy('endLoadingCb');
@@ -762,8 +762,9 @@ describe('Exploration save service ' +
       .and.returnValue(Promise.resolve(null));
     let modalSpy = spyOn($uibModal, 'open').and.callThrough();
 
-    explorationSaveService.saveChangesAsync(
-      startLoadingCb, endLoadingCb);
+    expectAsync(
+      explorationSaveService.saveChangesAsync(startLoadingCb, endLoadingCb)
+    ).toBeRejected();
     flush();
     $rootScope.$apply();
 

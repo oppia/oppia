@@ -383,7 +383,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
           // If the modal is open, do not open another one.
           if (modalIsOpen) {
             $rootScope.$applyAsync();
-            return Promise.reject();
+            return;
           }
 
           var modalInstance = $uibModal.open({

@@ -869,7 +869,7 @@ class InteractionInstance:
         # InteractionCustomizationArg helper functions.
         # Then, convert back to original dict format afterwards, at the end.
         customization_args = (
-            InteractionInstance
+            InteractionCustomizationArg
             .convert_cust_args_dict_to_cust_args_based_on_specs(
                 interaction_dict['customization_args'],
                 ca_specs_dict)
