@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 from core import utils
+
 from core.domain import user_services  # pylint: disable=invalid-import-from # isort:skip
 from core.platform import models  # pylint: disable=invalid-import-from # isort:skip
 
