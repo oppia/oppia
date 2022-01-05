@@ -36,7 +36,7 @@ class ParamNames(enum.Enum):
     FEATURE_B = 'feature_b'
 
 
-SERVER_MODES = platform_parameter_domain.SERVER_MODES # pylint: disable=invalid-name
+SERVER_MODES = platform_parameter_domain.ServerModes # pylint: disable=invalid-name
 FEATURE_STAGES = platform_parameter_domain.FEATURE_STAGES # pylint: disable=invalid-name
 
 
@@ -59,10 +59,10 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
 
         self.dev_feature = registry.Registry.create_feature_flag(
             ParamNames.FEATURE_A, 'a feature in dev stage',
-            platform_parameter_domain.FEATURE_STAGES.dev)
+            platform_parameter_domain.FEATURE_STAGES.DEV)
         self.prod_feature = registry.Registry.create_feature_flag(
             ParamNames.FEATURE_B, 'a feature in prod stage',
-            platform_parameter_domain.FEATURE_STAGES.prod)
+            platform_parameter_domain.FEATURE_STAGES.PROD)
         registry.Registry.update_platform_parameter(
             self.dev_feature.name, self.user_id, 'edit rules',
             [
@@ -71,7 +71,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                         {
                             'type': 'server_mode',
                             'conditions': [
-                                ['=', SERVER_MODES.dev.value]
+                                ['=', SERVER_MODES.DEV.value]
                             ]
                         }
                     ],
@@ -88,9 +88,9 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                         {
                             'type': 'server_mode',
                             'conditions': [
-                                ['=', SERVER_MODES.dev.value],
-                                ['=', SERVER_MODES.test.value],
-                                ['=', SERVER_MODES.prod.value]
+                                ['=', SERVER_MODES.DEV.value],
+                                ['=', SERVER_MODES.TEST.value],
+                                ['=', SERVER_MODES.PROD.value]
                             ]
                         }
                     ],
@@ -123,7 +123,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
             )
             self.assertEqual(
                 context.server_mode,
-                platform_parameter_domain.FEATURE_STAGES.dev)
+                platform_parameter_domain.FEATURE_STAGES.DEV)
             self.assertEqual(context.platform_type, 'Android')
             self.assertEqual(context.browser_type, None)
             self.assertEqual(context.app_version, '1.0.0')
@@ -198,7 +198,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                         {
                             'type': 'server_mode',
                             'conditions': [
-                                ['=', SERVER_MODES.prod.value]
+                                ['=', SERVER_MODES.PROD.value]
                             ],
                         },
                         {
@@ -230,7 +230,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                         {
                             'type': 'server_mode',
                             'conditions': [
-                                ['=', FEATURE_STAGES.dev.value]
+                                ['=', FEATURE_STAGES.DEV.value]
                             ]
                         }
                     ],

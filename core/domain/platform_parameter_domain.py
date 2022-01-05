@@ -33,15 +33,15 @@ from core.domain import change_domain
 # to PascalCase and its values to UPPER_CASE. Because we want to be consistent
 # throughout the codebase according to the coding style guide.
 # https://github.com/oppia/oppia/wiki/Coding-style-guide
-class SERVER_MODES(enum.Enum): # pylint: disable=invalid-name
+class ServerModes(enum.Enum): # pylint: disable=invalid-name
     """Enum for server modes."""
 
-    dev = 'dev' # pylint: disable=invalid-name
-    test = 'test' # pylint: disable=invalid-name
-    prod = 'prod' # pylint: disable=invalid-name
+    DEV = 'dev' # pylint: disable=invalid-name
+    TEST = 'test' # pylint: disable=invalid-name
+    PROD = 'prod' # pylint: disable=invalid-name
 
 
-FEATURE_STAGES = SERVER_MODES # pylint: disable=invalid-name
+FEATURE_STAGES = ServerModes # pylint: disable=invalid-name
 
 
 # TODO(#14419): Change naming style of Enum class from SCREAMING_SNAKE_CASE
@@ -57,11 +57,11 @@ class DATA_TYPES(enum.Enum): # pylint: disable=invalid-name
 
 
 ALLOWED_SERVER_MODES = [
-    SERVER_MODES.dev.value, SERVER_MODES.test.value, SERVER_MODES.prod.value]
+    ServerModes.DEV.value, ServerModes.TEST.value, ServerModes.PROD.value]
 ALLOWED_FEATURE_STAGES = [
-    FEATURE_STAGES.dev.value,
-    FEATURE_STAGES.test.value,
-    FEATURE_STAGES.prod.value
+    FEATURE_STAGES.DEV.value,
+    FEATURE_STAGES.TEST.value,
+    FEATURE_STAGES.PROD.value
 ]
 ALLOWED_PLATFORM_TYPES = constants.PLATFORM_PARAMETER_ALLOWED_PLATFORM_TYPES
 ALLOWED_BROWSER_TYPES = constants.PLATFORM_PARAMETER_ALLOWED_BROWSER_TYPES
@@ -767,15 +767,15 @@ class PlatformParameter:
             for server_mode_filter in server_mode_filters:
                 server_modes = [
                     value for _, value in server_mode_filter.conditions]
-                if self._feature_stage == FEATURE_STAGES.dev.value:
+                if self._feature_stage == FEATURE_STAGES.DEV.value:
                     if (
-                            SERVER_MODES.test.value in server_modes or
-                            SERVER_MODES.prod.value in server_modes):
+                            ServerModes.TEST.value in server_modes or
+                            ServerModes.PROD.value in server_modes):
                         raise utils.ValidationError(
                             'Feature in dev stage cannot be enabled in test or'
                             ' production environments.')
-                elif self._feature_stage == FEATURE_STAGES.test.value:
-                    if SERVER_MODES.prod.value in server_modes:
+                elif self._feature_stage == FEATURE_STAGES.TEST.value:
+                    if ServerModes.PROD.value in server_modes:
                         raise utils.ValidationError(
                             'Feature in test stage cannot be enabled in '
                             'production environment.')

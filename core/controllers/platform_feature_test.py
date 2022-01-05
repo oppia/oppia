@@ -58,10 +58,10 @@ class PlatformFeaturesEvaluationHandlerTest(test_utils.GenericTestBase):
         registry.Registry.parameter_registry.clear()
         self.dev_feature = registry.Registry.create_platform_parameter(
             ParamNames.PARAMETER_A, 'parameter for test', DATA_TYPES.bool,
-            is_feature=True, feature_stage=param_domain.FEATURE_STAGES.dev)
+            is_feature=True, feature_stage=param_domain.FEATURE_STAGES.DEV)
         self.prod_feature = registry.Registry.create_platform_parameter(
             ParamNames.PARAMETER_B, 'parameter for test', DATA_TYPES.bool,
-            is_feature=True, feature_stage=param_domain.FEATURE_STAGES.prod)
+            is_feature=True, feature_stage=param_domain.FEATURE_STAGES.PROD)
         registry.Registry.update_platform_parameter(
             self.prod_feature.name, self.user_id, 'edit rules',
             [
@@ -70,7 +70,7 @@ class PlatformFeaturesEvaluationHandlerTest(test_utils.GenericTestBase):
                         {
                             'type': 'server_mode',
                             'conditions': [
-                                ['=', param_domain.SERVER_MODES.dev.value]
+                                ['=', param_domain.ServerModes.DEV.value]
                             ]
                         }
                     ],
@@ -225,11 +225,11 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
     def test_get_with_dummy_feature_enabled_in_dev_returns_ok(self):
         dev_mode_ctx = self.swap(constants, 'DEV_MODE', True)
         dummy_feature_dev_stage_context = self._mock_dummy_feature_stage(
-            param_domain.FEATURE_STAGES.dev)
+            param_domain.FEATURE_STAGES.DEV)
 
         with dev_mode_ctx, dummy_feature_dev_stage_context:
             self._set_dummy_feature_status_for_mode(
-                True, param_domain.SERVER_MODES.dev
+                True, param_domain.ServerModes.DEV
             )
 
             result = self.get_json(
@@ -240,11 +240,11 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
     def test_get_with_dummy_feature_disabled_in_dev_raises_404(self):
         dev_mode_ctx = self.swap(constants, 'DEV_MODE', True)
         dummy_feature_dev_stage_context = self._mock_dummy_feature_stage(
-            param_domain.FEATURE_STAGES.dev)
+            param_domain.FEATURE_STAGES.DEV)
 
         with dev_mode_ctx, dummy_feature_dev_stage_context:
             self._set_dummy_feature_status_for_mode(
-                False, param_domain.SERVER_MODES.dev
+                False, param_domain.ServerModes.DEV
             )
             self.get_json(
                 '/platform_feature_dummy_handler',
@@ -254,11 +254,11 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
     def test_get_with_dummy_feature_enabled_in_prod_returns_ok(self):
         dev_mode_ctx = self.swap(constants, 'DEV_MODE', False)
         dummy_feature_prod_stage_context = self._mock_dummy_feature_stage(
-            param_domain.FEATURE_STAGES.prod)
+            param_domain.FEATURE_STAGES.PROD)
 
         with dev_mode_ctx, dummy_feature_prod_stage_context:
             self._set_dummy_feature_status_for_mode(
-                True, param_domain.SERVER_MODES.prod
+                True, param_domain.ServerModes.PROD
             )
 
             result = self.get_json(
@@ -269,11 +269,11 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
     def test_get_with_dummy_feature_disabled_in_prod_raises_404(self):
         dev_mode_ctx = self.swap(constants, 'DEV_MODE', False)
         dummy_feature_prod_stage_context = self._mock_dummy_feature_stage(
-            param_domain.FEATURE_STAGES.prod)
+            param_domain.FEATURE_STAGES.PROD)
 
         with dev_mode_ctx, dummy_feature_prod_stage_context:
             self._set_dummy_feature_status_for_mode(
-                False, param_domain.SERVER_MODES.prod
+                False, param_domain.ServerModes.PROD
             )
             self.get_json(
                 '/platform_feature_dummy_handler',

@@ -44,7 +44,7 @@ class PARAM_NAMES(enum.Enum): # pylint: disable=invalid-name
 Registry.create_feature_flag(
     PARAM_NAMES.dummy_feature,
     'This is a dummy feature flag.',
-    FEATURE_STAGES.dev,
+    FEATURE_STAGES.DEV,
 )
 
 Registry.create_platform_parameter(
