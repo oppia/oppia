@@ -27,8 +27,6 @@ from core.constants import constants
 from typing import List, TypeVar, Type, Optional
 import datetime
 
-T = TypeVar('T', bound='UserQuery')
-
 attribute_names = [ # pylint: disable=invalid-name
     predicate['backend_attr'] for predicate in (
         constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION)]
@@ -136,7 +134,7 @@ class UserQuery:
 
     @classmethod
     def create_default(
-        cls: Type[T],
+        cls,
         query_id: str,
         query_params: UserQueryParams,
         submitter_id: str

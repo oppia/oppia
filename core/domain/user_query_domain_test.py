@@ -63,8 +63,8 @@ class UserQueryTests(test_utils.GenericTestBase):
             self.user_query.validate()
 
     def test_validate_query_with_invalid_type_submitter_id_raises(
-            self
-        ) -> None:
+        self
+    ) -> None:
         self.user_query.submitter_id = 1 #type: ignore
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, 'Expected submitter ID to be a string'
@@ -72,8 +72,8 @@ class UserQueryTests(test_utils.GenericTestBase):
             self.user_query.validate()
 
     def test_validate_query_with_invalid_user_id_submitter_id_raises(
-            self
-        ) -> None:
+        self
+    ) -> None:
         self.user_query.submitter_id = 'aaabbc'
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, 'Expected submitter ID to be a valid user ID'
@@ -102,8 +102,8 @@ class UserQueryTests(test_utils.GenericTestBase):
             self.user_query.validate()
 
     def test_validate_query_with_invalid_type_of_values_in_user_ids_raises(
-            self
-        ) -> None:
+        self
+    ) -> None:
         self.user_query.user_ids = [1] #type: ignore
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError,
@@ -120,8 +120,8 @@ class UserQueryTests(test_utils.GenericTestBase):
             self.user_query.validate()
 
     def test_validate_query_with_invalid_type_of_sent_email_model_id_raises(
-            self
-        ) -> None:
+        self
+    ) -> None:
         self.user_query.sent_email_model_id = 1 #type: ignore
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError,
