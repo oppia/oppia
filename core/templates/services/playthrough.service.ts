@@ -255,7 +255,7 @@ export class PlaythroughService {
       stateName, this.playthroughDurationInSecs);
   }
 
-  storePlaythrough(): void {
+  storePlaythrough(): void | null {
     if (this.isRecordedPlaythroughHelpful()) {
       const playthrough = this.createNewPlaythrough();
       if (playthrough !== null) {
