@@ -85,7 +85,7 @@ describe('PlaythroughService', () => {
 
   const spyOnStorePlaythrough = (callback: (p: Playthrough)=> any = undefined )=> {
     if (callback) {
-        spyOn(playthroughBackendApiService, 'storePlaythroughAsync')
+      spyOn(playthroughBackendApiService, 'storePlaythroughAsync')
         .and.callFake(async(p: Playthrough, _: number) => callback(p));
     } else {
         spyOn(
