@@ -161,7 +161,7 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
       this.editableThumbnailDataUrl = (
         this.imageUploadHelperService
           .getTrustedResourceUrlForThumbnailFilename(
-            data.filename, (this.contextService.getEntityType() || undefined),
+            data.filename, (this.contextService.getEntityType() || ''),
             this.contextService.getEntityId()));
       callback();
     });
