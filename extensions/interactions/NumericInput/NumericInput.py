@@ -120,7 +120,6 @@ class NumericInput(base.BaseInteraction):
             list. The AnswerGroupDto proto object list.
         """
         answer_group_list_proto = []
-
         for answer_group in answer_groups:
             base_answer_group_proto = answer_group.to_proto()
             rules_spec_proto = cls._convert_rule_specs_to_proto(
