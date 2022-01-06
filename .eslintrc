@@ -256,6 +256,7 @@
         "SwitchCase": 1,
         "ignoredNodes": [
           "ConditionalExpression",
+          // TODO(#14575): Remove once we have linting for class declaration.
           "ClassDeclaration"
         ]
       }
