@@ -1,3 +1,6 @@
+<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/about-page/about-page.component.css" as="style">
+<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/about-page/about-page.component.rtl.css" as="style">
+
 <div class="about-page protractor-test-about-page">
   <div class="oppia-about-page-section-one">
     <div class="oppia-about-page-section-one-right">
