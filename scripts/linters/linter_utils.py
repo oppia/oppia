@@ -21,14 +21,9 @@ from __future__ import annotations
 
 import collections
 import contextlib
-import functools
-import inspect
 import shutil
 import sys
 import tempfile
-import threading
-
-from core import python_utils
 
 @contextlib.contextmanager
 def redirect_stdout(new_target):

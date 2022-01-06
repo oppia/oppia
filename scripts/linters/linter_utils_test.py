@@ -19,7 +19,6 @@
 from __future__ import annotations
 
 import builtins
-import collections
 import os
 import tempfile
 
