@@ -570,7 +570,6 @@ def apply_change_list(exploration_id, change_list):
                             feconf.CURRENT_STATE_SCHEMA_VERSION,
                             change.to_version))
 
-        exploration.update_proto_size_in_bytes()
         return exploration
 
     except Exception as e:
@@ -713,7 +712,6 @@ def _create_exploration(
             changes made in this model, which should give sufficient information
             to reconstruct the commit.
     """
-    exploration.update_proto_size_in_bytes()
 
     # This line is needed because otherwise a rights object will be created,
     # but the creation of an exploration object will fail.
