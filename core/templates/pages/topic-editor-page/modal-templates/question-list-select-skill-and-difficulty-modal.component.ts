@@ -1,0 +1,118 @@
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License
+
+/**
+ * @fileoverview Component for questions list select skill and
+ * difficulty modal.
+ */
+
+import { Component, Input, OnInit } from '@angular/core';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { AppConstants } from 'app.constants';
+import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import { QuestionsListConstants } from 'components/question-directives/questions-list/questions-list.constants';
+import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
+import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
+import { Skill } from 'domain/skill/SkillObjectFactory';
+import { ExtractImageFilenamesFromModelService } from 'pages/exploration-player-page/services/extract-image-filenames-from-model.service';
+import { AlertsService } from 'services/alerts.service';
+import { AssetsBackendApiService } from 'services/assets-backend-api.service';
+import { ImageLocalStorageService } from 'services/image-local-storage.service';
+
+@Component({
+  selector: 'oppia-question-list-select-skill-and-difficulty-modal',
+  templateUrl: './question-list-select-skill-and-difficulty-modal.component.html'
+})
+export class QuestionListSelectSkillAndDifficultyModalComponent
+  extends ConfirmOrCancelModal implements OnInit {
+  @Input() allSkillSummaries;
+  @Input() countOfSkillsToPrioritize;
+  @Input() currentMode;
+  @Input() linkedSkillsWithDifficulty;
+  @Input() skillIdToRubricsObject;
+  instructionMessage;
+  skillSummaries;
+  skillSummariesInitial;
+  skillSummariesFinal;
+  selectedSkills;
+  DEFAULT_SKILL_DIFFICULTY;
+  MODE_SELECT_DIFFICULTY;
+  MODE_SELECT_SKILL;
+
+  constructor(
+    private alertsService: AlertsService,
+    private assetsBackendApiService: AssetsBackendApiService,
+    private extractImageFilenamesFromModelService: ExtractImageFilenamesFromModelService,
+    private imageLocalStorageService: ImageLocalStorageService,
+    private ngbActiveModal: NgbActiveModal,
+    private skillBackendApiService: SkillBackendApiService
+  ) {
+    super(ngbActiveModal);
+  }
+
+  ngOnInit(): void {
+    this.instructionMessage = (
+      'Select the skill(s) to link the question to:');
+    this.skillSummaries = this.allSkillSummaries;
+    this.skillSummariesInitial = [];
+    this.skillSummariesFinal = [];
+    this.selectedSkills = [];
+    this.DEFAULT_SKILL_DIFFICULTY = AppConstants.DEFAULT_SKILL_DIFFICULTY
+    this.MODE_SELECT_DIFFICULTY = QuestionsListConstants.MODE_SELECT_DIFFICULTY
+    this.MODE_SELECT_SKILL = QuestionsListConstants.MODE_SELECT_SKILL
+
+    for (let idx in this.allSkillSummaries) {
+      if (idx < this.countOfSkillsToPrioritize) {
+        this.skillSummariesInitial.push(
+          this.allSkillSummaries[idx]);
+      } else {
+        this.skillSummariesFinal.push(
+          this.allSkillSummaries[idx]);
+      }
+    }
+  }
+
+  isSkillSelected(skillId: string): boolean {
+    return this.selectedSkills.includes(skillId);
+  };
+
+  selectOrDeselectSkill(summary) {
+    if (!this.isSkillSelected(summary.id)) {
+      this.linkedSkillsWithDifficulty.push(
+        SkillDifficulty.create(
+          summary.id, summary.description,
+          this.DEFAULT_SKILL_DIFFICULTY));
+      this.selectedSkills.push(summary.id);
+    } else {
+      let idIndex = this.linkedSkillsWithDifficulty.map((linkedSkillWithDifficulty) => {
+          return linkedSkillWithDifficulty.getId();
+        }).indexOf(summary.id);
+      this.linkedSkillsWithDifficulty.splice(idIndex, 1);
+      let index = this.selectedSkills.indexOf(summary.id);
+      this.selectedSkills.splice(index, 1);
+    }
+  };
+
+  goToSelectSkillView(): void {
+    this.currentMode = this.MODE_SELECT_SKILL;
+  };
+
+  goToNextStep(): void {
+    this.currentMode = this.MODE_SELECT_DIFFICULTY;
+  };
+
+  startQuestionCreation(): void {
+    this.ngbActiveModal.close(this.linkedSkillsWithDifficulty);
+  };
+}

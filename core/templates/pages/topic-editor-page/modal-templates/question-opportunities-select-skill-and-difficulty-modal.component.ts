@@ -23,6 +23,7 @@ import { AppConstants } from 'app.constants';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { QuestionsListConstants } from 'components/question-directives/questions-list/questions-list.constants';
 import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
+import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
 import { Skill } from 'domain/skill/SkillObjectFactory';
 import { ExtractImageFilenamesFromModelService } from 'pages/exploration-player-page/services/extract-image-filenames-from-model.service';
 import { AlertsService } from 'services/alerts.service';
@@ -30,7 +31,7 @@ import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
 
 @Component({
-  selector: 'oppia-select-skill-and-difficulty-modal',
+  selector: 'oppia-question-opportunities-select-skill-and-difficulty-modal',
   templateUrl: './select-skill-and-difficulty-modal.component.html'
 })
 export class QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent
@@ -38,9 +39,8 @@ export class QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent
   @Input() skillId;
   instructionMessage: string;
   currentMode: string;
-  skillDifficulty;
   skillIdToRubricsObject;
-  linkedSkillsWithDifficulty;
+  linkedSkillsWithDifficulty = [];
   skill: Skill;
 
   constructor(
@@ -86,7 +86,7 @@ export class QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent
           reader.readAsDataURL(file.data);
         });
         this.linkedSkillsWithDifficulty = [
-          this.skillDifficulty.create(
+          SkillDifficulty.create(
             this.skillId, this.skill.getDescription(),
             AppConstants.DEFAULT_SKILL_DIFFICULTY)
         ];

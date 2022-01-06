@@ -95,6 +95,8 @@ import { RatingDisplayComponent } from './ratings/rating-display/rating-display.
 import { SupplementalCardComponent } from 'pages/exploration-player-page/learner-experience/supplemental-card.component';
 import { SmoothHeightAnimatorComponent } from './smooth-height/smooth-height-animator.component';
 import { ConfirmQuestionExitComponent } from './question-directives/modal-templates/confirm-question-exit-modal.component';
+import { QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent } from 'pages/topic-editor-page/modal-templates/question-opportunities-select-skill-and-difficulty-modal.component';
+import { QuestionListSelectSkillAndDifficultyModalComponent } from 'pages/topic-editor-page/modal-templates/question-list-select-skill-and-difficulty-modal.component';
 
 // Pipes.
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
@@ -207,7 +209,9 @@ import { QuestionEditorSaveModalComponent } from './question-directives/modal-te
     UploadActivityModalComponent,
     SortByPipe,
     LearnerDashboardIconsComponent,
-    PreviewThumbnailComponent
+    PreviewThumbnailComponent,
+    QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent,
+    QuestionListSelectSkillAndDifficultyModalComponent
   ],
 
   entryComponents: [
@@ -269,7 +273,9 @@ import { QuestionEditorSaveModalComponent } from './question-directives/modal-te
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     LearnerDashboardIconsComponent,
-    PreviewThumbnailComponent
+    PreviewThumbnailComponent,
+    QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent,
+    QuestionListSelectSkillAndDifficultyModalComponent
   ],
 
   exports: [
@@ -347,6 +353,8 @@ import { QuestionEditorSaveModalComponent } from './question-directives/modal-te
     SummarizeNonnegativeNumberPipe,
     SortByPipe,
     LearnerDashboardIconsComponent,
+    QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent,
+    QuestionListSelectSkillAndDifficultyModalComponent
   ],
 })
 

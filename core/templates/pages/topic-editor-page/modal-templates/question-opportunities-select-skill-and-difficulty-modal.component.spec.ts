@@ -52,7 +52,7 @@ class MockReaderObject {
   }
 }
 
-fdescribe(
+describe(
   'Questions Opportunities Select Skill And Difficulty Modal Component',
   () => {
     let component: QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent;

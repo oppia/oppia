@@ -38,9 +38,6 @@ require(
 require(
   'pages/contributor-dashboard-page/modal-templates/' +
   'question-suggestion-editor-modal.controller.ts');
-require(
-  'pages/topic-editor-page/modal-templates/' +
-  'question-opportunities-select-skill-and-difficulty-modal.controller.ts');
 
 require(
   'components/question-directives/questions-list/' +
@@ -60,17 +57,20 @@ require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/site-analytics.service.ts');
 
+import { NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
+import { QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent } from "pages/topic-editor-page/modal-templates/question-opportunities-select-skill-and-difficulty-modal.component";
+
 angular.module('oppia').component('questionOpportunities', {
   template: require('./question-opportunities.component.html'),
   controller: [
     '$rootScope', '$uibModal', 'AlertsService', 'ContextService',
     'ContributionOpportunitiesService', 'QuestionObjectFactory',
-    'QuestionUndoRedoService', 'SiteAnalyticsService',
+    'NgbModal', 'QuestionUndoRedoService', 'SiteAnalyticsService',
     'UrlInterpolationService', 'UserService', 'MAX_QUESTIONS_PER_SKILL',
     function(
         $rootScope, $uibModal, AlertsService, ContextService,
         ContributionOpportunitiesService, QuestionObjectFactory,
-        QuestionUndoRedoService, SiteAnalyticsService,
+        NgbModal, QuestionUndoRedoService, SiteAnalyticsService,
         UrlInterpolationService, UserService, MAX_QUESTIONS_PER_SKILL) {
       const ctrl = this;
       let userIsLoggedIn = false;
@@ -158,17 +158,11 @@ angular.module('oppia').component('questionOpportunities', {
         SiteAnalyticsService.registerContributorDashboardSuggestEvent(
           'Question');
 
-        $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/topic-editor-page/modal-templates/' +
-            'select-skill-and-difficulty-modal.template.html'),
+        let modalRef: NgbModalRef = NgbModal.open(QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent, {
           backdrop: true,
-          resolve: {
-            skillId: () => skillId
-          },
-          controller: (
-            'QuestionsOpportunitiesSelectSkillAndDifficultyModalController')
-        }).result.then(function(result) {
+        })
+        modalRef.componentInstance.skillId = skillId;
+        modalRef.result.then(function(result) {
           if (AlertsService.warnings.length === 0) {
             ctrl.createQuestion(result.skill, result.skillDifficulty);
           }

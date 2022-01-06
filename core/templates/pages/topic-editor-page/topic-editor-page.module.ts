@@ -43,7 +43,6 @@ import { DeleteStoryModalComponent } from './modal-templates/delete-story-modal.
 import { TopicSavePendingChangesComponent } from './modal-templates/topic-save-pending-changes-modal.component';
 import { TopicEditorSendMailComponent } from './modal-templates/topic-editor-send-mail-modal.component';
 import { TopicEditorSaveModalComponent } from './modal-templates/topic-editor-save-modal.component';
-import { QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent } from './modal-templates/question-opportunities-select-skill-and-difficulty-modal.component';
 
 @NgModule({
   imports: [
@@ -55,7 +54,6 @@ import { QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent } from './
     ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
-    QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent,
     StoriesListComponent,
     SubtopicsListComponent,
     SubtopicPreviewTab,
@@ -69,7 +67,6 @@ import { QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent } from './
     TopicEditorSaveModalComponent
   ],
   entryComponents: [
-    QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent,
     StoriesListComponent,
     SubtopicsListComponent,
     SubtopicPreviewTab,

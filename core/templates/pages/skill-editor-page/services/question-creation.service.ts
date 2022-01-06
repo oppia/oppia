@@ -16,7 +16,9 @@
 /**
  * @fileoverview Service for creating a new question.
  */
+import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
+import { QuestionListSelectSkillAndDifficultyModalComponent } from 'pages/topic-editor-page/modal-templates/question-list-select-skill-and-difficulty-modal.component';
 
 require(
   'components/common-layout-directives/common-elements/' +
@@ -58,7 +60,7 @@ require('services/image-local-storage.service.ts');
 angular.module('oppia').factory('QuestionCreationService', [
   '$location', '$rootScope', '$uibModal', 'AlertsService',
   'EditableQuestionBackendApiService', 'ImageLocalStorageService',
-  'QuestionObjectFactory',
+  'NgbModal', 'QuestionObjectFactory',
   'QuestionUndoRedoService', 'SkillBackendApiService',
   'SkillEditorStateService', 'UrlInterpolationService',
   'DEFAULT_SKILL_DIFFICULTY', 'MODE_SELECT_DIFFICULTY',
@@ -66,7 +68,7 @@ angular.module('oppia').factory('QuestionCreationService', [
   function(
       $location, $rootScope, $uibModal, AlertsService,
       EditableQuestionBackendApiService, ImageLocalStorageService,
-      QuestionObjectFactory,
+      NgbModal, QuestionObjectFactory,
       QuestionUndoRedoService, SkillBackendApiService,
       SkillEditorStateService, UrlInterpolationService,
       DEFAULT_SKILL_DIFFICULTY, MODE_SELECT_DIFFICULTY,
@@ -146,20 +148,15 @@ angular.module('oppia').factory('QuestionCreationService', [
       }
 
       if (noOfRubricsWithExplanation > 1) {
-        $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/topic-editor-page/modal-templates/' +
-              'select-skill-and-difficulty-modal.template.html'),
-          backdrop: 'static',
-          resolve: {
-            allSkillSummaries: () => allSkillSummaries,
-            countOfSkillsToPrioritize: () => countOfSkillsToPrioritize,
-            currentMode: () => currentMode,
-            linkedSkillsWithDifficulty: () => linkedSkillsWithDifficulty,
-            skillIdToRubricsObject: () => skillIdToRubricsObject
-          },
-          controller: 'QuestionsListSelectSkillAndDifficultyModalController'
-        }).result.then(function(linkedSkillsWithDifficulty) {
+        let modalRef: NgbModalRef = NgbModal.open(QuestionListSelectSkillAndDifficultyModalComponent, {
+          backdrop: 'static'
+        })
+        modalRef.componentInstance.allSkillSummaries = allSkillSummaries;
+        modalRef.componentInstance.countOfSkillsToPrioritize = countOfSkillsToPrioritize;
+        modalRef.componentInstance.currentMode = currentMode;
+        modalRef.componentInstance.linkedSkillsWithDifficulty = linkedSkillsWithDifficulty;
+        modalRef.componentInstance.skillIdToRubricsObject = skillIdToRubricsObject;
+        modalRef.result.then(function(linkedSkillsWithDifficulty) {
           continueQuestionEditing(linkedSkillsWithDifficulty);
         }, function() {
           // Note to developers:

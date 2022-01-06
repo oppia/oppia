@@ -31,7 +31,7 @@ class MockNgbModalRef {
   };
 }
 
-describe('Question Editor Modal Controller', function() {
+fdescribe('Question Editor Modal Controller', function() {
   let $q = null;
   let $scope = null;
   let ngbModal: NgbModal;
@@ -40,8 +40,19 @@ describe('Question Editor Modal Controller', function() {
   let AlertsService = null;
   let QuestionObjectFactory = null;
   let QuestionUndoRedoService = null;
+  let QuestionValidationService = null;
   let StateEditorService = null;
   importAllAngularServices();
+
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
 
   const associatedSkillSummariesDict = [{
     id: '1',
@@ -155,6 +166,7 @@ describe('Question Editor Modal Controller', function() {
       questionStateData = question.getStateData();
 
       spyOn(StateEditorService, 'isCurrentSolutionValid').and.returnValue(true);
+      spyOn(QuestionValidationService, 'isQuestionValid').and.returnValue(true);
 
       $scope = $rootScope.$new();
       $controller('QuestionEditorModalController', {
@@ -366,6 +378,7 @@ describe('Question Editor Modal Controller', function() {
       QuestionObjectFactory = $injector.get('QuestionObjectFactory');
       QuestionUndoRedoService = $injector.get('QuestionUndoRedoService');
       StateEditorService = $injector.get('StateEditorService');
+      QuestionValidationService = $injector.get('QuestionValidationService');
 
       $uibModalInstance = jasmine.createSpyObj(
         '$uibModalInstance', ['close', 'dismiss']);
@@ -442,6 +455,8 @@ describe('Question Editor Modal Controller', function() {
       questionStateData = question.getStateData();
 
       spyOn(StateEditorService, 'isCurrentSolutionValid').and.returnValue(
+        false);
+      spyOn(QuestionValidationService, 'isQuestionValid').and.returnValue(
         false);
 
       $scope = $rootScope.$new();
