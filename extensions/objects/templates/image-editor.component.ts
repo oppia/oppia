@@ -815,10 +815,11 @@ export class ImageEditorComponent implements OnInit, OnChanges {
   }
 
   increaseResizePercent(amount: number): void {
-    // Do not allow to increase size above 100% (only downsize allowed).
+    // Do not allow to increase size above 200% (only downsize allowed).
     this.imageResizeRatio = Math.min(
-      1, this.imageResizeRatio + amount / 100);
+      2, this.imageResizeRatio + amount / 100);
     this.updateValidationWithLatestDimensions();
+    this.cancelCropImage();
   }
 
   private updateValidationWithLatestDimensions(): void {
