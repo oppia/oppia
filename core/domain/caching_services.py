@@ -159,6 +159,9 @@ def flush_memory_caches() -> None:
     memory_cache_services.flush_caches()
 
 
+# This function returns result_dict whose values can be any of the type from
+# Exploration, Skill, Story, Topic, Collection, str. hence Any type has to be
+# used here for the type of returned dictionary.
 def get_multi(
     namespace: str, sub_namespace: str | None, obj_ids: List[str]
 ) -> Dict[str, Any]:
@@ -185,6 +188,10 @@ def get_multi(
         dict(str, Exploration|Skill|Story|Topic|Collection|str). Dictionary of
         decoded (id, value) pairs retrieved from the platform caching service.
     """
+
+    # In result_dict's key-value pair, value can be any of the type from
+    # Exploration, Skill, Story, Topic, Collection, str. hence Any type has
+    # to be used here for the value type of result_dict dictionary.
     result_dict: Dict[str, Any] = {}
     if len(obj_ids) == 0:
         return result_dict
@@ -202,6 +209,9 @@ def get_multi(
     return result_dict
 
 
+# id_value_mapping is a Dict whose values can be any of the type from
+# Exploration, Skill, Story, Topic, Collection, str. hence Any type has
+# to be used here for the value type of id_value_mapping dictionary.
 def set_multi(
     namespace: str, sub_namespace: str | None, id_value_mapping: Dict[str, Any]
 ) -> bool:

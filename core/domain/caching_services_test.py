@@ -668,6 +668,9 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         default_exploration = exp_domain.Exploration.from_dict( # type: ignore[no-untyped-call]
             self.exploration_dict_with_unicode_characters)
 
+        # id_value_mapping is a Dict whose values can be any of the type from
+        # Exploration, Skill, Story, Topic, Collection, str. hence Any type
+        # has to be used here for the value type of id_value_mapping dictionary.
         def mock_memory_cache_services_set_multi(
             id_value_mapping: Dict[str, Any]
         ) -> None:
