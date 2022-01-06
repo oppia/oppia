@@ -81,7 +81,7 @@ export class ResponseHeaderComponent {
   }
 
   deleteResponse(evt: any): void {
-    this.onDeleteFn(this.index(), evt);
+    this.onDeleteFn(this.index, evt);
   }
 }
 
