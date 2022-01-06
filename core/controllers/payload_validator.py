@@ -85,8 +85,9 @@ def validate_arguments_against_schema(
         if (
                 arg_key not in handler_args or
                 handler_args[arg_key] is None or
-                # Null request params are cast to 'None' by webapp.
-                handler_args[arg_key] == 'None'
+                # Null request params are cast to strings by webapp.
+                handler_args[arg_key] == 'None' or
+                handler_args[arg_key] == 'null'
         ):
             if 'default_value' in arg_schema:
                 if arg_schema['default_value'] is None:
