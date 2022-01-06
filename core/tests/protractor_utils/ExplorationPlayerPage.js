@@ -34,7 +34,7 @@ var ExplorationPlayerPage = function() {
   var conversationContent = element.all(
     by.css('.protractor-test-conversation-content'));
   var conversationFeedback = element(
-    by.css('.protractor-test-conversation-feedback'));
+    by.css('.protractor-test-conversation-feedback-latest'));
   var explorationHeader = element(
     by.css('.protractor-test-exploration-header'));
   var infoCardRating = element(
