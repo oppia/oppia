@@ -211,11 +211,13 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     SortByPipe,
     LearnerDashboardIconsComponent,
     PreviewThumbnailComponent,
+    AddHintModalComponent,
     DeleteInteractionModalComponent,
     DeleteHintModalComponent,
     DeleteLastHintModalComponent,
     DeleteSolutionModalComponent,
     SavePendingChangesModalComponent,
+    HintEditorComponent
   ],
 
   entryComponents: [
@@ -276,11 +278,13 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     LearnerDashboardIconsComponent,
     PreviewThumbnailComponent,
+    AddHintModalComponent,
     DeleteInteractionModalComponent,
     DeleteHintModalComponent,
     DeleteLastHintModalComponent,
     DeleteSolutionModalComponent,
     SavePendingChangesModalComponent,
+    HintEditorComponent
   ],
 
   exports: [
@@ -361,6 +365,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     DeleteHintModalComponent,
     DeleteLastHintModalComponent,
     DeleteSolutionModalComponent,
+    HintEditorComponent
   ],
 })
 
