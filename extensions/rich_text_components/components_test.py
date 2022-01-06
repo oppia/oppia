@@ -264,6 +264,20 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
                 },
                 re.escape(
                     'Missing keys: [\'title\'], Extra keys: [\'tab-title\']')
+            ),
+            (
+                {
+                    'tab_contents-with-value': [{
+                        'content': (
+                            '<oppia-noninteractive-collapsible content-with-value=' # pylint: disable=line-too-long
+                            '"&amp;quot;&amp;lt;p&amp;gt;Hello&amp;lt;/p&amp;gt;&amp;' # pylint: disable=line-too-long
+                            'quot;" heading-with-value="&amp;quot;SubCollapsible&amp;' # pylint: disable=line-too-long
+                            'quot;"></oppia-noninteractive-collapsible><p>&nbsp;</p>' # pylint: disable=line-too-long
+                        ),
+                        'title': 'Collapsible'
+                    }]
+                },
+                'Nested tabs and collapsible'
             )
         ]
 
