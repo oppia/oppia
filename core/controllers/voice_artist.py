@@ -66,7 +66,10 @@ class AudioUploadHandler(base.BaseHandler):
                     'type': 'basestring',
                     'validators': [{
                         'id': 'should_end_with',
-                        'choices': list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys())
+                        'choices': [
+                            '.' + extension for extension in list(
+                                feconf.ACCEPTED_AUDIO_EXTENSIONS.keys())
+                        ]
                     }]
                 }
             }
@@ -82,15 +85,9 @@ class AudioUploadHandler(base.BaseHandler):
         """Saves an audio file uploaded by a content creator."""
         raw_audio_file = self.normalized_request.get('raw_audio_file')
         filename = self.normalized_payload.get('filename')
-        allowed_formats = list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys())
 
         dot_index = filename.rfind('.')
         extension = filename[dot_index + 1:].lower()
-
-        if dot_index in (-1, 0):
-            raise self.InvalidInputException(
-                'No filename extension: it should have '
-                'one of the following extensions: %s' % allowed_formats)
 
         tempbuffer = io.BytesIO()
         tempbuffer.write(raw_audio_file)

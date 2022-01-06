@@ -545,12 +545,11 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
                     'schema': {
                         'type': 'basestring',
                         'validators': [{
-                            'id': 'is_regex_matched',
-                            'regex_pattern': r'^[A-Za-z0-9-]+[.][a-z0-9]+$'
-                        }, {
                             'id': 'should_end_with',
-                            'choices': list(
+                            'choices': [
+                                '.' + extension for extension in list(
                                 mock_accepted_audio_extensions.keys())
+                            ]
                         }]
                     }
                 }
@@ -749,7 +748,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         self.assertEqual(response_dict['status_code'], 400)
         error_msg = (
             'Schema validation for \'filename\' failed: Validation '
-            'failed: should_end_with ({\'choices\': [\'mp3\']}) for '
+            'failed: should_end_with ({\'choices\': [\'.mp3\']}) for '
             'object test.wav'
         )
         self.assertEqual(response_dict['error'], error_msg)
@@ -816,7 +815,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         self.assertEqual(response_dict['status_code'], 400)
         error_msg = (
             'Schema validation for \'filename\' failed: Validation failed: '
-            'should_end_with ({\'choices\': [\'mp3\']}) for object test'
+            'should_end_with ({\'choices\': [\'.mp3\']}) for object test'
         )
         self.assertEqual(response_dict['error'], error_msg)
 
