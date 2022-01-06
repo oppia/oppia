@@ -164,9 +164,10 @@ export class AssetsBackendApiService {
     this.abortAllCurrentDownloads(constants.ASSET_TYPE_IMAGE);
   }
 
-  fetchFiles(entityType: string, entityId: string, filename: string,
-    assetType: string):  Promise<AudioFile | ImageFile> {
-    return this.fetchFile(entityType, entityId, filename, assetType);
+  getFile(
+    entityType: string, entityId: string, filename: string,
+    assetType: string): Promise<AudioFile | ImageFile> {
+      return this.fetchFile(entityType, entityId, filename, assetType);
   }
 
   getAssetsFilesCurrentlyBeingRequested(): (

@@ -12,10 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
-import { ConfirmQuestionExitComponent } from "components/question-directives/modal-templates/confirm-question-exit-modal.component";
-import { QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent } from "pages/topic-editor-page/modal-templates/questions-opportunities-select-skill-and-difficulty-modal.component";
-
 /**
  * @fileoverview Controller for question suggestion editor modal.
  */
@@ -31,6 +27,10 @@ require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/image-local-storage.service.ts');
 require('services/site-analytics.service.ts');
+
+import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { ConfirmQuestionExitComponent } from 'components/question-directives/modal-templates/confirm-question-exit-modal.component';
+import { QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent } from 'pages/topic-editor-page/modal-templates/questions-opportunities-select-skill-and-difficulty-modal.component';
 
 angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
   '$rootScope', '$scope', '$uibModalInstance', 'AlertsService',
@@ -114,9 +114,10 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
     };
     $scope.skillId = $scope.skill.getId();
     $scope.onClickChangeDifficulty = function() {
-      let modalRef: NgbModalRef = NgbModal.open(QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent, {
-        backdrop: true,
-      })
+      let modalRef: NgbModalRef = NgbModal.open(
+        QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent, {
+          backdrop: true,
+        });
       modalRef.componentInstance.skillId = $scope.skillId;
       modalRef.result.then(function(result) {
         if (AlertsService.warnings.length === 0) {

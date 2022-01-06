@@ -12,18 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
-
 /**
  * @fileoverview Controller for question editor modal.
  */
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
-import { SelectSkillModalComponent } from 'components/skill-selector/select-skill-modal.component';
-import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmQuestionExitComponent } from './confirm-question-exit-modal.component';
-import { QuestionEditorSaveModalComponent } from './question-editor-save-modal.component';
 
 require(
   'components/state-editor/state-editor-properties-services/' +
@@ -35,10 +29,16 @@ require('services/context.service.ts');
 require('services/image-local-storage.service.ts');
 require('services/ngb-modal.service.ts');
 
+import { SelectSkillModalComponent } from 'components/skill-selector/select-skill-modal.component';
+import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { ConfirmQuestionExitComponent } from './confirm-question-exit-modal.component';
+import { QuestionEditorSaveModalComponent } from './question-editor-save-modal.component';
+import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
+
 angular.module('oppia').controller('QuestionEditorModalController', [
   '$rootScope', '$scope', '$uibModal', '$uibModalInstance', 'AlertsService',
   'ContextService', 'ImageLocalStorageService', 'NgbModal',
-  'QuestionUndoRedoService','QuestionValidationService',
+  'QuestionUndoRedoService', 'QuestionValidationService',
   'UrlInterpolationService', 'associatedSkillSummaries', 'canEditQuestion',
   'categorizedSkills', 'groupedSkillSummaries', 'misconceptionsBySkill',
   'newQuestionIsBeingCreated', 'question', 'questionId', 'questionStateData',

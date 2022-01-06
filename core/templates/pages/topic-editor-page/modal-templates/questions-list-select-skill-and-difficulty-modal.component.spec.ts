@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 /**
  * @fileoverview Unit tests for
  * QuestionsListSelectSkillAndDifficultyModalComponent.
@@ -36,7 +37,8 @@ class MockActiveModal {
 
 describe('Questions List Select Skill And Difficulty Modal Component', () => {
   let component: QuestionsListSelectSkillAndDifficultyModalComponent;
-  let fixture: ComponentFixture<QuestionsListSelectSkillAndDifficultyModalComponent>;
+  let fixture:
+    ComponentFixture<QuestionsListSelectSkillAndDifficultyModalComponent>;
   let ngbActiveModal: NgbActiveModal;
 
   let allSkillSummaries = [{
@@ -71,18 +73,20 @@ describe('Questions List Select Skill And Difficulty Modal Component', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(QuestionsListSelectSkillAndDifficultyModalComponent);
+    fixture = TestBed.createComponent(
+      QuestionsListSelectSkillAndDifficultyModalComponent);
     component = fixture.componentInstance;
 
     allSkillSummaries.map(summary => (
       ShortSkillSummary.create(summary.id, summary.description)));
-    
+
     fixture.detectChanges();
   });
 
   it('should initialize component properties after component' +
-      ' is initialized', () => {
-      expect(component.countOfSkillsToPrioritize).toBe(countOfSkillsToPrioritize);
+    ' is initialized', () => {
+      expect(component.countOfSkillsToPrioritize).toBe(
+        countOfSkillsToPrioritize);
       expect(component.instructionMessage).toBe(
         'Select the skill(s) to link the question to:');
       expect(component.currentMode).toBe(currentMode);
@@ -94,53 +98,52 @@ describe('Questions List Select Skill And Difficulty Modal Component', () => {
       expect(component.skillIdToRubricsObject).toEqual(skillIdToRubricsObject);
     });
 
-    it('should toggle skill selection when clicking on it', () => {
-      expect(component.linkedSkillsWithDifficulty.length).toBe(0);
+  it('should toggle skill selection when clicking on it', () => {
+    expect(component.linkedSkillsWithDifficulty.length).toBe(0);
 
-      let summary = allSkillSummaries[0];
-      component.selectOrDeselectSkill(summary);
+    let summary = allSkillSummaries[0];
+    component.selectOrDeselectSkill(summary);
 
-      expect(component.isSkillSelected(summary.id)).toBe(true);
-      expect(component.linkedSkillsWithDifficulty.length).toBe(1);
+    expect(component.isSkillSelected(summary.id)).toBe(true);
+    expect(component.linkedSkillsWithDifficulty.length).toBe(1);
 
-      component.selectOrDeselectSkill(summary);
+    component.selectOrDeselectSkill(summary);
 
-      expect(component.isSkillSelected(summary.id)).toBe(false);
-      expect(component.linkedSkillsWithDifficulty.length).toBe(0);
+    expect(component.isSkillSelected(summary.id)).toBe(false);
+    expect(component.linkedSkillsWithDifficulty.length).toBe(0);
+  });
+
+  it('should change view mode to select skill when changing view',
+    () => {
+      expect(component.currentMode).toBe(currentMode);
+
+      component.goToSelectSkillView();
+
+      expect(component.currentMode).toBe('MODE_SELECT_SKILL');
     });
 
-    it('should change view mode to select skill when changing view',
-      () => {
-        expect(component.currentMode).toBe(currentMode);
+  it('should change view mode to select difficulty after selecting a skill',
+    () => {
+      expect(component.currentMode).toBe(currentMode);
 
-        component.goToSelectSkillView();
+      component.goToNextStep();
 
-        expect(component.currentMode).toBe('MODE_SELECT_SKILL');
-      });
+      expect(component.currentMode).toBe('MODE_SELECT_DIFFICULTY');
+    });
 
-    it('should change view mode to select difficulty after selecting a skill',
-      () => {
-        expect(component.currentMode).toBe(currentMode);
+  it('should select skill and its difficulty proerly when closing the modal',
+    () => {
+      let summary = allSkillSummaries[1];
+      component.selectOrDeselectSkill(summary);
 
-        component.goToNextStep();
+      component.startQuestionCreation();
 
-        expect(component.currentMode).toBe('MODE_SELECT_DIFFICULTY');
-      });
+      expect(ngbActiveModal.close).toHaveBeenCalledWith([
+        SkillDifficulty.create(
+          allSkillSummaries[1].id, allSkillSummaries[1].description, 0.3)
+      ]);
 
-    it('should select skill and its difficulty proerly when closing the modal',
-      () => {
-        let summary = allSkillSummaries[1];
-        component.selectOrDeselectSkill(summary);
-
-        component.startQuestionCreation();
-
-        expect(ngbActiveModal.close).toHaveBeenCalledWith([
-          SkillDifficulty.create(
-            allSkillSummaries[1].id, allSkillSummaries[1].description, 0.3)
-        ]);
-
-        // Remove summary to not affect other specs.
-        component.selectOrDeselectSkill(summary);
-      });
-
+      // Remove summary to not affect other specs.
+      component.selectOrDeselectSkill(summary);
+    });
 });

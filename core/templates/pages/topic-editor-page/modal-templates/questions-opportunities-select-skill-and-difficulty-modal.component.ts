@@ -10,7 +10,7 @@
 // distributed under the License is distributed on an "AS-IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
-// limitations under the License
+// limitations under the License.
 
 /**
  * @fileoverview Component for questions opportunities select skill and
@@ -30,8 +30,9 @@ import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
 
 @Component({
-  selector: 'oppia-question-opportunities-select-skill-and-difficulty-modal',
-  templateUrl: './questions-opportunities-select-skill-and-difficulty-modal.component.html'
+  selector: 'oppia-questions-opportunities-select-skill-and-difficulty-modal',
+  templateUrl: './questions-opportunities-select-skill-and-difficulty-modal' +
+    '.component.html'
 })
 export class QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent
   extends ConfirmOrCancelModal implements OnInit {
@@ -44,7 +45,8 @@ export class QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent
   constructor(
     private alertsService: AlertsService,
     private assetsBackendApiService: AssetsBackendApiService,
-    private extractImageFilenamesFromModelService: ExtractImageFilenamesFromModelService,
+    private extractImageFilenamesFromModelService:
+      ExtractImageFilenamesFromModelService,
     private imageLocalStorageService: ImageLocalStorageService,
     private ngbActiveModal: NgbActiveModal,
     private skillBackendApiService: SkillBackendApiService
@@ -56,45 +58,45 @@ export class QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent
     this.instructionMessage = (
       'Select the skill(s) to link the question to:');
     this.skillBackendApiService.fetchSkillAsync(this.skillId)
-    .then((backendSkillObject) => {
-      this.skill = backendSkillObject.skill;
-      // Skills have SubtitledHtml fields that can contain images. In
-      // order to render them in the contributor dashboard, we parse the
-      // HTML fields in the Skill to get a list of filenames, fetch
-      // these images and store their corresponding base64 URLs in the local
-      // storage. The image components will use the data from the local
-      // storage to render the image.
-      let imageFileFetchPromises = [];
-      let imageFilenames = (
-        this.extractImageFilenamesFromModelService.getImageFilenamesInSkill(
-          this.skill));
-      imageFilenames.forEach(imageFilename => {
-        imageFileFetchPromises.push(this.assetsBackendApiService.fetchFiles(
-          AppConstants.ENTITY_TYPE.SKILL, this.skillId,
-          imageFilename, AppConstants.ASSET_TYPE_IMAGE));
-      });
-      Promise.all(imageFileFetchPromises).then(files => {
-        files.forEach(file => {
-          const reader = new FileReader();
-          reader.onload = () => {
-            const imageData = reader.result as string;
-            this.imageLocalStorageService.saveImage(file.filename, imageData);
-          };
-          reader.readAsDataURL(file.data);
+      .then((backendSkillObject) => {
+        this.skill = backendSkillObject.skill;
+        // Skills have SubtitledHtml fields that can contain images. In
+        // order to render them in the contributor dashboard, we parse the
+        // HTML fields in the Skill to get a list of filenames, fetch
+        // these images and store their corresponding base64 URLs in the local
+        // storage. The image components will use the data from the local
+        // storage to render the image.
+        let imageFileFetchPromises = [];
+        let imageFilenames = (
+          this.extractImageFilenamesFromModelService.getImageFilenamesInSkill(
+            this.skill));
+        imageFilenames.forEach(imageFilename => {
+          imageFileFetchPromises.push(this.assetsBackendApiService.getFile(
+            AppConstants.ENTITY_TYPE.SKILL, this.skillId,
+            imageFilename, AppConstants.ASSET_TYPE_IMAGE));
         });
-        this.linkedSkillsWithDifficulty = [
-          SkillDifficulty.create(
-            this.skillId, this.skill.getDescription(),
-            AppConstants.DEFAULT_SKILL_DIFFICULTY)
-        ];
-        this.skillIdToRubricsObject = {};
-        this.skillIdToRubricsObject[this.skillId] =
-          this.skill.getRubrics();
+        Promise.all(imageFileFetchPromises).then(files => {
+          files.forEach(file => {
+            const reader = new FileReader();
+            reader.onload = () => {
+              const imageData = reader.result as string;
+              this.imageLocalStorageService.saveImage(file.filename, imageData);
+            };
+            reader.readAsDataURL(file.data);
+          });
+          this.linkedSkillsWithDifficulty = [
+            SkillDifficulty.create(
+              this.skillId, this.skill.getDescription(),
+              AppConstants.DEFAULT_SKILL_DIFFICULTY)
+          ];
+          this.skillIdToRubricsObject = {};
+          this.skillIdToRubricsObject[this.skillId] =
+            this.skill.getRubrics();
+        });
+      }, (error) => {
+        this.alertsService.addWarning(
+          `Error populating skill: ${error}.`);
       });
-    }, (error) => {
-      this.alertsService.addWarning(
-        `Error populating skill: ${error}.`);
-    });
   }
 
   startQuestionCreation(): void {

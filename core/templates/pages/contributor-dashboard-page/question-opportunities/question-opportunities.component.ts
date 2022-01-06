@@ -57,21 +57,23 @@ require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/site-analytics.service.ts');
 
-import { NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
-import { QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent } from "pages/topic-editor-page/modal-templates/questions-opportunities-select-skill-and-difficulty-modal.component";
+import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent } from 'pages/topic-editor-page/modal-templates/questions-opportunities-select-skill-and-difficulty-modal.component';
 
 angular.module('oppia').component('questionOpportunities', {
   template: require('./question-opportunities.component.html'),
   controller: [
     '$rootScope', '$uibModal', 'AlertsService', 'ContextService',
-    'ContributionOpportunitiesService', 'QuestionObjectFactory',
-    'NgbModal', 'QuestionUndoRedoService', 'SiteAnalyticsService',
-    'UrlInterpolationService', 'UserService', 'MAX_QUESTIONS_PER_SKILL',
+    'ContributionOpportunitiesService', 'NgbModal',
+    'QuestionObjectFactory', 'QuestionUndoRedoService',
+    'SiteAnalyticsService', 'UrlInterpolationService',
+    'UserService', 'MAX_QUESTIONS_PER_SKILL',
     function(
         $rootScope, $uibModal, AlertsService, ContextService,
-        ContributionOpportunitiesService, QuestionObjectFactory,
-        NgbModal, QuestionUndoRedoService, SiteAnalyticsService,
-        UrlInterpolationService, UserService, MAX_QUESTIONS_PER_SKILL) {
+        ContributionOpportunitiesService, NgbModal,
+        QuestionObjectFactory, QuestionUndoRedoService,
+        SiteAnalyticsService, UrlInterpolationService,
+        UserService, MAX_QUESTIONS_PER_SKILL) {
       const ctrl = this;
       let userIsLoggedIn = false;
       let allOpportunities = [];
@@ -158,9 +160,10 @@ angular.module('oppia').component('questionOpportunities', {
         SiteAnalyticsService.registerContributorDashboardSuggestEvent(
           'Question');
 
-        let modalRef: NgbModalRef = NgbModal.open(QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent, {
-          backdrop: true,
-        })
+        let modalRef: NgbModalRef = NgbModal.open(
+          QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent, {
+            backdrop: true,
+          });
         modalRef.componentInstance.skillId = skillId;
         modalRef.result.then(function(result) {
           if (AlertsService.warnings.length === 0) {

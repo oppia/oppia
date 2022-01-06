@@ -31,7 +31,7 @@ class MockNgbModalRef {
   };
 }
 
-fdescribe('Question Editor Modal Controller', function() {
+describe('Question Editor Modal Controller', function() {
   let $q = null;
   let $scope = null;
   let ngbModal: NgbModal;

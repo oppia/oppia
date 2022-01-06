@@ -10,7 +10,7 @@
 // distributed under the License is distributed on an "AS-IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
-// limitations under the License
+// limitations under the License.
 
 /**
  * @fileoverview Component for questions list select skill and
@@ -23,27 +23,29 @@ import { AppConstants } from 'app.constants';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { QuestionsListConstants } from 'components/question-directives/questions-list/questions-list.constants';
 import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
+import { Skill, SkillBackendDict } from 'domain/skill/SkillObjectFactory';
 
 @Component({
   selector: 'oppia-question-list-select-skill-and-difficulty-modal',
-  templateUrl: './questions-list-select-skill-and-difficulty-modal.component.html'
+  templateUrl: './questions-list-select-skill-and-difficulty-modal' +
+    '.component.html'
 })
 export class QuestionsListSelectSkillAndDifficultyModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-  @Input() allSkillSummaries;
+  @Input() allSkillSummaries: Skill;
+  @Input() currentMode: string;
   @Input() countOfSkillsToPrioritize;
-  @Input() currentMode;
   @Input() linkedSkillsWithDifficulty;
   @Input() skillIdToRubricsObject;
-  instructionMessage;
-  skillSummaries;
-  skillSummariesInitial;
-  skillSummariesFinal;
-  selectedSkills;
-  DEFAULT_SKILL_DIFFICULTY;
-  MODE_SELECT_DIFFICULTY;
-  MODE_SELECT_SKILL;
-  skillsToShow = [];
+  instructionMessage: string;
+  skillSummaries: Skill;
+  skillSummariesInitial: SkillBackendDict[];
+  skillSummariesFinal: SkillBackendDict[];
+  selectedSkills: string[];
+  DEFAULT_SKILL_DIFFICULTY: number;
+  MODE_SELECT_DIFFICULTY: string;
+  MODE_SELECT_SKILL: string;
+  skillsToShow: SkillBackendDict[] = [];
 
   constructor(
     private ngbActiveModal: NgbActiveModal
@@ -58,9 +60,9 @@ export class QuestionsListSelectSkillAndDifficultyModalComponent
     this.skillSummariesInitial = [];
     this.skillSummariesFinal = [];
     this.selectedSkills = [];
-    this.DEFAULT_SKILL_DIFFICULTY = AppConstants.DEFAULT_SKILL_DIFFICULTY
-    this.MODE_SELECT_DIFFICULTY = QuestionsListConstants.MODE_SELECT_DIFFICULTY
-    this.MODE_SELECT_SKILL = QuestionsListConstants.MODE_SELECT_SKILL
+    this.DEFAULT_SKILL_DIFFICULTY = AppConstants.DEFAULT_SKILL_DIFFICULTY;
+    this.MODE_SELECT_DIFFICULTY = QuestionsListConstants.MODE_SELECT_DIFFICULTY;
+    this.MODE_SELECT_SKILL = QuestionsListConstants.MODE_SELECT_SKILL;
     this.filterSkills('');
 
     for (let idx in this.allSkillSummaries) {
@@ -90,7 +92,7 @@ export class QuestionsListSelectSkillAndDifficultyModalComponent
     return this.selectedSkills.includes(skillId);
   }
 
-  selectOrDeselectSkill(summary) {
+  selectOrDeselectSkill(summary: {id: string, description: string}): void {
     if (!this.isSkillSelected(summary.id)) {
       this.linkedSkillsWithDifficulty.push(
         SkillDifficulty.create(
@@ -98,7 +100,8 @@ export class QuestionsListSelectSkillAndDifficultyModalComponent
           this.DEFAULT_SKILL_DIFFICULTY));
       this.selectedSkills.push(summary.id);
     } else {
-      let idIndex = this.linkedSkillsWithDifficulty.map((linkedSkillWithDifficulty) => {
+      let idIndex = this.linkedSkillsWithDifficulty.map(
+        (linkedSkillWithDifficulty) => {
           return linkedSkillWithDifficulty.getId();
         }).indexOf(summary.id);
       this.linkedSkillsWithDifficulty.splice(idIndex, 1);

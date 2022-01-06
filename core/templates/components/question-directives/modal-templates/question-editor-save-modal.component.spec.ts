@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for TopicEditorSaveModalComponent.
+ * @fileoverview Unit tests for QuestionEditorSaveModalComponent.
  */
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
@@ -21,30 +21,16 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { QuestionEditorSaveModalComponent } from './question-editor-save-modal.component';
 
-class MockActiveModal {
-  close(): void {
-    return;
-  }
-
-  dismiss(): void {
-    return;
-  }
-}
-
-describe('Topic Editor Save Modal Controller', function() {
+describe('Question Editor Save Modal Component', function() {
   let component: QuestionEditorSaveModalComponent;
   let fixture: ComponentFixture<QuestionEditorSaveModalComponent>;
-  let topicIsPublished = true;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
         QuestionEditorSaveModalComponent
       ],
-      providers: [{
-        provide: NgbActiveModal,
-        useClass: MockActiveModal
-      }],
+      providers: [NgbActiveModal],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));

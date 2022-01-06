@@ -56,7 +56,8 @@ describe(
   'Questions Opportunities Select Skill And Difficulty Modal Component',
   () => {
     let component: QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent;
-    let fixture: ComponentFixture<QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent>;
+    let fixture:
+    ComponentFixture<QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent>;
     let alertsService: AlertsService;
     let assetsBackendApiService: AssetsBackendApiService;
     let ngbActiveModal: NgbActiveModal;
@@ -145,7 +146,7 @@ describe(
         spyOn(
           extractImageFilenamesFromModelService,
           'getImageFilenamesInSkill').and.returnValue(['dummyImg.png']);
-        spyOn(assetsBackendApiService, 'fetchFiles').and.returnValue(
+        spyOn(assetsBackendApiService, 'getFile').and.returnValue(
           Promise.resolve(mockImageFile));
         // This throws "Argument of type 'MockReaderObject' is not assignable
         // to parameter of type 'FileReader'.". We need to suppress this error

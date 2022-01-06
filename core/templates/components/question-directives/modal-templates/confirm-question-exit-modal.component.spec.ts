@@ -21,7 +21,7 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmQuestionExitComponent } from './confirm-question-exit-modal.component';
 
-describe('Delete Worked Example Modal Component', () => {
+describe('Confirm Question Exit Component', () => {
   let component: ConfirmQuestionExitComponent;
   let fixture: ComponentFixture<ConfirmQuestionExitComponent>;
 
@@ -30,9 +30,7 @@ describe('Delete Worked Example Modal Component', () => {
       declarations: [
         ConfirmQuestionExitComponent
       ],
-      providers: [{
-        provide: NgbActiveModal
-      }],
+      providers: [NgbActiveModal],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));
