@@ -87,14 +87,11 @@
         <div class="mobile-activity-card-summary-section">
           <ul *ngIf="!isCollectionPreviewTile" class="mobile-activity-card-summary-elements">
             <li>
-              <span class="far fa-eye eye-icon" ngbTooltip="I18N_LIBRARY_VIEWS_TOOLTIP' | translate" placement="top" container="body">
-                <span class="oppia-icon-accessibility-label" [innerHTML]="'I18N_LIBRARY_VIEWS_TOOLTIP' | translate"> </span>
-              </span>
-              <span *ngIf="numViews">
-                {{ numViews | summarizeNonnegativeNumber }}
-              </span>
+              <span *ngIf="numViews">{{ numViews | summarizeNonnegativeNumber }}</span>
               <span *ngIf="!numViews" [innerHTML]="'I18N_LIBRARY_N/A' | translate" class="oppia-inactive-summary-tile-attribute">
               </span>
+              <span *ngIf="numViews == '1'"  class="views-text">view</span>
+              <span *ngIf="numViews != '1'" class="views-text">views</span>
             </li>
             <li>
               <span>
@@ -162,7 +159,7 @@
     width: auto;
   }
 
-  .eye-icon {
-    margin-right: 10px;
+  .views-text {
+    margin-left: 6px;
   }
 </style>
