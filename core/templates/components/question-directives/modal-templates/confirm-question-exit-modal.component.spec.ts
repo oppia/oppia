@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the ConfirmQuestionExitComponent.
+ * @fileoverview Unit tests for the ConfirmQuestionExitModalComponent.
  */
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
@@ -21,7 +21,7 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmQuestionExitComponent } from './confirm-question-exit-modal.component';
 
-describe('Confirm Question Exit Component', () => {
+describe('Confirm Question Exit Modal Component', () => {
   let component: ConfirmQuestionExitComponent;
   let fixture: ComponentFixture<ConfirmQuestionExitComponent>;
 

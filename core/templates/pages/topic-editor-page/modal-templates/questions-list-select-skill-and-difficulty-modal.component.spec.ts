@@ -154,9 +154,9 @@ describe('Questions List Select Skill And Difficulty Modal Component', () => {
       component.selectOrDeselectSkill(summary);
     });
 
-    it('should filter the skills', () => {
-      component.filterSkills('Skill 1 description')
+  it('should filter the skills', () => {
+    component.filterSkills('Skill 1 description');
 
-      expect(component.skillsToShow.length).toBe(1);
-    });
+    expect(component.skillsToShow.length).toBe(1);
+  });
 });

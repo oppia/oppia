@@ -174,28 +174,28 @@ describe(
         expect(ngbActiveModal.close).toHaveBeenCalledWith({
           skill: skillObjectFactory.createFromBackendDict(skill),
           skillDifficulty: 0.3
-          });
         });
+      });
     });
 
-  describe('when fetching skill fails', () => {
-    beforeEach(() => {
-      fixture = TestBed.createComponent(QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent);
-      component = fixture.componentInstance;
-      alertsService = TestBed.inject(AlertsService);
-      ngbActiveModal = TestBed.inject(NgbActiveModal);
-      skillBackendApiService = TestBed.inject(SkillBackendApiService);
-     
-      spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
+    describe('when fetching skill fails', () => {
+      beforeEach(() => {
+        fixture = TestBed.createComponent(QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent);
+        component = fixture.componentInstance;
+        alertsService = TestBed.inject(AlertsService);
+        ngbActiveModal = TestBed.inject(NgbActiveModal);
+        skillBackendApiService = TestBed.inject(SkillBackendApiService);
+  
+        spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
           Promise.reject('It was not possible to fetch the skill'));
-      fixture.detectChanges();
+        fixture.detectChanges();
+      });
+
+      it('should shows a warning error', fakeAsync(() => {
+        let addWarningSpy = spyOn(alertsService, 'addWarning');
+
+        expect(addWarningSpy.calls.allArgs()[0]).toEqual(
+          ['Error populating skill: It was not possible to fetch the skill.']);
+      }));
     });
-
-    it('should shows a warning error', fakeAsync(() => {
-      let addWarningSpy = spyOn(alertsService, 'addWarning');
-
-      expect(addWarningSpy.calls.allArgs()[0]).toEqual(
-        ['Error populating skill: It was not possible to fetch the skill.']);
-    }));
   });
-});

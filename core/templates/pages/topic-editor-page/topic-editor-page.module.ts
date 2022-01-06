@@ -59,7 +59,6 @@ import { TopicEditorSaveModalComponent } from './modal-templates/topic-editor-sa
     TopicPreviewTabComponent,
     TopicEditorNavbarBreadcrumbComponent,
     CreateNewSubtopicModalComponent,
-    TopicEditorSaveModalComponent,
     DeleteStoryModalComponent,
     TopicEditorSendMailComponent,
     TopicEditorSaveModalComponent

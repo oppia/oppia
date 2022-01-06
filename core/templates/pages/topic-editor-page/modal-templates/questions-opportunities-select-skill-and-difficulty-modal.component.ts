@@ -31,8 +31,7 @@ import { ImageLocalStorageService } from 'services/image-local-storage.service';
 
 @Component({
   selector: 'oppia-questions-opportunities-select-skill-and-difficulty-modal',
-  templateUrl: './questions-opportunities-select-skill-and-difficulty-modal' +
-    '.component.html'
+  templateUrl: './questions-opportunities-select-skill-and-difficulty-modal.component.html'
 })
 export class QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent
   extends ConfirmOrCancelModal implements OnInit {
