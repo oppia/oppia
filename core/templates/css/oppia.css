@@ -4592,7 +4592,6 @@ div.oppia-issues-learner-action {
   display: inline;
   font-size: 0.8em;
   line-height: 1;
-  margin: 0 2px;
   padding: .3em .35em .3em .5em;
   text-align: center;
   vertical-align: baseline;
@@ -4649,6 +4648,22 @@ div.oppia-issues-learner-action {
 
 .mat-card-content.oppia-profile-portfolio-container {
   background-color: transparent;
+  /* Increase no. of columns on contributors profile page */
+  display: grid;
+  grid-template-columns: max-content max-content max-content;
+}
+
+/* Increase no. of columns on contributors profile page */
+@media (max-width: 1080px) {
+  .mat-card-content.oppia-profile-portfolio-container {
+    grid-template-columns: max-content max-content;
+  }
+}
+
+@media (max-width: 820px) {
+  .mat-card-content.oppia-profile-portfolio-container {
+    grid-template-columns: max-content;
+  }
 }
 
 .oppia-profile-portfolio-pages {
@@ -4717,6 +4732,9 @@ div.oppia-issues-learner-action {
   }
   .oppia-profile-user-bio {
     display: inline-block;
+  }
+  .mat-card-content.oppia-profile-portfolio-container {
+    grid-template-columns: unset;
   }
 }
 
