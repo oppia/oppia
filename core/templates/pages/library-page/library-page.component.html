@@ -186,12 +186,14 @@
             </div>
           </div>
           <div class="height-toggle-btn-container">
-            <button class="card-container-height-toggle-btn"
-                    id="height-toggle-btn-{{idx}}"
-                    *ngIf="libraryWindowIsNarrow && group.activity_summary_dicts.length > 3"
-                    (click)="toggleCardContainerHeightInMobileView($event)">
-              See More
-            </button>
+            <div class="button-alignment-div">
+              <button class="card-container-height-toggle-btn"
+                      id="height-toggle-btn-{{idx}}"
+                      *ngIf="libraryWindowIsNarrow && group.activity_summary_dicts.length > 3"
+                      (click)="toggleCardContainerHeightInMobileView($event)">
+                See More
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -356,7 +358,7 @@
     overflow-y: hidden;
   }
   .limit-cards-shown {
-    max-height: 294px;
+    max-height: 293px;
   }
   .card-container-height-toggle-btn {
     background: #04857c;
@@ -364,12 +366,15 @@
     border-radius: 8px;
     color: #fff;
     font-size: 18px;
-    padding: 8px 20px 5px 20px;
+    padding: 6px 20px 3px 20px;
   }
   .height-toggle-btn-container {
     display: flex;
     justify-content: center;
     margin-top: 12px;
+  }
+  .button-alignment-div {
+    width: 350px;
   }
   .oppia-library-carousel {
     float: left;
