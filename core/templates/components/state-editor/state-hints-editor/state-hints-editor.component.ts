@@ -161,6 +161,7 @@ angular.module('oppia').component('stateHintsEditor', {
           StateHintsService.displayed = [];
           StateHintsService.saveDisplayedValue();
           ctrl.onSaveHints(StateHintsService.displayed);
+          $rootScope.$apply();
         }, function() {
           AlertsService.clearWarnings();
         });
@@ -187,6 +188,7 @@ angular.module('oppia').component('stateHintsEditor', {
           if (index === StateHintsService.getActiveHintIndex()) {
             StateHintsService.setActiveHintIndex(null);
           }
+          $rootScope.$apply();
         }, function() {
           AlertsService.clearWarnings();
         });
