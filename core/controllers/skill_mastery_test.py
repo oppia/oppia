@@ -636,7 +636,8 @@ class SubtopicMasteryDataHandlerTest(test_utils.GenericTestBase):
                     topic_id_1, topic_id_2])
             }, expected_status_int=400)
 
-            self.assertEqual(json_response['error'],
+            self.assertEqual(
+                json_response['error'],
                 'Invalid topic ID %s' % topic_id_1)
 
         self.logout()
