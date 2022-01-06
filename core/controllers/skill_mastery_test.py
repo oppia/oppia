@@ -265,7 +265,7 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             json_response['error'],
             'Schema validation for \'mastery_change_per_skill\' failed: ' +
-            'Expected dict, received %s'%(mastery_change_per_skill)
+            'Expected dict, received %s' %(mastery_change_per_skill)
         )
 
         self.logout()

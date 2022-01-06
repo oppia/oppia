@@ -55,6 +55,7 @@ class SkillMasteryDataHandler(base.BaseHandler):
             }
         }
     }
+
     @acl_decorators.can_access_learner_dashboard
     def get(self):
         """Handles GET requests."""

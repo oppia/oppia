@@ -147,7 +147,7 @@ def normalize_against_schema(
             )
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_FLOAT:
         if isinstance(obj, bool):
-            raise Exception('Expected float, received %s'% obj)
+            raise Exception('Expected float, received %s' % obj)
         try:
             obj = float(obj)
         except Exception:
