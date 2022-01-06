@@ -2750,6 +2750,7 @@ div#ng-curtain {
   display: inline-block;
 }
 .navbar-header {
+  display: flex;
   /* Prevent whitespace from inline-block elements from adding space. */
   font-size: 0;
 }
