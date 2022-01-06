@@ -17,14 +17,14 @@
  */
 
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { FormControl, FormGroup } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import cloneDeep from 'lodash/cloneDeep';
 import { ContextService } from 'services/context.service';
 import { EditabilityService } from 'services/editability.service';
 import { ExternalSaveService } from 'services/external-save.service';
 import { Hint } from 'domain/exploration/HintObjectFactory';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { FormControl, FormGroup } from '@angular/forms';
 
 interface HintFormSchema {
   type: string;
