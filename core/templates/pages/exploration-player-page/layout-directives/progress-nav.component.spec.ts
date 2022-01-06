@@ -100,17 +100,12 @@ describe('Progress nav component', () => {
 
   it('should initialize', fakeAsync(() => {
     let isIframed = true;
-    let mockDisplayedCardIndexChangedEventEmitter = new EventEmitter<void>();
     let mockOnHelpCardAvailableEventEmitter = (
       new EventEmitter<HelpCardEventResponse>());
     let mockSchemaFormSubmittedEventEmitter = new EventEmitter<void>();
 
     spyOn(urlService, 'isIframed').and.returnValue(isIframed);
-    spyOn(componentInstance, 'updateDisplayedCardInfo');
     spyOn(componentInstance.submit, 'emit');
-    spyOnProperty(
-      playerPositionService, 'displayedCardIndexChangedEventEmitter')
-      .and.returnValue(mockDisplayedCardIndexChangedEventEmitter);
     spyOnProperty(playerPositionService, 'onHelpCardAvailable')
       .and.returnValue(mockOnHelpCardAvailableEventEmitter);
     spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(0);
@@ -118,7 +113,6 @@ describe('Progress nav component', () => {
       .and.returnValue(mockSchemaFormSubmittedEventEmitter);
 
     componentInstance.ngOnInit();
-    mockDisplayedCardIndexChangedEventEmitter.emit();
     mockOnHelpCardAvailableEventEmitter.emit({
       hasContinueButton: true
     } as HelpCardEventResponse);
@@ -126,7 +120,6 @@ describe('Progress nav component', () => {
     tick();
 
     expect(componentInstance.isIframed).toEqual(isIframed);
-    expect(componentInstance.updateDisplayedCardInfo).toHaveBeenCalled();
     expect(componentInstance.helpCardHasContinueButton).toBeTrue();
     expect(componentInstance.submit.emit).toHaveBeenCalled();
   }));
