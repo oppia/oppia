@@ -87,6 +87,7 @@ class ActivityReferenceDomainUnitTests(test_utils.GenericTestBase):
             sample_activity_object.to_dict()
         )
 
+
 class ActivityReferencesDomainUnitTests(test_utils.GenericTestBase):
     """Tests for ActivityReferences domain class."""
 
