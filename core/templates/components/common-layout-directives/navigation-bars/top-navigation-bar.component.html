@@ -227,60 +227,56 @@
               (mouseleave)="closeSubmenuIfNotMobile($event)">
             <div class="d-flex flex-column">
               <div class="top-section d-flex">
-                <a class="item item-border d-flex flex-column"
-                   (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_CLOSE})"
-                   href="/partnerships"
-                   [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.ROUTE"
-                   rel="noopener">
+                <div class="item item-border d-flex flex-column" onclick="location.href='/partnerships'"
+                   (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_CLOSE})">
                   <div class="heading">
-                    <span class="material-icons language">language</span>
-                    {{'I18N_TOPNAV_PARTNERSHIPS' | translate}}
+                    <span class="material-icons language mx-1">language</span>
+                    <a class="heading-text" href="/partnerships"
+                       [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.ROUTE" rel="noopener">{{'I18N_TOPNAV_PARTNERSHIPS' | translate}}
+                    </a>
                   </div>
                   <div class="des">
                     {{'I18N_TOPNAV_PARTNERSHIPS_DESCRIPTION' | translate}}
                   </div>
-                </a>
-                <a class="item d-flex flex-column"
-                   href="/volunteer"
-                   [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.VOLUNTEER.ROUTE"
-                   (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {enter: ACTION_CLOSE})"
-                   rel="noopener">
+                </div>
+                <div class="item d-flex flex-column" onclick="location.href='/volunteer'">
                   <div class="heading">
-                    <span class="material-icons volunteer">supervisor_account</span>
-                    {{'I18N_HEADING_VOLUNTEER'| translate}}
+                    <span class="material-icons volunteer mx-1">supervisor_account</span>
+                    <a class="heading-text" href="/volunteer" [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.VOLUNTEER.ROUTE"
+                       (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {enter: ACTION_CLOSE})"
+                       rel="noopener">{{'I18N_HEADING_VOLUNTEER'| translate}}
+                    </a>
                   </div>
                   <div class="des">
                     {{'I18N_TOPNAV_VOLUNTEER_DESCRIPTION' | translate}}
                   </div>
-                </a>
+                </div>
               </div>
               <div class="bottom-section d-flex">
-                <a class="item item-border d-flex flex-column"
-                   href="/contact"
-                   [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.CONTACT.ROUTE"
-                   (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {enter: ACTION_CLOSE})"
-                   rel="noopener">
+                <div class="item item-border d-flex flex-column" onclick="location.href='/contact'">
                   <div class="heading">
-                    <span class="material-icons contact">mail</span>
-                    {{'I18N_TOPNAV_CONTACT_US' | translate}}
+                    <span class="material-icons contact mx-1">mail</span>
+                    <a href="/contact" [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.CONTACT.ROUTE"
+                       (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {enter: ACTION_CLOSE})"
+                       rel="noopener" class="heading-text">{{'I18N_TOPNAV_CONTACT_US' | translate}}
+                    </a>
                   </div>
                   <div class="des">
                     {{'I18N_TOPNAV_CONTACT_US_DESCRIPTION' | translate}}
                   </div>
-                </a>
-                <a class="item d-flex flex-column"
-                   href="/donate"
-                   [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE"
-                   (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {enter: ACTION_CLOSE})"
-                   rel="noopener">
+                </div>
+                <div class="item d-flex flex-column" onclick="location.href='/donate'">
                   <div class="heading">
-                    <span class="material-icons fav">favorite</span>
-                    {{'I18N_TOPNAV_DONATE' | translate}}
+                    <span class="material-icons fav mx-1">favorite</span>
+                    <a class="heading-text" href="/donate" [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE"
+                       (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {enter: ACTION_CLOSE})"
+                       rel="noopener">{{'I18N_TOPNAV_DONATE' | translate}}
+                    </a>
                   </div>
                   <div class="des">
                     {{'I18N_TOPNAV_DONATE_DESCRIPTION' | translate}}
                   </div>
-                </a>
+                </div>
               </div>
             </div>
           </ul>
@@ -306,11 +302,11 @@
               class="dropdown-menu oppia-navbar-dropdown oppia-navbar-dropdown-right"
               (mouseover)="openSubmenu($event, 'donateMenu')"
               (mouseleave)="closeSubmenuIfNotMobile($event)">
-            <li class="nav-item oppia-navbar-dropdown-item">
-              <a class="dropdown-item nav-link oppia-navbar-tab-content oppia-navbar-tab-content-heading"
+            <li class="item nav-item oppia-navbar-dropdown-item">
+              <a class="oppia-navbar-tab-content oppia-navbar-tab-content-heading"
                  href="/donate"
                  [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE"
-                 (keydown)="onMenuKeypress($event, 'donateMenu', {enter: ACTION_CLOSE})"
+                 (keydown)="onMenuKeypress($event, 'donateMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_CLOSE})"
                  rel="noopener"
               >
                 <i class="material-icons oppia-navbar-dropdown-heart-icon">&#xE87D;</i>
@@ -533,6 +529,17 @@
   </ul>
 </div>
 <style>
+  .dropdown-menu .item:hover a {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+  }
+  .dropdown-menu a:focus, .dropdown-menu a:hover {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+  }
+  .heading a {
+    color:#212121;
+  }
   .nav-item-links a {
     color: #212121;
     text-decoration: none;
@@ -558,9 +565,6 @@
   }
   .get-involved-dropdown a {
     text-decoration: none;
-  }
-  .dropdown-menu a:focus {
-    text-decoration: underline;
   }
   .get-involved-dropdown .language {
     color: #F2994A;
@@ -596,7 +600,6 @@
   }
   .item:hover, .item:focus {
     background-color: #21212107;
-    text-decoration: underline !important;
   }
   .top-section .item {
     padding-bottom: 27px;
@@ -846,15 +849,6 @@
     font-size: 16px;
     font-weight: 500;
     padding: 0;
-  }
-  .oppia-navbar-tab-content-heading:after {
-    border-style: solid;
-    border-width: 0 0 1.59px;
-    bottom: 1px;
-    content: '';
-    left: 28px;
-    position: absolute;
-    width: 50.5px;
   }
   .oppia-navbar-dropdown-heart-icon {
     color: #EB5757;
