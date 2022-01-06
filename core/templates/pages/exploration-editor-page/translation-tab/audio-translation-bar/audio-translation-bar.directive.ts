@@ -544,7 +544,7 @@ angular.module('oppia').directive('audioTranslationBar', [
               $('.oppia-main-body').off('dragleave');
               $('.oppia-translation-tab').off('drop');
               // Remove wavesurefer finish event listener.
-              $scope.waveSurfer.un('finish', waveSurferOnFinishCb);
+              $scope.waveSurfer?.un('finish', waveSurferOnFinishCb);
             });
 
             ctrl.directiveSubscriptions.add(
