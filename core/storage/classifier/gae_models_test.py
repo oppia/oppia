@@ -45,6 +45,30 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
             classifier_models.ClassifierTrainingJobModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
+    def test_get_export_policy(self) -> None:
+        sample_dict = base_models.BaseModel.get_export_policy()
+        sample_dict.update(
+            {'algorithm_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'interaction_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'status': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'training_data': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'next_scheduled_check_time':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'algorithm_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            })
+        self.assertEqual(
+            classifier_models.ClassifierTrainingJobModel.get_export_policy(),
+            sample_dict)
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            classifier_models.ClassifierTrainingJobModel.
+                get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
+
     def test_create_and_get_new_training_job_runs_successfully(self) -> None:
         next_scheduled_check_time = datetime.datetime.utcnow()
         job_id = classifier_models.ClassifierTrainingJobModel.create(
@@ -312,6 +336,42 @@ class StateTrainingJobsMappingModelUnitTests(test_utils.GenericTestBase):
             classifier_models.StateTrainingJobsMappingModel
             .get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+    def test_get_export_policy(self) -> None:
+        sample_dict = base_models.BaseModel.get_export_policy()
+        sample_dict.update(
+            {'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'algorithm_ids_to_job_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            })
+        self.assertEqual(
+            classifier_models.StateTrainingJobsMappingModel.get_export_policy(),
+            sample_dict)
+
+    def test_get_model(self) -> None:
+        exp_id = 'exp_id1'
+        exp_version = 1
+        state_name = 'state_name1'
+        job_id = 'job_id1'
+        classifier_models.StateTrainingJobsMappingModel.create(
+            exp_id, exp_version, state_name, {'algorithm_id': job_id})
+
+        mapping = (
+            classifier_models.StateTrainingJobsMappingModel.get_model(
+                exp_id, exp_version, state_name))
+        # Ruling out the possibility of None for mypy type checking.
+        assert mapping is not None
+
+        self.assertEqual(mapping.exp_id, exp_id)
+        self.assertEqual(mapping.exp_version, 1)
+        self.assertEqual(mapping.state_name, state_name)
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            classifier_models.StateTrainingJobsMappingModel.
+                get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
 
     def test_create_and_get_new_mapping_runs_successfully(self) -> None:
         mapping_id = (
