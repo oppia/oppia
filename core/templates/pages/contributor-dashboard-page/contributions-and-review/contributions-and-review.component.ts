@@ -331,28 +331,33 @@ angular.module('oppia').component('contributionsAndReview', {
         }
       };
 
+      ctrl.getActiveDropdownTabChoice = function() {
+        if (ctrl.activeTabType === ctrl.TAB_TYPE_REVIEWS) {
+          if (ctrl.activeSuggestionType === SUGGESTION_TYPE_QUESTION) {
+            return 'Review Questions';
+          } else {
+            return 'Review Translations';
+          }
+        } else {
+          if (ctrl.activeSuggestionType === SUGGESTION_TYPE_QUESTION) {
+            return 'Questions';
+          } else {
+            return 'Translations';
+          }
+        }
+      };
+
       ctrl.switchToTab = function(tabType, suggestionType) {
         ctrl.activeSuggestionType = suggestionType;
         ctrl.activeTabType = tabType;
-        ctrl.activeDropdownTabChoice =
-          ctrl.getOptionValueFromTabAndSuggestionTypes(tabType, suggestionType);
+        ctrl.activeDropdownTabChoice = ctrl.getActiveDropdownTabChoice();
+        ctrl.dropdownShown = false;
         ctrl.contributions = {};
         ContributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit();
       };
 
-      ctrl.getTabAndSuggestionTypesFromDropdownOption = function() {
-        return ctrl.activeDropdownTabChoice.split(' ');
-      };
-
-      ctrl.getOptionValueFromTabAndSuggestionTypes = function(
-          tabType, suggestionType) {
-        return tabType + ' ' + suggestionType;
-      };
-
-      ctrl.switchToTabFromDropdownChoice = function() {
-        var [tabType, suggestionType] =
-          ctrl.getTabAndSuggestionTypesFromDropdownOption();
-        ctrl.switchToTab(tabType, suggestionType);
+      ctrl.toggleDropdown = function() {
+        ctrl.dropdownShown = !ctrl.dropdownShown;
       };
 
       ctrl.loadContributions = function() {
@@ -373,28 +378,40 @@ angular.module('oppia').component('contributionsAndReview', {
         });
       };
 
+      $(document).bind('click', function(clickEvent) {
+        const dropdown = document
+          .querySelector('.oppia-contributions-dropdown-container');
+        const clickOccurredWithinDropdown =
+          dropdown.contains(clickEvent.target);
+
+        if (clickOccurredWithinDropdown) {
+          return;
+        }
+
+        $rootScope.$apply(function() {
+          ctrl.dropdownShown = false;
+        });
+      });
+
       ctrl.$onInit = function() {
         ctrl.contributions = [];
         ctrl.userDetailsLoading = true;
         ctrl.userIsLoggedIn = false;
         ctrl.activeTabType = '';
         ctrl.activeSuggestionType = '';
+        ctrl.dropdownShown = false;
         ctrl.activeDropdownTabChoice = '';
         ctrl.reviewTabs = [];
         ctrl.contributionTabs = [
           {
             suggestionType: SUGGESTION_TYPE_QUESTION,
             text: 'Questions',
-            enabled: false,
-            dropdownOptionValue: ctrl.getOptionValueFromTabAndSuggestionTypes(
-              ctrl.TAB_TYPE_CONTRIBUTIONS, SUGGESTION_TYPE_QUESTION)
+            enabled: false
           },
           {
             suggestionType: SUGGESTION_TYPE_TRANSLATE,
             text: 'Translations',
-            enabled: true,
-            dropdownOptionValue: ctrl.getOptionValueFromTabAndSuggestionTypes(
-              ctrl.TAB_TYPE_CONTRIBUTIONS, SUGGESTION_TYPE_TRANSLATE)
+            enabled: true
           }
         ];
 
@@ -422,10 +439,7 @@ angular.module('oppia').component('contributionsAndReview', {
                 if (userCanReviewQuestionSuggestions) {
                   ctrl.reviewTabs.push({
                     suggestionType: SUGGESTION_TYPE_QUESTION,
-                    text: 'Review Questions',
-                    dropdownOptionValue:
-                      ctrl.getOptionValueFromTabAndSuggestionTypes(
-                        ctrl.TAB_TYPE_REVIEWS, SUGGESTION_TYPE_QUESTION)
+                    text: 'Review Questions'
                   });
                   userReviewableSuggestionTypes.push(SUGGESTION_TYPE_QUESTION);
                 }
@@ -434,10 +448,7 @@ angular.module('oppia').component('contributionsAndReview', {
                     .length > 0) {
                   ctrl.reviewTabs.push({
                     suggestionType: SUGGESTION_TYPE_TRANSLATE,
-                    text: 'Review Translations',
-                    dropdownOptionValue:
-                      ctrl.getOptionValueFromTabAndSuggestionTypes(
-                        ctrl.TAB_TYPE_REVIEWS, SUGGESTION_TYPE_TRANSLATE)
+                    text: 'Review Translations'
                   });
                   userReviewableSuggestionTypes.push(SUGGESTION_TYPE_TRANSLATE);
                 }
