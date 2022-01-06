@@ -15,6 +15,7 @@
 """Tests for the Question Player controller."""
 
 from __future__ import annotations
+import json
 
 from core import feconf
 from core import python_utils
@@ -528,8 +529,10 @@ class SubtopicMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         # First case: One subtopic mastery doesn't exist.
         response_json = self.get_json(
-            '%s' % feconf.SUBTOPIC_MASTERY_DATA_URL, params={
-                'comma_separated_topic_ids': ','.join([topic_id_1, topic_id_2])
+            '%s' % feconf.SUBTOPIC_MASTERY_DATA_URL,
+            params={
+                'selected_topic_ids': json.dumps([
+                    topic_id_1, topic_id_2])
             })
         degrees_of_mastery_1 = {
             u'1': python_utils.divide(
@@ -548,8 +551,10 @@ class SubtopicMasteryDataHandlerTest(test_utils.GenericTestBase):
         skill_services.create_user_skill_mastery(
             self.user_id, self.skill_id_3, self.degree_of_mastery_3)
         response_json = self.get_json(
-            '%s' % feconf.SUBTOPIC_MASTERY_DATA_URL, params={
-                'comma_separated_topic_ids': ','.join([topic_id_1, topic_id_2])
+            '%s' % feconf.SUBTOPIC_MASTERY_DATA_URL,
+            params={
+                'selected_topic_ids': json.dumps([
+                    topic_id_1, topic_id_2])
             })
         degrees_of_mastery_1 = {
             u'1': python_utils.divide(
@@ -571,7 +576,8 @@ class SubtopicMasteryDataHandlerTest(test_utils.GenericTestBase):
             self.user_id, self.skill_id_4, self.degree_of_mastery_4)
         response_json = self.get_json(
             '%s' % feconf.SUBTOPIC_MASTERY_DATA_URL, params={
-                'comma_separated_topic_ids': ','.join([topic_id_1, topic_id_2])
+                'selected_topic_ids': json.dumps([
+                    topic_id_1, topic_id_2])
             })
         degrees_of_mastery_1 = {
             u'1': python_utils.divide(
@@ -593,13 +599,15 @@ class SubtopicMasteryDataHandlerTest(test_utils.GenericTestBase):
     def test_get_with_invalid_topic_id_returns_400(self):
         self.login(self.NEW_USER_EMAIL)
         response_json = self.get_json(
-            '%s' % feconf.SUBTOPIC_MASTERY_DATA_URL, params={
-                'comma_separated_topic_ids': 'invalid_topic_id'
+            '%s' % feconf.SUBTOPIC_MASTERY_DATA_URL,
+            params={
+                'selected_topic_ids': 'invalid_topic_id'
             }, expected_status_int=400)
 
         self.assertEqual(
             response_json['error'],
-            'Invalid topic ID invalid_topic_id')
+            'Schema validation for \'selected_topic_ids\' failed: '
+            'Expecting value: line 1 column 1 (char 0)')
 
         self.logout()
 
@@ -611,6 +619,6 @@ class SubtopicMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             json_response['error'],
-            'Missing key in handler args: comma_separated_topic_ids.')
+            'Missing key in handler args: selected_topic_ids.')
 
         self.logout()

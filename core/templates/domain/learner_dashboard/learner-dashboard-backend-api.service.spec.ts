@@ -574,7 +574,8 @@ describe('Learner Dashboard Backend API Service', () => {
       .then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      '/subtopic_mastery_handler/data?comma_separated_topic_ids=topic_id');
+      '/subtopic_mastery_handler/data?' +
+      'selected_topic_ids=%22topic_id%22');
     expect(req.request.method).toEqual('GET');
     req.flush(sampleSubtopicMastery);
 
@@ -595,7 +596,8 @@ describe('Learner Dashboard Backend API Service', () => {
       .then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      '/subtopic_mastery_handler/data?comma_separated_topic_ids=topic_id');
+      '/subtopic_mastery_handler/data?' +
+      'selected_topic_ids=%22topic_id%22');
     expect(req.request.method).toEqual('GET');
     req.flush({
       error: 400
