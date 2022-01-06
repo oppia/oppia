@@ -538,6 +538,7 @@ angular.module('oppia').directive('audioTranslationBar', [
 
             $scope.$on('$destroy', function() {
               document.body.onkeyup = null;
+              // TODO(#12146): Remove jQuery usage below.
               // Remove jQuery event listeners.
               $('.oppia-translation-tab').off('dragover');
               $('.oppia-main-body').off('dragleave');
