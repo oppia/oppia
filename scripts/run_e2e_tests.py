@@ -318,7 +318,8 @@ def main(args=None):
                 flake_checker.report_pass(parsed_args.suite)
                 break
 
-            # Check whether we should rerun based on this suite's policy.
+            # Check whether we should rerun based on this suite's policy
+            # and override instructions from the flake checker server.
             test_is_flaky, rerun_override = flake_checker.is_test_output_flaky(
                 output, parsed_args.suite)
             if rerun_override == flake_checker.RERUN_YES:
