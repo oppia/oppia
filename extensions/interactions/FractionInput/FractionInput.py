@@ -130,8 +130,8 @@ class FractionInput(base.BaseInteraction):
         Returns:
             CustomizationArgsDto. The proto object.
         """
-        placeholder_proto = (
-            customization_args['customPlaceholder'].value.to_android_content_proto())
+        content = customization_args['customPlaceholder'].value
+        placeholder_proto = content.to_android_content_proto()
 
         return state_pb2.FractionInputInstanceDto.CustomizationArgsDto(
             requires_simplest_form=(
@@ -180,7 +180,8 @@ class FractionInput(base.BaseInteraction):
         """
         answer_group_list_proto = []
         for answer_group in answer_groups:
-            base_answer_group_proto = answer_group.to_android_answer_group_proto()
+            base_answer_group_proto = (
+                answer_group.to_android_answer_group_proto())
             rules_spec_proto = cls._convert_rule_specs_to_proto(
                 answer_group.rule_specs)
             answer_group_list_proto.append(

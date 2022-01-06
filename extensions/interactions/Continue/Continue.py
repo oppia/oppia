@@ -89,6 +89,8 @@ class Continue(base.BaseInteraction):
         Returns:
             CustomizationArgsDto. The proto object.
         """
+        content = customization_args['buttonText'].value
+
         return state_pb2.ContinueInstanceDto.CustomizationArgsDto(
-            button_text=customization_args['buttonText'].value.to_android_content_proto()
+            button_text=content.to_android_content_proto()
         )

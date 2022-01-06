@@ -3729,12 +3729,14 @@ class State:
         Returns:
             StateDto. The proto object.
         """
+        recorded_voiceovers = self.recorded_voiceovers
+        written_translations = self.written_translations
         return state_pb2.StateDto(
             content=self.content.to_android_content_proto(),
             recorded_voiceovers=(
-                self.recorded_voiceovers.to_android_recorded_voiceovers_proto()),
+                recorded_voiceovers.to_android_recorded_voiceovers_proto()),
             written_translations=(
-                self.written_translations.to_android_written_translations_proto()),
+                written_translations.to_android_written_translations_proto()),
             interaction=self.interaction.to_android_interaction_proto()
         )
 

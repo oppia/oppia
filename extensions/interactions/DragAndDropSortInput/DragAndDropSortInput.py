@@ -130,7 +130,8 @@ class DragAndDropSortInput(base.BaseInteraction):
         """
         answer_group_list_proto = []
         for answer_group in answer_groups:
-            base_answer_group_proto = answer_group.to_android_answer_group_proto()
+            base_answer_group_proto = (
+                answer_group.to_android_answer_group_proto())
             rules_spec_proto = (
                 cls._convert_rule_specs_to_proto(answer_group.rule_specs))
             answer_group_list_proto.append(
@@ -359,7 +360,8 @@ class DragAndDropSortInput(base.BaseInteraction):
             CustomizationArgsDto. The CustomizationArgsDto proto object.
         """
         choices_list_proto = [
-            value.to_android_content_proto() for value in customization_args['choices'].value
+            value.to_android_content_proto()
+            for value in customization_args['choices'].value
         ]
 
         return state_pb2.DragAndDropSortInputInstanceDto.CustomizationArgsDto(
