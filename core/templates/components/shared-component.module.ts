@@ -95,6 +95,7 @@ import { RatingDisplayComponent } from './ratings/rating-display/rating-display.
 import { SupplementalCardComponent } from 'pages/exploration-player-page/learner-experience/supplemental-card.component';
 import { AddHintModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-hint-modal.component';
 import { SmoothHeightAnimatorComponent } from './smooth-height/smooth-height-animator.component';
+import { ResponseHeaderComponent } from './state-directives/response-header/response-header.component';
 
 // Pipes.
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
@@ -205,7 +206,8 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     SortByPipe,
     LearnerDashboardIconsComponent,
     PreviewThumbnailComponent,
-    AddHintModalComponent
+    AddHintModalComponent,
+    ResponseHeaderComponent
   ],
 
   entryComponents: [
@@ -266,7 +268,8 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     LearnerDashboardIconsComponent,
     PreviewThumbnailComponent,
-    AddHintModalComponent
+    AddHintModalComponent,
+    ResponseHeaderComponent
   ],
 
   exports: [
@@ -342,6 +345,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     SummarizeNonnegativeNumberPipe,
     SortByPipe,
     LearnerDashboardIconsComponent,
+    ResponseHeaderComponent
   ],
 })
 
