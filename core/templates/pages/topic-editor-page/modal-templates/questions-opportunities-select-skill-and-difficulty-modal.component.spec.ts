@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 /**
  * @fileoverview Unit tests for
  * QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent.
@@ -174,24 +175,24 @@ describe(
       });
     });
 
-    describe('when fetching skill fails', () => {
-      beforeEach(() => {
-        fixture = TestBed.createComponent(QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent);
-        component = fixture.componentInstance;
-        alertsService = TestBed.inject(AlertsService);
-        ngbActiveModal = TestBed.inject(NgbActiveModal);
-        skillBackendApiService = TestBed.inject(SkillBackendApiService);
-       
-        spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
-            Promise.reject('It was not possible to fetch the skill'));
-        fixture.detectChanges();
-      });
-
-      it('should shows a warning error', fakeAsync(() => {
-        let addWarningSpy = spyOn(alertsService, 'addWarning');
-
-        expect(addWarningSpy.calls.allArgs()[0]).toEqual(
-          ['Error populating skill: It was not possible to fetch the skill.']);
-      }));
+  describe('when fetching skill fails', () => {
+    beforeEach(() => {
+      fixture = TestBed.createComponent(QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent);
+      component = fixture.componentInstance;
+      alertsService = TestBed.inject(AlertsService);
+      ngbActiveModal = TestBed.inject(NgbActiveModal);
+      skillBackendApiService = TestBed.inject(SkillBackendApiService);
+     
+      spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
+          Promise.reject('It was not possible to fetch the skill'));
+      fixture.detectChanges();
     });
+
+    it('should shows a warning error', fakeAsync(() => {
+      let addWarningSpy = spyOn(alertsService, 'addWarning');
+
+      expect(addWarningSpy.calls.allArgs()[0]).toEqual(
+        ['Error populating skill: It was not possible to fetch the skill.']);
+    }));
+  });
 });

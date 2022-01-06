@@ -85,17 +85,17 @@ describe('Questions List Select Skill And Difficulty Modal Component', () => {
 
   it('should initialize component properties after component' +
     ' is initialized', () => {
-      expect(component.countOfSkillsToPrioritize).toBe(
-        countOfSkillsToPrioritize);
-      expect(component.instructionMessage).toBe(
-        'Select the skill(s) to link the question to:');
-      expect(component.currentMode).toBe(currentMode);
-      expect(component.linkedSkillsWithDifficulty).toEqual(
-        linkedSkillsWithDifficulty);
-      expect(component.skillSummaries).toEqual(allSkillSummaries);
-      expect(component.skillSummariesInitial.length).toBe(2);
-      expect(component.skillSummariesFinal.length).toBe(1);
-      expect(component.skillIdToRubricsObject).toEqual(skillIdToRubricsObject);
+    expect(component.countOfSkillsToPrioritize).toBe(
+      countOfSkillsToPrioritize);
+    expect(component.instructionMessage).toBe(
+      'Select the skill(s) to link the question to:');
+    expect(component.currentMode).toBe(currentMode);
+    expect(component.linkedSkillsWithDifficulty).toEqual(
+      linkedSkillsWithDifficulty);
+    expect(component.skillSummaries).toEqual(allSkillSummaries);
+    expect(component.skillSummariesInitial.length).toBe(2);
+    expect(component.skillSummariesFinal.length).toBe(1);
+    expect(component.skillIdToRubricsObject).toEqual(skillIdToRubricsObject);
     });
 
   it('should toggle skill selection when clicking on it', () => {
