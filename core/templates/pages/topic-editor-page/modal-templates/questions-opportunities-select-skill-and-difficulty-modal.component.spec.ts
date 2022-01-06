@@ -64,7 +64,8 @@ describe(
     let ngbActiveModal: NgbActiveModal;
     let skillBackendApiService: SkillBackendApiService;
     let skillObjectFactory: SkillObjectFactory;
-    let extractImageFilenamesFromModelService: ExtractImageFilenamesFromModelService;
+    let extractImageFilenamesFromModelService:
+      ExtractImageFilenamesFromModelService;
     let mockImageFile: ImageFile;
     let mockBlob: Blob;
 
@@ -94,16 +95,18 @@ describe(
 
     describe('when fetching skill successfully', () => {
       beforeEach(() => {
-        fixture = TestBed.createComponent(QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent);
+        fixture = TestBed.createComponent(
+          QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent);
         component = fixture.componentInstance;
         alertsService = TestBed.inject(AlertsService);
         assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
         ngbActiveModal = TestBed.inject(NgbActiveModal);
         skillBackendApiService = TestBed.inject(SkillBackendApiService);
         skillObjectFactory = TestBed.inject(SkillObjectFactory);
-        extractImageFilenamesFromModelService = TestBed.inject(ExtractImageFilenamesFromModelService);
+        extractImageFilenamesFromModelService = TestBed.inject(
+          ExtractImageFilenamesFromModelService);
         let skillDifficulties = ['easy', 'medium'];
-        
+
         let misconceptionDict1 = {
           id: 2,
           name: 'test name',
@@ -142,7 +145,7 @@ describe(
             skill: skillObjectFactory.createFromBackendDict(skill),
             assignedSkillTopicData: {},
             groupedSkillSummaries: {},
-        }));
+          }));
         mockImageFile = new ImageFile('dummyImg.png', mockBlob);
         spyOn(
           extractImageFilenamesFromModelService,
@@ -160,8 +163,8 @@ describe(
 
       it('should initialize properties after component is' +
         ' initialized', fakeAsync(() => {
-        expect(component.skill).toEqual(skillObjectFactory.createFromBackendDict(
-          skill));
+        expect(component.skill).toEqual(
+          skillObjectFactory.createFromBackendDict(skill));
       }));
 
       it('should create a question and select its difficulty when closing' +
@@ -171,8 +174,8 @@ describe(
         expect(ngbActiveModal.close).toHaveBeenCalledWith({
           skill: skillObjectFactory.createFromBackendDict(skill),
           skillDifficulty: 0.3
+          });
         });
-      });
     });
 
   describe('when fetching skill fails', () => {

@@ -25,15 +25,19 @@ import { QuestionsListConstants } from 'components/question-directives/questions
 import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
 import { Skill, SkillBackendDict } from 'domain/skill/SkillObjectFactory';
 
+interface Summary {
+  'id': string;
+  'description': string;
+}
+
 @Component({
-  selector: 'oppia-question-list-select-skill-and-difficulty-modal',
-  templateUrl: './questions-list-select-skill-and-difficulty-modal' +
-    '.component.html'
+  selector: 'oppia-questions-list-select-skill-and-difficulty-modal',
+  templateUrl: './questions-list-select-skill-and-difficulty-modal.component.html'
 })
 export class QuestionsListSelectSkillAndDifficultyModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-  @Input() allSkillSummaries: Skill;
   @Input() currentMode: string;
+  @Input() allSkillSummaries;
   @Input() countOfSkillsToPrioritize;
   @Input() linkedSkillsWithDifficulty;
   @Input() skillIdToRubricsObject;
@@ -76,7 +80,7 @@ export class QuestionsListSelectSkillAndDifficultyModalComponent
     }
   }
 
-  private filterSkills(skillSelector: string): void {
+  filterSkills(skillSelector: string): void {
     if (skillSelector === '') {
       this.skillsToShow = this.skillSummariesInitial;
     }
@@ -92,7 +96,7 @@ export class QuestionsListSelectSkillAndDifficultyModalComponent
     return this.selectedSkills.includes(skillId);
   }
 
-  selectOrDeselectSkill(summary: {id: string, description: string}): void {
+  selectOrDeselectSkill(summary: Summary): void {
     if (!this.isSkillSelected(summary.id)) {
       this.linkedSkillsWithDifficulty.push(
         SkillDifficulty.create(

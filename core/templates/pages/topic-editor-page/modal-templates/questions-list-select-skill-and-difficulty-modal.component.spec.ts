@@ -76,10 +76,16 @@ describe('Questions List Select Skill And Difficulty Modal Component', () => {
     fixture = TestBed.createComponent(
       QuestionsListSelectSkillAndDifficultyModalComponent);
     component = fixture.componentInstance;
+    ngbActiveModal = TestBed.inject(NgbActiveModal);
 
     allSkillSummaries.map(summary => (
       ShortSkillSummary.create(summary.id, summary.description)));
 
+    component.allSkillSummaries = allSkillSummaries;
+    component.countOfSkillsToPrioritize = countOfSkillsToPrioritize;
+    component.currentMode = currentMode;
+    component.linkedSkillsWithDifficulty = linkedSkillsWithDifficulty;
+    component.skillIdToRubricsObject = skillIdToRubricsObject;
     fixture.detectChanges();
   });
 
@@ -96,7 +102,7 @@ describe('Questions List Select Skill And Difficulty Modal Component', () => {
     expect(component.skillSummariesInitial.length).toBe(2);
     expect(component.skillSummariesFinal.length).toBe(1);
     expect(component.skillIdToRubricsObject).toEqual(skillIdToRubricsObject);
-    });
+  });
 
   it('should toggle skill selection when clicking on it', () => {
     expect(component.linkedSkillsWithDifficulty.length).toBe(0);
@@ -133,6 +139,7 @@ describe('Questions List Select Skill And Difficulty Modal Component', () => {
 
   it('should select skill and its difficulty proerly when closing the modal',
     () => {
+      spyOn(ngbActiveModal, 'close');
       let summary = allSkillSummaries[1];
       component.selectOrDeselectSkill(summary);
 
@@ -145,5 +152,11 @@ describe('Questions List Select Skill And Difficulty Modal Component', () => {
 
       // Remove summary to not affect other specs.
       component.selectOrDeselectSkill(summary);
+    });
+
+    it('should filter the skills', () => {
+      component.filterSkills('Skill 1 description')
+
+      expect(component.skillsToShow.length).toBe(1);
     });
 });
