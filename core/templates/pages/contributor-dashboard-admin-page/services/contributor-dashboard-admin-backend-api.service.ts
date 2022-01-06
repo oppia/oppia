@@ -61,7 +61,7 @@ export class ContributorDashboardAdminBackendApiService {
     private urlInterpolationService: UrlInterpolationService) {}
 
   async addContributionReviewerAsync(
-      category: string, username: string, languageCode: string
+      category: string, username: string, languageCode: string | null
   ): Promise<void> {
     return new Promise((resolve, reject) => {
       this.http.post<void>(
@@ -79,7 +79,7 @@ export class ContributorDashboardAdminBackendApiService {
   }
 
   async viewContributionReviewersAsync(
-      category: string, languageCode: string
+      category: string, languageCode: string | null
   ): Promise<ViewContributionBackendResponse> {
     let params = {};
     if (languageCode !== null) {
@@ -119,7 +119,8 @@ export class ContributorDashboardAdminBackendApiService {
   }
 
   async removeContributionReviewerAsync(
-      username: string, category: string, languageCode: string): Promise<void> {
+      username: string, category: string, languageCode: string | null
+  ): Promise<void> {
     var url = this.urlInterpolationService.interpolateUrl(
       PageConstants.CONTRIBUTION_RIGHTS_HANDLER_URL, { category });
     var params = {
