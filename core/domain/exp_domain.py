@@ -2361,8 +2361,7 @@ class Exploration:
 
     @classmethod
     def _add_id_and_proto_size_in_bytes_to_dict(
-        cls, exploration_dict, exploration_id
-    ):
+        cls, exploration_dict, exploration_id):
         """Add id and proto_size_in_bytes to the exploration dict.
 
         Args:
@@ -2555,7 +2554,7 @@ class Exploration:
 
         return html_list
 
-    def to_proto(self):
+    def to_android_exploration_proto(self):
         """Returns a proto representation of the exploration object.
 
         Returns:
@@ -2563,7 +2562,7 @@ class Exploration:
         """
         state_protos = {}
         for (state_name, state) in self.states.items():
-            state_protos[state_name] = state.to_proto()
+            state_protos[state_name] = state.to_android_state_proto()
 
         return exploration_pb2.ExplorationDto(
             id=self.id,
@@ -2579,7 +2578,7 @@ class Exploration:
         Returns:
             int. The byte size of the proto object.
         """
-        return int(self.to_proto().ByteSize())
+        return int(self.to_android_exploration_proto().ByteSize())
 
 
 class ExplorationSummary:

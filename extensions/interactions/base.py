@@ -275,6 +275,6 @@ class BaseInteraction:
         """
         hints_proto = {}
         if hints is not None:
-            hints_proto = [hint.to_proto() for hint in hints]
+            hints_proto = [hint.to_android_hint_proto() for hint in hints]
 
         return hints_proto

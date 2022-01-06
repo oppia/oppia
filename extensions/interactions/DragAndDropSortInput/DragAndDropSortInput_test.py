@@ -114,7 +114,7 @@ class DragAndDropSortInputInteractionTests(test_utils.GenericTestBase):
         interaction_domain = (
             state_domain.InteractionInstance.from_dict(
                 interaction_dict))
-        drag_and_drop_proto = drag_and_drop_instance.to_proto(
+        drag_and_drop_proto = drag_and_drop_instance.to_android_drag_drop_input_proto(
             interaction_domain.default_outcome,
             interaction_domain.customization_args,
             interaction_domain.solution,

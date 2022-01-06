@@ -55,7 +55,7 @@ class Continue(base.BaseInteraction):
     }]
 
     @classmethod
-    def to_proto(cls, default_outcome, customization_args):
+    def to_android_continue_proto(cls, default_outcome, customization_args):
         """Creates a ContinueInstanceDto proto object.
 
         Args:
@@ -65,7 +65,7 @@ class Continue(base.BaseInteraction):
         Returns:
             ContinueInstanceDto. The proto object.
         """
-        outcome_proto = default_outcome.to_proto()
+        outcome_proto = default_outcome.to_android_outcome_proto()
         customization_args_proto = (
             cls._convert_customization_args_to_proto(customization_args)
         )
@@ -90,5 +90,5 @@ class Continue(base.BaseInteraction):
             CustomizationArgsDto. The proto object.
         """
         return state_pb2.ContinueInstanceDto.CustomizationArgsDto(
-            button_text=customization_args['buttonText'].value.to_proto()
+            button_text=customization_args['buttonText'].value.to_android_content_proto()
         )

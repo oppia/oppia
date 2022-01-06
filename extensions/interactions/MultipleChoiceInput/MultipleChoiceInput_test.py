@@ -94,7 +94,7 @@ class MultipleChoiceInputInteractionTests(test_utils.GenericTestBase):
             state_domain.InteractionInstance.from_dict(
                 interaction_dict))
         multiple_choice_input_proto = (
-            multiple_choice_input_instance.to_proto(
+            multiple_choice_input_instance.to_android_multiple_choice_input_proto(
                 interaction_domain.default_outcome,
                 interaction_domain.customization_args,
                 interaction_domain.hints,

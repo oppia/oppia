@@ -113,7 +113,7 @@ class NumericExpressionInputInteractionTests(test_utils.GenericTestBase):
 
         interaction_domain = (
             state_domain.InteractionInstance.from_dict(interaction_dict))
-        numeric_proto = numeric_instance.to_proto(
+        numeric_proto = numeric_instance.to_android_numeric_expression_proto(
             interaction_domain.default_outcome,
             interaction_domain.customization_args,
             interaction_domain.solution,

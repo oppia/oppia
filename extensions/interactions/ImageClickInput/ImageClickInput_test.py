@@ -98,11 +98,12 @@ class ImageClickInputInteractionTests(test_utils.GenericTestBase):
         interaction_domain = (
             state_domain.InteractionInstance.from_dict(
                 interaction_dict))
-        image_input_proto = image_input_instance.to_proto(
-            interaction_domain.default_outcome,
-            interaction_domain.customization_args,
-            interaction_domain.hints,
-            interaction_domain.answer_groups)
+        image_input_proto = (
+            image_input_instance.to_android_image_click_input_proto(
+                interaction_domain.default_outcome,
+                interaction_domain.customization_args,
+                interaction_domain.hints,
+                interaction_domain.answer_groups))
 
         image_input_customization_args = (
             image_input_proto.customization_args.image_and_regions)

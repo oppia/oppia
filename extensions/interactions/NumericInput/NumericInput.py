@@ -60,7 +60,7 @@ class NumericInput(base.BaseInteraction):
     }]
 
     @classmethod
-    def to_proto(
+    def to_android_numeric_input_proto(
         cls, default_outcome, solution, hints, answer_groups
     ):
         """Creates a NumericInputInstanceDto proto object.
@@ -74,7 +74,7 @@ class NumericInput(base.BaseInteraction):
         Returns:
             NumericInputInstanceDto. The proto object.
         """
-        outcome_proto = default_outcome.to_proto()
+        outcome_proto = default_outcome.to_android_outcome_proto()
         hints_proto_list = cls.get_hint_proto_list(cls, hints)
         solution_proto = cls._convert_solution_to_proto(solution)
         answer_groups_proto = cls._convert_answer_groups_to_proto(answer_groups)
@@ -101,7 +101,7 @@ class NumericInput(base.BaseInteraction):
         solution_proto = {}
         if solution is not None:
             solution_proto = state_pb2.NumericInputInstanceDto.SolutionDto(
-                base_solution=solution.to_proto(),
+                base_solution=solution.to_android_solution_proto(),
                 correct_answer=solution.correct_answer
             )
 
@@ -121,7 +121,7 @@ class NumericInput(base.BaseInteraction):
         """
         answer_group_list_proto = []
         for answer_group in answer_groups:
-            base_answer_group_proto = answer_group.to_proto()
+            base_answer_group_proto = answer_group.to_android_answer_group_proto()
             rules_spec_proto = cls._convert_rule_specs_to_proto(
                 answer_group.rule_specs)
             answer_group_list_proto.append(

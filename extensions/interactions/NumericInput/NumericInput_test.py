@@ -120,7 +120,7 @@ class NumericInputInteractionTests(test_utils.GenericTestBase):
         interaction_domain = (
             state_domain.InteractionInstance.from_dict(
                 interaction_dict))
-        numeric_input_proto = numeric_input_instance.to_proto(
+        numeric_input_proto = numeric_input_instance.to_android_numeric_input_proto(
             interaction_domain.default_outcome,
             interaction_domain.solution,
             interaction_domain.hints,

@@ -188,7 +188,7 @@ class FractionInputInteractionTests(test_utils.GenericTestBase):
         )
         interaction_domain = (
             state_domain.InteractionInstance.from_dict(interaction_dict))
-        fraction_proto = fraction_instance.to_proto(
+        fraction_proto = fraction_instance.to_android_fraction_input_proto(
             interaction_domain.default_outcome,
             interaction_domain.customization_args,
             interaction_domain.hints,

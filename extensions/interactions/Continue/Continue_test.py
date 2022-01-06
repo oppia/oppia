@@ -56,7 +56,7 @@ class ContinueInteractionTests(test_utils.GenericTestBase):
             interaction_registry.Registry.get_interaction_by_id('Continue'))
         interaction_domain = (
             state_domain.InteractionInstance.from_dict(interaction_dict))
-        continue_proto = continue_instance.to_proto(
+        continue_proto = continue_instance.to_android_continue_proto(
             interaction_domain.default_outcome,
             interaction_domain.customization_args)
 

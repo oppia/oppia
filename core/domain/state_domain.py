@@ -106,7 +106,7 @@ class AnswerGroup:
             answer_group_dict['tagged_skill_misconception_id']
         )
 
-    def to_proto(self):
+    def to_android_answer_group_proto(self):
         """Returns a proto representation of the answer group object.
 
         Returns:
@@ -121,7 +121,7 @@ class AnswerGroup:
                 misconception_id=misconception_id)
 
         return state_pb2.BaseAnswerGroupDto(
-            outcome=self.outcome.to_proto(),
+            outcome=self.outcome.to_android_outcome_proto(),
             tagged_skill_misconception=misconception_proto
         )
 
@@ -315,13 +315,14 @@ class Hint:
         hint_content.validate()
         return cls(hint_content)
 
-    def to_proto(self):
+    def to_android_hint_proto(self):
         """Returns a proto representation of the hint object.
 
         Returns:
             HintDto. The proto object.
         """
-        return state_pb2.HintDto(hint_content=self.hint_content.to_proto())
+        return state_pb2.HintDto(
+            hint_content=self.hint_content.to_android_content_proto())
 
     def validate(self):
         """Validates all properties of Hint."""
@@ -412,14 +413,14 @@ class Solution:
                     solution_dict['correct_answer']),
             explanation)
 
-    def to_proto(self):
+    def to_android_solution_proto(self):
         """Returns a proto representation of the solution object.
 
         Returns:
             BaseSolutionDto. The proto object.
         """
         return state_pb2.BaseSolutionDto(
-            explanation=self.explanation.to_proto()
+            explanation=self.explanation.to_android_content_proto()
         )
 
     def validate(self, interaction_id):
@@ -579,7 +580,7 @@ class InteractionInstance:
             [Hint.from_dict(h) for h in interaction_dict['hints']],
             solution_dict)
 
-    def to_proto(self):
+    def to_android_interaction_proto(self):
         """Returns a proto representation of the interaction object.
 
         Returns:
@@ -595,66 +596,78 @@ class InteractionInstance:
 
         if self.id == 'Continue':
             interaction_proto = state_pb2.InteractionInstanceDto(
-                continue_instance=interaction_instance.to_proto(
-                    self.default_outcome, self.customization_args))
+                continue_instance=(
+                    interaction_instance.to_android_continue_proto(
+                        self.default_outcome, self.customization_args)))
         elif self.id == 'FractionInput':
             interaction_proto = state_pb2.InteractionInstanceDto(
-                fraction_input=interaction_instance.to_proto(
-                    self.default_outcome, self.customization_args,
-                    self.hints, self.solution, self.answer_groups))
+                fraction_input=(
+                    interaction_instance.to_android_fraction_input_proto(
+                        self.default_outcome, self.customization_args,
+                        self.hints, self.solution, self.answer_groups)))
         elif self.id == 'ItemSelectionInput':
             interaction_proto = state_pb2.InteractionInstanceDto(
-                item_selection_input=interaction_instance.to_proto(
-                    self.default_outcome, self.customization_args,
-                    self.hints, self.answer_groups))
+                item_selection_input=(
+                    interaction_instance.to_android_item_selection_input_proto(
+                        self.default_outcome, self.customization_args,
+                        self.hints, self.answer_groups)))
         elif self.id == 'MultipleChoiceInput':
             interaction_proto = state_pb2.InteractionInstanceDto(
-                multiple_choice_input=interaction_instance.to_proto(
-                    self.default_outcome, self.customization_args,
-                    self.hints, self.answer_groups))
+                multiple_choice_input=(
+                    interaction_instance.to_android_multiple_choice_input_proto(
+                        self.default_outcome, self.customization_args,
+                        self.hints, self.answer_groups)))
         elif self.id == 'NumericInput':
             interaction_proto = state_pb2.InteractionInstanceDto(
-                numeric_input=interaction_instance.to_proto(
-                    self.default_outcome, self.solution,
-                    self.hints, self.answer_groups))
+                numeric_input=(
+                    interaction_instance.to_android_numeric_input_proto(
+                        self.default_outcome, self.solution,
+                        self.hints, self.answer_groups)))
         elif self.id == 'TextInput':
             interaction_proto = state_pb2.InteractionInstanceDto(
-                text_input=interaction_instance.to_proto(
+                text_input=interaction_instance.to_android_text_input_proto(
                     self.default_outcome, self.customization_args,
                     self.solution, self.hints, self.answer_groups))
         elif self.id == 'RatioExpressionInput':
             interaction_proto = state_pb2.InteractionInstanceDto(
-                ratio_expression_input=interaction_instance.to_proto(
-                    self.default_outcome, self.customization_args,
-                    self.solution, self.hints, self.answer_groups))
+                ratio_expression_input=(
+                    interaction_instance.to_android_ratio_input_proto(
+                        self.default_outcome, self.customization_args,
+                        self.solution, self.hints, self.answer_groups)))
         elif self.id == 'ImageClickInput':
             interaction_proto = state_pb2.InteractionInstanceDto(
-                image_click_input=interaction_instance.to_proto(
-                    self.default_outcome, self.customization_args,
-                    self.hints, self.answer_groups))
+                image_click_input=(
+                    interaction_instance.to_android_image_click_input_proto(
+                        self.default_outcome, self.customization_args,
+                        self.hints, self.answer_groups)))
         elif self.id == 'DragAndDropSortInput':
             interaction_proto = state_pb2.InteractionInstanceDto(
-                drag_and_drop_sort_input=interaction_instance.to_proto(
-                    self.default_outcome, self.customization_args,
-                    self.solution, self.hints, self.answer_groups))
+                drag_and_drop_sort_input=(
+                    interaction_instance.to_android_drag_drop_input_proto(
+                        self.default_outcome, self.customization_args,
+                        self.solution, self.hints, self.answer_groups)))
         elif self.id == 'AlgebraicExpressionInput':
             interaction_proto = state_pb2.InteractionInstanceDto(
-                algebraic_expression_input=interaction_instance.to_proto(
-                    self.default_outcome, self.customization_args,
-                    self.solution, self.hints, self.answer_groups))
+                algebraic_expression_input=(
+                    interaction_instance.to_android_algebric_expression_proto(
+                        self.default_outcome, self.customization_args,
+                        self.solution, self.hints, self.answer_groups)))
         elif self.id == 'MathEquationInput':
             interaction_proto = state_pb2.InteractionInstanceDto(
-                math_equation_input=interaction_instance.to_proto(
-                    self.default_outcome, self.customization_args,
-                    self.solution, self.hints, self.answer_groups))
+                math_equation_input=(
+                    interaction_instance.to_android_math_equation_input_proto(
+                        self.default_outcome, self.customization_args,
+                        self.solution, self.hints, self.answer_groups)))
         elif self.id == 'NumericExpressionInput':
             interaction_proto = state_pb2.InteractionInstanceDto(
-                numeric_expression_input=interaction_instance.to_proto(
-                    self.default_outcome, self.customization_args,
-                    self.solution, self.hints, self.answer_groups))
+                numeric_expression_input=(
+                    interaction_instance.to_android_numeric_expression_proto(
+                        self.default_outcome, self.customization_args,
+                        self.solution, self.hints, self.answer_groups)))
         elif self.id == 'EndExploration':
             interaction_proto = state_pb2.InteractionInstanceDto(
-                end_exploration=interaction_instance.to_proto())
+                end_exploration=(
+                    interaction_instance.to_android_end_exploration_proto()))
 
         return interaction_proto
 
@@ -1396,7 +1409,7 @@ class Outcome:
             outcome_dict['missing_prerequisite_skill_id']
         )
 
-    def to_proto(self):
+    def to_android_outcome_proto(self):
         """Returns a proto representation of the outcome object.
 
         Returns:
@@ -1404,7 +1417,7 @@ class Outcome:
         """
         return state_pb2.OutcomeDto(
             destination_state=self.dest,
-            feedback=self.feedback.to_proto(),
+            feedback=self.feedback.to_android_content_proto(),
             labelled_as_correct=self.labelled_as_correct
         )
 
@@ -1532,7 +1545,7 @@ class Voiceover:
             voiceover_dict['needs_update'],
             voiceover_dict['duration_secs'])
 
-    def to_proto(self):
+    def to_android_voiceover_proto(self):
         """Returns a proto representation of the voiceover object.
 
         Returns:
@@ -1697,7 +1710,7 @@ class WrittenTranslation:
             written_translation_dict['translation'],
             written_translation_dict['needs_update'])
 
-    def to_proto(self):
+    def to_android_written_translation_proto(self):
         """Returns a proto representation of the written translation object.
 
         Returns:
@@ -1807,7 +1820,7 @@ class WrittenTranslations:
 
         return cls(translations_mapping)
 
-    def to_proto(self):
+    def to_android_written_translations_proto(self):
         """Returns a proto representation of the written translations object.
 
         Returns:
@@ -1833,7 +1846,7 @@ class WrittenTranslations:
             for (lang_code, written_translation) in (
                 language_code_to_written_translation.items()):
                 written_translation_proto = (
-                    written_translation.to_proto())
+                    written_translation.to_android_written_translation_proto())
                 language_to_content_id_map = (
                     language_to_content_id_written_translation_map[lang_code])
                 language_to_content_id_map[content_id] = (
@@ -2153,7 +2166,7 @@ class RecordedVoiceovers:
 
         return cls(voiceovers_mapping)
 
-    def to_proto(self):
+    def to_android_recorded_voiceovers_proto(self):
         """Returns a proto representation of the recorded voiceovers object.
 
         Returns:
@@ -2178,7 +2191,7 @@ class RecordedVoiceovers:
             self.voiceovers_mapping.items()):
             for (language_code, voiceover) in (
                 language_code_to_voiceover.items()):
-                voiceover_proto = voiceover.to_proto()
+                voiceover_proto = voiceover.to_android_voiceover_proto()
                 language_to_content_id_map = (
                     language_to_content_id_voiceover_file_map[language_code])
                 language_to_content_id_map[content_id] = voiceover_proto
@@ -2549,7 +2562,7 @@ class SubtitledHtml:
         return cls(
             subtitled_html_dict['content_id'], subtitled_html_dict['html'])
 
-    def to_proto(self):
+    def to_android_content_proto(self):
         """Returns a proto representation of the subtitled html object.
 
         Returns:
@@ -2634,7 +2647,7 @@ class SubtitledUnicode:
             subtitled_unicode_dict['unicode_str']
         )
 
-    def to_proto(self):
+    def to_android_content_proto(self):
         """Returns a proto representation of the subtitled unicode object.
 
         Returns:
@@ -3710,17 +3723,19 @@ class State:
                 copy.deepcopy(feconf.DEFAULT_WRITTEN_TRANSLATIONS)),
             False, is_initial_state, 0)
 
-    def to_proto(self):
+    def to_android_state_proto(self):
         """Returns a proto representation of the state object.
 
         Returns:
             StateDto. The proto object.
         """
         return state_pb2.StateDto(
-            content=self.content.to_proto(),
-            recorded_voiceovers=self.recorded_voiceovers.to_proto(),
-            written_translations=self.written_translations.to_proto(),
-            interaction=self.interaction.to_proto()
+            content=self.content.to_android_content_proto(),
+            recorded_voiceovers=(
+                self.recorded_voiceovers.to_android_recorded_voiceovers_proto()),
+            written_translations=(
+                self.written_translations.to_android_written_translations_proto()),
+            interaction=self.interaction.to_android_interaction_proto()
         )
 
     @classmethod

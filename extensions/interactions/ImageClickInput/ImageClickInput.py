@@ -72,7 +72,7 @@ class ImageClickInput(base.BaseInteraction):
     }]
 
     @classmethod
-    def to_proto(
+    def to_android_image_click_input_proto(
         cls, default_outcome, customization_args, hints, answer_groups
     ):
         """Creates a ImageClickInputInstanceDto proto object.
@@ -89,7 +89,7 @@ class ImageClickInput(base.BaseInteraction):
         customization_args_proto = (
             cls._convert_customization_args_to_proto(customization_args)
         )
-        outcome_proto = default_outcome.to_proto()
+        outcome_proto = default_outcome.to_android_outcome_proto()
         hints_proto_list = cls.get_hint_proto_list(cls, hints)
         answer_groups_proto = cls._convert_answer_groups_to_proto(answer_groups)
 
@@ -114,7 +114,7 @@ class ImageClickInput(base.BaseInteraction):
         """
         answer_group_list_proto = []
         for answer_group in answer_groups:
-            base_answer_group_proto = answer_group.to_proto()
+            base_answer_group_proto = answer_group.to_android_answer_group_proto()
             rules_spec_proto = cls._convert_rule_specs_to_proto(
                 answer_group.rule_specs)
             answer_group_list_proto.append(

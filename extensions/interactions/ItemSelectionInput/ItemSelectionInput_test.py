@@ -119,11 +119,12 @@ class ItemSelectionInputInteractionTests(test_utils.GenericTestBase):
         interaction_domain = (
             state_domain.InteractionInstance.from_dict(
                 interaction_dict))
-        item_selection_proto = item_selection_input_instance.to_proto(
-            interaction_domain.default_outcome,
-            interaction_domain.customization_args,
-            interaction_domain.hints,
-            interaction_domain.answer_groups)
+        item_selection_proto = (
+            item_selection_input_instance.to_android_item_selection_input_proto(
+                interaction_domain.default_outcome,
+                interaction_domain.customization_args,
+                interaction_domain.hints,
+                interaction_domain.answer_groups))
 
         item_customization_args = (
             item_selection_proto.customization_args)

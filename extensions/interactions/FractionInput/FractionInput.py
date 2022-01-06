@@ -84,7 +84,7 @@ class FractionInput(base.BaseInteraction):
     }]
 
     @classmethod
-    def to_proto(
+    def to_android_fraction_input_proto(
         cls, default_outcome, customization_args, hints, solution, answer_groups
     ):
         """Creates a FractionInputInstanceDto proto object.
@@ -102,7 +102,7 @@ class FractionInput(base.BaseInteraction):
         customization_args_proto = (
             cls._convert_customization_args_to_proto(customization_args)
         )
-        outcome_proto = default_outcome.to_proto()
+        outcome_proto = default_outcome.to_android_outcome_proto()
         hints_proto_list = cls.get_hint_proto_list(cls, hints)
         solution_proto = cls._convert_solution_to_proto(solution)
         answer_groups_proto = cls._convert_answer_groups_to_proto(
@@ -131,7 +131,7 @@ class FractionInput(base.BaseInteraction):
             CustomizationArgsDto. The proto object.
         """
         placeholder_proto = (
-            customization_args['customPlaceholder'].value.to_proto())
+            customization_args['customPlaceholder'].value.to_android_content_proto())
 
         return state_pb2.FractionInputInstanceDto.CustomizationArgsDto(
             requires_simplest_form=(
@@ -160,7 +160,7 @@ class FractionInput(base.BaseInteraction):
         solution_proto = {}
         if solution is not None:
             solution_proto = state_pb2.FractionInputInstanceDto.SolutionDto(
-                base_solution=solution.to_proto(),
+                base_solution=solution.to_android_solution_proto(),
                 correct_answer=cls._convert_fraction_to_proto(
                     solution.correct_answer)
             )
@@ -180,7 +180,7 @@ class FractionInput(base.BaseInteraction):
         """
         answer_group_list_proto = []
         for answer_group in answer_groups:
-            base_answer_group_proto = answer_group.to_proto()
+            base_answer_group_proto = answer_group.to_android_answer_group_proto()
             rules_spec_proto = cls._convert_rule_specs_to_proto(
                 answer_group.rule_specs)
             answer_group_list_proto.append(
