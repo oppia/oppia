@@ -59,6 +59,33 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
                 params,
                 0)
 
+    def test_defer_makes_the_correct_request(self):
+        correct_fn_identifier = '/task/deferredtaskshandler'
+        correct_url = feconf.TASK_URL_DEFERRED
+        correct_queue_name = taskqueue_services.QUEUE_NAME_EMAILS
+        correct_payload = {
+            'fn_identifier': '/task/deferredtaskshandler',
+            'args': [],
+            'kwargs': {}
+        }
+
+        def mock_create_http_task(
+                queue_name, url, payload=None, scheduled_for=None,
+                task_name=None):
+            self.assertEqual(queue_name, correct_queue_name)
+            self.assertEqual(url, correct_url)
+            self.assertEqual(payload, correct_payload)
+            self.assertIsNone(scheduled_for)
+            self.assertIsNone(task_name)
+
+        swap_create_http_task = self.swap(
+            taskqueue_services.platform_taskqueue_services, 'create_http_task',
+            mock_create_http_task)
+
+        with swap_create_http_task:
+            taskqueue_services.defer(
+                correct_fn_identifier, correct_queue_name)
+
     def test_enqueue_task_makes_the_correct_request(self):
         correct_payload = {
             'user_id': '1'
