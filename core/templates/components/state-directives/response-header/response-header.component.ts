@@ -16,80 +16,76 @@
  * @fileoverview Component for the header of the response tiles.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-editor.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-interaction-id.service');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-property.service.ts');
-require('services/editability.service.ts');
+import { Component, Input } from '@angular/core';
+import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+import { EditabilityService } from 'services/editability.service';
+import INTERACTION_SPECS from 'interactions/interaction_specs.json';
+import { AppConstants } from 'app.constants';
+import { downgradeComponent } from '@angular/upgrade/static';
 
-angular.module('oppia').component('responseHeader', {
-  bindings: {
-    getIndex: '&index',
-    getOutcome: '&outcome',
-    getSummary: '&summary',
-    getShortSummary: '&shortSummary',
-    isActive: '&isActive',
-    getOnDeleteFn: '&onDeleteFn',
-    getNumRules: '&numRules',
-    isResponse: '&isResponse',
-    showWarning: '&showWarning',
-    navigateToState: '='
-  },
-  template: require(
-    'components/state-directives/response-header/' +
-    'response-header.component.html'),
-  controllerAs: '$ctrl',
-  controller: [
-    'EditabilityService', 'StateEditorService', 'StateInteractionIdService',
-    'INTERACTION_SPECS', 'PLACEHOLDER_OUTCOME_DEST',
-    function(
-        EditabilityService, StateEditorService, StateInteractionIdService,
-        INTERACTION_SPECS, PLACEHOLDER_OUTCOME_DEST) {
-      var ctrl = this;
-      ctrl.isInQuestionMode = function() {
-        return StateEditorService.isInQuestionMode();
-      };
+@Component({
+  selector: 'oppia-response-header',
+  templateUrl: './response-header.component.html'
+})
+export class ResponseHeaderComponent {
+  @Input() index;
+  @Input() summary;
+  @Input() shortSummary;
+  @Input() isActive;
+  @Input() onDeleteFn;
+  @Input() outcome;
+  @Input() navigateToState;
+  @Input() numRules;
+  @Input() showWarning;
+  @Input() isResponse;
+  @Input() correctnessFeedbackEnabled;
 
-      ctrl.getCurrentInteractionId = function() {
-        return StateInteractionIdService.savedMemento;
-      };
+  constructor(
+    private stateEditorService: StateEditorService,
+    private stateInteractionIdService: StateInteractionIdService,
+    private editabilityService: EditabilityService,
+  ) {}
 
-      ctrl.isCorrectnessFeedbackEnabled = function() {
-        return StateEditorService.getCorrectnessFeedbackEnabled();
-      };
-      // This returns false if the current interaction ID is null.
-      ctrl.isCurrentInteractionLinear = function() {
-        var interactionId = ctrl.getCurrentInteractionId();
-        return interactionId && INTERACTION_SPECS[interactionId].is_linear;
-      };
+  isInQuestionMode(): boolean {
+    return this.stateEditorService.isInQuestionMode();
+  }
 
-      ctrl.isCorrect = function() {
-        return ctrl.getOutcome() && ctrl.getOutcome().labelledAsCorrect;
-      };
+  getCurrentInteractionId(): string {
+    return this.stateInteractionIdService.savedMemento;
+  }
 
-      ctrl.isOutcomeLooping = function() {
-        var outcome = ctrl.getOutcome();
-        var activeStateName = StateEditorService.getActiveStateName();
-        return outcome && (outcome.dest === activeStateName);
-      };
+  isCorrectnessFeedbackEnabled(): boolean {
+    return this.stateEditorService.getCorrectnessFeedbackEnabled();
+  }
 
-      ctrl.isCreatingNewState = function() {
-        var outcome = ctrl.getOutcome();
-        return outcome && outcome.dest === PLACEHOLDER_OUTCOME_DEST;
-      };
+  // This returns false if the current interaction ID is null.
+  isCurrentInteractionLinear(): boolean {
+    const interactionId = this.getCurrentInteractionId();
+    return interactionId && INTERACTION_SPECS[interactionId].is_linear;
+  }
 
-      ctrl.deleteResponse = function(evt) {
-        ctrl.getOnDeleteFn()(ctrl.getIndex(), evt);
-      };
-      ctrl.$onInit = function() {
-        ctrl.EditabilityService = EditabilityService;
-      };
-    }
-  ]
-});
+  isCorrect(): boolean {
+    return this.outcome && this.outcome.labelledAsCorrect;
+  }
+
+  isOutcomeLooping(): boolean {
+    const outcome = this.outcome;
+    const activeStateName = this.stateEditorService.getActiveStateName();
+    return outcome && (outcome.dest === activeStateName);
+  }
+
+  isCreatingNewState(): boolean {
+    const outcome = this.outcome;
+    return outcome && outcome.dest === AppConstants.PLACEHOLDER_OUTCOME_DEST;
+  }
+
+  deleteResponse(evt: any): void {
+    this.onDeleteFn(this.index, evt);
+  }
+}
+
+angular.module('oppia').directive('oppiaResponseHeader',
+  downgradeComponent({
+    component: ResponseHeaderComponent
+  }) as angular.IDirectiveFactory);
