@@ -146,6 +146,8 @@ def normalize_against_schema(
                 global_validators=global_validators
             )
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_FLOAT:
+        if isinstance(obj, bool):
+            raise Exception('Expected float, received %s'% obj)
         try:
             obj = float(obj)
         except Exception:
