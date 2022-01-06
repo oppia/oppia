@@ -376,25 +376,20 @@ exports.config = {
         ' because it\'s on CircleCI');
     }
 
-    // Screenshots will only run on the develop branch of "oppia/oppia", since
-    // currently we don't run videos due to memory issues.
-
-    if (process.env.REPOSITORY == 'oppia/oppia' && process.env.GITHUB_REF == 'refs/heads/develop') {
-      // This takes screenshots of failed tests. For more information see
-      // https://www.npmjs.com/package/protractor-jasmine2-screenshot-reporter
-      jasmine.getEnv().addReporter(new HtmlScreenshotReporter({
-        // Directory for screenshots.
-        dest: '../protractor-screenshots',
-        // Function to build filenames of screenshots.
-        pathBuilder: function(currentSpec) {
-          let filename = currentSpec.fullName;
-          return filename.replace(/[\":<>|*?]/g, 'ESCAPED_CHARACTER');
-        },
-        captureOnlyFailedSpecs: true,
-        reportFailedUrl: true,
-        preserveDirectory: true
-      }));
-    }
+    // This takes screenshots of failed tests. For more information see
+    // https://www.npmjs.com/package/protractor-jasmine2-screenshot-reporter
+    jasmine.getEnv().addReporter(new HtmlScreenshotReporter({
+      // Directory for screenshots.
+      dest: '../protractor-screenshots',
+      // Function to build filenames of screenshots.
+      pathBuilder: function(currentSpec) {
+        let filename = currentSpec.fullName;
+        return filename.replace(/[\":<>|*?]/g, 'ESCAPED_CHARACTER');
+      },
+      captureOnlyFailedSpecs: true,
+      reportFailedUrl: true,
+      preserveDirectory: true
+    }));
 
     var SpecReporter = require('jasmine-spec-reporter').SpecReporter;
     jasmine.getEnv().addReporter(new SpecReporter({
