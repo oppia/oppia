@@ -25,6 +25,7 @@ import shutil
 import sys
 import tempfile
 
+
 @contextlib.contextmanager
 def redirect_stdout(new_target):
     """Redirect stdout to the new target.
