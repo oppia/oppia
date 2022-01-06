@@ -622,3 +622,21 @@ class SubtopicMasteryDataHandlerTest(test_utils.GenericTestBase):
             'Missing key in handler args: selected_topic_ids.')
 
         self.logout()
+
+    def test_with_delete_topic_id(self):
+        self.login(self.NEW_USER_EMAIL)
+        topic_id_1 = topic_fetchers.get_new_topic_id()
+        topic_id_2 = topic_fetchers.get_new_topic_id()
+
+        with self.swap_to_always_return(
+            topic_fetchers, 'get_topics_by_ids', [None,'random_topic']):
+            json_response = self.get_json(
+            '%s' % feconf.SUBTOPIC_MASTERY_DATA_URL, params={
+                'selected_topic_ids': json.dumps([
+                    topic_id_1, topic_id_2])
+            }, expected_status_int= 400)
+
+            self.assertEqual(json_response['error'],
+                'Invalid topic ID %s' % topic_id_1)
+
+        self.logout()
