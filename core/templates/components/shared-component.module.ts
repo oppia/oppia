@@ -93,6 +93,8 @@ import { TutorCardComponent } from 'pages/exploration-player-page/learner-experi
 import { ContentLanguageSelectorComponent } from 'pages/exploration-player-page/layout-directives/content-language-selector.component';
 import { RatingDisplayComponent } from './ratings/rating-display/rating-display.component';
 import { SupplementalCardComponent } from 'pages/exploration-player-page/learner-experience/supplemental-card.component';
+import { SavePendingChangesModalComponent } from './save-pending-changes/save-pending-changes-modal.component';
+import { AddHintModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-hint-modal.component';
 import { SmoothHeightAnimatorComponent } from './smooth-height/smooth-height-animator.component';
 import { ConfirmQuestionExitComponent } from './question-directives/modal-templates/confirm-question-exit-modal.component';
 import { QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent } from 'pages/topic-editor-page/modal-templates/questions-opportunities-select-skill-and-difficulty-modal.component';
@@ -211,7 +213,9 @@ import { QuestionEditorSaveModalComponent } from './question-directives/modal-te
     LearnerDashboardIconsComponent,
     PreviewThumbnailComponent,
     QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent,
-    QuestionsListSelectSkillAndDifficultyModalComponent
+    QuestionsListSelectSkillAndDifficultyModalComponent,
+    SavePendingChangesModalComponent,
+    AddHintModalComponent
   ],
 
   entryComponents: [
@@ -275,7 +279,9 @@ import { QuestionEditorSaveModalComponent } from './question-directives/modal-te
     LearnerDashboardIconsComponent,
     PreviewThumbnailComponent,
     QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent,
-    QuestionsListSelectSkillAndDifficultyModalComponent
+    QuestionsListSelectSkillAndDifficultyModalComponent,
+    SavePendingChangesModalComponent,
+    AddHintModalComponent
   ],
 
   exports: [
@@ -352,6 +358,7 @@ import { QuestionEditorSaveModalComponent } from './question-directives/modal-te
     TruncatePipe,
     SummarizeNonnegativeNumberPipe,
     SortByPipe,
+    SavePendingChangesModalComponent,
     LearnerDashboardIconsComponent,
     QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent,
     QuestionsListSelectSkillAndDifficultyModalComponent

@@ -13,23 +13,22 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the TopicSavePendingChangesComponent.
+ * @fileoverview Unit tests for the DeleteWorkedExampleComponent.
  */
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { DeleteWorkedExampleComponent } from './delete-worked-example-modal.component';
 
-import { TopicSavePendingChangesComponent } from './topic-save-pending-changes-modal.component';
-
-describe('Topic Save Pending Changes Component', function() {
-  let component: TopicSavePendingChangesComponent;
-  let fixture: ComponentFixture<TopicSavePendingChangesComponent>;
+describe('Delete Worked Example Modal Component', function() {
+  let component: DeleteWorkedExampleComponent;
+  let fixture: ComponentFixture<DeleteWorkedExampleComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
-        TopicSavePendingChangesComponent
+        DeleteWorkedExampleComponent
       ],
       providers: [{
         provide: NgbActiveModal
@@ -39,7 +38,7 @@ describe('Topic Save Pending Changes Component', function() {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(TopicSavePendingChangesComponent);
+    fixture = TestBed.createComponent(DeleteWorkedExampleComponent);
     component = fixture.componentInstance;
 
     TestBed.inject(NgbActiveModal);
