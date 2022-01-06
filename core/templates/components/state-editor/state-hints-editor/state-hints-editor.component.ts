@@ -17,12 +17,8 @@
  * editor.
  */
 
-import { DeleteHintModalComponent } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-hint-modal.component';
-import { DeleteLastHintModalComponent } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-last-hint-modal.component';
+import { DeleteHintModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-hint-modal.component';
+import { DeleteLastHintModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-last-hint-modal.component';
 
 require(
   'components/common-layout-directives/common-elements/' +
