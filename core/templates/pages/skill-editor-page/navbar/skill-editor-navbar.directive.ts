@@ -17,7 +17,8 @@
  */
 
 import { Subscription } from 'rxjs';
-import { SavePendingChangesModalComponent } from '../modal-templates/save-pending-changes-modal.component';
+import { SkillEditorSaveModalComponent } from '../modal-templates/skill-editor-save-modal.component';
+import { SavePendingChangesModalComponent } from 'components/save-pending-changes/save-pending-changes-modal.component';
 
 require(
   'components/common-layout-directives/common-elements/' +
@@ -43,11 +44,11 @@ angular.module('oppia').directive('skillEditorNavbar', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/skill-editor-page/navbar/skill-editor-navbar.directive.html'),
       controller: [
-        '$rootScope', '$scope', '$uibModal', 'AlertsService', 'NgbModal',
+        '$rootScope', '$scope', 'AlertsService', 'NgbModal',
         'SkillEditorRoutingService', 'SkillEditorStateService',
         'SkillUpdateService', 'UndoRedoService', 'UrlService',
         function(
-            $rootScope, $scope, $uibModal, AlertsService, NgbModal,
+            $rootScope, $scope, AlertsService, NgbModal,
             SkillEditorRoutingService, SkillEditorStateService,
             SkillUpdateService, UndoRedoService, UrlService) {
           var ctrl = this;
@@ -88,12 +89,8 @@ angular.module('oppia').directive('skillEditorNavbar', [
           };
 
           $scope.saveChanges = function() {
-            $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/skill-editor-page/modal-templates/' +
-                'skill-editor-save-modal.directive.html'),
+            NgbModal.open(SkillEditorSaveModalComponent, {
               backdrop: 'static',
-              controller: 'ConfirmOrCancelModalController'
             }).result.then(function(commitMessage) {
               SkillEditorStateService.saveSkill(commitMessage, () => {
                 AlertsService.addSuccessMessage('Changes Saved.');
@@ -127,9 +124,16 @@ angular.module('oppia').directive('skillEditorNavbar', [
             // discarded, the misconceptions won't be saved, but there will be
             // some questions with these now non-existent misconceptions.
             if (UndoRedoService.getChangeCount() > 0) {
-              NgbModal.open(SavePendingChangesModalComponent, {
-                backdrop: true,
-              }).result.then(null, function() {
+              const modalRef = NgbModal.open(
+                SavePendingChangesModalComponent, {
+                  backdrop: true
+                });
+
+              modalRef.componentInstance.body = (
+                'Please save all pending ' +
+                'changes before viewing the questions list.');
+
+              modalRef.result.then(null, function() {
                 // Note to developers:
                 // This callback is triggered when the Cancel button is clicked.
                 // No further action is needed.
