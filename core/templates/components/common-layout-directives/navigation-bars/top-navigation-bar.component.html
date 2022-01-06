@@ -228,7 +228,7 @@
             <div class="d-flex flex-column">
               <div class="top-section d-flex">
                 <div class="item item-border d-flex flex-column" onclick="location.href='/partnerships'"
-                   (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_CLOSE})">
+                     (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_CLOSE})">
                   <div class="heading">
                     <span class="material-icons language mx-1">language</span>
                     <a class="heading-text" href="/partnerships"
@@ -529,20 +529,23 @@
   </ul>
 </div>
 <style>
-  .dropdown-menu .item:hover a {
-    text-decoration: underline;
-    text-decoration-thickness: 2px;
+  .get-involved-dropdown a {
+    text-decoration: none;
+  }
+  .heading a {
+    color: #212121;
+  }
+  .nav-item-links a {
+    color: #212121;
+    text-decoration: none;
   }
   .dropdown-menu a:focus, .dropdown-menu a:hover {
     text-decoration: underline;
     text-decoration-thickness: 2px;
   }
-  .heading a {
-    color:#212121;
-  }
-  .nav-item-links a {
-    color: #212121;
-    text-decoration: none;
+  .dropdown-menu .item:hover a {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
   }
   .nav-link:focus {
     background-color: #fff;
@@ -562,9 +565,6 @@
     font-weight: 500;
     line-height: 18.75px;
     padding: 0;
-  }
-  .get-involved-dropdown a {
-    text-decoration: none;
   }
   .get-involved-dropdown .language {
     color: #F2994A;
