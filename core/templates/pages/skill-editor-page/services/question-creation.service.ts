@@ -18,7 +18,7 @@
  */
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
-import { QuestionListSelectSkillAndDifficultyModalComponent } from 'pages/topic-editor-page/modal-templates/question-list-select-skill-and-difficulty-modal.component';
+import { QuestionsListSelectSkillAndDifficultyModalComponent } from 'pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.component';
 
 require(
   'components/common-layout-directives/common-elements/' +
@@ -148,7 +148,7 @@ angular.module('oppia').factory('QuestionCreationService', [
       }
 
       if (noOfRubricsWithExplanation > 1) {
-        let modalRef: NgbModalRef = NgbModal.open(QuestionListSelectSkillAndDifficultyModalComponent, {
+        let modalRef: NgbModalRef = NgbModal.open(QuestionsListSelectSkillAndDifficultyModalComponent, {
           backdrop: 'static'
         })
         modalRef.componentInstance.allSkillSummaries = allSkillSummaries;

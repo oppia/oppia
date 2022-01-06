@@ -26,7 +26,7 @@ import { ImageFile } from 'domain/utilities/image-file.model';
 import { ExtractImageFilenamesFromModelService } from 'pages/exploration-player-page/services/extract-image-filenames-from-model.service';
 import { AlertsService } from 'services/alerts.service';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
-import { QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent } from './question-opportunities-select-skill-and-difficulty-modal.component';
+import { QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent } from './questions-opportunities-select-skill-and-difficulty-modal.component';
 
 class MockActiveModal {
   close(): void {

@@ -14,7 +14,7 @@
 
 import { NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
 import { ConfirmQuestionExitComponent } from "components/question-directives/modal-templates/confirm-question-exit-modal.component";
-import { QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent } from "pages/topic-editor-page/modal-templates/question-opportunities-select-skill-and-difficulty-modal.component";
+import { QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent } from "pages/topic-editor-page/modal-templates/questions-opportunities-select-skill-and-difficulty-modal.component";
 
 /**
  * @fileoverview Controller for question suggestion editor modal.

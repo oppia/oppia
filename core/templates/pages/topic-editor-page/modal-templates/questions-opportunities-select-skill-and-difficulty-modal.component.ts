@@ -32,13 +32,12 @@ import { ImageLocalStorageService } from 'services/image-local-storage.service';
 
 @Component({
   selector: 'oppia-question-opportunities-select-skill-and-difficulty-modal',
-  templateUrl: './select-skill-and-difficulty-modal.component.html'
+  templateUrl: './questions-opportunities-select-skill-and-difficulty-modal.component.html'
 })
 export class QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent
   extends ConfirmOrCancelModal implements OnInit {
   @Input() skillId;
   instructionMessage: string;
-  currentMode: string;
   skillIdToRubricsObject;
   linkedSkillsWithDifficulty = [];
   skill: Skill;
@@ -57,7 +56,6 @@ export class QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent
   ngOnInit(): void {
     this.instructionMessage = (
       'Select the skill(s) to link the question to:');
-    this.currentMode = QuestionsListConstants.MODE_SELECT_DIFFICULTY;
     this.skillBackendApiService.fetchSkillAsync(this.skillId)
     .then((backendSkillObject) => {
       this.skill = backendSkillObject.skill;

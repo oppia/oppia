@@ -22,19 +22,13 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { QuestionsListConstants } from 'components/question-directives/questions-list/questions-list.constants';
-import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
 import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
-import { Skill } from 'domain/skill/SkillObjectFactory';
-import { ExtractImageFilenamesFromModelService } from 'pages/exploration-player-page/services/extract-image-filenames-from-model.service';
-import { AlertsService } from 'services/alerts.service';
-import { AssetsBackendApiService } from 'services/assets-backend-api.service';
-import { ImageLocalStorageService } from 'services/image-local-storage.service';
 
 @Component({
   selector: 'oppia-question-list-select-skill-and-difficulty-modal',
-  templateUrl: './question-list-select-skill-and-difficulty-modal.component.html'
+  templateUrl: './questions-list-select-skill-and-difficulty-modal.component.html'
 })
-export class QuestionListSelectSkillAndDifficultyModalComponent
+export class QuestionsListSelectSkillAndDifficultyModalComponent
   extends ConfirmOrCancelModal implements OnInit {
   @Input() allSkillSummaries;
   @Input() countOfSkillsToPrioritize;
@@ -49,14 +43,10 @@ export class QuestionListSelectSkillAndDifficultyModalComponent
   DEFAULT_SKILL_DIFFICULTY;
   MODE_SELECT_DIFFICULTY;
   MODE_SELECT_SKILL;
+  skillsToShow = [];
 
   constructor(
-    private alertsService: AlertsService,
-    private assetsBackendApiService: AssetsBackendApiService,
-    private extractImageFilenamesFromModelService: ExtractImageFilenamesFromModelService,
-    private imageLocalStorageService: ImageLocalStorageService,
-    private ngbActiveModal: NgbActiveModal,
-    private skillBackendApiService: SkillBackendApiService
+    private ngbActiveModal: NgbActiveModal
   ) {
     super(ngbActiveModal);
   }
@@ -71,6 +61,7 @@ export class QuestionListSelectSkillAndDifficultyModalComponent
     this.DEFAULT_SKILL_DIFFICULTY = AppConstants.DEFAULT_SKILL_DIFFICULTY
     this.MODE_SELECT_DIFFICULTY = QuestionsListConstants.MODE_SELECT_DIFFICULTY
     this.MODE_SELECT_SKILL = QuestionsListConstants.MODE_SELECT_SKILL
+    this.filterSkills('');
 
     for (let idx in this.allSkillSummaries) {
       if (idx < this.countOfSkillsToPrioritize) {
@@ -83,9 +74,21 @@ export class QuestionListSelectSkillAndDifficultyModalComponent
     }
   }
 
+  private filterSkills(skillSelector: string): void {
+    if (skillSelector === '') {
+      this.skillsToShow = this.skillSummariesInitial;
+    }
+
+    skillSelector = skillSelector.toLowerCase();
+
+    this.skillsToShow = this.skillSummariesInitial.filter(
+      option => (option.description.toLowerCase().indexOf(skillSelector) >= 0)
+    );
+  }
+
   isSkillSelected(skillId: string): boolean {
     return this.selectedSkills.includes(skillId);
-  };
+  }
 
   selectOrDeselectSkill(summary) {
     if (!this.isSkillSelected(summary.id)) {
@@ -102,17 +105,17 @@ export class QuestionListSelectSkillAndDifficultyModalComponent
       let index = this.selectedSkills.indexOf(summary.id);
       this.selectedSkills.splice(index, 1);
     }
-  };
+  }
 
   goToSelectSkillView(): void {
     this.currentMode = this.MODE_SELECT_SKILL;
-  };
+  }
 
   goToNextStep(): void {
     this.currentMode = this.MODE_SELECT_DIFFICULTY;
-  };
+  }
 
   startQuestionCreation(): void {
     this.ngbActiveModal.close(this.linkedSkillsWithDifficulty);
-  };
+  }
 }
