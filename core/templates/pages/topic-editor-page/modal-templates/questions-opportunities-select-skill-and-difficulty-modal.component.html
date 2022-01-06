@@ -19,8 +19,8 @@
     </div>
   </div>
 </div>
-<div class="modal-footer" [ngSwitch]="linkedSkillsWithDifficulty.length > 0">
-  <div *ngSwitchCase="true">
+<div [ngSwitch]="linkedSkillsWithDifficulty.length > 0">
+  <div *ngSwitchCase="true" class="modal-footer" >
     <button class="btn btn-secondary" (click)="cancel()"> Cancel </button>
     <button class="btn btn-success protractor-test-confirm-skill-difficulty-button"
             [disabled]="linkedSkillsWithDifficulty.length === 0"

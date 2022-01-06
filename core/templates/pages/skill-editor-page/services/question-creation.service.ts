@@ -47,9 +47,6 @@ require(
   'components/state-editor/state-editor-properties-services/' +
     'state-editor.service.ts');
 require(
-  'pages/topic-editor-page/modal-templates/' +
-    'questions-list-select-skill-and-difficulty-modal.controller.ts');
-require(
   'pages/topics-and-skills-dashboard-page/' +
     'topics-and-skills-dashboard-page.constants.ajs.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
