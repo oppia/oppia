@@ -142,7 +142,7 @@ def normalize_against_schema(
         normalized_obj = {}
         for key, value in obj.items():
             normalized_obj[key] = normalize_against_schema(
-                value,schema_value_type[SCHEMA_KEY_SCHEMA],
+                value, schema_value_type[SCHEMA_KEY_SCHEMA],
                 global_validators=global_validators
             )
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_FLOAT:
