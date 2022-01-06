@@ -273,7 +273,6 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     LearnerDashboardIconsComponent,
     PreviewThumbnailComponent,
-    AddHintModalComponent,
     DeleteHintModalComponent,
     DeleteLastHintModalComponent,
     SavePendingChangesModalComponent,
