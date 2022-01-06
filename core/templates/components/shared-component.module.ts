@@ -99,6 +99,7 @@ import { SmoothHeightAnimatorComponent } from './smooth-height/smooth-height-ani
 import { ConfirmQuestionExitComponent } from './question-directives/modal-templates/confirm-question-exit-modal.component';
 import { QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent } from 'pages/topic-editor-page/modal-templates/questions-opportunities-select-skill-and-difficulty-modal.component';
 import { QuestionsListSelectSkillAndDifficultyModalComponent } from 'pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.component';
+import { QuestionEditorSaveModalComponent } from './question-directives/modal-templates/question-editor-save-modal.component';
 
 // Pipes.
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
@@ -114,7 +115,6 @@ import { AuthService } from 'services/auth.service';
 
 // Miscellaneous.
 import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
-import { QuestionEditorSaveModalComponent } from './question-directives/modal-templates/question-editor-save-modal.component';
 
 @NgModule({
   imports: [
