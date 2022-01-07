@@ -781,7 +781,7 @@ class Exploration:
         exploration.created_on = exploration_created_on
         exploration.last_updated = exploration_last_updated
 
-        exploration.proto_size_in_bytes = self.is_stale
+        exploration.proto_size_in_bytes = cls.is_stale
 
         return exploration
 
@@ -1323,8 +1323,8 @@ class Exploration:
             int. Updated exploration's proto size.
         """
         if proto_size_is_stale:
-              self._cached_android_proto_size_in_bytes = self.get_proto_size()
-              proto_size_is_stale = False
+            self._cached_android_proto_size_in_bytes = self.get_proto_size()
+            proto_size_is_stale = False
         return self._cached_android_proto_size_in_bytes
 
     def has_state_name(self, state_name):
@@ -2419,7 +2419,8 @@ class Exploration:
 
         # The constructor calculates the proto_size_in_bytes and adds it to the
         # domain object. So, we add that value directly to the dict.
-        exploration_dict['proto_size_in_bytes'] = self.is_stale
+        exploration_dict['proto_size_in_bytes'] = (
+            exploration._cached_android_proto_size_in_bytes)
 
         return exploration_dict
 

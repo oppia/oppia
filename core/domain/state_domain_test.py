@@ -24,7 +24,6 @@ import logging
 import os
 import re
 
-from core import android_validation_constants
 from core import feconf
 from core import schema_utils
 from core import utils
@@ -37,7 +36,6 @@ from core.domain import rules_registry
 from core.domain import state_domain
 from core.domain import translatable_object_registry
 from core.tests import test_utils
-from google.protobuf.descriptor import FieldDescriptor
 from proto_files import state_pb2
 
 
