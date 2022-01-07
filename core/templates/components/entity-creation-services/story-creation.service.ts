@@ -26,10 +26,12 @@ import { CreateNewStoryModalComponent } from 'pages/topic-editor-page/modal-temp
 
 angular.module('oppia').factory('StoryCreationService', [
   '$http', '$window', 'AlertsService', 'ImageLocalStorageService',
-  'LoaderService', 'NgbModal', 'TopicEditorStateService', 'UrlInterpolationService',
+  'LoaderService', 'NgbModal', 'TopicEditorStateService',
+  'UrlInterpolationService',
   function(
       $http, $window, AlertsService, ImageLocalStorageService,
-      LoaderService, NgbModal, TopicEditorStateService, UrlInterpolationService) {
+      LoaderService, NgbModal, TopicEditorStateService,
+      UrlInterpolationService) {
     var STORY_EDITOR_URL_TEMPLATE = '/story_editor/<story_id>';
     var STORY_CREATOR_URL_TEMPLATE = '/topic_editor_story_handler/<topic_id>';
     var storyCreationInProgress = false;

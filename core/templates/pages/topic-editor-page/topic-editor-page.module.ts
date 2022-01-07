@@ -54,7 +54,7 @@ import { CreateNewStoryModalComponent } from './modal-templates/create-new-story
     SharedComponentsModule,
     ToastrModule.forRoot(toastrConfig)
   ],
-  declarations: [,
+  declarations: [
     CreateNewStoryModalComponent,
     StoriesListComponent,
     SubtopicsListComponent,

@@ -78,22 +78,23 @@ describe('Story Creation Service', () => {
       .and.returnValue($q.resolve('sample-csrf-token'));
   }));
 
-  it('should not initiate new story creation if another is in process', fakeAsync(() => {
-    spyOn(ngbModal, 'open').and.returnValue({
-      result: $q.resolve({
-        isValid: () => true,
-        title: 'Title',
-        description: 'Description',
-        urlFragment: 'url'
-      })
-    }as NgbModalRef);
+  it('should not initiate new story creation if another is in process',
+    fakeAsync(() => {
+      spyOn(ngbModal, 'open').and.returnValue({
+        result: $q.resolve({
+          isValid: () => true,
+          title: 'Title',
+          description: 'Description',
+          urlFragment: 'url'
+        })
+      } as NgbModalRef);
 
-    StoryCreationService.createNewCanonicalStory();
-    $scope.$apply();
+      StoryCreationService.createNewCanonicalStory();
+      $scope.$apply();
 
-    // Creating a new story while previous was in creation process.
-    expect(StoryCreationService.createNewCanonicalStory()).toBe(undefined);
-  }));
+      // Creating a new story while previous was in creation process.
+      expect(StoryCreationService.createNewCanonicalStory()).toBe(undefined);
+    }));
 
   it('should post story data to server and change window location' +
     ' on success', fakeAsync(() => {
@@ -104,7 +105,7 @@ describe('Story Creation Service', () => {
         description: 'Description',
         urlFragment: 'url'
       })
-    }as NgbModalRef);
+    } as NgbModalRef);
 
     $httpBackend.expectPOST('/topic_editor_story_handler/id')
       .respond(200, {storyId: 'id'});
@@ -121,21 +122,22 @@ describe('Story Creation Service', () => {
     expect(mockWindow.location).toBe('/story_editor/id');
   }));
 
-  it('should throw error if the newly created story is not valid', fakeAsync(() => {
-    spyOn(ngbModal, 'open').and.returnValue({
-      result: $q.resolve({
-        isValid: () => false,
-        title: 'Title',
-        description: 'Description',
-        urlFragment: 'url'
-      })
-    }as NgbModalRef);
-    try {
-      StoryCreationService.createNewCanonicalStory();
-      tick();
-      $scope.$apply();
-    } catch (e) {
-      expect(e).toBe(new Error('Story fields cannot be empty'));
-    }
-  }));
+  it('should throw error if the newly created story is not valid',
+    fakeAsync(() => {
+      spyOn(ngbModal, 'open').and.returnValue({
+        result: $q.resolve({
+          isValid: () => false,
+          title: 'Title',
+          description: 'Description',
+          urlFragment: 'url'
+        })
+      } as NgbModalRef);
+      try {
+        StoryCreationService.createNewCanonicalStory();
+        tick();
+        $scope.$apply();
+      } catch (e) {
+        expect(e).toBe(new Error('Story fields cannot be empty'));
+      }
+    }));
 });
