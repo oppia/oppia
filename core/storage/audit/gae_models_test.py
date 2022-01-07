@@ -58,16 +58,19 @@ class RoleQueryAuditModelUnitTests(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.KEEP)
 
     def test_get_export_policy(self) -> None:
-        sample_dict = base_models.BaseModel.get_export_policy()
-        sample_dict.update(
-            {'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'intent': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'role': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'username': base_models.EXPORT_POLICY.NOT_APPLICABLE
-            })
+        export_policy = audit_models.RoleQueryAuditModel.get_export_policy()
         self.assertEqual(
-            audit_models.RoleQueryAuditModel.get_export_policy(),
-            sample_dict)
+            export_policy['user_id'],
+            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+        self.assertEqual(
+            export_policy['intent'],
+            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+        self.assertEqual(
+            export_policy['role'],
+            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+        self.assertEqual(
+            export_policy['username'],
+            base_models.EXPORT_POLICY.NOT_APPLICABLE)
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
