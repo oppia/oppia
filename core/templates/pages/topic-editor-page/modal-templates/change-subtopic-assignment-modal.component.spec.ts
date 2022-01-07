@@ -47,14 +47,19 @@ describe('Change subtopic assignment modal', () => {
   it('should initialize component properties after component is initialized',
     function() {
       component.ngOnInit();
+
       expect(component.subtopics).toEqual(subtopics);
       expect(component.selectedSubtopicId).toEqual(null);
     });
 
   it('should change the selected subtopic index', function() {
+    // Setup.
     component.changeSelectedSubtopic(10);
+    // Pre-check.
     expect(component.selectedSubtopicId).toEqual(10);
+    // Action.
     component.changeSelectedSubtopic(3);
+    // Post-check.
     expect(component.selectedSubtopicId).toEqual(3);
   });
 });
