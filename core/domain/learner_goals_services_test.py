@@ -234,19 +234,19 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
 
     def test_get_all_topic_ids_in_learn(self):
         self.assertEqual(
-            self._get_all_topic_ids_to_learn(
+            learner_goals_services.get_all_topic_ids_to_learn(
                 self.viewer_id), [])
 
         # Add an topic to the learner goals.
         learner_goals_services.mark_topic_to_learn(
             self.viewer_id, self.TOPIC_ID_1)
         self.assertEqual(
-            self._get_all_topic_ids_to_learn(
+            learner_goals_services.get_all_topic_ids_to_learn(
                 self.viewer_id), [self.TOPIC_ID_1])
 
         # Add another topic.
         learner_goals_services.mark_topic_to_learn(
             self.viewer_id, self.TOPIC_ID_2)
         self.assertEqual(
-            self._get_all_topic_ids_to_learn(
+            learner_goals_services.get_all_topic_ids_to_learn(
                 self.viewer_id), [self.TOPIC_ID_1, self.TOPIC_ID_2])
