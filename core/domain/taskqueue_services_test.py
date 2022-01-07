@@ -69,18 +69,17 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
             'kwargs': {}
         }
 
-        def mock_create_http_task(
-                queue_name, url, payload=None, scheduled_for=None,
-                task_name=None):
-            self.assertEqual(queue_name, correct_queue_name)
-            self.assertEqual(url, correct_url)
-            self.assertEqual(payload, correct_payload)
-            self.assertIsNone(scheduled_for)
-            self.assertIsNone(task_name)
-
-        swap_create_http_task = self.swap(
-            taskqueue_services.platform_taskqueue_services, 'create_http_task',
-            mock_create_http_task)
+        swap_create_http_task = self.swap_with_checks(
+            taskqueue_services.platform_taskqueue_services,
+            'create_http_task',
+            lambda queue_name, url, payload=None, scheduled_for=None,
+                task_name=None: (
+                self.assertEqual(queue_name, correct_queue_name),
+                self.assertEqual(url, correct_url),
+                self.assertEqual(payload, correct_payload),
+                self.assertIsNone(scheduled_for),
+                self.assertIsNone(task_name)),
+        )
 
         with swap_create_http_task:
             taskqueue_services.defer(
