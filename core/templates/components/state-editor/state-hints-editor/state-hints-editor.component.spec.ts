@@ -91,8 +91,7 @@ class MockStateHintsService {
   }
 }
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('StateHintsEditorComponent', () => {
+describe('StateHintsEditorComponent', () => {
   let component: StateHintsEditorComponent;
   let fixture: ComponentFixture<StateHintsEditorComponent>;
   let ngbModal: NgbModal;
