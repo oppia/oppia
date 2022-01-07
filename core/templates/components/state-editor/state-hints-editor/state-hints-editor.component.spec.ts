@@ -31,7 +31,6 @@ import { AlertsService } from 'services/alerts.service';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { HintBackendDict, HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
-import { CdkDrag, CdkDragSortEvent, CdkDropList } from '@angular/cdk/drag-drop';
 
 class MockStateHintsService {
   displayed = [
