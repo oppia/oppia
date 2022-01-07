@@ -130,7 +130,7 @@
       </div>
     </div>
     <attribution-guide></attribution-guide>
-    <div *ngIf="!isLoggedIn && showLoginOverlay" class="story-viewer-login-container">
+    <div *ngIf="!isLoggedIn && showLoginOverlay" class="story-viewer-login-container" #overlay>
       <h2 class="login-text">Save your progress</h2>
       <div class="login-buttons">
         <button class="btn mat-raised-button oppia-login-button text-light protractor-test-login-button" (click)="signIn()">
@@ -142,7 +142,7 @@
         </button>
       </div>
       <div class="skip-container d-flex justify-content-end">
-        <button class="btn skip-btn px-5" (click)="hideLoginOverlay()">SKIP</button>
+        <button class="btn skip-btn px-5" (click)="hideLoginOverlay()" #skip>SKIP</button>
       </div>
     </div>
   </div>
