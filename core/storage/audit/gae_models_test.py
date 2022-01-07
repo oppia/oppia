@@ -57,6 +57,24 @@ class RoleQueryAuditModelUnitTests(test_utils.GenericTestBase):
             audit_models.RoleQueryAuditModel.get_deletion_policy(),
             base_models.DELETION_POLICY.KEEP)
 
+    def test_get_export_policy(self) -> None:
+        sample_dict = base_models.BaseModel.get_export_policy()
+        sample_dict.update(
+            {'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'intent': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'role': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'username': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            })
+        self.assertEqual(
+            audit_models.RoleQueryAuditModel.get_export_policy(),
+            sample_dict)
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            audit_models.RoleQueryAuditModel.
+                get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
+
     def test_has_reference_to_user_id(self) -> None:
         self.assertTrue(
             audit_models.RoleQueryAuditModel
@@ -103,6 +121,23 @@ class UsernameChangeAuditModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             audit_models.UsernameChangeAuditModel.get_deletion_policy(),
             base_models.DELETION_POLICY.KEEP)
+
+    def test_get_export_policy(self) -> None:
+        sample_dict = base_models.BaseModel.get_export_policy()
+        sample_dict.update(
+            {'committer_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'old_username': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'new_username': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            })
+        self.assertEqual(
+            audit_models.UsernameChangeAuditModel.get_export_policy(),
+            sample_dict)
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            audit_models.UsernameChangeAuditModel.
+                get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
 
     def test_has_reference_to_user_id(self) -> None:
         self.assertTrue(
