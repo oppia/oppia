@@ -44,7 +44,8 @@ describe('Solution Verification Service', () => {
     });
   }));
   beforeEach(() => {
-    mockInteractionState = {
+    
+     = {
       TextInput: {
         display_mode: 'inline',
         is_terminal: false

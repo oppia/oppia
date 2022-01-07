@@ -80,7 +80,7 @@ export class ResponseHeaderComponent {
     return outcome && outcome.dest === AppConstants.PLACEHOLDER_OUTCOME_DEST;
   }
 
-  deleteResponse(evt: any): void {
+  deleteResponse(evt: Event): void {
     this.onDeleteFn(this.index, evt);
   }
 }
