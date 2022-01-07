@@ -67,7 +67,7 @@ describe('Response Header Component', () => {
       labelledAsCorrect: true,
       dest: '/'
     };
-    component.onDeleteFn = (event) => {
+    component.deleteFn = (event) => {
       return () => {};
     };
     component.index = 0;
@@ -111,9 +111,9 @@ describe('Response Header Component', () => {
   });
 
   it('should delete response when user clicks delete button', () => {
-    spyOn(component, 'onDeleteFn').and.callThrough();
+    spyOn(component, 'deleteFn').and.callThrough();
     component.deleteResponse(new Event(''));
 
-    expect(component.onDeleteFn).toHaveBeenCalled();
+    expect(component.deleteFn).toHaveBeenCalled();
   });
 });

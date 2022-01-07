@@ -102,6 +102,7 @@ import { AddHintModalComponent } from 'pages/exploration-editor-page/editor-tab/
 import { SmoothHeightAnimatorComponent } from './smooth-height/smooth-height-animator.component';
 import { HintEditorComponent } from 'components/state-directives/hint-editor/hint-editor.component';
 import { ResponseHeaderComponent } from './state-directives/response-header/response-header.component';
+import { StateHintsEditorComponent } from 'components/state-editor/state-hints-editor/state-hints-editor.component';
 
 // Pipes.
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
@@ -110,7 +111,7 @@ import { SummarizeNonnegativeNumberPipe } from 'filters/summarize-nonnegative-nu
 import { SortByPipe } from 'filters/string-utility-filters/sort-by.pipe';
 import { FilterForMatchingSubstringPipe } from 'filters/string-utility-filters/filter-for-matching-substring.pipe';
 import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
-
+import { DragDropModule } from '@angular/cdk/drag-drop';
 
 // Services.
 import { AuthService } from 'services/auth.service';
@@ -121,6 +122,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
 @NgModule({
   imports: [
     BaseModule,
+    DragDropModule,
     CommonModule,
     CustomFormsComponentsModule,
     CommonElementsModule,
@@ -219,7 +221,8 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     DeleteSolutionModalComponent,
     SavePendingChangesModalComponent,
     HintEditorComponent,
-    ResponseHeaderComponent
+    ResponseHeaderComponent,
+    StateHintsEditorComponent
   ],
 
   entryComponents: [
@@ -287,7 +290,8 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     DeleteSolutionModalComponent,
     SavePendingChangesModalComponent,
     HintEditorComponent,
-    ResponseHeaderComponent
+    ResponseHeaderComponent,
+    StateHintsEditorComponent
   ],
 
   exports: [
@@ -369,7 +373,8 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     DeleteLastHintModalComponent,
     DeleteSolutionModalComponent,
     HintEditorComponent,
-    ResponseHeaderComponent
+    ResponseHeaderComponent,
+    StateHintsEditorComponent
   ],
 })
 

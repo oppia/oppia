@@ -33,7 +33,7 @@ export class ResponseHeaderComponent {
   @Input() summary;
   @Input() shortSummary;
   @Input() isActive;
-  @Input() onDeleteFn;
+  @Input() deleteFn;
   @Input() outcome;
   @Input() navigateToState;
   @Input() numRules;
@@ -81,7 +81,7 @@ export class ResponseHeaderComponent {
   }
 
   deleteResponse(evt: Event): void {
-    this.onDeleteFn(this.index, evt);
+    this.deleteFn(this.index, evt);
   }
 }
 

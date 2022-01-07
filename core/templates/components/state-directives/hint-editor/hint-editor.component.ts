@@ -38,7 +38,7 @@ interface HintFormSchema {
 export class HintEditorComponent implements OnInit, OnDestroy {
   @Input() hint: Hint;
   @Input() indexPlusOne!: number;
-  @Input() onSave;
+  @Input() save;
   @Input() showMarkAllAudioAsNeedingUpdateModalIfRequired;
   directiveSubscriptions = new Subscription();
   hintEditorIsOpen: boolean;
@@ -85,7 +85,7 @@ export class HintEditorComponent implements OnInit, OnDestroy {
         [hintContentId]);
     }
 
-    this.onSave();
+    this.save();
   }
 
   cancelThisHintEdit(): void {

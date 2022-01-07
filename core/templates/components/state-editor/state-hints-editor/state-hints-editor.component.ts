@@ -13,226 +13,218 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the add and view hints section of the state
+ * @fileoverview Component for the add and view hints section of the state
  * editor.
  */
 
+import { Component, Input, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { Hint } from 'domain/exploration/HintObjectFactory';
+import INTERACTION_SPECS from 'interactions/interaction_specs.json';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import { StateHintsService } from 'components/state-editor/state-editor-properties-services/state-hints.service';
+import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+import { StateNextContentIdIndexService } from 'components/state-editor/state-editor-properties-services/state-next-content-id-index.service';
+import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
+import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe';
+import { AlertsService } from 'services/alerts.service';
+import { EditabilityService } from 'services/editability.service';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { ExternalSaveService } from 'services/external-save.service';
+import { AddHintModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-hint-modal.component';
 import { DeleteHintModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-hint-modal.component';
 import { DeleteLastHintModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-last-hint-modal.component';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { CdkDragSortEvent, moveItemInArray} from '@angular/cdk/drag-drop';
 
-require('components/state-directives/hint-editor/hint-editor.component.ts');
-require(
-  'components/state-directives/response-header/response-header.component.ts');
-require('domain/exploration/HintObjectFactory.ts');
-require('domain/utilities/url-interpolation.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-editor.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-hints.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-interaction-id.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-next-content-id-index.service');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-solution.service.ts');
-require('filters/format-rte-preview.filter.ts');
-require('services/alerts.service.ts');
-require('services/context.service.ts');
-require('services/editability.service.ts');
-require('services/generate-content-id.service.ts');
-require('services/contextual/window-dimensions.service.ts');
-require('services/external-save.service.ts');
-require('services/ngb-modal.service.ts');
+@Component({
+  selector: 'oppia-state-hints-editor',
+  templateUrl: './state-hints-editor.component.html'
+})
+export class StateHintsEditorComponent implements OnInit {
+  @Input() onSaveHints;
+  @Input() onSaveNextContentIdIndex;
+  @Input() onSaveSolution;
+  @Input() showMarkAllAudioAsNeedingUpdateModalIfRequired;
+  hintCardIsShown: boolean;
+  canEdit: boolean;
 
-import { AddHintModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-hint-modal.component';
+  constructor(
+    private stateHintsService: StateHintsService,
+    private urlInterpolationService: UrlInterpolationService,
+    private stateEditorService: StateEditorService,
+    private stateInteractionIdService: StateInteractionIdService,
+    private stateNextContentIdIndexService: StateNextContentIdIndexService,
+    private stateSolutionService: StateSolutionService,
+    private alertsService: AlertsService,
+    private editabilityService: EditabilityService,
+    private windowDimensionsService: WindowDimensionsService,
+    private externalSaveService: ExternalSaveService,
+    private formatRtePreviewPipe: FormatRtePreviewPipe,
+    private ngbModal: NgbModal,
+  ) {}
 
-angular.module('oppia').component('stateHintsEditor', {
-  bindings: {
-    onSaveHints: '=',
-    onSaveNextContentIdIndex: '=',
-    onSaveSolution: '=',
-    showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
-  },
-  template: require('./state-hints-editor.component.html'),
-  controller: [
-    '$filter', '$rootScope', '$scope', 'AlertsService',
-    'EditabilityService', 'ExternalSaveService', 'NgbModal',
-    'StateEditorService', 'StateHintsService',
-    'StateInteractionIdService', 'StateNextContentIdIndexService',
-    'StateSolutionService',
-    'UrlInterpolationService', 'WindowDimensionsService',
-    'INTERACTION_SPECS',
-    function(
-        $filter, $rootScope, $scope, AlertsService,
-        EditabilityService, ExternalSaveService, NgbModal,
-        StateEditorService, StateHintsService,
-        StateInteractionIdService, StateNextContentIdIndexService,
-        StateSolutionService,
-        UrlInterpolationService, WindowDimensionsService,
-        INTERACTION_SPECS) {
-      var ctrl = this;
-      $scope.getHintButtonText = function() {
-        var hintButtonText = '+ ADD HINT';
-        if ($scope.StateHintsService.displayed) {
-          if ($scope.StateHintsService.displayed.length >= 5) {
-            hintButtonText = 'Limit Reached';
-          }
-        }
-        return hintButtonText;
-      };
+  drop(event: CdkDragSortEvent<Hint[]>): void {
+    moveItemInArray(
+      this.stateHintsService.displayed, event.previousIndex,
+      event.currentIndex);
+    this.stateHintsService.saveDisplayedValue();
+    this.stateHintsService.saveDisplayedValue();
+    this.onSaveHints(this.stateHintsService.displayed);
+  }
 
-      $scope.getHintSummary = function(hint) {
-        var hintAsPlainText = $filter(
-          'formatRtePreview')(hint.hintContent.html);
-        return hintAsPlainText;
-      };
-
-      $scope.changeActiveHintIndex = function(newIndex) {
-        var currentActiveIndex = StateHintsService.getActiveHintIndex();
-        if (currentActiveIndex !== null && (
-          !StateHintsService.displayed[currentActiveIndex]
-            .hintContent.html)) {
-          if (StateSolutionService.savedMemento &&
-            StateHintsService.displayed.length === 1) {
-            openDeleteLastHintModal();
-            return;
-          } else {
-            AlertsService.addInfoMessage('Deleting empty hint.');
-            StateHintsService.displayed.splice(currentActiveIndex, 1);
-            StateHintsService.saveDisplayedValue();
-            ctrl.onSaveHints(StateHintsService.displayed);
-          }
-        }
-        // If the current hint is being clicked on again, close it.
-        if (newIndex === StateHintsService.getActiveHintIndex()) {
-          StateHintsService.setActiveHintIndex(null);
-        } else {
-          StateHintsService.setActiveHintIndex(newIndex);
-        }
-      };
-
-      // This returns false if the current interaction ID is null.
-      $scope.isCurrentInteractionLinear = function() {
-        var interactionId = StateInteractionIdService.savedMemento;
-        return interactionId && INTERACTION_SPECS[interactionId].is_linear;
-      };
-
-      $scope.openAddHintModal = function() {
-        if ($scope.StateHintsService.displayed.length >= 5) {
-          return;
-        }
-        AlertsService.clearWarnings();
-        ExternalSaveService.onExternalSave.emit();
-
-        NgbModal.open(AddHintModalComponent, {
-          backdrop: 'static',
-          windowClass: 'add-hint-modal'
-        }).result.then(function(result) {
-          StateHintsService.displayed.push(result.hint);
-          StateHintsService.saveDisplayedValue();
-          ctrl.onSaveHints(StateHintsService.displayed);
-          StateNextContentIdIndexService.saveDisplayedValue();
-          ctrl.onSaveNextContentIdIndex(
-            StateNextContentIdIndexService.displayed);
-          $rootScope.$apply();
-        }, function() {
-          AlertsService.clearWarnings();
-        });
-      };
-
-      var openDeleteLastHintModal = function() {
-        AlertsService.clearWarnings();
-
-        NgbModal.open(DeleteLastHintModalComponent, {
-          backdrop: true,
-        }).result.then(function() {
-          StateSolutionService.displayed = null;
-          StateSolutionService.saveDisplayedValue();
-          ctrl.onSaveSolution(StateSolutionService.displayed);
-
-          StateHintsService.displayed = [];
-          StateHintsService.saveDisplayedValue();
-          ctrl.onSaveHints(StateHintsService.displayed);
-          $rootScope.$applyAsync();
-        }, function() {
-          AlertsService.clearWarnings();
-        });
-      };
-
-      $scope.deleteHint = function(index, evt) {
-        // Prevent clicking on the delete button from also toggling the
-        // display state of the hint.
-        evt.stopPropagation();
-
-        AlertsService.clearWarnings();
-        NgbModal.open(DeleteHintModalComponent, {
-          backdrop: true,
-        }).result.then(function() {
-          if (StateSolutionService.savedMemento &&
-            StateHintsService.savedMemento.length === 1) {
-            openDeleteLastHintModal();
-          } else {
-            StateHintsService.displayed.splice(index, 1);
-            StateHintsService.saveDisplayedValue();
-            ctrl.onSaveHints(StateHintsService.displayed);
-          }
-
-          if (index === StateHintsService.getActiveHintIndex()) {
-            StateHintsService.setActiveHintIndex(null);
-          }
-          $rootScope.$applyAsync();
-        }, function() {
-          AlertsService.clearWarnings();
-        });
-      };
-
-      $scope.onSaveInlineHint = function() {
-        StateHintsService.saveDisplayedValue();
-        ctrl.onSaveHints(StateHintsService.displayed);
-      };
-
-      $scope.toggleHintCard = function() {
-        $scope.hintCardIsShown = !$scope.hintCardIsShown;
-      };
-
-      ctrl.$onInit = function() {
-        $scope.EditabilityService = EditabilityService;
-        $scope.StateHintsService = StateHintsService;
-        $scope.hintCardIsShown = (
-          !WindowDimensionsService.isWindowNarrow());
-        StateHintsService.setActiveHintIndex(null);
-        $scope.canEdit = EditabilityService.isEditable();
-        $scope.getStaticImageUrl = function(imagePath) {
-          return UrlInterpolationService.getStaticImageUrl(imagePath);
-        };
-        // When the page is scrolled so that the top of the page is above
-        // the browser viewport, there are some bugs in the positioning of
-        // the helper. This is a bug in jQueryUI that has not been fixed
-        // yet. For more details, see http://stackoverflow.com/q/5791886
-        $scope.HINT_LIST_SORTABLE_OPTIONS = {
-          axis: 'y',
-          cursor: 'move',
-          handle: '.oppia-hint-sort-handle',
-          items: '.oppia-sortable-hint',
-          revert: 100,
-          tolerance: 'pointer',
-          start: function(e, ui) {
-            ExternalSaveService.onExternalSave.emit();
-            StateHintsService.setActiveHintIndex(null);
-            ui.placeholder.height(ui.item.height());
-          },
-          stop: function() {
-            StateHintsService.saveDisplayedValue();
-            ctrl.onSaveHints(StateHintsService.displayed);
-          }
-        };
-        StateEditorService.updateStateHintsEditorInitialised();
-      };
+  getHintButtonText(): string {
+    var hintButtonText = '+ ADD HINT';
+    if (this.stateHintsService.displayed) {
+      if (this.stateHintsService.displayed.length >= 5) {
+        hintButtonText = 'Limit Reached';
+      }
     }
-  ]
-});
+    return hintButtonText;
+  }
+
+  getHintSummary(hint: Hint): string {
+    const hintAsPlainText =
+      this.formatRtePreviewPipe.transform(hint.hintContent.html);
+    return hintAsPlainText;
+  }
+
+  changeActiveHintIndex(newIndex: number): void {
+    const currentActiveIndex = this.stateHintsService.getActiveHintIndex();
+    if (currentActiveIndex !== null && (
+      !this.stateHintsService.displayed[currentActiveIndex]
+        .hintContent.html)) {
+      if (this.stateSolutionService.savedMemento &&
+        this.stateHintsService.displayed.length === 1) {
+        this.openDeleteLastHintModal();
+        return;
+      } else {
+        this.alertsService.addInfoMessage('Deleting empty hint.');
+        this.stateHintsService.displayed.splice(currentActiveIndex, 1);
+        this.stateHintsService.saveDisplayedValue();
+        this.onSaveHints(this.stateHintsService.displayed);
+      }
+    }
+    // If the current hint is being clicked on again, close it.
+    if (newIndex === this.stateHintsService.getActiveHintIndex()) {
+      this.stateHintsService.setActiveHintIndex(null);
+    } else {
+      this.stateHintsService.setActiveHintIndex(newIndex);
+    }
+  }
+
+  // This returns false if the current interaction ID is null.
+  isCurrentInteractionLinear(): boolean {
+    const interactionId = this.stateInteractionIdService.savedMemento;
+    return interactionId && INTERACTION_SPECS[interactionId].is_linear;
+  }
+
+  openAddHintModal(): void {
+    if (this.stateHintsService.displayed.length >= 5) {
+      return;
+    }
+    this.alertsService.clearWarnings();
+    this.externalSaveService.onExternalSave.emit();
+
+    const addHintSuccess = (result: {hint: Hint}): void => {
+      this.stateHintsService.displayed.push(result.hint);
+      this.stateHintsService.saveDisplayedValue();
+      this.onSaveHints(this.stateHintsService.displayed);
+      this.stateNextContentIdIndexService.saveDisplayedValue();
+      this.onSaveNextContentIdIndex(
+        this.stateNextContentIdIndexService.displayed);
+    };
+
+    this.ngbModal.open(AddHintModalComponent, {
+      backdrop: 'static',
+      windowClass: 'add-hint-modal'
+    }).result.then(function(result) {
+      addHintSuccess(result);
+    }, function() {
+      this.alertsService.clearWarnings();
+    });
+  }
+
+  openDeleteLastHintModal = (): void => {
+    this.alertsService.clearWarnings();
+
+    const openDeleteLastHintSuccess = (): void => {
+      this.stateSolutionService.displayed = null;
+      this.stateSolutionService.saveDisplayedValue();
+      this.onSaveSolution(this.stateSolutionService.displayed);
+
+      this.stateHintsService.displayed = [];
+      this.stateHintsService.saveDisplayedValue();
+      this.onSaveHints(this.stateHintsService.displayed);
+    };
+
+    this.ngbModal.open(DeleteLastHintModalComponent, {
+      backdrop: true,
+    }).result.then(function() {
+      openDeleteLastHintSuccess();
+    }, function() {
+      this.alertsService.clearWarnings();
+    });
+  };
+
+  deleteHint = (index: number, evt: Event): void => {
+    // Prevent clicking on the delete button from also toggling the
+    // display state of the hint.
+    evt.stopPropagation();
+
+    const deleteHintModalSuccess = (): void => {
+      if (this.stateSolutionService.savedMemento &&
+        this.stateHintsService.savedMemento.length === 1) {
+        this.openDeleteLastHintModal();
+      } else {
+        this.stateHintsService.displayed.splice(index, 1);
+        this.stateHintsService.saveDisplayedValue();
+        this.onSaveHints(this.stateHintsService.displayed);
+      }
+
+      if (index === this.stateHintsService.getActiveHintIndex()) {
+        this.stateHintsService.setActiveHintIndex(null);
+      }
+    };
+
+    this.alertsService.clearWarnings();
+    this.ngbModal.open(DeleteHintModalComponent, {
+      backdrop: true,
+    }).result.then(function() {
+      deleteHintModalSuccess();
+    }, function() {
+      this.alertsService.clearWarnings();
+    });
+  };
+
+  onSaveInlineHint(): void {
+    this.stateHintsService.saveDisplayedValue();
+    this.onSaveHints(this.stateHintsService.displayed);
+  }
+
+  toggleHintCard(): void {
+    this.hintCardIsShown = !this.hintCardIsShown;
+  }
+
+  getStaticImageUrl(imagePath: string): string {
+    return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  }
+
+  ngOnInit(): void {
+    this.hintCardIsShown = (
+      !this.windowDimensionsService.isWindowNarrow());
+    this.stateHintsService.setActiveHintIndex(null);
+    this.canEdit = this.editabilityService.isEditable();
+    // When the page is scrolled so that the top of the page is above
+    // the browser viewport, there are some bugs in the positioning of
+    // the helper. This is a bug in jQueryUI that has not been fixed
+    // yet. For more details, see http://stackoverflow.com/q/5791886
+    this.stateEditorService.updateStateHintsEditorInitialised();
+  }
+}
+
+angular.module('oppia').directive('oppiaStateHintsEditor',
+downgradeComponent({
+  component: StateHintsEditorComponent
+}) as angular.IDirectiveFactory);

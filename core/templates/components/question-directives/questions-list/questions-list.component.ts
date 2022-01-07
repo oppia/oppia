@@ -497,6 +497,9 @@ angular.module('oppia').component('questionsList', {
         ctrl.updateSkillLinkage();
       };
       ctrl.isQuestionSavable = function() {
+        // Update changes First.
+        $rootScope.$applyAsync();
+
         // Not savable if there are no changes.
         if (!QuestionUndoRedoService.hasChanges() && (
           ctrl.skillLinkageModificationsArray &&
