@@ -24,7 +24,7 @@
       </mat-card-content>
       <mat-card-actions class="card-actions">
         <div class="fx-row fx-main-center fx-cross-center full-width">
-          <button mat-raised-button [disabled]="isStartButtonDisabled() && questionsStatusCallIsComplete"
+          <button mat-raised-button [disabled]="isStartButtonDisabled()"
                   [ngClass]="{'practice-buttton-background-status-pending': !questionsStatusCallIsComplete, 'practice-buttton-background-status-complete': questionsStatusCallIsComplete}"
                   (click)="openNewPracticeSession()" class="practice-session-button protractor-test-practice-start-button" >
             <span *ngIf="questionsStatusCallIsComplete" class="font-heavy" [innerHTML]="'I18N_TOPIC_VIEWER_START_PRACTICE' | translate"></span>
