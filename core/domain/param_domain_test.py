@@ -94,7 +94,7 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
         }
         param_spec = param_domain.ParamSpec.from_dict(sample_dict)
         self.assertEqual(param_spec.to_dict(), sample_dict)
-        
+
     def test_param_change_class(self):
         """Test the ParamChange class."""
         param_change = param_domain.ParamChange(
