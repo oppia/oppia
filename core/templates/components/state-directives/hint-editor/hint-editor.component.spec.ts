@@ -25,8 +25,7 @@ import { ExternalSaveService } from 'services/external-save.service';
 import { HintBackendDict } from 'domain/exploration/HintObjectFactory';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('HintEditorComponent', () => {
+describe('HintEditorComponent', () => {
   let component: HintEditorComponent;
   let fixture: ComponentFixture<HintEditorComponent>;
   let editabilityService: EditabilityService;
@@ -74,8 +73,7 @@ fdescribe('HintEditorComponent', () => {
     component.ngOnDestroy();
   });
 
-  // eslint-disable-next-line oppia/no-test-blockers
-  fit('should set component properties on initialization', () => {
+  it('should set component properties on initialization', () => {
     expect(component.hintMemento).toBe(null);
     expect(component.isEditable).toBe(false);
     expect(component.hintEditorIsOpen).toBe(false);
