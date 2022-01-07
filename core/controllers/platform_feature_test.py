@@ -58,10 +58,10 @@ class PlatformFeaturesEvaluationHandlerTest(test_utils.GenericTestBase):
         registry.Registry.parameter_registry.clear()
         self.dev_feature = registry.Registry.create_platform_parameter(
             ParamNames.PARAMETER_A, 'parameter for test', DATA_TYPES.bool,
-            is_feature=True, feature_stage=param_domain.FEATURE_STAGES.DEV)
+            is_feature=True, feature_stage=param_domain.FeatureStages.DEV)
         self.prod_feature = registry.Registry.create_platform_parameter(
             ParamNames.PARAMETER_B, 'parameter for test', DATA_TYPES.bool,
-            is_feature=True, feature_stage=param_domain.FEATURE_STAGES.PROD)
+            is_feature=True, feature_stage=param_domain.FeatureStages.PROD)
         registry.Registry.update_platform_parameter(
             self.prod_feature.name, self.user_id, 'edit rules',
             [
@@ -225,7 +225,7 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
     def test_get_with_dummy_feature_enabled_in_dev_returns_ok(self):
         dev_mode_ctx = self.swap(constants, 'DEV_MODE', True)
         dummy_feature_dev_stage_context = self._mock_dummy_feature_stage(
-            param_domain.FEATURE_STAGES.DEV)
+            param_domain.FeatureStages.DEV)
 
         with dev_mode_ctx, dummy_feature_dev_stage_context:
             self._set_dummy_feature_status_for_mode(
@@ -240,7 +240,7 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
     def test_get_with_dummy_feature_disabled_in_dev_raises_404(self):
         dev_mode_ctx = self.swap(constants, 'DEV_MODE', True)
         dummy_feature_dev_stage_context = self._mock_dummy_feature_stage(
-            param_domain.FEATURE_STAGES.DEV)
+            param_domain.FeatureStages.DEV)
 
         with dev_mode_ctx, dummy_feature_dev_stage_context:
             self._set_dummy_feature_status_for_mode(
@@ -254,7 +254,7 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
     def test_get_with_dummy_feature_enabled_in_prod_returns_ok(self):
         dev_mode_ctx = self.swap(constants, 'DEV_MODE', False)
         dummy_feature_prod_stage_context = self._mock_dummy_feature_stage(
-            param_domain.FEATURE_STAGES.PROD)
+            param_domain.FeatureStages.PROD)
 
         with dev_mode_ctx, dummy_feature_prod_stage_context:
             self._set_dummy_feature_status_for_mode(
@@ -269,7 +269,7 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
     def test_get_with_dummy_feature_disabled_in_prod_raises_404(self):
         dev_mode_ctx = self.swap(constants, 'DEV_MODE', False)
         dummy_feature_prod_stage_context = self._mock_dummy_feature_stage(
-            param_domain.FEATURE_STAGES.PROD)
+            param_domain.FeatureStages.PROD)
 
         with dev_mode_ctx, dummy_feature_prod_stage_context:
             self._set_dummy_feature_status_for_mode(

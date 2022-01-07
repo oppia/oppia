@@ -24,7 +24,7 @@ from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_registry as registry
 
 Registry = registry.Registry
-FEATURE_STAGES = platform_parameter_domain.FEATURE_STAGES # pylint: disable=invalid-name
+FeatureStages = platform_parameter_domain.FeatureStages
 DATA_TYPES = platform_parameter_domain.DATA_TYPES # pylint: disable=invalid-name
 
 
@@ -44,7 +44,7 @@ class PARAM_NAMES(enum.Enum): # pylint: disable=invalid-name
 Registry.create_feature_flag(
     PARAM_NAMES.dummy_feature,
     'This is a dummy feature flag.',
-    FEATURE_STAGES.DEV,
+    FeatureStages.DEV,
 )
 
 Registry.create_platform_parameter(

@@ -37,7 +37,7 @@ class ServerModes(enum.Enum):
     PROD = 'prod'
 
 
-FEATURE_STAGES = ServerModes # pylint: disable=invalid-name
+FeatureStages = ServerModes
 
 
 # TODO(#14419): Change naming style of Enum class from SCREAMING_SNAKE_CASE
@@ -55,9 +55,9 @@ class DATA_TYPES(enum.Enum): # pylint: disable=invalid-name
 ALLOWED_SERVER_MODES = [
     ServerModes.DEV.value, ServerModes.TEST.value, ServerModes.PROD.value]
 ALLOWED_FEATURE_STAGES = [
-    FEATURE_STAGES.DEV.value,
-    FEATURE_STAGES.TEST.value,
-    FEATURE_STAGES.PROD.value
+    FeatureStages.DEV.value,
+    FeatureStages.TEST.value,
+    FeatureStages.PROD.value
 ]
 ALLOWED_PLATFORM_TYPES = constants.PLATFORM_PARAMETER_ALLOWED_PLATFORM_TYPES
 ALLOWED_BROWSER_TYPES = constants.PLATFORM_PARAMETER_ALLOWED_BROWSER_TYPES
@@ -763,14 +763,14 @@ class PlatformParameter:
             for server_mode_filter in server_mode_filters:
                 server_modes = [
                     value for _, value in server_mode_filter.conditions]
-                if self._feature_stage == FEATURE_STAGES.DEV.value:
+                if self._feature_stage == FeatureStages.DEV.value:
                     if (
                             ServerModes.TEST.value in server_modes or
                             ServerModes.PROD.value in server_modes):
                         raise utils.ValidationError(
                             'Feature in dev stage cannot be enabled in test or'
                             ' production environments.')
-                elif self._feature_stage == FEATURE_STAGES.TEST.value:
+                elif self._feature_stage == FeatureStages.TEST.value:
                     if ServerModes.PROD.value in server_modes:
                         raise utils.ValidationError(
                             'Feature in test stage cannot be enabled in '

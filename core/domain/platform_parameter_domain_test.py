@@ -25,7 +25,7 @@ from core import utils
 from core.domain import platform_parameter_domain as parameter_domain
 from core.tests import test_utils
 
-SERVER_MODES = parameter_domain.ServerModes # pylint: disable=invalid-name
+ServerModes = parameter_domain.ServerModes
 
 
 class PlatformParameterChangeTests(test_utils.GenericTestBase):
@@ -114,7 +114,7 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'app_version': '1.0.0',
             },
             {
-                'server_mode': SERVER_MODES.DEV,
+                'server_mode': ServerModes.DEV,
             },
         )
         self.assertFalse(context.is_valid)
@@ -127,7 +127,7 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'app_version': '1.0.0',
             },
             {
-                'server_mode': SERVER_MODES.DEV,
+                'server_mode': ServerModes.DEV,
             },
         )
         self.assertTrue(context.is_valid)
@@ -139,7 +139,7 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'browser_type': 'Chrome',
             },
             {
-                'server_mode': SERVER_MODES.DEV,
+                'server_mode': ServerModes.DEV,
             },
         )
         self.assertTrue(context.is_valid)
@@ -151,7 +151,7 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'app_version': '3.0.0',
             },
             {
-                'server_mode': SERVER_MODES.DEV,
+                'server_mode': ServerModes.DEV,
             },
         )
         self.assertTrue(context.is_valid)
@@ -164,7 +164,7 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'app_version': '1.0.0',
             },
             {
-                'server_mode': SERVER_MODES.DEV,
+                'server_mode': ServerModes.DEV,
             },
         )
         context.validate()
@@ -177,7 +177,7 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'app_version': '1.0.0',
             },
             {
-                'server_mode': SERVER_MODES.DEV,
+                'server_mode': ServerModes.DEV,
             },
         )
         # No exception should be raised since invalid platform types are
@@ -192,7 +192,7 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'app_version': '1.0.0',
             },
             {
-                'server_mode': SERVER_MODES.DEV,
+                'server_mode': ServerModes.DEV,
             },
         )
         with self.assertRaisesRegexp(
@@ -207,7 +207,7 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'app_version': 'a.a.a',
             },
             {
-                'server_mode': SERVER_MODES.DEV,
+                'server_mode': ServerModes.DEV,
             },
         )
         with self.assertRaisesRegexp(
@@ -223,7 +223,7 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'app_version': '1.0.0.0',
             },
             {
-                'server_mode': SERVER_MODES.DEV,
+                'server_mode': ServerModes.DEV,
             },
         )
         with self.assertRaisesRegexp(
@@ -238,7 +238,7 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'app_version': '1.0.0-abcedef-invalid',
             },
             {
-                'server_mode': SERVER_MODES.DEV,
+                'server_mode': ServerModes.DEV,
             },
         )
         with self.assertRaisesRegexp(
@@ -280,7 +280,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
                 'app_version': app_version,
             },
             {
-                'server_mode': getattr(SERVER_MODES, mode),
+                'server_mode': getattr(ServerModes, mode),
             },
         )
 
@@ -1602,7 +1602,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                 'app_version': '1.2.3',
             },
             {
-                'server_mode': SERVER_MODES.DEV,
+                'server_mode': ServerModes.DEV,
             },
         )
         self.assertEqual(parameter.evaluate(dev_context), '222')
@@ -1637,7 +1637,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                 'app_version': '1.2.3',
             },
             {
-                'server_mode': SERVER_MODES.PROD,
+                'server_mode': ServerModes.PROD,
             },
         )
         self.assertEqual(parameter.evaluate(prod_context), '111')
@@ -1672,7 +1672,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                 'app_version': '1.2.3',
             },
             {
-                'server_mode': SERVER_MODES.DEV,
+                'server_mode': ServerModes.DEV,
             },
         )
         self.assertEqual(parameter.evaluate(dev_context), '111')

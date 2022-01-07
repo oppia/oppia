@@ -36,8 +36,8 @@ class ParamNames(enum.Enum):
     FEATURE_B = 'feature_b'
 
 
-SERVER_MODES = platform_parameter_domain.ServerModes # pylint: disable=invalid-name
-FEATURE_STAGES = platform_parameter_domain.FEATURE_STAGES # pylint: disable=invalid-name
+ServerModes = platform_parameter_domain.ServerModes
+FeatureStages = platform_parameter_domain.FeatureStages
 
 
 class PlatformFeatureServiceTest(test_utils.GenericTestBase):
@@ -71,7 +71,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                         {
                             'type': 'server_mode',
                             'conditions': [
-                                ['=', SERVER_MODES.DEV.value]
+                                ['=', ServerModes.DEV.value]
                             ]
                         }
                     ],
@@ -88,9 +88,9 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                         {
                             'type': 'server_mode',
                             'conditions': [
-                                ['=', SERVER_MODES.DEV.value],
-                                ['=', SERVER_MODES.TEST.value],
-                                ['=', SERVER_MODES.PROD.value]
+                                ['=', ServerModes.DEV.value],
+                                ['=', ServerModes.TEST.value],
+                                ['=', ServerModes.PROD.value]
                             ]
                         }
                     ],
@@ -198,7 +198,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                         {
                             'type': 'server_mode',
                             'conditions': [
-                                ['=', SERVER_MODES.PROD.value]
+                                ['=', ServerModes.PROD.value]
                             ],
                         },
                         {
@@ -230,7 +230,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                         {
                             'type': 'server_mode',
                             'conditions': [
-                                ['=', FEATURE_STAGES.DEV.value]
+                                ['=', FeatureStages.DEV.value]
                             ]
                         }
                     ],
