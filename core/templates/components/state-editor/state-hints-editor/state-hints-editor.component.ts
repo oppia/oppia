@@ -70,7 +70,6 @@ export class StateHintsEditorComponent implements OnInit {
       this.stateHintsService.displayed, event.previousIndex,
       event.currentIndex);
     this.stateHintsService.saveDisplayedValue();
-    this.stateHintsService.saveDisplayedValue();
     this.onSaveHints(this.stateHintsService.displayed);
   }
 

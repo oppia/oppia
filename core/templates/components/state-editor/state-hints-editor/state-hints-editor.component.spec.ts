@@ -31,6 +31,7 @@ import { AlertsService } from 'services/alerts.service';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { HintBackendDict, HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
+import { CdkDrag, CdkDragSortEvent, CdkDropList } from '@angular/cdk/drag-drop';
 
 class MockStateHintsService {
   displayed = [
@@ -90,7 +91,8 @@ class MockStateHintsService {
   }
 }
 
-describe('StateHintsEditorComponent', () => {
+// eslint-disable-next-line oppia/no-test-blockers
+fdescribe('StateHintsEditorComponent', () => {
   let component: StateHintsEditorComponent;
   let fixture: ComponentFixture<StateHintsEditorComponent>;
   let ngbModal: NgbModal;
@@ -165,7 +167,17 @@ describe('StateHintsEditorComponent', () => {
   });
 
   it('should change list oder', () => {
+    spyOn(stateHintsService, 'saveDisplayedValue').and.callThrough();
 
+    const event = {
+      previousIndex: 1,
+      currentIndex: 2,
+      container: undefined,
+      item: undefined,
+    };
+    component.drop(event);
+
+    expect(stateHintsService.saveDisplayedValue).toHaveBeenCalled();
   });
 
   it('should set component properties on initialization', () => {
