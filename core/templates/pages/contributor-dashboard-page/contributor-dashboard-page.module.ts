@@ -16,6 +16,7 @@
  * @fileoverview Module for the contributor dashboard page.
  */
 
+import { DragDropModule } from '@angular/cdk/drag-drop';
 import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
@@ -48,6 +49,7 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
 @NgModule({
   imports: [
     BrowserModule,
+    DragDropModule,
     BrowserAnimationsModule,
     HttpClientModule,
     InteractionExtensionsModule,
