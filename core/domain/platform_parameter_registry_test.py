@@ -31,7 +31,7 @@ from core.tests import test_utils
 (config_models,) = models.Registry.import_models(
     [models.NAMES.config])
 
-DATA_TYPES = parameter_domain.DATA_TYPES # pylint: disable=invalid-name
+DataTypes = parameter_domain.DataTypes
 FeatureStages = parameter_domain.FeatureStages
 
 
@@ -66,7 +66,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         registry.Registry.init_platform_parameter_from_dict({
             'name': name,
             'description': 'for test',
-            'data_type': DATA_TYPES.string.value,
+            'data_type': DataTypes.STRING.value,
             'rules': [
                 {
                     'filters': [
@@ -87,7 +87,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
 
     def test_create_platform_parameter(self):
         parameter = registry.Registry.create_platform_parameter(
-            ParamNames.PARAMETER_A, 'test', registry.DATA_TYPES.bool)
+            ParamNames.PARAMETER_A, 'test', registry.DataTypes.BOOL)
         self.assertIsInstance(parameter, parameter_domain.PlatformParameter)
         parameter.validate()
 
@@ -111,26 +111,26 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
     def test_create_feature_flag(self):
         feature = registry.Registry.create_feature_flag(
             ParamNames.PARAMETER_A, 'test feature', FeatureStages.DEV)
-        self.assertEqual(feature.data_type, registry.DATA_TYPES.bool.value)
+        self.assertEqual(feature.data_type, registry.DataTypes.BOOL.value)
         self.assertTrue(feature.is_feature)
         self.assertEqual(feature.feature_stage, FeatureStages.DEV.value)
         feature.validate()
 
     def test_default_value_of_bool_platform_parameter(self):
         parameter = registry.Registry.create_platform_parameter(
-            ParamNames.PARAMETER_A, 'test feature', registry.DATA_TYPES.bool)
+            ParamNames.PARAMETER_A, 'test feature', registry.DataTypes.BOOL)
         parameter.validate()
         self.assertEqual(parameter.default_value, False)
 
     def test_default_value_of_string_platform_parameter(self):
         parameter = registry.Registry.create_platform_parameter(
-            ParamNames.PARAMETER_A, 'test', DATA_TYPES.string)
+            ParamNames.PARAMETER_A, 'test', DataTypes.STRING)
         parameter.validate()
         self.assertEqual(parameter.default_value, '')
 
     def test_default_value_of_number_platform_parameter(self):
         parameter = registry.Registry.create_platform_parameter(
-            ParamNames.PARAMETER_A, 'test', DATA_TYPES.number)
+            ParamNames.PARAMETER_A, 'test', DataTypes.NUMBER)
         parameter.validate()
         self.assertEqual(parameter.default_value, 0)
 
@@ -368,7 +368,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         registry.Registry.init_platform_parameter_from_dict({
             'name': 'parameter_a',
             'description': 'for test',
-            'data_type': DATA_TYPES.string.value,
+            'data_type': DataTypes.STRING.value,
             'rules': [
                 {
                     'filters': [
@@ -389,7 +389,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         registry.Registry.init_platform_parameter_from_dict({
             'name': 'parameter_b',
             'description': 'for test',
-            'data_type': registry.DATA_TYPES.bool.value,
+            'data_type': registry.DataTypes.BOOL.value,
             'rules': [],
             'rule_schema_version': (
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),

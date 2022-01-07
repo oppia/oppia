@@ -26,16 +26,16 @@ from core.platform import models
 (config_models,) = models.Registry.import_models(
     [models.NAMES.config])
 
-DATA_TYPES = platform_parameter_domain.DATA_TYPES # pylint: disable=invalid-name
+DataTypes = platform_parameter_domain.DataTypes
 
 
 class Registry:
     """Registry of all platform parameters."""
 
     DEFAULT_VALUE_BY_TYPE_DICT = {
-        DATA_TYPES.bool: False,
-        DATA_TYPES.number: 0,
-        DATA_TYPES.string: '',
+        DataTypes.BOOL: False,
+        DataTypes.NUMBER: 0,
+        DataTypes.STRING: '',
     }
 
     # The keys of parameter_registry are the property names, and the values
@@ -100,7 +100,7 @@ class Registry:
             PlatformParameter. The created feature flag.
         """
         return cls.create_platform_parameter(
-            name, description, DATA_TYPES.bool,
+            name, description, DataTypes.BOOL,
             is_feature=True, feature_stage=stage)
 
     @classmethod

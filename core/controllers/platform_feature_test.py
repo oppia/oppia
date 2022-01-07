@@ -34,7 +34,7 @@ class ParamNames(enum.Enum):
     PARAMETER_B = 'parameter_b'
 
 
-DATA_TYPES = param_domain.DATA_TYPES # pylint: disable=invalid-name
+DataTypes = param_domain.DataTypes
 
 
 class PlatformFeaturesEvaluationHandlerTest(test_utils.GenericTestBase):
@@ -57,10 +57,10 @@ class PlatformFeaturesEvaluationHandlerTest(test_utils.GenericTestBase):
 
         registry.Registry.parameter_registry.clear()
         self.dev_feature = registry.Registry.create_platform_parameter(
-            ParamNames.PARAMETER_A, 'parameter for test', DATA_TYPES.bool,
+            ParamNames.PARAMETER_A, 'parameter for test', DataTypes.BOOL,
             is_feature=True, feature_stage=param_domain.FeatureStages.DEV)
         self.prod_feature = registry.Registry.create_platform_parameter(
-            ParamNames.PARAMETER_B, 'parameter for test', DATA_TYPES.bool,
+            ParamNames.PARAMETER_B, 'parameter for test', DataTypes.BOOL,
             is_feature=True, feature_stage=param_domain.FeatureStages.PROD)
         registry.Registry.update_platform_parameter(
             self.prod_feature.name, self.user_id, 'edit rules',

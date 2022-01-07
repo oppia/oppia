@@ -40,16 +40,13 @@ class ServerModes(enum.Enum):
 FeatureStages = ServerModes
 
 
-# TODO(#14419): Change naming style of Enum class from SCREAMING_SNAKE_CASE
-# to PascalCase and its values to UPPER_CASE. Because we want to be consistent
-# throughout the codebase according to the coding style guide.
-# https://github.com/oppia/oppia/wiki/Coding-style-guide
-class DATA_TYPES(enum.Enum): # pylint: disable=invalid-name
+
+class DataTypes(enum.Enum):
     """Enum for data types."""
 
-    bool = 'bool' # pylint: disable=invalid-name
-    string = 'string' # pylint: disable=invalid-name
-    number = 'number' # pylint: disable=invalid-name
+    BOOL = 'bool'
+    STRING = 'string'
+    NUMBER = 'number'
 
 
 ALLOWED_SERVER_MODES = [
@@ -570,9 +567,9 @@ class PlatformParameter:
     """Domain object for platform parameters."""
 
     DATA_TYPE_PREDICATES_DICT = {
-        DATA_TYPES.bool.value: lambda x: isinstance(x, bool),
-        DATA_TYPES.string.value: lambda x: isinstance(x, str),
-        DATA_TYPES.number.value: lambda x: isinstance(x, (float, int)),
+        DataTypes.BOOL.value: lambda x: isinstance(x, bool),
+        DataTypes.STRING.value: lambda x: isinstance(x, str),
+        DataTypes.NUMBER.value: lambda x: isinstance(x, (float, int)),
     }
 
     PARAMETER_NAME_REGEXP = r'^[A-Za-z0-9_]{1,100}$'
@@ -743,7 +740,7 @@ class PlatformParameter:
         """Validates the PlatformParameter domain object that is a feature
         flag.
         """
-        if self._data_type != DATA_TYPES.bool.value:
+        if self._data_type != DataTypes.BOOL.value:
             raise utils.ValidationError(
                 'Data type of feature flags must be bool, got \'%s\' '
                 'instead.' % self._data_type)
