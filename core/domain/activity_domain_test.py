@@ -81,11 +81,14 @@ class ActivityReferenceDomainUnitTests(test_utils.GenericTestBase):
             'type': 'exploration',
             'id': '1234'
         }
-        sample_activity_object = activity_domain.ActivityReference.from_dict(sample_dict) # pylint: disable=line-too-long
-        self.assertEqual(
-            sample_dict,
-            sample_activity_object.to_dict()
-        )
+        returned_activity_object = activity_domain.ActivityReference.from_dict(
+            sample_dict)
+        returned_activity_dict = returned_activity_object.to_dict()
+
+        self.assertEqual(sample_dict,returned_activity_dict)
+        self.assertEqual(sample_dict['type'],returned_activity_dict['type'])
+        self.assertEqual(sample_dict['id'],returned_activity_dict['id'])
+
 
 
 class ActivityReferencesDomainUnitTests(test_utils.GenericTestBase):
