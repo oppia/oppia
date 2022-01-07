@@ -56,6 +56,36 @@ class BlogPostModelTest(test_utils.GenericTestBase):
         self.blog_post_model.update_timestamps()
         self.blog_post_model.put()
 
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            blog_models.BlogPostModel.
+                get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER)
+
+    def test_get_export_policy(self) -> None:
+        export_policy = blog_models.BlogPostModel.get_export_policy()
+        self.assertEqual(
+            export_policy['author_id'],
+            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+        self.assertEqual(
+            export_policy['content'],
+            base_models.EXPORT_POLICY.EXPORTED)
+        self.assertEqual(
+            export_policy['published_on'],
+            base_models.EXPORT_POLICY.EXPORTED)
+        self.assertEqual(
+            export_policy['tags'],
+            base_models.EXPORT_POLICY.EXPORTED)
+        self.assertEqual(
+            export_policy['thumbnail_filename'],
+            base_models.EXPORT_POLICY.EXPORTED)
+        self.assertEqual(
+            export_policy['title'],
+            base_models.EXPORT_POLICY.EXPORTED)
+        self.assertEqual(
+            export_policy['url_fragment'],
+            base_models.EXPORT_POLICY.EXPORTED)
+
     def test_get_deletion_policy(self):
         self.assertEqual(
             blog_models.BlogPostModel.get_deletion_policy(),
@@ -183,6 +213,36 @@ class BlogPostSummaryModelTest(test_utils.GenericTestBase):
         self.blog_post_summary_model_new.update_timestamps()
         self.blog_post_summary_model_new.put()
 
+    def test_get_export_policy(self) -> None:
+        export_policy = blog_models.BlogPostSummaryModel.get_export_policy()
+        self.assertEqual(
+            export_policy['author_id'],
+            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+        self.assertEqual(
+            export_policy['summary'],
+            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+        self.assertEqual(
+            export_policy['published_on'],
+            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+        self.assertEqual(
+            export_policy['tags'],
+            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+        self.assertEqual(
+            export_policy['thumbnail_filename'],
+            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+        self.assertEqual(
+            export_policy['title'],
+            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+        self.assertEqual(
+            export_policy['url_fragment'],
+            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            blog_models.BlogPostSummaryModel.
+                get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
+
     def test_get_deletion_policy(self):
         self.assertEqual(
             blog_models.BlogPostSummaryModel.get_deletion_policy(),
@@ -234,6 +294,30 @@ class BlogPostRightsModelTest(test_utils.GenericTestBase):
         )
         self.blog_post_rights_draft_model.update_timestamps()
         self.blog_post_rights_draft_model.put()
+
+    def test_get_export_policy(self) -> None:
+        export_policy = blog_models.BlogPostRightsModel.get_export_policy()
+        self.assertEqual(
+            export_policy['editor_ids'],
+            base_models.EXPORT_POLICY.EXPORTED)
+        self.assertEqual(
+            export_policy['blog_post_is_published'],
+            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+
+    def test_get_field_name_mapping_to_takeout_keys(self) -> None:
+        self.assertEqual(
+            blog_models.BlogPostRightsModel.
+            get_field_name_mapping_to_takeout_keys(),
+            {
+                'editor_ids': 'editable_blog_post_ids'
+            })
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            blog_models.BlogPostRightsModel.
+                get_model_association_to_user(),
+            base_models.
+            MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_SHARED_ACROSS_USERS)
 
     def test_get_deletion_policy(self):
         self.assertEqual(
