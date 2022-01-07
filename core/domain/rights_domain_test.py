@@ -210,7 +210,7 @@ class ActivityRightsTests(test_utils.GenericTestBase):
             self.activity_rights.validate()
 
     def test_to_dict(self) -> None:
-        sample_activity_rights_dict = {
+        sample_activity_rights_dict: rights_domain.ActivityRightsDict = {
             'cloned_from': None,
             'status': rights_domain.ACTIVITY_STATUS_PUBLIC,
             'community_owned': False,
