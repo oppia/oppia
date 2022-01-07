@@ -48,6 +48,31 @@ class StoryModelTest(test_utils.GenericTestBase):
             story_models.StoryModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
+    def test_get_export_policy(self) -> None:
+        # sample_dict = base_models.BaseModel.get_export_policy()
+        # sample_dict.update(
+            self.assertEqual(
+            story_models.StoryModel.get_export_policy(),
+            {'corresponding_topic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'meta_tag_content': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'notes': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'story_contents': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'story_contents_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'thumbnail_bg_color': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'thumbnail_filename': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'thumbnail_size_in_bytes': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'url_fragment': base_models.EXPORT_POLICY.NOT_APPLICABLE})
+
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            story_models.StoryModel.
+                get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
+
     def test_story_model(self) -> None:
         """Method to test the StoryModel."""
 
@@ -106,6 +131,20 @@ class StoryModelTest(test_utils.GenericTestBase):
 class StoryCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
     """Test the StoryCommitLogEntryModel class."""
 
+    def test_get_export_policy(self) -> None:
+        sample_dict = base_models.BaseModel.get_export_policy()
+        sample_dict.update(
+            {'story_id': base_models.EXPORT_POLICY.NOT_APPLICABLE})
+        self.assertEqual(
+            story_models.StoryCommitLogEntryModel.get_export_policy(),
+            sample_dict)
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            story_models.StoryCommitLogEntryModel.
+                get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
+
     def test_has_reference_to_user_id(self) -> None:
         commit = story_models.StoryCommitLogEntryModel.create(
             'b', 0, 'committer_id', 'msg', 'create', [{}],
@@ -128,6 +167,31 @@ class StorySummaryModelTest(test_utils.GenericTestBase):
         self.assertEqual(
             story_models.StorySummaryModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+    def test_get_export_policy(self) -> None:
+        sample_dict = base_models.BaseModel.get_export_policy()
+        sample_dict.update(
+            {'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'story_model_last_updated':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'story_model_created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'node_titles': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'thumbnail_filename': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'thumbnail_bg_color': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'url_fragment': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            })
+        self.assertEqual(
+            story_models.StorySummaryModel.get_export_policy(),
+            sample_dict)
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            story_models.StorySummaryModel.
+                get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
 
     def test_story_summary_model(self) -> None:
         """Method to test the StorySummaryModel."""
