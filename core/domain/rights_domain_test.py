@@ -240,7 +240,7 @@ class ActivityRightsTests(test_utils.GenericTestBase):
         self.activity_rights.voice_artist_ids = ['123456']
         self.assertTrue(self.activity_rights.is_voice_artist('123456'))
         self.assertFalse(self.activity_rights.is_voice_artist('123457'))
-    
+
     def test_is_viewer(self) -> None:
         self.activity_rights.viewer_ids = ['123456']
         self.assertTrue(self.activity_rights.is_viewer('123456'))
