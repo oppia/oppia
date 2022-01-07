@@ -29,12 +29,12 @@ from core.constants import constants
 from core.domain import change_domain
 
 
-class ServerModes(enum.Enum): # pylint: disable=invalid-name
+class ServerModes(enum.Enum):
     """Enum for server modes."""
 
-    DEV = 'dev' # pylint: disable=invalid-name
-    TEST = 'test' # pylint: disable=invalid-name
-    PROD = 'prod' # pylint: disable=invalid-name
+    DEV = 'dev'
+    TEST = 'test'
+    PROD = 'prod'
 
 
 FEATURE_STAGES = ServerModes # pylint: disable=invalid-name
