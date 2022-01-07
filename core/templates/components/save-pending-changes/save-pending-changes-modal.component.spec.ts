@@ -20,15 +20,13 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { SavePendingChangesModalComponent } from './save-pending-changes-modal.component';
 
-describe('Delete Topic Modal Component', () => {
-  let fixture: ComponentFixture<SavePendingChangesModalComponent>;
+describe('Save pending changes modal', () => {
   let componentInstance: SavePendingChangesModalComponent;
+  let fixture: ComponentFixture<SavePendingChangesModalComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        SavePendingChangesModalComponent
-      ],
+      declarations: [SavePendingChangesModalComponent],
       providers: [
         NgbActiveModal
       ]
