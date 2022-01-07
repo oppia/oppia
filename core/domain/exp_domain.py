@@ -619,8 +619,9 @@ class Exploration:
         self.last_updated = last_updated
         self.auto_tts_enabled = auto_tts_enabled
         self.correctness_feedback_enabled = correctness_feedback_enabled
-        self._cached_android_proto_size_in_bytes = 0
         self.proto_size_is_stale = True
+        self._cached_android_proto_size_in_bytes = 0
+        self.proto_size_in_bytes = None
 
     @classmethod
     def create_default_exploration(
@@ -780,8 +781,7 @@ class Exploration:
         exploration.created_on = exploration_created_on
         exploration.last_updated = exploration_last_updated
 
-        exploration._cached_android_proto_size_in_bytes = (
-            exploration_dict['_cached_android_proto_size_in_bytes'])
+        exploration.proto_size_in_bytes = self.is_stale
 
         return exploration
 
@@ -1357,7 +1357,7 @@ class Exploration:
             title: str. The exploration title to set.
         """
         self.title = title
-        proto_size_is_stale = True
+        self.proto_size_is_stale = True
 
     def update_category(self, category):
         """Update the exploration category.
@@ -1366,7 +1366,7 @@ class Exploration:
             category: str. The exploration category to set.
         """
         self.category = category
-        proto_size_is_stale = True
+        self.proto_size_is_stale = True
 
     def update_objective(self, objective):
         """Update the exploration objective.
@@ -1375,7 +1375,7 @@ class Exploration:
             objective: str. The exploration objective to set.
         """
         self.objective = objective
-        proto_size_is_stale = True
+        self.proto_size_is_stale = True
 
     def update_language_code(self, language_code):
         """Update the exploration language code.
@@ -1384,7 +1384,7 @@ class Exploration:
             language_code: str. The exploration language code to set.
         """
         self.language_code = language_code
-        proto_size_is_stale = True
+        self.proto_size_is_stale = True
 
     def update_tags(self, tags):
         """Update the tags of the exploration.
@@ -1393,7 +1393,7 @@ class Exploration:
             tags: list(str). List of tags to set.
         """
         self.tags = tags
-        proto_size_is_stale = True
+        self.proto_size_is_stale = True
 
     def update_blurb(self, blurb):
         """Update the blurb of the exploration.
@@ -1402,7 +1402,7 @@ class Exploration:
             blurb: str. The blurb to set.
         """
         self.blurb = blurb
-        proto_size_is_stale = True
+        self.proto_size_is_stale = True
 
     def update_author_notes(self, author_notes):
         """Update the author notes of the exploration.
@@ -1411,7 +1411,7 @@ class Exploration:
             author_notes: str. The author notes to set.
         """
         self.author_notes = author_notes
-        proto_size_is_stale = True
+        self.proto_size_is_stale = True
 
     def update_param_specs(self, param_specs_dict):
         """Update the param spec dict.
@@ -1425,7 +1425,7 @@ class Exploration:
             ps_name: param_domain.ParamSpec.from_dict(ps_val)
             for (ps_name, ps_val) in param_specs_dict.items()
         }
-        proto_size_is_stale = True
+        self.proto_size_is_stale = True
 
     def update_param_changes(self, param_changes):
         """Update the param change dict.
@@ -1434,7 +1434,7 @@ class Exploration:
             param_changes: list(ParamChange). List of ParamChange objects.
         """
         self.param_changes = param_changes
-        proto_size_is_stale = True
+        self.proto_size_is_stale = True
 
     def update_init_state_name(self, init_state_name):
         """Update the name for the initial state of the exploration.
@@ -1452,7 +1452,7 @@ class Exploration:
         if old_init_state_name in self.states:
             self.states[old_init_state_name].card_is_checkpoint = False
         self.init_state.card_is_checkpoint = True
-        proto_size_is_stale = True
+        self.proto_size_is_stale = True
 
     def update_auto_tts_enabled(self, auto_tts_enabled):
         """Update whether automatic text-to-speech is enabled.
@@ -1462,7 +1462,7 @@ class Exploration:
                 is enabled or not.
         """
         self.auto_tts_enabled = auto_tts_enabled
-        proto_size_is_stale = True
+        self.proto_size_is_stale = True
 
     def update_correctness_feedback_enabled(self, correctness_feedback_enabled):
         """Update whether correctness feedback is enabled.
@@ -1472,7 +1472,7 @@ class Exploration:
                 is enabled or not.
         """
         self.correctness_feedback_enabled = correctness_feedback_enabled
-        proto_size_is_stale = True
+        self.proto_size_is_stale = True
 
     # Methods relating to states.
     def add_states(self, state_names):
@@ -2419,8 +2419,7 @@ class Exploration:
 
         # The constructor calculates the proto_size_in_bytes and adds it to the
         # domain object. So, we add that value directly to the dict.
-        exploration_dict['_cached_android_proto_size_in_bytes'] = (
-            exploration._cached_android_proto_size_in_bytes)
+        exploration_dict['proto_size_in_bytes'] = self.is_stale
 
         return exploration_dict
 
@@ -2436,7 +2435,7 @@ class Exploration:
         # The ID and the proto_size_in_bytes are the properties that should not
         # be stored within the YAML representation.
         del exp_dict['id']
-        del exp_dict['_cached_android_proto_size_in_bytes']
+        del exp_dict['proto_size_in_bytes']
 
         return python_utils.yaml_from_dict(exp_dict)
 
@@ -2462,7 +2461,7 @@ class Exploration:
             'tags': self.tags,
             'auto_tts_enabled': self.auto_tts_enabled,
             'correctness_feedback_enabled': self.correctness_feedback_enabled,
-            '_cached_android_proto_size_in_bytes': self.is_stale,
+            'proto_size_in_bytes': self.is_stale,
             'states': {state_name: state.to_dict()
                        for (state_name, state) in self.states.items()}
         })

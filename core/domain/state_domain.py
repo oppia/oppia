@@ -668,6 +668,8 @@ class InteractionInstance:
             interaction_proto = state_pb2.InteractionInstanceDto(
                 end_exploration=(
                     interaction_instance.to_android_end_exploration_proto()))
+        else:
+            interaction_proto = None
 
         return interaction_proto
 
@@ -1863,12 +1865,7 @@ class WrittenTranslations:
                 proto = languages_pb2.WrittenTranslationContentMappingDto(
                     language=language_code[lang_code],
                     translation_content_mapping=written_translation_content_map)
-            else:
-                proto = languages_pb2.WrittenTranslationContentMappingDto(
-                    language=(
-                        languages_pb2.LanguageType.LANGUAGE_CODE_UNSPECIFIED),
-                    translation_content_mapping=written_translation_content_map)
-            written_translation_content_mapping_protos_list.append(proto)
+                written_translation_content_mapping_protos_list.append(proto)
 
         return written_translation_content_mapping_protos_list
 
@@ -2204,15 +2201,12 @@ class RecordedVoiceovers:
         for (lang_code, voiceover_file_content_map) in (
             language_to_content_id_voiceover_file_map.items()):
             if lang_code in android_validation_constants.SUPPORTED_LANGUAGES:
-                proto = languages_pb2.VoiceoverContentMappingDto(
-                    language=language_code[lang_code],
-                    voiceover_content_mapping=voiceover_file_content_map)
-            else:
-                proto = languages_pb2.VoiceoverContentMappingDto(
-                    language=(
-                        languages_pb2.LanguageType.LANGUAGE_CODE_UNSPECIFIED),
-                    voiceover_content_mapping=voiceover_file_content_map)
-            voiceover_content_mapping_protos_list.append(proto)
+                voiceover_content_mapping_proto = (
+                    languages_pb2.VoiceoverContentMappingDto(
+                        language=language_code[lang_code],
+                        voiceover_content_mapping=voiceover_file_content_map))
+                voiceover_content_mapping_protos_list.append(
+                    voiceover_content_mapping_proto)
 
         return voiceover_content_mapping_protos_list
 
@@ -3729,16 +3723,29 @@ class State:
         Returns:
             StateDto. The proto object.
         """
-        recorded_voiceovers = self.recorded_voiceovers
-        written_translations = self.written_translations
-        return state_pb2.StateDto(
-            content=self.content.to_android_content_proto(),
-            recorded_voiceovers=(
-                recorded_voiceovers.to_android_recorded_voiceovers_proto()),
-            written_translations=(
-                written_translations.to_android_written_translations_proto()),
-            interaction=self.interaction.to_android_interaction_proto()
-        )
+        state_proto = {}
+        content_proto = self.content.to_android_content_proto()
+        recorded_voiceovers_proto = (
+            self.recorded_voiceovers.to_android_recorded_voiceovers_proto())
+        written_translations_proto = (
+            self.written_translations.to_android_written_translations_proto())
+        interaction_proto = self.interaction.to_android_interaction_proto()
+
+        if self.interaction.to_android_interaction_proto() is None:
+            state_proto = state_pb2.StateDto(
+                content=content_proto,
+                recorded_voiceovers=recorded_voiceovers_proto,
+                written_translations=written_translations_proto
+            )
+        else:
+            state_proto = state_pb2.StateDto(
+                content=content_proto,
+                recorded_voiceovers=recorded_voiceovers_proto,
+                written_translations=written_translations_proto,
+                interaction=interaction_proto
+            )
+
+        return state_proto
 
     @classmethod
     def convert_html_fields_in_state(

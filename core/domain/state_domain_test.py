@@ -37,6 +37,7 @@ from core.domain import rules_registry
 from core.domain import state_domain
 from core.domain import translatable_object_registry
 from core.tests import test_utils
+from google.protobuf.descriptor import FieldDescriptor
 from proto_files import state_pb2
 
 
@@ -4454,20 +4455,6 @@ class InteractionInstanceDomainTests(test_utils.GenericTestBase):
         default_outcome = state_domain.Outcome(
             'end_state_name', subtitled_html, False, [], None, None)
 
-        for interaction_id in (
-            android_validation_constants.VALID_INTERACTION_IDS):
-            interaction_obj = state_domain.InteractionInstance(
-                interaction_id,
-                {}, [], default_outcome, [], [], None)
-            if interaction_obj.is_supported_on_android_app():
-                self.assertTrue(
-                    hasattr(interaction_obj, 'to_proto')
-                )
-            else:
-                self.assertFalse(
-                    hasattr(interaction_obj, 'to_proto')
-                )
-
         continue_customization_args = (
             interaction.convert_customization_args_dict_to_customization_args(
                 'Continue',
@@ -4484,7 +4471,7 @@ class InteractionInstanceDomainTests(test_utils.GenericTestBase):
         continue_interaction = state_domain.InteractionInstance(
             'Continue',
             continue_customization_args, [], default_outcome, [], [], None)
-        continue_proto = continue_interaction.to_android_continue_proto()
+        continue_proto = continue_interaction.to_android_interaction_proto()
         self.assertEqual(
             type(continue_proto.continue_instance),
             state_pb2.ContinueInstanceDto
@@ -4515,7 +4502,7 @@ class InteractionInstanceDomainTests(test_utils.GenericTestBase):
             'FractionInput',
             fraction_customization_args, [], default_outcome, [], [], None)
         fraction_input_proto = (
-            fraction_interaction.to_android_fraction_input_proto())
+            fraction_interaction.to_android_interaction_proto())
         self.assertEqual(
             type(fraction_input_proto.fraction_input),
             state_pb2.FractionInputInstanceDto
@@ -4546,7 +4533,7 @@ class InteractionInstanceDomainTests(test_utils.GenericTestBase):
             'ItemSelectionInput',
             item_customization_args, [], default_outcome, [], [], None)
         item_selection_input_proto = (
-            item_interaction.to_android_item_selection_input_proto())
+            item_interaction.to_android_interaction_proto())
         self.assertEqual(
             type(item_selection_input_proto.item_selection_input),
             state_pb2.ItemSelectionInputInstanceDto
@@ -4572,7 +4559,7 @@ class InteractionInstanceDomainTests(test_utils.GenericTestBase):
             'MultipleChoiceInput',
             multi_customization_args, [], default_outcome, [], [], None)
         multiple_choice_input_proto = (
-            multi_interaction.to_android_multiple_choice_input_proto())
+            multi_interaction.to_android_interaction_proto())
         self.assertEqual(
             type(multiple_choice_input_proto.multiple_choice_input),
             state_pb2.MultipleChoiceInputInstanceDto
@@ -4592,7 +4579,7 @@ class InteractionInstanceDomainTests(test_utils.GenericTestBase):
             'NumericInput',
             numeric_customization_args, [], default_outcome, [], [], None)
         numeric_input_proto = (
-            numeric_interaction.to_android_numeric_input_proto())
+            numeric_interaction.to_android_interaction_proto())
         self.assertEqual(
             type(numeric_input_proto.numeric_input),
             state_pb2.NumericInputInstanceDto
@@ -4617,7 +4604,7 @@ class InteractionInstanceDomainTests(test_utils.GenericTestBase):
             'TextInput',
             text_customization_args, [], default_outcome, [], [], None)
         self.assertEqual(
-            type(text_interaction.to_android_text_input_proto().text_input),
+            type(text_interaction.to_android_interaction_proto().text_input),
             state_pb2.TextInputInstanceDto
         )
 
@@ -4639,7 +4626,7 @@ class InteractionInstanceDomainTests(test_utils.GenericTestBase):
         ratio_interaction = state_domain.InteractionInstance(
             'RatioExpressionInput',
             ratio_customization_args, [], default_outcome, [], [], None)
-        ratio_input_proto = ratio_interaction.to_android_ratio_input_proto()
+        ratio_input_proto = ratio_interaction.to_android_interaction_proto()
         self.assertEqual(
             type(ratio_input_proto.ratio_expression_input),
             state_pb2.RatioExpressionInputInstanceDto
@@ -4667,7 +4654,7 @@ class InteractionInstanceDomainTests(test_utils.GenericTestBase):
             'DragAndDropSortInput',
             drag_customization_args, [], default_outcome, [], [], None)
         drag_drop_input_proto = (
-            drag_interaction.to_android_drag_drop_input_proto())
+            drag_interaction.to_android_interaction_proto())
         self.assertEqual(
             type(drag_drop_input_proto.drag_and_drop_sort_input),
             state_pb2.DragAndDropSortInputInstanceDto
@@ -4701,7 +4688,7 @@ class InteractionInstanceDomainTests(test_utils.GenericTestBase):
             'ImageClickInput',
             image_customization_args, [], default_outcome, [], [], None)
         image_click_input_proto = (
-            image_interaction.to_android_image_click_input_proto())
+            image_interaction.to_android_interaction_proto())
         self.assertEqual(
             type(image_click_input_proto.image_click_input),
             state_pb2.ImageClickInputInstanceDto
@@ -4723,7 +4710,7 @@ class InteractionInstanceDomainTests(test_utils.GenericTestBase):
             'AlgebraicExpressionInput',
             algebric_customization_args, [], default_outcome, [], [], None)
         algebric_expression_proto = (
-            algebric_interaction.to_android_algebric_expression_proto())
+            algebric_interaction.to_android_interaction_proto())
         self.assertEqual(
             type(algebric_expression_proto.algebraic_expression_input),
             state_pb2.AlgebraicExpressionInputInstanceDto
@@ -4745,7 +4732,7 @@ class InteractionInstanceDomainTests(test_utils.GenericTestBase):
             'MathEquationInput',
             math_customization_args, [], default_outcome, [], [], None)
         math_equation_input_proto = (
-            math_interaction.to_android_math_equation_input_proto())
+            math_interaction.to_android_interaction_proto())
         self.assertEqual(
             type(math_equation_input_proto.math_equation_input),
             state_pb2.MathEquationInputInstanceDto
@@ -4770,7 +4757,7 @@ class InteractionInstanceDomainTests(test_utils.GenericTestBase):
             'NumericExpressionInput',
             numeric_customization_args, [], default_outcome, [], [], None)
         numeric_expression_proto = (
-            numeric_interaction.to_android_numeric_expression_proto())
+            numeric_interaction.to_android_interaction_proto())
         self.assertEqual(
             type(numeric_expression_proto.numeric_expression_input),
             state_pb2.NumericExpressionInputInstanceDto
@@ -4780,7 +4767,7 @@ class InteractionInstanceDomainTests(test_utils.GenericTestBase):
             'EndExploration',
             {}, [], default_outcome, [], [], None)
         end_exploration_proto = (
-            end_interaction.to_android_end_exploration_proto())
+            end_interaction.to_android_interaction_proto())
         self.assertEqual(
             type(end_exploration_proto.end_exploration),
             state_pb2.EndExplorationInstanceDto
@@ -4789,42 +4776,48 @@ class InteractionInstanceDomainTests(test_utils.GenericTestBase):
         numer_with_units_interaction = state_domain.InteractionInstance(
             'NumberWithUnits',
             {}, [], default_outcome, [], [], None)
-        self.assertFalse(
-            numer_with_units_interaction.to_android_number_with_units_proto())
+        self.assertEqual(
+            numer_with_units_interaction.to_android_interaction_proto(),
+            None)
 
         code_repl_interaction = state_domain.InteractionInstance(
             'CodeRepl',
             {}, [], default_outcome, [], [], None)
-        self.assertFalse(code_repl_interaction.to_android_code_repl_proto())
+        self.assertEqual(
+            code_repl_interaction.to_android_interaction_proto(), None)
 
         graph_input_interaction = state_domain.InteractionInstance(
             'GraphInput',
             {}, [], default_outcome, [], [], None)
-        self.assertFalse(
-            graph_input_interaction.to_android_graph_input_proto())
+        self.assertEqual(
+            graph_input_interaction.to_android_interaction_proto(), None)
 
         interactive_map_interaction = state_domain.InteractionInstance(
             'InteractiveMap',
             {}, [], default_outcome, [], [], None)
-        self.assertFalse(
-            interactive_map_interaction.to_android_interactive_map_proto())
+        self.assertEqual(
+            interactive_map_interaction.to_android_interaction_proto(),
+            None)
 
         music_notes_input_interaction = state_domain.InteractionInstance(
             'MusicNotesInput',
             {}, [], default_outcome, [], [], None)
-        self.assertFalse(
-            music_notes_input_interaction.to_android_music_notes_proto())
+        self.assertEqual(
+            music_notes_input_interaction.to_android_interaction_proto(),
+            None)
 
         pencil_code_editor_interaction = state_domain.InteractionInstance(
             'PencilCodeEditor',
             {}, [], default_outcome, [], [], None)
-        self.assertFalse(
-            pencil_code_editor_interaction.to_android_pencil_code_proto())
+        self.assertEqual(
+            pencil_code_editor_interaction.to_android_interaction_proto(),
+            None)
 
         set_input_interaction = state_domain.InteractionInstance(
             'SetInput',
             {}, [], default_outcome, [], [], None)
-        self.assertFalse(set_input_interaction.to_android_set_input_proto())
+        self.assertEqual(
+            set_input_interaction.to_android_interaction_proto(), None)
 
 
 class SubtitledHtmlDomainUnitTests(test_utils.GenericTestBase):
@@ -5264,9 +5257,6 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             written_translations_proto.translation_language_mapping[1].language,
             3)
-        self.assertEqual(
-            written_translations_proto.translation_language_mapping[2].language,
-            0)
 
 
 class WrittenTranslationDomainUnitTests(test_utils.GenericTestBase):
@@ -5601,8 +5591,6 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
             recorded_voiceovers_proto.voiceover_content_mapping[0].language, 1)
         self.assertEqual(
             recorded_voiceovers_proto.voiceover_content_mapping[1].language, 3)
-        self.assertEqual(
-            recorded_voiceovers_proto.voiceover_content_mapping[2].language, 0)
 
 
 class VoiceoverDomainTests(test_utils.GenericTestBase):
