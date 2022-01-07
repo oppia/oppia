@@ -20,7 +20,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { EditThumbnailModalComponent } from './edit-thumbnail-modal.component';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
+import { ChangeDetectorRef, NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 
 @Pipe({name: 'translate'})
@@ -130,6 +130,10 @@ describe('Edit Thumbnail Modal Component', () => {
 
   it('should load a image file in onchange event and save it if it\'s a' +
     ' svg file', () => {
+    const changeDetectorRef =
+      fixture.debugElement.injector.get(ChangeDetectorRef);
+    const detectChangesSpy =
+      spyOn(changeDetectorRef.constructor.prototype, 'detectChanges');
     spyOn(component, 'isUploadedImageSvg').and.returnValue(true);
     spyOn(component, 'isValidFilename').and.returnValue(true);
     const resetSpy = spyOn(component, 'reset').and.callThrough();
@@ -141,6 +145,7 @@ describe('Edit Thumbnail Modal Component', () => {
 
     component.onFileChanged(file);
     expect(component.invalidImageWarningIsShown).toBe(false);
+    expect(detectChangesSpy).toHaveBeenCalled();
     expect(component.invalidFilenameWarningIsShown).toBe(false);
     expect(component.tags).toEqual(['script']);
     expect(component.attrs).toEqual([]);
@@ -221,7 +226,14 @@ describe('Edit Thumbnail Modal Component', () => {
       height: 0,
       width: 0
     };
+    const changeDetectorRef =
+      fixture.debugElement.injector.get(ChangeDetectorRef);
+    const detectChangesSpy =
+      spyOn(changeDetectorRef.constructor.prototype, 'detectChanges');
+
     component.setImageDimensions(180, 180);
+
+    expect(detectChangesSpy).toHaveBeenCalled();
     expect(component.dimensions).toEqual({ height: 180, width: 180 });
   });
 
@@ -264,6 +276,10 @@ describe('Edit Thumbnail Modal Component', () => {
 
   it('should disable \'Add Thumbnail\' button unless a new image is' +
     ' uploaded', () => {
+    const changeDetectorRef =
+      fixture.debugElement.injector.get(ChangeDetectorRef);
+    const detectChangesSpy =
+      spyOn(changeDetectorRef.constructor.prototype, 'detectChanges');
     spyOn(component, 'isUploadedImageSvg').and.returnValue(true);
     spyOn(component, 'isValidFilename').and.returnValue(true);
     spyOn(
@@ -273,8 +289,12 @@ describe('Edit Thumbnail Modal Component', () => {
     });
     let file = new File([fileContent], 'triangle.svg', {type: 'image/svg'});
     component.uploadedImageMimeType = 'image/svg+xml';
+
     expect(component.thumbnailHasChanged).toBeFalse();
+
     component.onFileChanged(file);
+
     expect(component.thumbnailHasChanged).toBeTrue();
+    expect(detectChangesSpy).toHaveBeenCalled();
   });
 });

@@ -16,20 +16,20 @@
  * @fileoverview Modal and functionality for the create story button.
  */
 
-require(
-  'pages/topic-editor-page/modal-templates/' +
-  'create-new-story-modal.controller.ts');
-
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('services/alerts.service.ts');
+require('services/ngb-modal.service.ts');
+
+import { CreateNewStoryModalComponent } from 'pages/topic-editor-page/modal-templates/create-new-story-modal.component';
+
 
 angular.module('oppia').factory('StoryCreationService', [
-  '$http', '$uibModal', '$window', 'AlertsService', 'ImageLocalStorageService',
-  'LoaderService', 'TopicEditorStateService', 'UrlInterpolationService',
+  '$http', '$window', 'AlertsService', 'ImageLocalStorageService',
+  'LoaderService', 'NgbModal', 'TopicEditorStateService', 'UrlInterpolationService',
   function(
-      $http, $uibModal, $window, AlertsService, ImageLocalStorageService,
-      LoaderService, TopicEditorStateService, UrlInterpolationService) {
+      $http, $window, AlertsService, ImageLocalStorageService,
+      LoaderService, NgbModal, TopicEditorStateService, UrlInterpolationService) {
     var STORY_EDITOR_URL_TEMPLATE = '/story_editor/<story_id>';
     var STORY_CREATOR_URL_TEMPLATE = '/topic_editor_story_handler/<topic_id>';
     var storyCreationInProgress = false;
@@ -39,12 +39,8 @@ angular.module('oppia').factory('StoryCreationService', [
         if (storyCreationInProgress) {
           return;
         }
-        $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/topic-editor-page/modal-templates/' +
-            'create-new-story-modal.template.html'),
+        NgbModal.open(CreateNewStoryModalComponent, {
           backdrop: 'static',
-          controller: 'CreateNewStoryModalController'
         }).result.then(function(newlyCreatedStory) {
           if (!newlyCreatedStory.isValid()) {
             throw new Error('Story fields cannot be empty');

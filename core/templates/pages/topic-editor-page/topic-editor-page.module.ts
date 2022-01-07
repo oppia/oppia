@@ -43,6 +43,7 @@ import { DeleteStoryModalComponent } from './modal-templates/delete-story-modal.
 import { TopicSavePendingChangesComponent } from './modal-templates/topic-save-pending-changes-modal.component';
 import { TopicEditorSendMailComponent } from './modal-templates/topic-editor-send-mail-modal.component';
 import { TopicEditorSaveModalComponent } from './modal-templates/topic-editor-save-modal.component';
+import { CreateNewStoryModalComponent } from './modal-templates/create-new-story-modal.component';
 
 @NgModule({
   imports: [
@@ -53,7 +54,8 @@ import { TopicEditorSaveModalComponent } from './modal-templates/topic-editor-sa
     SharedComponentsModule,
     ToastrModule.forRoot(toastrConfig)
   ],
-  declarations: [
+  declarations: [,
+    CreateNewStoryModalComponent,
     StoriesListComponent,
     SubtopicsListComponent,
     SubtopicPreviewTab,
@@ -66,6 +68,7 @@ import { TopicEditorSaveModalComponent } from './modal-templates/topic-editor-sa
     TopicEditorSaveModalComponent
   ],
   entryComponents: [
+    CreateNewStoryModalComponent,
     StoriesListComponent,
     SubtopicsListComponent,
     SubtopicPreviewTab,
@@ -75,7 +78,7 @@ import { TopicEditorSaveModalComponent } from './modal-templates/topic-editor-sa
     DeleteStoryModalComponent,
     TopicSavePendingChangesComponent,
     TopicEditorSendMailComponent,
-    TopicEditorSaveModalComponent
+    TopicEditorSaveModalComponent,
   ],
   providers: [
     {
