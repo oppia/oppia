@@ -106,18 +106,20 @@ describe('Preferences', function() {
     await users.login('paul@preferences.com');
     await preferencesPage.get();
     expect(preferencesPage.preferredAudioLanguageSelector).toBeUndefined();
-    await preferencesPage.selectPreferredAudioLanguage('Hindi');
-    await preferencesPage.expectPreferredAudioLanguageToBe('Hindi');
+    await preferencesPage.selectPreferredAudioLanguage('हिन्दी (Hindi)');
+    await preferencesPage.expectPreferredAudioLanguageToBe('हिन्दी (Hindi)');
     await browser.refresh();
     await waitFor.pageToFullyLoad();
 
-    await preferencesPage.expectPreferredAudioLanguageToBe('Hindi');
-    await preferencesPage.selectPreferredAudioLanguage('Hungarian');
-    await preferencesPage.expectPreferredAudioLanguageToBe('Hungarian');
+    await preferencesPage.expectPreferredAudioLanguageToBe('हिन्दी (Hindi)');
+    await preferencesPage.selectPreferredAudioLanguage('magyar (Hungarian)');
+    await preferencesPage.expectPreferredAudioLanguageToBe(
+      'magyar (Hungarian)');
     await browser.refresh();
     await waitFor.pageToFullyLoad();
 
-    await preferencesPage.expectPreferredAudioLanguageToBe('Hungarian');
+    await preferencesPage.expectPreferredAudioLanguageToBe(
+      'magyar (Hungarian)');
   });
 
   it('should change prefered site language of the learner', async function() {
