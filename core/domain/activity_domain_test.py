@@ -85,10 +85,9 @@ class ActivityReferenceDomainUnitTests(test_utils.GenericTestBase):
             sample_dict)
         returned_activity_dict = returned_activity_object.to_dict()
 
-        self.assertEqual(sample_dict,returned_activity_dict)
-        self.assertEqual(sample_dict['type'],returned_activity_dict['type'])
-        self.assertEqual(sample_dict['id'],returned_activity_dict['id'])
-
+        self.assertEqual(sample_dict, returned_activity_dict)
+        self.assertEqual(sample_dict['type'], returned_activity_dict['type'])
+        self.assertEqual(sample_dict['id'], returned_activity_dict['id'])
 
 
 class ActivityReferencesDomainUnitTests(test_utils.GenericTestBase):
