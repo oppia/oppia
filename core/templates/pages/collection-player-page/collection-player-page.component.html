@@ -27,7 +27,7 @@
     <div *ngIf="collection"
          class="oppia-collection-path-section">
       <svg width="540px"
-           style="margin-left: 10px;"
+           [ngStyle]="{'margin-left': '10px'}"
            [attr.height]="svgHeight + 'px'"
            xmlns="http://www.w3.org/2000/svg">
         <path fill="none"
