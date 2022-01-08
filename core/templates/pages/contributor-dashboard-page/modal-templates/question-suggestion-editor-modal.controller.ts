@@ -106,6 +106,8 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
     // Checking if Question contains all requirements to enable
     // Save and Publish Question.
     $scope.isQuestionValid = function() {
+      $rootScope.$applyAsync();
+
       return QuestionValidationService.isQuestionValid(
         $scope.question, $scope.misconceptionsBySkill);
     };
