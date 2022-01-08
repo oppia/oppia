@@ -872,6 +872,43 @@ describe('Contributions and review component', function() {
 
       expect(dropdownChoice).toBe('Translations');
     });
+
+    it('should close dropdown when a click is made outside', function() {
+      const element = {
+        contains: function() {
+          return true;
+        }
+      };
+
+      const clickEvent = {
+        target: {}
+      };
+
+      const querySelectorSpy = spyOn(document, 'querySelector').and
+      // This throws "Argument of type '{ contains: () => boolean; }' is not
+      // assignable to parameter of type 'Element'. Type '{ contains:
+      // () => boolean; }' is missing the following properties from type
+      // 'Element': attributes, classList, className, clientHeight, and 159
+      // more.". We need to suppress this error because only the properties
+      // provided in the element object are required for testing.
+      // @ts-expect-error
+        .returnValue(element);
+
+
+      ctrl.dropdownShown = true;
+
+      ctrl.closeDropdownWhenClickedOutside(clickEvent);
+
+      expect(querySelectorSpy).toHaveBeenCalled();
+      expect(ctrl.dropdownShown).toBe(true);
+
+      spyOn(element, 'contains').and.returnValue(false);
+      ctrl.dropdownShown = true;
+
+      ctrl.closeDropdownWhenClickedOutside(clickEvent);
+
+      expect(ctrl.dropdownShown).toBe(false);
+    });
   });
 
   describe('when user is allowed to review questions and ' +
