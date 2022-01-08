@@ -31,6 +31,8 @@ from core.domain import topic_domain
 from core.platform import models
 
 from typing import Any, Callable, Dict, List, cast
+from typing_extensions import Literal
+from typing_extensions import TypedDict
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -48,51 +50,73 @@ MEMCACHE_KEY_DELIMITER = ':'
 # each key in this namespace should be a serialized representation of an
 # Exploration. There is also a special sub-namespace represented by the empty
 # string; this sub-namespace stores the latest version of the exploration.
-CACHE_NAMESPACE_EXPLORATION = 'exploration'
+CACHE_NAMESPACE_EXPLORATION: Literal['exploration'] = 'exploration'
 # This namespace supports sub-namespaces which are identified by the stringified
 # version number of the collections within the sub-namespace. The value for
 # each key in this namespace should be a serialized representation of a
 # Collection. There is also a special sub-namespace represented by the empty
 # string; this sub-namespace stores the latest version of the collection.
-CACHE_NAMESPACE_COLLECTION = 'collection'
+CACHE_NAMESPACE_COLLECTION: Literal['collection'] = 'collection'
 # This namespace supports sub-namespaces which are identified by the stringified
 # version number of the skills within the sub-namespace. The value for
 # each key in this namespace should be a serialized representation of a
 # Skill. There is also a special sub-namespace represented by the empty
 # string; this sub-namespace stores the latest version of the skill.
-CACHE_NAMESPACE_SKILL = 'skill'
+CACHE_NAMESPACE_SKILL: Literal['skill'] = 'skill'
 # This namespace supports sub-namespaces which are identified by the stringified
 # version number of the stories within the sub-namespace. The value for
 # each key in this namespace should be a serialized representation of a
 # Story. There is also a special sub-namespace represented by the empty
 # string; this sub-namespace stores the latest version of the story.
-CACHE_NAMESPACE_STORY = 'story'
+CACHE_NAMESPACE_STORY: Literal['story'] = 'story'
 # This namespace supports sub-namespaces which are identified by the stringified
 # version number of the topics within the sub-namespace. The value for
 # each key in this namespace should be a serialized representation of a
 # Topic. There is also a special sub-namespace represented by the empty
 # string; this sub-namespace stores the latest version of the topic.
-CACHE_NAMESPACE_TOPIC = 'topic'
+CACHE_NAMESPACE_TOPIC: Literal['topic'] = 'topic'
 # This namespace supports sub-namespaces which are identified by the stringified
 # version number of the topics within the sub-namespace. The value for
 # each key in this namespace should be a serialized representation of a
 # Platform Parameter. This namespace does not support sub-namespaces.
-CACHE_NAMESPACE_PLATFORM_PARAMETER = 'platform'
+CACHE_NAMESPACE_PLATFORM_PARAMETER: Literal['platform'] = 'platform'
 # The value for each key in this namespace should be a serialized representation
 # of a ConfigPropertyModel value (the 'value' attribute of a ConfigPropertyModel
 # object). This namespace does not support sub-namespaces.
-CACHE_NAMESPACE_CONFIG = 'config'
+CACHE_NAMESPACE_CONFIG: Literal['config'] = 'config'
 # The sub-namespace is not necessary for the default namespace. The namespace
 # handles default datatypes allowed by Redis including Strings, Lists, Sets,
 # and Hashes. More details can be found at: https://redis.io/topics/data-types.
-CACHE_NAMESPACE_DEFAULT = 'default'
+CACHE_NAMESPACE_DEFAULT: Literal['default'] = 'default'
 
-# Dict DESERIALIZATION_FUNCTIONS has key-value pair of string and
-# functions respectively. Every function accept one argument which is string
-# and returns corresponding object, which can be any of the type Collection,
-# Exploration, Skill, Story, Topic, PlatformParameter and simple python object.
-# So, Any was assigned as a type for return value of function.
-DESERIALIZATION_FUNCTIONS: Dict[str, Callable[[str], Any]] = {
+
+class DeserializationFunctionsDict(TypedDict):
+    """Dictionary representing the DESERIALIZATION_FUNCTIONS Dictionary"""
+
+    collection: Callable[[str], collection_domain.Collection]
+    exploration: Callable[[str], exp_domain.Exploration]
+    skill: Callable[[str], skill_domain.Skill]
+    story: Callable[[str], story_domain.Story]
+    topic: Callable[[str], topic_domain.Topic]
+    platform: Callable[[str], platform_parameter_domain.PlatformParameter]
+    config: Callable[[str], object]
+    default: Callable[[str], object]
+
+
+class SerializationFunctionsDict(TypedDict):
+    """Dictionary representing the SERIALIZATION_FUNCTIONS Dictionary"""
+
+    collection: Callable[[collection_domain.Collection], str]
+    exploration: Callable[[exp_domain.Exploration], str]
+    skill: Callable[[skill_domain.Skill], str]
+    story: Callable[[story_domain.Story], str]
+    topic: Callable[[topic_domain.Topic], str]
+    platform: Callable[[platform_parameter_domain.PlatformParameter], str]
+    config: Callable[[object], str]
+    default: Callable[[object], str]
+
+
+DESERIALIZATION_FUNCTIONS: DeserializationFunctionsDict = {
     CACHE_NAMESPACE_COLLECTION: collection_domain.Collection.deserialize,
     CACHE_NAMESPACE_EXPLORATION: exp_domain.Exploration.deserialize,
     CACHE_NAMESPACE_SKILL: skill_domain.Skill.deserialize,
@@ -104,19 +128,19 @@ DESERIALIZATION_FUNCTIONS: Dict[str, Callable[[str], Any]] = {
     CACHE_NAMESPACE_DEFAULT: json.loads
 }
 
-# Dict SERIALIZATION_FUNCTIONS has key as string and lambda function as value.
-# Every function accept one argument which is a specific object of type from
-# Collection, Exploration, Skill, Story, Topic, PlatformParameter and
-# simple python object. So, Any was assigned as a type for argument value of
-# function. Function returns JSON-encoded string encoding all of the information
-# composing the object.
-SERIALIZATION_FUNCTIONS: Dict[str, Callable[[Any], str]] = {
-    CACHE_NAMESPACE_COLLECTION: lambda x: cast(str, x.serialize()),
-    CACHE_NAMESPACE_EXPLORATION: lambda x: cast(str, x.serialize()),
-    CACHE_NAMESPACE_SKILL: lambda x: cast(str, x.serialize()),
-    CACHE_NAMESPACE_STORY: lambda x: cast(str, x.serialize()),
-    CACHE_NAMESPACE_TOPIC: lambda x: cast(str, x.serialize()),
-    CACHE_NAMESPACE_PLATFORM_PARAMETER: lambda x: cast(str, x.serialize()),
+
+# Here every 'x' in value belongs to some object, like
+# CACHE_NAMESPACE_COLLECTION's x is a collection object. When we call
+# serialize method on it, Mypy expectsit to be a typed call. So, to
+# remove un-typed-call error ignore statement is placed temporarily.
+# Untill all classes are typed.
+SERIALIZATION_FUNCTIONS: SerializationFunctionsDict = {
+    CACHE_NAMESPACE_COLLECTION: lambda x: cast(str, x.serialize()), # type: ignore[no-untyped-call]
+    CACHE_NAMESPACE_EXPLORATION: lambda x: cast(str, x.serialize()), # type: ignore[no-untyped-call]
+    CACHE_NAMESPACE_SKILL: lambda x: cast(str, x.serialize()), # type: ignore[no-untyped-call]
+    CACHE_NAMESPACE_STORY: lambda x: cast(str, x.serialize()), # type: ignore[no-untyped-call]
+    CACHE_NAMESPACE_TOPIC: lambda x: cast(str, x.serialize()), # type: ignore[no-untyped-call]
+    CACHE_NAMESPACE_PLATFORM_PARAMETER: lambda x: cast(str, x.serialize()), # type: ignore[no-untyped-call]
     CACHE_NAMESPACE_CONFIG: json.dumps,
     CACHE_NAMESPACE_DEFAULT: json.dumps
 }
@@ -163,7 +187,12 @@ def flush_memory_caches() -> None:
 # Exploration, Skill, Story, Topic, Collection, str. hence Any type has to be
 # used here for the type of returned dictionary.
 def get_multi(
-    namespace: str, sub_namespace: str | None, obj_ids: List[str]
+    namespace: Literal[
+        'collection', 'exploration',
+        'skill', 'story',
+        'topic', 'platform',
+        'config', 'default'],
+    sub_namespace: str | None, obj_ids: List[str]
 ) -> Dict[str, Any]:
     """Get a dictionary of the {id, value} pairs from the memory cache.
 
@@ -213,7 +242,12 @@ def get_multi(
 # Exploration, Skill, Story, Topic, Collection, str. hence Any type has
 # to be used here for the value type of id_value_mapping dictionary.
 def set_multi(
-    namespace: str, sub_namespace: str | None, id_value_mapping: Dict[str, Any]
+    namespace: Literal[
+        'collection', 'exploration',
+        'skill', 'story',
+        'topic', 'platform',
+        'config', 'default'],
+    sub_namespace: str | None, id_value_mapping: Dict[str, Any]
 ) -> bool:
     """Set multiple id values at once to the cache, where the values are all
     of a specific namespace type or a Redis compatible type (more details here:

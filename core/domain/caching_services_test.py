@@ -252,34 +252,34 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 'exp_id_1', title='A title', category='A category'))
         self.assertEqual(
             default_exploration.to_dict(),
-            deserialize(serialize(default_exploration)).to_dict())
+            deserialize(serialize(default_exploration)).to_dict()) # type: ignore[no-untyped-call]
 
     def test_invalid_namespace_raises_error(self) -> None:
         invalid_namespace = 'invalid'
         key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
 
-        with self.assertRaisesRegexp(# type: ignore[no-untyped-call]
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             ValueError,
             'Invalid namespace: %s.' % invalid_namespace):
             caching_services.set_multi(
-                invalid_namespace, None,
+                invalid_namespace, None, # type: ignore[arg-type]
                 key_value_mapping)
 
-        with self.assertRaisesRegexp(# type: ignore[no-untyped-call]
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             ValueError,
             'Invalid namespace: %s.' % invalid_namespace):
             caching_services.get_multi(
-                invalid_namespace, None,
+                invalid_namespace, None, # type: ignore[arg-type]
                 ['a', 'b', 'c'])
 
-        with self.assertRaisesRegexp(# type: ignore[no-untyped-call]
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             ValueError,
             'Invalid namespace: %s.' % invalid_namespace):
             caching_services.delete_multi(
                 invalid_namespace, None, ['a', 'b', 'c'])
 
         invalid_sub_namespace = 'sub:namespace'
-        with self.assertRaisesRegexp(# type: ignore[no-untyped-call]
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             ValueError,
             'Sub-namespace %s cannot contain \':\'.' % invalid_sub_namespace):
             caching_services.get_multi(
