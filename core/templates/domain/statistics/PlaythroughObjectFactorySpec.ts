@@ -122,10 +122,10 @@ describe('Playthrough Object Factory', () => {
       }
     );
 
-    expect(playthroughObject.expId).toEqual('expId1');
-    expect(playthroughObject.expVersion).toEqual(1);
-    expect(playthroughObject.issueType).toEqual('EarlyQuit');
-    expect(playthroughObject.issueCustomizationArgs).toEqual({
+    expect(playthroughObject!.expId).toEqual('expId1');
+    expect(playthroughObject!.expVersion).toEqual(1);
+    expect(playthroughObject!.issueType).toEqual('EarlyQuit');
+    expect(playthroughObject!.issueCustomizationArgs).toEqual({
       state_name: {
         value: 'state'
       },
