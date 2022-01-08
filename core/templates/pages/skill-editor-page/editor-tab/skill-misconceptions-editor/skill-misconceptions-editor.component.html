@@ -43,7 +43,7 @@
               <div *ngIf="activeMisconceptionIndex === i">
                 <div class="oppia-editor-card-section">
                   <oppia-misconception-editor [misconception]="skill.findMisconceptionById(misconception.getId())"
-                                              [index]="i"
+                                              [getIndex]="i"
                                               [isEditable]="isEditable">
                   </oppia-misconception-editor>
                 </div>
