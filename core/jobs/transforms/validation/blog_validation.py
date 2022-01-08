@@ -77,7 +77,7 @@ class ValidateBlogPostModelDomainObjectsInstances(
         # to private blog posts. We can't determine public/private without
         # performing an NDB get() operation, which are forbidden in Apache Beam
         # jobs.
-        return base_validation.VALIDATION_MODES.strict
+        return base_validation.ValidationModes.STRICT
 
 
 @validation_decorators.AuditsExisting(
@@ -161,7 +161,7 @@ class ValidateBlogSummaryModelDomainObjectsInstances(
         # to private blog posts. We can't determine public/private without
         # performing an NDB get() operation, which are forbidden in Apache Beam
         # jobs.
-        return base_validation.VALIDATION_MODES.strict
+        return base_validation.ValidationModes.STRICT
 
 
 @validation_decorators.RelationshipsOf(
