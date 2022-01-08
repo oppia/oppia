@@ -3138,5 +3138,5 @@ class ImageUploadHandler(BaseEditorControllerTests):
             )
 
         self.assertEqual(response['filename'], filename)
-        
+
         self.logout()
