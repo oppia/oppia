@@ -20,13 +20,13 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ChangeDetectorRef, EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { Subscription } from 'rxjs';
 import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
 import { Misconception, MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
 import { SkillUpdateService } from 'domain/skill/skill-update.service';
 import { Skill } from 'domain/skill/SkillObjectFactory';
 import { DeleteMisconceptionModalComponent } from 'pages/skill-editor-page/modal-templates/delete-misconception-modal.component';
 import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
-import { Subscription } from 'rxjs';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { SkillMisconceptionsEditorComponent } from './skill-misconceptions-editor.component';
 
@@ -128,8 +128,7 @@ describe('Skill Misconceptions Editor Component', () => {
         misconception: sampleMisconception
       })
     } as NgbModalRef);
-    spyOn(
-      skillUpdateService, 'addMisconception').and.returnValue(null);
+    spyOn(skillUpdateService, 'addMisconception').and.returnValue(null);
 
     component.openAddMisconceptionModal();
     tick();
@@ -142,10 +141,9 @@ describe('Skill Misconceptions Editor Component', () => {
   it('should close add misconception modal when clicking on close ' +
     'button', fakeAsync(() => {
     spyOn(ngbModal, 'open').and.returnValue({
-        result: Promise.reject()
-      } as NgbModalRef);
-    spyOn(
-      skillUpdateService, 'addMisconception').and.returnValue(null);
+      result: Promise.reject()
+    } as NgbModalRef);
+    spyOn(skillUpdateService, 'addMisconception').and.returnValue(null);
 
     component.openAddMisconceptionModal();
 
@@ -162,14 +160,13 @@ describe('Skill Misconceptions Editor Component', () => {
       result: Promise.resolve({
         result: {
           id: 'id'
-        } 
+        }
       })
     } as NgbModalRef);
-    spyOn(
-      skillUpdateService, 'deleteMisconception').and.returnValue(null);
+    spyOn(skillUpdateService, 'deleteMisconception').and.returnValue(null);
 
     component.ngOnInit();
-    component.openDeleteMisconceptionModal(1,'1');
+    component.openDeleteMisconceptionModal(1, '1');
     tick();
 
     expect(ngbModal.open).toHaveBeenCalledWith(
@@ -185,11 +182,10 @@ describe('Skill Misconceptions Editor Component', () => {
       },
       result: Promise.reject()
     } as NgbModalRef);
-    spyOn(
-      skillUpdateService, 'deleteMisconception').and.returnValue(null);
+    spyOn(skillUpdateService, 'deleteMisconception').and.returnValue(null);
 
     component.ngOnInit();
-    component.openDeleteMisconceptionModal(1,'1');
+    component.openDeleteMisconceptionModal(1, '1');
     tick();
 
     expect(ngbModal.open).toHaveBeenCalledWith(
@@ -210,6 +206,7 @@ describe('Skill Misconceptions Editor Component', () => {
 
   it('should change active misconception index', () => {
     component.activeMisconceptionIndex = 1;
+
     component.changeActiveMisconceptionIndex(2);
 
     expect(component.activeMisconceptionIndex).toBe(2);
@@ -218,6 +215,7 @@ describe('Skill Misconceptions Editor Component', () => {
   it('should set active misconception index to null if ' +
     'oldIndex is newIndex', () => {
     component.activeMisconceptionIndex = 1;
+
     component.changeActiveMisconceptionIndex(1);
 
     expect(component.activeMisconceptionIndex).toBe(null);
