@@ -50,12 +50,12 @@ angular.module('oppia').directive('skillEditorMainTab', [
         '/pages/skill-editor-page/editor-tab/' +
         'skill-editor-main-tab.directive.html'),
       controller: [
-        '$scope', '$timeout', 'FocusManagerService', 'NgbModal',
+        '$rootScope', '$scope', '$timeout', 'FocusManagerService', 'NgbModal',
         'PageTitleService',
         'SkillEditorRoutingService', 'SkillEditorStateService',
         'UndoRedoService',
         function(
-            $scope, $timeout, FocusManagerService, NgbModal,
+            $rootScope, $scope, $timeout, FocusManagerService, NgbModal,
             PageTitleService,
             SkillEditorRoutingService, SkillEditorStateService,
             UndoRedoService) {
@@ -116,6 +116,9 @@ angular.module('oppia').directive('skillEditorMainTab', [
 
           $scope.hasLoadedSkill = function() {
             $scope.skill = SkillEditorStateService.getSkill();
+            // TODO(#8521): Remove the use of $rootScope.$applyAsync()
+            // once the directive is migrated to angular.
+            $rootScope.$applyAsync();
             return SkillEditorStateService.hasLoadedSkill();
           };
 

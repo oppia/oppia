@@ -193,10 +193,6 @@ describe('Skill Misconceptions Editor Component', () => {
     expect(skillUpdateService.deleteMisconception).not.toHaveBeenCalled();
   }));
 
-  it('should always return true when calling \'isEditable\'', () => {
-    expect(component.isEditable()).toBe(true);
-  });
-
   it('should return misconception name given input as misconception ' +
     'when calling \'getMisconceptionSummary \'', () => {
     let name = component.getMisconceptionSummary(sampleMisconception);
