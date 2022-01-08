@@ -45,7 +45,7 @@ describe('Contributor dashboard page', function() {
   const USER_EMAILS = ['user0@contributor.com', 'user1@contributor.com'];
   const QUESTION_ADMIN_EMAIL = 'user@contributor.com';
   const QUESTION_ADMIN_USERNAME = 'user4321';
-  const HINDI_LANGUAGE = 'Hindi';
+  const HINDI_LANGUAGE = 'हिन्दी (Hindi)';
   let contributorDashboardPage = null;
   let contributorDashboardTranslateTextTab = null;
   let topicsAndSkillsDashboardPage = null;
@@ -253,7 +253,7 @@ describe('Contributor dashboard page', function() {
 });
 
 describe('Contributor dashboard admin page contribution rights form', () => {
-  const HINDI_LANGUAGE = 'Hindi';
+  const HINDI_LANGUAGE = 'हिन्दी (Hindi)';
   const QUESTION_ADMIN_EMAIL = 'userX@contributor.com';
   const QUESTION_ADMIN_USERNAME = 'user1234';
   const TRANSLATION_ADMIN_EMAIL = 'userY@contributor.com';
