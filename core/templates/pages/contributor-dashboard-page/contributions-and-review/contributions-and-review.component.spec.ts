@@ -184,7 +184,7 @@ describe('Contributions and review component', function() {
       ' initialized', function() {
       expect(ctrl.activeTabType).toBe('reviews');
       expect(ctrl.activeSuggestionType).toBe('add_question');
-      expect(ctrl.activeDropdownTabChoice).toBe('reviews add_question');
+      expect(ctrl.activeDropdownTabChoice).toBe('Review Questions');
       expect(ctrl.userIsLoggedIn).toBe(true);
       expect(ctrl.userDetailsLoading).toBe(false);
       expect(ctrl.reviewTabs.length).toEqual(2);
@@ -735,7 +735,7 @@ describe('Contributions and review component', function() {
       ' initialized', function() {
       expect(ctrl.activeTabType).toBe('contributions');
       expect(ctrl.activeSuggestionType).toBe('add_question');
-      expect(ctrl.activeDropdownTabChoice).toBe('contributions add_question');
+      expect(ctrl.activeDropdownTabChoice).toBe('Questions');
       expect(ctrl.userIsLoggedIn).toBe(true);
       expect(ctrl.userDetailsLoading).toBe(false);
       expect(ctrl.reviewTabs.length).toEqual(0);
@@ -846,43 +846,31 @@ describe('Contributions and review component', function() {
       ctrl.isActiveTab(ctrl.TAB_TYPE_CONTRIBUTIONS, 'add_question');
     });
 
-    it('should get option value using tab type ' +
-      'and suggestion type', function() {
-      spyOn(ctrl, 'activeDropdownTabChoice');
-      ctrl.activeDropdownTabChoice =
-        ctrl.getOptionValueFromTabAndSuggestionTypes(
-          ctrl.TAB_TYPE_CONTRIBUTIONS, 'add_question');
+    it('should toggle dropdown when it is clicked', function() {
+      ctrl.dropdownShown = false;
+      ctrl.toggleDropdown();
 
-      expect(ctrl.activeDropdownTabChoice).toBe(
-        ctrl.TAB_TYPE_CONTRIBUTIONS + ' ' + 'add_question');
+      expect(ctrl.dropdownShown).toBe(true);
+
+      ctrl.toggleDropdown();
+
+      expect(ctrl.dropdownShown).toBe(false);
     });
 
-    it('should obtain tab type and suggestion type ' +
-      'from option value', function() {
-      ctrl.activeDropdownTabChoice =
-        ctrl.getOptionValueFromTabAndSuggestionTypes(
-          ctrl.TAB_TYPE_CONTRIBUTIONS, 'add_question');
+    it('should set active dropdown choice correctly', function() {
+      ctrl.activeTabType = ctrl.TAB_TYPE_REVIEWS;
+      ctrl.activeSuggestionType = 'add_question';
 
-      var [tabType, suggestionType] =
-        ctrl.getTabAndSuggestionTypesFromDropdownOption();
+      var dropdownChoice = ctrl.getActiveDropdownTabChoice();
 
-      expect(tabType).toBe(ctrl.TAB_TYPE_CONTRIBUTIONS);
-      expect(suggestionType).toBe('add_question');
-    });
+      expect(dropdownChoice).toBe('Review Questions');
 
-    it('should switch tabs when a dropdown selection is made', function() {
-      spyOn(ctrl, 'switchToTab').and.callThrough();
-      spyOn(ctrl, 'isActiveTab').and.callThrough();
+      ctrl.activeTabType = ctrl.TAB_TYPE_CONTRIBUTIONS;
+      ctrl.activeSuggestionType = 'translate_content';
 
-      ctrl.activeDropdownTabChoice =
-        ctrl.getOptionValueFromTabAndSuggestionTypes(
-          ctrl.TAB_TYPE_CONTRIBUTIONS, 'add_question');
-      ctrl.switchToTabFromDropdownChoice();
+      var dropdownChoice = ctrl.getActiveDropdownTabChoice();
 
-      expect(ctrl.switchToTab).toHaveBeenCalledWith(
-        ctrl.TAB_TYPE_CONTRIBUTIONS, 'add_question');
-      expect(ctrl.isActiveTab(ctrl.TAB_TYPE_CONTRIBUTIONS, 'add_question'))
-        .toBe(true);
+      expect(dropdownChoice).toBe('Translate');
     });
   });
 
