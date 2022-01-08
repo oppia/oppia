@@ -88,6 +88,29 @@ angular.module('oppia').component('contributionsAndReview', {
       ctrl.TAB_TYPE_CONTRIBUTIONS = 'contributions';
       ctrl.TAB_TYPE_REVIEWS = 'reviews';
 
+      var tabNameToOpportunityFetchFunction = {
+        [SUGGESTION_TYPE_QUESTION]: {
+          [ctrl.TAB_TYPE_CONTRIBUTIONS]: () => {
+            return ContributionAndReviewService
+              .getUserCreatedQuestionSuggestionsAsync();
+          },
+          [ctrl.TAB_TYPE_REVIEWS]: () => {
+            return ContributionAndReviewService
+              .getReviewableQuestionSuggestionsAsync();
+          }
+        },
+        [SUGGESTION_TYPE_TRANSLATE]: {
+          [ctrl.TAB_TYPE_CONTRIBUTIONS]: () => {
+            return ContributionAndReviewService
+              .getUserCreatedTranslationSuggestionsAsync();
+          },
+          [ctrl.TAB_TYPE_REVIEWS]: () => {
+            return ContributionAndReviewService
+              .getReviewableTranslationSuggestionsAsync();
+          }
+        }
+      };
+
       var getQuestionContributionsSummary = function(
           suggestionIdToSuggestions) {
         var questionContributionsSummaryList = [];
@@ -268,14 +291,6 @@ angular.module('oppia').component('contributionsAndReview', {
         });
       };
 
-      var _handleLoadContribution = function(suggestionIdToSuggestions) {
-        ctrl.contributions = suggestionIdToSuggestions;
-        return {
-          opportunitiesDicts: getContributionSummaries(ctrl.contributions),
-          more: false
-        };
-      };
-
       ctrl.isActiveTab = function(tabType, suggestionType) {
         return (
           ctrl.activeTabType === tabType &&
@@ -335,31 +350,16 @@ angular.module('oppia').component('contributionsAndReview', {
           });
         }
 
-        // This function was refactored because after migrating the
-        // contribution-and-review service, its functions were not
-        // getting called properly using the previous method
-        // i.e. fetchFunction().
-        if (ctrl.activeSuggestionType === SUGGESTION_TYPE_QUESTION &&
-            ctrl.activeTabType === ctrl.TAB_TYPE_CONTRIBUTIONS) {
-          return ContributionAndReviewService
-            .getUserCreatedQuestionSuggestionsAsync()
-            .then(_handleLoadContribution);
-        } else if (ctrl.activeSuggestionType === SUGGESTION_TYPE_QUESTION &&
-            ctrl.activeTabType === ctrl.TAB_TYPE_REVIEWS) {
-          return ContributionAndReviewService
-            .getReviewableQuestionSuggestionsAsync()
-            .then(_handleLoadContribution);
-        } else if (ctrl.activeSuggestionType === SUGGESTION_TYPE_TRANSLATE &&
-            ctrl.activeTabType === ctrl.TAB_TYPE_CONTRIBUTIONS) {
-          return ContributionAndReviewService
-            .getUserCreatedTranslationSuggestionsAsync()
-            .then(_handleLoadContribution);
-        } else if (ctrl.activeSuggestionType === SUGGESTION_TYPE_TRANSLATE &&
-            ctrl.activeTabType === ctrl.TAB_TYPE_REVIEWS) {
-          return ContributionAndReviewService
-            .getReviewableTranslationSuggestionsAsync()
-            .then(_handleLoadContribution);
-        }
+        var fetchFunction = tabNameToOpportunityFetchFunction[
+          ctrl.activeSuggestionType][ctrl.activeTabType];
+
+        return fetchFunction().then(function(suggestionIdToSuggestions) {
+          ctrl.contributions = suggestionIdToSuggestions;
+          return {
+            opportunitiesDicts: getContributionSummaries(ctrl.contributions),
+            more: false
+          };
+        });
       };
 
       ctrl.$onInit = function() {
