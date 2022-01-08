@@ -53,16 +53,13 @@ STATS_ID_DELIMITER = ':'
 ANDROID_VERSION_NAME_DELIMITER = '-'
 
 
-# TODO(#14419): Change naming style of Enum class from SCREAMING_SNAKE_CASE
-# to PascalCase and its values to UPPER_CASE. Because we want to be consistent
-# throughout the codebase according to the coding style guide.
-# https://github.com/oppia/oppia/wiki/Coding-style-guide
-class ReportType(enum.Enum): # pylint: disable=invalid-name
+
+class ReportType(enum.Enum): 
     """Enum for report types."""
 
-    SUGGESTION = 'suggestion' # pylint: disable=invalid-name
-    ISSUE = 'issue' # pylint: disable=invalid-name
-    CRASH = 'crash' # pylint: disable=invalid-name
+    SUGGESTION = 'suggestion' 
+    ISSUE = 'issue' 
+    CRASH = 'crash' 
 
 
 # TODO(#14419): Change naming style of Enum class from SCREAMING_SNAKE_CASE
