@@ -133,7 +133,7 @@ describe('Playthrough Object Factory', () => {
         value: 1.2
       }
     });
-    expect(playthroughObject.actions).toEqual(
+    expect(playthroughObject!.actions).toEqual(
       [laof.createNewAnswerSubmitAction({
         state_name: {
           value: 'state'
