@@ -870,7 +870,7 @@ describe('Contributions and review component', function() {
 
       var dropdownChoice = ctrl.getActiveDropdownTabChoice();
 
-      expect(dropdownChoice).toBe('Translate');
+      expect(dropdownChoice).toBe('Translations');
     });
   });
 
