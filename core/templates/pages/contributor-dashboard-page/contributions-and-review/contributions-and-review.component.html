@@ -15,9 +15,9 @@
           Available Tasks
         </div>
         <div class="oppia-contributions-dropdown-list-option"
-            ng-repeat="tab in $ctrl.reviewTabs"
-            ng-click="$ctrl.switchToTab($ctrl.TAB_TYPE_REVIEWS, tab.suggestionType)"
-            ng-class="$ctrl.isActiveTab($ctrl.TAB_TYPE_REVIEWS, tab.suggestionType) ? 'oppia-contributions-dropdown-list-option-selected' : ''">
+             ng-repeat="tab in $ctrl.reviewTabs"
+             ng-click="$ctrl.switchToTab($ctrl.TAB_TYPE_REVIEWS, tab.suggestionType)"
+             ng-class="$ctrl.isActiveTab($ctrl.TAB_TYPE_REVIEWS, tab.suggestionType) ? 'oppia-contributions-dropdown-list-option-selected' : ''">
           {{ tab.text }}
         </div>
         <div class="oppia-contributions-option-group-label"
@@ -25,10 +25,10 @@
           Contributions
         </div>
         <div class="oppia-contributions-dropdown-list-option"
-            ng-if="tab.enabled"
-            ng-repeat="tab in $ctrl.contributionTabs"
-            ng-click="$ctrl.switchToTab($ctrl.TAB_TYPE_CONTRIBUTIONS, tab.suggestionType)"
-            ng-class="$ctrl.isActiveTab($ctrl.TAB_TYPE_CONTRIBUTIONS, tab.suggestionType) ? 'oppia-contributions-dropdown-list-option-selected' : ''">
+             ng-if="tab.enabled"
+             ng-repeat="tab in $ctrl.contributionTabs"
+             ng-click="$ctrl.switchToTab($ctrl.TAB_TYPE_CONTRIBUTIONS, tab.suggestionType)"
+             ng-class="$ctrl.isActiveTab($ctrl.TAB_TYPE_CONTRIBUTIONS, tab.suggestionType) ? 'oppia-contributions-dropdown-list-option-selected' : ''">
           {{ tab.text }}
         </div>
       </div>
@@ -105,13 +105,13 @@
     display: flex;
     justify-content: space-between;
     padding: 10px 20px;
-    width: 60%;
     position: relative;
+    width: 60%;
   }
   contributions-and-review .oppia-contributions-selection-container {
-    font-weight: lighter;
     display: flex;
     flex: 1;
+    font-weight: lighter;
     justify-content: space-between;
   }
   contributions-and-review .oppia-contributions-dropdown-arrow {
@@ -119,15 +119,15 @@
     font-size: 1.5em;
   }
   contributions-and-review .oppia-contributions-dropdown-list-container {
-    width: 100%;
-    position: absolute;
-    top: 100%;
-    right: 0;
     background-color: #fff;
     border-radius: 4px;
     box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
     left: 0;
     padding: 8px 12px;
+    position: absolute;
+    right: 0;
+    top: 100%;
+    width: 100%;
     z-index: 1;
   }
   contributions-and-review .oppia-contributions-option-group-label {
@@ -222,9 +222,9 @@
 
   @media only screen and (max-width: 600px) {
     contributions-and-review .oppia-contributions-dropdown-section {
+      align-items: center;
       display: flex;
       justify-content: space-between;
-      align-items: center;
     }
     contributions-and-review .oppia-contributions-show-review {
       align-items: center;
