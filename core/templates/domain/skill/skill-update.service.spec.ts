@@ -27,6 +27,7 @@ import { SkillUpdateService } from 'domain/skill/skill-update.service';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { WorkedExampleObjectFactory, WorkedExampleBackendDict } from 'domain/skill/WorkedExampleObjectFactory';
+import { EventEmitter } from '@angular/core';
 
 describe('Skill update service', () => {
   let skillUpdateService: SkillUpdateService = null;
@@ -240,6 +241,10 @@ describe('Skill update service', () => {
 
     undoRedoService.undoChange(skill);
     expect(skill.getPrerequisiteSkillIds().length).toEqual(1);
+
+    let mockPrerequisiteSkillChangeEventEmitter = new EventEmitter();
+    expect(skillUpdateService.onPrerequisiteSkillChange)
+      .toEqual(mockPrerequisiteSkillChangeEventEmitter);
   });
 
   it('should delete a prerequisite skill', () => {
