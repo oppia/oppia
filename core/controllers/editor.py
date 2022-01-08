@@ -974,9 +974,7 @@ class ImageUploadHandler(EditorHandler):
         raw = self.normalized_request.get('image')
         filename = self.normalized_payload.get('filename')
         filename_prefix = self.normalized_payload.get('filename_prefix')
-        print("\n\n\n\n\nHere: ")
-        print("\nAlmost Completed... Good JOB ")
-        print(self.email + "\n\n\n\n\n\n\n\n\n\n")
+
         try:
             file_format = image_validation_services.validate_image_and_filename(
                 raw, filename)
@@ -990,7 +988,6 @@ class ImageUploadHandler(EditorHandler):
             filename_prefix, filename)
 
         if fs.isfile(filepath):
-            print("\nBoom its Done!! .. PR Time\n\n\n\n\n\n\n\n")
             raise self.InvalidInputException(
                 'A file with the name %s already exists. Please choose a '
                 'different name.' % filename)

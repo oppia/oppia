@@ -29,10 +29,10 @@ from core import python_utils
 from core.constants import constants
 from core.controllers import creator_dashboard
 from core.domain import config_services
-from core.domain import fs_domain
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import fs_domain
 from core.domain import question_services
 from core.domain import rights_domain
 from core.domain import rights_manager
@@ -1397,7 +1397,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
 
         # Since, check edit_activity_always return false, therefore
-        # editor will behave as voiceover artist
+        # editor will behave as voiceover artist.
         get_voiceover_swap = self.swap_to_always_return(
             rights_manager, 'check_can_edit_activity', value=False)
 
@@ -2694,8 +2694,8 @@ class EditorAutosaveTest(BaseEditorControllerTests):
             'version': 1,
         }
 
-        # user will behave as a voice artist because check_can_edit_activity
-        # is false but check_can_voiceover_activity is still true
+        # User will behave as a voice artist because check_can_edit_activity
+        # is false but check_can_voiceover_activity is still true.
         get_voiceover_swap = self.swap_to_always_return(
             rights_manager, 'check_can_edit_activity', value=False)
 
@@ -3020,10 +3020,8 @@ class UserExplorationPermissionsHandlerTests(BaseEditorControllerTests):
 
 class ImageUploadHandler(BaseEditorControllerTests):
     """ Test the handling of uploads by image uploads handler """
-
     def test_return_error_when_image_not_uploaded(self):
         """ Test error when no image is uploaded """
-
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -3055,7 +3053,6 @@ class ImageUploadHandler(BaseEditorControllerTests):
 
     def test_return_error_when_uploaded_image_already_exists(self):
         """ Test error when uploaded image already exists """
-
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -3069,7 +3066,7 @@ class ImageUploadHandler(BaseEditorControllerTests):
             feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX,
             feconf.ENTITY_TYPE_EXPLORATION, exp_id)
 
-        # to get raw image for testing
+        # To get raw image for testing.
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
             'rb', encoding=None
@@ -3104,7 +3101,6 @@ class ImageUploadHandler(BaseEditorControllerTests):
 
     def test_upload_successful_when_image_uploaded(self):
         """ Test no error when valid image is uploaded """
-
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -3118,7 +3114,7 @@ class ImageUploadHandler(BaseEditorControllerTests):
             feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX,
             feconf.ENTITY_TYPE_EXPLORATION, exp_id)
 
-        # to get raw image for testing
+        # To get raw image for testing.
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
             'rb', encoding=None
