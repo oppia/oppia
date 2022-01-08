@@ -40,11 +40,11 @@ export class PlaythroughBackendApiService {
       playthrough: Playthrough, issueSchemaVersion: number): Promise<void> {
     let playthroughUrl = this.urlInterpolationService.interpolateUrl(
       this.STORE_PLAYTHROUGH_URL, {
-        exploration_id: playthrough.expId
+        exploration_id: playthrough!.expId
       });
 
     return this.http.post<void>(playthroughUrl, {
-      playthrough_data: playthrough.toBackendDict(),
+      playthrough_data: playthrough!.toBackendDict(),
       issue_schema_version: issueSchemaVersion,
     }).toPromise();
   }
