@@ -129,11 +129,11 @@ DESERIALIZATION_FUNCTIONS: DeserializationFunctionsDict = {
 }
 
 
-# Here every 'x' in value belongs to some object, like
-# CACHE_NAMESPACE_COLLECTION's x is a collection object. When we call
-# serialize method on it, Mypy expectsit to be a typed call. So, to
-# remove un-typed-call error ignore statement is placed temporarily.
-# Untill all classes are typed.
+# Since we mapped this Dict with `SerializationFunctionsDict`. So, here
+# every 'x' in value belongs to some object, like CACHE_NAMESPACE_COLLECTION's
+# x is a collection object. When we call serialize method on it, Mypy expects
+# it to be a typed call. So, to remove un-typed-call error ignore statement
+# is placed temporarily. Untill all classes are typed.
 SERIALIZATION_FUNCTIONS: SerializationFunctionsDict = {
     CACHE_NAMESPACE_COLLECTION: lambda x: cast(str, x.serialize()), # type: ignore[no-untyped-call]
     CACHE_NAMESPACE_EXPLORATION: lambda x: cast(str, x.serialize()), # type: ignore[no-untyped-call]
