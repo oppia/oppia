@@ -346,14 +346,14 @@ class AppFeedbackReport:
     @classmethod
     def get_android_text_size_from_string(
         cls, text_size_name: str
-    ) -> app_feedback_report_constants.ANDROID_TEXT_SIZE:
+    ) -> app_feedback_report_constants.AndroidTextSize:
         """Determines the app text size based on the JSON value.
 
         Args:
             text_size_name: str. The name of the app's text size set.
 
         Returns:
-            ANDROID_TEXT_SIZE. The enum representing the text size.
+            AndroidTextSize. The enum representing the text size.
         """
         for text_size_type in (
             app_feedback_report_constants.ALLOWED_ANDROID_TEXT_SIZES):
@@ -380,21 +380,21 @@ class AppFeedbackReport:
         """
         entry_point_name = entry_point_json['entry_point_name']
         if entry_point_name == (
-            app_feedback_report_constants.ENTRY_POINT.navigation_drawer.name):
+            app_feedback_report_constants.EntryPoint.NAVIGATION_DRAWER.name):
             return NavigationDrawerEntryPoint()
         elif entry_point_name == (
-            app_feedback_report_constants.ENTRY_POINT.lesson_player.name):
+            app_feedback_report_constants.EntryPoint.LESSON_PLAYER.name):
             return LessonPlayerEntryPoint(
                 entry_point_json['entry_point_topic_id'],
                 entry_point_json['entry_point_story_id'],
                 entry_point_json['entry_point_exploration_id'])
         elif entry_point_name == (
-            app_feedback_report_constants.ENTRY_POINT.revision_card.name):
+            app_feedback_report_constants.EntryPoint.REVISION_CARD.name):
             return RevisionCardEntryPoint(
                 entry_point_json['entry_point_topic_id'],
                 entry_point_json['entry_point_subtopic_id'])
         elif entry_point_name == (
-            app_feedback_report_constants.ENTRY_POINT.crash.name):
+            app_feedback_report_constants.EntryPoint.CRASH.name):
             return CrashEntryPoint()
         else:
             raise utils.InvalidInputException(
@@ -403,14 +403,14 @@ class AppFeedbackReport:
     @classmethod
     def get_android_network_type_from_string(
         cls, network_type_name: str
-    ) -> app_feedback_report_constants.ANDROID_NETWORK_TYPE:
+    ) -> app_feedback_report_constants.AndroidNetworkType:
         """Determines the network type based on the JSON value.
 
         Args:
             network_type_name: str. The name of the network type.
 
         Returns:
-            ANDROID_NETWORK_TYPE. The enum representing the network type.
+            AndroidNetworkType. The enum representing the network type.
         """
         for network_type in (
             app_feedback_report_constants.ALLOWED_ANDROID_NETWORK_TYPES):
@@ -644,7 +644,7 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
         device_model: str,
         sdk_version: int,
         build_fingerprint: str,
-        network_type: app_feedback_report_constants.ANDROID_NETWORK_TYPE
+        network_type: app_feedback_report_constants.AndroidNetworkType
     ) -> None:
         """Constructs an AndroidDeviceSystemContext domain object.
 
@@ -663,7 +663,7 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
             sdk_version: int. The Android SDK version running on the device.
             build_fingerprint: str. The unique build fingerprint of this app
                 version.
-            network_type: ANDROID_NETWORK_TYPE. The enum for the network type
+            network_type: AndroidNetworkType. The enum for the network type
                 the device was connected to.
         """
         super(AndroidDeviceSystemContext, self).__init__(
@@ -836,12 +836,12 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
 
     @classmethod
     def require_valid_network_type(
-        cls, network_type: app_feedback_report_constants.ANDROID_NETWORK_TYPE
+        cls, network_type: app_feedback_report_constants.AndroidNetworkType
     ) -> None:
         """Checks that the Android device's network type is valid.
 
         Args:
-            network_type: ANDROID_NETWORK_TYPE. The network type the device
+            network_type: AndroidNetworkType. The network type the device
                 was connected to when sending the report, as an enum.
 
         Raises:
@@ -916,7 +916,7 @@ class AndroidAppContext(AppContext):
         entry_point: EntryPoint,
         text_language_code: str,
         audio_language_code: str,
-        text_size: app_feedback_report_constants.ANDROID_TEXT_SIZE,
+        text_size: app_feedback_report_constants.AndroidTextSize,
         only_allows_wifi_download_and_update: bool,
         automatically_update_topics: bool,
         account_is_profile_admin: bool,
@@ -932,7 +932,7 @@ class AndroidAppContext(AppContext):
                 in the app.
             audio_language_code: str. The ISO-639 code for the audio language
                 set in the app.
-            text_size: ANDROID_TEXT_SIZE. The enum type for text size set by
+            text_size: AndroidTextSize. The enum type for text size set by
                 the user in the app.
             only_allows_wifi_download_and_update: bool. True if the user only
                 allows downloads and updates when connected to wifi.
@@ -1060,13 +1060,13 @@ class AndroidAppContext(AppContext):
 
     @classmethod
     def require_valid_text_size(
-        cls, text_size: app_feedback_report_constants.ANDROID_TEXT_SIZE
+        cls, text_size: app_feedback_report_constants.AndroidTextSize
     ) -> None:
         """Checks whether the package version code is a valid string code for
         Oppia Android.
 
         Args:
-            text_size: ANDROID_TEXT_SIZE. The enum type for the text size set by
+            text_size: AndroidTextSize. The enum type for the text size set by
                 the user in the app.
 
         Raises:
@@ -1089,7 +1089,7 @@ class EntryPoint:
 
     def __init__(
         self,
-        entry_point: app_feedback_report_constants.ENTRY_POINT,
+        entry_point: app_feedback_report_constants.EntryPoint,
         topic_id: Optional[str] = None,
         story_id: Optional[str] = None,
         exploration_id: Optional[str] = None,
@@ -1098,7 +1098,7 @@ class EntryPoint:
         """Constructs an EntryPoint domain object.
 
         Args:
-            entry_point: ENTRY_POINT. The enum type for entry point used.
+            entry_point: EntryPoint. The enum type for entry point used.
             topic_id: str|None. The id for the current topic if the report was
                 sent during a topic in a lesson or revision session.
             story_id: str|None. The id for the current story if the report was
@@ -1141,13 +1141,13 @@ class EntryPoint:
     def require_valid_entry_point_name(
         cls,
         actual_name: str,
-        expected_entry_point: app_feedback_report_constants.ENTRY_POINT
+        expected_entry_point: app_feedback_report_constants.EntryPoint
     ) -> None:
         """Validates this EntryPoint name.
 
         Args:
             actual_name: str. The name used for this entry point object.
-            expected_entry_point: ENTRY_POINT. The enum type that should match
+            expected_entry_point: EntryPoint. The enum type that should match
                 the given entry_point_name.
 
         Raises:
@@ -1199,7 +1199,7 @@ class NavigationDrawerEntryPoint(EntryPoint):
     def __init__(self) -> None:
         """Constructs an NavigationDrawerEntryPoint domain object."""
         super(NavigationDrawerEntryPoint, self).__init__(
-            app_feedback_report_constants.ENTRY_POINT.navigation_drawer, None,
+            app_feedback_report_constants.EntryPoint.NAVIGATION_DRAWER, None,
             None, None, None)
 
     def to_dict(self) -> Dict[str, Any]:
@@ -1223,7 +1223,7 @@ class NavigationDrawerEntryPoint(EntryPoint):
         """
         self.require_valid_entry_point_name(
             self.entry_point_name,
-            app_feedback_report_constants.ENTRY_POINT.navigation_drawer)
+            app_feedback_report_constants.EntryPoint.NAVIGATION_DRAWER)
 
 
 class LessonPlayerEntryPoint(EntryPoint):
@@ -1243,7 +1243,7 @@ class LessonPlayerEntryPoint(EntryPoint):
                 user is playing when intiating the report.
         """
         super(LessonPlayerEntryPoint, self).__init__(
-            app_feedback_report_constants.ENTRY_POINT.lesson_player,
+            app_feedback_report_constants.EntryPoint.LESSON_PLAYER,
             topic_id=topic_id, story_id=story_id, exploration_id=exploration_id)
 
     def to_dict(self) -> Dict[str, Any]:
@@ -1269,7 +1269,7 @@ class LessonPlayerEntryPoint(EntryPoint):
         """
         self.require_valid_entry_point_name(
             self.entry_point_name,
-            app_feedback_report_constants.ENTRY_POINT.lesson_player)
+            app_feedback_report_constants.EntryPoint.LESSON_PLAYER)
         topic_domain.Topic.require_valid_topic_id(self.topic_id) # type: ignore[no-untyped-call]
         story_domain.Story.require_valid_story_id(self.story_id) # type: ignore[no-untyped-call]
         self.require_valid_entry_point_exploration(
@@ -1289,7 +1289,7 @@ class RevisionCardEntryPoint(EntryPoint):
                 reviewing when intiating the report.
         """
         super(RevisionCardEntryPoint, self).__init__(
-            app_feedback_report_constants.ENTRY_POINT.revision_card,
+            app_feedback_report_constants.EntryPoint.REVISION_CARD,
             topic_id, None, None, subtopic_id)
 
     def to_dict(self) -> Dict[str, Any]:
@@ -1315,7 +1315,7 @@ class RevisionCardEntryPoint(EntryPoint):
         """
         self.require_valid_entry_point_name(
             self.entry_point_name,
-            app_feedback_report_constants.ENTRY_POINT.revision_card)
+            app_feedback_report_constants.EntryPoint.REVISION_CARD)
         topic_domain.Topic.require_valid_topic_id(self.topic_id) # type: ignore[no-untyped-call]
         if not isinstance(self.subtopic_id, int):
             raise utils.ValidationError(
@@ -1330,7 +1330,7 @@ class CrashEntryPoint(EntryPoint):
         """Constructs an CrashEntryPoint domain object."""
         super(
             CrashEntryPoint, self).__init__(
-                app_feedback_report_constants.ENTRY_POINT.crash, None, None,
+                app_feedback_report_constants.EntryPoint.CRASH, None, None,
                 None, None)
 
     def to_dict(self) -> Dict[str, Any]:
@@ -1353,7 +1353,7 @@ class CrashEntryPoint(EntryPoint):
         """
         self.require_valid_entry_point_name(
             self.entry_point_name,
-            app_feedback_report_constants.ENTRY_POINT.crash)
+            app_feedback_report_constants.EntryPoint.CRASH)
 
 
 class AppFeedbackReportTicket:
@@ -1558,7 +1558,7 @@ class AppFeedbackReportDailyStats:
             total_reports_submitted: int. The total number of reports submitted
                 on this date for this ticket.
             daily_param_stats: dict. A dict representing the statistics on this
-                date. Keys in this dict correpond to STATS_PARAMETER_NAMES
+                date. Keys in this dict correpond to StatsParameterNames
                 enums, while values are ReportStatsParameterValueCounts objects.
         """
         self.stats_id = stats_id

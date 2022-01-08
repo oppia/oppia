@@ -65,9 +65,9 @@ ENTRY_POINT_CRASH = 'crash'
 ENTRY_POINT_NAVIGATION_DRAWER = 'navigation_drawer'
 LANGUAGE_LOCALE_CODE_ENGLISH = 'en'
 ANDROID_PACKAGE_VERSION_CODE = 1
-NETWORK_WIFI = app_feedback_report_constants.ANDROID_NETWORK_TYPE.wifi
+NETWORK_WIFI = app_feedback_report_constants.AndroidNetworkType.WIFI
 ANDROID_TEXT_SIZE = (
-    app_feedback_report_constants.ANDROID_TEXT_SIZE.medium_text_size)
+    app_feedback_report_constants.AndroidTextSize.MEDIUM_TEXT_SIZE)
 ANDROID_BUILD_FINGERPRINT = 'example_fingerprint_id'
 EVENT_LOGS = ['event1', 'event2']
 LOGCAT_LOGS = ['logcat1', 'logcat2']
@@ -330,7 +330,7 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
         }
 
         entry_point_json['entry_point_name'] = (
-            app_feedback_report_constants.ENTRY_POINT.navigation_drawer.name)
+            app_feedback_report_constants.EntryPoint.NAVIGATION_DRAWER.name)
         navigation_drawer_obj = (
             feedback_report.get_entry_point_from_json(
                 entry_point_json))
@@ -340,7 +340,7 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
                 app_feedback_report_domain.NavigationDrawerEntryPoint))
 
         entry_point_json['entry_point_name'] = (
-            app_feedback_report_constants.ENTRY_POINT.lesson_player.name)
+            app_feedback_report_constants.EntryPoint.LESSON_PLAYER.name)
         lesson_player_obj = (
             feedback_report.get_entry_point_from_json(
                 entry_point_json))
@@ -350,7 +350,7 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
                 app_feedback_report_domain.LessonPlayerEntryPoint))
 
         entry_point_json['entry_point_name'] = (
-            app_feedback_report_constants.ENTRY_POINT.revision_card.name)
+            app_feedback_report_constants.EntryPoint.REVISION_CARD.name)
         revision_card_obj = (
             feedback_report.get_entry_point_from_json(
                 entry_point_json))
@@ -360,7 +360,7 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
                 app_feedback_report_domain.RevisionCardEntryPoint))
 
         entry_point_json['entry_point_name'] = (
-            app_feedback_report_constants.ENTRY_POINT.crash.name)
+            app_feedback_report_constants.EntryPoint.CRASH.name)
         crash_obj = (
             feedback_report.get_entry_point_from_json(
                 entry_point_json))
@@ -384,7 +384,7 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
     def test_get_android_network_type_from_string_returns_expected_network_type(
             self) -> None:
         feedback_report = app_feedback_report_domain.AppFeedbackReport
-        for network_type in app_feedback_report_constants.ANDROID_NETWORK_TYPE:
+        for network_type in app_feedback_report_constants.AndroidNetworkType:
             self.assertEqual(
                 feedback_report.get_android_network_type_from_string(
                     network_type.name), network_type)
@@ -739,7 +739,7 @@ class EntryPointDomainTests(test_utils.GenericTestBase):
         super(EntryPointDomainTests, self).setUp()
         self.entry_point = (
             app_feedback_report_domain.EntryPoint(
-                app_feedback_report_constants.ENTRY_POINT.navigation_drawer,
+                app_feedback_report_constants.EntryPoint.NAVIGATION_DRAWER,
                 'topic_id', 'story_id', 'exploration_id', 'subtopic_id'))
 
     def test_to_dict_raises_exception(self) -> None:
@@ -765,7 +765,7 @@ class NavigationDrawerEntryPointDomainTests(test_utils.GenericTestBase):
     def test_to_dict(self) -> None:
         expected_dict = {
             'entry_point_name': (
-                app_feedback_report_constants.ENTRY_POINT.navigation_drawer.name) # pylint: disable=line-too-long
+                app_feedback_report_constants.EntryPoint.NAVIGATION_DRAWER.name) # pylint: disable=line-too-long
         }
         self.assertDictEqual(
             expected_dict, self.entry_point.to_dict())
@@ -793,7 +793,7 @@ class NavigationDrawerEntryPointDomainTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected entry point name %s' % (
-                app_feedback_report_constants.ENTRY_POINT.navigation_drawer.name)): # pylint: disable=line-too-long
+                app_feedback_report_constants.EntryPoint.NAVIGATION_DRAWER.name)): # pylint: disable=line-too-long
             self.entry_point.validate()
 
 
@@ -808,7 +808,7 @@ class LessonPlayerEntryPointDomainTests(test_utils.GenericTestBase):
     def test_to_dict(self) -> None:
         expected_dict = {
             'entry_point_name': (
-                app_feedback_report_constants.ENTRY_POINT.lesson_player.name),
+                app_feedback_report_constants.EntryPoint.LESSON_PLAYER.name),
             'topic_id': 'topic_id',
             'story_id': 'story_id',
             'exploration_id': 'exploration_id'
@@ -837,7 +837,7 @@ class LessonPlayerEntryPointDomainTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             self.entry_point,
             'Expected entry point name %s' % (
-                app_feedback_report_constants.ENTRY_POINT.lesson_player.name))
+                app_feedback_report_constants.EntryPoint.LESSON_PLAYER.name))
 
     def test_validation_invalid_topic_id_fails(self) -> None:
         self.entry_point.topic_id = 'invalid_topic_id'
@@ -897,7 +897,7 @@ class RevisionCardEntryPointDomainTests(test_utils.GenericTestBase):
     def test_to_dict(self) -> None:
         expected_dict = {
             'entry_point_name': (
-                app_feedback_report_constants.ENTRY_POINT.revision_card.name),
+                app_feedback_report_constants.EntryPoint.REVISION_CARD.name),
             'topic_id': 'topic_id',
             'subtopic_id': 'subtopic_id'
         }
@@ -925,7 +925,7 @@ class RevisionCardEntryPointDomainTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             self.entry_point,
             'Expected entry point name %s' % (
-                app_feedback_report_constants.ENTRY_POINT.revision_card.name))
+                app_feedback_report_constants.EntryPoint.REVISION_CARD.name))
 
     def test_validation_invalid_topic_id_fails(self) -> None:
         self.entry_point.topic_id = 'invalid_topic_id'
@@ -967,7 +967,7 @@ class CrashEntryPointDomainTests(test_utils.GenericTestBase):
     def test_to_dict(self) -> None:
         expected_dict = {
             'entry_point_name': (
-                app_feedback_report_constants.ENTRY_POINT.crash.name)
+                app_feedback_report_constants.EntryPoint.CRASH.name)
         }
         self.assertDictEqual(
             expected_dict, self.entry_point.to_dict())
@@ -995,7 +995,7 @@ class CrashEntryPointDomainTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected entry point name %s' % (
-                app_feedback_report_constants.ENTRY_POINT.crash.name)):
+                app_feedback_report_constants.EntryPoint.CRASH.name)):
             self.entry_point.validate()
 
 
@@ -1014,7 +1014,7 @@ class AppContextDomainTests(test_utils.GenericTestBase):
         expected_dict = {
             'entry_point': {
                 'entry_point_name': (
-                    app_feedback_report_constants.ENTRY_POINT.navigation_drawer.name), # pylint: disable=line-too-long
+                    app_feedback_report_constants.EntryPoint.NAVIGATION_DRAWER.name), # pylint: disable=line-too-long
             },
             'text_language_code': LANGUAGE_LOCALE_CODE_ENGLISH,
             'audio_language_code': LANGUAGE_LOCALE_CODE_ENGLISH
@@ -1045,7 +1045,7 @@ class AndroidAppContextDomainTests(test_utils.GenericTestBase):
         expected_dict = {
             'entry_point': {
                 'entry_point_name': (
-                    app_feedback_report_constants.ENTRY_POINT.navigation_drawer.name), # pylint: disable=line-too-long
+                    app_feedback_report_constants.EntryPoint.NAVIGATION_DRAWER.name), # pylint: disable=line-too-long
             },
             'text_language_code': LANGUAGE_LOCALE_CODE_ENGLISH,
             'audio_language_code': LANGUAGE_LOCALE_CODE_ENGLISH,
