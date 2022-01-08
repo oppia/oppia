@@ -16,7 +16,6 @@
  * @fileoverview Module for the exploration editor page.
  */
 
-import { DragDropModule } from '@angular/cdk/drag-drop';
 import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
@@ -62,7 +61,6 @@ import { RevertExplorationModalComponent } from './history-tab/modal-templates/r
 @NgModule({
   imports: [
     BrowserModule,
-    DragDropModule,
     BrowserAnimationsModule,
     HttpClientModule,
     InteractionExtensionsModule,

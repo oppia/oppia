@@ -35,6 +35,7 @@ import { CodeMirrorModule } from './code-mirror/codemirror.module';
 import { OppiaCkEditor4Module } from './ck-editor-helpers/ckeditor4.module';
 import { BaseModule } from '../base-components/base.module';
 import { NgBootstrapModule } from 'modules/ng-boostrap.module';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 
 // Components.
 import { AudioBarComponent } from 'pages/exploration-player-page/layout-directives/audio-bar.component';
@@ -111,7 +112,6 @@ import { SummarizeNonnegativeNumberPipe } from 'filters/summarize-nonnegative-nu
 import { SortByPipe } from 'filters/string-utility-filters/sort-by.pipe';
 import { FilterForMatchingSubstringPipe } from 'filters/string-utility-filters/filter-for-matching-substring.pipe';
 import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
-import { DragDropModule } from '@angular/cdk/drag-drop';
 
 // Services.
 import { AuthService } from 'services/auth.service';
@@ -307,6 +307,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     ObjectComponentsModule,
     OppiaCkEditor4Module,
     SharedFormsModule,
+    DragDropModule,
     // Components, directives, and pipes.
     AttributionGuideComponent,
     AudioBarComponent,
