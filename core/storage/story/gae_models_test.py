@@ -152,7 +152,8 @@ class StoryCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
     """Test the StoryCommitLogEntryModel class."""
 
     def test_get_export_policy(self) -> None:
-        export_policy = story_models.StoryCommitLogEntryModel.get_export_policy() # pylint: disable=line-too-long
+        export_policy = (
+            story_models.StoryCommitLogEntryModel.get_export_policy())
         self.assertEqual(
             export_policy['story_id'],
             base_models.EXPORT_POLICY.NOT_APPLICABLE)
@@ -187,9 +188,7 @@ class StorySummaryModelTest(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_get_export_policy(self) -> None:
-        sample_dict = base_models.BaseModel.get_export_policy()
-        sample_dict.update(
-            {'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+        sample_dict =    {'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'story_model_last_updated':
@@ -200,7 +199,7 @@ class StorySummaryModelTest(test_utils.GenericTestBase):
             'thumbnail_bg_color': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'url_fragment': base_models.EXPORT_POLICY.NOT_APPLICABLE
-            })
+            }
         self.assertEqual(
             story_models.StorySummaryModel.get_export_policy(),
             sample_dict)
