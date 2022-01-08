@@ -40,7 +40,7 @@ describe('Skill backend API service', () => {
     skillObjectFactory = TestBed.inject(SkillObjectFactory);
 
     const misconceptionDict = {
-      id: '2',
+      id: 2,
       name: 'test name',
       notes: 'test notes',
       feedback: 'test feedback',
