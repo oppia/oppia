@@ -29,13 +29,13 @@ import apache_beam as beam
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import datastore_services
     from mypy_imports import collection_models
 
-collection_models = models.Registry.import_models([models.NAMES.collection])
+(collection_models,) = models.Registry.import_models([models.NAMES.collection])
 datastore_services = models.Registry.import_datastore_services()
 
-class CountCollectionModel(base_jobs.JobBase):
+
+class CountCollectionModelJob(base_jobs.JobBase):
     """Job that generate emails of CollectionModels users."""
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
@@ -49,10 +49,10 @@ class CountCollectionModel(base_jobs.JobBase):
         extract_collection_model = (
             self.pipeline
             | 'Get all collection models' >> ndb_io.GetModels(
-                collection_models.CollectionModel.get_all(
+                collection_models.CollectionRightsModel.get_all(
                     include_deleted=False))
-            | 'Extract user IDs' >> beam.Map(
-                lambda collection: collection.id)
+            | 'Extract user IDs' >> beam.FlatMap(
+                    lambda collection_rights: collection_rights.owner_ids)
             | 'Extract emails' >> beam.Map(
                 user_services.get_email_from_user_id)
         )
@@ -60,5 +60,5 @@ class CountCollectionModel(base_jobs.JobBase):
         return (
             extract_collection_model
             | 'Count the output' >> (
-                job_result_transforms.ResultsToJobRunResults())
+                job_result_transforms.CountObjectsToJobRunResult())
         )
