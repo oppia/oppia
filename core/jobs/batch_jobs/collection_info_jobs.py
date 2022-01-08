@@ -53,6 +53,7 @@ class CountCollectionModelJob(base_jobs.JobBase):
                     include_deleted=False))
             | 'Extract user IDs' >> beam.FlatMap(
                     lambda collection_rights: collection_rights.owner_ids)
+            | 'Remove duplicates' >> beam.Distinct() # pylint: disable=no-value-for-parameter
             | 'Extract emails' >> beam.Map(
                 user_services.get_email_from_user_id)
         )

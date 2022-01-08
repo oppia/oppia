@@ -39,6 +39,7 @@ class CountCollectionModelJobTests(job_test_utils.JobTestBase):
     JOB_CLASS = collection_info_jobs.CountCollectionModelJob
 
     USER_ID_1 = 'id_1'
+    USER_ID_2 = 'id_2'
 
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty()
@@ -67,4 +68,49 @@ class CountCollectionModelJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(stdout='SUCCESS: 1')
+        ])
+
+    def test_counts_multiple_collection(self) -> None:
+        user1 = self.create_model(
+            user_models.UserSettingsModel,
+            id=self.USER_ID_1,
+            email='some@email.com',
+            roles=[feconf.ROLE_ID_COLLECTION_EDITOR]
+        )
+        user2 = self.create_model(
+            user_models.UserSettingsModel,
+            id=self.USER_ID_2,
+            email='some2@email.com',
+            roles=[feconf.ROLE_ID_COLLECTION_EDITOR]
+        )
+        user1.update_timestamps()
+        user2.update_timestamps()
+        collection1 = self.create_model(
+            collection_models.CollectionRightsModel,
+            id=1,
+            owner_ids=[self.USER_ID_1, self.USER_ID_2],
+            editor_ids=[self.USER_ID_1],
+            voice_artist_ids=[self.USER_ID_1],
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            viewable_if_private=False,
+            first_published_msec=0.2
+        )
+        collection1.update_timestamps()
+        collection2 = self.create_model(
+            collection_models.CollectionRightsModel,
+            id=2,
+            owner_ids=[self.USER_ID_2],
+            editor_ids=[self.USER_ID_1],
+            voice_artist_ids=[self.USER_ID_1],
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            viewable_if_private=False,
+            first_published_msec=0.2
+        )
+        collection2.update_timestamps()
+        self.put_multi([user1, user2, collection1, collection2])
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(stdout='SUCCESS: 2')
         ])
