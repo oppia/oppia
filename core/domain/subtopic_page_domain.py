@@ -75,9 +75,9 @@ class SubtopicPageChange(change_domain.BaseChange):
 class SubtopicPageContentsDict(TypedDict):
     """Dictionary representing the SubtopicPageContents object."""
 
-    subtitled_html: state_domain.SubtitledHtml
-    recorded_voiceovers: state_domain.RecordedVoiceovers
-    written_translations: state_domain.WrittenTranslations
+    subtitled_html: state_domain.SubtitledHtml.to_dict()
+    recorded_voiceovers: state_domain.RecordedVoiceovers.to_dict()
+    written_translations: state_domain.WrittenTranslations.to_dict()
 
 
 class SubtopicPageContents:
@@ -143,7 +143,7 @@ class SubtopicPageContents:
     @classmethod
     def from_dict(
         cls,
-        page_contents_dict: Dict[str, object]
+        page_contents_dict: SubtopicPageContentsDict
     ) -> SubtopicPageContents:
         """Creates a subtopic page contents object from a dictionary.
 
@@ -174,7 +174,7 @@ class VersionedPageContentsDict(TypedDict):
 
 
 class SubtopicPageDict(TypedDict):
-    """Dictionary representing the SubtopicPageContents object."""
+    """Dictionary representing the SubtopicPage object."""
 
     id: str
     topic_id: str
@@ -291,11 +291,9 @@ class SubtopicPage:
             state_domain.WrittenTranslations.convert_html_in_written_translations( # type: ignore[no-untyped-call]
                 subtopic_page_contents_dict['written_translations'],
                 conversion_fn))
-        (subtopic_page_contents_dict['subtitled_html'].to_dict( # type: ignore[no-untyped-call]
-        ))['html'] = (
+        subtopic_page_contents_dict['subtitled_html']['html'] = (
             conversion_fn(
-                (subtopic_page_contents_dict['subtitled_html'].to_dict( # type: ignore[no-untyped-call]
-                ))['html']))
+                subtopic_page_contents_dict['subtitled_html']['html']))
         return subtopic_page_contents_dict
 
     @classmethod
