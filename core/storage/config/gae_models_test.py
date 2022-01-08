@@ -213,7 +213,8 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
 
     def test_get_model_association_to_user(self):
         self.assertEqual(
-            config_models.PlatformParameterModel.get_model_association_to_user(),
+            config_models.PlatformParameterModel.
+            get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
         )
 
