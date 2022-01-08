@@ -3019,9 +3019,11 @@ class UserExplorationPermissionsHandlerTests(BaseEditorControllerTests):
 
 
 class ImageUploadHandler(BaseEditorControllerTests):
-    """ Test the handling of uploads by image uploads handler """
+    """Test the handling of uploads by image uploads handler."""
+
     def test_return_error_when_image_not_uploaded(self):
-        """ Test error when no image is uploaded """
+        """Test error when no image is uploaded."""
+
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -3050,9 +3052,9 @@ class ImageUploadHandler(BaseEditorControllerTests):
 
         self.logout()
 
-
     def test_return_error_when_uploaded_image_already_exists(self):
-        """ Test error when uploaded image already exists """
+        """Test error when uploaded image already exists."""
+
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -3098,9 +3100,9 @@ class ImageUploadHandler(BaseEditorControllerTests):
 
         self.logout()
 
-
     def test_upload_successful_when_image_uploaded(self):
-        """ Test no error when valid image is uploaded """
+        """Test no error when valid image is uploaded."""
+
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -3136,5 +3138,5 @@ class ImageUploadHandler(BaseEditorControllerTests):
             )
 
         self.assertEqual(response['filename'], filename)
-
+        
         self.logout()
