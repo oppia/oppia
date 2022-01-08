@@ -29,6 +29,7 @@ from core import python_utils
 from core.constants import constants
 from core.controllers import creator_dashboard
 from core.domain import config_services
+from core.domain import fs_domain
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -1321,6 +1322,8 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
     COLLABORATOR2_USERNAME = 'collab2'
     COLLABORATOR3_EMAIL = 'collaborator3@example.com'
     COLLABORATOR3_USERNAME = 'collab3'
+    COLLABORATOR4_EMAIL = 'collaborator4@example.com'
+    COLLABORATOR4_USERNAME = 'collab4'
     RANDOM_USER_EMAIL = 'randomuser@example.com'
     RANDOM_USER_USERNAME = 'randomuser'
 
@@ -1333,6 +1336,8 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             self.COLLABORATOR2_EMAIL, self.COLLABORATOR2_USERNAME)
         self.signup(
             self.COLLABORATOR3_EMAIL, self.COLLABORATOR3_USERNAME)
+        self.signup(
+            self.COLLABORATOR4_EMAIL, self.COLLABORATOR4_USERNAME)
 
         # Owner creates exploration.
         self.login(self.OWNER_EMAIL)
@@ -1360,7 +1365,6 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
                 'new_member_username': self.VIEWER_USERNAME,
                 'new_member_role': rights_domain.ROLE_VIEWER
             }, csrf_token=csrf_token)
-
         self.put_json(
             rights_url, {
                 'version': exploration.version,
@@ -1373,12 +1377,61 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
                 'new_member_username': self.COLLABORATOR2_USERNAME,
                 'new_member_role': rights_domain.ROLE_EDITOR
             }, csrf_token=csrf_token)
+        self.put_json(
+            rights_url, {
+                'version': exploration.version,
+                'new_member_username': self.COLLABORATOR4_USERNAME,
+                'new_member_role': rights_domain.ROLE_EDITOR
+            }, csrf_token=csrf_token)
         self.logout()
 
         # Check that viewer can access editor page but cannot edit.
         self.login(self.VIEWER_EMAIL)
         self.assert_cannot_edit(exp_id)
         self.assert_cannot_voiceover(exp_id)
+        self.logout()
+
+        # Check that COLLABORATOR 4 who cannot edit but can voiceover,
+        # cannot add a new State 6.
+        self.login(self.COLLABORATOR4_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        # Since, check edit_activity_always return false, therefore
+        # editor will behave as voiceover artist
+        get_voiceover_swap = self.swap_to_always_return(
+            rights_manager, 'check_can_edit_activity', value=False)
+
+        with get_voiceover_swap:
+            self.assert_cannot_edit(exp_id)
+            self.assert_can_voiceover(exp_id)
+
+            response_dict = self.put_json(
+                '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id),
+                {
+                    'version': exploration.version,
+                    'commit_message': 'Added State 4',
+                    'change_list': [{
+                        'cmd': 'add_state',
+                        'state_name': 'State 4'
+                    }]
+                },
+                csrf_token=csrf_token,
+                expected_status_int=500
+            )
+
+            # Check that collaborator 4 cannot add new members.
+            exploration = exp_fetchers.get_exploration_by_id(exp_id)
+            rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
+            self.put_json(
+                rights_url, {
+                    'version': exploration.version,
+                    'new_member_username': self.COLLABORATOR3_USERNAME,
+                    'new_member_role': rights_domain.ROLE_EDITOR,
+                },
+                csrf_token=csrf_token,
+                expected_status_int=401
+            )
+
         self.logout()
 
         # Check that collaborator can access editor page and can edit.
@@ -2635,6 +2688,32 @@ class EditorAutosaveTest(BaseEditorControllerTests):
         self.assertEqual(response['draft_change_list_id'], 2)
         self.assertTrue(response['changes_are_mergeable'])
 
+    def test_draft_not_updated_without_editing_rights(self):
+        payload = {
+            'change_list': self.NEW_CHANGELIST,
+            'version': 1,
+        }
+
+        # user will behave as a voice artist because check_can_edit_activity
+        # is false but check_can_voiceover_activity is still true
+        get_voiceover_swap = self.swap_to_always_return(
+            rights_manager, 'check_can_edit_activity', value=False)
+
+        with get_voiceover_swap:
+            response = self.put_json(
+                '/createhandler/autosave_draft/%s' % self.EXP_ID2,
+                payload,
+                csrf_token=self.csrf_token,
+                expected_status_int=400
+            )
+
+        error_msg = (
+            'Voice artist does not have permission to make some changes '
+            'in the change list.'
+        )
+
+        self.assertEqual(response['error'], error_msg)
+
     def test_draft_updated_version_invalid(self):
         payload = {
             'change_list': self.NEW_CHANGELIST,
@@ -2935,5 +3014,131 @@ class UserExplorationPermissionsHandlerTests(BaseEditorControllerTests):
         self.assertTrue(response['can_voiceover'])
         self.assertFalse(response['can_unpublish'])
         self.assertFalse(response['can_manage_voice_artist'])
+
+        self.logout()
+
+
+class ImageUploadHandler(BaseEditorControllerTests):
+    """ Test the handling of uploads by image uploads handler """
+
+    def test_return_error_when_image_not_uploaded(self):
+        """ Test error when no image is uploaded """
+
+        self.login(self.EDITOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        exp_id = exp_fetchers.get_new_exploration_id()
+        self.save_new_valid_exploration(exp_id, self.editor_id)
+
+        filename = 'image_file.svg'
+        filename_prefix = 'image'
+
+        publish_url = '%s/%s/%s' % (
+            feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX,
+            feconf.ENTITY_TYPE_EXPLORATION, exp_id)
+
+        response = self.post_json(
+            publish_url, {
+                'image': 'sample_image',
+                'filename': filename,
+                'filename_prefix': filename_prefix
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400
+        )
+
+        error_msg = ('No image supplied')
+        self.assertEqual(response['error'], error_msg)
+
+        self.logout()
+
+
+    def test_return_error_when_uploaded_image_already_exists(self):
+        """ Test error when uploaded image already exists """
+
+        self.login(self.EDITOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        exp_id = exp_fetchers.get_new_exploration_id()
+        self.save_new_valid_exploration(exp_id, self.editor_id)
+
+        filename = 'img.png'
+        filename_prefix = 'image'
+
+        publish_url = '%s/%s/%s' % (
+            feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX,
+            feconf.ENTITY_TYPE_EXPLORATION, exp_id)
+
+        # to get raw image for testing
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
+            'rb', encoding=None
+        ) as f:
+            raw_image = f.read()
+
+        get_image_exits_swap = self.swap_to_always_return(
+            fs_domain.GcsFileSystem, 'isfile', value=True)
+
+        test_app_swap = self.swap(self, 'testapp', self.testapp)
+
+        with test_app_swap and get_image_exits_swap:
+            response = self.post_json(
+                publish_url, {
+                    'image': 'img',
+                    'filename': filename,
+                    'filename_prefix': filename_prefix
+                },
+                csrf_token=csrf_token,
+                expected_status_int=400,
+                upload_files=(('image', 'unused_filename', raw_image),)
+            )
+
+        error_msg = (
+            'A file with the name %s already exists. Please choose a '
+            'different name.' % filename
+        )
+        self.assertEqual(response['error'], error_msg)
+
+        self.logout()
+
+
+    def test_upload_successful_when_image_uploaded(self):
+        """ Test no error when valid image is uploaded """
+
+        self.login(self.EDITOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        exp_id = exp_fetchers.get_new_exploration_id()
+        self.save_new_valid_exploration(exp_id, self.editor_id)
+
+        filename = 'img.png'
+        filename_prefix = 'image'
+
+        publish_url = '%s/%s/%s' % (
+            feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX,
+            feconf.ENTITY_TYPE_EXPLORATION, exp_id)
+
+        # to get raw image for testing
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
+            'rb', encoding=None
+        ) as f:
+            raw_image = f.read()
+
+        test_app_swap = self.swap(self, 'testapp', self.testapp)
+
+        with test_app_swap:
+            response = self.post_json(
+                publish_url, {
+                    'image': 'img',
+                    'filename': filename,
+                    'filename_prefix': filename_prefix
+                },
+                csrf_token=csrf_token,
+                expected_status_int=200,
+                upload_files=(('image', 'unused_filename', raw_image),)
+            )
+
+        self.assertEqual(response['filename'], filename)
 
         self.logout()
