@@ -378,9 +378,14 @@ angular.module('oppia').component('contributionsAndReview', {
         });
       };
 
-      $(document).bind('click', function(clickEvent) {
+      ctrl.closeDropdownWhenClickedOutside = function(clickEvent) {
         const dropdown = document
           .querySelector('.oppia-contributions-dropdown-container');
+
+        if (!dropdown) {
+          return;
+        }
+
         const clickOccurredWithinDropdown =
           dropdown.contains(clickEvent.target);
 
@@ -388,10 +393,9 @@ angular.module('oppia').component('contributionsAndReview', {
           return;
         }
 
-        $rootScope.$apply(function() {
-          ctrl.dropdownShown = false;
-        });
-      });
+        ctrl.dropdownShown = false;
+        $rootScope.$apply();
+      };
 
       ctrl.$onInit = function() {
         ctrl.contributions = [];
@@ -471,6 +475,11 @@ angular.module('oppia').component('contributionsAndReview', {
           // once the controller is migrated to angular.
           $rootScope.$applyAsync();
         });
+        $(document).on('click', ctrl.closeDropdownWhenClickedOutside);
+      };
+
+      ctrl.$onDestroy = function() {
+        $(document).off('click', ctrl.closeDropdownWhenClickedOutside);
       };
     }
   ]
