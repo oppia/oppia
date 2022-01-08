@@ -47,7 +47,7 @@ export class ReviewMaterialEditorComponent implements OnInit {
   };
 
   constructor(
-    private changeDetectorRef: ChangeDetectorRef,
+    private changeDetectorRef: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -91,5 +91,5 @@ export class ReviewMaterialEditorComponent implements OnInit {
   }
 }
 
-angular.module('oppia').directive('oppiaWorkedExampleEditor',
+angular.module('oppia').directive('oppiaReviewMaterialEditor',
   downgradeComponent({component: ReviewMaterialEditorComponent}));

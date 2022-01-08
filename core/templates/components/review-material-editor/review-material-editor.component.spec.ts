@@ -77,13 +77,14 @@ describe('Review Material Editor Component', () => {
   });
 
   it('should save concept card explanation when user clicks on save', () => {
-    component.editableExplanation = 'Explanation';
+    spyOn(component.onSaveExplanation, 'emit');
+    component.editableExplanation = 'explanation';
 
     component.saveConceptCardExplanation();
 
-    expect(component.onSaveExplanation)
+    expect(component.onSaveExplanation.emit)
       .toHaveBeenCalledWith(SubtitledHtml.createDefault(
-        component.editableExplanation, 'Explanation'));
+        component.editableExplanation, 'explanation'));
   });
 
   it('should get schema', () => {
