@@ -16,12 +16,12 @@
  * @fileoverview Unit tests for storyViewerPage.
  */
 
-import { TestBed, fakeAsync, flushMicrotasks, tick } from '@angular/core/testing';
+import { TestBed, fakeAsync, flushMicrotasks, tick, ComponentFixture } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { StoryNode } from 'domain/story/story-node.model';
 import { StoryPlaythrough, StoryPlaythroughBackendDict } from 'domain/story_viewer/story-playthrough.model';
 import { StoryViewerPageComponent } from './story-viewer-page.component';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ElementRef, NO_ERRORS_SCHEMA } from '@angular/core';
 import { UserService } from 'services/user.service';
 import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
 import { AlertsService } from 'services/alerts.service';
@@ -40,6 +40,7 @@ class MockAssetsBackendApiService {
 }
 
 describe('Story Viewer Page component', () => {
+  let fixture: ComponentFixture<StoryViewerPageComponent>;
   let httpTestingController = null;
   let component: StoryViewerPageComponent;
   let alertsService = null;
@@ -83,7 +84,7 @@ describe('Story Viewer Page component', () => {
     alertsService = TestBed.get(AlertsService);
     storyViewerBackendApiService = TestBed.get(StoryViewerBackendApiService);
     windowRef = TestBed.get(WindowRef);
-    let fixture = TestBed.createComponent(StoryViewerPageComponent);
+    fixture = TestBed.createComponent(StoryViewerPageComponent);
     component = fixture.componentInstance;
     spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
       location: {
@@ -491,5 +492,55 @@ describe('Story Viewer Page component', () => {
     tick();
 
     expect(component.showLoginOverlay).toEqual(false);
+  }));
+  it('should set focus on skip buuton when clicked outside overlay',
+    fakeAsync(()=>{
+      component.isLoggedIn = false;
+      spyOn(component, 'focusSkipButton');
+      const container = fixture.debugElement.nativeElement
+        .querySelector('.oppia-story-viewer-container') as HTMLDivElement;
+
+      const event = new MouseEvent('click', {
+        view: window,
+        bubbles: true,
+        cancelable: true,
+        relatedTarget: window
+      });
+
+      container.dispatchEvent(event);
+      tick();
+
+      expect(component.focusSkipButton)
+        .toHaveBeenCalledWith(event, component.isLoggedIn);
+    }));
+  it('should set focus on skip button', fakeAsync(()=>{
+    component.skipButton = new ElementRef(document.createElement('button'));
+    component.overlay = new ElementRef(document.createElement('div'));
+    spyOn(component, 'focusSkipButton');
+    spyOn(component.skipButton.nativeElement, 'focus');
+
+    const container = fixture.debugElement.nativeElement
+      .querySelector('.oppia-story-viewer-container') as HTMLDivElement;
+
+    const event = new MouseEvent('click', {
+      view: window,
+      bubbles: true,
+      cancelable: true,
+      relatedTarget: window
+    });
+
+    let mainEvent;
+
+    container.addEventListener('click', (e)=>{
+      mainEvent = e;
+    });
+
+    container.dispatchEvent(event);
+    tick();
+
+    component.focusSkipButton(mainEvent, false);
+    tick();
+
+    expect(component.skipButton.nativeElement.focus).toHaveBeenCalled();
   }));
 });

@@ -16,7 +16,7 @@
  * @fileoverview Component for the main page of the story viewer.
  */
 
-import { Component, OnInit, ViewChild, ElementRef, Renderer2 } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { UrlService } from 'services/contextual/url.service';
@@ -43,8 +43,8 @@ interface IconParametersArray {
   templateUrl: './story-viewer-page.component.html'
 })
 export class StoryViewerPageComponent implements OnInit {
-  @ViewChild('skip') skipButton: ElementRef;
-  @ViewChild('overlay') overlay: ElementRef;
+  @ViewChild('overlay') overlay: ElementRef<HTMLDivElement>;
+  @ViewChild('skip') skipButton: ElementRef<HTMLButtonElement>;
   showLoginOverlay: boolean = true;
   storyPlaythroughObject: StoryPlaythrough;
   storyId: string;
@@ -71,10 +71,18 @@ export class StoryViewerPageComponent implements OnInit {
     private storyViewerBackendApiService: StoryViewerBackendApiService,
     private pageTitleService: PageTitleService,
     private alertsService: AlertsService,
-    private renderer2: Renderer2
   ) {}
 
-  private unlistener: () => void;
+  focusSkipButton(event: MouseEvent, isLoggedIn: boolean): void {
+    if (isLoggedIn || !this.showLoginOverlay) {
+      return;
+    }
+    const target = event.target as Element;
+    if (target.closest('.story-viewer-login-container') !==
+        this.overlay.nativeElement) {
+      this.skipButton.nativeElement.focus();
+    }
+  }
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
@@ -147,14 +155,6 @@ export class StoryViewerPageComponent implements OnInit {
     this.isLoggedIn = false;
     this.userService.getUserInfoAsync().then((userInfo) => {
       this.isLoggedIn = userInfo.isLoggedIn();
-      if (!this.isLoggedIn) {
-        this.unlistener = this.renderer2.listen('window', 'click', (event)=>{
-          if (event.target !== this.overlay.nativeElement &&
-            event.target.parentElement !== this.overlay.nativeElement) {
-            this.skipButton.nativeElement.focus();
-          }
-        });
-      }
     });
     this.topicUrlFragment = (
       this.urlService.getTopicUrlFragmentFromLearnerUrl());
@@ -195,10 +195,6 @@ export class StoryViewerPageComponent implements OnInit {
     // background color and icon url for the icons generated on the
     // path.
     this.pathIconParameters = [];
-  }
-
-  ngOnDestroy(): void {
-    this.unlistener(); // Removing event listensers.
   }
 }
 
