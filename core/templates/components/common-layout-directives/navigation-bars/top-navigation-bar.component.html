@@ -105,8 +105,8 @@
                       <div class="dropdown-item nav-link oppia-navbar-tab-content protractor-test-classroom-link nav-item-top-link">
                         <a (keydown)="onMenuKeypress($event, 'learnMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_CLOSE})" class="underline"
                            (click)="navigateToClassroomPage('/learn/' + DEFAULT_CLASSROOM_URL_FRAGMENT)" href="#">{{ 'I18N_TOPNAV_CLASSROOM_BASIC_MATHS' | translate }}
-                        </a>                          
-                    </div>
+                        </a>
+                      </div>
                       <div class="des">{{ 'I18N_TOPNAV_LEARN_DESCRIPTION_1' | translate }}</div>
                     </div>
                     <picture>
@@ -182,7 +182,7 @@
                  class="dropdown-item nav-link oppia-navbar-tab-content protractor-test-about-link about-link"
                  href="/about"
                  [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.ABOUT.ROUTE">
-                 <span class="link">{{'I18N_TOPNAV_ABOUT_OPPIA' | translate}}</span>
+                <span class="link">{{'I18N_TOPNAV_ABOUT_OPPIA' | translate}}</span>
               </a>
             </li>
             <li class="nav-item">
@@ -190,7 +190,7 @@
                  href="/about-foundation"
                  (keydown)="onMenuKeypress($event, 'aboutMenu', {enter: ACTION_CLOSE})"
                  rel="noopener">
-                 <span class="link">{{'I18N_TOPNAV_OPPIA_FOUNDATION' | translate}}</span>
+                <span class="link">{{'I18N_TOPNAV_OPPIA_FOUNDATION' | translate}}</span>
               </a>
             </li>
             <li class="nav-item">
@@ -198,7 +198,7 @@
                  href="https://medium.com/oppia-org"
                  (keydown)="onMenuKeypress($event, 'aboutMenu', {enter: ACTION_CLOSE})"
                  rel="noopener">
-                 <span class="link">{{'I18N_TOPNAV_BLOG' | translate}}</span>
+                <span class="link">{{'I18N_TOPNAV_BLOG' | translate}}</span>
               </a>
             </li>
           </ul>
@@ -553,10 +553,13 @@
   .learn-dropdown-menu a, .about-dropdown-menu a, .get-involved-dropdown a, .donate-dropdown a {
     text-decoration: none;
   }
-  /* .dropdown-menu a:focus, .dropdown-menu a:hover {
-    text-decoration: underline;
-    text-decoration-thickness: 2px;
-  } */
+  .learn-dropdown-menu .nav-item-top-link a {
+    color: #333;
+    font-family: 'Roboto', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 18.75px;
+  }
   .dropdown-menu .innvolved-item:hover a {
     border-bottom: #000 solid 2px;
   }
@@ -644,13 +647,6 @@
   .learn-dropdown-menu .nav-item-top-link {
     padding: 0;
     padding-bottom: 8px;
-  }
-  .learn-dropdown-menu .nav-item-top-link a {
-    color: #333;
-    font-family: 'Roboto', sans-serif;
-    font-size: 16px;
-    font-weight: 500;
-    line-height: 18.75px;
   }
   .learn-dropdown-menu .nav-item-right-head {
     color: #333;
