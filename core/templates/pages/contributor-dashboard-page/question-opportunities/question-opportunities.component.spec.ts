@@ -241,16 +241,11 @@ describe('Question opportunities component', function() {
 
   it('should create a question when closing create question modal',
     fakeAsync(() => {
-      var openSpy = spyOn(ngbModal, 'open');
-      spyOn(userService, 'getUserInfoAsync').and.returnValue(
-        $q.resolve({
-          isLoggedIn: () => true
-        }));
-      ctrl.$onInit();
+      ctrl.userIsLoggedIn = true;
       $rootScope.$apply();
       alertsService.clearWarnings();
 
-      openSpy.and.returnValue({
+      var openSpy = spyOn(ngbModal, 'open').and.returnValue({
         componentInstance: MockNgbModalRef,
         result: Promise.resolve({
           skill: skillObjectFactory.createFromBackendDict({
@@ -276,32 +271,26 @@ describe('Question opportunities component', function() {
       }as NgbModalRef);
       ctrl.onClickSuggestQuestionButton('1');
       openSpy.calls.reset();
+      tick();
 
       spyOn(questionUndoRedoService, 'clearChanges');
-      openSpy.and.returnValue({
-        componentInstance: MockNgbModalRef,
+      var modalSpy = spyOn($uibModal, 'open').and.returnValue({
         result: Promise.resolve()
-      }as NgbModalRef);
-      $rootScope.$apply();
-      tick();
+      });
       $rootScope.$apply();
 
       expect(openSpy).toHaveBeenCalled();
+      expect(modalSpy).toHaveBeenCalled();
       expect(questionUndoRedoService.clearChanges).toHaveBeenCalled();
     }));
 
   it('should suggest a question when dismissing create question modal',
     fakeAsync(() => {
-      var openSpy = spyOn(ngbModal, 'open');
-      spyOn(userService, 'getUserInfoAsync').and.returnValue(
-        $q.resolve({
-          isLoggedIn: () => true
-        }));
-      ctrl.$onInit();
+      ctrl.userIsLoggedIn = true;
       $rootScope.$apply();
       alertsService.clearWarnings();
 
-      openSpy.and.returnValue({
+      var openSpy = spyOn(ngbModal, 'open').and.returnValue({
         componentInstance: MockNgbModalRef,
         result: Promise.resolve({
           skill: skillObjectFactory.createFromBackendDict({
@@ -324,18 +313,19 @@ describe('Question opportunities component', function() {
           }),
           skillDifficulty: 1
         })
-      }as NgbModalRef);
+      } as NgbModalRef);
       ctrl.onClickSuggestQuestionButton('1');
       openSpy.calls.reset();
 
       spyOn(questionUndoRedoService, 'clearChanges');
-      openSpy.and.returnValue({
-        result: $q.reject()
-      }as NgbModalRef);
+      var modalSpy = spyOn($uibModal, 'open').and.returnValue({
+        result: Promise.reject()
+      });
       tick();
       $rootScope.$apply();
 
       expect(openSpy).toHaveBeenCalled();
+      expect(modalSpy).toHaveBeenCalled();
       expect(questionUndoRedoService.clearChanges).toHaveBeenCalled();
     }));
 

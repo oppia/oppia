@@ -561,7 +561,6 @@ describe('QuestionsListComponent', () => {
 
   it('should show \'confirm question modal exit\' modal when user ' +
     'clicks cancel', fakeAsync(() => {
-    spyOn(ngbModal, 'open');
     spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
       return ({
         result: Promise.resolve()
@@ -589,7 +588,6 @@ describe('QuestionsListComponent', () => {
 
   it('should close \'confirm question modal exit\' modal when user clicks' +
     ' cancel', fakeAsync(() => {
-    spyOn(ngbModal, 'open');
     spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
       return ({
         result: Promise.reject()
@@ -1030,11 +1028,11 @@ describe('QuestionsListComponent', () => {
   });
 
   it('should open question editor save modal if question' +
-    ' is being updated when user click on \'SAVE\' button', () => {
+    ' is being updated when user click on \'SAVE\' button', fakeAsync(() => {
     ctrl.questionIsBeingUpdated = true;
-    spyOn($uibModal, 'open').and.returnValue({
+    spyOn(ngbModal, 'open').and.returnValue({
       result: $q.resolve('commit')
-    });
+    } as NgbModalRef);
     spyOn(ctrl, 'updateSkillLinkageAndQuestions');
     spyOn(ctrl, 'saveAndPublishQuestion');
 
@@ -1042,6 +1040,7 @@ describe('QuestionsListComponent', () => {
     ctrl.skillLinkageModificationsArray = ['1', '2'];
 
     ctrl.saveQuestion();
+    tick();
     $scope.$apply();
 
     expect(ctrl.updateSkillLinkageAndQuestions).toHaveBeenCalledWith('commit');
@@ -1050,10 +1049,11 @@ describe('QuestionsListComponent', () => {
     ctrl.skillLinkageModificationsArray = [];
 
     ctrl.saveQuestion();
+    tick();
     $scope.$apply();
 
     expect(ctrl.saveAndPublishQuestion).toHaveBeenCalledWith('commit');
-  });
+  }));
 
   it('should create new question if user clicks on \'SAVE\' and if question' +
     ' is not being updates', () => {
@@ -1067,20 +1067,22 @@ describe('QuestionsListComponent', () => {
     expect(SkillEditorRoutingService.creatingNewQuestion).toHaveBeenCalled();
   });
 
-  it('should close question editor save modal if user clicks cancel', () => {
-    ctrl.questionIsBeingUpdated = true;
-    spyOn(ctrl, 'saveAndPublishQuestion');
-    ctrl.skillLinkageModificationsArray = ['1', '2'];
+  it('should close question editor save modal if user clicks cancel',
+    fakeAsync(() => {
+      ctrl.questionIsBeingUpdated = true;
+      spyOn(ctrl, 'saveAndPublishQuestion');
+      ctrl.skillLinkageModificationsArray = ['1', '2'];
 
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.reject()
-    });
+      spyOn(ngbModal, 'open').and.returnValue({
+        result: $q.reject()
+      } as NgbModalRef);
 
-    ctrl.saveQuestion();
-    $scope.$apply();
+      ctrl.saveQuestion();
+      tick();
+      $scope.$apply();
 
-    expect(ctrl.saveAndPublishQuestion).not.toHaveBeenCalled();
-  });
+      expect(ctrl.saveAndPublishQuestion).not.toHaveBeenCalled();
+    }));
 
   it('should get cached question summaries for one skill', () => {
     let summary = QuestionSummary
