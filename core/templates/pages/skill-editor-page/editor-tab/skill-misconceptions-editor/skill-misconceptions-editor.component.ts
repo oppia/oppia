@@ -16,7 +16,7 @@
  * @fileoverview Component for the skill misconceptions editor.
  */
 
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { Subscription } from 'rxjs';
@@ -40,7 +40,6 @@ export class SkillMisconceptionsEditorComponent implements OnInit {
   activeMisconceptionIndex: number;
 
   constructor(
-    private changeDetectorRef: ChangeDetectorRef,
     private ngbModal: NgbModal,
     private skillEditorStateService: SkillEditorStateService,
     private skillUpdateService: SkillUpdateService,
