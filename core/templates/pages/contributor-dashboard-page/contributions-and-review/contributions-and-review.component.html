@@ -1,6 +1,6 @@
 <div class="oppia-contributions-show-review">
   <div class="oppia-contributions-dropdown-section">
-    <div>View</div>
+    <div class="dropdown-label">View</div>
     <div class="oppia-contributions-dropdown-container">
       <div class="oppia-contributions-selection-container" ng-click="$ctrl.toggleDropdown()">
         {{ $ctrl.activeDropdownTabChoice }}
@@ -10,7 +10,8 @@
       </div>
 
       <div ng-if="$ctrl.dropdownShown" class="oppia-contributions-dropdown-list-container">
-        <div class="oppia-contributions-option-group-label">
+        <div class="oppia-contributions-option-group-label"
+             ng-if="$ctrl.reviewTabs.length > 0">
           Available Tasks
         </div>
         <div class="oppia-contributions-dropdown-list-option"
@@ -19,10 +20,12 @@
             ng-class="$ctrl.isActiveTab($ctrl.TAB_TYPE_REVIEWS, tab.suggestionType) ? 'oppia-contributions-dropdown-list-option-selected' : ''">
           {{ tab.text }}
         </div>
-        <div class="oppia-contributions-option-group-label">
+        <div class="oppia-contributions-option-group-label"
+             ng-if="$ctrl.userIsLoggedIn">
           Contributions
         </div>
         <div class="oppia-contributions-dropdown-list-option"
+            ng-if="tab.enabled"
             ng-repeat="tab in $ctrl.contributionTabs"
             ng-click="$ctrl.switchToTab($ctrl.TAB_TYPE_CONTRIBUTIONS, tab.suggestionType)"
             ng-class="$ctrl.isActiveTab($ctrl.TAB_TYPE_CONTRIBUTIONS, tab.suggestionType) ? 'oppia-contributions-dropdown-list-option-selected' : ''">
@@ -90,6 +93,10 @@
     padding: 3%;
     padding-inline: 6%;
     width: 100%;
+  }
+  contributions-and-review .dropdown-label {
+    color: rgb(104, 104, 104);
+    margin-left: 10px;
   }
   contributions-and-review .oppia-contributions-dropdown-container {
     background-color: #fff;
