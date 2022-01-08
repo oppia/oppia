@@ -7,7 +7,7 @@
     <div class="oppia-state-content-display oppia-transition-200 protractor-test-concept-card-explanation"
          [ngClass]="oppia-prevent-selection"
          title="Concept Card Explanation">
-      <span class="oppia-placeholder" ng-show="editableExplanation === ''">
+      <span class="oppia-placeholder" [hidden]="!(editableExplanation === '')">
           Give a review or explanation of the skill.
       </span>
       <angular-html-bind-wrapper [htmlData]="getBindableDict().displayedConceptCardExplanation">
@@ -31,7 +31,7 @@
             (click)="saveConceptCardExplanation()">
       Save
     </button>
-    <button type="button" class="btn btn-secondary float-right" (click)="closeConceptCardExplanationEditor()">Cancel</button>
+    <button type="button" class="btn btn-secondary float-right" (click)="closeConceptCardExplanationEditor()">Cancekjhjl</button>
     <div class="oppia-clear"></div>
   </div>
 </div>
