@@ -43,15 +43,18 @@ fdescribe('Review Material Editor Component', () => {
     fixture = TestBed.createComponent(ReviewMaterialEditorComponent);
     component = fixture.componentInstance;
 
-    component.bindableDict.displayedConceptCardExplanation = 'Explanation';
-    component.ngOnInit();
+    component.bindableDict = {
+      displayedConceptCardExplanation: 'Explanation',
+      displayedWorkedExamples: 'Examples'
+    }
+    fixture.detectChanges();
   });
 
   it('should set component properties on initialization', () => {
     expect(component.HTML_SCHEMA).toEqual({
       type: 'html'
     });
-    expect(component.editableExplanation).toBe('explanation');
+    expect(component.editableExplanation).toBe('Explanation');
     expect(component.conceptCardExplanationEditorIsShown).toBe(false);
   });
 

@@ -16,7 +16,7 @@
  * @fileoverview Component for the skill review material editor.
  */
 
-import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
@@ -27,6 +27,7 @@ interface HtmlSchema {
 
 interface BindableDict {
   'displayedConceptCardExplanation': string;
+  'displayedWorkedExamples': string;
 }
 
 @Component({
@@ -35,9 +36,10 @@ interface BindableDict {
 })
 export class ReviewMaterialEditorComponent implements OnInit {
   @Input() bindableDict: BindableDict;
-  @Input() onSaveExplanation;
+  @Output() onSaveExplanation:
+    EventEmitter<SubtitledHtml> = (new EventEmitter());
   explanationMemento: string;
-  editableExplanation: string = null;
+  editableExplanation: string;
   conceptCardExplanationEditorIsShown: boolean;
   COMPONENT_NAME_EXPLANATION;
   HTML_SCHEMA: HtmlSchema = {
@@ -83,9 +85,9 @@ export class ReviewMaterialEditorComponent implements OnInit {
 
   saveConceptCardExplanation(): void {
     this.conceptCardExplanationEditorIsShown = false;
-    var explanationObject = SubtitledHtml.createDefault(
+    let explanationObject = SubtitledHtml.createDefault(
       this.editableExplanation, this.COMPONENT_NAME_EXPLANATION);
-    this.onSaveExplanation(explanationObject);
+    this.onSaveExplanation.emit(explanationObject);
   }
 }
 
