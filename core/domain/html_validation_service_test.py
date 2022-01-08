@@ -1248,3 +1248,10 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 html_validation_service.convert_svg_diagram_tags_to_image_tags(
                     test_case['html_content']),
                 test_case['expected_output'])
+
+    def test_fix_incorrectly_encoded_chars(self):
+        html_string = '<p>Hello this is <span>testing &nbsp;</span></p>'
+        self.assertEqual(
+            html_validation_service.fix_incorrectly_encoded_chars(html_string),
+            '<p>Hello this is <span>testing  </span></p>'
+        )
