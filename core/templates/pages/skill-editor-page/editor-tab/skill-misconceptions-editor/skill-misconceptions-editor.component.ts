@@ -38,6 +38,7 @@ export class SkillMisconceptionsEditorComponent implements OnInit {
   misconceptionsListIsShown: boolean;
   misconceptions: Misconception[];
   activeMisconceptionIndex: number;
+  isEditable: boolean = true;
 
   constructor(
     private ngbModal: NgbModal,
@@ -59,10 +60,6 @@ export class SkillMisconceptionsEditorComponent implements OnInit {
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
-  }
-
-  isEditable(): boolean {
-    return true;
   }
 
   changeActiveMisconceptionIndex(idx: number): void {
