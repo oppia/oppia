@@ -22,7 +22,7 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { ReviewMaterialEditorComponent } from './review-material-editor.component';
 
-fdescribe('Review Material Editor Component', () => {
+describe('Review Material Editor Component', () => {
   let component: ReviewMaterialEditorComponent;
   let fixture: ComponentFixture<ReviewMaterialEditorComponent>;
 
@@ -46,7 +46,7 @@ fdescribe('Review Material Editor Component', () => {
     component.bindableDict = {
       displayedConceptCardExplanation: 'Explanation',
       displayedWorkedExamples: 'Examples'
-    }
+    };
     fixture.detectChanges();
   });
 

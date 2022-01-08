@@ -20,10 +20,10 @@
 </div>
 
 <div *ngIf="conceptCardExplanationEditorIsShown">
-  <schema-based-editor  class="protractor-test-concept-card-text"
-                        [schema]="getSchema.bind(this)"
-                        [localValue]="editableExplanation"
-                        (localValueChange)="updateLocalExp($event)">
+  <schema-based-editor class="protractor-test-concept-card-text"
+                       [schema]="getSchema.bind(this)"
+                       [localValue]="editableExplanation"
+                       (localValueChange)="updateLocalExp($event)">
   </schema-based-editor>
   <div class="editor-buttons">
     <button type="button"
