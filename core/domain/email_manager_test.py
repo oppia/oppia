@@ -6071,4 +6071,3 @@ class NotMergeableChangesEmailUnitTest(test_utils.EmailTestBase):
                 'Thanks!',
                 messages[0].html
             )
-            
