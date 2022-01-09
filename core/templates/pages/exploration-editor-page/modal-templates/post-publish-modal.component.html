@@ -13,7 +13,7 @@
       <div (click)="selectText($event)">{{explorationLink}}</div>
       <span *ngIf="explorationLinkCopied">Copied<i class="fa fa-check" aria-hidden="true"></i></span>
     </div>
-    <sharing-links layoutType="row"
+    <sharing-links layoutType="row post-publish-modal-sharing-links"
                    layoutAlignType="center center"
                    shareType="exploration"
                    [explorationId]="explorationId">
