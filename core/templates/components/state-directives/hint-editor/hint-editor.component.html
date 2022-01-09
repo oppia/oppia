@@ -24,21 +24,17 @@
   </div>
 
   <div *ngIf="isEditable && hintEditorIsOpen">
-    <form role="form"
-          class="form-inline"
-          name="editHintForm"
-          [formGroup]="editHintForm"
-          (ngSubmit)="saveThisHint()">
+    <div class="form-inline">
       <div class="oppia-rule-details-header">
         <strong>Hint # {{indexPlusOne}} is...</strong>
         <!-- TODO(sll): Find a way to do this without resorting to private properties like _html -->
-        <schema-based-editor formControlName="schemaBasedEditor"
+        <schema-based-editor 
                              [schema]="getSchema.bind(this)"
                              [localValue]="hint.hintContent._html"
                              (localValueChange)="updateHintContentHtml($event)">
         </schema-based-editor>
       </div>
-    </form>
+    </div>
 
     <div *ngIf="isHintLengthExceeded()" class="oppia-length-validation-error">
       The hint length is too long. Please use at most 500 characters.
