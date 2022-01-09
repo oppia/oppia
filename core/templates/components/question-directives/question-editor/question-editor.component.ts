@@ -50,12 +50,12 @@ angular.module('oppia').component('questionEditor', {
   template: require('./question-editor.component.html'),
   controllerAs: '$ctrl',
   controller: [
-    'EditabilityService', 'LoaderService', 'NgbModal',
+    '$rootScope', 'EditabilityService', 'LoaderService', 'NgbModal',
     'QuestionUpdateService', 'SolutionValidityService',
     'StateEditorService', 'StateInteractionIdService',
     'UrlInterpolationService',
     function(
-        EditabilityService, LoaderService, NgbModal,
+        $rootScope, EditabilityService, LoaderService, NgbModal,
         QuestionUpdateService, SolutionValidityService,
         StateEditorService, StateInteractionIdService,
         UrlInterpolationService) {
@@ -87,6 +87,7 @@ angular.module('oppia').component('questionEditor', {
 
       var _init = function() {
         StateEditorService.setStateNames([]);
+        StateEditorService.setCorrectnessFeedbackEnabled(true);
         StateEditorService.setInQuestionMode(true);
         StateEditorService.setInapplicableSkillMisconceptionIds(
           ctrl.question.getInapplicableSkillMisconceptionIds());
@@ -165,6 +166,7 @@ angular.module('oppia').component('questionEditor', {
       };
 
       ctrl.saveHints = function(displayedValue) {
+        $rootScope.$applyAsync();
         _updateQuestion(function() {
           StateEditorService.setInteractionHints(
             angular.copy(displayedValue));
