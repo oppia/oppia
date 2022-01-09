@@ -46,12 +46,12 @@ BASE_MODEL_ID_PATTERN = r'^[A-Za-z0-9-_]{1,%s}$' % base_models.ID_LENGTH
 MAX_CLOCK_SKEW_SECS = datetime.timedelta(seconds=1)
 
 
-class ValidationModes(enum.Enum): # pylint: disable=invalid-name
+class ValidationModes(enum.Enum):
     """Enum for validation modes."""
 
-    NEUTRAL = 'neutral' # pylint: disable=invalid-name
-    STRICT = 'strict' # pylint: disable=invalid-name
-    NON_STRICT = 'non_strict' # pylint: disable=invalid-name
+    NEUTRAL = 'neutral'
+    STRICT = 'strict'
+    NON_STRICT = 'non_strict'
 
 
 class ValidateDeletedModel(beam.DoFn):
