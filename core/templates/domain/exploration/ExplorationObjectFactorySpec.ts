@@ -21,7 +21,7 @@ import { TestBed } from '@angular/core/testing';
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { Exploration, ExplorationBackendDict, ExplorationObjectFactory } from 'domain/exploration/ExplorationObjectFactory';
-import { StateObjectFactory } from 'domain/state/StateObjectFactory';
+import { StateBackendDict, StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { Voiceover } from
   'domain/exploration/voiceover.model';
 import { InteractionObjectFactory } from
@@ -30,6 +30,8 @@ import { LoggerService } from 'services/contextual/logger.service';
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
+import { SubtitledHtmlBackendDict } from
+  'domain/exploration/subtitled-html.model';
 
 describe('Exploration object factory', () => {
   let eof: ExplorationObjectFactory;
@@ -37,8 +39,8 @@ describe('Exploration object factory', () => {
   let ssof: StatesObjectFactory;
   let iof: InteractionObjectFactory;
   let ls: LoggerService;
-  let loggerErrorSpy;
-  let firstState, secondState;
+  let loggerErrorSpy: jasmine.Spy<(msg: string) => void>;
+  let firstState: StateBackendDict, secondState: StateBackendDict;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -88,11 +90,15 @@ describe('Exploration object factory', () => {
         },
         default_outcome: {
           dest: 'new state',
-          feedback: [],
-          param_changes: []
+          feedback: {} as SubtitledHtmlBackendDict,
+          param_changes: [],
+          labelled_as_correct: false,
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null
         },
         hints: [],
-        id: 'TextInput'
+        id: 'TextInput',
+        solution: null
       },
       param_changes: [],
       solicit_answer_details: false,
@@ -102,6 +108,10 @@ describe('Exploration object factory', () => {
           default_outcome: {}
         }
       },
+      classifier_model_id: null,
+      card_is_checkpoint: false,
+      linked_skill_id: null,
+      next_content_id_index: Number(undefined)
     };
     secondState = {
       content: {
@@ -129,11 +139,15 @@ describe('Exploration object factory', () => {
         },
         default_outcome: {
           dest: 'new state',
-          feedback: [],
-          param_changes: []
+          feedback: {} as SubtitledHtmlBackendDict,
+          param_changes: [],
+          labelled_as_correct: false,
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null
         },
         hints: [],
-        id: 'EndExploration'
+        id: 'EndExploration',
+        solution: null
       },
       param_changes: [],
       solicit_answer_details: false,
@@ -143,6 +157,10 @@ describe('Exploration object factory', () => {
           default_outcome: {}
         }
       },
+      classifier_model_id: null,
+      card_is_checkpoint: false,
+      linked_skill_id: null,
+      next_content_id_index: Number(undefined)
     };
 
     const explorationDict: ExplorationBackendDict = {

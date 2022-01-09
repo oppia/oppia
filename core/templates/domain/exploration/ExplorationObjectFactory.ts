@@ -48,6 +48,7 @@ import { UrlInterpolationService } from
 import { Voiceover } from 'domain/exploration/voiceover.model';
 
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
+import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 import { ExplorationChange } from './exploration-draft.model';
 
 export interface ExplorationBackendDict {
@@ -92,12 +93,18 @@ export class Exploration {
 
   // ---- Instance methods ----
   isStateTerminal(stateName: string): boolean {
-    return (
-      stateName && this.getInteractionId(stateName) &&
-        INTERACTION_SPECS[this.getInteractionId(stateName)].is_terminal);
+    if (stateName) {
+      let interactionId = this.getInteractionId(stateName);
+      if (interactionId) {
+        return (
+          INTERACTION_SPECS[interactionId as InteractionSpecsKey].is_terminal
+        );
+      }
+    }
+    return false;
   }
 
-  getAuthorRecommendedExpIds(stateName: string): string[] {
+  getAuthorRecommendedExpIds(stateName: string): string[] | null {
     if (!this.isStateTerminal(stateName)) {
       throw new Error(
         'Tried to get recommendations for a non-terminal state: ' +
@@ -112,7 +119,7 @@ export class Exploration {
       customizationArgs.recommendedExplorationIds.value : null;
   }
 
-  getInteraction(stateName: string): Interaction {
+  getInteraction(stateName: string): Interaction | null {
     let state = this.states.getState(stateName);
     if (!state) {
       this.logger.error('Invalid state name: ' + stateName);
@@ -121,7 +128,7 @@ export class Exploration {
     return state.interaction;
   }
 
-  getInteractionId(stateName: string): string {
+  getInteractionId(stateName: string): string | null {
     let interaction = this.getInteraction(stateName);
     if (interaction === null) {
       return null;
@@ -130,7 +137,7 @@ export class Exploration {
   }
 
   getInteractionCustomizationArgs(
-      stateName: string): InteractionCustomizationArgs {
+      stateName: string): InteractionCustomizationArgs | null {
     let interaction = this.getInteraction(stateName);
     if (interaction === null) {
       return null;
@@ -138,17 +145,21 @@ export class Exploration {
     return interaction.customizationArgs;
   }
 
-  getInteractionInstructions(stateName: string): string {
+  getInteractionInstructions(stateName: string): string | null {
     let interactionId = this.getInteractionId(stateName);
-    return interactionId ? INTERACTION_SPECS[interactionId].instructions : '';
+    return interactionId ? INTERACTION_SPECS[
+      interactionId as InteractionSpecsKey
+    ].instructions : '';
   }
 
-  getNarrowInstructions(stateName: string): string {
+  getNarrowInstructions(stateName: string): string | null {
     let interactionId = this.getInteractionId(stateName);
     return (
         interactionId ?
-            INTERACTION_SPECS[interactionId].narrow_instructions :
-            '');
+            INTERACTION_SPECS[
+              interactionId as InteractionSpecsKey
+            ].narrow_instructions : ''
+    );
   }
 
   getInteractionThumbnailSrc(stateName: string): string {
@@ -168,7 +179,7 @@ export class Exploration {
     // possible in the learner view.
     return (
       !interactionId ||
-        INTERACTION_SPECS[interactionId].display_mode ===
+        INTERACTION_SPECS[interactionId as InteractionSpecsKey].display_mode ===
         AppConstants.INTERACTION_DISPLAY_MODE_INLINE);
   }
   getStates(): States {
@@ -191,7 +202,7 @@ export class Exploration {
     return this.getState(stateName).content.html;
   }
 
-  getVoiceovers(stateName: string): BindableVoiceovers {
+  getVoiceovers(stateName: string): BindableVoiceovers | null {
     let state = this.getState(stateName);
     if (!state) {
       this.logger.error('Invalid state name: ' + stateName);
@@ -204,7 +215,7 @@ export class Exploration {
   }
 
   getVoiceover(
-      stateName: string, languageCode: string): Voiceover {
+      stateName: string, languageCode: string): Voiceover | null {
     let state = this.getState(stateName);
     if (!state) {
       this.logger.error('Invalid state name: ' + stateName);
