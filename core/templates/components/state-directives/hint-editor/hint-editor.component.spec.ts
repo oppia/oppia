@@ -74,11 +74,8 @@ describe('HintEditorComponent', () => {
   });
 
   it('should set component properties on initialization', () => {
-    expect(component.hintMemento).toBe(null);
-    expect(component.isEditable).toBe(false);
-    expect(component.hintEditorIsOpen).toBe(false);
-
     spyOn(editabilityService, 'isEditable').and.returnValue(true);
+
     component.ngOnInit();
 
     expect(component.hintMemento).toBe(null);
