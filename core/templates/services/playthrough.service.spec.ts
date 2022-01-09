@@ -23,7 +23,7 @@ import { ExplorationFeaturesService } from
   'services/exploration-features.service';
 import { LearnerActionObjectFactory } from
   'domain/statistics/LearnerActionObjectFactory';
-import { CyclicStateTransitionsPlaythrough, EarlyQuitPlaythrough, MultipleIncorrectSubmissionsPlaythrough, Playthrough } from 'domain/statistics/PlaythroughObjectFactory';
+import {  Playthrough } from 'domain/statistics/PlaythroughObjectFactory';
 import { PlaythroughService } from 'services/playthrough.service';
 import { PlaythroughBackendApiService } from
   'domain/statistics/playthrough-backend-api.service';
