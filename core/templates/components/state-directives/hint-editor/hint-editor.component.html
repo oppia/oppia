@@ -3,7 +3,7 @@
        class="h-100"
        [attr.title]="isEditable ? 'Edit hint' : ''">
     <div class="oppia-readonly-rule-tile"
-         ngClass="{'oppia-editable-section': isEditable}">
+        [ngClass]="{'oppia-editable-section': isEditable}">
       <div class="oppia-rule-preview oppia-transition-200">
         <div class="oppia-click-to-start-editing  protractor-test-open-hint-editor"
              *ngIf="isEditable" (click)="openHintEditor()">
@@ -28,7 +28,7 @@
           class="form-inline"
           name="editHintForm"
           [formGroup]="editHintForm"
-          ngSubmit="saveThisHint()">
+          (ngSubmit)="saveThisHint()">
       <div class="oppia-rule-details-header">
         <strong>Hint # {{indexPlusOne}} is...</strong>
         <!-- TODO(sll): Find a way to do this without resorting to private properties like _html -->

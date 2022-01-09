@@ -219,7 +219,6 @@ angular.module('oppia').component('questionEditor', {
       };
 
       ctrl.$onInit = function() {
-        StateEditorService.setCorrectnessFeedbackEnabled(true);
         ctrl.directiveSubscriptions.add(
           StateEditorService.onStateEditorDirectiveInitialized.subscribe(
             () => _init()

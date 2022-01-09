@@ -38,6 +38,9 @@ import { DeleteLastHintModalComponent } from 'pages/exploration-editor-page/edit
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { CdkDragSortEvent, moveItemInArray} from '@angular/cdk/drag-drop';
 
+interface AddHintModalResponse {
+  hint: Hint;
+}
 @Component({
   selector: 'oppia-state-hints-editor',
   templateUrl: './state-hints-editor.component.html'
@@ -84,9 +87,7 @@ export class StateHintsEditorComponent implements OnInit {
   }
 
   getHintSummary(hint: Hint): string {
-    const hintAsPlainText =
-      this.formatRtePreviewPipe.transform(hint.hintContent.html);
-    return hintAsPlainText;
+    return this.formatRtePreviewPipe.transform(hint.hintContent.html);
   }
 
   changeActiveHintIndex(newIndex: number): void {
@@ -126,7 +127,7 @@ export class StateHintsEditorComponent implements OnInit {
     this.alertsService.clearWarnings();
     this.externalSaveService.onExternalSave.emit();
 
-    const addHintSuccess = (result: {hint: Hint}): void => {
+    const addHintSuccess = (result: AddHintModalResponse): void => {
       this.stateHintsService.displayed.push(result.hint);
       this.stateHintsService.saveDisplayedValue();
       this.onSaveHints(this.stateHintsService.displayed);
