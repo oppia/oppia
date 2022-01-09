@@ -268,15 +268,15 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             ValueError,
             'Invalid namespace: %s.' % invalid_namespace):
-            caching_services.get_multi(
-                invalid_namespace, None, # type: ignore[arg-type]
+            caching_services.get_multi( # type: ignore[call-overload]
+                invalid_namespace, None,
                 ['a', 'b', 'c'])
 
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             ValueError,
             'Invalid namespace: %s.' % invalid_namespace):
             caching_services.delete_multi(
-                invalid_namespace, None, ['a', 'b', 'c'])
+                invalid_namespace, None, ['a', 'b', 'c']) # type: ignore[arg-type]
 
         invalid_sub_namespace = 'sub:namespace'
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
@@ -340,7 +340,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             '0', [exploration_id])
         self.assertEqual(
             default_exploration.to_dict(),
-            exp_ids_to_explorations[exploration_id].to_dict())
+            exp_ids_to_explorations[exploration_id].to_dict()) # type: ignore[no-untyped-call]
 
     def test_partial_fetches_returns_correct_elements(self) -> None:
         """Testing that querying the cache returns reasonable output for
@@ -758,7 +758,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             default_exploration.to_dict(),
-            exp_ids_to_explorations[exploration_id].to_dict())
+            exp_ids_to_explorations[exploration_id].to_dict()) # type: ignore[no-untyped-call]
 
     def test_collections_with_unicode_characters_are_set_and_get_correctly(
         self
@@ -794,7 +794,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             default_collection.to_dict(),
-            collections[collection_id].to_dict())
+            collections[collection_id].to_dict()) # type: ignore[no-untyped-call]
 
     def test_skills_with_unicode_characters_are_set_and_get_correctly(
         self
@@ -841,7 +841,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             default_skill.to_dict(),
-            skills[skill_id].to_dict())
+            skills[skill_id].to_dict()) # type: ignore[no-untyped-call]
 
     def test_topics_with_unicode_characters_are_set_and_get_correctly(
         self
@@ -878,7 +878,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             default_topic.to_dict(),
-            topics[topic_id].to_dict())
+            topics[topic_id].to_dict()) # type: ignore[no-untyped-call]
 
     def test_stories_with_unicode_characters_are_set_and_get_correctly(
         self
@@ -917,7 +917,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             default_story.to_dict(),
-            stories[story_id].to_dict())
+            stories[story_id].to_dict()) # type: ignore[no-untyped-call]
 
     def test_platform_parameters_with_unicode_are_set_and_get_correctly(
         self
@@ -967,4 +967,4 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             default_parameter.to_dict(),
-            platform_parameters[platform_parameter_id].to_dict())
+            platform_parameters[platform_parameter_id].to_dict()) # type: ignore[no-untyped-call]

@@ -30,7 +30,7 @@ from core.domain import story_domain
 from core.domain import topic_domain
 from core.platform import models
 
-from typing import Any, Callable, Dict, List, cast
+from typing import Any, Callable, Dict, List, cast, overload
 from typing_extensions import Literal
 from typing_extensions import TypedDict
 
@@ -147,7 +147,12 @@ SERIALIZATION_FUNCTIONS: SerializationFunctionsDict = {
 
 
 def _get_memcache_key(
-    namespace: str, sub_namespace: str | None, obj_id: str
+    namespace: Literal[
+        'collection', 'exploration',
+        'skill', 'story',
+        'topic', 'platform',
+        'config', 'default'],
+    sub_namespace: str | None, obj_id: str
 ) -> str:
     """Returns a memcache key for the class under the corresponding
     namespace and sub_namespace.
@@ -183,9 +188,62 @@ def flush_memory_caches() -> None:
     memory_cache_services.flush_caches()
 
 
-# This function returns result_dict whose values can be any of the type from
-# Exploration, Skill, Story, Topic, Collection, str. hence Any type has to be
-# used here for the type of returned dictionary.
+@overload
+def get_multi(
+    namespace: Literal['collection'],
+    sub_namespace: str | None, obj_ids: List[str]
+) -> Dict[str, collection_domain.Collection]: ...
+
+
+@overload
+def get_multi(
+    namespace: Literal['exploration'],
+    sub_namespace: str | None, obj_ids: List[str]
+) -> Dict[str, exp_domain.Exploration]: ...
+
+
+@overload
+def get_multi(
+    namespace: Literal['skill'],
+    sub_namespace: str | None, obj_ids: List[str]
+) -> Dict[str, skill_domain.Skill]: ...
+
+
+@overload
+def get_multi(
+    namespace: Literal['story'],
+    sub_namespace: str | None, obj_ids: List[str]
+) -> Dict[str, story_domain.Story]: ...
+
+
+@overload
+def get_multi(
+    namespace: Literal['topic'],
+    sub_namespace: str | None, obj_ids: List[str]
+) -> Dict[str, topic_domain.Topic]: ...
+
+
+@overload
+def get_multi(
+    namespace: Literal['platform'],
+    sub_namespace: str | None, obj_ids: List[str]
+) -> Dict[str, platform_parameter_domain.PlatformParameter]: ...
+
+
+@overload
+def get_multi(
+    namespace: Literal['config'],
+    sub_namespace: str | None, obj_ids: List[str]
+) -> Dict[str, object]: ...
+
+
+@overload
+def get_multi(
+    namespace: Literal['default'],
+    sub_namespace: str | None, obj_ids: List[str]
+) -> Dict[str, object]: ...
+
+
 def get_multi(
     namespace: Literal[
         'collection', 'exploration',
@@ -287,7 +345,12 @@ def set_multi(
 
 
 def delete_multi(
-    namespace: str, sub_namespace: str | None, obj_ids: List[str]
+    namespace: Literal[
+        'collection', 'exploration',
+        'skill', 'story',
+        'topic', 'platform',
+        'config', 'default'],
+    sub_namespace: str | None, obj_ids: List[str]
 ) -> bool:
     """Deletes multiple ids in the cache.
 
