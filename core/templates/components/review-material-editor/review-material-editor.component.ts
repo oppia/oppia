@@ -41,7 +41,7 @@ export class ReviewMaterialEditorComponent implements OnInit {
   explanationMemento: string;
   editableExplanation: string;
   conceptCardExplanationEditorIsShown: boolean;
-  COMPONENT_NAME_EXPLANATION;
+  COMPONENT_NAME_EXPLANATION: string;
   HTML_SCHEMA: HtmlSchema = {
     type: 'html'
   };
