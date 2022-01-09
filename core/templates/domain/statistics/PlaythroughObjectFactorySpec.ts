@@ -122,10 +122,10 @@ describe('Playthrough Object Factory', () => {
       }
     );
 
-    expect(playthroughObject!.expId).toEqual('expId1');
-    expect(playthroughObject!.expVersion).toEqual(1);
-    expect(playthroughObject!.issueType).toEqual('EarlyQuit');
-    expect(playthroughObject!.issueCustomizationArgs).toEqual({
+    expect(playthroughObject.expId).toEqual('expId1');
+    expect(playthroughObject.expVersion).toEqual(1);
+    expect(playthroughObject.issueType).toEqual('EarlyQuit');
+    expect(playthroughObject.issueCustomizationArgs).toEqual({
       state_name: {
         value: 'state'
       },
@@ -133,7 +133,7 @@ describe('Playthrough Object Factory', () => {
         value: 1.2
       }
     });
-    expect(playthroughObject!.actions).toEqual(
+    expect(playthroughObject.actions).toEqual(
       [laof.createNewAnswerSubmitAction({
         state_name: {
           value: 'state'
