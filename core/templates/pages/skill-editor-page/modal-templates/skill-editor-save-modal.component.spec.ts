@@ -13,30 +13,32 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for Save Pending Changes Modal.
+ * @fileoverview Unit tests for skill editor save modal.
  */
 
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { SavePendingChangesModalComponent } from './save-pending-changes-modal.component';
+import { SkillEditorSaveModalComponent } from './skill-editor-save-modal.component';
 
-describe('Delete Topic Modal Component', () => {
-  let fixture: ComponentFixture<SavePendingChangesModalComponent>;
-  let componentInstance: SavePendingChangesModalComponent;
+describe('Skill editor save modal component', () => {
+  let fixture: ComponentFixture<SkillEditorSaveModalComponent>;
+  let componentInstance: SkillEditorSaveModalComponent;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
-        SavePendingChangesModalComponent
+        SkillEditorSaveModalComponent
       ],
       providers: [
         NgbActiveModal
-      ]
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(SavePendingChangesModalComponent);
+    fixture = TestBed.createComponent(SkillEditorSaveModalComponent);
     componentInstance = fixture.componentInstance;
   });
 

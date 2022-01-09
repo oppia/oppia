@@ -13,22 +13,24 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for topic save pending changes modal.
+ * @fileoverview Component for preview set parameters modal.
  */
 
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
-  selector: 'oppia-topic-save-pending-changes-modal',
-  templateUrl: './topic-save-pending-changes-modal.component.html'
+  selector: 'oppia-preview-set-parameters-modal',
+  templateUrl: './preview-set-parameters-modal.component.html'
 })
-export class TopicSavePendingChangesComponent
-  extends ConfirmOrCancelModal {
+
+export class PreviewSetParametersModalComponent extends ConfirmOrCancelModal {
+  @Input() manualParamChanges: string[];
+
   constructor(
-    private ngbActiveModal: NgbActiveModal
+    private ngbActiveModal: NgbActiveModal,
   ) {
     super(ngbActiveModal);
   }

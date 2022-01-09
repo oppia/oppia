@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for Save Pending Changes Modal.
+ * @fileoverview Component for delete worked example modal.
  */
 
 import { Component } from '@angular/core';
@@ -21,12 +21,13 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
-  selector: 'save-pending-changes-modal',
-  templateUrl: './save-pending-changes-modal.component.html'
+  selector: 'oppia-delete-worked-example-modal',
+  templateUrl: './delete-worked-example-modal.component.html'
 })
-export class SavePendingChangesModalComponent
-  extends ConfirmOrCancelModal {
-  constructor(ngbActiveModal: NgbActiveModal) {
+export class DeleteWorkedExampleComponent extends ConfirmOrCancelModal {
+  constructor(
+    private ngbActiveModal: NgbActiveModal
+  ) {
     super(ngbActiveModal);
   }
 }

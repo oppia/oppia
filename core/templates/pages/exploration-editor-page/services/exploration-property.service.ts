@@ -31,8 +31,8 @@ import { LoggerService } from 'services/contextual/logger.service';
   providedIn: 'root'
 })
 export class ExplorationPropertyService {
-  public displayed: string;
-  savedMemento: string;
+  public displayed: string | boolean;
+  savedMemento: string | boolean;
 
   // The backend name for this property. THIS MUST BE SPECIFIED BY
   // SUBCLASSES.
@@ -56,7 +56,7 @@ export class ExplorationPropertyService {
     },
   };
 
-  init(value: string): void {
+  init(value: string | boolean): void {
     if (!this.propertyName) {
       throw new Error('Exploration property name cannot be null.');
     }
@@ -83,14 +83,14 @@ export class ExplorationPropertyService {
 
   // Transforms the given value into a normalized form. THIS CAN BE
   // OVERRIDDEN BY SUBCLASSES. The default behavior is to do nothing.
-  _normalize(value: string): string {
+  _normalize(value: string | boolean): string | boolean {
     return value;
   }
 
   // Validates the given value and returns a boolean stating whether it
   // is valid or not. THIS CAN BE OVERRIDDEN BY SUBCLASSES. The default
   // behavior is to always return true.
-  _isValid(value: string): boolean {
+  _isValid(value: string | boolean): boolean {
     return true;
   }
 
