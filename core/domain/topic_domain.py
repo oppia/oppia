@@ -339,8 +339,7 @@ class StoryReference:
                 invalid.
         """
         if len(self.story_id) != constants.STORY_ID_LENGTH:
-            raise utils.ValidationError(
-                'Expected story_id should have this length.')
+            raise utils.ValidationError('Invalid story id.')
 
 
 class SubtopicDict(TypedDict):
