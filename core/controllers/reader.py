@@ -458,7 +458,11 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
             },
             'answer': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_least',
+                        'min_value': 1
+                    }]
                 }
             },
             'client_time_spent_in_secs': {
@@ -472,12 +476,20 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
             },
             'answer_group_index': {
                 'schema': {
-                    'type': 'int'
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 0
+                    }]
                 }
             },
             'rule_spec_index': {
                 'schema': {
-                    'type': 'int'
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 0
+                    }]
                 }
             },
             'version': {
@@ -505,9 +517,6 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
         params = self.normalized_payload.get('params', {})
         # The version of the exploration.
         version = self.normalized_payload.get('version')
-        if version is None:
-            raise self.InvalidInputException(
-                'NONE EXP VERSION: Answer Submit')
         session_id = self.normalized_payload.get('session_id')
         client_time_spent_in_secs = self.normalized_payload.get(
             'client_time_spent_in_secs')
