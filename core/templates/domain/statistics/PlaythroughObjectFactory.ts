@@ -114,7 +114,7 @@ export class CyclicStateTransitionsPlaythrough extends PlaythroughBase<
 export type Playthrough = (
   EarlyQuitPlaythrough |
   MultipleIncorrectSubmissionsPlaythrough |
-  CyclicStateTransitionsPlaythrough | null);
+  CyclicStateTransitionsPlaythrough );
 
 @Injectable({
   providedIn: 'root'
