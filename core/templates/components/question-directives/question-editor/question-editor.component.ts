@@ -217,6 +217,7 @@ angular.module('oppia').component('questionEditor', {
       };
 
       ctrl.$onInit = function() {
+        StateEditorService.setCorrectnessFeedbackEnabled(true);
         ctrl.directiveSubscriptions.add(
           StateEditorService.onStateEditorDirectiveInitialized.subscribe(
             () => _init()
@@ -247,8 +248,6 @@ angular.module('oppia').component('questionEditor', {
         ctrl.interactionIsShown = false;
 
         ctrl.stateEditorInitialized = false;
-        StateEditorService.setCorrectnessFeedbackEnabled(true);
-
         // The _init function is written separately since it is also called
         // in $scope.$on when some external events are triggered.
         _init();
