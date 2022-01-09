@@ -64,7 +64,7 @@ describe('HintEditorComponent', () => {
     };
     component.showMarkAllAudioAsNeedingUpdateModalIfRequired = (event) => {
     };
-    component.save = () => {};
+    component.saveHint = () => {};
 
     fixture.detectChanges();
   });
