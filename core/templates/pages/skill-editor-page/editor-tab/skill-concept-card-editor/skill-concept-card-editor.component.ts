@@ -88,10 +88,10 @@ angular.module('oppia').component('skillConceptCardEditor', {
       $scope.onSaveExplanation = function(explanationObject) {
         SkillUpdateService.setConceptCardExplanation(
           $scope.skill, explanationObject);
+        initBindableFieldsDict();
         // TODO(#8521): Remove the use of $rootScope.$apply()
         // once the controller is migrated to angular.
         $rootScope.$apply();
-        initBindableFieldsDict();
       };
 
       $scope.changeActiveWorkedExampleIndex = function(idx) {

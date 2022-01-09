@@ -72,8 +72,8 @@ export class ReviewMaterialEditorComponent implements OnInit {
   }
 
   openConceptCardExplanationEditor(): void {
-    this.editableExplanation =
-      this.bindableDict.displayedConceptCardExplanation;
+    this.editableExplanation = (
+      this.bindableDict.displayedConceptCardExplanation);
     this.explanationMemento = this.editableExplanation;
     this.conceptCardExplanationEditorIsShown = true;
   }
