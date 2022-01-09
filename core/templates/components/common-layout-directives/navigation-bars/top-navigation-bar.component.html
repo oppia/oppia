@@ -132,7 +132,7 @@
                     </div>
                     <a (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})" class="nav-item-bottom-link" href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}">
                       <span class="link">{{ 'I18N_TOPNAV_LEARN_LINK_1' | translate }}</span>
-                      <span class="material-icons">arrow_right_alt</span>
+                      <span class="material-icons arrow-forward">arrow_forward</span>
                     </a>
                   </div>
                   <a *ngIf="userIsLoggedIn"
@@ -140,7 +140,7 @@
                      class="nav-item-bottom-link-logged"
                      href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}">
                     <span class="link">{{ 'I18N_TOPNAV_LEARN_LINK_2' | translate }}</span>
-                    <span class="material-icons">arrow_right_alt</span>
+                    <span class="material-icons arrow-forward">arrow_forward</span>
                   </a>
                 </div>
                 <div class="nav-content nav-item-right d-flex flex-column">
@@ -148,7 +148,7 @@
                   <div class="des">{{ 'I18N_TOPNAV_LIBRARY_DESCRIPTION' | translate }}</div>
                   <a (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})" class="nav-item-bottom-link" href="/community-library">
                     <span class="link">{{ 'I18N_TOPNAV_LIBRARY' | translate }}</span>
-                    <span class="material-icons">arrow_right_alt</span>
+                    <span class="material-icons arrow-forward">arrow_forward</span>
                   </a>
                 </div>
               </div>
@@ -283,39 +283,19 @@
         <li [ngClass]="{'open': activeMenuName === 'donateMenu'}"
             ngbDropdown
             [hidden]="!navElementsVisibilityStatus.I18N_TOPNAV_DONATE"
-            class="nav-item oppia-navbar-clickable-dropdown protractor-test-about-oppia-list-item">
-          <a ngbDropdownToggle (keydown)="onMenuKeypress($event, 'donateMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
-             class="nav-link oppia-navbar-tab dropdown-toggle donate-tab"
+            class="nav-item protractor-test-about-oppia-list-item">
+          <a class="nav-link oppia-navbar-tab donate-tab"
              aria-haspopup="true"
              aria-expanded="false"
              tabindex="0"
-             (mouseover)="openSubmenu($event, 'donateMenu')"
-             (mouseleave)="closeSubmenuIfNotMobile($event)"
+             href="/donate"
+             [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE"
+             rel="noopener"
              autofocus>
             <span class="oppia-navbar-tab-content"
                  [innerHTML]="'I18N_TOPNAV_DONATE' | translate">
             </span>
           </a>
-          <ul ngbDropdownMenu
-              [ngStyle]="{'left.px': donateMenuOffset}"
-              class="dropdown-menu oppia-navbar-dropdown oppia-navbar-dropdown-right donate-dropdown"
-              (mouseover)="openSubmenu($event, 'donateMenu')"
-              (mouseleave)="closeSubmenuIfNotMobile($event)">
-            <li class="item nav-item oppia-navbar-dropdown-item">
-              <a class="oppia-navbar-tab-content oppia-navbar-tab-content-heading donate-link"
-                 href="/donate"
-                 [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE"
-                 (keydown)="onMenuKeypress($event, 'donateMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_CLOSE})"
-                 rel="noopener"
-              >
-                <i class="material-icons oppia-navbar-dropdown-heart-icon">&#xE87D;</i>
-                <span class="link">{{'I18N_TOPNAV_DONATE' | translate}}</span>
-              </a>
-              <span class="nav-link-desc oppia-navbar-tab-content-desc"
-                  [innerHTML]="'I18N_TOPNAV_DONATE_DESCRIPTION' | translate">
-              </span>
-            </li>
-          </ul>
         </li>
       </ul>
     </li>
@@ -528,16 +508,17 @@
   </ul>
 </div>
 <style>
-  .donate-link:hover .link, .donate-link:focus .link {
-    border-bottom: 2px solid #000;
-    transition: 50ms;
+  .arrow-forward {
+    color: #00645C;
+    font-size: 14px;
+    margin-left: 4px;
   }
   .about-link:hover .link, .about-link:focus .link {
-    border-bottom: 2px solid #737373;
+    border-bottom: 2px solid #333;
     transition: 50ms;
   }
   .underline:hover, .underline:focus {
-    border-bottom: 2px solid #000;
+    border-bottom: 2px solid #333;
     transition: 50ms;
   }
   .get-involved-dropdown a {
@@ -550,7 +531,7 @@
     color: #212121;
     text-decoration: none;
   }
-  .learn-dropdown-menu a, .about-dropdown-menu a, .get-involved-dropdown a, .donate-dropdown a {
+  .learn-dropdown-menu a, .about-dropdown-menu a, .get-involved-dropdown a {
     text-decoration: none;
   }
   .learn-dropdown-menu .nav-item-top-link a {
@@ -561,7 +542,8 @@
     line-height: 18.75px;
   }
   .dropdown-menu .innvolved-item:hover a {
-    border-bottom: #000 solid 2px;
+    border-bottom: #333 solid 2px;
+    transition: 50ms;
   }
   .nav-link:focus {
     background-color: #fff;
@@ -713,6 +695,8 @@
   }
   .dropdown-menu {
     border-radius: 3px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
   }
   .rtl-navbar-header .dropdown-menu {
     left: 0 !important;
