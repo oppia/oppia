@@ -6026,6 +6026,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             self.assertEqual(
                 sent_email_model.intent, feconf.EMAIL_INTENT_REMOVE_REVIEWER)
 
+
 class NotMergeableChangesEmailUnitTest(test_utils.EmailTestBase):
     """Unit test related to not mergeable change list emails sent to admin."""
 
@@ -6046,7 +6047,7 @@ class NotMergeableChangesEmailUnitTest(test_utils.EmailTestBase):
 
             # Send an account deletion failed email to admin.
             email_manager.send_not_mergeable_change_list_to_admin_for_review(
-                'testExploration', 1, 2, { 'field1': 'value1' }
+                'testExploration', 1, 2, {'field1': 'value1'}
             )
 
             # Make sure emails are sent.
@@ -6060,8 +6061,9 @@ class NotMergeableChangesEmailUnitTest(test_utils.EmailTestBase):
             )
             self.assertIn(
                 'Hi Admin,<br><br>'
-                'Some draft changes were rejected in exploration testExploration because the '
-                'changes were conflicting and could not be saved. Please see the '
+                'Some draft changes were rejected in exploration '
+                'testExploration because the changes were conflicting and '
+                'could not be saved. Please see the '
                 'rejected change list below:<br>'
                 'Discarded change list: {\'field1\': \'value1\'} <br><br>'
                 'Frontend Version: 1<br>'
@@ -6069,3 +6071,4 @@ class NotMergeableChangesEmailUnitTest(test_utils.EmailTestBase):
                 'Thanks!',
                 messages[0].html
             )
+            
