@@ -338,8 +338,14 @@ class StoryReference:
             ValidationError. One or more attributes of the StoryReference are
                 invalid.
         """
-        if len(self.story_id) != constants.STORY_ID_LENGTH:
-            raise utils.ValidationError('Invalid story id.')
+        if not isinstance(self.story_id, str):
+            raise utils.ValidationError(
+                'Expected story id to be a string, received %s' %
+                self.story_id)
+        if not isinstance(self.story_is_published, bool):
+            raise utils.ValidationError(
+                'Expected story_is_published to be a boolean, received %s' %
+                self.story_is_published)
 
 
 class SubtopicDict(TypedDict):
@@ -500,11 +506,31 @@ class Subtopic:
             raise utils.ValidationError(
                 'Subtopic thumbnail size in bytes cannot be zero.')
 
+        if not isinstance(self.id, int):
+            raise utils.ValidationError(
+                'Expected subtopic id to be an int, received %s' % self.id)
+
+        if not isinstance(self.title, str):
+            raise utils.ValidationError(
+                'Expected subtopic title to be a string, received %s' %
+                self.title)
+
         title_limit = android_validation_constants.MAX_CHARS_IN_SUBTOPIC_TITLE
         if len(self.title) > title_limit:
             raise utils.ValidationError(
                 'Expected subtopic title to be less than %d characters, '
                 'received %s' % (title_limit, self.title))
+
+        if not isinstance(self.skill_ids, list):
+            raise utils.ValidationError(
+                'Expected skill ids to be a list, received %s' %
+                self.skill_ids)
+
+        for skill_id in self.skill_ids:
+            if not isinstance(skill_id, str):
+                raise utils.ValidationError(
+                    'Expected each skill id to be a string, received %s' %
+                    skill_id)
 
         if len(self.skill_ids) > len(set(self.skill_ids)):
             raise utils.ValidationError(
@@ -766,6 +792,10 @@ class Topic:
         Args:
             topic_id: str. The topic id to validate.
         """
+        if not isinstance(topic_id, str):
+            raise utils.ValidationError(
+                'Topic id should be a string, received: %s' % topic_id)
+
         if topic_id is not None:
             if len(topic_id) != 12:
                 raise utils.ValidationError('Topic id %s is invalid' % topic_id)
@@ -780,6 +810,9 @@ class Topic:
         Args:
             name: str. The name to validate.
         """
+        if not isinstance(name, str):
+            raise utils.ValidationError('Name should be a string.')
+
         if name == '':
             raise utils.ValidationError('Name field should not be empty')
 
@@ -982,6 +1015,16 @@ class Topic:
         Raises:
             Exception. Invalid input.
         """
+        if not isinstance(from_index, int):
+            raise Exception(
+                'Expected from_index value to be a number, '
+                'received %s' % from_index)
+
+        if not isinstance(to_index, int):
+            raise Exception(
+                'Expected to_index value to be a number, '
+                'received %s' % to_index)
+
         if from_index == to_index:
             raise Exception(
                 'Expected from_index and to_index values to be different.')
@@ -1077,6 +1120,10 @@ class Topic:
         self.require_valid_name(self.name)
         self.require_valid_url_fragment(self.url_fragment)
         self.require_valid_thumbnail_filename(self.thumbnail_filename)
+        if not isinstance(self.practice_tab_is_displayed, bool):
+            raise utils.ValidationError(
+                'Practice tab is displayed property should be a boolean.'
+                'Received %s.' % self.practice_tab_is_displayed)
         utils.require_valid_meta_tag_content(self.meta_tag_content)
         utils.require_valid_page_title_fragment_for_web(
             self.page_title_fragment_for_web)
@@ -1108,6 +1155,26 @@ class Topic:
                 'Topic description should be at most %d characters, '
                 'received %s.' % (description_limit, self.description))
 
+        if not isinstance(self.subtopics, list):
+            raise utils.ValidationError(
+                'Expected subtopics to be a list, received %s'
+                % self.subtopics)
+
+        if not isinstance(self.next_subtopic_id, int):
+            raise utils.ValidationError(
+                'Expected next_subtopic_id to be an int, received %s'
+                % self.next_subtopic_id)
+
+        if not isinstance(self.subtopic_schema_version, int):
+            raise utils.ValidationError(
+                'Expected subtopic schema version to be an integer, received %s'
+                % self.subtopic_schema_version)
+
+        if not isinstance(self.story_reference_schema_version, int):
+            raise utils.ValidationError(
+                'Expected story reference schema version to be an integer, '
+                'received %s' % self.story_reference_schema_version)
+
         if (self.subtopic_schema_version !=
                 feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION):
             raise utils.ValidationError(
@@ -1117,6 +1184,10 @@ class Topic:
                     self.subtopic_schema_version))
 
         for subtopic in self.subtopics:
+            if not isinstance(subtopic, Subtopic):
+                raise utils.ValidationError(
+                    'Expected each subtopic to be a Subtopic object, '
+                    'received %s' % subtopic)
             subtopic.validate()
             if subtopic.id >= self.next_subtopic_id:
                 raise utils.ValidationError(
@@ -1139,15 +1210,28 @@ class Topic:
                 'Subtopic url fragments are not unique across '
                 'subtopics in the topic')
 
+        if not isinstance(self.language_code, str):
+            raise utils.ValidationError(
+                'Expected language code to be a string, received %s' %
+                self.language_code)
         if not utils.is_valid_language_code(self.language_code):
             raise utils.ValidationError(
                 'Invalid language code: %s' % self.language_code)
+
+        if not isinstance(self.canonical_story_references, list):
+            raise utils.ValidationError(
+                'Expected canonical story references to be a list, received %s'
+                % self.canonical_story_references)
 
         canonical_story_ids = self.get_canonical_story_ids()
         if len(canonical_story_ids) > len(set(canonical_story_ids)):
             raise utils.ValidationError(
                 'Expected all canonical story ids to be distinct.')
 
+        if not isinstance(self.additional_story_references, list):
+            raise utils.ValidationError(
+                'Expected additional story references to be a list, received %s'
+                % self.additional_story_references)
         additional_story_ids = self.get_additional_story_ids()
         if len(additional_story_ids) > len(set(additional_story_ids)):
             raise utils.ValidationError(
@@ -1163,6 +1247,11 @@ class Topic:
         all_story_references = self.get_all_story_references()
         for reference in all_story_references:
             reference.validate()
+
+        if not isinstance(self.uncategorized_skill_ids, list):
+            raise utils.ValidationError(
+                'Expected uncategorized skill ids to be a list, received %s'
+                % self.uncategorized_skill_ids)
 
     @classmethod
     def create_default_topic(
@@ -1341,6 +1430,8 @@ class Topic:
         Raises:
             ValidationError. Name should be a string.
         """
+        if not isinstance(new_name, str):
+            raise utils.ValidationError('Name should be a string.')
         self.name = new_name
         self.canonical_name = new_name.lower()
 
@@ -1698,6 +1789,16 @@ class Topic:
         Raises:
             Exception. Invalid input.
         """
+        if not isinstance(from_index, int):
+            raise Exception(
+                'Expected from_index value to be a number, '
+                'received %s' % from_index)
+
+        if not isinstance(to_index, int):
+            raise Exception(
+                'Expected to_index value to be a number, '
+                'received %s' % to_index)
+
         if from_index == to_index:
             raise Exception(
                 'Expected from_index and to_index values to be different.')
@@ -1732,6 +1833,16 @@ class Topic:
         Raises:
             Exception. Invalid input.
         """
+        if not isinstance(from_index, int):
+            raise Exception(
+                'Expected from_index value to be a number, '
+                'received %s' % from_index)
+
+        if not isinstance(to_index, int):
+            raise Exception(
+                'Expected to_index value to be a number, '
+                'received %s' % to_index)
+
         if from_index == to_index:
             raise Exception(
                 'Expected from_index and to_index values to be different.')
@@ -1955,8 +2066,15 @@ class TopicSummary:
                 are not valid.
         """
         self.require_valid_url_fragment(self.url_fragment)
+        if not isinstance(self.name, str):
+            raise utils.ValidationError('Name should be a string.')
         if self.name == '':
             raise utils.ValidationError('Name field should not be empty')
+
+        if not isinstance(self.description, str):
+            raise utils.ValidationError(
+                'Expected description to be a string, received %s'
+                % self.description)
 
         utils.require_valid_thumbnail_filename(self.thumbnail_filename)
         if (
@@ -1973,28 +2091,54 @@ class TopicSummary:
             raise utils.ValidationError(
                 'Topic thumbnail background color is not specified.')
 
+        if not isinstance(self.canonical_name, str):
+            raise utils.ValidationError('Canonical name should be a string.')
         if self.canonical_name == '':
             raise utils.ValidationError(
                 'Canonical name field should not be empty')
 
+        if not isinstance(self.language_code, str):
+            raise utils.ValidationError(
+                'Expected language code to be a string, received %s' %
+                self.language_code)
         if not utils.is_valid_language_code(self.language_code):
             raise utils.ValidationError(
                 'Invalid language code: %s' % self.language_code)
+
+        if not isinstance(self.canonical_story_count, int):
+            raise utils.ValidationError(
+                'Expected canonical story count to be an integer, '
+                'received \'%s\'' % self.canonical_story_count)
 
         if self.canonical_story_count < 0:
             raise utils.ValidationError(
                 'Expected canonical_story_count to be non-negative, '
                 'received \'%s\'' % self.canonical_story_count)
 
+        if not isinstance(self.additional_story_count, int):
+            raise utils.ValidationError(
+                'Expected additional story count to be an integer, '
+                'received \'%s\'' % self.additional_story_count)
+
         if self.additional_story_count < 0:
             raise utils.ValidationError(
                 'Expected additional_story_count to be non-negative, '
                 'received \'%s\'' % self.additional_story_count)
 
+        if not isinstance(self.uncategorized_skill_count, int):
+            raise utils.ValidationError(
+                'Expected uncategorized skill count to be an integer, '
+                'received \'%s\'' % self.uncategorized_skill_count)
+
         if self.uncategorized_skill_count < 0:
             raise utils.ValidationError(
                 'Expected uncategorized_skill_count to be non-negative, '
                 'received \'%s\'' % self.uncategorized_skill_count)
+
+        if not isinstance(self.total_skill_count, int):
+            raise utils.ValidationError(
+                'Expected total skill count to be an integer, received \'%s\''
+                % self.total_skill_count)
 
         if self.total_skill_count < 0:
             raise utils.ValidationError(
@@ -2007,10 +2151,20 @@ class TopicSummary:
                 'uncategorized_skill_count %s, received \'%s\'' % (
                     self.uncategorized_skill_count, self.total_skill_count))
 
+        if not isinstance(self.total_published_node_count, int):
+            raise utils.ValidationError(
+                'Expected total published node count to be an integer, '
+                'received \'%s\'' % self.total_published_node_count)
+
         if self.total_published_node_count < 0:
             raise utils.ValidationError(
                 'Expected total_published_node_count to be non-negative, '
                 'received \'%s\'' % self.total_published_node_count)
+
+        if not isinstance(self.subtopic_count, int):
+            raise utils.ValidationError(
+                'Expected subtopic count to be an integer, received \'%s\''
+                % self.subtopic_count)
 
         if self.subtopic_count < 0:
             raise utils.ValidationError(
