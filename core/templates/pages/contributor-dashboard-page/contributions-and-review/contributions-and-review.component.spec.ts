@@ -909,6 +909,14 @@ describe('Contributions and review component', function() {
 
       expect(ctrl.dropdownShown).toBe(false);
     });
+
+    it('should unbind event listener when onDestroy is called', function() {
+      const unbindSpy = spyOn($.fn, 'off');
+
+      ctrl.$onDestroy();
+
+      expect(unbindSpy).toHaveBeenCalled();
+    });
   });
 
   describe('when user is allowed to review questions and ' +
