@@ -16,7 +16,7 @@
  * @fileoverview Controller for the main tab of the skill editor.
  */
 
-import { SavePendingChangesModalComponent } from '../modal-templates/save-pending-changes-modal.component';
+import { SavePendingChangesModalComponent } from 'components/save-pending-changes/save-pending-changes-modal.component';
 
 require('services/stateful/focus-manager.service.ts');
 require(
@@ -39,6 +39,7 @@ require('domain/utilities/url-interpolation.service.ts');
 require('pages/skill-editor-page/services/question-creation.service.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 require('services/ngb-modal.service.ts');
+
 angular.module('oppia').directive('skillEditorMainTab', [
   'UrlInterpolationService',
   function(UrlInterpolationService) {
@@ -59,6 +60,7 @@ angular.module('oppia').directive('skillEditorMainTab', [
             SkillEditorRoutingService, SkillEditorStateService,
             UndoRedoService) {
           var ctrl = this;
+
           $scope.createQuestion = function() {
             // This check is needed because if a skill has unsaved changes to
             // misconceptions, then these will be reflected in the questions
@@ -66,9 +68,16 @@ angular.module('oppia').directive('skillEditorMainTab', [
             // discarded, the misconceptions won't be saved, but there will be
             // some questions with these now non-existent misconceptions.
             if (UndoRedoService.getChangeCount() > 0) {
-              NgbModal.open(SavePendingChangesModalComponent, {
-                backdrop: true,
-              }).result.then(null, function() {
+              const modalRef = NgbModal.open(
+                SavePendingChangesModalComponent, {
+                  backdrop: true
+                });
+
+              modalRef.componentInstance.body = (
+                'Please save all pending ' +
+                'changes before viewing the questions list.');
+
+              modalRef.result.then(null, function() {
                 // Note to developers:
                 // This callback is triggered when the Cancel button is clicked.
                 // No further action is needed.
