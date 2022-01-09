@@ -21,6 +21,8 @@ import 'zone.js';
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { DynamicContentModule } from 'components/angular-html-bind/dynamic-content.module';
+import { MaterialModule } from 'modules/material.module';
+import { FormsModule } from '@angular/forms';
 import { ShortResponseItemSelectionInputComponent } from './directives/oppia-short-response-item-selection-input.component';
 import { ResponseItemSelectionInput } from './directives/oppia-response-item-selection-input.component';
 import { InteractiveItemSelectionInputComponent } from './directives/oppia-interactive-item-selection-input.component';
@@ -30,7 +32,9 @@ import { TranslateModule } from '@ngx-translate/core';
   imports: [
     CommonModule,
     DynamicContentModule,
-    TranslateModule
+    TranslateModule,
+    MaterialModule,
+    FormsModule,
   ],
   declarations: [
     ShortResponseItemSelectionInputComponent,
