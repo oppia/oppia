@@ -52,7 +52,7 @@ describe('PlaythroughService', () => {
 
   const recordStateTransitions = (stateNames: string[]) => {
     for (let i = 0; i < stateNames.length - 1; ++i) {
-      playthroughService!.recordAnswerSubmitAction(
+      playthroughService.recordAnswerSubmitAction(
         stateNames[i], stateNames[i + 1],
         'TextInput', 'Hello', 'Correct', 30);
     }
@@ -112,7 +112,7 @@ describe('PlaythroughService', () => {
     describe('Managing playthroughs', () => {
       it('should record actions', () => {
         const storePlaythroughSpy = spyOnStorePlaythrough(playthrough => {
-          expect(playthrough!.actions).toEqual([
+          expect(playthrough.actions).toEqual([
             learnerActionObjectFactory.createNewExplorationStartAction({
               state_name: {value: 'A'},
             }),
@@ -143,8 +143,8 @@ describe('PlaythroughService', () => {
 
       it('should ignore extraneous actions', () => {
         const storePlaythroughSpy = spyOnStorePlaythrough(playthrough => {
-          expect(playthrough!.actions).toEqual([
-            learnerActionObjectFactory!.createNewExplorationStartAction({
+          expect(playthrough.actions).toEqual([
+            learnerActionObjectFactory.createNewExplorationStartAction({
               state_name: {value: 'A'},
             }),
             learnerActionObjectFactory!.createNewAnswerSubmitAction({
@@ -155,7 +155,7 @@ describe('PlaythroughService', () => {
               feedback: {value: 'Wrong!'},
               time_spent_state_in_msecs: {value: 30000},
             }),
-            learnerActionObjectFactory!.createNewExplorationQuitAction({
+            learnerActionObjectFactory.createNewExplorationQuitAction({
               state_name: {value: 'B'},
               time_spent_in_state_in_msecs: {value: 40000},
             }),
@@ -219,7 +219,7 @@ describe('PlaythroughService', () => {
 
       it('should identify multiple incorrect submissions', () => {
         const storePlaythroughSpy = spyOnStorePlaythrough(playthrough => {
-          expect(playthrough!.issueType).toEqual('MultipleIncorrectSubmissions');
+          expect(playthrough.issueType).toEqual('MultipleIncorrectSubmissions');
         });
 
         mockTimedExplorationDurationInSecs(400);
@@ -246,8 +246,8 @@ describe('PlaythroughService', () => {
 
       it('should identify cyclic state transitions', () => {
         const storePlaythroughSpy = spyOnStorePlaythrough(playthrough => {
-          expect(playthrough!.issueType).toEqual('CyclicStateTransitions');
-          expect(playthrough!.issueCustomizationArgs).toEqual({
+          expect(playthrough.issueType).toEqual('CyclicStateTransitions');
+          expect(playthrough.issueCustomizationArgs).toEqual({
             state_names: {value: ['A', 'B', 'C', 'A']},
           });
         });
@@ -263,8 +263,8 @@ describe('PlaythroughService', () => {
 
       it('should identify early quits', () => {
         const storePlaythroughSpy = spyOnStorePlaythrough(playthrough => {
-          expect(playthrough!.issueType).toEqual('EarlyQuit');
-          expect(playthrough!.issueCustomizationArgs).toEqual({
+          expect(playthrough.issueType).toEqual('EarlyQuit');
+          expect(playthrough.issueCustomizationArgs).toEqual({
             state_name: {value: 'A'},
             time_spent_in_exp_in_msecs: {value: 60000},
           });
@@ -320,8 +320,8 @@ describe('PlaythroughService', () => {
         // For this test, we check when the cyclic portion appears at the start
         // (head) of the playthrough.
         const storePlaythroughSpy = spyOnStorePlaythrough(playthrough => {
-          expect(playthrough!.issueType).toEqual('CyclicStateTransitions');
-          expect(playthrough!.issueCustomizationArgs).toEqual({
+          expect(playthrough.issueType).toEqual('CyclicStateTransitions');
+          expect(playthrough.issueCustomizationArgs).toEqual({
             state_names: {value: ['A', 'B', 'C', 'A']},
           });
         });
@@ -336,8 +336,8 @@ describe('PlaythroughService', () => {
 
       it('should identify cycle within an otherwise linear path', () => {
         const storePlaythroughSpy = spyOnStorePlaythrough(playthrough => {
-          expect(playthrough!.issueType).toEqual('CyclicStateTransitions');
-          expect(playthrough!.issueCustomizationArgs).toEqual({
+          expect(playthrough.issueType).toEqual('CyclicStateTransitions');
+          expect(playthrough.issueCustomizationArgs).toEqual({
             state_names: {value: ['C', 'D', 'E', 'C']},
           });
         });
@@ -354,8 +354,8 @@ describe('PlaythroughService', () => {
 
       it('should identify cycle with nested 1-cycles', () => {
         const storePlaythroughSpy = spyOnStorePlaythrough(playthrough => {
-          expect(playthrough!.issueType).toEqual('CyclicStateTransitions');
-          expect(playthrough!.issueCustomizationArgs).toEqual({
+          expect(playthrough.issueType).toEqual('CyclicStateTransitions');
+          expect(playthrough.issueCustomizationArgs).toEqual({
             state_names: {value: ['A', 'B', 'C', 'A']},
           });
         });
@@ -373,8 +373,8 @@ describe('PlaythroughService', () => {
       it('should not group rotations of cycles together', () => {
         const storePlaythroughSpy = spyOnStorePlaythrough(playthrough => {
           expect(playthrough).not.toBeNull();
-          expect(playthrough!.issueType).toEqual('CyclicStateTransitions');
-          expect(playthrough!.issueCustomizationArgs).toEqual({
+          expect(playthrough.issueType).toEqual('CyclicStateTransitions');
+          expect(playthrough.issueCustomizationArgs).toEqual({
             state_names: {value: ['C', 'A']},
           });
         });
@@ -394,8 +394,8 @@ describe('PlaythroughService', () => {
       it('should fail to find a large cycle if a smaller one is nested', () => {
         const storePlaythroughSpy = spyOnStorePlaythrough(playthrough => {
           expect(playthrough).not.toBeNull();
-          expect(playthrough!.issueType).toBeNull();
-          expect(playthrough!.issueCustomizationArgs).toBeNull();
+          expect(playthrough.issueType).toBeNull();
+          expect(playthrough.issueCustomizationArgs).toBeNull();
         });
 
         playthroughService.recordExplorationStartAction('A');
@@ -411,8 +411,8 @@ describe('PlaythroughService', () => {
         'number of occurrences', () => {
         const storePlaythroughSpy = spyOnStorePlaythrough(playthrough => {
           expect(playthrough).not.toBeNull();
-          expect(playthrough!.issueType).toEqual('CyclicStateTransitions');
-          expect(playthrough!.issueCustomizationArgs).toEqual({
+          expect(playthrough.issueType).toEqual('CyclicStateTransitions');
+          expect(playthrough.issueCustomizationArgs).toEqual({
             state_names: {value: ['S', 'T', 'S']},
           });
         });
@@ -448,8 +448,8 @@ describe('PlaythroughService', () => {
         'enough times', () => {
         const storePlaythroughSpy = spyOnStorePlaythrough(playthrough => {
           expect(playthrough).not.toBeNull();
-          expect(playthrough!.issueType).toBeNull();
-          expect(playthrough!.issueCustomizationArgs).toBeNull();
+          expect(playthrough.issueType).toBeNull();
+          expect(playthrough.issueCustomizationArgs).toBeNull();
         });
 
         playthroughService.recordExplorationStartAction('A');
@@ -467,7 +467,7 @@ describe('PlaythroughService', () => {
       it('should prioritize multiple incorrect submissions over cyclic state ' +
         'transitions and early quit', () => {
         const storePlaythroughSpy = spyOnStorePlaythrough(playthrough => {
-          expect(playthrough!.issueType).toEqual('MultipleIncorrectSubmissions');
+          expect(playthrough.issueType).toEqual('MultipleIncorrectSubmissions');
         });
 
         mockTimedExplorationDurationInSecs(50);
@@ -483,7 +483,7 @@ describe('PlaythroughService', () => {
       it('should prioritize multiple incorrect submissions over early quit',
         () => {
           const storePlaythroughSpy = spyOnStorePlaythrough(playthrough => {
-            expect(playthrough!.issueType)
+            expect(playthrough.issueType)
               .toEqual('MultipleIncorrectSubmissions');
           });
 
@@ -498,7 +498,7 @@ describe('PlaythroughService', () => {
 
       it('should prioritize cyclic state transitions over early quit', () => {
         const storePlaythroughSpy = spyOnStorePlaythrough(playthrough => {
-          expect(playthrough!.issueType).toEqual('CyclicStateTransitions');
+          expect(playthrough.issueType).toEqual('CyclicStateTransitions');
         });
 
         mockTimedExplorationDurationInSecs(50);
