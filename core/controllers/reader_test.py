@@ -2439,6 +2439,21 @@ class ExplorationEmbedPageTests(test_utils.GenericTestBase):
 
         self.logout()
 
+    def test_handler_raises_error_with_no_collection_id(self):
+        self.login(self.OWNER_EMAIL)
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.owner_id)
+
+        self.get_html_response(
+            '%s/%s' % (feconf.EXPLORATION_URL_EMBED_PREFIX, self.EXP_ID),
+            params={
+                'v': exploration.version,
+                'collection_id': None
+            }, expected_status_int=404
+        )
+
+        self.logout()
+
     def test_handler_raises_error_with_invalid_version(self):
         self.login(self.OWNER_EMAIL)
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
