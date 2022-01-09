@@ -96,10 +96,16 @@ angular.module('oppia').directive('skillEditorMainTab', [
             if (!$scope.topicName && $scope.assignedSkillTopicData) {
               $scope.topicName = Object.keys($scope.assignedSkillTopicData)[0];
               $scope.changeSelectedTopic($scope.topicName);
+              // TODO(#8521): Remove the use of $rootScope.$applyAsync()
+              // once the directive is migrated to angular.
+              $rootScope.$applyAsync();
               return $scope.assignedSkillTopicData;
             }
             $scope.assignedSkillTopicData = (
               SkillEditorStateService.getAssignedSkillTopicData());
+            // TODO(#8521): Remove the use of $rootScope.$applyAsync()
+            // once the directive is migrated to angular.
+            $rootScope.$applyAsync();
             return $scope.assignedSkillTopicData;
           };
 
@@ -112,9 +118,6 @@ angular.module('oppia').directive('skillEditorMainTab', [
           $scope.changeSelectedTopic = function(topicName) {
             $scope.subtopicName = (
               $scope.assignedSkillTopicData[topicName]);
-            // TODO(#8521): Remove the use of $rootScope.$applyAsync()
-            // once the directive is migrated to angular.
-            $rootScope.$applyAsync();
           };
 
           $scope.hasLoadedSkill = function() {
