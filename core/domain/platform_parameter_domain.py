@@ -763,7 +763,8 @@ class PlatformParameter:
                 if self._feature_stage == FeatureStages.DEV.value:
                     if (
                             ServerModes.TEST.value in server_modes or
-                            ServerModes.PROD.value in server_modes):
+                            ServerModes.PROD.value in server_modes
+                    ):
                         raise utils.ValidationError(
                             'Feature in dev stage cannot be enabled in test or'
                             ' production environments.')
