@@ -5,11 +5,11 @@
         <strong class="heading-text">Misconceptions</strong>
         <i class="fa fa-caret-down"
            *ngIf="!misconceptionsListIsShown"
-           aria-hidden="true">
+           [attr.aria-hidden]="true">
         </i>
         <i class="fa fa-caret-up"
            *ngIf="misconceptionsListIsShown"
-           aria-hidden="true">
+           [attr.aria-hidden]="true">
         </i>
       </div>
       <div *ngIf="misconceptionsListIsShown" class="oppia-mobile-collapsible-card-content">

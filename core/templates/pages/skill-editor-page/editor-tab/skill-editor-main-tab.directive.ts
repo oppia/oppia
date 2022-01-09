@@ -112,13 +112,13 @@ angular.module('oppia').directive('skillEditorMainTab', [
           $scope.changeSelectedTopic = function(topicName) {
             $scope.subtopicName = (
               $scope.assignedSkillTopicData[topicName]);
+            // TODO(#8521): Remove the use of $rootScope.$applyAsync()
+            // once the directive is migrated to angular.
+            $rootScope.$applyAsync();
           };
 
           $scope.hasLoadedSkill = function() {
             $scope.skill = SkillEditorStateService.getSkill();
-            // TODO(#8521): Remove the use of $rootScope.$applyAsync()
-            // once the directive is migrated to angular.
-            $rootScope.$applyAsync();
             return SkillEditorStateService.hasLoadedSkill();
           };
 
