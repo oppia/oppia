@@ -50,8 +50,7 @@
         </div>
         <div class="mt-3"
              *ngIf="questionsStatusCallIsComplete && !questionsAreAvailable && isAtLeastOneSubtopicSelected()">
-          <em class="text-danger">
-            There are no questions created yet for the selected subtopic(s).
+          <em class="text-danger" [innerHTML]="'I18N_TOPIC_VIEWER_NO_QUESTION_WARNING' | translate">
           </em>
         </div>
       </mat-card-actions>
