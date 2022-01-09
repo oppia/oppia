@@ -93,15 +93,11 @@ export class Exploration {
 
   // ---- Instance methods ----
   isStateTerminal(stateName: string): boolean {
-    if (stateName) {
-      let interactionId = this.getInteractionId(stateName);
-      if (interactionId) {
-        return (
-          INTERACTION_SPECS[interactionId as InteractionSpecsKey].is_terminal
-        );
-      }
-    }
-    return false;
+    let interactionId = this.getInteractionId(stateName);
+    return (
+      Boolean(interactionId) && INTERACTION_SPECS[
+        interactionId as InteractionSpecsKey].is_terminal
+    );
   }
 
   getAuthorRecommendedExpIds(stateName: string): string[] | null {
