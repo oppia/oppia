@@ -16,6 +16,13 @@
  * @fileoverview Controller for the main topic editor.
  */
 
+import { SavePendingChangesModalComponent } from 'components/save-pending-changes/save-pending-changes-modal.component';
+import { Subscription } from 'rxjs';
+
+// TODO(#9186): Change variable name to 'constants' once this file
+// is migrated to Angular.
+import topicConstants from 'assets/constants';
+
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
@@ -51,12 +58,7 @@ require(
   'domain/topics_and_skills_dashboard/' +
   'topics-and-skills-dashboard-backend-api.service.ts');
 require('base-components/loading-message.component.ts');
-
-import { Subscription } from 'rxjs';
-
-// TODO(#9186): Change variable name to 'constants' once this file
-// is migrated to Angular.
-import topicConstants from 'assets/constants';
+require('services/ngb-modal.service.ts');
 
 angular.module('oppia').directive('topicEditorTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -68,7 +70,7 @@ angular.module('oppia').directive('topicEditorTab', [
       controller: [
         '$rootScope', '$scope', '$uibModal', 'ContextService',
         'EntityCreationService', 'FocusManagerService',
-        'ImageUploadHelperService',
+        'ImageUploadHelperService', 'NgbModal',
         'PageTitleService', 'StoryCreationService',
         'TopicEditorRoutingService', 'TopicEditorStateService',
         'TopicUpdateService', 'TopicsAndSkillsDashboardBackendApiService',
@@ -81,7 +83,7 @@ angular.module('oppia').directive('topicEditorTab', [
         function(
             $rootScope, $scope, $uibModal, ContextService,
             EntityCreationService, FocusManagerService,
-            ImageUploadHelperService,
+            ImageUploadHelperService, NgbModal,
             PageTitleService, StoryCreationService,
             TopicEditorRoutingService, TopicEditorStateService,
             TopicUpdateService, TopicsAndSkillsDashboardBackendApiService,
@@ -203,13 +205,16 @@ angular.module('oppia').directive('topicEditorTab', [
 
           $scope.createCanonicalStory = function() {
             if (UndoRedoService.getChangeCount() > 0) {
-              $uibModal.open({
-                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/pages/topic-editor-page/modal-templates/' +
-                  'topic-save-pending-changes-modal.template.html'),
-                backdrop: true,
-                controller: 'ConfirmOrCancelModalController'
-              }).result.then(function() {}, function() {
+              const modalRef = NgbModal.open(
+                SavePendingChangesModalComponent, {
+                  backdrop: true
+                });
+
+              modalRef.componentInstance.body = (
+                'Please save all pending changes ' +
+                'before exiting the topic editor.');
+
+              modalRef.result.then(function() {}, function() {
                 // Note to developers:
                 // This callback is triggered when the Cancel button is clicked.
                 // No further action is needed.
@@ -221,13 +226,16 @@ angular.module('oppia').directive('topicEditorTab', [
 
           $scope.createSkill = function() {
             if (UndoRedoService.getChangeCount() > 0) {
-              $uibModal.open({
-                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/pages/topic-editor-page/modal-templates/' +
-                    'topic-save-pending-changes-modal.template.html'),
-                backdrop: true,
-                controller: 'ConfirmOrCancelModalController'
-              }).result.then(function() {}, function() {
+              const modalRef = NgbModal.open(
+                SavePendingChangesModalComponent, {
+                  backdrop: true
+                });
+
+              modalRef.componentInstance.body = (
+                'Please save all pending changes ' +
+                'before exiting the topic editor.');
+
+              modalRef.result.then(function() {}, function() {
                 // Note to developers:
                 // This callback is triggered when the Cancel button is clicked.
                 // No further action is needed.
