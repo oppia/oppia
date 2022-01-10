@@ -3776,12 +3776,21 @@ oppia-noninteractive-link {
   padding: 5px 8px 4px 8px;
 }
 
+@media (max-width: 610px) {
+  .oppia-activity-summary-tile.small-width .metrics li .far {
+    margin-top: 10px;
+  }
+}
+
 @media (max-width: 420px) {
   .oppia-activity-summary-tile.small-width .metrics li {
     font-size: 0.6em;
   }
   .oppia-activity-summary-tile.small-width .recently-updated {
     display: none;
+  }
+  .oppia-activity-summary-tile.small-width .metrics li .fas {
+    margin-bottom: 4px;
   }
 }
 
@@ -4646,14 +4655,13 @@ div.oppia-issues-learner-action {
   width: 100%;
 }
 
+/* Increase no. of columns for cards on contributors profile page */
 .mat-card-content.oppia-profile-portfolio-container {
   background-color: transparent;
-  /* Increase no. of columns on contributors profile page */
   display: grid;
   grid-template-columns: max-content max-content max-content;
 }
 
-/* Increase no. of columns on contributors profile page */
 @media (max-width: 1080px) {
   .mat-card-content.oppia-profile-portfolio-container {
     grid-template-columns: max-content max-content;
