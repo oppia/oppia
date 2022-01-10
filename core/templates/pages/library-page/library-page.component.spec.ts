@@ -407,6 +407,13 @@ describe('Library Page Component', () => {
     // Other button's text should remain unchanged.
     expect(componentInstance.mobileLibraryGroupsProperties[1].buttonText)
       .toBe('Collapse Section');
+
+    componentInstance.toggleButtonText(1);
+
+    expect(componentInstance.mobileLibraryGroupsProperties[1].buttonText)
+      .toBe('See More');
+    expect(componentInstance.mobileLibraryGroupsProperties[0].buttonText)
+      .toBe('Collapse Section');
   });
 
   it('should toggle the corresponding container\'s max-height' +
