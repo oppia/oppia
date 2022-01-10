@@ -335,16 +335,13 @@ angular.module('oppia').component('contributionsAndReview', {
         if (ctrl.activeTabType === ctrl.TAB_TYPE_REVIEWS) {
           if (ctrl.activeSuggestionType === SUGGESTION_TYPE_QUESTION) {
             return 'Review Questions';
-          } else {
-            return 'Review Translations';
           }
-        } else {
-          if (ctrl.activeSuggestionType === SUGGESTION_TYPE_QUESTION) {
-            return 'Questions';
-          } else {
-            return 'Translations';
-          }
+          return 'Review Translations';
         }
+        if (ctrl.activeSuggestionType === SUGGESTION_TYPE_QUESTION) {
+          return 'Questions';
+        }
+        return 'Translations';
       };
 
       ctrl.switchToTab = function(tabType, suggestionType) {
