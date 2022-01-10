@@ -193,7 +193,6 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     RatingDisplayComponent,
     ResponseHeaderComponent,
     RubricsEditorComponent,
-    SavePendingChangesModalComponent,
     ScoreRingComponent,
     SelectSkillModalComponent,
     SearchBarComponent,
@@ -222,6 +221,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     SortByPipe,
     LearnerDashboardIconsComponent,
     PreviewThumbnailComponent,
+    SavePendingChangesModalComponent,
     AddHintModalComponent
   ],
 
@@ -323,6 +323,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     DeleteHintModalComponent,
     DeleteInteractionModalComponent,
     DeleteLastHintModalComponent,
+    DeleteSolutionModalComponent,
     DisplaySolutionModalComponent,
     DisplaySolutionInterstititalModalComponent,
     DisplayHintModalComponent,
@@ -333,12 +334,14 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     PracticeTabComponent,
     CollectionSummaryTileComponent,
     HintAndSolutionButtonsComponent,
+    HintEditorComponent,
     InputResponsePairComponent,
     LazyLoadingComponent,
     FilterForMatchingSubstringPipe,
     ProfileLinkImageComponent,
     PreviewThumbnailComponent,
     RatingDisplayComponent,
+    ResponseHeaderComponent,
     RubricsEditorComponent,
     FilterForMatchingSubstringPipe,
     OnScreenKeyboardComponent,
@@ -346,6 +349,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     OutcomeFeedbackEditorComponent,
     ProgressNavComponent,
     SearchBarComponent,
+    StateHintsEditorComponent,
     QuestionDifficultySelectorComponent,
     ScoreRingComponent,
     StateSkillEditorComponent,
@@ -372,10 +376,6 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     SortByPipe,
     SavePendingChangesModalComponent,
     LearnerDashboardIconsComponent,
-    DeleteSolutionModalComponent,
-    HintEditorComponent,
-    ResponseHeaderComponent,
-    StateHintsEditorComponent
   ],
 })
 
