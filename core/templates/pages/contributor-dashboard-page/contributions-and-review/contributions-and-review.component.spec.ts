@@ -879,11 +879,9 @@ describe('Contributions and review component', function() {
           return true;
         }
       };
-
       const clickEvent = {
         target: {}
       };
-
       const querySelectorSpy = spyOn(document, 'querySelector').and
       // This throws "Argument of type '{ contains: () => boolean; }' is not
       // assignable to parameter of type 'Element'. Type '{ contains:
@@ -893,12 +891,9 @@ describe('Contributions and review component', function() {
       // provided in the element object are required for testing.
       // @ts-expect-error
         .returnValue(element);
-
-
       ctrl.dropdownShown = true;
 
       ctrl.closeDropdownWhenClickedOutside(clickEvent);
-
       expect(querySelectorSpy).toHaveBeenCalled();
       expect(ctrl.dropdownShown).toBe(true);
 
@@ -906,7 +901,6 @@ describe('Contributions and review component', function() {
       ctrl.dropdownShown = true;
 
       ctrl.closeDropdownWhenClickedOutside(clickEvent);
-
       expect(ctrl.dropdownShown).toBe(false);
     });
 

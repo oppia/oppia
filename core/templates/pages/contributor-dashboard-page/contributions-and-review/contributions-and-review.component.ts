@@ -381,14 +381,12 @@ angular.module('oppia').component('contributionsAndReview', {
       ctrl.closeDropdownWhenClickedOutside = function(clickEvent) {
         const dropdown = document
           .querySelector('.oppia-contributions-dropdown-container');
-
         if (!dropdown) {
           return;
         }
 
         const clickOccurredWithinDropdown =
           dropdown.contains(clickEvent.target);
-
         if (clickOccurredWithinDropdown) {
           return;
         }
