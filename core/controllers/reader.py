@@ -46,6 +46,10 @@ from core.domain import stats_services
 from core.domain import story_fetchers
 from core.domain import summary_services
 from core.domain import user_services
+from core.domain.exp_domain import (
+    EXPLICIT_CLASSIFICATION, TRAINING_DATA_CLASSIFICATION,
+    STATISTICAL_CLASSIFICATION, DEFAULT_OUTCOME_CLASSIFICATION
+    )
 
 MAX_SYSTEM_RECOMMENDATIONS = 4
 
@@ -458,11 +462,7 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
             },
             'answer': {
                 'schema': {
-                    'type': 'basestring',
-                    'validators': [{
-                        'id': 'has_length_at_least',
-                        'min_value': 1
-                    }]
+                    'type': 'basestring'
                 }
             },
             'client_time_spent_in_secs': {
@@ -497,7 +497,11 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
             },
             'classification_categorization': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'choices': [
+                        EXPLICIT_CLASSIFICATION, TRAINING_DATA_CLASSIFICATION,
+                        STATISTICAL_CLASSIFICATION, DEFAULT_OUTCOME_CLASSIFICATION
+                    ]
                 }
             }
         }
