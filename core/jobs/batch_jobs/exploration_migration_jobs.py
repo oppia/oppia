@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Jobs for adding proto_size_in_bytes attribute to exploration."""
+"""Jobs for adding android_proto_size_in_bytes attribute to exploration."""
 
 from __future__ import annotations
 

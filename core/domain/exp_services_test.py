@@ -5591,7 +5591,7 @@ title: Old Title
     def test_update_exploration_proto_size(self):
         exploration = (
             exp_domain.Exploration.create_default_exploration(self.NEW_EXP_ID))
-        self.assertEqual(exploration.proto_size_in_bytes, 58)
+        self.assertEqual(exploration.android_proto_size_in_bytes, 58)
         exp_services.update_exploration(
             self.albert_id, self.NEW_EXP_ID, [
                 exp_domain.ExplorationChange({
@@ -5702,7 +5702,7 @@ title: Old Title
 
         updated_exploration = exp_fetchers.get_exploration_by_id(
             self.NEW_EXP_ID)
-        self.assertEqual(updated_exploration.proto_size_in_bytes, 308)
+        self.assertEqual(updated_exploration.android_proto_size_in_bytes, 308)
 
     def test_update_exploration_param_changes(self):
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)

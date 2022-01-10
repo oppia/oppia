@@ -272,7 +272,7 @@ class ExplorationChange(change_domain.BaseChange):
         'title', 'category', 'objective', 'language_code', 'tags',
         'blurb', 'author_notes', 'param_specs', 'param_changes',
         'init_state_name', 'auto_tts_enabled', 'correctness_feedback_enabled',
-        'proto_size_in_bytes')
+        'android_proto_size_in_bytes')
 
     ALLOWED_COMMANDS = [{
         'name': CMD_CREATE_NEW,
@@ -552,8 +552,6 @@ class VersionedExplorationInteractionIdsMapping:
 class Exploration:
     """Domain object for an Oppia exploration."""
 
-    __initialized = False
-
     def __init__(
             self, exploration_id, title, category, objective,
             language_code, tags, blurb, author_notes,
@@ -621,10 +619,9 @@ class Exploration:
         self.last_updated = last_updated
         self.auto_tts_enabled = auto_tts_enabled
         self.correctness_feedback_enabled = correctness_feedback_enabled
-        self.proto_size_in_bytes = None
+        self.android_proto_size_in_bytes = None
         self.proto_size_is_stale = True
         self._cached_android_proto_size_in_bytes = 0
-        __initialized = True
 
     @classmethod
     def create_default_exploration(
@@ -784,7 +781,8 @@ class Exploration:
         exploration.created_on = exploration_created_on
         exploration.last_updated = exploration_last_updated
 
-        exploration.proto_size_in_bytes = exploration.is_stale
+        exploration.android_proto_size_in_bytes = (
+            exploration_dict['android_proto_size_in_bytes'])
 
         return exploration
 
@@ -932,15 +930,15 @@ class Exploration:
                 'Expected correctness_feedback_enabled to be a bool, received '
                 '%s' % self.correctness_feedback_enabled)
 
-        if not isinstance(self.proto_size_in_bytes, int):
+        if not isinstance(self.android_proto_size_in_bytes, int):
             raise utils.ValidationError(
                 'Expected proto size to be an int, received %s'
-                % self.proto_size_in_bytes)
+                % self.android_proto_size_in_bytes)
 
-        if self.proto_size_in_bytes <= 0:
+        if self.android_proto_size_in_bytes <= 0:
             raise utils.ValidationError(
                 'Expected proto size to be a positive integer, received %s'
-                % self.proto_size_in_bytes)
+                % self.android_proto_size_in_bytes)
 
         for param_name in self.param_specs:
             if not isinstance(param_name, str):
@@ -1331,15 +1329,12 @@ class Exploration:
 
         return self._cached_android_proto_size_in_bytes
 
-    def __setattr__(self, aa, new_value):
-        if self.__initialized:
-            if (aa != 'proto_size_in_bytes' and
-                aa != 'proto_size_is_stale' and
-                aa != '_cached_android_proto_size_in_bytes'):
-                self.proto_size_is_stale = True
-                self.proto_size_in_bytes = self.is_stale
+    def __setattr__(self, attrname, new_value):
+        if attrname == 'proto_size_is_stale' and new_value == True:
+            super(Exploration, self).__setattr__(attrname, new_value)
+            self.android_proto_size_in_bytes = self.is_stale
         else:
-            super(Exploration, self).__setattr__(aa, new_value)
+            super(Exploration, self).__setattr__(attrname, new_value)
 
     def has_state_name(self, state_name):
         """Whether the exploration has a state with the given state name.
@@ -2385,7 +2380,7 @@ class Exploration:
     @classmethod
     def _add_id_and_proto_size_in_bytes_to_dict(
         cls, exploration_dict, exploration_id):
-        """Add id and proto_size_in_bytes to the exploration dict.
+        """Add id and android_proto_size_in_bytes to the exploration dict.
 
         Args:
             exploration_dict: dict. The dict representation of Exploration
@@ -2398,7 +2393,7 @@ class Exploration:
         """
         exploration_dict['id'] = exploration_id
 
-        # If the proto_size_in_bytes of the dict is wrong, it will be
+        # If the android_proto_size_in_bytes of the dict is wrong, it will be
         # overwritten with the correct value calculated from the
         # exploration object.
         exploration = cls(
@@ -2419,9 +2414,11 @@ class Exploration:
             exploration_dict['auto_tts_enabled'],
             exploration_dict['correctness_feedback_enabled'])
 
-        # The constructor calculates the proto_size_in_bytes and adds it to the
-        # domain object. So, we add that value directly to the dict.
-        exploration_dict['proto_size_in_bytes'] = exploration.is_stale
+        # The constructor calculates the android_proto_size_in_bytes
+        # and adds it to the domain object.
+        # So, we add that value directly to the dict.
+        exploration_dict['android_proto_size_in_bytes'] = (
+            exploration.android_proto_size_in_bytes)
 
         return exploration_dict
 
@@ -2434,10 +2431,10 @@ class Exploration:
         exp_dict = self.to_dict()
         exp_dict['schema_version'] = self.CURRENT_EXP_SCHEMA_VERSION
 
-        # The ID and the proto_size_in_bytes are the properties that should not
+        # The ID and the android_proto_size_in_bytes are the properties that should not
         # be stored within the YAML representation.
         del exp_dict['id']
-        del exp_dict['proto_size_in_bytes']
+        del exp_dict['android_proto_size_in_bytes']
 
         return python_utils.yaml_from_dict(exp_dict)
 
@@ -2463,7 +2460,7 @@ class Exploration:
             'tags': self.tags,
             'auto_tts_enabled': self.auto_tts_enabled,
             'correctness_feedback_enabled': self.correctness_feedback_enabled,
-            'proto_size_in_bytes': self.proto_size_in_bytes,
+            'android_proto_size_in_bytes': self.android_proto_size_in_bytes,
             'states': {state_name: state.to_dict()
                        for (state_name, state) in self.states.items()}
         })

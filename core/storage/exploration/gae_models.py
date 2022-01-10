@@ -230,7 +230,7 @@ class ExplorationModel(base_models.VersionedModel):
     correctness_feedback_enabled = datastore_services.BooleanProperty(
         default=False, indexed=True)
     # Size in bytes of Android Proto representation.
-    proto_size_in_bytes = datastore_services.IntegerProperty(
+    android_proto_size_in_bytes = datastore_services.IntegerProperty(
         indexed=True, required=True)
 
     @staticmethod
@@ -263,7 +263,7 @@ class ExplorationModel(base_models.VersionedModel):
             'auto_tts_enabled': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'correctness_feedback_enabled':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'proto_size_in_bytes':
+            'android_proto_size_in_bytes':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
