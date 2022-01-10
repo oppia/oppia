@@ -10,7 +10,8 @@
           cx="150"
           cy="150">
   </circle>
-  <circle class="score-ring-circle"
+  <circle #scoreRing
+          class="score-ring-circle"
           [attr.stroke]="getScoreRingColor()"
           stroke-width="13"
           fill="transparent"
@@ -33,9 +34,7 @@
   .score-ring-circle {
     transform: rotate(-90deg);
     transform-origin: 50% 50%;
-    transition: 0.35s stroke-dashoffset;
-    transition-delay: 2s;
-    transition-duration: 5s;
+    transition-property: stroke-dashoffset;
   }
   @media(max-width: 425px) {
     .score-ring {
