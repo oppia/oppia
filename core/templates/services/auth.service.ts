@@ -28,8 +28,9 @@ import { AppConstants } from 'app.constants';
 import { AuthBackendApiService } from 'services/auth-backend-api.service';
 
 abstract class AuthServiceImpl {
-  abstract getRedirectResultAsync():
-   Promise<firebase.auth.UserCredential | null>;
+  abstract getRedirectResultAsync(): Promise<
+    firebase.auth.UserCredential | null
+  >;
   abstract signInWithRedirectAsync(): Promise<void>;
   abstract signOutAsync(): Promise<void>;
 }

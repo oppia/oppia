@@ -99,21 +99,22 @@ describe('TranslateTextBackendApiService', () => {
 
   describe('suggestTranslatedTextAsync', () => {
     class MockReaderObject {
-    result = 'data:image/png;base64,imageBlob1';
-    onload: () => string;
-    constructor() {
-      this.onload = () => {
-        return 'Fake onload executed';
-      };
-    }
-    readAsDataURL(file: Blob) {
-      this.onload();
-      return 'The file is loaded';
-    }
+      result = 'data:image/png;base64,imageBlob1';
+      onload: () => string;
+      constructor() {
+        this.onload = () => {
+          return 'Fake onload executed';
+        };
+      }
+      readAsDataURL(file: Blob) {
+        this.onload();
+        return 'The file is loaded';
+      }
     }
     let successHandler: jasmine.Spy<jasmine.Func>;
     let failHandler: (error: HttpErrorResponse) => void;
     let imagesData: ImagesData[];
+
     beforeEach(() => {
       successHandler = jasmine.createSpy('success');
       failHandler = jasmine.createSpy('error');
@@ -159,7 +160,8 @@ describe('TranslateTextBackendApiService', () => {
         'contentHtml',
         'translationHtml',
         imagesData,
-        'html').then(successHandler, failHandler);
+        'html'
+      ).then(successHandler, failHandler);
       flushMicrotasks();
       const req = httpTestingController.expectOne(
         '/suggestionhandler/');
@@ -184,7 +186,8 @@ describe('TranslateTextBackendApiService', () => {
         'contentHtml',
         'translationHtml',
         imagesData,
-        'html').then(successHandler, failHandler);
+        'html'
+      ).then(successHandler, failHandler);
       flushMicrotasks();
       const req = httpTestingController.expectOne(
         '/suggestionhandler/');
@@ -197,6 +200,7 @@ describe('TranslateTextBackendApiService', () => {
 
       expect(successHandler).toHaveBeenCalled();
     }));
+
     it('should handle multiple image blobs per filename', fakeAsync(() => {
       imagesData = [{
         filename: 'imageFilename1',
@@ -235,7 +239,8 @@ describe('TranslateTextBackendApiService', () => {
         'contentHtml',
         'translationHtml',
         imagesData,
-        'html').then(successHandler, failHandler);
+        'html'
+      ).then(successHandler, failHandler);
       flushMicrotasks();
       const req = httpTestingController.expectOne(
         '/suggestionhandler/');
@@ -272,7 +277,8 @@ describe('TranslateTextBackendApiService', () => {
         'contentHtml',
         'translationHtml',
         imagesData,
-        'html').then(successHandler, failHandler);
+        'html'
+      ).then(successHandler, failHandler);
       flushMicrotasks();
       const req = httpTestingController.expectOne(
         '/suggestionhandler/');
@@ -298,7 +304,8 @@ describe('TranslateTextBackendApiService', () => {
           'contentHtml',
           'translationHtml',
           imagesData,
-          'html')
+          'html'
+        )
       ).toBeRejectedWithError('No image data found');
     });
 

@@ -42,66 +42,66 @@ interface mergeviewOptions {
   templateUrl: './state-diff-modal.component.html',
 })
 export class StateDiffModalComponent
-  extends ConfirmOrCancelModal implements OnInit {
-    newState: State | null;
-    oldState: State | null;
-    newStateName: string;
-    oldStateName: string;
-    headers: headersAndYamlStrs;
-    yamlStrs: headersAndYamlStrs = {
-      leftPane: '',
-      rightPane: '',
-    };
-    CODEMIRROR_MERGEVIEW_OPTIONS: mergeviewOptions = {
-      lineNumbers: true,
-      readOnly: true,
-      mode: 'yaml',
-      viewportMargin: 100
-    };
+    extends ConfirmOrCancelModal implements OnInit {
+  newState: State | null;
+  oldState: State | null;
+  newStateName: string;
+  oldStateName: string;
+  headers: headersAndYamlStrs;
+  yamlStrs: headersAndYamlStrs = {
+    leftPane: '',
+    rightPane: '',
+  };
+  CODEMIRROR_MERGEVIEW_OPTIONS: mergeviewOptions = {
+    lineNumbers: true,
+    readOnly: true,
+    mode: 'yaml',
+    viewportMargin: 100
+  };
 
-    constructor(
-        private ngbActiveModal: NgbActiveModal,
-        private contextService: ContextService,
-        private urlInterpolationService: UrlInterpolationService,
-        private stateDiffModalBackendApiService:
-        StateDiffModalBackendApiService,
-    ) {
-      super(ngbActiveModal);
+  constructor(
+      private ngbActiveModal: NgbActiveModal,
+      private contextService: ContextService,
+      private urlInterpolationService: UrlInterpolationService,
+      private stateDiffModalBackendApiService:
+      StateDiffModalBackendApiService,
+  ) {
+    super(ngbActiveModal);
+  }
+
+  ngOnInit(): void {
+    const url = this.urlInterpolationService.interpolateUrl(
+      '/createhandler/state_yaml/<exploration_id>', {
+        exploration_id: (
+          this.contextService.getExplorationId())
+      });
+
+    if (this.oldState) {
+      this.stateDiffModalBackendApiService.fetchYaml(
+        this.oldState.toBackendDict(), 50, url).then(response => {
+        this.yamlStrs.leftPane = response.yaml;
+      });
+    } else {
+      // Note: the timeout is needed or the string will be sent
+      // before codemirror has fully loaded and will not be
+      // displayed. This causes issues with the e2e tests.
+      setTimeout(() => {
+        this.yamlStrs.leftPane = '';
+      }, 200);
     }
 
-    ngOnInit(): void {
-      const url = this.urlInterpolationService.interpolateUrl(
-        '/createhandler/state_yaml/<exploration_id>', {
-          exploration_id: (
-            this.contextService.getExplorationId())
-        });
-
-      if (this.oldState) {
-        this.stateDiffModalBackendApiService.fetchYaml(
-          this.oldState.toBackendDict(), 50, url).then(response => {
-          this.yamlStrs.leftPane = response.yaml;
-        });
-      } else {
-        // Note: the timeout is needed or the string will be sent
-        // before codemirror has fully loaded and will not be
-        // displayed. This causes issues with the e2e tests.
-        setTimeout(() => {
-          this.yamlStrs.leftPane = '';
-        }, 200);
-      }
-
-      if (this.newState) {
-        this.stateDiffModalBackendApiService.fetchYaml(
-          this.newState.toBackendDict(), 50, url).then(response => {
-          this.yamlStrs.rightPane = response.yaml;
-        });
-      } else {
-        // Note: the timeout is needed or the string will be sent
-        // before codemirror has fully loaded and will not be
-        // displayed. This causes issues with the e2e tests.
-        setTimeout(() => {
-          this.yamlStrs.rightPane = '';
-        }, 200);
-      }
+    if (this.newState) {
+      this.stateDiffModalBackendApiService.fetchYaml(
+        this.newState.toBackendDict(), 50, url).then(response => {
+        this.yamlStrs.rightPane = response.yaml;
+      });
+    } else {
+      // Note: the timeout is needed or the string will be sent
+      // before codemirror has fully loaded and will not be
+      // displayed. This causes issues with the e2e tests.
+      setTimeout(() => {
+        this.yamlStrs.rightPane = '';
+      }, 200);
     }
+  }
 }

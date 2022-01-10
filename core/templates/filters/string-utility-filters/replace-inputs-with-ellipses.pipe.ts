@@ -21,9 +21,9 @@ import { Pipe, PipeTransform } from '@angular/core';
 // Filter that replaces all {{...}} in a string with '...'.
 @Pipe({name: 'replaceInputsWithEllipses'})
 export class ReplaceInputsWithEllipsesPipe implements PipeTransform {
-    pattern = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/g;
+  pattern = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/g;
 
-    transform(input: string): string {
-      return input ? input.replace(this.pattern, '...') : '';
-    }
+  transform(input: string): string {
+    return input ? input.replace(this.pattern, '...') : '';
+  }
 }

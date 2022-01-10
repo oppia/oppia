@@ -84,7 +84,7 @@ export class HintsAndSolutionManagerService {
   showTooltip(): void {
     this.tooltipIsOpen = true;
     this.hintsDiscovered = true;
-    this._timeoutElapsedEventEmitter.next();
+    this._timeoutElapsedEventEmitter.emit();
   }
 
   releaseHint(): void {
@@ -95,11 +95,11 @@ export class HintsAndSolutionManagerService {
           this.showTooltip.bind(this), this.WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC);
       }
     }
-    this._timeoutElapsedEventEmitter.next();
+    this._timeoutElapsedEventEmitter.emit();
   }
   releaseSolution(): void {
     this.solutionReleased = true;
-    this._timeoutElapsedEventEmitter.next();
+    this._timeoutElapsedEventEmitter.emit();
   }
   accelerateHintRelease(): void {
     this.enqueueTimeout(this.releaseHint, this.ACCELERATED_HINT_WAIT_TIME_MSEC);
