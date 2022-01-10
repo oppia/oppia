@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for storyViewerPage.
  */
 
-import { TestBed, fakeAsync, flushMicrotasks, tick, ComponentFixture } from '@angular/core/testing';
+import { TestBed, fakeAsync, flushMicrotasks, tick } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { StoryNode } from 'domain/story/story-node.model';
 import { StoryPlaythrough, StoryPlaythroughBackendDict } from 'domain/story_viewer/story-playthrough.model';
@@ -40,7 +40,6 @@ class MockAssetsBackendApiService {
 }
 
 describe('Story Viewer Page component', () => {
-  let fixture: ComponentFixture<StoryViewerPageComponent>;
   let httpTestingController = null;
   let component: StoryViewerPageComponent;
   let alertsService = null;
@@ -84,7 +83,7 @@ describe('Story Viewer Page component', () => {
     alertsService = TestBed.get(AlertsService);
     storyViewerBackendApiService = TestBed.get(StoryViewerBackendApiService);
     windowRef = TestBed.get(WindowRef);
-    fixture = TestBed.createComponent(StoryViewerPageComponent);
+    let fixture = TestBed.createComponent(StoryViewerPageComponent);
     component = fixture.componentInstance;
     spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
       location: {
@@ -497,8 +496,8 @@ describe('Story Viewer Page component', () => {
     fakeAsync(()=>{
       component.isLoggedIn = false;
       spyOn(component, 'focusSkipButton');
-      const container = fixture.debugElement.nativeElement
-        .querySelector('.oppia-story-viewer-container') as HTMLDivElement;
+      const container = document.createElement('div');
+      container.classList.add('oppia-story-viewer-container');
 
       const event = new MouseEvent('click', {
         view: window,
@@ -519,8 +518,8 @@ describe('Story Viewer Page component', () => {
     spyOn(component, 'focusSkipButton');
     spyOn(component.skipButton.nativeElement, 'focus');
 
-    const container = fixture.debugElement.nativeElement
-      .querySelector('.oppia-story-viewer-container') as HTMLDivElement;
+    const container = document.createElement('div');
+    container.classList.add('oppia-story-viewer-container');
 
     const event = new MouseEvent('click', {
       view: window,
