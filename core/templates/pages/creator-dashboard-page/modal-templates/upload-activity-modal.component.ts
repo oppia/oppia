@@ -52,7 +52,7 @@ export class UploadActivityModalComponent {
       return;
     }
     returnObj.yamlFile = file;
-    this.activeModal.dismiss(returnObj);
+    this.activeModal.close(returnObj);
   }
 
   cancel(): void {

@@ -73,8 +73,10 @@ export interface ExplorationChangeEditStateProperty {
 
 export interface ExplorationChangeEditExplorationProperty {
   'cmd': 'edit_exploration_property';
-  'new_value': ParamChangeBackendDict[] | ParamSpecBackendDict | string;
-  'old_value': ParamChangeBackendDict[] | ParamSpecBackendDict | string;
+  'new_value': ParamChangeBackendDict[] | ParamSpecBackendDict | string |
+   boolean;
+  'old_value': ParamChangeBackendDict[] | ParamSpecBackendDict | string |
+   boolean;
   'property_name': string;
 }
 

@@ -17,18 +17,21 @@
  */
 
 import { TestBed } from '@angular/core/testing';
+import { ExplorationCorrectnessFeedbackService } from './exploration-correctness-feedback.service';
+import { ExplorationPropertyService } from './exploration-property.service';
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
 import { ExplorationDataService } from './exploration-data.service';
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
-/* eslint-disable-next-line max-len */
-require('pages/exploration-editor-page/services/exploration-correctness-feedback.service');
 
-describe('Exploration Correctness Feedback Service', function() {
-  var ExplorationCorrectnessFeedbackService;
-  importAllAngularServices();
+describe('Exploration Correctness Feedback Service', () => {
+  let ecfs: ExplorationCorrectnessFeedbackService;
+  let httpTestingController: HttpTestingController;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
       providers: [
+        ExplorationPropertyService,
         {
           provide: ExplorationDataService,
           useValue: {
@@ -40,28 +43,22 @@ describe('Exploration Correctness Feedback Service', function() {
         }
       ]
     });
+    httpTestingController = TestBed.inject(HttpTestingController);
+    ecfs = TestBed.inject(ExplorationCorrectnessFeedbackService);
   });
 
+  afterEach(() => {
+    httpTestingController.verify();
+  });
 
-  beforeEach(angular.mock.inject(function($injector) {
-    ExplorationCorrectnessFeedbackService = $injector.get(
-      'ExplorationCorrectnessFeedbackService');
-  }));
-
-  it('should toggle correctness feedback display', function() {
-    var isValidSpy = spyOn(
-      ExplorationCorrectnessFeedbackService, '_isValid').and.callThrough();
-
+  it('should toggl correctness feedback display', () => {
     // Function isEnabled() returns undefined in the first time.
-    expect(ExplorationCorrectnessFeedbackService.isEnabled()).toBeFalsy();
+    expect(ecfs.isEnabled()).toBeFalsy();
 
-    ExplorationCorrectnessFeedbackService.toggleCorrectnessFeedback();
-    ExplorationCorrectnessFeedbackService.isEnabled();
-    expect(ExplorationCorrectnessFeedbackService.isEnabled()).toBe(true);
+    ecfs.toggleCorrectnessFeedback();
+    expect(ecfs.isEnabled()).toBeTrue();
 
-    ExplorationCorrectnessFeedbackService.toggleCorrectnessFeedback();
-    expect(ExplorationCorrectnessFeedbackService.isEnabled()).toBe(false);
-
-    expect(isValidSpy).toHaveBeenCalledTimes(2);
+    ecfs.toggleCorrectnessFeedback();
+    expect(ecfs.isEnabled()).toBeFalse();
   });
 });
