@@ -127,6 +127,18 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             ' story references list of the topic.'):
             self.topic.delete_canonical_story('story_id_5')
 
+    def test_rearrange_canonical_story_fail_with_invalid_from_index_value(self) -> None:
+        with self.assertRaisesRegexp(  # type: ignore[no-untyped-call]
+            Exception, 'Expected from_index value to be a number, '
+                       'received None'):
+            self.topic.rearrange_canonical_story(None, 2) # type: ignore[arg-type]
+
+    def test_rearrange_canonical_story_fail_with_invalid_to_index_value(self) -> None:
+        with self.assertRaisesRegexp(  # type: ignore[no-untyped-call]
+            Exception, 'Expected to_index value to be a number, '
+                       'received None'):
+            self.topic.rearrange_canonical_story(1, None) # type: ignore[arg-type]
+
     def test_rearrange_canonical_story_fail_with_out_of_bound_indexes(
         self
     ) -> None:
@@ -191,6 +203,18 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(canonical_story_ids[1], 'story_id_2')
         self.assertEqual(canonical_story_ids[2], 'story_id_3')
 
+    def test_rearrange_skill_in_subtopic_fail_with_invalid_from_index(self) -> None:
+        with self.assertRaisesRegexp(  # type: ignore[no-untyped-call]
+            Exception, 'Expected from_index value to be a number, '
+                       'received None'):
+            self.topic.rearrange_skill_in_subtopic(1, None, 2) # type: ignore[arg-type]
+
+    def test_rearrange_skill_in_subtopic_fail_with_invalid_to_index_value(self) -> None:
+        with self.assertRaisesRegexp(  # type: ignore[no-untyped-call]
+            Exception, 'Expected to_index value to be a number, '
+                       'received None'):
+            self.topic.rearrange_skill_in_subtopic(1, 1, None) # type: ignore[arg-type]
+
     def test_rearrange_skill_in_subtopic_fail_with_out_of_bound_indexes(
         self
     ) -> None:
@@ -246,6 +270,18 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill_ids[0], 'skill_id_1')
         self.assertEqual(skill_ids[1], 'skill_id_2')
         self.assertEqual(skill_ids[2], 'skill_id_3')
+
+    def test_rearrange_subtopic_fail_with_invalid_from_index(self) -> None:
+        with self.assertRaisesRegexp(  # type: ignore[no-untyped-call]
+            Exception, 'Expected from_index value to be a number, '
+                       'received None'):
+            self.topic.rearrange_subtopic(None, 2) # type: ignore[arg-type]
+
+    def test_rearrange_subtopic_fail_with_invalid_to_index_value(self) -> None:
+        with self.assertRaisesRegexp(  # type: ignore[no-untyped-call]
+            Exception, 'Expected to_index value to be a number, '
+                       'received None'):
+            self.topic.rearrange_subtopic(1, None) # type: ignore[arg-type]
 
     def test_rearrange_subtopic_fail_with_out_of_bound_indexes(self) -> None:
         with self.assertRaisesRegexp(  # type: ignore[no-untyped-call]
@@ -459,6 +495,13 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected subtopic title to be less than 64 characters')
 
+    def test_story_is_published_validation(self) -> None:
+        self.topic.canonical_story_references = [
+            topic_domain.StoryReference('story_id', 'published') # type: ignore[arg-type]
+        ]
+        self._assert_validation_error(
+            'Expected story_is_published to be a boolean')
+
     def test_thumbnail_filename_validation_for_subtopic(self) -> None:
         self._assert_valid_thumbnail_filename_for_subtopic(
             'Thumbnail filename should not start with a dot.', '.name')
@@ -472,6 +515,13 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             'Thumbnail filename should include an extension.', 'name')
         self._assert_valid_thumbnail_filename_for_subtopic(
             'Expected a filename ending in svg, received name.jpg', 'name.jpg')
+
+    def test_topic_thumbnail_filename_in_strict_mode(self) -> None:
+        self.topic.thumbnail_bg_color = None
+        with self.assertRaisesRegexp(  # type: ignore[no-untyped-call]
+            utils.ValidationError,
+            'Expected thumbnail filename to be a string, received None.'):
+            self.topic.validate(strict=True)
 
     def test_topic_thumbnail_bg_validation(self) -> None:
         self.topic.thumbnail_bg_color = '#FFFFFF'

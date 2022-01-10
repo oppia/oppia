@@ -338,10 +338,6 @@ class StoryReference:
             ValidationError. One or more attributes of the StoryReference are
                 invalid.
         """
-        if not isinstance(self.story_id, str):
-            raise utils.ValidationError(
-                'Expected story id to be a string, received %s' %
-                self.story_id)
         if not isinstance(self.story_is_published, bool):
             raise utils.ValidationError(
                 'Expected story_is_published to be a boolean, received %s' %
@@ -815,10 +811,6 @@ class Topic:
         Args:
             topic_id: str. The topic id to validate.
         """
-        if not isinstance(topic_id, str):
-            raise utils.ValidationError(
-                'Topic id should be a string, received: %s' % topic_id)
-
         if topic_id is not None and len(topic_id) != 12:
             raise utils.ValidationError('Topic id %s is invalid' % topic_id)
 
@@ -829,9 +821,6 @@ class Topic:
         Args:
             name: str. The name to validate.
         """
-        if not isinstance(name, str):
-            raise utils.ValidationError('Name should be a string.')
-
         if name == '':
             raise utils.ValidationError('Name field should not be empty')
 
@@ -1031,15 +1020,15 @@ class Topic:
         Raises:
             Exception. Invalid input.
         """
-        if not isinstance(from_index, int):
+        if from_index is None:
             raise Exception(
                 'Expected from_index value to be a number, '
-                'received %s' % from_index)
-
-        if not isinstance(to_index, int):
+                       'received None')
+        
+        if to_index is None:
             raise Exception(
                 'Expected to_index value to be a number, '
-                'received %s' % to_index)
+                       'received None')
 
         if from_index == to_index:
             raise Exception(
@@ -1173,10 +1162,6 @@ class Topic:
                     self.subtopic_schema_version))
 
         for subtopic in self.subtopics:
-            if not isinstance(subtopic, Subtopic):
-                raise utils.ValidationError(
-                    'Expected each subtopic to be a Subtopic object, '
-                    'received %s' % subtopic)
             subtopic.validate()
             if subtopic.id >= self.next_subtopic_id:
                 raise utils.ValidationError(
@@ -1385,12 +1370,7 @@ class Topic:
 
         Args:
             new_name: str. The updated name for the topic.
-
-        Raises:
-            ValidationError. Name should be a string.
         """
-        if not isinstance(new_name, str):
-            raise utils.ValidationError('Name should be a string.')
         self.name = new_name
         self.canonical_name = new_name.lower()
 
@@ -1724,15 +1704,15 @@ class Topic:
         Raises:
             Exception. Invalid input.
         """
-        if not isinstance(from_index, int):
+        if from_index is None:
             raise Exception(
                 'Expected from_index value to be a number, '
-                'received %s' % from_index)
-
-        if not isinstance(to_index, int):
+                       'received None')
+        
+        if to_index is None:
             raise Exception(
                 'Expected to_index value to be a number, '
-                'received %s' % to_index)
+                       'received None')
 
         if from_index == to_index:
             raise Exception(
@@ -1766,15 +1746,15 @@ class Topic:
         Raises:
             Exception. Invalid input.
         """
-        if not isinstance(from_index, int):
+        if from_index is None:
             raise Exception(
                 'Expected from_index value to be a number, '
-                'received %s' % from_index)
-
-        if not isinstance(to_index, int):
+                       'received None')
+        
+        if to_index is None:
             raise Exception(
                 'Expected to_index value to be a number, '
-                'received %s' % to_index)
+                       'received None')
 
         if from_index == to_index:
             raise Exception(
@@ -2137,12 +2117,12 @@ class TopicRights:
         }
 
     def is_manager(
-        self, user_id: Optional[str]
+        self, user_id: str
     ) -> bool:
         """Checks whether given user is a manager of the topic.
 
         Args:
-            user_id: str or None. Id of the user.
+            user_id: str. Id of the user.
 
         Returns:
             bool. Whether user is a topic manager of this topic.
