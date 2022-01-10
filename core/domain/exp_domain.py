@@ -272,7 +272,7 @@ class ExplorationChange(change_domain.BaseChange):
         'title', 'category', 'objective', 'language_code', 'tags',
         'blurb', 'author_notes', 'param_specs', 'param_changes',
         'init_state_name', 'auto_tts_enabled', 'correctness_feedback_enabled',
-        '_cached_android_proto_size_in_bytes')
+        'proto_size_in_bytes')
 
     ALLOWED_COMMANDS = [{
         'name': CMD_CREATE_NEW,
@@ -781,7 +781,7 @@ class Exploration:
         exploration.created_on = exploration_created_on
         exploration.last_updated = exploration_last_updated
 
-        exploration.proto_size_in_bytes = cls.is_stale
+        exploration.proto_size_in_bytes = exploration.is_stale
 
         return exploration
 
@@ -929,15 +929,15 @@ class Exploration:
                 'Expected correctness_feedback_enabled to be a bool, received '
                 '%s' % self.correctness_feedback_enabled)
 
-        if not isinstance(self._cached_android_proto_size_in_bytes, int):
+        if not isinstance(self.proto_size_in_bytes, int):
             raise utils.ValidationError(
                 'Expected proto size to be an int, received %s'
-                % self._cached_android_proto_size_in_bytes)
+                % self.proto_size_in_bytes)
 
-        if self._cached_android_proto_size_in_bytes <= 0:
+        if self.proto_size_in_bytes <= 0:
             raise utils.ValidationError(
                 'Expected proto size to be a positive integer, received %s'
-                % self._cached_android_proto_size_in_bytes)
+                % self.proto_size_in_bytes)
 
         for param_name in self.param_specs:
             if not isinstance(param_name, str):
@@ -1322,9 +1322,10 @@ class Exploration:
         Returns:
             int. Updated exploration's proto size.
         """
-        if proto_size_is_stale:
+        if self.proto_size_is_stale:
             self._cached_android_proto_size_in_bytes = self.get_proto_size()
-            proto_size_is_stale = False
+            self.proto_size_is_stale = False
+
         return self._cached_android_proto_size_in_bytes
 
     def has_state_name(self, state_name):
@@ -2419,8 +2420,7 @@ class Exploration:
 
         # The constructor calculates the proto_size_in_bytes and adds it to the
         # domain object. So, we add that value directly to the dict.
-        exploration_dict['proto_size_in_bytes'] = (
-            exploration._cached_android_proto_size_in_bytes)
+        exploration_dict['proto_size_in_bytes'] = exploration.is_stale
 
         return exploration_dict
 
