@@ -63,28 +63,21 @@ class BlogPostModelTest(test_utils.GenericTestBase):
             base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER)
 
     def test_get_export_policy(self) -> None:
-        export_policy = blog_models.BlogPostModel.get_export_policy()
+        sample_dict = {
+            'author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'title': base_models.EXPORT_POLICY.EXPORTED,
+            'content': base_models.EXPORT_POLICY.EXPORTED,
+            'url_fragment': base_models.EXPORT_POLICY.EXPORTED,
+            'tags': base_models.EXPORT_POLICY.EXPORTED,
+            'thumbnail_filename': base_models.EXPORT_POLICY.EXPORTED,
+            'published_on': base_models.EXPORT_POLICY.EXPORTED,
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
         self.assertEqual(
-            export_policy['author_id'],
-            base_models.EXPORT_POLICY.NOT_APPLICABLE)
-        self.assertEqual(
-            export_policy['content'],
-            base_models.EXPORT_POLICY.EXPORTED)
-        self.assertEqual(
-            export_policy['published_on'],
-            base_models.EXPORT_POLICY.EXPORTED)
-        self.assertEqual(
-            export_policy['tags'],
-            base_models.EXPORT_POLICY.EXPORTED)
-        self.assertEqual(
-            export_policy['thumbnail_filename'],
-            base_models.EXPORT_POLICY.EXPORTED)
-        self.assertEqual(
-            export_policy['title'],
-            base_models.EXPORT_POLICY.EXPORTED)
-        self.assertEqual(
-            export_policy['url_fragment'],
-            base_models.EXPORT_POLICY.EXPORTED)
+            blog_models.BlogPostModel.get_export_policy(),
+            sample_dict)
 
     def test_get_deletion_policy(self):
         self.assertEqual(
@@ -214,28 +207,21 @@ class BlogPostSummaryModelTest(test_utils.GenericTestBase):
         self.blog_post_summary_model_new.put()
 
     def test_get_export_policy(self) -> None:
-        export_policy = blog_models.BlogPostSummaryModel.get_export_policy()
+        sample_dict = {
+            'author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'summary': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'url_fragment': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'tags': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'thumbnail_filename': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'published_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
         self.assertEqual(
-            export_policy['author_id'],
-            base_models.EXPORT_POLICY.NOT_APPLICABLE)
-        self.assertEqual(
-            export_policy['summary'],
-            base_models.EXPORT_POLICY.NOT_APPLICABLE)
-        self.assertEqual(
-            export_policy['published_on'],
-            base_models.EXPORT_POLICY.NOT_APPLICABLE)
-        self.assertEqual(
-            export_policy['tags'],
-            base_models.EXPORT_POLICY.NOT_APPLICABLE)
-        self.assertEqual(
-            export_policy['thumbnail_filename'],
-            base_models.EXPORT_POLICY.NOT_APPLICABLE)
-        self.assertEqual(
-            export_policy['title'],
-            base_models.EXPORT_POLICY.NOT_APPLICABLE)
-        self.assertEqual(
-            export_policy['url_fragment'],
-            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+            blog_models.BlogPostSummaryModel.get_export_policy(),
+            sample_dict)
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
@@ -296,13 +282,16 @@ class BlogPostRightsModelTest(test_utils.GenericTestBase):
         self.blog_post_rights_draft_model.put()
 
     def test_get_export_policy(self) -> None:
-        export_policy = blog_models.BlogPostRightsModel.get_export_policy()
+        sample_dict = {
+            'editor_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'blog_post_is_published': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
         self.assertEqual(
-            export_policy['editor_ids'],
-            base_models.EXPORT_POLICY.EXPORTED)
-        self.assertEqual(
-            export_policy['blog_post_is_published'],
-            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+            blog_models.BlogPostRightsModel.get_export_policy(),
+            sample_dict)
 
     def test_get_field_name_mapping_to_takeout_keys(self) -> None:
         self.assertEqual(
