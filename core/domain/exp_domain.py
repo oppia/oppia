@@ -1330,7 +1330,7 @@ class Exploration:
         return self._cached_android_proto_size_in_bytes
 
     def __setattr__(self, attrname, new_value):
-        if attrname == 'proto_size_is_stale' and new_value == True:
+        if attrname == 'proto_size_is_stale' and new_value is True:
             super(Exploration, self).__setattr__(attrname, new_value)
             self.android_proto_size_in_bytes = self.is_stale
         else:
@@ -2431,8 +2431,8 @@ class Exploration:
         exp_dict = self.to_dict()
         exp_dict['schema_version'] = self.CURRENT_EXP_SCHEMA_VERSION
 
-        # The ID and the android_proto_size_in_bytes are the properties that should not
-        # be stored within the YAML representation.
+        # The ID and the android_proto_size_in_bytes are the properties
+        # that should not be stored within the YAML representation.
         del exp_dict['id']
         del exp_dict['android_proto_size_in_bytes']
 
