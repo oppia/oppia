@@ -65,28 +65,24 @@ class REPORT_TYPE(enum.Enum): # pylint: disable=invalid-name
     crash = 'crash' # pylint: disable=invalid-name
 
 
-# TODO(#14419): Change naming style of Enum class from SCREAMING_SNAKE_CASE
-# to PascalCase and its values to UPPER_CASE. Because we want to be consistent
-# throughout the codebase according to the coding style guide.
-# https://github.com/oppia/oppia/wiki/Coding-style-guide
-class Category(enum.Enum): # pylint: disable=invalid-name
+class Category(enum.Enum): 
     """Enum for categories."""
 
-    FEATURE_SUGGESTION = 'feature_suggestion' # pylint: disable=invalid-name
-    LANGUAGE_SUGGESTION = 'language_suggestion' # pylint: disable=invalid-name
-    OTHER_SUGGESTION = 'other_suggestion' # pylint: disable=invalid-name
-    LESSON_QUESTION_ISSUE = 'lesson_question_issue' # pylint: disable=invalid-name
-    LANGUAGE_GENERAL_ISSUE = 'language_general_issue' # pylint: disable=invalid-name
-    LANGUAGE_AUDIO_ISSUE = 'language_audio_issue' # pylint: disable=invalid-name
-    LANGUAGE_TEXT_ISSUE = 'language_text_issue' # pylint: disable=invalid-name
-    TOPICS_ISSUE = 'topics_issue' # pylint: disable=invalid-name
-    PROFILE_ISSUE = 'profile_issue' # pylint: disable=invalid-name
-    OTHER_ISSUE = 'other_issue' # pylint: disable=invalid-name
-    LESSON_PLAYER_CRASH = 'lesson_player_crash' # pylint: disable=invalid-name
-    PRACTICE_QUESTIONS_CRASH = 'practice_questions_crash' # pylint: disable=invalid-name
-    OPTIONS_PAGE_CRASH = 'options_page_crash' # pylint: disable=invalid-name
-    PROFILE_PAGE_CRASH = 'profile_page_crash' # pylint: disable=invalid-name
-    OTHER_CRASH = 'other_crash' # pylint: disable=invalid-name
+    FEATURE_SUGGESTION = 'feature_suggestion'
+    LANGUAGE_SUGGESTION = 'language_suggestion'
+    OTHER_SUGGESTION = 'other_suggestion'
+    LESSON_QUESTION_ISSUE = 'lesson_question_issue'
+    LANGUAGE_GENERAL_ISSUE = 'language_general_issue'
+    LANGUAGE_AUDIO_ISSUE = 'language_audio_issue'
+    LANGUAGE_TEXT_ISSUE = 'language_text_issue'
+    TOPICS_ISSUE = 'topics_issue'
+    PROFILE_ISSUE = 'profile_issue'
+    OTHER_ISSUE = 'other_issue'
+    LESSON_PLAYER_CRASH = 'lesson_player_crash'
+    PRACTICE_QUESTIONS_CRASH = 'practice_questions_crash'
+    OPTIONS_PAGE_CRASH = 'options_page_crash'
+    PROFILE_PAGE_CRASH = 'profile_page_crash'
+    OTHER_CRASH = 'other_crash'
 
 
 # TODO(#14419): Change naming style of Enum class from SCREAMING_SNAKE_CASE
