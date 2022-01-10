@@ -79,48 +79,6 @@ def _does_exploration_exist(exploration_id, version, collection_id):
 class ExplorationEmbedPage(base.BaseHandler):
     """Page describing a single embedded exploration."""
 
-    URL_PATH_ARGS_SCHEMAS = {
-        'exploration_id': {
-            'schema': {
-                'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': constants.ENTITY_ID_REGEX
-                }]
-            }
-        }
-    }
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {
-            'v': {
-                'schema': {
-                    'type': 'int',
-                    'validators': [{
-                        'id': 'is_at_least',
-                        'min_value': 1
-                    }]
-                },
-                'default_value': None
-            },
-            'collection_id': {
-                'schema': {
-                    'type': 'basestring',
-                    'validators': [{
-                        'id': 'is_regex_matched',
-                        'regex_pattern': constants.ENTITY_ID_REGEX
-                    }]
-                },
-                'default_value': None
-            },
-            'iframed': {
-                'schema': {
-                    'type': 'bool'
-                },
-                'default_value': None
-            },
-        }
-    }
-
     @acl_decorators.can_play_exploration
     def get(self, exploration_id):
         """Handles GET requests.
