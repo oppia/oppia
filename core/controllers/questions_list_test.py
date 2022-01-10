@@ -144,6 +144,11 @@ class QuestionsListHandlerTests(BaseQuestionsListControllerTests):
             self.assertFalse(more)
         self.logout()
 
+    def test_get_fails_when_offset_not_valid(self):
+        self.get_json('%s/%s?offset=a' % (
+            feconf.QUESTIONS_LIST_URL_PREFIX, self.skill_id),
+                      expected_status_int=400)
+
     def test_get_fails_when_skill_id_not_valid(self):
         self.get_json('%s/%s?offset=0' % (
             feconf.QUESTIONS_LIST_URL_PREFIX, '1,2'),
