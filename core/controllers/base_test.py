@@ -1217,7 +1217,8 @@ class SignUpTests(test_utils.GenericTestBase):
         response = self.post_json(
             feconf.SIGNUP_DATA_URL, {
                 'username': 'abc',
-                'agreed_to_terms': True
+                'agreed_to_terms': True,
+                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
             }, csrf_token=csrf_token, expected_status_int=401,
         )
 
@@ -1233,11 +1234,31 @@ class SignUpTests(test_utils.GenericTestBase):
         self.post_json(
             feconf.SIGNUP_DATA_URL, {
                 'username': 'abc',
-                'agreed_to_terms': True
+                'agreed_to_terms': True,
+                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
             }, csrf_token=csrf_token,
         )
 
         self.get_html_response('/community-library')
+
+    def test_error_is_raised_during_signup_using_invalid_token(self):
+        """Test that error is raised if user tries to signup
+        using invalid CSRF token.
+        """
+        self.login('abc@example.com')
+        self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
+
+        response = self.post_json(
+            feconf.SIGNUP_DATA_URL, {
+                'username': 'abc',
+                'agreed_to_terms': True,
+                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
+            }, csrf_token='invalid_token', expected_status_int=401,
+        )
+
+        self.assertEqual(response['error'],
+            'Your session has expired, and unfortunately your '
+            'changes cannot be saved. Please refresh the page.')
 
 
 class CsrfTokenHandlerTests(test_utils.GenericTestBase):
