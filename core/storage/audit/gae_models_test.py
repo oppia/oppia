@@ -58,19 +58,18 @@ class RoleQueryAuditModelUnitTests(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.KEEP)
 
     def test_get_export_policy(self) -> None:
-        export_policy = audit_models.RoleQueryAuditModel.get_export_policy()
+        sample_dict = {
+            'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'intent': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'role': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'username': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
         self.assertEqual(
-            export_policy['user_id'],
-            base_models.EXPORT_POLICY.NOT_APPLICABLE)
-        self.assertEqual(
-            export_policy['intent'],
-            base_models.EXPORT_POLICY.NOT_APPLICABLE)
-        self.assertEqual(
-            export_policy['role'],
-            base_models.EXPORT_POLICY.NOT_APPLICABLE)
-        self.assertEqual(
-            export_policy['username'],
-            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+            audit_models.RoleQueryAuditModel.get_export_policy(),
+            sample_dict)
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
@@ -126,12 +125,14 @@ class UsernameChangeAuditModelUnitTests(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.KEEP)
 
     def test_get_export_policy(self) -> None:
-        sample_dict = base_models.BaseModel.get_export_policy()
-        sample_dict.update(
-            {'committer_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+        sample_dict = {
+            'committer_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'old_username': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'new_username': base_models.EXPORT_POLICY.NOT_APPLICABLE
-            })
+            'new_username': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
         self.assertEqual(
             audit_models.UsernameChangeAuditModel.get_export_policy(),
             sample_dict)
