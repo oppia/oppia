@@ -235,7 +235,6 @@ export class LibraryPageComponent {
     this.mobileLibraryGroupsProperties[idx].inCollapsedState =
       !this.mobileLibraryGroupsProperties[idx].inCollapsedState;
     this.toggleButtonText(idx);
-    console.log(this.mobileLibraryGroupsProperties);
   }
 
   ngOnInit(): void {

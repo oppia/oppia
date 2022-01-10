@@ -151,7 +151,7 @@
             </div>
           </div>
 
-          <div class="oppia-activity-cards-container"
+          <div class="oppia-mobile-activity-cards-container"
                [ngClass]="{'limit-cards-shown': mobileLibraryGroupsProperties[idx].inCollapsedState}"
                *ngIf="libraryWindowIsNarrow && leftmostCardIndices">
             <div class="oppia-library-mobile-tile" *ngFor="let activity of group.activity_summary_dicts">
@@ -353,7 +353,7 @@
     top: 0;
     white-space: nowrap;
   }
-  .oppia-activity-cards-container {
+  .oppia-mobile-activity-cards-container {
     overflow-y: hidden;
   }
   .limit-cards-shown {
