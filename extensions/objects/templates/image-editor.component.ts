@@ -815,10 +815,19 @@ export class ImageEditorComponent implements OnInit, OnChanges {
   }
 
   increaseResizePercent(amount: number): void {
-    // Do not allow to increase size above 100% (only downsize allowed).
+    const imageDataURI = (
+      this.imgData || this.data.metadata.uploadedImageData as string);
+    const mimeType = imageDataURI.split(';')[0];
+    const maxImageRatio = (mimeType === 'data:image/svg+xml') ? 2 : 1;
+    // Do not allow the user to increase size beyond 100% for non-SVG images
+    // and 200% for SVG images. Users may downsize the image if required.
+    // SVG images can be resized to 200% because certain SVGs may not contain a
+    // default height/width, this results in a browser-specific default, which
+    // may be too small to work with.
     this.imageResizeRatio = Math.min(
-      1, this.imageResizeRatio + amount / 100);
+      maxImageRatio, this.imageResizeRatio + amount / 100);
     this.updateValidationWithLatestDimensions();
+    this.cancelCropImage();
   }
 
   private updateValidationWithLatestDimensions(): void {
