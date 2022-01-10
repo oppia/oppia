@@ -893,7 +893,6 @@ describe('Contributions and review component', function() {
       expect(ctrl.dropdownShown).toBe(true);
 
       spyOn(element, 'contains').and.returnValue(false);
-      ctrl.dropdownShown = true;
 
       ctrl.closeDropdownWhenClickedOutside(clickEvent);
       expect(ctrl.dropdownShown).toBe(false);
