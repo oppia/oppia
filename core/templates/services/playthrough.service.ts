@@ -114,7 +114,7 @@ class CyclicStateTransitionsTracker {
 }
 
 class EarlyQuitTracker {
-  private stateName: string = " ";
+  private stateName: string | null = null;
   private expDurationInSecs: number | null = null;
 
   foundAnIssue(): boolean {
@@ -123,7 +123,7 @@ class EarlyQuitTracker {
       this.expDurationInSecs < ServicesConstants.EARLY_QUIT_THRESHOLD_IN_SECS);
   }
 
-  recordExplorationQuit(stateName:string , expDurationInSecs: number | null): void {
+  recordExplorationQuit(stateName: string, expDurationInSecs: number | null): void {
     this.stateName = stateName;
     this.expDurationInSecs = expDurationInSecs;
   }
@@ -131,7 +131,7 @@ class EarlyQuitTracker {
   generateIssueCustomizationArgs(): EarlyQuitCustomizationArgs {
     return {
       state_name!: {value: this.stateName},
-      time_spent_in_exp_in_msecs: {value: this.expDurationInSecs! * 1000},
+      time_spent_in_exp_in_msecs: {value: this.expDurationInSecs * 1000},
     };
   }
 }
@@ -171,14 +171,14 @@ class MultipleIncorrectAnswersTracker {
   providedIn: 'root'
 })
 export class PlaythroughService {
-  private explorationId: string = " ";
+  private explorationId: string | null = null;
   private explorationVersion: number | null = null;
   private learnerIsInSamplePopulation: boolean | null = null;
 
   private eqTracker: EarlyQuitTracker | null = null;
   private cstTracker: CyclicStateTransitionsTracker | null = null;
   private misTracker: MultipleIncorrectAnswersTracker | null = null;
-  private recordedLearnerActions: LearnerAction[] | null = null;
+  private recordedLearnerActions: LearnerAction[] = [];
   private playthroughStopwatch: Stopwatch | null = null;
   private playthroughDurationInSecs: number | null = null;
 
@@ -192,8 +192,8 @@ export class PlaythroughService {
       explorationId: string, explorationVersion: number | null,
       sampleSizePopulationProportion: number): void {
     this.explorationId = explorationId;
-    this.explorationVersion!= explorationVersion;
-    this.learnerIsInSamplePopulation! = (
+    this.explorationVersion= explorationVersion;
+    this.learnerIsInSamplePopulation = (
       Math.random() < sampleSizePopulationProportion);
   }
 
@@ -255,7 +255,7 @@ export class PlaythroughService {
       stateName, this.playthroughDurationInSecs);
   }
 
-  storePlaythrough(): void | null {
+  storePlaythrough(): void {
     if (this.isRecordedPlaythroughHelpful()) {
       const playthrough = this.createNewPlaythrough();
       if (playthrough !== null) {
