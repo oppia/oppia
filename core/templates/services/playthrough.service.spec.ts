@@ -23,12 +23,11 @@ import { ExplorationFeaturesService } from
   'services/exploration-features.service';
 import { LearnerActionObjectFactory } from
   'domain/statistics/LearnerActionObjectFactory';
-import {  Playthrough } from 'domain/statistics/PlaythroughObjectFactory';
+import { Playthrough } from 'domain/statistics/PlaythroughObjectFactory';
 import { PlaythroughService } from 'services/playthrough.service';
 import { PlaythroughBackendApiService } from
   'domain/statistics/playthrough-backend-api.service';
 import { Stopwatch } from 'domain/utilities/stopwatch.model';
-
 
 describe('PlaythroughService', () => {
   let explorationFeaturesService: ExplorationFeaturesService;
@@ -147,7 +146,7 @@ describe('PlaythroughService', () => {
             learnerActionObjectFactory.createNewExplorationStartAction({
               state_name: {value: 'A'},
             }),
-            learnerActionObjectFactory!.createNewAnswerSubmitAction({
+            learnerActionObjectFactory.createNewAnswerSubmitAction({
               state_name: {value: 'A'},
               dest_state_name: {value: 'B'},
               interaction_id: {value: 'TextInput'},
@@ -295,8 +294,8 @@ describe('PlaythroughService', () => {
         // For this test, we check when the cyclic portion appears at the end
         // (tail) of the playthrough.
         const storePlaythroughSpy = spyOnStorePlaythrough(playthrough => {
-          expect(playthrough!.issueType).toEqual('CyclicStateTransitions');
-          expect(playthrough!.issueCustomizationArgs).toEqual({
+          expect(playthrough.issueType).toEqual('CyclicStateTransitions');
+          expect(playthrough.issueCustomizationArgs).toEqual({
             state_names: {value: ['C', 'D', 'E', 'C']},
           });
         });
