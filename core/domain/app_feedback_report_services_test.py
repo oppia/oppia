@@ -132,7 +132,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         },
         'user_supplied_feedback': {
             'report_type': 'suggestion',
-            'category': 'language_suggestion',
+            'category': 'LANGUAGE_SUGGESTION',
             'user_feedback_selected_items': [],
             'user_feedback_other_text_input': 'french'
         }
