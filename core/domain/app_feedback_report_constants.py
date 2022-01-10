@@ -69,24 +69,24 @@ class REPORT_TYPE(enum.Enum): # pylint: disable=invalid-name
 # to PascalCase and its values to UPPER_CASE. Because we want to be consistent
 # throughout the codebase according to the coding style guide.
 # https://github.com/oppia/oppia/wiki/Coding-style-guide
-class CATEGORY(enum.Enum): # pylint: disable=invalid-name
+class Category(enum.Enum): # pylint: disable=invalid-name
     """Enum for categories."""
 
-    feature_suggestion = 'feature_suggestion' # pylint: disable=invalid-name
-    language_suggestion = 'language_suggestion' # pylint: disable=invalid-name
-    other_suggestion = 'other_suggestion' # pylint: disable=invalid-name
-    lesson_question_issue = 'lesson_question_issue' # pylint: disable=invalid-name
-    language_general_issue = 'language_general_issue' # pylint: disable=invalid-name
-    language_audio_issue = 'language_audio_issue' # pylint: disable=invalid-name
-    language_text_issue = 'language_text_issue' # pylint: disable=invalid-name
-    topics_issue = 'topics_issue' # pylint: disable=invalid-name
-    profile_issue = 'profile_issue' # pylint: disable=invalid-name
-    other_issue = 'other_issue' # pylint: disable=invalid-name
-    lesson_player_crash = 'lesson_player_crash' # pylint: disable=invalid-name
-    practice_questions_crash = 'practice_questions_crash' # pylint: disable=invalid-name
-    options_page_crash = 'options_page_crash' # pylint: disable=invalid-name
-    profile_page_crash = 'profile_page_crash' # pylint: disable=invalid-name
-    other_crash = 'other_crash' # pylint: disable=invalid-name
+    FEATURE_SUGGESTION = 'feature_suggestion' # pylint: disable=invalid-name
+    LANGUAGE_SUGGESTION = 'language_suggestion' # pylint: disable=invalid-name
+    OTHER_SUGGESTION = 'other_suggestion' # pylint: disable=invalid-name
+    LESSON_QUESTION_ISSUE = 'lesson_question_issue' # pylint: disable=invalid-name
+    LANGUAGE_GENERAL_ISSUE = 'language_general_issue' # pylint: disable=invalid-name
+    LANGUAGE_AUDIO_ISSUE = 'language_audio_issue' # pylint: disable=invalid-name
+    LANGUAGE_TEXT_ISSUE = 'language_text_issue' # pylint: disable=invalid-name
+    TOPICS_ISSUE = 'topics_issue' # pylint: disable=invalid-name
+    PROFILE_ISSUE = 'profile_issue' # pylint: disable=invalid-name
+    OTHER_ISSUE = 'other_issue' # pylint: disable=invalid-name
+    LESSON_PLAYER_CRASH = 'lesson_player_crash' # pylint: disable=invalid-name
+    PRACTICE_QUESTIONS_CRASH = 'practice_questions_crash' # pylint: disable=invalid-name
+    OPTIONS_PAGE_CRASH = 'options_page_crash' # pylint: disable=invalid-name
+    PROFILE_PAGE_CRASH = 'profile_page_crash' # pylint: disable=invalid-name
+    OTHER_CRASH = 'other_crash' # pylint: disable=invalid-name
 
 
 # TODO(#14419): Change naming style of Enum class from SCREAMING_SNAKE_CASE
@@ -153,22 +153,22 @@ ANDROID_ENTRY_POINT = [
 ALLOWED_REPORT_TYPES = [
     REPORT_TYPE.suggestion, REPORT_TYPE.issue, REPORT_TYPE.crash]
 ALLOWED_CATEGORIES = [
-    CATEGORY.feature_suggestion, CATEGORY.language_suggestion,
-    CATEGORY.other_suggestion, CATEGORY.language_general_issue,
-    CATEGORY.language_audio_issue, CATEGORY.language_text_issue,
-    CATEGORY.topics_issue, CATEGORY.profile_issue, CATEGORY.other_issue,
-    CATEGORY.lesson_player_crash, CATEGORY.practice_questions_crash,
-    CATEGORY.options_page_crash, CATEGORY.profile_page_crash,
-    CATEGORY.other_crash]
+    Category.FEATURE_SUGGESTION, Category.LANGUAGE_SUGGESTION,
+    Category.OTHER_SUGGESTION, Category.LANGUAGE_GENERAL_ISSUE,
+    Category.LANGUAGE_AUDIO_ISSUE, Category.LANGUAGE_TEXT_ISSUE,
+    Category.TOPICS_ISSUE, Category.PROFILE_ISSUE, Category.OTHER_ISSUE,
+    Category.LESSON_PLAYER_CRASH, Category.PRACTICE_QUESTIONS_CRASH,
+    Category.OPTIONS_PAGE_CRASH, Category.PROFILE_PAGE_CRASH,
+    Category.OTHER_CRASH]
 ALLOWED_ONLY_INPUT_TEXT_CATEGORIES = [
-    CATEGORY.feature_suggestion, CATEGORY.language_suggestion,
-    CATEGORY.other_suggestion, CATEGORY.other_issue,
-    CATEGORY.lesson_player_crash, CATEGORY.practice_questions_crash,
-    CATEGORY.options_page_crash, CATEGORY.profile_page_crash,
-    CATEGORY.other_crash]
+    Category.FEATURE_SUGGESTION, Category.LANGUAGE_SUGGESTION,
+    Category.OTHER_SUGGESTION, Category.OTHER_ISSUE,
+    Category.LESSON_PLAYER_CRASH, Category.PRACTICE_QUESTIONS_CRASH,
+    Category.OPTIONS_PAGE_CRASH, Category.PROFILE_PAGE_CRASH,
+    Category.OTHER_CRASH]
 ALLOWED_SELECTION_ITEMS_CATEGORIES = [
-    CATEGORY.language_audio_issue, CATEGORY.language_text_issue,
-    CATEGORY.topics_issue, CATEGORY.profile_issue]
+    Category.LANGUAGE_AUDIO_ISSUE, Category.LANGUAGE_TEXT_ISSUE,
+    Category.TOPICS_ISSUE, Category.PROFILE_ISSUE]
 ALLOWED_STATS_PARAMETERS = [
     STATS_PARAMETER_NAMES.platform,
     STATS_PARAMETER_NAMES.report_type,

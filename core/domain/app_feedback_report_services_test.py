@@ -63,7 +63,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
     USER_ID = 'user_1'
     REPORT_TYPE_SUGGESTION = (
         app_feedback_report_constants.REPORT_TYPE.suggestion)
-    CATEGORY_OTHER = app_feedback_report_constants.CATEGORY.other_suggestion
+    CATEGORY_OTHER = app_feedback_report_constants.Category.OTHER_SUGGESTION
     ANDROID_PLATFORM_VERSION = '0.1-alpha-abcdef1234'
     COUNTRY_LOCALE_CODE_INDIA = 'in'
     ANDROID_DEVICE_MODEL = 'Pixel 4a'
