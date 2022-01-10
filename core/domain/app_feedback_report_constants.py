@@ -65,7 +65,7 @@ class REPORT_TYPE(enum.Enum): # pylint: disable=invalid-name
     crash = 'crash' # pylint: disable=invalid-name
 
 
-class Category(enum.Enum): 
+class Category(enum.Enum):
     """Enum for categories."""
 
     FEATURE_SUGGESTION = 'feature_suggestion'
