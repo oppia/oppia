@@ -552,6 +552,7 @@ class VersionedExplorationInteractionIdsMapping:
 class Exploration:
     """Domain object for an Oppia exploration."""
 
+    __initialized = False
     def __init__(
             self, exploration_id, title, category, objective,
             language_code, tags, blurb, author_notes,
@@ -622,6 +623,7 @@ class Exploration:
         self.proto_size_in_bytes = None
         self.proto_size_is_stale = True
         self._cached_android_proto_size_in_bytes = 0
+        __initialized = True
 
     @classmethod
     def create_default_exploration(
@@ -1325,14 +1327,18 @@ class Exploration:
         if self.proto_size_is_stale:
             self._cached_android_proto_size_in_bytes = self.get_proto_size()
             self.proto_size_is_stale = False
-            self.proto_size_in_bytes = self._cached_android_proto_size_in_bytes
 
         return self._cached_android_proto_size_in_bytes
 
-    def __setattr__(self, property, new_value):
-        super().__setattr__(property, new_value)
-        if property == 'proto_size_is_stale':
-            self.is_stale
+    def __setattr__(self, aa, new_value):
+        if self.__initialized:
+            if (aa != 'proto_size_in_bytes' and
+                aa != 'proto_size_is_stale' and
+                aa != '_cached_android_proto_size_in_bytes'):
+                self.proto_size_is_stale = True
+                self.proto_size_in_bytes = self.is_stale
+        else:
+            super(Exploration, self).__setattr__(aa, new_value)
 
     def has_state_name(self, state_name):
         """Whether the exploration has a state with the given state name.
