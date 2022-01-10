@@ -45,9 +45,8 @@ class TaskEntryModelTests(test_utils.GenericTestBase):
             })
 
     def test_get_export_policy(self) -> None:
-        sample_dict = base_models.BaseModel.get_export_policy()
-        sample_dict.update(
-            {'composite_entity_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+        sample_dict = {
+            'composite_entity_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'entity_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'entity_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'entity_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -57,8 +56,11 @@ class TaskEntryModelTests(test_utils.GenericTestBase):
             'issue_description': base_models.EXPORT_POLICY.EXPORTED,
             'status': base_models.EXPORT_POLICY.EXPORTED,
             'resolver_id': base_models.EXPORT_POLICY.EXPORTED,
-            'resolved_on': base_models.EXPORT_POLICY.EXPORTED
-            })
+            'resolved_on': base_models.EXPORT_POLICY.EXPORTED,
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            }
         self.assertEqual(
             improvements_models.TaskEntryModel.get_export_policy(),
             sample_dict)
