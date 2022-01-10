@@ -107,8 +107,6 @@ angular.module('oppia').component('questionEditor', {
       };
 
       var _updateQuestion = function(updateFunction) {
-        $rootScope.$applyAsync();
-
         if (ctrl.questionChanged) {
           ctrl.questionChanged();
         }
@@ -169,6 +167,7 @@ angular.module('oppia').component('questionEditor', {
 
       ctrl.saveHints = function(displayedValue) {
         _updateQuestion(function() {
+          $rootScope.$applyAsync();
           StateEditorService.setInteractionHints(
             angular.copy(displayedValue));
         });
