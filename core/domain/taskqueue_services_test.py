@@ -61,11 +61,12 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
 
     def test_defer_makes_the_correct_request(self):
         correct_fn_identifier = '/task/deferredtaskshandler'
-        correct_url = feconf.TASK_URL_DEFERRED
         correct_queue_name = taskqueue_services.QUEUE_NAME_EMAILS
         correct_args = (1, 2, 3)
         correct_kwargs = {'a': 'b', 'c': 'd'}
-        correct_payload = {
+
+        expected_url = feconf.TASK_URL_DEFERRED
+        expected_payload = {
             'fn_identifier': correct_fn_identifier,
             'args': correct_args,
             'kwargs': correct_kwargs
@@ -77,8 +78,8 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
             lambda queue_name, url, payload=None, scheduled_for=None: None,
             expected_kwargs=[{
                 'queue_name': correct_queue_name,
-                'url': correct_url,
-                'payload': correct_payload
+                'url': expected_url,
+                'payload': expected_payload
             }]
         )
 
