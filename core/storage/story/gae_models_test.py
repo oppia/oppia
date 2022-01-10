@@ -49,43 +49,28 @@ class StoryModelTest(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_get_export_policy(self) -> None:
-        export_policy = story_models.StoryModel.get_export_policy()
+        sample_dict = {
+            'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'thumbnail_filename': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'thumbnail_bg_color': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'thumbnail_size_in_bytes': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'notes': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'story_contents': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'story_contents_schema_version':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'corresponding_topic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'url_fragment': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'meta_tag_content': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+        }
         self.assertEqual(
-            export_policy['meta_tag_content'],
-            base_models.EXPORT_POLICY.NOT_APPLICABLE)
-        self.assertEqual(
-            export_policy['thumbnail_size_in_bytes'],
-            base_models.EXPORT_POLICY.NOT_APPLICABLE)
-        self.assertEqual(
-            export_policy['url_fragment'],
-            base_models.EXPORT_POLICY.NOT_APPLICABLE)
-        self.assertEqual(
-            export_policy['corresponding_topic_id'],
-            base_models.EXPORT_POLICY.NOT_APPLICABLE)
-        self.assertEqual(
-            export_policy['story_contents_schema_version'],
-            base_models.EXPORT_POLICY.NOT_APPLICABLE)
-        self.assertEqual(
-            export_policy['story_contents'],
-            base_models.EXPORT_POLICY.NOT_APPLICABLE)
-        self.assertEqual(
-            export_policy['language_code'],
-            base_models.EXPORT_POLICY.NOT_APPLICABLE)
-        self.assertEqual(
-            export_policy['notes'],
-            base_models.EXPORT_POLICY.NOT_APPLICABLE)
-        self.assertEqual(
-            export_policy['description'],
-            base_models.EXPORT_POLICY.NOT_APPLICABLE)
-        self.assertEqual(
-            export_policy['thumbnail_bg_color'],
-            base_models.EXPORT_POLICY.NOT_APPLICABLE)
-        self.assertEqual(
-            export_policy['thumbnail_filename'],
-            base_models.EXPORT_POLICY.NOT_APPLICABLE)
-        self.assertEqual(
-            export_policy['title'],
-            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+            story_models.StoryModel.get_export_policy(),
+            sample_dict)
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
@@ -152,11 +137,27 @@ class StoryCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
     """Test the StoryCommitLogEntryModel class."""
 
     def test_get_export_policy(self) -> None:
-        export_policy = (
-            story_models.StoryCommitLogEntryModel.get_export_policy())
+        sample_dict = {
+            'story_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'commit_cmds': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'commit_message':
+            base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'commit_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'post_commit_community_owned':
+            base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'post_commit_is_private':
+            base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'post_commit_status':
+            base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+        }
         self.assertEqual(
-            export_policy['story_id'],
-            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+            story_models.StoryCommitLogEntryModel.get_export_policy(),
+            sample_dict)
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
@@ -188,7 +189,8 @@ class StorySummaryModelTest(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_get_export_policy(self) -> None:
-        sample_dict =    {'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+        sample_dict = {
+            'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'story_model_last_updated':
@@ -198,8 +200,11 @@ class StorySummaryModelTest(test_utils.GenericTestBase):
             'thumbnail_filename': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'thumbnail_bg_color': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'url_fragment': base_models.EXPORT_POLICY.NOT_APPLICABLE
-            }
+            'url_fragment': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
         self.assertEqual(
             story_models.StorySummaryModel.get_export_policy(),
             sample_dict)
