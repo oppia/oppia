@@ -35,6 +35,11 @@ import { ActivityDict,
   LibraryPageBackendApiService,
   SummaryDict } from './services/library-page-backend-api.service';
 
+interface mobileLibraryGroupProperties {
+  inCollapsedState: boolean;
+  buttonText: string;
+}
+
 @Component({
   selector: 'oppia-library-page',
   templateUrl: './library-page.component.html'
@@ -52,6 +57,7 @@ export class LibraryPageComponent {
   tileDisplayCount: number = 0;
   activeGroupIndex: number;
   libraryGroups: SummaryDict[];
+  mobileLibraryGroupsProperties: mobileLibraryGroupProperties[];
   leftmostCardIndices: number[] = [];
   currentPath: string;
   pageMode: string;
@@ -217,28 +223,19 @@ export class LibraryPageComponent {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  getCorrespondingContainerIDForButtonClick(buttonID: string): string {
-    let containerIDValue = buttonID.split('-')[3];
-    return '#card-container-' + containerIDValue;
-  }
-
-  toggleButtonText(container: HTMLElement, button: HTMLElement): void {
-    if (container.classList.contains('limit-cards-shown')) {
-      button.textContent = 'Collapse Section';
+  toggleButtonText(idx: number): void {
+    if (this.mobileLibraryGroupsProperties[idx].buttonText === 'See More') {
+      this.mobileLibraryGroupsProperties[idx].buttonText = 'Collapse Section';
     } else {
-      button.textContent = 'See More';
+      this.mobileLibraryGroupsProperties[idx].buttonText = 'See More';
     }
   }
 
-  toggleCardContainerHeightInMobileView(click: Event): void {
-    let buttonElement = click.target as HTMLElement;
-    let containerID = this.getCorrespondingContainerIDForButtonClick(
-      buttonElement.id);
-    let containerElement = (
-      document.querySelector(containerID) as HTMLElement);
-
-    this.toggleButtonText(containerElement, buttonElement);
-    containerElement.classList.toggle('limit-cards-shown');
+  toggleCardContainerHeightInMobileView(idx: number): void {
+    this.mobileLibraryGroupsProperties[idx].inCollapsedState =
+      !this.mobileLibraryGroupsProperties[idx].inCollapsedState;
+    this.toggleButtonText(idx);
+    console.log(this.mobileLibraryGroupsProperties);
   }
 
   ngOnInit(): void {
@@ -278,6 +275,10 @@ export class LibraryPageComponent {
     // Keeps track of the index of the left-most visible card of each
     // group.
     this.leftmostCardIndices = [];
+
+    // Keeps track of the state of each library group when in mobile view
+    // i.e. if they are in a collapsed state or not.
+    this.mobileLibraryGroupsProperties = [];
 
     if (this.pageMode === LibraryPageConstants.LIBRARY_PAGE_MODES.GROUP) {
       let pathnameArray = (
@@ -376,6 +377,15 @@ export class LibraryPageComponent {
           this.leftmostCardIndices = [];
           for (let i = 0; i < this.libraryGroups.length; i++) {
             this.leftmostCardIndices.push(0);
+          }
+          // The following initializes the array so that every group
+          // (in mobile view) loads in with a limit on the number of cards
+          // displayed, and with the button text being "See More".
+          for (let i = 0; i < this.libraryGroups.length; i++) {
+            this.mobileLibraryGroupsProperties.push({
+              inCollapsedState: true,
+              buttonText: 'See More'
+            });
           }
         });
     }
