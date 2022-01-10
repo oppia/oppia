@@ -77,7 +77,7 @@ export class StateHintsEditorComponent implements OnInit {
   }
 
   getHintButtonText(): string {
-    var hintButtonText = '+ ADD HINT';
+    let hintButtonText = '+ ADD HINT';
     if (this.stateHintsService.displayed) {
       if (this.stateHintsService.displayed.length >= 5) {
         hintButtonText = 'Limit Reached';
