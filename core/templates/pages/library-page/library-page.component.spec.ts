@@ -388,99 +388,50 @@ describe('Library Page Component', () => {
     expect(componentInstance.leftmostCardIndices.length).toEqual(0);
   });
 
-  it('should determine corresponding card container ID ' +
-    'to toggle max-height', () => {
-    let buttonID = 'height-toggle-btn-6';
-    spyOn(componentInstance, 'getCorrespondingContainerIDForButtonClick').and
-      .callThrough();
-    expect(
-      componentInstance.getCorrespondingContainerIDForButtonClick(buttonID))
-      .toBe('#card-container-6');
+  it('should toggle the correct button\'s text when clicked', () => {
+    componentInstance.mobileLibraryGroupsProperties = [
+      {
+        inCollapsedState: true,
+        buttonText: 'See More'
+      },
+      {
+        inCollapsedState: false,
+        buttonText: 'Collapse Section'
+      }
+    ];
+    componentInstance.toggleButtonText(0);
+
+    // Correct button text should be toggled.
+    expect(componentInstance.mobileLibraryGroupsProperties[0].buttonText)
+      .toBe('Collapse Section');
+    // Other button's text should remain unchanged.
+    expect(componentInstance.mobileLibraryGroupsProperties[1].buttonText)
+      .toBe('Collapse Section');
   });
 
-  it('should toggle button text when clicked', () => {
-    // This throws "Type '{ textContent: string; }' is missing the following
-    // properties from type 'HTMLElement': accessKey, accessKeyLabel,
-    // autocapitalize, dir, and 274 more." We need to suppress this error
-    // because only textContent is required for testing, and it is
-    // unnecessary to provide the remaining properties.
-    // @ts-expect-error
-    let button: HTMLElement = {
-      textContent: 'Collapse Section'
-    };
-    let container: HTMLElement = {
-      // This throws "Type '{ contains: () => boolean; }' is missing the
-      // following properties from type 'DOMTokenList': length, value, add,
-      // item, and 5 more." We need to suppress this error because only the
-      // contains method is required for testing, and it is unnecessary to
-      // provide the rest of the properties.
-      // @ts-expect-error
-      classList: {
-        contains: (): boolean => {
-          return false;
-        }
+  it('should toggle the corresponding container\'s max-height' +
+    'and toggle the corresponding button\'s text', () => {
+    let buttonTextToggleSpy = spyOn(componentInstance, 'toggleButtonText');
+    componentInstance.mobileLibraryGroupsProperties = [
+      {
+        inCollapsedState: true,
+        buttonText: 'See More'
+      },
+      {
+        inCollapsedState: false,
+        buttonText: 'Collapse Section'
       }
-    };
+    ];
 
-    const containsMethodSpy =
-      spyOn(container.classList, 'contains').and.returnValue(false);
+    componentInstance.toggleCardContainerHeightInMobileView(0);
 
-    componentInstance.toggleButtonText(container, button);
-    expect(button.textContent).toBe('See More');
-
-    containsMethodSpy.and.returnValue(true);
-
-    componentInstance.toggleButtonText(container, button);
-    expect(button.textContent).toBe('Collapse Section');
-  });
-
-  it('should toggle the corresponding container\'s max-height', () => {
-    spyOn(componentInstance, 'getCorrespondingContainerIDForButtonClick')
-      .and.returnValue('#dummy-container-id');
-    let dummyContainerElement = {
-      classList: {
-        length: 2,
-        contains: (): boolean => {
-          return true;
-        },
-        toggle: (): boolean => {
-          return false;
-        }
-      }
-    };
-    spyOn(dummyContainerElement.classList, 'toggle').and.returnValue(false);
-    // This throws "Argument of type '{ classList: { length: number; contains:
-    // () => boolean; toggle: () => boolean; }; }' is not assignable to
-    // parameter of type 'Element'.
-    // Type '{ classList: { length: number; contains: () => boolean; toggle:
-    // () => boolean; }; }' is missing the following properties from type
-    // 'Element': attributes, className, clientHeight, clientLeft, and 159
-    // more".
-    // We need to suppress this error because only the values provided
-    // in the element object are required for testing and it is unnecessary
-    // to provide the rest.
-    // @ts-expect-error
-    spyOn(document, 'querySelector').and.returnValue(dummyContainerElement);
-    let click: Event = {
-      target: {
-        // This throws "Type '{ id: string; textContent: string; }' is not
-        // assignable to type 'EventTarget'. Object literal may only specify
-        // known properties, and 'id' does not exist in type 'EventTarget'".
-        // We need to suppress this error because the 'id' property is
-        // required for testing.
-        // @ts-expect-error
-        id: 'height-toggle-btn-6',
-        textContent: 'See More'
-      }
-    };
-
-    componentInstance.toggleCardContainerHeightInMobileView(click);
-
-    expect(componentInstance.getCorrespondingContainerIDForButtonClick)
-      .toHaveBeenCalledWith('height-toggle-btn-6');
-    expect(document.querySelector).toHaveBeenCalledWith('#dummy-container-id');
-    expect(dummyContainerElement.classList.toggle)
-      .toHaveBeenCalledWith('limit-cards-shown');
+    // Correct container's height should be toggled.
+    expect(componentInstance.mobileLibraryGroupsProperties[0].inCollapsedState)
+      .toBe(false);
+    // Other container's height should remain unchanged.
+    expect(componentInstance.mobileLibraryGroupsProperties[1].inCollapsedState)
+      .toBe(false);
+    expect(buttonTextToggleSpy).toHaveBeenCalledWith(0);
   });
 
   it('should show full results page when full results url is available',
