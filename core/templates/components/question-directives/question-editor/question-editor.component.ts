@@ -167,10 +167,10 @@ angular.module('oppia').component('questionEditor', {
 
       ctrl.saveHints = function(displayedValue) {
         _updateQuestion(function() {
-          $rootScope.$applyAsync();
           StateEditorService.setInteractionHints(
             angular.copy(displayedValue));
         });
+        $rootScope.$applyAsync();
       };
 
       ctrl.saveInapplicableSkillMisconceptionIds = function(
