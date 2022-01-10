@@ -72,11 +72,6 @@ describe('Contribution Opportunities Service', () => {
       skillOpportunity.opportunities[0])
   ];
 
-  const sampleVoiceoverOpportunitiesResponse = [
-    ExplorationOpportunitySummary.createFromBackendDict(
-      skillOpportunity.opportunities[0])
-  ];
-
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
@@ -223,64 +218,6 @@ describe('Contribution Opportunities Service', () => {
 
     expect(getTranslationOpportunitiesSpy).toHaveBeenCalled();
     expect(successHandler).toHaveBeenCalledWith(translationOpportunitiesDict);
-  }));
-
-  it('should return voiceover opportunities when calling ' +
-    '\'getVoiceoverOpportunitiesAsync\'', fakeAsync(() => {
-    const successHandler = jasmine.createSpy('success');
-    const failHandler = jasmine.createSpy('fail');
-
-    let voiceoverOpportunitiesDict: ExplorationOpportunitiesDict = {
-      opportunities: sampleVoiceoverOpportunitiesResponse,
-      more: true
-    };
-
-    let getVoiceoverOpportunitiesSpy = spyOn(
-      contributionOpportunitiesBackendApiService,
-      'fetchVoiceoverOpportunitiesAsync')
-      .and.returnValue(Promise.resolve(
-        {
-          opportunities: sampleVoiceoverOpportunitiesResponse,
-          nextCursor: '6',
-          more: true
-        }
-      ));
-
-    contributionOpportunitiesService.getVoiceoverOpportunitiesAsync('en').then(
-      successHandler, failHandler);
-    tick();
-
-    expect(getVoiceoverOpportunitiesSpy).toHaveBeenCalled();
-    expect(successHandler).toHaveBeenCalledWith(voiceoverOpportunitiesDict);
-  }));
-
-  it('should return more voiceover opportunities if they are available ' +
-    'when calling \'getMoreVoiceoverOpportunitiesAsync\'', fakeAsync(() => {
-    const successHandler = jasmine.createSpy('success');
-    const failHandler = jasmine.createSpy('fail');
-
-    let voiceoverOpportunitiesDict: ExplorationOpportunitiesDict = {
-      opportunities: sampleVoiceoverOpportunitiesResponse,
-      more: true
-    };
-
-    let getVoiceoverOpportunitiesSpy = spyOn(
-      contributionOpportunitiesBackendApiService,
-      'fetchVoiceoverOpportunitiesAsync')
-      .and.returnValue(Promise.resolve(
-        {
-          opportunities: sampleVoiceoverOpportunitiesResponse,
-          nextCursor: '6',
-          more: true
-        }
-      ));
-
-    contributionOpportunitiesService.getMoreVoiceoverOpportunitiesAsync('en')
-      .then(successHandler, failHandler);
-    tick();
-
-    expect(getVoiceoverOpportunitiesSpy).toHaveBeenCalled();
-    expect(successHandler).toHaveBeenCalledWith(voiceoverOpportunitiesDict);
   }));
 
   it('should return all topic names when calling \'getAllTopicNamesAsync\'',
