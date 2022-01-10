@@ -2447,8 +2447,7 @@ class ExplorationEmbedPageTests(test_utils.GenericTestBase):
         self.get_html_response(
             '%s/%s' % (feconf.EXPLORATION_URL_EMBED_PREFIX, self.EXP_ID),
             params={
-                'v': exploration.version,
-                'collection_id': None
+                'v': exploration.version
             }, expected_status_int=404
         )
 
