@@ -27,8 +27,6 @@ from core.platform import models
     [models.NAMES.config])
 
 
-
-
 class Registry:
     """Registry of all platform parameters."""
 
@@ -52,10 +50,10 @@ class Registry:
         Args:
             name: Enum(PARAMS). The name of the platform parameter.
             description: str. The description of the platform parameter.
-            data_type: Enum(DATA_TYPES). The data type of the platform
+            data_type: Enum(DataTypes). The data type of the platform
                 parameter, must be one of the following: bool, number, string.
             is_feature: bool. True if the platform parameter is a feature flag.
-            feature_stage: Enum(FEATURE_STAGES)|None. The stage of the feature,
+            feature_stage: Enum(FeatureStages)|None. The stage of the feature,
                 required if 'is_feature' is True.
 
         Returns:
@@ -94,7 +92,7 @@ class Registry:
         Args:
             name: Enum(PARAMS). The name of the platform parameter.
             description: str. The description of the platform parameter.
-            stage: Enum(FEATURE_STAGES). The stage of the feature.
+            stage: Enum(FeatureStages). The stage of the feature.
 
         Returns:
             PlatformParameter. The created feature flag.

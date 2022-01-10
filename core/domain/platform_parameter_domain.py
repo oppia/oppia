@@ -40,7 +40,6 @@ class ServerModes(enum.Enum):
 FeatureStages = ServerModes
 
 
-
 class DataTypes(enum.Enum):
     """Enum for data types."""
 
@@ -129,7 +128,7 @@ class EvaluationContext:
         """Returns the server mode of Oppia.
 
         Returns:
-            Enum(SERVER_MODES). The the server mode of Oppia,
+            Enum(ServerModes). The the server mode of Oppia,
             must be one of the following: dev, test, prod.
         """
         return self._server_mode
@@ -663,7 +662,7 @@ class PlatformParameter:
         """Returns the stage of the feature flag.
 
         Returns:
-            FEATURE_STAGES|None. The stage of the feature flag, None if the
+            FeatureStages|None. The stage of the feature flag, None if the
             parameter isn't a feature flag.
         """
         return self._feature_stage
