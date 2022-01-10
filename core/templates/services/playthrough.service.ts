@@ -114,7 +114,7 @@ class CyclicStateTransitionsTracker {
 }
 
 class EarlyQuitTracker {
-  private stateName: string | null = null;
+  private stateName: string = " ";
   private expDurationInSecs: number | null = null;
 
   foundAnIssue(): boolean {
@@ -131,7 +131,7 @@ class EarlyQuitTracker {
   generateIssueCustomizationArgs(): EarlyQuitCustomizationArgs {
     return {
       state_name!: {value: this.stateName},
-      time_spent_in_exp_in_msecs: {value: this.expDurationInSecs * 1000},
+      time_spent_in_exp_in_msecs: {value: this.expDurationInSecs! * 1000},
     };
   }
 }
@@ -171,7 +171,7 @@ class MultipleIncorrectAnswersTracker {
   providedIn: 'root'
 })
 export class PlaythroughService {
-  private explorationId: string | null = null;
+  private explorationId: string = " ";
   private explorationVersion: number | null = null;
   private learnerIsInSamplePopulation: boolean | null = null;
 
