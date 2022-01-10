@@ -19,11 +19,11 @@
   </div>
 </div>
 <div class="clearfix" ng-if="$ctrl.misconceptionEditorIsOpen">
-  <question-misconception-selector misconception-feedback-is-used="$ctrl.feedbackIsUsed"
-                                   selected-misconception="$ctrl.selectedMisconception"
-                                   selected-misconception-skill-id="$ctrl.selectedMisconceptionSkillId"
+  <oppia-question-misconception-selector [misconception-feedback-is-used]="$ctrl.feedbackIsUsed"
+                                   [selected-misconception]="$ctrl.selectedMisconception"
+                                   [selected-misconception-skill-id]="$ctrl.selectedMisconceptionSkillId"
                                    tagged-skill-misconception-id="$ctrl.getTaggedSkillMisconceptionId()">
-  </question-misconception-selector>
+  </oppia-question-misconception-selector>
   <button class="btn btn-success float-right" ng-disabled="$ctrl.selectedMisconception === null" ng-click="$ctrl.updateMisconception()">Save Misconception</button>
 </div>
 <button type="button"
