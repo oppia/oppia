@@ -169,8 +169,8 @@ angular.module('oppia').component('questionEditor', {
         _updateQuestion(function() {
           StateEditorService.setInteractionHints(
             angular.copy(displayedValue));
+          $rootScope.$applyAsync();
         });
-        $rootScope.$applyAsync();
       };
 
       ctrl.saveInapplicableSkillMisconceptionIds = function(
