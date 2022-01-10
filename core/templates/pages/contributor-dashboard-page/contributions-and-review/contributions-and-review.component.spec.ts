@@ -848,12 +848,11 @@ describe('Contributions and review component', function() {
 
     it('should toggle dropdown when it is clicked', function() {
       ctrl.dropdownShown = false;
-      ctrl.toggleDropdown();
 
+      ctrl.toggleDropdown();
       expect(ctrl.dropdownShown).toBe(true);
 
       ctrl.toggleDropdown();
-
       expect(ctrl.dropdownShown).toBe(false);
     });
 
@@ -861,16 +860,12 @@ describe('Contributions and review component', function() {
       ctrl.activeTabType = ctrl.TAB_TYPE_REVIEWS;
       ctrl.activeSuggestionType = 'add_question';
 
-      var dropdownChoice = ctrl.getActiveDropdownTabChoice();
-
-      expect(dropdownChoice).toBe('Review Questions');
+      expect(ctrl.getActiveDropdownTabChoice()).toBe('Review Questions');
 
       ctrl.activeTabType = ctrl.TAB_TYPE_CONTRIBUTIONS;
       ctrl.activeSuggestionType = 'translate_content';
 
-      var dropdownChoice = ctrl.getActiveDropdownTabChoice();
-
-      expect(dropdownChoice).toBe('Translations');
+      expect(ctrl.getActiveDropdownTabChoice()).toBe('Translations');
     });
 
     it('should close dropdown when a click is made outside', function() {
@@ -908,7 +903,6 @@ describe('Contributions and review component', function() {
       const unbindSpy = spyOn($.fn, 'off');
 
       ctrl.$onDestroy();
-
       expect(unbindSpy).toHaveBeenCalled();
     });
   });
