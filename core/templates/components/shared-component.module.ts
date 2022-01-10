@@ -122,8 +122,8 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
 @NgModule({
   imports: [
     BaseModule,
-    DragDropModule,
     CommonModule,
+    DragDropModule,
     CustomFormsComponentsModule,
     CommonElementsModule,
     CodeMirrorModule,
@@ -222,7 +222,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     SortByPipe,
     LearnerDashboardIconsComponent,
     PreviewThumbnailComponent,
-    AddHintModalComponent,
+    AddHintModalComponent
   ],
 
   entryComponents: [
@@ -264,13 +264,16 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     ExplorationEmbedButtonModalComponent,
     OutcomeFeedbackEditorComponent,
     HintAndSolutionButtonsComponent,
+    HintEditorComponent,
     InputResponsePairComponent,
     KeyboardShortcutHelpModalComponent,
     ProgressNavComponent,
     PreviewThumbnailComponent,
     QuestionDifficultySelectorComponent,
     RatingDisplayComponent,
+    ResponseHeaderComponent,
     RubricsEditorComponent,
+    StateHintsEditorComponent,
     ScoreRingComponent,
     SearchBarComponent,
     StorySummaryTileComponent,
@@ -287,11 +290,8 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     LearnerDashboardIconsComponent,
     PreviewThumbnailComponent,
-    AddHintModalComponent,
     SavePendingChangesModalComponent,
-    HintEditorComponent,
-    ResponseHeaderComponent,
-    StateHintsEditorComponent
+    AddHintModalComponent
   ],
 
   exports: [
