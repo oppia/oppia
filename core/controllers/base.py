@@ -168,10 +168,19 @@ class BaseHandler(webapp2.RequestHandler):
         # Initializes the return dict for the handlers.
         self.values = {}
 
+        # This try-catch block is intended to log cases where getting the
+        # request payload errors with ValueError: Invalid boundary in multipart
+        # form: b''. This is done to gather sufficient data to help debug the
+        # error if it arises in the future.
+        try:
+            payload_json_string = self.request.get('payload')
+        except ValueError as e:
+            logging.error('%s: request %s', e, self.request)
+            raise e
         # TODO(#13155): Remove the if-else part once all the handlers have had
         # schema validation implemented.
-        if self.request.get('payload'):
-            self.payload = json.loads(self.request.get('payload'))
+        if payload_json_string:
+            self.payload = json.loads(payload_json_string)
         else:
             self.payload = None
         self.iframed = False

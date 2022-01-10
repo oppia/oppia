@@ -13,21 +13,22 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the Oppia splash page.
+ * @fileoverview Component for skill editor save modal.
  */
+
 import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import { AppConstants } from 'app.constants';
 
 @Component({
-  selector: 'oppia-story-save-pending-changes-modal',
-  templateUrl: './story-save-pending-changes-modal.component.html'
+  selector: 'skill-editor-save-modal',
+  templateUrl: './skill-editor-save-modal.component.html'
 })
-export class StorySavePendingChangesModalComponent {
-  constructor(
-      private activeModal: NgbActiveModal
-  ) {}
-
-  cancel(): void {
-    this.activeModal.dismiss();
+export class SkillEditorSaveModalComponent extends ConfirmOrCancelModal {
+  commitMessage: string;
+  MAX_COMMIT_MESSAGE_LENGTH: number = AppConstants.MAX_COMMIT_MESSAGE_LENGTH;
+  constructor(activeModal: NgbActiveModal) {
+    super(activeModal);
   }
 }
