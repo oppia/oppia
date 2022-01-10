@@ -27,7 +27,7 @@
     Correct
   </span>
   <span *ngIf="outcome && !isOutcomeLooping() && !isCreatingNewState() && !isInQuestionMode()"
-        (click)="navigateToState(outcome.dest)" class="oppia-nested-link">
+        (click)="returnToState()" class="oppia-nested-link">
     {{outcome.dest}}
   </span>
   <span class="oppia-nested-link" *ngIf="outcome && !isOutcomeLooping() && isCreatingNewState()">
@@ -43,7 +43,7 @@
 </div>
 
 <span class="oppia-delete-response-button oppia-transition-200 protractor-test-delete-response"
-      *ngIf="this.editabilityService.isEditable() && deleteFn"
+      *ngIf="this.editabilityService.isEditable()"
       (click)="deleteResponse($event)">
   <i class="material-icons md-18">&#xE5CD;</i>
 </span>

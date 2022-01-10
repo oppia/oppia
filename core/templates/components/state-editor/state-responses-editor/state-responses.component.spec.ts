@@ -787,27 +787,35 @@ describe('StateResponsesComponent', () => {
     ' on delete button', () => {
     spyOn(ngbModal, 'open').and.callThrough();
 
-    $scope.deleteAnswerGroup(0, new Event(''));
+    const value = {
+      index: 0,
+      evt: new Event('')
+    };
+
+    $scope.deleteAnswerGroup(value);
 
     expect(ngbModal.open).toHaveBeenCalled();
   });
 
   it('should delete answer group after modal is opened', () => {
-    spyOn(ResponsesService, 'deleteAnswerGroup').and.callFake(
-      (index, callback) => {
-        callback();
-      }
-    );
+    spyOn(ResponsesService, 'deleteAnswerGroup').and.callThrough();
+    spyOn($rootScope, '$apply').and.callThrough();
     spyOn(ngbModal, 'open').and.returnValue(
       {
         result: $q.resolve()
       } as NgbModalRef
     );
 
-    $scope.deleteAnswerGroup(0, new Event(''));
+    const value = {
+      index: 0,
+      evt: new Event('')
+    };
+
+    $scope.deleteAnswerGroup(value);
     $scope.$apply();
 
     expect(ngbModal.open).toHaveBeenCalled();
+    expect($rootScope.$apply).toHaveBeenCalled();
     expect(ResponsesService.deleteAnswerGroup).toHaveBeenCalled();
   });
 
@@ -819,7 +827,12 @@ describe('StateResponsesComponent', () => {
       } as NgbModalRef
     );
 
-    $scope.deleteAnswerGroup(0, new Event(''));
+    const value = {
+      index: 0,
+      evt: new Event('')
+    };
+
+    $scope.deleteAnswerGroup(value);
     $scope.$apply();
 
     expect(AlertsService.clearWarnings).toHaveBeenCalledTimes(2);

@@ -145,13 +145,6 @@ describe('StateHintsEditorComponent', () => {
     stateSolutionService.savedMemento = solutionObjectFactory.createNew(
       true, 'correct_answer', '<p> Hint Index 0 </p>', '0'
     );
-    component.onSaveHints = () => {};
-    component.onSaveSolution = () => {};
-    component.onSaveNextContentIdIndex = () => {};
-    component.showMarkAllAudioAsNeedingUpdateModalIfRequired = (event) => {
-    };
-
-    fixture.detectChanges();
 
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
     spyOn(editabilityService, 'isEditable').and.returnValue(true);
@@ -161,11 +154,23 @@ describe('StateHintsEditorComponent', () => {
       }) as NgbModalRef;
     });
 
+    fixture.detectChanges();
     component.ngOnInit();
+  });
+
+  it('should emit showMarkAllAudioAsNeedingUpdateModalIfRequired', () => {
+    spyOn(component.showMarkAllAudioAsNeedingUpdateModalIfRequired, 'emit');
+
+    component.sendShowMarkAllAudioAsNeedingUpdateModalIfRequired(
+      new Event(' '));
+
+    expect(component.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit)
+      .toHaveBeenCalled();
   });
 
   it('should change list oder', () => {
     spyOn(stateHintsService, 'saveDisplayedValue').and.callThrough();
+    spyOn(component.onSaveHints, 'emit').and.callThrough();
 
     const event = {
       previousIndex: 1,
@@ -176,6 +181,7 @@ describe('StateHintsEditorComponent', () => {
     component.drop(event);
 
     expect(stateHintsService.saveDisplayedValue).toHaveBeenCalled();
+    expect(component.onSaveHints.emit).toHaveBeenCalled();
   });
 
   it('should set component properties on initialization', () => {
@@ -195,12 +201,12 @@ describe('StateHintsEditorComponent', () => {
 
   it('should save displayed hint value when user saves inline hint', () => {
     spyOn(stateHintsService, 'saveDisplayedValue');
-    spyOn(component, 'onSaveHints');
+    spyOn(component.onSaveHints, 'emit');
 
     component.onSaveInlineHint();
 
     expect(stateHintsService.saveDisplayedValue).toHaveBeenCalled();
-    expect(component.onSaveHints).toHaveBeenCalled();
+    expect(component.onSaveHints.emit).toHaveBeenCalled();
   });
 
   it('should check if current interaction is linear', () => {
@@ -447,7 +453,12 @@ describe('StateHintsEditorComponent', () => {
     ];
     stateHintsService.savedMemento = stateHintsService.displayed;
 
-    component.deleteHint(0, new Event(''));
+    const value = {
+      index: 0,
+      evt: new Event('')
+    };
+
+    component.deleteHint(value);
     tick();
 
     expect(ngbModal.open).toHaveBeenCalled();
@@ -477,7 +488,12 @@ describe('StateHintsEditorComponent', () => {
     ];
     stateHintsService.savedMemento = stateHintsService.displayed;
 
-    component.deleteHint(0, new Event(''));
+    const value = {
+      index: 0,
+      evt: new Event('')
+    };
+
+    component.deleteHint(value);
     tick();
 
     expect(stateHintsService.displayed.length).toEqual(1);
@@ -491,7 +507,12 @@ describe('StateHintsEditorComponent', () => {
       } as NgbModalRef
     );
 
-    component.deleteHint(0, new Event(''));
+    const value = {
+      index: 0,
+      evt: new Event('')
+    };
+
+    component.deleteHint(value);
 
     expect(alertsService.clearWarnings).toHaveBeenCalledTimes(1);
   });

@@ -62,9 +62,6 @@ describe('HintEditorComponent', () => {
         };
       }
     };
-    component.showMarkAllAudioAsNeedingUpdateModalIfRequired = (event) => {
-    };
-    component.saveHint = () => {};
 
     fixture.detectChanges();
   });
@@ -87,15 +84,15 @@ describe('HintEditorComponent', () => {
     let onExternalSaveEmitter = new EventEmitter();
     spyOnProperty(externalSaveService, 'onExternalSave')
       .and.returnValue(onExternalSaveEmitter);
-    const showMarkAllAudioAsNeedingUpdateModalIfRequiredSpy =
-      spyOn(component, 'showMarkAllAudioAsNeedingUpdateModalIfRequired');
+    spyOn(component.showMarkAllAudioAsNeedingUpdateModalIfRequired, 'emit')
+      .and.callThrough();
 
     component.ngOnInit();
 
     component.hintEditorIsOpen = true;
     component.hint = {
       hintContent: SubtitledHtml.createDefault(
-        'change', 'roj'),
+        'change', 'data'),
 
       toBackendDict(): HintBackendDict {
         return {
@@ -117,7 +114,7 @@ describe('HintEditorComponent', () => {
     onExternalSaveEmitter.emit();
     tick();
 
-    expect(showMarkAllAudioAsNeedingUpdateModalIfRequiredSpy)
+    expect(component.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit)
       .toHaveBeenCalled();
   }));
 

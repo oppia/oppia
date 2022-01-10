@@ -22,6 +22,7 @@ import { ResponseHeaderComponent } from './response-header.component';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
+import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 
 const mockInteractionState = {
   TextInput: {
@@ -36,6 +37,7 @@ describe('Response Header Component', () => {
   let component: ResponseHeaderComponent;
   let fixture: ComponentFixture<ResponseHeaderComponent>;
   let stateEditorService: StateEditorService;
+  let outcomeObjectFactory: OutcomeObjectFactory;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -44,6 +46,7 @@ describe('Response Header Component', () => {
       ],
       providers: [
         StateEditorService,
+        OutcomeObjectFactory,
         {
           provide: INTERACTION_SPECS,
           useValue: mockInteractionState
@@ -62,14 +65,9 @@ describe('Response Header Component', () => {
     component = fixture.componentInstance;
 
     stateEditorService = TestBed.inject(StateEditorService);
+    outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
 
-    component.outcome = {
-      labelledAsCorrect: true,
-      dest: '/'
-    };
-    component.deleteFn = (event) => {
-      return () => {};
-    };
+    component.outcome = outcomeObjectFactory.createNew('/', null, null, null);
     component.index = 0;
 
     fixture.detectChanges();
@@ -96,8 +94,16 @@ describe('Response Header Component', () => {
     expect(component.isCurrentInteractionLinear()).toBe(false);
   });
 
+  it('should navigate to state after user click on outcome dest', () => {
+    spyOn(component.navigateToState, 'emit').and.callThrough();
+
+    component.returnToState();
+
+    expect(component.navigateToState.emit).toHaveBeenCalled();
+  });
+
   it('should check if current response is outcome is correct', () => {
-    expect(component.isCorrect()).toBe(true);
+    expect(component.isCorrect()).toBe(false);
   });
 
   it('should check if outcome is in a loop', () => {
@@ -111,9 +117,9 @@ describe('Response Header Component', () => {
   });
 
   it('should delete response when user clicks delete button', () => {
-    spyOn(component, 'deleteFn').and.callThrough();
+    spyOn(component.deleteFn, 'emit').and.callThrough();
     component.deleteResponse(new Event(''));
 
-    expect(component.deleteFn).toHaveBeenCalled();
+    expect(component.deleteFn.emit).toHaveBeenCalled();
   });
 });

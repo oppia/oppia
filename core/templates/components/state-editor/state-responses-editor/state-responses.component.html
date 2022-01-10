@@ -37,9 +37,9 @@
                                        [summary]="summarizeAnswerGroup(answerGroup, getCurrentInteractionId(), getAnswerChoices(), false)"
                                        [short-summary]="summarizeAnswerGroup(answerGroup, getCurrentInteractionId(), getAnswerChoices(), true)"
                                        [is-active]="$index === activeAnswerGroupIndex"
-                                       [delete-fn]="deleteAnswerGroup"
+                                       (delete-fn)="deleteAnswerGroup($event)"
                                        [outcome]="answerGroup.outcome"
-                                       [navigate-to-state]="$ctrl.navigateToState"
+                                       (navigate-to-state)="$ctrl.navigateToState($event)"
                                        [num-rules]="answerGroup.rules.length"
                                        [is-response]="true">
                 </oppia-response-header>
@@ -84,7 +84,7 @@
                                        [summary]="summarizeDefaultOutcome(defaultOutcome, getCurrentInteractionId(), answerGroups.length, false)"
                                        [short-summary]="summarizeDefaultOutcome(defaultOutcome, getCurrentInteractionId(), answerGroups.length, true)"
                                        [outcome]="defaultOutcome"
-                                       [navigate-to-state]="$ctrl.navigateToState"
+                                       (navigate-to-state)="$ctrl.navigateToState($event)"
                                        [is-response]="true">
                 </oppia-response-header>
               </a>

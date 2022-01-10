@@ -16,36 +16,41 @@
  * @fileoverview Component for the header of the response tiles.
  */
 
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { EditabilityService } from 'services/editability.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { AppConstants } from 'app.constants';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 
 @Component({
   selector: 'oppia-response-header',
   templateUrl: './response-header.component.html'
 })
 export class ResponseHeaderComponent {
-  @Input() index;
-  @Input() summary;
-  @Input() shortSummary;
-  @Input() isActive;
-  @Input() deleteFn;
-  @Input() outcome;
-  @Input() navigateToState;
-  @Input() numRules;
-  @Input() showWarning;
-  @Input() isResponse;
-  @Input() correctnessFeedbackEnabled;
+  @Input() index: number;
+  @Input() summary: string;
+  @Input() shortSummary: string;
+  @Input() isActive: boolean;
+  @Input() outcome: Outcome;
+  @Input() numRules: number;
+  @Input() isResponse: boolean;
+  @Input() correctnessFeedbackEnabled: boolean;
+  @Input() showWarning: boolean;
+  @Output() deleteFn = new EventEmitter();
+  @Output() navigateToState = new EventEmitter();
 
   constructor(
     private stateEditorService: StateEditorService,
     private stateInteractionIdService: StateInteractionIdService,
     private editabilityService: EditabilityService,
   ) {}
+
+  returnToState(): void {
+    this.navigateToState.emit(this.outcome.dest);
+  }
 
   isInQuestionMode(): boolean {
     return this.stateEditorService.isInQuestionMode();
@@ -81,7 +86,12 @@ export class ResponseHeaderComponent {
   }
 
   deleteResponse(evt: Event): void {
-    this.deleteFn(this.index, evt);
+    const value = {
+      index: this.index,
+      evt: evt
+    };
+
+    this.deleteFn.emit(value);
   }
 }
 

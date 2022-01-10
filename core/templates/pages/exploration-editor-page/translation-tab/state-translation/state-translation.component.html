@@ -153,7 +153,7 @@
                                      [num-rules]="answerGroup.rules.length"
                                      [is-response]="true"
                                      [show-warning]="contentIdNeedUpdates(answerGroup.outcome.feedback.contentId)"
-                                     [navigate-to-state]="navigateToState"
+                                     (navigate-to-state)="navigateToState($event)"
                                      [correctness-feedback-enabled]="ExplorationCorrectnessFeedbackService.isEnabled()">
               </oppia-response-header>
             </a>
@@ -193,7 +193,7 @@
                                      [outcome]="stateDefaultOutcome"
                                      [is-response]="true"
                                      [show-warning]="contentIdNeedUpdates(stateDefaultOutcome.feedback.contentId)"
-                                     [navigate-to-state]="navigateToState"
+                                     (navigate-to-state)="navigateToState($event)"
                                      [correctness-feedback-enabled]="ExplorationCorrectnessFeedbackService.isEnabled()">
               </oppia-response-header>
             </a>

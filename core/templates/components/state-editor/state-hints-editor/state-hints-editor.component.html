@@ -53,7 +53,7 @@
                                          [summary]="getHintSummary(hint)"
                                          [shortSummary]="getHintSummary(hint)"
                                          [isActive]="index === stateHintsService.getActiveHintIndex()"
-                                         [deleteFn]="deleteHint">
+                                         (deleteFn)="deleteHint($event)">
                   </oppia-response-header>
                 </a>
 

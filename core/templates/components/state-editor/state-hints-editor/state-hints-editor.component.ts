@@ -38,6 +38,10 @@ import { DeleteLastHintModalComponent } from 'pages/exploration-editor-page/edit
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { CdkDragSortEvent, moveItemInArray} from '@angular/cdk/drag-drop';
 
+interface deleteResponse {
+  index: number;
+  evt: Event;
+}
 interface AddHintModalResponse {
   hint: Hint;
 }
@@ -169,22 +173,22 @@ export class StateHintsEditorComponent implements OnInit {
     });
   };
 
-  deleteHint = (index: number, evt: Event): void => {
+  deleteHint(value: deleteResponse): void {
     // Prevent clicking on the delete button from also toggling the
     // display state of the hint.
-    evt.stopPropagation();
+    value.evt.stopPropagation();
 
     const deleteHintModalSuccess = (): void => {
       if (this.stateSolutionService.savedMemento &&
         this.stateHintsService.savedMemento.length === 1) {
         this.openDeleteLastHintModal();
       } else {
-        this.stateHintsService.displayed.splice(index, 1);
+        this.stateHintsService.displayed.splice(value.index, 1);
         this.stateHintsService.saveDisplayedValue();
         this.onSaveHints.emit(this.stateHintsService.displayed);
       }
 
-      if (index === this.stateHintsService.getActiveHintIndex()) {
+      if (value.index === this.stateHintsService.getActiveHintIndex()) {
         this.stateHintsService.setActiveHintIndex(null);
       }
     };
@@ -197,7 +201,7 @@ export class StateHintsEditorComponent implements OnInit {
     }, function() {
       this.alertsService.clearWarnings();
     });
-  };
+  }
 
   onSaveInlineHint(): void {
     this.stateHintsService.saveDisplayedValue();
