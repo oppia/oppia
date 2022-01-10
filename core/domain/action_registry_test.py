@@ -32,7 +32,7 @@ class ActionRegistryUnitTests(test_utils.GenericTestBase):
 
     def test_cannot_get_action_by_invalid_type(self):
         # Testing with invalid action type.
-        with self.assertRaises(KeyError):
+        with self.assertRaisesRegex(KeyError, 'fakeAction'):
             action_registry.Registry.get_action_by_type('fakeAction')
 
     def test_can_get_action_by_valid_type(self):
