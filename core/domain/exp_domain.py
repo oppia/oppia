@@ -552,7 +552,8 @@ class VersionedExplorationInteractionIdsMapping:
 class Exploration:
     """Domain object for an Oppia exploration."""
 
-    __initialized__ = False
+    __initialized = False
+
     def __init__(
             self, exploration_id, title, category, objective,
             language_code, tags, blurb, author_notes,
@@ -623,7 +624,7 @@ class Exploration:
         self.proto_size_in_bytes = None
         self.proto_size_is_stale = True
         self._cached_android_proto_size_in_bytes = 0
-        __initialized__ = True
+        __initialized = True
 
     @classmethod
     def create_default_exploration(
@@ -1331,7 +1332,7 @@ class Exploration:
         return self._cached_android_proto_size_in_bytes
 
     def __setattr__(self, aa, new_value):
-        if self.__initialized__:
+        if self.__initialized:
             if (aa != 'proto_size_in_bytes' and
                 aa != 'proto_size_is_stale' and
                 aa != '_cached_android_proto_size_in_bytes'):
