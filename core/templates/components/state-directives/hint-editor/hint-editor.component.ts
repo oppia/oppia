@@ -38,7 +38,7 @@ interface HintFormSchema {
 export class HintEditorComponent implements OnInit, OnDestroy {
   @Input() hint: Hint;
   @Input() indexPlusOne!: number;
-  @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired= new EventEmitter();
+  @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired = new EventEmitter();
   @Output() saveHint = new EventEmitter();
 
   directiveSubscriptions = new Subscription();
