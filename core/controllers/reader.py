@@ -46,10 +46,7 @@ from core.domain import stats_services
 from core.domain import story_fetchers
 from core.domain import summary_services
 from core.domain import user_services
-from core.domain.exp_domain import DEFAULT_OUTCOME_CLASSIFICATION
-from core.domain.exp_domain import EXPLICIT_CLASSIFICATION
-from core.domain.exp_domain import STATISTICAL_CLASSIFICATION
-from core.domain.exp_domain import TRAINING_DATA_CLASSIFICATION
+from core.domain import exp_domain
 
 MAX_SYSTEM_RECOMMENDATIONS = 4
 
@@ -499,10 +496,10 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
                 'schema': {
                     'type': 'basestring',
                     'choices': [
-                        EXPLICIT_CLASSIFICATION,
-                        TRAINING_DATA_CLASSIFICATION,
-                        STATISTICAL_CLASSIFICATION,
-                        DEFAULT_OUTCOME_CLASSIFICATION
+                        exp_domain.EXPLICIT_CLASSIFICATION,
+                        exp_domain.TRAINING_DATA_CLASSIFICATION,
+                        exp_domain.STATISTICAL_CLASSIFICATION,
+                        exp_domain.DEFAULT_OUTCOME_CLASSIFICATION
                     ]
                 }
             }
