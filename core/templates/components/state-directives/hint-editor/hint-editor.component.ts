@@ -16,7 +16,7 @@
  * @fileoverview Component for the hint editor.
  */
 
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { FormControl, FormGroup } from '@angular/forms';
 import { Subscription } from 'rxjs';
@@ -38,8 +38,9 @@ interface HintFormSchema {
 export class HintEditorComponent implements OnInit, OnDestroy {
   @Input() hint: Hint;
   @Input() indexPlusOne!: number;
-  @Input() saveHint;
-  @Input() showMarkAllAudioAsNeedingUpdateModalIfRequired;
+  @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired= new EventEmitter();
+  @Output() saveHint = new EventEmitter();
+
   directiveSubscriptions = new Subscription();
   hintEditorIsOpen: boolean;
   hintMemento: Hint;
@@ -81,11 +82,11 @@ export class HintEditorComponent implements OnInit, OnDestroy {
 
     if (contentHasChanged) {
       const hintContentId = this.hint.hintContent.contentId;
-      this.showMarkAllAudioAsNeedingUpdateModalIfRequired(
+      this.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit(
         [hintContentId]);
     }
 
-    this.saveHint();
+    this.saveHint.emit();
   }
 
   cancelThisHintEdit(): void {

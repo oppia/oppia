@@ -17,7 +17,7 @@
  * editor.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { Hint } from 'domain/exploration/HintObjectFactory';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
@@ -46,10 +46,11 @@ interface AddHintModalResponse {
   templateUrl: './state-hints-editor.component.html'
 })
 export class StateHintsEditorComponent implements OnInit {
-  @Input() onSaveHints;
-  @Input() onSaveNextContentIdIndex;
-  @Input() onSaveSolution;
-  @Input() showMarkAllAudioAsNeedingUpdateModalIfRequired;
+  @Output() onSaveNextContentIdIndex = new EventEmitter();
+  @Output() onSaveSolution = new EventEmitter();
+  @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired = new EventEmitter();
+  @Output() onSaveHints = new EventEmitter();
+
   hintCardIsShown: boolean;
   canEdit: boolean;
 
@@ -73,7 +74,7 @@ export class StateHintsEditorComponent implements OnInit {
       this.stateHintsService.displayed, event.previousIndex,
       event.currentIndex);
     this.stateHintsService.saveDisplayedValue();
-    this.onSaveHints(this.stateHintsService.displayed);
+    this.onSaveHints.emit(this.stateHintsService.displayed);
   }
 
   getHintButtonText(): string {
@@ -103,7 +104,7 @@ export class StateHintsEditorComponent implements OnInit {
         this.alertsService.addInfoMessage('Deleting empty hint.');
         this.stateHintsService.displayed.splice(currentActiveIndex, 1);
         this.stateHintsService.saveDisplayedValue();
-        this.onSaveHints(this.stateHintsService.displayed);
+        this.onSaveHints.emit(this.stateHintsService.displayed);
       }
     }
     // If the current hint is being clicked on again, close it.
@@ -130,9 +131,9 @@ export class StateHintsEditorComponent implements OnInit {
     const addHintSuccess = (result: AddHintModalResponse): void => {
       this.stateHintsService.displayed.push(result.hint);
       this.stateHintsService.saveDisplayedValue();
-      this.onSaveHints(this.stateHintsService.displayed);
+      this.onSaveHints.emit(this.stateHintsService.displayed);
       this.stateNextContentIdIndexService.saveDisplayedValue();
-      this.onSaveNextContentIdIndex(
+      this.onSaveNextContentIdIndex.emit(
         this.stateNextContentIdIndexService.displayed);
     };
 
@@ -152,11 +153,11 @@ export class StateHintsEditorComponent implements OnInit {
     const openDeleteLastHintSuccess = (): void => {
       this.stateSolutionService.displayed = null;
       this.stateSolutionService.saveDisplayedValue();
-      this.onSaveSolution(this.stateSolutionService.displayed);
+      this.onSaveSolution.emit(this.stateSolutionService.displayed);
 
       this.stateHintsService.displayed = [];
       this.stateHintsService.saveDisplayedValue();
-      this.onSaveHints(this.stateHintsService.displayed);
+      this.onSaveHints.emit(this.stateHintsService.displayed);
     };
 
     this.ngbModal.open(DeleteLastHintModalComponent, {
@@ -180,7 +181,7 @@ export class StateHintsEditorComponent implements OnInit {
       } else {
         this.stateHintsService.displayed.splice(index, 1);
         this.stateHintsService.saveDisplayedValue();
-        this.onSaveHints(this.stateHintsService.displayed);
+        this.onSaveHints.emit(this.stateHintsService.displayed);
       }
 
       if (index === this.stateHintsService.getActiveHintIndex()) {
@@ -200,7 +201,11 @@ export class StateHintsEditorComponent implements OnInit {
 
   onSaveInlineHint(): void {
     this.stateHintsService.saveDisplayedValue();
-    this.onSaveHints(this.stateHintsService.displayed);
+    this.onSaveHints.emit(this.stateHintsService.displayed);
+  }
+
+  sendShowMarkAllAudioAsNeedingUpdateModalIfRequired(value: Event): void {
+    this.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit(value);
   }
 
   toggleHintCard(): void {

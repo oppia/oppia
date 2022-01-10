@@ -60,9 +60,9 @@
                 <div *ngIf="stateHintsService.getActiveHintIndex() === index">
                   <div class="oppia-editor-card-section protractor-test-hint-body-{{index}}">
                     <oppia-hint-editor [hint]="hint"
-                                       [saveHint]="onSaveInlineHint"
                                        [indexPlusOne]="index + 1"
-                                       [showMarkAllAudioAsNeedingUpdateModalIfRequired]="showMarkAllAudioAsNeedingUpdateModalIfRequired">
+                                       (saveHint)="onSaveInlineHint"
+                                       (showMarkAllAudioAsNeedingUpdateModalIfRequired)="sendShowMarkAllAudioAsNeedingUpdateModalIfRequired($event)">
                     </oppia-hint-editor>
                   </div>
                 </div>
