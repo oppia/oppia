@@ -293,13 +293,27 @@ export class SvgEditorComponent implements OnInit {
       };
       this.diagramWidth = dimensions.width;
       this.diagramHeight = dimensions.height;
-      this.svgFileFetcherBackendApiService.fetchSvg(
-        this.data.savedSvgUrl as string
-      ).subscribe(
-        response => {
-          this.savedSvgDiagram = response;
-        }
-      );
+      let svgDataUrl = this.imageLocalStorageService.getRawImageData(
+        this.data.savedSvgFileName);
+      if (
+        this.imageSaveDestination ===
+        AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE && svgDataUrl
+      ) {
+        this.uploadedSvgDataUrl = {
+          safeUrl: this.svgSanitizerService.getTrustedSvgResourceUrl(
+            svgDataUrl as string),
+          unsafeUrl: svgDataUrl as string
+        };
+        this.savedSvgDiagram = atob(svgDataUrl.split(',')[1]);
+      } else {
+        this.svgFileFetcherBackendApiService.fetchSvg(
+          this.data.savedSvgUrl as string
+        ).subscribe(
+          response => {
+            this.savedSvgDiagram = response;
+          }
+        );
+      }
     }
   }
 
