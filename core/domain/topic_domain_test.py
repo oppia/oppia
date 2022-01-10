@@ -127,13 +127,17 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             ' story references list of the topic.'):
             self.topic.delete_canonical_story('story_id_5')
 
-    def test_rearrange_canonical_story_fail_with_invalid_from_index_value(self) -> None:
+    def test_rearrange_canonical_story_fail_with_invalid_from_index_value(
+        self
+    ) -> None:
         with self.assertRaisesRegexp(  # type: ignore[no-untyped-call]
             Exception, 'Expected from_index value to be a number, '
                        'received None'):
             self.topic.rearrange_canonical_story(None, 2) # type: ignore[arg-type]
 
-    def test_rearrange_canonical_story_fail_with_invalid_to_index_value(self) -> None:
+    def test_rearrange_canonical_story_fail_with_invalid_to_index_value(
+        self
+    ) -> None:
         with self.assertRaisesRegexp(  # type: ignore[no-untyped-call]
             Exception, 'Expected to_index value to be a number, '
                        'received None'):
@@ -203,13 +207,17 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(canonical_story_ids[1], 'story_id_2')
         self.assertEqual(canonical_story_ids[2], 'story_id_3')
 
-    def test_rearrange_skill_in_subtopic_fail_with_invalid_from_index(self) -> None:
+    def test_rearrange_skill_in_subtopic_fail_with_invalid_from_index(
+        self
+    ) -> None:
         with self.assertRaisesRegexp(  # type: ignore[no-untyped-call]
             Exception, 'Expected from_index value to be a number, '
                        'received None'):
             self.topic.rearrange_skill_in_subtopic(1, None, 2) # type: ignore[arg-type]
 
-    def test_rearrange_skill_in_subtopic_fail_with_invalid_to_index_value(self) -> None:
+    def test_rearrange_skill_in_subtopic_fail_with_invalid_to_index_value(
+        self
+    ) -> None:
         with self.assertRaisesRegexp(  # type: ignore[no-untyped-call]
             Exception, 'Expected to_index value to be a number, '
                        'received None'):

@@ -1024,7 +1024,7 @@ class Topic:
             raise Exception(
                 'Expected from_index value to be a number, '
                        'received None')
-        
+
         if to_index is None:
             raise Exception(
                 'Expected to_index value to be a number, '
@@ -1708,7 +1708,7 @@ class Topic:
             raise Exception(
                 'Expected from_index value to be a number, '
                        'received None')
-        
+
         if to_index is None:
             raise Exception(
                 'Expected to_index value to be a number, '
@@ -1750,7 +1750,7 @@ class Topic:
             raise Exception(
                 'Expected from_index value to be a number, '
                        'received None')
-        
+
         if to_index is None:
             raise Exception(
                 'Expected to_index value to be a number, '
