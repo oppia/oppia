@@ -95,11 +95,13 @@ export class Exploration {
   isStateTerminal(stateName: string): boolean {
     let interactionId = this.getInteractionId(stateName);
     return (
-      Boolean(interactionId) && INTERACTION_SPECS[
-        interactionId as InteractionSpecsKey].is_terminal
+      Boolean(interactionId) &&
+      INTERACTION_SPECS[interactionId as InteractionSpecsKey].is_terminal
     );
   }
 
+  // If no customization arguments are defined for a terminal state,
+  // a null value is returned.
   getAuthorRecommendedExpIds(stateName: string): string[] | null {
     if (!this.isStateTerminal(stateName)) {
       throw new Error(
@@ -115,6 +117,7 @@ export class Exploration {
       customizationArgs.recommendedExplorationIds.value : null;
   }
 
+  // Returned interaction is null for invalid state names.
   getInteraction(stateName: string): Interaction | null {
     let state = this.states.getState(stateName);
     if (!state) {
@@ -124,6 +127,7 @@ export class Exploration {
     return state.interaction;
   }
 
+  // Returned interaction id is null for invalid state names.
   getInteractionId(stateName: string): string | null {
     let interaction = this.getInteraction(stateName);
     if (interaction === null) {
@@ -132,8 +136,10 @@ export class Exploration {
     return interaction.id;
   }
 
+  // Returned interaction customization args is null for invalid state names.
   getInteractionCustomizationArgs(
-      stateName: string): InteractionCustomizationArgs | null {
+      stateName: string
+  ): InteractionCustomizationArgs | null {
     let interaction = this.getInteraction(stateName);
     if (interaction === null) {
       return null;
@@ -141,6 +147,8 @@ export class Exploration {
     return interaction.customizationArgs;
   }
 
+  // The 'instructions' key in INTERACTION_SPECS for some interaction
+  // specs can be null, hence return type is string | null.
   getInteractionInstructions(stateName: string): string | null {
     let interactionId = this.getInteractionId(stateName);
     return interactionId ? INTERACTION_SPECS[
@@ -148,6 +156,8 @@ export class Exploration {
     ].instructions : '';
   }
 
+  // The 'narrow_instructions' key in INTERACTION_SPECS for some
+  // interaction specs can be null, hence return type is string | null.
   getNarrowInstructions(stateName: string): string | null {
     let interactionId = this.getInteractionId(stateName);
     return (
@@ -198,6 +208,7 @@ export class Exploration {
     return this.getState(stateName).content.html;
   }
 
+  // Returned BindableVoiceover instance is null for invalid state names.
   getVoiceovers(stateName: string): BindableVoiceovers | null {
     let state = this.getState(stateName);
     if (!state) {
@@ -210,6 +221,7 @@ export class Exploration {
       contentId);
   }
 
+  // Returned Voiceover instance is null for invalid state names.
   getVoiceover(
       stateName: string, languageCode: string): Voiceover | null {
     let state = this.getState(stateName);
