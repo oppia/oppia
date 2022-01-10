@@ -461,39 +461,7 @@ class StateStatsTests(test_utils.GenericTestBase):
     def test_clone(self):
         state_stats = stats_domain.StateStats(0, 10, 0, 4, 0, 18, 0, 7, 2, 0, 2)
         expected_state_stats = state_stats.clone()
-        self.assertEqual(
-            state_stats.total_answers_count_v1,
-            expected_state_stats.total_answers_count_v1)
-        self.assertEqual(
-            state_stats.total_answers_count_v2,
-            expected_state_stats.total_answers_count_v2)
-        self.assertEqual(
-            state_stats.useful_feedback_count_v1,
-            expected_state_stats.useful_feedback_count_v1)
-        self.assertEqual(
-            state_stats.useful_feedback_count_v2,
-            expected_state_stats.useful_feedback_count_v2)
-        self.assertEqual(
-            state_stats.total_hit_count_v1,
-            expected_state_stats.total_hit_count_v1)
-        self.assertEqual(
-            state_stats.total_hit_count_v2,
-            expected_state_stats.total_hit_count_v2)
-        self.assertEqual(
-            state_stats.first_hit_count_v1,
-            expected_state_stats.first_hit_count_v1)
-        self.assertEqual(
-            state_stats.first_hit_count_v2,
-            expected_state_stats.first_hit_count_v2)
-        self.assertEqual(
-            state_stats.num_times_solution_viewed_v2,
-            expected_state_stats.num_times_solution_viewed_v2)
-        self.assertEqual(
-            state_stats.num_completions_v1,
-            expected_state_stats.num_completions_v1)
-        self.assertEqual(
-            state_stats.num_completions_v2,
-            expected_state_stats.num_completions_v2)
+        self.assertEqual(state_stats.to_dict(), expected_state_stats.to_dict())
 
 
 class SessionStateStatsTests(test_utils.GenericTestBase):
