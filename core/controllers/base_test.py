@@ -473,6 +473,23 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         )
         self.assertEqual(call_counter.times_called, 1)
 
+    def test_logs_request_with_invalid_payload(self):
+        with contextlib.ExitStack() as exit_stack:
+            logs = exit_stack.enter_context(
+                self.capture_logging(min_level=logging.ERROR))
+            exit_stack.enter_context(self.swap_to_always_raise(
+                webapp2.Request, 'get',
+                error=ValueError('uh-oh')))
+            self.get_custom_response(
+                '/',
+                expected_content_type='text/plain',
+                params=None,
+                expected_status_int=500)
+
+        self.assertRegexpMatches(
+            logs[0],
+            'uh-oh: request GET /')
+
 
 class MaintenanceModeTests(test_utils.GenericTestBase):
     """Tests BaseHandler behavior when maintenance mode is enabled.
@@ -1217,7 +1234,8 @@ class SignUpTests(test_utils.GenericTestBase):
         response = self.post_json(
             feconf.SIGNUP_DATA_URL, {
                 'username': 'abc',
-                'agreed_to_terms': True
+                'agreed_to_terms': True,
+                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
             }, csrf_token=csrf_token, expected_status_int=401,
         )
 
@@ -1233,7 +1251,8 @@ class SignUpTests(test_utils.GenericTestBase):
         self.post_json(
             feconf.SIGNUP_DATA_URL, {
                 'username': 'abc',
-                'agreed_to_terms': True
+                'agreed_to_terms': True,
+                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
             }, csrf_token=csrf_token,
         )
 
@@ -1249,7 +1268,8 @@ class SignUpTests(test_utils.GenericTestBase):
         response = self.post_json(
             feconf.SIGNUP_DATA_URL, {
                 'username': 'abc',
-                'agreed_to_terms': True
+                'agreed_to_terms': True,
+                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
             }, csrf_token='invalid_token', expected_status_int=401,
         )
 

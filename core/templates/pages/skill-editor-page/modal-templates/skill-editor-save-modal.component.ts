@@ -13,20 +13,22 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for Save Pending Changes Modal.
+ * @fileoverview Component for skill editor save modal.
  */
 
 import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import { AppConstants } from 'app.constants';
 
 @Component({
-  selector: 'save-pending-changes-modal',
-  templateUrl: './save-pending-changes-modal.component.html'
+  selector: 'skill-editor-save-modal',
+  templateUrl: './skill-editor-save-modal.component.html'
 })
-export class SavePendingChangesModalComponent
-  extends ConfirmOrCancelModal {
-  constructor(ngbActiveModal: NgbActiveModal) {
-    super(ngbActiveModal);
+export class SkillEditorSaveModalComponent extends ConfirmOrCancelModal {
+  commitMessage: string;
+  MAX_COMMIT_MESSAGE_LENGTH: number = AppConstants.MAX_COMMIT_MESSAGE_LENGTH;
+  constructor(activeModal: NgbActiveModal) {
+    super(activeModal);
   }
 }

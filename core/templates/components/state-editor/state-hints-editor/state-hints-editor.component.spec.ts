@@ -19,6 +19,12 @@ import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
  * @fileoverview Unit test for State Hints Editor Component.
  */
 
+import { fakeAsync, tick } from '@angular/core/testing';
+
+class MockNgbModalRef {
+  componentInstance = {};
+}
+
 describe('StateHintsEditorComponent', () => {
   let ctrl = null;
   let $rootScope = null;
@@ -35,7 +41,6 @@ describe('StateHintsEditorComponent', () => {
   let StateSolutionService = null;
   let AlertsService = null;
 
-  beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -64,10 +69,12 @@ describe('StateHintsEditorComponent', () => {
     AlertsService = $injector.get('AlertsService');
 
     ctrl = $componentController('stateHintsEditor', {
+      NgbModal: ngbModal,
       $scope: $scope
     }, {
       onSaveHints: () => {},
-      onSaveSolution: () => {}
+      onSaveSolution: () => {},
+      onSaveNextContentIdIndex: () => {}
     });
 
     spyOn(WindowDimensionsService, 'isWindowNarrow').and.returnValue(true);
@@ -259,42 +266,44 @@ describe('StateHintsEditorComponent', () => {
     expect($uibModal.open).not.toHaveBeenCalled();
   });
 
-  it('should open add hints modal when user clicks on add hint button', () => {
-    $scope.StateHintsService.displayed = [
-      {
-        hintContent: {
-          html: '<p> Hint </p>'
+  it('should open add hints modal when user clicks on add hint button',
+    fakeAsync(() => {
+      $scope.StateHintsService.displayed = [
+        {
+          hintContent: {
+            html: '<p> Hint </p>'
+          }
         }
-      }
-    ];
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.resolve({
-        hint: {
+      ];
+      spyOn(ngbModal, 'open').and.returnValue({
+        componentInstance: new MockNgbModalRef(),
+        result: Promise.resolve({
+          hint: {
+            hintContent: {
+              html: '<p> New hint </p>'
+            }
+          }
+        })
+      } as NgbModalRef);
+
+      $scope.openAddHintModal();
+      tick();
+
+      expect(StateHintsService.displayed).toEqual([
+        {
+          hintContent: {
+            html: '<p> Hint </p>'
+          }
+        },
+        {
           hintContent: {
             html: '<p> New hint </p>'
           }
         }
-      })
-    });
+      ]);
+    }));
 
-    $scope.openAddHintModal();
-    $scope.$apply();
-
-    expect(StateHintsService.displayed).toEqual([
-      {
-        hintContent: {
-          html: '<p> Hint </p>'
-        }
-      },
-      {
-        hintContent: {
-          html: '<p> New hint </p>'
-        }
-      }
-    ]);
-  });
-
-  it('should close add hint modal when user clicks cancel', () => {
+  it('should close add hint modal when user clicks cancel', fakeAsync(() => {
     $scope.StateHintsService.displayed = [
       {
         hintContent: {
@@ -302,15 +311,16 @@ describe('StateHintsEditorComponent', () => {
         }
       }
     ];
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.reject()
-    });
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: new MockNgbModalRef(),
+      result: Promise.reject()
+    } as NgbModalRef);
 
     $scope.openAddHintModal();
-    $scope.$apply();
+    tick();
 
-    expect($uibModal.open).toHaveBeenCalled();
-  });
+    expect(ngbModal.open).toHaveBeenCalled();
+  }));
 
   it('should open delete hint modal when user clicks on' +
     ' delete hint button', () => {
