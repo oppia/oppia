@@ -738,7 +738,7 @@ def require_valid_url_fragment(
                 name_type, name))
 
 
-def require_valid_thumbnail_filename(thumbnail_filename: Optional[str]) -> None:
+def require_valid_thumbnail_filename(thumbnail_filename: str) -> None:
     """Generic thumbnail filename validation.
 
         Args:

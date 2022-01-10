@@ -31,8 +31,6 @@ from core.domain import topic_domain
 from core.domain import user_services
 from core.tests import test_utils
 
-from typing import Any, Dict, Optional
-
 
 class TopicDomainUnitTests(test_utils.GenericTestBase):
     """Tests for topic domain objects."""
@@ -62,7 +60,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         """Tests the create_default_topic() function."""
         topic = topic_domain.Topic.create_default_topic(
             self.topic_id, 'Name', 'abbrev', 'description')
-        expected_topic_dict: Dict[str, Any] = {
+        expected_topic_dict: topic_domain.TopicDict = {
             'id': self.topic_id,
             'name': 'Name',
             'abbreviated_name': 'Name',
@@ -403,20 +401,10 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             utils.ValidationError, expected_error_substring):
             topic_domain.Topic.require_valid_topic_id(topic_id)
 
-    def _assert_valid_abbreviated_name(
-        self,
-        expected_error_substring: str,
-        name: str
-    ) -> None:
-        """Checks that the topic passes strict validation."""
-        with self.assertRaisesRegexp(  # type: ignore[no-untyped-call]
-            utils.ValidationError, expected_error_substring):
-            topic_domain.Topic.require_valid_name(name)
-
     def _assert_valid_thumbnail_filename_for_topic(
         self,
         expected_error_substring: str,
-        thumbnail_filename: Optional[str]
+        thumbnail_filename: str
     ) -> None:
         """Checks that topic passes validation for thumbnail filename."""
         with self.assertRaisesRegexp(  # type: ignore[no-untyped-call]
@@ -427,7 +415,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
     def _assert_valid_thumbnail_filename_for_subtopic(
         self,
         expected_error_substring: str,
-        thumbnail_filename: Optional[str]
+        thumbnail_filename: str
     ) -> None:
         """Checks that subtopic passes validation for thumbnail filename."""
         with self.assertRaisesRegexp(  # type: ignore[no-untyped-call]
@@ -484,13 +472,6 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             'Thumbnail filename should include an extension.', 'name')
         self._assert_valid_thumbnail_filename_for_subtopic(
             'Expected a filename ending in svg, received name.jpg', 'name.jpg')
-
-    def test_topic_thumbnail_filename_in_strict_mode(self) -> None:
-        self.topic.thumbnail_bg_color = None
-        with self.assertRaisesRegexp(  # type: ignore[no-untyped-call]
-            utils.ValidationError,
-            'Expected thumbnail filename to be a string, received None.'):
-            self.topic.validate(strict=True)
 
     def test_topic_thumbnail_bg_validation(self) -> None:
         self.topic.thumbnail_bg_color = '#FFFFFF'
@@ -697,7 +678,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             })
 
     def test_cannot_create_topic_rights_change_class_with_invalid_changelist(
-            self) -> None:
+        self
+    ) -> None:
         with self.assertRaisesRegexp(  # type: ignore[no-untyped-call]
             Exception, 'Missing cmd key in change dict'):
             topic_domain.TopicRightsChange({})  # type: ignore[no-untyped-call]
@@ -751,25 +733,14 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(self.topic.thumbnail_bg_color, '#C6DCDA')
 
     def test_cannot_add_uncategorized_skill_with_existing_uncategorized_skill(
-            self) -> None:
+        self
+    ) -> None:
         self.assertEqual(self.topic.uncategorized_skill_ids, [])
         self.topic.uncategorized_skill_ids = ['skill_id1']
         with self.assertRaisesRegexp(  # type: ignore[no-untyped-call]
             Exception,
             'The skill id skill_id1 is already an uncategorized skill.'):
             self.topic.add_uncategorized_skill_id('skill_id1')
-
-    def test_cannot_delete_subtopic_with_invalid_subtopic_id(self) -> None:
-        with self.assertRaisesRegexp(  # type: ignore[no-untyped-call]
-            Exception, 'The subtopic with id invalid_id does not exist.'):
-            self.topic.delete_subtopic('invalid_id')  # type: ignore[arg-type]
-
-    def test_cannot_update_subtopic_title_with_invalid_subtopic_id(
-        self
-    ) -> None:
-        with self.assertRaisesRegexp(  # type: ignore[no-untyped-call]
-            Exception, 'The subtopic with id invalid_id does not exist.'):
-            self.topic.update_subtopic_title('invalid_id', 'new title') # type: ignore[arg-type]
 
     def test_update_subtopic_title(self) -> None:
         self.assertEqual(len(self.topic.subtopics), 1)
@@ -809,11 +780,6 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.topic.subtopics[0].thumbnail_size_in_bytes, len(raw_image))
 
-        with self.assertRaisesRegexp(  # type: ignore[no-untyped-call]
-            Exception, 'The subtopic with id invalid_id does not exist.'):
-            self.topic.update_subtopic_thumbnail_filename(
-                'invalid_id', 'new title') # type: ignore[arg-type]
-
     def test_update_subtopic_url_fragment(self) -> None:
         self.assertEqual(len(self.topic.subtopics), 1)
         self.assertEqual(
@@ -821,10 +787,6 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.update_subtopic_url_fragment(1, 'new-subtopic-url')
         self.assertEqual(
             self.topic.subtopics[0].url_fragment, 'new-subtopic-url')
-
-        with self.assertRaisesRegexp(  # type: ignore[no-untyped-call]
-            Exception, 'The subtopic with id invalid_id does not exist.'):
-            self.topic.update_subtopic_url_fragment('invalid_id', 'new-url') # type: ignore[arg-type]
 
     def test_update_subtopic_thumbnail_bg_color(self) -> None:
         self.assertEqual(len(self.topic.subtopics), 1)
@@ -834,25 +796,6 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.update_subtopic_thumbnail_bg_color(1, '#FFFFFF')
         self.assertEqual(
             self.topic.subtopics[0].thumbnail_bg_color, '#FFFFFF')
-
-        with self.assertRaisesRegexp(  # type: ignore[no-untyped-call]
-            Exception, 'The subtopic with id invalid_id does not exist.'):
-            self.topic.update_subtopic_thumbnail_bg_color(
-                'invalid_id', '#FFFFFF') # type: ignore[arg-type]
-
-    def test_cannot_remove_skill_id_from_subtopic_with_invalid_subtopic_id(
-            self) -> None:
-        with self.assertRaisesRegexp(  # type: ignore[no-untyped-call]
-            Exception, 'The subtopic with id invalid_id does not exist.'):
-            self.topic.remove_skill_id_from_subtopic('invalid_id', 'skill_id1') # type: ignore[arg-type]
-
-    def test_cannot_move_skill_id_to_subtopic_with_invalid_subtopic_id(
-        self
-    ) -> None:
-        with self.assertRaisesRegexp(  # type: ignore[no-untyped-call]
-            Exception, 'The subtopic with id old_subtopic_id does not exist.'):
-            self.topic.move_skill_id_to_subtopic(
-                'old_subtopic_id', 'new_subtopic_id', 'skill_id1') # type: ignore[arg-type]
 
     def test_cannot_move_existing_skill_to_subtopic(self) -> None:
         self.topic.subtopics = [
@@ -1089,7 +1032,8 @@ class TopicChangeTests(test_utils.GenericTestBase):
         self.assertEqual(topic_change_object.name, 'name')
 
     def test_topic_change_object_with_migrate_subtopic_schema_to_latest_version(
-            self) -> None:
+        self
+    ) -> None:
         topic_change_object = topic_domain.TopicChange({  # type: ignore[no-untyped-call]
             'cmd': 'migrate_subtopic_schema_to_latest_version',
             'from_version': 'from_version',
@@ -1262,16 +1206,6 @@ class TopicSummaryTests(test_utils.GenericTestBase):
         self.topic_summary.thumbnail_bg_color = '#FFFFFF'
         self._assert_validation_error(
             'Topic thumbnail background color #FFFFFF is not supported.')
-
-    def test_thumbnail_filename_or_thumbnail_bg_color_is_none(self) -> None:
-        self.topic_summary.thumbnail_bg_color = '#C6DCDA'
-        self.topic_summary.thumbnail_filename = None
-        self._assert_validation_error(
-            'Topic thumbnail image is not provided.')
-        self.topic_summary.thumbnail_bg_color = None
-        self.topic_summary.thumbnail_filename = 'test.svg'
-        self._assert_validation_error(
-            'Topic thumbnail background color is not specified.')
 
     def test_validation_fails_with_empty_name(self) -> None:
         self.topic_summary.name = ''
