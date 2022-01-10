@@ -2548,10 +2548,6 @@ oppia-parameter {
   width: 70%;
 }
 
-.oppia-help-modal .modal-dialog {
-  height: 330px;
-}
-
 .modal.in .modal-dialog {
   -webkit-transform: translate(0,0);
   -ms-transform: translate(0,0);
@@ -3101,11 +3097,6 @@ md-card.preview-conversation-skin-supplemental-card {
   border-radius: 0;
   height: 100%;
   min-height: 450px;
-}
-
-.oppia-help-modal .modal-content {
-  border-radius: 0;
-  height: 100%;
 }
 
 .oppia-modal-information-card .modal-dialog .modal-content {
@@ -4838,51 +4829,6 @@ div.oppia-issues-learner-action {
 
 .oppia-typeahead-form .dropdown-item.active {
   color: #212529;
-}
-
-.oppia-help-modal-header-container {
-  text-align: center;
-}
-
-.oppia-help-modal .modal-body {
-  height: 100%;
-  margin: 5% auto;
-  width: 90%;
-}
-
-.oppia-help-modal .oppia-help-modal-button {
-  background-color: #015c53;
-  border-radius: 4px;
-  color: #fff;
-  font-family: "Roboto", Arial, sans-serif;
-  font-size: 14px;
-  margin-right: 10px;
-  margin-top: 10px;
-  text-transform: uppercase;
-  width: 220px;
-}
-.oppia-help-modal .oppia-help-modal-button:hover,
-.oppia-help-modal .oppia-help-modal-button:focus,
-.oppia-help-modal .oppia-help-modal-button:active {
-  background-color: rgba(5, 190, 178, 1);
-  color: #fff;
-}
-
-@media (max-width: 760px) {
-  .oppia-help-modal .modal-dialog {
-    margin: 10% auto;
-    width: 80%;
-  }
-}
-
-@media (max-width: 550px) {
-  .oppia-help-dismiss {
-    margin-bottom: 1em;
-  }
-
-  .oppia-help-modal .oppia-help-modal-button {
-    width: 100%;
-  }
 }
 
 /*
