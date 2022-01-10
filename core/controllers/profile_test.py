@@ -304,7 +304,6 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
         csrf_token = self.get_new_csrf_token()
         user_settings = user_services.get_user_settings(self.owner_id)
-        self.assertIsNone(user_settings.default_dashboard)
         self.put_json(
             feconf.PREFERENCES_DATA_URL,
             {
@@ -395,7 +394,11 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
         self.post_json(
             feconf.SIGNUP_DATA_URL,
-            {'username': self.EDITOR_USERNAME, 'agreed_to_terms': True},
+            {
+                'username': self.EDITOR_USERNAME,
+                'agreed_to_terms': True,
+                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
+            },
             csrf_token=csrf_token)
 
         # The email update preference should be whatever the setting in feconf
@@ -435,7 +438,8 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
             {
                 'username': self.EDITOR_USERNAME,
                 'agreed_to_terms': True,
-                'can_receive_email_updates': True
+                'can_receive_email_updates': True,
+                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
             },
             csrf_token=csrf_token)
         self.assertFalse(
@@ -488,7 +492,8 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
                 {
                     'username': self.EDITOR_USERNAME,
                     'agreed_to_terms': True,
-                    'can_receive_email_updates': True
+                    'can_receive_email_updates': True,
+                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
                 }, csrf_token=csrf_token)
             self.assertTrue(
                 json_response['bulk_email_signup_message_should_be_shown'])
@@ -502,7 +507,8 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
             {
                 'username': self.EDITOR_USERNAME,
                 'agreed_to_terms': True,
-                'can_receive_email_updates': False
+                'can_receive_email_updates': False,
+                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
             },
             csrf_token=csrf_token)
 
@@ -636,7 +642,11 @@ class SignupTests(test_utils.GenericTestBase):
         # Registering this user fully.
         self.post_json(
             feconf.SIGNUP_DATA_URL,
-            {'username': self.EDITOR_USERNAME, 'agreed_to_terms': True},
+            {
+                'username': self.EDITOR_USERNAME,
+                'agreed_to_terms': True,
+                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
+            },
             csrf_token=csrf_token)
 
         def strip_domain_from_location_header(url):
@@ -678,19 +688,38 @@ class SignupTests(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         response_dict = self.post_json(
-            feconf.SIGNUP_DATA_URL, {'agreed_to_terms': False},
+            feconf.SIGNUP_DATA_URL,
+            {
+                'username': self.EDITOR_USERNAME,
+                'agreed_to_terms': False,
+                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
+            },
             csrf_token=csrf_token, expected_status_int=400)
-        self.assertIn('you will need to accept', response_dict['error'])
+        error_msg = (
+            'In order to edit explorations on this site, you will need to'
+            ' accept the license terms.'
+        )
+        self.assertIn(
+            'In order to edit explorations on this site, you will need to'
+            ' accept the license terms.', response_dict['error'])
 
         response_dict = self.post_json(
             feconf.SIGNUP_DATA_URL,
-            {'agreed_to_terms': 'Hasta la vista!'},
+            {
+                'username': self.EDITOR_USERNAME,
+                'agreed_to_terms': False,
+                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
+            },
             csrf_token=csrf_token, expected_status_int=400)
-        self.assertIn('you will need to accept', response_dict['error'])
+        self.assertIn(error_msg, response_dict['error'])
 
         self.post_json(
             feconf.SIGNUP_DATA_URL,
-            {'agreed_to_terms': True, 'username': self.EDITOR_USERNAME},
+            {
+                'agreed_to_terms': True,
+                'username': self.EDITOR_USERNAME,
+                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
+            },
             csrf_token=csrf_token)
 
         self.logout()
@@ -701,33 +730,63 @@ class SignupTests(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         response_dict = self.post_json(
-            feconf.SIGNUP_DATA_URL, {'agreed_to_terms': True},
-            csrf_token=csrf_token, expected_status_int=400)
-        self.assertIn('Empty username supplied', response_dict['error'])
-
-        response_dict = self.post_json(
             feconf.SIGNUP_DATA_URL,
-            {'username': '', 'agreed_to_terms': True},
-            csrf_token=csrf_token, expected_status_int=400)
-        self.assertIn('Empty username supplied', response_dict['error'])
-
-        response_dict = self.post_json(
-            feconf.SIGNUP_DATA_URL,
-            {'username': '!a!', 'agreed_to_terms': True},
+            {
+                'agreed_to_terms': True,
+                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
+            },
             csrf_token=csrf_token, expected_status_int=400)
         self.assertIn(
-            'can only have alphanumeric characters', response_dict['error'])
+            'Missing key in handler args: username.',
+            response_dict['error'])
 
         response_dict = self.post_json(
             feconf.SIGNUP_DATA_URL,
-            {'username': self.UNICODE_TEST_STRING, 'agreed_to_terms': True},
+            {
+                'username': '',
+                'agreed_to_terms': True,
+                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
+            },
+            csrf_token=csrf_token, expected_status_int=400)
+        error_msg = 'Validation failed: is_valid_username_string ({})'
+        self.assertIn(
+            'Schema validation for \'username\' failed: %s for object'
+            % error_msg,
+            response_dict['error'])
+
+        response_dict = self.post_json(
+            feconf.SIGNUP_DATA_URL,
+            {
+                'username': '!a!',
+                'agreed_to_terms': True,
+                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
+            },
             csrf_token=csrf_token, expected_status_int=400)
         self.assertIn(
-            'can only have alphanumeric characters', response_dict['error'])
+            'Schema validation for \'username\' failed: %s for object !a!'
+            % error_msg,
+            response_dict['error'])
 
         response_dict = self.post_json(
             feconf.SIGNUP_DATA_URL,
-            {'username': 'abcde', 'agreed_to_terms': True},
+            {
+                'username': self.UNICODE_TEST_STRING,
+                'agreed_to_terms': True,
+                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
+            },
+            csrf_token=csrf_token, expected_status_int=400)
+        self.assertIn(
+            'Schema validation for \'username\' failed: %s for object %s'
+            % (error_msg, self.UNICODE_TEST_STRING),
+            response_dict['error'])
+
+        response_dict = self.post_json(
+            feconf.SIGNUP_DATA_URL,
+            {
+                'username': 'abcde',
+                'agreed_to_terms': True,
+                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
+            },
             csrf_token=csrf_token)
 
         self.logout()
@@ -740,9 +799,11 @@ class SignupTests(test_utils.GenericTestBase):
         # This user should have the creator dashboard as default.
         self.post_json(
             feconf.SIGNUP_DATA_URL,
-            {'agreed_to_terms': True, 'username': self.EDITOR_USERNAME,
-             'default_dashboard': constants.DASHBOARD_TYPE_CREATOR,
-             'can_receive_email_updates': None},
+            {
+                'agreed_to_terms': True, 'username': self.EDITOR_USERNAME,
+                'default_dashboard': constants.DASHBOARD_TYPE_CREATOR,
+                'can_receive_email_updates': None
+            },
             csrf_token=csrf_token)
 
         user_id = user_services.get_user_id_from_username(self.EDITOR_USERNAME)
