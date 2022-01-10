@@ -5342,7 +5342,7 @@ class AccountDeletionEmailUnitTest(test_utils.EmailTestBase):
             # Make sure there are no emails already sent.
             messages = self._get_sent_email_messages(
                 feconf.ADMIN_EMAIL_ADDRESS)
-            self.assertEqual(len(messages), 0)
+            self.assertEqual(messages, [])
 
             # Send an account deletion failed email to admin.
             email_manager.send_account_deletion_failed_email(
@@ -6043,7 +6043,7 @@ class NotMergeableChangesEmailUnitTest(test_utils.EmailTestBase):
             # Make sure there are no emails already sent.
             messages = self._get_sent_email_messages(
                 feconf.ADMIN_EMAIL_ADDRESS)
-            self.assertEqual(len(messages), 0)
+            self.assertEqual(messages, [])
 
             # Send an account deletion failed email to admin.
             email_manager.send_not_mergeable_change_list_to_admin_for_review(

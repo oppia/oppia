@@ -30,11 +30,12 @@ class ActionRegistryUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             len(action_registry.Registry.get_all_actions()), 3)
 
-    def test_get_action_by_type(self):
+    def test_cannot_get_action_by_invalid_type(self):
         # Testing with invalid action type.
-        with self.assertRaisesRegex(KeyError, 'fakeAction'):
+        with self.assertRaises(KeyError):
             action_registry.Registry.get_action_by_type('fakeAction')
 
+    def test_can_get_action_by_valid_type(self):
         # Testing with valid action type.
         self.assertIsNotNone(
             action_registry.Registry.get_action_by_type('ExplorationStart'))
