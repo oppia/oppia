@@ -50,12 +50,12 @@ angular.module('oppia').directive('skillEditorMainTab', [
         '/pages/skill-editor-page/editor-tab/' +
         'skill-editor-main-tab.directive.html'),
       controller: [
-        '$rootScope', '$scope', '$timeout', 'FocusManagerService', 'NgbModal',
+        '$scope', '$timeout', 'FocusManagerService', 'NgbModal',
         'PageTitleService',
         'SkillEditorRoutingService', 'SkillEditorStateService',
         'UndoRedoService',
         function(
-            $rootScope, $scope, $timeout, FocusManagerService, NgbModal,
+            $scope, $timeout, FocusManagerService, NgbModal,
             PageTitleService,
             SkillEditorRoutingService, SkillEditorStateService,
             UndoRedoService) {
@@ -96,16 +96,10 @@ angular.module('oppia').directive('skillEditorMainTab', [
             if (!$scope.topicName && $scope.assignedSkillTopicData) {
               $scope.topicName = Object.keys($scope.assignedSkillTopicData)[0];
               $scope.changeSelectedTopic($scope.topicName);
-              // TODO(#8521): Remove the use of $rootScope.$applyAsync()
-              // once the directive is migrated to angular.
-              $rootScope.$applyAsync();
               return $scope.assignedSkillTopicData;
             }
             $scope.assignedSkillTopicData = (
               SkillEditorStateService.getAssignedSkillTopicData());
-            // TODO(#8521): Remove the use of $rootScope.$applyAsync()
-            // once the directive is migrated to angular.
-            $rootScope.$applyAsync();
             return $scope.assignedSkillTopicData;
           };
 
