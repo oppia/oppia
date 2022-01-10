@@ -43,22 +43,22 @@ interface mergeviewOptions {
 })
 export class StateDiffModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-    newState: State | null;
-    oldState: State | null;
-    newStateName: string;
-    oldStateName: string;
-    headers: headersAndYamlStrs;
-    yamlStrs: headersAndYamlStrs = {
-      leftPane: '',
-      rightPane: '',
-    };
+  newState: State | null;
+  oldState: State | null;
+  newStateName: string;
+  oldStateName: string;
+  headers: headersAndYamlStrs;
+  yamlStrs: headersAndYamlStrs = {
+    leftPane: '',
+    rightPane: '',
+  };
 
-    CODEMIRROR_MERGEVIEW_OPTIONS: mergeviewOptions = {
-      lineNumbers: true,
-      readOnly: true,
-      mode: 'yaml',
-      viewportMargin: 100
-    };
+  CODEMIRROR_MERGEVIEW_OPTIONS: mergeviewOptions = {
+    lineNumbers: true,
+    readOnly: true,
+    mode: 'yaml',
+    viewportMargin: 100
+  };
 
   constructor(
       private ngbActiveModal: NgbActiveModal,

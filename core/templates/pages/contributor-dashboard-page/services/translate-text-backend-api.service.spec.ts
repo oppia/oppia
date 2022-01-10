@@ -106,7 +106,7 @@ describe('TranslateTextBackendApiService', () => {
           return 'Fake onload executed';
         };
       }
-      
+
       readAsDataURL(file: Blob) {
         this.onload();
         return 'The file is loaded';

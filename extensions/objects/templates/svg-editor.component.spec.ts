@@ -872,7 +872,7 @@ describe(
           return 'Fake onload executed';
         };
       }
-      
+
       set src(url) {
         this.onload();
       }
