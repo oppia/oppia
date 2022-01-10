@@ -128,7 +128,6 @@ disable=abstract-method,
         raise-missing-from,
         super-with-arguments,
         unnecessary-pass,
-        useless-object-inheritance,
         consider-using-f-string,
         consider-using-in,
 # TODO(#14322): Reinstate this.
