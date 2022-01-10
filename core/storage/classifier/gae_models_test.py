@@ -46,22 +46,24 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_get_export_policy(self) -> None:
-        sample_dict = base_models.BaseModel.get_export_policy()
-        sample_dict.update(
-            {'algorithm_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+        expected_export_policy_dict = {
+            'algorithm_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'interaction_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'status': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'training_data': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'next_scheduled_check_time':
-                base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'algorithm_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
-            })
+            'next_scheduled_check_time': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE),
+            'algorithm_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+        }
         self.assertEqual(
             classifier_models.ClassifierTrainingJobModel.get_export_policy(),
-            sample_dict)
+            expected_export_policy_dict)
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
@@ -338,16 +340,19 @@ class StateTrainingJobsMappingModelUnitTests(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_get_export_policy(self) -> None:
-        sample_dict = base_models.BaseModel.get_export_policy()
-        sample_dict.update(
-            {'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+        expected_export_policy_dict = {
+            'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'algorithm_ids_to_job_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
-            })
+            'algorithm_ids_to_job_ids': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE),
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+        }
         self.assertEqual(
             classifier_models.StateTrainingJobsMappingModel.get_export_policy(),
-            sample_dict)
+            expected_export_policy_dict)
 
     def test_get_model(self) -> None:
         exp_id = 'exp_id1'
