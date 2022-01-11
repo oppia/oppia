@@ -311,9 +311,10 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
             }])
 
         with getenv_swap, datetime_swap, post_swap:
-            flaky = flake_checker.is_test_output_flaky(
+            flaky, rerun = flake_checker.is_test_output_flaky(
                 ['line1', 'line2'], 'suiteName')
             self.assertTrue(flaky)
+            self.assertEqual(rerun, flake_checker.RERUN_UNKNOWN)
 
     def test_successful_report_construct_url(self):
 
@@ -365,9 +366,10 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
             }])
 
         with getenv_swap, datetime_swap, post_swap:
-            flaky = flake_checker.is_test_output_flaky(
+            flaky, rerun = flake_checker.is_test_output_flaky(
                 ['line1', 'line2'], 'suiteName')
             self.assertTrue(flaky)
+            self.assertEqual(rerun, flake_checker.RERUN_UNKNOWN)
 
     def test_unsuccessful_report_exception(self):
 
@@ -409,9 +411,10 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
             }])
 
         with getenv_swap, datetime_swap, post_swap:
-            flaky = flake_checker.is_test_output_flaky(
+            flaky, rerun = flake_checker.is_test_output_flaky(
                 ['line1', 'line2'], 'suiteName')
             self.assertFalse(flaky)
+            self.assertEqual(rerun, flake_checker.RERUN_UNKNOWN)
 
     def test_unsuccessful_report_not_ok(self):
 
@@ -453,9 +456,10 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
             }])
 
         with getenv_swap, datetime_swap, post_swap:
-            flaky = flake_checker.is_test_output_flaky(
+            flaky, rerun = flake_checker.is_test_output_flaky(
                 ['line1', 'line2'], 'suiteName')
             self.assertFalse(flaky)
+            self.assertEqual(rerun, flake_checker.RERUN_UNKNOWN)
 
     def test_unsuccessful_report_bad_payload(self):
 
@@ -497,6 +501,7 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
             }])
 
         with getenv_swap, datetime_swap, post_swap:
-            flaky = flake_checker.is_test_output_flaky(
+            flaky, rerun = flake_checker.is_test_output_flaky(
                 ['line1', 'line2'], 'suiteName')
             self.assertFalse(flaky)
+            self.assertEqual(rerun, flake_checker.RERUN_UNKNOWN)
