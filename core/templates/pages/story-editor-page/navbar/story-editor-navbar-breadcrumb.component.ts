@@ -11,11 +11,9 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
 /**
  * @fileoverview Component for the navbar breadcrumb of the story editor.
  */
-
 import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -24,7 +22,7 @@ import { Story } from 'domain/story/StoryObjectFactory';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { Subscription } from 'rxjs';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { SavePendingChangesModalComponent } from 'components/save-pending-changes/save-pending-changes-modal.component';
+import { StorySavePendingChangesModalComponent } from '../modal-templates/story-save-pending-changes-modal.component';
 import { StoryEditorStateService } from '../services/story-editor-state.service';
 
  @Component({
@@ -39,53 +37,44 @@ export class StoryEditorNavbarBreadcrumbComponent {
      private windowRef: WindowRef,
      private urlInterpolationService: UrlInterpolationService
   ) {}
+   topicName: string;
+   story: Story;
+   directiveSubscriptions = new Subscription();
+   TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topicId>';
 
-  topicName: string;
-  story: Story;
-  directiveSubscriptions = new Subscription();
-  TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topicId>';
+   returnToTopicEditorPage(): void {
+     if (this.undoRedoService.getChangeCount() > 0) {
+       this.ngbModal.open(
+         StorySavePendingChangesModalComponent,
+         { backdrop: true },
+       ).result.then(() => {}, () => {
+         // Note to developers:
+         // This callback is triggered when the Cancel button is clicked.
+         // No further action is needed.
+       });
+     } else {
+       this.windowRef.nativeWindow.open(
+         this.urlInterpolationService.interpolateUrl(
+           this.TOPIC_EDITOR_URL_TEMPLATE, {
+             topicId: this.story.getCorrespondingTopicId()
+           }
+         ), '_self');
+     }
+   }
 
-  returnToTopicEditorPage(): void {
-    if (this.undoRedoService.getChangeCount() > 0) {
-      const modalRef = this.ngbModal.open(
-        SavePendingChangesModalComponent,
-        {backdrop: true}
-      );
+   ngOnInit(): void {
+     this.directiveSubscriptions.add(
+       this.storyEditorStateService.onStoryInitialized.subscribe(
+         () => {
+           this.topicName = this.storyEditorStateService.getTopicName();
+           this.story = this.storyEditorStateService.getStory();
+         }
+       ));
+   }
 
-      modalRef.componentInstance.body = (
-        'Please save all pending changes before returning to the topic.');
-
-      modalRef.result.then(() => {}, () => {
-        // Note to developers:
-        // This callback is triggered when the Cancel button is clicked.
-        // No further action is needed.
-      });
-    } else {
-      this.windowRef.nativeWindow.open(
-        this.urlInterpolationService.interpolateUrl(
-          this.TOPIC_EDITOR_URL_TEMPLATE, {
-            topicId: this.story.getCorrespondingTopicId()
-          }
-        ),
-        '_self'
-      );
-    }
-  }
-
-  ngOnInit(): void {
-    this.directiveSubscriptions.add(
-      this.storyEditorStateService.onStoryInitialized.subscribe(
-        () => {
-          this.topicName = this.storyEditorStateService.getTopicName();
-          this.story = this.storyEditorStateService.getStory();
-        }
-      )
-    );
-  }
-
-  ngOnDestroy(): void {
-    this.directiveSubscriptions.unsubscribe();
-  }
+   ngOnDestroy(): void {
+     this.directiveSubscriptions.unsubscribe();
+   }
 }
 
 angular.module('oppia').directive('oppiaStoryEditorNavbarBreadcrumb',

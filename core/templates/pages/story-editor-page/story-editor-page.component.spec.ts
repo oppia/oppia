@@ -19,24 +19,19 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // App.ts is upgraded to Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
-// ^^^ This block is to be removed.
 
 import { EventEmitter } from '@angular/core';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+
+// ^^^ This block is to be removed.
 
 require('pages/story-editor-page/story-editor-page.component.ts');
 
-class MockNgbModalRef {
-  componentInstance: {
-    body: 'xyz';
-  };
-}
-
 describe('Story editor page', function() {
   var ctrl = null;
+  var $q = null;
   var $scope = null;
   var $rootScope = null;
-  let ngbModal: NgbModal = null;
+  var $uibModal = null;
   var PageTitleService = null;
   var PreventPageUnloadEventService = null;
   var StoryEditorStateService = null;
@@ -66,21 +61,14 @@ describe('Story editor page', function() {
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('$window', mockedWindow);
-
-    $provide.value('NgbModal', {
-      open: () => {
-        return {
-          result: Promise.resolve()
-        };
-      }
-    });
   }));
 
   importAllAngularServices();
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
+    $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
-    ngbModal = $injector.get('NgbModal');
+    $uibModal = $injector.get('$uibModal');
     PageTitleService = $injector.get('PageTitleService');
     PreventPageUnloadEventService = $injector.get(
       'PreventPageUnloadEventService');
@@ -184,33 +172,27 @@ describe('Story editor page', function() {
   it('should return to topic editor page when closing confirmation modal',
     function() {
       spyOn(UndoRedoService, 'getChangeCount').and.returnValue(1);
-      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        return ({
-          componentInstance: MockNgbModalRef,
-          result: Promise.resolve()
-        }) as NgbModalRef;
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.resolve()
       });
 
       ctrl.returnToTopicEditorPage();
       $scope.$apply();
 
-      expect(modalSpy).toHaveBeenCalled();
+      expect($uibModal.open).toHaveBeenCalled();
     });
 
   it('should return to topic editor page when dismissing confirmation modal',
     function() {
       spyOn(UndoRedoService, 'getChangeCount').and.returnValue(1);
-      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        return ({
-          componentInstance: MockNgbModalRef,
-          result: Promise.reject()
-        }) as NgbModalRef;
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.reject()
       });
 
       ctrl.returnToTopicEditorPage();
       $scope.$apply();
 
-      expect(modalSpy).toHaveBeenCalled();
+      expect($uibModal.open).toHaveBeenCalled();
     });
 
   it('should open topic editor page when there is no change',

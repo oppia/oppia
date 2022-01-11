@@ -27,12 +27,6 @@ import { Subtopic } from 'domain/topic/subtopic.model';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 // ^^^ This block is to be removed.
 
-class MockNgbModalRef {
-  componentInstance: {
-    body: 'xyz';
-  };
-}
-
 describe('Topic editor tab directive', function() {
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
@@ -87,7 +81,6 @@ describe('Topic editor tab directive', function() {
     ngbModal = $injector.get('NgbModal');
     $q = $injector.get('$q');
     directive = $injector.get('topicEditorTabDirective')[0];
-    ngbModal = $injector.get('NgbModal');
     TopicEditorStateService = $injector.get('TopicEditorStateService');
     TopicObjectFactory = $injector.get('TopicObjectFactory');
     var MockContextSerivce = {
@@ -238,14 +231,13 @@ describe('Topic editor tab directive', function() {
   it('should open save changes warning modal before creating skill',
     function() {
       spyOn(UndoRedoService, 'getChangeCount').and.returnValue(1);
-      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        return ({
-          componentInstance: MockNgbModalRef,
-          result: Promise.resolve()
-        }) as NgbModalRef;
-      });
+      spyOn(ngbModal, 'open').and.returnValue(
+        {
+          result: $q.resolve()
+        } as NgbModalRef
+      );
       $scope.createSkill();
-      expect(modalSpy).toHaveBeenCalled();
+      expect(ngbModal.open).toHaveBeenCalled();
     });
 
   it('should call TopicEditorStateService to load topic when ' +
@@ -466,14 +458,13 @@ describe('Topic editor tab directive', function() {
 
   it('should open save pending changes modal if changes are made', function() {
     spyOn(UndoRedoService, 'getChangeCount').and.returnValue(1);
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return ({
-        componentInstance: MockNgbModalRef,
-        result: Promise.resolve()
-      }) as NgbModalRef;
-    });
+    spyOn(ngbModal, 'open').and.returnValue(
+      {
+        result: $q.resolve()
+      } as NgbModalRef
+    );
     $scope.createCanonicalStory();
-    expect(modalSpy).toHaveBeenCalled();
+    expect(ngbModal.open).toHaveBeenCalled();
   });
 
   it('should call TopicRoutingService to navigate to subtopic', function() {

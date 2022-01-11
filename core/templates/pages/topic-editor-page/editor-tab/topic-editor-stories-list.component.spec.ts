@@ -20,12 +20,6 @@ import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { StorySummary } from 'domain/story/story-summary.model';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-class MockNgbModalRef {
-  componentInstance: {
-    body: 'xyz';
-  };
-}
-
 describe('topicEditorStoriesList', () => {
   let ctrl = null;
   let $rootScope = null;
@@ -38,8 +32,6 @@ describe('topicEditorStoriesList', () => {
   let ngbModal: NgbModal = null;
 
   importAllAngularServices();
-  beforeEach(angular.mock.module('oppia'));
-
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('NgbModal', {
       open: () => {
@@ -174,33 +166,31 @@ describe('topicEditorStoriesList', () => {
 
   it('should open save changes modal when user tries to open story editor' +
   ' without saving changes', () => {
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return ({
-        componentInstance: MockNgbModalRef,
-        result: Promise.resolve()
-      }) as NgbModalRef;
-    });
+    spyOn(ngbModal, 'open').and.returnValue(
+      {
+        result: $q.resolve()
+      } as NgbModalRef
+    );
     spyOn(undoRedoService, 'getChangeCount').and.returnValue(1);
 
     $scope.openStoryEditor('storyId');
     $scope.$apply();
 
-    expect(modalSpy).toHaveBeenCalled();
+    expect(ngbModal.open).toHaveBeenCalled();
   });
 
   it('should close save changes modal when closes the saves changes' +
   ' modal', () => {
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return ({
-        componentInstance: MockNgbModalRef,
-        result: Promise.reject()
-      }) as NgbModalRef;
-    });
+    spyOn(ngbModal, 'open').and.returnValue(
+      {
+        result: $q.reject()
+      } as NgbModalRef
+    );
     spyOn(undoRedoService, 'getChangeCount').and.returnValue(1);
 
     $scope.openStoryEditor('storyId');
     $scope.$apply();
 
-    expect(modalSpy).toHaveBeenCalled();
+    expect(ngbModal.open).toHaveBeenCalled();
   });
 });

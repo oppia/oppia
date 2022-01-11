@@ -13,35 +13,42 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for Save Pending Changes Modal.
+ * @fileoverview Unit tests for the TopicSavePendingChangesComponent.
  */
 
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { SavePendingChangesModalComponent } from './save-pending-changes-modal.component';
 
-describe('Save pending changes modal', () => {
-  let componentInstance: SavePendingChangesModalComponent;
-  let fixture: ComponentFixture<SavePendingChangesModalComponent>;
+import { TopicSavePendingChangesComponent } from './topic-save-pending-changes-modal.component';
+
+describe('Topic Save Pending Changes Component', function() {
+  let component: TopicSavePendingChangesComponent;
+  let fixture: ComponentFixture<TopicSavePendingChangesComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [SavePendingChangesModalComponent],
-      providers: [
-        NgbActiveModal
-      ]
+      declarations: [
+        TopicSavePendingChangesComponent
+      ],
+      providers: [{
+        provide: NgbActiveModal
+      }],
+      schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(SavePendingChangesModalComponent);
-    componentInstance = fixture.componentInstance;
+    fixture = TestBed.createComponent(TopicSavePendingChangesComponent);
+    component = fixture.componentInstance;
+
+    TestBed.inject(NgbActiveModal);
   });
 
   // This component have no more frontend tests as it inherits the
   // ConfirmOrCancelModalComponent and doesn't have any additional
   // functionality. Please see the ConfirmOrCancelModalComponent for more tests.
   it('should create', () => {
-    expect(componentInstance).toBeDefined();
+    expect(component).toBeDefined();
   });
 });
