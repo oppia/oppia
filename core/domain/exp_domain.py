@@ -619,9 +619,9 @@ class Exploration:
         self.last_updated = last_updated
         self.auto_tts_enabled = auto_tts_enabled
         self.correctness_feedback_enabled = correctness_feedback_enabled
-        self.android_proto_size_in_bytes = None
-        self.proto_size_is_stale = True
+        self.android_proto_size_is_stale = True
         self._cached_android_proto_size_in_bytes = 0
+        self.android_proto_size_in_bytes = self.proto_size_in_bytes
 
     @classmethod
     def create_default_exploration(
@@ -1317,24 +1317,24 @@ class Exploration:
         return self.is_demo_exploration_id(self.id)
 
     @property
-    def is_stale(self):
+    def proto_size_in_bytes(self):
         """Whether the exploration proto size is up to date.
 
         Returns:
             int. Updated exploration's proto size.
         """
-        if self.proto_size_is_stale:
+        if self.android_proto_size_is_stale:
             self._cached_android_proto_size_in_bytes = self.get_proto_size()
-            self.proto_size_is_stale = False
+            self.android_proto_size_is_stale = False
 
         return self._cached_android_proto_size_in_bytes
 
     def __setattr__(self, attrname, new_value):
-        if attrname == 'proto_size_is_stale' and new_value is True:
-            super(Exploration, self).__setattr__(attrname, new_value)
-            self.android_proto_size_in_bytes = self.is_stale
-        else:
-            super(Exploration, self).__setattr__(attrname, new_value)
+        if (attrname != '_cached_android_proto_size_in_bytes' and
+            attrname != 'proto_size_in_bytes' and
+            attrname != 'android_proto_size_is_stale'):
+            self.android_proto_size_is_stale = True
+        super(Exploration, self).__setattr__(attrname, new_value)
 
     def has_state_name(self, state_name):
         """Whether the exploration has a state with the given state name.
