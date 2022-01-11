@@ -1331,7 +1331,6 @@ class Exploration:
 
     def __setattr__(self, attrname, new_value):
         if (attrname != '_cached_android_proto_size_in_bytes' and
-            attrname != 'proto_size_in_bytes' and
             attrname != 'android_proto_size_is_stale'):
             self.android_proto_size_is_stale = True
         super(Exploration, self).__setattr__(attrname, new_value)
