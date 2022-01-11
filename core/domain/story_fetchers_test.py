@@ -16,6 +16,7 @@
 
 from __future__ import annotations
 
+from core import feconf
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_services
@@ -24,7 +25,6 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-from core import feconf
 
 (story_models, user_models) = models.Registry.import_models(
     [models.NAMES.story, models.NAMES.user])
@@ -132,12 +132,12 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         'schema_version': story_model.story_contents_schema_version,
         'story_contents': story_model.story_contents
         }
-        story_fetchers._migrate_story_contents_to_latest_schema(
+        story_fetchers._migrate_story_contents_to_latest_schema( # pylint: disable=protected-access
             versioned_story_contents, story_id)
         versioned_story_contents[
             'schema_version'
         ] = feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION - 1
-        story_fetchers._migrate_story_contents_to_latest_schema(
+        story_fetchers._migrate_story_contents_to_latest_schema( # pylint: disable=protected-access
                 versioned_story_contents, story_id
         )
         versioned_story_contents['schema_version'] = 6
@@ -146,7 +146,7 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
             'Sorry, we can only process v1-v%d story schemas at '
             'present.' % feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION
             ):
-            story_fetchers._migrate_story_contents_to_latest_schema(
+            story_fetchers._migrate_story_contents_to_latest_schema( # pylint: disable=protected-access
                 versioned_story_contents, story_id
             )
 
