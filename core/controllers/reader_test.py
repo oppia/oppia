@@ -2445,13 +2445,13 @@ class ExplorationEmbedPageTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id)
 
-        response = self.post_json(
+        self.post_json(
             '%s/%s' % (feconf.EXPLORATION_URL_EMBED_PREFIX, self.EXP_ID),
             {
                 'v': exploration.version
             }, csrf_token=csrf_token, expected_status_int=500
         )
-        print(response)
+        
         self.logout()
 
     def test_handler_raises_error_with_invalid_version(self):
