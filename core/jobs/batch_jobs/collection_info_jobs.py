@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-from core.domain import user_services
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
