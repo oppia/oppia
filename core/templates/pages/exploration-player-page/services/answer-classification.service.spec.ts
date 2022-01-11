@@ -40,10 +40,13 @@ import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { TextClassifierFrozenModel } from 'classifiers/proto/text_classifier';
 import { TextInputRulesService } from
   'interactions/TextInput/directives/text-input-rules.service';
+import { AlertsService } from 'services/alerts.service';
 
-describe('Answer Classification Service', () => {
+// eslint-disable-next-line oppia/no-test-blockers
+fdescribe('Answer Classification Service', () => {
   const stateName = 'Test State';
 
+  let alertsService: AlertsService;
   let answerClassificationService: AnswerClassificationService;
   let appService: AppService;
   let interactionSpecsService: InteractionSpecsService;
@@ -59,6 +62,7 @@ describe('Answer Classification Service', () => {
       providers: [CamelCaseToHyphensPipe],
     });
 
+    alertsService = TestBed.inject(AlertsService);
     answerClassificationService = TestBed.get(AnswerClassificationService);
     appService = TestBed.get(AppService);
     interactionSpecsService = TestBed.get(InteractionSpecsService);
@@ -249,6 +253,24 @@ describe('Answer Classification Service', () => {
           ExplorationPlayerConstants.DEFAULT_OUTCOME_CLASSIFICATION
         )
       );
+    });
+
+    it('should fail if if no answer group matches and' +
+    'default outcome of interaction is not defined', () => {
+      spyOn(alertsService, 'addWarning').and.callThrough();
+
+      stateDict.interaction.default_outcome = null;
+      const state = (
+        stateObjectFactory.createFromBackendDict(stateName, stateDict));
+
+      expect(
+        () => answerClassificationService.getMatchingClassificationResult(
+          state.name, state.interaction, 'abc', textInputRulesService)
+      ).toThrowError(
+        'No defaultOutcome was available to classify the answer.');
+
+      expect(alertsService.addWarning).toHaveBeenCalledWith(
+        'Something went wrong with the exploration.');
     });
 
     it(
@@ -460,6 +482,28 @@ describe('Answer Classification Service', () => {
       });
 
     it(
+      'should return the default rule if prediction service' +
+          'cannot predict the answer group index and returns -1',
+      () => {
+        spyOn(predictionAlgorithmRegistryService, 'getPredictionService').and
+          .returnValue({
+            predict: (classifierData, answer) => -1
+          });
+
+        const state = (
+          stateObjectFactory.createFromBackendDict(stateName, stateDict));
+
+        expect(
+          answerClassificationService.getMatchingClassificationResult(
+            state.name, state.interaction, '0', textInputRulesService)
+        ).toEqual(
+          new AnswerClassificationResult(
+            outcomeObjectFactory.createNew(
+              'default', 'default_outcome', '', []), 2, 0,
+            ExplorationPlayerConstants.DEFAULT_OUTCOME_CLASSIFICATION));
+      });
+
+    it(
       'should return the default rule if no answer group matches and ' +
         'interaction is not trainable',
       () => {
@@ -630,5 +674,129 @@ describe('Answer Classification Service', () => {
             state.interaction.answerGroups[1].outcome, 1, 0,
             ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION));
       });
+  });
+
+  describe('whether answer is classified explicitly or' +
+  'goes into new state', () => {
+    let stateDict;
+    let expId = '0';
+
+    beforeEach(() => {
+      spyOn(
+        interactionSpecsService, 'isInteractionTrainable'
+      ).and.returnValue(true);
+      spyOn(appService, 'isMachineLearningClassificationEnabled')
+        .and.returnValue(true);
+      stateClassifierMappingService.init(expId, 0);
+
+      stateDict = {
+        content: {
+          content_id: 'content',
+          html: 'content'
+        },
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {},
+            feedback_2: {}
+          }
+        },
+        interaction: {
+          id: 'TextInput',
+          customization_args: {
+            placeholder: {
+              value: {
+                content_id: 'ca_placeholder_0',
+                unicode_str: ''
+              }
+            },
+            rows: { value: 1 }
+          },
+          answer_groups: [{
+            outcome: {
+              dest: 'outcome 1',
+              feedback: {
+                content_id: 'feedback_1',
+                html: ''
+              },
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null
+            },
+            training_data: ['abc', 'input'],
+            rule_specs: [{
+              rule_type: 'Equals',
+              inputs: {
+                x: {
+                  contentId: 'rule_input_0',
+                  normalizedStrSet: ['equal']
+                }
+              }
+            }],
+          }],
+          default_outcome: {
+            dest: stateName,
+            feedback: {
+              content_id: 'default_outcome',
+              html: ''
+            },
+            labelled_as_correct: false,
+            param_changes: [],
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null
+          },
+          hints: []
+        },
+        param_changes: [],
+        solicit_answer_details: false,
+        written_translations: {
+          translations_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {},
+            feedback_2: {}
+          }
+        }
+      };
+    });
+
+    it('should return false when no answer group matches and' +
+    'default outcome has destination equal to state name', () => {
+      spyOn(answerClassificationService, 'getMatchingClassificationResult')
+        .and.callThrough();
+
+      const state = (
+        stateObjectFactory.createFromBackendDict(stateName, stateDict));
+
+      let result = (
+        answerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
+          state.name, state, '777', textInputRulesService));
+
+      expect(result).toBe(false);
+      expect(
+        answerClassificationService.getMatchingClassificationResult
+      ).toHaveBeenCalledWith(
+        state.name, state.interaction, '777', textInputRulesService);
+    });
+
+    it('should return true if any rule in any answer group matches', () => {
+      spyOn(answerClassificationService, 'getMatchingClassificationResult')
+        .and.callThrough();
+
+      const state = (
+        stateObjectFactory.createFromBackendDict(stateName, stateDict));
+
+      let result = (
+        answerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
+          state.name, state, 'equal', textInputRulesService));
+
+      expect(result).toBe(true);
+      expect(
+        answerClassificationService.getMatchingClassificationResult
+      ).toHaveBeenCalledWith(
+        state.name, state.interaction, 'equal', textInputRulesService);
+    });
   });
 });
