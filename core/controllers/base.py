@@ -528,7 +528,7 @@ class BaseHandler(webapp2.RequestHandler):
 
     def head(self, *args, **kwargs):
         """Method to handle HEAD requests. It returns only
-        the headers of GET request
+        the headers of GET request.
         """
         return self.get(*args, **kwargs)
 
