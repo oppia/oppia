@@ -1252,12 +1252,12 @@ class ContentMigrationTests(test_utils.GenericTestBase):
     def test_get_correct_html_string_replacing_incorrectly_encoded_chars(self):
         test_cases = [
             {
-                'html_string': '<p>Hello this is <span>testing &nbsp;</span></p>',
-                'expected_output': '<p>Hello this is <span>testing  </span></p>'
+                'html_string': '<p>This is <span>testing &nbsp;</span></p>',
+                'expected_output': '<p>This is <span>testing  </span></p>'
             },
             {
-                'html_string': '<p>Hello this is <span>\t testing \n</span></p>',
-                'expected_output': '<p>Hello this is <span> testing </span></p>'
+                'html_string': '<p>This is <span>\t testing \n</span></p>',
+                'expected_output': '<p>This is <span> testing </span></p>'
             },
             {
                 'html_string': '<p>Hello this is <span>testing \xa0</span></p>',
@@ -1281,6 +1281,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         ]
         for test_case in test_cases:
             self.assertEqual(
-                html_validation_service.fix_incorrectly_encoded_chars(test_case['html_string']),
+                html_validation_service.fix_incorrectly_encoded_chars(
+                    test_case['html_string']),
                 test_case['expected_output']
             )
