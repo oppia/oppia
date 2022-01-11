@@ -30,12 +30,14 @@ import apache_beam as beam
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import collection_models
+    from mypy_imports import user_models
 
-(collection_models,) = models.Registry.import_models([models.NAMES.collection])
+(collection_models, user_models) = models.Registry.import_models([
+    models.NAMES.collection, models.NAMES.user])
 datastore_services = models.Registry.import_datastore_services()
 
 
-class CountCollectionModelJob(base_jobs.JobBase):
+class GetCollectionOwnersEmailsJob(base_jobs.JobBase):
     """Job that generate emails of CollectionModels users."""
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
@@ -46,20 +48,34 @@ class CountCollectionModelJob(base_jobs.JobBase):
             PCollection. A PCollection of 'SUCCESS' or 'FAILURE' results from
             generating email of CollectionModel user.
         """
-        extract_collection_model = (
+        collection_user_ids_pcollection = (
             self.pipeline
-            | 'Get all collection models' >> ndb_io.GetModels(
+            | 'Get all collection rights models' >> ndb_io.GetModels(
                 collection_models.CollectionRightsModel.get_all(
                     include_deleted=False))
             | 'Extract user IDs' >> beam.FlatMap(
                     lambda collection_rights: collection_rights.owner_ids)
             | 'Remove duplicates' >> beam.Distinct() # pylint: disable=no-value-for-parameter
-            | 'Extract emails' >> beam.Map(
-                user_services.get_email_from_user_id)
+        )
+        collection_user_ids = beam.pvalue.AsIter(
+            collection_user_ids_pcollection)
+
+        user_email_pcollection = (
+            self.pipeline
+            | 'Get all user settings models' >> ndb_io.GetModels(
+                user_models.UserSettingsModel.get_all(
+                    include_deleted=False))
+            | 'Filter model that belong to collection' >> (
+                beam.Filter(
+                    lambda model, ids: (
+                        model.id in ids),
+                    ids=collection_user_ids
+                ))
+            | 'Get e-mail' >> beam.Map(lambda model: model.email)
         )
 
         return (
-            extract_collection_model
+            user_email_pcollection
             | 'Count the output' >> (
                 job_result_transforms.CountObjectsToJobRunResult())
         )

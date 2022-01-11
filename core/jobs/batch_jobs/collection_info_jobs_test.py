@@ -34,9 +34,9 @@ if MYPY: # pragma: no cover
 datastore_services = models.Registry.import_datastore_services()
 
 
-class CountCollectionModelJobTests(job_test_utils.JobTestBase):
+class GetCollectionOwnersEmailsJobTests(job_test_utils.JobTestBase):
 
-    JOB_CLASS = collection_info_jobs.CountCollectionModelJob
+    JOB_CLASS = collection_info_jobs.GetCollectionOwnersEmailsJob
 
     USER_ID_1 = 'id_1'
     USER_ID_2 = 'id_2'
