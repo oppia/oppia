@@ -226,8 +226,6 @@ class BaseHandlerTests(test_utils.GenericTestBase):
 
         self.delete_json('/community-library/data', expected_status_int=404)
 
-        self.testapp.head('/community-library/extra', status=404)
-
     def test_html_requests_have_no_store_cache_policy(self):
         response = self.get_html_response('/community-library')
         # We set 'no-store' and 'must-revalidate', but webapp
@@ -1043,11 +1041,6 @@ class CheckAllHandlersHaveDecoratorTests(test_utils.GenericTestBase):
                 handler_is_decorated = hasattr(handler.delete, '__wrapped__')
                 handlers_checked.append(
                     (handler.__name__, 'DELETE', handler_is_decorated))
-
-            if handler.head != base.BaseHandler.head:
-                handler_is_decorated = hasattr(handler.delete, '__wrapped__')
-                handlers_checked.append(
-                    (handler.__name__, 'HEAD', handler_is_decorated))
 
         self.log_line('Verifying decorators for handlers .... ')
         for (name, method, handler_is_decorated) in handlers_checked:
@@ -1884,8 +1877,7 @@ class HandlerClassWithSchemaInStillNeedsSchemaListRaiseErrorTest(
             return self.render_json({})
 
     def setUp(self):
-        super(HandlerClassWithSchemaInStillNeedsSchemaListRaiseErrorTest,
-            self).setUp()
+        super().setUp()
         user_id = user_services.get_user_id_from_username('learneruser')
         self.csrf_token = base.CsrfTokenManager.create_csrf_token(user_id)
         self.payload = {'arg_a': 'val'}
@@ -1903,6 +1895,42 @@ class HandlerClassWithSchemaInStillNeedsSchemaListRaiseErrorTest(
             self.post_json(
                 '/mock', self.payload, csrf_token=self.csrf_token,
                 expected_status_int=500)
+
+
+class HeaderRequestsTests(test_utils.GenericTestBase):
+    """Tests to check header requests"""
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'entity_id': {
+                'schema': {
+                    'type': 'int'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+        def get(self, entity_id):
+            return self.render_json({'entity_id': entity_id})
+
+    def setUp(self):
+        super().setUp()
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication([
+            webapp2.Route(
+                '/mock/<entity_id>', self.MockHandler, name='MockHandler')],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_head_request_with_invalid_url_args_raises(self):
+        with self.swap(self, 'testapp', self.testapp):
+            self.testapp.head('/mock/not_int', status=400)
+
+    def test_valid_head_request_returns_only_headers(self):
+        with self.swap(self, 'testapp', self.testapp):
+            response = self.testapp.head('/mock/234', status=200)
+            self.assertEqual(response.body, b'')
+            self.assertIsNotNone(response.headers)
 
 
 class RequestMethodNotInHandlerClassDoNotRaiseMissingSchemaErrorTest(

@@ -149,7 +149,6 @@ class BaseHandler(webapp2.RequestHandler):
     POST_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     PUT_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     DELETE_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    HEAD_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     # Using Dict[str, Any] here because the following schema can have a
     # recursive structure and currently mypy doesn't support recursive type
@@ -340,7 +339,7 @@ class BaseHandler(webapp2.RequestHandler):
             self.handle_exception(e, self.app.debug)
             schema_validation_succeeded = False
             # TODO(#13155): Remove this clause once all the handlers have had
-            #  schema validation implemented.
+            # schema validation implemented.
         except (NotImplementedError, self.InternalErrorException) as e:
             self.handle_exception(e, self.app.debug)
             schema_validation_succeeded = False
@@ -358,6 +357,8 @@ class BaseHandler(webapp2.RequestHandler):
         """
         handler_class_name = self.__class__.__name__
         request_method = self.request.environ['REQUEST_METHOD']
+        if request_method == 'HEAD':
+            request_method = 'GET'
         url_path_args = self.request.route_kwargs
 
         if (
@@ -401,7 +402,7 @@ class BaseHandler(webapp2.RequestHandler):
         # needed for analytics).
         extra_args_are_allowed = (
             self.GET_HANDLER_ERROR_RETURN_TYPE == feconf.HANDLER_TYPE_HTML and
-            request_method in ['GET', 'HEAD'])
+            request_method == 'GET')
 
         if self.URL_PATH_ARGS_SCHEMAS is None:
             raise NotImplementedError(
@@ -424,7 +425,7 @@ class BaseHandler(webapp2.RequestHandler):
         # This check ensures that if a request method is not defined
         # in the handler class then schema validation will not raise
         # NotImplementedError for that corresponding request method.
-        if request_method in ['GET', 'POST', 'PUT', 'DELETE', 'HEAD'] and (
+        if request_method in ['GET', 'POST', 'PUT', 'DELETE'] and (
                 getattr(self.__class__, request_method.lower()) ==
                 getattr(BaseHandler, request_method.lower())):
             return
@@ -437,8 +438,7 @@ class BaseHandler(webapp2.RequestHandler):
                 'Missing schema for %s method in %s handler class.' % (
                     request_method, handler_class_name))
 
-        allow_string_to_bool_conversion = request_method in [
-            'GET', 'DELETE', 'HEAD']
+        allow_string_to_bool_conversion = request_method in ['GET', 'DELETE']
         normalized_arg_values, errors = (
             payload_validator.validate_arguments_against_schema(
                 handler_args, schema_for_request_method, extra_args_are_allowed,
@@ -462,7 +462,7 @@ class BaseHandler(webapp2.RequestHandler):
         # Populate the payload/request with the default args before passing
         # execution onwards to the handler.
         for arg in keys_that_correspond_to_default_values:
-            if request_method in ['GET', 'DELETE', 'HEAD']:
+            if request_method in ['GET', 'DELETE']:
                 self.normalized_request[arg] = normalized_arg_values.get(arg)
             else:
                 self.normalized_payload[arg] = normalized_arg_values.get(arg)
@@ -526,13 +526,11 @@ class BaseHandler(webapp2.RequestHandler):
         """
         raise self.PageNotFoundException
 
-    def head(self, *args):  # pylint: disable=unused-argument
-        """Base method to handle HEAD requests.
-
-        Raises:
-            PageNotFoundException. Page not found error (error code 404).
+    def head(self, *args, **kwargs):
+        """Method to handle HEAD requests. It returns only
+        the headers of GET request
         """
-        raise self.PageNotFoundException
+        return self.get(*args, **kwargs)
 
     def render_json(self, values: Dict[Any, Any]) -> None:
         """Prepares JSON response to be sent to the client.
@@ -663,9 +661,6 @@ class BaseHandler(webapp2.RequestHandler):
         elif method == 'DELETE':
             self._render_exception_json_or_html(
                 self.DELETE_HANDLER_ERROR_RETURN_TYPE, values)
-        elif method == 'HEAD':
-            self._render_exception_json_or_html(
-                self.HEAD_HANDLER_ERROR_RETURN_TYPE, values)
         else:
             logging.warning('Not a recognized request method.')
             self._render_exception_json_or_html(None, values)
