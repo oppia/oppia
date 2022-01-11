@@ -354,7 +354,7 @@ class StateTrainingJobsMappingModelUnitTests(test_utils.GenericTestBase):
             classifier_models.StateTrainingJobsMappingModel.get_export_policy(),
             expected_export_policy_dict)
 
-    def test_get_model(self) -> None:
+    def test_get_model_from_exploration_attributes(self) -> None:
         exp_id = 'exp_id1'
         exp_version = 1
         state_name = 'state_name1'
@@ -371,6 +371,8 @@ class StateTrainingJobsMappingModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(mapping.exp_id, exp_id)
         self.assertEqual(mapping.exp_version, 1)
         self.assertEqual(mapping.state_name, state_name)
+        self.assertDictEqual(
+            mapping.algorithm_ids_to_job_ids, {'algorithm_id': job_id})
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
@@ -423,7 +425,7 @@ class StateTrainingJobsMappingModelUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(mapping_id, 'exp_id1.2.%s' % state_name2)
 
-    def test_get_model_from_exploration_attributes(self) -> None:
+    def test_get_models_from_exploration_attributes(self) -> None:
         exp_id = 'exp_id1'
         exp_version = 1
         state_name = 'state_name1'
