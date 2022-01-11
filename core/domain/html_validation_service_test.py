@@ -1249,7 +1249,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                     test_case['html_content']),
                 test_case['expected_output'])
 
-    def test_get_html_string_with_incorrectly_encoded_chars_correct_encoded_html_string(self):
+    def test_get_html_string_with_incorrectly_encoded_chars_correct_html_string(self): # pylint: disable=line-too-long
         html_string = '<p>Hello this is <span>testing &nbsp;</span></p>'
         self.assertEqual(
             html_validation_service.fix_incorrectly_encoded_chars(html_string),
