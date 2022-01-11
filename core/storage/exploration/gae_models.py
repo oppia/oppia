@@ -231,7 +231,7 @@ class ExplorationModel(base_models.VersionedModel):
         default=False, indexed=True)
     # Size in bytes of Android Proto representation.
     android_proto_size_in_bytes = datastore_services.IntegerProperty(
-        indexed=True, required=True)
+        indexed=True)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
