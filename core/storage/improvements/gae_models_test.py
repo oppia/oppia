@@ -36,13 +36,14 @@ class TaskEntryModelTests(test_utils.GenericTestBase):
     def test_get_field_name_mapping_to_takeout_keys(self) -> None:
         self.assertEqual(
             improvements_models.TaskEntryModel.
-            get_field_name_mapping_to_takeout_keys(),
+                get_field_name_mapping_to_takeout_keys(),
             {
                 'resolver_id': 'task_ids_resolved_by_user',
                 'issue_description': 'issue_descriptions',
                 'status': 'statuses',
                 'resolved_on': 'resolution_msecs'
-            })
+            }
+        )
 
     def test_get_export_policy(self) -> None:
         expected_export_policy_dict = {
@@ -68,9 +69,10 @@ class TaskEntryModelTests(test_utils.GenericTestBase):
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
             improvements_models.TaskEntryModel
-            .get_model_association_to_user(),
+                .get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.
-            ONE_INSTANCE_SHARED_ACROSS_USERS)
+                ONE_INSTANCE_SHARED_ACROSS_USERS
+        )
 
     def test_has_reference_to_user_id(self) -> None:
         improvements_models.TaskEntryModel.create(
