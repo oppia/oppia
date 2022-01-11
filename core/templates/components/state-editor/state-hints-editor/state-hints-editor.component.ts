@@ -39,7 +39,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { CdkDragSortEvent, moveItemInArray} from '@angular/cdk/drag-drop';
 import { Solution } from 'domain/exploration/SolutionObjectFactory';
 
-interface DeleteValue {
+interface DeleteValueResponse {
   index: number;
   evt: Event;
 }
@@ -176,7 +176,7 @@ export class StateHintsEditorComponent implements OnInit {
     });
   };
 
-  deleteHint(value: DeleteValue): void {
+  deleteHint(value: DeleteValueResponse): void {
     // Prevent clicking on the delete button from also toggling the
     // display state of the hint.
     value.evt.stopPropagation();
