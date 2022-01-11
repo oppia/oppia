@@ -31,50 +31,50 @@ import { StoryEditorStateService } from '../services/story-editor-state.service'
  })
 export class StoryEditorNavbarBreadcrumbComponent {
   constructor(
-     private undoRedoService: UndoRedoService,
-     private ngbModal: NgbModal,
-     private storyEditorStateService: StoryEditorStateService,
-     private windowRef: WindowRef,
-     private urlInterpolationService: UrlInterpolationService
+    private undoRedoService: UndoRedoService,
+    private ngbModal: NgbModal,
+    private storyEditorStateService: StoryEditorStateService,
+    private windowRef: WindowRef,
+    private urlInterpolationService: UrlInterpolationService
   ) {}
-   topicName: string;
-   story: Story;
-   directiveSubscriptions = new Subscription();
-   TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topicId>';
+  topicName: string;
+  story: Story;
+  directiveSubscriptions = new Subscription();
+  TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topicId>';
 
-   returnToTopicEditorPage(): void {
-     if (this.undoRedoService.getChangeCount() > 0) {
-       this.ngbModal.open(
-         StorySavePendingChangesModalComponent,
-         { backdrop: true },
-       ).result.then(() => {}, () => {
-         // Note to developers:
-         // This callback is triggered when the Cancel button is clicked.
-         // No further action is needed.
-       });
-     } else {
-       this.windowRef.nativeWindow.open(
-         this.urlInterpolationService.interpolateUrl(
-           this.TOPIC_EDITOR_URL_TEMPLATE, {
-             topicId: this.story.getCorrespondingTopicId()
-           }
-         ), '_self');
-     }
-   }
+  returnToTopicEditorPage(): void {
+    if (this.undoRedoService.getChangeCount() > 0) {
+      this.ngbModal.open(
+        StorySavePendingChangesModalComponent,
+        { backdrop: true },
+      ).result.then(() => {}, () => {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
+      });
+    } else {
+      this.windowRef.nativeWindow.open(
+        this.urlInterpolationService.interpolateUrl(
+          this.TOPIC_EDITOR_URL_TEMPLATE, {
+            topicId: this.story.getCorrespondingTopicId()
+          }
+        ), '_self');
+    }
+  }
 
-   ngOnInit(): void {
-     this.directiveSubscriptions.add(
-       this.storyEditorStateService.onStoryInitialized.subscribe(
-         () => {
-           this.topicName = this.storyEditorStateService.getTopicName();
-           this.story = this.storyEditorStateService.getStory();
-         }
-       ));
-   }
+  ngOnInit(): void {
+    this.directiveSubscriptions.add(
+      this.storyEditorStateService.onStoryInitialized.subscribe(
+        () => {
+          this.topicName = this.storyEditorStateService.getTopicName();
+          this.story = this.storyEditorStateService.getStory();
+        }
+      ));
+  }
 
-   ngOnDestroy(): void {
-     this.directiveSubscriptions.unsubscribe();
-   }
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
+  }
 }
 
 angular.module('oppia').directive('oppiaStoryEditorNavbarBreadcrumb',
