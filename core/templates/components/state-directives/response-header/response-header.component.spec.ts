@@ -117,9 +117,9 @@ describe('Response Header Component', () => {
   });
 
   it('should delete response when user clicks delete button', () => {
-    spyOn(component.deleteFn, 'emit').and.callThrough();
+    spyOn(component.delete, 'emit').and.callThrough();
     component.deleteResponse(new Event(''));
 
-    expect(component.deleteFn.emit).toHaveBeenCalled();
+    expect(component.delete.emit).toHaveBeenCalled();
   });
 });

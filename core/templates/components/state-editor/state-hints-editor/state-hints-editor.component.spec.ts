@@ -162,7 +162,7 @@ describe('StateHintsEditorComponent', () => {
     spyOn(component.showMarkAllAudioAsNeedingUpdateModalIfRequired, 'emit');
 
     component.sendShowMarkAllAudioAsNeedingUpdateModalIfRequired(
-      new Event(' '));
+      ['data', 'data']);
 
     expect(component.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit)
       .toHaveBeenCalled();
