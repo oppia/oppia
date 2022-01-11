@@ -13,42 +13,39 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the TopicSavePendingChangesComponent.
+ * @fileoverview Unit tests for skill editor save modal.
  */
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { SkillEditorSaveModalComponent } from './skill-editor-save-modal.component';
 
-import { TopicSavePendingChangesComponent } from './topic-save-pending-changes-modal.component';
-
-describe('Topic Save Pending Changes Component', function() {
-  let component: TopicSavePendingChangesComponent;
-  let fixture: ComponentFixture<TopicSavePendingChangesComponent>;
+describe('Skill editor save modal component', () => {
+  let fixture: ComponentFixture<SkillEditorSaveModalComponent>;
+  let componentInstance: SkillEditorSaveModalComponent;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
-        TopicSavePendingChangesComponent
+        SkillEditorSaveModalComponent
       ],
-      providers: [{
-        provide: NgbActiveModal
-      }],
+      providers: [
+        NgbActiveModal
+      ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(TopicSavePendingChangesComponent);
-    component = fixture.componentInstance;
-
-    TestBed.inject(NgbActiveModal);
+    fixture = TestBed.createComponent(SkillEditorSaveModalComponent);
+    componentInstance = fixture.componentInstance;
   });
 
   // This component have no more frontend tests as it inherits the
   // ConfirmOrCancelModalComponent and doesn't have any additional
   // functionality. Please see the ConfirmOrCancelModalComponent for more tests.
   it('should create', () => {
-    expect(component).toBeDefined();
+    expect(componentInstance).toBeDefined();
   });
 });
