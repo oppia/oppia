@@ -5427,7 +5427,7 @@ class OppiaAndroidDecoratorTest(test_utils.GenericTestBase):
         },
         'user_supplied_feedback': {
             'report_type': 'suggestion',
-            'category': 'LANGUAGE_SUGGESTION',
+            'category': 'language_suggestion',
             'user_feedback_selected_items': [],
             'user_feedback_other_text_input': 'french'
         }
