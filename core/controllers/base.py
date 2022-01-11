@@ -338,7 +338,8 @@ class BaseHandler(webapp2.RequestHandler):
 
         # TODO(#13155): Remove NotImplementedError once all the handlers
         # have had schema validation implemented.
-        except (NotImplementedError, self.InternalErrorException,
+        except (
+                NotImplementedError, self.InternalErrorException,
                 self.InvalidInputException) as e:
             self.handle_exception(e, self.app.debug)
             schema_validation_succeeded = False
@@ -358,7 +359,7 @@ class BaseHandler(webapp2.RequestHandler):
         request_method = self.request.environ['REQUEST_METHOD']
 
         # For HEAD requests, the schema of GET handler is validated
-        # against request arguments
+        # against request arguments.
         if request_method == 'HEAD':
             request_method = 'GET'
 
