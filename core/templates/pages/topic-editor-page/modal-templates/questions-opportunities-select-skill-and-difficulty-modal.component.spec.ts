@@ -18,8 +18,8 @@
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ChangeDetectorRef, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, waitForAsync } from '@angular/core/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
@@ -69,8 +69,12 @@ describe(
     let mockImageFile: ImageFile;
     let mockBlob: Blob;
 
-    let skillId = 'skill_1';
+    let misconceptionDict1 = null;
+    let rubricDict = null;
     let skill = null;
+    let skillContentsDict = null;
+    let skillDifficulties = ['easy', 'medium'];
+    let skillId = 'skill_1';
 
     beforeEach(waitForAsync(() => {
       TestBed.configureTestingModule({
@@ -81,7 +85,6 @@ describe(
         providers: [
           AlertsService,
           AssetsBackendApiService,
-          ChangeDetectorRef,
           ExtractImageFilenamesFromModelService,
           {
             provide: NgbActiveModal,
@@ -105,20 +108,19 @@ describe(
         skillObjectFactory = TestBed.inject(SkillObjectFactory);
         extractImageFilenamesFromModelService = TestBed.inject(
           ExtractImageFilenamesFromModelService);
-        let skillDifficulties = ['easy', 'medium'];
 
-        let misconceptionDict1 = {
+        misconceptionDict1 = {
           id: 2,
           name: 'test name',
           notes: 'test notes',
           feedback: 'test feedback',
           must_be_addressed: true
         };
-        let rubricDict = {
+        rubricDict = {
           difficulty: skillDifficulties[0],
           explanations: ['explanation']
         };
-        let skillContentsDict = {
+        skillContentsDict = {
           explanation: {
             html: 'test explanation',
             content_id: 'explanation',
@@ -128,7 +130,7 @@ describe(
             voiceovers_mapping: {}
           }
         };
-        skill = {
+        skill = skillObjectFactory.createFromBackendDict({
           id: skillId,
           description: 'Skill 1 description',
           misconceptions: [misconceptionDict1],
@@ -137,15 +139,11 @@ describe(
           language_code: 'en',
           version: 1,
           next_misconception_id: 3,
-          prerequisite_skill_ids: []
-        };
+          prerequisite_skill_ids: [],
+          all_questions_merged: true,
+          superseding_skill_id: 'skill',
+        });
 
-        spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
-          Promise.resolve({
-            skill: skillObjectFactory.createFromBackendDict(skill),
-            assignedSkillTopicData: {},
-            groupedSkillSummaries: {},
-          }));
         mockImageFile = new ImageFile('dummyImg.png', mockBlob);
         spyOn(
           extractImageFilenamesFromModelService,
@@ -158,24 +156,47 @@ describe(
         // defined the properties we need in 'MockReaderObject'.
         // @ts-expect-error
         spyOn(window, 'FileReader').and.returnValue(new MockReaderObject());
-        fixture.detectChanges();
       });
 
       it('should initialize properties after component is' +
         ' initialized', fakeAsync(() => {
-        expect(component.skill).toEqual(
-          skillObjectFactory.createFromBackendDict(skill));
+        spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
+          Promise.resolve({
+            skill: skill,
+            assignedSkillTopicData: {},
+            groupedSkillSummaries: {},
+          }));
+        
+        component.ngOnInit();
+        tick();
+
+        expect(component.skill).toEqual(skill);
       }));
 
       it('should create a question and select its difficulty when closing' +
-        ' the modal', () => {
+        ' the modal', fakeAsync(() => {
+        spyOn(ngbActiveModal, 'close');
+        spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
+          Promise.resolve({
+            skill: skill,
+            assignedSkillTopicData: {},
+            groupedSkillSummaries: {},
+          }));
+        component.linkedSkillsWithDifficulty = [{
+          getDifficulty(): string {
+            return '0.3';
+          }
+        }];
+
+        component.ngOnInit();
+        tick();
         component.startQuestionCreation();
 
         expect(ngbActiveModal.close).toHaveBeenCalledWith({
-          skill: skillObjectFactory.createFromBackendDict(skill),
+          skill: skill,
           skillDifficulty: 0.3
         });
-      });
+      }));
     });
 
     describe('when fetching skill fails', () => {
@@ -185,14 +206,15 @@ describe(
         alertsService = TestBed.inject(AlertsService);
         ngbActiveModal = TestBed.inject(NgbActiveModal);
         skillBackendApiService = TestBed.inject(SkillBackendApiService);
-  
-        spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
-          Promise.reject('It was not possible to fetch the skill'));
-        fixture.detectChanges();
       });
 
       it('should shows a warning error', fakeAsync(() => {
         let addWarningSpy = spyOn(alertsService, 'addWarning');
+        spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
+          Promise.reject('It was not possible to fetch the skill'));
+
+        component.ngOnInit();
+        tick();
 
         expect(addWarningSpy.calls.allArgs()[0]).toEqual(
           ['Error populating skill: It was not possible to fetch the skill.']);

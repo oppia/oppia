@@ -241,10 +241,16 @@ describe('Question opportunities component', function() {
 
   it('should create a question when closing create question modal',
     fakeAsync(() => {
-      ctrl.userIsLoggedIn = true;
-      $rootScope.$apply();
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(
+        Promise.resolve({
+          isLoggedIn: () => true
+        }));
+
+      ctrl.$onInit();
+      tick();
       alertsService.clearWarnings();
 
+      spyOn(questionUndoRedoService, 'clearChanges');
       var openSpy = spyOn(ngbModal, 'open').and.returnValue({
         componentInstance: MockNgbModalRef,
         result: Promise.resolve({
@@ -269,27 +275,27 @@ describe('Question opportunities component', function() {
           skillDifficulty: 1
         })
       }as NgbModalRef);
-      ctrl.onClickSuggestQuestionButton('1');
-      openSpy.calls.reset();
-      tick();
 
-      spyOn(questionUndoRedoService, 'clearChanges');
-      var modalSpy = spyOn($uibModal, 'open').and.returnValue({
-        result: Promise.resolve()
-      });
-      $rootScope.$apply();
+      ctrl.onClickSuggestQuestionButton('1');
+      tick();
+      
 
       expect(openSpy).toHaveBeenCalled();
-      expect(modalSpy).toHaveBeenCalled();
       expect(questionUndoRedoService.clearChanges).toHaveBeenCalled();
     }));
 
   it('should suggest a question when dismissing create question modal',
     fakeAsync(() => {
-      ctrl.userIsLoggedIn = true;
-      $rootScope.$apply();
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(
+        Promise.resolve({
+          isLoggedIn: () => true
+        }));
+
+      ctrl.$onInit();
+      tick();
       alertsService.clearWarnings();
 
+      spyOn(questionUndoRedoService, 'clearChanges');
       var openSpy = spyOn(ngbModal, 'open').and.returnValue({
         componentInstance: MockNgbModalRef,
         result: Promise.resolve({
@@ -314,18 +320,11 @@ describe('Question opportunities component', function() {
           skillDifficulty: 1
         })
       } as NgbModalRef);
+
       ctrl.onClickSuggestQuestionButton('1');
-      openSpy.calls.reset();
-
-      spyOn(questionUndoRedoService, 'clearChanges');
-      var modalSpy = spyOn($uibModal, 'open').and.returnValue({
-        result: Promise.reject()
-      });
       tick();
-      $rootScope.$apply();
-
+      
       expect(openSpy).toHaveBeenCalled();
-      expect(modalSpy).toHaveBeenCalled();
       expect(questionUndoRedoService.clearChanges).toHaveBeenCalled();
     }));
 

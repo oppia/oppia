@@ -32,10 +32,8 @@ class MockNgbModalRef {
 }
 
 describe('Question Editor Modal Controller', function() {
-  let $q = null;
   let $scope = null;
   let ngbModal: NgbModal = null;
-  let $uibModal = null;
   let $uibModalInstance = null;
   let AlertsService = null;
   let ContextService = null;
@@ -72,8 +70,6 @@ describe('Question Editor Modal Controller', function() {
 
   describe('when question is valid', function() {
     beforeEach(angular.mock.inject(function($injector, $controller) {
-      $uibModal = $injector.get('$uibModal');
-      $q = $injector.get('$q');
       ngbModal = TestBed.inject(NgbModal);
       const $rootScope = $injector.get('$rootScope');
       AlertsService = $injector.get('AlertsService');
@@ -376,9 +372,7 @@ describe('Question Editor Modal Controller', function() {
 
   describe('when question is not valid', function() {
     beforeEach(angular.mock.inject(function($injector, $controller) {
-      $uibModal = $injector.get('$uibModal');
       ngbModal = TestBed.inject(NgbModal);
-      $q = $injector.get('$q');
       const $rootScope = $injector.get('$rootScope');
       AlertsService = $injector.get('AlertsService');
       QuestionObjectFactory = $injector.get('QuestionObjectFactory');
