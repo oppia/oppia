@@ -29,10 +29,14 @@ import apache_beam as beam
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import collection_models
+    from mypy_imports import feedback_models
     from mypy_imports import user_models
 
-(collection_models, user_models) = models.Registry.import_models([
-    models.NAMES.collection, models.NAMES.user])
+(
+    collection_models, feedback_models, user_models
+) = models.Registry.import_models([
+    models.NAMES.collection, models.NAMES.feedback, models.NAMES.user])
+
 datastore_services = models.Registry.import_datastore_services()
 
 
@@ -75,6 +79,36 @@ class GetCollectionOwnersEmailsJob(base_jobs.JobBase):
 
         return (
             user_email_pcollection
+            | 'Count the output' >> (
+                job_result_transforms.CountObjectsToJobRunResult())
+        )
+
+
+class MatchEntiryTypeCollectionJob(base_jobs.JobBase):
+    """Job that match entity_type as collection."""
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        """Returns a PCollection of 'SUCCESS' or 'FAILURE' results from
+        matching entity_type as collection.
+
+        Returns:
+            PCollection. A PCollection of 'SUCCESS' or 'FAILURE' results from
+            matching entity_type as collection.
+        """
+        feedback_model_matched_as_collection = (
+            self.pipeline
+            | 'Get all GeneralFeedbackThread models' >> ndb_io.GetModels(
+                feedback_models.GeneralFeedbackThreadModel.get_all(
+                    include_deleted=False))
+            | 'Extract entity_type' >> beam.Map(
+                    lambda feeback_model: feeback_model.entity_type)
+            | 'Match entity_type' >> beam.Filter(
+                lambda entity_type: entity_type == 'collection')
+            | 'print out ' >> beam.Map(print)
+        )
+
+        return (
+            feedback_model_matched_as_collection
             | 'Count the output' >> (
                 job_result_transforms.CountObjectsToJobRunResult())
         )

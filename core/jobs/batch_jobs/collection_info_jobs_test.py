@@ -28,9 +28,14 @@ from core.platform import models
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import collection_models
+    from mypy_imports import feedback_models
+    from mypy_imports import user_models
 
-(collection_models, user_models) = models.Registry.import_models(
-    [models.NAMES.collection, models.NAMES.user])
+(
+    collection_models, feedback_models, user_models
+) = models.Registry.import_models([
+    models.NAMES.collection, models.NAMES.feedback, models.NAMES.user])
+
 datastore_services = models.Registry.import_datastore_services()
 
 
@@ -113,4 +118,97 @@ class GetCollectionOwnersEmailsJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(stdout='SUCCESS: 2')
+        ])
+
+
+class MatchEntiryTypeCollectionJobTests(job_test_utils.JobTestBase):
+
+    JOB_CLASS = collection_info_jobs.MatchEntiryTypeCollectionJob
+
+    USER_ID = 'user_1'
+    ENTITY_ID = 'col_id_1'
+    ENTITY_ID_1 = 'exp_id_1'
+    ENTITY_ID_2 = 'top_id_1'
+
+    ENTITY_TYPE = 'collection'
+    ENTITY_TYPE_1 = feconf.ENTITY_TYPE_EXPLORATION
+    ENTITY_TYPE_2 = feconf.ENTITY_TYPE_TOPIC
+
+    STATUS = 'open'
+    SUBJECT = 'dummy subject'
+    HAS_SUGGESTION = True
+    SUMMARY = 'This is a great summary.'
+    MESSAGE_COUNT = 0
+
+    def test_empty_storage(self) -> None:
+        self.assert_job_output_is_empty()
+
+    def test_match_single_collection(self) -> None:
+        feedback_thread_model = self.create_model(
+            feedback_models.GeneralFeedbackThreadModel,
+            id='%s.%s.%s' % (self.ENTITY_TYPE, self.ENTITY_ID, 'random'),
+            entity_type=self.ENTITY_TYPE,
+            entity_id=self.ENTITY_ID,
+            original_author_id=self.USER_ID,
+            status=self.STATUS,
+            subject=self.SUBJECT,
+            has_suggestion=self.HAS_SUGGESTION,
+            summary=self.SUMMARY,
+            message_count=self.MESSAGE_COUNT
+        )
+        feedback_thread_model.update_timestamps()
+        feedback_thread_model.put()
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(stdout='SUCCESS: 1')
+        ])
+
+    def test_match_multiple_collection(self) -> None:
+        feedback_thread_model = self.create_model(
+            feedback_models.GeneralFeedbackThreadModel,
+            id='%s.%s.%s' % (self.ENTITY_TYPE, self.ENTITY_ID, 'random'),
+            entity_type=self.ENTITY_TYPE,
+            entity_id=self.ENTITY_ID,
+            original_author_id=self.USER_ID,
+            status=self.STATUS,
+            subject=self.SUBJECT,
+            has_suggestion=self.HAS_SUGGESTION,
+            summary=self.SUMMARY,
+            message_count=self.MESSAGE_COUNT
+        )
+        feedback_thread_model.update_timestamps()
+        feedback_thread_model.put()
+
+        feedback_thread_model1 = self.create_model(
+            feedback_models.GeneralFeedbackThreadModel,
+            id='%s.%s.%s' % (self.ENTITY_TYPE_1, self.ENTITY_ID_1, 'random'),
+            entity_type=self.ENTITY_TYPE_1,
+            entity_id=self.ENTITY_ID_1,
+            original_author_id=self.USER_ID,
+            status=self.STATUS,
+            subject=self.SUBJECT,
+            has_suggestion=self.HAS_SUGGESTION,
+            summary=self.SUMMARY,
+            message_count=self.MESSAGE_COUNT
+        )
+        feedback_thread_model1.update_timestamps()
+        feedback_thread_model1.put()
+
+        feedback_thread_model2 = self.create_model(
+            feedback_models.GeneralFeedbackThreadModel,
+            id='%s.%s.%s' % (self.ENTITY_TYPE_2, self.ENTITY_ID_2, 'random'),
+            entity_type=self.ENTITY_TYPE_2,
+            entity_id=self.ENTITY_ID_2,
+            original_author_id=self.USER_ID,
+            status=self.STATUS,
+            subject=self.SUBJECT,
+            has_suggestion=self.HAS_SUGGESTION,
+            summary=self.SUMMARY,
+            message_count=self.MESSAGE_COUNT
+        )
+        feedback_thread_model2.update_timestamps()
+        feedback_thread_model2.put()
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(stdout='SUCCESS: 1')
         ])
