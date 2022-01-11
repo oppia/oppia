@@ -10,6 +10,7 @@
               cols="50"
               [maxlength]="MAX_COMMIT_MESSAGE_LENGTH"
               [(ngModel)]="commitMessage"
+              (change)="updateButton()"
               oppiaFocusOn="saveChangesModalOpened"
               class="protractor-test-commit-message-input"
               autofocus>
