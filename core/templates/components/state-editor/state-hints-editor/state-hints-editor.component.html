@@ -30,10 +30,10 @@
           <!-- An HTML element marked ui-sortable should contain only one element,
           and this element should have an ng-repeat defined on it. See the
           ui-sortable documentation for more details. -->
-            <ul cdkDropList (cdkDropListDropped)="drop($event)" class="nav oppia-option-list nav-stacked nav-pills">
+          <div cdkDropList (cdkDropListDropped)="drop($event)" class="nav oppia-option-list nav-stacked nav-pills">
               <!-- Note that adding "track by index" here seems to mess up the final
               index in the stop() event handler. -->
-              <li cdkDrag *ngFor="let hint of stateHintsService.displayed; let index = index"
+              <div [cdkDragDisabled]="stateHintsService.getActiveHintIndex() === index ? true : false" cdkDrag *ngFor="let hint of stateHintsService.displayed; let index = index"
                   ngClass="{'active': stateHintsService.getActiveHintIndex() === index}"
                   class="oppia-rule-block oppia-sortable-hint oppia-prevent-selection">
                 <span class="oppia-hint-sort-handle"
@@ -66,8 +66,8 @@
                     </oppia-hint-editor>
                   </div>
                 </div>
-              </li>
-            </ul>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -96,6 +96,11 @@
   .oppia-add-hint-button-container {
     margin: 10px 0;
   }
+
+  .oppia-editor-card-section {
+    padding: 10px;
+  }
+
   @media screen and (max-width: 768px) {
     .state-hints-header-container {
       padding: 0;
@@ -106,5 +111,39 @@
     .state-hints-header i {
       display: block;
     }
+  }
+
+  .oppia-hint-sort-handle {
+    position: absolute;
+    top: 9px;
+    padding-right: 4px;
+  }
+
+  .oppia-sortable-hint {
+    padding: 10px 8px;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .cdk-drag-placeholder {
+    opacity: 0;
+  }
+
+  .cdk-drag-preview {
+    box-sizing: border-box;
+    border-radius: 4px;
+    box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+                0 8px 10px 1px rgba(0, 0, 0, 0.14),
+                0 3px 14px 2px rgba(0, 0, 0, 0.12);
+  }
+
+  .cdk-drag-animating {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  }
+
+  .oppia-option-list.cdk-drop-list-dragging .oppia-sortable-hint:not(.cdk-drag-placeholder) {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
   }
 </style>
