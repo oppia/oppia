@@ -25,6 +25,11 @@ import { AppConstants } from 'app.constants';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 
+interface DeleteValue {
+  index: number;
+  evt: Event;
+}
+
 @Component({
   selector: 'oppia-response-header',
   templateUrl: './response-header.component.html'
@@ -39,8 +44,8 @@ export class ResponseHeaderComponent {
   @Input() isResponse: boolean;
   @Input() correctnessFeedbackEnabled: boolean;
   @Input() showWarning: boolean;
-  @Output() deleteFn = new EventEmitter();
-  @Output() navigateToState = new EventEmitter();
+  @Output() delete = new EventEmitter<DeleteValue>();
+  @Output() navigateToState = new EventEmitter<string>();
 
   constructor(
     private stateEditorService: StateEditorService,
@@ -86,12 +91,12 @@ export class ResponseHeaderComponent {
   }
 
   deleteResponse(evt: Event): void {
-    const value = {
+    const value: DeleteValue = {
       index: this.index,
       evt: evt
     };
 
-    this.deleteFn.emit(value);
+    this.delete.emit(value);
   }
 }
 

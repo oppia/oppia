@@ -37,40 +37,43 @@ import { DeleteHintModalComponent } from 'pages/exploration-editor-page/editor-t
 import { DeleteLastHintModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-last-hint-modal.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { CdkDragSortEvent, moveItemInArray} from '@angular/cdk/drag-drop';
+import { Solution } from 'domain/exploration/SolutionObjectFactory';
 
-interface deleteResponse {
+interface DeleteValue {
   index: number;
   evt: Event;
 }
 interface AddHintModalResponse {
   hint: Hint;
 }
+
 @Component({
   selector: 'oppia-state-hints-editor',
   templateUrl: './state-hints-editor.component.html'
 })
 export class StateHintsEditorComponent implements OnInit {
-  @Output() onSaveNextContentIdIndex = new EventEmitter();
-  @Output() onSaveSolution = new EventEmitter();
-  @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired = new EventEmitter();
-  @Output() onSaveHints = new EventEmitter();
+  @Output() onSaveNextContentIdIndex = new EventEmitter<number>();
+  @Output() onSaveSolution = new EventEmitter<Solution>();
+  @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired =
+    new EventEmitter<string[]>();
+  @Output() onSaveHints = new EventEmitter<Hint[]>();
 
   hintCardIsShown: boolean;
   canEdit: boolean;
 
   constructor(
-    private stateHintsService: StateHintsService,
-    private urlInterpolationService: UrlInterpolationService,
-    private stateEditorService: StateEditorService,
-    private stateInteractionIdService: StateInteractionIdService,
-    private stateNextContentIdIndexService: StateNextContentIdIndexService,
-    private stateSolutionService: StateSolutionService,
     private alertsService: AlertsService,
     private editabilityService: EditabilityService,
-    private windowDimensionsService: WindowDimensionsService,
     private externalSaveService: ExternalSaveService,
     private formatRtePreviewPipe: FormatRtePreviewPipe,
     private ngbModal: NgbModal,
+    private stateEditorService: StateEditorService,
+    private stateHintsService: StateHintsService,
+    private stateInteractionIdService: StateInteractionIdService,
+    private stateNextContentIdIndexService: StateNextContentIdIndexService,
+    private stateSolutionService: StateSolutionService,
+    private urlInterpolationService: UrlInterpolationService,
+    private windowDimensionsService: WindowDimensionsService,
   ) {}
 
   drop(event: CdkDragSortEvent<Hint[]>): void {
@@ -173,7 +176,7 @@ export class StateHintsEditorComponent implements OnInit {
     });
   };
 
-  deleteHint(value: deleteResponse): void {
+  deleteHint(value: DeleteValue): void {
     // Prevent clicking on the delete button from also toggling the
     // display state of the hint.
     value.evt.stopPropagation();
@@ -208,7 +211,7 @@ export class StateHintsEditorComponent implements OnInit {
     this.onSaveHints.emit(this.stateHintsService.displayed);
   }
 
-  sendShowMarkAllAudioAsNeedingUpdateModalIfRequired(value: Event): void {
+  sendShowMarkAllAudioAsNeedingUpdateModalIfRequired(value: string[]): void {
     this.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit(value);
   }
 
