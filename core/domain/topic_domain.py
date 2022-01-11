@@ -821,6 +821,9 @@ class Topic:
         Args:
             name: str. The name to validate.
         """
+        if not isinstance(name, str):
+            raise utils.ValidationError('Name should be a string.')
+
         if name == '':
             raise utils.ValidationError('Name field should not be empty')
 
@@ -1370,7 +1373,12 @@ class Topic:
 
         Args:
             new_name: str. The updated name for the topic.
+
+        Raises:
+            ValidationError. Name should be a string.
         """
+        if not isinstance(new_name, str):
+            raise utils.ValidationError('Name should be a string.')
         self.name = new_name
         self.canonical_name = new_name.lower()
 
@@ -2117,12 +2125,12 @@ class TopicRights:
         }
 
     def is_manager(
-        self, user_id: str
+        self, user_id: Optional[str]
     ) -> bool:
         """Checks whether given user is a manager of the topic.
 
         Args:
-            user_id: str. Id of the user.
+            user_id: str or None. Id of the user.
 
         Returns:
             bool. Whether user is a topic manager of this topic.
