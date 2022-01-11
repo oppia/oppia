@@ -26,7 +26,7 @@ import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
  * @fileoverview Unit tests for StateResponsesComponent.
  */
 
-describe('StateResponsesComponent', () => {
+fdescribe('StateResponsesComponent', () => {
   let ctrl = null;
   let $rootScope = null;
   let $scope = null;
@@ -798,7 +798,10 @@ describe('StateResponsesComponent', () => {
   });
 
   it('should delete answer group after modal is opened', () => {
-    spyOn(ResponsesService, 'deleteAnswerGroup').and.callThrough();
+    spyOn(ResponsesService, 'deleteAnswerGroup').and.callFake(
+      (number: string, callback: () => void) => {
+        callback();
+      });
     spyOn($rootScope, '$apply').and.callThrough();
     spyOn(ngbModal, 'open').and.returnValue(
       {
