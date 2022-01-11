@@ -26,7 +26,7 @@ import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
  * @fileoverview Unit tests for StateResponsesComponent.
  */
 
-fdescribe('StateResponsesComponent', () => {
+describe('StateResponsesComponent', () => {
   let ctrl = null;
   let $rootScope = null;
   let $scope = null;
