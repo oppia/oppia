@@ -408,7 +408,9 @@ describe('Translation tab component', function() {
     ' dismissed', fakeAsync(() => {
     ctrl.$onInit();
 
-    spyOn(stateTutorialFirstTimeService, 'markTranslationTutorialFinished');
+    spyOn(stateTutorialFirstTimeService, 'markTranslationTutorialFinished')
+      .and.stub();
+    spyOn(siteAnalyticsService, 'registerDeclineTutorialModalEvent').and.stub();
     spyOn(ngbModal, 'open').and.returnValue({
       result: Promise.reject('exp1')
     } as NgbModalRef);
@@ -416,6 +418,8 @@ describe('Translation tab component', function() {
     tick();
     $scope.$apply();
 
+    expect(siteAnalyticsService.registerDeclineTutorialModalEvent)
+      .toHaveBeenCalledWith('exp1');
     expect(stateTutorialFirstTimeService.markTranslationTutorialFinished)
       .toHaveBeenCalled();
   }));
