@@ -63,7 +63,7 @@ class BlogPostModelTest(test_utils.GenericTestBase):
             base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER)
 
     def test_get_export_policy(self) -> None:
-        sample_dict = {
+        expected_export_policy_dict = {
             'author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'title': base_models.EXPORT_POLICY.EXPORTED,
             'content': base_models.EXPORT_POLICY.EXPORTED,
@@ -77,7 +77,7 @@ class BlogPostModelTest(test_utils.GenericTestBase):
         }
         self.assertEqual(
             blog_models.BlogPostModel.get_export_policy(),
-            sample_dict)
+            expected_export_policy_dict)
 
     def test_get_deletion_policy(self):
         self.assertEqual(
@@ -207,7 +207,7 @@ class BlogPostSummaryModelTest(test_utils.GenericTestBase):
         self.blog_post_summary_model_new.put()
 
     def test_get_export_policy(self) -> None:
-        sample_dict = {
+        expected_export_policy_dict = {
             'author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'summary': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -221,7 +221,7 @@ class BlogPostSummaryModelTest(test_utils.GenericTestBase):
         }
         self.assertEqual(
             blog_models.BlogPostSummaryModel.get_export_policy(),
-            sample_dict)
+            expected_export_policy_dict)
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
@@ -282,7 +282,7 @@ class BlogPostRightsModelTest(test_utils.GenericTestBase):
         self.blog_post_rights_draft_model.put()
 
     def test_get_export_policy(self) -> None:
-        sample_dict = {
+        expected_export_policy_dict = {
             'editor_ids': base_models.EXPORT_POLICY.EXPORTED,
             'blog_post_is_published': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -291,7 +291,7 @@ class BlogPostRightsModelTest(test_utils.GenericTestBase):
         }
         self.assertEqual(
             blog_models.BlogPostRightsModel.get_export_policy(),
-            sample_dict)
+            expected_export_policy_dict)
 
     def test_get_field_name_mapping_to_takeout_keys(self) -> None:
         self.assertEqual(
@@ -306,7 +306,7 @@ class BlogPostRightsModelTest(test_utils.GenericTestBase):
             blog_models.BlogPostRightsModel.
                 get_model_association_to_user(),
             base_models.
-            MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_SHARED_ACROSS_USERS)
+                MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_SHARED_ACROSS_USERS)
 
     def test_get_deletion_policy(self):
         self.assertEqual(
