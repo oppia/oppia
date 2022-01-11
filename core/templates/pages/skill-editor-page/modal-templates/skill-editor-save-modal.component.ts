@@ -25,11 +25,10 @@ import { AppConstants } from 'app.constants';
   selector: 'skill-editor-save-modal',
   templateUrl: './skill-editor-save-modal.component.html'
 })
-export class SkillEditorSaveModalComponent
-  extends ConfirmOrCancelModal {
-    commitMessage: string;
-    MAX_COMMIT_MESSAGE_LENGTH: number = AppConstants.MAX_COMMIT_MESSAGE_LENGTH;
-    constructor(activeModal: NgbActiveModal) {
-      super(activeModal);
-    }
+export class SkillEditorSaveModalComponent extends ConfirmOrCancelModal {
+  commitMessage: string;
+  MAX_COMMIT_MESSAGE_LENGTH: number = AppConstants.MAX_COMMIT_MESSAGE_LENGTH;
+  constructor(activeModal: NgbActiveModal) {
+    super(activeModal);
+  }
 }
