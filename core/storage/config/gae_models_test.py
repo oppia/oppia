@@ -79,7 +79,7 @@ class ConfigPropertyModelUnitTests(test_utils.GenericTestBase):
         )
 
     def test_get_export_policy(self) -> None:
-        sample_dict = {
+        expected_export_policy_dict = {
             'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -88,7 +88,7 @@ class ConfigPropertyModelUnitTests(test_utils.GenericTestBase):
         }
         self.assertEqual(
             config_models.ConfigPropertyModel.get_export_policy(),
-            sample_dict
+            expected_export_policy_dict
         )
 
 
@@ -221,7 +221,7 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
         )
 
     def test_get_export_policy(self) -> None:
-        sample_dict = {
+        expected_export_policy_dict = {
             'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -231,5 +231,5 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
         }
         self.assertEqual(
             config_models.PlatformParameterModel.get_export_policy(),
-            sample_dict
+            expected_export_policy_dict
         )

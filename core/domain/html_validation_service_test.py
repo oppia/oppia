@@ -1249,7 +1249,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                     test_case['html_content']),
                 test_case['expected_output'])
 
-    def test_get_correct_html_string_replacing_incorrectly_encoded_chars(self):
+    def test_fix_incorrectly_encoded_chars_replaces_incorrect_encodings(self):
         test_cases = [
             {
                 'html_string': '<p>This is <span>testing &nbsp;</span></p>',
