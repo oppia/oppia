@@ -816,7 +816,11 @@ describe('StateResponsesComponent', () => {
 
     expect(ngbModal.open).toHaveBeenCalled();
     expect($rootScope.$apply).toHaveBeenCalled();
-    expect(ResponsesService.deleteAnswerGroup).toHaveBeenCalled();
+    expect(ResponsesService.deleteAnswerGroup)
+      .toHaveBeenCalledWith(0, function(newAnswerGroups) {
+        ctrl.onSaveInteractionAnswerGroups(newAnswerGroups);
+        ctrl.refreshWarnings()();
+      });
   });
 
   it('should clear warnings when delete answer group modal is closed', () => {
