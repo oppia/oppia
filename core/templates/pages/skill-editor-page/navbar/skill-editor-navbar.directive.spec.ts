@@ -46,8 +46,8 @@ describe('Skill Editor Navbar Directive', function() {
   let directive = null;
   let $uibModal = null;
   let $q = null;
-  let skillEditorRoutingService = null;
   let ngbModal: NgbModal = null;
+  let skillEditorRoutingService = null;
   let skillEditorStateService: SkillEditorStateService = null;
   let undoRedoService: UndoRedoService = null;
   let urlService: UrlService = null;
@@ -83,6 +83,7 @@ describe('Skill Editor Navbar Directive', function() {
     $uibModal = $injector.get('$uibModal');
     ngbModal = $injector.get('NgbModal');
     $q = $injector.get('$q');
+    ngbModal = $injector.get('NgbModal');
     directive = $injector.get('skillEditorNavbarDirective')[0];
     skillEditorStateService = $injector.get('SkillEditorStateService');
     skillEditorRoutingService = $injector.get('SkillEditorRoutingService');
@@ -274,9 +275,11 @@ describe('Skill Editor Navbar Directive', function() {
 
   it('should not save changes if save changes modal is opened and cancel ' +
     'button is clicked', fakeAsync(function() {
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.reject()
-    });
+    spyOn(ngbModal, 'open').and.returnValue(
+      {
+        result: $q.reject()
+      } as NgbModalRef
+    );
     let saveSkillSpy = spyOn(skillEditorStateService, 'saveSkill')
       .and.returnValue(null);
 
