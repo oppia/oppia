@@ -946,6 +946,13 @@ describe('StateResponsesComponent', () => {
         outcomeObjectFactory.createNew('unused', '1', 'Feedback text', []),
         [], '0'), '1', {}, true))
       .toBe('[Answer] Feedback text');
+
+    expect($scope.summarizeAnswerGroup(
+      answerGroupObjectFactory.createNew(
+        [],
+        outcomeObjectFactory.createNew('unused', '1', 'Feedback text', []),
+        [], '0'), '1', {}, false))
+      .toBe('[Answer ] Feedback text');
   });
 
   it('should get summary default outcome when outcome is linear', () => {
