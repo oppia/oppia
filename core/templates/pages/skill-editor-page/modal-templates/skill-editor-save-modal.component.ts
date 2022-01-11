@@ -28,6 +28,7 @@ import { AppConstants } from 'app.constants';
 export class SkillEditorSaveModalComponent extends ConfirmOrCancelModal {
   commitMessage: string;
   MAX_COMMIT_MESSAGE_LENGTH: number = AppConstants.MAX_COMMIT_MESSAGE_LENGTH;
+
   constructor(
     private activeModal: NgbActiveModal,
     private changeDetectorRef: ChangeDetectorRef,
@@ -35,7 +36,7 @@ export class SkillEditorSaveModalComponent extends ConfirmOrCancelModal {
     super(activeModal);
   }
 
-  updateButton(): void {
+  updateSaveDraftButton(): void {
     this.changeDetectorRef.detectChanges();
   }
 }
