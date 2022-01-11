@@ -4655,7 +4655,7 @@ div.oppia-issues-learner-action {
   width: 100%;
 }
 
-/* Increase no. of columns for cards on contributors profile page */
+/* By using 'grid-template-columns' we specify the number of columns for different display sizes. */
 .mat-card-content.oppia-profile-portfolio-container {
   background-color: transparent;
   display: grid;
