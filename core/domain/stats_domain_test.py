@@ -458,7 +458,7 @@ class StateStatsTests(test_utils.GenericTestBase):
         self.assertEqual(
             state_stats.to_frontend_dict(), expected_state_stats_dict)
 
-    def test_clone(self):
+    def test_get_with_self_clone_object(self):
         state_stats = stats_domain.StateStats(0, 10, 0, 4, 0, 18, 0, 7, 2, 0, 2)
         expected_state_stats = state_stats.clone()
         self.assertEqual(state_stats.to_dict(), expected_state_stats.to_dict())
