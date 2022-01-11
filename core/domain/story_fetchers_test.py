@@ -132,6 +132,7 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         'schema_version': story_model.story_contents_schema_version,
         'story_contents': story_model.story_contents
         }
+        # Disable protected function for test.
         story_fetchers._migrate_story_contents_to_latest_schema( # pylint: disable=protected-access
             versioned_story_contents, story_id)
         versioned_story_contents[
