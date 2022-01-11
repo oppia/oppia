@@ -2449,7 +2449,7 @@ class ExplorationEmbedPageTests(test_utils.GenericTestBase):
             '%s/%s' % (feconf.EXPLORATION_URL_EMBED_PREFIX, self.EXP_ID),
             {
                 'v': exploration.version
-            }, csrf_token=csrf_token, expected_status_int=500)        
+            }, csrf_token=csrf_token, expected_status_int=500)
         self.logout()
 
     def test_handler_raises_error_with_invalid_version(self):
