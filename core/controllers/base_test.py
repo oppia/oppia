@@ -1860,8 +1860,7 @@ class HandlerClassWithSchemaInStillNeedsSchemaListRaiseErrorTest(
     """
 
     class MockHandler(base.BaseHandler):
-        """Mock handler with schema.
-        """
+        """Mock handler with schema."""
         URL_PATH_ARGS_SCHEMAS = {}
         HANDLER_ARGS_SCHEMAS = {
             'POST': {
