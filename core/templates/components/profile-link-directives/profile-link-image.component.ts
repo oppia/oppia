@@ -37,8 +37,9 @@ export class ProfileLinkImageComponent implements OnInit {
   profileImageUrl!: string;
   profilePicture!: string;
   profileUrl = (
-    '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PROFILE.ROUTE +
-    '/' + this.username
+    '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PROFILE.ROUTE.replace(
+      ':username_fragment', this.username
+    )
   );
 
   constructor(
@@ -59,6 +60,11 @@ export class ProfileLinkImageComponent implements OnInit {
       this.urlInterpolationService.getStaticImageUrl(
         '/avatar/user_blue_72px.webp'));
     this.profilePicture = DEFAULT_PROFILE_IMAGE_PATH;
+    this.profileUrl = (
+      '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PROFILE.ROUTE.replace(
+        ':username_fragment', this.username
+      )
+    );
 
     // Returns a promise for the user profile picture, or the default
     // image if user is not logged in or has not uploaded a profile
