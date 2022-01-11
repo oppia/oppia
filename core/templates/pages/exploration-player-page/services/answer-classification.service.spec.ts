@@ -42,8 +42,7 @@ import { TextInputRulesService } from
   'interactions/TextInput/directives/text-input-rules.service';
 import { AlertsService } from 'services/alerts.service';
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Answer Classification Service', () => {
+describe('Answer Classification Service', () => {
   const stateName = 'Test State';
 
   let alertsService: AlertsService;
