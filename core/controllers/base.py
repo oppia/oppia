@@ -335,12 +335,11 @@ class BaseHandler(webapp2.RequestHandler):
         schema_validation_succeeded = True
         try:
             self.validate_and_normalize_args()
-        except self.InvalidInputException as e:
-            self.handle_exception(e, self.app.debug)
-            schema_validation_succeeded = False
-            # TODO(#13155): Remove this clause once all the handlers have had
-            # schema validation implemented.
-        except (NotImplementedError, self.InternalErrorException) as e:
+
+        # TODO(#13155): Remove NotImplementedError once all the handlers
+        # have had schema validation implemented.
+        except (NotImplementedError, self.InternalErrorException,
+                self.InvalidInputException) as e:
             self.handle_exception(e, self.app.debug)
             schema_validation_succeeded = False
         if not schema_validation_succeeded:
@@ -357,8 +356,12 @@ class BaseHandler(webapp2.RequestHandler):
         """
         handler_class_name = self.__class__.__name__
         request_method = self.request.environ['REQUEST_METHOD']
+
+        # For HEAD requests, the schema of GET handler is validated
+        # against request arguments
         if request_method == 'HEAD':
             request_method = 'GET'
+
         url_path_args = self.request.route_kwargs
 
         if (
@@ -527,8 +530,8 @@ class BaseHandler(webapp2.RequestHandler):
         raise self.PageNotFoundException
 
     def head(self, *args, **kwargs):
-        """Method to handle HEAD requests. It returns only
-        the headers of GET request.
+        """Method to handle HEAD requests. The function automatically
+        returns only the headers of GET request.
         """
         return self.get(*args, **kwargs)
 
