@@ -84,7 +84,7 @@ describe('Skill editor main tab directive', function() {
     ctrl.$onInit();
   }));
 
-  it('should initialize the variables', () => {
+  it('should initialize the variables', function() {
     expect($scope.selectedTopic).toEqual(null);
     expect($scope.subtopicName).toEqual(null);
   });
@@ -109,7 +109,7 @@ describe('Skill editor main tab directive', function() {
     expect($scope.hasLoadedSkill()).toBe(true);
   });
 
-  it('should open save changes modal with $uibModal when unsaved changes are' +
+  it('should open save changes modal with ngbModal when unsaved changes are' +
   ' present', function() {
     spyOn(UndoRedoService, 'getChangeCount').and.returnValue(1);
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {

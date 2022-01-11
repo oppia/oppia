@@ -14,80 +14,62 @@
 
 
 /**
- * @fileoverview Unit tests for the skill prerequisite skills editor.
+ * @fileoverview Unit tests for the skill editor main tab directive.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { SkillPrerequisiteSkillsEditorComponent } from './skill-prerequisite-skills-editor.component';
-import { SkillUpdateService } from 'domain/skill/skill-update.service';
-import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
-import { AlertsService } from 'services/alerts.service';
-import { TopicsAndSkillsDashboardBackendApiService, TopicsAndSkillDashboardData } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { Skill } from 'domain/skill/SkillObjectFactory';
-import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
+import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
+import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+import { SkillUpdateService } from 'domain/skill/skill-update.service';
+import { AlertsService } from 'services/alerts.service';
+// ^^^ This block is to be removed.
 
-describe('Skill editor main tab Component', () => {
-  let component: SkillPrerequisiteSkillsEditorComponent;
-  let fixture: ComponentFixture<SkillPrerequisiteSkillsEditorComponent>;
-  let skillUpdateService: SkillUpdateService;
-  let skillEditorStateService: SkillEditorStateService;
-  let alertsService: AlertsService;
+describe('Skill editor main tab directive', function() {
+  let $scope = null;
+  let ctrl = null;
+  let $rootScope = null;
+  let ngbModal: NgbModal = null;
+  let skillEditorStateService: SkillEditorStateService = null;
+  let skillObjectFactory: SkillObjectFactory = null;
   let topicsAndSkillsDashboardBackendApiService:
-    TopicsAndSkillsDashboardBackendApiService;
-  let windowDimensionsService: WindowDimensionsService;
-  let ngbModal: NgbModal;
-  let skillObjectFactory: SkillObjectFactory;
+    TopicsAndSkillsDashboardBackendApiService = null;
+  let skillUpdateService: SkillUpdateService = null;
+  let alertsService: AlertsService = null;
 
-  let topicAndSkillsDashboardDataBackendDict: TopicsAndSkillDashboardData;
-  let sampleSkill: Skill;
+  let sampleSkill = null;
   let skillSummaryDict = null;
+  let topicAndSkillsDashboardDataBackendDict = null;
+  let windowDimensionsService = null;
 
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule
-      ],
-      declarations: [
-        SkillPrerequisiteSkillsEditorComponent
-      ],
-      providers: [
-        SkillUpdateService,
-        SkillEditorStateService,
-        AlertsService,
-        WindowDimensionsService,
-        NgbModal
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
-    }).compileComponents();
-  }));
+  beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(SkillPrerequisiteSkillsEditorComponent);
-    component = fixture.componentInstance;
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+  });
 
-    skillUpdateService = TestBed.inject(SkillUpdateService);
-    skillEditorStateService = TestBed.inject(SkillEditorStateService);
-    alertsService = TestBed.inject(AlertsService);
-    topicsAndSkillsDashboardBackendApiService =
-      TestBed.inject(TopicsAndSkillsDashboardBackendApiService);
-    windowDimensionsService = TestBed.inject(WindowDimensionsService);
+
+  beforeEach(angular.mock.inject(function($injector, $componentController) {
+    $rootScope = $injector.get('$rootScope');
+    $scope = $rootScope.$new();
     ngbModal = TestBed.inject(NgbModal);
-    skillObjectFactory = TestBed.inject(SkillObjectFactory);
 
-    skillSummaryDict = {
-      id: 'skillId1',
-      description: 'description1',
-      language_code: 'en',
-      version: 1,
-      misconception_count: 3,
-      worked_examples_count: 3,
-      skill_model_created_on: 1593138898626.193,
-      skill_model_last_updated: 1593138898626.193
-    };
+    skillEditorStateService = $injector.get('SkillEditorStateService');
+    skillObjectFactory = $injector.get('SkillObjectFactory');
+    topicsAndSkillsDashboardBackendApiService = $injector.get(
+      'TopicsAndSkillsDashboardBackendApiService');
+    skillUpdateService = $injector.get('SkillUpdateService');
+    windowDimensionsService = $injector.get(
+      'WindowDimensionsService');
+    alertsService = $injector.get('AlertsService');
 
     let misconceptionDict1 = {
       id: 2,
@@ -97,12 +79,12 @@ describe('Skill editor main tab Component', () => {
       must_be_addressed: true
     };
 
-    const rubricDict = {
+    let rubricDict = {
       difficulty: 'medium',
       explanations: ['explanation']
     };
 
-    const skillContentsDict = {
+    let skillContentsDict = {
       explanation: {
         html: 'test explanation',
         content_id: 'explanation',
@@ -127,222 +109,179 @@ describe('Skill editor main tab Component', () => {
       all_questions_merged: true
     });
 
+    skillSummaryDict = {
+      id: 'skillId1',
+      description: 'description1',
+      language_code: 'en',
+      version: 1,
+      misconception_count: 3,
+      worked_examples_count: 3,
+      skill_model_created_on: 1593138898626.193,
+      skill_model_last_updated: 1593138898626.193
+    };
+
     topicAndSkillsDashboardDataBackendDict = {
-      allClassroomNames: [
+      all_classroom_names: [
         'math'
       ],
-      categorizedSkillsDict: {
+      categorized_skills_dict: {
         'Empty Topic': {
           uncategorized: []
         },
         'Dummy Topic 1': {
           uncategorized: [
             {
-              id: 'BBB6dzfb5pPt',
-              description: 'Dummy Skill 1',
-              getId(): string {
-                return this.id;
-              },
-              getDescription(): string {
-                return this.description;
-              }
+              skill_id: 'BBB6dzfb5pPt',
+              skill_description: 'Dummy Skill 1'
             }
           ],
           'Dummy Subtopic Title': [
             {
-              id: 'D1FdmljJNXdt',
-              description: 'Dummy Skill 2',
-              getId(): string {
-                return this.id;
-              },
-              getDescription(): string {
-                return this.description;
-              }
+              skill_id: 'D1FdmljJNXdt',
+              skill_description: 'Dummy Skill 2'
             }
           ]
         }
       },
-      topicSummaries: [
+      topic_summary_dicts: [
         {
           version: 1,
-          urlFragment: 'empty-topic',
-          languageCode: 'en',
+          url_fragment: 'empty-topic',
+          language_code: 'en',
           description: 'description',
-          uncategorizedSkillCount: 0,
-          totalPublishedNodeCount: 0,
-          canEditTopic: true,
-          isPublished: false,
+          uncategorized_skill_count: 0,
+          total_published_node_count: 0,
+          can_edit_topic: true,
+          is_published: false,
           id: 'HLEn0XQiV9XE',
-          topicModelCreatedOn: 1623851496406.576,
-          subtopicCount: 0,
-          thumbnailBgColor: '#FFFFFF',
-          canonicalStoryCount: 0,
+          topic_model_created_on: 1623851496406.576,
+          subtopic_count: 0,
+          thumbnail_bg_color: '#FFFFFF',
+          canonical_story_count: 0,
           name: 'Empty Topic',
           classroom: 'math',
-          totalSkillCount: 0,
-          additionalStoryCount: 0,
-          topicModelLastUpdated: 1623851496406.582,
-          thumbnailFilename: 'thumbnail_filename',
-          getId(): string {
-            return this.id;
-          },
-          getName(): string {
-            return this.name;
-          },
-          getCanonicalStoryCount(): number {
-            return this.canonicalStoryCount;
-          },
-          getSubtopicCount(): number {
-            return this.subtopicCount;
-          },
-          getTotalSkillCount(): number {
-            return this.totalSkillCount;
-          },
-          getTotalPublishedNodeCount(): number {
-            return this.totalPublishedNodeCount;
-          },
-          getUncategorizedSkillCount(): number {
-            return this.uncategorizedSkillCount;
-          },
-          getLanguageCode(): string {
-            return this.languageCode;
-          },
-          getDescription(): string {
-            return this.description;
-          },
-          getVersion(): number {
-            return this.version;
-          },
-          getAdditionalStoryCount(): number {
-            return this.additionalStoryCount;
-          },
-          getTopicModelCreatedOn(): number {
-            return this.topicModelCreatedOn;
-          },
-          getTopicModelLastUpdated(): number {
-            return this.topicModelLastUpdated;
-          },
-          getClassroom(): string | undefined {
-            return this.classroom;
-          },
-          getUrlFragment(): string {
-            return this.urlFragment;
-          },
-          getThumbnailFilename(): string {
-            return this.thumbnailFilename;
-          },
-          getThumbnailBgColor(): string {
-            return this.thumbnailBgColor;
-          },
-          isTopicPublished(): boolean {
-            return this.isPublished;
-          }
+          total_skill_count: 0,
+          additional_story_count: 0,
+          topic_model_last_updated: 1623851496406.582,
+          thumbnail_filename: 'thumbnail_filename'
+        },
+        {
+          version: 3,
+          url_fragment: 'dummy-topic-one',
+          language_code: 'en',
+          description: 'description',
+          uncategorized_skill_count: 1,
+          total_published_node_count: 3,
+          can_edit_topic: true,
+          is_published: false,
+          id: 'JS7lmbdZRoPc',
+          topic_model_created_on: 1623851496107.91,
+          subtopic_count: 1,
+          thumbnail_bg_color: '#FFFFFF',
+          canonical_story_count: 1,
+          name: 'Dummy Topic 1',
+          classroom: 'math',
+          total_skill_count: 2,
+          additional_story_count: 0,
+          topic_model_last_updated: 1623851737518.369,
+          thumbnail_filename: 'thumbnail_filename'
         }
       ],
-      canDeleteSkill: true,
-      untriagedSkillSummaries: [
+      can_delete_skill: true,
+      untriaged_skill_summary_dicts: [
         {
           version: 1,
-          languageCode: 'en',
+          language_code: 'en',
           description: 'Dummy Skill 3',
-          skillModelCreatedOn: 1623851495022.93,
-          skillModelLastUpdated: 1623851495022.942,
-          workedExamplesCount: 0,
+          skill_model_created_on: 1623851495022.93,
+          skill_model_last_updated: 1623851495022.942,
+          worked_examples_count: 0,
           id: '4P77sLaU14DE',
-          misconceptionCount: 0
+          misconception_count: 0
         }
       ],
-      totalSkillCount: 3,
-      canCreateTopic: true,
-      canCreateSkill: true,
-      mergeableSkillSummaries: [
+      total_skill_count: 3,
+      can_create_topic: true,
+      can_create_skill: true,
+      mergeable_skill_summary_dicts: [
         {
           version: 1,
-          languageCode: 'en',
+          language_code: 'en',
           description: 'Dummy Skill 1',
-          skillModelCreatedOn: 1623851493737.796,
-          skillModelLastUpdated: 1623851493737.808,
-          workedExamplesCount: 0,
+          skill_model_created_on: 1623851493737.796,
+          skill_model_last_updated: 1623851493737.808,
+          worked_examples_count: 0,
           id: 'BBB6dzfb5pPt',
-          misconceptionCount: 0
+          misconception_count: 0
         },
         {
           version: 1,
-          languageCode: 'en',
+          language_code: 'en',
           description: 'Dummy Skill 2',
-          skillModelCreatedOn: 1623851494780.516,
-          skillModelLastUpdated: 1623851494780.529,
-          workedExamplesCount: 0,
+          skill_model_created_on: 1623851494780.516,
+          skill_model_last_updated: 1623851494780.529,
+          worked_examples_count: 0,
           id: 'D1FdmljJNXdt',
-          misconceptionCount: 0
+          misconception_count: 0
         }
       ],
-      canDeleteTopic: true,
+      can_delete_topic: true,
     };
 
-    spyOn(skillEditorStateService, 'getSkill').and.returnValue(sampleSkill);
-    spyOn(topicsAndSkillsDashboardBackendApiService, 'fetchDashboardDataAsync')
-      .and.resolveTo(topicAndSkillsDashboardDataBackendDict);
+    ctrl = $componentController('skillPrerequisiteSkillsEditor', {
+      $rootScope: $scope,
+      $scope: $scope,
+      NgbModal: ngbModal
+    });
+    ctrl.$onInit();
+  }));
 
-    fixture.detectChanges();
-  });
-
-  it('should fetch skill when initialized', fakeAsync(() => {
+  it('should fetch skill when initialized', function() {
     spyOn(
       skillEditorStateService, 'getGroupedSkillSummaries').and.returnValue({
       current: [],
       others: [skillSummaryDict]
     });
+    spyOn(skillEditorStateService, 'getSkill').and.returnValue(sampleSkill);
+    spyOn(topicsAndSkillsDashboardBackendApiService, 'fetchDashboardDataAsync')
+      .and.resolveTo(topicAndSkillsDashboardDataBackendDict);
+    ctrl.$onInit();
 
-    component.ngOnInit();
-    tick();
+    expect($scope.skill).toEqual(sampleSkill);
+  });
 
-    expect(component.skill).toEqual(sampleSkill);
-  }));
-
-  it('should remove skill id when calling \'removeSkillId\'', () => {
+  it('should remove skill id when calling \'removeSkillId\'', function() {
     let deleteSpy = spyOn(skillUpdateService, 'deletePrerequisiteSkill')
       .and.returnValue(null);
 
-    component.removeSkillId('xyz');
+    $scope.removeSkillId();
 
     expect(deleteSpy).toHaveBeenCalled();
   });
 
   it('should return skill editor url when calling ' +
-    '\'getSkillEditorUrl\'', () => {
-    let result = component.getSkillEditorUrl('skillId');
+    '\'getSkillEditorUrl\'', function() {
+    let result = $scope.getSkillEditorUrl('skillId');
 
     expect(result).toBe('/skill_editor/skillId');
   });
 
   it('should toggle prerequisite skills ' +
-    '\'togglePrerequisiteSkills\'', () => {
-    component.prerequisiteSkillsAreShown = false;
+    '\'togglePrerequisiteSkills\'', function() {
+    $scope.prerequisiteSkillsAreShown = false;
     spyOn(windowDimensionsService, 'isWindowNarrow')
       .and.returnValue(true);
 
-    component.togglePrerequisiteSkills();
-    expect(component.prerequisiteSkillsAreShown).toBe(true);
+    $scope.togglePrerequisiteSkills();
+    expect($scope.prerequisiteSkillsAreShown).toBe(true);
 
-    component.togglePrerequisiteSkills();
-    expect(component.prerequisiteSkillsAreShown).toBe(false);
+    $scope.togglePrerequisiteSkills();
+    expect($scope.prerequisiteSkillsAreShown).toBe(false);
   });
 
-  it('should show skill description on skill-editor tab', fakeAsync(() => {
-    component.ngOnInit();
-    tick(20);
-
-    let desc = component.getSkillDescription('4P77sLaU14DE');
-    expect(desc).toEqual('Dummy Skill 3');
-
-    let desc2 = component.getSkillDescription('BBB6dzfb5pPt');
-    expect(desc2).toEqual('Dummy Skill 1');
-  }));
-
-  describe('while adding a skill', () => {
+  describe('while adding a skill', function() {
     it('should show info message if we try ' +
-      'to add a prerequisite skill to itself', fakeAsync(() => {
+      'to add a prerequisite skill to itself', fakeAsync(function() {
       spyOn(ngbModal, 'open').and.callFake(() => {
         return ({
           componentInstance: {},
@@ -354,8 +293,8 @@ describe('Skill editor main tab Component', () => {
       let alertsSpy = spyOn(alertsService, 'addInfoMessage')
         .and.returnValue(null);
 
-      component.skill = sampleSkill;
-      component.addSkill();
+      $scope.skill = sampleSkill;
+      $scope.addSkill();
       tick();
 
       expect(alertsSpy).toHaveBeenCalledWith(
@@ -363,7 +302,7 @@ describe('Skill editor main tab Component', () => {
     }));
 
     it('should show info message if we try to add a prerequisite ' +
-      'skill which has already been added', fakeAsync(() => {
+      'skill which has already been added', fakeAsync(function() {
       spyOn(ngbModal, 'open').and.callFake(() => {
         return ({
           componentInstance: {},
@@ -372,12 +311,11 @@ describe('Skill editor main tab Component', () => {
           })
         }) as NgbModalRef;
       });
-
       let alertsSpy = spyOn(alertsService, 'addInfoMessage')
         .and.returnValue(null);
 
-      component.skill = sampleSkill;
-      component.addSkill();
+      $scope.skill = sampleSkill;
+      $scope.addSkill();
       tick();
 
       expect(alertsSpy).toHaveBeenCalledWith(
@@ -385,7 +323,7 @@ describe('Skill editor main tab Component', () => {
     }));
 
     it('should add skill sucessfully when calling ' +
-      '\'addSkill\'', fakeAsync(() => {
+      '\'addSkill\'', fakeAsync(function() {
       let modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
         return ({
           componentInstance: {},
@@ -394,9 +332,8 @@ describe('Skill editor main tab Component', () => {
           })
         }) as NgbModalRef;
       });
-
-      component.skill = sampleSkill;
-      component.addSkill();
+      $scope.skill = sampleSkill;
+      $scope.addSkill();
       tick();
 
       expect(modalSpy).toHaveBeenCalled();

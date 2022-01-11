@@ -17,8 +17,10 @@
  */
 
 import cloneDeep from 'lodash/cloneDeep';
+
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { EventEmitter, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
+
 import {
   BackendChangeObject,
   Change,
@@ -34,8 +36,6 @@ import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
   providedIn: 'root',
 })
 export class SkillUpdateService {
-  private _prerequisiteSkillChanged = new EventEmitter();
-
   constructor(private undoRedoService: UndoRedoService) {}
 
   private _applyChange = (
@@ -313,7 +313,6 @@ export class SkillUpdateService {
         skill.deletePrerequisiteSkill(skillId);
       }
     );
-    this._prerequisiteSkillChanged.emit();
   }
 
   deletePrerequisiteSkill(skill: Skill, skillId: string): void {
@@ -331,11 +330,6 @@ export class SkillUpdateService {
         skill.addPrerequisiteSkill(skillId);
       }
     );
-    this._prerequisiteSkillChanged.emit();
-  }
-
-  get onPrerequisiteSkillChange(): EventEmitter<unknown> {
-    return this._prerequisiteSkillChanged;
   }
 
   updateMisconceptionName(
