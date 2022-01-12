@@ -61,11 +61,6 @@ class PythonUtilsTests(test_utils.GenericTestBase):
         self.assertEqual(python_utils.divide(4, 2), 2)
         self.assertEqual(python_utils.divide(5, 2), 2)
 
-    def test_url_unsplit(self):
-        response = urllib.parse.urlsplit('http://www.google.com')
-        self.assertEqual(
-            urllib.parse.urlunsplit(response), 'http://www.google.com')
-
     def test_parse_query_string(self):
         response = python_utils.parse_query_string(
             'http://www.google.com?search=oppia')
