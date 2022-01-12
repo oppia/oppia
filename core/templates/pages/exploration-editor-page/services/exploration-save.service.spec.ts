@@ -684,7 +684,7 @@ describe('Exploration save service ' +
       });
     let modalSpy = spyOn($uibModal, 'open').and.callThrough();
 
-    explorationSaveService.saveChanges(
+    explorationSaveService.saveChangesAsync(
       startLoadingCb, endLoadingCb);
     // We need multiple '$rootScope.$apply()' here since, the source code
     // consists of nested promises.
@@ -720,7 +720,7 @@ describe('Exploration save service ' +
     let focusSpy = spyOnProperty(focusManagerService, 'onFocus')
       .and.returnValue(mockEventEmitter);
 
-    explorationSaveService.saveChanges(
+    explorationSaveService.saveChangesAsync(
       startLoadingCb, endLoadingCb);
     // We need multiple '$rootScope.$apply()' here since, the source code
     // consists of nested promises.
@@ -762,8 +762,9 @@ describe('Exploration save service ' +
       .and.returnValue(Promise.resolve(null));
     let modalSpy = spyOn($uibModal, 'open').and.callThrough();
 
-    explorationSaveService.saveChanges(
-      startLoadingCb, endLoadingCb);
+    expectAsync(
+      explorationSaveService.saveChangesAsync(startLoadingCb, endLoadingCb)
+    ).toBeRejected();
     flush();
     $rootScope.$apply();
 
@@ -791,10 +792,10 @@ describe('Exploration save service ' +
     let modalSpy = spyOn($uibModal, 'open').and.callThrough();
 
     // Opening modal first time.
-    explorationSaveService.saveChanges(
+    explorationSaveService.saveChangesAsync(
       startLoadingCb, endLoadingCb);
     // Opening modal second time.
-    explorationSaveService.saveChanges(
+    explorationSaveService.saveChangesAsync(
       startLoadingCb, endLoadingCb);
     // We need multiple '$rootScope.$apply()' here since, the source code
     // consists of nested promises.
@@ -834,7 +835,7 @@ describe('Exploration save service ' +
         result: Promise.resolve('commitMessage')
       });
 
-    explorationSaveService.saveChanges(
+    explorationSaveService.saveChangesAsync(
       startLoadingCb, endLoadingCb);
     // We need multiple '$rootScope.$apply()' here since, the source code
     // consists of nested promises.
@@ -874,7 +875,7 @@ describe('Exploration save service ' +
     let focusSpy = spyOn(focusManagerService, 'setFocus')
       .and.returnValue(null);
 
-    explorationSaveService.saveChanges(
+    explorationSaveService.saveChangesAsync(
       startLoadingCb, endLoadingCb);
     tick();
     $rootScope.$apply();
