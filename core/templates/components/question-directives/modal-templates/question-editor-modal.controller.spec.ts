@@ -32,15 +32,25 @@ class MockNgbModalRef {
 }
 
 describe('Question Editor Modal Controller', function() {
+  let $q = null;
   let $scope = null;
-  let ngbModal: NgbModal = null;
+  let ngbModal: NgbModal;
   let $uibModalInstance = null;
   let AlertsService = null;
-  let ContextService = null;
   let QuestionObjectFactory = null;
   let QuestionUndoRedoService = null;
   let StateEditorService = null;
   importAllAngularServices();
+
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
 
   const associatedSkillSummariesDict = [{
     id: '1',
@@ -70,12 +80,12 @@ describe('Question Editor Modal Controller', function() {
 
   describe('when question is valid', function() {
     beforeEach(angular.mock.inject(function($injector, $controller) {
+      $q = $injector.get('$q');
       ngbModal = TestBed.inject(NgbModal);
       const $rootScope = $injector.get('$rootScope');
       AlertsService = $injector.get('AlertsService');
-      ContextService = $injector.get('ContextService');
       QuestionObjectFactory = $injector.get('QuestionObjectFactory');
-
+      QuestionUndoRedoService = $injector.get('QuestionUndoRedoService');
       StateEditorService = $injector.get('StateEditorService');
 
       $uibModalInstance = jasmine.createSpyObj(
@@ -239,11 +249,7 @@ describe('Question Editor Modal Controller', function() {
       });
 
     it('should close modal successfully', function() {
-      spyOn($scope, 'isQuestionValid').and.returnValue(true);
-      spyOn(ContextService, 'resetImageSaveDestination').and.returnValue(null);
-
       $scope.done();
-
       expect($uibModalInstance.close).toHaveBeenCalled();
     });
 
@@ -270,10 +276,8 @@ describe('Question Editor Modal Controller', function() {
               result: Promise.resolve(summary)
             } as NgbModalRef);
         });
-
         $scope.addSkill();
         $scope.$apply();
-
         expect(modalSpy).toHaveBeenCalled();
       });
 
@@ -291,7 +295,6 @@ describe('Question Editor Modal Controller', function() {
     });
 
     it('should save and commit when there is no pending changes', function() {
-      spyOn($scope, 'isQuestionValid').and.returnValue(true);
       spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(false);
 
       expect($scope.isSaveAndCommitButtonDisabled()).toBe(true);
@@ -302,13 +305,14 @@ describe('Question Editor Modal Controller', function() {
     });
 
     it('should save and commit after modifying skills', function() {
-      const openModalSpy = spyOn(ngbModal, 'open');
-      spyOn($scope, 'isQuestionValid').and.returnValue(true);
-      spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(true);
-      expect($scope.isSaveAndCommitButtonDisabled()).toBe(false);
       const commitMessage = 'Commiting skills';
+      const openModalSpy = spyOn(ngbModal, 'open');
+      spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(true);
+
+      expect($scope.isSaveAndCommitButtonDisabled()).toBe(false);
+
       openModalSpy.and.returnValue({
-        result: Promise.resolve(commitMessage)
+        result: $q.resolve(commitMessage)
       } as NgbModalRef);
 
       $scope.saveAndCommit();
@@ -324,11 +328,12 @@ describe('Question Editor Modal Controller', function() {
     it('should not save and commit when dismissing the add skill modal',
       function() {
         const openModalSpy = spyOn(ngbModal, 'open');
-        spyOn($scope, 'isQuestionValid').and.returnValue(true);
         spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(true);
+
         expect($scope.isSaveAndCommitButtonDisabled()).toBe(false);
+
         openModalSpy.and.returnValue({
-          result: Promise.reject()
+          result: $q.reject()
         } as NgbModalRef);
 
         $scope.saveAndCommit();
@@ -347,7 +352,7 @@ describe('Question Editor Modal Controller', function() {
       ' saved', function() {
       spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(true);
       spyOn(ngbModal, 'open').and.returnValue({
-        result: Promise.resolve()
+        result: $q.resolve()
       } as NgbModalRef);
 
       $scope.cancel();
@@ -360,7 +365,7 @@ describe('Question Editor Modal Controller', function() {
       ' saved', function() {
       spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(true);
       spyOn(ngbModal, 'open').and.returnValue({
-        result: Promise.reject()
+        result: $q.reject()
       } as NgbModalRef);
 
       $scope.cancel();
@@ -373,6 +378,7 @@ describe('Question Editor Modal Controller', function() {
   describe('when question is not valid', function() {
     beforeEach(angular.mock.inject(function($injector, $controller) {
       ngbModal = TestBed.inject(NgbModal);
+      $q = $injector.get('$q');
       const $rootScope = $injector.get('$rootScope');
       AlertsService = $injector.get('AlertsService');
       QuestionObjectFactory = $injector.get('QuestionObjectFactory');
@@ -476,19 +482,13 @@ describe('Question Editor Modal Controller', function() {
       });
     }));
 
-    it('should not close modal', function() { 
-      spyOn($scope, 'isQuestionValid').and.returnValue(false);
-
+    it('should not close modal', function() {
       $scope.done();
-
       expect($uibModalInstance.close).not.toHaveBeenCalled();
     });
 
-    it('should not save and commit changes', function() {
-      spyOn($scope, 'isQuestionValid').and.returnValue(false);
-
+    it('should not save and commit changes', function() {;
       $scope.saveAndCommit();
-
       expect($uibModalInstance.close).not.toHaveBeenCalled();
     });
   });

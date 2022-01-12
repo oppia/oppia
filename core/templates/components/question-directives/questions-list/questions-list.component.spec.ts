@@ -42,7 +42,6 @@ describe('QuestionsListComponent', () => {
   let $rootScope = null;
   let $scope = null;
   let $q = null;
-  let $uibModal = null;
   let $timeout = null;
 
   let ngbModal: NgbModal;
@@ -83,7 +82,6 @@ describe('QuestionsListComponent', () => {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     $q = $injector.get('$q');
-    $uibModal = $injector.get('$uibModal');
     $timeout = $injector.get('$timeout');
 
     WindowDimensionsService = $injector.get('WindowDimensionsService');

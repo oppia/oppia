@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Unit tests for
- * QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent.
+ * QuestionsOpportunitiesSelectDifficultyModalComponent.
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -27,7 +27,7 @@ import { ImageFile } from 'domain/utilities/image-file.model';
 import { ExtractImageFilenamesFromModelService } from 'pages/exploration-player-page/services/extract-image-filenames-from-model.service';
 import { AlertsService } from 'services/alerts.service';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
-import { QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent } from './questions-opportunities-select-skill-and-difficulty-modal.component';
+import { QuestionsOpportunitiesSelectDifficultyModalComponent } from './questions-opportunities-select-difficulty-modal.component';
 
 class MockActiveModal {
   close(): void {
@@ -54,11 +54,10 @@ class MockReaderObject {
 }
 
 describe(
-  'Questions Opportunities Select Skill And Difficulty Modal Component',
-  () => {
-    let component: QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent;
+  'Questions Opportunities Select Difficulty Modal Component', () => {
+    let component: QuestionsOpportunitiesSelectDifficultyModalComponent;
     let fixture:
-    ComponentFixture<QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent>;
+    ComponentFixture<QuestionsOpportunitiesSelectDifficultyModalComponent>;
     let alertsService: AlertsService;
     let assetsBackendApiService: AssetsBackendApiService;
     let ngbActiveModal: NgbActiveModal;
@@ -80,7 +79,7 @@ describe(
       TestBed.configureTestingModule({
         imports: [HttpClientTestingModule],
         declarations: [
-          QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent
+          QuestionsOpportunitiesSelectDifficultyModalComponent
         ],
         providers: [
           AlertsService,
@@ -99,7 +98,7 @@ describe(
     describe('when fetching skill successfully', () => {
       beforeEach(() => {
         fixture = TestBed.createComponent(
-          QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent);
+          QuestionsOpportunitiesSelectDifficultyModalComponent);
         component = fixture.componentInstance;
         alertsService = TestBed.inject(AlertsService);
         assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
@@ -148,7 +147,7 @@ describe(
         spyOn(
           extractImageFilenamesFromModelService,
           'getImageFilenamesInSkill').and.returnValue(['dummyImg.png']);
-        spyOn(assetsBackendApiService, 'getFile').and.returnValue(
+        spyOn(assetsBackendApiService, 'fetchFile').and.returnValue(
           Promise.resolve(mockImageFile));
         // This throws "Argument of type 'MockReaderObject' is not assignable
         // to parameter of type 'FileReader'.". We need to suppress this error
@@ -201,7 +200,8 @@ describe(
 
     describe('when fetching skill fails', () => {
       beforeEach(() => {
-        fixture = TestBed.createComponent(QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent);
+        fixture = TestBed.createComponent(
+          QuestionsOpportunitiesSelectDifficultyModalComponent);
         component = fixture.componentInstance;
         alertsService = TestBed.inject(AlertsService);
         ngbActiveModal = TestBed.inject(NgbActiveModal);

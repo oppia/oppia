@@ -164,12 +164,6 @@ export class AssetsBackendApiService {
     this.abortAllCurrentDownloads(constants.ASSET_TYPE_IMAGE);
   }
 
-  getFile(
-      entityType: string, entityId: string, filename: string,
-      assetType: string): Promise<AudioFile | ImageFile> {
-    return this.fetchFile(entityType, entityId, filename, assetType);
-  }
-
   getAssetsFilesCurrentlyBeingRequested(): (
     {[assetType: string]: readonly FileDownloadRequest[]}) {
     return {
@@ -218,7 +212,7 @@ export class AssetsBackendApiService {
     }
   }
 
-  private async fetchFile(
+  async fetchFile(
       entityType: string, entityId: string, filename: string,
       assetType: string): Promise<AudioFile | ImageFile> {
     let onResolve!: (_: Blob) => void;

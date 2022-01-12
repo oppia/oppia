@@ -23,7 +23,6 @@ require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
 require('domain/editor/undo_redo/question-undo-redo.service.ts');
-require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/image-local-storage.service.ts');
@@ -36,10 +35,10 @@ import { QuestionEditorSaveModalComponent } from './question-editor-save-modal.c
 import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 
 angular.module('oppia').controller('QuestionEditorModalController', [
-  '$rootScope', '$scope', '$uibModal', '$uibModalInstance', 'AlertsService',
+  '$rootScope', '$scope', '$uibModalInstance', 'AlertsService',
   'ContextService', 'ImageLocalStorageService', 'NgbModal',
   'QuestionUndoRedoService', 'QuestionValidationService',
-  'UrlInterpolationService', 'associatedSkillSummaries', 'canEditQuestion',
+  'associatedSkillSummaries', 'canEditQuestion',
   'categorizedSkills', 'groupedSkillSummaries', 'misconceptionsBySkill',
   'newQuestionIsBeingCreated', 'question', 'questionId', 'questionStateData',
   'rubric', 'skillName', 'untriagedSkillSummaries', 'MAX_COMMIT_MESSAGE_LENGTH',
@@ -155,10 +154,10 @@ angular.module('oppia').controller('QuestionEditorModalController', [
           backdrop: 'static'
         }).result.then(function(commitMessage) {
           returnModalObject.commitMessage = commitMessage;
+          $uibModalInstance.close(returnModalObject);
           // TODO(#8521): Remove the use of $rootScope.$apply()
           // once the controller is migrated to angular.
           $rootScope.$apply();
-          $uibModalInstance.close(returnModalObject);
         }, function() {
           // Note to developers:
           // This callback is triggered when the Cancel button is

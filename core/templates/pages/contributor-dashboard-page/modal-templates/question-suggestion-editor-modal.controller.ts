@@ -30,7 +30,7 @@ require('services/site-analytics.service.ts');
 
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmQuestionExitComponent } from 'components/question-directives/modal-templates/confirm-question-exit-modal.component';
-import { QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent } from 'pages/topic-editor-page/modal-templates/questions-opportunities-select-skill-and-difficulty-modal.component';
+import { QuestionsOpportunitiesSelectDifficultyModalComponent } from 'pages/topic-editor-page/modal-templates/questions-opportunities-select-difficulty-modal.component';
 
 angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
   '$rootScope', '$scope', '$uibModalInstance', 'AlertsService',
@@ -115,7 +115,7 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
     $scope.skillId = $scope.skill.getId();
     $scope.onClickChangeDifficulty = function() {
       let modalRef: NgbModalRef = NgbModal.open(
-        QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent, {
+        QuestionsOpportunitiesSelectDifficultyModalComponent, {
           backdrop: true,
         });
       modalRef.componentInstance.skillId = $scope.skillId;

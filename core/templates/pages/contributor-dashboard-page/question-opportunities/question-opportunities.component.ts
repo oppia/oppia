@@ -58,7 +58,7 @@ require('services/context.service.ts');
 require('services/site-analytics.service.ts');
 
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent } from 'pages/topic-editor-page/modal-templates/questions-opportunities-select-skill-and-difficulty-modal.component';
+import { QuestionsOpportunitiesSelectDifficultyModalComponent } from 'pages/topic-editor-page/modal-templates/questions-opportunities-select-difficulty-modal.component';
 
 angular.module('oppia').component('questionOpportunities', {
   template: require('./question-opportunities.component.html'),
@@ -161,7 +161,7 @@ angular.module('oppia').component('questionOpportunities', {
           'Question');
 
         let modalRef: NgbModalRef = NgbModal.open(
-          QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent, {
+          QuestionsOpportunitiesSelectDifficultyModalComponent, {
             backdrop: true,
           });
         modalRef.componentInstance.skillId = skillId;

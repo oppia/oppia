@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for questions opportunities select skill and
- * difficulty modal.
+ * @fileoverview Component for questions opportunities select difficulty modal.
+ * 
  */
 
 import { Component, Input, OnInit } from '@angular/core';
@@ -30,16 +30,17 @@ import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
 
 @Component({
-  selector: 'oppia-questions-opportunities-select-skill-and-difficulty-modal',
-  templateUrl: './questions-opportunities-select-skill-and-difficulty-modal.component.html'
+  selector: 'oppia-questions-opportunities-select-difficulty-modal',
+  templateUrl:
+    './questions-opportunities-select-difficulty-modal.component.html'
 })
-export class QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent
+export class QuestionsOpportunitiesSelectDifficultyModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-  @Input() skillId;
+  @Input() skillId: string;
   instructionMessage: string;
-  skillIdToRubricsObject;
-  linkedSkillsWithDifficulty = [];
+  skillIdToRubricsObject: object;
   skill: Skill;
+  linkedSkillsWithDifficulty = [];
 
   constructor(
     private alertsService: AlertsService,
@@ -70,7 +71,7 @@ export class QuestionsOpportunitiesSelectSkillAndDifficultyModalComponent
           this.extractImageFilenamesFromModelService.getImageFilenamesInSkill(
             this.skill));
         imageFilenames.forEach(imageFilename => {
-          imageFileFetchPromises.push(this.assetsBackendApiService.getFile(
+          imageFileFetchPromises.push(this.assetsBackendApiService.fetchFile(
             AppConstants.ENTITY_TYPE.SKILL, this.skillId,
             imageFilename, AppConstants.ASSET_TYPE_IMAGE));
         });
