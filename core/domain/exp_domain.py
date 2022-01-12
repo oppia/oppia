@@ -1327,7 +1327,8 @@ class Exploration:
 
     def __setattr__(self, attrname, new_value):
         """Perform the android_proto_size_is_stale check every time
-        the Exploration class object updates."""
+        the Exploration class object updates.
+        """
 
         # If the value of _cached_android_proto_size_in_bytes or
         # android_proto_size_is_stale gets updated, we don't want to
