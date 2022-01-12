@@ -53,10 +53,6 @@ export class ResponseHeaderComponent {
     private editabilityService: EditabilityService,
   ) {}
 
-  test(): void {
-    console.log(this.outcome);
-  }
-
   returnToState(): void {
     this.navigateToState.emit(this.outcome.dest);
   }

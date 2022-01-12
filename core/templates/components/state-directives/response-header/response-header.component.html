@@ -1,4 +1,3 @@
-<button (click)="test()">test</button>
 <div class="oppia-response-header-block">
   <div class="oppia-response-header">
     <span *ngIf="showWarning">⚠</span>
@@ -44,7 +43,7 @@
 </div>
 
 <span class="oppia-delete-response-button oppia-transition-200 protractor-test-delete-response"
-      *ngIf="editabilityService.isEditable() && (outcome.feedback.contentId() === 'default_outcome' ? false : true)"
+      *ngIf="editabilityService.isEditable() && (outcome.feedback.contentId === 'default_outcome' ? false : true)"
       (click)="deleteResponse($event)">
   <i class="material-icons md-18">&#xE5CD;</i>
 </span>
