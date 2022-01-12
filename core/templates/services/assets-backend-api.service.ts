@@ -212,7 +212,7 @@ export class AssetsBackendApiService {
     }
   }
 
-  async fetchFile(
+  private async fetchFile(
       entityType: string, entityId: string, filename: string,
       assetType: string): Promise<AudioFile | ImageFile> {
     let onResolve!: (_: Blob) => void;

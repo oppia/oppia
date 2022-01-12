@@ -70,9 +70,9 @@ export class QuestionsOpportunitiesSelectDifficultyModalComponent
           this.extractImageFilenamesFromModelService.getImageFilenamesInSkill(
             this.skill));
         imageFilenames.forEach(imageFilename => {
-          imageFileFetchPromises.push(this.assetsBackendApiService.fetchFile(
+          imageFileFetchPromises.push(this.assetsBackendApiService.loadImage(
             AppConstants.ENTITY_TYPE.SKILL, this.skillId,
-            imageFilename, AppConstants.ASSET_TYPE_IMAGE));
+            imageFilename));
         });
         Promise.all(imageFileFetchPromises).then(files => {
           files.forEach(file => {

@@ -147,7 +147,7 @@ describe(
         spyOn(
           extractImageFilenamesFromModelService,
           'getImageFilenamesInSkill').and.returnValue(['dummyImg.png']);
-        spyOn(assetsBackendApiService, 'fetchFile').and.returnValue(
+        spyOn(assetsBackendApiService, 'loadImage').and.returnValue(
           Promise.resolve(mockImageFile));
         // This throws "Argument of type 'MockReaderObject' is not assignable
         // to parameter of type 'FileReader'.". We need to suppress this error

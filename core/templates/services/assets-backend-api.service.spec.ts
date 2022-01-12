@@ -25,7 +25,7 @@ import { ImageFile } from 'domain/utilities/image-file.model';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 
-describe('Assets Backend API Service', () => {
+fdescribe('Assets Backend API Service', () => {
   describe('on dev mode', () => {
     let assetsBackendApiService: AssetsBackendApiService;
     let csrfTokenService: CsrfTokenService;

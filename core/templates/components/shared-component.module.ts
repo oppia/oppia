@@ -100,6 +100,7 @@ import { ConfirmQuestionExitModalComponent } from './question-directives/modal-t
 import { QuestionsOpportunitiesSelectDifficultyModalComponent } from 'pages/topic-editor-page/modal-templates/questions-opportunities-select-difficulty-modal.component';
 import { QuestionsListSelectSkillAndDifficultyModalComponent } from 'pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.component';
 import { QuestionEditorSaveModalComponent } from './question-directives/modal-templates/question-editor-save-modal.component';
+import { ReviewMaterialEditorComponent } from './review-material-editor/review-material-editor.component';
 
 // Pipes.
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
@@ -215,7 +216,8 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     QuestionsOpportunitiesSelectDifficultyModalComponent,
     QuestionsListSelectSkillAndDifficultyModalComponent,
     SavePendingChangesModalComponent,
-    AddHintModalComponent
+    AddHintModalComponent,
+    ReviewMaterialEditorComponent
   ],
 
   entryComponents: [
@@ -281,7 +283,8 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     QuestionsOpportunitiesSelectDifficultyModalComponent,
     QuestionsListSelectSkillAndDifficultyModalComponent,
     SavePendingChangesModalComponent,
-    AddHintModalComponent
+    AddHintModalComponent,
+    ReviewMaterialEditorComponent
   ],
 
   exports: [
@@ -361,7 +364,8 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     SavePendingChangesModalComponent,
     LearnerDashboardIconsComponent,
     QuestionsOpportunitiesSelectDifficultyModalComponent,
-    QuestionsListSelectSkillAndDifficultyModalComponent
+    QuestionsListSelectSkillAndDifficultyModalComponent,
+    ReviewMaterialEditorComponent
   ],
 })
 
