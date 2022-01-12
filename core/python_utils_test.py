@@ -23,7 +23,6 @@ import builtins
 import os
 import sys
 import unittest
-import urllib
 
 from core import python_utils
 from core.tests import test_utils
