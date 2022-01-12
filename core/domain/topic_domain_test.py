@@ -1385,3 +1385,9 @@ class TopicRightsTests(test_utils.GenericTestBase):
     def test_is_manager(self) -> None:
         self.assertTrue(self.topic_summary.is_manager(self.user_id_a))
         self.assertFalse(self.topic_summary.is_manager(self.user_id_b))
+
+    def test_is_manager_with_invalid_user_id(self) -> None:
+        with self.assertRaisesRegexp(  # type: ignore[no-untyped-call]
+            Exception, 'Expected user_id value to be a string, '
+                       'received None'):
+            self.topic_summary.is_manager(None)

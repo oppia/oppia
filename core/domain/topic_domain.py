@@ -2097,14 +2097,18 @@ class TopicRights:
         }
 
     def is_manager(
-        self, user_id: Optional[str]
+        self, user_id: str
     ) -> bool:
         """Checks whether given user is a manager of the topic.
 
         Args:
-            user_id: str or None. Id of the user.
+            user_id: str. Id of the user.
 
         Returns:
             bool. Whether user is a topic manager of this topic.
         """
-        return bool(user_id in self.manager_ids)
+        if user_id:
+            return bool(user_id in self.manager_ids)
+        raise Exception(
+            'Expected user_id value to be a string, '
+                       'received None')
