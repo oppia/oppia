@@ -39,6 +39,7 @@
                                        [is-active]="$index === activeAnswerGroupIndex"
                                        (delete)="deleteAnswerGroup($event)"
                                        [outcome]="answerGroup.outcome"
+                                       [default-outcome]="false"
                                        (navigate-to-state)="$ctrl.navigateToState($event)"
                                        [num-rules]="answerGroup.rules.length"
                                        [is-response]="true">
@@ -84,6 +85,7 @@
                                        [summary]="summarizeDefaultOutcome(defaultOutcome, getCurrentInteractionId(), answerGroups.length, false)"
                                        [short-summary]="summarizeDefaultOutcome(defaultOutcome, getCurrentInteractionId(), answerGroups.length, true)"
                                        [outcome]="defaultOutcome"
+                                       [default-outcome]="true"
                                        (navigate-to-state)="$ctrl.navigateToState($event)"
                                        [is-response]="true">
                 </oppia-response-header>

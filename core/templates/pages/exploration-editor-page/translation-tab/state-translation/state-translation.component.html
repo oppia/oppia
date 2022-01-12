@@ -79,7 +79,7 @@
              ng-class="{'oppia-rule-tab-active': activeHintIndex === $index}"
              ng-style="contentIdStatusColorStyle(caContent.content.contentId)">
             <oppia-response-header [index]="$index"
-                                   [outcome]="null"
+                                   [default-outcome]="true"
                                    [summary]="caContent.name + ': ' + getSubtitledContentSummary(caContent.content)"
                                    [short-summary]="caContent.name + ': ' + getSubtitledContentSummary(caContent.content)"
                                    [is-active]="$index === activeCustomizationArgContentIndex"
@@ -151,6 +151,7 @@
                                      [short-summary]="summarizeAnswerGroup(answerGroup, stateInteractionId, answerChoices, true)"
                                      [is-active]="$index === activeAnswerGroupIndex"
                                      [outcome]="answerGroup.outcome"
+                                     [default-outcome]="true"
                                      [num-rules]="answerGroup.rules.length"
                                      [is-response]="true"
                                      [show-warning]="contentIdNeedUpdates(answerGroup.outcome.feedback.contentId)"
@@ -192,6 +193,7 @@
                                      [summary]="summarizeDefaultOutcome(stateDefaultOutcome, stateInteractionId, stateDefaultOutcome.length, false)"
                                      [short-summary]="summarizeDefaultOutcome(stateDefaultOutcome, stateInteractionId, stateDefaultOutcome.length, true)"
                                      [outcome]="stateDefaultOutcome"
+                                     [default-outcome]="true"
                                      [is-response]="true"
                                      [show-warning]="contentIdNeedUpdates(stateDefaultOutcome.feedback.contentId)"
                                      (navigate-to-state)="navigateToState($event)"
@@ -223,7 +225,7 @@
              ng-class="{'oppia-rule-tab-active': activeHintIndex === $index}"
              ng-style="contentIdStatusColorStyle(hint.hintContent.contentId)">
             <oppia-response-header [index]="$index"
-                                   [outcome]="null"
+                                   [default-outcome]="true"
                                    [summary]="getSubtitledContentSummary(hint.hintContent)"
                                    [short-summary]="getSubtitledContentSummary(hint.hintContent)"
                                    [is-active]="$index === activeHintIndex"

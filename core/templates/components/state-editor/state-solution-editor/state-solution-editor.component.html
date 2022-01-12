@@ -42,7 +42,7 @@
               <a ng-click="toggleInlineSolutionEditorIsActive()"
                  class="oppia-rule-tab protractor-test-oppia-solution-tab">
                 <oppia-response-header [summary]="getSolutionSummary()"
-                                       [outcome]="null"
+                                       [default-outcome]="false"
                                        [short-summary]="getSolutionSummary()"
                                        (delete)="deleteSolution($event)">
                 </oppia-response-header>
