@@ -1390,4 +1390,4 @@ class TopicRightsTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(  # type: ignore[no-untyped-call]
             Exception, 'Expected user_id value to be a string, '
                        'received None'):
-            self.topic_summary.is_manager(None)
+            self.topic_summary.is_manager(None) # type: ignore[arg-type]
