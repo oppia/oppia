@@ -376,25 +376,20 @@ exports.config = {
         ' because it\'s on CircleCI');
     }
 
-    // Screenshots will only run on CircleCI, since we don't have videos here.
-    // We don't need these on Github Actions since we have videos.
-
-    if (process.env.CIRCLECI) {
-      // This takes screenshots of failed tests. For more information see
-      // https://www.npmjs.com/package/protractor-jasmine2-screenshot-reporter
-      jasmine.getEnv().addReporter(new HtmlScreenshotReporter({
-        // Directory for screenshots.
-        dest: '../protractor-screenshots',
-        // Function to build filenames of screenshots.
-        pathBuilder: function(currentSpec) {
-          let filename = currentSpec.fullName;
-          return filename.replace(/[\":<>|*?]/g, 'ESCAPED_CHARACTER');
-        },
-        captureOnlyFailedSpecs: true,
-        reportFailedUrl: true,
-        preserveDirectory: true
-      }));
-    }
+    // This takes screenshots of failed tests. For more information see
+    // https://www.npmjs.com/package/protractor-jasmine2-screenshot-reporter
+    jasmine.getEnv().addReporter(new HtmlScreenshotReporter({
+      // Directory for screenshots.
+      dest: '../protractor-screenshots',
+      // Function to build filenames of screenshots.
+      pathBuilder: function(currentSpec) {
+        let filename = currentSpec.fullName;
+        return filename.replace(/[\":<>|*?]/g, 'ESCAPED_CHARACTER');
+      },
+      captureOnlyFailedSpecs: true,
+      reportFailedUrl: true,
+      preserveDirectory: true
+    }));
 
     var SpecReporter = require('jasmine-spec-reporter').SpecReporter;
     jasmine.getEnv().addReporter(new SpecReporter({
