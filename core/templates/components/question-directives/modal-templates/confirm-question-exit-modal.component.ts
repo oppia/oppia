@@ -24,7 +24,7 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
   selector: 'oppia-confirm-question-exit-modal',
   templateUrl: './confirm-question-exit-modal.component.html'
 })
-export class ConfirmQuestionExitComponent extends ConfirmOrCancelModal {
+export class ConfirmQuestionExitModalComponent extends ConfirmOrCancelModal {
   constructor(
     private ngbActiveModal: NgbActiveModal
   ) {

@@ -30,7 +30,7 @@ require('services/ngb-modal.service.ts');
 
 import { SelectSkillModalComponent } from 'components/skill-selector/select-skill-modal.component';
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmQuestionExitComponent } from './confirm-question-exit-modal.component';
+import { ConfirmQuestionExitModalComponent } from './confirm-question-exit-modal.component';
 import { QuestionEditorSaveModalComponent } from './question-editor-save-modal.component';
 import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 
@@ -190,7 +190,7 @@ angular.module('oppia').controller('QuestionEditorModalController', [
 
     $scope.cancel = function() {
       if (QuestionUndoRedoService.hasChanges()) {
-        NgbModal.open(ConfirmQuestionExitComponent, {
+        NgbModal.open(ConfirmQuestionExitModalComponent, {
           backdrop: true,
         }).result.then(function() {
           ContextService.resetImageSaveDestination();

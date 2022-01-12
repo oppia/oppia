@@ -96,7 +96,7 @@ import { SupplementalCardComponent } from 'pages/exploration-player-page/learner
 import { SavePendingChangesModalComponent } from './save-pending-changes/save-pending-changes-modal.component';
 import { AddHintModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-hint-modal.component';
 import { SmoothHeightAnimatorComponent } from './smooth-height/smooth-height-animator.component';
-import { ConfirmQuestionExitComponent } from './question-directives/modal-templates/confirm-question-exit-modal.component';
+import { ConfirmQuestionExitModalComponent } from './question-directives/modal-templates/confirm-question-exit-modal.component';
 import { QuestionsOpportunitiesSelectDifficultyModalComponent } from 'pages/topic-editor-page/modal-templates/questions-opportunities-select-difficulty-modal.component';
 import { QuestionsListSelectSkillAndDifficultyModalComponent } from 'pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.component';
 import { QuestionEditorSaveModalComponent } from './question-directives/modal-templates/question-editor-save-modal.component';
@@ -154,7 +154,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     BackgroundBannerComponent,
     CompletionGraphComponent,
     CorrectnessFooterComponent,
-    ConfirmQuestionExitComponent,
+    ConfirmQuestionExitModalComponent,
     ContinueButtonComponent,
     ContentLanguageSelectorComponent,
     CreateNewSkillModalComponent,
@@ -224,7 +224,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     BackgroundBannerComponent,
     CompletionGraphComponent,
     CorrectnessFooterComponent,
-    ConfirmQuestionExitComponent,
+    ConfirmQuestionExitModalComponent,
     ContinueButtonComponent,
     ConceptCardComponent,
     ContentLanguageSelectorComponent,
@@ -304,7 +304,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     BackgroundBannerComponent,
     CompletionGraphComponent,
     CorrectnessFooterComponent,
-    ConfirmQuestionExitComponent,
+    ConfirmQuestionExitModalComponent,
     ContinueButtonComponent,
     ContentLanguageSelectorComponent,
     CreateNewSkillModalComponent,

@@ -19,16 +19,16 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmQuestionExitComponent } from './confirm-question-exit-modal.component';
+import { ConfirmQuestionExitModalComponent } from './confirm-question-exit-modal.component';
 
 describe('Confirm Question Exit Modal Component', () => {
-  let component: ConfirmQuestionExitComponent;
-  let fixture: ComponentFixture<ConfirmQuestionExitComponent>;
+  let component: ConfirmQuestionExitModalComponent;
+  let fixture: ComponentFixture<ConfirmQuestionExitModalComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
-        ConfirmQuestionExitComponent
+        ConfirmQuestionExitModalComponent
       ],
       providers: [NgbActiveModal],
       schemas: [NO_ERRORS_SCHEMA]
@@ -36,7 +36,7 @@ describe('Confirm Question Exit Modal Component', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ConfirmQuestionExitComponent);
+    fixture = TestBed.createComponent(ConfirmQuestionExitModalComponent);
     component = fixture.componentInstance;
 
     TestBed.inject(NgbActiveModal);

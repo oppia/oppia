@@ -29,7 +29,7 @@ require('services/image-local-storage.service.ts');
 require('services/site-analytics.service.ts');
 
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmQuestionExitComponent } from 'components/question-directives/modal-templates/confirm-question-exit-modal.component';
+import { ConfirmQuestionExitModalComponent } from 'components/question-directives/modal-templates/confirm-question-exit-modal.component';
 import { QuestionsOpportunitiesSelectDifficultyModalComponent } from 'pages/topic-editor-page/modal-templates/questions-opportunities-select-difficulty-modal.component';
 
 angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
@@ -132,7 +132,7 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
     };
     $scope.cancel = function() {
       if (QuestionUndoRedoService.hasChanges()) {
-        NgbModal.open(ConfirmQuestionExitComponent, {
+        NgbModal.open(ConfirmQuestionExitModalComponent, {
           backdrop: true,
         }).result.then(function() {
           $uibModalInstance.dismiss('cancel');
