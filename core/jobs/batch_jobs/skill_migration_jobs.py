@@ -134,7 +134,7 @@ class MigrateSkillJob(base_jobs.JobBase):
             skill: Skill. The skill which should be deleted from cache.
 
         Returns:
-            Result(str,Exception). The id of the skill when the deletion
+            Result(str, Exception). The id of the skill when the deletion
             was successful or Exception when the deletion failed.
         """
         try:

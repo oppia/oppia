@@ -481,9 +481,9 @@ def _save_story(
             'which is too old. Please reload the page and try again.'
             % (story_model.version, story.version))
 
-    story_model = populate_story_model_fields(story_model, story)
+    populated_story_model = populate_story_model_fields(story_model, story)
     change_dicts = [change.to_dict() for change in change_list]
-    story_model.commit(committer_id, commit_message, change_dicts)
+    populated_story_model.commit(committer_id, commit_message, change_dicts)
     caching_services.delete_multi(
         caching_services.CACHE_NAMESPACE_STORY, None, [story.id])
     story.version += 1
@@ -663,14 +663,12 @@ def compute_summary_of_story(story):
     """
     story_model_node_titles = [
         node.title for node in story.story_contents.nodes]
-    story_summary = story_domain.StorySummary(
+    return story_domain.StorySummary(
         story.id, story.title, story.description, story.language_code,
         story.version, story_model_node_titles, story.thumbnail_bg_color,
         story.thumbnail_filename, story.url_fragment, story.created_on,
         story.last_updated
     )
-
-    return story_summary
 
 
 def create_story_summary(story_id):

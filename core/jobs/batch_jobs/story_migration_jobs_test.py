@@ -49,13 +49,13 @@ class MigrateStoryJobTests(job_test_utils.JobTestBase):
 
     def setUp(self):
         super().setUp()
-        story_summary_model = self.create_model(
+        self.story_summary_model = self.create_model(
             story_models.StorySummaryModel,
             id=self.STORY_1_ID,
             title='title',
             url_fragment='urlfragment',
             language_code='cs',
-            description='description',
+            description='desc',
             node_titles=['title1', 'title2'],
             story_model_last_updated=datetime.datetime.utcnow(),
             story_model_created_on=datetime.datetime.utcnow(),
@@ -77,8 +77,9 @@ class MigrateStoryJobTests(job_test_utils.JobTestBase):
             }]
         )
         datastore_services.update_timestamps_multi([
-            topic_model, story_summary_model])
-        datastore_services.put_multi([topic_model, story_summary_model])
+            topic_model, self.story_summary_model])
+        datastore_services.put_multi([
+            topic_model, self.story_summary_model])
         self.latest_contents = {
             'nodes': [{
                 'id': 'node_1111',
@@ -137,6 +138,45 @@ class MigrateStoryJobTests(job_test_utils.JobTestBase):
             feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION)
         self.assertEqual(
             migrated_story_model.story_contents, self.latest_contents)
+
+    def test_question_summary_of_unmigrated_question_is_updated(self) -> None:
+        story_model = self.create_model(
+            story_models.StoryModel,
+            id=self.STORY_1_ID,
+            story_contents_schema_version=4,
+            title='title2',
+            language_code='en',
+            notes='notes',
+            description='desc2',
+            story_contents=self.unmigrated_contents,
+            corresponding_topic_id=self.TOPIC_1_ID,
+            url_fragment='urlfragment',
+        )
+        story_model.update_timestamps()
+        story_model.commit(feconf.SYSTEM_COMMITTER_ID, 'Create story', [{
+            'cmd': story_domain.CMD_CREATE_NEW
+        }])
+
+        self.assertEqual(self.story_summary_model.version, 1)
+        self.assertEqual(self.story_summary_model.title, 'title')
+        self.assertEqual(self.story_summary_model.language_code, 'cs')
+        self.assertEqual(self.story_summary_model.description, 'desc')
+        self.assertEqual(
+            self.story_summary_model.node_titles, ['title1', 'title2'])
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(stdout='STORY PROCESSED SUCCESS: 1'),
+            job_run_result.JobRunResult(stdout='STORY MIGRATED SUCCESS: 1'),
+            job_run_result.JobRunResult(stdout='CACHE DELETION SUCCESS: 1')
+        ])
+
+        migrated_story_summary_model = (
+            story_models.StorySummaryModel.get(self.STORY_1_ID))
+        self.assertEqual(migrated_story_summary_model.version, 2)
+        self.assertEqual(migrated_story_summary_model.title, 'title2')
+        self.assertEqual(migrated_story_summary_model.language_code, 'en')
+        self.assertEqual(migrated_story_summary_model.description, 'desc2')
+        self.assertEqual(migrated_story_summary_model.node_titles, ['title'])
 
     def test_broken_skill_is_not_migrated(self) -> None:
         story_model = self.create_model(
