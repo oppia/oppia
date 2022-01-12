@@ -274,11 +274,10 @@ describe('Question opportunities component', function() {
           }),
           skillDifficulty: 1
         })
-      }as NgbModalRef);
+      } as NgbModalRef);
 
       ctrl.onClickSuggestQuestionButton('1');
       tick();
-      
 
       expect(openSpy).toHaveBeenCalled();
       expect(questionUndoRedoService.clearChanges).toHaveBeenCalled();
@@ -323,7 +322,7 @@ describe('Question opportunities component', function() {
 
       ctrl.onClickSuggestQuestionButton('1');
       tick();
-      
+
       expect(openSpy).toHaveBeenCalled();
       expect(questionUndoRedoService.clearChanges).toHaveBeenCalled();
     }));

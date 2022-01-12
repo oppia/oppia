@@ -32,7 +32,8 @@ interface Summary {
 
 @Component({
   selector: 'oppia-questions-list-select-skill-and-difficulty-modal',
-  templateUrl: './questions-list-select-skill-and-difficulty-modal.component.html'
+  templateUrl:
+    './questions-list-select-skill-and-difficulty-modal.component.html'
 })
 export class QuestionsListSelectSkillAndDifficultyModalComponent
   extends ConfirmOrCancelModal implements OnInit {

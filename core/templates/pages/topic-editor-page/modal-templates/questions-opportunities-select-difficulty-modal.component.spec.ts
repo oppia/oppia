@@ -165,7 +165,7 @@ describe(
             assignedSkillTopicData: {},
             groupedSkillSummaries: {},
           }));
-        
+
         component.ngOnInit();
         tick();
 

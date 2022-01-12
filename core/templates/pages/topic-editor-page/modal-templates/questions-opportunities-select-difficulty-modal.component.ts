@@ -14,7 +14,6 @@
 
 /**
  * @fileoverview Component for questions opportunities select difficulty modal.
- * 
  */
 
 import { Component, Input, OnInit } from '@angular/core';

@@ -487,7 +487,7 @@ describe('Question Editor Modal Controller', function() {
       expect($uibModalInstance.close).not.toHaveBeenCalled();
     });
 
-    it('should not save and commit changes', function() {;
+    it('should not save and commit changes', function() {
       $scope.saveAndCommit();
       expect($uibModalInstance.close).not.toHaveBeenCalled();
     });

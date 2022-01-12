@@ -239,7 +239,7 @@ describe('Question Creation Service', function() {
             return 'medium';
           }
         }
-      ]
+      ];
       var sampleQuestion = QuestionObjectFactory.createFromBackendDict(
         sampleQuestionBackendDict);
       spyOn(QuestionObjectFactory, 'createDefaultQuestion').and.returnValue(

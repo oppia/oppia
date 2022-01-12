@@ -310,7 +310,7 @@ describe('Question Suggestion Editor Modal Controller', function() {
 
     it('should open skill difficulty selection modal on clicking' +
         ' change difficulty icon', fakeAsync(() => {
-      var uibSpy =  spyOn(ngbModal, 'open').and.returnValue({
+      var uibSpy = spyOn(ngbModal, 'open').and.returnValue({
         componentInstance: MockNgbModalRef,
         result: $q.resolve()
       } as NgbModalRef);
