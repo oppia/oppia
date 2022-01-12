@@ -331,11 +331,30 @@ angular.module('oppia').component('contributionsAndReview', {
         }
       };
 
+      ctrl.getActiveDropdownTabChoice = function() {
+        if (ctrl.activeTabType === ctrl.TAB_TYPE_REVIEWS) {
+          if (ctrl.activeSuggestionType === SUGGESTION_TYPE_QUESTION) {
+            return 'Review Questions';
+          }
+          return 'Review Translations';
+        }
+        if (ctrl.activeSuggestionType === SUGGESTION_TYPE_QUESTION) {
+          return 'Questions';
+        }
+        return 'Translations';
+      };
+
       ctrl.switchToTab = function(tabType, suggestionType) {
         ctrl.activeSuggestionType = suggestionType;
         ctrl.activeTabType = tabType;
+        ctrl.activeDropdownTabChoice = ctrl.getActiveDropdownTabChoice();
+        ctrl.dropdownShown = false;
         ctrl.contributions = {};
         ContributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit();
+      };
+
+      ctrl.toggleDropdown = function() {
+        ctrl.dropdownShown = !ctrl.dropdownShown;
       };
 
       ctrl.loadContributions = function() {
@@ -356,12 +375,31 @@ angular.module('oppia').component('contributionsAndReview', {
         });
       };
 
+      ctrl.closeDropdownWhenClickedOutside = function(clickEvent) {
+        const dropdown = document
+          .querySelector('.oppia-contributions-dropdown-container');
+        if (!dropdown) {
+          return;
+        }
+
+        const clickOccurredWithinDropdown =
+          dropdown.contains(clickEvent.target);
+        if (clickOccurredWithinDropdown) {
+          return;
+        }
+
+        ctrl.dropdownShown = false;
+        $rootScope.$apply();
+      };
+
       ctrl.$onInit = function() {
         ctrl.contributions = [];
         ctrl.userDetailsLoading = true;
         ctrl.userIsLoggedIn = false;
         ctrl.activeTabType = '';
         ctrl.activeSuggestionType = '';
+        ctrl.dropdownShown = false;
+        ctrl.activeDropdownTabChoice = '';
         ctrl.reviewTabs = [];
         ctrl.contributionTabs = [
           {
@@ -432,6 +470,11 @@ angular.module('oppia').component('contributionsAndReview', {
           // once the controller is migrated to angular.
           $rootScope.$applyAsync();
         });
+        $(document).on('click', ctrl.closeDropdownWhenClickedOutside);
+      };
+
+      ctrl.$onDestroy = function() {
+        $(document).off('click', ctrl.closeDropdownWhenClickedOutside);
       };
     }
   ]
