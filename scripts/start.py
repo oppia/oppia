@@ -23,7 +23,8 @@ import argparse
 import contextlib
 import time
 
-
+# Do not import any Oppia modules here,
+# import them below the "install_third_party_libs.main()" line.
 from . import install_third_party_libs
 # This installs third party libraries before importing other files or importing
 # libraries that use the builtins python module (e.g. build, python_utils).
@@ -31,6 +32,7 @@ install_third_party_libs.main()
 
 from . import build # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import common # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from . import extend_index_yaml # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import servers # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 from core.constants import constants # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
@@ -117,6 +119,12 @@ def notify_about_successful_shutdown():
         '\n\n')
 
 
+def call_extend_index_yaml():
+    """Calls the extend_index_yaml.py script."""
+    print('\033[94m' + 'Extending index.yaml...' + '\033[0m')
+    extend_index_yaml.main()
+
+
 def main(args=None):
     """Starts up a development server running Oppia."""
     parsed_args = _PARSER.parse_args(args=args)
@@ -134,6 +142,7 @@ def main(args=None):
     with contextlib.ExitStack() as stack, alert_on_exit():
         # ExitStack unwinds in reverse-order, so this will be the final action.
         stack.callback(notify_about_successful_shutdown)
+        stack.callback(call_extend_index_yaml)
 
         build_args = []
         if parsed_args.prod_env:

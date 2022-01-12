@@ -16,6 +16,9 @@
  * @fileoverview Component for the story editor page.
  */
 
+import { Subscription } from 'rxjs';
+import { SavePendingChangesModalComponent } from 'components/save-pending-changes/save-pending-changes-modal.component';
+
 require('objects/objectComponentsRequires.ts');
 require('pages/interaction-specs.constants.ajs.ts');
 
@@ -43,23 +46,22 @@ require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 require('services/bottom-navbar-status.service.ts');
 require('services/page-title.service.ts');
 require('services/loader.service.ts');
+require('services/ngb-modal.service.ts');
 require('services/prevent-page-unload-event.service.ts');
-
-import { Subscription } from 'rxjs';
 
 angular.module('oppia').component('storyEditorPage', {
   template: require('./story-editor-page.component.html'),
   controller: [
-    '$uibModal', '$window', 'BottomNavbarStatusService',
-    'EditableStoryBackendApiService', 'LoaderService',
+    '$window', 'BottomNavbarStatusService',
+    'EditableStoryBackendApiService', 'LoaderService', 'NgbModal',
     'PageTitleService', 'PreventPageUnloadEventService',
     'StoryEditorNavigationService', 'StoryEditorStateService',
     'StoryValidationService', 'UndoRedoService',
     'UrlInterpolationService', 'UrlService',
     'MAX_COMMIT_MESSAGE_LENGTH',
     function(
-        $uibModal, $window, BottomNavbarStatusService,
-        EditableStoryBackendApiService, LoaderService,
+        $window, BottomNavbarStatusService,
+        EditableStoryBackendApiService, LoaderService, NgbModal,
         PageTitleService, PreventPageUnloadEventService,
         StoryEditorNavigationService, StoryEditorStateService,
         StoryValidationService, UndoRedoService,
@@ -71,13 +73,15 @@ angular.module('oppia').component('storyEditorPage', {
       var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topicId>';
       ctrl.returnToTopicEditorPage = function() {
         if (UndoRedoService.getChangeCount() > 0) {
-          $uibModal.open({
-            templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-              '/pages/story-editor-page/modal-templates/' +
-              'story-save-pending-changes-modal.template.html'),
-            backdrop: true,
-            controller: 'ConfirmOrCancelModalController'
-          }).result.then(function() {}, function() {
+          const modalRef = NgbModal.open(
+            SavePendingChangesModalComponent, {
+              backdrop: true
+            });
+
+          modalRef.componentInstance.body = (
+            'Please save all pending changes before returning to the topic.');
+
+          modalRef.result.then(function() {}, function() {
             // Note to developers:
             // This callback is triggered when the Cancel button is clicked.
             // No further action is needed.

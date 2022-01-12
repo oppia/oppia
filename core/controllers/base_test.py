@@ -43,6 +43,7 @@ from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import taskqueue_services
 from core.domain import user_services
+from core.domain import wipeout_service
 from core.platform import models
 from core.tests import test_utils
 import main
@@ -157,11 +158,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         # Create user that is scheduled for deletion.
         self.signup(self.DELETED_USER_EMAIL, self.DELETED_USER_USERNAME)
         deleted_user_id = self.get_user_id_from_email(self.DELETED_USER_EMAIL)
-        deleted_user_model = (
-            user_models.UserSettingsModel.get_by_id(deleted_user_id))
-        deleted_user_model.deleted = True
-        deleted_user_model.update_timestamps()
-        deleted_user_model.put()
+        wipeout_service.pre_delete_user(deleted_user_id)
 
         # Create a new user but do not submit their registration form.
         user_services.create_new_user(
@@ -333,6 +330,17 @@ class BaseHandlerTests(test_utils.GenericTestBase):
 
         self.assertEqual(observed_log_messages, ['Frontend error: errors'])
 
+    def test_redirect_when_user_is_disabled(self):
+        get_auth_claims_from_request_swap = self.swap_to_always_raise(
+            auth_services,
+            'get_auth_claims_from_request',
+            auth_domain.UserDisabledError
+        )
+        with get_auth_claims_from_request_swap:
+            response = self.get_html_response('/', expected_status_int=302)
+            self.assertIn(
+                'pending-account-deletion', response.headers['location'])
+
     def test_redirect_oppia_test_server(self):
         # The old demo server redirects to the new demo server.
         response = self.get_html_response(
@@ -464,6 +472,23 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             ]
         )
         self.assertEqual(call_counter.times_called, 1)
+
+    def test_logs_request_with_invalid_payload(self):
+        with contextlib.ExitStack() as exit_stack:
+            logs = exit_stack.enter_context(
+                self.capture_logging(min_level=logging.ERROR))
+            exit_stack.enter_context(self.swap_to_always_raise(
+                webapp2.Request, 'get',
+                error=ValueError('uh-oh')))
+            self.get_custom_response(
+                '/',
+                expected_content_type='text/plain',
+                params=None,
+                expected_status_int=500)
+
+        self.assertRegexpMatches(
+            logs[0],
+            'uh-oh: request GET /')
 
 
 class MaintenanceModeTests(test_utils.GenericTestBase):
@@ -1209,7 +1234,8 @@ class SignUpTests(test_utils.GenericTestBase):
         response = self.post_json(
             feconf.SIGNUP_DATA_URL, {
                 'username': 'abc',
-                'agreed_to_terms': True
+                'agreed_to_terms': True,
+                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
             }, csrf_token=csrf_token, expected_status_int=401,
         )
 
@@ -1225,11 +1251,31 @@ class SignUpTests(test_utils.GenericTestBase):
         self.post_json(
             feconf.SIGNUP_DATA_URL, {
                 'username': 'abc',
-                'agreed_to_terms': True
+                'agreed_to_terms': True,
+                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
             }, csrf_token=csrf_token,
         )
 
         self.get_html_response('/community-library')
+
+    def test_error_is_raised_during_signup_using_invalid_token(self):
+        """Test that error is raised if user tries to signup
+        using invalid CSRF token.
+        """
+        self.login('abc@example.com')
+        self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
+
+        response = self.post_json(
+            feconf.SIGNUP_DATA_URL, {
+                'username': 'abc',
+                'agreed_to_terms': True,
+                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
+            }, csrf_token='invalid_token', expected_status_int=401,
+        )
+
+        self.assertEqual(response['error'],
+            'Your session has expired, and unfortunately your '
+            'changes cannot be saved. Please refresh the page.')
 
 
 class CsrfTokenHandlerTests(test_utils.GenericTestBase):

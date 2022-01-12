@@ -42,10 +42,10 @@
 
               <div ng-if="activeMisconceptionIndex === $index">
                 <div class="oppia-editor-card-section">
-                  <misconception-editor misconception="skill.findMisconceptionById(misconception.getId())"
-                                        index="$index"
-                                        is-editable="isEditable">
-                  </misconception-editor>
+                  <oppia-misconception-editor [misconception]="skill.findMisconceptionById(misconception.getId())"
+                                              [index]="$index"
+                                              [is-editable]="isEditable">
+                  </oppia-misconception-editor>
                 </div>
               </div>
             </li>
@@ -66,8 +66,8 @@
   }
 
   skill-misconceptions-editor .add-skill-misconception-button {
-    background-color: #058CA6;
-    color: #FFF;
+    background-color: #058ca6;
+    color: #fff;
   }
 
   skill-misconceptions-editor .helper-text {
