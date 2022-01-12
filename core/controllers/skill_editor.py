@@ -161,30 +161,48 @@ class EditableSkillDataHandler(base.BaseHandler):
     HANDLER_ARGS_SCHEMAS = {
         'GET': {},
         'PUT': {
-            'params': {
-                'version': {
-                    'schema': {
-                        'type': 'int',
-                        'validators': [{
-                            'id': 'is_at_least',
-                            'min_value': 1
-                        }]
-                    }
+            'version': {
+                'schema': {
+                    'type': 'int',
+                }
+            },
+            'commit_message': {
+                'schema': {
+                    'type': 'basestring'
                 },
-                'commit_message': {
-                    'schema': {
-                        'type': 'basestring'
-                    },
-                    'default_value': None
-                },
-                'change_dicts': {
-                    'schema': {
-                        'type': 'list',
-                        'items': {
-                            'type': 'object_dict',
-                            'object_class': (
-                                skill_domain.SkillChange)
-                        }
+                'default_value': None
+            },
+            'change_dicts': {
+                'schema': {
+                    'type': 'list',
+                    'items': {
+                        'type': 'dict',
+                        'properties': [
+                            {
+                                'name': 'cmd',
+                                'schema': {
+                                    'type': 'basestring'
+                                }
+                            },
+                            {
+                                'name': 'property_name',
+                                'schema': {
+                                    'type': 'basestring'
+                                }
+                            },
+                            {
+                                'name': 'old_value',
+                                'schema': {
+                                    'type': 'basestring'
+                                }
+                            },
+                            {
+                                'name': 'new_value',
+                                'schema': {
+                                    'type': 'basestring'
+                                }
+                            }
+                        ]
                     }
                 }
             }
