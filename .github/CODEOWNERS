@@ -186,7 +186,6 @@
 /.pylintrc @Hudda @DubeySandeep
 /.stylelintrc @Hudda @DubeySandeep
 /.yarnrc @DubeySandeep
-/core/templates/css/.stylelintrc @Hudda @DubeySandeep
 /tox.ini @Hudda @DubeySandeep
 /scripts/*.py @DubeySandeep
 /scripts/check_e2e_tests_are_captured_in_ci*.py @DubeySandeep
@@ -218,6 +217,7 @@
 /core/templates/components/state-directives/ @kevintab95
 /core/templates/components/graph-services/ @kevintab95
 /core/templates/components/on-screen-keyboard/ @aks681
+/core/templates/components/save-pending-changes/ @kevintab95
 /core/templates/components/version-diff-visualization/ @aks681
 /core/templates/domain/editor/ @kevintab95
 /core/templates/domain/exploration/ @kevintab95

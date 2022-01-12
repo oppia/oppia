@@ -112,6 +112,8 @@ export class ExplorationRightsService {
           response.rights.voice_artist_names, response.rights.viewer_names,
           response.rights.status, response.rights.cloned_from,
           response.rights.community_owned, response.rights.viewable_if_private);
+      }, (response) => {
+        this.alertsService.addWarning(response.error.error);
       });
   }
 
