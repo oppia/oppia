@@ -43,6 +43,7 @@ export class ExplorationHtmlFormatterService {
     'GraphInput',
     'ImageClickInput',
     'NumericExpressionInput',
+    'PencilCodeEditor',
     'NumericInput',
     'InteractiveMap',
     'MultipleChoiceInput',

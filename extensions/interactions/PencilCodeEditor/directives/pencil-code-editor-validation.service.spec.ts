@@ -16,16 +16,11 @@
  * @fileoverview Unit tests for Pencil Code Editor Validation Service.
  */
 
-import { AnswerGroup, AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
+import { AnswerGroup, AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
 import { AppConstants } from 'app.constants';
-import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
-import { PencilCodeEditorValidationService } from
-  // eslint-disable-next-line max-len
-  'interactions/PencilCodeEditor/directives/pencil-code-editor-validation.service';
-import { RuleObjectFactory, RuleInputs } from
-  'domain/exploration/RuleObjectFactory';
+import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
+import { PencilCodeEditorValidationService } from 'interactions/PencilCodeEditor/directives/pencil-code-editor-validation.service';
+import { RuleObjectFactory, RuleInputs } from 'domain/exploration/RuleObjectFactory';
 import { TestBed } from '@angular/core/testing';
 
 describe('Pencil Code Editor Validation Service', () => {
@@ -36,10 +31,10 @@ describe('Pencil Code Editor Validation Service', () => {
   let agof: AnswerGroupObjectFactory;
 
   beforeEach(() => {
-    oof = TestBed.get(OutcomeObjectFactory);
-    pcevs = TestBed.get(PencilCodeEditorValidationService);
-    rof = TestBed.get(RuleObjectFactory);
-    agof = TestBed.get(AnswerGroupObjectFactory);
+    oof = TestBed.inject(OutcomeObjectFactory);
+    pcevs = TestBed.inject(PencilCodeEditorValidationService);
+    rof = TestBed.inject(RuleObjectFactory);
+    agof = TestBed.inject(AnswerGroupObjectFactory);
   });
 
   describe('on calling getCustomizationArgsWarnings', () => {

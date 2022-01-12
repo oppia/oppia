@@ -43,7 +43,8 @@ export class InteractionAttributesExtractorService {
     'MultipleChoiceInput',
     'SetInput',
     'TextInput',
-    'MathEquationInput'
+    'MathEquationInput',
+    'PencilCodeEditor',
   ];
 
   constructor(
@@ -54,6 +55,8 @@ export class InteractionAttributesExtractorService {
   getValuesFromAttributes(
       interactionId: InteractionSpecsKey, attributes: Object
   ): InteractionCustomizationArgs {
+    console.log(interactionId);
+    console.log(attributes);
     const caBackendDict: InteractionCustomizationArgsBackendDict = {};
     const caSpecs = (
       InteractionSpecsConstants.INTERACTION_SPECS[

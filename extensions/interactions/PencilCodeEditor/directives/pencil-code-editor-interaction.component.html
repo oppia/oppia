@@ -1,11 +1,12 @@
 <div class="pencil-code-editor-container">
-  <div class="pencil-code-editor-iframe oppia-pencil-code-editor-iframe">
-    <div></div>
+  <div  class="pencil-code-editor-iframe oppia-pencil-code-editor-iframe">
+    <div id="codeEditorIframe"></div>
   </div>
   <div class="oppia-reset-code-button-container">
-    <md-button class="md-button-success" ng-click="$ctrl.reset($ctrl.currentInitialValue)" ng-disabled="!$ctrl.interactionIsActive">
-      <span class="oppia-reset-code-text" translate="I18N_RESET_CODE"></span>
-    </md-button>
+    <button class="md-button-success oppia-reset-code-text"
+            (click)="reset()" [disabled]="!interactionIsActive"
+            [innerHTML]="'I18N_RESET_CODE' | translate">
+    </button>
   </div>
 </div>
 <style>
