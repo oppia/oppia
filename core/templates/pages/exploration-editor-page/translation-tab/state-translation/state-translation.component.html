@@ -79,6 +79,7 @@
              ng-class="{'oppia-rule-tab-active': activeHintIndex === $index}"
              ng-style="contentIdStatusColorStyle(caContent.content.contentId)">
             <oppia-response-header [index]="$index"
+                                   [outcome]="null"
                                    [summary]="caContent.name + ': ' + getSubtitledContentSummary(caContent.content)"
                                    [short-summary]="caContent.name + ': ' + getSubtitledContentSummary(caContent.content)"
                                    [is-active]="$index === activeCustomizationArgContentIndex"
@@ -222,6 +223,7 @@
              ng-class="{'oppia-rule-tab-active': activeHintIndex === $index}"
              ng-style="contentIdStatusColorStyle(hint.hintContent.contentId)">
             <oppia-response-header [index]="$index"
+                                   [outcome]="null"
                                    [summary]="getSubtitledContentSummary(hint.hintContent)"
                                    [short-summary]="getSubtitledContentSummary(hint.hintContent)"
                                    [is-active]="$index === activeHintIndex"

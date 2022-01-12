@@ -43,7 +43,7 @@
 </div>
 
 <span class="oppia-delete-response-button oppia-transition-200 protractor-test-delete-response"
-      *ngIf="editabilityService.isEditable() && (outcome.feedback.contentId === 'default_outcome' ? false : true)"
+      *ngIf="editabilityService.isEditable() && !isDefaultOutcome()"
       (click)="deleteResponse($event)">
   <i class="material-icons md-18">&#xE5CD;</i>
 </span>

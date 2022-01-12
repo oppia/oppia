@@ -46,6 +46,7 @@ export class ResponseHeaderComponent {
   @Input() showWarning: boolean;
   @Output() delete = new EventEmitter<DeleteValue>();
   @Output() navigateToState = new EventEmitter<string>();
+  isDefaultResponse: boolean;
 
   constructor(
     private stateEditorService: StateEditorService,
@@ -97,6 +98,14 @@ export class ResponseHeaderComponent {
     };
 
     this.delete.emit(value);
+  }
+
+  isDefaultOutcome(): boolean {
+    if (this.outcome === null) {
+      return false;
+    }
+    return (
+      this.outcome.feedback.contentId === 'default_outcome' ? true : false);
   }
 }
 

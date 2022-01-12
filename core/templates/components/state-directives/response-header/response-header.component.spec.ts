@@ -116,6 +116,17 @@ describe('Response Header Component', () => {
     expect(component.isCreatingNewState()).toBe(true);
   });
 
+  it('should check delete button is not present on default outcome', () => {
+    component.outcome.feedback.contentId = 'default_outcome';
+    expect(component.isDefaultOutcome()).toBe(true);
+
+    component.outcome.feedback.contentId = 'feedback_1';
+    expect(component.isDefaultOutcome()).toBe(false);
+
+    component.outcome = null;
+    expect(component.isDefaultOutcome()).toBe(false);
+  });
+
   it('should delete response when user clicks delete button', () => {
     spyOn(component.delete, 'emit').and.callThrough();
     component.deleteResponse(new Event(''));

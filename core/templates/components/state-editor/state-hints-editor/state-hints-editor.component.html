@@ -48,6 +48,7 @@
                    class="oppia-rule-tab protractor-test-hint-tab"
                    ngClass="{'oppia-rule-tab-active': stateHintsService.getActiveHintIndex() === index}">
                   <oppia-response-header class="oppia-response-header-center"
+                                         [outcome]="null"
                                          [index]="index"
                                          [summary]="getHintSummary(hint)"
                                          [shortSummary]="getHintSummary(hint)"
