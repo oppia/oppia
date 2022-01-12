@@ -601,7 +601,8 @@ class SignupEmailTests(test_utils.EmailTestBase):
             self.post_json(
                 feconf.SIGNUP_DATA_URL, {
                     'agreed_to_terms': True,
-                    'username': self.EDITOR_USERNAME
+                    'username': self.EDITOR_USERNAME,
+                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
                 }, csrf_token=csrf_token)
 
             # Check that no email was sent.
@@ -632,7 +633,8 @@ class SignupEmailTests(test_utils.EmailTestBase):
             self.post_json(
                 feconf.SIGNUP_DATA_URL, {
                     'agreed_to_terms': True,
-                    'username': self.EDITOR_USERNAME
+                    'username': self.EDITOR_USERNAME,
+                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
                 }, csrf_token=csrf_token)
 
             # However, an error should be recorded in the logs.
@@ -679,7 +681,8 @@ class SignupEmailTests(test_utils.EmailTestBase):
             self.post_json(
                 feconf.SIGNUP_DATA_URL, {
                     'agreed_to_terms': True,
-                    'username': self.EDITOR_USERNAME
+                    'username': self.EDITOR_USERNAME,
+                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
                 }, csrf_token=csrf_token)
 
             # However, an error should be recorded in the logs.
@@ -724,7 +727,8 @@ class SignupEmailTests(test_utils.EmailTestBase):
             self.post_json(
                 feconf.SIGNUP_DATA_URL, {
                     'agreed_to_terms': True,
-                    'username': self.EDITOR_USERNAME
+                    'username': self.EDITOR_USERNAME,
+                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
                 }, csrf_token=csrf_token)
 
             # However, an error should be recorded in the logs.
@@ -755,7 +759,8 @@ class SignupEmailTests(test_utils.EmailTestBase):
             self.post_json(
                 feconf.SIGNUP_DATA_URL, {
                     'agreed_to_terms': True,
-                    'username': self.EDITOR_USERNAME
+                    'username': self.EDITOR_USERNAME,
+                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
                 }, csrf_token=csrf_token)
 
             # Check that an email was sent with the correct content.
@@ -786,7 +791,8 @@ class SignupEmailTests(test_utils.EmailTestBase):
             self.post_json(
                 feconf.SIGNUP_DATA_URL, {
                     'agreed_to_terms': True,
-                    'username': self.EDITOR_USERNAME
+                    'username': self.EDITOR_USERNAME,
+                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
                 }, csrf_token=csrf_token)
 
             # Check that an email was sent.
@@ -797,7 +803,8 @@ class SignupEmailTests(test_utils.EmailTestBase):
             self.post_json(
                 feconf.SIGNUP_DATA_URL, {
                     'agreed_to_terms': True,
-                    'username': self.EDITOR_USERNAME
+                    'username': self.EDITOR_USERNAME,
+                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
                 }, csrf_token=csrf_token)
 
             # Check that no new email was sent.
@@ -821,7 +828,8 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 feconf.SIGNUP_DATA_URL,
                 {
                     'agreed_to_terms': True,
-                    'username': 'BadUsername!!!'
+                    'username': 'BadUsername!!!',
+                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
                 },
                 csrf_token=csrf_token, expected_status_int=400)
 
@@ -833,7 +841,8 @@ class SignupEmailTests(test_utils.EmailTestBase):
             self.post_json(
                 feconf.SIGNUP_DATA_URL, {
                     'agreed_to_terms': True,
-                    'username': self.EDITOR_USERNAME
+                    'username': self.EDITOR_USERNAME,
+                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
                 }, csrf_token=csrf_token)
 
             # Check that a new email was sent.
@@ -862,7 +871,8 @@ class SignupEmailTests(test_utils.EmailTestBase):
             self.post_json(
                 feconf.SIGNUP_DATA_URL, {
                     'agreed_to_terms': True,
-                    'username': self.EDITOR_USERNAME
+                    'username': self.EDITOR_USERNAME,
+                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
                 }, csrf_token=csrf_token)
 
             # Check that a new email was sent.
