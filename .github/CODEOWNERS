@@ -50,6 +50,7 @@
 /core/templates/components/code-mirror/ @srijanreddy98 @ashutoshc8101
 /core/templates/components/filter-fields/ @srijanreddy98 @ashutoshc8101
 /core/templates/components/oppia-angular-root.component.* @srijanreddy98 @ashutoshc8101
+/core/templates/components/smooth-height/smooth-height-animator.component.* @srijanreddy98 @ashutoshc8101
 /core/templates/modules/ @srijanreddy98 @ashutoshc8101
 /core/templates/pages/common-imports.ts @srijanreddy98 @ashutoshc8101
 /core/templates/pages/mock-ajs.ts @srijanreddy98 @ashutoshc8101
@@ -67,7 +68,6 @@
 /core/templates/services/request-interceptor.service*.ts @srijanreddy98 @ashutoshc8101
 /core/templates/services/UpgradedServices.ts @srijanreddy98 @ashutoshc8101
 /core/templates/hybrid-router-module-provider*.ts @srijanreddy98 @ashutoshc8101
-
 
 # TS typing
 /typings/ @vojtechjelinek
@@ -186,7 +186,6 @@
 /.pylintrc @Hudda @DubeySandeep
 /.stylelintrc @Hudda @DubeySandeep
 /.yarnrc @DubeySandeep
-/core/templates/css/.stylelintrc @Hudda @DubeySandeep
 /tox.ini @Hudda @DubeySandeep
 /scripts/*.py @DubeySandeep
 /scripts/check_e2e_tests_are_captured_in_ci*.py @DubeySandeep
@@ -218,6 +217,7 @@
 /core/templates/components/state-directives/ @kevintab95
 /core/templates/components/graph-services/ @kevintab95
 /core/templates/components/on-screen-keyboard/ @aks681
+/core/templates/components/save-pending-changes/ @kevintab95
 /core/templates/components/version-diff-visualization/ @aks681
 /core/templates/domain/editor/ @kevintab95
 /core/templates/domain/exploration/ @kevintab95
