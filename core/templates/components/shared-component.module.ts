@@ -104,6 +104,7 @@ import { SmoothHeightAnimatorComponent } from './smooth-height/smooth-height-ani
 import { HintEditorComponent } from 'components/state-directives/hint-editor/hint-editor.component';
 import { ResponseHeaderComponent } from './state-directives/response-header/response-header.component';
 import { StateHintsEditorComponent } from 'components/state-editor/state-hints-editor/state-hints-editor.component';
+import { ReviewMaterialEditorComponent } from './review-material-editor/review-material-editor.component';
 
 // Pipes.
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
@@ -223,7 +224,8 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     LearnerDashboardIconsComponent,
     PreviewThumbnailComponent,
     SavePendingChangesModalComponent,
-    AddHintModalComponent
+    AddHintModalComponent,
+    ReviewMaterialEditorComponent
   ],
 
   entryComponents: [
@@ -292,7 +294,8 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     LearnerDashboardIconsComponent,
     PreviewThumbnailComponent,
     SavePendingChangesModalComponent,
-    AddHintModalComponent
+    AddHintModalComponent,
+    ReviewMaterialEditorComponent
   ],
 
   exports: [
@@ -377,6 +380,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     SortByPipe,
     SavePendingChangesModalComponent,
     LearnerDashboardIconsComponent,
+    ReviewMaterialEditorComponent
   ],
 })
 
