@@ -5124,7 +5124,7 @@ export default {
     "direction": "ltr"
   }, {
     "id": "ee",
-    "description": "Eʋegbe",
+    "description": "Eʋegbe (Ewe)",
     "relatedLanguages": ["ee"],
     "direction": "ltr"
   }, {
