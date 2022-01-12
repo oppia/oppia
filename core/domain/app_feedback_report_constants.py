@@ -53,13 +53,12 @@ STATS_ID_DELIMITER = ':'
 ANDROID_VERSION_NAME_DELIMITER = '-'
 
 
-
-class ReportType(enum.Enum): 
+class ReportType(enum.Enum):
     """Enum for report types."""
 
-    SUGGESTION = 'suggestion' 
-    ISSUE = 'issue' 
-    CRASH = 'crash' 
+    SUGGESTION = 'suggestion'
+    ISSUE = 'issue'
+    CRASH = 'crash'
 
 
 # TODO(#14419): Change naming style of Enum class from SCREAMING_SNAKE_CASE
