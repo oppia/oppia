@@ -68,7 +68,6 @@ angular.module('oppia').directive('skillEditorNavbar', [
           };
 
           $scope.getChangeListCount = function() {
-            $rootScope.$applyAsync();
             return UndoRedoService.getChangeCount();
           };
 
