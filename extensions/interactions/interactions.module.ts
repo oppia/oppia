@@ -32,7 +32,7 @@ import { NumericInputModule } from './NumericInput/numeric-input-interactions.mo
 import { MathEquationInputModule } from './MathEquationInput/math-equation-input-interactions.module';
 import { InteractiveMapInteractionModule } from './InteractiveMap/interactive-map-interactions.module';
 import { MultipleChoiceInputInteractionModule } from './MultipleChoiceInput/multiple-choice-input-interactions.module';
-import { ItemSelectionInputInteractionModule } from './ItemSelectionInput/item-selection-input-interaction.module';
+import { ItemSelectionInputInteractionModule } from './ItemSelectionInput/item-selection-input-interactions.module';
 import { SetInputInteractionModule } from './SetInput/set-input-interactions.module';
 import { TextInputInteractionModule } from './TextInput/text-input-interactions.module';
 import { TranslateModule } from '@ngx-translate/core';
