@@ -2439,17 +2439,19 @@ class ExplorationEmbedPageTests(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_handler_raises_error_with_no_collection_id(self):
+    def test_handler_raises_error_with_no_collection(self):
         self.login(self.OWNER_EMAIL)
-        csrf_token = self.get_new_csrf_token()
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id)
 
-        self.post_json(
+        self.get_html_response(
             '%s/%s' % (feconf.EXPLORATION_URL_EMBED_PREFIX, self.EXP_ID),
-            {
-                'v': exploration.version
-            }, csrf_token=csrf_token, expected_status_int=500)
+            params={
+                'v': exploration.version,
+                'collection_id': 'aZ9_______12'
+            }, expected_status_int=404
+        )
+
         self.logout()
 
     def test_handler_raises_error_with_invalid_version(self):
