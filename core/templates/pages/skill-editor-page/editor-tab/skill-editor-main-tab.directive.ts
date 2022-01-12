@@ -50,16 +50,20 @@ angular.module('oppia').directive('skillEditorMainTab', [
         '/pages/skill-editor-page/editor-tab/' +
         'skill-editor-main-tab.directive.html'),
       controller: [
-        '$scope', '$timeout', 'FocusManagerService', 'NgbModal',
+        '$rootScope', '$scope', '$timeout', 'FocusManagerService', 'NgbModal',
         'PageTitleService',
         'SkillEditorRoutingService', 'SkillEditorStateService',
         'UndoRedoService',
         function(
-            $scope, $timeout, FocusManagerService, NgbModal,
+            $rootScope, $scope, $timeout, FocusManagerService, NgbModal,
             PageTitleService,
             SkillEditorRoutingService, SkillEditorStateService,
             UndoRedoService) {
           var ctrl = this;
+
+          $scope.getMisconceptionChange = function() {
+            $rootScope.$applyAsync();
+          }
 
           $scope.createQuestion = function() {
             // This check is needed because if a skill has unsaved changes to

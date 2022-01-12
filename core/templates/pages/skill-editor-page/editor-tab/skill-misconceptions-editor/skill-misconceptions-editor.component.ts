@@ -16,7 +16,7 @@
  * @fileoverview Component for the skill misconceptions editor.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { Subscription } from 'rxjs';
@@ -33,6 +33,7 @@ import { Skill } from 'domain/skill/SkillObjectFactory';
   templateUrl: './skill-misconceptions-editor.component.html'
 })
 export class SkillMisconceptionsEditorComponent implements OnInit {
+  @Output() getMisconceptionsChange = new EventEmitter();
   directiveSubscriptions = new Subscription();
   skill: Skill;
   misconceptionsListIsShown: boolean;
@@ -84,6 +85,7 @@ export class SkillMisconceptionsEditorComponent implements OnInit {
       this.skillUpdateService.deleteMisconception(this.skill, result.id);
       this.misconceptions = this.skill.getMisconceptions();
       this.activeMisconceptionIndex = null;
+      this.getMisconceptionsChange.emit();
     }, () => {
       // Note to developers:
       // This callback is triggered when the Cancel button is clicked.
@@ -98,6 +100,7 @@ export class SkillMisconceptionsEditorComponent implements OnInit {
       this.skillUpdateService.addMisconception(
         this.skill, result.misconception);
       this.misconceptions = this.skill.getMisconceptions();
+      this.getMisconceptionsChange.emit();
     }, () => {
       // Note to developers:
       // This callback is triggered when the Cancel button is clicked.
