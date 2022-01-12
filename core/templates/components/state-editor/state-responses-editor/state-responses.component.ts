@@ -352,7 +352,6 @@ angular.module('oppia').component('stateResponses', {
         });
       };
 
-      $scope.isResposeDeleteable =
       $scope.deleteAnswerGroup = function(value) {
         // Prevent clicking on the delete button from also toggling the
         // display state of the answer group.
