@@ -46,11 +46,11 @@ export class RecordedVoiceovers {
     return Object.keys(this.voiceoversMapping);
   }
 
-  getBindableVoiceovers(contentId: string | null): BindableVoiceovers {
+  getBindableVoiceovers(contentId: string): BindableVoiceovers {
     return this.voiceoversMapping[String(contentId)];
   }
 
-  getVoiceover(contentId: string | null, langCode: string): Voiceover {
+  getVoiceover(contentId: string, langCode: string): Voiceover {
     return this.voiceoversMapping[String(contentId)][langCode];
   }
 

@@ -34,8 +34,6 @@ import { EndExplorationCustomizationArgs, InteractionCustomizationArgs } from
   'interactions/customization-args-defs';
 import { Interaction } from
   'domain/exploration/InteractionObjectFactory';
-import { BindableVoiceovers } from
-  'domain/exploration/recorded-voiceovers.model';
 import { State } from 'domain/state/StateObjectFactory';
 import {
   StateObjectsBackendDict,
@@ -45,7 +43,6 @@ import {
 } from 'domain/exploration/StatesObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-import { Voiceover } from 'domain/exploration/voiceover.model';
 
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
@@ -117,7 +114,7 @@ export class Exploration {
       customizationArgs.recommendedExplorationIds.value : null;
   }
 
-  // Returned interaction is null for invalid state names.
+  // Interaction is null for invalid state name.
   getInteraction(stateName: string): Interaction | null {
     let state = this.states.getState(stateName);
     if (!state) {
@@ -127,7 +124,7 @@ export class Exploration {
     return state.interaction;
   }
 
-  // Returned interaction id is null for invalid state names.
+  // Interaction ID is null for invalid state name.
   getInteractionId(stateName: string): string | null {
     let interaction = this.getInteraction(stateName);
     if (interaction === null) {
@@ -136,7 +133,7 @@ export class Exploration {
     return interaction.id;
   }
 
-  // Returned interaction customization args is null for invalid state names.
+  // Interaction customization args are null for invalid state name.
   getInteractionCustomizationArgs(
       stateName: string
   ): InteractionCustomizationArgs | null {
@@ -145,36 +142,6 @@ export class Exploration {
       return null;
     }
     return interaction.customizationArgs;
-  }
-
-  // The 'instructions' key in INTERACTION_SPECS for some interaction
-  // specs can be null, hence return type is string | null.
-  getInteractionInstructions(stateName: string): string | null {
-    let interactionId = this.getInteractionId(stateName);
-    return interactionId ? INTERACTION_SPECS[
-      interactionId as InteractionSpecsKey
-    ].instructions : '';
-  }
-
-  // The 'narrow_instructions' key in INTERACTION_SPECS for some
-  // interaction specs can be null, hence return type is string | null.
-  getNarrowInstructions(stateName: string): string | null {
-    let interactionId = this.getInteractionId(stateName);
-    return (
-        interactionId ?
-            INTERACTION_SPECS[
-              interactionId as InteractionSpecsKey
-            ].narrow_instructions : ''
-    );
-  }
-
-  getInteractionThumbnailSrc(stateName: string): string {
-    // TODO(sll): Unify this with the 'choose interaction' modal in
-    // state_editor_interaction.html.
-    let interactionId = this.getInteractionId(stateName);
-    return interactionId ? (
-        this.urlInterpolationService
-          .getInteractionThumbnailImageUrl(interactionId)) : '';
   }
 
   isInteractionInline(stateName: string): boolean {
@@ -206,33 +173,6 @@ export class Exploration {
 
   getUninterpolatedContentHtml(stateName: string): string {
     return this.getState(stateName).content.html;
-  }
-
-  // Returned BindableVoiceover instance is null for invalid state names.
-  getVoiceovers(stateName: string): BindableVoiceovers | null {
-    let state = this.getState(stateName);
-    if (!state) {
-      this.logger.error('Invalid state name: ' + stateName);
-      return null;
-    }
-    let recordedVoiceovers = state.recordedVoiceovers;
-    let contentId = state.content.contentId;
-    return recordedVoiceovers.getBindableVoiceovers(
-      contentId);
-  }
-
-  // Returned Voiceover instance is null for invalid state names.
-  getVoiceover(
-      stateName: string, languageCode: string): Voiceover | null {
-    let state = this.getState(stateName);
-    if (!state) {
-      this.logger.error('Invalid state name: ' + stateName);
-      return null;
-    }
-    let recordedVoiceovers = state.recordedVoiceovers;
-    let contentId = state.content.contentId;
-    const voiceovers = recordedVoiceovers.getVoiceover(contentId, languageCode);
-    return voiceovers || null;
   }
 
   getAllVoiceovers(languageCode: string): VoiceoverObjectsDict {
