@@ -4,7 +4,7 @@
   complete mirror image of the LTR version.
 */
 .chapter-identifier {
-  color: #00645C;
+  color: #00645c;
   font-weight: 500;
 }
 
@@ -38,13 +38,13 @@
 }
 
 .completed-icon {
-  color: #00645C;
+  color: #00645c;
   float: right;
   margin-left: 6px;
 }
 
 .view-button {
-  color: #00645C;
+  color: #00645c;
   cursor: pointer;
   font-weight: bold;
   margin-top: 1.5vh;
@@ -72,7 +72,7 @@
 }
 
 .chapter-details {
-  border: 1px solid #7B7B7B;
+  border: 1px solid #7b7b7b;
   border-radius: 0.25rem;
   display: inline-block;
   margin-right: 0.8vw;
@@ -91,7 +91,7 @@
 }
 
 .title-text {
-  border-left: 1px solid #7B7B7B;
+  border-left: 1px solid #7b7b7b;
   font-weight: 500;
   padding-left: 10px;
 }

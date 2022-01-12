@@ -4,7 +4,7 @@
   complete mirror image of the LTR version.
 */
 .oppia-arrow-button {
-  color: #00645C;
+  color: #00645c;
   float: right;
   height: 44px;
   position: relative;
@@ -13,14 +13,14 @@
   width: 6px;
 }
 .oppia-current-goals-content {
-  border-bottom: 1px solid #CCC;
+  border-bottom: 1px solid #ccc;
   margin-bottom: 16px;
   margin-right: 80px;
   min-height: 57px;
   width: 615px;
 }
 .oppia-completed-goals {
-  border-bottom: 1px solid #CCC;
+  border-bottom: 1px solid #ccc;
   height: 125px;
   margin-bottom: 14px;
   width: 656px;
@@ -37,7 +37,7 @@
   text-align: right;
 }
 .oppia-completed-goals-content {
-  border-bottom: 1px solid #CCC;
+  border-bottom: 1px solid #ccc;
   margin: auto;
   margin-bottom: 14px;
   min-height: 57px;
@@ -45,7 +45,7 @@
   width: 656px;
 }
 .oppia-goals-story-name {
-  color: #333333B3;
+  color: #333333b3;
   font-size: 16px;
   font-style: italic;
   letter-spacing: 0;
@@ -53,7 +53,7 @@
   text-align: right;
 }
 .oppia-edit-goals-content {
-  border-bottom: 1px solid #CCC;
+  border-bottom: 1px solid #ccc;
   margin: auto;
   margin-bottom: 14px;
   min-height: 36px;
@@ -74,7 +74,7 @@
   width: 150px;
 }
 .oppia-edit-goals-subheading {
-  border-bottom: 1px solid #CCC;
+  border-bottom: 1px solid #ccc;
   height: 68px;
   margin: auto;
   margin-bottom: 14px;
@@ -119,7 +119,7 @@
   width: 270px;
 }
 .oppia-new-story-content {
-  color: #00645C;
+  color: #00645c;
   font-size: 16px;
   letter-spacing: 0;
   opacity: 1;

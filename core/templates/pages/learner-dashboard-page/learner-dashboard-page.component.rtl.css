@@ -50,9 +50,9 @@ body {
 }
 
 .oppia-learner-dashboard-buttons {
-  background: #FFF 100% 0% no-repeat padding-box;
+  background: #fff 100% 0% no-repeat padding-box;
   bottom: 0;
-  box-shadow: 0 -3px 5px #3333331A;
+  box-shadow: 0 -3px 5px #3333331a;
   height: 2.5rem;
   position: absolute;
   width: 100%;
@@ -60,7 +60,7 @@ body {
 }
 
 .oppia-learner-dashboard-progress-button-menu-options {
-  color: #00645C;
+  color: #00645c;
   cursor: pointer;
   display: inline-block;
   font-size: 19px;
@@ -96,8 +96,8 @@ body {
 }
 
 .oppia-learner-dashboard-section-active {
-  background-color: #00645C1A;
-  color: #00645C;
+  background-color: #00645c1a;
+  color: #00645c;
 }
 
 .oppia-learner-dashboard-side-content {
@@ -296,7 +296,7 @@ body {
 }
 
 .oppia-learner-dashboard-feedback-section .feedback-thread-warning {
-  color: #0277BD;
+  color: #0277bd;
   margin-right: 4px;
 }
 

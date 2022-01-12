@@ -10,7 +10,6 @@
   min-height: 500px;
   padding-top: 30px;
   position: relative;
-  text-align: left;
 }
 
 .oppia-story-viewer-container {
@@ -76,7 +75,7 @@ over the blank preview card */
 }
 
 .oppia-lesson-icon-completed {
-  background-color: #296E5F;
+  background-color: #296e5f;
   border-radius: 50%;
   height: 40px;
   left: 50%;
@@ -89,7 +88,7 @@ over the blank preview card */
 
 .oppia-lesson-icon-uncompleted {
   background-color: #fff;
-  border: #296E5F 3px solid;
+  border: #296e5f 3px solid;
   border-radius: 50%;
   height: 40px;
   left: 50%;
@@ -104,7 +103,7 @@ over the blank preview card */
 }
 
 .oppia-story-viewer-title {
-  color: #00645C;
+  color: #00645c;
   font-family: Capriola, Roboto, Arial, sans-serif;
   font-size: 2.4em;
   font-weight: 500;
