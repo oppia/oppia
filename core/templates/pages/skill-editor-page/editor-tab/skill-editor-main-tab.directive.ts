@@ -62,8 +62,10 @@ angular.module('oppia').directive('skillEditorMainTab', [
           var ctrl = this;
 
           $scope.getMisconceptionChange = function() {
+            // TODO(#8521): Remove the use of $rootScope.$applyAsync()
+            // once the directive is migrated to angular.
             $rootScope.$applyAsync();
-          }
+          };
 
           $scope.createQuestion = function() {
             // This check is needed because if a skill has unsaved changes to
