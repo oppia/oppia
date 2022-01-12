@@ -336,13 +336,13 @@ class Normalizers:
         url_components = urllib.parse.urlsplit(obj)
         quoted_url_components = [
             urllib.parse.quote(component) for component in url_components]
-        raw = urllib.parse.urlunsplit(quoted_url_components) # type: ignore[no-untyped-call]
+        raw = urllib.parse.urlunsplit(quoted_url_components)
 
         acceptable = html_cleaner.filter_a('a', 'href', obj) # type: ignore[no-untyped-call]
         assert acceptable, (
             'Invalid URL: Sanitized URL should start with '
             '\'http://\' or \'https://\'; received %s' % raw)
-        return raw # type: ignore[no-any-return]
+        return raw
 
     @staticmethod
     def normalize_spaces(obj: str) -> str:
