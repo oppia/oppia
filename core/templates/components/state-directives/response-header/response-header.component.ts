@@ -46,7 +46,6 @@ export class ResponseHeaderComponent {
   @Input() showWarning: boolean;
   @Output() delete = new EventEmitter<DeleteValue>();
   @Output() navigateToState = new EventEmitter<string>();
-  isDefaultResponse: boolean;
 
   constructor(
     private stateEditorService: StateEditorService,
