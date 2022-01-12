@@ -121,6 +121,38 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
             .get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
+    def test_get_model_association_to_user(self):
+        self.assertEqual(
+            opportunity_models.ExplorationOpportunitySummaryModel
+            .get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+        )
+
+    def test_get_export_policy(self):
+        expected_export_policy_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'topic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'topic_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'story_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'story_title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'chapter_title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'content_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'incomplete_translation_language_codes':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'translation_counts': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'language_codes_with_assigned_voice_artists':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'language_codes_needing_voice_artists':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
+        self.assertEqual(
+            opportunity_models.ExplorationOpportunitySummaryModel
+            .get_export_policy(),
+            expected_export_policy_dict
+        )
+
     def test_get_all_translation_opportunities(self) -> None:
         results, cursor, more = (
             opportunity_models.ExplorationOpportunitySummaryModel
@@ -277,6 +309,27 @@ class SkillOpportunityModelTest(test_utils.GenericTestBase):
         self.assertEqual(
             opportunity_models.SkillOpportunityModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+    def test_get_model_association_to_user(self):
+        self.assertEqual(
+            opportunity_models.SkillOpportunityModel
+            .get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+        )
+
+    def test_get_export_policy(self):
+        expected_export_policy_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'skill_description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'question_count': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
+        self.assertEqual(
+            opportunity_models.SkillOpportunityModel
+            .get_export_policy(),
+            expected_export_policy_dict
+        )
 
     def test_get_skill_opportunities(self) -> None:
         results, cursor, more = (
