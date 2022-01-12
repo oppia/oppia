@@ -146,6 +146,52 @@ class EditableSkillDataHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    URL_PATH_ARGS_SCHEMAS = {
+        'skill_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'PUT': {
+            'params': {
+                'version': {
+                    'schema': {
+                        'type': 'int',
+                        'validators': [{
+                            'id': 'is_at_least',
+                            'min_value': 1
+                        }]
+                    }
+                },
+                'commit_message': {
+                    'schema': {
+                        'type': 'basestring'
+                    },
+                    'default_value': None
+                },
+                'change_dicts': {
+                    'schema': {
+                        'type': 'list',
+                        'items': {
+                            'type': 'object_dict',
+                            'object_class': (
+                                skill_domain.SkillChange)
+                        }
+                    }
+                }
+            }
+        },
+        'DELETE': {}
+    }
+
     @acl_decorators.open_access
     def get(self, skill_id):
         """Populates the data on the individual skill page."""
@@ -206,7 +252,7 @@ class EditableSkillDataHandler(base.BaseHandler):
         version = self.payload.get('version')
         _require_valid_version(version, skill.version)
 
-        commit_message = self.payload.get('commit_message')
+        commit_message = self.payload.get('commit_message', None)
 
         if (commit_message is not None and
                 len(commit_message) > constants.MAX_COMMIT_MESSAGE_LENGTH):
