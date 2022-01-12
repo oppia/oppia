@@ -109,6 +109,11 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
                 'title': 'Title',
                 'url_fragment': 'dummy-subtopic-url'}])
 
+    def test_get_subtopic_index_fail_with_invalid_subtopic_id(self) -> None:
+        with self.assertRaisesRegexp(  # type: ignore[no-untyped-call]
+            Exception, 'The subtopic with id -2 does not exist.'):
+            self.topic.get_subtopic_index(-2)
+
     def test_delete_canonical_story(self) -> None:
         self.topic.canonical_story_references = [
             topic_domain.StoryReference.create_default_story_reference(
@@ -1264,6 +1269,16 @@ class TopicSummaryTests(test_utils.GenericTestBase):
         self.topic_summary.thumbnail_bg_color = '#FFFFFF'
         self._assert_validation_error(
             'Topic thumbnail background color #FFFFFF is not supported.')
+
+    def test_thumbnail_filename_or_thumbnail_bg_color_is_none(self) -> None:
+        self.topic_summary.thumbnail_bg_color = '#C6DCDA'
+        self.topic_summary.thumbnail_filename = None  # type: ignore[assignment]
+        self._assert_validation_error(
+            'Topic thumbnail image is not provided.')
+        self.topic_summary.thumbnail_bg_color = None  # type: ignore[assignment]
+        self.topic_summary.thumbnail_filename = 'test.svg'
+        self._assert_validation_error(
+            'Topic thumbnail background color is not specified.')
 
     def test_validation_fails_with_empty_name(self) -> None:
         self.topic_summary.name = ''

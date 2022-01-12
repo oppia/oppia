@@ -1144,10 +1144,6 @@ class Topic:
                 raise utils.ValidationError(
                     'Expected thumbnail filename to be a string, received %s.'
                     % self.thumbnail_filename)
-        if not isinstance(self.description, str):
-            raise utils.ValidationError(
-                'Expected description to be a string, received %s'
-                % self.description)
 
         description_limit = (
             android_validation_constants.MAX_CHARS_IN_TOPIC_DESCRIPTION)
@@ -1603,9 +1599,6 @@ class Topic:
             Exception. A subtopic with the given id doesn't exist.
         """
         subtopic_index = self.get_subtopic_index(subtopic_id)
-        if subtopic_index is None:
-            raise Exception(
-                'A subtopic with id %s doesn\'t exist. ' % subtopic_id)
         for skill_id in self.subtopics[subtopic_index].skill_ids:
             self.uncategorized_skill_ids.append(skill_id)
         del self.subtopics[subtopic_index]
@@ -1623,9 +1616,6 @@ class Topic:
             Exception. The subtopic with the given id doesn't exist.
         """
         subtopic_index = self.get_subtopic_index(subtopic_id)
-        if subtopic_index is None:
-            raise Exception(
-                'The subtopic with id %s does not exist.' % subtopic_id)
         self.subtopics[subtopic_index].title = new_title
 
     def update_subtopic_thumbnail_filename(
@@ -1642,9 +1632,6 @@ class Topic:
             Exception. The subtopic with the given id doesn't exist.
         """
         subtopic_index = self.get_subtopic_index(subtopic_id)
-        if subtopic_index is None:
-            raise Exception(
-                'The subtopic with id %s does not exist.' % subtopic_id)
 
         file_system_class = fs_services.get_entity_file_system_class()  # type: ignore[no-untyped-call]
         fs = fs_domain.AbstractFileSystem(file_system_class(  # type: ignore[no-untyped-call]
@@ -1671,9 +1658,6 @@ class Topic:
             new_url_fragment: str. The new url fragment of the subtopic.
         """
         subtopic_index = self.get_subtopic_index(subtopic_id)
-        if subtopic_index is None:
-            raise Exception(
-                'The subtopic with id %s does not exist.' % subtopic_id)
         utils.require_valid_url_fragment(
             new_url_fragment, 'Subtopic Url Fragment',
             constants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT)
@@ -1693,9 +1677,6 @@ class Topic:
             Exception. The subtopic with the given id doesn't exist.
         """
         subtopic_index = self.get_subtopic_index(subtopic_id)
-        if subtopic_index is None:
-            raise Exception(
-                'The subtopic with id %s does not exist.' % subtopic_id)
         self.subtopics[subtopic_index].thumbnail_bg_color = (
             new_thumbnail_bg_color)
 
@@ -1801,9 +1782,6 @@ class Topic:
         """
         if old_subtopic_id is not None:
             old_subtopic_index = self.get_subtopic_index(old_subtopic_id)
-            if old_subtopic_index is None:
-                raise Exception(
-                    'The subtopic with id %s does not exist.' % old_subtopic_id)
             if skill_id not in self.subtopics[old_subtopic_index].skill_ids:
                 raise Exception(
                     'Skill id %s is not present in the given old subtopic'
@@ -1814,9 +1792,6 @@ class Topic:
                     'Skill id %s is not an uncategorized skill id.' % skill_id)
 
         new_subtopic_index = self.get_subtopic_index(new_subtopic_id)
-        if new_subtopic_index is None:
-            raise Exception(
-                'The subtopic with id %s does not exist.' % new_subtopic_id)
         if skill_id in self.subtopics[new_subtopic_index].skill_ids:
             raise Exception(
                 'Skill id %s is already present in the target subtopic'
@@ -1847,9 +1822,6 @@ class Topic:
         """
 
         subtopic_index = self.get_subtopic_index(subtopic_id)
-        if subtopic_index is None:
-            raise Exception(
-                'The subtopic with id %s does not exist.' % subtopic_id)
         if skill_id not in self.subtopics[subtopic_index].skill_ids:
             raise Exception(
                 'Skill id %s is not present in the old subtopic'
