@@ -610,6 +610,8 @@ def populate_exploration_model_fields(exploration_model, exploration):
     exploration_model.auto_tts_enabled = exploration.auto_tts_enabled
     exploration_model.correctness_feedback_enabled = (
         exploration.correctness_feedback_enabled)
+    exploration_model.android_proto_size_in_bytes = (
+        exploration.android_proto_size_in_bytes)
 
     return exploration_model
 
@@ -1205,7 +1207,7 @@ def regenerate_exploration_summary_with_new_contributor(
             the exploration summary.
     """
     exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-    exp_summary = compute_summary_of_exploration(exploration)
+    exp_summary = _compute_summary_of_exploration(exploration)
     exp_summary.add_contribution_by_user(contributor_id)
     save_exploration_summary(exp_summary)
 
@@ -1219,13 +1221,13 @@ def regenerate_exploration_and_contributors_summaries(exploration_id):
         exploration_id: str. ID of the exploration.
     """
     exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-    exp_summary = compute_summary_of_exploration(exploration)
+    exp_summary = _compute_summary_of_exploration(exploration)
     exp_summary.contributors_summary = (
         compute_exploration_contributors_summary(exp_summary.id))
     save_exploration_summary(exp_summary)
 
 
-def compute_summary_of_exploration(exploration):
+def _compute_summary_of_exploration(exploration):
     """Create an ExplorationSummary domain object for a given Exploration
     domain object and return it.
 
@@ -1321,14 +1323,14 @@ def populate_exploration_summary_model_fields(
     from exploration summary object.
 
     Args:
-        exp_summary_model: ExplorationSummaryModel. The
+        exp_summary_model: ExpSummaryModel. The
             model to populate.
         exp_summary: ExplorationSummary. The
             exploration summary domain object which should be used
             to populate the model.
 
     Returns:
-        ExplorationSummaryModel. Populated model.
+        ExpSummaryModel. Populated model.
     """
     exp_summary_dict = {
         'title': exp_summary.title,

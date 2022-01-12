@@ -2331,30 +2331,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exp_domain.Exploration.deserialize(
                 exploration.serialize()).to_dict())
 
-    def test_validation_of_android_proto_size_in_bytes(self):
-        """Test validating android_proto_size_in_bytes of explorations."""
-        exploration = self.save_new_valid_exploration(
-            'exp_id', 'user@example.com', title='', category='',
-            objective='', end_state_name='End')
-        exploration.validate()
-
-        exploration.android_proto_size_in_bytes = '1'
-        with self.assertRaisesRegexp(
-            Exception, 'Expected proto size to be an int, received 1'):
-            exploration.validate()
-
-        exploration.android_proto_size_in_bytes = -2
-        with self.assertRaisesRegexp(
-            Exception,
-            'Expected proto size to be a positive integer, received -2'):
-            exploration.validate()
-
-        exploration.android_proto_size_in_bytes = 0
-        with self.assertRaisesRegexp(
-            Exception,
-            'Expected proto size to be a positive integer, received '):
-            exploration.validate()
-
     def test_proto_size_calculation_is_correct(self):
         """Test proto size calculation function."""
         exploration = self.save_new_valid_exploration(

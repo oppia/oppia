@@ -81,10 +81,41 @@ class MigrateExplorationJob(base_jobs.JobBase):
         return result.Ok((exp_id, exploration))
 
     @staticmethod
+    def _migrate_exploration_summary(
+        exp_id: str, exp_summary_model: exp_models.ExpSummaryModel
+    ) -> result.Result[
+        Tuple[str, exp_domain.ExplorationSummary], Tuple[str, Exception]
+    ]:
+        """Migrates exploration summary and transforms exploration summary model
+        into exploration summary object.
+
+        Args:
+            exp_id: str. The id of the exploration.
+            exp_model: ExpSummaryModel. The exploration model to migrate.
+
+        Returns:
+            Result((str, ExplorationSummary), (str, Exception)). Result
+            containing tuple that consists of exploration ID and either
+            exploration object or Exception. Exploration object is
+            returned when the migration was successful and Exception
+            is returned otherwise.
+        """
+        try:
+            exploration_summary = (
+                exp_fetchers.get_exploration_summary_from_model(exp_model))
+            exploration_summary.validate()
+        except Exception as e:
+            logging.exception(e)
+            return result.Err((exp_id, e))
+
+        return result.Ok((exp_id, exploration_summary))
+
+    @staticmethod
     def _update_exploration(
         exp_model: exp_models.ExplorationModel,
         migrated_exploration: exp_domain.Exploration,
-        exploration_changes: Sequence[exp_domain.ExplorationChange]
+        exploration_changes: Sequence[exp_domain.ExplorationChange],
+        exploration_rights_model: exp_models.ExplorationRightsModel
     ) -> Sequence[base_models.BaseModel]:
         """Generates newly updated exploration models.
 
@@ -108,12 +139,13 @@ class MigrateExplorationJob(base_jobs.JobBase):
         ) % (exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION)
         change_dicts = [change.to_dict() for change in exploration_changes]
         with datastore_services.get_ndb_context():
+            additional_model = { 'rights_model': exploration_rights_model }
             models_to_put = updated_exploration_model.compute_models_to_commit(
                 feconf.MIGRATION_BOT_USERNAME,
                 feconf.COMMIT_TYPE_EDIT,
                 commit_message,
                 change_dicts,
-                additional_models={}
+                additional_models=additional_model
             ).values()
         datastore_services.update_timestamps_multi(list(models_to_put))
         return models_to_put
@@ -121,6 +153,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
     @staticmethod
     def _update_exploration_summary(
         migrated_exploration: exp_domain.Exploration,
+        exploration_summary: exp_domain.ExplorationSummary,
         exploration_summary_model: exp_models.ExpSummaryModel
     ) -> exp_models.ExpSummaryModel:
         """Generates newly updated exploration summary model.
@@ -135,17 +168,14 @@ class MigrateExplorationJob(base_jobs.JobBase):
             ExpSummaryModel. The updated exploration summary model to put into
             the datastore.
         """
-        with datastore_services.get_ndb_context():
-            exploration_summary = exp_services.compute_summary_of_exploration(
-                migrated_exploration)
-            exploration_summary.version += 1
+        exploration_summary.version += 1
         updated_exploration_summary_model = (
             exp_services.populate_exploration_summary_model_fields(
                 exploration_summary_model, exploration_summary
             )
         )
 
-        return updated_exploration_summary_model
+        return exploration_summary_model
 
     @staticmethod
     def _generate_exploration_changes(
@@ -231,6 +261,19 @@ class MigrateExplorationJob(base_jobs.JobBase):
             | 'Add exploration summary keys' >> beam.WithKeys( # pylint: disable=no-value-for-parameter
                 lambda exploration_summary_model: exploration_summary_model.id)
         )
+        exploration_rights_models = (
+            self.pipeline
+            | 'Get all non-deleted exploration rights models' >> (
+                ndb_io.GetModels(
+                    exp_models.ExplorationRightsModel.get_all(
+                        include_deleted=False)
+                    )
+                )
+            # Pylint disable is needed because pylint is not able to correctly
+            # detect that the value is passed through the pipe.
+            | 'Add exploration rights keys' >> beam.WithKeys( # pylint: disable=no-value-for-parameter
+                lambda exploration_rights_models: exploration_rights_models.id)
+        )
 
         migrated_exploration_results = (
             unmigrated_exploration_models
@@ -244,6 +287,20 @@ class MigrateExplorationJob(base_jobs.JobBase):
             | 'Unwrap ok' >> beam.Map(
                 lambda result_item: result_item.unwrap())
         )
+
+        migrated_exploration_summary_results = (
+            exploration_summary_models
+            | 'Transform and migrate exploration summary model' >> beam.MapTuple(
+                self._migrate_exploration_summary)
+        )
+        migrated_exploration_summaries = (
+            migrated_exploration_summary_results
+            | 'Filter ok' >> beam.Filter(
+                lambda result_item: result_item.is_ok())
+            | 'Unwrap oks' >> beam.Map(
+                lambda result_item: result_item.unwrap())
+        )
+
         migrated_exploration_job_run_results = (
             migrated_exploration_results
             | 'Generate results for migration' >> (
@@ -262,18 +319,22 @@ class MigrateExplorationJob(base_jobs.JobBase):
                 'exp_model': unmigrated_exploration_models,
                 'exploration_summary_model': exploration_summary_models,
                 'exploration': migrated_explorations,
-                'exploration_changes': exploration_changes
+                'exploration_summary': migrated_exploration_summaries,
+                'exploration_changes': exploration_changes,
+                'exploration_rights_model': exploration_rights_models
             }
             | 'Merge objects' >> beam.CoGroupByKey()
             | 'Get rid of ID' >> beam.Values()  # pylint: disable=no-value-for-parameter
             | 'Remove unmigrated exploration' >> beam.Filter(
-                lambda x: len(x['exploration_changes']) > 0 and len(x['exploration']) > 0) # pylint: disable=line-too-long
+                lambda x: len(x['exploration_changes']) > 0 and len(x['exploration']) > 0 and len(x['exploration_summary']) > 0) # pylint: disable=line-too-long
             | 'Reorganize the exploration objects' >> beam.Map(lambda objects: {
                     'exp_model': objects['exp_model'][0],
                     'exploration_summary_model': (
                         objects['exploration_summary_model'][0]),
                     'exploration': objects['exploration'][0],
-                    'exploration_changes': objects['exploration_changes']
+                    'exploration_summary': objects['exploration_summary'][0],
+                    'exploration_changes': objects['exploration_changes'],
+                    'exploration_rights_model': objects['exploration_rights_model'],
                 })
         )
 
@@ -301,6 +362,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
                     exp_objects['exp_model'],
                     exp_objects['exploration'],
                     exp_objects['exploration_changes'],
+                    exp_objects['exploration_rights_model'],
                 ))
         )
 
@@ -309,6 +371,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
             | 'Generate exploration summary models to put' >> beam.Map(
                 lambda exp_objects: self._update_exploration_summary(
                     exp_objects['exploration'],
+                    exp_objects['exploration_summary'],
                     exp_objects['exploration_summary_model']
                 ))
         )

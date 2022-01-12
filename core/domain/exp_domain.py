@@ -621,7 +621,6 @@ class Exploration:
         self.correctness_feedback_enabled = correctness_feedback_enabled
         self.android_proto_size_is_stale = True
         self._cached_android_proto_size_in_bytes = 0
-        self._android_proto_size_in_bytes = self.android_proto_size_in_bytes
 
     @classmethod
     def create_default_exploration(
@@ -780,9 +779,6 @@ class Exploration:
         exploration.version = exploration_version
         exploration.created_on = exploration_created_on
         exploration.last_updated = exploration_last_updated
-
-        exploration._android_proto_size_in_bytes = (
-            exploration_dict['android_proto_size_in_bytes'])
 
         return exploration
 
@@ -1330,12 +1326,19 @@ class Exploration:
         return self._cached_android_proto_size_in_bytes
 
     def __setattr__(self, attrname, new_value):
+        """Perform the android_proto_size_is_stale check every time
+        the Exploration class object updates."""
+
+        # If the value of _cached_android_proto_size_in_bytes or
+        # android_proto_size_is_stale gets updated, we don't want to
+        # recompute the exploration's proto size. These both attributes are
+        # the supporting attribute, not included in the proto size calculation.
         if attrname not in (
             '_cached_android_proto_size_in_bytes',
             'android_proto_size_is_stale'
         ):
             self.android_proto_size_is_stale = True
-        super(Exploration, self).__setattr__(attrname, new_value)
+        super().__setattr__(attrname, new_value)
 
     def has_state_name(self, state_name):
         """Whether the exploration has a state with the given state name.
@@ -2253,31 +2256,12 @@ class Exploration:
         return exploration_dict
 
     @classmethod
-    def _convert_v54_dict_to_v55_dict(cls, exploration_dict, exploration_id):
-        """Converts a v54 exploration dict into a v55 exploration dict.
-        Version 55 contains the exploration size.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v55.
-            exploration_id: str. The exploration id.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v55.
-        """
-        return cls._add_id_and_proto_size_in_bytes_to_dict(
-            exploration_dict, exploration_id
-        )
-
-    @classmethod
-    def _migrate_to_latest_yaml_version(cls, yaml_content, exploration_id):
+    def _migrate_to_latest_yaml_version(cls, yaml_content):
         """Return the YAML content of the exploration in the latest schema
         format.
 
         Args:
             yaml_content: str. The YAML representation of the exploration.
-            exploration_id: str. The exploration id.
 
         Returns:
             tuple(dict, int). The dict 'exploration_dict' is the representation
@@ -2347,11 +2331,6 @@ class Exploration:
                 exploration_dict)
             exploration_schema_version = 54
 
-        if exploration_schema_version == 54:
-            exploration_dict = cls._convert_v54_dict_to_v55_dict(
-                exploration_dict, exploration_id)
-            exploration_schema_version = 55
-
         return exploration_dict
 
     @classmethod
@@ -2371,57 +2350,9 @@ class Exploration:
                 outside the range [EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION,
                 CURRENT_EXP_SCHEMA_VERSION].
         """
-        exploration_dict = cls._migrate_to_latest_yaml_version(
-            yaml_content, exploration_id)
-        exploration_dict = cls._add_id_and_proto_size_in_bytes_to_dict(
-            exploration_dict, exploration_id)
-
-        return Exploration.from_dict(exploration_dict)
-
-    @classmethod
-    def _add_id_and_proto_size_in_bytes_to_dict(
-        cls, exploration_dict, exploration_id):
-        """Add id and _android_proto_size_in_bytes to the exploration dict.
-
-        Args:
-            exploration_dict: dict. The dict representation of Exploration
-                object.
-            exploration_id: str. The exploration id.
-
-        Returns:
-            exploration_dict: dict. The updated dict representation of
-            Exploration object.
-        """
+        exploration_dict = cls._migrate_to_latest_yaml_version(yaml_content)
         exploration_dict['id'] = exploration_id
-
-        # If the android_proto_size_in_bytes of the dict is wrong, it will be
-        # overwritten with the correct value calculated from the
-        # exploration object.
-        exploration = cls(
-            exploration_dict['id'],
-            exploration_dict['title'],
-            exploration_dict['category'],
-            exploration_dict['objective'],
-            exploration_dict['language_code'],
-            exploration_dict['tags'],
-            exploration_dict['blurb'],
-            exploration_dict['author_notes'],
-            exploration_dict['states_schema_version'],
-            exploration_dict['init_state_name'],
-            exploration_dict['states'],
-            exploration_dict['param_specs'],
-            exploration_dict['param_changes'],
-            exploration_dict['schema_version'],
-            exploration_dict['auto_tts_enabled'],
-            exploration_dict['correctness_feedback_enabled'])
-
-        # The constructor calculates the _android_proto_size_in_bytes
-        # and adds it to the domain object.
-        # So, we add that value directly to the dict.
-        exploration_dict['android_proto_size_in_bytes'] = (
-            exploration.android_proto_size_in_bytes)
-
-        return exploration_dict
+        return Exploration.from_dict(exploration_dict)
 
     def to_yaml(self):
         """Convert the exploration domain object into YAML string.
@@ -2432,10 +2363,9 @@ class Exploration:
         exp_dict = self.to_dict()
         exp_dict['schema_version'] = self.CURRENT_EXP_SCHEMA_VERSION
 
-        # The ID and the android_proto_size_in_bytes are the properties
+        # The ID is the properties
         # that should not be stored within the YAML representation.
         del exp_dict['id']
-        del exp_dict['android_proto_size_in_bytes']
 
         return python_utils.yaml_from_dict(exp_dict)
 
@@ -2461,7 +2391,6 @@ class Exploration:
             'tags': self.tags,
             'auto_tts_enabled': self.auto_tts_enabled,
             'correctness_feedback_enabled': self.correctness_feedback_enabled,
-            'android_proto_size_in_bytes': self.android_proto_size_in_bytes,
             'states': {state_name: state.to_dict()
                        for (state_name, state) in self.states.items()}
         })
