@@ -47,7 +47,7 @@
                 <a (click)="changeActiveHintIndex(index)"
                    class="oppia-rule-tab protractor-test-hint-tab"
                    ngClass="{'oppia-rule-tab-active': stateHintsService.getActiveHintIndex() === index}">
-                   <oppia-response-header class="oppia-response-header-center"
+                  <oppia-response-header class="oppia-response-header-center"
                                          [defaultOutcome]="false"
                                          [index]="index"
                                          [summary]="getHintSummary(hint)"
