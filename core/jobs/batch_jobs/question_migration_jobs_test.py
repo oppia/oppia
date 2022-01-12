@@ -55,98 +55,98 @@ class MigrateStoryJobTests(job_test_utils.JobTestBase):
         self.question_summary_model.update_timestamps()
         self.question_summary_model.put()
         self.latest_question_state_data = {
-                'content': {'content_id': 'content', 'html': 'test content'},
-                'param_changes': [],
-                'interaction': {
-                    'solution': {
-                        'explanation': {
-                            'content_id': 'solution_1', 'html': 'solution'
-                        },
-                        'answer_is_exclusive': True,
-                        'correct_answer': 'answer'
+            'content': {'content_id': 'content', 'html': 'test content'},
+            'param_changes': [],
+            'interaction': {
+                'solution': {
+                    'explanation': {
+                        'content_id': 'solution_1', 'html': 'solution'
                     },
-                    'answer_groups': [{
-                        'outcome': {
-                            'dest': None,
-                            'feedback': {
-                                'content_id': 'feedback_1',
-                                'html': '<p>Feedback</p>'
-                            },
-                            'labelled_as_correct': True,
-                            'param_changes': [],
-                            'refresher_exploration_id': None,
-                            'missing_prerequisite_skill_id': None
-                        },
-                        'rule_specs': [{
-                            'inputs': {
-                                'x': {
-                                    'contentId': 'rule_input_Equals',
-                                    'normalizedStrSet': ['Test']
-                                }
-                            },
-                            'rule_type': 'Contains'
-                        }],
-                        'training_data': [],
-                        'tagged_skill_misconception_id': None
-                    }],
-                    'default_outcome': {
-                        'param_changes': [],
-                        'feedback': {
-                            'content_id': 'default_outcome',
-                            'html': ''
-                        },
+                    'answer_is_exclusive': True,
+                    'correct_answer': 'answer'
+                },
+                'answer_groups': [{
+                    'outcome': {
                         'dest': None,
-                        'refresher_exploration_id': None,
-                        'missing_prerequisite_skill_id': None,
-                        'labelled_as_correct': True
-                    },
-                    'customization_args': {
-                        'rows': {
-                            'value': 1
+                        'feedback': {
+                            'content_id': 'feedback_1',
+                            'html': '<p>Feedback</p>'
                         },
-                        'placeholder': {
-                            'value': {
-                                'unicode_str': '',
-                                'content_id': 'ca_placeholder_0'
-                            }
-                        }
+                        'labelled_as_correct': True,
+                        'param_changes': [],
+                        'refresher_exploration_id': None,
+                        'missing_prerequisite_skill_id': None
                     },
-                    'confirmed_unclassified_answers': [],
-                    'id': 'TextInput',
-                    'hints': [{
-                        'hint_content': {
-                            'content_id': 'hint_1', 'html': '<p>Hint 1</p>'
+                    'rule_specs': [{
+                        'inputs': {
+                            'x': {
+                                'contentId': 'rule_input_Equals',
+                                'normalizedStrSet': ['Test']
+                            }
+                        },
+                        'rule_type': 'Contains'
+                    }],
+                    'training_data': [],
+                    'tagged_skill_misconception_id': None
+                }],
+                'default_outcome': {
+                    'param_changes': [],
+                    'feedback': {
+                        'content_id': 'default_outcome',
+                        'html': ''
+                    },
+                    'dest': None,
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None,
+                    'labelled_as_correct': True
+                },
+                'customization_args': {
+                    'rows': {
+                        'value': 1
+                    },
+                    'placeholder': {
+                        'value': {
+                            'unicode_str': '',
+                            'content_id': 'ca_placeholder_0'
                         }
-                    }]
-                },
-                'linked_skill_id': None,
-                'recorded_voiceovers': {
-                    'voiceovers_mapping': {
-                        'content': {},
-                        'default_outcome': {},
-                        'feedback_1': {},
-                        'rule_input_Equals': {},
-                        'hint_1': {},
-                        'solution_1': {},
-                        'ca_placeholder_0': {}
                     }
                 },
-                'classifier_model_id': None,
-                'written_translations': {
-                    'translations_mapping': {
-                        'content': {},
-                        'default_outcome': {},
-                        'feedback_1': {},
-                        'rule_input_Equals': {},
-                        'hint_1': {},
-                        'solution_1': {},
-                        'ca_placeholder_0': {}
+                'confirmed_unclassified_answers': [],
+                'id': 'TextInput',
+                'hints': [{
+                    'hint_content': {
+                        'content_id': 'hint_1', 'html': '<p>Hint 1</p>'
                     }
-                },
-                'next_content_id_index': 1,
-                'card_is_checkpoint': False,
-                'solicit_answer_details': False
-            }
+                }]
+            },
+            'linked_skill_id': None,
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {
+                    'content': {},
+                    'default_outcome': {},
+                    'feedback_1': {},
+                    'rule_input_Equals': {},
+                    'hint_1': {},
+                    'solution_1': {},
+                    'ca_placeholder_0': {}
+                }
+            },
+            'classifier_model_id': None,
+            'written_translations': {
+                'translations_mapping': {
+                    'content': {},
+                    'default_outcome': {},
+                    'feedback_1': {},
+                    'rule_input_Equals': {},
+                    'hint_1': {},
+                    'solution_1': {},
+                    'ca_placeholder_0': {}
+                }
+            },
+            'next_content_id_index': 1,
+            'card_is_checkpoint': False,
+            'solicit_answer_details': False
+        }
         self.broken_question_state_data = copy.deepcopy(
             self.latest_question_state_data)
         self.broken_question_state_data['linked_skill_id'] = ['id1', 'id1']
