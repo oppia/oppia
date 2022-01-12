@@ -450,6 +450,16 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             utils.ValidationError, expected_error_substring):
             topic_domain.Topic.require_valid_topic_id(topic_id)
 
+    def _assert_valid_name_for_topic(
+        self,
+        expected_error_substring: str,
+        name: str
+    ) -> None:
+        """Checks that topic passes validation for name."""
+        with self.assertRaisesRegexp(  # type: ignore[no-untyped-call]
+            utils.ValidationError, expected_error_substring):
+            topic_domain.Topic.require_valid_name(name)
+
     def _assert_valid_thumbnail_filename_for_topic(
         self,
         expected_error_substring: str,
@@ -474,6 +484,16 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
     def test_valid_topic_id(self) -> None:
         self._assert_valid_topic_id('Topic id abc is invalid', 'abc')
+
+    def test_valid_name_topic(self) -> None:
+        self._assert_valid_name_for_topic(
+            'Name should be a string.', 123) # type: ignore[arg-type]
+        self._assert_valid_name_for_topic(
+            'Name field should not be empty', '')
+        self._assert_valid_name_for_topic(
+            'Topic name should be at most 39 characters, received '
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
 
     def test_thumbnail_filename_validation_for_topic(self) -> None:
         self._assert_valid_thumbnail_filename_for_topic(
