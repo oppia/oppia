@@ -84,7 +84,6 @@ scripts.linters.js_ts_linter_test
 core.storage.improvements.gae_models_test
 core.storage.story.gae_models_test
 core.storage.classifier.gae_models_test
-core.storage.blog.gae_models_test
 main_test
 core.storage.recommendations.gae_models_test
 core.storage.feedback.gae_models_test
