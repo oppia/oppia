@@ -621,7 +621,7 @@ class Exploration:
         self.correctness_feedback_enabled = correctness_feedback_enabled
         self.android_proto_size_is_stale = True
         self._cached_android_proto_size_in_bytes = 0
-        self.android_proto_size_in_bytes = self.proto_size_in_bytes
+        self._android_proto_size_in_bytes = self.android_proto_size_in_bytes
 
     @classmethod
     def create_default_exploration(
@@ -781,7 +781,7 @@ class Exploration:
         exploration.created_on = exploration_created_on
         exploration.last_updated = exploration_last_updated
 
-        exploration.android_proto_size_in_bytes = (
+        exploration._android_proto_size_in_bytes = (
             exploration_dict['android_proto_size_in_bytes'])
 
         return exploration
@@ -1317,7 +1317,7 @@ class Exploration:
         return self.is_demo_exploration_id(self.id)
 
     @property
-    def proto_size_in_bytes(self):
+    def android_proto_size_in_bytes(self):
         """Whether the exploration proto size is up to date.
 
         Returns:
@@ -1330,8 +1330,10 @@ class Exploration:
         return self._cached_android_proto_size_in_bytes
 
     def __setattr__(self, attrname, new_value):
-        if (attrname != '_cached_android_proto_size_in_bytes' and
-            attrname != 'android_proto_size_is_stale'):
+        if attrname not in (
+            '_cached_android_proto_size_in_bytes',
+            'android_proto_size_is_stale'
+        ):
             self.android_proto_size_is_stale = True
         super(Exploration, self).__setattr__(attrname, new_value)
 
@@ -2379,7 +2381,7 @@ class Exploration:
     @classmethod
     def _add_id_and_proto_size_in_bytes_to_dict(
         cls, exploration_dict, exploration_id):
-        """Add id and android_proto_size_in_bytes to the exploration dict.
+        """Add id and _android_proto_size_in_bytes to the exploration dict.
 
         Args:
             exploration_dict: dict. The dict representation of Exploration
@@ -2413,7 +2415,7 @@ class Exploration:
             exploration_dict['auto_tts_enabled'],
             exploration_dict['correctness_feedback_enabled'])
 
-        # The constructor calculates the android_proto_size_in_bytes
+        # The constructor calculates the _android_proto_size_in_bytes
         # and adds it to the domain object.
         # So, we add that value directly to the dict.
         exploration_dict['android_proto_size_in_bytes'] = (
