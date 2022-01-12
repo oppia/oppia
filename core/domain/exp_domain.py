@@ -619,7 +619,7 @@ class Exploration:
         self.last_updated = last_updated
         self.auto_tts_enabled = auto_tts_enabled
         self.correctness_feedback_enabled = correctness_feedback_enabled
-        self.android_proto_size_is_stale = True
+        self._cached_android_proto_size_is_stale = True
         self._cached_android_proto_size_in_bytes = 0
 
     @classmethod
@@ -1314,31 +1314,38 @@ class Exploration:
 
     @property
     def android_proto_size_in_bytes(self):
-        """Whether the exploration proto size is up to date.
+        """Compute the exploration proto size if any attribute
+        has any data change.
 
         Returns:
             int. Updated exploration's proto size.
         """
-        if self.android_proto_size_is_stale:
+        if self._cached_android_proto_size_is_stale:
             self._cached_android_proto_size_in_bytes = self.get_proto_size()
-            self.android_proto_size_is_stale = False
+            self._cached_android_proto_size_is_stale = False
 
         return self._cached_android_proto_size_in_bytes
 
     def __setattr__(self, attrname, new_value):
-        """Perform the android_proto_size_is_stale check every time
+        """Perform the _cached_android_proto_size_is_stale check every time
         the Exploration class object updates.
+
+        Args:
+            attrname: str. The name of the Exploration class attribute.
+            new_value: *. The value of the attribute on which
+                function is called.
         """
 
         # If the value of _cached_android_proto_size_in_bytes or
-        # android_proto_size_is_stale gets updated, we don't want to
-        # recompute the exploration's proto size. These both attributes are
-        # the supporting attribute, not included in the proto size calculation.
+        # _cached_android_proto_size_is_stale gets updated, we don't want to
+        # recompute the exploration's proto size. These attributes are
+        # both supporting attribute which aren't included in the
+        # proto size calculation.
         if attrname not in (
             '_cached_android_proto_size_in_bytes',
-            'android_proto_size_is_stale'
+            '_cached_android_proto_size_is_stale'
         ):
-            self.android_proto_size_is_stale = True
+            self._cached_android_proto_size_is_stale = True
         super().__setattr__(attrname, new_value)
 
     def has_state_name(self, state_name):
