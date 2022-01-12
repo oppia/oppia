@@ -28,19 +28,19 @@ import { Subtopic } from 'domain/topic/subtopic.model';
 
 export class ChangeSubtopicAssignmentModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-    subtopics: Subtopic[];
-    selectedSubtopicId: number;
-    constructor(
-      private ngbActiveModal: NgbActiveModal,
-    ) {
-      super(ngbActiveModal);
-    }
+  subtopics: Subtopic[];
+  selectedSubtopicId: number;
+  constructor(
+    private ngbActiveModal: NgbActiveModal,
+  ) {
+    super(ngbActiveModal);
+  }
 
-    ngOnInit(): void {
-      this.selectedSubtopicId = null;
-    }
+  ngOnInit(): void {
+    this.selectedSubtopicId = null;
+  }
 
-    changeSelectedSubtopic(subtopicId: number): void {
-      this.selectedSubtopicId = subtopicId;
-    }
+  changeSelectedSubtopic(subtopicId: number): void {
+    this.selectedSubtopicId = subtopicId;
+  }
 }
