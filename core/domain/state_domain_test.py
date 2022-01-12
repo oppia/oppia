@@ -5680,7 +5680,7 @@ class OutcomeDomainTests(test_utils.GenericTestBase):
         outcome_proto = state_domain.Outcome(
             'Second',
             subtitled_html_feedback, True, [], None, None
-        ).to_android_content_proto()
+        ).to_android_outcome_proto()
         self.assertEqual(outcome_proto.destination_state, 'Second')
         self.assertEqual(outcome_proto.feedback.content_id, 'content_id')
         self.assertEqual(outcome_proto.feedback.text, '<p>html</p>')
