@@ -3680,7 +3680,7 @@ class FunctionWrapper:
         # and binds them to the call signature of the method. Serves as a
         # replacement for inspect.getcallargs() in python versions >= 3.5.
         sig = inspect.signature(self._func)
-        args_dict = sig.bind_partial(*args, **kwargs)
+        args_dict = sig.bind_partial(*args, **kwargs).arguments
 
         self.pre_call_hook(args_dict)
 
