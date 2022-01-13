@@ -34,6 +34,7 @@ import { StoriesListComponent } from
 import { SubtopicsListComponent } from
   'pages/topic-viewer-page/subtopics-list/subtopics-list.component';
 import { SubtopicPreviewTab } from './subtopic-editor/subtopic-preview-tab.component';
+import { ChangeSubtopicAssignmentModalComponent } from './modal-templates/change-subtopic-assignment-modal.component';
 import { TopicPreviewTabComponent } from './preview-tab/topic-preview-tab.component';
 import { TopicEditorNavbarBreadcrumbComponent } from './navbar/topic-editor-navbar-breadcrumb.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -53,6 +54,7 @@ import { TopicEditorSaveModalComponent } from './modal-templates/topic-editor-sa
     ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
+    ChangeSubtopicAssignmentModalComponent,
     StoriesListComponent,
     SubtopicsListComponent,
     SubtopicPreviewTab,
@@ -64,6 +66,7 @@ import { TopicEditorSaveModalComponent } from './modal-templates/topic-editor-sa
     TopicEditorSaveModalComponent
   ],
   entryComponents: [
+    ChangeSubtopicAssignmentModalComponent,
     StoriesListComponent,
     SubtopicsListComponent,
     SubtopicPreviewTab,
