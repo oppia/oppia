@@ -94,8 +94,9 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             'exploration.exp1.thread_5', None)
 
     def test_get_model_association_to_user(self) -> None:
+        gen_model = suggestion_models.GeneralSuggestionModel
         self.assertEqual(
-            suggestion_models.GeneralSuggestionModel.get_model_association_to_user(),
+            gen_model.get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
         )
 
@@ -123,31 +124,34 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         )
 
     def test_get_in_review_translation_suggestions(self):
+        gen = suggestion_models.GeneralSuggestionModel
         self.assertEqual(
-            suggestion_models.GeneralSuggestionModel.get_in_review_translation_suggestions('author-1', ['en', 'de']),
+            gen.get_in_review_translation_suggestions('author-1', ['en', 'de']),
             []
         )
 
     def test_get_in_review_question_suggestions(self):
+        gen_model = suggestion_models.GeneralSuggestionModel
         self.assertEqual(
-            suggestion_models.GeneralSuggestionModel.get_in_review_question_suggestions(
+            gen_model.get_in_review_question_suggestions(
                 'author_1'
             ),
             []
         )
 
     def test_get_user_created_suggestions_of_suggestion_type(self) -> None:
-            result = suggestion_models.GeneralSuggestionModel.get_user_created_suggestions_of_suggestion_type(
-                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT, 'author_1'
-            )
-            self.assertEqual(result[0].status, 'review')
-            self.assertEqual(result[0].author_id, 'author_1')
-            self.assertEqual(result[0].final_reviewer_id, 'reviewer_1')
-            self.assertEqual(result[0].status, 'review')
-            self.assertEqual(
-                result[0].suggestion_type,
-                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT
-            )
+        gen_model = suggestion_models.GeneralSuggestionModel
+        result = gen_model.get_user_created_suggestions_of_suggestion_type(
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT, 'author_1'
+        )
+        self.assertEqual(result[0].status, 'review')
+        self.assertEqual(result[0].author_id, 'author_1')
+        self.assertEqual(result[0].final_reviewer_id, 'reviewer_1')
+        self.assertEqual(result[0].status, 'review')
+        self.assertEqual(
+            result[0].suggestion_type,
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT
+        )
 
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
@@ -1227,8 +1231,9 @@ class GeneralVoiceoverApplicationModelUnitTests(test_utils.GenericTestBase):
     """Tests for the GeneralVoiceoverApplicationModel class."""
 
     def test_get_model_association_to_user(self):
+        gen_voice_model = suggestion_models.GeneralVoiceoverApplicationModel
         self.assertEqual(
-            suggestion_models.GeneralVoiceoverApplicationModel.get_model_association_to_user(),
+            gen_voice_model.get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
         )
 
@@ -1247,14 +1252,16 @@ class GeneralVoiceoverApplicationModelUnitTests(test_utils.GenericTestBase):
             'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
         }
+        gen_voice_model = suggestion_models.GeneralVoiceoverApplicationModel
         self.assertEqual(
             dictionary,
-            suggestion_models.GeneralVoiceoverApplicationModel.get_export_policy()
-        )                
+            gen_voice_model.get_export_policy()
+        )
 
     def test_get_deletion_policy(self) -> None:
+        gen_voice_model = suggestion_models.GeneralVoiceoverApplicationModel
         self.assertEqual(
-            suggestion_models.GeneralVoiceoverApplicationModel.get_deletion_policy(),
+            gen_voice_model.get_deletion_policy(),
             base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
 
     def test_has_reference_to_user_id_author(self) -> None:
@@ -1560,8 +1567,9 @@ class CommunityContributionStatsModelUnitTests(test_utils.GenericTestBase):
         )
 
     def test_get_model_association_to_user(self):
+        gen_comm = suggestion_models.CommunityContributionStatsModel
         self.assertEqual(
-            suggestion_models.CommunityContributionStatsModel.get_model_association_to_user(),
+            gen_comm.get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
         )
 
@@ -1579,8 +1587,9 @@ class CommunityContributionStatsModelUnitTests(test_utils.GenericTestBase):
             'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
         }
+        community = suggestion_models.CommunityContributionStatsModel
         self.assertEqual(
-            suggestion_models.CommunityContributionStatsModel.get_export_policy(),
+            community.get_export_policy(),
             dictionary
         )
 
@@ -1816,15 +1825,19 @@ class TranslationContributionStatsModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(expected_data, user_data)
 
     def test_get_model_association_to_user(self):
+        translation_model = suggestion_models.TranslationContributionStatsModel
         self.assertEqual(
             base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER,
-            suggestion_models.TranslationContributionStatsModel.get_model_association_to_user()
+            translation_model.get_model_association_to_user()
         )
 
     def test_get_all_by_user_id(self):
+        translation_model = suggestion_models.TranslationContributionStatsModel
         self.assertEqual(
-            [],
-            suggestion_models.TranslationContributionStatsModel.get_all_by_user_id('author_1')
+            translation_model.get_all_by_user_id(
+                'author_1'
+            ),
+            []
         )
 
     def test_get_export_policy(self):
@@ -1855,7 +1868,8 @@ class TranslationContributionStatsModelUnitTests(test_utils.GenericTestBase):
                 'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
         }
+        translation_model = suggestion_models.TranslationContributionStatsModel
         self.assertEqual(
             dictionary,
-            suggestion_models.TranslationContributionStatsModel.get_export_policy()
+            translation_model.get_export_policy()
         )
