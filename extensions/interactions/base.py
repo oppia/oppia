@@ -271,7 +271,7 @@ class BaseInteraction:
             hints: list(Hint). List of hints.
 
         Returns:
-            list(HintDto) The list of HintDto proto object.
+            list(HintDto). The list of HintDto proto object.
         """
         hints_proto = []
         if hints is not None:

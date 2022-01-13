@@ -117,7 +117,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
         exp_model: exp_models.ExplorationModel,
         migrated_exploration: exp_domain.Exploration,
         exploration_changes: Sequence[exp_domain.ExplorationChange],
-        exploration_rights_model: exp_models.ExplorationRightsModel
+        exp_rights_model: exp_models.ExplorationRightsModel
     ) -> Sequence[base_models.BaseModel]:
         """Generates newly updated exploration models.
 
@@ -128,7 +128,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
                 domain object.
             exploration_changes: sequence(ExplorationChange). The
                 exploration changes to apply.
-            exploration_rights_model: ExplorationRightsModel. The
+            exp_rights_model: ExplorationRightsModel. The
                 additional model.
 
         Returns:
@@ -350,7 +350,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
             | 'Get rid of ID' >> beam.Values()  # pylint: disable=no-value-for-parameter
             | 'Remove unmigrated exploration' >> beam.Filter(
                 lambda x: len(x['exploration_summary']) > 0)
-            | 'Reorganize the exploration summary objects' >> beam.Map(lambda objects: {
+            | 'Reorganize the exploration summary objects' >> beam.Map(lambda objects: { # pylint: disable=line-too-long
                     'exp_model': objects['exp_model'][0],
                     'exploration_summary_model': (
                         objects['exploration_summary_model'][0])
