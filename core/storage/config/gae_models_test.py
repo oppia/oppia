@@ -72,6 +72,25 @@ class ConfigPropertyModelUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(retrieved_model2.value, 'd')
 
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            config_models.ConfigPropertyModel.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+        )
+
+    def test_get_export_policy(self) -> None:
+        expected_export_policy_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'value': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
+        self.assertEqual(
+            config_models.ConfigPropertyModel.get_export_policy(),
+            expected_export_policy_dict
+        )
+
 
 class PlatformParameterSnapshotContentModelTests(test_utils.GenericTestBase):
 
@@ -194,3 +213,23 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
         assert retrieved_model is not None
 
         self.assertEqual(retrieved_model.rules, new_rules)
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            config_models.PlatformParameterModel.get_model_association_to_user(), # pylint: disable=line-too-long
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+        )
+
+    def test_get_export_policy(self) -> None:
+        expected_export_policy_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'rules': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'rule_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
+        self.assertEqual(
+            config_models.PlatformParameterModel.get_export_policy(),
+            expected_export_policy_dict
+        )
