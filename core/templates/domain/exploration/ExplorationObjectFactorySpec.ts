@@ -34,11 +34,13 @@ import { SubtitledHtmlBackendDict } from
 
 describe('Exploration object factory', () => {
   let eof: ExplorationObjectFactory;
-  let sof: StateObjectFactory, exploration: Exploration;
+  let sof: StateObjectFactory;
+  let exploration: Exploration;
   let iof: InteractionObjectFactory;
   let ls: LoggerService;
   let loggerErrorSpy: jasmine.Spy<(msg: string) => void>;
-  let firstState: StateBackendDict, secondState: StateBackendDict;
+  let firstState: StateBackendDict;
+  let secondState: StateBackendDict;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
