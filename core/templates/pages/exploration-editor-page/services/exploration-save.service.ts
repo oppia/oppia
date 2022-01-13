@@ -336,7 +336,10 @@ angular.module('oppia').factory('ExplorationSaveService', [
         return whenModalsClosed.promise;
       },
 
-      saveChanges: function(onStartLoadingCallback, onEndLoadingCallback) {
+      saveChangesAsync: async function(
+          onStartLoadingCallback,
+          onEndLoadingCallback
+      ) {
         // This is marked as resolved after modal is closed, so we can change
         // controller 'saveIsInProgress' back to false.
         var whenModalClosed = $q.defer();
@@ -348,7 +351,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
           // If the exploration is not private, warnings should be fixed before
           // it can be saved.
           AlertsService.addWarning(ExplorationWarningsService.getWarnings()[0]);
-          return;
+          return Promise.reject();
         }
 
         ExplorationDataService.getLastSavedDataAsync().then(function(data) {
