@@ -432,21 +432,70 @@ fdescribe('Collection player page component', () => {
       .and.resolveTo(sampleCollection);
     spyOn(userService, 'getUserInfoAsync')
       .and.returnValue(Promise.resolve(userInfoForCollectionCreator));
-    spyOn(component, 'closeOnClickingOutside').and.callThrough();
     spyOn(component, 'scrollToLocation').and.callThrough();
+    spyOn(component, 'closeOnClickingOutside').and.callThrough();
+    spyOn(component, 'updateExplorationPreview').and.callThrough();
 
     fixture.detectChanges();
+    component.ngOnInit();
     tick();
-
-    component.updateExplorationPreview('exp_id');
     fixture.detectChanges();
-    tick();
 
-    let element = fixture.nativeElement.querySelector(
+    // Opening the preview card.
+    let icons = fixture.nativeElement.querySelectorAll(
+      '.protractor-mobile-test-collection-exploration');
+    let icon = icons[0];
+    icon.dispatchEvent(new Event('click'));
+
+    expect(component.scrollToLocation).toHaveBeenCalledWith(
+      'mobile-path-anchor-0');
+    expect(component.updateExplorationPreview).toHaveBeenCalledWith('exp_id');
+    expect(component.explorationCardIsShown).toBeTrue();
+
+    fixture.detectChanges();
+
+    // Clicking outside the preview card.
+    let mask = fixture.nativeElement.querySelector(
       '.oppia-activity-summary-tile-mobile-background-mask');
-    element.dispatchEvent(new Event('click'));
+    mask.dispatchEvent(new Event('click'));
 
     expect(component.closeOnClickingOutside).toHaveBeenCalled();
     expect(component.scrollToLocation).toHaveBeenCalled();
+    expect(component.explorationCardIsShown).toBeFalse();
+  }));
+
+  it('should close the exploration card and scroll into the' +
+      'exploration icon location on clicking outside of the exploration card',
+  fakeAsync(() => {
+    spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
+      .and.resolveTo(sampleCollection);
+    spyOn(userService, 'getUserInfoAsync')
+      .and.returnValue(Promise.resolve(userInfoForCollectionCreator));
+    spyOn(component, 'scrollToLocation').and.callThrough();
+    spyOn(component, 'updateExplorationPreview').and.callThrough();
+
+    fixture.detectChanges();
+    component.ngOnInit();
+    tick();
+    fixture.detectChanges();
+
+    // Opening the preview card.
+    let icons = fixture.nativeElement.querySelectorAll(
+      '.protractor-mobile-test-collection-exploration');
+    let icon = icons[0];
+    icon.dispatchEvent(new Event('click'));
+
+    expect(component.scrollToLocation).toHaveBeenCalledWith(
+      'mobile-path-anchor-0');
+    expect(component.updateExplorationPreview).toHaveBeenCalledWith('exp_id');
+    expect(component.explorationCardIsShown).toBeTrue();
+
+    fixture.detectChanges();
+
+    // Touching outside the preview card.
+    document.dispatchEvent(new Event('touchstart'));
+
+    expect(component.scrollToLocation).toHaveBeenCalled();
+    expect(component.explorationCardIsShown).toBeFalse();
   }));
 });
