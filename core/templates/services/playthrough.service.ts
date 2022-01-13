@@ -45,7 +45,7 @@ class CyclicStateTransitionsTracker {
 
   constructor(initStateName: string) {
     this.pathOfVisitedStates = [initStateName];
-    this.cycleOfVisitedStates = [] ;
+    this.cycleOfVisitedStates = [];
     this.numLoops = 0;
   }
 
@@ -114,7 +114,7 @@ class CyclicStateTransitionsTracker {
 }
 
 class EarlyQuitTracker {
-  private stateName: string = " ";
+  private stateName: string = ' ';
   private expDurationInSecs: number | null = null;
 
   foundAnIssue(): boolean {
@@ -129,9 +129,10 @@ class EarlyQuitTracker {
   }
 
   generateIssueCustomizationArgs(): EarlyQuitCustomizationArgs {
+    (this.expDurationInSecs !== null)
     return {
       state_name!: {value: this.stateName},
-      time_spent_in_exp_in_msecs: {value: this.expDurationInSecs! * 1000},
+      time_spent_in_exp_in_msecs: {value: this.expDurationInSecs * 1000},
     };
   }
 }
@@ -171,7 +172,7 @@ class MultipleIncorrectAnswersTracker {
   providedIn: 'root'
 })
 export class PlaythroughService {
-  private explorationId: string = " ";
+  private explorationId: string = ' ';
   private explorationVersion: number | null = null;
   private learnerIsInSamplePopulation: boolean | null = null;
 
@@ -192,7 +193,7 @@ export class PlaythroughService {
       explorationId: string, explorationVersion: number | null,
       sampleSizePopulationProportion: number): void {
     this.explorationId = explorationId;
-    this.explorationVersion= explorationVersion;
+    this.explorationVersion = explorationVersion;
     this.learnerIsInSamplePopulation = (
       Math.random() < sampleSizePopulationProportion);
   }
@@ -223,8 +224,9 @@ export class PlaythroughService {
     if (!this.hasRecordingBegun() || this.hasRecordingFinished()) {
       return;
     }
-
-    this.recordedLearnerActions!.push(
+        
+    (this.recordedLearnerActions !== null)
+    this.recordedLearnerActions.push(
       this.learnerActionObjectFactory.createNewAnswerSubmitAction({
         state_name: {value: stateName},
         dest_state_name: {value: destStateName},
@@ -233,9 +235,10 @@ export class PlaythroughService {
         feedback: {value: feedback},
         time_spent_state_in_msecs: {value: 1000 * timeSpentInStateSecs}
       }));
-
-    this.misTracker!.recordStateTransition(destStateName);
-    this.cstTracker!.recordStateTransition(destStateName);
+        
+    (this.misTracker !== null && this.cstTracker !== null)  
+    this.misTracker.recordStateTransition(destStateName);
+    this.cstTracker.recordStateTransition(destStateName);
   }
 
   recordExplorationQuitAction(
@@ -243,15 +246,16 @@ export class PlaythroughService {
     if (!this.hasRecordingBegun() || this.hasRecordingFinished()) {
       return;
     }
-
-    this.recordedLearnerActions!.push(
+        
+    (this.recordedLearnerActions !== null)
+    this.recordedLearnerActions.push(
       this.learnerActionObjectFactory.createNewExplorationQuitAction({
         state_name: {value: stateName},
         time_spent_in_state_in_msecs: {value: 1000 * timeSpentInStateSecs}
       }));
-
-    this.playthroughDurationInSecs = this.playthroughStopwatch!.getTimeInSecs();
-    this.eqTracker!.recordExplorationQuit(
+    (this.playthroughStopwatch !== null && this.eqTracker !== null)
+    this.playthroughDurationInSecs = this.playthroughStopwatch.getTimeInSecs();
+    this.eqTracker.recordExplorationQuit(
       stateName, this.playthroughDurationInSecs);
   }
 
@@ -274,24 +278,25 @@ export class PlaythroughService {
    * If none of the issue types have been discovered, returns null instead.
    */
   private createNewPlaythrough(): Playthrough | null {
+    (this.explorationVersion !== null && this.recordedLearnerActions !== null)
     if (this.misTracker && this.misTracker.foundAnIssue()) {
       return this.playthroughObjectFactory
         .createNewMultipleIncorrectSubmissionsPlaythrough(
-          this.explorationId, this.explorationVersion!,
+          this.explorationId, this.explorationVersion,
           this.misTracker.generateIssueCustomizationArgs(),
-          this.recordedLearnerActions!);
+          this.recordedLearnerActions);
     } else if (this.cstTracker && this.cstTracker.foundAnIssue()) {
       return this.playthroughObjectFactory
         .createNewCyclicStateTransitionsPlaythrough(
-          this.explorationId, this.explorationVersion!,
+          this.explorationId, this.explorationVersion,
           this.cstTracker.generateIssueCustomizationArgs(),
-          this.recordedLearnerActions!);
+          this.recordedLearnerActions);
     } else if (this.eqTracker && this.eqTracker.foundAnIssue()) {
       return this.playthroughObjectFactory
         .createNewEarlyQuitPlaythrough(
-          this.explorationId, this.explorationVersion!,
+          this.explorationId, this.explorationVersion,
           this.eqTracker.generateIssueCustomizationArgs(),
-          this.recordedLearnerActions!);
+          this.recordedLearnerActions);
     }
     return null;
   }
@@ -309,22 +314,24 @@ export class PlaythroughService {
   }
 
   private hasRecordingFinished(): boolean {
+    (this.recordedLearnerActions !== null)
     return (
       this.hasRecordingBegun() &&
-      this.recordedLearnerActions!.length > 1 &&
-      this.recordedLearnerActions![this.recordedLearnerActions!.length - 1]
+      this.recordedLearnerActions.length > 1 &&
+      this.recordedLearnerActions[this.recordedLearnerActions.length - 1]
         .actionType === AppConstants.ACTION_TYPE_EXPLORATION_QUIT);
   }
 
   private isRecordedPlaythroughHelpful(): boolean {
+    (this.recordedLearnerActions !== null && this.playthroughDurationInSecs !== null)
     return (
       // Playthroughs are only helpful in their entirety.
       this.hasRecordingFinished() &&
       // Playthroughs are only helpful if learners have attempted an answer.
-      this.recordedLearnerActions!.some(
+      this.recordedLearnerActions.some(
         a => a.actionType === AppConstants.ACTION_TYPE_ANSWER_SUBMIT) &&
       // Playthroughs are only helpful if learners have invested enough time.
-      this.playthroughDurationInSecs! >=
+      this.playthroughDurationInSecs >=
           ServicesConstants.MIN_PLAYTHROUGH_DURATION_IN_SECS);
   }
 }
