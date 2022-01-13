@@ -136,29 +136,29 @@ export class StateHintsEditorComponent implements OnInit {
     this.alertsService.clearWarnings();
     this.externalSaveService.onExternalSave.emit();
 
-    const addHintSuccess = (result: AddHintModalResponse): void => {
+    this.ngbModal.open(AddHintModalComponent, {
+      backdrop: 'static',
+      windowClass: 'add-hint-modal'
+    }).result.then((result: AddHintModalResponse): void => {
       this.stateHintsService.displayed.push(result.hint);
       this.stateHintsService.saveDisplayedValue();
       this.onSaveHints.emit(this.stateHintsService.displayed);
       this.stateNextContentIdIndexService.saveDisplayedValue();
       this.onSaveNextContentIdIndex.emit(
         this.stateNextContentIdIndexService.displayed);
-    };
-
-    this.ngbModal.open(AddHintModalComponent, {
-      backdrop: 'static',
-      windowClass: 'add-hint-modal'
-    }).result.then(function(result) {
-      addHintSuccess(result);
-    }, function() {
-      this.alertsService.clearWarnings();
+    }, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
     });
   }
 
   openDeleteLastHintModal = (): void => {
     this.alertsService.clearWarnings();
 
-    const openDeleteLastHintSuccess = (): void => {
+    this.ngbModal.open(DeleteLastHintModalComponent, {
+      backdrop: true,
+    }).result.then((): void => {
       this.stateSolutionService.displayed = null;
       this.stateSolutionService.saveDisplayedValue();
       this.onSaveSolution.emit(this.stateSolutionService.displayed);
@@ -166,13 +166,7 @@ export class StateHintsEditorComponent implements OnInit {
       this.stateHintsService.displayed = [];
       this.stateHintsService.saveDisplayedValue();
       this.onSaveHints.emit(this.stateHintsService.displayed);
-    };
-
-    this.ngbModal.open(DeleteLastHintModalComponent, {
-      backdrop: true,
-    }).result.then(function() {
-      openDeleteLastHintSuccess();
-    }, function() {
+    }, (): void => {
       this.alertsService.clearWarnings();
     });
   };
