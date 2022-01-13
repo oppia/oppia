@@ -121,12 +121,17 @@ export class ContributorDashboardAdminBackendApiService {
   async removeContributionReviewerAsync(
       username: string, category: string, languageCode: string | null
   ): Promise<void> {
-    var url = this.urlInterpolationService.interpolateUrl(
+    const url = this.urlInterpolationService.interpolateUrl(
       PageConstants.CONTRIBUTION_RIGHTS_HANDLER_URL, { category });
-    var params = {
-      username: username,
-      language_code: languageCode
+    const params: {
+      username: string,
+      language_code?: string
+    } = {
+      username: username
     };
+    if (languageCode !== null) {
+      params.language_code = languageCode;
+    }
     return new Promise((resolve, reject) => {
       this.http.delete<void>(url, {
         params

@@ -224,8 +224,7 @@ describe('Contributor dashboard admin backend api service', () => {
     let languageCode = null;
     let username = 'validUser';
     let payload = {
-      username: username,
-      language_code: languageCode
+      username: username
     };
     cdabas.removeContributionReviewerAsync(
       username, category, languageCode).then(successHandler, failHandler);
@@ -249,8 +248,7 @@ describe('Contributor dashboard admin backend api service', () => {
     let languageCode = null;
     let username = 'InvalidUser';
     let payload = {
-      username: username,
-      language_code: languageCode
+      username: username
     };
     cdabas.removeContributionReviewerAsync(
       username, category, languageCode).then(successHandler, failHandler);
@@ -278,8 +276,7 @@ describe('Contributor dashboard admin backend api service', () => {
     let category = 'submit_question';
     let username = 'validUser';
     let payload = {
-      username: username,
-      language_code: null
+      username: username
     };
     cdabas.removeContributionReviewerAsync(
       username, category, null).then(successHandler, failHandler);
