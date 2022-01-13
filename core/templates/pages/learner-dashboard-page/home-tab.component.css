@@ -115,7 +115,7 @@
   }
   .home-tab .continue-where-you-left-off .continue-where-you-left-off-scroll::-webkit-scrollbar,
   .home-tab .suggested-for-you .topic-summary-tile-scroll::-webkit-scrollbar {
-  -webkit-appearance: none;
+    -webkit-appearance: none;
   }
   .home-tab .continue-where-you-left-off .continue-where-you-left-off-scroll::-webkit-scrollbar-thumb,
   .home-tab .suggested-for-you .topic-summary-tile-scroll::-webkit-scrollbar-thumb {

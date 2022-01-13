@@ -31,19 +31,27 @@ css_files_list = [
     'core/templates/pages/splash-page/splash-page.component.css',
     'core/templates/base-components/base-content.component.css',
     'core/templates/pages/library-page/library-page.component.css',
-    'core/templates/pages/topic-viewer-page/practice-tab/practice-tab.component.css',
+    'core/templates/pages/topic-viewer-page/practice-tab/'
+    'practice-tab.component.css',
     'core/templates/pages/classroom-page/classroom-page.component.css',
-    'core/templates/pages/topic-viewer-page/subtopics-list/subtopics-list.component.css',
+    'core/templates/pages/topic-viewer-page/subtopics-list/'
+    'subtopics-list.component.css',
     'core/templates/pages/story-viewer-page/story-viewer-page.component.css',
     'core/templates/pages/topic-viewer-page/topic-viewer-page.component.css',
     'core/templates/components/summary-tile/story-summary-tile.component.css',
-    'core/templates/pages/subtopic-viewer-page/subtopic-viewer-page.component.css',
-    'core/templates/pages/learner-dashboard-page/community-lessons-tab.component.css',
-    'core/templates/pages/story-viewer-page/story-viewer-page-root.component.css',
-    'core/templates/pages/learner-dashboard-page/learner-dashboard-page.component.css',
-    'core/templates/pages/topic-viewer-page/stories-list/topic-viewer-stories-list.component.css',
+    'core/templates/pages/subtopic-viewer-page/'
+    'subtopic-viewer-page.component.css',
+    'core/templates/pages/learner-dashboard-page/'
+    'community-lessons-tab.component.css',
+    'core/templates/pages/story-viewer-page/'
+    'story-viewer-page-root.component.css',
+    'core/templates/pages/learner-dashboard-page/'
+    'learner-dashboard-page.component.css',
+    'core/templates/pages/topic-viewer-page/stories-list/'
+    'topic-viewer-stories-list.component.css',
     'core/templates/pages/library-page/search-bar/search-bar.component.css'
 ]
+
 
 def start_subprocess_for_result(cmd):
     """Starts subprocess and returns (stdout, stderr)."""
@@ -52,13 +60,15 @@ def start_subprocess_for_result(cmd):
     out, err = task.communicate()
     return out, err
 
-def main(args=None):
+
+def main():
     """Main method for generating rtl css files."""
     for file_path in css_files_list:
-        out, err = start_subprocess_for_result(['rtlcss', file_path])
+        _, err = start_subprocess_for_result(['rtlcss', file_path])
         if err:
             raise ValueError(err)
-    print ("All RTL CSS files generated!")
+    print('All RTL CSS files generated!')
+
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
 # it will only be called when generate_rtl_css.py is used as a script.

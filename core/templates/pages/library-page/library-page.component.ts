@@ -107,7 +107,8 @@ export class LibraryPageComponent {
       this.MAX_NUM_TILES_PER_ROW);
 
     $('.oppia-library-carousel').css({
-      'max-width': (this.tileDisplayCount * AppConstants.LIBRARY_TILE_WIDTH_PX) + 'px'
+      'max-width': (
+        this.tileDisplayCount * AppConstants.LIBRARY_TILE_WIDTH_PX) + 'px'
     });
 
     // The following determines whether to enable left scroll after
