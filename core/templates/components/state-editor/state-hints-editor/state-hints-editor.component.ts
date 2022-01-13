@@ -192,7 +192,7 @@ export class StateHintsEditorComponent implements OnInit {
       if (value.index === this.stateHintsService.getActiveHintIndex()) {
         this.stateHintsService.setActiveHintIndex(null);
       }
-    }, function() {
+    }, (): void => {
       this.alertsService.clearWarnings();
     });
   }
