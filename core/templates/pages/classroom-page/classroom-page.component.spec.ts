@@ -26,6 +26,7 @@ import { CapitalizePipe } from 'filters/string-utility-filters/capitalize.pipe';
 import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
 import { AlertsService } from 'services/alerts.service';
 import { UrlService } from 'services/contextual/url.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { LoaderService } from 'services/loader.service';
 import { PageTitleService } from 'services/page-title.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
@@ -49,6 +50,7 @@ describe('Classroom Page Component', () => {
   let siteAnalyticsService: SiteAnalyticsService;
   let alertsService: AlertsService;
   let accessValidationBackendApiService: AccessValidationBackendApiService;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -88,6 +90,7 @@ describe('Classroom Page Component', () => {
     alertsService = TestBed.inject(AlertsService);
     accessValidationBackendApiService = TestBed.inject(
       AccessValidationBackendApiService);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
   });
 
   it('should create', () => {
@@ -164,4 +167,17 @@ describe('Classroom Page Component', () => {
       expect(alertsService.addWarning).toHaveBeenCalledWith(
         'Failed to get dashboard data');
     }));
+
+    it('should display correct translations', () => {
+      spyOn(i18nLanguageCodeService, 'getClassroomTranslationKey').and.returnValue(
+        'II8N_CLASSROOM_MATH_TITLE');
+      spyOn(i18nLanguageCodeService, 'hasTranslations').and.returnValue(
+          true);
+  
+      component.ngOnInit();
+  
+      expect(component.classroomNameTranslationKey).toBe('II8N_CLASSROOM_MATH_TITLE');
+      expect(component.classroomNameHasTranslation()).toBe(true);
+    });
+
 });

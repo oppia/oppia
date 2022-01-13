@@ -77,6 +77,22 @@ export default {
 
   "RTL_LANGUAGE_CODES": ["ar"],
 
+  // TODO: Remove this method when translation service is extended.
+  // Hacky translations keys for classroom, topic, skill, exploration
+  // and subtopic names and descriptions. Needs to be udpated whenever
+  // any new class, topic, skill, exploration or subtopic is added or a
+  // previous one is deleted.
+  "HACKY_TRANSLATIONS_KEYS": [
+    "II8N_CLASSROOM_MATH_TITLE",
+    "I18N_TOPIC_iX9kYCjnouWN_TITLE",
+    "I18N_TOPIC_sWBXKH4PZcK6_TITLE",
+    "I18N_TOPIC_C4fqwrvqWpRm_TITLE",
+    "I18N_TOPIC_qW12maD4hiA8_TITLE",
+    "I18N_TOPIC_dLmjjMDbCcrf_TITLE",
+    "I18N_TOPIC_0abdeaJhmfPm_TITLE",
+    "I18N_TOPIC_5g0nxGUmx5J5_TITLE"
+  ],
+
   "ALLOWED_THUMBNAIL_BG_COLORS": {
     "chapter": ["#F8BF74", "#D68F78", "#8EBBB6", "#B3D8F1"],
     "topic": ["#C6DCDA"],

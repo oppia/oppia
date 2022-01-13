@@ -23,6 +23,7 @@ import { ClassroomDomainConstants } from 'domain/classroom/classroom-domain.cons
 import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'oppia-topic-summary-tile',
@@ -33,9 +34,11 @@ export class TopicSummaryTileComponent {
   @Input() classroomUrlFragment: string;
   @Input() isPublished: boolean;
   thumbnailUrl: string = '';
+  topicNameTranslationKey: string;
 
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
+    private i18nLanguageCodeService: I18nLanguageCodeService,
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
@@ -46,6 +49,8 @@ export class TopicSummaryTileComponent {
           AppConstants.ENTITY_TYPE.TOPIC, this.topicSummary.getId(),
           this.topicSummary.getThumbnailFilename());
     }
+    this.topicNameTranslationKey = this.i18nLanguageCodeService.
+    getTopicTranslationKey(this.topicSummary.getId(), false);
   }
 
   getTopicPageUrl(): string {
@@ -79,6 +84,12 @@ export class TopicSummaryTileComponent {
       parseInt(bgColor.substring(4, 6), 16) - 100);
 
     return '#' + newRValue + newGValue + newBValue;
+  }
+
+  // TODO: Remove this method when translation service is extended.
+  topicNameHasTranslation(): boolean {
+    return this.i18nLanguageCodeService.hasTranslations(
+      this.topicNameTranslationKey);
   }
 }
 

@@ -56,6 +56,20 @@ describe('I18nLanguageCodeService', () => {
     expect(i18nLanguageCodeService.isCurrentLanguageRTL()).toBe(true);
   });
 
+  it('should set translation keys correctly', () => {
+    expect(i18nLanguageCodeService.getClassroomTranslationKey(
+      'Math')).toBe('II8N_CLASSROOM_MATH_TITLE');
+    expect(i18nLanguageCodeService.getTopicTranslationKey(
+      '12345axa', false)).toBe('II8N_TOPIC_12345axa_TITLE');
+    expect(i18nLanguageCodeService.getTopicTranslationKey(
+      '12345axa', true)).toBe('II8N_TOPIC_12345axa_DESCRIPTION');
+  });
+
+  it('should check whether translation key is present', () => {
+    expect(i18nLanguageCodeService.hasTranslations(
+      'II8N_TOPIC_12345axa_TITLE')).toBe(false);
+  });
+
   it('should get event emitter for loading of preferred language codes', () => {
     let mockPreferredLanguageCodesLoadedEventEmitter = new EventEmitter();
     expect(i18nLanguageCodeService.onPreferredLanguageCodesLoaded).toEqual(

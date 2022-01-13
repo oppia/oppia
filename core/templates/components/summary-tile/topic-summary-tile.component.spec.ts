@@ -21,6 +21,7 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { TopicSummaryTileComponent } from './topic-summary-tile.component';
 
@@ -30,6 +31,7 @@ describe('TopicSummaryTileCompoennt', () => {
 
   let abas: AssetsBackendApiService;
   let urlInterpolationService: UrlInterpolationService;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -46,6 +48,7 @@ describe('TopicSummaryTileCompoennt', () => {
     component = fixture.componentInstance;
     abas = TestBed.inject(AssetsBackendApiService);
     urlInterpolationService = TestBed.get(UrlInterpolationService);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
 
     component.topicSummary = CreatorTopicSummary.createFromBackendDict({
       topic_model_created_on: 1581839432987.596,
@@ -92,5 +95,17 @@ describe('TopicSummaryTileCompoennt', () => {
 
   it('should get darker thumbnail background color', () => {
     expect(component.getDarkerThumbnailBgColor()).toBe('#627876');
+  });
+
+  it('should get correct translations', () => {
+    spyOn(i18nLanguageCodeService, 'getTopicTranslationKey').and.returnValue(
+      'II8N_TOPIC_12345axa_TITLE');
+    spyOn(i18nLanguageCodeService, 'hasTranslations').and.returnValue(
+        false);
+
+    component.ngOnInit();
+
+    expect(component.topicNameTranslationKey).toBe('II8N_TOPIC_12345axa_TITLE');
+    expect(component.topicNameHasTranslation()).toBe(false);
   });
 });
