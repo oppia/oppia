@@ -86,7 +86,7 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
       this.userSelections[this.choices[i]] = false;
     }
 
-    this.displayCheckboxes = (this.maxAllowableSelectionCount > 1);
+    this.displayCheckboxes = this.maxAllowableSelectionCount > 1;
 
     // The following indicates that the number of answers is more than
     // maxAllowableSelectionCount.
@@ -94,7 +94,7 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
 
     // The following indicates that the number of answers is less than
     // minAllowableSelectionCount.
-    this.notEnoughSelections = (this.minAllowableSelectionCount > 0);
+    this.notEnoughSelections = this.minAllowableSelectionCount > 0;
     this.currentInteractionService.registerCurrentInteraction(
       this.submitAnswer.bind(this), this.validityCheckFn.bind(this));
   }

@@ -22,8 +22,12 @@
     <div class="item-selection-input-container" *ngFor="let choice of choices; index as idx">
       <div *ngIf="displayCheckboxes">
         <label dir="auto" class="item-selection-input-item protractor-test-item-selection-input-item">
-          <mat-checkbox class="item-selection-input-checkbox protractor-test-item-selection-input-checkbox" [(ngModel)]="userSelections[choice]" [checked]="userSelections[choice]"
-                        (change)="onToggleCheckbox()" [disabled]="preventAdditionalSelections && !userSelections[choice]" tabindex="0"
+          <mat-checkbox class="item-selection-input-checkbox protractor-test-item-selection-input-checkbox"
+                        [(ngModel)]="userSelections[choice]"
+                        [checked]="userSelections[choice]"
+                        (change)="onToggleCheckbox()"
+                        [disabled]="preventAdditionalSelections && !userSelections[choice]" 
+                        tabindex="0"
                         [ngModelOptions]="{standalone: true}">
             <span dir="auto">
               <angular-html-bind-wrapper class="protractor-test-item-selection-option" [htmlData]="choice">

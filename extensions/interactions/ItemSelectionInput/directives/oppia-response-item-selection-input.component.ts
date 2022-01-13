@@ -41,9 +41,11 @@ export class ResponseItemSelectionInput implements OnInit {
 
   ngOnInit(): void {
     const _answer = this.htmlEscaperService.escapedJsonToObj(
-      this.answer) as string[];
+      this.answer
+    ) as string[];
     const _choices = this.htmlEscaperService.escapedJsonToObj(
-      this.choices) as { _html: string; _contentId: string }[];
+      this.choices
+    ) as { _html: string; _contentId: string }[];
 
     const choicesContentIds = _choices.map(choice => choice._contentId);
     this.responses = _answer.map(
