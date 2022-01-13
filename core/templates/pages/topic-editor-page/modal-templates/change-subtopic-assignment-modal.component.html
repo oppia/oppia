@@ -1,0 +1,24 @@
+<div class="modal-header">
+  <h3>Assign skill to subtopic</h3>
+</div>
+<div class="modal-body">
+  <mat-radio-group class="oppia-radio-group">
+    <mat-radio-button *ngFor="let subtopic of subtopics" [value]="subtopic.getTitle()" attr.aria-label="{{ subtopic.getTitle() }}" (click)="changeSelectedSubtopic(subtopic.getId())">
+      {{ subtopic.getTitle() }}
+    </mat-radio-button>
+  </mat-radio-group>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
+  <button class="btn btn-primary" (click)="confirm(selectedSubtopicId)">
+    <span>Assign</span>
+  </button>
+</div>
+<style>
+  .oppia-radio-group {
+    display: flex;
+    flex-direction: column;
+    margin: 15px 0;
+  }
+</style>
