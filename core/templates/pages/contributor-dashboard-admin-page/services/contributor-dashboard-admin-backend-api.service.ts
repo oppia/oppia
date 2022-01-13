@@ -124,8 +124,8 @@ export class ContributorDashboardAdminBackendApiService {
     const url = this.urlInterpolationService.interpolateUrl(
       PageConstants.CONTRIBUTION_RIGHTS_HANDLER_URL, { category });
     const params: {
-      username: string,
-      language_code?: string
+      username: string;
+      language_code?: string;
     } = {
       username: username
     };
