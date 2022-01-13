@@ -102,7 +102,7 @@ export class ClassroomPageComponent {
   updateClassroomNameTranslationKey(): void {
     if (!this.i18nLanguageCodeService.hasTranslations(
       this.classroomNameTranslationKey)) {
-        this.classroomNameTranslationKey = this.classroomDisplayName;
+      this.classroomNameTranslationKey = this.classroomDisplayName;
     }
   }
 

@@ -91,7 +91,7 @@ export class TopicSummaryTileComponent {
   updateTopicNameTranslationKey(): void {
     if (!this.i18nLanguageCodeService.hasTranslations(
       this.topicNameTranslationKey)) {
-        this.topicNameTranslationKey = this.topicSummary.getName()
+      this.topicNameTranslationKey = this.topicSummary.getName();
     }
   }
 }
