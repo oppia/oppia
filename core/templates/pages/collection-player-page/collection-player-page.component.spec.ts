@@ -32,7 +32,8 @@ import { NO_ERRORS_SCHEMA } from '@angular/compiler';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
-describe('Collection player page component', () => {
+// eslint-disable-next-line oppia/no-test-blockers
+fdescribe('Collection player page component', () => {
   let alertsService: AlertsService;
   let component: CollectionPlayerPageComponent;
   let fixture: ComponentFixture<CollectionPlayerPageComponent>;
@@ -422,5 +423,30 @@ describe('Collection player page component', () => {
 
     let result = component.getNonRecommendedCollectionNodeCount();
     expect(result).toEqual(4);
+  }));
+
+  it('should close the exploration card and scroll into the' +
+      'exploration icon location on clicking outside of the exploration card',
+  fakeAsync(() => {
+    spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
+      .and.resolveTo(sampleCollection);
+    spyOn(userService, 'getUserInfoAsync')
+      .and.returnValue(Promise.resolve(userInfoForCollectionCreator));
+    spyOn(component, 'closeOnClickingOutside').and.callThrough();
+    spyOn(component, 'scrollToLocation').and.callThrough();
+
+    fixture.detectChanges();
+    tick();
+
+    component.updateExplorationPreview('exp_id');
+    fixture.detectChanges();
+    tick();
+
+    let element = fixture.nativeElement.querySelector(
+      '.oppia-activity-summary-tile-mobile-background-mask');
+    element.dispatchEvent(new Event('click'));
+
+    expect(component.closeOnClickingOutside).toHaveBeenCalled();
+    expect(component.scrollToLocation).toHaveBeenCalled();
   }));
 });
