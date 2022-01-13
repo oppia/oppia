@@ -18,8 +18,6 @@
 
 from __future__ import annotations
 
-import datetime
-
 from core import feconf
 from core.constants import constants
 from core.domain import caching_services
@@ -185,7 +183,7 @@ class MigrateExplorationJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
-                stderr="EXPLORATION PROCESSED ERROR: \"('exp_1_id', ValidationError(\"There is no state in ['state'] corresponding to the exploration's initial state name wrong_init_state_name.\"))\": 1"
+                stderr="EXPLORATION PROCESSED ERROR: \"('exp_1_id', ValidationError(\"There is no state in ['state'] corresponding to the exploration's initial state name wrong_init_state_name.\"))\": 1" # pylint: disable=line-too-long
             )
         ])
 
