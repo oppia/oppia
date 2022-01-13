@@ -105,7 +105,7 @@ describe('TopicSummaryTileCompoennt', () => {
 
     component.ngOnInit();
 
-    expect(component.topicNameTranslationKey).toBe('II8N_TOPIC_12345axa_TITLE');
-    expect(component.topicNameHasTranslation()).toBe(false);
+    expect(component.topicNameTranslationKey).toBe(
+      component.topicSummary.name);
   });
 });

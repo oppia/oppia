@@ -78,6 +78,7 @@ export class ClassroomPageComponent {
           classroomData.getName());
         this.classroomNameTranslationKey = this.i18nLanguageCodeService.
           getClassroomTranslationKey(this.classroomDisplayName);
+        this.updateClassroomNameTranslationKey();
         this.pageTitleService.setDocumentTitle(
           `Learn ${this.classroomDisplayName} with Oppia | Oppia`);
         this.loaderService.hideLoadingScreen();
@@ -98,9 +99,11 @@ export class ClassroomPageComponent {
   }
 
   // Remove this method when translation service is extended.
-  classroomNameHasTranslation(): boolean {
-    return this.i18nLanguageCodeService.hasTranslations(
-      this.classroomNameTranslationKey);
+  updateClassroomNameTranslationKey(): void {
+    if (!this.i18nLanguageCodeService.hasTranslations(
+      this.classroomNameTranslationKey)) {
+        this.classroomNameTranslationKey = this.classroomDisplayName;
+    }
   }
 
   getStaticImageUrl(imagePath: string): string {

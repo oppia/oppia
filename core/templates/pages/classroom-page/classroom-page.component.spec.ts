@@ -142,7 +142,6 @@ describe('Classroom Page Component', () => {
     expect(component.classroomDisplayName).toEqual(classroomData.getName());
     expect(component.classroomNameTranslationKey).toBe(
       'II8N_CLASSROOM_MATH_TITLE');
-    expect(component.classroomNameHasTranslation()).toBe(true);
     expect(pageTitleService.setDocumentTitle).toHaveBeenCalled();
     expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
     expect(classroomBackendApiService.onInitializeTranslation.emit)

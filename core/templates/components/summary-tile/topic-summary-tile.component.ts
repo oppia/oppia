@@ -51,6 +51,7 @@ export class TopicSummaryTileComponent {
     }
     this.topicNameTranslationKey = this.i18nLanguageCodeService.
       getTopicTranslationKey(this.topicSummary.getId(), false);
+    this.updateTopicNameTranslationKey();
   }
 
   getTopicPageUrl(): string {
@@ -87,9 +88,11 @@ export class TopicSummaryTileComponent {
   }
 
   // Remove this method when translation service is extended.
-  topicNameHasTranslation(): boolean {
-    return this.i18nLanguageCodeService.hasTranslations(
-      this.topicNameTranslationKey);
+  updateTopicNameTranslationKey(): void {
+    if (!this.i18nLanguageCodeService.hasTranslations(
+      this.topicNameTranslationKey)) {
+        this.topicNameTranslationKey = this.topicSummary.getName()
+    }
   }
 }
 
