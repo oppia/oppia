@@ -54,13 +54,13 @@ export class ContributionAndReviewBackendApiService {
   private _UPDATE_QUESTION_HANDLER_URL = (
     '/updatequestionsuggestionhandler/<suggestion_id>');
 
-  private SUBMITTED_QUESTION_SUGGESTIONS = (
+  private _SUBMITTED_QUESTION_SUGGESTIONS = (
     'SUBMITTED_QUESTION_SUGGESTIONS');
-  private REVIEWABLE_QUESTION_SUGGESTIONS = (
+  private _REVIEWABLE_QUESTION_SUGGESTIONS = (
     'REVIEWABLE_QUESTION_SUGGESTIONS');
-  private SUBMITTED_TRANSLATION_SUGGESTIONS = (
+  private _SUBMITTED_TRANSLATION_SUGGESTIONS = (
     'SUBMITTED_TRANSLATION_SUGGESTIONS');
-  private REVIEWABLE_TRANSLATION_SUGGESTIONS = (
+  private _REVIEWABLE_TRANSLATION_SUGGESTIONS = (
     'REVIEWABLE_TRANSLATION_SUGGESTIONS');
 
   constructor(
@@ -69,23 +69,27 @@ export class ContributionAndReviewBackendApiService {
   ) {}
 
   async fetchSuggestionsAsync(
-      fetchType: string,
+      fetchType: string
   ): Promise<FetchSuggestionsResponse> {
-    if (fetchType === this.SUBMITTED_QUESTION_SUGGESTIONS) {
+    if (fetchType === this._SUBMITTED_QUESTION_SUGGESTIONS) {
       return this.fetchSubmittedSuggestionsAsync('skill', 'add_question');
-    } else if (fetchType === this.SUBMITTED_TRANSLATION_SUGGESTIONS) {
+    }
+    if (fetchType === this._SUBMITTED_TRANSLATION_SUGGESTIONS) {
       return this.fetchSubmittedSuggestionsAsync(
         'exploration', 'translate_content');
-    } else if (fetchType === this.REVIEWABLE_QUESTION_SUGGESTIONS) {
+    }
+    if (fetchType === this._REVIEWABLE_QUESTION_SUGGESTIONS) {
       return this.fetchReviewableSuggestionsAsync('skill', 'add_question');
-    } else if (fetchType === this.REVIEWABLE_TRANSLATION_SUGGESTIONS) {
+    }
+    if (fetchType === this._REVIEWABLE_TRANSLATION_SUGGESTIONS) {
       return this.fetchReviewableSuggestionsAsync(
         'exploration', 'translate_content');
     }
   }
 
   async fetchSubmittedSuggestionsAsync(
-      targetType: string, suggestionType: string
+      targetType: string,
+      suggestionType: string
   ): Promise<FetchSuggestionsResponse> {
     let url = this.urlInterpolationService.interpolateUrl(
       this._SUBMITTED_SUGGESTION_LIST_HANDLER_URL, {
@@ -97,7 +101,8 @@ export class ContributionAndReviewBackendApiService {
   }
 
   async fetchReviewableSuggestionsAsync(
-      targetType: string, suggestionType: string
+      targetType: string,
+      suggestionType: string
   ): Promise<FetchSuggestionsResponse> {
     let url = this.urlInterpolationService.interpolateUrl(
       this._REVIEWABLE_SUGGESTIONS_HANDLER_URL, {
@@ -109,7 +114,9 @@ export class ContributionAndReviewBackendApiService {
   }
 
   async resolveToExplorationAsync(
-      expId: string, suggestionId: string, data: ResolveToExplorationData
+      expId: string,
+      suggestionId: string,
+      data: ResolveToExplorationData
   ): Promise<void> {
     let url = this.urlInterpolationService.interpolateUrl(
       this._SUGGESTION_TO_EXPLORATION_ACTION_HANDLER_URL, {
@@ -121,7 +128,9 @@ export class ContributionAndReviewBackendApiService {
   }
 
   async resolveToSkillAsync(
-      skillId: string, suggestionId: string, data: ResolveToSkillData
+      skillId: string,
+      suggestionId: string,
+      data: ResolveToSkillData
   ): Promise<void> {
     let url = this.urlInterpolationService.interpolateUrl(
       this._SUGGESTION_TO_SKILL_ACTION_HANDLER_URL, {
