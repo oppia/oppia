@@ -3781,12 +3781,21 @@ oppia-noninteractive-link {
   padding: 5px 8px 4px 8px;
 }
 
+@media (max-width: 610px) {
+  .oppia-activity-summary-tile.small-width .metrics li .far {
+    margin-top: 10px;
+  }
+}
+
 @media (max-width: 420px) {
   .oppia-activity-summary-tile.small-width .metrics li {
     font-size: 0.6em;
   }
   .oppia-activity-summary-tile.small-width .recently-updated {
     display: none;
+  }
+  .oppia-activity-summary-tile.small-width .metrics li .fas {
+    margin-bottom: 4px;
   }
 }
 
@@ -4597,7 +4606,6 @@ div.oppia-issues-learner-action {
   display: inline;
   font-size: 0.8em;
   line-height: 1;
-  margin: 0 2px;
   padding: .3em .35em .3em .5em;
   text-align: center;
   vertical-align: baseline;
@@ -4652,8 +4660,23 @@ div.oppia-issues-learner-action {
   width: 100%;
 }
 
+/* By using 'grid-template-columns' we specify the number of columns for different display sizes. */
 .mat-card-content.oppia-profile-portfolio-container {
   background-color: transparent;
+  display: grid;
+  grid-template-columns: max-content max-content max-content;
+}
+
+@media (max-width: 1080px) {
+  .mat-card-content.oppia-profile-portfolio-container {
+    grid-template-columns: max-content max-content;
+  }
+}
+
+@media (max-width: 820px) {
+  .mat-card-content.oppia-profile-portfolio-container {
+    grid-template-columns: max-content;
+  }
 }
 
 .oppia-profile-portfolio-pages {
@@ -4722,6 +4745,9 @@ div.oppia-issues-learner-action {
   }
   .oppia-profile-user-bio {
     display: inline-block;
+  }
+  .mat-card-content.oppia-profile-portfolio-container {
+    grid-template-columns: unset;
   }
 }
 
