@@ -36,7 +36,6 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
     STORY_ID = None
     NODE_ID_1 = story_domain.NODE_ID_PREFIX + '1'
     NODE_ID_2 = story_domain.NODE_ID_PREFIX + '2'
-    owner_id = 'owner'
     USER_ID = 'user'
     story = None
 
@@ -186,6 +185,8 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(story_summary.title, 'Title')
         self.assertEqual(story_summary.description, 'Description')
         self.assertEqual(story_summary.node_titles, ['Title 1'])
+        self.assertEqual(story_summary.thumbnail_bg_color, None)
+        self.assertEqual(story_summary.thumbnail_filename, None)
         with self.swap_to_always_return(
             story_models.StorySummaryModel,
             'get'
