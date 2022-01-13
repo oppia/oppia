@@ -125,6 +125,10 @@ describe('Classroom Page Component', () => {
       );
     spyOn(classroomBackendApiService, 'fetchClassroomDataAsync')
       .and.returnValue(Promise.resolve(classroomData));
+    spyOn(i18nLanguageCodeService, 'getClassroomTranslationKey')
+      .and.returnValue('II8N_CLASSROOM_MATH_TITLE');
+    spyOn(i18nLanguageCodeService, 'hasTranslations').and.returnValue(
+      true);
 
     component.ngOnInit();
     tick();
@@ -136,6 +140,9 @@ describe('Classroom Page Component', () => {
       .toHaveBeenCalled();
     expect(component.classroomData).toEqual(classroomData);
     expect(component.classroomDisplayName).toEqual(classroomData.getName());
+    expect(component.classroomNameTranslationKey).toBe(
+      'II8N_CLASSROOM_MATH_TITLE');
+    expect(component.classroomNameHasTranslation()).toBe(true);
     expect(pageTitleService.setDocumentTitle).toHaveBeenCalled();
     expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
     expect(classroomBackendApiService.onInitializeTranslation.emit)
@@ -167,17 +174,4 @@ describe('Classroom Page Component', () => {
       expect(alertsService.addWarning).toHaveBeenCalledWith(
         'Failed to get dashboard data');
     }));
-
-  it('should display correct translations', () => {
-    spyOn(i18nLanguageCodeService, 'getClassroomTranslationKey').and.
-      returnValue('II8N_CLASSROOM_MATH_TITLE');
-    spyOn(i18nLanguageCodeService, 'hasTranslations').and.returnValue(
-      true);
-
-    component.ngOnInit();
-
-    expect(component.classroomNameTranslationKey).toBe(
-      'II8N_CLASSROOM_MATH_TITLE');
-    expect(component.classroomNameHasTranslation()).toBe(true);
-  });
 });
