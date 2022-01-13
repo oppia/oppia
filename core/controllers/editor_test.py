@@ -2746,7 +2746,8 @@ class EditorAutosaveTest(BaseEditorControllerTests):
             )
             exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
                 '%s.%s' % (self.owner_id, self.EXP_ID2))
-            self.assertNotEqual(exp_user_data.draft_change_list, self.NEW_CHANGELIST)
+            self.assertNotEqual(
+                exp_user_data.draft_change_list, self.NEW_CHANGELIST)
             self.assertNotEqual(exp_user_data.draft_change_list_exp_version, 10)
             self.assertNotEqual(exp_user_data.draft_change_list_id, 2)
 
@@ -3061,10 +3062,10 @@ class UserExplorationPermissionsHandlerTests(BaseEditorControllerTests):
         self.logout()
 
 
-class ImageUploadHandler(BaseEditorControllerTests):
+class ImageUploadHandlerTests(BaseEditorControllerTests):
 
     def test_return_error_when_image_not_uploaded(self):
-        """Test error when no image is uploaded."""
+        """Test that an error is returned when no image is uploaded."""
 
         exp_image_upload_endpoint = '/createhandler/imageupload'
 
@@ -3094,7 +3095,7 @@ class ImageUploadHandler(BaseEditorControllerTests):
         error_msg = ('No image supplied')
         self.assertEqual(response['error'], error_msg)
 
-        # check if current file is actually uploaded or not
+        # Check if current file is actually uploaded or not.
         file_system_class = fs_services.get_entity_file_system_class()
         fs = fs_domain.AbstractFileSystem(
             file_system_class(feconf.ENTITY_TYPE_EXPLORATION, exp_id))
@@ -3104,7 +3105,9 @@ class ImageUploadHandler(BaseEditorControllerTests):
         self.logout()
 
     def test_return_error_when_uploaded_image_already_exists(self):
-        """Test error when uploaded image already exists."""
+        """Test that an error is returned when uploaded
+        image already exists.
+        """
 
         exp_image_upload_endpoint = '/createhandler/imageupload'
 
@@ -3149,7 +3152,7 @@ class ImageUploadHandler(BaseEditorControllerTests):
         )
         self.assertEqual(response['error'], error_msg)
 
-        # check if current file is actually uploaded or not
+        # Check if current file is actually uploaded or not.
         file_system_class = fs_services.get_entity_file_system_class()
         fs = fs_domain.AbstractFileSystem(
             file_system_class(feconf.ENTITY_TYPE_EXPLORATION, exp_id))
@@ -3159,7 +3162,7 @@ class ImageUploadHandler(BaseEditorControllerTests):
         self.logout()
 
     def test_upload_successful_when_image_uploaded(self):
-        """Test no error when valid image is uploaded."""
+        """Test that no error is returned when valid image is uploaded."""
 
         exp_image_upload_endpoint = '/createhandler/imageupload'
 
