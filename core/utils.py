@@ -785,7 +785,7 @@ def require_valid_image_filename(image_filename: str) -> None:
         Raises:
             ValidationError. Image filename is not a string.
             ValidationError. Image filename does start with a dot.
-            ValidationError. Image filename includes slashesb
+            ValidationError. Image filename includes slashes
                 or consecutive dots.
             ValidationError. Image filename does not include an extension.
         """
