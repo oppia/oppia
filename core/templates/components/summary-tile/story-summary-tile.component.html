@@ -1,3 +1,6 @@
+<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/components/summary-tile/story-summary-tile.component.css" as="style">
+<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/components/summary-tile/story-summary-tile.component.rtl.css" as="style">
+
 <div class="story-summary-tile protractor-test-story-summary-title">
   <div class="story-progress-bar">
     <svg class="story-progress-svg" width="50" height="50" *ngIf="nodeCount">
@@ -77,6 +80,6 @@
   </div>
 
 </div>
-<!-- TODO(aks681): Incorporate the CSS file inclusion in webpack. -->
+<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
 <link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/components/summary-tile/story-summary-tile.component.css">
 <link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/components/summary-tile/story-summary-tile.component.rtl.css">

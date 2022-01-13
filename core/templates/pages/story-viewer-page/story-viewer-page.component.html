@@ -1,3 +1,6 @@
+<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/story-viewer-page/story-viewer-page.component.css" as="style">
+<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/story-viewer-page/story-viewer-page.component.rtl.css" as="style">
+
 <div class="oppia-story-viewer-container">
   <div *ngIf="storyIsLoaded">
     <div class="oppia-story-viewer-inner-container">
@@ -144,6 +147,6 @@
     </div>
   </div>
 </div>
-<!-- TODO(aks681): Incorporate the CSS file inclusion in webpack. -->
+<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
 <link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/story-viewer-page/story-viewer-page.component.css">
 <link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/story-viewer-page/story-viewer-page.component.rtl.css">

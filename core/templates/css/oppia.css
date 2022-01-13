@@ -804,15 +804,6 @@ textarea {
 }
 
 
-
-.input-group-addon.oppia-search-bar-icon {
-  border-radius: 4px 0 0 4px;
-  font-size: 14px;
-  font-weight: normal;
-  line-height: 1;
-  padding: 7px 12px;
-  text-align: center;
-}
 .oppia-help-dropdown .uib-popover {
   color: white;
   font-size: 14px;

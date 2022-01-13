@@ -1,3 +1,6 @@
+<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/library-page/library-page.component.css" as="style">
+<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/library-page/library-page.component.rtl.css" as="style">
+
 <div class="oppia-library-container">
   <div class="oppia-library-container-inner">
     <div>
@@ -78,6 +81,7 @@
         </div>
 
         <div class="oppia-library-group"
+             dir="auto"
              *ngFor="let group of libraryGroups; index as idx"
              (mouseenter)="setActiveGroup(idx)"
              (mouseleave)="clearActiveGroup()">
@@ -207,6 +211,6 @@
     </div>
   </div>
 </div>
-<!-- TODO(aks681): Incorporate the CSS file inclusion in webpack. -->
+<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
 <link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/library-page/library-page.component.css">
 <link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/library-page/library-page.component.rtl.css">

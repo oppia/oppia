@@ -1,3 +1,6 @@
+<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/topic-viewer-page/stories-list/topic-viewer-stories-list.component.css" as="style">
+<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/topic-viewer-page/stories-list/topic-viewer-stories-list.component.rtl.css" as="style">
+
 <div class="stories-list">
   <div class="oppia-stories-list-container">
     <mat-card class="oppia-page-card oppia-long-text">
@@ -14,6 +17,6 @@
     </mat-card>
   </div>
 </div>
-<!-- TODO(aks681): Incorporate the CSS file inclusion in webpack. -->
+<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
 <link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/topic-viewer-page/stories-list/topic-viewer-stories-list.component.css">
 <link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/topic-viewer-page/stories-list/topic-viewer-stories-list.component.rtl.css">
