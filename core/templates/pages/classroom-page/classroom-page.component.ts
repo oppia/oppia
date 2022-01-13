@@ -77,7 +77,7 @@ export class ClassroomPageComponent {
         this.classroomDisplayName = this.capitalizePipe.transform(
           classroomData.getName());
         this.classroomNameTranslationKey = this.i18nLanguageCodeService.
-        getClassroomTranslationKey(this.classroomDisplayName);
+          getClassroomTranslationKey(this.classroomDisplayName);
         this.pageTitleService.setDocumentTitle(
           `Learn ${this.classroomDisplayName} with Oppia | Oppia`);
         this.loaderService.hideLoadingScreen();
@@ -97,7 +97,7 @@ export class ClassroomPageComponent {
     });
   }
 
-  // TODO: Remove this method when translation service is extended.
+  // Remove this method when translation service is extended.
   classroomNameHasTranslation(): boolean {
     return this.i18nLanguageCodeService.hasTranslations(
       this.classroomNameTranslationKey);

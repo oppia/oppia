@@ -101,7 +101,7 @@ describe('TopicSummaryTileCompoennt', () => {
     spyOn(i18nLanguageCodeService, 'getTopicTranslationKey').and.returnValue(
       'II8N_TOPIC_12345axa_TITLE');
     spyOn(i18nLanguageCodeService, 'hasTranslations').and.returnValue(
-        false);
+      false);
 
     component.ngOnInit();
 

@@ -36,7 +36,8 @@ export class I18nLanguageCodeService {
   static languageCodeChangeEventEmitter = new EventEmitter<string> ();
   static languageCode: string = AppConstants.DEFAULT_LANGUAGE_CODE;
   static rtlLanguageCodes: readonly string[] = AppConstants.RTL_LANGUAGE_CODES;
-  static hackyTranslationKeys: readonly string[] = AppConstants.HACKY_TRANSLATIONS_KEYS;
+  static hackyTranslationKeys: readonly string[] =
+    AppConstants.HACKY_TRANSLATIONS_KEYS;
 
   private _preferredLanguageCodesLoadedEventEmitter =
     new EventEmitter<string[]>();
@@ -54,21 +55,21 @@ export class I18nLanguageCodeService {
         this.getCurrentI18nLanguageCode()) !== -1);
   }
 
-  // TODO: Remove this method when translation service is extended.
+  // Remove this method when translation service is extended.
   getClassroomTranslationKey(classroomName: string): string {
     return `II8N_CLASSROOM_${classroomName.toUpperCase()}_TITLE`;
   }
 
-  // TODO: Remove this method when translation service is extended.
+  // Remove this method when translation service is extended.
   getTopicTranslationKey(topicId: string, isDescription: boolean): string {
     return (
       isDescription ?
-      `II8N_TOPIC_${topicId}_DESCRIPTION`:
+      `II8N_TOPIC_${topicId}_DESCRIPTION` :
       `II8N_TOPIC_${topicId}_TITLE`
     );
   }
 
-  // TODO: Remove this method when translation service is extended.
+  // Remove this method when translation service is extended.
   hasTranslations(translationKey: string): boolean {
     return (
       // TODO(#9154): Change I18nLanguageCodeService to "this".

@@ -168,16 +168,16 @@ describe('Classroom Page Component', () => {
         'Failed to get dashboard data');
     }));
 
-    it('should display correct translations', () => {
-      spyOn(i18nLanguageCodeService, 'getClassroomTranslationKey').and.returnValue(
-        'II8N_CLASSROOM_MATH_TITLE');
-      spyOn(i18nLanguageCodeService, 'hasTranslations').and.returnValue(
-          true);
-  
-      component.ngOnInit();
-  
-      expect(component.classroomNameTranslationKey).toBe('II8N_CLASSROOM_MATH_TITLE');
-      expect(component.classroomNameHasTranslation()).toBe(true);
-    });
+  it('should display correct translations', () => {
+    spyOn(i18nLanguageCodeService, 'getClassroomTranslationKey').and.
+      returnValue('II8N_CLASSROOM_MATH_TITLE');
+    spyOn(i18nLanguageCodeService, 'hasTranslations').and.returnValue(
+      true);
 
+    component.ngOnInit();
+
+    expect(component.classroomNameTranslationKey).toBe(
+      'II8N_CLASSROOM_MATH_TITLE');
+    expect(component.classroomNameHasTranslation()).toBe(true);
+  });
 });
