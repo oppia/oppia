@@ -1143,8 +1143,10 @@ class StateAnswersModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(stat_answer_models[0].exploration_id, 'exp_id')
         self.assertEqual(stat_answer_models[0].exploration_version, 1)
         self.assertEqual(stat_answer_models[0].state_name, 'state_name')
-        self.assertEqual(stat_answer_models[0].submitted_answer_list,
-            submitted_answer_list)
+        self.assertEqual(
+            stat_answer_models[0].submitted_answer_list,
+            submitted_answer_list
+        )
         self.assertEqual(stat_answer_models[0].shard_count, 0)
 
         # Use a smaller max answer list size so fewer answers are needed to
