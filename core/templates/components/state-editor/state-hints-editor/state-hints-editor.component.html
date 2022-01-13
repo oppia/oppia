@@ -33,8 +33,11 @@
             <div cdkDropList (cdkDropListDropped)="drop($event)" class="nav oppia-option-list nav-stacked nav-pills">
               <!-- Note that adding "track by index" here seems to mess up the final
               index in the stop() event handler. -->
-              <div [cdkDragDisabled]="stateHintsService.getActiveHintIndex() === index ? true : false" cdkDrag *ngFor="let hint of stateHintsService.displayed; let index = index"
-                  ngClass="{'active': stateHintsService.getActiveHintIndex() === index}" class="oppia-rule-block oppia-sortable-hint oppia-prevent-selection">
+              <div [cdkDragDisabled]="stateHintsService.getActiveHintIndex() === index ? true : false"
+                   cdkDrag
+                   *ngFor="let hint of stateHintsService.displayed; let index = index"
+                   ngClass="{'active': stateHintsService.getActiveHintIndex() === index}"
+                   class="oppia-rule-block oppia-sortable-hint oppia-prevent-selection">
                 <span class="oppia-hint-sort-handle"
                       *ngIf="stateHintsService.displayed.length > 1"
                       (mousedown)="changeActiveHintIndex(null)">

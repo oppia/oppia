@@ -18,7 +18,9 @@
  */
 
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { CdkDragSortEvent, moveItemInArray} from '@angular/cdk/drag-drop';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Hint } from 'domain/exploration/HintObjectFactory';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -35,14 +37,13 @@ import { ExternalSaveService } from 'services/external-save.service';
 import { AddHintModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-hint-modal.component';
 import { DeleteHintModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-hint-modal.component';
 import { DeleteLastHintModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-last-hint-modal.component';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { CdkDragSortEvent, moveItemInArray} from '@angular/cdk/drag-drop';
 import { Solution } from 'domain/exploration/SolutionObjectFactory';
 
 interface DeleteValueResponse {
   index: number;
   evt: Event;
 }
+
 interface AddHintModalResponse {
   hint: Hint;
 }
