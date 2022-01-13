@@ -47,6 +47,22 @@ class SubtopicPageModelUnitTest(test_utils.GenericTestBase):
 
     SUBTOPIC_PAGE_ID = 'subtopic_page_id'
 
+    def test_get_export_policy(self) -> None:
+        expected_export_policy_dict = {
+            'topic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'page_contents': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'page_contents_schema_version': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE),
+            'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+        }
+        self.assertEqual(
+            subtopic_models.SubtopicPageModel.get_export_policy(),
+            expected_export_policy_dict)
+
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             subtopic_models.SubtopicPageModel.get_deletion_policy(),
@@ -107,6 +123,34 @@ class SubtopicPageCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         self.assertFalse(
             subtopic_models.SubtopicPageCommitLogEntryModel
             .has_reference_to_user_id('x_id'))
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            subtopic_models.SubtopicPageCommitLogEntryModel.
+                get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
+
+    def test_get_export_policy(self) -> None:
+        expected_export_policy_dict = {
+            'subtopic_page_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'commit_cmds': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'commit_message': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'commit_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'post_commit_community_owned': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE),
+            'post_commit_is_private': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE),
+            'post_commit_status': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE),
+            'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+        }
+        self.assertEqual(
+            subtopic_models.SubtopicPageCommitLogEntryModel.get_export_policy(),
+            expected_export_policy_dict)
 
     def test__get_instance_id(self) -> None:
         # Calling create() method calls _get_instance (a protected method)
