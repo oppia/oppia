@@ -505,7 +505,7 @@ class StateHitEventHandler(base.BaseHandler):
                     }]
                 }
             },
-	        'client_time_spent_in_secs': {
+            'client_time_spent_in_secs': {
                 'schema': {
                     'type': 'int',
                 }
