@@ -174,24 +174,6 @@ def get_package_file_contents(package: str, filepath: str) -> str:
         return pkgutil.get_data(package, filepath).decode('utf-8')
 
 
-def url_unsplit(url_parts):
-    """Combine the elements of a tuple as returned by urlsplit() into a complete
-    URL as a string using urlparse.urlunsplit if run under Python 2 and
-    urllib.parse.urlunsplit if run under Python 3.
-
-    Args:
-        url_parts: tuple(str). The components of a URL.
-
-    Returns:
-        str. The complete URL.
-    """
-    try:
-        import urllib.parse as urlparse
-    except ImportError:
-        import urlparse
-    return urlparse.urlunsplit(url_parts)  # pylint: disable=disallowed-function-calls
-
-
 def parse_query_string(query_string):
     """Parse a query string given as a string argument
     (data of type application/x-www-form-urlencoded) using urlparse.parse_qs if
