@@ -83,12 +83,15 @@ def validate_arguments_against_schema(
     normalized_values = {}
     for arg_key, arg_schema in handler_args_schemas.items():
         if (
-                arg_key not in handler_args or
-                handler_args[arg_key] is None or
-                # Null request params are cast to strings by webapp.
-                handler_args[arg_key] == 'None' or
-                handler_args[arg_key] == 'null'
+                arg_key in handler_args and
+                (
+                    # Null request params are cast to strings by webapp.
+                    handler_args[arg_key] == 'None' or
+                    handler_args[arg_key] == 'null'
+                )
         ):
+            handler_args[arg_key] = None
+        if arg_key not in handler_args or handler_args[arg_key] is None:
             if 'default_value' in arg_schema:
                 if arg_schema['default_value'] is None:
                     # Skip validation because the argument is optional.
