@@ -230,6 +230,7 @@ describe('Editor Navigation Component', function() {
           result: $q.resolve('editor')
         } as NgbModalRef
       );
+
       $scope.showUserHelpModal();
       $scope.$apply();
 
@@ -244,6 +245,7 @@ describe('Editor Navigation Component', function() {
             result: $q.resolve('translation')
           } as NgbModalRef
       );
+
       $scope.showUserHelpModal();
       $scope.$apply();
 

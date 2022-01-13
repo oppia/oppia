@@ -528,8 +528,10 @@ describe('Exploration editor page component', function() {
           result: $q.resolve('translation')
         } as NgbModalRef
       );
+
       ctrl.showUserHelpModal();
       $rootScope.$apply();
+
       expect(ngbModal.open).toHaveBeenCalled();
     });
   });
