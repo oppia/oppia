@@ -33,32 +33,32 @@ import { TranslateModule } from '@ngx-translate/core';
 import { PencilCodeResetConfirmationComponent } from './directives/pencil-code-reset-confirmation.component';
 
 @NgModule({
-    imports: [
-        CommonModule,
-        BrowserModule,
-        MaterialModule,
-        SharedPipesModule,
-        SharedFormsModule,
-        TranslateModule
-    ],
-    declarations: [
-        PencilCodeEditorComponent,
-        ResponePencilCodeEditorComponent,
-        ShortResponePencilCodeEditorComponent,
-        PencilCodeResetConfirmationComponent
-    ],
-    entryComponents: [
-        PencilCodeEditorComponent,
-        ResponePencilCodeEditorComponent,
-        ShortResponePencilCodeEditorComponent,
-        PencilCodeResetConfirmationComponent
-    ],
-    exports: [
-        PencilCodeEditorComponent,
-        ResponePencilCodeEditorComponent,
-        ShortResponePencilCodeEditorComponent,
-        PencilCodeResetConfirmationComponent
-    ],
+  imports: [
+    CommonModule,
+    BrowserModule,
+    MaterialModule,
+    SharedPipesModule,
+    SharedFormsModule,
+    TranslateModule
+  ],
+  declarations: [
+    PencilCodeEditorComponent,
+    ResponePencilCodeEditorComponent,
+    ShortResponePencilCodeEditorComponent,
+    PencilCodeResetConfirmationComponent
+  ],
+  entryComponents: [
+    PencilCodeEditorComponent,
+    ResponePencilCodeEditorComponent,
+    ShortResponePencilCodeEditorComponent,
+    PencilCodeResetConfirmationComponent
+  ],
+  exports: [
+    PencilCodeEditorComponent,
+    ResponePencilCodeEditorComponent,
+    ShortResponePencilCodeEditorComponent,
+    PencilCodeResetConfirmationComponent
+  ],
 })
 
 export class PencilCodeEditorModule {}

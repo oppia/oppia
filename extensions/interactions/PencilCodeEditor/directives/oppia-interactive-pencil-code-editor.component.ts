@@ -20,7 +20,7 @@
  * followed by the name of the arg.
  */
 
-import { Component, ElementRef, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
@@ -39,7 +39,8 @@ import { PencilCodeEditorRulesService } from './pencil-code-editor-rules.service
 export class PencilCodeEditorComponent implements OnInit, OnDestroy {
   constructor(
     private playerPositionService: PlayerPositionService,
-    private interactionAttributesExtractorService: InteractionAttributesExtractorService,
+    private interactionAttributesExtractorService:
+      InteractionAttributesExtractorService,
     private currentInteractionService: CurrentInteractionService,
     private ngbModal: NgbModal,
     private focusManagerService: FocusManagerService,
@@ -59,7 +60,7 @@ export class PencilCodeEditorComponent implements OnInit, OnDestroy {
       initialCodeWithValue: this.initialCodeWithValue
     };
   }
-  
+
   reset(): void {
     this.ngbModal.open(PencilCodeResetConfirmationComponent, {
       backdrop: 'static',
@@ -93,14 +94,15 @@ export class PencilCodeEditorComponent implements OnInit, OnDestroy {
     this.pce = new PencilCodeEmbed(this.iframeDiv);
     this.interactionIsActive = (this.lastAnswer === null);
 
-    const { initialCode } = this.interactionAttributesExtractorService.getValuesFromAttributes(
-      'PencilCodeEditor',
-      this._getAttributes()
-    ) as PencilCodeEditorCustomizationArgs;
+    const { initialCode } = (
+      this.interactionAttributesExtractorService.getValuesFromAttributes(
+        'PencilCodeEditor',
+        this._getAttributes()
+      ) as PencilCodeEditorCustomizationArgs);
     this.initialCode = this.interactionIsActive ?
       initialCode :
       this.lastAnswer.code;
-    
+
     this.pce.beginLoad(this.initialCode.value);
     this.pce.on('load', () => {
       // Hides the error console at the bottom right, and prevents it
@@ -157,7 +159,7 @@ export class PencilCodeEditorComponent implements OnInit, OnDestroy {
       // issue in this case.
       this.pce.eval(
         'document.body.innerHTML', // disable-bad-pattern-check
-        (pencilCodeHtml: any) => {
+        (pencilCodeHtml) => {
           let normalizedCode = this.getNormalizedCode();
 
           // Get all the divs, and extract their textual content.
@@ -173,15 +175,15 @@ export class PencilCodeEditorComponent implements OnInit, OnDestroy {
             evaluation: '',
             error: ''
           } as unknown as string,
-           this.pencilCodeEditorRulesService as unknown as InteractionRulesService);
+           this.pencilCodeEditorRulesService as
+           unknown as InteractionRulesService);
         }, true);
     });
 
-    this.pce.on('error', (error: { message: any; }) => {
+    this.pce.on('error', (error: { message }) => {
       if (hasSubmittedAnswer) {
         return;
       }
-      console.log('error2');
       let normalizedCode = this.getNormalizedCode();
 
       errorIsHappening = true;

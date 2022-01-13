@@ -16,23 +16,23 @@
  * @fileoverview Component for the Pencil Code Reset Confirmation.
  */
 
-import { Component } from "@angular/core";
-import { NgbActiveModal } from "@ng-bootstrap/ng-bootstrap";
+import { Component } from '@angular/core';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
-    selector: 'oppia-pencil-code-reset-confirmation',
-    templateUrl: './pencil-code-reset-confirmation.component.html'
+  selector: 'oppia-pencil-code-reset-confirmation',
+  templateUrl: './pencil-code-reset-confirmation.component.html'
 })
 export class PencilCodeResetConfirmationComponent {
-    constructor(
+  constructor(
         private ngbActiveModal: NgbActiveModal
-    ) {}
+  ) {}
 
-    confirm(): void {
-        this.ngbActiveModal.close();
-    }
+  confirm(): void {
+    this.ngbActiveModal.close();
+  }
 
-    cancel(): void {
-        this.ngbActiveModal.dismiss();
-    }
+  cancel(): void {
+    this.ngbActiveModal.dismiss();
+  }
 }

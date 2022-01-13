@@ -20,9 +20,9 @@
  * followed by the name of the arg.
  */
 
-import { Component, Input, OnInit, Provider } from "@angular/core";
-import { downgradeComponent } from "@angular/upgrade/static";
-import { HtmlEscaperService } from "services/html-escaper.service";
+import { Component, Input, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { HtmlEscaperService } from 'services/html-escaper.service';
 
 interface Answer {
   code: string;
