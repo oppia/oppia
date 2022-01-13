@@ -91,7 +91,7 @@ CACHE_NAMESPACE_DEFAULT: Literal['default'] = 'default'
 
 
 class DeserializationFunctionsDict(TypedDict):
-    """Dictionary representing the DESERIALIZATION_FUNCTIONS Dictionary"""
+    """Type for the DESERIALIZATION_FUNCTIONS."""
 
     collection: Callable[[str], collection_domain.Collection]
     exploration: Callable[[str], exp_domain.Exploration]
@@ -99,12 +99,12 @@ class DeserializationFunctionsDict(TypedDict):
     story: Callable[[str], story_domain.Story]
     topic: Callable[[str], topic_domain.Topic]
     platform: Callable[[str], platform_parameter_domain.PlatformParameter]
-    config: Callable[[str], object]
-    default: Callable[[str], object]
+    config: Callable[[str], dict[str, Any]]
+    default: Callable[[str], dict[str, Any]]
 
 
 class SerializationFunctionsDict(TypedDict):
-    """Dictionary representing the SERIALIZATION_FUNCTIONS Dictionary"""
+    """Type for the SERIALIZATION_FUNCTIONS."""
 
     collection: Callable[[collection_domain.Collection], str]
     exploration: Callable[[exp_domain.Exploration], str]
@@ -112,8 +112,8 @@ class SerializationFunctionsDict(TypedDict):
     story: Callable[[story_domain.Story], str]
     topic: Callable[[topic_domain.Topic], str]
     platform: Callable[[platform_parameter_domain.PlatformParameter], str]
-    config: Callable[[object], str]
-    default: Callable[[object], str]
+    config: Callable[[dict[str, Any]], str]
+    default: Callable[[dict[str, Any]], str]
 
 
 DESERIALIZATION_FUNCTIONS: DeserializationFunctionsDict = {
@@ -234,14 +234,14 @@ def get_multi(
 def get_multi(
     namespace: Literal['config'],
     sub_namespace: str | None, obj_ids: List[str]
-) -> Dict[str, object]: ...
+) -> Dict[str, Dict[str, Any]]: ...
 
 
 @overload
 def get_multi(
     namespace: Literal['default'],
     sub_namespace: str | None, obj_ids: List[str]
-) -> Dict[str, object]: ...
+) -> Dict[str, Dict[str, Any]]: ...
 
 
 def get_multi(

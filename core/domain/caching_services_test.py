@@ -33,7 +33,7 @@ from core.domain import topic_domain
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Any, Dict, cast
+from typing import Any, Dict
 
 memory_cache_services = models.Registry.import_cache_services()
 
@@ -391,14 +391,9 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             '0',
             [exploration_id, nonexistent_exploration_id])
 
-        # Using a cast here because the return value of get_multi method is
-        # Dict[str, Any] and mypy will assume result.get() to be Any otherwise.
-        result_exploration = cast(
-            exp_domain.Exploration, result.get(exploration_id))
-
         self.assertEqual(
             default_exploration.to_dict(),
-            result_exploration.to_dict()) # type: ignore[no-untyped-call]
+            result[exploration_id].to_dict()) # type: ignore[no-untyped-call]
 
         self.assertFalse(nonexistent_exploration_id in result)
 
@@ -445,13 +440,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             '1',
             [exploration_id])
 
-        # Using a cast here because the return value of get_multi method is
-        # Dict[str, Any] and mypy will assume result.get() to be Any otherwise.
-        result_exploration = cast(
-            exp_domain.Exploration, existent_result.get(exploration_id))
-
         self.assertEqual(
-            result_exploration.to_dict(), # type: ignore[no-untyped-call]
+            existent_result[exploration_id].to_dict(), # type: ignore[no-untyped-call]
             default_exploration.to_dict())
 
     def test_set_multi_returns_true_for_successful_insert_into_cache(
