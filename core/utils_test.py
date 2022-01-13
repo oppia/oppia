@@ -668,21 +668,21 @@ class UtilsTests(test_utils.GenericTestBase):
             utils.require_valid_filename(image_filename)
 
     def test_require_valid_image_filename(self) -> None:
-        """Test filename validation."""
+        """Test image filename validation."""
         self._assert_valid_image_filename(
-            'Expected file name to be a string, received 10', 10) # type: ignore[arg-type]
+            'Expected image filename to be a string, received 10', 10) # type: ignore[arg-type]
         self._assert_valid_image_filename(
-            'File name should not start with a dot.', '.name')
+            'Image filename should not start with a dot.', '.name')
         self._assert_valid_image_filename(
-            'File name should not include slashes or '
+            'Image filename should not include slashes or '
             'consecutive dot characters.', 'file/name')
         self._assert_valid_image_filename(
-            'File name should not include slashes or '
+            'Image filename should not include slashes or '
             'consecutive dot characters.', 'file..name')
         self._assert_valid_image_filename(
-            'File name should include an extension.', 'name')
+            'Image filename should include an extension.', 'name')
         filename = 'filename.svg'
-        utils.require_valid_filename(filename)
+        utils.require_valid_image_filename(filename)
 
     def test_get_time_in_millisecs(self) -> None:
         dt = datetime.datetime(2020, 6, 15)

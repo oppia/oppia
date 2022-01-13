@@ -776,35 +776,32 @@ def require_valid_thumbnail_filename(thumbnail_filename: str) -> None:
                 thumbnail_filename)
 
 
-def require_valid_filename(filename: str) -> None:
-    """Generic file name validation.
-
+def require_valid_image_filename(image_filename: str) -> None:
+    """Generic image filename validation.
         Args:
-            filename: str. The file name to validate.
-
+            image_filename: str. The image filename to validate.
         Raises:
-            ValidationError. File name is not a string.
-            ValidationError. File name does start with a dot.
-            ValidationError. File name includes slashes
+            ValidationError. Image filename is not a string.
+            ValidationError. Image filename does start with a dot.
+            ValidationError. Image filename includes slashes
                 or consecutive dots.
-            ValidationError. File name does not include an extension.
+            ValidationError. Image filename does not include an extension.
         """
-
-    if filename is not None:
-        if not isinstance(filename, str):
+    if image_filename is not None:
+        if not isinstance(image_filename, str):
             raise ValidationError(
-                'Expected file name to be a string, received %s'
-                % filename)
-        if filename.rfind('.') == 0:
+                'Expected image filename to be a string, received %s'
+                % image_filename)
+        if image_filename.rfind('.') == 0:
             raise ValidationError(
-                'File name should not start with a dot.')
-        if '/' in filename or '..' in filename:
+                'Image filename should not start with a dot.')
+        if '/' in image_filename or '..' in image_filename:
             raise ValidationError(
-                'File name should not include slashes or '
+                'Image filename should not include slashes or '
                 'consecutive dot characters.')
-        if '.' not in filename:
+        if '.' not in image_filename:
             raise ValidationError(
-                'File name should include an extension.')
+                'Image filename should include an extension.')
 
 
 def require_valid_meta_tag_content(meta_tag_content: str) -> None:
