@@ -105,6 +105,7 @@ describe('TopicSummaryTileCompoennt', () => {
 
     component.ngOnInit();
 
+    expect(component.hasTranslationKey()).toBe(false);
     expect(component.topicNameTranslationKey).toBe(
       component.topicSummary.name);
   });

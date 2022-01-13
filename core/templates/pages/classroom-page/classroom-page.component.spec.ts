@@ -104,6 +104,12 @@ describe('Classroom Page Component', () => {
     expect(component.getStaticImageUrl('test')).toEqual(imageUrl);
   });
 
+  it('should check whether translation key is present', () => {
+    spyOn(i18nLanguageCodeService, 'hasTranslations').and.returnValue(
+      true);
+    expect(component.hasTranslationKey()).toBe(true);
+  });
+
   it('should initialize', fakeAsync(() => {
     let classroomUrlFragment = 'test_fragment';
     let bannerImageUrl = 'banner_image_url';
