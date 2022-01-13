@@ -1364,7 +1364,7 @@ class TestBase(unittest.TestCase):
         get_match = re.match if full_match else re.search
         differences = [
             '~ [i=%d]:\t%r does not match: %r' % (i, item, regexp)
-            for i, (regexp, item) in enumerate(python_utils.ZIP(regexps, items))
+            for i, (regexp, item) in enumerate(zip(regexps, items))
             if get_match(regexp, item, flags=re.DOTALL) is None
         ]
         if len(items) < len(regexps):
@@ -2648,7 +2648,7 @@ title: Title
         exploration.correctness_feedback_enabled = correctness_feedback_enabled
         exploration.add_states(state_names[1:])
         for from_state_name, dest_state_name in (
-                python_utils.ZIP(state_names[:-1], state_names[1:])):
+                zip(state_names[:-1], state_names[1:])):
             from_state = exploration.states[from_state_name]
             self.set_interaction_for_state(
                 from_state, next(interaction_ids))

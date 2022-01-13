@@ -20,7 +20,6 @@ from __future__ import annotations
 
 import itertools
 
-from core import python_utils
 from core.domain import beam_job_domain
 from core.domain import beam_job_services
 from core.jobs import base_jobs
@@ -111,7 +110,7 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
         # instead. Reference: https://github.com/python/mypy/issues/9590.
         by_id = lambda model: model.id
         run_models = sorted(beam_job_run_models, key=by_id)
-        for i, (run, model) in enumerate(python_utils.ZIP(runs, run_models)):
+        for i, (run, model) in enumerate(zip(runs, run_models)):
             with self.subTest('i=%d' % i):
                 self.assertEqual(run.job_id, model.id)
                 self.assertEqual(run.job_name, model.job_name)

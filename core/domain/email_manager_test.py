@@ -21,7 +21,6 @@ import logging
 import types
 
 from core import feconf
-from core import python_utils
 from core.constants import constants
 from core.domain import config_domain
 from core.domain import config_services
@@ -5505,8 +5504,7 @@ class EmailPreferencesTests(test_utils.EmailTestBase):
         emails = ('user1@example.com', 'user2@example.com')
 
         user_ids = []
-        for user_id, username, user_email in python_utils.ZIP(
-                gae_ids, usernames, emails):
+        for user_id, username, user_email in zip(gae_ids, usernames, emails):
             user_settings = user_services.create_new_user(user_id, user_email)
             user_ids.append(user_settings.user_id)
             user_services.set_username(user_settings.user_id, username)
