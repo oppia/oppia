@@ -121,14 +121,14 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
             .get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
-    def test_get_model_association_to_user(self):
+    def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
             opportunity_models.ExplorationOpportunitySummaryModel
             .get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
         )
 
-    def test_get_export_policy(self):
+    def test_get_export_policy(self) -> None:
         expected_export_policy_dict = {
             'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -310,14 +310,14 @@ class SkillOpportunityModelTest(test_utils.GenericTestBase):
             opportunity_models.SkillOpportunityModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
-    def test_get_model_association_to_user(self):
+    def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
             opportunity_models.SkillOpportunityModel
             .get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
         )
 
-    def test_get_export_policy(self):
+    def test_get_export_policy(self) -> None:
         expected_export_policy_dict = {
             'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
