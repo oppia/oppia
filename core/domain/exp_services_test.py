@@ -4692,7 +4692,7 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
     def test_get_next_page_of_all_non_private_commits(self):
         all_commits = (
             exp_services.get_next_page_of_all_non_private_commits()[0])
-        self.assertEqual(len(all_commits), 7)
+        self.assertEqual(len(all_commits), 1)
         commit_dicts = [commit.to_dict() for commit in all_commits]
         self.assertDictContainsSubset(
             self.COMMIT_ALBERT_PUBLISH_EXP_2, commit_dicts[0])
@@ -5587,122 +5587,6 @@ title: Old Title
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(exploration.title, 'new title')
         self.assertEqual(exploration.blurb, 'blurb_changed')
-
-    def test_update_exploration_proto_size(self):
-        exploration = (
-            exp_domain.Exploration.create_default_exploration(self.NEW_EXP_ID))
-        self.assertEqual(exploration.android_proto_size_in_bytes, 56)
-        exp_services.update_exploration(
-            self.albert_id, self.NEW_EXP_ID, [
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_ADD_STATE,
-                    'state_name': 'State A',
-                }),
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_ADD_STATE,
-                    'state_name': 'State 2',
-                }),
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_ADD_STATE,
-                    'state_name': 'State 3',
-                }),
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                    'state_name': 'State A',
-                    'new_value': 'TextInput'
-                }),
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name':
-                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
-                    'state_name': 'State A',
-                    'new_value': {
-                        'placeholder': {
-                            'value': {
-                                'content_id': 'ca_placeholder_0',
-                                'unicode_str': ''
-                            }
-                        },
-                        'rows': {'value': 1}
-                    }
-                }),
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name':
-                        exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
-                    'state_name': 'State A',
-                    'new_value': 1
-                }),
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                    'state_name': 'State 2',
-                    'new_value': 'TextInput'
-                }),
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name':
-                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
-                    'state_name': 'State 2',
-                    'new_value': {
-                        'placeholder': {
-                            'value': {
-                                'content_id': 'ca_placeholder_0',
-                                'unicode_str': ''
-                            }
-                        },
-                        'rows': {'value': 1}
-                    }
-                }),
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name':
-                        exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
-                    'state_name': 'State 2',
-                    'new_value': 1
-                }),
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                    'state_name': 'State 3',
-                    'new_value': 'TextInput'
-                }),
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name':
-                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
-                    'state_name': 'State 3',
-                    'new_value': {
-                        'placeholder': {
-                            'value': {
-                                'content_id': 'ca_placeholder_0',
-                                'unicode_str': ''
-                            }
-                        },
-                        'rows': {'value': 1}
-                    }
-                }),
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name':
-                        exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
-                    'state_name': 'State 3',
-                    'new_value': 1
-                }),
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_RENAME_STATE,
-                    'old_state_name': 'State 2',
-                    'new_state_name': 'State B'
-                }),
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_DELETE_STATE,
-                    'state_name': 'State 3',
-                })], 'changes')
-
-        updated_exploration = exp_fetchers.get_exploration_by_id(
-            self.NEW_EXP_ID)
-        self.assertEqual(updated_exploration.android_proto_size_in_bytes, 308)
 
     def test_update_exploration_param_changes(self):
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)

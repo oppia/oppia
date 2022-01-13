@@ -2331,14 +2331,34 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exp_domain.Exploration.deserialize(
                 exploration.serialize()).to_dict())
 
-    def test_proto_size_calculation_is_correct(self):
+    def test_android_proto_size_calculation_is_correct(self):
         """Test proto size calculation function."""
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
             objective='', end_state_name='End')
 
-        exploration_proto_size = exploration.get_proto_size()
-        self.assertEqual(exploration_proto_size, 141)
+        self.assertEqual(exploration.android_proto_size_in_bytes, 141)
+
+        exploration.title = 'Title'
+        exploration.category = 'Category'
+        exploration.objective = 'Objective'
+
+        self.assertEqual(exploration.android_proto_size_in_bytes, 148)
+
+    def test_android_proto_conversion_is_correct(self):
+        """Test exploration proto is correct."""
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
+        exploration_proto = exploration.to_android_exploration_proto()
+
+        self.assertEqual(exploration_proto.id, 'eid')
+        self.assertEqual(exploration_proto.content_version, 0)
+        self.assertEqual(
+            exploration_proto.init_state_name, feconf.DEFAULT_INIT_STATE_NAME)
+        self.assertEqual(
+            exploration_proto.title, feconf.DEFAULT_EXPLORATION_TITLE)
+        self.assertEqual(
+            exploration_proto.states[feconf.DEFAULT_INIT_STATE_NAME]
+            .content.content_id, 'content')
 
 
 class ExplorationSummaryTests(test_utils.GenericTestBase):

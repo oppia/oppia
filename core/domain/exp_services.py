@@ -569,7 +569,6 @@ def apply_change_list(exploration_id, change_list):
                         'version %s, received %s' % (
                             feconf.CURRENT_STATE_SCHEMA_VERSION,
                             change.to_version))
-
         return exploration
 
     except Exception as e:
@@ -655,7 +654,8 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
     old_states = exp_fetchers.get_exploration_from_model(
         exploration_model).states
 
-    populate_exploration_model_fields(exploration_model, exploration)
+    exploration_model = (
+        populate_exploration_model_fields(exploration_model, exploration))
 
     change_list_dict = [change.to_dict() for change in change_list]
     exploration_model.commit(committer_id, commit_message, change_list_dict)
@@ -714,7 +714,6 @@ def _create_exploration(
             changes made in this model, which should give sufficient information
             to reconstruct the commit.
     """
-
     # This line is needed because otherwise a rights object will be created,
     # but the creation of an exploration object will fail.
     exploration.validate()
@@ -1170,7 +1169,6 @@ def update_exploration(
     updated_exploration = apply_change_list(exploration_id, change_list)
     if get_story_id_linked_to_exploration(exploration_id) is not None:
         validate_exploration_for_story(updated_exploration, True)
-
     _save_exploration(
         committer_id, updated_exploration, commit_message, change_list)
 
@@ -1242,7 +1240,7 @@ def _compute_summary_of_exploration(exploration):
         exploration.id, strict=True)
     exp_summary_model = exp_models.ExpSummaryModel.get(
         exploration.id, strict=False)
-    if exp_summary_model:
+    if exp_summary_model is not None:
         old_exp_summary = exp_fetchers.get_exploration_summary_from_model(
             exp_summary_model)
         ratings = old_exp_summary.ratings or feconf.get_empty_ratings()
@@ -1323,11 +1321,9 @@ def populate_exploration_summary_model_fields(
     from exploration summary object.
 
     Args:
-        exp_summary_model: ExpSummaryModel. The
-            model to populate.
-        exp_summary: ExplorationSummary. The
-            exploration summary domain object which should be used
-            to populate the model.
+        exp_summary_model: ExpSummaryModel. The model to populate.
+        exp_summary: ExplorationSummary. The exploration summary domain
+            object which should be used to populate the model.
 
     Returns:
         ExpSummaryModel. Populated model.

@@ -1857,7 +1857,7 @@ class WrittenTranslations:
         written_translation_content_mapping_protos_list = []
 
         language_code = (
-            android_validation_constants.LANGAUGE_CODE_TO_ENUM_MAP)
+            android_validation_constants.LANGUAGE_CODE_TO_ENUM_MAP)
 
         for (lang_code, written_translation_content_map) in (
             language_to_content_id_written_translation_map.items()):
@@ -2194,7 +2194,7 @@ class RecordedVoiceovers:
                 language_to_content_id_map[content_id] = voiceover_proto
 
         language_code = (
-            android_validation_constants.LANGAUGE_CODE_TO_ENUM_MAP)
+            android_validation_constants.LANGUAGE_CODE_TO_ENUM_MAP)
 
         voiceover_content_mapping_protos_list = []
 

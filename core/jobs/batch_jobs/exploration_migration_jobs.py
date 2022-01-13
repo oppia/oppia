@@ -97,9 +97,9 @@ class MigrateExplorationJob(base_jobs.JobBase):
         Returns:
             Result((str, ExplorationSummary), (str, Exception)). Result
             containing tuple that consists of exploration ID and either
-            exploration object or Exception. Exploration object is
-            returned when the migration was successful and Exception
-            is returned otherwise.
+            exploration summary object or Exception. ExplorationSummary
+            object is returned when the migration was successful and
+            Exception is returned otherwise.
         """
         try:
             exploration_summary = (
@@ -143,15 +143,12 @@ class MigrateExplorationJob(base_jobs.JobBase):
         ) % (exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION)
         change_dicts = [change.to_dict() for change in exploration_changes]
         with datastore_services.get_ndb_context():
-            exp_rights_model = {
-                'rights_model': exploration_rights_model
-            }
             models_to_put = updated_exploration_model.compute_models_to_commit(
                 feconf.MIGRATION_BOT_USERNAME,
                 feconf.COMMIT_TYPE_EDIT,
                 commit_message,
                 change_dicts,
-                additional_models=exp_rights_model
+                additional_models={'rights_model': exp_rights_model}
             ).values()
         datastore_services.update_timestamps_multi(list(models_to_put))
         return models_to_put
@@ -344,11 +341,34 @@ class MigrateExplorationJob(base_jobs.JobBase):
                 })
         )
 
+        exploration_summary_objects_list = (
+            {
+                'exp_model': unmigrated_exploration_models,
+                'exploration_summary_model': exploration_summary_models,
+            }
+            | 'Merge objects' >> beam.CoGroupByKey()
+            | 'Get rid of ID' >> beam.Values()  # pylint: disable=no-value-for-parameter
+            | 'Remove unmigrated exploration' >> beam.Filter(
+                lambda x: len(x['exploration_summary']) > 0)
+            | 'Reorganize the exploration summary objects' >> beam.Map(lambda objects: {
+                    'exp_model': objects['exp_model'][0],
+                    'exploration_summary_model': (
+                        objects['exploration_summary_model'][0])
+                })
+        )
+
         exploration_objects_list_job_run_results = (
             exploration_objects_list
             | 'Transform exploration objects into job run results' >> (
                 job_result_transforms.CountObjectsToJobRunResult(
                     'EXPLORATION MIGRATED'))
+        )
+
+        exploration_summary_objects_list_job_run_results = (
+            exploration_summary_objects_list
+            | 'Transform exploration summary objects into job run results' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'EXPLORATION SUMMARY MIGRATED'))
         )
 
         cache_deletion_job_run_results = (
@@ -391,7 +411,8 @@ class MigrateExplorationJob(base_jobs.JobBase):
             (
                 cache_deletion_job_run_results,
                 migrated_exploration_job_run_results,
-                exploration_objects_list_job_run_results
+                exploration_objects_list_job_run_results,
+                exploration_summary_objects_list_job_run_results
             )
             | beam.Flatten()
         )

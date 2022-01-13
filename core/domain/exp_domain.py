@@ -1314,11 +1314,11 @@ class Exploration:
 
     @property
     def android_proto_size_in_bytes(self):
-        """Compute the exploration proto size if any attribute
-        has any data change.
+        """Returns the most up-to-date size of the exploration proto,
+         recomputing from scratch if necessary.
 
         Returns:
-            int. Updated exploration's proto size.
+            int. Updated exploration's proto size, in bytes.
         """
         if self._cached_android_proto_size_is_stale:
             self._cached_android_proto_size_in_bytes = self.get_proto_size()
@@ -1327,8 +1327,8 @@ class Exploration:
         return self._cached_android_proto_size_in_bytes
 
     def __setattr__(self, attrname, new_value):
-        """Perform the _cached_android_proto_size_is_stale check every time
-        the Exploration class object updates.
+        """Set _cached_android_proto_size_is_stale to True every time
+        the Exploration object is updated.
 
         Args:
             attrname: str. The name of the Exploration class attribute.
@@ -1339,7 +1339,7 @@ class Exploration:
         # If the value of _cached_android_proto_size_in_bytes or
         # _cached_android_proto_size_is_stale gets updated, we don't want to
         # recompute the exploration's proto size. These attributes are
-        # both supporting attribute which aren't included in the
+        # both supporting attributes which aren't included in the
         # proto size calculation.
         if attrname not in (
             '_cached_android_proto_size_in_bytes',
@@ -2371,8 +2371,8 @@ class Exploration:
         exp_dict = self.to_dict()
         exp_dict['schema_version'] = self.CURRENT_EXP_SCHEMA_VERSION
 
-        # The ID is the properties
-        # that should not be stored within the YAML representation.
+        # The ID is the only property which should not be stored within the
+        # YAML representation.
         del exp_dict['id']
 
         return python_utils.yaml_from_dict(exp_dict)

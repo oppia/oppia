@@ -271,9 +271,9 @@ class BaseInteraction:
             hints: list(Hint). List of hints.
 
         Returns:
-            list. The list of HintDto proto object.
+            list(HintDto) The list of HintDto proto object.
         """
-        hints_proto = {}
+        hints_proto = []
         if hints is not None:
             hints_proto = [hint.to_android_hint_proto() for hint in hints]
 
