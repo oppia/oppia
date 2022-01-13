@@ -21,7 +21,6 @@ from __future__ import annotations
 import os
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.domain import event_services
 from core.domain import exp_domain
@@ -873,7 +872,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                 },
                 'schema_version': stats_models.CURRENT_ACTION_SCHEMA_VERSION,
             }
-            for state_name, dest_state_name in python_utils.ZIP(
+            for state_name, dest_state_name in zip(
                 state_names[:-1], state_names[1:]))
         actions.append({
             'action_type': 'ExplorationQuit',
