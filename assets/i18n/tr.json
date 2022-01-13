@@ -213,7 +213,7 @@
 	"I18N_GET_STARTED_PAGE_PARAGRAPH_4": "Bir keşif birden fazla adımdan oluşuyor. Her adım metin (örneğin yazılı bir açıklama), resim ve video içerebilir. Her adım, öğrenciye devam etmesi için denemesi gereken bir soru sunar. Çoktan seçmeli bir soru olabilir, içine bir şey yazmalarını gerektirebilir veya bir dizi başka etkileşimlerden biri olabilir.",
 	"I18N_GET_STARTED_PAGE_PARAGRAPH_5": "Öğrenci soruyu cevapladığında, Oppia onlara geri bildirim verecek ve bir sonraki adıma devam etmelerine izin verecektir. Öğrencilerin Oppia'yı nasıl yaşadıklarını görmek için, bu keşiflerden birini deneyin:",
 	"I18N_GET_STARTED_PAGE_PARAGRAPH_6": "Araştırma oluşturma hakkında daha fazla bilgiyi <a href=\"https://oppia.github.io/#/CreatingAnExploration\" target=\"new\">kullanıcı belgelerinde</a> bulabilirsiniz.",
-	"I18N_GET_STARTED_PAGE_PARAGRAPH_7": "Araştırmanızı oluşturduktan ve öğrenenleri görmeye hazır olduğunuzda, sayfanın üstündeki 'Yayınla' düğmesini tıklayın. Bu, keşiflerinizi dünyadaki öğrenciler için hazır hale getirecek!",
+	"I18N_GET_STARTED_PAGE_PARAGRAPH_7": "Araştırmanızı oluşturduktan ve öğrenenleri görmeye hazır olduğunuzda, sayfanın üstündeki 'Yayımla' düğmesini tıklayın. Bu, keşiflerinizi dünyadaki öğrenciler için hazır hale getirecek!",
 	"I18N_GET_STARTED_PAGE_PARAGRAPH_7_HEADING": "Keşiflerinizi Yayınlayın",
 	"I18N_GET_STARTED_PAGE_PARAGRAPH_8": "Araştırmayı yayınladıktan sonra, bir bağlantı yoluyla paylaşabilir veya hatta <a href=\"https://oppia.github.io/#/EmbeddingAnExploration\" target=\"new\">kendi web sayfanıza gömebilirsiniz</a>.",
 	"I18N_GET_STARTED_PAGE_PARAGRAPH_8_HEADING": "Keşfinizi Paylaşın",
