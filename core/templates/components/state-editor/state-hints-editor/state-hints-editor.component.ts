@@ -176,7 +176,10 @@ export class StateHintsEditorComponent implements OnInit {
     // display state of the hint.
     value.evt.stopPropagation();
 
-    const deleteHintModalSuccess = (): void => {
+    this.alertsService.clearWarnings();
+    this.ngbModal.open(DeleteHintModalComponent, {
+      backdrop: true,
+    }).result.then((): void => {
       if (this.stateSolutionService.savedMemento &&
         this.stateHintsService.savedMemento.length === 1) {
         this.openDeleteLastHintModal();
@@ -189,13 +192,6 @@ export class StateHintsEditorComponent implements OnInit {
       if (value.index === this.stateHintsService.getActiveHintIndex()) {
         this.stateHintsService.setActiveHintIndex(null);
       }
-    };
-
-    this.alertsService.clearWarnings();
-    this.ngbModal.open(DeleteHintModalComponent, {
-      backdrop: true,
-    }).result.then(function() {
-      deleteHintModalSuccess();
     }, function() {
       this.alertsService.clearWarnings();
     });
