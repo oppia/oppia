@@ -59,7 +59,7 @@ export class SkillEditorStateService {
   private _skill!: Skill;
   private _skillRights!: SkillRights;
   private _skillIsInitialized: boolean = false;
-  private assignedSkillTopicData = null;
+  private assignedSkillTopicData: { [topicName: string]: string } | null = null;
   private _skillIsBeingLoaded: boolean = false;
   private _skillIsBeingSaved: boolean = false;
   private _groupedSkillSummaries: GroupedSkillSummaries = {
@@ -86,7 +86,10 @@ export class SkillEditorStateService {
     this._setSkill(skill);
   };
 
-  private _updateGroupedSkillSummaries = (groupedSkillSummaries) => {
+  private _updateGroupedSkillSummaries = (
+    groupedSkillSummaries: {
+      [topicName: string]: SkillSummaryBackendDict[]
+    }) => {
     let topicName = null;
     this._groupedSkillSummaries.current = [];
     this._groupedSkillSummaries.others = [];
@@ -103,9 +106,11 @@ export class SkillEditorStateService {
         break;
       }
     }
-    for (let idx in groupedSkillSummaries[topicName]) {
-      this._groupedSkillSummaries.current.push(
-        groupedSkillSummaries[topicName][idx]);
+    if (topicName !== null) {
+      for (let idx in groupedSkillSummaries[topicName]) {
+        this._groupedSkillSummaries.current.push(
+          groupedSkillSummaries[topicName][idx]);
+      }
     }
     for (let name in groupedSkillSummaries) {
       if (name === topicName) {
@@ -171,7 +176,7 @@ export class SkillEditorStateService {
     return this._skillIsBeingLoaded;
   }
 
-  getAssignedSkillTopicData(): string {
+  getAssignedSkillTopicData(): { [topicName: string]: string } | null {
     return this.assignedSkillTopicData;
   }
 
