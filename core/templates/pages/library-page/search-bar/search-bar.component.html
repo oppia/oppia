@@ -4,7 +4,7 @@
 <div class="oppia-same-row-container">
   <form class="navbar-form search-bar-float-left oppia-search-bar-form" role="search">
     <div class="form-group">
-      <div class="input-group oppia-input-group" [ngClass]="{'classroom-page-input-group': classroomPageIsActive}">
+      <div class="input-group oppia-input-group" [ngClass]="{'classroom-page-input-group': isSearchButtonActive()}">
         <div class="input-group-addon oppia-search-bar-icon">
           <i class="material-icons oppia-translate-icon-down md-18" *ngIf="!isSearchInProgress()">&#xE8B6;</i>
           <span *ngIf="isSearchInProgress()">
@@ -15,7 +15,7 @@
                class="form-control oppia-search-bar-input oppia-search-bar-text-input protractor-test-search-input"
                [placeholder]="searchBarPlaceholder"
                [(ngModel)]="searchQuery"
-               (ngModelChange)="classroomPageIsActive ? null : onSearchQueryChangeExec()"
+               (ngModelChange)="searchButtonIsActive ? null : onSearchQueryChangeExec()"
                [ngModelOptions]="{ updateOn: 'blur', standalone:'true' }"
                aria-label="Search bar"
                (keydown.enter)="$event.target.blur()"
@@ -33,6 +33,7 @@
             type="button"
             class="btn protractor-test-search-bar-dropdown-toggle oppia-search-bar-dropdown-toggle oppia-search-bar-input oppia-search-bar-category-input dropdown-toggle"
             title="{{ selectionDetails.categories.description | translate }}">
+      <i *ngIf="isMobileViewActive()" class="material-icons md-18 category-selector-icon">&#xE574;</i>
       {{categoryButtonText|truncate:14}}
     </button>
     <ul ngbDropdownMenu
@@ -88,6 +89,7 @@
           type="button"
           class="btn protractor-test-search-bar-dropdown-toggle oppia-search-bar-input oppia-search-bar-language-input dropdown-toggle language-dropdown-toggle oppia-search-bar-dropdown-toggle-button"
           title="{{selectionDetails.languageCodes.description | translate}}">
+    <i *ngIf="isMobileViewActive()" class="material-icons md-18 language-selector-icon">&#xe8e2;</i>
     {{ languageButtonText | truncate:14 }}
   </button>
   <ul ngbDropdownMenu class="protractor-test-search-bar-dropdown-menu oppia-search-bar-dropdown-menu-section dropdown-menu"
@@ -134,11 +136,11 @@
 </div>
 <div class="oppia-same-row-container">
   <div class="search-bar-float-left oppia-navbar-button-container">
-    <div *ngIf="classroomPageIsActive"
+    <div *ngIf="searchButtonIsActive"
          class="oppia-search-button protractor-test-search-button"
          (click)="onSearchQueryChangeExec()"
          title="Click here to search">
-         Go!
+      <i class="material-icons md-18 search-button-icon">&#xe8b6;</i>
     </div>
   </div>
 </div>

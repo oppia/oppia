@@ -27,6 +27,7 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { SearchService, SelectionDetails } from 'services/search.service';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { UrlService } from 'services/contextual/url.service';
 import { ConstructTranslationIdsService } from 'services/construct-translation-ids.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
@@ -61,6 +62,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   KEYBOARD_EVENT_TO_KEY_CODES!: {};
   directiveSubscriptions: Subscription = new Subscription();
   classroomPageIsActive: boolean = false;
+  searchButtonIsActive: boolean = false;
   searchQuery: string = '';
   searchQueryChanged: Subject<string> = new Subject<string>();
   translationData: Record<string, number> = {};
@@ -70,6 +72,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   constructor(
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private windowRef: WindowRef,
+    private windowDimensionsService: WindowDimensionsService,
     private searchService: SearchService,
     private urlService: UrlService,
     private navigationService: NavigationService,
@@ -80,6 +83,17 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   ) {
     this.classroomPageIsActive = (
       this.urlService.getPathname().startsWith('/learn'));
+    this.isSearchButtonActive();
+  }
+
+  isMobileViewActive(): boolean {
+    return this.windowDimensionsService.getWidth() <= 766;
+  }
+
+  isSearchButtonActive(): boolean {
+    this.searchButtonIsActive = this.classroomPageIsActive ||
+      this.isMobileViewActive();
+    return this.searchButtonIsActive;
   }
 
   isSearchInProgress(): boolean {
@@ -87,7 +101,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   }
 
   searchToBeExec(e: {target: {value: string}}): void {
-    if (!this.classroomPageIsActive) {
+    if (!this.searchButtonIsActive) {
       this.searchQueryChanged.next(e.target.value);
     }
   }
