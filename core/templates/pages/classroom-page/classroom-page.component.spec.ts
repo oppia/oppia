@@ -126,7 +126,7 @@ describe('Classroom Page Component', () => {
     spyOn(classroomBackendApiService, 'fetchClassroomDataAsync')
       .and.returnValue(Promise.resolve(classroomData));
     spyOn(i18nLanguageCodeService, 'getClassroomTranslationKey')
-      .and.returnValue('II8N_CLASSROOM_MATH_TITLE');
+      .and.returnValue('I18N_CLASSROOM_MATH_TITLE');
     spyOn(i18nLanguageCodeService, 'hasTranslations').and.returnValue(
       true);
 
@@ -141,7 +141,7 @@ describe('Classroom Page Component', () => {
     expect(component.classroomData).toEqual(classroomData);
     expect(component.classroomDisplayName).toEqual(classroomData.getName());
     expect(component.classroomNameTranslationKey).toBe(
-      'II8N_CLASSROOM_MATH_TITLE');
+      'I18N_CLASSROOM_MATH_TITLE');
     expect(pageTitleService.setDocumentTitle).toHaveBeenCalled();
     expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
     expect(classroomBackendApiService.onInitializeTranslation.emit)

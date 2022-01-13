@@ -57,15 +57,15 @@ export class I18nLanguageCodeService {
 
   // Remove this method when translation service is extended.
   getClassroomTranslationKey(classroomName: string): string {
-    return `II8N_CLASSROOM_${classroomName.toUpperCase()}_TITLE`;
+    return `I18N_CLASSROOM_${classroomName.toUpperCase()}_TITLE`;
   }
 
   // Remove this method when translation service is extended.
   getTopicTranslationKey(topicId: string, isDescription: boolean): string {
     return (
       isDescription ?
-      `II8N_TOPIC_${topicId}_DESCRIPTION` :
-      `II8N_TOPIC_${topicId}_TITLE`
+      `I18N_TOPIC_${topicId}_DESCRIPTION` :
+      `I18N_TOPIC_${topicId}_TITLE`
     );
   }
 

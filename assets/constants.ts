@@ -83,7 +83,7 @@ export default {
   // any new class, topic, skill, exploration or subtopic is added or a
   // previous one is deleted.
   "HACKY_TRANSLATIONS_KEYS": [
-    "II8N_CLASSROOM_MATH_TITLE",
+    "I18N_CLASSROOM_MATH_TITLE",
     "I18N_TOPIC_iX9kYCjnouWN_TITLE",
     "I18N_TOPIC_sWBXKH4PZcK6_TITLE",
     "I18N_TOPIC_C4fqwrvqWpRm_TITLE",

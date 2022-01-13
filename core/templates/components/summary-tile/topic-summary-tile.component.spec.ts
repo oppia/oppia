@@ -99,7 +99,7 @@ describe('TopicSummaryTileCompoennt', () => {
 
   it('should get correct translations', () => {
     spyOn(i18nLanguageCodeService, 'getTopicTranslationKey').and.returnValue(
-      'II8N_TOPIC_12345axa_TITLE');
+      'I18N_TOPIC_12345axa_TITLE');
     spyOn(i18nLanguageCodeService, 'hasTranslations').and.returnValue(
       false);
 

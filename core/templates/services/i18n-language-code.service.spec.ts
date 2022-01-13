@@ -58,16 +58,16 @@ describe('I18nLanguageCodeService', () => {
 
   it('should set translation keys correctly', () => {
     expect(i18nLanguageCodeService.getClassroomTranslationKey(
-      'Math')).toBe('II8N_CLASSROOM_MATH_TITLE');
+      'Math')).toBe('I18N_CLASSROOM_MATH_TITLE');
     expect(i18nLanguageCodeService.getTopicTranslationKey(
-      '12345axa', false)).toBe('II8N_TOPIC_12345axa_TITLE');
+      '12345axa', false)).toBe('I18N_TOPIC_12345axa_TITLE');
     expect(i18nLanguageCodeService.getTopicTranslationKey(
-      '12345axa', true)).toBe('II8N_TOPIC_12345axa_DESCRIPTION');
+      '12345axa', true)).toBe('I18N_TOPIC_12345axa_DESCRIPTION');
   });
 
   it('should check whether translation key is present', () => {
     expect(i18nLanguageCodeService.hasTranslations(
-      'II8N_TOPIC_12345axa_TITLE')).toBe(false);
+      'I18N_TOPIC_12345axa_TITLE')).toBe(false);
   });
 
   it('should get event emitter for loading of preferred language codes', () => {
