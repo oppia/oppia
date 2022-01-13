@@ -26,7 +26,7 @@
                         [(ngModel)]="userSelections[choice]"
                         [checked]="userSelections[choice]"
                         (change)="onToggleCheckbox()"
-                        [disabled]="preventAdditionalSelections && !userSelections[choice]" 
+                        [disabled]="preventAdditionalSelections && !userSelections[choice]"
                         tabindex="0"
                         [ngModelOptions]="{standalone: true}">
             <span dir="auto">
