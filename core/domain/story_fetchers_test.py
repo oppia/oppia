@@ -186,9 +186,9 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(story_summary.title, 'Title')
         self.assertEqual(story_summary.description, 'Description')
         self.assertEqual(story_summary.node_titles, ['Title 1'])
-        with self.assertRaisesRegex(
-            Exception,
-            'Entity for class StorySummaryModel with id fakeID not found'
+        with self.swap_to_always_return(
+            story_models.StorySummaryModel,
+            'get'
             ):
             story_summary = story_fetchers.get_story_summary_by_id('fakeID')
             self.assertEqual(story_summary, None)
