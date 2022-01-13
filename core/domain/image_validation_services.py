@@ -26,11 +26,14 @@ from core.domain import html_validation_service
 
 def validate_image_and_filename(raw_image, filename):
     """Validates the image data and its filename.
+
     Args:
         raw_image: str. The image content.
         filename: str. The filename for the image.
+
     Returns:
         str. The file format of the image.
+
     Raises:
         ValidationError. Image or filename supplied fails one of the
             validation checks.

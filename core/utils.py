@@ -778,12 +778,14 @@ def require_valid_thumbnail_filename(thumbnail_filename: str) -> None:
 
 def require_valid_image_filename(image_filename: str) -> None:
     """Generic image filename validation.
+
         Args:
             image_filename: str. The image filename to validate.
+
         Raises:
             ValidationError. Image filename is not a string.
             ValidationError. Image filename does start with a dot.
-            ValidationError. Image filename includes slashes
+            ValidationError. Image filename includes slashesb
                 or consecutive dots.
             ValidationError. Image filename does not include an extension.
         """
