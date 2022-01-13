@@ -20,7 +20,6 @@ from __future__ import annotations
 
 import collections
 
-from core import python_utils
 from core.jobs import base_jobs
 from core.jobs import job_utils
 from core.jobs.io import ndb_io
@@ -118,7 +117,7 @@ class AuditAllStorageModelsJob(base_jobs.JobBase):
                 beam.ParDo(base_validation.ValidateDeletedModel()))
         ]
 
-        model_groups = python_utils.ZIP(KIND_BY_INDEX, models_of_kind_by_index)
+        model_groups = zip(KIND_BY_INDEX, models_of_kind_by_index)
         for kind, models_of_kind in model_groups:
             audit_error_pcolls.extend(models_of_kind | ApplyAuditDoFns(kind))
 

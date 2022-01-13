@@ -22,7 +22,6 @@ import datetime
 import logging
 
 from core import feconf
-from core import python_utils
 from core import schema_utils
 from core import utils
 from core.constants import constants
@@ -911,7 +910,7 @@ def can_users_receive_thread_email(
         user_services.get_users_email_preferences_for_exploration(
             recipient_ids, exploration_id))
     zipped_preferences = list(
-        python_utils.ZIP(users_global_prefs, users_exploration_prefs))
+        zip(users_global_prefs, users_exploration_prefs))
 
     result = []
     if has_suggestion:
@@ -1430,7 +1429,7 @@ def _send_suggestions_waiting_too_long_email(
             'email_body_template'])
     # Get the emails and usernames of the admins.
     admin_user_settings = user_services.get_users_settings(admin_ids)
-    curriculum_admin_usernames, admin_emails = list(python_utils.ZIP(*[
+    curriculum_admin_usernames, admin_emails = list(zip(*[
         (admin_user_setting.username, admin_user_setting.email)
         if admin_user_setting is not None else (None, None)
         for admin_user_setting in admin_user_settings
@@ -1577,7 +1576,7 @@ def _send_reviews_needed_email_to_admins(
         'email_body_template']
     # Get the emails and usernames of the users.
     admin_user_settings = user_services.get_users_settings(admin_ids)
-    curriculum_admin_usernames, admin_emails = list(python_utils.ZIP(*[
+    curriculum_admin_usernames, admin_emails = list(zip(*[
         (admin_user_setting.username, admin_user_setting.email)
         if admin_user_setting is not None else (None, None)
         for admin_user_setting in admin_user_settings
@@ -1641,7 +1640,7 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
         return
 
     reviewer_user_settings = user_services.get_users_settings(reviewer_ids)
-    reviewer_usernames, reviewer_emails = list(python_utils.ZIP(*[
+    reviewer_usernames, reviewer_emails = list(zip(*[
         (reviewer_user_setting.username, reviewer_user_setting.email)
         if reviewer_user_setting is not None else (None, None)
         for reviewer_user_setting in reviewer_user_settings

@@ -19,7 +19,6 @@
 from __future__ import annotations
 
 from core import feconf
-from core import python_utils
 from core import utils
 # TODO(#13594): After the domain layer is refactored to be independent of
 # the storage layer, the disable=invalid-import will
@@ -470,7 +469,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         # Generate the new ids.
         instance_ids = [
             cls._generate_id(thread_id, message_id) for thread_id, message_id
-            in python_utils.ZIP(thread_ids, message_ids)
+            in zip(thread_ids, message_ids)
         ]
 
         # Check if the new ids are valid.
