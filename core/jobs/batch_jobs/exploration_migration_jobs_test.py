@@ -49,20 +49,25 @@ class MigrateExplorationJobTests(job_test_utils.JobTestBase):
 
     def setUp(self):
         super().setUp()
-        exp_summary = self.create_model(
+        exp_summary_model = self.create_model(
             exp_models.ExpSummaryModel,
             id=self.EXP_1_ID,
             deleted=False,
             title='title',
             category='category',
             objective='objective',
-            language_code='lang',
-            community_owned=False,
+            language_code='en',
+            ratings=feconf.get_empty_ratings(),
+            scaled_average_rating=feconf.EMPTY_SCALED_AVERAGE_RATING,
             status=constants.ACTIVITY_STATUS_PUBLIC,
-            exploration_model_last_updated=datetime.datetime.utcnow()
+            community_owned=False,
+            owner_ids=[self.USER_ID_1],
+            contributor_ids=[],
+            contributors_summary={},
+            version=1
         )
-        exp_summary.update_timestamps()
-        exp_summary.put()
+        exp_summary_model.update_timestamps()
+        exp_summary_model.put()
 
         exp_models.ExplorationRightsModel(
             id=self.EXP_1_ID,
@@ -91,7 +96,6 @@ class MigrateExplorationJobTests(job_test_utils.JobTestBase):
             title='exploration title',
             category='category',
             objective='objective',
-            language_code='cs',
             init_state_name='state',
             states_schema_version=48,
             states={
@@ -108,12 +112,16 @@ class MigrateExplorationJobTests(job_test_utils.JobTestBase):
         with cache_swap:
             self.assert_job_output_is([
                 job_run_result.JobRunResult(
-                    stdout='EXPLORATION MIGRATED SUCCESS: 1'),
-                job_run_result.JobRunResult(
                     stdout='EXPLORATION PROCESSED SUCCESS: 1'),
                 job_run_result.JobRunResult(
+                    stdout='EXPLORATION SUMMARY MIGRATED SUCCESS: 1'),
+                job_run_result.JobRunResult(
                     stderr='CACHE DELETION ERROR: "cache deletion error": 1'
-                )
+                ),
+                job_run_result.JobRunResult(
+                    stdout='EXPLORATION SUMMARY PROCESSED SUCCESS: 1'),
+                job_run_result.JobRunResult(
+                    stdout='EXPLORATION MIGRATED SUCCESS: 1'),
             ])
 
         migrated_exp_model = exp_models.ExplorationModel.get(self.EXP_1_ID)
@@ -125,8 +133,6 @@ class MigrateExplorationJobTests(job_test_utils.JobTestBase):
             id=self.EXP_1_ID,
             title='exploration title',
             category='category',
-            objective='objective',
-            language_code='cs',
             init_state_name='state',
             states_schema_version=48,
             states={
@@ -144,13 +150,18 @@ class MigrateExplorationJobTests(job_test_utils.JobTestBase):
             job_run_result.JobRunResult(
                 stdout='EXPLORATION PROCESSED SUCCESS: 1'),
             job_run_result.JobRunResult(
+                stdout='EXPLORATION SUMMARY PROCESSED SUCCESS: 1'),
+            job_run_result.JobRunResult(
                 stdout='EXPLORATION MIGRATED SUCCESS: 1'),
             job_run_result.JobRunResult(
-                stdout='CACHE DELETION SUCCESS: 1')
+                stdout='CACHE DELETION SUCCESS: 1'),
+            job_run_result.JobRunResult(
+                stdout='EXPLORATION SUMMARY MIGRATED SUCCESS: 1')
         ])
 
         migrated_exp_model = exp_models.ExplorationModel.get(self.EXP_1_ID)
         self.assertEqual(migrated_exp_model.version, 2)
+        self.assertEqual(migrated_exp_model.android_proto_size_in_bytes, 64)
 
     def test_broken_exploration_is_not_migrated(self) -> None:
         exp_model = self.create_model(
@@ -159,8 +170,7 @@ class MigrateExplorationJobTests(job_test_utils.JobTestBase):
             title='exploration title',
             category='category',
             objective='objective',
-            language_code=1,
-            init_state_name='state',
+            init_state_name='wrong_init_state_name',
             states_schema_version=48,
             states={
                 'state': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
@@ -175,12 +185,7 @@ class MigrateExplorationJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
-                stderr=(
-                    'EXPLORATION PROCESSED ERROR: "(\'exp_1\','
-                    'ValidationError('
-                    '\'Expected language_code to be a string, received 1\'))": '
-                    '1'
-                )
+                stderr="EXPLORATION PROCESSED ERROR: \"('exp_1_id', ValidationError(\"There is no state in ['state'] corresponding to the exploration's initial state name wrong_init_state_name.\"))\": 1"
             )
         ])
 
@@ -194,14 +199,14 @@ class MigrateExplorationJobTests(job_test_utils.JobTestBase):
             title='exploration title',
             category='category',
             objective='objective',
-            language_code='cs',
             init_state_name='state',
             states_schema_version=48,
             states={
                 'state': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
                     'state', is_initial_state=True
                 ).to_dict()
-            }
+            },
+            android_proto_size_in_bytes=64
         )
         exp_model.update_timestamps()
         exp_model.commit(feconf.SYSTEM_COMMITTER_ID, 'Create exploration', [{
@@ -210,7 +215,9 @@ class MigrateExplorationJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
-                stdout='EXPLORATION PROCESSED SUCCESS: 1')
+                stdout='EXPLORATION PROCESSED SUCCESS: 1'),
+            job_run_result.JobRunResult(
+                stdout='EXPLORATION SUMMARY PROCESSED SUCCESS: 1')
         ])
 
         unmigrated_exploration_model = exp_models.ExplorationModel.get(

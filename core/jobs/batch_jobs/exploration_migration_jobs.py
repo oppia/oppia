@@ -309,6 +309,12 @@ class MigrateExplorationJob(base_jobs.JobBase):
                 job_result_transforms.ResultsToJobRunResults(
                     'EXPLORATION PROCESSED'))
         )
+        migrated_exploration_summary_job_run_results = (
+            migrated_exploration_summary_results
+            | 'Generate results for summary migration' >> (
+                job_result_transforms.ResultsToJobRunResults(
+                    'EXPLORATION SUMMARY PROCESSED'))
+        )
 
         exploration_changes = (
             unmigrated_exploration_models
@@ -346,10 +352,8 @@ class MigrateExplorationJob(base_jobs.JobBase):
                 'exp_model': unmigrated_exploration_models,
                 'exploration_summary_model': exploration_summary_models,
             }
-            | 'Merge objects' >> beam.CoGroupByKey()
-            | 'Get rid of ID' >> beam.Values()  # pylint: disable=no-value-for-parameter
-            | 'Remove unmigrated exploration' >> beam.Filter(
-                lambda x: len(x['exploration_summary']) > 0)
+            | 'Merge summary objects' >> beam.CoGroupByKey()
+            | 'Get rid of summary ID' >> beam.Values()  # pylint: disable=no-value-for-parameter
             | 'Reorganize the exploration summary objects' >> beam.Map(lambda objects: { # pylint: disable=line-too-long
                     'exp_model': objects['exp_model'][0],
                     'exploration_summary_model': (
@@ -411,6 +415,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
             (
                 cache_deletion_job_run_results,
                 migrated_exploration_job_run_results,
+                migrated_exploration_summary_job_run_results,
                 exploration_objects_list_job_run_results,
                 exploration_summary_objects_list_job_run_results
             )
