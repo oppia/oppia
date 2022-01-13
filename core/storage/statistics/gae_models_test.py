@@ -91,6 +91,7 @@ class StateCounterModelTests(test_utils.GenericTestBase):
             expected_export_policy_dict
         )
 
+
 class AnswerSubmittedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
     """Test the AnswerSubmittedEventLogEntryModel class."""
 
@@ -311,7 +312,7 @@ class MaybeLeaveExplorationEventLogEntryModelUnitTests(
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_create_event_models(self) -> None:
-        # No error raised while creating model
+        # No error raised while creating model.
         stats_models.MaybeLeaveExplorationEventLogEntryModel.create(
             'exp_id1', 1, 'state_name1', 'session_id1', 1.0, {},
             feconf.PLAY_TYPE_NORMAL)
@@ -322,7 +323,7 @@ class MaybeLeaveExplorationEventLogEntryModelUnitTests(
                 .get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
         )
-    
+
     def test_get_export_policy(self) -> None:
         expected_export_policy_dict = {
             'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -340,7 +341,8 @@ class MaybeLeaveExplorationEventLogEntryModelUnitTests(
             'event_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
         }
         self.assertEqual(
-            stats_models.MaybeLeaveExplorationEventLogEntryModel.get_export_policy(),
+            stats_models.MaybeLeaveExplorationEventLogEntryModel
+                .get_export_policy(),
             expected_export_policy_dict
         )
 
@@ -380,7 +382,7 @@ class CompleteExplorationEventLogEntryModelUnitTests(
                 .get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
         )
-    
+
     def test_get_export_policy(self) -> None:
         expected_export_policy_dict = {
             'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -415,7 +417,7 @@ class RateExplorationEventLogEntryModelUnitTests(
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_create_event_models(self) -> None:
-        # No error raised while creating model
+        # No error raised while creating model.
         stats_models.RateExplorationEventLogEntryModel.create(
             'exp_id', 'user_id', 2, 1
         )
@@ -426,7 +428,7 @@ class RateExplorationEventLogEntryModelUnitTests(
                 .get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
         )
-    
+
     def test_get_export_policy(self) -> None:
         expected_export_policy_dict = {
             'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -476,7 +478,7 @@ class StateHitEventLogEntryModelUnitTests(test_utils.GenericTestBase):
                 .get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
         )
-    
+
     def test_get_export_policy(self) -> None:
         expected_export_policy_dict = {
             'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -527,7 +529,7 @@ class StateCompleteEventLogEntryModelUnitTests(test_utils.GenericTestBase):
                 .get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
         )
-    
+
     def test_get_export_policy(self) -> None:
         expected_export_policy_dict = {
             'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -584,7 +586,7 @@ class LeaveForRefresherExplorationEventLogEntryModelUnitTests(
                 .get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
         )
-    
+
     def test_get_export_policy(self) -> None:
         expected_export_policy_dict = {
             'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -687,7 +689,7 @@ class ExplorationStatsModelUnitTests(test_utils.GenericTestBase):
                 .get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
         )
-    
+
     def test_get_export_policy(self) -> None:
         expected_export_policy_dict = {
             'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -707,6 +709,7 @@ class ExplorationStatsModelUnitTests(test_utils.GenericTestBase):
             stats_models.ExplorationStatsModel.get_export_policy(),
             expected_export_policy_dict
         )
+
 
 class ExplorationIssuesModelUnitTests(test_utils.GenericTestBase):
     """Test the ExplorationIssuesModel class."""
@@ -749,7 +752,7 @@ class ExplorationIssuesModelUnitTests(test_utils.GenericTestBase):
                 .get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
         )
-    
+
     def test_get_export_policy(self) -> None:
         expected_export_policy_dict = {
             'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -808,7 +811,7 @@ class PlaythroughModelUnitTests(test_utils.GenericTestBase):
             stats_models.PlaythroughModel.get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
         )
-    
+
     def test_get_export_policy(self) -> None:
         expected_export_policy_dict = {
             'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -967,7 +970,7 @@ class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
                 .get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
         )
-    
+
     def test_get_export_policy(self) -> None:
         expected_export_policy_dict = {
             'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -1034,7 +1037,7 @@ class ExplorationAnnotationsModelUnitTests(test_utils.GenericTestBase):
                 .get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
         )
-    
+
     def test_get_export_policy(self) -> None:
         expected_export_policy_dict = {
             'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -1140,7 +1143,8 @@ class StateAnswersModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(stat_answer_models[0].exploration_id, 'exp_id')
         self.assertEqual(stat_answer_models[0].exploration_version, 1)
         self.assertEqual(stat_answer_models[0].state_name, 'state_name')
-        self.assertEqual(stat_answer_models[0].submitted_answer_list, submitted_answer_list)
+        self.assertEqual(stat_answer_models[0].submitted_answer_list,
+            submitted_answer_list)
         self.assertEqual(stat_answer_models[0].shard_count, 0)
 
         # Use a smaller max answer list size so fewer answers are needed to
@@ -1165,7 +1169,7 @@ class StateAnswersModelUnitTests(test_utils.GenericTestBase):
             stats_models.StateAnswersModel.get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
         )
-    
+
     def test_get_export_policy(self) -> None:
         expected_export_policy_dict = {
             'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -1202,7 +1206,7 @@ class StateAnswersCalcOutputModelUnitTests(test_utils.GenericTestBase):
                 .get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
         )
-    
+
     def test_get_export_policy(self) -> None:
         expected_export_policy_dict = {
             'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
