@@ -72,12 +72,10 @@ export class BaseUndoRedo {
    * fires mutation event.
    */
   undoChange(domainObject: DomainObject): boolean {
-    if (this._appliedChanges.length !== 0) {
-      var change = this._appliedChanges.pop();
-      if (change !== undefined) {
-        this._undoneChanges.push(change);
-        this._reverseChange(change, domainObject);
-      }
+    var change = this._appliedChanges.pop();
+    if (change !== undefined) {
+      this._undoneChanges.push(change);
+      this._reverseChange(change, domainObject);
       return true;
     }
     return false;
@@ -89,12 +87,10 @@ export class BaseUndoRedo {
    * returned list will not be reflected in this class instance.
    */
   redoChange(domainObject: DomainObject): boolean {
-    if (this._undoneChanges.length !== 0) {
-      var change = this._undoneChanges.pop();
-      if (change !== undefined) {
-        this._appliedChanges.push(change);
-        this._applyChange(change, domainObject);
-      }
+    var change = this._undoneChanges.pop();
+    if (change !== undefined) {
+      this._appliedChanges.push(change);
+      this._applyChange(change, domainObject);
       return true;
     }
     return false;
