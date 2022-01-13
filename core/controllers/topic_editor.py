@@ -66,10 +66,7 @@ class TopicEditorStoryHandler(base.BaseHandler):
         'POST': {
             'title': {
                 'schema': {
-                    'type': 'basestring',
-                    'validators': [{
-                        'id': 'is_valid_story_title'
-                    }]
+                    'type': 'basestring'
                 }
             },
             'description': {
@@ -79,10 +76,7 @@ class TopicEditorStoryHandler(base.BaseHandler):
             },
             'filename': {
                 'schema': {
-                    'type': 'basestring',
-                    'validators': [{
-                        'id': 'is_valid_file_name'
-                    }]
+                    'type': 'basestring'
                 }
             },
             'thumbnailBgColor': {
@@ -92,10 +86,7 @@ class TopicEditorStoryHandler(base.BaseHandler):
             },
             'image': {
                 'schema': {
-                    'type': 'basestring',
-                    'validators': [{
-                        'id': 'is_valid_image'
-                    }]
+                    'type': 'basestring'
                 }
             },
             'story_url_fragment': constants.SCHEMA_FOR_STORY_URL_FRAGMENTS
@@ -154,6 +145,7 @@ class TopicEditorStoryHandler(base.BaseHandler):
         raw_image = self.normalized_request.get('image')
         story_url_fragment = self.normalized_payload.get('story_url_fragment')
 
+        story_domain.Story.require_valid_title(title)
         if story_services.does_story_exist_with_url_fragment(
                 story_url_fragment):
             raise self.InvalidInputException(
@@ -174,9 +166,7 @@ class TopicEditorStoryHandler(base.BaseHandler):
         try:
             file_format = (
                 image_validation_services.
-                detect_and_validate_format_of_raw_image(raw_image))
-            image_validation_services.verify_image_type_and_extension(
-                file_format, thumbnail_filename)
+                validate_image_and_filename(raw_image, thumbnail_filename))
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 

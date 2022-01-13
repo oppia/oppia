@@ -36,7 +36,6 @@ from core import utils
 from core.constants import constants
 from core.domain import expression_parser
 from core.domain import html_cleaner
-from core.domain import story_domain
 from core.domain import user_domain
 
 from typing import Any, Callable, Dict, List, Optional, cast
@@ -680,22 +679,6 @@ class _Validators:
 
         try:
             user_domain.UserSettings.require_valid_username(obj)
-            return True
-        except utils.ValidationError:
-            return False
-
-    @staticmethod
-    def is_valid_story_title(obj: str) -> bool:
-        """Checks if the given obj (a string) represents a valid title.
-
-        Args:
-            obj: str. The title to verify.
-
-        Returns:
-            bool. Whether the given object is a valid title.
-        """
-        try:
-            story_domain.Story.require_valid_title(obj)
             return True
         except utils.ValidationError:
             return False
