@@ -132,3 +132,12 @@ class ConceptCardDataHandlerTest(test_utils.GenericTestBase):
                 feconf.CONCEPT_CARD_DATA_URL_PREFIX,
                 json.dumps([self.skill_id_2])),
             expected_status_int=404)
+
+    def test_invalid_skill_id(self):
+        skill_ids = [1, 2]
+        json_response = self.get_json(
+            '%s/%s' % (
+                feconf.CONCEPT_CARD_DATA_URL_PREFIX,
+                json.dumps(skill_ids)), expected_status_int=400)
+
+        self.assertEqual(json_response['error'], 'Skill id should be a string.')

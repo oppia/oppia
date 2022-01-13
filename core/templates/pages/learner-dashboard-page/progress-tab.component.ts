@@ -79,7 +79,7 @@ export class ProgressTabComponent implements OnInit {
     if (this.topicsInSkillProficiency.length !== 0) {
       this.subtopicMastery = await (
         this.learnerDashboardBackendApiService.fetchSubtopicMastery(
-          this.topicIdsInSkillProficiency.join(',')));
+          this.topicIdsInSkillProficiency));
     }
     this.displaySkills = new Array(
       this.topicsInSkillProficiency.length).fill(false);

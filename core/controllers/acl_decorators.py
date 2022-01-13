@@ -231,7 +231,7 @@ def can_view_skills(handler):
         """Checks if the user can view the skills.
 
         Args:
-            selected_skill_ids: str. The skill ids
+            selected_skill_ids: list(str). The skill ids
                 separated by commas.
             **kwargs: *. Keyword arguments.
 
@@ -248,8 +248,8 @@ def can_view_skills(handler):
         try:
             for skill_id in selected_skill_ids:
                 skill_domain.Skill.require_valid_skill_id(skill_id)
-        except utils.ValidationError:
-            raise self.InvalidInputException
+        except utils.ValidationError as e:
+            raise self.InvalidInputException(e)
 
         try:
             skill_fetchers.get_multi_skills(selected_skill_ids)

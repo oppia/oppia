@@ -345,7 +345,7 @@ export class LearnerDashboardBackendApiService {
   }
 
   async _fetchSubtopicMastery(
-      topicIds: string): Promise<Record<string,
+      topicIds: string[]): Promise<Record<string,
     SubtopicMasterySummaryBackendDict>> {
     return new Promise((resolve, reject) => {
       this.http.get<SubtopicMasteryDict>(
@@ -359,7 +359,7 @@ export class LearnerDashboardBackendApiService {
     });
   }
 
-  async fetchSubtopicMastery(topicIds: string): Promise<Record<string,
+  async fetchSubtopicMastery(topicIds: string[]): Promise<Record<string,
     SubtopicMasterySummaryBackendDict>> {
     return this._fetchSubtopicMastery(topicIds);
   }
