@@ -514,8 +514,10 @@ describe('Exploration editor page component', function() {
           result: $q.resolve('editor')
         } as NgbModalRef
       );
+
       ctrl.showUserHelpModal();
       $rootScope.$apply();
+
       expect(ngbModal.open).toHaveBeenCalled();
     });
 
