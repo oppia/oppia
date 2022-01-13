@@ -99,6 +99,10 @@ classroom-page .oppia-classroom-page-subheading-text {
 }
 
 @media(max-width: 1150px) {
+  .oppia-topic-summary-tiles {
+    margin-bottom: 55px;
+  }
+
   .oppia-classroom-viewer-container .oppia-topic-summary-tiles {
     grid-template-columns: 180px 180px 180px;
   }
@@ -109,6 +113,7 @@ classroom-page .oppia-classroom-page-subheading-text {
   }
 
   .oppia-classroom-search-container {
+    margin-bottom: -54px;
     margin-right: -20vw;
   }
 }
@@ -130,11 +135,18 @@ classroom-page .oppia-classroom-page-subheading-text {
   }
 
   .oppia-classroom-search-section {
-    width: 90vw;
+    text-align: center;
+    width: 95vw;
+  }
+
+  .oppia-classroom-search-bar-container {
+    display: flex;
+    justify-content: center;
   }
 
   .oppia-classroom-search-container {
     margin-right: -10vw;
+    padding-bottom: 27px;
   }
 
   .classroom-page-help-text {
@@ -163,7 +175,7 @@ classroom-page .oppia-classroom-page-subheading-text {
   }
 
   .oppia-classroom-search-section {
-    width: 90vw;
+    width: 95vw;
   }
 
   .oppia-classroom-details {

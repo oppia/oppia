@@ -67,9 +67,17 @@
   border-bottom: 1px solid;
 }
 
+.practice-button-background-status-complete {
+  background-color: #00645c;
+}
+
+.practice-button-background-status-pending {
+  background-color: rgba(0, 0, 0, .26);
+  box-shadow: none;
+}
+
 .practice-tab .practice-session-button {
   align-self: center;
-  background-color: #00645c;
   border-radius: 0.4em;
   color: white;
   font-family: "Roboto", Arial, sans-serif;

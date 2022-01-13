@@ -16,6 +16,10 @@
   width: 100vw;
 }
 
+.oppia-classroom-viewer-container {
+  text-align: left;
+}
+
 .oppia-classroom-search-section .classroom-page-search-bar {
   margin-left: -18px;
 }
