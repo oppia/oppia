@@ -91,10 +91,6 @@ class InteractionAnswerUnitTests(test_utils.GenericTestBase):
             interaction.answer_type = 'FakeObjType'
             interaction.normalize_answer('15')
 
-    def test_get_correct_copy_of_dependency_ids(self):
-        interaction = base.BaseInteraction()
-        self.assertEqual(interaction.dependency_ids, [])
-
     def test_get_rule_description_with_invalid_rule_name_raises_error(self):
         interaction = interaction_registry.Registry.get_interaction_by_id(
             'CodeRepl')
