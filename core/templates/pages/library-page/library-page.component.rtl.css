@@ -189,9 +189,9 @@
   max-width: 856px;
 }
 .oppia-search-bar-container {
-  margin: 0 auto 5vh auto;
+  margin: 0 25% 5vh 25%;
   padding-bottom: 40px;
-  width: max-content;
+  width: 100%;
 }
 .oppia-library-no-exploration-groups {
   margin: 150px auto;
