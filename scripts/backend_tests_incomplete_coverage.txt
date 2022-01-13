@@ -19,7 +19,6 @@ core.domain.question_domain_test
 core.domain.rights_manager_test
 core.domain.skill_services_test
 core.domain.story_domain_test
-core.domain.activity_domain_test
 core.domain.suggestion_services_test
 core.domain.stats_services_test
 core.domain.value_generators_domain_test
@@ -80,11 +79,10 @@ scripts.linters.js_ts_linter_test
 core.storage.improvements.gae_models_test
 core.storage.audit.gae_models_test
 core.storage.story.gae_models_test
+core.storage.audit.gae_models_test
 core.storage.classifier.gae_models_test
 main_test
-core.storage.recommendations.gae_models_test
 core.storage.feedback.gae_models_test
-core.storage.subtopic.gae_models_test
 core.domain.user_domain_test
 core.storage.opportunity.gae_models_test
 scripts.install_third_party_libs_test
