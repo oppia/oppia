@@ -123,14 +123,14 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             dictionary
         )
 
-    def test_get_in_review_translation_suggestions(self):
+    def test_get_in_review_translation_suggestions(self) -> None:
         gen = suggestion_models.GeneralSuggestionModel
         self.assertEqual(
             gen.get_in_review_translation_suggestions('author-1', ['en', 'de']),
             []
         )
 
-    def test_get_in_review_question_suggestions(self):
+    def test_get_in_review_question_suggestions(self) -> None:
         gen_model = suggestion_models.GeneralSuggestionModel
         self.assertEqual(
             gen_model.get_in_review_question_suggestions(
@@ -1230,14 +1230,14 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
 class GeneralVoiceoverApplicationModelUnitTests(test_utils.GenericTestBase):
     """Tests for the GeneralVoiceoverApplicationModel class."""
 
-    def test_get_model_association_to_user(self):
+    def test_get_model_association_to_user(self) -> None:
         gen_voice_model = suggestion_models.GeneralVoiceoverApplicationModel
         self.assertEqual(
             gen_voice_model.get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
         )
 
-    def test_get_export_policy(self):
+    def test_get_export_policy(self) -> None:
         dictionary = {
             'target_type': base_models.EXPORT_POLICY.EXPORTED,
             'target_id': base_models.EXPORT_POLICY.EXPORTED,
@@ -1566,14 +1566,14 @@ class CommunityContributionStatsModelUnitTests(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.NOT_APPLICABLE
         )
 
-    def test_get_model_association_to_user(self):
+    def test_get_model_association_to_user(self) -> None:
         gen_comm = suggestion_models.CommunityContributionStatsModel
         self.assertEqual(
             gen_comm.get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
         )
 
-    def test_get_export_policy(self):
+    def test_get_export_policy(self) -> None:
         dictionary = {
             'translation_reviewer_counts_by_lang_code':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -1824,14 +1824,14 @@ class TranslationContributionStatsModelUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(expected_data, user_data)
 
-    def test_get_model_association_to_user(self):
+    def test_get_model_association_to_user(self) -> None:
         translation_model = suggestion_models.TranslationContributionStatsModel
         self.assertEqual(
             base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER,
             translation_model.get_model_association_to_user()
         )
 
-    def test_get_all_by_user_id(self):
+    def test_get_all_by_user_id(self) -> None:
         translation_model = suggestion_models.TranslationContributionStatsModel
         self.assertEqual(
             translation_model.get_all_by_user_id(
@@ -1840,7 +1840,7 @@ class TranslationContributionStatsModelUnitTests(test_utils.GenericTestBase):
             []
         )
 
-    def test_get_export_policy(self):
+    def test_get_export_policy(self) -> None:
         dictionary = {
             'language_code':
                 base_models.EXPORT_POLICY.EXPORTED,
