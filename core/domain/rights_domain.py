@@ -17,7 +17,6 @@
 from __future__ import annotations
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.domain import change_domain
@@ -274,7 +273,7 @@ class ActivityRights:
                 raise Exception(
                     'Public explorations can be viewed by anyone.')
 
-        for role, user_ids in python_utils.ZIP(
+        for role, user_ids in zip(
                 [ROLE_OWNER, ROLE_EDITOR, ROLE_VIEWER, ROLE_VOICE_ARTIST],
                 [self.owner_ids, self.editor_ids, self.viewer_ids,
                  self.voice_artist_ids]):
