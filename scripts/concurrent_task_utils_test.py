@@ -131,7 +131,7 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
         with self.print_swap:
             task.start()
             task.join()
-        self.assertRegexpMatches(
+        self.assertRegex(
             self.task_stdout[0],
             r'\d+:\d+:\d+ Report from name check\n-+\nFAILED  '
             'name check failed')
