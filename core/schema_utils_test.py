@@ -558,7 +558,7 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
             ),
             (
                 {
-                    'type':'variable_keys_dict',
+                    'type': 'variable_keys_dict',
                     'values': 1
                 },
                 'Expected dict, got 1'
@@ -1206,7 +1206,7 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
         self.check_normalization(
             schema, mappings, invalid_values_with_error_messages)
 
-    def test_dict_with_variable_key_schema(self)-> None:
+    def test_dict_with_variable_key_schema(self) -> None:
         schema = {
             'type': schema_utils.SCHEMA_TYPE_DICT_WITH_VARIABLE_NO_OF_KEYS,
             'values': {
@@ -1220,13 +1220,25 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
             }
         }
 
-        mappings = [
-            ({'skills_id1': [1.2, 3], 'skills_id2': [2.0, 0]},
-             {'skills_id1': [1, 3], 'skills_id2': [2, 0]}),
-            ({'skills_id1': ['45', 2], 'skills_id2': [23, 3]},
-             {'skills_id1': [45, 2], 'skills_id2': [23, 3]}),
-            ({'skills_id1': [1, 2], 'skills_id2': [2, 3]},
-             {'skills_id1': [1, 2], 'skills_id2': [2, 3]})]
+        mappings = [({
+                'skills_id1': [1.2, 3],
+                'skills_id2': [2.0, 0]
+            }, {
+                'skills_id1': [1, 3],
+                'skills_id2': [2, 0]
+            }), ({
+                'skills_id1': ['45', 2],
+                'skills_id2': [23, 3]
+            }, {
+                'skills_id1': [45, 2],
+                'skills_id2': [23, 3]
+            }), ({
+                'skills_id1': [1, 2],
+                'skills_id2': [2, 3]
+            }, {
+                'skills_id1': [1, 2],
+                'skills_id2': [2, 3]
+            })]
         invalid_values_with_error_messages = [
             ([1, 2], re.escape('Expected dict, received [1, 2]')),
             ({1: 2, 'topic_id1': 3}, 'Expected key to be string, received 1'),
