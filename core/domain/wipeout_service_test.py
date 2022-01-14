@@ -4656,11 +4656,11 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
 
         self.assertIsNone(user_services.get_user_settings(self.user_1_id))
         self.assertIsNone(user_services.get_user_settings(self.profile_user_id))
-        with self.assertRaisesRegexp(Exception, 'User not found.'):
+        with self.assertRaisesRegex(Exception, 'User not found.'):
             # Try to do some action with the deleted user.
             user_services.update_preferred_language_codes(
                 self.user_1_id, ['en'])
-        with self.assertRaisesRegexp(Exception, 'User not found.'):
+        with self.assertRaisesRegex(Exception, 'User not found.'):
             # Try to do some action with the deleted user.
             user_services.update_preferred_language_codes(
                 self.profile_user_id, ['en'])
