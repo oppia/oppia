@@ -50,8 +50,8 @@ export class TopicSummaryTileComponent {
           this.topicSummary.getThumbnailFilename());
     }
     this.topicNameTranslationKey = this.i18nLanguageCodeService.
-      getTopicTitleTranslationKey(this.topicSummary.getId(),
-        this.topicSummary.getName());
+      getTopicTitleTranslationKey(
+        this.topicSummary.getId(), this.topicSummary.getName());
   }
 
   getTopicPageUrl(): string {

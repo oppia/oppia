@@ -42,7 +42,7 @@ export class I18nLanguageCodeService {
    * It stores all classroom metadata translation keys, like topic/story
    * title, description keys which currently cannot be translated from the
    * translations dashboard.
-   */ 
+   */
   static hackyTranslationKeys: readonly string[] =
     AppConstants.HACKY_TRANSLATIONS_KEYS;
 
@@ -73,14 +73,16 @@ export class I18nLanguageCodeService {
    * checks if the key has translation and the current language is not english
    * and returns the classroom name or the translation key based on it.
    * @param classroomName : string - Name of the classroom.
-   * @returns : string - Name of the classroom if translation key does not exist
-   * in constants file or if the current language is english else the translation
-   * key for the classroom.
+   * @returns : string - Name of the classroom if translation key does not
+   * exist in constants file or if the current language is english else the
+   * translation key for the classroom.
    */
   getClassroomTranslationKey(classroomName: string): string {
     let translationKey = `I18N_CLASSROOM_${classroomName.toUpperCase()}_TITLE`;
     if (this.hasTranslation(translationKey)) {
-      if(!this.isCurrentLanguageEnglish()) return translationKey;
+      if (!this.isCurrentLanguageEnglish()) {
+        return translationKey;
+      }
     }
     return classroomName;
   }
@@ -94,13 +96,15 @@ export class I18nLanguageCodeService {
    * translation key.
    * @param topicName : string - Name of the topic.
    * @returns : string - Name of the topic if translation key does not exist
-   * in constants file or if the current language is english else the translation
-   * key for the topic.
+   * in constants file or if the current language is english else the
+   * translation key for the topic.
    */
   getTopicTitleTranslationKey(topicId: string, topicName: string): string {
     let translationKey = `I18N_TOPIC_${topicId}_TITLE`;
     if (this.hasTranslation(translationKey)) {
-      if(!this.isCurrentLanguageEnglish()) return translationKey;
+      if (!this.isCurrentLanguageEnglish()) {
+        return translationKey;
+      }
     }
     return topicName;
   }
