@@ -354,8 +354,7 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             json_response['error'],
            'Schema validation for \'mastery_change_per_skill\' failed: ' +
-           'Expected float, received True'
-            )
+           'Expected float, received True')
 
         self.logout()
 
