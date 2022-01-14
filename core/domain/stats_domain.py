@@ -26,11 +26,15 @@ import sys
 from core import feconf
 from core import utils
 from core.constants import constants
-from core.domain import action_registry
 from core.domain import customization_args_util
 from core.domain import exp_domain
-from core.domain import interaction_registry
-from core.domain import playthrough_issue_registry
+
+from core.domain import action_registry  # pylint: disable=invalid-import-from # isort:skip
+from core.domain import interaction_registry  # pylint: disable=invalid-import-from # isort:skip
+from core.domain import playthrough_issue_registry  # pylint: disable=invalid-import-from # isort:skip
+
+# TODO(#14537): Refactor this file and remove imports marked
+# with 'invalid-import-from'.
 
 # These are special sentinel values attributed to answers migrated from the old
 # answer storage model. Those answers could not have session IDs or time spent
