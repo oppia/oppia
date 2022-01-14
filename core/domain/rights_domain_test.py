@@ -209,6 +209,50 @@ class ActivityRightsTests(test_utils.GenericTestBase):
             'Activity should have atleast one owner.'):
             self.activity_rights.validate()
 
+    def test_to_dict(self) -> None:
+        sample_activity_rights_dict: rights_domain.ActivityRightsDict = {
+            'cloned_from': None,
+            'status': rights_domain.ACTIVITY_STATUS_PUBLIC,
+            'community_owned': False,
+            'owner_names': ['owner'],
+            'editor_names': [],
+            'voice_artist_names': [],
+            'viewer_names': [],
+            'viewable_if_private': False,
+        }
+        self.assertEqual(
+            self.activity_rights.to_dict(), sample_activity_rights_dict
+        )
+
+        self.activity_rights.community_owned = True
+        sample_activity_rights_dict['community_owned'] = True
+        sample_activity_rights_dict['owner_names'] = []
+        self.assertEqual(
+            self.activity_rights.to_dict(), sample_activity_rights_dict
+        )
+
+    def test_is_editor(self) -> None:
+        self.activity_rights.editor_ids = ['123456']
+        self.assertTrue(self.activity_rights.is_editor('123456'))
+        self.assertFalse(self.activity_rights.is_editor('123457'))
+
+    def test_is_voice_artist(self) -> None:
+        self.activity_rights.voice_artist_ids = ['123456']
+        self.assertTrue(self.activity_rights.is_voice_artist('123456'))
+        self.assertFalse(self.activity_rights.is_voice_artist('123457'))
+
+    def test_is_viewer(self) -> None:
+        self.activity_rights.viewer_ids = ['123456']
+        self.assertTrue(self.activity_rights.is_viewer('123456'))
+        self.assertFalse(self.activity_rights.is_viewer('123457'))
+
+    def test_is_solely_owned_by_user(self) -> None:
+        self.activity_rights.owner_ids = ['123456']
+        self.assertTrue(self.activity_rights.is_solely_owned_by_user('123456'))
+
+        self.activity_rights.owner_ids = ['123456', '1234567']
+        self.assertFalse(self.activity_rights.is_solely_owned_by_user('123456'))
+
     def test_assign_role_replaces_old_role(self) -> None:
         self.activity_rights.owner_ids = ['123456']
         self.activity_rights.editor_ids = []
@@ -244,6 +288,21 @@ class ActivityRightsTests(test_utils.GenericTestBase):
             Exception, 'This user already can edit this exploration.'):
             self.activity_rights.assign_new_role(
                 '123456', rights_domain.ROLE_EDITOR)
+
+        self.activity_rights.assign_new_role(
+            '123456', rights_domain.ROLE_VOICE_ARTIST)
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+            Exception, 'This user already can voiceover this exploration.'):
+            self.activity_rights.assign_new_role(
+                '123456', rights_domain.ROLE_VOICE_ARTIST)
+
+        self.activity_rights.status = rights_domain.ACTIVITY_STATUS_PRIVATE
+        self.activity_rights.assign_new_role(
+                '123456', rights_domain.ROLE_VIEWER)
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+            Exception, 'This user already can view this exploration.'):
+            self.activity_rights.assign_new_role(
+                '123456', rights_domain.ROLE_VIEWER)
 
     def test_cannot_assign_viewer_to_public_exp(self) -> None:
         self.activity_rights.owner_ids = []
