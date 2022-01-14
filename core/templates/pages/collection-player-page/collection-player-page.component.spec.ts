@@ -18,6 +18,7 @@
 
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { AlertsService } from 'services/alerts.service';
+import { CollectionPlayerBackendApiService } from './services/collection-player-backend-api.service';
 import { GuestCollectionProgressService } from 'domain/collection/guest-collection-progress.service';
 import { ReadOnlyCollectionBackendApiService } from 'domain/collection/read-only-collection-backend-api.service';
 import { UserService } from 'services/user.service';
@@ -32,11 +33,11 @@ import { NO_ERRORS_SCHEMA } from '@angular/compiler';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Collection player page component', () => {
+describe('Collection player page component', () => {
   let alertsService: AlertsService;
   let component: CollectionPlayerPageComponent;
   let fixture: ComponentFixture<CollectionPlayerPageComponent>;
+  let collectionPlayerBackendApiService: CollectionPlayerBackendApiService;
   let guestCollectionProgressService:
     GuestCollectionProgressService;
   let readOnlyCollectionBackendApiService:
@@ -69,6 +70,8 @@ fdescribe('Collection player page component', () => {
 
   beforeEach(() => {
     alertsService = TestBed.inject(AlertsService);
+    collectionPlayerBackendApiService = TestBed.inject(
+      CollectionPlayerBackendApiService);
     userService = TestBed.inject(UserService);
     urlService = TestBed.inject(UrlService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
@@ -172,6 +175,14 @@ fdescribe('Collection player page component', () => {
     sampleCollection = Collection.create(
       sampleCollectionBackendObject);
 
+    spyOn(collectionPlayerBackendApiService, 'fetchCollectionSummariesAsync')
+      .and.returnValue(Promise.resolve({
+        is_admin: false,
+        is_topic_manager: false,
+        summaries: [],
+        user_email: 'tester@example.com',
+        username: false
+      }));
     spyOn(urlService, 'getCollectionIdFromUrl').and.returnValue('collectionId');
     alertsSpy = spyOn(alertsService, 'addWarning').and.returnValue(null);
   });
@@ -244,9 +255,14 @@ fdescribe('Collection player page component', () => {
     // Loading collections.
     component.ngOnInit();
     tick();
-    let result = component.isCompletedExploration('123');
+    let res1 = component.isCompletedExploration('123');
 
-    expect(result).toEqual(false);
+    expect(res1).toEqual(false);
+
+    component.collectionPlaythrough = undefined;
+    let res2 = component.isCompletedExploration('123');
+
+    expect(res2).toEqual(false);
   }));
 
   it('should generate empty path parameters when collection ' +
@@ -498,4 +514,28 @@ fdescribe('Collection player page component', () => {
     expect(component.scrollToLocation).toHaveBeenCalled();
     expect(component.explorationCardIsShown).toBeFalse();
   }));
+
+  // // eslint-disable-next-line oppia/no-test-blockers
+  // fit('should do', fakeAsync(() => {
+  //   spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
+  //     .and.resolveTo(sampleCollection);
+  //   spyOn(userService, 'getUserInfoAsync')
+  //     .and.returnValue(Promise.resolve(new UserInfo(
+  //       ['USER_ROLE'], true, false, false, false, true,
+  //       'en', 'username1', 'tester@example.com', false
+  //     )));
+  //   spyOn(guestCollectionProgressService, 'hasCompletedSomeExploration')
+  //     .and.returnValue(true);
+  //   spyOn(guestCollectionProgressService, 'getCompletedExplorationIds')
+  //     .and.returnValue(['expId2']);
+  //   spyOn(guestCollectionProgressService, 'getNextExplorationId')
+  //     .and.returnValue('expId');
+  //   spyOnProperty(
+  //     AppConstants,
+  //     'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS'
+  //   ).and.returnValue(['collectionId']);
+
+  //   component.ngOnInit();
+  //   tick();
+  // }));
 });

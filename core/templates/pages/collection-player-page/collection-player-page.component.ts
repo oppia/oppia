@@ -33,7 +33,6 @@ import { AppConstants } from 'app.constants';
 import { Collection } from 'domain/collection/collection.model';
 import { CollectionPlayerBackendApiService } from './services/collection-player-backend-api.service';
 import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
-import { LoggerService } from 'services/contextual/logger.service';
 
 export interface IconParametersArray {
   thumbnailIconUrl: string;
@@ -105,7 +104,6 @@ export class CollectionPlayerPageComponent implements OnInit {
     private pageTitleService: PageTitleService,
     private userService: UserService,
     private windowRef: WindowRef,
-    private logger: LoggerService,
     private collectionPlayerBackendApiService: CollectionPlayerBackendApiService
   ) {}
 
@@ -145,7 +143,6 @@ export class CollectionPlayerPageComponent implements OnInit {
   }
 
   updateExplorationPreview(explorationId: string): void {
-    this.logger.info('updateExplorationPreview');
     this.explorationCardIsShown = true;
     this.currentExplorationId = explorationId;
     this.summaryToPreview = this.getCollectionNodeForExplorationId(
