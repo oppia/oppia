@@ -13,23 +13,34 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for skill editor save modal.
+ * @fileoverview Component for change subtopic assignment modal.
  */
 
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { AppConstants } from 'app.constants';
+import { Subtopic } from 'domain/topic/subtopic.model';
 
 @Component({
-  selector: 'skill-editor-save-modal',
-  templateUrl: './skill-editor-save-modal.component.html'
+  selector: 'oppia-change-subtopic-assignment-modal',
+  templateUrl: './change-subtopic-assignment-modal.component.html'
 })
-export class SkillEditorSaveModalComponent
-  extends ConfirmOrCancelModal {
-    commitMessage: string;
-    MAX_COMMIT_MESSAGE_LENGTH: number = AppConstants.MAX_COMMIT_MESSAGE_LENGTH;
-    constructor(activeModal: NgbActiveModal) {
-      super(activeModal);
-    }
+
+export class ChangeSubtopicAssignmentModalComponent
+  extends ConfirmOrCancelModal implements OnInit {
+  subtopics: Subtopic[];
+  selectedSubtopicId: number;
+  constructor(
+    private ngbActiveModal: NgbActiveModal,
+  ) {
+    super(ngbActiveModal);
+  }
+
+  ngOnInit(): void {
+    this.selectedSubtopicId = null;
+  }
+
+  changeSelectedSubtopic(subtopicId: number): void {
+    this.selectedSubtopicId = subtopicId;
+  }
 }
