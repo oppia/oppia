@@ -608,7 +608,7 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
             client_time_spent_in_secs: float,
             params: Dict[str, str],
             play_type: str
-    ) -> None:
+    ) -> str:
         """Creates a new leave exploration event and then writes it
         to the datastore.
 
@@ -644,6 +644,7 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
             event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
         leave_event_entity.update_timestamps()
         leave_event_entity.put()
+        return entity_id
 
     @staticmethod
     def get_model_association_to_user(

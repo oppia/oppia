@@ -312,10 +312,20 @@ class MaybeLeaveExplorationEventLogEntryModelUnitTests(
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_create_event_models(self) -> None:
-        # No error raised while creating model.
-        stats_models.MaybeLeaveExplorationEventLogEntryModel.create(
+        event_id = stats_models.MaybeLeaveExplorationEventLogEntryModel.create(
             'exp_id1', 1, 'state_name1', 'session_id1', 1.0, {},
             feconf.PLAY_TYPE_NORMAL)
+        event_model = stats_models.MaybeLeaveExplorationEventLogEntryModel.get(
+            event_id)
+
+        # Ruling out the possibility of None for mypy type checking.
+        assert event_model is not None
+        self.assertEqual(event_model.exploration_id, 'exp_id1')
+        self.assertEqual(event_model.exploration_version, 1)
+        self.assertEqual(event_model.state_name, 'state_name1')
+        self.assertEqual(event_model.session_id, 'session_id1')
+        self.assertEqual(event_model.params, {})
+        self.assertEqual(event_model.play_type, feconf.PLAY_TYPE_NORMAL)
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
@@ -417,10 +427,17 @@ class RateExplorationEventLogEntryModelUnitTests(
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_create_event_models(self) -> None:
-        # No error raised while creating model.
-        stats_models.RateExplorationEventLogEntryModel.create(
+        event_id = stats_models.RateExplorationEventLogEntryModel.create(
             'exp_id', 'user_id', 2, 1
         )
+        event_model = stats_models.CompleteExplorationEventLogEntryModel.get(
+            event_id)
+
+        # Ruling out the possibility of None for mypy type checking.
+        assert event_model is not None
+        self.assertEqual(event_model.exploration_id, 'exp_id')
+        self.assertEqual(event_model.rating, 1)
+        self.assertEqual(event_model.old_rating, 1)
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
