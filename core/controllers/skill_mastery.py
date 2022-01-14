@@ -36,9 +36,10 @@ class SkillMasteryDataHandler(base.BaseHandler):
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
-            'comma_separated_skill_ids': {
+            'selected_skill_ids': {
                 'schema': {
-                    'type': 'basestring',
+                    'type': 'custom',
+                    'obj_type': 'JsonEncodedInString'
                 }
             }
         },
@@ -59,14 +60,10 @@ class SkillMasteryDataHandler(base.BaseHandler):
     @acl_decorators.can_access_learner_dashboard
     def get(self):
         """Handles GET requests."""
-        comma_separated_skill_ids = (
-            self.request.get('comma_separated_skill_ids'))
-        if not comma_separated_skill_ids:
-            raise self.InvalidInputException(
-                'Expected request to contain parameter '
-                'comma_separated_skill_ids.')
+        selected_skill_ids = (
+            self.normalized_request.get('selected_skill_ids'))
 
-        skill_ids = comma_separated_skill_ids.split(',')
+        skill_ids = selected_skill_ids
 
         try:
             for skill_id in skill_ids:

@@ -15,6 +15,7 @@
 """Tests for the Question Player controller."""
 
 from __future__ import annotations
+import json
 
 from core import feconf
 from core import python_utils
@@ -56,7 +57,7 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
         response_json = self.get_json(
             '%s' % feconf.SKILL_MASTERY_DATA_URL,
             params={
-                'comma_separated_skill_ids': ','.join(skill_ids)
+                'selected_skill_ids': json.dumps(skill_ids)
             })
         degrees_of_mastery = {
             self.skill_id_1: self.degree_of_mastery_1,
@@ -77,7 +78,7 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
         response_json = self.get_json(
             '%s' % feconf.SKILL_MASTERY_DATA_URL,
             params={
-                'comma_separated_skill_ids': ','.join(skill_ids)
+                'selected_skill_ids': json.dumps(skill_ids)
             })
         degrees_of_mastery = {
             self.skill_id_1: self.degree_of_mastery_1,
@@ -96,7 +97,7 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             json_response['error'],
-            'Missing key in handler args: comma_separated_skill_ids.')
+            'Missing key in handler args: selected_skill_ids.')
 
         self.logout()
 
@@ -107,7 +108,7 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
         json_response = self.get_json(
             '%s' % feconf.SKILL_MASTERY_DATA_URL,
             params={
-                'comma_separated_skill_ids': ','.join(skill_ids)
+                'selected_skill_ids': json.dumps(skill_ids)
             }, expected_status_int=400)
 
         self.assertEqual(
@@ -124,7 +125,7 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
         self.get_json(
             '%s' % feconf.SKILL_MASTERY_DATA_URL,
             params={
-                'comma_separated_skill_ids': ','.join(skill_ids)
+                'selected_skill_ids': json.dumps(skill_ids)
             }, expected_status_int=404)
 
         self.logout()
