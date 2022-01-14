@@ -28,8 +28,6 @@ import sys
 import tempfile
 import threading
 
-from core import python_utils
-
 
 def memoize(func):
     """Decorator which provides thread-safe, cached-access to the return values
@@ -90,8 +88,7 @@ def memoize(func):
     # values and use them to build the kwargs that func will actually see.
     arg_names, _, _, defaults = inspect.getargspec(func)
     defaults = defaults if defaults is not None else ()
-    default_func_kwargs = dict(
-        python_utils.ZIP(arg_names[-len(defaults):], defaults))
+    default_func_kwargs = dict(zip(arg_names[-len(defaults):], defaults))
 
     @functools.wraps(func)
     def memoized_func(*args, **kwargs):
