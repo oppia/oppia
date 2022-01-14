@@ -141,6 +141,8 @@ def normalize_against_schema(
         schema_value_type = schema[SCHEMA_KEY_VALUES]
         normalized_obj = {}
         for key, value in obj.items():
+            assert isinstance(key, str), (
+                'Expected key to be string, received %s' % key)
             normalized_obj[key] = normalize_against_schema(
                 value, schema_value_type[SCHEMA_KEY_SCHEMA],
                 global_validators=global_validators
