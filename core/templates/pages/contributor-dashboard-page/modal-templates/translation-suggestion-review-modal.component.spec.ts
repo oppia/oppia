@@ -138,7 +138,7 @@ describe('Translation Suggestion Review Modal Component', function() {
       html: '<p>In Hindi</p>'
     };
 
-    let userInfo = new UserInfo(
+    const userInfo = new UserInfo(
       ['USER_ROLE'], true, false, false, false, true,
       'en', 'username1', 'tester@example.com', true
     );

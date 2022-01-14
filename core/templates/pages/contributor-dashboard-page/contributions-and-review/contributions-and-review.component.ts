@@ -233,7 +233,7 @@ angular.module('oppia').component('contributionsAndReview', {
         var subheading = (
           details.topic_name + ' / ' + details.story_title +
           ' / ' + details.chapter_title);
-        let modalRef: NgbModalRef = NgbModal.open(
+        const modalRef: NgbModalRef = NgbModal.open(
           TranslationSuggestionReviewModalComponent, {
             backdrop: 'static',
             windowClass: 'oppia-translation-suggestion-review-modal',

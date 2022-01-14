@@ -242,11 +242,10 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   // The length of the commit message should not exceed 375 characters,
   // since this is the maximum allowed commit message size.
   generateCommitMessage(): string {
-    var contentId = this.activeSuggestion.change.content_id;
-    var stateName = this.activeSuggestion.change.state_name;
-    var contentType = contentId.split('_')[0];
-
-    var commitMessage = `${contentType} section of "${stateName}" card`;
+    const contentId = this.activeSuggestion.change.content_id;
+    const stateName = this.activeSuggestion.change.state_name;
+    const contentType = contentId.split('_')[0];
+    const commitMessage = `${contentType} section of "${stateName}" card`;
 
     return commitMessage;
   }
