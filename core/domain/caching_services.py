@@ -31,8 +31,7 @@ from core.domain import topic_domain
 from core.platform import models
 
 from typing import Any, Callable, Dict, List, cast, overload
-from typing_extensions import Literal
-from typing_extensions import TypedDict
+from typing_extensions import Final, Literal, TypedDict
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -50,44 +49,44 @@ MEMCACHE_KEY_DELIMITER = ':'
 # each key in this namespace should be a serialized representation of an
 # Exploration. There is also a special sub-namespace represented by the empty
 # string; this sub-namespace stores the latest version of the exploration.
-CACHE_NAMESPACE_EXPLORATION: Literal['exploration'] = 'exploration'
+CACHE_NAMESPACE_EXPLORATION: Final = 'exploration'
 # This namespace supports sub-namespaces which are identified by the stringified
 # version number of the collections within the sub-namespace. The value for
 # each key in this namespace should be a serialized representation of a
 # Collection. There is also a special sub-namespace represented by the empty
 # string; this sub-namespace stores the latest version of the collection.
-CACHE_NAMESPACE_COLLECTION: Literal['collection'] = 'collection'
+CACHE_NAMESPACE_COLLECTION: Final = 'collection'
 # This namespace supports sub-namespaces which are identified by the stringified
 # version number of the skills within the sub-namespace. The value for
 # each key in this namespace should be a serialized representation of a
 # Skill. There is also a special sub-namespace represented by the empty
 # string; this sub-namespace stores the latest version of the skill.
-CACHE_NAMESPACE_SKILL: Literal['skill'] = 'skill'
+CACHE_NAMESPACE_SKILL: Final = 'skill'
 # This namespace supports sub-namespaces which are identified by the stringified
 # version number of the stories within the sub-namespace. The value for
 # each key in this namespace should be a serialized representation of a
 # Story. There is also a special sub-namespace represented by the empty
 # string; this sub-namespace stores the latest version of the story.
-CACHE_NAMESPACE_STORY: Literal['story'] = 'story'
+CACHE_NAMESPACE_STORY: Final = 'story'
 # This namespace supports sub-namespaces which are identified by the stringified
 # version number of the topics within the sub-namespace. The value for
 # each key in this namespace should be a serialized representation of a
 # Topic. There is also a special sub-namespace represented by the empty
 # string; this sub-namespace stores the latest version of the topic.
-CACHE_NAMESPACE_TOPIC: Literal['topic'] = 'topic'
+CACHE_NAMESPACE_TOPIC: Final = 'topic'
 # This namespace supports sub-namespaces which are identified by the stringified
 # version number of the topics within the sub-namespace. The value for
 # each key in this namespace should be a serialized representation of a
 # Platform Parameter. This namespace does not support sub-namespaces.
-CACHE_NAMESPACE_PLATFORM_PARAMETER: Literal['platform'] = 'platform'
+CACHE_NAMESPACE_PLATFORM_PARAMETER: Final = 'platform'
 # The value for each key in this namespace should be a serialized representation
 # of a ConfigPropertyModel value (the 'value' attribute of a ConfigPropertyModel
 # object). This namespace does not support sub-namespaces.
-CACHE_NAMESPACE_CONFIG: Literal['config'] = 'config'
+CACHE_NAMESPACE_CONFIG: Final = 'config'
 # The sub-namespace is not necessary for the default namespace. The namespace
 # handles default datatypes allowed by Redis including Strings, Lists, Sets,
 # and Hashes. More details can be found at: https://redis.io/topics/data-types.
-CACHE_NAMESPACE_DEFAULT: Literal['default'] = 'default'
+CACHE_NAMESPACE_DEFAULT: Final = 'default'
 
 
 class DeserializationFunctionsDict(TypedDict):
@@ -114,6 +113,14 @@ class SerializationFunctionsDict(TypedDict):
     platform: Callable[[platform_parameter_domain.PlatformParameter], str]
     config: Callable[[dict[str, Any]], str]
     default: Callable[[dict[str, Any]], str]
+
+
+# Type defined for arguments which can accpet only keys of Dict
+# DESERIALIZATION_FUNCTIONS or SERIALIZATION_FUNCTIONS.
+namespace_type = Literal[
+        'collection', 'exploration', 'skill', 'story', 'topic', 'platform',
+        'config', 'default'
+        ]
 
 
 DESERIALIZATION_FUNCTIONS: DeserializationFunctionsDict = {
@@ -147,11 +154,7 @@ SERIALIZATION_FUNCTIONS: SerializationFunctionsDict = {
 
 
 def _get_memcache_key(
-    namespace: Literal[
-        'collection', 'exploration',
-        'skill', 'story',
-        'topic', 'platform',
-        'config', 'default'],
+    namespace: namespace_type,
     sub_namespace: str | None, obj_id: str
 ) -> str:
     """Returns a memcache key for the class under the corresponding
@@ -245,11 +248,7 @@ def get_multi(
 
 
 def get_multi(
-    namespace: Literal[
-        'collection', 'exploration',
-        'skill', 'story',
-        'topic', 'platform',
-        'config', 'default'],
+    namespace: namespace_type,
     sub_namespace: str | None, obj_ids: List[str]
 ) -> Dict[str, Any]:
     """Get a dictionary of the {id, value} pairs from the memory cache.
@@ -300,11 +299,7 @@ def get_multi(
 # Exploration, Skill, Story, Topic, Collection, str. hence Any type has
 # to be used here for the value type of id_value_mapping dictionary.
 def set_multi(
-    namespace: Literal[
-        'collection', 'exploration',
-        'skill', 'story',
-        'topic', 'platform',
-        'config', 'default'],
+    namespace: namespace_type,
     sub_namespace: str | None, id_value_mapping: Dict[str, Any]
 ) -> bool:
     """Set multiple id values at once to the cache, where the values are all
@@ -345,11 +340,7 @@ def set_multi(
 
 
 def delete_multi(
-    namespace: Literal[
-        'collection', 'exploration',
-        'skill', 'story',
-        'topic', 'platform',
-        'config', 'default'],
+    namespace: namespace_type,
     sub_namespace: str | None, obj_ids: List[str]
 ) -> bool:
     """Deletes multiple ids in the cache.

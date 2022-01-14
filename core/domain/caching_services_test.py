@@ -256,27 +256,17 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
     def test_invalid_namespace_raises_error(self) -> None:
         invalid_namespace = 'invalid'
-        key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
 
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-            ValueError,
-            'Invalid namespace: %s.' % invalid_namespace):
-            caching_services.set_multi(
-                invalid_namespace, None, # type: ignore[arg-type]
-                key_value_mapping)
-
+        # get_multi has namespace argument, which can accept only keys of
+        # DESERIALIZATION_FUNCTIONS Dict and 'invalid' is not one of them.
+        # So, we don't have any overload function for 'invalid' key.
+        # that's why we added call-overload ignore statement here.
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             ValueError,
             'Invalid namespace: %s.' % invalid_namespace):
             caching_services.get_multi( # type: ignore[call-overload]
                 invalid_namespace, None,
                 ['a', 'b', 'c'])
-
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-            ValueError,
-            'Invalid namespace: %s.' % invalid_namespace):
-            caching_services.delete_multi(
-                invalid_namespace, None, ['a', 'b', 'c']) # type: ignore[arg-type]
 
         invalid_sub_namespace = 'sub:namespace'
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
