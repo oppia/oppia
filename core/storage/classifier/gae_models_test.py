@@ -313,7 +313,7 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
     def test_raise_exception_by_mocking_collision(self) -> None:
         next_scheduled_check_time = datetime.datetime.utcnow()
 
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception, 'The id generator for ClassifierTrainingJobModel is '
             'producing too many collisions.'
             ):
@@ -397,7 +397,7 @@ class StateTrainingJobsMappingModelUnitTests(test_utils.GenericTestBase):
             mapping.algorithm_ids_to_job_ids, {'algorithm_id': 'job_id4'})
 
         # Test that exception is raised when creating mapping with same id.
-        with self.assertRaisesRegexp(Exception, ( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, ( # type: ignore[no-untyped-call]
             'A model with the same ID already exists.')):
             mapping_id = (
                 classifier_models.StateTrainingJobsMappingModel.create(
