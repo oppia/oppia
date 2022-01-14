@@ -36,6 +36,13 @@ export class I18nLanguageCodeService {
   static languageCodeChangeEventEmitter = new EventEmitter<string> ();
   static languageCode: string = AppConstants.DEFAULT_LANGUAGE_CODE;
   static rtlLanguageCodes: readonly string[] = AppConstants.RTL_LANGUAGE_CODES;
+
+  // TODO(#9154): Remove this method when translation service is extended.
+  /**
+   * It stores all classroom metadata translation keys, like topic/story
+   * title, description keys which currently cannot be translated from the
+   * translations dashboard.
+   */ 
   static hackyTranslationKeys: readonly string[] =
     AppConstants.HACKY_TRANSLATIONS_KEYS;
 
@@ -55,22 +62,59 @@ export class I18nLanguageCodeService {
         this.getCurrentI18nLanguageCode()) !== -1);
   }
 
-  // Remove this method when translation service is extended.
+  // TODO(#14645):Remove this method when translation service is extended.
+  isCurrentLanguageEnglish(): boolean {
+    return (this.getCurrentI18nLanguageCode() === 'en');
+  }
+
+  // TODO(#14645):Remove this method when translation service is extended.
+  /**
+   * Takes classroom name as input, generates the translation key for that,
+   * checks if the key has translation and the current language is not english
+   * and returns the classroom name or the translation key based on it.
+   * @param classroomName : string - Name of the classroom.
+   * @returns : string - Name of the classroom if translation key does not exist
+   * in constants file or if the current language is english else the translation
+   * key for the classroom.
+   */
   getClassroomTranslationKey(classroomName: string): string {
-    return `I18N_CLASSROOM_${classroomName.toUpperCase()}_TITLE`;
+    let translationKey = `I18N_CLASSROOM_${classroomName.toUpperCase()}_TITLE`;
+    if (this.hasTranslation(translationKey)) {
+      if(!this.isCurrentLanguageEnglish()) return translationKey;
+    }
+    return classroomName;
   }
 
-  // Remove this method when translation service is extended.
-  getTopicTranslationKey(topicId: string, isDescription: boolean): string {
-    return (
-      isDescription ?
-      `I18N_TOPIC_${topicId}_DESCRIPTION` :
-      `I18N_TOPIC_${topicId}_TITLE`
-    );
+  // TODO(#14645):Remove this method when translation service is extended.
+  /**
+   * Takes topic id and name as input, generates the translation key for that,
+   * checks if the key has translation and the current language is not english
+   * and returns the topic name or the translation key based on it.
+   * @param topicId : string - Unique id of the topic, used to generate
+   * translation key.
+   * @param topicName : string - Name of the topic.
+   * @returns : string - Name of the topic if translation key does not exist
+   * in constants file or if the current language is english else the translation
+   * key for the topic.
+   */
+  getTopicTitleTranslationKey(topicId: string, topicName: string): string {
+    let translationKey = `I18N_TOPIC_${topicId}_TITLE`;
+    if (this.hasTranslation(translationKey)) {
+      if(!this.isCurrentLanguageEnglish()) return translationKey;
+    }
+    return topicName;
   }
 
-  // Remove this method when translation service is extended.
-  hasTranslations(translationKey: string): boolean {
+  // TODO(#14645):Remove this method when translation service is extended.
+  /**
+   * Checks if the translation key is present in the constants file which
+   * indicates it has atleast the translation key added in en.json.
+   * @param translationKey : string - Translation key that needs to be
+   * checked whether is has translation in language json files.
+   * @returns : boolean - True if translation key is present in language json
+   * files else False.
+   */
+  hasTranslation(translationKey: string): boolean {
     return (
       // TODO(#9154): Change I18nLanguageCodeService to "this".
       I18nLanguageCodeService.hackyTranslationKeys.indexOf(

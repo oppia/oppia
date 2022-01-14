@@ -50,9 +50,8 @@ export class TopicSummaryTileComponent {
           this.topicSummary.getThumbnailFilename());
     }
     this.topicNameTranslationKey = this.i18nLanguageCodeService.
-      getTopicTranslationKey(this.topicSummary.getId(), false);
-    this.topicNameTranslationKey = this.hasTranslationKey() ?
-      this.topicNameTranslationKey : this.topicSummary.getName();
+      getTopicTitleTranslationKey(this.topicSummary.getId(),
+        this.topicSummary.getName());
   }
 
   getTopicPageUrl(): string {
@@ -86,12 +85,6 @@ export class TopicSummaryTileComponent {
       parseInt(bgColor.substring(4, 6), 16) - 100);
 
     return '#' + newRValue + newGValue + newBValue;
-  }
-
-  // Remove this method when translation service is extended.
-  hasTranslationKey(): boolean {
-    return this.i18nLanguageCodeService.hasTranslations(
-      this.topicNameTranslationKey);
   }
 }
 

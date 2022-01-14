@@ -56,18 +56,56 @@ describe('I18nLanguageCodeService', () => {
     expect(i18nLanguageCodeService.isCurrentLanguageRTL()).toBe(true);
   });
 
-  it('should set translation keys correctly', () => {
-    expect(i18nLanguageCodeService.getClassroomTranslationKey(
-      'Math')).toBe('I18N_CLASSROOM_MATH_TITLE');
-    expect(i18nLanguageCodeService.getTopicTranslationKey(
-      '12345axa', false)).toBe('I18N_TOPIC_12345axa_TITLE');
-    expect(i18nLanguageCodeService.getTopicTranslationKey(
-      '12345axa', true)).toBe('I18N_TOPIC_12345axa_DESCRIPTION');
+  it('should get whether the current language is english correctly', () => {
+    i18nLanguageCodeService.setI18nLanguageCode('es');
+    expect(i18nLanguageCodeService.isCurrentLanguageEnglish()).toBe(false);
+    i18nLanguageCodeService.setI18nLanguageCode('en');
+    expect(i18nLanguageCodeService.isCurrentLanguageEnglish()).toBe(true);
+    i18nLanguageCodeService.setI18nLanguageCode('ar');
+    expect(i18nLanguageCodeService.isCurrentLanguageEnglish()).toBe(false);
   });
 
-  it('should check whether translation key is present', () => {
-    expect(i18nLanguageCodeService.hasTranslations(
+  it('should check whether translation key is present correctly', () => {
+    expect(i18nLanguageCodeService.hasTranslation(
+      'I18N_CLASSROOM_MATH_TITLE')).toBe(true);
+    expect(i18nLanguageCodeService.hasTranslation(
       'I18N_TOPIC_12345axa_TITLE')).toBe(false);
+  });
+
+  it('should set classroom translation key correctly', () => {
+    spyOn(i18nLanguageCodeService, 'hasTranslation').and.returnValue(false);
+    i18nLanguageCodeService.setI18nLanguageCode('en');
+    expect(i18nLanguageCodeService.getClassroomTranslationKey(
+      'Math')).toBe('Math');
+    spyOn(i18nLanguageCodeService, 'hasTranslation').and.returnValue(true);
+    expect(i18nLanguageCodeService.getClassroomTranslationKey(
+      'Math')).toBe('Math');
+
+    i18nLanguageCodeService.setI18nLanguageCode('es');
+    spyOn(i18nLanguageCodeService, 'hasTranslation').and.returnValue(false);
+    expect(i18nLanguageCodeService.getClassroomTranslationKey(
+      'Math')).toBe('Math');
+    spyOn(i18nLanguageCodeService, 'hasTranslation').and.returnValue(true);
+    expect(i18nLanguageCodeService.getClassroomTranslationKey(
+      'Math')).toBe('I18N_CLASSROOM_MATH_TITLE');
+  });
+
+  it('should set topic translation key correctly', () => {
+    i18nLanguageCodeService.setI18nLanguageCode('en');
+    spyOn(i18nLanguageCodeService, 'hasTranslation').and.returnValue(false);
+    expect(i18nLanguageCodeService.getTopicTitleTranslationKey(
+      'abcd1234', 'Fractions')).toBe('Fractions');
+    spyOn(i18nLanguageCodeService, 'hasTranslation').and.returnValue(true);
+    expect(i18nLanguageCodeService.getTopicTitleTranslationKey(
+      'abcd1234', 'Fractions')).toBe('Fractions');
+
+    i18nLanguageCodeService.setI18nLanguageCode('es');
+    spyOn(i18nLanguageCodeService, 'hasTranslation').and.returnValue(false);
+    expect(i18nLanguageCodeService.getTopicTitleTranslationKey(
+      'abcd1234', 'Fractions')).toBe('Fractions');
+    spyOn(i18nLanguageCodeService, 'hasTranslation').and.returnValue(true);
+    expect(i18nLanguageCodeService.getTopicTitleTranslationKey(
+      'abcd1234', 'Fractions')).toBe('I18N_TOPIC_abcd1234_TITLE');
   });
 
   it('should get event emitter for loading of preferred language codes', () => {

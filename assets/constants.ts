@@ -77,7 +77,7 @@ export default {
 
   "RTL_LANGUAGE_CODES": ["ar"],
 
-  // Remove this method when translation service is extended.
+  // TODO(#14645):Remove these keys once translation service is extended.
   // Hacky translations keys for classroom, topic, skill, exploration
   // and subtopic names and descriptions. Needs to be udpated whenever
   // any new class, topic, skill, exploration or subtopic is added or a

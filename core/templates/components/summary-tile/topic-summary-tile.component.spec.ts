@@ -97,15 +97,12 @@ describe('TopicSummaryTileCompoennt', () => {
     expect(component.getDarkerThumbnailBgColor()).toBe('#627876');
   });
 
-  it('should get correct translations', () => {
-    spyOn(i18nLanguageCodeService, 'getTopicTranslationKey').and.returnValue(
-      'I18N_TOPIC_12345axa_TITLE');
-    spyOn(i18nLanguageCodeService, 'hasTranslations').and.returnValue(
-      false);
+  it('should get topic name translation key correctly', () => {
+    spyOn(i18nLanguageCodeService, 'getTopicTitleTranslationKey')
+      .and.returnValue(component.topicSummary.name);
 
     component.ngOnInit();
 
-    expect(component.hasTranslationKey()).toBe(false);
     expect(component.topicNameTranslationKey).toBe(
       component.topicSummary.name);
   });
