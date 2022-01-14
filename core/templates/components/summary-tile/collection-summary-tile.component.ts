@@ -56,7 +56,7 @@ export class CollectionSummaryTileComponent implements OnInit, OnDestroy {
   defaultEmptyTitle!: string;
   activityTypeCollection!: string;
   mobileCardToBeShown: boolean = false;
-  resizeSubscription: Subscription | undefined;
+  resizeSubscription!: Subscription;
   // A null value for 'relativeLastUpdatedDateTime' indicates that
   // getLastUpdatedMsecs received after component interactions
   // is empty or does not exist.
