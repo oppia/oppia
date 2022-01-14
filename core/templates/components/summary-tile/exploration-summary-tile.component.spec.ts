@@ -227,6 +227,7 @@ describe('Exploration Summary Tile Component', () => {
       windowDimensionsService, 'getResizeEvent').and.callThrough();
     const windowWidthSpy = spyOn(
       windowDimensionsService, 'getWidth').and.callThrough();
+    component.mobileCutoffPx = 536;
 
     component.ngOnInit();
     tick();

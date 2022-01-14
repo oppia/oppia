@@ -136,6 +136,7 @@ describe('Collection Summary Tile Component', () => {
       .and.returnValue(Promise.resolve(userInfo));
     const windowResizeSpy = spyOn(
       windowDimensionsService, 'getResizeEvent').and.callThrough();
+    component.mobileCutoffPx = 536;
 
     component.ngOnInit();
     tick();
