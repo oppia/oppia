@@ -868,7 +868,7 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
             user_id: str,
             rating: int,
             old_rating: Optional[int]
-    ) -> None:
+    ) -> str:
         """Creates a new rate exploration event and then writes it to the
         datastore.
 
@@ -892,6 +892,7 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
             old_rating=old_rating,
             event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION
         ).put()
+        return entity_id
 
     @staticmethod
     def get_model_association_to_user(
