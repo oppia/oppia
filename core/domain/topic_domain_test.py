@@ -132,22 +132,6 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             ' story references list of the topic.'):
             self.topic.delete_canonical_story('story_id_5')
 
-    def test_rearrange_canonical_story_fail_with_invalid_from_index_value(
-        self
-    ) -> None:
-        with self.assertRaisesRegexp(  # type: ignore[no-untyped-call]
-            Exception, 'Expected from_index value to be a number, '
-                       'received None'):
-            self.topic.rearrange_canonical_story(None, 2) # type: ignore[arg-type]
-
-    def test_rearrange_canonical_story_fail_with_invalid_to_index_value(
-        self
-    ) -> None:
-        with self.assertRaisesRegexp(  # type: ignore[no-untyped-call]
-            Exception, 'Expected to_index value to be a number, '
-                       'received None'):
-            self.topic.rearrange_canonical_story(1, None) # type: ignore[arg-type]
-
     def test_rearrange_canonical_story_fail_with_out_of_bound_indexes(
         self
     ) -> None:
@@ -212,22 +196,6 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(canonical_story_ids[1], 'story_id_2')
         self.assertEqual(canonical_story_ids[2], 'story_id_3')
 
-    def test_rearrange_skill_in_subtopic_fail_with_invalid_from_index(
-        self
-    ) -> None:
-        with self.assertRaisesRegexp(  # type: ignore[no-untyped-call]
-            Exception, 'Expected from_index value to be a number, '
-                       'received None'):
-            self.topic.rearrange_skill_in_subtopic(1, None, 2) # type: ignore[arg-type]
-
-    def test_rearrange_skill_in_subtopic_fail_with_invalid_to_index_value(
-        self
-    ) -> None:
-        with self.assertRaisesRegexp(  # type: ignore[no-untyped-call]
-            Exception, 'Expected to_index value to be a number, '
-                       'received None'):
-            self.topic.rearrange_skill_in_subtopic(1, 1, None) # type: ignore[arg-type]
-
     def test_rearrange_skill_in_subtopic_fail_with_out_of_bound_indexes(
         self
     ) -> None:
@@ -283,18 +251,6 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill_ids[0], 'skill_id_1')
         self.assertEqual(skill_ids[1], 'skill_id_2')
         self.assertEqual(skill_ids[2], 'skill_id_3')
-
-    def test_rearrange_subtopic_fail_with_invalid_from_index(self) -> None:
-        with self.assertRaisesRegexp(  # type: ignore[no-untyped-call]
-            Exception, 'Expected from_index value to be a number, '
-                       'received None'):
-            self.topic.rearrange_subtopic(None, 2) # type: ignore[arg-type]
-
-    def test_rearrange_subtopic_fail_with_invalid_to_index_value(self) -> None:
-        with self.assertRaisesRegexp(  # type: ignore[no-untyped-call]
-            Exception, 'Expected to_index value to be a number, '
-                       'received None'):
-            self.topic.rearrange_subtopic(1, None) # type: ignore[arg-type]
 
     def test_rearrange_subtopic_fail_with_out_of_bound_indexes(self) -> None:
         with self.assertRaisesRegexp(  # type: ignore[no-untyped-call]
@@ -487,8 +443,6 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
     def test_valid_name_topic(self) -> None:
         self._assert_valid_name_for_topic(
-            'Name should be a string.', 123) # type: ignore[arg-type]
-        self._assert_valid_name_for_topic(
             'Name field should not be empty', '')
         self._assert_valid_name_for_topic(
             'Topic name should be at most 39 characters, received '
@@ -527,13 +481,6 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             'ijklmnopqrstuvwxyz')
         self._assert_validation_error(
             'Expected subtopic title to be less than 64 characters')
-
-    def test_story_is_published_validation(self) -> None:
-        self.topic.canonical_story_references = [
-            topic_domain.StoryReference('story_id', 'published') # type: ignore[arg-type]
-        ]
-        self._assert_validation_error(
-            'Expected story_is_published to be a boolean')
 
     def test_thumbnail_filename_validation_for_subtopic(self) -> None:
         self._assert_valid_thumbnail_filename_for_subtopic(
@@ -1405,9 +1352,3 @@ class TopicRightsTests(test_utils.GenericTestBase):
     def test_is_manager(self) -> None:
         self.assertTrue(self.topic_summary.is_manager(self.user_id_a))
         self.assertFalse(self.topic_summary.is_manager(self.user_id_b))
-
-    def test_is_manager_with_invalid_user_id(self) -> None:
-        with self.assertRaisesRegexp(  # type: ignore[no-untyped-call]
-            Exception, 'Expected user_id value to be a string, '
-                       'received None'):
-            self.topic_summary.is_manager(None) # type: ignore[arg-type]

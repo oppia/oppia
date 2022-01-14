@@ -283,9 +283,7 @@ class StoryReference:
         self.story_id = story_id
         self.story_is_published = story_is_published
 
-    def to_dict(
-        self
-    ) -> StoryReferenceDict:
+    def to_dict(self) -> StoryReferenceDict:
         """Returns a dict representing this StoryReference domain object.
 
         Returns:
@@ -315,9 +313,7 @@ class StoryReference:
         return story_reference
 
     @classmethod
-    def create_default_story_reference(
-        cls, story_id: str
-    ) -> StoryReference:
+    def create_default_story_reference(cls, story_id: str) -> StoryReference:
         """Creates a StoryReference object with default values.
 
         Args:
@@ -329,9 +325,7 @@ class StoryReference:
         """
         return cls(story_id, False)
 
-    def validate(
-        self
-    ) -> None:
+    def validate(self) -> None:
         """Validates various properties of the StoryReference object.
 
         Raises:
@@ -392,9 +386,7 @@ class Subtopic:
         self.thumbnail_size_in_bytes = thumbnail_size_in_bytes
         self.url_fragment = url_fragment
 
-    def to_dict(
-        self
-    ) -> SubtopicDict:
+    def to_dict(self) -> SubtopicDict:
         """Returns a dict representing this Subtopic domain object.
 
         Returns:
@@ -411,9 +403,7 @@ class Subtopic:
         }
 
     @classmethod
-    def from_dict(
-        cls, subtopic_dict: SubtopicDict
-    ) -> Subtopic:
+    def from_dict(cls, subtopic_dict: SubtopicDict) -> Subtopic:
         """Returns a Subtopic domain object from a dict.
 
         Args:
@@ -431,9 +421,7 @@ class Subtopic:
         return subtopic
 
     @classmethod
-    def create_default_subtopic(
-        cls, subtopic_id: int, title: str
-    ) -> Subtopic:
+    def create_default_subtopic(cls, subtopic_id: int, title: str) -> Subtopic:
         """Creates a Subtopic object with default values.
 
         Args:
@@ -447,9 +435,7 @@ class Subtopic:
         return cls(subtopic_id, title, [], None, None, None, '')
 
     @classmethod
-    def require_valid_thumbnail_filename(
-        cls, thumbnail_filename: str
-    ) -> None:
+    def require_valid_thumbnail_filename(cls, thumbnail_filename: str) -> None:
         """Checks whether the thumbnail filename of the subtopic is a valid
             one.
 
@@ -459,9 +445,7 @@ class Subtopic:
         utils.require_valid_thumbnail_filename(thumbnail_filename)
 
     @classmethod
-    def require_valid_thumbnail_bg_color(
-        cls, thumbnail_bg_color: str
-    ) -> bool:
+    def require_valid_thumbnail_bg_color(cls, thumbnail_bg_color: str) -> bool:
         """Checks whether the thumbnail background color of the subtopic is a
             valid one.
 
@@ -475,9 +459,7 @@ class Subtopic:
         return thumbnail_bg_color in constants.ALLOWED_THUMBNAIL_BG_COLORS[
             'subtopic']
 
-    def validate(
-        self
-    ) -> None:
+    def validate(self) -> None:
         """Validates various properties of the Subtopic object.
 
         Raises:
@@ -541,14 +523,14 @@ class TopicDict(TypedDict, total=False):
 
 
 class VersionedSubtopicsDict(TypedDict):
-    """Dictionary that represents versioned_subtopics."""
+    """Dictionary that represents versioned subtopics."""
 
     schema_version: int
     subtopics: List[Subtopic]
 
 
 class VersionedStoryReferences(TypedDict):
-    """Dictionary that represents versioned_story_references."""
+    """Dictionary that represents versioned story references."""
 
     schema_version: int
     story_references: List[StoryReference]
@@ -647,9 +629,7 @@ class Topic:
         self.practice_tab_is_displayed = practice_tab_is_displayed
         self.page_title_fragment_for_web = page_title_fragment_for_web
 
-    def to_dict(
-        self
-    ) -> TopicDict:
+    def to_dict(self) -> TopicDict:
         """Returns a dict representing this Topic domain object.
 
         Returns:
@@ -687,9 +667,7 @@ class Topic:
             'page_title_fragment_for_web': self.page_title_fragment_for_web
         }
 
-    def serialize(
-        self
-    ) -> str:
+    def serialize(self) -> str:
         """Returns the object serialized as a JSON string.
 
         Returns:
@@ -772,9 +750,7 @@ class Topic:
         return topic
 
     @classmethod
-    def deserialize(
-        cls, json_string: str
-    ) -> Topic:
+    def deserialize(cls, json_string: str) -> Topic:
         """Returns a Topic domain object decoded from a JSON string.
 
         Args:
@@ -803,9 +779,7 @@ class Topic:
         return topic
 
     @classmethod
-    def require_valid_topic_id(
-        cls, topic_id: Optional[str]
-    ) -> None:
+    def require_valid_topic_id(cls, topic_id: Optional[str]) -> None:
         """Checks whether the topic id is a valid one.
 
         Args:
@@ -834,9 +808,7 @@ class Topic:
                 % (name_limit, name))
 
     @classmethod
-    def require_valid_url_fragment(
-        cls, url_fragment: str
-    ) -> None:
+    def require_valid_url_fragment(cls, url_fragment: str) -> None:
         """Checks whether the url fragment of the topic is a valid one.
 
         Args:
@@ -847,9 +819,7 @@ class Topic:
             constants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT)
 
     @classmethod
-    def require_valid_thumbnail_filename(
-        cls, thumbnail_filename: str
-    ) -> None:
+    def require_valid_thumbnail_filename(cls, thumbnail_filename: str) -> None:
         """Checks whether the thumbnail filename of the topic is a valid
             one.
 
@@ -859,9 +829,7 @@ class Topic:
         utils.require_valid_thumbnail_filename(thumbnail_filename)
 
     @classmethod
-    def require_valid_thumbnail_bg_color(
-        cls, thumbnail_bg_color: str
-    ) -> bool:
+    def require_valid_thumbnail_bg_color(cls, thumbnail_bg_color: str) -> bool:
         """Checks whether the thumbnail background color of the topic is a
             valid one.
 
@@ -875,9 +843,7 @@ class Topic:
         return thumbnail_bg_color in constants.ALLOWED_THUMBNAIL_BG_COLORS[
             'topic']
 
-    def get_all_skill_ids(
-        self
-    ) -> List[str]:
+    def get_all_skill_ids(self) -> List[str]:
         """Returns all the ids of all the skills present in the topic.
 
         Returns:
@@ -889,9 +855,7 @@ class Topic:
             skill_ids.extend(copy.deepcopy(subtopic.skill_ids))
         return skill_ids
 
-    def publish_story(
-        self, story_id: str
-    ) -> None:
+    def publish_story(self, story_id: str) -> None:
         """Marks story with the given id as published.
 
         Raises:
@@ -908,9 +872,7 @@ class Topic:
                 return
         raise Exception('Story with given id doesn\'t exist in the topic')
 
-    def unpublish_story(
-        self, story_id: str
-    ) -> None:
+    def unpublish_story(self, story_id: str) -> None:
         """Marks story with the given id as unpublished.
 
         Raises:
@@ -946,9 +908,7 @@ class Topic:
         ]
         return story_ids
 
-    def get_all_story_references(
-        self
-    ) -> List[StoryReference]:
+    def get_all_story_references(self) -> List[StoryReference]:
         """Returns all the story references in the topic - both canonical and
         additional.
 
@@ -976,9 +936,7 @@ class Topic:
         ]
         return story_ids
 
-    def get_all_uncategorized_skill_ids(
-        self
-    ) -> List[str]:
+    def get_all_uncategorized_skill_ids(self) -> List[str]:
         """Returns ids of all the uncategorized skills present in the topic.
 
         Returns:
@@ -987,9 +945,7 @@ class Topic:
         """
         return self.uncategorized_skill_ids
 
-    def delete_canonical_story(
-        self, story_id: str
-    ) -> None:
+    def delete_canonical_story(self, story_id: str) -> None:
         """Removes a story from the canonical_story_references list.
 
         Args:
@@ -1010,9 +966,7 @@ class Topic:
                 'The story_id %s is not present in the canonical '
                 'story references list of the topic.' % story_id)
 
-    def rearrange_canonical_story(
-        self, from_index: int, to_index: int
-    ) -> None:
+    def rearrange_canonical_story(self, from_index: int, to_index: int) -> None:
         """Rearranges or moves a canonical story to another position.
 
         Args:
@@ -1023,16 +977,6 @@ class Topic:
         Raises:
             Exception. Invalid input.
         """
-        if from_index is None:
-            raise Exception(
-                'Expected from_index value to be a number, '
-                       'received None')
-
-        if to_index is None:
-            raise Exception(
-                'Expected to_index value to be a number, '
-                       'received None')
-
         if from_index == to_index:
             raise Exception(
                 'Expected from_index and to_index values to be different.')
@@ -1051,9 +995,7 @@ class Topic:
         self.canonical_story_references.insert(
             to_index, canonical_story_reference_to_move)
 
-    def add_canonical_story(
-        self, story_id: str
-    ) -> None:
+    def add_canonical_story(self, story_id: str) -> None:
         """Adds a story to the canonical_story_references list.
 
         Args:
@@ -1068,9 +1010,7 @@ class Topic:
             StoryReference.create_default_story_reference(story_id)
         )
 
-    def add_additional_story(
-        self, story_id: str
-    ) -> None:
+    def add_additional_story(self, story_id: str) -> None:
         """Adds a story to the additional_story_references list.
 
         Args:
@@ -1085,9 +1025,7 @@ class Topic:
             StoryReference.create_default_story_reference(story_id)
         )
 
-    def delete_additional_story(
-        self, story_id: str
-    ) -> None:
+    def delete_additional_story(self, story_id: str) -> None:
         """Removes a story from the additional_story_references list.
 
         Args:
@@ -1108,9 +1046,7 @@ class Topic:
                 'The story_id %s is not present in the additional '
                 'story references list of the topic.' % story_id)
 
-    def validate(
-        self, strict: bool = False
-    ) -> None:
+    def validate(self, strict: bool = False) -> None:
         """Validates all properties of this topic and its constituents.
 
         Args:
@@ -1297,7 +1233,9 @@ class Topic:
 
     @classmethod
     def update_subtopics_from_model(
-        cls, versioned_subtopics: VersionedSubtopicsDict, current_version: int,
+        cls,
+        versioned_subtopics: VersionedSubtopicsDict,
+        current_version: int,
         topic_id: str
     ) -> None:
         """Converts the subtopics blob contained in the given
@@ -1332,7 +1270,8 @@ class Topic:
 
     @classmethod
     def update_story_references_from_model(
-        cls, versioned_story_references: VersionedStoryReferences,
+        cls,
+        versioned_story_references: VersionedStoryReferences,
         current_version: int
     ) -> None:
         """Converts the story_references blob contained in the given
@@ -1362,9 +1301,7 @@ class Topic:
         versioned_story_references['story_references'] = (
             updated_story_references)
 
-    def update_name(
-        self, new_name: str
-    ) -> None:
+    def update_name(self, new_name: str) -> None:
         """Updates the name of a topic object.
 
         Args:
@@ -1378,9 +1315,7 @@ class Topic:
         self.name = new_name
         self.canonical_name = new_name.lower()
 
-    def update_abbreviated_name(
-        self, new_abbreviated_name: str
-    ) -> None:
+    def update_abbreviated_name(self, new_abbreviated_name: str) -> None:
         """Updates the abbreviated_name of a topic object.
 
         Args:
@@ -1389,9 +1324,7 @@ class Topic:
         """
         self.abbreviated_name = new_abbreviated_name
 
-    def update_url_fragment(
-        self, new_url_fragment: str
-    ) -> None:
+    def update_url_fragment(self, new_url_fragment: str) -> None:
         """Updates the url_fragment of a topic object.
 
         Args:
@@ -1433,9 +1366,7 @@ class Topic:
         """
         self.thumbnail_bg_color = new_thumbnail_bg_color
 
-    def update_description(
-        self, new_description: str
-    ) -> None:
+    def update_description(self, new_description: str) -> None:
         """Updates the description of a topic object.
 
         Args:
@@ -1443,9 +1374,7 @@ class Topic:
         """
         self.description = new_description
 
-    def update_language_code(
-        self, new_language_code: str
-    ) -> None:
+    def update_language_code(self, new_language_code: str) -> None:
         """Updates the language code of a topic object.
 
         Args:
@@ -1453,9 +1382,7 @@ class Topic:
         """
         self.language_code = new_language_code
 
-    def update_meta_tag_content(
-        self, new_meta_tag_content: str
-    ) -> None:
+    def update_meta_tag_content(self, new_meta_tag_content: str) -> None:
         """Updates the meta tag content of a topic object.
 
         Args:
@@ -1530,9 +1457,7 @@ class Topic:
                 % uncategorized_skill_id)
         self.uncategorized_skill_ids.remove(uncategorized_skill_id)
 
-    def get_all_subtopics(
-        self
-    ) -> List[SubtopicDict]:
+    def get_all_subtopics(self) -> List[SubtopicDict]:
         """Returns all subtopics in the topic.
 
         Returns:
@@ -1544,9 +1469,7 @@ class Topic:
             subtopics.append(subtopic.to_dict())
         return subtopics
 
-    def get_subtopic_index(
-        self, subtopic_id: int
-    ) -> int:
+    def get_subtopic_index(self, subtopic_id: int) -> int:
         """Gets the index of the subtopic with the given id in the subtopics
         list.
 
@@ -1564,9 +1487,7 @@ class Topic:
         raise Exception(
             'The subtopic with id %s does not exist.' % subtopic_id)
 
-    def add_subtopic(
-        self, new_subtopic_id: int, title: str
-    ) -> None:
+    def add_subtopic(self, new_subtopic_id: int, title: str) -> None:
         """Adds a subtopic with the given id and title.
 
         Args:
@@ -1586,9 +1507,7 @@ class Topic:
         self.subtopics.append(
             Subtopic.create_default_subtopic(new_subtopic_id, title))
 
-    def delete_subtopic(
-        self, subtopic_id: int
-    ) -> None:
+    def delete_subtopic(self, subtopic_id: int) -> None:
         """Deletes the subtopic with the given id and adds all its skills to
         uncategorized skill ids section.
 
@@ -1603,9 +1522,7 @@ class Topic:
             self.uncategorized_skill_ids.append(skill_id)
         del self.subtopics[subtopic_index]
 
-    def update_subtopic_title(
-        self, subtopic_id: int, new_title: str
-    ) -> None:
+    def update_subtopic_title(self, subtopic_id: int, new_title: str) -> None:
         """Updates the title of the new subtopic.
 
         Args:
@@ -1693,16 +1610,6 @@ class Topic:
         Raises:
             Exception. Invalid input.
         """
-        if from_index is None:
-            raise Exception(
-                'Expected from_index value to be a number, '
-                       'received None')
-
-        if to_index is None:
-            raise Exception(
-                'Expected to_index value to be a number, '
-                       'received None')
-
         if from_index == to_index:
             raise Exception(
                 'Expected from_index and to_index values to be different.')
@@ -1723,9 +1630,7 @@ class Topic:
         self.subtopics[subtopic_index].skill_ids.insert(
             to_index, skill_to_move)
 
-    def rearrange_subtopic(
-        self, from_index: int, to_index: int
-    ) -> None:
+    def rearrange_subtopic(self, from_index: int, to_index: int) -> None:
         """Rearranges the subtopic in the topic.
 
         Args:
@@ -1735,16 +1640,6 @@ class Topic:
         Raises:
             Exception. Invalid input.
         """
-        if from_index is None:
-            raise Exception(
-                'Expected from_index value to be a number, '
-                       'received None')
-
-        if to_index is None:
-            raise Exception(
-                'Expected to_index value to be a number, '
-                       'received None')
-
         if from_index == to_index:
             raise Exception(
                 'Expected from_index and to_index values to be different.')
@@ -1761,7 +1656,9 @@ class Topic:
         self.subtopics.insert(to_index, skill_to_move)
 
     def move_skill_id_to_subtopic(
-        self, old_subtopic_id: Optional[int], new_subtopic_id: int,
+        self,
+        old_subtopic_id: Optional[int],
+        new_subtopic_id: int,
         skill_id: str
     ) -> None:
         """Moves the skill_id to a new subtopic or to uncategorized skill ids.
@@ -1830,9 +1727,7 @@ class Topic:
         self.subtopics[subtopic_index].skill_ids.remove(skill_id)
         self.uncategorized_skill_ids.append(skill_id)
 
-    def are_subtopic_url_fragments_unique(
-        self
-    ) -> bool:
+    def are_subtopic_url_fragments_unique(self) -> bool:
         """Checks if all the subtopic url fragments are unique across the
         topic.
 
@@ -1936,9 +1831,7 @@ class TopicSummary:
         self.url_fragment = url_fragment
 
     @classmethod
-    def require_valid_url_fragment(
-        cls, url_fragment: str
-    ) -> None:
+    def require_valid_url_fragment(cls, url_fragment: str) -> None:
         """Checks whether the url fragment of the topic is a valid one.
 
         Args:
@@ -1948,9 +1841,7 @@ class TopicSummary:
             url_fragment, 'Topic URL Fragment',
             constants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT)
 
-    def validate(
-        self
-    ) -> None:
+    def validate(self) -> None:
         """Validates all properties of this topic summary.
 
         Raises:
@@ -2020,9 +1911,7 @@ class TopicSummary:
                 'Expected subtopic_count to be non-negative, '
                 'received \'%s\'' % self.subtopic_count)
 
-    def to_dict(
-        self
-    ) -> TopicSummaryDict:
+    def to_dict(self) -> TopicSummaryDict:
         """Returns a dictionary representation of this domain object.
 
         Returns:
@@ -2080,9 +1969,7 @@ class TopicRights:
         self.manager_ids = manager_ids
         self.topic_is_published = topic_is_published
 
-    def to_dict(
-        self
-    ) -> TopicRightsDict:
+    def to_dict(self) -> TopicRightsDict:
         """Returns a dict suitable for use by the frontend.
 
         Returns:
@@ -2096,9 +1983,7 @@ class TopicRights:
             'topic_is_published': self.topic_is_published
         }
 
-    def is_manager(
-        self, user_id: str
-    ) -> bool:
+    def is_manager(self, user_id: str) -> bool:
         """Checks whether given user is a manager of the topic.
 
         Args:
