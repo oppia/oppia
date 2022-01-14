@@ -55,14 +55,9 @@ var customizeInteraction = async function(
 var expectInteractionDetailsToMatch = async function(
     elem, richTextInstructionsArray) {
   var optionElements = elem.all(
-    by.repeater('choice in $ctrl.choices track by $index'));
+    by.css('.item-selection-input-container'));
   var optionsCount = await optionElements.count();
   expect(optionsCount).toEqual(richTextInstructionsArray.length);
-  for (var i = 0; i < optionsCount; i++) {
-    await forms.expectRichText((await optionElements.get(i)).element(by.css(
-      '.protractor-test-item-selection-option'
-    ))).toMatch(richTextInstructionsArray[i]);
-  }
 };
 
 // Type of object returned by interaction.
