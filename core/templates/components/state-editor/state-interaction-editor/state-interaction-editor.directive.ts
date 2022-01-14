@@ -92,7 +92,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
         'components/state-editor/state-interaction-editor/' +
         'state-interaction-editor.directive.html'),
       controller: [
-        '$scope', '$uibModal', 'AlertsService', 'ContextService',
+        '$rootScope', '$scope', '$uibModal', 'AlertsService', 'ContextService',
         'EditabilityService', 'ExplorationHtmlFormatterService',
         'InteractionDetailsCacheService', 'NgbModal',
         'ResponsesService', 'StateContentService',
@@ -100,7 +100,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
         'StateInteractionIdService', 'StateNextContentIdIndexService',
         'StateSolutionService', 'UrlInterpolationService',
         'WindowDimensionsService', 'INTERACTION_SPECS', function(
-            $scope, $uibModal, AlertsService, ContextService,
+            $rootScope, $scope, $uibModal, AlertsService, ContextService,
             EditabilityService, ExplorationHtmlFormatterService,
             InteractionDetailsCacheService, NgbModal,
             ResponsesService, StateContentService,
@@ -281,6 +281,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
               $scope.recomputeGraph();
               _updateInteractionPreview();
               _updateAnswerChoices();
+              $rootScope.$applyAsync();
             }, function() {
               AlertsService.clearWarnings();
             });

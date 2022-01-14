@@ -71,6 +71,10 @@ import { ThumbnailUploaderComponent } from './forms/custom-forms-directives/thum
 import { EditThumbnailModalComponent } from './forms/custom-forms-directives/edit-thumbnail-modal.component';
 import { CorrectnessFooterComponent } from 'pages/exploration-player-page/layout-directives/correctness-footer.component';
 import { ContinueButtonComponent } from 'pages/exploration-player-page/learner-experience/continue-button.component';
+import { DeleteInteractionModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-interaction-modal.component';
+import { DeleteHintModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-hint-modal.component';
+import { DeleteLastHintModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-last-hint-modal.component';
+import { DeleteSolutionModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-solution-modal.component';
 import { ProgressNavComponent } from 'pages/exploration-player-page/layout-directives/progress-nav.component';
 import { QuestionDifficultySelectorComponent } from './question-difficulty-selector/question-difficulty-selector.component';
 import { PreviewThumbnailComponent } from 'pages/topic-editor-page/modal-templates/preview-thumbnail.component';
@@ -207,6 +211,10 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     SortByPipe,
     LearnerDashboardIconsComponent,
     PreviewThumbnailComponent,
+    DeleteInteractionModalComponent,
+    DeleteHintModalComponent,
+    DeleteLastHintModalComponent,
+    DeleteSolutionModalComponent,
     SavePendingChangesModalComponent,
     AddHintModalComponent,
     ReviewMaterialEditorComponent
@@ -270,6 +278,10 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     LearnerDashboardIconsComponent,
     PreviewThumbnailComponent,
+    DeleteInteractionModalComponent,
+    DeleteHintModalComponent,
+    DeleteLastHintModalComponent,
+    DeleteSolutionModalComponent,
     SavePendingChangesModalComponent,
     AddHintModalComponent,
     ReviewMaterialEditorComponent
@@ -349,6 +361,10 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     SortByPipe,
     SavePendingChangesModalComponent,
     LearnerDashboardIconsComponent,
+    DeleteInteractionModalComponent,
+    DeleteHintModalComponent,
+    DeleteLastHintModalComponent,
+    DeleteSolutionModalComponent,
     ReviewMaterialEditorComponent
   ],
 })
