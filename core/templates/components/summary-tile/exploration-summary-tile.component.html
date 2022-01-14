@@ -31,7 +31,7 @@
       <ul *ngIf="!isCollectionPreviewTile" class="metrics layout-align-space-between-center layout-row">
         <li>
           <span class="protractor-test-exp-summary-tile-rating" [ngClass]="{'rating-disabled': !avgRating}">
-            <span class="fas fa-star" ngbTooltip="'I18N_LIBRARY_RATINGS_TOOLTIP' | translate " placement="top" container="body">
+            <span class="fas fa-star" [ngbTooltip]="'I18N_LIBRARY_RATINGS_TOOLTIP' | translate " placement="top" container="body">
               <span class="oppia-icon-accessibility-label" [innerHTML]="'I18N_LIBRARY_RATINGS_TOOLTIP' | translate"></span>
             </span>
             <span *ngIf="avgRating">
@@ -42,7 +42,7 @@
           </span>
         </li>
         <li>
-          <span class="far fa-eye" ngbTooltip="I18N_LIBRARY_VIEWS_TOOLTIP' | translate" placement="top" container="body">
+          <span class="far fa-eye" [ngbTooltip]="'I18N_LIBRARY_VIEWS_TOOLTIP' | translate" placement="top" container="body">
             <span class="oppia-icon-accessibility-label" [innerHTML]="'I18N_LIBRARY_VIEWS_TOOLTIP' | translate"></span>
           </span>
           <span *ngIf="numViews">
@@ -97,7 +97,7 @@
   }
 
   .oppia-learner-confirm-button {
-    background: #0D48A1;
+    background: #0d48a1;
     color: #fff;
     font-size: 16px;
     line-height: 22px;
