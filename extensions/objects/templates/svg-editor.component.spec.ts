@@ -848,30 +848,30 @@ describe(
     };
 
     class mockReaderObject {
-    result = null;
-    onload = null;
-    constructor() {
-      this.onload = () => {
-        return 'Fake onload executed';
-      };
-    }
-    readAsDataURL(file) {
-      this.onload();
-      return 'The file is loaded';
-    }
+      result = null;
+      onload = null;
+      constructor() {
+        this.onload = () => {
+          return 'Fake onload executed';
+        };
+      }
+      readAsDataURL(file) {
+        this.onload();
+        return 'The file is loaded';
+      }
     }
 
     class mockImageObject {
-    source = null;
-    onload = null;
-    constructor() {
-      this.onload = () => {
-        return 'Fake onload executed';
-      };
-    }
-    set src(url) {
-      this.onload();
-    }
+      source = null;
+      onload = null;
+      constructor() {
+        this.onload = () => {
+          return 'Fake onload executed';
+        };
+      }
+      set src(url) {
+        this.onload();
+      }
     }
 
     beforeEach(waitForAsync(() => {
