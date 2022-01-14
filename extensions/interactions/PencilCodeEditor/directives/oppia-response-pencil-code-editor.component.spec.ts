@@ -16,17 +16,18 @@
  * @fileoverview Unit Tests for the PencilCodeEditor response.
  */
 
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { ResponePencilCodeEditor } from './oppia-response-pencil-code-editor.component';
 
-describe('oppiaShortResponsePencilCodeEditor', () => {
+describe('oppiaResponsePencilCodeEditor', () => {
   let component: ResponePencilCodeEditor;
   let fixture: ComponentFixture<ResponePencilCodeEditor>;
 
   class mockHtmlEscaperService {
-    escapedJsonToObj(answer: string): Object {
-      return JSON.parse(answer);
+    escapedJsonToObj(answer: string): string {
+      return answer;
     }
   }
 
@@ -39,6 +40,7 @@ describe('oppiaShortResponsePencilCodeEditor', () => {
           useClass: mockHtmlEscaperService
         }
       ],
+      schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));
 
@@ -47,7 +49,7 @@ describe('oppiaShortResponsePencilCodeEditor', () => {
     component = fixture.componentInstance;
     component.answer = {
       code: '# Add the initial code snippet here.'
-    } as unknown as string;
+    };
   });
 
   it('should initialise the component when submits answer', () => {

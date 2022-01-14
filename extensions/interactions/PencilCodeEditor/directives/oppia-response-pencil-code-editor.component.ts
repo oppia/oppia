@@ -33,7 +33,7 @@ interface Answer {
   templateUrl: './pencil-code-editor-response.component.html'
 })
 export class ResponePencilCodeEditor implements OnInit {
-  @Input() answer: string;
+  @Input() answer;
   answerCode: string;
 
   constructor(

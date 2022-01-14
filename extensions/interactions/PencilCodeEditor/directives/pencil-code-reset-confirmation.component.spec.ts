@@ -20,6 +20,7 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { PencilCodeResetConfirmation } from './pencil-code-reset-confirmation.component';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 class MockActiveModal {
   dismiss(): void {
@@ -38,7 +39,11 @@ describe('Pencil Code Reset Confirmation Modal', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [PencilCodeResetConfirmation],
+      imports: [],
+      declarations: [
+        PencilCodeResetConfirmation,
+        MockTranslatePipe
+      ],
       providers: [
         {
           provide: NgbActiveModal,

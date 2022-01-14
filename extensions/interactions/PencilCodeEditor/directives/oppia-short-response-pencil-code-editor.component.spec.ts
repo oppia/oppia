@@ -16,7 +16,9 @@
  * @fileoverview Directive for the PencilCodeEditor short response.
  */
 
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { TruncateAtFirstLinePipe } from 'filters/string-utility-filters/truncate-at-first-line.pipe';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { ShortResponePencilCodeEditor } from './oppia-short-response-pencil-code-editor.component';
 
@@ -25,20 +27,24 @@ describe('oppiaShortResponsePencilCodeEditor', () => {
   let fixture: ComponentFixture<ShortResponePencilCodeEditor>;
 
   class mockHtmlEscaperService {
-    escapedJsonToObj(answer: string): Object {
-      return JSON.parse(answer);
+    escapedJsonToObj(answer: string): string {
+      return answer;
     }
   }
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ShortResponePencilCodeEditor],
+      declarations: [
+        ShortResponePencilCodeEditor,
+        TruncateAtFirstLinePipe
+      ],
       providers: [
         {
           provide: HtmlEscaperService,
           useClass: mockHtmlEscaperService
         }
       ],
+      schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));
 
