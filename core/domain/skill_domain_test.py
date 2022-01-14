@@ -72,17 +72,17 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
 
     def _assert_validation_error(self, expected_error_substring):
         """Checks that the skill passes strict validation."""
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, expected_error_substring):
             self.skill.validate()
 
     def test_skill_id_validation_fails_with_invalid_skill_id_type(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Skill id should be a string'):
             skill_domain.Skill.require_valid_skill_id(10)
 
     def test_skill_id_validation_fails_with_invalid_skill_id_length(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid skill id'):
             skill_domain.Skill.require_valid_skill_id('abc')
 
@@ -111,7 +111,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
     def test_valid_misconception_must_be_addressed(self):
         self.skill.validate()
         must_be_addressed = 'False'
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             ValueError, 'must_be_addressed should be a bool value'):
             self.skill.update_misconception_must_be_addressed(
                 0, must_be_addressed)
@@ -464,7 +464,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self.skill.validate()
 
     def test_require_valid_description_with_empty_description_raise_error(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Description field should not be empty'):
             self.skill.require_valid_description('')
 
@@ -523,17 +523,17 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
 class SkillChangeTests(test_utils.GenericTestBase):
 
     def test_skill_change_object_with_missing_cmd(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Missing cmd key in change dict'):
             skill_domain.SkillChange({'invalid': 'data'})
 
     def test_skill_change_object_with_invalid_cmd(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Command invalid is not allowed'):
             skill_domain.SkillChange({'cmd': 'invalid'})
 
     def test_skill_change_object_with_missing_attribute_in_cmd(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'The following required attributes are missing: '
                 'new_value, old_value')):
@@ -543,7 +543,7 @@ class SkillChangeTests(test_utils.GenericTestBase):
             })
 
     def test_skill_change_object_with_extra_attribute_in_cmd(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'The following extra attributes are present: invalid')):
             skill_domain.SkillChange({
@@ -555,7 +555,7 @@ class SkillChangeTests(test_utils.GenericTestBase):
             })
 
     def test_skill_change_object_with_invalid_skill_property(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'Value for property_name in cmd update_skill_property: '
                 'invalid is not allowed')):
@@ -568,7 +568,7 @@ class SkillChangeTests(test_utils.GenericTestBase):
 
     def test_skill_change_object_with_invalid_skill_misconception_property(
             self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'Value for property_name in cmd '
                 'update_skill_misconceptions_property: invalid is not '
@@ -583,7 +583,7 @@ class SkillChangeTests(test_utils.GenericTestBase):
 
     def test_skill_change_object_with_invalid_skill_contents_property(
             self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'Value for property_name in cmd '
                 'update_skill_contents_property: invalid is not allowed')):
@@ -766,39 +766,39 @@ class SkillSummaryTests(test_utils.GenericTestBase):
 
     def test_validation_fails_with_invalid_description(self):
         self.skill_summary.description = 0
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Description should be a string.'):
             self.skill_summary.validate()
 
     def test_validation_fails_with_empty_description(self):
         self.skill_summary.description = ''
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Description field should not be empty'):
             self.skill_summary.validate()
 
     def test_validation_fails_with_invalid_language_code(self):
         self.skill_summary.language_code = 0
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected language code to be a string, received 0'):
             self.skill_summary.validate()
 
     def test_validation_fails_with_unallowed_language_code(self):
         self.skill_summary.language_code = 'invalid'
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid language code: invalid'):
             self.skill_summary.validate()
 
     def test_validation_fails_with_invalid_misconception_count(self):
         self.skill_summary.misconception_count = '10'
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected misconception_count to be an int, received \'10\''):
             self.skill_summary.validate()
 
     def test_validation_fails_with_negative_misconception_count(self):
         self.skill_summary.misconception_count = -1
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'Expected misconception_count to be non-negative, '
                 'received \'-1\'')):
@@ -806,14 +806,14 @@ class SkillSummaryTests(test_utils.GenericTestBase):
 
     def test_validation_fails_with_invalid_worked_examples_count(self):
         self.skill_summary.worked_examples_count = '10'
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected worked_examples_count to be an int, received \'10\''):
             self.skill_summary.validate()
 
     def test_validation_fails_with_negative_worked_examples_count(self):
         self.skill_summary.worked_examples_count = -1
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'Expected worked_examples_count to be non-negative, '
                 'received \'-1\'')):
