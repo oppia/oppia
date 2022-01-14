@@ -29,10 +29,6 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { StateParamChangesEditorComponent } from './editor-tab/state-param-changes-editor/state-param-changes-editor.component';
-import { DeleteHintModalComponent } from './editor-tab/templates/modal-templates/delete-hint-modal.component';
-import { DeleteInteractionModalComponent } from './editor-tab/templates/modal-templates/delete-interaction-modal.component';
-import { DeleteLastHintModalComponent } from './editor-tab/templates/modal-templates/delete-last-hint-modal.component';
-import { DeleteSolutionModalComponent } from './editor-tab/templates/modal-templates/delete-solution-modal.component';
 import { DeleteStateSkillModalComponent } from './editor-tab/templates/modal-templates/delete-state-skill-modal.component';
 import { ParamChangesEditorDirective } from './param-changes-editor/param-changes-editor.component';
 import { SwitchContentLanguageRefreshRequiredModalComponent } from 'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
@@ -73,10 +69,6 @@ import { RevertExplorationModalComponent } from './history-tab/modal-templates/r
   ],
   declarations: [
     CkEditorCopyToolbarComponent,
-    DeleteHintModalComponent,
-    DeleteInteractionModalComponent,
-    DeleteLastHintModalComponent,
-    DeleteSolutionModalComponent,
     DeleteStateSkillModalComponent,
     ParamChangesEditorDirective,
     StateParamChangesEditorComponent,
@@ -110,10 +102,6 @@ import { RevertExplorationModalComponent } from './history-tab/modal-templates/r
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
-    DeleteHintModalComponent,
-    DeleteInteractionModalComponent,
-    DeleteLastHintModalComponent,
-    DeleteSolutionModalComponent,
     DeleteStateSkillModalComponent,
     StateParamChangesEditorComponent,
     SwitchContentLanguageRefreshRequiredModalComponent,
