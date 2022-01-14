@@ -77,7 +77,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
     def test_set_and_get_username(self):
         auth_id = 'someUser'
         username = 'username'
-        with self.assertRaisesRegexp(Exception, 'User not found.'):
+        with self.assertRaisesRegex(Exception, 'User not found.'):
             user_services.set_username(auth_id, username)
 
         user_settings = user_services.create_new_user(
@@ -121,7 +121,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_services.get_usernames([feconf.SYSTEM_COMMITTER_ID]))
 
     def test_get_username_for_nonexistent_user(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'User with ID \'fakeUser\' not found.'
         ):
@@ -202,7 +202,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             ('oppiaXyz', 'This username is not available.'),
             ('abcOppiaXyz', 'This username is not available.')]
         for username, error_msg in bad_usernames_with_expected_error_message:
-            with self.assertRaisesRegexp(utils.ValidationError, error_msg):
+            with self.assertRaisesRegex(utils.ValidationError, error_msg):
                 user_services.set_username(user_id, username)
 
     def test_update_user_settings_for_invalid_display_alias_raises_error(self):
@@ -217,7 +217,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.modifiable_new_user_data.user_id = user_id
         self.modifiable_new_user_data.pin = None
         for display_alias, error_msg in bad_display_aliases_with_expected_error:
-            with self.assertRaisesRegexp(utils.ValidationError, error_msg):
+            with self.assertRaisesRegex(utils.ValidationError, error_msg):
                 self.modifiable_new_user_data.display_alias = display_alias
                 user_services.update_multiple_users_data(
                     [self.modifiable_new_user_data])
@@ -252,13 +252,13 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             )
         ]
         for email, error_msg in bad_email_addresses_with_expected_error_message:
-            with self.assertRaisesRegexp(utils.ValidationError, error_msg):
+            with self.assertRaisesRegex(utils.ValidationError, error_msg):
                 user_services.create_new_user('auth_id', email)
 
     def test_create_new_user_with_invalid_email_creates_no_user_models(self):
         bad_email = '@'
         error_msg = 'Invalid email address: @'
-        with self.assertRaisesRegexp(utils.ValidationError, error_msg):
+        with self.assertRaisesRegex(utils.ValidationError, error_msg):
             user_services.create_new_user('auth_id', bad_email)
         tmp_admin_user_id = self.get_user_id_from_email(self.SUPER_ADMIN_EMAIL)
         user_ids_in_user_settings = [
@@ -335,7 +335,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
     def test_get_user_settings_by_auth_id_strict_for_missing_auth_id_is_none(
             self):
-        with self.assertRaisesRegexp(Exception, 'User not found.'):
+        with self.assertRaisesRegex(Exception, 'User not found.'):
             user_services.get_user_settings_by_auth_id('auth_id_x', strict=True)
 
     def test_fetch_gravatar_success(self):
@@ -595,8 +595,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             'test3@email.com', 'test4@email.com']
 
         user_ids = []
-        for auth_id, email, name in python_utils.ZIP(
-                auth_ids, user_emails, usernames):
+        for auth_id, email, name in zip(auth_ids, user_emails, usernames):
             user_id = user_services.create_new_user(auth_id, email).user_id
             user_ids.append(user_id)
             user_services.set_username(user_id, name)
@@ -623,8 +622,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             'test3@email.com', 'test4@email.com']
 
         user_ids = []
-        for uid, email, name in python_utils.ZIP(
-                auth_ids, user_emails, usernames):
+        for uid, email, name in zip(auth_ids, user_emails, usernames):
             user_id = user_services.create_new_user(uid, email).user_id
             user_ids.append(user_id)
             user_services.set_username(user_id, name)
@@ -772,7 +770,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
     def test_get_all_profiles_auth_details_non_existent_id_raises_error(self):
         non_existent_user_id = 'id_x'
         error_msg = 'Parent user not found.'
-        with self.assertRaisesRegexp(Exception, error_msg):
+        with self.assertRaisesRegex(Exception, error_msg):
             user_services.get_all_profiles_auth_details_by_parent_user_id(
                 non_existent_user_id)
 
@@ -802,7 +800,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_services.get_user_roles_from_id(profile_user_id),
             [feconf.ROLE_ID_MOBILE_LEARNER])
         error_msg = 'The role of a Mobile Learner cannot be changed.'
-        with self.assertRaisesRegexp(Exception, error_msg):
+        with self.assertRaisesRegex(Exception, error_msg):
             user_services.add_user_role(
                 profile_user_id, feconf.ROLE_ID_FULL_USER)
 
@@ -816,7 +814,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             [feconf.ROLE_ID_FULL_USER])
         error_msg = 'Adding a %s role is not allowed.' % (
             feconf.ROLE_ID_MOBILE_LEARNER)
-        with self.assertRaisesRegexp(Exception, error_msg):
+        with self.assertRaisesRegex(Exception, error_msg):
             user_services.add_user_role(
                 user_id, feconf.ROLE_ID_MOBILE_LEARNER)
 
@@ -846,7 +844,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_services.get_user_roles_from_id(profile_user_id),
             [feconf.ROLE_ID_MOBILE_LEARNER])
         error_msg = 'The role of a Mobile Learner cannot be changed.'
-        with self.assertRaisesRegexp(Exception, error_msg):
+        with self.assertRaisesRegex(Exception, error_msg):
             user_services.remove_user_role(
                 profile_user_id, feconf.ROLE_ID_TOPIC_MANAGER)
 
@@ -863,7 +861,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertFalse(user_settings_model.banned)
 
         error_msg = 'Removing a default role is not allowed.'
-        with self.assertRaisesRegexp(Exception, error_msg):
+        with self.assertRaisesRegex(Exception, error_msg):
             user_services.remove_user_role(user_id, feconf.ROLE_ID_FULL_USER)
 
     def test_mark_user_banned(self):
@@ -931,7 +929,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
     def test_get_auth_details_by_user_id_strict_non_existing_user_error(self):
         non_existent_user_id = 'id_x'
         error_msg = 'User not found'
-        with self.assertRaisesRegexp(Exception, error_msg):
+        with self.assertRaisesRegex(Exception, error_msg):
             user_services.get_auth_details_by_user_id(
                 non_existent_user_id, strict=True)
 
@@ -973,7 +971,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         profile_pin = '123'
         user_services.create_new_user(auth_id, email)
         error_msg = 'Pin must be set for a full user before creating a profile.'
-        with self.assertRaisesRegexp(Exception, error_msg):
+        with self.assertRaisesRegex(Exception, error_msg):
             self.modifiable_new_user_data.display_alias = display_alias
             self.modifiable_new_user_data.pin = profile_pin
             user_services.create_new_profiles(
@@ -1072,7 +1070,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         profile_pin = '123'
         display_alias = 'display_alias'
         error_msg = 'User not found.'
-        with self.assertRaisesRegexp(Exception, error_msg):
+        with self.assertRaisesRegex(Exception, error_msg):
             self.modifiable_new_user_data.display_alias = display_alias
             self.modifiable_new_user_data.pin = profile_pin
             user_services.create_new_profiles(
@@ -1093,7 +1091,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.modifiable_user_data.display_alias = display_alias
         user_services.update_multiple_users_data([self.modifiable_user_data])
         error_msg = 'User id cannot already exist for a new user.'
-        with self.assertRaisesRegexp(Exception, error_msg):
+        with self.assertRaisesRegex(Exception, error_msg):
             self.modifiable_new_user_data.display_alias = display_alias_2
             self.modifiable_new_user_data.pin = profile_pin
             self.modifiable_new_user_data.user_id = 'user_id'
@@ -1112,7 +1110,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.modifiable_user_data.display_alias = display_alias
 
         error_msg = 'Missing user ID.'
-        with self.assertRaisesRegexp(Exception, error_msg):
+        with self.assertRaisesRegex(Exception, error_msg):
             user_services.update_multiple_users_data(
                 [self.modifiable_user_data])
 
@@ -1128,7 +1126,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.modifiable_user_data.display_alias = display_alias
 
         error_msg = 'User not found.'
-        with self.assertRaisesRegexp(Exception, error_msg):
+        with self.assertRaisesRegex(Exception, error_msg):
             user_services.update_multiple_users_data(
                 [self.modifiable_user_data])
 
@@ -1299,11 +1297,11 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_services.parse_date_from_string('2016-07-05'),
             {'year': 2016, 'month': 7, 'day': 5})
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             ValueError,
             'time data \'2016-13-01\' does not match format \'%Y-%m-%d\''):
             user_services.parse_date_from_string('2016-13-01')
-        with self.assertRaisesRegexp(ValueError, 'unconverted data remains: 2'):
+        with self.assertRaisesRegex(ValueError, 'unconverted data remains: 2'):
             user_services.parse_date_from_string('2016-03-32')
 
     def test_record_user_started_state_translation_tutorial(self):
@@ -1725,36 +1723,36 @@ class SubjectInterestsUnitTests(test_utils.GenericTestBase):
         user_services.set_username(self.user_id, self.username)
 
     def test_invalid_subject_interests_are_not_accepted(self):
-        with self.assertRaisesRegexp(utils.ValidationError, 'to be a list'):
+        with self.assertRaisesRegex(utils.ValidationError, 'to be a list'):
             user_services.update_subject_interests(self.user_id, 'not a list')
 
-        with self.assertRaisesRegexp(utils.ValidationError, 'to be a string'):
+        with self.assertRaisesRegex(utils.ValidationError, 'to be a string'):
             user_services.update_subject_interests(self.user_id, [1, 2, 3])
 
-        with self.assertRaisesRegexp(utils.ValidationError, 'to be non-empty'):
+        with self.assertRaisesRegex(utils.ValidationError, 'to be non-empty'):
             user_services.update_subject_interests(self.user_id, ['', 'ab'])
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'to consist only of lowercase alphabetic characters and spaces'
             ):
             user_services.update_subject_interests(self.user_id, ['!'])
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'to consist only of lowercase alphabetic characters and spaces'
             ):
             user_services.update_subject_interests(
                 self.user_id, ['has-hyphens'])
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'to consist only of lowercase alphabetic characters and spaces'
             ):
             user_services.update_subject_interests(
                 self.user_id, ['HasCapitalLetters'])
 
-        with self.assertRaisesRegexp(utils.ValidationError, 'to be distinct'):
+        with self.assertRaisesRegex(utils.ValidationError, 'to be distinct'):
             user_services.update_subject_interests(self.user_id, ['a', 'a'])
 
         # The following cases are all valid.
@@ -2632,7 +2630,7 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
 
     def test_get_question_reviewer_usernames_with_lanaguge_code_raise_error(
             self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected language_code to be None'):
             user_services.get_contributor_usernames(
                 constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
@@ -2656,7 +2654,7 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
 
     def test_get_contributor_usernames_with_invalid_category_raises(
             self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Invalid category: invalid_category'):
             user_services.get_contributor_usernames(
                 'invalid_category', language_code='hi')
