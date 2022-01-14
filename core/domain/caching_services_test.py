@@ -254,28 +254,28 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         invalid_namespace = 'invalid'
         key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             ValueError,
             'Invalid namespace: %s.' % invalid_namespace):
             caching_services.set_multi(
                 invalid_namespace, None,
                 key_value_mapping)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             ValueError,
             'Invalid namespace: %s.' % invalid_namespace):
             caching_services.get_multi(
                 invalid_namespace, None,
                 ['a', 'b', 'c'])
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             ValueError,
             'Invalid namespace: %s.' % invalid_namespace):
             caching_services.delete_multi(
                 invalid_namespace, None, ['a', 'b', 'c'])
 
         invalid_sub_namespace = 'sub:namespace'
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             ValueError,
             'Sub-namespace %s cannot contain \':\'.' % invalid_sub_namespace):
             caching_services.get_multi(
