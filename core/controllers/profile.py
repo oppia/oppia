@@ -306,6 +306,17 @@ class SignupPage(base.BaseHandler):
     """The page which prompts for username and acceptance of terms."""
 
     REDIRECT_UNFINISHED_SIGNUPS = False
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'return_url': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            }
+        }
+    }
 
     @acl_decorators.require_user_id_else_redirect_to_homepage
     def get(self):
