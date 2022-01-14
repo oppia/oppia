@@ -26,12 +26,9 @@ require(
 require('directives/angular-html-bind.directive.ts');
 require(
   'pages/skill-editor-page/editor-tab/skill-concept-card-editor/' +
-  'worked-example-editor.directive.ts');
+  'worked-example-editor.component.ts');
 require(
   'pages/skill-editor-page/editor-tab/skill-preview-modal.controller.ts');
-require(
-  'pages/skill-editor-page/modal-templates/' +
-  'add-worked-example-modal.controller.ts');
 
 require('domain/skill/skill-update.service.ts');
 require('domain/skill/WorkedExampleObjectFactory.ts');
@@ -45,20 +42,24 @@ require('services/generate-content-id.service.ts');
 require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
 
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import { AddWorkedExampleModalComponent } from 'pages/skill-editor-page/modal-templates/add-worked-example.component';
+import { DeleteWorkedExampleComponent } from 'pages/skill-editor-page/modal-templates/delete-worked-example-modal.component';
 import { Subscription } from 'rxjs';
 
 angular.module('oppia').component('skillConceptCardEditor', {
   bindings: {},
   template: require('./skill-concept-card-editor.component.html'),
   controller: [
-    '$filter', '$scope', '$uibModal', 'GenerateContentIdService',
-    'PageTitleService', 'SkillEditorStateService',
+    '$filter', '$rootScope', '$scope', '$uibModal',
+    'GenerateContentIdService',
+    'NgbModal', 'PageTitleService', 'SkillEditorStateService',
     'SkillUpdateService', 'UrlInterpolationService',
     'WindowDimensionsService', 'WorkedExampleObjectFactory',
     'COMPONENT_NAME_WORKED_EXAMPLE',
     function(
-        $filter, $scope, $uibModal,
-        GenerateContentIdService, PageTitleService, SkillEditorStateService,
+        $filter, $rootScope, $scope, $uibModal,
+        GenerateContentIdService, NgbModal, PageTitleService,
+        SkillEditorStateService,
         SkillUpdateService, UrlInterpolationService,
         WindowDimensionsService, WorkedExampleObjectFactory,
         COMPONENT_NAME_WORKED_EXAMPLE) {
@@ -88,6 +89,9 @@ angular.module('oppia').component('skillConceptCardEditor', {
         SkillUpdateService.setConceptCardExplanation(
           $scope.skill, explanationObject);
         initBindableFieldsDict();
+        // TODO(#8521): Remove the use of $rootScope.$apply()
+        // once the controller is migrated to angular.
+        $rootScope.$apply();
       };
 
       $scope.changeActiveWorkedExampleIndex = function(idx) {
@@ -101,17 +105,16 @@ angular.module('oppia').component('skillConceptCardEditor', {
       };
 
       $scope.deleteWorkedExample = function(index, evt) {
-        $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/skill-editor-page/modal-templates/' +
-            'delete-worked-example-modal.directive.html'),
-          backdrop: 'static',
-          controller: 'ConfirmOrCancelModalController'
+        NgbModal.open(DeleteWorkedExampleComponent, {
+          backdrop: 'static'
         }).result.then(function() {
           SkillUpdateService.deleteWorkedExample($scope.skill, index);
           $scope.bindableFieldsDict.displayedWorkedExamples =
             $scope.skill.getConceptCard().getWorkedExamples();
           $scope.activeWorkedExampleIndex = null;
+          // TODO(#8521): Remove the use of $rootScope.$apply()
+          // once the controller is migrated to angular.
+          $rootScope.$apply();
         }, function() {
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.
@@ -124,12 +127,8 @@ angular.module('oppia').component('skillConceptCardEditor', {
       };
 
       $scope.openAddWorkedExampleModal = function() {
-        $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/skill-editor-page/modal-templates/' +
-            'add-worked-example-modal.directive.html'),
-          backdrop: 'static',
-          controller: 'AddWorkedExampleModalController'
+        NgbModal.open(AddWorkedExampleModalComponent, {
+          backdrop: 'static'
         }).result.then(function(result) {
           var newExample = WorkedExampleObjectFactory.create(
             SubtitledHtml.createDefault(
@@ -149,6 +148,9 @@ angular.module('oppia').component('skillConceptCardEditor', {
             $scope.skill, newExample);
           $scope.bindableFieldsDict.displayedWorkedExamples =
             $scope.skill.getConceptCard().getWorkedExamples();
+          // TODO(#8521): Remove the use of $rootScope.$apply()
+          // once the controller is migrated to angular.
+          $rootScope.$apply();
         }, function() {
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.

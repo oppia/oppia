@@ -28,19 +28,19 @@
     width: 100%;
   }
   .oppia-sidebar-menu-icon {
+    float: right;
     height: 22px;
     margin: 0 35px 3px 6px;
+    transition-duration: 0.5s;
     vertical-align: middle;
     width: 22px;
-    float: right;
-    transition-duration: 0.5s;
   }
   .oppia-sidebar-menu ul {
     font-size: 16px;
     list-style: none;
     margin-bottom: 0;
     padding-left: 0;
-    padding-top: 0px;
+    padding-top: 0;
   }
   .oppia-sidebar-menu hr {
     margin-bottom: 0;
@@ -100,15 +100,15 @@
   .oppia-sidebar-submenu-icon {
     height: 22px;
     margin: 0 6px 3px -3px;
+    transition-duration: 0.5s;
     vertical-align: middle;
     width: 22px;
-    transition-duration: 0.5s;
   }
   .oppia-sidebar-submenu-text {
+    color: #767676;
+    font-family: "Roboto", Arial, sans-serif;
     margin-left: 26px;
     margin-right: 26px;
-    font-family: Roboto;
-    color: #767676;
   }
   .oppia-sidebar-submenu-upperborder {
     border-top: 1px solid #efeded;
@@ -117,22 +117,22 @@
     transform: rotate(-180deg);
   }
   .oppia-sidebar-learn-subtext {
+    color: #767676;
+    font-family: "Roboto", Arial, sans-serif;
     margin-top: 2px;
     width: 95%;
-    font-family: Roboto;
-    color: #767676;
   }
   .oppia-sidebar-menu li {
     border-bottom: 1px solid #e3e3e3;
   }
   .oppia-submenu-image-position {
     float: right;
-    margin-top: 5%;
     margin-right: 5%;
+    margin-top: 5%;
   }
   .oppia-submenu-image {
-    width: 64.54px;
     height: 80px;
+    width: 64.54px;
   }
   .oppia-community-library-section {
     background: #ededed;
@@ -142,36 +142,36 @@
             box-shadow: 0 8px 6px -6px grey;
   }
   .learn-submenu-links {
-    color: #00645C;
+    color: #00645c;
   }
   .oppia-sidebar-menu span {
-  font-family: Roboto;
-  font-style: normal;
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 16px;
-  letter-spacing: 0.3px;
+    font-family: "Roboto", Arial, sans-serif;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    line-height: 16px;
   }
   .oppia-sidebar-submenu-toggle {
-    border-bottom: 2px solid #27AE60;
+    border-bottom: 2px solid #27ae60;
   }
   .submenu-notop-margin {
     margin-top: -16px;
   }
   i.expand-icon {
-    color: #27AE60;
+    color: #27ae60;
   }
   i.partnerships-icon {
-    color: #F2994A;
+    color: #f2994a;
   }
   i.volunteer-icon {
-    color: #2D9CDB;
+    color: #2d9cdb;
   }
   i.donate-icon {
-    color: #EB5757;
+    color: #eb5757;
   }
   i.contact-icon {
-    color: #B4BBC4;
+    color: #b4bbc4;
   }
 </style>
 
@@ -183,7 +183,7 @@
   </div>
 
   <ul>
-    <li [ngClass]="{'active': currentUrl === '/learn/math'}">
+    <li [ngClass]="{'active': currentUrl === '/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}'}">
       <div (click)="togglelearnSubmenu(); stopclickfurther($event)" class="oppia-sidebar-expandalbe-button protractor-mobile-test-learn" >
         <i class="material-icons oppia-sidebar-menu-icon expand-icon oppia-sidebar-menu-icon-transition"
           [ngClass]="{'oppia-sidebar-menu-icon-transition': learnSubmenuIsShown}">expand_more
@@ -204,21 +204,21 @@
                  alt="learn-math-logo">
           </picture>
         </div>
-        <a href="/learn/math" routerLink="/learn/math" class="protractor-mobile-test-mathematics-link">
+        <a href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}" routerLink="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}" class="protractor-mobile-test-mathematics-link">
           <span>{{ 'I18N_SIDEBAR_MATH_FOUNDATIONS' | translate }}</span>
           <p class="oppia-sidebar-learn-subtext">{{ 'I18N_SIDEBAR_MATH_FOUNDATIONS_DESCRIPTION' | translate }}</p>
         </a>
-        <div *ngIf="!userIsLoggedIn && topicSummariesLength">
-          <div *ngFor="let topicSummary of classroomData.getTopicSummaries().slice(0, 3)">
+        <div *ngIf="!userIsLoggedIn && classroomData.length > 0">
+          <div *ngFor="let topicSummary of classroomData.slice(0, 3)">
             <div class="submenu-notop-margin">
-              <a (click)="navigateToClassroomPage('/learn/math/' + topicSummary.getUrlFragment())">
+              <a (click)="navigateToClassroomPage('/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}/' + topicSummary.getUrlFragment())">
                 <span>{{ topicSummary.getName() }}</span>
               </a>
             </div>
           </div>
         </div>
         <div class="submenu-notop-margin">
-          <a href="/learn/math" routerLink="/learn/math" class="protractor-mobile-test-mathematics-link">
+          <a href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}" routerLink="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}" class="protractor-mobile-test-mathematics-link">
             <span class="learn-submenu-links" *ngIf="!userIsLoggedIn">{{ 'I18N_SIDEBAR_SUBMENU_SEE_ALL_LESSONS' | translate }}</span>
             <span class="learn-submenu-links" *ngIf="userIsLoggedIn">Continue learning</span>
             <i class="material-icons oppia-sidebar-menu-icon float-none learn-submenu-links">arrow_forward</i>

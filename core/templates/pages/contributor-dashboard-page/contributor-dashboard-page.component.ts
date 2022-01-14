@@ -38,9 +38,6 @@ require(
 require(
   'pages/contributor-dashboard-page/translation-opportunities/' +
   'translation-opportunities.component.ts');
-require(
-  'pages/contributor-dashboard-page/voiceover-opportunities/' +
-  'voiceover-opportunities.component.ts');
 require('services/stateful/focus-manager.service.ts');
 require('domain/utilities/language-util.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
