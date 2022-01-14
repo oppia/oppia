@@ -94,14 +94,14 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             'exploration.exp1.thread_5', None)
 
     def test_get_model_association_to_user(self) -> None:
-        gen_model = suggestion_models.GeneralSuggestionModel
+        suggestion_model = suggestion_models.GeneralSuggestionModel
         self.assertEqual(
-            gen_model.get_model_association_to_user(),
+            suggestion_model.get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
         )
 
     def test_get_export_policy(self) -> None:
-        dictionary = {
+        expected_export_policy_dict = {
             'suggestion_type': base_models.EXPORT_POLICY.EXPORTED,
             'target_type': base_models.EXPORT_POLICY.EXPORTED,
             'target_id': base_models.EXPORT_POLICY.EXPORTED,
@@ -120,28 +120,32 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         }
         self.assertEqual(
             suggestion_models.GeneralSuggestionModel.get_export_policy(),
-            dictionary
+            expected_export_policy_dict
         )
 
     def test_get_in_review_translation_suggestions(self) -> None:
-        gen = suggestion_models.GeneralSuggestionModel
+        suggestion_model = suggestion_models.GeneralSuggestionModel
         self.assertEqual(
-            gen.get_in_review_translation_suggestions('author-1', ['en', 'de']),
+            suggestion_model.get_in_review_translation_suggestions(
+                'author-1',
+                ['en', 'de']
+            ),
             []
         )
 
     def test_get_in_review_question_suggestions(self) -> None:
-        gen_model = suggestion_models.GeneralSuggestionModel
+        suggestion_model = suggestion_models.GeneralSuggestionModel
         self.assertEqual(
-            gen_model.get_in_review_question_suggestions(
+            suggestion_model.get_in_review_question_suggestions(
                 'author_1'
             ),
             []
         )
 
     def test_get_user_created_suggestions_of_suggestion_type(self) -> None:
-        gen_model = suggestion_models.GeneralSuggestionModel
-        result = gen_model.get_user_created_suggestions_of_suggestion_type(
+        suggestion_model = suggestion_models.GeneralSuggestionModel
+        # Disabling pylint, long-line because of the long method name.
+        result = suggestion_model.get_user_created_suggestions_of_suggestion_type( # pylint: disable=line-too-long
             feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT, 'author_1'
         )
         self.assertEqual(result[0].status, 'review')
@@ -1231,14 +1235,14 @@ class GeneralVoiceoverApplicationModelUnitTests(test_utils.GenericTestBase):
     """Tests for the GeneralVoiceoverApplicationModel class."""
 
     def test_get_model_association_to_user(self) -> None:
-        gen_voice_model = suggestion_models.GeneralVoiceoverApplicationModel
+        voiceover_model = suggestion_models.GeneralVoiceoverApplicationModel
         self.assertEqual(
-            gen_voice_model.get_model_association_to_user(),
+            voiceover_model.get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
         )
 
     def test_get_export_policy(self) -> None:
-        dictionary = {
+        expected_export_policy_dict = {
             'target_type': base_models.EXPORT_POLICY.EXPORTED,
             'target_id': base_models.EXPORT_POLICY.EXPORTED,
             'status': base_models.EXPORT_POLICY.EXPORTED,
@@ -1252,16 +1256,16 @@ class GeneralVoiceoverApplicationModelUnitTests(test_utils.GenericTestBase):
             'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
         }
-        gen_voice_model = suggestion_models.GeneralVoiceoverApplicationModel
+        voiceover_model = suggestion_models.GeneralVoiceoverApplicationModel
         self.assertEqual(
-            dictionary,
-            gen_voice_model.get_export_policy()
+            expected_export_policy_dict,
+            voiceover_model.get_export_policy()
         )
 
     def test_get_deletion_policy(self) -> None:
-        gen_voice_model = suggestion_models.GeneralVoiceoverApplicationModel
+        voiceover_model = suggestion_models.GeneralVoiceoverApplicationModel
         self.assertEqual(
-            gen_voice_model.get_deletion_policy(),
+            voiceover_model.get_deletion_policy(),
             base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
 
     def test_has_reference_to_user_id_author(self) -> None:
@@ -1574,7 +1578,7 @@ class CommunityContributionStatsModelUnitTests(test_utils.GenericTestBase):
         )
 
     def test_get_export_policy(self) -> None:
-        dictionary = {
+        expected_export_policy_dict = {
             'translation_reviewer_counts_by_lang_code':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'translation_suggestion_counts_by_lang_code':
@@ -1590,7 +1594,7 @@ class CommunityContributionStatsModelUnitTests(test_utils.GenericTestBase):
         community = suggestion_models.CommunityContributionStatsModel
         self.assertEqual(
             community.get_export_policy(),
-            dictionary
+            expected_export_policy_dict
         )
 
 
@@ -1841,35 +1845,28 @@ class TranslationContributionStatsModelUnitTests(test_utils.GenericTestBase):
         )
 
     def test_get_export_policy(self) -> None:
-        dictionary = {
-            'language_code':
-                base_models.EXPORT_POLICY.EXPORTED,
-            'contributor_user_id':
-                base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'topic_id':
-                base_models.EXPORT_POLICY.EXPORTED,
-            'submitted_translations_count':
-                base_models.EXPORT_POLICY.EXPORTED,
+        expected_export_policy_dict = {
+            'language_code': base_models.EXPORT_POLICY.EXPORTED,
+            'contributor_user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'topic_id': base_models.EXPORT_POLICY.EXPORTED,
+            'submitted_translations_count': base_models.EXPORT_POLICY.EXPORTED,
             'submitted_translation_word_count':
                 base_models.EXPORT_POLICY.EXPORTED,
-            'accepted_translations_count':
-                base_models.EXPORT_POLICY.EXPORTED,
+            'accepted_translations_count': base_models.EXPORT_POLICY.EXPORTED,
             'accepted_translations_without_reviewer_edits_count':
                 base_models.EXPORT_POLICY.EXPORTED,
             'accepted_translation_word_count':
                 base_models.EXPORT_POLICY.EXPORTED,
-            'rejected_translations_count':
-                base_models.EXPORT_POLICY.EXPORTED,
+            'rejected_translations_count': base_models.EXPORT_POLICY.EXPORTED,
             'rejected_translation_word_count':
                 base_models.EXPORT_POLICY.EXPORTED,
-            'contribution_dates':
-                base_models.EXPORT_POLICY.EXPORTED,
-                'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'contribution_dates': base_models.EXPORT_POLICY.EXPORTED,
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
         }
         translation_model = suggestion_models.TranslationContributionStatsModel
         self.assertEqual(
-            dictionary,
+            expected_export_policy_dict,
             translation_model.get_export_policy()
         )
