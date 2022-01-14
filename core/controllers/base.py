@@ -339,8 +339,10 @@ class BaseHandler(webapp2.RequestHandler):
         # TODO(#13155): Remove NotImplementedError once all the handlers
         # have had schema validation implemented.
         except (
-                NotImplementedError, self.InternalErrorException,
-                self.InvalidInputException) as e:
+            NotImplementedError,
+            self.InternalErrorException,
+            self.InvalidInputException
+        ) as e:
             self.handle_exception(e, self.app.debug)
             schema_validation_succeeded = False
         if not schema_validation_succeeded:
@@ -358,8 +360,8 @@ class BaseHandler(webapp2.RequestHandler):
         handler_class_name = self.__class__.__name__
         request_method = self.request.environ['REQUEST_METHOD']
 
-        # For HEAD requests, the schema of GET handler is validated
-        # against request arguments.
+        # For HEAD requests, we use the schema of GET handler,
+        # because HEAD returns just the handlers of the GET request.
         if request_method == 'HEAD':
             request_method = 'GET'
 
@@ -531,8 +533,8 @@ class BaseHandler(webapp2.RequestHandler):
         raise self.PageNotFoundException
 
     def head(self, *args, **kwargs):
-        """Method to handle HEAD requests. The function automatically
-        returns only the headers of GET request.
+        """Method to handle HEAD requests. The webapp library automatically
+        makes sure that HEAD only returns the headers of GET request.
         """
         return self.get(*args, **kwargs)
 
