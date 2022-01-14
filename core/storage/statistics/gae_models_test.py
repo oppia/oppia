@@ -110,7 +110,7 @@ class AnswerSubmittedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
             event_id)
 
         # Ruling out the possibility of None for mypy type checking.
-        self.assertIsNotNone(event_model)
+        assert event_model is not None
         self.assertEqual(event_model.exp_id, 'exp_id1')
         self.assertEqual(event_model.exp_version, 1)
         self.assertEqual(event_model.state_name, 'state_name1')
@@ -164,7 +164,7 @@ class ExplorationActualStartEventLogEntryModelUnitTests(
             event_id)
 
         # Ruling out the possibility of None for mypy type checking.
-        self.assertIsNotNone(event_model)
+        assert event_model is not None
         self.assertEqual(event_model.exp_id, 'exp_id1')
         self.assertEqual(event_model.exp_version, 1)
         self.assertEqual(event_model.state_name, 'state_name1')
@@ -212,7 +212,7 @@ class SolutionHitEventLogEntryModelUnitTests(test_utils.GenericTestBase):
             event_id)
 
         # Ruling out the possibility of None for mypy type checking.
-        self.assertIsNotNone(event_model)
+        assert event_model is not None
         self.assertEqual(event_model.exp_id, 'exp_id1')
         self.assertEqual(event_model.exp_version, 1)
         self.assertEqual(event_model.state_name, 'state_name1')
@@ -264,7 +264,7 @@ class StartExplorationEventLogEntryModelUnitTests(test_utils.GenericTestBase):
             event_id)
 
         # Ruling out the possibility of None for mypy type checking.
-        self.assertIsNotNone(event_model)
+        assert event_model is not None
         self.assertEqual(event_model.exploration_id, 'exp_id1')
         self.assertEqual(event_model.exploration_version, 1)
         self.assertEqual(event_model.state_name, 'state_name1')
@@ -312,20 +312,10 @@ class MaybeLeaveExplorationEventLogEntryModelUnitTests(
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_create_event_models(self) -> None:
-        event_id = stats_models.MaybeLeaveExplorationEventLogEntryModel.create(
+        # No error raised while creating model.
+        stats_models.MaybeLeaveExplorationEventLogEntryModel.create(
             'exp_id1', 1, 'state_name1', 'session_id1', 1.0, {},
             feconf.PLAY_TYPE_NORMAL)
-        event_model = stats_models.MaybeLeaveExplorationEventLogEntryModel.get(
-            event_id
-        )
-
-        self.assertIsNotNone(event_model)
-        self.assertEqual(event_model.exploration_id, 'exp_id1')
-        self.assertEqual(event_model.exploration_version, 1)
-        self.assertEqual(event_model.state_name, 'state_name1')
-        self.assertEqual(event_model.session_id, 'session_id1')
-        self.assertEqual(event_model.params, {})
-        self.assertEqual(event_model.play_type, feconf.PLAY_TYPE_NORMAL)
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
@@ -377,7 +367,7 @@ class CompleteExplorationEventLogEntryModelUnitTests(
             event_id)
 
         # Ruling out the possibility of None for mypy type checking.
-        self.assertIsNotNone(event_model)
+        assert event_model is not None
         self.assertEqual(event_model.exploration_id, 'exp_id1')
         self.assertEqual(event_model.exploration_version, 1)
         self.assertEqual(event_model.state_name, 'state_name1')
@@ -427,17 +417,10 @@ class RateExplorationEventLogEntryModelUnitTests(
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_create_event_models(self) -> None:
-        event_id = stats_models.RateExplorationEventLogEntryModel.create(
+        # No error raised while creating model.
+        stats_models.RateExplorationEventLogEntryModel.create(
             'exp_id', 'user_id', 2, 1
         )
-        event_model = stats_models.RateExplorationEventLogEntryModel.get(
-            event_id
-        )
-
-        self.assertIsNotNone(event_model)
-        self.assertEqual(event_model.exploration_id, 'exp_id')
-        self.assertEqual(event_model.rating, 2)
-        self.assertEqual(event_model.old_rating, 1)
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
@@ -482,7 +465,7 @@ class StateHitEventLogEntryModelUnitTests(test_utils.GenericTestBase):
             event_id)
 
         # Ruling out the possibility of None for mypy type checking.
-        self.assertIsNotNone(event_model)
+        assert event_model is not None
         self.assertEqual(event_model.exploration_id, 'exp_id1')
         self.assertEqual(event_model.exploration_version, 1)
         self.assertEqual(event_model.state_name, 'state_name1')
@@ -533,7 +516,7 @@ class StateCompleteEventLogEntryModelUnitTests(test_utils.GenericTestBase):
             event_id)
 
         # Ruling out the possibility of None for mypy type checking.
-        self.assertIsNotNone(event_model)
+        assert event_model is not None
         self.assertEqual(event_model.exp_id, 'exp_id1')
         self.assertEqual(event_model.exp_version, 1)
         self.assertEqual(event_model.state_name, 'state_name1')
@@ -586,7 +569,7 @@ class LeaveForRefresherExplorationEventLogEntryModelUnitTests(
                 event_id))
 
         # Ruling out the possibility of None for mypy type checking.
-        self.assertIsNotNone(event_model)
+        assert event_model is not None
         self.assertEqual(event_model.exp_id, 'exp_id1')
         self.assertEqual(event_model.refresher_exp_id, 'exp_id2')
         self.assertEqual(event_model.exp_version, 1)
@@ -642,7 +625,7 @@ class ExplorationStatsModelUnitTests(test_utils.GenericTestBase):
             'exp_id1', 1)
 
         # Ruling out the possibility of None for mypy type checking.
-        self.assertIsNotNone(model)
+        assert model is not None
         self.assertEqual(model.id, model_id)
         self.assertEqual(model.exp_id, 'exp_id1')
         self.assertEqual(model.exp_version, 1)
@@ -671,9 +654,9 @@ class ExplorationStatsModelUnitTests(test_utils.GenericTestBase):
             exp_version_reference_dicts)
 
         # Ruling out the possibility of None for mypy type checking.
-        self.assertIsNotNone(stat_models[0])
-        self.assertIsNotNone(stat_models[1])
-        self.assertIsNotNone(stat_models[2])
+        assert stat_models[0] is not None
+        assert stat_models[1] is not None
+        assert stat_models[2] is not None
         self.assertEqual(len(stat_models), 3)
         self.assertEqual(stat_models[0].exp_id, 'exp_id1')
         self.assertEqual(stat_models[0].exp_version, 1)
@@ -692,8 +675,8 @@ class ExplorationStatsModelUnitTests(test_utils.GenericTestBase):
             'exp_id1', [1, 2]
         )
 
-        self.assertIsNotNone(stat_models[0])
-        self.assertIsNotNone(stat_models[1])
+        assert stat_models[0] is not None
+        assert stat_models[1] is not None
         self.assertEqual(len(stat_models), 2)
         self.assertEqual(stat_models[0].exp_id, 'exp_id1')
         self.assertEqual(stat_models[0].exp_version, 1)
@@ -744,7 +727,7 @@ class ExplorationIssuesModelUnitTests(test_utils.GenericTestBase):
         model = stats_models.ExplorationIssuesModel.get(model_id)
 
         # Ruling out the possibility of None for mypy type checking.
-        self.assertIsNotNone(model)
+        assert model is not None
         self.assertEqual(model.id, model_id)
         self.assertEqual(model.exp_id, 'exp_id1')
         self.assertEqual(model.exp_version, 1)
@@ -757,7 +740,7 @@ class ExplorationIssuesModelUnitTests(test_utils.GenericTestBase):
 
         model = stats_models.ExplorationIssuesModel.get_model('exp_id1', 1)
         # Ruling out the possibility of None for mypy type checking.
-        self.assertIsNotNone(model)
+        assert model is not None
         self.assertEqual(model.id, model_id)
         self.assertEqual(model.exp_id, 'exp_id1')
         self.assertEqual(model.exp_version, 1)
@@ -801,7 +784,7 @@ class PlaythroughModelUnitTests(test_utils.GenericTestBase):
         model = stats_models.PlaythroughModel.get(model_id)
 
         # Ruling out the possibility of None for mypy type checking.
-        self.assertIsNotNone(model)
+        assert model is not None
         self.assertEqual(model.id, model_id)
         self.assertEqual(model.exp_id, 'exp_id1')
         self.assertEqual(model.exp_version, 1)
@@ -920,7 +903,7 @@ class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
             stats_models.LearnerAnswerDetailsModel.get_model_instance(
                 feconf.ENTITY_TYPE_EXPLORATION, state_reference))
         # Ruling out the possibility of None for mypy type checking.
-        self.assertIsNotNone(model_instance)
+        assert model_instance is not None
         self.assertEqual(model_instance.id, 'exploration:exp_id:state_name')
         self.assertEqual(model_instance.state_reference, state_reference)
         self.assertEqual(
@@ -943,7 +926,7 @@ class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
             stats_models.LearnerAnswerDetailsModel.get_model_instance(
                 feconf.ENTITY_TYPE_QUESTION, state_reference))
         # Ruling out the possibility of None for mypy type checking.
-        self.assertIsNotNone(model_instance)
+        assert model_instance is not None
         self.assertEqual(model_instance.state_reference, state_reference)
         self.assertEqual(
             model_instance.entity_type, feconf.ENTITY_TYPE_QUESTION)
@@ -976,7 +959,8 @@ class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
             stats_models.LearnerAnswerDetailsModel.get_model_instance(
                 feconf.ENTITY_TYPE_EXPLORATION, state_reference))
         # Ruling out the possibility of None for mypy type checking.
-        self.assertIsNotNone(model_instance)
+        assert model_instance is not None
+        self.assertNotEqual(model_instance, None)
         self.assertEqual(
             model_instance.state_reference, '123:%s' % (state_name))
 
@@ -1023,7 +1007,7 @@ class ExplorationAnnotationsModelUnitTests(test_utils.GenericTestBase):
         model1 = stats_models.ExplorationAnnotationsModel.get('exp_id1:1')
 
         # Ruling out the possibility of None for mypy type checking.
-        self.assertIsNotNone(model1)
+        assert model1 is not None
         self.assertEqual(model1.exploration_id, 'exp_id1')
         self.assertEqual(model1.version, '1')
         self.assertEqual(model1.num_starts, 5)
@@ -1091,7 +1075,7 @@ class StateAnswersModelUnitTests(test_utils.GenericTestBase):
             'exp_id', 1, 'state_name')
 
         # Ruling out the possibility of None for mypy type checking.
-        self.assertIsNotNone(model1)
+        assert model1 is not None
         # Ensure we got the correct model.
         self.assertEqual(model1.exploration_id, 'exp_id')
         self.assertEqual(model1.exploration_version, 1)
@@ -1111,7 +1095,7 @@ class StateAnswersModelUnitTests(test_utils.GenericTestBase):
                 'exp_id', 1, 'state_name')
 
             # Ruling out the possibility of None for mypy type checking.
-            self.assertIsNotNone(model1)
+            assert model1 is not None
             self.assertEqual(model1.shard_count, 1)
 
             stats_models.StateAnswersModel.insert_submitted_answers(
@@ -1122,7 +1106,7 @@ class StateAnswersModelUnitTests(test_utils.GenericTestBase):
                 'exp_id', 1, 'state_name')
 
             # Ruling out the possibility of None for mypy type checking.
-            self.assertIsNotNone(model1)
+            assert model1 is not None
             self.assertEqual(model1.shard_count, 2)
 
         # 'shard_count' will not increase as number of answers are less than
@@ -1135,7 +1119,7 @@ class StateAnswersModelUnitTests(test_utils.GenericTestBase):
             'exp_id', 1, 'state_name')
 
         # Ruling out the possibility of None for mypy type checking.
-        self.assertIsNotNone(model1)
+        assert model1 is not None
         self.assertEqual(model1.shard_count, 2)
 
     def test_get_all_state_answer_models(self) -> None:
@@ -1154,7 +1138,7 @@ class StateAnswersModelUnitTests(test_utils.GenericTestBase):
         )
 
         # Ruling out the possibility of None for mypy type checking.
-        self.assertIsNotNone(stat_answer_models)
+        assert stat_answer_models is not None
         # Ensure we got the correct model.
         self.assertEqual(stat_answer_models[0].exploration_id, 'exp_id')
         self.assertEqual(stat_answer_models[0].exploration_version, 1)
@@ -1178,7 +1162,7 @@ class StateAnswersModelUnitTests(test_utils.GenericTestBase):
             )
 
             # Ruling out the possibility of None for mypy type checking.
-            self.assertIsNotNone(stat_answer_models)
+            assert stat_answer_models is not None
             # Ensure we got the correct model.
             self.assertEqual(stat_answer_models[0].shard_count, 1)
 

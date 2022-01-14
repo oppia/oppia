@@ -608,7 +608,7 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
             client_time_spent_in_secs: float,
             params: Dict[str, str],
             play_type: str
-    ) -> str:
+    ) -> None:
         """Creates a new leave exploration event and then writes it
         to the datastore.
 
@@ -644,7 +644,6 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
             event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
         leave_event_entity.update_timestamps()
         leave_event_entity.put()
-        return entity_id
 
     @staticmethod
     def get_model_association_to_user(
@@ -868,7 +867,7 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
             user_id: str,
             rating: int,
             old_rating: Optional[int]
-    ) -> str:
+    ) -> None:
         """Creates a new rate exploration event and then writes it to the
         datastore.
 
@@ -892,7 +891,6 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
             old_rating=old_rating,
             event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION
         ).put()
-        return entity_id
 
     @staticmethod
     def get_model_association_to_user(
