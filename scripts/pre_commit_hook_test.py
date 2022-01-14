@@ -370,7 +370,7 @@ class PreCommitHookTests(test_utils.GenericTestBase):
             tmp.write('{"GCLOUD_PATH": "%s"}' % incorrect_gcloud_path)
         constants_file_swap = self.swap(
             pre_commit_hook, 'RELEASE_CONSTANTS_FILEPATH', temp_file_name)
-        with constants_file_swap, self.assertRaisesRegexp(
+        with constants_file_swap, self.assertRaises(
             Exception, (
                 'The gcloud path in common.py: %s should match the path in '
                 'release_constants.json: %s. Please fix.' % (

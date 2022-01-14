@@ -194,7 +194,7 @@ def check_changes_in_gcloud_path():
         release_constants_gcloud_path = json.loads(f.read())['GCLOUD_PATH']
 
     if not (
-            os.path.exists(release_constants_gcloud_path) and 
+            os.path.exists(release_constants_gcloud_path) and
             os.path.samefile(release_constants_gcloud_path, common.GCLOUD_PATH)
     ):
         raise Exception(
