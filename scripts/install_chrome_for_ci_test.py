@@ -67,7 +67,7 @@ class InstallChromeTests(test_utils.GenericTestBase):
             ])
 
         with run_cmd_swap:
-            with self.assertRaisesRegexp(
+            with self.assertRaisesRegex(
                 subprocess.CalledProcessError,
                 'Command \'sudo apt-get update\' returned non-zero exit '
                 'status 1'
@@ -103,7 +103,7 @@ class GetChromeVersionTests(test_utils.GenericTestBase):
             ])
 
         with run_cmd_swap:
-            with self.assertRaisesRegexp(
+            with self.assertRaisesRegex(
                 subprocess.CalledProcessError,
                 'Command \'google-chrome --version\' returned non-zero exit '
                 'status 1'
@@ -165,7 +165,7 @@ class MainTests(test_utils.GenericTestBase):
             expected_args=[tuple()])
 
         with install_chrome_swap, get_version_swap:
-            with self.assertRaisesRegexp(
+            with self.assertRaisesRegex(
                 RuntimeError, (
                     'Chrome version {} should have been installed. '
                     'Version 123.0.12.45 was found instead.'

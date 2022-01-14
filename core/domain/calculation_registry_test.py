@@ -32,6 +32,6 @@ class CalculationRegistryTests(test_utils.GenericTestBase):
                 calculation_registry.Registry.get_calculation_by_id(
                     'AnswerFrequencies'),
                 models.AnswerFrequencies))
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             TypeError, '\'a\' is not a valid calculation id.'):
             calculation_registry.Registry.get_calculation_by_id('a')

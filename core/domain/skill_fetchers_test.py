@@ -125,7 +125,7 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skills[1].description, 'Description B')
         self.assertEqual(skills[1].misconceptions, [])
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'No skill exists for ID skill_c'):
             skill_fetchers.get_multi_skills(['skill_a', 'skill_c'])
 
@@ -155,7 +155,7 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
         model.commit(
             self.user_id_admin, 'skill model created', commit_cmd_dicts)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Sorry, we can only process v1-v%d skill schemas at '
             'present.' % feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION):
@@ -200,7 +200,7 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
         model.commit(
             self.user_id_admin, 'skill model created', commit_cmd_dicts)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Sorry, we can only process v1-v%d misconception schemas at '
             'present.' % feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION):
@@ -244,7 +244,7 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
         model.commit(
             self.user_id_admin, 'skill model created', commit_cmd_dicts)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Sorry, we can only process v1-v%d rubric schemas at '
             'present.' % feconf.CURRENT_RUBRIC_SCHEMA_VERSION):

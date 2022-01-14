@@ -121,29 +121,29 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         canonical_story_ids = self.topic.get_canonical_story_ids()
         self.assertEqual(
             canonical_story_ids, ['story_id', 'story_id_2'])
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'The story_id story_id_5 is not present in the canonical'
             ' story references list of the topic.'):
             self.topic.delete_canonical_story('story_id_5')
 
     def test_rearrange_canonical_story_fail_with_invalid_from_index_value(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected from_index value to be a number, '
                        'received None'):
             self.topic.rearrange_canonical_story(None, 2)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected from_index value to be a number, '
                        'received a'):
             self.topic.rearrange_canonical_story('a', 2)
 
     def test_rearrange_canonical_story_fail_with_invalid_to_index_value(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected to_index value to be a number, '
                        'received None'):
             self.topic.rearrange_canonical_story(1, None)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected to_index value to be a number, '
                        'received a'):
             self.topic.rearrange_canonical_story(1, 'a')
@@ -153,24 +153,24 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             topic_domain.StoryReference.create_default_story_reference(
                 'story_id_1')
         ]
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected from_index value to be with-in bounds.'):
             self.topic.rearrange_canonical_story(10, 0)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected from_index value to be with-in bounds.'):
             self.topic.rearrange_canonical_story(-1, 0)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected to_index value to be with-in bounds.'):
             self.topic.rearrange_canonical_story(0, 10)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected to_index value to be with-in bounds.'):
             self.topic.rearrange_canonical_story(0, -1)
 
     def test_rearrange_canonical_story_fail_with_identical_index_values(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected from_index and to_index values to be '
                        'different.'):
             self.topic.rearrange_canonical_story(1, 1)
@@ -209,46 +209,46 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(canonical_story_ids[2], 'story_id_3')
 
     def test_rearrange_skill_in_subtopic_fail_with_invalid_from_index(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected from_index value to be a number, '
                        'received None'):
             self.topic.rearrange_skill_in_subtopic(1, None, 2)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected from_index value to be a number, '
                        'received a'):
             self.topic.rearrange_skill_in_subtopic(1, 'a', 2)
 
     def test_rearrange_skill_in_subtopic_fail_with_invalid_to_index_value(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected to_index value to be a number, '
                        'received None'):
             self.topic.rearrange_skill_in_subtopic(1, 1, None)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected to_index value to be a number, '
                        'received a'):
             self.topic.rearrange_skill_in_subtopic(1, 1, 'a')
 
     def test_rearrange_skill_in_subtopic_fail_with_out_of_bound_indexes(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected from_index value to be with-in bounds.'):
             self.topic.rearrange_skill_in_subtopic(1, 10, 1)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected from_index value to be with-in bounds.'):
             self.topic.rearrange_skill_in_subtopic(1, -1, 0)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected to_index value to be with-in bounds.'):
             self.topic.rearrange_skill_in_subtopic(1, 0, 10)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected to_index value to be with-in bounds.'):
             self.topic.rearrange_skill_in_subtopic(1, 0, -10)
 
     def test_rearrange_skill_in_subtopic_fail_with_identical_index_values(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected from_index and to_index values to be '
                        'different.'):
             self.topic.rearrange_skill_in_subtopic(1, 1, 1)
@@ -283,46 +283,46 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill_ids[2], 'skill_id_3')
 
     def test_rearrange_subtopic_fail_with_invalid_from_index(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected from_index value to be a number, '
                        'received None'):
             self.topic.rearrange_subtopic(None, 2)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected from_index value to be a number, '
                        'received a'):
             self.topic.rearrange_subtopic('a', 2)
 
     def test_rearrange_subtopic_fail_with_invalid_to_index_value(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected to_index value to be a number, '
                        'received None'):
             self.topic.rearrange_subtopic(1, None)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected to_index value to be a number, '
                        'received a'):
             self.topic.rearrange_subtopic(1, 'a')
 
     def test_rearrange_subtopic_fail_with_out_of_bound_indexes(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected from_index value to be with-in bounds.'):
             self.topic.rearrange_subtopic(10, 1)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected from_index value to be with-in bounds.'):
             self.topic.rearrange_subtopic(-1, 0)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected to_index value to be with-in bounds.'):
             self.topic.rearrange_subtopic(0, 10)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected to_index value to be with-in bounds.'):
             self.topic.rearrange_subtopic(0, -10)
 
     def test_rearrange_subtopic_fail_with_identical_index_values(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected from_index and to_index values to be '
                        'different.'):
             self.topic.rearrange_subtopic(1, 1)
@@ -389,7 +389,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             canonical_story_ids,
             ['story_id', 'story_id_1', 'story_id_2'])
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'The story_id story_id_2 is already present in the '
             'canonical story references list of the topic.'):
             self.topic.add_canonical_story('story_id_2')
@@ -407,7 +407,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         additional_story_ids = self.topic.get_additional_story_ids()
         self.assertEqual(
             additional_story_ids, ['story_id', 'story_id_2'])
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'The story_id story_id_5 is not present in the additional'
             ' story references list of the topic.'):
@@ -425,40 +425,40 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             additional_story_ids,
             ['story_id', 'story_id_1', 'story_id_2'])
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'The story_id story_id_2 is already present in the '
             'additional story references list of the topic.'):
             self.topic.add_additional_story('story_id_2')
 
     def _assert_validation_error(self, expected_error_substring):
         """Checks that the topic passes strict validation."""
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, expected_error_substring):
             self.topic.validate()
 
     def _assert_strict_validation_error(self, expected_error_substring):
         """Checks that the topic passes prepublish validation."""
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, expected_error_substring):
             self.topic.validate(strict=True)
 
     def _assert_valid_topic_id(self, expected_error_substring, topic_id):
         """Checks that the skill passes strict validation."""
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, expected_error_substring):
             topic_domain.Topic.require_valid_topic_id(topic_id)
 
     def _assert_valid_abbreviated_name(
             self, expected_error_substring, name):
         """Checks that the topic passes strict validation."""
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, expected_error_substring):
             topic_domain.Topic.require_valid_abbreviated_name(name)
 
     def _assert_valid_thumbnail_filename_for_topic(
             self, expected_error_substring, thumbnail_filename):
         """Checks that topic passes validation for thumbnail filename."""
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, expected_error_substring):
             topic_domain.Topic.require_valid_thumbnail_filename(
                 thumbnail_filename)
@@ -466,7 +466,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
     def _assert_valid_thumbnail_filename_for_subtopic(
             self, expected_error_substring, thumbnail_filename):
         """Checks that subtopic passes validation for thumbnail filename."""
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, expected_error_substring):
             topic_domain.Subtopic.require_valid_thumbnail_filename(
                 thumbnail_filename)
@@ -548,7 +548,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
     def test_topic_thumbnail_filename_in_strict_mode(self):
         self.topic.thumbnail_bg_color = None
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected thumbnail filename to be a string, received None.'):
             self.topic.validate(strict=True)
@@ -618,7 +618,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
     def test_validation_fails_with_invalid_url_fragment(self):
         self.topic.url_fragment = 0
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Topic URL Fragment field must be a string. Received 0.'):
             self.topic.validate()
@@ -626,7 +626,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
     def test_validation_fails_with_empty_url_fragment(self):
         self.topic.url_fragment = ''
         validation_message = 'Topic URL Fragment field should not be empty.'
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, validation_message):
             self.topic.validate()
 
@@ -637,7 +637,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             'Topic URL Fragment field should not exceed %d characters, '
             'received %s.' % (
                 url_fragment_char_limit, self.topic.url_fragment))
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, validation_message):
             self.topic.validate()
 
@@ -748,7 +748,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
                 'id_2', 'Title2', ['skill_id_2'], 'image.svg',
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-title-two'))
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'The skill id skill_id_1 already exists in subtopic with id 1'):
             self.topic.add_uncategorized_skill_id('skill_id_1')
@@ -757,7 +757,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
     def test_remove_uncategorized_skill_id(self):
         self.topic.uncategorized_skill_ids = ['skill_id_5']
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'The skill id skill_id_3 is not present in the topic'):
             self.topic.remove_uncategorized_skill_id('skill_id_3')
@@ -774,7 +774,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
         self.topic.uncategorized_skill_ids = ['skill_id_1']
         self.topic.subtopics[0].skill_ids = ['skill_id_2']
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Skill id skill_id_3 is not an uncategorized skill id'):
             self.topic.move_skill_id_to_subtopic(None, 'id_1', 'skill_id_3')
@@ -802,7 +802,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.assertFalse(topic_rights.is_manager('fakeuser'))
 
     def test_cannot_create_topic_rights_change_class_with_invalid_cmd(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Command invalid cmd is not allowed'):
             topic_domain.TopicRightsChange({
                 'cmd': 'invalid cmd'
@@ -810,7 +810,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
     def test_cannot_create_topic_rights_change_class_with_invalid_changelist(
             self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Missing cmd key in change dict'):
             topic_domain.TopicRightsChange({})
 
@@ -834,7 +834,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
     def test_update_thumbnail_filename(self):
         self.assertEqual(self.topic.thumbnail_filename, None)
         # Test exception when thumbnail is not found on filesystem.
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'The thumbnail img.svg for topic with id %s does not exist'
             ' in the filesystem.' % (self.topic_id)):
@@ -866,18 +866,18 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             self):
         self.assertEqual(self.topic.uncategorized_skill_ids, [])
         self.topic.uncategorized_skill_ids = ['skill_id1']
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'The skill id skill_id1 is already an uncategorized skill.'):
             self.topic.add_uncategorized_skill_id('skill_id1')
 
     def test_cannot_delete_subtopic_with_invalid_subtopic_id(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'A subtopic with id invalid_id doesn\'t exist.'):
             self.topic.delete_subtopic('invalid_id')
 
     def test_cannot_update_subtopic_title_with_invalid_subtopic_id(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'The subtopic with id invalid_id does not exist.'):
             self.topic.update_subtopic_title('invalid_id', 'new title')
 
@@ -896,7 +896,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             self.topic.subtopics[0].thumbnail_size_in_bytes, 21131)
 
         # Test Exception when the thumbnail is not found in filesystem.
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'The thumbnail %s for subtopic with topic_id %s does'
             ' not exist in the filesystem.' % (
                 'new_image.svg', self.topic_id)):
@@ -919,7 +919,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.topic.subtopics[0].thumbnail_size_in_bytes, len(raw_image))
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'The subtopic with id invalid_id does not exist.'):
             self.topic.update_subtopic_thumbnail_filename(
                 'invalid_id', 'new title')
@@ -932,7 +932,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.topic.subtopics[0].url_fragment, 'new-subtopic-url')
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'The subtopic with id invalid_id does not exist.'):
             self.topic.update_subtopic_url_fragment('invalid_id', 'new-url')
 
@@ -945,19 +945,19 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.topic.subtopics[0].thumbnail_bg_color, '#FFFFFF')
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'The subtopic with id invalid_id does not exist.'):
             self.topic.update_subtopic_thumbnail_bg_color(
                 'invalid_id', '#FFFFFF')
 
     def test_cannot_remove_skill_id_from_subtopic_with_invalid_subtopic_id(
             self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'The subtopic with id invalid_id does not exist.'):
             self.topic.remove_skill_id_from_subtopic('invalid_id', 'skill_id1')
 
     def test_cannot_move_skill_id_to_subtopic_with_invalid_subtopic_id(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'The subtopic with id old_subtopic_id does not exist.'):
             self.topic.move_skill_id_to_subtopic(
                 'old_subtopic_id', 'new_subtopic_id', 'skill_id1')
@@ -972,7 +972,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
                 2, 'Another title', ['skill_id_1'], 'image.svg',
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-two')]
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Skill id skill_id_1 is already present in the target subtopic'):
             self.topic.move_skill_id_to_subtopic(1, 2, 'skill_id_1')
@@ -998,17 +998,17 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 class TopicChangeTests(test_utils.GenericTestBase):
 
     def test_topic_change_object_with_missing_cmd(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Missing cmd key in change dict'):
             topic_domain.TopicChange({'invalid': 'data'})
 
     def test_topic_change_object_with_invalid_cmd(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Command invalid is not allowed'):
             topic_domain.TopicChange({'cmd': 'invalid'})
 
     def test_topic_change_object_with_missing_attribute_in_cmd(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'The following required attributes are missing: '
                 'new_value, old_value')):
@@ -1018,7 +1018,7 @@ class TopicChangeTests(test_utils.GenericTestBase):
             })
 
     def test_topic_change_object_with_extra_attribute_in_cmd(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'The following extra attributes are present: invalid')):
             topic_domain.TopicChange({
@@ -1029,7 +1029,7 @@ class TopicChangeTests(test_utils.GenericTestBase):
             })
 
     def test_topic_change_object_with_invalid_topic_property(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'Value for property_name in cmd update_topic_property: '
                 'invalid is not allowed')):
@@ -1041,7 +1041,7 @@ class TopicChangeTests(test_utils.GenericTestBase):
             })
 
     def test_topic_change_object_with_invalid_subtopic_property(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'Value for property_name in cmd update_subtopic_property: '
                 'invalid is not allowed')):
@@ -1054,7 +1054,7 @@ class TopicChangeTests(test_utils.GenericTestBase):
             })
 
     def test_topic_change_object_with_invalid_subtopic_page_property(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'Value for property_name in cmd update_subtopic_page_property: '
                 'invalid is not allowed')):
@@ -1214,17 +1214,17 @@ class TopicChangeTests(test_utils.GenericTestBase):
 class TopicRightsChangeTests(test_utils.GenericTestBase):
 
     def test_topic_rights_change_object_with_missing_cmd(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Missing cmd key in change dict'):
             topic_domain.TopicRightsChange({'invalid': 'data'})
 
     def test_topic_change_rights_object_with_invalid_cmd(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Command invalid is not allowed'):
             topic_domain.TopicRightsChange({'cmd': 'invalid'})
 
     def test_topic_rights_change_object_with_missing_attribute_in_cmd(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'The following required attributes are missing: '
                 'new_role, old_role')):
@@ -1234,7 +1234,7 @@ class TopicRightsChangeTests(test_utils.GenericTestBase):
             })
 
     def test_topic_rights_change_object_with_extra_attribute_in_cmd(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'The following extra attributes are present: invalid')):
             topic_domain.TopicRightsChange({
@@ -1243,7 +1243,7 @@ class TopicRightsChangeTests(test_utils.GenericTestBase):
             })
 
     def test_topic_rights_change_object_with_invalid_role(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'Value for old_role in cmd change_role: '
                 'invalid is not allowed')):
@@ -1340,7 +1340,7 @@ class TopicSummaryTests(test_utils.GenericTestBase):
             expected_error_substring: str. String that should be a substring
                 of the expected error message.
         """
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, expected_error_substring):
             self.topic_summary.validate()
 
@@ -1381,7 +1381,7 @@ class TopicSummaryTests(test_utils.GenericTestBase):
 
     def test_validation_fails_with_invalid_url_fragment(self):
         self.topic_summary.url_fragment = 0
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Topic URL Fragment field must be a string. Received 0.'):
             self.topic_summary.validate()
@@ -1389,7 +1389,7 @@ class TopicSummaryTests(test_utils.GenericTestBase):
     def test_validation_fails_with_empty_url_fragment(self):
         self.topic_summary.url_fragment = ''
         validation_message = 'Topic URL Fragment field should not be empty.'
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, validation_message):
             self.topic_summary.validate()
 
@@ -1400,7 +1400,7 @@ class TopicSummaryTests(test_utils.GenericTestBase):
             'Topic URL Fragment field should not exceed %d characters, '
             'received %s.' % (
                 url_fragment_char_limit, self.topic_summary.url_fragment))
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, validation_message):
             self.topic_summary.validate()
 

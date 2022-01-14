@@ -335,7 +335,7 @@ class TasksTests(test_utils.EmailTestBase):
             incorrect_function_identifier,
             taskqueue_services.QUEUE_NAME_DEFAULT)
 
-        raises_incorrect_function_id_exception = self.assertRaisesRegexp(
+        raises_incorrect_function_id_exception = self.assertRaisesRegex(
             Exception,
             'The function id, %s, is not valid.' %
             incorrect_function_identifier)

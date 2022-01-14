@@ -168,7 +168,7 @@ class SetupTests(test_utils.GenericTestBase):
             'version_info', ['major', 'minor'])
         version_swap = self.swap(
             sys, 'version_info', version_info(major=3, minor=4))
-        with print_swap, uname_swap, version_swap, self.assertRaisesRegexp(
+        with print_swap, uname_swap, version_swap, self.assertRaisesRegex(
             Exception, 'No suitable python version found.'):
             setup.test_python_version()
         self.assertEqual(print_arr, [])
@@ -185,7 +185,7 @@ class SetupTests(test_utils.GenericTestBase):
         version_swap = self.swap(
             sys, 'version_info', version_info(major=3, minor=4))
         with print_swap, os_name_swap, version_swap:
-            with self.assertRaisesRegexp(
+            with self.assertRaisesRegex(
                 Exception, 'No suitable python version found.'):
                 setup.test_python_version()
         self.assertEqual(
@@ -205,7 +205,7 @@ class SetupTests(test_utils.GenericTestBase):
         check_call_swap = self.swap_to_always_return(subprocess, 'call', 1)
 
         with self.python2_print_swap, self.version_info_py37_swap:
-            with check_call_swap, self.assertRaisesRegexp(SystemExit, '1'):
+            with check_call_swap, self.assertRaisesRegex(SystemExit, '1'):
                 setup.test_python_version()
 
     def test_download_and_install_package(self):
@@ -268,7 +268,7 @@ class SetupTests(test_utils.GenericTestBase):
         getcwd_swap = self.swap(os, 'getcwd', mock_getcwd)
         print_swap = self.swap(builtins, 'print', mock_print)
         with self.test_py_swap, getcwd_swap, print_swap:
-            with self.assertRaisesRegexp(Exception, 'Invalid root directory.'):
+            with self.assertRaisesRegex(Exception, 'Invalid root directory.'):
                 setup.main(args=[])
         self.assertFalse(
             'WARNING   This script should be run from the oppia/ '
@@ -585,7 +585,7 @@ class SetupTests(test_utils.GenericTestBase):
 
         with self.test_py_swap, self.create_swap, self.uname_swap:
             with self.exists_swap, self.chown_swap, self.chmod_swap, print_swap:
-                with isfile_swap, self.get_swap, self.assertRaisesRegexp(
+                with isfile_swap, self.get_swap, self.assertRaisesRegex(
                     Exception, 'Chrome not found.'):
                     setup.main(args=[])
         self.assertTrue('Chrome is not found, stopping ...' in print_arr)

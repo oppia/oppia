@@ -422,7 +422,7 @@ class PlaythroughModelUnitTests(test_utils.GenericTestBase):
             stats_models.PlaythroughModel, 'get_by_id', types.MethodType(
                 lambda _, __: True, stats_models.PlaythroughModel))
 
-        assert_raises_regexp_context_manager = self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        assert_raises_regexp_context_manager = self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception, 'The id generator for PlaythroughModel is producing too '
             'many collisions.')
 

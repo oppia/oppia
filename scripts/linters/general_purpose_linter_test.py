@@ -217,7 +217,7 @@ class GeneralLintTests(test_utils.LinterTestBase):
         with self.swap(FILE_CACHE, 'readlines', _mock_readlines_error):
             linter = general_purpose_linter.GeneralPurposeLinter(
                 [INVALID_ANNOTATIONS_FILEPATH], FILE_CACHE)
-            with self.assertRaisesRegexp(
+            with self.assertRaisesRegex(
                     Exception,
                     '%s filecache error' % INVALID_ANNOTATIONS_FILEPATH):
                 linter.check_mandatory_patterns()

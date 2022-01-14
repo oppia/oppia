@@ -74,7 +74,7 @@ class PreCommitHookTests(test_utils.GenericTestBase):
             mock_start_subprocess_for_result)
 
         with islink_swap, exists_swap, subprocess_swap, self.print_swap:
-            with self.assertRaisesRegexp(ValueError, 'Error'):
+            with self.assertRaisesRegex(ValueError, 'Error'):
                 pre_commit_hook.install_hook()
         self.assertTrue('Symlink already exists' in self.print_arr)
         self.assertFalse(
@@ -222,7 +222,7 @@ class PreCommitHookTests(test_utils.GenericTestBase):
         subprocess_swap = self.swap(
             pre_commit_hook, 'start_subprocess_for_result',
             mock_start_subprocess_for_result)
-        with subprocess_swap, self.assertRaisesRegexp(ValueError, 'Error'):
+        with subprocess_swap, self.assertRaisesRegex(ValueError, 'Error'):
             pre_commit_hook.does_diff_include_package_lock_file()
 
     def test_does_current_folder_contain_have_package_lock_file(self):
@@ -259,7 +259,7 @@ class PreCommitHookTests(test_utils.GenericTestBase):
                 b'+  "DASHBOARD_TYPE_CREATOR": "creator-change",\n')
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
-        with check_output_swap, self.assertRaisesRegexp(
+        with check_output_swap, self.assertRaisesRegex(
             Exception,
             'Changes to %s made for deployment cannot be committed.' % (
                 pre_commit_hook.FECONF_FILEPATH)):
@@ -276,7 +276,7 @@ class PreCommitHookTests(test_utils.GenericTestBase):
                 b'+  "ANALYTICS_ID": "change",\n')
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
-        with check_output_swap, self.assertRaisesRegexp(
+        with check_output_swap, self.assertRaisesRegex(
             Exception,
             'Changes to %s made for deployment cannot be committed.' % (
                 pre_commit_hook.CONSTANTS_FILEPATH)):
@@ -300,7 +300,7 @@ class PreCommitHookTests(test_utils.GenericTestBase):
             pre_commit_hook, 'check_changes_in_config',
             mock_check_changes_in_config)
         with package_lock_swap, package_lock_in_current_folder_swap:
-            with check_config_swap, self.print_swap, self.assertRaisesRegexp(
+            with check_config_swap, self.print_swap, self.assertRaisesRegex(
                 SystemExit, '1'):
                 pre_commit_hook.main(args=[])
         self.assertTrue(

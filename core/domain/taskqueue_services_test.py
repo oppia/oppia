@@ -36,7 +36,7 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
                 self.y = 2
 
         arg1 = NonSerializableArgs()
-        serialization_exception = self.assertRaisesRegexp(
+        serialization_exception = self.assertRaisesRegex(
             ValueError,
             'The args or kwargs passed to the deferred call with '
             'function_identifier, %s, are not json serializable.' %
@@ -50,7 +50,7 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
         params = {
             'param1': set()
         }
-        serialization_exception = self.assertRaisesRegexp(
+        serialization_exception = self.assertRaisesRegex(
             ValueError,
             'The params added to the email task call cannot be json serialized')
         with serialization_exception:

@@ -41,7 +41,7 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
         self, expected_error_substring: str
     ) -> None:
         """Checks that the blog post passes strict validation."""
-        with self.assertRaisesRegexp(# type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(# type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             self.blog_post.validate(strict=True)
 
@@ -51,7 +51,7 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
         self, expected_error_substring: str
     ) -> None:
         """Checks that the blog post passes validation."""
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             self.blog_post.validate()
 
@@ -61,7 +61,7 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
         tags: List[str]
     ) -> None:
         """Checks that the blog post tags passes validation."""
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             blog_domain.BlogPost.require_valid_tags(tags, False)
 
@@ -71,7 +71,7 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
         thumbnail_filename: str
     ) -> None:
         """Checks that blog post passes validation for thumbnail filename."""
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             blog_domain.BlogPost.require_valid_thumbnail_filename(
                 thumbnail_filename, strict=False)
@@ -80,7 +80,7 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
         self, expected_error_substring: str
     ) -> None:
         """Checks that blog post passes validation for thumbnail filename."""
-        with self.assertRaisesRegexp(# type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(# type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             blog_domain.BlogPost.require_valid_thumbnail_filename(
                 self.blog_post.thumbnail_filename, strict=True)
@@ -89,7 +89,7 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
         self, expected_error_substring: str
     ) -> None:
         """Checks that blog post passes strict validation for url."""
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             blog_domain.BlogPost.require_valid_url_fragment(
                 self.blog_post.url_fragment)
@@ -98,7 +98,7 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
         self, expected_error_substring: str, title: str
     ) -> None:
         """Checks that blog post passes strict validation for title."""
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             blog_domain.BlogPost.require_valid_title(title, True)
 
@@ -106,7 +106,7 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
         self, expected_error_substring: str, title: str
     ) -> None:
         """Checks that blog post passes validation for title."""
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             blog_domain.BlogPost.require_valid_title(title, False)
 
@@ -114,7 +114,7 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
         self, expected_error_substring: str, url: str
     ) -> None:
         """Checks that blog post passes validation for url."""
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             blog_domain.BlogPost.require_valid_url_fragment(url)
 
@@ -122,7 +122,7 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
         self, expected_error_substring: str, blog_id: str
     ) -> None:
         """Checks that blog post passes validation for id."""
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             blog_domain.BlogPost.require_valid_blog_post_id(blog_id)
 
@@ -130,7 +130,7 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
         self, expected_error_substring: str
     ) -> None:
         """Checks that blog post passes validation for thumbnail update."""
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             self.blog_post.update_thumbnail_filename(
                 self.blog_post.thumbnail_filename
@@ -172,7 +172,7 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
         self, expected_error_substring: str, tags: List[str]
     ) -> None:
         """Checks that the blog post tags passes validation."""
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             blog_domain.BlogPost.require_valid_tags(tags, True)
 
@@ -362,7 +362,7 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
         thumbnail_filename: str
     ) -> None:
         """Checks that blog post passes validation for thumbnail filename."""
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             blog_domain.BlogPostSummary.require_valid_thumbnail_filename(
                 thumbnail_filename, strict=False)
@@ -371,7 +371,7 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
         self, expected_error_substring: str
     ) -> None:
         """Checks that blog post passes validation for thumbnail filename."""
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             blog_domain.BlogPostSummary.require_valid_thumbnail_filename(
                 self.blog_post_summary.thumbnail_filename, strict=True)
@@ -394,7 +394,7 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
         self, expected_error_substring: str, title: str
     ) -> None:
         """Checks that blog post passes strict validation for title."""
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             blog_domain.BlogPostSummary.require_valid_title(title, True)
 
@@ -402,7 +402,7 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
         self, expected_error_substring: str, title: str
     ) -> None:
         """Checks that blog post passes validation for title."""
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             blog_domain.BlogPostSummary.require_valid_title(title, False)
 
@@ -410,7 +410,7 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
         self, expected_error_substring: str, url: str
     ) -> None:
         """Checks that blog post passes validation for url."""
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             blog_domain.BlogPostSummary.require_valid_url_fragment(url)
 
@@ -418,7 +418,7 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
         self, expected_error_substring: str
     ) -> None:
         """Checks that blog post passes validation for url."""
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             blog_domain.BlogPostSummary.require_valid_url_fragment(
                 self.blog_post_summary.url_fragment)
@@ -427,7 +427,7 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
         self, expected_error_substring: str
     ) -> None:
         """Checks that blog post passes validation for title."""
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             blog_domain.BlogPostSummary.require_valid_title(
                 self.blog_post_summary.title, False)
@@ -436,7 +436,7 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
         self, expected_error_substring: str
     ) -> None:
         """Checks that blog post passes validation for tags."""
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             blog_domain.BlogPostSummary.require_valid_tags(
                 self.blog_post_summary.tags, False)
@@ -445,7 +445,7 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
         self, expected_error_substring: str, tags: List[str]
     ) -> None:
         """Checks that the blog post tags passes validation."""
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             blog_domain.BlogPostSummary.require_valid_tags(tags, False)
 
@@ -453,7 +453,7 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
         self, expected_error_substring: str, tags: List[str]
     ) -> None:
         """Checks that the blog post tags passes validation."""
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             blog_domain.BlogPostSummary.require_valid_tags(tags, True)
 
@@ -486,7 +486,7 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
         self, expected_error_substring: str
     ) -> None:
         """Checks that the blog post passes strict validation."""
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             self.blog_post_summary.validate(strict=True)
 
@@ -496,7 +496,7 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
         self, expected_error_substring: str
     ) -> None:
         """Checks that the blog post passes validation."""
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             self.blog_post_summary.validate()
 

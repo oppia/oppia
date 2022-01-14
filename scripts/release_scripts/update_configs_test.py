@@ -77,7 +77,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         def mock_url_open(unused_url):
             raise Exception('Not found.')
         url_open_swap = self.swap(utils, 'url_open', mock_url_open)
-        with url_open_swap, self.assertRaisesRegexp(
+        with url_open_swap, self.assertRaisesRegex(
             Exception, 'Terms mainpage does not exist on Github.'
         ):
             update_configs.main(
@@ -164,7 +164,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         with python_utils.open_file(temp_feconf_path, 'w') as f:
             f.write(feconf_text)
 
-        with getpass_swap, self.assertRaisesRegexp(
+        with getpass_swap, self.assertRaisesRegex(
             AssertionError, 'Missing mailgun API key'):
             update_configs.add_mailgun_api_key(temp_feconf_path)
 
@@ -188,7 +188,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         with python_utils.open_file(temp_feconf_path, 'w') as f:
             f.write(feconf_text)
 
-        with getpass_swap, self.assertRaisesRegexp(
+        with getpass_swap, self.assertRaisesRegex(
             AssertionError, 'Missing mailchimp API key'):
             update_configs.add_mailchimp_api_key(temp_feconf_path)
 
@@ -411,7 +411,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n')
         with python_utils.open_file(temp_feconf_path, 'w') as f:
             f.write(feconf_text)
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'The mailgun API key must be added before deployment.'):
             update_configs.verify_feconf(temp_feconf_path, True)
 
@@ -432,7 +432,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
                 mailgun_api_key))
         with python_utils.open_file(temp_feconf_path, 'w') as f:
             f.write(feconf_text)
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'The mailchimp API key must be added before deployment'):
             update_configs.verify_feconf(temp_feconf_path, True)
 
@@ -471,12 +471,12 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
                 mailgun_api_key, mailchimp_api_key))
         with python_utils.open_file(temp_feconf_path, 'w') as f:
             f.write(feconf_text)
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'REDISHOST must be updated before deployment.'):
             update_configs.verify_feconf(temp_feconf_path, True)
 
     def test_invalid_config(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Invalid line in invalid_feconf_updates.config '
             'config file: INVALID_KEY: \'invalid\''):
@@ -485,7 +485,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
                 INVALID_FECONF_CONFIG_PATH, update_configs.FECONF_REGEX)
 
     def test_missing_line_in_local_config(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Could not find correct number of lines in '
             'feconf.txt matching: EXTRA_KEY = \'extra\''):

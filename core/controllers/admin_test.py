@@ -153,7 +153,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
-        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'Cannot reload an exploration in production.')
         with assert_raises_regexp_context_manager, prod_mode_swap:
             self.post_json(
@@ -169,7 +169,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
-        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'Cannot load new structures data in production.')
         with assert_raises_regexp_context_manager, prod_mode_swap:
             self.post_json(
@@ -181,7 +181,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_non_admins_cannot_load_new_structures_data(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
-        assert_raises_regexp = self.assertRaisesRegexp(
+        assert_raises_regexp = self.assertRaisesRegex(
             Exception, 'User does not have enough rights to generate data.')
         with assert_raises_regexp:
             self.post_json(
@@ -195,7 +195,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
-        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'Cannot generate dummy skills in production.')
         with assert_raises_regexp_context_manager, prod_mode_swap:
             self.post_json(
@@ -207,7 +207,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_non_admins_cannot_generate_dummy_skill_data(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
-        assert_raises_regexp = self.assertRaisesRegexp(
+        assert_raises_regexp = self.assertRaisesRegex(
             Exception, 'User does not have enough rights to generate data.')
         with assert_raises_regexp:
             self.post_json(
@@ -221,7 +221,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
-        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'Cannot reload a collection in production.')
         with assert_raises_regexp_context_manager, prod_mode_swap:
             self.post_json(
@@ -1012,7 +1012,7 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
-        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'Cannot generate dummy explorations in production.')
 
         with assert_raises_regexp_context_manager, prod_mode_swap:

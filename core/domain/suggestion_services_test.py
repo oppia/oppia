@@ -205,7 +205,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict, observed_suggestion.to_dict())
 
     def test_cannot_create_suggestion_with_invalid_suggestion_type(self):
-        with self.assertRaisesRegexp(Exception, 'Invalid suggestion type'):
+        with self.assertRaisesRegex(Exception, 'Invalid suggestion type'):
             suggestion_services.create_suggestion(
                 'invalid_suggestion_type',
                 feconf.ENTITY_TYPE_EXPLORATION,
@@ -213,7 +213,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 self.author_id, self.change, 'test description')
 
     def test_cannot_create_suggestion_with_invalid_author_id(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected author_id to be in a valid user ID format'):
             suggestion_services.create_suggestion(
                 feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
@@ -231,7 +231,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'translation_html': '<p>Translation for invalid content.</p>',
             'data_format': 'html'
         }
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'The Exploration content has changed since this translation '
             'was submitted.'):
@@ -280,7 +280,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         self.assert_suggestion_status(
             suggestion.suggestion_id, suggestion_models.STATUS_IN_REVIEW)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Review message cannot be empty.'):
             suggestion_services.reject_suggestion(
                 suggestion.suggestion_id, self.reviewer_id, '')
@@ -448,7 +448,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'You cannot accept the suggestion with id %s because it does not '
             'exist.' % (self.suggestion_id)
         )
-        with self.assertRaisesRegexp(Exception, expected_exception_regexp):
+        with self.assertRaisesRegex(Exception, expected_exception_regexp):
             self.mock_accept_suggestion(
                 self.suggestion_id, self.reviewer_id, self.COMMIT_MESSAGE,
                 'review message')
@@ -487,7 +487,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'Invalid math tags found in the suggestion with id %s.' % (
                 self.suggestion_id)
         )
-        with self.assertRaisesRegexp(Exception, expected_exception_regexp):
+        with self.assertRaisesRegex(Exception, expected_exception_regexp):
             self.mock_accept_suggestion(
                 self.suggestion_id, self.reviewer_id, self.COMMIT_MESSAGE,
                 'review message')
@@ -510,7 +510,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'The suggestion with id %s has already been accepted/rejected.' % (
                 self.suggestion_id)
         )
-        with self.assertRaisesRegexp(Exception, expected_exception_regexp):
+        with self.assertRaisesRegex(Exception, expected_exception_regexp):
             suggestion_services.accept_suggestion(
                 self.suggestion_id, self.reviewer_id, self.COMMIT_MESSAGE, None)
 
@@ -529,7 +529,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'The suggestion with id %s has already been accepted/rejected.' % (
                 self.suggestion_id)
         )
-        with self.assertRaisesRegexp(Exception, expected_exception_regexp):
+        with self.assertRaisesRegex(Exception, expected_exception_regexp):
             suggestion_services.accept_suggestion(
                 self.suggestion_id, self.reviewer_id, self.COMMIT_MESSAGE, None)
 
@@ -542,7 +542,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         suggestion = suggestion_services.get_suggestion_by_id(
             self.suggestion_id)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected score_category to be of the form '
                                    'score_type.score_sub_type, received '
                                    'invalid_score_category'):
@@ -559,7 +559,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         self.assert_suggestion_status(
             self.suggestion_id, suggestion_models.STATUS_IN_REVIEW)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Commit message cannot be empty.'):
             suggestion_services.accept_suggestion(
                 self.suggestion_id, self.reviewer_id,
@@ -624,7 +624,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'You cannot reject the suggestion with id %s because it does not '
             'exist.' % (self.suggestion_id)
         )
-        with self.assertRaisesRegexp(Exception, expected_exception_regexp):
+        with self.assertRaisesRegex(Exception, expected_exception_regexp):
             suggestion_services.reject_suggestion(
                 self.suggestion_id, self.reviewer_id, 'review message')
 
@@ -644,7 +644,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'The suggestion with id %s has already been accepted/rejected.' % (
                 self.suggestion_id)
         )
-        with self.assertRaisesRegexp(Exception, expected_exception_regexp):
+        with self.assertRaisesRegex(Exception, expected_exception_regexp):
             suggestion_services.reject_suggestion(
                 self.suggestion_id, self.reviewer_id, 'reject review message')
 
@@ -668,7 +668,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'The suggestion with id %s has already been accepted/rejected.' % (
                 self.suggestion_id)
         )
-        with self.assertRaisesRegexp(Exception, expected_exception_regexp):
+        with self.assertRaisesRegex(Exception, expected_exception_regexp):
             suggestion_services.reject_suggestion(
                 self.suggestion_id, self.reviewer_id, 'reject review message')
 
@@ -713,7 +713,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         self.mock_create_suggestion(self.target_id)
 
         # Can't resubmit a rejected suggestion if the summary message is empty.
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Summary message cannot be empty.'):
             suggestion_services.resubmit_rejected_suggestion(
                 self.suggestion_id, '', self.author_id, {})
@@ -728,7 +728,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'The suggestion with id %s is not yet handled.' % (
                 self.suggestion_id)
         )
-        with self.assertRaisesRegexp(Exception, expected_exception_regexp):
+        with self.assertRaisesRegex(Exception, expected_exception_regexp):
             suggestion_services.resubmit_rejected_suggestion(
                 self.suggestion_id, 'resubmit summary message',
                 self.author_id, {}
@@ -751,7 +751,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'suggestions can be resubmitted.' % (
                 self.suggestion_id)
         )
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, expected_exception_regexp):
             suggestion_services.resubmit_rejected_suggestion(
                 self.suggestion_id, 'resubmit summary message',
@@ -1153,7 +1153,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             ('target_id', self.target_id_1),
             ('invalid_field', 'value')
         ]
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Not allowed to query on field invalid_field'):
             suggestion_services.query_suggestions(queries)
 
@@ -1931,7 +1931,7 @@ class VoiceoverApplicationServiceUnitTest(test_utils.GenericTestBase):
             self.voiceover_application_model.id)
 
         self.voiceover_application_model.target_type = 'invalid_type'
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Invalid target type for voiceover application: invalid_type'):
             suggestion_services.get_voiceover_application(
@@ -2070,7 +2070,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
         with self.swap(
             suggestion_services, 'SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS',
             suggestion_emphasized_text_getter_functions_mock):
-            with self.assertRaisesRegexp(
+            with self.assertRaisesRegex(
                 Exception,
                 'Expected suggestion type to be offered on the Contributor '
                 'Dashboard, received: %s.' % (

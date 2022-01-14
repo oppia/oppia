@@ -118,7 +118,7 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
         with common_test_swap, mock_tests_to_remove:
             with mock_protractor_test_suites:
                 with mock_ci_scripts:
-                    with self.assertRaisesRegexp(
+                    with self.assertRaisesRegex(
                         Exception,
                         re.escape(
                             'Protractor test suites and CI test suites are not '
@@ -147,7 +147,7 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
             'TEST_SUITES_NOT_RUN_IN_CI', [])
 
         with mock_ci_scripts:
-            with self.assertRaisesRegexp(
+            with self.assertRaisesRegex(
                 Exception, 'coreEditorAndPlayerFeatures is expected to be in '
                            'the e2e test suites extracted from the script '
                            'section of CI config files, but it is '
@@ -155,7 +155,7 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
                 check_e2e_tests_are_captured_in_ci.main()
 
         with mock_protractor_test_suites, mock_tests_not_in_ci:
-            with self.assertRaisesRegexp(
+            with self.assertRaisesRegex(
                 Exception, 'coreEditorAndPlayerFeatures is expected to be in '
                            'the e2e test suites extracted from the '
                            'protractor.conf.js file, but it is missing.'):
@@ -184,7 +184,7 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
 
         with ci_path_swap, mock_tests_to_remove:
             with mock_get_e2e_suite_names_from_ci_config_file:
-                with self.assertRaisesRegexp(
+                with self.assertRaisesRegex(
                     Exception, 'The e2e test suites that have been extracted '
                                'from script section from CI config files '
                                'are empty.'):
@@ -223,7 +223,7 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
 
         with protractor_path_swap, mock_tests_to_remove:
             with mock_e2e_test_suites, protractor_test_suite_files_swap:
-                with self.assertRaisesRegexp(
+                with self.assertRaisesRegex(
                     Exception, 'The e2e test suites that have been extracted'
                                ' from protractor.conf.js are empty.'):
                     check_e2e_tests_are_captured_in_ci.main()
@@ -238,7 +238,7 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
             mock_get_e2e_test_filenames_from_protractor_dir)
 
         with protractor_test_suite_files_swap:
-            with self.assertRaisesRegexp(
+            with self.assertRaisesRegex(
                 Exception, 'One or more test file from protractor or '
                            'protractor_desktop directory is missing from '
                            'protractor.conf.js'):

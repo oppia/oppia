@@ -45,15 +45,15 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
         self.assertEqual(self.fs.get('abc.png'), b'file_contents')
 
     def test_validate_entity_parameters(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid entity_id received: 1'):
             fs_domain.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, 1)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Entity id cannot be empty'):
             fs_domain.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, '')
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid entity_name received: '
             'invalid_name.'):
             fs_domain.GcsFileSystem('invalid_name', 'exp_id')
@@ -65,12 +65,12 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
 
         self.fs.delete('abc.png')
         self.assertFalse(self.fs.isfile('abc.png'))
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             IOError, re.escape('File abc.png not found')
         ):
             self.fs.get('abc.png')
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             IOError, 'File does not exist: fake_file.png'
         ):
             self.fs.delete('fake_file.png')
@@ -90,10 +90,10 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.fs.listdir('abc'), ['abc/abcd.png'])
 
-        with self.assertRaisesRegexp(IOError, 'Invalid filepath'):
+        with self.assertRaisesRegex(IOError, 'Invalid filepath'):
             self.fs.listdir('/abc')
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             IOError,
             (
                 'The dir_name should not start with /'
@@ -138,15 +138,15 @@ class DirectoryTraversalTests(test_utils.GenericTestBase):
             '..', '../another_exploration', '../', '/..', '/abc']
 
         for filepath in invalid_filepaths:
-            with self.assertRaisesRegexp(IOError, 'Invalid filepath'):
+            with self.assertRaisesRegex(IOError, 'Invalid filepath'):
                 fs.isfile(filepath)
-            with self.assertRaisesRegexp(IOError, 'Invalid filepath'):
+            with self.assertRaisesRegex(IOError, 'Invalid filepath'):
                 fs.open(filepath)
-            with self.assertRaisesRegexp(IOError, 'Invalid filepath'):
+            with self.assertRaisesRegex(IOError, 'Invalid filepath'):
                 fs.get(filepath)
-            with self.assertRaisesRegexp(IOError, 'Invalid filepath'):
+            with self.assertRaisesRegex(IOError, 'Invalid filepath'):
                 fs.commit(filepath, 'raw_file')
-            with self.assertRaisesRegexp(IOError, 'Invalid filepath'):
+            with self.assertRaisesRegex(IOError, 'Invalid filepath'):
                 fs.delete(filepath)
-            with self.assertRaisesRegexp(IOError, 'Invalid filepath'):
+            with self.assertRaisesRegex(IOError, 'Invalid filepath'):
                 fs.listdir(filepath)

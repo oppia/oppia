@@ -208,7 +208,7 @@ class RegistryUnitTest(test_utils.TestBase):
 
     def test_import_models_invalid(self) -> None:
         """Tests import_models function with an invalid option."""
-        with self.assertRaisesRegexp(Exception, 'Invalid model name: '): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'Invalid model name: '): # type: ignore[no-untyped-call]
             # Using type ignore[list-item] because list item 0 is a string.
             # expected type class names. This is done to test the function
             # with invalid model names.
@@ -256,7 +256,7 @@ class RegistryUnitTest(test_utils.TestBase):
     def test_errors_in_datastore_services_functions(self) -> None:
         """Tests datastore services functions errors."""
         from core.platform.datastore import cloud_datastore_services
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception, 'Model names should not be duplicated in input list.'):
             cloud_datastore_services.fetch_multiple_entities_by_ids_and_models(
                 [('SampleModel', ['id_1', 'id_2']),
@@ -305,7 +305,7 @@ class RegistryUnitTest(test_utils.TestBase):
             feconf, 'EMAIL_SERVICE_PROVIDER',
             'invalid service provider'), (
                 self.swap(constants, 'DEV_MODE', False)):
-            with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex( # type: ignore[no-untyped-call]
                 Exception,
                 'Invalid email service provider: invalid service provider'
             ):
@@ -332,7 +332,7 @@ class RegistryUnitTest(test_utils.TestBase):
             feconf, 'BULK_EMAIL_SERVICE_PROVIDER',
             'invalid service provider'), (
                 self.swap(constants, 'EMULATOR_MODE', False)):
-            with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex( # type: ignore[no-untyped-call]
                 Exception,
                 'Invalid bulk email service provider: invalid service '
                 'provider'):
@@ -407,7 +407,7 @@ class RegistryUnitTest(test_utils.TestBase):
             self
     ) -> None:
         """Tests NotImplementedError of Platform."""
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             NotImplementedError,
             re.escape(
                 'import_models() method is not overwritten in '

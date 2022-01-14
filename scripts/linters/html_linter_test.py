@@ -103,14 +103,14 @@ class CustomHTMLParserTests(test_utils.LinterTestBase):
         self.assertTrue(lint_task_report.failed)
 
     def test_custom_linter_with_invalid_tags(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             html_linter.TagMismatchException, 'Error in line 2 of file'):
             html_linter.HTMLLintChecksManager(
                 [INVALID_MISMATCHED_TAGS_HTML_FILEPATH], FILE_CACHE
                 ).perform_all_lint_checks()
 
     def test_custom_linter_with_tag_mismatch(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             html_linter.TagMismatchException, 'Error in line 13 of file'):
             html_linter.HTMLLintChecksManager(
                 [INVALID_TAG_MISMATCH_HTML_FILEPATH], FILE_CACHE
@@ -128,7 +128,7 @@ class CustomHTMLParserTests(test_utils.LinterTestBase):
         self.assertTrue(lint_task_report.failed)
 
     def test_custom_without_html_end_tag(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             html_linter.TagMismatchException, 'Error in file'):
             html_linter.HTMLLintChecksManager(
                 [INVALID_MISSING_HTML_TAG_HTML_FILEPATH], FILE_CACHE

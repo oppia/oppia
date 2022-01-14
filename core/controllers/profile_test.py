@@ -318,7 +318,7 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
     def test_update_preferences_with_invalid_update_type_raises_exception(self):
         self.login(self.OWNER_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        with self.assertRaisesRegexp(Exception, 'Invalid update type:'):
+        with self.assertRaisesRegex(Exception, 'Invalid update type:'):
             self.put_json(
                 feconf.PREFERENCES_DATA_URL,
                 {'update_type': 'invalid_update_type'},

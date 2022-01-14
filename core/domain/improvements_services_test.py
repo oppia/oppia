@@ -475,7 +475,7 @@ class ApplyChangesToModelTests(ImprovementsServicesTestBase):
             improvements_models.TaskEntryModel.get_by_id(task_entry.task_id))
         task_entry.target_id = 'Different State'
 
-        with self.assertRaisesRegexp(Exception, 'Wrong model provided'):
+        with self.assertRaisesRegex(Exception, 'Wrong model provided'):
             improvements_services.apply_changes_to_model(
                 task_entry, task_entry_model)
 

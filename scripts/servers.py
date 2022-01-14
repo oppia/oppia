@@ -100,7 +100,7 @@ def managed_process(
             procs_gone, procs_still_alive = (
                 psutil.wait_procs(procs_to_kill, timeout=timeout_secs))
             for proc in procs_still_alive:
-                logging.warn('Forced to kill %s!' % get_proc_info(proc))
+                logging.warning('Forced to kill %s!' % get_proc_info(proc))
                 proc.kill()
             for proc in procs_gone:
                 logging.info('%s has already ended.' % get_proc_info(proc))

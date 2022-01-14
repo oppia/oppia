@@ -64,7 +64,7 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
 
     def test_retrieval_of_explorations(self):
         """Test the get_exploration_by_id() method."""
-        with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
+        with self.assertRaisesRegex(Exception, 'Entity .* not found'):
             exp_fetchers.get_exploration_by_id('fake_eid')
 
         retrieved_exploration = (
@@ -72,14 +72,14 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
         self.assertEqual(self.exploration_1.id, retrieved_exploration.id)
         self.assertEqual(self.exploration_1.title, retrieved_exploration.title)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Entity for class ExplorationModel with id fake_exploration'
             ' not found'):
             exp_fetchers.get_exploration_by_id('fake_exploration')
 
     def test_retrieval_of_multiple_exploration_versions_for_fake_exp_id(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             ValueError, 'The given entity_id fake_exp_id is invalid'):
             (
                 exp_fetchers
@@ -134,7 +134,7 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
         exp_services.update_exploration(
             feconf.SYSTEM_COMMITTER_ID, self.EXP_1_ID, change_list, '')
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             ValueError,
             'Requested version number 4 cannot be higher than the current '
             'version number 3.'):
@@ -143,7 +143,7 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
                 .get_multiple_versioned_exp_interaction_ids_mapping_by_version(
                     self.EXP_1_ID, [1, 2, 3, 4]))
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             ValueError,
             'At least one version number is invalid'):
             (
@@ -173,7 +173,7 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
 
         self.assertNotIn('doesnt_exist', result)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Couldn\'t find explorations with the following ids:\n'
             'doesnt_exist'):
