@@ -92,7 +92,7 @@ class CollectWeeklyDashboardStatsJobTests(job_test_utils.JobTestBase):
 
         self.put_multi([user_settings_model, user_stats_model])
 
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception,
             'Sorry, we can only process v1-v%d dashboard stats schemas at '
             'present.' % feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION
