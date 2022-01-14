@@ -43,7 +43,7 @@ class ConceptCardDataHandler(base.BaseHandler):
         """Handles GET requests.
 
         Args:
-            selected_skill_ids: list(str). Comma separated IDs of skills.
+            selected_skill_ids: list(str). List of skill ids.
         """
 
         skills = skill_fetchers.get_multi_skills(selected_skill_ids)

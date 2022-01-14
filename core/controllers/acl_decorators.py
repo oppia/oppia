@@ -231,8 +231,7 @@ def can_view_skills(handler):
         """Checks if the user can view the skills.
 
         Args:
-            selected_skill_ids: list(str). The skill ids
-                separated by commas.
+            selected_skill_ids: list(str). List of skill ids.
             **kwargs: *. Keyword arguments.
 
         Returns:

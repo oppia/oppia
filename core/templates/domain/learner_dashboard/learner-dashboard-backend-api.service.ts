@@ -345,8 +345,8 @@ export class LearnerDashboardBackendApiService {
   }
 
   async _fetchSubtopicMastery(
-      topicIds: string[]): Promise<Record<string,
-    SubtopicMasterySummaryBackendDict>> {
+      topicIds: string[]
+  ): Promise<Record<string, SubtopicMasterySummaryBackendDict>> {
     return new Promise((resolve, reject) => {
       this.http.get<SubtopicMasteryDict>(
         AppConstants.SUBTOPIC_MASTERY_DATA_URL_TEMPLATE, {
@@ -359,8 +359,9 @@ export class LearnerDashboardBackendApiService {
     });
   }
 
-  async fetchSubtopicMastery(topicIds: string[]): Promise<Record<string,
-    SubtopicMasterySummaryBackendDict>> {
+  async fetchSubtopicMastery(
+      topicIds: string[]
+  ): Promise<Record<string, SubtopicMasterySummaryBackendDict>> {
     return this._fetchSubtopicMastery(topicIds);
   }
 }
