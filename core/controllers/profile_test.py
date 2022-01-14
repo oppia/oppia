@@ -102,7 +102,7 @@ class ProfilePageTests(test_utils.GenericTestBase):
                 {
                     'username': self.EDITOR_USERNAME,
                     'agreed_to_terms': True,
-                    'can_recieve_email_updates': None
+                    'default_dashboard': constants.DASHBOARD_TYPE_CREATOR,
                 },
                 csrf_token=csrf_token)
             self.assertEqual(response, {})
@@ -550,7 +550,7 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
                     {
                         'username': self.EDITOR_USERNAME,
                         'agreed_to_terms': True,
-                        'can_receive_email_updates': None
+                        'default_dashboard': constants.DASHBOARD_TYPE_CREATOR
                     },
                     csrf_token=csrf_token
                 )
