@@ -17,19 +17,25 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { ExplorationPropertyService } from './exploration-property.service';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ExplorationTagsService } from './exploration-tags.service';
 
-describe('Exploration Tags Service', function() {
-  let explorationTagsService: ExplorationTagsService = null;
-
-  importAllAngularServices();
+describe('Exploration Tags Service', () => {
+  let explorationTagsService: ExplorationTagsService;
 
   beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [
+        ExplorationPropertyService
+      ]
+    });
+
     explorationTagsService = TestBed.inject(ExplorationTagsService);
   });
 
-  it('should test the child object properties', function() {
+  it('should test the child object properties', () => {
     expect(explorationTagsService.propertyName).toBe('tags');
     let NotNormalize = ['angularjs ', ' google  cloud  storage   ', ' python'];
     let Normalize = ['angularjs', 'google cloud storage', 'python'];

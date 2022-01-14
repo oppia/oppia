@@ -1,22 +1,3 @@
-  <!--
-  Off-screen preview of the next card in order to pre-determine the target
-  height for the card content transition animation.
-  -->
-<div class="conversation-skin-future-tutor-card" aria-hidden="true">
-  <div class="oppia-learner-view-card-content">
-    <div class="oppia-learner-view-card-top-section">
-      <angular-html-bind class="oppia-rte-viewer oppia-learner-view-card-top-content"
-                         html-data="nextCard.getContentHtml()">
-      </angular-html-bind>
-    </div>
-    <div ng-if="upcomingInlineInteractionHtml">
-      <div class="conversation-skin-inline-interaction">
-        <angular-html-bind html-data="upcomingInlineInteractionHtml">
-        </angular-html-bind>
-      </div>
-    </div>
-  </div>
-</div>
 <div class="embedded-body">
   <section role="main" ng-if="hasFullyLoaded">
     <div class="conversation-skin-cards-container conversation-skin-animate-cards"
@@ -602,13 +583,13 @@ directive. -->
       width: 100%;
     }
     .conversation-skin-main-tutor-card .instructions-button {
-      background-color: #0D48A1;
+      background-color: #0d48a1;
       color: #fff;
       padding: 6px 12px;
     }
     .conversation-skin-main-tutor-card button.md-button.md-default-theme.instructions-button:focus,
     .conversation-skin-main-tutor-card button.md-button.md-default-theme.instructions-button:hover {
-      background-color: #115FD4;
+      background-color: #115fd4;
     }
     .conversation-skin-user-avatar,
     .conversation-skin-oppia-avatar {
