@@ -13,20 +13,34 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for Save Pending Changes Modal.
+ * @fileoverview Component for change subtopic assignment modal.
  */
 
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import { Subtopic } from 'domain/topic/subtopic.model';
 
 @Component({
-  selector: 'save-pending-changes-modal',
-  templateUrl: './save-pending-changes-modal.component.html'
+  selector: 'oppia-change-subtopic-assignment-modal',
+  templateUrl: './change-subtopic-assignment-modal.component.html'
 })
-export class SavePendingChangesModalComponent
-  extends ConfirmOrCancelModal {
-  constructor(ngbActiveModal: NgbActiveModal) {
+
+export class ChangeSubtopicAssignmentModalComponent
+  extends ConfirmOrCancelModal implements OnInit {
+  subtopics: Subtopic[];
+  selectedSubtopicId: number;
+  constructor(
+    private ngbActiveModal: NgbActiveModal,
+  ) {
     super(ngbActiveModal);
+  }
+
+  ngOnInit(): void {
+    this.selectedSubtopicId = null;
+  }
+
+  changeSelectedSubtopic(subtopicId: number): void {
+    this.selectedSubtopicId = subtopicId;
   }
 }

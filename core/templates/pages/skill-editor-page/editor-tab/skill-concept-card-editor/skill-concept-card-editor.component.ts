@@ -26,7 +26,7 @@ require(
 require('directives/angular-html-bind.directive.ts');
 require(
   'pages/skill-editor-page/editor-tab/skill-concept-card-editor/' +
-  'worked-example-editor.directive.ts');
+  'worked-example-editor.component.ts');
 require(
   'pages/skill-editor-page/editor-tab/skill-preview-modal.controller.ts');
 
@@ -89,6 +89,9 @@ angular.module('oppia').component('skillConceptCardEditor', {
         SkillUpdateService.setConceptCardExplanation(
           $scope.skill, explanationObject);
         initBindableFieldsDict();
+        // TODO(#8521): Remove the use of $rootScope.$apply()
+        // once the controller is migrated to angular.
+        $rootScope.$apply();
       };
 
       $scope.changeActiveWorkedExampleIndex = function(idx) {

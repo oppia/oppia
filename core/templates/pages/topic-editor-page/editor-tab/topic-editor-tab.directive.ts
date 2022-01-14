@@ -16,6 +16,15 @@
  * @fileoverview Controller for the main topic editor.
  */
 
+import { ChangeSubtopicAssignmentModalComponent } from '../modal-templates/change-subtopic-assignment-modal.component';
+import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { SavePendingChangesModalComponent } from 'components/save-pending-changes/save-pending-changes-modal.component';
+import { Subscription } from 'rxjs';
+
+// TODO(#9186): Change variable name to 'constants' once this file
+// is migrated to Angular.
+import topicConstants from 'assets/constants';
+
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
@@ -30,9 +39,6 @@ require('domain/topic/topic-update.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/topic-editor-page/rearrange-skills-in-subtopics-modal.controller.ts');
-require(
-  'pages/topic-editor-page/modal-templates/' +
-    'change-subtopic-assignment-modal.template.controller.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('pages/topic-editor-page/services/topic-editor-routing.service.ts');
 require('pages/topic-editor-page/services/entity-creation.service.ts');
@@ -52,14 +58,6 @@ require(
   'topics-and-skills-dashboard-backend-api.service.ts');
 require('base-components/loading-message.component.ts');
 require('services/ngb-modal.service.ts');
-
-import { Subscription } from 'rxjs';
-import { TopicSavePendingChangesComponent } from
-  '../modal-templates/topic-save-pending-changes-modal.component';
-
-// TODO(#9186): Change variable name to 'constants' once this file
-// is migrated to Angular.
-import topicConstants from 'assets/constants';
 
 angular.module('oppia').directive('topicEditorTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -206,9 +204,16 @@ angular.module('oppia').directive('topicEditorTab', [
 
           $scope.createCanonicalStory = function() {
             if (UndoRedoService.getChangeCount() > 0) {
-              NgbModal.open(TopicSavePendingChangesComponent, {
-                backdrop: true
-              }).result.then(function() {}, function() {
+              const modalRef = NgbModal.open(
+                SavePendingChangesModalComponent, {
+                  backdrop: true
+                });
+
+              modalRef.componentInstance.body = (
+                'Please save all pending changes ' +
+                'before exiting the topic editor.');
+
+              modalRef.result.then(function() {}, function() {
                 // Note to developers:
                 // This callback is triggered when the Cancel button is clicked.
                 // No further action is needed.
@@ -220,9 +225,16 @@ angular.module('oppia').directive('topicEditorTab', [
 
           $scope.createSkill = function() {
             if (UndoRedoService.getChangeCount() > 0) {
-              NgbModal.open(TopicSavePendingChangesComponent, {
-                backdrop: true
-              }).result.then(function() {}, function() {
+              const modalRef = NgbModal.open(
+                SavePendingChangesModalComponent, {
+                  backdrop: true
+                });
+
+              modalRef.componentInstance.body = (
+                'Please save all pending changes ' +
+                'before exiting the topic editor.');
+
+              modalRef.result.then(function() {}, function() {
                 // Note to developers:
                 // This callback is triggered when the Cancel button is clicked.
                 // No further action is needed.
@@ -418,16 +430,14 @@ angular.module('oppia').directive('topicEditorTab', [
 
           $scope.changeSubtopicAssignment = function(
               oldSubtopicId, skillSummary) {
-            $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/topic-editor-page/modal-templates/' +
-                      'change-subtopic-assignment-modal.template.html'),
-              backdrop: 'static',
-              resolve: {
-                subtopics: () => $scope.subtopics
-              },
-              controller: 'ChangeSubtopicAssignmentModalController'
-            }).result.then(function(newSubtopicId) {
+            const modalRef: NgbModalRef = NgbModal.open(
+              ChangeSubtopicAssignmentModalComponent, {
+                backdrop: 'static',
+                windowClass: 'oppia-change-subtopic-assignment-modal',
+                size: 'xl'
+              });
+            modalRef.componentInstance.subtopics = $scope.subtopics;
+            modalRef.result.then(function(newSubtopicId) {
               if (oldSubtopicId === newSubtopicId) {
                 return;
               }
