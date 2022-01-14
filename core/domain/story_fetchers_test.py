@@ -133,13 +133,13 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(node_index, 0)
 
         # Tests error should be raised if story or node doesn't exist.
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Story node with id node_5 does not exist in this story.'):
             story_fetchers.get_node_index_by_story_id_and_node_id(
                 self.STORY_ID, 'node_5')
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Story with id story_id_2 does not exist.'):
             story_fetchers.get_node_index_by_story_id_and_node_id(
                 'story_id_2', self.NODE_ID_1)
