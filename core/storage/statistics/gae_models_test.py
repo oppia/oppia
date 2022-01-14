@@ -430,7 +430,7 @@ class RateExplorationEventLogEntryModelUnitTests(
         event_id = stats_models.RateExplorationEventLogEntryModel.create(
             'exp_id', 'user_id', 2, 1
         )
-        event_model = stats_models.CompleteExplorationEventLogEntryModel.get(
+        event_model = stats_models.RateExplorationEventLogEntryModel.get(
             event_id)
 
         # Ruling out the possibility of None for mypy type checking.
