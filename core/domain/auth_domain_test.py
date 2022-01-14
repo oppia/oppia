@@ -44,11 +44,11 @@ class AuthIdUserIdPairTests(test_utils.TestBase):
 class AuthClaimsTests(test_utils.TestBase):
 
     def test_rejects_empty_auth_id(self) -> None:
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception, 'auth_id must not be empty'
         ):
             auth_domain.AuthClaims('', None, False)
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception, 'auth_id must not be empty'
         ):
             auth_domain.AuthClaims('', None, True)
@@ -124,64 +124,64 @@ class UserAuthDetailsTests(test_utils.GenericTestBase):
 
     def test_validate_non_str_user_id(self) -> None:
         self.user_auth_details.user_id = 123
-        self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, 'user_id must be a string',
             self.user_auth_details.validate)
 
     def test_validate_user_id_enforces_all_lowercase_letters(self) -> None:
         self.user_auth_details.user_id = 'uid_%s%s' % ('a' * 31, 'A')
-        self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, 'wrong format',
             self.user_auth_details.validate)
 
     def test_validate_user_id_enforces_length_to_be_at_least_36(self) -> None:
         self.user_auth_details.user_id = 'uid_%s' % ('a' * 31)
-        self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, 'wrong format',
             self.user_auth_details.validate)
 
     def test_validate_user_id_enforces_uid_prefix(self) -> None:
         self.user_auth_details.user_id = 'a' * 36
-        self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, 'wrong format',
             self.user_auth_details.validate)
 
     def test_validate_empty_user_id(self) -> None:
         self.user_auth_details.user_id = ''
-        self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, 'No user_id specified',
             self.user_auth_details.validate)
 
     def test_validate_parent_user_id_enforces_all_lowercase_letters(
         self) -> None:
         self.user_auth_details.parent_user_id = 'uid_%s%s' % ('a' * 31, 'A')
-        self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, 'wrong format',
             self.user_auth_details.validate)
 
     def test_validate_parent_user_id_enforces_length_to_be_at_least_36(
         self) -> None:
         self.user_auth_details.parent_user_id = 'uid_%s' % ('a' * 31)
-        self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, 'wrong format',
             self.user_auth_details.validate)
 
     def test_validate_parent_user_id_enforces_uid_prefix(
         self) -> None:
         self.user_auth_details.parent_user_id = 'a' * 36
-        self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, 'wrong format',
             self.user_auth_details.validate)
 
     def test_validate_non_str_gae_id(self) -> None:
         self.user_auth_details.gae_id = 123
-        self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, 'gae_id must be a string',
             self.user_auth_details.validate)
 
     def test_validate_non_str_firebase_auth_id(self) -> None:
         self.user_auth_details.firebase_auth_id = 123
-        self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, 'firebase_auth_id must be a string',
             self.user_auth_details.validate)
 
@@ -190,7 +190,7 @@ class UserAuthDetailsTests(test_utils.GenericTestBase):
             user_models.UserSettingsModel.get_new_id(''))
         self.user_auth_details.gae_id = self.auth_id
         self.user_auth_details.firebase_auth_id = None
-        self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError,
             'parent_user_id must not be set for a full user',
             self.user_auth_details.validate)
@@ -202,7 +202,7 @@ class UserAuthDetailsTests(test_utils.GenericTestBase):
             user_models.UserSettingsModel.get_new_id(''))
         self.user_auth_details.gae_id = None
         self.user_auth_details.firebase_auth_id = self.auth_id
-        self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError,
             'parent_user_id must not be set for a full user',
             self.user_auth_details.validate)
@@ -211,7 +211,7 @@ class UserAuthDetailsTests(test_utils.GenericTestBase):
         self.user_auth_details.parent_user_id = None
         self.user_auth_details.gae_id = None
         self.user_auth_details.firebase_auth_id = None
-        self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError,
             'parent_user_id must be set for a profile user',
             self.user_auth_details.validate)

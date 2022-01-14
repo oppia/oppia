@@ -39,6 +39,7 @@ import { DeleteWorkedExampleComponent } from './modal-templates/delete-worked-ex
 import { AddWorkedExampleModalComponent } from './modal-templates/add-worked-example.component';
 import { SkillRubricsEditorComponent } from './editor-tab/skill-rubrics-editor/skill-rubrics-editor.component';
 import { AddMisconceptionModalComponent } from './modal-templates/add-misconception-modal.component';
+import { SkillMisconceptionsEditorComponent } from './editor-tab/skill-misconceptions-editor/skill-misconceptions-editor.component';
 
 @NgModule({
   imports: [
@@ -59,7 +60,8 @@ import { AddMisconceptionModalComponent } from './modal-templates/add-misconcept
     AddWorkedExampleModalComponent,
     DeleteWorkedExampleComponent,
     SkillRubricsEditorComponent,
-    AddMisconceptionModalComponent
+    AddMisconceptionModalComponent,
+    SkillMisconceptionsEditorComponent
   ],
   entryComponents: [
     DeleteMisconceptionModalComponent,
@@ -71,7 +73,8 @@ import { AddMisconceptionModalComponent } from './modal-templates/add-misconcept
     AddWorkedExampleModalComponent,
     DeleteWorkedExampleComponent,
     SkillRubricsEditorComponent,
-    AddMisconceptionModalComponent
+    AddMisconceptionModalComponent,
+    SkillMisconceptionsEditorComponent
   ],
   providers: [
     {

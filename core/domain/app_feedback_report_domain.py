@@ -24,16 +24,20 @@ import re
 from core import feconf
 from core import utils
 from core.domain import app_feedback_report_constants
-from core.domain import exp_services
 from core.domain import story_domain
 from core.domain import topic_domain
-from core.platform import models
 
-from typing import Dict, Optional, Type, List, Any, Match # isort:skip # pylint: disable=unused-import
+from typing import Any, Dict, List, Match, Optional
+
+from core.domain import exp_services  # pylint: disable=invalid-import-from # isort:skip
+from core.platform import models  # pylint: disable=invalid-import-from # isort:skip
 
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import app_feedback_report_models
+
+# TODO(#14537): Refactor this file and remove imports marked
+# with 'invalid-import-from'.
 
 (app_feedback_report_models,) = models.Registry.import_models(
     [models.NAMES.app_feedback_report])

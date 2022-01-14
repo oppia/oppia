@@ -30,7 +30,6 @@ import logging
 import os
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.domain import activity_services
@@ -1071,8 +1070,7 @@ def compute_collection_contributors_summary(collection_id):
     contributor_ids = list(contributors_summary)
     # Remove IDs that are deleted or do not exist.
     users_settings = user_services.get_users_settings(contributor_ids)
-    for contributor_id, user_settings in python_utils.ZIP(
-            contributor_ids, users_settings):
+    for contributor_id, user_settings in zip(contributor_ids, users_settings):
         if user_settings is None:
             del contributors_summary[contributor_id]
 
