@@ -72,38 +72,36 @@ describe('I18nLanguageCodeService', () => {
       'I18N_TOPIC_12345axa_TITLE')).toBe(false);
   });
 
-  it('should set classroom translation key correctly', () => {
-    spyOn(i18nLanguageCodeService, 'hasTranslation').and.returnValue(false);
+  it('should get classroom translation key correctly', () => {
+    spyOn(i18nLanguageCodeService, 'hasTranslation')
+      .and.returnValues(false, true, false, true);
+
     i18nLanguageCodeService.setI18nLanguageCode('en');
     expect(i18nLanguageCodeService.getClassroomTranslationKey(
       'Math')).toBe('Math');
-    spyOn(i18nLanguageCodeService, 'hasTranslation').and.returnValue(true);
     expect(i18nLanguageCodeService.getClassroomTranslationKey(
       'Math')).toBe('Math');
 
     i18nLanguageCodeService.setI18nLanguageCode('es');
-    spyOn(i18nLanguageCodeService, 'hasTranslation').and.returnValue(false);
     expect(i18nLanguageCodeService.getClassroomTranslationKey(
       'Math')).toBe('Math');
-    spyOn(i18nLanguageCodeService, 'hasTranslation').and.returnValue(true);
     expect(i18nLanguageCodeService.getClassroomTranslationKey(
       'Math')).toBe('I18N_CLASSROOM_MATH_TITLE');
   });
 
-  it('should set topic translation key correctly', () => {
+  it('should get topic translation key correctly', () => {
+    spyOn(i18nLanguageCodeService, 'hasTranslation')
+      .and.returnValues(false, true, false, true);
+
     i18nLanguageCodeService.setI18nLanguageCode('en');
-    spyOn(i18nLanguageCodeService, 'hasTranslation').and.returnValue(false);
     expect(i18nLanguageCodeService.getTopicTitleTranslationKey(
       'abcd1234', 'Fractions')).toBe('Fractions');
-    spyOn(i18nLanguageCodeService, 'hasTranslation').and.returnValue(true);
     expect(i18nLanguageCodeService.getTopicTitleTranslationKey(
       'abcd1234', 'Fractions')).toBe('Fractions');
 
     i18nLanguageCodeService.setI18nLanguageCode('es');
-    spyOn(i18nLanguageCodeService, 'hasTranslation').and.returnValue(false);
     expect(i18nLanguageCodeService.getTopicTitleTranslationKey(
       'abcd1234', 'Fractions')).toBe('Fractions');
-    spyOn(i18nLanguageCodeService, 'hasTranslation').and.returnValue(true);
     expect(i18nLanguageCodeService.getTopicTitleTranslationKey(
       'abcd1234', 'Fractions')).toBe('I18N_TOPIC_abcd1234_TITLE');
   });
