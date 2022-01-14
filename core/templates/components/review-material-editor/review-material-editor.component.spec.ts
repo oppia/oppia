@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,80 +12,92 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
-
 /**
  * @fileoverview Unit tests for Review Material Editor Component.
  */
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ChangeDetectorRef, NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import { ReviewMaterialEditorComponent } from './review-material-editor.component';
+
 describe('Review Material Editor Component', () => {
-  let ctrl = null;
-  let $scope = null;
-  let $rootScope = null;
+  let component: ReviewMaterialEditorComponent;
+  let fixture: ComponentFixture<ReviewMaterialEditorComponent>;
 
-  beforeEach(angular.mock.module('oppia'));
-  importAllAngularServices();
-
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
-
-    ctrl = $componentController('reviewMaterialEditor', {
-      $scope: $scope
-    }, {
-      getBindableDict: () => {
-        return {
-          displayedConceptCardExplanation: 'Explanation'
-        };
-      },
-      onSaveExplanation: () => {}
-    });
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      declarations: [
+        ReviewMaterialEditorComponent
+      ],
+      providers: [
+        ChangeDetectorRef
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
 
+  beforeEach(() => {
+    fixture = TestBed.createComponent(ReviewMaterialEditorComponent);
+    component = fixture.componentInstance;
+
+    component.bindableDict = {
+      displayedConceptCardExplanation: 'Explanation',
+      displayedWorkedExamples: 'Examples'
+    };
+    fixture.detectChanges();
+  });
+
   it('should set component properties on initialization', () => {
-    expect(ctrl.HTML_SCHEMA).toEqual(undefined);
-    expect(ctrl.editableExplanation).toBe(undefined);
-    expect(ctrl.conceptCardExplanationEditorIsShown).toBe(undefined);
-
-    ctrl.$onInit();
-
-    expect(ctrl.HTML_SCHEMA).toEqual({
+    expect(component.HTML_SCHEMA).toEqual({
       type: 'html'
     });
-    expect(ctrl.editableExplanation).toBe('Explanation');
-    expect(ctrl.conceptCardExplanationEditorIsShown).toBe(false);
+    expect(component.editableExplanation).toBe('Explanation');
+    expect(component.conceptCardExplanationEditorIsShown).toBe(false);
   });
 
   it('should open concept card explanation editor when user' +
     ' clicks to edit concept card', () => {
-    ctrl.conceptCardExplanationEditorIsShown = false;
+    component.conceptCardExplanationEditorIsShown = false;
 
-    expect(ctrl.editableExplanation).toBe(undefined);
+    component.openConceptCardExplanationEditor();
 
-    ctrl.openConceptCardExplanationEditor();
-
-    expect(ctrl.editableExplanation).toBe('Explanation');
-    expect(ctrl.conceptCardExplanationEditorIsShown).toBe(true);
+    expect(component.conceptCardExplanationEditorIsShown).toBe(true);
   });
 
   it('should close concept card explanation editor when user' +
     ' clicks on close', () => {
-    ctrl.conceptCardExplanationEditorIsShown = true;
+    component.conceptCardExplanationEditorIsShown = true;
 
-    ctrl.closeConceptCardExplanationEditor();
+    component.closeConceptCardExplanationEditor();
 
-    expect(ctrl.conceptCardExplanationEditorIsShown).toBe(false);
+    expect(component.conceptCardExplanationEditorIsShown).toBe(false);
   });
 
   it('should save concept card explanation when user clicks on save', () => {
-    spyOn(ctrl, 'onSaveExplanation');
-    ctrl.editableExplanation = 'Explanation';
+    spyOn(component.onSaveExplanation, 'emit');
+    component.editableExplanation = 'explanation';
 
-    ctrl.saveConceptCardExplanation();
+    component.saveConceptCardExplanation();
 
-    expect(ctrl.onSaveExplanation)
+    expect(component.onSaveExplanation.emit)
       .toHaveBeenCalledWith(SubtitledHtml.createDefault(
-        ctrl.editableExplanation, 'explanation'));
+        component.editableExplanation, 'explanation'));
+  });
+
+  it('should get schema', () => {
+    expect(component.getSchema())
+      .toEqual(component.HTML_SCHEMA);
+  });
+
+  it('should update editableExplanation', () => {
+    component.editableExplanation = 'Old Explanation';
+
+    let exp = 'New Explanation';
+    component.updateLocalExp(exp);
+
+    expect(component.editableExplanation).toEqual(exp);
   });
 });
