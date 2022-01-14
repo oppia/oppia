@@ -291,7 +291,7 @@ class ActivityRightsTests(test_utils.GenericTestBase):
 
         self.activity_rights.assign_new_role(
             '123456', rights_domain.ROLE_VOICE_ARTIST)
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception, 'This user already can voiceover this exploration.'):
             self.activity_rights.assign_new_role(
                 '123456', rights_domain.ROLE_VOICE_ARTIST)
@@ -299,7 +299,7 @@ class ActivityRightsTests(test_utils.GenericTestBase):
         self.activity_rights.status = rights_domain.ACTIVITY_STATUS_PRIVATE
         self.activity_rights.assign_new_role(
                 '123456', rights_domain.ROLE_VIEWER)
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception, 'This user already can view this exploration.'):
             self.activity_rights.assign_new_role(
                 '123456', rights_domain.ROLE_VIEWER)
