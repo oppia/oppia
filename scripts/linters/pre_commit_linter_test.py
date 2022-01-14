@@ -158,7 +158,7 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
 
         with self.print_swap, self.sys_swap, install_swap:
             with get_filenames_from_path_swap:
-                with self.assertRaisesRegexp(
+                with self.assertRaisesRegex(
                     RuntimeError, 'mock_file in multiple shards'
                 ):
                     pre_commit_linter.main(args=['--shard', '1'])
@@ -216,13 +216,13 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
             'Unexpected whitespace before \":\"'], self.linter_stdout)
 
     def test_main_with_invalid_filepath_with_path_arg(self):
-        with self.print_swap, self.assertRaisesRegexp(SystemExit, '1'):
+        with self.print_swap, self.assertRaisesRegex(SystemExit, '1'):
             pre_commit_linter.main(args=['--path=invalid_file.py'])
         self.assert_same_list_elements(
             ['Could not locate file or directory'], self.linter_stdout)
 
     def test_main_with_invalid_filepath_with_file_arg(self):
-        with self.print_swap, self.assertRaisesRegexp(SystemExit, '1'):
+        with self.print_swap, self.assertRaisesRegex(SystemExit, '1'):
             pre_commit_linter.main(args=['--files=invalid_file.py'])
         self.assert_same_list_elements(
             ['The following file(s) do not exist'], self.linter_stdout)
@@ -251,7 +251,7 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
         self.assertFalse(all_checks_passed(self.linter_stdout))
 
     def test_main_with_only_check_file_extensions_arg_with_js_ts_options(self):
-        with self.print_swap, self.assertRaisesRegexp(SystemExit, '1'):
+        with self.print_swap, self.assertRaisesRegex(SystemExit, '1'):
             pre_commit_linter.main(
                 args=['--path=%s' % VALID_TS_FILEPATH,
                       '--only-check-file-extensions', 'ts', 'js'])
