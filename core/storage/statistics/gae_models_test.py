@@ -436,7 +436,7 @@ class RateExplorationEventLogEntryModelUnitTests(
         # Ruling out the possibility of None for mypy type checking.
         assert event_model is not None
         self.assertEqual(event_model.exploration_id, 'exp_id')
-        self.assertEqual(event_model.rating, 1)
+        self.assertEqual(event_model.rating, 2)
         self.assertEqual(event_model.old_rating, 1)
 
     def test_get_model_association_to_user(self) -> None:
