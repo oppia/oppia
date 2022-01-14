@@ -109,7 +109,7 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
 
     def _assert_validation_error(self, expected_error_substring):
         """Checks that the topic passes strict validation."""
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, expected_error_substring):
             self.subtopic_page.validate()
 
@@ -250,20 +250,20 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
 
     def test_validate_version_number(self):
         self.subtopic_page.version = 'invalid_version'
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected version number to be an int'):
             self.subtopic_page.validate()
 
     def test_validate_page_contents_schema_version_type(self):
         self.subtopic_page.page_contents_schema_version = 'invalid_version'
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Expected page contents schema version to be an integer'):
             self.subtopic_page.validate()
 
     def test_validate_page_contents_schema_version(self):
         self.subtopic_page.page_contents_schema_version = 0
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Expected page contents schema version to be %s'
             % feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION):
@@ -341,17 +341,17 @@ class SubtopicPageContentsDomainUnitTests(test_utils.GenericTestBase):
 class SubtopicPageChangeTests(test_utils.GenericTestBase):
 
     def test_subtopic_page_change_object_with_missing_cmd(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Missing cmd key in change dict'):
             subtopic_page_domain.SubtopicPageChange({'invalid': 'data'})
 
     def test_subtopic_page_change_object_with_invalid_cmd(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Command invalid is not allowed'):
             subtopic_page_domain.SubtopicPageChange({'cmd': 'invalid'})
 
     def test_subtopic_page_change_object_with_missing_attribute_in_cmd(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'The following required attributes are missing: '
                 'new_value, old_value')):
@@ -361,7 +361,7 @@ class SubtopicPageChangeTests(test_utils.GenericTestBase):
             })
 
     def test_subtopic_page_change_object_with_extra_attribute_in_cmd(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'The following extra attributes are present: invalid')):
             subtopic_page_domain.SubtopicPageChange({
@@ -373,7 +373,7 @@ class SubtopicPageChangeTests(test_utils.GenericTestBase):
 
     def test_subtopic_page_change_object_with_invalid_subtopic_page_property(
             self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'Value for property_name in cmd update_subtopic_page_property: '
                 'invalid is not allowed')):
