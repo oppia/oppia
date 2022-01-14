@@ -23,10 +23,14 @@ import re
 
 from core import utils
 from core.constants import constants
-from core.domain import html_cleaner
 
 from typing import List, Optional
 from typing_extensions import TypedDict
+
+from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
+
+# TODO(#14537): Refactor this file and remove imports marked
+# with 'invalid-import-from'.
 
 # This is same as base_models.ID_Length.
 BLOG_POST_ID_LENGTH = 12

@@ -20,7 +20,10 @@ from __future__ import annotations
 
 from core import feconf
 from core import utils
-from core.platform import models
+from core.platform import models   # pylint: disable=invalid-import-from # isort:skip
+
+# TODO(#14537): Refactor this file and remove imports marked
+# with 'invalid-import-from'.
 
 storage_services = models.Registry.import_storage_services()
 app_identity_services = models.Registry.import_app_identity_services()

@@ -31,12 +31,16 @@ from core import schema_utils
 from core import utils
 from core.constants import constants
 from core.domain import customization_args_util
-from core.domain import html_cleaner
-from core.domain import interaction_registry
 from core.domain import param_domain
-from core.domain import rules_registry
-from core.domain import translatable_object_registry
 from extensions.objects.models import objects
+
+from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
+from core.domain import interaction_registry  # pylint: disable=invalid-import-from # isort:skip
+from core.domain import rules_registry  # pylint: disable=invalid-import-from # isort:skip
+from core.domain import translatable_object_registry  # pylint: disable=invalid-import-from # isort:skip
+
+# TODO(#14537): Refactor this file and remove imports marked
+# with 'invalid-import-from'.
 
 
 class AnswerGroup:

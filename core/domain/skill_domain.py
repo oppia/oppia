@@ -24,9 +24,13 @@ from core import feconf
 from core import utils
 from core.constants import constants
 from core.domain import change_domain
-from core.domain import html_cleaner
-from core.domain import html_validation_service
 from core.domain import state_domain
+
+from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
+from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
+
+# TODO(#14537): Refactor this file and remove imports marked
+# with 'invalid-import-from'.
 
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
