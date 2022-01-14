@@ -102,6 +102,8 @@ import { AddHintModalComponent } from 'pages/exploration-editor-page/editor-tab/
 import { SmoothHeightAnimatorComponent } from './smooth-height/smooth-height-animator.component';
 import { QuestionMisconceptionSelectorComponent } from './question-directives/question-misconception-selector/question-misconception-selector.component';
 import { ReviewMaterialEditorComponent } from './review-material-editor/review-material-editor.component';
+import { TagMisconceptionModalComponent } from './question-directives/question-misconception-editor/tag-misconception-modal-component';
+import { QuestionMisconceptionEditorComponent } from './question-directives/question-misconception-editor/question-misconception-editor.component';
 
 // Pipes.
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
@@ -220,7 +222,9 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     DeleteSolutionModalComponent,
     SavePendingChangesModalComponent,
     AddHintModalComponent,
-    ReviewMaterialEditorComponent
+    ReviewMaterialEditorComponent,
+    TagMisconceptionModalComponent,
+    QuestionMisconceptionEditorComponent
   ],
 
   entryComponents: [
@@ -289,7 +293,9 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     DeleteSolutionModalComponent,
     SavePendingChangesModalComponent,
     AddHintModalComponent,
-    ReviewMaterialEditorComponent
+    ReviewMaterialEditorComponent,
+    TagMisconceptionModalComponent,
+    QuestionMisconceptionEditorComponent
   ],
 
   exports: [
@@ -371,7 +377,9 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     DeleteHintModalComponent,
     DeleteLastHintModalComponent,
     DeleteSolutionModalComponent,
-    ReviewMaterialEditorComponent
+    ReviewMaterialEditorComponent,
+    TagMisconceptionModalComponent,
+    QuestionMisconceptionEditorComponent
   ],
 })
 

@@ -16,19 +16,20 @@
  * @fileoverview Component for the question misconception selector.
  */
 
-import { Component, Input, OnInit, Output } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import cloneDeep from 'lodash/cloneDeep';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import { Misconception } from 'domain/skill/MisconceptionObjectFactory';
 
 @Component({
   selector: 'oppia-question-misconception-selector',
   templateUrl: './question-misconception-selector.component.html'
 })
 export class QuestionMisconceptionSelectorComponent implements OnInit {
-  @Input() misconceptionFeedbackIsUsed;
-  @Input() selectedMisconception;
-  @Input() selectedMisconceptionSkillId;
+  @Input() misconceptionFeedbackIsUsed: boolean;
+  @Input() selectedMisconception: Misconception;
+  @Input() selectedMisconceptionSkillId: string;
   misconceptionsBySkill;
 
   constructor(
@@ -40,14 +41,14 @@ export class QuestionMisconceptionSelectorComponent implements OnInit {
       this.stateEditorService.getMisconceptionsBySkill());
   }
 
-  selectMisconception(misconception, skillId): void {
-  this.selectedMisconception = cloneDeep(misconception);
-  this.selectedMisconceptionSkillId = skillId;
+  selectMisconception(misconception: Misconception, skillId: string): void {
+    this.selectedMisconception = cloneDeep(misconception);
+    this.selectedMisconceptionSkillId = skillId;
   }
 
   toggleMisconceptionFeedbackUsage(): void {
-  this.misconceptionFeedbackIsUsed = (
-    !this.misconceptionFeedbackIsUsed);
+    this.misconceptionFeedbackIsUsed = (
+      !this.misconceptionFeedbackIsUsed);
   }
 }
 

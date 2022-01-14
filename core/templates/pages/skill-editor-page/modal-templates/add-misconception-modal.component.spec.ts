@@ -118,7 +118,7 @@ describe('Add Misconception Modal Component', function() {
     fixture.detectChanges();
   });
 
-  it('should initialize $scope properties after controller is initialized',
+  it('should initialize properties after component is initialized',
     () => {
       expect(component.skill).toEqual(skillObject);
       expect(component.misconceptionName).toBe('');
@@ -169,6 +169,7 @@ describe('Add Misconception Modal Component', function() {
   it('should update misconceptionNotes', () => {
     let notes = 'notes';
     component.ngOnInit();
+
     component.updateLocalForm(notes);
 
     expect(component.misconceptionNotes).toEqual(notes);
@@ -177,6 +178,7 @@ describe('Add Misconception Modal Component', function() {
   it('should update misconceptionFeedback', () => {
     let feedback = 'feedback';
     component.ngOnInit();
+
     component.updateLocalFeedback(feedback);
 
     expect(component.misconceptionFeedback).toEqual(feedback);

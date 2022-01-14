@@ -70,9 +70,10 @@ angular.module('oppia').controller('AddAnswerGroupModalController', [
       $scope.tmpOutcome.feedback = outcome.feedback;
     };
     $scope.updateTaggedMisconception = function(
-        misconceptionId, skillId) {
+        taggedMisconception) {
       $scope.tmpTaggedSkillMisconceptionId = (
-        `${skillId}-${misconceptionId}`);
+        `${taggedMisconception.skillId}-${
+          taggedMisconception.misconceptionId}`);
     };
     $scope.openFeedbackEditor = function() {
       $scope.feedbackEditorIsOpen = true;
