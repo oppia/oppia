@@ -32,9 +32,9 @@ interface Answer {
   selector: 'oppia-response',
   templateUrl: './pencil-code-editor-response.component.html'
 })
-export class ResponePencilCodeEditorComponent implements OnInit {
-  @Input() answer;
-  answerCode;
+export class ResponePencilCodeEditor implements OnInit {
+  @Input() answer: string;
+  answerCode: string;
 
   constructor(
     private htmlEscaperService: HtmlEscaperService
@@ -48,5 +48,5 @@ export class ResponePencilCodeEditorComponent implements OnInit {
 
 angular.module('oppia').directive(
   'oppiaResponsePencilCodeEditor', downgradeComponent(
-    {component: ResponePencilCodeEditorComponent}
+    {component: ResponePencilCodeEditor}
   ) as angular.IDirectiveFactory);

@@ -25,12 +25,12 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { MaterialModule } from 'modules/material.module';
 import { SharedFormsModule } from 'components/forms/shared-forms.module';
-import { PencilCodeEditorComponent } from './directives/oppia-interactive-pencil-code-editor.component';
-import { ResponePencilCodeEditorComponent } from './directives/oppia-response-pencil-code-editor.component';
-import { ShortResponePencilCodeEditorComponent } from './directives/oppia-short-response-pencil-code-editor.component';
+import { PencilCodeEditor } from './directives/oppia-interactive-pencil-code-editor.component';
+import { ResponePencilCodeEditor } from './directives/oppia-response-pencil-code-editor.component';
+import { ShortResponePencilCodeEditor } from './directives/oppia-short-response-pencil-code-editor.component';
 import { SharedPipesModule } from 'filters/shared-pipes.module';
 import { TranslateModule } from '@ngx-translate/core';
-import { PencilCodeResetConfirmationComponent } from './directives/pencil-code-reset-confirmation.component';
+import { PencilCodeResetConfirmation } from './directives/pencil-code-reset-confirmation.component';
 
 @NgModule({
   imports: [
@@ -42,22 +42,22 @@ import { PencilCodeResetConfirmationComponent } from './directives/pencil-code-r
     TranslateModule
   ],
   declarations: [
-    PencilCodeEditorComponent,
-    ResponePencilCodeEditorComponent,
-    ShortResponePencilCodeEditorComponent,
-    PencilCodeResetConfirmationComponent
+    PencilCodeEditor,
+    ResponePencilCodeEditor,
+    ShortResponePencilCodeEditor,
+    PencilCodeResetConfirmation
   ],
   entryComponents: [
-    PencilCodeEditorComponent,
-    ResponePencilCodeEditorComponent,
-    ShortResponePencilCodeEditorComponent,
-    PencilCodeResetConfirmationComponent
+    PencilCodeEditor,
+    ResponePencilCodeEditor,
+    ShortResponePencilCodeEditor,
+    PencilCodeResetConfirmation
   ],
   exports: [
-    PencilCodeEditorComponent,
-    ResponePencilCodeEditorComponent,
-    ShortResponePencilCodeEditorComponent,
-    PencilCodeResetConfirmationComponent
+    PencilCodeEditor,
+    ResponePencilCodeEditor,
+    ShortResponePencilCodeEditor,
+    PencilCodeResetConfirmation
   ],
 })
 

@@ -32,13 +32,13 @@ interface Answer {
   selector: 'oppia-short-response',
   templateUrl: './pencil-code-editor-short-response.component.html'
 })
-export class ShortResponePencilCodeEditorComponent implements OnInit {
+export class ShortResponePencilCodeEditor implements OnInit {
   constructor(
     private htmlEscaperService: HtmlEscaperService
   ) {}
 
   @Input() answer;
-  answerCode;
+  answerCode: string;
 
   ngOnInit(): void {
     this.answerCode = (
@@ -48,5 +48,5 @@ export class ShortResponePencilCodeEditorComponent implements OnInit {
 
 angular.module('oppia').directive(
   'oppiaShortResponsePencilCodeEditor', downgradeComponent(
-    {component: ShortResponePencilCodeEditorComponent}
+    {component: ShortResponePencilCodeEditor}
   ) as angular.IDirectiveFactory);

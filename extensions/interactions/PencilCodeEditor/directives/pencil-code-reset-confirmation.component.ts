@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,13 +23,13 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
   selector: 'oppia-pencil-code-reset-confirmation',
   templateUrl: './pencil-code-reset-confirmation.component.html'
 })
-export class PencilCodeResetConfirmationComponent {
+export class PencilCodeResetConfirmation {
   constructor(
-        private ngbActiveModal: NgbActiveModal
+    private ngbActiveModal: NgbActiveModal
   ) {}
 
-  confirm(): void {
-    this.ngbActiveModal.close();
+  confirm(value: string): void {
+    this.ngbActiveModal.close(value);
   }
 
   cancel(): void {

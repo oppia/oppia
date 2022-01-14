@@ -16,33 +16,44 @@
  * @fileoverview Directive for the PencilCodeEditor short response.
  */
 
-describe('oppiaShortResponsePencilCodeEditor', function() {
-  let ctrl = null;
-  let directive = null;
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { HtmlEscaperService } from 'services/html-escaper.service';
+import { ShortResponePencilCodeEditor } from './oppia-short-response-pencil-code-editor.component';
 
-  let mockHtmlEscaperService = {
-    escapedJsonToObj: function(answer) {
-      return answer;
+describe('oppiaShortResponsePencilCodeEditor', () => {
+  let component: ShortResponePencilCodeEditor;
+  let fixture: ComponentFixture<ShortResponePencilCodeEditor>;
+
+  class mockHtmlEscaperService {
+    escapedJsonToObj(answer: string): Object {
+      return JSON.parse(answer);
     }
-  };
+  }
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('HtmlEscaperService', mockHtmlEscaperService);
-
-    $provide.value('$attrs', {
-      answer: {
-        code: '# Add the initial code snippet here.'
-      }
-    });
-  }));
-  beforeEach(angular.mock.inject(function($injector) {
-    directive = $injector.get('oppiaShortResponsePencilCodeEditorDirective')[0];
-    ctrl = $injector.instantiate(directive.controller);
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [ShortResponePencilCodeEditor],
+      providers: [
+        {
+          provide: HtmlEscaperService,
+          useClass: mockHtmlEscaperService
+        }
+      ],
+    }).compileComponents();
   }));
 
-  it('should initialise the component when submits answer', function() {
-    ctrl.$onInit();
-    expect(ctrl.answerCode).toEqual('# Add the initial code snippet here.');
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(ShortResponePencilCodeEditor);
+    component = fixture.componentInstance;
+    component.answer = {
+      code: '# Add the initial code snippet here.'
+    };
+  });
+
+  it('should initialise the component when submits answer', () => {
+    component.ngOnInit();
+    expect(component.answerCode).toEqual(
+      '# Add the initial code snippet here.');
   });
 });
