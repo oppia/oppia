@@ -622,6 +622,9 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
             params: dict. Current parameter values, map of parameter name
                 to value.
             play_type: str. Type of play-through.
+
+        Returns:
+            str. New unique ID for this entity class.
         """
         # TODO(sll): Some events currently do not have an entity ID that was
         # set using this method; it was randomly set instead due to an error.
@@ -875,6 +878,9 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
             rating: int. Value of rating assigned to exploration.
             old_rating: int or None. Will be None if the user rates an
                 exploration for the first time.
+
+        Returns:
+            str. New unique ID for this entity class.
         """
         entity_id = cls.get_new_event_entity_id(
             exp_id, user_id)

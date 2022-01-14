@@ -17,7 +17,6 @@
 """Tests for Oppia statistics models."""
 
 from __future__ import annotations
-from asyncio import events
 
 import types
 
