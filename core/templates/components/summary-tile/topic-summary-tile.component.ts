@@ -23,7 +23,7 @@ import { ClassroomDomainConstants } from 'domain/classroom/classroom-domain.cons
 import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'oppia-topic-summary-tile',
@@ -50,8 +50,8 @@ export class TopicSummaryTileComponent {
           this.topicSummary.getThumbnailFilename());
     }
     this.topicNameTranslationKey = this.i18nLanguageCodeService.
-      getTopicTitleTranslationKey(
-        this.topicSummary.getId(), this.topicSummary.getName());
+      getTopicTranslationKey(
+        this.topicSummary.getId(), TranslationKeyType.Title);
   }
 
   getTopicPageUrl(): string {
@@ -85,6 +85,14 @@ export class TopicSummaryTileComponent {
       parseInt(bgColor.substring(4, 6), 16) - 100);
 
     return '#' + newRValue + newGValue + newBValue;
+  }
+
+  // Used for choosing from topic name or topic translation key to be
+  // displayed in the topic summary tile html block.
+  isTopicTranslationKeyToBeDisplayed(): boolean {
+    return this.i18nLanguageCodeService.isTranslationKeyToBeDisplayed(
+      this.topicNameTranslationKey
+    );
   }
 }
 

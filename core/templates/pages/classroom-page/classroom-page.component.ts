@@ -100,6 +100,14 @@ export class ClassroomPageComponent {
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
+
+  // Used for choosing from classroom name or topic translation key to be
+  // displayed in the classroom name html block.
+  isClassroomTranslationKeyToBeDisplayed(): boolean {
+    return this.i18nLanguageCodeService.isTranslationKeyToBeDisplayed(
+      this.classroomNameTranslationKey
+    );
+  }
 }
 
 angular.module('oppia').directive('oppiaClassroomPage',

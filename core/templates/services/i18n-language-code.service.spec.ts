@@ -18,7 +18,7 @@
 
 import { EventEmitter } from '@angular/core';
 
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
 import { Subscription } from 'rxjs';
 
 describe('I18nLanguageCodeService', () => {
@@ -65,45 +65,56 @@ describe('I18nLanguageCodeService', () => {
     expect(i18nLanguageCodeService.isCurrentLanguageEnglish()).toBe(false);
   });
 
-  it('should check whether translation key is present correctly', () => {
-    expect(i18nLanguageCodeService.hasTranslation(
+  it('should check whether translation key is valid correctly', () => {
+    spyOn(i18nLanguageCodeService, 'isTranslationKeyValid')
+      .and.returnValues(true, false);
+    expect(i18nLanguageCodeService.isTranslationKeyValid(
       'I18N_CLASSROOM_MATH_TITLE')).toBe(true);
-    expect(i18nLanguageCodeService.hasTranslation(
+    expect(i18nLanguageCodeService.isTranslationKeyValid(
       'I18N_TOPIC_12345axa_TITLE')).toBe(false);
   });
 
   it('should get classroom translation key correctly', () => {
-    spyOn(i18nLanguageCodeService, 'hasTranslation')
-      .and.returnValues(false, true, false, true);
+    spyOn(i18nLanguageCodeService, 'getClassroomTranslationKey')
+      .and.returnValues(
+        'I18N_CLASSROOM_MATH_TITLE', 'I18N_CLASSROOM_SCIENCE_TITLE'
+      );
 
-    i18nLanguageCodeService.setI18nLanguageCode('en');
-    expect(i18nLanguageCodeService.getClassroomTranslationKey(
-      'Math')).toBe('Math');
-    expect(i18nLanguageCodeService.getClassroomTranslationKey(
-      'Math')).toBe('Math');
-
-    i18nLanguageCodeService.setI18nLanguageCode('es');
-    expect(i18nLanguageCodeService.getClassroomTranslationKey(
-      'Math')).toBe('Math');
     expect(i18nLanguageCodeService.getClassroomTranslationKey(
       'Math')).toBe('I18N_CLASSROOM_MATH_TITLE');
+    expect(i18nLanguageCodeService.getClassroomTranslationKey(
+      'Science')).toBe('I18N_CLASSROOM_SCIENCE_TITLE');
   });
 
   it('should get topic translation key correctly', () => {
-    spyOn(i18nLanguageCodeService, 'hasTranslation')
+    spyOn(i18nLanguageCodeService, 'getTopicTranslationKey')
+      .and.returnValues(
+        'I18N_TOPIC_abc1234_TITLE', 'I18N_TOPIC_abc1234_DESCRIPTION'
+      );
+
+    expect(i18nLanguageCodeService.getTopicTranslationKey(
+      'abc1234', TranslationKeyType.Title)).toBe(
+        'I18N_TOPIC_abc1234_TITLE');
+    expect(i18nLanguageCodeService.getTopicTranslationKey(
+      'abc1234', TranslationKeyType.Description)).toBe(
+        'I18N_TOPIC_abc1234_DESCRIPTION');
+  });
+
+  it('should check if translation key is to be displayed correctly', () => {
+    spyOn(i18nLanguageCodeService, 'isTranslationKeyValid')
       .and.returnValues(false, true, false, true);
 
     i18nLanguageCodeService.setI18nLanguageCode('en');
-    expect(i18nLanguageCodeService.getTopicTitleTranslationKey(
-      'abcd1234', 'Fractions')).toBe('Fractions');
-    expect(i18nLanguageCodeService.getTopicTitleTranslationKey(
-      'abcd1234', 'Fractions')).toBe('Fractions');
+    expect(i18nLanguageCodeService.isTranslationKeyToBeDisplayed(
+      'abcd1234')).toBe(false);
+    expect(i18nLanguageCodeService.isTranslationKeyToBeDisplayed(
+      'abcd1234')).toBe(false);
 
     i18nLanguageCodeService.setI18nLanguageCode('es');
-    expect(i18nLanguageCodeService.getTopicTitleTranslationKey(
-      'abcd1234', 'Fractions')).toBe('Fractions');
-    expect(i18nLanguageCodeService.getTopicTitleTranslationKey(
-      'abcd1234', 'Fractions')).toBe('I18N_TOPIC_abcd1234_TITLE');
+    expect(i18nLanguageCodeService.isTranslationKeyToBeDisplayed(
+      'abcd1234')).toBe(false);
+    expect(i18nLanguageCodeService.isTranslationKeyToBeDisplayed(
+      'abcd1234')).toBe(true);
   });
 
   it('should get event emitter for loading of preferred language codes', () => {
