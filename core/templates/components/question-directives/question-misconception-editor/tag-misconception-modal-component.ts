@@ -20,6 +20,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import { MisconceptionUpdatedValues } from '../question-misconception-selector/question-misconception-selector.component';
 
 @Component({
   selector: 'oppia-tag-misconception-modal',
@@ -46,6 +47,15 @@ export class TagMisconceptionModalComponent
     this.tempSelectedMisconception = null;
     this.tempSelectedMisconceptionSkillId = null;
     this.tempMisconceptionFeedbackIsUsed = true;
+  }
+
+  updateValues(newValues: MisconceptionUpdatedValues): void {
+    this.tempSelectedMisconception = (
+      newValues.misconception);
+    this.tempSelectedMisconceptionSkillId = (
+      newValues.skillId);
+    this.tempMisconceptionFeedbackIsUsed = (
+      newValues.feedbackIsUsed);
   }
 
   done(): void {

@@ -24,8 +24,8 @@ import { ExternalSaveService } from 'services/external-save.service';
 import { TagMisconceptionModalComponent } from './tag-misconception-modal-component';
 
 interface TaggedMisconception {
-  'misconceptionId': number;
-  'skillId': string;
+  misconceptionId: number;
+  skillId: string;
 }
 
 @Component({
@@ -61,7 +61,7 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
     this.selectedMisconceptionSkillId = null;
     this.misconceptionsBySkill = (
       this.stateEditorService.getMisconceptionsBySkill());
-    this.misconceptionEditorIsOpen = null;
+    this.misconceptionEditorIsOpen = false;
     let skillMisconceptionId = this.taggedSkillMisconceptionId;
     if (skillMisconceptionId) {
       if (typeof skillMisconceptionId === 'string' &&
@@ -140,5 +140,5 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
   }
 }
 
-angular.module('oppia').component('oppiaQuestionMisconceptionEditor',
+angular.module('oppia').directive('oppiaQuestionMisconceptionEditor',
   downgradeComponent({component: QuestionMisconceptionEditorComponent}));
