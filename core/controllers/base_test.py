@@ -110,8 +110,8 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         def get(self):
             self.render_template('invalid_page.html')
 
-        def head(self):
-            """Do a HEAD request. This is an unrecognized request method in our
+        def options(self):
+            """Do a OPTIONS request. This is an unrecognized request method in our
             codebase.
             """
             self.render_template({'invalid_page.html'})
@@ -280,7 +280,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             observed_log_messages.append(msg)
 
         with self.swap(logging, 'warning', mock_logging_function):
-            self.testapp.head('/mock', status=500)
+            self.testapp.options('/mock', status=500)
             self.assertEqual(len(observed_log_messages), 2)
             self.assertEqual(
                 observed_log_messages[0],
@@ -1850,6 +1850,86 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
         with self.swap(self, 'testapp', self.mock_testapp4):
             self.put_json('/mock_play_exploration', {}, csrf_token=csrf_token)
         self.logout()
+
+
+class HandlerClassWithSchemaInStillNeedsSchemaListRaiseErrorTest(
+        test_utils.GenericTestBase):
+    """This test ensures that, InternalServerError is raised for
+    the request with handler class which has schema but class name is still in
+    HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS.
+    """
+
+    class MockHandler(base.BaseHandler):
+        """Mock handler with schema."""
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {
+            'POST': {
+                'arg_a': {
+                    'schema': {
+                        'type': 'basestring'
+                    }
+                }
+            }
+        }
+
+        def post(self):
+            return self.render_json({})
+
+    def setUp(self):
+        super().setUp()
+        user_id = user_services.get_user_id_from_username('learneruser')
+        self.csrf_token = base.CsrfTokenManager.create_csrf_token(user_id)
+        self.payload = {'arg_a': 'val'}
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock', self.MockHandler, name='MockHandler')],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_post_request_raise_internal_server_error(self):
+        test_app_ctx = self.swap(self, 'testapp', self.testapp)
+        handler_class_still_needs_schema_list_ctx = self.swap(
+            handler_schema_constants, 'HANDLER_CLASS_NAMES_WITH_NO_SCHEMA',
+            ['MockHandler'])
+        with test_app_ctx, handler_class_still_needs_schema_list_ctx:
+            self.post_json(
+                '/mock', self.payload, csrf_token=self.csrf_token,
+                expected_status_int=500)
+
+
+class HeaderRequestsTests(test_utils.GenericTestBase):
+    """Tests to check header requests."""
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'entity_id': {
+                'schema': {
+                    'type': 'int'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+        def get(self, entity_id):
+            return self.render_json({'entity_id': entity_id})
+
+    def setUp(self):
+        super().setUp()
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication([
+            webapp2.Route(
+                '/mock/<entity_id>', self.MockHandler, name='MockHandler')],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_head_request_with_invalid_url_args_raises(self):
+        with self.swap(self, 'testapp', self.testapp):
+            self.testapp.head('/mock/not_int', status=400)
+
+    def test_valid_head_request_returns_only_headers(self):
+        with self.swap(self, 'testapp', self.testapp):
+            response = self.testapp.head('/mock/234', status=200)
+            self.assertEqual(response.body, b'')
+            self.assertIsNotNone(response.headers)
 
 
 class RequestMethodNotInHandlerClassDoNotRaiseMissingSchemaErrorTest(
