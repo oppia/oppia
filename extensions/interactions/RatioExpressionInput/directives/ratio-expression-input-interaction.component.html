@@ -1,13 +1,13 @@
 <form autocomplete="off" [attr.disabled]="!isValid ? true : null" role="form" class="form-horizontal">
   <!-- This ng-form is needed for submitting answer on hitting enter. -->
   <input type="text"
-        name="answer"
-        [(ngModel)]="answer"
-        (ngModelChange)="answerValueChanged()"
-        class="form-control"
-        (keyup.enter)="submitAnswer()"
-        [oppiaFocusOn]="labelForFocusTarget"
-        placeholder="{{ placeholder }}">
+         name="answer"
+         [(ngModel)]="answer"
+         (ngModelChange)="answerValueChanged()"
+         class="form-control"
+         (keyup.enter)="submitAnswer()"
+         [oppiaFocusOn]="labelForFocusTarget"
+         placeholder="{{ placeholder }}">
 
   <div class="oppia-form-error oppia-ratio-expression-input-error">
     {{errorMessage}}
