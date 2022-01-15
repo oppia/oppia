@@ -174,8 +174,7 @@ class Question(translation_domain.BaseTranslatableObject):
         self.last_updated = last_updated
 
     def _register_all_translatable_fields(self) -> None:
-        """Registration of all translatable field for Question."""
-
+        """Registers all of translatable fields/objects in the question."""
         self._register_translatable_object(self.question_state_data)
 
     def to_dict(self):

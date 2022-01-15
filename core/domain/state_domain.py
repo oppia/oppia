@@ -77,7 +77,7 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
         self.tagged_skill_misconception_id = tagged_skill_misconception_id
 
     def _register_all_translatable_fields(self) -> None:
-        """Registration of all translatable field for AnswerGroup."""
+        """Registers all of translatable field/objects in the answer group."""
 
         if self.outcome is not None:
             self._register_translatable_object(self.outcome)
@@ -284,7 +284,7 @@ class Hint(translation_domain.BaseTranslatableObject):
         self.hint_content = hint_content
 
     def _register_all_translatable_fields(self) -> None:
-        """Registration of all the fields for Hint."""
+        """Registers all of the translatable fields/objects in the hint."""
 
         self._register_translatable_field(
             translation_domain.TRANSLATABLE_CONTENT_FORMAT_HTML,
@@ -372,7 +372,7 @@ class Solution(translation_domain.BaseTranslatableObject):
         self.explanation = explanation
 
     def _register_all_translatable_fields(self) -> None:
-        """Registration of all the fields for Solution."""
+        """Registers all of the translatable fields/objects in the solution."""
 
         self._register_translatable_field(
             translation_domain.TRANSLATABLE_CONTENT_FORMAT_HTML,
@@ -529,8 +529,8 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         self.solution = solution
 
     def _register_all_translatable_fields(self) -> None:
-        """Registration of all the translatable fields for
-        InteractionInstance.
+        """Registers all of the translatable fields/objects in the interaction
+        instance.
         """
         if self.default_outcome is not None:
             self._register_translatable_object(self.default_outcome)
@@ -988,14 +988,16 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
         self.schema = schema
 
     def _register_all_translatable_fields(self) -> None:
-        """Registration of all the fields for InteractionCustomizationArg."""
+        """Registers all of the translatable fields/objects in the interaction
+        customization args.
+        """
 
         subtitled_htmls = self.get_subtitled_html()
         for subtitled_html in subtitled_htmls:
             html_string = subtitled_html.html
             # Make sure we don't include content that only consists of
             # numbers. See issue #13055.
-            if html_string != '' and not html_string.isnumeric():
+            if not html_string.isnumeric():
                 self._register_translatable_field(
                     translation_domain.TRANSLATABLE_CONTENT_FORMAT_HTML,
                     subtitled_html.content_id,
@@ -1003,12 +1005,11 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
 
         subtitled_unicodes = self.get_subtitled_unicode()
         for subtitled_unicode in subtitled_unicodes:
-            if subtitled_unicode.unicode_str != '':
-                self._register_translatable_field(
-                    translation_domain
-                    .TRANSLATABLE_CONTENT_FORMAT_UNICODE_STRING,
-                    subtitled_unicode.content_id,
-                    subtitled_unicode.unicode_str)
+            self._register_translatable_field(
+                translation_domain
+                .TRANSLATABLE_CONTENT_FORMAT_UNICODE_STRING,
+                subtitled_unicode.content_id,
+                subtitled_unicode.unicode_str)
 
     def to_customization_arg_dict(self):
         """Converts a InteractionCustomizationArgument domain object to a
@@ -1347,13 +1348,12 @@ class Outcome(translation_domain.BaseTranslatableObject):
         self.missing_prerequisite_skill_id = missing_prerequisite_skill_id
 
     def _register_all_translatable_fields(self) -> None:
-        """Registration of all translatable field for Outcome."""
+        """Registers all of the translatable fields/objects in the outcome."""
 
-        if not self.feedback.html == '':
-            self._register_translatable_field(
-                translation_domain.TRANSLATABLE_CONTENT_FORMAT_HTML,
-                self.feedback.content_id,
-                self.feedback.html)
+        self._register_translatable_field(
+            translation_domain.TRANSLATABLE_CONTENT_FORMAT_HTML,
+            self.feedback.content_id,
+            self.feedback.html)
 
     def to_dict(self):
         """Returns a dict representing this Outcome domain object.
@@ -2131,7 +2131,7 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
         self.inputs = inputs
 
     def _register_all_translatable_fields(self) -> None:
-        """Registration of all the fields for RuleSpec."""
+        """Registers all of the translatable fields/objects in the rule spec."""
 
         for input_value in self.inputs.values():
             if 'normalizedStrSet' in input_value:
@@ -2582,7 +2582,7 @@ class State(translation_domain.BaseTranslatableObject):
         self.next_content_id_index = next_content_id_index
 
     def _register_all_translatable_fields(self) -> None:
-        """Registration of translatable field for State."""
+        """Registers all of the translatable fields/objects in the state."""
 
         self._register_translatable_field(
             translation_domain.TRANSLATABLE_CONTENT_FORMAT_HTML,

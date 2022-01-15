@@ -4372,39 +4372,112 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             ]
         )
 
-    def test_get_translatable_fields_returns_corrctly(self):
-        """Get all translatable fields from exploration."""
+    def test_get_translatable_fields_for_state_content(self):
+        "Get all translatable fields for state content."
 
-        exploration = exp_domain.Exploration.create_default_exploration(
-            'exp_id')
-        exploration.add_states(['State1'])
-        state = exploration.states['State1']
-
+        state = state_domain.State.create_default_state('state_1')
         state_content_dict = {
             'content_id': 'content',
             'html': '<p>state content html</p>'
         }
+        state.update_content(
+            state_domain.SubtitledHtml.from_dict(state_content_dict))
+
+        translatable_contents = [
+            translatable_content.content
+            for translatable_content in
+            state.get_translatable_fields().values()
+        ]
+        self.assertItemsEqual(
+            translatable_contents, ['<p>state content html</p>']
+        )
+
+    def test_get_translatable_fields_for_answer_groups(self):
+        """Get all the translatable fields for answer group."""
+
+        state = state_domain.State.create_default_state('state_1')
         state_answer_group = [state_domain.AnswerGroup(
             state_domain.Outcome(
-                exploration.init_state_name, state_domain.SubtitledHtml(
+                'destination', state_domain.SubtitledHtml(
                     'feedback_1', '<p>state outcome html</p>'),
-                False, [], None, None),
-            [
-                state_domain.RuleSpec(
-                    'Equals', {
-                        'x': {
-                            'contentId': 'rule_input_Equals',
-                            'normalizedStrSet': ['Test']
-                            }})
-            ],
+                False, [], None, None), [
+                    state_domain.RuleSpec(
+                        'Equals', {
+                            'x': {
+                                'contentId': 'rule_input_Equals',
+                                'normalizedStrSet': ['Test rule spec.']
+                                }})
+                    ],
             [],
             None
         )]
-        state_default_outcome = state_domain.Outcome(
-            'State1', state_domain.SubtitledHtml(
-                'default_outcome', '<p>Default outcome for State1</p>'),
-            False, [], None, None
+        state.update_interaction_id('TextInput')
+        state.update_interaction_answer_groups(state_answer_group)
+
+        translatable_contents = [
+            translatable_content.content
+            for translatable_content in
+            state.get_translatable_fields().values()
+        ]
+        self.assertItemsEqual(
+            translatable_contents, [
+                '<p>state outcome html</p>',
+                ['Test rule spec.']]
         )
+
+    def test_get_translatable_fields_for_solution(self):
+        """Get all translatable fields for solution."""
+
+        state = state_domain.State.create_default_state('state_1')
+        state_solution_dict = {
+            'answer_is_exclusive': True,
+            'correct_answer': 'Answer1',
+            'explanation': {
+                'content_id': 'solution',
+                'html': '<p>This is solution for state1</p>'
+            }
+        }
+        state.update_interaction_id('TextInput')
+        solution = state_domain.Solution.from_dict(
+            state.interaction.id, state_solution_dict)
+        state.update_interaction_solution(solution)
+
+        translatable_contents = [
+            translatable_content.content
+            for translatable_content in
+            state.get_translatable_fields().values()
+        ]
+        self.assertItemsEqual(
+            translatable_contents, ['<p>This is solution for state1</p>'])
+
+    def test_get_translatable_fields_for_customization_args(self):
+        """Get all the translatable fields for customization args."""
+
+        state = state_domain.State.create_default_state('state_1')
+        state_interaction_cust_args = {
+            'placeholder': {
+                'value': {
+                    'content_id': 'ca_placeholder_0',
+                    'unicode_str': 'Translatable cust args.'
+                }
+            },
+            'rows': {'value': 1}
+        }
+        state.update_interaction_id('TextInput')
+        state.update_interaction_customization_args(state_interaction_cust_args)
+
+        translatable_contents = [
+            translatable_content.content
+            for translatable_content in
+            state.get_translatable_fields().values()
+        ]
+        self.assertItemsEqual(
+            translatable_contents, ['Translatable cust args.'])
+
+    def test_get_translatable_fields_for_hints(self):
+        """Get all translatable fields for hints."""
+
+        state = state_domain.State.create_default_state('state_1')
         state_hint_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml(
@@ -4417,52 +4490,16 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 )
             ),
         ]
-        state_solution_dict = {
-            'answer_is_exclusive': True,
-            'correct_answer': 'Answer1',
-            'explanation': {
-                'content_id': 'solution',
-                'html': '<p>This is solution for state1</p>'
-            }
-        }
-        state_interaction_cust_args = {
-            'placeholder': {
-                'value': {
-                    'content_id': 'ca_placeholder_0',
-                    'unicode_str': ''
-                }
-            },
-            'rows': {'value': 1}
-        }
-
-        state.update_next_content_id_index(3)
-        state.update_content(
-            state_domain.SubtitledHtml.from_dict(state_content_dict))
-        state.update_interaction_id('TextInput')
-        state.update_interaction_customization_args(state_interaction_cust_args)
-        state.update_interaction_answer_groups(
-            state_answer_group)
-        state.update_interaction_default_outcome(state_default_outcome)
         state.update_interaction_hints(state_hint_list)
-        solution = state_domain.Solution.from_dict(
-            state.interaction.id, state_solution_dict)
-        state.update_interaction_solution(solution)
         translatable_contents = [
             translatable_content.content
             for translatable_content in
-            exploration.get_translatable_fields().values()
+            state.get_translatable_fields().values()
         ]
-
         self.assertItemsEqual(
-            translatable_contents,
-            [
-                '<p>state outcome html</p>',
-                '<p>Default outcome for State1</p>',
+            translatable_contents, [
                 '<p>Hello, this is html1 for state1</p>',
-                ['Test'],
                 '<p>Hello, this is html2 for state1</p>',
-                '<p>This is solution for state1</p>',
-                '<p>state content html</p>'
             ])
 
 

@@ -624,8 +624,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         self.correctness_feedback_enabled = correctness_feedback_enabled
 
     def _register_all_translatable_fields(self) -> None:
-        """Registration of translatable fields for exploration."""
-
+        """Registers all of translatable fields/objects in the exploration."""
         for state in self.states.values():
             self._register_translatable_object(state)
 
