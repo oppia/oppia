@@ -1877,11 +1877,16 @@ class TranslationContributionStatsModelUnitTests(test_utils.GenericTestBase):
             ),
             []
         )
-        translation_model_data = translation_model.get_all_by_user_id(self.CONTRIBUTOR_USER_ID)
+        translation_model_data = translation_model.get_all_by_user_id(
+            self.CONTRIBUTOR_USER_ID)
         self.assertEqual(len(translation_model_data), 2)
-        self.assertEqual(translation_model_data[1].language_code, self.LANGUAGE_CODE)
+        self.assertEqual(
+            translation_model_data[1].language_code, self.LANGUAGE_CODE)
         self.assertEqual(translation_model_data[1].topic_id, self.TOPIC_ID)
-        self.assertEqual(translation_model_data[1].contributor_user_id, self.CONTRIBUTOR_USER_ID)
+        self.assertEqual(
+            translation_model_data[1].contributor_user_id,
+            self.CONTRIBUTOR_USER_ID
+        )
 
     def test_get_export_policy(self) -> None:
         expected_export_policy_dict = {
