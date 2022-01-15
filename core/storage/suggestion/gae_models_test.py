@@ -1571,9 +1571,9 @@ class CommunityContributionStatsModelUnitTests(test_utils.GenericTestBase):
         )
 
     def test_get_model_association_to_user(self) -> None:
-        gen_comm = suggestion_models.CommunityContributionStatsModel
+        contrib_model = suggestion_models.CommunityContributionStatsModel
         self.assertEqual(
-            gen_comm.get_model_association_to_user(),
+            contrib_model.get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
         )
 
