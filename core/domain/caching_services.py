@@ -336,9 +336,6 @@ def set_multi(
     if len(id_value_mapping) == 0:
         return True
 
-    if namespace not in SERIALIZATION_FUNCTIONS:
-        raise ValueError('Invalid namespace: %s.' % namespace)
-
     memory_cache_id_value_mapping = {
         _get_memcache_key(namespace, sub_namespace, obj_id):
         SERIALIZATION_FUNCTIONS[namespace](value)
@@ -373,9 +370,6 @@ def delete_multi(
     """
     if len(obj_ids) == 0:
         return True
-
-    if namespace not in DESERIALIZATION_FUNCTIONS:
-        raise ValueError('Invalid namespace: %s.' % namespace)
 
     memcache_keys = [
         _get_memcache_key(namespace, sub_namespace, obj_id)
