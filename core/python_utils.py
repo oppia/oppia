@@ -230,20 +230,6 @@ def url_encode(query, doseq=False):
     return urlparse.urlencode(query, doseq=doseq)
 
 
-def divide(number1, number2):
-    """This function divides number1 by number2 in the Python 2 way, i.e it
-    performs an integer division.
-
-    Args:
-        number1: int. The dividend.
-        number2: int. The divisor.
-
-    Returns:
-        int. The quotent.
-    """
-    return past.utils.old_div(number1, number2)
-
-
 def _recursively_convert_to_str(value):
     """Convert all builtins.bytes and builtins.str elements in a data structure
     to bytes and unicode respectively. This is required for the
