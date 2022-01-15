@@ -229,7 +229,7 @@ class TakeoutServiceProfileUserUnitTests(test_utils.GenericTestBase):
 
         self.set_up_trivial()
         error_msg = 'Takeout for profile users is not yet supported.'
-        with self.assertRaisesRegexp(NotImplementedError, error_msg):
+        with self.assertRaisesRegex(NotImplementedError, error_msg):
             takeout_service.export_data_for_user(self.PROFILE_ID_1)
 
     def test_export_data_for_profile_user_nontrivial_raises_error(self):
@@ -237,7 +237,7 @@ class TakeoutServiceProfileUserUnitTests(test_utils.GenericTestBase):
 
         self.set_up_non_trivial()
         error_msg = 'Takeout for profile users is not yet supported.'
-        with self.assertRaisesRegexp(NotImplementedError, error_msg):
+        with self.assertRaisesRegex(NotImplementedError, error_msg):
             takeout_service.export_data_for_user(self.PROFILE_ID_1)
 
 
@@ -876,7 +876,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
 
     def test_export_nonexistent_full_user_raises_error(self):
         """Setup for nonexistent user test of export_data functionality."""
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             user_models.UserSettingsModel.EntityNotFoundError,
             'Entity for class UserSettingsModel with id fake_user_id '
             'not found'):
