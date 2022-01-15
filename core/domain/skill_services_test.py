@@ -103,7 +103,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
             'invalid_property_name')]
 
-        with self.assertRaisesRegexp(Exception, 'Invalid change dict.'):
+        with self.assertRaisesRegex(Exception, 'Invalid change dict.'):
             skill_services.apply_change_list(
                 self.SKILL_ID, invalid_skill_change_list, self.user_id_a)
 
@@ -690,7 +690,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             'Found topic \'Topic1\' contains the two skills to be merged. '
             'Please unassign one of these skills from topic '
             'and retry this operation.')
-        with self.assertRaisesRegexp(Exception, error_message):
+        with self.assertRaisesRegex(Exception, error_message):
             skill_services.replace_skill_id_in_all_topics(
                 self.USER_ID, self.SKILL_ID, 'new_skill_id')
 
@@ -894,7 +894,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         skill_model = skill_models.SkillModel.get_by_id(self.SKILL_ID)
         self.assertEqual(skill_model, None)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'The suggestion with id %s has already been accepted/'
             'rejected.' % suggestion.suggestion_id):
             suggestion_services.auto_reject_question_suggestions_for_skill_id(
@@ -910,13 +910,13 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             })
         ]
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected a commit message, received none.'):
             skill_services.update_skill(
                 self.USER_ID, self.SKILL_ID, changelist, '')
 
     def test_cannot_update_skill_with_empty_changelist(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Unexpected error: received an invalid change list when trying to '
             'save skill'):
@@ -935,7 +935,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         skill_model = skill_models.SkillModel.get(self.SKILL_ID)
         skill_model.version = 0
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Unexpected error: trying to update version 0 of skill '
             'from version 1. Please reload the page and try again.'):
@@ -944,7 +944,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 'Change language code.')
 
         skill_model.version = 2
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Trying to update version 2 of skill from version 1, which is too '
             'old. Please reload the page and try again.'):
@@ -962,7 +962,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             })
         ]
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'The user does not have enough rights to edit the '
             'skill description.'):
@@ -1137,7 +1137,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             observed_log_messages.append(msg % args)
 
         logging_swap = self.swap(logging, 'error', _mock_logging_function)
-        assert_raises_context_manager = self.assertRaisesRegexp(
+        assert_raises_context_manager = self.assertRaisesRegex(
             Exception, '\'str\' object has no attribute \'cmd\'')
 
         with logging_swap, assert_raises_context_manager:
@@ -1146,7 +1146,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 'commit message')
 
         self.assertEqual(len(observed_log_messages), 1)
-        self.assertRegexpMatches(
+        self.assertRegex(
             observed_log_messages[0], 'object has no'
             ' attribute \'cmd\' %s invalid_change_list' % self.SKILL_ID)
 
@@ -1160,7 +1160,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             'new_value': 'Name'
         })]
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'There is no misconception with the given id.'):
             skill_services.update_skill(
                 self.USER_ID, self.SKILL_ID, changelist,
@@ -1177,7 +1177,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             'new_value': True
         })]
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'There is no misconception with the given id.'):
             skill_services.update_skill(
                 self.USER_ID, self.SKILL_ID, changelist,
@@ -1188,7 +1188,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             'cmd': skill_domain.CMD_ADD_PREREQUISITE_SKILL,
             'skill_id': 'skill_id_1'
         })]
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'The skill is already a prerequisite skill.'):
             skill_services.update_skill(
                 self.USER_ID, self.SKILL_ID, changelist,
@@ -1199,7 +1199,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             'cmd': skill_domain.CMD_DELETE_PREREQUISITE_SKILL,
             'skill_id': 'skill_id_5'
         })]
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'The skill to remove is not a prerequisite skill.'):
             skill_services.update_skill(
                 self.USER_ID, self.SKILL_ID, changelist,
@@ -1212,7 +1212,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             'explanations': ['<p>Explanation</p>']
         })]
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'There is no rubric for the given difficulty.'):
             skill_services.update_skill(
                 self.USER_ID, self.SKILL_ID, changelist,
@@ -1224,7 +1224,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             'misconception_id': 'invalid_id'
         })]
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'There is no misconception with the given id.'):
             skill_services.update_skill(
                 self.USER_ID, self.SKILL_ID, changelist, 'Delete misconception')
@@ -1239,7 +1239,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             'new_value': 'new description'
         })]
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'There is no misconception with the given id.'):
             skill_services.update_skill(
                 self.USER_ID, self.SKILL_ID, changelist,
@@ -1255,7 +1255,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             'new_value': 'new feedback'
         })]
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'There is no misconception with the given id.'):
             skill_services.update_skill(
                 self.USER_ID, self.SKILL_ID, changelist,
