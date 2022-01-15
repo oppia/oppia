@@ -18,9 +18,9 @@
         <div class="concept-card-subtitle">
           This gives the learner a brief overview of how to perform the skill.
         </div>
-        <review-material-editor bindable-dict="bindableFieldsDict"
-                                on-save-explanation="onSaveExplanation">
-        </review-material-editor>
+        <oppia-review-material-editor [bindable-dict]="bindableFieldsDict"
+                                      (on-save-explanation)="onSaveExplanation($event)">
+        </oppia-review-material-editor>
       </div>
     </div>
   </div>
@@ -76,10 +76,10 @@
               </a>
               <div ng-if="activeWorkedExampleIndex === $index">
                 <div class="oppia-editor-card-section">
-                  <worked-example-editor worked-example="workedExample"
-                                         index="$index"
-                                         is-editable="isEditable">
-                  </worked-example-editor>
+                  <oppia-worked-example-editor [worked-example]="workedExample"
+                                               [index]="$index"
+                                               [is-editable]="isEditable">
+                  </oppia-worked-example-editor>
                 </div>
               </div>
             </li>
@@ -111,12 +111,12 @@
     position: relative;
   }
   skill-concept-card-editor .btn-add-skill-example {
-    background-color: #058CA6;
-    color: #FFF;
+    background-color: #058ca6;
+    color: #fff;
   }
   skill-concept-card-editor .btn-show-preview {
     border-top: 1px solid #c1c1c1;
-    color: #00645D;
+    color: #00645d;
     font-size: 14px;
     padding: 10px 0;
   }

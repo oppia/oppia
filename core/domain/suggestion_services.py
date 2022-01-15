@@ -829,8 +829,7 @@ def get_suggestions_waiting_for_review_info_to_notify_reviewers(reviewer_ids):
                 # We can't include suggestions that were authored by the
                 # reviewer because reviewers aren't allowed to review their own
                 # suggestions.
-                elif question_suggestion.author_id != (
-                        user_contribution_rights.id):
+                if question_suggestion.author_id != user_contribution_rights.id:
                     heapq.heappush(suggestions_waiting_longest_heap, (
                         question_suggestion.last_updated, question_suggestion))
 

@@ -20,7 +20,6 @@ from __future__ import annotations
 
 import json
 
-from core import python_utils
 from core.domain import collection_domain
 from core.domain import exp_domain
 from core.domain import platform_parameter_domain
@@ -174,7 +173,7 @@ def get_multi(namespace, sub_namespace, obj_ids):
         _get_memcache_key(namespace, sub_namespace, obj_id)
         for obj_id in obj_ids]
     values = memory_cache_services.get_multi(memcache_keys)
-    for obj_id, value in python_utils.ZIP(obj_ids, values):
+    for obj_id, value in zip(obj_ids, values):
         if value:
             result_dict[obj_id] = DESERIALIZATION_FUNCTIONS[namespace](value)
     return result_dict
