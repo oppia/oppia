@@ -21,7 +21,6 @@ from __future__ import annotations
 import datetime
 import os
 
-
 from core import feconf
 from core import python_utils
 from core import utils
@@ -111,8 +110,17 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
     def test_get_subtopic_index_fail_with_invalid_subtopic_id(self) -> None:
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
-            Exception, 'The subtopic with id -2 does not exist.'):
+            Exception, 'The subtopic with id -2 does not exist.'
+        ):
             self.topic.get_subtopic_index(-2)
+
+    def test_validation_story_id_with_invalid_data(self) -> None:
+        story_reference = (
+            topic_domain.StoryReference.create_default_story_reference(
+            ''))
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            utils.ValidationError, 'Story id should not be empty'):
+            story_reference.validate()
 
     def test_delete_canonical_story(self) -> None:
         self.topic.canonical_story_references = [
@@ -693,6 +701,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
     def test_is_manager(self) -> None:
         user_ids = [self.user_id_a, self.user_id_b]
+        assert user_ids[0] is not None
+        assert user_ids[1] is not None
         topic_rights = topic_domain.TopicRights(self.topic_id, user_ids, False)
         self.assertTrue(topic_rights.is_manager(self.user_id_a))
         self.assertTrue(topic_rights.is_manager(self.user_id_b))
@@ -708,7 +718,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             })
 
     def test_cannot_create_topic_rights_change_class_with_invalid_changelist(
-            self) -> None:
+        self
+    ) -> None:
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'Missing cmd key in change dict'):
             topic_domain.TopicRightsChange({})  # type: ignore[no-untyped-call]

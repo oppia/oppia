@@ -337,10 +337,9 @@ class StoryReference:
             ValidationError. One or more attributes of the StoryReference are
                 invalid.
         """
-        if not isinstance(self.story_is_published, bool):
+        if self.story_id == '':
             raise utils.ValidationError(
-                'Expected story_is_published to be a boolean, received %s' %
-                self.story_is_published)
+                    'Story id should not be empty')
 
 
 class SubtopicDict(TypedDict):
@@ -800,9 +799,6 @@ class Topic:
         Args:
             name: str. The name to validate.
         """
-        if not isinstance(name, str):
-            raise utils.ValidationError('Name should be a string.')
-
         if name == '':
             raise utils.ValidationError('Name field should not be empty')
 
@@ -1997,8 +1993,4 @@ class TopicRights:
         Returns:
             bool. Whether user is a topic manager of this topic.
         """
-        if user_id:
-            return bool(user_id in self.manager_ids)
-        raise Exception(
-            'Expected user_id value to be a string, '
-                       'received None')
+        return bool(user_id in self.manager_ids)
