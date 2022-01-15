@@ -198,7 +198,8 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
 
     def test_get_model_association_to_user(self):
         self.assertEqual(
-            question_models.QuestionSkillLinkModel.get_model_association_to_user(),
+            question_models.QuestionSkillLinkModel
+                .get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
         )
 
@@ -315,7 +316,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         question_models.QuestionSkillLinkModel.put_multi_question_skill_links([
             question_skill_link_model
         ])
-        
+
         with self.assertRaisesRegex(
             Exception,
             'The given question is already linked to given skill'
