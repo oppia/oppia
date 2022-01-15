@@ -53,6 +53,31 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
             question_models.QuestionModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
+    def test_get_model_association_to_user(self):
+        self.assertEqual(
+            question_models.QuestionModel.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+        )
+
+    def test_get_export_policy(self):
+        expected_export_policy_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'question_state_data': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'question_state_data_schema_version':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'linked_skill_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'inapplicable_skill_misconception_ids':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
+        self.assertEqual(
+            question_models.QuestionModel.get_export_policy(),
+            expected_export_policy_dict
+        )
+
     def test_create_question_empty_skill_id_list(self) -> None:
         state = state_domain.State.create_default_state('ABC') # type: ignore[no-untyped-call]
         question_state_data = state.to_dict()
@@ -171,6 +196,26 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
             question_models.QuestionSkillLinkModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
+    def test_get_model_association_to_user(self):
+        self.assertEqual(
+            question_models.QuestionSkillLinkModel.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+        )
+
+    def test_get_export_policy(self):
+        expected_export_policy_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'question_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'skill_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'skill_difficulty': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
+        self.assertEqual(
+            question_models.QuestionSkillLinkModel.get_export_policy(),
+            expected_export_policy_dict
+        )
+
     def test_create_question_skill_link(self) -> None:
         question_id = 'A Test Question Id'
         skill_id = 'A Test Skill Id'
@@ -182,6 +227,16 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(questionskilllink_model.skill_id, skill_id)
         self.assertEqual(
             questionskilllink_model.skill_difficulty, skill_difficulty)
+
+    def test_get_all_question_ids_linked_to_skill_id(self):
+        skill_id_1 = skill_services.get_new_skill_id() # type: ignore[no-untyped-call]
+        self.save_new_skill(skill_id_1, 'user', description='Description 1') # type: ignore[no-untyped-call]
+
+        self.assertEqual(
+            question_models.QuestionSkillLinkModel
+                .get_all_question_ids_linked_to_skill_id(skill_id_1),
+            []
+        )
 
     def test_put_multi_question_skill_link(self) -> None:
         questionskilllink_model1 = (
@@ -250,6 +305,23 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(len(question_skill_links), 1)
         self.assertEqual(question_skill_links[0].question_id, 'question_id3')
+
+    def test_cannot_link_same_question_to_given_skill(self):
+        question_skill_link_model = (
+            question_models.QuestionSkillLinkModel.create(
+                'question_id1', 'skill_id1', 0.1)
+            )
+
+        question_models.QuestionSkillLinkModel.put_multi_question_skill_links([
+            question_skill_link_model
+        ])
+        
+        with self.assertRaisesRegex(
+            Exception,
+            'The given question is already linked to given skill'
+        ):
+            question_models.QuestionSkillLinkModel.create(
+                'question_id1', 'skill_id1', 0.1)
 
     def test_get_models_by_question_id(self) -> None:
         questionskilllink_model1 = (
@@ -762,6 +834,34 @@ class QuestionCommitLogEntryModelUnitTests(test_utils.GenericTestBase):
             question_models.QuestionCommitLogEntryModel
             .has_reference_to_user_id('x_id'))
 
+    def test_get_model_association_to_user(self):
+        self.assertEqual(
+            question_models.QuestionCommitLogEntryModel
+                .get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+        )
+
+    def test_get_export_policy(self):
+        expected_export_policy_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'commit_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'commit_message': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'commit_cmds': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'post_commit_status': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'post_commit_community_owned':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'post_commit_is_private': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'question_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
+        self.assertEqual(
+            question_models.QuestionCommitLogEntryModel.get_export_policy(),
+            expected_export_policy_dict
+        )
+
 
 class QuestionSummaryModelUnitTests(test_utils.GenericTestBase):
     """Tests the QuestionSummaryModel class."""
@@ -770,3 +870,28 @@ class QuestionSummaryModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             question_models.QuestionSummaryModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+    def test_get_model_association_to_user(self):
+        self.assertEqual(
+            question_models.QuestionSummaryModel
+                .get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+        )
+
+    def test_get_export_policy(self):
+        expected_export_policy_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'question_model_last_updated':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'question_model_created_on':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'question_content': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'interaction_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'misconception_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
+        self.assertEqual(
+            question_models.QuestionSummaryModel.get_export_policy(),
+            expected_export_policy_dict
+        )
