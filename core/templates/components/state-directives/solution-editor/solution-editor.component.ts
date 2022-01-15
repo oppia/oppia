@@ -16,13 +16,14 @@
  * @fileoverview Component for the solution editor.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { StateCustomizationArgsService } from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import { EditabilityService } from 'services/editability.service';
 import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { Solution } from 'domain/exploration/SolutionObjectFactory';
 
 interface explanationFormSchema {
   type: string;
@@ -34,11 +35,10 @@ interface explanationFormSchema {
   templateUrl: './solution-editor.component.html'
 })
 export class SolutionEditor implements OnInit {
-  @Input() interactionId;
-  @Input() onSaveSolution;
-  @Input() correctAnswerEditorHtml;
-  @Input() onOpenSolutionEditor;
-  @Input() showMarkAllAudioAsNeedingUpdateModalIfRequired;
+  @Output() saveSolution: EventEmitter<Solution> = new EventEmitter();
+  @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired:
+    EventEmitter<string[]> = new EventEmitter();
+  @Output() openSolutionEditorModal: EventEmitter<void> = new EventEmitter();
 
   isEditable: boolean;
   EXPLANATION_FORM_SCHEMA: explanationFormSchema;
@@ -56,6 +56,18 @@ export class SolutionEditor implements OnInit {
       this.stateSolutionService.savedMemento.correctAnswer as string,
       this.stateInteractionIdService.savedMemento,
       this.stateCustomizationArgsService.savedMemento);
+  }
+
+  updateNewSolution(value: Solution): void {
+    this.saveSolution.emit(value);
+  }
+
+  openMarkAllAudioAsNeedingUpdateModalIfRequired(value: string[]): void {
+    this.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit(value);
+  }
+
+  openEditorModal(): void {
+    this.openSolutionEditorModal.emit();
   }
 
   ngOnInit(): void {

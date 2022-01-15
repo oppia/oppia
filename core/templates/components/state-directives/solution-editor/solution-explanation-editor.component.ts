@@ -16,13 +16,14 @@
  * @fileoverview Component for the solution explanation editor.
  */
 
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { ContextService } from 'services/context.service';
 import { EditabilityService } from 'services/editability.service';
 import { ExternalSaveService } from 'services/external-save.service';
 import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { Solution } from 'domain/exploration/SolutionObjectFactory';
 
 interface explanationFormSchema {
   type: string;
@@ -35,8 +36,9 @@ interface explanationFormSchema {
 })
 export class SolutionExplanationEditor
   implements OnDestroy, OnInit {
-  @Input() onSaveSolution;
-  @Input() showMarkAllAudioAsNeedingUpdateModalIfRequired;
+  @Output() onSaveSolution: EventEmitter<Solution> = new EventEmitter();
+  @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired:
+    EventEmitter<string[]> = new EventEmitter();
 
   directiveSubscriptions = new Subscription();
   isEditable: boolean;
@@ -78,11 +80,11 @@ export class SolutionExplanationEditor
     if (contentHasChanged) {
       var solutionContentId = this.stateSolutionService.displayed.explanation
         .contentId;
-      this.showMarkAllAudioAsNeedingUpdateModalIfRequired(
+      this.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit(
         [solutionContentId]);
     }
     this.stateSolutionService.saveDisplayedValue();
-    this.onSaveSolution(this.stateSolutionService.displayed);
+    this.onSaveSolution.emit(this.stateSolutionService.displayed);
     this.explanationEditorIsOpen = false;
   }
 
