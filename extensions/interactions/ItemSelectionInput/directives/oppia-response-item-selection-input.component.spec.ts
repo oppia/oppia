@@ -19,11 +19,11 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { HtmlEscaperService } from 'services/html-escaper.service';
-import { ResponseItemSelectionInput } from './oppia-response-item-selection-input.component';
+import { ResponseItemSelectionInputComponent } from './oppia-response-item-selection-input.component';
 
-describe('ResponseMultipleChoiceInputComponent', () => {
-  let component: ResponseItemSelectionInput;
-  let fixture: ComponentFixture<ResponseItemSelectionInput>;
+describe('ResponseItemSelectionInput', () => {
+  let component: ResponseItemSelectionInputComponent;
+  let fixture: ComponentFixture<ResponseItemSelectionInputComponent>;
 
   class mockHtmlEscaperService {
     escapedJsonToObj(answer: string): string {
@@ -33,7 +33,7 @@ describe('ResponseMultipleChoiceInputComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ResponseItemSelectionInput],
+      declarations: [ResponseItemSelectionInputComponent],
       providers: [
         {
           provide: HtmlEscaperService,
@@ -45,7 +45,7 @@ describe('ResponseMultipleChoiceInputComponent', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ResponseItemSelectionInput);
+    fixture = TestBed.createComponent(ResponseItemSelectionInputComponent);
     component = fixture.componentInstance;
     component.answer = '["ca_choices_1"]';
     component.choices = '[{' +

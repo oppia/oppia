@@ -24,7 +24,7 @@ import { DynamicContentModule } from 'components/angular-html-bind/dynamic-conte
 import { MaterialModule } from 'modules/material.module';
 import { FormsModule } from '@angular/forms';
 import { ShortResponseItemSelectionInputComponent } from './directives/oppia-short-response-item-selection-input.component';
-import { ResponseItemSelectionInput } from './directives/oppia-response-item-selection-input.component';
+import { ResponseItemSelectionInputComponent } from './directives/oppia-response-item-selection-input.component';
 import { InteractiveItemSelectionInputComponent } from './directives/oppia-interactive-item-selection-input.component';
 import { TranslateModule } from '@ngx-translate/core';
 
@@ -38,17 +38,17 @@ import { TranslateModule } from '@ngx-translate/core';
   ],
   declarations: [
     ShortResponseItemSelectionInputComponent,
-    ResponseItemSelectionInput,
+    ResponseItemSelectionInputComponent,
     InteractiveItemSelectionInputComponent
   ],
   entryComponents: [
     ShortResponseItemSelectionInputComponent,
-    ResponseItemSelectionInput,
+    ResponseItemSelectionInputComponent,
     InteractiveItemSelectionInputComponent
   ],
   exports: [
     ShortResponseItemSelectionInputComponent,
-    ResponseItemSelectionInput,
+    ResponseItemSelectionInputComponent,
     InteractiveItemSelectionInputComponent
   ],
 })

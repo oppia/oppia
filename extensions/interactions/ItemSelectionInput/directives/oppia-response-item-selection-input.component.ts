@@ -29,7 +29,7 @@ import { HtmlEscaperService } from 'services/html-escaper.service';
   templateUrl: './item-selection-input-response.component.html',
   styleUrls: []
 })
-export class ResponseItemSelectionInput implements OnInit {
+export class ResponseItemSelectionInputComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -55,5 +55,5 @@ export class ResponseItemSelectionInput implements OnInit {
 
 angular.module('oppia').directive(
   'oppiaResponseItemSelectionInput', downgradeComponent({
-    component: ResponseItemSelectionInput
+    component: ResponseItemSelectionInputComponent
   }) as angular.IDirectiveFactory);
