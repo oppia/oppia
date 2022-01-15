@@ -135,11 +135,12 @@ class EarlyQuitTracker {
 
 
    generateIssueCustomizationArgs(): EarlyQuitCustomizationArgs {
-     (this.expDurationInSecs !== null);
-     return {
-       state_name!: {value: this.stateName},
-       time_spent_in_exp_in_msecs!: {value: this.expDurationInSecs * 1000},
-     };
+     if (this.expDurationInSecs !== null) {
+       return {
+         state_name!: {value: this.stateName},
+         time_spent_in_exp_in_msecs!: {value: this.expDurationInSecs * 1000},
+       };
+     }
    }
 }
 
@@ -308,6 +309,7 @@ export class PlaythroughService {
        }
        return null;
      }
+     return null;
    }
 
 
@@ -333,15 +335,16 @@ export class PlaythroughService {
    }
 
    private isRecordedPlaythroughHelpful(): boolean {
-     if (this.recordedLearnerActions !== null) {
+     if (this.recordedLearnerActions !== null &&
+      this.playthroughDurationInSecs !== null) {
        return (
          // Playthroughs are only helpful in their entirety.
          this.hasRecordingFinished() &&
-        // Playthroughs are only helpful if learners have attempted an answer.
-        this.recordedLearnerActions.some(
-          a => a.actionType === AppConstants.ACTION_TYPE_ANSWER_SUBMIT) &&
+         // Playthroughs are only helpful if learners have attempted an answer.
+            this.recordedLearnerActions.some(
+              a => a.actionType === AppConstants.ACTION_TYPE_ANSWER_SUBMIT) &&
          // Playthroughs are only helpful if learners have invested enough time.
-      this.playthroughDurationInSecs >=
+         this.playthroughDurationInSecs >=
             ServicesConstants.MIN_PLAYTHROUGH_DURATION_IN_SECS);
      }
    }
@@ -350,3 +353,4 @@ export class PlaythroughService {
 angular.module('oppia').factory(
   'PlaythroughService',
   downgradeInjectable(PlaythroughService));
+
