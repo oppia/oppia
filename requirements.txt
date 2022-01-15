@@ -8,12 +8,10 @@
 #
 #    pip-compile --no-emit-index-url
 #
-apache-beam[gcp]==2.34.0
+apache-beam[gcp]==2.35.0
     # via -r requirements.in
 attrs==20.3.0
     # via pytest
-avro-python3==1.9.2.1
-    # via apache-beam
 beautifulsoup4==4.10.0
     # via -r requirements.in
 bleach==4.1.0
@@ -50,9 +48,7 @@ fasteners==0.16
 firebase-admin==5.1.0
     # via -r requirements.in
 future==0.18.2
-    # via
-    #   -r requirements.in
-    #   apache-beam
+    # via -r requirements.in
 google-api-core[grpc,grpcgcp]==1.31.2
     # via
     #   firebase-admin
@@ -118,7 +114,7 @@ google-cloud-datastore==1.15.3
     # via
     #   apache-beam
     #   google-cloud-ndb
-google-cloud-dlp==1.0.0
+google-cloud-dlp==3.4.0
     # via apache-beam
 google-cloud-firestore==2.1.0
     # via firebase-admin
@@ -228,7 +224,7 @@ packaging==20.4
     #   google-api-core
     #   google-cloud-appengine-logging
     #   pytest
-pillow==8.4.0
+pillow==9.0.0
     # via -r requirements.in
 pluggy==0.13.1
     # via pytest
@@ -236,9 +232,11 @@ proto-google-cloud-datastore-v1==0.90.4
     # via googledatastore
 proto-plus==1.18.1
     # via
+    #   apache-beam
     #   google-cloud-appengine-logging
     #   google-cloud-bigquery-storage
     #   google-cloud-dataflow-client
+    #   google-cloud-dlp
     #   google-cloud-firestore
     #   google-cloud-logging
     #   google-cloud-recommendations-ai
@@ -283,11 +281,12 @@ pytest==6.2.5
     # via -r requirements.in
 python-dateutil==2.8.1
     # via apache-beam
-pytz==2020.1
+pytz==2021.3
     # via
     #   apache-beam
     #   fastavro
     #   google-api-core
+    #   google-cloud-dlp
     #   google-cloud-firestore
     #   google-cloud-ndb
 pyyaml==6.0
