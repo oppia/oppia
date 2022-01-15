@@ -41,13 +41,13 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
   @Input() isEditable: boolean;
   @Input() outcome;
   @Input() rules;
-  taggedMisconception: TaggedMisconception;
-  feedbackIsUsed;
-  misconceptionName;
+  feedbackIsUsed: boolean;
+  misconceptionEditorIsOpen: boolean;
+  misconceptionName: string;
+  misconceptionsBySkill: object;
   selectedMisconception;
-  misconceptionsBySkill;
   selectedMisconceptionSkillId;
-  misconceptionEditorIsOpen;
+  taggedMisconception: TaggedMisconception;
 
   constructor(
     private externalSaveService: ExternalSaveService,
