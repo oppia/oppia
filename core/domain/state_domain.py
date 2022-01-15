@@ -31,12 +31,16 @@ from core import schema_utils
 from core import utils
 from core.constants import constants
 from core.domain import customization_args_util
-from core.domain import html_cleaner
-from core.domain import interaction_registry
 from core.domain import param_domain
-from core.domain import rules_registry
-from core.domain import translatable_object_registry
 from extensions.objects.models import objects
+
+from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
+from core.domain import interaction_registry  # pylint: disable=invalid-import-from # isort:skip
+from core.domain import rules_registry  # pylint: disable=invalid-import-from # isort:skip
+from core.domain import translatable_object_registry  # pylint: disable=invalid-import-from # isort:skip
+
+# TODO(#14537): Refactor this file and remove imports marked
+# with 'invalid-import-from'.
 
 
 class AnswerGroup:
@@ -869,7 +873,7 @@ class InteractionInstance:
         # InteractionCustomizationArg helper functions.
         # Then, convert back to original dict format afterwards, at the end.
         customization_args = (
-            InteractionInstance
+            InteractionCustomizationArg
             .convert_cust_args_dict_to_cust_args_based_on_specs(
                 interaction_dict['customization_args'],
                 ca_specs_dict)
@@ -921,38 +925,9 @@ class InteractionInstance:
             interaction_id).to_dict()['customization_arg_specs']
 
         return (
-            InteractionInstance
+            InteractionCustomizationArg
             .convert_cust_args_dict_to_cust_args_based_on_specs(
                 customization_args_dict, ca_specs_dict))
-
-    @staticmethod
-    def convert_cust_args_dict_to_cust_args_based_on_specs(
-        ca_dict,
-        ca_specs_dict
-    ):
-        """Converts customization arguments dictionary to customization
-        arguments. This is done by converting each customization argument to a
-        InteractionCustomizationArg domain object.
-
-        Args:
-            ca_dict: dict. A dictionary of customization
-                argument name to a customization argument dict, which is a dict
-                of the single key 'value' to the value of the customization
-                argument.
-            ca_specs_dict: dict. A dictionary of customization argument specs.
-
-        Returns:
-            dict. A dictionary of customization argument names to the
-            InteractionCustomizationArg domain object's.
-        """
-        return {
-            spec['name']: (
-                InteractionCustomizationArg.from_customization_arg_dict(
-                    ca_dict[spec['name']],
-                    spec['schema']
-                )
-            ) for spec in ca_specs_dict
-        }
 
 
 class InteractionCustomizationArg:
@@ -1230,6 +1205,35 @@ class InteractionCustomizationArg:
                 ) for property_spec in schema['properties']]))
 
         return result
+
+    @staticmethod
+    def convert_cust_args_dict_to_cust_args_based_on_specs(
+        ca_dict,
+        ca_specs_dict
+    ):
+        """Converts customization arguments dictionary to customization
+        arguments. This is done by converting each customization argument to a
+        InteractionCustomizationArg domain object.
+
+        Args:
+            ca_dict: dict. A dictionary of customization
+                argument name to a customization argument dict, which is a dict
+                of the single key 'value' to the value of the customization
+                argument.
+            ca_specs_dict: dict. A dictionary of customization argument specs.
+
+        Returns:
+            dict. A dictionary of customization argument names to the
+            InteractionCustomizationArg domain object's.
+        """
+        return {
+            spec['name']: (
+                InteractionCustomizationArg.from_customization_arg_dict(
+                    ca_dict[spec['name']],
+                    spec['schema']
+                )
+            ) for spec in ca_specs_dict
+        }
 
 
 class Outcome:
@@ -3407,7 +3411,7 @@ class State:
             state_dict: dict. The dict representation of State object.
             conversion_fn: function. The conversion function to be applied on
                 the states_dict.
-            state_schema_version: number. The state schema version.
+            state_schema_version: int. The state schema version.
             state_uses_old_interaction_cust_args_schema: bool. Whether the
                 interaction customization arguments contain SubtitledHtml
                 and SubtitledUnicode dicts (should be True if prior to state
@@ -3524,8 +3528,9 @@ class State:
         else:
             ca_specs_dict = (
                 interaction_registry.Registry
-                .get_all_specs_for_state_schema_version_or_latest(
-                    state_schema_version
+                .get_all_specs_for_state_schema_version(
+                    state_schema_version,
+                    can_fetch_latest_specs=True
                 )[interaction_id]['customization_arg_specs']
             )
             state_dict['interaction'] = (

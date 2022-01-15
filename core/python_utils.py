@@ -174,24 +174,6 @@ def get_package_file_contents(package: str, filepath: str) -> str:
         return pkgutil.get_data(package, filepath).decode('utf-8')
 
 
-def url_unsplit(url_parts):
-    """Combine the elements of a tuple as returned by urlsplit() into a complete
-    URL as a string using urlparse.urlunsplit if run under Python 2 and
-    urllib.parse.urlunsplit if run under Python 3.
-
-    Args:
-        url_parts: tuple(str). The components of a URL.
-
-    Returns:
-        str. The complete URL.
-    """
-    try:
-        import urllib.parse as urlparse
-    except ImportError:
-        import urlparse
-    return urlparse.urlunsplit(url_parts)  # pylint: disable=disallowed-function-calls
-
-
 def parse_query_string(query_string):
     """Parse a query string given as a string argument
     (data of type application/x-www-form-urlencoded) using urlparse.parse_qs if
@@ -305,29 +287,3 @@ def yaml_from_dict(dictionary, width=80):
     """
     dictionary = _recursively_convert_to_str(dictionary)
     return yaml.safe_dump(dictionary, default_flow_style=False, width=width)
-
-
-def create_enum(*sequential):
-    """Creates a enumerated constant.
-
-    Args:
-        *sequential: *. Sequence List to generate the enumerations.
-
-    Returns:
-        dict. Dictionary containing the enumerated constants.
-    """
-    enum_values = dict(ZIP(sequential, sequential))
-    try:
-        from enum import Enum  # pylint: disable=import-only-modules
-
-        # The type() of argument 1 in Enum must be str, not unicode.
-        return Enum(str('Enum'), enum_values)  # pylint: disable=disallowed-function-calls
-    except ImportError:
-        _enums = {}
-        for name, value in enum_values.items():
-            _value = {
-                'name': name,
-                'value': value
-            }
-            _enums[name] = type('Enum', (), _value)
-        return type('Enum', (), _enums)

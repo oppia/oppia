@@ -311,7 +311,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
     def test_dev_mode_cannot_be_true_on_production(self):
         server_software_swap = self.swap(
             os, 'environ', {'SERVER_SOFTWARE': 'Production'})
-        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'DEV_MODE can\'t be true on production.')
         with assert_raises_regexp_context_manager, server_software_swap:
             # This reloads the feconf module so that all the checks in
@@ -473,6 +473,23 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         )
         self.assertEqual(call_counter.times_called, 1)
 
+    def test_logs_request_with_invalid_payload(self):
+        with contextlib.ExitStack() as exit_stack:
+            logs = exit_stack.enter_context(
+                self.capture_logging(min_level=logging.ERROR))
+            exit_stack.enter_context(self.swap_to_always_raise(
+                webapp2.Request, 'get',
+                error=ValueError('uh-oh')))
+            self.get_custom_response(
+                '/',
+                expected_content_type='text/plain',
+                params=None,
+                expected_status_int=500)
+
+        self.assertRegexpMatches(
+            logs[0],
+            'uh-oh: request GET /')
+
 
 class MaintenanceModeTests(test_utils.GenericTestBase):
     """Tests BaseHandler behavior when maintenance mode is enabled.
@@ -581,7 +598,7 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
         self.assertEqual(call_counter.times_called, 1)
 
     def test_signup_fails(self):
-        with self.assertRaisesRegexp(Exception, 'Bad response: 503'):
+        with self.assertRaisesRegex(Exception, 'Bad response: 503'):
             self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
     def test_signup_succeeds_when_maintenance_mode_is_disabled(self):
@@ -620,7 +637,7 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
 
         self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
 
-        with self.assertRaisesRegexp(Exception, 'Bad response: 503'):
+        with self.assertRaisesRegex(Exception, 'Bad response: 503'):
             self.get_json('/url_handler?current_url=/')
 
         self.assertEqual(destroy_auth_session_call_counter.times_called, 1)
@@ -1217,7 +1234,8 @@ class SignUpTests(test_utils.GenericTestBase):
         response = self.post_json(
             feconf.SIGNUP_DATA_URL, {
                 'username': 'abc',
-                'agreed_to_terms': True
+                'agreed_to_terms': True,
+                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
             }, csrf_token=csrf_token, expected_status_int=401,
         )
 
@@ -1233,11 +1251,31 @@ class SignUpTests(test_utils.GenericTestBase):
         self.post_json(
             feconf.SIGNUP_DATA_URL, {
                 'username': 'abc',
-                'agreed_to_terms': True
+                'agreed_to_terms': True,
+                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
             }, csrf_token=csrf_token,
         )
 
         self.get_html_response('/community-library')
+
+    def test_error_is_raised_during_signup_using_invalid_token(self):
+        """Test that error is raised if user tries to signup
+        using invalid CSRF token.
+        """
+        self.login('abc@example.com')
+        self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
+
+        response = self.post_json(
+            feconf.SIGNUP_DATA_URL, {
+                'username': 'abc',
+                'agreed_to_terms': True,
+                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
+            }, csrf_token='invalid_token', expected_status_int=401,
+        )
+
+        self.assertEqual(response['error'],
+            'Your session has expired, and unfortunately your '
+            'changes cannot be saved. Please refresh the page.')
 
 
 class CsrfTokenHandlerTests(test_utils.GenericTestBase):

@@ -104,7 +104,7 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
     def test_raise_exception_by_mocking_collision(self) -> None:
         feedback_thread_model_cls = feedback_models.GeneralFeedbackThreadModel
         # Test create method.
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception, 'Feedback thread ID conflict on create.'):
             # Swap dependent method get_by_id to simulate collision every time.
             with self.swap(
@@ -116,7 +116,7 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
                     'exploration.exp_id.thread_id')
 
         # Test generate_new_thread_id method.
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception,
             'New thread id generator is producing too many collisions.'):
             # Swap dependent method get_by_id to simulate collision every time.
@@ -196,10 +196,10 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
             r'The following feedback message ID\(s\) conflicted on '
             'create: %s' % (instance_id)
         )
-        with self.assertRaisesRegexp(Exception, expected_exception_regexp): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, expected_exception_regexp): # type: ignore[no-untyped-call]
             feedback_models.GeneralFeedbackMessageModel.create(
-                feedback_domain.FullyQualifiedMessageIdentifier( # type: ignore[no-untyped-call]
-                    thread_id, '0')
+                feedback_domain.FullyQualifiedMessageIdentifier(
+                    thread_id, 0)
             )
 
     def test_get_all_messages(self) -> None:

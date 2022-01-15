@@ -17,9 +17,9 @@
 from __future__ import annotations
 
 import datetime
+import enum
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.platform import models
 
@@ -42,13 +42,28 @@ PLATFORM_CHOICE_WEB = 'web'
 PLATFORM_CHOICES = [PLATFORM_CHOICE_ANDROID, PLATFORM_CHOICE_WEB]
 GITHUB_REPO_CHOICES = PLATFORM_CHOICES
 
+
+# TODO(#14419): Change naming style of Enum class from SCREAMING_SNAKE_CASE
+# to PascalCase and its values to UPPER_CASE. Because we want to be consistent
+# throughout the codebase according to the coding style guide.
+# https://github.com/oppia/oppia/wiki/Coding-style-guide
+
 # The model field names that can be filtered / sorted for when maintainers
 # triage feedback reports.
-FILTER_FIELD_NAMES = python_utils.create_enum( # type: ignore[no-untyped-call]
-    'platform', 'report_type', 'entry_point', 'submitted_on',
-    'android_device_model', 'android_sdk_version', 'text_language_code',
-    'audio_language_code', 'platform_version',
-    'android_device_country_locale_code')
+class FILTER_FIELD_NAMES(enum.Enum): # pylint: disable=invalid-name
+    """Enum for the model field names that can be filtered"""
+
+    platform = 'platform' # pylint: disable=invalid-name
+    report_type = 'report_type' # pylint: disable=invalid-name
+    entry_point = 'entry_point' # pylint: disable=invalid-name
+    submitted_on = 'submitted_on' # pylint: disable=invalid-name
+    android_device_model = 'android_device_model' # pylint: disable=invalid-name
+    android_sdk_version = 'android_sdk_version' # pylint: disable=invalid-name
+    text_language_code = 'text_language_code' # pylint: disable=invalid-name
+    audio_language_code = 'audio_language_code' # pylint: disable=invalid-name
+    platform_version = 'platform_version' # pylint: disable=invalid-name
+    android_device_country_locale_code = 'android_device_country_locale_code' # pylint: disable=invalid-name
+
 
 # An ID used for stats model entities tracking all unticketed reports.
 UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID = (
@@ -309,7 +324,9 @@ class AppFeedbackReportModel(base_models.BaseModel):
         return report_models
 
     @classmethod
-    def get_filter_options_for_field(cls, filter_field: str) -> List[str]:
+    def get_filter_options_for_field(
+        cls, filter_field: FILTER_FIELD_NAMES
+    ) -> List[str]:
         """Fetches values that can be used to filter reports by.
 
         Args:
@@ -319,7 +336,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
         Returns:
             list(str). The possible values that the field name can have.
         """
-        query = cls.query(projection=[filter_field.name], distinct=True) # type: ignore[attr-defined]
+        query = cls.query(projection=[filter_field.name], distinct=True)
         filter_values = []
         if filter_field == FILTER_FIELD_NAMES.report_type:
             filter_values = [model.report_type for model in query]
@@ -346,7 +363,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
         else:
             raise utils.InvalidInputException(
                 'The field %s is not a valid field to filter reports on' % (
-                    filter_field.name)) # type: ignore[attr-defined]
+                    filter_field.name))
         return filter_values
 
     @staticmethod

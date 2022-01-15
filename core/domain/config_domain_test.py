@@ -31,17 +31,17 @@ from core.tests import test_utils
 class ConfigPropertyChangeTests(test_utils.GenericTestBase):
 
     def test_config_property_change_object_with_missing_cmd(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Missing cmd key in change dict'):
             config_domain.ConfigPropertyChange({'invalid': 'data'})
 
     def test_config_property_change_object_with_invalid_cmd(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Command invalid is not allowed'):
             config_domain.ConfigPropertyChange({'cmd': 'invalid'})
 
     def test_config_property_change_object_with_missing_attribute_in_cmd(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'The following required attributes are missing: '
                 'new_value')):
@@ -50,7 +50,7 @@ class ConfigPropertyChangeTests(test_utils.GenericTestBase):
             })
 
     def test_config_property_change_object_with_extra_attribute_in_cmd(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'The following extra attributes are present: invalid')):
             config_domain.ConfigPropertyChange({
@@ -93,7 +93,7 @@ class ConfigPropertyRegistryTests(test_utils.GenericTestBase):
 
     def test_get_exception_creating_new_config_property_with_existing_name(
             self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Property with name promo_bar_enabled already exists'):
             config_domain.ConfigProperty(
                 'promo_bar_enabled', 'schema', 'description', 'default_value')

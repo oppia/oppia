@@ -18,18 +18,42 @@
 
 from __future__ import annotations
 
+import enum
 import json
 import re
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.domain import change_domain
 
-SERVER_MODES = python_utils.create_enum('dev', 'test', 'prod') # pylint: disable=invalid-name
+
+# TODO(#14419): Change naming style of Enum class from SCREAMING_SNAKE_CASE
+# to PascalCase and its values to UPPER_CASE. Because we want to be consistent
+# throughout the codebase according to the coding style guide.
+# https://github.com/oppia/oppia/wiki/Coding-style-guide
+class SERVER_MODES(enum.Enum): # pylint: disable=invalid-name
+    """Enum for server modes."""
+
+    dev = 'dev' # pylint: disable=invalid-name
+    test = 'test' # pylint: disable=invalid-name
+    prod = 'prod' # pylint: disable=invalid-name
+
+
 FEATURE_STAGES = SERVER_MODES # pylint: disable=invalid-name
-DATA_TYPES = python_utils.create_enum('bool', 'string', 'number') # pylint: disable=invalid-name
+
+
+# TODO(#14419): Change naming style of Enum class from SCREAMING_SNAKE_CASE
+# to PascalCase and its values to UPPER_CASE. Because we want to be consistent
+# throughout the codebase according to the coding style guide.
+# https://github.com/oppia/oppia/wiki/Coding-style-guide
+class DATA_TYPES(enum.Enum): # pylint: disable=invalid-name
+    """Enum for data types."""
+
+    bool = 'bool' # pylint: disable=invalid-name
+    string = 'string' # pylint: disable=invalid-name
+    number = 'number' # pylint: disable=invalid-name
+
 
 ALLOWED_SERVER_MODES = [
     SERVER_MODES.dev.value, SERVER_MODES.test.value, SERVER_MODES.prod.value]
@@ -390,8 +414,7 @@ class PlatformParameterFilter:
         version_a = version_a.split('.')
         version_b = version_b.split('.')
 
-        for sub_version_a, sub_version_b in python_utils.ZIP(
-                version_a, version_b):
+        for sub_version_a, sub_version_b in zip(version_a, version_b):
             if int(sub_version_a) < int(sub_version_b):
                 return True
             elif int(sub_version_a) > int(sub_version_b):

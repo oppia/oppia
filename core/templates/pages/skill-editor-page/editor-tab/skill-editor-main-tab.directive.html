@@ -8,9 +8,9 @@
         <span><[skill.getDescription()]></span>
       </p>
       <skill-concept-card-editor></skill-concept-card-editor>
-      <skill-misconceptions-editor></skill-misconceptions-editor>
-      <skill-prerequisite-skills-editor></skill-prerequisite-skills-editor>
-      <skill-rubrics-editor></skill-rubrics-editor>
+      <oppia-skill-misconceptions-editor (get-misconceptions-change)="getMisconceptionChange()"></oppia-skill-misconceptions-editor>
+      <oppia-skill-prerequisite-skills-editor></oppia-skill-prerequisite-skills-editor>
+      <oppia-skill-rubrics-editor></oppia-skill-rubrics-editor>
     </div>
     <div class="skill-editor-info-container">
       <md-card class="oppia-editor-card-section skill-editor-status">
@@ -145,7 +145,7 @@
   }
   .skill-editor .skill-editor-helper-box {
     align-items: center;
-    background-color: #FFF;
+    background-color: #fff;
     border: 1px solid #aaaac1;
     border-radius: 6px;
     box-shadow: none;
