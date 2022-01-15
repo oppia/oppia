@@ -191,6 +191,14 @@ class BeamEntityToAndFromModelTests(test_utils.TestBase):
             FooModel(id='abc', project=feconf.OPPIA_PROJECT_ID, prop='123'),
             job_utils.get_ndb_model_from_beam_entity(beam_entity))
 
+    def test_get_beam_key_from_ndb_key(self):
+        beam_key = beam_datastore_types.Key(
+            ('FooModel', 'abc'), project=feconf.OPPIA_PROJECT_ID,
+                namespace=self.namespace)
+            
+        ndb_key = job_utils.get_ndb_key_from_beam_key(beam_key)
+        self.assertEqual(job_utils.get_beam_key_from_ndb_key(ndb_key), beam_key)
+
     def test_get_model_from_beam_entity_with_time(self) -> None:
         utcnow = datetime.datetime.utcnow()
 
