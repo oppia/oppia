@@ -117,9 +117,15 @@ class SerializationFunctionsDict(TypedDict):
 # Type defined for arguments which can accpet only keys of Dict
 # DESERIALIZATION_FUNCTIONS or SERIALIZATION_FUNCTIONS.
 namespace_type = Literal[
-        'collection', 'exploration', 'skill', 'story', 'topic', 'platform',
-        'config', 'default'
-        ]
+        'collection',
+        'exploration',
+        'skill',
+        'story',
+        'topic',
+        'platform',
+        'config',
+        'default'
+]
 
 
 DESERIALIZATION_FUNCTIONS: DeserializationFunctionsDict = {
@@ -154,7 +160,8 @@ SERIALIZATION_FUNCTIONS: SerializationFunctionsDict = {
 
 def _get_memcache_key(
     namespace: namespace_type,
-    sub_namespace: str | None, obj_id: str
+    sub_namespace: str | None,
+    obj_id: str
 ) -> str:
     """Returns a memcache key for the class under the corresponding
     namespace and sub_namespace.
@@ -248,7 +255,8 @@ def get_multi(
 
 def get_multi(
     namespace: namespace_type,
-    sub_namespace: str | None, obj_ids: List[str]
+    sub_namespace: str | None,
+    obj_ids: List[str]
 ) -> Dict[str, Any]:
     """Get a dictionary of the {id, value} pairs from the memory cache.
 
@@ -299,7 +307,8 @@ def get_multi(
 # to be used here for the value type of id_value_mapping dictionary.
 def set_multi(
     namespace: namespace_type,
-    sub_namespace: str | None, id_value_mapping: Dict[str, Any]
+    sub_namespace: str | None,
+    id_value_mapping: Dict[str, Any]
 ) -> bool:
     """Set multiple id values at once to the cache, where the values are all
     of a specific namespace type or a Redis compatible type (more details here:
@@ -340,7 +349,8 @@ def set_multi(
 
 def delete_multi(
     namespace: namespace_type,
-    sub_namespace: str | None, obj_ids: List[str]
+    sub_namespace: str | None,
+    obj_ids: List[str]
 ) -> bool:
     """Deletes multiple ids in the cache.
 
