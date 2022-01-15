@@ -160,7 +160,7 @@ angular.module('oppia').component('questionOpportunities', {
         SiteAnalyticsService.registerContributorDashboardSuggestEvent(
           'Question');
 
-        let modalRef: NgbModalRef = NgbModal.open(
+        const modalRef: NgbModalRef = NgbModal.open(
           QuestionsOpportunitiesSelectDifficultyModalComponent, {
             backdrop: true,
           });

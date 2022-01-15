@@ -19,15 +19,15 @@
     </div>
   </div>
 </div>
-<div [ngSwitch]="linkedSkillsWithDifficulty.length > 0">
-  <div *ngSwitchCase="true" class="modal-footer" >
+<div>
+  <div *ngIf="linkedSkillsWithDifficulty.length > 0" class="modal-footer">
     <button class="btn btn-secondary" (click)="cancel()"> Cancel </button>
     <button class="btn btn-success protractor-test-confirm-skill-difficulty-button"
             [disabled]="linkedSkillsWithDifficulty.length === 0"
             (click)="startQuestionCreation()"> Continue
     </button>
   </div>
-  <div *ngSwitchCase="false">
+  <div *ngIf="linkedSkillsWithDifficulty.length == 0">
     <button class="btn btn-secondary" (click)="goToSelectSkillView()"> Back </button>
   </div>
 </div>

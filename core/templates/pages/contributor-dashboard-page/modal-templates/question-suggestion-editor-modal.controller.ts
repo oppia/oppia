@@ -114,7 +114,7 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
     };
     $scope.skillId = $scope.skill.getId();
     $scope.onClickChangeDifficulty = function() {
-      let modalRef: NgbModalRef = NgbModal.open(
+      const modalRef: NgbModalRef = NgbModal.open(
         QuestionsOpportunitiesSelectDifficultyModalComponent, {
           backdrop: true,
         });

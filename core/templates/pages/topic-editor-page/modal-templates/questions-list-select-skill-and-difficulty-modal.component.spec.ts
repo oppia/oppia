@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for
- * QuestionsListSelectSkillAndDifficultyModalComponent.
+ * @fileoverview Unit tests for questions list select
+ * skill and difficulty modal component.
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -81,7 +81,6 @@ describe('Questions List Select Skill And Difficulty Modal Component', () => {
     allSkillSummaries.map(summary => (
       ShortSkillSummary.create(summary.id, summary.description)));
 
-    component.allSkillSummaries = allSkillSummaries;
     component.countOfSkillsToPrioritize = countOfSkillsToPrioritize;
     component.currentMode = currentMode;
     component.linkedSkillsWithDifficulty = linkedSkillsWithDifficulty;
@@ -98,7 +97,6 @@ describe('Questions List Select Skill And Difficulty Modal Component', () => {
     expect(component.currentMode).toBe(currentMode);
     expect(component.linkedSkillsWithDifficulty).toEqual(
       linkedSkillsWithDifficulty);
-    expect(component.skillSummaries).toEqual(allSkillSummaries);
     expect(component.skillSummariesInitial.length).toBe(2);
     expect(component.skillSummariesFinal.length).toBe(1);
     expect(component.skillIdToRubricsObject).toEqual(skillIdToRubricsObject);

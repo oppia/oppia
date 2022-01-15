@@ -39,7 +39,7 @@ export class QuestionsOpportunitiesSelectDifficultyModalComponent
   instructionMessage: string;
   skillIdToRubricsObject: object;
   skill: Skill;
-  linkedSkillsWithDifficulty = [];
+  linkedSkillsWithDifficulty: SkillDifficulty[] = [];
 
   constructor(
     private alertsService: AlertsService,
@@ -102,8 +102,7 @@ export class QuestionsOpportunitiesSelectDifficultyModalComponent
     const result = {
       skill: this.skill,
       skillDifficulty:
-        parseFloat(
-          this.linkedSkillsWithDifficulty[0].getDifficulty())
+        this.linkedSkillsWithDifficulty[0].getDifficulty()
     };
     this.ngbActiveModal.close(result);
   }

@@ -13,7 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for QuestionEditorSaveModalComponent.
+ * @fileoverview Unit tests for question editor save modal
+ * component.
  */
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
@@ -39,13 +40,9 @@ describe('Question Editor Save Modal Component', function() {
     fixture = TestBed.createComponent(QuestionEditorSaveModalComponent);
     component = fixture.componentInstance;
 
-    TestBed.inject(NgbActiveModal);
     fixture.detectChanges();
   });
 
-  // This component have no more frontend tests as it inherits the
-  // ConfirmOrCancelModalComponent and doesn't have any additional
-  // functionality. Please see the ConfirmOrCancelModalComponent for more tests.
   it('should create', () => {
     expect(component).toBeDefined();
   });

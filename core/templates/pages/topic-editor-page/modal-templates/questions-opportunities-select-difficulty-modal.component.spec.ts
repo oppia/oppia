@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for
- * QuestionsOpportunitiesSelectDifficultyModalComponent.
+ * @fileoverview Unit tests for questions opportunities
+ * select difficulty modal component.
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -22,6 +22,7 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
+import { SkillDifficultyBackendDict } from 'domain/skill/skill-difficulty.model';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { ImageFile } from 'domain/utilities/image-file.model';
 import { ExtractImageFilenamesFromModelService } from 'pages/exploration-player-page/services/extract-image-filenames-from-model.service';
@@ -55,9 +56,11 @@ class MockReaderObject {
 
 describe(
   'Questions Opportunities Select Difficulty Modal Component', () => {
-    let component: QuestionsOpportunitiesSelectDifficultyModalComponent;
+    let component:
+    QuestionsOpportunitiesSelectDifficultyModalComponent;
     let fixture:
-    ComponentFixture<QuestionsOpportunitiesSelectDifficultyModalComponent>;
+    ComponentFixture<
+    QuestionsOpportunitiesSelectDifficultyModalComponent>;
     let alertsService: AlertsService;
     let assetsBackendApiService: AssetsBackendApiService;
     let ngbActiveModal: NgbActiveModal;
@@ -182,8 +185,36 @@ describe(
             groupedSkillSummaries: {},
           }));
         component.linkedSkillsWithDifficulty = [{
-          getDifficulty(): string {
-            return '0.3';
+          _id: '1',
+          _description: 'desc',
+          _difficulty: 0.3,
+
+          toBackendDict(): SkillDifficultyBackendDict {
+            return {
+              id: '1',
+              description: 'desc',
+              difficulty: 0.3,
+            };
+          },
+
+          getDescription(): string {
+            return 'desc';
+          },
+
+          getDifficulty(): number {
+            return 0.3;
+          },
+
+          setDifficulty(): void {
+            return;
+          },
+
+          setDescription(): void {
+            return;
+          },
+
+          getId(): string {
+            return '1';
           }
         }];
 

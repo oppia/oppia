@@ -23,11 +23,11 @@ import { AppConstants } from 'app.constants';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { QuestionsListConstants } from 'components/question-directives/questions-list/questions-list.constants';
 import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
-import { Skill, SkillBackendDict } from 'domain/skill/SkillObjectFactory';
+import { SkillSummary } from 'domain/skill/skill-summary.model';
 
 interface Summary {
-  'id': string;
-  'description': string;
+  id: string;
+  description: string;
 }
 
 @Component({
@@ -38,19 +38,19 @@ interface Summary {
 export class QuestionsListSelectSkillAndDifficultyModalComponent
   extends ConfirmOrCancelModal implements OnInit {
   @Input() currentMode: string;
-  @Input() allSkillSummaries;
-  @Input() countOfSkillsToPrioritize;
-  @Input() linkedSkillsWithDifficulty;
-  @Input() skillIdToRubricsObject;
+  @Input() countOfSkillsToPrioritize: number;
+  @Input() linkedSkillsWithDifficulty: SkillDifficulty[];
+  @Input() skillIdToRubricsObject: object;
+  @Input() allSkillSummaries: SkillSummary[];
   instructionMessage: string;
-  skillSummaries: Skill;
-  skillSummariesInitial: SkillBackendDict[];
-  skillSummariesFinal: SkillBackendDict[];
+  skillSummaries: SkillSummary[];
+  skillSummariesInitial: SkillSummary[];
+  skillSummariesFinal: SkillSummary[];
   selectedSkills: string[];
   DEFAULT_SKILL_DIFFICULTY: number;
   MODE_SELECT_DIFFICULTY: string;
   MODE_SELECT_SKILL: string;
-  skillsToShow: SkillBackendDict[] = [];
+  skillsToShow: SkillSummary[] = [];
 
   constructor(
     private ngbActiveModal: NgbActiveModal
@@ -70,7 +70,7 @@ export class QuestionsListSelectSkillAndDifficultyModalComponent
     this.MODE_SELECT_SKILL = QuestionsListConstants.MODE_SELECT_SKILL;
     this.filterSkills('');
 
-    for (let idx in this.allSkillSummaries) {
+    for (let idx = 0; idx < this.allSkillSummaries.length; idx++) {
       if (idx < this.countOfSkillsToPrioritize) {
         this.skillSummariesInitial.push(
           this.allSkillSummaries[idx]);

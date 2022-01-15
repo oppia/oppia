@@ -13,7 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the ConfirmQuestionExitModalComponent.
+ * @fileoverview Unit tests for the confirm question exit
+ * modal component.
  */
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
@@ -38,13 +39,8 @@ describe('Confirm Question Exit Modal Component', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(ConfirmQuestionExitModalComponent);
     component = fixture.componentInstance;
-
-    TestBed.inject(NgbActiveModal);
   });
 
-  // This component have no more frontend tests as it inherits the
-  // ConfirmOrCancelModalComponent and doesn't have any additional
-  // functionality. Please see the ConfirmOrCancelModalComponent for more tests.
   it('should create', () => {
     expect(component).toBeDefined();
   });
