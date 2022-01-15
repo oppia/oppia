@@ -386,6 +386,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             'additional story references list of the topic.'):
             self.topic.add_additional_story('story_id_2')
 
+    # In this file we are using two methods with the same name and for that,
+    # Mypy checks were giving [override] error. Thus we add an ignore.
     def _assert_validation_error(  # type: ignore[override]
         self,
         expected_error_substring: str
@@ -1221,6 +1223,8 @@ class TopicSummaryTests(test_utils.GenericTestBase):
             1, 1, 1, 1, 1, 1, 1, 'image.svg', '#C6DCDA', 'url-frag',
             current_time, current_time)
 
+    # In this file we are using two methods with the same name and for that,
+    # Mypy checks were giving [override] error. Thus we add an ignore.
     def _assert_validation_error(  # type: ignore[override]
         self,
         expected_error_substring: str
