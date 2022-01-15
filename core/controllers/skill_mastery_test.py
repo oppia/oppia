@@ -17,7 +17,6 @@
 from __future__ import annotations
 
 from core import feconf
-from core import python_utils
 from core.domain import skill_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
