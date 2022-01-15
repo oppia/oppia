@@ -448,8 +448,8 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             return []
 
         question_count_per_skill = int(
-            math.ceil(python_utils.divide( # type: ignore[no-untyped-call]
-                float(total_question_count), float(len(skill_ids)))))
+            math.ceil(( # type: ignore[no-untyped-call]
+                float(total_question_count) // float(len(skill_ids)))))
 
         question_skill_link_mapping = {}
 
@@ -591,8 +591,8 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
         question_count_per_skill = int(
             math.ceil(
-                python_utils.divide( # type: ignore[no-untyped-call]
-                    float(total_question_count), float(len(skill_ids)))))
+                ( # type: ignore[no-untyped-call]
+                    float(total_question_count) // float(len(skill_ids)))))
         question_skill_link_models = []
         existing_question_ids = []
 

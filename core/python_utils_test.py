@@ -57,8 +57,8 @@ class PythonUtilsTests(test_utils.GenericTestBase):
                 f.readlines()
 
     def test_divide(self):
-        self.assertEqual(python_utils.divide(4, 2), 2)
-        self.assertEqual(python_utils.divide(5, 2), 2)
+        self.assertEqual((4 // 2), 2)
+        self.assertEqual((5 // 2), 2)
 
     def test_parse_query_string(self):
         response = python_utils.parse_query_string(

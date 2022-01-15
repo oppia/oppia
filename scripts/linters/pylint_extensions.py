@@ -1678,7 +1678,7 @@ class DivisionOperatorChecker(checkers.BaseChecker):
     priority = -1
     msgs = {
         'C0015': (
-            'Please use python_utils.divide() instead of the "/" operator',
+            'Please use "//" operator instead of the "/" operator',
             'division-operator-used',
             'Do not use division operator.'
         )
@@ -1686,7 +1686,7 @@ class DivisionOperatorChecker(checkers.BaseChecker):
 
     def visit_binop(self, node):
         """Visit assign statements to ensure that the division operator('/')
-        is not used and python_utils.divide() is used instead.
+        is not used and "//" operator is used instead.
 
         Args:
             node: astroid.node.BinOp. Node to access module content.

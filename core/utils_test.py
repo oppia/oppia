@@ -691,7 +691,7 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(
             dt,
             datetime.datetime.fromtimestamp(
-                python_utils.divide(msecs, 1000.0))) # type: ignore[no-untyped-call]
+                (msecs // 1000.0))) # type: ignore[no-untyped-call]
 
     def test_get_time_in_millisecs_with_complicated_time(self) -> None:
         dt = datetime.datetime(2020, 6, 15, 5, 18, 23, microsecond=123456)
@@ -699,7 +699,7 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(
             dt,
             datetime.datetime.fromtimestamp(
-                python_utils.divide(msecs, 1000.0))) # type: ignore[no-untyped-call]
+                (msecs // 1000.0))) # type: ignore[no-untyped-call]
 
     def test_grouper(self) -> None:
         self.assertEqual(
