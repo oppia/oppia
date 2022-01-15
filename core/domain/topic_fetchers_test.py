@@ -121,7 +121,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         model.commit(
             self.user_id_a, 'topic model created', commit_cmd_dicts)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Sorry, we can only process v1-v%d subtopic schemas at '
             'present.' % feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION):
@@ -145,7 +145,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         model.commit(
             self.user_id_a, 'topic model created', commit_cmd_dicts)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Sorry, we can only process v1-v%d story reference schemas at '
             'present.' % feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION):
