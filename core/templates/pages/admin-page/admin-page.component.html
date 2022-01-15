@@ -23,7 +23,8 @@
                       (setStatusMessage)="setStatusMessage($event)">
   </admin-features-tab>
 
-  <oppia-admin-roles-tab *ngIf="isRolesTabOpen()">
+  <oppia-admin-roles-tab *ngIf="isRolesTabOpen()"
+                         (setStatusMessage)="setStatusMessage($event)">
   </oppia-admin-roles-tab>
 
   <oppia-admin-misc-tab *ngIf="isMiscTabOpen()"
