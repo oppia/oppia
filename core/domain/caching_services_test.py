@@ -261,7 +261,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         # DESERIALIZATION_FUNCTIONS Dict and 'invalid' is not one of them.
         # So, we don't have any overload function for 'invalid' key.
         # that's why we added call-overload ignore statement here.
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             ValueError,
             'Invalid namespace: %s.' % invalid_namespace):
             caching_services.get_multi( # type: ignore[call-overload]
@@ -269,7 +269,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 ['a', 'b', 'c'])
 
         invalid_sub_namespace = 'sub:namespace'
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             ValueError,
             'Sub-namespace %s cannot contain \':\'.' % invalid_sub_namespace):
             caching_services.get_multi(
