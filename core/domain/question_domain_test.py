@@ -54,7 +54,7 @@ class QuestionChangeTest(test_utils.GenericTestBase):
         """Test to verify __init__ method of the Question Change object
         when change_dict is without cmd key.
         """
-        self.assertRaisesRegexp(
+        self.assertRaisesRegex(
             utils.ValidationError,
             'Missing cmd key in change dict',
             callableObj=question_domain.QuestionChange,
@@ -65,7 +65,7 @@ class QuestionChangeTest(test_utils.GenericTestBase):
         """Test to verify __init__ method of the Question Change object
         when change_dict is with wrong cmd value.
         """
-        self.assertRaisesRegexp(
+        self.assertRaisesRegex(
             utils.ValidationError,
             'Command wrong is not allowed',
             callableObj=question_domain.QuestionChange,
@@ -76,7 +76,7 @@ class QuestionChangeTest(test_utils.GenericTestBase):
         """Test to verify __init__ method of the Question Change object
         when change_dict is with missing attributes in cmd.
         """
-        self.assertRaisesRegexp(
+        self.assertRaisesRegex(
             utils.ValidationError,
             'The following required attributes are present: new_value',
             callableObj=question_domain.QuestionChange,
@@ -91,7 +91,7 @@ class QuestionChangeTest(test_utils.GenericTestBase):
         """Test to verify __init__ method of the Question Change object
         when change_dict is with extra attributes in cmd.
         """
-        self.assertRaisesRegexp(
+        self.assertRaisesRegex(
             utils.ValidationError,
             'The following extra attributes are present: invalid',
             callableObj=question_domain.QuestionChange,
@@ -102,7 +102,7 @@ class QuestionChangeTest(test_utils.GenericTestBase):
         """Test to verify __init__ method of the Question Change object
         when cmd is update_question_property and wrong property_name is given.
         """
-        self.assertRaisesRegexp(
+        self.assertRaisesRegex(
             utils.ValidationError, (
                 'Value for property_name in cmd update_question_property: '
                 'wrong is not allowed'),
@@ -212,7 +212,7 @@ class QuestionSuggestionChangeTest(test_utils.GenericTestBase):
         """Test to verify __init__ method of the QuestionSuggestionChange
         object when change_dict is without cmd key.
         """
-        self.assertRaisesRegexp(
+        self.assertRaisesRegex(
             utils.ValidationError,
             'Missing cmd key in change dict',
             callableObj=question_domain.QuestionSuggestionChange,
@@ -223,7 +223,7 @@ class QuestionSuggestionChangeTest(test_utils.GenericTestBase):
         """Test to verify __init__ method of the QuestionSuggestionChange object
         when change_dict is with wrong cmd value.
         """
-        self.assertRaisesRegexp(
+        self.assertRaisesRegex(
             utils.ValidationError,
             'Command wrong is not allowed',
             callableObj=question_domain.QuestionSuggestionChange,
@@ -234,7 +234,7 @@ class QuestionSuggestionChangeTest(test_utils.GenericTestBase):
         """Test to verify __init__ method of the QuestionSuggestionChange object
         when change_dict is with missing attributes in cmd.
         """
-        self.assertRaisesRegexp(
+        self.assertRaisesRegex(
             utils.ValidationError,
             'The following required attributes are present: new_value',
             callableObj=question_domain.QuestionSuggestionChange,
@@ -248,7 +248,7 @@ class QuestionSuggestionChangeTest(test_utils.GenericTestBase):
         """Test to verify __init__ method of the QuestionSuggestionChange object
         when change_dict is with extra attributes in cmd.
         """
-        self.assertRaisesRegexp(
+        self.assertRaisesRegex(
             utils.ValidationError,
             'The following extra attributes are present: invalid',
             callableObj=question_domain.QuestionSuggestionChange,
@@ -315,7 +315,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
     def _assert_validation_error(self, expected_error_substring):
         """Checks that the skill passes strict validation."""
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, expected_error_substring
         ):
             self.question.validate()
@@ -569,34 +569,34 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
 
     def test_validation_with_invalid_id(self):
         self.observed_object.id = 1
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected id to be a string, received 1'):
             self.observed_object.validate()
 
     def test_validation_with_invalid_interaction_id(self):
         self.observed_object.interaction_id = 1
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected interaction id to be a string, received 1'):
             self.observed_object.validate()
 
     def test_validation_with_invalid_question_content(self):
         self.observed_object.question_content = 1
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected question content to be a string, received 1'):
             self.observed_object.validate()
 
     def test_validation_with_invalid_created_on(self):
         self.observed_object.created_on = 1
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected created on to be a datetime, received 1'):
             self.observed_object.validate()
 
     def test_validation_with_invalid_last_updated(self):
         self.observed_object.last_updated = 1
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected last updated to be a datetime, received 1'):
             self.observed_object.validate()
@@ -606,7 +606,7 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
         misconception_ids value is an invalid list.
         """
         self.observed_object.misconception_ids = ['Test', 1]
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             re.escape(
                 'Expected misconception ids to be a list of strings, '
@@ -618,7 +618,7 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
         misconception_ids value is an invalid type.
         """
         self.observed_object.misconception_ids = 123
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected misconception ids to be a list of strings, '
             'received 123'):

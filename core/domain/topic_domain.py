@@ -29,9 +29,13 @@ from core import utils
 from core.constants import constants
 from core.domain import change_domain
 from core.domain import fs_domain
-from core.domain import fs_services
 from core.domain import subtopic_page_domain
-from core.domain import user_services
+
+from core.domain import fs_services  # pylint: disable=invalid-import-from # isort:skip
+from core.domain import user_services  # pylint: disable=invalid-import-from # isort:skip
+
+# TODO(#14537): Refactor this file and remove imports marked
+# with 'invalid-import-from'.
 
 CMD_CREATE_NEW = feconf.CMD_CREATE_NEW
 CMD_CHANGE_ROLE = feconf.CMD_CHANGE_ROLE
