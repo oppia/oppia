@@ -722,7 +722,8 @@ def save_question_summary(question_summary):
             be saved in the datastore.
     """
     existing_question_summary_model = (
-        question_models.QuestionSummaryModel.get(question_summary.id))
+        question_models.QuestionSummaryModel.get(
+            question_summary.id, strict=False))
     question_summary_model = populate_question_summary_model_fields(
         existing_question_summary_model, question_summary
     )
