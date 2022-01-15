@@ -32,9 +32,9 @@ class UserQueryTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super(UserQueryTests, self).setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL) # type: ignore[no-untyped-call]  
+        self.user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL) # type: ignore[no-untyped-call]
         self.user_query_params = user_query_domain.UserQueryParams( # type: ignore[call-arg]
-            inactive_in_last_n_days=20 
+            inactive_in_last_n_days=20
         )
         self.user_query = user_query_domain.UserQuery(
             query_id='user_query_id',
@@ -63,7 +63,9 @@ class UserQueryTests(test_utils.GenericTestBase):
         ):
             self.user_query.validate()
 
-    def test_validate_query_with_non_user_id_values_in_user_ids_raises(self) -> None:
+    def test_validate_query_with_non_user_id_values_in_user_ids_raises(
+        self
+    ) -> None:
         self.user_query.user_ids = ['aaa']
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError,

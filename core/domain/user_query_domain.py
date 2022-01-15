@@ -24,14 +24,14 @@ from core import feconf
 from core import utils
 from core.constants import constants
 
-from typing import List, TypeVar, Type, Optional
+from typing import List, Optional
 import datetime
 
 attribute_names = [ # pylint: disable=invalid-name
     predicate['backend_attr'] for predicate in (
         constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION)]
 
-# ignore annotation for namedtuple type
+# Ignore annotation for namedtuple type
 UserQueryParams = collections.namedtuple( # type: ignore[misc]
     'UserQueryParams', attribute_names, defaults=(None,) * len(attribute_names)) # type: ignore[misc]
 
