@@ -26,6 +26,7 @@ import { ExplorationLanguageInfo } from
   'pages/exploration-player-page/services/audio-translation-language.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { UrlService } from 'services/contextual/url.service';
+import { AppConstants } from 'app.constants';
 
 import { INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM } from 'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
 
@@ -129,6 +130,71 @@ export class ContentTranslationLanguageService {
    */
   getCurrentContentLanguageCode(): string {
     return this.currentContentLanguageCode;
+  }
+
+  isContentLanguageRTL(): boolean {
+    const supportedLanguages = AppConstants.SUPPORTED_CONTENT_LANGUAGES;
+    for (let i of supportedLanguages) {
+      if (i.code === this.currentContentLanguageCode) {
+        if (i.direction === 'rtl') {
+          return true;
+        }
+        return false;
+      }
+    }
+    return false;
+  }
+
+  getInputValidationRegex(): RegExp {
+    const currentLanguage = this.currentContentLanguageCode;
+    const supportedLanguages = AppConstants.SUPPORTED_CONTENT_LANGUAGES;
+    let radix: string;
+    for (let i of supportedLanguages) {
+      if (i.code === currentLanguage) {
+        radix = i.radix;
+        break;
+      }
+    }
+    const dot = new RegExp('-{0,1}[\d]+([\.]?[\d]+)?', 'g');
+    const comma = new RegExp('-{0,1}[\d]+([,]?[\d]+)?', 'g');
+    const arabic = new RegExp('-{0,1}[\d]+([٫]?[\d]+)?', 'g');
+
+    if (radix === ',') {
+      return comma; // Input with a comma as radix.
+    } else if (radix === '٫') {
+      return arabic; // Input with the Arabic seperator.
+    } else {
+      return dot; // Input with a period as radix.
+    }
+  }
+
+  convertToEnglishDecimal(number: string): number {
+    let numString = number.replace(',', '.');
+    numString = numString.replace('٫', '.');
+    let engNum = parseFloat(numString);
+    return engNum;
+  }
+
+  convertToLocalizedNumber(number: number): string {
+    const currentLanguage = this.currentContentLanguageCode;
+    const supportedLanguages = AppConstants.SUPPORTED_CONTENT_LANGUAGES;
+    let stringNumber = number.toString();
+    let convertedNumber: string = stringNumber;
+
+    let radix: string;
+    for (let i of supportedLanguages) {
+      if (i.code === currentLanguage) {
+        radix = i.radix;
+        break;
+      }
+    }
+    if (radix === ',') {
+      convertedNumber = stringNumber.replace('.', ',');
+    } else if (radix === '٫') {
+      convertedNumber = stringNumber.replace('.', ',');
+    }
+
+    return convertedNumber;
   }
 
   /**

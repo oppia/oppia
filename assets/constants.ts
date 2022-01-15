@@ -4762,215 +4762,268 @@ export default {
   "SUPPORTED_CONTENT_LANGUAGES": [{
     "code": "en",
     "description": "English",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": "."
   }, {
     "code": "ar",
     "description": "العربية (Arabic)",
-    "direction": "rtl"
+    "direction": "rtl",
+    "radix": "٫"
   }, {
     "code": "sq",
     "description": "shqip (Albanian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": ","
   }, {
     "code": "az",
     "description": "Azeri (Azerbaijani)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": ","
   }, {
     "code": "bg",
     "description": "български (Bulgarian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": ","
   }, {
     "code": "bn",
     "description": "বাংলা (Bangla)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": "."
   }, {
     "code": "ca",
     "description": "català (Catalan)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": ","
   }, {
     "code": "zh",
     "description": "中文 (Chinese)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": "."
   }, {
     "code": "hr",
     "description": "hrvatski (Croatian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": ","
   }, {
     "code": "cs",
     "description": "čeština (Czech)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": ","
   }, {
     "code": "da",
     "description": "dansk (Danish)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": ","
   }, {
     "code": "nl",
     "description": "Nederlands (Dutch)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": ","
   }, {
     "code": "fat",
     "description": "Fanti",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": "."
   }, {
     "code": "tl",
     "description": "Filipino (Filipino)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": "."
   }, {
     "code": "fi",
     "description": "suomi (Finnish)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": ","
   }, {
     "code": "fr",
     "description": "français (French)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": ","
   }, {
     "code": "lg",
     "description": "Luganda (Ganda)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": "."
   }, {
     "code": "de",
     "description": "Deutsch (German)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": ","
   }, {
     "code": "el",
     "description": "ελληνικά (Greek)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": ","
   }, {
     "code": "ha",
     "description": "Halshen Hausa (Hausa)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": "."
   }, {
     "code": "he",
     "description": "עברית (Hebrew)",
-    "direction": "rtl"
+    "direction": "rtl",
+    "radix": "."
   }, {
     "code": "hi",
     "description": "हिन्दी (Hindi)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": "."
   }, {
     "code": "hi-en",
     "description": "Hinglish",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": "."
   }, {
     "code": "hu",
     "description": "magyar (Hungarian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": ","
   }, {
     "code": "id",
     "description": "Bahasa Indonesia (Indonesian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": ","
   }, {
     "code": "ig",
     "description": "Ásụ̀sụ́ Ìgbò (Igbo)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": "."
   }, {
     "code": "it",
     "description": "italiano (Italian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": ","
   }, {
     "code": "ja",
     "description": "日本語 (Japanese)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": "."
   }, {
     "code": "kab",
     "description": "Taqbaylit (Kabyle)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": ","
   }, {
     "code": "ko",
     "description": "한국어 (Korean)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": "."
   }, {
     "code": "lv",
     "description": "latviešu (Latvian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": ","
   }, {
     "code": "lt",
     "description": "lietuvių (Lithuanian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": ","
   }, {
     "code": "mr",
     "description": "मराठी (Marathi)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": "."
   }, {
     "code": "no",
     "description": "Norsk (Norwegian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": ","
   }, {
     "code": "fa",
     "description": "فارسی (Persian)",
-    "direction": "rtl"
+    "direction": "rtl",
+    "radix": "٫"
   }, {
     "code": "pl",
     "description": "polszczyzna (Polish)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": ","
   }, {
     "code": "prs",
     "description": "دری (Dari)",
-    "direction": "rtl"
+    "direction": "rtl",
+    "radix": "٫"
   }, {
     "code": "pt",
     "description": "português (Portuguese)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": ","
   }, {
     "code": "ro",
     "description": "română (Romanian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": ","
   }, {
     "code": "ru",
     "description": "pусский (Russian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": ","
   }, {
     "code": "sr",
     "description": "cрпски (Serbian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": ","
   }, {
     "code": "sk",
     "description": "slovenčina (Slovak)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": ","
   }, {
     "code": "sl",
     "description": "slovenščina (Slovenian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": ","
   }, {
     "code": "es",
     "description": "español (Spanish)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": ","
   }, {
     "code": "sw",
     "description": "kiswahili (Swahili)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": "."
   }, {
     "code": "sv",
     "description": "svenska (Swedish)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": ","
   }, {
     "code": "ta",
     "description": "தமிழ் (Tamil)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": "."
   }, {
     "code": "th",
     "description": "ภาษาไทย (Thai)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": "."
   }, {
     "code": "tr",
     "description": "Türkçe (Turkish)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": ","
   }, {
     "code": "uk",
     "description": "yкраїнська (Ukrainian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": ","
   }, {
     "code": "ur",
     "description": "اُردُو (Urdu)",
-    "direction": "rtl"
+    "direction": "rtl",
+    "radix": "٫"
   }, {
     "code": "vi",
     "description": "Tiếng Việt (Vietnamese)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": ","
   }, {
     "code": "yo",
     "description": "Èdè Yorùbá (Yoruba)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": "."
   }],
 
   // NOTE TO DEVELOPERS: While adding another language, please ensure that the
