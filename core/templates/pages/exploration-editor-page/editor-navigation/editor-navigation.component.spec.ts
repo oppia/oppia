@@ -262,7 +262,7 @@ describe('Editor Navigation Component', function() {
       deferred.resolve();
       var explorationSpy = spyOn(
         explorationSaveService,
-        'saveChanges').and.returnValue(deferred.promise);
+        'saveChangesAsync').and.returnValue(deferred.promise);
       $scope.saveChanges();
       $rootScope.$apply();
       expect(explorationSpy).toHaveBeenCalled();

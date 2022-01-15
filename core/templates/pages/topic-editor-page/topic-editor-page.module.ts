@@ -34,11 +34,14 @@ import { StoriesListComponent } from
 import { SubtopicsListComponent } from
   'pages/topic-viewer-page/subtopics-list/subtopics-list.component';
 import { SubtopicPreviewTab } from './subtopic-editor/subtopic-preview-tab.component';
+import { ChangeSubtopicAssignmentModalComponent } from './modal-templates/change-subtopic-assignment-modal.component';
 import { TopicPreviewTabComponent } from './preview-tab/topic-preview-tab.component';
 import { TopicEditorNavbarBreadcrumbComponent } from './navbar/topic-editor-navbar-breadcrumb.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
 import { CreateNewSubtopicModalComponent } from 'pages/topic-editor-page/modal-templates/create-new-subtopic-modal.component';
+import { DeleteStoryModalComponent } from './modal-templates/delete-story-modal.component';
+import { TopicEditorSendMailComponent } from './modal-templates/topic-editor-send-mail-modal.component';
 import { TopicEditorSaveModalComponent } from './modal-templates/topic-editor-save-modal.component';
 
 @NgModule({
@@ -51,21 +54,27 @@ import { TopicEditorSaveModalComponent } from './modal-templates/topic-editor-sa
     ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
+    ChangeSubtopicAssignmentModalComponent,
     StoriesListComponent,
     SubtopicsListComponent,
     SubtopicPreviewTab,
     TopicPreviewTabComponent,
     TopicEditorNavbarBreadcrumbComponent,
     CreateNewSubtopicModalComponent,
+    DeleteStoryModalComponent,
+    TopicEditorSendMailComponent,
     TopicEditorSaveModalComponent
   ],
   entryComponents: [
+    ChangeSubtopicAssignmentModalComponent,
     StoriesListComponent,
     SubtopicsListComponent,
     SubtopicPreviewTab,
     TopicPreviewTabComponent,
     TopicEditorNavbarBreadcrumbComponent,
     CreateNewSubtopicModalComponent,
+    DeleteStoryModalComponent,
+    TopicEditorSendMailComponent,
     TopicEditorSaveModalComponent
   ],
   providers: [
