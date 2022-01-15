@@ -48,7 +48,8 @@ export class ExplorationHtmlFormatterService {
     'MultipleChoiceInput',
     'SetInput',
     'TextInput',
-    'MathEquationInput'
+    'MathEquationInput',
+    'RatioExpressionInput',
   ];
 
   constructor(

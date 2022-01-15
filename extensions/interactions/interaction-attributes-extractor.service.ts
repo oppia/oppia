@@ -43,7 +43,8 @@ export class InteractionAttributesExtractorService {
     'MultipleChoiceInput',
     'SetInput',
     'TextInput',
-    'MathEquationInput'
+    'MathEquationInput',
+    'RatioExpressionInput',
   ];
 
   constructor(
