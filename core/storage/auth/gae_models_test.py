@@ -20,6 +20,7 @@ from __future__ import annotations
 
 from core import feconf
 from core.platform import models
+from core.storage.user.gae_models import UserSettingsModel
 from core.tests import test_utils
 
 MYPY = False
@@ -72,6 +73,23 @@ class UserAuthDetailsModelTests(test_utils.GenericTestBase):
             auth_models.UserAuthDetailsModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE_AT_END)
 
+    def test_export_data_trivial(self) -> None:
+        exported_data = (
+            auth_models.UserAuthDetailsModel.export_data(
+                self.NONEXISTENT_USER_ID))
+        expected_data = ({})
+        self.assertEqual(exported_data, expected_data)
+    
+    def test_export_data_nontrivial(self) -> None:
+        user_auth_model = auth_models.UserAuthDetailsModel.get_by_id(self.PROFILE_2_ID)
+        self.assertIsNotNone(user_auth_model)
+        parent_data = UserSettingsModel.get(user_auth_model.parent_user_id)
+        exported_data = (
+            auth_models.UserAuthDetailsModel.export_data(
+                self.USER_ID))
+        expected_data = {'parent_username': parent_data.parent_username }
+        self.assertEqual(expected_data, exported_data)
+        
     def test_apply_deletion_policy_for_registered_user_deletes_them(
             self
     ) -> None:
