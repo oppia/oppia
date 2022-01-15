@@ -31,7 +31,7 @@ export interface GraphNodes {
   [stateName: string]: string;
 }
 
-interface GraphData {
+export interface GraphData {
   finalStateIds: string[];
   initStateId: string;
   links: GraphLink[];
