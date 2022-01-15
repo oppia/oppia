@@ -29,8 +29,7 @@ import { InteractionObjectFactory } from
 import { LoggerService } from 'services/contextual/logger.service';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
-import { SubtitledHtmlBackendDict } from
-  'domain/exploration/subtitled-html.model';
+import { SubtitledHtmlBackendDict } from 'domain/exploration/subtitled-html.model';
 
 describe('Exploration object factory', () => {
   let eof: ExplorationObjectFactory;
@@ -110,7 +109,7 @@ describe('Exploration object factory', () => {
       classifier_model_id: null,
       card_is_checkpoint: false,
       linked_skill_id: null,
-      next_content_id_index: Number(undefined)
+      next_content_id_index: 1
     };
     secondState = {
       content: {
@@ -159,7 +158,7 @@ describe('Exploration object factory', () => {
       classifier_model_id: null,
       card_is_checkpoint: false,
       linked_skill_id: null,
-      next_content_id_index: Number(undefined)
+      next_content_id_index: 1
     };
 
     const explorationDict: ExplorationBackendDict = {
