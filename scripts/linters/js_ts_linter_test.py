@@ -94,7 +94,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
             js_ts_linter, 'compile_all_ts_files', lambda: None)
         esprima_swap = self.swap(esprima, 'parseScript', mock_parse_script)
 
-        with esprima_swap, compile_all_ts_files_swap, self.assertRaisesRegexp(
+        with esprima_swap, compile_all_ts_files_swap, self.assertRaisesRegex(
             Exception, re.escape('Exception raised from parse_script()')
         ):
             js_ts_linter.JsTsLintChecksManager(
@@ -175,7 +175,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
         communicate_swap = self.swap(
             subprocess.Popen, 'communicate', mock_communicate)
         with popen_swap, communicate_swap:
-            with self.assertRaisesRegexp(Exception, 'Invalid'):
+            with self.assertRaisesRegex(Exception, 'Invalid'):
                 js_ts_linter.ThirdPartyJsTsLintChecksManager(
                     [INVALID_SORTED_DEPENDENCIES_FILEPATH]
                 ).perform_all_lint_checks()
@@ -186,7 +186,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
 
         exists_swap = self.swap(os.path, 'exists', mock_exists)
 
-        with exists_swap, self.assertRaisesRegexp(
+        with exists_swap, self.assertRaisesRegex(
             Exception,
             'ERROR    Please run start.sh first to install node-eslint and '
             'its dependencies.'):
