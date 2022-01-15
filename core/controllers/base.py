@@ -371,6 +371,8 @@ class BaseHandler(webapp2.RequestHandler):
             handler_class_name in
             handler_schema_constants.HANDLER_CLASS_NAMES_WITH_NO_SCHEMA
         ):
+            # TODO(#13155): Remove this clause once all the handlers have had
+            # schema validation implemented.
             if self.URL_PATH_ARGS_SCHEMAS or self.HANDLER_ARGS_SCHEMAS:
                 raise self.InternalErrorException(
                     'Remove handler class name from '

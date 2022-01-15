@@ -1897,7 +1897,7 @@ class HandlerClassWithSchemaInStillNeedsSchemaListRaiseErrorTest(
 
 
 class HeaderRequestsTests(test_utils.GenericTestBase):
-    """Tests to check header requests"""
+    """Tests to check header requests."""
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
