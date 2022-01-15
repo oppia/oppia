@@ -1837,33 +1837,72 @@ class TranslationContributionStatsModelUnitTests(test_utils.GenericTestBase):
 
     def test_get_all_by_user_id(self) -> None:
         translation_model = suggestion_models.TranslationContributionStatsModel
+        suggestion_models.TranslationContributionStatsModel.create(
+            language_code=self.LANGUAGE_CODE,
+            contributor_user_id=self.CONTRIBUTOR_USER_ID,
+            topic_id=self.TOPIC_ID,
+            submitted_translations_count=self.SUBMITTED_TRANSLATIONS_COUNT,
+            submitted_translation_word_count=(
+                self.SUBMITTED_TRANSLATION_WORD_COUNT),
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_without_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
+            rejected_translation_word_count=(
+                self.REJECTED_TRANSLATION_WORD_COUNT),
+            contribution_dates=self.CONTRIBUTION_DATES
+        )
+        suggestion_models.TranslationContributionStatsModel.create(
+            language_code=self.LANGUAGE_CODE,
+            contributor_user_id=self.CONTRIBUTOR_USER_ID,
+            topic_id='topic_2',
+            submitted_translations_count=self.SUBMITTED_TRANSLATIONS_COUNT,
+            submitted_translation_word_count=(
+                self.SUBMITTED_TRANSLATION_WORD_COUNT + 100),
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_without_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
+            rejected_translation_word_count=(
+                self.REJECTED_TRANSLATION_WORD_COUNT),
+            contribution_dates=self.CONTRIBUTION_DATES
+        )
         self.assertEqual(
             translation_model.get_all_by_user_id(
                 'author_1'
             ),
             []
         )
+        translation_model_data = translation_model.get_all_by_user_id(self.CONTRIBUTOR_USER_ID)
+        self.assertEqual(len(translation_model_data), 2)
+        self.assertEqual(translation_model_data[1].language_code, self.LANGUAGE_CODE)
+        self.assertEqual(translation_model_data[1].topic_id, self.TOPIC_ID)
+        self.assertEqual(translation_model_data[1].contributor_user_id, self.CONTRIBUTOR_USER_ID)
 
     def test_get_export_policy(self) -> None:
         expected_export_policy_dict = {
-            'language_code': base_models.EXPORT_POLICY.EXPORTED,
-            'contributor_user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'topic_id': base_models.EXPORT_POLICY.EXPORTED,
-            'submitted_translations_count': base_models.EXPORT_POLICY.EXPORTED,
-            'submitted_translation_word_count':
-                base_models.EXPORT_POLICY.EXPORTED,
             'accepted_translations_count': base_models.EXPORT_POLICY.EXPORTED,
             'accepted_translations_without_reviewer_edits_count':
                 base_models.EXPORT_POLICY.EXPORTED,
             'accepted_translation_word_count':
                 base_models.EXPORT_POLICY.EXPORTED,
+            'contribution_dates': base_models.EXPORT_POLICY.EXPORTED,
+            'contributor_user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'language_code': base_models.EXPORT_POLICY.EXPORTED,
             'rejected_translations_count': base_models.EXPORT_POLICY.EXPORTED,
             'rejected_translation_word_count':
                 base_models.EXPORT_POLICY.EXPORTED,
-            'contribution_dates': base_models.EXPORT_POLICY.EXPORTED,
-            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'submitted_translations_count': base_models.EXPORT_POLICY.EXPORTED,
+            'submitted_translation_word_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'topic_id': base_models.EXPORT_POLICY.EXPORTED,
         }
         translation_model = suggestion_models.TranslationContributionStatsModel
         self.assertEqual(
