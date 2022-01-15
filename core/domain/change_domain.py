@@ -22,12 +22,12 @@ import copy
 
 from core import utils
 
+from typing import Any, Dict, List
+
 from core.platform import models  # pylint: disable=invalid-import-from # isort:skip
 
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
-
-from typing import Any, Dict, List
 
 MYPY = False
 if MYPY:  # pragma: no cover
