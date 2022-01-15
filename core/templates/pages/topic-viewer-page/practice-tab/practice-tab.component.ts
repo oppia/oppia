@@ -35,9 +35,9 @@ import { WindowRef } from 'services/contextual/window-ref.service';
   styleUrls: []
 })
 export class PracticeTabComponent implements OnInit {
-  @Input() topicName: string;
+  @Input() topicName!: string;
   @Input() startButtonIsDisabled: boolean = false;
-  @Input() subtopicsList: Subtopic[];
+  @Input() subtopicsList!: Subtopic[];
   @Input() displayArea: string = 'topicViewer';
   @Input() topicUrlFragment: string = '';
   @Input() classroomUrlFragment: string = '';
@@ -47,7 +47,7 @@ export class PracticeTabComponent implements OnInit {
   selectedSubtopicIndices: boolean[] = [];
   questionsAreAvailable: boolean = false;
   subtopicIds: number[] = [];
-  clientWidth: number;
+  clientWidth!: number;
   subtopicMasteryArray: number[] = [];
   questionsStatusCallIsComplete: boolean = true;
 
@@ -100,11 +100,11 @@ export class PracticeTabComponent implements OnInit {
   }
 
   checkIfQuestionsExist(subtopicIndices: boolean[]): void {
-    const skillIds = [];
+    const skillIds: string[] = [];
     this.questionsStatusCallIsComplete = false;
     for (let idx in subtopicIndices) {
       if (subtopicIndices[idx]) {
-        skillIds.push(this.availableSubtopics[idx].getSkillIds());
+        skillIds.push(...this.availableSubtopics[idx].getSkillIds());
       }
     }
     if (skillIds.length > 0) {
