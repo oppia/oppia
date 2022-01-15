@@ -21,7 +21,6 @@ from __future__ import annotations
 import logging
 
 from core import feconf
-from core import python_utils
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import feedback_services

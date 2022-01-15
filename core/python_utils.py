@@ -36,8 +36,6 @@ sys.path.insert(0, _CERTIFI_PATH)
 import yaml  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 import builtins  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-import past.builtins  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-import past.utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 
 MAP = builtins.map
