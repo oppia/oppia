@@ -22,12 +22,13 @@ import copy
 
 from core import utils
 
+from typing import Dict
+
 from core.platform import models  # pylint: disable=invalid-import-from # isort:skip
 
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
 
-from typing import Dict
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 

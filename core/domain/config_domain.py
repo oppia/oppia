@@ -23,13 +23,14 @@ from core import schema_utils
 from core.constants import constants
 from core.domain import change_domain
 
+from typing import Any, Dict, List, cast
+
 from core.domain import caching_services  # pylint: disable=invalid-import-from # isort:skip
 from core.platform import models  # pylint: disable=invalid-import-from # isort:skip
 
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
 
-from typing import Any, Dict, List, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
