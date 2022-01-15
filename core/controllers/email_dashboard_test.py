@@ -80,9 +80,9 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
     def test_that_page_is_accessible_to_authorised_users_only(self):
         # Make sure that only authorised users can access query pages.
         self.login(self.USER_A_EMAIL)
-        with self.assertRaisesRegexp(Exception, '401 Unauthorized'):
+        with self.assertRaisesRegex(Exception, '401 Unauthorized'):
             self.get_html_response('/emaildashboard')
-        with self.assertRaisesRegexp(Exception, '401 Unauthorized'):
+        with self.assertRaisesRegex(Exception, '401 Unauthorized'):
             self.get_html_response(
                 '/querystatuscheck?query_id=%s' % 'valid_query_id')
         self.logout()
