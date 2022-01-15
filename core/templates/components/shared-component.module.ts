@@ -97,6 +97,8 @@ import { SavePendingChangesModalComponent } from './save-pending-changes/save-pe
 import { AddHintModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-hint-modal.component';
 import { SmoothHeightAnimatorComponent } from './smooth-height/smooth-height-animator.component';
 import { ReviewMaterialEditorComponent } from './review-material-editor/review-material-editor.component';
+import { SolutionExplanationEditor } from './state-directives/solution-editor/solution-explanation-editor.component';
+import { SolutionEditor } from './state-directives/solution-editor/solution-editor.component';
 
 // Pipes.
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
@@ -209,7 +211,9 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     PreviewThumbnailComponent,
     SavePendingChangesModalComponent,
     AddHintModalComponent,
-    ReviewMaterialEditorComponent
+    ReviewMaterialEditorComponent,
+    SolutionExplanationEditor,
+    SolutionEditor
   ],
 
   entryComponents: [
@@ -272,7 +276,9 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     PreviewThumbnailComponent,
     SavePendingChangesModalComponent,
     AddHintModalComponent,
-    ReviewMaterialEditorComponent
+    ReviewMaterialEditorComponent,
+    SolutionExplanationEditor,
+    SolutionEditor
   ],
 
   exports: [
@@ -349,7 +355,9 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     SortByPipe,
     SavePendingChangesModalComponent,
     LearnerDashboardIconsComponent,
-    ReviewMaterialEditorComponent
+    ReviewMaterialEditorComponent,
+    SolutionExplanationEditor,
+    SolutionEditor
   ],
 })
 
