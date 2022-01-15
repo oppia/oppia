@@ -140,7 +140,7 @@ class EarlyQuitTracker {
          state_name!: {value: this.stateName},
          time_spent_in_exp_in_msecs!: {value: this.expDurationInSecs * 1000},
        };
-     } return null;
+     }
    }
 }
 
@@ -344,13 +344,12 @@ export class PlaythroughService {
             this.recordedLearnerActions.some(
               a => a.actionType === AppConstants.ACTION_TYPE_ANSWER_SUBMIT) &&
          // Playthroughs are only helpful if learners have invested enough time.
-         this.playthroughDurationInSecs >=
+          this.playthroughDurationInSecs >=
             ServicesConstants.MIN_PLAYTHROUGH_DURATION_IN_SECS);
-     } return null;
+     }
    }
 }
 
 angular.module('oppia').factory(
   'PlaythroughService',
   downgradeInjectable(PlaythroughService));
-
