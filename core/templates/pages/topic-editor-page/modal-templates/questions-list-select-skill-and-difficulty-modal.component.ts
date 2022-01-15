@@ -23,7 +23,7 @@ import { AppConstants } from 'app.constants';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { QuestionsListConstants } from 'components/question-directives/questions-list/questions-list.constants';
 import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
-import { SkillSummary } from 'domain/skill/skill-summary.model';
+import { SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
 
 interface Summary {
   id: string;
@@ -41,16 +41,16 @@ export class QuestionsListSelectSkillAndDifficultyModalComponent
   @Input() countOfSkillsToPrioritize: number;
   @Input() linkedSkillsWithDifficulty: SkillDifficulty[];
   @Input() skillIdToRubricsObject: object;
-  @Input() allSkillSummaries: SkillSummary[];
+  @Input() allSkillSummaries: SkillSummaryBackendDict[];
   instructionMessage: string;
-  skillSummaries: SkillSummary[];
-  skillSummariesInitial: SkillSummary[];
-  skillSummariesFinal: SkillSummary[];
+  skillSummaries: SkillSummaryBackendDict[];
+  skillSummariesInitial: SkillSummaryBackendDict[];
+  skillSummariesFinal: SkillSummaryBackendDict[];
   selectedSkills: string[];
   DEFAULT_SKILL_DIFFICULTY: number;
   MODE_SELECT_DIFFICULTY: string;
   MODE_SELECT_SKILL: string;
-  skillsToShow: SkillSummary[] = [];
+  skillsToShow: SkillSummaryBackendDict[] = [];
 
   constructor(
     private ngbActiveModal: NgbActiveModal

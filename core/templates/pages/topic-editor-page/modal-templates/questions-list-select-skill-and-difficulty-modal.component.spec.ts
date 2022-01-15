@@ -43,13 +43,31 @@ describe('Questions List Select Skill And Difficulty Modal Component', () => {
 
   let allSkillSummaries = [{
     id: '1',
-    description: 'Skill 1 description'
+    description: 'Skill 1 description',
+    language_code: 'en',
+    version: 1,
+    misconception_count: 2,
+    worked_examples_count: 2,
+    skill_model_created_on: 2,
+    skill_model_last_updated: 2,
   }, {
     id: '2',
-    description: 'Skill 2 description'
+    description: 'Skill 2 description',
+    language_code: 'en',
+    version: 1,
+    misconception_count: 2,
+    worked_examples_count: 2,
+    skill_model_created_on: 2,
+    skill_model_last_updated: 2,
   }, {
     id: '3',
-    description: 'Skill 3 description'
+    description: 'Skill 3 description',
+    language_code: 'en',
+    version: 1,
+    misconception_count: 2,
+    worked_examples_count: 2,
+    skill_model_created_on: 2,
+    skill_model_last_updated: 2,
   }];
   let countOfSkillsToPrioritize = 2;
   let currentMode = null;
@@ -81,9 +99,11 @@ describe('Questions List Select Skill And Difficulty Modal Component', () => {
     allSkillSummaries.map(summary => (
       ShortSkillSummary.create(summary.id, summary.description)));
 
+    component.allSkillSummaries = allSkillSummaries;
     component.countOfSkillsToPrioritize = countOfSkillsToPrioritize;
     component.currentMode = currentMode;
     component.linkedSkillsWithDifficulty = linkedSkillsWithDifficulty;
+    component.skillSummaries = allSkillSummaries;
     component.skillIdToRubricsObject = skillIdToRubricsObject;
     fixture.detectChanges();
   });
@@ -97,6 +117,7 @@ describe('Questions List Select Skill And Difficulty Modal Component', () => {
     expect(component.currentMode).toBe(currentMode);
     expect(component.linkedSkillsWithDifficulty).toEqual(
       linkedSkillsWithDifficulty);
+    expect(component.skillSummaries).toBe(allSkillSummaries);
     expect(component.skillSummariesInitial.length).toBe(2);
     expect(component.skillSummariesFinal.length).toBe(1);
     expect(component.skillIdToRubricsObject).toEqual(skillIdToRubricsObject);
