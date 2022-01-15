@@ -16,65 +16,135 @@
  * @fileoverview Unit test for Solution Editor Component.
  */
 
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { SolutionEditor } from './solution-editor.component';
+import { EditabilityService } from 'services/editability.service';
+import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
+import { StateCustomizationArgsService } from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
+import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
+import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
 
-describe('SolutionEditorComponent', () => {
-  let ctrl = null;
-  let $rootScope = null;
-  let $scope = null;
+class mockStateCustomizationArgsService {
+  savedMemento = 'data3';
+}
+class mockStateInteractionIdService {
+  savedMemento = 'data2';
+}
+class mockStateSolutionService {
+  savedMemento = {
+    correctAnswer: 'data1'
+  };
+}
+class mockExplorationHtmlFormatterService {
+  getAnswerHtml(x, y, z): string {
+    return x + y + z;
+  }
+}
+class mockEditabilityService {
+  isEditable(): boolean {
+    return true;
+  }
+}
 
-  let EditabilityService = null;
-  let ExplorationHtmlFormatterService = null;
-  let StateSolutionService = null;
-  let StateInteractionIdService = null;
-  let StateCustomizationArgsService = null;
+describe('Solution editor component', function() {
+  let component: SolutionEditor;
+  let fixture: ComponentFixture<SolutionEditor>;
+  let editabilityService: EditabilityService;
+  let solutionObjectFactory: SolutionObjectFactory;
 
-  beforeEach(angular.mock.module('oppia'));
-  importAllAngularServices();
-
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
-
-    EditabilityService = $injector.get('EditabilityService');
-    StateSolutionService = $injector.get('StateSolutionService');
-    StateInteractionIdService = $injector.get('StateInteractionIdService');
-    EditabilityService = $injector.get('EditabilityService');
-    ExplorationHtmlFormatterService = $injector.get(
-      'ExplorationHtmlFormatterService');
-    StateCustomizationArgsService = $injector.get(
-      'StateCustomizationArgsService');
-
-    ctrl = $componentController('solutionEditor', {
-      $scope: $scope
-    });
-
-    StateSolutionService.savedMemento = {
-      correctAnswer: 'Ans'
-    };
-    StateInteractionIdService.savedMemento = 'TextInput';
-    StateCustomizationArgsService.savedMemento = 'Args';
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      declarations: [
+        SolutionEditor
+      ],
+      providers: [
+        SolutionObjectFactory,
+        {
+          provide: EditabilityService,
+          useClass: mockEditabilityService
+        },
+        {
+          provide: ExplorationHtmlFormatterService,
+          useClass: mockExplorationHtmlFormatterService
+        },
+        {
+          provide: StateSolutionService,
+          useClass: mockStateSolutionService
+        },
+        {
+          provide: StateInteractionIdService,
+          useClass: mockStateInteractionIdService
+        },
+        {
+          provide: StateCustomizationArgsService,
+          useClass: mockStateCustomizationArgsService
+        }
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
 
-  it('should set component properties on initialization', () => {
-    spyOn(EditabilityService, 'isEditable').and.returnValue(true);
+  beforeEach(() => {
+    fixture = TestBed.createComponent(SolutionEditor);
+    component = fixture.componentInstance;
 
-    ctrl.$onInit();
+    solutionObjectFactory = TestBed.inject(SolutionObjectFactory);
+    editabilityService = TestBed.inject(EditabilityService);
 
-    expect(ctrl.isEditable).toBe(true);
-    expect(ctrl.EXPLANATION_FORM_SCHEMA).toEqual({
-      type: 'html',
-      ui_config: {}
-    });
+    fixture.detectChanges();
   });
 
-  it('should get answer HTML', () => {
-    spyOn(ExplorationHtmlFormatterService, 'getAnswerHtml').and.returnValue({
-      answer: 'Answer'
-    });
+  it('should initalized', () => {
+    spyOn(editabilityService, 'isEditable').and.callThrough();
 
-    expect(ctrl.getAnswerHtml()).toEqual({
-      answer: 'Answer'
-    });
+    component.ngOnInit();
+
+    expect(editabilityService.isEditable).toHaveBeenCalled();
+    expect(component.EXPLANATION_FORM_SCHEMA).toEqual(
+      {
+        type: 'html',
+        ui_config: {}
+      }
+    );
+  });
+
+  it('should open editor modal', () => {
+    spyOn(component.openSolutionEditorModal, 'emit').and.stub();
+
+    component.openEditorModal();
+
+    expect(component.openSolutionEditorModal.emit).toHaveBeenCalled();
+  });
+
+  it('should show open mark all audio as needing update modal', () => {
+    const modalData = ['value', 'value 2'];
+
+    spyOn(component.showMarkAllAudioAsNeedingUpdateModalIfRequired, 'emit')
+      .and.stub();
+
+    component.openMarkAllAudioAsNeedingUpdateModalIfRequired(modalData);
+
+    expect(component.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit)
+      .toHaveBeenCalledOnceWith(modalData);
+  });
+
+  it('should save new solution', () => {
+    let solution = solutionObjectFactory.createNew(
+      true, null, 'Html', 'XyzID');
+    spyOn(component.saveSolution, 'emit').and.stub();
+
+    component.updateNewSolution(solution);
+
+    expect(component.saveSolution.emit).toHaveBeenCalledOnceWith(solution);
+  });
+
+  it('should display answer', () => {
+    spyOn(component, 'getAnswerHtml').and.stub();
+
+    component.getAnswerHtml();
+
+    expect(component.getAnswerHtml).toHaveBeenCalled();
   });
 });

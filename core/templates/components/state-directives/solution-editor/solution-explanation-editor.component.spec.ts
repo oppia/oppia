@@ -16,120 +16,60 @@
  * @fileoverview Unit test for Solution Explanation Editor Component.
  */
 
-import { EventEmitter } from '@angular/core';
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
+import { EditabilityService } from 'services/editability.service';
+import { ContextService } from 'services/context.service';
+import { SolutionExplanationEditor } from './solution-explanation-editor.component';
 
-describe('SolutionExplanationEditorComponent', () => {
-  let ctrl = null;
-  let $rootScope = null;
-  let $scope = null;
+// eslint-disable-next-line oppia/no-test-blockers
+fdescribe('Post Publish Modal Controller', function() {
+  let component: SolutionExplanationEditor;
+  let fixture: ComponentFixture<SolutionExplanationEditor>;
+  let contextService: ContextService;
+  let editabilityService: EditabilityService;
 
-  let EditabilityService = null;
-  let ExternalSaveService = null;
-  let StateSolutionService = null;
-
-  beforeEach(angular.mock.module('oppia'));
-  importAllAngularServices();
-
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
-
-    EditabilityService = $injector.get('EditabilityService');
-    ExternalSaveService = $injector.get('ExternalSaveService');
-    StateSolutionService = $injector.get('StateSolutionService');
-
-    ctrl = $componentController('solutionExplanationEditor', {
-      $scope: $scope
-    }, {
-      showMarkAllAudioAsNeedingUpdateModalIfRequired: () => {},
-      onSaveSolution: () => {}
-    });
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      declarations: [
+        SolutionExplanationEditor
+      ],
+      providers: [
+        ContextService,
+        EditabilityService
+        // {
+        //   provide: WindowRef,
+        //   useClass: MockWindowRef
+        // }
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
 
-  afterEach(() => {
-    ctrl.$onDestroy();
+  beforeEach(() => {
+    fixture = TestBed.createComponent(SolutionExplanationEditor);
+    component = fixture.componentInstance;
+
+    contextService = TestBed.inject(ContextService);
+    editabilityService = TestBed.inject(EditabilityService);
+
+    spyOn(contextService, 'getEntityType').and.returnValue('question');
+    spyOn(editabilityService, 'isEditable').and.returnValue(true);
+
+    fixture.detectChanges();
   });
 
-  it('should set component properties on initialization', () => {
-    spyOn(EditabilityService, 'isEditable').and.returnValue(true);
-
-    expect(ctrl.editSolutionForm).toEqual(undefined);
-    expect(ctrl.isEditable).toBe(undefined);
-    expect(ctrl.explanationEditorIsOpen).toBe(undefined);
-
-    ctrl.$onInit();
-
-    expect(ctrl.editSolutionForm).toEqual({});
-    expect(ctrl.isEditable).toBe(true);
-    expect(ctrl.explanationEditorIsOpen).toBe(false);
-  });
-
-  it('should save explanation when external save event is triggered', () => {
-    let onExternalSaveEmitter = new EventEmitter();
-    spyOnProperty(ExternalSaveService, 'onExternalSave')
-      .and.returnValue(onExternalSaveEmitter);
-    spyOn(ctrl, 'showMarkAllAudioAsNeedingUpdateModalIfRequired');
-
-    ctrl.$onInit();
-
-    ctrl.explanationEditorIsOpen = true;
-    ctrl.editSolutionForm = {
-      $valid: true
-    };
-    StateSolutionService.savedMemento = {
-      explanation: {
-        html: '<p> Hint </p>'
+  it('should start', () => {
+    let Work = new EventEmitter();
+    spyOn()
+    component.ngOnInit();
+    expect(component.isEditable).toEqual(true);
+    expect(component.explanationEditorIsOpen).toEqual(false);
+    expect(component.EXPLANATION_FORM_SCHEMA).toEqual({
+      type: 'html',
+      ui_config: {
+        hide_complex_extensions: true
       }
-    };
-    StateSolutionService.displayed = {
-      explanation: {
-        contentId: 'contentID',
-        html: '<p> Hint Changed </p>'
-      }
-    };
-
-    onExternalSaveEmitter.emit();
-    $scope.$apply();
-
-    expect(ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired)
-      .toHaveBeenCalledWith(['contentID']);
-    expect(ctrl.explanationEditorIsOpen).toBe(false);
-  });
-
-  it('should open explanation editor when user clicks on \'Edit hint\'', () => {
-    ctrl.isEditable = true;
-    ctrl.explanationEditorIsOpen = false;
-
-    ctrl.openExplanationEditor();
-
-    expect(ctrl.explanationEditorIsOpen).toBe(true);
-  });
-
-  it('should cancel hint edit if user clicks on \'Cancel\'', () => {
-    ctrl.explanationEditorIsOpen = true;
-
-    ctrl.cancelThisExplanationEdit();
-
-    expect(ctrl.explanationEditorIsOpen).toBe(false);
-  });
-
-  it('should check if solution explanation length exceeds 100000 characters',
-    () => {
-      StateSolutionService.displayed = {
-        explanation: {
-          contentId: 'contentID',
-          html: 'a'.repeat(100000)
-        }
-      };
-      expect(ctrl.isSolutionExplanationLengthExceeded()).toBe(false);
-
-      StateSolutionService.displayed = {
-        explanation: {
-          contentId: 'contentID',
-          html: 'a'.repeat(100001)
-        }
-      };
-      expect(ctrl.isSolutionExplanationLengthExceeded()).toBe(true);
     });
+  });
 });

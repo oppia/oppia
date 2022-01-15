@@ -367,7 +367,6 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     SortByPipe,
     SavePendingChangesModalComponent,
     LearnerDashboardIconsComponent,
-    ReviewMaterialEditorComponent,
     DeleteInteractionModalComponent,
     DeleteHintModalComponent,
     DeleteLastHintModalComponent,

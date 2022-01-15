@@ -16,7 +16,7 @@
           {{stateSolutionService.savedMemento.answerIsExclusive ? 'The only' : 'One'}} solution is...
         </strong>
         <span>
-          <angular-html-bind-wrapper classStr="oppia-rte-editor" [htmlData]="getAnswerHtml()">
+          <angular-html-bind-wrapper [htmlData]="getAnswerHtml()">
           </angular-html-bind-wrapper>
         </span>
       </div>
