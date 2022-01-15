@@ -196,7 +196,7 @@ class BeamEntityToAndFromModelTests(test_utils.TestBase):
             ('FooModel', 'abc'), project=feconf.OPPIA_PROJECT_ID,
                 namespace=self.namespace)
             
-        ndb_key = job_utils.get_ndb_key_from_beam_key(beam_key)
+        ndb_key = datastore_services.Key._from_ds_key(beam_key.to_client_key())
         self.assertEqual(job_utils.get_beam_key_from_ndb_key(ndb_key), beam_key)
 
     def test_get_model_from_beam_entity_with_time(self) -> None:
