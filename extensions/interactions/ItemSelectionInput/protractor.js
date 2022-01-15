@@ -58,16 +58,11 @@ var expectInteractionDetailsToMatch = async function(
     by.css('.item-selection-input-container'));
   var optionsCount = await optionElements.count();
   expect(optionsCount).toEqual(richTextInstructionsArray.length);
-  var promises = [];
   for (var i = 0; i < optionsCount; i++) {
-    promises.push(await (await optionElements.get(i)).element(by.css(
-      '.protractor-test-item-selection-option')).getText());
+    await forms.expectRichText((await optionElements.get(i)).element(by.css(
+      '.protractor-test-item-selection-option'
+    ))).toMatch(richTextInstructionsArray[i]);
   }
-  var rteInstructionArrayCopy = [...richTextInstructionsArray];
-  rteInstructionArrayCopy.sort();
-  var results = await protractor.promise.all(promises);
-  results.sort();
-  expect(rteInstructionArrayCopy).toEqual(results);
 };
 
 // Type of object returned by interaction.
