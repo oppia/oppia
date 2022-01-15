@@ -34,7 +34,7 @@ import { InteractiveMapInteractionModule } from './InteractiveMap/interactive-ma
 import { MultipleChoiceInputInteractionModule } from './MultipleChoiceInput/multiple-choice-input-interactions.module';
 import { SetInputInteractionModule } from './SetInput/set-input-interactions.module';
 import { TextInputInteractionModule } from './TextInput/text-input-interactions.module';
-import { RatioExpressionInputInteractionModule } from './RatioExpressionInput/ratio-expression-input-interactios.module';
+import { RatioExpressionInputInteractionModule } from './RatioExpressionInput/ratio-expression-input-interactions.module';
 import { TranslateModule } from '@ngx-translate/core';
 
 @NgModule({
