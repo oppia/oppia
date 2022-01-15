@@ -69,6 +69,7 @@ describe('Subtopic viewer navbar breadcrumb component', function() {
                       }
                     },
                     next_subtopic_dict: null,
+                    prev_subtopic_dict: null,
                     topic_id: 'topic_1',
                     topic_name: 'topic_1'
                   }));
