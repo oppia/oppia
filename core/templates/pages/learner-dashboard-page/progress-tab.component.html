@@ -1,7 +1,7 @@
 <div class="progress-tab">
   <div class="skill-proficiency" [ngClass]="{'empty-section': emptySkillProficiency}" [ngStyle]="{'margin-top': windowIsNarrow? '35px': '64px'}" *ngIf="!windowIsNarrow || (windowIsNarrow && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.SKILL_PROFICIENCY)">
     <div class="skill-proficiency-heading">
-      <p class="skill-proficiency-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_SKILL_PROFICIENCY_SECTION' | translate">
+      <p class="skill-proficiency-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_SKILL_PROGRESS_SECTION' | translate">
       </p>
       <a class="info-tooltip" href="#/">
         <img [src]="getStaticImageUrl('/learner_dashboard/info.svg')" alt="info image" class="oppia-svg-info-image" *ngIf="!emptySkillProficiency">
