@@ -453,6 +453,7 @@
     "core/templates/pages/profile-page/profile-page-backend-api.service.spec.ts",
     "core/templates/pages/profile-page/profile-page-domain.constants.ts",
     "core/templates/pages/profile-page/profile-page.component.ts",
+    "core/templates/pages/profile-page/profile-page.component.spec.ts",
     "core/templates/pages/release-coordinator-page/release-coordinator-page.component.ts",
     "core/templates/pages/review-test-page/review-test-engine.service.ts",
     "core/templates/pages/review-test-page/review-test-engine.service.spec.ts",
