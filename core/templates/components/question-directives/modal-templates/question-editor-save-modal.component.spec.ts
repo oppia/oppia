@@ -43,6 +43,9 @@ describe('Question Editor Save Modal Component', function() {
     fixture.detectChanges();
   });
 
+  // This component have no more frontend tests as it inherits the
+  // ConfirmOrCancelModalComponent and doesn't have any additional
+  // functionality. Please see the ConfirmOrCancelModalComponent for more tests.
   it('should create', () => {
     expect(component).toBeDefined();
   });
