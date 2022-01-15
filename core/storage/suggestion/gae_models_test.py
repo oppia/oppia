@@ -171,7 +171,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
     def test_create_suggestion_fails_if_id_collides_with_existing_one(
             self
     ) -> None:
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception, 'There is already a suggestion with the given id: '
                        'exploration.exp1.thread_1'):
             suggestion_models.GeneralSuggestionModel.create(
@@ -191,7 +191,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 queries)), 5)
         queries = [('suggestion_type', 'invalid_suggestion_type')]
 
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception, 'Value \'invalid_suggestion_type\' for property'
                        ' suggestion_type is not an allowed choice'):
             suggestion_models.GeneralSuggestionModel.query_suggestions(queries)
@@ -295,7 +295,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             ('target_id', self.target_id),
             ('invalid_field', 'value')
         ]
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception, 'Not allowed to query on field invalid_field'):
             suggestion_models.GeneralSuggestionModel.query_suggestions(queries)
 
@@ -619,7 +619,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
     ) -> None:
         with self.swap(
             feconf, 'CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES', []):
-            with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex( # type: ignore[no-untyped-call]
                 Exception,
                 'Expected the suggestion types offered on the Contributor '
                 'Dashboard to be nonempty.'):
@@ -906,7 +906,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             suggestion_models.GeneralSuggestionModel
             .get_in_review_suggestions_in_score_categories(
                 ['category1', 'category_invalid'], 'author_2')), 1)
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception, 'Received empty list of score categories'):
             self.assertEqual(len(
                 suggestion_models.GeneralSuggestionModel

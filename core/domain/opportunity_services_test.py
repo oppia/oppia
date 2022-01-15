@@ -582,7 +582,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             self):
         opportunity_services.create_skill_opportunity(
             self.SKILL_ID, 'description')
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'SkillOpportunity corresponding to skill ID %s already exists.'
             % self.SKILL_ID):
@@ -942,7 +942,7 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
     def test_regenerate_opportunities_related_to_topic_when_story_deleted(self):
         story_models.StoryModel.delete_by_id(self.STORY_ID)
 
-        self.assertRaisesRegexp(
+        self.assertRaisesRegex(
             Exception, 'Failed to regenerate opportunities',
             lambda: (
                 opportunity_services.regenerate_opportunities_related_to_topic(
