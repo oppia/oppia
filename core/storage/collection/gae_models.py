@@ -22,7 +22,6 @@ import copy
 import datetime
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.platform import models
@@ -380,8 +379,8 @@ class CollectionModel(base_models.VersionedModel):
             collection_rights_models = CollectionRightsModel.get_multi(
                 entity_ids, include_deleted=True)
             versioned_models = cls.get_multi(entity_ids, include_deleted=True)
-            for model, rights_model in python_utils.ZIP(
-                    versioned_models, collection_rights_models):
+            for model, rights_model in zip(
+                versioned_models, collection_rights_models):
                 # Ruling out the possibility of None for mypy type checking.
                 assert model is not None
                 assert rights_model is not None
