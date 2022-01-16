@@ -50,12 +50,12 @@ angular.module('oppia').component('questionEditor', {
   template: require('./question-editor.component.html'),
   controllerAs: '$ctrl',
   controller: [
-    'EditabilityService', 'LoaderService', 'NgbModal',
+    '$rootScope', 'EditabilityService', 'LoaderService', 'NgbModal',
     'QuestionUpdateService', 'SolutionValidityService',
     'StateEditorService', 'StateInteractionIdService',
     'UrlInterpolationService',
     function(
-        EditabilityService, LoaderService, NgbModal,
+        $rootScope, EditabilityService, LoaderService, NgbModal,
         QuestionUpdateService, SolutionValidityService,
         StateEditorService, StateInteractionIdService,
         UrlInterpolationService) {
@@ -169,6 +169,7 @@ angular.module('oppia').component('questionEditor', {
         _updateQuestion(function() {
           StateEditorService.setInteractionHints(
             angular.copy(displayedValue));
+          $rootScope.$applyAsync();
         });
       };
 
