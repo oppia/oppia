@@ -104,6 +104,7 @@ export class SolutionExplanationEditor
         }
       })
     );
+
     this.isEditable = this.editabilityService.isEditable();
     this.explanationEditorIsOpen = false;
 

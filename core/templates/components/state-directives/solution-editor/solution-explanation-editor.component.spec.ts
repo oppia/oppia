@@ -16,18 +16,49 @@
  * @fileoverview Unit test for Solution Explanation Editor Component.
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { EditabilityService } from 'services/editability.service';
 import { ContextService } from 'services/context.service';
 import { SolutionExplanationEditor } from './solution-explanation-editor.component';
+import { ExternalSaveService } from 'services/external-save.service';
+import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
+
+class mockStateSolutionService {
+  displayed = {
+    explanation: {
+      _html: 'Hello world',
+      contentId: 'contentId',
+      get html(): string {
+        return 'Hello world';
+      }
+    }
+  };
+
+  savedMemento = {
+    explanation: {
+      _html: 'Hello world 2',
+      contentId: 'xyz',
+      get html(): string {
+        return 'Hello world 2';
+      }
+    }
+  };
+
+  saveDisplayedValue() {
+  }
+}
 
 // eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Post Publish Modal Controller', function() {
+fdescribe('Solution explanation editor', function() {
   let component: SolutionExplanationEditor;
   let fixture: ComponentFixture<SolutionExplanationEditor>;
+
   let contextService: ContextService;
   let editabilityService: EditabilityService;
+  let stateSolutionService: StateSolutionService;
+  let externalSaveService: ExternalSaveService;
+  let externalSaveServiceEmitter = new EventEmitter<void>();
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -36,11 +67,12 @@ fdescribe('Post Publish Modal Controller', function() {
       ],
       providers: [
         ContextService,
-        EditabilityService
-        // {
-        //   provide: WindowRef,
-        //   useClass: MockWindowRef
-        // }
+        EditabilityService,
+        ExternalSaveService,
+        {
+          provide: StateSolutionService,
+          useClass: mockStateSolutionService
+        }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -52,24 +84,71 @@ fdescribe('Post Publish Modal Controller', function() {
 
     contextService = TestBed.inject(ContextService);
     editabilityService = TestBed.inject(EditabilityService);
+    stateSolutionService = TestBed.inject(StateSolutionService);
+    externalSaveService = TestBed.inject(ExternalSaveService);
 
+
+    spyOnProperty(externalSaveService, 'onExternalSave')
+      .and.returnValue(externalSaveServiceEmitter);
     spyOn(contextService, 'getEntityType').and.returnValue('question');
     spyOn(editabilityService, 'isEditable').and.returnValue(true);
 
     fixture.detectChanges();
+    component.ngOnInit();
   });
 
-  it('should start', () => {
-    let Work = new EventEmitter();
-    spyOn()
-    component.ngOnInit();
-    expect(component.isEditable).toEqual(true);
-    expect(component.explanationEditorIsOpen).toEqual(false);
-    expect(component.EXPLANATION_FORM_SCHEMA).toEqual({
+  it('should intitalize with default values', () => {
+    const schema = {
       type: 'html',
       ui_config: {
         hide_complex_extensions: true
       }
-    });
+    };
+
+    expect(component.isEditable).toEqual(true);
+    expect(component.explanationEditorIsOpen).toEqual(false);
+    expect(component.EXPLANATION_FORM_SCHEMA).toEqual(schema);
+    expect(component.getSchema()).toEqual(schema);
+    expect(component.isSolutionExplanationLengthExceeded()).toBeFalse();
+
+    component.openExplanationEditor();
+    expect(component.explanationEditorIsOpen).toBeTrue();
+
+    component.cancelThisExplanationEdit();
+    expect(component.explanationEditorIsOpen).toBeFalse();
   });
+
+  it('should open shema based editor on user click', () => {
+    const schema = {
+      type: 'html',
+      ui_config: {
+        hide_complex_extensions: true
+      }
+    };
+
+    component.openExplanationEditor();
+
+    expect(component.getSchema()).toEqual(schema);
+    expect(component.explanationEditorIsOpen).toBeTrue();
+
+    const updatedHtml = 'updateHtml';
+
+    component.updateHtml(updatedHtml);
+    expect(stateSolutionService.displayed.explanation._html).toBe(updatedHtml);
+  });
+
+  it('should open shema based editor on user click me', fakeAsync(() => {
+    spyOn(component.showMarkAllAudioAsNeedingUpdateModalIfRequired, 'emit')
+      .and.stub();
+    spyOn(component.onSaveSolution, 'emit').and.stub();
+
+    component.explanationEditorIsOpen = true;
+    externalSaveServiceEmitter.emit();
+    tick();
+
+    expect(component.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit)
+      .toHaveBeenCalled();
+    expect(component.onSaveSolution.emit).toHaveBeenCalled();
+    expect(component.explanationEditorIsOpen).toBe(false);
+  }));
 });
