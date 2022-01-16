@@ -770,6 +770,7 @@
 	"I18N_TOPIC_VIEWER_LESSON": "Title shown in a label in the topic's viewer page, when the number of chapters is equal to one.",
 	"I18N_TOPIC_VIEWER_LESSONS": "Title shown in a tab header in the topic's viewer page. - Clicking on this tab header shows the list of stories in topic.",
 	"I18N_TOPIC_VIEWER_MASTER_SKILLS": "Title shown in the 'Practice' tab in the topic viewer, where the user can select skills to tackle questions on them.",
+	"I18N_TOPIC_VIEWER_NO_QUESTION_WARNING": "Text displayed below the start button in 'practice' tab, when user select a subtopic which does not contain any questions attached to it.",
 	"I18N_TOPIC_VIEWER_PRACTICE": "Title shown in a tab header in the topic's viewer page. - Clicking on this tab header shows a list of the practice questions that can be used to test the learner's understanding of the topic.",
 	"I18N_TOPIC_VIEWER_REVISION": "Title shown in a tab header in the topic's viewer page. - Clicking on this shows a list of the subtopics that lie within the topic",
 	"I18N_TOPIC_VIEWER_SELECT_SKILLS": "Subtitle shown in the 'Practice' tab in the topic viewer, where the user can select skills to tackle questions on them.",
