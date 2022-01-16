@@ -24,11 +24,16 @@ import { Collection } from 'domain/collection/collection.model';
 import { GuestCollectionProgressService } from 'domain/collection/guest-collection-progress.service';
 import { ReadOnlyCollectionBackendApiService } from 'domain/collection/read-only-collection-backend-api.service';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
+import { BindableVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { ExplorationRecommendationsBackendApiService } from 'domain/recommendations/exploration-recommendations-backend-api.service';
 import { ConceptCardBackendApiService } from 'domain/skill/concept-card-backend-api.service';
+import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
 import { StateCard } from 'domain/state_card/state-card.model';
+import { ReadOnlyStoryNode } from 'domain/story_viewer/read-only-story-node.model';
+import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
 import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
-import { ExplorationSummaryBackendApiService } from 'domain/summary/exploration-summary-backend-api.service';
+import { ExplorationSummaryBackendApiService, ExplorationSummaryDict } from 'domain/summary/exploration-summary-backend-api.service';
 import { UserInfo } from 'domain/user/user-info.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { CollectionPlayerBackendApiService } from 'pages/collection-player-page/services/collection-player-backend-api.service';
@@ -47,6 +52,7 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { UserService } from 'services/user.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { ExplorationPlayerConstants } from '../exploration-player-page.constants';
+import { InteractionRulesService } from '../services/answer-classification.service';
 import { AudioTranslationLanguageService } from '../services/audio-translation-language.service';
 import { ContentTranslationLanguageService } from '../services/content-translation-language.service';
 import { ContentTranslationManagerService } from '../services/content-translation-manager.service';
@@ -75,13 +81,13 @@ class MockWindowRef {
       reload: () => {}
     },
     addEventListener(event: string, callback) {
-      callback('');
-    }
+      callback({returnValue: null});
+    },
+    scrollTo: (x, y) => {}
   };
 }
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Conversation skin component', () => {
+describe('Conversation skin component', () => {
   let fixture: ComponentFixture<ConversationSkinComponent>;
   let componentInstance: ConversationSkinComponent;
   let alertsService: AlertsService;
@@ -127,6 +133,11 @@ fdescribe('Conversation skin component', () => {
   let userService: UserService;
   let windowDimensionsService: WindowDimensionsService;
   let windowRef: WindowRef;
+
+  let displayedCard = new StateCard(
+    null, null, null, new Interaction(
+      [], [], null, null, [], '', null),
+    [], null, null, '', null);
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -218,13 +229,14 @@ fdescribe('Conversation skin component', () => {
       is_topic_manager: false,
       username: true
     };
-    spyOn(contextService, 'isInExplorationEditorPage');
+    let newStateName = 'newState';
+    spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
       Promise.resolve(new UserInfo(
         [], false, false,
         false, false, false, '', '', '', true)));
     spyOn(urlService, 'getCollectionIdFromExplorationUrl')
-      .and.returnValue(collectionId);
+      .and.returnValues(collectionId, null);
 
     spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
       .and.returnValue(Promise.resolve(new Collection(
@@ -237,19 +249,28 @@ fdescribe('Conversation skin component', () => {
     spyOn(urlInterpolationService, 'getStaticImageUrl')
       .and.returnValue('oppia_avatar_url');
     spyOn(explorationPlayerStateService, 'isInQuestionPlayerMode')
-      .and.returnValue(true);
+      .and.returnValues(true, false);
     spyOn(componentInstance, 'initializePage');
     spyOn(collectionPlayerBackendApiService, 'fetchCollectionSummariesAsync')
-      .and.returnValue(Promise.resolve(collectionSummary));
+      .and.returnValue(
+        Promise.resolve(collectionSummary));
     spyOn(questionPlayerStateService, 'hintUsed');
     spyOn(questionPlayerEngineService, 'getCurrentQuestion');
     spyOn(questionPlayerStateService, 'solutionViewed');
+    spyOn(imagePreloaderService, 'onStateChange');
+    spyOn(statsReportingService, 'recordExplorationCompleted');
+    spyOn(statsReportingService, 'recordExplorationActuallyStarted');
+    spyOn(
+      guestCollectionProgressService, 'recordExplorationCompletedInCollection');
+    spyOn(componentInstance, 'doesCollectionAllowsGuestProgress')
+      .and.returnValue(true);
+    spyOn(statsReportingService, 'recordMaybeLeaveEvent');
+    spyOn(playerTranscriptService, 'getLastStateName').and.returnValue('');
+    spyOn(learnerParamsService, 'getAllParams').and.returnValue({});
 
     let mockOnHintConsumed = new EventEmitter();
     let mockOnSolutionViewedEventEmitter = new EventEmitter();
     let mockOnPlayerStateChange = new EventEmitter();
-
-    componentInstance.ngOnInit();
 
     spyOnProperty(hintsAndSolutionManagerService, 'onHintConsumed')
       .and.returnValue(mockOnHintConsumed);
@@ -259,16 +280,29 @@ fdescribe('Conversation skin component', () => {
     spyOnProperty(explorationPlayerStateService, 'onPlayerStateChange')
       .and.returnValue(mockOnPlayerStateChange);
 
+    componentInstance.nextCard = new StateCard(
+      null, null, null, new Interaction(
+        [], [], null, null, [], 'EndExploration', null),
+      [], null, null, '', null);
+    componentInstance.isLoggedIn = false;
+    componentInstance.hasInteractedAtLeastOnce = true;
+    componentInstance.displayedCard = displayedCard;
+
+    componentInstance.ngOnInit();
+
     mockOnHintConsumed.emit();
     mockOnSolutionViewedEventEmitter.emit();
     mockOnPlayerStateChange.emit();
-    tick();
-    tick();
-    tick();
-    tick();
-    tick();
-    tick();
-    tick();
+    mockOnPlayerStateChange.emit(newStateName);
+    tick(100);
+
+    componentInstance.redirectToRefresherExplorationConfirmed = true;
+
+    spyOn(alertsService, 'addWarning');
+    componentInstance.ngOnInit();
+
+    TestBed.inject(WindowRef).nativeWindow.onresize(null);
+    tick(1000);
   }));
 
   it('should tell if submit button is disabled', () => {
@@ -281,6 +315,10 @@ fdescribe('Conversation skin component', () => {
 
     expect(componentInstance.isSubmitButtonDisabled()).toBeTrue();
     expect(componentInstance.isSubmitButtonDisabled()).toBeFalse();
+  });
+
+  it('should tell if collection allows guest progress', () => {
+    expect(componentInstance.doesCollectionAllowsGuestProgress('')).toBeFalse();
   });
 
   it('should change card', () => {
@@ -401,11 +439,8 @@ fdescribe('Conversation skin component', () => {
   });
 
   it('should tell if supplemental card is non empty', () => {
-    let stateCard = new StateCard(
-      null, null, null, new Interaction(
-        [], [], null, null, [], '', null),
-      [], null, null, '', null);
-    expect(componentInstance.isSupplementalCardNonempty(stateCard)).toBeFalse();
+    expect(componentInstance.isSupplementalCardNonempty(displayedCard))
+      .toBeFalse();
   });
 
   it('should return to exploration after concept card is compeleted', () => {
@@ -440,23 +475,50 @@ fdescribe('Conversation skin component', () => {
     expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
   });
 
-  it('should initialize page', () => {
-    spyOn(playerPositionService, 'init');
+  it('should initialize page', fakeAsync(() => {
+    spyOn(playerPositionService, 'init').and.callFake((callb) => {
+      callb();
+    });
     componentInstance.questionPlayerConfig = {};
-    spyOn(explorationPlayerStateService, 'initializeQuestionPlayer');
+    spyOn(explorationPlayerStateService.onPlayerStateChange, 'emit');
+    spyOn(focusManagerService, 'setFocusIfOnDesktop');
+    spyOn(loaderService, 'hideLoadingScreen');
+    let getLanguageSpy = spyOn(explorationPlayerStateService, 'getLanguageCode')
+      .and.returnValue('en');
+    spyOn(explorationPlayerStateService, 'initializeQuestionPlayer')
+      .and.callFake((config, callb, questionAreAvailable) => {
+        callb(displayedCard, 'label');
+      });
+    spyOn(componentInstance, 'adjustPageHeight');
+    spyOn(playerPositionService.onNewCardOpened, 'emit');
+    componentInstance.isIframed = true;
+    spyOn(playerPositionService, 'setDisplayedCardIndex');
 
     componentInstance.initializePage();
+    tick(100);
     expect(componentInstance.hasInteractedAtLeastOnce).toBeFalse();
     expect(componentInstance.recommendedExplorationSummaries).toEqual([]);
     expect(playerPositionService.init).toHaveBeenCalled();
 
     componentInstance.questionPlayerConfig = null;
     spyOn(explorationPlayerStateService, 'initializePlayer');
+    spyOn(playerPositionService, 'getDisplayedCardIndex');
+    spyOn(playerTranscriptService, 'getCard').and.returnValue(displayedCard);
+    spyOn(playerPositionService.onActiveCardChanged, 'emit');
+    spyOn(audioPlayerService.onAutoplayAudio, 'emit');
+    spyOn(autogeneratedAudioPlayerService, 'cancel');
+    spyOn(playerTranscriptService, 'isLastCard').and.returnValues(true, false);
+    spyOn(focusManagerService, 'setFocusIfOnDesktop');
+    spyOn(componentInstance, 'getContentFocusLabel');
 
+    getLanguageSpy.and.returnValue('pq');
+    componentInstance.initializePage();
+
+    tick(100);
     componentInstance.initializePage();
 
     expect(explorationPlayerStateService.initializePlayer).toHaveBeenCalled();
-  });
+  }));
 
   it('should tell if window can show two cards', () => {
     spyOn(windowDimensionsService, 'getWidth').and.returnValue(
@@ -480,5 +542,456 @@ fdescribe('Conversation skin component', () => {
     componentInstance.submitAnswerFromProgressNav();
 
     expect(currentInteractionService.submitAnswer).toHaveBeenCalled();
+  });
+
+  it('should show learn again button', () => {
+    componentInstance.displayedCard = {
+      getStateName: () => null
+    } as StateCard;
+
+    spyOn(explorationPlayerStateService, 'isInQuestionMode').and.returnValues(
+      false, true, true, true);
+
+    expect(componentInstance.isLearnAgainButton()).toBeFalse();
+
+    componentInstance.displayedCard = displayedCard;
+
+    expect(componentInstance.isLearnAgainButton()).toBeFalse();
+
+    componentInstance.displayedCard = new StateCard(
+      null, null, null, new Interaction(
+        [], [], null, null, [], 'Continue', null),
+      [], null, null, '', null);
+
+    expect(componentInstance.isLearnAgainButton()).toBeFalse();
+
+    componentInstance.displayedCard = new StateCard(
+      null, null, null, new Interaction(
+        [], [], null, null, [], 'ImageClickInput', null),
+      [], null, null, '', null);
+
+    componentInstance.pendingCardWasSeenBefore = true;
+    componentInstance.answerIsCorrect = false;
+    spyOn(componentInstance, 'isCorrectnessFeedbackEnabled')
+      .and.returnValue(true);
+
+    expect(componentInstance.isLearnAgainButton()).toBeTrue();
+  });
+
+  it('should adjust page height on scroll', fakeAsync(() => {
+    componentInstance.lastRequestedHeight = document.body.scrollHeight + 100;
+    componentInstance.lastRequestedScroll = false;
+    spyOn(messengerService, 'sendMessage');
+
+    let callbSpy = jasmine.createSpy('adjust page height callback');
+    let scrollValue = true;
+
+    componentInstance.adjustPageHeight(scrollValue, callbSpy);
+    tick(150);
+
+    expect(messengerService.sendMessage).toHaveBeenCalled();
+    expect(componentInstance.lastRequestedScroll).toEqual(scrollValue);
+    expect(callbSpy).toHaveBeenCalled();
+  }));
+
+  it('should get exploration link', () => {
+    componentInstance.recommendedExplorationSummaries = [{id: ''}];
+
+    expect(componentInstance.getExplorationLink()).toEqual('#');
+
+    let expId = '123';
+    let collectionId = '980';
+    let storyUrlFragment = 'story_fragment';
+    let nodeId = 'node_id';
+    let topicUrlFragment = 'topic_url_fragment';
+    let classroomUrlFragment = 'classroom_fragment';
+    componentInstance.recommendedExplorationSummaries = [{
+      id: expId,
+      parentExplorationIds: ['4566', 's9af0'],
+      nextNodeId: nodeId
+    }];
+    spyOn(urlService, 'getUrlParams').and.returnValues({
+      collection_id: collectionId
+    }, {
+      story_url_fragment: storyUrlFragment,
+      node_id: nodeId,
+      topic_url_fragment: topicUrlFragment,
+      classroom_url_fragment: classroomUrlFragment
+    }, {
+      story_url_fragment: storyUrlFragment,
+      node_id: nodeId,
+      topic_url_fragment: topicUrlFragment,
+      classroom_url_fragment: classroomUrlFragment
+    });
+
+    expect(componentInstance.getExplorationLink()).toEqual(
+      '/explore/' + expId + '?collection_id=' + collectionId +
+      '&parent=' + componentInstance.recommendedExplorationSummaries[0]
+        .parentExplorationIds[0]);
+    expect(urlService.getUrlParams).toHaveBeenCalled();
+
+    componentInstance.parentExplorationIds = null;
+    componentInstance.storyNodeIdToAdd = nodeId;
+
+    expect(componentInstance.getExplorationLink()).toEqual(
+      '/explore/' + expId + '?parent=' +
+      componentInstance.recommendedExplorationSummaries[0]
+        .parentExplorationIds[0] + '&topic_url_fragment=' + topicUrlFragment +
+        '&classroom_url_fragment=' + classroomUrlFragment +
+        '&story_url_fragment=' + storyUrlFragment + '&node_id=' + nodeId
+    );
+
+    spyOn(urlService, 'getPathname').and.returnValue(
+      '/story/story-url-fragment');
+    spyOn(urlService, 'getStoryUrlFragmentFromLearnerUrl').and.returnValue(
+      storyUrlFragment);
+    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
+      topicUrlFragment);
+    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
+      classroomUrlFragment);
+
+    expect(componentInstance.getExplorationLink()).toEqual(
+      '/explore/' + expId + '?parent=' +
+      componentInstance.recommendedExplorationSummaries[0]
+        .parentExplorationIds[0] + '&topic_url_fragment=' + topicUrlFragment +
+        '&classroom_url_fragment=' + classroomUrlFragment +
+        '&story_url_fragment=' + storyUrlFragment + '&node_id=' + nodeId
+    );
+    expect(urlService.getPathname).toHaveBeenCalled();
+    expect(urlService.getStoryUrlFragmentFromLearnerUrl).toHaveBeenCalled();
+    expect(urlService.getTopicUrlFragmentFromLearnerUrl).toHaveBeenCalled();
+    expect(urlService.getClassroomUrlFragmentFromLearnerUrl).toHaveBeenCalled();
+  });
+
+  it('should tell if current supplemental card is non empty', () => {
+    componentInstance.displayedCard = displayedCard;
+    spyOn(componentInstance, 'isSupplementalCardNonempty').and.returnValues(
+      true, false);
+
+    expect(componentInstance.isCurrentSupplementalCardNonempty()).toBeTrue();
+    expect(componentInstance.isCurrentSupplementalCardNonempty()).toBeFalse();
+  });
+
+  it('should tell if supplemental nav is shown', () => {
+    componentInstance.displayedCard = new StateCard(
+      null, null, null, new Interaction(
+        [], [], null, null, [], 'NumberWithUnits', null),
+      [], null, null, '', null);
+    spyOn(explorationPlayerStateService, 'isInQuestionMode').and.returnValues(
+      false, true);
+    spyOn(componentInstance, 'isCurrentCardAtEndOfTranscript')
+      .and.returnValue(true);
+    expect(componentInstance.isSupplementalNavShown()).toBeFalse();
+    expect(componentInstance.isSupplementalNavShown()).toBeTrue();
+  });
+
+  it('should animate to two cards', fakeAsync(() => {
+    let doneCallbackSpy = jasmine.createSpy('done callback');
+    componentInstance.animateToTwoCards(doneCallbackSpy);
+
+    tick(1000);
+    expect(componentInstance.isAnimatingToTwoCards).toBeFalse();
+    expect(doneCallbackSpy).toHaveBeenCalled();
+  }));
+
+  it('should animate to one card', fakeAsync(() => {
+    let doneCallbackSpy = jasmine.createSpy('done callback');
+    componentInstance.animateToOneCard(doneCallbackSpy);
+
+    tick(600);
+    expect(componentInstance.isAnimatingToOneCard).toBeFalse();
+    expect(doneCallbackSpy).toHaveBeenCalled();
+  }));
+
+  it('should show pending card', fakeAsync(() => {
+    spyOn(explorationPlayerStateService, 'recordNewCardAdded');
+    spyOn(focusManagerService, 'setFocusIfOnDesktop');
+    spyOn(componentInstance, 'scrollToTop');
+    spyOn(playerPositionService.onNewCardOpened, 'emit');
+    spyOn(explorationPlayerStateService, 'getLanguageCode')
+      .and.returnValue('en');
+    spyOn(playerTranscriptService, 'getNumCards').and.returnValue(10);
+    spyOn(contentTranslationManagerService, 'displayTranslations');
+    spyOn(componentInstance, 'isSupplementalCardNonempty');
+    spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(0);
+    spyOn(componentInstance, 'canWindowShowTwoCards');
+    spyOn(componentInstance, 'animateToOneCard');
+    spyOn(playerPositionService, 'setDisplayedCardIndex');
+    spyOn(playerPositionService, 'changeCurrentQuestion');
+    spyOn(urlService, 'getQueryFieldValuesAsList').and.returnValue(['123']);
+    spyOn(explorationPlayerStateService, 'isInStoryChapterMode')
+      .and.returnValue(true);
+    spyOn(urlService, 'getUrlParams').and.returnValue({
+      topic_url_fragment: 'topicUrlFragment',
+      classroom_url_fragment: 'classroomUrlFragment',
+      story_url_fragment: 'storyUrlFragment',
+      node_id: 'nodeId'
+    });
+    spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue('story');
+    let readOnlyStoryNode = new ReadOnlyStoryNode(
+      '', '', '', [], [], [], '', false, '', null, false, '', '');
+    spyOn(storyViewerBackendApiService, 'fetchStoryDataAsync')
+      .and.returnValue(Promise.resolve(
+        new StoryPlaythrough(
+          'nodeId', [readOnlyStoryNode, readOnlyStoryNode], '', '', '', '')
+      ));
+    spyOn(storyViewerBackendApiService, 'recordChapterCompletionAsync')
+      .and.returnValues(Promise.resolve({
+        readyForReviewTest: true,
+        nextNodeId: '',
+        summaries: []
+      }));
+
+    componentInstance.displayedCard = new StateCard(
+      null, null, null, new Interaction(
+        [], [], null, null, [], 'EndExploration', null),
+      [], null, null, '', null);
+    componentInstance.isLoggedIn = true;
+
+    componentInstance.showPendingCard();
+    tick(1000);
+
+    expect(explorationPlayerStateService.recordNewCardAdded).toHaveBeenCalled();
+  }));
+
+  it('should scroll to bottom', fakeAsync(() => {
+    componentInstance.scrollToBottom();
+    tick(200);
+
+    spyOn(window, '$').and.returnValue({
+      offset: () => {
+        return {top: 10};
+      },
+      outerHeight: () => 10,
+      scrollTop: () => 0,
+      height: () => 0,
+      animate: () => {}
+    } as unknown as JQLite);
+
+    componentInstance.scrollToBottom();
+    tick(200);
+    expect(window.$).toHaveBeenCalled();
+  }));
+
+  it('should scroll to top', fakeAsync(() => {
+    let animateSpy = jasmine.createSpy('jquery spy');
+    spyOn(window, '$').and.returnValue({
+      animate: animateSpy
+    } as unknown as JQLite);
+    componentInstance.scrollToTop();
+    tick(1000);
+    expect(animateSpy).toHaveBeenCalled();
+  }));
+
+  it('should show upcoming card', () => {
+    spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(0);
+    spyOn(displayedCard, 'getStateName').and.returnValue(null);
+    componentInstance.displayedCard = displayedCard;
+    spyOn(explorationPlayerStateService, 'isInQuestionMode').and.returnValues(
+      false, true, true, true, true);
+    spyOn(playerTranscriptService, 'isLastCard')
+      .and.returnValues(true, false, false, false, false);
+    spyOn(componentInstance, 'returnToExplorationAfterConceptCard');
+
+    componentInstance.showUpcomingCard();
+
+    componentInstance.questionSessionCompleted = true;
+    spyOn(questionPlayerStateService.onQuestionSessionCompleted, 'emit');
+    spyOn(questionPlayerStateService, 'getQuestionPlayerStateData');
+
+    componentInstance.showUpcomingCard();
+
+    componentInstance.questionSessionCompleted = false;
+    componentInstance.moveToExploration = true;
+    spyOn(explorationPlayerStateService, 'moveToExploration');
+
+    componentInstance.showUpcomingCard();
+
+    componentInstance.moveToExploration = false;
+    let stateCard = new StateCard(
+      'stateName', null, null, new Interaction(
+        [], [], null, null, [], 'EndExploration', null),
+      [], null, null, '', null);
+    stateCard.markAsCompleted();
+    componentInstance.displayedCard = stateCard;
+    componentInstance.nextCard = stateCard;
+    componentInstance.conceptCard = new ConceptCard(
+      new SubtitledHtml('', ''), [], null);
+    spyOn(explorationPlayerStateService, 'recordNewCardAdded');
+    spyOn(playerTranscriptService, 'addNewCard');
+    spyOn(explorationPlayerStateService, 'getLanguageCode')
+      .and.returnValue('en');
+    spyOn(contentTranslationLanguageService, 'getCurrentContentLanguageCode')
+      .and.returnValue('en');
+    spyOn(contentTranslationManagerService, 'displayTranslations');
+
+    spyOn(playerTranscriptService, 'getNumCards').and.returnValue(10);
+    spyOn(componentInstance, 'isSupplementalCardNonempty')
+      .and.returnValues(false, true);
+    spyOn(playerTranscriptService, 'getCard');
+    spyOn(playerTranscriptService, 'getLastCard');
+    spyOn(componentInstance, 'canWindowShowTwoCards').and.returnValue(true);
+    spyOn(playerPositionService, 'setDisplayedCardIndex');
+    spyOn(componentInstance, 'animateToTwoCards').and.callFake((callb) => {
+      callb();
+    });
+    spyOn(playerPositionService, 'changeCurrentQuestion');
+    spyOn(componentInstance, 'showPendingCard');
+    spyOn(urlService, 'getQueryFieldValuesAsList').and.returnValue([]);
+    spyOn(explorationEngineService, 'getAuthorRecommendedExpIds')
+      .and.returnValue([]);
+    spyOn(explorationPlayerStateService, 'isInStoryChapterMode')
+      .and.returnValue(true);
+    spyOn(userService, 'setReturnUrl');
+    spyOn(urlService, 'getUrlParams').and.returnValue({
+      topic_url_fragment: 'topicUrlFragment',
+      classroom_url_fragment: 'classroomUrlFragment',
+      story_url_fragment: 'storyUrlFragment',
+      node_id: 'nodeId'
+    });
+
+    componentInstance.isLoggedIn = false;
+
+    componentInstance.showUpcomingCard();
+
+    componentInstance.conceptCard = null;
+    componentInstance.answerIsCorrect = true;
+
+    componentInstance.showUpcomingCard();
+  });
+
+  it('should submit answer', fakeAsync(() => {
+    componentInstance.answerIsBeingProcessed = true;
+    componentInstance.submitAnswer('', null);
+
+    componentInstance.answerIsBeingProcessed = false;
+    componentInstance.displayedCard = displayedCard;
+    spyOn(componentInstance, 'isCurrentCardAtEndOfTranscript').and.returnValue(
+      true);
+    componentInstance.isInPreviewMode = false;
+    spyOn(fatigueDetectionService, 'recordSubmissionTimestamp');
+    spyOn(fatigueDetectionService, 'isSubmittingTooFast').and.returnValues(
+      true, false);
+    spyOn(fatigueDetectionService, 'displayTakeBreakMessage');
+    spyOn(explorationPlayerStateService.onOppiaFeedbackAvailable, 'emit');
+    componentInstance.submitAnswer('', null);
+
+    spyOn(explorationPlayerStateService, 'isInQuestionMode')
+      .and.returnValues(false, false, false, true);
+    spyOn(componentInstance, 'initLearnerAnswerInfoService');
+    spyOn(explorationEngineService, 'getState');
+    spyOn(componentInstance, 'alwaysAskLearnerForAnswerDetails');
+    spyOn(numberAttemptsService, 'submitAttempt');
+    spyOn(playerTranscriptService, 'addNewInput');
+    spyOn(componentInstance, 'getCanAskLearnerForAnswerInfo').and.returnValues(
+      true, false);
+    spyOn(playerTranscriptService, 'addNewResponse');
+    spyOn(learnerAnswerInfoService, 'getSolicitAnswerDetailsQuestion');
+    spyOn(playerPositionService.onHelpCardAvailable, 'emit');
+
+    componentInstance.submitAnswer('', null);
+    tick(200);
+
+    spyOn(playerPositionService, 'recordAnswerSubmission');
+    spyOn(explorationPlayerStateService, 'getCurrentEngineService')
+      .and.returnValue(explorationEngineService);
+
+    let callback = (
+        answer: string, interactionRulesService: InteractionRulesService,
+        successCallback: (
+        nextCard: StateCard,
+        refreshInteraction: boolean,
+        feedbackHtml: string,
+        feedbackAudioTranslations: BindableVoiceovers,
+        refresherExplorationId: string,
+        missingPrerequisiteSkillId: string,
+        remainOnCurrentCard: boolean,
+        taggedSkillMisconceptionId: string,
+        wasOldStateInitial: boolean,
+        isFirstHit: boolean,
+        isFinalQuestion: boolean,
+        focusLabel: string
+      ) => void
+    ) => {
+      let stateCard = new StateCard(
+        null, null, null, new Interaction(
+          [], [], null, null, [], 'EndExploration', null),
+        [], null, null, '', null);
+      successCallback(
+        stateCard, true, 'feedback', null, 'refresherId', '', false, '', true,
+        false, true, '');
+      successCallback(
+        stateCard, true, 'feedback', null, 'refresherId', '', false, '', true,
+        false, false, '');
+      successCallback(
+        stateCard, true, '', null, 'refresherId', '', false, '', true,
+        false, false, '');
+      successCallback(
+        stateCard, true, 'feedback', null, '', 'skill_id', true, '', true,
+        false, false, '');
+      componentInstance.displayedCard = new StateCard(
+        null, null, null, new Interaction(
+          [], [], null, null, [], 'ImageClickInput', null),
+        [], null, null, '', null);
+      successCallback(
+        stateCard, true, 'feedback', null, 'refresherId', 'skill_id', true,
+        '', true, false, false, '');
+      return false;
+    };
+    spyOn(explorationEngineService, 'submitAnswer').and.callFake(callback);
+    spyOn(playerPositionService, 'getCurrentStateName')
+      .and.returnValue('oldState');
+    spyOn(statsReportingService, 'recordStateTransition');
+    spyOn(learnerParamsService, 'getAllParams');
+    spyOn(statsReportingService, 'recordStateCompleted');
+    spyOn(statsReportingService, 'recordExplorationActuallyStarted');
+    spyOn(explorationPlayerStateService, 'isInQuestionPlayerMode')
+      .and.returnValue(true);
+    spyOn(componentInstance, 'showUpcomingCard');
+    spyOn(fatigueDetectionService, 'reset');
+    spyOn(numberAttemptsService, 'reset');
+    spyOn(questionPlayerStateService, 'answerSubmitted');
+    spyOn(questionPlayerEngineService, 'getCurrentQuestion');
+    spyOn(playerTranscriptService, 'updateLatestInteractionHtml');
+    spyOn(conceptCardBackendApiService, 'loadConceptCardsAsync')
+      .and.returnValue(Promise.resolve([
+        new ConceptCard(
+          new SubtitledHtml('', ''), [], null)
+      ]));
+
+    spyOn(
+      explorationSummaryBackendApiService,
+      'loadPublicExplorationSummariesAsync')
+      .and.returnValue(Promise.resolve({
+        summaries: [{} as ExplorationSummaryDict]
+      }));
+    spyOn(
+      refresherExplorationConfirmationModalService,
+      'displayRedirectConfirmationModal').and.callFake((id, callb) => {
+      callb();
+    });
+    spyOn(statsReportingService, 'recordLeaveForRefresherExp');
+    spyOn(playerTranscriptService, 'hasEncounteredStateBefore')
+      .and.returnValue(true);
+    spyOn(explorationPlayerStateService, 'recordNewCardAdded');
+
+    componentInstance.explorationActuallyStarted = false;
+
+    componentInstance.submitAnswer('', null);
+    tick(2000);
+  }));
+
+  it('should fix supplement card on scroll', () => {
+    let addClassSpy = jasmine.createSpy('add class spy');
+    spyOn(window, '$').and.returnValue({
+      height: () => 30,
+      scrollTop: () => 30,
+      addClass: addClassSpy
+    } as unknown as JQLite);
+
+    componentInstance.fixSupplementOnScroll();
+
+    expect(addClassSpy).toHaveBeenCalled();
+    expect(window.$).toHaveBeenCalled();
   });
 });

@@ -249,16 +249,9 @@ export class ConversationSkinComponent {
             // If the user is a guest, has completed this exploration
             // within the context of a collection, and the collection is
             // whitelisted, record their temporary progress.
-            let whiteListedCollectionIds = (
-              AppConstants.
-                WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS
-            );
-            let collectionAllowsGuestProgress = (
-              (
-                whiteListedCollectionIds as unknown as string[]
-              ).
-                indexOf(this.collectionId) !== -1);
-            if (collectionAllowsGuestProgress && !this.isLoggedIn) {
+
+            if (this.doesCollectionAllowsGuestProgress(
+              this.collectionId) && !this.isLoggedIn) {
               this.guestCollectionProgressService.
                 recordExplorationCompletedInCollection(
                   this.collectionId, this.explorationId);
@@ -324,6 +317,18 @@ export class ConversationSkinComponent {
           }
         );
     }
+  }
+
+  doesCollectionAllowsGuestProgress(collectionId: string): boolean {
+    let whiteListedCollectionIds = (
+      AppConstants.
+        WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS
+    );
+    return (
+      (
+        whiteListedCollectionIds as unknown as string[]
+      ).
+        indexOf(collectionId) !== -1);
   }
 
   isSubmitButtonDisabled(): boolean {
@@ -955,7 +960,7 @@ export class ConversationSkinComponent {
               this.conceptCardBackendApiService.loadConceptCardsAsync(
                 [missingPrerequisiteSkillId]
               ).then((conceptCardObject) => {
-                // This.conceptCard = conceptCardObject;
+                this.conceptCard = conceptCardObject[0];
                 if (helpCardAvailable) {
                   this.playerPositionService.onHelpCardAvailable.emit({
                     helpCardHtml: feedbackHtml,
