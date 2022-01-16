@@ -230,8 +230,10 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             caching_services.get_multi(
-                caching_services.CACHE_NAMESPACE_DEFAULT, None,
-                ['a', 'b', 'c']), {})
+                caching_services.CACHE_NAMESPACE_DEFAULT,
+                None,
+                ['a', 'b', 'c']),
+            {})
         self.assertEqual(
             caching_services.get_multi(
                 caching_services.CACHE_NAMESPACE_EXPLORATION,
@@ -293,8 +295,10 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             caching_services.get_multi(
-                caching_services.CACHE_NAMESPACE_DEFAULT, None,
-                ['a', 'b', 'c', 'd']), {})
+                caching_services.CACHE_NAMESPACE_DEFAULT,
+                None,
+                ['a', 'b', 'c', 'd']),
+            {})
         self.assertEqual(
             caching_services.get_multi(
                 caching_services.CACHE_NAMESPACE_EXPLORATION,
@@ -352,12 +356,16 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             caching_services.get_multi(
-                caching_services.CACHE_NAMESPACE_DEFAULT, None,
-                ['a', 'b', 'c']), {})
+                caching_services.CACHE_NAMESPACE_DEFAULT,
+                None,
+                ['a', 'b', 'c']),
+            {})
 
         self.assertEqual(
             caching_services.get_multi(
-                caching_services.CACHE_NAMESPACE_DEFAULT, None, []),
+                caching_services.CACHE_NAMESPACE_DEFAULT,
+                None,
+                []),
             {})
 
         caching_services.set_multi(
@@ -368,11 +376,14 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             })
 
         caching_services.set_multi(
-            caching_services.CACHE_NAMESPACE_DEFAULT, None, key_value_mapping)
+            caching_services.CACHE_NAMESPACE_DEFAULT,
+            None,
+            key_value_mapping)
 
         self.assertEqual(
             caching_services.get_multi(
-                caching_services.CACHE_NAMESPACE_DEFAULT, None,
+                caching_services.CACHE_NAMESPACE_DEFAULT,
+                None,
                 ['a', 'b', 'c']),
             {'a': '1', 'c': '3'})
 
@@ -404,7 +415,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             caching_services.get_multi(
                 caching_services.CACHE_NAMESPACE_DEFAULT,
                 '0',
-                [exploration_id]), {})
+                [exploration_id]),
+            {})
 
     def test_queries_to_wrong_sub_namespace_returns_none(self) -> None:
         exploration_id = 'id'
@@ -507,7 +519,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             caching_services.get_multi(
                 caching_services.CACHE_NAMESPACE_EXPLORATION,
-                '0', [exploration_id]),
+                '0',
+                [exploration_id]),
             {})
 
     def test_delete_multi_returns_false_when_not_all_ids_exist(self) -> None:
@@ -519,7 +532,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertFalse(
             caching_services.delete_multi(
-                caching_services.CACHE_NAMESPACE_DEFAULT, None,
+                caching_services.CACHE_NAMESPACE_DEFAULT,
+                None,
                 ['a', 'e', 'f']))
 
     def test_delete_multi_returns_false_when_namespace_incorrect(self) -> None:
@@ -530,7 +544,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertFalse(
             caching_services.delete_multi(
-                caching_services.CACHE_NAMESPACE_EXPLORATION, None,
+                caching_services.CACHE_NAMESPACE_EXPLORATION,
+                None,
                 ['a', 'b', 'c']))
 
     def test_delete_multi_returns_false_when_sub_namespace_incorrect(
@@ -689,7 +704,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         }
         self.assertEqual(
             caching_services.get_multi(
-                caching_services.CACHE_NAMESPACE_DEFAULT, None,
+                caching_services.CACHE_NAMESPACE_DEFAULT,
+                None,
                 ['a', 'b', 'c']),
             {})
         cache_strings_response = caching_services.set_multi(
@@ -698,7 +714,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             caching_services.get_multi(
-                caching_services.CACHE_NAMESPACE_DEFAULT, None,
+                caching_services.CACHE_NAMESPACE_DEFAULT,
+                None,
                 ['a', 'b', 'c']),
             {
                 'a': '%#$', 'b': '\t',

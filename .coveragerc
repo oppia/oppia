@@ -11,3 +11,8 @@ omit =
     # TODO(#13935): Remove python_utils from the list once the codebase is
     # run under Python 3.
     core/python_utils.py
+
+[report]
+exclude_lines =
+    pragma: no cover
+    @overload

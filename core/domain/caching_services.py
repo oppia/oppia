@@ -114,17 +114,17 @@ class SerializationFunctionsDict(TypedDict):
     default: Callable[[dict[str, Any]], str]
 
 
-# Type defined for arguments which can accpet only keys of Dict
+# Type defined for arguments which can accept only keys of Dict
 # DESERIALIZATION_FUNCTIONS or SERIALIZATION_FUNCTIONS.
-namespace_type = Literal[
-        'collection',
-        'exploration',
-        'skill',
-        'story',
-        'topic',
-        'platform',
-        'config',
-        'default'
+NamespaceType = Literal[
+    'collection',
+    'exploration',
+    'skill',
+    'story',
+    'topic',
+    'platform',
+    'config',
+    'default'
 ]
 
 
@@ -159,7 +159,7 @@ SERIALIZATION_FUNCTIONS: SerializationFunctionsDict = {
 
 
 def _get_memcache_key(
-    namespace: namespace_type,
+    namespace: NamespaceType,
     sub_namespace: str | None,
     obj_id: str
 ) -> str:
@@ -200,61 +200,69 @@ def flush_memory_caches() -> None:
 @overload
 def get_multi(
     namespace: Literal['collection'],
-    sub_namespace: str | None, obj_ids: List[str]
+    sub_namespace: str | None,
+    obj_ids: List[str]
 ) -> Dict[str, collection_domain.Collection]: ...
 
 
 @overload
 def get_multi(
     namespace: Literal['exploration'],
-    sub_namespace: str | None, obj_ids: List[str]
+    sub_namespace: str | None,
+    obj_ids: List[str]
 ) -> Dict[str, exp_domain.Exploration]: ...
 
 
 @overload
 def get_multi(
     namespace: Literal['skill'],
-    sub_namespace: str | None, obj_ids: List[str]
+    sub_namespace: str | None,
+    obj_ids: List[str]
 ) -> Dict[str, skill_domain.Skill]: ...
 
 
 @overload
 def get_multi(
     namespace: Literal['story'],
-    sub_namespace: str | None, obj_ids: List[str]
+    sub_namespace: str | None,
+    obj_ids: List[str]
 ) -> Dict[str, story_domain.Story]: ...
 
 
 @overload
 def get_multi(
     namespace: Literal['topic'],
-    sub_namespace: str | None, obj_ids: List[str]
+    sub_namespace: str | None,
+    obj_ids: List[str]
 ) -> Dict[str, topic_domain.Topic]: ...
 
 
 @overload
 def get_multi(
     namespace: Literal['platform'],
-    sub_namespace: str | None, obj_ids: List[str]
+    sub_namespace: str | None,
+    obj_ids: List[str]
 ) -> Dict[str, platform_parameter_domain.PlatformParameter]: ...
 
 
 @overload
 def get_multi(
     namespace: Literal['config'],
-    sub_namespace: str | None, obj_ids: List[str]
+    sub_namespace: str | None,
+    obj_ids: List[str]
 ) -> Dict[str, Dict[str, Any]]: ...
 
 
 @overload
 def get_multi(
     namespace: Literal['default'],
-    sub_namespace: str | None, obj_ids: List[str]
+    sub_namespace: str | None,
+    obj_ids: List[str]
 ) -> Dict[str, Dict[str, Any]]: ...
 
 
 def get_multi(
-    namespace: namespace_type,
+    namespace: NamespaceType,
     sub_namespace: str | None,
     obj_ids: List[str]
 ) -> Dict[str, Any]:
@@ -306,7 +314,7 @@ def get_multi(
 # Exploration, Skill, Story, Topic, Collection, str. hence Any type has
 # to be used here for the value type of id_value_mapping dictionary.
 def set_multi(
-    namespace: namespace_type,
+    namespace: NamespaceType,
     sub_namespace: str | None,
     id_value_mapping: Dict[str, Any]
 ) -> bool:
@@ -345,7 +353,7 @@ def set_multi(
 
 
 def delete_multi(
-    namespace: namespace_type,
+    namespace: NamespaceType,
     sub_namespace: str | None,
     obj_ids: List[str]
 ) -> bool:
