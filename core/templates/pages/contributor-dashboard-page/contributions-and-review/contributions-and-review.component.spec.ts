@@ -918,6 +918,16 @@ describe('Contributions and review component', function() {
       expect(ctrl.dropdownShown).toBe(false);
     });
 
+    it('should return back when user click is made outside', function() {
+      const clickEvent = {
+        target: {}
+      };
+      spyOn(document, 'querySelector').and.returnValue(null);
+
+      ctrl.closeDropdownWhenClickedOutside(clickEvent);
+      expect(document.querySelector).toHaveBeenCalled();
+    });
+
     it('should unbind event listener when onDestroy is called', function() {
       const unbindSpy = spyOn($.fn, 'off');
 

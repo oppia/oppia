@@ -35,6 +35,7 @@ import { CodeMirrorModule } from './code-mirror/codemirror.module';
 import { OppiaCkEditor4Module } from './ck-editor-helpers/ckeditor4.module';
 import { BaseModule } from '../base-components/base.module';
 import { NgBootstrapModule } from 'modules/ng-boostrap.module';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 
 // Components.
 import { AudioBarComponent } from 'pages/exploration-player-page/layout-directives/audio-bar.component';
@@ -100,6 +101,9 @@ import { SupplementalCardComponent } from 'pages/exploration-player-page/learner
 import { SavePendingChangesModalComponent } from './save-pending-changes/save-pending-changes-modal.component';
 import { AddHintModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-hint-modal.component';
 import { SmoothHeightAnimatorComponent } from './smooth-height/smooth-height-animator.component';
+import { HintEditorComponent } from 'components/state-directives/hint-editor/hint-editor.component';
+import { ResponseHeaderComponent } from './state-directives/response-header/response-header.component';
+import { StateHintsEditorComponent } from 'components/state-editor/state-hints-editor/state-hints-editor.component';
 import { ReviewMaterialEditorComponent } from './review-material-editor/review-material-editor.component';
 
 // Pipes.
@@ -121,6 +125,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
   imports: [
     BaseModule,
     CommonModule,
+    DragDropModule,
     CustomFormsComponentsModule,
     CommonElementsModule,
     CodeMirrorModule,
@@ -160,6 +165,10 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     CreateNewSkillModalComponent,
     CreateActivityModalComponent,
     DeleteAnswerGroupModalComponent,
+    DeleteHintModalComponent,
+    DeleteInteractionModalComponent,
+    DeleteLastHintModalComponent,
+    DeleteSolutionModalComponent,
     DisplaySolutionModalComponent,
     DisplaySolutionInterstititalModalComponent,
     DisplayHintModalComponent,
@@ -171,6 +180,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     ExplorationEmbedButtonModalComponent,
     FilterForMatchingSubstringPipe,
     HintAndSolutionButtonsComponent,
+    HintEditorComponent,
     InputResponsePairComponent,
     KeyboardShortcutHelpModalComponent,
     LazyLoadingComponent,
@@ -183,6 +193,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     ProgressNavComponent,
     QuestionDifficultySelectorComponent,
     RatingDisplayComponent,
+    ResponseHeaderComponent,
     RubricsEditorComponent,
     ScoreRingComponent,
     SelectSkillModalComponent,
@@ -191,6 +202,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     SmoothHeightAnimatorComponent,
     SkillSelectorComponent,
     SkillMasteryViewerComponent,
+    StateHintsEditorComponent,
     StateSkillEditorComponent,
     StorySummaryTileComponent,
     SubtopicSummaryTileComponent,
@@ -231,6 +243,10 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     ContentLanguageSelectorComponent,
     CreateNewSkillModalComponent,
     CreateActivityModalComponent,
+    DeleteHintModalComponent,
+    DeleteInteractionModalComponent,
+    DeleteLastHintModalComponent,
+    DeleteSolutionModalComponent,
     ExplorationFooterComponent,
     ExplorationSummaryTileComponent,
     FilteredChoicesFieldComponent,
@@ -255,13 +271,16 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     ExplorationEmbedButtonModalComponent,
     OutcomeFeedbackEditorComponent,
     HintAndSolutionButtonsComponent,
+    HintEditorComponent,
     InputResponsePairComponent,
     KeyboardShortcutHelpModalComponent,
     ProgressNavComponent,
     PreviewThumbnailComponent,
     QuestionDifficultySelectorComponent,
     RatingDisplayComponent,
+    ResponseHeaderComponent,
     RubricsEditorComponent,
+    StateHintsEditorComponent,
     ScoreRingComponent,
     SearchBarComponent,
     StorySummaryTileComponent,
@@ -300,6 +319,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     ObjectComponentsModule,
     OppiaCkEditor4Module,
     SharedFormsModule,
+    DragDropModule,
     // Components, directives, and pipes.
     AttributionGuideComponent,
     AudioBarComponent,
@@ -312,6 +332,10 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     CreateNewSkillModalComponent,
     CreateActivityModalComponent,
     DeleteAnswerGroupModalComponent,
+    DeleteHintModalComponent,
+    DeleteInteractionModalComponent,
+    DeleteLastHintModalComponent,
+    DeleteSolutionModalComponent,
     DisplaySolutionModalComponent,
     DisplaySolutionInterstititalModalComponent,
     DisplayHintModalComponent,
@@ -322,12 +346,14 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     PracticeTabComponent,
     CollectionSummaryTileComponent,
     HintAndSolutionButtonsComponent,
+    HintEditorComponent,
     InputResponsePairComponent,
     LazyLoadingComponent,
     FilterForMatchingSubstringPipe,
     ProfileLinkImageComponent,
     PreviewThumbnailComponent,
     RatingDisplayComponent,
+    ResponseHeaderComponent,
     RubricsEditorComponent,
     FilterForMatchingSubstringPipe,
     OnScreenKeyboardComponent,
@@ -335,6 +361,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     OutcomeFeedbackEditorComponent,
     ProgressNavComponent,
     SearchBarComponent,
+    StateHintsEditorComponent,
     QuestionDifficultySelectorComponent,
     ScoreRingComponent,
     StateSkillEditorComponent,

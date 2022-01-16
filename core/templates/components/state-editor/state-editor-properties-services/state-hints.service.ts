@@ -35,6 +35,8 @@ export class StateHintsService extends StatePropertyService<Hint[]> {
     this.setterMethodKey = 'saveHints';
   }
 
+  displayed: Hint[] = [];
+
   getActiveHintIndex(): number | null {
     return this.activeHintIndex;
   }
