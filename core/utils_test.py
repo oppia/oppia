@@ -76,7 +76,7 @@ class UtilsTests(test_utils.GenericTestBase):
             yaml_dict = utils.dict_from_yaml(yaml_str)
             self.assertEqual(adict, yaml_dict)
 
-        with self.assertRaisesRegexp(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.InvalidInputException,
             'while parsing a flow node\n'
             'expected the node content, but found \'<stream end>\'\n'):
