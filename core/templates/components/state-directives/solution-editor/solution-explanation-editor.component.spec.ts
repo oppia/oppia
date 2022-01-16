@@ -49,8 +49,7 @@ class mockStateSolutionService {
   }
 }
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Solution explanation editor', function() {
+describe('Solution explanation editor', function() {
   let component: SolutionExplanationEditor;
   let fixture: ComponentFixture<SolutionExplanationEditor>;
 
@@ -137,7 +136,7 @@ fdescribe('Solution explanation editor', function() {
     expect(stateSolutionService.displayed.explanation._html).toBe(updatedHtml);
   });
 
-  it('should open shema based editor on user click me', fakeAsync(() => {
+  it('should save the explanation', fakeAsync(() => {
     spyOn(component.showMarkAllAudioAsNeedingUpdateModalIfRequired, 'emit')
       .and.stub();
     spyOn(component.onSaveSolution, 'emit').and.stub();
