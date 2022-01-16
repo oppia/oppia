@@ -127,7 +127,10 @@ class UserAuthDetailsModelTests(test_utils.GenericTestBase):
             banned=False,
             username='user'
         ).put()
-        parent_data = UserSettingsModel.get(user_auth_model.parent_user_id)
+        parent_data = (
+            user_models.UserSettingsModel.
+                get(user_auth_model.parent_user_id)
+        )
         self.assertIsNotNone(parent_data)
         exported_data = (
             auth_models.UserAuthDetailsModel.export_data(
