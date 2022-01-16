@@ -339,19 +339,19 @@ class AppFeedbackReportModel(base_models.BaseModel):
         query = cls.query(projection=[filter_field.name], distinct=True)
         filter_values = []
         if filter_field == FilterFieldNames.REPORT_TYPE:
-            filter_values = [model.report_type for model in query]
-        elif filter_field == FilterFieldNames.platform:
-            filter_values = [model.platform for model in query]
+            filter_values = [model.REPORT_TYPE for model in query]
+        elif filter_field == FilterFieldNames.PLATFORM:
+            filter_values = [model.PLATFORM for model in query]
         elif filter_field == FilterFieldNames.ENTRY_POINT:
-            filter_values = [model.entry_point for model in query]
+            filter_values = [model.ENTRY_POINT for model in query]
         elif filter_field == FilterFieldNames.SUBMITTED_ON:
-            filter_values = [model.submitted_on.date() for model in query]
+            filter_values = [model.SUBMITTED_ON.date() for model in query]
         elif filter_field == FilterFieldNames.ANDROID_DEVICE_MODEL:
-            filter_values = [model.android_device_model for model in query]
+            filter_values = [model.ANDROID_DEVICE_MODEL for model in query]
         elif filter_field == FilterFieldNames.ANDROID_SDK_VERSION:
-            filter_values = [model.android_sdk_version for model in query]
+            filter_values = [model.ANDROID_SDK_VERSION for model in query]
         elif filter_field == FilterFieldNames.TEXT_LANGUAGE_CODE:
-            filter_values = [model.text_language_code for model in query]
+            filter_values = [model.TEXT_LANGUAGE_CODE for model in query]
         elif filter_field == FilterFieldNames.AUDIO_LANGUAGE_CODE:
             filter_values = [model.audio_language_code for model in query]
         elif filter_field == FilterFieldNames.PLATFORM_VERSION:
