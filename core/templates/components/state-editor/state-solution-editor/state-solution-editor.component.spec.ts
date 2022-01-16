@@ -133,7 +133,12 @@ describe('StateSolutionEditorComponent', () => {
     spyOn(StateEditorService, 'deleteCurrentSolutionValidity');
     spyOn(StateSolutionService, 'saveDisplayedValue');
 
-    $scope.deleteSolution(0, new Event(''));
+    const value = {
+      index: 0,
+      evt: new Event('')
+    };
+
+    $scope.deleteSolution(value);
     $scope.$apply();
 
     expect(StateEditorService.deleteCurrentSolutionValidity).toHaveBeenCalled();
@@ -147,7 +152,12 @@ describe('StateSolutionEditorComponent', () => {
       } as NgbModalRef
     );
 
-    $scope.deleteSolution(0, new Event(''));
+    const value = {
+      index: 0,
+      evt: new Event('')
+    };
+
+    $scope.deleteSolution(value);
     $scope.$apply();
 
     expect(ngbModal.open).toHaveBeenCalled();
