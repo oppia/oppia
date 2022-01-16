@@ -23,7 +23,7 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ShortResponseRatioExpressionInputComponent } from './directives/oppia-short-response-ratio-expression-input.component';
 import { ResponseRatioExpressionInputComponent } from './directives/oppia-response-ratio-expression-input.component';
-import { InteractiveRatioExpressionInput } from './directives/oppia-interactive-ratio-expression-input.component';
+import { InteractiveRatioExpressionInputComponent } from './directives/oppia-interactive-ratio-expression-input.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
 
 @NgModule({
@@ -35,17 +35,17 @@ import { SharedComponentsModule } from 'components/shared-component.module';
   declarations: [
     ShortResponseRatioExpressionInputComponent,
     ResponseRatioExpressionInputComponent,
-    InteractiveRatioExpressionInput
+    InteractiveRatioExpressionInputComponent
   ],
   entryComponents: [
     ShortResponseRatioExpressionInputComponent,
     ResponseRatioExpressionInputComponent,
-    InteractiveRatioExpressionInput
+    InteractiveRatioExpressionInputComponent
   ],
   exports: [
     ShortResponseRatioExpressionInputComponent,
     ResponseRatioExpressionInputComponent,
-    InteractiveRatioExpressionInput
+    InteractiveRatioExpressionInputComponent
   ],
 })
 

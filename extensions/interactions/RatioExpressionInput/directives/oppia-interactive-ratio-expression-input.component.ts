@@ -34,7 +34,8 @@ import { RatioInputAnswer, InteractionAnswer } from 'interactions/answer-defs';
   templateUrl: './ratio-expression-input-interaction.component.html',
   styleUrls: []
 })
-export class InteractiveRatioExpressionInput implements OnInit, OnDestroy {
+export class InteractiveRatioExpressionInputComponent
+implements OnInit, OnDestroy {
   @Input() placeholderWithValue: string = '';
   @Input() numberOfTermsWithValue: string = '';
   @Input() labelForFocusTarget: string;
@@ -143,5 +144,5 @@ export class InteractiveRatioExpressionInput implements OnInit, OnDestroy {
 
 angular.module('oppia').directive(
   'oppiaInteractiveRatioExpressionInput', downgradeComponent({
-    component: InteractiveRatioExpressionInput
+    component: InteractiveRatioExpressionInputComponent
   }) as angular.IDirectiveFactory);
