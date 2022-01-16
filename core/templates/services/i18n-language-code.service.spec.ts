@@ -94,10 +94,10 @@ describe('I18nLanguageCodeService', () => {
 
     expect(i18nLanguageCodeService.getTopicTranslationKey(
       'abc1234', TranslationKeyType.Title)).toBe(
-        'I18N_TOPIC_abc1234_TITLE');
+      'I18N_TOPIC_abc1234_TITLE');
     expect(i18nLanguageCodeService.getTopicTranslationKey(
       'abc1234', TranslationKeyType.Description)).toBe(
-        'I18N_TOPIC_abc1234_DESCRIPTION');
+      'I18N_TOPIC_abc1234_DESCRIPTION');
   });
 
   it('should check if translation key is to be displayed correctly', () => {

@@ -97,7 +97,7 @@ export class I18nLanguageCodeService {
    * @returns {string} - translation key for the topic name/description.
    */
   getTopicTranslationKey(
-    topicId: string, keyType: TranslationKeyType): string {
+      topicId: string, keyType: TranslationKeyType): string {
     return `I18N_TOPIC_${topicId}_${keyType}`;
   }
 
@@ -126,7 +126,7 @@ export class I18nLanguageCodeService {
    */
   isTranslationKeyToBeDisplayed(translationKey: string): boolean {
     let isTranslationKeyValid = this.isTranslationKeyValid(translationKey);
-    return (isTranslationKeyValid && this.isCurrentLanguageEnglish());
+    return (isTranslationKeyValid && !this.isCurrentLanguageEnglish());
   }
 
   get onI18nLanguageCodeChange(): EventEmitter<string> {
