@@ -174,8 +174,8 @@ angular.module('oppia').component('stateSolutionEditor', {
         });
       };
 
-      $scope.deleteSolution = function(index, evt) {
-        evt.stopPropagation();
+      $scope.deleteSolution = function(value) {
+        value.evt.stopPropagation();
 
         AlertsService.clearWarnings();
         NgbModal.open(DeleteSolutionModalComponent, {
