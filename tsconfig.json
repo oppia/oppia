@@ -5,7 +5,7 @@
     "downlevelIteration": true,
     "lib": ["es2017", "dom", "webworker"],
     "module": "es2020",
-    "noImplicitUseStrict": true,
+    "strict": true,
     "outDir": "local_compiled_js_for_test",
     "rootDir": ".",
     "target": "es6",

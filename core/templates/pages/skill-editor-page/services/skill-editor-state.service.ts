@@ -32,6 +32,8 @@ import { AlertsService } from 'services/alerts.service';
 import { QuestionsListService } from 'services/questions-list.service';
 import { LoaderService } from 'services/loader.service';
 
+type assignedSkillTopicDataType = { [topicName: string]: string } | null
+
 export interface GroupedSkillSummaries {
   current: {
     id: string;
@@ -59,7 +61,7 @@ export class SkillEditorStateService {
   private _skill!: Skill;
   private _skillRights!: SkillRights;
   private _skillIsInitialized: boolean = false;
-  private assignedSkillTopicData: { [topicName: string]: string } | null = null;
+  private assignedSkillTopicData: assignedSkillTopicDataType = null;
   private _skillIsBeingLoaded: boolean = false;
   private _skillIsBeingSaved: boolean = false;
   private _groupedSkillSummaries: GroupedSkillSummaries = {

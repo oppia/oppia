@@ -105,7 +105,7 @@ export class SkillsListComponent {
           }, 100);
         }
       ).catch((errorMessage: string) => {
-        let errorToast: string | null = null;
+        let errorToast: string;
         // This error is thrown as part of a final validation check in
         // the backend, hence the message does not include instructions
         // for the user to follow.
