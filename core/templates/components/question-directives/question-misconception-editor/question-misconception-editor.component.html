@@ -19,7 +19,7 @@
   </div>
 </div>
 <div class="clearfix" *ngIf="misconceptionEditorIsOpen">
-  <oppia-question-misconception-selector [misconceptionFeedbackIsUsed]="feedbackIsUsed"
+  <oppia-question-misconception-selector (updateMisconceptionValues)="updateValues($event)"
                                          [selectedMisconception]="selectedMisconception"
                                          [selectedMisconceptionSkillId]="selectedMisconceptionSkillId"
                                          taggedSkillMisconceptionId="taggedSkillMisconceptionId">

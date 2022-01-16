@@ -21,24 +21,17 @@ import cloneDeep from 'lodash/cloneDeep';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { Misconception } from 'domain/skill/MisconceptionObjectFactory';
 
-
-export interface MisconceptionUpdatedValues {
-  misconception: Misconception;
-  skillId: string;
-  feedbackIsUsed: boolean;
-}
 @Component({
   selector: 'oppia-question-misconception-selector',
   templateUrl: './question-misconception-selector.component.html'
 })
 export class QuestionMisconceptionSelectorComponent implements OnInit {
-  @Input() misconceptionFeedbackIsUsed: boolean;
   @Input() selectedMisconception: Misconception;
   @Input() selectedMisconceptionSkillId: string;
   @Output() updateMisconceptionValues:
-  EventEmitter<MisconceptionUpdatedValues> = (new EventEmitter());
+  EventEmitter<object> = (new EventEmitter());
+  misconceptionFeedbackIsUsed: boolean = true;
   misconceptionsBySkill;
-  updatedValues: MisconceptionUpdatedValues;
 
   constructor(
     private stateEditorService: StateEditorService,
@@ -47,21 +40,17 @@ export class QuestionMisconceptionSelectorComponent implements OnInit {
   ngOnInit(): void {
     this.misconceptionsBySkill = (
       this.stateEditorService.getMisconceptionsBySkill());
-    this.updatedValues.misconception = null;
-    this.updatedValues.skillId = null;
-    this.updatedValues.feedbackIsUsed = false;
   }
 
   selectMisconception(misconception: Misconception, skillId: string): void {
     this.selectedMisconception = cloneDeep(misconception);
     this.selectedMisconceptionSkillId = skillId;
-    this.updatedValues.misconception = (
-      this.selectedMisconception);
-    this.updatedValues.skillId = (
-      this.selectedMisconceptionSkillId);
-    this.updatedValues.feedbackIsUsed = (
-      this.misconceptionFeedbackIsUsed);
-    this.updateMisconceptionValues.emit(this.updatedValues);
+    let updatedValues = {
+      misconception: this.selectedMisconception,
+      skillId: this.selectedMisconceptionSkillId,
+      feedbackIsUsed: this.misconceptionFeedbackIsUsed
+    };
+    this.updateMisconceptionValues.emit(updatedValues);
   }
 
   toggleMisconceptionFeedbackUsage(): void {

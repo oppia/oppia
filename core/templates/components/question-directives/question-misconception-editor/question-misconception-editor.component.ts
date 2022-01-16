@@ -19,13 +19,16 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import cloneDeep from 'lodash/cloneDeep';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import { Misconception } from 'domain/skill/MisconceptionObjectFactory';
 import { ExternalSaveService } from 'services/external-save.service';
 import { TagMisconceptionModalComponent } from './tag-misconception-modal-component';
 
-interface TaggedMisconception {
-  misconceptionId: number;
+export interface MisconceptionUpdatedValues {
+  misconception: Misconception;
   skillId: string;
+  feedbackIsUsed: boolean;
 }
 
 @Component({
@@ -36,7 +39,7 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
   @Output() onSaveAnswerGroupFeedback:
     EventEmitter<object> = (new EventEmitter());
   @Output() onSaveTaggedMisconception:
-    EventEmitter<TaggedMisconception> = (new EventEmitter());
+    EventEmitter<object> = (new EventEmitter());
   @Input() taggedSkillMisconceptionId;
   @Input() isEditable: boolean;
   @Input() outcome;
@@ -47,7 +50,6 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
   misconceptionsBySkill: object;
   selectedMisconception;
   selectedMisconceptionSkillId;
-  taggedMisconception: TaggedMisconception;
 
   constructor(
     private externalSaveService: ExternalSaveService,
@@ -97,6 +99,15 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
     return containsMisconceptions;
   }
 
+  updateValues(newValues: MisconceptionUpdatedValues): void {
+    this.selectedMisconception = (
+      newValues.misconception);
+    this.selectedMisconceptionSkillId = (
+      newValues.skillId);
+    this.feedbackIsUsed = (
+      newValues.feedbackIsUsed);
+  }
+
   tagAnswerGroupWithMisconception(): void {
     let modalRef: NgbModalRef = this.ngbModal.open(
       TagMisconceptionModalComponent, {
@@ -105,12 +116,9 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
     modalRef.componentInstance.taggedSkillMisconceptionId = (
       this.taggedSkillMisconceptionId);
     modalRef.result.then((returnObject) => {
-      let misconception = returnObject.misconception;
-      let misconceptionSkillId = returnObject.misconceptionSkillId;
-      let feedbackIsUsed = returnObject.feedbackIsUsed;
-      this.selectedMisconception = misconception;
-      this.selectedMisconceptionSkillId = misconceptionSkillId;
-      this.feedbackIsUsed = feedbackIsUsed;
+      this.selectedMisconception = returnObject.misconception;
+      this.selectedMisconceptionSkillId = returnObject.misconceptionSkillId;
+      this.feedbackIsUsed = returnObject.feedbackIsUsed;
       this.updateMisconception();
     }, () => {
       // Note to developers:
@@ -120,12 +128,13 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
   }
 
   updateMisconception(): void {
-    this.taggedMisconception.skillId = this.selectedMisconceptionSkillId;
-    this.taggedMisconception.misconceptionId = (
-      this.selectedMisconception.getId());
-    this.onSaveTaggedMisconception.emit(this.taggedMisconception);
+    let taggedMisconception = {
+      skillId: this.selectedMisconceptionSkillId,
+      misconceptionId: this.selectedMisconception.getId()
+    };
+    this.onSaveTaggedMisconception.emit(taggedMisconception);
     this.misconceptionName = this.selectedMisconception.getName();
-    let outcome = angular.copy(this.outcome);
+    let outcome = cloneDeep(this.outcome);
     if (this.feedbackIsUsed) {
       outcome.feedback.html = (
         this.selectedMisconception.getFeedback());

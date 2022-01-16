@@ -1,8 +1,9 @@
 Selected Misconception: {{ selectedMisconception && selectedMisconception.getName() }}
+<!-- This misconceptionsBySkill returns an object where value correspond to misconceptions and key correspond to skillId  -->
 <div *ngFor="let member of misconceptionsBySkill | keyvalue">
   <div *ngFor="let misconception of member.value">
     <button class="btn btn-secondary misconception-button" (click)="selectMisconception(misconception, member.key)">
-      <b class="d-inline">{{ misconception.isMandatory() ? '' : ' (Optional) ' }}{{ misconception.getName() }}</b>
+      <strong class="d-inline">{{ misconception.isMandatory() ? '' : ' (Optional) ' }}{{ misconception.getName() }}</strong>
       <angular-html-bind-wrapper class="misconception-notes-container" [htmlData]="misconception.getNotes()">
       </angular-html-bind-wrapper>
     </button>
@@ -16,7 +17,7 @@ Selected Misconception: {{ selectedMisconception && selectedMisconception.getNam
     </div>
   </div>
 </div>
-<span (click)="toggleMisconceptionFeedbackUsage()" aria-hidden="true">
+<span (click)="toggleMisconceptionFeedbackUsage()" [attr.aria-hidden]="true">
   <i *ngIf="!misconceptionFeedbackIsUsed" class="material-icons md-18 misconception-feedback-usage-checkbox">&#xE835;</i>
   <i *ngIf="misconceptionFeedbackIsUsed" class="material-icons md-18 misconception-feedback-usage-checkbox">&#xE834;</i>
   Use misconception feedback as answer group feedback.
