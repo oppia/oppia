@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the PencilCodeEditor short response.
+ * @fileoverview Component for the PencilCodeEditor short response.
  */
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';

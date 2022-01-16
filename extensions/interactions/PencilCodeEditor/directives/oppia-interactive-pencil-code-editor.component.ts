@@ -37,24 +37,24 @@ import { PencilCodeEditorRulesService } from './pencil-code-editor-rules.service
   templateUrl: './pencil-code-editor-interaction.component.html'
 })
 export class PencilCodeEditor implements OnInit, OnDestroy {
-  constructor(
-    private playerPositionService: PlayerPositionService,
-    private interactionAttributesExtractorService:
-      InteractionAttributesExtractorService,
-    private currentInteractionService: CurrentInteractionService,
-    private ngbModal: NgbModal,
-    private el: ElementRef,
-    private focusManagerService: FocusManagerService,
-    private pencilCodeEditorRulesService: PencilCodeEditorRulesService
-  ) {}
-
   @Input() lastAnswer: { code: string };
   @Input() initialCodeWithValue: string;
   directiveSubscriptions = new Subscription();
-  iframeDiv: Object;
+  iframeDiv: NodeListOf<Element>;
   pce: PencilCodeEmbed;
   interactionIsActive: boolean;
-  someInitialCode;
+  someInitialCode: string;
+
+  constructor(
+    private currentInteractionService: CurrentInteractionService,
+    private elementRef: ElementRef,
+    private focusManagerService: FocusManagerService,
+    private interactionAttributesExtractorService:
+      InteractionAttributesExtractorService,
+    private ngbModal: NgbModal,
+    private playerPositionService: PlayerPositionService,
+    private pencilCodeEditorRulesService: PencilCodeEditorRulesService
+  ) {}
 
   private _getAttributes() {
     return {
@@ -92,7 +92,7 @@ export class PencilCodeEditor implements OnInit, OnDestroy {
       )
     );
 
-    this.iframeDiv = this.el.nativeElement.querySelectorAll(
+    this.iframeDiv = this.elementRef.nativeElement.querySelectorAll(
       '.pencil-code-editor-iframe')[0];
     this.pce = new PencilCodeEmbed(this.iframeDiv);
     this.interactionIsActive = (this.lastAnswer === null);
@@ -103,10 +103,10 @@ export class PencilCodeEditor implements OnInit, OnDestroy {
         this._getAttributes()
       ) as PencilCodeEditorCustomizationArgs);
     this.someInitialCode = this.interactionIsActive ?
-      initialCode :
+      initialCode.value :
       this.lastAnswer.code;
 
-    this.pce.beginLoad(this.someInitialCode.value);
+    this.pce.beginLoad(this.someInitialCode);
     this.pce.on('load', () => {
       // Hides the error console at the bottom right, and prevents it
       // from showing up even if the code has an error. Also, hides the

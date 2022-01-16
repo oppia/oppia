@@ -29,20 +29,21 @@ interface Answer {
 }
 
 @Component({
-  selector: 'oppia-short-response',
+  selector: 'oppia-short-response-pencil-code-editor',
   templateUrl: './pencil-code-editor-short-response.component.html'
 })
 export class ShortResponePencilCodeEditor implements OnInit {
+  @Input() answer: Answer;
+  answerCode: string;
+
   constructor(
     private htmlEscaperService: HtmlEscaperService
   ) {}
 
-  @Input() answer;
-  answerCode: string;
-
   ngOnInit(): void {
     this.answerCode = (
-      (this.htmlEscaperService.escapedJsonToObj(this.answer) as Answer).code);
+      (this.htmlEscaperService.escapedJsonToObj(
+        (this.answer) as unknown as string) as Answer).code);
   }
 }
 
