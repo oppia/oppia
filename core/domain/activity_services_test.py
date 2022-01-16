@@ -104,7 +104,7 @@ class ActivityServicesTests(test_utils.GenericTestBase):
         self._compare_lists(
             activity_services.get_featured_activity_references(), [])
 
-        with self.assertRaisesRegexp(Exception, 'should not have duplicates'):
+        with self.assertRaisesRegex(Exception, 'should not have duplicates'):
             activity_services.update_featured_activity_references([
                 self._create_exploration_reference(self.EXP_ID_0),
                 self._create_exploration_reference(self.EXP_ID_0)])
@@ -221,7 +221,7 @@ class ActivityServicesTests(test_utils.GenericTestBase):
 
     def test_split_by_type_raises_error_if_given_invalid_activity_ref(self):
         exploration_123 = self._create_exploration_reference('123')
-        with self.assertRaisesRegexp(Exception, 'Invalid activity reference'):
+        with self.assertRaisesRegex(Exception, 'Invalid activity reference'):
             activity_services.split_by_type([
                 exploration_123,
                 activity_domain.ActivityReference('invalid_type', 'bbb')
