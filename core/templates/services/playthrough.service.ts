@@ -140,6 +140,8 @@ class EarlyQuitTracker {
         state_name!: {value: this.stateName},
         time_spent_in_exp_in_msecs!: {value: this.expDurationInSecs * 1000},
       };
+    } else {
+      throw console.error('Value should not be null !');
     }
   }
 }
@@ -346,6 +348,8 @@ export class PlaythroughService {
         // Playthroughs are only helpful if learners have invested enough time.
           this.playthroughDurationInSecs >=
             ServicesConstants.MIN_PLAYTHROUGH_DURATION_IN_SECS);
+    } else {
+      throw console.error('Value should not be null!');
     }
   }
 }
