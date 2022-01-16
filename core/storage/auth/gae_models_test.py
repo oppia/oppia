@@ -20,16 +20,21 @@ from __future__ import annotations
 
 from core import feconf
 from core.platform import models
-from core.storage.user.gae_models import UserSettingsModel
 from core.tests import test_utils
 
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import auth_models
     from mypy_imports import base_models
+    from mypy_imports import user_models
 
-(auth_models, base_models) = (
-    models.Registry.import_models([models.NAMES.auth, models.NAMES.base_model]))
+(auth_models, base_models, user_models) = (
+    models.Registry.import_models([
+        models.NAMES.auth,
+        models.NAMES.base_model,
+        models.NAMES.user
+    ])
+)
 
 
 class UserAuthDetailsModelTests(test_utils.GenericTestBase):
@@ -73,23 +78,63 @@ class UserAuthDetailsModelTests(test_utils.GenericTestBase):
             auth_models.UserAuthDetailsModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE_AT_END)
 
+    def test_get_field_names_for_takeout(self) -> None:
+        expected_dict = {
+            'parent_user_id': 'parent_username'
+        }
+        self.assertEqual(
+            auth_models.UserAuthDetailsModel
+                .get_field_names_for_takeout(),
+            expected_dict)
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            auth_models.UserAuthDetailsModel.
+                get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER)
+
+    def test_get_export_policy(self) -> None:
+        expected_export_policy_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'gae_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'firebase_auth_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'parent_user_id': base_models.EXPORT_POLICY.EXPORTED,
+        }
+        self.assertEqual(
+            auth_models.UserAuthDetailsModel
+                .get_export_policy(),
+            expected_export_policy_dict)
+
     def test_export_data_trivial(self) -> None:
         exported_data = (
             auth_models.UserAuthDetailsModel.export_data(
                 self.NONEXISTENT_USER_ID))
         expected_data = ({})
         self.assertEqual(exported_data, expected_data)
-    
+
     def test_export_data_nontrivial(self) -> None:
-        user_auth_model = auth_models.UserAuthDetailsModel.get_by_id(self.PROFILE_2_ID)
+        user_auth_model = (
+            auth_models.UserAuthDetailsModel
+                .get_by_id(self.PROFILE_2_ID))
         self.assertIsNotNone(user_auth_model)
+        self.assertIsNotNone(user_auth_model.parent_user_id)
+        user_models.UserSettingsModel(
+            id=self.USER_ID,
+            email='user@example.com',
+            roles=[feconf.ROLE_ID_CURRICULUM_ADMIN],
+            banned=False,
+            username='user'
+        ).put()
         parent_data = UserSettingsModel.get(user_auth_model.parent_user_id)
+        self.assertIsNotNone(parent_data)
         exported_data = (
             auth_models.UserAuthDetailsModel.export_data(
-                self.USER_ID))
-        expected_data = {'parent_username': parent_data.parent_username }
+                self.PROFILE_2_ID))
+        expected_data = {'parent_username': parent_data.username}
         self.assertEqual(expected_data, exported_data)
-        
+
     def test_apply_deletion_policy_for_registered_user_deletes_them(
             self
     ) -> None:
@@ -195,6 +240,24 @@ class UserIdentifiersModelTests(test_utils.GenericTestBase):
         self.assertEqual(
             auth_models.UserIdentifiersModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE_AT_END)
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            auth_models.UserIdentifiersModel.
+                get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
+
+    def test_get_export_policy(self) -> None:
+        expected_export_policy_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+        }
+        self.assertEqual(
+            auth_models.UserIdentifiersModel
+                .get_export_policy(),
+            expected_export_policy_dict)
 
     def test_apply_deletion_policy_for_registered_user_deletes_them(
             self
