@@ -59,7 +59,7 @@ class GetCollectionOwnersEmailsJobTests(job_test_utils.JobTestBase):
         user.update_timestamps()
         collection = self.create_model(
             collection_models.CollectionRightsModel,
-            id=1,
+            id='col_1',
             owner_ids=[self.USER_ID_1],
             editor_ids=[self.USER_ID_1],
             voice_artist_ids=[self.USER_ID_1],
@@ -72,7 +72,9 @@ class GetCollectionOwnersEmailsJobTests(job_test_utils.JobTestBase):
         self.put_multi([user, collection])
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS: 1')
+            job_run_result.JobRunResult(
+                stdout=(
+                    'collection_ids: [\'col_1\'], email: [\'some@email.com\']'))
         ])
 
     def test_counts_multiple_collection(self) -> None:
@@ -92,7 +94,7 @@ class GetCollectionOwnersEmailsJobTests(job_test_utils.JobTestBase):
         user2.update_timestamps()
         collection1 = self.create_model(
             collection_models.CollectionRightsModel,
-            id=1,
+            id='col_1',
             owner_ids=[self.USER_ID_1, self.USER_ID_2],
             editor_ids=[self.USER_ID_1],
             voice_artist_ids=[self.USER_ID_1],
@@ -104,7 +106,7 @@ class GetCollectionOwnersEmailsJobTests(job_test_utils.JobTestBase):
         collection1.update_timestamps()
         collection2 = self.create_model(
             collection_models.CollectionRightsModel,
-            id=2,
+            id='col_2',
             owner_ids=[self.USER_ID_2],
             editor_ids=[self.USER_ID_1],
             voice_artist_ids=[self.USER_ID_1],
@@ -117,7 +119,15 @@ class GetCollectionOwnersEmailsJobTests(job_test_utils.JobTestBase):
         self.put_multi([user1, user2, collection1, collection2])
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS: 2')
+            job_run_result.JobRunResult(
+                stdout=(
+                    'collection_ids: [\'col_1\'], email: '
+                    '[\'some@email.com\']')),
+            job_run_result.JobRunResult(
+                stdout=(
+                    'collection_ids: [\'col_1\', \'col_2\'], email: '
+                    '[\'some2@email.com\']')
+                )
         ])
 
 

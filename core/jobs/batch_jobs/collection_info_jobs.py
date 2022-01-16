@@ -26,6 +26,8 @@ from core.platform import models
 
 import apache_beam as beam
 
+from typing import Iterable, Tuple
+
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import collection_models
@@ -41,47 +43,52 @@ datastore_services = models.Registry.import_datastore_services()
 
 
 class GetCollectionOwnersEmailsJob(base_jobs.JobBase):
-    """Job that generate emails of CollectionModels users."""
+    """Job that extracts collection id and user email from datastore."""
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        """Returns a PCollection of 'SUCCESS' or 'FAILURE' results from
-        generating email of CollectionModel user.
 
-        Returns:
-            PCollection. A PCollection of 'SUCCESS' or 'FAILURE' results from
-            generating email of CollectionModel user.
-        """
-        collection_user_ids_pcollection = (
+        collection_pair = (
             self.pipeline
-            | 'Get all collection rights models' >> ndb_io.GetModels(
+            | 'get collection models ' >> ndb_io.GetModels(
                 collection_models.CollectionRightsModel.get_all(
                     include_deleted=False))
-            | 'Extract user IDs' >> beam.FlatMap(
-                    lambda collection_rights: collection_rights.owner_ids)
-            | 'Remove duplicates' >> beam.Distinct() # pylint: disable=no-value-for-parameter
+            | 'Flatten owner_ids and format' >> beam.ParDo(
+                FlattenIDs())
         )
-        collection_user_ids = beam.pvalue.AsIter(
-            collection_user_ids_pcollection)
 
-        user_email_pcollection = (
+        user_pair = (
             self.pipeline
             | 'Get all user settings models' >> ndb_io.GetModels(
                 user_models.UserSettingsModel.get_all(
                     include_deleted=False))
-            | 'Filter model that belong to collection' >> (
-                beam.Filter(
-                    lambda model, ids: (
-                        model.id in ids),
-                    ids=collection_user_ids
-                ))
-            | 'Get e-mail' >> beam.Map(lambda model: model.email)
+            | 'Extract id and email' >> beam.Map(
+                    lambda user_setting: (
+                        user_setting.id, user_setting.email))
+        )
+
+        group_by_user_id = (
+            (collection_pair, user_pair)
+            | 'Group by user_id' >> beam.CoGroupByKey()
+            | 'Drop user id' >> beam.Values()  # pylint: disable=no-value-for-parameter
         )
 
         return (
-            user_email_pcollection
-            | 'Count the output' >> (
-                job_result_transforms.CountObjectsToJobRunResult())
+            group_by_user_id
+            | 'Get final result' >> beam.MapTuple(
+                lambda collection, email: job_run_result.JobRunResult.as_stdout(
+                    'collection_ids: %s, email: %s' % (collection, email)
+                ))
         )
+
+
+class FlattenIDs(beam.DoFn):  # type: ignore[misc]
+    """DoFn to extract user id and collection id."""
+
+    def process(
+        self, collection_rights_model: datastore_services.Model
+    ) -> Iterable[Tuple[str, str]]:
+        for user_id in collection_rights_model.owner_ids:
+            yield (user_id, collection_rights_model.id)
 
 
 class MatchEntiryTypeCollectionJob(base_jobs.JobBase):
@@ -104,7 +111,6 @@ class MatchEntiryTypeCollectionJob(base_jobs.JobBase):
                     lambda feeback_model: feeback_model.entity_type)
             | 'Match entity_type' >> beam.Filter(
                 lambda entity_type: entity_type == 'collection')
-            | 'print out ' >> beam.Map(print)
         )
 
         return (
