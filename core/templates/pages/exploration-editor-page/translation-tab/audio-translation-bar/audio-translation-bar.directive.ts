@@ -291,15 +291,17 @@ angular.module('oppia').directive('audioTranslationBar', [
             });
           };
 
+          const waveSurferOnFinishCb = () => {
+            $scope.unsavedAudioIsPlaying = false;
+            $scope.$applyAsync();
+          };
+
           // Play and pause for unsaved recording.
           $scope.playAndPauseUnsavedAudio = function() {
             $scope.unsavedAudioIsPlaying = !$scope.unsavedAudioIsPlaying;
             if ($scope.unsavedAudioIsPlaying) {
               $scope.waveSurfer.play();
-              $scope.waveSurfer.on('finish', function() {
-                $scope.unsavedAudioIsPlaying = false;
-                $scope.$applyAsync();
-              });
+              $scope.waveSurfer.on('finish', waveSurferOnFinishCb);
             } else {
               $scope.waveSurfer.pause();
             }
@@ -536,6 +538,13 @@ angular.module('oppia').directive('audioTranslationBar', [
 
             $scope.$on('$destroy', function() {
               document.body.onkeyup = null;
+              // TODO(#12146): Remove jQuery usage below.
+              // Remove jQuery event listeners.
+              $('.oppia-translation-tab').off('dragover');
+              $('.oppia-main-body').off('dragleave');
+              $('.oppia-translation-tab').off('drop');
+              // Remove wavesurefer finish event listener.
+              $scope.waveSurfer?.un('finish', waveSurferOnFinishCb);
             });
 
             ctrl.directiveSubscriptions.add(
