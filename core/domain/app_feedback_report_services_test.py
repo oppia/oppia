@@ -736,7 +736,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                     filter_obj.filter_options[0],
                     self.ENTRY_POINT_NAVIGATION_DRAWER.name)
             elif filter_obj.filter_field == (
-                    filter_field_names.submitted_on):
+                    filter_field_names.SUBMITTED_ON):
                 self.assertEqual(
                     filter_obj.filter_options[0],
                     self.REPORT_SUBMITTED_TIMESTAMP.date())
