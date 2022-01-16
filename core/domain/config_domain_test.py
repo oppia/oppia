@@ -97,7 +97,7 @@ class ConfigPropertyRegistryTests(test_utils.GenericTestBase):
     def test_config_property_schemas_are_valid(self) -> None:
         for property_name in (
                 config_domain.Registry.get_all_config_property_names()):
-            schema = config_domain.Registry.get_config_property(
+            schema = config_domain.Registry.get_config_property( # type: ignore[union-attr]
                 property_name).schema
             schema_utils_test.validate_schema(schema)
 

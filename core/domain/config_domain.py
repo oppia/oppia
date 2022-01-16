@@ -23,7 +23,7 @@ from core import schema_utils
 from core.constants import constants
 from core.domain import change_domain
 
-from typing import Any, Dict, List, cast
+from typing import Any, Dict, List, Optional
 
 from core.domain import caching_services  # pylint: disable=invalid-import-from # isort:skip
 from core.platform import models  # pylint: disable=invalid-import-from # isort:skip
@@ -359,7 +359,7 @@ class Registry:
         cls._config_registry[name] = instance
 
     @classmethod
-    def get_config_property(cls, name: str) -> ConfigProperty:
+    def get_config_property(cls, name: str) -> Optional[ConfigProperty]:
         """Returns the instance of the specified name of the configuration
         property.
 
@@ -369,7 +369,7 @@ class Registry:
         Returns:
             instance. The instance of the specified configuration property.
         """
-        return cast(ConfigProperty, cls._config_registry.get(name))
+        return cls._config_registry.get(name)
 
     # This function returns Dict with property_name as key and every value
     # is a Dict of properties of that particular property_name.
