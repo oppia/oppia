@@ -1175,7 +1175,7 @@ class StateAnswersModelUnitTests(test_utils.GenericTestBase):
                 submitted_answer_list)
 
             stat_answer_models = stats_models.StateAnswersModel.get_all_models(
-            'exp_id', 1, 'state_name'
+                'exp_id', 1, 'state_name'
             )
 
             # Ruling out the possibility of None for mypy type checking.
