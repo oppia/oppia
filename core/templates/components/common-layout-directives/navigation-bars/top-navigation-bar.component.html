@@ -103,8 +103,11 @@
                   <div class="nav-item-top d-flex justify-content-between">
                     <div class="nav-content d-flex flex-column">
                       <div class="dropdown-item nav-link oppia-navbar-tab-content protractor-test-classroom-link nav-item-top-link">
-                        <a (keydown)="onMenuKeypress($event, 'learnMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_CLOSE})" class="underline"
-                           (click)="navigateToClassroomPage('/learn/' + DEFAULT_CLASSROOM_URL_FRAGMENT)" href="#">{{ 'I18N_TOPNAV_CLASSROOM_BASIC_MATHS' | translate }}
+                        <a (keydown)="onMenuKeypress($event, 'learnMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_CLOSE})"
+                           class="underline"
+                           (click)="navigateToClassroomPage('/learn/' + DEFAULT_CLASSROOM_URL_FRAGMENT)"
+                           href="#">
+                             {{ 'I18N_TOPNAV_CLASSROOM_BASIC_MATHS' | translate }}
                         </a>
                       </div>
                       <div class="des">{{ 'I18N_TOPNAV_LEARN_DESCRIPTION_1' | translate }}</div>
