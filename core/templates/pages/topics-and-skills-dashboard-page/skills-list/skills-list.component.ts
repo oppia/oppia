@@ -51,17 +51,21 @@ interface MergeModalResult {
   templateUrl: './skills-list.component.html'
 })
 export class SkillsListComponent {
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() skillSummaries!: AugmentedSkillSummary[];
   @Input() pageNumber!: number;
   @Input() itemsPerPage!: number;
   @Input() editableTopicSummaries!: CreatorTopicSummary[];
   @Input() mergeableSkillSummaries!: SkillSummary[];
-  @Input() untriagedSkillSummaries!: SkillSummary[];
-  @Input() userCanDeleteSkill: boolean = false;
-  @Input() userCanCreateSkill: boolean = false;
+  @Input() userCanDeleteSkill: boolean = true;
+  @Input() userCanCreateSkill: boolean = true;
   @Input() skillsCategorizedByTopics!: SkillsCategorizedByTopics;
-  directiveSubscriptions: Subscription = new Subscription();
+  @Input() untriagedSkillSummaries!: SkillSummary[];
+  
   selectedIndex!: string;
+  directiveSubscriptions: Subscription = new Subscription();
   SKILL_HEADINGS: string[] = [
     'index', 'description', 'worked_examples_count',
     'misconception_count', 'status'];
