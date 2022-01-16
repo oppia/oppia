@@ -22,7 +22,7 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 
-import { AdminBackendApiService, AdminPageData } from 'domain/admin/admin-backend-api.service';
+import { AdminBackendApiService, AdminPageData, UserRolesBackendResponse } from 'domain/admin/admin-backend-api.service';
 import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 import { AdminDataService } from '../services/admin-data.service';
 import { AdminRolesTabComponent} from './admin-roles-tab.component';
@@ -149,16 +149,20 @@ describe('Admin roles tab component ', function() {
   });
 
   describe('on startEditing', function() {
+    let successPromise: Promise<UserRolesBackendResponse>;
+
     beforeEach(function() {
-      spyOn(adminBackendApiService, 'viewUsersRoleAsync')
-        .and.returnValue(Promise.resolve({
-          roles: ['TOPIC_MANAGER'],
-          managed_topic_ids: ['topic_id_1'],
-          banned: false
-        }));
+      successPromise = Promise.resolve({
+        roles: ['TOPIC_MANAGER'],
+        managed_topic_ids: ['topic_id_1'],
+        banned: false
+      });
     });
 
     it('should enable roleIsCurrentlyBeingEdited', fakeAsync(() => {
+      spyOn(adminBackendApiService, 'viewUsersRoleAsync').and.returnValue(
+        successPromise
+      );
       expect(component.roleIsCurrentlyBeingEdited).toBeFalse();
 
       component.startEditing();
@@ -168,6 +172,10 @@ describe('Admin roles tab component ', function() {
     }));
 
     it('should fetch user roles and intialize properties', fakeAsync(() => {
+      spyOn(adminBackendApiService, 'viewUsersRoleAsync').and.returnValue(
+        successPromise
+      );
+
       // Prechecks.
       expect(component.rolesFetched).toBeFalse();
       expect(component.userRoles).toEqual([]);
@@ -181,6 +189,20 @@ describe('Admin roles tab component ', function() {
       expect(component.userRoles).toEqual(['TOPIC_MANAGER']);
       expect(component.managedTopicIds).toEqual(['topic_id_1']);
       expect(component.userIsBanned).toBeFalse();
+    }));
+
+    it('should set status when viewUsersRoleAsync fails', fakeAsync(() => {
+      spyOn(adminBackendApiService, 'viewUsersRoleAsync').and.returnValue(
+        Promise.reject('Error')
+      );
+      spyOn(component.setStatusMessage, 'emit');
+      expect(component.roleIsCurrentlyBeingEdited).toBeFalse();
+
+      component.startEditing();
+      tick();
+
+      expect(component.roleIsCurrentlyBeingEdited).toBeFalse();
+      expect(component.setStatusMessage.emit).toHaveBeenCalledWith('Error');
     }));
   });
 
