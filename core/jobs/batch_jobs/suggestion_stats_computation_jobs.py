@@ -21,6 +21,7 @@ from __future__ import annotations
 import datetime
 
 from core import feconf
+from core.domain import exp_domain
 from core.domain import html_cleaner
 from core.domain import opportunity_domain
 from core.domain import opportunity_services
@@ -178,15 +179,20 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                 suggestion_models.TranslationContributionStatsModel.generate_id(
                     suggestion.language_code, suggestion.author_id, topic_id))
             try:
-                # Content in set format is a list, content in unicode and html
-                # format is a string. This code normalizes the content to the
-                # list type so that we can easily count words.
-                if state_domain.WrittenTranslation.is_data_format_list(
-                        suggestion.change.data_format
+                change = suggestion.change
+                # In the new translation command the content in set format is
+                # a list, content in unicode and html format is a string.
+                # This code normalizes the content to the list type so that
+                # we can easily count words.
+                if (
+                        change.cmd == exp_domain.CMD_ADD_WRITTEN_TRANSLATION and
+                        state_domain.WrittenTranslation.is_data_format_list(
+                            change.data_format
+                        )
                 ):
-                    content_items = suggestion.change.content_html
+                    content_items = change.content_html
                 else:
-                    content_items = [suggestion.change.content_html]
+                    content_items = [change.content_html]
 
                 content_word_count = 0
                 for item in content_items:
