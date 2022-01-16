@@ -134,7 +134,9 @@
                         </a>
                       </div>
                     </div>
-                    <a (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})" class="nav-item-bottom-link" href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}">
+                    <a (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})"
+                       class="nav-item-bottom-link"
+                       href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}">
                       <span class="link">{{ 'I18N_TOPNAV_LEARN_LINK_1' | translate }}</span>
                       <span class="material-icons arrow-forward">arrow_forward</span>
                     </a>
@@ -150,7 +152,9 @@
                 <div class="nav-content nav-item-right d-flex flex-column">
                   <div class="nav-item-right-head">{{ 'I18N_TOPNAV_LEARN_HEADING' | translate }}</div>
                   <div class="des">{{ 'I18N_TOPNAV_LIBRARY_DESCRIPTION' | translate }}</div>
-                  <a (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})" class="nav-item-bottom-link" href="/community-library">
+                  <a (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})"
+                     class="nav-item-bottom-link"
+                     href="/community-library">
                     <span class="link">{{ 'I18N_TOPNAV_LIBRARY' | translate }}</span>
                     <span class="material-icons arrow-forward">arrow_forward</span>
                   </a>
@@ -230,22 +234,28 @@
               (mouseleave)="closeSubmenuIfNotMobile($event)">
             <div class="d-flex flex-column">
               <div class="top-section d-flex">
-                <div class="item item-border d-flex flex-column innvolved-item" onclick="location.href='/partnerships'"
+                <div class="item item-border d-flex flex-column innvolved-item"
+                     onclick="location.href='/partnerships'"
                      (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_CLOSE})">
                   <div class="heading">
                     <span class="material-icons language mx-1">language</span>
-                    <a class="heading-text underline" href="/partnerships"
-                       [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.ROUTE" rel="noopener">{{'I18N_TOPNAV_PARTNERSHIPS' | translate}}
+                    <a class="heading-text underline"
+                       href="/partnerships"
+                       [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.ROUTE"
+                       rel="noopener">{{'I18N_TOPNAV_PARTNERSHIPS' | translate}}
                     </a>
                   </div>
                   <div class="des">
                     {{'I18N_TOPNAV_PARTNERSHIPS_DESCRIPTION' | translate}}
                   </div>
                 </div>
-                <div class="item d-flex flex-column innvolved-item" onclick="location.href='/volunteer'">
+                <div class="item d-flex flex-column innvolved-item"
+                     onclick="location.href='/volunteer'">
                   <div class="heading">
                     <span class="material-icons volunteer mx-1">supervisor_account</span>
-                    <a class="heading-text underline" href="/volunteer" [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.VOLUNTEER.ROUTE"
+                    <a class="heading-text underline"
+                       href="/volunteer"
+                       [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.VOLUNTEER.ROUTE"
                        (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {enter: ACTION_CLOSE})"
                        rel="noopener">{{'I18N_HEADING_VOLUNTEER'| translate}}
                     </a>
@@ -256,22 +266,28 @@
                 </div>
               </div>
               <div class="bottom-section d-flex">
-                <div class="item item-border d-flex flex-column innvolved-item" onclick="location.href='/contact'">
+                <div class="item item-border d-flex flex-column innvolved-item"
+                     onclick="location.href='/contact'">
                   <div class="heading">
                     <span class="material-icons contact mx-1">mail</span>
-                    <a href="/contact" [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.CONTACT.ROUTE"
+                    <a href="/contact"
+                       [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.CONTACT.ROUTE"
                        (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {enter: ACTION_CLOSE})"
-                       rel="noopener" class="heading-text underline">{{'I18N_TOPNAV_CONTACT_US' | translate}}
+                       rel="noopener"
+                       class="heading-text underline">{{'I18N_TOPNAV_CONTACT_US' | translate}}
                     </a>
                   </div>
                   <div class="des">
                     {{'I18N_TOPNAV_CONTACT_US_DESCRIPTION' | translate}}
                   </div>
                 </div>
-                <div class="item d-flex flex-column innvolved-item" onclick="location.href='/donate'">
+                <div class="item d-flex flex-column innvolved-item"
+                     onclick="location.href='/donate'">
                   <div class="heading">
                     <span class="material-icons fav mx-1">favorite</span>
-                    <a class="heading-text underline" href="/donate" [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE"
+                    <a class="heading-text underline"
+                       href="/donate"
+                       [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE"
                        (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {enter: ACTION_CLOSE})"
                        rel="noopener">{{'I18N_TOPNAV_DONATE' | translate}}
                     </a>
@@ -319,7 +335,9 @@
           <span class="desktop-view-language-code" *ngIf="!windowIsNarrow"> {{ currentLanguageText }} </span>
         </button>
       </div>
-      <ul ngbDropdownMenu class="dropdown-menu oppia-navbar-dropdown language-dropdown" [style.margin-top]="userIsLoggedIn ? '-10px': '0'"
+      <ul ngbDropdownMenu
+          class="dropdown-menu oppia-navbar-dropdown language-dropdown"
+          [style.margin-top]="userIsLoggedIn ? '-10px': '0'"
           (mouseover)="openSubmenu($event, 'languageMenu')"
           (mouseleave)="closeSubmenuIfNotMobile($event)">
         <li class="nav-item" [ngClass]="'protractor-test-i18n-language-' + language.id" *ngFor="let language of supportedSiteLanguages">
@@ -604,7 +622,8 @@
     padding: 32px;
     width: 287px;
   }
-  .item:hover, .item:focus {
+  .item:hover,
+  .item:focus {
     background-color: #21212107;
   }
   .top-section .item {
@@ -685,7 +704,8 @@
     padding: 0;
     padding-top: 16px;
   }
-  .learn-dropdown-menu .nav-item-bottom-link:hover .link,  .learn-dropdown-menu .nav-item-bottom-link:focus .link {
+  .learn-dropdown-menu .nav-item-bottom-link:hover .link,
+  .learn-dropdown-menu .nav-item-bottom-link:focus .link {
     border-bottom: #00645c 2px solid;
     transition: 50ms;
   }
@@ -697,7 +717,8 @@
     line-height: 16.41px;
     padding: 0;
   }
-  .learn-dropdown-menu .nav-item-bottom-link-logged:hover .link,  .learn-dropdown-menu .nav-item-bottom-link-logged:focus .link {
+  .learn-dropdown-menu .nav-item-bottom-link-logged:hover .link,
+  .learn-dropdown-menu .nav-item-bottom-link-logged:focus .link {
     border-bottom: #00645c 2px solid;
     transition: 50ms;
   }
