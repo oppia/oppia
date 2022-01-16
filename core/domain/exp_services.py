@@ -1661,7 +1661,7 @@ def get_average_rating(ratings):
 
         for rating_value, rating_count in ratings.items():
             rating_sum += rating_weightings[rating_value] * rating_count
-        return (rating_sum // (number_of_ratings * 1.0))
+        return rating_sum // (number_of_ratings * 1.0)
 
 
 def get_scaled_average_rating(ratings):
