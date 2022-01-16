@@ -117,7 +117,7 @@ class BaseTranslatableObject:
 
         Args:
             entityTranslation: EntityTranslation. An object storing existing
-                translation of the entity.
+                translation of an entity.
 
         Returns:
             list(TranslatableContent). Returns a list of TranslatableContents.
@@ -228,7 +228,7 @@ class TranslatedContent:
     object.
 
     Args:
-        content: str|list(str). The content which is translated.
+        content: str|list(str). The content which is already translated.
         needs_update: bool. A boolean value which represents that whether any
             translation needs update or not.
     """
