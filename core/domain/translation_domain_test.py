@@ -151,7 +151,7 @@ class BaseTranslatableObjectUnitTest(test_utils.GenericTestBase):
         translatable_object = TranslatableObject3(
             'My name is jack.', 'My name is jhon.')
 
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception,
             'A translatable field is already registered with the '
             'same content id: content_id_2'):
@@ -161,7 +161,7 @@ class BaseTranslatableObjectUnitTest(test_utils.GenericTestBase):
         translatable_object = TranslatableObject4(
             'My name is jack.', 'My name is jhon.')
 
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception, 'Must be implemented in subclasses.'):
             translatable_object.get_translatable_fields()
 
