@@ -50,11 +50,11 @@
                    show-mark-all-audio-as-needing-update-modal-if-required="$ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired">
   </state-responses>
   <div>
-    <state-hints-editor on-save-hints="$ctrl.onSaveHints"
-                        on-save-next-content-id-index="$ctrl.onSaveNextContentIdIndex"
-                        on-save-solution="$ctrl.onSaveSolution"
-                        show-mark-all-audio-as-needing-update-modal-if-required="$ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired">
-    </state-hints-editor>
+    <oppia-state-hints-editor (on-save-next-content-id-index)="$ctrl.onSaveNextContentIdIndex($event)"
+                              (on-save-solution)="$ctrl.onSaveSolution($event)"
+                              (on-save-hints)="$ctrl.onSaveHints($event)"
+                              (show-mark-all-audio-as-needing-update-modal-if-required)="$ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired($event)">
+    </oppia-state-hints-editor>
   </div>
   <div ng-if="currentInteractionCanHaveSolution">
     <state-solution-editor on-save-solution="$ctrl.onSaveSolution"
