@@ -514,28 +514,4 @@ describe('Collection player page component', () => {
     expect(component.scrollToLocation).toHaveBeenCalled();
     expect(component.explorationCardIsShown).toBeFalse();
   }));
-
-  // // eslint-disable-next-line oppia/no-test-blockers
-  // fit('should do', fakeAsync(() => {
-  //   spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
-  //     .and.resolveTo(sampleCollection);
-  //   spyOn(userService, 'getUserInfoAsync')
-  //     .and.returnValue(Promise.resolve(new UserInfo(
-  //       ['USER_ROLE'], true, false, false, false, true,
-  //       'en', 'username1', 'tester@example.com', false
-  //     )));
-  //   spyOn(guestCollectionProgressService, 'hasCompletedSomeExploration')
-  //     .and.returnValue(true);
-  //   spyOn(guestCollectionProgressService, 'getCompletedExplorationIds')
-  //     .and.returnValue(['expId2']);
-  //   spyOn(guestCollectionProgressService, 'getNextExplorationId')
-  //     .and.returnValue('expId');
-  //   spyOnProperty(
-  //     AppConstants,
-  //     'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS'
-  //   ).and.returnValue(['collectionId']);
-
-  //   component.ngOnInit();
-  //   tick();
-  // }));
 });

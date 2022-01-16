@@ -44,7 +44,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'Base.ts',
     'ck-editor-4-rte.component.ts',
     'ck-editor-4-widgets.initializer.ts',
-    'collection-player-page.component.ts',
     'collection.model.ts',
     'contribution-and-review.service.ts',
     'conversation-skin.directive.ts',
