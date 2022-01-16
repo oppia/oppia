@@ -8,9 +8,9 @@
     Please enter a brief description of what you have changed:
     <textarea rows="3"
               cols="50"
-              [maxlength]="MAX_COMMIT_MESSAGE_LENGTH"
+              [attr.maxlength]="MAX_COMMIT_MESSAGE_LENGTH"
               [(ngModel)]="commitMessage"
-              oppiaFocusOn="saveChangesModalOpened"
+              (ngModelChange)="updateSaveDraftButton()"
               class="protractor-test-commit-message-input"
               autofocus>
     </textarea>
