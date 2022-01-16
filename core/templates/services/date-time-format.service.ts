@@ -102,7 +102,7 @@ export class DateTimeFormatService {
   /**
    * This function returns the relative time from now.
    * @param {number} millisSinceEpoch - milliseconds since Epoch
-   * @returns {boolean} string representing the relative time from now
+   * @returns {string} string representing the relative time from now
    */
   getRelativeTimeFromNow(millisSinceEpoch: number): string {
     dayjs.extend(relativeTime);
