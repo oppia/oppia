@@ -232,8 +232,8 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     SavePendingChangesModalComponent,
     AddHintModalComponent,
     ReviewMaterialEditorComponent,
+    SolutionEditor,
     SolutionExplanationEditor,
-    SolutionEditor
   ],
 
   entryComponents: [
@@ -308,8 +308,8 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     SavePendingChangesModalComponent,
     AddHintModalComponent,
     ReviewMaterialEditorComponent,
-    SolutionExplanationEditor,
-    SolutionEditor
+    SolutionEditor,
+    SolutionExplanationEditor
   ],
 
   exports: [
@@ -399,8 +399,8 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     DeleteLastHintModalComponent,
     DeleteSolutionModalComponent,
     ReviewMaterialEditorComponent,
-    SolutionExplanationEditor,
-    SolutionEditor
+    SolutionEditor,
+    SolutionExplanationEditor
   ],
 })
 

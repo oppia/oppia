@@ -17,12 +17,12 @@
  */
 
 import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { Subscription } from 'rxjs';
 import { ContextService } from 'services/context.service';
 import { EditabilityService } from 'services/editability.service';
 import { ExternalSaveService } from 'services/external-save.service';
 import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
-import { downgradeComponent } from '@angular/upgrade/static';
 import { Solution } from 'domain/exploration/SolutionObjectFactory';
 
 interface explanationFormSchema {
@@ -44,7 +44,6 @@ export class SolutionExplanationEditor
   isEditable: boolean;
   explanationEditorIsOpen: boolean;
   EXPLANATION_FORM_SCHEMA: explanationFormSchema;
-
 
   constructor(
     private contextService: ContextService,
@@ -107,7 +106,6 @@ export class SolutionExplanationEditor
 
     this.isEditable = this.editabilityService.isEditable();
     this.explanationEditorIsOpen = false;
-
     this.EXPLANATION_FORM_SCHEMA = {
       type: 'html',
       ui_config: {

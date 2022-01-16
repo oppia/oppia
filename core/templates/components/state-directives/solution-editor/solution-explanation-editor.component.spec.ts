@@ -96,6 +96,10 @@ describe('Solution explanation editor', function() {
     component.ngOnInit();
   });
 
+  afterEach(() => {
+    component.ngOnDestroy();
+  });
+
   it('should intitalize with default values', () => {
     const schema = {
       type: 'html',

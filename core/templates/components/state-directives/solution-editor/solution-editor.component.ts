@@ -17,12 +17,12 @@
  */
 
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { StateCustomizationArgsService } from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import { EditabilityService } from 'services/editability.service';
 import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
-import { downgradeComponent } from '@angular/upgrade/static';
 import { Solution } from 'domain/exploration/SolutionObjectFactory';
 
 interface explanationFormSchema {
