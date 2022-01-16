@@ -111,8 +111,7 @@ class UserAuthDetailsModelTests(test_utils.GenericTestBase):
         exported_data = (
             auth_models.UserAuthDetailsModel.export_data(
                 self.NONEXISTENT_USER_ID))
-        expected_data = ({})
-        self.assertEqual(exported_data, expected_data)
+        self.assertEqual(exported_data, {})
 
     def test_export_data_nontrivial(self) -> None:
         user_auth_model = (
@@ -131,7 +130,7 @@ class UserAuthDetailsModelTests(test_utils.GenericTestBase):
             user_models.UserSettingsModel.
                 get(user_auth_model.parent_user_id)
         )
-        self.assertIsNotNone(parent_data)
+        assert parent_data is not None
         exported_data = (
             auth_models.UserAuthDetailsModel.export_data(
                 self.PROFILE_2_ID))
