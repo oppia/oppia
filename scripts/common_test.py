@@ -125,7 +125,7 @@ class CommonTests(test_utils.GenericTestBase):
         def mock_getcwd():
             return 'invalid'
         getcwd_swap = self.swap(os, 'getcwd', mock_getcwd)
-        with getcwd_swap, self.assertRaisesRegexp(
+        with getcwd_swap, self.assertRaisesRegex(
             Exception, 'Please run this script from the oppia/ directory.'):
             common.require_cwd_to_be_oppia()
 
@@ -243,7 +243,7 @@ class CommonTests(test_utils.GenericTestBase):
             return b'remote1 url1\nremote2 url2'
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
-        with check_output_swap, self.assertRaisesRegexp(
+        with check_output_swap, self.assertRaisesRegex(
             Exception,
             'ERROR: There is no existing remote alias for the url3 repo.'
         ):
@@ -262,7 +262,7 @@ class CommonTests(test_utils.GenericTestBase):
             return b'invalid'
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
-        with check_output_swap, self.assertRaisesRegexp(
+        with check_output_swap, self.assertRaisesRegex(
             Exception, 'ERROR: This script should be run from a clean branch.'
         ):
             common.verify_local_repo_is_clean()
@@ -289,7 +289,7 @@ class CommonTests(test_utils.GenericTestBase):
                 'release-maintenance-1.2.3'), '1.2.3')
 
     def test_get_current_release_version_number_with_invalid_branch(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Invalid branch name: invalid-branch.'):
             common.get_current_release_version_number('invalid-branch')
 
@@ -361,7 +361,7 @@ class CommonTests(test_utils.GenericTestBase):
             return b'On branch invalid'
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
-        with check_output_swap, self.assertRaisesRegexp(
+        with check_output_swap, self.assertRaisesRegex(
             Exception,
             'ERROR: This script can only be run from the "test" branch.'
         ):
@@ -539,7 +539,7 @@ class CommonTests(test_utils.GenericTestBase):
         def mock_getpass(prompt):  # pylint: disable=unused-argument
             return None
         getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
-        with getpass_swap, self.assertRaisesRegexp(
+        with getpass_swap, self.assertRaisesRegex(
             Exception,
             'No personal access token provided, please set up a personal '
             'access token at https://github.com/settings/tokens and re-run '
@@ -625,7 +625,7 @@ class CommonTests(test_utils.GenericTestBase):
         open_tab_swap = self.swap(
             common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
         with get_issues_swap, get_label_swap, open_tab_swap:
-            with self.assertRaisesRegexp(
+            with self.assertRaisesRegex(
                 Exception, (
                     'There are PRs for current release which do not '
                     'have a \'%s\' label. Please ensure that '
@@ -677,7 +677,7 @@ class CommonTests(test_utils.GenericTestBase):
         with python_utils.open_file(origin_file, 'r') as f:
             origin_content = f.readlines()
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             ValueError, 'Wrong number of replacements. Expected 1. Performed 0.'
         ):
             common.inplace_replace_file(
@@ -703,7 +703,7 @@ class CommonTests(test_utils.GenericTestBase):
             raise ValueError('Exception raised from compile()')
 
         compile_swap = self.swap_with_checks(re, 'compile', mock_compile)
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             ValueError,
             re.escape('Exception raised from compile()')
         ), compile_swap:
@@ -855,7 +855,7 @@ class CommonTests(test_utils.GenericTestBase):
 
     def test_write_stdout_safe_with_oserror(self):
         write_swap = self.swap_to_always_raise(os, 'write', OSError('OS error'))
-        with write_swap, self.assertRaisesRegexp(OSError, 'OS error'):
+        with write_swap, self.assertRaisesRegex(OSError, 'OS error'):
             common.write_stdout_safe('test')
 
     def test_write_stdout_safe_with_unsupportedoperation(self):
@@ -868,4 +868,4 @@ class CommonTests(test_utils.GenericTestBase):
 
         with write_swap, stdout_write_swap:
             common.write_stdout_safe('test')
-        self.assertEquals(mock_stdout.getvalue(), 'test')
+        self.assertEqual(mock_stdout.getvalue(), 'test')

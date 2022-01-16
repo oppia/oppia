@@ -33,6 +33,47 @@ base_models, improvements_models = models.Registry.import_models(
 class TaskEntryModelTests(test_utils.GenericTestBase):
     """Unit tests for TaskEntryModel instances."""
 
+    def test_get_field_name_mapping_to_takeout_keys(self) -> None:
+        self.assertEqual(
+            improvements_models.TaskEntryModel.
+                get_field_name_mapping_to_takeout_keys(),
+            {
+                'resolver_id': 'task_ids_resolved_by_user',
+                'issue_description': 'issue_descriptions',
+                'status': 'statuses',
+                'resolved_on': 'resolution_msecs'
+            }
+        )
+
+    def test_get_export_policy(self) -> None:
+        expected_export_policy_dict = {
+            'composite_entity_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'entity_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'entity_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'entity_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'task_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'target_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'target_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'issue_description': base_models.EXPORT_POLICY.EXPORTED,
+            'status': base_models.EXPORT_POLICY.EXPORTED,
+            'resolver_id': base_models.EXPORT_POLICY.EXPORTED,
+            'resolved_on': base_models.EXPORT_POLICY.EXPORTED,
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+        }
+        self.assertEqual(
+            improvements_models.TaskEntryModel.get_export_policy(),
+            expected_export_policy_dict)
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            improvements_models.TaskEntryModel
+                .get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.
+                ONE_INSTANCE_SHARED_ACROSS_USERS
+        )
+
     def test_has_reference_to_user_id(self) -> None:
         improvements_models.TaskEntryModel.create(
             improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
@@ -188,7 +229,7 @@ class TaskEntryModelTests(test_utils.GenericTestBase):
             'issue_description',
             status=improvements_models.TASK_STATUS_OPEN)
 
-        with self.assertRaisesRegexp(Exception, 'Task id .* already exists'): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'Task id .* already exists'): # type: ignore[no-untyped-call]
             improvements_models.TaskEntryModel.create(
                 improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
                 'eid',
