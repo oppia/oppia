@@ -166,7 +166,8 @@ class EvaluationContext:
                 raise utils.ValidationError(
                     'Invalid version \'%s\', expected to match regexp %s.' % (
                         self._app_version, APP_VERSION_WITH_HASH_REGEXP))
-            elif (
+
+            if (
                     match.group(2) is not None and
                     match.group(2) not in ALLOWED_APP_VERSION_FLAVORS):
                 raise utils.ValidationError(
