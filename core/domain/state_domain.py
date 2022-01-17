@@ -1723,8 +1723,8 @@ class WrittenTranslation:
             WrittenTranslationDto. The proto object.
         """
         written_translation_proto = {}
-        if self.data_format in
-            (WrittenTranslation.DATA_FORMAT_HTML,
+        if self.data_format in (
+            WrittenTranslation.DATA_FORMAT_HTML,
             WrittenTranslation.DATA_FORMAT_UNICODE_STRING):
             written_translation_proto = (
                 languages_pb2.WrittenTranslationDto(
