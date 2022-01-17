@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import enum
 import inspect
-from types import ModuleType  # pylint: disable=import-only-modules
+from types import ModuleType  
 
 from core import feconf
 from core.constants import constants
@@ -29,52 +29,49 @@ from typing import List, Tuple, Type
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models  # pylint: disable=unused-import
+    from mypy_imports import base_models  
 
 # Valid model names.
 
 
-# TODO(#14419): Change naming style of Enum class from SCREAMING_SNAKE_CASE
-# to PascalCase and its values to UPPER_CASE. Because we want to be consistent
-# throughout the codebase according to the coding style guide.
-# https://github.com/oppia/oppia/wiki/Coding-style-guide
-class NAMES(enum.Enum): # pylint: disable=invalid-name
+
+class NAMES(enum.Enum): 
     """Enum for valid model names."""
 
-    activity = 'activity' # pylint: disable=invalid-name
-    app_feedback_report = 'app_feedback_report' # pylint: disable=invalid-name
-    audit = 'audit' # pylint: disable=invalid-name
-    base_model = 'base_model' # pylint: disable=invalid-name
-    beam_job = 'beam_job' # pylint: disable=invalid-name
-    blog = 'blog' # pylint: disable=invalid-name
-    classifier = 'classifier' # pylint: disable=invalid-name
-    collection = 'collection' # pylint: disable=invalid-name
-    config = 'config' # pylint: disable=invalid-name
-    email = 'email' # pylint: disable=invalid-name
-    exploration = 'exploration' # pylint: disable=invalid-name
-    feedback = 'feedback' # pylint: disable=invalid-name
-    improvements = 'improvements' # pylint: disable=invalid-name
-    job = 'job' # pylint: disable=invalid-name
-    opportunity = 'opportunity' # pylint: disable=invalid-name
-    question = 'question' # pylint: disable=invalid-name
-    recommendations = 'recommendations' # pylint: disable=invalid-name
-    skill = 'skill' # pylint: disable=invalid-name
-    statistics = 'statistics' # pylint: disable=invalid-name
-    auth = 'auth' # pylint: disable=invalid-name
-    story = 'story' # pylint: disable=invalid-name
-    subtopic = 'subtopic' # pylint: disable=invalid-name
-    suggestion = 'suggestion' # pylint: disable=invalid-name
-    topic = 'topic' # pylint: disable=invalid-name
-    translation = 'translation' # pylint: disable=invalid-name
-    user = 'user' # pylint: disable=invalid-name
+    activity = 'activity' 
+    AppFeedbackReport = 'app_feedback_report' 
+    audit = 'audit' 
+    BaseModel = 'base_model' 
+    BeamJob = 'beam_job' 
+    blog = 'blog' 
+    classifier = 'classifier' 
+    collection = 'collection' 
+    config = 'config' 
+    email = 'email' 
+    exploration = 'exploration' 
+    feedback = 'feedback' 
+    improvements = 'improvements' 
+    job = 'job' 
+    opportunity = 'opportunity' 
+    question = 'question' 
+    recommendations = 'recommendations' 
+    skill = 'skill' 
+    statistics = 'statistics' 
+    auth = 'auth' 
+    story = 'story' 
+    subtopic = 'subtopic' 
+    suggestion = 'suggestion' 
+    topic = 'topic' 
+    translation = 'translation' 
+    user = 'user' 
 
 # Types of deletion policies. The pragma comment is needed because Enums are
 # evaluated as classes in Python and they should use PascalCase, but using
 # UPPER_CASE seems more appropriate here.
 
 
-MODULES_WITH_PSEUDONYMIZABLE_CLASSES = (  # pylint: disable=invalid-name
-    NAMES.app_feedback_report, NAMES.blog, NAMES.collection, NAMES.config,
+MODULES_WITH_PSEUDONYMIZABLE_CLASSES = (  
+    NAMES.AppFeedbackReport, NAMES.blog, NAMES.collection, NAMES.config,
     NAMES.exploration, NAMES.feedback, NAMES.question, NAMES.skill, NAMES.story,
     NAMES.subtopic, NAMES.suggestion, NAMES.topic
 )
@@ -130,7 +127,7 @@ class _Gae(Platform):
             if name == NAMES.activity:
                 from core.storage.activity import gae_models as activity_models
                 returned_models.append(activity_models)
-            elif name == NAMES.app_feedback_report:
+            elif name == NAMES.AppFeedbackReport:
                 from core.storage.app_feedback_report import (
                     gae_models as app_feedback_report_models)
                 returned_models.append(app_feedback_report_models)
@@ -140,10 +137,10 @@ class _Gae(Platform):
             elif name == NAMES.auth:
                 from core.storage.auth import gae_models as auth_models
                 returned_models.append(auth_models)
-            elif name == NAMES.base_model:
+            elif name == NAMES.BaseModel:
                 from core.storage.base_model import gae_models as base_model
                 returned_models.append(base_model)
-            elif name == NAMES.beam_job:
+            elif name == NAMES.BeamJob:
                 from core.storage.beam_job import gae_models as beam_job_models
                 returned_models.append(beam_job_models)
             elif name == NAMES.blog:
@@ -254,7 +251,7 @@ class _Gae(Platform):
         Returns:
             list(class). The corresponding storage-layer model classes.
         """
-        model_names = [name for name in NAMES if name != NAMES.base_model]
+        model_names = [name for name in NAMES if name != NAMES.BaseModel]
         return cls.get_storage_model_classes(model_names)
 
     @classmethod
