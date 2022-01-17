@@ -329,8 +329,7 @@ export class PlaythroughService {
   private isPlaythroughRecordingEnabled(): boolean {
     return (
       this.explorationFeaturesService.isPlaythroughRecordingEnabled() &&
-      this.learnerIsInSamplePopulation
-    );
+      this.learnerIsInSamplePopulation === true);
   }
 
   private hasRecordingBegun(): boolean {
