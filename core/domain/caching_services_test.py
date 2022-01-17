@@ -306,7 +306,9 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 [exploration_id]),
             {})
 
-        caching_services.set_multi(
+        # set_mutli can accept str with literal(default), but here
+        # we passing object. Hence, ignore statement is used.
+        caching_services.set_multi( # type: ignore[call-overload]
             caching_services.CACHE_NAMESPACE_DEFAULT, None, key_value_mapping)
         default_exploration = (
             exp_domain.Exploration.create_default_exploration( # type: ignore[no-untyped-call]

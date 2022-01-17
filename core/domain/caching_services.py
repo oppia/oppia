@@ -310,9 +310,71 @@ def get_multi(
     return result_dict
 
 
-# id_value_mapping is a Dict whose values can be any of the type from
-# Exploration, Skill, Story, Topic, Collection, str. hence Any type has
-# to be used here for the value type of id_value_mapping dictionary.
+@overload
+def set_multi(
+    namespace: Literal['exploration'],
+    sub_namespace: str | None,
+    id_value_mapping: Dict[str, exp_domain.Exploration]
+) -> bool: ...
+
+
+@overload
+def set_multi(
+    namespace: Literal['collection'],
+    sub_namespace: str | None,
+    id_value_mapping: Dict[str, collection_domain.Collection]
+) -> bool: ...
+
+
+@overload
+def set_multi(
+    namespace: Literal['skill'],
+    sub_namespace: str | None,
+    id_value_mapping: Dict[str, skill_domain.Skill]
+) -> bool: ...
+
+
+@overload
+def set_multi(
+    namespace: Literal['story'],
+    sub_namespace: str | None,
+    id_value_mapping: Dict[str, story_domain.Story]
+) -> bool: ...
+
+
+@overload
+def set_multi(
+    namespace: Literal['topic'],
+    sub_namespace: str | None,
+    id_value_mapping: Dict[str, topic_domain.Topic]
+) -> bool: ...
+
+
+@overload
+def set_multi(
+    namespace: Literal['platform'],
+    sub_namespace: str | None,
+    id_value_mapping: Dict[str,
+        platform_parameter_domain.PlatformParameter]
+) -> bool: ...
+
+
+@overload
+def set_multi(
+    namespace: Literal['config'],
+    sub_namespace: str | None,
+    id_value_mapping: Dict[str, str]
+) -> bool: ...
+
+
+@overload
+def set_multi(
+    namespace: Literal['default'],
+    sub_namespace: str | None,
+    id_value_mapping: Dict[str, str]
+) -> bool: ...
+
+
 def set_multi(
     namespace: NamespaceType,
     sub_namespace: str | None,
