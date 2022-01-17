@@ -30,15 +30,15 @@ import { UserService } from 'services/user.service';
 import { ProfilePageBackendApiService } from './profile-page-backend-api.service';
 
 interface ViewedProfileUsername {
-  title: string | null;
-  value: string | null;
-  helpText: string | null;
+  title: string ;
+  value: string ;
+  helpText: string ;
 }
 
 interface UserDisplayedStatistic {
-  title: string | null;
-  value: number | null;
-  helpText: string | null;
+  title: string ;
+  value: number ;
+  helpText: string ;
 }
 
 @Component({
@@ -52,27 +52,27 @@ export class ProfilePageComponent {
     value: '',
     helpText: ''
   };
-  usernameIsLong: boolean | undefined;
+  usernameIsLong: boolean ;
   userBio: string = '';
   userDisplayedStatistics: UserDisplayedStatistic[] = [];
   userEditedExplorations: LearnerExplorationSummary[] = [];
-  userNotLoggedIn: boolean | undefined;
-  isAlreadySubscribed: boolean | undefined;
-  isUserVisitingOwnProfile: boolean | undefined;
+  userNotLoggedIn: boolean ;
+  isAlreadySubscribed: boolean ;
+  isUserVisitingOwnProfile: boolean ;
   subscriptionButtonPopoverText: string = '';
   currentPageNumber: number = 0;
   PAGE_SIZE: number = 6;
   startingExplorationNumber: number = 1;
   endingExplorationNumber: number = 6;
-  profileIsOfCurrentUser: boolean | undefined;
+  profileIsOfCurrentUser: boolean ;
   data: UserProfile;
-  numUserPortfolioExplorations: number | undefined;
+  numUserPortfolioExplorations: number ;
   explorationsOnPage: LearnerExplorationSummary[] = [];
-  explorationIndexEnd: number | undefined;
-  explorationIndexStart: number | undefined;
+  explorationIndexEnd: number ;
+  explorationIndexStart: number ;
   subjectInterests: string[] = [];
   profilePictureDataUrl: string = '';
-  firstContributionMsec: number | undefined;
+  firstContributionMsec: number ;
   preferencesUrl : string = (
     '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PREFERENCES.ROUTE);
 
