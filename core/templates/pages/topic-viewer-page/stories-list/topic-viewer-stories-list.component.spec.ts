@@ -44,12 +44,12 @@ describe('stories list component', () => {
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
   });
 
-  it('should check if the view is mobile or not', () => {
+  it('should check if the view is tablet or not', () => {
     var widthSpy = spyOn(windowDimensionsService, 'getWidth');
-    widthSpy.and.returnValue(400);
-    expect(component.checkMobileView()).toBe(true);
+    widthSpy.and.returnValue(730);
+    expect(component.checkTabletView()).toBe(true);
 
-    widthSpy.and.returnValue(700);
-    expect(component.checkMobileView()).toBe(false);
+    widthSpy.and.returnValue(800);
+    expect(component.checkTabletView()).toBe(false);
   });
 });

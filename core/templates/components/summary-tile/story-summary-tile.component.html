@@ -1,6 +1,6 @@
 <div class="protractor-test-story-summary-title"
-  [ngClass]="checkMobileView() ? 'story-summary-tile-mobile': 'story-summary-tile-desktop'">
-  <div class="story-progress-bar" *ngIf="!checkMobileView()">
+  [ngClass]="checkTabletView() ? 'story-summary-tile-mobile': 'story-summary-tile-desktop'">
+  <div class="story-progress-bar" *ngIf="!checkTabletView()">
     <svg class="story-progress-svg" width="50" height="50" *ngIf="nodeCount">
       <circle class="story-progress-circle total-circle"
               cx="25"
@@ -28,7 +28,7 @@
     </svg>
   </div>
   <!-- Left-to-right is enforced here due to the formatting of the HTML with the title on the left and chapter count on the right. -->
-  <div class="oppia-story-title" dir="ltr" *ngIf="!checkMobileView()">
+  <div class="oppia-story-title" dir="ltr" *ngIf="!checkTabletView()">
     <strong class="title-text">
       <a [href]="storyLink" [ngClass]="{'disabled-link': !classroomUrlFragment}">{{ storyTitle }} </a>
     </strong>
@@ -47,7 +47,7 @@
              [ngStyle]="{background: thumbnailBgColor}">
       </a>
     </div>
-    <div class="story-details-box bottom-edge-shadow" *ngIf="checkMobileView()">
+    <div class="story-details-box bottom-edge-shadow" *ngIf="checkTabletView()">
       <div class="story-progress-bar">
         <svg class="story-progress-svg" width="50" height="50" *ngIf="nodeCount">
           <circle class="story-progress-circle total-circle"
@@ -76,7 +76,7 @@
         </svg>
         <p class="story-status-element">{{storyStatus}}</p>
       </div>
-      <div class="oppia-story-title" dir="ltr" *ngIf="checkMobileView()">
+      <div class="oppia-story-title" dir="ltr" *ngIf="checkTabletView()">
         <strong class="title-text">
           <a [href]="storyLink" [ngClass]="{'disabled-link': !classroomUrlFragment}">{{ storyTitle }} </a>
         </strong>
@@ -95,7 +95,7 @@
         <span class="material-icons"> arrow_drop_up </span>
       </div>
     </div>
-    <div class="chapters-container-box chapter-container" *ngIf="checkMobileView()">
+    <div class="chapters-container-box chapter-container" *ngIf="checkTabletView()">
       <div *ngFor="let title of nodeTitles;let idx = index">
         <div class="story-details-box chapter-specific-box" *ngIf="idx < chaptersDisplayed">
           <div class="chapter-icon">
@@ -109,7 +109,7 @@
         </div>
       </div>
     </div>
-    <div class="chapter-details" *ngIf="!checkMobileView()">
+    <div class="chapter-details" *ngIf="!checkTabletView()">
       <div class="chapter-title"
            *ngFor="let title of nodeTitles;let idx = index">
         <div *ngIf="storySummary.isNodeCompleted(title)" class="material-icons completed-icon">
@@ -305,7 +305,7 @@
     padding-bottom: 15px;
   }
 
-  @media (max-width: 500px) {
+  @media (max-width: 768px) {
     .story-details {
       border-radius: 0.4em;
       box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.2);

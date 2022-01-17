@@ -165,8 +165,8 @@ describe('StorySummaryTileComponent', () => {
     expect(component.chaptersDisplayed).toBe(1);
   });
 
-  it('should display 3 chapters if window width is greater' +
-  ' than 500px', () => {
+  it('should display only 2 chapters if window width is greater' +
+    ' than 500px and less than 768px', () => {
     component.storySummary = StorySummary.createFromBackendDict({
       id: 'storyId',
       title: 'Story Title',
@@ -179,7 +179,30 @@ describe('StorySummaryTileComponent', () => {
       url_fragment: 'story1',
       all_node_dicts: []
     });
-    spyOn(wds, 'getWidth').and.returnValue(501);
+    spyOn(wds, 'getWidth').and.returnValue(650);
+
+    expect(component.chaptersDisplayed).toBe(undefined);
+
+    component.ngOnInit();
+
+    expect(component.chaptersDisplayed).toBe(2);
+  });
+
+  it('should display 3 chapters if window width is greater' +
+  ' than 768px', () => {
+    component.storySummary = StorySummary.createFromBackendDict({
+      id: 'storyId',
+      title: 'Story Title',
+      node_titles: ['node1', 'node2', 'node3'],
+      thumbnail_filename: 'thumbnail.jpg',
+      thumbnail_bg_color: '#FF9933',
+      description: 'This is the story description',
+      story_is_published: true,
+      completed_node_titles: ['node1'],
+      url_fragment: 'story1',
+      all_node_dicts: []
+    });
+    spyOn(wds, 'getWidth').and.returnValue(800);
 
     expect(component.chaptersDisplayed).toBe(undefined);
 
@@ -200,13 +223,13 @@ describe('StorySummaryTileComponent', () => {
     expect(component.storyStatus).toBe('Completed');
   });
 
-  it('should check if the view is mobile or not', () => {
+  it('should check if the view is tablet or not', () => {
     var widthSpy = spyOn(wds, 'getWidth');
-    widthSpy.and.returnValue(400);
-    expect(component.checkMobileView()).toBe(true);
-
     widthSpy.and.returnValue(700);
-    expect(component.checkMobileView()).toBe(false);
+    expect(component.checkTabletView()).toBe(true);
+
+    widthSpy.and.returnValue(800);
+    expect(component.checkTabletView()).toBe(false);
   });
 
   it('should show \'View All\' button if number of nodes is not same as the' +

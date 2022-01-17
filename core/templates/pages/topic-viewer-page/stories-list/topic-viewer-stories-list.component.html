@@ -1,11 +1,11 @@
 <div class="stories-list">
   <div class="oppia-stories-list-container">
-    <mat-card class="oppia-page-card oppia-long-text" [ngClass]="checkMobileView() ? 'm-0': 'mat-card-margin-desktop'">
+    <mat-card class="oppia-page-card oppia-long-text" [ngClass]="checkTabletView() ? 'm-0': 'mat-card-margin-desktop'">
       <h2 class="tab-title">{{ topicName }}</h2>
       <div class="topic-description protractor-test-topic-description">
         {{ topicDescription }}
       </div>
-      <strong class="stories-can-play" *ngIf="checkMobileView()">{{'I18N_TOPIC_VIEWER_STORIES_HEAD' | translate}}</strong>
+      <strong class="stories-can-play" *ngIf="checkTabletView()">{{'I18N_TOPIC_VIEWER_STORIES_HEAD' | translate}}</strong>
       <div *ngFor="let storySummary of canonicalStorySummaries" class="story-info-container">
         <oppia-story-summary-tile [classroomUrlFragment]="classroomUrlFragment"
                                   [storySummary]="storySummary"
@@ -54,6 +54,17 @@
   @media(max-width: 1024px) {
     .oppia-stories-list-container .oppia-page-card {
       width: 80vw;
+    }
+  }
+
+  @media(max-width: 768px) {
+    .oppia-stories-list-container .oppia-page-card {
+      padding: 8em 24px 64px 24px;
+      width: 100%;
+    }
+
+    .story-info-container {
+      padding-top: 0;
     }
   }
 

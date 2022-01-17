@@ -38,8 +38,8 @@ export class StoriesListComponent {
     private windowDimensionsService: WindowDimensionsService,
   ) {}
 
-  checkMobileView(): boolean {
-    return this.windowDimensionsService.getWidth() < 500;
+  checkTabletView(): boolean {
+    return this.windowDimensionsService.getWidth() < 768;
   }
 }
 angular.module('oppia').directive(

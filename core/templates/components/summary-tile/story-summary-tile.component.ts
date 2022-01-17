@@ -64,8 +64,8 @@ export class StorySummaryTileComponent implements OnInit {
     private assetsBackendApiService: AssetsBackendApiService
   ) {}
 
-  checkMobileView(): boolean {
-    return this.windowDimensionsService.getWidth() < 500;
+  checkTabletView(): boolean {
+    return this.windowDimensionsService.getWidth() < 768;
   }
 
   getStoryLink(): string {
@@ -187,6 +187,10 @@ export class StorySummaryTileComponent implements OnInit {
       (this.completedStoriesCount / this.nodeCount) * 100);
 
     this.chaptersDisplayed = 3;
+    if (this.windowDimensionsService.getWidth() <= 768 &&
+      this.windowDimensionsService.getWidth() > 500) {
+      this.chaptersDisplayed = 2;
+    }
     if (this.windowDimensionsService.getWidth() <= 500) {
       this.chaptersDisplayed = 1;
     }

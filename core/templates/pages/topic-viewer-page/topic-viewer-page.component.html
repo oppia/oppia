@@ -1,10 +1,10 @@
 <div class="oppia-topic-viewer-container position-relative">
   <div class="oppia-topic-viewer-tabs-container position-relative" headroom>
     <div class="topic-viewer-tabs-list">
-      <ul class="topic-viewer-tabs" [ngClass]="checkMobileView() ? 'pad-top-mobile': 'pad-top-desktop'">
+      <ul class="topic-viewer-tabs" [ngClass]="checkTabletView() ? 'pad-top-mobile': 'pad-top-desktop'">
         <li [ngClass]="{'topic-viewer-tabs-active': activeTab === 'story'}">
           <div class="topic-viewer-tabs-text" (click)="setActiveTab('story')">
-            <img *ngIf="!checkMobileView()" alt="play story icon" class="tab-icon" [src]="getStaticImageUrl('/icons/play_icon_24px.svg')">
+            <img *ngIf="!checkTabletView()" alt="play story icon" class="tab-icon" [src]="getStaticImageUrl('/icons/play_icon_24px.svg')">
             <a class="tab-title"
                [innerHTML]="'I18N_TOPIC_VIEWER_LESSONS' | translate">
             </a>
@@ -12,7 +12,7 @@
         </li>
         <li [ngClass]="{'topic-viewer-tabs-active': activeTab === 'practice'}">
           <div class="topic-viewer-tabs-text" (click)="setActiveTab('practice')">
-            <img *ngIf="!checkMobileView()" alt="practice icon" class="tab-icon" [src]="getStaticImageUrl('/icons/train_icon_24px.svg')">
+            <img *ngIf="!checkTabletView()" alt="practice icon" class="tab-icon" [src]="getStaticImageUrl('/icons/train_icon_24px.svg')">
             <a class="tab-title protractor-test-practice-tab-link"
                [innerHTML]="'I18N_TOPIC_VIEWER_PRACTICE' | translate">
             </a>
@@ -20,7 +20,7 @@
         </li>
         <li [ngClass]="{'topic-viewer-tabs-active': activeTab === 'subtopics'}">
           <div class="topic-viewer-tabs-text" (click)="setActiveTab('subtopics')">
-            <img *ngIf="!checkMobileView()" alt="practice icon" class="tab-icon" [src]="getStaticImageUrl('/icons/review_icon_24px.svg')">
+            <img *ngIf="!checkTabletView()" alt="practice icon" class="tab-icon" [src]="getStaticImageUrl('/icons/review_icon_24px.svg')">
             <a class="tab-title protractor-test-revision-tab-link"
                [innerHTML]="'I18N_TOPIC_VIEWER_REVISION' | translate">
             </a>
