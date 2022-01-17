@@ -38,7 +38,6 @@ core.domain.learner_goals_services_test
 core.utils_test
 scripts.install_backend_python_libs_test
 core.domain.subtopic_page_domain_test
-core.domain.event_services_test
 core.domain.user_services_test
 core.domain.recommendations_services_test
 core.storage.skill.gae_models_test
