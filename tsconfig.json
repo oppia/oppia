@@ -16,6 +16,7 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "resolveJsonModule": true,
+    "strictPropertyInitialization": false,
     "moduleResolution": "node",
     "baseUrl": ".",
     "paths": {
