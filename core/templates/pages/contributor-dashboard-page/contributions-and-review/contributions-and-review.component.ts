@@ -312,10 +312,10 @@ angular.module('oppia').component('contributionsAndReview', {
         }
         if (suggestion.suggestion_type === SUGGESTION_TYPE_TRANSLATE) {
           const suggestionIdToContribution = {};
-          for (let suggestionId in ctrl.contributions) {
+          ctrl.contributions.forEach(suggestionId => {
             var contribution = ctrl.contributions[suggestionId];
-            suggestionIdToContribution[suggestionId] = contribution;
-          }
+            suggestionIdToContribution[suggestionId] = contribution;            
+          });
           ContextService.setCustomEntityContext(
             IMAGE_CONTEXT.EXPLORATION_SUGGESTIONS, suggestion.target_id);
           _showTranslationSuggestionModal(
@@ -428,13 +428,13 @@ angular.module('oppia').component('contributionsAndReview', {
                 var userReviewableSuggestionTypes = [];
                 var userCanSuggestQuestions = (
                   userContributionRights.can_suggest_questions);
-                for (var index in ctrl.contributionTabs) {
+                ctrl.contributionTabs.forEach(index => {
                   if (ctrl.contributionTabs[index].suggestionType === (
                     SUGGESTION_TYPE_QUESTION)) {
                     ctrl.contributionTabs[index].enabled = (
                       userCanSuggestQuestions);
-                  }
-                }
+                  }                  
+                });
                 if (userCanReviewQuestionSuggestions) {
                   ctrl.reviewTabs.push({
                     suggestionType: SUGGESTION_TYPE_QUESTION,

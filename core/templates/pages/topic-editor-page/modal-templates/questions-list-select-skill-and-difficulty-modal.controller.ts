@@ -50,16 +50,16 @@ angular.module('oppia').controller(
       $scope.skillSummariesInitial = [];
       $scope.skillSummariesFinal = [];
       let selectedSkills = [];
-
-      for (var idx in allSkillSummaries) {
+      
+      allSkillSummaries.forEach(idx => {
         if (idx < countOfSkillsToPrioritize) {
           $scope.skillSummariesInitial.push(
             allSkillSummaries[idx]);
         } else {
           $scope.skillSummariesFinal.push(
             allSkillSummaries[idx]);
-        }
-      }
+        }        
+      });
       $scope.skillIdToRubricsObject = skillIdToRubricsObject;
 
       $scope.isSkillSelected = function(skillId) {

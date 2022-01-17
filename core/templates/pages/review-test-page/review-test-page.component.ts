@@ -77,11 +77,11 @@ angular.module('oppia').component('reviewTestPage', {
             var skillDescriptions = [];
             PageTitleService.setDocumentTitle(
               'Review Test: ' + result.storyName + ' - Oppia');
-            for (var skillId in result.skillDescriptions) {
+            result.skillDescriptions.forEach(skillId => {
               skillIdList.push(skillId);
               skillDescriptions.push(
-                result.skillDescriptions[skillId]);
-            }
+                result.skillDescriptions[skillId]);              
+            }); 
             var questionPlayerConfig = {
               resultActionButtons: [
                 {

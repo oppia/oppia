@@ -78,7 +78,7 @@ angular.module('oppia').component('questionOpportunities', {
 
       var getPresentableOpportunitiesData = function({opportunities, more}) {
         let opportunitiesDicts = [];
-        for (let index in opportunities) {
+        opportunities.forEach(index => {
           const opportunity = opportunities[index];
           const heading = opportunity.getOpportunityHeading();
           const subheading = opportunity.getOpportunitySubheading();
@@ -94,7 +94,8 @@ angular.module('oppia').component('questionOpportunities', {
           };
           allOpportunities[opportunityDict.id] = opportunityDict;
           opportunitiesDicts.push(opportunityDict);
-        }
+          
+        });
         return {opportunitiesDicts, more};
       };
 

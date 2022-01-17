@@ -35,11 +35,11 @@ angular.module('oppia').controller('QuestionsListSelectSkillModalController', [
     $scope.countOfSkillsToPrioritize = skillsInSameTopicCount;
 
     $scope.save = function() {
-      for (var idx in sortedSkillSummaries) {
+      sortedSkillSummaries.forEach(element => {
         if ($scope.selectedSkillId === sortedSkillSummaries[idx].id) {
           $uibModalInstance.close(sortedSkillSummaries[idx]);
-        }
-      }
+        }        
+      });
     };
   }
 ]);

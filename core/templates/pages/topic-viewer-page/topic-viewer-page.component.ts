@@ -101,10 +101,10 @@ export class TopicViewerPageComponent implements OnInit {
         this.canonicalStorySummaries = (
           readOnlyTopic.getCanonicalStorySummaries());
         this.chapterCount = 0;
-        for (let idx in this.canonicalStorySummaries) {
+        this.canonicalStorySummaries.forEach(idx => {
           this.chapterCount += (
-            this.canonicalStorySummaries[idx].getNodeTitles().length);
-        }
+            this.canonicalStorySummaries[idx].getNodeTitles().length);          
+        });
         this.degreesOfMastery = readOnlyTopic.getDegreesOfMastery();
         this.subtopics = readOnlyTopic.getSubtopics();
         this.skillDescriptions = readOnlyTopic.getSkillDescriptions();

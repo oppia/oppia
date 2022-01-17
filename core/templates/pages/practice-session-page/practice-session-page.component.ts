@@ -71,11 +71,11 @@ angular.module('oppia').component('practiceSessionPage', {
         $http.get(practiceSessionsDataUrl).then(function(result) {
           var skillList = [];
           var skillDescriptions = [];
-          for (var skillId in result.data.skill_ids_to_descriptions_map) {
+          result.data.skill_ids_to_descriptions_map.forEach(skillId => {
             skillList.push(skillId);
             skillDescriptions.push(
-              result.data.skill_ids_to_descriptions_map[skillId]);
-          }
+              result.data.skill_ids_to_descriptions_map[skillId]);            
+          });
           var questionPlayerConfig = {
             resultActionButtons: [
               {

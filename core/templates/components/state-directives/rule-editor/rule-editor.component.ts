@@ -244,13 +244,12 @@ angular.module('oppia').component('ruleEditor', {
 
           tmpRuleDescription = tmpRuleDescription.replace(PATTERN, ' ');
         }
-
-        for (var key in ctrl.rule.inputs) {
+        ctrl.rule.inputs.forEach(key => {
           if (oldRuleInputs.hasOwnProperty(key) &&
             oldRuleInputTypes[key] === ctrl.rule.inputTypes[key]) {
             ctrl.rule.inputs[key] = oldRuleInputs[key];
-          }
-        }
+          }          
+        });
       };
 
       ctrl.cancelThisEdit = function() {

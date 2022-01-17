@@ -99,12 +99,12 @@ angular.module('oppia').component('outcomeDestinationEditor', {
           if (lastComputedArrangement) {
             var maxDepth = 0;
             var maxOffset = 0;
-            for (stateName in lastComputedArrangement) {
+            lastComputedArrangement.forEach(stateName => {
               maxDepth = Math.max(
                 maxDepth, lastComputedArrangement[stateName].depth);
               maxOffset = Math.max(
-                maxOffset, lastComputedArrangement[stateName].offset);
-            }
+                maxOffset, lastComputedArrangement[stateName].offset);              
+            });
 
             // Higher scores come later.
             var allStateScores = {};

@@ -84,10 +84,10 @@ export class UnassignSkillFromTopicsModalComponent
     }
   }
   close(): void {
-    for (let index in this.selectedTopicNames) {
+    this.selectedTopicNames.forEach(index => {
       this.selectedTopics.push(
-        this.topicsAssignments[this.selectedTopicNames[index]]);
-    }
+        this.topicsAssignments[this.selectedTopicNames[index]]);      
+    });
     this.ngbActiveModal.close(this.selectedTopics);
   }
 }

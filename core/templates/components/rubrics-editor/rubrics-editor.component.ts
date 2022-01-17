@@ -174,14 +174,14 @@ export class RubricsEditorComponent {
   }
 
   ngOnInit(): void {
-    for (let idx in this.rubrics) {
+    this.rubrics.forEach(idx => {
       let explanations = this.rubrics[idx].getExplanations();
       let difficulty = this.rubrics[idx].getDifficulty();
       this.explanationsMemento[difficulty] = [...explanations];
       this.explanationEditorIsOpen[difficulty] = (
         Array(explanations.length).fill(false));
-      this.editableExplanations[difficulty] = [...explanations];
-    }
+      this.editableExplanations[difficulty] = [...explanations];      
+    });
     this.selectedRubricIndex = null;
     this.rubricsOptions = [
       {id: 0, difficulty: 'Easy'},

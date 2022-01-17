@@ -70,7 +70,7 @@ export class TranslationOpportunitiesComponent {
     more: boolean;
   } {
     const opportunitiesDicts: TranslationOpportunity[] = [];
-    for (const index in opportunities) {
+    opportunities.forEach(index  => {
       const opportunity = opportunities[index];
       const subheading = opportunity.getOpportunitySubheading();
       const heading = opportunity.getOpportunityHeading();
@@ -89,8 +89,8 @@ export class TranslationOpportunitiesComponent {
         translationsCount: opportunity.getTranslationsCount(languageCode)
       };
       this.allOpportunities[opportunityDict.id] = opportunityDict;
-      opportunitiesDicts.push(opportunityDict);
-    }
+      opportunitiesDicts.push(opportunityDict);      
+    });
     return {opportunitiesDicts, more};
   }
 

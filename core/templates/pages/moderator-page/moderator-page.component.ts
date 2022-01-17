@@ -85,12 +85,11 @@ export class ModeratorPageComponent {
         // Update the explorationData object with information about newly-
         // discovered explorations.
         let explorationIdsToExplorationData = response.exp_ids_to_exp_data;
-        for (let expId in explorationIdsToExplorationData) {
+        explorationIdsToExplorationData.forEach(expId => {
           if (!this.explorationData.hasOwnProperty(expId)) {
             this.explorationData[expId] = (
-              explorationIdsToExplorationData[expId]);
-          }
-        }
+              explorationIdsToExplorationData[expId]);          
+        });
         this.allCommits = response.results;
         this.loaderService.hideLoadingScreen();
       });

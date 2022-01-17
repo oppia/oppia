@@ -148,10 +148,10 @@ implements OnInit {
 
     for (let name in this.groupedSkillSummaries) {
       let skillSummaries = this.groupedSkillSummaries[name];
-      for (let idx in skillSummaries) {
+      skillSummaries.forEach(idx => {
         this.skillIdToSummaryMap[skillSummaries[idx].id] =
-          skillSummaries[idx].description;
-      }
+          skillSummaries[idx].description;        
+      });
     }
   }
 }
