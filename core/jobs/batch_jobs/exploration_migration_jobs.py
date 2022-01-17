@@ -343,7 +343,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
                     'exploration_summary': objects['exploration_summary'][0],
                     'exploration_changes': objects['exploration_changes'],
                     'exploration_rights_model': (
-                        objects['exploration_rights_model'])
+                        objects['exploration_rights_model'][0])
                 })
         )
 
@@ -392,7 +392,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
                     exp_objects['exp_model'],
                     exp_objects['exploration'],
                     exp_objects['exploration_changes'],
-                    exp_objects['exploration_rights_model'][0],
+                    exp_objects['exploration_rights_model'],
                 ))
         )
 

@@ -1368,7 +1368,7 @@ def save_exploration_summary(exp_summary):
     Args:
         exp_summary: ExplorationSummary. The exploration summary to save.
     """
-    exp_summary_model = (exp_models.ExpSummaryModel.get_by_id(exp_summary.id))
+    exp_summary_model = exp_models.ExpSummaryModel.get_by_id(exp_summary.id)
     exp_summary_model = populate_exploration_summary_model_fields(
         exp_summary_model, exp_summary)
 
