@@ -235,7 +235,7 @@
             <div class="d-flex flex-column">
               <div class="top-section d-flex">
                 <div class="item item-border d-flex flex-column innvolved-item"
-                     onclick="location.href='/partnerships'"
+                     (click)="navigateToPage('/partnerships')"
                      (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_CLOSE})">
                   <div class="heading">
                     <span class="material-icons language mx-1">language</span>
@@ -250,7 +250,7 @@
                   </div>
                 </div>
                 <div class="item d-flex flex-column innvolved-item"
-                     onclick="location.href='/volunteer'">
+                     (click)="navigateToPage('/volunteer')">
                   <div class="heading">
                     <span class="material-icons volunteer mx-1">supervisor_account</span>
                     <a class="heading-text underline"
@@ -267,7 +267,7 @@
               </div>
               <div class="bottom-section d-flex">
                 <div class="item item-border d-flex flex-column innvolved-item"
-                     onclick="location.href='/contact'">
+                     (click)="navigateToPage('/contact')">
                   <div class="heading">
                     <span class="material-icons contact mx-1">mail</span>
                     <a href="/contact"
@@ -282,7 +282,7 @@
                   </div>
                 </div>
                 <div class="item d-flex flex-column innvolved-item"
-                     onclick="location.href='/donate'">
+                     (click)="navigateToPage('/donate')">
                   <div class="heading">
                     <span class="material-icons fav mx-1">favorite</span>
                     <a class="heading-text underline"
