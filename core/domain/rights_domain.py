@@ -292,13 +292,16 @@ class ActivityRights:
             if old_role == ROLE_OWNER:
                 raise Exception(
                     'This user already owns this exploration.')
-            elif old_role == ROLE_EDITOR:
+
+            if old_role == ROLE_EDITOR:
                 raise Exception(
                     'This user already can edit this exploration.')
-            elif old_role == ROLE_VOICE_ARTIST:
+
+            if old_role == ROLE_VOICE_ARTIST:
                 raise Exception(
                     'This user already can voiceover this exploration.')
-            elif old_role == ROLE_VIEWER:
+
+            if old_role == ROLE_VIEWER:
                 raise Exception(
                     'This user already can view this exploration.')
 

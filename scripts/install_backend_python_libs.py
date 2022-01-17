@@ -137,7 +137,7 @@ def _get_requirements_file_contents():
             if not line or line.startswith('#'):
                 continue
 
-            elif line.startswith('git'):
+            if line.startswith('git'):
                 match = GIT_DIRECT_URL_REQUIREMENT_PATTERN.match(line)
                 if not match:
                     raise Exception(

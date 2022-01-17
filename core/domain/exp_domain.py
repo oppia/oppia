@@ -3156,8 +3156,7 @@ class ExplorationChangeMergeVerifier:
             if change_is_mergeable:
                 changes_are_mergeable = True
                 continue
-            else:
-                changes_are_mergeable = False
-                break
+            changes_are_mergeable = False
+            break
 
         return changes_are_mergeable, False

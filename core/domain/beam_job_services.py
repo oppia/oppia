@@ -80,12 +80,11 @@ def cancel_beam_job(job_id: str) -> beam_job_domain.BeamJobRun:
     if beam_job_run_model is None:
         raise ValueError('No such job with id="%s"' % job_id)
 
-    elif beam_job_run_model.dataflow_job_id is None:
+    if beam_job_run_model.dataflow_job_id is None:
         raise ValueError('Job with id="%s" cannot be cancelled' % job_id)
 
-    else:
-        jobs_manager.cancel_job(beam_job_run_model)
-        return get_beam_job_run_from_model(beam_job_run_model)
+    jobs_manager.cancel_job(beam_job_run_model)
+    return get_beam_job_run_from_model(beam_job_run_model)
 
 
 def get_beam_jobs() -> List[beam_job_domain.BeamJob]:

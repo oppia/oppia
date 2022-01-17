@@ -149,7 +149,8 @@ def get_remote_name():
             'command \'git remote add upstream '
             'https://github.com/oppia/oppia.git\'\n'
         )
-    elif remote_num > 1:
+
+    if remote_num > 1:
         print(
             'Warning: Please keep only one remote branch for oppia:develop '
             'to run the lint checks efficiently.\n')
@@ -218,8 +219,8 @@ def get_merge_base(branch, other_branch):
         ['git', 'merge-base', branch, other_branch])
     if err:
         raise ValueError(err)
-    else:
-        return merge_base.decode('utf-8').strip()
+
+    return merge_base.decode('utf-8').strip()
 
 
 def compare_to_remote(remote, local_branch, remote_branch=None):

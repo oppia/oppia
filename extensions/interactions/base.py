@@ -228,8 +228,8 @@ class BaseInteraction:
         """Gets a rule description, given its name."""
         if rule_name not in self.rules_dict:
             raise Exception('Could not find rule with name %s' % rule_name)
-        else:
-            return self.rules_dict[rule_name]['description']
+
+        return self.rules_dict[rule_name]['description']
 
     def get_rule_param_list(self, rule_name):
         """Gets the parameter list for a given rule."""

@@ -512,10 +512,12 @@ def main(args=None):
 
     if task_execution_failed:
         raise Exception('Task execution failed.')
-    elif total_errors or total_failures:
+
+    if total_errors or total_failures:
         raise Exception(
             '%s errors, %s failures' % (total_errors, total_failures))
-    elif incomplete_coverage:
+
+    if incomplete_coverage:
         raise Exception(
             '%s tests incompletely cover associated code files.' %
             incomplete_coverage)
