@@ -1180,7 +1180,7 @@ class StateAnswersModelUnitTests(test_utils.GenericTestBase):
             stats_models.StateAnswersModel.insert_submitted_answers(
                 'exp_id', 1, 'state_name', 'interaction_id3',
                 submitted_answer_list3)
-            
+
             stat_answer_models = stats_models.StateAnswersModel.get_all_models(
                 'exp_id', 1, 'state_name'
             )
