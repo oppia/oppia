@@ -1,7 +1,7 @@
 <!-- Select Skill View -->
 <div *ngIf="currentMode === 'MODE_SELECT_SKILL'">
   <div class="modal-header">
-    <h3 *ngIf="skillSummaries.length == 0">
+    <h3 *ngIf="skillSummaries.length === 0">
       No skills linked to topic
     </h3>
     <h3 *ngIf="skillSummaries.length > 0">
@@ -9,7 +9,7 @@
     </h3>
   </div>
   <div class="modal-body select-skill-modal protractor-test-skill-select-modal">
-    <div *ngIf="skillSummaries.length == 0">
+    <div *ngIf="skillSummaries.length === 0">
       You can only create questions for topics that have atleast one skill
       attached to it. Please link a skill to this topic before adding questions.
     </div>
@@ -48,7 +48,7 @@
               (click)="goToNextStep()"> Next
       </button>
     </div>
-    <div *ngIf="skillSummaries.length == 0">
+    <div *ngIf="skillSummaries.length === 0">
       <button class="btn btn-secondary" (click)="cancel()"> Ok </button>
     </div>
   </div>
@@ -56,7 +56,7 @@
 <!-- Select Difficulty View -->
 <div *ngIf="currentMode === 'MODE_SELECT_DIFFICULTY'">
   <div class="modal-header">
-    <h3 *ngIf="linkedSkillsWithDifficulty.length == 0">
+    <h3 *ngIf="linkedSkillsWithDifficulty.length === 0">
       Select skills you would like to link to the question.
     </h3>
     <h3 *ngIf="linkedSkillsWithDifficulty.length > 0">
@@ -64,7 +64,7 @@
     </h3>
   </div>
   <div class="modal-body select-skill-modal">
-    <div *ngIf="linkedSkillsWithDifficulty.length == 0">
+    <div *ngIf="linkedSkillsWithDifficulty.length === 0">
       You can only set difficulty after selecting skills linked to the question. Please go back and link skill(s) to this question.
     </div>
     <div class="list-group">
@@ -84,7 +84,7 @@
               (click)="startQuestionCreation()"> Continue
       </button>
     </div>
-    <div *ngIf="linkedSkillsWithDifficulty.length == 0">
+    <div *ngIf="linkedSkillsWithDifficulty.length === 0">
       <button class="btn btn-secondary" (click)="goToSelectSkillView()"> Back </button>
     </div>
   </div>

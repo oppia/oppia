@@ -149,15 +149,15 @@ angular.module('oppia').factory('QuestionCreationService', [
           QuestionsListSelectSkillAndDifficultyModalComponent, {
             backdrop: 'static'
           });
-        modalRef.componentInstance.allSkillSummaries =
-          allSkillSummaries;
-        modalRef.componentInstance.countOfSkillsToPrioritize =
-          countOfSkillsToPrioritize;
+        modalRef.componentInstance.allSkillSummaries = (
+          allSkillSummaries);
+        modalRef.componentInstance.countOfSkillsToPrioritize = (
+          countOfSkillsToPrioritize);
         modalRef.componentInstance.currentMode = currentMode;
-        modalRef.componentInstance.linkedSkillsWithDifficulty =
-          linkedSkillsWithDifficulty;
-        modalRef.componentInstance.skillIdToRubricsObject =
-          skillIdToRubricsObject;
+        modalRef.componentInstance.linkedSkillsWithDifficulty = (
+          linkedSkillsWithDifficulty);
+        modalRef.componentInstance.skillIdToRubricsObject = (
+          skillIdToRubricsObject);
         modalRef.result.then(function(linkedSkillsWithDifficulty) {
           continueQuestionEditing(linkedSkillsWithDifficulty);
         }, function() {

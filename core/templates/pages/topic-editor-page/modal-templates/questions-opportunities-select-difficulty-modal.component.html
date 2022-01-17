@@ -1,5 +1,5 @@
 <div class="modal-header">
-  <h3 *ngIf="linkedSkillsWithDifficulty.length == 0">
+  <h3 *ngIf="linkedSkillsWithDifficulty.length === 0">
     Select skills you would like to link to the question.
   </h3>
   <h3 *ngIf="linkedSkillsWithDifficulty.length > 0">
@@ -7,7 +7,7 @@
   </h3>
 </div>
 <div class="modal-body select-skill-modal">
-  <div *ngIf="linkedSkillsWithDifficulty.length == 0">
+  <div *ngIf="linkedSkillsWithDifficulty.length === 0">
     You can only set difficulty after selecting skills linked to the question. Please go back and link skill(s) to this question.
   </div>
   <div class="list-group">
@@ -27,7 +27,7 @@
             (click)="startQuestionCreation()"> Continue
     </button>
   </div>
-  <div *ngIf="linkedSkillsWithDifficulty.length == 0">
+  <div *ngIf="linkedSkillsWithDifficulty.length === 0">
     <button class="btn btn-secondary" (click)="goToSelectSkillView()"> Back </button>
   </div>
 </div>
