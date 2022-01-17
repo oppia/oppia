@@ -24,6 +24,8 @@ import { Subscription } from 'rxjs';
 describe('I18nLanguageCodeService', () => {
   const i18nLanguageCodeService = new I18nLanguageCodeService();
   let languageCode: string = '';
+  let translationKey: string = '';
+  let isTranslationKeyValid: boolean;
   let testSubscriptions: Subscription;
   beforeEach(() => {
     testSubscriptions = new Subscription();
@@ -66,38 +68,37 @@ describe('I18nLanguageCodeService', () => {
   });
 
   it('should check whether translation key is valid correctly', () => {
-    spyOn(i18nLanguageCodeService, 'isTranslationKeyValid')
-      .and.returnValues(true, false);
-    expect(i18nLanguageCodeService.isTranslationKeyValid(
-      'I18N_CLASSROOM_MATH_TITLE')).toBe(true);
-    expect(i18nLanguageCodeService.isTranslationKeyValid(
-      'I18N_TOPIC_12345axa_TITLE')).toBe(false);
+    // I18N_CLASSROOM_MATH_TITLE is present in constants file and hence
+    // it is valid.
+    isTranslationKeyValid = i18nLanguageCodeService.isTranslationKeyValid(
+      'I18N_CLASSROOM_MATH_TITLE');
+    expect(isTranslationKeyValid).toBe(true);
+
+    // I18N_TOPIC_12345axa_TITLE is not present in constants file and hence
+    // it is invalid.
+    isTranslationKeyValid = i18nLanguageCodeService.isTranslationKeyValid(
+      'I18N_TOPIC_12345axa_TITLE');
+    expect(isTranslationKeyValid).toBe(false);
   });
 
   it('should get classroom translation key correctly', () => {
-    spyOn(i18nLanguageCodeService, 'getClassroomTranslationKey')
-      .and.returnValues(
-        'I18N_CLASSROOM_MATH_TITLE', 'I18N_CLASSROOM_SCIENCE_TITLE'
-      );
+    translationKey = i18nLanguageCodeService.getClassroomTranslationKey(
+      'Math');
+    expect(translationKey).toBe('I18N_CLASSROOM_MATH_TITLE');
 
-    expect(i18nLanguageCodeService.getClassroomTranslationKey(
-      'Math')).toBe('I18N_CLASSROOM_MATH_TITLE');
-    expect(i18nLanguageCodeService.getClassroomTranslationKey(
-      'Science')).toBe('I18N_CLASSROOM_SCIENCE_TITLE');
+    translationKey = i18nLanguageCodeService.getClassroomTranslationKey(
+      'Science');
+    expect(translationKey).toBe('I18N_CLASSROOM_SCIENCE_TITLE');
   });
 
   it('should get topic translation key correctly', () => {
-    spyOn(i18nLanguageCodeService, 'getTopicTranslationKey')
-      .and.returnValues(
-        'I18N_TOPIC_abc1234_TITLE', 'I18N_TOPIC_abc1234_DESCRIPTION'
-      );
+    translationKey = i18nLanguageCodeService.getTopicTranslationKey(
+      'abc1234', TranslationKeyType.Title);
+    expect(translationKey).toBe('I18N_TOPIC_abc1234_TITLE');
 
-    expect(i18nLanguageCodeService.getTopicTranslationKey(
-      'abc1234', TranslationKeyType.Title)).toBe(
-      'I18N_TOPIC_abc1234_TITLE');
-    expect(i18nLanguageCodeService.getTopicTranslationKey(
-      'abc1234', TranslationKeyType.Description)).toBe(
-      'I18N_TOPIC_abc1234_DESCRIPTION');
+    translationKey = i18nLanguageCodeService.getTopicTranslationKey(
+      'abc1234', TranslationKeyType.Description);
+    expect(translationKey).toBe('I18N_TOPIC_abc1234_DESCRIPTION');
   });
 
   it('should check if translation key is to be displayed correctly', () => {
