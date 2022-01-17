@@ -45,14 +45,31 @@ datastore_services = models.Registry.import_datastore_services()
 class GetCollectionOwnersEmailsJob(base_jobs.JobBase):
     """Job that extracts collection id and user email from datastore."""
 
+    @staticmethod
+    def _extract_user_and_collection_ids(
+        collection_rights_model: datastore_services.Model
+    ) -> Iterable[Tuple[str, str]]:
+        """Extracts user id and collection id.
+
+        Args:
+            collection_rights_model: datastore_services.Model.
+                The collection rights model to extract user id and
+                collection id from.
+
+        Yields:
+            (str,str). Tuple containing user id and collection id.
+        """
+        for user_id in collection_rights_model.owner_ids:
+            yield (user_id, collection_rights_model.id)
+
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
 
         collection_pairs = (
             self.pipeline
             | 'get collection models ' >> ndb_io.GetModels(
                 collection_models.CollectionRightsModel.get_all())
-            | 'Flatten owner_ids and format' >> beam.ParDo(
-                ExtractUserAndCollectionIDs())
+            | 'Flatten owner_ids and format' >> beam.FlatMap(
+                self._extract_user_and_collection_ids)
         )
 
         user_pairs = (
@@ -81,16 +98,6 @@ class GetCollectionOwnersEmailsJob(base_jobs.JobBase):
                     'collection_ids: %s, email: %s' % (collection, email)
                 ))
         )
-
-
-class ExtractUserAndCollectionIDs(beam.DoFn):  # type: ignore[misc]
-    """DoFn to extract user id and collection id."""
-
-    def process(
-        self, collection_rights_model: datastore_services.Model
-    ) -> Iterable[Tuple[str, str]]:
-        for user_id in collection_rights_model.owner_ids:
-            yield (user_id, collection_rights_model.id)
 
 
 class MatchEntityTypeCollectionJob(base_jobs.JobBase):
