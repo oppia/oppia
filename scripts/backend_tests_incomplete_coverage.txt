@@ -1,4 +1,3 @@
-core.controllers.editor_test
 extensions.interactions.base_test
 core.controllers.domain_objects_validator_test
 core.controllers.story_editor_test
