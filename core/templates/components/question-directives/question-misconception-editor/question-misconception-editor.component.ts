@@ -45,7 +45,7 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
     EventEmitter<object> = (new EventEmitter());
   @Output() onSaveTaggedMisconception:
     EventEmitter<object> = (new EventEmitter());
-  @Input() taggedSkillMisconceptionId;
+  @Input() taggedSkillMisconceptionId: string;
   @Input() isEditable: boolean;
   @Input() outcome: Outcome;
   feedbackIsUsed: boolean;
