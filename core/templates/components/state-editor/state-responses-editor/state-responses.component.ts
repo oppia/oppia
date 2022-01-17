@@ -352,17 +352,17 @@ angular.module('oppia').component('stateResponses', {
         });
       };
 
-      $scope.deleteAnswerGroup = function(index, evt) {
+      $scope.deleteAnswerGroup = function(value) {
         // Prevent clicking on the delete button from also toggling the
         // display state of the answer group.
-        evt.stopPropagation();
+        value.evt.stopPropagation();
 
         AlertsService.clearWarnings();
         NgbModal.open(DeleteAnswerGroupModalComponent, {
           backdrop: true,
         }).result.then(function() {
           ResponsesService.deleteAnswerGroup(
-            index, function(newAnswerGroups) {
+            value.index, function(newAnswerGroups) {
               ctrl.onSaveInteractionAnswerGroups(newAnswerGroups);
               ctrl.refreshWarnings()();
             });
