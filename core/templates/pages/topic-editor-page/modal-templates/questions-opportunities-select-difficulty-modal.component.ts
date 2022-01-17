@@ -20,6 +20,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import { Rubric } from 'domain/skill/rubric.model';
 import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
 import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
 import { Skill } from 'domain/skill/SkillObjectFactory';
@@ -37,7 +38,7 @@ export class QuestionsOpportunitiesSelectDifficultyModalComponent
   extends ConfirmOrCancelModal implements OnInit {
   @Input() skillId: string;
   instructionMessage: string;
-  skillIdToRubricsObject: object;
+  skillIdToRubricsObject: Record<string, Rubric[]>;
   skill: Skill;
   linkedSkillsWithDifficulty: SkillDifficulty[] = [];
 
@@ -89,8 +90,8 @@ export class QuestionsOpportunitiesSelectDifficultyModalComponent
               AppConstants.DEFAULT_SKILL_DIFFICULTY)
           ];
           this.skillIdToRubricsObject = {};
-          this.skillIdToRubricsObject[this.skillId] =
-            this.skill.getRubrics();
+          this.skillIdToRubricsObject[this.skillId] = (
+            this.skill.getRubrics());
         });
       }, (error) => {
         this.alertsService.addWarning(
