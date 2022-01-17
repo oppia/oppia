@@ -1,4 +1,4 @@
-<div class="oppia-story-viewer-container" (click)="focusSkipButton($event, isLoggedIn)">
+<div class="oppia-story-viewer-container" (click)="focusSkipButton($event.target, isLoggedIn)">
   <div *ngIf="storyIsLoaded">
     <div class="oppia-story-viewer-inner-container">
       <div *ngIf="storyPlaythroughObject" class="oppia-story-player-tiles-container">

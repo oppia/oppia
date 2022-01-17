@@ -73,11 +73,11 @@ export class StoryViewerPageComponent implements OnInit {
     private alertsService: AlertsService,
   ) {}
 
-  focusSkipButton(event: MouseEvent, isLoggedIn: boolean): void {
+  focusSkipButton(eventTarget: Element, isLoggedIn: boolean): void {
     if (isLoggedIn || !this.showLoginOverlay) {
       return;
     }
-    const target = event.target as Element;
+    const target = eventTarget;
     if (target.closest('.story-viewer-login-container') !==
         this.overlay.nativeElement) {
       this.skipButton.nativeElement.focus();

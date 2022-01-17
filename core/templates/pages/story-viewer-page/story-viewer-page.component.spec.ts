@@ -32,7 +32,6 @@ import { UserInfo } from 'domain/user/user-info.model';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 
-
 class MockAssetsBackendApiService {
   getThumbnailUrlForPreview() {
     return 'thumbnail-url';
@@ -492,52 +491,32 @@ describe('Story Viewer Page component', () => {
 
     expect(component.showLoginOverlay).toEqual(false);
   }));
-  it('should set focus on skip buuton when clicked outside overlay',
-    fakeAsync(()=>{
-      component.isLoggedIn = false;
-      spyOn(component, 'focusSkipButton');
-      const container = document.createElement('div');
-      container.classList.add('oppia-story-viewer-container');
 
-      const event = new MouseEvent('click', {
-        view: window,
-        bubbles: true,
-        cancelable: true,
-        relatedTarget: window
-      });
+  // eslint-disable-next-line oppia/no-test-blockers
+  fit('should set focus on skip button', fakeAsync(()=>{
+    let target = document.createElement('div');
+    target.classList.add('target');
 
-      container.dispatchEvent(event);
-      tick();
+    let nonTarget = document.createElement('div');
+    nonTarget.classList.add('test');
 
-      expect(component.focusSkipButton)
-        .toHaveBeenCalledWith(event, component.isLoggedIn);
-    }));
-  it('should set focus on skip button', fakeAsync(()=>{
-    component.skipButton = new ElementRef(document.createElement('button'));
-    component.overlay = new ElementRef(document.createElement('div'));
+    let overlay = new ElementRef(document.createElement('div'));
+    let button = new ElementRef(document.createElement('button'));
+
+    component.skipButton = button;
+    component.overlay = overlay;
+    component.showLoginOverlay = true;
+
     spyOn(component, 'focusSkipButton');
     spyOn(component.skipButton.nativeElement, 'focus');
+    spyOn(target, 'closest').and.returnValue(nonTarget);
 
-    const container = document.createElement('div');
-    container.classList.add('oppia-story-viewer-container');
-
-    const event = new MouseEvent('click', {
-      view: window,
-      bubbles: true,
-      cancelable: true,
-      relatedTarget: window
-    });
-
-    let mainEvent;
-
-    container.addEventListener('click', (e)=>{
-      mainEvent = e;
-    });
-
-    container.dispatchEvent(event);
+    component.focusSkipButton(target, true);
     tick();
 
-    component.focusSkipButton(mainEvent, false);
+    expect(component.skipButton.nativeElement.focus).not.toHaveBeenCalled();
+
+    component.focusSkipButton(target, false);
     tick();
 
     expect(component.skipButton.nativeElement.focus).toHaveBeenCalled();
