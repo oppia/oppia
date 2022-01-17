@@ -49,7 +49,7 @@ class SkillMasteryDataHandler(base.BaseHandler):
                     'type': 'variable_keys_dict',
                     'keys': {
                         'schema': {
-                            'type':'basestring'
+                            'type': 'basestring'
                         }
                     },
                     'values': {
