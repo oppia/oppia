@@ -140,9 +140,9 @@ class GetCollectionOwnersEmailsJobTests(job_test_utils.JobTestBase):
         ])
 
 
-class MatchEntiryTypeCollectionJobTests(job_test_utils.JobTestBase):
+class MatchEntityTypeCollectionJobTests(job_test_utils.JobTestBase):
 
-    JOB_CLASS = collection_info_jobs.MatchEntiryTypeCollectionJob
+    JOB_CLASS = collection_info_jobs.MatchEntityTypeCollectionJob
 
     USER_ID = 'user_1'
     ENTITY_ID = 'col_id_1'

@@ -47,36 +47,35 @@ class GetCollectionOwnersEmailsJob(base_jobs.JobBase):
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
 
-        collection_pair = (
+        collection_pairs = (
             self.pipeline
             | 'get collection models ' >> ndb_io.GetModels(
-                collection_models.CollectionRightsModel.get_all(
-                    include_deleted=False))
+                collection_models.CollectionRightsModel.get_all())
             | 'Flatten owner_ids and format' >> beam.ParDo(
-                FlattenIDs())
+                ExtractUserAndCollectionIDs())
         )
 
-        user_pair = (
+        user_pairs = (
             self.pipeline
             | 'Get all user settings models' >> ndb_io.GetModels(
-                user_models.UserSettingsModel.get_all(
-                    include_deleted=False))
+                user_models.UserSettingsModel.get_all())
             | 'Extract id and email' >> beam.Map(
                     lambda user_setting: (
                         user_setting.id, user_setting.email))
         )
 
-        group_by_user_id = (
-            (collection_pair, user_pair)
+        collection_ids_to_email_mapping = (
+            (collection_pairs, user_pairs)
             | 'Group by user_id' >> beam.CoGroupByKey()
             | 'Drop user id' >> beam.Values()  # pylint: disable=no-value-for-parameter
             | 'Filter out results without any collection' >> beam.Filter(
-                lambda collection_email: len(collection_email[0]) > 0
+                lambda collection_ids_and_email: len(
+                    collection_ids_and_email[0]) > 0
             )
         )
 
         return (
-            group_by_user_id
+            collection_ids_to_email_mapping
             | 'Get final result' >> beam.MapTuple(
                 lambda collection, email: job_run_result.JobRunResult.as_stdout(
                     'collection_ids: %s, email: %s' % (collection, email)
@@ -84,7 +83,7 @@ class GetCollectionOwnersEmailsJob(base_jobs.JobBase):
         )
 
 
-class FlattenIDs(beam.DoFn):  # type: ignore[misc]
+class ExtractUserAndCollectionIDs(beam.DoFn):  # type: ignore[misc]
     """DoFn to extract user id and collection id."""
 
     def process(
@@ -94,7 +93,7 @@ class FlattenIDs(beam.DoFn):  # type: ignore[misc]
             yield (user_id, collection_rights_model.id)
 
 
-class MatchEntiryTypeCollectionJob(base_jobs.JobBase):
+class MatchEntityTypeCollectionJob(base_jobs.JobBase):
     """Job that match entity_type as collection."""
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
