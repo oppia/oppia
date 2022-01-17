@@ -70,6 +70,9 @@ class GetCollectionOwnersEmailsJob(base_jobs.JobBase):
             (collection_pair, user_pair)
             | 'Group by user_id' >> beam.CoGroupByKey()
             | 'Drop user id' >> beam.Values()  # pylint: disable=no-value-for-parameter
+            | 'Filter out results without any collection' >> beam.Filter(
+                lambda collection_email: len(collection_email[0]) > 0
+            )
         )
 
         return (

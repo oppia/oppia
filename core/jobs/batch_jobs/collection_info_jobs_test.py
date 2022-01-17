@@ -45,6 +45,7 @@ class GetCollectionOwnersEmailsJobTests(job_test_utils.JobTestBase):
 
     USER_ID_1 = 'id_1'
     USER_ID_2 = 'id_2'
+    USER_ID_3 = 'id_3'
 
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty()
@@ -90,8 +91,16 @@ class GetCollectionOwnersEmailsJobTests(job_test_utils.JobTestBase):
             email='some2@email.com',
             roles=[feconf.ROLE_ID_COLLECTION_EDITOR]
         )
+        # Checking a user who has no collection.
+        user3 = self.create_model(
+            user_models.UserSettingsModel,
+            id=self.USER_ID_3,
+            email='some3@email.com',
+            roles=[feconf.ROLE_ID_COLLECTION_EDITOR]
+        )
         user1.update_timestamps()
         user2.update_timestamps()
+        user3.update_timestamps()
         collection1 = self.create_model(
             collection_models.CollectionRightsModel,
             id='col_1',
@@ -116,7 +125,7 @@ class GetCollectionOwnersEmailsJobTests(job_test_utils.JobTestBase):
             first_published_msec=0.2
         )
         collection2.update_timestamps()
-        self.put_multi([user1, user2, collection1, collection2])
+        self.put_multi([user1, user2, user3, collection1, collection2])
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
