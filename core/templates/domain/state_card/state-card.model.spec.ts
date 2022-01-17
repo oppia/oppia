@@ -124,7 +124,7 @@ describe('State card object factory', () => {
       writtenTranslationsObjectFactory.createEmpty(),
       'content', audioTranslationLanguageService);
     _sampleCard2 = StateCard.createNewCard(
-      'State 2', '<p>Content</p>', null,
+      'State 2', '<p>Content</p>', '',
       null, null, writtenTranslationsObjectFactory.createEmpty(),
       'content', audioTranslationLanguageService);
   });
@@ -366,7 +366,7 @@ describe('State card object factory', () => {
     _sampleCard1.restoreImmutable(_sampleCard2);
 
     expect(_sampleCard1.getStateName()).toEqual('State 2');
-    expect(_sampleCard1.getInteractionHtml()).toEqual(null);
+    expect(_sampleCard1.getInteractionHtml()).toEqual('');
     expect(_sampleCard1.getInteractionId()).toEqual(null);
   });
 });
