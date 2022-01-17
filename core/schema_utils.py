@@ -46,6 +46,7 @@ SCHEMA_KEY_TYPE = 'type'
 SCHEMA_KEY_POST_NORMALIZERS = 'post_normalizers'
 SCHEMA_KEY_CHOICES = 'choices'
 SCHEMA_KEY_NAME = 'name'
+SCHEMA_KEY_KEYS = 'keys'
 SCHEMA_KEY_VALUES = 'values'
 SCHEMA_KEY_SCHEMA = 'schema'
 SCHEMA_KEY_OBJ_TYPE = 'obj_type'
@@ -140,9 +141,11 @@ def normalize_against_schema(
         schema_value_type = schema[SCHEMA_KEY_VALUES]
         normalized_obj = {}
         for key, value in obj.items():
-            assert isinstance(key, str), (
-                'Expected key to be string, received %s' % key)
-            normalized_obj[key] = normalize_against_schema(
+            normalized_key = normalize_against_schema(
+                key, schema[SCHEMA_KEY_KEYS][SCHEMA_KEY_SCHEMA],
+                global_validators=global_validators
+            )
+            normalized_obj[normalized_key] = normalize_against_schema(
                 value, schema_value_type[SCHEMA_KEY_SCHEMA],
                 global_validators=global_validators
             )

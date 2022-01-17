@@ -47,11 +47,16 @@ class SkillMasteryDataHandler(base.BaseHandler):
             'mastery_change_per_skill': {
                 'schema': {
                     'type': 'variable_keys_dict',
-                     'values': {
+                    'keys': {
+                        'schema': {
+                            'type':'basestring'
+                        }
+                    },
+                    'values': {
                          'schema': {
                              'type': 'float'
                          }
-                     }
+                    }
                 }
             }
         }
@@ -60,10 +65,8 @@ class SkillMasteryDataHandler(base.BaseHandler):
     @acl_decorators.can_access_learner_dashboard
     def get(self):
         """Handles GET requests."""
-        selected_skill_ids = (
+        skill_ids = (
             self.normalized_request.get('selected_skill_ids'))
-
-        skill_ids = selected_skill_ids
 
         try:
             for skill_id in skill_ids:
