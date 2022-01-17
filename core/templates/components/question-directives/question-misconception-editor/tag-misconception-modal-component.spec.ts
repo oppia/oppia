@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for TagMisconceptionModalComponent.
+ * @fileoverview Unit tests for tag misconception modal component.
  */
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
@@ -65,11 +65,16 @@ describe('Tag misconception modal component', () => {
     component = fixture.componentInstance;
     ngbActiveModal = TestBed.inject(NgbActiveModal);
     stateEditorService = TestBed.inject(StateEditorService);
+    misconceptionObjectFactory = TestBed.inject(MisconceptionObjectFactory);
 
     mockMisconceptionObject = {
       abc: [
         misconceptionObjectFactory.create(
           1, 'misc1', 'notes1', 'feedback1', true)
+      ],
+      def: [
+        misconceptionObjectFactory.create(
+          2, 'misc2', 'notes2', 'feedback1', true)
       ]
     };
     spyOn(stateEditorService, 'getMisconceptionsBySkill').and.callFake(() => {
@@ -79,7 +84,34 @@ describe('Tag misconception modal component', () => {
     fixture.detectChanges();
   });
 
+  it('should initialize the properties correctly', () => {
+    expect(component.misconceptionsBySkill).toEqual(mockMisconceptionObject);
+    expect(component.tempSelectedMisconception).toEqual(null);
+    expect(component.tempSelectedMisconceptionSkillId).toEqual(null);
+    expect(component.tempMisconceptionFeedbackIsUsed).toEqual(true);
+  });
+
+  it('should update the values', () => {
+    let updatedValues = {
+      misconception: mockMisconceptionObject.def[0],
+      skillId: 'id',
+      feedbackIsUsed: false,
+    };
+
+    expect(component.tempSelectedMisconception).toEqual(null);
+    expect(component.tempSelectedMisconceptionSkillId).toEqual(null);
+    expect(component.tempMisconceptionFeedbackIsUsed).toBeTrue();
+
+    component.updateValues(updatedValues);
+
+    expect(component.tempSelectedMisconception).toEqual(
+      mockMisconceptionObject.def[0]);
+    expect(component.tempSelectedMisconceptionSkillId).toEqual('id');
+    expect(component.tempMisconceptionFeedbackIsUsed).toBeFalse();
+  });
+
   it('should close modal correctly', () => {
+    spyOn(ngbActiveModal, 'close');
     component.tempSelectedMisconception = mockMisconceptionObject.abc[0];
     component.tempSelectedMisconceptionSkillId = 'abc';
 
@@ -90,11 +122,5 @@ describe('Tag misconception modal component', () => {
       misconceptionSkillId: 'abc',
       feedbackIsUsed: true
     });
-  });
-
-  it('should dismiss modal correctly', () => {
-    component.cancel();
-
-    expect(ngbActiveModal.dismiss).toHaveBeenCalled();
   });
 });

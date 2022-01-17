@@ -13,19 +13,17 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the QuestionMisconceptionEditorComponent.
+ * @fileoverview Unit tests for the question misconception editor component.
  */
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { QuestionMisconceptionEditorComponent } from './question-misconception-editor.component';
 import { ExternalSaveService } from 'services/external-save.service';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
-import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 
 
 describe('Question misconception editor component', () => {
@@ -36,6 +34,12 @@ describe('Question misconception editor component', () => {
 
   let misconceptionObjectFactory: MisconceptionObjectFactory;
   let mockMisconceptionObject;
+  let outcome = {
+    feedback: {
+      content_id: null,
+      html: ''
+    }
+  };
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -56,10 +60,10 @@ describe('Question misconception editor component', () => {
     component = fixture.componentInstance;
     ngbModal = TestBed.inject(NgbModal);
     stateEditorService = TestBed.inject(StateEditorService);
+    misconceptionObjectFactory = TestBed.inject(MisconceptionObjectFactory);
 
     component.isEditable = true;
-    component.outcome = new OutcomeObjectFactory();
-    component.rules = new RuleObjectFactory();
+    component.outcome = outcome;
     mockMisconceptionObject = {
       abc: [
         misconceptionObjectFactory.create(
@@ -78,6 +82,7 @@ describe('Question misconception editor component', () => {
   it(
     'should initialize correctly when tagged misconception is provided',
     () => {
+      expect(component.misconceptionEditorIsOpen).toEqual(false);
       expect(component.misconceptionName).toEqual('misc1');
       expect(component.selectedMisconception).toEqual(
         mockMisconceptionObject.abc[0]);
@@ -161,9 +166,7 @@ describe('Question misconception editor component', () => {
   });
 
   it('should update tagged misconception name correctly', () => {
-    component.outcome.feedback = {
-      setHtml: () => null
-    };
+    component.outcome.feedback = null;
     component.editMisconception();
 
     expect(component.misconceptionEditorIsOpen).toBeTrue();
@@ -177,5 +180,24 @@ describe('Question misconception editor component', () => {
 
     expect(component.misconceptionEditorIsOpen).toBeFalse();
     expect(component.misconceptionName).toEqual('misc1');
+  });
+
+  it('should update the values', () => {
+    let updatedValues = {
+      misconception: mockMisconceptionObject.def[0],
+      skillId: 'id',
+      feedbackIsUsed: false,
+    };
+
+    expect(component.selectedMisconception).toEqual(null);
+    expect(component.selectedMisconceptionSkillId).toEqual(null);
+    expect(component.feedbackIsUsed).toBeTrue();
+
+    component.updateValues(updatedValues);
+
+    expect(component.selectedMisconception).toEqual(
+      mockMisconceptionObject.def[0]);
+    expect(component.selectedMisconceptionSkillId).toEqual('id');
+    expect(component.feedbackIsUsed).toBeFalse();
   });
 });

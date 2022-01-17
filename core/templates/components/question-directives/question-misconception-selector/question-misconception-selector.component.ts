@@ -26,12 +26,12 @@ import { Misconception } from 'domain/skill/MisconceptionObjectFactory';
   templateUrl: './question-misconception-selector.component.html'
 })
 export class QuestionMisconceptionSelectorComponent implements OnInit {
-  @Input() selectedMisconception: Misconception;
-  @Input() selectedMisconceptionSkillId: string;
   @Output() updateMisconceptionValues:
   EventEmitter<object> = (new EventEmitter());
+  @Input() selectedMisconception: Misconception;
+  @Input() selectedMisconceptionSkillId: string;
   misconceptionFeedbackIsUsed: boolean = true;
-  misconceptionsBySkill;
+  misconceptionsBySkill: object;
 
   constructor(
     private stateEditorService: StateEditorService,

@@ -20,6 +20,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import { Misconception } from 'domain/skill/MisconceptionObjectFactory';
 import { MisconceptionUpdatedValues } from './question-misconception-editor.component';
 
 @Component({
@@ -27,12 +28,12 @@ import { MisconceptionUpdatedValues } from './question-misconception-editor.comp
   templateUrl: './tag-misconception-modal.component.html'
 })
 export class TagMisconceptionModalComponent
-   extends ConfirmOrCancelModal implements OnInit {
-  @Input() taggedSkillMisconceptionId;
-  misconceptionsBySkill;
-  tempSelectedMisconception;
-  tempSelectedMisconceptionSkillId;
-  tempMisconceptionFeedbackIsUsed;
+  extends ConfirmOrCancelModal implements OnInit {
+  @Input() taggedSkillMisconceptionId: string;
+  misconceptionsBySkill: object;
+  tempSelectedMisconception: Misconception;
+  tempSelectedMisconceptionSkillId: string;
+  tempMisconceptionFeedbackIsUsed: boolean;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,

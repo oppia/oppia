@@ -24,11 +24,16 @@ import { StateEditorService } from 'components/state-editor/state-editor-propert
 import { Misconception } from 'domain/skill/MisconceptionObjectFactory';
 import { ExternalSaveService } from 'services/external-save.service';
 import { TagMisconceptionModalComponent } from './tag-misconception-modal-component';
+import { SubtitledHtmlBackendDict } from 'domain/exploration/subtitled-html.model';
 
 export interface MisconceptionUpdatedValues {
   misconception: Misconception;
   skillId: string;
   feedbackIsUsed: boolean;
+}
+
+interface Outcome {
+  feedback: SubtitledHtmlBackendDict;
 }
 
 @Component({
@@ -42,14 +47,13 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
     EventEmitter<object> = (new EventEmitter());
   @Input() taggedSkillMisconceptionId;
   @Input() isEditable: boolean;
-  @Input() outcome;
-  @Input() rules;
+  @Input() outcome: Outcome;
   feedbackIsUsed: boolean;
   misconceptionEditorIsOpen: boolean;
   misconceptionName: string;
   misconceptionsBySkill: object;
-  selectedMisconception;
-  selectedMisconceptionSkillId;
+  selectedMisconception: Misconception;
+  selectedMisconceptionSkillId: string;
 
   constructor(
     private externalSaveService: ExternalSaveService,
