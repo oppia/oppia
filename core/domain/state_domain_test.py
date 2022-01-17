@@ -4373,7 +4373,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         )
 
     def test_get_translatable_fields_for_state_content(self):
-        "Get all translatable fields for state content."
+        """Get all translatable fields for state content."""
 
         state = state_domain.State.create_default_state('state_1')
         state_content_dict = {
@@ -4434,7 +4434,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'correct_answer': 'Answer1',
             'explanation': {
                 'content_id': 'solution',
-                'html': '<p>This is solution for state1</p>'
+                'html': '<p>This is solution for state_1</p>'
             }
         }
         state.update_interaction_id('TextInput')
@@ -4448,7 +4448,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             state.get_translatable_fields().values()
         ]
         self.assertItemsEqual(
-            translatable_contents, ['<p>This is solution for state1</p>'])
+            translatable_contents, ['<p>This is solution for state_1</p>'])
 
     def test_get_translatable_fields_for_customization_args(self):
         """Get all the translatable fields for customization args."""
@@ -4481,12 +4481,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_hint_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml(
-                    'hint_1', '<p>Hello, this is html1 for state1</p>'
+                    'hint_1', '<p>Hello, this is html1 for state_1</p>'
                 )
             ),
             state_domain.Hint(
                 state_domain.SubtitledHtml(
-                    'hint_2', '<p>Hello, this is html2 for state1</p>'
+                    'hint_2', '<p>Hello, this is html2 for state_1</p>'
                 )
             ),
         ]
@@ -4498,8 +4498,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         ]
         self.assertItemsEqual(
             translatable_contents, [
-                '<p>Hello, this is html1 for state1</p>',
-                '<p>Hello, this is html2 for state1</p>',
+                '<p>Hello, this is html1 for state_1</p>',
+                '<p>Hello, this is html2 for state_1</p>',
             ])
 
 
