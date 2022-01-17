@@ -113,7 +113,7 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
   }
 
   tagAnswerGroupWithMisconception(): void {
-    let modalRef: NgbModalRef = this.ngbModal.open(
+    const modalRef: NgbModalRef = this.ngbModal.open(
       TagMisconceptionModalComponent, {
         backdrop: 'static'
       });
