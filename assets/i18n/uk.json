@@ -770,6 +770,7 @@
 	"I18N_TOPIC_VIEWER_LESSON": "Урок",
 	"I18N_TOPIC_VIEWER_LESSONS": "Уроки",
 	"I18N_TOPIC_VIEWER_MASTER_SKILLS": "Майстерні навички для <[topicName]>",
+	"I18N_TOPIC_VIEWER_NO_QUESTION_WARNING": "Для вибраних підтем ще не створено жодних запитань.",
 	"I18N_TOPIC_VIEWER_PRACTICE": "Практика",
 	"I18N_TOPIC_VIEWER_REVISION": "Редакція",
 	"I18N_TOPIC_VIEWER_SELECT_SKILLS": "Виберіть навички з уроків <[topicName]>, які б ви хотіли відпрацювати.",
