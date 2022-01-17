@@ -34,7 +34,7 @@ class MockActiveModal {
   }
 }
 
-describe('Tag misconception modal component', () => {
+describe('Tag Misconception Modal Component', () => {
   let component: TagMisconceptionModalComponent;
   let fixture: ComponentFixture<TagMisconceptionModalComponent>;
   let ngbActiveModal: NgbActiveModal;

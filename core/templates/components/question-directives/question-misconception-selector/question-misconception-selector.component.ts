@@ -19,7 +19,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import cloneDeep from 'lodash/cloneDeep';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { Misconception } from 'domain/skill/MisconceptionObjectFactory';
+import { Misconception, MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
 
 @Component({
   selector: 'oppia-question-misconception-selector',
@@ -30,14 +30,15 @@ export class QuestionMisconceptionSelectorComponent implements OnInit {
   EventEmitter<object> = (new EventEmitter());
   @Input() selectedMisconception: Misconception;
   @Input() selectedMisconceptionSkillId: string;
-  misconceptionFeedbackIsUsed: boolean = true;
-  misconceptionsBySkill: object;
+  misconceptionFeedbackIsUsed: boolean;
+  misconceptionsBySkill: MisconceptionSkillMap;
 
   constructor(
     private stateEditorService: StateEditorService,
   ) {}
 
   ngOnInit(): void {
+    this.misconceptionFeedbackIsUsed = true;
     this.misconceptionsBySkill = (
       this.stateEditorService.getMisconceptionsBySkill());
   }

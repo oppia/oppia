@@ -21,7 +21,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import cloneDeep from 'lodash/cloneDeep';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { Misconception } from 'domain/skill/MisconceptionObjectFactory';
+import { Misconception, MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
 import { ExternalSaveService } from 'services/external-save.service';
 import { TagMisconceptionModalComponent } from './tag-misconception-modal-component';
 import { SubtitledHtmlBackendDict } from 'domain/exploration/subtitled-html.model';
@@ -45,13 +45,13 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
     EventEmitter<object> = (new EventEmitter());
   @Output() onSaveTaggedMisconception:
     EventEmitter<object> = (new EventEmitter());
-  @Input() taggedSkillMisconceptionId: string;
-  @Input() isEditable: boolean;
   @Input() outcome: Outcome;
+  @Input() isEditable: boolean;
+  @Input() taggedSkillMisconceptionId: string;
   feedbackIsUsed: boolean;
   misconceptionEditorIsOpen: boolean;
   misconceptionName: string;
-  misconceptionsBySkill: object;
+  misconceptionsBySkill: MisconceptionSkillMap;
   selectedMisconception: Misconception;
   selectedMisconceptionSkillId: string;
 

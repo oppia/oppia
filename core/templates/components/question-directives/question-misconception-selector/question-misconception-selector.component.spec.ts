@@ -21,16 +21,15 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
-import { SolutionValidityService } from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import { QuestionMisconceptionSelectorComponent } from './question-misconception-selector.component';
 
-describe('Question misconception selector component', () => {
+describe('Question Misconception Selector Component', () => {
   let component: QuestionMisconceptionSelectorComponent;
   let fixture: ComponentFixture<QuestionMisconceptionSelectorComponent>;
-
-  let mockMisconceptionObject = null;
-  let misconceptionObjectFactory = null;
   let stateEditorService: StateEditorService;
+
+  let misconceptionObjectFactory: MisconceptionObjectFactory;
+  let mockMisconceptionObject;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -48,9 +47,8 @@ describe('Question misconception selector component', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(QuestionMisconceptionSelectorComponent);
     component = fixture.componentInstance;
-    misconceptionObjectFactory = new MisconceptionObjectFactory();
-    stateEditorService = new StateEditorService(
-      new SolutionValidityService());
+    stateEditorService = TestBed.inject(StateEditorService);
+    misconceptionObjectFactory = TestBed.inject(MisconceptionObjectFactory);
 
     misconceptionObjectFactory = TestBed.inject(MisconceptionObjectFactory);
     stateEditorService = TestBed.inject(StateEditorService);
@@ -69,13 +67,13 @@ describe('Question misconception selector component', () => {
       return mockMisconceptionObject;
     });
 
-    component.selectedMisconception = mockMisconceptionObject.abc;
-    component.misconceptionFeedbackIsUsed = true;
+    component.selectedMisconception = mockMisconceptionObject.abc[0];
     component.selectedMisconceptionSkillId = 'abc';
     fixture.detectChanges();
   });
 
-  it('should initialize correctly', () => {
+  it('should initialize the properties correctly', () => {
+    expect(component.misconceptionFeedbackIsUsed).toBeTrue();
     expect(component.misconceptionsBySkill).toEqual(mockMisconceptionObject);
   });
 

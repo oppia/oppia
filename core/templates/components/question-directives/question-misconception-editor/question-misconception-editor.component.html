@@ -22,7 +22,7 @@
   <oppia-question-misconception-selector (updateMisconceptionValues)="updateValues($event)"
                                          [selectedMisconception]="selectedMisconception"
                                          [selectedMisconceptionSkillId]="selectedMisconceptionSkillId"
-                                         taggedSkillMisconceptionId="taggedSkillMisconceptionId">
+                                         [taggedSkillMisconceptionId]="taggedSkillMisconceptionId">
   </oppia-question-misconception-selector>
   <button class="btn btn-success float-right" [disabled]="selectedMisconception === null" (click)="updateMisconception()">Save Misconception</button>
 </div>
