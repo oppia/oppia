@@ -1232,7 +1232,7 @@ def _compute_summary_of_exploration(exploration):
     contributor_ids = list(contributors_summary.keys())
 
     exploration_model_last_updated = datetime.datetime.fromtimestamp(
-        (get_last_updated_by_human_ms(exploration.id) // 1000.0))
+        (get_last_updated_by_human_ms(exploration.id) / 1000.0))
     exploration_model_created_on = exploration.created_on
     first_published_msec = exp_rights.first_published_msec
     exp_summary = exp_domain.ExplorationSummary(
@@ -1663,7 +1663,7 @@ def get_average_rating(ratings):
 
         for rating_value, rating_count in ratings.items():
             rating_sum += rating_weightings[rating_value] * rating_count
-        return rating_sum // (number_of_ratings * 1.0)
+        return rating_sum / (number_of_ratings * 1.0)
 
 
 def get_scaled_average_rating(ratings):

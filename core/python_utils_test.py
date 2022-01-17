@@ -56,10 +56,6 @@ class PythonUtilsTests(test_utils.GenericTestBase):
             with python_utils.open_file('invalid_file.py', 'r') as f:
                 f.readlines()
 
-    def test_divide(self):
-        self.assertEqual((4 // 2), 2)
-        self.assertEqual((5 // 2), 2)
-
     def test_parse_query_string(self):
         response = python_utils.parse_query_string(
             'http://www.google.com?search=oppia')

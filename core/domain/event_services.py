@@ -322,7 +322,7 @@ def _refresh_average_ratings_transactional(user_id, new_rating, old_rating):
         else:
             sum_of_ratings -= old_rating
         average_ratings = (
-            sum_of_ratings // float(num_ratings))
+            sum_of_ratings / float(num_ratings))
     user_stats_model.average_ratings = average_ratings
     user_stats_model.num_ratings = num_ratings
     user_stats_model.update_timestamps()

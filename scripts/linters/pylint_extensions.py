@@ -1670,32 +1670,6 @@ class SingleCharAndNewlineAtEOFChecker(checkers.BaseChecker):
             self.add_message('newline-at-eof', line=file_length)
 
 
-class DivisionOperatorChecker(checkers.BaseChecker):
-    """Checks if division operator is used."""
-
-    __implements__ = interfaces.IAstroidChecker
-    name = 'division-operator-used'
-    priority = -1
-    msgs = {
-        'C0015': (
-            'Please use "//" operator instead of the "/" operator',
-            'division-operator-used',
-            'Do not use division operator.'
-        )
-    }
-
-    def visit_binop(self, node):
-        """Visit assign statements to ensure that the division operator('/')
-        is not used and "//" operator is used instead.
-
-        Args:
-            node: astroid.node.BinOp. Node to access module content.
-        """
-        if node.op == '/':
-            self.add_message(
-                'division-operator-used', node=node)
-
-
 class SingleLineCommentChecker(checkers.BaseChecker):
     """Checks if comments follow correct style."""
 
