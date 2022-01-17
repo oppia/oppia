@@ -3067,8 +3067,6 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
     def test_return_error_when_image_not_uploaded(self):
         """Test that an error is returned when no image is uploaded."""
 
-        exp_image_upload_endpoint = '/createhandler/imageupload'
-
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -3079,7 +3077,7 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
         filename_prefix = 'image'
 
         publish_url = '%s/%s/%s' % (
-            exp_image_upload_endpoint,
+            feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX,
             feconf.ENTITY_TYPE_EXPLORATION, exp_id)
 
         response = self.post_json(
@@ -3109,8 +3107,6 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
         image already exists.
         """
 
-        exp_image_upload_endpoint = '/createhandler/imageupload'
-
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -3121,7 +3117,7 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
         filename_prefix = 'image'
 
         publish_url = '%s/%s/%s' % (
-            exp_image_upload_endpoint,
+            feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX,
             feconf.ENTITY_TYPE_EXPLORATION, exp_id)
 
         # Read raw image for testing.
@@ -3164,8 +3160,6 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
     def test_upload_successful_when_image_uploaded(self):
         """Test that no error is returned when valid image is uploaded."""
 
-        exp_image_upload_endpoint = '/createhandler/imageupload'
-
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -3176,7 +3170,7 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
         filename_prefix = 'image'
 
         publish_url = '%s/%s/%s' % (
-            exp_image_upload_endpoint,
+            feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX,
             feconf.ENTITY_TYPE_EXPLORATION, exp_id)
 
         # Read raw image for testing.
