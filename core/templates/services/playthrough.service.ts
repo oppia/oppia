@@ -124,9 +124,10 @@ class EarlyQuitTracker {
       this.expDurationInSecs < ServicesConstants.EARLY_QUIT_THRESHOLD_IN_SECS);
   }
 
-  recordExplorationQuit(
-      stateName: string,
-      expDurationInSecs: number | null): void {
+   recordExplorationQuit(
+       stateName: string,
+       expDurationInSecs: number | null
+   ): void {
     if (this.stateName !== null && this.expDurationInSecs !== null) {
       this.stateName = stateName;
       this.expDurationInSecs = expDurationInSecs;
@@ -141,7 +142,7 @@ class EarlyQuitTracker {
         time_spent_in_exp_in_msecs!: {value: this.expDurationInSecs * 1000},
       };
     } else {
-      throw console.error('Value should not be null !');
+      throw Error('Value expDurationInSecs should not be null!');
     }
   }
 }
@@ -199,8 +200,10 @@ export class PlaythroughService {
        private playthroughObjectFactory: PlaythroughObjectFactory) {}
 
   initSession(
-      explorationId: string, explorationVersion: number | null,
-      sampleSizePopulationProportion: number): void {
+      explorationId: string, 
+      explorationVersion: number | null,
+      sampleSizePopulationProportion: number
+  ): void {
     this.explorationId = explorationId;
     this.explorationVersion = explorationVersion;
     this.learnerIsInSamplePopulation = (
@@ -228,8 +231,13 @@ export class PlaythroughService {
   }
 
   recordAnswerSubmitAction(
-      stateName: string, destStateName: string, interactionId: string,
-      answer: string, feedback: string, timeSpentInStateSecs: number): void {
+      stateName: string, 
+      destStateName: string, 
+      interactionId: string,
+      answer: string, 
+      feedback: string, 
+      timeSpentInStateSecs: number
+  ): void {
     if (!this.hasRecordingBegun() || this.hasRecordingFinished()) {
       return;
     }
@@ -250,7 +258,8 @@ export class PlaythroughService {
   }
 
   recordExplorationQuitAction(
-      stateName: string, timeSpentInStateSecs: number): void {
+      stateName: string, timeSpentInStateSecs: number
+  ): void {
     if (!this.hasRecordingBegun() || this.hasRecordingFinished()) {
       return;
     }
@@ -261,8 +270,8 @@ export class PlaythroughService {
         time_spent_in_state_in_msecs: {value: 1000 * timeSpentInStateSecs}
       }));
     if (this.playthroughStopwatch !== null && this.eqTracker !== null) {
-      this.playthroughDurationInSecs =
-       this.playthroughStopwatch.getTimeInSecs();
+      this.playthroughDurationInSecs = (
+        this.playthroughStopwatch.getTimeInSecs());
       this.eqTracker.recordExplorationQuit(
         stateName, this.playthroughDurationInSecs);
     }
@@ -272,8 +281,8 @@ export class PlaythroughService {
     if (this.isRecordedPlaythroughHelpful()) {
       const playthrough = this.createNewPlaythrough();
       if (playthrough !== null) {
-        this.playthroughBackendApiService.
-          storePlaythroughAsync(playthrough, 1);
+        this.playthroughBackendApiService.storePlaythroughAsync(
+          playthrough, 1);
       }
     }
   }
@@ -288,8 +297,10 @@ export class PlaythroughService {
     * If none of the issue types have been discovered, returns null instead.
     */
   private createNewPlaythrough(): Playthrough | null {
-    if (this.explorationVersion !== null &&
-       this.recordedLearnerActions !== null) {
+    if (
+      this.explorationVersion !== null &&
+      this.recordedLearnerActions !== null
+    ) {
       if (this.misTracker && this.misTracker.foundAnIssue()) {
         return this.playthroughObjectFactory
           .createNewMultipleIncorrectSubmissionsPlaythrough(
@@ -318,13 +329,15 @@ export class PlaythroughService {
   private isPlaythroughRecordingEnabled(): boolean {
     return (
       this.explorationFeaturesService.isPlaythroughRecordingEnabled() &&
-      this.learnerIsInSamplePopulation === true);
+      this.learnerIsInSamplePopulation
+    );
   }
 
   private hasRecordingBegun(): boolean {
     return (
       this.isPlaythroughRecordingEnabled() &&
-      this.recordedLearnerActions !== null);
+      this.recordedLearnerActions !== null
+    );
   }
 
   private hasRecordingFinished(): boolean {
@@ -337,8 +350,10 @@ export class PlaythroughService {
   }
 
   private isRecordedPlaythroughHelpful(): boolean {
-    if (this.recordedLearnerActions !== null &&
-      this.playthroughDurationInSecs !== null) {
+    if (
+      this.recordedLearnerActions !== null &&
+      this.playthroughDurationInSecs !== null
+    ) {
       return (
         // Playthroughs are only helpful in their entirety.
         this.hasRecordingFinished() &&
@@ -349,7 +364,8 @@ export class PlaythroughService {
           this.playthroughDurationInSecs >=
             ServicesConstants.MIN_PLAYTHROUGH_DURATION_IN_SECS);
     } else {
-      throw console.error('Value should not be null!');
+      throw Error(
+        'Values should not be null!');
     }
   }
 }
