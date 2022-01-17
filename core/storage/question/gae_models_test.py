@@ -233,10 +233,30 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         skill_id_1 = skill_services.get_new_skill_id() # type: ignore[no-untyped-call]
         self.save_new_skill(skill_id_1, 'user', description='Description 1') # type: ignore[no-untyped-call]
 
+        # Testing that no question is linked to a skill
         self.assertEqual(
             question_models.QuestionSkillLinkModel
             .get_all_question_ids_linked_to_skill_id(skill_id_1),
             []
+        )
+
+        questionskilllink_model1 = (
+            question_models.QuestionSkillLinkModel.create(
+                'question_id1', skill_id_1, 0.1)
+            )
+        questionskilllink_model2 = (
+            question_models.QuestionSkillLinkModel.create(
+                'question_id2', skill_id_1, 0.2)
+            )
+        
+        question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
+            [questionskilllink_model1, questionskilllink_model2]
+            )
+
+        self.assertEqual(
+            question_models.QuestionSkillLinkModel
+            .get_all_question_ids_linked_to_skill_id(skill_id_1),
+            ['question_id1', 'question_id2']
         )
 
     def test_put_multi_question_skill_link(self) -> None:
@@ -319,7 +339,8 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception,
-            'The given question is already linked to given skill'
+            'The question with ID question_id1 is already linked to '
+            'skill skill_id1'
         ):
             question_models.QuestionSkillLinkModel.create(
                 'question_id1', 'skill_id1', 0.1)
