@@ -233,7 +233,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         skill_id_1 = skill_services.get_new_skill_id() # type: ignore[no-untyped-call]
         self.save_new_skill(skill_id_1, 'user', description='Description 1') # type: ignore[no-untyped-call]
 
-        # Testing that no question is linked to a skill
+        # Testing that no question is linked to a skill.
         self.assertEqual(
             question_models.QuestionSkillLinkModel
             .get_all_question_ids_linked_to_skill_id(skill_id_1),
@@ -248,7 +248,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
             question_models.QuestionSkillLinkModel.create(
                 'question_id2', skill_id_1, 0.2)
             )
-        
+
         question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
             [questionskilllink_model1, questionskilllink_model2]
             )

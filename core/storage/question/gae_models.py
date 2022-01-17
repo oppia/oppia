@@ -362,7 +362,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         question_skill_link_id = cls.get_model_id(question_id, skill_id)
         if cls.get(question_skill_link_id, strict=False) is not None:
             raise Exception(
-                'The question with ID %s is already linked to skill %s' % 
+                'The question with ID %s is already linked to skill %s' %
                 (question_id, skill_id))
 
         question_skill_link_model_instance = cls(
