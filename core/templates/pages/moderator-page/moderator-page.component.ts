@@ -88,7 +88,8 @@ export class ModeratorPageComponent {
         explorationIdsToExplorationData.forEach(expId => {
           if (!this.explorationData.hasOwnProperty(expId)) {
             this.explorationData[expId] = (
-              explorationIdsToExplorationData[expId]);          
+              explorationIdsToExplorationData[expId]); 
+            }   
         });
         this.allCommits = response.results;
         this.loaderService.hideLoadingScreen();
