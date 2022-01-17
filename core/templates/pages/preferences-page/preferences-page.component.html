@@ -121,7 +121,7 @@
                     </strong>
                   </div>
                   <div class="oppia-impact-text">
-                    <span>Impact</span>
+                    <span>{{ 'I18N_PREFERENCES_OPPIA_IMPACT_SECTION_HEADING' | translate }}</span>
                     <span> {{ subscription.creator_impact || 0 }}</span>
                   </div>
                 </span>
@@ -280,21 +280,23 @@
     <hr>
 
     <div role="form" class="form-group row">
-      <label class="col-lg-4 col-md-4 col-sm-4">Export Account</label>
+      <label class="col-lg-4 col-md-4 col-sm-4 text-capitalize">{{ 'I18N_PREFERENCES_EXPORT_ACCOUNT' | translate }}</label>
       <div class="col-lg-8 col-md-8 col-sm-8" *ngIf="!exportingData">
         <a href="/export-account-handler">
           <button type="button"
                   class="btn btn-primary protractor-test-export-account-button"
                   title="Export account"
                   (click)="handleExportDataClick()">
-            Export account
+                  {{ 'I18N_PREFERENCES_EXPORT_ACCOUNT' | translate }}
           </button>
         </a>
-        <span class="form-text oppia-form-text">This will download your Oppia account data as a JSON formatted text file.</span>
+        <span class="form-text oppia-form-text">
+          {{ 'I18N_PREFERENCES_EXPORT_ACCOUNT_INFO_TEXT' | translate }}
+        </span>
       </div>
       <div class="col-lg-8 col-md-8 col-sm-8" *ngIf="exportingData">
-        <span class="form-text oppia-form-text">Please do not leave this page. Your data is currently being loaded and will be downloaded as a
-            JSON formatted text file upon completion. If something goes wrong, please contact <a href="mailto:support@oppia.org">support@oppia.org</a>.
+        <span class="form-text oppia-form-text">
+          {{ 'I18N_PREFERENCES_EXPORT_ACCOUNT_WARNING_TEXT' | translate }} <a href="mailto:support@oppia.org">support@oppia.org</a>.
         </span>
       </div>
     </div>
