@@ -334,7 +334,7 @@ class FeedbackThreadStatusChangedEventHandlerTests(test_utils.GenericTestBase):
 
         # Changing Status from closed to open.
         event_services.FeedbackThreadStatusChangedEventHandler.record(
-            exp_id, "", feedback_models.STATUS_CHOICES_OPEN)
+            exp_id, '', feedback_models.STATUS_CHOICES_OPEN)
 
         thread = feedback_services.get_thread_analytics(exp_id)
         self.assertEqual(thread.id, exp_id)
@@ -342,11 +342,12 @@ class FeedbackThreadStatusChangedEventHandlerTests(test_utils.GenericTestBase):
 
         # Changing Status from open to closed.
         event_services.FeedbackThreadStatusChangedEventHandler.record(
-            exp_id, feedback_models.STATUS_CHOICES_OPEN, "")
+            exp_id, feedback_models.STATUS_CHOICES_OPEN, '')
 
         thread = feedback_services.get_thread_analytics(exp_id)
         self.assertEqual(thread.id, exp_id)
         self.assertEqual(thread.num_open_threads, 0)
+
 
 class TestEventHandler(event_services.BaseEventHandler):
     """Mock event class for processing events of type 'test_event'."""
