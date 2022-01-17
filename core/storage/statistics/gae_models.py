@@ -624,7 +624,7 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
             play_type: str. Type of play-through.
 
         Returns:
-            str. New unique ID for this entity class.
+            str. New unique ID for this entity instance.
         """
         # TODO(sll): Some events currently do not have an entity ID that was
         # set using this method; it was randomly set instead due to an error.
@@ -853,7 +853,7 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
             user_id: str. ID of the user.
 
         Returns:
-            str. New unique ID for this entity class.
+            str. New unique ID for this entity instance.
         """
         timestamp = datetime.datetime.utcnow()
         return cls.get_new_id('%s:%s:%s' % (
@@ -880,7 +880,7 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
                 exploration for the first time.
 
         Returns:
-            str. New unique ID for this entity class.
+            str. New unique ID for this entity instance.
         """
         entity_id = cls.get_new_event_entity_id(
             exp_id, user_id)
