@@ -229,7 +229,7 @@ class TaskEntryModelTests(test_utils.GenericTestBase):
             'issue_description',
             status=improvements_models.TASK_STATUS_OPEN)
 
-        with self.assertRaisesRegexp(Exception, 'Task id .* already exists'): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'Task id .* already exists'): # type: ignore[no-untyped-call]
             improvements_models.TaskEntryModel.create(
                 improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
                 'eid',
