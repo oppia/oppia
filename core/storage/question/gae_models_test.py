@@ -66,12 +66,12 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
             'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'question_state_data': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'question_state_data_schema_version':
-                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'question_state_data_schema_version': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE),
             'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'linked_skill_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'inapplicable_skill_misconception_ids':
-                base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'inapplicable_skill_misconception_ids': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE)
         }
         self.assertEqual(
             question_models.QuestionModel.get_export_policy(),
@@ -199,7 +199,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
             question_models.QuestionSkillLinkModel
-                .get_model_association_to_user(),
+            .get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
         )
 
@@ -235,7 +235,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             question_models.QuestionSkillLinkModel
-                .get_all_question_ids_linked_to_skill_id(skill_id_1),
+            .get_all_question_ids_linked_to_skill_id(skill_id_1),
             []
         )
 
@@ -838,7 +838,7 @@ class QuestionCommitLogEntryModelUnitTests(test_utils.GenericTestBase):
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
             question_models.QuestionCommitLogEntryModel
-                .get_model_association_to_user(),
+            .get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
         )
 
@@ -852,8 +852,8 @@ class QuestionCommitLogEntryModelUnitTests(test_utils.GenericTestBase):
             'commit_message': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'commit_cmds': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'post_commit_status': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'post_commit_community_owned':
-                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'post_commit_community_owned': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE),
             'post_commit_is_private': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'question_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
@@ -875,7 +875,7 @@ class QuestionSummaryModelUnitTests(test_utils.GenericTestBase):
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
             question_models.QuestionSummaryModel
-                .get_model_association_to_user(),
+            .get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
         )
 
@@ -884,10 +884,10 @@ class QuestionSummaryModelUnitTests(test_utils.GenericTestBase):
             'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'question_model_last_updated':
-                base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'question_model_created_on':
-                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'question_model_last_updated': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE),
+            'question_model_created_on': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE),
             'question_content': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'interaction_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'misconception_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE

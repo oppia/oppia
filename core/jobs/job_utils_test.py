@@ -193,8 +193,10 @@ class BeamEntityToAndFromModelTests(test_utils.TestBase):
 
     def test_get_beam_key_from_ndb_key(self):
         beam_key = beam_datastore_types.Key(
-            ('FooModel', 'abc'), project=feconf.OPPIA_PROJECT_ID,
-                namespace=self.namespace)
+            ('FooModel', 'abc'), 
+            project=feconf.OPPIA_PROJECT_ID,
+            namespace=self.namespace
+        )
 
         ndb_key = datastore_services.Key._from_ds_key(beam_key.to_client_key())  # pylint: disable=protected-access
         self.assertEqual(job_utils.get_beam_key_from_ndb_key(ndb_key), beam_key)
