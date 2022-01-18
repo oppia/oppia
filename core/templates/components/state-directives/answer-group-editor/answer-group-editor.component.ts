@@ -59,7 +59,7 @@ angular.module('oppia').component('answerGroupEditor', {
     getOnSaveNextContentIdIndex: '&onSaveNextContentIdIndex',
     taggedSkillMisconceptionId: '=',
     isEditable: '=',
-    getOnSaveAnswerGroupFeedbackFn: '&saveAnswerGroupFeedback',
+    getOnSaveAnswerGroupFeedbackFn: '&onSaveAnswerGroupFeedback',
     onSaveTaggedMisconception: '=',
     outcome: '=',
     rules: '=',
