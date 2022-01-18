@@ -49,6 +49,10 @@ describe('Subtopic object factory', () => {
     expect(_sampleSubtopic.validate()).toEqual([]);
   });
 
+  it('should be able to increment the id', () => {
+    expect(_sampleSubtopic.incrementId()).toEqual(2);
+  });
+
   it('should return the skill ids', () => {
     expect(_sampleSubtopic.getSkillIds()).toEqual(skillIds);
   });
@@ -58,6 +62,14 @@ describe('Subtopic object factory', () => {
     _sampleSubtopic.setThumbnailFilename('');
     expect(_sampleSubtopic.prepublishValidate()).toEqual([
       'Subtopic Title should have a thumbnail.']);
+  });
+
+  it('should validate the url fragment', () => {
+    _sampleSubtopic.setUrlFragment('title1');
+
+    expect(
+      _sampleSubtopic.validate()
+    ).toEqual(['Subtopic url fragment is invalid.']);
   });
 
   it('should validate the subtopic', () => {
