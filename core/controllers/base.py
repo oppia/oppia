@@ -30,7 +30,6 @@ import urllib
 from core import feconf
 from core import handler_schema_constants
 from core import utils
-from core import utils
 from core.controllers import payload_validator
 from core.domain import auth_domain
 from core.domain import auth_services

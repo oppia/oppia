@@ -20,7 +20,6 @@ import os
 
 from core import feconf
 from core import utils
-from core import utils
 from core.domain import image_validation_services
 from core.tests import test_utils
 

@@ -21,7 +21,6 @@ import os
 
 from core import feconf
 from core import utils
-from core import utils
 from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers

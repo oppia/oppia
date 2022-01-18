@@ -31,7 +31,6 @@ import types
 from core import feconf
 from core import handler_schema_constants
 from core import utils
-from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base

@@ -29,7 +29,6 @@ import urllib.request as urlrequest
 import zipfile
 
 from core import utils
-from core import utils
 from core.tests import test_utils
 
 from . import common

@@ -30,7 +30,6 @@ import re
 import sys
 
 from core import utils
-from core import utils
 from .. import common
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))

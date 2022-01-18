@@ -24,7 +24,6 @@ import os
 import tempfile
 
 from core import utils
-from core import utils
 from core.tests import test_utils
 from scripts import common
 from scripts.release_scripts import update_configs

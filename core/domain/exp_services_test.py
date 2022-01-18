@@ -26,7 +26,6 @@ import zipfile
 
 from core import feconf
 from core import utils
-from core import utils
 from core.domain import classifier_services
 from core.domain import draft_upgrade_services
 from core.domain import exp_domain

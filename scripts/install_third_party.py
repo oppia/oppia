@@ -28,7 +28,6 @@ import urllib
 import zipfile
 
 from core import utils
-from core import utils
 
 from . import common
 from . import install_backend_python_libs

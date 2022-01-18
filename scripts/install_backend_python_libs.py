@@ -25,7 +25,6 @@ import subprocess
 import sys
 
 from core import utils
-from core import utils
 
 import pkg_resources
 
