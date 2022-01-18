@@ -27,7 +27,6 @@ core.domain.auth_services_test
 core.domain.opportunity_services_test
 core.domain.feedback_domain_test
 core.domain.story_fetchers_test
-core.domain.param_domain_test
 core.domain.playthrough_issue_registry_test
 core.domain.feedback_services_test
 core.domain.exp_services_test
