@@ -20,13 +20,13 @@ import { Ratio } from 'domain/objects/ratio.model';
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
-import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
+import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
+import { InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
 import { RatioExpressionInputRulesService } from './ratio-expression-input-rules.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { RatioExpressionInputCustomizationArgs } from 'interactions/customization-args-defs';
-import { InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
 import { RatioInputAnswer, InteractionAnswer } from 'interactions/answer-defs';
 
 @Component({
@@ -54,10 +54,10 @@ implements OnInit, OnDestroy {
   };
   constructor(
     private currentInteractionService: CurrentInteractionService,
-    private ratioExpressionInputRulesService: RatioExpressionInputRulesService,
     private focusManagerService: FocusManagerService,
     private interactionAttributesExtractorService:
-      InteractionAttributesExtractorService
+      InteractionAttributesExtractorService,
+    private ratioExpressionInputRulesService: RatioExpressionInputRulesService,
   ) {
     this.componentSubscriptions.add(this.answerChanged.pipe(
       // Wait 150ms after the last event before emitting last event.
