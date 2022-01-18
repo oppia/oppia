@@ -48,7 +48,7 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
             rte_component_class.validate(item)
 
         for item, error_msg in invalid_items_with_error_messages:
-            with self.assertRaisesRegexp(Exception, error_msg):
+            with self.assertRaisesRegex(Exception, error_msg):
                 rte_component_class.validate(item)
 
     def test_collapsible_validation(self):
