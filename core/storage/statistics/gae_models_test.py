@@ -1162,7 +1162,7 @@ class StateAnswersModelUnitTests(test_utils.GenericTestBase):
 
         # Ruling out the possibility of None for mypy type checking.
         assert stat_answer_models is not None
-        
+
         # Ensure we got the correct model.
         self.assertEqual(stat_answer_models[0].exploration_id, 'exp_id')
         self.assertEqual(stat_answer_models[0].exploration_version, 1)
@@ -1171,7 +1171,7 @@ class StateAnswersModelUnitTests(test_utils.GenericTestBase):
             stat_answer_models[0].submitted_answer_list,
             submitted_answer_list1 + submitted_answer_list2
         )
-    
+
     def test_get_all_state_answer_models_of_all_shards(self) -> None:
         # Use a smaller max answer list size so fewer answers are needed to
         # exceed a shard. This will increase the 'shard_count'.
