@@ -80,7 +80,7 @@ var testSuite = [{
   ruleArguments: ['IsEquivalentTo', '(9*x^2)-6*x+1'],
   expectedInteractionDetails: [],
   wrongAnswers: ['sqrt((3x-1)^(2))', '9*(x)^(2)-6*x-1', '((3*x-1))^(4)'],
-  correctAnswers: ['(9*x^2)-6*x+1', '(1-3x)^(2)']
+  correctAnswers: ['(9*x^2)-6*x+1', '(1-3x)^2']
 }];
 
 exports.customizeInteraction = customizeInteraction;
