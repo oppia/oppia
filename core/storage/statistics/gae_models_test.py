@@ -1139,13 +1139,13 @@ class StateAnswersModelUnitTests(test_utils.GenericTestBase):
         assert model1 is not None
         self.assertEqual(model1.shard_count, 2)
 
-    def test_get_all_state_answer_models(self) -> None:
-        # Testing when no model is associated with exploration.
+    def test_get_all_state_answer_models_of_a_single_shard(self) -> None:
         self.assertIsNone(stats_models.StateAnswersModel.get_all_models(
             'exp_id', 1, 'state_name'
         ))
 
-        # Testing when shard count is 0.
+        # The 'shard_count' will be zero since the number of answer lists
+        # is less than _MAX_ANSWER_LIST_BYTE_SIZE.
         submitted_answer_list1 = [{'answer1': 'value1'}]
         stats_models.StateAnswersModel.insert_submitted_answers(
             'exp_id', 1, 'state_name', 'interaction_id1',
@@ -1162,6 +1162,7 @@ class StateAnswersModelUnitTests(test_utils.GenericTestBase):
 
         # Ruling out the possibility of None for mypy type checking.
         assert stat_answer_models is not None
+        
         # Ensure we got the correct model.
         self.assertEqual(stat_answer_models[0].exploration_id, 'exp_id')
         self.assertEqual(stat_answer_models[0].exploration_version, 1)
@@ -1170,16 +1171,21 @@ class StateAnswersModelUnitTests(test_utils.GenericTestBase):
             stat_answer_models[0].submitted_answer_list,
             submitted_answer_list1 + submitted_answer_list2
         )
-
-        # Testing when shard count > 0.
+    
+    def test_get_all_state_answer_models_of_all_shards(self) -> None:
         # Use a smaller max answer list size so fewer answers are needed to
         # exceed a shard. This will increase the 'shard_count'.
         with self.swap(
             stats_models.StateAnswersModel, '_MAX_ANSWER_LIST_BYTE_SIZE', 1):
-            submitted_answer_list3 = [{'answer3': 'value3'}]
+            submitted_answer_list1 = [{'answer1': 'value1'}]
             stats_models.StateAnswersModel.insert_submitted_answers(
-                'exp_id', 1, 'state_name', 'interaction_id3',
-                submitted_answer_list3)
+                'exp_id', 1, 'state_name', 'interaction_id1',
+                submitted_answer_list1)
+
+            submitted_answer_list2 = [{'answer2': 'value2'}]
+            stats_models.StateAnswersModel.insert_submitted_answers(
+                'exp_id', 1, 'state_name', 'interaction_id2',
+                submitted_answer_list2)
 
             stat_answer_models = stats_models.StateAnswersModel.get_all_models(
                 'exp_id', 1, 'state_name'
@@ -1187,21 +1193,22 @@ class StateAnswersModelUnitTests(test_utils.GenericTestBase):
 
             # Ruling out the possibility of None for mypy type checking.
             assert stat_answer_models is not None
-            # Ensure we got the correct model.
-            self.assertEqual(stat_answer_models[0].exploration_id, 'exp_id')
-            self.assertEqual(stat_answer_models[0].exploration_version, 1)
-            self.assertEqual(stat_answer_models[0].state_name, 'state_name')
-            self.assertEqual(
-                stat_answer_models[0].submitted_answer_list,
-                submitted_answer_list1 + submitted_answer_list2
-            )
 
+            # Ensure we got the correct model.
             self.assertEqual(stat_answer_models[1].exploration_id, 'exp_id')
             self.assertEqual(stat_answer_models[1].exploration_version, 1)
             self.assertEqual(stat_answer_models[1].state_name, 'state_name')
             self.assertEqual(
                 stat_answer_models[1].submitted_answer_list,
-                submitted_answer_list3
+                submitted_answer_list1
+            )
+
+            self.assertEqual(stat_answer_models[2].exploration_id, 'exp_id')
+            self.assertEqual(stat_answer_models[2].exploration_version, 1)
+            self.assertEqual(stat_answer_models[2].state_name, 'state_name')
+            self.assertEqual(
+                stat_answer_models[2].submitted_answer_list,
+                submitted_answer_list2
             )
 
     def test_get_model_association_to_user(self) -> None:
