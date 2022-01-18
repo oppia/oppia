@@ -45,7 +45,7 @@ describe('Contributor dashboard page', function() {
   const USER_EMAILS = ['user0@contributor.com', 'user1@contributor.com'];
   const QUESTION_ADMIN_EMAIL = 'user@contributor.com';
   const QUESTION_ADMIN_USERNAME = 'user4321';
-  const HINDI_LANGUAGE = 'हिन्दी (Hindi)';
+  const GERMAN_LANGUAGE = 'Deutsch (German)';
   let contributorDashboardPage = null;
   let contributorDashboardTranslateTextTab = null;
   let topicsAndSkillsDashboardPage = null;
@@ -116,9 +116,9 @@ describe('Contributor dashboard page', function() {
   it('should allow user to switch to translate text tab', async function() {
     await contributorDashboardPage.get();
     await contributorDashboardPage.navigateToTranslateTextTab();
-    await contributorDashboardTranslateTextTab.changeLanguage(HINDI_LANGUAGE);
+    await contributorDashboardTranslateTextTab.changeLanguage(GERMAN_LANGUAGE);
     await contributorDashboardTranslateTextTab.expectSelectedLanguageToBe(
-      HINDI_LANGUAGE);
+      GERMAN_LANGUAGE);
   });
 
   it('should allow reviewer to accept question suggestions', async function() {
@@ -253,7 +253,7 @@ describe('Contributor dashboard page', function() {
 });
 
 describe('Contributor dashboard admin page contribution rights form', () => {
-  const HINDI_LANGUAGE = 'हिन्दी (Hindi)';
+  const GERMAN_LANGUAGE = 'Deutsch (German)';
   const QUESTION_ADMIN_EMAIL = 'userX@contributor.com';
   const QUESTION_ADMIN_USERNAME = 'user1234';
   const TRANSLATION_ADMIN_EMAIL = 'userY@contributor.com';
@@ -295,15 +295,15 @@ describe('Contributor dashboard admin page contribution rights form', () => {
       await users.login(TRANSLATION_ADMIN_EMAIL);
       await contributorDashboardAdminPage.get();
       await contributorDashboardAdminPage.assignTranslationReviewer(
-        translationReviewerUsername, HINDI_LANGUAGE);
+        translationReviewerUsername, GERMAN_LANGUAGE);
       await contributorDashboardAdminPage.expectUserToBeTranslationReviewer(
-        translationReviewerUsername, HINDI_LANGUAGE);
+        translationReviewerUsername, GERMAN_LANGUAGE);
       await users.logout();
 
       await users.login(translationReviewerEmail);
       await contributorDashboardPage.get();
       await contributorDashboardPage.expectUserToBeTranslationReviewer(
-        HINDI_LANGUAGE);
+        GERMAN_LANGUAGE);
       await users.logout();
     });
 
