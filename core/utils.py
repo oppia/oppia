@@ -22,6 +22,7 @@ import collections
 import datetime
 import hashlib
 import imghdr
+import io
 import itertools
 import json
 import os
@@ -30,6 +31,7 @@ import re
 import string
 import sys
 import time
+import typing
 import unicodedata
 import urllib
 import zlib
@@ -91,7 +93,9 @@ class ExplorationConversionError(Exception):
     pass
 
 
-def open_file(filename, mode, encoding='utf-8', newline=None):
+def open_file(
+        filename: str, mode: str, encoding: Union[str, None]='utf-8',
+        newline: Union[str, None]=None) -> io.TextIOWrapper:
     """Open file and return a corresponding file object.
 
     Args:
@@ -101,12 +105,14 @@ def open_file(filename, mode, encoding='utf-8', newline=None):
         newline: None|str. Controls how universal newlines work.
 
     Returns:
-        TextIOWrapper. The file object.
+        _io.TextIOWrapper. The file object.
 
     Raises:
         FileNotFoundError. The file cannot be found.
     """
-    return open(filename, mode, encoding=encoding, newline=newline)
+    file = open(filename, mode, encoding=encoding, newline=newline)
+    file = typing.cast(io.TextIOWrapper, file)
+    return file
 
 
 def get_file_contents(
@@ -130,9 +136,8 @@ def get_file_contents(
     else:
         encoding = 'utf-8'
 
-    with open_file( # type: ignore[no-untyped-call]
-        filepath, mode, encoding=encoding) as f:
-        return f.read() # type: ignore[no-any-return]
+    with open_file(filepath, mode, encoding=encoding) as f:
+        return f.read() # type: ignore[return-value]
 
 
 def get_exploration_components_from_dir(

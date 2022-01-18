@@ -33,7 +33,7 @@ class ConstantsTests(test_utils.GenericTestBase):
 
     def test_constants_file_contains_valid_json(self) -> None:
         """Test if the constants file is valid json file."""
-        with utils.open_file( # type: ignore[no-untyped-call]
+        with utils.open_file(
             os.path.join('assets', 'constants.ts'), 'r'
         ) as f:
             json = constants.parse_json_from_ts(f.read())
@@ -71,7 +71,7 @@ class ConstantsTests(test_utils.GenericTestBase):
         """Tests if comments are removed from json text."""
         dummy_constants_filepath = os.path.join(
             feconf.TESTS_DATA_DIR, 'dummy_constants.js')
-        with utils.open_file(dummy_constants_filepath, 'r') as f: # type: ignore[no-untyped-call]
+        with utils.open_file(dummy_constants_filepath, 'r') as f:
             actual_text_without_comments = constants.remove_comments(f.read())
             expected_text_without_comments = (
                 'var dummy_constants = {\n'

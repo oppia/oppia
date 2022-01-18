@@ -123,7 +123,7 @@ class RedisCacheServicesUnitTests(test_utils.TestBase):
         self.assertTrue(os.path.exists(
             os.path.join(common.CURR_DIR, 'redis.conf')))
 
-        with utils.open_file( # type: ignore[no-untyped-call]
+        with utils.open_file(
                 os.path.join(common.CURR_DIR, 'redis.conf'), 'r') as redis_conf:
             lines = redis_conf.readlines()
             elements = lines[0].split()
