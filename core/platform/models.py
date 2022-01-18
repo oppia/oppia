@@ -11,36 +11,36 @@ if MYPY: # pragma: no cover
     from mypy_imports import base_models  
 class NAMES(enum.Enum): 
     """Enum for valid model names."""
-    activity = 'ACTIVITY' 
-    AppFeedbackReport = 'APP_FEEDBACK_REPORT' 
-    audit = 'AUDIT' 
-    BaseModel = 'BASE_MODEL' 
-    BeamJob = 'BEAM_JOB' 
-    blog = 'BLOG' 
-    classifier = 'CLASSIFIER' 
-    collection = 'COLLECTION' 
-    config = 'CONFIG' 
-    email = 'EMAIL' 
-    exploration = 'EXPLORATION' 
-    feedback = 'FEEDBACK' 
-    improvements = 'IMPROVEMENTS' 
-    job = 'JOB' 
-    opportunity = 'OPPORTUNITY' 
-    question = 'QUESTION' 
-    recommendations = 'RECOMMENDATIONS' 
-    skill = 'SKILL' 
-    statistics = 'STATISTICS' 
-    auth = 'AUTH' 
-    story = 'STORY' 
-    subtopic = 'SUBTOPIC' 
-    suggestion = 'SUGGESTION' 
-    topic = 'TOPIC' 
-    translation = 'TRANSLATION' 
-    user = 'USER' 
+    ACTIVITY = 'activity' 
+    APPFEEDBACKREPORT = 'app_feedback_report' 
+    AUDIT = 'audit' 
+    BASEMODEL = 'base_model' 
+    BEAMJOB = 'beam_job' 
+    BLOG = 'blog' 
+    CLASSIFIER = 'classifier' 
+    COLLECTION = 'collection' 
+    CONFIG = 'config' 
+    EMAIL = 'email' 
+    EXPLORATION = 'exploration' 
+    FEEDBACK = 'feedback' 
+    IMPROVEMENTS = 'improvements' 
+    JOB = 'job' 
+    OPPORTUNITY = 'opportunity' 
+    QUESTION = 'question' 
+    RECOMMENDATIONS = 'recommendations' 
+    SKILL = 'skill' 
+    STATISTICS = 'statistics' 
+    AUTH = 'auth' 
+    STORY = 'story' 
+    SUBTOPIC = 'subtopic' 
+    SUGGESTION = 'suggestion' 
+    TOPIC = 'topic' 
+    TRANSLATION = 'translation' 
+    USER = 'user' 
 MODULES_WITH_PSEUDONYMIZABLE_CLASSES = (  
-    NAMES.AppFeedbackReport, NAMES.blog, NAMES.collection, NAMES.config,
-    NAMES.exploration, NAMES.feedback, NAMES.question, NAMES.skill, NAMES.story,
-    NAMES.subtopic, NAMES.suggestion, NAMES.topic
+    NAMES.APPFEEDBACKREPORT, NAMES.BLOG, NAMES.COLLECTION, NAMES.CONFIG,
+    NAMES.EXPLORATION, NAMES.FEEDBACK, NAMES.QUESTION, NAMES.SKILL, NAMES.STORY,
+    NAMES.SUBTOPIC, NAMES.SUGGESTION, NAMES.TOPIC
 )
 GAE_PLATFORM = 'gae'
 class Platform:
@@ -73,91 +73,91 @@ class _Gae(Platform):
         """
         returned_models: List[ModuleType] = []
         for name in model_names:
-            if name == NAMES.activity:
+            if name == NAMES.ACTIVITY:
                 from core.storage.activity import gae_models as activity_models
                 returned_models.append(activity_models)
-            elif name == NAMES.AppFeedbackReport:
+            elif name == NAMES.APPFEEDBACKREPORT:
                 from core.storage.app_feedback_report import (
                     gae_models as app_feedback_report_models)
                 returned_models.append(app_feedback_report_models)
-            elif name == NAMES.audit:
+            elif name == NAMES.AUDIT:
                 from core.storage.audit import gae_models as audit_models
                 returned_models.append(audit_models)
-            elif name == NAMES.auth:
+            elif name == NAMES.AUTH:
                 from core.storage.auth import gae_models as auth_models
                 returned_models.append(auth_models)
-            elif name == NAMES.BaseModel:
+            elif name == NAMES.BASEMODEL:
                 from core.storage.base_model import gae_models as base_model
                 returned_models.append(base_model)
-            elif name == NAMES.BeamJob:
+            elif name == NAMES.BEAMJOB:
                 from core.storage.beam_job import gae_models as beam_job_models
                 returned_models.append(beam_job_models)
-            elif name == NAMES.blog:
+            elif name == NAMES.BLOG:
                 from core.storage.blog import gae_models as blog_models
                 returned_models.append(blog_models)
-            elif name == NAMES.classifier:
+            elif name == NAMES.CLASSIFIER:
                 from core.storage.classifier import (
                     gae_models as classifier_models)
                 returned_models.append(classifier_models)
-            elif name == NAMES.collection:
+            elif name == NAMES.COLLECTION:
                 from core.storage.collection import (
                     gae_models as collection_models)
                 returned_models.append(collection_models)
-            elif name == NAMES.config:
+            elif name == NAMES.CONFIG:
                 from core.storage.config import gae_models as config_models
                 returned_models.append(config_models)
-            elif name == NAMES.email:
+            elif name == NAMES.EMAIL:
                 from core.storage.email import gae_models as email_models
                 returned_models.append(email_models)
-            elif name == NAMES.exploration:
+            elif name == NAMES.EXPLORATION:
                 from core.storage.exploration import gae_models as exp_models
                 returned_models.append(exp_models)
-            elif name == NAMES.feedback:
+            elif name == NAMES.FEEDBACK:
                 from core.storage.feedback import gae_models as feedback_models
                 returned_models.append(feedback_models)
-            elif name == NAMES.improvements:
+            elif name == NAMES.IMPROVEMENTS:
                 from core.storage.improvements import (
                     gae_models as improvements_models)
                 returned_models.append(improvements_models)
-            elif name == NAMES.job:
+            elif name == NAMES.JOB:
                 from core.storage.job import gae_models as job_models
                 returned_models.append(job_models)
-            elif name == NAMES.opportunity:
+            elif name == NAMES.OPPORTUNITY:
                 from core.storage.opportunity import (
                     gae_models as opportunity_models)
                 returned_models.append(opportunity_models)
-            elif name == NAMES.question:
+            elif name == NAMES.QUESTION:
                 from core.storage.question import gae_models as question_models
                 returned_models.append(question_models)
-            elif name == NAMES.recommendations:
+            elif name == NAMES.RECOMMENDATIONS:
                 from core.storage.recommendations import (
                     gae_models as recommendations_models)
                 returned_models.append(recommendations_models)
-            elif name == NAMES.skill:
+            elif name == NAMES.SKILL:
                 from core.storage.skill import gae_models as skill_models
                 returned_models.append(skill_models)
-            elif name == NAMES.statistics:
+            elif name == NAMES.STATISTICS:
                 from core.storage.statistics import (
                     gae_models as statistics_models)
                 returned_models.append(statistics_models)
-            elif name == NAMES.story:
+            elif name == NAMES.STORY:
                 from core.storage.story import gae_models as story_models
                 returned_models.append(story_models)
-            elif name == NAMES.subtopic:
+            elif name == NAMES.SUBTOPIC:
                 from core.storage.subtopic import gae_models as subtopic_models
                 returned_models.append(subtopic_models)
-            elif name == NAMES.suggestion:
+            elif name == NAMES.SUGGESTION:
                 from core.storage.suggestion import (
                     gae_models as suggestion_models)
                 returned_models.append(suggestion_models)
-            elif name == NAMES.topic:
+            elif name == NAMES.TOPIC:
                 from core.storage.topic import gae_models as topic_models
                 returned_models.append(topic_models)
-            elif name == NAMES.translation:
+            elif name == NAMES.TRANSLATION:
                 from core.storage.translation import (
                     gae_models as translation_models)
                 returned_models.append(translation_models)
-            elif name == NAMES.user:
+            elif name == NAMES.USER:
                 from core.storage.user import gae_models as user_models
                 returned_models.append(user_models)
             else:
