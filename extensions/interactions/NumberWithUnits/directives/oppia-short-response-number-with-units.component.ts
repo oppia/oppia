@@ -40,12 +40,12 @@ export class ShortResponseNumberWithUnitsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const _answer: NumberWithUnitsAnswer = (
+    const answer: NumberWithUnitsAnswer = (
       this.htmlEscaperService.escapedJsonToObj(
         this.answer
       ) as NumberWithUnitsAnswer);
     this.responses = this.numberWithUnitsObjectFactory.fromDict(
-      _answer).toString();
+      answer).toString();
   }
 }
 

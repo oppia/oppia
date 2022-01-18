@@ -19,10 +19,12 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { downgradeComponent } from '@angular/upgrade/static';
+
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { downgradeComponent } from '@angular/upgrade/static';
 import { InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
+
 import { NumberWithUnitsAnswer, InteractionAnswer } from 'interactions/answer-defs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { HelpModalNumberWithUnitsComponent } from './oppia-help-modal-number-with-units.component';
@@ -35,7 +37,7 @@ import { NumberWithUnitsRulesService } from './number-with-units-rules.service';
   styleUrls: []
 })
 export class InteractiveNumberWithUnitsComponent
-implements OnInit, OnDestroy {
+  implements OnInit, OnDestroy {
   @Input() labelForFocusTarget: string;
   @Input() savedSolution: InteractionAnswer;
   componentSubscriptions: Subscription = new Subscription();
@@ -48,6 +50,7 @@ implements OnInit, OnDestroy {
     type: 'unicode',
     ui_config: {}
   };
+
   constructor(
     private currentInteractionService: CurrentInteractionService,
     private focusManagerService: FocusManagerService,
