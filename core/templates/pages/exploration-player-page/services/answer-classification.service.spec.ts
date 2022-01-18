@@ -254,7 +254,7 @@ describe('Answer Classification Service', () => {
       );
     });
 
-    it('should fail if if no answer group matches and' +
+    it('should fail if no answer group matches and' +
     'default outcome of interaction is not defined', () => {
       spyOn(alertsService, 'addWarning').and.callThrough();
 
@@ -460,29 +460,25 @@ describe('Answer Classification Service', () => {
       };
     });
 
-    it(
-      'should query the prediction service if no answer group matches and ' +
-        'interaction is trainable',
-      () => {
-        spyOn(
-          interactionSpecsService, 'isInteractionTrainable'
-        ).and.returnValue(true);
+    it('should query the prediction service if no answer group matches and ' +
+        'interaction is trainable', () => {
+      spyOn(
+        interactionSpecsService, 'isInteractionTrainable'
+      ).and.returnValue(true);
 
-        const state = (
-          stateObjectFactory.createFromBackendDict(stateName, stateDict));
+      const state = (
+        stateObjectFactory.createFromBackendDict(stateName, stateDict));
 
-        expect(
-          answerClassificationService.getMatchingClassificationResult(
-            state.name, state.interaction, '0', textInputRulesService)
-        ).toEqual(
-          new AnswerClassificationResult(
-            state.interaction.answerGroups[1].outcome, 1, null,
-            ExplorationPlayerConstants.STATISTICAL_CLASSIFICATION));
-      });
+      expect(
+        answerClassificationService.getMatchingClassificationResult(
+          state.name, state.interaction, '0', textInputRulesService)
+      ).toEqual(
+        new AnswerClassificationResult(
+          state.interaction.answerGroups[1].outcome, 1, null,
+          ExplorationPlayerConstants.STATISTICAL_CLASSIFICATION));
+    });
 
-    it(
-      'should return the default rule if prediction service' +
-          'cannot predict the answer group index and returns -1',
+    it('should get default rule if the answer group can not be predicted',
       () => {
         spyOn(predictionAlgorithmRegistryService, 'getPredictionService').and
           .returnValue({
@@ -673,129 +669,44 @@ describe('Answer Classification Service', () => {
             state.interaction.answerGroups[1].outcome, 1, 0,
             ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION));
       });
-  });
 
-  describe('whether answer is classified explicitly or' +
-  'goes into new state', () => {
-    let stateDict;
-    let expId = '0';
-
-    beforeEach(() => {
-      spyOn(
-        interactionSpecsService, 'isInteractionTrainable'
-      ).and.returnValue(true);
-      spyOn(appService, 'isMachineLearningClassificationEnabled')
-        .and.returnValue(true);
-      stateClassifierMappingService.init(expId, 0);
-
-      stateDict = {
-        content: {
-          content_id: 'content',
-          html: 'content'
-        },
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {},
-            feedback_2: {}
-          }
-        },
-        interaction: {
-          id: 'TextInput',
-          customization_args: {
-            placeholder: {
-              value: {
-                content_id: 'ca_placeholder_0',
-                unicode_str: ''
-              }
-            },
-            rows: { value: 1 }
-          },
-          answer_groups: [{
-            outcome: {
-              dest: 'outcome 1',
-              feedback: {
-                content_id: 'feedback_1',
-                html: ''
-              },
-              labelled_as_correct: false,
-              param_changes: [],
-              refresher_exploration_id: null,
-              missing_prerequisite_skill_id: null
-            },
-            training_data: ['abc', 'input'],
-            rule_specs: [{
-              rule_type: 'Equals',
-              inputs: {
-                x: {
-                  contentId: 'rule_input_0',
-                  normalizedStrSet: ['equal']
-                }
-              }
-            }],
-          }],
-          default_outcome: {
-            dest: stateName,
-            feedback: {
-              content_id: 'default_outcome',
-              html: ''
-            },
-            labelled_as_correct: false,
-            param_changes: [],
-            refresher_exploration_id: null,
-            missing_prerequisite_skill_id: null
-          },
-          hints: []
-        },
-        param_changes: [],
-        solicit_answer_details: false,
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {},
-            feedback_2: {}
-          }
-        }
-      };
-    });
-
-    it('should return false when no answer group matches and' +
-    'default outcome has destination equal to state name', () => {
+    it('should check whether answer is classified explicitly ' +
+        'or goes into new state', () => {
       spyOn(answerClassificationService, 'getMatchingClassificationResult')
         .and.callThrough();
 
-      const state = (
+      // Returns false when no answer group matches and
+      // default outcome has destination equal to state name.
+
+      stateDict.interaction.default_outcome.dest = stateName;
+      let state1 = (
         stateObjectFactory.createFromBackendDict(stateName, stateDict));
 
-      let result = (
+      let res1 = (
         answerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
-          state.name, state, '777', textInputRulesService));
+          state1.name, state1, '777', textInputRulesService));
 
-      expect(result).toBe(false);
+      expect(res1).toBe(false);
       expect(
         answerClassificationService.getMatchingClassificationResult
       ).toHaveBeenCalledWith(
-        state.name, state.interaction, '777', textInputRulesService);
-    });
+        state1.name, state1.interaction, '777', textInputRulesService);
 
-    it('should return true if any rule in any answer group matches', () => {
-      spyOn(answerClassificationService, 'getMatchingClassificationResult')
-        .and.callThrough();
+      // Returns true if any answer group matches.
 
-      const state = (
+      stateDict.interaction.default_outcome.dest = 'default';
+      let state2 = (
         stateObjectFactory.createFromBackendDict(stateName, stateDict));
 
-      let result = (
+      let res2 = (
         answerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
-          state.name, state, 'equal', textInputRulesService));
+          state2.name, state2, 'equal', textInputRulesService));
 
-      expect(result).toBe(true);
+      expect(res2).toBe(true);
       expect(
         answerClassificationService.getMatchingClassificationResult
       ).toHaveBeenCalledWith(
-        state.name, state.interaction, 'equal', textInputRulesService);
+        state2.name, state2.interaction, 'equal', textInputRulesService);
     });
   });
 });

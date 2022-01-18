@@ -246,7 +246,9 @@ describe('Collection player page component', () => {
     expect(pathIconParameters).toEqual(collectionNodesList);
   }));
 
-  it('should check whether the exploration is completed', fakeAsync(() => {
+  it('should check whether the exploration is completed when ' +
+      'collection playthrough is available',
+  fakeAsync(() => {
     spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
       .and.resolveTo(sampleCollection);
     spyOn(userService, 'getUserInfoAsync')
@@ -255,14 +257,28 @@ describe('Collection player page component', () => {
     // Loading collections.
     component.ngOnInit();
     tick();
-    let res1 = component.isCompletedExploration('123');
+    let res = component.isCompletedExploration('123');
 
-    expect(res1).toEqual(false);
+    expect(res).toEqual(false);
+  }));
 
+  it('should return false on checking whether exploration is completed ' +
+      'when collection playthrough is not available',
+  fakeAsync(() => {
+    spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
+      .and.resolveTo(sampleCollection);
+    spyOn(userService, 'getUserInfoAsync')
+      .and.returnValue(Promise.resolve(userInfoForCollectionCreator));
+
+    // Loading collections.
+    component.ngOnInit();
+    tick();
+
+    // This happens when collection is not loaded.
     component.collectionPlaythrough = undefined;
-    let res2 = component.isCompletedExploration('123');
+    let res = component.isCompletedExploration('123');
 
-    expect(res2).toEqual(false);
+    expect(res).toEqual(false);
   }));
 
   it('should generate empty path parameters when collection ' +
@@ -481,7 +497,7 @@ describe('Collection player page component', () => {
   }));
 
   it('should close the exploration card and scroll into the' +
-      'exploration icon location on clicking outside of the exploration card',
+      'exploration icon location on touching outside of the exploration card',
   fakeAsync(() => {
     spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
       .and.resolveTo(sampleCollection);
