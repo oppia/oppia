@@ -120,12 +120,16 @@ class UserAuthDetailsModelTests(test_utils.GenericTestBase):
         user_auth_model = (
             auth_models.UserAuthDetailsModel
                 .get_by_id(self.PROFILE_2_ID))
-
-        # Ensure that both the model and parent_user_id exist.
         self.assertIsNotNone(user_auth_model)
+
+        # The parent_user_id should exist to fetch the
+        # parent_model further on in the test.
         self.assertIsNotNone(user_auth_model.parent_user_id)
 
-        # Create an object for the purpose of testing.
+        # Create the model instance to be fetched using
+        # user_auth_model.parent_user_id. The fetched
+        # parent_model will provide the username to be
+        # returned by .export_data().
         user_models.UserSettingsModel(
             id=self.USER_ID,
             email='user@example.com',
@@ -268,8 +272,7 @@ class UserIdentifiersModelTests(test_utils.GenericTestBase):
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
         }
         self.assertEqual(
-            auth_models.UserIdentifiersModel
-                .get_export_policy(),
+            auth_models.UserIdentifiersModel.get_export_policy(),
             expected_export_policy_dict)
 
     def test_apply_deletion_policy_for_registered_user_deletes_them(
