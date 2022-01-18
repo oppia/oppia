@@ -12,6 +12,11 @@ omit =
     # run under Python 3.
     core/python_utils.py
 
+# exclude_lines is used to exclude a particular clause.
+# Any line with a comment of “pragma: no cover” is excluded.
+# If that line introduces a clause, for example, an if clause, function or class,
+# then the entire clause is also excluded. Similarly, @overload is used to exclude 
+# a particular function's multiple signatures, which are skipped during runtime.
 [report]
 exclude_lines =
     pragma: no cover

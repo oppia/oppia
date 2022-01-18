@@ -97,9 +97,11 @@ class ConfigPropertyRegistryTests(test_utils.GenericTestBase):
     def test_config_property_schemas_are_valid(self) -> None:
         for property_name in (
                 config_domain.Registry.get_all_config_property_names()):
-            schema = config_domain.Registry.get_config_property( # type: ignore[union-attr]
-                property_name).schema
-            schema_utils_test.validate_schema(schema)
+            config_property = config_domain.Registry.get_config_property(
+                property_name)
+            # Ruling out the possibility of None for mypy type checking.
+            assert config_property is not None
+            schema_utils_test.validate_schema(config_property.schema)
 
     def test_get_exception_creating_new_config_property_with_existing_name(
         self
