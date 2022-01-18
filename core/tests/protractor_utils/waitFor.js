@@ -26,6 +26,7 @@ var Constants = require('./ProtractorConstants');
 // mobile device.
 var DEFAULT_WAIT_TIME_MSECS = browser.isMobile ? 20000 : 10000;
 var DEFAULT_WAIT_TIME_MSECS_FOR_NEW_TAB = 15000;
+var DEFAULT_WAIT_TIME_MSECS_FOR_CLIENT_SIDE_REDIRECT = 15000;
 
 var toastInfoElement = element(by.css('.toast-info'));
 var toastSuccessElement = element(by.css('.toast-success'));
@@ -198,7 +199,8 @@ var clientSideRedirection = async function(
     var url = await browser.driver.getCurrentUrl();
     // Condition to wait on.
     return check(decodeURIComponent(url));
-  }, DEFAULT_WAIT_TIME_MSECS, 'Takes time for url redirection');
+  }, DEFAULT_WAIT_TIME_MSECS_FOR_CLIENT_SIDE_REDIRECT,
+     'Client Side Redirection taking too long');
 
   // Waiting for caller specified conditions.
   await waitForCallerSpecifiedConditions();
