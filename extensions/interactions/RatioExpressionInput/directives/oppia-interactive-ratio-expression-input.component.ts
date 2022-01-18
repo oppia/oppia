@@ -106,7 +106,7 @@ implements OnInit, OnDestroy {
 
   submitAnswer(): void {
     try {
-      var ratioExpression =
+      const ratioExpression =
         Ratio.fromRawInputString(this.answer);
       if (
         (

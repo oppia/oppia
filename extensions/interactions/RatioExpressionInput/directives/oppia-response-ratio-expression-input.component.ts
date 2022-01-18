@@ -41,11 +41,11 @@ export class ResponseRatioExpressionInputComponent implements OnInit {
   constructor(private htmlEscaperService: HtmlEscaperService) {}
 
   ngOnInit(): void {
-    const _answer: RatioInputAnswer = this.htmlEscaperService.escapedJsonToObj(
+    const answer: RatioInputAnswer = this.htmlEscaperService.escapedJsonToObj(
       this.answer
     ) as RatioInputAnswer;
 
-    this.responses = Ratio.fromList(_answer).toAnswerString();
+    this.responses = Ratio.fromList(answer).toAnswerString();
   }
 }
 
