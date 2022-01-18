@@ -1232,7 +1232,7 @@ def _compute_summary_of_exploration(exploration):
     contributor_ids = list(contributors_summary.keys())
 
     exploration_model_last_updated = datetime.datetime.fromtimestamp(
-        (get_last_updated_by_human_ms(exploration.id) / 1000.0))
+        get_last_updated_by_human_ms(exploration.id) / 1000.0)
     exploration_model_created_on = exploration.created_on
     first_published_msec = exp_rights.first_published_msec
     exp_summary = exp_domain.ExplorationSummary(
@@ -1683,7 +1683,7 @@ def get_scaled_average_rating(ratings):
         return 0
     average_rating = get_average_rating(ratings)
     z = 1.9599639715843482
-    x = ((average_rating - 1) // 4)
+    x = (average_rating - 1) / 4
     # The following calculates the lower bound Wilson Score as documented
     # http://www.goproblems.com/test/wilson/wilson.php?v1=0&v2=0&v3=0&v4=&v5=1
     a = x + ((z**2) // (2 * n))

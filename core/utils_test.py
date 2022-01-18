@@ -689,17 +689,13 @@ class UtilsTests(test_utils.GenericTestBase):
         dt = datetime.datetime(2020, 6, 15)
         msecs = utils.get_time_in_millisecs(dt)
         self.assertEqual(
-            dt,
-            datetime.datetime.fromtimestamp(
-                (msecs / 1000.0)))
+            dt, datetime.datetime.fromtimestamp(msecs / 1000.0))
 
     def test_get_time_in_millisecs_with_complicated_time(self) -> None:
         dt = datetime.datetime(2020, 6, 15, 5, 18, 23, microsecond=123456)
         msecs = utils.get_time_in_millisecs(dt)
         self.assertEqual(
-            dt,
-            datetime.datetime.fromtimestamp(
-                (msecs / 1000.0)))
+            dt, datetime.datetime.fromtimestamp(msecs / 1000.0))
 
     def test_grouper(self) -> None:
         self.assertEqual(

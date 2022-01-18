@@ -1269,7 +1269,7 @@ class LoadingAndDeletionOfCollectionDemosTests(CollectionServicesUnitTests):
             collection.validate()
 
             duration = datetime.datetime.utcnow() - start_time
-            processing_time = duration.seconds + (duration.microseconds // 1E6)
+            processing_time = duration.seconds + (duration.microseconds / 1E6)
             self.log_line(
                 'Loaded and validated collection %s (%.2f seconds)' %
                 (collection.title, processing_time))

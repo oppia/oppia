@@ -453,7 +453,7 @@ class TestUtilsTests(test_utils.GenericTestBase):
 
     def test_swap_to_always_raise_with_error(self):
         obj = mock.Mock()
-        obj.func = lambda: (1 // 0)
+        obj.func = lambda: 1 // 0
 
         with self.assertRaisesRegex(
             ZeroDivisionError, 'integer division or modulo by zero'

@@ -545,7 +545,7 @@ def get_human_readable_time_string(time_msec: float) -> str:
     # Ignoring arg-type because we are preventing direct usage of 'str' for
     # Python3 compatibilty.
     return time.strftime(
-        '%B %d %H:%M:%S', time.gmtime((time_msec / 1000.0)))
+        '%B %d %H:%M:%S', time.gmtime(time_msec / 1000.0))
 
 
 def create_string_from_largest_unit_in_timedelta(
