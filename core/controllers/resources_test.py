@@ -19,7 +19,7 @@ from __future__ import annotations
 import os
 
 from core import feconf
-from core import python_utils
+from core import utils
 from core.constants import constants
 from core.domain import exp_services
 from core.domain import fs_domain
@@ -59,7 +59,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
             'rb', encoding=None
         ) as f:
@@ -89,7 +89,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
             'rb', encoding=None
         ) as f:
@@ -114,7 +114,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
             'rb', encoding=None
         ) as f:
@@ -166,7 +166,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
         ) as f:
             raw_image = f.read()
@@ -188,7 +188,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
         ) as f:
             raw_image = f.read()
@@ -210,7 +210,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
             encoding=None
         ) as f:
@@ -233,7 +233,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
             encoding=None
         ) as f:
@@ -256,7 +256,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
             encoding=None
         ) as f:
@@ -287,7 +287,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         filename_with_correct_extension = (
             '%s.png' % filename_without_extension)
 
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
             'rb', encoding=None
         ) as f:
@@ -414,7 +414,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
             'rb', encoding=None
         ) as f:
@@ -439,7 +439,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
     def test_missing_extensions_are_detected(self):
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
             'rb', encoding=None
         ) as f:
@@ -465,7 +465,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
             'rb', encoding=None
         ) as f:
@@ -533,7 +533,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
     def test_guest_can_not_upload(self):
         csrf_token = self.get_new_csrf_token()
 
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_MP3),
             'rb', encoding=None
         ) as f:
@@ -553,7 +553,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_MP3),
             'rb', encoding=None
         ) as f:
@@ -571,7 +571,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_MP3),
             'rb', encoding=None
         ) as f:
@@ -593,7 +593,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         fs = fs_domain.AbstractFileSystem(file_system_class(
             feconf.ENTITY_TYPE_EXPLORATION, '0'))
 
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_FLAC),
             'rb', encoding=None
         ) as f:
@@ -621,7 +621,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         # Use an accepted audio extension in mismatched_filename
         # that differs from the uploaded file's audio type.
         mismatched_filename = 'test.flac'
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_MP3),
             'rb', encoding=None
         ) as f:
@@ -651,7 +651,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
             'rb', encoding=None
         ) as f:
@@ -673,7 +673,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(
                 feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_MPEG_CONTAINER),
             'rb', encoding=None
@@ -698,7 +698,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         supplied_filename = (
             '%s.%s' % (filename_without_extension, invalid_extension))
 
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_MP3),
             'rb', encoding=None
         ) as f:
@@ -760,7 +760,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         missing_extension_filename = 'test'
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_MP3),
             'rb', encoding=None
         ) as f:
@@ -786,7 +786,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(
                 feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_OVER_MAX_LENGTH),
             'rb', encoding=None
@@ -816,7 +816,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         # Use an accepted audio extension in mismatched_filename
         # that differs from the uploaded file's audio type.
         mismatched_filename = 'test.mp3'
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(
                 feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_FLAC),
             'rb', encoding=None
@@ -841,7 +841,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_MP3),
             'rb', encoding=None
         ) as f:

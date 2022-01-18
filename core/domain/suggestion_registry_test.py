@@ -20,7 +20,7 @@ import datetime
 import os
 
 from core import feconf
-from core import python_utils
+from core import utils
 from core import utils
 from core.domain import config_services
 from core.domain import exp_domain
@@ -2395,7 +2395,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         question_state_dict = self._create_valid_question_data(
             'default_state').to_dict()
         question_state_dict['content']['html'] = html_content
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb', encoding=None) as f:
             raw_image = f.read()
@@ -2440,7 +2440,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         suggestion.accept('commit_message')
 
     def test_accept_suggestion_with_image_region_interactions(self):
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
             encoding=None) as f:
             original_image_content = f.read()

@@ -28,7 +28,7 @@ import tempfile
 import urllib.request as urlrequest
 import zipfile
 
-from core import python_utils
+from core import utils
 from core import utils
 from core.tests import test_utils
 
@@ -148,7 +148,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             # So, the mock returns a file object as a mock so that the read
             # function can work correctly.
             temp_file = tempfile.NamedTemporaryFile()
-            file_obj = python_utils.open_file(temp_file.name, 'r')
+            file_obj = utils.open_file(temp_file.name, 'r')
             return file_obj
         def mock_string_io(buffer_value):  # pylint: disable=unused-argument
             return MOCK_TMP_UNZIP_PATH
@@ -191,7 +191,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
     def test_get_file_contents(self):
         temp_file = tempfile.NamedTemporaryFile().name
         actual_text = 'Testing install third party file.'
-        with python_utils.open_file(temp_file, 'w') as f:
+        with utils.open_file(temp_file, 'w') as f:
             f.write(actual_text)
         self.assertEqual(
             install_third_party.get_file_contents(temp_file), actual_text)
@@ -199,7 +199,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
     def test_return_json(self):
         temp_file = tempfile.NamedTemporaryFile().name
         actual_text = '{"Testing": "install_third_party"}'
-        with python_utils.open_file(temp_file, 'w') as f:
+        with utils.open_file(temp_file, 'w') as f:
             f.write(actual_text)
         self.assertEqual(
             install_third_party.return_json(temp_file),

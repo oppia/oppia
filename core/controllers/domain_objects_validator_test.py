@@ -19,7 +19,7 @@ from __future__ import annotations
 import os
 
 from core import feconf
-from core import python_utils
+from core import utils
 from core import utils
 from core.controllers import domain_objects_validator
 from core.tests import test_utils
@@ -289,7 +289,7 @@ class ValidateSuggestionImagesTests(test_utils.GenericTestBase):
     def test_valid_images_do_not_raises_exception(self) -> None:
         files = {'img.png': None, 'test2_svg.svg': None}
         for filename in files:
-            with python_utils.open_file(
+            with utils.open_file(
                 os.path.join(feconf.TESTS_DATA_DIR, filename), 'rb',
                 encoding=None
             ) as f:

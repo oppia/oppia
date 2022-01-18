@@ -33,7 +33,7 @@ import tempfile
 import time
 
 from core import constants
-from core import python_utils
+from core import utils
 from core.tests import test_utils
 
 from . import common
@@ -442,7 +442,7 @@ class CommonTests(test_utils.GenericTestBase):
         temp_file = tempfile.NamedTemporaryFile(dir=temp_dirpath)
         temp_file.name = 'temp_file'
         temp_file_path = os.path.join(temp_dirpath, 'temp_file')
-        with python_utils.open_file(temp_file_path, 'w') as f:
+        with utils.open_file(temp_file_path, 'w') as f:
             f.write('content')
 
         common.recursive_chown(root_temp_dir, os.getuid(), -1)
@@ -507,7 +507,7 @@ class CommonTests(test_utils.GenericTestBase):
             """
             temp_file = tempfile.NamedTemporaryFile()
             temp_file.name = 'temp_file'
-            with python_utils.open_file('temp_file', 'w') as f:
+            with utils.open_file('temp_file', 'w') as f:
                 f.write('content')
 
             self.assertTrue(os.path.exists('temp_file'))
@@ -661,7 +661,7 @@ class CommonTests(test_utils.GenericTestBase):
                 '"DEV_MODE": true,',
                 expected_number_of_replacements=1
             )
-        with python_utils.open_file(origin_file, 'r') as f:
+        with utils.open_file(origin_file, 'r') as f:
             self.assertEqual(expected_lines, f.readlines())
         # Revert the file.
         os.remove(origin_file)
@@ -674,7 +674,7 @@ class CommonTests(test_utils.GenericTestBase):
             'core', 'tests', 'data', 'inplace_replace_test.json')
         backup_file = os.path.join(
             'core', 'tests', 'data', 'inplace_replace_test.json.bak')
-        with python_utils.open_file(origin_file, 'r') as f:
+        with utils.open_file(origin_file, 'r') as f:
             origin_content = f.readlines()
 
         with self.assertRaisesRegex(
@@ -687,7 +687,7 @@ class CommonTests(test_utils.GenericTestBase):
                 expected_number_of_replacements=1
             )
         self.assertFalse(os.path.isfile(backup_file))
-        with python_utils.open_file(origin_file, 'r') as f:
+        with utils.open_file(origin_file, 'r') as f:
             new_content = f.readlines()
         self.assertEqual(origin_content, new_content)
 
@@ -696,7 +696,7 @@ class CommonTests(test_utils.GenericTestBase):
             'core', 'tests', 'data', 'inplace_replace_test.json')
         backup_file = os.path.join(
             'core', 'tests', 'data', 'inplace_replace_test.json.bak')
-        with python_utils.open_file(origin_file, 'r') as f:
+        with utils.open_file(origin_file, 'r') as f:
             origin_content = f.readlines()
 
         def mock_compile(unused_arg):
@@ -710,7 +710,7 @@ class CommonTests(test_utils.GenericTestBase):
             common.inplace_replace_file(
                 origin_file, '"DEV_MODE": .*', '"DEV_MODE": true,')
         self.assertFalse(os.path.isfile(backup_file))
-        with python_utils.open_file(origin_file, 'r') as f:
+        with utils.open_file(origin_file, 'r') as f:
             new_content = f.readlines()
         self.assertEqual(origin_content, new_content)
 
@@ -719,7 +719,7 @@ class CommonTests(test_utils.GenericTestBase):
             os.path.join('core', 'tests', 'data', 'inplace_replace_test.json'))
         backup_file_path = '%s.bak' % file_path
 
-        with python_utils.open_file(file_path, 'r') as f:
+        with utils.open_file(file_path, 'r') as f:
             self.assertEqual(f.readlines(), [
                 '{\n',
                 '    "RANDMON1" : "randomValue1",\n',
@@ -731,7 +731,7 @@ class CommonTests(test_utils.GenericTestBase):
 
         replace_file_context = common.inplace_replace_file_context(
             file_path, '"DEV_MODE": .*', '"DEV_MODE": true,')
-        with replace_file_context, python_utils.open_file(file_path, 'r') as f:
+        with replace_file_context, utils.open_file(file_path, 'r') as f:
             self.assertEqual(f.readlines(), [
                 '{\n',
                 '    "RANDMON1" : "randomValue1",\n',
@@ -742,7 +742,7 @@ class CommonTests(test_utils.GenericTestBase):
             ])
             self.assertTrue(os.path.isfile(backup_file_path))
 
-        with python_utils.open_file(file_path, 'r') as f:
+        with utils.open_file(file_path, 'r') as f:
             self.assertEqual(f.readlines(), [
                 '{\n',
                 '    "RANDMON1" : "randomValue1",\n',
@@ -783,7 +783,7 @@ class CommonTests(test_utils.GenericTestBase):
         try:
             os.makedirs('readme_test_dir')
             common.create_readme('readme_test_dir', 'Testing readme.')
-            with python_utils.open_file('readme_test_dir/README.md', 'r') as f:
+            with utils.open_file('readme_test_dir/README.md', 'r') as f:
                 self.assertEqual(f.read(), 'Testing readme.')
         finally:
             if os.path.exists('readme_test_dir'):

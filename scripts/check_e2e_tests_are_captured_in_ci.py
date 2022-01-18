@@ -21,7 +21,7 @@ from __future__ import annotations
 import os
 import re
 
-from core import python_utils
+from core import utils
 from core import utils
 
 # These test suites are not present in CI. One is extra
@@ -78,7 +78,7 @@ def read_protractor_conf_file():
     Returns:
         str. The contents of protractor.conf.js, as a string.
     """
-    protractor_config_file_content = python_utils.open_file(
+    protractor_config_file_content = utils.open_file(
         PROTRACTOR_CONF_FILE_PATH, 'r').read()
     return protractor_config_file_content
 
@@ -92,7 +92,7 @@ def read_and_parse_ci_config_files():
     ci_dicts = []
     for filepath in os.listdir(CI_PATH):
         if re.search(r'e2e_.*\.yml', filepath):
-            ci_file_content = python_utils.open_file(
+            ci_file_content = utils.open_file(
                 os.path.join(CI_PATH, filepath), 'r').read()
             ci_dicts.append(ci_file_content)
     return ci_dicts

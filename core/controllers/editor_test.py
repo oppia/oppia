@@ -25,7 +25,7 @@ import os
 import zipfile
 
 from core import feconf
-from core import python_utils
+from core import utils
 from core.constants import constants
 from core.controllers import creator_dashboard
 from core.domain import config_services
@@ -599,7 +599,7 @@ written_translations:
         golden_zip_filepath = os.path.join(
             feconf.TESTS_DATA_DIR,
             'oppia-ThetitleforZIPdownloadhandlertest!-v2-gold.zip')
-        with python_utils.open_file(
+        with utils.open_file(
             golden_zip_filepath, 'rb', encoding=None) as f:
             golden_zipfile = f.read()
         zf_gold = zipfile.ZipFile(io.BytesIO(golden_zipfile))

@@ -29,7 +29,7 @@ import urllib
 
 from core import feconf
 from core import handler_schema_constants
-from core import python_utils
+from core import utils
 from core import utils
 from core.controllers import payload_validator
 from core.domain import auth_domain
@@ -70,7 +70,7 @@ def load_template(filename):
         str. The HTML file content.
     """
     filepath = os.path.join(feconf.FRONTEND_TEMPLATES_DIR, filename)
-    with python_utils.open_file(filepath, 'r') as f:
+    with utils.open_file(filepath, 'r') as f:
         html_text = f.read()
     return html_text
 

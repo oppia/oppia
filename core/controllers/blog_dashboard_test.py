@@ -19,7 +19,7 @@ from __future__ import annotations
 import os
 
 from core import feconf
-from core import python_utils
+from core import utils
 from core import utils
 from core.domain import blog_services
 from core.tests import test_utils
@@ -354,7 +354,7 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
         payload = {
             'thumbnail_filename': 'test_svg.svg'
         }
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
             encoding=None
         ) as f:
@@ -375,7 +375,7 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
             'thumbnail_filename': 'cafe.flac'
         }
 
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'cafe.flac'), 'rb',
             encoding=None
         ) as f:

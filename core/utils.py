@@ -35,7 +35,7 @@ import urllib
 import zlib
 
 from core import feconf
-from core import python_utils
+from core import utils
 from core.constants import constants
 
 from typing import (
@@ -112,7 +112,7 @@ def get_file_contents(
     else:
         encoding = 'utf-8'
 
-    with python_utils.open_file( # type: ignore[no-untyped-call]
+    with utils.open_file( # type: ignore[no-untyped-call]
         filepath, mode, encoding=encoding) as f:
         return f.read() # type: ignore[no-any-return]
 

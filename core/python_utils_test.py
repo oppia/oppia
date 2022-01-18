@@ -24,7 +24,7 @@ import os
 import sys
 import unittest
 
-from core import python_utils
+from core import utils
 from core.tests import test_utils
 from core.tests.data import unicode_and_str_handler
 
@@ -44,7 +44,7 @@ class PythonUtilsTests(test_utils.GenericTestBase):
         self.assertEqual(args_list, ['arg1', 'arg2'])
 
     def test_open_file(self):
-        with python_utils.open_file(
+        with utils.open_file(
                 os.path.join('core', 'python_utils.py'), 'r'
         ) as f:
             file_content = f.readlines()
@@ -53,7 +53,7 @@ class PythonUtilsTests(test_utils.GenericTestBase):
     def test_can_not_open_file(self):
         with self.assertRaisesRegex(
             IOError, 'Unable to open file: invalid_file.py'):
-            with python_utils.open_file('invalid_file.py', 'r') as f:
+            with utils.open_file('invalid_file.py', 'r') as f:
                 f.readlines()
 
     def test_divide(self):
@@ -145,7 +145,7 @@ class PythonUtilsForPython3Tests(test_utils.GenericTestBase):
         self.assertIsInstance(
             unicode_and_str_handler.SOME_BINARY_TEXT, bytes)
 
-        with python_utils.open_file(
+        with utils.open_file(
             'core/tests/data/unicode_and_str_handler.py', 'r') as f:
             file_content = f.read()
             self.assertIsInstance(file_content, str)

@@ -28,7 +28,7 @@ import sys
 import tempfile
 
 from core import constants
-from core import python_utils
+from core import utils
 from core.tests import test_utils
 from scripts import common
 from scripts.release_scripts import update_changelog_and_credits
@@ -66,7 +66,7 @@ def read_from_file(filepath):
     Returns:
         list(str). The list of lines in the file.
     """
-    with python_utils.open_file(filepath, 'r') as f:
+    with utils.open_file(filepath, 'r') as f:
         return f.readlines()
 
 
@@ -77,7 +77,7 @@ def write_to_file(filepath, filelines):
         filepath: str. The path of the file to write to.
         filelines: list(str). The lines to write to the file.
     """
-    with python_utils.open_file(filepath, 'w') as f:
+    with utils.open_file(filepath, 'w') as f:
         for line in filelines:
             f.write(line)
 
@@ -264,7 +264,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             write_to_file(MOCK_CONTRIBUTORS_FILEPATH, contributors_filelines)
 
     def test_update_developer_names(self):
-        with python_utils.open_file(
+        with utils.open_file(
             update_changelog_and_credits.ABOUT_PAGE_CONSTANTS_FILEPATH, 'r'
         ) as f:
             about_page_lines = f.readlines()
@@ -276,7 +276,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
 
         tmp_file = tempfile.NamedTemporaryFile()
         tmp_file.name = MOCK_ABOUT_PAGE_CONSTANTS_FILEPATH
-        with python_utils.open_file(
+        with utils.open_file(
             MOCK_ABOUT_PAGE_CONSTANTS_FILEPATH, 'w'
         ) as f:
             for line in about_page_lines:
@@ -299,7 +299,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             update_changelog_and_credits.update_developer_names(
                 release_summary_lines)
 
-        with python_utils.open_file(tmp_file.name, 'r') as f:
+        with utils.open_file(tmp_file.name, 'r') as f:
             about_page_lines = f.readlines()
             start_index = about_page_lines.index(
                 update_changelog_and_credits.CREDITS_START_LINE) + 1
@@ -441,7 +441,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
                         update_changelog_and_credits.main()
 
     def test_get_release_summary_lines(self):
-        with python_utils.open_file(MOCK_RELEASE_SUMMARY_FILEPATH, 'r') as f:
+        with utils.open_file(MOCK_RELEASE_SUMMARY_FILEPATH, 'r') as f:
             correct_lines = f.readlines()
             wrong_lines = []
             for line in correct_lines:
@@ -566,14 +566,14 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             'PACKAGE_JSON_FILEPATH',
             MOCK_PACKAGE_JSON_PATH
         )
-        package_json_content = python_utils.open_file(
+        package_json_content = utils.open_file(
             MOCK_PACKAGE_JSON_PATH, 'r').read()
         package_json_regex = re.compile('"version": ".*"')
         expected_package_json_content = package_json_regex.sub(
             '"version": "1.2.3"', package_json_content)
 
         feconf_swap = self.swap(common, 'FECONF_PATH', MOCK_FECONF_PATH)
-        feconf_content = python_utils.open_file(MOCK_FECONF_PATH, 'r').read()
+        feconf_content = utils.open_file(MOCK_FECONF_PATH, 'r').read()
         feconf_regex = re.compile('OPPIA_VERSION = \'.*\'')
         expected_feconf_content = feconf_regex.sub(
             'OPPIA_VERSION = \'1.2.3\'', feconf_content)
@@ -584,9 +584,9 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
                 stack.enter_context(feconf_swap)
                 stack.enter_context(package_json_swap)
                 update_changelog_and_credits.update_version_in_config_files()
-            updated_package_json_content = python_utils.open_file(
+            updated_package_json_content = utils.open_file(
                 MOCK_PACKAGE_JSON_PATH, 'r').read()
-            updated_feconf_content = python_utils.open_file(
+            updated_feconf_content = utils.open_file(
                 MOCK_FECONF_PATH, 'r').read()
             self.assertEqual(
                 updated_package_json_content, expected_package_json_content)

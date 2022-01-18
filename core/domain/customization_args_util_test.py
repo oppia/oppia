@@ -22,7 +22,7 @@ import os
 import re
 
 from core import feconf
-from core import python_utils
+from core import utils
 from core import utils
 from core.domain import customization_args_util
 from core.domain import interaction_registry
@@ -388,7 +388,7 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
         """
         filepath = os.path.join(
             feconf.INTERACTIONS_DIR, 'customization-args-defs.ts')
-        with python_utils.open_file(filepath, 'r', newline='') as f:
+        with utils.open_file(filepath, 'r', newline='') as f:
             lines = f.readlines()
 
         all_interaction_ids = (
@@ -445,7 +445,7 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
         filepath = os.path.join(
             'core', 'templates', 'domain', 'exploration',
             'InteractionObjectFactory.ts')
-        with python_utils.open_file(filepath, 'r', newline='') as f:
+        with utils.open_file(filepath, 'r', newline='') as f:
             lines = f.readlines()
 
         all_interaction_ids = (
@@ -484,7 +484,7 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
         """
         filepath = os.path.join(
             'typings', 'tests', 'customization-args-defs-test.ts')
-        with python_utils.open_file(filepath, 'r', newline='') as f:
+        with utils.open_file(filepath, 'r', newline='') as f:
             lines = f.readlines()
 
         all_interaction_ids = (

@@ -20,7 +20,7 @@ import logging
 import os
 
 from core import feconf
-from core import python_utils
+from core import utils
 from core import utils
 from core.constants import constants
 from core.domain import exp_domain
@@ -164,7 +164,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         ]
 
         # Save a dummy image on filesystem, to be used as thumbnail.
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb', encoding=None) as f:
             raw_image = f.read()
@@ -253,7 +253,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         ]
 
         # Save a dummy image on filesystem, to be used as thumbnail.
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb', encoding=None) as f:
             raw_image = f.read()

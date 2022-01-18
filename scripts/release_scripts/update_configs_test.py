@@ -23,7 +23,7 @@ import getpass
 import os
 import tempfile
 
-from core import python_utils
+from core import utils
 from core import utils
 from core.tests import test_utils
 from scripts import common
@@ -134,14 +134,14 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         expected_feconf_text = feconf_text.replace(
             'datetime.datetime(2015, 10, 14, 2, 40, 0)',
             'datetime.datetime(2016, 11, 15, 3, 41, 1)')
-        with python_utils.open_file(temp_feconf_path, 'w') as f:
+        with utils.open_file(temp_feconf_path, 'w') as f:
             f.write(feconf_text)
 
         with self.getpass_swap, self.get_org_swap, self.get_repo_swap:
             with self.open_tab_swap, input_swap, get_commit_swap:
                 update_configs.check_updates_to_terms_of_service(
                     temp_feconf_path, 'test-token')
-        with python_utils.open_file(temp_feconf_path, 'r') as f:
+        with utils.open_file(temp_feconf_path, 'r') as f:
             self.assertEqual(f.read(), expected_feconf_text)
 
     def test_missing_mailgun_api_key_line(self):
@@ -161,7 +161,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             'since it is used in\n'
             '# the existing storage models for UserStatsModel.\n'
             'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'%Y-%m-%d\'\n')
-        with python_utils.open_file(temp_feconf_path, 'w') as f:
+        with utils.open_file(temp_feconf_path, 'w') as f:
             f.write(feconf_text)
 
         with getpass_swap, self.assertRaisesRegex(
@@ -185,7 +185,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             'since it is used in\n'
             '# the existing storage models for UserStatsModel.\n'
             'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'%Y-%m-%d\'\n')
-        with python_utils.open_file(temp_feconf_path, 'w') as f:
+        with utils.open_file(temp_feconf_path, 'w') as f:
             f.write(feconf_text)
 
         with getpass_swap, self.assertRaisesRegex(
@@ -235,13 +235,13 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             '# the existing storage models for UserStatsModel.\n'
             'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n' % (
                 mailgun_api_key))
-        with python_utils.open_file(temp_feconf_path, 'w') as f:
+        with utils.open_file(temp_feconf_path, 'w') as f:
             f.write(feconf_text)
 
         with getpass_swap:
             update_configs.add_mailgun_api_key(temp_feconf_path)
         self.assertEqual(check_prompts, expected_check_prompts)
-        with python_utils.open_file(temp_feconf_path, 'r') as f:
+        with utils.open_file(temp_feconf_path, 'r') as f:
             self.assertEqual(f.read(), expected_feconf_text)
 
     def test_invalid_mailchimp_api_key(self):
@@ -289,13 +289,13 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             '# the existing storage models for UserStatsModel.\n'
             'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n' % (
                 mailchimp_api_key))
-        with python_utils.open_file(temp_feconf_path, 'w') as f:
+        with utils.open_file(temp_feconf_path, 'w') as f:
             f.write(feconf_text)
 
         with getpass_swap:
             update_configs.add_mailchimp_api_key(temp_feconf_path)
         self.assertEqual(check_prompts, expected_check_prompts)
-        with python_utils.open_file(temp_feconf_path, 'r') as f:
+        with utils.open_file(temp_feconf_path, 'r') as f:
             self.assertEqual(f.read(), expected_feconf_text)
 
     def test_addition_of_mailgun_api_key(self):
@@ -328,12 +328,12 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             '# the existing storage models for UserStatsModel.\n'
             'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n' % (
                 mailgun_api_key))
-        with python_utils.open_file(temp_feconf_path, 'w') as f:
+        with utils.open_file(temp_feconf_path, 'w') as f:
             f.write(feconf_text)
 
         with getpass_swap:
             update_configs.add_mailgun_api_key(temp_feconf_path)
-        with python_utils.open_file(temp_feconf_path, 'r') as f:
+        with utils.open_file(temp_feconf_path, 'r') as f:
             self.assertEqual(f.read(), expected_feconf_text)
 
     def test_addition_of_mailchimp_api_key(self):
@@ -368,12 +368,12 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             '# the existing storage models for UserStatsModel.\n'
             'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n' % (
                 mailchimp_api_key))
-        with python_utils.open_file(temp_feconf_path, 'w') as f:
+        with utils.open_file(temp_feconf_path, 'w') as f:
             f.write(feconf_text)
 
         with getpass_swap:
             update_configs.add_mailchimp_api_key(temp_feconf_path)
-        with python_utils.open_file(temp_feconf_path, 'r') as f:
+        with utils.open_file(temp_feconf_path, 'r') as f:
             self.assertEqual(f.read(), expected_feconf_text)
 
     def test_feconf_verification_with_correct_config(self):
@@ -393,7 +393,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             '# the existing storage models for UserStatsModel.\n'
             'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n' % (
                 mailgun_api_key, mailchimp_api_key))
-        with python_utils.open_file(temp_feconf_path, 'w') as f:
+        with utils.open_file(temp_feconf_path, 'w') as f:
             f.write(feconf_text)
         update_configs.verify_feconf(temp_feconf_path, True)
 
@@ -409,7 +409,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             'since it is used in\n'
             '# the existing storage models for UserStatsModel.\n'
             'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n')
-        with python_utils.open_file(temp_feconf_path, 'w') as f:
+        with utils.open_file(temp_feconf_path, 'w') as f:
             f.write(feconf_text)
         with self.assertRaisesRegex(
             Exception, 'The mailgun API key must be added before deployment.'):
@@ -430,7 +430,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             '# the existing storage models for UserStatsModel.\n'
             'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n' % (
                 mailgun_api_key))
-        with python_utils.open_file(temp_feconf_path, 'w') as f:
+        with utils.open_file(temp_feconf_path, 'w') as f:
             f.write(feconf_text)
         with self.assertRaisesRegex(
             Exception, 'The mailchimp API key must be added before deployment'):
@@ -449,7 +449,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             'since it is used in\n'
             '# the existing storage models for UserStatsModel.\n'
             'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n')
-        with python_utils.open_file(temp_feconf_path, 'w') as f:
+        with utils.open_file(temp_feconf_path, 'w') as f:
             f.write(feconf_text)
         update_configs.verify_feconf(temp_feconf_path, False)
 
@@ -469,7 +469,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             '# the existing storage models for UserStatsModel.\n'
             'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n' % (
                 mailgun_api_key, mailchimp_api_key))
-        with python_utils.open_file(temp_feconf_path, 'w') as f:
+        with utils.open_file(temp_feconf_path, 'w') as f:
             f.write(feconf_text)
         with self.assertRaisesRegex(
             Exception, 'REDISHOST must be updated before deployment.'):
@@ -494,7 +494,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
                 FECONF_CONFIG_PATH_WITH_EXTRA_LINE, update_configs.FECONF_REGEX)
 
     def test_changes_are_applied_to_config(self):
-        with python_utils.open_file(MOCK_LOCAL_FECONF_PATH, 'r') as f:
+        with utils.open_file(MOCK_LOCAL_FECONF_PATH, 'r') as f:
             original_text = f.read()
         expected_text = original_text.replace(
             'INCOMING_EMAILS_DOMAIN_NAME = \'\'',
@@ -504,10 +504,10 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
                 MOCK_LOCAL_FECONF_PATH,
                 VALID_FECONF_CONFIG_PATH,
                 update_configs.FECONF_REGEX)
-            with python_utils.open_file(MOCK_LOCAL_FECONF_PATH, 'r') as f:
+            with utils.open_file(MOCK_LOCAL_FECONF_PATH, 'r') as f:
                 self.assertEqual(f.read(), expected_text)
         finally:
-            with python_utils.open_file(MOCK_LOCAL_FECONF_PATH, 'w') as f:
+            with utils.open_file(MOCK_LOCAL_FECONF_PATH, 'w') as f:
                 f.write(original_text)
 
     def test_function_calls_with_prompt_for_feconf_and_terms_update(self):
