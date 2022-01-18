@@ -91,6 +91,24 @@ class ExplorationConversionError(Exception):
     pass
 
 
+def open_file(filename, mode, encoding='utf-8', newline=None):
+    """Open file and return a corresponding file object.
+
+    Args:
+        filename: str. The file to be opened.
+        mode: str. Mode in which the file is opened.
+        encoding: str. Encoding in which the file is opened.
+        newline: None|str. Controls how universal newlines work.
+
+    Returns:
+        TextIOWrapper. The file object.
+
+    Raises:
+        FileNotFoundError. The file cannot be found.
+    """
+    return open(filename, mode, encoding=encoding, newline=newline)
+
+
 def get_file_contents(
         filepath: str, raw_bytes: bool = False, mode: str = 'r'
 ) -> bytes:
@@ -112,7 +130,7 @@ def get_file_contents(
     else:
         encoding = 'utf-8'
 
-    with utils.open_file( # type: ignore[no-untyped-call]
+    with open_file( # type: ignore[no-untyped-call]
         filepath, mode, encoding=encoding) as f:
         return f.read() # type: ignore[no-any-return]
 
@@ -1215,21 +1233,3 @@ def url_open(source_url: str) -> str:
     # The type ignore is needed, because typestubs define the return type
     # of 'urlopen' as 'Any' which is wrong.
     return urllib.request.urlopen(source_url, context=context) # type: ignore[no-any-return]
-
-
-def open_file(filename, mode, encoding='utf-8', newline=None):
-    """Open file and return a corresponding file object.
-
-    Args:
-        filename: str. The file to be opened.
-        mode: str. Mode in which the file is opened.
-        encoding: str. Encoding in which the file is opened.
-        newline: None|str. Controls how universal newlines work.
-
-    Returns:
-        TextIOWrapper. The file object.
-
-    Raises:
-        FileNotFoundError. The file cannot be found.
-    """
-    return open(filename, mode, encoding=encoding, newline=newline)
