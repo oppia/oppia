@@ -83,7 +83,7 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
     // choice was selected by the user (default is false).
     this.userSelections = {};
 
-    for (var i = 0; i < this.choices.length; i++) {
+    for (let i = 0; i < this.choices.length; i++) {
       this.userSelections[this.choices[i]] = false;
     }
 
@@ -113,11 +113,9 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
   submitMultipleChoiceAnswer(event: MouseEvent, index: number): void {
     event.preventDefault();
     // Deselect previously selected option.
-    var selectedElement = (
-      document.querySelector(
-        'button.multiple-choice-option.selected'));
-    if (selectedElement) {
-      selectedElement.classList.remove('selected');
+    if ((event.currentTarget as HTMLDivElement).classList.contains(
+      'selected')) {
+      (event.currentTarget as HTMLDivElement).classList.remove('selected');
     }
     // Selected current option.
     (event.currentTarget as HTMLDivElement).classList.add('selected');
@@ -137,8 +135,8 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
 
     this.currentInteractionService.onSubmit(
       answers as unknown as string,
-      // eslint-disable-next-line max-len
-      this.itemSelectionInputRulesService as unknown as InteractionRulesService);
+      this.itemSelectionInputRulesService as unknown as
+      InteractionRulesService);
   }
 
   validityCheckFn(): boolean {
