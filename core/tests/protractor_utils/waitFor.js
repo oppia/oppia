@@ -197,7 +197,7 @@ var clientSideRedirection = async function(
   // complete. Manually waiting for redirection here.
   await browser.driver.wait(async() => {
     var url = await browser.driver.getCurrentUrl();
-    console.log(url);
+
     // Condition to wait on.
     return check(decodeURIComponent(url));
   }, DEFAULT_WAIT_TIME_MSECS_FOR_CLIENT_SIDE_REDIRECT,
