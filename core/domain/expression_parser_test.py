@@ -82,13 +82,13 @@ class HelperFunctionsUnitTests(test_utils.GenericTestBase):
         self.assertFalse(
             expression_parser.contains_at_least_one_variable('tan(30)'))
 
-        with self.assertRaisesRegexp(Exception, 'Invalid bracket pairing.'):
+        with self.assertRaisesRegex(Exception, 'Invalid bracket pairing.'):
             expression_parser.contains_at_least_one_variable('1 +2)')
-        with self.assertRaisesRegexp(Exception, 'Invalid character: ~.'):
+        with self.assertRaisesRegex(Exception, 'Invalid character: ~.'):
             expression_parser.contains_at_least_one_variable('a~2')
-        with self.assertRaisesRegexp(Exception, 'Invalid character: !.'):
+        with self.assertRaisesRegex(Exception, 'Invalid character: !.'):
             expression_parser.contains_at_least_one_variable('4! 2')
-        with self.assertRaisesRegexp(Exception, 'Invalid token: ..'):
+        with self.assertRaisesRegex(Exception, 'Invalid token: ..'):
             expression_parser.contains_at_least_one_variable(
                 'alpha + bet/22.3.4')
 
