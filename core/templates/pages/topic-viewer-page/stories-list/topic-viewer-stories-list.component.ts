@@ -31,7 +31,11 @@ export class StoriesListComponent {
   @Input() classroomUrlFragment: string;
   @Input() topicUrlFragment: string;
   @Input() topicName: string;
+  @Input() topicNameTranslationKey: string;
+  @Input() topicNameTranslationKeyIsToBeDisplayed: boolean;
   @Input() topicDescription: string;
+  @Input() topicDescTranslationKey: string;
+  @Input() topicDescTranslationKeyIsToBeDisplayed: boolean;
   constructor() {}
 }
 angular.module('oppia').directive(

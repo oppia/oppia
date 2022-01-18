@@ -28,6 +28,7 @@ import { UrlService } from 'services/contextual/url.service';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { PageTitleService } from 'services/page-title.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 
@@ -58,6 +59,7 @@ describe('Topic viewer page', () => {
   let windowDimensionsService = null;
   let topicViewerPageComponent = null;
   let windowRef: MockWindowRef;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
 
   let topicName = 'Topic Name';
   let topicUrlFragment = 'topic-frag';
@@ -108,6 +110,7 @@ describe('Topic viewer page', () => {
     pageTitleService = TestBed.inject(PageTitleService);
     urlService = TestBed.inject(UrlService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     let fixture = TestBed.createComponent(TopicViewerPageComponent);
     topicViewerPageComponent = fixture.componentInstance;
   });
@@ -124,6 +127,11 @@ describe('Topic viewer page', () => {
     spyOn(pageTitleService, 'setDocumentTitle').and.callThrough();
     spyOn(pageTitleService, 'updateMetaTag').and.callThrough();
     spyOn(windowRef.nativeWindow.history, 'pushState');
+    spyOn(i18nLanguageCodeService, 'getTopicTranslationKey')
+      .and.returnValues(
+        'I18N_TOPIC_abc1234_TITLE', 'I18N_TOPIC_abc1234_DESCRIPTION');
+    spyOn(i18nLanguageCodeService, 'isTranslationKeyToBeDisplayed')
+      .and.returnValues(true, false);
 
     topicViewerPageComponent.ngOnInit();
     expect(topicViewerPageComponent.canonicalStorySummaries).toEqual([]);
@@ -135,6 +143,14 @@ describe('Topic viewer page', () => {
     req.flush(topicDict);
     flushMicrotasks();
 
+    expect(topicViewerPageComponent.topicNameTranslationKey).toBe(
+      'I18N_TOPIC_abc1234_TITLE');
+    expect(topicViewerPageComponent.topicNameTranslationKeyIsToBeDisplayed)
+      .toBe(true);
+    expect(topicViewerPageComponent.topicDescTranslationKey).toBe(
+      'I18N_TOPIC_abc1234_DESCRIPTION');
+    expect(topicViewerPageComponent.topicDescTranslationKeyIsToBeDisplayed)
+      .toBe(false);
     expect(topicViewerPageComponent.topicId).toBe('1');
     expect(topicViewerPageComponent.topicName).toBe('Topic Name');
     expect(pageTitleService.setDocumentTitle).toHaveBeenCalledWith(

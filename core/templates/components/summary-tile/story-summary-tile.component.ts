@@ -26,6 +26,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { AppConstants } from 'app.constants';
 import { StorySummary } from 'domain/story/story-summary.model';
+import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'oppia-story-summary-tile',
@@ -45,6 +46,8 @@ export class StorySummaryTileComponent implements OnInit {
   completedStoriesCount!: number;
   storyProgress!: number;
   storyTitle!: string;
+  storyTitleTranslationKey!: string;
+  storyTitleTranslationKeyIsToBeDisplayed: boolean = false;
   strokeDashArrayValues!: string | number;
   completedStrokeDashArrayValues!: string;
   thumbnailBgColor!: string;
@@ -60,7 +63,8 @@ export class StorySummaryTileComponent implements OnInit {
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
     private windowDimensionsService: WindowDimensionsService,
-    private assetsBackendApiService: AssetsBackendApiService
+    private assetsBackendApiService: AssetsBackendApiService,
+    private i18nLanguageCodeService: I18nLanguageCodeService
   ) {}
 
   getStoryLink(): string {
@@ -191,6 +195,11 @@ export class StorySummaryTileComponent implements OnInit {
     this.getStrokeDashArrayValues();
     this.storyLink = this.getStoryLink();
     this.storyTitle = this.storySummary.getTitle();
+    this.storyTitleTranslationKey = this.i18nLanguageCodeService
+      .getStoryTranslationKey(
+        this.storySummary.getId(), TranslationKeyType.TITLE);
+    this.storyTitleTranslationKeyIsToBeDisplayed = this.i18nLanguageCodeService
+      .isTranslationKeyToBeDisplayed(this.storyTitleTranslationKey);
     this.strokeDashArrayValues = this.getStrokeDashArrayValues();
     this.completedStrokeDashArrayValues =
       this.getCompletedStrokeDashArrayValues();

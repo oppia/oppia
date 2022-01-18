@@ -11,10 +11,10 @@
       </picture>
     </div>
     <div class="topic-details" [ngStyle]="{'background-color': getDarkerThumbnailBgColor()}" ng-class="{'mask-effect': !isPublished}">
-      <span class="topic-name" *ngIf="!isTopicTranslationKeyToBeDisplayed()">
+      <span class="topic-name" *ngIf="!topicNameTranslationKeyIsToBeDisplayed">
         {{ topicSummary.getName() }}
       </span>
-      <span class="topic-name" *ngIf="!isTopicTranslationKeyToBeDisplayed()">
+      <span class="topic-name" *ngIf="topicNameTranslationKeyIsToBeDisplayed">
         {{ topicNameTranslationKey | translate }}
       </span>
       {{ topicSummary.getTotalPublishedNodeCount() }}

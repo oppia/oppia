@@ -29,7 +29,16 @@
   <!-- Left-to-right is enforced here due to the formatting of the HTML with the title on the left and chapter count on the right. -->
   <div class="oppia-story-title" dir="ltr">
     <strong class="title-text">
-      <a [href]="storyLink" [ngClass]="{'disabled-link': !classroomUrlFragment}">{{ storyTitle }} </a>
+      <a [href]="storyLink"
+         [ngClass]="{'disabled-link': !classroomUrlFragment}"
+         *ngIf="!storyTitleTranslationKeyIsToBeDisplayed">
+         {{ storyTitle }}
+      </a>
+      <a [href]="storyLink"
+         [ngClass]="{'disabled-link': !classroomUrlFragment}"
+         *ngIf="storyTitleTranslationKeyIsToBeDisplayed">
+         {{ storyTitleTranslationKey | translate }}
+      </a>
     </strong>
     <span dir="auto" class="oppia-chapters-count">
       <span [innerHTML]="'I18N_TOPIC_VIEWER_CHAPTERS' | translate:{count:nodeCount, messageFormat: true}"></span>

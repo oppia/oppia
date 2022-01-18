@@ -24,14 +24,13 @@ import { AppConstants } from 'app.constants';
  * Used to define if the translation key is type title or desciption.
  */
 export enum TranslationKeyType {
-  Title = 'TITLE',
-  Description = 'DESCRIPTION',
+  TITLE = 'TITLE',
+  DESCRIPTION = 'DESCRIPTION',
 }
 
 @Injectable({
   providedIn: 'root'
 })
-
 export class I18nLanguageCodeService {
   // TODO(#9154): Remove static when migration is complete.
   /**
@@ -52,7 +51,7 @@ export class I18nLanguageCodeService {
    * title, description keys which currently cannot be translated from the
    * translations dashboard.
    */
-  private HACKY_TRANSLATIONS_KEYS: readonly string[] =
+  private _HACKY_TRANSLATIONS_KEYS: readonly string[] =
     AppConstants.HACKY_TRANSLATIONS_KEYS;
 
   private _preferredLanguageCodesLoadedEventEmitter =
@@ -103,6 +102,20 @@ export class I18nLanguageCodeService {
 
   // TODO(#14645):Remove this method when translation service is extended.
   /**
+   * Takes story id and entity translationKey type as input, generates and
+   * returns the translation key based on that.
+   * @param {string} storyId - Unique id of the story, used to generate
+   * translation key.
+   * @param {TranslationKeyType} keyType - either Title or Description.
+   * @returns {string} - translation key for the topic name/description.
+   */
+  getStoryTranslationKey(
+      storyId: string, keyType: TranslationKeyType): string {
+    return `I18N_STORY_${storyId}_${keyType}`;
+  }
+
+  // TODO(#14645):Remove this method when translation service is extended.
+  /**
    * Checks if the translation key is valid by checking if it is present
    * in the constants file which indicates it has atleast the translation
    * key added in en.json file.
@@ -113,7 +126,7 @@ export class I18nLanguageCodeService {
    */
   isTranslationKeyValid(translationKey: string): boolean {
     return (
-      this.HACKY_TRANSLATIONS_KEYS.indexOf(translationKey) !== -1);
+      this._HACKY_TRANSLATIONS_KEYS.indexOf(translationKey) !== -1);
   }
 
   // TODO(#14645):Remove this method when translation service is extended.
@@ -125,8 +138,8 @@ export class I18nLanguageCodeService {
    * displayed and false otherwise.
    */
   isTranslationKeyToBeDisplayed(translationKey: string): boolean {
-    let isTranslationKeyValid = this.isTranslationKeyValid(translationKey);
-    return (isTranslationKeyValid && !this.isCurrentLanguageEnglish());
+    let translationKeyIsValid = this.isTranslationKeyValid(translationKey);
+    return (translationKeyIsValid && !this.isCurrentLanguageEnglish());
   }
 
   get onI18nLanguageCodeChange(): EventEmitter<string> {

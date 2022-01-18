@@ -25,7 +25,7 @@ describe('I18nLanguageCodeService', () => {
   const i18nLanguageCodeService = new I18nLanguageCodeService();
   let languageCode: string = '';
   let translationKey: string = '';
-  let isTranslationKeyValid: boolean;
+  let translationKeyIsValid: boolean;
   let testSubscriptions: Subscription;
   beforeEach(() => {
     testSubscriptions = new Subscription();
@@ -70,15 +70,15 @@ describe('I18nLanguageCodeService', () => {
   it('should check whether translation key is valid correctly', () => {
     // I18N_CLASSROOM_MATH_TITLE is present in constants file and hence
     // it is valid.
-    isTranslationKeyValid = i18nLanguageCodeService.isTranslationKeyValid(
+    translationKeyIsValid = i18nLanguageCodeService.isTranslationKeyValid(
       'I18N_CLASSROOM_MATH_TITLE');
-    expect(isTranslationKeyValid).toBe(true);
+    expect(translationKeyIsValid).toBe(true);
 
     // I18N_TOPIC_12345axa_TITLE is not present in constants file and hence
     // it is invalid.
-    isTranslationKeyValid = i18nLanguageCodeService.isTranslationKeyValid(
+    translationKeyIsValid = i18nLanguageCodeService.isTranslationKeyValid(
       'I18N_TOPIC_12345axa_TITLE');
-    expect(isTranslationKeyValid).toBe(false);
+    expect(translationKeyIsValid).toBe(false);
   });
 
   it('should get classroom translation key correctly', () => {
@@ -93,12 +93,22 @@ describe('I18nLanguageCodeService', () => {
 
   it('should get topic translation key correctly', () => {
     translationKey = i18nLanguageCodeService.getTopicTranslationKey(
-      'abc1234', TranslationKeyType.Title);
+      'abc1234', TranslationKeyType.TITLE);
     expect(translationKey).toBe('I18N_TOPIC_abc1234_TITLE');
 
     translationKey = i18nLanguageCodeService.getTopicTranslationKey(
-      'abc1234', TranslationKeyType.Description);
+      'abc1234', TranslationKeyType.DESCRIPTION);
     expect(translationKey).toBe('I18N_TOPIC_abc1234_DESCRIPTION');
+  });
+
+  it('should get story translation key correctly', () => {
+    translationKey = i18nLanguageCodeService.getStoryTranslationKey(
+      'abc1234', TranslationKeyType.TITLE);
+    expect(translationKey).toBe('I18N_STORY_abc1234_TITLE');
+
+    translationKey = i18nLanguageCodeService.getStoryTranslationKey(
+      'abc1234', TranslationKeyType.DESCRIPTION);
+    expect(translationKey).toBe('I18N_STORY_abc1234_DESCRIPTION');
   });
 
   it('should check if translation key is to be displayed correctly', () => {

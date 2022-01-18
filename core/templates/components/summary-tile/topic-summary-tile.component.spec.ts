@@ -99,7 +99,7 @@ describe('TopicSummaryTileCompoennt', () => {
 
   it('should get topic name translation key correctly', () => {
     spyOn(i18nLanguageCodeService, 'getTopicTranslationKey')
-      .and.returnValues('I18N_TOPIC_abc1234_TITLE');
+      .and.returnValue('I18N_TOPIC_abc1234_TITLE');
 
     component.ngOnInit();
 
@@ -109,15 +109,12 @@ describe('TopicSummaryTileCompoennt', () => {
 
   it('should check if topic name translation key is to be displayed correctly',
     () => {
-      spyOn(i18nLanguageCodeService, 'getTopicTranslationKey')
-        .and.returnValues('I18N_TOPIC_abc1234_TITLE');
       spyOn(i18nLanguageCodeService, 'isTranslationKeyToBeDisplayed')
-        .and.returnValues(true, false);
+        .and.returnValue(true);
 
       component.ngOnInit();
 
-      expect(component.isTopicTranslationKeyToBeDisplayed()).toBe(true);
-      expect(component.isTopicTranslationKeyToBeDisplayed()).toBe(false);
+      expect(component.topicNameTranslationKeyIsToBeDisplayed).toBe(true);
     }
   );
 });

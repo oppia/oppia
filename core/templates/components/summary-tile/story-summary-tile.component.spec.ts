@@ -21,6 +21,7 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { StorySummary } from 'domain/story/story-summary.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { StorySummaryTileComponent } from './story-summary-tile.component';
 
@@ -30,6 +31,7 @@ describe('StorySummaryTileComponent', () => {
   let fixture: ComponentFixture<StorySummaryTileComponent>;
   let wds: WindowDimensionsService;
   let urlInterpolationService: UrlInterpolationService;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -46,6 +48,7 @@ describe('StorySummaryTileComponent', () => {
     component = fixture.componentInstance;
     wds = TestBed.inject(WindowDimensionsService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
   });
 
   it('should set properties on initialization', () => {
@@ -73,6 +76,10 @@ describe('StorySummaryTileComponent', () => {
     expect(component.completedStrokeDashArrayValues).toBe(undefined);
     expect(component.thumbnailBgColor).toBe(undefined);
     expect(component.nodeTitles).toEqual(undefined);
+    spyOn(i18nLanguageCodeService, 'getStoryTranslationKey')
+      .and.returnValue('I18N_STORY_storyId_TITLE');
+    spyOn(i18nLanguageCodeService, 'isTranslationKeyToBeDisplayed')
+      .and.returnValue(false);
 
     component.ngOnInit();
 
@@ -81,6 +88,9 @@ describe('StorySummaryTileComponent', () => {
     expect(component.storyProgress).toBe(33);
     expect(component.storyLink).toBe('#');
     expect(component.storyTitle).toBe('Story Title');
+    expect(component.storyTitleTranslationKey).toEqual(
+      'I18N_STORY_storyId_TITLE');
+    expect(component.storyTitleTranslationKeyIsToBeDisplayed).toEqual(false);
 
     // Here the value is calculated by the formula -> (circumference -
     // (nodeCount * gapLength))/nodeCount = (2 * 20 * Math.PI - (3*5)) / 3

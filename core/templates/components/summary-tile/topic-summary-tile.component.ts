@@ -35,6 +35,7 @@ export class TopicSummaryTileComponent {
   @Input() isPublished: boolean;
   thumbnailUrl: string = '';
   topicNameTranslationKey: string;
+  topicNameTranslationKeyIsToBeDisplayed: boolean;
 
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
@@ -51,7 +52,9 @@ export class TopicSummaryTileComponent {
     }
     this.topicNameTranslationKey = this.i18nLanguageCodeService.
       getTopicTranslationKey(
-        this.topicSummary.getId(), TranslationKeyType.Title);
+        this.topicSummary.getId(), TranslationKeyType.TITLE);
+    this.topicNameTranslationKeyIsToBeDisplayed = this.i18nLanguageCodeService.
+      isTranslationKeyToBeDisplayed(this.topicNameTranslationKey);
   }
 
   getTopicPageUrl(): string {
@@ -85,14 +88,6 @@ export class TopicSummaryTileComponent {
       parseInt(bgColor.substring(4, 6), 16) - 100);
 
     return '#' + newRValue + newGValue + newBValue;
-  }
-
-  // Used for choosing from topic name or topic translation key to be
-  // displayed in the topic summary tile html block.
-  isTopicTranslationKeyToBeDisplayed(): boolean {
-    return this.i18nLanguageCodeService.isTranslationKeyToBeDisplayed(
-      this.topicNameTranslationKey
-    );
   }
 }
 
