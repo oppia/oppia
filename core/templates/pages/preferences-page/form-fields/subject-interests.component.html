@@ -8,7 +8,7 @@
       {{ subjectInterest }}
       <mat-icon matChipRemove *ngIf="removable">{{ 'I18N_PREFERENCES_CANCEL_BUTTON' | translate }}</mat-icon>
     </mat-chip>
-    <input placeholder="New Subject Interest"
+    <input placeholder="{{ 'I18N_PREFERENCES_SUBJECT_INTERESTS_LABEL' | translate }}"
            class="protractor-test-subject-interests-input"
            #subjectInterestInput
            [formControl]="formCtrl"

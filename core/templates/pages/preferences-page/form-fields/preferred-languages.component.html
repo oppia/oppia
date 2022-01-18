@@ -12,7 +12,7 @@
       </ng-container>
       <mat-icon matChipRemove *ngIf="removable">{{ 'I18N_PREFERENCES_CANCEL_BUTTON' | translate }}</mat-icon>
     </mat-chip>
-    <input placeholder="Select preferred languages."
+    <input placeholder="{{ 'I18N_PREFERENCES_PREFERRED_EXPLORATION_LANGUAGE_SELECT' | translate }}"
            #languageInput
            [formControl]="formCtrl"
            [matAutocomplete]="auto"
