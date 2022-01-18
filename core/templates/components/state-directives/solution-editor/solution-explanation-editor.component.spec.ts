@@ -143,7 +143,7 @@ describe('Solution explanation editor', function() {
   it('should save the explanation', fakeAsync(() => {
     spyOn(component.showMarkAllAudioAsNeedingUpdateModalIfRequired, 'emit')
       .and.stub();
-    spyOn(component.onSaveSolution, 'emit').and.stub();
+    spyOn(component.saveSolution, 'emit').and.stub();
 
     component.explanationEditorIsOpen = true;
     externalSaveServiceEmitter.emit();
@@ -151,7 +151,7 @@ describe('Solution explanation editor', function() {
 
     expect(component.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit)
       .toHaveBeenCalled();
-    expect(component.onSaveSolution.emit).toHaveBeenCalled();
+    expect(component.saveSolution.emit).toHaveBeenCalled();
     expect(component.explanationEditorIsOpen).toBe(false);
   }));
 });
