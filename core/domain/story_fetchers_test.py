@@ -213,7 +213,11 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
             self.USER_ID, self.STORY_ID
         )
         pending_nodes = result['pending_nodes']
-        self.assertNotEqual(pending_nodes, [])
+        self.assertEqual(len(pending_nodes), 1)
+        self.assertEqual(pending_nodes[0].description, '')
+        self.assertEqual(pending_nodes[0].title, 'Title 1')
+        self.assertEqual(pending_nodes[0].id, self.NODE_ID_1)
+        self.assertEqual(pending_nodes[0].exploration_id, None)
 
     def test_get_completed_nodes_in_story(self):
         story = story_fetchers.get_story_by_id(self.STORY_ID)
