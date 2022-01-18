@@ -52,7 +52,7 @@ export class SolutionExplanationEditor
     private stateSolutionService: StateSolutionService
   ) {}
 
-  updateHtml(newHtmlString: string): void {
+  updateExplanationHtml(newHtmlString: string): void {
     this.stateSolutionService.displayed.explanation._html = newHtmlString;
   }
 

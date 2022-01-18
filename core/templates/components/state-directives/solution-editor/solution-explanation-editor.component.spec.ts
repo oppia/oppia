@@ -136,7 +136,7 @@ describe('Solution explanation editor', function() {
 
     const updatedHtml = 'updateHtml';
 
-    component.updateHtml(updatedHtml);
+    component.updateExplanationHtml(updatedHtml);
     expect(stateSolutionService.displayed.explanation._html).toBe(updatedHtml);
   });
 
