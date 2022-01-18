@@ -1,8 +1,6 @@
 core.controllers.editor_test
-core.controllers.resources_test
 extensions.interactions.base_test
 core.controllers.domain_objects_validator_test
-core.controllers.profile_test
 core.controllers.story_editor_test
 core.constants_test
 core.controllers.reader_test
@@ -19,7 +17,6 @@ core.domain.question_domain_test
 core.domain.rights_manager_test
 core.domain.skill_services_test
 core.domain.story_domain_test
-core.domain.activity_domain_test
 core.domain.suggestion_services_test
 core.domain.stats_services_test
 core.domain.value_generators_domain_test
@@ -30,7 +27,6 @@ core.domain.auth_services_test
 core.domain.opportunity_services_test
 core.domain.feedback_domain_test
 core.domain.story_fetchers_test
-core.domain.rights_domain_test
 core.domain.param_domain_test
 core.domain.playthrough_issue_registry_test
 core.domain.feedback_services_test
@@ -77,7 +73,6 @@ core.jobs.job_test_utils_test
 core.jobs.job_utils_test
 core.domain.image_validation_services_test
 scripts.linters.js_ts_linter_test
-core.storage.story.gae_models_test
 core.storage.audit.gae_models_test
 core.storage.classifier.gae_models_test
 main_test

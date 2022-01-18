@@ -124,49 +124,49 @@ class UserSettingsTests(test_utils.GenericTestBase):
 
     def test_validate_non_str_user_id_raises_exception(self):
         self.user_settings.user_id = 0
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected user_id to be a string'
         ):
             self.user_settings.validate()
 
     def test_validate_wrong_format_user_id_raises_exception(self):
         self.user_settings.user_id = 'uid_%sA' % ('a' * 31)
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'The user ID is in a wrong format.'
         ):
             self.user_settings.validate()
 
         self.user_settings.user_id = 'uid_%s' % ('a' * 31)
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'The user ID is in a wrong format.'
         ):
             self.user_settings.validate()
 
         self.user_settings.user_id = 'a' * 36
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'The user ID is in a wrong format.'
         ):
             self.user_settings.validate()
 
     def test_validate_invalid_banned_value_type_raises_exception(self):
         self.user_settings.banned = 123
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected banned to be a bool'):
             self.user_settings.validate()
 
         self.user_settings.banned = '123'
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected banned to be a bool'):
             self.user_settings.validate()
 
     def test_validate_invalid_roles_value_type_raises_exception(self):
         self.user_settings.roles = 123
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected roles to be a list'):
             self.user_settings.validate()
 
         self.user_settings.roles = True
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected roles to be a list'):
             self.user_settings.validate()
 
@@ -174,7 +174,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
         self.user_settings.roles = ['FULL_USER']
         self.user_settings.banned = True
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected roles for banned user to be empty'):
             self.user_settings.validate()
@@ -182,21 +182,21 @@ class UserSettingsTests(test_utils.GenericTestBase):
     def test_validate_roles_with_duplicate_value_raise_exception(self):
         self.user_settings.roles = ['FULL_USER', 'FULL_USER', 'TOPIC_MANAGER']
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Roles contains duplicate values:'):
             self.user_settings.validate()
 
     def test_validate_roles_without_any_default_role_raise_exception(self):
         self.user_settings.roles = ['TOPIC_MANAGER']
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected roles to contains one default role.'):
             self.user_settings.validate()
 
     def test_validate_non_str_pin_id(self):
         self.user_settings.pin = 0
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected PIN to be a string'
         ):
             self.user_settings.validate()
@@ -208,7 +208,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
             (feconf.FULL_USER_PIN_LENGTH, feconf.PROFILE_USER_PIN_LENGTH)
         )
         for pin in invalid_pin_values_list:
-            with self.assertRaisesRegexp(
+            with self.assertRaisesRegex(
                 utils.ValidationError, error_msg
             ):
                 self.user_settings.pin = pin
@@ -224,7 +224,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
         valid_pin_values_list = ['AbC', '123A}', '1!2', 'AB!', '[123]']
         error_msg = 'Only numeric characters are allowed in PIN'
         for pin in valid_pin_values_list:
-            with self.assertRaisesRegexp(
+            with self.assertRaisesRegex(
                 utils.ValidationError, error_msg
             ):
                 self.user_settings.pin = pin
@@ -232,34 +232,34 @@ class UserSettingsTests(test_utils.GenericTestBase):
 
     def test_validate_empty_user_id_raises_exception(self):
         self.user_settings.user_id = ''
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'No user id specified.'
         ):
             self.user_settings.validate()
 
     def test_validate_non_str_role_raises_exception(self):
         self.user_settings.roles = [0]
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected roles to be a string'
         ):
             self.user_settings.validate()
 
     def test_validate_invalid_role_name_raises_exception(self):
         self.user_settings.roles = ['invalid_role']
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Role invalid_role does not exist.'):
             self.user_settings.validate()
 
     def test_validate_non_str_display_alias_raises_error(self):
         self.user_settings.display_alias = 0
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected display_alias to be a string,'
             ' received %s' % self.user_settings.display_alias):
             self.user_settings.validate()
 
     def test_validate_non_str_creator_dashboard_display_pref_raises_error(self):
         self.user_settings.creator_dashboard_display_pref = 0
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected dashboard display preference to be a string'
         ):
@@ -268,7 +268,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
     def test_validate_invalid_creator_dashboard_display_pref_raises_error(self):
         self.user_settings.creator_dashboard_display_pref = (
             'invalid_creator_dashboard_display_pref')
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'invalid_creator_dashboard_display_pref is not a valid '
             'value for the dashboard display preferences.'
@@ -284,7 +284,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
         auth_id = self.get_auth_id_from_email(self.OWNER_EMAIL)
         profile_pin = '123'
         error_msg = 'Expected display_alias to be a string, received'
-        with self.assertRaisesRegexp(utils.ValidationError, error_msg):
+        with self.assertRaisesRegex(utils.ValidationError, error_msg):
             self.modifiable_new_user_data.display_alias = ''
             self.modifiable_new_user_data.pin = profile_pin
             user_services.create_new_profiles(
@@ -297,14 +297,14 @@ class UserSettingsTests(test_utils.GenericTestBase):
     def test_create_new_user_with_existing_auth_id_raises_error(self):
         user_id = self.user_settings.user_id
         user_auth_id = auth_services.get_auth_id_from_user_id(user_id)
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'User %s already exists for auth_id %s.'
             % (user_id, user_auth_id)
         ):
             user_services.create_new_user(user_auth_id, self.OWNER_EMAIL)
 
     def test_cannot_set_existing_username(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Sorry, the username \"%s\" is already taken! Please pick '
             'a different one.' % self.OWNER_USERNAME
@@ -312,7 +312,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
             user_services.set_username(self.owner_id, self.OWNER_USERNAME)
 
     def test_cannot_add_user_role_with_invalid_role(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Role invalid_role does not exist.'
         ):
             user_services.add_user_role(self.owner_id, 'invalid_role')
@@ -325,7 +325,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
             observed_log_messages.append(msg % args)
 
         logging_swap = self.swap(logging, 'error', _mock_logging_function)
-        assert_raises_user_not_found = self.assertRaisesRegexp(
+        assert_raises_user_not_found = self.assertRaisesRegex(
             Exception, 'User not found.')
 
         with logging_swap, assert_raises_user_not_found:
@@ -396,37 +396,37 @@ class UserContributionsTests(test_utils.GenericTestBase):
 
     def test_validate_non_str_user_id(self):
         self.user_contributions.user_id = 0
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected user_id to be a string'):
             self.user_contributions.validate()
 
     def test_validate_user_id(self):
         self.user_contributions.user_id = ''
-        with self.assertRaisesRegexp(Exception, 'No user id specified.'):
+        with self.assertRaisesRegex(Exception, 'No user id specified.'):
             self.user_contributions.validate()
 
     def test_validate_non_list_created_exploration_ids(self):
         self.user_contributions.created_exploration_ids = 0
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected created_exploration_ids to be a list'):
             self.user_contributions.validate()
 
     def test_validate_created_exploration_ids(self):
         self.user_contributions.created_exploration_ids = [0]
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected exploration_id in created_exploration_ids '
             'to be a string'):
             self.user_contributions.validate()
 
     def test_validate_non_list_edited_exploration_ids(self):
         self.user_contributions.edited_exploration_ids = 0
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected edited_exploration_ids to be a list'):
             self.user_contributions.validate()
 
     def test_validate_edited_exploration_ids(self):
         self.user_contributions.edited_exploration_ids = [0]
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected exploration_id in edited_exploration_ids '
             'to be a string'):
             self.user_contributions.validate()
@@ -445,14 +445,14 @@ class UserContributionsTests(test_utils.GenericTestBase):
         self.assertEqual(contributions.edited_exploration_ids, ['e2'])
 
     def test_cannot_create_user_contributions_with_existing_user_id(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'User contributions model for user %s already exists.'
             % self.owner_id):
             user_services.create_user_contributions(self.owner_id, [], [])
 
     def test_cannot_update_user_contributions_with_invalid_user_id(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'User contributions model for user invalid_user_id does not exist'):
             user_services.update_user_contributions('invalid_user_id', [], [])
@@ -465,7 +465,7 @@ class UserContributionsTests(test_utils.GenericTestBase):
         model.put()
 
         self.assertIsNone(user_services.get_user_impact_score(self.owner_id))
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Sorry, we can only process v1-v%d dashboard stats schemas at '
             'present.' % feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION):
@@ -1078,14 +1078,14 @@ class UserContributionRightsTests(test_utils.GenericTestBase):
 
     def test_can_review_translation_for_language_codes_incorrect_type(self):
         self.user_contribution_rights.can_review_translation_for_language_codes = 5 # pylint: disable=line-too-long
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected can_review_translation_for_language_codes to be a list'):
             self.user_contribution_rights.validate()
 
     def test_can_review_voiceover_for_language_codes_incorrect_type(self):
         self.user_contribution_rights.can_review_voiceover_for_language_codes = 5 # pylint: disable=line-too-long
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected can_review_voiceover_for_language_codes to be a list'):
             self.user_contribution_rights.validate()
@@ -1093,14 +1093,14 @@ class UserContributionRightsTests(test_utils.GenericTestBase):
     def test_incorrect_language_code_for_voiceover_raise_error(self):
         self.user_contribution_rights.can_review_voiceover_for_language_codes = [ # pylint: disable=line-too-long
             'invalid_lang_code']
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid language_code: invalid_lang_code'):
             self.user_contribution_rights.validate()
 
     def test_incorrect_language_code_for_translation_raise_error(self):
         self.user_contribution_rights.can_review_translation_for_language_codes = [ # pylint: disable=line-too-long
             'invalid_lang_code']
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid language_code: invalid_lang_code'):
             self.user_contribution_rights.validate()
 
@@ -1112,7 +1112,7 @@ class UserContributionRightsTests(test_utils.GenericTestBase):
 
         self.user_contribution_rights.can_review_voiceover_for_language_codes = [ # pylint: disable=line-too-long
             'hi', 'hi']
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected can_review_voiceover_for_language_codes list not to have '
             'duplicate values'):
@@ -1126,7 +1126,7 @@ class UserContributionRightsTests(test_utils.GenericTestBase):
 
         self.user_contribution_rights.can_review_translation_for_language_codes = [ # pylint: disable=line-too-long
             'hi', 'hi']
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected can_review_translation_for_language_codes list not to '
             'have duplicate values'):
@@ -1134,14 +1134,14 @@ class UserContributionRightsTests(test_utils.GenericTestBase):
 
     def test_incorrect_type_for_can_review_questions_raise_error(self):
         self.user_contribution_rights.can_review_questions = 5
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected can_review_questions to be a boolean value'):
             self.user_contribution_rights.validate()
 
     def test_incorrect_type_for_can_submit_questions_raise_error(self):
         self.user_contribution_rights.can_submit_questions = 5
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected can_submit_questions to be a boolean value'):
             self.user_contribution_rights.validate()
@@ -1225,7 +1225,7 @@ class ModifiableUserDataTests(test_utils.GenericTestBase):
             'user_id': 'user_id',
         }
         error_msg = 'Invalid modifiable user data: no schema version specified.'
-        with self.assertRaisesRegexp(Exception, error_msg):
+        with self.assertRaisesRegex(Exception, error_msg):
             user_domain.ModifiableUserData.from_raw_dict(user_data_dict)
 
     def test_from_raw_dict_with_invalid_schema_version_raises_error(self):
@@ -1246,7 +1246,7 @@ class ModifiableUserDataTests(test_utils.GenericTestBase):
         for version in invalid_schema_versions:
             user_data_dict['schema_version'] = version
             error_msg = 'Invalid version %s received.' % version
-            with self.assertRaisesRegexp(Exception, error_msg):
+            with self.assertRaisesRegex(Exception, error_msg):
                 user_domain.ModifiableUserData.from_raw_dict(user_data_dict)
 
     def test_from_raw_dict_with_invalid_schema_version_type_raises_error(self):
@@ -1268,7 +1268,7 @@ class ModifiableUserDataTests(test_utils.GenericTestBase):
                 'Version has invalid type, expected int, '
                 'received %s' % type(version)
             )
-            with self.assertRaisesRegexp(Exception, error_msg):
+            with self.assertRaisesRegex(Exception, error_msg):
                 user_domain.ModifiableUserData.from_raw_dict(user_data_dict)
 
     # This test should be modified to use the original class ModifiableUserData

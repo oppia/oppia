@@ -141,7 +141,7 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
             run.to_dict())
 
     def test_run_beam_job_without_args_raises_an_exception(self) -> None:
-        with self.assertRaisesRegexp(ValueError, 'Must specify the job'): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(ValueError, 'Must specify the job'): # type: ignore[no-untyped-call]
             beam_job_services.run_beam_job()
 
     def test_cancel_beam_job(self) -> None:
@@ -152,13 +152,13 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
         with self.swap_to_always_return(jobs_manager, 'cancel_job'):
             run = beam_job_services.cancel_beam_job(model.id)
 
-        self.assertEquals(
+        self.assertEqual(
             run.to_dict(),
             beam_job_services.get_beam_job_run_from_model(model).to_dict())
 
     def test_cancel_beam_job_which_does_not_exist_raises_an_error(self) -> None:
         with self.swap_to_always_return(jobs_manager, 'cancel_job'):
-            self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+            self.assertRaisesRegex( # type: ignore[no-untyped-call]
                 ValueError, 'No such job',
                 lambda: beam_job_services.cancel_beam_job('123'))
 
@@ -170,7 +170,7 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
         model.put()
 
         with self.swap_to_always_return(jobs_manager, 'cancel_job'):
-            self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+            self.assertRaisesRegex( # type: ignore[no-untyped-call]
                 ValueError, 'cannot be cancelled',
                 lambda: beam_job_services.cancel_beam_job(model.id))
 
