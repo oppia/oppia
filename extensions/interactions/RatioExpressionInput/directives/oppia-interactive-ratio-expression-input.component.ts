@@ -39,8 +39,8 @@ import { RatioInputAnswer, InteractionAnswer } from 'interactions/answer-defs';
 })
 export class InteractiveRatioExpressionInputComponent
   implements OnInit, OnDestroy {
-  @Input() placeholderWithValue: string = '';
-  @Input() numberOfTermsWithValue: string = '';
+  @Input() placeholderWithValue: string;
+  @Input() numberOfTermsWithValue: string;
   @Input() labelForFocusTarget: string;
   @Input() savedSolution: InteractionAnswer;
   componentSubscriptions: Subscription = new Subscription();
