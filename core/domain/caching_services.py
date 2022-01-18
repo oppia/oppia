@@ -354,8 +354,10 @@ def set_multi(
 def set_multi(
     namespace: Literal['platform'],
     sub_namespace: str | None,
-    id_value_mapping: Dict[str,
-        platform_parameter_domain.PlatformParameter]
+    id_value_mapping: Dict[
+        str,
+        platform_parameter_domain.PlatformParameter
+    ]
 ) -> bool: ...
 
 
