@@ -16,6 +16,8 @@
  * @fileoverview Controller for the main topic editor.
  */
 
+import { ChangeSubtopicAssignmentModalComponent } from '../modal-templates/change-subtopic-assignment-modal.component';
+import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { SavePendingChangesModalComponent } from 'components/save-pending-changes/save-pending-changes-modal.component';
 import { Subscription } from 'rxjs';
 
@@ -37,9 +39,6 @@ require('domain/topic/topic-update.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/topic-editor-page/rearrange-skills-in-subtopics-modal.controller.ts');
-require(
-  'pages/topic-editor-page/modal-templates/' +
-    'change-subtopic-assignment-modal.template.controller.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('pages/topic-editor-page/services/topic-editor-routing.service.ts');
 require('pages/topic-editor-page/services/entity-creation.service.ts');
@@ -431,16 +430,14 @@ angular.module('oppia').directive('topicEditorTab', [
 
           $scope.changeSubtopicAssignment = function(
               oldSubtopicId, skillSummary) {
-            $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/topic-editor-page/modal-templates/' +
-                      'change-subtopic-assignment-modal.template.html'),
-              backdrop: 'static',
-              resolve: {
-                subtopics: () => $scope.subtopics
-              },
-              controller: 'ChangeSubtopicAssignmentModalController'
-            }).result.then(function(newSubtopicId) {
+            const modalRef: NgbModalRef = NgbModal.open(
+              ChangeSubtopicAssignmentModalComponent, {
+                backdrop: 'static',
+                windowClass: 'oppia-change-subtopic-assignment-modal',
+                size: 'xl'
+              });
+            modalRef.componentInstance.subtopics = $scope.subtopics;
+            modalRef.result.then(function(newSubtopicId) {
               if (oldSubtopicId === newSubtopicId) {
                 return;
               }
