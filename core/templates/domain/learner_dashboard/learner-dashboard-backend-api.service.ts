@@ -345,12 +345,12 @@ export class LearnerDashboardBackendApiService {
   }
 
   async _fetchSubtopicMastery(
-      topicIds: string): Promise<Record<string,
-    SubtopicMasterySummaryBackendDict>> {
+      topicIds: string[]
+  ): Promise<Record<string, SubtopicMasterySummaryBackendDict>> {
     return new Promise((resolve, reject) => {
       this.http.get<SubtopicMasteryDict>(
         AppConstants.SUBTOPIC_MASTERY_DATA_URL_TEMPLATE, {
-          params: { comma_separated_topic_ids: topicIds }}).toPromise()
+          params: { selected_topic_ids: JSON.stringify(topicIds) }}).toPromise()
         .then(response => {
           resolve(response.subtopic_mastery_dict);
         }, errorResponse => {
@@ -359,8 +359,9 @@ export class LearnerDashboardBackendApiService {
     });
   }
 
-  async fetchSubtopicMastery(topicIds: string): Promise<Record<string,
-    SubtopicMasterySummaryBackendDict>> {
+  async fetchSubtopicMastery(
+      topicIds: string[]
+  ): Promise<Record<string, SubtopicMasterySummaryBackendDict>> {
     return this._fetchSubtopicMastery(topicIds);
   }
 }

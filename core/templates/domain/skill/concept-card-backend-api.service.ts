@@ -52,7 +52,7 @@ export class ConceptCardBackendApiService {
       errorCallback: (reason: string) => void): void {
     var conceptCardDataUrl = this.urlInterpolation.interpolateUrl(
       SkillDomainConstants.CONCEPT_CARD_DATA_URL_TEMPLATE, {
-        comma_separated_skill_ids: skillIds.join(',')
+        selected_skill_ids: JSON.stringify(skillIds)
       });
 
     const conceptCardObjects: ConceptCard[] = [];

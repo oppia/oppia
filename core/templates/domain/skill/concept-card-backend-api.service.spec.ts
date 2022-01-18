@@ -162,7 +162,8 @@ describe('Concept card backend API service', () => {
 
       conceptCardBackendApiService.loadConceptCardsAsync(['1']).then(
         successHandler, failHandler);
-      var req = httpTestingController.expectOne('/concept_card_handler/1');
+      var req = httpTestingController.expectOne(
+        '/concept_card_handler/' + encodeURIComponent('["1"]'));
       expect(req.request.method).toEqual('GET');
       req.flush(sampleResponse1);
 
@@ -179,7 +180,7 @@ describe('Concept card backend API service', () => {
       let failHandler = jasmine.createSpy('fail');
 
       let conceptCardDataUrl = (
-        '/concept_card_handler/' + encodeURIComponent('1,2'));
+        '/concept_card_handler/' + encodeURIComponent('["1","2"]'));
 
       conceptCardBackendApiService.loadConceptCardsAsync(['1', '2']).then(
         successHandler, failHandler);
@@ -204,12 +205,14 @@ describe('Concept card backend API service', () => {
               expect(conceptCards2).toEqual(conceptCardSampleResponse3);
             });
 
-          var req1 = httpTestingController.expectOne('/concept_card_handler/2');
+          var req1 = httpTestingController.expectOne(
+            '/concept_card_handler/' + encodeURIComponent('["2"]'));
           expect(req1.request.method).toEqual('GET');
           req1.flush(sampleResponse2);
         });
 
-      var req2 = httpTestingController.expectOne('/concept_card_handler/1');
+      var req2 = httpTestingController.expectOne(
+        '/concept_card_handler/' + encodeURIComponent('["1"]'));
       expect(req2.request.method).toEqual('GET');
       req2.flush(sampleResponse1);
 
@@ -223,7 +226,8 @@ describe('Concept card backend API service', () => {
 
       conceptCardBackendApiService.loadConceptCardsAsync(['1']).then(
         successHandler, failHandler);
-      var req = httpTestingController.expectOne('/concept_card_handler/1');
+      var req = httpTestingController.expectOne(
+        '/concept_card_handler/' + encodeURIComponent('["1"]'));
       expect(req.request.method).toEqual('GET');
       req.flush({
         error: 'Error loading skill 1.'
@@ -247,7 +251,8 @@ describe('Concept card backend API service', () => {
           });
       });
 
-    var req = httpTestingController.expectOne('/concept_card_handler/1');
+    var req = httpTestingController.expectOne(
+      '/concept_card_handler/' + encodeURIComponent('["1"]'));
     expect(req.request.method).toEqual('GET');
     req.flush(sampleResponse1);
 
