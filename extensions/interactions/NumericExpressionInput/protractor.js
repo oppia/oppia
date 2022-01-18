@@ -48,21 +48,7 @@ var submitAnswer = async function(elem, answer) {
 
 var answerObjectType = 'NumericExpression';
 
-var testSuite = [{
-  interactionArguments: ['Type an expression here, using only numbers.'],
-  ruleArguments: ['MatchesExactlyWith', '6-(-4)'],
-  expectedInteractionDetails: ['Type an expression here, using only numbers.'],
-  wrongAnswers: ['10', '3*2-(-4)', '-(-4)+6', '6+4'],
-  correctAnswers: ['6-(-4)']
-}, {
-  interactionArguments: [
-    'Type an expression here, using numbers and the addition sign.'],
-  ruleArguments: ['IsEquivalentTo', '3*10^(-5)'],
-  expectedInteractionDetails: [
-    'Type an expression here, using numbers and the addition sign.'],
-  wrongAnswers: ['3*10^5', '2*10^(-5)', '5*10^(-3)'],
-  correctAnswers: ['3*10^(-5)', '0.00003']
-}];
+var testSuite = [];
 
 exports.customizeInteraction = customizeInteraction;
 exports.expectInteractionDetailsToMatch = expectInteractionDetailsToMatch;
