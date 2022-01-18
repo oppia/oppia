@@ -38,23 +38,23 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
   @Input() choicesWithValue: string;
   @Input() maxAllowableSelectionCountWithValue: string;
   @Input() minAllowableSelectionCountWithValue: string;
-  newQuestion: boolean;
-  selectionCount: number;
-  userSelections: {[key: string]: boolean};
-  preventAdditionalSelections: boolean;
-  notEnoughSelections: boolean;
+  choices: string[];
+  choicesValue: SubtitledHtml[];
+  displayCheckboxes: boolean;
   maxAllowableSelectionCount: number;
   minAllowableSelectionCount: number;
-  choices: string[];
-  displayCheckboxes: boolean;
-  choicesValue: SubtitledHtml[];
+  newQuestion: boolean;
+  notEnoughSelections: boolean;
+  preventAdditionalSelections: boolean;
+  selectionCount: number;
+  userSelections: {[key: string]: boolean};
 
   constructor(
+    private browserCheckerService: BrowserCheckerService,
     private currentInteractionService: CurrentInteractionService,
     private interactionAttributesExtractorService:
       InteractionAttributesExtractorService,
-    private itemSelectionInputRulesService: ItemSelectionInputRulesService,
-    private browserCheckerService: BrowserCheckerService) {}
+    private itemSelectionInputRulesService: ItemSelectionInputRulesService) {}
 
   ngOnInit(): void {
     const {

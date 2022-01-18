@@ -23,33 +23,33 @@ import { NgModule } from '@angular/core';
 import { DynamicContentModule } from 'components/angular-html-bind/dynamic-content.module';
 import { MaterialModule } from 'modules/material.module';
 import { FormsModule } from '@angular/forms';
+import { InteractiveItemSelectionInputComponent } from './directives/oppia-interactive-item-selection-input.component';
 import { ShortResponseItemSelectionInputComponent } from './directives/oppia-short-response-item-selection-input.component';
 import { ResponseItemSelectionInputComponent } from './directives/oppia-response-item-selection-input.component';
-import { InteractiveItemSelectionInputComponent } from './directives/oppia-interactive-item-selection-input.component';
 import { TranslateModule } from '@ngx-translate/core';
 
 @NgModule({
   imports: [
     CommonModule,
     DynamicContentModule,
-    TranslateModule,
-    MaterialModule,
     FormsModule,
+    MaterialModule,
+    TranslateModule,
   ],
   declarations: [
-    ShortResponseItemSelectionInputComponent,
+    InteractiveItemSelectionInputComponent,
     ResponseItemSelectionInputComponent,
-    InteractiveItemSelectionInputComponent
+    ShortResponseItemSelectionInputComponent,
   ],
   entryComponents: [
-    ShortResponseItemSelectionInputComponent,
+    InteractiveItemSelectionInputComponent,
     ResponseItemSelectionInputComponent,
-    InteractiveItemSelectionInputComponent
+    ShortResponseItemSelectionInputComponent,
   ],
   exports: [
-    ShortResponseItemSelectionInputComponent,
+    InteractiveItemSelectionInputComponent,
     ResponseItemSelectionInputComponent,
-    InteractiveItemSelectionInputComponent
+    ShortResponseItemSelectionInputComponent,
   ],
 })
 
