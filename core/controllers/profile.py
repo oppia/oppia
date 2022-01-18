@@ -118,7 +118,8 @@ class BulkEmailWebhookEndpoint(base.BaseHandler):
     @acl_decorators.is_source_mailchimp
     def post(self, _):
         """Handles POST requests."""
-        if self.normalized_request.get('data[list_id]') != feconf.MAILCHIMP_AUDIENCE_ID:
+        if (self.normalized_request.get('data[list_id]')
+            != feconf.MAILCHIMP_AUDIENCE_ID):
             self.render_json({})
             return
 
@@ -321,7 +322,8 @@ class SignupPage(base.BaseHandler):
     @acl_decorators.require_user_id_else_redirect_to_homepage
     def get(self):
         """Handles GET requests."""
-        return_url = self.normalized_request.get('return_url', self.normalized_request.uri)
+        return_url = self.normalized_request.get('return_url',
+                                    self.request.uri)
         # Validating return_url for no external redirections.
         if re.match('^/[^//]', return_url) is None:
             return_url = '/'
@@ -591,7 +593,8 @@ class UrlHandler(base.BaseHandler):
         if self.user_id:
             self.render_json({'login_url': None})
         else:
-            if self.normalized_request and self.normalized_request.get('current_url'):
+            if (self.normalized_request and
+                    self.normalized_request.get('current_url')):
                 target_url = self.normalized_request.get('current_url')
                 login_url = user_services.create_login_url(target_url)
                 self.render_json({'login_url': login_url})
