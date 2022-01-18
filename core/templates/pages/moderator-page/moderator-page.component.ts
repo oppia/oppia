@@ -81,18 +81,19 @@ export class ModeratorPageComponent {
   ngOnInit(): void {
     this.loaderService.showLoadingScreen('Loading');
     this.moderatorPageBackendApiService.getRecentCommitsAsync()
-      .then((response) => {
-        // Update the explorationData object with information about newly-
-        // discovered explorations.
-        let explorationIdsToExplorationData = response.exp_ids_to_exp_data;
-        explorationIdsToExplorationData.forEach(expId => {
-          if (!this.explorationData.hasOwnProperty(expId)) {
-            this.explorationData[expId] = (
-              explorationIdsToExplorationData[expId]);          
-        });
-        this.allCommits = response.results;
-        this.loaderService.hideLoadingScreen();
+    .then((response) => {
+      // Update the explorationData object with information about newly-
+      // discovered explorations.
+      let explorationIdsToExplorationData = response.exp_ids_to_exp_data;
+      explorationIdsToExplorationData.forEach(expId => {        
+        if (!this.explorationData.hasOwnProperty(expId)) {
+          this.explorationData[expId] = (
+            explorationIdsToExplorationData[expId]);
+        }
       });
+      this.allCommits = response.results;
+      this.loaderService.hideLoadingScreen();
+    });;
 
     this.moderatorPageBackendApiService.getRecentFeedbackMessagesAsync()
       .then((response) => {
