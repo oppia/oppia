@@ -52,6 +52,7 @@ implements OnInit, OnDestroy {
     type: 'unicode',
     ui_config: {}
   };
+
   constructor(
     private currentInteractionService: CurrentInteractionService,
     private focusManagerService: FocusManagerService,

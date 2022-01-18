@@ -28,7 +28,7 @@ describe('InteractiveRatioExpressionInput', () => {
   let fixture: ComponentFixture<InteractiveRatioExpressionInputComponent>;
   let currentInteractionService: CurrentInteractionService;
 
-  class mockInteractionAttributesExtractorService {
+  class MockInteractionAttributesExtractorService {
     getValuesFromAttributes(interactionId, attributes) {
       return {
         numberOfTerms: {
@@ -58,7 +58,7 @@ describe('InteractiveRatioExpressionInput', () => {
       providers: [
         {
           provide: InteractionAttributesExtractorService,
-          useClass: mockInteractionAttributesExtractorService
+          useClass: MockInteractionAttributesExtractorService
         },
         {
           provide: CurrentInteractionService,

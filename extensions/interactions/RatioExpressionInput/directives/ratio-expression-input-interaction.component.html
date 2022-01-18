@@ -7,7 +7,7 @@
          class="form-control"
          (keyup.enter)="submitAnswer()"
          [oppiaFocusOn]="labelForFocusTarget"
-         placeholder="{{ placeholder }}">
+         [placeholder]="placeholder">
 
   <div class="oppia-form-error oppia-ratio-expression-input-error">
     {{errorMessage}}
