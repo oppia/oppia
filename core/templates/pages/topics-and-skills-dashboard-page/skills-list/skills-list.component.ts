@@ -63,7 +63,7 @@ export class SkillsListComponent {
   @Input() userCanDeleteSkill: boolean = true;
   @Input() userCanCreateSkill: boolean = true;
   @Input() untriagedSkillSummaries!: SkillSummary[];
-  
+
   selectedIndex!: string;
   directiveSubscriptions: Subscription = new Subscription();
   SKILL_HEADINGS: string[] = [

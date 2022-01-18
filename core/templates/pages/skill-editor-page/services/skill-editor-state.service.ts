@@ -32,7 +32,7 @@ import { AlertsService } from 'services/alerts.service';
 import { QuestionsListService } from 'services/questions-list.service';
 import { LoaderService } from 'services/loader.service';
 
-type assignedSkillTopicDataType = { [topicName: string]: string } | null
+type assignedSkillTopicDataType = { [topicName: string]: string; } | null
 
 export interface GroupedSkillSummaries {
   current: {
@@ -89,10 +89,10 @@ export class SkillEditorStateService {
   };
 
   private _updateGroupedSkillSummaries = (
-    groupedSkillSummaries: {
+      groupedSkillSummaries: {
       [topicName: string]: SkillSummaryBackendDict[];
     }
-) => {
+  ) => {
     let topicName = null;
     this._groupedSkillSummaries.current = [];
     this._groupedSkillSummaries.others = [];
