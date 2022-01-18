@@ -17,15 +17,18 @@
  */
 
 import { Ratio } from 'domain/objects/ratio.model';
+
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
 import { InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
 import { RatioExpressionInputRulesService } from './ratio-expression-input-rules.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { downgradeComponent } from '@angular/upgrade/static';
+
 import { RatioExpressionInputCustomizationArgs } from 'interactions/customization-args-defs';
 import { RatioInputAnswer, InteractionAnswer } from 'interactions/answer-defs';
 
@@ -35,7 +38,7 @@ import { RatioInputAnswer, InteractionAnswer } from 'interactions/answer-defs';
   styleUrls: []
 })
 export class InteractiveRatioExpressionInputComponent
-implements OnInit, OnDestroy {
+  implements OnInit, OnDestroy {
   @Input() placeholderWithValue: string = '';
   @Input() numberOfTermsWithValue: string = '';
   @Input() labelForFocusTarget: string;
@@ -107,16 +110,15 @@ implements OnInit, OnDestroy {
 
   submitAnswer(): void {
     try {
-      const ratioExpression =
-        Ratio.fromRawInputString(this.answer);
+      const ratioExpression = Ratio.fromRawInputString(this.answer);
       if (
-        (
-          ratioExpression.getNumberOfTerms() !==
-          this.expectedNumberOfTerms) && (this.expectedNumberOfTerms !== 0)
+        ratioExpression.getNumberOfTerms() !== this.expectedNumberOfTerms &&
+        this.expectedNumberOfTerms !== 0
       ) {
         throw new Error(
           'The creator has specified the number of terms in' +
-          ' the answer to be ' + this.expectedNumberOfTerms + '.');
+          ' the answer to be ' + this.expectedNumberOfTerms + '.'
+        );
       }
       this.errorMessage = '';
       this.isValid = true;
