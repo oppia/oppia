@@ -306,16 +306,22 @@ def validate_params_dict(params):
     return params
 
 
-def validate_topic_and_sub_topic_change(obj):
+def validate_topic_and_sub_topic_change(change_dict):
     """Validates Topic or Subtopic change.
 
     Args:
-        obj: dict. Data that needs to be validated.
+        change_dict: dict. Data that needs to be validated.
+
+    Returns:
+        dict. Returns the validated change_dict.
     """
     allowed_commands = [
-        command['name'] for command in topic_domain.ALLOWED_COMMANDS
+        command['name'] for command in topic_domain.TopicChange.ALLOWED_COMMANDS
     ]
-    if obj['cmd'] not in allowed_commands:
+
+    if change_dict.get('cmd', None) not in allowed_commands:
         raise base.BaseHandler.InvalidInputException(
-            '%s cmd is not allowed.' % obj['cmd']
+            '%s cmd is not allowed.' % change_dict['cmd']
         )
+
+    return change_dict

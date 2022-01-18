@@ -294,10 +294,7 @@ class EditableTopicDataHandler(base.BaseHandler):
         'PUT': {
             'version': {
                 'schema': {
-                    'type': 'basestring',
-                    'validators': [{
-                        'id': 'is_nonempty'
-                    }]
+                    'type': 'int'
                 }
             },
             'commit_message': {
@@ -311,17 +308,14 @@ class EditableTopicDataHandler(base.BaseHandler):
             },
             'topic_and_subtopic_page_change_dicts': {
                 'schema': {
-                    'type': 'dict',
-                    'properties': [{
-                        'name': 'cmd',
-                        'schema': {
-                            'type': 'basestring',
-                            'validation_method': (
-                                domain_objects_validator.
-                                validate_topic_and_sub_topic_change
-                            )
-                        }
-                    }]
+                    'type': 'list',
+                    'items': {
+                        'type': 'object_dict',
+                        'validation_method': (
+                            domain_objects_validator.
+                            validate_topic_and_sub_topic_change
+                        )
+                    }
                 }
             }
         },
