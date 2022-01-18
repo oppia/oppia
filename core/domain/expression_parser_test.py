@@ -23,8 +23,8 @@ from core.tests import test_utils
 
 
 class HelperFunctionsUnitTests(test_utils.GenericTestBase):
-    """Test the 'contains_balanced_brackets' and 'is_algebraic' helper
-    functions.
+    """Test the 'contains_balanced_brackets' and
+    'contains_at_least_one_variable' helper functions.
     """
 
     def test_contains_balanced_brackets(self):
@@ -53,32 +53,44 @@ class HelperFunctionsUnitTests(test_utils.GenericTestBase):
         self.assertFalse(expression_parser.contains_balanced_brackets('4/{0/]'))
         self.assertFalse(expression_parser.contains_balanced_brackets('(a/2]'))
 
-    def test_is_algebraic(self):
-        """Tests for is_algebraic method."""
-        self.assertTrue(expression_parser.is_algebraic('a^2.3'))
-        self.assertTrue(expression_parser.is_algebraic('abs(alpha)'))
-        self.assertTrue(expression_parser.is_algebraic('alpha/gamma'))
-        self.assertTrue(expression_parser.is_algebraic('A + 2/3'))
+    def test_contains_at_least_one_variable(self):
+        """Tests for contains_at_least_one_variable method."""
+        self.assertTrue(
+            expression_parser.contains_at_least_one_variable('a^2.3'))
+        self.assertTrue(
+            expression_parser.contains_at_least_one_variable('abs(alpha)'))
+        self.assertTrue(
+            expression_parser.contains_at_least_one_variable('alpha/gamma'))
+        self.assertTrue(
+            expression_parser.contains_at_least_one_variable('A + 2/3'))
         # The following tests might seem as invalid but the individual letters
         # will be joined via '*' during tokenization which makes them valid.
-        self.assertTrue(expression_parser.is_algebraic('Alpha'))
-        self.assertTrue(expression_parser.is_algebraic('invalid + 2'))
-        self.assertTrue(expression_parser.is_algebraic('alpha + bet/22'))
+        self.assertTrue(
+            expression_parser.contains_at_least_one_variable('Alpha'))
+        self.assertTrue(
+            expression_parser.contains_at_least_one_variable('invalid + 2'))
+        self.assertTrue(
+            expression_parser.contains_at_least_one_variable('alpha + bet/22'))
 
-        self.assertFalse(expression_parser.is_algebraic('1 + 2'))
-        self.assertFalse(expression_parser.is_algebraic('1^2^3/4'))
-        self.assertFalse(expression_parser.is_algebraic('1'))
-        self.assertFalse(expression_parser.is_algebraic('sqrt(4/4)'))
-        self.assertFalse(expression_parser.is_algebraic('tan(30)'))
+        self.assertFalse(
+            expression_parser.contains_at_least_one_variable('1 + 2'))
+        self.assertFalse(
+            expression_parser.contains_at_least_one_variable('1^2^3/4'))
+        self.assertFalse(expression_parser.contains_at_least_one_variable('1'))
+        self.assertFalse(
+            expression_parser.contains_at_least_one_variable('sqrt(4/4)'))
+        self.assertFalse(
+            expression_parser.contains_at_least_one_variable('tan(30)'))
 
-        with self.assertRaisesRegex(Exception, 'Invalid bracket pairing.'):
-            expression_parser.is_algebraic('1 +2)')
-        with self.assertRaisesRegex(Exception, 'Invalid character: ~.'):
-            expression_parser.is_algebraic('a~2')
-        with self.assertRaisesRegex(Exception, 'Invalid character: !.'):
-            expression_parser.is_algebraic('4! 2')
-        with self.assertRaisesRegex(Exception, 'Invalid token: ..'):
-            expression_parser.is_algebraic('alpha + bet/22.3.4')
+        with self.assertRaisesRegexp(Exception, 'Invalid bracket pairing.'):
+            expression_parser.contains_at_least_one_variable('1 +2)')
+        with self.assertRaisesRegexp(Exception, 'Invalid character: ~.'):
+            expression_parser.contains_at_least_one_variable('a~2')
+        with self.assertRaisesRegexp(Exception, 'Invalid character: !.'):
+            expression_parser.contains_at_least_one_variable('4! 2')
+        with self.assertRaisesRegexp(Exception, 'Invalid token: ..'):
+            expression_parser.contains_at_least_one_variable(
+                'alpha + bet/22.3.4')
 
     def test_tokenize(self):
         """Tests for tokenize method."""
