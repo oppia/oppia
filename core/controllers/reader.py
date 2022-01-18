@@ -127,7 +127,7 @@ class ExplorationEmbedPage(base.BaseHandler):
 
         # Note: this is an optional argument and will be None when the
         # exploration is being played outside the context of a collection.
-        collection_id = self.normalized_request.get('collection_id', None)
+        collection_id = self.normalized_request.get('collection_id')
 
         # This check is needed in order to show the correct page when a 404
         # error is raised. The self.request.get('iframed') part of the check is
