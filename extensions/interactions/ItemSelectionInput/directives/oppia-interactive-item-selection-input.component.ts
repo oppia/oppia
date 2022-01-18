@@ -24,8 +24,9 @@ import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { ItemSelectionInputCustomizationArgs } from 'interactions/customization-args-defs';
 import { BrowserCheckerService } from 'domain/utilities/browser-checker.service';
-import { CurrentInteractionService, InteractionRulesService } from 'pages/exploration-player-page/services/current-interaction.service';
+import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
+import { InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
 import { ItemSelectionInputRulesService } from 'interactions/ItemSelectionInput/directives/item-selection-input-rules.service';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
