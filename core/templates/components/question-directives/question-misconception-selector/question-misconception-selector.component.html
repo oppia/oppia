@@ -4,7 +4,7 @@ Selected Misconception: {{ selectedMisconception && selectedMisconception.getNam
   <div *ngFor="let misconception of member.value">
     <button class="btn btn-secondary misconception-button" (click)="selectMisconception(misconception, member.key)">
       <strong class="d-inline">{{ misconception.isMandatory() ? '' : ' (Optional) ' }}{{ misconception.getName() }}</strong>
-      <angular-html-bind-wrapper class="misconception-notes-container" [htmlData]="misconception.getNotes()">
+      <angular-html-bind-wrapper classStr="misconception-notes-container" [htmlData]="misconception.getNotes()">
       </angular-html-bind-wrapper>
     </button>
     <div *ngIf="selectedMisconceptionSkillId === member.key && selectedMisconception.getId() === misconception.getId()">

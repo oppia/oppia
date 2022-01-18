@@ -1,4 +1,4 @@
-// Copyright 2021 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,16 +21,23 @@ import cloneDeep from 'lodash/cloneDeep';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { Misconception, MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
 
+interface UpdatedValues {
+  misconception: Misconception;
+  skillId: string;
+  feedbackIsUsed: boolean;
+}
+
 @Component({
   selector: 'oppia-question-misconception-selector',
   templateUrl: './question-misconception-selector.component.html'
 })
 export class QuestionMisconceptionSelectorComponent implements OnInit {
   @Output() updateMisconceptionValues:
-  EventEmitter<object> = (new EventEmitter());
+  EventEmitter<UpdatedValues> = (new EventEmitter());
   @Input() selectedMisconception: Misconception;
   @Input() selectedMisconceptionSkillId: string;
-  misconceptionFeedbackIsUsed: boolean;
+  @Input() misconceptionFeedbackIsUsed: boolean;
+  @Input() taggedSkillMisconceptionId: string;
   misconceptionsBySkill: MisconceptionSkillMap;
 
   constructor(

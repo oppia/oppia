@@ -20,8 +20,10 @@
 </div>
 <div class="clearfix" *ngIf="misconceptionEditorIsOpen">
   <oppia-question-misconception-selector (updateMisconceptionValues)="updateValues($event)"
+                                         [misconceptionFeedbackIsUsed]="feedbackIsUsed"
                                          [selectedMisconception]="selectedMisconception"
-                                         [selectedMisconceptionSkillId]="selectedMisconceptionSkillId">
+                                         [selectedMisconceptionSkillId]="selectedMisconceptionSkillId"
+                                         [taggedSkillMisconceptionId]="taggedSkillMisconceptionId">
   </oppia-question-misconception-selector>
   <button class="btn btn-success float-right" [disabled]="selectedMisconception === null" (click)="updateMisconception()">Save Misconception</button>
 </div>

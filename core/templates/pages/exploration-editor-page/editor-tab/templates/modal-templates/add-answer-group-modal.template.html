@@ -52,10 +52,11 @@
     <input class="protractor-test-editor-correctness-toggle" type="checkbox" ng-model="tmpOutcome.labelledAsCorrect">
   </div>
   <oppia-question-misconception-editor ng-if="questionModeEnabled"
-                                       (on-save-tagged-misconception)="updateTaggedMisconception($event)"
-                                       (on-save-answer-group-feedback)="updateAnswerGroupFeedback($event)"
+                                       (save-tagged-misconception)="updateTaggedMisconception($event)"
+                                       (save-answer-group-feedback)="updateAnswerGroupFeedback($event)"
                                        [is-editable]="true"
                                        [outcome]="tmpOutcome"
+                                       [rules]="tmpRule"
                                        [tagged-skill-misconception-id]="tmpTaggedSkillMisconceptionId">
   </oppia-question-misconception-editor>
 </div>

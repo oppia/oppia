@@ -1,4 +1,4 @@
-// Copyright 2021 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import { Misconception, MisconceptionSkillMap } from 'domain/skill/Misconception
 import { ExternalSaveService } from 'services/external-save.service';
 import { TagMisconceptionModalComponent } from './tag-misconception-modal-component';
 import { SubtitledHtmlBackendDict } from 'domain/exploration/subtitled-html.model';
+import { Rule } from 'domain/exploration/RuleObjectFactory';
 
 export interface MisconceptionUpdatedValues {
   misconception: Misconception;
@@ -36,17 +37,23 @@ interface Outcome {
   feedback: SubtitledHtmlBackendDict;
 }
 
+interface TaggedMisconception {
+  skillId: string;
+  misconceptionId: number;
+}
+
 @Component({
   selector: 'oppia-question-misconception-editor',
   templateUrl: './question-misconception-editor.component.html'
 })
 export class QuestionMisconceptionEditorComponent implements OnInit {
-  @Output() onSaveAnswerGroupFeedback:
-    EventEmitter<object> = (new EventEmitter());
-  @Output() onSaveTaggedMisconception:
-    EventEmitter<object> = (new EventEmitter());
+  @Output() saveAnswerGroupFeedback:
+    EventEmitter<Outcome> = (new EventEmitter());
+  @Output() saveTaggedMisconception:
+    EventEmitter<TaggedMisconception> = (new EventEmitter());
   @Input() outcome: Outcome;
   @Input() isEditable: boolean;
+  @Input() rules: Rule;
   @Input() taggedSkillMisconceptionId: string;
   feedbackIsUsed: boolean;
   misconceptionEditorIsOpen: boolean;
@@ -136,13 +143,13 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
       skillId: this.selectedMisconceptionSkillId,
       misconceptionId: this.selectedMisconception.getId()
     };
-    this.onSaveTaggedMisconception.emit(taggedMisconception);
+    this.saveTaggedMisconception.emit(taggedMisconception);
     this.misconceptionName = this.selectedMisconception.getName();
     let outcome = cloneDeep(this.outcome);
     if (this.feedbackIsUsed) {
       outcome.feedback.html = (
         this.selectedMisconception.getFeedback());
-      this.onSaveAnswerGroupFeedback.emit(outcome);
+      this.saveAnswerGroupFeedback.emit(outcome);
       this.externalSaveService.onExternalSave.emit();
     }
     this.misconceptionEditorIsOpen = false;
