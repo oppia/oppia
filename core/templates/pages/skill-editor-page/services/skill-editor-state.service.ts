@@ -32,7 +32,10 @@ import { AlertsService } from 'services/alerts.service';
 import { QuestionsListService } from 'services/questions-list.service';
 import { LoaderService } from 'services/loader.service';
 
-type assignedSkillTopicDataType = { [topicName: string]: string } | null;
+interface AssignedSkillTopicData { [topicName: string]: string }
+interface groupedSkillSummariesType {
+  [topicName: string]: SkillSummaryBackendDict[];
+}
 
 export interface GroupedSkillSummaries {
   current: {
@@ -61,7 +64,7 @@ export class SkillEditorStateService {
   private _skill!: Skill;
   private _skillRights!: SkillRights;
   private _skillIsInitialized: boolean = false;
-  private assignedSkillTopicData: assignedSkillTopicDataType = null;
+  private _assignedSkillTopicData: AssignedSkillTopicData | null = null;
   private _skillIsBeingLoaded: boolean = false;
   private _skillIsBeingSaved: boolean = false;
   private _groupedSkillSummaries: GroupedSkillSummaries = {
@@ -89,9 +92,7 @@ export class SkillEditorStateService {
   };
 
   private _updateGroupedSkillSummaries = (
-      groupedSkillSummaries: {
-      [topicName: string]: SkillSummaryBackendDict[];
-    }
+      groupedSkillSummaries: groupedSkillSummariesType
   ) => {
     let topicName = null;
     this._groupedSkillSummaries.current = [];
@@ -156,7 +157,7 @@ export class SkillEditorStateService {
     Promise.all([skillDataPromise, skillRightsPromise]).then(
       ([newBackendSkillObject, newSkillRightsObject]) => {
         this._updateSkillRights(newSkillRightsObject);
-        this.assignedSkillTopicData = (
+        this._assignedSkillTopicData = (
           newBackendSkillObject.assignedSkillTopicData);
         this._updateSkill(newBackendSkillObject.skill);
         this._updateGroupedSkillSummaries(
@@ -179,8 +180,12 @@ export class SkillEditorStateService {
     return this._skillIsBeingLoaded;
   }
 
+  /**
+   * _assignedSkillTopicData will be null (the initial value)
+   * if loadSkill() fails to initialize it due to any reasons.
+   */
   getAssignedSkillTopicData(): { [topicName: string]: string } | null {
-    return this.assignedSkillTopicData;
+    return this._assignedSkillTopicData;
   }
 
   getGroupedSkillSummaries(): GroupedSkillSummaries {
