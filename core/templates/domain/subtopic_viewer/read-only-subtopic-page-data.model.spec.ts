@@ -32,6 +32,7 @@ describe('Subtopic data object factory', () => {
         topic_id: 'topic_id',
         topic_name: 'topic',
         next_subtopic_dict: null,
+        prev_subtopic_dict: null,
         subtopic_title: 'sample_title',
         page_contents: {
           subtitled_html: {
