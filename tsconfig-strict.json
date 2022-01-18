@@ -134,6 +134,7 @@
     "core/templates/domain/collection/guest-collection-progress.service.spec.ts",
     "core/templates/domain/collection/search-explorations-backend-api.service.ts",
     "core/templates/domain/collection/search-explorations-backend-api.service.spec.ts",
+    "core/templates/domain/editor/undo_redo/base-undo-redo.service.ts",
     "core/templates/domain/exploration/AnswerGroupObjectFactory.ts",
     "core/templates/domain/exploration/HintObjectFactory.ts",
     "core/templates/domain/exploration/HintObjectFactorySpec.ts",
