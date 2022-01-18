@@ -116,10 +116,10 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
     def test_validation_story_id_with_invalid_data(self) -> None:
         story_reference = (
-            topic_domain.StoryReference.create_default_story_reference(
-            ''))
+            topic_domain.StoryReference.create_default_story_reference(''))
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
-            utils.ValidationError, 'Story id should not be empty'):
+            utils.ValidationError, 'Story id should not be empty'
+        ):
             story_reference.validate()
 
     def test_delete_canonical_story(self) -> None:
@@ -386,8 +386,9 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             'additional story references list of the topic.'):
             self.topic.add_additional_story('story_id_2')
 
-    # In this file we are using two methods with the same name and for that,
-    # Mypy checks were giving [override] error. Thus we add an ignore.
+    # Here we override the definition of the function from the parent class,
+    # but that is fine as _assert_validation_error is supposed to be
+    # customizable and thus we add an ignore.
     def _assert_validation_error(  # type: ignore[override]
         self,
         expected_error_substring: str
@@ -1223,8 +1224,9 @@ class TopicSummaryTests(test_utils.GenericTestBase):
             1, 1, 1, 1, 1, 1, 1, 'image.svg', '#C6DCDA', 'url-frag',
             current_time, current_time)
 
-    # In this file we are using two methods with the same name and for that,
-    # Mypy checks were giving [override] error. Thus we add an ignore.
+    # Here we override the definition of the function from the parent class,
+    # but that is fine as _assert_validation_error is supposed to be
+    # customizable and thus we add an ignore.
     def _assert_validation_error(  # type: ignore[override]
         self,
         expected_error_substring: str

@@ -339,7 +339,7 @@ class StoryReference:
         """
         if self.story_id == '':
             raise utils.ValidationError(
-                    'Story id should not be empty')
+                'Story id should not be empty')
 
 
 class SubtopicDict(TypedDict):
