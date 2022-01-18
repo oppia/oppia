@@ -550,7 +550,7 @@ class SubtopicMasteryDataHandlerTest(test_utils.GenericTestBase):
                 'comma_separated_topic_ids': ','.join([topic_id_1, topic_id_2])
             })
         degrees_of_mastery_1 = {
-            u'1': ((self.degree_of_mastery_1 + self.degree_of_mastery_2) // 2),
+            u'1': ((self.degree_of_mastery_1 + self.degree_of_mastery_2) / 2),
             u'2': self.degree_of_mastery_3
         }
         degrees_of_mastery_2 = {
