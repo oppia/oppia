@@ -25,6 +25,7 @@ import re
 import zipfile
 
 from core import feconf
+from core import python_utils
 from core import utils
 from core.domain import classifier_services
 from core.domain import draft_upgrade_services

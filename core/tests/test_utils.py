@@ -33,7 +33,6 @@ import re
 import unittest
 
 from core import feconf
-from core import utils
 from core import schema_utils
 from core import utils
 from core.constants import constants

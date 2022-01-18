@@ -28,6 +28,7 @@ import sys
 import tempfile
 
 from core import constants
+from core import python_utils
 from core import utils
 from core.tests import test_utils
 from scripts import common

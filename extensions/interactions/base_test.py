@@ -26,7 +26,7 @@ import string
 import struct
 
 from core import feconf
-from core import utils
+from core import python_utils
 from core import schema_utils
 from core import schema_utils_test
 from core import utils

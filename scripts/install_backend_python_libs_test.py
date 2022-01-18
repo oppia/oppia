@@ -27,6 +27,7 @@ import shutil
 import subprocess
 import sys
 
+from core import python_utils
 from core import utils
 from core.tests import test_utils
 from scripts import common
