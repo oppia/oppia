@@ -164,6 +164,10 @@ class EditableSkillDataHandler(base.BaseHandler):
             'version': {
                 'schema': {
                     'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 1
+                    }]
                 }
             },
             'commit_message': {
@@ -176,33 +180,9 @@ class EditableSkillDataHandler(base.BaseHandler):
                 'schema': {
                     'type': 'list',
                     'items': {
-                        'type': 'dict',
-                        'properties': [
-                            {
-                                'name': 'cmd',
-                                'schema': {
-                                    'type': 'basestring'
-                                }
-                            },
-                            {
-                                'name': 'property_name',
-                                'schema': {
-                                    'type': 'basestring'
-                                }
-                            },
-                            {
-                                'name': 'old_value',
-                                'schema': {
-                                    'type': 'basestring'
-                                }
-                            },
-                            {
-                                'name': 'new_value',
-                                'schema': {
-                                    'type': 'basestring'
-                                }
-                            }
-                        ]
+                        'type': 'object_dict',
+                        'object_class': (
+                            skill_domain.SkillChange)
                     }
                 }
             }
@@ -267,10 +247,10 @@ class EditableSkillDataHandler(base.BaseHandler):
             raise self.PageNotFoundException(
                 Exception('The skill with the given id doesn\'t exist.'))
 
-        version = self.payload.get('version')
+        version = self.normalized_payload.get('version')
         _require_valid_version(version, skill.version)
 
-        commit_message = self.payload.get('commit_message', None)
+        commit_message = self.normalized_payload.get('commit_message')
 
         if (commit_message is not None and
                 len(commit_message) > constants.MAX_COMMIT_MESSAGE_LENGTH):
@@ -278,7 +258,7 @@ class EditableSkillDataHandler(base.BaseHandler):
                 'Commit messages must be at most %s characters long.'
                 % constants.MAX_COMMIT_MESSAGE_LENGTH)
 
-        change_dicts = self.payload.get('change_dicts')
+        change_dicts = self.normalized_payload.get('change_dicts')
         change_list = [
             skill_domain.SkillChange(change_dict)
             for change_dict in change_dicts

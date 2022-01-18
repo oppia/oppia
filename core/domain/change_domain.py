@@ -222,6 +222,22 @@ class BaseChange:
                     self, attribute_name)
 
         return base_change_dict
+    
+    def from_dict(self, base_change_dict):
+        """Returns a BaseChange domain object from a dict.
+
+        Args:
+            base_change_dict: dict. The dict representation of
+                BaseChange object.
+
+        Returns:
+            BaseChange. The corresponding BaseChange domain object.
+        """
+        return self(base_change_dict)
+
+    def validate(self):
+        # Debugging
+        print("Debug")
 
     def __getattr__(self, name: str) -> str:
         # AttributeError needs to be thrown in order to make

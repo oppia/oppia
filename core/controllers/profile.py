@@ -118,11 +118,11 @@ class BulkEmailWebhookEndpoint(base.BaseHandler):
     @acl_decorators.is_source_mailchimp
     def post(self, _):
         """Handles POST requests."""
-        if self.request.get('data[list_id]') != feconf.MAILCHIMP_AUDIENCE_ID:
+        if self.normalized_request.get('data[list_id]') != feconf.MAILCHIMP_AUDIENCE_ID:
             self.render_json({})
             return
 
-        email = self.request.get('data[email]')
+        email = self.normalized_request.get('data[email]')
         user_settings = user_services.get_user_settings_from_email(email)
 
         # Ignore the request if the user does not exist in Oppia.
@@ -132,14 +132,14 @@ class BulkEmailWebhookEndpoint(base.BaseHandler):
 
         user_id = user_settings.user_id
         user_email_preferences = user_services.get_email_preferences(user_id)
-        if self.request.get('type') == 'subscribe':
+        if self.normalized_request.get('type') == 'subscribe':
             user_services.update_email_preferences(
                 user_id, True,
                 user_email_preferences.can_receive_editor_role_email,
                 user_email_preferences.can_receive_feedback_message_email,
                 user_email_preferences.can_receive_subscription_email,
                 bulk_email_db_already_updated=True)
-        elif self.request.get('type') == 'unsubscribe':
+        elif self.normalized_request.get('type') == 'unsubscribe':
             user_services.update_email_preferences(
                 user_id, False,
                 user_email_preferences.can_receive_editor_role_email,
@@ -204,8 +204,8 @@ class PreferencesHandler(base.BaseHandler):
     @acl_decorators.can_manage_own_account
     def put(self):
         """Handles PUT requests."""
-        update_type = self.payload.get('update_type')
-        data = self.payload.get('data')
+        update_type = self.normalized_payload.get('update_type')
+        data = self.normalized_payload.get('data')
         bulk_email_signup_message_should_be_shown = False
         if update_type == 'user_bio':
             if len(data) > feconf.MAX_BIO_LENGTH_IN_CHARS:
@@ -321,7 +321,7 @@ class SignupPage(base.BaseHandler):
     @acl_decorators.require_user_id_else_redirect_to_homepage
     def get(self):
         """Handles GET requests."""
-        return_url = self.request.get('return_url', self.request.uri)
+        return_url = self.normalized_request.get('return_url', self.normalized_request.uri)
         # Validating return_url for no external redirections.
         if re.match('^/[^//]', return_url) is None:
             return_url = '/'
@@ -516,7 +516,7 @@ class UsernameCheckHandler(base.BaseHandler):
     @acl_decorators.require_user_id_else_redirect_to_homepage
     def post(self):
         """Handles POST requests."""
-        username = self.payload.get('username')
+        username = self.normalized_payload.get('username')
         try:
             user_domain.UserSettings.require_valid_username(username)
         except utils.ValidationError as e:
@@ -534,7 +534,7 @@ class SiteLanguageHandler(base.BaseHandler):
     @acl_decorators.can_manage_own_account
     def put(self):
         """Handles PUT requests."""
-        site_language_code = self.payload.get('site_language_code')
+        site_language_code = self.normalized_payload.get('site_language_code')
         user_services.update_preferred_site_language_code(
             self.user_id, site_language_code)
         self.render_json({})
@@ -591,8 +591,8 @@ class UrlHandler(base.BaseHandler):
         if self.user_id:
             self.render_json({'login_url': None})
         else:
-            if self.request and self.request.get('current_url'):
-                target_url = self.request.get('current_url')
+            if self.normalized_request and self.normalized_request.get('current_url'):
+                target_url = self.normalized_request.get('current_url')
                 login_url = user_services.create_login_url(target_url)
                 self.render_json({'login_url': login_url})
             else:
