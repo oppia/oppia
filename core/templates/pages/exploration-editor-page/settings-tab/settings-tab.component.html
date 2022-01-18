@@ -341,7 +341,7 @@
                 </span>
               </div>
 
-              <input type="submit" class="btn btn-secondary protractor-test-save-role" value="Save" ng-disabled="!$ctrl.rolesSaveButtonEnabled">
+              <input type="submit" class="btn btn-secondary protractor-test-save-role" value="Save" ng-disabled="!$ctrl.rolesSaveButtonEnabled || !$ctrl.newMemberUsername">
               <button type="button" class="btn btn-secondary" ng-click="$ctrl.closeEditRolesForm()" ng-show="$ctrl.isRolesFormOpen">
                 Cancel
               </button>
@@ -670,7 +670,7 @@
     text-align: right;
   }
   settings-tab .oppia-edit-roles-btn {
-    color: #009C8A;
+    color: #009c8a;
     cursor: pointer;
     font-weight: bold;
   }
@@ -678,8 +678,8 @@
     color: #666;
   }
   settings-tab .oppia-delete-button {
-    background-color: #C55F45;
-    color: #FFF;
+    background-color: #c55f45;
+    color: #fff;
   }
   settings-tab .secondary-info-text {
     font-size: smaller;

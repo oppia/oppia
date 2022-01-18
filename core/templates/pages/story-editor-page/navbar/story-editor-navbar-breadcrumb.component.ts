@@ -47,9 +47,10 @@ export class StoryEditorNavbarBreadcrumbComponent {
 
   returnToTopicEditorPage(): void {
     if (this.undoRedoService.getChangeCount() > 0) {
-      const modalRef = this.ngbModal.open(SavePendingChangesModalComponent, {
-        backdrop: true
-      });
+      const modalRef = this.ngbModal.open(
+        SavePendingChangesModalComponent,
+        {backdrop: true}
+      );
 
       modalRef.componentInstance.body = (
         'Please save all pending changes before returning to the topic.');
@@ -65,7 +66,9 @@ export class StoryEditorNavbarBreadcrumbComponent {
           this.TOPIC_EDITOR_URL_TEMPLATE, {
             topicId: this.story.getCorrespondingTopicId()
           }
-        ), '_self');
+        ),
+        '_self'
+      );
     }
   }
 
@@ -76,7 +79,8 @@ export class StoryEditorNavbarBreadcrumbComponent {
           this.topicName = this.storyEditorStateService.getTopicName();
           this.story = this.storyEditorStateService.getStory();
         }
-      ));
+      )
+    );
   }
 
   ngOnDestroy(): void {
