@@ -741,6 +741,7 @@
 	"I18N_STORY_VIEWER_COMPLETED_CHAPTER": "The title for a chapter icon, in the story viewer, that is completed by the learner.",
 	"I18N_SUBSCRIBE_BUTTON_TEXT": "The text that appears on the subscribe button, which allows users to subscribe to creators.\n{{Identical|Subscribe}}",
 	"I18N_SUBTOPIC_VIEWER_NEXT_SKILL": "Text appears next to a skill summary card, labelling it as the next skill to complete",
+	"I18N_SUBTOPIC_VIEWER_PREVIOUS_SKILL": "Text appears next to a skill summary card, labelling it as the previous skill to complete",
 	"I18N_TEACH_BENEFITS_ONE": "The first benefit, shown in the splash page, of using Oppia.",
 	"I18N_TEACH_BENEFITS_THREE": "The third benefit, shown in the splash page, of using Oppia.",
 	"I18N_TEACH_BENEFITS_TITLE": "Title displayed in the benefits section on the splash page.",
