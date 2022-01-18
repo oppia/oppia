@@ -50,7 +50,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
     """Test the user services methods."""
 
     def setUp(self):
-        super(UserServicesUnitTests, self).setUp()
+        super().setUp()
         user_data_dict = {
             'schema_version': 1,
             'display_alias': 'display_alias',
@@ -1333,7 +1333,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
     COLLECTION_OBJECTIVE = 'objective'
 
     def setUp(self):
-        super(UpdateContributionMsecTests, self).setUp()
+        super().setUp()
 
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
@@ -1603,7 +1603,7 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
     CURRENT_DATE_AS_STRING = user_services.get_current_date_as_string()
 
     def setUp(self):
-        super(UserDashboardStatsTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
@@ -1713,7 +1713,7 @@ class SubjectInterestsUnitTests(test_utils.GenericTestBase):
     """Test the update_subject_interests method."""
 
     def setUp(self):
-        super(SubjectInterestsUnitTests, self).setUp()
+        super().setUp()
         self.auth_id = 'someUser'
         self.username = 'username'
         self.user_email = 'user@example.com'
@@ -1768,7 +1768,7 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Create exploration with two versions."""
-        super(LastLoginIntegrationTests, self).setUp()
+        super().setUp()
 
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
@@ -1835,7 +1835,7 @@ class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Create users for creating and editing exploration."""
-        super(LastExplorationEditedIntegrationTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
@@ -1907,7 +1907,7 @@ class LastExplorationCreatedIntegrationTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Create user for creating exploration."""
-        super(LastExplorationCreatedIntegrationTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
@@ -1984,7 +1984,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(
-            CommunityContributionStatsUnitTests, self).setUp()
+            ).setUp()
 
         self.signup(self.REVIEWER_1_EMAIL, 'reviewer1')
         self.reviewer_1_id = self.get_user_id_from_email(
@@ -2328,7 +2328,7 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
     QUESTION_REVIEWER_USERNAME = 'questionreviewer'
 
     def setUp(self):
-        super(UserContributionReviewRightsTests, self).setUp()
+        super().setUp()
         self.signup(self.TRANSLATOR_EMAIL, self.TRANSLATOR_USERNAME)
         self.translator_id = self.get_user_id_from_email(self.TRANSLATOR_EMAIL)
 

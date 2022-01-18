@@ -45,7 +45,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
     skill_id_2 = 'skill_2'
 
     def setUp(self):
-        super(SubtopicPageServicesUnitTests, self).setUp()
+        super().setUp()
         self.TOPIC_ID = topic_fetchers.get_new_topic_id()
         self.subtopic_page = (
             subtopic_page_domain.SubtopicPage.create_default_subtopic_page(

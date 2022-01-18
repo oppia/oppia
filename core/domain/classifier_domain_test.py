@@ -31,7 +31,7 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
     """Test the ClassifierTrainingJob domain."""
 
     def setUp(self) -> None:
-        super(ClassifierTrainingJobDomainTests, self).setUp()
+        super().setUp()
 
         self.training_data: classifier_domain.TrainingDataType = [
             {
@@ -186,7 +186,7 @@ class StateTrainingJobsMappingDomainTests(test_utils.GenericTestBase):
     """Tests for the StateTrainingJobsMapping domain."""
 
     def setUp(self) -> None:
-        super(StateTrainingJobsMappingDomainTests, self).setUp()
+        super().setUp()
 
         self.mapping_dict: classifier_domain.StateTrainingJobsMappingDict = {
             'exp_id': 'exp_id1',

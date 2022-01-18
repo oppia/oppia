@@ -49,14 +49,14 @@ class FooError(base_validation_errors.BaseAuditError):
     """A simple test-only error."""
 
     def __init__(self, model):
-        super(FooError, self).__init__('foo', model)
+        super().__init__('foo', model)
 
 
 class BarError(base_validation_errors.BaseAuditError):
     """A simple test-only error."""
 
     def __init__(self, model):
-        super(BarError, self).__init__('bar', model)
+        super().__init__('bar', model)
 
 
 class AuditErrorsTestBase(core_test_utils.TestBase):
@@ -70,7 +70,7 @@ class AuditErrorsTestBase(core_test_utils.TestBase):
 class BaseAuditErrorTests(AuditErrorsTestBase):
 
     def setUp(self):
-        super(BaseAuditErrorTests, self).setUp()
+        super().setUp()
         self.model = base_models.BaseModel(id='123')
 
     def test_message(self):
@@ -93,7 +93,7 @@ class BaseAuditErrorTests(AuditErrorsTestBase):
             """Subclass that tries to assign an int value to self.stderr."""
 
             def __init__(self, model):
-                super(ErrorWithIntMessage, self).__init__(123, model)
+                super().__init__(123, model)
 
         with self.assertRaisesRegex(TypeError, 'must be a string'):
             ErrorWithIntMessage(self.model)
@@ -103,7 +103,7 @@ class BaseAuditErrorTests(AuditErrorsTestBase):
             """Subclass that tries to assign an empty value to self.stderr."""
 
             def __init__(self, model):
-                super(ErrorWithEmptyMessage, self).__init__('', model)
+                super().__init__('', model)
 
         with self.assertRaisesRegex(ValueError, 'must be a non-empty string'):
             ErrorWithEmptyMessage(self.model)

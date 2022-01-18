@@ -306,7 +306,7 @@ class AdditionOperatorNode(Node):
             left: Node. Left child of the operator.
             right: Node. Right child of the operator.
         """
-        super(AdditionOperatorNode, self).__init__([left, right])
+        super().__init__([left, right])
 
 
 class SubtractionOperatorNode(Node):
@@ -319,7 +319,7 @@ class SubtractionOperatorNode(Node):
             left: Node. Left child of the operator.
             right: Node. Right child of the operator.
         """
-        super(SubtractionOperatorNode, self).__init__([left, right])
+        super().__init__([left, right])
 
 
 class MultiplicationOperatorNode(Node):
@@ -332,7 +332,7 @@ class MultiplicationOperatorNode(Node):
             left: Node. Left child of the operator.
             right: Node. Right child of the operator.
         """
-        super(MultiplicationOperatorNode, self).__init__([left, right])
+        super().__init__([left, right])
 
 
 class DivisionOperatorNode(Node):
@@ -345,7 +345,7 @@ class DivisionOperatorNode(Node):
             left: Node. Left child of the operator.
             right: Node. Right child of the operator.
         """
-        super(DivisionOperatorNode, self).__init__([left, right])
+        super().__init__([left, right])
 
 
 class PowerOperatorNode(Node):
@@ -358,7 +358,7 @@ class PowerOperatorNode(Node):
             left: Node. Left child of the operator.
             right: Node. Right child of the operator.
         """
-        super(PowerOperatorNode, self).__init__([left, right])
+        super().__init__([left, right])
 
 
 class IdentifierNode(Node):
@@ -374,7 +374,7 @@ class IdentifierNode(Node):
             token: Token. The token representing the identifier.
         """
         self.token = token
-        super(IdentifierNode, self).__init__([])
+        super().__init__([])
 
 
 class NumberNode(Node):
@@ -387,7 +387,7 @@ class NumberNode(Node):
             token: Token. The token representing a real number.
         """
         self.token = token
-        super(NumberNode, self).__init__([])
+        super().__init__([])
 
 
 class UnaryFunctionNode(Node):
@@ -403,7 +403,7 @@ class UnaryFunctionNode(Node):
             child: Node. The parameter of the function.
         """
         self.token = token
-        super(UnaryFunctionNode, self).__init__([child])
+        super().__init__([child])
 
 
 class Parser:

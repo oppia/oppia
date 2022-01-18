@@ -72,7 +72,7 @@ class ConfigPropertyModel(base_models.VersionedModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'value': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
@@ -86,7 +86,7 @@ class ConfigPropertyModel(base_models.VersionedModel):
         committer_id: str,
         commit_cmds: List[Dict[str, Any]]
     ) -> None:
-        super(ConfigPropertyModel, self).commit(committer_id, '', commit_cmds)
+        super().commit(committer_id, '', commit_cmds)
 
 
 class PlatformParameterSnapshotMetadataModel(
@@ -134,7 +134,7 @@ class PlatformParameterModel(base_models.VersionedModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'rules': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'rule_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })

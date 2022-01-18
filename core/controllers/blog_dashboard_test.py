@@ -62,7 +62,7 @@ class BlogDashboardDataHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Completes the sign-up process for the various users."""
-        super(BlogDashboardDataHandlerTests, self).setUp()
+        super().setUp()
         self.signup(
             self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
         self.signup(
@@ -160,7 +160,7 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Completes the sign-up process for the various users."""
-        super(BlogPostHandlerTests, self).setUp()
+        super().setUp()
         self.signup(
             self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
         self.signup(

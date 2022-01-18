@@ -670,7 +670,7 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
             network_type: ANDROID_NETWORK_TYPE. The enum for the network type
                 the device was connected to.
         """
-        super(AndroidDeviceSystemContext, self).__init__(
+        super().__init__(
             version_name, device_country_locale_code)
         self.package_version_code = package_version_code
         self.device_language_locale_code = device_language_locale_code
@@ -951,7 +951,7 @@ class AndroidAppContext(AppContext):
                 recorded in the app; the list is empty if this instance has been
                 scrubbed.
         """
-        super(AndroidAppContext, self).__init__(
+        super().__init__(
             entry_point, text_language_code, audio_language_code)
         self.entry_point = entry_point
         self.text_language_code = text_language_code
@@ -1202,7 +1202,7 @@ class NavigationDrawerEntryPoint(EntryPoint):
 
     def __init__(self) -> None:
         """Constructs an NavigationDrawerEntryPoint domain object."""
-        super(NavigationDrawerEntryPoint, self).__init__(
+        super().__init__(
             app_feedback_report_constants.ENTRY_POINT.navigation_drawer, None,
             None, None, None)
 
@@ -1246,7 +1246,7 @@ class LessonPlayerEntryPoint(EntryPoint):
             exploration_id: str. The unique ID for the current exploration the
                 user is playing when intiating the report.
         """
-        super(LessonPlayerEntryPoint, self).__init__(
+        super().__init__(
             app_feedback_report_constants.ENTRY_POINT.lesson_player,
             topic_id=topic_id, story_id=story_id, exploration_id=exploration_id)
 
@@ -1292,7 +1292,7 @@ class RevisionCardEntryPoint(EntryPoint):
             subtopic_id: int. The ID for the current subtopic the user is
                 reviewing when intiating the report.
         """
-        super(RevisionCardEntryPoint, self).__init__(
+        super().__init__(
             app_feedback_report_constants.ENTRY_POINT.revision_card,
             topic_id, None, None, subtopic_id)
 
@@ -1333,7 +1333,7 @@ class CrashEntryPoint(EntryPoint):
     def __init__(self) -> None:
         """Constructs an CrashEntryPoint domain object."""
         super(
-            CrashEntryPoint, self).__init__(
+            ).__init__(
                 app_feedback_report_constants.ENTRY_POINT.crash, None, None,
                 None, None)
 

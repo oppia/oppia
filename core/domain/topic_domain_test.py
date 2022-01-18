@@ -37,7 +37,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
     topic_id = 'topic_id'
 
     def setUp(self):
-        super(TopicDomainUnitTests, self).setUp()
+        super().setUp()
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
         self.topic = topic_domain.Topic.create_default_topic(
@@ -1306,7 +1306,7 @@ class TopicRightsChangeTests(test_utils.GenericTestBase):
 class TopicSummaryTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(TopicSummaryTests, self).setUp()
+        super().setUp()
         current_time = datetime.datetime.utcnow()
         time_in_millisecs = utils.get_time_in_millisecs(current_time)
         self.topic_summary_dict = {
@@ -1504,7 +1504,7 @@ class TopicSummaryTests(test_utils.GenericTestBase):
 class TopicRightsTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(TopicRightsTests, self).setUp()
+        super().setUp()
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
         self.user_id_a = self.get_user_id_from_email('a@example.com')

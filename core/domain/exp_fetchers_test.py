@@ -37,7 +37,7 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
     EXP_3_ID = 'exploration_3_id'
 
     def setUp(self):
-        super(ExplorationRetrievalTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.exploration_1 = self.save_new_default_exploration(
@@ -280,7 +280,7 @@ title: Old Title
     ALBERT_NAME = 'albert'
 
     def setUp(self):
-        super(ExplorationConversionPipelineTests, self).setUp()
+        super().setUp()
 
         # Setup user who will own the test explorations.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)

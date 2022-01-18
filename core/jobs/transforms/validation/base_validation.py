@@ -91,7 +91,7 @@ class ValidateBaseModelId(beam.DoFn):
     """
 
     def __init__(self):
-        super(ValidateBaseModelId, self).__init__()
+        super().__init__()
         # IMPORTANT: Only picklable objects can be stored on DoFns! This is
         # because DoFns are serialized with pickle when run on a pipeline (and
         # might be run on many different machines). Any other types assigned to

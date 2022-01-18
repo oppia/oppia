@@ -45,7 +45,7 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
     COL_TITLE_4 = 'col title 4'
 
     def setUp(self):
-        super(LearnerPlaylistHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 

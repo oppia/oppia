@@ -59,7 +59,7 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
     USER = 'ADMIN'
 
     def setUp(self):
-        super(SaveOriginalAndCompressedVersionsOfImageTests, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.user_id_admin = (
@@ -196,7 +196,7 @@ class FileSystemClassifierDataTests(test_utils.GenericTestBase):
     """Unit tests for storing, reading and deleting classifier data."""
 
     def setUp(self):
-        super(FileSystemClassifierDataTests, self).setUp()
+        super().setUp()
         self.fs = fs_domain.AbstractFileSystem(
             fs_domain.GcsFileSystem(
                 feconf.ENTITY_TYPE_EXPLORATION, 'exp_id'))

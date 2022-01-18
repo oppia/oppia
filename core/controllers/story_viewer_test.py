@@ -42,7 +42,7 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Completes the sign up process for the various users."""
-        super(BaseStoryViewerControllerTests, self).setUp()
+        super().setUp()
         self.VIEWER_EMAIL = 'viewer@example.com'
         self.VIEWER_USERNAME = 'viewer'
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)

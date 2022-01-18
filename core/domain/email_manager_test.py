@@ -45,7 +45,7 @@ class FailedMLTest(test_utils.EmailTestBase):
     """
 
     def setUp(self):
-        super(FailedMLTest, self).setUp()
+        super().setUp()
         self.can_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', True)
         self.can_send_feedback_email_ctx = self.swap(
@@ -157,7 +157,7 @@ class EmailRightsTest(test_utils.GenericTestBase):
     """Test that only certain users can send certain types of emails."""
 
     def setUp(self):
-        super(EmailRightsTest, self).setUp()
+        super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
@@ -218,7 +218,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
     EXPLORATION_TITLE = 'Title'
 
     def setUp(self):
-        super(ExplorationMembershipEmailTests, self).setUp()
+        super().setUp()
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
@@ -550,7 +550,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
     """Test that signup-email sending functionality works as expected."""
 
     def setUp(self):
-        super(SignupEmailTests, self).setUp()
+        super().setUp()
 
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
@@ -907,7 +907,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
     """Test that duplicate emails are not sent."""
 
     def setUp(self):
-        super(DuplicateEmailTests, self).setUp()
+        super().setUp()
 
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
@@ -1261,7 +1261,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
 class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
 
     def setUp(self):
-        super(FeedbackMessageBatchEmailTests, self).setUp()
+        super().setUp()
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
@@ -1396,7 +1396,7 @@ class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
 
 class SuggestionEmailTests(test_utils.EmailTestBase):
     def setUp(self):
-        super(SuggestionEmailTests, self).setUp()
+        super().setUp()
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
@@ -1500,7 +1500,7 @@ class SuggestionEmailTests(test_utils.EmailTestBase):
 
 class SubscriptionEmailTests(test_utils.EmailTestBase):
     def setUp(self):
-        super(SubscriptionEmailTests, self).setUp()
+        super().setUp()
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
@@ -1597,7 +1597,7 @@ class SubscriptionEmailTests(test_utils.EmailTestBase):
 
 class FeedbackMessageInstantEmailTests(test_utils.EmailTestBase):
     def setUp(self):
-        super(FeedbackMessageInstantEmailTests, self).setUp()
+        super().setUp()
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
@@ -1703,7 +1703,7 @@ class FlagExplorationEmailTest(test_utils.EmailTestBase):
     """Test that emails are sent to moderators when explorations are flagged."""
 
     def setUp(self):
-        super(FlagExplorationEmailTest, self).setUp()
+        super().setUp()
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
@@ -1823,7 +1823,7 @@ class OnboardingReviewerInstantEmailTests(test_utils.EmailTestBase):
     REVIEWER_EMAIL = 'reviewer@example.com'
 
     def setUp(self):
-        super(OnboardingReviewerInstantEmailTests, self).setUp()
+        super().setUp()
         self.signup(self.REVIEWER_EMAIL, self.REVIEWER_USERNAME)
         self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
         user_services.update_email_preferences(
@@ -1897,7 +1897,7 @@ class NotifyReviewerInstantEmailTests(test_utils.EmailTestBase):
     REVIEWER_EMAIL = 'reviewer@example.com'
 
     def setUp(self):
-        super(NotifyReviewerInstantEmailTests, self).setUp()
+        super().setUp()
         self.signup(self.REVIEWER_EMAIL, self.REVIEWER_USERNAME)
         self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
         user_services.update_email_preferences(
@@ -2086,7 +2086,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         self.logged_info.append(msg % args)
 
     def setUp(self):
-        super(NotifyContributionDashboardReviewersEmailTests, self).setUp()
+        super().setUp()
         self.signup(self.AUTHOR_EMAIL, self.AUTHOR_USERNAME)
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.signup(self.REVIEWER_1_EMAIL, self.REVIEWER_1_USERNAME)
@@ -3651,8 +3651,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
 
     def setUp(self):
         super(
-            NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests,
-            self).setUp()
+            ).setUp()
         self.signup(self.AUTHOR_EMAIL, self.AUTHOR_USERNAME)
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.signup(
@@ -4402,8 +4401,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
     def setUp(self):
         super(
-            NotifyAdminsContributorDashboardReviewersNeededTests,
-            self).setUp()
+          ).setUp()
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.signup(
@@ -4997,7 +4995,7 @@ class QueryStatusNotificationEmailTests(test_utils.EmailTestBase):
     RECIPIENT_B_USERNAME = 'userb'
 
     def setUp(self):
-        super(QueryStatusNotificationEmailTests, self).setUp()
+        super().setUp()
         self.signup(self.SUBMITTER_EMAIL, self.SUBMITTER_USERNAME)
         self.submitter_id = self.get_user_id_from_email(self.SUBMITTER_EMAIL)
         self.signup(self.SENDER_EMAIL, self.SENDER_USERNAME)
@@ -5188,7 +5186,7 @@ class VoiceoverApplicationEmailUnitTest(test_utils.EmailTestBase):
     APPLICANT_EMAIL = 'applicant@example.com'
 
     def setUp(self):
-        super(VoiceoverApplicationEmailUnitTest, self).setUp()
+        super().setUp()
         self.signup(self.APPLICANT_EMAIL, self.APPLICANT_USERNAME)
         self.applicant_id = self.get_user_id_from_email(self.APPLICANT_EMAIL)
         user_services.update_email_preferences(
@@ -5325,7 +5323,7 @@ class AccountDeletionEmailUnitTest(test_utils.EmailTestBase):
     APPLICANT_EMAIL = 'applicant@example.com'
 
     def setUp(self):
-        super(AccountDeletionEmailUnitTest, self).setUp()
+        super().setUp()
         self.signup(self.APPLICANT_EMAIL, self.APPLICANT_USERNAME)
         self.applicant_id = self.get_user_id_from_email(self.APPLICANT_EMAIL)
         self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
@@ -5387,7 +5385,7 @@ class BulkEmailsTests(test_utils.EmailTestBase):
     RECIPIENT_B_USERNAME = 'userb'
 
     def setUp(self):
-        super(BulkEmailsTests, self).setUp()
+        super().setUp()
         # SENDER is authorised sender.
         # FAKE_SENDER is unauthorised sender.
         # A and B are recipients.
@@ -5577,7 +5575,7 @@ class ModeratorActionEmailsTests(test_utils.EmailTestBase):
     RECIPIENT_USERNAME = 'usera'
 
     def setUp(self):
-        super(ModeratorActionEmailsTests, self).setUp()
+        super().setUp()
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
         self.set_moderators([self.MODERATOR_USERNAME])
@@ -5641,7 +5639,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
     QUESTION_REVIEWER_EMAIL = 'questionreviewer@example.com'
 
     def setUp(self):
-        super(ContributionReviewerEmailTest, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.TRANSLATION_REVIEWER_EMAIL, 'translator')
         self.signup(self.VOICEOVER_REVIEWER_EMAIL, 'voiceartist')

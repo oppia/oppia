@@ -111,7 +111,7 @@ class CloudStorageEmulatorUnitTests(test_utils.TestBase):
     """Tests for CloudStorageEmulator."""
 
     def setUp(self) -> None:
-        super(CloudStorageEmulatorUnitTests, self).setUp()
+        super().setUp()
         self.emulator = cloud_storage_emulator.CloudStorageEmulator()
         self.emulator.namespace = 'namespace'
         self.emulator.reset()
@@ -123,7 +123,7 @@ class CloudStorageEmulatorUnitTests(test_utils.TestBase):
             '/different/path.png', b'data2', 'image/png')
 
     def tearDown(self) -> None:
-        super(CloudStorageEmulatorUnitTests, self).tearDown()
+        super().tearDown()
         self.emulator.reset()
 
     def test_get_blob_retrieves_correct_blob_from_redis(self) -> None:

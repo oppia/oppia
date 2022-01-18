@@ -40,7 +40,7 @@ class InformSubscribersTest(test_utils.EmailTestBase):
     USER_EMAIL_2 = 'user2@test.com'
 
     def setUp(self):
-        super(InformSubscribersTest, self).setUp()
+        super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.USER_EMAIL, self.USER_NAME)
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)

@@ -26,7 +26,7 @@ class CloudTranslateEmulatorUnitTests(test_utils.TestBase):
     """Tests for cloud_translate_emulator."""
 
     def setUp(self) -> None:
-        super(CloudTranslateEmulatorUnitTests, self).setUp()
+        super().setUp()
         self.emulator = cloud_translate_emulator.CloudTranslateEmulator()
 
     def test_init_prepopulates_responses(self) -> None:

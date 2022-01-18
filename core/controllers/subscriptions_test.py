@@ -32,7 +32,7 @@ class SubscriptionTests(test_utils.GenericTestBase):
     USER2_USERNAME = 'user2'
 
     def setUp(self):
-        super(SubscriptionTests, self).setUp()
+        super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 

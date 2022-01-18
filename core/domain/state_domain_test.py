@@ -5062,7 +5062,7 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
 class VoiceoverDomainTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(VoiceoverDomainTests, self).setUp()
+        super().setUp()
         self.voiceover = state_domain.Voiceover('filename.mp3', 10, False, 15.0)
 
     def test_validate_non_str_filename(self):

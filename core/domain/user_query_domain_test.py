@@ -30,7 +30,7 @@ class UserQueryTests(test_utils.GenericTestBase):
     """Test for the UserQuery."""
 
     def setUp(self):
-        super(UserQueryTests, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.user_query_params = user_query_domain.UserQueryParams(

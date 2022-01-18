@@ -55,7 +55,7 @@ class CronJobTests(test_utils.GenericTestBase):
     FOURTEEN_WEEKS = datetime.timedelta(weeks=14)
 
     def setUp(self):
-        super(CronJobTests, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
@@ -294,8 +294,7 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
 
     def setUp(self):
         super(
-            CronMailReviewersContributorDashboardSuggestionsHandlerTests,
-            self).setUp()
+            ).setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
@@ -510,8 +509,7 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
 
     def setUp(self):
         super(
-            CronMailAdminContributorDashboardBottlenecksHandlerTests,
-            self).setUp()
+            ).setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         # This sets the role of the user to admin.

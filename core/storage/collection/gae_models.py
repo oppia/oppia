@@ -87,7 +87,7 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         because the history of commits isn't deemed as useful for users since
         commit logs don't contain relevant data corresponding to those users.
         """
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'collection_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
@@ -200,7 +200,7 @@ class CollectionModel(base_models.VersionedModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'category': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'objective': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -370,7 +370,7 @@ class CollectionModel(base_models.VersionedModel):
                 from storage, otherwise there are only marked as deleted.
                 Default is False.
         """
-        super(CollectionModel, cls).delete_multi(
+        super().delete_multi(
             entity_ids, committer_id,
             commit_message, force_deletion=force_deletion)
 
@@ -516,7 +516,7 @@ class CollectionRightsModel(base_models.VersionedModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data to export/delete corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'owner_ids': base_models.EXPORT_POLICY.EXPORTED,
             'editor_ids': base_models.EXPORT_POLICY.EXPORTED,
             'voice_artist_ids': base_models.EXPORT_POLICY.EXPORTED,
@@ -565,7 +565,7 @@ class CollectionRightsModel(base_models.VersionedModel):
                     cmd: str. Unique command.
                 and additional arguments for that command.
         """
-        super(CollectionRightsModel, self).commit(
+        super().commit(
             committer_id, commit_message, commit_cmds)
 
     # TODO(#13523): Change 'model_dict' to domain object/TypedDict to
@@ -861,7 +861,7 @@ class CollectionSummaryModel(base_models.BaseModel):
         because noteworthy details that belong to this model have already been
         exported as a part of the CollectionRightsModel.
         """
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'category': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'objective': base_models.EXPORT_POLICY.NOT_APPLICABLE,

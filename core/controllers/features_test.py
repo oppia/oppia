@@ -34,7 +34,7 @@ class ExplorationFeaturesTestBase(test_utils.GenericTestBase):
     EXP_ID = 'expId'
 
     def setUp(self):
-        super(ExplorationFeaturesTestBase, self).setUp()
+        super().setUp()
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)

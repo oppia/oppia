@@ -45,7 +45,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
     """Tests for the platform parameter Registry."""
 
     def setUp(self):
-        super(PlatformParameterRegistryTests, self).setUp()
+        super().setUp()
 
         self.original_param_registry = registry.Registry.parameter_registry
         registry.Registry.parameter_registry.clear()
@@ -57,7 +57,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             parameter_names)
 
     def tearDown(self):
-        super(PlatformParameterRegistryTests, self).tearDown()
+        super().tearDown()
 
         registry.Registry.parameter_registry = self.original_param_registry
 

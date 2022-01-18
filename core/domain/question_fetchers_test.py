@@ -33,7 +33,7 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
     """Tests for question fetchers."""
 
     def setUp(self):
-        super(QuestionFetchersUnitTests, self).setUp()
+        super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 

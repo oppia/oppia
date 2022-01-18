@@ -30,7 +30,7 @@ class MachineTranslationTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Setup for MachineTranslation domain object tests."""
-        super(MachineTranslationTests, self).setUp()
+        super().setUp()
         self._init_translation()
 
     def _init_translation(self) -> None:

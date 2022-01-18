@@ -132,7 +132,6 @@ disable=abstract-method,
         non-explicit-keyword-args,
         not-an-iterable,
         raise-missing-from,
-        super-with-arguments,
         unnecessary-pass,
         consider-using-f-string,
 # TODO(#14322): Reinstate this.

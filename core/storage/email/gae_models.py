@@ -112,7 +112,7 @@ class SentEmailModel(base_models.BaseModel):
         because users already have access to noteworthy details of this data
         (since emails were sent to them).
         """
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'recipient_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'recipient_email': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'sender_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -219,7 +219,7 @@ class SentEmailModel(base_models.BaseModel):
 
     def _pre_put_hook(self) -> None:
         """Operations to perform just before the model is `put` into storage."""
-        super(SentEmailModel, self)._pre_put_hook()
+        super()._pre_put_hook()
         self.email_hash = self._generate_hash(
             self.recipient_id, self.subject, self.html_body)
 
@@ -389,7 +389,7 @@ class BulkEmailModel(base_models.BaseModel):
         because users already have access to noteworthy details of this data
         (since emails were sent to them).
         """
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'sender_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'sender_email': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'recipient_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,

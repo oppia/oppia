@@ -31,7 +31,7 @@ class CollectionViewerPermissionsTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Before each individual test, create a dummy collection."""
-        super(CollectionViewerPermissionsTests, self).setUp()
+        super().setUp()
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
@@ -104,7 +104,7 @@ class CollectionViewerControllerEndToEndTests(test_utils.GenericTestBase):
     """Test the collection viewer controller using a sample collection."""
 
     def setUp(self):
-        super(CollectionViewerControllerEndToEndTests, self).setUp()
+        super().setUp()
 
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)

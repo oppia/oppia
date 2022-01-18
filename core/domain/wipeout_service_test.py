@@ -72,7 +72,7 @@ class WipeoutServiceHelpersTests(test_utils.GenericTestBase):
     USER_2_USERNAME = 'username2'
 
     def setUp(self):
-        super(WipeoutServiceHelpersTests, self).setUp()
+        super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
@@ -179,7 +179,7 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
     USER_3_USERNAME = 'username3'
 
     def setUp(self):
-        super(WipeoutServicePreDeleteTests, self).setUp()
+        super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.add_user_role(
@@ -571,7 +571,7 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
     USER_2_USERNAME = 'username2'
 
     def setUp(self):
-        super(WipeoutServiceRunFunctionsTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
@@ -779,7 +779,7 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(
     ANDROID_REPORT_INFO_SCHEMA_VERSION = 1
 
     def setUp(self):
-        super(WipeoutServiceDeleteAppFeedbackReportModelsTests, self).setUp()
+        super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
@@ -981,8 +981,7 @@ class WipeoutServiceVerifyDeleteAppFeedbackReportModelsTests(
 
     def setUp(self):
         super(
-            WipeoutServiceVerifyDeleteAppFeedbackReportModelsTests,
-            self).setUp()
+            ).setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
@@ -1085,7 +1084,7 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
     CONFIG_2_ID = 'config_2_id'
 
     def setUp(self):
-        super(WipeoutServiceDeleteConfigModelsTests, self).setUp()
+        super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
@@ -1269,7 +1268,7 @@ class WipeoutServiceVerifyDeleteConfigModelsTests(test_utils.GenericTestBase):
     CONFIG_2_ID = 'config_2_id'
 
     def setUp(self):
-        super(WipeoutServiceVerifyDeleteConfigModelsTests, self).setUp()
+        super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         config_model = config_models.ConfigPropertyModel(
@@ -1315,7 +1314,7 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
     COL_2_ID = 'col_2_id'
 
     def setUp(self):
-        super(WipeoutServiceDeleteCollectionModelsTests, self).setUp()
+        super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
@@ -1664,7 +1663,7 @@ class WipeoutServiceVerifyDeleteCollectionModelsTests(
     COL_2_ID = 'col_2_id'
 
     def setUp(self):
-        super(WipeoutServiceVerifyDeleteCollectionModelsTests, self).setUp()
+        super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.save_new_valid_collection(self.COL_1_ID, self.user_1_id)
@@ -1710,7 +1709,7 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
     EXP_2_ID = 'exp_2_id'
 
     def setUp(self):
-        super(WipeoutServiceDeleteExplorationModelsTests, self).setUp()
+        super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
@@ -2045,7 +2044,7 @@ class WipeoutServiceVerifyDeleteExplorationModelsTests(
     EXP_2_ID = 'exp_2_id'
 
     def setUp(self):
-        super(WipeoutServiceVerifyDeleteExplorationModelsTests, self).setUp()
+        super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.save_new_valid_exploration(self.EXP_1_ID, self.user_1_id)
@@ -2096,7 +2095,7 @@ class WipeoutServiceDeleteFeedbackModelsTests(test_utils.GenericTestBase):
     NUMBER_OF_MODELS = 150
 
     def setUp(self):
-        super(WipeoutServiceDeleteFeedbackModelsTests, self).setUp()
+        super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
@@ -2310,7 +2309,7 @@ class WipeoutServiceVerifyDeleteFeedbackModelsTests(test_utils.GenericTestBase):
     EXP_1_ID = 'exp_1_id'
 
     def setUp(self):
-        super(WipeoutServiceVerifyDeleteFeedbackModelsTests, self).setUp()
+        super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         feedback_models.GeneralFeedbackThreadModel(
@@ -2383,7 +2382,7 @@ class WipeoutServiceDeleteImprovementsModelsTests(test_utils.GenericTestBase):
     EXP_2_ID = 'exp_2_id'
 
     def setUp(self):
-        super(WipeoutServiceDeleteImprovementsModelsTests, self).setUp()
+        super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.improvements_model_1_id = (
@@ -2448,7 +2447,7 @@ class WipeoutServiceVerifyDeleteImprovementsModelsTests(
     EXP_3_ID = 'exp_3_id'
 
     def setUp(self):
-        super(WipeoutServiceVerifyDeleteImprovementsModelsTests, self).setUp()
+        super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
@@ -2518,7 +2517,7 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
     USER_2_USERNAME = 'username2'
 
     def setUp(self):
-        super(WipeoutServiceDeleteQuestionModelsTests, self).setUp()
+        super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
         self.set_curriculum_admins((self.USER_1_USERNAME, self.USER_2_USERNAME))
@@ -2860,7 +2859,7 @@ class WipeoutServiceVerifyDeleteQuestionModelsTests(test_utils.GenericTestBase):
     USER_2_USERNAME = 'username2'
 
     def setUp(self):
-        super(WipeoutServiceVerifyDeleteQuestionModelsTests, self).setUp()
+        super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
         self.set_curriculum_admins((self.USER_1_USERNAME, self.USER_2_USERNAME))
@@ -2918,7 +2917,7 @@ class WipeoutServiceDeleteSkillModelsTests(test_utils.GenericTestBase):
     USER_2_USERNAME = 'username2'
 
     def setUp(self):
-        super(WipeoutServiceDeleteSkillModelsTests, self).setUp()
+        super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
         self.set_curriculum_admins((self.USER_1_USERNAME, self.USER_2_USERNAME))
@@ -3164,7 +3163,7 @@ class WipeoutServiceVerifyDeleteSkillModelsTests(test_utils.GenericTestBase):
     USER_2_USERNAME = 'username2'
 
     def setUp(self):
-        super(WipeoutServiceVerifyDeleteSkillModelsTests, self).setUp()
+        super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
         self.set_curriculum_admins((self.USER_1_USERNAME, self.USER_2_USERNAME))
@@ -3217,7 +3216,7 @@ class WipeoutServiceDeleteStoryModelsTests(test_utils.GenericTestBase):
     USER_2_USERNAME = 'username2'
 
     def setUp(self):
-        super(WipeoutServiceDeleteStoryModelsTests, self).setUp()
+        super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
@@ -3475,7 +3474,7 @@ class WipeoutServiceVerifyDeleteStoryModelsTests(test_utils.GenericTestBase):
     USER_2_USERNAME = 'username2'
 
     def setUp(self):
-        super(WipeoutServiceVerifyDeleteStoryModelsTests, self).setUp()
+        super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
@@ -3536,7 +3535,7 @@ class WipeoutServiceDeleteSubtopicModelsTests(test_utils.GenericTestBase):
     SUBTOP_2_ID = 'subtop_2_id'
 
     def setUp(self):
-        super(WipeoutServiceDeleteSubtopicModelsTests, self).setUp()
+        super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
@@ -3825,7 +3824,7 @@ class WipeoutServiceVerifyDeleteSubtopicModelsTests(test_utils.GenericTestBase):
     SUBTOP_1_ID = 'subtop_1_id'
 
     def setUp(self):
-        super(WipeoutServiceVerifyDeleteSubtopicModelsTests, self).setUp()
+        super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.save_new_topic(self.TOP_1_ID, self.user_1_id)
@@ -3872,7 +3871,7 @@ class WipeoutServiceDeleteSuggestionModelsTests(test_utils.GenericTestBase):
     EXP_2_ID = 'exp_2_id'
 
     def setUp(self):
-        super(WipeoutServiceDeleteSuggestionModelsTests, self).setUp()
+        super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
@@ -3966,7 +3965,7 @@ class WipeoutServiceVerifyDeleteSuggestionModelsTests(
     EXP_2_ID = 'exp_2_id'
 
     def setUp(self):
-        super(WipeoutServiceVerifyDeleteSuggestionModelsTests, self).setUp()
+        super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
@@ -4036,7 +4035,7 @@ class WipeoutServiceDeleteTopicModelsTests(test_utils.GenericTestBase):
     TOP_2_ID = 'top_2_id'
 
     def setUp(self):
-        super(WipeoutServiceDeleteTopicModelsTests, self).setUp()
+        super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
@@ -4303,7 +4302,7 @@ class WipeoutServiceVerifyDeleteTopicModelsTests(test_utils.GenericTestBase):
     SUBTOP_1_ID = 'subtop_1_id'
 
     def setUp(self):
-        super(WipeoutServiceVerifyDeleteTopicModelsTests, self).setUp()
+        super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.save_new_topic(self.TOP_1_ID, self.user_1_id)
@@ -4348,7 +4347,7 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
     EXPLORATION_2_ID = 'exp_2_id'
 
     def setUp(self):
-        super(WipeoutServiceDeleteUserModelsTests, self).setUp()
+        super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
@@ -4675,7 +4674,7 @@ class WipeoutServiceVerifyDeleteUserModelsTests(test_utils.GenericTestBase):
     USER_2_USERNAME = 'username2'
 
     def setUp(self):
-        super(WipeoutServiceVerifyDeleteUserModelsTests, self).setUp()
+        super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
@@ -4828,7 +4827,7 @@ class WipeoutServiceDeleteBlogPostModelsTests(test_utils.GenericTestBase):
     THUMBNAIL = 'xyzabc'
 
     def setUp(self):
-        super(WipeoutServiceDeleteBlogPostModelsTests, self).setUp()
+        super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
@@ -5054,7 +5053,7 @@ class PendingUserDeletionTaskServiceTests(test_utils.GenericTestBase):
     USER_1_USERNAME = 'a'
 
     def setUp(self):
-        super(PendingUserDeletionTaskServiceTests, self).setUp()
+        super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         user_models.CompletedActivitiesModel(
@@ -5155,7 +5154,7 @@ class CheckCompletionOfUserDeletionTaskServiceTests(
     USER_1_USERNAME = 'a'
 
     def setUp(self):
-        super(CheckCompletionOfUserDeletionTaskServiceTests, self).setUp()
+        super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         user_models.CompletedActivitiesModel(

@@ -45,7 +45,7 @@ class MockModifiableUserData(user_domain.ModifiableUserData):
             self, display_alias, pin, preferred_language_codes,
             preferred_site_language_code, preferred_audio_language_code,
             user_id=None, fake_field=None):
-        super(MockModifiableUserData, self).__init__(
+        super().__init__(
             display_alias, pin, preferred_language_codes,
             preferred_site_language_code, preferred_audio_language_code,
             user_id=None)
@@ -91,7 +91,7 @@ class MockModifiableUserData(user_domain.ModifiableUserData):
 class UserSettingsTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(UserSettingsTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.owner = user_services.get_user_actions_info(self.owner_id)
@@ -387,7 +387,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
 class UserContributionsTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(UserContributionsTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.user_contributions = user_services.get_user_contributions(
@@ -1015,7 +1015,7 @@ class UserContributionProficiencyTests(test_utils.GenericTestBase):
     """Testing domain object for user contribution scoring model."""
 
     def setUp(self):
-        super(UserContributionProficiencyTests, self).setUp()
+        super().setUp()
         self.user_proficiency = user_domain.UserContributionProficiency(
             'user_id0', 'category0', 0, False)
 
@@ -1058,7 +1058,7 @@ class UserContributionRightsTests(test_utils.GenericTestBase):
     """Testing UserContributionRights domain object."""
 
     def setUp(self):
-        super(UserContributionRightsTests, self).setUp()
+        super().setUp()
         self.user_contribution_rights = user_domain.UserContributionRights(
             'user_id', ['hi'], [], True, False)
 

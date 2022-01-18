@@ -38,7 +38,7 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
     COLLECTION_ID = 'A_collection_id'
 
     def setUp(self):
-        super(SearchServicesUnitTests, self).setUp()
+        super().setUp()
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)

@@ -232,7 +232,7 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
     EXPLORATION_ID = 'exp_id_0'
 
     def setUp(self):
-        super(CollectionDomainUnitTests, self).setUp()
+        super().setUp()
         self.save_new_valid_collection(
             self.COLLECTION_ID, 'user@example.com', title='Title',
             category='Category', objective='Objective',
@@ -951,7 +951,7 @@ title: A title
 class CollectionSummaryTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(CollectionSummaryTests, self).setUp()
+        super().setUp()
         current_time = datetime.datetime.utcnow()
         self.collection_summary_dict = {
             'category': 'category',

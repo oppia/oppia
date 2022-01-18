@@ -28,7 +28,7 @@ from core.tests import test_utils
 class ImageValidationServiceTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(ImageValidationServiceTests, self).setUp()
+        super().setUp()
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
             'rb', encoding=None) as f:

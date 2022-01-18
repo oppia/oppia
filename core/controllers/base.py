@@ -126,7 +126,6 @@ class UserFacingExceptions:
 
         def __init__(self):
             super(
-                UserFacingExceptions.TemporaryMaintenanceException, self
             ).__init__(
                 'Oppia is currently being upgraded, and the site should be up '
                 'and running again in a few hours. Thanks for your patience!')
@@ -348,7 +347,7 @@ class BaseHandler(webapp2.RequestHandler):
         if not schema_validation_succeeded:
             return
 
-        super(BaseHandler, self).dispatch()
+        super().dispatch()
 
     def validate_and_normalize_args(self):
         """Validates schema for controller layer handler class arguments.
@@ -574,7 +573,7 @@ class BaseHandler(webapp2.RequestHandler):
         # We use this super in order to bypass the write method
         # in webapp2.Response, since webapp2.Response doesn't support writing
         # bytes.
-        super(webapp2.Response, self.response).write(file.getvalue())  # pylint: disable=bad-super-call
+        super().write(file.getvalue())  # pylint: disable=bad-super-call
 
     def render_template(self, filepath, iframe_restriction='DENY'):
         """Prepares an HTML response to be sent to the client.

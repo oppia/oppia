@@ -39,7 +39,7 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
     story = None
 
     def setUp(self):
-        super(StoryFetchersUnitTests, self).setUp()
+        super().setUp()
         self.STORY_ID = story_services.get_new_story_id()
         self.TOPIC_ID = topic_fetchers.get_new_topic_id()
         self.save_new_topic(

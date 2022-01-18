@@ -27,7 +27,7 @@ class DuplicateBlogTitleError(base_validation_errors.BaseAuditError):
 
     def __init__(self, model):
         message = 'title=%s is not unique' % utils.quoted(model.title)
-        super(DuplicateBlogTitleError, self).__init__(message, model)
+        super().__init__(message, model)
 
 
 class DuplicateBlogUrlError(base_validation_errors.BaseAuditError):
@@ -35,7 +35,7 @@ class DuplicateBlogUrlError(base_validation_errors.BaseAuditError):
 
     def __init__(self, model):
         message = 'url=%s is not unique' % utils.quoted(model.url_fragment)
-        super(DuplicateBlogUrlError, self).__init__(message, model)
+        super().__init__(message, model)
 
 
 class InconsistentPublishTimestampsError(base_validation_errors.BaseAuditError):
@@ -44,7 +44,7 @@ class InconsistentPublishTimestampsError(base_validation_errors.BaseAuditError):
     def __init__(self, model):
         message = 'created_on=%r is later than published_on=%r' % (
             model.created_on, model.published_on)
-        super(InconsistentPublishTimestampsError, self).__init__(message, model)
+        super().__init__(message, model)
 
 
 class InconsistentPublishLastUpdatedTimestampsError(
@@ -55,7 +55,6 @@ class InconsistentPublishLastUpdatedTimestampsError(
         message = 'published_on=%r is later than last_updated=%r' % (
             model.published_on, model.last_updated)
         super(
-            InconsistentPublishLastUpdatedTimestampsError, self
             ).__init__(message, model)
 
 
@@ -66,4 +65,4 @@ class ModelMutatedDuringJobError(base_validation_errors.BaseAuditError):
         message = (
             'published_on=%r is later than the audit job\'s start time' % (
                 model.published_on))
-        super(ModelMutatedDuringJobError, self).__init__(message, model)
+        super().__init__(message, model)

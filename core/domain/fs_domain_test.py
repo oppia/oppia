@@ -33,7 +33,7 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
     """Tests for the GCS file system."""
 
     def setUp(self):
-        super(GcsFileSystemUnitTests, self).setUp()
+        super().setUp()
         self.USER_EMAIL = 'abc@example.com'
         self.signup(self.USER_EMAIL, 'username')
         self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
@@ -124,7 +124,7 @@ class DirectoryTraversalTests(test_utils.GenericTestBase):
     """Tests to check for the possibility of directory traversal."""
 
     def setUp(self):
-        super(DirectoryTraversalTests, self).setUp()
+        super().setUp()
         self.USER_EMAIL = 'abc@example.com'
         self.signup(self.USER_EMAIL, 'username')
         self.user_id = self.get_user_id_from_email(self.USER_EMAIL)

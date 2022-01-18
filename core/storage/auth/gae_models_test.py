@@ -46,7 +46,7 @@ class UserAuthDetailsModelTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Set up user models in storage for use in testing."""
-        super(UserAuthDetailsModelTests, self).setUp()
+        super().setUp()
 
         auth_models.UserAuthDetailsModel(
             id=self.USER_ID,
@@ -166,7 +166,7 @@ class UserIdentifiersModelTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Set up user models in storage for use in testing."""
-        super(UserIdentifiersModelTests, self).setUp()
+        super().setUp()
 
         auth_models.UserIdentifiersModel(
             id=self.USER_GAE_ID,
@@ -244,7 +244,7 @@ class UserIdByFirebaseAuthIdModelTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Set up user models in storage for use in testing."""
-        super(UserIdByFirebaseAuthIdModelTests, self).setUp()
+        super().setUp()
 
         auth_models.UserIdByFirebaseAuthIdModel(
             id=self.USER_AUTH_ID, user_id=self.USER_ID).put()

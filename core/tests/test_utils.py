@@ -994,7 +994,7 @@ class TestBase(unittest.TestCase):
         """
 
         with datastore_services.get_ndb_context(namespace=self.namespace):
-            super(TestBase, self).run(result=result)
+            super().run(result=result)
 
     def _get_unicode_test_string(self, suffix):
         """Returns a string that contains unicode characters and ends with the
@@ -1330,7 +1330,7 @@ class TestBase(unittest.TestCase):
                 'Please provide a sufficiently strong regexp string to '
                 'validate that the correct error is being raised.')
 
-        return super(TestBase, self).assertRaisesRegex(
+        return super().assertRaisesRegex(
             expected_exception, expected_regex, *args, **kwargs)
 
     def assertItemsEqual(self, *args, **kwargs):  # pylint: disable=invalid-name
@@ -1407,14 +1407,14 @@ class AppEngineTestBase(TestBase):
     DEFAULT_VERSION_HOSTNAME = '%s:%s' % (HTTP_HOST, SERVER_PORT)
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
-        super(AppEngineTestBase, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         # Defined outside of setUp() because we access it from methods, but can
         # only install it during the run() method. Defining it in __init__
         # satisfies pylint's attribute-defined-outside-init warning.
         self._platform_taskqueue_services_stub = TaskqueueServicesStub(self)
 
     def setUp(self) -> None:
-        super(AppEngineTestBase, self).setUp()
+        super().setUp()
         # Initialize namespace for the storage emulator.
         storage_services.CLIENT.namespace = self.id()
         # Set up apps for testing.
@@ -1424,7 +1424,7 @@ class AppEngineTestBase(TestBase):
         datastore_services.delete_multi(
             datastore_services.query_everything().iter(keys_only=True))
         storage_services.CLIENT.reset()
-        super(AppEngineTestBase, self).tearDown()
+        super().tearDown()
 
     def run(self, result=None):
         """Run the test, collecting the result into the specified TestResult.
@@ -1444,7 +1444,7 @@ class AppEngineTestBase(TestBase):
             platform_taskqueue_services, 'create_http_task',
             self._platform_taskqueue_services_stub.create_http_task)
         with platform_taskqueue_services_swap:
-            super(AppEngineTestBase, self).run(result=result)
+            super().run(result=result)
 
     def count_jobs_in_taskqueue(self, queue_name):
         """Returns the total number of tasks in a single queue if a queue name
@@ -1884,10 +1884,10 @@ title: Title
                 memory_cache_services, 'delete_multi',
                 memory_cache_services_stub.delete_multi))
 
-            super(GenericTestBase, self).run(result=result)
+            super().run(result=result)
 
     def setUp(self) -> None:
-        super(GenericTestBase, self).setUp()
+        super().setUp()
         if self.AUTO_CREATE_DEFAULT_SUPERADMIN_USER:
             self.signup_superadmin_user()
 
@@ -3389,7 +3389,7 @@ class LinterTestBase(GenericTestBase):
     """Base class for linter tests."""
 
     def setUp(self):
-        super(LinterTestBase, self).setUp()
+        super().setUp()
         self.linter_stdout = []
 
         def mock_print(*args):
@@ -3492,10 +3492,10 @@ class GenericEmailTestBase(GenericTestBase):
         with self.swap(
             email_services, 'send_email_to_recipients',
             self._send_email_to_recipients):
-            super(EmailTestBase, self).run(result=result)
+            super().run(result=result)
 
     def setUp(self):
-        super(GenericEmailTestBase, self).setUp()
+        super().setUp()
         self._wipe_emails_dict()
 
     def _wipe_emails_dict(self):
@@ -3727,7 +3727,7 @@ class CallCounter(FunctionWrapper):
         """Counts the number of times the given function has been called. See
         FunctionWrapper for arguments.
         """
-        super(CallCounter, self).__init__(f)
+        super().__init__(f)
         self._times_called = 0
 
     @property
@@ -3769,7 +3769,7 @@ class FailingFunction(FunctionWrapper):
                 succeed, if it is FailingFunction. INFINITY, all calls will
                 fail.
         """
-        super(FailingFunction, self).__init__(f)
+        super().__init__(f)
         self._exception = exception
         self._num_tries_before_success = num_tries_before_success
         self._always_fail = (

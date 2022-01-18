@@ -26,7 +26,7 @@ class ActivityReferenceDomainUnitTests(test_utils.GenericTestBase):
     """Tests for ActivityReference domain class."""
 
     def setUp(self) -> None:
-        super(ActivityReferenceDomainUnitTests, self).setUp()
+        super().setUp()
         self.exp_activity_reference = activity_domain.ActivityReference(
             'exploration', '1234')
         self.collection_activity_reference = activity_domain.ActivityReference(
@@ -94,7 +94,7 @@ class ActivityReferencesDomainUnitTests(test_utils.GenericTestBase):
     """Tests for ActivityReferences domain class."""
 
     def setUp(self) -> None:
-        super(ActivityReferencesDomainUnitTests, self).setUp()
+        super().setUp()
         exp_activity_reference = activity_domain.ActivityReference(
             'exploration', '1234')
         collection_activity_reference = activity_domain.ActivityReference(

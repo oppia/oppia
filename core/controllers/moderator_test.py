@@ -51,7 +51,7 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
     user_email = 'albert@example.com'
 
     def setUp(self):
-        super(FeaturedActivitiesHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup(self.user_email, self.username)
         self.set_moderators([self.MODERATOR_USERNAME])
@@ -101,7 +101,7 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
 
 class EmailDraftHandlerTests(test_utils.GenericTestBase):
     def setUp(self):
-        super(EmailDraftHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.set_moderators([self.MODERATOR_USERNAME])
 
