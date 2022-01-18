@@ -88,14 +88,14 @@ class InteractionAnswerUnitTests(test_utils.GenericTestBase):
         interaction.answer_type = 'NonnegativeInt'
         interaction.normalize_answer('15')
 
-        with self.assertRaisesRegexp(Exception, 'not a valid object class'):
+        with self.assertRaisesRegex(Exception, 'not a valid object class'):
             interaction.answer_type = 'FakeObjType'
             interaction.normalize_answer('15')
 
     def test_get_rule_description_with_invalid_rule_name_raises_error(self):
         interaction = interaction_registry.Registry.get_interaction_by_id(
             'CodeRepl')
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Could not find rule with name invalid_rule_name'):
             interaction.get_rule_description('invalid_rule_name')
 
@@ -103,7 +103,7 @@ class InteractionAnswerUnitTests(test_utils.GenericTestBase):
             self):
         interaction = interaction_registry.Registry.get_interaction_by_id(
             'CodeRepl')
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Rule CodeEquals has no param called invalid_rule_param_name'):
             interaction.get_rule_param_type(
@@ -259,7 +259,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         _check_num_interaction_rules('MultipleChoiceInput', 1)
         _check_num_interaction_rules('NumericInput', 7)
         _check_num_interaction_rules('Continue', 0)
-        with self.assertRaisesRegexp(KeyError, '\'FakeObjType\''):
+        with self.assertRaisesRegex(KeyError, '\'FakeObjType\''):
             _check_num_interaction_rules('FakeObjType', 0)
 
     def test_interaction_rule_descriptions_in_dict(self):
