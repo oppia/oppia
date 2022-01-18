@@ -25,7 +25,7 @@ import { StateInteractionIdService } from 'components/state-editor/state-editor-
 import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
 import { Solution } from 'domain/exploration/SolutionObjectFactory';
 
-interface explanationFormSchema {
+interface ExplanationFormSchema {
   type: string;
   ui_config: object;
 }
@@ -41,12 +41,12 @@ export class SolutionEditor implements OnInit {
   @Output() openSolutionEditorModal: EventEmitter<void> = new EventEmitter();
 
   isEditable: boolean;
-  EXPLANATION_FORM_SCHEMA: explanationFormSchema;
+  EXPLANATION_FORM_SCHEMA: ExplanationFormSchema;
 
   constructor(
-    private stateCustomizationArgsService: StateCustomizationArgsService,
     private editabilityService: EditabilityService,
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
+    private stateCustomizationArgsService: StateCustomizationArgsService,
     private stateInteractionIdService: StateInteractionIdService,
     private stateSolutionService: StateSolutionService,
   ) {}

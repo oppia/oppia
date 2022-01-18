@@ -25,7 +25,7 @@ import { ExternalSaveService } from 'services/external-save.service';
 import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
 import { Solution } from 'domain/exploration/SolutionObjectFactory';
 
-interface explanationFormSchema {
+interface ExplanationFormSchema {
   type: string;
   ui_config: object;
 }
@@ -36,14 +36,14 @@ interface explanationFormSchema {
 })
 export class SolutionExplanationEditor
   implements OnDestroy, OnInit {
-  @Output() onSaveSolution: EventEmitter<Solution> = new EventEmitter();
+  @Output() saveSolution: EventEmitter<Solution> = new EventEmitter();
   @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired:
     EventEmitter<string[]> = new EventEmitter();
 
   directiveSubscriptions = new Subscription();
   isEditable: boolean;
   explanationEditorIsOpen: boolean;
-  EXPLANATION_FORM_SCHEMA: explanationFormSchema;
+  EXPLANATION_FORM_SCHEMA: ExplanationFormSchema;
 
   constructor(
     private contextService: ContextService,
@@ -77,13 +77,13 @@ export class SolutionExplanationEditor
       this.stateSolutionService.displayed.explanation.html !==
       this.stateSolutionService.savedMemento.explanation.html);
     if (contentHasChanged) {
-      var solutionContentId = this.stateSolutionService.displayed.explanation
+      const solutionContentId = this.stateSolutionService.displayed.explanation
         .contentId;
       this.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit(
         [solutionContentId]);
     }
     this.stateSolutionService.saveDisplayedValue();
-    this.onSaveSolution.emit(this.stateSolutionService.displayed);
+    this.saveSolution.emit(this.stateSolutionService.displayed);
     this.explanationEditorIsOpen = false;
   }
 

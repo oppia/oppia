@@ -24,7 +24,7 @@ import { SolutionExplanationEditor } from './solution-explanation-editor.compone
 import { ExternalSaveService } from 'services/external-save.service';
 import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
 
-class mockStateSolutionService {
+class MockStateSolutionService {
   displayed = {
     explanation: {
       _html: 'Hello world',
@@ -70,7 +70,7 @@ describe('Solution explanation editor', function() {
         ExternalSaveService,
         {
           provide: StateSolutionService,
-          useClass: mockStateSolutionService
+          useClass: MockStateSolutionService
         }
       ],
       schemas: [NO_ERRORS_SCHEMA]

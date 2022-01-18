@@ -26,23 +26,27 @@ import { ExplorationHtmlFormatterService } from 'services/exploration-html-forma
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
 
-class mockStateCustomizationArgsService {
+class MockStateCustomizationArgsService {
   savedMemento = 'data3';
 }
-class mockStateInteractionIdService {
+
+class MockStateInteractionIdService {
   savedMemento = 'data2';
 }
-class mockStateSolutionService {
+
+class MockStateSolutionService {
   savedMemento = {
     correctAnswer: 'data1'
   };
 }
-class mockExplorationHtmlFormatterService {
+
+class MockExplorationHtmlFormatterService {
   getAnswerHtml(x, y, z): string {
     return x + y + z;
   }
 }
-class mockEditabilityService {
+
+class MockEditabilityService {
   isEditable(): boolean {
     return true;
   }
@@ -63,23 +67,23 @@ describe('Solution editor component', function() {
         SolutionObjectFactory,
         {
           provide: EditabilityService,
-          useClass: mockEditabilityService
+          useClass: MockEditabilityService
         },
         {
           provide: ExplorationHtmlFormatterService,
-          useClass: mockExplorationHtmlFormatterService
+          useClass: MockExplorationHtmlFormatterService
         },
         {
           provide: StateSolutionService,
-          useClass: mockStateSolutionService
+          useClass: MockStateSolutionService
         },
         {
           provide: StateInteractionIdService,
-          useClass: mockStateInteractionIdService
+          useClass: MockStateInteractionIdService
         },
         {
           provide: StateCustomizationArgsService,
-          useClass: mockStateCustomizationArgsService
+          useClass: MockStateCustomizationArgsService
         }
       ],
       schemas: [NO_ERRORS_SCHEMA]
