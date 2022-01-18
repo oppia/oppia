@@ -223,7 +223,7 @@ class BaseChange:
         return base_change_dict
 
     @classmethod
-    def from_dict(self, base_change_dict):
+    def from_dict(cls, base_change_dict):
         """Returns a BaseChange domain object from a dict.
 
         Args:
@@ -233,7 +233,7 @@ class BaseChange:
         Returns:
             BaseChange. The corresponding BaseChange domain object.
         """
-        return self(base_change_dict)
+        return cls(base_change_dict)
 
     def __getattr__(self, name: str) -> str:
         # AttributeError needs to be thrown in order to make
