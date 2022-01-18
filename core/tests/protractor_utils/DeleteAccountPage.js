@@ -44,6 +44,8 @@ var DeleteAccountPage = function() {
     await waitFor.clientSideRedirection(async() => {
       await action.click('Confirm deletion button', confirmDeletionButton);
     }, (url) => {
+      console.log(url);
+      console.log(url === 'http://localhost:9001/pending-account-deletion');
       return url === 'http://localhost:9001/pending-account-deletion';
     }, async() => {
       await waitFor.visibilityOf(
