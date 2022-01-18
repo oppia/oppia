@@ -13,13 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for the numeric expression extension components.
+ * @fileoverview Module for the pencil code editor interaction.
  */
 
-import 'core-js/es7/reflect';
-import 'zone.js';
-
-import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
@@ -27,18 +23,15 @@ import { MaterialModule } from 'modules/material.module';
 import { PencilCodeEditor } from './directives/oppia-interactive-pencil-code-editor.component';
 import { PencilCodeResetConfirmation } from './directives/pencil-code-reset-confirmation.component';
 import { ResponePencilCodeEditor } from './directives/oppia-response-pencil-code-editor.component';
-import { SharedFormsModule } from 'components/forms/shared-forms.module';
 import { ShortResponePencilCodeEditor } from './directives/oppia-short-response-pencil-code-editor.component';
-import { SharedPipesModule } from 'filters/shared-pipes.module';
 import { TranslateModule } from '@ngx-translate/core';
+import { SharedPipesModule } from 'filters/shared-pipes.module';
 
 @NgModule({
   imports: [
-    CommonModule,
+    SharedPipesModule,
     BrowserModule,
     MaterialModule,
-    SharedPipesModule,
-    SharedFormsModule,
     TranslateModule
   ],
   declarations: [

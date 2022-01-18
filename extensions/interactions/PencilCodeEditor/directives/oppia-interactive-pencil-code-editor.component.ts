@@ -20,17 +20,17 @@
  * followed by the name of the arg.
  */
 
-import { Component, Input, OnDestroy, OnInit, ElementRef } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
+import { Component, Input, OnDestroy, OnInit, ElementRef } from '@angular/core';
 import { CurrentInteractionService, InteractionRulesService } from 'pages/exploration-player-page/services/current-interaction.service';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
+import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { PencilCodeEditorCustomizationArgs } from 'interactions/customization-args-defs';
+import { PencilCodeEditorRulesService } from './pencil-code-editor-rules.service';
+import { PencilCodeResetConfirmation } from './pencil-code-reset-confirmation.component';
 import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
 import { Subscription } from 'rxjs';
-import { PencilCodeResetConfirmation } from './pencil-code-reset-confirmation.component';
-import { PencilCodeEditorCustomizationArgs } from 'interactions/customization-args-defs';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { PencilCodeEditorRulesService } from './pencil-code-editor-rules.service';
 
 @Component({
   selector: 'oppia-interactive-pencil-code-editor',
@@ -102,9 +102,8 @@ export class PencilCodeEditor implements OnInit, OnDestroy {
         'PencilCodeEditor',
         this._getAttributes()
       ) as PencilCodeEditorCustomizationArgs);
-    this.someInitialCode = this.interactionIsActive ?
-      initialCode.value :
-      this.lastAnswer.code;
+    this.someInitialCode = (
+      this.interactionIsActive ? initialCode.value : this.lastAnswer.code);
 
     this.pce.beginLoad(this.someInitialCode);
     this.pce.on('load', () => {
@@ -113,7 +112,21 @@ export class PencilCodeEditor implements OnInit, OnDestroy {
       // turtle, and redefines say() to also write the text on the
       // screen.
       this.pce.setupScript([{
-        code: [].join('\n'),
+        code: [
+          'window.onerror = function() {',
+          '  return true;',
+          '};',
+          'debug.hide();',
+          'window.removeEventListener("error", debug)',
+          '',
+          'ht();',
+          '',
+          'oldsay = window.say',
+          'say = function(x) {',
+          '  write(x);',
+          '  oldsay(x);',
+          '};'
+        ].join('\n'),
         type: 'text/javascript'
       }]);
 
@@ -152,10 +165,15 @@ export class PencilCodeEditor implements OnInit, OnDestroy {
           let normalizedCode = this.getNormalizedCode();
 
           // Get all the divs, and extract their textual content.
-          let output = $.map(
-            $(pencilCodeHtml).filter('div'), (elem) => {
-              return $(elem).text();
-            }).join('\n');
+          let temp = document.createElement('div');
+          // eslint-disable-next-line oppia/no-inner-html
+          temp.innerHTML = pencilCodeHtml;
+          let output: string = '';
+          let htmlObject = temp.querySelectorAll('div');
+          for (let i = 0; i < htmlObject.length; i++) {
+            // eslint-disable-next-line oppia/no-inner-html
+            output += htmlObject[i].innerHTML + '\n';
+          }
 
           hasSubmittedAnswer = true;
           this.currentInteractionService.onSubmit({

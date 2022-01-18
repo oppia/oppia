@@ -4,7 +4,8 @@
   </div>
   <div class="oppia-reset-code-button-container">
     <button mat-button class="oppia-reset-code-text"
-            (click)="reset()" [disabled]="!interactionIsActive"
+            (click)="reset()"
+            [disabled]="!interactionIsActive"
             [innerHTML]="'I18N_RESET_CODE' | translate">
     </button>
   </div>

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit Tests for the PencilCodeEditor response.
+ * @fileoverview Unit Tests for the pencil code editor response.
  */
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
