@@ -109,7 +109,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             'question_id', strict=False)
         self.assertIsNone(question)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Entity for class QuestionModel with id question_id '
             'not found'):
             question_services.get_question_by_id('question_id')
@@ -182,7 +182,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertEqual(
             merged_question_skill_links[0].skill_difficulties, [0.9])
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'The given question and skill are not linked.'):
             question_services.update_question_skill_link_difficulty(
                 self.question_id, 'skill_10', 0.9)
@@ -206,7 +206,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
     def test_get_questions_by_skill_ids_raise_error_with_high_question_count(
             self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Question count is too high, please limit the question '
             'count to %d.' % feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME):
             question_services.get_questions_by_skill_ids(
@@ -217,7 +217,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             self.question_id, self.editor_id,
             self._create_valid_question_data('ABC'), ['skill_1'])
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Skill difficulties and skill ids should match. '
             'The lengths of the two lists are different.'):
             question_services.link_multiple_skills_for_question(
@@ -277,7 +277,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
     def test_create_and_get_question_skill_link(self):
         question_id_2 = question_services.get_new_question_id()
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             re.escape(
                 'Entity for class QuestionModel with id %s not found' % (
@@ -306,7 +306,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             question_services.get_displayable_question_skill_link_details(
                 5, ['skill_1', 'skill_2', 'skill_3'], 0))
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Querying linked question summaries for more than 3 '
             'skills at a time is not supported currently.'):
             question_services.get_displayable_question_skill_link_details(
@@ -350,7 +350,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertItemsEqual(
             question_ids, [self.question_id, question_id_2])
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'The given question is already linked to given skill'):
             question_services.create_new_question_skill_link(
                 self.editor_id, self.question_id, 'skill_1', 0.3)
@@ -436,12 +436,12 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
         question_services.delete_question(self.editor_id, self.question_id)
 
-        with self.assertRaisesRegexp(Exception, (
+        with self.assertRaisesRegex(Exception, (
             'Entity for class QuestionModel with id %s not found' % (
                 self.question_id))):
             question_models.QuestionModel.get(self.question_id)
 
-        with self.assertRaisesRegexp(Exception, (
+        with self.assertRaisesRegex(Exception, (
             'Entity for class QuestionSummaryModel with id %s not found' % (
                 self.question_id))):
             question_models.QuestionSummaryModel.get(self.question_id)
@@ -509,13 +509,13 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         }
         change_list = [question_domain.QuestionChange(change_dict)]
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected a commit message, received none.'):
             question_services.update_question(
                 self.editor_id, self.question_id, change_list, None)
 
     def test_cannot_update_question_with_no_change_list(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Unexpected error: received an invalid change list when trying to '
             'save question'):
@@ -570,7 +570,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             observed_log_messages.append(msg % args)
 
         logging_swap = self.swap(logging, 'error', _mock_logging_function)
-        assert_raises_context_manager = self.assertRaisesRegexp(
+        assert_raises_context_manager = self.assertRaisesRegex(
             Exception, '\'str\' object has no attribute \'cmd\'')
 
         with logging_swap, assert_raises_context_manager:
@@ -579,7 +579,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 'updated question language code')
 
         self.assertEqual(len(observed_log_messages), 1)
-        self.assertRegexpMatches(
+        self.assertRegex(
             observed_log_messages[0],
             'object has no attribute \'cmd\' %s '
             'invalid_change_list' % self.question_id)
@@ -653,7 +653,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
     def test_get_skills_of_question(self):
         # If the question id doesnt exist at all, it returns an empty list.
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Entity for class QuestionModel with id '
             'non_existent_question_id not found'):
             question_services.get_skills_linked_to_question(
@@ -690,7 +690,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertEqual(
             question_services.get_interaction_id_for_question(
                 self.question_id), 'TextInput')
-        with self.assertRaisesRegexp(Exception, 'No questions exists with'):
+        with self.assertRaisesRegex(Exception, 'No questions exists with'):
             question_services.get_interaction_id_for_question('fake_q_id')
 
     def test_untag_deleted_misconceptions_on_no_change_to_skill(self):

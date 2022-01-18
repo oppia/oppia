@@ -259,7 +259,7 @@
     font-family: "Capriola", "Roboto", Arial, sans-serif;
   }
   .oppia-library-h2 {
-    color: #047C74;
+    color: #047c74;
     font-family: "Rubik, regular", "Roboto", Arial, sans-serif;
     padding-bottom: 1em;
   }
@@ -482,6 +482,35 @@
     }
     .oppia-classroom-text > a {
       margin-top: 40px;
+    }
+  }
+  .oppia-exp-summary-tiles-container {
+    display: block;
+    height: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 928px;
+    min-height: 300px;
+    padding-bottom: 24px;
+    padding-top: 24px;
+    width: 100vw;
+  }
+
+  /* Ensure that the summary tiles tiles remain centered. Note that these values
+    would need to be updated if the summary tiles are changed. */
+  @media (max-width: 844px) {
+    .oppia-exp-summary-tiles-container {
+      margin-left: 5vw;
+      margin-right: 5vw;
+      max-width: 89vw;
+      width: initial;
+    }
+  }
+  @media (max-width: 632px) {
+    .oppia-exp-summary-tiles-container {
+      margin-left: 2vw;
+      margin-right: 2vw;
+      max-width: 96vw;
     }
   }
 </style>

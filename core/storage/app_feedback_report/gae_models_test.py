@@ -173,7 +173,7 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
     def test_create_raises_exception_by_mocking_collision(self) -> None:
         model_class = app_feedback_report_models.AppFeedbackReportModel
         # Test Exception for AppFeedbackReportModel.
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception, 'The id generator for AppFeedbackReportModel is '
             'producing too many collisions.'):
             # Swap dependent method get_by_id to simulate collision every time.
@@ -295,7 +295,7 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
             """Invalid filter."""
 
             INVALID_FIELD = 'invalid_field'
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.InvalidInputException,
             'The field %s is not a valid field to filter reports on' % (
                 InvalidFilter.INVALID_FIELD.name)
@@ -369,7 +369,7 @@ class AppFeedbackReportTicketModelTests(test_utils.GenericTestBase):
     def test_create_raises_exception_by_mocking_collision(self) -> None:
         model_class = app_feedback_report_models.AppFeedbackReportTicketModel
         # Test Exception for AppFeedbackReportTicketModel.
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception,
             'The id generator for AppFeedbackReportTicketModel is producing too'
             'many collisions.'

@@ -278,7 +278,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
 
         with os_name_swap, url_retrieve_swap:
             with self.dir_exists_swap, isfile_swap, zipfile_swap:
-                with self.assertRaisesRegexp(
+                with self.assertRaisesRegex(
                     Exception, 'Error installing protoc binary'):
                     install_third_party_libs.install_buf_and_protoc()
 
@@ -293,7 +293,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
 
     def test_proto_file_compilation_raises_exception_on_compile_errors(self):
         with self.Popen_error_swap:
-            with self.assertRaisesRegexp(
+            with self.assertRaisesRegex(
                 Exception, 'Error compiling proto files at mock_path'):
                 install_third_party_libs.compile_protobuf_files(['mock_path'])
 

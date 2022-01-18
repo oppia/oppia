@@ -114,14 +114,12 @@ describe('SolutionExplanationEditorComponent', () => {
     expect(ctrl.explanationEditorIsOpen).toBe(false);
   });
 
-  it('should check if solution explanation length has exceeded 200 characters',
+  it('should check if solution explanation length exceeds 100000 characters',
     () => {
-      var solutionExplanation = 'Solution explanation';
-
       StateSolutionService.displayed = {
         explanation: {
           contentId: 'contentID',
-          html: '<p> ' + solutionExplanation + ' </p>'
+          html: 'a'.repeat(100000)
         }
       };
       expect(ctrl.isSolutionExplanationLengthExceeded()).toBe(false);
@@ -129,7 +127,7 @@ describe('SolutionExplanationEditorComponent', () => {
       StateSolutionService.displayed = {
         explanation: {
           contentId: 'contentID',
-          html: '<p> ' + solutionExplanation.repeat(180) + ' </p>'
+          html: 'a'.repeat(100001)
         }
       };
       expect(ctrl.isSolutionExplanationLengthExceeded()).toBe(true);

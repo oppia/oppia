@@ -203,13 +203,13 @@ class MypyScriptChecks(test_utils.GenericTestBase):
     def test_main_with_files_with_mypy_errors(self):
         with self.install_mypy_prereq_swap_success:
             with self.install_swap, self.popen_swap_failure:
-                with self.assertRaisesRegexp(SystemExit, '2'):
+                with self.assertRaisesRegex(SystemExit, '2'):
                     run_mypy_checks.main(args=['--files', 'file1.py'])
 
     def test_main_failure_due_to_mypy_errors(self):
         with self.popen_swap_failure:
             with self.install_swap, self.install_mypy_prereq_swap_success:
-                with self.assertRaisesRegexp(SystemExit, '2'):
+                with self.assertRaisesRegex(SystemExit, '2'):
                     run_mypy_checks.main(args=[])
 
     def test_main_with_install_prerequisites_success(self):
@@ -220,5 +220,5 @@ class MypyScriptChecks(test_utils.GenericTestBase):
 
     def test_main_with_install_prerequisites_failure(self):
         with self.popen_swap_failure, self.install_swap:
-            with self.assertRaisesRegexp(SystemExit, '1'):
+            with self.assertRaisesRegex(SystemExit, '1'):
                 run_mypy_checks.main(args=[])

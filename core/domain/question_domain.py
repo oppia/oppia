@@ -31,16 +31,17 @@ from core.domain import change_domain
 from core.domain import customization_args_util
 from core.domain import exp_domain
 from core.domain import expression_parser
-from core.domain import html_cleaner
-from core.domain import html_validation_service
-from core.domain import interaction_registry
 from core.domain import state_domain
-from core.platform import models
 from extensions import domain
 
 from pylatexenc import latex2text
 
-(question_models,) = models.Registry.import_models([models.NAMES.question])
+from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
+from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
+from core.domain import interaction_registry  # pylint: disable=invalid-import-from # isort:skip
+
+# TODO(#14537): Refactor this file and remove imports marked
+# with 'invalid-import-from'.
 
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.

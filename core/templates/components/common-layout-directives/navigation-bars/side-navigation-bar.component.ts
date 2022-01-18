@@ -38,9 +38,9 @@ export class SideNavigationBarComponent {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
    @Input() display!: boolean;
 
+   DEFAULT_CLASSROOM_URL_FRAGMENT = AppConstants.DEFAULT_CLASSROOM_URL_FRAGMENT;
    currentUrl!: string;
    classroomData: CreatorTopicSummary[] = [];
-   topicSummariesLength: number = 0;
    CLASSROOM_PROMOS_ARE_ENABLED: boolean = false;
    getinvolvedSubmenuIsShown: boolean = false;
    learnSubmenuIsShown: boolean = true;
@@ -72,25 +72,23 @@ export class SideNavigationBarComponent {
      service.fetchClassroomPromosAreEnabledStatusAsync().then(
        classroomPromosAreEnabled => {
          this.CLASSROOM_PROMOS_ARE_ENABLED = classroomPromosAreEnabled;
+         if (classroomPromosAreEnabled) {
+           this.accessValidationBackendApiService.validateAccessToClassroomPage(
+             this.DEFAULT_CLASSROOM_URL_FRAGMENT).then(()=>{
+             this.classroomBackendApiService.fetchClassroomDataAsync(
+               this.DEFAULT_CLASSROOM_URL_FRAGMENT)
+               .then((classroomData) => {
+                 this.classroomData = classroomData.getTopicSummaries();
+                 this.classroomBackendApiService.onInitializeTranslation.emit();
+                 this.siteAnalyticsService.registerClassroomPageViewed();
+               });
+           });
+         }
        });
 
      this.userService.getUserInfoAsync().then((userInfo) => {
        this.userIsLoggedIn = userInfo.isLoggedIn();
      });
-   }
-
-   ngAfterViewChecked(): void {
-     if (this.CLASSROOM_PROMOS_ARE_ENABLED) {
-       this.accessValidationBackendApiService.validateAccessToClassroomPage(
-         'math').then(()=>{
-         this.classroomBackendApiService.fetchClassroomDataAsync(
-           'math').then((classroomData) => {
-           this.classroomData = classroomData.getTopicSummaries();
-         });
-       });
-     }
-
-     this.changeDetectorRef.detectChanges();
    }
 
    stopclickfurther(event: Event): void {

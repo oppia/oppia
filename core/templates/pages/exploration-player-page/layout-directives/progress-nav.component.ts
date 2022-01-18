@@ -90,12 +90,6 @@ export class ProgressNavComponent {
 
   ngOnInit(): void {
     this.isIframed = this.urlService.isIframed();
-    this.directiveSubscriptions.add(
-      this.playerPositionService.displayedCardIndexChangedEventEmitter
-        .subscribe((index) => {
-          this.updateDisplayedCardInfo();
-        })
-    );
 
     this.directiveSubscriptions.add(
       this.playerPositionService.onHelpCardAvailable.subscribe(
@@ -111,10 +105,6 @@ export class ProgressNavComponent {
         }
       )
     );
-
-    if (this.playerPositionService.getDisplayedCardIndex() > -1) {
-      this.updateDisplayedCardInfo();
-    }
   }
 
   ngOnDestroy(): void {

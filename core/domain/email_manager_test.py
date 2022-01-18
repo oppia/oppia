@@ -21,7 +21,6 @@ import logging
 import types
 
 from core import feconf
-from core import python_utils
 from core.constants import constants
 from core.domain import config_domain
 from core.domain import config_services
@@ -192,23 +191,23 @@ class EmailRightsTest(test_utils.GenericTestBase):
                     email_manager.require_sender_id_is_valid(
                         intent, sender_id)
                 else:
-                    with self.assertRaisesRegexp(
+                    with self.assertRaisesRegex(
                         Exception, 'Invalid sender_id'
                     ):
                         email_manager.require_sender_id_is_valid(
                             intent, sender_id)
 
         # Also test null and invalid intent strings.
-        with self.assertRaisesRegexp(Exception, 'Invalid email intent string'):
+        with self.assertRaisesRegex(Exception, 'Invalid email intent string'):
             email_manager.require_sender_id_is_valid(
                 '', feconf.SYSTEM_COMMITTER_ID)
-        with self.assertRaisesRegexp(Exception, 'Invalid email intent string'):
+        with self.assertRaisesRegex(Exception, 'Invalid email intent string'):
             email_manager.require_sender_id_is_valid(
                 '', self.admin_id)
-        with self.assertRaisesRegexp(Exception, 'Invalid email intent string'):
+        with self.assertRaisesRegex(Exception, 'Invalid email intent string'):
             email_manager.require_sender_id_is_valid(
                 'invalid_intent', feconf.SYSTEM_COMMITTER_ID)
-        with self.assertRaisesRegexp(Exception, 'Invalid email intent string'):
+        with self.assertRaisesRegex(Exception, 'Invalid email intent string'):
             email_manager.require_sender_id_is_valid(
                 'invalid_intent', self.admin_id)
 
@@ -541,7 +540,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
         with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx:
             # Check that an exception is raised when an invalid
             # role is supplied.
-            with self.assertRaisesRegexp(Exception, 'Invalid role'):
+            with self.assertRaisesRegex(Exception, 'Invalid role'):
                 email_manager.send_role_notification_email(
                     self.editor_id, self.new_user_id, rights_domain.ROLE_NONE,
                     self.exploration.id, self.exploration.title)
@@ -601,7 +600,8 @@ class SignupEmailTests(test_utils.EmailTestBase):
             self.post_json(
                 feconf.SIGNUP_DATA_URL, {
                     'agreed_to_terms': True,
-                    'username': self.EDITOR_USERNAME
+                    'username': self.EDITOR_USERNAME,
+                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
                 }, csrf_token=csrf_token)
 
             # Check that no email was sent.
@@ -632,7 +632,8 @@ class SignupEmailTests(test_utils.EmailTestBase):
             self.post_json(
                 feconf.SIGNUP_DATA_URL, {
                     'agreed_to_terms': True,
-                    'username': self.EDITOR_USERNAME
+                    'username': self.EDITOR_USERNAME,
+                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
                 }, csrf_token=csrf_token)
 
             # However, an error should be recorded in the logs.
@@ -679,7 +680,8 @@ class SignupEmailTests(test_utils.EmailTestBase):
             self.post_json(
                 feconf.SIGNUP_DATA_URL, {
                     'agreed_to_terms': True,
-                    'username': self.EDITOR_USERNAME
+                    'username': self.EDITOR_USERNAME,
+                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
                 }, csrf_token=csrf_token)
 
             # However, an error should be recorded in the logs.
@@ -724,7 +726,8 @@ class SignupEmailTests(test_utils.EmailTestBase):
             self.post_json(
                 feconf.SIGNUP_DATA_URL, {
                     'agreed_to_terms': True,
-                    'username': self.EDITOR_USERNAME
+                    'username': self.EDITOR_USERNAME,
+                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
                 }, csrf_token=csrf_token)
 
             # However, an error should be recorded in the logs.
@@ -755,7 +758,8 @@ class SignupEmailTests(test_utils.EmailTestBase):
             self.post_json(
                 feconf.SIGNUP_DATA_URL, {
                     'agreed_to_terms': True,
-                    'username': self.EDITOR_USERNAME
+                    'username': self.EDITOR_USERNAME,
+                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
                 }, csrf_token=csrf_token)
 
             # Check that an email was sent with the correct content.
@@ -786,7 +790,8 @@ class SignupEmailTests(test_utils.EmailTestBase):
             self.post_json(
                 feconf.SIGNUP_DATA_URL, {
                     'agreed_to_terms': True,
-                    'username': self.EDITOR_USERNAME
+                    'username': self.EDITOR_USERNAME,
+                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
                 }, csrf_token=csrf_token)
 
             # Check that an email was sent.
@@ -797,7 +802,8 @@ class SignupEmailTests(test_utils.EmailTestBase):
             self.post_json(
                 feconf.SIGNUP_DATA_URL, {
                     'agreed_to_terms': True,
-                    'username': self.EDITOR_USERNAME
+                    'username': self.EDITOR_USERNAME,
+                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
                 }, csrf_token=csrf_token)
 
             # Check that no new email was sent.
@@ -821,7 +827,8 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 feconf.SIGNUP_DATA_URL,
                 {
                     'agreed_to_terms': True,
-                    'username': 'BadUsername!!!'
+                    'username': 'BadUsername!!!',
+                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
                 },
                 csrf_token=csrf_token, expected_status_int=400)
 
@@ -833,7 +840,8 @@ class SignupEmailTests(test_utils.EmailTestBase):
             self.post_json(
                 feconf.SIGNUP_DATA_URL, {
                     'agreed_to_terms': True,
-                    'username': self.EDITOR_USERNAME
+                    'username': self.EDITOR_USERNAME,
+                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
                 }, csrf_token=csrf_token)
 
             # Check that a new email was sent.
@@ -862,7 +870,8 @@ class SignupEmailTests(test_utils.EmailTestBase):
             self.post_json(
                 feconf.SIGNUP_DATA_URL, {
                     'agreed_to_terms': True,
-                    'username': self.EDITOR_USERNAME
+                    'username': self.EDITOR_USERNAME,
+                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
                 }, csrf_token=csrf_token)
 
             # Check that a new email was sent.
@@ -970,7 +979,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
 
             # An error should be recorded in the logs.
             self.assertEqual(log_new_error_counter.times_called, 1)
-            self.assertRegexpMatches(logged_errors[0], 'Duplicate email')
+            self.assertRegex(logged_errors[0], 'Duplicate email')
 
             # Check that a new email was not sent.
             messages = self._get_sent_email_messages(self.NEW_USER_EMAIL)
@@ -1030,7 +1039,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
 
             # An error should be recorded in the logs.
             self.assertEqual(log_new_error_counter.times_called, 1)
-            self.assertRegexpMatches(logged_errors[0], 'Duplicate email')
+            self.assertRegex(logged_errors[0], 'Duplicate email')
 
             # Check that a new email was not sent.
             messages = self._get_sent_email_messages(self.NEW_USER_EMAIL)
@@ -5458,7 +5467,7 @@ class BulkEmailsTests(test_utils.EmailTestBase):
 
     def test_that_exception_is_raised_for_unauthorised_sender(self):
         with self.can_send_emails_ctx, (
-            self.assertRaisesRegexp(
+            self.assertRaisesRegex(
                 Exception, 'Invalid sender_id for email')):
             email_manager.send_user_query_email(
                 self.fake_sender_id, self.recipient_ids, 'email_subject',
@@ -5495,8 +5504,7 @@ class EmailPreferencesTests(test_utils.EmailTestBase):
         emails = ('user1@example.com', 'user2@example.com')
 
         user_ids = []
-        for user_id, username, user_email in python_utils.ZIP(
-                gae_ids, usernames, emails):
+        for user_id, username, user_email in zip(gae_ids, usernames, emails):
             user_settings = user_services.create_new_user(user_id, user_email)
             user_ids.append(user_settings.user_id)
             user_services.set_username(user_settings.user_id, username)
@@ -5584,14 +5592,14 @@ class ModeratorActionEmailsTests(test_utils.EmailTestBase):
             feconf, 'REQUIRE_EMAIL_ON_MODERATOR_ACTION', True)
 
     def test_exception_raised_if_email_on_moderator_action_is_false(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'For moderator emails to be sent, please ensure that '
             'REQUIRE_EMAIL_ON_MODERATOR_ACTION is set to True.'):
             email_manager.require_moderator_email_prereqs_are_satisfied()
 
     def test_exception_raised_if_can_send_emails_is_false(self):
-        with self.can_send_email_moderator_action_ctx, self.assertRaisesRegexp(
+        with self.can_send_email_moderator_action_ctx, self.assertRaisesRegex(
             Exception,
             'For moderator emails to be sent, please ensure that '
             'CAN_SEND_EMAILS is set to True.'):
@@ -5671,7 +5679,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
 
     def test_assign_translation_reviewer_email_for_invalid_review_category(
             self):
-        with self.assertRaisesRegexp(Exception, 'Invalid review_category'):
+        with self.assertRaisesRegex(Exception, 'Invalid review_category'):
             email_manager.send_email_to_new_contribution_reviewer(
                 self.translation_reviewer_id, 'invalid_category')
 
@@ -5840,7 +5848,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
 
     def test_remove_translation_reviewer_email_for_invalid_review_category(
             self):
-        with self.assertRaisesRegexp(Exception, 'Invalid review_category'):
+        with self.assertRaisesRegex(Exception, 'Invalid review_category'):
             email_manager.send_email_to_removed_contribution_reviewer(
                 self.translation_reviewer_id, 'invalid_category')
 

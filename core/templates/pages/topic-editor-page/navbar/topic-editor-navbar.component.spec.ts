@@ -53,6 +53,7 @@ describe('topicEditorNavbar', () => {
       }
     });
   }));
+
   beforeEach(angular.mock.module('oppia', function($provide) {
     let mockWindow = {
       location: '',
@@ -73,6 +74,7 @@ describe('topicEditorNavbar', () => {
     TopicRightsBackendApiService =
       $injector.get('TopicRightsBackendApiService');
     $uibModal = $injector.get('$uibModal');
+    ngbModal = $injector.get('NgbModal');
 
     var subtopic = Subtopic.createFromTitle(1, 'subtopic1');
     subtopic._skillIds = ['skill_1'];
@@ -337,9 +339,11 @@ describe('topicEditorNavbar', () => {
   ' clicks the \'publish\' button and then cancels', fakeAsync(() => {
     spyOn(TopicRightsBackendApiService, 'sendMailAsync').and.returnValue(
       Promise.resolve());
-    spyOn($uibModal, 'open').and.returnValue({
-      result: Promise.reject()
-    });
+    spyOn(ngbModal, 'open').and.returnValue(
+      {
+        result: Promise.reject()
+      } as NgbModalRef
+    );
     spyOn(AlertsService, 'addSuccessMessage');
     $scope.topicRights = TopicRights.createFromBackendDict({
       published: false,

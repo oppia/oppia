@@ -164,6 +164,12 @@ describe('Exploration Html Formatter Service', () => {
     ).toBe(expectedHtmlTag);
   });
 
+  it('should throw error when interaction id is null', () => {
+    expect(() => {
+      ehfs.getAnswerHtml('sampleAnswer', null, {});
+    }).toThrowError('InteractionId cannot be null');
+  });
+
   it('should set short answer HTML correctly', () => {
     var interactionId = 'sampleId';
     var answer = 'sampleAnswer';
