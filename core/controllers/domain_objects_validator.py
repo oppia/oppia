@@ -321,7 +321,7 @@ def validate_topic_and_sub_topic_change(change_dict):
 
     if change_dict.get('cmd', None) not in allowed_commands:
         raise base.BaseHandler.InvalidInputException(
-            '%s cmd is not allowed.' % change_dict['cmd']
+            '%s cmd is not allowed.' % change_dict.get('cmd', None)
         )
 
     return change_dict

@@ -465,9 +465,10 @@ class TopicEditorTests(
         self.logout()
 
     def test_editable_topic_handler_put_fails_with_long_commit_message(self):
+        commit_msg = 'a' * (constants.MAX_COMMIT_MESSAGE_LENGTH + 1)
         change_cmd = {
             'version': 2,
-            'commit_message': 'a' * (constants.MAX_COMMIT_MESSAGE_LENGTH + 1),
+            'commit_message': commit_msg,
             'topic_and_subtopic_page_change_dicts': [{
                 'cmd': 'update_topic_property',
                 'property_name': 'name',
@@ -478,10 +479,16 @@ class TopicEditorTests(
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        self.put_json(
+        json_response = self.put_json(
             '%s/%s' % (
                 feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
             change_cmd, csrf_token=csrf_token, expected_status_int=400)
+        self.assertEqual(
+            json_response['error'],
+            'Schema validation for \'commit_message\' failed: '
+            'Validation failed: has_length_at_most '
+            f'({{\'max_value\': {constants.MAX_COMMIT_MESSAGE_LENGTH}}}) '
+            f'for object {commit_msg}')
 
     def test_editable_topic_handler_put_raises_error_with_invalid_name(self):
         change_cmd = {
@@ -497,10 +504,12 @@ class TopicEditorTests(
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        self.put_json(
+        json_response = self.put_json(
             '%s/%s' % (
                 feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
             change_cmd, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(json_response['error'], 'Name should be a string.')
 
     def test_editable_topic_handler_put(self):
         # Check that admins can edit a topic.
