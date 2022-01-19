@@ -1,28 +1,29 @@
 <div class="form-inline oppia-form-inline protractor-test-dest-bubble">
   <div class="oppia-rule-details-header">
-    <strong ng-if="$ctrl.outcomeHasFeedback">And afterwards, directs the learner to...</strong>
-    <strong ng-if="!$ctrl.outcomeHasFeedback">Oppia directs the learner to...</strong>
+    <strong *ngIf="outcomeHasFeedback">And afterwards, directs the learner to...</strong>
+    <strong *ngIf="!outcomeHasFeedback">Oppia directs the learner to...</strong>
   </div>
   <div class="form-group oppia-form-group">
     <span>
-      <select class="form-control oppia-form-control" ng-model="$ctrl.outcome.dest" ng-options="choice.id as choice.text for choice in $ctrl.destChoices" ng-change="$ctrl.onDestSelectorChange()">
-      </select>
+      <select class="form-control oppia-form-control" [(ngModel)]="outcome.dest" (ngModelChange)="onDestSelectorChange($event)">
+        <option *ngFor="let choice of destChoices">{{ choice.text }}</option>
+    </select>
     </span>
   </div>
-  <ng-form name="newStateNameForm">
-    <span ng-if="$ctrl.isCreatingNewState($ctrl.outcome)">
-      <input type="text" focus-on="$ctrl.newStateNameInputField" name="newStateName" ng-model="$ctrl.outcome.newStateName" maxlength="{{$ctrl.maxLen}}" class="form-control protractor-test-add-state-input" tabindex="0" aria-invalid="false" ng-pattern="$ctrl.newStateNamePattern" required>
+  <form name="newStateNameForm">
+    <span *ngIf="isCreatingNewState(outcome)">
+      <input type="text" (focus)="newStateNameInputField" name="newStateName" [(ngModel)]="outcome.newStateName" [attr.maxlength]="maxLen" class="form-control protractor-test-add-state-input" tabindex="0" [attr.aria-invalid]="false" pattern="newStateNamePattern" required>
     </span>
-    <p ng-show="newStateNameForm.newStateName.$error.pattern" class="form-text oppia-form-error oppia-form-error-text">Please pick a card name consisting of alphanumeric characters, spaces and/or hyphens.</p>
-  </ng-form>
+    <p [hidden]="!newStateNameForm.newStateName.$error.pattern" class="form-text oppia-form-error oppia-form-error-text">Please pick a card name consisting of alphanumeric characters, spaces and/or hyphens.</p>
+  </form>
 
-  <div ng-if="$ctrl.isSelfLoop() && $ctrl.canEditRefresherExplorationId" class="oppia-id-text">
+  <div *ngIf="isSelfLoop() && canEditRefresherExplorationId" class="oppia-id-text">
     <b>Refresher exploration ID (optional):</b>
-    <input type="text" name="refresherExplorationId" ng-model="$ctrl.outcome.refresherExplorationId" class="form-control protractor-test-add-refresher-exploration-id" tabindex="0" aria-invalid="false" ng-pattern="$ctrl.globalIdPattern">
+    <input type="text" name="refresherExplorationId" [(ngModel)]="outcome.refresherExplorationId" class="form-control protractor-test-add-refresher-exploration-id" tabindex="0" [attr.aria-invalid]="false" pattern="globalIdPattern">
   </div>
-  <div class="oppia-id-text" ng-if="$ctrl.canAddPrerequisiteSkill">
+  <div class="oppia-id-text" *ngIf="canAddPrerequisiteSkill">
     <b>Prerequisite skill ID (optional):&nbsp;</b>
-    <input type="text" name="missingPrerequisiteSkillId" ng-model="$ctrl.outcome.missingPrerequisiteSkillId" class="form-control" tabindex="0" aria-invalid="false" ng-model-options="{allowInvalid: true}" ng-pattern="$ctrl.explorationAndSkillIdPattern">
+    <input type="text" name="missingPrerequisiteSkillId" [(ngModel)]="outcome.missingPrerequisiteSkillId" class="form-control" tabindex="0" [attr.aria-invalid]="false" [ngModelOptions]="{allowInvalid: true}" pattern="explorationAndSkillIdPattern">
     <p class="oppia-prerequisite-explanation-text">
       <i> Mention the skill that this state requires so that a learner who is stuck in the state can quickly learn the
           required material and continue with the exploration.
@@ -32,22 +33,22 @@
 </div>
 
 <style>
-  outcome-destination-editor .oppia-form-inline {
+  .oppia-form-inline {
     margin-bottom: 10px;
   }
-  outcome-destination-editor .oppia-form-group {
+  .oppia-form-group {
     font-size: 1.1em;
   }
-  outcome-destination-editor .form-control.oppia-form-control {
+  .form-control.oppia-form-control {
     width: 200px;
   }
-  outcome-destination-editor .oppia-form-error-text {
+  .oppia-form-error-text {
     font-size: 0.85em;
   }
-  outcome-destination-editor .oppia-id-text {
+  .oppia-id-text {
     margin-top: 12px;
   }
-  outcome-destination-editor .oppia-prerequisite-explanation-text {
+  .oppia-prerequisite-explanation-text {
     font-size: 0.8em;
   }
 </style>

@@ -95,6 +95,7 @@ import { RatingDisplayComponent } from './ratings/rating-display/rating-display.
 import { SupplementalCardComponent } from 'pages/exploration-player-page/learner-experience/supplemental-card.component';
 import { AddHintModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-hint-modal.component';
 import { SmoothHeightAnimatorComponent } from './smooth-height/smooth-height-animator.component';
+import { OutcomeDestinstionEditorComponent } from './state-directives/outcome-editor/outcome-destination-editor.component';
 
 // Pipes.
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
@@ -171,6 +172,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     MultiSelectionFieldComponent,
     OnScreenKeyboardComponent,
     OppiaAngularRootComponent,
+    OutcomeDestinstionEditorComponent,
     OutcomeFeedbackEditorComponent,
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
@@ -241,6 +243,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     TakeBreakModalComponent,
     StateSkillEditorComponent,
     ExplorationEmbedButtonModalComponent,
+    OutcomeDestinstionEditorComponent,
     OutcomeFeedbackEditorComponent,
     HintAndSolutionButtonsComponent,
     InputResponsePairComponent,
@@ -314,6 +317,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     FilterForMatchingSubstringPipe,
     OnScreenKeyboardComponent,
     OppiaAngularRootComponent,
+    OutcomeDestinstionEditorComponent,
     OutcomeFeedbackEditorComponent,
     ProgressNavComponent,
     SearchBarComponent,
