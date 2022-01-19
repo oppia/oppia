@@ -126,6 +126,10 @@ export class TopicViewerPageComponent implements OnInit {
     return this.windowDimensionsService.getWidth() < 500;
   }
 
+  checkTabletView(): boolean {
+    return this.windowDimensionsService.getWidth() < 768;
+  }
+
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
