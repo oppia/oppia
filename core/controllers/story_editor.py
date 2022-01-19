@@ -76,7 +76,10 @@ class EditableStoryDataHandler(base.BaseHandler):
             'version': {
                 'schema': {
                     'type': 'int',
-                    'default_value': 1
+                    'validators': [{
+                        'id': 'has_length_at_least',
+                        'min_value': 1
+                    }]
                 }
             },
             'commit_message': {
