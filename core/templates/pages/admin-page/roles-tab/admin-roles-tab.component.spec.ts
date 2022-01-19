@@ -201,6 +201,8 @@ describe('Admin roles tab component ', function() {
       component.startEditing();
       tick();
 
+      // As the promise is rejected with error, we do not expect it to be marked
+      // as being edited and the status message is shown with the error.
       expect(component.roleIsCurrentlyBeingEdited).toBeFalse();
       expect(component.setStatusMessage.emit).toHaveBeenCalledWith('Error');
     }));
