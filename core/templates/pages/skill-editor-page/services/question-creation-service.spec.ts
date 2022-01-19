@@ -21,6 +21,18 @@
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 // ^^^ This block is to be removed.
 import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { fakeAsync, tick } from '@angular/core/testing';
+
+class MockNgbModalRef {
+  componentInstance: {
+    allSkillSummaries: null;
+    countOfSkillsToPrioritize: null;
+    currentMode: null;
+    linkedSkillsWithDifficulty: null;
+    skillIdToRubricsObject: null;
+  };
+}
 
 describe('Question Creation Service', function() {
   var $rootScope = null;
@@ -31,6 +43,8 @@ describe('Question Creation Service', function() {
   var EditableQuestionBackendApiService = null;
   var SkillBackendApiService = null;
   var $uibModal = null;
+  let ngbModal: NgbModal;
+  var linkedSkillsWithDifficulty = null;
 
   var SkillObjectFactory = null;
   var skillSummaryDict = {
@@ -44,7 +58,15 @@ describe('Question Creation Service', function() {
     skill_model_last_updated: 1593138898626.193
   };
 
-  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
 
   importAllAngularServices();
 
@@ -54,6 +76,7 @@ describe('Question Creation Service', function() {
       SkillEditorStateService = $injector.get('SkillEditorStateService');
       SkillObjectFactory = $injector.get('SkillObjectFactory');
       $q = $injector.get('$q');
+      ngbModal = $injector.get('NgbModal');
       SkillBackendApiService = $injector.get('SkillBackendApiService');
       EditableQuestionBackendApiService = $injector.get(
         'EditableQuestionBackendApiService');
@@ -199,6 +222,24 @@ describe('Question Creation Service', function() {
         version: 1,
         inapplicable_skill_misconception_ids: ['skillId1-Id1']
       };
+      linkedSkillsWithDifficulty = [
+        {
+          getId(): string {
+            return 'skill 1';
+          },
+          getDifficulty(): string {
+            return 'easy';
+          }
+        },
+        {
+          getId(): string {
+            return 'skill 2';
+          },
+          getDifficulty(): string {
+            return 'medium';
+          }
+        }
+      ];
       var sampleQuestion = QuestionObjectFactory.createFromBackendDict(
         sampleQuestionBackendDict);
       spyOn(QuestionObjectFactory, 'createDefaultQuestion').and.returnValue(
@@ -206,27 +247,43 @@ describe('Question Creation Service', function() {
       $rootScope = $injector.get('$rootScope');
     }));
 
-    it('should create question', function() {
+    it('should create question', fakeAsync(() => {
       var skillDiff = SkillDifficulty.create(
         'skillId1', 'description', 0.3);
-      var modalSpy = spyOn($uibModal, 'open').and.returnValue(
-        {result: Promise.resolve([skillDiff])});
+      var modalSpy = spyOn(ngbModal, 'open').and.returnValue({
+        componentInstance: MockNgbModalRef,
+        result: Promise.resolve([skillDiff])
+      } as NgbModalRef);
       qcs.createQuestion();
-      expect(modalSpy).toHaveBeenCalled();
-    });
+      tick();
 
-    it('should open question editor modal', function() {
+      expect(modalSpy).toHaveBeenCalled();
+    }));
+
+    it('should open question editor modal', fakeAsync(() => {
+      spyOn(ngbModal, 'open').and.returnValue({
+        componentInstance: MockNgbModalRef,
+        result: Promise.resolve(linkedSkillsWithDifficulty)
+      } as NgbModalRef);
+
       qcs.createQuestion();
       qcs.initializeNewQuestionCreation();
 
       var modalSpy = spyOn($uibModal, 'open').and.returnValue({
         result: Promise.resolve()});
       qcs.openQuestionEditor(0.3);
+      tick();
+
       expect(modalSpy).toHaveBeenCalled();
-    });
+    }));
 
     it('should call question backend api service to create the question',
-      function() {
+      fakeAsync(() => {
+        var modalSpy = spyOn(ngbModal, 'open').and.returnValue({
+          componentInstance: MockNgbModalRef,
+          result: Promise.resolve(linkedSkillsWithDifficulty)
+        } as NgbModalRef);
+
         qcs.createQuestion();
         qcs.initializeNewQuestionCreation();
         qcs.populateMisconceptions();
@@ -234,8 +291,11 @@ describe('Question Creation Service', function() {
         var questionSpy = (
           spyOn(EditableQuestionBackendApiService, 'createQuestionAsync'));
         qcs.saveAndPublishQuestion();
+        tick();
+
         expect(questionSpy).toHaveBeenCalled();
-      });
+        expect(modalSpy).toHaveBeenCalled();
+      }));
   });
 
   describe('when question interaction validation fails', function() {

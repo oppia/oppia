@@ -17,7 +17,15 @@
  */
 // TODO(#7222): Remove usage of importAllAngularServices once upgraded to
 // Angular 8.
+import { fakeAsync, tick } from '@angular/core/testing';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+
+class MockNgbModalRef {
+  componentInstance: {
+    skillId: null;
+  };
+}
 
 describe('Question Suggestion Editor Modal Controller', function() {
   let $uibModal = null;
@@ -28,6 +36,7 @@ describe('Question Suggestion Editor Modal Controller', function() {
   let AlertsService = null;
   let ContributionAndReviewService = null;
   let CsrfTokenService = null;
+  let ngbModal: NgbModal;
   let QuestionObjectFactory = null;
   let QuestionSuggestionBackendApiService = null;
   let QuestionUndoRedoService = null;
@@ -42,6 +51,16 @@ describe('Question Suggestion Editor Modal Controller', function() {
   let skillDifficulty = 0.3;
   let suggestionId = null;
   importAllAngularServices();
+
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.service('QuestionSuggestionBackendApiService', function() {
@@ -69,6 +88,7 @@ describe('Question Suggestion Editor Modal Controller', function() {
   describe('when question is valid', function() {
     beforeEach(angular.mock.inject(function($injector, $controller) {
       $uibModal = $injector.get('$uibModal');
+      ngbModal = $injector.get('NgbModal');
       $q = $injector.get('$q');
       const $rootScope = $injector.get('$rootScope');
       $flushPendingTasks = $injector.get('$flushPendingTasks');
@@ -262,16 +282,19 @@ describe('Question Suggestion Editor Modal Controller', function() {
     });
 
     it('should dismiss modal if there is pending changes which won\'t be' +
-      ' saved', function() {
+      ' saved', fakeAsync(() => {
       spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(true);
-      spyOn($uibModal, 'open').and.returnValue({
+      spyOn(ngbModal, 'open').and.returnValue({
+        componentInstance: MockNgbModalRef,
         result: $q.resolve()
-      });
+      } as NgbModalRef);
+
       $scope.cancel();
+      tick();
       $scope.$apply();
 
       expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
-    });
+    }));
 
     it('should not dismiss modal if there is pending changes which will be' +
       ' saved', function() {
@@ -286,27 +309,37 @@ describe('Question Suggestion Editor Modal Controller', function() {
     });
 
     it('should open skill difficulty selection modal on clicking' +
-        ' change difficulty icon', function() {
-      var uibSpy = spyOn($uibModal, 'open').and.callThrough();
+        ' change difficulty icon', fakeAsync(() => {
+      var uibSpy = spyOn(ngbModal, 'open').and.returnValue({
+        componentInstance: MockNgbModalRef,
+        result: $q.resolve()
+      } as NgbModalRef);
+
       $scope.onClickChangeDifficulty();
+      tick();
       $scope.$apply();
       $flushPendingTasks();
+
       expect(uibSpy).toHaveBeenCalled();
-    });
+    }));
 
     it('should change skill difficulty when skill difficulty' +
-      ' is edited via skill difficulty modal', function() {
-      spyOn($uibModal, 'open').and.returnValue({
+      ' is edited via skill difficulty modal', fakeAsync(() => {
+      spyOn(ngbModal, 'open').and.returnValue({
+        componentInstance: MockNgbModalRef,
         result: $q.resolve({
           skillDifficulty: 0.6
         })
-      });
+      } as NgbModalRef);
+
       $scope.onClickChangeDifficulty();
+      tick();
       $scope.$apply();
       $flushPendingTasks();
+
       expect($scope.skillDifficulty).toBe(0.6);
       expect($scope.skillDifficultyString).toBe('Medium');
-    });
+    }));
 
     it('should set the correct skill difficulty string', function() {
       $scope.setDifficultyString(0.6);
@@ -317,15 +350,19 @@ describe('Question Suggestion Editor Modal Controller', function() {
       expect($scope.skillDifficultyString).toBe('Easy');
     });
 
-    it('should dismiss modal if cancel button is clicked', function() {
-      spyOn($uibModal, 'open').and.returnValue({
+    it('should dismiss modal if cancel button is clicked', fakeAsync(() => {
+      spyOn(ngbModal, 'open').and.returnValue({
+        componentInstance: MockNgbModalRef,
         result: $q.reject()
-      });
+      } as NgbModalRef);
+
       $scope.onClickChangeDifficulty();
       $scope.cancel();
+      tick();
       $scope.$apply();
+
       expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
-    });
+    }));
   });
   describe('when question is not valid', function() {
     beforeEach(angular.mock.inject(function($injector, $controller) {
