@@ -124,23 +124,64 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         )
 
     def test_get_in_review_translation_suggestions(self) -> None:
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            self.target_id, self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_3', self.change_cmd, self.score_category,
+            'exploration.exp1.thread_6', None)
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            self.target_id, self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_3', self.change_cmd, self.score_category,
+            'exploration.exp1.thread_7', None)
         suggestion_model = suggestion_models.GeneralSuggestionModel
-        self.assertEqual(
-            suggestion_model.get_in_review_translation_suggestions(
-                'author-1',
-                ['en', 'de']
-            ),
-            []
+        suggestions = suggestion_model.get_in_review_translation_suggestions(
+            'author-1',
+            [None]
         )
+        self.assertEqual(len(suggestions), 2)
+        for suggestion in suggestions:
+            self.assertEqual(
+                suggestion.status,
+                suggestion_models.STATUS_IN_REVIEW
+            )
+            self.assertEqual(suggestion.author_id, 'author_3')
 
     def test_get_in_review_question_suggestions(self) -> None:
-        suggestion_model = suggestion_models.GeneralSuggestionModel
-        self.assertEqual(
-            suggestion_model.get_in_review_question_suggestions(
-                'author_1'
-            ),
-            []
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            self.target_id, self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_1',
+            'reviewer_1', self.change_cmd, self.score_category,
+            'exploration.exp1.thread_6', None
         )
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            self.target_id, self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_1',
+            'reviewer_1', self.change_cmd, self.score_category,
+            'exploration.exp1.thread_7', None
+        )
+        suggestion_model = suggestion_models.GeneralSuggestionModel
+        suggestions = suggestion_model.get_in_review_question_suggestions(
+                'author_2'
+        )
+        self.assertEqual(len(suggestions), 2)
+        for suggestion in suggestions:
+            self.assertEqual(
+                suggestion.status, suggestion_models.STATUS_IN_REVIEW
+            )
+            self.assertEqual(
+                suggestion.suggestion_type,
+                feconf.SUGGESTION_TYPE_ADD_QUESTION
+            )
+            self.assertEqual(suggestion.author_id, 'author_1')
 
     def test_get_user_created_suggestions_of_suggestion_type(self) -> None:
         suggestion_model = suggestion_models.GeneralSuggestionModel
@@ -1840,10 +1881,10 @@ class TranslationContributionStatsModelUnitTests(test_utils.GenericTestBase):
         suggestion_models.TranslationContributionStatsModel.create(
             language_code=self.LANGUAGE_CODE,
             contributor_user_id=self.CONTRIBUTOR_USER_ID,
-            topic_id=self.TOPIC_ID,
+            topic_id='topic_2',
             submitted_translations_count=self.SUBMITTED_TRANSLATIONS_COUNT,
             submitted_translation_word_count=(
-                self.SUBMITTED_TRANSLATION_WORD_COUNT),
+                self.SUBMITTED_TRANSLATION_WORD_COUNT + 100),
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
             accepted_translations_without_reviewer_edits_count=(
                 self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
@@ -1857,10 +1898,10 @@ class TranslationContributionStatsModelUnitTests(test_utils.GenericTestBase):
         suggestion_models.TranslationContributionStatsModel.create(
             language_code=self.LANGUAGE_CODE,
             contributor_user_id=self.CONTRIBUTOR_USER_ID,
-            topic_id='topic_2',
+            topic_id=self.TOPIC_ID,
             submitted_translations_count=self.SUBMITTED_TRANSLATIONS_COUNT,
             submitted_translation_word_count=(
-                self.SUBMITTED_TRANSLATION_WORD_COUNT + 100),
+                self.SUBMITTED_TRANSLATION_WORD_COUNT),
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
             accepted_translations_without_reviewer_edits_count=(
                 self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
@@ -1879,14 +1920,15 @@ class TranslationContributionStatsModelUnitTests(test_utils.GenericTestBase):
         )
         translation_model_data = translation_model.get_all_by_user_id(
             self.CONTRIBUTOR_USER_ID)
-        self.assertEqual(len(translation_model_data), 2)
-        self.assertEqual(
-            translation_model_data[1].language_code, self.LANGUAGE_CODE)
+        self.assertEqual(translation_model_data[0].topic_id, 'topic_2')
         self.assertEqual(translation_model_data[1].topic_id, self.TOPIC_ID)
-        self.assertEqual(
-            translation_model_data[1].contributor_user_id,
-            self.CONTRIBUTOR_USER_ID
-        )
+        self.assertEqual(len(translation_model_data), 2)
+        for translation in translation_model_data:
+            self.assertEqual(translation.language_code, self.LANGUAGE_CODE)
+            self.assertEqual(
+                translation.contributor_user_id,
+                self.CONTRIBUTOR_USER_ID
+            )
 
     def test_get_export_policy(self) -> None:
         expected_export_policy_dict = {
