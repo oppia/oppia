@@ -79,7 +79,8 @@ export class SubtopicSummaryTileComponent implements OnInit {
       this.thumbnailUrl = null;
     }
     this.subtopicTitleTranslationKey = this.i18nLanguageCodeService.
-      getSubtopicTranslationKey(this.topicId, this.subtopic.getId(),
+      getSubtopicTranslationKey(
+        this.topicId, this.subtopic.getId(),
         TranslationKeyType.TITLE);
   }
 

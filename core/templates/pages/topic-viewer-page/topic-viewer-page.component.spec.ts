@@ -28,7 +28,6 @@ import { UrlService } from 'services/contextual/url.service';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { PageTitleService } from 'services/page-title.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 
@@ -59,7 +58,6 @@ describe('Topic viewer page', () => {
   let windowDimensionsService = null;
   let topicViewerPageComponent = null;
   let windowRef: MockWindowRef;
-  let i18nLanguageCodeService: I18nLanguageCodeService;
 
   let topicName = 'Topic Name';
   let topicUrlFragment = 'topic-frag';
@@ -110,7 +108,6 @@ describe('Topic viewer page', () => {
     pageTitleService = TestBed.inject(PageTitleService);
     urlService = TestBed.inject(UrlService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
-    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     let fixture = TestBed.createComponent(TopicViewerPageComponent);
     topicViewerPageComponent = fixture.componentInstance;
   });

@@ -22,7 +22,7 @@ import { SubtopicSummaryTileComponent } from 'components/summary-tile/subtopic-s
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { SubtopicsListComponent } from './subtopics-list.component';
- 
+
 describe('Subtopics List Component', () => {
   let component: SubtopicsListComponent;
   let fixture: ComponentFixture<SubtopicsListComponent>;
@@ -76,5 +76,6 @@ describe('Subtopics List Component', () => {
       component.ngOnInit();
 
       expect(component.isHackyTopicNameTranslationDisplayed()).toBe(true);
-  });
+    }
+  );
 });

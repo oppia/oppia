@@ -22,7 +22,7 @@ import { StorySummaryTileComponent } from 'components/summary-tile/story-summary
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { StoriesListComponent } from './topic-viewer-stories-list.component';
- 
+
 describe('Topic Viewer Stories List Component', () => {
   let component: StoriesListComponent;
   let fixture: ComponentFixture<StoriesListComponent>;
@@ -79,5 +79,6 @@ describe('Topic Viewer Stories List Component', () => {
 
       expect(component.isHackyTopicNameTranslationDisplayed()).toBe(true);
       expect(component.isHackyTopicDescTranslationDisplayed()).toBe(true);
-  });
+    }
+  );
 });

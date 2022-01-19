@@ -210,7 +210,7 @@ export class StorySummaryTileComponent implements OnInit {
         getStoryNodeTranslationKey(
           this.storySummary.getId(), storyNode.getId(),
           TranslationKeyType.TITLE);
-      this.nodeTitlesTranslationKeys.push(storyNodeTranslationKey)
+      this.nodeTitlesTranslationKeys.push(storyNodeTranslationKey);
     }
   }
 
