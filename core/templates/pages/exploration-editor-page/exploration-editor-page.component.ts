@@ -67,7 +67,7 @@ require(
   'pages/exploration-editor-page/translation-tab/translation-tab.component.ts');
 require(
   'pages/exploration-player-page/learner-experience/' +
-  'conversation-skin.directive.ts');
+  'conversation-skin.component.ts');
 require(
   'pages/exploration-player-page/layout-directives/' +
   'exploration-footer.component.ts');

@@ -31,14 +31,13 @@ export class CollectionPlayerBackendApiService {
 
   async fetchCollectionSummariesAsync(
       collectionId: string
-  ): Promise<void | CollectionSummary> {
-    return this.http.get('/collectionsummarieshandler/data', {
-      params: {
-        stringified_collection_ids: JSON.stringify([collectionId])
-      }
-    }).toPromise().then((response: CollectionSummary) => {
-      return response;
-    });
+  ): Promise<CollectionSummary> {
+    return this.http.get<CollectionSummary>(
+      '/collectionsummarieshandler/data', {
+        params: {
+          stringified_collection_ids: JSON.stringify([collectionId])
+        }
+      }).toPromise();
   }
 }
 

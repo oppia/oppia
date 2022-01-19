@@ -159,20 +159,30 @@ why they need to be overriden.  */
   transform: translate3d(0,-1px,0);
 }
 
-.oppia-learner-confirm-button.protractor-test-submit-answer-button.md-button[disabled] {
+.oppia-learner-confirm-button.protractor-test-submit-answer-button.md-button[disabled],
+.oppia-learner-confirm-button.protractor-test-submit-answer-button.mat-button[disabled] {
   background-color: transparent;
   color: rgba(0,0,0,0.38);
   cursor: default;
 }
 
-.oppia-learner-confirm-button.protractor-test-submit-answer-button.md-button[disabled]:hover {
+.oppia-learner-confirm-button.protractor-test-submit-answer-button.md-button[disabled]:hover,
+.oppia-learner-confirm-button.protractor-test-submit-answer-button.mat-button[disabled]:hover {
   text-decoration: none;
 }
 
-.oppia-learner-confirm-button.protractor-test-submit-answer-button.md-button {
+.oppia-learner-confirm-button.protractor-test-submit-answer-button.md-button,
+.oppia-learner-confirm-button.protractor-test-submit-answer-button.mat-button {
   font: 16px;
   margin: 0;
   min-width: 55px;
+}
+
+.oppia-learner-confirm-button.protractor-test-submit-answer-button.mat-button {
+  border-radius: 2px;
+  font-size: 16px;
+  line-height: 22px;
+  text-transform: uppercase;
 }
 
 .oppia-length-validation-error {
@@ -4899,4 +4909,61 @@ div.oppia-issues-learner-action {
   font-size: 1em;
   min-width: max-content;
   width: 30%;
+}
+
+.conversation-skin-oppia-avatar, .conversation-skin-user-avatar {
+  height: 36px;
+  position: absolute;
+  top: 0;
+  width: 36px;
+  z-index: 1;
+}
+
+.conversation-skin-oppia-feedback-container .conversation-skin-oppia-avatar {
+  height: 100px;
+  left: -87px;
+  top: -20px;
+  width: 100px;
+}
+
+.conversation-skin-oppia-feedback-content,
+.conversation-skin-learner-answer-content {
+  margin-bottom: 12px;
+  overflow: auto;
+  padding: 8px 12px;
+  word-wrap: break-word;
+}
+
+.conversation-skin-oppia-feedback-content,
+.conversation-skin-help-card-content {
+  background-color: rgba(224,242,241,1);
+  border-top-left-radius: 0;
+}
+
+.conversation-skin-learner-answer-content {
+  background-color: rgba(236,239,241,1);
+  border-bottom-right-radius: 0;
+}
+
+
+/*
+    This CSS block is for ensuring that only a response from a multi-line text input preserves newlines.
+    Leveraging the parent class ".conversation-skin-learner-answer-content" will render newlines in the
+    other interactions (ie; Multiple Choice, Item Selection) which is not necessary.
+*/
+oppia-response-text-input {
+  white-space: pre-wrap;
+}
+
+@media screen and (max-width: 959px) {
+  .conversation-skin-user-avatar,
+  .conversation-skin-oppia-avatar {
+    display: none;
+  }
+
+  .oppia-learner-view-card {
+    margin-left: 0;
+    padding-bottom: 0;
+    padding-left: 0;
+  }
 }
