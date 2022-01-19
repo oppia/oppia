@@ -67,6 +67,32 @@ describe('Subtopic viewer page', function() {
         thumbnail_filename: '',
         thumbnail_bg_color: '',
         url_fragment: subtopicUrlFragment
+      },
+      prev_subtopic_dict: null
+    }));
+
+  let subtopicDataObjectWithPrevSubtopic: ReadOnlySubtopicPageData = (
+    ReadOnlySubtopicPageData.createFromBackendDict({
+      topic_id: topicId,
+      topic_name: topicName,
+      subtopic_title: subtopicTitle,
+      page_contents: {
+        subtitled_html: {
+          content_id: '',
+          html: 'This is a html'
+        },
+        recorded_voiceovers: {
+          voiceovers_mapping: {}
+        }
+      },
+      next_subtopic_dict: null,
+      prev_subtopic_dict: {
+        id: 1,
+        title: '',
+        skill_ids: [],
+        thumbnail_filename: '',
+        thumbnail_bg_color: '',
+        url_fragment: subtopicUrlFragment
       }
     }));
 
@@ -105,7 +131,8 @@ describe('Subtopic viewer page', function() {
     loaderService = TestBed.inject(LoaderService);
   });
 
-  it('should succesfully get subtopic data and set context', fakeAsync(() => {
+  it('should succesfully get subtopic data and set context with next subtopic' +
+  ' card', fakeAsync(() => {
     spyOn(pageTitleService, 'setDocumentTitle');
     spyOn(pageTitleService, 'updateMetaTag');
     spyOn(contextService, 'setCustomEntityContext');
@@ -118,7 +145,7 @@ describe('Subtopic viewer page', function() {
       'subtopic-url');
     spyOn(loaderService, 'showLoadingScreen');
 
-    expect(component.nextSubtopicSummaryIsShown).toBe(false);
+    expect(component.subtopicSummaryIsShown).toBe(false);
     spyOn(subtopicViewerBackendApiService, 'fetchSubtopicDataAsync')
       .and.returnValue(Promise.resolve(subtopicDataObject));
 
@@ -133,7 +160,8 @@ describe('Subtopic viewer page', function() {
       subtopicDataObject.getParentTopicId());
     expect(component.nextSubtopic).toEqual(
       subtopicDataObject.getNextSubtopic());
-    expect(component.nextSubtopicSummaryIsShown).toBeTrue();
+    expect(component.prevSubtopic).toBeNull();
+    expect(component.subtopicSummaryIsShown).toBeTrue();
 
     expect(contextService.setCustomEntityContext).toHaveBeenCalled();
     expect(pageTitleService.setDocumentTitle).toHaveBeenCalled();
@@ -142,6 +170,37 @@ describe('Subtopic viewer page', function() {
     component.ngOnDestroy();
     expect(contextService.removeCustomEntityContext).toHaveBeenCalled();
   }));
+
+  it('should succesfully get subtopic data with prev subtopic card',
+    fakeAsync(() => {
+      spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
+        'topic-url');
+      spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl')
+        .and.returnValue('classroom-url');
+      spyOn(urlService, 'getSubtopicUrlFragmentFromLearnerUrl').and.returnValue(
+        'subtopic-url');
+      spyOn(loaderService, 'showLoadingScreen');
+
+      expect(component.subtopicSummaryIsShown).toBe(false);
+      spyOn(subtopicViewerBackendApiService, 'fetchSubtopicDataAsync')
+        .and.returnValue(Promise.resolve(subtopicDataObjectWithPrevSubtopic));
+
+      component.ngOnInit();
+      tick();
+
+      expect(component.pageContents).toEqual(
+        subtopicDataObjectWithPrevSubtopic.getPageContents());
+      expect(component.subtopicTitle).toEqual(
+        subtopicDataObjectWithPrevSubtopic.getSubtopicTitle());
+      expect(component.parentTopicId).toEqual(
+        subtopicDataObjectWithPrevSubtopic.getParentTopicId());
+      expect(component.prevSubtopic).toEqual(
+        subtopicDataObjectWithPrevSubtopic.getPrevSubtopic());
+      expect(component.nextSubtopic).toBeNull();
+      expect(component.subtopicSummaryIsShown).toBeTrue();
+
+      component.ngOnDestroy();
+    }));
 
   it(
     'should use reject handler when fetching subtopic data fails',
