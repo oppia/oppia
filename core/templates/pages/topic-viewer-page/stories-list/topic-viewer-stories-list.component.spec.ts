@@ -16,11 +16,14 @@
  * @fileoverview Unit tests for storiesList.
  */
 
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { StorySummaryTileComponent } from 'components/summary-tile/story-summary-tile.component';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { StoriesListComponent } from './topic-viewer-stories-list.component';
  
-describe('Topic Selector Component', () => {
+describe('Topic Viewer Stories List Component', () => {
   let component: StoriesListComponent;
   let fixture: ComponentFixture<StoriesListComponent>;
   let i18nLanguageCodeService: I18nLanguageCodeService;
@@ -28,8 +31,11 @@ describe('Topic Selector Component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
-        StoriesListComponent
-      ]
+        MockTranslatePipe,
+        StoriesListComponent,
+        StorySummaryTileComponent
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));
 
@@ -37,6 +43,12 @@ describe('Topic Selector Component', () => {
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     fixture = TestBed.createComponent(StoriesListComponent);
     component = fixture.componentInstance;
+    component.canonicalStorySummaries = [];
+    component.classroomUrlFragment = 'classroom';
+    component.topicUrlFragment = 'topic';
+    component.topicName = 'Topic Name';
+    component.topicDescription = 'Topic Description';
+    component.topicId = 'topicId';
   });
 
   it('should initialize properties after successfully', () => {

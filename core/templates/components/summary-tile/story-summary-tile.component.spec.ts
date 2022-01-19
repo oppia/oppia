@@ -118,7 +118,7 @@ describe('StorySummaryTileComponent', () => {
     expect(hackyStoryTitleTranslationIsDisplayed).toBe(false);
     let hackyNodeTitleTranslationIsDisplayed =
       component.isHackyNodeTitleTranslationDisplayed(0);
-    expect(hackyNodeTitleTranslationIsDisplayed).toBe(false);
+    expect(hackyNodeTitleTranslationIsDisplayed).toBe(true);
     // Here the value is calculated by the formula -> (circumference -
     // (nodeCount * gapLength))/nodeCount = (2 * 20 * Math.PI - (3*5)) / 3
     // = 36.88790204786391. Along with this value, gapLength (5) is also

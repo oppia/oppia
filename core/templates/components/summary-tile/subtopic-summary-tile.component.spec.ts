@@ -106,6 +106,9 @@ describe('SubtopicSummaryTileComponent', () => {
   });
 
   it('should check if subtopic translation is displayed correctly', () => {
+    spyOn(abas, 'getThumbnailUrlForPreview').and.returnValue('/thumbnail/url');
+    spyOn(i18nLanguageCodeService, 'getSubtopicTranslationKey')
+      .and.returnValue('I18N_SUBTOPIC_123abcd_1_TITLE');
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
       .and.returnValue(false);
     spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
@@ -113,9 +116,10 @@ describe('SubtopicSummaryTileComponent', () => {
 
     component.ngOnInit();
 
+    expect(component.subtopicTitleTranslationKey).toBe(
+      'I18N_SUBTOPIC_123abcd_1_TITLE');
     let hackySubtopicTitleTranslationIsDisplayed =
       component.isHackySubtopicTitleTranslationDisplayed();
-
     expect(hackySubtopicTitleTranslationIsDisplayed).toBe(true);
   });
 

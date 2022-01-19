@@ -16,11 +16,14 @@
  * @fileoverview Unit tests for subtopicsList.
  */
 
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { SubtopicSummaryTileComponent } from 'components/summary-tile/subtopic-summary-tile.component';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { SubtopicsListComponent } from './subtopics-list.component';
  
-describe('Topic Selector Component', () => {
+describe('Subtopics List Component', () => {
   let component: SubtopicsListComponent;
   let fixture: ComponentFixture<SubtopicsListComponent>;
   let i18nLanguageCodeService: I18nLanguageCodeService;
@@ -28,21 +31,32 @@ describe('Topic Selector Component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
-        SubtopicsListComponent
-      ]
+        MockTranslatePipe,
+        SubtopicsListComponent,
+        SubtopicSummaryTileComponent
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     fixture = TestBed.createComponent(SubtopicsListComponent);
     component = fixture.componentInstance;
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+    component.subtopicsList = [];
+    component.classroomUrlFragment = 'classroom';
+    component.topicUrlFragment = 'topic';
+    component.topicName = 'Topic Name';
+    component.topicId = 'topicId';
+  });
+
+  it('should create', () => {
+    expect(component).toBeDefined();
   });
 
   it('should initialize properties after successfully', () => {
     spyOn(i18nLanguageCodeService, 'getTopicTranslationKey')
       .and.returnValue('I18N_TOPIC_123abcd_TITLE');
-    expect(component).toBeDefined();
 
     component.ngOnInit();
 
