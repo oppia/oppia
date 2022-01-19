@@ -291,7 +291,7 @@ describe('Interactions', function() {
 
     // Play Math Expression Input interaction.
     await explorationPlayerPage.submitAnswer(
-      'AlgebraicExpressionInput', '4 * x^10');
+      'AlgebraicExpressionInput', '4 * x^2');
     await explorationPlayerPage.expectLatestFeedbackToMatch(
       await forms.toRichText('Good job!'));
     await explorationPlayerPage.clickThroughToNextCard();
