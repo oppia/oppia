@@ -244,7 +244,7 @@ class BaseChange:
         """
 
         base_change_dict = self.to_dict()
-        self.validate_dict(base_change_dict) 
+        self.validate_dict(base_change_dict)
 
     def __getattr__(self, name: str) -> str:
         # AttributeError needs to be thrown in order to make
