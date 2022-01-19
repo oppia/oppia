@@ -52,27 +52,27 @@ export class ProfilePageComponent {
     value: '',
     helpText: ''
   };
-  usernameIsLong: boolean ;
+  usernameIsLong!: boolean ;
   userBio: string = '';
   userDisplayedStatistics: UserDisplayedStatistic[] = [];
   userEditedExplorations: LearnerExplorationSummary[] = [];
-  userNotLoggedIn: boolean ;
-  isAlreadySubscribed: boolean ;
-  isUserVisitingOwnProfile: boolean ;
+  userNotLoggedIn!: boolean ;
+  isAlreadySubscribed!: boolean ;
+  isUserVisitingOwnProfile!: boolean ;
   subscriptionButtonPopoverText: string = '';
   currentPageNumber: number = 0;
   PAGE_SIZE: number = 6;
   startingExplorationNumber: number = 1;
   endingExplorationNumber: number = 6;
-  profileIsOfCurrentUser: boolean ;
-  data: UserProfile;
-  numUserPortfolioExplorations: number ;
+  profileIsOfCurrentUser!: boolean ;
+  data!: UserProfile;
+  numUserPortfolioExplorations!: number ;
   explorationsOnPage: LearnerExplorationSummary[] = [];
-  explorationIndexEnd: number ;
-  explorationIndexStart: number ;
+  explorationIndexEnd!: number ;
+  explorationIndexStart!: number ;
   subjectInterests: string[] = [];
   profilePictureDataUrl: string = '';
-  firstContributionMsec: number ;
+  firstContributionMsec!: number ;
   preferencesUrl : string = (
     '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PREFERENCES.ROUTE);
 
