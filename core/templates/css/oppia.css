@@ -4473,6 +4473,19 @@ div.oppia-issues-learner-action {
   z-index: 1035 !important;
 }
 
+/*
+  The .forced-modal-stack-over and .forced-modal-backdrop-stack-over styles may be
+  removed once rte-helper-service is migrated to Angular. Currently, these styles
+  are used for correctly stacking AngularJS modals on top of Angular modals.
+*/
+.forced-modal-stack-over {
+  z-index: 1060 !important;
+}
+
+.forced-modal-backdrop-stack-over {
+  z-index: 1055 !important;
+}
+
 .oppia-profile-h1 {
   color: #fff;
   display: inline;

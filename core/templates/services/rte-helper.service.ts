@@ -94,6 +94,12 @@ angular.module('oppia').factory('RteHelperService', [
             'components/ck-editor-helpers/' +
             'customize-rte-component-modal.template.html'),
           backdrop: 'static',
+          // The 'windowClass' & 'backdropClass' options may be removed once
+          // this service is migrated to Angular and NgbModal is used instead of
+          // uibModal. Currently, these custom classes are used for correctly
+          // stacking AngularJS modals on top of Angular modals.
+          windowClass: 'forced-modal-stack-over',
+          backdropClass: 'forced-modal-backdrop-stack-over',
           resolve: {
             customizationArgSpecs: function() {
               return customizationArgSpecs;
