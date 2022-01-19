@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the PencilCodeEditor interaction.
+ * @fileoverview Component for the pencil code editor interaction.
  *
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the directive is: the name of the parameter, followed by 'With',
@@ -166,6 +166,11 @@ export class PencilCodeEditor implements OnInit, OnDestroy {
 
           // Get all the divs, and extract their textual content.
           let temp = document.createElement('div');
+          // 'pencilCodeHtml' here is a string of raw code for div of
+          // 'pencil-code-editor-iframe' in template. In order to extract all
+          // divs from raw code we are converting it first into an element
+          // thereby selecting all the divs inside it and then extracting all
+          // the content inside them for which 'innerHTML' is used.
           // eslint-disable-next-line oppia/no-inner-html
           temp.innerHTML = pencilCodeHtml;
           let output: string = '';
@@ -176,6 +181,7 @@ export class PencilCodeEditor implements OnInit, OnDestroy {
           }
 
           hasSubmittedAnswer = true;
+          // TODO(#13015): Remove use of unknown as a type.
           this.currentInteractionService.onSubmit({
             code: normalizedCode,
             output: output || '',
@@ -196,6 +202,7 @@ export class PencilCodeEditor implements OnInit, OnDestroy {
       errorIsHappening = true;
       hasSubmittedAnswer = true;
 
+      // TODO(#13015): Remove use of unknown as a type.
       this.currentInteractionService.onSubmit({
         code: normalizedCode,
         output: '',

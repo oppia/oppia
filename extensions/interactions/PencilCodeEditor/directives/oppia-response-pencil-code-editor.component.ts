@@ -13,15 +13,15 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the PencilCodeEditor response.
+ * @fileoverview Component for the pencil code editor response.
  *
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the component is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { Component, Input, OnInit } from '@angular/core';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 
 interface Answer {
@@ -40,6 +40,7 @@ export class ResponePencilCodeEditor implements OnInit {
     private htmlEscaperService: HtmlEscaperService
   ) {}
 
+  // TODO(#13015): Remove use of unknown as a type.
   ngOnInit(): void {
     this.answerCode = (
       (this.htmlEscaperService.escapedJsonToObj(

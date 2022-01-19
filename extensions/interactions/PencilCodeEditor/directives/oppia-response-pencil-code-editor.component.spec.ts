@@ -13,31 +13,31 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit Tests for the pencil code editor response.
+ * @fileoverview Unit Tests for the pencil code editor response component.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { HtmlEscaperService } from 'services/html-escaper.service';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ResponePencilCodeEditor } from './oppia-response-pencil-code-editor.component';
 
-describe('oppiaResponsePencilCodeEditor', () => {
+describe('Response pencil code editor component ', () => {
   let component: ResponePencilCodeEditor;
   let fixture: ComponentFixture<ResponePencilCodeEditor>;
 
-  class mockHtmlEscaperService {
+  class MockHtmlEscaperService {
     escapedJsonToObj(answer: string): string {
       return answer;
     }
   }
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ResponePencilCodeEditor],
       providers: [
         {
           provide: HtmlEscaperService,
-          useClass: mockHtmlEscaperService
+          useClass: MockHtmlEscaperService
         }
       ],
       schemas: [NO_ERRORS_SCHEMA]
@@ -52,7 +52,7 @@ describe('oppiaResponsePencilCodeEditor', () => {
     };
   });
 
-  it('should initialise the component when submits answer', () => {
+  it('should initialize the component when submits answer', () => {
     component.ngOnInit();
     expect(component.answerCode).toEqual(
       '# Add the initial code snippet here.');

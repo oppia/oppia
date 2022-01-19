@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the Pencil Code Reset Confirmation.
+ * @fileoverview Component for the Pencil code reset confirmation modal.
  */
 
 import { Component } from '@angular/core';

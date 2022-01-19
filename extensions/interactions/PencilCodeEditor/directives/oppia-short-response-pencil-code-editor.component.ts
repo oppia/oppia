@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the PencilCodeEditor short response.
+ * @fileoverview Component for the pencil code editor short response.
  *
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the component is: the name of the parameter, followed by 'With',
@@ -40,6 +40,7 @@ export class ShortResponePencilCodeEditor implements OnInit {
     private htmlEscaperService: HtmlEscaperService
   ) {}
 
+  // TODO(#13015): Remove use of unknown as a type.
   ngOnInit(): void {
     this.answerCode = (
       (this.htmlEscaperService.escapedJsonToObj(

@@ -13,26 +13,26 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the pencil code editor short response.
+ * @fileoverview Unit Tests for the pencil code editor short response component.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { TruncateAtFirstLinePipe } from 'filters/string-utility-filters/truncate-at-first-line.pipe';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { HtmlEscaperService } from 'services/html-escaper.service';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ShortResponePencilCodeEditor } from './oppia-short-response-pencil-code-editor.component';
+import { TruncateAtFirstLinePipe } from 'filters/string-utility-filters/truncate-at-first-line.pipe';
 
-describe('oppiaShortResponsePencilCodeEditor', () => {
+describe('Short response pencil code editor component ', () => {
   let component: ShortResponePencilCodeEditor;
   let fixture: ComponentFixture<ShortResponePencilCodeEditor>;
 
-  class mockHtmlEscaperService {
+  class MockHtmlEscaperService {
     escapedJsonToObj(answer: string): string {
       return answer;
     }
   }
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
         ShortResponePencilCodeEditor,
@@ -41,7 +41,7 @@ describe('oppiaShortResponsePencilCodeEditor', () => {
       providers: [
         {
           provide: HtmlEscaperService,
-          useClass: mockHtmlEscaperService
+          useClass: MockHtmlEscaperService
         }
       ],
       schemas: [NO_ERRORS_SCHEMA]
@@ -57,7 +57,7 @@ describe('oppiaShortResponsePencilCodeEditor', () => {
     };
   });
 
-  it('should initialise the component when submits answer', () => {
+  it('should initialize the component when submits answer', () => {
     component.ngOnInit();
     expect(component.answerCode).toEqual(
       '# Add the initial code snippet here.');

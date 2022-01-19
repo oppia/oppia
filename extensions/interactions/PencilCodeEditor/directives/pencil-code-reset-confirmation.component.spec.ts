@@ -16,11 +16,11 @@
  * @fileoverview Unit tests for Pencil Code Reset Confirmation Modal.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { PencilCodeResetConfirmation } from './pencil-code-reset-confirmation.component';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { PencilCodeResetConfirmation } from './pencil-code-reset-confirmation.component';
 
 class MockActiveModal {
   dismiss(): void {
