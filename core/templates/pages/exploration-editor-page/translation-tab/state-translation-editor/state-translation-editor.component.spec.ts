@@ -27,7 +27,7 @@ import { StateWrittenTranslationsService } from
 import { StateRecordedVoiceoversService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
-import { WrittenTranslationObjectFactory } from
+import { WrittenTranslation } from
   'domain/exploration/writtentranslation-object.model';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { StateEditorRefreshService } from
@@ -149,7 +149,7 @@ describe('State Translation Editor Component', function() {
     stateWrittenTranslationsService = TestBed.get(
       StateWrittenTranslationsService);
     writtenTranslationObjectFactory = TestBed.get(
-      WrittenTranslationObjectFactory);
+      WrittenTranslation);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {

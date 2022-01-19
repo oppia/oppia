@@ -47,7 +47,7 @@ import { StateEditorService } from
   'components/state-editor/state-editor-properties-services/state-editor.service';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { WrittenTranslationObjectFactory } from
+import { WrittenTranslation } from
   'domain/exploration/writtentranslation-object.model';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
@@ -149,7 +149,7 @@ describe('Exploration editor tab component', function() {
     $provide.value('UnitsObjectFactory', TestBed.get(UnitsObjectFactory));
     $provide.value(
       'WrittenTranslationObjectFactory',
-      TestBed.get(WrittenTranslationObjectFactory));
+      TestBed.get(WrittenTranslation));
     $provide.value(
       'WrittenTranslationsObjectFactory',
       TestBed.get(WrittenTranslationsObjectFactory));

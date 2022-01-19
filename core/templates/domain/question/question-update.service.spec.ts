@@ -29,7 +29,7 @@ import { ParamChangesObjectFactory } from
   'domain/exploration/ParamChangesObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
-import { WrittenTranslationObjectFactory } from
+import { WrittenTranslation } from
   'domain/exploration/writtentranslation-object.model';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
@@ -79,11 +79,11 @@ describe('Question update service', function() {
     $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
     $provide.value(
       'WrittenTranslationObjectFactory',
-      new WrittenTranslationObjectFactory());
+      new WrittenTranslation());
     $provide.value(
       'WrittenTranslationsObjectFactory',
       new WrittenTranslationsObjectFactory(
-        new WrittenTranslationObjectFactory()));
+        new WrittenTranslation()));
   }));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();

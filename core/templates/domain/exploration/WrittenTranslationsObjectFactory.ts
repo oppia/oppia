@@ -23,8 +23,7 @@ import { Injectable } from '@angular/core';
 import {
   DataFormatToDefaultValuesKey,
   TranslationBackendDict,
-  WrittenTranslation,
-  WrittenTranslationObjectFactory
+  WrittenTranslation
 } from 'domain/exploration/writtentranslation-object.model';
 
 export interface WrittenTranslationsBackendDict {
@@ -49,10 +48,10 @@ interface WrittenTranslationsMapping {
 
 export class WrittenTranslations {
   translationsMapping: WrittenTranslationsMapping;
-  _writtenTranslationObjectFactory: WrittenTranslationObjectFactory;
+  _writtenTranslationObjectFactory: WrittenTranslation;
   constructor(
       translationsMapping: WrittenTranslationsMapping,
-      writtenTranslationObjectFactory: WrittenTranslationObjectFactory) {
+      writtenTranslationObjectFactory: WrittenTranslation) {
     this.translationsMapping = translationsMapping;
     this._writtenTranslationObjectFactory = writtenTranslationObjectFactory;
   }
@@ -163,7 +162,7 @@ export class WrittenTranslations {
 })
 export class WrittenTranslationsObjectFactory {
   constructor(
-    private writtenTranslationObjectFactory: WrittenTranslationObjectFactory) {}
+    private writtenTranslationObjectFactory: WrittenTranslation) {}
 
   createFromBackendDict(
       writtenTranslationsDict: WrittenTranslationsBackendDict

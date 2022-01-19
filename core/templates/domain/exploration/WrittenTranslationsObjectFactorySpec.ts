@@ -19,19 +19,19 @@ import { TestBed } from '@angular/core/testing';
 
 import { WrittenTranslations, WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
-import { WrittenTranslationObjectFactory } from
+import { WrittenTranslation } from
   'domain/exploration/writtentranslation-object.model';
 
 describe('Written Translations Object Factory', () => {
   let writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory;
-  let writtenTranslationObjectFactory: WrittenTranslationObjectFactory;
+  let writtenTranslationObjectFactory: WrittenTranslation;
   let writtenTranslationsBackendDict: WrittenTranslations;
 
   beforeEach(() => {
     writtenTranslationsObjectFactory = TestBed.inject(
       WrittenTranslationsObjectFactory);
     writtenTranslationObjectFactory = TestBed.inject(
-      WrittenTranslationObjectFactory);
+      WrittenTranslation);
 
     writtenTranslationsBackendDict = (
       writtenTranslationsObjectFactory.createFromBackendDict({

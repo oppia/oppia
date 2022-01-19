@@ -93,7 +93,7 @@ export class WrittenTranslation {
       needs_update: this.needsUpdate
     };
   }
-  static createNew(dataFormat: string): WrittenTranslation {
+  createNew(dataFormat: string): WrittenTranslation {
     if (!DATA_FORMAT_TO_DEFAULT_VALUES.hasOwnProperty(dataFormat)) {
       throw new Error('Invalid translation data format: ' + dataFormat);
     }
@@ -109,7 +109,7 @@ export class WrittenTranslation {
     );
   }
   
-  static createFromBackendDict(
+  createFromBackendDict(
       translationBackendDict: TranslationBackendDict): WrittenTranslation {
     return new WrittenTranslation(
       translationBackendDict.data_format as DataFormatToDefaultValuesKey,

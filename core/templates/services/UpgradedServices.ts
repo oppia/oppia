@@ -492,7 +492,7 @@ import { WinnowingPreprocessingService } from
   'classifiers/winnowing-preprocessing.service';
 import { WorkedExampleObjectFactory } from
   'domain/skill/WorkedExampleObjectFactory';
-import { WrittenTranslationObjectFactory } from
+import { WrittenTranslation } from
   'domain/exploration/writtentranslation-object.model';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';

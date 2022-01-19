@@ -31,7 +31,7 @@ import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { VersionTreeService } from
   'pages/exploration-editor-page/history-tab/services/version-tree.service';
-import { WrittenTranslationObjectFactory } from
+import { WrittenTranslation } from
   'domain/exploration/writtentranslation-object.model';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
@@ -113,7 +113,7 @@ describe('History tab component', function() {
     $provide.value('VersionTreeService', TestBed.get(VersionTreeService));
     $provide.value(
       'WrittenTranslationObjectFactory',
-      TestBed.get(WrittenTranslationObjectFactory));
+      TestBed.get(WrittenTranslation));
     $provide.value(
       'WrittenTranslationsObjectFactory',
       TestBed.get(WrittenTranslationsObjectFactory));
