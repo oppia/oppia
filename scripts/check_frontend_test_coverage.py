@@ -77,7 +77,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'subtopic.model.ts',
     'translation-file-hash-loader-backend-api.service.ts',
     'truncate-and-capitalize.filter.ts',
-    'truncate-and-capitalize.pipe.ts',
     'truncate-input-based-on-interaction-answer-type.filter.ts',
     'truncate.filter.ts',
     # Please don't try to cover `unit-test-utils.ajs.ts` file.
