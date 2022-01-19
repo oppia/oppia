@@ -315,8 +315,9 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
             expected_status_int=400)
         # Check PUT returns 404 when cannot get skill by id.
         self.delete_skill_model_and_memcache(self.admin_id, self.skill_id)
+        self.put_payload['version'] = 1
         self.put_json(
-            self.url, {}, csrf_token=csrf_token, expected_status_int=404)
+            self.url, self.put_payload, csrf_token=csrf_token, expected_status_int=404)
         self.logout()
 
     def test_editable_skill_handler_delete_succeeds(self):

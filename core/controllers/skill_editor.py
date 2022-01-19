@@ -193,10 +193,6 @@ class EditableSkillDataHandler(base.BaseHandler):
     @acl_decorators.open_access
     def get(self, skill_id):
         """Populates the data on the individual skill page."""
-        try:
-            skill_domain.Skill.require_valid_skill_id(skill_id)
-        except utils.ValidationError:
-            raise self.PageNotFoundException('Invalid skill id.')
 
         skill = skill_fetchers.get_skill_by_id(skill_id, strict=False)
 
@@ -259,10 +255,7 @@ class EditableSkillDataHandler(base.BaseHandler):
                 % constants.MAX_COMMIT_MESSAGE_LENGTH)
 
         change_dicts = self.normalized_payload.get('change_dicts')
-        change_list = [
-            skill_domain.SkillChange(change_dict)
-            for change_dict in change_dicts
-        ]
+        change_list = change_dicts
         try:
             skill_services.update_skill(
                 self.user_id, skill_id, change_list, commit_message)

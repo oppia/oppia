@@ -235,6 +235,17 @@ class BaseChange:
         """
         return cls(base_change_dict)
 
+    def validate(self):
+        """Validates various properties of the BaseChange object.
+
+        Raises:
+            ValidationError. One or more attributes of the BaseChange are
+                invalid.
+        """
+
+        base_change_dict = self.to_dict()
+        self.validate_dict(base_change_dict) 
+
     def __getattr__(self, name: str) -> str:
         # AttributeError needs to be thrown in order to make
         # instances of this class picklable.
