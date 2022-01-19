@@ -381,7 +381,7 @@ def _save_topic(committer_id, topic, commit_message, change_list):
             'Unexpected error: trying to update version %s of topic '
             'from version %s. Please reload the page and try again.'
             % (topic_model.version, topic.version))
-    elif topic.version < topic_model.version:
+    if topic.version < topic_model.version:
         raise Exception(
             'Trying to update version %s of topic from version %s, '
             'which is too old. Please reload the page and try again.'

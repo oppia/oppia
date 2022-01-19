@@ -13,21 +13,30 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the Oppia splash page.
+ * @fileoverview Component for question editor save modal.
  */
-import { Component } from '@angular/core';
+
+import { Component, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { AppConstants } from 'app.constants';
+import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
-  selector: 'oppia-story-save-pending-changes-modal',
-  templateUrl: './story-save-pending-changes-modal.component.html'
+  selector: 'oppia-question-editor-save-modal',
+  templateUrl: './question-editor-save-modal.component.html'
 })
-export class StorySavePendingChangesModalComponent {
-  constructor(
-      private activeModal: NgbActiveModal
-  ) {}
+export class QuestionEditorSaveModalComponent extends ConfirmOrCancelModal
+  implements OnInit {
+  MAX_COMMIT_MESSAGE_LENGTH: number;
 
-  cancel(): void {
-    this.activeModal.dismiss();
+  constructor(
+    private ngbActiveModal: NgbActiveModal,
+  ) {
+    super(ngbActiveModal);
+  }
+
+  ngOnInit(): void {
+    this.MAX_COMMIT_MESSAGE_LENGTH = (
+      AppConstants.MAX_COMMIT_MESSAGE_LENGTH);
   }
 }

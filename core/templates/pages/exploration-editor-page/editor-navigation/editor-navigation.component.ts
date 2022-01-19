@@ -147,13 +147,13 @@ angular.module('oppia').component('editorNavigation', {
         $scope.saveIsInProcess = true;
         $scope.loadingDotsAreShown = true;
 
-        ExplorationSaveService.saveChanges(
+        ExplorationSaveService.saveChangesAsync(
           $scope.showLoadingDots, $scope.hideLoadingDots)
           .then(function() {
             $scope.saveIsInProcess = false;
             $scope.loadingDotsAreShown = false;
             $scope.$applyAsync();
-          });
+          }, () => {});
         $scope.$applyAsync();
       };
 

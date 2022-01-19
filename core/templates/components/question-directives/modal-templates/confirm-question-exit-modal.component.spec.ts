@@ -13,36 +13,32 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the TopicSavePendingChangesComponent.
+ * @fileoverview Unit tests for the confirm question exit
+ * modal component.
  */
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { ConfirmQuestionExitModalComponent } from './confirm-question-exit-modal.component';
 
-import { TopicSavePendingChangesComponent } from './topic-save-pending-changes-modal.component';
-
-describe('Topic Save Pending Changes Component', function() {
-  let component: TopicSavePendingChangesComponent;
-  let fixture: ComponentFixture<TopicSavePendingChangesComponent>;
+describe('Confirm Question Exit Modal Component', () => {
+  let component: ConfirmQuestionExitModalComponent;
+  let fixture: ComponentFixture<ConfirmQuestionExitModalComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
-        TopicSavePendingChangesComponent
+        ConfirmQuestionExitModalComponent
       ],
-      providers: [{
-        provide: NgbActiveModal
-      }],
+      providers: [NgbActiveModal],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(TopicSavePendingChangesComponent);
+    fixture = TestBed.createComponent(ConfirmQuestionExitModalComponent);
     component = fixture.componentInstance;
-
-    TestBed.inject(NgbActiveModal);
   });
 
   // This component have no more frontend tests as it inherits the
