@@ -273,7 +273,8 @@ class ExplorationChange(change_domain.BaseChange):
     EXPLORATION_PROPERTIES = (
         'title', 'category', 'objective', 'language_code', 'tags',
         'blurb', 'author_notes', 'param_specs', 'param_changes',
-        'init_state_name', 'auto_tts_enabled', 'correctness_feedback_enabled')
+        'init_state_name', 'auto_tts_enabled', 'correctness_feedback_enabled',
+        'next_content_id_index')
 
     ALLOWED_COMMANDS = [{
         'name': CMD_CREATE_NEW,
@@ -587,6 +588,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 enabled.
             correctness_feedback_enabled: bool. True if correctness feedback is
                 enabled.
+            next_content_id_index: int. The next_content_id index to use for
+                generation of new content ids.
             created_on: datetime.datetime. Date and time when the exploration
                 is created.
             last_updated: datetime.datetime. Date and time when the exploration
@@ -634,7 +637,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
             init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
             category=feconf.DEFAULT_EXPLORATION_CATEGORY,
             objective=feconf.DEFAULT_EXPLORATION_OBJECTIVE,
-            language_code=constants.DEFAULT_LANGUAGE_CODE):
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            next_content_id_index=(
+                feconf.DEFAULT_NEXT_CONTENT_ID_INDEX_FOR_AN_ENTITY)):
         """Returns a Exploration domain object with default values.
 
         'title', 'init_state_name', 'category', 'objective' if not provided are
@@ -651,6 +656,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
             category: str. The category of the exploration.
             objective: str. The objective of the exploration.
             language_code: str. The language code of the exploration.
+            next_content_id_index: int. The next_content_id index to use for
+                generation of new content ids.
 
         Returns:
             Exploration. The Exploration domain object with default
@@ -667,7 +674,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             exploration_id, title, category, objective, language_code, [], '',
             '', feconf.CURRENT_STATE_SCHEMA_VERSION,
             init_state_name, states_dict, {}, [], 0,
-            feconf.DEFAULT_AUTO_TTS_ENABLED, False)
+            feconf.DEFAULT_AUTO_TTS_ENABLED, False, next_content_id_index)
 
     @classmethod
     def from_dict(
@@ -702,6 +709,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
         exploration.auto_tts_enabled = exploration_dict['auto_tts_enabled']
         exploration.correctness_feedback_enabled = exploration_dict[
             'correctness_feedback_enabled']
+        exploration.next_content_id_index = exploration_dict[
+            'next_content_id_index']
 
         exploration.param_specs = {
             ps_name: param_domain.ParamSpec.from_dict(ps_val) for
@@ -764,12 +773,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 state_domain.RecordedVoiceovers.from_dict(
                     sdict['recorded_voiceovers']))
 
-            state.written_translations = (
-                state_domain.WrittenTranslations.from_dict(
-                    sdict['written_translations']))
-
-            state.next_content_id_index = sdict['next_content_id_index']
-
             state.linked_skill_id = sdict['linked_skill_id']
 
             state.solicit_answer_details = sdict['solicit_answer_details']
@@ -785,7 +788,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
         exploration.version = exploration_version
         exploration.created_on = exploration_created_on
         exploration.last_updated = exploration_last_updated
-        exploration.next_content_id_index = exploration['next_content_id_index']
 
         return exploration
 
@@ -932,6 +934,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
             raise utils.ValidationError(
                 'Expected correctness_feedback_enabled to be a bool, received '
                 '%s' % self.correctness_feedback_enabled)
+
+        if not isinstance(self.next_content_id_index, int):
+            raise utils.ValidationError(
+                'Expected next_content_is_index to be an int, received %s.'
+                % self.next_content_id_index)
 
         for param_name in self.param_specs:
             if not isinstance(param_name, str):
@@ -3167,9 +3174,9 @@ class ExplorationChangeMergeVerifier:
                     current_exploration.__getattribute__(
                         change.property_name))
             elif change.cmd = CMD_MARK_TRANSLATION_NEEDS_UPDATE:
-                # TODO
+                change_is_mergeable = True
             elif change.cmd = CMD_REMOVE_TRANSLATION:
-                # TODO
+                change_is_mergeable = True
 
             if change_is_mergeable:
                 changes_are_mergeable = True

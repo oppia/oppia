@@ -1504,3 +1504,6 @@ COMMIT_TYPE_CREATE = 'create'
 COMMIT_TYPE_REVERT = 'revert'
 COMMIT_TYPE_EDIT = 'edit'
 COMMIT_TYPE_DELETE = 'delete'
+
+# The default next_content_id_index for exploration and question.
+DEFAULT_NEXT_CONTENT_ID_INDEX_FOR_AN_ENTITY = 0

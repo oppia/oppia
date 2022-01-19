@@ -35,6 +35,7 @@ TRANSLATABLE_CONTENT_FORMAT_SET_OF_UNICODE_STRING = 'set_of_unicode_string'
 # Globally remove these variables/methods from codebase..
 # next_content_id_index
 # get_translation_counts()
+# _get_all_translatable_content
 # get_translatable_content_count()
 # add_translation()
 # get_all_html_content_strings()

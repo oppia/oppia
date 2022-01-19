@@ -2513,7 +2513,6 @@ class State(translation_domain.BaseTranslatableObject):
 
         return python_utils.yaml_from_dict(state.to_dict(), width=width)
 
-    # TODO: Remove this.
     def get_translation_counts(self):
         """Return a dict representing the number of translations available in a
         languages in which there exists at least one translation in the state
@@ -3083,7 +3082,7 @@ class State(translation_domain.BaseTranslatableObject):
             value as TranslatableItem containing the content and the data
             format.
         """
-        content_id_to_translatable_item = self._get_all_translatable_content()
+        content_id_to_translatable_item = self.get_translatable_fields()
         available_translation_content_ids = (
             self.written_translations
             .get_content_ids_that_are_correctly_translated(language_code))
