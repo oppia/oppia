@@ -122,8 +122,7 @@ class ExplorationEmbedPage(base.BaseHandler):
         Args:
             exploration_id: str. The ID of the exploration.
         """
-        version_str = self.normalized_request.get('v')
-        version = int(version_str) if version_str else None
+        version = self.normalized_request.get('v')
 
         # Note: this is an optional argument and will be None when the
         # exploration is being played outside the context of a collection.
