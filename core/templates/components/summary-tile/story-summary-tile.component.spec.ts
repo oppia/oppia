@@ -64,7 +64,21 @@ describe('StorySummaryTileComponent', () => {
       story_is_published: true,
       completed_node_titles: ['node1'],
       url_fragment: 'story1',
-      all_node_dicts: []
+      all_node_dicts: [
+        {
+          id: 'node_1',
+          title: 'node1',
+          description: 'This is node 1',
+          destination_node_ids: [],
+          prerequisite_skill_ids: [],
+          acquired_skill_ids: [],
+          outline: '',
+          outline_is_finalized: true,
+          exploration_id: null,
+          thumbnail_bg_color: null,
+          thumbnail_filename: null
+        }
+      ]
     });
 
     expect(component.nodeCount).toBe(undefined);
@@ -76,10 +90,14 @@ describe('StorySummaryTileComponent', () => {
     expect(component.completedStrokeDashArrayValues).toBe(undefined);
     expect(component.thumbnailBgColor).toBe(undefined);
     expect(component.nodeTitles).toEqual(undefined);
+    expect(component.storyTitleTranslationKey).toEqual(undefined);
     spyOn(i18nLanguageCodeService, 'getStoryTranslationKey')
       .and.returnValue('I18N_STORY_storyId_TITLE');
     spyOn(i18nLanguageCodeService, 'isTranslationKeyToBeDisplayed')
-      .and.returnValue(false);
+      .and.returnValues(false, false);
+    spyOn(i18nLanguageCodeService, 'getStoryNodeTranslationKey')
+      .and.returnValue('I18N_STORYNODE_storyId_node_1_TITLE');
+    
 
     component.ngOnInit();
 
@@ -91,6 +109,10 @@ describe('StorySummaryTileComponent', () => {
     expect(component.storyTitleTranslationKey).toEqual(
       'I18N_STORY_storyId_TITLE');
     expect(component.storyTitleTranslationKeyIsToBeDisplayed).toEqual(false);
+    expect(component.nodeTitlesTranslationKeys).toEqual(
+      ['I18N_STORYNODE_storyId_node_1_TITLE']);
+    expect(component.nodeTitlesTranslationKeysAreToBeDisplayed).toEqual(
+      [false]);
 
     // Here the value is calculated by the formula -> (circumference -
     // (nodeCount * gapLength))/nodeCount = (2 * 20 * Math.PI - (3*5)) / 3

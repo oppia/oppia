@@ -27,6 +27,7 @@ import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { AppConstants } from 'app.constants';
 import { StorySummary } from 'domain/story/story-summary.model';
 import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
+import { StoryNode } from 'domain/story/story-node.model';
 
 @Component({
   selector: 'oppia-story-summary-tile',
@@ -52,6 +53,8 @@ export class StorySummaryTileComponent implements OnInit {
   completedStrokeDashArrayValues!: string;
   thumbnailBgColor!: string;
   nodeTitles!: string[];
+  nodeTitlesTranslationKeys: string[] = [];
+  nodeTitlesTranslationKeysAreToBeDisplayed: boolean[] = [];
   storyLink!: string;
   thumbnailUrl: string | null = null;
   showButton: boolean = false;
@@ -205,6 +208,18 @@ export class StorySummaryTileComponent implements OnInit {
       this.getCompletedStrokeDashArrayValues();
     this.thumbnailBgColor = this.storySummary.getThumbnailBgColor();
     this.nodeTitles = this.storySummary.getNodeTitles();
+    for (let idx in this.storySummary.getAllNodes()) {
+      let storyNode: StoryNode = this.storySummary.getAllNodes()[idx];
+      let storyNodeTranslationKey = this.i18nLanguageCodeService.
+        getStoryNodeTranslationKey(
+          this.storySummary.getId(), storyNode.getId(),
+          TranslationKeyType.TITLE);
+      this.nodeTitlesTranslationKeys.push(storyNodeTranslationKey)
+      this.nodeTitlesTranslationKeysAreToBeDisplayed.push(
+        this.i18nLanguageCodeService.isTranslationKeyToBeDisplayed(
+          storyNodeTranslationKey)
+      );
+    }
   }
 }
 

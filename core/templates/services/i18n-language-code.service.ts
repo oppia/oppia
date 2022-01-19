@@ -107,11 +107,27 @@ export class I18nLanguageCodeService {
    * @param {string} storyId - Unique id of the story, used to generate
    * translation key.
    * @param {TranslationKeyType} keyType - either Title or Description.
-   * @returns {string} - translation key for the topic name/description.
+   * @returns {string} - translation key for the story name/description.
    */
   getStoryTranslationKey(
       storyId: string, keyType: TranslationKeyType): string {
     return `I18N_STORY_${storyId}_${keyType}`;
+  }
+
+  // TODO(#14645):Remove this method when translation service is extended.
+  /**
+   * Takes story id, story node id and entity translationKey type as input,
+   * generates and returns the translation key based on that.
+   * @param {string} storyId - Unique id of the story, used to generate
+   * translation key.
+   * @param {string} storyNodeId - unique node id with respect to the story.
+   * @param {TranslationKeyType} keyType - either Title or Description.
+   * @returns {string} - translation key for the story node name.
+   */
+  getStoryNodeTranslationKey(
+      storyId: string, storyNodeId: string,
+      keyType: TranslationKeyType): string {
+    return `I18N_STORYNODE_${storyId}_${storyNodeId}_${keyType}`;
   }
 
   // TODO(#14645):Remove this method when translation service is extended.

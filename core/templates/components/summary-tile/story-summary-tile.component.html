@@ -67,7 +67,12 @@
             <span class="chapter-identifier" [innerHTML]="'I18N_TOPIC_VIEWER_CHAPTER' | translate">
             </span>&nbsp;
             <span class="chapter-identifier">{{ idx + 1 }}:</span>&nbsp;
-            <span dir="auto">{{ title }}</span>
+            <span dir="auto" *ngIf="!nodeTitlesTranslationKeysAreToBeDisplayed[idx]">
+              {{ title }}
+            </span>
+            <span dir="auto" *ngIf="nodeTitlesTranslationKeysAreToBeDisplayed[idx]">
+              {{ nodeTitlesTranslationKeys[idx] | translate }}
+            </span>
           </a>
         </div>
       </div>
