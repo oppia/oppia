@@ -30,6 +30,54 @@ import { LoggerService } from 'services/contextual/logger.service';
 import { ExplorationChange } from 'domain/exploration/exploration-draft.model';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { InternetConnectivityService } from 'services/internet-connectivity.service';
+import { SubtitledHtml, SubtitledHtmlBackendDict } from 'domain/exploration/subtitled-html.model';
+import { ParamChange, ParamChangeBackendDict } from 'domain/exploration/ParamChangeObjectFactory';
+import { InteractionCustomizationArgs, InteractionCustomizationArgsBackendDict } from 'interactions/customization-args-defs';
+import { AnswerGroup, AnswerGroupBackendDict } from 'domain/exploration/AnswerGroupObjectFactory';
+import { Hint, HintBackendDict } from 'domain/exploration/HintObjectFactory';
+import { Outcome, OutcomeBackendDict } from 'domain/exploration/OutcomeObjectFactory';
+import { RecordedVoiceOverBackendDict, RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+
+export type StatePropertyValues = (
+  SubtitledHtml |
+  ParamChange[] |
+  string |
+  InteractionCustomizationArgsBackendDict |
+  AnswerGroup[] |
+  Hint[] |
+  Outcome |
+  RecordedVoiceovers |
+  boolean
+);
+export type StatePropertyDictValues = (
+  SubtitledHtmlBackendDict |
+  ParamChangeBackendDict[] |
+  string |
+  InteractionCustomizationArgs |
+  AnswerGroupBackendDict[] |
+  HintBackendDict[] |
+  OutcomeBackendDict |
+  RecordedVoiceOverBackendDict |
+  boolean
+);
+export type StatePropertyNames = (
+  'answer_groups' |
+  'card_is_checkpoint' |
+  'confirmed_unclassified_answers' |
+  'content' |
+  'recorded_voiceovers' |
+  'linked_skill_id' |
+  'default_outcome' |
+  'param_changes' |
+  'param_specs' |
+  'hints' |
+  'next_content_id_index' |
+  'solicit_answer_details' |
+  'solution' |
+  'widget_id' |
+  'widget_customization_args' |
+  'written_translations'
+);
 
 @Injectable({
   providedIn: 'root'
@@ -241,8 +289,9 @@ export class ChangeListService {
    */
 
   editStateProperty(
-      stateName: string, backendName: string,
-      newValue: string, oldValue: string): void {
+      stateName: string, backendName: StatePropertyNames,
+      newValue: StatePropertyDictValues, oldValue: StatePropertyDictValues
+  ): void {
     if (!this.ALLOWED_STATE_BACKEND_NAMES.hasOwnProperty(backendName)) {
       this.alertsService.addWarning('Invalid state property: ' + backendName);
       return;

@@ -332,7 +332,7 @@ export class TopicsAndSkillsDashboardPageComponent {
         if (!stayInSameTab || !this.activeTab) {
           this.activeTab = this.TAB_NAME_TOPICS;
         }
-        this.userCanCreateSkill = response.canCreateSkill;
+        this.userCanCreateSkill = response.canCreateSkillresponse;
         this.userCanCreateTopic = response.canCreateTopic;
         this.userCanDeleteSkill = response.canDeleteSkill;
         this.userCanDeleteTopic = response.canDeleteTopic;

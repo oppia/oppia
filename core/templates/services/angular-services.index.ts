@@ -395,6 +395,8 @@ import { ExplorationParamSpecsService } from 'pages/exploration-editor-page/serv
 import { ExplorationParamChangesService } from 'pages/exploration-editor-page/services/exploration-param-changes.service';
 import { ExplorationObjectiveService } from 'pages/exploration-editor-page/services/exploration-objective.service';
 import { ExplorationTitleService } from 'pages/exploration-editor-page/services/exploration-title.service';
+import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
+import { GraphDataService } from 'pages/exploration-editor-page/services/graph-data.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -527,6 +529,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ExplorationRecommendationsBackendApiService',
     ExplorationRecommendationsBackendApiService],
   ['ExplorationRecommendationsService', ExplorationRecommendationsService],
+  ['ExplorationStatesService', ExplorationStatesService],
   ['ExplorationStatsBackendApiService', ExplorationStatsBackendApiService],
   ['ExplorationStatsService', ExplorationStatsService],
   ['ExplorationSummaryBackendApiService', ExplorationSummaryBackendApiService],
@@ -553,6 +556,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['FractionInputRulesService', FractionInputRulesService],
   ['FractionInputValidationService', FractionInputValidationService],
   ['GenerateContentIdService', GenerateContentIdService],
+  ['GraphDataService', GraphDataService],
   ['GraphDetailService', GraphDetailService],
   ['GraphInputRulesService', GraphInputRulesService],
   ['GraphInputValidationService', GraphInputValidationService],
