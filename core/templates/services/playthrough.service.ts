@@ -91,7 +91,7 @@ class CyclicStateTransitionsTracker {
         this.cycleOfVisitedStates = cycleOfVisitedStates;
         this.numLoops = 1;
       }
-       this.pathOfVisitedStates.length = 0;
+      this.pathOfVisitedStates.length = 0;
     }
     this.pathOfVisitedStates.push(destStateName);
   }
@@ -124,10 +124,10 @@ class EarlyQuitTracker {
       this.expDurationInSecs < ServicesConstants.EARLY_QUIT_THRESHOLD_IN_SECS);
   }
 
-   recordExplorationQuit(
-       stateName: string,
-       expDurationInSecs: number | null
-   ): void {
+  recordExplorationQuit(
+      stateName: string,
+      expDurationInSecs: number | null
+  ): void {
     if (this.stateName !== null && this.expDurationInSecs !== null) {
       this.stateName = stateName;
       this.expDurationInSecs = expDurationInSecs;
@@ -200,7 +200,7 @@ export class PlaythroughService {
        private playthroughObjectFactory: PlaythroughObjectFactory) {}
 
   initSession(
-      explorationId: string, 
+      explorationId: string,
       explorationVersion: number | null,
       sampleSizePopulationProportion: number
   ): void {
@@ -231,11 +231,11 @@ export class PlaythroughService {
   }
 
   recordAnswerSubmitAction(
-      stateName: string, 
-      destStateName: string, 
+      stateName: string,
+      destStateName: string,
       interactionId: string,
-      answer: string, 
-      feedback: string, 
+      answer: string,
+      feedback: string,
       timeSpentInStateSecs: number
   ): void {
     if (!this.hasRecordingBegun() || this.hasRecordingFinished()) {
