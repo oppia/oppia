@@ -130,18 +130,18 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             self.target_id, self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
             'reviewer_3', self.change_cmd, self.score_category,
-            'exploration.exp1.thread_6', None)
+            'exploration.exp1.thread_6', 'en')
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
             'reviewer_3', self.change_cmd, self.score_category,
-            'exploration.exp1.thread_7', None)
+            'exploration.exp1.thread_7', 'en')
         suggestion_model = suggestion_models.GeneralSuggestionModel
         suggestions = suggestion_model.get_in_review_translation_suggestions(
             'author-1',
-            [None]
+            ['en']
         )
         self.assertEqual(len(suggestions), 2)
         for suggestion in suggestions:
