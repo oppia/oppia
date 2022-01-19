@@ -169,7 +169,7 @@ def get_package_file_contents(package: str, filepath: str) -> str:
     """
     try:
         with (io.open(os.path.join(
-            package,filepath),'r', encoding='utf-8')) as file:
+            package, filepath) , 'r' , encoding='utf-8')) as file:
             return file.read()
     except FileNotFoundError:
         return pkgutil.get_data(package, filepath).decode('utf-8')
