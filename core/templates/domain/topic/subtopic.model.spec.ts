@@ -57,8 +57,8 @@ describe('Subtopic model', () => {
   it('should return correct url fragment', () => {
     expect(_sampleSubtopic.getUrlFragment()).toEqual('title');
 
-    _sampleSubtopic.setUrlFragment(null);
-    expect(_sampleSubtopic.getUrlFragment()).toBeNull();
+    _sampleSubtopic.setUrlFragment('test');
+    expect(_sampleSubtopic.getUrlFragment()).toEqual('test');
   });
 
   it('should return the skill ids', () => {
@@ -164,14 +164,14 @@ describe('Subtopic model', () => {
   it('should return correct thumbnail filename', () => {
     expect(_sampleSubtopic.getThumbnailFilename()).toEqual('image.png');
 
-    _sampleSubtopic.setThumbnailFilename(null);
-    expect(_sampleSubtopic.getThumbnailFilename()).toBeNull();
+    _sampleSubtopic.setThumbnailFilename('test.png');
+    expect(_sampleSubtopic.getThumbnailFilename()).toEqual('test.png');
   });
 
   it('should return correct thumbnail background color', () => {
     expect(_sampleSubtopic.getThumbnailBgColor()).toEqual('#a33f40');
 
-    _sampleSubtopic.setThumbnailBgColor(null);
-    expect(_sampleSubtopic.getThumbnailBgColor()).toBeNull();
+    _sampleSubtopic.setThumbnailBgColor('#3f3fa3');
+    expect(_sampleSubtopic.getThumbnailBgColor()).toEqual('#3f3fa3');
   });
 });
