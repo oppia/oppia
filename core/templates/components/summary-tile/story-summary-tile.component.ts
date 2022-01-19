@@ -48,13 +48,11 @@ export class StorySummaryTileComponent implements OnInit {
   storyProgress!: number;
   storyTitle!: string;
   storyTitleTranslationKey!: string;
-  storyTitleTranslationKeyIsToBeDisplayed: boolean = false;
   strokeDashArrayValues!: string | number;
   completedStrokeDashArrayValues!: string;
   thumbnailBgColor!: string;
   nodeTitles!: string[];
   nodeTitlesTranslationKeys: string[] = [];
-  nodeTitlesTranslationKeysAreToBeDisplayed: boolean[] = [];
   storyLink!: string;
   thumbnailUrl: string | null = null;
   showButton: boolean = false;
@@ -201,8 +199,6 @@ export class StorySummaryTileComponent implements OnInit {
     this.storyTitleTranslationKey = this.i18nLanguageCodeService
       .getStoryTranslationKey(
         this.storySummary.getId(), TranslationKeyType.TITLE);
-    this.storyTitleTranslationKeyIsToBeDisplayed = this.i18nLanguageCodeService
-      .isTranslationKeyToBeDisplayed(this.storyTitleTranslationKey);
     this.strokeDashArrayValues = this.getStrokeDashArrayValues();
     this.completedStrokeDashArrayValues =
       this.getCompletedStrokeDashArrayValues();
@@ -215,11 +211,23 @@ export class StorySummaryTileComponent implements OnInit {
           this.storySummary.getId(), storyNode.getId(),
           TranslationKeyType.TITLE);
       this.nodeTitlesTranslationKeys.push(storyNodeTranslationKey)
-      this.nodeTitlesTranslationKeysAreToBeDisplayed.push(
-        this.i18nLanguageCodeService.isTranslationKeyToBeDisplayed(
-          storyNodeTranslationKey)
-      );
     }
+  }
+
+  isHackyStoryTitleTranslationDisplayed(): boolean {
+    return (
+      this.i18nLanguageCodeService.isHackyTranslationAvailable(
+        this.storyTitleTranslationKey) &&
+        !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    );
+  }
+
+  isHackyNodeTitleTranslationDisplayed(index: number): boolean {
+    return (
+      this.i18nLanguageCodeService.isHackyTranslationAvailable(
+        this.nodeTitlesTranslationKeys[index]) &&
+        !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    );
   }
 }
 

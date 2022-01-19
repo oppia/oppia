@@ -103,9 +103,11 @@ export class ClassroomPageComponent {
 
   // Used for choosing from classroom name or topic translation key to be
   // displayed in the classroom name html block.
-  isClassroomTranslationKeyToBeDisplayed(): boolean {
-    return this.i18nLanguageCodeService.isTranslationKeyToBeDisplayed(
-      this.classroomNameTranslationKey
+  isHackyClassroomTranslationDisplayed(): boolean {
+    return (
+      this.i18nLanguageCodeService.isHackyTranslationAvailable(
+        this.classroomNameTranslationKey) &&
+        !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
     );
   }
 }

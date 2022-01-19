@@ -29,15 +29,13 @@
   <!-- Left-to-right is enforced here due to the formatting of the HTML with the title on the left and chapter count on the right. -->
   <div class="oppia-story-title" dir="ltr">
     <strong class="title-text">
-      <a [href]="storyLink"
-         [ngClass]="{'disabled-link': !classroomUrlFragment}"
-         *ngIf="!storyTitleTranslationKeyIsToBeDisplayed">
-         {{ storyTitle }}
-      </a>
-      <a [href]="storyLink"
-         [ngClass]="{'disabled-link': !classroomUrlFragment}"
-         *ngIf="storyTitleTranslationKeyIsToBeDisplayed">
-         {{ storyTitleTranslationKey | translate }}
+      <a [href]="storyLink" [ngClass]="{'disabled-link': !classroomUrlFragment}">
+        <span *ngIf="!isHackyStoryTitleTranslationDisplayed()">
+          {{ storyTitle }}
+        </span>
+        <span *ngIf="isHackyStoryTitleTranslationDisplayed()">
+          {{ storyTitleTranslationKey | translate }}
+        </span>
       </a>
     </strong>
     <span dir="auto" class="oppia-chapters-count">
@@ -67,10 +65,10 @@
             <span class="chapter-identifier" [innerHTML]="'I18N_TOPIC_VIEWER_CHAPTER' | translate">
             </span>&nbsp;
             <span class="chapter-identifier">{{ idx + 1 }}:</span>&nbsp;
-            <span dir="auto" *ngIf="!nodeTitlesTranslationKeysAreToBeDisplayed[idx]">
+            <span dir="auto" *ngIf="!isHackyNodeTitleTranslationDisplayed(idx)">
               {{ title }}
             </span>
-            <span dir="auto" *ngIf="nodeTitlesTranslationKeysAreToBeDisplayed[idx]">
+            <span dir="auto" *ngIf="isHackyNodeTitleTranslationDisplayed(idx)">
               {{ nodeTitlesTranslationKeys[idx] | translate }}
             </span>
           </a>

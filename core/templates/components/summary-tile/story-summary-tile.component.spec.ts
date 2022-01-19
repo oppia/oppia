@@ -93,11 +93,12 @@ describe('StorySummaryTileComponent', () => {
     expect(component.storyTitleTranslationKey).toEqual(undefined);
     spyOn(i18nLanguageCodeService, 'getStoryTranslationKey')
       .and.returnValue('I18N_STORY_storyId_TITLE');
-    spyOn(i18nLanguageCodeService, 'isTranslationKeyToBeDisplayed')
-      .and.returnValues(false, false);
     spyOn(i18nLanguageCodeService, 'getStoryNodeTranslationKey')
       .and.returnValue('I18N_STORYNODE_storyId_node_1_TITLE');
-    
+    spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
+      .and.returnValues(false, true);
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
+      .and.returnValues(false, false);
 
     component.ngOnInit();
 
@@ -108,12 +109,16 @@ describe('StorySummaryTileComponent', () => {
     expect(component.storyTitle).toBe('Story Title');
     expect(component.storyTitleTranslationKey).toEqual(
       'I18N_STORY_storyId_TITLE');
-    expect(component.storyTitleTranslationKeyIsToBeDisplayed).toEqual(false);
     expect(component.nodeTitlesTranslationKeys).toEqual(
       ['I18N_STORYNODE_storyId_node_1_TITLE']);
-    expect(component.nodeTitlesTranslationKeysAreToBeDisplayed).toEqual(
-      [false]);
-
+    // Translation is only displayed if the language is not English
+    // and it's hacky translation is available.
+    let hackyStoryTitleTranslationIsDisplayed =
+      component.isHackyStoryTitleTranslationDisplayed();
+    expect(hackyStoryTitleTranslationIsDisplayed).toBe(false);
+    let hackyNodeTitleTranslationIsDisplayed =
+      component.isHackyNodeTitleTranslationDisplayed(0);
+    expect(hackyNodeTitleTranslationIsDisplayed).toBe(false);
     // Here the value is calculated by the formula -> (circumference -
     // (nodeCount * gapLength))/nodeCount = (2 * 20 * Math.PI - (3*5)) / 3
     // = 36.88790204786391. Along with this value, gapLength (5) is also

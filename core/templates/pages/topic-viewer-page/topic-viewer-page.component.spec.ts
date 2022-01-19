@@ -127,11 +127,6 @@ describe('Topic viewer page', () => {
     spyOn(pageTitleService, 'setDocumentTitle').and.callThrough();
     spyOn(pageTitleService, 'updateMetaTag').and.callThrough();
     spyOn(windowRef.nativeWindow.history, 'pushState');
-    spyOn(i18nLanguageCodeService, 'getTopicTranslationKey')
-      .and.returnValues(
-        'I18N_TOPIC_abc1234_TITLE', 'I18N_TOPIC_abc1234_DESCRIPTION');
-    spyOn(i18nLanguageCodeService, 'isTranslationKeyToBeDisplayed')
-      .and.returnValues(true, false);
 
     topicViewerPageComponent.ngOnInit();
     expect(topicViewerPageComponent.canonicalStorySummaries).toEqual([]);
@@ -143,14 +138,6 @@ describe('Topic viewer page', () => {
     req.flush(topicDict);
     flushMicrotasks();
 
-    expect(topicViewerPageComponent.topicNameTranslationKey).toBe(
-      'I18N_TOPIC_abc1234_TITLE');
-    expect(topicViewerPageComponent.topicNameTranslationKeyIsToBeDisplayed)
-      .toBe(true);
-    expect(topicViewerPageComponent.topicDescTranslationKey).toBe(
-      'I18N_TOPIC_abc1234_DESCRIPTION');
-    expect(topicViewerPageComponent.topicDescTranslationKeyIsToBeDisplayed)
-      .toBe(false);
     expect(topicViewerPageComponent.topicId).toBe('1');
     expect(topicViewerPageComponent.topicName).toBe('Topic Name');
     expect(pageTitleService.setDocumentTitle).toHaveBeenCalledWith(

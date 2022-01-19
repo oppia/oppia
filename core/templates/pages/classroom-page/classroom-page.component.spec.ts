@@ -127,9 +127,10 @@ describe('Classroom Page Component', () => {
       .and.returnValue(Promise.resolve(classroomData));
     spyOn(i18nLanguageCodeService, 'getClassroomTranslationKey')
       .and.returnValue('I18N_CLASSROOM_MATH_TITLE');
-    spyOn(i18nLanguageCodeService, 'isTranslationKeyToBeDisplayed')
-      .and.returnValues(true, false);
-
+    spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
+      .and.returnValue(true);
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
+      .and.returnValue(false);
     component.ngOnInit();
     tick();
     tick();
@@ -142,8 +143,7 @@ describe('Classroom Page Component', () => {
     expect(component.classroomDisplayName).toEqual(classroomData.getName());
     expect(component.classroomNameTranslationKey).toBe(
       'I18N_CLASSROOM_MATH_TITLE');
-    expect(component.isClassroomTranslationKeyToBeDisplayed()).toBe(true);
-    expect(component.isClassroomTranslationKeyToBeDisplayed()).toBe(false);
+    expect(component.isHackyClassroomTranslationDisplayed()).toBe(true);
     expect(pageTitleService.setDocumentTitle).toHaveBeenCalled();
     expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
     expect(classroomBackendApiService.onInitializeTranslation.emit)

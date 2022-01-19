@@ -25,7 +25,7 @@ describe('I18nLanguageCodeService', () => {
   const i18nLanguageCodeService = new I18nLanguageCodeService();
   let languageCode: string = '';
   let translationKey: string = '';
-  let translationKeyIsValid: boolean;
+  let hackyTranslationIsAvailable: boolean;
   let testSubscriptions: Subscription;
   beforeEach(() => {
     testSubscriptions = new Subscription();
@@ -67,18 +67,18 @@ describe('I18nLanguageCodeService', () => {
     expect(i18nLanguageCodeService.isCurrentLanguageEnglish()).toBe(false);
   });
 
-  it('should check whether translation key is valid correctly', () => {
+  it('should check whether hacky translation is available correctly', () => {
     // I18N_CLASSROOM_MATH_TITLE is present in constants file and hence
     // it is valid.
-    translationKeyIsValid = i18nLanguageCodeService.isTranslationKeyValid(
+    hackyTranslationIsAvailable = i18nLanguageCodeService.isHackyTranslationAvailable(
       'I18N_CLASSROOM_MATH_TITLE');
-    expect(translationKeyIsValid).toBe(true);
+    expect(hackyTranslationIsAvailable).toBe(true);
 
     // I18N_TOPIC_12345axa_TITLE is not present in constants file and hence
     // it is invalid.
-    translationKeyIsValid = i18nLanguageCodeService.isTranslationKeyValid(
+    hackyTranslationIsAvailable = i18nLanguageCodeService.isHackyTranslationAvailable(
       'I18N_TOPIC_12345axa_TITLE');
-    expect(translationKeyIsValid).toBe(false);
+    expect(hackyTranslationIsAvailable).toBe(false);
   });
 
   it('should get classroom translation key correctly', () => {
@@ -91,14 +91,22 @@ describe('I18nLanguageCodeService', () => {
     expect(translationKey).toBe('I18N_CLASSROOM_SCIENCE_TITLE');
   });
 
-  it('should get topic translation key correctly', () => {
+  it('should get topic and subtopic translation key correctly', () => {
     translationKey = i18nLanguageCodeService.getTopicTranslationKey(
       'abc1234', TranslationKeyType.TITLE);
     expect(translationKey).toBe('I18N_TOPIC_abc1234_TITLE');
 
+    translationKey = i18nLanguageCodeService.getSubtopicTranslationKey(
+      'abc1234', 1, TranslationKeyType.TITLE);
+    expect(translationKey).toBe('I18N_SUBTOPIC_abc1234_1_TITLE');
+
     translationKey = i18nLanguageCodeService.getTopicTranslationKey(
       'abc1234', TranslationKeyType.DESCRIPTION);
     expect(translationKey).toBe('I18N_TOPIC_abc1234_DESCRIPTION');
+
+    translationKey = i18nLanguageCodeService.getSubtopicTranslationKey(
+      'abc1234', 1, TranslationKeyType.DESCRIPTION);
+    expect(translationKey).toBe('I18N_SUBTOPIC_abc1234_1_DESCRIPTION');
   });
 
   it('should get story and story node translation keys correctly', () => {
@@ -113,23 +121,6 @@ describe('I18nLanguageCodeService', () => {
     translationKey = i18nLanguageCodeService.getStoryNodeTranslationKey(
       'abc1234', 'node_1', TranslationKeyType.TITLE);
     expect(translationKey).toBe('I18N_STORYNODE_abc1234_node_1_TITLE');
-  });
-
-  it('should check if translation key is to be displayed correctly', () => {
-    spyOn(i18nLanguageCodeService, 'isTranslationKeyValid')
-      .and.returnValues(false, true, false, true);
-
-    i18nLanguageCodeService.setI18nLanguageCode('en');
-    expect(i18nLanguageCodeService.isTranslationKeyToBeDisplayed(
-      'abcd1234')).toBe(false);
-    expect(i18nLanguageCodeService.isTranslationKeyToBeDisplayed(
-      'abcd1234')).toBe(false);
-
-    i18nLanguageCodeService.setI18nLanguageCode('es');
-    expect(i18nLanguageCodeService.isTranslationKeyToBeDisplayed(
-      'abcd1234')).toBe(false);
-    expect(i18nLanguageCodeService.isTranslationKeyToBeDisplayed(
-      'abcd1234')).toBe(true);
   });
 
   it('should get event emitter for loading of preferred language codes', () => {

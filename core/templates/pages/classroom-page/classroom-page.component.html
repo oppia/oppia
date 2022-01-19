@@ -2,11 +2,13 @@
 <div class="oppia-classroom-viewer-container position-relative">
   <div class="oppia-classroom-header">
     <div class="classroom-header">{{ 'I18N_CLASSROOM_PAGE_HEADING' | translate }}</div>
-    <div class="classroom-name" *ngIf="!isClassroomTranslationKeyToBeDisplayed()">
-      {{ classroomDisplayName }}
-    </div>
-    <div class="classroom-name" *ngIf="isClassroomTranslationKeyToBeDisplayed()">
-      {{ classroomNameTranslationKey | translate }}
+    <div class="classroom-name">
+      <span *ngIf="!isHackyClassroomTranslationDisplayed()">
+        {{ classroomDisplayName }}
+      </span>
+      <span *ngIf="isHackyClassroomTranslationDisplayed()">
+        {{ classroomNameTranslationKey | translate }}
+      </span>
     </div>
   </div>
   <div class="oppia-classroom-banner">

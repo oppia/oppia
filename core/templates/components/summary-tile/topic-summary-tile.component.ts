@@ -35,7 +35,6 @@ export class TopicSummaryTileComponent {
   @Input() isPublished: boolean;
   thumbnailUrl: string = '';
   topicNameTranslationKey: string;
-  topicNameTranslationKeyIsToBeDisplayed: boolean;
 
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
@@ -53,8 +52,6 @@ export class TopicSummaryTileComponent {
     this.topicNameTranslationKey = this.i18nLanguageCodeService.
       getTopicTranslationKey(
         this.topicSummary.getId(), TranslationKeyType.TITLE);
-    this.topicNameTranslationKeyIsToBeDisplayed = this.i18nLanguageCodeService.
-      isTranslationKeyToBeDisplayed(this.topicNameTranslationKey);
   }
 
   getTopicPageUrl(): string {
@@ -88,6 +85,14 @@ export class TopicSummaryTileComponent {
       parseInt(bgColor.substring(4, 6), 16) - 100);
 
     return '#' + newRValue + newGValue + newBValue;
+  }
+
+  isHackyTopicNameTranslationDisplayed(): boolean {
+    return (
+      this.i18nLanguageCodeService.isHackyTranslationAvailable(
+        this.topicNameTranslationKey) &&
+        !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    );
   }
 }
 

@@ -45,7 +45,7 @@ export class I18nLanguageCodeService {
   static languageCode: string = AppConstants.DEFAULT_LANGUAGE_CODE;
   static rtlLanguageCodes: readonly string[] = AppConstants.RTL_LANGUAGE_CODES;
 
-  // TODO(#9154): Remove this method when translation service is extended.
+  // TODO(#9154): Remove this variable when translation service is extended.
   /**
    * It stores all classroom metadata translation keys, like topic/story
    * title, description keys which currently cannot be translated from the
@@ -70,12 +70,12 @@ export class I18nLanguageCodeService {
         this.getCurrentI18nLanguageCode()) !== -1);
   }
 
-  // TODO(#14645):Remove this method when translation service is extended.
+  // TODO(#14645): Remove this method when translation service is extended.
   isCurrentLanguageEnglish(): boolean {
     return this.getCurrentI18nLanguageCode() === 'en';
   }
 
-  // TODO(#14645):Remove this method when translation service is extended.
+  // TODO(#14645): Remove this method when translation service is extended.
   /**
    * Takes classroom name as input, generates and returns the translation
    * key based on that.
@@ -86,7 +86,7 @@ export class I18nLanguageCodeService {
     return `I18N_CLASSROOM_${classroomName.toUpperCase()}_TITLE`;
   }
 
-  // TODO(#14645):Remove this method when translation service is extended.
+  // TODO(#14645): Remove this method when translation service is extended.
   /**
    * Takes topic id and entity translationKey type as input, generates and
    * returns the translation key based on that.
@@ -100,7 +100,24 @@ export class I18nLanguageCodeService {
     return `I18N_TOPIC_${topicId}_${keyType}`;
   }
 
-  // TODO(#14645):Remove this method when translation service is extended.
+  // TODO(#14645): Remove this method when translation service is extended.
+  /**
+   * Takes topic id, subtopic id and entity translationKey type as input,
+   * generates and returns the translation key based on that.
+   * @param {string} topicId - Unique id of the topic, used to generate
+   * translation key.
+   * @param {number} subtopicId - Unique id of the subtopic, with respect
+   * to the topic.
+   * @param {TranslationKeyType} keyType - either Title or Description.
+   * @returns {string} - translation key for the subtopic name/description.
+   */
+  getSubtopicTranslationKey(
+      topicId: string, subtopicId: number,
+      keyType: TranslationKeyType): string {
+    return `I18N_SUBTOPIC_${topicId}_${subtopicId}_${keyType}`;
+  }
+
+  // TODO(#14645): Remove this method when translation service is extended.
   /**
    * Takes story id and entity translationKey type as input, generates and
    * returns the translation key based on that.
@@ -114,7 +131,7 @@ export class I18nLanguageCodeService {
     return `I18N_STORY_${storyId}_${keyType}`;
   }
 
-  // TODO(#14645):Remove this method when translation service is extended.
+  // TODO(#14645): Remove this method when translation service is extended.
   /**
    * Takes story id, story node id and entity translationKey type as input,
    * generates and returns the translation key based on that.
@@ -130,7 +147,7 @@ export class I18nLanguageCodeService {
     return `I18N_STORYNODE_${storyId}_${storyNodeId}_${keyType}`;
   }
 
-  // TODO(#14645):Remove this method when translation service is extended.
+  // TODO(#14645): Remove this method when translation service is extended.
   /**
    * Checks if the translation key is valid by checking if it is present
    * in the constants file which indicates it has atleast the translation
@@ -140,22 +157,9 @@ export class I18nLanguageCodeService {
    * @returns {boolean} - True if translation key is present in language json
    * files else False.
    */
-  isTranslationKeyValid(translationKey: string): boolean {
+  isHackyTranslationAvailable(translationKey: string): boolean {
     return (
       this._HACKY_TRANSLATIONS_KEYS.indexOf(translationKey) !== -1);
-  }
-
-  // TODO(#14645):Remove this method when translation service is extended.
-  /**
-   * Checks if the given key is to be displayed in frontend or not based on
-   * if the given translation key is valid and if the current language is
-   * English or not.
-   * @returns {boolean} - True if the given translation key is to be
-   * displayed and false otherwise.
-   */
-  isTranslationKeyToBeDisplayed(translationKey: string): boolean {
-    let translationKeyIsValid = this.isTranslationKeyValid(translationKey);
-    return (translationKeyIsValid && !this.isCurrentLanguageEnglish());
   }
 
   get onI18nLanguageCodeChange(): EventEmitter<string> {

@@ -1,19 +1,21 @@
 <div class="stories-list">
   <div class="oppia-stories-list-container">
     <mat-card class="oppia-page-card oppia-long-text">
-      <h2 class="tab-title" *ngIf="!topicNameTranslationKeyIsToBeDisplayed">
-        {{ topicName }}
+      <h2 class="tab-title">
+        <span *ngIf="!isHackyTopicNameTranslationDisplayed()">
+          {{ topicName }}
+        </span>
+        <span *ngIf="isHackyTopicNameTranslationDisplayed()">
+          {{ topicNameTranslationKey | translate }}
+        </span>
       </h2>
-      <h2 class="tab-title" *ngIf="topicNameTranslationKeyIsToBeDisplayed">
-        {{ topicNameTranslationKey | translate }}
-      </h2>
-      <div class="topic-description protractor-test-topic-description"
-           *ngIf="!topicDescTranslationKeyIsToBeDisplayed">
-        {{ topicDescription }}
-      </div>
-      <div class="topic-description protractor-test-topic-description"
-           *ngIf="topicDescTranslationKeyIsToBeDisplayed">
-        {{ topicDescTranslationKey | translate }}
+      <div class="topic-description protractor-test-topic-description">
+        <span *ngIf="!isHackyTopicNameTranslationDisplayed()">
+          {{ topicDescription }}
+        </span>
+        <span *ngIf="isHackyTopicNameTranslationDisplayed()">
+          {{ topicDescTranslationKey | translate }}
+        </span>
       </div>
       <div *ngFor="let storySummary of canonicalStorySummaries" class="story-info-container">
         <oppia-story-summary-tile [classroomUrlFragment]="classroomUrlFragment"

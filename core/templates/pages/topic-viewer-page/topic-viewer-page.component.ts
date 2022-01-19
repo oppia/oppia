@@ -38,7 +38,6 @@ import { WindowDimensionsService } from
 import { LoaderService } from 'services/loader.service';
 import { PageTitleService } from 'services/page-title.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
 
 
 @Component({
@@ -54,10 +53,6 @@ export class TopicViewerPageComponent implements OnInit {
   topicIsLoading: boolean = true;
   topicId: string = '';
   topicName: string = '';
-  topicNameTranslationKey: string = '';
-  topicNameTranslationKeyIsToBeDisplayed: boolean = false;
-  topicDescTranslationKey: string = '';
-  topicDescTranslationKeyIsToBeDisplayed: boolean = false;
   topicDescription: string = '';
   chapterCount: number = 0;
   degreesOfMastery: DegreesOfMastery = {};
@@ -73,8 +68,7 @@ export class TopicViewerPageComponent implements OnInit {
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
     private windowDimensionsService: WindowDimensionsService,
-    private windowRef: WindowRef,
-    private i18nLanguageCodeService: I18nLanguageCodeService
+    private windowRef: WindowRef
   ) {}
 
   ngOnInit(): void {
@@ -99,18 +93,7 @@ export class TopicViewerPageComponent implements OnInit {
       (readOnlyTopic: ReadOnlyTopic) => {
         this.topicId = readOnlyTopic.getTopicId();
         this.topicName = readOnlyTopic.getTopicName();
-        this.topicNameTranslationKey = this.i18nLanguageCodeService
-          .getTopicTranslationKey(this.topicId, TranslationKeyType.TITLE);
         this.topicDescription = readOnlyTopic.getTopicDescription();
-        this.topicDescTranslationKey = this.i18nLanguageCodeService
-          .getTopicTranslationKey(
-            this.topicId, TranslationKeyType.DESCRIPTION);
-        this.topicNameTranslationKeyIsToBeDisplayed =
-          this.i18nLanguageCodeService.isTranslationKeyToBeDisplayed(
-            this.topicNameTranslationKey);
-        this.topicDescTranslationKeyIsToBeDisplayed =
-          this.i18nLanguageCodeService.isTranslationKeyToBeDisplayed(
-            this.topicDescTranslationKey);
         this.pageTitleService.setDocumentTitle(
           `Learn ${this.topicName} | ` +
           `${readOnlyTopic.getPageTitleFragmentForWeb()} | Oppia`);

@@ -107,14 +107,16 @@ describe('TopicSummaryTileCompoennt', () => {
       'I18N_TOPIC_abc1234_TITLE');
   });
 
-  it('should check if topic name translation key is to be displayed correctly',
+  it('should check if hacky topic name translation is displayed correctly',
     () => {
-      spyOn(i18nLanguageCodeService, 'isTranslationKeyToBeDisplayed')
+      spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
         .and.returnValue(true);
+      spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
+        .and.returnValue(false);
 
       component.ngOnInit();
 
-      expect(component.topicNameTranslationKeyIsToBeDisplayed).toBe(true);
+      expect(component.isHackyTopicNameTranslationDisplayed()).toBe(true);
     }
   );
 });
