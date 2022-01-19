@@ -91,6 +91,11 @@ class ConfigPropertyRegistryTests(test_utils.GenericTestBase):
                 property_name).schema
             schema_utils_test.validate_schema(schema)
 
+        schemas = config_domain.Registry.get_config_property_schemas()
+        for property_name in (
+                config_domain.Registry.get_all_config_property_names()):
+            schema_utils_test.validate_schema(schemas[property_name]['schema'])
+
     def test_get_exception_creating_new_config_property_with_existing_name(
             self):
         with self.assertRaisesRegex(
@@ -105,3 +110,4 @@ class ConfigPropertyRegistryTests(test_utils.GenericTestBase):
         retrieved_model = config_domain.ConfigProperty(
             'config_model', config_domain.BOOL_SCHEMA, 'description', False)
         self.assertEqual(retrieved_model.value, 'new_value')
+        self.assertEqual(retrieved_model.description, 'description')
