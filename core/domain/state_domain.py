@@ -1803,8 +1803,8 @@ class WrittenTranslations:
         if content_id in self.translations_mapping:
             raise Exception(
                 'The content_id %s already exist.' % content_id)
-        else:
-            self.translations_mapping[content_id] = {}
+
+        self.translations_mapping[content_id] = {}
 
     def delete_content_id_for_translation(self, content_id):
         """Deletes a content id from the content_translation dict.
@@ -1821,8 +1821,8 @@ class WrittenTranslations:
         if content_id not in self.translations_mapping:
             raise Exception(
                 'The content_id %s does not exist.' % content_id)
-        else:
-            self.translations_mapping.pop(content_id, None)
+
+        self.translations_mapping.pop(content_id, None)
 
     def get_all_html_content_strings(self):
         """Gets all html content strings used in the WrittenTranslations.
@@ -2035,8 +2035,8 @@ class RecordedVoiceovers:
         if content_id not in self.voiceovers_mapping:
             raise Exception(
                 'The content_id %s does not exist.' % content_id)
-        else:
-            self.voiceovers_mapping.pop(content_id, None)
+
+        self.voiceovers_mapping.pop(content_id, None)
 
 
 class RuleSpec:
@@ -2519,7 +2519,7 @@ class State:
         if not allow_null_interaction and self.interaction.id is None:
             raise utils.ValidationError(
                 'This state does not have any interaction specified.')
-        elif self.interaction.id is not None:
+        if self.interaction.id is not None:
             self.interaction.validate(exp_param_specs_dict)
 
         content_id_list = []
@@ -2786,30 +2786,27 @@ class State:
                 raise Exception(
                     'The content_id %s does not exist in recorded_voiceovers.'
                     % content_id)
-            elif not content_id in content_ids_for_text_translations:
+            if not content_id in content_ids_for_text_translations:
                 raise Exception(
                     'The content_id %s does not exist in written_translations.'
                     % content_id)
-            else:
-                self.recorded_voiceovers.delete_content_id_for_voiceover(
-                    content_id)
-                self.written_translations.delete_content_id_for_translation(
-                    content_id)
+
+            self.recorded_voiceovers.delete_content_id_for_voiceover(content_id)
+            self.written_translations.delete_content_id_for_translation(
+                content_id)
 
         for content_id in content_ids_to_add:
             if content_id in content_ids_for_voiceovers:
                 raise Exception(
                     'The content_id %s already exists in recorded_voiceovers'
                     % content_id)
-            elif content_id in content_ids_for_text_translations:
+            if content_id in content_ids_for_text_translations:
                 raise Exception(
                     'The content_id %s already exists in written_translations.'
                     % content_id)
-            else:
-                self.recorded_voiceovers.add_content_id_for_voiceover(
-                    content_id)
-                self.written_translations.add_content_id_for_translation(
-                    content_id)
+
+            self.recorded_voiceovers.add_content_id_for_voiceover(content_id)
+            self.written_translations.add_content_id_for_translation(content_id)
 
     def add_translation(self, content_id, language_code, translation_html):
         """Adds translation to a given content id in a specific language.
