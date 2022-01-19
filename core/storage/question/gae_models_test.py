@@ -251,7 +251,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
 
         question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
             [questionskilllink_model1, questionskilllink_model2]
-            )
+        )
 
         self.assertEqual(
             question_models.QuestionSkillLinkModel
