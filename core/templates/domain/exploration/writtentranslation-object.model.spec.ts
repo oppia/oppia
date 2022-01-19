@@ -25,9 +25,11 @@ import {
 } from 'domain/exploration/writtentranslation-object.model';
 
 describe('WrittenTranslation object factory', () => {
-  let writtenTranslation
+  let writtenTranslation1: WrittenTranslation;
+  let writtenTranslation: WrittenTranslation;
   beforeEach(() => {
-    writtenTranslation = WrittenTranslation.createFromBackendDict({
+    // writtenTranslation = writtenTranslation1.createFromBackendDict(
+    writtenTranslation = writtenTranslation1.createFromBackendDict({
       data_format: 'html',
       translation: '<p>HTML</p>',
       needs_update: false
@@ -35,7 +37,7 @@ describe('WrittenTranslation object factory', () => {
   });
 
   it('should set and get translation value correctly', () => {
-    expect(writtenTranslation).toEqual(WrittenTranslation.createFromBackendDict({
+    expect(writtenTranslation).toEqual(writtenTranslation1.createFromBackendDict({
       data_format: 'html',
       translation: '<p>HTML</p>',
       needs_update: false
@@ -47,13 +49,13 @@ describe('WrittenTranslation object factory', () => {
 
     writtenTranslation.setTranslation('<p>New HTML</p>');
     expect(writtenTranslation.getTranslation()).toEqual('<p>New HTML</p>');
-    expect(writtenTranslation).toEqual(WrittenTranslation.createFromBackendDict({
+    expect(writtenTranslation).toEqual(writtenTranslation1.createFromBackendDict({
       data_format: 'html',
       translation: '<p>New HTML</p>',
       needs_update: false
     }));
 
-    const unicodeWrittenTranslation = WrittenTranslation.createFromBackendDict({
+    const unicodeWrittenTranslation = writtenTranslation1.createFromBackendDict({
       data_format: 'unicode',
       translation: 'unicode',
       needs_update: false
@@ -63,7 +65,7 @@ describe('WrittenTranslation object factory', () => {
     expect(unicodeWrittenTranslation.isUnicode()).toBe(true);
     expect(unicodeWrittenTranslation.isSetOfStrings()).toBe(false);
 
-    const setOfStringsWrittenTranslation = WrittenTranslation.createFromBackendDict({
+    const setOfStringsWrittenTranslation = writtenTranslation1.createFromBackendDict({
       data_format: 'set_of_normalized_string',
       translation: ['a string'],
       needs_update: false
@@ -76,12 +78,12 @@ describe('WrittenTranslation object factory', () => {
   });
 
   it('should throw error for an invalid data format on creation', () => {
-    expect(() => WrittenTranslation.createNew('invalid')).toThrowError(
+    expect(() => writtenTranslation1.createNew('invalid')).toThrowError(
       'Invalid translation data format: invalid');
   });
 
   it('should throw error if the wrong setter is used', () => {
-    writtenTranslation = WrittenTranslation.createFromBackendDict({
+    writtenTranslation = writtenTranslation1.createFromBackendDict({
       data_format: 'unicode',
       translation: 'unicode',
       needs_update: false
@@ -94,13 +96,13 @@ describe('WrittenTranslation object factory', () => {
 
   it('should correctly mark written translation as needing update',
     () => {
-      expect(writtenTranslation).toEqual(WrittenTranslation.createFromBackendDict({
+      expect(writtenTranslation).toEqual(writtenTranslation1.createFromBackendDict({
         data_format: 'html',
         translation: '<p>HTML</p>',
         needs_update: false
       }));
       writtenTranslation.markAsNeedingUpdate();
-      expect(writtenTranslation).toEqual(WrittenTranslation.createFromBackendDict({
+      expect(writtenTranslation).toEqual(writtenTranslation1.createFromBackendDict({
         data_format: 'html',
         translation: '<p>HTML</p>',
         needs_update: true
@@ -108,20 +110,20 @@ describe('WrittenTranslation object factory', () => {
     });
 
   it('should toggle needs update attribute correctly', () => {
-    expect(writtenTranslation).toEqual(WrittenTranslation.createFromBackendDict({
+    expect(writtenTranslation).toEqual(writtenTranslation1.createFromBackendDict({
       data_format: 'html',
       translation: '<p>HTML</p>',
       needs_update: false
     }));
     writtenTranslation.toggleNeedsUpdateAttribute();
-    expect(writtenTranslation).toEqual(WrittenTranslation.createFromBackendDict({
+    expect(writtenTranslation).toEqual(writtenTranslation1.createFromBackendDict({
       data_format: 'html',
       translation: '<p>HTML</p>',
       needs_update: true
     }));
 
     writtenTranslation.toggleNeedsUpdateAttribute();
-    expect(writtenTranslation).toEqual(WrittenTranslation.createFromBackendDict({
+    expect(writtenTranslation).toEqual(writtenTranslation1.createFromBackendDict({
       data_format: 'html',
       translation: '<p>HTML</p>',
       needs_update: false
@@ -137,16 +139,16 @@ describe('WrittenTranslation object factory', () => {
   });
 
   it('should create a new written translation translation', () => {
-    expect(WrittenTranslation.createNew(TRANSLATION_DATA_FORMAT_HTML)).toEqual(
-      WrittenTranslation.createFromBackendDict({
+    expect(writtenTranslation1.createNew(TRANSLATION_DATA_FORMAT_HTML)).toEqual(
+      writtenTranslation1.createFromBackendDict({
         data_format: 'html',
         translation: '',
         needs_update: false
       })
     );
 
-    expect(WrittenTranslation.createNew(TRANSLATION_DATA_FORMAT_UNICODE)).toEqual(
-      WrittenTranslation.createFromBackendDict({
+    expect(writtenTranslation1.createNew(TRANSLATION_DATA_FORMAT_UNICODE)).toEqual(
+      writtenTranslation1.createFromBackendDict({
         data_format: 'unicode',
         translation: '',
         needs_update: false
@@ -154,9 +156,9 @@ describe('WrittenTranslation object factory', () => {
     );
 
     expect(
-      WrittenTranslation.createNew(TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING)
+      writtenTranslation1.createNew(TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING)
     ).toEqual(
-      WrittenTranslation.createFromBackendDict({
+      writtenTranslation1.createFromBackendDict({
         data_format: 'set_of_unicode_string',
         translation: [],
         needs_update: false
@@ -164,9 +166,9 @@ describe('WrittenTranslation object factory', () => {
     );
 
     expect(
-      WrittenTranslation.createNew(TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING)
+      writtenTranslation1.createNew(TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING)
     ).toEqual(
-      WrittenTranslation.createFromBackendDict({
+      writtenTranslation1.createFromBackendDict({
         data_format: 'set_of_normalized_string',
         translation: [],
         needs_update: false

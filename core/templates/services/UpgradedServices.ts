@@ -640,7 +640,7 @@ export class UpgradedServices {
     upgradedServices['WinnowingPreprocessingService'] =
       new WinnowingPreprocessingService();
     upgradedServices['WrittenTranslationObjectFactory'] =
-      new WrittenTranslationObjectFactory();
+      new WrittenTranslation();
     upgradedServices['baseInteractionValidationService'] =
       new baseInteractionValidationService();
     upgradedServices['ɵangular_packages_common_http_http_d'] =
