@@ -122,6 +122,13 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         ):
             story_reference.validate()
 
+        story_reference = (
+            topic_domain.StoryReference.create_default_story_reference('abc'))
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            utils.ValidationError, 'Invalid story id.'
+        ):
+            story_reference.validate()
+
     def test_delete_canonical_story(self) -> None:
         self.topic.canonical_story_references = [
             topic_domain.StoryReference.create_default_story_reference(

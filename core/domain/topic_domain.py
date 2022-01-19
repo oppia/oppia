@@ -341,6 +341,9 @@ class StoryReference:
             raise utils.ValidationError(
                 'Story id should not be empty')
 
+        if len(self.story_id) != constants.STORY_ID_LENGTH:
+            raise utils.ValidationError('Invalid story id.')
+
 
 class SubtopicDict(TypedDict):
     """Dictionary representation of Subtopic."""
