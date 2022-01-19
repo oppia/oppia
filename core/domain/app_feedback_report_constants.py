@@ -119,10 +119,6 @@ class STATS_PARAMETER_NAMES(enum.Enum): # pylint: disable=invalid-name
     version_name = 'version_name' # pylint: disable=invalid-name
 
 
-# TODO(#14419): Change naming style of Enum class from SCREAMING_SNAKE_CASE
-# to PascalCase and its values to UPPER_CASE. Because we want to be consistent
-# throughout the codebase according to the coding style guide.
-# https://github.com/oppia/oppia/wiki/Coding-style-guide
 class AndroidTextSize(enum.Enum): 
     """Enum for android text sizes."""
 
@@ -133,16 +129,12 @@ class AndroidTextSize(enum.Enum):
     EXTRA_LARGE_TEXT_SIZE = 'extra_large_text_size' 
 
 
-# TODO(#14419): Change naming style of Enum class from SCREAMING_SNAKE_CASE
-# to PascalCase and its values to UPPER_CASE. Because we want to be consistent
-# throughout the codebase according to the coding style guide.
-# https://github.com/oppia/oppia/wiki/Coding-style-guide
-class ANDROID_NETWORK_TYPE(enum.Enum): # pylint: disable=invalid-name
+class AndroidNetworkType(enum.Enum): 
     """Enum for android network types."""
 
-    wifi = 'wifi' # pylint: disable=invalid-name
-    cellular = 'cellular' # pylint: disable=invalid-name
-    none = 'none' # pylint: disable=invalid-name
+    WIFI = 'wifi' 
+    CELLULAR = 'cellular' 
+    NONE = 'none' 
 
 
 FILTER_FIELD_NAMES = app_feedback_report_models.FILTER_FIELD_NAMES
@@ -187,8 +179,8 @@ ALLOWED_FILTERS = [
     FILTER_FIELD_NAMES.audio_language_code, FILTER_FIELD_NAMES.platform_version,
     FILTER_FIELD_NAMES.android_device_country_locale_code]
 ALLOWED_ANDROID_NETWORK_TYPES = [
-    ANDROID_NETWORK_TYPE.wifi, ANDROID_NETWORK_TYPE.cellular,
-    ANDROID_NETWORK_TYPE.none]
+    AndroidNetworkType.WIFI, AndroidNetworkType.CELLULAR,
+    AndroidNetworkType.NONE]
 ALLOWED_ANDROID_TEXT_SIZES = [
     AndroidTextSize.TEXT_SIZE_UNSPECIFIED, AndroidTextSize.SMALL_TEXT_SIZE,
     AndroidTextSize.MEDIUM_TEXT_SIZE, AndroidTextSize.LARGE_TEXT_SIZE,
