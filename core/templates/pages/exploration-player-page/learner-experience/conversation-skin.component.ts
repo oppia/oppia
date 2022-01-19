@@ -648,8 +648,6 @@ export class ConversationSkinComponent {
 
     let nextSupplementalCardIsNonempty = this.isSupplementalCardNonempty(
       this.playerTranscriptService.getLastCard());
-    let previousDisplayedCardIndex = (
-      this.playerPositionService.getDisplayedCardIndex());
 
     if (
       totalNumCards > 1 &&
@@ -672,23 +670,7 @@ export class ConversationSkinComponent {
     this.playerPositionService.changeCurrentQuestion(
       this.playerPositionService.getDisplayedCardIndex());
 
-    // TODO(#7951): Remove the following try-catch block once #7951 has
-    // been fixed.
-    try {
-      this.displayedCard.isTerminal();
-    } catch (error) {
-      let additionalDebugInfo = (
-        `${error.message} \n` +
-        `state name: ${newCard && newCard.getStateName()} \n` +
-        `totalNumCards: ${totalNumCards} \n` +
-        'previous displayedCardIndex: ' +
-        `${previousDisplayedCardIndex} \n` +
-        'current displayedCardIndex: ' +
-        `${this.playerPositionService.getDisplayedCardIndex()} \n`);
-      throw new Error(additionalDebugInfo);
-    }
-
-    if (this.displayedCard.isTerminal()) {
+    if (this.displayedCard && this.displayedCard.isTerminal()) {
       this.isRefresherExploration = false;
       this.parentExplorationIds =
         this.urlService.getQueryFieldValuesAsList('parent');
@@ -1060,7 +1042,7 @@ export class ConversationSkinComponent {
             } else {
               this.playerTranscriptService.addNewResponse(feedbackHtml);
               // If there is no feedback, it immediately moves on
-              // to next card. Therefore $scope.answerIsCorrect needs
+              // to next card. Therefore this.answerIsCorrect needs
               // to be set to false before it proceeds to next card.
               this.answerIsCorrect = false;
               this.showPendingCard();
