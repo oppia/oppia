@@ -1,10 +1,8 @@
 core.controllers.editor_test
 extensions.interactions.base_test
 core.controllers.domain_objects_validator_test
-core.controllers.story_editor_test
 core.constants_test
 core.controllers.reader_test
-core.controllers.skill_editor_test
 core.controllers.tasks_test
 core.controllers.voice_artist_test
 core.domain.classifier_services_test
@@ -77,8 +75,6 @@ core.storage.classifier.gae_models_test
 main_test
 core.storage.feedback.gae_models_test
 core.domain.user_domain_test
-core.storage.opportunity.gae_models_test
 scripts.install_third_party_libs_test
-core.storage.statistics.gae_models_test
 core.storage.exploration.gae_models_test
 scripts.docstrings_checker_test
