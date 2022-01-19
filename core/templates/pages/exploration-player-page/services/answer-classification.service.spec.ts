@@ -687,7 +687,7 @@ describe('Answer Classification Service', () => {
         answerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
           state1.name, state1, '777', textInputRulesService));
 
-      expect(res1).toBe(false);
+      expect(res1).toBeFalse();
       expect(
         answerClassificationService.getMatchingClassificationResult
       ).toHaveBeenCalledWith(
@@ -703,7 +703,7 @@ describe('Answer Classification Service', () => {
         answerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
           state2.name, state2, 'equal', textInputRulesService));
 
-      expect(res2).toBe(true);
+      expect(res2).toBeTrue();
       expect(
         answerClassificationService.getMatchingClassificationResult
       ).toHaveBeenCalledWith(
