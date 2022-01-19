@@ -492,8 +492,7 @@ describe('Story Viewer Page component', () => {
     expect(component.showLoginOverlay).toEqual(false);
   }));
 
-  // eslint-disable-next-line oppia/no-test-blockers
-  fit('should set focus on skip button', fakeAsync(()=>{
+  it('should set focus on skip button', fakeAsync(()=>{
     let target = document.createElement('div');
     target.classList.add('target');
 
@@ -507,7 +506,7 @@ describe('Story Viewer Page component', () => {
     component.overlay = overlay;
     component.showLoginOverlay = true;
 
-    spyOn(component, 'focusSkipButton');
+    spyOn(component, 'focusSkipButton').and.callThrough();
     spyOn(component.skipButton.nativeElement, 'focus');
     spyOn(target, 'closest').and.returnValue(nonTarget);
 
