@@ -107,8 +107,10 @@ export class MathInteractionsService {
     Multiple consecutive parens are considered redundant. eg: for ((a - b))
     the outer pair of parens are considered as redundant.
     */
-    if (closingInd + 2 < expressionString.length &&
-        expressionString[closingInd + 2] === '^') {
+    if ((closingInd + 2 < expressionString.length &&
+        expressionString[closingInd + 2] === '^') ||
+        (openingInd - 2 >= 0 &&
+        expressionString[openingInd - 2] === '^')) {
       // Guppy adds redundant parens while using exponents, so we need to ignore
       // them.
       return false;
@@ -138,13 +140,15 @@ export class MathInteractionsService {
       if (char === '(') {
         // Hack to identify if this is the opening paren of a function call
         // like sqrt(...). If so, we ignore that paren.
-        if (i > 0 && expressionString[i - 1].match(/[a-zA-Z]/)) {
-          continue;
+        if (i > 0 && expressionString[i - 1].match(/[a-zA-Z]|\^/)) {
+          stack.push(-1);
+        } else {
+          stack.push(i);
         }
-        stack.push(i);
       } else if (char === ')') {
         let openingInd = stack.pop() || 0;
-        if (this.isParenRedundant(expressionString, openingInd, i)) {
+        if (openingInd !== -1 && this.isParenRedundant(
+          expressionString, openingInd, i)) {
           return [true, expressionString.slice(openingInd - 1, i + 2)];
         }
       }
