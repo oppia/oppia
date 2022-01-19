@@ -1,11 +1,10 @@
-<form autocomplete="off" [disabled]="!isValid ? true : false" role="form" class="form-horizontal">
+<form autocomplete="off" [attr.disabled]="!isValid ? true : false" role="form" class="form-horizontal" (submit)="submitAnswer()">
   <!-- This ng-form is needed for submitting answer on hitting enter. -->
   <input type="text"
          name="answer"
          [(ngModel)]="answer"
          (ngModelChange)="answerValueChanged()"
          class="form-control"
-         (keyup.enter)="submitAnswer()"
          [oppiaFocusOn]="labelForFocusTarget">
 
   <div class="oppia-form-error oppia-units-input-error">
