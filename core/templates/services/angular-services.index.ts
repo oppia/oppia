@@ -84,7 +84,7 @@ import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { SubtitledUnicodeObjectFactory } from 'domain/exploration/SubtitledUnicodeObjectFactory';
-import { WrittenTranslationObjectFactory } from 'domain/exploration/WrittenTranslationObjectFactory';
+import { WrittenTranslationObjectFactory } from 'domain/exploration/writtentranslation-object.model';
 import { WrittenTranslationsObjectFactory } from 'domain/exploration/WrittenTranslationsObjectFactory';
 import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
 import { ExplorationIdValidationService } from 'domain/exploration/exploration-id-validation.service';

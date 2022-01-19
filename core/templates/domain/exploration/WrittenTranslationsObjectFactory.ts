@@ -25,7 +25,7 @@ import {
   TranslationBackendDict,
   WrittenTranslation,
   WrittenTranslationObjectFactory
-} from 'domain/exploration/WrittenTranslationObjectFactory';
+} from 'domain/exploration/writtentranslation-object.model';
 
 export interface WrittenTranslationsBackendDict {
   'translations_mapping': {

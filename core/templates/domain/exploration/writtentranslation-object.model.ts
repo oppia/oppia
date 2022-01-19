@@ -13,12 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating new frontend instances of
+ * @fileoverview Model class for creating new frontend instances of
  * WrittenTranslation domain objects.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 import cloneDeep from 'lodash/cloneDeep';
 
 export const TRANSLATION_DATA_FORMAT_HTML = 'html';
@@ -95,17 +93,11 @@ export class WrittenTranslation {
       needs_update: this.needsUpdate
     };
   }
-}
-
-@Injectable({
-  providedIn: 'root'
-})
-export class WrittenTranslationObjectFactory {
-  createNew(dataFormat: string): WrittenTranslation {
+  static createNew(dataFormat: string): WrittenTranslation {
     if (!DATA_FORMAT_TO_DEFAULT_VALUES.hasOwnProperty(dataFormat)) {
       throw new Error('Invalid translation data format: ' + dataFormat);
     }
-
+  
     return new WrittenTranslation(
       dataFormat as DataFormatToDefaultValuesKey,
       cloneDeep(
@@ -116,8 +108,8 @@ export class WrittenTranslationObjectFactory {
       false
     );
   }
-
-  createFromBackendDict(
+  
+  static createFromBackendDict(
       translationBackendDict: TranslationBackendDict): WrittenTranslation {
     return new WrittenTranslation(
       translationBackendDict.data_format as DataFormatToDefaultValuesKey,
@@ -125,7 +117,3 @@ export class WrittenTranslationObjectFactory {
       translationBackendDict.needs_update);
   }
 }
-
-angular.module('oppia').factory(
-  'WrittenTranslationObjectFactory',
-  downgradeInjectable(WrittenTranslationObjectFactory));

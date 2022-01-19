@@ -22,7 +22,7 @@ import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { WrittenTranslationObjectFactory } from
-  'domain/exploration/WrittenTranslationObjectFactory';
+  'domain/exploration/writtentranslation-object.model';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';

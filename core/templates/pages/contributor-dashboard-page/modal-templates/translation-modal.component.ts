@@ -37,7 +37,7 @@ import { ListSchema, UnicodeSchema } from 'services/schema-default-value.service
 import {
   TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING,
   TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING
-} from 'domain/exploration/WrittenTranslationObjectFactory';
+} from 'domain/exploration/writtentranslation-object.model';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 

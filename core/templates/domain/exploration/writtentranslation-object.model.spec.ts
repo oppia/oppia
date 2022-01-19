@@ -13,25 +13,21 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the WrittenTranslation object factory.
+ * @fileoverview Unit tests for the writtentranslation-object.model.
  */
 
 import {
-  WrittenTranslationObjectFactory,
   WrittenTranslation,
   TRANSLATION_DATA_FORMAT_HTML,
   TRANSLATION_DATA_FORMAT_UNICODE,
   TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING,
   TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING
-} from 'domain/exploration/WrittenTranslationObjectFactory';
+} from 'domain/exploration/writtentranslation-object.model';
 
 describe('WrittenTranslation object factory', () => {
-  let wtof: WrittenTranslationObjectFactory;
-  let writtenTranslation: WrittenTranslation;
-
+  let writtenTranslation
   beforeEach(() => {
-    wtof = new WrittenTranslationObjectFactory();
-    writtenTranslation = wtof.createFromBackendDict({
+    writtenTranslation = WrittenTranslation.createFromBackendDict({
       data_format: 'html',
       translation: '<p>HTML</p>',
       needs_update: false
@@ -39,7 +35,7 @@ describe('WrittenTranslation object factory', () => {
   });
 
   it('should set and get translation value correctly', () => {
-    expect(writtenTranslation).toEqual(wtof.createFromBackendDict({
+    expect(writtenTranslation).toEqual(WrittenTranslation.createFromBackendDict({
       data_format: 'html',
       translation: '<p>HTML</p>',
       needs_update: false
@@ -51,13 +47,13 @@ describe('WrittenTranslation object factory', () => {
 
     writtenTranslation.setTranslation('<p>New HTML</p>');
     expect(writtenTranslation.getTranslation()).toEqual('<p>New HTML</p>');
-    expect(writtenTranslation).toEqual(wtof.createFromBackendDict({
+    expect(writtenTranslation).toEqual(WrittenTranslation.createFromBackendDict({
       data_format: 'html',
       translation: '<p>New HTML</p>',
       needs_update: false
     }));
 
-    const unicodeWrittenTranslation = wtof.createFromBackendDict({
+    const unicodeWrittenTranslation = WrittenTranslation.createFromBackendDict({
       data_format: 'unicode',
       translation: 'unicode',
       needs_update: false
@@ -67,7 +63,7 @@ describe('WrittenTranslation object factory', () => {
     expect(unicodeWrittenTranslation.isUnicode()).toBe(true);
     expect(unicodeWrittenTranslation.isSetOfStrings()).toBe(false);
 
-    const setOfStringsWrittenTranslation = wtof.createFromBackendDict({
+    const setOfStringsWrittenTranslation = WrittenTranslation.createFromBackendDict({
       data_format: 'set_of_normalized_string',
       translation: ['a string'],
       needs_update: false
@@ -80,12 +76,12 @@ describe('WrittenTranslation object factory', () => {
   });
 
   it('should throw error for an invalid data format on creation', () => {
-    expect(() => wtof.createNew('invalid')).toThrowError(
+    expect(() => WrittenTranslation.createNew('invalid')).toThrowError(
       'Invalid translation data format: invalid');
   });
 
   it('should throw error if the wrong setter is used', () => {
-    writtenTranslation = wtof.createFromBackendDict({
+    writtenTranslation = WrittenTranslation.createFromBackendDict({
       data_format: 'unicode',
       translation: 'unicode',
       needs_update: false
@@ -98,13 +94,13 @@ describe('WrittenTranslation object factory', () => {
 
   it('should correctly mark written translation as needing update',
     () => {
-      expect(writtenTranslation).toEqual(wtof.createFromBackendDict({
+      expect(writtenTranslation).toEqual(WrittenTranslation.createFromBackendDict({
         data_format: 'html',
         translation: '<p>HTML</p>',
         needs_update: false
       }));
       writtenTranslation.markAsNeedingUpdate();
-      expect(writtenTranslation).toEqual(wtof.createFromBackendDict({
+      expect(writtenTranslation).toEqual(WrittenTranslation.createFromBackendDict({
         data_format: 'html',
         translation: '<p>HTML</p>',
         needs_update: true
@@ -112,20 +108,20 @@ describe('WrittenTranslation object factory', () => {
     });
 
   it('should toggle needs update attribute correctly', () => {
-    expect(writtenTranslation).toEqual(wtof.createFromBackendDict({
+    expect(writtenTranslation).toEqual(WrittenTranslation.createFromBackendDict({
       data_format: 'html',
       translation: '<p>HTML</p>',
       needs_update: false
     }));
     writtenTranslation.toggleNeedsUpdateAttribute();
-    expect(writtenTranslation).toEqual(wtof.createFromBackendDict({
+    expect(writtenTranslation).toEqual(WrittenTranslation.createFromBackendDict({
       data_format: 'html',
       translation: '<p>HTML</p>',
       needs_update: true
     }));
 
     writtenTranslation.toggleNeedsUpdateAttribute();
-    expect(writtenTranslation).toEqual(wtof.createFromBackendDict({
+    expect(writtenTranslation).toEqual(WrittenTranslation.createFromBackendDict({
       data_format: 'html',
       translation: '<p>HTML</p>',
       needs_update: false
@@ -141,16 +137,16 @@ describe('WrittenTranslation object factory', () => {
   });
 
   it('should create a new written translation translation', () => {
-    expect(wtof.createNew(TRANSLATION_DATA_FORMAT_HTML)).toEqual(
-      wtof.createFromBackendDict({
+    expect(WrittenTranslation.createNew(TRANSLATION_DATA_FORMAT_HTML)).toEqual(
+      WrittenTranslation.createFromBackendDict({
         data_format: 'html',
         translation: '',
         needs_update: false
       })
     );
 
-    expect(wtof.createNew(TRANSLATION_DATA_FORMAT_UNICODE)).toEqual(
-      wtof.createFromBackendDict({
+    expect(WrittenTranslation.createNew(TRANSLATION_DATA_FORMAT_UNICODE)).toEqual(
+      WrittenTranslation.createFromBackendDict({
         data_format: 'unicode',
         translation: '',
         needs_update: false
@@ -158,9 +154,9 @@ describe('WrittenTranslation object factory', () => {
     );
 
     expect(
-      wtof.createNew(TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING)
+      WrittenTranslation.createNew(TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING)
     ).toEqual(
-      wtof.createFromBackendDict({
+      WrittenTranslation.createFromBackendDict({
         data_format: 'set_of_unicode_string',
         translation: [],
         needs_update: false
@@ -168,9 +164,9 @@ describe('WrittenTranslation object factory', () => {
     );
 
     expect(
-      wtof.createNew(TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING)
+      WrittenTranslation.createNew(TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING)
     ).toEqual(
-      wtof.createFromBackendDict({
+      WrittenTranslation.createFromBackendDict({
         data_format: 'set_of_normalized_string',
         translation: [],
         needs_update: false

@@ -32,7 +32,7 @@ import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { VersionTreeService } from
   'pages/exploration-editor-page/history-tab/services/version-tree.service';
 import { WrittenTranslationObjectFactory } from
-  'domain/exploration/WrittenTranslationObjectFactory';
+  'domain/exploration/writtentranslation-object.model';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';

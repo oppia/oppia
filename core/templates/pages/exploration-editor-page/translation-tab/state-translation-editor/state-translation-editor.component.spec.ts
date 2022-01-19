@@ -28,7 +28,7 @@ import { StateRecordedVoiceoversService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
 import { WrittenTranslationObjectFactory } from
-  'domain/exploration/WrittenTranslationObjectFactory';
+  'domain/exploration/writtentranslation-object.model';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';

@@ -48,7 +48,7 @@ import { StateEditorService } from
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { WrittenTranslationObjectFactory } from
-  'domain/exploration/WrittenTranslationObjectFactory';
+  'domain/exploration/writtentranslation-object.model';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 import { SolutionObjectFactory } from

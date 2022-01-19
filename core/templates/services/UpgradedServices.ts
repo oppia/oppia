@@ -493,7 +493,7 @@ import { WinnowingPreprocessingService } from
 import { WorkedExampleObjectFactory } from
   'domain/skill/WorkedExampleObjectFactory';
 import { WrittenTranslationObjectFactory } from
-  'domain/exploration/WrittenTranslationObjectFactory';
+  'domain/exploration/writtentranslation-object.model';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 import { SolutionVerificationService } from
