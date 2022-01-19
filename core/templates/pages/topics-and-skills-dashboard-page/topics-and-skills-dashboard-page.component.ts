@@ -37,7 +37,6 @@ import { TopicsAndSkillsDashboardPageService } from './topics-and-skills-dashboa
 })
 export class TopicsAndSkillsDashboardPageComponent {
   directiveSubscriptions: Subscription = new Subscription();
-  TOPIC_CLASSROOM_UNASSIGNED: string = 'UNASSIGNED';
   totalTopicSummaries: CreatorTopicSummary[] = [];
   topicSummaries: CreatorTopicSummary[] = [];
   totalEntityCountToDisplay: number;
@@ -332,7 +331,7 @@ export class TopicsAndSkillsDashboardPageComponent {
         if (!stayInSameTab || !this.activeTab) {
           this.activeTab = this.TAB_NAME_TOPICS;
         }
-        this.userCanCreateSkill = response.canCreateSkillresponse;
+        this.userCanCreateSkill = response.canCreateSkill;
         this.userCanCreateTopic = response.canCreateTopic;
         this.userCanDeleteSkill = response.canDeleteSkill;
         this.userCanDeleteTopic = response.canDeleteTopic;

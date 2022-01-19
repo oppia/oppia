@@ -76,7 +76,8 @@ export type StatePropertyNames = (
   'solution' |
   'widget_id' |
   'widget_customization_args' |
-  'written_translations'
+  'written_translations' |
+  'state_name'
 );
 
 @Injectable({
@@ -109,7 +110,7 @@ export class ChangeListService {
     correctness_feedback_enabled: true
   };
 
-  ALLOWED_STATE_BACKEND_NAMES = {
+  ALLOWED_STATE_BACKEND_NAMES: Record<StatePropertyNames, boolean> = {
     answer_groups: true,
     confirmed_unclassified_answers: true,
     content: true,
