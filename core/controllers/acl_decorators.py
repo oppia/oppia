@@ -63,8 +63,8 @@ def _redirect_based_on_return_type(
     """
     if expected_return_type == feconf.HANDLER_TYPE_JSON:
         raise handler.PageNotFoundException
-    else:
-        handler.redirect(redirection_url)
+
+    handler.redirect(redirection_url)
 
 
 def open_access(handler):
@@ -117,13 +117,14 @@ def is_source_mailchimp(handler):
         """
         if feconf.MAILCHIMP_WEBHOOK_SECRET is None:
             raise self.PageNotFoundException
-        elif secret != feconf.MAILCHIMP_WEBHOOK_SECRET:
+
+        if secret != feconf.MAILCHIMP_WEBHOOK_SECRET:
             logging.error(
                 'Invalid Mailchimp webhook request received with secret: %s'
                 % secret)
             raise self.PageNotFoundException
-        else:
-            return handler(self, secret, **kwargs)
+
+        return handler(self, secret, **kwargs)
     test_is_source_mailchimp.__wrapped__ = True
 
     return test_is_source_mailchimp
@@ -160,12 +161,12 @@ def does_classroom_exist(handler):
             # the access validation handler endpoint.
             if self.GET_HANDLER_ERROR_RETURN_TYPE == feconf.HANDLER_TYPE_JSON:
                 raise self.PageNotFoundException
-            else:
-                # As this decorator is not expected to be used with other
-                # handler types, raising an error here.
-                raise Exception(
-                    'does_classroom_exist decorator is only expected to '
-                    'be used with json return type handlers.')
+
+            # As this decorator is not expected to be used with other
+            # handler types, raising an error here.
+            raise Exception(
+                'does_classroom_exist decorator is only expected to '
+                'be used with json return type handlers.')
 
         return handler(self, classroom_url_fragment, **kwargs)
     test_does_classroom_exist.__wrapped__ = True
@@ -227,12 +228,11 @@ def can_view_skills(handler):
         can view multiple given skills.
     """
 
-    def test_can_view(self, comma_separated_skill_ids, **kwargs):
+    def test_can_view(self, selected_skill_ids, **kwargs):
         """Checks if the user can view the skills.
 
         Args:
-            comma_separated_skill_ids: str. The skill ids
-                separated by commas.
+            selected_skill_ids: list(str). List of skill ids.
             **kwargs: *. Keyword arguments.
 
         Returns:
@@ -244,20 +244,19 @@ def can_view_skills(handler):
         # This is a temporary check, since a decorator is required for every
         # method. Once skill publishing is done, whether given skill is
         # published should be checked here.
-        skill_ids = comma_separated_skill_ids.split(',')
 
         try:
-            for skill_id in skill_ids:
+            for skill_id in selected_skill_ids:
                 skill_domain.Skill.require_valid_skill_id(skill_id)
-        except utils.ValidationError:
-            raise self.InvalidInputException
+        except utils.ValidationError as e:
+            raise self.InvalidInputException(e)
 
         try:
-            skill_fetchers.get_multi_skills(skill_ids)
+            skill_fetchers.get_multi_skills(selected_skill_ids)
         except Exception as e:
             raise self.PageNotFoundException(e)
 
-        return handler(self, comma_separated_skill_ids, **kwargs)
+        return handler(self, selected_skill_ids, **kwargs)
     test_can_view.__wrapped__ = True
 
     return test_can_view
@@ -2112,8 +2111,8 @@ def can_perform_tasks_in_taskqueue(handler):
                 not self.current_user_is_super_admin):
             raise self.UnauthorizedUserException(
                 'You do not have the credentials to access this page.')
-        else:
-            return handler(self, **kwargs)
+
+        return handler(self, **kwargs)
     test_can_perform.__wrapped__ = True
 
     return test_can_perform
