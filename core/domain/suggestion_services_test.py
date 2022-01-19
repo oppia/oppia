@@ -2047,8 +2047,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
             expected_reviewable_suggestion_email_info.submission_datetime)
 
     def setUp(self):
-        super(
-            ).setUp()
+        super().setUp()
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.author_id = self.get_user_id_from_email(
             self.AUTHOR_EMAIL)
@@ -2692,8 +2691,7 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
             )
 
     def setUp(self):
-        super(
-            ).setUp()
+        super().setUp()
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.signup(self.REVIEWER_1_EMAIL, 'reviewer1')
@@ -3288,8 +3286,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             community_contribution_stats.question_suggestion_count, 0)
 
     def setUp(self):
-        super(
-        ).setUp()
+        super().setUp()
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.author_id = self.get_user_id_from_email(
             self.AUTHOR_EMAIL)
@@ -3801,8 +3798,7 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
             )
 
     def setUp(self):
-        super(
-            ).setUp()
+        super().setUp()
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.signup(self.REVIEWER_1_EMAIL, 'reviewer1')
@@ -4047,8 +4043,7 @@ class GetSuggestionTypesThatNeedReviewersUnitTests(test_utils.GenericTestBase):
             community_contribution_stats.question_suggestion_count, 0)
 
     def setUp(self):
-        super(
-         ).setUp()
+        super().setUp()
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.save_new_valid_exploration(self.target_id, self.author_id)

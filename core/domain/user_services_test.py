@@ -1983,8 +1983,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             community_contribution_stats.question_suggestion_count, 0)
 
     def setUp(self):
-        super(
-            ).setUp()
+        super().setUp()
 
         self.signup(self.REVIEWER_1_EMAIL, 'reviewer1')
         self.reviewer_1_id = self.get_user_id_from_email(

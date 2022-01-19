@@ -980,8 +980,7 @@ class WipeoutServiceVerifyDeleteAppFeedbackReportModelsTests(
     ANDROID_REPORT_INFO_SCHEMA_VERSION = 1
 
     def setUp(self):
-        super(
-            ).setUp()
+        super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
