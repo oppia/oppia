@@ -448,7 +448,7 @@ def managed_portserver():
         # standalone scripts do not. Because of this, the following line cannot
         # be covered. This is fine since we want to cleanup this code anyway in
         # #11549.
-        sys.path.insert(1, common.PSUTIL_DIR) # pragma: nocover
+        sys.path.insert(1, common.PSUTIL_DIR) # pragma: no cover
     import psutil
 
     # Check if a socket file exists. This file can exist when previous instance
