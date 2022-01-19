@@ -35,7 +35,7 @@ class InstallThirdPartyLibsImportTests(test_utils.GenericTestBase):
     """Tests import of install third party libs."""
 
     def setUp(self):
-        super(InstallThirdPartyLibsImportTests, self).setUp()
+        super().setUp()
         self.commands = []
         def mock_popen_error_call(unused_cmd_tokens, *args, **kwargs): # pylint: disable=unused-argument
             class Ret(test_utils.GenericTestBase):

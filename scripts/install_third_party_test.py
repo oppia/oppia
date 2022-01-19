@@ -44,7 +44,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
     """Test the methods for installing third party."""
 
     def setUp(self):
-        super(InstallThirdPartyTests, self).setUp()
+        super().setUp()
         self.check_function_calls = {
             'remove_is_called': False,
             'rename_is_called': False,

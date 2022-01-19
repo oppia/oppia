@@ -40,7 +40,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
     """Tests for CustomLintChecksManager."""
 
     def setUp(self):
-        super(CustomLintChecksManagerTests, self).setUp()
+        super().setUp()
         self.verbose_mode_enabled = False
         self.dependencies_file = io.StringIO(
             '{\"dependencies\":{\"frontend\":{\"guppy\":'

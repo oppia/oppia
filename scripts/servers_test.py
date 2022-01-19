@@ -46,14 +46,14 @@ class ManagedProcessTests(test_utils.TestBase):
         collections.namedtuple('POPEN_CALL', ['program_args', 'kwargs']))
 
     def setUp(self):
-        super(ManagedProcessTests, self).setUp()
+        super().setUp()
         self.exit_stack = contextlib.ExitStack()
 
     def tearDown(self):
         try:
             self.exit_stack.close()
         finally:
-            super(ManagedProcessTests, self).tearDown()
+            super().tearDown()
 
     @contextlib.contextmanager
     def swap_popen(self, unresponsive=False, num_children=0, outputs=()):

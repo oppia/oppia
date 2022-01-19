@@ -38,7 +38,7 @@ from pylint import utils  # isort:skip
 class ExplicitKeywordArgsCheckerTests(unittest.TestCase):
 
     def setUp(self):
-        super(ExplicitKeywordArgsCheckerTests, self).setUp()
+        super().setUp()
         self.checker_test_object = testutils.CheckerTestCase()
         self.checker_test_object.CHECKER_CLASS = (
             pylint_extensions.ExplicitKeywordArgsChecker)
@@ -186,7 +186,7 @@ class ExplicitKeywordArgsCheckerTests(unittest.TestCase):
 class HangingIndentCheckerTests(unittest.TestCase):
 
     def setUp(self):
-        super(HangingIndentCheckerTests, self).setUp()
+        super().setUp()
         self.checker_test_object = testutils.CheckerTestCase()
         self.checker_test_object.CHECKER_CLASS = (
             pylint_extensions.HangingIndentChecker)
@@ -336,7 +336,7 @@ class HangingIndentCheckerTests(unittest.TestCase):
 class DocstringParameterCheckerTests(unittest.TestCase):
 
     def setUp(self):
-        super(DocstringParameterCheckerTests, self).setUp()
+        super().setUp()
         self.checker_test_object = testutils.CheckerTestCase()
         self.checker_test_object.CHECKER_CLASS = (
             pylint_extensions.DocstringParameterChecker)
@@ -2002,7 +2002,7 @@ class FunctionArgsOrderCheckerTests(unittest.TestCase):
 class RestrictedImportCheckerTests(unittest.TestCase):
 
     def setUp(self):
-        super(RestrictedImportCheckerTests, self).setUp()
+        super().setUp()
         self.checker_test_object = testutils.CheckerTestCase()
         self.checker_test_object.CHECKER_CLASS = (
             pylint_extensions.RestrictedImportChecker)
@@ -2342,7 +2342,7 @@ class SingleCharAndNewlineAtEOFCheckerTests(unittest.TestCase):
 class DivisionOperatorCheckerTests(unittest.TestCase):
 
     def setUp(self):
-        super(DivisionOperatorCheckerTests, self).setUp()
+        super().setUp()
         self.checker_test_object = testutils.CheckerTestCase()
         self.checker_test_object.CHECKER_CLASS = (
             pylint_extensions.DivisionOperatorChecker)
@@ -2380,7 +2380,7 @@ class DivisionOperatorCheckerTests(unittest.TestCase):
 class SingleLineCommentCheckerTests(unittest.TestCase):
 
     def setUp(self):
-        super(SingleLineCommentCheckerTests, self).setUp()
+        super().setUp()
         self.checker_test_object = testutils.CheckerTestCase()
         self.checker_test_object.CHECKER_CLASS = (
             pylint_extensions.SingleLineCommentChecker)
@@ -2669,7 +2669,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
 class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
 
     def setUp(self):
-        super(BlankLineBelowFileOverviewCheckerTests, self).setUp()
+        super().setUp()
         self.checker_test_object = testutils.CheckerTestCase()
         self.checker_test_object.CHECKER_CLASS = (
             pylint_extensions.BlankLineBelowFileOverviewChecker)
@@ -2869,7 +2869,7 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
 class SingleLinePragmaCheckerTests(unittest.TestCase):
 
     def setUp(self):
-        super(SingleLinePragmaCheckerTests, self).setUp()
+        super().setUp()
         self.checker_test_object = testutils.CheckerTestCase()
         self.checker_test_object.CHECKER_CLASS = (
             pylint_extensions.SingleLinePragmaChecker)
@@ -3025,7 +3025,7 @@ class SingleLinePragmaCheckerTests(unittest.TestCase):
 class SingleSpaceAfterKeyWordCheckerTests(unittest.TestCase):
 
     def setUp(self):
-        super(SingleSpaceAfterKeyWordCheckerTests, self).setUp()
+        super().setUp()
         self.checker_test_object = testutils.CheckerTestCase()
         self.checker_test_object.CHECKER_CLASS = (
             pylint_extensions.SingleSpaceAfterKeyWordChecker)
@@ -3145,7 +3145,7 @@ class SingleSpaceAfterKeyWordCheckerTests(unittest.TestCase):
 class InequalityWithNoneCheckerTests(unittest.TestCase):
 
     def setUp(self):
-        super(InequalityWithNoneCheckerTests, self).setUp()
+        super().setUp()
         self.checker_test_object = testutils.CheckerTestCase()
         self.checker_test_object.CHECKER_CLASS = (
             pylint_extensions.InequalityWithNoneChecker)
@@ -3199,7 +3199,7 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
     """Unit tests for DisallowedFunctionsChecker"""
 
     def setUp(self):
-        super(DisallowedFunctionsCheckerTests, self).setUp()
+        super().setUp()
         self.checker_test_object = testutils.CheckerTestCase()
         self.checker_test_object.CHECKER_CLASS = (
             pylint_extensions.DisallowedFunctionsChecker)
@@ -3391,7 +3391,7 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
 class NonTestFilesFunctionNameCheckerTests(unittest.TestCase):
 
     def setUp(self):
-        super(NonTestFilesFunctionNameCheckerTests, self).setUp()
+        super().setUp()
         self.checker_test_object = testutils.CheckerTestCase()
         self.checker_test_object.CHECKER_CLASS = (
             pylint_extensions.NonTestFilesFunctionNameChecker)
@@ -3453,7 +3453,7 @@ class NonTestFilesFunctionNameCheckerTests(unittest.TestCase):
 class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
 
     def setUp(self):
-        super(DisallowHandlerWithoutSchemaTests, self).setUp()
+        super().setUp()
         self.checker_test_object = testutils.CheckerTestCase()
         self.checker_test_object.CHECKER_CLASS = (
             pylint_extensions.DisallowHandlerWithoutSchema)
@@ -3633,7 +3633,7 @@ class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
 class DisallowedImportsCheckerTests(unittest.TestCase):
 
     def setUp(self):
-        super(DisallowedImportsCheckerTests, self).setUp()
+        super().setUp()
         self.checker_test_object = testutils.CheckerTestCase()
         self.checker_test_object.CHECKER_CLASS = (
             pylint_extensions.DisallowedImportsChecker)

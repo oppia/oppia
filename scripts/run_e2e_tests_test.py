@@ -55,14 +55,14 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
     """Test the run_e2e_tests methods."""
 
     def setUp(self):
-        super(RunE2ETestsTests, self).setUp()
+        super().setUp()
         self.exit_stack = contextlib.ExitStack()
 
     def tearDown(self):
         try:
             self.exit_stack.close()
         finally:
-            super(RunE2ETestsTests, self).tearDown()
+            super().tearDown()
 
     def test_is_oppia_server_already_running_when_ports_closed(self):
         self.exit_stack.enter_context(self.swap_to_always_return(

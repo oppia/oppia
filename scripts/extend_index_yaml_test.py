@@ -29,7 +29,7 @@ class ExtendIndexYamlTest(test_utils.GenericTestBase):
     """Class for testing the extend_index_yaml script."""
 
     def setUp(self) -> None:
-        super(ExtendIndexYamlTest, self).setUp()
+        super().setUp()
         self.index_yaml_file = tempfile.NamedTemporaryFile()
         self.web_inf_index_yaml_file = tempfile.NamedTemporaryFile()
         self.index_yaml_file_name = self.index_yaml_file.name
@@ -62,7 +62,7 @@ class ExtendIndexYamlTest(test_utils.GenericTestBase):
             self.assertEqual(actual_index_yaml, expected_index_yaml)
 
     def tearDown(self) -> None:
-        super(ExtendIndexYamlTest, self).tearDown()
+        super().tearDown()
         self.index_yaml_file.close()
         self.web_inf_index_yaml_file.close()
 

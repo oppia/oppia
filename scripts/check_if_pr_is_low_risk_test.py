@@ -75,7 +75,7 @@ class ParsePrUrlTests(test_utils.GenericTestBase):
 class LoadDiffTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(LoadDiffTests, self).setUp()
+        super().setUp()
         self.url = (
             'https://patch-diff.githubusercontent.com'
             '/raw/oppia/oppia/pull/1'
@@ -268,7 +268,7 @@ class LoadDiffTests(test_utils.GenericTestBase):
 class LookupPrTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(LookupPrTests, self).setUp()
+        super().setUp()
         self.url = (
             'https://api.github.com/repos/oppia/oppia/pulls/1')
         self.headers = {

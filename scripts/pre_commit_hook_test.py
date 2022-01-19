@@ -36,7 +36,7 @@ class PreCommitHookTests(test_utils.GenericTestBase):
     """Test the methods for pre commit hook script."""
 
     def setUp(self):
-        super(PreCommitHookTests, self).setUp()
+        super().setUp()
         self.print_arr = []
         def mock_print(msg):
             self.print_arr.append(msg)

@@ -82,7 +82,7 @@ class TaskThread(threading.Thread):
     """Runs a task in its own thread."""
 
     def __init__(self, func, verbose, semaphore, name, report_enabled):
-        super(TaskThread, self).__init__()
+        super().__init__()
         self.func = func
         self.task_results = []
         self.exception = None
