@@ -44,6 +44,8 @@ import { MaterialModule } from 'modules/material.module';
 import { RefresherExplorationConfirmationModal } from './modals/refresher-exploration-confirmation-modal.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
+import { ToastrModule } from 'ngx-toastr';
+import { RatingsAndRecommendationsComponent } from './learner-experience/ratings-and-recommendations.component';
 
 @NgModule({
   imports: [
@@ -68,6 +70,7 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     LearnerLocalNavComponent,
     FeedbackPopupComponent,
     LearnerViewInfoComponent,
+    RatingsAndRecommendationsComponent,
     RefresherExplorationConfirmationModal,
   ],
   entryComponents: [
@@ -79,6 +82,7 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     FeedbackPopupComponent,
     LearnerAnswerInfoCard,
     LearnerViewInfoComponent,
+    RatingsAndRecommendationsComponent,
     RefresherExplorationConfirmationModal,
   ],
   providers: [
@@ -106,7 +110,6 @@ class ExplorationPlayerPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
-import { ToastrModule } from 'ngx-toastr';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

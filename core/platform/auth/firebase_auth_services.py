@@ -56,7 +56,6 @@ from __future__ import annotations
 import logging
 
 from core import feconf
-from core import python_utils
 from core.constants import constants
 from core.domain import auth_domain
 from core.platform import models
@@ -409,14 +408,13 @@ def associate_multi_auth_ids_with_user_ids(
         Exception. One or more auth associations already exist.
     """
     # Turn list(pair) to pair(list): https://stackoverflow.com/a/7558990/4859885
-    auth_ids, user_ids = python_utils.ZIP(*auth_id_user_id_pairs)
+    auth_ids, user_ids = zip(*auth_id_user_id_pairs)
 
     user_id_collisions = get_multi_user_ids_from_auth_ids(auth_ids)
     if any(user_id is not None for user_id in user_id_collisions):
         user_id_collisions_text = ', '.join(
             '{auth_id=%r: user_id=%r}' % (auth_id, user_id)
-            for auth_id, user_id in python_utils.ZIP(
-                auth_ids, user_id_collisions)
+            for auth_id, user_id in zip(auth_ids, user_id_collisions)
             if user_id is not None)
         raise Exception('already associated: %s' % user_id_collisions_text)
 
@@ -424,8 +422,7 @@ def associate_multi_auth_ids_with_user_ids(
     if any(auth_id is not None for auth_id in auth_id_collisions):
         auth_id_collisions_text = ', '.join(
             '{user_id=%r: auth_id=%r}' % (user_id, auth_id)
-            for user_id, auth_id in python_utils.ZIP(
-                user_ids, auth_id_collisions)
+            for user_id, auth_id in zip(user_ids, auth_id_collisions)
             if auth_id is not None)
         raise Exception('already associated: %s' % auth_id_collisions_text)
 
@@ -433,7 +430,7 @@ def associate_multi_auth_ids_with_user_ids(
     # doesn't exist because get_auth_id_from_user_id returned None.
     assoc_by_auth_id_models = [
         auth_models.UserIdByFirebaseAuthIdModel(id=auth_id, user_id=user_id)
-        for auth_id, user_id in python_utils.ZIP(auth_ids, user_ids)
+        for auth_id, user_id in zip(auth_ids, user_ids)
     ]
     auth_models.UserIdByFirebaseAuthIdModel.update_timestamps_multi(
         assoc_by_auth_id_models)
@@ -447,7 +444,7 @@ def associate_multi_auth_ids_with_user_ids(
     # create a new model rather than update an existing one.
     assoc_by_user_id_models = [
         auth_models.UserAuthDetailsModel(id=user_id, firebase_auth_id=auth_id)
-        for auth_id, user_id, assoc_by_user_id_model in python_utils.ZIP(
+        for auth_id, user_id, assoc_by_user_id_model in zip(
             auth_ids, user_ids,
             auth_models.UserAuthDetailsModel.get_multi(user_ids))
         if (assoc_by_user_id_model is None or

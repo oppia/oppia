@@ -40,6 +40,15 @@ describe('Router Service', () => {
   var refreshVersionHistorySpy = null;
   var refreshStateEditorSpy = null;
 
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
   importAllAngularServices();
   beforeEach(angular.mock.inject($injector => {
     RouterService = $injector.get('RouterService');

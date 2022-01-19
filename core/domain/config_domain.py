@@ -21,9 +21,13 @@ from __future__ import annotations
 from core import feconf
 from core import schema_utils
 from core.constants import constants
-from core.domain import caching_services
 from core.domain import change_domain
-from core.platform import models
+
+from core.domain import caching_services  # pylint: disable=invalid-import-from # isort:skip
+from core.platform import models  # pylint: disable=invalid-import-from # isort:skip
+
+# TODO(#14537): Refactor this file and remove imports marked
+# with 'invalid-import-from'.
 
 (config_models, suggestion_models,) = models.Registry.import_models(
     [models.NAMES.config, models.NAMES.suggestion])

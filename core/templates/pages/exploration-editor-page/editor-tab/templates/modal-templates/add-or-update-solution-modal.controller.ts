@@ -111,7 +111,8 @@ angular.module('oppia').controller('AddOrUpdateSolutionModalController', [
     };
 
     $scope.isSolutionExplanationLengthExceeded = function(solExplanation) {
-      return (solExplanation.length > 3000);
+      // TODO(#13764): Edit this check after appropriate limits are found.
+      return (solExplanation.length > 100000);
     };
 
     $scope.saveSolution = function() {

@@ -51,7 +51,7 @@
   <div dir="auto">
     <angular-html-bind-wrapper *ngIf="data.oppiaResponse !== null"
                                [htmlData]="data.oppiaResponse"
-                               classStr="oppia-rte-viewer conversation-skin-oppia-feedback-content protractor-test-conversation-feedback"
+                               [classStr]="'oppia-rte-viewer conversation-skin-oppia-feedback-content ' + (bottomSection ? 'protractor-test-conversation-feedback-latest' : '')"
                                [ngStyle]="{'min-width': (isVideoRteElementPresentInResponse() ? '75%': 'inherit')}"
                                [ngClass]="getFeedbackAudioHighlightClass()">
     </angular-html-bind-wrapper>

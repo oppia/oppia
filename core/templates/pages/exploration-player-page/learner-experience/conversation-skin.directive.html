@@ -1,33 +1,3 @@
-<!--
-  Off-screen preview of the next card in order to pre-determine the target
-  height for the card content transition animation.
--->
-<div class="conversation-skin-future-tutor-card" aria-hidden="true">
-  <div class="oppia-learner-view-card-content">
-    <div class="oppia-learner-view-card-top-section">
-      <angular-html-bind class="oppia-rte-viewer oppia-learner-view-card-top-content"
-                         html-data="nextCard.getContentHtml()">
-      </angular-html-bind>
-    </div>
-
-    <div>
-      <angular-html-bind ng-if="upcomingInlineInteractionHtml"
-                         class="conversation-skin-inline-interaction"
-                         html-data="upcomingInlineInteractionHtml">
-      </angular-html-bind>
-    </div>
-
-    <div ng-if="!upcomingInlineInteractionHtml"
-         class="conversation-skin-inline-interaction">
-      <div class="oppia-conversation-skin-instructions">
-        <[upcomingInteractionInstructions]>
-        <i ng-if="canWindowShowTwoCards()" class="material-icons md-18 position-relative">&#xE5C8;</i>
-        <i ng-if="!canWindowShowTwoCards()" class="material-icons md-18 position-relative">&#xE5DB;</i>
-      </div>
-    </div>
-  </div>
-</div>
-
 <div role="main" class="oppia-conversation-skin-animate-cards-container position-relative" ng-if="hasFullyLoaded">
   <div class="conversation-skin-cards-container conversation-skin-animate-cards protractor-test-conversation-skin-cards-container"
        ng-class="{'animate-to-two-cards': isAnimatingToTwoCards, 'animate-to-one-card': isAnimatingToOneCard}">
@@ -98,69 +68,17 @@
   </div>
 </div>
 
-<div ng-if="isOnTerminalCard() && isCurrentCardAtEndOfTranscript()"
-     class="conversation-skin-final-summary">
-  <div ng-if="isLoggedIn && !isInPreviewMode" class="conversation-skin-final-ratings">
-    <div class="conversation-skin-final-ratings-header" translate="I18N_PLAYER_RATE_EXPLORATION">
-    </div>
-    <div popover-placement="bottom" uib-popover-template="'<[getFeedbackPopoverUrl()]>'" popover-trigger="click">
-      <oppia-rating-display [rating-value]="userRating" [is-editable]="true" (edit)="submitUserRating($event)"
-                            class="conversation-skin-final-ratings-display">
-      </oppia-rating-display>
-    </div>
-  </div>
-
-  <div ng-if="!collectionSummary && !inStoryMode && recommendedExplorationSummaries && recommendedExplorationSummaries.length > 0"
-       class="conversation-skin-final-recommendations">
-    <div ng-if="recommendedExplorationSummaries.length > 0">
-      <span ng-if="!collectionSummary && !isRefresherExploration" class="conversation-skin-final-recommendations-header"
-            translate="I18N_PLAYER_RECOMMEND_EXPLORATIONS">
-      </span>
-
-      <div class="oppia-exp-summary-tiles-container conversation-skin-recommended-activities-container">
-        <oppia-exploration-summary-tile ng-repeat="exp in (recommendedExplorationSummaries|limitTo:3) track by $index"
-                                        [collection-id]="collectionId"
-                                        [exploration-id]="exp.id"
-                                        [exploration-title]="exp.title"
-                                        [story-node-id]="nextNodeId"
-                                        [parent-exploration-ids]="parentExplorationIds"
-                                        [last-updated-msec]="exp.lastUpdatedMsec"
-                                        [objective]="exp.objective"
-                                        [category]="exp.category"
-                                        [ratings]="exp.ratings"
-                                        [thumbnail-icon-url]="exp.thumbnailIconUrl"
-                                        [thumbnail-bg-color]="exp.thumbnailBgColor"
-                                        [num-views]="exp.numViews"
-                                        [is-community-owned]="exp.communityOwned"
-                                        class="oppia-exploration-summary-tile">
-        </oppia-exploration-summary-tile>
-      </div>
-
-    </div>
-  </div>
-
-  <div ng-if="inStoryMode" class="conversation-skin-back-to-collection-container">
-    <a ng-href="<[storyViewerUrl]>" class="conversation-skin-back-to-collection" translate="I18N_PLAYER_RETURN_TO_STORY"></a>
-  </div>
-  <div ng-if="!collectionSummary && !isRefresherExploration && !inStoryMode" class="conversation-skin-back-to-collection-container">
-    <a ng-href="/community-library" class="conversation-skin-back-to-collection" translate="I18N_PLAYER_RETURN_TO_LIBRARY"></a>
-  </div>
-  <div ng-if="collectionSummary && !isRefresherExploration" class="conversation-skin-back-to-collection-container">
-    <a ng-href="/collection/<[collectionId]>" class="conversation-skin-back-to-collection" translate="I18N_PLAYER_BACK_TO_COLLECTION"></a>
-  </div>
-  <div ng-if="inStoryMode && !isLoggedIn" class="conversation-skin-login-container">
-    <div class="conversation-skin-congratulations-text" translate="I18N_CHAPTER_COMPLETION"></div>
-    <span class="conversation-skin-login-text text-secondary" translate="I18N_SAVE_PROGRESS"></span>
-    <div class="mt-2">
-      <md-button class="md-raised oppia-login-button text-light protractor-test-login-button" ng-click="signIn()">
-        LOGIN
-      </md-button>
-      <md-button class="md-raised oppia-sign-up-button text-light" ng-click="signIn()">
-        SIGN UP
-      </md-button>
-    </div>
-  </div>
-</div>
+<oppia-ratings-and-recommendations ng-if="isOnTerminalCard() && isCurrentCardAtEndOfTranscript()"
+                                   [user-is-logged-in]="isLoggedIn"
+                                   [exploration-is-in-preview-mode]="isInPreviewMode"
+                                   [question-player-config]="questionPlayerConfig"
+                                   [in-story-mode]="inStoryMode"
+                                   [story-viewer-url]="storyViewerUrl"
+                                   [collection-summary]="collectionSummary"
+                                   [is-refresher-exploration]="isRefresherExploration"
+                                   [recommended-exploration-summaries]="recommendedExplorationSummaries"
+                                   [parent-exploration-ids]="parentExplorationIds">
+</oppia-ratings-and-recommendations>
 
 <!-- These styles must be embedded within the directive script tags, since
 otherwise they will interfere with the iframed conversation skin directive.
@@ -192,23 +110,6 @@ otherwise they will interfere with the iframed conversation skin directive.
     min-width: 50%;
   }
 
-  .conversation-skin-login-container {
-    background-color: #FFF;
-    margin: -52px auto 92px;
-    padding: 1.5em 2em;
-    text-align: center;
-    width: 38%;
-  }
-
-  .conversation-skin-login-container .conversation-skin-login-text {
-    font-size: 0.8em;
-  }
-
-  .conversation-skin-login-container .conversation-skin-congratulations-text {
-    font-size: 1.2em;
-    font-weight: 500;
-  }
-
   .conversation-skin-next-lesson-wrapper {
     align-items: center;
     background-color: white;
@@ -221,22 +122,11 @@ otherwise they will interfere with the iframed conversation skin directive.
     vertical-align: middle;
   }
   .conversation-skin-next-lesson-text {
-    color: #0D48A1;
+    color: #0d48a1;
     display: block;
     font-size: 14px;
     font-weight: 800;
     height: 14px;
-  }
-
-  .conversation-skin-back-to-collection-container {
-    margin-bottom: 92px;
-    margin-top: 25px;
-    text-align: center;
-  }
-
-  .conversation-skin-back-to-collection {
-    color: #064b46;
-    text-decoration: underline;
   }
 
   .conversation-skin-oppia-avatar, .conversation-skin-user-avatar {
@@ -281,13 +171,6 @@ otherwise they will interfere with the iframed conversation skin directive.
     .conversation-skin-tutor-card-container {
       min-width: 100vw;
     }
-  }
-
-  .conversation-skin-future-tutor-card {
-    left: -30000px;
-    max-width: 560px;
-    position: fixed;
-    top: -30000px;
   }
 
   .conversation-skin-supplemental-card-container {
@@ -372,31 +255,6 @@ otherwise they will interfere with the iframed conversation skin directive.
     opacity: 0;
   }
 
-  .conversation-skin-final-ratings {
-    background-color: white;
-    margin: 0 auto 60px;
-    padding: 11px;
-    text-align: center;
-    width: 38%;
-  }
-  .conversation-skin-final-ratings-header {
-    color: #064b46;
-    margin: 20px 0 0;
-  }
-  .conversation-skin-final-ratings-display {
-    color: #064b46;
-    letter-spacing: 10px;
-  }
-
-  .conversation-skin-final-recommendations {
-    margin-top: 50px;
-    text-align: center;
-  }
-  .conversation-skin-final-recommendations-header {
-    color: #064b46;
-    font-size: 150%;
-  }
-
   .conversation-skin-oppia-feedback.ng-enter {
     opacity: 0;
     -webkit-transition: all .5s;
@@ -404,15 +262,6 @@ otherwise they will interfere with the iframed conversation skin directive.
   }
   .conversation-skin-oppia-feedback.ng-enter.ng-enter-active {
     opacity: 1;
-  }
-
-  .conversation-skin-final-summary {
-    margin-bottom: 25px;
-    margin-top: 20px;
-  }
-
-  .conversation-skin-recommended-activities-container {
-    padding-top: 10px;
   }
 
   .conversation-skin-supplemental-nav {
@@ -428,10 +277,6 @@ otherwise they will interfere with the iframed conversation skin directive.
     top: -10px;
   }
 
-  conversation-skin .oppia-conversation-skin-instructions {
-    padding: 6px 12px;
-  }
-
   conversation-skin .oppia-conversation-skin-animate-cards-container {
     margin: 0 auto;
   }
@@ -441,29 +286,11 @@ otherwise they will interfere with the iframed conversation skin directive.
   }
 
   conversation-skin .oppia-button-raised.md-raised {
-    background-color: #0D48A1
+    background-color: #0d48a1
   }
 
   conversation-skin .oppia-button-icon {
     color: #fff;
-  }
-
-  conversation-skin .oppia-exploration-summary-tile {
-    margin-left: 10px;
-  }
-
-  conversation-skin .oppia-login-button.md-raised {
-    background-color: #00645C;
-    font-size: 1em;
-    min-width: max-content;
-    width: 30%;
-  }
-
-  conversation-skin .oppia-sign-up-button.md-raised {
-    background-color: #00609C;
-    font-size: 1em;
-    min-width: max-content;
-    width: 30%;
   }
 
   @media screen and (max-width: 959px) {
@@ -535,10 +362,6 @@ otherwise they will interfere with the iframed conversation skin directive.
     }
     .conversation-skin-final-ratings {
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.23);
-      width: 100%;
-    }
-
-    .conversation-skin-login-container {
       width: 100%;
     }
   }

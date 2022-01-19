@@ -21,11 +21,20 @@ import { TestBed } from '@angular/core/testing';
 import { CurrentInteractionService } from
   'pages/exploration-player-page/services/current-interaction.service';
 import { UrlService } from 'services/contextual/url.service';
+import { PlayerPositionService } from
+  'pages/exploration-player-page/services/player-position.service';
+import { PlayerTranscriptService } from
+  'pages/exploration-player-page/services/player-transcript.service';
+import { StateCard } from 'domain/state_card/state-card.model';
+import { ContextService } from 'services/context.service';
 
 describe('Current Interaction Service', () => {
   let urlService: UrlService = null;
   let currentInteractionService: CurrentInteractionService = null;
+  let contextService: ContextService = null;
   let DUMMY_ANSWER = 'dummy_answer';
+  let playerTranscriptService: PlayerTranscriptService = null;
+  let playerPositionService: PlayerPositionService = null;
 
   // This mock is required since ContextService is used in
   // CurrentInteractionService to obtain the explorationId. So, in the
@@ -38,6 +47,9 @@ describe('Current Interaction Service', () => {
       return '/explore/123';
     });
     currentInteractionService = TestBed.get(CurrentInteractionService);
+    playerTranscriptService = TestBed.inject(PlayerTranscriptService);
+    playerPositionService = TestBed.inject(PlayerPositionService);
+    contextService = TestBed.inject(ContextService);
   });
 
 
@@ -113,5 +125,44 @@ describe('Current Interaction Service', () => {
 
     expect(hookStateA).toEqual(1);
     expect(hookStateB).toEqual(3);
+  });
+
+  it('should throw error on submitting when submitAnswerFn is null', () => {
+    spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(1);
+    spyOn(playerTranscriptService, 'getCard').and.returnValue(
+      StateCard.createNewCard(
+        'First State', 'Content HTML',
+        '<oppia-text-input-html></oppia-text-input-html>',
+        null, null, null, '', null));
+    spyOn(contextService, 'getExplorationId').and.returnValue('abc');
+    spyOn(contextService, 'getPageContext').and.returnValue('learner');
+
+    let additionalInfo = (
+      '\nUndefined submit answer debug logs:' +
+      '\nInteraction ID: null' +
+      '\nExploration ID: abc' +
+      '\nState Name: First State' +
+      '\nContext: learner' +
+      '\nErrored at index: 1');
+
+    currentInteractionService.registerCurrentInteraction(null, null);
+
+    expect(() => currentInteractionService.submitAnswer()).toThrowError(
+      'The current interaction did not ' + 'register a _submitAnswerFn.' +
+        additionalInfo);
+  });
+
+  it('should update view with new answer', () => {
+    // Here, toBeDefined is used instead of testing with a value
+    // because currentInteractionService.onAnswerChanged$ returns
+    // observable of answerChangedSubject which is a private static
+    // member of the class CurrentInteractionService and hence cannot
+    // be accessed from outside. And the first toBeDefined is used
+    // just to verify that updateViewWithNewAnswer is a defined function.
+
+    expect(currentInteractionService.updateViewWithNewAnswer).toBeDefined();
+    currentInteractionService.updateViewWithNewAnswer();
+
+    expect(currentInteractionService.onAnswerChanged$).toBeDefined();
   });
 });

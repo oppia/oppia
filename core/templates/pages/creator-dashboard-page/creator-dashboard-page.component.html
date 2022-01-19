@@ -3,12 +3,7 @@
   <div class="oppia-dashboard-title"
        [ngClass]="checkMobileView() ? 'oppia-dashboard-title-mobile-padding': 'oppia-dashboard-title-desktop-padding'">
     <span class="float-left" [innerHTML]="'I18N_DASHBOARD_CREATOR_DASHBOARD' | translate"></span>
-    <button type="button"
-            class="oppia-creator-dashboard-intro-button oppia-transition-200 protractor-test-create-new-exploration-button oppia-autofocus"
-            [ngClass]="checkMobileView() ? 'oppia-creator-dashboard-button-mobile': 'oppia-creator-dashboard-button-desktop'"
-            (click)="createNewExploration()" autofocus>
-      + {{'I18N_CREATE_EXPLORATION' | translate}}
-    </button>
+    <oppia-create-activity-button></oppia-create-activity-button>
   </div>
 
   <div class="m-auto oppia-dashboard-aggregated-stats oppia-creator-dashboard-main-content pt-1"
@@ -265,7 +260,7 @@
               layout-wrap
               class="metrics"
               fxLayoutAlign="space-between center">
-            <div class="rowOne">
+            <div class="row-one">
               <li flex="50" class="protractor-test-exp-summary-tile-rating">
                 <span>
                   <span class="fa fa-star oppia-dashboard-card-statistic-icon"
@@ -295,7 +290,7 @@
               </li>
             </div>
 
-            <div class="rowTwo">
+            <div class="row-two">
               <li flex="50" class="protractor-test-exp-summary-tile-num-views">
                 <span class="fa fa-eye oppia-dashboard-card-statistic-icon"
                       ngbTooltip="{{ 'I18N_LIBRARY_VIEWS_TOOLTIP' | translate }}"
@@ -419,12 +414,15 @@
     margin-left: 0;
     margin-top: 0;
   }
-  .rowOne, .rowTwo {
+  .row-one, .row-two {
     display: flex;
     justify-content: space-between;
     padding-left: 10px;
     padding-right: 10px;
     padding-top: 7px;
+  }
+  .row-two {
+    margin-bottom: 12px;
   }
   .oppia-mat-card {
     display: flex;
@@ -634,35 +632,20 @@
   .oppia-dashboard-table td {
     padding: 7px 3px;
   }
-  .oppia-creator-dashboard-intro-button {
-    background-color: #00645c;
-    border-radius: 6px;
-    color: #fff;
-    font-family: "Roboto", Arial, sans-serif;
-    font-size: 14px;
-    font-weight: 500;
-    letter-spacing: 0.7px;
-    margin-top: 10px;
-    padding: 10px 12px;
-    text-transform: uppercase;
-    width: 200px;
-  }
-  .oppia-creator-dashboard-button-mobile {
-    transform: none;
-  }
-  .oppia-creator-dashboard-button-desktop {
-    transform: translate(70px, -15px);
-  }
+
   .oppia-dashboard-intro-card {
     font-family: "Capriola", "Roboto", Arial, sans-serif;
   }
+
   .oppia-dashboard-intro-picture {
     width: 400px;
   }
+
   .oppia-dashboard-tab-panel {
     font-size: 15px;
     padding: 5px 0 20px 10px;
   }
+
   .exploration-list-item:not(:last-child) {
     border-bottom: 1px solid #bbb;
   }

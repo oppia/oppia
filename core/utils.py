@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import base64
+import binascii
 import collections
 import datetime
 import hashlib
@@ -158,13 +159,13 @@ def get_exploration_components_from_dir(
                         raise Exception(
                             'More than one non-asset file specified '
                             'for %s' % dir_path)
-                    elif not filepath.endswith('.yaml'):
+                    if not filepath.endswith('.yaml'):
                         raise Exception(
                             'Found invalid non-asset file %s. There '
                             'should only be a single non-asset file, '
                             'and it should have a .yaml suffix.' % filepath)
-                    else:
-                        yaml_content = get_file_contents(filepath)
+
+                    yaml_content = get_file_contents(filepath)
             else:
                 filepath_array = filepath.split('/')
                 # The additional offset is to remove the 'assets/' prefix.
@@ -331,6 +332,22 @@ def convert_png_binary_to_data_url(content: bytes) -> str:
         raise Exception('The given string does not represent a PNG image.')
 
 
+def is_base64_encoded(content: str) -> bool:
+    """Checks if a string is base64 encoded.
+
+    Args:
+        content: str. String to check.
+
+    Returns:
+        bool. True if a string is base64 encoded, False otherwise.
+    """
+    try:
+        base64.b64decode(content, validate=True)
+        return True
+    except binascii.Error:
+        return False
+
+
 def convert_png_to_data_url(filepath: str) -> str:
     """Converts the png file at filepath to a data URL.
 
@@ -398,7 +415,7 @@ def set_url_query_parameter(
     query_params[param_name] = [param_value]
     new_query_string = urllib.parse.urlencode(query_params, doseq=True)
 
-    return python_utils.url_unsplit( # type: ignore[no-any-return, no-untyped-call]
+    return urllib.parse.urlunsplit(
         (scheme, netloc, path, new_query_string, fragment))
 
 
@@ -556,7 +573,7 @@ def create_string_from_largest_unit_in_timedelta(
     if total_seconds <= 0:
         raise Exception(
             'Expected a positive timedelta, received: %s.' % total_seconds)
-    elif timedelta_obj.days != 0:
+    if timedelta_obj.days != 0:
         return '%s day%s' % (
             int(timedelta_obj.days), 's' if timedelta_obj.days > 1 else '')
     else:

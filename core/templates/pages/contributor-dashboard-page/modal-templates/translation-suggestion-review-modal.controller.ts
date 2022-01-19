@@ -258,18 +258,26 @@ angular.module('oppia').controller(
       // Returns whether the active suggestion's exploration_content_html
       // differs from the content_html of the suggestion's change object.
       $scope.hasExplorationContentChanged = function() {
-        if (
-          Array.isArray($scope.contentHtml) ||
-          Array.isArray($scope.explorationContentHtml)) {
+        return !$scope.isHtmlContentEqual(
+          $scope.contentHtml, $scope.explorationContentHtml);
+      };
+
+      $scope.isHtmlContentEqual = function(first, second) {
+        if (Array.isArray(first) || Array.isArray(second)) {
           // Check equality of all array elements.
           return (
-            $scope.contentHtml.length !==
-              $scope.explorationContentHtml.length ||
-            $scope.contentHtml.some(
-              (val, index) => val !== $scope.explorationContentHtml[index])
+            first.length === second.length &&
+            first.every(
+              (val, index) => stripWhitespace(val) === stripWhitespace(
+                second[index]))
           );
         }
-        return $scope.contentHtml !== $scope.explorationContentHtml;
+        return stripWhitespace(first) === stripWhitespace(second);
+      };
+
+      // Strips whitespace (spaces, tabs, line breaks) and '&nbsp;'.
+      const stripWhitespace = function(htmlString) {
+        return htmlString.replace(/&nbsp;|\s+/g, '');
       };
 
       $scope.editSuggestion = function() {

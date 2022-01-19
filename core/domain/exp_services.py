@@ -610,7 +610,8 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
             'Unexpected error: trying to update version %s of exploration '
             'from version %s. Please reload the page and try again.'
             % (exploration_model.version, exploration.version))
-    elif exploration.version < exploration_model.version:
+
+    if exploration.version < exploration_model.version:
         raise Exception(
             'Trying to update version %s of exploration from version %s, '
             'which is too old. Please reload the page and try again.'
@@ -1283,8 +1284,7 @@ def compute_exploration_contributors_summary(exploration_id):
     contributor_ids = list(contributors_summary)
     # Remove IDs that are deleted or do not exist.
     users_settings = user_services.get_users_settings(contributor_ids)
-    for contributor_id, user_settings in python_utils.ZIP(
-            contributor_ids, users_settings):
+    for contributor_id, user_settings in zip(contributor_ids, users_settings):
         if user_settings is None:
             del contributors_summary[contributor_id]
 
@@ -1380,7 +1380,8 @@ def revert_exploration(
             'Unexpected error: trying to update version %s of exploration '
             'from version %s. Please reload the page and try again.'
             % (exploration_model.version, current_version))
-    elif current_version < exploration_model.version:
+
+    if current_version < exploration_model.version:
         raise Exception(
             'Trying to update version %s of exploration from version %s, '
             'which is too old. Please reload the page and try again.'

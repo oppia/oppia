@@ -190,7 +190,7 @@ describe('QuestionsListComponent', () => {
       id: 'skillId1',
       description: 'test description 1',
       misconceptions: [{
-        id: '2',
+        id: 2,
         name: 'test name',
         notes: 'test notes',
         feedback: 'test feedback',
@@ -300,7 +300,7 @@ describe('QuestionsListComponent', () => {
     ctrl.$onInit();
     $scope.$apply();
 
-    expect(ctrl.misconceptionIdsForSelectedSkill).toEqual(['2']);
+    expect(ctrl.misconceptionIdsForSelectedSkill).toEqual([2]);
   });
 
   it('should start creating question on navigating to question editor', () => {
@@ -334,7 +334,7 @@ describe('QuestionsListComponent', () => {
       id: 'skillId1',
       description: 'test description 1',
       misconceptions: [{
-        id: '2',
+        id: 2,
         name: 'test name',
         notes: 'test notes',
         feedback: 'test feedback',
@@ -373,7 +373,7 @@ describe('QuestionsListComponent', () => {
     expect(ctrl.misconceptionsBySkill).toEqual({
       skillId1: [
         misconceptionObjectFactory.createFromBackendDict({
-          id: '2',
+          id: 2,
           name: 'test name',
           notes: 'test notes',
           feedback: 'test feedback',
@@ -665,7 +665,7 @@ describe('QuestionsListComponent', () => {
           associated_skill_dicts: [{
             id: 'skillId1',
             misconceptions: [{
-              id: 'misconception1',
+              id: 1,
               feedback: '',
               must_be_addressed: false,
               notes: '',
