@@ -1,4 +1,4 @@
-<form autocomplete="off" [attr.disabled]="!isValid ? true : false" role="form" class="form-horizontal" (submit)="submitAnswer()">
+<form autocomplete="off" [attr.disabled]="!isValid" role="form" class="form-horizontal" (submit)="submitAnswer()">
   <!-- This ng-form is needed for submitting answer on hitting enter. -->
   <input type="text"
          name="answer"
