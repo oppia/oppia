@@ -35,8 +35,10 @@ if MYPY: # pragma: no cover
 datastore_services = models.Registry.import_datastore_services()
 
 
+# TODO(#14537): This is a duplicate of the same TypedDict in translation_domain,
+# it should be removed after we refactor our importing.
 class TranslatedContentDict(TypedDict):
-    """Dict type for TranslatedContent object."""
+    """Dictionary representing TranslatedContent object."""
 
     content: str|List[str]
     needs_update: bool
@@ -45,28 +47,33 @@ class TranslatedContentDict(TypedDict):
 class EntityTranslationsModel(base_models.BaseModel):
     """Model for storing entity translations ."""
 
+    # The id of the corresponding entity.
     entity_id = datastore_services.StringProperty(required=True, indexed=True)
+    # The type of the corresponding entity.
     entity_type = datastore_services.StringProperty(required=True, indexed=True)
+    # The version of the corresponding entity.
     entity_version = datastore_services.IntegerProperty(
         required=True, indexed=True)
+    # The ISO 639-1 code for the language an entity is written in.
     language_code = datastore_services.StringProperty(
         required=True, indexed=True)
+    # The translated content.
     translations = datastore_services.JsonProperty(required=True)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
-        """Model is not associated with users."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
     def get_model_association_to_user(
     ) -> base_models.MODEL_ASSOCIATION_TO_USER:
-        """Model is not associated with users."""
+        """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
-        """Model is not associated with users."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'entity_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'entity_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,

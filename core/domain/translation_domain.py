@@ -51,7 +51,7 @@ TRANSLATABLE_CONTENT_FORMAT_SET_OF_UNICODE_STRING = 'set_of_unicode_string'
 # STATE_PROPERTY_WRITTEN_TRANSLATIONS
 
 class TranslatableContentDict(TypedDict):
-    """Dict type for TranslatableContent object."""
+    """Dictionary representing TranslatableContent object."""
 
     content_id: str
     content: str|List[str]
@@ -59,7 +59,7 @@ class TranslatableContentDict(TypedDict):
 
 
 class TranslatedContentDict(TypedDict):
-    """Dict type for TranslatedContent object."""
+    """Dictionary representing TranslatedContent object."""
 
     content: str|List[str]
     needs_update: bool
@@ -123,8 +123,7 @@ class BaseTranslatableObject:
         """
         self._translatable_contents = {}
         self._register_all_translatable_fields()
-        translatable_contents = copy.deepcopy(self._translatable_contents)
-        return translatable_contents
+        return copy.deepcopy(self._translatable_contents)
 
     def get_all_contents_which_needs_translations(
         self,
@@ -134,20 +133,23 @@ class BaseTranslatableObject:
         translation or which needs updates in an existing translations.
 
         Args:
-            entityTranslation: EntityTranslation. An object representing
-                EntityTranslation class.
+            entityTranslation: EntityTranslation. An object storing existing
+                translation of an entity.
 
         Returns:
             list(TranslatableContent). Returns a list of TranslatableContents.
         """
         contents_which_need_translation = []
+        content_ids_for_translated_contents = (
+            entityTranslation.translations.keys())
+
         for translatable_item in self.get_translatable_fields().values():
             # translatable_item is of type TranslatableContent.
             if translatable_item.content == '':
                 continue
             if (
                 not translatable_item.content_id in
-                entityTranslation.translations.keys()
+                content_ids_for_translated_contents
             ):
                 contents_which_need_translation.append(translatable_item)
             elif (
@@ -239,11 +241,11 @@ class TranslatableContent:
 
 
 class TranslatedContent:
-    """This class represents the translated contents of TranslatableContent
+    """Represents the translated contents of TranslatableContent
     object.
 
     Args:
-        content: str|list(str). The content which is translated.
+        content: str|list(str). The content which is already translated.
         needs_update: bool. A boolean value which represents that whether any
             translation needs update or not.
     """
