@@ -91,22 +91,23 @@ export class PracticeTabComponent implements OnInit {
     if (this.startButtonIsDisabled) {
       return true;
     }
-    this.selectedSubtopicIndices.forEach(idx => {
+    for(const idx of Object.keys(this.selectedSubtopicIndices)) {
       if (this.selectedSubtopicIndices[idx]) {
         return !this.questionsAreAvailable;
-      }      
-    });
+      }   
+    }
     return true;
   }
 
   checkIfQuestionsExist(subtopicIndices: boolean[]): void {
     const skillIds = [];
     this.questionsStatusCallIsComplete = false;
-    subtopicIndices.forEach(idx => {
+    for(const idx of Object.keys(subtopicIndices)) {
       if (subtopicIndices[idx]) {
         skillIds.push(this.availableSubtopics[idx].getSkillIds());
-      }      
-    });
+      }    
+
+    }
     if (skillIds.length > 0) {
       this.questionBackendApiService.fetchTotalQuestionCountForSkillIdsAsync(
         skillIds).then(questionCount => {
@@ -121,12 +122,12 @@ export class PracticeTabComponent implements OnInit {
 
   openNewPracticeSession(): void {
     const selectedSubtopicIds = [];
-    this.selectedSubtopicIndices.forEach(idx => {
+    for(const idx of Object.keys(this.selectedSubtopicIndices)) {
       if (this.selectedSubtopicIndices[idx]) {
         selectedSubtopicIds.push(
           this.availableSubtopics[idx].getId());      
       }
-    });
+    }
     let practiceSessionsUrl = this.urlInterpolationService.interpolateUrl(
       PracticeSessionPageConstants.PRACTICE_SESSIONS_URL, {
         topic_url_fragment: this.topicUrlFragment,

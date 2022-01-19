@@ -179,7 +179,7 @@ angular.module('oppia').component('versionDiffVisualization', {
       };
       ctrl.diffGraphSecondaryLabels = {};
       ctrl.diffGraphNodeColors = {};
-      nodesData.forEach(nodeId => {
+      for(const nodeId of Object.keys(nodesData)) {
         var nodeStateProperty = nodesData[nodeId].stateProperty;
         if (nodeStateProperty === STATE_PROPERTY_ADDED) {
           diffGraphNodes[nodeId] = nodesData[nodeId].newestStateName;
@@ -216,8 +216,9 @@ angular.module('oppia').component('versionDiffVisualization', {
           }
         } else {
           throw new Error('Invalid state property.');
-        }        
-      });
+        }
+
+      }
 
       ctrl.v1InitStateId = ctrl.getDiffData().v1InitStateId;
 

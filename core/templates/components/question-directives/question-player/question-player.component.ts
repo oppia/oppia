@@ -338,7 +338,7 @@ angular.module('oppia').component('questionPlayer', {
         createScorePerSkillMapping();
         $scope.resultsLoaded = false;
         var totalQuestions = Object.keys(questionStateData).length;
-        questionStateData.forEach(question => {
+        for(const question of Object.keys(questionStateData)) {
           var questionData = questionStateData[question];
           var totalHintsPenalty = 0.0;
           var wrongAnswerPenalty = 0.0;
@@ -360,10 +360,10 @@ angular.module('oppia').component('questionPlayer', {
           }
           // Calculate total score.
           ctrl.totalScore += questionScore;
-
+  
           // Increment number of questions.
           ctrl.allQuestions += 1;
-
+  
           // Calculate scores per skill.
           if (!(questionData.linkedSkillIds)) {
             return;
@@ -376,7 +376,7 @@ angular.module('oppia').component('questionPlayer', {
             ctrl.scorePerSkillMapping[skillId].score += questionScore;
             ctrl.scorePerSkillMapping[skillId].total += 1.0;
           }
-        }); 
+        }
         ctrl.finalCorrect = ctrl.totalScore;
         ctrl.totalScore = Math.round(
           ctrl.totalScore * 100 / totalQuestions);

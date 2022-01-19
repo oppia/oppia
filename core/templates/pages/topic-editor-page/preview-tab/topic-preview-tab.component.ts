@@ -50,10 +50,10 @@ export class TopicPreviewTabComponent {
     this.subtopics = this.topic.getSubtopics();
     this.cannonicalStorySummaries = (
       this.topicEditorStateService.getCanonicalStorySummaries());
-    this.cannonicalStorySummaries.forEach(idx => {
+    for(const idx of Object.keys(this.subtopics)) {
       this.chapterCount += (
-        this.cannonicalStorySummaries[idx].getNodeTitles().length);      
-    });
+        this.cannonicalStorySummaries[idx].getNodeTitles().length);   
+    }
   }
 
   getStaticImageUrl(imagePath: string): string {
