@@ -111,11 +111,11 @@ export class ProfilePageComponent {
         }, {
           title: 'Created',
           value: data.createdExpSummaries.length,
-          helpText: null
+          helpText: ''
         }, {
           title: 'Edited',
           value: data.createdExpSummaries.length,
-          helpText: null
+          helpText: ''
         }];
 
         this.userEditedExplorations = data.editedExpSummaries.sort(
@@ -126,7 +126,10 @@ export class ProfilePageComponent {
             const avgRating2 = (
               this.ratingComputationService.computeAverageRating(
                 exploration2.ratings));
-
+            
+            if(avgRating1 == null) return -1;
+            if(avgRating2 == null) return 1;
+            if(avgRating1 == null && avgRating2 == null) return 0;
             if (avgRating1 > avgRating2) {
               return 1;
             } else if (avgRating1 === avgRating2) {

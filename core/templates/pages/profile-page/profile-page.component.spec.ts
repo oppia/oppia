@@ -229,7 +229,7 @@ describe('Profile page', () => {
     ' page is not provided', fakeAsync(() => {
     spyOn(mockWindowRef.nativeWindow.location, 'reload');
     spyOn(userService, 'getLoginUrlAsync').and.returnValue(
-      Promise.resolve(null));
+      Promise.resolve(''));
 
     componentInstance.ngOnInit();
     tick();
