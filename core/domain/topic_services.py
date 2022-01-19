@@ -334,7 +334,6 @@ def apply_change_list(topic_id, change_list):
                 # latest schema version. As a result, simply resaving the
                 # topic is sufficient to apply the schema migration.
                 continue
-
         return (
             topic, modified_subtopic_pages, deleted_subtopic_ids,
             newly_created_subtopic_ids, modified_subtopic_change_cmds)

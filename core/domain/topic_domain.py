@@ -523,8 +523,7 @@ class Topic:
             subtopics, subtopic_schema_version, next_subtopic_id,
             language_code, version, story_reference_schema_version,
             meta_tag_content, practice_tab_is_displayed,
-            page_title_fragment_for_web,
-            created_on=None, last_updated=None):
+            page_title_fragment_for_web, created_on=None, last_updated=None):
         """Constructs a Topic domain object.
 
         Args:
