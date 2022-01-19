@@ -23,6 +23,8 @@ require(
   'state-interaction-id.service');
 require(
   'pages/exploration-editor-page/editor-tab/services/responses.service.ts');
+require(
+  'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
 
 angular.module('oppia').controller(
   'TrainingDataEditorPanelServiceModalController', [
