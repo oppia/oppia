@@ -27,11 +27,11 @@ from core import utils
 from core.constants import constants
 from core.domain import change_domain
 from core.domain import fs_domain
+from proto_files import topic_summary_pb2
 
 from core.domain import fs_services  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
-from proto_files import topic_summary_pb2
 
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.

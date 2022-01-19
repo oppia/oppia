@@ -29,12 +29,12 @@ from core import utils
 from core.constants import constants
 from core.domain import change_domain
 from core.domain import fs_domain
-from core.domain import skill_fetchers
-from core.domain import story_fetchers
 from core.domain import subtopic_page_domain
 from proto_files import topic_summary_pb2
 
 from core.domain import fs_services  # pylint: disable=invalid-import-from # isort:skip
+from core.domain import skill_fetchers # pylint: disable=invalid-import-from # isort:skip
+from core.domain import story_fetchers # pylint: disable=invalid-import-from # isort:skip
 from core.domain import user_services  # pylint: disable=invalid-import-from # isort:skip
 
 # TODO(#14537): Refactor this file and remove imports marked
