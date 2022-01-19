@@ -58,16 +58,17 @@ var answerObjectType = 'AlgebraicExpression';
 
 var testSuite = [{
   interactionArguments: [['a', 'b']],
-  ruleArguments: ['MatchesExactlyWith', '((a+b))^(2)'],
+  ruleArguments: ['MatchesExactlyWith', '(a+b)^2'],
   expectedInteractionDetails: [],
   wrongAnswers: ['(a-b)^2', '(a-b)^3', 'a^2+2*a*b+b^2'],
-  correctAnswers: ['(a+b)^2', '(b+a)^2', '(a+b)*(a+b)']
+  correctAnswers: ['(a+b)^2']
 }, {
   interactionArguments: [['x', 'z']],
   ruleArguments: ['MatchesExactlyWith', '((x^2)-x)/z'],
   expectedInteractionDetails: [],
-  wrongAnswers: ['((x^3)-x)/z', 'x(x-1)/z', '((x^2)/z)-x/z'],
-  correctAnswers: ['((x^2)-x)/z', '((x*x)-x)*z^(-1)']
+  wrongAnswers: [
+    '((x^3)-x)/z', 'x(x-1)/z', '((x^2)/z)-x/z', '((x*x)-x)*z^(-1)'],
+  correctAnswers: ['((x^2)-x)/z']
 }, {
   interactionArguments: [['π', 'r']],
   ruleArguments: ['IsEquivalentTo', 'pi*r^2'],
@@ -79,7 +80,7 @@ var testSuite = [{
   ruleArguments: ['IsEquivalentTo', '(9*x^2)-6*x+1'],
   expectedInteractionDetails: [],
   wrongAnswers: ['sqrt((3x-1)^(2))', '9*(x)^(2)-6*x-1', '((3*x-1))^(4)'],
-  correctAnswers: ['(9*x^2)-6*x+1', '(1-3x)^(2)']
+  correctAnswers: ['(9*x^2)-6*x+1', '(1-3x)^2']
 }];
 
 exports.customizeInteraction = customizeInteraction;
