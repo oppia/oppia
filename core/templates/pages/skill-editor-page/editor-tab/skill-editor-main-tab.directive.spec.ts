@@ -156,4 +156,12 @@ describe('Skill editor main tab directive', function() {
     $timeout.flush();
     expect(focusSpy).toHaveBeenCalled();
   });
+
+  it('should update the changes', function() {
+    spyOn($rootScope, '$applyAsync');
+
+    $scope.getMisconceptionChange();
+
+    expect($rootScope.$applyAsync).toHaveBeenCalled();
+  });
 });

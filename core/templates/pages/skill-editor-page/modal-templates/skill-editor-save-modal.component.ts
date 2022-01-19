@@ -16,7 +16,7 @@
  * @fileoverview Component for skill editor save modal.
  */
 
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { AppConstants } from 'app.constants';
@@ -28,7 +28,15 @@ import { AppConstants } from 'app.constants';
 export class SkillEditorSaveModalComponent extends ConfirmOrCancelModal {
   commitMessage: string;
   MAX_COMMIT_MESSAGE_LENGTH: number = AppConstants.MAX_COMMIT_MESSAGE_LENGTH;
-  constructor(activeModal: NgbActiveModal) {
-    super(activeModal);
+
+  constructor(
+    private ngbActiveModal: NgbActiveModal,
+    private changeDetectorRef: ChangeDetectorRef,
+  ) {
+    super(ngbActiveModal);
+  }
+
+  updateSaveDraftButton(): void {
+    this.changeDetectorRef.detectChanges();
   }
 }

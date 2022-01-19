@@ -90,7 +90,7 @@ class VoiceArtistTest(BaseVoiceArtistControllerTests):
         self.csrf_token = self.get_new_csrf_token()
 
     def test_put_with_no_payload_version_raises_error(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Missing key in handler args: version.'):
             self.put_json(
                 '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, self.EXP_ID), {
@@ -105,7 +105,7 @@ class VoiceArtistTest(BaseVoiceArtistControllerTests):
 
     def test_put_with_payload_version_different_from_exp_version_raises_error(
             self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Trying to update version 1 of exploration from version'
             ' 3, which is not possible. Please reload the page and try again.'):
 
