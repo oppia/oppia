@@ -3650,8 +3650,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         self.logged_info.append(msg % args)
 
     def setUp(self):
-        super(
-            ).setUp()
+        super().setUp()
         self.signup(self.AUTHOR_EMAIL, self.AUTHOR_USERNAME)
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.signup(
@@ -4400,8 +4399,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         self.logged_info.append(msg % args)
 
     def setUp(self):
-        super(
-          ).setUp()
+        super().setUp()
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.signup(

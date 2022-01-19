@@ -1332,8 +1332,7 @@ class CrashEntryPoint(EntryPoint):
 
     def __init__(self) -> None:
         """Constructs an CrashEntryPoint domain object."""
-        super(
-            ).__init__(
+        super().__init__(
                 app_feedback_report_constants.ENTRY_POINT.crash, None, None,
                 None, None)
 
