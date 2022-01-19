@@ -1813,8 +1813,8 @@ class RecordedVoiceovers:
         if content_id not in self.voiceovers_mapping:
             raise Exception(
                 'The content_id %s does not exist.' % content_id)
-        else:
-            self.voiceovers_mapping.pop(content_id, None)
+
+        self.voiceovers_mapping.pop(content_id, None)
 
 
 class RuleSpec(translation_domain.BaseTranslatableObject):
@@ -2317,7 +2317,7 @@ class State(translation_domain.BaseTranslatableObject):
         if not allow_null_interaction and self.interaction.id is None:
             raise utils.ValidationError(
                 'This state does not have any interaction specified.')
-        elif self.interaction.id is not None:
+        if self.interaction.id is not None:
             self.interaction.validate(exp_param_specs_dict)
 
         content_id_list = []
