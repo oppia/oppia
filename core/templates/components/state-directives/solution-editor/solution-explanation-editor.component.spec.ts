@@ -45,11 +45,10 @@ class MockStateSolutionService {
     }
   };
 
-  saveDisplayedValue() {
-  }
+  saveDisplayedValue() {}
 }
 
-describe('Solution explanation editor', function() {
+describe('Solution explanation editor', () => {
   let component: SolutionExplanationEditor;
   let fixture: ComponentFixture<SolutionExplanationEditor>;
 

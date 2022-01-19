@@ -52,7 +52,7 @@ class MockEditabilityService {
   }
 }
 
-describe('Solution editor component', function() {
+describe('Solution editor component', () => {
   let component: SolutionEditor;
   let fixture: ComponentFixture<SolutionEditor>;
   let editabilityService: EditabilityService;
