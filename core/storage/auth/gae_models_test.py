@@ -110,11 +110,11 @@ class UserAuthDetailsModelTests(test_utils.GenericTestBase):
     def test_export_data_trivial(self) -> None:
         """Trivial test of export_data functionality."""
 
-        exported_model = (
+        exported_dict = (
             auth_models.UserAuthDetailsModel.export_data(
                 self.NONEXISTENT_USER_ID))
 
-        self.assertEqual(exported_model, {})
+        self.assertEqual(exported_dict, {})
 
     def test_export_data_nontrivial(self) -> None:
         user_auth_model = (
@@ -125,6 +125,7 @@ class UserAuthDetailsModelTests(test_utils.GenericTestBase):
         # The parent_user_id should exist to fetch the
         # parent_model further on in the test.
         self.assertIsNotNone(user_auth_model.parent_user_id)
+        self.assertEqual(user_auth_model.parent_user_id, self.USER_ID)
 
         # Create the model instance to be fetched using
         # user_auth_model.parent_user_id. The fetched
@@ -138,19 +139,12 @@ class UserAuthDetailsModelTests(test_utils.GenericTestBase):
             username='user'
         ).put()
 
-        parent_model = (
-            user_models.UserSettingsModel.
-                get(user_auth_model.parent_user_id)
-        )
-
-        # Ruling out the possibility of None for mypy type checking.
-        assert parent_model is not None
-        exported_model = (
+        exported_dict = (
             auth_models.UserAuthDetailsModel.export_data(
                 self.PROFILE_2_ID))
-        expected_model = {'parent_username': parent_model.username}
+        expected_dict = {'parent_username': 'user'}
 
-        self.assertEqual(expected_model, exported_model)
+        self.assertEqual(expected_dict, exported_dict)
 
     def test_apply_deletion_policy_for_registered_user_deletes_them(
             self
