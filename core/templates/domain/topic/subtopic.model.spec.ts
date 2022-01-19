@@ -20,7 +20,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { Subtopic } from 'domain/topic/subtopic.model';
 
-describe('Subtopic object factory', () => {
+describe('Subtopic model', () => {
   let _sampleSubtopic: Subtopic;
   let skillIds = ['skill_1', 'skill_2'];
 
@@ -49,8 +49,16 @@ describe('Subtopic object factory', () => {
     expect(_sampleSubtopic.validate()).toEqual([]);
   });
 
-  it('should be able to increment the id', () => {
+  it('should be able to increment and decrement the id', () => {
     expect(_sampleSubtopic.incrementId()).toEqual(2);
+    expect(_sampleSubtopic.decrementId()).toEqual(1);
+  });
+
+  it('should return correct url fragment', () => {
+    expect(_sampleSubtopic.getUrlFragment()).toEqual('title');
+
+    _sampleSubtopic.setUrlFragment(null);
+    expect(_sampleSubtopic.getUrlFragment()).toBeNull();
   });
 
   it('should return the skill ids', () => {
@@ -72,12 +80,41 @@ describe('Subtopic object factory', () => {
     ).toEqual(['Subtopic url fragment is invalid.']);
   });
 
-  it('should validate the subtopic', () => {
+  it('should validate the subtopic title', () => {
     _sampleSubtopic.setTitle('');
 
     expect(
       _sampleSubtopic.validate()
     ).toEqual(['Subtopic title should not be empty']);
+  });
+
+  it('should check for duplicate skill in subtopic', () => {
+    // We have to create a new subtopic because duplicate skills cannot be
+    // added by addSkill() method.
+    let dummySkillIds = ['skill_1', 'skill_2', 'skill_1'];
+    let sampleSubtopicBackendObject = {
+      id: 1,
+      thumbnail_filename: 'image.png',
+      thumbnail_bg_color: '#a33f40',
+      title: 'Title',
+      skill_ids: dummySkillIds,
+      url_fragment: 'title'
+    };
+    let sampleSkillIdToDesriptionMap = {
+      skill_1: 'Description 1',
+      skill_2: 'Description 2',
+      // @ts-ignore
+      skill_1: 'Description 3' // eslint-disable-line no-dupe-keys
+    };
+    let dummySampleSubtopic = Subtopic.create(
+      sampleSubtopicBackendObject, sampleSkillIdToDesriptionMap);
+
+    expect(
+      dummySampleSubtopic.validate()
+    ).toEqual([
+      'The skill with id skill_1 is duplicated in subtopic with id 1',
+      'The skill with id skill_1 is duplicated in subtopic with id 1'
+    ]);
   });
 
   it('should be able to create a subtopic object with given title and id',
@@ -87,6 +124,23 @@ describe('Subtopic object factory', () => {
       expect(subtopic.getTitle()).toBe('Title2');
       expect(subtopic.getSkillSummaries()).toEqual([]);
     });
+
+  it('should be able to add new skill', () => {
+    _sampleSubtopic.addSkill('skill_3', 'Description 3');
+    expect(_sampleSubtopic.getSkillSummaries().length).toEqual(3);
+    expect(_sampleSubtopic.getSkillSummaries()[0].getId()).toEqual('skill_1');
+    expect(
+      _sampleSubtopic.getSkillSummaries()[0].getDescription()
+    ).toEqual('Description 1');
+    expect(_sampleSubtopic.getSkillSummaries()[1].getId()).toEqual('skill_2');
+    expect(
+      _sampleSubtopic.getSkillSummaries()[1].getDescription()
+    ).toEqual('Description 2');
+    expect(_sampleSubtopic.getSkillSummaries()[2].getId()).toEqual('skill_3');
+    expect(
+      _sampleSubtopic.getSkillSummaries()[2].getDescription()
+    ).toEqual('Description 3');
+  });
 
   it('should not add duplicate elements to skill ids list', () => {
     expect(_sampleSubtopic.addSkill('skill_1', 'Description 1')).toEqual(false);
@@ -99,5 +153,25 @@ describe('Subtopic object factory', () => {
     expect(
       _sampleSubtopic.getSkillSummaries()[0].getDescription()
     ).toEqual('Description 2');
+  });
+
+  it('should check if skill is present before removing', () => {
+    expect(() => {
+      _sampleSubtopic.removeSkill('skill_3');
+    }).toThrowError('The given skill doesn\'t exist in the subtopic');
+  });
+
+  it('should return correct thumbnail filename', () => {
+    expect(_sampleSubtopic.getThumbnailFilename()).toEqual('image.png');
+
+    _sampleSubtopic.setThumbnailFilename(null);
+    expect(_sampleSubtopic.getThumbnailFilename()).toBeNull();
+  });
+
+  it('should return correct thumbnail background color', () => {
+    expect(_sampleSubtopic.getThumbnailBgColor()).toEqual('#a33f40');
+
+    _sampleSubtopic.setThumbnailBgColor(null);
+    expect(_sampleSubtopic.getThumbnailBgColor()).toBeNull();
   });
 });
