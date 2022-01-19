@@ -35,7 +35,8 @@ if MYPY: # pragma: no cover
 datastore_services = models.Registry.import_datastore_services()
 
 
-# TODO(#14537): Make sure that domain object files do not import services.
+# TODO(#14537): This is a duplicate of the same TypedDict in translation_domain,
+# it should be removed after we refactor our importing.
 class TranslatedContentDict(TypedDict):
     """Dictionary representing TranslatedContent object."""
 
