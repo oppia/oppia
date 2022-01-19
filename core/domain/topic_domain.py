@@ -59,6 +59,7 @@ TOPIC_PROPERTY_URL_FRAGMENT = 'url_fragment'
 TOPIC_PROPERTY_META_TAG_CONTENT = 'meta_tag_content'
 TOPIC_PROPERTY_PRACTICE_TAB_IS_DISPLAYED = 'practice_tab_is_displayed'
 TOPIC_PROPERTY_PAGE_TITLE_FRAGMENT_FOR_WEB = 'page_title_fragment_for_web'
+TOPIC_PROPERTY_ANDROID_PROTO_SIZE_IN_BYTES = 'android_proto_size_in_bytes'
 
 SUBTOPIC_PROPERTY_TITLE = 'title'
 SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME = 'thumbnail_filename'
@@ -123,7 +124,8 @@ class TopicChange(change_domain.BaseChange):
         TOPIC_PROPERTY_URL_FRAGMENT,
         TOPIC_PROPERTY_META_TAG_CONTENT,
         TOPIC_PROPERTY_PRACTICE_TAB_IS_DISPLAYED,
-        TOPIC_PROPERTY_PAGE_TITLE_FRAGMENT_FOR_WEB)
+        TOPIC_PROPERTY_PAGE_TITLE_FRAGMENT_FOR_WEB,
+        TOPIC_PROPERTY_ANDROID_PROTO_SIZE_IN_BYTES)
 
     # The allowed list of subtopic properties which can be used in
     # update_subtopic_property command.
@@ -358,7 +360,6 @@ class Subtopic:
         self.thumbnail_bg_color = thumbnail_bg_color
         self.thumbnail_size_in_bytes = thumbnail_size_in_bytes
         self.url_fragment = url_fragment
-        self.proto_size_in_bytes = self.get_proto_size()
 
     def to_dict(self):
         """Returns a dict representing this Subtopic domain object.
@@ -373,8 +374,7 @@ class Subtopic:
             'thumbnail_filename': self.thumbnail_filename,
             'thumbnail_bg_color': self.thumbnail_bg_color,
             'thumbnail_size_in_bytes': self.thumbnail_size_in_bytes,
-            'url_fragment': self.url_fragment,
-            'proto_size_in_bytes': self.proto_size_in_bytes
+            'url_fragment': self.url_fragment
         }
 
     @classmethod
@@ -394,11 +394,9 @@ class Subtopic:
             subtopic_dict['thumbnail_size_in_bytes'],
             subtopic_dict['url_fragment'])
 
-        subtopic.proto_size_in_bytes = subtopic_dict['proto_size_in_bytes']
-
         return subtopic
 
-    def to_proto(self):
+    def to_android_subtopic_proto(self):
         """Returns a Subtopic proto object from its respective items.
 
         Returns:
@@ -409,7 +407,7 @@ class Subtopic:
         for skill_id in self.skill_ids:
             skill = skill_fetchers.get_skill_by_id(
                 skill_id, strict=False)
-            skill_summaries_list.append(skill.to_proto())
+            skill_summaries_list.append(skill.to_android_skill_proto())
 
         return topic_summary_pb2.SubtopicSummaryDto(
             index=self.id,
@@ -587,7 +585,8 @@ class Topic:
         self.meta_tag_content = meta_tag_content
         self.practice_tab_is_displayed = practice_tab_is_displayed
         self.page_title_fragment_for_web = page_title_fragment_for_web
-        self.proto_size_in_bytes = self.get_proto_size()
+        self._cached_android_proto_size_is_stale = True
+        self._cached_android_proto_size_in_bytes = 0
 
     def to_dict(self):
         """Returns a dict representing this Topic domain object.
@@ -624,8 +623,7 @@ class Topic:
                 self.story_reference_schema_version),
             'meta_tag_content': self.meta_tag_content,
             'practice_tab_is_displayed': self.practice_tab_is_displayed,
-            'page_title_fragment_for_web': self.page_title_fragment_for_web,
-            'proto_size_in_bytes': self.proto_size_in_bytes
+            'page_title_fragment_for_web': self.page_title_fragment_for_web
         }
 
     def serialize(self):
@@ -703,8 +701,6 @@ class Topic:
             topic_dict['page_title_fragment_for_web'],
             topic_created_on,
             topic_last_updated)
-
-        topic.proto_size_in_bytes = topic_dict['proto_size_in_bytes']
 
         return topic
 
@@ -1161,15 +1157,51 @@ class Topic:
                 'Expected uncategorized skill ids to be a list, received %s'
                 % self.uncategorized_skill_ids)
 
-        if not isinstance(self.proto_size_in_bytes, int):
+        if not isinstance(self.android_proto_size_in_bytes, int):
             raise utils.ValidationError(
                 'Expected proto size to be an int, received %s'
-                % self.proto_size_in_bytes)
+                % self.android_proto_size_in_bytes)
 
-        if self.proto_size_in_bytes <= 0:
+        if self.android_proto_size_in_bytes <= 0:
             raise utils.ValidationError(
                 'Expected proto size to be a positive integer, received %s'
-                % self.proto_size_in_bytes)
+                % self.android_proto_size_in_bytes)
+
+    @property
+    def android_proto_size_in_bytes(self):
+        """Returns the most up-to-date size of the topic proto,
+        recomputing from scratch if necessary.
+
+        Returns:
+            int. Updated exploration's proto size, in bytes.
+        """
+        if self._cached_android_proto_size_is_stale:
+            self._cached_android_proto_size_in_bytes = self.get_proto_size()
+            self._cached_android_proto_size_is_stale = False
+
+        return self._cached_android_proto_size_in_bytes
+
+    def __setattr__(self, attrname, new_value):
+        """Set _cached_android_proto_size_is_stale to True every time
+        the Topic object is updated.
+
+        Args:
+            attrname: str. The name of the Topic class attribute.
+            new_value: *. The value of the attribute on which
+                function is called.
+        """
+
+        # If the value of _cached_android_proto_size_in_bytes or
+        # _cached_android_proto_size_is_stale gets updated, we don't want to
+        # recompute the exploration's proto size. These attributes are
+        # both supporting attributes which aren't included in the
+        # proto size calculation.
+        if attrname not in (
+            '_cached_android_proto_size_in_bytes',
+            '_cached_android_proto_size_is_stale'
+        ):
+            self._cached_android_proto_size_is_stale = True
+        super().__setattr__(attrname, new_value)
 
     @classmethod
     def create_default_topic(
@@ -1194,7 +1226,7 @@ class Topic:
             constants.DEFAULT_LANGUAGE_CODE, 0,
             feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION, '', False, '')
 
-    def to_proto(self):
+    def to_android_topic_proto(self):
         """Returns a Topic proto object from its respective items.
 
         Returns:
@@ -1208,12 +1240,12 @@ class Topic:
                 story = story_fetchers.get_story_by_id(
                     reference.story_id, strict=False)
                 story_summaries_proto_list.append(
-                    story.to_proto())
+                    story.to_android_story_proto())
 
         if self.subtopics is not None:
             for subtopic in self.subtopics:
                 subtopic_summaries_proto_list.append(
-                    subtopic.to_proto())
+                    subtopic.to_android_subtopic_proto())
 
         return topic_summary_pb2.DownloadableTopicSummaryDto(
             id=self.id,
@@ -1223,17 +1255,13 @@ class Topic:
             subtopic_summaries=subtopic_summaries_proto_list,
             content_version=self.version)
 
-    def update_proto_size_in_bytes(self):
-        """Update the proto size of topic object."""
-        self.proto_size_in_bytes = self.get_proto_size()
-
     def get_proto_size(self):
         """Calculate the byte size of the proto object.
 
         Returns:
             int. The byte size of the proto object.
         """
-        return int(self.to_proto().ByteSize())
+        return int(self.to_android_topic_proto().ByteSize())
 
     @classmethod
     def _convert_subtopic_v3_dict_to_v4_dict(cls, topic_id, subtopic_dict):

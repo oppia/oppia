@@ -332,7 +332,7 @@ class StoryNode:
 
         return node
 
-    def to_proto(self):
+    def to_android_story_node_proto(self):
         """Returns a StoryNode proto object from its respective items.
 
         Returns:
@@ -986,7 +986,7 @@ class Story:
 
         return story
 
-    def to_proto(self):
+    def to_android_story_proto(self):
         """Returns a Story proto object from its respective items.
 
         Returns:
@@ -994,7 +994,7 @@ class Story:
         """
         chapters_list = []
         for node in self.story_contents.nodes:
-            chapters_list.append(node.to_proto())
+            chapters_list.append(node.to_android_story_node_proto())
 
         return topic_summary_pb2.StorySummaryDto(
             id=self.id,

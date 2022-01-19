@@ -586,7 +586,6 @@ class Skill:
         self.superseding_skill_id = superseding_skill_id
         self.all_questions_merged = all_questions_merged
         self.prerequisite_skill_ids = prerequisite_skill_ids
-        self.proto_size_in_bytes = self.get_proto_size()
 
     @classmethod
     def require_valid_skill_id(cls, skill_id):
@@ -783,7 +782,7 @@ class Skill:
             'prerequisite_skill_ids': self.prerequisite_skill_ids
         }
 
-    def to_proto(self):
+    def to_android_skill_proto(self):
         """Returns a Skill proto object from its respective items.
 
         Returns:
@@ -794,14 +793,6 @@ class Skill:
             name=self.description,
             content_version=self.version
         )
-
-    def get_proto_size(self):
-        """Calculate the byte size of the proto object.
-
-        Returns:
-            int. The byte size of the proto object.
-        """
-        return int(self.to_proto().ByteSize())
 
     def serialize(self):
         """Returns the object serialized as a JSON string.
@@ -1558,8 +1549,8 @@ class SkillSummary:
 
     def __init__(
             self, skill_id, description, language_code, version,
-            misconception_count, worked_examples_count,
-            skill_model_created_on, skill_model_last_updated):
+            misconception_count, worked_examples_count, skill_model_created_on,
+            skill_model_last_updated):
         """Constructs a SkillSummary domain object.
 
         Args:
@@ -1625,16 +1616,6 @@ class SkillSummary:
             raise utils.ValidationError(
                 'Expected worked_examples_count to be non-negative, '
                 'received \'%s\'' % self.worked_examples_count)
-
-        if not isinstance(self.proto_size_in_bytes, int):
-            raise utils.ValidationError(
-                'Expected proto size to be an int, received %s'
-                % self.proto_size_in_bytes)
-
-        if self.proto_size_in_bytes <= 0:
-            raise utils.ValidationError(
-                'Expected proto size to be a positive integer, received %s'
-                % self.proto_size_in_bytes)
 
     def to_dict(self):
         """Returns a dictionary representation of this domain object.

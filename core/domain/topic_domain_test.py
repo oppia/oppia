@@ -994,6 +994,17 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             topic_domain.Topic.deserialize(
                 self.topic.serialize()).to_dict())
 
+    def test_android_proto_size_calculation_is_correct(self):
+        """Test proto size calculation function."""
+        topic = topic_domain.Topic.create_default_topic(
+            "topic_id_new", 'Name', 'abbrev', 'description')
+        self.assertEqual(topic.android_proto_size_in_bytes, 141)
+
+        topic.language_code = 'en'
+        topic.practice_tab_is_displayed = False
+
+        self.assertEqual(topic.android_proto_size_in_bytes, 148)
+
 
 class TopicChangeTests(test_utils.GenericTestBase):
 
