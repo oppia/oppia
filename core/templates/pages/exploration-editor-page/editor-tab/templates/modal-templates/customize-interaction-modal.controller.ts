@@ -1,3 +1,4 @@
+/* eslint-disable angular/di */
 // Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -61,6 +62,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
   'ALLOWED_QUESTION_INTERACTION_CATEGORIES',
   'COMPONENT_NAME_INTERACTION_CUSTOMIZATION_ARGS',
   'INTERACTION_SPECS',
+  // eslint-disable-next-line angular/di-unused
   function(
       $controller, $injector, $scope, $uibModal, $uibModalInstance,
       ContextService, EditorFirstTimeEventsService,
@@ -68,7 +70,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
       StateCustomizationArgsService, StateEditorService,
       StateInteractionIdService, StateNextContentIdIndexService,
       UrlInterpolationService,
-      showMarkAllAudioAsNeedingUpdateModalIfRequired,
+      _showMarkAllAudioAsNeedingUpdateModalIfRequired,
       ALLOWED_EXPLORATION_IN_STORY_INTERACTION_CATEGORIES,
       ALLOWED_INTERACTION_CATEGORIES,
       ALLOWED_QUESTION_INTERACTION_CATEGORIES,
@@ -91,7 +93,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
     };
 
     $scope.INTERACTION_SPECS = INTERACTION_SPECS;
-
+// lower part
     if (StateEditorService.isInQuestionMode()) {
       $scope.ALLOWED_INTERACTION_CATEGORIES = (
         ALLOWED_QUESTION_INTERACTION_CATEGORIES);
@@ -127,13 +129,12 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
       }
 
       StateCustomizationArgsService.onSchemaBasedFormsShown.emit();
-      $scope.form = {};
       $scope.hasCustomizationArgs = (
         StateCustomizationArgsService.displayed &&
         Object.keys(StateCustomizationArgsService.displayed).length > 0
       );
     }
-
+// uppper part
     $scope.getCustomizationArgsWarningsList = function() {
       var validationServiceName =
         INTERACTION_SPECS[
@@ -173,7 +174,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
             newInteractionId).customization);
       } else {
         const customizationArgsBackendDict = {};
-        $scope.customizationArgSpecs.forEach(function(caSpec) {
+        $scope.customizationArgSpecs.forEach(function(caSpec: { name: string | number; default_value: unknown }) {
           customizationArgsBackendDict[caSpec.name] = {
             value: caSpec.default_value
           };
@@ -196,7 +197,6 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
       }
 
       StateCustomizationArgsService.onSchemaBasedFormsShown.emit();
-      $scope.form = {};
     };
 
     $scope.returnToInteractionSelector = function() {
@@ -212,7 +212,6 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
       return !!(
         $scope.hasCustomizationArgs &&
         $scope.StateInteractionIdService.displayed &&
-        $scope.form.schemaForm.$valid &&
         ($scope.getCustomizationArgsWarningsList().length === 0));
     };
 
@@ -231,11 +230,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
       });
 
       if (warningMessages.length === 0) {
-        if ($scope.form.schemaForm.$invalid) {
-          return 'Some of the form entries are invalid.';
-        } else {
-          return '';
-        }
+        return 'Some of the form entries are invalid.';
       } else {
         return warningMessages.join(' ');
       }
@@ -331,92 +326,95 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
      * in the customization arguments.
      * @returns {Object} A Mapping of content ids (string) to content (string).
      */
-    $scope.getContentIdToContent = function() {
-      const interactionId = $scope.StateInteractionIdService.displayed;
-      const contentIdToContent = {};
+    $scope.getContentIdToContent = function(): object {
+      // const interactionId = $scope.StateInteractionIdService.displayed;
+      // const contentIdToContent = {};
 
-      let traverseSchemaAndCollectContent = (
-          value: Object | Object[],
-          schema: Schema
-      ): void => {
-        const schemaIsSubtitledHtml = (
-          schema.type === SchemaConstants.SCHEMA_TYPE_CUSTOM &&
-          schema.obj_type === SchemaConstants.SCHEMA_OBJ_TYPE_SUBTITLED_HTML);
-        const schemaIsSubtitledUnicode = (
-          schema.type === SchemaConstants.SCHEMA_TYPE_CUSTOM &&
-          schema.obj_type === SchemaConstants.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE
-        );
+      // let traverseSchemaAndCollectContent = (
+      //     value: Object | Object[],
+      //     schema: Schema
+      // ): void => {
+      //   const schemaIsSubtitledHtml = (
+      //     schema.type === SchemaConstants.SCHEMA_TYPE_CUSTOM &&
+      //     schema.obj_type === SchemaConstants.SCHEMA_OBJ_TYPE_SUBTITLED_HTML);
+      //   const schemaIsSubtitledUnicode = (
+      //     schema.type === SchemaConstants.SCHEMA_TYPE_CUSTOM &&
+      //     schema.obj_type === SchemaConstants.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE
+      //   );
 
-        if (schemaIsSubtitledHtml) {
-          const subtitledHtmlValue = value as SubtitledHtml;
-          contentIdToContent[
-            subtitledHtmlValue.contentId
-          ] = subtitledHtmlValue.html;
-        } else if (schemaIsSubtitledUnicode) {
-          const subtitledUnicodeValue = value as SubtitledUnicode;
-          contentIdToContent[
-            subtitledUnicodeValue.contentId
-          ] = subtitledUnicodeValue.unicode;
-        } else if (schema.type === SchemaConstants.SCHEMA_KEY_LIST) {
-          for (let i = 0; i < (value as Object[]).length; i++) {
-            traverseSchemaAndCollectContent(value[i], schema.items as Schema);
-          }
-        } else if (schema.type === SchemaConstants.SCHEMA_TYPE_DICT) {
-          schema.properties.forEach(property => {
-            const name = property.name;
-            traverseSchemaAndCollectContent(value[name], property.schema);
-          });
-        }
-      };
+      //   if (schemaIsSubtitledHtml) {
+      //     const subtitledHtmlValue = value as SubtitledHtml;
+      //     contentIdToContent[
+      //       subtitledHtmlValue.contentId
+      //     ] = subtitledHtmlValue.html;
+      //   } else if (schemaIsSubtitledUnicode) {
+      //     const subtitledUnicodeValue = value as SubtitledUnicode;
+      //     contentIdToContent[
+      //       subtitledUnicodeValue.contentId
+      //     ] = subtitledUnicodeValue.unicode;
+      //   } else if (schema.type === SchemaConstants.SCHEMA_KEY_LIST) {
+      //     for (let i = 0; i < (value as Object[]).length; i++) {
+      //       traverseSchemaAndCollectContent(value[i], schema.items as Schema);
+      //     }
+      //   } else if (schema.type === SchemaConstants.SCHEMA_TYPE_DICT) {
+      //     schema.properties.forEach(property => {
+      //       const name = property.name;
+      //       traverseSchemaAndCollectContent(value[name], property.schema);
+      //     });
+      //   }
+      // };
 
-      const caSpecs = INTERACTION_SPECS[interactionId].customization_arg_specs;
-      const caValues = StateCustomizationArgsService.displayed;
-      for (const caSpec of caSpecs) {
-        const name = caSpec.name;
-        if (caValues.hasOwnProperty(name)) {
-          traverseSchemaAndCollectContent(caValues[name].value, caSpec.schema);
-        }
-      }
+      // const caSpecs = INTERACTION_SPECS[interactionId].customization_arg_specs;
+      // const caValues = StateCustomizationArgsService.displayed;
+      // for (const caSpec of caSpecs) {
+      //   const name = caSpec.name;
+      //   if (caValues.hasOwnProperty(name)) {
+      //     traverseSchemaAndCollectContent(caValues[name].value, caSpec.schema);
+      //   }
+      // }
 
-      return contentIdToContent;
+      // return contentIdToContent;
     };
 
     $scope.save = function() {
-      const updatedContentIdToContent = $scope.getContentIdToContent(
-        StateCustomizationArgsService.displayed);
-      const contentIdsWithModifiedContent = [];
-      Object.keys($scope.originalContentIdToContent).forEach(contentId => {
-        if (
-          $scope.originalContentIdToContent.hasOwnProperty(contentId) &&
-          updatedContentIdToContent.hasOwnProperty(contentId) &&
-          ($scope.originalContentIdToContent[contentId] !==
-            updatedContentIdToContent[contentId])
-        ) {
-          contentIdsWithModifiedContent.push(contentId);
-        }
-      });
-      showMarkAllAudioAsNeedingUpdateModalIfRequired(
-        contentIdsWithModifiedContent);
+      // Const updatedContentIdToContent = $scope.getContentIdToContent(
+      //   StateCustomizationArgsService.displayed);
+      // const contentIdsWithModifiedContent = [];
+      // console.log('called');
+      // Object.keys($scope.originalContentIdToContent).forEach(contentId => {
+      //   if (
+      //     $scope.originalContentIdToContent.hasOwnProperty(contentId) &&
+      //     updatedContentIdToContent.hasOwnProperty(contentId) &&
+      //     ($scope.originalContentIdToContent[contentId] !==
+      //       updatedContentIdToContent[contentId])
+      //   ) {
+      //     console.log('called 1 ');
+      //     contentIdsWithModifiedContent.push(contentId);
+      //   }
+      //   console.log('called 2');
+      // });
+      // showMarkAllAudioAsNeedingUpdateModalIfRequired(
+      //   contentIdsWithModifiedContent);
 
-      $scope.populateNullContentIds();
-      EditorFirstTimeEventsService.registerFirstSaveInteractionEvent();
-      $uibModalInstance.close();
+      // $scope.populateNullContentIds();
+      // EditorFirstTimeEventsService.registerFirstSaveInteractionEvent();
+      // $uibModalInstance.close();
     };
 
-    $scope.getHyphenatedLowercaseCategoryName = function(categoryName) {
+    $scope.getHyphenatedLowercaseCategoryName = function(categoryName: string) {
       return categoryName && categoryName.replace(/\s/g, '-').toLowerCase();
     };
 
     $scope.init = function() {
-      $scope.originalContentIdToContent = {};
-      if (StateInteractionIdService.savedMemento) {
-        // We track the original html or unicode for each content id so that we
-        // can detect changes in $scope.save().
-        $scope.originalContentIdToContent = $scope.getContentIdToContent(
-          StateCustomizationArgsService.displayed);
-      }
-      $scope.explorationIsLinkedToStory = (
-        ContextService.isExplorationLinkedToStory());
+      // $scope.originalContentIdToContent = {};
+      // if (StateInteractionIdService.savedMemento) {
+      //   // We track the original html or unicode for each content id so that we
+      //   // can detect changes in $scope.save().
+      //   $scope.originalContentIdToContent = $scope.getContentIdToContent(
+      //     StateCustomizationArgsService.displayed);
+      // }
+      // $scope.explorationIsLinkedToStory = (
+      //   ContextService.isExplorationLinkedToStory());
     };
 
     $scope.init();

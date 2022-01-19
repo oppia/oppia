@@ -65,7 +65,8 @@ import { RevertExplorationModalComponent } from './history-tab/modal-templates/r
     HttpClientModule,
     InteractionExtensionsModule,
     SharedComponentsModule,
-    ToastrModule.forRoot(toastrConfig)
+    ToastrModule.forRoot(toastrConfig),
+    NgbModule
   ],
   declarations: [
     CkEditorCopyToolbarComponent,
@@ -159,6 +160,7 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 import { ToastrModule } from 'ngx-toastr';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

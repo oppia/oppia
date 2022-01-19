@@ -13,8 +13,8 @@
 
 <div class="customize-interaction-body-container modal-body">
   <div ng-if="!StateInteractionIdService.displayed" ng-cloak>
-    <uib-tabset>
-      <uib-tab ng-repeat="category in ALLOWED_INTERACTION_CATEGORIES"
+    <ngb-tabset>
+      <ngb-tab ng-repeat="category in ALLOWED_INTERACTION_CATEGORIES"
                heading="<[category.name]>" active="category.active"
                class="protractor-test-interaction-tab-<[getHyphenatedLowercaseCategoryName(category.name)]>">
         <br>
@@ -31,7 +31,7 @@
     </uib-tabset>
   </div>
 
-  <form ng-if="StateInteractionIdService.displayed && hasCustomizationArgs" name="form.schemaForm" class="interaction-editor-form protractor-test-interaction-editor">
+  <div ng-if="StateInteractionIdService.displayed && hasCustomizationArgs" class="interaction-editor-form protractor-test-interaction-editor">
     <div ng-repeat="customizationArgSpec in customizationArgSpecs track by $index">
       <div ng-if="customizationArgSpec.schema.type !== 'bool'" class="oppia-interaction-customization-label"><[customizationArgSpec.description]></div>
       <schema-based-editor ng-class="{'boolean-checkbox': customizationArgSpec.schema.type === 'bool'}"
@@ -44,11 +44,11 @@
     <div ng-if="getCustomizationArgsWarningMessage()" class="alert alert-danger oppia-units-input-error">
       <[getCustomizationArgsWarningMessage()]>
     </div>
-  </form>
+  </div>
 
-  <form ng-if="StateInteractionIdService.displayed && !hasCustomizationArgs && customizationModalReopened">
+  <div ng-if="StateInteractionIdService.displayed && !hasCustomizationArgs && customizationModalReopened">
     This interaction cannot be modified. To delete it, close this popup and click the 'x' button in the top-right corner.
-  </form>
+  </div>
 </div>
 
 <div class="modal-footer">

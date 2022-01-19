@@ -17,6 +17,7 @@
  * editor.
  */
 
+import { CustomizeInteractionModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/customize-interaction-modal.component';
 import { DeleteInteractionModalComponent } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-interaction-modal.component';
@@ -92,7 +93,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
         'components/state-editor/state-interaction-editor/' +
         'state-interaction-editor.directive.html'),
       controller: [
-        '$rootScope', '$scope', '$uibModal', 'AlertsService', 'ContextService',
+        '$rootScope', '$scope', 'AlertsService', 'ContextService',
         'EditabilityService', 'ExplorationHtmlFormatterService',
         'InteractionDetailsCacheService', 'NgbModal',
         'ResponsesService', 'StateContentService',
@@ -100,7 +101,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
         'StateInteractionIdService', 'StateNextContentIdIndexService',
         'StateSolutionService', 'UrlInterpolationService',
         'WindowDimensionsService', 'INTERACTION_SPECS', function(
-            $rootScope, $scope, $uibModal, AlertsService, ContextService,
+            $rootScope, $scope, AlertsService, ContextService,
             EditabilityService, ExplorationHtmlFormatterService,
             InteractionDetailsCacheService, NgbModal,
             ResponsesService, StateContentService,
@@ -233,19 +234,18 @@ angular.module('oppia').directive('stateInteractionEditor', [
             if (EditabilityService.isEditable()) {
               AlertsService.clearWarnings();
 
-              $uibModal.open({
-                template: require(
-                  'pages/exploration-editor-page/editor-tab/templates/' +
-                  'modal-templates/customize-interaction-modal.template.html'),
-                resolve: {
-                  showMarkAllAudioAsNeedingUpdateModalIfRequired: () =>
-                    $scope.showMarkAllAudioAsNeedingUpdateModalIfRequired
-                },
-                keyboard: false,
-                backdrop: 'static',
-                windowClass: 'customize-interaction-modal',
-                controller: 'CustomizeInteractionModalController'
-              }).result.then(
+              const modalRef = NgbModal
+                .open(CustomizeInteractionModalComponent, {
+                  bkeyboard: false,
+                  backdrop: 'static',
+                  windowClass: 'customize-interaction-modal'
+                });
+
+              modalRef.componentInstance
+                .showMarkAllAudioAsNeedingUpdateModalIfRequired =
+              $scope.showMarkAllAudioAsNeedingUpdateModalIfRequired;
+
+              modalRef.result.then(
                 $scope.onCustomizationModalSavePostHook, function() {
                   StateInteractionIdService.restoreFromMemento();
                   StateCustomizationArgsService.restoreFromMemento();
