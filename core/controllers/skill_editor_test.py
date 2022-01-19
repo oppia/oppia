@@ -150,6 +150,11 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
             }]
         }
 
+    def test_cannot_get_skill_by_invalid_skill_id(self):
+        url_with_invalid_id = '%s/%s' % (
+            feconf.SKILL_EDITOR_DATA_URL_PREFIX, 'invalidSkillId')
+        self.get_json(url_with_invalid_id, expected_status_int=404)
+
     def test_guest_can_not_delete_skill(self):
         response = self.delete_json(self.url, expected_status_int=401)
         self.assertEqual(
