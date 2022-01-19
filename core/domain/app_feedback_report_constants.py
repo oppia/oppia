@@ -123,14 +123,14 @@ class STATS_PARAMETER_NAMES(enum.Enum): # pylint: disable=invalid-name
 # to PascalCase and its values to UPPER_CASE. Because we want to be consistent
 # throughout the codebase according to the coding style guide.
 # https://github.com/oppia/oppia/wiki/Coding-style-guide
-class ANDROID_TEXT_SIZE(enum.Enum): # pylint: disable=invalid-name
+class AndroidTextSize(enum.Enum): 
     """Enum for android text sizes."""
 
-    text_size_unspecified = 'text_size_unspecified' # pylint: disable=invalid-name
-    small_text_size = 'small_text_size' # pylint: disable=invalid-name
-    medium_text_size = 'medium_text_size' # pylint: disable=invalid-name
-    large_text_size = 'large_text_size' # pylint: disable=invalid-name
-    extra_large_text_size = 'extra_large_text_size' # pylint: disable=invalid-name
+    TEXT_SIZE_UNSPECIFIED = 'text_size_unspecified' 
+    SMALL_TEXT_SIZE = 'SMALL_TEXT_SIZE' 
+    MEDIUM_TEXT_SIZE = 'medium_text_size' 
+    LARGE_TEXT_SIZE = 'large_text_size' 
+    EXTRA_LARGE_TEXT_SIZE = 'extra_large_text_size' 
 
 
 # TODO(#14419): Change naming style of Enum class from SCREAMING_SNAKE_CASE
@@ -189,7 +189,7 @@ ALLOWED_FILTERS = [
 ALLOWED_ANDROID_NETWORK_TYPES = [
     ANDROID_NETWORK_TYPE.wifi, ANDROID_NETWORK_TYPE.cellular,
     ANDROID_NETWORK_TYPE.none]
-ALLOWED_ANDROID_TEXT_SIZES = [
-    ANDROID_TEXT_SIZE.text_size_unspecified, ANDROID_TEXT_SIZE.small_text_size,
-    ANDROID_TEXT_SIZE.medium_text_size, ANDROID_TEXT_SIZE.large_text_size,
-    ANDROID_TEXT_SIZE.extra_large_text_size]
+ALLOWED_AndroidTextSizeS = [
+    AndroidTextSize.TEXT_SIZE_UNSPECIFIED, AndroidTextSize.SMALL_TEXT_SIZE,
+    AndroidTextSize.MEDIUM_TEXT_SIZE, AndroidTextSize.LARGE_TEXT_SIZE,
+    AndroidTextSize.EXTRA_LARGE_TEXT_SIZE]
