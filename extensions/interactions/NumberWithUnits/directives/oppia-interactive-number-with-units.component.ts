@@ -37,7 +37,7 @@ import { NumberWithUnitsRulesService } from './number-with-units-rules.service';
   styleUrls: []
 })
 export class InteractiveNumberWithUnitsComponent
-  implements OnInit, OnDestroy {
+    implements OnInit, OnDestroy {
   @Input() labelForFocusTarget: string;
   @Input() savedSolution: InteractionAnswer;
   componentSubscriptions: Subscription = new Subscription();
