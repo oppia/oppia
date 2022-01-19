@@ -480,10 +480,11 @@ describe('Answer Classification Service', () => {
 
     it('should get default rule if the answer group can not be predicted',
       () => {
-        spyOn(predictionAlgorithmRegistryService, 'getPredictionService').and
-          .returnValue({
-            predict: (classifierData, answer) => -1
-          });
+        spyOn(
+          predictionAlgorithmRegistryService, 'getPredictionService'
+        ).and.returnValue({
+          predict: (classifierData, answer) => -1
+        });
 
         const state = (
           stateObjectFactory.createFromBackendDict(stateName, stateDict));

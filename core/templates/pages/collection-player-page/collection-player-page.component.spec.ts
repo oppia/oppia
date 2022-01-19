@@ -259,7 +259,7 @@ describe('Collection player page component', () => {
     tick();
     let res = component.isCompletedExploration('123');
 
-    expect(res).toEqual(false);
+    expect(res).toBeFalse();
   }));
 
   it('should return false on checking whether exploration is completed ' +
@@ -278,7 +278,7 @@ describe('Collection player page component', () => {
     component.collectionPlaythrough = undefined;
     let res = component.isCompletedExploration('123');
 
-    expect(res).toEqual(false);
+    expect(res).toBeFalse();
   }));
 
   it('should generate empty path parameters when collection ' +
