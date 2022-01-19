@@ -25,7 +25,7 @@ describe('ShortResponseRatioExpressionInput', () => {
   let component: ResponseNumberWithUnitsComponent;
   let fixture: ComponentFixture<ResponseNumberWithUnitsComponent>;
 
-  class mockHtmlEscaperService {
+  class MockHtmlEscaperService {
     escapedJsonToObj(answer: string): string {
       return JSON.parse(answer);
     }
@@ -37,7 +37,7 @@ describe('ShortResponseRatioExpressionInput', () => {
       providers: [
         {
           provide: HtmlEscaperService,
-          useClass: mockHtmlEscaperService
+          useClass: MockHtmlEscaperService
         },
       ],
       schemas: [NO_ERRORS_SCHEMA]

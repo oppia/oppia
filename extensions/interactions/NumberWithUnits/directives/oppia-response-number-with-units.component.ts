@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the NumberWithUnits response.
+ * @fileoverview Component for the NumberWithUnits response.
  */
 
 import { Component, Input, OnInit } from '@angular/core';

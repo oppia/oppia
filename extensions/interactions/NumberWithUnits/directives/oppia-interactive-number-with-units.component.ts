@@ -104,7 +104,7 @@ export class InteractiveNumberWithUnitsComponent
 
   submitAnswer(): void {
     try {
-      var numberWithUnits = (
+      const numberWithUnits = (
         this.numberWithUnitsObjectFactory.fromRawInputString(this.answer));
       this.currentInteractionService.onSubmit(
         numberWithUnits as unknown as string,
@@ -119,7 +119,7 @@ export class InteractiveNumberWithUnitsComponent
     this.ngbModal.open(HelpModalNumberWithUnitsComponent, {
       backdrop: true,
       windowClass: 'oppia-help-modal-number-with-units'
-    }).result.then(function() {}, function() {
+    }).result.then(() => {}, () => {
       // Note to developers:
       // This callback is triggered when the Cancel button is clicked.
       // No further action is needed.
