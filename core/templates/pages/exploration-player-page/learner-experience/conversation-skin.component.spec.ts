@@ -262,6 +262,7 @@ describe('Conversation skin component', () => {
     spyOn(statsReportingService, 'recordMaybeLeaveEvent');
     spyOn(playerTranscriptService, 'getLastStateName').and.returnValue('');
     spyOn(learnerParamsService, 'getAllParams').and.returnValue({});
+    spyOn(messengerService, 'sendMessage');
 
     let mockOnHintConsumed = new EventEmitter();
     let mockOnSolutionViewedEventEmitter = new EventEmitter();
