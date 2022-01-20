@@ -333,6 +333,23 @@ describe('Exploration Summary Tile Component', () => {
     expect(component.mobileCardToBeShown).toBe(false);
   });
 
+  it('should check if mobile card is to be shown', () => {
+    const urlPathSpy = spyOn(urlService, 'getPathname')
+      .and.returnValue('/community-library');
+    component.isWindowLarge = false;
+
+    component.checkIfMobileCardToBeShown();
+
+    expect(urlPathSpy).toHaveBeenCalled();
+    expect(component.mobileCardToBeShown).toBe(true);
+
+    urlPathSpy.and.returnValue('/not-community-library');
+
+    component.checkIfMobileCardToBeShown();
+
+    expect(component.mobileCardToBeShown).toBe(false);
+  });
+
   it('should set the hover state to true', () => {
     component.setHoverState(true);
     fixture.detectChanges();
