@@ -168,8 +168,8 @@ def get_package_file_contents(package: str, filepath: str) -> str:
         str. The contents of the file.
     """
     try:
-        with (io.open(os.path.join(
-            package, filepath) , 'r' , encoding='utf-8')) as file:
+        with io.open(os.path.join(
+            package, filepath), 'r', encoding='utf-8') as file:
             return file.read()
     except FileNotFoundError:
         return pkgutil.get_data(package, filepath).decode('utf-8')
