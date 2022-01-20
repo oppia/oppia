@@ -96,9 +96,10 @@ export class CustomizeInteractionModalComponent
     return INTERACTION_SPECS[interactionId].name;
   }
 
-  updateHtml(value: Event, index: number): void {
-    this.stateCustomizationArgsService.displayed[
-      this.customizationArgSpecs[index].name].value = value;
+  getValue(index: number): any {
+    return (
+      this.stateCustomizationArgsService.displayed[
+        this.customizationArgSpecs[index].name].value);
   }
 
   getSchemaCallback(schema: Schema): () => Schema {
