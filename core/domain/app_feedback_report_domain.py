@@ -350,7 +350,7 @@ class AppFeedbackReport:
     @classmethod
     def get_android_text_size_from_string(
         cls, text_size_name: str
-    ) -> app_feedback_report_constants.ANDROID_TEXT_SIZE:
+    ) -> app_feedback_report_constants.AndroidTextSize:
         """Determines the app text size based on the JSON value.
 
         Args:
@@ -407,7 +407,7 @@ class AppFeedbackReport:
     @classmethod
     def get_android_network_type_from_string(
         cls, network_type_name: str
-    ) -> app_feedback_report_constants.ANDROID_NETWORK_TYPE:
+    ) -> app_feedback_report_constants.AndroidNetworkType:
         """Determines the network type based on the JSON value.
 
         Args:
@@ -648,7 +648,7 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
         device_model: str,
         sdk_version: int,
         build_fingerprint: str,
-        network_type: app_feedback_report_constants.ANDROID_NETWORK_TYPE
+        network_type: app_feedback_report_constants.AndroidNetworkType
     ) -> None:
         """Constructs an AndroidDeviceSystemContext domain object.
 
@@ -840,7 +840,7 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
 
     @classmethod
     def require_valid_network_type(
-        cls, network_type: app_feedback_report_constants.ANDROID_NETWORK_TYPE
+        cls, network_type: app_feedback_report_constants.AndroidNetworkType
     ) -> None:
         """Checks that the Android device's network type is valid.
 
@@ -920,7 +920,7 @@ class AndroidAppContext(AppContext):
         entry_point: EntryPoint,
         text_language_code: str,
         audio_language_code: str,
-        text_size: app_feedback_report_constants.ANDROID_TEXT_SIZE,
+        text_size: app_feedback_report_constants.AndroidTextSize,
         only_allows_wifi_download_and_update: bool,
         automatically_update_topics: bool,
         account_is_profile_admin: bool,
@@ -1064,7 +1064,7 @@ class AndroidAppContext(AppContext):
 
     @classmethod
     def require_valid_text_size(
-        cls, text_size: app_feedback_report_constants.ANDROID_TEXT_SIZE
+        cls, text_size: app_feedback_report_constants.AndroidTextSize
     ) -> None:
         """Checks whether the package version code is a valid string code for
         Oppia Android.
