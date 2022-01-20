@@ -12,11 +12,12 @@
 </div>
 
 <div class="customize-interaction-body-container modal-body">
-  <div *ngIf="!stateInteractionIdService?.displayed">
+  <div>
     <nav ngbNav #nav="ngbNav" [(activeId)]="active" class="nav-tabs">
       <ng-container ngbNavItem *ngFor="let category of allowedInteractionCategories">
-        <a ngbNavLink>{{category.name}}</a>
+        <a ngbNavLink *ngIf="isinteractionOpen">{{category.name}}</a>
         <ng-template ngbNavContent>
+          <div *ngIf="isinteractionOpen">
           <div *ngFor="let interactionId of category.interaction_ids"
                (click)="onChangeInteractionId(interactionId)"
                class="oppia-interaction-tile protractor-test-interaction-tile-{{interactionId}}">
@@ -25,19 +26,21 @@
               {{getTitle(interactionId)}}
             </div>
           </div>
+        </div>
         </ng-template>
       </ng-container>
     </nav>
     <div [ngbNavOutlet]="nav" class="mt-4"></div>
   </div>
 
-  <div *ngIf="stateInteractionIdService.displayed && hasCustomizationArgs" class="interaction-editor-form protractor-test-interaction-editor">
-    <div *ngFor="let customizationArgSpec of customizationArgSpecs">
+  <div *ngIf="!isinteractionOpen && hasCustomizationArgs" class="interaction-editor-form protractor-test-interaction-editor">
+    <div *ngFor="let customizationArgSpec of customizationArgSpecs; index as index;">
       <div *ngIf="customizationArgSpec.schema.type !== 'bool'" class="oppia-interaction-customization-label">{{customizationArgSpec.description}}</div>
       <schema-based-editor [ngClass]="{'boolean-checkbox': customizationArgSpec.schema.type === 'bool'}"
-                           [schema]="getSchema.bind(this)"
+                           [schema]="getSchemaCallback(customizationArgSpec.schema)"
                            [localValue]="stateCustomizationArgsService.displayed[customizationArgSpec.name].value"
-                           (localValueChange)="updateHtml($event)">
+                           (localValueChange)="updateHtml($event, index)"
+                           >
       </schema-based-editor>
       <div *ngIf="customizationArgSpec.schema.type === 'bool'" class="oppia-interaction-customization-label">{{customizationArgSpec.description}}</div>
       <div class="oppia-interaction-customization-label-container"></div>
@@ -47,7 +50,7 @@
     </div>
   </div>
 
-  <div *ngIf="stateInteractionIdService.displayed && !hasCustomizationArgs && customizationModalReopened">
+  <div *ngIf="!isinteractionOpen && !hasCustomizationArgs && customizationModalReopened">
     This interaction cannot be modified. To delete it, close this popup and click the 'x' button in the top-right corner.
   </div>
 </div>
@@ -55,7 +58,7 @@
 <div class="modal-footer">
   <button class="btn btn-secondary" (click)="cancel()" *ngIf="!hasCustomizationArgs">Cancel</button>
   <!-- Do not show this button if an interaction is already selected. -->
-  <button class="btn btn-secondary float-left" (click)="returnToInteractionSelector()" *ngIf="stateInteractionIdService.displayed && !stateInteractionIdService.savedMemento && hasCustomizationArgs">Change Interaction</button>
+  <button class="btn btn-secondary float-left" (click)="returnToInteractionSelector()" *ngIf="!isinteractionOpen && !stateInteractionIdService.savedMemento && hasCustomizationArgs">Change Interaction</button>
 
   <button class="btn btn-secondary" (click)="cancelWithConfirm()" *ngIf="hasCustomizationArgs">Cancel</button>
        <!-- popover-append-to-body -->
