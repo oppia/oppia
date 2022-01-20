@@ -611,6 +611,7 @@ def populate_exploration_model_fields(exploration_model, exploration):
         exploration.correctness_feedback_enabled)
     exploration_model.android_proto_size_in_bytes = (
         exploration.android_proto_size_in_bytes)
+    exploration_model.version = exploration.version
 
     return exploration_model
 

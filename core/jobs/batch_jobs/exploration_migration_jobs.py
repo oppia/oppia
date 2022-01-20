@@ -204,7 +204,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
         exp_summary.viewer_ids = exp_rights.viewer_ids
         exp_summary.contributor_ids = contributor_ids
         exp_summary.contributors_summary = contributors_summary
-        exp_summary.version = migrated_exploration.version
+        exp_summary.version += 1
         exp_summary.exploration_model_created_on = (
             exploration_model_created_on)
         exp_summary.first_published_msec = first_published_msec
@@ -334,6 +334,12 @@ class MigrateExplorationJob(base_jobs.JobBase):
                     'EXPLORATION PROCESSED'))
         )
 
+        exploration_changes = (
+            unmigrated_exploration_models
+            | 'Generate exploration changes' >> beam.FlatMapTuple(
+                self._generate_exploration_changes)
+        )
+
         migrated_exploration_summary_results = (
             exploration_summary_models
             | 'Transform and migrate summary model' >> beam.MapTuple( # pylint: disable=line-too-long
@@ -351,12 +357,6 @@ class MigrateExplorationJob(base_jobs.JobBase):
             | 'Generate results for summary migration' >> (
                 job_result_transforms.ResultsToJobRunResults(
                     'EXPLORATION SUMMARY PROCESSED'))
-        )
-
-        exploration_changes = (
-            unmigrated_exploration_models
-            | 'Generate exploration changes' >> beam.FlatMapTuple(
-                self._generate_exploration_changes)
         )
 
         exploration_objects_list = (
@@ -391,22 +391,8 @@ class MigrateExplorationJob(base_jobs.JobBase):
                     'EXPLORATION MIGRATED'))
         )
 
-        exploration_summary_objects_list = (
-            {
-                'exp_model': unmigrated_exploration_models,
-                'exploration_summary_model': exploration_summary_models,
-            }
-            | 'Merge summary objects' >> beam.CoGroupByKey()
-            | 'Get rid of summary ID' >> beam.Values()  # pylint: disable=no-value-for-parameter
-            | 'Reorganize the exploration summary objects' >> beam.Map(lambda objects: { # pylint: disable=line-too-long
-                    'exp_model': objects['exp_model'][0],
-                    'exploration_summary_model': (
-                        objects['exploration_summary_model'][0])
-                })
-        )
-
         exploration_summary_objects_list_job_run_results = (
-            exploration_summary_objects_list
+            exploration_objects_list
             | 'Transform exploration summary objects into job run results' >> (
                 job_result_transforms.CountObjectsToJobRunResult(
                     'EXPLORATION SUMMARY MIGRATED'))
@@ -434,7 +420,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
         )
 
         exp_summary_models_to_put = (
-            exploration_summary_objects_list
+            exploration_objects_list
             | 'Generate exploration summary models to put' >> beam.Map(
                 lambda exp_objects: self._update_exploration_summary(
                     exp_objects['exploration'],
