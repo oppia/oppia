@@ -74,7 +74,7 @@ class AudioUploadHandler(base.BaseHandler):
                 audio = mp3.MP3(tempbuffer)
             else:
                 audio = mutagen.File(tempbuffer)
-        except mutagen.MutagenError:
+        except mutagen.MutagenError as mutagen_error:
             # The calls to mp3.MP3() versus mutagen.File() seem to behave
             # differently upon not being able to interpret the audio.
             # mp3.MP3() raises a MutagenError whereas mutagen.File()
@@ -82,7 +82,8 @@ class AudioUploadHandler(base.BaseHandler):
             # the case. Occasionally, mutagen.File() also seems to
             # raise a MutagenError.
             raise self.InvalidInputException(
-                'Audio not recognized as a %s file' % extension)
+                'Audio not recognized as a %s file' % extension
+            ) from mutagen_error
         tempbuffer.close()
 
         if audio is None:

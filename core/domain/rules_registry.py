@@ -72,10 +72,10 @@ class Registry:
                 specs_from_json = json.loads(
                     python_utils.get_package_file_contents(
                         'extensions', spec_file))
-            except:
+            except Exception as exception:
                 raise Exception(
                     'No specs json file found for state schema v%i' %
-                    state_schema_version)
+                    state_schema_version) from exception
 
             cls._state_schema_version_to_html_field_types_to_rule_specs[
                 state_schema_version] = specs_from_json

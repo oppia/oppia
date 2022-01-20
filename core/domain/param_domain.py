@@ -214,9 +214,9 @@ class ParamChange:
 
         try:
             hasattr(self, 'generator')
-        except KeyError:
+        except KeyError as key_error:
             raise utils.ValidationError(
-                'Invalid generator ID %s' % self._generator_id)
+                'Invalid generator ID %s' % self._generator_id) from key_error
 
         if not isinstance(self.customization_args, dict):
             raise utils.ValidationError(

@@ -236,10 +236,10 @@ def validate_topic_similarities(data):
             similarity = topic_similarities_values[row_ind][col_ind]
             try:
                 similarity = float(similarity)
-            except ValueError:
+            except ValueError as value_error:
                 raise ValueError(
                     'Expected similarity to be a float, received %s' % (
-                        similarity))
+                        similarity)) from value_error
 
             if similarity < 0.0 or similarity > 1.0:
                 raise ValueError(

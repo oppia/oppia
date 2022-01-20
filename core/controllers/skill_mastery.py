@@ -49,8 +49,9 @@ class SkillMasteryDataHandler(base.BaseHandler):
         try:
             for skill_id in skill_ids:
                 skill_domain.Skill.require_valid_skill_id(skill_id)
-        except utils.ValidationError:
-            raise self.InvalidInputException('Invalid skill ID %s' % skill_id)
+        except utils.ValidationError as validation_error:
+            raise self.InvalidInputException(
+                'Invalid skill ID %s' % skill_id) from validation_error
 
         try:
             skill_fetchers.get_multi_skills(skill_ids)
@@ -86,9 +87,9 @@ class SkillMasteryDataHandler(base.BaseHandler):
         for skill_id in skill_ids:
             try:
                 skill_domain.Skill.require_valid_skill_id(skill_id)
-            except utils.ValidationError:
+            except utils.ValidationError as validation_error:
                 raise self.InvalidInputException(
-                    'Invalid skill ID %s' % skill_id)
+                    'Invalid skill ID %s' % skill_id) from validation_error
 
             # float(bool) will not raise an error.
             if isinstance(mastery_change_per_skill[skill_id], bool):
@@ -100,11 +101,11 @@ class SkillMasteryDataHandler(base.BaseHandler):
             try:
                 mastery_change_per_skill[skill_id] = (
                     float(mastery_change_per_skill[skill_id]))
-            except (TypeError, ValueError):
+            except (TypeError, ValueError) as error:
                 raise self.InvalidInputException(
                     'Expected degree of mastery of skill %s to be a number, '
                     'received %s.'
-                    % (skill_id, mastery_change_per_skill[skill_id]))
+                    % (skill_id, mastery_change_per_skill[skill_id])) from error
 
             if current_degrees_of_mastery[skill_id] is None:
                 current_degrees_of_mastery[skill_id] = 0.0

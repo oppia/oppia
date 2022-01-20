@@ -148,8 +148,8 @@ def open_file(filename, mode, encoding='utf-8', newline=None):
     # This should be removed after we fully migrate to Python 3.
     try:
         return io.open(filename, mode, encoding=encoding, newline=newline)
-    except:
-        raise IOError('Unable to open file: %s' % filename)
+    except IOError as io_error:
+        raise IOError('Unable to open file: %s' % filename) from io_error
 
 
 def get_package_file_contents(package: str, filepath: str) -> str:

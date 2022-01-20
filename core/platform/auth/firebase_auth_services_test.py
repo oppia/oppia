@@ -387,8 +387,8 @@ class FirebaseAdminSdkStub:
 
         try:
             page_index = int(page_token) if page_token is not None else 0
-        except (ValueError, TypeError):
-            raise ValueError('page_token=%r is invalid' % page_token)
+        except (ValueError, TypeError) as error:
+            raise ValueError('page_token=%r is invalid' % page_token) from error
 
         if 0 <= page_index < len(page_list):
             return self._create_list_users_page_fragile(page_list, page_index)
