@@ -113,10 +113,10 @@ export class ContributionAndReviewBackendApiService {
     return this.http.get<FetchSuggestionsResponse>(url).toPromise();
   }
 
-  async resolveToExplorationAsync(
+  async reviewExplorationSuggestionAsync(
       expId: string,
       suggestionId: string,
-      data: ResolveToExplorationData
+      requestBody: ResolveToExplorationData
   ): Promise<void> {
     let url = this.urlInterpolationService.interpolateUrl(
       this._SUGGESTION_TO_EXPLORATION_ACTION_HANDLER_URL, {
@@ -124,13 +124,13 @@ export class ContributionAndReviewBackendApiService {
         suggestion_id: suggestionId
       }
     );
-    return this.http.put<void>(url, data).toPromise();
+    return this.http.put<void>(url, requestBody).toPromise();
   }
 
-  async resolveToSkillAsync(
+  async reviewSkillSuggestionAsync(
       skillId: string,
       suggestionId: string,
-      data: ResolveToSkillData
+      requestBody: ResolveToSkillData
   ): Promise<void> {
     let url = this.urlInterpolationService.interpolateUrl(
       this._SUGGESTION_TO_SKILL_ACTION_HANDLER_URL, {
@@ -138,28 +138,28 @@ export class ContributionAndReviewBackendApiService {
         suggestion_id: suggestionId
       }
     );
-    return this.http.put<void>(url, data).toPromise();
+    return this.http.put<void>(url, requestBody).toPromise();
   }
 
   async updateTranslationSuggestionAsync(
-      suggestionId: string, data: UpdateTranslationData
+      suggestionId: string, requestBody: UpdateTranslationData
   ): Promise<void> {
     let url = this.urlInterpolationService.interpolateUrl(
       this._UPDATE_TRANSLATION_HANDLER_URL, {
         suggestion_id: suggestionId
       }
     );
-    return this.http.put<void>(url, data).toPromise();
+    return this.http.put<void>(url, requestBody).toPromise();
   }
 
   async updateQuestionSuggestionAsync(
-      suggestionId: string, body: FormData
+      suggestionId: string, requestBody: FormData
   ): Promise<void> {
     let url = this.urlInterpolationService.interpolateUrl(
       this._UPDATE_QUESTION_HANDLER_URL, {
         suggestion_id: suggestionId
       }
     );
-    return this.http.post<void>(url, body).toPromise();
+    return this.http.post<void>(url, requestBody).toPromise();
   }
 }

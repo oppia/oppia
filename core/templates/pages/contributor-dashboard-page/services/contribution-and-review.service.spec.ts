@@ -147,7 +147,7 @@ describe('Contribution and review service', () => {
 
     it('should call onSuccess function on' +
     'resolving suggestion to exploration correctly', fakeAsync(() => {
-      spyOn(carbas, 'resolveToExplorationAsync')
+      spyOn(carbas, 'reviewExplorationSuggestionAsync')
         .and.returnValue(Promise.resolve());
 
       cars.resolveSuggestionToExploration(
@@ -156,7 +156,7 @@ describe('Contribution and review service', () => {
       );
       tick();
 
-      expect(carbas.resolveToExplorationAsync).toHaveBeenCalledWith(
+      expect(carbas.reviewExplorationSuggestionAsync).toHaveBeenCalledWith(
         'abc', 'pqr', data);
       expect(onSuccess).toHaveBeenCalledWith('pqr');
       expect(onFailure).not.toHaveBeenCalled();
@@ -164,7 +164,7 @@ describe('Contribution and review service', () => {
 
     it('should call onFailure function when' +
     'resolving suggestion to exploration fails', fakeAsync(() => {
-      spyOn(carbas, 'resolveToExplorationAsync').and
+      spyOn(carbas, 'reviewExplorationSuggestionAsync').and
         .returnValue(Promise.reject());
 
       cars.resolveSuggestionToExploration(
@@ -173,7 +173,7 @@ describe('Contribution and review service', () => {
       );
       tick();
 
-      expect(carbas.resolveToExplorationAsync).toHaveBeenCalledWith(
+      expect(carbas.reviewExplorationSuggestionAsync).toHaveBeenCalledWith(
         'abc', 'pqr', data);
       expect(onSuccess).not.toHaveBeenCalled();
       expect(onFailure).toHaveBeenCalled();
@@ -198,13 +198,15 @@ describe('Contribution and review service', () => {
 
     it('should call onSuccess function on' +
     'resolving suggestion to skill correctly', fakeAsync(() => {
-      spyOn(carbas, 'resolveToSkillAsync').and.returnValue(Promise.resolve());
+      spyOn(
+        carbas, 'reviewSkillSuggestionAsync'
+      ).and.returnValue(Promise.resolve());
 
       cars.resolveSuggestiontoSkill(
         'abc', 'pqr', 'accept', 'review message', 'easy', onSuccess, onFailure);
       tick();
 
-      expect(carbas.resolveToSkillAsync)
+      expect(carbas.reviewSkillSuggestionAsync)
         .toHaveBeenCalledWith('abc', 'pqr', data);
       expect(onSuccess).toHaveBeenCalledWith('pqr');
       expect(onFailure).not.toHaveBeenCalled();
@@ -212,13 +214,15 @@ describe('Contribution and review service', () => {
 
     it('should call onFailure function when' +
     'resolving suggestion to skill fails', fakeAsync(() => {
-      spyOn(carbas, 'resolveToSkillAsync').and.returnValue(Promise.reject());
+      spyOn(
+        carbas, 'reviewSkillSuggestionAsync'
+      ).and.returnValue(Promise.reject());
 
       cars.resolveSuggestiontoSkill(
         'abc', 'pqr', 'accept', 'review message', 'easy', onSuccess, onFailure);
       tick();
 
-      expect(carbas.resolveToSkillAsync)
+      expect(carbas.reviewSkillSuggestionAsync)
         .toHaveBeenCalledWith('abc', 'pqr', data);
       expect(onSuccess).not.toHaveBeenCalled();
       expect(onFailure).toHaveBeenCalled();

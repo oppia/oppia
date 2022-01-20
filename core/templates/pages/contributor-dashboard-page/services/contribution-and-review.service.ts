@@ -59,10 +59,10 @@ export class ContributionAndReviewService {
     return (
       this.contributionAndReviewBackendApiService.fetchSuggestionsAsync(
         fetchType
-      ).then((data) => {
+      ).then((responseBody) => {
         let suggestionIdToSuggestions: FetchSuggestions = {};
-        let targetIdToDetails = data.target_id_to_opportunity_dict;
-        data.suggestions.forEach((suggestion) => {
+        let targetIdToDetails = responseBody.target_id_to_opportunity_dict;
+        responseBody.suggestions.forEach((suggestion) => {
           suggestionIdToSuggestions[suggestion.suggestion_id] = {
             suggestion: suggestion,
             details: targetIdToDetails[suggestion.target_id]
@@ -95,7 +95,7 @@ export class ContributionAndReviewService {
       onSuccess: (suggestionId: string) => void,
       onFailure: (error) => void
   ): Promise<void> {
-    let data = {
+    let requestBody = {
       action: action,
       review_message: reviewMessage,
       commit_message: (
@@ -105,8 +105,8 @@ export class ContributionAndReviewService {
     };
 
     return this.contributionAndReviewBackendApiService
-      .resolveToExplorationAsync(
-        targetId, suggestionId, data
+      .reviewExplorationSuggestionAsync(
+        targetId, suggestionId, requestBody
       ).then(() => {
         onSuccess(suggestionId);
       }, (error) => {
@@ -120,19 +120,20 @@ export class ContributionAndReviewService {
       onSuccess: (suggestionId: string) => void,
       onFailure: () => void
   ): Promise<void> {
-    let data = {
+    let requestBody = {
       action: action,
       review_message: reviewMessage,
       skill_difficulty: skillDifficulty
     };
 
-    return this.contributionAndReviewBackendApiService.resolveToSkillAsync(
-      targetId, suggestionId, data
-    ).then(() => {
-      onSuccess(suggestionId);
-    }, () => {
-      onFailure && onFailure();
-    });
+    return this.contributionAndReviewBackendApiService
+      .reviewSkillSuggestionAsync(
+        targetId, suggestionId, requestBody
+      ).then(() => {
+        onSuccess(suggestionId);
+      }, () => {
+        onFailure && onFailure();
+      });
   }
 
   async updateTranslationSuggestionAsync(
@@ -140,13 +141,13 @@ export class ContributionAndReviewService {
       onSuccess: () => void,
       onFailure: (error) => void
   ): Promise<void> {
-    let data = {
+    let requestBody = {
       translation_html: translationHtml
     };
 
     return this.contributionAndReviewBackendApiService
       .updateTranslationSuggestionAsync(
-        suggestionId, data
+        suggestionId, requestBody
       ).then(() => {
         onSuccess();
       }, (error) => onFailure && onFailure(error));
@@ -162,17 +163,17 @@ export class ContributionAndReviewService {
       skill_difficulty: skillDifficulty,
       question_state_data: questionStateData
     };
-    const body = new FormData();
-    body.append('payload', JSON.stringify(payload));
+    const requestBody = new FormData();
+    requestBody.append('payload', JSON.stringify(payload));
     imagesData.forEach(obj => {
       if (obj.imageBlob !== null) {
-        body.append(obj.filename, obj.imageBlob);
+        requestBody.append(obj.filename, obj.imageBlob);
       }
     });
 
     return this.contributionAndReviewBackendApiService
       .updateQuestionSuggestionAsync(
-        suggestionId, body
+        suggestionId, requestBody
       ).then(() => {
         onSuccess(suggestionId);
       }, () => onFailure && onFailure(suggestionId));
