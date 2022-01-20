@@ -45,6 +45,7 @@ export class InteractionAttributesExtractorService {
     'TextInput',
     'MathEquationInput',
     'RatioExpressionInput',
+    'PencilCodeEditor',
   ];
 
   constructor(
