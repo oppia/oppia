@@ -164,7 +164,7 @@ def compile_protobuf_files(proto_files_paths):
         else:
             command = [
                 buf_path, 'generate', path, '--template',
-                os.path.abspath('buf_gen_non_frontend.yaml')]
+                os.path.abspath('buf_gen_backend.yaml')]
         process = subprocess.Popen(
             command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
             env=proto_env)

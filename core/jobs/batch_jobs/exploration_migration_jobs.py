@@ -312,7 +312,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
             # Pylint disable is needed because pylint is not able to correctly
             # detect that the value is passed through the pipe.
             | 'Add exploration rights keys' >> beam.WithKeys( # pylint: disable=no-value-for-parameter
-                lambda exploration_rights_models: exploration_rights_models.id)
+                lambda exploration_rights_model: exploration_rights_model.id)
         )
 
         migrated_exploration_results = (
@@ -434,7 +434,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
         )
 
         exp_summary_models_to_put = (
-            exploration_objects_list
+            exploration_summary_objects_list
             | 'Generate exploration summary models to put' >> beam.Map(
                 lambda exp_objects: self._update_exploration_summary(
                     exp_objects['exploration'],
