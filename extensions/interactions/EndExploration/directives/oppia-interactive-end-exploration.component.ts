@@ -30,7 +30,6 @@ import { InteractionAttributesExtractorService } from 'interactions/interaction-
 import { ReadOnlyCollectionBackendApiService } from 'domain/collection/read-only-collection-backend-api.service';
 import { UrlService } from 'services/contextual/url.service';
 
-import { AppConstants } from 'app.constants';
 import { ServicesConstants } from 'services/services.constants';
 
 @Component({
@@ -96,7 +95,6 @@ export class InteractiveEndExplorationComponent implements OnInit {
       // Display a message if any author-recommended explorations are
       // invalid.
       this.endExplorationBackendApiService.getRecommendExplorationsData(
-        AppConstants.EXPLORATION_SUMMARY_DATA_URL_TEMPLATE,
         authorRecommendedExplorationIds
       ).then((response) => {
         let foundExpIds = [];

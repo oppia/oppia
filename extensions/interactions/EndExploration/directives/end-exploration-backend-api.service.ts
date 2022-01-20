@@ -18,6 +18,7 @@
 
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { AppConstants } from 'app.constants';
 
 export interface RecommendExplorationBackendDict {
   'summaries': RecommendExplorationDict[];
@@ -36,11 +37,10 @@ export class EndExplorationBackendApiService {
   ) {}
 
   getRecommendExplorationsData(
-      explorationSummaryDataUrl: string,
       authorRecommendedExplorationIds: string[]):
         Promise<RecommendExplorationBackendDict> {
     return this.http.get<RecommendExplorationBackendDict>(
-      explorationSummaryDataUrl, {
+      AppConstants.EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, {
         params: {
           stringified_exp_ids: JSON.stringify(
             authorRecommendedExplorationIds)
