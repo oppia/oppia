@@ -220,7 +220,6 @@ export class ChangeListService {
    *
    * @param {string} stateName - The name of the newly-added state
    */
-
   addState(stateName: string): void {
     this.addChange({
       cmd: 'add_state',
@@ -235,7 +234,6 @@ export class ChangeListService {
    *
    * @param {string} stateName - The name of the deleted state.
    */
-
   deleteState(stateName: string): void {
     this.addChange({
       cmd: 'delete_state',
@@ -259,7 +257,6 @@ export class ChangeListService {
    * @param {string} newValue - The new value of the property
    * @param {string} oldValue - The previous value of the property
    */
-
   editExplorationProperty(
       backendName: string,
       newValue: string | boolean,
@@ -288,7 +285,6 @@ export class ChangeListService {
    * @param {string} newValue - The new value of the property
    * @param {string} oldValue - The previous value of the property
    */
-
   editStateProperty(
       stateName: string, backendName: StatePropertyNames,
       newValue: StatePropertyDictValues, oldValue: StatePropertyDictValues
@@ -320,7 +316,6 @@ export class ChangeListService {
    *
    * @param {object} changeList - Autosaved changeList data
    */
-
   loadAutosavedChangeList(changeList: ExplorationChange[]): void {
     this.explorationChangeList = changeList;
   }

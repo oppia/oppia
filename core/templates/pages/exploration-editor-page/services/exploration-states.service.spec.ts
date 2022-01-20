@@ -22,6 +22,7 @@ import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { ContextService } from 'services/context.service';
 import { ExplorationStatesService } from './exploration-states.service';
 import { AnswerGroup, AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 class MockNgbModalRef {
   componentInstance = {
@@ -48,6 +49,7 @@ describe('ExplorationStatesService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
       providers: [
         ChangeListService,
         {
@@ -61,7 +63,10 @@ describe('ExplorationStatesService', () => {
   beforeEach(() => {
     ngbModal = TestBed.inject(NgbModal);
     changeListService = TestBed.inject(ChangeListService);
+    contextService = TestBed.inject(ContextService);
+    explorationStatesService = TestBed.inject(ExplorationStatesService);
     answerGroupObjectFactory = TestBed.inject(AnswerGroupObjectFactory);
+    answerGroup = TestBed.inject(AnswerGroup);
   });
 
   beforeEach(() => {
