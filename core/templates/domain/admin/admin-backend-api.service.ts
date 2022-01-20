@@ -197,7 +197,8 @@ export class AdminBackendApiService {
 
   // Admin Roles Tab Services.
   async viewUsersRoleAsync(
-      username: string): Promise<UserRolesBackendResponse> {
+      username: string
+  ): Promise<UserRolesBackendResponse> {
     return new Promise((resolve, reject) => {
       this.http.get<UserRolesBackendResponse>(
         AdminPageConstants.ADMIN_ROLE_HANDLER_URL, {
