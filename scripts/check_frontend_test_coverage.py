@@ -76,7 +76,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'story-node.model.ts',
     'subtopic.model.ts',
     'translation-file-hash-loader-backend-api.service.ts',
-    'truncate-and-capitalize.filter.ts',
     'truncate-and-capitalize.pipe.ts',
     'truncate-input-based-on-interaction-answer-type.filter.ts',
     'truncate.filter.ts',
