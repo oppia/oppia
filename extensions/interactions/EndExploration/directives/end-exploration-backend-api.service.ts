@@ -18,26 +18,13 @@
 
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { HumanReadableContributorsSummary } from 'domain/summary/creator-exploration-summary.model';
 
-export interface ExplorationSummaryBackendDict {
-  'summaries': ExplorationSummaryDict[];
+export interface RecommendExplorationBackendDict {
+  'summaries': RecommendExplorationDict[];
 }
 
-export interface ExplorationSummaryDict {
-  'category': string;
-  'community_owned': boolean;
-  'human_readable_contributors_summary': (
-    HumanReadableContributorsSummary);
+export interface RecommendExplorationDict {
   'id': string;
-  'language_code': string;
-  'num_views': number;
-  'objective': string;
-  'status': string;
-  'tags': [];
-  'thumbnail_bg_color': string;
-  'thumbnail_icon_url': string;
-  'title': string;
 }
 
 @Injectable({
@@ -51,8 +38,8 @@ export class EndExplorationBackendApiService {
   getRecommendExplorationsData(
       explorationSummaryDataUrl: string,
       authorRecommendedExplorationIds: string[]):
-        Promise<ExplorationSummaryBackendDict> {
-    return this.http.get<ExplorationSummaryBackendDict>(
+        Promise<RecommendExplorationBackendDict> {
+    return this.http.get<RecommendExplorationBackendDict>(
       explorationSummaryDataUrl, {
         params: {
           stringified_exp_ids: JSON.stringify(
