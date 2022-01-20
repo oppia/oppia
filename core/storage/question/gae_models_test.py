@@ -149,7 +149,7 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
         language_code = 'en'
         version = 1
 
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception, 'The id generator for QuestionModel is producing too '
             'many collisions.'
             ):
@@ -529,7 +529,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
             self
     ) -> None:
         skill_ids = ['skill_id%s' % number for number in range(25)]
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception, 'Please keep the number of skill IDs below 20.'):
             (
                 question_models.QuestionSkillLinkModel.
@@ -737,7 +737,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
 
     def test_request_too_many_skills_raises_error(self) -> None:
         skill_ids = ['skill_id%s' % number for number in range(25)]
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception, 'Please keep the number of skill IDs below 20.'):
             (
                 question_models.QuestionSkillLinkModel.

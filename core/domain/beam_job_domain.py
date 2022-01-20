@@ -22,9 +22,13 @@ import datetime
 
 from core import utils
 from core.jobs import base_jobs
-from core.platform import models
 
-from typing import Dict, List, Type, Union # isort: skip
+from typing import Dict, List, Type, Union
+
+from core.platform import models  # pylint: disable=invalid-import-from # isort:skip
+
+# TODO(#14537): Refactor this file and remove imports marked
+# with 'invalid-import-from'.
 
 MYPY = False
 if MYPY:  # pragma: no cover
