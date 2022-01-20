@@ -51,7 +51,8 @@ CODEOWNER_IMPORTANT_PATHS = [
     '/.github/stale.yml',
     '/.github/workflows/',
     '/core/android_validation_constants*.py',
-    '/extensions/interactions/rule_templates.json']
+    '/extensions/interactions/rule_templates.json',
+    '/buf_gen_non_frontend.yaml']
 
 
 class CodeownerLintChecksManager:

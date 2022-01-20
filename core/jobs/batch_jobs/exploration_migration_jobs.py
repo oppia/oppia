@@ -18,16 +18,13 @@
 
 from __future__ import annotations
 
-import datetime
 import logging
 
 from core import feconf
-from core import python_utils
 from core.domain import caching_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
-from core.domain import opportunity_services
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
@@ -76,17 +73,6 @@ class MigrateExplorationJob(base_jobs.JobBase):
         """
         try:
             exploration = exp_fetchers.get_exploration_from_model(exp_model)
-            with datastore_services.get_ndb_context():
-                if exp_services.get_story_id_linked_to_exploration(
-                    exp_id) is not None:
-                    exp_services.validate_exploration_for_story(
-                        exploration, True)
-
-            if opportunity_services.is_exploration_available_for_contribution( # pylint: disable=line-too-long
-                exp_id):
-                    opportunity_services.update_opportunity_with_updated_exploration( # pylint: disable=line-too-long
-                        exp_id)
-
             exploration.validate()
         except Exception as e:
             logging.exception(e)
@@ -190,41 +176,16 @@ class MigrateExplorationJob(base_jobs.JobBase):
             ExpSummaryModel. The updated exploration summary model to put into
             the datastore.
         """
-        if exp_summary_model is not None:
-            old_exp_summary = exp_fetchers.get_exploration_summary_from_model(
-                exp_summary_model)
-            ratings = old_exp_summary.ratings or feconf.get_empty_ratings()
-            scaled_average_rating = (
-                exp_services.get_scaled_average_rating(ratings))
-        else:
-            ratings = feconf.get_empty_ratings()
-            scaled_average_rating = feconf.EMPTY_SCALED_AVERAGE_RATING
+        old_exp_summary = exp_fetchers.get_exploration_summary_from_model(
+            exp_summary_model)
+        ratings = old_exp_summary.ratings or feconf.get_empty_ratings()
+        scaled_average_rating = (
+            exp_services.get_scaled_average_rating(ratings))
 
         contributors_summary = (
             exp_summary_model.contributors_summary if exp_summary_model else {})
         contributor_ids = list(contributors_summary.keys())
 
-        last_human_update_ms = 0
-
-        current_version = migrated_exploration.version
-        version_nums = list(range(1, current_version + 1))
-
-        with datastore_services.get_ndb_context():
-            snapshots_metadata = (
-                exp_models.ExplorationModel.get_snapshots_metadata(
-                    migrated_exploration.id,
-                    version_nums,
-                    allow_deleted=False
-                )
-            )
-
-        for snapshot_metadata in reversed(snapshots_metadata):
-            if snapshot_metadata['committer_id'] != feconf.MIGRATION_BOT_USER_ID: # pylint: disable=line-too-long
-                last_human_update_ms = snapshot_metadata['created_on_ms']
-                break
-
-        exploration_model_last_updated = datetime.datetime.fromtimestamp(
-            python_utils.divide(last_human_update_ms, 1000.0))
         exploration_model_created_on = migrated_exploration.created_on
         first_published_msec = exp_rights.first_published_msec
 
@@ -246,8 +207,6 @@ class MigrateExplorationJob(base_jobs.JobBase):
         exp_summary.version = migrated_exploration.version
         exp_summary.exploration_model_created_on = (
             exploration_model_created_on)
-        exp_summary.exploration_model_last_updated = (
-            exploration_model_last_updated)
         exp_summary.first_published_msec = first_published_msec
 
         updated_exploration_summary_model = (

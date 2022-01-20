@@ -88,10 +88,11 @@ BUF_DIR = os.path.join(
     common.OPPIA_TOOLS_DIR, 'buf-%s' % common.BUF_VERSION)
 PROTOC_DIR = os.path.join(BUF_DIR, 'protoc')
 # Path of files which needs to be compiled by protobuf.
+# Paired with the frontend requirement.
 PROTO_FILES_PATHS = [
-    os.path.join(common.THIRD_PARTY_DIR, 'oppia-ml-proto-0.0.0'),
-    os.path.join(
-        common.THIRD_PARTY_DIR, 'oppia-proto-api-introduce-proto-api-v1')]
+    (True, os.path.join(common.THIRD_PARTY_DIR, 'oppia-ml-proto-0.0.0')),
+    (False, os.path.join(
+        common.THIRD_PARTY_DIR, 'oppia-proto-api-introduce-proto-api-v1'))]
 # Path to typescript plugin required to compile ts compatible files from proto.
 PROTOC_GEN_TS_PATH = os.path.join(common.NODE_MODULES_PATH, 'protoc-gen-ts')
 
@@ -157,9 +158,13 @@ def compile_protobuf_files(proto_files_paths):
     buf_path = os.path.join(
         BUF_DIR,
         BUF_DARWIN_FILES[0] if common.is_mac_os() else BUF_LINUX_FILES[0])
-    for path in proto_files_paths:
-        command = [
-            buf_path, 'generate', path]
+    for is_frontend_required, path in proto_files_paths:
+        if is_frontend_required:
+            command = [buf_path, 'generate', path]
+        else:
+            command = [
+                buf_path, 'generate', path, '--template',
+                os.path.abspath('buf_gen_non_frontend.yaml')]
         process = subprocess.Popen(
             command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
             env=proto_env)
