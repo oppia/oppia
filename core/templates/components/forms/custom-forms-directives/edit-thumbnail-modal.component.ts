@@ -100,6 +100,11 @@ export class EditThumbnailModalComponent implements OnInit {
 
   updateBackgroundColor(color: string): void {
     this.bgColor = color;
+    if(this.tempBgColor!=color){
+      this.thumbnailHasChanged = true;
+    } else {
+      this.thumbnailHasChanged = false;
+    }
   }
 
   setUploadedFile(file: File): void {
@@ -164,6 +169,7 @@ export class EditThumbnailModalComponent implements OnInit {
   }
 
   confirm(): void {
+    this.tempBgColor = this.bgColor;
     this.ngbActiveModal.close({
       newThumbnailDataUrl: this.uploadedImage,
       newBgColor: this.bgColor,
