@@ -123,7 +123,7 @@ class AndroidTextSize(enum.Enum):
     """Enum for android text sizes."""
 
     TEXT_SIZE_UNSPECIFIED = 'text_size_unspecified' 
-    SMALL_TEXT_SIZE = 'SMALL_TEXT_SIZE' 
+    SMALL_TEXT_SIZE = 'small_text_size' 
     MEDIUM_TEXT_SIZE = 'medium_text_size' 
     LARGE_TEXT_SIZE = 'large_text_size' 
     EXTRA_LARGE_TEXT_SIZE = 'extra_large_text_size' 
