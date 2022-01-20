@@ -59,8 +59,8 @@ export class ExplorationPlayerStateService {
   explorationId: string;
   version: number;
   storyUrlFragment: string;
-  private _playerStateChangeEventEmitter: EventEmitter<void> = (
-    new EventEmitter());
+  private _playerStateChangeEventEmitter: EventEmitter<string> = (
+    new EventEmitter<string>());
 
   constructor(
     private contextService: ContextService,
@@ -354,7 +354,7 @@ export class ExplorationPlayerStateService {
     return this._totalQuestionsReceivedEventEmitter;
   }
 
-  get onPlayerStateChange(): EventEmitter<void> {
+  get onPlayerStateChange(): EventEmitter<string> {
     return this._playerStateChangeEventEmitter;
   }
 

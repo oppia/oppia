@@ -211,7 +211,7 @@ class ReportPassTests(test_utils.GenericTestBase):
         post_swap = self.swap(requests, 'post', mock_post)
 
         with getenv_swap, post_swap:
-            with self.assertRaisesRegexp(
+            with self.assertRaisesRegex(
                 Exception, 'Unknown build environment.'):
                 flake_checker.report_pass('suiteName')
 
@@ -232,7 +232,7 @@ class ReportPassTests(test_utils.GenericTestBase):
         post_swap = self.swap(requests, 'post', mock_post)
 
         with getenv_swap, post_swap:
-            with self.assertRaisesRegexp(
+            with self.assertRaisesRegex(
                 RuntimeError,
                 'Expected environment variable CIRCLE_BUILD_URL missing'):
                 flake_checker.report_pass('suiteName')
