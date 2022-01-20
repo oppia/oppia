@@ -94,10 +94,10 @@ export class PracticeTabComponent implements OnInit {
     if (this.startButtonIsDisabled) {
       return true;
     }
-    for(const idx of Object.keys(this.selectedSubtopicIndices)) {
+    for(const idx in this.selectedSubtopicIndices) {
       if (this.selectedSubtopicIndices[idx]) {
         return !this.questionsAreAvailable;
-      }   
+      }
     }
     return true;
   }
@@ -105,7 +105,7 @@ export class PracticeTabComponent implements OnInit {
   checkIfQuestionsExist(subtopicIndices: boolean[]): void {
     const skillIds: string[] = [];
     this.questionsStatusCallIsComplete = false;
-    for(const idx of Object.keys(subtopicIndices)) {
+    for(const idx in subtopicIndices) {
       if (subtopicIndices[idx]) {
         skillIds.push(...this.availableSubtopics[idx].getSkillIds());
       }
@@ -124,7 +124,7 @@ export class PracticeTabComponent implements OnInit {
 
   openNewPracticeSession(): void {
     const selectedSubtopicIds = [];
-    for(const idx of Object.keys(this.selectedSubtopicIndices)) {
+    for(const idx in this.selectedSubtopicIndices) {
       if (this.selectedSubtopicIndices[idx]) {
         selectedSubtopicIds.push(
           this.availableSubtopics[idx].getId());      
