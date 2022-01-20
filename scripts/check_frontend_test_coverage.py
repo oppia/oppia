@@ -47,7 +47,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'ck-editor-4-widgets.initializer.ts',
     'collection-player-page.component.ts',
     'contribution-and-review.service.ts',
-    'conversation-skin.directive.ts',
     'exploration-states.service.ts',
     'expression-evaluator.service.ts',
     'expression-interpolation.service.ts',
