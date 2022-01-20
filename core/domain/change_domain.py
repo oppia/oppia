@@ -251,7 +251,7 @@ class BaseChange:
         """
         # Validating the BaseChange object by converting
         # it into a dict and using the validate_dict method.
-        # This is done because the validation of a dict was 
+        # This is done because the validation of a dict was
         # already implemented and the same logic is required here.
 
         self.validate_dict(self.to_dict())
