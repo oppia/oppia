@@ -100,7 +100,7 @@ export class EditThumbnailModalComponent implements OnInit {
 
   updateBackgroundColor(color: string): void {
     this.bgColor = color;
-    if(this.tempBgColor!=color){
+    if (this.tempBgColor !== color) {
       this.thumbnailHasChanged = true;
     } else {
       this.thumbnailHasChanged = false;
