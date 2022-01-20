@@ -30,7 +30,6 @@ import logging
 import os
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.domain import activity_services
@@ -760,7 +759,8 @@ def _save_collection(committer_id, collection, commit_message, change_list):
             'Unexpected error: trying to update version %s of collection '
             'from version %s. Please reload the page and try again.'
             % (collection_model.version, collection.version))
-    elif collection.version < collection_model.version:
+
+    if collection.version < collection_model.version:
         raise Exception(
             'Trying to update version %s of collection from version %s, '
             'which is too old. Please reload the page and try again.'
@@ -1071,8 +1071,7 @@ def compute_collection_contributors_summary(collection_id):
     contributor_ids = list(contributors_summary)
     # Remove IDs that are deleted or do not exist.
     users_settings = user_services.get_users_settings(contributor_ids)
-    for contributor_id, user_settings in python_utils.ZIP(
-            contributor_ids, users_settings):
+    for contributor_id, user_settings in zip(contributor_ids, users_settings):
         if user_settings is None:
             del contributors_summary[contributor_id]
 

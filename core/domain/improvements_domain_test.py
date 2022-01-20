@@ -104,7 +104,7 @@ class TaskEntryTests(test_utils.GenericTestBase):
             feconf.DEFAULT_INIT_STATE_NAME, 'issue description',
             improvements_models.TASK_STATUS_RESOLVED, invalid_resolver_id,
             self.MOCK_DATE)
-        with self.assertRaisesRegexp(Exception, 'User not found'): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'User not found'): # type: ignore[no-untyped-call]
             task_entry.to_dict()
 
     def test_can_create_open_task_with_corresponding_values(self) -> None:

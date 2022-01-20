@@ -33,16 +33,17 @@
                 </div>
               </div>
               <a ng-click="changeActiveAnswerGroupIndex($index)" class="oppia-rule-tab protractor-test-response-tab" ng-class="{'oppia-rule-tab-active': activeAnswerGroupIndex === $index}">
-                <response-header index="$index"
-                                 summary="summarizeAnswerGroup(answerGroup, getCurrentInteractionId(), getAnswerChoices(), false)"
-                                 short-summary="summarizeAnswerGroup(answerGroup, getCurrentInteractionId(), getAnswerChoices(), true)"
-                                 is-active="$index === activeAnswerGroupIndex"
-                                 on-delete-fn="deleteAnswerGroup"
-                                 outcome="answerGroup.outcome"
-                                 navigate-to-state="$ctrl.navigateToState"
-                                 num-rules="answerGroup.rules.length"
-                                 is-response="true">
-                </response-header>
+                <oppia-response-header [index]="$index"
+                                       [summary]="summarizeAnswerGroup(answerGroup, getCurrentInteractionId(), getAnswerChoices(), false)"
+                                       [short-summary]="summarizeAnswerGroup(answerGroup, getCurrentInteractionId(), getAnswerChoices(), true)"
+                                       [is-active]="$index === activeAnswerGroupIndex"
+                                       (delete)="deleteAnswerGroup($event)"
+                                       [outcome]="answerGroup.outcome"
+                                       [default-outcome]="false"
+                                       (navigate-to-state)="$ctrl.navigateToState($event)"
+                                       [num-rules]="answerGroup.rules.length"
+                                       [is-response]="true">
+                </oppia-response-header>
               </a>
 
               <div ng-if="activeAnswerGroupIndex === $index">
@@ -79,14 +80,15 @@
                 </div>
               </div>
               <a ng-click="changeActiveAnswerGroupIndex(answerGroups.length)" class="oppia-rule-tab oppia-default-rule-tab protractor-test-default-response-tab" ng-class="{'oppia-rule-tab-active': activeAnswerGroupIndex == answerGroups.length}">
-                <response-header index="$index"
-                                 is-active="$index === activeAnswerGroupIndex"
-                                 summary="summarizeDefaultOutcome(defaultOutcome, getCurrentInteractionId(), answerGroups.length, false)"
-                                 short-summary="summarizeDefaultOutcome(defaultOutcome, getCurrentInteractionId(), answerGroups.length, true)"
-                                 outcome="defaultOutcome"
-                                 navigate-to-state="$ctrl.navigateToState"
-                                 is-response="true">
-                </response-header>
+                <oppia-response-header [index]="$index"
+                                       [is-active]="$index === activeAnswerGroupIndex"
+                                       [summary]="summarizeDefaultOutcome(defaultOutcome, getCurrentInteractionId(), answerGroups.length, false)"
+                                       [short-summary]="summarizeDefaultOutcome(defaultOutcome, getCurrentInteractionId(), answerGroups.length, true)"
+                                       [outcome]="defaultOutcome"
+                                       [default-outcome]="true"
+                                       (navigate-to-state)="$ctrl.navigateToState($event)"
+                                       [is-response]="true">
+                </oppia-response-header>
               </a>
 
               <div ng-if="activeAnswerGroupIndex === answerGroups.length">
@@ -197,7 +199,7 @@
     margin: 8px 0;
   }
   state-responses .nav-pills > li > a.oppia-rule-tab {
-    background: #E0F2F1 !important;
+    background: #e0f2f1 !important;
   }
   state-responses .state-response-container {
     padding: 15px 30px;
@@ -216,7 +218,7 @@
     font-size: 1.75rem;
   }
   state-responses .misconception-list-item {
-    background-color: #FFF5C8;
+    background-color: #fff5c8;
     border: 2px solid #827127;
     border-radius: 4px;
     margin: 10px;
@@ -234,7 +236,7 @@
     place-content: center;
   }
   state-responses .optional-misconception-edit-options {
-    background-color: #FFF;
+    background-color: #fff;
     border: 2px solid #000;
     border-radius: 4px;
     cursor: pointer;
@@ -247,7 +249,7 @@
     z-index: 1;
   }
   state-responses .optional-misconception-list-no-action {
-    background-color: #FFF;
+    background-color: #fff;
     border: 2px solid #999;
   }
   @media screen and (max-width: 768px) {
