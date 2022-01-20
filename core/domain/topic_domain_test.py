@@ -723,7 +723,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
     ) -> None:
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'Command invalid cmd is not allowed'):
-            topic_domain.TopicRightsChange({  # type: ignore[no-untyped-call]
+            topic_domain.TopicRightsChange({
                 'cmd': 'invalid cmd'
             })
 
@@ -732,14 +732,14 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
     ) -> None:
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'Missing cmd key in change dict'):
-            topic_domain.TopicRightsChange({})  # type: ignore[no-untyped-call]
+            topic_domain.TopicRightsChange({})
 
     def test_create_new_topic_rights_change_class(self) -> None:
-        topic_rights = topic_domain.TopicRightsChange({  # type: ignore[no-untyped-call]
+        topic_rights = topic_domain.TopicRightsChange({
             'cmd': 'create_new'
         })
 
-        self.assertEqual(topic_rights.to_dict(), {'cmd': 'create_new'})  # type: ignore[no-untyped-call]
+        self.assertEqual(topic_rights.to_dict(), {'cmd': 'create_new'})
 
     def test_update_language_code(self) -> None:
         self.assertEqual(self.topic.language_code, 'en')
@@ -885,19 +885,19 @@ class TopicChangeTests(test_utils.GenericTestBase):
     def test_topic_change_object_with_missing_cmd(self) -> None:
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Missing cmd key in change dict'):
-            topic_domain.TopicChange({'invalid': 'data'})  # type: ignore[no-untyped-call]
+            topic_domain.TopicChange({'invalid': 'data'})
 
     def test_topic_change_object_with_invalid_cmd(self) -> None:
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Command invalid is not allowed'):
-            topic_domain.TopicChange({'cmd': 'invalid'})  # type: ignore[no-untyped-call]
+            topic_domain.TopicChange({'cmd': 'invalid'})
 
     def test_topic_change_object_with_missing_attribute_in_cmd(self) -> None:
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, (
                 'The following required attributes are missing: '
                 'new_value, old_value')):
-            topic_domain.TopicChange({  # type: ignore[no-untyped-call]
+            topic_domain.TopicChange({
                 'cmd': 'update_topic_property',
                 'property_name': 'name',
             })
@@ -906,7 +906,7 @@ class TopicChangeTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, (
                 'The following extra attributes are present: invalid')):
-            topic_domain.TopicChange({  # type: ignore[no-untyped-call]
+            topic_domain.TopicChange({
                 'cmd': 'add_subtopic',
                 'title': 'title',
                 'subtopic_id': 'subtopic_id',
@@ -918,7 +918,7 @@ class TopicChangeTests(test_utils.GenericTestBase):
             utils.ValidationError, (
                 'Value for property_name in cmd update_topic_property: '
                 'invalid is not allowed')):
-            topic_domain.TopicChange({  # type: ignore[no-untyped-call]
+            topic_domain.TopicChange({
                 'cmd': 'update_topic_property',
                 'property_name': 'invalid',
                 'old_value': 'old_value',
@@ -930,7 +930,7 @@ class TopicChangeTests(test_utils.GenericTestBase):
             utils.ValidationError, (
                 'Value for property_name in cmd update_subtopic_property: '
                 'invalid is not allowed')):
-            topic_domain.TopicChange({  # type: ignore[no-untyped-call]
+            topic_domain.TopicChange({
                 'cmd': 'update_subtopic_property',
                 'subtopic_id': 'subtopic_id',
                 'property_name': 'invalid',
@@ -945,7 +945,7 @@ class TopicChangeTests(test_utils.GenericTestBase):
             utils.ValidationError, (
                 'Value for property_name in cmd update_subtopic_page_property: '
                 'invalid is not allowed')):
-            topic_domain.TopicChange({  # type: ignore[no-untyped-call]
+            topic_domain.TopicChange({
                 'cmd': 'update_subtopic_page_property',
                 'subtopic_id': 'subtopic_id',
                 'property_name': 'invalid',
@@ -954,7 +954,7 @@ class TopicChangeTests(test_utils.GenericTestBase):
             })
 
     def test_topic_change_object_with_add_subtopic(self) -> None:
-        topic_change_object = topic_domain.TopicChange({  # type: ignore[no-untyped-call]
+        topic_change_object = topic_domain.TopicChange({
             'cmd': 'add_subtopic',
             'subtopic_id': 'subtopic_id',
             'title': 'title'
@@ -965,7 +965,7 @@ class TopicChangeTests(test_utils.GenericTestBase):
         self.assertEqual(topic_change_object.title, 'title')
 
     def test_topic_change_object_with_delete_subtopic(self) -> None:
-        topic_change_object = topic_domain.TopicChange({  # type: ignore[no-untyped-call]
+        topic_change_object = topic_domain.TopicChange({
             'cmd': 'delete_subtopic',
             'subtopic_id': 'subtopic_id'
         })
@@ -974,7 +974,7 @@ class TopicChangeTests(test_utils.GenericTestBase):
         self.assertEqual(topic_change_object.subtopic_id, 'subtopic_id')
 
     def test_topic_change_object_with_add_uncategorized_skill_id(self) -> None:
-        topic_change_object = topic_domain.TopicChange({  # type: ignore[no-untyped-call]
+        topic_change_object = topic_domain.TopicChange({
             'cmd': 'add_uncategorized_skill_id',
             'new_uncategorized_skill_id': 'new_uncategorized_skill_id'
         })
@@ -987,7 +987,7 @@ class TopicChangeTests(test_utils.GenericTestBase):
     def test_topic_change_object_with_remove_uncategorized_skill_id(
         self
     ) -> None:
-        topic_change_object = topic_domain.TopicChange({  # type: ignore[no-untyped-call]
+        topic_change_object = topic_domain.TopicChange({
             'cmd': 'remove_uncategorized_skill_id',
             'uncategorized_skill_id': 'uncategorized_skill_id'
         })
@@ -999,7 +999,7 @@ class TopicChangeTests(test_utils.GenericTestBase):
             'uncategorized_skill_id')
 
     def test_topic_change_object_with_move_skill_id_to_subtopic(self) -> None:
-        topic_change_object = topic_domain.TopicChange({  # type: ignore[no-untyped-call]
+        topic_change_object = topic_domain.TopicChange({
             'cmd': 'move_skill_id_to_subtopic',
             'skill_id': 'skill_id',
             'old_subtopic_id': 'old_subtopic_id',
@@ -1014,7 +1014,7 @@ class TopicChangeTests(test_utils.GenericTestBase):
     def test_topic_change_object_with_remove_skill_id_from_subtopic(
         self
     ) -> None:
-        topic_change_object = topic_domain.TopicChange({  # type: ignore[no-untyped-call]
+        topic_change_object = topic_domain.TopicChange({
             'cmd': 'remove_skill_id_from_subtopic',
             'skill_id': 'skill_id',
             'subtopic_id': 'subtopic_id'
@@ -1026,7 +1026,7 @@ class TopicChangeTests(test_utils.GenericTestBase):
         self.assertEqual(topic_change_object.subtopic_id, 'subtopic_id')
 
     def test_topic_change_object_with_update_subtopic_property(self) -> None:
-        topic_change_object = topic_domain.TopicChange({  # type: ignore[no-untyped-call]
+        topic_change_object = topic_domain.TopicChange({
             'cmd': 'update_subtopic_property',
             'subtopic_id': 'subtopic_id',
             'property_name': 'title',
@@ -1043,7 +1043,7 @@ class TopicChangeTests(test_utils.GenericTestBase):
     def test_topic_change_object_with_update_subtopic_page_property(
         self
     ) -> None:
-        topic_change_object = topic_domain.TopicChange({  # type: ignore[no-untyped-call]
+        topic_change_object = topic_domain.TopicChange({
             'cmd': 'update_subtopic_page_property',
             'subtopic_id': 'subtopic_id',
             'property_name': 'page_contents_html',
@@ -1060,7 +1060,7 @@ class TopicChangeTests(test_utils.GenericTestBase):
         self.assertEqual(topic_change_object.old_value, 'old_value')
 
     def test_topic_change_object_with_update_topic_property(self) -> None:
-        topic_change_object = topic_domain.TopicChange({  # type: ignore[no-untyped-call]
+        topic_change_object = topic_domain.TopicChange({
             'cmd': 'update_topic_property',
             'property_name': 'name',
             'new_value': 'new_value',
@@ -1073,7 +1073,7 @@ class TopicChangeTests(test_utils.GenericTestBase):
         self.assertEqual(topic_change_object.old_value, 'old_value')
 
     def test_topic_change_object_with_create_new(self) -> None:
-        topic_change_object = topic_domain.TopicChange({  # type: ignore[no-untyped-call]
+        topic_change_object = topic_domain.TopicChange({
             'cmd': 'create_new',
             'name': 'name',
         })
@@ -1084,7 +1084,7 @@ class TopicChangeTests(test_utils.GenericTestBase):
     def test_topic_change_object_with_migrate_subtopic_schema_to_latest_version(
         self
     ) -> None:
-        topic_change_object = topic_domain.TopicChange({  # type: ignore[no-untyped-call]
+        topic_change_object = topic_domain.TopicChange({
             'cmd': 'migrate_subtopic_schema_to_latest_version',
             'from_version': 'from_version',
             'to_version': 'to_version',
@@ -1101,8 +1101,8 @@ class TopicChangeTests(test_utils.GenericTestBase):
             'cmd': 'create_new',
             'name': 'name'
         }
-        topic_change_object = topic_domain.TopicChange(topic_change_dict)  # type: ignore[no-untyped-call]
-        self.assertEqual(topic_change_object.to_dict(), topic_change_dict)  # type: ignore[no-untyped-call]
+        topic_change_object = topic_domain.TopicChange(topic_change_dict)
+        self.assertEqual(topic_change_object.to_dict(), topic_change_dict)
 
 
 class TopicRightsChangeTests(test_utils.GenericTestBase):
@@ -1110,12 +1110,12 @@ class TopicRightsChangeTests(test_utils.GenericTestBase):
     def test_topic_rights_change_object_with_missing_cmd(self) -> None:
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Missing cmd key in change dict'):
-            topic_domain.TopicRightsChange({'invalid': 'data'})  # type: ignore[no-untyped-call]
+            topic_domain.TopicRightsChange({'invalid': 'data'})
 
     def test_topic_change_rights_object_with_invalid_cmd(self) -> None:
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Command invalid is not allowed'):
-            topic_domain.TopicRightsChange({'cmd': 'invalid'})  # type: ignore[no-untyped-call]
+            topic_domain.TopicRightsChange({'cmd': 'invalid'})
 
     def test_topic_rights_change_object_with_missing_attribute_in_cmd(
         self
@@ -1124,7 +1124,7 @@ class TopicRightsChangeTests(test_utils.GenericTestBase):
             utils.ValidationError, (
                 'The following required attributes are missing: '
                 'new_role, old_role')):
-            topic_domain.TopicRightsChange({  # type: ignore[no-untyped-call]
+            topic_domain.TopicRightsChange({
                 'cmd': 'change_role',
                 'assignee_id': 'assignee_id',
             })
@@ -1135,7 +1135,7 @@ class TopicRightsChangeTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, (
                 'The following extra attributes are present: invalid')):
-            topic_domain.TopicRightsChange({  # type: ignore[no-untyped-call]
+            topic_domain.TopicRightsChange({
                 'cmd': 'publish_topic',
                 'invalid': 'invalid'
             })
@@ -1145,7 +1145,7 @@ class TopicRightsChangeTests(test_utils.GenericTestBase):
             utils.ValidationError, (
                 'Value for old_role in cmd change_role: '
                 'invalid is not allowed')):
-            topic_domain.TopicRightsChange({  # type: ignore[no-untyped-call]
+            topic_domain.TopicRightsChange({
                 'cmd': 'change_role',
                 'assignee_id': 'assignee_id',
                 'old_role': 'invalid',
@@ -1153,14 +1153,14 @@ class TopicRightsChangeTests(test_utils.GenericTestBase):
             })
 
     def test_topic_rights_change_object_with_create_new(self) -> None:
-        topic_rights_change_object = topic_domain.TopicRightsChange({  # type: ignore[no-untyped-call]
+        topic_rights_change_object = topic_domain.TopicRightsChange({
             'cmd': 'create_new'
         })
 
         self.assertEqual(topic_rights_change_object.cmd, 'create_new')
 
     def test_topic_rights_change_object_with_change_role(self) -> None:
-        topic_rights_change_object = topic_domain.TopicRightsChange({  # type: ignore[no-untyped-call]
+        topic_rights_change_object = topic_domain.TopicRightsChange({
             'cmd': 'change_role',
             'assignee_id': 'assignee_id',
             'old_role': topic_domain.ROLE_NONE,
@@ -1175,14 +1175,14 @@ class TopicRightsChangeTests(test_utils.GenericTestBase):
             topic_rights_change_object.new_role, topic_domain.ROLE_MANAGER)
 
     def test_topic_rights_change_object_with_publish_topic(self) -> None:
-        topic_rights_change_object = topic_domain.TopicRightsChange({  # type: ignore[no-untyped-call]
+        topic_rights_change_object = topic_domain.TopicRightsChange({
             'cmd': 'publish_topic'
         })
 
         self.assertEqual(topic_rights_change_object.cmd, 'publish_topic')
 
     def test_topic_rights_change_object_with_unpublish_topic(self) -> None:
-        topic_rights_change_object = topic_domain.TopicRightsChange({  # type: ignore[no-untyped-call]
+        topic_rights_change_object = topic_domain.TopicRightsChange({
             'cmd': 'unpublish_topic'
         })
 
@@ -1195,10 +1195,10 @@ class TopicRightsChangeTests(test_utils.GenericTestBase):
             'old_role': topic_domain.ROLE_NONE,
             'new_role': topic_domain.ROLE_MANAGER
         }
-        topic_rights_change_object = topic_domain.TopicRightsChange(  # type: ignore[no-untyped-call]
+        topic_rights_change_object = topic_domain.TopicRightsChange(
             topic_rights_change_dict)
         self.assertEqual(
-            topic_rights_change_object.to_dict(), topic_rights_change_dict)  # type: ignore[no-untyped-call]
+            topic_rights_change_object.to_dict(), topic_rights_change_dict)
 
 
 class TopicSummaryTests(test_utils.GenericTestBase):
