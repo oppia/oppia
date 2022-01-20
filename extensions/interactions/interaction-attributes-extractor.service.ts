@@ -33,6 +33,7 @@ import { InteractionSpecsConstants, InteractionSpecsKey } from 'pages/interactio
 export class InteractionAttributesExtractorService {
   private readonly migratedInteractions: string[] = [
     'Continue',
+    'EndExploration',
     'FractionInput',
     'GraphInput',
     'ImageClickInput',

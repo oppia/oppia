@@ -39,6 +39,7 @@ export class ExplorationHtmlFormatterService {
     'AlgebraicExpressionInput',
     'CodeRepl',
     'Continue',
+    'EndExploration',
     'FractionInput',
     'GraphInput',
     'ImageClickInput',

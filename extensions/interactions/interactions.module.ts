@@ -23,6 +23,7 @@ import { NgModule } from '@angular/core';
 
 import { AlgebraicExpressionInputExtensionsModule } from './AlgebraicExpressionInput/algebraic-expression-input-interactions.module';
 import { ContinueExtensionsModule } from './Continue/continue-interactions.module';
+import { EndExplorationExtensionsModule } from './EndExploration/end-exploration-interactions.module';
 import { FractionInputInteractionModule } from './FractionInput/fraction-input-interactions.module';
 import { GraphInputInteractionModule } from './GraphInput/graph-input-interactions.module';
 import { ImageClickInputInteractionModule } from './ImageClickInput/image-click-input-interactions.module';
@@ -42,6 +43,7 @@ import { TranslateModule } from '@ngx-translate/core';
     AlgebraicExpressionInputExtensionsModule,
     CodeReplInteractionModule,
     ContinueExtensionsModule,
+    EndExplorationExtensionsModule,
     FractionInputInteractionModule,
     GraphInputInteractionModule,
     ImageClickInputInteractionModule,
@@ -60,6 +62,7 @@ import { TranslateModule } from '@ngx-translate/core';
     AlgebraicExpressionInputExtensionsModule,
     CodeReplInteractionModule,
     ContinueExtensionsModule,
+    EndExplorationExtensionsModule,
     FractionInputInteractionModule,
     GraphInputInteractionModule,
     ImageClickInputInteractionModule,
