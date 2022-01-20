@@ -141,6 +141,7 @@ class BaseChange:
             ValidationError. The given change_dict is not valid.
         """
         self.validate_dict(change_dict)
+
         cmd_name = change_dict['cmd']
         self.cmd = cmd_name
 
@@ -248,9 +249,12 @@ class BaseChange:
             ValidationError. One or more attributes of the BaseChange are
                 invalid.
         """
+        # Validating the BaseChange object by converting
+        # it into a dict and using the validate_dict method.
+        # This is done because the validation of a dict was 
+        # already implemented and the same logic is required here.
 
-        base_change_dict = self.to_dict()
-        self.validate_dict(base_change_dict)
+        self.validate_dict(self.to_dict())
 
     def __getattr__(self, name: str) -> str:
         # AttributeError needs to be thrown in order to make

@@ -254,8 +254,7 @@ class EditableSkillDataHandler(base.BaseHandler):
                 'Commit messages must be at most %s characters long.'
                 % constants.MAX_COMMIT_MESSAGE_LENGTH)
 
-        change_dicts = self.normalized_payload.get('change_dicts')
-        change_list = change_dicts
+        change_list = self.normalized_payload.get('change_dicts')
         try:
             skill_services.update_skill(
                 self.user_id, skill_id, change_list, commit_message)
@@ -273,7 +272,6 @@ class EditableSkillDataHandler(base.BaseHandler):
     @acl_decorators.can_delete_skill
     def delete(self, skill_id):
         """Handles Delete requests."""
-        skill_domain.Skill.require_valid_skill_id(skill_id)
 
         skill_services.remove_skill_from_all_topics(self.user_id, skill_id)
 
