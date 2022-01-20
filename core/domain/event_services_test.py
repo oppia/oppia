@@ -65,7 +65,6 @@ class ExplorationActualStartEventHandlerTests(test_utils.GenericTestBase):
     def test_record_exploration_actual_start_events(self):
         all_models = (
             stats_models.ExplorationActualStartEventLogEntryModel.get_all())
-
         self.assertEqual(all_models.count(), 0)
 
         event_services.ExplorationActualStartEventHandler.record(
@@ -73,7 +72,6 @@ class ExplorationActualStartEventHandlerTests(test_utils.GenericTestBase):
 
         all_models = (
             stats_models.ExplorationActualStartEventLogEntryModel.get_all())
-
         self.assertEqual(all_models.count(), 1)
 
         model = all_models.get()
@@ -89,7 +87,6 @@ class SolutionHitEventHandlerTests(test_utils.GenericTestBase):
     def test_record_solution_hit_events(self):
         all_models = (
             stats_models.SolutionHitEventLogEntryModel.get_all())
-
         self.assertEqual(all_models.count(), 0)
 
         event_services.SolutionHitEventHandler.record(
@@ -97,7 +94,6 @@ class SolutionHitEventHandlerTests(test_utils.GenericTestBase):
 
         all_models = (
             stats_models.SolutionHitEventLogEntryModel.get_all())
-
         self.assertEqual(all_models.count(), 1)
 
         model = all_models.get()
@@ -123,7 +119,6 @@ class StartExplorationEventHandlerTests(test_utils.GenericTestBase):
 
         all_models = (
             stats_models.StartExplorationEventLogEntryModel.get_all())
-
         self.assertEqual(all_models.count(), 1)
 
         model = all_models.get()
@@ -153,7 +148,6 @@ class MaybeLeaveExplorationEventHandlerTests(test_utils.GenericTestBase):
 
         all_models = (
             stats_models.MaybeLeaveExplorationEventLogEntryModel.get_all())
-
         self.assertEqual(all_models.count(), 1)
 
         model = all_models.get()
@@ -184,7 +178,6 @@ class CompleteExplorationEventHandlerTests(test_utils.GenericTestBase):
 
         all_models = (
             stats_models.CompleteExplorationEventLogEntryModel.get_all())
-
         self.assertEqual(all_models.count(), 1)
 
         model = all_models.get()
@@ -214,7 +207,6 @@ class RateExplorationEventHandlerTests(test_utils.GenericTestBase):
 
         all_models = (
             stats_models.RateExplorationEventLogEntryModel.get_all())
-
         self.assertEqual(all_models.count(), 1)
 
         model = all_models.get()
@@ -232,7 +224,6 @@ class StateHitEventHandlerTests(test_utils.GenericTestBase):
     def test_record_state_hit_events(self):
         all_models = (
             stats_models.StateHitEventLogEntryModel.get_all())
-
         self.assertEqual(all_models.count(), 0)
 
         event_services.StateHitEventHandler.record(
@@ -241,7 +232,6 @@ class StateHitEventHandlerTests(test_utils.GenericTestBase):
 
         all_models = (
             stats_models.StateHitEventLogEntryModel.get_all())
-
         self.assertEqual(all_models.count(), 1)
 
         model = all_models.get()
@@ -259,7 +249,6 @@ class StateCompleteEventHandlerTests(test_utils.GenericTestBase):
     def test_record_state_complete_events(self):
         all_models = (
             stats_models.StateCompleteEventLogEntryModel.get_all())
-
         self.assertEqual(all_models.count(), 0)
 
         event_services.StateCompleteEventHandler.record(
@@ -267,7 +256,6 @@ class StateCompleteEventHandlerTests(test_utils.GenericTestBase):
 
         all_models = (
             stats_models.StateCompleteEventLogEntryModel.get_all())
-
         self.assertEqual(all_models.count(), 1)
 
         model = all_models.get()
@@ -285,7 +273,6 @@ class LeaveForRefresherExpEventHandlerTests(test_utils.GenericTestBase):
         all_models = (
             stats_models.LeaveForRefresherExplorationEventLogEntryModel
             .get_all())
-
         self.assertEqual(all_models.count(), 0)
 
         event_services.LeaveForRefresherExpEventHandler.record(
@@ -294,7 +281,6 @@ class LeaveForRefresherExpEventHandlerTests(test_utils.GenericTestBase):
         all_models = (
             stats_models.LeaveForRefresherExplorationEventLogEntryModel
             .get_all())
-
         self.assertEqual(all_models.count(), 1)
 
         model = all_models.get()
@@ -407,7 +393,6 @@ class StatsEventsHandlerUnitTests(test_utils.GenericTestBase):
 
         all_models = (
             stats_models.ExplorationStatsModel.get_all())
-
         self.assertEqual(all_models.count(), 0)
 
         exp_id = 'eid1'
@@ -433,7 +418,6 @@ class AnswerSubmissionEventHandlerTests(test_utils.GenericTestBase):
     def test_answer_submission(self):
         all_models = (
             stats_models.AnswerSubmittedEventLogEntryModel.get_all())
-
         self.assertEqual(all_models.count(), 0)
 
         exp_id = 'eid1'
@@ -473,7 +457,6 @@ class AnswerSubmissionEventHandlerTests(test_utils.GenericTestBase):
 
         all_models = (
             stats_models.AnswerSubmittedEventLogEntryModel.get_all())
-
         self.assertEqual(all_models.count(), 1)
 
         model = all_models.get()
@@ -534,18 +517,20 @@ class UserStatsEventsFunctionsTests(test_utils.GenericTestBase):
     def test_average_ratings_of_users_exps_are_calculated_correctly(self):
 
         # If user id is not present in UserStatsModel.
+        # Here, self.admin_id is not yet inserted in the user models.
         event_services.handle_exploration_rating('exp_id', 5, None)
         admin_average_ratings = (
             user_services.get_dashboard_stats(self.admin_id)['average_ratings'])
         self.assertEqual(admin_average_ratings, 5)
 
+        # Inserting self.admin_id in the UserStatsModel.
         user_models.UserStatsModel(
             id=self.admin_id, average_ratings=None, num_ratings=0, total_plays=0
         ).put()
 
         admin_average_ratings = (
             user_services.get_dashboard_stats(self.admin_id)['average_ratings'])
-        self.assertIsNone(admin_average_ratings)
+        self.assertEqual(admin_average_ratings, None)
 
         event_services.handle_exploration_rating('exp_id', 5, None)
         admin_average_ratings = (
