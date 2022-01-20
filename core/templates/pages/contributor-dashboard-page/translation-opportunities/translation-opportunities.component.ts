@@ -89,8 +89,7 @@ export class TranslationOpportunitiesComponent {
         translationsCount: opportunity.getTranslationsCount(languageCode)
       };
       this.allOpportunities[opportunityDict.id] = opportunityDict;
-      opportunitiesDicts.push(opportunityDict);    
-
+      opportunitiesDicts.push(opportunityDict); 
     }
     return {opportunitiesDicts, more};
   }

@@ -95,8 +95,7 @@ angular.module('oppia').component('questionOpportunities', {
             actionButtonTitle: 'Suggest Question',
           };
           allOpportunities[opportunityDict.id] = opportunityDict;
-          opportunitiesDicts.push(opportunityDict);
-          
+          opportunitiesDicts.push(opportunityDict);          
         });
         return {opportunitiesDicts, more};
       };
