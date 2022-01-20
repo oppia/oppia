@@ -60,8 +60,8 @@ export class ContributionAndReviewService {
       this.contributionAndReviewBackendApiService.fetchSuggestionsAsync(
         fetchType
       ).then((responseBody) => {
-        let suggestionIdToSuggestions: FetchSuggestions = {};
-        let targetIdToDetails = responseBody.target_id_to_opportunity_dict;
+        const suggestionIdToSuggestions: FetchSuggestions = {};
+        const targetIdToDetails = responseBody.target_id_to_opportunity_dict;
         responseBody.suggestions.forEach((suggestion) => {
           suggestionIdToSuggestions[suggestion.suggestion_id] = {
             suggestion: suggestion,
@@ -95,7 +95,7 @@ export class ContributionAndReviewService {
       onSuccess: (suggestionId: string) => void,
       onFailure: (error) => void
   ): Promise<void> {
-    let requestBody = {
+    const requestBody = {
       action: action,
       review_message: reviewMessage,
       commit_message: (
@@ -120,7 +120,7 @@ export class ContributionAndReviewService {
       onSuccess: (suggestionId: string) => void,
       onFailure: () => void
   ): Promise<void> {
-    let requestBody = {
+    const requestBody = {
       action: action,
       review_message: reviewMessage,
       skill_difficulty: skillDifficulty
@@ -141,7 +141,7 @@ export class ContributionAndReviewService {
       onSuccess: () => void,
       onFailure: (error) => void
   ): Promise<void> {
-    let requestBody = {
+    const requestBody = {
       translation_html: translationHtml
     };
 

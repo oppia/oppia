@@ -91,7 +91,7 @@ export class ContributionAndReviewBackendApiService {
       targetType: string,
       suggestionType: string
   ): Promise<FetchSuggestionsResponse> {
-    let url = this.urlInterpolationService.interpolateUrl(
+    const url = this.urlInterpolationService.interpolateUrl(
       this._SUBMITTED_SUGGESTION_LIST_HANDLER_URL, {
         target_type: targetType,
         suggestion_type: suggestionType
@@ -104,7 +104,7 @@ export class ContributionAndReviewBackendApiService {
       targetType: string,
       suggestionType: string
   ): Promise<FetchSuggestionsResponse> {
-    let url = this.urlInterpolationService.interpolateUrl(
+    const url = this.urlInterpolationService.interpolateUrl(
       this._REVIEWABLE_SUGGESTIONS_HANDLER_URL, {
         target_type: targetType,
         suggestion_type: suggestionType
@@ -118,7 +118,7 @@ export class ContributionAndReviewBackendApiService {
       suggestionId: string,
       requestBody: ResolveToExplorationData
   ): Promise<void> {
-    let url = this.urlInterpolationService.interpolateUrl(
+    const url = this.urlInterpolationService.interpolateUrl(
       this._SUGGESTION_TO_EXPLORATION_ACTION_HANDLER_URL, {
         exp_id: expId,
         suggestion_id: suggestionId
@@ -132,7 +132,7 @@ export class ContributionAndReviewBackendApiService {
       suggestionId: string,
       requestBody: ResolveToSkillData
   ): Promise<void> {
-    let url = this.urlInterpolationService.interpolateUrl(
+    const url = this.urlInterpolationService.interpolateUrl(
       this._SUGGESTION_TO_SKILL_ACTION_HANDLER_URL, {
         skill_id: skillId,
         suggestion_id: suggestionId
@@ -144,7 +144,7 @@ export class ContributionAndReviewBackendApiService {
   async updateTranslationSuggestionAsync(
       suggestionId: string, requestBody: UpdateTranslationData
   ): Promise<void> {
-    let url = this.urlInterpolationService.interpolateUrl(
+    const url = this.urlInterpolationService.interpolateUrl(
       this._UPDATE_TRANSLATION_HANDLER_URL, {
         suggestion_id: suggestionId
       }
@@ -155,7 +155,7 @@ export class ContributionAndReviewBackendApiService {
   async updateQuestionSuggestionAsync(
       suggestionId: string, requestBody: FormData
   ): Promise<void> {
-    let url = this.urlInterpolationService.interpolateUrl(
+    const url = this.urlInterpolationService.interpolateUrl(
       this._UPDATE_QUESTION_HANDLER_URL, {
         suggestion_id: suggestionId
       }
