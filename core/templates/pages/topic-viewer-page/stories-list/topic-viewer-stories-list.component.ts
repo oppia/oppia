@@ -21,6 +21,8 @@ import { downgradeComponent } from '@angular/upgrade/static';
 
 import { StorySummary } from 'domain/story/story-summary.model';
 import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
+import { WindowDimensionsService } from
+  'services/contextual/window-dimensions.service';
 
 @Component({
   selector: 'stories-list',
@@ -38,7 +40,8 @@ export class StoriesListComponent implements OnInit {
   topicDescTranslationKey: string;
 
   constructor(
-    private i18nLanguageCodeService: I18nLanguageCodeService
+    private i18nLanguageCodeService: I18nLanguageCodeService,
+    private windowDimensionsService: WindowDimensionsService
   ) {}
 
   ngOnInit(): void {
@@ -62,6 +65,10 @@ export class StoriesListComponent implements OnInit {
         this.topicDescTranslationKey) &&
         !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
     );
+  }
+
+  checkTabletView(): boolean {
+    return this.windowDimensionsService.getWidth() < 768;
   }
 }
 angular.module('oppia').directive(

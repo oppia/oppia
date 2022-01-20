@@ -179,8 +179,8 @@ describe('StorySummaryTileComponent', () => {
       .toBe('/assetsdevhandler/story/storyId/assets/thumbnail/thumbnail.jpg');
   });
 
-  it('should display only 2 chapters if window width is less' +
-    ' than equal to 800px', () => {
+  it('should display only 1 chapters if window width is less' +
+    ' than equal to 500px', () => {
     component.storySummary = StorySummary.createFromBackendDict({
       id: 'storyId',
       title: 'Story Title',
@@ -193,7 +193,30 @@ describe('StorySummaryTileComponent', () => {
       url_fragment: 'story1',
       all_node_dicts: []
     });
-    spyOn(wds, 'getWidth').and.returnValue(790);
+    spyOn(wds, 'getWidth').and.returnValue(460);
+
+    expect(component.chaptersDisplayed).toBe(undefined);
+
+    component.ngOnInit();
+
+    expect(component.chaptersDisplayed).toBe(1);
+  });
+
+  it('should display only 2 chapters if window width is greater' +
+    ' than 500px and less than 768px', () => {
+    component.storySummary = StorySummary.createFromBackendDict({
+      id: 'storyId',
+      title: 'Story Title',
+      node_titles: ['node1', 'node2', 'node3'],
+      thumbnail_filename: 'thumbnail.jpg',
+      thumbnail_bg_color: '#FF9933',
+      description: 'This is the story description',
+      story_is_published: true,
+      completed_node_titles: ['node1'],
+      url_fragment: 'story1',
+      all_node_dicts: []
+    });
+    spyOn(wds, 'getWidth').and.returnValue(650);
 
     expect(component.chaptersDisplayed).toBe(undefined);
 
@@ -203,7 +226,7 @@ describe('StorySummaryTileComponent', () => {
   });
 
   it('should display 3 chapters if window width is greater' +
-  ' than 800px', () => {
+  ' than 768px', () => {
     component.storySummary = StorySummary.createFromBackendDict({
       id: 'storyId',
       title: 'Story Title',
@@ -216,13 +239,34 @@ describe('StorySummaryTileComponent', () => {
       url_fragment: 'story1',
       all_node_dicts: []
     });
-    spyOn(wds, 'getWidth').and.returnValue(801);
+    spyOn(wds, 'getWidth').and.returnValue(800);
 
     expect(component.chaptersDisplayed).toBe(undefined);
 
     component.ngOnInit();
 
     expect(component.chaptersDisplayed).toBe(3);
+  });
+
+  it('should return correct story status', () => {
+    component.storyProgress = 0;
+    component.getStoryStatus();
+    expect(component.storyStatus).toBe('Not Started');
+    component.storyProgress = 67;
+    component.getStoryStatus();
+    expect(component.storyStatus).toBe('In Progress');
+    component.storyProgress = 100;
+    component.getStoryStatus();
+    expect(component.storyStatus).toBe('Completed');
+  });
+
+  it('should check if the view is tablet or not', () => {
+    var widthSpy = spyOn(wds, 'getWidth');
+    widthSpy.and.returnValue(700);
+    expect(component.checkTabletView()).toBe(true);
+
+    widthSpy.and.returnValue(800);
+    expect(component.checkTabletView()).toBe(false);
   });
 
   it('should show \'View All\' button if number of nodes is not same as the' +
@@ -441,7 +485,7 @@ describe('StorySummaryTileComponent', () => {
   });
 
   it('should show all chapters when user click on \'View All\' button', () => {
-    spyOn(wds, 'getWidth').and.returnValue(790);
+    spyOn(wds, 'getWidth').and.returnValue(460);
     component.storySummary = StorySummary.createFromBackendDict({
       id: 'storyId',
       title: 'Story Title',
@@ -461,17 +505,17 @@ describe('StorySummaryTileComponent', () => {
     component.ngOnInit();
 
     expect(component.initialCount).toBe(undefined);
-    expect(component.chaptersDisplayed).toBe(2);
+    expect(component.chaptersDisplayed).toBe(1);
 
     component.showAllChapters();
 
-    expect(component.initialCount).toBe(2);
+    expect(component.initialCount).toBe(1);
     expect(component.chaptersDisplayed).toBe(3);
   });
 
   it('should hide extra chapters when user click on \'View less\'' +
     ' button', () => {
-    spyOn(wds, 'getWidth').and.returnValue(790);
+    spyOn(wds, 'getWidth').and.returnValue(460);
     component.storySummary = StorySummary.createFromBackendDict({
       id: 'storyId',
       title: 'Story Title',
@@ -489,7 +533,7 @@ describe('StorySummaryTileComponent', () => {
 
     component.ngOnInit();
 
-    expect(component.chaptersDisplayed).toBe(2);
+    expect(component.chaptersDisplayed).toBe(1);
 
     component.showAllChapters();
 
@@ -497,7 +541,7 @@ describe('StorySummaryTileComponent', () => {
 
     component.hideExtraChapters();
 
-    expect(component.chaptersDisplayed).toBe(2);
+    expect(component.chaptersDisplayed).toBe(1);
   });
 
   it('should return \'#\' for storyLink if UrlInterpolation' +

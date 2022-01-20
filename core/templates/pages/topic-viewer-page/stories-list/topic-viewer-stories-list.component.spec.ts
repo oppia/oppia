@@ -18,7 +18,7 @@
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { StorySummaryTileComponent } from 'components/summary-tile/story-summary-tile.component';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { StoriesListComponent } from './topic-viewer-stories-list.component';
@@ -27,13 +27,13 @@ describe('Topic Viewer Stories List Component', () => {
   let component: StoriesListComponent;
   let fixture: ComponentFixture<StoriesListComponent>;
   let i18nLanguageCodeService: I18nLanguageCodeService;
+  let windowDimensionsService: WindowDimensionsService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
-        MockTranslatePipe,
         StoriesListComponent,
-        StorySummaryTileComponent
+        MockTranslatePipe
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -49,6 +49,7 @@ describe('Topic Viewer Stories List Component', () => {
     component.topicName = 'Topic Name';
     component.topicDescription = 'Topic Description';
     component.topicId = 'topicId';
+    windowDimensionsService = TestBed.inject(WindowDimensionsService);
   });
 
   it('should initialize properties after successfully', () => {
@@ -81,4 +82,13 @@ describe('Topic Viewer Stories List Component', () => {
       expect(component.isHackyTopicDescTranslationDisplayed()).toBe(true);
     }
   );
+
+  it('should check if the view is tablet or not', () => {
+    var widthSpy = spyOn(windowDimensionsService, 'getWidth');
+    widthSpy.and.returnValue(730);
+    expect(component.checkTabletView()).toBe(true);
+
+    widthSpy.and.returnValue(800);
+    expect(component.checkTabletView()).toBe(false);
+  });
 });

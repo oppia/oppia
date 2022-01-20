@@ -46,6 +46,7 @@ export class StorySummaryTileComponent implements OnInit {
   nodeCount!: number;
   completedStoriesCount!: number;
   storyProgress!: number;
+  storyStatus!: string;
   storyTitle!: string;
   storyTitleTranslationKey!: string;
   strokeDashArrayValues!: string | number;
@@ -68,6 +69,10 @@ export class StorySummaryTileComponent implements OnInit {
     private i18nLanguageCodeService: I18nLanguageCodeService
   ) {}
 
+  checkTabletView(): boolean {
+    return this.windowDimensionsService.getWidth() < 768;
+  }
+
   getStoryLink(): string {
     // This component is being used in the topic editor as well and
     // we want to disable the linking in this case.
@@ -84,6 +89,16 @@ export class StorySummaryTileComponent implements OnInit {
       return '#';
     }
     return storyLink;
+  }
+
+  getStoryStatus(): void {
+    if (this.storyProgress === 0) {
+      this.storyStatus = 'Not Started';
+    } else if (this.storyProgress < 100 && this.storyProgress > 0) {
+      this.storyStatus = 'In Progress';
+    } else if (this.storyProgress === 100) {
+      this.storyStatus = 'Completed';
+    }
   }
 
   isChapterCompleted(title: string): boolean {
@@ -177,8 +192,12 @@ export class StorySummaryTileComponent implements OnInit {
       (this.completedStoriesCount / this.nodeCount) * 100);
 
     this.chaptersDisplayed = 3;
-    if (this.windowDimensionsService.getWidth() <= 800) {
+    if (this.windowDimensionsService.getWidth() <= 768 &&
+      this.windowDimensionsService.getWidth() > 500) {
       this.chaptersDisplayed = 2;
+    }
+    if (this.windowDimensionsService.getWidth() <= 500) {
+      this.chaptersDisplayed = 1;
     }
     this.showButton = false;
     if (this.chaptersDisplayed !== this.nodeCount) {
@@ -212,6 +231,7 @@ export class StorySummaryTileComponent implements OnInit {
           TranslationKeyType.TITLE);
       this.nodeTitlesTranslationKeys.push(storyNodeTranslationKey);
     }
+    this.getStoryStatus();
   }
 
   isHackyStoryTitleTranslationDisplayed(): boolean {
