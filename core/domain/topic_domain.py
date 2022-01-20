@@ -341,8 +341,9 @@ class StoryReference:
             raise utils.ValidationError(
                 'Story id should not be empty')
 
-        if len(self.story_id) != constants.STORY_ID_LENGTH:
-            raise utils.ValidationError('Invalid story id.')
+        if not bool(re.match(constants.ENTITY_ID_REGEX, self.story_id)):
+            raise utils.ValidationError(
+                'Invalid story id')
 
 
 class SubtopicDict(TypedDict):
