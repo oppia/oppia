@@ -20,6 +20,7 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MaterialModule } from 'modules/material.module';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { PreferredSiteLanguageSelectorComponent } from './preferred-language-selector.component';
 
 describe('Preferred Site Language Selector Component', () => {
@@ -34,6 +35,7 @@ describe('Preferred Site Language Selector Component', () => {
         FormsModule,
       ],
       declarations: [
+        MockTranslatePipe,
         PreferredSiteLanguageSelectorComponent
       ]
     }).compileComponents();
