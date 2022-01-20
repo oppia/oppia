@@ -139,6 +139,9 @@ describe('oppiaInteractiveItemSelectionInput', function() {
             },
             remove: () => {
               return;
+            },
+            contains: (text) => {
+              return true;
             }
           }
         });
@@ -150,6 +153,9 @@ describe('oppiaInteractiveItemSelectionInput', function() {
             },
             remove: () => {
               return;
+            },
+            contains: (text) => {
+              return true;
             }
           }
 
@@ -190,6 +196,9 @@ describe('oppiaInteractiveItemSelectionInput', function() {
             },
             remove: () => {
               return;
+            },
+            contains: (text) => {
+              return true;
             }
           }
         });
@@ -201,6 +210,9 @@ describe('oppiaInteractiveItemSelectionInput', function() {
             },
             remove: () => {
               return;
+            },
+            contains: (text) => {
+              return true;
             }
           }
 
