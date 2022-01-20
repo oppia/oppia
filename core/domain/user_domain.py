@@ -212,8 +212,11 @@ class UserSettings:
                     'Expected PIN to be a string, received %s' %
                     self.pin
                 )
-            elif (len(self.pin) != feconf.FULL_USER_PIN_LENGTH and
-                  len(self.pin) != feconf.PROFILE_USER_PIN_LENGTH):
+
+            if (
+                    len(self.pin) != feconf.FULL_USER_PIN_LENGTH and
+                    len(self.pin) != feconf.PROFILE_USER_PIN_LENGTH
+            ):
                 raise utils.ValidationError(
                     'User PIN can only be of length %s or %s' %
                     (
@@ -221,12 +224,12 @@ class UserSettings:
                         feconf.PROFILE_USER_PIN_LENGTH
                     )
                 )
-            else:
-                for character in self.pin:
-                    if character < '0' or character > '9':
-                        raise utils.ValidationError(
-                            'Only numeric characters are allowed in PIN.'
-                        )
+
+            for character in self.pin:
+                if character < '0' or character > '9':
+                    raise utils.ValidationError(
+                        'Only numeric characters are allowed in PIN.'
+                    )
 
         if (self.display_alias is not None and
                 not isinstance(self.display_alias, str)):
@@ -388,22 +391,22 @@ class UserSettings:
         """
         if not username:
             raise utils.ValidationError('Empty username supplied.')
-        elif len(username) > constants.MAX_USERNAME_LENGTH:
+        if len(username) > constants.MAX_USERNAME_LENGTH:
             raise utils.ValidationError(
                 'A username can have at most %s characters.'
                 % constants.MAX_USERNAME_LENGTH)
-        elif not re.match(feconf.ALPHANUMERIC_REGEX, username):
+        if not re.match(feconf.ALPHANUMERIC_REGEX, username):
             raise utils.ValidationError(
                 'Usernames can only have alphanumeric characters.')
-        else:
-            # Disallow usernames that contain the system usernames or the
-            # strings "admin" or "oppia".
-            reserved_usernames = set(feconf.SYSTEM_USERS.values()) | set([
-                'admin', 'oppia'])
-            for reserved_username in reserved_usernames:
-                if reserved_username in username.lower().strip():
-                    raise utils.ValidationError(
-                        'This username is not available.')
+
+        # Disallow usernames that contain the system usernames or the
+        # strings "admin" or "oppia".
+        reserved_usernames = (
+            set(feconf.SYSTEM_USERS.values()) | {'admin', 'oppia'}
+        )
+        for reserved_username in reserved_usernames:
+            if reserved_username in username.lower().strip():
+                raise utils.ValidationError('This username is not available.')
 
     def mark_banned(self):
         """Marks a user banned."""

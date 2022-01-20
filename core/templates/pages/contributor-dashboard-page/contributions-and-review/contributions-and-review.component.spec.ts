@@ -862,6 +862,16 @@ describe('Contributions and review component', function() {
 
       expect(ctrl.getActiveDropdownTabChoice()).toBe('Review Questions');
 
+      ctrl.activeTabType = ctrl.TAB_TYPE_REVIEWS;
+      ctrl.activeSuggestionType = 'translate_content';
+
+      expect(ctrl.getActiveDropdownTabChoice()).toBe('Review Translations');
+
+      ctrl.activeTabType = ctrl.TAB_TYPE_CONTRIBUTIONS;
+      ctrl.activeSuggestionType = 'add_question';
+
+      expect(ctrl.getActiveDropdownTabChoice()).toBe('Questions');
+
       ctrl.activeTabType = ctrl.TAB_TYPE_CONTRIBUTIONS;
       ctrl.activeSuggestionType = 'translate_content';
 
@@ -878,6 +888,16 @@ describe('Contributions and review component', function() {
         target: {}
       };
       const querySelectorSpy = spyOn(document, 'querySelector').and
+        .returnValue(null);
+      const elementContainsSpy = spyOn(element, 'contains').and
+        .returnValue(true);
+      ctrl.dropdownShown = true;
+
+      ctrl.closeDropdownWhenClickedOutside();
+      expect(querySelectorSpy).toHaveBeenCalled();
+      expect(elementContainsSpy).not.toHaveBeenCalled();
+      expect(ctrl.dropdownShown).toBe(true);
+
       // This throws "Argument of type '{ contains: () => boolean; }' is not
       // assignable to parameter of type 'Element'. Type '{ contains:
       // () => boolean; }' is missing the following properties from type
@@ -885,17 +905,27 @@ describe('Contributions and review component', function() {
       // more.". We need to suppress this error because only the properties
       // provided in the element object are required for testing.
       // @ts-expect-error
-        .returnValue(element);
-      ctrl.dropdownShown = true;
+      querySelectorSpy.and.returnValue(element);
 
       ctrl.closeDropdownWhenClickedOutside(clickEvent);
       expect(querySelectorSpy).toHaveBeenCalled();
+      expect(elementContainsSpy).toHaveBeenCalled();
       expect(ctrl.dropdownShown).toBe(true);
 
-      spyOn(element, 'contains').and.returnValue(false);
+      elementContainsSpy.and.returnValue(false);
 
       ctrl.closeDropdownWhenClickedOutside(clickEvent);
       expect(ctrl.dropdownShown).toBe(false);
+    });
+
+    it('should return back when user click is made outside', function() {
+      const clickEvent = {
+        target: {}
+      };
+      spyOn(document, 'querySelector').and.returnValue(null);
+
+      ctrl.closeDropdownWhenClickedOutside(clickEvent);
+      expect(document.querySelector).toHaveBeenCalled();
     });
 
     it('should unbind event listener when onDestroy is called', function() {

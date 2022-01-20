@@ -40,9 +40,6 @@ require(
 require(
   'components/question-directives/modal-templates/' +
   'question-editor-modal.controller.ts');
-require(
-  'pages/topic-editor-page/modal-templates/' +
-  'questions-list-select-skill-and-difficulty-modal.controller.ts');
 
 require('domain/editor/undo_redo/question-undo-redo.service.ts');
 require('domain/question/editable-question-backend-api.service.ts');
@@ -66,6 +63,8 @@ require('services/stateful/focus-manager.service.ts');
 import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
 import { Subscription } from 'rxjs';
+import { ConfirmQuestionExitModalComponent } from '../modal-templates/confirm-question-exit-modal.component';
+import { QuestionEditorSaveModalComponent } from '../modal-templates/question-editor-save-modal.component';
 
 angular.module('oppia').component('questionsList', {
   bindings: {
@@ -82,26 +81,24 @@ angular.module('oppia').component('questionsList', {
   },
   template: require('./questions-list.component.html'),
   controller: [
-    '$location', '$rootScope', '$timeout', '$uibModal', 'AlertsService',
+    '$location', '$rootScope', '$timeout', 'AlertsService',
     'ContextService', 'EditableQuestionBackendApiService',
     'FocusManagerService', 'ImageLocalStorageService',
     'MisconceptionObjectFactory', 'NgbModal',
     'QuestionObjectFactory', 'QuestionUndoRedoService',
     'QuestionValidationService', 'QuestionsListService',
-    'SkillBackendApiService',
-    'SkillEditorRoutingService', 'UrlInterpolationService',
+    'SkillBackendApiService', 'SkillEditorRoutingService',
     'UtilsService', 'WindowDimensionsService',
     'DEFAULT_SKILL_DIFFICULTY', 'INTERACTION_SPECS',
     'NUM_QUESTIONS_PER_PAGE',
     function(
-        $location, $rootScope, $timeout, $uibModal, AlertsService,
+        $location, $rootScope, $timeout, AlertsService,
         ContextService, EditableQuestionBackendApiService,
         FocusManagerService, ImageLocalStorageService,
         MisconceptionObjectFactory, NgbModal,
         QuestionObjectFactory, QuestionUndoRedoService,
         QuestionValidationService, QuestionsListService,
-        SkillBackendApiService,
-        SkillEditorRoutingService, UrlInterpolationService,
+        SkillBackendApiService, SkillEditorRoutingService,
         UtilsService, WindowDimensionsService,
         DEFAULT_SKILL_DIFFICULTY, INTERACTION_SPECS,
         NUM_QUESTIONS_PER_PAGE) {
@@ -252,18 +249,15 @@ angular.module('oppia').component('questionsList', {
       };
 
       ctrl.cancel = function() {
-        $uibModal.open({
-          templateUrl:
-              UrlInterpolationService.getDirectiveTemplateUrl(
-                '/components/question-directives' +
-                  '/modal-templates/' +
-                  'confirm-question-modal-exit-modal.directive.html'),
+        NgbModal.open(ConfirmQuestionExitModalComponent, {
           backdrop: true,
-          controller: 'ConfirmOrCancelModalController'
         }).result.then(function() {
           ContextService.resetImageSaveDestination();
           ctrl.editorIsOpen = false;
           $location.hash(null);
+          // TODO(#8521): Remove the use of $rootScope.$apply()
+          // once the controller is migrated to angular.
+          $rootScope.$apply();
         }, function() {
           // Note to developers:
           // This callback is triggered when the Cancel button is
@@ -605,14 +599,8 @@ angular.module('oppia').component('questionsList', {
         ContextService.resetImageSaveDestination();
         $location.hash(null);
         if (ctrl.questionIsBeingUpdated) {
-          $uibModal.open({
-            templateUrl:
-                  UrlInterpolationService.getDirectiveTemplateUrl(
-                    '/components/question-directives' +
-                      '/modal-templates/' +
-                      'question-editor-save-modal.template.html'),
+          NgbModal.open(QuestionEditorSaveModalComponent, {
             backdrop: 'static',
-            controller: 'ConfirmOrCancelModalController'
           }).result.then(function(commitMessage) {
             if (ctrl.skillLinkageModificationsArray &&
                 ctrl.skillLinkageModificationsArray.length > 0) {
@@ -621,6 +609,9 @@ angular.module('oppia').component('questionsList', {
               ContextService.resetImageSaveDestination();
               ctrl.saveAndPublishQuestion(commitMessage);
             }
+            // TODO(#8521): Remove the use of $rootScope.$apply()
+            // once the controller is migrated to angular.
+            $rootScope.$apply();
           }, () => {
             // Note to developers:
             // This callback is triggered when the Cancel button is

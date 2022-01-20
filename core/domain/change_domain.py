@@ -21,7 +21,13 @@ from __future__ import annotations
 import copy
 
 from core import utils
-from core.platform import models
+
+from typing import Dict
+
+from core.platform import models  # pylint: disable=invalid-import-from # isort:skip
+
+# TODO(#14537): Refactor this file and remove imports marked
+# with 'invalid-import-from'.
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
@@ -125,7 +131,7 @@ class BaseChange:
         'user_id_attribute_names': []
     }]
 
-    def __init__(self, change_dict):
+    def __init__(self, change_dict: Dict[str, str]) -> None:
         """Initializes a BaseChange object from a dict.
 
         Args:
@@ -153,7 +159,7 @@ class BaseChange:
         for attribute_name in cmd_attribute_names:
             setattr(self, attribute_name, change_dict.get(attribute_name))
 
-    def validate_dict(self, change_dict):
+    def validate_dict(self, change_dict: Dict[str, str]) -> None:
         """Checks that the command in change dict is valid for the domain
         object.
 
@@ -197,7 +203,7 @@ class BaseChange:
         validate_cmd(
             cmd_name, valid_cmd_attribute_specs, actual_cmd_attributes)
 
-    def to_dict(self):
+    def to_dict(self) -> Dict[str, str]:
         """Returns a dict representing the BaseChange domain object.
 
         Returns:

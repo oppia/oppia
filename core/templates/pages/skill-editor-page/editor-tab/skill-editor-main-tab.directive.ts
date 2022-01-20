@@ -27,7 +27,7 @@ require(
   'skill-concept-card-editor.component.ts');
 require(
   'pages/skill-editor-page/editor-tab/skill-misconceptions-editor/' +
-  'skill-misconceptions-editor.directive.ts');
+  'skill-misconceptions-editor.component.ts');
 require(
   'pages/skill-editor-page/editor-tab/skill-prerequisite-skills-editor/' +
   'skill-prerequisite-skills-editor.component.ts');
@@ -50,16 +50,22 @@ angular.module('oppia').directive('skillEditorMainTab', [
         '/pages/skill-editor-page/editor-tab/' +
         'skill-editor-main-tab.directive.html'),
       controller: [
-        '$scope', '$timeout', 'FocusManagerService', 'NgbModal',
+        '$rootScope', '$scope', '$timeout', 'FocusManagerService', 'NgbModal',
         'PageTitleService',
         'SkillEditorRoutingService', 'SkillEditorStateService',
         'UndoRedoService',
         function(
-            $scope, $timeout, FocusManagerService, NgbModal,
+            $rootScope, $scope, $timeout, FocusManagerService, NgbModal,
             PageTitleService,
             SkillEditorRoutingService, SkillEditorStateService,
             UndoRedoService) {
           var ctrl = this;
+
+          $scope.getMisconceptionChange = function() {
+            // TODO(#8521): Remove the use of $rootScope.$applyAsync()
+            // once the directive is migrated to angular.
+            $rootScope.$applyAsync();
+          };
 
           $scope.createQuestion = function() {
             // This check is needed because if a skill has unsaved changes to

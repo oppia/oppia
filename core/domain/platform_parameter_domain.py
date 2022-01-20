@@ -23,7 +23,6 @@ import json
 import re
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.domain import change_domain
@@ -175,7 +174,8 @@ class EvaluationContext:
                 raise utils.ValidationError(
                     'Invalid version \'%s\', expected to match regexp %s.' % (
                         self._app_version, APP_VERSION_WITH_HASH_REGEXP))
-            elif (
+
+            if (
                     match.group(2) is not None and
                     match.group(2) not in ALLOWED_APP_VERSION_FLAVORS):
                 raise utils.ValidationError(
@@ -415,8 +415,7 @@ class PlatformParameterFilter:
         version_a = version_a.split('.')
         version_b = version_b.split('.')
 
-        for sub_version_a, sub_version_b in python_utils.ZIP(
-                version_a, version_b):
+        for sub_version_a, sub_version_b in zip(version_a, version_b):
             if int(sub_version_a) < int(sub_version_b):
                 return True
             elif int(sub_version_a) > int(sub_version_b):

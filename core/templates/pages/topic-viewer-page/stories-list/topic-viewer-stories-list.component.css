@@ -7,11 +7,21 @@
   https://rtlcss.com/learn/usage-guide/control-directives .
 */
 .tab-title {
-  margin: .83em 0 0.1em 0;
+  color: #017a70;
+  font-weight: lighter;
+  margin: .83em 0 0.3em 0;
 }
 
 .story-info-container {
   padding-top: 4vh;
+}
+
+.stories-can-play {
+  display: inline-block;
+  font-size: 1.4em;
+  font-weight: 500;
+  margin-top: 0.5em;
+  padding-bottom: 15px;
 }
 
 .topic-description {
@@ -22,9 +32,12 @@
 
 .oppia-stories-list-container .oppia-page-card {
   border-radius: 0.25em;
-  margin-top: 10em;
   padding-bottom: 7.5vh;
   width: 704px;
+}
+
+.mat-card-margin-desktop {
+  margin-top: 10em;
 }
 
 @media(max-width: 1024px) {
@@ -33,9 +46,24 @@
   }
 }
 
+@media(max-width: 768px) {
+  .oppia-stories-list-container .oppia-page-card {
+    padding: 8em 24px 64px 24px;
+    width: 100%;
+  }
+
+  .story-info-container {
+    padding-top: 0;
+  }
+}
+
 @media(max-width: 500px) {
   .oppia-stories-list-container .oppia-page-card {
-    padding: 15px 24px 64px 24px;
-    width: 90vw;
+    padding: 12em 24px 64px 24px;
+    width: 100%;
+  }
+
+  .story-info-container {
+    padding-top: 0;
   }
 }

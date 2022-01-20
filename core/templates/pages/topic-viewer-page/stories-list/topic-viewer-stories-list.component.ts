@@ -21,6 +21,8 @@ import { downgradeComponent } from '@angular/upgrade/static';
 
 import { StorySummary } from 'domain/story/story-summary.model';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { WindowDimensionsService } from
+  'services/contextual/window-dimensions.service';
 
 @Component({
   selector: 'stories-list',
@@ -33,7 +35,14 @@ export class StoriesListComponent {
   @Input() topicUrlFragment: string;
   @Input() topicName: string;
   @Input() topicDescription: string;
-  constructor(private i18nLanguageCodeService: I18nLanguageCodeService) {}
+  constructor(
+    private windowDimensionsService: WindowDimensionsService,
+    private i18nLanguageCodeService: I18nLanguageCodeService
+  ) {}
+
+  checkTabletView(): boolean {
+    return this.windowDimensionsService.getWidth() < 768;
+  }
 
   isLanguageRTL(): boolean {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();

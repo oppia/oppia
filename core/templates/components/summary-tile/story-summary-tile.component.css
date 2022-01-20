@@ -88,8 +88,12 @@
   display: flex;
 }
 
-.story-summary-tile {
+.story-summary-tile-desktop {
   margin-left: 3vw;
+  padding-bottom: 7vh;
+}
+
+.story-summary-tile-mobile {
   padding-bottom: 7vh;
 }
 
@@ -158,17 +162,71 @@ a:hover {
   }
 }
 
-@media (max-width: 640px) {
+.stories-can-play {
+  display: inline-block;
+  font-size: 1.4em;
+  font-weight: 500;
+  padding-bottom: 15px;
+}
+
+@media (max-width: 768px) {
   .story-details {
     border-radius: 0.4em;
     box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.2);
     display: inherit;
-    width: 225px;
+    width: 100%;
+  }
+
+  .story-progress-circle {
+    fill-opacity: 0;
+    stroke-width: 3;
+  }
+
+  .completed-circle {
+    stroke: #3cb8be;
+  }
+
+  .total-circle {
+    stroke: rgba(78, 77, 77, 0.62);
+  }
+
+  .chapter-title {
+    display: block;
+    font-size: 1.1em;
+    margin-bottom: 0;
+  }
+
+  .view-button {
+    color: #00645c;
+    cursor: pointer;
+    font-weight: bold;
+    margin-bottom: 0;
+    margin-top: 0.5vh;
+    text-align: center;
+    width: 100%;
+  }
+
+  .oppia-story-title {
+    display: inline-block;
+    font-size: 1.4em;
+    padding-bottom: 0;
+    padding-left: 5px;
+    padding-top: 5px;
+    width: 70%;
+  }
+
+  .title-text {
+    border-right: 0;
+    font-weight: 500;
+    padding-right: 10px;
+    text-decoration: none;
   }
 
   .story-thumbnail {
     border: none;
     border-radius: 0.4em 0.4em 0 0;
+    height: 160px;
+    width: 100%;
   }
 
   .chapter-details {
@@ -177,19 +235,77 @@ a:hover {
     padding: 2vh 3vw 2vh 4vw;
     width: 225px;
   }
-}
 
-@media (max-width: 360px) {
-  .story-details {
-    border-radius: 0.4em;
-    box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.2);
-    display: inherit;
-    width: 225px;
+  .story-progress-bar {
+    float: right;
+    padding-right: 12px;
+    padding-top: 5px;
   }
 
-  .story-thumbnail {
-    height: 150px;
-    width: 225px;
+  .chapter-container {
+    background-color: rgba(230, 230, 230, 0.38);
+  }
+
+  .story-details-box {
+    border: none;
+    display: inline-block;
+    margin-left: 0;
+    padding: 2vh 3vw 2vh 4vw;
+    width: 100%;
+  }
+
+  .bottom-edge-shadow {
+    border-bottom: 0.8px solid rgb(255, 254, 254);
+    border-radius: 0.4em;
+    box-shadow: 0 6px 7px -4px #606060;
+  }
+
+  .oppia-chapters-count-text {
+    margin-bottom: 0;
+    margin-top: 10px;
+    width: 50%;
+  }
+
+  .chapter-specific-box {
+    background-color: white;
+    border-radius: 0 0.4em 0.4em 0;
+    box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.2);
+    margin-bottom: 2vh;
+    padding: 0;
+  }
+
+  .chapter-icon {
+    background-color: #4c9e8b;
+    border-radius: 0 10px 0 0;
+    float: left;
+    margin-right: 10px;
+    padding: 10px;
+    width: fit-content;
+  }
+
+  .chapter-icon-number {
+    color: white;
+    font-weight: bolder;
+    padding: 2px;
+  }
+
+  .chapters-container-box {
+    border: none;
+    display: inline-block;
+    margin-left: 0;
+    padding: 2vh 3vw 0 4vw;
+    width: 100%;
+  }
+
+  .chapter-text {
+    float: left;
+    margin-top: 10px;
+  }
+
+  .story-status-element {
+    font-size: 10px;
+    margin-bottom: 0;
+    margin-top: 3px;
   }
 }
 

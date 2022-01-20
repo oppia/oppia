@@ -80,9 +80,16 @@
   justify-content: space-evenly;
   margin-bottom: 0;
   padding-left: 0;
-  padding-top: 20px;
   text-align: center;
   width: 100%;
+}
+
+.oppia-topic-viewer-tabs-container .pad-top-mobile {
+  padding-top: 10px;
+}
+
+.oppia-topic-viewer-tabs-container .pad-top-desktop {
+  padding-top: 20px;
 }
 
 .oppia-topic-viewer-tabs-container .topic-viewer-tabs li {

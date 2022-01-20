@@ -67,7 +67,6 @@
 }
 .oppia-subtopic-viewer-next-subtopic-summary {
   display: flex;
-  justify-content: flex-end;
   margin-bottom: 100px;
   margin-left: auto;
   margin-right: auto;

@@ -22,7 +22,6 @@ import datetime
 import logging
 
 from core import feconf
-from core import python_utils
 from core import schema_utils
 from core import utils
 from core.constants import constants
@@ -392,13 +391,13 @@ def require_sender_id_is_valid(intent, sender_id):
 
     if intent not in SENDER_VALIDATORS:
         raise Exception('Invalid email intent string: %s' % intent)
-    else:
-        if not SENDER_VALIDATORS[intent](sender_id):
-            logging.error(
-                'Invalid sender_id %s for email with intent \'%s\'' %
-                (sender_id, intent))
-            raise Exception(
-                'Invalid sender_id for email with intent \'%s\'' % intent)
+
+    if not SENDER_VALIDATORS[intent](sender_id):
+        logging.error(
+            'Invalid sender_id %s for email with intent \'%s\'' %
+            (sender_id, intent))
+        raise Exception(
+            'Invalid sender_id for email with intent \'%s\'' % intent)
 
 
 def _send_email(
@@ -911,7 +910,7 @@ def can_users_receive_thread_email(
         user_services.get_users_email_preferences_for_exploration(
             recipient_ids, exploration_id))
     zipped_preferences = list(
-        python_utils.ZIP(users_global_prefs, users_exploration_prefs))
+        zip(users_global_prefs, users_exploration_prefs))
 
     result = []
     if has_suggestion:
@@ -1430,7 +1429,7 @@ def _send_suggestions_waiting_too_long_email(
             'email_body_template'])
     # Get the emails and usernames of the admins.
     admin_user_settings = user_services.get_users_settings(admin_ids)
-    curriculum_admin_usernames, admin_emails = list(python_utils.ZIP(*[
+    curriculum_admin_usernames, admin_emails = list(zip(*[
         (admin_user_setting.username, admin_user_setting.email)
         if admin_user_setting is not None else (None, None)
         for admin_user_setting in admin_user_settings
@@ -1441,19 +1440,18 @@ def _send_suggestions_waiting_too_long_email(
             log_new_error(
                 'There was no email for the given admin id: %s.' % admin_id)
             continue
-        else:
-            email_body = email_body_template % (
-                curriculum_admin_usernames[index], feconf.OPPIA_SITE_URL,
-                feconf.CONTRIBUTOR_DASHBOARD_URL,
-                suggestion_models.SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS,
-                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL,
-                list_of_suggestion_descriptions)
+        email_body = email_body_template % (
+            curriculum_admin_usernames[index], feconf.OPPIA_SITE_URL,
+            feconf.CONTRIBUTOR_DASHBOARD_URL,
+            suggestion_models.SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS,
+            feconf.OPPIA_SITE_URL, feconf.ADMIN_URL,
+            list_of_suggestion_descriptions)
 
-            _send_email(
-                admin_id, feconf.SYSTEM_COMMITTER_ID,
-                feconf.EMAIL_INTENT_ADDRESS_CONTRIBUTOR_DASHBOARD_SUGGESTIONS,
-                email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS,
-                recipient_email=admin_emails[index])
+        _send_email(
+            admin_id, feconf.SYSTEM_COMMITTER_ID,
+            feconf.EMAIL_INTENT_ADDRESS_CONTRIBUTOR_DASHBOARD_SUGGESTIONS,
+            email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS,
+            recipient_email=admin_emails[index])
 
 
 def send_mail_to_notify_admins_that_reviewers_are_needed(
@@ -1577,7 +1575,7 @@ def _send_reviews_needed_email_to_admins(
         'email_body_template']
     # Get the emails and usernames of the users.
     admin_user_settings = user_services.get_users_settings(admin_ids)
-    curriculum_admin_usernames, admin_emails = list(python_utils.ZIP(*[
+    curriculum_admin_usernames, admin_emails = list(zip(*[
         (admin_user_setting.username, admin_user_setting.email)
         if admin_user_setting is not None else (None, None)
         for admin_user_setting in admin_user_settings
@@ -1588,16 +1586,15 @@ def _send_reviews_needed_email_to_admins(
             log_new_error(
                 'There was no email for the given admin id: %s.' % admin_id)
             continue
-        else:
-            email_body = email_body_template % (
-                curriculum_admin_usernames[index], feconf.OPPIA_SITE_URL,
-                feconf.ADMIN_URL, suggestions_needing_reviewers_html)
+        email_body = email_body_template % (
+            curriculum_admin_usernames[index], feconf.OPPIA_SITE_URL,
+            feconf.ADMIN_URL, suggestions_needing_reviewers_html)
 
-            _send_email(
-                admin_id, feconf.SYSTEM_COMMITTER_ID,
-                feconf.EMAIL_INTENT_ADD_CONTRIBUTOR_DASHBOARD_REVIEWERS,
-                email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS,
-                recipient_email=admin_emails[index])
+        _send_email(
+            admin_id, feconf.SYSTEM_COMMITTER_ID,
+            feconf.EMAIL_INTENT_ADD_CONTRIBUTOR_DASHBOARD_REVIEWERS,
+            email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS,
+            recipient_email=admin_emails[index])
 
 
 def send_mail_to_notify_contributor_dashboard_reviewers(
@@ -1641,7 +1638,7 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
         return
 
     reviewer_user_settings = user_services.get_users_settings(reviewer_ids)
-    reviewer_usernames, reviewer_emails = list(python_utils.ZIP(*[
+    reviewer_usernames, reviewer_emails = list(zip(*[
         (reviewer_user_setting.username, reviewer_user_setting.email)
         if reviewer_user_setting is not None else (None, None)
         for reviewer_user_setting in reviewer_user_settings
@@ -1653,30 +1650,33 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
                 'There were no suggestions to recommend to the reviewer with '
                 'user id: %s.' % reviewer_id)
             continue
-        elif not reviewer_emails[index]:
+
+        if not reviewer_emails[index]:
             log_new_error(
                 'There was no email for the given reviewer id: %s.' % (
                     reviewer_id))
             continue
-        else:
-            suggestion_descriptions = []
-            for reviewer_suggestion_email_info in (
-                    reviewers_suggestion_email_infos[index]):
-                suggestion_descriptions.append(
-                    _create_html_for_reviewable_suggestion_email_info(
-                        reviewer_suggestion_email_info))
 
-            email_body = email_body_template % (
-                reviewer_usernames[index], feconf.OPPIA_SITE_URL,
-                feconf.CONTRIBUTOR_DASHBOARD_URL, ''.join(
-                    suggestion_descriptions),
-                EMAIL_FOOTER.value)
+        suggestion_descriptions = []
+        for reviewer_suggestion_email_info in (
+                reviewers_suggestion_email_infos[index]):
+            suggestion_descriptions.append(
+                _create_html_for_reviewable_suggestion_email_info(
+                    reviewer_suggestion_email_info))
 
-            _send_email(
-                reviewer_id, feconf.SYSTEM_COMMITTER_ID,
-                feconf.EMAIL_INTENT_REVIEW_CONTRIBUTOR_DASHBOARD_SUGGESTIONS,
-                email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS,
-                recipient_email=reviewer_emails[index])
+        email_body = email_body_template % (
+            reviewer_usernames[index],
+            feconf.OPPIA_SITE_URL,
+            feconf.CONTRIBUTOR_DASHBOARD_URL,
+            ''.join(suggestion_descriptions),
+            EMAIL_FOOTER.value
+        )
+
+        _send_email(
+            reviewer_id, feconf.SYSTEM_COMMITTER_ID,
+            feconf.EMAIL_INTENT_REVIEW_CONTRIBUTOR_DASHBOARD_SUGGESTIONS,
+            email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS,
+            recipient_email=reviewer_emails[index])
 
 
 def send_accepted_voiceover_application_email(

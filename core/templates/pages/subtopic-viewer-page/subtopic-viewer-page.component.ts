@@ -36,14 +36,15 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
   styleUrls: []
 })
 export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
-  nextSubtopicSummaryIsShown: boolean = false;
+  subtopicSummaryIsShown: boolean = false;
   topicUrlFragment: string;
   classroomUrlFragment: string;
   subtopicUrlFragment: string;
   pageContents: SubtopicPageContents;
   subtopicTitle: string;
   parentTopicId: string;
-  nextSubtopic: Subtopic;
+  nextSubtopic: Subtopic = null;
+  prevSubtopic: Subtopic = null;
 
   constructor(
     private alertsService: AlertsService,
@@ -88,9 +89,14 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
         `Review the skill of ${this.subtopicTitle.toLowerCase()}.`);
 
       let nextSubtopic = subtopicDataObject.getNextSubtopic();
+      let prevSubtopic = subtopicDataObject.getPrevSubtopic();
       if (nextSubtopic) {
         this.nextSubtopic = nextSubtopic;
-        this.nextSubtopicSummaryIsShown = true;
+        this.subtopicSummaryIsShown = true;
+      }
+      if (prevSubtopic) {
+        this.prevSubtopic = prevSubtopic;
+        this.subtopicSummaryIsShown = true;
       }
 
       this.loaderService.hideLoadingScreen();
