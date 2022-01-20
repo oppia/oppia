@@ -32,8 +32,10 @@ import { AlertsService } from 'services/alerts.service';
 import { QuestionsListService } from 'services/questions-list.service';
 import { LoaderService } from 'services/loader.service';
 
-interface AssignedSkillTopicData { [topicName: string]: string }
-interface groupedSkillSummariesType {
+interface AssignedSkillTopicData {
+  [topicName: string]: string;
+}
+interface GroupedSkillSummaryDictionaries {
   [topicName: string]: SkillSummaryBackendDict[];
 }
 
@@ -92,7 +94,7 @@ export class SkillEditorStateService {
   };
 
   private _updateGroupedSkillSummaries = (
-      groupedSkillSummaries: groupedSkillSummariesType
+      groupedSkillSummaries: GroupedSkillSummaryDictionaries
   ) => {
     let topicName = null;
     this._groupedSkillSummaries.current = [];
@@ -180,11 +182,9 @@ export class SkillEditorStateService {
     return this._skillIsBeingLoaded;
   }
 
-  /**
-   * _assignedSkillTopicData will be null (the initial value)
-   * if loadSkill() fails to initialize it due to any reasons.
-   */
-  getAssignedSkillTopicData(): { [topicName: string]: string } | null {
+  // 'getAssignedSkillTopicData()' will be return null if 'loadSkill()' did
+  // not yet initialize '_assignedSkillTopicData' or failed to initialize it.
+  getAssignedSkillTopicData(): AssignedSkillTopicData | null {
     return this._assignedSkillTopicData;
   }
 
