@@ -1750,8 +1750,8 @@ class LearnerAnswerDetails:
                     learner_answer_info.get_learner_answer_info_dict_size())
         if self.learner_answer_info_list == new_learner_answer_info_list:
             raise Exception('Learner answer info with the given id not found.')
-        else:
-            self.learner_answer_info_list = new_learner_answer_info_list
+
+        self.learner_answer_info_list = new_learner_answer_info_list
 
     def update_state_reference(self, new_state_reference):
         """Updates the state_reference of the LearnerAnswerDetails object.
