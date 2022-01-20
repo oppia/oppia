@@ -81,6 +81,20 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
             Exception, 'Invalid parameter change customization_arg name:'):
             param_domain.ParamChange('abc', 'Copier', {1: '1'}).validate()
 
+    def test_param_spec_to_dict(self):
+        sample_dict = {
+            'obj_type': 'UnicodeString'
+        }
+        param_spec = param_domain.ParamSpec(sample_dict['obj_type'])
+        self.assertEqual(param_spec.to_dict(), sample_dict)
+
+    def test_param_spec_from_dict(self):
+        sample_dict = {
+            'obj_type': 'UnicodeString'
+        }
+        param_spec = param_domain.ParamSpec.from_dict(sample_dict)
+        self.assertEqual(param_spec.to_dict(), sample_dict)
+
     def test_param_change_class(self):
         """Test the ParamChange class."""
         param_change = param_domain.ParamChange(
@@ -93,3 +107,12 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
             'customization_args': {'value': '3'}
         })
         self.assertEqual(param_change.get_normalized_value('Int', {}), 3)
+
+    def test_param_change_from_dict(self):
+        sample_dict = {
+            'name': 'abc',
+            'generator_id': 'Copier',
+            'customization_args': {'value': '3'}
+        }
+        param_change = param_domain.ParamChange.from_dict(sample_dict)
+        self.assertEqual(param_change.to_dict(), sample_dict)

@@ -1,33 +1,32 @@
 <div class="embedded-body">
-  <section role="main" ng-if="hasFullyLoaded">
+  <section role="main" *ngIf="hasFullyLoaded">
     <div class="conversation-skin-cards-container conversation-skin-animate-cards"
-         ng-class="{'animate-to-two-cards': isAnimatingToTwoCards, 'animate-to-one-card': isAnimatingToOneCard, 'with-supplementary-card': isCurrentSupplementalCardNonempty()}">
+         [ngClass]="{'animate-to-two-cards': isAnimatingToTwoCards, 'animate-to-one-card': isAnimatingToOneCard, 'with-supplementary-card': isCurrentSupplementalCardNonempty()}">
 
       <div class="conversation-skin-main-tutor-card-embed"
-           ng-class="{ 'conversation-skin-animate-tutor-card-on-narrow': !canWindowShowTwoCards() && isCurrentSupplementalCardNonempty()}">
-        <oppia-tutor-card [displayed-card]="displayedCard"
-                          [avatar-image-is-shown]="true"
-                          [start-card-change-animation]="startCardChangeAnimation">
+           [ngClass]="{ 'conversation-skin-animate-tutor-card-on-narrow': !canWindowShowTwoCards() && isCurrentSupplementalCardNonempty()}">
+        <oppia-tutor-card [displayedCard]="displayedCard"
+                          [avatarImageIsShown]="true"
+                          [startCardChangeAnimation]="startCardChangeAnimation">
         </oppia-tutor-card>
-        <div ng-if="isCurrentSupplementalCardNonempty() && !canWindowShowTwoCards()">
-          <supplemental-card on-click-continue-button="showUpcomingCard()"
-                             displayed-card="displayedCard">
-          </supplemental-card>
+        <div *ngIf="isCurrentSupplementalCardNonempty() && !canWindowShowTwoCards()">
+          <oppia-supplemental-card (clickContinueButton)="showUpcomingCard()"
+                                   [displayedCard]="displayedCard">
+          </oppia-supplemental-card>
         </div>
         <oppia-progress-nav (submit)="submitAnswerFromProgressNav()"
-                            [is-learn-again-button]="isLearnAgainButton"
-                            [submit-button-is-disabled]="submitButtonIsDisabled()"
-                            [displayed-card]="displayedCard"
-                            [submit-button-is-shown]="!answerIsBeingProcessed"
-                            (click-continue-button)="showUpcomingCard()">
+                            [isLearnAgainButton]="isLearnAgainButton()"
+                            [displayedCard]="displayedCard"
+                            [submitButtonIsShown]="!answerIsBeingProcessed"
+                            (clickContinueButton)="showUpcomingCard()">
         </oppia-progress-nav>
       </div>
 
-      <div ng-if="isCurrentSupplementalCardNonempty() && canWindowShowTwoCards()"
+      <div *ngIf="isCurrentSupplementalCardNonempty() && canWindowShowTwoCards()"
            class="conversation-skin-supplemental-card-container">
-        <supplemental-card on-click-continue-button="showUpcomingCard()"
-                           displayed-card="displayedCard">
-        </supplemental-card>
+        <oppia-supplemental-card (clickContinueButton)="showUpcomingCard()"
+                                 [displayedCard]="displayedCard">
+        </oppia-supplemental-card>
       </div>
     </div>
   </section>
@@ -35,8 +34,8 @@
   <footer class="grid-container">
     <nav class="bottom-nav-row">
       <div class="col-1-4 bottom-nav-left">
-        <div ng-if="isOnTerminalCard()" class="nav-bar-bottom-replay-content">
-          <i ng-click="reloadExploration()" class="material-icons replay-nav-icon">replay</i>
+        <div *ngIf="isOnTerminalCard()" class="nav-bar-bottom-replay-content">
+          <i (click)="reloadExploration()" class="material-icons replay-nav-icon">replay</i>
           <span class="oppia-restart-exploration"> Restart exploration? </span>
         </div>
       </div>
@@ -45,12 +44,12 @@
       <div class="col-1-4">
         <div>
           <div class="nav-bar-bottom-visit-oppia">
-            <span ng-if="isOnTerminalCard()" class="oppia-view-more-explorations">For more explorations, visit:</span>
-            <a class="oppia-link" ng-click="onNavigateFromIframe()" href="https://www.oppia.org/" target="_blank" rel="noopener">
+            <span *ngIf="isOnTerminalCard()" class="oppia-view-more-explorations">For more explorations, visit:</span>
+            <a class="oppia-link" (click)="onNavigateFromIframe()" href="https://www.oppia.org/" target="_blank" rel="noopener">
               <picture>
-                <source type="image/webp" ng-srcset="<[getStaticImageUrl('/logo/288x128_logo_white.webp')]>">
-                <source type="image/png" ng-srcset="<[getStaticImageUrl('/logo/288x128_logo_white.png')]>">
-                <img class="logo-bottom-nav-bar" ng-src="<[getStaticImageUrl('/logo/288x128_logo_white.png')]>">
+                <source type="image/webp" [srcset]="getStaticImageUrl('/logo/288x128_logo_white.webp')">
+                <source type="image/png" [srcset]="getStaticImageUrl('/logo/288x128_logo_white.png')">
+                <img class="logo-bottom-nav-bar" [src]="getStaticImageUrl('/logo/288x128_logo_white.png')">
               </picture>
             </a>
           </div>
@@ -187,16 +186,6 @@ directive. -->
     Additional CSS for the conversation_v1 skin.
     All classes below should start with .conversation-skin
   */
-
-  .conversation-skin-oppia-avatar,
-  .conversation-skin-learner-answer-container .conversation-skin-user-avatar {
-    height: 36px;
-    position: absolute;
-    top: 0;
-    width: 36px;
-    z-index: 1;
-  }
-
   .conversation-skin-oppia-avatar {
     left: -20px;
   }
@@ -390,7 +379,7 @@ directive. -->
     border-bottom-right-radius: 0;
   }
 
-  conversation-skin .conversation-skin-main-tutor-card-embed {
+  .conversation-skin-main-tutor-card-embed {
     margin-bottom: 100px;
   }
 
@@ -404,8 +393,12 @@ directive. -->
   }
 
   .conversation-skin-learner-answer-container {
+    height: 36px;
+    position: absolute;
     text-align: right;
-    width: auto;
+    top: 0;
+    width: 36px;
+    z-index: 1;
   }
 
   .conversation-skin-tutor-card-middle-section .conversation-skin-learner-answer-content {
@@ -587,8 +580,8 @@ directive. -->
       color: #fff;
       padding: 6px 12px;
     }
-    .conversation-skin-main-tutor-card button.md-button.md-default-theme.instructions-button:focus,
-    .conversation-skin-main-tutor-card button.md-button.md-default-theme.instructions-button:hover {
+    .conversation-skin-main-tutor-card button.mat-button.instructions-button:focus,
+    .conversation-skin-main-tutor-card button.mat-button.instructions-button:hover {
       background-color: #115fd4;
     }
     .conversation-skin-user-avatar,
