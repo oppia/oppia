@@ -101,7 +101,7 @@ import { SupplementalCardComponent } from 'pages/exploration-player-page/learner
 import { SavePendingChangesModalComponent } from './save-pending-changes/save-pending-changes-modal.component';
 import { AddHintModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-hint-modal.component';
 import { SmoothHeightAnimatorComponent } from './smooth-height/smooth-height-animator.component';
-import { OutcomeDestinstionEditorComponent } from './state-directives/outcome-editor/outcome-destination-editor.component';
+import { OutcomeDestinationEditorComponent } from './state-directives/outcome-editor/outcome-destination-editor.component';
 import { ConversationSkinComponent } from 'pages/exploration-player-page/learner-experience/conversation-skin.component';
 import { RatingsAndRecommendationsComponent } from 'pages/exploration-player-page/learner-experience/ratings-and-recommendations.component';
 import { LearnerAnswerInfoCard } from 'pages/exploration-player-page/learner-experience/learner-answer-info-card.component';
@@ -202,7 +202,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     MultiSelectionFieldComponent,
     OnScreenKeyboardComponent,
     OppiaAngularRootComponent,
-    OutcomeDestinstionEditorComponent,
+    OutcomeDestinationEditorComponent,
     OutcomeFeedbackEditorComponent,
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
@@ -294,7 +294,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     TakeBreakModalComponent,
     StateSkillEditorComponent,
     ExplorationEmbedButtonModalComponent,
-    OutcomeDestinstionEditorComponent,
+    OutcomeDestinationEditorComponent,
     LearnerAnswerInfoCard,
     OutcomeFeedbackEditorComponent,
     HintAndSolutionButtonsComponent,
@@ -394,7 +394,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     FilterForMatchingSubstringPipe,
     OnScreenKeyboardComponent,
     OppiaAngularRootComponent,
-    OutcomeDestinstionEditorComponent,
+    OutcomeDestinationEditorComponent,
     OutcomeFeedbackEditorComponent,
     ProgressNavComponent,
     SearchBarComponent,

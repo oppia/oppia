@@ -31,10 +31,10 @@ import { AppConstants } from 'app.constants';
   selector: 'oppia-outcome-destination-editor',
   templateUrl: './outcome-destination-editor.component.html'
 })
-export class OutcomeDestinstionEditorComponent implements
+export class OutcomeDestinationEditorComponent implements
   OnInit, OnDestroy {
-  @Input() outcome;
-  @Input() outcomeHasFeedback;
+  @Input() outcome: Outcome;
+  @Input() outcomeHasFeedback: boolean;
   @Input() addState;
   directiveSubscriptions = new Subscription();
   PLACEHOLDER_OUTCOME_DEST = AppConstants.PLACEHOLDER_OUTCOME_DEST;
@@ -75,84 +75,78 @@ export class OutcomeDestinstionEditorComponent implements
 
 
   updateOptionNames(): void {
-    // $timeout is being used here to update the view.
-    // $scope.$applyAsync() doesn't work and $scope.$apply() causes
-    // console errors.
-    setTimeout(() => {
-      this.currentStateName = this.stateEditorService.getActiveStateName();
+    this.currentStateName = this.stateEditorService.getActiveStateName();
 
-      let questionModeEnabled = this.stateEditorService.isInQuestionMode();
-      // This is a list of objects, each with an ID and name. These
-      // represent all states, as well as an option to create a
-      // new state.
-      this.destChoices = [{
-        id: (questionModeEnabled ? null : this.currentStateName),
-        text: '(try again)'
-      }];
+    let questionModeEnabled = this.stateEditorService.isInQuestionMode();
+    // This is a list of objects, each with an ID and name. These
+    // represent all states, as well as an option to create a
+    // new state.
+    this.destChoices = [{
+      id: (questionModeEnabled ? null : this.currentStateName),
+      text: '(try again)'
+    }];
 
-      // Arrange the remaining states based on their order in the state
-      // graph.
-      let lastComputedArrangement = (
-        this.stateGraphLayoutService.getLastComputedArrangement());
-      let allStateNames = this.stateEditorService.getStateNames();
+    // Arrange the remaining states based on their order in the state
+    // graph.
+    let lastComputedArrangement = (
+      this.stateGraphLayoutService.getLastComputedArrangement());
+    let allStateNames = this.stateEditorService.getStateNames();
 
-      // It is possible that lastComputedArrangement is null if the
-      // graph has never been rendered at the time this computation is
-      // being carried out.
-      let stateNames = angular.copy(allStateNames);
-      let stateName = null;
-      if (lastComputedArrangement) {
-        let maxDepth = 0;
-        let maxOffset = 0;
-        for (stateName in lastComputedArrangement) {
-          maxDepth = Math.max(
-            maxDepth, lastComputedArrangement[stateName].depth);
-          maxOffset = Math.max(
-            maxOffset, lastComputedArrangement[stateName].offset);
-        }
-
-        // Higher scores come later.
-        let allStateScores = {};
-        let unarrangedStateCount = 0;
-        for (let i = 0; i < allStateNames.length; i++) {
-          stateName = allStateNames[i];
-          if (lastComputedArrangement.hasOwnProperty(stateName)) {
-            allStateScores[stateName] = (
-              lastComputedArrangement[stateName].depth *
-              (maxOffset + 1) +
-              lastComputedArrangement[stateName].offset);
-          } else {
-            // States that have just been added in the rule 'create new'
-            // modal are not yet included as part of
-            // lastComputedArrangement so we account for them here.
-            allStateScores[stateName] = (
-              (maxDepth + 1) * (maxOffset + 1) + unarrangedStateCount);
-            unarrangedStateCount++;
-          }
-        }
-
-        stateNames = allStateNames.sort(function(a, b) {
-          return allStateScores[a] - allStateScores[b];
-        });
+    // It is possible that lastComputedArrangement is null if the
+    // graph has never been rendered at the time this computation is
+    // being carried out.
+    let stateNames = angular.copy(allStateNames);
+    let stateName = null;
+    if (lastComputedArrangement) {
+      let maxDepth = 0;
+      let maxOffset = 0;
+      for (stateName in lastComputedArrangement) {
+        maxDepth = Math.max(
+          maxDepth, lastComputedArrangement[stateName].depth);
+        maxOffset = Math.max(
+          maxOffset, lastComputedArrangement[stateName].offset);
       }
 
-      for (let i = 0; i < stateNames.length; i++) {
-        if (stateNames[i] !== this.currentStateName) {
-          this.destChoices.push({
-            id: stateNames[i],
-            text: stateNames[i]
-          });
+      // Higher scores come later.
+      let allStateScores = {};
+      let unarrangedStateCount = 0;
+      for (let i = 0; i < allStateNames.length; i++) {
+        stateName = allStateNames[i];
+        if (lastComputedArrangement.hasOwnProperty(stateName)) {
+          allStateScores[stateName] = (
+            lastComputedArrangement[stateName].depth *
+            (maxOffset + 1) +
+            lastComputedArrangement[stateName].offset);
+        } else {
+          // States that have just been added in the rule 'create new'
+          // modal are not yet included as part of
+          // lastComputedArrangement so we account for them here.
+          allStateScores[stateName] = (
+            (maxDepth + 1) * (maxOffset + 1) + unarrangedStateCount);
+          unarrangedStateCount++;
         }
       }
 
-      if (!questionModeEnabled) {
+      stateNames = allStateNames.sort(function(a, b) {
+        return allStateScores[a] - allStateScores[b];
+      });
+    }
+
+    for (let i = 0; i < stateNames.length; i++) {
+      if (stateNames[i] !== this.currentStateName) {
         this.destChoices.push({
-          id: this.PLACEHOLDER_OUTCOME_DEST,
-          text: 'A New Card Called...'
+          id: stateNames[i],
+          text: stateNames[i]
         });
       }
-      // This value of 10ms is arbitrary, it has no significance.
-    }, 10);
+    }
+
+    if (!questionModeEnabled) {
+      this.destChoices.push({
+        id: this.PLACEHOLDER_OUTCOME_DEST,
+        text: 'A New Card Called...'
+      });
+    }
   }
 
   ngOnInit(): void {
@@ -166,9 +160,8 @@ export class OutcomeDestinstionEditorComponent implements
           this.editorFirstTimeEventsService
             .registerFirstCreateSecondStateEvent();
 
-          let newStateName = this.outcome.newStateName;
+          let newStateName = this.stateEditorService.getActiveStateName();
           this.outcome.dest = newStateName;
-          delete this.outcome.newStateName;
 
           this.addState(newStateName);
         }
@@ -202,4 +195,4 @@ export class OutcomeDestinstionEditorComponent implements
 }
 
 angular.module('oppia').directive('oppiaOutcomeDestinstionEditor',
-  downgradeComponent({component: OutcomeDestinstionEditorComponent}));
+  downgradeComponent({component: OutcomeDestinationEditorComponent}));
