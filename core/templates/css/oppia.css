@@ -773,7 +773,8 @@ textarea {
   background-color: #094142;
   bottom: 0;
   color: #fff;
-  font-size: 15px;
+  font-size: 14px;
+  font-weight: bold;
   line-height: 20px;
   padding-bottom: 5vh;
   position: relative;
