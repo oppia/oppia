@@ -86,7 +86,7 @@ describe('SubtopicSummaryTileComponent', () => {
 
     spyOn(abas, 'getThumbnailUrlForPreview').and.returnValue('/thumbnail/url');
     spyOn(i18nLanguageCodeService, 'getSubtopicTranslationKey')
-      .and.returnValue('I18N_SUBTOPIC_123abcd_1_TITLE');
+      .and.returnValue('I18N_SUBTOPIC_123abcd_title_TITLE');
 
     component.ngOnInit();
 
@@ -94,7 +94,7 @@ describe('SubtopicSummaryTileComponent', () => {
     expect(component.subtopicTitle).toBe('Title');
     expect(component.thumbnailUrl).toBe('/thumbnail/url');
     expect(component.subtopicTitleTranslationKey).toBe(
-      'I18N_SUBTOPIC_123abcd_1_TITLE');
+      'I18N_SUBTOPIC_123abcd_title_TITLE');
   });
 
   it('should set thumbnail url as null if thumbnail is not present', () => {
@@ -108,7 +108,7 @@ describe('SubtopicSummaryTileComponent', () => {
   it('should check if subtopic translation is displayed correctly', () => {
     spyOn(abas, 'getThumbnailUrlForPreview').and.returnValue('/thumbnail/url');
     spyOn(i18nLanguageCodeService, 'getSubtopicTranslationKey')
-      .and.returnValue('I18N_SUBTOPIC_123abcd_1_TITLE');
+      .and.returnValue('I18N_SUBTOPIC_123abcd_test_TITLE');
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
       .and.returnValue(false);
     spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
@@ -117,7 +117,7 @@ describe('SubtopicSummaryTileComponent', () => {
     component.ngOnInit();
 
     expect(component.subtopicTitleTranslationKey).toBe(
-      'I18N_SUBTOPIC_123abcd_1_TITLE');
+      'I18N_SUBTOPIC_123abcd_test_TITLE');
     let hackySubtopicTitleTranslationIsDisplayed =
       component.isHackySubtopicTitleTranslationDisplayed();
     expect(hackySubtopicTitleTranslationIsDisplayed).toBe(true);

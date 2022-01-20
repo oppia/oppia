@@ -102,19 +102,19 @@ export class I18nLanguageCodeService {
 
   // TODO(#14645): Remove this method when translation service is extended.
   /**
-   * Takes topic id, subtopic id and entity translationKey type as input,
-   * generates and returns the translation key based on that.
+   * Takes topic id, subtopic url fragment and entity translationKey type as
+   * input, generates and returns the translation key based on that.
    * @param {string} topicId - Unique id of the topic, used to generate
    * translation key.
-   * @param {number} subtopicId - Unique id of the subtopic, with respect
-   * to the topic.
+   * @param {string} subtopicUrlFragment - Unique url fragment subtopic, with
+   * respect to the topic.
    * @param {TranslationKeyType} keyType - either Title or Description.
    * @returns {string} - translation key for the subtopic name/description.
    */
   getSubtopicTranslationKey(
-      topicId: string, subtopicId: number,
+      topicId: string, subtopicUrlFragment: string,
       keyType: TranslationKeyType): string {
-    return `I18N_SUBTOPIC_${topicId}_${subtopicId}_${keyType}`;
+    return `I18N_SUBTOPIC_${topicId}_${subtopicUrlFragment}_${keyType}`;
   }
 
   // TODO(#14645): Remove this method when translation service is extended.

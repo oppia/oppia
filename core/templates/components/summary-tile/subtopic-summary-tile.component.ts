@@ -80,7 +80,7 @@ export class SubtopicSummaryTileComponent implements OnInit {
     }
     this.subtopicTitleTranslationKey = this.i18nLanguageCodeService.
       getSubtopicTranslationKey(
-        this.topicId, this.subtopic.getId(),
+        this.topicId, this.subtopic.getUrlFragment(),
         TranslationKeyType.TITLE);
   }
 

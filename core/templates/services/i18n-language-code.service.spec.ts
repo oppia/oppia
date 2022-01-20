@@ -97,16 +97,17 @@ describe('I18nLanguageCodeService', () => {
     expect(translationKey).toBe('I18N_TOPIC_abc1234_TITLE');
 
     translationKey = i18nLanguageCodeService.getSubtopicTranslationKey(
-      'abc1234', 1, TranslationKeyType.TITLE);
-    expect(translationKey).toBe('I18N_SUBTOPIC_abc1234_1_TITLE');
+      'abc1234', 'test-subtopic', TranslationKeyType.TITLE);
+    expect(translationKey).toBe('I18N_SUBTOPIC_abc1234_test-subtopic_TITLE');
 
     translationKey = i18nLanguageCodeService.getTopicTranslationKey(
       'abc1234', TranslationKeyType.DESCRIPTION);
     expect(translationKey).toBe('I18N_TOPIC_abc1234_DESCRIPTION');
 
     translationKey = i18nLanguageCodeService.getSubtopicTranslationKey(
-      'abc1234', 1, TranslationKeyType.DESCRIPTION);
-    expect(translationKey).toBe('I18N_SUBTOPIC_abc1234_1_DESCRIPTION');
+      'abc1234', 'test-subtopic', TranslationKeyType.DESCRIPTION);
+    expect(translationKey).toBe(
+      'I18N_SUBTOPIC_abc1234_test-subtopic_DESCRIPTION');
   });
 
   it('should get story and story node translation keys correctly', () => {
