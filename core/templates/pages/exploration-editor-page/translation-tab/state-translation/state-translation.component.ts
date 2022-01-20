@@ -65,7 +65,7 @@ import {
   TRANSLATION_DATA_FORMAT_UNICODE,
   TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING,
   TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING
-} from 'domain/exploration/writtentranslation-object.model';
+} from 'domain/exploration/written-translation.model';
 import { InteractionCustomizationArgs } from
   'interactions/customization-args-defs';
 import { Rule } from 'domain/exploration/RuleObjectFactory';

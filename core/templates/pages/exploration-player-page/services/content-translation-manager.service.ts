@@ -27,7 +27,7 @@ import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
 import { StateCard } from 'domain/state_card/state-card.model';
 import { WrittenTranslation } from
-  'domain/exploration/writtentranslation-object.model';
+  'domain/exploration/written-translation.model';
 import { SubtitledHtml } from
   'domain/exploration/subtitled-html.model';
 import { Schema } from 'services/schema-default-value.service';

@@ -32,7 +32,7 @@ import { ParamChangesObjectFactory } from
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { WrittenTranslation } from
-  'domain/exploration/writtentranslation-object.model';
+  'domain/exploration/written-translation.model';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';

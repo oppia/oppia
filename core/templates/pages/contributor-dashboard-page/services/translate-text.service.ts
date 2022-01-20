@@ -26,7 +26,7 @@ import { TranslatableTexts } from 'domain/opportunity/translatable-texts.model';
 import {
   TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING,
   TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING
-} from 'domain/exploration/writtentranslation-object.model';
+} from 'domain/exploration/written-translation.model';
 
 export interface TranslatableItem {
   translation: string | string[];

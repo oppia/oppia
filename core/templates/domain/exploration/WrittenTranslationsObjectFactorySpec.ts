@@ -20,7 +20,7 @@ import { TestBed } from '@angular/core/testing';
 import { WrittenTranslations, WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 import { WrittenTranslation } from
-  'domain/exploration/writtentranslation-object.model';
+  'domain/exploration/written-translation.model';
 
 describe('Written Translations Object Factory', () => {
   let writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory;

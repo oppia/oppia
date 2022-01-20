@@ -24,7 +24,7 @@ import {
   DataFormatToDefaultValuesKey,
   TranslationBackendDict,
   WrittenTranslation
-} from 'domain/exploration/writtentranslation-object.model';
+} from 'domain/exploration/written-translation.model';
 
 export interface WrittenTranslationsBackendDict {
   'translations_mapping': {

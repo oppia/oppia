@@ -27,7 +27,7 @@ import {
 import { AppConstants } from 'app.constants';
 import { Voiceover } from 'domain/exploration/voiceover.model';
 import { WrittenTranslation } from
-  'domain/exploration/writtentranslation-object.model';
+  'domain/exploration/written-translation.model';
 
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { InteractionSpecsKey } from 'pages/interaction-specs.constants';

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the writtentranslation-object.model.
+ * @fileoverview Unit tests for the written-translation.model.
  */
 
 import {
@@ -22,7 +22,7 @@ import {
   TRANSLATION_DATA_FORMAT_UNICODE,
   TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING,
   TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING
-} from 'domain/exploration/writtentranslation-object.model';
+} from 'domain/exploration/written-translation.model';
 
 describe('WrittenTranslation object factory', () => {
   let writtenTranslation1: WrittenTranslation;
