@@ -517,11 +517,11 @@ class UserStatsEventsFunctionsTests(test_utils.GenericTestBase):
     def test_average_ratings_of_users_exps_are_calculated_correctly(self):
 
         # If user id is not present in UserStatsModel.
-        # Here, self.admin_id is not yet inserted in the user models.
+        # Here, invalid_id is not yet inserted in the user models.
         event_services.handle_exploration_rating('exp_id', 5, None)
         admin_average_ratings = (
-            user_services.get_dashboard_stats(self.admin_id)['average_ratings'])
-        self.assertEqual(admin_average_ratings, 5)
+            user_services.get_dashboard_stats('invalid_id')['average_ratings'])
+        self.assertEqual(admin_average_ratings, None)
 
         # Inserting self.admin_id in the UserStatsModel.
         user_models.UserStatsModel(
