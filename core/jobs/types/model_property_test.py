@@ -75,22 +75,22 @@ class ModelPropertyTests(test_utils.TestBase):
     def test_init_raises_type_error_when_model_is_not_a_class(self):
         model = SubclassOfBaseModel()
 
-        with self.assertRaisesRegexp(TypeError, 'not a model class'):
+        with self.assertRaisesRegex(TypeError, 'not a model class'):
             model_property.ModelProperty(model, SubclassOfBaseModel.value)
 
     def test_init_raises_type_error_when_model_is_unrelated_to_base_model(self):
-        with self.assertRaisesRegexp(TypeError, 'not a subclass of BaseModel'):
+        with self.assertRaisesRegex(TypeError, 'not a subclass of BaseModel'):
             model_property.ModelProperty(
                 SubclassOfNdbModel, SubclassOfNdbModel.value)
 
     def test_init_raises_type_error_when_property_is_not_an_ndb_property(self):
         model = SubclassOfBaseModel(value='123')
 
-        with self.assertRaisesRegexp(TypeError, 'not an NDB Property'):
+        with self.assertRaisesRegex(TypeError, 'not an NDB Property'):
             model_property.ModelProperty(SubclassOfBaseModel, model.value)
 
     def test_init_raises_value_error_when_property_is_not_in_model(self):
-        with self.assertRaisesRegexp(ValueError, 'not a property of'):
+        with self.assertRaisesRegex(ValueError, 'not a property of'):
             model_property.ModelProperty(
                 SubclassOfBaseModel, SubclassOfNdbModel.value)
 
@@ -208,7 +208,7 @@ class ModelPropertyTests(test_utils.TestBase):
     def test_yield_value_from_model_raises_type_error_if_not_right_kind(self):
         model = RepeatedValueModel(values=['123', '456', '789'])
 
-        self.assertRaisesRegexp(
+        self.assertRaisesRegex(
             TypeError, 'not an instance of SubclassOfBaseModel',
             lambda: list(self.ndb_property.yield_value_from_model(model)))
 

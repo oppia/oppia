@@ -1,10 +1,10 @@
 <div class="oppia-topic-viewer-container position-relative">
   <div class="oppia-topic-viewer-tabs-container position-relative" headroom>
     <div class="topic-viewer-tabs-list">
-      <ul class="topic-viewer-tabs">
+      <ul class="topic-viewer-tabs" [ngClass]="checkTabletView() ? 'pad-top-mobile': 'pad-top-desktop'">
         <li [ngClass]="{'topic-viewer-tabs-active': activeTab === 'story'}">
           <div class="topic-viewer-tabs-text" (click)="setActiveTab('story')">
-            <img alt="play story icon" class="tab-icon" [src]="getStaticImageUrl('/icons/play_icon_24px.svg')">
+            <img *ngIf="!checkTabletView()" alt="play story icon" class="tab-icon" [src]="getStaticImageUrl('/icons/play_icon_24px.svg')">
             <a class="tab-title"
                [innerHTML]="'I18N_TOPIC_VIEWER_LESSONS' | translate">
             </a>
@@ -12,7 +12,7 @@
         </li>
         <li [ngClass]="{'topic-viewer-tabs-active': activeTab === 'practice'}">
           <div class="topic-viewer-tabs-text" (click)="setActiveTab('practice')">
-            <img alt="" class="tab-icon" [src]="getStaticImageUrl('/icons/train_icon_24px.svg')">
+            <img *ngIf="!checkTabletView()" alt="practice icon" class="tab-icon" [src]="getStaticImageUrl('/icons/train_icon_24px.svg')">
             <a class="tab-title protractor-test-practice-tab-link"
                [innerHTML]="'I18N_TOPIC_VIEWER_PRACTICE' | translate">
             </a>
@@ -20,7 +20,7 @@
         </li>
         <li [ngClass]="{'topic-viewer-tabs-active': activeTab === 'subtopics'}">
           <div class="topic-viewer-tabs-text" (click)="setActiveTab('subtopics')">
-            <img alt="" class="tab-icon" [src]="getStaticImageUrl('/icons/review_icon_24px.svg')">
+            <img *ngIf="!checkTabletView()" alt="practice icon" class="tab-icon" [src]="getStaticImageUrl('/icons/review_icon_24px.svg')">
             <a class="tab-title protractor-test-revision-tab-link"
                [innerHTML]="'I18N_TOPIC_VIEWER_REVISION' | translate">
             </a>
@@ -40,8 +40,10 @@
                     [topicUrlFragment]="topicUrlFragment">
       </stories-list>
       <mat-card dir="auto" *ngIf="!canonicalStorySummaries.length" class="oppia-page-card practice-tab-not-available-card">
-        <h2 class="coming-soon-title">Coming Soon!</h2>
-        <div class="coming-soon-text">Come back later when lessons are available for this topic.</div>
+        <h2 class="coming-soon-title" [innerHTML]="'I18N_TOPIC_VIEWER_COMING_SOON' | translate">
+        </h2>
+        <div class="coming-soon-text" [innerHTML]="'I18N_TOPIC_VIEWER_COMING_SOON_LESSONS' | translate">
+        </div>
       </mat-card>
     </div>
     <div *ngIf="activeTab === 'practice'">
@@ -50,8 +52,10 @@
                     [topicName]="topicName">
       </practice-tab>
       <mat-card dir="auto" *ngIf="!practiceTabIsDisplayed" class="oppia-page-card practice-tab-not-available-card">
-        <h2 class="coming-soon-title">Coming Soon!</h2>
-        <div class="coming-soon-text">Come back later when practice questions are available for this topic.</div>
+        <h2 class="coming-soon-title" [innerHTML]="'I18N_TOPIC_VIEWER_COMING_SOON' | translate">
+        </h2>
+        <div class="coming-soon-text" [innerHTML]="'I18N_TOPIC_VIEWER_COMING_SOON_PRACTICE' | translate">
+        </div>
       </mat-card>
     </div>
     <div *ngIf="activeTab === 'subtopics'">
@@ -72,7 +76,7 @@
   }
 
   .navbar-light .navbar-container {
-    background: #00645C;
+    background: #00645c;
     border-bottom: 1px solid rgba(255, 255, 255, 0.5);
   }
 
@@ -101,7 +105,7 @@
   }
 
   .oppia-topic-viewer-tabs-container {
-    background-color: #00645C;
+    background-color: #00645c;
     box-shadow: 3px 3px 6px rgba(0,0,0, 0.5);
     font-family: 'Capriola', 'Roboto', Arial, sans-serif;
     margin: 0 auto;
@@ -138,9 +142,16 @@
     justify-content: space-evenly;
     margin-bottom: 0;
     padding-left: 0;
-    padding-top: 20px;
     text-align: center;
     width: 100%;
+  }
+
+  .oppia-topic-viewer-tabs-container .pad-top-mobile {
+    padding-top: 10px;
+  }
+
+  .oppia-topic-viewer-tabs-container .pad-top-desktop {
+    padding-top: 20px;
   }
 
   .oppia-topic-viewer-tabs-container .topic-viewer-tabs li {
