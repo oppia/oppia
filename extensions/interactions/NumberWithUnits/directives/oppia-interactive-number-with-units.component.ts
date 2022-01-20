@@ -106,6 +106,7 @@ export class InteractiveNumberWithUnitsComponent
     try {
       const numberWithUnits = (
         this.numberWithUnitsObjectFactory.fromRawInputString(this.answer));
+      // TODO(#13015): Remove use of unknown as a type.
       this.currentInteractionService.onSubmit(
         numberWithUnits as unknown as string,
         this.numberWithUnitsRulesService as unknown as InteractionRulesService);
