@@ -7,7 +7,7 @@
     <div class="col-md-3 oppia-learner-dashboard-side-content"
          *ngIf="!windowIsNarrow">
       <mat-card class="oppia-learner-dashboard-main-menu">
-        <h4 class="oppia-learner-dashboard-menu protractor-test-home-section"
+        <h4 class="oppia-learner-dashboard-menu oppia-learner-dashborad-menu-hover protractor-test-home-section"
             [ngClass]="{'oppia-learner-dashboard-section-active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME}"
             (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME)">
           <span [innerHTML]="LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME | translate"></span>
@@ -431,12 +431,12 @@
   }
 
   .oppia-learner-dashboard-section-active {
-    background-color: #00645c1a;
+    background-color: rgba(0, 100, 92, 0.1);
     color: #00645c;
   }
 
   .oppia-learner-dashborad-menu-hover:hover {
-    background-color: #00645C1A;
+    background-color: rgba(0, 100, 92, 0.1);
   }
 
   .oppia-learner-dashboard-side-content {
