@@ -116,16 +116,17 @@ export class InteractiveRatioExpressionInputComponent
         this.expectedNumberOfTerms !== 0
       ) {
         throw new Error(
-          'The creator has specified the number of terms in' +
-          ' the answer to be ' + this.expectedNumberOfTerms + '.'
+          'The creator has specified the number of terms in ' +
+          `the answer to be ${this.expectedNumberOfTerms}.`
         );
       }
       this.errorMessage = '';
       this.isValid = true;
+      // TODO(#13015): Remove use of unknown as a type.
       this.currentInteractionService.onSubmit(
         ratioExpression.getComponents() as unknown as string,
-        // eslint-disable-next-line max-len
-        this.ratioExpressionInputRulesService as unknown as InteractionRulesService);
+        this.ratioExpressionInputRulesService as unknown as
+        InteractionRulesService);
     } catch (parsingError) {
       this.errorMessage = parsingError.message;
       this.isValid = false;
