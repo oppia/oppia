@@ -212,8 +212,8 @@ class PreferencesHandler(base.BaseHandler):
                 raise self.InvalidInputException(
                     'User bio exceeds maximum character limit: %s'
                     % feconf.MAX_BIO_LENGTH_IN_CHARS)
-            else:
-                user_services.update_user_bio(self.user_id, data)
+
+            user_services.update_user_bio(self.user_id, data)
         elif update_type == 'subject_interests':
             user_services.update_subject_interests(self.user_id, data)
         elif update_type == 'preferred_language_codes':
@@ -306,6 +306,17 @@ class SignupPage(base.BaseHandler):
     """The page which prompts for username and acceptance of terms."""
 
     REDIRECT_UNFINISHED_SIGNUPS = False
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'return_url': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            }
+        }
+    }
 
     @acl_decorators.require_user_id_else_redirect_to_homepage
     def get(self):
@@ -416,8 +427,8 @@ class SignupHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'In order to edit explorations on this site, you will '
                 'need to accept the license terms.')
-        else:
-            user_services.record_agreement_to_terms(self.user_id)
+
+        user_services.record_agreement_to_terms(self.user_id)
 
         if not user_services.get_username(self.user_id):
             user_services.set_username(self.user_id, username)

@@ -18,9 +18,9 @@
         <div class="concept-card-subtitle">
           This gives the learner a brief overview of how to perform the skill.
         </div>
-        <review-material-editor bindable-dict="bindableFieldsDict"
-                                on-save-explanation="onSaveExplanation">
-        </review-material-editor>
+        <oppia-review-material-editor [bindable-dict]="bindableFieldsDict"
+                                      (on-save-explanation)="onSaveExplanation($event)">
+        </oppia-review-material-editor>
       </div>
     </div>
   </div>
