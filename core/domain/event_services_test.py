@@ -442,25 +442,34 @@ class AnswerSubmissionEventHandlerTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration(exp_id, self.OWNER_EMAIL)
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
 
-        # Args errors in event_services.py (AnswerSubmissionEventHandler)
-        # Error: Cannot init list(dict(str, any)) because it is not
-        # of the type list(str, any).
-        do_nothing_swap = self.swap_to_always_return(
-            stats_services, 'record_answer', value=True)
-        with do_nothing_swap:
-            event_services.AnswerSubmissionEventHandler.record(
-                exp_id,
-                exploration.version,
-                state_name=feconf.DEFAULT_INIT_STATE_NAME,
-                interaction_id=1,
-                answer_group_index=1,
-                rule_spec_index=1,
-                classification_categorization=category,
-                session_id=session_id,
-                time_spent_in_secs=2,
-                params={},
-                normalized_answer='answer_submitted'
-            )
+        event_services.AnswerSubmissionEventHandler.record(
+            exp_id,
+            exploration.version,
+            state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            interaction_id='TextInput',
+            answer_group_index=1,
+            rule_spec_index=1,
+            classification_categorization=category,
+            session_id=session_id,
+            time_spent_in_secs=2,
+            params={},
+            normalized_answer='answer_submitted'
+        )
+
+        state_answers = stats_services.get_state_answers(
+            exp_id, exploration.version,
+            exploration.init_state_name)
+
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+            'answer': 'answer_submitted',
+            'time_spent_in_sec': 2.0,
+            'answer_group_index': 1,
+            'rule_spec_index': 1,
+            'classification_categorization': category,
+            'session_id': session_id,
+            'interaction_id': 'TextInput',
+            'params': {}
+        }])
 
         all_models = (
             stats_models.AnswerSubmittedEventLogEntryModel.get_all())
