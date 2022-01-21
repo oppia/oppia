@@ -337,13 +337,9 @@ class StoryReference:
             ValidationError. One or more attributes of the StoryReference are
                 invalid.
         """
-        if self.story_id == '':
-            raise utils.ValidationError(
-                'Story id should not be empty')
-
         if not bool(re.match(constants.ENTITY_ID_REGEX, self.story_id)):
             raise utils.ValidationError(
-                'Invalid story id')
+                'Invalid story ID: %s' % self.story_id)
 
 
 class SubtopicDict(TypedDict):

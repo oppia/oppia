@@ -116,17 +116,10 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
     def test_validation_story_id_with_invalid_data(self) -> None:
         story_reference = (
-            topic_domain.StoryReference.create_default_story_reference(''))
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
-            utils.ValidationError, 'Story id should not be empty'
-        ):
-            story_reference.validate()
-
-        story_reference = (
             topic_domain.StoryReference.create_default_story_reference(
                 '#6*5&A0%'))
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
-            utils.ValidationError, 'Invalid story id'
+            utils.ValidationError, 'Invalid story ID:'
         ):
             story_reference.validate()
 
