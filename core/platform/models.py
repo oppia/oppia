@@ -18,9 +18,6 @@ if MYPY:
     from mypy_imports import base_models
 
 
-
-
-
 class Names(enum.Enum):
     """Enum for valid model names."""
 
@@ -50,8 +47,6 @@ class Names(enum.Enum):
     TOPIC = 'topic'
     TRANSLATION = 'translation'
     USER = 'user'
-
-
 
 
 MODULES_WITH_PSEUDONYMIZABLE_CLASSES = (
@@ -85,7 +80,6 @@ class _Gae(Platform):
     """Provides platform-specific imports related to
     GAE (Google App Engine).
     """
-
 
     @classmethod
     def import_models(cls, model_names: List[Names]) -> Tuple[ModuleType, ...]:
@@ -395,7 +389,6 @@ class Registry:
     """Platform-agnostic interface for retrieving platform-specific
     modules.
     """
-
 
     _PLATFORM_MAPPING = {
         _Gae.NAME: _Gae,
