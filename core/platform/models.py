@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import enum
 import inspect
-from types import ModuleType
+from types import ModuleType # pylint:disable=import-only-modules
 
 from core import feconf
 from core.constants import constants
