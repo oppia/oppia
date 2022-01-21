@@ -122,7 +122,7 @@ export class RequestInterceptor implements HttpInterceptor {
   }
 
   private static validateParams(request: HttpRequest<FormData>): void {
-    if (request.params === null) {
+    if (!request.params) {
       return;
     }
     RequestInterceptor.checkForNullParams(request.params);

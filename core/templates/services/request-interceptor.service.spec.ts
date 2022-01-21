@@ -166,7 +166,7 @@ describe('Request Interceptor Service', () => {
     }).toBeTruthy();
   });
 
-  it('should not throw error if params are null', () => {
+  it('should not throw error if no params are specified', () => {
     expect(() => {
       requestInterceptor.intercept(
         new HttpRequest(
