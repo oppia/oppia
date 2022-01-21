@@ -238,7 +238,7 @@ class BaseChange:
         return base_change_dict
 
     # Here we use Any, because getattr is of Callable type and
-    # it does not make sense to check it against anything
+    # it does not make sense to check it against anything.
     def __getattr__(self, name: str) -> Any:
         # AttributeError needs to be thrown in order to make
         # instances of this class picklable.
