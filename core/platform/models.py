@@ -114,7 +114,7 @@ class _Gae(Platform):
             if name == Names.ACTIVITY:
                 from core.storage.activity import gae_models as activity_models
                 returned_models.append(activity_models)
-            elif name == Names.APPFEEDBACKREPORT:
+            elif name == Names.APP_FEEDBACK_REPORT:
                 from core.storage.app_feedback_report import (
                     gae_models as app_feedback_report_models)
                 returned_models.append(app_feedback_report_models)
@@ -144,7 +144,7 @@ class _Gae(Platform):
             elif name == Names.CONFIG:
                 from core.storage.config import gae_models as config_models
                 returned_models.append(config_models)
-            elif name == Names.email:
+            elif name == Names.EMAIL:
                 from core.storage.email import gae_models as email_models
                 returned_models.append(email_models)
             elif name == Names.EXPLORATION:
@@ -238,7 +238,7 @@ class _Gae(Platform):
         Returns:
             list(class). The corresponding storage-layer model classes.
         """
-        model_names = [name for name in Names if name != Names.BASEMODEL]
+        model_names = [name for name in Names if name != Names.BASE_MODEL]
         return cls.get_storage_model_classes(model_names)
 
     @classmethod

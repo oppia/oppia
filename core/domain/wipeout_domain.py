@@ -95,6 +95,6 @@ class PendingDeletionRequest:
                 contains wrong key.
         """
         for key in self.pseudonymizable_entity_mappings.keys():
-            if key not in [name.value for name in models.NAMES]:
+            if key not in [name.value for name in models.Names]:
                 raise utils.ValidationError(
                     'pseudonymizable_entity_mappings contain wrong key')
