@@ -80,7 +80,7 @@ export class RequestInterceptor implements HttpInterceptor {
       }
     }
 
-    RequestInterceptor.validateParams(request);
+    RequestInterceptor.checkForNullParams(request.params);
 
     if (request.body) {
       return from(this.csrf.getTokenAsync())
@@ -121,14 +121,7 @@ export class RequestInterceptor implements HttpInterceptor {
     }
   }
 
-  private static validateParams(request: HttpRequest<FormData>): void {
-    if (!request.params) {
-      return;
-    }
-    RequestInterceptor.checkForNullParams(request.params);
-  }
-
-  private static checkForNullParams(params: HttpParams) {
+  private static checkForNullParams(params: HttpParams): void {
     params.keys().forEach((key: string) => {
       params.getAll(key)?.forEach((value: string) => {
         if (value === 'null' || value === 'None') {
