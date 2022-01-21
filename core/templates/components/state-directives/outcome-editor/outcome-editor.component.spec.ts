@@ -13,55 +13,54 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for OutcomeEditorComponent.
+ * @fileoverview Unit tests for outcome editor component.
  */
 
-import { EventEmitter } from '@angular/core';
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
+import { ExternalSaveService } from 'services/external-save.service';
+import { OutcomeEditorComponent } from './outcome-editor.component';
 
-describe('OutcomeEditorComponent', () => {
-  let ctrl = null;
-  let $scope = null;
-  let $rootScope = null;
+describe('Outcome Editor Component', () => {
+  let component: OutcomeEditorComponent;
+  let fixture: ComponentFixture<OutcomeEditorComponent>;
+  let externalSaveService: ExternalSaveService;
+  let outcomeObjectFactory: OutcomeObjectFactory;
+  let stateEditorService: StateEditorService;
+  let stateInteractionIdService: StateInteractionIdService;
 
-  let StateEditorService = null;
-  let ExternalSaveService = null;
-  let StateInteractionIdService = null;
-  let OutcomeObjectFactory = null;
-
-  beforeEach(angular.mock.module('oppia'));
-  importAllAngularServices();
-
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
-
-    StateEditorService = $injector.get('StateEditorService');
-    ExternalSaveService = $injector.get('ExternalSaveService');
-    StateInteractionIdService = $injector.get('StateInteractionIdService');
-    OutcomeObjectFactory = $injector.get('OutcomeObjectFactory');
-
-    ctrl = $componentController('outcomeEditor', {
-      $scope: $scope
-    }, {
-      isEditable: () => true,
-      getOnSaveCorrectnessLabelFn: () => {
-        return () => {};
-      },
-      showMarkAllAudioAsNeedingUpdateModalIfRequired: () => {},
-      getOnSaveFeedbackFn: () => {
-        return () => {};
-      },
-      getOnSaveDestFn: () => {
-        return () => {};
-      }
-    });
-
-    spyOn(StateEditorService, 'isExplorationWhitelisted').and.returnValue(true);
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      declarations: [
+        OutcomeEditorComponent
+      ],
+      providers: [
+        ExternalSaveService,
+        StateEditorService,
+        StateInteractionIdService,
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
 
+  beforeEach(() => {
+    fixture = TestBed.createComponent(OutcomeEditorComponent);
+    component = fixture.componentInstance;
+    externalSaveService = TestBed.inject(ExternalSaveService);
+    outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
+    stateEditorService = TestBed.inject(StateEditorService);
+    stateInteractionIdService = TestBed.inject(StateInteractionIdService);
+
+    spyOn(stateEditorService, 'isExplorationWhitelisted').and.returnValue(true);
+  });
+
   afterEach(() => {
-    ctrl.$onDestroy();
+    component.ngOnDestroy();
   });
 
   it('should set component properties on initialization', () => {
@@ -71,127 +70,124 @@ describe('OutcomeEditorComponent', () => {
       },
       hasNonemptyFeedback: () => true
     };
-    ctrl.outcome = outcome;
+    component.outcome = outcome;
 
-    expect(ctrl.editOutcomeForm).toEqual(undefined);
-    expect(ctrl.canAddPrerequisiteSkill).toBe(undefined);
-    expect(ctrl.feedbackEditorIsOpen).toBe(undefined);
-    expect(ctrl.destinationEditorIsOpen).toBe(undefined);
-    expect(ctrl.correctnessLabelEditorIsOpen).toBe(undefined);
-    expect(ctrl.savedOutcome).toBe(undefined);
+    expect(component.editOutcomeForm).toEqual(undefined);
+    expect(component.canAddPrerequisiteSkill).toBe(undefined);
+    expect(component.feedbackEditorIsOpen).toBe(undefined);
+    expect(component.destinationEditorIsOpen).toBe(undefined);
+    expect(component.correctnessLabelEditorIsOpen).toBe(undefined);
+    expect(component.savedOutcome).toBe(undefined);
 
-    ctrl.$onInit();
+    component.ngOnInit();
 
-    expect(ctrl.editOutcomeForm).toEqual({});
-    expect(ctrl.canAddPrerequisiteSkill).toBe(false);
-    expect(ctrl.feedbackEditorIsOpen).toBe(false);
-    expect(ctrl.destinationEditorIsOpen).toBe(false);
-    expect(ctrl.correctnessLabelEditorIsOpen).toBe(false);
-    expect(ctrl.savedOutcome).toEqual(outcome);
+    expect(component.editOutcomeForm).toEqual({});
+    expect(component.canAddPrerequisiteSkill).toBe(false);
+    expect(component.feedbackEditorIsOpen).toBe(false);
+    expect(component.destinationEditorIsOpen).toBe(false);
+    expect(component.correctnessLabelEditorIsOpen).toBe(false);
+    expect(component.savedOutcome).toEqual(outcome);
   });
 
   it('should save feedback on external save event when editFeedbackForm is' +
     ' valid and state is not invalid after feedback save', () => {
     let onExternalSaveEmitter = new EventEmitter();
-    spyOnProperty(ExternalSaveService, 'onExternalSave')
+    spyOnProperty(externalSaveService, 'onExternalSave')
       .and.returnValue(onExternalSaveEmitter);
-    spyOn(ctrl, 'invalidStateAfterFeedbackSave').and.returnValue(false);
-    spyOn(ctrl, 'saveThisFeedback');
+    spyOn(component, 'invalidStateAfterFeedbackSave').and.returnValue(false);
+    spyOn(component, 'saveThisFeedback');
 
-    ctrl.$onInit();
+    component.ngOnInit();
 
-    ctrl.feedbackEditorIsOpen = true;
-    ctrl.editOutcomeForm = {
+    component.feedbackEditorIsOpen = true;
+    component.editOutcomeForm = {
       editFeedbackForm: {
         $valid: true
       }
     };
 
     onExternalSaveEmitter.emit();
-    $scope.$apply();
 
-    expect(ctrl.saveThisFeedback).toHaveBeenCalledWith(false);
+    expect(component.saveThisFeedback).toHaveBeenCalledWith(false);
   });
 
   it('should cancel feedback edit on external save event when' +
     ' editFeedbackForm is not valid or state us not valid after' +
     ' feedback save', () => {
     let onExternalSaveEmitter = new EventEmitter();
-    spyOnProperty(ExternalSaveService, 'onExternalSave')
+    spyOnProperty(externalSaveService, 'onExternalSave')
       .and.returnValue(onExternalSaveEmitter);
-    spyOn(ctrl, 'invalidStateAfterFeedbackSave').and.returnValue(false);
+    spyOn(component, 'invalidStateAfterFeedbackSave').and.returnValue(false);
 
-    ctrl.$onInit();
+    component.ngOnInit();
 
     // Setup. No pre-check as we are setting up values below.
-    ctrl.feedbackEditorIsOpen = true;
-    ctrl.editOutcomeForm = {
+    component.feedbackEditorIsOpen = true;
+    component.editOutcomeForm = {
       editFeedbackForm: {
         $valid: false
       }
     };
-    ctrl.savedOutcome = {
+    component.savedOutcome = {
       feedback: 'Saved Outcome'
     };
-    ctrl.outcome = {
+    component.outcome = {
       feedback: 'Outcome'
     };
 
     // Action.
     onExternalSaveEmitter.emit();
-    $scope.$apply();
 
     // Post-check.
-    expect(ctrl.feedbackEditorIsOpen).toBe(false);
-    expect(ctrl.outcome.feedback).toBe('Saved Outcome');
+    expect(component.feedbackEditorIsOpen).toBe(false);
+    expect(component.outcome.feedback).toBe('Saved Outcome');
   });
 
   it('should save destination on interaction change when edit destination' +
     ' form is valid and state is not invalid after destination save', () => {
     let onInteractionIdChangedEmitter = new EventEmitter();
-    spyOnProperty(StateInteractionIdService, 'onInteractionIdChanged')
+    spyOnProperty(stateInteractionIdService, 'onInteractionIdChanged')
       .and.returnValue(onInteractionIdChangedEmitter);
-    spyOn(ctrl, 'invalidStateAfterDestinationSave').and.returnValue(false);
-    spyOn(ctrl, 'saveThisDestination');
+    spyOn(component, 'invalidStateAfterDestinationSave').and.returnValue(false);
+    spyOn(component, 'saveThisDestination');
 
-    ctrl.$onInit();
+    component.ngOnInit();
 
-    ctrl.destinationEditorIsOpen = true;
-    ctrl.editOutcomeForm = {
+    component.destinationEditorIsOpen = true;
+    component.editOutcomeForm = {
       editDestForm: {
         $valid: true
       }
     };
 
     onInteractionIdChangedEmitter.emit();
-    $scope.$apply();
 
-    expect(ctrl.saveThisDestination).toHaveBeenCalled();
+    expect(component.saveThisDestination).toHaveBeenCalled();
   });
 
   it('should cancel destination edit on interaction change when edit' +
     ' destination form is not valid or state is invalid after' +
     ' destination save', () => {
     let onInteractionIdChangedEmitter = new EventEmitter();
-    spyOnProperty(StateInteractionIdService, 'onInteractionIdChanged')
+    spyOnProperty(stateInteractionIdService, 'onInteractionIdChanged')
       .and.returnValue(onInteractionIdChangedEmitter);
-    spyOn(ctrl, 'invalidStateAfterDestinationSave').and.returnValue(false);
+    spyOn(component, 'invalidStateAfterDestinationSave').and.returnValue(false);
 
-    ctrl.$onInit();
+    component.ngOnInit();
 
     // Setup. No pre-check as we are setting up values below.
-    ctrl.destinationEditorIsOpen = true;
-    ctrl.editOutcomeForm = {
+    component.destinationEditorIsOpen = true;
+    component.editOutcomeForm = {
       editDestForm: {
         $valid: false
       }
     };
-    ctrl.savedOutcome = {
+    component.savedOutcome = {
       dest: 'Saved Dest',
       refresherExplorationId: 'ExpId',
       missingPrerequisiteSkillId: 'SkillId'
     };
-    ctrl.outcome = {
+    component.outcome = {
       dest: 'Dest',
       refresherExplorationId: '',
       missingPrerequisiteSkillId: ''
@@ -199,163 +195,162 @@ describe('OutcomeEditorComponent', () => {
 
     // Action.
     onInteractionIdChangedEmitter.emit();
-    $scope.$apply();
 
     // Post-check.
-    expect(ctrl.destinationEditorIsOpen).toBe(false);
-    expect(ctrl.outcome.dest).toBe('Saved Dest');
-    expect(ctrl.outcome.refresherExplorationId).toBe('ExpId');
-    expect(ctrl.outcome.missingPrerequisiteSkillId).toBe('SkillId');
+    expect(component.destinationEditorIsOpen).toBe(false);
+    expect(component.outcome.dest).toBe('Saved Dest');
+    expect(component.outcome.refresherExplorationId).toBe('ExpId');
+    expect(component.outcome.missingPrerequisiteSkillId).toBe('SkillId');
   });
 
   it('should check if state is in question mode', () => {
-    spyOn(StateEditorService, 'isInQuestionMode').and.returnValue(true);
+    spyOn(stateEditorService, 'isInQuestionMode').and.returnValue(true);
 
-    expect(ctrl.isInQuestionMode()).toBe(true);
+    expect(component.isInQuestionMode()).toBe(true);
   });
 
   it('should get current interaction\'s ID', () => {
-    StateInteractionIdService.savedMemento = 'TextInput';
+    stateInteractionIdService.savedMemento = 'TextInput';
 
-    expect(ctrl.getCurrentInteractionId()).toBe('TextInput');
+    expect(component.getCurrentInteractionId()).toBe('TextInput');
   });
 
   it('should check if correctness feedback is enabled', () => {
-    spyOn(StateEditorService, 'getCorrectnessFeedbackEnabled')
+    spyOn(stateEditorService, 'getCorrectnessFeedbackEnabled')
       .and.returnValue(true);
 
-    expect(ctrl.isCorrectnessFeedbackEnabled()).toBe(true);
+    expect(component.isCorrectnessFeedbackEnabled()).toBe(true);
   });
 
   it('should check if current interaction is linear or not', () => {
-    StateInteractionIdService.savedMemento = 'TextInput';
+    stateInteractionIdService.savedMemento = 'TextInput';
 
-    expect(ctrl.isCurrentInteractionLinear()).toBe(false);
+    expect(component.isCurrentInteractionLinear()).toBe(false);
   });
 
   it('should check if a state is in self loop', () => {
-    spyOn(StateEditorService, 'getActiveStateName')
+    spyOn(stateEditorService, 'getActiveStateName')
       .and.returnValue('Hola');
 
-    expect(ctrl.isSelfLoop({dest: 'Hola'})).toBe(true);
-    expect(ctrl.isSelfLoop({dest: 'Introduction'})).toBe(false);
+    expect(component.isSelfLoop({dest: 'Hola'})).toBe(true);
+    expect(component.isSelfLoop({dest: 'Introduction'})).toBe(false);
   });
 
   it('should check if state if of self loop with no feedback', () => {
-    let outcome = OutcomeObjectFactory.createNew(
+    let outcome = outcomeObjectFactory.createNew(
       'State Name', '1', '', []);
-    spyOn(StateEditorService, 'getActiveStateName')
+    spyOn(stateEditorService, 'getActiveStateName')
       .and.returnValue('State Name');
 
-    expect(ctrl.isSelfLoopWithNoFeedback(outcome)).toBe(true);
-    expect(ctrl.isSelfLoopWithNoFeedback('')).toBe(false);
+    expect(component.isSelfLoopWithNoFeedback(outcome)).toBe(true);
+    expect(component.isSelfLoopWithNoFeedback(null)).toBe(false);
   });
 
   it('should check if state will become invalid after feedback' +
     ' is saved', () => {
-    spyOn(StateEditorService, 'getActiveStateName')
+    spyOn(stateEditorService, 'getActiveStateName')
       .and.returnValue('State Name');
-    ctrl.outcome = OutcomeObjectFactory.createNew(
+    component.outcome = outcomeObjectFactory.createNew(
       'Introduction', '1', '', []);
-    ctrl.savedOutcome = OutcomeObjectFactory.createNew(
+    component.savedOutcome = outcomeObjectFactory.createNew(
       'State Name', '1', '', []);
 
-    expect(ctrl.invalidStateAfterFeedbackSave()).toBe(true);
+    expect(component.invalidStateAfterFeedbackSave()).toBe(true);
   });
 
   it('should check if state will become invalid after destination' +
     ' is saved', () => {
-    spyOn(StateEditorService, 'getActiveStateName')
+    spyOn(stateEditorService, 'getActiveStateName')
       .and.returnValue('Introduction');
-    ctrl.outcome = OutcomeObjectFactory.createNew(
+    component.outcome = outcomeObjectFactory.createNew(
       'Introduction', '1', '', []);
-    ctrl.savedOutcome = OutcomeObjectFactory.createNew(
+    component.savedOutcome = outcomeObjectFactory.createNew(
       'State Name', '1', '', []);
 
-    expect(ctrl.invalidStateAfterDestinationSave()).toBe(true);
+    expect(component.invalidStateAfterDestinationSave()).toBe(true);
   });
 
   it('should open feedback editor if it is editable', () => {
-    ctrl.feedbackEditorIsOpen = false;
+    component.feedbackEditorIsOpen = false;
 
-    ctrl.openFeedbackEditor();
+    component.openFeedbackEditor();
 
-    expect(ctrl.feedbackEditorIsOpen).toBe(true);
+    expect(component.feedbackEditorIsOpen).toBe(true);
   });
 
   it('should open destination editor if it is editable', () => {
-    ctrl.destinationEditorIsOpen = false;
+    component.destinationEditorIsOpen = false;
 
-    ctrl.openDestinationEditor();
+    component.openDestinationEditor();
 
-    expect(ctrl.destinationEditorIsOpen).toBe(true);
+    expect(component.destinationEditorIsOpen).toBe(true);
   });
 
   it('should save correctness label when it is changed', () => {
-    ctrl.savedOutcome = {
+    component.savedOutcome = {
       labelledAsCorrect: false
     };
-    ctrl.outcome = {
+    component.outcome = {
       labelledAsCorrect: true
     };
 
-    ctrl.onChangeCorrectnessLabel();
+    component.onChangeCorrectnessLabel();
 
-    expect(ctrl.savedOutcome.labelledAsCorrect).toBe(true);
+    expect(component.savedOutcome.labelledAsCorrect).toBe(true);
   });
 
   it('should set destination as null when saving feedback in' +
     ' question mode', () => {
-    ctrl.savedOutcome = {
+    component.savedOutcome = {
       feedback: {
         contentId: 'savedContentId',
         html: '<p> Saved Outcome </p>'
       },
       dest: 'Saved Dest'
     };
-    ctrl.outcome = {
+    component.outcome = {
       feedback: {
         contentId: 'contentId',
         html: '<p> Outcome </p>'
       },
       dest: 'Dest'
     };
-    spyOn(StateEditorService, 'isInQuestionMode').and.returnValue(true);
-    spyOn(ctrl, 'showMarkAllAudioAsNeedingUpdateModalIfRequired');
+    spyOn(stateEditorService, 'isInQuestionMode').and.returnValue(true);
+    spyOn(component, 'showMarkAllAudioAsNeedingUpdateModalIfRequired');
 
-    ctrl.saveThisFeedback(true);
+    component.saveThisFeedback(true);
 
-    expect(ctrl.savedOutcome.dest).toBe(null);
-    expect(ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired)
+    expect(component.savedOutcome.dest).toBe(null);
+    expect(component.showMarkAllAudioAsNeedingUpdateModalIfRequired)
       .toHaveBeenCalledWith(['contentId']);
   });
 
   it('should set destination when saving feedback not in question mode', () => {
-    ctrl.savedOutcome = {
+    component.savedOutcome = {
       feedback: {
         contentId: 'savedContentId',
         html: '<p> Saved Outcome </p>'
       },
       dest: 'Dest',
     };
-    ctrl.outcome = {
+    component.outcome = {
       feedback: {
         contentId: 'contentId',
         html: '<p> Outcome </p>'
       },
       dest: 'Dest',
     };
-    spyOn(StateEditorService, 'isInQuestionMode').and.returnValue(false);
-    spyOn(StateEditorService, 'getActiveStateName').and.returnValue('Hola');
+    spyOn(stateEditorService, 'isInQuestionMode').and.returnValue(false);
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue('Hola');
 
-    ctrl.saveThisFeedback(false);
+    component.saveThisFeedback(false);
 
-    expect(ctrl.savedOutcome.dest).toBe('Hola');
+    expect(component.savedOutcome.dest).toBe('Hola');
   });
 
   it('should set refresher exploration ID as null on saving destination' +
     ' when state is not in self loop', () => {
-    ctrl.savedOutcome = {
+    component.savedOutcome = {
       feedback: {
         contentId: 'savedContentId',
         html: '<p> Saved Outcome </p>'
@@ -364,7 +359,7 @@ describe('OutcomeEditorComponent', () => {
       refresherExplorationId: 'ExpId',
       missingPrerequisiteSkillId: ''
     };
-    ctrl.outcome = {
+    component.outcome = {
       feedback: {
         contentId: 'contentId',
         html: '<p> Outcome </p>'
@@ -373,28 +368,28 @@ describe('OutcomeEditorComponent', () => {
       refresherExplorationId: 'OutcomeExpId',
       missingPrerequisiteSkillId: 'SkillId'
     };
-    spyOn(StateEditorService, 'getActiveStateName').and.returnValue('Dest1');
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue('Dest1');
 
-    ctrl.saveThisDestination();
+    component.saveThisDestination();
 
-    expect(ctrl.outcome.refresherExplorationId).toBe(null);
-    expect(ctrl.savedOutcome.refresherExplorationId).toBe(null);
-    expect(ctrl.savedOutcome.missingPrerequisiteSkillId).toBe('SkillId');
+    expect(component.outcome.refresherExplorationId).toBe(null);
+    expect(component.savedOutcome.refresherExplorationId).toBe(null);
+    expect(component.savedOutcome.missingPrerequisiteSkillId).toBe('SkillId');
   });
 
   it('should check if outcome feedback exceeds 10000 characters', () => {
-    ctrl.outcome = {
+    component.outcome = {
       feedback: {
         _html: 'a'.repeat(10000)
       }
     };
-    expect(ctrl.isFeedbackLengthExceeded()).toBe(false);
+    expect(component.isFeedbackLengthExceeded()).toBe(false);
 
-    ctrl.outcome = {
+    component.outcome = {
       feedback: {
         _html: 'a'.repeat(10001)
       }
     };
-    expect(ctrl.isFeedbackLengthExceeded()).toBe(true);
+    expect(component.isFeedbackLengthExceeded()).toBe(true);
   });
 });

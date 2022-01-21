@@ -16,7 +16,7 @@
  * @fileoverview Component for the outcome editor.
  */
 
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import cloneDeep from 'lodash/cloneDeep';
 import { AppConstants } from 'app.constants';
@@ -31,11 +31,10 @@ import INTERACTION_SPECS from 'interactions/interaction_specs.json';
   selector: 'oppia-outcome-editor',
   templateUrl: './outcome-editor.component.html'
 })
-export class OutcomeEditorComponent implements
-  OnInit, OnDestroy {
+export class OutcomeEditorComponent implements OnInit {
   @Input() displayFeedback: boolean;
   @Input() isEditable: boolean;
-  @Input() outcome: Outcome;
+  @Input() outcome;
   @Input() outcomeHasFeedback: boolean;
   @Input() warningsAreSuppressed: boolean;
   @Input() showMarkAllAudioAsNeedingUpdateModalIfRequired;
@@ -106,7 +105,7 @@ export class OutcomeEditorComponent implements
     return (this.outcome.feedback._html.length > 10000);
   }
 
-  isSelfLoop(outcome: Outcome): boolean {
+  isSelfLoop(outcome: {dest: string}): boolean {
     return (
       outcome &&
       outcome.dest === this.stateEditorService.getActiveStateName());

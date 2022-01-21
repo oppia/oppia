@@ -16,25 +16,22 @@
  * @fileoverview Component for the outcome destination editor.
  */
 
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import { Component, Input, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
+import cloneDeep from 'lodash/cloneDeep';
 import { StateGraphLayoutService } from 'components/graph-services/graph-layout.service';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { EditorFirstTimeEventsService } from 'pages/exploration-editor-page/services/editor-first-time-events.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { UserService } from 'services/user.service';
-import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { AppConstants } from 'app.constants';
-import cloneDeep from 'lodash/cloneDeep';
 
 @Component({
   selector: 'oppia-outcome-destination-editor',
   templateUrl: './outcome-destination-editor.component.html'
 })
-export class OutcomeDestinationEditorComponent implements
-  OnInit, OnDestroy {
-  @Input() outcome: Outcome;
+export class OutcomeDestinationEditorComponent implements OnInit {
+  @Input() outcome;
   @Input() outcomeHasFeedback: boolean;
   @Input() addState;
   directiveSubscriptions = new Subscription();
@@ -49,7 +46,7 @@ export class OutcomeDestinationEditorComponent implements
   newStateNamePattern;
   destChoices;
   currentStateName = null;
-  maxLen;
+  maxLen: number;
 
   constructor(
     private editorFirstTimeEventsService: EditorFirstTimeEventsService,
@@ -69,7 +66,7 @@ export class OutcomeDestinationEditorComponent implements
     }
   }
 
-  isCreatingNewState(outcome: Outcome): boolean {
+  isCreatingNewState(outcome: {dest: string}): boolean {
     this.maxLen = this.MAX_STATE_NAME_LENGTH;
     return outcome.dest === this.PLACEHOLDER_OUTCOME_DEST;
   }
@@ -192,6 +189,3 @@ export class OutcomeDestinationEditorComponent implements
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive('oppiaOutcomeDestinationEditor',
-  downgradeComponent({component: OutcomeDestinationEditorComponent}));
