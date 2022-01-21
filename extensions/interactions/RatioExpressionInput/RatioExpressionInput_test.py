@@ -51,12 +51,13 @@ class RatioExpressionInputInteractionTests(test_utils.GenericTestBase):
                     'rule_type': 'IsEquivalent'
                 }, {
                     'inputs': {
-                        'x': 1
+                        'y': 1
                     },
                     'rule_type': 'HasNumberOfTermsEqualTo'
                 }, {
                     'inputs': {
-                        'x': [1, 2]
+                        'x': 1,
+                        'y': 2
                     },
                     'rule_type': 'HasSpecificTermEqualTo'
                 }],

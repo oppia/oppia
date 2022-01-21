@@ -168,7 +168,7 @@ class RatioExpressionInput(base.BaseInteraction):
             rule_type = rule_spec.rule_type
             rule_proto = (
                 rule_type_to_proto_fun_mapping[rule_type](
-                    rule_spec.inputs['x']
+                    rule_spec.inputs
                 )
             )
             rule_specs_list_proto.append(
@@ -178,11 +178,11 @@ class RatioExpressionInput(base.BaseInteraction):
         return rule_specs_list_proto
 
     @classmethod
-    def _convert_equals_rule_spec_to_proto(cls, ratio):
+    def _convert_equals_rule_spec_to_proto(cls, input_dict):
         """Creates a EqualsSpecDto proto object.
 
         Args:
-            ratio: Ratio. The Ratio domain object.
+            input_dict: dict. The rule dict.
 
         Returns:
             EqualsSpecDto. The proto object.
@@ -190,15 +190,15 @@ class RatioExpressionInput(base.BaseInteraction):
         ratio_rule_spec = state_pb2.RatioExpressionInputInstanceDto.RuleSpecDto
 
         return ratio_rule_spec.EqualsSpecDto(
-            input=cls._to_ratio_expression_proto(ratio)
+            input=cls._to_ratio_expression_proto(input_dict['x'])
         )
 
     @classmethod
-    def _convert_is_equivalent_rule_spec_to_proto(cls, ratio):
+    def _convert_is_equivalent_rule_spec_to_proto(cls, input_dict):
         """Creates a IsEquivalentSpecDto proto object.
 
         Args:
-            ratio: Ratio. The Ratio domain object.
+            input_dict: dict. The rule dict.
 
         Returns:
             IsEquivalentSpecDto. The proto object.
@@ -206,17 +206,17 @@ class RatioExpressionInput(base.BaseInteraction):
         ratio_rule_spec = state_pb2.RatioExpressionInputInstanceDto.RuleSpecDto
 
         return ratio_rule_spec.IsEquivalentSpecDto(
-            input=cls._to_ratio_expression_proto(ratio)
+            input=cls._to_ratio_expression_proto(input_dict['x'])
         )
 
     @classmethod
     def _convert_has_numer_of_terms_equal_rule_spec_to_proto(
-        cls, input_term_count
+        cls, input_dict
     ):
         """Creates a HasNumberOfTermsEqualToSpecDto proto object.
 
         Args:
-            input_term_count: int. The number of terms.
+            input_dict: dict. The rule dict.
 
         Returns:
             HasNumberOfTermsEqualToSpecDto. The proto object.
@@ -224,7 +224,7 @@ class RatioExpressionInput(base.BaseInteraction):
         ratio_rule_spec = state_pb2.RatioExpressionInputInstanceDto.RuleSpecDto
 
         return ratio_rule_spec.HasNumberOfTermsEqualToSpecDto(
-            input_term_count=input_term_count
+            input_term_count=input_dict['y']
         )
 
     @classmethod
@@ -234,7 +234,7 @@ class RatioExpressionInput(base.BaseInteraction):
         """Creates a HasSpecificTermEqualToSpecDto proto object.
 
         Args:
-            input_dict: int. The number of terms.
+            input_dict: dict. The rule dict.
 
         Returns:
             HasSpecificTermEqualToSpecDto. The proto object.
@@ -242,8 +242,8 @@ class RatioExpressionInput(base.BaseInteraction):
         ratio_rule_spec = state_pb2.RatioExpressionInputInstanceDto.RuleSpecDto
 
         return ratio_rule_spec.HasSpecificTermEqualToSpecDto(
-            input_term_index=input_dict[0],
-            input_expected_term_value=input_dict[1]
+            input_term_index=input_dict['x'],
+            input_expected_term_value=input_dict['y']
         )
 
     @classmethod
