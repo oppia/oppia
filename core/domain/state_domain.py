@@ -3025,11 +3025,11 @@ class State:
 
                         try:
                             normalized_param = param_type.normalize(value)
-                        except Exception as exception:
+                        except Exception as e:
                             raise Exception(
                                 'Value has the wrong type. It should be a %s. '
                                 'The value is %s' %
-                                (param_type.__name__, value)) from exception
+                                (param_type.__name__, value)) from e
 
                     rule_inputs[param_name] = normalized_param
 

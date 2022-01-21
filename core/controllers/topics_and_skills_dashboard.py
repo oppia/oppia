@@ -289,9 +289,9 @@ class NewTopicHandler(base.BaseHandler):
 
         try:
             topic_domain.Topic.require_valid_name(name)
-        except Exception as exception:
+        except Exception as e:
             raise self.InvalidInputException(
-                'Invalid topic name, received %s.' % name) from exception
+                'Invalid topic name, received %s.' % name) from e
         new_topic_id = topic_fetchers.get_new_topic_id()
         topic = topic_domain.Topic.create_default_topic(
             new_topic_id, name, url_fragment, description)
@@ -351,10 +351,10 @@ class NewSkillHandler(base.BaseHandler):
             subtitled_html = (
                 state_domain.SubtitledHtml.from_dict(explanation_dict))
             subtitled_html.validate()
-        except Exception as exception:
+        except Exception as e:
             raise self.InvalidInputException(
                 'Explanation should be a valid SubtitledHtml dict.'
-            ) from exception
+            ) from e
 
         rubrics = [skill_domain.Rubric.from_dict(rubric) for rubric in rubrics]
         new_skill_id = skill_services.get_new_skill_id()

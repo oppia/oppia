@@ -175,8 +175,8 @@ class ExplorationHandler(EditorHandler):
             exploration_data['exploration_is_linked_to_story'] = (
                 exp_services.get_story_id_linked_to_exploration(
                     exploration_id) is not None)
-        except Exception as exception:
-            raise self.PageNotFoundException from exception
+        except Exception as e:
+            raise self.PageNotFoundException from e
 
         self.values.update(exploration_data)
         self.render_json(self.values)
