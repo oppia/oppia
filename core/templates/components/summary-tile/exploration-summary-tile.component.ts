@@ -86,8 +86,8 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   avgRating!: number | null;
   thumbnailIcon!: string;
   mobileCardToBeShown: boolean = false;
-  explTitleTranslationKey: string;
-  objectiveTranslationKey: string;
+  explTitleTranslationKey!: string;
+  objectiveTranslationKey!: string;
 
   constructor(
     private ratingComputationService: RatingComputationService,

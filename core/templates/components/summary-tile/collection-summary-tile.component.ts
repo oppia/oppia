@@ -62,8 +62,8 @@ export class CollectionSummaryTileComponent implements OnInit, OnDestroy {
   // getLastUpdatedMsecs received after component interactions
   // is empty or does not exist.
   relativeLastUpdatedDateTime: string | null = null;
-  collectionTitleTranslationKey: string;
-  objectiveTranslationKey: string;
+  collectionTitleTranslationKey!: string;
+  objectiveTranslationKey!: string;
 
   constructor(
     private dateTimeFormatService: DateTimeFormatService,
