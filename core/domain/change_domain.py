@@ -139,7 +139,7 @@ class BaseChange:
         'user_id_attribute_names': []
     }]
 
-    def __init__(self, change_dict: Dict[str, str]):
+    def __init__(self, change_dict: Dict[str, str]) -> None:
         """Initializes a BaseChange object from a dict.
 
         Args:

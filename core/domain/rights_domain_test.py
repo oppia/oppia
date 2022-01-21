@@ -379,7 +379,6 @@ class ExplorationRightsChangeTests(test_utils.GenericTestBase):
     def test_exploration_rights_change_object_with_create_new(self) -> None:
         exploration_rights_change_object = (
             rights_domain.ExplorationRightsChange({'cmd': 'create_new'}))
-
         self.assertEqual(exploration_rights_change_object.cmd, 'create_new')
 
     def test_exploration_rights_change_object_with_change_role(self) -> None:
