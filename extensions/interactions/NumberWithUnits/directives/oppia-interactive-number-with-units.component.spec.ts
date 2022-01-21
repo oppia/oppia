@@ -29,7 +29,7 @@ describe('Interactive number with units interaction', () => {
   let fixture: ComponentFixture<InteractiveNumberWithUnitsComponent>;
   let currentInteractionService: CurrentInteractionService;
   let numberWithUnitsObjectFactory: NumberWithUnitsObjectFactory;
-  let ngbModal: NgbModal = null;
+  let ngbModal: NgbModal;
 
   let mockCurrentInteractionService = {
     updateViewWithNewAnswer: () => {},
@@ -94,7 +94,7 @@ describe('Interactive number with units interaction', () => {
       tick(150);
 
       expect(component.errorMessage).toBe('');
-      expect(component.isValid).toBe(true);
+      expect(component.isValid).toBeTrue();
     }));
 
   it('should display warning when the answer format is incorrect',
@@ -108,7 +108,7 @@ describe('Interactive number with units interaction', () => {
       tick(150);
 
       expect(component.errorMessage).toBe('Unit "k" not found.');
-      expect(component.isValid).toBe(false);
+      expect(component.isValid).toBeFalse();
     }));
 
   it('should close help modal when user clicks the \'close\' button', () =>{
@@ -179,11 +179,11 @@ describe('Interactive number with units interaction', () => {
   it('should unsubscribe when component is destroyed', function() {
     spyOn(component.componentSubscriptions, 'unsubscribe').and.callThrough();
 
-    expect(component.componentSubscriptions.closed).toBe(false);
+    expect(component.componentSubscriptions.closed).toBeFalse();
 
     component.ngOnDestroy();
 
     expect(component.componentSubscriptions.unsubscribe).toHaveBeenCalled();
-    expect(component.componentSubscriptions.closed).toBe(true);
+    expect(component.componentSubscriptions.closed).toBeTrue();
   });
 });
