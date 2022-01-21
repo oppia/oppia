@@ -31,7 +31,6 @@ import re
 import string
 import sys
 import time
-import typing
 import unicodedata
 import urllib
 import zlib
@@ -42,7 +41,7 @@ from core.constants import constants
 
 from typing import (
     Any, Callable, Dict, Iterable, Iterator, List, Optional, Tuple, TypeVar,
-    Union)
+    Union, cast)
 
 _YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-5.1.2')
 sys.path.insert(0, _YAML_PATH)
@@ -111,7 +110,7 @@ def open_file(
         FileNotFoundError. The file cannot be found.
     """
     file = open(filename, mode, encoding=encoding, newline=newline)
-    file = typing.cast(io.TextIOWrapper, file)
+    file = cast(io.TextIOWrapper, file)
     return file
 
 
