@@ -212,31 +212,32 @@ describe('Collection player page component', () => {
       'I18N_COLLECTION_123ab_TITLE');
     expect(component.explTitleTranslationKeys).toEqual(
       ['I18N_EXPLORATION_123ab_TITLE', 'I18N_EXPLORATION_123bc_TITLE',
-      'I18N_EXPLORATION_123cd_TITLE', 'I18N_EXPLORATION_123de_TITLE',
-      'I18N_EXPLORATION_123ef_TITLE', 'I18N_EXPLORATION_123fg_TITLE']);
+        'I18N_EXPLORATION_123cd_TITLE', 'I18N_EXPLORATION_123de_TITLE',
+        'I18N_EXPLORATION_123ef_TITLE', 'I18N_EXPLORATION_123fg_TITLE']);
   }));
 
   it('should check whether hacky translations are displayed or not'
     , fakeAsync(() => {
-    spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
-      .and.resolveTo(sampleCollection);
-    spyOn(userService, 'getUserInfoAsync')
-      .and.returnValue(Promise.resolve(userInfoForCollectionCreator));
-    spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
-      .and.returnValues(false, true);
-    spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
-      .and.returnValues(false, false);
+      spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
+        .and.resolveTo(sampleCollection);
+      spyOn(userService, 'getUserInfoAsync')
+        .and.returnValue(Promise.resolve(userInfoForCollectionCreator));
+      spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
+        .and.returnValues(false, true);
+      spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
+        .and.returnValues(false, false);
 
-    component.ngOnInit();
-    tick();
+      component.ngOnInit();
+      tick();
 
-    let hackyTranslationIsDisplayed =
-      component.isHackyExplTitleTranslationDisplayed(0);
-    expect(hackyTranslationIsDisplayed).toBe(false);
-    hackyTranslationIsDisplayed =
-      component.isHackyCollectionTitleTranslationDisplayed();
-    expect(hackyTranslationIsDisplayed).toBe(true);
-  }));
+      let hackyTranslationIsDisplayed =
+        component.isHackyExplTitleTranslationDisplayed(0);
+      expect(hackyTranslationIsDisplayed).toBe(false);
+      hackyTranslationIsDisplayed =
+        component.isHackyCollectionTitleTranslationDisplayed();
+      expect(hackyTranslationIsDisplayed).toBe(true);
+    })
+  );
 
   it('should stop event propagation when click event is emitted', () => {
     let eventSpy = jasmine.createSpyObj(

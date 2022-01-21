@@ -254,32 +254,32 @@ describe('Exploration Summary Tile Component', () => {
 
   it('should check whether hacky translations are displayed or not'
     , fakeAsync(() => {
-    const userServiceSpy = spyOn(
-      userService, 'getUserInfoAsync')
-      .and.returnValue(Promise.resolve(userInfo));
-    const windowResizeSpy = spyOn(
-      windowDimensionsService, 'getResizeEvent').and.callThrough();
-    const windowWidthSpy = spyOn(
-      windowDimensionsService, 'getWidth').and.callThrough();
-    spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
-      .and.returnValues(false, true);
-    spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
-      .and.returnValues(false, false);
+      const userServiceSpy = spyOn(
+        userService, 'getUserInfoAsync')
+        .and.returnValue(Promise.resolve(userInfo));
+      const windowResizeSpy = spyOn(
+        windowDimensionsService, 'getResizeEvent').and.callThrough();
+      const windowWidthSpy = spyOn(
+        windowDimensionsService, 'getWidth').and.callThrough();
+      spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
+        .and.returnValues(false, true);
+      spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
+        .and.returnValues(false, false);
 
-    component.ngOnInit();
-    tick();
-    fixture.detectChanges();
+      component.ngOnInit();
+      tick();
+      fixture.detectChanges();
 
-    expect(userServiceSpy).toHaveBeenCalled();
-    expect(windowResizeSpy).toHaveBeenCalled();
-    expect(windowWidthSpy).toHaveBeenCalled();
-    let hackyTranslationIsDisplayed =
-      component.isHackyExplTitleTranslationDisplayed();
-    expect(hackyTranslationIsDisplayed).toBe(false);
-    hackyTranslationIsDisplayed =
-      component.isHackyObjectiveTranslationDisplayed();
-    expect(hackyTranslationIsDisplayed).toBe(true);
-  }));
+      expect(userServiceSpy).toHaveBeenCalled();
+      expect(windowResizeSpy).toHaveBeenCalled();
+      expect(windowWidthSpy).toHaveBeenCalled();
+      let hackyTranslationIsDisplayed =
+        component.isHackyExplTitleTranslationDisplayed();
+      expect(hackyTranslationIsDisplayed).toBe(false);
+      hackyTranslationIsDisplayed =
+        component.isHackyObjectiveTranslationDisplayed();
+      expect(hackyTranslationIsDisplayed).toBe(true);
+    }));
 
   it('should intialize the component and set mobileCutoffPx to 0' +
     ' if it is undefined', fakeAsync(() => {
@@ -313,7 +313,8 @@ describe('Exploration Summary Tile Component', () => {
       tick();
       fixture.detectChanges();
       expect(component.resizeSubscription.closed).toBe(true);
-    }));
+    })
+  );
 
   it('should check if mobile card is to be shown', () => {
     const urlPathSpy = spyOn(urlService, 'getPathname')

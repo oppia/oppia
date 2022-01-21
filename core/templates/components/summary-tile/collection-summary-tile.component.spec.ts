@@ -176,28 +176,28 @@ describe('Collection Summary Tile Component', () => {
 
   it('should check whether hacky translations are displayed or not'
     , fakeAsync(() => {
-    const userServiceSpy = spyOn(
-      userService, 'getUserInfoAsync')
-      .and.returnValue(Promise.resolve(userInfo));
-    const windowResizeSpy = spyOn(
-      windowDimensionsService, 'getResizeEvent').and.callThrough();
-    spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
-      .and.returnValues(false, true);
-    spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
-      .and.returnValues(false, false);
+      const userServiceSpy = spyOn(
+        userService, 'getUserInfoAsync')
+        .and.returnValue(Promise.resolve(userInfo));
+      const windowResizeSpy = spyOn(
+        windowDimensionsService, 'getResizeEvent').and.callThrough();
+      spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
+        .and.returnValues(false, true);
+      spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
+        .and.returnValues(false, false);
 
-    component.ngOnInit();
-    tick();
+      component.ngOnInit();
+      tick();
 
-    expect(userServiceSpy).toHaveBeenCalled();
-    expect(windowResizeSpy).toHaveBeenCalled();
-    let hackyTranslationIsDisplayed =
-      component.isHackyCollectionTitleTranslationDisplayed();
-    expect(hackyTranslationIsDisplayed).toBe(false);
-    hackyTranslationIsDisplayed =
-      component.isHackyObjectiveTranslationDisplayed();
-    expect(hackyTranslationIsDisplayed).toBe(true);
-  }));
+      expect(userServiceSpy).toHaveBeenCalled();
+      expect(windowResizeSpy).toHaveBeenCalled();
+      let hackyTranslationIsDisplayed =
+        component.isHackyCollectionTitleTranslationDisplayed();
+      expect(hackyTranslationIsDisplayed).toBe(false);
+      hackyTranslationIsDisplayed =
+        component.isHackyObjectiveTranslationDisplayed();
+      expect(hackyTranslationIsDisplayed).toBe(true);
+    }));
 
   it('should set mobileCutoffPx to 0 if it is not ' +
     'specified', fakeAsync(() => {

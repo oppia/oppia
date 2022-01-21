@@ -103,10 +103,11 @@ export class CollectionPlayerPageComponent implements OnInit {
     private loaderService: LoaderService,
     private urlService: UrlService,
     private readOnlyCollectionBackendApiService:
-     ReadOnlyCollectionBackendApiService,
+      ReadOnlyCollectionBackendApiService,
     private pageTitleService: PageTitleService,
     private userService: UserService,
-    private collectionPlayerBackendApiService: CollectionPlayerBackendApiService,
+    private collectionPlayerBackendApiService:
+      CollectionPlayerBackendApiService,
     private i18nLanguageCodeService: I18nLanguageCodeService
   ) {}
 
@@ -308,7 +309,7 @@ export class CollectionPlayerPageComponent implements OnInit {
     }
   }
 
-  isHackyExplTitleTranslationDisplayed(index): boolean {
+  isHackyExplTitleTranslationDisplayed(index: number): boolean {
     return (
       this.i18nLanguageCodeService.isHackyTranslationAvailable(
         this.explTitleTranslationKeys[index]) &&
@@ -399,7 +400,7 @@ export class CollectionPlayerPageComponent implements OnInit {
           );
 
           this.collectionNodes = collection.getCollectionNodes();
-          
+
           for (let idx in this.collectionNodes) {
             this.explTitleTranslationKeys.push(
               this.i18nLanguageCodeService.getExplorationTranslationKey(

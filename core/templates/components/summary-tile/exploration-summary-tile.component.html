@@ -30,8 +30,8 @@
       <div class="summary-section"
            section="{isWindowLarge?undefined:'right-section'}">
         <div *ngIf="isWindowLarge" class="objective protractor-test-exp-summary-tile-objective">
-             <span *ngIf="!isHackyObjectiveTranslationDisplayed()">{{ objective | truncateAndCapitalize:95 }}</span>
-             <span *ngIf="isHackyObjectiveTranslationDisplayed()">{{ objectiveTranslationKey | translate | truncateAndCapitalize:95 }}</span>
+          <span *ngIf="!isHackyObjectiveTranslationDisplayed()">{{ objective | truncateAndCapitalize:95 }}</span>
+          <span *ngIf="isHackyObjectiveTranslationDisplayed()">{{ objectiveTranslationKey | translate | truncateAndCapitalize:95 }}</span>
         </div>
         <div *ngIf="!objective" class="objective">
           <span [innerHTML]="'I18N_LIBRARY_NO_OBJECTIVE' | translate">
