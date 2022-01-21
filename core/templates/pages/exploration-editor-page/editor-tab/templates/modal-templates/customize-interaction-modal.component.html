@@ -38,7 +38,7 @@
       <div *ngIf="customizationArgSpec.schema.type !== 'bool'" class="oppia-interaction-customization-label">{{customizationArgSpec.description}}</div>
       <schema-based-editor [ngClass]="{'boolean-checkbox': customizationArgSpec.schema.type === 'bool'}"
                            [schema]="getSchemaCallback(customizationArgSpec.schema)"
-                           [(localValue)]="stateCustomizationArgsService.displayed[customizationArgSpec.name].value">
+                           [localValue]="stateCustomizationArgsService.displayed[customizationArgSpec.name].value">
       </schema-based-editor>
       <div *ngIf="customizationArgSpec.schema.type === 'bool'" class="oppia-interaction-customization-label">{{customizationArgSpec.description}}</div>
       <div class="oppia-interaction-customization-label-container"></div>
