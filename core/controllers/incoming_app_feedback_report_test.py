@@ -21,6 +21,7 @@ from __future__ import annotations
 import datetime
 
 from core import android_validation_constants
+from core.domain import app_feedback_report_constants
 from core.platform import models
 from core.tests import test_utils
 
@@ -69,7 +70,7 @@ REPORT_JSON = {
     },
     'user_supplied_feedback': {
         'report_type': 'suggestion',
-        'category': 'LANGUAGE_SUGGESTION',
+        'category': app_feedback_report_constants.Category.LANGUAGE_SUGGESTION.value,
         'user_feedback_selected_items': [],
         'user_feedback_other_text_input': 'french'
     }

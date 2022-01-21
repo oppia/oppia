@@ -68,21 +68,21 @@ class REPORT_TYPE(enum.Enum): # pylint: disable=invalid-name
 class Category(enum.Enum):
     """Enum for categories."""
 
-    FEATURE_SUGGESTION = 'feature_suggestion'
-    LANGUAGE_SUGGESTION = 'language_suggestion'
-    OTHER_SUGGESTION = 'other_suggestion'
-    LESSON_QUESTION_ISSUE = 'lesson_question_issue'
-    LANGUAGE_GENERAL_ISSUE = 'language_general_issue'
-    LANGUAGE_AUDIO_ISSUE = 'language_audio_issue'
-    LANGUAGE_TEXT_ISSUE = 'language_text_issue'
-    TOPICS_ISSUE = 'topics_issue'
-    PROFILE_ISSUE = 'profile_issue'
-    OTHER_ISSUE = 'other_issue'
-    LESSON_PLAYER_CRASH = 'lesson_player_crash'
-    PRACTICE_QUESTIONS_CRASH = 'practice_questions_crash'
-    OPTIONS_PAGE_CRASH = 'options_page_crash'
-    PROFILE_PAGE_CRASH = 'profile_page_crash'
-    OTHER_CRASH = 'other_crash'
+    FEATURE_SUGGESTION = 'FEATURE_SUGGESTION'
+    LANGUAGE_SUGGESTION = 'LANGUAGE_SUGGESTION'
+    OTHER_SUGGESTION = 'OTHER_SUGGESTION'
+    LESSON_QUESTION_ISSUE = 'LESSON_QUESTION_ISSUE'
+    LANGUAGE_GENERAL_ISSUE = 'LANGUAGE_GENERAL_ISSUE'
+    LANGUAGE_AUDIO_ISSUE = 'LANGUAGE_AUDIO_ISSUE'
+    LANGUAGE_TEXT_ISSUE = 'LANGUAGE_TEXT_ISSUE'
+    TOPICS_ISSUE = 'TOPICS_ISSUE'
+    PROFILE_ISSUE = 'PROFILE_ISSUE'
+    OTHER_ISSUE = 'OTHER_ISSUE'
+    LESSON_PLAYER_CRASH = 'LESSON_PLAYER_CRASH'
+    PRACTICE_QUESTIONS_CRASH = 'PRACTICE_QUESTIONS_CRASH'
+    OPTIONS_PAGE_CRASH = 'OPTIONS_PAGE_CRASH'
+    PROFILE_PAGE_CRASH = 'PROFILE_PAGE_CRASH'
+    OTHER_CRASH = 'OTHER_CRASH'
 
 
 # TODO(#14419): Change naming style of Enum class from SCREAMING_SNAKE_CASE

@@ -25,6 +25,7 @@ from core import feconf
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import app_feedback_report_constants
 from core.domain import app_feedback_report_domain
 from core.domain import blog_services
 from core.domain import classifier_domain
@@ -5427,7 +5428,7 @@ class OppiaAndroidDecoratorTest(test_utils.GenericTestBase):
         },
         'user_supplied_feedback': {
             'report_type': 'suggestion',
-            'category': 'LANGUAGE_SUGGESTION',
+            'category': app_feedback_report_constants.Category.LANGUAGE_SUGGESTION.value,
             'user_feedback_selected_items': [],
             'user_feedback_other_text_input': 'french'
         }
