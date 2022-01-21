@@ -218,7 +218,7 @@ class RegistryUnitTest(test_utils.TestBase):
         """Tests get_all_storage_model_classes."""
         from core.storage.user import gae_models as user_models
         classes = self.registry_instance.get_storage_model_classes(
-            [models.NAMES.user])
+            [models.Names.USER])
         self.assertIn(user_models.UserSettingsModel, classes)
         self.assertIn(user_models.CompletedActivitiesModel, classes)
         self.assertIn(user_models.IncompleteActivitiesModel, classes)

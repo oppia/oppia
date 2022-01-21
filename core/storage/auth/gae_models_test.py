@@ -28,7 +28,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import base_models
 
 (auth_models, base_models) = (
-    models.Registry.import_models([models.NAMES.auth, models.NAMES.base_model]))
+    models.Registry.import_models([models.Names.AUTH, models.Names.BASE_MODEL]))
 
 
 class UserAuthDetailsModelTests(test_utils.GenericTestBase):
