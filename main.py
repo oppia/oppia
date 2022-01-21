@@ -742,7 +742,7 @@ URLS = [
         topic_editor.TopicPublishSendMailHandler),
 
     get_redirect_route(
-        r'%s/<comma_separated_skill_ids>' % feconf.CONCEPT_CARD_DATA_URL_PREFIX,
+        r'%s/<selected_skill_ids>' % feconf.CONCEPT_CARD_DATA_URL_PREFIX,
         concept_card_viewer.ConceptCardDataHandler),
     get_redirect_route(
         r'%s/<question_id>' % feconf.QUESTION_SKILL_LINK_URL_PREFIX,
