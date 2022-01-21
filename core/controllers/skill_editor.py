@@ -42,9 +42,6 @@ def _require_valid_version(version_from_payload, skill_version):
     Raises:
         Exception. Invalid input.
     """
-    if version_from_payload is None:
-        raise base.BaseHandler.InvalidInputException(
-            'Invalid POST request: a version must be specified.')
 
     if version_from_payload != skill_version:
         raise base.BaseHandler.InvalidInputException(

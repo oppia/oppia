@@ -314,7 +314,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         self.put_json(
             self.url, self.put_payload, csrf_token=csrf_token,
             expected_status_int=400)
-        self.put_payload['version'] = -1
+        self.put_payload['version'] = 10
         self.put_json(
             self.url, self.put_payload, csrf_token=csrf_token,
             expected_status_int=400)
