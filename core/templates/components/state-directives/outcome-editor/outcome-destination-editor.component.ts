@@ -26,6 +26,7 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { UserService } from 'services/user.service';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { AppConstants } from 'app.constants';
+import cloneDeep from 'lodash/cloneDeep';
 
 @Component({
   selector: 'oppia-outcome-destination-editor',
@@ -37,17 +38,17 @@ export class OutcomeDestinationEditorComponent implements
   @Input() outcomeHasFeedback: boolean;
   @Input() addState;
   directiveSubscriptions = new Subscription();
-  PLACEHOLDER_OUTCOME_DEST = AppConstants.PLACEHOLDER_OUTCOME_DEST;
   ENABLE_PREREQUISITE_SKILLS = AppConstants.ENABLE_PREREQUISITE_SKILLS;
-  MAX_STATE_NAME_LENGTH = AppConstants.MAX_STATE_NAME_LENGTH;
-  canAddPrerequisiteSkill;
-  canEditRefresherExplorationId;
   EXPLORATION_AND_SKILL_ID_PATTERN = (
     AppConstants.EXPLORATION_AND_SKILL_ID_PATTERN);
+  MAX_STATE_NAME_LENGTH = AppConstants.MAX_STATE_NAME_LENGTH;
+  PLACEHOLDER_OUTCOME_DEST = AppConstants.PLACEHOLDER_OUTCOME_DEST;
+  canAddPrerequisiteSkill;
+  canEditRefresherExplorationId;
   explorationAndSkillIdPattern;
   newStateNamePattern;
   destChoices;
-  currentStateName;
+  currentStateName = null;
   maxLen;
 
   constructor(
@@ -76,7 +77,6 @@ export class OutcomeDestinationEditorComponent implements
 
   updateOptionNames(): void {
     this.currentStateName = this.stateEditorService.getActiveStateName();
-
     let questionModeEnabled = this.stateEditorService.isInQuestionMode();
     // This is a list of objects, each with an ID and name. These
     // represent all states, as well as an option to create a
@@ -95,12 +95,12 @@ export class OutcomeDestinationEditorComponent implements
     // It is possible that lastComputedArrangement is null if the
     // graph has never been rendered at the time this computation is
     // being carried out.
-    let stateNames = angular.copy(allStateNames);
+    let stateNames = cloneDeep(allStateNames);
     let stateName = null;
     if (lastComputedArrangement) {
       let maxDepth = 0;
       let maxOffset = 0;
-      for (stateName in lastComputedArrangement) {
+      for (let stateName in lastComputedArrangement) {
         maxDepth = Math.max(
           maxDepth, lastComputedArrangement[stateName].depth);
         maxOffset = Math.max(
@@ -127,7 +127,7 @@ export class OutcomeDestinationEditorComponent implements
         }
       }
 
-      stateNames = allStateNames.sort(function(a, b) {
+      stateNames = allStateNames.sort((a, b) => {
         return allStateScores[a] - allStateScores[b];
       });
     }
@@ -186,7 +186,6 @@ export class OutcomeDestinationEditorComponent implements
     this.explorationAndSkillIdPattern =
       this.EXPLORATION_AND_SKILL_ID_PATTERN;
     this.newStateNamePattern = /^[a-zA-Z0-9.\s-]+$/;
-    this.destChoices = [];
   }
 
   ngOnDestroy(): void {
@@ -194,5 +193,5 @@ export class OutcomeDestinationEditorComponent implements
   }
 }
 
-angular.module('oppia').directive('oppiaOutcomeDestinstionEditor',
+angular.module('oppia').directive('oppiaOutcomeDestinationEditor',
   downgradeComponent({component: OutcomeDestinationEditorComponent}));
