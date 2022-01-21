@@ -50,12 +50,10 @@
 
               <div ng-if="inlineSolutionEditorIsActive">
                 <div class="oppia-editor-card-section protractor-test-oppia-solution-body">
-                  <solution-editor interaction-id="StateInteractionIdService.savedMemento"
-                                   correct-answer-editor-html="correctAnswerEditorHtml"
-                                   on-open-solution-editor="openAddOrUpdateSolutionModal()"
-                                   on-save-solution="$ctrl.onSaveSolution"
-                                   show-mark-all-audio-as-needing-update-modal-if-required="$ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired">
-                  </solution-editor>
+                  <oppia-solution-editor (open-solution-editor-modal)="openAddOrUpdateSolutionModal()"
+                                         (save-solution)="saveSolution($event)"
+                                         (show-mark-all-audio-as-needing-update-modal-if-required)="openMarkAllAudioAsNeedingUpdateModalIfRequired($event)">
+                  </oppia-solution-editor>
                 </div>
               </div>
             </li>

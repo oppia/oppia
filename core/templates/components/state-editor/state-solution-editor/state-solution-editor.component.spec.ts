@@ -84,7 +84,8 @@ describe('StateSolutionEditorComponent', () => {
       refreshWarnings: () => {
         return () => {};
       },
-      onSaveSolution: () => {}
+      onSaveSolution: () => {},
+      showMarkAllAudioAsNeedingUpdateModalIfRequired: () => {}
     });
 
     solution = sof.createFromBackendDict({
@@ -250,5 +251,19 @@ describe('StateSolutionEditorComponent', () => {
     $scope.$apply();
 
     expect($uibModal.open).toHaveBeenCalled();
+  });
+
+  it('should save solution and open showMarkAllAudioAsNeedingUpdateModal' +
+    ' when user click', () => {
+    spyOn(ctrl, 'showMarkAllAudioAsNeedingUpdateModalIfRequired').and
+      .callThrough();
+    spyOn(ctrl, 'onSaveSolution').and.callThrough();
+
+    $scope.openMarkAllAudioAsNeedingUpdateModalIfRequired('oppia');
+    $scope.saveSolution('saveSolution');
+
+    expect(ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired)
+      .toHaveBeenCalledWith('oppia');
+    expect(ctrl.onSaveSolution).toHaveBeenCalledWith('saveSolution');
   });
 });
