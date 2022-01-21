@@ -78,9 +78,9 @@ def contains_balanced_brackets(expression):
     return len(stack) == 0
 
 
-def is_algebraic(expression):
-    """Checks if the given expression is algebraic. An algebraic expression must
-    contain at least one valid identifier (latin letter or greek symbol name).
+def contains_at_least_one_variable(expression):
+    """Checks if the given expression contains at least one valid identifier
+    (latin letter or greek symbol name).
 
     Args:
         expression: str. A math expression.

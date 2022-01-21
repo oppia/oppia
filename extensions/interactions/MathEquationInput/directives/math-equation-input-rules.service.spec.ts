@@ -38,12 +38,12 @@ describe('Math equation input rules service', () => {
     expect(meirs.MatchesExactlyWith(
       'y=m*x^2+c', {x: inputString, y: positionOfTerms})).toBeTrue();
     expect(meirs.MatchesExactlyWith(
-      '(y^2)/y=m*x+c', {x: inputString, y: positionOfTerms})).toBeTrue();
-    expect(meirs.MatchesExactlyWith(
       'y=0', {x: inputString, y: positionOfTerms})).toBeTrue();
     expect(meirs.MatchesExactlyWith(
       'y=m*x-c', {x: inputString, y: positionOfTerms})).toBeTrue();
     // Rejected cases.
+    expect(meirs.MatchesExactlyWith(
+      '(y^2)/y=m*x+c', {x: inputString, y: positionOfTerms})).toBeFalse();
     expect(meirs.MatchesExactlyWith(
       'y-m*x=c', {x: inputString, y: positionOfTerms})).toBeFalse();
     expect(meirs.MatchesExactlyWith(
@@ -62,12 +62,12 @@ describe('Math equation input rules service', () => {
     expect(meirs.MatchesExactlyWith(
       'y=m*x+c', {x: inputString, y: positionOfTerms})).toBeTrue();
     expect(meirs.MatchesExactlyWith(
-      'y^2=m*x+c', {x: inputString, y: positionOfTerms})).toBeTrue();
-    expect(meirs.MatchesExactlyWith(
       '0=m*x+c', {x: inputString, y: positionOfTerms})).toBeTrue();
     expect(meirs.MatchesExactlyWith(
-      '0=c+m*x', {x: inputString, y: positionOfTerms})).toBeTrue();
+      'y^2=m*x+c', {x: inputString, y: positionOfTerms})).toBeTrue();
     // Rejected cases.
+    expect(meirs.MatchesExactlyWith(
+      '0=c+m*x', {x: inputString, y: positionOfTerms})).toBeFalse();
     expect(meirs.MatchesExactlyWith(
       'y-m*x=c', {x: inputString, y: positionOfTerms})).toBeFalse();
     expect(meirs.MatchesExactlyWith(
@@ -87,10 +87,13 @@ describe('Math equation input rules service', () => {
       'y=m*x+c',
       {x: inputString, y: positionOfTerms})).toBeTrue();
     expect(meirs.MatchesExactlyWith(
-      'y=c+m*x', {x: inputString, y: positionOfTerms})).toBeTrue();
-    expect(meirs.MatchesExactlyWith(
-      '(y^2)/y=m*x+c', {x: inputString, y: positionOfTerms})).toBeTrue();
+      'y = m*x + c',
+      {x: inputString, y: positionOfTerms})).toBeTrue();
     // Rejected cases.
+    expect(meirs.MatchesExactlyWith(
+      'y=c+m*x', {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.MatchesExactlyWith(
+      '(y^2)/y=m*x+c', {x: inputString, y: positionOfTerms})).toBeFalse();
     expect(meirs.MatchesExactlyWith(
       'y-m*x=c', {x: inputString, y: positionOfTerms})).toBeFalse();
     expect(meirs.MatchesExactlyWith(
