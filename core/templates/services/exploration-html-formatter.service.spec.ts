@@ -38,7 +38,7 @@ describe('Exploration Html Formatter Service', () => {
     ehfs = TestBed.inject(ExplorationHtmlFormatterService);
   });
 
-  fit('should correctly set interaction HTML for a non migrated interaction ' +
+  it('should correctly set interaction HTML for a non migrated interaction ' +
      'when it is in editor mode', () => {
     var interactionId = 'EndExploration';
     let custArgs = {
@@ -48,7 +48,7 @@ describe('Exploration Html Formatter Service', () => {
     var expectedHtmlTag = '<oppia-interactive-end-exploration ' +
       'placeholder-with-value="{&amp;quot;unicode_str&amp;quot;:&amp;quot;' +
       'enter here&amp;quot;,&amp;quot;content_id&amp;quot;:&amp;quot;&amp;' +
-      'quot;}" rows-with-value="1" last-answer="lastAnswer">' +
+      'quot;}" rows-with-value="1" [last-answer]="lastAnswer">' +
       '</oppia-interactive-end-exploration>';
     expect(ehfs.getInteractionHtml(interactionId, custArgs, true, null, null))
       .toBe(expectedHtmlTag);
@@ -111,25 +111,25 @@ describe('Exploration Html Formatter Service', () => {
     ).toBe(expectedHtmlTag);
   });
 
-  fit('should correctly set interaction HTML when it is in player mode',
+  it('should correctly set interaction HTML when it is in player mode',
     () => {
       var interactionId = 'EndExploration';
       var focusLabel = 'sampleLabel';
       var expectedHtmlTag = '<oppia-interactive-end-exploration ' +
-        'label-for-focus-target="' + focusLabel + '" last-answer="null">' +
+        'label-for-focus-target="' + focusLabel + '" [last-answer]="null">' +
         '</oppia-interactive-end-exploration>';
       expect(
         ehfs.getInteractionHtml(interactionId, {}, false, focusLabel, null)
       ).toBe(expectedHtmlTag);
     });
 
-  fit('should correctly set interaction HTML when solution has been provided',
+  it('should correctly set interaction HTML when solution has been provided',
     () => {
       var interactionId = 'EndExploration';
       var focusLabel = 'sampleLabel';
       var expectedHtmlTag = '<oppia-interactive-end-exploration ' +
-        'saved-solution="savedMemento()" ' +
-        'label-for-focus-target="' + focusLabel + '" last-answer="null">' +
+        'label-for-focus-target="' + focusLabel + '" ' +
+        '[saved-solution]="savedMemento()" [last-answer]="null">' +
         '</oppia-interactive-end-exploration>';
       expect(
         ehfs.getInteractionHtml(
