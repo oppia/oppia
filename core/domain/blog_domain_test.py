@@ -315,6 +315,25 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
             'Expected image filename to be a string, received 123'
         )
 
+    def _assert_valid_tag_elements(
+        self, expected_error_substring: str
+    ) -> None:
+        """Checks that blog post passes validation for tags."""
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+            utils.ValidationError, expected_error_substring):
+            blog_domain.BlogPost.require_valid_tags(
+                self.blog_post.tags, False)
+
+    def test_blog_post_tags_passes_validation(self) -> None:
+        self.blog_post.tags = ['tag', 123]
+        self._assert_valid_tag_elements(
+            'Expected each tag in \'tags\' to be a string, received: '
+            '\'123\'')
+
+    def test_title_validation(self):
+        self.blog_post.title = 1
+        self._assert_validation_error('Title should be a string')
+
 
 class BlogPostRightsDomainUnitTests(test_utils.GenericTestBase):
 
@@ -588,3 +607,11 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
         self._assert_valid_tag_elements(
             'Expected each tag in \'tags\' to be a string, received: '
             '\'123\'')
+
+    def test_blog_post_summary_dict_content(self) -> None:
+        """Test that to_dict preserve all data within a
+        blog post summary contents object.
+        """
+        blog_post_summary_contents_dict = self.blog_post_summary.to_dict()
+        self.assertEqual(
+            self.blog_post_summary.to_dict(), blog_post_summary_contents_dict)
