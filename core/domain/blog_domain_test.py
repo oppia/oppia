@@ -330,7 +330,7 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
             'Expected each tag in \'tags\' to be a string, received: '
             '\'123\'')
 
-    def test_title_validation(self):
+    def test_title_validation(self) -> None:
         self.blog_post.title = 1
         self._assert_validation_error('Title should be a string')
 
