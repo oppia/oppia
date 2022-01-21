@@ -96,7 +96,7 @@ def validate_new_config_property_values(new_config_property):
             raise Exception(
                 'config property name should be a string, received'
                 ': %s' % name)
-        config_property = config_domain.Registry.get_config_property(name) # type: ignore[no-untyped-call]
+        config_property = config_domain.Registry.get_config_property(name)
         if config_property is None:
             raise Exception('%s do not have any schema.' % name)
 
@@ -128,7 +128,7 @@ def validate_change_dict_for_blog_post(change_dict):
             change_dict['tags'], False)
         # Validates that the tags in the change dict are from the list of
         # default tags set by admin.
-        list_of_default_tags = config_domain.Registry.get_config_property( # type: ignore[no-untyped-call]
+        list_of_default_tags = config_domain.Registry.get_config_property(
             'list_of_default_tags_for_blog_post').value
         if not all(tag in list_of_default_tags for tag in change_dict['tags']):
             raise Exception(
