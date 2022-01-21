@@ -39,14 +39,16 @@ describe('End Exploration Backend Api Service', () => {
     httpTestingController.verify();
   });
 
-  it('should get history data when getData called',
+  it('should get data when getRecommendExplorationsData function called',
     fakeAsync(() => {
-      let stringifiedExpIds = 'check';
-      service.getRecommendExplorationsData(
-        stringifiedExpIds
-      ).then(successHandler, failHandler);
+      const explorationIds = ['0'];
+      const requestUrl = '/explorationsummarieshandler/data?' +
+      'stringified_exp_ids=' + encodeURI(JSON.stringify(explorationIds));
 
-      let req = httpTestingController.expectOne('check');
+      service.getRecommendExplorationsData(
+        explorationIds).then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(requestUrl);
       expect(req.request.method).toEqual('GET');
       req.flush([]);
 

@@ -38,7 +38,7 @@ describe('Exploration Html Formatter Service', () => {
     ehfs = TestBed.inject(ExplorationHtmlFormatterService);
   });
 
-  it('should correctly set interaction HTML for a non migrated interaction ' +
+  fit('should correctly set interaction HTML for a non migrated interaction ' +
      'when it is in editor mode', () => {
     var interactionId = 'EndExploration';
     let custArgs = {
@@ -111,7 +111,7 @@ describe('Exploration Html Formatter Service', () => {
     ).toBe(expectedHtmlTag);
   });
 
-  it('should correctly set interaction HTML when it is in player mode',
+  fit('should correctly set interaction HTML when it is in player mode',
     () => {
       var interactionId = 'EndExploration';
       var focusLabel = 'sampleLabel';
@@ -123,7 +123,7 @@ describe('Exploration Html Formatter Service', () => {
       ).toBe(expectedHtmlTag);
     });
 
-  it('should correctly set interaction HTML when solution has been provided',
+  fit('should correctly set interaction HTML when solution has been provided',
     () => {
       var interactionId = 'EndExploration';
       var focusLabel = 'sampleLabel';

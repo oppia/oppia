@@ -45,6 +45,7 @@ export class InteractiveEndExplorationComponent implements OnInit {
   isInEditorPage: boolean;
   isInEditorPreviewMode: boolean;
   isInEditorMainTab: boolean;
+  getCollectionTitle: () => string;
 
   constructor(
     private contextService: ContextService,
@@ -84,7 +85,7 @@ export class InteractiveEndExplorationComponent implements OnInit {
     if (this.collectionId) {
       this.readOnlyCollectionBackendApiService
         .loadCollectionAsync(this.collectionId)
-        .then(function(collection) {
+        .then((collection) => {
           this.getCollectionTitle = () => collection.getTitle();
         });
     }
