@@ -166,7 +166,17 @@ describe('Request Interceptor Service', () => {
     }).toBeTruthy();
   });
 
-  it('should throw error if null param is supplied', () => {
+  it('should not throw error if params are null', () => {
+    expect(() => {
+      requestInterceptor.intercept(
+        new HttpRequest(
+          'GET',
+          'url'),
+          {} as HttpHandler);
+    }).toBeTruthy();
+  });
+
+  it('should throw error if param with null value is supplied', () => {
     expect(() => {
       requestInterceptor.intercept(
         new HttpRequest(
@@ -177,7 +187,7 @@ describe('Request Interceptor Service', () => {
     }).toThrowError('Cannot supply params with value "None" or "null".');
   });
 
-  it('should throw error if None param is supplied', () => {
+  it('should throw error if param with None value is supplied', () => {
     expect(() => {
       requestInterceptor.intercept(
         new HttpRequest(
