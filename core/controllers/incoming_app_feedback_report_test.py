@@ -70,7 +70,8 @@ REPORT_JSON = {
     },
     'user_supplied_feedback': {
         'report_type': 'suggestion',
-        'category': app_feedback_report_constants.Category.LANGUAGE_SUGGESTION.value,
+        'category': app_feedback_report_constants.Category.
+                    LANGUAGE_SUGGESTION.value,
         'user_feedback_selected_items': [],
         'user_feedback_other_text_input': 'french'
     }

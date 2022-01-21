@@ -183,7 +183,8 @@ class CronJobTests(test_utils.GenericTestBase):
                 submitted_on=report_submitted_timestamp,
                 local_timezone_offset_hrs=0,
                 report_type='suggestion',
-                category=app_feedback_report_constants.Category.LANGUAGE_SUGGESTION.value,
+                category=app_feedback_report_constants.Category.
+                        LANGUAGE_SUGGESTION.value,
                 platform_version='0.1-alpha-abcdef1234',
                 android_device_country_locale_code='in',
                 android_device_model='Pixel 4a',
