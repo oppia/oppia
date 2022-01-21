@@ -130,8 +130,6 @@ class MigrateExplorationJob(base_jobs.JobBase):
         Args:
             migrated_exploration: Exploration. The migrated exploration
                 domain object.
-            exp_summary: ExplorationSummary. The exploration
-                summary domain object.
             exp_summary_model: ExpSummaryModel. The exploration
                 summary model to update.
             exp_rights: ExplorationRightsModel. The exploration
@@ -186,9 +184,9 @@ class MigrateExplorationJob(base_jobs.JobBase):
         is lower than the latest schema version.
 
         Args:
-            exp_id: str. The id of the exploration.
             exp_model: ExplorationModel. The exploration for which to generate
                 the change objects.
+            exploration: Exploration. The exploration domain object.
 
         Yields:
             (str, ExplorationChange). Tuple containing exploration
