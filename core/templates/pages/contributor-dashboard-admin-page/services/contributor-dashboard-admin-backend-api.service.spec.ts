@@ -221,7 +221,7 @@ describe('Contributor dashboard admin backend api service', () => {
   it('should remove user contribution rights given the username' +
     'when calling removeContributionReviewerAsync', fakeAsync(() => {
     let category = 'translation';
-    let languageCode = null;
+    let languageCode = 'en';
     let username = 'validUser';
     let payload = {
       username: username
