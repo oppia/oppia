@@ -60,7 +60,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'object-editor.directive.ts',
     'oppia-footer.component.ts',
     'oppia-interactive-music-notes-input.directive.ts',
-    'oppia-interactive-pencil-code-editor.directive.ts',
+    'oppia-interactive-pencil-code-editor.component.ts',
     'oppia-root.directive.ts',
     'parameterize-rule-description.filter.ts',
     'python-program.tokenizer.ts',
