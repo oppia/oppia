@@ -237,10 +237,11 @@ class BaseChange:
 
         return base_change_dict
 
-    def __getattr__(self, name: str) -> str:
+    # Here we use Any, because getattr is of Callable type and
+    # it does not make sense to check it against anything
+    def __getattr__(self, name: str) -> Any:
         # AttributeError needs to be thrown in order to make
         # instances of this class picklable.
-        assert (isinstance(name, str) and isinstance(getattr, str))
         try:
             return self.__dict__[name]
         except KeyError:
