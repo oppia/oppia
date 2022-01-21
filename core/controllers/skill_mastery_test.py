@@ -582,7 +582,7 @@ class SubtopicMasteryDataHandlerTest(test_utils.GenericTestBase):
             u'2': self.degree_of_mastery_3
         }
         degrees_of_mastery_2 = {
-            u'1': ((self.degree_of_mastery_3 + self.degree_of_mastery_4) / 2),
+            u'1': (self.degree_of_mastery_3 + self.degree_of_mastery_4) / 2,
             u'2': self.degree_of_mastery_5
         }
         self.assertEqual(
