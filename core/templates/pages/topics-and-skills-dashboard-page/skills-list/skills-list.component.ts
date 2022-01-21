@@ -61,8 +61,8 @@ export class SkillsListComponent {
   @Input() mergeableSkillSummaries!: SkillSummary[];
   @Input() skillsCategorizedByTopics!: SkillsCategorizedByTopics;
   @Input() untriagedSkillSummaries!: SkillSummary[];
-  @Input() userCanCreateSkill!: boolean;
-  @Input() userCanDeleteSkill!: boolean;
+  @Input() userCanCreateSkill: boolean = true;
+  @Input() userCanDeleteSkill: boolean = true;
 
   selectedIndex!: string;
   directiveSubscriptions: Subscription = new Subscription();
