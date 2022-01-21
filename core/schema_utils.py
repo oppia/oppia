@@ -545,11 +545,10 @@ class _Validators:
         if not expression_parser.is_valid_expression(obj): # type: ignore[no-untyped-call]
             return False
 
-        expression_is_algebraic = expression_parser.is_algebraic(obj) # type: ignore[no-untyped-call]
-        # If the algebraic flag is true, expression_is_algebraic should
-        # also be true, otherwise both should be false which would imply
-        # that the expression is numeric.
-        return not algebraic ^ expression_is_algebraic
+        expression_contains_at_least_one_variable = (
+            expression_parser.contains_at_least_one_variable(obj)) # type: ignore[no-untyped-call]
+        # This ensures that numeric expressions don't contain variables.
+        return algebraic or not expression_contains_at_least_one_variable
 
     @staticmethod
     def is_valid_algebraic_expression(obj: str) -> bool:
@@ -594,25 +593,24 @@ class _Validators:
 
         is_valid_algebraic_expression = get_validator(
             'is_valid_algebraic_expression')
-        is_valid_numeric_expression = get_validator(
-            'is_valid_numeric_expression')
         lhs, rhs = obj.split('=')
 
         # Both sides have to be valid expressions and at least one of them has
-        # to be a valid algebraic expression.
-        lhs_is_algebraically_valid = is_valid_algebraic_expression(lhs)
-        rhs_is_algebraically_valid = is_valid_algebraic_expression(rhs)
+        # to have at least one variable.
+        lhs_is_valid = is_valid_algebraic_expression(lhs)
+        rhs_is_valid = is_valid_algebraic_expression(rhs)
 
-        lhs_is_numerically_valid = is_valid_numeric_expression(lhs)
-        rhs_is_numerically_valid = is_valid_numeric_expression(rhs)
+        if not lhs_is_valid or not rhs_is_valid:
+            return False
 
-        if lhs_is_algebraically_valid and rhs_is_algebraically_valid:
-            return True
-        if lhs_is_algebraically_valid and rhs_is_numerically_valid:
-            return True
-        if lhs_is_numerically_valid and rhs_is_algebraically_valid:
-            return True
-        return False
+        lhs_contains_variable = (
+            expression_parser.contains_at_least_one_variable(lhs)) # type: ignore[no-untyped-call]
+        rhs_contains_variable = (
+            expression_parser.contains_at_least_one_variable(rhs)) # type: ignore[no-untyped-call]
+
+        if not lhs_contains_variable and not rhs_contains_variable:
+            return False
+        return True
 
     @staticmethod
     def is_supported_audio_language_code(obj: str) -> bool:
