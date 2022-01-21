@@ -48,6 +48,9 @@ angular.module('oppia').controller('CreateNewChapterModalController', [
       $scope.nodeTitles = nodeTitles;
       $scope.errorMsg = null;
       $scope.invalidExpErrorString = 'Please enter a valid exploration id.';
+      $scope.correctnessFeedbackDisabledString = 'The correctness feedback ' +
+        'of this exploration is disabled. Explorations need to have their ' +
+        'correctness feedback enabled before they can be added to a story.';
       $scope.MAX_CHARS_IN_EXPLORATION_TITLE = MAX_CHARS_IN_EXPLORATION_TITLE;
       $scope.story = StoryEditorStateService.getStory();
       $scope.nodeId = $scope.story.getStoryContents().getNextNodeId();
@@ -56,6 +59,7 @@ angular.module('oppia').controller('CreateNewChapterModalController', [
       $scope.allowedBgColors = (
         newChapterConstants.ALLOWED_THUMBNAIL_BG_COLORS.chapter);
       StoryUpdateService.addStoryNode($scope.story, $scope.title);
+      $scope.correctnessFeedbackDisabled = false;
     };
 
     $scope.init();
@@ -94,28 +98,15 @@ angular.module('oppia').controller('CreateNewChapterModalController', [
           return;
         }
       }
-      if (StoryEditorStateService.isStoryPublished()) {
-        ExplorationIdValidationService.isExpPublishedAsync(
-          $scope.explorationId).then(function(expIdIsValid) {
-          $scope.expIdIsValid = expIdIsValid;
-          if ($scope.expIdIsValid) {
-            StoryUpdateService.setStoryNodeExplorationId(
-              $scope.story, $scope.nodeId, $scope.explorationId);
-            $uibModalInstance.close();
-          } else {
-            $scope.invalidExpId = true;
-          }
-        });
-      } else {
-        StoryUpdateService.setStoryNodeExplorationId(
-          $scope.story, $scope.nodeId, $scope.explorationId);
-        $uibModalInstance.close();
-      }
+      StoryUpdateService.setStoryNodeExplorationId(
+        $scope.story, $scope.nodeId, $scope.explorationId);
+      $uibModalInstance.close();
     };
 
     $scope.resetErrorMsg = function() {
       $scope.errorMsg = null;
       $scope.invalidExpId = false;
+      $scope.correctnessFeedbackDisabled = false;
       $scope.invalidExpErrorString = 'Please enter a valid exploration id.';
     };
 
@@ -136,8 +127,29 @@ angular.module('oppia').controller('CreateNewChapterModalController', [
         $scope.errorMsg = 'A chapter with this title already exists';
         return;
       }
-      $scope.updateTitle();
-      $scope.updateExplorationId();
+      ExplorationIdValidationService.isExpPublishedAsync($scope.explorationId)
+        .then((expIsPublished) => {
+          if (!expIsPublished) {
+            $scope.invalidExpErrorString = 'This exploration does not exist ' +
+              'or is not published yet.';
+            $scope.invalidExpId = true;
+            $scope.$applyAsync();
+            return;
+          }
+          $scope.invalidExpId = false;
+          ExplorationIdValidationService.isCorrectnessFeedbackEnabled(
+            $scope.explorationId).then(
+            (correctnessFeedbackIsEnabled) => {
+              if (!correctnessFeedbackIsEnabled) {
+                $scope.correctnessFeedbackDisabled = true;
+                $scope.$applyAsync();
+                return;
+              }
+              $scope.correctnessFeedbackDisabled = false;
+              $scope.updateTitle();
+              $scope.updateExplorationId();
+            });
+        });
     };
   }
 ]);
