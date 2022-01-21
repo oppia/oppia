@@ -286,7 +286,7 @@ def run_tests(args):
                     # Although our unit tests always provide unicode strings,
                     # the actual server needs this failsafe since it can output
                     # non-unicode strings.
-                    line = line.encode('utf-8')  # pragma: nocover
+                    line = line.encode('utf-8')  # pragma: no cover
                 output_lines.append(line.rstrip())
                 # Replaces non-ASCII characters with '?'.
                 common.write_stdout_safe(line.decode('ascii', errors='replace'))

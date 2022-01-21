@@ -96,7 +96,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             """Enum for data type."""
 
             INVALID = 'invalid'
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Unsupported data type \'invalid\''):
             registry.Registry.create_platform_parameter(
                 ParamNames.PARAMETER_A, 'test', DataType.INVALID)
@@ -104,7 +104,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
     def test_create_platform_parameter_with_the_same_name_failure(self):
         param_name = 'parameter_a'
         self._create_example_parameter_with_name(param_name)
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Parameter with name %s already exists' % param_name):
             self._create_example_parameter_with_name(param_name)
 
@@ -142,7 +142,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         self.assertIsInstance(parameter, parameter_domain.PlatformParameter)
 
     def test_get_non_existing_parameter_failure(self):
-        with self.assertRaisesRegexp(Exception, 'not found'):
+        with self.assertRaisesRegex(Exception, 'not found'):
             registry.Registry.get_platform_parameter('parameter_a')
 
     def test_get_all_parameter_names(self):
@@ -224,7 +224,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         param = registry.Registry.get_platform_parameter(parameter_name)
         param.validate()
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected string'):
             registry.Registry.update_platform_parameter(
                 parameter_name,
@@ -249,7 +249,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         registry.Registry.create_feature_flag(
             ParamNames.PARAMETER_A, 'dev feature', FEATURE_STAGES.dev)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Feature in dev stage cannot be enabled in test or production '
             'environments.'):
@@ -276,7 +276,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         registry.Registry.create_feature_flag(
             ParamNames.PARAMETER_A, 'dev feature', FEATURE_STAGES.dev)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Feature in dev stage cannot be enabled in test or production '
             'environments.'):
@@ -303,7 +303,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         registry.Registry.create_feature_flag(
             ParamNames.PARAMETER_A, 'dev feature', FEATURE_STAGES.test)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Feature in test stage cannot be enabled in production '
             'environment.'):

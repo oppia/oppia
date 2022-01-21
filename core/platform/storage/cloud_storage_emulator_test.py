@@ -54,7 +54,7 @@ class BlobUnitTests(test_utils.TestBase):
         self.assertEqual(blob.content_type, 'audio/mp3')
 
     def test_init_blob_with_wrong_mimetype_raise_exception(self) -> None:
-        with self.assertRaisesRegexp(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
                 Exception, 'Content type contains unknown MIME type.'):
             cloud_storage_emulator.EmulatorBlob('name', b'string', 'png')
 
