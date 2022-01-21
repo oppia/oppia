@@ -117,13 +117,19 @@ describe('Rubrics Editor Component', () => {
   it('should check if total number of explanations' +
       ' have reached the limit',
   () => {
-    let index: number = 0;
+    let easyDifficulty = 'Easy';
+    let mediumDifficulty = 'Medium';
+    let hardDifficulty = 'Hard';
     componentInstance.ngOnInit();
-    componentInstance.editableExplanations[difficulty][index] = 'not_empty';
+    componentInstance.editableExplanations[easyDifficulty].push('not_empty');
+    componentInstance.editableExplanations[mediumDifficulty].push('not_empty');
+    componentInstance.editableExplanations[hardDifficulty].push('not_empty');
     expect(componentInstance.hasReachedExplanationCountLimit())
       .toBeFalse();
-    for (index = 1; index < 10; index++) {
-      componentInstance.editableExplanations[difficulty].push('not_empty');
+    for (let index = 0; index < 3; index++) {
+      componentInstance.editableExplanations[easyDifficulty].push('not_empty');
+      componentInstance.editableExplanations[mediumDifficulty].push('not_empty');
+      componentInstance.editableExplanations[hardDifficulty].push('not_empty');
     }
     expect(componentInstance.hasReachedExplanationCountLimit())
       .toBeTrue();
