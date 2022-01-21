@@ -29,7 +29,10 @@ from core.domain import role_services
 from core.domain import subscription_services
 from core.domain import taskqueue_services
 from core.domain import user_services
+from core.domain import exp_services
+from core.domain import collection_services
 from core.platform import models
+
 
 datastore_services = models.Registry.import_datastore_services()
 (collection_models, exp_models) = models.Registry.import_models([
@@ -114,8 +117,6 @@ def _update_exploration_summary(activity_rights):
         activity_rights: ActivityRights. The rights object for the given
             activity.
     """
-    # TODO(msl): Get rid of inline imports by refactoring code.
-    from core.domain import exp_services
     exp_services.regenerate_exploration_and_contributors_summaries(
         activity_rights.id)
 
@@ -130,7 +131,6 @@ def _update_collection_summary(activity_rights):
         activity_rights: ActivityRights. The rights object for the given
             activity.
     """
-    from core.domain import collection_services
     collection_services.regenerate_collection_and_contributors_summaries(
         activity_rights.id)
 

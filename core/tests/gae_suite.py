@@ -28,7 +28,7 @@ import argparse
 import os
 import sys
 import unittest
-
+import dev_appserver
 sys.path.insert(1, os.getcwd())
 
 from scripts import common # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
@@ -90,7 +90,6 @@ def main(args=None):
     # Cloud SDK comes with certain packages preinstalled including webapp2,
     # jinja2, and pyyaml so this function makes sure that those libraries are
     # installed.
-    import dev_appserver
     dev_appserver.fix_sys_path()
 
     # In the process of migrating Oppia from Python 2 to Python 3, we are using
