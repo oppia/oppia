@@ -224,7 +224,8 @@ describe('Contributor dashboard admin backend api service', () => {
     let languageCode = 'en';
     let username = 'validUser';
     let payload = {
-      username: username
+      username: username,
+      language_code: languageCode
     };
     cdabas.removeContributionReviewerAsync(
       username, category, languageCode).then(successHandler, failHandler);
@@ -245,10 +246,11 @@ describe('Contributor dashboard admin backend api service', () => {
   it('should fail to remove user contribution rights when user does' +
     'not exist when calling removeContributionReviewerAsync', fakeAsync(() => {
     let category = 'translation';
-    let languageCode = null;
+    let languageCode = 'en';
     let username = 'InvalidUser';
     let payload = {
-      username: username
+      username: username,
+      language_code: languageCode
     };
     cdabas.removeContributionReviewerAsync(
       username, category, languageCode).then(successHandler, failHandler);
