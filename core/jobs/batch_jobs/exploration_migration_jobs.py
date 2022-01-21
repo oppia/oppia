@@ -81,38 +81,6 @@ class MigrateExplorationJob(base_jobs.JobBase):
         return result.Ok((exp_id, exploration))
 
     @staticmethod
-    def _migrate_exploration_summary(
-        exp_id: str, exp_summary_model: exp_models.ExpSummaryModel
-    ) -> result.Result[
-        Tuple[str, exp_domain.ExplorationSummary], Tuple[str, Exception]
-    ]:
-        """Migrates exploration summary and transforms exploration summary model
-        into exploration summary object.
-
-        Args:
-            exp_id: str. The id of the exploration.
-            exp_summary_model: ExpSummaryModel. The exploration
-                model to migrate.
-
-        Returns:
-            Result((str, ExplorationSummary), (str, Exception)). Result
-            containing tuple that consists of exploration ID and either
-            exploration summary object or Exception. ExplorationSummary
-            object is returned when the migration was successful and
-            Exception is returned otherwise.
-        """
-        try:
-            exploration_summary = (
-                exp_fetchers.get_exploration_summary_from_model(
-                    exp_summary_model))
-            exploration_summary.validate()
-        except Exception as e:
-            logging.exception(e)
-            return result.Err((exp_id, e))
-
-        return result.Ok((exp_id, exploration_summary))
-
-    @staticmethod
     def _update_exploration(
         exp_model: exp_models.ExplorationModel,
         migrated_exploration: exp_domain.Exploration,
@@ -138,9 +106,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
         updated_exploration_model = (
             exp_services.populate_exploration_model_fields(
                 exp_model, migrated_exploration))
-        commit_message = (
-            'Update exploration content schema version to %d.'
-        ) % (exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION)
+        commit_message = 'Added android_proto_size_in_bytes attribute.'
         change_dicts = [change.to_dict() for change in exploration_changes]
         with datastore_services.get_ndb_context():
             models_to_put = updated_exploration_model.compute_models_to_commit(
@@ -156,7 +122,6 @@ class MigrateExplorationJob(base_jobs.JobBase):
     @staticmethod
     def _update_exploration_summary(
         migrated_exploration: exp_domain.Exploration,
-        exp_summary: exp_domain.ExplorationSummary,
         exp_summary_model: exp_models.ExpSummaryModel,
         exp_rights: exp_models.ExplorationRightsModel
     ) -> exp_models.ExpSummaryModel:
@@ -189,25 +154,19 @@ class MigrateExplorationJob(base_jobs.JobBase):
         exploration_model_created_on = migrated_exploration.created_on
         first_published_msec = exp_rights.first_published_msec
 
-        exp_summary.id = migrated_exploration.id
-        exp_summary.title = migrated_exploration.title
-        exp_summary.category = migrated_exploration.category
-        exp_summary.objective = migrated_exploration.objective
-        exp_summary.language_code = migrated_exploration.language_code
-        exp_summary.tags = migrated_exploration.tags
-        exp_summary.ratings = ratings
-        exp_summary.scaled_average_rating = scaled_average_rating
-        exp_summary.status = exp_rights.status
-        exp_summary.community_owned = exp_rights.community_owned
-        exp_summary.editor_ids = exp_rights.editor_ids
-        exp_summary.voice_artist_ids = exp_rights.voice_artist_ids
-        exp_summary.viewer_ids = exp_rights.viewer_ids
-        exp_summary.contributor_ids = contributor_ids
-        exp_summary.contributors_summary = contributors_summary
-        exp_summary.version += 1
-        exp_summary.exploration_model_created_on = (
-            exploration_model_created_on)
-        exp_summary.first_published_msec = first_published_msec
+        exp_summary = exp_domain.ExplorationSummary(
+            migrated_exploration.id, migrated_exploration.title,
+            migrated_exploration.category, migrated_exploration.objective,
+            migrated_exploration.language_code, migrated_exploration.tags,
+            ratings, scaled_average_rating,
+            exp_rights.status, exp_rights.community_owned,
+            exp_rights.owner_ids, exp_rights.editor_ids,
+            exp_rights.voice_artist_ids, exp_rights.viewer_ids,
+            contributor_ids, contributors_summary, migrated_exploration.version,
+            exploration_model_created_on,
+            exp_summary_model.exploration_model_last_updated,
+            first_published_msec, exp_summary_model.deleted
+        )
 
         updated_exploration_summary_model = (
             exp_services.populate_exploration_summary_model_fields(
@@ -219,7 +178,8 @@ class MigrateExplorationJob(base_jobs.JobBase):
 
     @staticmethod
     def _generate_exploration_changes(
-        exp_id: str, exp_model: exp_models.ExplorationModel
+        exp_model: exp_models.ExplorationModel,
+        exploration: exp_domain.Exploration
     ) -> Iterable[Tuple[str, exp_domain.ExplorationChange]]:
         """Generates exploration change objects. Exploration
         change object is generated when schema version for some field
@@ -234,15 +194,13 @@ class MigrateExplorationJob(base_jobs.JobBase):
             (str, ExplorationChange). Tuple containing exploration
             ID and exploration change object.
         """
-        if exp_model.version < (
-            exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION):
+        if not hasattr(exp_model, 'android_proto_size_in_bytes'):
             exp_change = exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
-                'from_version': str(exp_model.version),
-                'to_version': (
-                    str(exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION))
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'android_proto_size_in_bytes',
+                'new_value': exploration.android_proto_size_in_bytes
             })
-            yield (exp_id, exp_change)
+            yield (exploration.id, exp_change)
 
     @staticmethod
     def _delete_exploration_from_cache(
@@ -334,29 +292,26 @@ class MigrateExplorationJob(base_jobs.JobBase):
                     'EXPLORATION PROCESSED'))
         )
 
-        exploration_changes = (
-            unmigrated_exploration_models
-            | 'Generate exploration changes' >> beam.FlatMapTuple(
-                self._generate_exploration_changes)
+        migrated_exploration_object_list = (
+            {
+                'exp_model': unmigrated_exploration_models,
+                'exploration': migrated_explorations,
+            }
+            | 'Merge object' >> beam.CoGroupByKey()
+            | 'Get rid ID' >> beam.Values()  # pylint: disable=no-value-for-parameter
+            | 'Reorganize the exploration object' >> beam.Map(lambda objects: {
+                    'exp_model': objects['exp_model'][0],
+                    'exploration': objects['exploration'][0]
+                })
         )
 
-        migrated_exploration_summary_results = (
-            exploration_summary_models
-            | 'Transform and migrate summary model' >> beam.MapTuple( # pylint: disable=line-too-long
-                self._migrate_exploration_summary)
-        )
-        migrated_exploration_summaries = (
-            migrated_exploration_summary_results
-            | 'Filter ok' >> beam.Filter(
-                lambda result_item: result_item.is_ok())
-            | 'Unwrap oks' >> beam.Map(
-                lambda result_item: result_item.unwrap())
-        )
-        migrated_exploration_summary_job_run_results = (
-            migrated_exploration_summary_results
-            | 'Generate results for summary migration' >> (
-                job_result_transforms.ResultsToJobRunResults(
-                    'EXPLORATION SUMMARY PROCESSED'))
+        exploration_changes = (
+            migrated_exploration_object_list
+            | 'Generate exploration changes' >> beam.FlatMap(
+                lambda exp_objects: self._generate_exploration_changes(
+                    exp_objects['exp_model'],
+                    exp_objects['exploration']
+                ))
         )
 
         exploration_objects_list = (
@@ -364,20 +319,18 @@ class MigrateExplorationJob(base_jobs.JobBase):
                 'exp_model': unmigrated_exploration_models,
                 'exploration_summary_model': exploration_summary_models,
                 'exploration': migrated_explorations,
-                'exploration_summary': migrated_exploration_summaries,
                 'exploration_changes': exploration_changes,
                 'exploration_rights_model': exploration_rights_models
             }
             | 'Merge objects' >> beam.CoGroupByKey()
             | 'Get rid of ID' >> beam.Values()  # pylint: disable=no-value-for-parameter
             | 'Remove unmigrated exploration' >> beam.Filter(
-                lambda x: len(x['exploration_changes']) > 0 and len(x['exploration']) > 0 and len(x['exploration_summary']) > 0) # pylint: disable=line-too-long
+                lambda x: len(x['exploration_changes']) > 0 and len(x['exploration']) > 0) # pylint: disable=line-too-long
             | 'Reorganize the exploration objects' >> beam.Map(lambda objects: {
                     'exp_model': objects['exp_model'][0],
                     'exploration_summary_model': (
                         objects['exploration_summary_model'][0]),
                     'exploration': objects['exploration'][0],
-                    'exploration_summary': objects['exploration_summary'][0],
                     'exploration_changes': objects['exploration_changes'],
                     'exploration_rights_model': (
                         objects['exploration_rights_model'][0])
@@ -389,13 +342,6 @@ class MigrateExplorationJob(base_jobs.JobBase):
             | 'Transform exploration objects into job run results' >> (
                 job_result_transforms.CountObjectsToJobRunResult(
                     'EXPLORATION MIGRATED'))
-        )
-
-        exploration_summary_objects_list_job_run_results = (
-            exploration_objects_list
-            | 'Transform exploration summary objects into job run results' >> (
-                job_result_transforms.CountObjectsToJobRunResult(
-                    'EXPLORATION SUMMARY MIGRATED'))
         )
 
         cache_deletion_job_run_results = (
@@ -424,7 +370,6 @@ class MigrateExplorationJob(base_jobs.JobBase):
             | 'Generate exploration summary models to put' >> beam.Map(
                 lambda exp_objects: self._update_exploration_summary(
                     exp_objects['exploration'],
-                    exp_objects['exploration_summary'],
                     exp_objects['exploration_summary_model'],
                     exp_objects['exploration_rights_model']
                 ))
@@ -440,9 +385,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
             (
                 cache_deletion_job_run_results,
                 migrated_exploration_job_run_results,
-                migrated_exploration_summary_job_run_results,
-                exploration_objects_list_job_run_results,
-                exploration_summary_objects_list_job_run_results
+                exploration_objects_list_job_run_results
             )
             | beam.Flatten()
         )
