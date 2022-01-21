@@ -36,6 +36,7 @@ import { MultipleChoiceInputInteractionModule } from './MultipleChoiceInput/mult
 import { SetInputInteractionModule } from './SetInput/set-input-interactions.module';
 import { TextInputInteractionModule } from './TextInput/text-input-interactions.module';
 import { TranslateModule } from '@ngx-translate/core';
+import { PencilCodeEditorModule } from './PencilCodeEditor/pencil-code-editor-interactions.module';
 
 @NgModule({
   imports: [
@@ -50,6 +51,7 @@ import { TranslateModule } from '@ngx-translate/core';
     NumericExpressionInputModule,
     NumericInputModule,
     MathEquationInputModule,
+    PencilCodeEditorModule,
     InteractiveMapInteractionModule,
     MultipleChoiceInputInteractionModule,
     SetInputInteractionModule,
@@ -67,6 +69,7 @@ import { TranslateModule } from '@ngx-translate/core';
     ImageClickInputInteractionModule,
     NumberWithUnitsInteractionModule,
     NumericExpressionInputModule,
+    PencilCodeEditorModule,
     NumericInputModule,
     MathEquationInputModule,
     InteractiveMapInteractionModule,
