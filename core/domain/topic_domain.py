@@ -397,7 +397,6 @@ class Subtopic:
             subtopic_dict['thumbnail_bg_color'],
             subtopic_dict['thumbnail_size_in_bytes'],
             subtopic_dict['url_fragment'])
-
         return subtopic
 
     def to_android_subtopic_proto(self):
