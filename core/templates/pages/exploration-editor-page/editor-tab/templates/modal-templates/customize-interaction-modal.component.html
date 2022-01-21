@@ -15,7 +15,7 @@
   <div>
     <nav ngbNav #nav="ngbNav" [(activeId)]="active" class="nav-tabs">
       <ng-container ngbNavItem *ngFor="let category of allowedInteractionCategories">
-        <a ngbNavLink *ngIf="isinteractionOpen">{{category.name}}</a>
+        <a ngbNavLink class="protractor-test-interaction-tab-{{getHyphenatedLowercaseCategoryName(category.name)}}" *ngIf="isinteractionOpen">{{category.name}}</a>
         <ng-template ngbNavContent>
           <div *ngIf="isinteractionOpen">
           <div *ngFor="let interactionId of category.interaction_ids"
