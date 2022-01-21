@@ -42,7 +42,7 @@ describe('Testing filters', function() {
       var filter = $filter('truncate');
       // Checking when input is null.
       expect(filter(null, 4, '...')).toEqual('');
-      // Chevking when length parameter is NaN.
+      // Checking when length parameter is NaN.
       expect(filter('example', 'a', '...')).toEqual('example');
       // Checking when input is not a string.
       expect(filter(1, 4, '...')).toEqual('1');
