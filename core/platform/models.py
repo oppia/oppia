@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import enum
 import inspect
-from types import ModuleType  # pylint: disable=import-only-modules
+from types import ModuleType
 
 from core import feconf
 from core.constants import constants
@@ -14,48 +14,48 @@ from core.constants import constants
 from typing import List, Tuple, Type
 
 MYPY = False
-if MYPY: 
-    from mypy_imports import base_models  
+if MYPY:
+    from mypy_imports import base_models
 
 
 
 
 
-class Names(enum.Enum): 
+class Names(enum.Enum):
     """Enum for valid model names."""
 
-    ACTIVITY = 'activity' 
-    APPFEEDBACKREPORT = 'app_feedback_report' 
-    AUDIT = 'audit' 
-    BASEMODEL = 'base_model' 
-    BEAMJOB = 'beam_job' 
-    BLOG = 'blog' 
-    CLASSIFIER = 'classifier' 
-    COLLECTION = 'collection' 
-    CONFIG = 'config' 
-    EMAIL = 'email' 
-    EXPLORATION = 'exploration' 
-    FEEDBACK = 'feedback' 
-    IMPROVEMENTS = 'improvements' 
-    JOB = 'job' 
-    OPPORTUNITY = 'opportunity' 
-    QUESTION = 'question' 
-    RECOMMENDATIONS = 'recommendations' 
-    SKILL = 'skill' 
-    STATISTICS = 'statistics' 
-    AUTH = 'auth' 
-    STORY = 'story' 
-    SUBTOPIC = 'subtopic' 
-    SUGGESTION = 'suggestion' 
-    TOPIC = 'topic' 
-    TRANSLATION = 'translation' 
-    USER = 'user' 
+    ACTIVITY = 'activity'
+    APP_FEEDBACK_REPORT = 'app_feedback_report'
+    AUDIT = 'audit'
+    BASE_MODEL = 'base_model'
+    BEAM_JOB = 'beam_job'
+    BLOG = 'blog'
+    CLASSIFIER = 'classifier'
+    COLLECTION = 'collection'
+    CONFIG = 'config'
+    EMAIL = 'email'
+    EXPLORATION = 'exploration'
+    FEEDBACK = 'feedback'
+    IMPROVEMENTS = 'improvements'
+    JOB = 'job'
+    OPPORTUNITY = 'opportunity'
+    QUESTION = 'question'
+    RECOMMENDATIONS = 'recommendations'
+    SKILL = 'skill'
+    STATISTICS = 'statistics'
+    AUTH = 'auth'
+    STORY = 'story'
+    SUBTOPIC = 'subtopic'
+    SUGGESTION = 'suggestion'
+    TOPIC = 'topic'
+    TRANSLATION = 'translation'
+    USER = 'user'
 
 
 
 
-MODULES_WITH_PSEUDONYMIZABLE_CLASSES = (  
-    Names.APPFEEDBACKREPORT, Names.BLOG, Names.COLLECTION, Names.CONFIG,
+MODULES_WITH_PSEUDONYMIZABLE_CLASSES = (
+    Names.APP_FEEDBACK_REPORT, Names.BLOG, Names.COLLECTION, Names.CONFIG,
     Names.EXPLORATION, Names.FEEDBACK, Names.QUESTION, Names.SKILL, Names.STORY,
     Names.SUBTOPIC, Names.SUGGESTION, Names.TOPIC
 )
@@ -86,7 +86,7 @@ class _Gae(Platform):
     GAE (Google App Engine).
     """
 
-    
+
     @classmethod
     def import_models(cls, model_names: List[Names]) -> Tuple[ModuleType, ...]:
         """Imports and returns the storage modules listed in model_names.
@@ -101,7 +101,7 @@ class _Gae(Platform):
             Exception. Invalid model name.
         """
         returned_models: List[ModuleType] = []
-        
+
         for name in model_names:
             if name == Names.ACTIVITY:
                 from core.storage.activity import gae_models as activity_models
@@ -116,10 +116,10 @@ class _Gae(Platform):
             elif name == Names.AUTH:
                 from core.storage.auth import gae_models as auth_models
                 returned_models.append(auth_models)
-            elif name == Names.BASEMODEL:
+            elif name == Names.BASE_MODEL:
                 from core.storage.base_model import gae_models as base_model
                 returned_models.append(base_model)
-            elif name == Names.BEAMJOB:
+            elif name == Names.BEAM_JOB:
                 from core.storage.beam_job import gae_models as beam_job_models
                 returned_models.append(beam_job_models)
             elif name == Names.BLOG:
@@ -396,7 +396,7 @@ class Registry:
     modules.
     """
 
-    
+
     _PLATFORM_MAPPING = {
         _Gae.NAME: _Gae,
     }
@@ -410,7 +410,7 @@ class Registry:
             class. The corresponding platform-specific interface class.
         """
         klass = cls._PLATFORM_MAPPING.get(GAE_PLATFORM)
-        
+
         assert klass is not None
         return klass
 
