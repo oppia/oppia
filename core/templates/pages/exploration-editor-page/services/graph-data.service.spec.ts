@@ -15,6 +15,7 @@
 /**
  * @fileoverview Unit tests for GraphDataService.
  */
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
 import { GraphDataService } from 'pages/exploration-editor-page/services/graph-data.service';
@@ -28,6 +29,10 @@ describe('Graph Data Service', () => {
   let explorationStatesService: ExplorationStatesService;
 
   beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+
     graphDataService = TestBed.get(GraphDataService);
     explorationInitStateNameService = TestBed.get(
       ExplorationInitStateNameService);
@@ -81,10 +86,10 @@ describe('Graph Data Service', () => {
             rows: { value: 1 }
           },
           default_outcome: {
-            dest: 'Me Llamo',
+            dest: 'Hola',
             feedback: {
-              content_id: 'feedback_1',
-              html: 'buen trabajo!',
+              content_id: 'default_outcome',
+              html: 'try again!',
             },
             labelled_as_correct: true,
             param_changes: [],

@@ -66,7 +66,6 @@ describe('ExplorationStatesService', () => {
     contextService = TestBed.inject(ContextService);
     explorationStatesService = TestBed.inject(ExplorationStatesService);
     answerGroupObjectFactory = TestBed.inject(AnswerGroupObjectFactory);
-    answerGroup = TestBed.inject(AnswerGroup);
   });
 
   beforeEach(() => {
@@ -96,7 +95,7 @@ describe('ExplorationStatesService', () => {
       },
       training_data: [],
       tagged_skill_misconception_id: null
-    }, null);
+    }, 'TextInput');
 
     explorationStatesService.init({
       Hola: {

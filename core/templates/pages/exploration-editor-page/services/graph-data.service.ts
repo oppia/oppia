@@ -23,13 +23,11 @@ import { ComputeGraphService, GraphData } from 'services/compute-graph.service';
 import { ExplorationInitStateNameService } from 'pages/exploration-editor-page/services/exploration-init-state-name.service';
 import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
 
-require('pages/exploration-editor-page/services/exploration-states.service.ts');
-
 @Injectable({
   providedIn: 'root'
 })
 export class GraphDataService {
-  _graphData: GraphData;
+  _graphData: GraphData | null = null;
 
   constructor(
     private computeGraphService: ComputeGraphService,
