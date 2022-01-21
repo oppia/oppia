@@ -129,7 +129,7 @@ export class RequestInterceptor implements HttpInterceptor {
   }
 
   private static checkForNullParams(params: HttpParams) {
-    params.keys().forEach((key: string) => {
+    params.keys().filter(key => params.has(key)).forEach((key: string) => {
       params.getAll(key).forEach((value: string) => {
         if (value === 'null' || value === 'None') {
           throw new Error('Cannot supply params with value "None" or "null".');
