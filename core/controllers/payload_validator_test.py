@@ -90,26 +90,6 @@ class PayloadValidationUnitTests(test_utils.GenericTestBase):
                     'default_value': None
                 }
             }, {}),
-            ({
-                'exploration_id': 'null'
-            }, {
-                'exploration_id': {
-                    'schema': {
-                        'type': 'basestring'
-                    },
-                    'default_value': None
-                }
-            }, {}),
-            ({
-                'exploration_id': 'None'
-            }, {
-                'exploration_id': {
-                    'schema': {
-                        'type': 'basestring'
-                    },
-                    'default_value': None
-                }
-            }, {}),
             ({}, {
                 'exploration_id': {
                     'schema': {

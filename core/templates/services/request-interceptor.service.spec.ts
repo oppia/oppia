@@ -21,7 +21,7 @@ import {
   HttpTestingController
 } from '@angular/common/http/testing';
 // eslint-disable-next-line oppia/disallow-httpclient
-import {HTTP_INTERCEPTORS, HttpClient, HttpHandler, HttpRequest} from '@angular/common/http';
+import {HTTP_INTERCEPTORS, HttpClient, HttpHandler, HttpRequest, HttpParams} from '@angular/common/http';
 
 import {
   MockCsrfTokenService,
@@ -153,5 +153,38 @@ describe('Request Interceptor Service', () => {
     } catch (e) {
       expect(e).toEqual(new Error('Token needs to be initialized'));
     }
+  });
+
+  it('should not throw error if params are valid', () => {
+    expect(() => {
+      requestInterceptor.intercept(
+        new HttpRequest(
+          'GET',
+          'url',
+          {params: new HttpParams({fromString: 'key=valid'})}),
+          {} as HttpHandler);
+    }).toBeTruthy();
+  });
+
+  it('should throw error if null param is supplied', () => {
+    expect(() => {
+      requestInterceptor.intercept(
+        new HttpRequest(
+          'GET',
+          'url',
+          {params: new HttpParams({fromString: 'key=null'})}),
+          {} as HttpHandler);
+    }).toThrowError('Cannot supply params with value "None" or "null".');
+  });
+
+  it('should throw error if None param is supplied', () => {
+    expect(() => {
+      requestInterceptor.intercept(
+        new HttpRequest(
+          'GET',
+          'url',
+          {params: new HttpParams({fromString: 'key=None'})}),
+          {} as HttpHandler);
+    }).toThrowError('Cannot supply params with value "None" or "null".');
   });
 });

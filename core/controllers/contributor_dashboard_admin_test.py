@@ -166,8 +166,7 @@ class ContributionRightsHandlerTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
         self.post_json(
             '/contributionrightshandler/question', {
-                'username': 'question',
-                'language_code': None
+                'username': 'question'
             }, csrf_token=csrf_token)
 
         self.assertTrue(user_services.can_review_question_suggestions(
@@ -188,8 +187,7 @@ class ContributionRightsHandlerTest(test_utils.GenericTestBase):
 
         response = self.post_json(
             '/contributionrightshandler/question', {
-                'username': 'question',
-                'language_code': None
+                'username': 'question'
             }, csrf_token=csrf_token, expected_status_int=400)
 
         self.assertEqual(
@@ -205,8 +203,7 @@ class ContributionRightsHandlerTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
         self.post_json(
             '/contributionrightshandler/submit_question', {
-                'username': 'question',
-                'language_code': None
+                'username': 'question'
             }, csrf_token=csrf_token)
 
         self.assertTrue(user_services.can_submit_question_suggestions(
@@ -220,8 +217,7 @@ class ContributionRightsHandlerTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
         response = self.post_json(
             '/contributionrightshandler/submit_question', {
-                'username': 'question',
-                'language_code': None
+                'username': 'question'
             }, csrf_token=csrf_token)
         self.assertTrue(user_services.can_submit_question_suggestions(
             self.question_reviewer_id))
@@ -305,8 +301,7 @@ class ContributionRightsHandlerTest(test_utils.GenericTestBase):
         self.login(self.QUESTION_ADMIN_EMAIL)
         self.delete_json(
             '/contributionrightshandler/question', params={
-                'username': 'question',
-                'language_code': None
+                'username': 'question'
             })
 
         self.assertFalse(user_services.can_review_question_suggestions(
@@ -319,8 +314,7 @@ class ContributionRightsHandlerTest(test_utils.GenericTestBase):
         self.login(self.QUESTION_ADMIN_EMAIL)
         response = self.delete_json(
             '/contributionrightshandler/question', params={
-                'username': 'question',
-                'language_code': None
+                'username': 'question'
             }, expected_status_int=400)
 
         self.assertEqual(
@@ -335,8 +329,7 @@ class ContributionRightsHandlerTest(test_utils.GenericTestBase):
         self.login(self.QUESTION_ADMIN_EMAIL)
         self.delete_json(
             '/contributionrightshandler/submit_question', params={
-                'username': 'question',
-                'language_code': None
+                'username': 'question'
             })
 
         self.assertFalse(user_services.can_submit_question_suggestions(
@@ -349,8 +342,7 @@ class ContributionRightsHandlerTest(test_utils.GenericTestBase):
         self.login(self.QUESTION_ADMIN_EMAIL)
         response = self.delete_json(
             '/contributionrightshandler/submit_question', params={
-                'username': 'question',
-                'language_code': None
+                'username': 'question'
             }, expected_status_int=400)
 
         self.assertEqual(

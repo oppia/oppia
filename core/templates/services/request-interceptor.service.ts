@@ -18,7 +18,7 @@
 
 import { from, Observable } from 'rxjs';
 import { HttpRequest, HttpInterceptor,
-  HttpEvent, HttpHandler } from '@angular/common/http';
+  HttpEvent, HttpHandler, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { switchMap } from 'rxjs/operators';
 import { CsrfTokenService } from './csrf-token.service';
@@ -80,6 +80,8 @@ export class RequestInterceptor implements HttpInterceptor {
       }
     }
 
+    RequestInterceptor.validateParams(request);
+
     if (request.body) {
       return from(this.csrf.getTokenAsync())
         .pipe(
@@ -117,5 +119,22 @@ export class RequestInterceptor implements HttpInterceptor {
     } else {
       return next.handle(request);
     }
+  }
+
+  private static validateParams(request: HttpRequest<FormData>): void {
+    if (request.params === null) {
+      return;
+    }
+    RequestInterceptor.checkForNullParams(request.params);
+  }
+
+  private static checkForNullParams(params: HttpParams) {
+    params.keys().forEach((key: string) => {
+      params.getAll(key).forEach((value: string) => {
+        if (value === 'null' || value === 'None') {
+          throw new Error('Cannot supply params with value "None" or "null".');
+        }
+      });
+    });
   }
 }
