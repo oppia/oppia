@@ -1663,7 +1663,7 @@ def get_average_rating(ratings):
 
         for rating_value, rating_count in ratings.items():
             rating_sum += rating_weightings[rating_value] * rating_count
-        return rating_sum / (number_of_ratings * 1.0)
+        return rating_sum / number_of_ratings
 
 
 def get_scaled_average_rating(ratings):
@@ -1689,8 +1689,7 @@ def get_scaled_average_rating(ratings):
     a = x + ((z**2) / (2 * n))
     b = z * math.sqrt(
         ((x * (1 - x)) / n) + ((z**2) / (4 * n**2)))
-    wilson_score_lower_bound = (
-        (a - b) / (1 + ((z**2) / n)))
+    wilson_score_lower_bound = (a - b) / (1 + ((z**2) / n))
     return 1 + 4 * wilson_score_lower_bound
 
 
