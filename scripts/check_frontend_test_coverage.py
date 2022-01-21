@@ -71,7 +71,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'state-card.model.ts',
     'state-content-editor.directive.ts',
     'state-interaction-editor.directive.ts',
-    'story-node.model.ts',
     'subtopic.model.ts',
     'translation-file-hash-loader-backend-api.service.ts',
     'truncate-and-capitalize.filter.ts',
