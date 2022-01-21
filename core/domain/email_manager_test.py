@@ -5337,6 +5337,38 @@ class AccountDeletionEmailUnitTest(test_utils.EmailTestBase):
             self.APPLICANT_EMAIL)
         self.assertEqual(len(messages), 0)
 
+    def test_account_deletion_failed_email_is_sent_correctly(self):
+        dummy_admin_address = 'admin@system.com'
+
+        admin_email_ctx = self.swap(
+            feconf, 'ADMIN_EMAIL_ADDRESS', dummy_admin_address)
+
+        with self.can_send_emails_ctx, admin_email_ctx:
+            # Make sure there are no emails already sent.
+            messages = self._get_sent_email_messages(
+                feconf.ADMIN_EMAIL_ADDRESS)
+            self.assertEqual(messages, [])
+
+            # Send an account deletion failed email to admin.
+            email_manager.send_account_deletion_failed_email(
+                self.applicant_id, self.APPLICANT_EMAIL
+            )
+
+            # Make sure emails are sent.
+            messages = self._get_sent_email_messages(
+                feconf.ADMIN_EMAIL_ADDRESS)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(messages[0].to, ['admin@system.com'])
+            self.assertEqual(
+                messages[0].subject,
+                'WIPEOUT: Account deletion failed'
+            )
+            self.assertIn(
+                'The Wipeout process failed for the user with ID \'%s\' and '
+                'email \'%s\'.' % (self.applicant_id, self.APPLICANT_EMAIL),
+                messages[0].html
+            )
+
     def test_that_correct_account_deleted_email_is_sent(self):
         expected_email_subject = 'Account deleted'
         expected_email_html_body = (
@@ -5997,3 +6029,49 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
                 'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
             self.assertEqual(
                 sent_email_model.intent, feconf.EMAIL_INTENT_REMOVE_REVIEWER)
+
+
+class NotMergeableChangesEmailUnitTest(test_utils.EmailTestBase):
+    """Unit test related to not mergeable change list emails sent to admin."""
+
+    dummy_admin_address = 'admin@system.com'
+
+    def setUp(self):
+        super(NotMergeableChangesEmailUnitTest, self).setUp()
+        self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
+        self.admin_email_ctx = self.swap(
+            feconf, 'ADMIN_EMAIL_ADDRESS', self.dummy_admin_address)
+
+    def test_not_mergeable_change_list_email_is_sent_correctly(self):
+        with self.can_send_emails_ctx, self.admin_email_ctx:
+            # Make sure there are no emails already sent.
+            messages = self._get_sent_email_messages(
+                feconf.ADMIN_EMAIL_ADDRESS)
+            self.assertEqual(messages, [])
+
+            # Send an account deletion failed email to admin.
+            email_manager.send_not_mergeable_change_list_to_admin_for_review(
+                'testExploration', 1, 2, {'field1': 'value1'}
+            )
+
+            # Make sure emails are sent.
+            messages = self._get_sent_email_messages(
+                feconf.ADMIN_EMAIL_ADDRESS)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(messages[0].to, ['admin@system.com'])
+            self.assertEqual(
+                messages[0].subject,
+                'Some changes were rejected due to a conflict'
+            )
+            self.assertIn(
+                'Hi Admin,<br><br>'
+                'Some draft changes were rejected in exploration '
+                'testExploration because the changes were conflicting and '
+                'could not be saved. Please see the '
+                'rejected change list below:<br>'
+                'Discarded change list: {\'field1\': \'value1\'} <br><br>'
+                'Frontend Version: 1<br>'
+                'Backend Version: 2<br><br>'
+                'Thanks!',
+                messages[0].html
+            )

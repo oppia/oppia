@@ -308,6 +308,11 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
                 'exp_id_1'))
         self.assertEqual(recommended_exp_ids, saved_recommendation_ids)
 
+        saved_recommendation_ids = (
+            recommendations_services.get_exploration_recommendations(
+                'exp_id_0'))
+        self.assertEqual(saved_recommendation_ids, [])
+
     def test_delete_recommendations_for_exploration(self):
         recommendations_services.delete_explorations_from_recommendations([
             'exp_id_1', 'exp_id_2'])
