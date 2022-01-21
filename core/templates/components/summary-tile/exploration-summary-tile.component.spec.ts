@@ -35,6 +35,7 @@ import { RatingComputationService } from 'components/ratings/rating-computation/
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { UserInfo } from 'domain/user/user-info.model';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 @Component({selector: 'learner-dashboard-icons', template: ''})
 class LearnerDashboardIconsComponentStub {
@@ -133,6 +134,7 @@ describe('Exploration Summary Tile Component', () => {
   let windowDimensionsService: WindowDimensionsService;
   let resizeEvent = new Event('resize');
   let windowRef: MockWindowRef;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
 
   let userInfo = new UserInfo(
     ['USER_ROLE'], true, false, false, false, true,
@@ -190,6 +192,7 @@ describe('Exploration Summary Tile Component', () => {
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     ratingComputationService = TestBed.inject(RatingComputationService);
     urlService = TestBed.inject(UrlService);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
 
     component.collectionId = '1';
     component.explorationId = '1';
@@ -228,6 +231,9 @@ describe('Exploration Summary Tile Component', () => {
     const windowWidthSpy = spyOn(
       windowDimensionsService, 'getWidth').and.callThrough();
     component.mobileCutoffPx = 536;
+    spyOn(i18nLanguageCodeService, 'getExplorationTranslationKey')
+      .and.returnValues(
+        'I18N_EXPLORATION_123ab_TITLE', 'I18N_EXPLORATION_123ab_DESCRIPTION');
 
     component.ngOnInit();
     tick();
@@ -236,10 +242,43 @@ describe('Exploration Summary Tile Component', () => {
     expect(component.activityType).toBe('exploration');
     expect(component.isRefresherExploration).toBe(true);
     expect(component.isWindowLarge).toBe(true);
+    expect(component.explTitleTranslationKey).toBe(
+      'I18N_EXPLORATION_123ab_TITLE');
+    expect(component.objectiveTranslationKey).toBe(
+      'I18N_EXPLORATION_123ab_DESCRIPTION');
 
     expect(userServiceSpy).toHaveBeenCalled();
     expect(windowResizeSpy).toHaveBeenCalled();
     expect(windowWidthSpy).toHaveBeenCalled();
+  }));
+
+  it('should check whether hacky translations are displayed or not'
+    , fakeAsync(() => {
+    const userServiceSpy = spyOn(
+      userService, 'getUserInfoAsync')
+      .and.returnValue(Promise.resolve(userInfo));
+    const windowResizeSpy = spyOn(
+      windowDimensionsService, 'getResizeEvent').and.callThrough();
+    const windowWidthSpy = spyOn(
+      windowDimensionsService, 'getWidth').and.callThrough();
+    spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
+      .and.returnValues(false, true);
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
+      .and.returnValues(false, false);
+
+    component.ngOnInit();
+    tick();
+    fixture.detectChanges();
+
+    expect(userServiceSpy).toHaveBeenCalled();
+    expect(windowResizeSpy).toHaveBeenCalled();
+    expect(windowWidthSpy).toHaveBeenCalled();
+    let hackyTranslationIsDisplayed =
+      component.isHackyExplTitleTranslationDisplayed();
+    expect(hackyTranslationIsDisplayed).toBe(false);
+    hackyTranslationIsDisplayed =
+      component.isHackyObjectiveTranslationDisplayed();
+    expect(hackyTranslationIsDisplayed).toBe(true);
   }));
 
   it('should intialize the component and set mobileCutoffPx to 0' +

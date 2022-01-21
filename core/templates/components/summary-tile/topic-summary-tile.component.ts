@@ -49,9 +49,9 @@ export class TopicSummaryTileComponent {
           AppConstants.ENTITY_TYPE.TOPIC, this.topicSummary.getId(),
           this.topicSummary.getThumbnailFilename());
     }
-    this.topicNameTranslationKey = this.i18nLanguageCodeService.
-      getTopicTranslationKey(
-        this.topicSummary.getId(), TranslationKeyType.TITLE);
+    this.topicNameTranslationKey = (
+      this.i18nLanguageCodeService.getTopicTranslationKey(
+        this.topicSummary.getId(), TranslationKeyType.TITLE));
   }
 
   getTopicPageUrl(): string {

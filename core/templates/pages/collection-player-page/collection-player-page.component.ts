@@ -22,7 +22,6 @@ import { ReadOnlyCollectionBackendApiService } from 'domain/collection/read-only
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { AlertsService } from 'services/alerts.service';
 import { UrlService } from 'services/contextual/url.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
 import { LoaderService } from 'services/loader.service';
 import { PageTitleService } from 'services/page-title.service';
 import { UserService } from 'services/user.service';
@@ -33,6 +32,7 @@ import { AppConstants } from 'app.constants';
 import { Collection } from 'domain/collection/collection.model';
 import { CollectionPlayerBackendApiService } from './services/collection-player-backend-api.service';
 import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
+import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
 
 export interface IconParametersArray {
   thumbnailIconUrl: string;
@@ -92,6 +92,9 @@ export class CollectionPlayerPageComponent implements OnInit {
   isLoggedIn: boolean = false;
   explorationCardIsShown: boolean = false;
   elementToScrollTo: string;
+  collectionNodes: CollectionNode[] = [];
+  collectionTitleTranslationKey: string;
+  explTitleTranslationKeys: string[] = [];
 
   constructor(
     private guestCollectionProgressService: GuestCollectionProgressService,
@@ -103,8 +106,8 @@ export class CollectionPlayerPageComponent implements OnInit {
      ReadOnlyCollectionBackendApiService,
     private pageTitleService: PageTitleService,
     private userService: UserService,
-    private windowRef: WindowRef,
-    private collectionPlayerBackendApiService: CollectionPlayerBackendApiService
+    private collectionPlayerBackendApiService: CollectionPlayerBackendApiService,
+    private i18nLanguageCodeService: I18nLanguageCodeService
   ) {}
 
   getStaticImageUrl(imagePath: string): string {
@@ -305,6 +308,22 @@ export class CollectionPlayerPageComponent implements OnInit {
     }
   }
 
+  isHackyExplTitleTranslationDisplayed(index): boolean {
+    return (
+      this.i18nLanguageCodeService.isHackyTranslationAvailable(
+        this.explTitleTranslationKeys[index]) &&
+        !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    );
+  }
+
+  isHackyCollectionTitleTranslationDisplayed(): boolean {
+    return (
+      this.i18nLanguageCodeService.isHackyTranslationAvailable(
+        this.collectionTitleTranslationKey) &&
+        !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    );
+  }
+
   ngOnInit(): void {
     this.loaderService.showLoadingScreen('Loading');
     this.collection = null;
@@ -372,6 +391,23 @@ export class CollectionPlayerPageComponent implements OnInit {
           }
           this.nextExplorationId =
             this.collectionPlaythrough.getNextExplorationId();
+
+          this.collectionTitleTranslationKey = (
+            this.i18nLanguageCodeService.getCollectionTranslationKey(
+              this.collectionId, TranslationKeyType.TITLE
+            )
+          );
+
+          this.collectionNodes = collection.getCollectionNodes();
+          
+          for (let idx in this.collectionNodes) {
+            this.explTitleTranslationKeys.push(
+              this.i18nLanguageCodeService.getExplorationTranslationKey(
+                this.collectionNodes[idx].getExplorationId(),
+                TranslationKeyType.TITLE
+              )
+            );
+          }
         });
       },
       () => {

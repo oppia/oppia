@@ -31,6 +31,7 @@ import { CollectionNodeBackendDict } from 'domain/collection/collection-node.mod
 import { NO_ERRORS_SCHEMA } from '@angular/compiler';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 describe('Collection player page component', () => {
   let alertsService: AlertsService;
@@ -48,6 +49,7 @@ describe('Collection player page component', () => {
   let sampleCollectionBackendObject: CollectionBackendDict;
   let collectionNodesList: IconParametersArray[];
   let collectionNodeBackendObject: CollectionNodeBackendDict;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
 
   const userInfoForCollectionCreator = new UserInfo(
     ['USER_ROLE'], true, false, false, false, true,
@@ -75,6 +77,7 @@ describe('Collection player page component', () => {
       GuestCollectionProgressService);
     readOnlyCollectionBackendApiService = TestBed.inject(
       ReadOnlyCollectionBackendApiService);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     fixture = TestBed.createComponent(CollectionPlayerPageComponent);
     component = fixture.componentInstance;
 
@@ -187,6 +190,52 @@ describe('Collection player page component', () => {
 
     expect(alertsSpy).toHaveBeenCalledWith(
       'There was an error loading the collection.');
+  }));
+
+  it('should initalize and set hacky translation keys', fakeAsync(() => {
+    spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
+      .and.resolveTo(sampleCollection);
+    spyOn(userService, 'getUserInfoAsync')
+      .and.returnValue(Promise.resolve(userInfoForCollectionCreator));
+    spyOn(i18nLanguageCodeService, 'getCollectionTranslationKey')
+      .and.returnValue('I18N_COLLECTION_123ab_TITLE');
+    spyOn(i18nLanguageCodeService, 'getExplorationTranslationKey')
+      .and.returnValues(
+        'I18N_EXPLORATION_123ab_TITLE', 'I18N_EXPLORATION_123bc_TITLE',
+        'I18N_EXPLORATION_123cd_TITLE', 'I18N_EXPLORATION_123de_TITLE',
+        'I18N_EXPLORATION_123ef_TITLE', 'I18N_EXPLORATION_123fg_TITLE');
+
+    component.ngOnInit();
+    tick();
+
+    expect(component.collectionTitleTranslationKey).toBe(
+      'I18N_COLLECTION_123ab_TITLE');
+    expect(component.explTitleTranslationKeys).toEqual(
+      ['I18N_EXPLORATION_123ab_TITLE', 'I18N_EXPLORATION_123bc_TITLE',
+      'I18N_EXPLORATION_123cd_TITLE', 'I18N_EXPLORATION_123de_TITLE',
+      'I18N_EXPLORATION_123ef_TITLE', 'I18N_EXPLORATION_123fg_TITLE']);
+  }));
+
+  it('should check whether hacky translations are displayed or not'
+    , fakeAsync(() => {
+    spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
+      .and.resolveTo(sampleCollection);
+    spyOn(userService, 'getUserInfoAsync')
+      .and.returnValue(Promise.resolve(userInfoForCollectionCreator));
+    spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
+      .and.returnValues(false, true);
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
+      .and.returnValues(false, false);
+
+    component.ngOnInit();
+    tick();
+
+    let hackyTranslationIsDisplayed =
+      component.isHackyExplTitleTranslationDisplayed(0);
+    expect(hackyTranslationIsDisplayed).toBe(false);
+    hackyTranslationIsDisplayed =
+      component.isHackyCollectionTitleTranslationDisplayed();
+    expect(hackyTranslationIsDisplayed).toBe(true);
   }));
 
   it('should stop event propagation when click event is emitted', () => {
