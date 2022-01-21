@@ -314,3 +314,51 @@ class ValidateParamsDict(test_utils.GenericTestBase):
     def test_valid_type_raises_no_exception(self):
         correct_type = {}
         domain_objects_validator.validate_params_dict(correct_type)
+
+
+class ValidateTopicChangeDict(test_utils.GenericTestBase):
+    """Tests to validate change_dict of TopicEditHandler."""
+
+    def test_valid_dict_raises_no_exception(self) -> None:
+        valid_change_dict = {
+            'cmd': 'update_topic_property',
+            'property_name': 'name',
+            'old_value': '',
+            'new_value': 'a'
+        }
+        self.assertEqual(
+            domain_objects_validator.
+            validate_topic_and_sub_topic_change(valid_change_dict),
+            valid_change_dict)
+
+    def test_invalid_dict_raises_exception(self) -> None:
+        cmd_none = {
+            'cmd': None,
+            'property_name': 'name',
+            'old_value': '',
+            'new_value': 'a'
+        }
+        cmd_invalid = {
+            'cmd': 'invalid_cmd',
+            'property_name': 'name',
+            'old_value': '',
+            'new_value': 'a'
+        }
+        cmd_missing = {
+            'property_name': 'name',
+            'old_value': '',
+            'new_value': 'a'
+        }
+
+        with self.assertRaisesRegex(
+            Exception, 'cmd is not allowed.'): # type: ignore[no-untyped-call]
+            domain_objects_validator.validate_topic_and_sub_topic_change(
+                cmd_none)
+        with self.assertRaisesRegex(
+            Exception, 'cmd is not allowed.'): # type: ignore[no-untyped-call]
+            domain_objects_validator.validate_topic_and_sub_topic_change(
+                cmd_invalid)
+        with self.assertRaisesRegex(
+            Exception, 'cmd is not allowed.'): # type: ignore[no-untyped-call]
+            domain_objects_validator.validate_topic_and_sub_topic_change(
+                cmd_missing)
