@@ -235,41 +235,41 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
 
     def test_in_terminal_state(self) -> None:
 
-        NOW = datetime.datetime.utcnow()
+        now = datetime.datetime.utcnow()
 
         cancelled_beam_job_run = beam_job_domain.BeamJobRun(
             '123', 'FooJob', beam_job_models.BeamJobState.CANCELLED.value,
-            NOW, NOW, True)
+            now, now, True)
         drained_beam_job_run = beam_job_domain.BeamJobRun(
             '123', 'FooJob', beam_job_models.BeamJobState.DRAINED.value,
-            NOW, NOW, True)
+            now, now, True)
         updated_beam_job_run = beam_job_domain.BeamJobRun(
             '123', 'FooJob', beam_job_models.BeamJobState.UPDATED.value,
-            NOW, NOW, True)
+            now, now, True)
         done_beam_job_run = beam_job_domain.BeamJobRun(
             '123', 'FooJob', beam_job_models.BeamJobState.DONE.value,
-            NOW, NOW, True)
+            now, now, True)
         failed_beam_job_run = beam_job_domain.BeamJobRun(
             '123', 'FooJob', beam_job_models.BeamJobState.FAILED.value,
-            NOW, NOW, True)
+            now, now, True)
         cancelling_beam_job_run = beam_job_domain.BeamJobRun(
             '123', 'FooJob', beam_job_models.BeamJobState.CANCELLING.value,
-            NOW, NOW, True)
+            now, now, True)
         draining_beam_job_run = beam_job_domain.BeamJobRun(
             '123', 'FooJob', beam_job_models.BeamJobState.DRAINING.value,
-            NOW, NOW, True)
+            now, now, True)
         pending_beam_job_run = beam_job_domain.BeamJobRun(
             '123', 'FooJob', beam_job_models.BeamJobState.PENDING.value,
-            NOW, NOW, True)
+            now, now, True)
         running_beam_job_run = beam_job_domain.BeamJobRun(
             '123', 'FooJob', beam_job_models.BeamJobState.RUNNING.value,
-            NOW, NOW, True)
+            now, now, True)
         stopped_beam_job_run = beam_job_domain.BeamJobRun(
             '123', 'FooJob', beam_job_models.BeamJobState.STOPPED.value,
-            NOW, NOW, True)
+            now, now, True)
         unknown_beam_job_run = beam_job_domain.BeamJobRun(
             '123', 'FooJob', beam_job_models.BeamJobState.UNKNOWN.value,
-            NOW, NOW, True)
+            now, now, True)
 
         self.assertTrue(
             beam_job_services.in_terminal_state(
