@@ -30,14 +30,7 @@ export interface OpportunityDict {
   'skill_description': string;
 }
 
-export interface FetchSuggestionsResponse {
-  'target_id_to_opportunity_dict': {
-    [targetId: string]: OpportunityDict;
-  };
-  suggestions: SuggestionBackendDict[];
-}
-
-interface FetchSuggestions {
+interface FetchSuggestionsResponse {
   [targetId: string]: {
     suggestion: SuggestionBackendDict;
     details: OpportunityDict;
@@ -53,14 +46,14 @@ export class ContributionAndReviewService {
       ContributionAndReviewBackendApiService
   ) {}
 
-  private async _fetchSuggestionsAsync(
+  private async fetchSuggestionsAsync(
       fetchType: string
-  ): Promise<FetchSuggestions> {
+  ): Promise<FetchSuggestionsResponse> {
     return (
       this.contributionAndReviewBackendApiService.fetchSuggestionsAsync(
         fetchType
       ).then((responseBody) => {
-        const suggestionIdToSuggestions: FetchSuggestions = {};
+        const suggestionIdToSuggestions: FetchSuggestionsResponse = {};
         const targetIdToDetails = responseBody.target_id_to_opportunity_dict;
         responseBody.suggestions.forEach((suggestion) => {
           suggestionIdToSuggestions[suggestion.suggestion_id] = {
@@ -73,23 +66,27 @@ export class ContributionAndReviewService {
     );
   }
 
-  async getUserCreatedQuestionSuggestionsAsync(): Promise<FetchSuggestions> {
-    return this._fetchSuggestionsAsync('SUBMITTED_QUESTION_SUGGESTIONS');
+  async getUserCreatedQuestionSuggestionsAsync():
+  Promise<FetchSuggestionsResponse> {
+    return this.fetchSuggestionsAsync('SUBMITTED_QUESTION_SUGGESTIONS');
   }
 
-  async getReviewableQuestionSuggestionsAsync(): Promise<FetchSuggestions> {
-    return this._fetchSuggestionsAsync('REVIEWABLE_QUESTION_SUGGESTIONS');
+  async getReviewableQuestionSuggestionsAsync():
+  Promise<FetchSuggestionsResponse> {
+    return this.fetchSuggestionsAsync('REVIEWABLE_QUESTION_SUGGESTIONS');
   }
 
-  async getUserCreatedTranslationSuggestionsAsync(): Promise<FetchSuggestions> {
-    return this._fetchSuggestionsAsync('SUBMITTED_TRANSLATION_SUGGESTIONS');
+  async getUserCreatedTranslationSuggestionsAsync():
+  Promise<FetchSuggestionsResponse> {
+    return this.fetchSuggestionsAsync('SUBMITTED_TRANSLATION_SUGGESTIONS');
   }
 
-  async getReviewableTranslationSuggestionsAsync(): Promise<FetchSuggestions> {
-    return this._fetchSuggestionsAsync('REVIEWABLE_TRANSLATION_SUGGESTIONS');
+  async getReviewableTranslationSuggestionsAsync():
+  Promise<FetchSuggestionsResponse> {
+    return this.fetchSuggestionsAsync('REVIEWABLE_TRANSLATION_SUGGESTIONS');
   }
 
-  resolveSuggestionToExploration(
+  reviewExplorationSuggestion(
       targetId: string, suggestionId: string, action: string,
       reviewMessage: string, commitMessage: string,
       onSuccess: (suggestionId: string) => void,
@@ -114,7 +111,7 @@ export class ContributionAndReviewService {
       });
   }
 
-  resolveSuggestiontoSkill(
+  reviewSkillSuggestion(
       targetId: string, suggestionId: string, action: string,
       reviewMessage: string, skillDifficulty: string,
       onSuccess: (suggestionId: string) => void,

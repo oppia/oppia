@@ -237,7 +237,7 @@ angular.module('oppia').component('contributionsAndReview', {
           },
           controller: 'QuestionSuggestionReviewModalController'
         }).result.then(function(result) {
-          ContributionAndReviewService.resolveSuggestiontoSkill(
+          ContributionAndReviewService.reviewSkillSuggestion(
             targetId, suggestionId, result.action, result.reviewMessage,
             result.skillDifficulty, resolveSuggestionSuccess, () => {
               AlertsService.addInfoMessage('Failed to submit suggestion.');

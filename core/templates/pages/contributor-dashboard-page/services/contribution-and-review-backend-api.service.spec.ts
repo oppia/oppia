@@ -34,7 +34,7 @@ describe('Contribution and review backend API service', () => {
     skill_id: 'skill_id_1',
     skill_description: 'skill_description_1',
   };
-  const testSuggestionsBackendObject = {
+  const suggestionsBackendObject = {
     suggestions: [
       suggestion1
     ],
@@ -73,7 +73,7 @@ describe('Contribution and review backend API service', () => {
       ).then(successHandler, failureHandler);
       const req = http.expectOne(url);
       expect(req.request.method).toEqual('GET');
-      req.flush(testSuggestionsBackendObject);
+      req.flush(suggestionsBackendObject);
       flushMicrotasks();
 
       expect(carbas.fetchSubmittedSuggestionsAsync)
@@ -91,7 +91,7 @@ describe('Contribution and review backend API service', () => {
       ).then(successHandler, failureHandler);
       const req = http.expectOne(url);
       expect(req.request.method).toEqual('GET');
-      req.flush(testSuggestionsBackendObject);
+      req.flush(suggestionsBackendObject);
       flushMicrotasks();
 
       expect(carbas.fetchSubmittedSuggestionsAsync)
@@ -109,7 +109,7 @@ describe('Contribution and review backend API service', () => {
       ).then(successHandler, failureHandler);
       const req = http.expectOne(url);
       expect(req.request.method).toEqual('GET');
-      req.flush(testSuggestionsBackendObject);
+      req.flush(suggestionsBackendObject);
       flushMicrotasks();
 
       expect(carbas.fetchReviewableSuggestionsAsync)
@@ -127,7 +127,7 @@ describe('Contribution and review backend API service', () => {
       ).then(successHandler, failureHandler);
       const req = http.expectOne(url);
       expect(req.request.method).toEqual('GET');
-      req.flush(testSuggestionsBackendObject);
+      req.flush(suggestionsBackendObject);
       flushMicrotasks();
 
       expect(carbas.fetchReviewableSuggestionsAsync)
@@ -137,7 +137,7 @@ describe('Contribution and review backend API service', () => {
     }));
   });
 
-  it('should correctly resolve suggestion to exploration', fakeAsync(() => {
+  it('should correctly review exploration suggestion', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
     const failureHandler = jasmine.createSpy('failure');
     const url = '/suggestionactionhandler/exploration/abc/pqr';
@@ -158,7 +158,7 @@ describe('Contribution and review backend API service', () => {
     expect(failureHandler).not.toHaveBeenCalled();
   }));
 
-  it('should correctly resolve suggestion to skill', fakeAsync(() => {
+  it('should correctly review skill suggestion', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
     const failureHandler = jasmine.createSpy('failure');
     const url = '/suggestionactionhandler/skill/abc/pqr';
@@ -202,7 +202,7 @@ describe('Contribution and review backend API service', () => {
     const successHandler = jasmine.createSpy('success');
     const failureHandler = jasmine.createSpy('failure');
     const url = '/updatequestionsuggestionhandler/abc';
-    const testQuestionStateData = {
+    const questionStateData = {
       classifier_model_id: null,
       content: {
         content_id: 'content',
@@ -262,7 +262,7 @@ describe('Contribution and review backend API service', () => {
     };
     const payload = {
       skill_difficulty: 'easy',
-      question_state_data: testQuestionStateData
+      question_state_data: questionStateData
     };
     const postBody = new FormData();
     postBody.append('payload', JSON.stringify(payload));

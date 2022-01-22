@@ -38,7 +38,7 @@ describe('Contribution and review service', () => {
     skill_description: 'skill_description_1',
   };
 
-  const testSuggestionsBackendObject = {
+  const suggestionsBackendObject = {
     suggestions: [
       suggestion1
     ],
@@ -49,7 +49,7 @@ describe('Contribution and review service', () => {
 
   const expectedSuggestionDict = {
     suggestion: suggestion1,
-    details: testSuggestionsBackendObject
+    details: suggestionsBackendObject
       .target_id_to_opportunity_dict.skill_id_1
   };
 
@@ -69,7 +69,7 @@ describe('Contribution and review service', () => {
     it('should return available question suggestions and opportunity details',
       () => {
         spyOn(carbas, 'fetchSuggestionsAsync').and.returnValue(
-          Promise.resolve(testSuggestionsBackendObject));
+          Promise.resolve(suggestionsBackendObject));
 
         cars.getUserCreatedQuestionSuggestionsAsync()
           .then((suggestionIdToSuggestions) => {
@@ -85,7 +85,7 @@ describe('Contribution and review service', () => {
     it('should return available question suggestions and opportunity details',
       () => {
         spyOn(carbas, 'fetchSuggestionsAsync').and.returnValue(
-          Promise.resolve(testSuggestionsBackendObject));
+          Promise.resolve(suggestionsBackendObject));
 
         cars.getReviewableQuestionSuggestionsAsync()
           .then((suggestionIdToSuggestions) => {
@@ -101,7 +101,7 @@ describe('Contribution and review service', () => {
     it('should return translation suggestions and opportunity details',
       () => {
         spyOn(carbas, 'fetchSuggestionsAsync').and.returnValue(
-          Promise.resolve(testSuggestionsBackendObject));
+          Promise.resolve(suggestionsBackendObject));
 
         cars.getUserCreatedTranslationSuggestionsAsync()
           .then((suggestionIdToSuggestions) => {
@@ -117,7 +117,7 @@ describe('Contribution and review service', () => {
     it('should return translation suggestions and opportunity details',
       () => {
         spyOn(carbas, 'fetchSuggestionsAsync').and.returnValue(
-          Promise.resolve(testSuggestionsBackendObject));
+          Promise.resolve(suggestionsBackendObject));
 
         cars.getReviewableTranslationSuggestionsAsync()
           .then((suggestionIdToSuggestions) => {
@@ -129,7 +129,7 @@ describe('Contribution and review service', () => {
       });
   });
 
-  describe('resolveSuggestionToExploration', () => {
+  describe('reviewExplorationSuggestion', () => {
     const requestBody = {
       action: 'accept',
       review_message: 'review message',
@@ -150,7 +150,7 @@ describe('Contribution and review service', () => {
       spyOn(carbas, 'reviewExplorationSuggestionAsync')
         .and.returnValue(Promise.resolve());
 
-      cars.resolveSuggestionToExploration(
+      cars.reviewExplorationSuggestion(
         'abc', 'pqr', 'accept', 'review message', 'commit message',
         onSuccess, onFailure
       );
@@ -167,7 +167,7 @@ describe('Contribution and review service', () => {
       spyOn(carbas, 'reviewExplorationSuggestionAsync').and
         .returnValue(Promise.reject());
 
-      cars.resolveSuggestionToExploration(
+      cars.reviewExplorationSuggestion(
         'abc', 'pqr', 'accept', 'review message', 'commit message',
         onSuccess, onFailure
       );
@@ -180,7 +180,7 @@ describe('Contribution and review service', () => {
     }));
   });
 
-  describe('resolveSuggestiontoSkill', () => {
+  describe('reviewSkillSuggestion', () => {
     const requestBody = {
       action: 'accept',
       review_message: 'review message',
@@ -202,7 +202,7 @@ describe('Contribution and review service', () => {
         carbas, 'reviewSkillSuggestionAsync'
       ).and.returnValue(Promise.resolve());
 
-      cars.resolveSuggestiontoSkill(
+      cars.reviewSkillSuggestion(
         'abc', 'pqr', 'accept', 'review message', 'easy', onSuccess, onFailure);
       tick();
 
@@ -218,7 +218,7 @@ describe('Contribution and review service', () => {
         carbas, 'reviewSkillSuggestionAsync'
       ).and.returnValue(Promise.reject());
 
-      cars.resolveSuggestiontoSkill(
+      cars.reviewSkillSuggestion(
         'abc', 'pqr', 'accept', 'review message', 'easy', onSuccess, onFailure);
       tick();
 
@@ -275,7 +275,7 @@ describe('Contribution and review service', () => {
   });
 
   describe('updateQuestionSuggestionAsync', () => {
-    const testQuestionStateData = {
+    const questionStateData = {
       classifier_model_id: null,
       content: {
         content_id: 'content',
@@ -334,19 +334,19 @@ describe('Contribution and review service', () => {
       }
     };
 
-    const testPayload = {
+    const payload = {
       skill_difficulty: 'easy',
-      question_state_data: testQuestionStateData
+      question_state_data: questionStateData
     };
 
-    const testImagesData = [{
+    const imagesData = [{
       filename: 'image1.png',
       imageBlob: new Blob()
     }];
 
     const requestBody = new FormData();
-    requestBody.append('payload', JSON.stringify(testPayload));
-    testImagesData.forEach(obj => {
+    requestBody.append('payload', JSON.stringify(payload));
+    imagesData.forEach(obj => {
       if (obj.imageBlob !== null) {
         requestBody.append(obj.filename, obj.imageBlob);
       }
@@ -368,8 +368,8 @@ describe('Contribution and review service', () => {
         .returnValue(Promise.resolve());
 
       cars.updateQuestionSuggestionAsync(
-        'pqr', 'easy', testQuestionStateData,
-        testImagesData, onSuccess, onFailure);
+        'pqr', 'easy', questionStateData,
+        imagesData, onSuccess, onFailure);
       tick();
 
       expect(carbas.updateQuestionSuggestionAsync)
@@ -384,8 +384,8 @@ describe('Contribution and review service', () => {
         .returnValue(Promise.reject());
 
       cars.updateQuestionSuggestionAsync(
-        'pqr', 'easy', testQuestionStateData,
-        testImagesData, onSuccess, onFailure);
+        'pqr', 'easy', questionStateData,
+        imagesData, onSuccess, onFailure);
       tick();
 
       expect(carbas.updateQuestionSuggestionAsync)
