@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import copy
 
+from core import feconf
 from core import utils
 
 from typing import Any, Dict, List
@@ -133,7 +134,7 @@ class BaseChange:
     # This is a list of common commands which is valid for all subclasses.
     # This should not be overriden by subclasses.
     COMMON_ALLOWED_COMMANDS = [{
-        'name': base_models.VersionedModel.CMD_DELETE_COMMIT,
+        'name': feconf.CMD_DELETE_COMMIT,
         'required_attribute_names': [],
         'optional_attribute_names': [],
         'user_id_attribute_names': []
