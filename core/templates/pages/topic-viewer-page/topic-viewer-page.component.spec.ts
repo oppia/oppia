@@ -231,6 +231,15 @@ describe('Topic viewer page', () => {
     expect(topicViewerPageComponent.checkMobileView()).toBe(false);
   });
 
+  it('should check if the view is tablet or not', () => {
+    var widthSpy = spyOn(windowDimensionsService, 'getWidth');
+    widthSpy.and.returnValue(700);
+    expect(topicViewerPageComponent.checkTabletView()).toBe(true);
+
+    widthSpy.and.returnValue(800);
+    expect(topicViewerPageComponent.checkTabletView()).toBe(false);
+  });
+
   it('should set url accordingly when user changes active tab to' +
   ' story tab', () => {
     spyOn(windowRef.nativeWindow.history, 'pushState');

@@ -58,6 +58,28 @@ describe('MathInteractionsService', () => {
       'a/b/c/d/e/f/g', ['a', 'b', 'c', 'd', 'e', 'f', 'g'])).toBeTrue();
     expect(mathInteractionsService.getWarningText()).toBe('');
 
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      'a^(b-c)', ['a', 'b', 'c'])).toBeTrue();
+
+    // We need to ignore redundant parens here since guppy auto adds extra
+    // parens while using exponents.
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      '((a+b))^(2)', ['a', 'b'])).toBeTrue();
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      '((x)^(2))', ['x'])).toBeTrue();
+
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      'a+(-b+c)', ['a', 'b', 'c'])).toBeTrue();
+
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      'a-(b+c)', ['a', 'b', 'c'])).toBeTrue();
+
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      'a*(b-c)', ['a', 'b', 'c'])).toBeTrue();
+
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      'a+(b-c)/d', ['a', 'b', 'c', 'd', 'e'])).toBeTrue();
+
     // Numeric Expressions.
     expect(mathInteractionsService.validateNumericExpression(
       '1/2')).toBeTrue();
@@ -157,12 +179,6 @@ describe('MathInteractionsService', () => {
       'Please enter a variable/number in it.');
 
     expect(mathInteractionsService.validateAlgebraicExpression(
-      '12+sqrt(4)', [])).toBeFalse();
-    expect(mathInteractionsService.getWarningText()).toBe(
-      'It looks like you have entered only numbers. Make sure to include' +
-      ' the necessary variables mentioned in the question.');
-
-    expect(mathInteractionsService.validateAlgebraicExpression(
       'x-y=0', ['x', 'y'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'It looks like you have entered an equation/inequality.' +
@@ -204,6 +220,84 @@ describe('MathInteractionsService', () => {
       '3.4.5 + 45/a', ['a'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'Your answer contains an invalid term: 3.4.5');
+
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      'a4', ['a'])).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'When multiplying, the variable should come after the number: 4a. ' +
+      'Please update your answer and try again.');
+
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      'a45', ['a'])).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'When multiplying, the variable should come after the number: 45a. ' +
+      'Please update your answer and try again.');
+
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      'a * omega34', ['a', 'omega'])).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'When multiplying, the variable should come after the number: 34omega. ' +
+      'Please update your answer and try again.');
+
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      'x^y^z', ['x', 'y', 'z'])).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'Your expression contains an exponent in an exponent which is not ' +
+      'supported.');
+
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      '3^4^5', ['a', 'x', 'y', 'z'])).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'Your expression contains an exponent in an exponent which is not ' +
+      'supported.');
+
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      'x^(y^z)', ['x', 'y', 'z'])).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'Your expression contains an exponent in an exponent which is not ' +
+      'supported.');
+
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      'x^(y*a^z)', ['a', 'x', 'y', 'z'])).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'Your expression contains an exponent in an exponent which is not ' +
+      'supported.');
+
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      'a^6', ['a'])).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'Your expression contains an exponent with value greater than 5 ' +
+      'which is not supported.');
+
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      'a^(3+4)', ['a'])).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'Your expression contains an exponent with value greater than 5 ' +
+      'which is not supported.');
+
+    expect(mathInteractionsService.validateNumericExpression(
+      '5^100')).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'Your expression contains an exponent with value greater than 5 ' +
+      'which is not supported.');
+
+    expect(mathInteractionsService.validateNumericExpression(
+      '((x)^(6))')).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'Your expression contains an exponent with value greater than 5 ' +
+      'which is not supported.');
+
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      'a+((b-c))', ['a', 'b', 'c'])).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'Your expression contains redundant parentheses: ((b-c)).'
+    );
+
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      '(((a + b))) + c', ['a', 'b', 'c'])).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'Your expression contains redundant parentheses: ((a+b)).'
+    );
 
     expect(mathInteractionsService.validateNumericExpression(
       'a/2')).toBeFalse();
@@ -349,7 +443,9 @@ describe('MathInteractionsService', () => {
     expect(mathInteractionsService.insertMultiplicationSigns(
       'ab/2')).toBe('a*b/2');
     expect(mathInteractionsService.insertMultiplicationSigns(
-      'alpha+ax^2')).toBe('alpha+a*x^2');
+      '5ab/2')).toBe('5*a*b/2');
+    expect(mathInteractionsService.insertMultiplicationSigns(
+      '3alpha+ax^2')).toBe('3*alpha+a*x^2');
     expect(mathInteractionsService.insertMultiplicationSigns(
       'sqrt(xyz)')).toBe('sqrt(x*y*z)');
     expect(mathInteractionsService.insertMultiplicationSigns(
