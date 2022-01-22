@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import itertools
+import datetime
 
 from core.domain import beam_job_domain
 from core.domain import beam_job_services
@@ -231,6 +232,89 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
         result = beam_job_services.get_beam_job_run_result('123')
         self.assertEqual(result.stdout, 'abc')
         self.assertEqual(result.stderr, '123')
+
+    def test_in_terminal_state(self) -> None:
+
+        self.NOW = datetime.datetime.utcnow()
+
+        cancelled_beam_job_run = beam_job_domain.BeamJobRun(
+            '123', 'FooJob', beam_job_models.BeamJobState.CANCELLED.value,
+            self.NOW, self.NOW, True)
+        drained_beam_job_run = beam_job_domain.BeamJobRun(
+            '123', 'FooJob', beam_job_models.BeamJobState.DRAINED.value,
+            self.NOW, self.NOW, True)
+        updated_beam_job_run = beam_job_domain.BeamJobRun(
+            '123', 'FooJob', beam_job_models.BeamJobState.UPDATED.value,
+            self.NOW, self.NOW, True)
+        done_beam_job_run = beam_job_domain.BeamJobRun(
+            '123', 'FooJob', beam_job_models.BeamJobState.DONE.value,
+            self.NOW, self.NOW, True)
+        failed_beam_job_run = beam_job_domain.BeamJobRun(
+            '123', 'FooJob', beam_job_models.BeamJobState.FAILED.value,
+            self.NOW, self.NOW, True)
+        cancelling_beam_job_run = beam_job_domain.BeamJobRun(
+            '123', 'FooJob', beam_job_models.BeamJobState.CANCELLING.value,
+            self.NOW, self.NOW, True)
+        draining_beam_job_run = beam_job_domain.BeamJobRun(
+            '123', 'FooJob', beam_job_models.BeamJobState.DRAINING.value,
+            self.NOW, self.NOW, True)
+        pending_beam_job_run = beam_job_domain.BeamJobRun(
+            '123', 'FooJob', beam_job_models.BeamJobState.PENDING.value,
+            self.NOW, self.NOW, True)
+        running_beam_job_run = beam_job_domain.BeamJobRun(
+            '123', 'FooJob', beam_job_models.BeamJobState.RUNNING.value,
+            self.NOW, self.NOW, True)
+        stopped_beam_job_run = beam_job_domain.BeamJobRun(
+            '123', 'FooJob', beam_job_models.BeamJobState.STOPPED.value,
+            self.NOW, self.NOW, True)
+        unknown_beam_job_run = beam_job_domain.BeamJobRun(
+            '123', 'FooJob', beam_job_models.BeamJobState.UNKNOWN.value,
+            self.NOW, self.NOW, True)
+
+        self.assertTrue(
+            beam_job_services.in_terminal_state(
+                cancelled_beam_job_run.job_state
+            ))
+        self.assertTrue(
+            beam_job_services.in_terminal_state(
+                drained_beam_job_run.job_state
+            ))
+        self.assertTrue(
+            beam_job_services.in_terminal_state(
+                updated_beam_job_run.job_state
+            ))
+        self.assertTrue(
+            beam_job_services.in_terminal_state(
+                done_beam_job_run.job_state
+            ))
+        self.assertTrue(
+            beam_job_services.in_terminal_state(
+                failed_beam_job_run.job_state
+            ))
+        self.assertFalse(
+            beam_job_services.in_terminal_state(
+                cancelling_beam_job_run.job_state
+            ))
+        self.assertFalse(
+            beam_job_services.in_terminal_state(
+                draining_beam_job_run.job_state
+                ))
+        self.assertFalse(beam_job_services.in_terminal_state(
+                pending_beam_job_run.job_state
+            ))
+        self.assertFalse(
+            beam_job_services.in_terminal_state(
+                running_beam_job_run.job_state
+            ))
+        self.assertFalse(
+            beam_job_services.in_terminal_state(
+                stopped_beam_job_run.job_state
+            ))
+        self.assertFalse(
+            beam_job_services.in_terminal_state(
+                unknown_beam_job_run.job_state
+            ))
+
 
 
 class GetBeamJobRunResultTests(test_utils.GenericTestBase):

@@ -95,6 +95,20 @@ def get_beam_jobs() -> List[beam_job_domain.BeamJob]:
     """
     return [beam_job_domain.BeamJob(j) for j in jobs_registry.get_all_jobs()]
 
+def in_terminal_state(job_state:str) -> bool:
+        """Returns whether the job run has reached a terminal state and is no
+        longer executing.
+
+        Returns:
+            bool. Whether the job has reached a terminal state.
+        """
+        return job_state in (
+            beam_job_models.BeamJobState.CANCELLED.value,
+            beam_job_models.BeamJobState.DRAINED.value,
+            beam_job_models.BeamJobState.UPDATED.value,
+            beam_job_models.BeamJobState.DONE.value,
+            beam_job_models.BeamJobState.FAILED.value,
+        )
 
 def get_beam_job_runs(
     refresh: bool = True
@@ -116,7 +130,7 @@ def get_beam_job_runs(
         updated_beam_job_run_models = []
 
         for i, beam_job_run_model in enumerate(beam_job_run_models):
-            if beam_job_runs[i].in_terminal_state:
+            if in_terminal_state(beam_job_runs[i]):
                 continue
             jobs_manager.refresh_state_of_beam_job_run_model(beam_job_run_model)
             beam_job_run_model.update_timestamps(update_last_updated_time=False)
