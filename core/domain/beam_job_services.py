@@ -132,7 +132,7 @@ def get_beam_job_runs(
         updated_beam_job_run_models = []
 
         for i, beam_job_run_model in enumerate(beam_job_run_models):
-            if in_terminal_state(beam_job_runs[i]):
+            if in_terminal_state(beam_job_runs[i].job_state):
                 continue
             jobs_manager.refresh_state_of_beam_job_run_model(beam_job_run_model)
             beam_job_run_model.update_timestamps(update_last_updated_time=False)
