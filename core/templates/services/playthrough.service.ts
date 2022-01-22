@@ -365,7 +365,8 @@ export class PlaythroughService {
             ServicesConstants.MIN_PLAYTHROUGH_DURATION_IN_SECS);
     } else {
       throw Error(
-        'Values should not be null!');
+        'Value recordedLearnerActions and' + 
+         'playthroughDurationInSecs should not be null!');
     }
   }
 }
