@@ -112,7 +112,8 @@ export class CustomizeInteractionModalComponent
     const INTERACTION_SERVICE_MAPPING = {
       ContinueValidationService: ContinueValidationService,
       EndExplorationValidationService: EndExplorationValidationService,
-      AlgebraicExpressionInput: AlgebraicExpressionInputValidationService,
+      AlgebraicExpressionInputValidationService:
+        AlgebraicExpressionInputValidationService,
       ImageClickInputValidationService: ImageClickInputValidationService,
       ItemSelectionInputValidationService: ItemSelectionInputValidationService,
       NumberWithUnitsValidationService: NumberWithUnitsValidationService,
