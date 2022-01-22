@@ -210,6 +210,28 @@ var clientSideRedirection = async function(
   await browser.waitForAngularEnabled(true);
 };
 
+var clientSideRedirectionT = async function(
+  action, url, waitForCallerSpecifiedConditions) {
+// Client side redirection is known to cause "both angularJS testability
+// and angular testability are undefined" flake.
+// As suggested by protractor devs here (http://git.io/v4gXM), waiting for
+// angular is disabled during client side redirects.
+await browser.waitForAngularEnabled(false);
+
+// Action triggering redirection.
+await action();
+
+// The action only triggers the redirection but does not wait for it to
+// complete. Manually waiting for redirection here.
+await urlRedirection(url);
+
+// Waiting for caller specified conditions.
+await waitForCallerSpecifiedConditions();
+
+// Client side redirection is complete, enabling wait for angular here.
+await browser.waitForAngularEnabled(true);
+};
+
 exports.DEFAULT_WAIT_TIME_MSECS = DEFAULT_WAIT_TIME_MSECS;
 exports.alertToBePresent = alertToBePresent;
 exports.elementToBeClickable = elementToBeClickable;
