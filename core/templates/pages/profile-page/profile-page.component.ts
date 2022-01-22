@@ -161,7 +161,7 @@ export class ProfilePageComponent {
         this.updateSubscriptionButtonPopoverText();
         this.numUserPortfolioExplorations = data.editedExpSummaries.length;
         this.subjectInterests = data.subjectInterests;
-        this.firstContributionMsec = data.firstContributionMsec;
+        this.firstContributionMsec = data.firstContributionMsec!;
         this.profilePictureDataUrl = decodeURIComponent((
           data.profilePictureDataUrl || this.DEFAULT_PROFILE_PICTURE_URL));
         this.loaderService.hideLoadingScreen();

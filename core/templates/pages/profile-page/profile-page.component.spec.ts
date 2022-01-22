@@ -256,7 +256,7 @@ describe('Profile page', () => {
       created_exp_summary_dicts: [],
       edited_exp_summary_dicts: [],
       is_already_subscribed: false
-    } as UserProfileBackendDict);
+    } as UserProfileBackendDict)!;
     spyOn(profilePageBackendApiService, 'fetchProfileDataAsync')
       .and.returnValue(Promise.resolve(profileDataLocal));
     componentInstance.ngOnInit();
