@@ -127,7 +127,6 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
                   .convertToEnglishDecimal(ctrl.localStringValue);
               }
             }
-
             // Generate errors (if any).
             ctrl.generateErrors();
           };
