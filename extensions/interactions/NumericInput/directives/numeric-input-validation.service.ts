@@ -29,6 +29,7 @@ import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
 
 import { AppConstants } from 'app.constants';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 interface Range {
   answerGroupIndex: number;
@@ -45,7 +46,8 @@ interface Range {
 export class NumericInputValidationService {
   constructor(
       private baseInteractionValidationServiceInstance:
-        baseInteractionValidationService) {}
+        baseInteractionValidationService,
+      private I18nLanguageCodeService: I18nLanguageCodeService) {}
 
   getCustomizationArgsWarnings(
       customizationArgs: NumericInputCustomizationArgs): Warning[] {
@@ -236,15 +238,16 @@ export class NumericInputValidationService {
       }
     }
     const stringValueRegExp = stringValue.match(/\d/g);
+    const radix = this.I18nLanguageCodeService.currentRadix();
     if (
       customizationArgs &&
       (stringValueRegExp === null || stringValueRegExp.length > 15)
     ) {
       return 'The answer should be greater than or equal to zero and ' +
-      'can contain at most 15 digits (0-9) or symbols(.).';
+      `can contain at most 15 digits (0-9) or symbols(${radix}).`;
     } else if (stringValueRegExp === null || stringValueRegExp.length > 15) {
       return 'The answer can contain at most 15 digits (0-9) or symbols ' +
-        '(. or -).';
+        `(${radix} or -).`;
     }
   }
 }

@@ -145,19 +145,24 @@ export class ContentTranslationLanguageService {
     return false;
   }
 
-  getInputValidationRegex(): RegExp {
-    const currentLanguage = this.currentContentLanguageCode;
-    const supportedLanguages = AppConstants.SUPPORTED_CONTENT_LANGUAGES;
+  currentRadix(): string {
+    const currentLanguage = this.getCurrentContentLanguageCode();
+    const supportedLanguages = AppConstants.SUPPORTED_SITE_LANGUAGES;
     let radix: string;
     for (let i of supportedLanguages) {
-      if (i.code === currentLanguage) {
+      if (i.id === currentLanguage) {
         radix = i.radix;
         break;
       }
     }
-    const dot = new RegExp('-{0,1}[\d]+([\.]?[\d]+)?', 'g');
-    const comma = new RegExp('-{0,1}[\d]+([,]?[\d]+)?', 'g');
-    const arabic = new RegExp('-{0,1}[\d]+([٫]?[\d]+)?', 'g');
+    return radix;
+  }
+
+  getInputValidationRegex(): RegExp {
+    const radix: string = this.currentRadix();
+    const dot = new RegExp('[^0-9\.\-]', 'g');
+    const comma = new RegExp('[^0-9\,\-]', 'g');
+    const arabic = new RegExp('[^0-9\٫\-]', 'g');
 
     if (radix === ',') {
       return comma; // Input with a comma as radix.
@@ -169,29 +174,42 @@ export class ContentTranslationLanguageService {
   }
 
   convertToEnglishDecimal(number: string): number {
-    let numString = number.replace(',', '.');
-    numString = numString.replace('٫', '.');
-    let engNum = parseFloat(numString);
+    const radix = this.currentRadix();
+
+    // Check if number is in proper format.
+    let validNumberRegex = new RegExp('-{0,1}[0-9]+([\.|\,|\٫]?[0-9]+)?', 'g');
+
+    let engNum: number;
+
+    // Get the valid part of input.
+    let numberMatch = number.match(validNumberRegex);
+
+    // If a valid match cannot be found, return null.
+    if (numberMatch === null) {
+      return null;
+    }
+
+    number = numberMatch[0];
+
+    let numString = number.replace(`${radix}`, '.');
+    engNum = parseFloat(numString);
+
+    // If the input cannot be parsed, output null.
+    if (isNaN(engNum)) {
+      engNum = null;
+    }
     return engNum;
   }
 
   convertToLocalizedNumber(number: number): string {
-    const currentLanguage = this.currentContentLanguageCode;
-    const supportedLanguages = AppConstants.SUPPORTED_CONTENT_LANGUAGES;
+    let radix = this.currentRadix();
     let stringNumber = number.toString();
     let convertedNumber: string = stringNumber;
 
-    let radix: string;
-    for (let i of supportedLanguages) {
-      if (i.code === currentLanguage) {
-        radix = i.radix;
-        break;
-      }
-    }
     if (radix === ',') {
       convertedNumber = stringNumber.replace('.', ',');
     } else if (radix === '٫') {
-      convertedNumber = stringNumber.replace('.', ',');
+      convertedNumber = stringNumber.replace('.', '٫');
     }
 
     return convertedNumber;

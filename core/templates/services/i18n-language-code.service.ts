@@ -36,7 +36,6 @@ export class I18nLanguageCodeService {
   static languageCodeChangeEventEmitter = new EventEmitter<string> ();
   static languageCode: string = AppConstants.DEFAULT_LANGUAGE_CODE;
   static rtlLanguageCodes: readonly string[] = AppConstants.RTL_LANGUAGE_CODES;
-
   private _preferredLanguageCodesLoadedEventEmitter =
     new EventEmitter<string[]>();
 
@@ -51,6 +50,76 @@ export class I18nLanguageCodeService {
     return (
       I18nLanguageCodeService.rtlLanguageCodes.indexOf(
         this.getCurrentI18nLanguageCode()) !== -1);
+  }
+
+  currentRadix(): string {
+    const currentLanguage = this.getCurrentI18nLanguageCode();
+    const supportedLanguages = AppConstants.SUPPORTED_SITE_LANGUAGES;
+    let radix: string;
+    for (let i of supportedLanguages) {
+      if (i.id === currentLanguage) {
+        radix = i.radix;
+        break;
+      }
+    }
+    return radix;
+  }
+
+  getInputValidationRegex(): RegExp {
+    const radix: string = this.currentRadix();
+    const dot = new RegExp('[^0-9\.\-]', 'g');
+    const comma = new RegExp('[^0-9\,\-]', 'g');
+    const arabic = new RegExp('[^0-9\٫\-]', 'g');
+
+    if (radix === ',') {
+      return comma; // Input with a comma as radix.
+    } else if (radix === '٫') {
+      return arabic; // Input with the Arabic seperator.
+    } else {
+      return dot; // Input with a period as radix.
+    }
+  }
+
+  convertToEnglishDecimal(number: string): number {
+    const radix = this.currentRadix();
+
+    // Check if number is in proper format.
+    let validNumberRegex = new RegExp('-{0,1}[0-9]+([\.|\,|\٫]?[0-9]+)?', 'g');
+
+    let engNum: number;
+
+    // Get the valid part of input.
+    let numberMatch = number.match(validNumberRegex);
+
+    // If a valid match cannot be found, return null.
+    if (numberMatch === null) {
+      return null;
+    }
+
+    number = numberMatch[0];
+
+    let numString = number.replace(`${radix}`, '.');
+    engNum = parseFloat(numString);
+
+    // If the input cannot be parsed, output null.
+    if (isNaN(engNum)) {
+      engNum = null;
+    }
+    return engNum;
+  }
+
+  convertToLocalizedNumber(number: number): string {
+    let radix = this.currentRadix();
+    let stringNumber = number.toString();
+    let convertedNumber: string = stringNumber;
+
+    if (radix === ',') {
+      convertedNumber = stringNumber.replace('.', ',');
+    } else if (radix === '٫') {
+      convertedNumber = stringNumber.replace('.', '٫');
+    }
+
+    return convertedNumber;
   }
 
   get onI18nLanguageCodeChange(): EventEmitter<string> {

@@ -5033,67 +5033,83 @@ export default {
   "SUPPORTED_SITE_LANGUAGES": [{
     "id": "en",
     "text": "English",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": "."
   }, {
     "id": "pt-br",
     "text": "Português (Brasil)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": ","
   }, {
     "id": "ar",
     "text": "العربية",
-    "direction": "rtl"
+    "direction": "rtl",
+    "radix": "٫"
   }, {
     "id": "hi",
     "text": "हिन्दी",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": "."
   }, {
     "id": "es",
     "text": "Español",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": ","
   }, {
     "id": "bn",
     "text": "বাংলা",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": "."
   }, {
     "id": "fr",
     "text": "français (French)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": ","
   }, {
     "id": "id",
     "text": "Bahasa Indonesia",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": ","
   }, {
     "id": "uk",
     "text": "украї́нська мо́ва (Ukrainian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": ","
   }, {
     "id": "sk",
     "text": "slovenčina (Slovak)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": ","
   }, {
     "id": "nl",
     "text": "Nederlands (Dutch)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": ","
   }, {
     "id": "kab",
     "text": "Taqbaylit (Kabyle)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": ","
   }, {
     "id": "vi",
     "text": "Tiếng Việt",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": ","
   }, {
     "id": "tr",
     "text": "Türkçe (Turkish)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": ","
   }, {
     "id": "zh-hans",
     "text": "中文(简体)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": "."
   }, {
     "id": "zh-hant",
     "text": "中文(繁體)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "radix": "."
   }],
 
   // List of supported audio languages in which we have audio and translations

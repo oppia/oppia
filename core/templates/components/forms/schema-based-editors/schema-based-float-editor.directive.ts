@@ -25,6 +25,10 @@ require(
   'interactions/NumericInput/directives/numeric-input-validation.service.ts');
 require('services/schema-form-submitted.service.ts');
 require('services/stateful/focus-manager.service.ts');
+require('services/context.service.ts');
+require('services/i18n-language-code.service.ts');
+// eslint-disable-next-line max-len
+require('pages/exploration-player-page/services/content-translation-language.service.ts');
 
 angular.module('oppia').directive('schemaBasedFloatEditor', [
   function() {
@@ -45,12 +49,14 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
       template: require('./schema-based-float-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$timeout', 'FocusManagerService',
-        'NumericInputValidationService',
+        '$scope', '$timeout', 'ContentTranslationLanguageService',
+        'ContextService', 'FocusManagerService',
+        'I18nLanguageCodeService', 'NumericInputValidationService',
         'SchemaFormSubmittedService',
         function(
-            $scope, $timeout, FocusManagerService,
-            NumericInputValidationService,
+            $scope, $timeout, ContentTranslationLanguageService,
+            ContextService, FocusManagerService,
+            I18nLanguageCodeService, NumericInputValidationService,
             SchemaFormSubmittedService) {
           var ctrl = this;
           var labelForFocus = $scope.labelForFocusTarget();
@@ -82,6 +88,38 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
             }
           };
 
+          ctrl.parseInput = function(): void {
+            let regex = I18nLanguageCodeService.getInputValidationRegex();
+
+            // Exploration Player.
+            if (ContextService.getPageContext() === 'learner') {
+              regex = ContentTranslationLanguageService
+                .getInputValidationRegex();
+            }
+
+            // Remove any character which is not a number or
+            // a decimal seperator.
+            ctrl.localStringValue = ctrl.localStringValue
+              .replace(regex, '');
+
+            // If input is empty, the number value should be null.
+            if (ctrl.localStringValue === '') {
+              ctrl.localValue = null;
+            } else {
+              // Exploration Player.
+              if (ContextService.getPageContext() === 'learner') {
+                ctrl.localValue = ContentTranslationLanguageService
+                  .convertToEnglishDecimal(ctrl.localStringValue);
+              } else { // All other players.
+                ctrl.localValue = I18nLanguageCodeService
+                  .convertToEnglishDecimal(ctrl.localStringValue);
+              }
+            }
+
+            // Generate errors (if any).
+            ctrl.generateErrors();
+          };
+
           // TODO(sll): Move these to ng-messages when we move to Angular 1.3.
           ctrl.getMinValue = function() {
             for (var i = 0; i < ctrl.validators().length; i++) {
@@ -102,7 +140,7 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
           ctrl.generateErrors = function() {
             ctrl.errorString = (
               NumericInputValidationService.getErrorString(
-                ctrl.localValue, ctrl.checkRequireNonnegativeInputValue));
+                ctrl.localStringValue, ctrl.checkRequireNonnegativeInputValue));
           };
 
           ctrl.onKeypress = function(evt) {
@@ -128,6 +166,9 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
               FocusManagerService.generateFocusLabel();
             if (ctrl.localValue === undefined) {
               ctrl.localValue = 0.0;
+            }
+            if (ctrl.localStringValue === undefined) {
+              ctrl.localStringValue = '';
             }
             // To check checkRequireNonnegativeInput customization argument
             // Value of numeric input interaction.
