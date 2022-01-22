@@ -28,7 +28,7 @@ import { EndExplorationBackendApiService } from './end-exploration-backend-api.s
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 
-describe('InteractiveRatioExpressionInput', () => {
+describe('Interactive ratio expression input', () => {
   let component: InteractiveEndExplorationComponent;
   let fixture: ComponentFixture<InteractiveEndExplorationComponent>;
   let contextService: ContextService;
