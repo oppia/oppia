@@ -104,8 +104,9 @@ class CyclicStateTransitionsTracker {
 
   private makeCycle(collisionIndex: number): string[] {
     const collision = this.pathOfVisitedStates[collisionIndex];
-    const cycleWithNoCollision =
-    this.pathOfVisitedStates.slice(collisionIndex);
+    const cycleWithNoCollision = (
+      this.pathOfVisitedStates.slice(collisionIndex));
+
     return [...cycleWithNoCollision, collision];
   }
 
