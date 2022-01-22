@@ -20,18 +20,76 @@
  * followed by the name of the arg.
  */
 
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { InteractiveEndExplorationComponent } from './oppia-interactive-end-exploration.component';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ContextService } from 'services/context.service';
+import { EndExplorationBackendApiService } from './end-exploration-backend-api.service';
+import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
+import { ReadOnlyCollectionBackendApiService } from 'domain/collection/read-only-collection-backend-api.service';
+import { UrlService } from 'services/contextual/url.service';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { CollectionNodeBackendDict } from 'domain/collection/collection-node.model';
+import { Collection, CollectionBackendDict } from 'domain/collection/collection.model';
 
-describe('EndExplorationValidationService', function() {
-  let ctrl;
-  let $httpBackend;
-  let $q;
-  let $rootScope;
-  let $scope;
-  let ContextService;
-  let ReadOnlyCollectionBackendApiService;
-  let UrlService;
+describe('InteractiveRatioExpressionInput', () => {
+  let component: InteractiveEndExplorationComponent;
+  let fixture: ComponentFixture<InteractiveEndExplorationComponent>;
+  let contextService: ContextService;
+  let endExplorationBackendApiService: EndExplorationBackendApiService;
+  let readOnlyCollectionBackendApiService: ReadOnlyCollectionBackendApiService;
+  let urlService: UrlService;
+  let sampleCollection: Collection;
 
+  const collectionNodeBackendObject: CollectionNodeBackendDict = {
+    exploration_id: 'exp_id',
+    exploration_summary: {
+      last_updated_msec: 1591296737470.528,
+      community_owned: false,
+      objective: 'Test Objective',
+      id: '44LKoKLlIbGe',
+      num_views: 0,
+      thumbnail_icon_url: '/subjects/Algebra.svg',
+      human_readable_contributors_summary: {},
+      language_code: 'en',
+      thumbnail_bg_color: '#cd672b',
+      created_on_msec: 1591296635736.666,
+      ratings: {
+        1: 0,
+        2: 0,
+        3: 0,
+        4: 0,
+        5: 0
+      },
+      status: 'public',
+      tags: [],
+      activity_type: 'exploration',
+      category: 'Algebra',
+      title: 'Test Title'
+    }
+  };
+  const sampleCollectionBackendObject: CollectionBackendDict = {
+    id: '0',
+    title: 'Collection Under Test',
+    objective: 'objective',
+    category: 'category',
+    version: 1,
+    nodes: [
+      collectionNodeBackendObject,
+      collectionNodeBackendObject,
+      collectionNodeBackendObject,
+      collectionNodeBackendObject,
+      collectionNodeBackendObject,
+      collectionNodeBackendObject
+    ],
+    language_code: null,
+    schema_version: null,
+    tags: null,
+    playthrough_dict: {
+      next_exploration_id: 'expId',
+      completed_exploration_ids: ['expId2']
+    }
+  };
   const httpResponse = {
     summaries: [{
       id: '0'
@@ -39,143 +97,134 @@ describe('EndExplorationValidationService', function() {
   };
   const editorTabContext = 'preview';
   const pageContextEditor = 'editor';
-  const sampleCollection = {
-    collection: {
-      id: '0',
-      title: 'Collection Under Test',
-      getTitle: function() {
-        return 'Collection Under Test';
-      }
+
+  class MockInteractionAttributesExtractorService {
+    getValuesFromAttributes(interactionId, attributes) {
+      return {
+        recommendedExplorationIds: {
+          value: JSON.parse(attributes.recommendedExplorationIdsWithValue)
+        },
+      };
     }
-  };
+  }
 
-  let mockInteractionAttributesExtractorService = {
-    getValuesFromAttributes: function(interactionId, attrs) {
-      return attrs;
-    }
-  };
-
-  beforeEach(angular.mock.module('oppia'));
-
-  importAllAngularServices();
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [InteractiveEndExplorationComponent],
+      imports: [HttpClientTestingModule],
+      providers: [
+        {
+          provide: InteractionAttributesExtractorService,
+          useClass: MockInteractionAttributesExtractorService
+        },
+        ContextService,
+        EndExplorationBackendApiService,
+        ReadOnlyCollectionBackendApiService,
+        UrlService
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
+  }));
 
   describe('Valid exploration id provided', function() {
     const explorationIds = ['0'];
-    const requestUrl = '/explorationsummarieshandler/data?' +
-      'stringified_exp_ids=' + encodeURI(JSON.stringify(explorationIds));
 
-    beforeEach(angular.mock.module('oppia', function($provide) {
-      $provide.value(
-        'InteractionAttributesExtractorService',
-        mockInteractionAttributesExtractorService);
-      $provide.value('$attrs', {
-        recommendedExplorationIds: explorationIds
-      });
-    }));
+    beforeEach(() => {
+      contextService = TestBed.inject(ContextService);
+      readOnlyCollectionBackendApiService =
+        TestBed.inject(ReadOnlyCollectionBackendApiService);
+      urlService = TestBed.inject(UrlService);
+      endExplorationBackendApiService =
+        TestBed.inject(EndExplorationBackendApiService);
+      fixture = (
+        TestBed.createComponent(InteractiveEndExplorationComponent));
+      component = fixture.componentInstance;
 
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
-      $q = $injector.get('$q');
-      $rootScope = $injector.get('$rootScope');
-      $scope = $rootScope.$new();
-      ContextService = $injector.get('ContextService');
-      ReadOnlyCollectionBackendApiService =
-        $injector.get('ReadOnlyCollectionBackendApiService');
-      $httpBackend = $injector.get('$httpBackend');
-      UrlService = $injector.get('UrlService');
-
-      ctrl = $componentController('oppiaInteractiveEndExploration');
-
-      spyOn(ContextService, 'getPageContext').and
+      spyOn(contextService, 'getPageContext').and
         .returnValue(pageContextEditor);
-      spyOn(ContextService, 'getEditorTabContext').and.
+      spyOn(contextService, 'getEditorTabContext').and.
         returnValue(editorTabContext);
-      spyOn(ReadOnlyCollectionBackendApiService, 'loadCollectionAsync')
-        .and.callFake(function() {
-          var deferred = $q.defer();
-          deferred.resolve(sampleCollection.collection);
-          return deferred.promise;
-        });
-      spyOn(UrlService, 'getCollectionIdFromExplorationUrl')
+      spyOn(urlService, 'getCollectionIdFromExplorationUrl')
         .and.returnValue('0');
-      spyOn(UrlService, 'isIframed').and.returnValue(true);
+      spyOn(urlService, 'isIframed').and.returnValue(true);
 
-      $httpBackend.expectGET(requestUrl).respond(httpResponse);
-      ctrl.$onInit();
-      $httpBackend.flush();
-      $scope.$apply();
-    }));
+      sampleCollection = Collection.create(sampleCollectionBackendObject);
+      sampleCollectionBackendObject.nodes = [collectionNodeBackendObject];
+      spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
+        .and.callFake(() => Promise.resolve(sampleCollection));
 
-    it('should initialize ctrl variables', function() {
-      expect(ctrl.isIframed).toBe(true);
-      expect(ctrl.isInEditorPage).toBe(true);
-      expect(ctrl.isInEditorPreviewMode).toBe(true);
-      expect(ctrl.isInEditorMainTab).toBe(false);
-      expect(ctrl.collectionId).toBe('0');
-      expect(ctrl.getCollectionTitle()).toBe('Collection Under Test');
-      expect(ctrl.errorMessage).toBe('');
+
+      component.recommendedExplorationIdsWithValue = JSON.stringify(
+        explorationIds);
+
+      spyOn(endExplorationBackendApiService, 'getRecommendExplorationsData')
+        .and.callFake(() => Promise.resolve(httpResponse));
+    });
+
+    fit('should initialize ctrl variables', function() {
+      component.ngOnInit();
+      expect(component.isIframed).toBe(true);
+      expect(component.isInEditorPage).toBe(true);
+      expect(component.isInEditorPreviewMode).toBe(true);
+      expect(component.isInEditorMainTab).toBe(false);
+      expect(component.collectionId).toBe('0');
+      let result = component.getCollectionTitle();
+      expect(result()).toBe('Collection Under Test');
+      expect(component.errorMessage).toBe('');
     });
 
     it('should not display error message', function() {
-      expect(ctrl.isInEditorPage).toBe(true);
-      expect(ctrl.isInEditorPreviewMode).toBe(true);
-      expect(ctrl.errorMessage).toBe('');
+      component.ngOnInit();
+      expect(component.isInEditorPage).toBe(true);
+      expect(component.isInEditorPreviewMode).toBe(true);
+      expect(component.errorMessage).toBe('');
     });
   });
 
   describe('Invalid exploration Id provided', function() {
     const explorationIds = ['0', '1'];
-    const requestUrl = '/explorationsummarieshandler/data?' +
-      'stringified_exp_ids=' + encodeURI(JSON.stringify(explorationIds));
 
-    beforeEach(angular.mock.module('oppia', function($provide) {
-      $provide.value(
-        'InteractionAttributesExtractorService',
-        mockInteractionAttributesExtractorService);
-      $provide.value('$attrs', {
-        recommendedExplorationIds: explorationIds
-      });
-    }));
+    beforeEach(() => {
+      contextService = TestBed.inject(ContextService);
+      readOnlyCollectionBackendApiService =
+        TestBed.inject(ReadOnlyCollectionBackendApiService);
+      urlService = TestBed.inject(UrlService);
+      endExplorationBackendApiService =
+        TestBed.inject(EndExplorationBackendApiService);
+      fixture = (
+        TestBed.createComponent(InteractiveEndExplorationComponent));
+      component = fixture.componentInstance;
 
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
-      $q = $injector.get('$q');
-      $rootScope = $injector.get('$rootScope');
-      $scope = $rootScope.$new();
-      ContextService = $injector.get('ContextService');
-      ReadOnlyCollectionBackendApiService =
-        $injector.get('ReadOnlyCollectionBackendApiService');
-      $httpBackend = $injector.get('$httpBackend');
-      UrlService = $injector.get('UrlService');
-
-      ctrl = $componentController('oppiaInteractiveEndExploration');
-
-      spyOn(ContextService, 'getPageContext').and
+      spyOn(contextService, 'getPageContext').and
         .returnValue(pageContextEditor);
-      spyOn(ContextService, 'getEditorTabContext').and.
+      spyOn(contextService, 'getEditorTabContext').and.
         returnValue(editorTabContext);
-      spyOn(ReadOnlyCollectionBackendApiService, 'loadCollectionAsync')
-        .and.callFake(function() {
-          var deferred = $q.defer();
-          deferred.resolve(sampleCollection.collection);
-          return deferred.promise;
-        });
-      spyOn(UrlService, 'getCollectionIdFromExplorationUrl')
+
+      sampleCollection = Collection.create(sampleCollectionBackendObject);
+      sampleCollectionBackendObject.nodes = [collectionNodeBackendObject];
+      spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
+        .and.callFake(() => Promise.resolve(sampleCollection));
+
+      spyOn(urlService, 'getCollectionIdFromExplorationUrl')
         .and.returnValue('0');
-      spyOn(UrlService, 'isIframed').and.returnValue(true);
+      spyOn(urlService, 'isIframed').and.returnValue(true);
 
-      $httpBackend.expectGET(requestUrl).respond(httpResponse);
-      ctrl.$onInit();
-      $httpBackend.flush();
-      $scope.$apply();
-    }));
+      component.recommendedExplorationIdsWithValue = JSON.stringify(
+        explorationIds);
 
-    it('should display error message', function() {
-      expect(ctrl.isIframed).toBe(true);
-      expect(ctrl.isInEditorPage).toBe(true);
-      expect(ctrl.isInEditorPreviewMode).toBe(true);
-      expect(ctrl.isInEditorMainTab).toBe(false);
-      expect(ctrl.collectionId).toBe('0');
-      expect(ctrl.getCollectionTitle()).toBe('Collection Under Test');
-      expect(ctrl.errorMessage).toBe(
+      spyOn(endExplorationBackendApiService, 'getRecommendExplorationsData')
+        .and.callFake(() => Promise.resolve(httpResponse));
+    });
+
+    fit('should display error message', function() {
+      component.ngOnInit();
+      expect(component.isIframed).toBe(true);
+      expect(component.isInEditorPage).toBe(true);
+      expect(component.isInEditorPreviewMode).toBe(true);
+      expect(component.isInEditorMainTab).toBe(false);
+      expect(component.collectionId).toBe('0');
+      expect(component.getCollectionTitle()).toBe('Collection Under Test');
+      expect(component.errorMessage).toBe(
         'Warning: exploration(s) with the IDs "' + '1' +
       '" will not be shown as recommendations because ' +
       'they either do not exist, or are not publicly viewable.');
@@ -185,53 +234,49 @@ describe('EndExplorationValidationService', function() {
   describe('Data should not be fetched from backend ', function() {
     const explorationIds = ['0', '1'];
 
-    beforeEach(angular.mock.module('oppia', function($provide) {
-      $provide.value(
-        'InteractionAttributesExtractorService',
-        mockInteractionAttributesExtractorService);
-      $provide.value('$attrs', {
-        recommendedExplorationIds: explorationIds
-      });
-    }));
+    beforeEach(() => {
+      contextService = TestBed.inject(ContextService);
+      readOnlyCollectionBackendApiService =
+        TestBed.inject(ReadOnlyCollectionBackendApiService);
+      urlService = TestBed.inject(UrlService);
+      endExplorationBackendApiService =
+        TestBed.inject(EndExplorationBackendApiService);
+      fixture = (
+        TestBed.createComponent(InteractiveEndExplorationComponent));
+      component = fixture.componentInstance;
 
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
-      $q = $injector.get('$q');
-      $rootScope = $injector.get('$rootScope');
-      $scope = $rootScope.$new();
-      ContextService = $injector.get('ContextService');
-      ReadOnlyCollectionBackendApiService =
-        $injector.get('ReadOnlyCollectionBackendApiService');
-      $httpBackend = $injector.get('$httpBackend');
-      UrlService = $injector.get('UrlService');
-
-      ctrl = $componentController('oppiaInteractiveEndExploration');
-
-      spyOn(ContextService, 'getPageContext').and
+      spyOn(contextService, 'getPageContext').and
         .returnValue('learner');
-      spyOn(ContextService, 'getEditorTabContext').and.
+      spyOn(contextService, 'getEditorTabContext').and.
         returnValue(editorTabContext);
-      spyOn(ReadOnlyCollectionBackendApiService, 'loadCollectionAsync')
-        .and.callFake(function() {
-          var deferred = $q.defer();
-          deferred.resolve(sampleCollection.collection);
-          return deferred.promise;
-        });
-      spyOn(UrlService, 'getCollectionIdFromExplorationUrl')
+
+      sampleCollection = Collection.create(sampleCollectionBackendObject);
+      sampleCollectionBackendObject.nodes = [collectionNodeBackendObject];
+      spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
+        .and.callFake(() => Promise.resolve(sampleCollection));
+
+      spyOn(urlService, 'getCollectionIdFromExplorationUrl')
         .and.returnValue('');
-      spyOn(UrlService, 'isIframed').and.returnValue(true);
-      ctrl.$onInit();
-      $scope.$apply();
-    }));
+      spyOn(urlService, 'isIframed').and.returnValue(true);
+
+      component.recommendedExplorationIdsWithValue = JSON.stringify(
+        explorationIds);
+
+      spyOn(endExplorationBackendApiService, 'getRecommendExplorationsData')
+        .and.callFake(() => Promise.resolve(httpResponse));
+    });
 
     it('should not load collection data', function() {
-      expect(ctrl.collectionId).toBe('');
-      expect(ReadOnlyCollectionBackendApiService.loadCollectionAsync)
+      component.ngOnInit();
+      expect(component.collectionId).toBe('');
+      expect(readOnlyCollectionBackendApiService.loadCollectionAsync)
         .not.toHaveBeenCalled();
     });
 
     it('should not check if any author-recommended explorations are' +
     ' invalid.', function() {
-      expect(ctrl.isInEditorPage).toBe(false);
+      component.ngOnInit();
+      expect(component.isInEditorPage).toBe(false);
       expect($httpBackend.flush).toThrowError();
       $httpBackend.verifyNoOutstandingRequest();
     });

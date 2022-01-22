@@ -40,12 +40,12 @@ import { ServicesConstants } from 'services/services.constants';
 export class InteractiveEndExplorationComponent implements OnInit {
   @Input() recommendedExplorationIdsWithValue: string;
   errorMessage: string;
-  collectionId: string;
+  // collectionId: string;
   isIframed: boolean;
   isInEditorPage: boolean;
   isInEditorPreviewMode: boolean;
   isInEditorMainTab: boolean;
-  getCollectionTitle: () => string;
+  // getCollectionTitle: () => string;
 
   constructor(
     private contextService: ContextService,
@@ -81,14 +81,16 @@ export class InteractiveEndExplorationComponent implements OnInit {
       this.contextService.getEditorTabContext() === (
         ServicesConstants.EXPLORATION_EDITOR_TAB_CONTEXT.EDITOR));
 
-    this.collectionId = this.urlService.getCollectionIdFromExplorationUrl();
-    if (this.collectionId) {
-      this.readOnlyCollectionBackendApiService
-        .loadCollectionAsync(this.collectionId)
-        .then((collection) => {
-          this.getCollectionTitle = () => collection.getTitle();
-        });
-    }
+    // this.collectionId = this.urlService.getCollectionIdFromExplorationUrl();
+    // if (this.collectionId) {
+    //   this.readOnlyCollectionBackendApiService
+    //     .loadCollectionAsync(this.collectionId)
+    //     .then((collection) => {
+    //       this.getCollectionTitle = function() {
+    //         return collection.getTitle();
+    //       };
+    //     });
+    // }
 
     this.errorMessage = '';
 
