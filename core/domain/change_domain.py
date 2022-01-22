@@ -32,6 +32,7 @@ from core.platform import models  # pylint: disable=invalid-import-from # isort:
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
+
 def validate_cmd(
     cmd_name: str,
     valid_cmd_attribute_specs: Dict[str, Any],
