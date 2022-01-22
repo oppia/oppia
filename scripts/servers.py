@@ -513,7 +513,7 @@ def managed_webdriver_server(chrome_version=None):
             if common.is_mac_os() else 'google-chrome')
         try:
             output = subprocess.check_output([chrome_command, '--version'])
-        except OSError:
+        except OSError as os_error:
             # For the error message on macOS, we need to add the backslashes in.
             # This is because it is likely that a user will try to run the
             # command on their terminal and, as mentioned above, the macOS
@@ -527,7 +527,7 @@ def managed_webdriver_server(chrome_version=None):
                 'chromedriver version to be used, please follow the '
                 'instructions mentioned in the following URL:\n'
                 'https://chromedriver.chromium.org/downloads/version-selection'
-                % chrome_command.replace(' ', r'\ '))
+                % chrome_command.replace(' ', r'\ ')) from os_error
 
         installed_version_parts = b''.join(re.findall(rb'[0-9.]', output))
         installed_version = '.'.join(
