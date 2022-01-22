@@ -20,76 +20,20 @@
  * followed by the name of the arg.
  */
 
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed, tick, fakeAsync } from '@angular/core/testing';
 import { InteractiveEndExplorationComponent } from './oppia-interactive-end-exploration.component';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ContextService } from 'services/context.service';
 import { EndExplorationBackendApiService } from './end-exploration-backend-api.service';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
-import { ReadOnlyCollectionBackendApiService } from 'domain/collection/read-only-collection-backend-api.service';
-import { UrlService } from 'services/contextual/url.service';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { CollectionNodeBackendDict } from 'domain/collection/collection-node.model';
-import { Collection, CollectionBackendDict } from 'domain/collection/collection.model';
 
 describe('InteractiveRatioExpressionInput', () => {
   let component: InteractiveEndExplorationComponent;
   let fixture: ComponentFixture<InteractiveEndExplorationComponent>;
   let contextService: ContextService;
   let endExplorationBackendApiService: EndExplorationBackendApiService;
-  let readOnlyCollectionBackendApiService: ReadOnlyCollectionBackendApiService;
-  let urlService: UrlService;
-  let sampleCollection: Collection;
 
-  const collectionNodeBackendObject: CollectionNodeBackendDict = {
-    exploration_id: 'exp_id',
-    exploration_summary: {
-      last_updated_msec: 1591296737470.528,
-      community_owned: false,
-      objective: 'Test Objective',
-      id: '44LKoKLlIbGe',
-      num_views: 0,
-      thumbnail_icon_url: '/subjects/Algebra.svg',
-      human_readable_contributors_summary: {},
-      language_code: 'en',
-      thumbnail_bg_color: '#cd672b',
-      created_on_msec: 1591296635736.666,
-      ratings: {
-        1: 0,
-        2: 0,
-        3: 0,
-        4: 0,
-        5: 0
-      },
-      status: 'public',
-      tags: [],
-      activity_type: 'exploration',
-      category: 'Algebra',
-      title: 'Test Title'
-    }
-  };
-  const sampleCollectionBackendObject: CollectionBackendDict = {
-    id: '0',
-    title: 'Collection Under Test',
-    objective: 'objective',
-    category: 'category',
-    version: 1,
-    nodes: [
-      collectionNodeBackendObject,
-      collectionNodeBackendObject,
-      collectionNodeBackendObject,
-      collectionNodeBackendObject,
-      collectionNodeBackendObject,
-      collectionNodeBackendObject
-    ],
-    language_code: null,
-    schema_version: null,
-    tags: null,
-    playthrough_dict: {
-      next_exploration_id: 'expId',
-      completed_exploration_ids: ['expId2']
-    }
-  };
   const httpResponse = {
     summaries: [{
       id: '0'
@@ -108,6 +52,12 @@ describe('InteractiveRatioExpressionInput', () => {
     }
   }
 
+  class MockEndExplorationBackendApiService {
+    async getRecommendExplorationsData() {
+      return Promise.resolve(httpResponse);
+    }
+  }
+
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [InteractiveEndExplorationComponent],
@@ -117,10 +67,11 @@ describe('InteractiveRatioExpressionInput', () => {
           provide: InteractionAttributesExtractorService,
           useClass: MockInteractionAttributesExtractorService
         },
+        {
+          provide: EndExplorationBackendApiService,
+          useClass: MockEndExplorationBackendApiService
+        },
         ContextService,
-        EndExplorationBackendApiService,
-        ReadOnlyCollectionBackendApiService,
-        UrlService
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -131,54 +82,44 @@ describe('InteractiveRatioExpressionInput', () => {
 
     beforeEach(() => {
       contextService = TestBed.inject(ContextService);
-      readOnlyCollectionBackendApiService =
-        TestBed.inject(ReadOnlyCollectionBackendApiService);
-      urlService = TestBed.inject(UrlService);
       endExplorationBackendApiService =
         TestBed.inject(EndExplorationBackendApiService);
       fixture = (
         TestBed.createComponent(InteractiveEndExplorationComponent));
       component = fixture.componentInstance;
 
+      component.recommendedExplorationIdsWithValue = JSON.stringify(
+        explorationIds);
+      component.errorMessage = '';
+
       spyOn(contextService, 'getPageContext').and
         .returnValue(pageContextEditor);
       spyOn(contextService, 'getEditorTabContext').and.
         returnValue(editorTabContext);
-      spyOn(urlService, 'getCollectionIdFromExplorationUrl')
-        .and.returnValue('0');
-      spyOn(urlService, 'isIframed').and.returnValue(true);
-
-      sampleCollection = Collection.create(sampleCollectionBackendObject);
-      sampleCollectionBackendObject.nodes = [collectionNodeBackendObject];
-      spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
-        .and.callFake(() => Promise.resolve(sampleCollection));
-
-
-      component.recommendedExplorationIdsWithValue = JSON.stringify(
-        explorationIds);
-
-      spyOn(endExplorationBackendApiService, 'getRecommendExplorationsData')
-        .and.callFake(() => Promise.resolve(httpResponse));
     });
 
-    fit('should initialize ctrl variables', function() {
+    it('should initialize ctrl variables', function() {
       component.ngOnInit();
-      expect(component.isIframed).toBe(true);
       expect(component.isInEditorPage).toBe(true);
       expect(component.isInEditorPreviewMode).toBe(true);
       expect(component.isInEditorMainTab).toBe(false);
-      expect(component.collectionId).toBe('0');
-      let result = component.getCollectionTitle();
-      expect(result()).toBe('Collection Under Test');
-      expect(component.errorMessage).toBe('');
     });
 
-    it('should not display error message', function() {
+    it('should not display error message', fakeAsync(() => {
+      const recommendExplorationSpy = spyOn(
+        endExplorationBackendApiService, 'getRecommendExplorationsData')
+        .and.callThrough();
+
       component.ngOnInit();
+      tick(150);
+      fixture.detectChanges();
+
       expect(component.isInEditorPage).toBe(true);
       expect(component.isInEditorPreviewMode).toBe(true);
+      expect(component.isInEditorMainTab).toBe(false);
+      expect(recommendExplorationSpy).toHaveBeenCalled();
       expect(component.errorMessage).toBe('');
-    });
+    }));
   });
 
   describe('Invalid exploration Id provided', function() {
@@ -186,49 +127,40 @@ describe('InteractiveRatioExpressionInput', () => {
 
     beforeEach(() => {
       contextService = TestBed.inject(ContextService);
-      readOnlyCollectionBackendApiService =
-        TestBed.inject(ReadOnlyCollectionBackendApiService);
-      urlService = TestBed.inject(UrlService);
       endExplorationBackendApiService =
         TestBed.inject(EndExplorationBackendApiService);
       fixture = (
         TestBed.createComponent(InteractiveEndExplorationComponent));
       component = fixture.componentInstance;
 
+      component.recommendedExplorationIdsWithValue = JSON.stringify(
+        explorationIds);
+      component.errorMessage = '';
+
       spyOn(contextService, 'getPageContext').and
         .returnValue(pageContextEditor);
       spyOn(contextService, 'getEditorTabContext').and.
         returnValue(editorTabContext);
-
-      sampleCollection = Collection.create(sampleCollectionBackendObject);
-      sampleCollectionBackendObject.nodes = [collectionNodeBackendObject];
-      spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
-        .and.callFake(() => Promise.resolve(sampleCollection));
-
-      spyOn(urlService, 'getCollectionIdFromExplorationUrl')
-        .and.returnValue('0');
-      spyOn(urlService, 'isIframed').and.returnValue(true);
-
-      component.recommendedExplorationIdsWithValue = JSON.stringify(
-        explorationIds);
-
-      spyOn(endExplorationBackendApiService, 'getRecommendExplorationsData')
-        .and.callFake(() => Promise.resolve(httpResponse));
     });
 
-    fit('should display error message', function() {
+    it('should display error message', fakeAsync(() => {
+      const recommendExplorationSpy = spyOn(
+        endExplorationBackendApiService, 'getRecommendExplorationsData')
+        .and.callThrough();
+
       component.ngOnInit();
-      expect(component.isIframed).toBe(true);
+      tick(150);
+      fixture.detectChanges();
+
       expect(component.isInEditorPage).toBe(true);
       expect(component.isInEditorPreviewMode).toBe(true);
       expect(component.isInEditorMainTab).toBe(false);
-      expect(component.collectionId).toBe('0');
-      expect(component.getCollectionTitle()).toBe('Collection Under Test');
+      expect(recommendExplorationSpy).toHaveBeenCalled();
       expect(component.errorMessage).toBe(
         'Warning: exploration(s) with the IDs "' + '1' +
       '" will not be shown as recommendations because ' +
       'they either do not exist, or are not publicly viewable.');
-    });
+    }));
   });
 
   describe('Data should not be fetched from backend ', function() {
@@ -236,49 +168,27 @@ describe('InteractiveRatioExpressionInput', () => {
 
     beforeEach(() => {
       contextService = TestBed.inject(ContextService);
-      readOnlyCollectionBackendApiService =
-        TestBed.inject(ReadOnlyCollectionBackendApiService);
-      urlService = TestBed.inject(UrlService);
       endExplorationBackendApiService =
         TestBed.inject(EndExplorationBackendApiService);
       fixture = (
         TestBed.createComponent(InteractiveEndExplorationComponent));
       component = fixture.componentInstance;
 
+      component.recommendedExplorationIdsWithValue = JSON.stringify(
+        explorationIds);
+
       spyOn(contextService, 'getPageContext').and
         .returnValue('learner');
       spyOn(contextService, 'getEditorTabContext').and.
         returnValue(editorTabContext);
-
-      sampleCollection = Collection.create(sampleCollectionBackendObject);
-      sampleCollectionBackendObject.nodes = [collectionNodeBackendObject];
-      spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
-        .and.callFake(() => Promise.resolve(sampleCollection));
-
-      spyOn(urlService, 'getCollectionIdFromExplorationUrl')
-        .and.returnValue('');
-      spyOn(urlService, 'isIframed').and.returnValue(true);
-
-      component.recommendedExplorationIdsWithValue = JSON.stringify(
-        explorationIds);
-
       spyOn(endExplorationBackendApiService, 'getRecommendExplorationsData')
         .and.callFake(() => Promise.resolve(httpResponse));
-    });
-
-    it('should not load collection data', function() {
-      component.ngOnInit();
-      expect(component.collectionId).toBe('');
-      expect(readOnlyCollectionBackendApiService.loadCollectionAsync)
-        .not.toHaveBeenCalled();
     });
 
     it('should not check if any author-recommended explorations are' +
     ' invalid.', function() {
       component.ngOnInit();
       expect(component.isInEditorPage).toBe(false);
-      expect($httpBackend.flush).toThrowError();
-      $httpBackend.verifyNoOutstandingRequest();
     });
   });
 });

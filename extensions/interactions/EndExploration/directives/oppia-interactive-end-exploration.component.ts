@@ -27,8 +27,6 @@ import { EndExplorationCustomizationArgs } from 'interactions/customization-args
 import { ContextService } from 'services/context.service';
 import { EndExplorationBackendApiService } from './end-exploration-backend-api.service';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
-import { ReadOnlyCollectionBackendApiService } from 'domain/collection/read-only-collection-backend-api.service';
-import { UrlService } from 'services/contextual/url.service';
 
 import { ServicesConstants } from 'services/services.constants';
 
@@ -39,22 +37,16 @@ import { ServicesConstants } from 'services/services.constants';
 })
 export class InteractiveEndExplorationComponent implements OnInit {
   @Input() recommendedExplorationIdsWithValue: string;
-  errorMessage: string;
-  // collectionId: string;
-  isIframed: boolean;
+  errorMessage: string = '';
   isInEditorPage: boolean;
   isInEditorPreviewMode: boolean;
   isInEditorMainTab: boolean;
-  // getCollectionTitle: () => string;
 
   constructor(
     private contextService: ContextService,
     private endExplorationBackendApiService: EndExplorationBackendApiService,
     private interactionAttributesExtractorService:
       InteractionAttributesExtractorService,
-    private readOnlyCollectionBackendApiService:
-      ReadOnlyCollectionBackendApiService,
-    private urlService: UrlService,
   ) {}
 
   ngOnInit(): void {
@@ -70,7 +62,6 @@ export class InteractiveEndExplorationComponent implements OnInit {
 
     const authorRecommendedExplorationIds = recommendedExplorationIds.value;
 
-    this.isIframed = this.urlService.isIframed();
     this.isInEditorPage = (
       this.contextService.getPageContext() === (
         ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR));
@@ -80,19 +71,6 @@ export class InteractiveEndExplorationComponent implements OnInit {
     this.isInEditorMainTab = this.isInEditorPage && (
       this.contextService.getEditorTabContext() === (
         ServicesConstants.EXPLORATION_EDITOR_TAB_CONTEXT.EDITOR));
-
-    // this.collectionId = this.urlService.getCollectionIdFromExplorationUrl();
-    // if (this.collectionId) {
-    //   this.readOnlyCollectionBackendApiService
-    //     .loadCollectionAsync(this.collectionId)
-    //     .then((collection) => {
-    //       this.getCollectionTitle = function() {
-    //         return collection.getTitle();
-    //       };
-    //     });
-    // }
-
-    this.errorMessage = '';
 
     if (this.isInEditorPage) {
       // Display a message if any author-recommended explorations are
