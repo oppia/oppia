@@ -227,6 +227,7 @@ describe('Exploration Summary Tile Component', () => {
       windowDimensionsService, 'getResizeEvent').and.callThrough();
     const windowWidthSpy = spyOn(
       windowDimensionsService, 'getWidth').and.callThrough();
+    component.mobileCutoffPx = 536;
 
     component.ngOnInit();
     tick();
@@ -274,6 +275,23 @@ describe('Exploration Summary Tile Component', () => {
       fixture.detectChanges();
       expect(component.resizeSubscription.closed).toBe(true);
     }));
+
+  it('should check if mobile card is to be shown', () => {
+    const urlPathSpy = spyOn(urlService, 'getPathname')
+      .and.returnValue('/community-library');
+    component.isWindowLarge = false;
+
+    component.checkIfMobileCardToBeShown();
+
+    expect(urlPathSpy).toHaveBeenCalled();
+    expect(component.mobileCardToBeShown).toBe(true);
+
+    urlPathSpy.and.returnValue('/not-community-library');
+
+    component.checkIfMobileCardToBeShown();
+
+    expect(component.mobileCardToBeShown).toBe(false);
+  });
 
   it('should set the hover state to true', () => {
     component.setHoverState(true);
@@ -361,6 +379,30 @@ describe('Exploration Summary Tile Component', () => {
     fixture.detectChanges();
 
     expect(dateTime).toBeNull();
+  });
+
+  it('should get relative last updated Date & time', () => {
+    const dateTimeSpy = spyOn(dateTimeFormatService, 'getRelativeTimeFromNow')
+      .and.returnValue('a few seconds ago');
+
+    component.lastUpdatedMsec = new Date().getUTCMilliseconds();
+    let relativeLastUpdatedDateTime =
+      component.getRelativeLastUpdatedDateTime();
+    fixture.detectChanges();
+
+    expect(dateTimeSpy).toHaveBeenCalled();
+    expect(relativeLastUpdatedDateTime).toBe('a few seconds ago');
+  });
+
+  it('should fail to get relative last updated Date & time', () => {
+    const dateTimeSpy = spyOn(dateTimeFormatService, 'getRelativeTimeFromNow');
+
+    let relativeLastUpdatedDateTime =
+      component.getRelativeLastUpdatedDateTime();
+    fixture.detectChanges();
+
+    expect(dateTimeSpy).not.toHaveBeenCalled();
+    expect(relativeLastUpdatedDateTime).toBeNull();
   });
 
   it('should get the thumbnail url', () => {

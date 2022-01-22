@@ -20,6 +20,8 @@ import { Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 import { StorySummary } from 'domain/story/story-summary.model';
+import { WindowDimensionsService } from
+  'services/contextual/window-dimensions.service';
 
 @Component({
   selector: 'stories-list',
@@ -32,7 +34,13 @@ export class StoriesListComponent {
   @Input() topicUrlFragment: string;
   @Input() topicName: string;
   @Input() topicDescription: string;
-  constructor() {}
+  constructor(
+    private windowDimensionsService: WindowDimensionsService,
+  ) {}
+
+  checkTabletView(): boolean {
+    return this.windowDimensionsService.getWidth() < 768;
+  }
 }
 angular.module('oppia').directive(
   'storiesList', downgradeComponent(
