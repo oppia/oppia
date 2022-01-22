@@ -171,7 +171,7 @@ class SubtopicMasteryDataHandler(base.BaseHandler):
                 if skill_mastery_dict:
                     # Subtopic mastery is average of skill masteries.
                     subtopic_mastery_dict[topic.id][subtopic.id] = (
-                        sum(skill_mastery_dict.values()) / 
+                        sum(skill_mastery_dict.values()) /
                         len(skill_mastery_dict))
 
         self.values.update({
