@@ -1687,7 +1687,7 @@ def get_scaled_average_rating(ratings):
     # The following calculates the lower bound Wilson Score as documented
     # http://www.goproblems.com/test/wilson/wilson.php?v1=0&v2=0&v3=0&v4=&v5=1
     a = x + ((z**2) / (2 * n))
-    b = z * math.sqrt((x * (1 - x)) / n) + ((z**2) / (4 * n**2))
+    b = z * math.sqrt(((x * (1 - x)) / n) + ((z**2) / (4 * n**2)))
     wilson_score_lower_bound = (a - b) / (1 + ((z**2) / n))
     return 1 + 4 * wilson_score_lower_bound
 
