@@ -23,6 +23,7 @@ in mypy checks not during runtime.
 
 from __future__ import annotations
 
+from core.platform.cache import redis_cache_services as memory_cache_services
 from core.platform.datastore import (
     cloud_datastore_services as datastore_services)
 from core.platform.search import elastic_search_services as search_services
@@ -73,6 +74,7 @@ __all__ = [
     'feedback_models',
     'improvements_models',
     'job_models',
+    'memory_cache_services',
     'opportunity_models',
     'question_models',
     'recommendations_models',
