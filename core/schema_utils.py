@@ -53,6 +53,7 @@ SCHEMA_KEY_VALIDATORS = 'validators'
 SCHEMA_KEY_DEFAULT_VALUE = 'default_value'
 SCHEMA_KEY_OBJECT_CLASS = 'object_class'
 SCHEMA_KEY_VALIDATION_METHOD = 'validation_method'
+SCHEMA_KEY_OPTIONS = 'options'
 
 SCHEMA_TYPE_BOOL = 'bool'
 SCHEMA_TYPE_CUSTOM = 'custom'
@@ -65,6 +66,7 @@ SCHEMA_TYPE_UNICODE = 'unicode'
 SCHEMA_TYPE_BASESTRING = 'basestring'
 SCHEMA_TYPE_UNICODE_OR_NONE = 'unicode_or_none'
 SCHEMA_TYPE_OBJECT_DICT = 'object_dict'
+SCHEMA_TYPE_MULTIPLE = 'multiple'
 
 SCHEMA_OBJ_TYPE_SUBTITLED_HTML = 'SubtitledHtml'
 SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE = 'SubtitledUnicode'
@@ -100,6 +102,13 @@ def normalize_against_schema(
     """
     normalized_obj: Any = None
 
+    if schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_MULTIPLE:
+        name = type(obj).__name__
+        if name == 'str':
+            name = 'basestring'
+        assert (name in schema[SCHEMA_KEY_OPTIONS]), (
+            '%s is not present in options' % obj)
+        schema[SCHEMA_KEY_TYPE] = name
     if schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_BOOL:
         assert isinstance(obj, bool), ('Expected bool, received %s' % obj)
         normalized_obj = obj

@@ -459,7 +459,8 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
             },
             'answer': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'multiple',
+                    'options': ['int', 'basestring']
                 }
             },
             'client_time_spent_in_secs': {
