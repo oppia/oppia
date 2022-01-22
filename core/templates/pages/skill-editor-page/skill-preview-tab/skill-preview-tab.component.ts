@@ -18,7 +18,7 @@
 
 require(
   'pages/exploration-player-page/learner-experience/' +
-    'conversation-skin.directive.ts');
+    'conversation-skin.component.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 require('pages/review-test-page/review-test-engine.service.ts');
 require(
