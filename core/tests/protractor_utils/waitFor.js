@@ -251,3 +251,4 @@ exports.fadeInToComplete = fadeInToComplete;
 exports.modalPopupToAppear = modalPopupToAppear;
 exports.fileToBeDownloaded = fileToBeDownloaded;
 exports.clientSideRedirection = clientSideRedirection;
+exports.clientSideRedirectionT = clientSideRedirectionT;
