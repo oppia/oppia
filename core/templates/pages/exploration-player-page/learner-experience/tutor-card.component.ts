@@ -144,7 +144,6 @@ export class TutorCardComponent {
         }
       )
     );
-    this.updateDisplayedCard();
   }
 
   ngOnDestroy(): void {
