@@ -20,31 +20,31 @@
   }
 </style>
 <div *ngIf="!feedbackEditorIsOpen && displayFeedback"
-     title="{{ isEditable() ? 'Edit feedback' : '' }}"
+     title="{{ isEditable ? 'Edit feedback' : '' }}"
      class="h-100">
   <div class="oppia-readonly-rule-tile protractor-test-edit-outcome-feedback-button"
-       [ngClass]="{'oppia-editable-section': isEditable()}">
+       [ngClass]="{'oppia-editable-section': isEditable}">
     <div class="oppia-rule-preview oppia-transition-200">
       <div class="oppia-click-to-start-editing protractor-test-open-outcome-feedback-editor"
-           *ngIf="isEditable()" (click)="openFeedbackEditor()">
-        <i *ngIf="isEditable()" class="material-icons oppia-editor-edit-icon float-right"
+           *ngIf="isEditable" (click)="openFeedbackEditor()">
+        <i *ngIf="isEditable" class="material-icons oppia-editor-edit-icon float-right"
            title="Edit Feedback">&#xE254;
         </i>
       </div>
 
       <strong>Oppia tells the learner...</strong>
       <div class="position-relative">
-        <span *ngIf="isSelfLoopWithNoFeedback(outcome) && !areWarningsSuppressed()">
+        <span *ngIf="isSelfLoopWithNoFeedback(outcome) && !areWarningsSuppressed">
           <span class="oppia-confusing-outcome-warning-text">
             <i class="material-icons">&#xE002;</i>
             Please give Oppia something useful to say here.
           </span>
         </span>
-        <span *ngIf="(!isSelfLoopWithNoFeedback(outcome) && !outcome.hasNonemptyFeedback()) || (isSelfLoopWithNoFeedback(outcome) && areWarningsSuppressed())"
+        <span *ngIf="(!isSelfLoopWithNoFeedback(outcome) && || (isSelfLoopWithNoFeedback(outcome) && areWarningsSuppressed)"
               class="oppia-nothing-text">
           <em>Nothing</em>
         </span>
-        <span *ngIf="outcome.hasNonemptyFeedback()" class="oppia-non-empty-feedback-text">
+        <span class="oppia-non-empty-feedback-text">
           <angular-html-bind-wrapper classStr="oppia-rte-editor" [htmlData]="outcome.feedback.html">
           </angular-html-bind-wrapper>
         </span>
@@ -55,7 +55,7 @@
   </div>
 </div>
 
-<div *ngIf="isEditable() && feedbackEditorIsOpen">
+<div *ngIf="isEditable && feedbackEditorIsOpen">
   <form role="form"
         class="form-inline protractor-test-edit-outcome-feedback"
         name="editOutcomeForm.editFeedbackForm">
@@ -90,13 +90,13 @@
 
 <div *ngIf="!destinationEditorIsOpen && !isInQuestionMode()"
      class="h-100"
-     title="{{ isEditable() ? 'Change the destination card' : '' }}">
+     title="{{ isEditable ? 'Change the destination card' : '' }}">
   <div class="oppia-readonly-rule-tile protractor-test-edit-outcome-dest-button"
-       [ngClass]="{'oppia-editable-section': isEditable()}">
+       [ngClass]="{'oppia-editable-section': isEditable}">
     <div class="oppia-rule-preview oppia-transition-200">
       <div class="oppia-click-to-start-editing protractor-test-open-outcome-dest-editor"
-           *ngIf="isEditable()" (click)="openDestinationEditor()">
-        <i *ngIf="isEditable()" class="material-icons oppia-editor-edit-icon float-right"
+           *ngIf="isEditable" (click)="openDestinationEditor()">
+        <i *ngIf="isEditable" class="material-icons oppia-editor-edit-icon float-right"
            title="Edit Destination">&#xE254;
         </i>
       </div>
@@ -123,7 +123,7 @@
   </div>
 </div>
 
-<div *ngIf="isEditable() && destinationEditorIsOpen && !isInQuestionMode()">
+<div *ngIf="isEditable && destinationEditorIsOpen && !isInQuestionMode()">
   <form role="form"
         class="form-inline protractor-test-edit-outcome-dest"
         name="editOutcomeForm.editDestForm"
@@ -155,15 +155,15 @@
 
 
 <div class="oppia-correctness-label-editor" *ngIf="isCorrectnessFeedbackEnabled() && !isCurrentInteractionLinear()">
-  <div *ngIf="!isEditable()"
-       title="{{ isEditable() ? 'Edit correctness setting' : '' }}"
+  <div *ngIf="!isEditable"
+       title="{{ isEditable ? 'Edit correctness setting' : '' }}"
        class="h-100">
     <div class="oppia-readonly-rule-tile"
-         [ngClass]="{'oppia-editable-section': isEditable()}">
+         [ngClass]="{'oppia-editable-section': isEditable}">
       <div class="oppia-rule-details-header">
         <div class="oppia-click-to-start-editing"
-             *ngIf="isEditable()" (click)="openCorrectnessLabelEditor()">
-          <i *ngIf="isEditable()" class="material-icons oppia-editor-edit-icon float-right"
+             *ngIf="isEditable" (click)="openCorrectnessLabelEditor()">
+          <i *ngIf="isEditable" class="material-icons oppia-editor-edit-icon float-right"
              title="Edit Correctness setting">&#xE254;
           </i>
         </div>
@@ -180,7 +180,7 @@
     </div>
   </div>
 
-  <div *ngIf="isEditable()">
+  <div *ngIf="isEditable">
     <strong>The answers in this group are correct</strong>
     <input class="protractor-test-editor-correctness-toggle" type="checkbox" [(ngModel)]="outcome.labelledAsCorrect" (change)="onChangeCorrectnessLabel()">
   </div>
