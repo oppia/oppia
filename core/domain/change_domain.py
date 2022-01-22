@@ -30,12 +30,7 @@ from core.platform import models  # pylint: disable=invalid-import-from # isort:
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
 
-MYPY = False
-if MYPY:  # pragma: no cover
-    from mypy_imports import base_models
-
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
-
 
 def validate_cmd(
     cmd_name: str,
@@ -238,8 +233,8 @@ class BaseChange:
 
         return base_change_dict
 
-    # Here we use Any, because getattr is of Callable type and
-    # it does not make sense to check it against anything.
+    # Here we use Any, because we don't know what exactly will getattr
+    # return, as change_domain can have a differing structure.
     def __getattr__(self, name: str) -> Any:
         # AttributeError needs to be thrown in order to make
         # instances of this class picklable.
