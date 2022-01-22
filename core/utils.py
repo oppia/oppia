@@ -93,7 +93,7 @@ class ExplorationConversionError(Exception):
 
 
 def open_file(
-        filename: str, mode: str, encoding: Union[str, None]='utf-8',
+        filename: str, mode: str, encoding: str='utf-8',
         newline: Union[str, None]=None) -> io.TextIOWrapper:
     """Open file and return a corresponding file object.
 
@@ -135,7 +135,8 @@ def get_file_contents(
     else:
         encoding = 'utf-8'
 
-    with open_file(filepath, mode, encoding=encoding) as f:
+    with open_file(
+        filepath, mode, encoding=encoding) as f: # type: ignore[arg-type]
         return f.read() # type: ignore[return-value]
 
 
