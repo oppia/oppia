@@ -106,6 +106,7 @@ def normalize_against_schema(
         # Importing this at the top of the file causes a circular dependency.
         # TODO(sll): Either get rid of custom objects or find a way to merge
         # them into the schema framework -- probably the latter.
+        # pylint: disable=import-outside-toplevel, single-line-pragma
         from core.domain import object_registry
         obj_class = object_registry.Registry.get_object_class_by_type( # type: ignore[no-untyped-call]
             schema[SCHEMA_KEY_OBJ_TYPE])

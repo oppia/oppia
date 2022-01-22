@@ -69,6 +69,7 @@ def SimpleXMLRPCServer( # pylint: disable=invalid-name
     Returns:
         SimpleXMLRPCServer. The SimpleXMLRPCServer object.
     """
+    # pylint: disable=import-outside-toplevel, single-line-pragma
     try:
         from xmlrpc.server import SimpleXMLRPCServer as impl  # pylint: disable=import-only-modules
     except ImportError:
@@ -97,6 +98,7 @@ def redirect_stdout(new_target):
         contextlib.redirect_stdout or contextlib2.redirect_stdout. The
         redirect_stdout object.
     """
+    # pylint: disable=import-outside-toplevel, single-line-pragma
     try:
         from contextlib import redirect_stdout as impl  # pylint: disable=import-only-modules
     except ImportError:
@@ -187,6 +189,7 @@ def parse_query_string(query_string):
         dict. The keys are the unique query variable names and the values are
         lists of values for each name.
     """
+    # pylint: disable=import-outside-toplevel, single-line-pragma
     try:
         import urllib.parse as urlparse
     except ImportError:
@@ -204,6 +207,7 @@ def url_quote(content):
     Returns:
         str. The quoted string.
     """
+    # pylint: disable=import-outside-toplevel, single-line-pragma
     try:
         import urllib.parse as urlparse
     except ImportError:
@@ -224,6 +228,7 @@ def url_encode(query, doseq=False):
     Returns:
         str. The 'url-encoded' string.
     """
+    # pylint: disable=import-outside-toplevel, single-line-pragma
     try:
         import urllib.parse as urlparse
     except ImportError:

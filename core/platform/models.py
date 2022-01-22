@@ -24,7 +24,12 @@ from types import ModuleType  # pylint: disable=import-only-modules
 
 from core import feconf
 from core.constants import constants
-
+from core.platform.app_identity import gae_app_identity_services
+from core.platform.auth import firebase_auth_services
+from core.platform.cache import redis_cache_services
+from core.platform.datastore import cloud_datastore_services
+from core.platform.search import elastic_search_services
+from core.platform.transactions import cloud_transaction_services
 from typing import List, Tuple, Type
 
 MYPY = False
@@ -127,6 +132,7 @@ class _Gae(Platform):
         # here since when we import modules using this function, we need to add
         # separate imports for mypy anyway.
         for name in model_names:
+            # pylint: disable=import-outside-toplevel, single-line-pragma
             if name == NAMES.activity:
                 from core.storage.activity import gae_models as activity_models
                 returned_models.append(activity_models)
@@ -264,7 +270,6 @@ class _Gae(Platform):
         Returns:
             module. The firebase_auth_services module.
         """
-        from core.platform.auth import firebase_auth_services
         return firebase_auth_services
 
     @classmethod
@@ -274,7 +279,6 @@ class _Gae(Platform):
         Returns:
             module. The gae_transaction_services module.
         """
-        from core.platform.transactions import cloud_transaction_services
         return cloud_transaction_services
 
     @classmethod
@@ -284,7 +288,6 @@ class _Gae(Platform):
         Returns:
             module. The gae_datastore_services module.
         """
-        from core.platform.datastore import cloud_datastore_services
         return cloud_datastore_services
 
     @classmethod
@@ -294,7 +297,6 @@ class _Gae(Platform):
         Returns:
             module. The gae_app_identity_services module.
         """
-        from core.platform.app_identity import gae_app_identity_services
         return gae_app_identity_services
 
     @classmethod
@@ -310,6 +312,7 @@ class _Gae(Platform):
             Exception. The value of feconf.EMAIL_SERVICE_PROVIDER does not
                 correspond to a valid email_services module.
         """
+        # pylint: disable=import-outside-toplevel, single-line-pragma
         if constants.DEV_MODE:
             from core.platform.email import dev_mode_email_services
             return dev_mode_email_services
@@ -336,6 +339,7 @@ class _Gae(Platform):
             Exception. The value of feconf.BULK_EMAIL_SERVICE_PROVIDER does not
                 correspond to a valid email_services module.
         """
+        # pylint: disable=import-outside-toplevel, single-line-pragma
         if constants.EMULATOR_MODE:
             from core.platform.bulk_email import dev_mode_bulk_email_services
             return dev_mode_bulk_email_services
@@ -356,7 +360,6 @@ class _Gae(Platform):
         Returns:
             module. The core.platform.cache services module.
         """
-        from core.platform.cache import redis_cache_services
         return redis_cache_services
 
     @classmethod
@@ -367,6 +370,7 @@ class _Gae(Platform):
         Returns:
             module. The core.platform.taskqueue services module.
         """
+        # pylint: disable=import-outside-toplevel, single-line-pragma
         if constants.EMULATOR_MODE:
             from core.platform.taskqueue import dev_mode_taskqueue_services
             return dev_mode_taskqueue_services
@@ -381,7 +385,6 @@ class _Gae(Platform):
         Returns:
             module. The gae_search_services module.
         """
-        from core.platform.search import elastic_search_services
         return elastic_search_services
 
     @classmethod
@@ -391,6 +394,7 @@ class _Gae(Platform):
         Returns:
             module. The cloud_translate_services module.
         """
+        # pylint: disable=import-outside-toplevel, single-line-pragma
         if constants.EMULATOR_MODE:
             from core.platform.translate import dev_mode_translate_services
             return dev_mode_translate_services
@@ -405,6 +409,7 @@ class _Gae(Platform):
         Returns:
             module. The cloud_translate_services module.
         """
+        # pylint: disable=import-outside-toplevel, single-line-pragma
         if constants.EMULATOR_MODE:
             from core.platform.storage import dev_mode_storage_services
             return dev_mode_storage_services
