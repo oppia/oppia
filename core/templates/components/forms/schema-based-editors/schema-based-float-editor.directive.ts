@@ -88,6 +88,18 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
             }
           };
 
+          ctrl.currentRadix = function() {
+            let radix = I18nLanguageCodeService.currentRadix();
+
+            // Exploration Player.
+            if (ContextService.getPageContext() === 'learner') {
+              radix = ContentTranslationLanguageService
+                .currentRadix();
+            }
+
+            return radix;
+          };
+
           ctrl.parseInput = function(): void {
             let regex = I18nLanguageCodeService.getInputValidationRegex();
 
@@ -140,7 +152,8 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
           ctrl.generateErrors = function() {
             ctrl.errorString = (
               NumericInputValidationService.getErrorString(
-                ctrl.localStringValue, ctrl.checkRequireNonnegativeInputValue));
+                ctrl.localStringValue, ctrl.checkRequireNonnegativeInputValue,
+                ctrl.currentRadix()));
           };
 
           ctrl.onKeypress = function(evt) {

@@ -29,7 +29,6 @@ import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
 
 import { AppConstants } from 'app.constants';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 interface Range {
   answerGroupIndex: number;
@@ -46,8 +45,7 @@ interface Range {
 export class NumericInputValidationService {
   constructor(
       private baseInteractionValidationServiceInstance:
-        baseInteractionValidationService,
-      private I18nLanguageCodeService: I18nLanguageCodeService) {}
+        baseInteractionValidationService) {}
 
   getCustomizationArgsWarnings(
       customizationArgs: NumericInputCustomizationArgs): Warning[] {
@@ -209,7 +207,7 @@ export class NumericInputValidationService {
   }
   // Returns 'undefined' when no error occurs.
   getErrorString(
-      value: number, customizationArgs: boolean
+      value: number, customizationArgs: boolean, radix?: string
   ): string | undefined {
     let stringValue = null;
     // Convert exponential notation to decimal number.
@@ -238,7 +236,9 @@ export class NumericInputValidationService {
       }
     }
     const stringValueRegExp = stringValue.match(/\d/g);
-    const radix = this.I18nLanguageCodeService.currentRadix();
+    if (!radix) {
+      radix = '.';
+    }
     if (
       customizationArgs &&
       (stringValueRegExp === null || stringValueRegExp.length > 15)
