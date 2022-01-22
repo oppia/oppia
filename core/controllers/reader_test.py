@@ -2405,7 +2405,7 @@ class ExplorationEmbedPageTests(test_utils.GenericTestBase):
             }
         )
         self.assertIn(
-            b'<exploration-player-page></exploration-player-page>',
+            b'<oppia-exploration-player-page></oppia-exploration-player-page>',
             response.body
         )
 
