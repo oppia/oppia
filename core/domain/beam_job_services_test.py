@@ -233,87 +233,131 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
         self.assertEqual(result.stdout, 'abc')
         self.assertEqual(result.stderr, '123')
 
-    def test_in_terminal_state(self) -> None:
+    def test_is_state_terminal(self) -> None:
 
         now = datetime.datetime.utcnow()
 
         cancelled_beam_job_run = beam_job_domain.BeamJobRun(
-            '123', 'FooJob', beam_job_models.BeamJobState.CANCELLED.value,
-            now, now, True)
+            '123',
+            'FooJob',
+            beam_job_models.BeamJobState.CANCELLED.value,
+            now,
+            now,
+            True
+        )
         drained_beam_job_run = beam_job_domain.BeamJobRun(
-            '123', 'FooJob', beam_job_models.BeamJobState.DRAINED.value,
-            now, now, True)
+            '123',
+            'FooJob',
+            beam_job_models.BeamJobState.DRAINED.value,
+            now,
+            now,
+            True
+        )
         updated_beam_job_run = beam_job_domain.BeamJobRun(
-            '123', 'FooJob', beam_job_models.BeamJobState.UPDATED.value,
-            now, now, True)
+            '123',
+            'FooJob',
+            beam_job_models.BeamJobState.UPDATED.value,
+            now,
+            now,
+            True
+        )
         done_beam_job_run = beam_job_domain.BeamJobRun(
-            '123', 'FooJob', beam_job_models.BeamJobState.DONE.value,
-            now, now, True)
+            '123',
+            'FooJob',
+            beam_job_models.BeamJobState.DONE.value,
+            now,
+            now,
+            True
+        )
         failed_beam_job_run = beam_job_domain.BeamJobRun(
-            '123', 'FooJob', beam_job_models.BeamJobState.FAILED.value,
-            now, now, True)
+            '123',
+            'FooJob',
+            beam_job_models.BeamJobState.FAILED.value,
+            now,
+            now,
+            True
+        )
         cancelling_beam_job_run = beam_job_domain.BeamJobRun(
-            '123', 'FooJob', beam_job_models.BeamJobState.CANCELLING.value,
-            now, now, True)
+            '123',
+            'FooJob',
+            beam_job_models.BeamJobState.CANCELLING.value,
+            now,
+            now,
+            True
+        )
         draining_beam_job_run = beam_job_domain.BeamJobRun(
-            '123', 'FooJob', beam_job_models.BeamJobState.DRAINING.value,
-            now, now, True)
+            '123',
+            'FooJob',
+            beam_job_models.BeamJobState.DRAINING.value,
+            now,
+            now,
+            True
+        )
         pending_beam_job_run = beam_job_domain.BeamJobRun(
-            '123', 'FooJob', beam_job_models.BeamJobState.PENDING.value,
-            now, now, True)
+            '123',
+            'FooJob',
+            beam_job_models.BeamJobState.PENDING.value,
+            now,
+            now,
+            True
+        )
         running_beam_job_run = beam_job_domain.BeamJobRun(
-            '123', 'FooJob', beam_job_models.BeamJobState.RUNNING.value,
-            now, now, True)
+            '123',
+            'FooJob',
+            beam_job_models.BeamJobState.RUNNING.value,
+            now,
+            now,
+            True
+        )
         stopped_beam_job_run = beam_job_domain.BeamJobRun(
-            '123', 'FooJob', beam_job_models.BeamJobState.STOPPED.value,
-            now, now, True)
+            '123',
+            'FooJob',
+            beam_job_models.BeamJobState.STOPPED.value,
+            now,
+            now, True
+        )
         unknown_beam_job_run = beam_job_domain.BeamJobRun(
-            '123', 'FooJob', beam_job_models.BeamJobState.UNKNOWN.value,
-            now, now, True)
+            '123',
+            'FooJob',
+            beam_job_models.BeamJobState.UNKNOWN.value,
+            now,
+            now,
+            True
+        )
 
-        self.assertTrue(
-            beam_job_services.in_terminal_state(
+        self.assertTrue(beam_job_services.is_state_terminal(
                 cancelled_beam_job_run.job_state
-            ))
-        self.assertTrue(
-            beam_job_services.in_terminal_state(
+        ))
+        self.assertTrue(beam_job_services.is_state_terminal(
                 drained_beam_job_run.job_state
-            ))
-        self.assertTrue(
-            beam_job_services.in_terminal_state(
+        ))
+        self.assertTrue(beam_job_services.is_state_terminal(
                 updated_beam_job_run.job_state
-            ))
-        self.assertTrue(
-            beam_job_services.in_terminal_state(
+        ))
+        self.assertTrue(beam_job_services.is_state_terminal(
                 done_beam_job_run.job_state
-            ))
-        self.assertTrue(
-            beam_job_services.in_terminal_state(
+        ))
+        self.assertTrue(beam_job_services.is_state_terminal(
                 failed_beam_job_run.job_state
-            ))
-        self.assertFalse(
-            beam_job_services.in_terminal_state(
+        ))
+        self.assertFalse(beam_job_services.is_state_terminal(
                 cancelling_beam_job_run.job_state
-            ))
-        self.assertFalse(
-            beam_job_services.in_terminal_state(
+        ))
+        self.assertFalse(beam_job_services.is_state_terminal(
                 draining_beam_job_run.job_state
-                ))
-        self.assertFalse(beam_job_services.in_terminal_state(
+        ))
+        self.assertFalse(beam_job_services.is_state_terminal(
                 pending_beam_job_run.job_state
-            ))
-        self.assertFalse(
-            beam_job_services.in_terminal_state(
+        ))
+        self.assertFalse(beam_job_services.is_state_terminal(
                 running_beam_job_run.job_state
-            ))
-        self.assertFalse(
-            beam_job_services.in_terminal_state(
+        ))
+        self.assertFalse(beam_job_services.is_state_terminal(
                 stopped_beam_job_run.job_state
-            ))
-        self.assertFalse(
-            beam_job_services.in_terminal_state(
+        ))
+        self.assertFalse(beam_job_services.is_state_terminal(
                 unknown_beam_job_run.job_state
-            ))
+        ))
 
 
 class GetBeamJobRunResultTests(test_utils.GenericTestBase):
