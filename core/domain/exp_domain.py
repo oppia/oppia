@@ -3173,9 +3173,9 @@ class ExplorationChangeMergeVerifier:
                         change.property_name) ==
                     current_exploration.__getattribute__(
                         change.property_name))
-            elif change.cmd = CMD_MARK_TRANSLATION_NEEDS_UPDATE:
+            elif change.cmd == CMD_MARK_TRANSLATION_NEEDS_UPDATE:
                 change_is_mergeable = True
-            elif change.cmd = CMD_REMOVE_TRANSLATION:
+            elif change.cmd == CMD_REMOVE_TRANSLATION:
                 change_is_mergeable = True
 
             if change_is_mergeable:

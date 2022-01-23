@@ -1547,117 +1547,6 @@ class Voiceover:
                 self.duration_secs)
 
 
-class WrittenTranslation:
-    """Value object representing a written translation for a content.
-
-    Here, "content" could mean a string or a list of strings. The latter arises,
-    for example, in the case where we are checking for equality of a learner's
-    answer against a given set of strings. In such cases, the number of strings
-    in the translation of the original object may not be the same as the number
-    of strings in the original object.
-    """
-
-    DATA_FORMAT_HTML = 'html'
-    DATA_FORMAT_UNICODE_STRING = 'unicode'
-    DATA_FORMAT_SET_OF_NORMALIZED_STRING = 'set_of_normalized_string'
-    DATA_FORMAT_SET_OF_UNICODE_STRING = 'set_of_unicode_string'
-
-    DATA_FORMAT_TO_TRANSLATABLE_OBJ_TYPE = {
-        DATA_FORMAT_HTML: 'TranslatableHtml',
-        DATA_FORMAT_UNICODE_STRING: 'TranslatableUnicodeString',
-        DATA_FORMAT_SET_OF_NORMALIZED_STRING: (
-            'TranslatableSetOfNormalizedString'),
-        DATA_FORMAT_SET_OF_UNICODE_STRING: 'TranslatableSetOfUnicodeString',
-    }
-
-    @classmethod
-    def is_data_format_list(cls, data_format):
-        """Checks whether the content of translation with given format is of
-        a list type.
-
-        Args:
-            data_format: str. The format of the translation.
-
-        Returns:
-            bool. Whether the content of translation is a list.
-        """
-        return data_format in (
-            cls.DATA_FORMAT_SET_OF_NORMALIZED_STRING,
-            cls.DATA_FORMAT_SET_OF_UNICODE_STRING
-        )
-
-    def __init__(self, data_format, translation, needs_update):
-        """Initializes a WrittenTranslation domain object.
-
-        Args:
-            data_format: str. One of the keys in
-                DATA_FORMAT_TO_TRANSLATABLE_OBJ_TYPE. Indicates the
-                type of the field (html, unicode, etc.).
-            translation: str|list(str). A user-submitted string or list of
-                strings that matches the given data format.
-            needs_update: bool. Whether the translation is marked as needing
-                review.
-        """
-        self.data_format = data_format
-        self.translation = translation
-        self.needs_update = needs_update
-
-    def to_dict(self):
-        """Returns a dict representing this WrittenTranslation domain object.
-
-        Returns:
-            dict. A dict, mapping all fields of WrittenTranslation instance.
-        """
-        return {
-            'data_format': self.data_format,
-            'translation': self.translation,
-            'needs_update': self.needs_update,
-        }
-
-    @classmethod
-    def from_dict(cls, written_translation_dict):
-        """Return a WrittenTranslation domain object from a dict.
-
-        Args:
-            written_translation_dict: dict. The dict representation of
-                WrittenTranslation object.
-
-        Returns:
-            WrittenTranslation. The corresponding WrittenTranslation domain
-            object.
-        """
-        return cls(
-            written_translation_dict['data_format'],
-            written_translation_dict['translation'],
-            written_translation_dict['needs_update'])
-
-    def validate(self):
-        """Validates properties of the WrittenTranslation, normalizing the
-        translation if needed.
-
-        Raises:
-            ValidationError. One or more attributes of the WrittenTranslation
-                are invalid.
-        """
-        if self.data_format not in (
-                self.DATA_FORMAT_TO_TRANSLATABLE_OBJ_TYPE):
-            raise utils.ValidationError(
-                'Invalid data_format: %s' % self.data_format)
-
-        translatable_class_name = (
-            self.DATA_FORMAT_TO_TRANSLATABLE_OBJ_TYPE[self.data_format])
-        translatable_obj_class = (
-            translatable_object_registry.Registry.get_object_class(
-                translatable_class_name))
-        self.translation = translatable_obj_class.normalize_value(
-            self.translation)
-
-        if not isinstance(self.needs_update, bool):
-            raise utils.ValidationError(
-                'Expected needs_update to be a bool, received %s' %
-                self.needs_update)
-
-
 class RecordedVoiceovers:
     """Value object representing a recorded voiceovers which stores voiceover of
     all state contents (like hints, feedback etc.) in different languages linked
@@ -2238,8 +2127,7 @@ class State(translation_domain.BaseTranslatableObject):
 
     def __init__(
             self, content, param_changes, interaction, recorded_voiceovers,
-            written_translations, solicit_answer_details, card_is_checkpoint,
-            linked_skill_id=None,
+            solicit_answer_details, card_is_checkpoint, linked_skill_id=None,
             classifier_model_id=None):
         """Initializes a State domain object.
 
@@ -3157,8 +3045,8 @@ class State(translation_domain.BaseTranslatableObject):
             InteractionInstance.create_default_interaction(
                 default_dest_state_name),
             RecordedVoiceovers.from_dict(copy.deepcopy(
-                feconf.DEFAULT_RECORDED_VOICEOVERS))),
-            False, is_initial_state, 0)
+                feconf.DEFAULT_RECORDED_VOICEOVERS)),
+            False, is_initial_state)
 
     @classmethod
     def convert_html_fields_in_state(

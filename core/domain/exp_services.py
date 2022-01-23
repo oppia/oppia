@@ -566,10 +566,6 @@ def apply_change_list(exploration_id, change_list):
                         'version %s, received %s' % (
                             feconf.CURRENT_STATE_SCHEMA_VERSION,
                             change.to_version))
-            elif change.cmd == exp_domain.CMD_MARK_TRANSLATION_NEEDS_UPDATE:
-                # TODO
-            elif change.cmd == exp_domain.CMD_REMOVE_TRANSLATION:
-                # TODO
         return exploration
 
     except Exception as e:
