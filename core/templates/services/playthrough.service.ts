@@ -94,7 +94,7 @@ class CyclicStateTransitionsTracker {
       this.pathOfVisitedStates.length = 0;
     }
     this.pathOfVisitedStates.push(destStateName);
-   }
+  }
 
   generateIssueCustomizationArgs(): CyclicStateTransitionsCustomizationArgs {
     return {
@@ -365,7 +365,7 @@ export class PlaythroughService {
             ServicesConstants.MIN_PLAYTHROUGH_DURATION_IN_SECS);
     } else {
       throw Error(
-        'Value recordedLearnerActions and' + 
+        'Value recordedLearnerActions and' +
          'playthroughDurationInSecs should not be null!');
     }
   }
