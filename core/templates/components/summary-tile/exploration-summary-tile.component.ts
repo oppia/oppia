@@ -76,12 +76,15 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   userIsLoggedIn: boolean = false;
   isRefresherExploration: boolean = false;
   contributors!: object;
-  // A null value for 'lastUpdatedDateTime' indicates that lastUpdatedMsecs
-  // received after component interactions is empty or does not exist.
+  // A null value for 'lastUpdatedDateTime' and 'relativeLastUpdatedDateTime'
+  // indicates that lastUpdatedMsecs received after component interactions
+  // is empty or does not exist.
   lastUpdatedDateTime: string | null = null;
+  relativeLastUpdatedDateTime: string | null = null;
   // 'avgRating' will be null if the exploration has no ratings.
   avgRating!: number | null;
   thumbnailIcon!: string;
+  mobileCardToBeShown: boolean = false;
 
   constructor(
     private ratingComputationService: RatingComputationService,
@@ -122,13 +125,16 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
     }
     this.isWindowLarge = (
       this.windowDimensionsService.getWidth() >= this.mobileCutoffPx);
+    this.checkIfMobileCardToBeShown();
 
     this.resizeSubscription = this.windowDimensionsService.getResizeEvent().
       subscribe(evt => {
         this.isWindowLarge = (
           this.windowDimensionsService.getWidth() >= this.mobileCutoffPx);
+        this.checkIfMobileCardToBeShown();
       });
     this.lastUpdatedDateTime = this.getLastUpdatedDatetime();
+    this.relativeLastUpdatedDateTime = this.getRelativeLastUpdatedDateTime();
     this.avgRating = this.getAverageRating();
     this.thumbnailIcon = this.getCompleteThumbnailIconUrl();
   }
@@ -137,6 +143,12 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
     if (this.resizeSubscription) {
       this.resizeSubscription.unsubscribe();
     }
+  }
+
+  checkIfMobileCardToBeShown(): void {
+    let currentPageUrl = this.urlService.getPathname();
+    this.mobileCardToBeShown = (
+      !this.isWindowLarge && (currentPageUrl === '/community-library'));
   }
 
   setHoverState(hoverState: boolean): void {
@@ -161,6 +173,14 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   getLastUpdatedDatetime(): string | null {
     if (this.lastUpdatedMsec) {
       return this.dateTimeFormatService.getLocaleAbbreviatedDatetimeString(
+        this.lastUpdatedMsec);
+    }
+    return null;
+  }
+
+  getRelativeLastUpdatedDateTime(): string | null {
+    if (this.lastUpdatedMsec) {
+      return this.dateTimeFormatService.getRelativeTimeFromNow(
         this.lastUpdatedMsec);
     }
     return null;
