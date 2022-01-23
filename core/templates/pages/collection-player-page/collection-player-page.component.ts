@@ -103,7 +103,7 @@ export class CollectionPlayerPageComponent implements OnInit {
     private pageTitleService: PageTitleService,
     private userService: UserService,
     private collectionPlayerBackendApiService:
-      CollectionPlayerBackendApiService,
+      CollectionPlayerBackendApiService
   ) {}
 
   getStaticImageUrl(imagePath: string): string {

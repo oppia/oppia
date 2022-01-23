@@ -67,7 +67,7 @@ export class CollectionSummaryTileComponent implements OnInit, OnDestroy {
     private userService: UserService,
     private urlInterpolationService: UrlInterpolationService,
     private windowDimensionsService: WindowDimensionsService,
-    private urlService: UrlService,
+    private urlService: UrlService
   ) {}
 
   ngOnInit(): void {
