@@ -136,9 +136,10 @@ class SubtopicMasteryDataHandler(base.BaseHandler):
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
-            'comma_separated_topic_ids': {
+            'selected_topic_ids': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'custom',
+                    'obj_type': 'JsonEncodedInString'
                 }
             }
         }
@@ -147,9 +148,7 @@ class SubtopicMasteryDataHandler(base.BaseHandler):
     @acl_decorators.can_access_learner_dashboard
     def get(self):
         """Handles GET requests."""
-        comma_separated_topic_ids = (
-            self.request.get('comma_separated_topic_ids'))
-        topic_ids = comma_separated_topic_ids.split(',')
+        topic_ids = self.normalized_request.get('selected_topic_ids')
         topics = topic_fetchers.get_topics_by_ids(topic_ids)
         all_skill_ids = []
         subtopic_mastery_dict = {}
