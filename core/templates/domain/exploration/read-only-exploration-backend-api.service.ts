@@ -110,7 +110,7 @@ export class ReadOnlyExplorationBackendApiService {
    * is called instead, if present. The rejection callback function is
    * passed any data returned by the backend in the case of an error.
    */
-  async fetchExplorationAsync(explorationId: string, version: number):
+  async fetchExplorationAsync(explorationId: string, version: number | null):
     Promise<FetchExplorationBackendResponse> {
     return this._fetchExplorationAsync(explorationId, version);
   }
