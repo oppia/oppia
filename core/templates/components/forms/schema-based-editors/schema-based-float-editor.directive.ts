@@ -127,6 +127,7 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
                   .convertToEnglishDecimal(ctrl.localStringValue);
               }
             }
+
             // Generate errors (if any).
             ctrl.generateErrors();
           };
@@ -151,7 +152,7 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
           ctrl.generateErrors = function() {
             ctrl.errorString = (
               NumericInputValidationService.getErrorString(
-                ctrl.localStringValue, ctrl.checkRequireNonnegativeInputValue,
+                ctrl.localValue, ctrl.checkRequireNonnegativeInputValue,
                 ctrl.currentRadix()));
           };
 

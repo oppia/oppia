@@ -36,6 +36,7 @@ export class I18nLanguageCodeService {
   static languageCodeChangeEventEmitter = new EventEmitter<string> ();
   static languageCode: string = AppConstants.DEFAULT_LANGUAGE_CODE;
   static rtlLanguageCodes: readonly string[] = AppConstants.RTL_LANGUAGE_CODES;
+
   private _preferredLanguageCodesLoadedEventEmitter =
     new EventEmitter<string[]>();
 
@@ -67,9 +68,9 @@ export class I18nLanguageCodeService {
 
   getInputValidationRegex(): RegExp {
     const radix: string = this.currentRadix();
-    const dot = new RegExp('[^0-9\.\-]', 'g');
-    const comma = new RegExp('[^0-9\,\-]', 'g');
-    const arabic = new RegExp('[^0-9\٫\-]', 'g');
+    const dot = new RegExp('[^e0-9\.\-]', 'g');
+    const comma = new RegExp('[^e0-9\,\-]', 'g');
+    const arabic = new RegExp('[^e0-9\٫\-]', 'g');
 
     if (radix === ',') {
       return comma; // Input with a comma as radix.
@@ -84,12 +85,13 @@ export class I18nLanguageCodeService {
     const radix = this.currentRadix();
 
     // Check if number is in proper format.
-    let validNumberRegex = new RegExp('-{0,1}[0-9]+([\.|\,|\٫]?[0-9]+)?', 'g');
+    // eslint-disable-next-line max-len
+    let validRegex = new RegExp('-{0,1}[0-9]+([\.|\,|\٫][0-9]+)?(e[0-9]+)?', 'g');
 
     let engNum: number;
 
     // Get the valid part of input.
-    let numberMatch = number.match(validNumberRegex);
+    let numberMatch = number.match(validRegex);
 
     // If a valid match cannot be found, return null.
     if (numberMatch === null) {
