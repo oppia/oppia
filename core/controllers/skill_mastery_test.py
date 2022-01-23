@@ -18,8 +18,6 @@ from __future__ import annotations
 
 import json
 
-import json
-
 from core import feconf
 from core import python_utils
 from core.domain import skill_services
