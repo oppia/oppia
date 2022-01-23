@@ -221,6 +221,14 @@ describe('Create New Chapter Modal Controller', function() {
       expect($uibModalInstance.close).toHaveBeenCalled();
     });
 
+  it('should set story node exploration id when updating exploration id',
+    function() {
+      var storyUpdateSpy = spyOn(
+        StoryUpdateService, 'setStoryNodeExplorationId');
+      $scope.updateExplorationId();
+      expect(storyUpdateSpy).toHaveBeenCalled();
+    });
+
   it('should not save when the chapter title is already used', function() {
     $scope.title = nodeTitles[0];
     $scope.save();
