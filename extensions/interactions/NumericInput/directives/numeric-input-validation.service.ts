@@ -229,7 +229,7 @@ export class NumericInputValidationService {
 
   // Returns 'undefined' when no error occurs.
   getErrorString(
-      value: number, customizationArgs: boolean, radix?: string
+      value: number, customizationArgs: boolean, decimalSeparator?: string
   ): string | undefined {
     let stringValue = null;
     // Convert exponential notation to decimal number.
@@ -258,18 +258,19 @@ export class NumericInputValidationService {
       }
     }
     const stringValueRegExp = stringValue.match(/\d/g);
-    if (!radix) {
-      radix = '.';
+
+    if (!decimalSeparator) {
+      decimalSeparator = '.';
     }
     if (
       customizationArgs &&
       (stringValueRegExp === null || stringValueRegExp.length > 15)
     ) {
       return 'The answer should be greater than or equal to zero and ' +
-      `can contain at most 15 digits (0-9) or symbols(${radix}).`;
+      `can contain at most 15 digits (0-9) or symbols(${decimalSeparator}).`;
     } else if (stringValueRegExp === null || stringValueRegExp.length > 15) {
       return 'The answer can contain at most 15 digits (0-9) or symbols ' +
-        `(${radix} or -).`;
+        `(${decimalSeparator} or -).`;
     }
   }
 }

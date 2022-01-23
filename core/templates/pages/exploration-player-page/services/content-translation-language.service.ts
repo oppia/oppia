@@ -145,36 +145,36 @@ export class ContentTranslationLanguageService {
     return false;
   }
 
-  currentRadix(): string {
+  currentDecimalSeparator(): string {
     const currentLanguage = this.getCurrentContentLanguageCode();
     const supportedLanguages = AppConstants.SUPPORTED_SITE_LANGUAGES;
-    let radix: string;
+    let decimalSeparator: string;
     for (let i of supportedLanguages) {
       if (i.id === currentLanguage) {
-        radix = i.radix;
+        decimalSeparator = i.decimal_separator;
         break;
       }
     }
-    return radix;
+    return decimalSeparator;
   }
 
   getInputValidationRegex(): RegExp {
-    const radix: string = this.currentRadix();
+    const decimalSeparator: string = this.currentDecimalSeparator();
     const dot = new RegExp('[^e0-9\.\-]', 'g');
     const comma = new RegExp('[^e0-9\,\-]', 'g');
     const arabic = new RegExp('[^e0-9\٫\-]', 'g');
 
-    if (radix === ',') {
-      return comma; // Input with a comma as radix.
-    } else if (radix === '٫') {
+    if (decimalSeparator === ',') {
+      return comma; // Input with a comma as decimal separator.
+    } else if (decimalSeparator === '٫') {
       return arabic; // Input with the Arabic seperator.
     } else {
-      return dot; // Input with a period as radix.
+      return dot; // Input with a period as decimal separator.
     }
   }
 
   convertToEnglishDecimal(number: string): number {
-    const radix = this.currentRadix();
+    const decimalSeparator = this.currentDecimalSeparator();
 
     // Check if number is in proper format.
     // eslint-disable-next-line max-len
@@ -192,7 +192,7 @@ export class ContentTranslationLanguageService {
 
     number = numberMatch[0];
 
-    let numString = number.replace(`${radix}`, '.');
+    let numString = number.replace(`${decimalSeparator}`, '.');
     engNum = parseFloat(numString);
 
     // If the input cannot be parsed, output null.
@@ -203,13 +203,13 @@ export class ContentTranslationLanguageService {
   }
 
   convertToLocalizedNumber(number: number): string {
-    let radix = this.currentRadix();
+    let decimalSeparator = this.currentDecimalSeparator();
     let stringNumber = number.toString();
     let convertedNumber: string = stringNumber;
 
-    if (radix === ',') {
+    if (decimalSeparator === ',') {
       convertedNumber = stringNumber.replace('.', ',');
-    } else if (radix === '٫') {
+    } else if (decimalSeparator === '٫') {
       convertedNumber = stringNumber.replace('.', '٫');
     }
 

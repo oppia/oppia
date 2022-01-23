@@ -88,16 +88,17 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
             }
           };
 
-          ctrl.currentRadix = function() {
-            let radix = I18nLanguageCodeService.currentRadix();
+          ctrl.currentDecimalSeparator = function() {
+            let decimalSeparator = I18nLanguageCodeService
+              .currentDecimalSeparator();
 
             // Exploration Player.
             if (ContextService.getPageContext() === 'learner') {
-              radix = ContentTranslationLanguageService
-                .currentRadix();
+              decimalSeparator = ContentTranslationLanguageService
+                .currentDecimalSeparator();
             }
 
-            return radix;
+            return decimalSeparator;
           };
 
           ctrl.parseInput = function(): void {
@@ -161,7 +162,7 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
             ctrl.errorString = (
               NumericInputValidationService.getErrorString(
                 ctrl.localValue, ctrl.checkRequireNonnegativeInputValue,
-                ctrl.currentRadix()));
+                ctrl.currentDecimalSeparator()));
           };
 
           ctrl.onKeypress = function(evt) {
