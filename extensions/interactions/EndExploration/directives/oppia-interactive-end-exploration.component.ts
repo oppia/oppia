@@ -97,7 +97,7 @@ export class InteractiveEndExplorationComponent implements OnInit {
           this.errorMessage = (
             `Warning: exploration(s) with the IDs "${listOfIds}` +
             '" will not be shown as recommendations because ' +
-            'they either do not exist, or are not publicly viewable...');
+            'they either do not exist, or are not publicly viewable.');
         }
       });
     }
