@@ -19,7 +19,7 @@
  * @fileoverview Component for the Customize Interaction Modal Component.
  */
 
-import { Component, Injector, Input, OnInit } from '@angular/core';
+import { AfterContentChecked, ChangeDetectorRef, Component, Injector, Input, OnInit } from '@angular/core';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { SchemaConstants } from 'components/forms/schema-based-editors/schema.constants';
@@ -64,7 +64,7 @@ import { RatioExpressionInputValidationService } from 'interactions/RatioExpress
   templateUrl: './customize-interaction-modal.component.html'
 })
 export class CustomizeInteractionModalComponent
-  extends ConfirmOrCancelModal implements OnInit {
+  extends ConfirmOrCancelModal implements OnInit, AfterContentChecked {
   @Input() showMarkAllAudioAsNeedingUpdateModalIfRequired;
 
   originalContentIdToContent: any;
@@ -87,7 +87,8 @@ export class CustomizeInteractionModalComponent
     private interactionObjectFactory: InteractionObjectFactory,
     private urlInterpolationService: UrlInterpolationService,
     private stateEditorService: StateEditorService,
-    private injector: Injector
+    private injector: Injector,
+    private changeDetectorRef: ChangeDetectorRef,
   ) {
     super(ngbActiveModal);
   }
@@ -145,6 +146,10 @@ export class CustomizeInteractionModalComponent
     var warningsList = validationService.getCustomizationArgsWarnings(
       this.stateCustomizationArgsService.displayed);
     return warningsList;
+  }
+
+  ngAfterContentChecked(): void {
+    this.changeDetectorRef.detectChanges();
   }
 
   getCustomizationArgsWarningMessage(): any {

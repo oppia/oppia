@@ -32,13 +32,13 @@
     </nav>
     <div [ngbNavOutlet]="nav" class="mt-4"></div>
   </div>
-
+  
   <div *ngIf="!isinteractionOpen && stateInteractionIdService.displayed && hasCustomizationArgs" class="interaction-editor-form protractor-test-interaction-editor">
     <div *ngFor="let customizationArgSpec of customizationArgSpecs; index as index;">
       <div *ngIf="customizationArgSpec.schema.type !== 'bool'" class="oppia-interaction-customization-label">{{customizationArgSpec.description}}</div>
       <schema-based-editor [ngClass]="{'boolean-checkbox': customizationArgSpec.schema.type === 'bool'}"
                            [schema]="getSchemaCallback(customizationArgSpec.schema)"
-                           [localValue]="stateCustomizationArgsService.displayed[customizationArgSpec.name].value">
+                           [(localValue)]="stateCustomizationArgsService.displayed[customizationArgSpec.name].value">
       </schema-based-editor>
       <div *ngIf="customizationArgSpec.schema.type === 'bool'" class="oppia-interaction-customization-label">{{customizationArgSpec.description}}</div>
       <div class="oppia-interaction-customization-label-container"></div>
