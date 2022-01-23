@@ -94,7 +94,7 @@ class CyclicStateTransitionsTracker {
       this.pathOfVisitedStates.length = 0;
     }
     this.pathOfVisitedStates.push(destStateName);
-  }
+   }
 
   generateIssueCustomizationArgs(): CyclicStateTransitionsCustomizationArgs {
     return {
