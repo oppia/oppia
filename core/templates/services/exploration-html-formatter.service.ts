@@ -43,13 +43,14 @@ export class ExplorationHtmlFormatterService {
     'FractionInput',
     'GraphInput',
     'ImageClickInput',
+    'InteractiveMap',
+    'MathEquationInput',
+    'MultipleChoiceInput',
     'NumericExpressionInput',
     'NumericInput',
-    'InteractiveMap',
-    'MultipleChoiceInput',
+    'PencilCodeEditor',
     'SetInput',
-    'TextInput',
-    'MathEquationInput'
+    'TextInput'
   ];
 
   constructor(
