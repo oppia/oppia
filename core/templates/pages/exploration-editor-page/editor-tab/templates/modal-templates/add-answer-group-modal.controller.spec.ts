@@ -122,9 +122,11 @@ describe('Add Answer Group Modal Controller', function() {
   it('should update tagged misconception', function() {
     expect($scope.tmpTaggedSkillMisconceptionId).toBe(null);
 
-    var misconceptionId = 'mis_1';
-    var skillId = 'skill_1';
-    $scope.updateTaggedMisconception(misconceptionId, skillId);
+    var taggedMisconception = {
+      misconceptionId: 'mis_1',
+      skillId: 'skill_1'
+    };
+    $scope.updateTaggedMisconception(taggedMisconception);
 
     expect($scope.tmpTaggedSkillMisconceptionId).toBe('skill_1-mis_1');
   });
