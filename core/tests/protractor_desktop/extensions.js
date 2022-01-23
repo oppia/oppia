@@ -1,4 +1,3 @@
-/* eslint-disable oppia/no-test-blockers */
 // Copyright 2014 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -112,7 +111,7 @@ describe('rich-text components', function() {
 });
 
 
-fdescribe('Interactions', function() {
+describe('Interactions', function() {
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
   var explorationEditorSettingsTab = null;
@@ -127,7 +126,7 @@ fdescribe('Interactions', function() {
     libraryPage = new LibraryPage.LibraryPage();
   });
 
-  fit('should pass their own test suites', async function() {
+  it('should pass their own test suites', async function() {
     await users.createUser('user@interactions.com', 'userInteractions');
     await users.login('user@interactions.com');
     await workflow.createExploration(true);
