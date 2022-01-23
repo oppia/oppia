@@ -34,10 +34,10 @@ import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 export class OutcomeEditorComponent implements OnInit {
   @Input() displayFeedback: boolean;
   @Input() isEditable: boolean;
-  @Input() outcome;
-  @Input() outcomeHasFeedback: boolean = false;
-  @Input() warningsAreSuppressed: boolean;
-  @Input() showMarkAllAudioAsNeedingUpdateModalIfRequired;
+  @Input() outcome: Outcome;
+  @Input() outcomeHasFeedback: boolean;
+  @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired:
+  EventEmitter<string[]> = new EventEmitter();
   @Output() saveDest: EventEmitter<string> = new EventEmitter();
   @Output() saveFeedback: EventEmitter<string> = new EventEmitter();
   @Output() saveCorrectnessLabel: EventEmitter<string> = new EventEmitter();
@@ -105,21 +105,22 @@ export class OutcomeEditorComponent implements OnInit {
     return (this.outcome.feedback._html.length > 10000);
   }
 
-  isSelfLoop(outcome: Outcome): boolean {
-    return (
-      outcome &&
-      outcome.dest === this.stateEditorService.getActiveStateName());
+  isSelfLoop(): boolean {
+    return Boolean (
+      this.outcome &&
+      this.outcome.dest === this.stateEditorService.getActiveStateName());
   }
 
   getCurrentInteractionId(): string {
     return this.stateInteractionIdService.savedMemento;
   }
 
-  isSelfLoopWithNoFeedback(outcome: Outcome): boolean {
-    if (outcome && typeof outcome === 'object' &&
-      outcome.constructor.name === 'Outcome') {
-      return this.isSelfLoop(outcome) &&
-        !outcome.hasNonemptyFeedback();
+  isSelfLoopWithNoFeedback(): boolean {
+    if (this.outcome && typeof this.outcome === 'object' &&
+      this.outcome.constructor.name === 'Outcome') {
+      return Boolean (
+        this.isSelfLoop() &&
+        !this.outcome.hasNonemptyFeedback());
     }
     return false;
   }
@@ -127,13 +128,17 @@ export class OutcomeEditorComponent implements OnInit {
   invalidStateAfterFeedbackSave(): boolean {
     let tmpOutcome = cloneDeep(this.savedOutcome);
     tmpOutcome.feedback = cloneDeep(this.outcome.feedback);
-    return this.isSelfLoopWithNoFeedback(tmpOutcome);
+    return Boolean (
+      tmpOutcome.dest === this.stateEditorService.getActiveStateName() &&
+      !tmpOutcome.hasNonemptyFeedback());
   }
 
   invalidStateAfterDestinationSave(): boolean {
     let tmpOutcome = cloneDeep(this.savedOutcome);
     tmpOutcome.dest = cloneDeep(this.outcome.dest);
-    return this.isSelfLoopWithNoFeedback(tmpOutcome);
+    return Boolean (
+      tmpOutcome.dest === this.stateEditorService.getActiveStateName() &&
+      !tmpOutcome.hasNonemptyFeedback());
   }
 
   openFeedbackEditor(): void {
@@ -169,7 +174,7 @@ export class OutcomeEditorComponent implements OnInit {
     }
     if (fromClickSaveFeedbackButton && contentHasChanged) {
       let contentId = this.savedOutcome.feedback.contentId;
-      this.showMarkAllAudioAsNeedingUpdateModalIfRequired([contentId]);
+      this.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit([contentId]);
     }
     this.saveFeedback.emit(this.savedOutcome);
   }
@@ -178,7 +183,7 @@ export class OutcomeEditorComponent implements OnInit {
     this.stateEditorService.onSaveOutcomeDestDetails.emit();
     this.destinationEditorIsOpen = false;
     this.savedOutcome.dest = cloneDeep(this.outcome.dest);
-    if (!this.isSelfLoop(this.outcome)) {
+    if (!this.isSelfLoop()) {
       this.outcome.refresherExplorationId = null;
     }
     this.savedOutcome.refresherExplorationId = (
@@ -239,4 +244,6 @@ export class OutcomeEditorComponent implements OnInit {
 }
 
 angular.module('oppia').directive('oppiaOutcomeEditor',
-  downgradeComponent({component: OutcomeEditorComponent}));
+downgradeComponent({
+  component: OutcomeEditorComponent
+}) as angular.IDirectiveFactory);

@@ -19,7 +19,7 @@
              [oppiaFocusOn]="newStateNameInputField"
              name="newStateName"
              [(ngModel)]="outcome.newStateName"
-             maxlength="{{ maxLen }}"
+             [attr.maxlength]="maxLen"
              tabindex="0"
              aria-invalid="false" required>
     </span>
@@ -33,14 +33,13 @@
            name="refresherExplorationId" 
            [(ngModel)]="outcome.refresherExplorationId" 
            tabindex="0" 
-           aria-invalid="false" 
-           >
+           aria-invalid="false">
   </div>
   <div class="oppia-id-text" *ngIf="canAddPrerequisiteSkill">
     <b>Prerequisite skill ID (optional):&nbsp;</b>
     <input class="form-control"
            type="text" 
-           name="missingPrerequisiteSkillId" 
+           name="missingPrerequisiteSkillId"
            [(ngModel)]="outcome.missingPrerequisiteSkillId"  
            tabindex="0" 
            aria-invalid="false" 

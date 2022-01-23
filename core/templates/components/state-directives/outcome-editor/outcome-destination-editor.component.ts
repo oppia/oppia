@@ -25,13 +25,15 @@ import { EditorFirstTimeEventsService } from 'pages/exploration-editor-page/serv
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { UserService } from 'services/user.service';
 import { AppConstants } from 'app.constants';
+import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
+import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
   selector: 'oppia-outcome-destination-editor',
   templateUrl: './outcome-destination-editor.component.html'
 })
 export class OutcomeDestinationEditorComponent implements OnInit {
-  @Input() outcome;
+  @Input() outcome: Outcome;
   @Input() outcomeHasFeedback: boolean;
   @Input() addState;
   directiveSubscriptions = new Subscription();
@@ -189,3 +191,7 @@ export class OutcomeDestinationEditorComponent implements OnInit {
     this.directiveSubscriptions.unsubscribe();
   }
 }
+
+angular.module('oppia').directive(
+  'oppiaOutcomeDestinationEditor', downgradeComponent(
+    {component: OutcomeDestinationEditorComponent}));

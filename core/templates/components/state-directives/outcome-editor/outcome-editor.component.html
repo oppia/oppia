@@ -34,17 +34,17 @@
 
       <strong>Oppia tells the learner...</strong>
       <div class="position-relative">
-        <span *ngIf="isSelfLoopWithNoFeedback(outcome) && warningsAreSuppressed">
+        <span *ngIf="isSelfLoopWithNoFeedback()">
           <span class="oppia-confusing-outcome-warning-text">
             <i class="material-icons">&#xE002;</i>
             Please give Oppia something useful to say here.
           </span>
         </span>
-        <span *ngIf="(!isSelfLoopWithNoFeedback(outcome) && !outcome.hasNonemptyFeedback()) || (isSelfLoopWithNoFeedback(outcome) && warningsAreSuppressed)"
+        <span *ngIf="!isSelfLoopWithNoFeedback()"
               class="oppia-nothing-text">
           <em>Nothing</em>
         </span>
-        <span class="oppia-non-empty-feedback-text" *ngIf="outcome.hasNonemptyFeedback()">
+        <span class="oppia-non-empty-feedback-text" *ngIf="this.outcome.hasNonemptyFeedback()">
           <angular-html-bind-wrapper classStr="oppia-rte-editor" [htmlData]="outcome.feedback.html">
           </angular-html-bind-wrapper>
         </span>
@@ -105,10 +105,10 @@
         <strong *ngIf="displayFeedback">And afterwards, directs the learner
         to...</strong>
         <strong *ngIf="!displayFeedback">Oppia directs the learner to...</strong>
-        <span *ngIf="!isSelfLoop(outcome)" class="position-relative">
+        <span *ngIf="!isSelfLoop()" class="position-relative">
           {{ outcome.dest }}
         </span>
-        <span *ngIf="isSelfLoop(outcome)" class="position-relative">
+        <span *ngIf="isSelfLoop()" class="position-relative">
           <span *ngIf="!outcome.refresherExplorationId">(try again)</span>
           <span *ngIf="outcome.refresherExplorationId">
             (try again, with refresher exploration "{{ outcome.refresherExplorationId }}")

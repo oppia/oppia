@@ -116,8 +116,7 @@
                         (save-correctness-label)="$ctrl.getOnSaveAnswerGroupCorrectnessLabelFn()"
                         [outcome]="$ctrl.outcome"
                         [add-state]="$ctrl.addState"
-                        [warnings-are-suppressed]="$ctrl.suppressWarnings()"
-                        [show-mark-all-audio-as-needing-update-modal-if-required]="$ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired">
+                        (show-mark-all-audio-as-needing-update-modal-if-required)="$ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired">
   </oppia-outcome-editor>
   <question-misconception-editor is-editable="$ctrl.isEditable"
                                  ng-if="$ctrl.isInQuestionMode()"
