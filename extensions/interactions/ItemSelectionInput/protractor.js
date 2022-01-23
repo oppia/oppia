@@ -33,8 +33,7 @@ var waitFor = require(
 var customizeInteraction = async function(
     elem, richTextInstructionsArray, maxSelectionAllowed) {
   await objects.IntEditor(
-    elem.all(by.repeater(
-      'customizationArgSpec in customizationArgSpecs track by $index'))
+    elem.all(by.css('.protractor-test-multiple-options'))
       .filter(async function(elem, index) {
         var text = await elem.getText();
         return text === 'Maximum number of selections permitted';

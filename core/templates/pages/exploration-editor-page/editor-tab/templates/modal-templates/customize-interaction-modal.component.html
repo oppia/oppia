@@ -34,7 +34,7 @@
   </div>
   
   <div *ngIf="!isinteractionOpen && stateInteractionIdService.displayed && hasCustomizationArgs" class="interaction-editor-form protractor-test-interaction-editor">
-    <div *ngFor="let customizationArgSpec of customizationArgSpecs; index as index;">
+    <div class="protractor-test-multiple-options" *ngFor="let customizationArgSpec of customizationArgSpecs">
       <div *ngIf="customizationArgSpec.schema.type !== 'bool'" class="oppia-interaction-customization-label">{{customizationArgSpec.description}}</div>
       <schema-based-editor [ngClass]="{'boolean-checkbox': customizationArgSpec.schema.type === 'bool'}"
                            [schema]="getSchemaCallback(customizationArgSpec.schema)"
