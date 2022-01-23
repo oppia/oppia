@@ -94,7 +94,7 @@ ignore-imports=yes
 
 disable=abstract-method,
         bad-super-call,
-        super-with-arguments
+        super-with-arguments,
         ungrouped-imports,
         arguments-differ,
         broad-except,
