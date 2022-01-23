@@ -35,7 +35,7 @@ export class OutcomeEditorComponent implements OnInit {
   @Input() displayFeedback: boolean;
   @Input() isEditable: boolean;
   @Input() outcome;
-  @Input() outcomeHasFeedback: boolean;
+  @Input() outcomeHasFeedback: boolean = false;
   @Input() warningsAreSuppressed: boolean;
   @Input() showMarkAllAudioAsNeedingUpdateModalIfRequired;
   @Output() saveDest: EventEmitter<string> = new EventEmitter();
@@ -43,8 +43,8 @@ export class OutcomeEditorComponent implements OnInit {
   @Output() saveCorrectnessLabel: EventEmitter<string> = new EventEmitter();
   directiveSubscriptions = new Subscription();
   ENABLE_PREREQUISITE_SKILLS = AppConstants.ENABLE_PREREQUISITE_SKILLS;
-  canAddPrerequisiteSkill;
-  feedbackEditorIsOpen;
+  canAddPrerequisiteSkill: boolean;
+  feedbackEditorIsOpen: boolean;
   editOutcomeForm;
   destinationEditorIsOpen;
   correctnessLabelEditorIsOpen;
@@ -105,7 +105,7 @@ export class OutcomeEditorComponent implements OnInit {
     return (this.outcome.feedback._html.length > 10000);
   }
 
-  isSelfLoop(outcome: {dest: string}): boolean {
+  isSelfLoop(outcome: Outcome): boolean {
     return (
       outcome &&
       outcome.dest === this.stateEditorService.getActiveStateName());

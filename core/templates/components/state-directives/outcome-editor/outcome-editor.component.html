@@ -34,17 +34,17 @@
 
       <strong>Oppia tells the learner...</strong>
       <div class="position-relative">
-        <span *ngIf="isSelfLoopWithNoFeedback(outcome) && !areWarningsSuppressed">
+        <span *ngIf="isSelfLoopWithNoFeedback(outcome) && warningsAreSuppressed">
           <span class="oppia-confusing-outcome-warning-text">
             <i class="material-icons">&#xE002;</i>
             Please give Oppia something useful to say here.
           </span>
         </span>
-        <span *ngIf="(!isSelfLoopWithNoFeedback(outcome) && || (isSelfLoopWithNoFeedback(outcome) && areWarningsSuppressed)"
+        <span *ngIf="(!isSelfLoopWithNoFeedback(outcome) && !outcome.hasNonemptyFeedback()) || (isSelfLoopWithNoFeedback(outcome) && warningsAreSuppressed)"
               class="oppia-nothing-text">
           <em>Nothing</em>
         </span>
-        <span class="oppia-non-empty-feedback-text">
+        <span class="oppia-non-empty-feedback-text" *ngIf="outcome.hasNonemptyFeedback()">
           <angular-html-bind-wrapper classStr="oppia-rte-editor" [htmlData]="outcome.feedback.html">
           </angular-html-bind-wrapper>
         </span>
@@ -68,7 +68,7 @@
   </div>
 
   <div class="oppia-rule-save-cancel-buttons">
-    <div class="float-right">
+    <div class="modal-footer">
       <button type="button"
               class="btn btn-secondary"
               (click)="cancelThisFeedbackEdit()">
