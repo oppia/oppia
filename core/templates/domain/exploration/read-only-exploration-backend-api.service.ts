@@ -83,7 +83,8 @@ export class ReadOnlyExplorationBackendApiService {
     return this._explorationCache.hasOwnProperty(explorationId);
   }
 
-  private _getExplorationUrl(explorationId: string, version: number): string {
+  private _getExplorationUrl(explorationId: string, version: number | null):
+    string {
     if (version) {
       return this.urlInterpolationService.interpolateUrl(
         AppConstants.EXPLORATION_VERSION_DATA_URL_TEMPLATE, {
