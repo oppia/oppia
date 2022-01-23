@@ -11,23 +11,11 @@
         class="oppia-page-heading" align="center">
       <span *ngIf="!collectionPlaythrough?.hasStartedCollection()"
             class="oppia-collection-player-title-font">
-            {{ 'I18N_COLLECTION_PLAYER_PAGE_BEGIN' | translate }}
-        <span *ngIf="!isHackyCollectionTitleTranslationDisplayed()">
-          {{ collection.getTitle() }}:
-        </span>
-        <span *ngIf="isHackyCollectionTitleTranslationDisplayed()">
-          {{ collectionTitleTranslationKey | translate }}:
-        </span>
+            {{ 'I18N_COLLECTION_PLAYER_PAGE_BEGIN' | translate }} {{ collection.getTitle() }}:
       </span>
       <span *ngIf="collectionPlaythrough?.hasStartedCollection()"
             class="oppia-collection-player-title-font">
-            {{ 'I18N_COLLECTION_PLAYER_PAGE_CONTINUE' | translate }}
-        <span *ngIf="!isHackyCollectionTitleTranslationDisplayed()">
-          {{ collection.getTitle() }}:
-        </span>
-        <span *ngIf="isHackyCollectionTitleTranslationDisplayed()">
-          {{ collectionTitleTranslationKey | translate }}:
-        </span>
+            {{ 'I18N_COLLECTION_PLAYER_PAGE_CONTINUE' | translate }} {{ collection.getTitle() }}:
       </span>
     </h2>
     <h2 *ngIf="collectionPlaythrough?.hasFinishedCollection()"
@@ -79,12 +67,7 @@
          [href]="getExplorationUrl(node?.getExplorationId())"
          [ngStyle]="{position: 'absolute', left: pathIconParameters[index].left, top: pathIconParameters[index].top}">
         <div [ngStyle]="{width: '160px',position: 'absolute',left: getExplorationTitlePosition(index),color: '#006553','font-family': 'Capriola, Roboto, Arial,sans-serif','font-size': '15px',bottom: '65%'}">
-          <span *ngIf="!isHackyExplTitleTranslationDisplayed(index)">
             {{ node.getExplorationTitle() }}
-          </span>
-          <span *ngIf="isHackyExplTitleTranslationDisplayed(index)">
-            {{ explTitleTranslationKeys[index] | translate }}
-          </span>
         </div>
 
         <svg class="oppia-collection-exploration protractor-test-collection-exploration"

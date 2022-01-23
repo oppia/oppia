@@ -14,23 +14,13 @@
         <img class="collection-corner-image" [src]="getStaticImageUrl('/general/collection_corner.svg')" alt="">
         <img class="thumbnail-image" [src]="getCompleteThumbnailIconUrl()" alt="{{ getCategory }}">
         <h3 class="activity-title protractor-test-collection-summary-tile-title">
-          <span *ngIf="!isHackyCollectionTitleTranslationDisplayed()">
-            {{ getCollectionTitle || defaultEmptyTitle }}
-          </span>
-          <span *ngIf="isHackyCollectionTitleTranslationDisplayed()">
-            {{ collectionTitleTranslationKey | translate }}
-          </span>
+          {{ getCollectionTitle || defaultEmptyTitle }}
         </h3>
       </div>
 
       <div [ngStyle]="isPlaylistTile && {'float': 'right', 'width': '67%', 'margin-top': '3%'}">
         <div class="objective">
-          <span *ngIf="getObjective && !isHackyCollectionTitleTranslationDisplayed()">
-            {{ getObjective | truncateAndCapitalize: 95 }}
-          </span>
-          <span *ngIf="getObjective && isHackyCollectionTitleTranslationDisplayed()">
-            {{ objectiveTranslationKey | translate | truncateAndCapitalize: 95 }}
-          </span>
+          {{ getObjective | truncateAndCapitalize: 95 }}
           <span *ngIf="!getObjective">No objective specified.</span>
         </div>
         <ul class="metrics layout-align-space-between-center layout-row">

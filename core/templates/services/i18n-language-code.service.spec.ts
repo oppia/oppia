@@ -130,16 +130,6 @@ describe('I18nLanguageCodeService', () => {
     expect(translationKey).toBe('I18N_EXPLORATION_abc1234_DESCRIPTION');
   });
 
-  it('should get collection translation key correctly', () => {
-    translationKey = i18nLanguageCodeService.getCollectionTranslationKey(
-      'abc1234', TranslationKeyType.TITLE);
-    expect(translationKey).toBe('I18N_COLLECTION_abc1234_TITLE');
-
-    translationKey = i18nLanguageCodeService.getCollectionTranslationKey(
-      'abc1234', TranslationKeyType.DESCRIPTION);
-    expect(translationKey).toBe('I18N_COLLECTION_abc1234_DESCRIPTION');
-  });
-
   it('should get event emitter for loading of preferred language codes', () => {
     let mockPreferredLanguageCodesLoadedEventEmitter = new EventEmitter();
     expect(i18nLanguageCodeService.onPreferredLanguageCodesLoaded).toEqual(

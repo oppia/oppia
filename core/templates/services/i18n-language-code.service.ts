@@ -147,20 +147,6 @@ export class I18nLanguageCodeService {
 
   // TODO(#14645): Remove this method when translation service is extended.
   /**
-   * Takes collection id and entity translationKey type as input, generates
-   * and returns the translation key based on that.
-   * @param {string} collectionId - Unique id of the collection, used to
-   * generate translation key.
-   * @param {TranslationKeyType} keyType - either Title or Description.
-   * @returns {string} - translation key for the collection name/description.
-   */
-  getCollectionTranslationKey(
-      collectionId: string, keyType: TranslationKeyType): string {
-    return `I18N_COLLECTION_${collectionId}_${keyType}`;
-  }
-
-  // TODO(#14645): Remove this method when translation service is extended.
-  /**
    * Checks if the translation key is valid by checking if it is present
    * in the constants file which indicates it has atleast the translation
    * key added in en.json file.

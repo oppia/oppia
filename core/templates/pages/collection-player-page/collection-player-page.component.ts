@@ -32,7 +32,6 @@ import { AppConstants } from 'app.constants';
 import { Collection } from 'domain/collection/collection.model';
 import { CollectionPlayerBackendApiService } from './services/collection-player-backend-api.service';
 import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
-import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
 
 export interface IconParametersArray {
   thumbnailIconUrl: string;
@@ -92,9 +91,6 @@ export class CollectionPlayerPageComponent implements OnInit {
   isLoggedIn: boolean = false;
   explorationCardIsShown: boolean = false;
   elementToScrollTo: string;
-  collectionNodes: CollectionNode[] = [];
-  collectionTitleTranslationKey: string;
-  explTitleTranslationKeys: string[] = [];
 
   constructor(
     private guestCollectionProgressService: GuestCollectionProgressService,
@@ -108,7 +104,6 @@ export class CollectionPlayerPageComponent implements OnInit {
     private userService: UserService,
     private collectionPlayerBackendApiService:
       CollectionPlayerBackendApiService,
-    private i18nLanguageCodeService: I18nLanguageCodeService
   ) {}
 
   getStaticImageUrl(imagePath: string): string {
@@ -309,22 +304,6 @@ export class CollectionPlayerPageComponent implements OnInit {
     }
   }
 
-  isHackyExplTitleTranslationDisplayed(index: number): boolean {
-    return (
-      this.i18nLanguageCodeService.isHackyTranslationAvailable(
-        this.explTitleTranslationKeys[index]) &&
-        !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
-    );
-  }
-
-  isHackyCollectionTitleTranslationDisplayed(): boolean {
-    return (
-      this.i18nLanguageCodeService.isHackyTranslationAvailable(
-        this.collectionTitleTranslationKey) &&
-        !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
-    );
-  }
-
   ngOnInit(): void {
     this.loaderService.showLoadingScreen('Loading');
     this.collection = null;
@@ -392,23 +371,6 @@ export class CollectionPlayerPageComponent implements OnInit {
           }
           this.nextExplorationId =
             this.collectionPlaythrough.getNextExplorationId();
-
-          this.collectionTitleTranslationKey = (
-            this.i18nLanguageCodeService.getCollectionTranslationKey(
-              this.collectionId, TranslationKeyType.TITLE
-            )
-          );
-
-          this.collectionNodes = collection.getCollectionNodes();
-
-          for (let idx in this.collectionNodes) {
-            this.explTitleTranslationKeys.push(
-              this.i18nLanguageCodeService.getExplorationTranslationKey(
-                this.collectionNodes[idx].getExplorationId(),
-                TranslationKeyType.TITLE
-              )
-            );
-          }
         });
       },
       () => {

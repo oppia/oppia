@@ -33,7 +33,6 @@ import { DateTimeFormatService } from 'services/date-time-format.service';
 import { UserInfo } from 'domain/user/user-info.model';
 import { UserService } from 'services/user.service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 
@@ -71,7 +70,6 @@ describe('Collection Summary Tile Component', () => {
   let urlInterpolationService: UrlInterpolationService;
   let urlService: MockUrlService;
   let windowDimensionsService: MockWindowDimensionsService;
-  let i18nLanguageCodeService: I18nLanguageCodeService;
 
   let userInfo: UserInfo = new UserInfo(
     ['USER_ROLE'], true, false, false, false, true,
@@ -118,7 +116,6 @@ describe('Collection Summary Tile Component', () => {
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     urlService = TestBed.inject(UrlService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
-    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     component.getCollectionId = '1';
     component.getCollectionTitle = 'Title';
     component.getLastUpdatedMsec = 1000;
@@ -142,9 +139,6 @@ describe('Collection Summary Tile Component', () => {
     const windowResizeSpy = spyOn(
       windowDimensionsService, 'getResizeEvent').and.callThrough();
     component.mobileCutoffPx = 536;
-    spyOn(i18nLanguageCodeService, 'getCollectionTranslationKey')
-      .and.returnValues(
-        'I18N_COLLECTION_123ab_TITLE', 'I18N_COLLECTION_123ab_DESCRIPTION');
 
     component.ngOnInit();
     tick();
@@ -152,10 +146,6 @@ describe('Collection Summary Tile Component', () => {
 
     expect(component.defaultEmptyTitle).toBe('Untitled');
     expect(component.activityTypeCollection).toBe('collection');
-    expect(component.collectionTitleTranslationKey).toBe(
-      'I18N_COLLECTION_123ab_TITLE');
-    expect(component.objectiveTranslationKey).toBe(
-      'I18N_COLLECTION_123ab_DESCRIPTION');
     expect(userServiceSpy).toHaveBeenCalled();
     expect(windowResizeSpy).toHaveBeenCalled();
     expect(component.resizeSubscription).not.toBe(undefined);
@@ -172,31 +162,6 @@ describe('Collection Summary Tile Component', () => {
       tick();
       fixture.detectChanges();
       expect(component.resizeSubscription.closed).toBe(true);
-    }));
-
-  it('should check whether hacky translations are displayed or not'
-    , fakeAsync(() => {
-      const userServiceSpy = spyOn(
-        userService, 'getUserInfoAsync')
-        .and.returnValue(Promise.resolve(userInfo));
-      const windowResizeSpy = spyOn(
-        windowDimensionsService, 'getResizeEvent').and.callThrough();
-      spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
-        .and.returnValues(false, true);
-      spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
-        .and.returnValues(false, false);
-
-      component.ngOnInit();
-      tick();
-
-      expect(userServiceSpy).toHaveBeenCalled();
-      expect(windowResizeSpy).toHaveBeenCalled();
-      let hackyTranslationIsDisplayed =
-        component.isHackyCollectionTitleTranslationDisplayed();
-      expect(hackyTranslationIsDisplayed).toBe(false);
-      hackyTranslationIsDisplayed =
-        component.isHackyObjectiveTranslationDisplayed();
-      expect(hackyTranslationIsDisplayed).toBe(true);
     }));
 
   it('should set mobileCutoffPx to 0 if it is not ' +

@@ -27,7 +27,6 @@ import { UserService } from 'services/user.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { UrlService } from 'services/contextual/url.service';
 import { Subscription } from 'rxjs';
-import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'oppia-collection-summary-tile',
@@ -62,8 +61,6 @@ export class CollectionSummaryTileComponent implements OnInit, OnDestroy {
   // getLastUpdatedMsecs received after component interactions
   // is empty or does not exist.
   relativeLastUpdatedDateTime: string | null = null;
-  collectionTitleTranslationKey!: string;
-  objectiveTranslationKey!: string;
 
   constructor(
     private dateTimeFormatService: DateTimeFormatService,
@@ -71,7 +68,6 @@ export class CollectionSummaryTileComponent implements OnInit, OnDestroy {
     private urlInterpolationService: UrlInterpolationService,
     private windowDimensionsService: WindowDimensionsService,
     private urlService: UrlService,
-    private i18nLanguageCodeService: I18nLanguageCodeService
   ) {}
 
   ngOnInit(): void {
@@ -89,14 +85,6 @@ export class CollectionSummaryTileComponent implements OnInit, OnDestroy {
         this.checkIfMobileCardToBeShown();
       });
     this.relativeLastUpdatedDateTime = this.getRelativeLastUpdatedDateTime();
-    this.collectionTitleTranslationKey = (
-      this.i18nLanguageCodeService.getCollectionTranslationKey(
-        this.getCollectionId, TranslationKeyType.TITLE)
-    );
-    this.objectiveTranslationKey = (
-      this.i18nLanguageCodeService.getCollectionTranslationKey(
-        this.getCollectionId, TranslationKeyType.DESCRIPTION)
-    );
   }
 
   ngOnDestroy(): void {
@@ -150,22 +138,6 @@ export class CollectionSummaryTileComponent implements OnInit, OnDestroy {
 
   setHoverState(hoverState: boolean): void {
     this.collectionIsCurrentlyHoveredOver = hoverState;
-  }
-
-  isHackyCollectionTitleTranslationDisplayed(): boolean {
-    return (
-      this.i18nLanguageCodeService.isHackyTranslationAvailable(
-        this.collectionTitleTranslationKey) &&
-        !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
-    );
-  }
-
-  isHackyObjectiveTranslationDisplayed(): boolean {
-    return (
-      this.i18nLanguageCodeService.isHackyTranslationAvailable(
-        this.objectiveTranslationKey) &&
-        !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
-    );
   }
 }
 
