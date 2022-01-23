@@ -93,8 +93,8 @@ describe('StorySummaryTileComponent', () => {
     expect(component.storyTitleTranslationKey).toEqual(undefined);
     spyOn(i18nLanguageCodeService, 'getStoryTranslationKey')
       .and.returnValue('I18N_STORY_storyId_TITLE');
-    spyOn(i18nLanguageCodeService, 'getStoryNodeTranslationKey')
-      .and.returnValue('I18N_STORYNODE_storyId_node_1_TITLE');
+    spyOn(i18nLanguageCodeService, 'getExplorationTranslationKey')
+      .and.returnValue('I18N_EXPLORATION_explId_TITLE');
     spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
       .and.returnValues(false, true);
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
@@ -110,7 +110,7 @@ describe('StorySummaryTileComponent', () => {
     expect(component.storyTitleTranslationKey).toEqual(
       'I18N_STORY_storyId_TITLE');
     expect(component.nodeTitlesTranslationKeys).toEqual(
-      ['I18N_STORYNODE_storyId_node_1_TITLE']);
+      ['I18N_EXPLORATION_explId_TITLE']);
     // Translation is only displayed if the language is not English
     // and it's hacky translation is available.
     let hackyStoryTitleTranslationIsDisplayed =

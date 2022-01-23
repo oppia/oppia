@@ -183,14 +183,13 @@ export class StoryViewerPageComponent implements OnInit {
           let storyNode: ReadOnlyStoryNode = this.storyNodes[idx];
           let storyNodeTitleTranslationKey = (
             this.i18nLanguageCodeService.
-              getStoryNodeTranslationKey(
-                this.storyId, storyNode.getId(), TranslationKeyType.TITLE)
+              getExplorationTranslationKey(
+                storyNode.getExplorationId(), TranslationKeyType.TITLE)
           );
           let storyNodeDescTranslationKey = (
             this.i18nLanguageCodeService.
-              getStoryNodeTranslationKey(
-                this.storyId, storyNode.getId(),
-                TranslationKeyType.DESCRIPTION)
+              getExplorationTranslationKey(
+                storyNode.getExplorationId(), TranslationKeyType.DESCRIPTION)
           );
           this.storyNodesTitleTranslationKeys.push(
             storyNodeTitleTranslationKey);

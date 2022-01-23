@@ -226,9 +226,8 @@ export class StorySummaryTileComponent implements OnInit {
     for (let idx in this.storySummary.getAllNodes()) {
       let storyNode: StoryNode = this.storySummary.getAllNodes()[idx];
       let storyNodeTranslationKey = this.i18nLanguageCodeService.
-        getStoryNodeTranslationKey(
-          this.storySummary.getId(), storyNode.getId(),
-          TranslationKeyType.TITLE);
+        getExplorationTranslationKey(
+          storyNode.getExplorationId() as string, TranslationKeyType.TITLE);
       this.nodeTitlesTranslationKeys.push(storyNodeTranslationKey);
     }
     this.getStoryStatus();

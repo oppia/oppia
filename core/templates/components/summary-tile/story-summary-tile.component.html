@@ -110,7 +110,12 @@
           </div>
           <div class="chapter-text">
             <a [href]="getChapterUrl(title)" rel="noopener" target="_blank">
-              <span dir="auto">{{ title }}</span>
+              <span dir="auto" *ngIf="!isHackyNodeTitleTranslationDisplayed(idx)">
+                {{ title }}
+              </span>
+              <span dir="auto" *ngIf="isHackyNodeTitleTranslationDisplayed(idx)">
+                {{ nodeTitlesTranslationKeys[idx] | translate }}
+              </span>
             </a>
           </div>
         </div>
