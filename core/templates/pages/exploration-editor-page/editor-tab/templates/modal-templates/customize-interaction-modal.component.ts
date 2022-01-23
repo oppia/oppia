@@ -404,7 +404,11 @@ export class CustomizeInteractionModalComponent
   }
 
   ngOnInit(): void {
-    this.isinteractionOpen = true;
+    if (this.stateInteractionIdService.displayed) {
+      this.isinteractionOpen = false;
+    } else {
+      this.isinteractionOpen = true;
+    }
     this.originalContentIdToContent = {};
     if (this.stateInteractionIdService.savedMemento) {
       this.originalContentIdToContent = this.getContentIdToContent();
