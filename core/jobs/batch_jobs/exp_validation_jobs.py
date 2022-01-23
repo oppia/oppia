@@ -18,13 +18,17 @@
 
 from __future__ import annotations
 
+from core.constants import constants
 from core.jobs import base_jobs
 from core.jobs import job_utils
 from core.jobs.io import ndb_io
+from core.jobs.transforms import job_result_transforms
 from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
+
+import result
 
 (exp_models, ) = models.Registry.import_models(
     [models.NAMES.exploration])
@@ -37,31 +41,26 @@ class GetNumberOfExpRightsWithDuplicateUsersJob(base_jobs.JobBase):
     def run(
         self
     ) -> beam.PCollection[job_run_result.JobRunResult]:
+        exp_rights_ids_to_exp_rights = (
+            self.pipeline
+            | 'Get every exploration rights model' >> (
+                ndb_io.GetModels(exp_models.ExplorationRightsModel.query()))
+            | 'Get exploration rights from model' >> beam.Map(
+                exp_fetchers.get_activity_rights_from_model, constants.ACTIVITY_TYPE_EXPLORATION)
+            | 'Combine exploration and ids' >> beam.Map(
+                lambda exp_rights: (exp_rights.id, exp_rights))
+        )
+
         return (
             self.pipeline
             | 'Get every Exploration Rights Model' >> (
-                ndb_io.GetModels(exp_models.ExplorationRightsModel.query()))
+                lambda: exp_rights_ids_to_exp_rights)
             | 'Get list of users with exploration rights' >> (
-                beam.Map(lambda model: (
-                    self.get_property_value(model, 'owner_ids') + 
-                    self.get_property_value(model, 'editor_ids') + 
-                    self.get_property_value(model, 'voice_artist_ids') + 
-                    self.get_property_value(model, 'viewer_ids')
+                beam.Map(lambda id, rights: (
+                    id, rights.owner_ids + rights.editor_ids + 
+                    rights.voice_artist_ids + rights.viewer_ids
                 )))
             | 'Find Exploration Rights Models with duplicate users' >> (
-                beam.Filter(lambda users: len(users) != len(set(users))))
-            | 'Map to 1s' >> beam.Map(lambda lst: 1)
-            | 'Get total number of models' >> beam.CombineGlobally(sum)
-            | 'Report total' >> beam.Map(job_run_result.JobRunResult.as_stdout)
+                beam.Filter(lambda id, users: len(users) != len(set(users))))
+            | 'Report total' >> beam.Map(job_result_transforms.ResultsToJobRunResults())
         )
-
-    def get_property_value(self, model, property_name):
-        """Returns value of the given property of model
-
-        Args:
-            model: datastore_services.Model. Entity to validate.
-
-        Returns:
-            value. The value of the property of model.
-        """
-        return job_utils.get_model_property(model, property_name)
