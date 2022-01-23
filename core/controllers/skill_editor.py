@@ -282,6 +282,14 @@ class SkillDataHandler(base.BaseHandler):
 class FetchSkillsHandler(base.BaseHandler):
     """A handler for accessing all skills data."""
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {},
+        'GET': {},
+        'DELETE': {},
+        'POST': {}
+    }
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.open_access
