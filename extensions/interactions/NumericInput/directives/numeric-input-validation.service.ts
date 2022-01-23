@@ -206,6 +206,28 @@ export class NumericInputValidationService {
     return warningsList;
   }
   // Returns 'undefined' when no error occurs.
+  getError(value: string): string | undefined {
+    value = value.toString().trim();
+    const trailingDot = /\.\d/g;
+    const twoDecimals = /.*\..*\./g;
+    const trailingMinus = /^-/g;
+    const extraMinus = /-.*-/g;
+    const extraExponent = /e.*e/g;
+
+    if (value.includes('.') && !value.match(trailingDot)) {
+      return 'Trailing decimals are not allowed.';
+    } else if (value.match(twoDecimals)) {
+      return 'At most 1 decimal point should be present.';
+    } else if (value.includes('-') && !value.match(trailingMinus)) {
+      return 'Minus (-) sign is only allowed in beginning.';
+    } else if (value.includes('-') && value.match(extraMinus)) {
+      return 'At most 1 minus (-) sign should be present.';
+    } else if (value.includes('e') && value.match(extraExponent)) {
+      return 'At most 1 exponent sign (e) should be present.';
+    }
+  }
+
+  // Returns 'undefined' when no error occurs.
   getErrorString(
       value: number, customizationArgs: boolean, radix?: string
   ): string | undefined {

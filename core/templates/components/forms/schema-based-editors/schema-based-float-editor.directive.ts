@@ -118,18 +118,26 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
             if (ctrl.localStringValue === '') {
               ctrl.localValue = null;
             } else {
-              // Exploration Player.
-              if (ContextService.getPageContext() === 'learner') {
-                ctrl.localValue = ContentTranslationLanguageService
-                  .convertToEnglishDecimal(ctrl.localStringValue);
-              } else { // All other players.
-                ctrl.localValue = I18nLanguageCodeService
-                  .convertToEnglishDecimal(ctrl.localStringValue);
+              // Make sure number is in a correct format.
+              let error = NumericInputValidationService
+                .getError(ctrl.localStringValue);
+              if (error !== undefined) {
+                ctrl.localValue = null;
+                ctrl.errorString = error;
+              } else { // Parse number if the string is in proper format.
+                // Exploration Player.
+                if (ContextService.getPageContext() === 'learner') {
+                  ctrl.localValue = ContentTranslationLanguageService
+                    .convertToEnglishDecimal(ctrl.localStringValue);
+                } else { // All other players.
+                  ctrl.localValue = I18nLanguageCodeService
+                    .convertToEnglishDecimal(ctrl.localStringValue);
+                }
+
+                // Generate errors (if any).
+                ctrl.generateErrors();
               }
             }
-
-            // Generate errors (if any).
-            ctrl.generateErrors();
           };
 
           // TODO(sll): Move these to ng-messages when we move to Angular 1.3.
