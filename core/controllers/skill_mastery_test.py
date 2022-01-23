@@ -15,6 +15,7 @@
 """Tests for the Question Player controller."""
 
 from __future__ import annotations
+
 import json
 
 from core import feconf
