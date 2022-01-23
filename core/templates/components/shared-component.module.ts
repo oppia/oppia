@@ -102,6 +102,7 @@ import { SupplementalCardComponent } from 'pages/exploration-player-page/learner
 import { SavePendingChangesModalComponent } from './save-pending-changes/save-pending-changes-modal.component';
 import { AddHintModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-hint-modal.component';
 import { SmoothHeightAnimatorComponent } from './smooth-height/smooth-height-animator.component';
+import { QuestionMisconceptionSelectorComponent } from './question-directives/question-misconception-selector/question-misconception-selector.component';
 import { ConversationSkinComponent } from 'pages/exploration-player-page/learner-experience/conversation-skin.component';
 import { RatingsAndRecommendationsComponent } from 'pages/exploration-player-page/learner-experience/ratings-and-recommendations.component';
 import { LearnerAnswerInfoCard } from 'pages/exploration-player-page/learner-experience/learner-answer-info-card.component';
@@ -117,6 +118,8 @@ import { StateHintsEditorComponent } from 'components/state-editor/state-hints-e
 import { ReviewMaterialEditorComponent } from './review-material-editor/review-material-editor.component';
 import { ConfirmLeaveModalComponent } from 'pages/exploration-editor-page/modal-templates/confirm-leave-modal.component';
 import { CustomizeInteractionModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/customize-interaction-modal.component';
+import { TagMisconceptionModalComponent } from './question-directives/question-misconception-editor/tag-misconception-modal-component';
+import { QuestionMisconceptionEditorComponent } from './question-directives/question-misconception-editor/question-misconception-editor.component';
 import { SolutionExplanationEditor } from './state-directives/solution-editor/solution-explanation-editor.component';
 import { SolutionEditor } from './state-directives/solution-editor/solution-editor.component';
 
@@ -245,6 +248,8 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     SortByPipe,
     LearnerDashboardIconsComponent,
     PreviewThumbnailComponent,
+    AddHintModalComponent,
+    QuestionMisconceptionSelectorComponent,
     QuestionsOpportunitiesSelectDifficultyModalComponent,
     QuestionsListSelectSkillAndDifficultyModalComponent,
     DeleteInteractionModalComponent,
@@ -256,6 +261,8 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     ReviewMaterialEditorComponent,
     ConfirmLeaveModalComponent,
     CustomizeInteractionModalComponent,
+    TagMisconceptionModalComponent,
+    QuestionMisconceptionEditorComponent,
     SolutionEditor,
     SolutionExplanationEditor,
   ],
@@ -332,6 +339,8 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     LearnerDashboardIconsComponent,
     PreviewThumbnailComponent,
+    AddHintModalComponent,
+    QuestionMisconceptionSelectorComponent,
     QuestionsOpportunitiesSelectDifficultyModalComponent,
     QuestionsListSelectSkillAndDifficultyModalComponent,
     DeleteInteractionModalComponent,
@@ -343,6 +352,8 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     ReviewMaterialEditorComponent,
     ConfirmLeaveModalComponent,
     CustomizeInteractionModalComponent,
+    TagMisconceptionModalComponent,
+    QuestionMisconceptionEditorComponent,
     SolutionEditor,
     SolutionExplanationEditor
   ],
@@ -436,6 +447,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     SortByPipe,
     SavePendingChangesModalComponent,
     LearnerDashboardIconsComponent,
+    QuestionMisconceptionSelectorComponent,
     QuestionsOpportunitiesSelectDifficultyModalComponent,
     QuestionsListSelectSkillAndDifficultyModalComponent,
     DeleteInteractionModalComponent,
@@ -445,6 +457,8 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     ReviewMaterialEditorComponent,
     ConfirmLeaveModalComponent,
     CustomizeInteractionModalComponent,
+    TagMisconceptionModalComponent,
+    QuestionMisconceptionEditorComponent,
     SolutionEditor,
     SolutionExplanationEditor
   ],
