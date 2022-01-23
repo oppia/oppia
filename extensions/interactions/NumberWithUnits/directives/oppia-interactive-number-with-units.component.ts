@@ -42,9 +42,9 @@ export class InteractiveNumberWithUnitsComponent
   @Input() savedSolution: InteractionAnswer;
   componentSubscriptions: Subscription = new Subscription();
   FORM_ERROR_TYPE: string = 'NUMBER_WITH_UNITS_FORMAT_ERROR';
-  errorMessage: string;
-  answer: string;
-  isValid: boolean;
+  errorMessage: string = '';
+  answer: string = '';
+  isValid: boolean = true;
   answerChanged: Subject<string> = new Subject<string>();
   NUMBER_WITH_UNITS_FORM_SCHEMA = {
     type: 'unicode',
