@@ -86,13 +86,13 @@
              (mouseenter)="setActiveGroup(idx)"
              (mouseleave)="clearActiveGroup()">
           <div class="oppia-library-group-header-container">
-            <h2 [ngClass]="{'active': activeGroupIndex === idx}" class="oppia-library-group-header">
+            <h2 [ngClass]="{'active': !libraryWindowIsNarrow && activeGroupIndex === idx}" class="oppia-library-group-header">
               <a *ngIf="group.has_full_results_page"
                  class="protractor-test-library-{{group.protractor_id}}"
                  (click)="showFullResultsPage(group.categories, group.full_results_url)"
                  tabindex="0">
                 <span [translate]="group.header_i18n_id"></span>
-                <span *ngIf="activeGroupIndex === idx"><i class="material-icons md-32">&#xE315;</i></span>
+                <span *ngIf="!libraryWindowIsNarrow && activeGroupIndex === idx"><i class="material-icons md-32">&#xE315;</i></span>
               </a>
               <span *ngIf="!group.has_full_results_page" [translate]="group.header_i18n_id">
               </span>
@@ -155,55 +155,47 @@
             </div>
           </div>
 
-          <div *ngIf="libraryWindowIsNarrow && leftmostCardIndices">
-            <button mat-button class="md-no-ink oppia-library-carousel-scroller"
-                    (click)="decrementLeftmostCardIndex(idx)"
-                    [hidden]="leftmostCardIndices[idx] == 0"
-                    aria-hidden="true">
-              <i class="material-icons">&#xE314;</i>
-            </button>
-            <div class="oppia-library-carousel-scroller" *ngIf="leftmostCardIndices[idx] == 0"></div>
-
-            <div class="oppia-library-carousel"
-                 (swiperight)="decrementLeftmostCardIndex(idx)"
-                 (swipeleft)="incrementLeftmostCardIndex(idx)">
-              <div class="oppia-library-carousel-tiles">
-                <oppia-collection-summary-tile *ngIf="group.activity_summary_dicts[leftmostCardIndices[idx]].activity_type == 'collection'"
-                                               [getCollectionId]="group.activity_summary_dicts[leftmostCardIndices[idx]].id"
-                                               [getCollectionTitle]="group.activity_summary_dicts[leftmostCardIndices[idx]].title"
-                                               [getLastUpdatedMsec]="group.activity_summary_dicts[leftmostCardIndices[idx]].last_updated_msec"
-                                               [getObjective]="group.activity_summary_dicts[leftmostCardIndices[idx]].objective"
-                                               [getNodeCount]="group.activity_summary_dicts[leftmostCardIndices[idx]].node_count"
-                                               [getCategory]="group.activity_summary_dicts[leftmostCardIndices[idx]].category"
-                                               [getThumbnailIconUrl]="group.activity_summary_dicts[leftmostCardIndices[idx]].thumbnail_icon_url"
-                                               [getThumbnailBgColor]="group.activity_summary_dicts[leftmostCardIndices[idx]].thumbnail_bg_color"
-                                               [showLearnerDashboardIconsIfPossible]="true"
-                                               [isContainerNarrow]="true">
-                </oppia-collection-summary-tile>
-                <oppia-exploration-summary-tile *ngIf="group.activity_summary_dicts[leftmostCardIndices[idx]].activity_type == 'exploration'"
-                                                [explorationId]="group.activity_summary_dicts[leftmostCardIndices[idx]].id"
-                                                [explorationTitle]="group.activity_summary_dicts[leftmostCardIndices[idx]].title"
-                                                [lastUpdatedMsec]="group.activity_summary_dicts[leftmostCardIndices[idx]].last_updated_msec"
-                                                [objective]="group.activity_summary_dicts[leftmostCardIndices[idx]].objective"
-                                                [category]="group.activity_summary_dicts[leftmostCardIndices[idx]].category"
-                                                [ratings]="group.activity_summary_dicts[leftmostCardIndices[idx]].ratings"
-                                                [numViews]="group.activity_summary_dicts[leftmostCardIndices[idx]].num_views"
-                                                [thumbnailIconUrl]="group.activity_summary_dicts[leftmostCardIndices[idx]].thumbnail_icon_url"
-                                                [thumbnailBgColor]="group.activity_summary_dicts[leftmostCardIndices[idx]].thumbnail_bg_color"
-                                                class="protractor-test-exp-summary-tile"
-                                                [showLearnerDashboardIconsIfPossible]="true"
-                                                [isContainerNarrow]="true">
-                </oppia-exploration-summary-tile>
-              </div>
+          <div class="oppia-mobile-activity-cards-container"
+               [ngClass]="{'limit-cards-shown': mobileLibraryGroupsProperties[idx].inCollapsedState}"
+               *ngIf="libraryWindowIsNarrow && leftmostCardIndices">
+            <div class="oppia-library-mobile-tile" *ngFor="let activity of group.activity_summary_dicts">
+              <oppia-collection-summary-tile *ngIf="activity.activity_type == 'collection'"
+                                             [getCollectionId]="activity.id"
+                                             [getCollectionTitle]="activity.title"
+                                             [getLastUpdatedMsec]="activity.last_updated_msec"
+                                             [getObjective]="activity.objective"
+                                             [getNodeCount]="activity.node_count"
+                                             [getCategory]="activity.category"
+                                             [getThumbnailIconUrl]="activity.thumbnail_icon_url"
+                                             [getThumbnailBgColor]="activity.thumbnail_bg_color"
+                                             [showLearnerDashboardIconsIfPossible]="true"
+                                             [isContainerNarrow]="true"
+                                             [mobileCutoffPx]="537">
+              </oppia-collection-summary-tile>
+              <oppia-exploration-summary-tile *ngIf="activity.activity_type == 'exploration'"
+                                              [explorationId]="activity.id"
+                                              [explorationTitle]="activity.title"
+                                              [lastUpdatedMsec]="activity.last_updated_msec"
+                                              [objective]="activity.objective"
+                                              [category]="activity.category"
+                                              [ratings]="activity.ratings"
+                                              [numViews]="activity.num_views"
+                                              [thumbnailIconUrl]="activity.thumbnail_icon_url"
+                                              [thumbnailBgColor]="activity.thumbnail_bg_color"
+                                              class="protractor-test-exp-summary-tile"
+                                              [showLearnerDashboardIconsIfPossible]="true"
+                                              [isContainerNarrow]="true"
+                                              [mobileCutoffPx]="537">
+              </oppia-exploration-summary-tile>
             </div>
-
-            <button mat-button class="md-no-ink oppia-library-carousel-scroller"
-                    (click)="incrementLeftmostCardIndex(idx)"
-                    [hidden]="(group.activity_summary_dicts?.length - tileDisplayCount) <= leftmostCardIndices[idx]">
-              <i class="material-icons">&#xE315;</i>
-            </button>
-            <div class="oppia-library-carousel-scroller"
-                 *ngIf="(group.activity_summary_dicts?.length - tileDisplayCount) <= leftmostCardIndices[idx]">
+          </div>
+          <div class="height-toggle-btn-container">
+            <div class="button-alignment-div">
+              <button class="card-container-height-toggle-btn"
+                      *ngIf="libraryWindowIsNarrow && group.activity_summary_dicts.length > 3"
+                      (click)="toggleCardContainerHeightInMobileView(idx)">
+                {{ mobileLibraryGroupsProperties[idx].buttonText }}
+              </button>
             </div>
           </div>
         </div>

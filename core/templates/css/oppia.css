@@ -532,6 +532,15 @@ p:last-child {
 .open > a {
   outline: 0;
 }
+
+.mobile-activity-summary-card a {
+  display: flex;
+  height: 100%;
+  justify-content: space-evenly;
+  padding-left: 10px;
+  width: 100%;
+}
+
 .oppia-share-dropdown-menu li > a {
   font-weight: bolder;
   padding: 10px;
@@ -3729,6 +3738,49 @@ oppia-noninteractive-link {
 .oppia-activity-summary-tile.oppia-dashboard-collection-tile {
   margin-left: 7.5px;
   margin-right: 7.5px;
+}
+
+.mobile-activity-summary-card {
+  height: 85px;
+  margin-bottom: 13px;
+  width: 350px;
+}
+
+.mobile-activity-card-details {
+  display: flex;
+  flex-direction: column;
+  padding: 15px 15px 15px 15px;
+  width: 270px;
+}
+
+.mobile-activity-card-details h3 {
+  font-size: 1em;
+  margin-bottom: auto;
+  margin-top: 0;
+}
+
+.mobile-activity-card-summary-section {
+  align-self: flex-end;
+  color: black;
+  width: 100%;
+}
+
+.mobile-activity-card-summary-elements {
+  align-items: flex-end;
+  display: flex;
+  margin-bottom: -5px;
+  padding-left: 0;
+  width: 100%;
+}
+
+.bullet-separator {
+  font-size: 10px;
+  margin: -3px 13px 0 16px;
+  opacity: 30%;
+}
+
+.mobile-activity-card-summary-elements li::marker {
+  color: transparent;
 }
 
 @media(max-width: 815px) {
