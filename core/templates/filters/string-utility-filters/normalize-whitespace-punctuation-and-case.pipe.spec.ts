@@ -33,13 +33,17 @@ describe('Testing NormalizeWhitespacePunctuationAndCasePipe', () => {
         expect(nwpcp).not.toEqual(null);
     });
 
-    it('should capitalize first letter and truncate string at a word break',
+    it('should normalize spaces and turn characters to lower case',
     () => {
-    // The first word always appears in the result.
+
       expect(nwpcp.transform('  remove '))
         .toEqual('remove');
+      
+      //Should remove the space if it does not
+      //separate two alphanumeric strings
       expect(nwpcp.transform('  remove ? '))
         .toEqual('remove?');
+      
       expect(nwpcp.transform(' teSTstrinG12  '))
         .toEqual('teststring12');
       expect(nwpcp.transform('tesT1\n teSt2'))
