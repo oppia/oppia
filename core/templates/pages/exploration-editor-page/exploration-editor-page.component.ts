@@ -67,7 +67,7 @@ require(
   'pages/exploration-editor-page/translation-tab/translation-tab.component.ts');
 require(
   'pages/exploration-player-page/learner-experience/' +
-  'conversation-skin.directive.ts');
+  'conversation-skin.component.ts');
 require(
   'pages/exploration-player-page/layout-directives/' +
   'exploration-footer.component.ts');
@@ -156,11 +156,12 @@ require('services/ngb-modal.service.ts');
 require('components/on-screen-keyboard/on-screen-keyboard.component');
 import { Subscription } from 'rxjs';
 import { WelcomeModalComponent } from './modal-templates/welcome-modal.component';
+import { HelpModalComponent } from './modal-templates/help-modal.component';
 
 angular.module('oppia').component('explorationEditorPage', {
   template: require('./exploration-editor-page.component.html'),
   controller: [
-    '$q', '$rootScope', '$scope', '$uibModal', 'AlertsService',
+    '$q', '$rootScope', '$scope', 'AlertsService',
     'AutosaveInfoModalsService', 'BottomNavbarStatusService',
     'ChangeListService', 'ContextService',
     'EditabilityService', 'ExplorationAutomaticTextToSpeechService',
@@ -185,7 +186,7 @@ angular.module('oppia').component('explorationEditorPage', {
     'UserEmailPreferencesService', 'UserExplorationPermissionsService',
     'UserService', 'WindowDimensionsService',
     function(
-        $q, $rootScope, $scope, $uibModal, AlertsService,
+        $q, $rootScope, $scope, AlertsService,
         AutosaveInfoModalsService, BottomNavbarStatusService,
         ChangeListService, ContextService,
         EditabilityService, ExplorationAutomaticTextToSpeechService,
@@ -478,12 +479,8 @@ angular.module('oppia').component('explorationEditorPage', {
         SiteAnalyticsService.registerClickHelpButtonEvent(explorationId);
         var EDITOR_TUTORIAL_MODE = 'editor';
         var TRANSLATION_TUTORIAL_MODE = 'translation';
-        $uibModal.open({
-          template: require(
-            'pages/exploration-editor-page/modal-templates/' +
-              'help-modal.template.html'),
+        NgbModal.open(HelpModalComponent, {
           backdrop: true,
-          controller: 'HelpModalController',
           windowClass: 'oppia-help-modal'
         }).result.then(mode => {
           if (mode === EDITOR_TUTORIAL_MODE) {
@@ -491,6 +488,7 @@ angular.module('oppia').component('explorationEditorPage', {
           } else if (mode === TRANSLATION_TUTORIAL_MODE) {
             StateTutorialFirstTimeService.onOpenTranslationTutorial.emit();
           }
+          $rootScope.$applyAsync();
         }, () => {
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.
