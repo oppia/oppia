@@ -18,17 +18,18 @@
 
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import cloneDeep from 'lodash/cloneDeep';
+import { Subscription } from 'rxjs';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { StateCustomizationArgsService } from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
 import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
-import { InteractionAnswer } from 'interactions/answer-defs';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
-import { Subscription } from 'rxjs';
 import { ContextService } from 'services/context.service';
 import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
+import { AppConstants } from 'app.constants';
 
 interface HtmlFormSchema {
   type: 'html';
@@ -36,11 +37,11 @@ interface HtmlFormSchema {
 }
 
 interface SolutionInterface {
-  'answerIsExclusive': boolean,
-  'correctAnswer': string,
-  'explanationHtml': string,
-  'explanationContentId': string,
-  'explanation'?: string,
+  'answerIsExclusive': boolean;
+  'correctAnswer': string;
+  'explanationHtml': string;
+  'explanationContentId': string;
+  'explanation'?: string;
 }
 
 @Component({
@@ -54,19 +55,21 @@ export class AddOrUpdateSolutionModalComponent
   data: SolutionInterface;
   tempAnsOption: string;
   isSubmitButtonDisabled: boolean;
-  COMPONENT_NAME_SOLUTION: string;
+  COMPONENT_NAME_SOLUTION: string = (
+    AppConstants.COMPONENT_NAME_SOLUTION);
   correctAnswerEditorHtml;
+  EMPTY_SOLUTION_DATA;
   savedMemento;
-  EMPTY_SOLUTION_DATA: object;
+  solutionType;
   SOLUTION_EDITOR_FOCUS_LABEL: string = (
     'currentCorrectAnswerEditorHtmlForSolutionEditor');
   EXPLANATION_FORM_SCHEMA: HtmlFormSchema = {
     type: 'html',
-      ui_config: {
-        hide_complex_extensions: (
-          this.contextService.getEntityType() === 'question')
-        }
+    ui_config: {
+      hide_complex_extensions: (
+        this.contextService.getEntityType() === 'question')
     }
+  };
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
@@ -78,7 +81,6 @@ export class AddOrUpdateSolutionModalComponent
     private stateCustomizationArgsService: StateCustomizationArgsService,
     private stateInteractionIdService: StateInteractionIdService,
     private stateSolutionService: StateSolutionService
-
   ) {
     super(ngbActiveModal);
   }
@@ -94,28 +96,30 @@ export class AddOrUpdateSolutionModalComponent
   }
 
   isSolutionExplanationLengthExceeded(
-    solExplanation: string): boolean {
-      return Boolean(solExplanation.length > 3000);
+      solExplanation: string): boolean {
+    // TODO(#13764): Edit this check after appropriate limits are found.
+    return Boolean(solExplanation.length > 3000);
   }
 
+  // Remove this function once the schema based editor
+  // is migrated to Angular 8+.
   getSchema(): HtmlFormSchema {
     return this.EXPLANATION_FORM_SCHEMA;
   }
 
-  onAnswerChange(): void {
-    if(this.tempAnsOption === 'The only'){
+  onAnswerChange($event: string): void {
+    if ($event === 'The only') {
       this.data.answerIsExclusive = true;
-    }
-    else{
+    } else {
       this.data.answerIsExclusive = false;
     }
   }
 
   updateLocalHtml($event: string): void {
-    if(this.data.explanationHtml !== $event){
+    if (this.data.explanationHtml !== $event) {
       this.data.explanationHtml = $event;
+      this.changeDetectorRef.detectChanges();
     }
-    this.changeDetectorRef.detectChanges();
   }
 
   saveSolution(): void {
@@ -135,48 +139,39 @@ export class AddOrUpdateSolutionModalComponent
   }
 
   ngOnInit(): void {
-    this.savedMemento = () => {
-      return this.stateSolutionService.savedMemento?.correctAnswer;
-    }
+    this.solutionType = this.stateSolutionService.savedMemento;
+    this.savedMemento = (
+      this.stateSolutionService.savedMemento?.correctAnswer);
     this.correctAnswerEditorHtml = (
       this.explorationHtmlFormatterService.getInteractionHtml(
         this.stateInteractionIdService.savedMemento,
         this.stateCustomizationArgsService.savedMemento,
         false,
         this.SOLUTION_EDITOR_FOCUS_LABEL,
-        this.savedMemento() ? 'savedMemento()' : null)
-      )
+        this.savedMemento ? 'savedMemento()' : null)
+    );
     this.answerIsValid = false;
-    if(this.stateSolutionService.savedMemento){
-      this.data.answerIsExclusive = (
-        this.stateSolutionService.savedMemento.answerIsExclusive);
-      this.data.correctAnswer = null;
-      this.data.explanationHtml = (
-        this.stateSolutionService.savedMemento.explanation.html);
-      this.data.explanationContentId = (
-        this.stateSolutionService.savedMemento.explanation.contentId);
-    }
-    else {
-      this.data.answerIsExclusive = false;
-      this.data.correctAnswer = null;
-      this.data.explanationHtml = '';
-      this.data.explanationContentId = this.COMPONENT_NAME_SOLUTION;
-    
-    }
+    this.EMPTY_SOLUTION_DATA = {
+      answerIsExclusive: false,
+      correctAnswer: null,
+      explanationHtml: '',
+      explanationContentId: this.COMPONENT_NAME_SOLUTION
+    };
+    this.data = this.solutionType ? {
+      answerIsExclusive: (
+        this.stateSolutionService.savedMemento.answerIsExclusive),
+      correctAnswer: null,
+      explanationHtml: (
+        this.stateSolutionService.savedMemento.explanation.html),
+      explanationContentId: (
+        this.stateSolutionService.savedMemento.explanation
+          .contentId)
+    } : cloneDeep(this.EMPTY_SOLUTION_DATA);
     this.isSubmitButtonDisabled = (
       this.currentInteractionService.isSubmitButtonDisabled());
     this.currentInteractionService.setOnSubmitFn((answer) => {
       this.data.correctAnswer = answer;
-    })
-    this.directiveSubscriptions.add(
-      this.currentInteractionService.onAnswerChanged$.subscribe(() => {
-       this.changeDetectorRef.detectChanges();
-      })
-    );
-  }
-
-  ngOnDestroy(): void {
-    this.directiveSubscriptions.unsubscribe();
+    });
   }
 }
 

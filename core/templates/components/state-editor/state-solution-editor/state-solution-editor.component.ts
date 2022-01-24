@@ -172,6 +172,9 @@ angular.module('oppia').component('stateSolutionEditor', {
                 INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION, 4000);
             }
           }
+          // TODO(#8521): Remove the use of $rootScope.$apply()
+          // once the controller is migrated to angular.
+          $rootScope.$applyAsync();
         }, function() {
           AlertsService.clearWarnings();
         });
@@ -189,6 +192,8 @@ angular.module('oppia').component('stateSolutionEditor', {
           ctrl.onSaveSolution(StateSolutionService.displayed);
           StateEditorService.deleteCurrentSolutionValidity();
           ctrl.refreshWarnings()();
+          // TODO(#8521): Remove the use of $rootScope.$apply()
+          // once the controller is migrated to angular.
           $rootScope.$applyAsync();
         }, function() {
           AlertsService.clearWarnings();
