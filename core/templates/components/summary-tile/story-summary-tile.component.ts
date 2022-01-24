@@ -236,16 +236,16 @@ export class StorySummaryTileComponent implements OnInit {
   isHackyStoryTitleTranslationDisplayed(): boolean {
     return (
       this.i18nLanguageCodeService.isHackyTranslationAvailable(
-        this.storyTitleTranslationKey) &&
-        !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+        this.storyTitleTranslationKey
+      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
     );
   }
 
   isHackyNodeTitleTranslationDisplayed(index: number): boolean {
     return (
       this.i18nLanguageCodeService.isHackyTranslationAvailable(
-        this.nodeTitlesTranslationKeys[index]) &&
-        !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+        this.nodeTitlesTranslationKeys[index]
+      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
     );
   }
 }

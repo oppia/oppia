@@ -54,16 +54,16 @@ export class StoriesListComponent implements OnInit {
   isHackyTopicNameTranslationDisplayed(): boolean {
     return (
       this.i18nLanguageCodeService.isHackyTranslationAvailable(
-        this.topicNameTranslationKey) &&
-        !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+        this.topicNameTranslationKey
+      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
     );
   }
 
   isHackyTopicDescTranslationDisplayed(): boolean {
     return (
       this.i18nLanguageCodeService.isHackyTranslationAvailable(
-        this.topicDescTranslationKey) &&
-        !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+        this.topicDescTranslationKey
+      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
     );
   }
 

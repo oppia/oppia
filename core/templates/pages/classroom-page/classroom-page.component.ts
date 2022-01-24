@@ -101,13 +101,13 @@ export class ClassroomPageComponent {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  // Used for choosing from classroom name or topic translation key to be
-  // displayed in the classroom name html block.
+  // This method is used to choose whether to display the classroom name or
+  // the classroom name translation in the UI.
   isHackyClassroomTranslationDisplayed(): boolean {
     return (
       this.i18nLanguageCodeService.isHackyTranslationAvailable(
-        this.classroomNameTranslationKey) &&
-        !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+        this.classroomNameTranslationKey
+      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
     );
   }
 }

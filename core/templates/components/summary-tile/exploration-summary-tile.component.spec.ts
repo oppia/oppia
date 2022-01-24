@@ -242,9 +242,9 @@ describe('Exploration Summary Tile Component', () => {
     expect(component.activityType).toBe('exploration');
     expect(component.isRefresherExploration).toBe(true);
     expect(component.isWindowLarge).toBe(true);
-    expect(component.explTitleTranslationKey).toBe(
+    expect(component.expTitleTranslationKey).toBe(
       'I18N_EXPLORATION_123ab_TITLE');
-    expect(component.objectiveTranslationKey).toBe(
+    expect(component.expObjectiveTranslationKey).toBe(
       'I18N_EXPLORATION_123ab_DESCRIPTION');
 
     expect(userServiceSpy).toHaveBeenCalled();
@@ -274,10 +274,10 @@ describe('Exploration Summary Tile Component', () => {
       expect(windowResizeSpy).toHaveBeenCalled();
       expect(windowWidthSpy).toHaveBeenCalled();
       let hackyTranslationIsDisplayed =
-        component.isHackyExplTitleTranslationDisplayed();
+        component.isHackyExpTitleTranslationDisplayed();
       expect(hackyTranslationIsDisplayed).toBe(false);
       hackyTranslationIsDisplayed =
-        component.isHackyObjectiveTranslationDisplayed();
+        component.isHackyExpObjectiveTranslationDisplayed();
       expect(hackyTranslationIsDisplayed).toBe(true);
     }));
 

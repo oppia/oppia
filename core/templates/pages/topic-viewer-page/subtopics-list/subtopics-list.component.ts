@@ -47,8 +47,8 @@ export class SubtopicsListComponent implements OnInit {
   isHackyTopicNameTranslationDisplayed(): boolean {
     return (
       this.i18nLanguageCodeService.isHackyTranslationAvailable(
-        this.topicNameTranslationKey) &&
-        !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+        this.topicNameTranslationKey
+      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
     );
   }
 }

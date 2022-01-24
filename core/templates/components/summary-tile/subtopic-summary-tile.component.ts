@@ -87,8 +87,8 @@ export class SubtopicSummaryTileComponent implements OnInit {
   isHackySubtopicTitleTranslationDisplayed(): boolean {
     return (
       this.i18nLanguageCodeService.isHackyTranslationAvailable(
-        this.subtopicTitleTranslationKey) &&
-        !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+        this.subtopicTitleTranslationKey
+      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
     );
   }
 }

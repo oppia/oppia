@@ -214,32 +214,32 @@ export class StoryViewerPageComponent implements OnInit {
   isHackyStoryTitleTranslationDisplayed(): boolean {
     return (
       this.i18nLanguageCodeService.isHackyTranslationAvailable(
-        this.storyTitleTranslationKey) &&
-        !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+        this.storyTitleTranslationKey
+      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
     );
   }
 
   isHackyStoryDescTranslationDisplayed(): boolean {
     return (
       this.i18nLanguageCodeService.isHackyTranslationAvailable(
-        this.storyDescTranslationKey) &&
-        !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+        this.storyDescTranslationKey
+      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
     );
   }
 
   isHackyStoryNodeTitleTranslationDisplayed(index: number): boolean {
     return (
       this.i18nLanguageCodeService.isHackyTranslationAvailable(
-        this.storyNodesTitleTranslationKeys[index]) &&
-        !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+        this.storyNodesTitleTranslationKeys[index]
+      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
     );
   }
 
   isHackyStoryNodeDescTranslationDisplayed(index: number): boolean {
     return (
       this.i18nLanguageCodeService.isHackyTranslationAvailable(
-        this.storyNodesDescTranslationKeys[index]) &&
-        !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+        this.storyNodesDescTranslationKeys[index]
+      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
     );
   }
 }

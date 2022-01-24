@@ -120,8 +120,8 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
   isHackySubtopicTitleTranslationDisplayed(): boolean {
     return (
       this.i18nLanguageCodeService.isHackyTranslationAvailable(
-        this.subtopicTitleTranslationKey) &&
-        !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+        this.subtopicTitleTranslationKey
+      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
     );
   }
 }

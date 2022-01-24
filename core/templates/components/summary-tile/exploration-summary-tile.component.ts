@@ -86,8 +86,8 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   avgRating!: number | null;
   thumbnailIcon!: string;
   mobileCardToBeShown: boolean = false;
-  explTitleTranslationKey!: string;
-  objectiveTranslationKey!: string;
+  expTitleTranslationKey!: string;
+  expObjectiveTranslationKey!: string;
 
   constructor(
     private ratingComputationService: RatingComputationService,
@@ -141,11 +141,11 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
     this.relativeLastUpdatedDateTime = this.getRelativeLastUpdatedDateTime();
     this.avgRating = this.getAverageRating();
     this.thumbnailIcon = this.getCompleteThumbnailIconUrl();
-    this.explTitleTranslationKey = (
+    this.expTitleTranslationKey = (
       this.i18nLanguageCodeService.getExplorationTranslationKey(
         this.explorationId, TranslationKeyType.TITLE)
     );
-    this.objectiveTranslationKey = (
+    this.expObjectiveTranslationKey = (
       this.i18nLanguageCodeService.getExplorationTranslationKey(
         this.explorationId, TranslationKeyType.DESCRIPTION)
     );
@@ -250,19 +250,19 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
       this.thumbnailIconUrl);
   }
 
-  isHackyExplTitleTranslationDisplayed(): boolean {
+  isHackyExpTitleTranslationDisplayed(): boolean {
     return (
       this.i18nLanguageCodeService.isHackyTranslationAvailable(
-        this.explTitleTranslationKey) &&
-        !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+        this.expTitleTranslationKey
+      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
     );
   }
 
-  isHackyObjectiveTranslationDisplayed(): boolean {
+  isHackyExpObjectiveTranslationDisplayed(): boolean {
     return (
       this.i18nLanguageCodeService.isHackyTranslationAvailable(
-        this.objectiveTranslationKey) &&
-        !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+        this.expObjectiveTranslationKey
+      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
     );
   }
 }

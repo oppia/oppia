@@ -148,12 +148,12 @@ export class I18nLanguageCodeService {
   // TODO(#14645): Remove this method when translation service is extended.
   /**
    * Checks if the translation key is valid by checking if it is present
-   * in the constants file which indicates it has atleast the translation
-   * key added in en.json file.
-   * @param {string} translationKey - Translation key that needs to be
-   * checked whether is has translation in language json files.
-   * @returns {boolean} - True if translation key is present in language json
-   * files else False.
+   * in the constants file which indicates that the translation key is
+   * present in the language JSON file.
+   * @param {string} translationKey - The translation key whose existence in
+   * the language JSON file needs to be checked.
+   * @returns {boolean} - Whether the given translation key is present
+   * in the language JSON files.
    */
   isHackyTranslationAvailable(translationKey: string): boolean {
     return (
