@@ -287,11 +287,10 @@ export class CollectionPlayerPageComponent implements OnInit {
       collectionId
     ).then((collectionSummary) => {
       summary = collectionSummary;
+      if (summary) {
+        this.collectionSummary = summary.summaries[0];
+      }
     });
-
-    if (summary) {
-      this.collectionSummary = summary.summaries[0];
-    }
   }
 
   updateCollection(collection: Collection): void {
