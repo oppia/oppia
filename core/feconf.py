@@ -31,7 +31,9 @@ from typing_extensions import TypedDict
 # This TypedDict is used intentionally so that the type checker can have
 # any of the following keys ommited.
 class ValidCmdAttributeSpecsAttributeDictNotTotal(TypedDict, total=False):
-    """Dictionary representing the optional ValidCmdAttributeSpecsDict object."""
+    """Dictionary representing the 
+    optional ValidCmdAttributeSpecsDict object."""
+
     allowed_values: Dict[str, List[str]]
     deprecated_values: Dict[str, List[str]]
 
@@ -41,6 +43,7 @@ class ValidCmdAttributeSpecsAttributeDicts(
     total=False
 ):
     """Dictionary representign the required ValidCmdAttributeDict object."""
+    
     name: str
     required_attribute_names: List[str]
     optional_attribute_names: List[str]
