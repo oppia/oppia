@@ -372,7 +372,7 @@ var ExplorationEditorMainTab = function() {
 
         // Save feedback.
         await action.click(
-          'saveOutcomeFeedbackButton', saveOutcomeFeedbackButton, true);
+          'saveOutcomeFeedbackButton', saveOutcomeFeedbackButton);
       },
       // This saves the rule after the destination is selected.
       //  - destinationName: The name of the state to move to, or null to stay
