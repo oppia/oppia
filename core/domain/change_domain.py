@@ -23,10 +23,21 @@ import copy
 from core import feconf
 from core import utils
 
-from typing import Dict
+from typing import Any, Dict, List
+
+from core.platform import models  # pylint: disable=invalid-import-from # isort:skip
+
+# TODO(#14537): Refactor this file and remove imports marked
+# with 'invalid-import-from'.
+
+(base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 
-def validate_cmd(cmd_name, valid_cmd_attribute_specs, actual_cmd_attributes):
+def validate_cmd(
+    cmd_name: str,
+    valid_cmd_attribute_specs: Dict[str, Any],
+    actual_cmd_attributes: Dict[str, str]
+) -> None:
     """Validates that the attributes of a command contain all the required
     attributes and some/all of optional attributes. It also checks that
     the values of attributes belong to a set of allowed values if any.
@@ -108,13 +119,13 @@ class BaseChange:
     # dict with key as attribute name and value as deprecated values
     # for the attribute.
     # This list can be overriden by subclasses, if needed.
-    ALLOWED_COMMANDS = []
+    ALLOWED_COMMANDS: List[Dict[str, Any]] = []
 
     # The list of deprecated commands of a change domain object. Each item
     # is a command that has been deprecated but these commands are yet to be
     # removed from the server data. Thus, once these commands are removed using
     # a migration job, we can remove the command from this list.
-    DEPRECATED_COMMANDS = []
+    DEPRECATED_COMMANDS: List[str] = []
 
     # This is a list of common commands which is valid for all subclasses.
     # This should not be overriden by subclasses.
@@ -223,7 +234,9 @@ class BaseChange:
 
         return base_change_dict
 
-    def __getattr__(self, name: str) -> str:
+    # Here we use Any, because we don't know what exactly will getattr
+    # return, as change_domain can have a differing structure.
+    def __getattr__(self, name: str) -> Any:
         # AttributeError needs to be thrown in order to make
         # instances of this class picklable.
         try:
