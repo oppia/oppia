@@ -95,6 +95,7 @@ angular.module('oppia').controller('CreateNewChapterModalController', [
           $scope.invalidExpErrorString = (
             'The given exploration already exists in the story.');
           $scope.invalidExpId = true;
+          $scope.$applyAsync();
           return;
         }
       }
