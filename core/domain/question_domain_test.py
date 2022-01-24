@@ -528,6 +528,33 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             self.question.question_state_data.to_dict()
         )
 
+    def test_android_proto_size_calculation_is_correct(self):
+        """Test proto size calculation function."""
+        question_id = 'col1.random'
+        skill_ids = ['test_skill2']
+        question = question_domain.Question.create_default_question(
+            question_id, skill_ids)
+
+        self.assertEqual(question.android_proto_size_in_bytes, 45)
+
+        new_skill_ids = ['test_skill1', 'test_skill2']
+        question.linked_skill_ids = new_skill_ids
+        self.assertEqual(question.android_proto_size_in_bytes, 58)
+
+    def test_android_proto_conversion_is_correct(self):
+        """Test question proto is correct."""
+        question_id = 'col1.random'
+        skill_ids = ['test_skill1', 'test_skill2']
+        question = question_domain.Question.create_default_question(
+            question_id, skill_ids)
+        question_proto = question.to_android_question_proto()
+
+        self.assertEqual(question_proto.id, 'col1.random')
+        self.assertEqual(
+            question_proto.content_version, feconf.CURRENT_STATE_SCHEMA_VERSION)
+        self.assertEqual(
+            question_proto.linked_skill_ids, skill_ids)
+
 
 class QuestionSummaryTest(test_utils.GenericTestBase):
     """Test for Question Summary object."""
