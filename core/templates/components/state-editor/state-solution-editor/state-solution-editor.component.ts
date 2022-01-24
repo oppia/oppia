@@ -137,6 +137,14 @@ angular.module('oppia').component('stateSolutionEditor', {
           ].is_linear);
       };
 
+      $scope.saveSolution = function(value) {
+        ctrl.onSaveSolution(value);
+      };
+
+      $scope.openMarkAllAudioAsNeedingUpdateModalIfRequired = function(value) {
+        ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired(value);
+      };
+
       $scope.openAddOrUpdateSolutionModal = function() {
         AlertsService.clearWarnings();
         ExternalSaveService.onExternalSave.emit();
