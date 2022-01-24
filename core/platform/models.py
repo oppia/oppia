@@ -77,7 +77,7 @@ class Platform:
 
     @classmethod
     def import_models(
-            cls, unused_model_names: List[Names]
+        cls, unused_model_names: List[Names]
     ) -> Tuple[ModuleType, ...]:
         """An abstract method that should be implemented on inherited
         classes.
