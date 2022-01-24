@@ -27,8 +27,20 @@ from core.constants import constants
 from typing import Dict, List, Union
 from typing_extensions import TypedDict
 
-CommandType = (
-    Dict[str, Union[str, List[str], Dict[str, Union[str, List[str]]]]])
+# This TypedDict is used intentionally so that the type checker can have
+# any of the following keys ommited.
+class ValidCmdAttributeSpecsAttributeDictNotTotal(TypedDict, total=False):
+    allowed_values: Dict[str, List[str]]
+    deprecated_values: Dict[str, List[str]]
+
+class ValidCmdAttributeSpecsAttributeDicts(
+    ValidCmdAttributeSpecsAttributeDictNotTotal, 
+    total=False
+):
+    name: str
+    required_attribute_names: List[str]
+    optional_attribute_names: List[str]
+    user_id_attribute_names: List[str]
 
 # The datastore model ID for the list of featured activity references. This
 # value should not be changed.
@@ -1313,7 +1325,7 @@ ALLOWED_ACTIVITY_STATUS = [
     constants.ACTIVITY_STATUS_PRIVATE, constants.ACTIVITY_STATUS_PUBLIC]
 
 # Commands allowed in CollectionRightsChange and ExplorationRightsChange.
-COMMON_RIGHTS_ALLOWED_COMMANDS: List[CommandType] = [{
+COMMON_RIGHTS_ALLOWED_COMMANDS: List[ValidCmdAttributeSpecsAttributeDicts] = [{
     'name': CMD_CREATE_NEW,
     'required_attribute_names': [],
     'optional_attribute_names': [],
@@ -1355,7 +1367,7 @@ COMMON_RIGHTS_ALLOWED_COMMANDS: List[CommandType] = [{
     'user_id_attribute_names': []
 }]
 
-COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS: List[CommandType] = copy.deepcopy(
+COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS: List[ValidCmdAttributeSpecsAttributeDicts] = copy.deepcopy(
     COMMON_RIGHTS_ALLOWED_COMMANDS
 )
 COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS.append({
@@ -1398,7 +1410,7 @@ ROLE_MANAGER = 'manager'
 ALLOWED_TOPIC_ROLES = [ROLE_NONE, ROLE_MANAGER]
 
 # Commands allowed in TopicRightsChange.
-TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS: List[CommandType] = [{
+TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS: List[ValidCmdAttributeSpecsAttributeDicts] = [{
     'name': CMD_CREATE_NEW,
     'required_attribute_names': [],
     'optional_attribute_names': [],

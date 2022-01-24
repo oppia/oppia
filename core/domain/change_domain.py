@@ -35,7 +35,7 @@ from core.platform import models  # pylint: disable=invalid-import-from # isort:
 
 def validate_cmd(
     cmd_name: str,
-    valid_cmd_attribute_specs: Dict[str, Any],
+    valid_cmd_attribute_specs: feconf.ValidCmdAttributeSpecsAttributeDicts,
     actual_cmd_attributes: Dict[str, str]
 ) -> None:
     """Validates that the attributes of a command contain all the required
@@ -119,7 +119,7 @@ class BaseChange:
     # dict with key as attribute name and value as deprecated values
     # for the attribute.
     # This list can be overriden by subclasses, if needed.
-    ALLOWED_COMMANDS: List[Dict[str, Any]] = []
+    ALLOWED_COMMANDS: List[feconf.ValidCmdAttributeSpecsAttributeDicts] = []
 
     # The list of deprecated commands of a change domain object. Each item
     # is a command that has been deprecated but these commands are yet to be
@@ -129,7 +129,7 @@ class BaseChange:
 
     # This is a list of common commands which is valid for all subclasses.
     # This should not be overriden by subclasses.
-    COMMON_ALLOWED_COMMANDS = [{
+    COMMON_ALLOWED_COMMANDS: List[feconf.ValidCmdAttributeSpecsAttributeDicts] = [{
         'name': feconf.CMD_DELETE_COMMIT,
         'required_attribute_names': [],
         'optional_attribute_names': [],
