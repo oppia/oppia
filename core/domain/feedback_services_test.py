@@ -135,7 +135,7 @@ class FeedbackServicesUnitTests(test_utils.EmailTestBase):
         feedback_models.FeedbackAnalyticsModel(id=self.EXP_1_ID).put()
 
         feedback_services.delete_threads_for_multiple_entities(
-            feconf.ENTITY_TYPE_EXPLORATION,[self.EXP_1_ID])
+            feconf.ENTITY_TYPE_EXPLORATION, [self.EXP_1_ID])
 
         feedback_services.delete_threads_for_multiple_entities(
             feconf.ENTITY_TYPE_EXPLORATION, [])
@@ -392,7 +392,8 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         messages_on_page = feedback_services.get_messages(thread_id)
         dictionary_list_message_on_page_1 = []
         dictionary_list_message_on_page_2 = []
-        method_result=feedback_services.get_next_page_of_all_feedback_messages()
+        method_result = (
+            feedback_services.get_next_page_of_all_feedback_messages())
         for i in (method_result)[0]:
             dictionary_list_message_on_page_1.append(i.to_dict().items())
         for i in messages_on_page:
@@ -405,8 +406,8 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         genral_feedback_result = (
         feedback_models.GeneralFeedbackMessageModel.get_all_messages(
             feconf.FEEDBACK_TAB_PAGE_SIZE, None))
-        self.assertEqual(method_result[1] , genral_feedback_result[1])
-        self.assertEqual(method_result[2] , genral_feedback_result[2])
+        self.assertEqual(method_result[1], genral_feedback_result[1])
+        self.assertEqual(method_result[2], genral_feedback_result[2])
 
     def test_get_multiple_threads(self):
         thread_1 = feedback_services.create_thread(
@@ -415,7 +416,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         thread_2 = feedback_services.create_thread(
             'exploration', self.EXP_ID_2, None,
             self.EXPECTED_THREAD_DICT['subject'], 'not used here')
-        thread_id_list = [thread_1 , thread_2]
+        thread_id_list = [thread_1, thread_2]
         thread_list = []
         thread_list_from_result = []
         for i in thread_id_list:
@@ -423,7 +424,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
                 feedback_services.get_thread(i).to_dict().items())
         for i in feedback_services.get_multiple_threads(thread_id_list):
             thread_list_from_result.append(i.to_dict().items())
-        self.assertListEqual(thread_list_from_result , thread_list)
+        self.assertListEqual(thread_list_from_result, thread_list)
 
     def test_handle_thread_status_changed(self):
         thread_id = feedback_services.create_thread(
@@ -431,18 +432,17 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
             self.EXPECTED_THREAD_DICT['subject'], 'not used here')
         feedback_services.create_message(
             thread_id, self.user_id,
-            feedback_models.STATUS_CHOICES_FIXED , None,
+            feedback_models.STATUS_CHOICES_FIXED, None,
             'feedback message not used here')
         self.assertEqual(feedback_services.get_total_open_threads(
-            [feedback_services.get_thread_analytics(self.EXP_ID_1)]),0)
+            [feedback_services.get_thread_analytics(self.EXP_ID_1)]), 0)
         feedback_services.handle_thread_status_changed(
         self.EXP_ID_1,
         feedback_models.STATUS_CHOICES_FIXED,
         feedback_models.STATUS_CHOICES_OPEN)
         self.assertEqual(feedback_services.get_total_open_threads(
             [feedback_services.get_thread_analytics(self.EXP_ID_1)]
-        ),1)
-
+        ), 1)
 
     def test_get_total_open_threads_for_multiple_explorations(self):
         feedback_services.create_thread(
