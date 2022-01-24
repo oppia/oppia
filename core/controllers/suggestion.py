@@ -18,13 +18,13 @@
 
 from __future__ import annotations
 
-import logging
+import base64
 
 from core import feconf
-from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.controllers import domain_objects_validator
 from core.domain import exp_fetchers
 from core.domain import fs_services
 from core.domain import html_cleaner
@@ -38,32 +38,86 @@ from core.domain import suggestion_services
 class SuggestionHandler(base.BaseHandler):
     """"Handles operations relating to suggestions."""
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'suggestion_type': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': feconf.SUGGESTION_TYPE_CHOICES
+                }
+            },
+            'target_type': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': feconf.SUGGESTION_TARGET_TYPE_CHOICES
+                }
+            },
+            'target_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'target_version_at_submission': {
+                'schema': {
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 1
+                    }]
+                }
+            },
+            'change': {
+               'schema': {
+                   'type': 'object_dict',
+                    'validation_method': (
+                        domain_objects_validator.
+                        validate_suggestion_change
+                    )
+               }
+            },
+            'description': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'files': {
+                'schema': {
+                    'type': 'object_dict',
+                    'validation_method': (
+                        domain_objects_validator.
+                        validate_suggestion_images
+                    )
+                },
+                'default_value': None
+            }
+        }
+    }
+
     @acl_decorators.can_suggest_changes
     def post(self):
         """Handles POST requests."""
-        if (self.payload.get('suggestion_type') ==
+        if (self.normalized_payload.get('suggestion_type') ==
                 feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT):
             raise self.InvalidInputException(
                 'Content suggestion submissions are no longer supported.')
 
-        try:
-            suggestion = suggestion_services.create_suggestion(
-                self.payload.get('suggestion_type'),
-                self.payload.get('target_type'), self.payload.get('target_id'),
-                self.payload.get('target_version_at_submission'),
-                self.user_id, self.payload.get('change'),
-                self.payload.get('description'))
-        except utils.ValidationError as e:
-            raise self.InvalidInputException(e)
+        suggestion = suggestion_services.create_suggestion(
+            self.normalized_payload.get('suggestion_type'),
+            self.normalized_payload.get('target_type'),
+            self.normalized_payload.get('target_id'),
+            self.normalized_payload.get('target_version_at_submission'),
+            self.user_id,
+            self.normalized_payload.get('change'),
+            self.normalized_payload.get('description'))
 
         suggestion_change = suggestion.change
         if (
                 suggestion_change.cmd == 'add_written_translation' and
+                suggestion_change.data_format in
                 (
-                    suggestion_change.data_format ==
                     state_domain.WrittenTranslation
-                    .DATA_FORMAT_SET_OF_NORMALIZED_STRING or
-                    suggestion_change.data_format ==
+                    .DATA_FORMAT_SET_OF_NORMALIZED_STRING,
                     state_domain.WrittenTranslation
                     .DATA_FORMAT_SET_OF_UNICODE_STRING
                 )
@@ -71,10 +125,18 @@ class SuggestionHandler(base.BaseHandler):
             self.render_json(self.values)
             return
 
-        _upload_suggestion_images(
-            self.request,
-            suggestion,
-            suggestion.get_new_image_filenames_added_in_suggestion())
+        # Images for question suggestions are already stored in the server
+        # before actually the question is submitted. Therefore no need of
+        # uploading images when the suggestion type is 'add_question'. But this
+        # is not good, since when the user cancels a question suggestion after
+        # adding an image, there is no method to remove the uploaded image.
+        # See more - https://github.com/oppia/oppia/issues/14298
+        if self.normalized_payload.get(
+            'suggestion_type') != (feconf.SUGGESTION_TYPE_ADD_QUESTION):
+            _upload_suggestion_images(
+                self.normalized_payload.get('files'),
+                suggestion,
+                suggestion.get_new_image_filenames_added_in_suggestion())
 
         self.render_json(self.values)
 
@@ -177,6 +239,18 @@ class SuggestionToSkillActionHandler(base.BaseHandler):
             suggestion_services.accept_suggestion(
                 suggestion_id, self.user_id, 'UNUSED_COMMIT_MESSAGE',
                 self.payload.get('review_message'))
+
+            suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+            target_entity_html_list = (
+                suggestion.get_target_entity_html_strings())
+            target_image_filenames = (
+                html_cleaner.get_image_filenames_from_html_strings(
+                    target_entity_html_list))
+
+            fs_services.copy_images(
+                suggestion.target_type, suggestion.target_id,
+                feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS, suggestion.target_id,
+                target_image_filenames)
         elif action == constants.ACTION_REJECT_SUGGESTION:
             suggestion_services.reject_suggestion(
                 suggestion_id, self.user_id, self.payload.get('review_message'))
@@ -242,6 +316,24 @@ class ReviewableSuggestionsHandler(SuggestionsProviderHandler):
     """Provides all suggestions which can be reviewed by the user for a given
     suggestion type.
     """
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'target_type': {
+            'schema': {
+                'type': 'basestring',
+            },
+            'choices': feconf.SUGGESTION_TARGET_TYPE_CHOICES
+        },
+        'suggestion_type': {
+            'schema': {
+                'type': 'basestring',
+            },
+            'choices': feconf.SUGGESTION_TYPE_CHOICES
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.can_view_reviewable_suggestions
     def get(self, target_type, suggestion_type):
@@ -388,20 +480,10 @@ class UpdateQuestionSuggestionHandler(base.BaseHandler):
             self.payload.get('question_state_data'))
         question_state_data_obj.validate(None, False)
 
-        updated_suggestion = suggestion_services.update_question_suggestion(
+        suggestion_services.update_question_suggestion(
             suggestion_id,
             self.payload.get('skill_difficulty'),
             self.payload.get('question_state_data'))
-
-        new_image_filenames = (
-            utils.compute_list_difference(
-                updated_suggestion
-                    .get_new_image_filenames_added_in_suggestion(),
-                suggestion.get_new_image_filenames_added_in_suggestion()
-            )
-        )
-        _upload_suggestion_images(
-            self.request, updated_suggestion, new_image_filenames)
 
         self.render_json(self.values)
 
@@ -468,49 +550,56 @@ def _construct_exploration_suggestions(suggestions):
     Returns:
         list(dict). List of suggestion dicts with an additional
         exploration_content_html field representing the target
-        exploration's current content.
+        exploration's current content. If the given suggestion refers to an
+        invalid content ID in the current exploration (this can happen if that
+        content was deleted after the suggestion was made), the corresponding
+        suggestion dict will be omitted from the return value.
     """
+    exp_ids = {suggestion.target_id for suggestion in suggestions}
+    exp_id_to_exp = exp_fetchers.get_multiple_explorations_by_id(list(exp_ids))
+
     suggestion_dicts = []
     for suggestion in suggestions:
-        exploration = exp_fetchers.get_exploration_by_id(
-            suggestion.target_id)
-        content_html = exploration.get_content_html(
-            suggestion.change.state_name, suggestion.change.content_id)
-        suggestion_dict = suggestion.to_dict()
-        suggestion_dict['exploration_content_html'] = content_html
-        suggestion_dicts.append(suggestion_dict)
+        available_states = exp_id_to_exp[suggestion.target_id].states
+        content_id_exists = False
+
+        # Checks whether the state name within change object of the suggestion
+        # is actually available in the target entity being suggested to and
+        # then find the availability of the content ID in the translatable
+        # content. See more - https://github.com/oppia/oppia/issues/14339
+        if suggestion.change.state_name in available_states:
+            content_id_exists = available_states[
+                suggestion.change.state_name].has_content_id(
+                    suggestion.change.content_id)
+
+        if content_id_exists:
+            content_html = exp_id_to_exp[suggestion.target_id].get_content_html(
+                suggestion.change.state_name, suggestion.change.content_id)
+            suggestion_dict = suggestion.to_dict()
+            suggestion_dict['exploration_content_html'] = content_html
+            suggestion_dicts.append(suggestion_dict)
     return suggestion_dicts
 
 
-def _upload_suggestion_images(request, suggestion, filenames):
+def _upload_suggestion_images(files, suggestion, filenames):
     """Saves a suggestion's images to storage.
 
     Args:
-        request: webapp2.Request. Request object containing a mapping of image
+        files: dict. Files containing a mapping of image
             filename to image blob.
         suggestion: BaseSuggestion. The suggestion for which images are being
             uploaded.
         filenames: list(str). The image filenames.
     """
     suggestion_image_context = suggestion.image_context
-    # TODO(#10513) : Find a way to save the images before the suggestion is
+    # TODO(#10513): Find a way to save the images before the suggestion is
     # created.
     for filename in filenames:
-        image = request.get(filename)
-        if not image:
-            logging.exception(
-                'Image not provided for file with name %s when the '
-                ' suggestion with target id %s was created.' % (
-                    filename, suggestion.target_id))
-            raise base.BaseHandler.InvalidInputException(
-                'No image data provided for file with name %s.'
-                % (filename))
-        try:
-            file_format = (
-                image_validation_services.validate_image_and_filename(
-                    image, filename))
-        except utils.ValidationError as e:
-            raise base.BaseHandler.InvalidInputException('%s' % (e))
+        image = files.get(filename)
+        image = base64.decodebytes(image.encode('utf-8'))
+        file_format = (
+            image_validation_services.validate_image_and_filename(
+                image, filename))
         image_is_compressible = (
             file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
         fs_services.save_original_and_compressed_versions_of_image(

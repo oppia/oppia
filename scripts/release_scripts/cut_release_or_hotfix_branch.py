@@ -44,7 +44,7 @@ import re
 import subprocess
 
 from core import constants
-from core import python_utils
+from core import utils
 from scripts import common
 
 
@@ -132,7 +132,7 @@ def verify_target_version_compatible_with_latest_release(
             minor version plus one.
         AssertionError. The current patch version is different than 0.
     """
-    response = python_utils.url_open(
+    response = utils.url_open(
         'https://api.github.com/repos/oppia/oppia/releases/latest')
     if response.getcode() != 200:
         raise Exception(
@@ -277,7 +277,7 @@ def execute_branch_cut(target_version, hotfix_number):
     common.open_new_tab_in_browser_if_possible(
         'https://github.com/oppia/oppia/actions?query=branch:%s'
         % branch_to_check)
-    python_utils.PRINT(
+    print(
         'Please confirm: are Actions checks passing on %s? (y/n) ' % (
             branch_to_check))
     answer = input().lower()
@@ -295,21 +295,21 @@ def execute_branch_cut(target_version, hotfix_number):
         else:
             branch_to_cut_from = 'release-%s-hotfix-%s' % (
                 target_version, hotfix_number - 1)
-        python_utils.PRINT('Cutting a new hotfix branch: %s' % new_branch_name)
+        print('Cutting a new hotfix branch: %s' % new_branch_name)
         subprocess.check_call([
             'git', 'checkout', '-b', new_branch_name, branch_to_cut_from])
     else:
         verify_target_version_compatible_with_latest_release(
             target_version)
-        python_utils.PRINT('Cutting a new release branch: %s' % new_branch_name)
+        print('Cutting a new release branch: %s' % new_branch_name)
         subprocess.check_call(['git', 'checkout', '-b', new_branch_name])
 
     # Push the new release branch to GitHub.
     if new_branch_type == constants.release_constants.BRANCH_TYPE_RELEASE:
-        python_utils.PRINT('Pushing new %s branch to GitHub.' % new_branch_type)
+        print('Pushing new %s branch to GitHub.' % new_branch_type)
         subprocess.check_call(['git', 'push', remote_alias, new_branch_name])
     else:
-        python_utils.PRINT(
+        print(
             'Please cherrypick the required PRs and push the branch '
             'to Github once this script is done.\n'
             'Note: It is fine to push the branch only after creating the '
@@ -325,11 +325,11 @@ def execute_branch_cut(target_version, hotfix_number):
         'branches (then add the oppia/release-coordinators team)\n' % (
             new_branch_name))
 
-    python_utils.PRINT('')
-    python_utils.PRINT(
+    print('')
+    print(
         'New %s branch successfully cut. You are now on branch %s' % (
             new_branch_type, new_branch_name))
-    python_utils.PRINT('Done!')
+    print('Done!')
 
 
 def main(args=None):

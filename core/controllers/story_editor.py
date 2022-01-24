@@ -225,6 +225,12 @@ class StoryUrlFragmentHandler(base.BaseHandler):
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'story_url_fragment': constants.SCHEMA_FOR_STORY_URL_FRAGMENTS
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.open_access
     def get(self, story_url_fragment):

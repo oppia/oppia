@@ -1,6 +1,6 @@
 <background-banner *ngIf="!windowIsNarrow || (windowIsNarrow && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME)"></background-banner>
 <div [ngStyle]="{'text-align': isLanguageRTL() ? 'right' : 'left', 'min-height': windowIsNarrow ? '85.5vh': 'auto'}"
-     class="oppia-learner-dashboard-container position-relative overflow-auto">
+     class="oppia-learner-dashboard-container position-relative">
   <div class="row oppia-row"
        [ngStyle]="windowIsNarrow ? {'display': 'block'} : {'display': 'flex'}"
        [ngClass]="{'oppia-learner-dashboard-mobile-mode': windowIsNarrow}">
@@ -385,9 +385,9 @@
   }
 
   .oppia-learner-dashboard-buttons {
-    background: #FFF 0% 0% no-repeat padding-box;
+    background: #fff 0% 0% no-repeat padding-box;
     bottom: 0;
-    box-shadow: 0 -3px 5px #3333331A;
+    box-shadow: 0 -3px 5px #3333331a;
     height: 2.5rem;
     position: absolute;
     width: 100%;
@@ -395,7 +395,7 @@
   }
 
   .oppia-learner-dashboard-progress-button-menu-options {
-    color: #00645C;
+    color: #00645c;
     cursor: pointer;
     display: inline-block;
     font-size: 19px;
@@ -431,12 +431,13 @@
   }
 
   .oppia-learner-dashboard-section-active {
-    background-color: #00645C1A;
-    color: #00645C;
+    background-color: #00645c1a;
+    color: #00645c;
   }
 
   .oppia-learner-dashboard-side-content {
     min-width: 241px;
+    padding-left: 100px;
     width: 20%;
   }
 
@@ -459,7 +460,7 @@
 
   .oppia-learner-dashboard-main-menu {
     background-color: white;
-    height: 480px;
+    height: auto;
     margin: 64px 0 0 0;
     padding: 0;
   }
@@ -630,7 +631,7 @@
   }
 
   .oppia-learner-dashboard-feedback-section .feedback-thread-warning {
-    color: #0277BD;
+    color: #0277bd;
     margin-left: 4px;
   }
 
@@ -687,6 +688,7 @@
     font-weight: bold;
     margin-right: 14px;
     margin-top: 8px;
+    text-align: right;
   }
 
   /* The css below helps in using headroom.js for footer. */

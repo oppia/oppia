@@ -29,14 +29,14 @@ export interface StorySummaryBackendDict {
   'thumbnail_bg_color': string;
   'description': string;
   'story_is_published': boolean;
-  'completed_node_titles': string[],
-  'url_fragment': string,
-  'all_node_dicts': StoryNodeBackendDict[],
+  'completed_node_titles': string[];
+  'url_fragment': string;
+  'all_node_dicts': StoryNodeBackendDict[];
   // This property is optional because it is only present in the
   // story summary dict of learner dashboard page.
   'topic_name'?: string;
-  'topic_url_fragment'?: string,
-  'classroom_url_fragment'?: string
+  'topic_url_fragment'?: string;
+  'classroom_url_fragment'?: string;
 }
 
 export class StorySummary {

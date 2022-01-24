@@ -26,78 +26,48 @@ from core.tests import test_utils
 class MachineTranslationTests(test_utils.GenericTestBase):
     """Tests for the MachineTranslation domain object."""
 
-    translation = None
+    translation: translation_domain.MachineTranslation
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Setup for MachineTranslation domain object tests."""
         super(MachineTranslationTests, self).setUp()
         self._init_translation()
 
-    def _init_translation(self):
+    def _init_translation(self) -> None:
         """Initialize self.translation with valid default values."""
         self.translation = translation_domain.MachineTranslation(
             'en', 'es', 'hello world', 'hola mundo')
         self.translation.validate()
 
-    def test_validate_with_non_string_source_language_code_raises(self):
-        self.translation.source_language_code = 3
-        expected_error_message = (
-            'Expected source_language_code to be a string, received 3')
-        with self.assertRaisesRegexp(
-            utils.ValidationError, expected_error_message):
-            self.translation.validate()
-
-    def test_validate_with_invalid_source_language_code_raises(self):
+    def test_validate_with_invalid_source_language_code_raises(self) -> None:
         self.translation.source_language_code = 'ABC'
         expected_error_message = (
             'Invalid source language code: ABC')
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_message):
             self.translation.validate()
 
-    def test_validate_with_non_string_target_language_code_raises(self):
-        self.translation.target_language_code = 3
-        expected_error_message = (
-            'Expected target_language_code to be a string, received 3')
-        with self.assertRaisesRegexp(
-            utils.ValidationError, expected_error_message):
-            self.translation.validate()
-
-    def test_validate_with_invalid_target_language_code_raises(self):
+    def test_validate_with_invalid_target_language_code_raises(self) -> None:
         self.translation.target_language_code = 'ABC'
         expected_error_message = (
             'Invalid target language code: ABC')
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_message):
             self.translation.validate()
 
-    def test_validate_with_same_source_target_language_codes_raises(self):
+    def test_validate_with_same_source_target_language_codes_raises(
+        self
+    ) -> None:
         self.translation.target_language_code = 'en'
         self.translation.source_language_code = 'en'
         expected_error_message = (
             'Expected source_language_code to be different from '
             'target_language_code: "en" = "en"')
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_message):
             self.translation.validate()
 
-    def test_validate_with_non_string_source_text_raises(self):
-        self.translation.source_text = 3
-        expected_error_message = (
-            'Expected source_text to be a string, received 3')
-        with self.assertRaisesRegexp(
-            utils.ValidationError, expected_error_message):
-            self.translation.validate()
-
-    def test_validate_with_non_string_translated_text_raises(self):
-        self.translation.translated_text = 3
-        expected_error_message = (
-            'Expected translated_text to be a string, received 3')
-        with self.assertRaisesRegexp(
-            utils.ValidationError, expected_error_message):
-            self.translation.validate()
-
-    def test_to_dict(self):
+    def test_to_dict(self) -> None:
         self.assertEqual(
             self.translation.to_dict(),
             {

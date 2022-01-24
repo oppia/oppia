@@ -26,9 +26,9 @@ import { ReleaseCoordinatorBackendApiService } from './services/release-coordina
 import { ReleaseCoordinatorPageConstants } from './release-coordinator-page.constants';
 
 interface MemoryCacheProfile {
-  totalAllocatedInBytes: string,
-  peakAllocatedInBytes: string,
-  totalKeysStored: string
+  totalAllocatedInBytes: string;
+  peakAllocatedInBytes: string;
+  totalKeysStored: string;
 }
 
 

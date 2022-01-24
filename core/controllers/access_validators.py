@@ -17,7 +17,6 @@
 from __future__ import annotations
 
 from core import feconf
-from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import classroom_services
@@ -120,30 +119,6 @@ class ProfileExistsValidationHandler(base.BaseHandler):
             username)
 
         if not user_settings:
-            raise self.PageNotFoundException
-
-
-class AccountDeletionIsEnabledValidationHandler(base.BaseHandler):
-    """Checks whether account deletion is enabled."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    # Type[str, Any] is used to match the type defined for this attribute in
-    # its parent class `base.BaseHandler`.
-    URL_PATH_ARGS_SCHEMAS: Dict[str, Any] = {}
-
-    # Type[str, Any] is used to match the type defined for this attribute in
-    # its parent class `base.BaseHandler`.
-    HANDLER_ARGS_SCHEMAS: Dict[str, Any] = {
-        'GET': {}
-    }
-
-    # Using type ignore[misc] here because untyped decorator makes function
-    # "get" also untyped.
-    @acl_decorators.open_access # type: ignore[misc]
-    def get(self) -> None:
-        """Handles GET requests."""
-        if not constants.ENABLE_ACCOUNT_DELETION:
             raise self.PageNotFoundException
 
 

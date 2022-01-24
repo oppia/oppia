@@ -22,6 +22,7 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter } from '@angular/core';
 import { fakeAsync, flush, TestBed, tick } from '@angular/core/testing';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { EditabilityService } from 'services/editability.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
@@ -42,6 +43,7 @@ describe('Exploration save service ' +
   let changeListService: ChangeListService = null;
   let ExplorationRightsService = null;
   let ExplorationTitleService = null;
+  let ngbModal: NgbModal = null;
 
   importAllAngularServices();
   beforeEach(angular.mock.module('oppia'));
@@ -90,6 +92,7 @@ describe('Exploration save service ' +
     changeListService = $injector.get('ChangeListService');
     ExplorationRightsService = $injector.get('ExplorationRightsService');
     ExplorationTitleService = $injector.get('ExplorationTitleService');
+    ngbModal = $injector.get('NgbModal');
   }));
 
   it('should open version mismatch modal', fakeAsync(function() {
@@ -141,10 +144,11 @@ describe('Exploration save service ' +
 
   it('should open confirm discard changes modal when clicked ' +
     'on discard changes button', fakeAsync(function() {
-    let modalSpy = spyOn($uibModal, 'open').and.returnValue(
-      {
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return ({
         result: Promise.resolve()
-      });
+      } as NgbModalRef);
+    });
     spyOn(changeListService, 'discardAllChanges')
       .and.returnValue(Promise.resolve(null));
 
@@ -680,7 +684,7 @@ describe('Exploration save service ' +
       });
     let modalSpy = spyOn($uibModal, 'open').and.callThrough();
 
-    explorationSaveService.saveChanges(
+    explorationSaveService.saveChangesAsync(
       startLoadingCb, endLoadingCb);
     // We need multiple '$rootScope.$apply()' here since, the source code
     // consists of nested promises.
@@ -716,7 +720,7 @@ describe('Exploration save service ' +
     let focusSpy = spyOnProperty(focusManagerService, 'onFocus')
       .and.returnValue(mockEventEmitter);
 
-    explorationSaveService.saveChanges(
+    explorationSaveService.saveChangesAsync(
       startLoadingCb, endLoadingCb);
     // We need multiple '$rootScope.$apply()' here since, the source code
     // consists of nested promises.
@@ -758,8 +762,9 @@ describe('Exploration save service ' +
       .and.returnValue(Promise.resolve(null));
     let modalSpy = spyOn($uibModal, 'open').and.callThrough();
 
-    explorationSaveService.saveChanges(
-      startLoadingCb, endLoadingCb);
+    expectAsync(
+      explorationSaveService.saveChangesAsync(startLoadingCb, endLoadingCb)
+    ).toBeRejected();
     flush();
     $rootScope.$apply();
 
@@ -787,10 +792,10 @@ describe('Exploration save service ' +
     let modalSpy = spyOn($uibModal, 'open').and.callThrough();
 
     // Opening modal first time.
-    explorationSaveService.saveChanges(
+    explorationSaveService.saveChangesAsync(
       startLoadingCb, endLoadingCb);
     // Opening modal second time.
-    explorationSaveService.saveChanges(
+    explorationSaveService.saveChangesAsync(
       startLoadingCb, endLoadingCb);
     // We need multiple '$rootScope.$apply()' here since, the source code
     // consists of nested promises.
@@ -830,7 +835,7 @@ describe('Exploration save service ' +
         result: Promise.resolve('commitMessage')
       });
 
-    explorationSaveService.saveChanges(
+    explorationSaveService.saveChangesAsync(
       startLoadingCb, endLoadingCb);
     // We need multiple '$rootScope.$apply()' here since, the source code
     // consists of nested promises.
@@ -870,7 +875,7 @@ describe('Exploration save service ' +
     let focusSpy = spyOn(focusManagerService, 'setFocus')
       .and.returnValue(null);
 
-    explorationSaveService.saveChanges(
+    explorationSaveService.saveChangesAsync(
       startLoadingCb, endLoadingCb);
     tick();
     $rootScope.$apply();

@@ -30,8 +30,8 @@ class CodeRepl(base.BaseInteraction):
     is_trainable = True
     _dependency_ids = ['skulpt', 'codemirror']
     answer_type = 'CodeEvaluation'
-    instructions = 'Type code in the editor'
-    narrow_instructions = 'Go to code editor'
+    instructions = 'I18N_INTERACTIONS_CODE_REPL_INSTRUCTION'
+    narrow_instructions = 'I18N_INTERACTIONS_CODE_REPL_NARROW_INSTRUCTION'
     needs_summary = True
     can_have_solution = True
     show_generic_submit_button = True

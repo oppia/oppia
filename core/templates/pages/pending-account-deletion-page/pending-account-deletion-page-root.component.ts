@@ -18,8 +18,6 @@
 
 import { Component } from '@angular/core';
 import { AppConstants } from 'app.constants';
-import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
-import { LoaderService } from 'services/loader.service';
 import { PageHeadService } from 'services/page-head.service';
 
 @Component({
@@ -31,24 +29,12 @@ export class PendingAccountDeletionPageRootComponent {
   errorPageIsShown: boolean = false;
 
   constructor(
-    private accessValidationBackendApiService:
-      AccessValidationBackendApiService,
-    private loaderService: LoaderService,
     private pageHeadService: PageHeadService
   ) {}
 
   ngOnInit(): void {
     this.pageHeadService.updateTitleAndMetaTags(
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PENDING_ACCOUNT_DELETION);
-
-    this.loaderService.showLoadingScreen('Loading');
-    this.accessValidationBackendApiService.accountDeletionIsEnabled()
-      .then((resp) => {
-        this.pageIsShown = true;
-      }, (err) => {
-        this.errorPageIsShown = true;
-      }).then(() => {
-        this.loaderService.hideLoadingScreen();
-      });
+    this.pageIsShown = true;
   }
 }

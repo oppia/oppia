@@ -43,6 +43,13 @@ describe('InteractiveCodeReplComponent', () => {
     }
   }
 
+  interface SkulptConfigurationArgs {
+    output: Function;
+    read: Function;
+    timeoutMsg: Function;
+    execLimit: number;
+  }
+
   let mockCurrentInteractionService = {
     onSubmit: (answer, rulesService) => {},
     registerCurrentInteraction: (submitAnswerFn, validateExpressionFn) => {
@@ -151,8 +158,8 @@ describe('InteractiveCodeReplComponent', () => {
   it('should update output when the code completes execution', () => {
     spyOn(currentInteractionService, 'registerCurrentInteraction').and.stub();
     spyOn(Sk, 'configure').and.callFake((
-        obj: {output: Function, read: Function, timeoutMsg: Function,
-          execLimit: number}) => {
+        obj: SkulptConfigurationArgs
+    ) => {
       obj.output('hello');
     });
 
@@ -167,8 +174,8 @@ describe('InteractiveCodeReplComponent', () => {
   it('should dispay a timeout message when the code takes too long to run',
     () => {
       spyOn(Sk, 'configure').and.callFake((
-          obj: {output: Function, read: Function, timeoutMsg: Function,
-          execLimit: number}) => {
+          obj: SkulptConfigurationArgs
+      ) => {
         obj.read('src/builtin/sys.js');
         obj.timeoutMsg();
       });
@@ -181,8 +188,8 @@ describe('InteractiveCodeReplComponent', () => {
 
   it('should throw error when builtin module is not found', () => {
     spyOn(Sk, 'configure').and.callFake((
-        obj: {output: Function, read: Function, timeoutMsg: Function,
-      execLimit: number}) => {
+        obj: SkulptConfigurationArgs
+    ) => {
       obj.read('test');
       obj.timeoutMsg();
     });

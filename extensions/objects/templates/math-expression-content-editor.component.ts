@@ -80,6 +80,9 @@ export class MathExpressionContentEditorComponent implements OnInit {
       this.value.mathExpressionSvgIsBeingProcessed = true;
     }
     this.valueChanged.emit(this.value);
+    if (this.value && this.value.raw_latex) {
+      this.localValue.label = this.value.raw_latex;
+    }
     this.directiveSubscriptions.add(
       this.externalRteSaveService.onExternalRteSave.subscribe(() => {
         this.processAndSaveSvg();

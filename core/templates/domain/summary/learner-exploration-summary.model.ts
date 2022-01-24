@@ -16,18 +16,14 @@
  * @fileoverview Frontend Model for learner exploration summary.
  */
 
+import { HumanReadableContributorsSummary } from 'domain/summary/creator-exploration-summary.model';
+
 export interface ExplorationRatings {
   '1': number;
   '2': number;
   '3': number;
   '4': number;
   '5': number;
-}
-
-export interface HumanReadableContributorsSummary {
-  [username: string]: {
-    'num_commits': number;
-  }
 }
 
 export interface LearnerExplorationSummaryBackendDict {

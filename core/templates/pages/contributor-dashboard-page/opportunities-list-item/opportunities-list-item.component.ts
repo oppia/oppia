@@ -49,12 +49,12 @@ export class OpportunitiesListItemComponent {
 
   opportunityDataIsLoading: boolean = true;
   labelText: string;
-  labelStyle: { 'background-color': string; };
+  labelStyle: { 'background-color': string };
   progressPercentage: string;
-  progressBarStyle: { width: string; };
-  translatedProgressStyle: { width: string; };
-  inReviewProgressStyle: { width: string; };
-  untranslatedProgressStyle: { width: string; };
+  progressBarStyle: { width: string };
+  translatedProgressStyle: { width: string };
+  inReviewProgressStyle: { width: string };
+  untranslatedProgressStyle: { width: string };
   correspondingOpportunityDeleted: boolean = false;
   translationProgressBar: boolean = false;
   opportunityButtonDisabled: boolean = false;

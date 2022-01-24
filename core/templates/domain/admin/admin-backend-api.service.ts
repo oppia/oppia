@@ -58,65 +58,64 @@ export interface ConfigPropertiesBackendResponse {
 }
 
 interface PendingDeletionRequestBackendResponse {
-  'number_of_pending_deletion_models': string
+  'number_of_pending_deletion_models': string;
 }
 
 export interface ModelsRelatedToUserBackendResponse {
-  'related_models_exist': boolean
+  'related_models_exist': boolean;
 }
 
 export interface SignupEmailContent {
-  'html_body': string,
-  'subject': string
+  'html_body': string;
+  'subject': string;
 }
 
 export interface ClassroomPageData {
-  'name': string,
-  'topic_ids': string[],
-  'course_details': string,
-  'url_fragment': string,
-  'topic_list_intro': string
+  'name': string;
+  'topic_ids': string[];
+  'course_details': string;
+  'url_fragment': string;
+  'topic_list_intro': string;
 }
 
 export interface VmidSharedSecretKeyMapping {
-  'shared_secret_key': string,
-  'vm_id': string
+  'shared_secret_key': string;
+  'vm_id': string;
 }
 
 export interface ConfigProperty {
-  description: string,
-  schema: Schema,
-  value: number | boolean | string | string[] | Object | Object[]
+  description: string;
+  schema: Schema;
+  value: number | boolean | string | string[] | Object | Object[];
 }
 
 export interface ConfigPropertyValues {
-  'always_ask_learners_for_answer_details': boolean,
-  'classroom_pages_data': ClassroomPageData,
-  'classroom_promos_are_enabled': boolean,
-  'contributor_can_suggest_questions': boolean,
-  'contributor_dashboard_is_enabled': boolean,
-  'contributor_dashboard_reviewer_emails_is_enabled': boolean,
-  'email_footer': string,
-  'email_sender_name': string,
-  'enable_admin_notifications_for_reviewer_shortage': boolean,
-  'featured_translation_languages': string[],
-  'high_bounce_rate_task_minimum_exploration_starts': number,
-  'high_bounce_rate_task_state_bounce_rate_creation_threshold': number,
-  'high_bounce_rate_task_state_bounce_rate_obsoletion_threshold': number,
-  'is_improvements_tab_enabled': boolean,
-  'max_number_of_explorations_in_math_svgs_batch': number,
-  'max_number_of_suggestions_per_reviewer': number,
-  'max_number_of_svgs_in_math_svgs_batch': number,
-  'notification_user_ids_for_failed_tasks': string[],
-  'notify_admins_suggestions_waiting_too_long_is_enabled': boolean,
-  'oppia_csrf_secret': string,
-  'promo_bar_enabled': boolean,
-  'promo_bar_message': string,
-  'record_playthrough_probability': number,
-  'signup_email_content': SignupEmailContent,
-  'unpublish_exploration_email_html_body': string,
-  'vmid_shared_secret_key_mapping': VmidSharedSecretKeyMapping,
-  'whitelisted_exploration_ids_for_playthroughs': string[]
+  'always_ask_learners_for_answer_details': boolean;
+  'classroom_pages_data': ClassroomPageData;
+  'classroom_promos_are_enabled': boolean;
+  'contributor_dashboard_is_enabled': boolean;
+  'contributor_dashboard_reviewer_emails_is_enabled': boolean;
+  'email_footer': string;
+  'email_sender_name': string;
+  'enable_admin_notifications_for_reviewer_shortage': boolean;
+  'featured_translation_languages': string[];
+  'high_bounce_rate_task_minimum_exploration_starts': number;
+  'high_bounce_rate_task_state_bounce_rate_creation_threshold': number;
+  'high_bounce_rate_task_state_bounce_rate_obsoletion_threshold': number;
+  'is_improvements_tab_enabled': boolean;
+  'max_number_of_explorations_in_math_svgs_batch': number;
+  'max_number_of_suggestions_per_reviewer': number;
+  'max_number_of_svgs_in_math_svgs_batch': number;
+  'notification_user_ids_for_failed_tasks': string[];
+  'notify_admins_suggestions_waiting_too_long_is_enabled': boolean;
+  'oppia_csrf_secret': string;
+  'promo_bar_enabled': boolean;
+  'promo_bar_message': string;
+  'record_playthrough_probability': number;
+  'signup_email_content': SignupEmailContent;
+  'unpublish_exploration_email_html_body': string;
+  'vmid_shared_secret_key_mapping': VmidSharedSecretKeyMapping;
+  'whitelisted_exploration_ids_for_playthroughs': string[];
 }
 
 export interface AdminPageDataBackendDict {
@@ -198,7 +197,8 @@ export class AdminBackendApiService {
 
   // Admin Roles Tab Services.
   async viewUsersRoleAsync(
-      username: string): Promise<UserRolesBackendResponse> {
+      username: string
+  ): Promise<UserRolesBackendResponse> {
     return new Promise((resolve, reject) => {
       this.http.get<UserRolesBackendResponse>(
         AdminPageConstants.ADMIN_ROLE_HANDLER_URL, {

@@ -56,7 +56,7 @@ def get_memory_cache_stats() -> caching_domain.MemoryCacheStats:
     # TODO(#13617): Update our typeshed after redis stubs are improved in
     # typeshed. Then the ignore[attr-defined] used below can be removed.
     redis_full_profile = OPPIA_REDIS_CLIENT.memory_stats() # type: ignore[attr-defined]
-    memory_stats = caching_domain.MemoryCacheStats( # type: ignore[no-untyped-call]
+    memory_stats = caching_domain.MemoryCacheStats(
         redis_full_profile.get('total.allocated'),
         redis_full_profile.get('peak.allocated'),
         redis_full_profile.get('keys.count'))

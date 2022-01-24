@@ -32,6 +32,7 @@ import constants from 'assets/constants';
 import { InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { InteractionAnswer } from 'interactions/answer-defs';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'oppia-interactive-algebraic-expression-input',
@@ -55,7 +56,8 @@ export class AlgebraicExpressionInputInteractionComponent implements OnInit {
     private guppyConfigurationService: GuppyConfigurationService,
     private guppyInitializationService: GuppyInitializationService,
     private htmlEscaperService: HtmlEscaperService,
-    private mathInteractionsService: MathInteractionsService
+    private mathInteractionsService: MathInteractionsService,
+    private translateService: TranslateService,
   ) {}
 
   isCurrentAnswerValid(): boolean {
@@ -96,9 +98,11 @@ export class AlgebraicExpressionInputInteractionComponent implements OnInit {
       this.htmlEscaperService.escapedJsonToObj(
         this.customOskLettersWithValue) as string[]
     );
+    let translatedPlaceholder = this.translateService.instant(
+      constants.MATH_INTERACTION_PLACEHOLDERS.AlgebraicExpressionInput);
     this.guppyInitializationService.init(
       'guppy-div-learner',
-      constants.MATH_INTERACTION_PLACEHOLDERS.AlgebraicExpressionInput,
+      translatedPlaceholder,
       this.savedSolution !== undefined ? this.savedSolution as string : ''
     );
     const eventType = (

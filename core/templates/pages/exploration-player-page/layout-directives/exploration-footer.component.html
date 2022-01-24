@@ -42,11 +42,13 @@
           </div>
         </li>
       </ul>
-      <oppia-hint-and-solution-buttons *ngIf="windowIsNarrow"></oppia-hint-and-solution-buttons>
+      <oppia-hint-and-solution-buttons *ngIf="windowIsNarrow && hintsAndSolutionsAreSupported">
+      </oppia-hint-and-solution-buttons>
     </div>
     <div [ngClass]="{'col-sm-7': isLanguageRTL(), 'col-sm-9': !isLanguageRTL()}">
       <div [ngClass]="{'float-left': isLanguageRTL(), 'float-right': !isLanguageRTL()}">
-        <oppia-hint-and-solution-buttons *ngIf="!windowIsNarrow"></oppia-hint-and-solution-buttons>
+        <oppia-hint-and-solution-buttons *ngIf="!windowIsNarrow && hintsAndSolutionsAreSupported">
+        </oppia-hint-and-solution-buttons>
       </div>
     </div>
   </div>
@@ -55,7 +57,7 @@
 <style>
   .oppia-exploration-footer {
     background-color: #094142;
-    color: #FFF;
+    color: #fff;
     font-family: "Capriola", "Roboto", Arial, sans-serif;
     font-size: 13px;
     height: 42px;

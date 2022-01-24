@@ -30,21 +30,21 @@ import {
 export interface WrittenTranslationsBackendDict {
   'translations_mapping': {
     [contentId: string]: {
-      [langCode: string]: TranslationBackendDict
-    }
-  }
+      [langCode: string]: TranslationBackendDict;
+    };
+  };
 }
 
 interface TranslationMappingDict {
     [contentId: string]: {
-      [langCode: string]: TranslationBackendDict
-    }
+      [langCode: string]: TranslationBackendDict;
+    };
 }
 
 interface WrittenTranslationsMapping {
   [contentId: string]: {
-    [langCode: string]: WrittenTranslation
-  }
+    [langCode: string]: WrittenTranslation;
+  };
 }
 
 export class WrittenTranslations {

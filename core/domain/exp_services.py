@@ -151,12 +151,20 @@ def get_exploration_ids_matching_query(
             it is empty, no language code filter is applied to the results. If
             it is not empty, then a result is considered valid if it matches at
             least one of these language codes.
-        offset: str or None. Optional offset from which to start the search
+        offset: int or None. Optional offset from which to start the search
             query. If no offset is supplied, the first N results matching
             the query are returned.
 
     Returns:
-        list(str). A list of exploration ids matching the given search query.
+        2-tuple of (returned_exploration_ids, search_offset). Where:
+            returned_exploration_ids : list(str). A list with all
+                exploration ids matching the given search query string,
+                as well as a search offset for future fetches.
+                The list contains exactly feconf.SEARCH_RESULTS_PAGE_SIZE
+                results if there are at least that many, otherwise it
+                contains all remaining results. (If this behaviour does
+                not occur, an error will be logged.)
+            search_offset: int. Search offset for future fetches.
     """
     returned_exploration_ids = []
     search_offset = offset
@@ -602,7 +610,8 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
             'Unexpected error: trying to update version %s of exploration '
             'from version %s. Please reload the page and try again.'
             % (exploration_model.version, exploration.version))
-    elif exploration.version < exploration_model.version:
+
+    if exploration.version < exploration_model.version:
         raise Exception(
             'Trying to update version %s of exploration from version %s, '
             'which is too old. Please reload the page and try again.'
@@ -1275,8 +1284,7 @@ def compute_exploration_contributors_summary(exploration_id):
     contributor_ids = list(contributors_summary)
     # Remove IDs that are deleted or do not exist.
     users_settings = user_services.get_users_settings(contributor_ids)
-    for contributor_id, user_settings in python_utils.ZIP(
-            contributor_ids, users_settings):
+    for contributor_id, user_settings in zip(contributor_ids, users_settings):
         if user_settings is None:
             del contributors_summary[contributor_id]
 
@@ -1372,7 +1380,8 @@ def revert_exploration(
             'Unexpected error: trying to update version %s of exploration '
             'from version %s. Please reload the page and try again.'
             % (exploration_model.version, current_version))
-    elif current_version < exploration_model.version:
+
+    if current_version < exploration_model.version:
         raise Exception(
             'Trying to update version %s of exploration from version %s, '
             'which is too old. Please reload the page and try again.'

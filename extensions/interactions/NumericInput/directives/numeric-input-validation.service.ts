@@ -31,12 +31,12 @@ import { Outcome } from
 import { AppConstants } from 'app.constants';
 
 interface Range {
-      answerGroupIndex: number,
-      ruleIndex: number,
-      lb: number,
-      ub: number,
-      lbi: boolean,
-      ubi: boolean,
+  answerGroupIndex: number;
+  ruleIndex: number;
+  lb: number;
+  ub: number;
+  lbi: boolean;
+  ubi: boolean;
 }
 
 @Injectable({

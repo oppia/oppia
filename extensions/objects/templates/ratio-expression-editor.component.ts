@@ -34,7 +34,7 @@ export class RatioExpressionEditorComponent implements OnInit {
   @Input() modalId!: symbol;
   @Input() value!: number[];
   @Output() valueChanged = new EventEmitter();
-  localValue!: { label: string; };
+  localValue!: { label: string };
   warningText: string = '';
   eventBusGroup: EventBusGroup;
 

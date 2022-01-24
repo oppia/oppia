@@ -17,6 +17,10 @@
  * editor.
  */
 
+import { DeleteInteractionModalComponent } from
+  // eslint-disable-next-line max-len
+  'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-interaction-modal.component';
+
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
@@ -60,6 +64,7 @@ require('services/exploration-html-formatter.service.ts');
 require('services/html-escaper.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/context.service');
+require('services/ngb-modal.service.ts');
 
 import { Subscription } from 'rxjs';
 
@@ -87,17 +92,17 @@ angular.module('oppia').directive('stateInteractionEditor', [
         'components/state-editor/state-interaction-editor/' +
         'state-interaction-editor.directive.html'),
       controller: [
-        '$scope', '$uibModal', 'AlertsService', 'ContextService',
+        '$rootScope', '$scope', '$uibModal', 'AlertsService', 'ContextService',
         'EditabilityService', 'ExplorationHtmlFormatterService',
-        'InteractionDetailsCacheService',
+        'InteractionDetailsCacheService', 'NgbModal',
         'ResponsesService', 'StateContentService',
         'StateCustomizationArgsService', 'StateEditorService',
         'StateInteractionIdService', 'StateNextContentIdIndexService',
         'StateSolutionService', 'UrlInterpolationService',
         'WindowDimensionsService', 'INTERACTION_SPECS', function(
-            $scope, $uibModal, AlertsService, ContextService,
+            $rootScope, $scope, $uibModal, AlertsService, ContextService,
             EditabilityService, ExplorationHtmlFormatterService,
-            InteractionDetailsCacheService,
+            InteractionDetailsCacheService, NgbModal,
             ResponsesService, StateContentService,
             StateCustomizationArgsService, StateEditorService,
             StateInteractionIdService, StateNextContentIdIndexService,
@@ -135,7 +140,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
             }
             return ExplorationHtmlFormatterService.getInteractionHtml(
               StateInteractionIdService.savedMemento,
-              interactionCustomizationArgs, false, null);
+              interactionCustomizationArgs, false, null, null);
           };
 
           var _updateInteractionPreview = function() {
@@ -251,12 +256,8 @@ angular.module('oppia').directive('stateInteractionEditor', [
 
           $scope.deleteInteraction = function() {
             AlertsService.clearWarnings();
-            $uibModal.open({
-              template: require(
-                'pages/exploration-editor-page/editor-tab/templates/' +
-                'modal-templates/delete-interaction-modal.template.html'),
+            NgbModal.open(DeleteInteractionModalComponent, {
               backdrop: true,
-              controller: 'ConfirmOrCancelModalController'
             }).result.then(function() {
               StateInteractionIdService.displayed = null;
               StateCustomizationArgsService.displayed = {};
@@ -280,6 +281,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
               $scope.recomputeGraph();
               _updateInteractionPreview();
               _updateAnswerChoices();
+              $rootScope.$applyAsync();
             }, function() {
               AlertsService.clearWarnings();
             });

@@ -216,7 +216,7 @@ export class RatioExpressionInputValidationService {
             currentRuleType === 'Equals' && (
               ratioRulesService.HasSpecificTermEqualTo(
                 currentInput as RatioInputAnswer,
-                seenRule.inputs as {x: number, y: number}))) {
+                seenRule.inputs as { x: number; y: number }))) {
             // This rule will make all of the following matching
             // inputs obsolete.
             warningsList.push({

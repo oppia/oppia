@@ -49,15 +49,15 @@ export class ImageWithRegionsEditorComponent implements OnInit {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() modalId!: symbol;
-  @Input() value!: { labeledRegions: Region[]; imagePath: string; };
+  @Input() value!: { labeledRegions: Region[]; imagePath: string };
   @Output() valueChanged = new EventEmitter();
   errorText!: string;
-  SCHEMA!: { type: string; 'obj_type': string; };
+  SCHEMA!: { type: string; 'obj_type': string };
   mouseX!: number;
   mouseY!: number;
   originalMouseX!: number;
   originalMouseY!: number;
-  originalRectArea!: { x: number; y: number; width: number; height: number; };
+  originalRectArea!: { x: number; y: number; width: number; height: number };
   rectX!: number;
   rectY!: number;
   rectWidth!: number;
@@ -314,6 +314,15 @@ export class ImageWithRegionsEditorComponent implements OnInit {
   }
 
   getPreviewUrl(imageUrl: string): string {
+    const entityType: string = this.contextService.getEntityType() as string;
+    if (
+      entityType !== (AppConstants.ENTITY_TYPE.EXPLORATION)
+    ) {
+      return this.assetsBackendApiService.getImageUrlForPreview(
+        entityType,
+        this.contextService.getEntityId(),
+        encodeURIComponent(imageUrl));
+    }
     return this.assetsBackendApiService.getImageUrlForPreview(
       AppConstants.ENTITY_TYPE.EXPLORATION,
       this.contextService.getExplorationId(),

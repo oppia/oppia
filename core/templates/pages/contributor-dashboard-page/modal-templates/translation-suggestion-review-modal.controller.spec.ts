@@ -57,11 +57,11 @@ describe('Translation Suggestion Review Modal Controller', function() {
       suggestion_type: 'translate_content',
       change: {
         content_id: 'hint_1',
-        content_html: 'Translation',
+        content_html: '<p>content</p><p>&nbsp;</p>',
         translation_html: 'Tradução',
         state_name: 'StateName'
       },
-      exploration_content_html: 'Translation'
+      exploration_content_html: '<p>content</p><p>&nbsp;</p>'
     };
     const suggestion2 = {
       suggestion_id: 'suggestion_2',
@@ -69,11 +69,11 @@ describe('Translation Suggestion Review Modal Controller', function() {
       suggestion_type: 'translate_content',
       change: {
         content_id: 'hint_1',
-        content_html: 'Translation',
+        content_html: '<p>content</p>',
         translation_html: 'Tradução',
         state_name: 'StateName'
       },
-      exploration_content_html: 'Translation CHANGED'
+      exploration_content_html: '<p>content CHANGED</p>'
     };
 
     const contribution1 = {
@@ -148,21 +148,20 @@ describe('Translation Suggestion Review Modal Controller', function() {
         .toHaveBeenCalledWith('Translation');
     });
 
-    it('should notify user on failed suggestion activities', function() {
+    it('should notify user on failed suggestion update', function() {
       const error = {
         data: {
           error: 'Error'
         }
       };
-      spyOn(AlertsService, 'clearWarnings');
-      spyOn(AlertsService, 'addWarning');
+
+      expect($scope.errorFound).toBeFalse();
+      expect($scope.errorMessage).toBe('');
 
       $scope.showTranslationSuggestionUpdateError(error);
 
-      expect(AlertsService.clearWarnings).toHaveBeenCalled();
-      expect(
-        AlertsService.addWarning).toHaveBeenCalledWith(
-        'Invalid Suggestion: Error');
+      expect($scope.errorFound).toBeTrue();
+      expect($scope.errorMessage).toBe('Invalid Suggestion: Error');
     });
 
     it('should accept suggestion in suggestion modal service when clicking' +
@@ -335,7 +334,9 @@ describe('Translation Suggestion Review Modal Controller', function() {
       'should update translation when the update button is clicked',
       function() {
         $scope.activeSuggestion.suggestion_id = 'suggestion_1';
-        $scope.editedContent = '<p>In Hindi</p>';
+        $scope.editedContent = {
+          html: '<p>In Hindi</p>'
+        };
         $scope.activeSuggestion.change = {
           cmd: 'add_written_translation',
           state_name: 'State 3',
@@ -355,16 +356,53 @@ describe('Translation Suggestion Review Modal Controller', function() {
 
         expect(contributionAndReviewService.updateTranslationSuggestionAsync)
           .toHaveBeenCalledWith(
-            'suggestion_1', $scope.editedContent,
+            'suggestion_1', $scope.editedContent.html,
             jasmine.any(Function),
             jasmine.any(Function));
       });
+
+    describe('isHtmlContentEqual', function() {
+      it('should return true regardless of &nbsp; differences', function() {
+        expect($scope.isHtmlContentEqual(
+          '<p>content</p><p>&nbsp;&nbsp;</p>', '<p>content</p><p> </p>'))
+          .toBe(true);
+      });
+
+      it('should return true regardless of new line differences', function() {
+        expect($scope.isHtmlContentEqual(
+          '<p>content</p>\r\n\n<p>content2</p>',
+          '<p>content</p><p>content2</p>'))
+          .toBe(true);
+      });
+
+      it('should return false if html content differ', function() {
+        expect($scope.isHtmlContentEqual(
+          '<p>content</p>', '<p>content CHANGED</p>'))
+          .toBe(false);
+      });
+
+      it('should return false if array contents differ', function() {
+        expect($scope.isHtmlContentEqual(
+          ['<p>content1</p>', '<p>content2</p>'],
+          ['<p>content1</p>', '<p>content2 CHANGED</p>']))
+          .toBe(false);
+      });
+
+      it('should return true if array contents are equal', function() {
+        expect($scope.isHtmlContentEqual(
+          ['<p>content1</p>', '<p>content2</p>'],
+          ['<p>content1</p>', '<p>content2</p>']))
+          .toBe(true);
+      });
+    });
   });
 
   describe('when viewing suggestion', function() {
     const reviewable = false;
-    let $httpBackend = null;
+    let $q = null;
+    let $rootScope = null;
     const subheading = 'subheading_title';
+    let ThreadDataBackendApiService = null;
 
     const suggestion1 = {
       suggestion_id: 'suggestion_1',
@@ -411,10 +449,12 @@ describe('Translation Suggestion Review Modal Controller', function() {
     };
 
     beforeEach(angular.mock.inject(function($injector, $controller) {
-      const $rootScope = $injector.get('$rootScope');
+      $rootScope = $injector.get('$rootScope');
       $uibModalInstance = jasmine.createSpyObj(
         '$uibModalInstance', ['close', 'dismiss']);
-      $httpBackend = $injector.get('$httpBackend');
+      $q = $injector.get('$q');
+      ThreadDataBackendApiService = $injector.get(
+        'ThreadDataBackendApiService');
 
       $scope = $rootScope.$new();
       $controller('TranslationSuggestionReviewModalController', {
@@ -438,7 +478,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
         // content_html.
         expect($scope.hasExplorationContentChanged()).toBe(true);
 
-        var messages = [{
+        const messages = [{
           author_username: '',
           created_om_msecs: 0,
           entity_type: '',
@@ -448,12 +488,112 @@ describe('Translation Suggestion Review Modal Controller', function() {
           updated_status: '',
           updated_subject: '',
         }];
-        $httpBackend.expect('GET', '/threadhandler/' + 'suggestion_1').respond({
-          messages: messages
-        });
-        $httpBackend.flush();
 
+        const fetchMessagesAsyncSpy = spyOn(
+          ThreadDataBackendApiService, 'fetchMessagesAsync')
+          .and.returnValue($q.resolve({
+            messages: messages
+          }));
+
+        $scope.init();
+        $rootScope.$apply();
+
+        expect(fetchMessagesAsyncSpy).toHaveBeenCalledWith('suggestion_1');
         expect($scope.reviewMessage).toBe('');
       });
+  });
+
+  describe('when reviewing suggestions' +
+    ' with deleted opportunites', function() {
+    const reviewable = false;
+    const subheading = 'subheading_title';
+
+    const suggestion1 = {
+      suggestion_id: 'suggestion_1',
+      target_id: '1',
+      suggestion_type: 'translate_content',
+      change: {
+        content_id: 'hint_1',
+        content_html: ['Translation1', 'Translation2'],
+        translation_html: 'Tradução',
+        state_name: 'StateName'
+      },
+      exploration_content_html: ['Translation1', 'Translation2 CHANGED'],
+      status: 'rejected'
+    };
+    const suggestion2 = {
+      suggestion_id: 'suggestion_2',
+      target_id: '2',
+      suggestion_type: 'translate_content',
+      change: {
+        content_id: 'hint_1',
+        content_html: 'Translation',
+        translation_html: 'Tradução',
+        state_name: 'StateName'
+      },
+      exploration_content_html: 'Translation'
+    };
+
+    const contribution1 = {
+      suggestion: suggestion1,
+      details: null
+    };
+
+    const deletedContribution = {
+      suggestion: suggestion2,
+      details: null
+    };
+
+    const suggestionIdToContribution = {
+      suggestion_1: contribution1,
+      suggestion_deleted: deletedContribution,
+    };
+
+    beforeEach(angular.mock.inject(function($injector, $controller) {
+      const $rootScope = $injector.get('$rootScope');
+      $uibModalInstance = jasmine.createSpyObj(
+        '$uibModalInstance', ['close', 'dismiss']);
+
+      $scope = $rootScope.$new();
+      $controller('TranslationSuggestionReviewModalController', {
+        $scope: $scope,
+        $uibModalInstance: $uibModalInstance,
+        initialSuggestionId: 'suggestion_1',
+        subheading: subheading,
+        reviewable: reviewable,
+        suggestionIdToContribution: angular.copy(suggestionIdToContribution)
+      });
+    }));
+
+    it('should reject suggestion in suggestion modal service when clicking ' +
+      'on reject and review next suggestion button', function() {
+      expect($scope.activeSuggestionId).toBe('suggestion_1');
+      expect($scope.activeSuggestion).toEqual(suggestion1);
+      expect($scope.reviewable).toBe(reviewable);
+      expect($scope.reviewMessage).toBe('');
+
+      spyOn(contributionAndReviewService, 'resolveSuggestionToExploration')
+        .and.callFake((
+            targetId, suggestionId, action, reviewMessage, commitMessage,
+            callback) => {
+          callback();
+        });
+      spyOn(
+        SiteAnalyticsService,
+        'registerContributorDashboardRejectSuggestion');
+      $scope.reviewMessage = 'Review message example';
+
+      $scope.rejectAndReviewNext();
+
+      expect(
+        SiteAnalyticsService.registerContributorDashboardRejectSuggestion)
+        .toHaveBeenCalledWith('Translation');
+      expect(contributionAndReviewService.resolveSuggestionToExploration)
+        .toHaveBeenCalledWith(
+          '1', 'suggestion_1', 'reject', 'Review message example',
+          'hint section of "StateName" card', $scope.showNextItemToReview);
+      expect($uibModalInstance.close).toHaveBeenCalledWith([
+        'suggestion_1']);
+    });
   });
 });

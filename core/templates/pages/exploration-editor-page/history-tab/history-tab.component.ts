@@ -16,12 +16,13 @@
  * @fileoverview Component for the exploration history tab.
  */
 
+import { Subscription } from 'rxjs';
+import cloneDeep from 'lodash/cloneDeep';
+import { RevertExplorationModalComponent } from './modal-templates/revert-exploration-modal.component';
+
 require(
   'components/version-diff-visualization/' +
   'version-diff-visualization.component.ts');
-require(
-  'pages/exploration-editor-page/history-tab/modal-templates/' +
-  'revert-exploration-modal.controller.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
@@ -33,22 +34,24 @@ require(
 require('services/date-time-format.service.ts');
 require('services/editability.service.ts');
 require('pages/exploration-editor-page/services/router.service.ts');
-
-import { Subscription } from 'rxjs';
-import cloneDeep from 'lodash/cloneDeep';
+require(
+  'pages/exploration-editor-page/services/' +
+  'history-tab-backend-api.service.ts'
+);
+require('services/ngb-modal.service.ts');
 
 angular.module('oppia').component('historyTab', {
   template: require('./history-tab.component.html'),
   controller: [
-    '$http', '$log', '$rootScope', '$uibModal', 'CompareVersionsService',
+    '$log', '$rootScope', 'CompareVersionsService',
     'DateTimeFormatService', 'EditabilityService', 'ExplorationDataService',
-    'LoaderService', 'RouterService',
-    'VersionTreeService', 'WindowRef',
+    'HistoryTabBackendApiService', 'LoaderService', 'NgbModal',
+    'RouterService', 'VersionTreeService', 'WindowRef',
     function(
-        $http, $log, $rootScope, $uibModal, CompareVersionsService,
+        $log, $rootScope, CompareVersionsService,
         DateTimeFormatService, EditabilityService, ExplorationDataService,
-        LoaderService, RouterService,
-        VersionTreeService, WindowRef) {
+        HistoryTabBackendApiService, LoaderService, NgbModal,
+        RouterService, VersionTreeService, WindowRef) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
       // Variable explorationSnapshots is a list of all snapshots for the
@@ -108,42 +111,43 @@ angular.module('oppia').component('historyTab', {
 
           ctrl.compareVersionsButtonIsHidden = ctrl.comparisonsAreDisabled;
 
-          $http.get(ctrl.explorationAllSnapshotsUrl).then(
-            function(response) {
-              explorationSnapshots = response.data.snapshots;
-              VersionTreeService.init(explorationSnapshots);
-
-              // Re-populate versionCheckboxArray and
-              // explorationVersionMetadata when history is refreshed.
-              ctrl.versionCheckboxArray = [];
-              ctrl.explorationVersionMetadata = [];
-              var lowestVersionIndex = 0;
-              for (
-                var i = currentVersion - 1; i >= lowestVersionIndex; i--) {
-                var versionNumber = explorationSnapshots[i].version_number;
-                ctrl.explorationVersionMetadata[versionNumber - 1] = {
-                  committerId: explorationSnapshots[i].committer_id,
-                  createdOnMsecsStr: (
-                    DateTimeFormatService
-                      .getLocaleDateTimeHourString(
-                        explorationSnapshots[i].created_on_ms)),
-                  tooltipText: DateTimeFormatService.getDateTimeInWords(
-                    explorationSnapshots[i].created_on_ms),
-                  commitMessage: explorationSnapshots[i].commit_message,
-                  versionNumber: explorationSnapshots[i].version_number
-                };
-                ctrl.versionCheckboxArray.push({
-                  vnum: explorationSnapshots[i].version_number,
-                  selected: false
-                });
+          HistoryTabBackendApiService
+            .getData(ctrl.explorationAllSnapshotsUrl).then(
+              function(response) {
+                explorationSnapshots = response.snapshots;
+                VersionTreeService.init(explorationSnapshots);
+                // Re-populate versionCheckboxArray and
+                // explorationVersionMetadata when history is refreshed.
+                ctrl.versionCheckboxArray = [];
+                ctrl.explorationVersionMetadata = [];
+                var lowestVersionIndex = 0;
+                for (
+                  var i = currentVersion - 1; i >= lowestVersionIndex; i--) {
+                  var versionNumber = explorationSnapshots[i].version_number;
+                  ctrl.explorationVersionMetadata[versionNumber - 1] = {
+                    committerId: explorationSnapshots[i].committer_id,
+                    createdOnMsecsStr: (
+                      DateTimeFormatService
+                        .getLocaleDateTimeHourString(
+                          explorationSnapshots[i].created_on_ms)),
+                    tooltipText: DateTimeFormatService.getDateTimeInWords(
+                      explorationSnapshots[i].created_on_ms),
+                    commitMessage: explorationSnapshots[i].commit_message,
+                    versionNumber: explorationSnapshots[i].version_number
+                  };
+                  ctrl.versionCheckboxArray.push({
+                    vnum: explorationSnapshots[i].version_number,
+                    selected: false
+                  });
+                }
+                ctrl.totalExplorationVersionMetadata = cloneDeep(
+                  ctrl.explorationVersionMetadata);
+                ctrl.totalExplorationVersionMetadata.reverse();
+                LoaderService.hideLoadingScreen();
+                ctrl.changeItemsPerPage();
+                $rootScope.$applyAsync();
               }
-              ctrl.totalExplorationVersionMetadata = cloneDeep(
-                ctrl.explorationVersionMetadata);
-              ctrl.totalExplorationVersionMetadata.reverse();
-              LoaderService.hideLoadingScreen();
-              ctrl.changeItemsPerPage();
-              $rootScope.$applyAsync();
-            });
+            );
           $rootScope.$applyAsync();
         });
       };
@@ -228,22 +232,25 @@ angular.module('oppia').component('historyTab', {
       };
 
       ctrl.showRevertExplorationModal = function(version) {
-        $uibModal.open({
-          template: require(
-            'pages/exploration-editor-page/history-tab/modal-templates/' +
-            'revert-exploration-modal.template.html'),
+        const modalRef = NgbModal.open(RevertExplorationModalComponent, {
           backdrop: true,
-          resolve: {
-            version: () => version
-          },
-          controller: 'RevertExplorationModalController'
-        }).result.then(function(version) {
-          $http.post(ctrl.revertExplorationUrl, {
-            current_version: ExplorationDataService.data.version,
-            revert_to_version: version
-          }).then(function() {
-            WindowRef.nativeWindow.location.reload();
-          });
+        });
+        modalRef.componentInstance.version = version;
+        modalRef.result.then(function(version) {
+          var data = {
+            revertExplorationUrl: ctrl.revertExplorationUrl,
+            currentVersion: ExplorationDataService.data.version,
+            revertToVersion: version
+          };
+          HistoryTabBackendApiService.postData(data).then(
+            function() {
+              WindowRef.nativeWindow.location.reload();
+            },
+            function() {
+              // Note to developers:
+              // This callback is triggered when the Post Request is failed.
+            }
+          );
         }, function(error) {
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.

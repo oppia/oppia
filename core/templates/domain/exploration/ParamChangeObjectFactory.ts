@@ -37,9 +37,9 @@ var DEFAULT_CUSTOMIZATION_ARGS: CustomizationArgs = {
 };
 
 interface ParamChangeCustomizationArgs {
-  'parse_with_jinja'?: boolean,
-  'value'?: string,
-  'list_of_values'?: string[]
+  'parse_with_jinja'?: boolean;
+  'value'?: string;
+  'list_of_values'?: string[];
 }
 
 export interface ParamChangeBackendDict {

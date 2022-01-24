@@ -44,7 +44,7 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
   @Input() previewDescriptionBgColor: string;
   @Input() previewFooter: string;
   @Input() previewTitle: string;
-  @Output() updateBgColor: EventEmitter<string> = new EventEmitter() ;
+  @Output() updateBgColor: EventEmitter<string> = new EventEmitter();
   @Output() updateFilename: EventEmitter<string> = new EventEmitter();
   @Output() imageSave: EventEmitter<void> = new EventEmitter();
   openInUploadMode: boolean;
@@ -52,7 +52,7 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
   tempImageName: string;
   uploadedImage: string;
   uploadedImageMimeType: string;
-  dimensions: { height: number; width: number; };
+  dimensions: { height: number; width: number };
   resampledFile: Blob;
   newThumbnailDataUrl: string;
   localStorageBgcolor: string;

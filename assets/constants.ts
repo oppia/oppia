@@ -45,6 +45,7 @@ export default {
   "DISABLED_EXPLORATION_IDS": ["5"],
   "TESTING_CONSTANT": "test",
   "LIBRARY_TILE_WIDTH_PX": 208,
+  "LIBRARY_MOBILE_TILE_WIDTH_PX": 350,
   "DASHBOARD_TYPE_CREATOR": "creator",
   "DASHBOARD_TYPE_LEARNER": "learner",
   "DEFAULT_COLOR": "#a33f40",
@@ -4772,6 +4773,10 @@ export default {
     "description": "shqip (Albanian)",
     "direction": "ltr"
   }, {
+    "code": "az",
+    "description": "Azeri (Azerbaijani)",
+    "direction": "ltr"
+  }, {
     "code": "bg",
     "description": "български (Bulgarian)",
     "direction": "ltr"
@@ -4832,6 +4837,10 @@ export default {
     "description": "ελληνικά (Greek)",
     "direction": "ltr"
   }, {
+    "code": "ha",
+    "description": "Halshen Hausa (Hausa)",
+    "direction": "ltr"
+  }, {
     "code": "he",
     "description": "עברית (Hebrew)",
     "direction": "rtl"
@@ -4850,6 +4859,10 @@ export default {
   }, {
     "code": "id",
     "description": "Bahasa Indonesia (Indonesian)",
+    "direction": "ltr"
+  }, {
+    "code": "ig",
+    "description": "Ásụ̀sụ́ Ìgbò (Igbo)",
     "direction": "ltr"
   }, {
     "code": "it",
@@ -4955,26 +4968,19 @@ export default {
     "code": "vi",
     "description": "Tiếng Việt (Vietnamese)",
     "direction": "ltr"
+  }, {
+    "code": "yo",
+    "description": "Èdè Yorùbá (Yoruba)",
+    "direction": "ltr"
   }],
 
   // NOTE TO DEVELOPERS: While adding another language, please ensure that the
-  // languages are in alphabetical order.
+  // languages are roughly in order of how much support we have for them in
+  // terms of lesson content translations.
   // List of supported site languages in which the platform is offered.
   "SUPPORTED_SITE_LANGUAGES": [{
-    "id": "id",
-    "text": "Bahasa Indonesia",
-    "direction": "ltr"
-  }, {
     "id": "en",
     "text": "English",
-    "direction": "ltr"
-  }, {
-    "id": "es",
-    "text": "Español",
-    "direction": "ltr"
-  }, {
-    "id": "fr",
-    "text": "français (French)",
     "direction": "ltr"
   }, {
     "id": "pt-br",
@@ -4984,6 +4990,38 @@ export default {
     "id": "ar",
     "text": "العربية",
     "direction": "rtl"
+  }, {
+    "id": "hi",
+    "text": "हिन्दी",
+    "direction": "ltr"
+  }, {
+    "id": "es",
+    "text": "Español",
+    "direction": "ltr"
+  }, {
+    "id": "bn",
+    "text": "বাংলা",
+    "direction": "ltr"
+  }, {
+    "id": "fr",
+    "text": "français (French)",
+    "direction": "ltr"
+  }, {
+    "id": "id",
+    "text": "Bahasa Indonesia",
+    "direction": "ltr"
+  }, {
+    "id": "uk",
+    "text": "украї́нська мо́ва (Ukrainian)",
+    "direction": "ltr"
+  }, {
+    "id": "sk",
+    "text": "slovenčina (Slovak)",
+    "direction": "ltr"
+  }, {
+    "id": "nl",
+    "text": "Nederlands (Dutch)",
+    "direction": "ltr"
   }, {
     "id": "kab",
     "text": "Taqbaylit (Kabyle)",
@@ -4995,14 +5033,6 @@ export default {
   }, {
     "id": "tr",
     "text": "Türkçe (Turkish)",
-    "direction": "ltr"
-  }, {
-    "id": "hi",
-    "text": "हिन्दी",
-    "direction": "ltr"
-  }, {
-    "id": "bn",
-    "text": "বাংলা",
     "direction": "ltr"
   }, {
     "id": "zh-hans",
@@ -5038,6 +5068,11 @@ export default {
     "description": "Arabic",
     "relatedLanguages": ["ar"],
     "direction": "rtl"
+  }, {
+    "id": "az",
+    "description": "Azerbaijani",
+    "relatedLanguages": ["az"],
+    "direction": "ltr"
   }, {
     "id": "bg",
     "description": "Bulgarian",
@@ -5134,6 +5169,11 @@ export default {
     "relatedLanguages": ["gaa"],
     "direction": "ltr"
   }, {
+    "id": "ha",
+    "description": "Hausa",
+    "relatedLanguages": ["ha"],
+    "direction": "ltr"
+  }, {
     "id": "he",
     "description": "Hebrew",
     "relatedLanguages": ["he"],
@@ -5157,6 +5197,11 @@ export default {
     "id": "id",
     "description": "Indonesian",
     "relatedLanguages": ["id"],
+    "direction": "ltr"
+  }, {
+    "id": "ig",
+    "description": "Igbo",
+    "relatedLanguages": ["igbo"],
     "direction": "ltr"
   }, {
     "id": "it",
@@ -5292,6 +5337,11 @@ export default {
     "id": "vi",
     "description": "Vietnamese",
     "relatedLanguages": ["vi"],
+    "direction": "ltr"
+  }, {
+    "id": "yo",
+    "description": "Yoruba",
+    "relatedLanguages": ["yo"],
     "direction": "ltr"
   }],
 
@@ -5609,6 +5659,7 @@ export default {
   // The recommended length for meta tag contents. Search engines will truncate
   // results greater than this limit.
   "MAX_CHARS_IN_META_TAG_CONTENT": 160,
+  "MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB": 5,
   "MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB": 50,
 
   "NEW_STATE_TEMPLATE": {
@@ -5805,9 +5856,10 @@ export default {
 
   // Placeholder texts for the math interactions.
   "MATH_INTERACTION_PLACEHOLDERS": {
-    "AlgebraicExpressionInput": "Type an expression here.",
-    "NumericExpressionInput": "Type an expression here, using only numbers.",
-    "MathEquationInput": "Type an equation here."
+    "AlgebraicExpressionInput": "I18N_INTERACTIONS_ALGEBRAIC_EXPR_INSTRUCTION",
+    "MathEquationInput": "I18N_INTERACTIONS_MATH_EQ_INSTRUCTION",
+    // The following is user editable and hence, is not translated.
+    "NumericExpressionInput": "Type an expression here, using only numbers."
   },
 
   // Unfinished features.
@@ -5826,12 +5878,6 @@ export default {
   "GCS_RESOURCE_BUCKET_NAME": "app_default_bucket",
 
   "ENABLE_EXP_FEEDBACK_FOR_LOGGED_OUT_USERS": true,
-
-  // Used to disable account removal until it is fully implemented.
-  "ENABLE_ACCOUNT_DELETION": true,
-
-  // Used to disable account data export until it is fully implemented.
-  "ENABLE_ACCOUNT_EXPORT": true,
 
   // Link to open when the Oppia avatar is clicked on any page.
   "OPPIA_AVATAR_LINK_URL": null,
@@ -5979,7 +6025,7 @@ export default {
     },
     "ABOUT_FOUNDATION": {
       "ROUTE": "about-foundation",
-      "TITLE": "About foundation | Oppia",
+      "TITLE": "About the Oppia Foundation | Oppia",
       "META": []
     },
     "CLASSROOM": {

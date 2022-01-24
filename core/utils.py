@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import base64
+import binascii
 import collections
 import datetime
 import hashlib
@@ -45,6 +46,8 @@ _YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-5.1.2')
 sys.path.insert(0, _YAML_PATH)
 
 import yaml  # isort:skip  # pylint: disable=wrong-import-position
+import certifi  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+import ssl  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 DATETIME_FORMAT = '%m/%d/%Y, %H:%M:%S:%f'
 ISO_8601_DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%fz'
@@ -156,13 +159,13 @@ def get_exploration_components_from_dir(
                         raise Exception(
                             'More than one non-asset file specified '
                             'for %s' % dir_path)
-                    elif not filepath.endswith('.yaml'):
+                    if not filepath.endswith('.yaml'):
                         raise Exception(
                             'Found invalid non-asset file %s. There '
                             'should only be a single non-asset file, '
                             'and it should have a .yaml suffix.' % filepath)
-                    else:
-                        yaml_content = get_file_contents(filepath)
+
+                    yaml_content = get_file_contents(filepath)
             else:
                 filepath_array = filepath.split('/')
                 # The additional offset is to remove the 'assets/' prefix.
@@ -303,7 +306,7 @@ def convert_png_data_url_to_binary(image_data_url: str) -> bytes:
     """
     if image_data_url.startswith(PNG_DATA_URL_PREFIX):
         return base64.b64decode(
-            python_utils.urllib_unquote(
+            urllib.parse.unquote(
                 image_data_url[len(PNG_DATA_URL_PREFIX):]))
     else:
         raise Exception('The given string does not represent a PNG data URL.')
@@ -327,6 +330,22 @@ def convert_png_binary_to_data_url(content: bytes) -> str:
         )
     else:
         raise Exception('The given string does not represent a PNG image.')
+
+
+def is_base64_encoded(content: str) -> bool:
+    """Checks if a string is base64 encoded.
+
+    Args:
+        content: str. String to check.
+
+    Returns:
+        bool. True if a string is base64 encoded, False otherwise.
+    """
+    try:
+        base64.b64decode(content, validate=True)
+        return True
+    except binascii.Error:
+        return False
 
 
 def convert_png_to_data_url(filepath: str) -> str:
@@ -396,7 +415,7 @@ def set_url_query_parameter(
     query_params[param_name] = [param_value]
     new_query_string = urllib.parse.urlencode(query_params, doseq=True)
 
-    return python_utils.url_unsplit( # type: ignore[no-any-return, no-untyped-call]
+    return urllib.parse.urlunsplit(
         (scheme, netloc, path, new_query_string, fragment))
 
 
@@ -554,7 +573,7 @@ def create_string_from_largest_unit_in_timedelta(
     if total_seconds <= 0:
         raise Exception(
             'Expected a positive timedelta, received: %s.' % total_seconds)
-    elif timedelta_obj.days != 0:
+    if timedelta_obj.days != 0:
         return '%s day%s' % (
             int(timedelta_obj.days), 's' if timedelta_obj.days > 1 else '')
     else:
@@ -974,7 +993,7 @@ def unescape_encoded_uri_component(escaped_string: str) -> str:
     Returns:
         str. Decoded string that was initially encoded with encodeURIComponent.
     """
-    return python_utils.urllib_unquote(escaped_string)
+    return urllib.parse.unquote(escaped_string)
 
 
 def snake_case_to_camel_case(snake_str: str) -> str:
@@ -1109,7 +1128,7 @@ def grouper(
     # To understand how/why this works, please refer to the following
     # Stack Overflow answer: https://stackoverflow.com/a/49181132/4859885.
     args = [iter(iterable)] * chunk_len
-    return python_utils.zip_longest(*args, fillvalue=fillvalue) # type: ignore[no-any-return, no-untyped-call]
+    return itertools.zip_longest(*args, fillvalue=fillvalue)
 
 
 def partition(
@@ -1179,3 +1198,20 @@ def quoted(s: str) -> str:
         str. The quoted string.
     """
     return json.dumps(s)
+
+
+def url_open(source_url: str) -> str:
+    """Opens a URL and returns the response.
+
+    Args:
+        source_url: str. The URL.
+
+    Returns:
+        urlopen. The 'urlopen' object.
+    """
+    # TODO(#12912): Remove pylint disable after the arg-name-for-non-keyword-arg
+    # check is refactored.
+    context = ssl.create_default_context(cafile=certifi.where())  # pylint: disable=arg-name-for-non-keyword-arg
+    # The type ignore is needed, because typestubs define the return type
+    # of 'urlopen' as 'Any' which is wrong.
+    return urllib.request.urlopen(source_url, context=context) # type: ignore[no-any-return]

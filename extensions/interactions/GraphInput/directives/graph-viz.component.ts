@@ -58,7 +58,7 @@ const debounce = (delay: number = 5): MethodDecorator => {
 interface GraphButton {
   text: string;
   description: string;
-  mode: number
+  mode: number;
 }
 
 interface GraphOption {

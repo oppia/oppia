@@ -104,7 +104,7 @@ require('components/concept-card/concept-card.component.ts');
 require('components/skill-mastery/skill-mastery.component.ts');
 require(
   'pages/exploration-player-page/learner-experience/' +
-  'conversation-skin.directive.ts');
+  'conversation-skin.component.ts');
 require(
   'pages/exploration-player-page/layout-directives/' +
   'exploration-footer.component.ts');
@@ -125,6 +125,7 @@ require('pages/exploration-player-page/services/player-position.service.ts');
 import { Subscription } from 'rxjs';
 
 require('pages/interaction-specs.constants.ajs.ts');
+require('services/prevent-page-unload-event.service.ts');
 
 angular.module('oppia').component('questionPlayer', {
   bindings: {
@@ -134,9 +135,9 @@ angular.module('oppia').component('questionPlayer', {
   controller: [
     '$location', '$rootScope', '$sanitize', '$sce', '$scope', '$uibModal',
     '$window', 'ExplorationPlayerStateService', 'PlayerPositionService',
-    'QuestionPlayerStateService', 'SkillMasteryBackendApiService',
-    'UrlInterpolationService', 'UserService', 'COLORS_FOR_PASS_FAIL_MODE',
-    'HASH_PARAM', 'MAX_MASTERY_GAIN_PER_QUESTION',
+    'PreventPageUnloadEventService', 'QuestionPlayerStateService',
+    'SkillMasteryBackendApiService', 'UserService',
+    'COLORS_FOR_PASS_FAIL_MODE', 'HASH_PARAM', 'MAX_MASTERY_GAIN_PER_QUESTION',
     'MAX_MASTERY_LOSS_PER_QUESTION', 'MAX_SCORE_PER_QUESTION',
     'QUESTION_PLAYER_MODE', 'VIEW_HINT_PENALTY',
     'VIEW_HINT_PENALTY_FOR_MASTERY', 'WRONG_ANSWER_PENALTY',
@@ -144,9 +145,9 @@ angular.module('oppia').component('questionPlayer', {
     function(
         $location, $rootScope, $sanitize, $sce, $scope, $uibModal,
         $window, ExplorationPlayerStateService, PlayerPositionService,
-        QuestionPlayerStateService, SkillMasteryBackendApiService,
-        UrlInterpolationService, UserService, COLORS_FOR_PASS_FAIL_MODE,
-        HASH_PARAM, MAX_MASTERY_GAIN_PER_QUESTION,
+        PreventPageUnloadEventService, QuestionPlayerStateService,
+        SkillMasteryBackendApiService, UserService,
+        COLORS_FOR_PASS_FAIL_MODE, HASH_PARAM, MAX_MASTERY_GAIN_PER_QUESTION,
         MAX_MASTERY_LOSS_PER_QUESTION, MAX_SCORE_PER_QUESTION,
         QUESTION_PLAYER_MODE, VIEW_HINT_PENALTY,
         VIEW_HINT_PENALTY_FOR_MASTERY, WRONG_ANSWER_PENALTY,
@@ -159,19 +160,10 @@ angular.module('oppia').component('questionPlayer', {
         ctrl.totalQuestions = 0;
         ctrl.currentProgress = 0;
         ctrl.totalScore = 0.0;
+        ctrl.allQuestions = 0;
+        ctrl.finalCorrect = 0.0;
         ctrl.scorePerSkillMapping = {};
         ctrl.testIsPassed = true;
-      };
-      var getStaticImageUrl = function(url) {
-        return UrlInterpolationService.getStaticImageUrl(url);
-      };
-
-      ctrl.getActionButtonOuterClass = function(actionButtonType) {
-        var className = getClassNameForType(actionButtonType);
-        if (className) {
-          return className + 'outer';
-        }
-        return '';
       };
 
       ctrl.getActionButtonInnerClass = function(actionButtonType) {
@@ -185,20 +177,13 @@ angular.module('oppia').component('questionPlayer', {
       ctrl.getActionButtonIconHtml = function(actionButtonType) {
         var iconHtml = '';
         if (actionButtonType === 'REVIEW_LOWEST_SCORED_SKILL') {
-          iconHtml = `<picture>
-          <source type="image/webp"
-          srcset="${getStaticImageUrl('/icons/rocket@2x.webp')}">
-          <source type="image/png"
-          srcset="${getStaticImageUrl('/icons/rocket@2x.png')}">
-          <img alt=""
-                class="action-button-icon"
-                src="${getStaticImageUrl('/icons/rocket@2x.png')}"/>
-          </picture>`;
+          iconHtml = '<i class="material-icons md-18 ' +
+          'action-button-icon">&#xe869</i>';
         } else if (actionButtonType === 'RETRY_SESSION') {
-          iconHtml = '<i class="material-icons md-36 ' +
+          iconHtml = '<i class="material-icons md-18 ' +
           'action-button-icon">&#xE5D5</i>';
         } else if (actionButtonType === 'DASHBOARD') {
-          iconHtml = '<i class="material-icons md-36 ' +
+          iconHtml = '<i class="material-icons md-18 ' +
           'action-button-icon">&#xE88A</i>';
         }
         return $sce.trustAsHtml($sanitize(iconHtml));
@@ -376,6 +361,9 @@ angular.module('oppia').component('questionPlayer', {
           // Calculate total score.
           ctrl.totalScore += questionScore;
 
+          // Increment number of questions.
+          ctrl.allQuestions += 1;
+
           // Calculate scores per skill.
           if (!(questionData.linkedSkillIds)) {
             continue;
@@ -389,9 +377,12 @@ angular.module('oppia').component('questionPlayer', {
             ctrl.scorePerSkillMapping[skillId].total += 1.0;
           }
         }
+        ctrl.finalCorrect = ctrl.totalScore;
         ctrl.totalScore = Math.round(
           ctrl.totalScore * 100 / totalQuestions);
         $scope.resultsLoaded = true;
+        QuestionPlayerStateService.resultsPageIsLoadedEventEmitter.emit(
+          $scope.resultsLoaded);
       };
 
       var getMasteryChangeForWrongAnswers = function(
@@ -503,6 +494,19 @@ angular.module('oppia').component('questionPlayer', {
         }
       };
 
+      ctrl.getColorForScoreBar = function(scorePerSkill) {
+        if (!isInPassOrFailMode()) {
+          return COLORS_FOR_PASS_FAIL_MODE.PASSED_COLOR_BAR;
+        }
+        var correctionRate = scorePerSkill.score / scorePerSkill.total;
+        if (correctionRate >=
+          ctrl.questionPlayerConfig.questionPlayerMode.passCutoff) {
+          return COLORS_FOR_PASS_FAIL_MODE.PASSED_COLOR_BAR;
+        } else {
+          return COLORS_FOR_PASS_FAIL_MODE.FAILED_COLOR;
+        }
+      };
+
       ctrl.reviewConceptCardAndRetryTest = function() {
         if (!ctrl.failedSkillIds || ctrl.failedSkillIds.length === 0) {
           throw new Error('No failed skills');
@@ -549,6 +553,9 @@ angular.module('oppia').component('questionPlayer', {
             (result) => {
               $location.hash(
                 HASH_PARAM + encodeURIComponent(JSON.stringify(result)));
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the controller is migrated to angular.
+              $rootScope.$applyAsync();
             })
         );
 
@@ -582,6 +589,13 @@ angular.module('oppia').component('questionPlayer', {
         // called in $scope.$on when some external events are triggered.
         initResults();
         ctrl.questionPlayerConfig = ctrl.getQuestionPlayerConfig();
+        QuestionPlayerStateService.resultsPageIsLoadedEventEmitter.emit(
+          $scope.resultsLoaded);
+        PreventPageUnloadEventService.addListener(
+          () => {
+            return (getCurrentQuestion() > 1);
+          }
+        );
       };
 
       ctrl.$onDestroy = function() {

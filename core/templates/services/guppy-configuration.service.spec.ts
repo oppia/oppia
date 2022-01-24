@@ -70,7 +70,7 @@ class MockComponentB implements OnInit {
 let guppyConfigurationService: GuppyConfigurationService;
 
 describe('GuppyConfigurationService', () => {
-  beforeAll(() => {
+  beforeEach(() => {
     guppyConfigurationService = TestBed.get(GuppyConfigurationService);
     window.Guppy = MockGuppy;
   });
@@ -90,7 +90,9 @@ describe('GuppyConfigurationService', () => {
       expect(Guppy.remove_global_symbol).not.toHaveBeenCalled();
     });
   });
+});
 
+describe('GuppyConfigurationService', () => {
   describe('Components calling the service', () => {
     let component: MockComponentB;
     let fixture: ComponentFixture<MockComponentB>;
@@ -102,6 +104,8 @@ describe('GuppyConfigurationService', () => {
           declarations: [MockComponentB],
         }
       ).compileComponents();
+      guppyConfigurationService = TestBed.get(GuppyConfigurationService);
+      window.Guppy = MockGuppy;
     }));
     beforeEach(() => {
       fixture = TestBed.createComponent(

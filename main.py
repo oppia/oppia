@@ -78,6 +78,7 @@ from core.controllers import voice_artist
 from core.platform import models
 from core.platform.auth import firebase_auth_services
 
+import google.cloud.logging
 from typing import Any, Dict, Optional, Type, TypeVar, cast
 import webapp2
 from webapp2_extras import routes
@@ -90,6 +91,15 @@ T = TypeVar('T')  # pylint: disable=invalid-name
 
 cache_services = models.Registry.import_cache_services()
 datastore_services = models.Registry.import_datastore_services()
+
+# Cloud Logging is disabled in emulator mode, since it is unnecessary and
+# creates a lot of noise.
+if not constants.EMULATOR_MODE:
+    # Instantiates a client and rtrieves a Cloud Logging handler based on the
+    # environment you're running in and integrates the handler with the Python
+    # logging module.
+    client = google.cloud.logging.Client()
+    client.setup_logging()
 
 # Suppress debug logging for chardet. See https://stackoverflow.com/a/48581323.
 # Without this, a lot of unnecessary debug logs are printed in error logs,
@@ -208,11 +218,6 @@ URLS = [
         r'%s/does_profile_exist/<username>' %
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.ProfileExistsValidationHandler),
-
-    get_redirect_route(
-        r'%s/account_deletion_is_enabled' %
-        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
-        access_validators.AccountDeletionIsEnabledValidationHandler),
 
     get_redirect_route(
         r'%s/can_access_release_coordinator_page' %
@@ -737,7 +742,7 @@ URLS = [
         topic_editor.TopicPublishSendMailHandler),
 
     get_redirect_route(
-        r'%s/<comma_separated_skill_ids>' % feconf.CONCEPT_CARD_DATA_URL_PREFIX,
+        r'%s/<selected_skill_ids>' % feconf.CONCEPT_CARD_DATA_URL_PREFIX,
         concept_card_viewer.ConceptCardDataHandler),
     get_redirect_route(
         r'%s/<question_id>' % feconf.QUESTION_SKILL_LINK_URL_PREFIX,
@@ -977,8 +982,7 @@ URLS.extend((
         r'%s' % feconf.TASK_URL_FEEDBACK_STATUS_EMAILS,
         tasks.FeedbackThreadStatusChangeEmailHandler),
     get_redirect_route(
-        r'%s' % feconf.TASK_URL_DEFERRED,
-        tasks.DeferredTasksHandler),
+        r'%s' % feconf.TASK_URL_DEFERRED, tasks.DeferredTasksHandler),
 ))
 
 # 404 error handler (Needs to be at the end of the URLS list).

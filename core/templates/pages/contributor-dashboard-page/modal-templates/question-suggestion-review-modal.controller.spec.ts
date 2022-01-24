@@ -27,7 +27,6 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 describe('Question Suggestion Review Modal Controller', function() {
   let $scope = null;
   let $http = null;
-  let $httpBackend = null;
   var $q = null;
   var $uibModal = null;
   let $uibModalInstance = null;
@@ -415,9 +414,15 @@ describe('Question Suggestion Review Modal Controller', function() {
 
   describe('when a suggestion is rejected', function() {
     let $rootScope = null;
+    let $q = null;
+    let ThreadDataBackendApiService = null;
+
     beforeEach(angular.mock.inject(function($injector, $controller) {
       $rootScope = $injector.get('$rootScope');
-      $httpBackend = $injector.get('$httpBackend');
+      $q = $injector.get('$q');
+      ThreadDataBackendApiService = $injector.get(
+        'ThreadDataBackendApiService');
+
       const skillRubrics = [{
         explanations: ['explanation'],
         difficulty: 'Easy'
@@ -513,15 +518,21 @@ describe('Question Suggestion Review Modal Controller', function() {
     }));
 
     it('should fetch the rejection message', function() {
-      const responseDict = {
-        messages: [
-          { text: 'Question submitted.' },
-          { text: 'This is a rejection.' }
-        ]
-      };
+      const messages = [
+        { text: 'Question submitted.' },
+        { text: 'This is a rejection.' }
+      ];
 
-      $httpBackend.expect('GET', '/threadhandler/123').respond(responseDict);
-      $httpBackend.flush();
+      const fetchMessagesAsyncSpy = spyOn(
+        ThreadDataBackendApiService, 'fetchMessagesAsync')
+        .and.returnValue($q.resolve({
+          messages: messages
+        }));
+
+      $scope.init();
+      $rootScope.$apply();
+
+      expect(fetchMessagesAsyncSpy).toHaveBeenCalledWith('123');
       expect($scope.reviewMessage).toBe('This is a rejection.');
     });
   });

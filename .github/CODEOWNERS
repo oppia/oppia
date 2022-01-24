@@ -50,6 +50,7 @@
 /core/templates/components/code-mirror/ @srijanreddy98 @ashutoshc8101
 /core/templates/components/filter-fields/ @srijanreddy98 @ashutoshc8101
 /core/templates/components/oppia-angular-root.component.* @srijanreddy98 @ashutoshc8101
+/core/templates/components/smooth-height/smooth-height-animator.component.* @srijanreddy98 @ashutoshc8101
 /core/templates/modules/ @srijanreddy98 @ashutoshc8101
 /core/templates/pages/common-imports.ts @srijanreddy98 @ashutoshc8101
 /core/templates/pages/mock-ajs.ts @srijanreddy98 @ashutoshc8101
@@ -67,7 +68,6 @@
 /core/templates/services/request-interceptor.service*.ts @srijanreddy98 @ashutoshc8101
 /core/templates/services/UpgradedServices.ts @srijanreddy98 @ashutoshc8101
 /core/templates/hybrid-router-module-provider*.ts @srijanreddy98 @ashutoshc8101
-
 
 # TS typing
 /typings/ @vojtechjelinek
@@ -88,8 +88,9 @@
 
 
 # App Feedback Reporting project
-/core/domain/app_feedback_report_*.py @BenHenning @vinitamurthi
-/core/controllers/incoming_app_feedback_report*.py @BenHenning @vinitamurthi
+# TODO(#14285): Replace @seanlip with @BenHenning for both.
+/core/domain/app_feedback_report_*.py @seanlip
+/core/controllers/incoming_app_feedback_report*.py @seanlip
 
 
 # Audio and Translation team.
@@ -132,20 +133,25 @@
 
 
 # Core documentation
-/AUTHORS @seanlip @BenHenning
+# TODO(#14285): Re-add @BenHenning.
+/AUTHORS @seanlip
 /CHANGELOG @seanlip @vojtechjelinek
-/CONTRIBUTORS @seanlip @BenHenning
+# TODO(#14285): Re-add @BenHenning.
+/CONTRIBUTORS @seanlip
 /LICENSE @seanlip
 /NOTICE @seanlip
 /core/templates/pages/about-page/ @DubeySandeep
-/core/templates/pages/about-page/about-page.constants.ts @seanlip @BenHenning
+# TODO(#14285): Re-add @BenHenning.
+/core/templates/pages/about-page/about-page.constants.ts @seanlip
 /core/templates/pages/license-page/ @vojtechjelinek
 /core/templates/pages/license-page/license-page.component.html @seanlip
 /core/templates/pages/privacy-page/ @DubeySandeep
-/core/templates/pages/privacy-page/privacy-page.component.html @seanlip @BenHenning
+# TODO(#14285): Re-add @BenHenning.
+/core/templates/pages/privacy-page/privacy-page.component.html @seanlip
 /core/templates/pages/privacy-page/privacy-page.component.ts @DubeySandeep
 /core/templates/pages/terms-page/ @DubeySandeep
-/core/templates/pages/terms-page/terms-page.component.html @seanlip @BenHenning
+# TODO(#14285): Re-add @BenHenning.
+/core/templates/pages/terms-page/terms-page.component.html @seanlip
 
 
 # Dashboard pages.
@@ -180,7 +186,6 @@
 /.pylintrc @Hudda @DubeySandeep
 /.stylelintrc @Hudda @DubeySandeep
 /.yarnrc @DubeySandeep
-/core/templates/css/.stylelintrc @Hudda @DubeySandeep
 /tox.ini @Hudda @DubeySandeep
 /scripts/*.py @DubeySandeep
 /scripts/check_e2e_tests_are_captured_in_ci*.py @DubeySandeep
@@ -212,6 +217,7 @@
 /core/templates/components/state-directives/ @kevintab95
 /core/templates/components/graph-services/ @kevintab95
 /core/templates/components/on-screen-keyboard/ @aks681
+/core/templates/components/save-pending-changes/ @kevintab95
 /core/templates/components/version-diff-visualization/ @aks681
 /core/templates/domain/editor/ @kevintab95
 /core/templates/domain/exploration/ @kevintab95
@@ -335,39 +341,38 @@
 
 
 # Lesson Analytics team.
-# TODO(#14094): Revert ownership of all files in this section to @seanlip after 2021-10-31.
-/core/controllers/features*.py @vojtechjelinek
-/core/controllers/improvements*.py @vojtechjelinek
-/core/domain/action_registry*.py @vojtechjelinek
-/core/domain/calculation_registry*.py @vojtechjelinek
-/core/domain/event_services*.py @vojtechjelinek
-/core/domain/improvements_domain*.py @vojtechjelinek
-/core/domain/improvements_services*.py @vojtechjelinek
-/core/domain/playthrough_issue_registry*.py @vojtechjelinek
-/core/domain/stats*.py @vojtechjelinek
-/core/domain/visualization_registry*.py @vojtechjelinek
-/core/templates/components/common-layout-directives/common-elements/answer-content-modal.controller*.ts @vojtechjelinek
-/core/templates/components/common-layout-directives/common-elements/answer-content-modal.template.html @vojtechjelinek
-/core/templates/components/common-layout-directives/common-elements/confirmation-modal.template.html @vojtechjelinek
-/core/templates/components/statistics-directives/ @vojtechjelinek
-/core/templates/domain/statistics/ @vojtechjelinek
-/core/templates/domain/improvements/ @vojtechjelinek
-/core/templates/pages/exploration-editor-page/improvements-tab/ @vojtechjelinek
-/core/templates/pages/exploration-editor-page/statistics-tab/ @vojtechjelinek
-/core/templates/services/exploration-improvements.service*.ts @vojtechjelinek
-/core/templates/services/exploration-improvements-backend-api.service*.ts @vojtechjelinek
-/core/templates/services/exploration-improvements-task-registry.service*.ts @vojtechjelinek
-/core/templates/services/exploration-stats.service*.ts @vojtechjelinek
-/core/templates/services/exploration-stats-backend-api.service*.ts @vojtechjelinek
-/core/templates/services/improvements.service*.ts @vojtechjelinek
-/core/templates/services/messenger.service.ts @vojtechjelinek
-/core/templates/services/playthrough*.ts @vojtechjelinek
-/core/templates/services/state-interaction-stats.service*.ts @vojtechjelinek
-/core/templates/services/state-top-answers-stats*.ts @vojtechjelinek
-/extensions/actions/ @vojtechjelinek
-/extensions/answer_summarizers/ @vojtechjelinek
-/extensions/issues/ @vojtechjelinek
-/extensions/visualizations/ @vojtechjelinek
+/core/controllers/features*.py @oppia/learner-analytics-reviewers
+/core/controllers/improvements*.py @oppia/learner-analytics-reviewers
+/core/domain/action_registry*.py @oppia/learner-analytics-reviewers
+/core/domain/calculation_registry*.py @oppia/learner-analytics-reviewers
+/core/domain/event_services*.py @oppia/learner-analytics-reviewers
+/core/domain/improvements_domain*.py @oppia/learner-analytics-reviewers
+/core/domain/improvements_services*.py @oppia/learner-analytics-reviewers
+/core/domain/playthrough_issue_registry*.py @oppia/learner-analytics-reviewers
+/core/domain/stats*.py @oppia/learner-analytics-reviewers
+/core/domain/visualization_registry*.py @oppia/learner-analytics-reviewers
+/core/templates/components/common-layout-directives/common-elements/answer-content-modal.controller*.ts @oppia/learner-analytics-reviewers
+/core/templates/components/common-layout-directives/common-elements/answer-content-modal.template.html @oppia/learner-analytics-reviewers
+/core/templates/components/common-layout-directives/common-elements/confirmation-modal.template.html @oppia/learner-analytics-reviewers
+/core/templates/components/statistics-directives/ @oppia/learner-analytics-reviewers
+/core/templates/domain/statistics/ @oppia/learner-analytics-reviewers
+/core/templates/domain/improvements/ @oppia/learner-analytics-reviewers
+/core/templates/pages/exploration-editor-page/improvements-tab/ @oppia/learner-analytics-reviewers
+/core/templates/pages/exploration-editor-page/statistics-tab/ @oppia/learner-analytics-reviewers
+/core/templates/services/exploration-improvements.service*.ts @oppia/learner-analytics-reviewers
+/core/templates/services/exploration-improvements-backend-api.service*.ts @oppia/learner-analytics-reviewers
+/core/templates/services/exploration-improvements-task-registry.service*.ts @oppia/learner-analytics-reviewers
+/core/templates/services/exploration-stats.service*.ts @oppia/learner-analytics-reviewers
+/core/templates/services/exploration-stats-backend-api.service*.ts @oppia/learner-analytics-reviewers
+/core/templates/services/improvements.service*.ts @oppia/learner-analytics-reviewers
+/core/templates/services/messenger.service.ts @oppia/learner-analytics-reviewers
+/core/templates/services/playthrough*.ts @oppia/learner-analytics-reviewers
+/core/templates/services/state-interaction-stats.service*.ts @oppia/learner-analytics-reviewers
+/core/templates/services/state-top-answers-stats*.ts @oppia/learner-analytics-reviewers
+/extensions/actions/ @oppia/learner-analytics-reviewers
+/extensions/answer_summarizers/ @oppia/learner-analytics-reviewers
+/extensions/issues/ @oppia/learner-analytics-reviewers
+/extensions/visualizations/ @oppia/learner-analytics-reviewers
 
 
 # Library page.
@@ -462,13 +467,13 @@
 
 
 # Beam jobs
-/setup.py @vojtechjelinek @brianrodri
-/MANIFEST.in @vojtechjelinek @brianrodri
+/setup.py @vojtechjelinek
+/MANIFEST.in @vojtechjelinek
 /core/jobs/ @vojtechjelinek
 /core/jobs/transforms @vojtechjelinek
 /core/jobs/types @vojtechjelinek
 /core/templates/domain/jobs/ @vojtechjelinek
-/core/controllers/beam_jobs*.py @brianrodri
+/core/controllers/beam_jobs*.py @vojtechjelinek
 
 # Infrastructure.
 /core/controllers/cron*.py @nithusha21
@@ -521,8 +526,8 @@
 /mypy.ini @hardikkat24 @vojtechjelinek
 /mypy_imports.py @hardikkat24 @vojtechjelinek
 /mypy_requirements.txt @hardikkat24 @vojtechjelinek
-/stubs/ @hardikkat24 @vojtechjelinek
-/scripts/run_mypy_checks*.py @hardikkat24 @vojtechjelinek @sajalasati
+/stubs/ @oppia/mypy-reviewers
+/scripts/run_mypy_checks*.py @oppia/mypy-reviewers
 
 
 # Restricted pages.
@@ -560,12 +565,14 @@
 /core/templates/services/autoplayed-videos.service*.ts @aks681
 /core/templates/services/external-save.service*.ts @srijanreddy98
 /core/templates/services/external-rte-save.service*.ts @srijanreddy98
+/core/templates/services/oppia-rte-parser.service*.ts @srijanreddy98 @aks681
 /core/templates/services/image-local-storage*.ts @DubeySandeep
 /core/templates/services/rte-helper.service*.ts @aks681
 /core/templates/services/rte-helper-modal.controller*.ts @aks681
 /core/domain/image_validation_services*.py @DubeySandeep
 /core/domain/rte_component_registry*.py @vojtechjelinek
 /extensions/ckeditor_plugins/ @aks681
+/extensions/rich_text_components/rte-output-display.component* @srijanreddy98 @aks681
 /extensions/rich_text_components/ @aks681
 /assets/rich_text_components_definitions.ts @aks681
 
@@ -627,8 +634,9 @@
 
 
 # User Data Takeout.
-/core/domain/takeout_*.py @BenHenning @vojtechjelinek
-/core/domain/wipeout_*.py @BenHenning @vojtechjelinek
+# TODO(#14285): Replace @seanlip with @BenHenning for both.
+/core/domain/takeout_*.py @seanlip @vojtechjelinek
+/core/domain/wipeout_*.py @seanlip @vojtechjelinek
 
 
 # User’s profile page.
@@ -645,13 +653,14 @@
 
 
 # Dynamic Feature Gating project
-/core/controllers/platform_feature*.py @BenHenning @vinitamurthi
-/core/domain/platform_feature_services*.py @BenHenning @vinitamurthi
-/core/domain/platform_parameter*.py @BenHenning @vinitamurthi
-/core/platform_feature*.py @BenHenning @vinitamurthi
-/core/templates/domain/platform_feature/ @BenHenning @vinitamurthi
-/core/templates/pages/admin-page/features-tab/ @BenHenning @vinitamurthi
-/core/templates/services/platform-feature*.ts @BenHenning @vinitamurthi
+# TODO(#14285): Replace @seanlip with @BenHenning for all of the patterns in this section.
+/core/controllers/platform_feature*.py @seanlip
+/core/domain/platform_feature_services*.py @seanlip
+/core/domain/platform_parameter*.py @seanlip
+/core/platform_feature*.py @seanlip
+/core/templates/domain/platform_feature/ @seanlip
+/core/templates/pages/admin-page/features-tab/ @seanlip
+/core/templates/services/platform-feature*.ts @seanlip
 
 
 # Frontend unit tests
@@ -667,6 +676,7 @@
 # Data stability.
 /core/controllers/domain_objects_validator*.py @vojtechjelinek
 /core/controllers/payload_validator*.py @vojtechjelinek
+/core/handler_schema_constants.py @vojtechjelinek
 
 
 # QA team.
@@ -684,6 +694,7 @@
 /extensions/rich_text_components/protractor.js @oppia/automated-qa-reviewers
 /extensions/objects/protractor.js @oppia/automated-qa-reviewers
 /scripts/backend_test_shards.json @oppia/automated-qa-reviewers
+/scripts/backend_tests_incomplete_coverage.txt @oppia/automated-qa-reviewers
 /.github/actions @oppia/automated-qa-reviewers
 
 
@@ -726,6 +737,7 @@
 /.github/stale.yml @vojtechjelinek
 /.github/workflows/ @DubeySandeep @oppia/automated-qa-reviewers
 # Files needed by the Android team.
-/core/controllers/android_e2e_config*.py @seanlip @BenHenning
-/core/android_validation_constants*.py @seanlip @BenHenning
-/extensions/interactions/rule_templates.json @seanlip @BenHenning
+# TODO(#14285): Re-add @BenHenning for the following 3.
+/core/controllers/android_e2e_config*.py @seanlip
+/core/android_validation_constants*.py @seanlip
+/extensions/interactions/rule_templates.json @seanlip

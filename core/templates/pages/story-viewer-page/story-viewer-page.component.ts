@@ -32,10 +32,10 @@ import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
 import { ReadOnlyStoryNode } from 'domain/story_viewer/read-only-story-node.model';
 
 interface IconParametersArray {
-  thumbnailIconUrl: string,
-  left: string,
-  top: string,
-  thumbnailBgColor: string,
+  thumbnailIconUrl: string;
+  left: string;
+  top: string;
+  thumbnailBgColor: string;
 }
 
 @Component({

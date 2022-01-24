@@ -23,7 +23,7 @@ import { EditableExplorationBackendApiService } from 'domain/exploration/editabl
 import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { PretestQuestionBackendApiService } from 'domain/question/pretest-question-backend-api.service';
 import { QuestionBackendApiService } from 'domain/question/question-backend-api.service';
-import { QuestionBackendDict } from 'domain/question/QuestionObjectFactory';
+import { Question, QuestionBackendDict, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { StateCard } from 'domain/state_card/state-card.model';
 import { ContextService } from 'services/context.service';
 import { UrlService } from 'services/contextual/url.service';
@@ -39,9 +39,9 @@ import { QuestionPlayerEngineService } from './question-player-engine.service';
 import { StatsReportingService } from './stats-reporting.service';
 
 interface QuestionPlayerConfigDict {
-  skillList: string[],
-  questionCount: number,
-  questionsSortedByDifficulty: boolean
+  skillList: string[];
+  questionCount: number;
+  questionsSortedByDifficulty: boolean;
 }
 
 @Injectable({
@@ -59,8 +59,8 @@ export class ExplorationPlayerStateService {
   explorationId: string;
   version: number;
   storyUrlFragment: string;
-  private _playerStateChangeEventEmitter: EventEmitter<void> = (
-    new EventEmitter());
+  private _playerStateChangeEventEmitter: EventEmitter<string> = (
+    new EventEmitter<string>());
 
   constructor(
     private contextService: ContextService,
@@ -79,6 +79,7 @@ export class ExplorationPlayerStateService {
     private playthroughService: PlaythroughService,
     private pretestQuestionBackendApiService: PretestQuestionBackendApiService,
     private questionBackendApiService: QuestionBackendApiService,
+    private questionObjectFactory: QuestionObjectFactory,
     private questionPlayerEngineService: QuestionPlayerEngineService,
     private readOnlyExplorationBackendApiService:
     ReadOnlyExplorationBackendApiService,
@@ -164,12 +165,12 @@ export class ExplorationPlayerStateService {
   }
 
   initializePretestServices(
-      pretestQuestionDicts: QuestionBackendDict[],
+      pretestQuestionObjects: Question[],
       callback: (
         initialCard: StateCard, nextFocusLabel: string) => void): void {
     this.playerCorrectnessFeedbackEnabledService.init(true);
     this.questionPlayerEngineService.init(
-      pretestQuestionDicts, callback, () => {});
+      pretestQuestionObjects, callback, () => {});
   }
 
   initializeQuestionPlayerServices(
@@ -177,8 +178,13 @@ export class ExplorationPlayerStateService {
       successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
       errorCallback: () => void): void {
     this.playerCorrectnessFeedbackEnabledService.init(true);
+    let questionObjects = questionDicts.map(
+      function(questionDict) {
+        return this.questionObjectFactory.createFromBackendDict(
+          questionDict);
+      }, this);
     this.questionPlayerEngineService.init(
-      questionDicts, successCallback, errorCallback);
+      questionObjects, successCallback, errorCallback);
   }
 
   setExplorationMode(): void {
@@ -348,7 +354,7 @@ export class ExplorationPlayerStateService {
     return this._totalQuestionsReceivedEventEmitter;
   }
 
-  get onPlayerStateChange(): EventEmitter<void> {
+  get onPlayerStateChange(): EventEmitter<string> {
     return this._playerStateChangeEventEmitter;
   }
 

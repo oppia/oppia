@@ -45,38 +45,28 @@ NOT_FULLY_COVERED_FILENAMES = [
     'Base.ts',
     'ck-editor-4-rte.component.ts',
     'ck-editor-4-widgets.initializer.ts',
-    'collection-editor-navbar-breadcrumb.component.ts',
-    'collection-footer.component.ts',
-    'collection-navbar.component.ts',
-    'collection-player-page.directive.ts',
+    'collection-player-page.component.ts',
     'collection.model.ts',
     'contribution-and-review.service.ts',
-    'conversation-skin.directive.ts',
-    'current-interaction.service.ts',
     'exploration-states.service.ts',
     'expression-evaluator.service.ts',
     'expression-interpolation.service.ts',
     'fatigue-detection.service.ts',
     'google-analytics.initializer.ts',
-    'language-util.service.ts',
     'learner-answer-info.service.ts',
     'mathjax-bind.directive.ts',
     'normalize-whitespace-punctuation-and-case.pipe.ts',
     'object-editor.directive.ts',
     'oppia-footer.component.ts',
     'oppia-interactive-music-notes-input.directive.ts',
-    'oppia-interactive-pencil-code-editor.directive.ts',
+    'oppia-interactive-pencil-code-editor.component.ts',
     'oppia-root.directive.ts',
     'parameterize-rule-description.filter.ts',
-    'player-correctness-feedback-enabled.service.ts',
-    'player-transcript.service.ts',
     'python-program.tokenizer.ts',
     'question-update.service.ts',
     'refresher-exploration-confirmation-modal.service.ts',
-    'release-coordinator-page.component.ts',
     'rule-type-selector.directive.ts',
     'schema-based-custom-viewer.directive.ts',
-    'schema-based-html-viewer.directive.ts',
     'schema-based-list-viewer.directive.ts',
     'select2-dropdown.directive.ts',
     'state-card.model.ts',
@@ -230,15 +220,15 @@ def check_coverage_changes():
                 .format(test_name))
 
     if errors:
-        python_utils.PRINT('------------------------------------')
-        python_utils.PRINT('Frontend Coverage Checks Not Passed.')
-        python_utils.PRINT('------------------------------------')
+        print('------------------------------------')
+        print('Frontend Coverage Checks Not Passed.')
+        print('------------------------------------')
         logging.error(errors)
         sys.exit(1)
     else:
-        python_utils.PRINT('------------------------------------')
-        python_utils.PRINT('All Frontend Coverage Checks Passed.')
-        python_utils.PRINT('------------------------------------')
+        print('------------------------------------')
+        print('All Frontend Coverage Checks Passed.')
+        print('------------------------------------')
 
     check_not_fully_covered_filenames_list_is_sorted()
 

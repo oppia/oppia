@@ -29,7 +29,7 @@ from core.tests import test_utils
 class ValueGeneratorsUnitTests(test_utils.GenericTestBase):
     """Test the value generator registry."""
 
-    def test_value_generator_registry(self):
+    def test_value_generator_registry(self) -> None:
         copier_id = 'Copier'
 
         copier = value_generators_domain.Registry.get_generator_class_by_id(
@@ -40,9 +40,9 @@ class ValueGeneratorsUnitTests(test_utils.GenericTestBase):
             value_generators_domain.Registry.get_all_generator_classes())
         self.assertEqual(len(all_generator_classes), 2)
 
-    def test_generate_value_of_base_value_generator_raises_error(self):
+    def test_generate_value_of_base_value_generator_raises_error(self) -> None:
         base_generator = value_generators_domain.BaseValueGenerator()
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             NotImplementedError,
             re.escape(
                 'generate_value() method has not yet been implemented')):
@@ -51,10 +51,11 @@ class ValueGeneratorsUnitTests(test_utils.GenericTestBase):
 
 class ValueGeneratorNameTests(test_utils.GenericTestBase):
 
-    def test_value_generator_names(self):
+    def test_value_generator_names(self) -> None:
         """This function checks for duplicate value generators."""
 
-        all_python_files = self.get_all_python_files()
+        all_python_files = (
+            self.get_all_python_files()) # type: ignore[no-untyped-call]
         all_value_generators = []
 
         for file_name in all_python_files:

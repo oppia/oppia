@@ -23,8 +23,6 @@ import sys
 import tarfile
 import urllib.request as urlrequest
 
-from core import python_utils
-
 from . import clean
 from . import common
 
@@ -52,7 +50,7 @@ def create_directory(directory_path):
 def test_python_version():
     running_python_version = '{0[0]}.{0[1]}'.format(sys.version_info)
     if running_python_version != '3.7':
-        python_utils.PRINT('Please use Python 3.7. Exiting...')
+        print('Please use Python 3.7. Exiting...')
         # If OS is Windows, print helpful error message about adding Python to
         # path.
         if common.is_windows_os():
@@ -69,6 +67,23 @@ def test_python_version():
                 'pythonpath-in-windows-7'])
         # Exit when no suitable Python environment can be found.
         raise Exception('No suitable python version found.')
+
+    # Verify that Python 2 is available. Python 2 is needed for the
+    # app_devserver. See the Google Cloud docs:
+    # https://cloud.google.com/appengine/docs/standard/python3/testing-and-deploying-your-app#local-dev-server
+    return_code = subprocess.call(
+        'python2 -V', stderr=subprocess.DEVNULL, shell=True
+    )
+    if return_code != 0:
+        print(
+            '\033[91m'
+            'The Oppia server needs Python 2 to be installed. '
+            'Please follow the instructions at '
+            'https://github.com/oppia/oppia/wiki/Troubleshooting#'
+            'python-2-is-not-available to fix this.'
+            '\033[0m'
+        )
+        sys.exit(1)
 
 
 def download_and_install_package(url_to_retrieve, filename):
@@ -151,10 +166,9 @@ def main(args=None):
     # folders.
     if not os.getcwd().endswith('oppia') and not os.getcwd().endswith(
             'deploy-'):
-        python_utils.PRINT('')
-        python_utils.PRINT(
-            'WARNING   This script should be run from the oppia/ root folder.')
-        python_utils.PRINT('')
+        print('')
+        print('WARNING This script should be run from the oppia/ root folder.')
+        print('')
         raise Exception('Invalid root directory.')
 
     # Set COMMON_DIR to the absolute path of the directory above OPPIA_DIR. This
@@ -176,10 +190,9 @@ def main(args=None):
         'the start.py script.\n')
 
     # Download and install node.js.
-    python_utils.PRINT(
-        'Checking if node.js is installed in %s' % common.OPPIA_TOOLS_DIR)
+    print('Checking if node.js is installed in %s' % common.OPPIA_TOOLS_DIR)
     if not os.path.exists(common.NODE_PATH):
-        python_utils.PRINT('Installing Node.js')
+        print('Installing Node.js')
         download_and_install_node()
     # Change ownership of node_modules.
     # Note: on some machines, these commands seem to take quite a long time.
@@ -188,10 +201,9 @@ def main(args=None):
         common.recursive_chmod(common.NODE_MODULES_PATH, 0o744)
 
     # Download and install yarn.
-    python_utils.PRINT(
-        'Checking if yarn is installed in %s' % common.OPPIA_TOOLS_DIR)
+    print('Checking if yarn is installed in %s' % common.OPPIA_TOOLS_DIR)
     if not os.path.exists(common.YARN_PATH):
-        python_utils.PRINT('Removing package-lock.json')
+        print('Removing package-lock.json')
         clean.delete_file('package-lock.json')
         common.print_each_string_after_two_new_lines([
             'Installing yarn',
@@ -239,11 +251,11 @@ def main(args=None):
         chrome_bin = (
             '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome')
     else:
-        python_utils.PRINT('Chrome is not found, stopping ...')
+        print('Chrome is not found, stopping ...')
         raise Exception('Chrome not found.')
 
     os.environ['CHROME_BIN'] = chrome_bin
-    python_utils.PRINT('Environment setup completed.')
+    print('Environment setup completed.')
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

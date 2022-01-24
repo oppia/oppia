@@ -21,10 +21,12 @@ from __future__ import annotations
 from core.domain import search_services
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
+from core.jobs.transforms import job_result_transforms
 from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
+import result
 from typing import Iterable, List, cast
 
 MYPY = False
@@ -61,6 +63,8 @@ class IndexExplorationsInSearchJob(base_jobs.JobBase):
                 max_batch_size=self.MAX_BATCH_SIZE)
             | 'Index batches of models' >> beam.ParDo(
                 IndexExplorationSummaries())
+            | 'Count the output' >> (
+                job_result_transforms.ResultsToJobRunResults())
         )
 
 
@@ -69,7 +73,7 @@ class IndexExplorationSummaries(beam.DoFn): # type: ignore[misc]
 
     def process(
         self, exp_summary_models: List[datastore_services.Model]
-    ) -> Iterable[job_run_result.JobRunResult]:
+    ) -> Iterable[result.Result[None, Exception]]:
         """Index exploration summaries and catch any errors.
 
         Args:
@@ -82,10 +86,7 @@ class IndexExplorationSummaries(beam.DoFn): # type: ignore[misc]
         try:
             search_services.index_exploration_summaries( # type: ignore[no-untyped-call]
                 cast(List[exp_models.ExpSummaryModel], exp_summary_models))
-            yield job_run_result.JobRunResult(
-                stdout='SUCCESS %s models indexed' % len(exp_summary_models)
-            )
-        except platform_search_services.SearchException:
-            yield job_run_result.JobRunResult(
-                stderr='FAILURE %s models not indexed' % len(exp_summary_models)
-            )
+            for _ in exp_summary_models:
+                yield result.Ok()
+        except platform_search_services.SearchException as e:
+            yield result.Err(e)

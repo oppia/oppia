@@ -126,7 +126,7 @@ export class LearnerDashboardPageComponent implements OnInit {
   messageSendingInProgress: boolean;
   profilePictureDataUrl: SafeResourceUrl;
   newMessage: {
-    'text': string
+    'text': string;
   };
   loadingFeedbacks: boolean;
   explorationTitle: string;

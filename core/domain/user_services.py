@@ -26,7 +26,6 @@ import re
 import urllib
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.domain import auth_domain
@@ -161,8 +160,7 @@ def get_users_settings(user_ids, strict=False, include_marked_deleted=False):
         user_ids, include_deleted=include_marked_deleted)
 
     if strict:
-        for user_id, user_settings_model in python_utils.ZIP(
-                user_ids, user_settings_models):
+        for user_id, user_settings_model in zip(user_ids, user_settings_models):
             if user_settings_model is None:
                 raise Exception('User with ID \'%s\' not found.' % user_id)
     result = []
@@ -174,7 +172,9 @@ def get_users_settings(user_ids, strict=False, include_marked_deleted=False):
                 roles=[
                     feconf.ROLE_ID_FULL_USER,
                     feconf.ROLE_ID_CURRICULUM_ADMIN,
-                    feconf.ROLE_ID_MODERATOR],
+                    feconf.ROLE_ID_MODERATOR,
+                    feconf.ROLE_ID_VOICEOVER_ADMIN
+                ],
                 banned=False,
                 username='admin',
                 last_agreed_to_terms=datetime.datetime.utcnow()
@@ -287,7 +287,9 @@ def get_user_settings_by_auth_id(auth_id, strict=False):
     Raises:
         Exception. The value of strict is True and given auth_id does not exist.
     """
-    user_id = auth_services.get_user_id_from_auth_id(auth_id)
+    user_id = auth_services.get_user_id_from_auth_id(
+        auth_id, include_deleted=True
+    )
     user_settings_model = (
         None if user_id is None else
         user_models.UserSettingsModel.get_by_id(user_id))
@@ -857,7 +859,7 @@ def update_multiple_users_data(modifiable_user_data_list):
     user_ids = [user.user_id for user in modifiable_user_data_list]
     user_settings_list = get_users_settings(user_ids)
     user_auth_details_list = get_multiple_user_auth_details(user_ids)
-    for modifiable_user_data, user_settings in python_utils.ZIP(
+    for modifiable_user_data, user_settings in zip(
             modifiable_user_data_list, user_settings_list):
         user_id = modifiable_user_data.user_id
         if user_id is None:
@@ -880,7 +882,7 @@ def _save_existing_users_settings(user_settings_list):
     user_ids = [user.user_id for user in user_settings_list]
     user_settings_models = user_models.UserSettingsModel.get_multi(
         user_ids, include_deleted=True)
-    for user_model, user_settings in python_utils.ZIP(
+    for user_model, user_settings in zip(
             user_settings_models, user_settings_list):
         user_settings.validate()
         user_model.populate(**user_settings.to_dict())
@@ -900,7 +902,7 @@ def _save_existing_users_auth_details(user_auth_details_list):
     user_ids = [user.user_id for user in user_auth_details_list]
     user_auth_models = auth_models.UserAuthDetailsModel.get_multi(
         user_ids, include_deleted=True)
-    for user_auth_details_model, user_auth_details in python_utils.ZIP(
+    for user_auth_details_model, user_auth_details in zip(
             user_auth_models, user_auth_details_list):
         user_auth_details.validate()
         user_auth_details_model.populate(**user_auth_details.to_dict())
@@ -1138,18 +1140,18 @@ def update_subject_interests(user_id, subject_interests):
     """
     if not isinstance(subject_interests, list):
         raise utils.ValidationError('Expected subject_interests to be a list.')
-    else:
-        for interest in subject_interests:
-            if not isinstance(interest, str):
-                raise utils.ValidationError(
-                    'Expected each subject interest to be a string.')
-            elif not interest:
-                raise utils.ValidationError(
-                    'Expected each subject interest to be non-empty.')
-            elif not re.match(constants.TAG_REGEX, interest):
-                raise utils.ValidationError(
-                    'Expected each subject interest to consist only of '
-                    'lowercase alphabetic characters and spaces.')
+
+    for interest in subject_interests:
+        if not isinstance(interest, str):
+            raise utils.ValidationError(
+                'Expected each subject interest to be a string.')
+        if not interest:
+            raise utils.ValidationError(
+                'Expected each subject interest to be non-empty.')
+        if not re.match(constants.TAG_REGEX, interest):
+            raise utils.ValidationError(
+                'Expected each subject interest to consist only of '
+                'lowercase alphabetic characters and spaces.')
 
     if len(set(subject_interests)) != len(subject_interests):
         raise utils.ValidationError(
@@ -1660,10 +1662,10 @@ def create_user_contributions(
     if user_contributions:
         raise Exception(
             'User contributions model for user %s already exists.' % user_id)
-    else:
-        user_contributions = user_domain.UserContributions(
-            user_id, created_exploration_ids, edited_exploration_ids)
-        _save_user_contributions(user_contributions)
+
+    user_contributions = user_domain.UserContributions(
+        user_id, created_exploration_ids, edited_exploration_ids)
+    _save_user_contributions(user_contributions)
     return user_contributions
 
 

@@ -44,23 +44,27 @@ export interface StoryBackendDict {
 }
 
 export class Story {
-  _id: string;
+  // Assigning union type of "string | null" to some fields,
+  // Because we are assigning null to those fields when we create
+  // interstitial story.
+  _id: string | null;
   _title: string;
   _description: string;
   _notes: string;
-  _storyContents: StoryContents;
+  _storyContents: StoryContents | null;
   _languageCode: string;
   _version: number;
-  _correspondingTopicId: string;
-  _thumbnailFilename: string;
-  _thumbnailBgColor: string;
-  _urlFragment: string;
+  _correspondingTopicId: string | null;
+  _thumbnailFilename: string | null;
+  _thumbnailBgColor: string | null;
+  _urlFragment: string | null;
   _metaTagContent: string;
   constructor(
-      id: string, title: string, description: string, notes: string,
-      storyContents: StoryContents, languageCode: string, version: number,
-      correspondingTopicId: string, thumbnailBgColor: string,
-      thumbnailFilename: string, urlFragment: string, metaTagContent: string) {
+      id: string | null, title: string, description: string,
+      notes: string, storyContents: StoryContents | null, languageCode: string,
+      version: number, correspondingTopicId: string | null,
+      thumbnailBgColor: string | null, thumbnailFilename: string | null,
+      urlFragment: string | null, metaTagContent: string) {
     this._id = id;
     this._title = title;
     this._description = description;
@@ -75,7 +79,10 @@ export class Story {
     this._metaTagContent = metaTagContent;
   }
 
-  getId(): string {
+  // Some methods have either string or null return value,
+  // because when we create interstitial story object
+  // their fields get null value.
+  getId(): string | null {
     return this._id;
   }
 
@@ -123,15 +130,15 @@ export class Story {
     return this._version;
   }
 
-  getStoryContents(): StoryContents {
+  getStoryContents(): StoryContents | null {
     return this._storyContents;
   }
 
-  getCorrespondingTopicId(): string {
+  getCorrespondingTopicId(): string | null {
     return this._correspondingTopicId;
   }
 
-  getThumbnailFilename(): string {
+  getThumbnailFilename(): string | null {
     return this._thumbnailFilename;
   }
 
@@ -139,7 +146,7 @@ export class Story {
     this._thumbnailFilename = thumbnailFilename;
   }
 
-  getThumbnailBgColor(): string {
+  getThumbnailBgColor(): string | null {
     return this._thumbnailBgColor;
   }
 
@@ -147,7 +154,7 @@ export class Story {
     this._thumbnailBgColor = thumbnailBgColor;
   }
 
-  getUrlFragment(): string {
+  getUrlFragment(): string | null {
     return this._urlFragment;
   }
 
@@ -179,8 +186,9 @@ export class Story {
           `${constants.MAX_CHARS_IN_STORY_URL_FRAGMENT} characters`);
       }
     }
-
-    issues = issues.concat(this._storyContents.validate());
+    if (this._storyContents !== null) {
+      issues = issues.concat(this._storyContents.validate());
+    }
     return issues;
   }
 
@@ -238,6 +246,10 @@ export class StoryObjectFactory {
     );
   }
 
+  /**
+ * TODO(#14169): Remove the interstitial story so that full story can be
+ * created from start.
+ */
   // Create an interstitial story that would be displayed in the editor until
   // the actual story is fetched from the backend.
   createInterstitialStory(): Story {

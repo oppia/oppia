@@ -18,8 +18,8 @@
  */
 
 export interface RubricBackendDict {
-  difficulty: string,
-  explanations: string[]
+  difficulty: string;
+  explanations: string[];
 }
 
 import cloneDeep from 'lodash/cloneDeep';

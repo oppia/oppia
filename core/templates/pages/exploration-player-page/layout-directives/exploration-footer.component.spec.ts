@@ -29,6 +29,7 @@ import { UrlService } from 'services/contextual/url.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { ExplorationSummaryBackendApiService, ExplorationSummaryDict } from 'domain/summary/exploration-summary-backend-api.service';
 import { EventEmitter } from '@angular/core';
+import { QuestionPlayerStateService } from 'components/question-directives/question-player/services/question-player-state.service';
 
 describe('ExplorationFooterComponent', () => {
   let component: ExplorationFooterComponent;
@@ -36,8 +37,10 @@ describe('ExplorationFooterComponent', () => {
   let contextService: ContextService;
   let urlService: UrlService;
   let windowDimensionsService: WindowDimensionsService;
+  let questionPlayerStateService: QuestionPlayerStateService;
   let mockResizeEventEmitter = new EventEmitter();
   let explorationSummaryBackendApiService: ExplorationSummaryBackendApiService;
+  let mockResultsLoadedEventEmitter = new EventEmitter<boolean>();
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -47,16 +50,19 @@ describe('ExplorationFooterComponent', () => {
         MockTranslatePipe,
         LimitToPipe
       ],
+      providers: [QuestionPlayerStateService],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    contextService = TestBed.get(ContextService);
-    urlService = TestBed.get(UrlService);
-    windowDimensionsService = TestBed.get(WindowDimensionsService);
-    explorationSummaryBackendApiService = TestBed.get(
+    contextService = TestBed.inject(ContextService);
+    urlService = TestBed.inject(UrlService);
+    windowDimensionsService = TestBed.inject(WindowDimensionsService);
+    explorationSummaryBackendApiService = TestBed.inject(
       ExplorationSummaryBackendApiService);
+    questionPlayerStateService = TestBed.inject(
+      QuestionPlayerStateService);
     fixture = TestBed.createComponent(ExplorationFooterComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -120,6 +126,33 @@ describe('ExplorationFooterComponent', () => {
     expect(component.contributorNames).toEqual([
       'contributor_2', 'contributor_3', 'contributor_1']);
   }));
+
+  it('should not show hints after user finishes practice session' +
+  ' and results are loadeed.', () => {
+    spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
+    expect(component.hintsAndSolutionsAreSupported).toBeTrue();
+
+    spyOnProperty(questionPlayerStateService, 'resultsPageIsLoadedEventEmitter')
+      .and.returnValue(mockResultsLoadedEventEmitter);
+
+    component.ngOnInit();
+    mockResultsLoadedEventEmitter.emit(true);
+
+    expect(component.hintsAndSolutionsAreSupported).toBeFalse();
+  });
+
+  it('should show hints when initialized in question player when user is' +
+  ' going through the practice session and should add subscription.', () => {
+    spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
+    spyOn(
+      questionPlayerStateService.resultsPageIsLoadedEventEmitter, 'subscribe');
+
+    component.ngOnInit();
+
+    expect(component.hintsAndSolutionsAreSupported).toBeTrue();
+    expect(questionPlayerStateService.resultsPageIsLoadedEventEmitter.subscribe)
+      .toHaveBeenCalled();
+  });
 
   it('should check if window is narrow when user resizes window', () => {
     spyOn(contextService, 'getExplorationId').and.returnValue('exp1');

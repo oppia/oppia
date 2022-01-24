@@ -75,12 +75,6 @@ describe('Contributor dashboard page', function() {
     await users.createUser(QUESTION_ADMIN_EMAIL, QUESTION_ADMIN_USERNAME);
 
     await users.createAndLoginCurriculumAdminUser(ADMIN_EMAIL, 'management');
-    await adminPage.editConfigProperty(
-      'Whether the contributor can suggest questions for skill opportunities.',
-      'Boolean', async function(elem) {
-        await elem.setValue(true);
-      });
-
 
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createTopic(
@@ -293,11 +287,6 @@ describe('Contributor dashboard admin page contribution rights form', () => {
 
     await adminPage.addRole(QUESTION_ADMIN_USERNAME, 'question admin');
     await adminPage.addRole(TRANSLATION_ADMIN_USERNAME, 'translation admin');
-    await adminPage.editConfigProperty(
-      'Whether the contributor can suggest questions for skill opportunities.',
-      'Boolean', async function(elem) {
-        await elem.setValue(true);
-      });
     await users.logout();
   });
 

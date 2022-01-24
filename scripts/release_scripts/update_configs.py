@@ -30,6 +30,7 @@ import re
 import sys
 
 from core import python_utils
+from core import utils
 from .. import common
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
@@ -134,21 +135,20 @@ def check_updates_to_terms_of_service(
     repo = g.get_organization('oppia').get_repo('oppia')
 
     common.open_new_tab_in_browser_if_possible(TERMS_PAGE_FOLDER_URL)
-    python_utils.PRINT(
+    print(
         'Are the terms of service changed? Check commits/changes made '
         'to the files in: core/templates/pages/terms-page. '
         'Enter y/ye/yes if they are changed else enter n/no.')
     terms_of_service_are_changed = input().lower()
     while terms_of_service_are_changed not in ['y', 'ye', 'yes', 'n', 'no']:
-        python_utils.PRINT(
+        print(
             'Invalid Input: %s. Please enter yes or no.' % (
                 terms_of_service_are_changed))
         terms_of_service_are_changed = input().lower()
 
     if terms_of_service_are_changed in (
             common.AFFIRMATIVE_CONFIRMATIONS):
-        python_utils.PRINT(
-            'Enter sha of the commit which changed the terms of service.')
+        print('Enter sha of the commit which changed the terms of service.')
         commit_sha = input().lstrip().rstrip()
         commit_time = repo.get_commit(commit_sha).commit.committer.date
         time_tuple = (
@@ -277,7 +277,7 @@ def main(args=None):
 
     if options.prompt_for_mailgun_and_terms_update:
         try:
-            python_utils.url_open(TERMS_PAGE_FOLDER_URL)
+            utils.url_open(TERMS_PAGE_FOLDER_URL)
         except Exception:
             raise Exception('Terms mainpage does not exist on Github.')
         add_mailgun_api_key(release_feconf_path)

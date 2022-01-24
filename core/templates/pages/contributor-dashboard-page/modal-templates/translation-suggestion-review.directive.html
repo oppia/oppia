@@ -44,16 +44,21 @@
               <[item]>
             </li>
           </ul>
-          <schema-based-editor schema="HTML_SCHEMA" local-value="editedContent" ng-if="startedEditing && isHtmlContent">
+          <schema-based-editor schema="HTML_SCHEMA" local-value="editedContent.html" ng-if="startedEditing && isHtmlContent">
           </schema-based-editor>
-          <schema-based-editor schema="UNICODE_SCHEMA" local-value="editedContent" ng-if="startedEditing && isUnicodeContent">
+          <schema-based-editor schema="UNICODE_SCHEMA" local-value="editedContent.html" ng-if="startedEditing && isUnicodeContent">
           </schema-based-editor>
-          <schema-based-editor schema="SET_OF_STRINGS_SCHEMA" local-value="editedContent" ng-if="startedEditing && isSetOfStringsContent">
+          <schema-based-editor schema="SET_OF_STRINGS_SCHEMA" local-value="editedContent.html" ng-if="startedEditing && isSetOfStringsContent">
           </schema-based-editor>
         </div>
         <div class="oppia-translation-review-edit-buttons">
           <button class="btn btn-secondary" ng-if="startedEditing" ng-click="cancelEdit()">Cancel</button>
           <button class="btn btn-success" ng-if="startedEditing" ng-click="updateSuggestion()">Update</button>
+        </div>
+        <div class="oppia-translation-error-section" ng-if="startedEditing && errorFound">
+          <p>
+            <[errorMessage]>
+          </p>
         </div>
       </div>
     </div>
@@ -113,6 +118,7 @@
     border: 1px solid #ccc;
     height: 88%;
     padding: 10px 0 10px 10px;
+    position: relative;
   }
   .oppia-suggestion-review-message {
     margin-left: 10px;
@@ -133,6 +139,17 @@
   .oppia-translation-review-edit-buttons {
     margin-left: 10px;
     margin-top: 10px;
+  }
+  .oppia-translation-error-section {
+    bottom: 10px;
+    color: red;
+    position: absolute;
+  }
+  .oppia-close-button-position {
+    font-size: 2.5rem;
+    position: absolute;
+    right: 8px;
+    top: 12px;
   }
   /* From 1023px onwards, the modal text branches to the next line.
      The use of line height ensures that alternate lines of the

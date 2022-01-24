@@ -34,10 +34,10 @@ import { LoaderService } from 'services/loader.service';
 
 export interface GroupedSkillSummaries {
   current: {
-    id: string,
-    description: string,
-  }[],
-  others: SkillSummaryBackendDict[]
+    id: string;
+    description: string;
+  }[];
+  others: SkillSummaryBackendDict[];
 }
 @Injectable({
   providedIn: 'root'

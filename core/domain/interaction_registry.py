@@ -106,13 +106,19 @@ class Registry:
         }
 
     @classmethod
-    def get_all_specs_for_state_schema_version(cls, state_schema_version):
+    def get_all_specs_for_state_schema_version(
+        cls,
+        state_schema_version,
+        can_fetch_latest_specs=False):
         """Returns a dict containing the full specs of each interaction for the
-        given state schema version, if available.
+        given state schema version, if available else return all specs or an
+        error depending on can_fetch_latest_specs.
 
         Args:
             state_schema_version: int. The state schema version to retrieve
                 interaction specs for.
+            can_fetch_latest_specs: boolean. Whether to fetch the latest specs
+                if the legacy specs file is not found.
 
         Returns:
             dict. The interaction specs for the given state schema
@@ -130,16 +136,19 @@ class Registry:
             spec_file = os.path.join(
                 feconf.INTERACTIONS_LEGACY_SPECS_FILE_DIR, file_name)
 
-            try:
+            if os.path.isfile(spec_file):
                 with python_utils.open_file(spec_file, 'r') as f:
                     specs_from_json = json.loads(f.read())
-            except IOError:
+                cls._state_schema_version_to_interaction_specs[
+                    state_schema_version] = specs_from_json
+                return cls._state_schema_version_to_interaction_specs[
+                    state_schema_version]
+            elif can_fetch_latest_specs:
+                return cls.get_all_specs()
+            else:
                 raise IOError(
                     'No specs JSON file found for state schema v%i' %
                     state_schema_version)
-
-            cls._state_schema_version_to_interaction_specs[
-                state_schema_version] = specs_from_json
 
         return cls._state_schema_version_to_interaction_specs[
             state_schema_version]

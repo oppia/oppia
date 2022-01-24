@@ -18,9 +18,9 @@ from __future__ import annotations
 
 import io
 import logging
+import urllib
 
 from core import feconf
-from core import python_utils
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -85,7 +85,7 @@ class AssetDevHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
         try:
-            filename = python_utils.urllib_unquote(encoded_filename)
+            filename = urllib.parse.unquote(encoded_filename)
             file_format = filename[(filename.rfind('.') + 1):]
 
             # If the following is not cast to str, an error occurs in the wsgi
@@ -115,6 +115,23 @@ class AssetDevHandler(base.BaseHandler):
 class PromoBarHandler(base.BaseHandler):
     """Handler for the promo-bar."""
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'PUT': {
+            'promo_bar_enabled': {
+                'schema': {
+                    'type': 'bool'
+                },
+            },
+            'promo_bar_message': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+    }
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     # This prevents partially logged in user from being logged out
     # during user registration.
@@ -129,8 +146,10 @@ class PromoBarHandler(base.BaseHandler):
 
     @acl_decorators.can_access_release_coordinator_page
     def put(self):
-        promo_bar_enabled_value = self.payload.get('promo_bar_enabled')
-        promo_bar_message_value = self.payload.get('promo_bar_message')
+        promo_bar_enabled_value = self.normalized_payload.get(
+            'promo_bar_enabled')
+        promo_bar_message_value = self.normalized_payload.get(
+            'promo_bar_message')
 
         logging.info(
             '[RELEASE COORDINATOR] %s saved promo-bar config property values: '

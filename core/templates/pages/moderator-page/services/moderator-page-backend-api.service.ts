@@ -22,42 +22,42 @@ import { ThreadMessageBackendDict }
   from 'domain/feedback_message/ThreadMessage.model';
 
 export interface CommitMessage {
-  'commit_message': string,
-  'commit_type': string,
-  'exploration_id': string,
-  'last_updated': number,
-  'post_commit_community_owned': boolean,
-  'post_commit_is_private': boolean,
-  'post_commit_status': string,
-  username: string,
-  version: number
+  'commit_message': string;
+  'commit_type': string;
+  'exploration_id': string;
+  'last_updated': number;
+  'post_commit_community_owned': boolean;
+  'post_commit_is_private': boolean;
+  'post_commit_status': string;
+  username: string;
+  version: number;
 }
 
 export interface ExplorationDict {
-  category: string,
-  title: string
+  category: string;
+  title: string;
 }
 
 export interface ActivityIdTypeDict {
-  id: string,
-  type: string
+  id: string;
+  type: string;
 }
 
 export interface RecentCommitResponse {
-  'results': CommitMessage[],
-  'cursor': string,
-  'more': boolean,
-  'exp_ids_to_exp_data': ExplorationDict[],
+  'results': CommitMessage[];
+  'cursor': string;
+  'more': boolean;
+  'exp_ids_to_exp_data': ExplorationDict[];
 }
 
 export interface RecentFeedbackMessages {
-  'results': ThreadMessageBackendDict[],
-  'cursor': string,
-  'more': boolean
+  'results': ThreadMessageBackendDict[];
+  'cursor': string;
+  'more': boolean;
 }
 
 export interface FeaturedActivityResponse {
-  'featured_activity_references': ActivityIdTypeDict[]
+  'featured_activity_references': ActivityIdTypeDict[];
 }
 
 @Injectable({

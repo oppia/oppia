@@ -26,25 +26,25 @@ import { UrlService } from 'services/contextual/url.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { ExplorationPlayerConstants } from '../exploration-player-page.constants';
-import { ExplorationEngineService } from '../services/exploration-engine.service';
 import { ExplorationPlayerStateService } from '../services/exploration-player-state.service';
 import { PlayerPositionService } from '../services/player-position.service';
 import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
 
 @Component({
   selector: 'oppia-progress-nav',
   templateUrl: './progress-nav.component.html'
 })
 export class ProgressNavComponent {
-  @Input() isLearnAgainButton: () => void;
+  @Input() isLearnAgainButton: boolean;
   @Input() displayedCard: StateCard;
   @Input() submitButtonIsShown: boolean;
-  @Input() submitButtonIsDisabled: boolean;
   @Output() submit: EventEmitter<void> = (
     new EventEmitter());
   @Output() clickContinueButton: EventEmitter<void> = (
     new EventEmitter());
+  @Output() changeCard: EventEmitter<number> = new EventEmitter();
 
   directiveSubscriptions = new Subscription();
   transcriptLength = 0;
@@ -65,13 +65,13 @@ export class ProgressNavComponent {
 
   constructor(
     private browserCheckerService: BrowserCheckerService,
-    private explorationEngineService: ExplorationEngineService,
     private explorationPlayerStateService: ExplorationPlayerStateService,
     private focusManagerService: FocusManagerService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private playerPositionService: PlayerPositionService,
     private playerTranscriptService: PlayerTranscriptService,
     private urlService: UrlService,
+    private schemaFormSubmittedService: SchemaFormSubmittedService,
     private windowDimensionsService: WindowDimensionsService
   ) {}
 
@@ -88,12 +88,6 @@ export class ProgressNavComponent {
 
   ngOnInit(): void {
     this.isIframed = this.urlService.isIframed();
-    this.directiveSubscriptions.add(
-      this.playerPositionService.displayedCardIndexChangedEventEmitter
-        .subscribe((index) => {
-          this.updateDisplayedCardInfo();
-        })
-    );
 
     this.directiveSubscriptions.add(
       this.playerPositionService.onHelpCardAvailable.subscribe(
@@ -102,10 +96,13 @@ export class ProgressNavComponent {
         }
       )
     );
-
-    if (this.playerPositionService.getDisplayedCardIndex() > -1) {
-      this.updateDisplayedCardInfo();
-    }
+    this.directiveSubscriptions.add(
+      this.schemaFormSubmittedService.onSubmittedSchemaBasedForm.subscribe(
+        () => {
+          this.submit.emit();
+        }
+      )
+    );
   }
 
   ngOnDestroy(): void {
@@ -172,13 +169,9 @@ export class ProgressNavComponent {
     }
   }
 
-  changeCard(index: number): void {
+  validateIndexAndChangeCard(index: number): void {
     if (index >= 0 && index < this.transcriptLength) {
-      this.playerPositionService.recordNavigationButtonClick();
-      this.playerPositionService.setDisplayedCardIndex(index);
-      this.explorationEngineService.onUpdateActiveStateIfInEditor.emit(
-        this.playerPositionService.getCurrentStateName());
-      this.playerPositionService.changeCurrentQuestion(index);
+      this.changeCard.emit(index);
     } else {
       throw new Error('Target card index out of bounds.');
     }
