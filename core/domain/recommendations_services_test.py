@@ -110,7 +110,7 @@ class TopicSimilarityUnitTests(test_utils.GenericTestBase):
             '0.2,1.0,0.8\n'
             '0.1,0.8,1.0')
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, (
                 'Length of topic similarities columns: 2 does not match '
                 'length of topic list: 3.')
@@ -120,7 +120,7 @@ class TopicSimilarityUnitTests(test_utils.GenericTestBase):
                 '1.0,0.2,0.1\n'
                 '0.2,1.0,0.8')
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, (
                 'Length of topic similarities rows: 2 does not match '
                 'length of topic list: 3.')
@@ -131,7 +131,7 @@ class TopicSimilarityUnitTests(test_utils.GenericTestBase):
                 '0.2,1.0\n'
                 '0.1,0.8,1.0')
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             ValueError,
             'Expected similarity to be between 0.0 and 1.0, received 800'
             ):
@@ -141,7 +141,7 @@ class TopicSimilarityUnitTests(test_utils.GenericTestBase):
                 '0.2,1.0,800\n'
                 '0.1,0.8,1.0')
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             ValueError,
             'Expected similarity to be a float, received string'
             ):
@@ -151,7 +151,7 @@ class TopicSimilarityUnitTests(test_utils.GenericTestBase):
                 '0.2,1.0,0.8\n'
                 '0.1,0.8,1.0')
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Topic Fake Topic not in list of known topics.'
             ):
             recommendations_services.update_topic_similarities(
@@ -160,7 +160,7 @@ class TopicSimilarityUnitTests(test_utils.GenericTestBase):
                 '0.2,1.0,0.8\n'
                 '0.1,0.8,1.0')
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected topic similarities to be symmetric.'
             ):
             recommendations_services.update_topic_similarities(
@@ -307,6 +307,11 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
             recommendations_services.get_exploration_recommendations(
                 'exp_id_1'))
         self.assertEqual(recommended_exp_ids, saved_recommendation_ids)
+
+        saved_recommendation_ids = (
+            recommendations_services.get_exploration_recommendations(
+                'exp_id_0'))
+        self.assertEqual(saved_recommendation_ids, [])
 
     def test_delete_recommendations_for_exploration(self):
         recommendations_services.delete_explorations_from_recommendations([

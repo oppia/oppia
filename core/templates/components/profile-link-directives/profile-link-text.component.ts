@@ -31,8 +31,9 @@ export class ProfileLinkTextComponent {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() username!: string;
   profileUrl = (
-    '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PROFILE.ROUTE +
-    '/' + this.username
+    '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PROFILE.ROUTE.replace(
+      ':username_fragment', this.username
+    )
   );
 
   constructor() {}
