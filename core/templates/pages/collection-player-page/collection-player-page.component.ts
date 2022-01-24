@@ -44,7 +44,7 @@ export interface CollectionSummary {
   'is_admin': boolean;
   'summaries': string[];
   'user_email': string;
-  'is_topic_manager': false;
+  'is_topic_manager': boolean;
   'username': boolean;
 }
 
@@ -282,13 +282,15 @@ export class CollectionPlayerPageComponent implements OnInit {
   }
 
   async fetchSummaryAsync(collectionId: string): Promise<void> {
-    let Summary = (
-      await
-      this.collectionPlayerBackendApiService.fetchCollectionSummariesAsync(
-        collectionId
-      ));
-    if (Summary) {
-      this.collectionSummary = Summary.summaries[0];
+    let summary = null;
+    this.collectionPlayerBackendApiService.fetchCollectionSummariesAsync(
+      collectionId
+    ).then((collectionSummary) => {
+      summary = collectionSummary;
+    });
+
+    if (summary) {
+      this.collectionSummary = summary.summaries[0];
     }
   }
 
