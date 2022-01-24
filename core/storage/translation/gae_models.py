@@ -21,7 +21,7 @@ from __future__ import annotations
 from core import utils
 from core.platform import models
 
-from typing import Dict, List, Optional, Sequence
+from typing import Dict, List, Optional, Sequence, Union
 from typing_extensions import TypedDict
 
 MYPY = False
@@ -40,7 +40,7 @@ datastore_services = models.Registry.import_datastore_services()
 class TranslatedContentDict(TypedDict):
     """Dictionary representing TranslatedContent object."""
 
-    content: str|List[str]
+    content: Union[str, List[str]]
     needs_update: bool
 
 
@@ -57,7 +57,8 @@ class EntityTranslationsModel(base_models.BaseModel):
     # The ISO 639-1 code for the language an entity is written in.
     language_code = datastore_services.StringProperty(
         required=True, indexed=True)
-    # The translated content.
+    # Represents the translated content of the TranslatableContent object. The
+    # format is of type dict(str, TranslatedContent).
     translations = datastore_services.JsonProperty(required=True)
 
     @staticmethod
@@ -116,7 +117,7 @@ class EntityTranslationsModel(base_models.BaseModel):
         entity_version and language_code.
 
         Args:
-            entity_type: str. Type of an entity.
+            entity_type: str. Type of the entity to fetch.
             entity_id: str. Id of an entity.
             entity_version: int. Version of an entity.
             language_code: str. Language code for a given entity.
@@ -137,8 +138,8 @@ class EntityTranslationsModel(base_models.BaseModel):
         entity_id: str,
         entity_version: int
     ) -> Sequence[Optional[EntityTranslationsModel]]:
-        """Gets EntityTranslationsModels by help of entity_type, entity_id,
-        entity_version.
+        """Gets EntityTranslationsModels corresponding to the given entity, for
+        all languages in which such models exist.
 
         Args:
             entity_type: str. Type of an entity.
@@ -147,8 +148,8 @@ class EntityTranslationsModel(base_models.BaseModel):
 
         Returns:
             list(EntityTranslationsModel|None). The EntityTranslationsModel
-            instances corresponding to the given inputs, if such a translation
-            exists, or None if no translation is found.
+            instances corresponding to the given inputs, if such translations
+            exist.
         """
         return cls.query(
             cls.entity_type == entity_type,

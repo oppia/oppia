@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import copy
+import enum
 
 from core import utils
 
@@ -26,11 +27,14 @@ from typing import Dict, List, Union
 from typing_extensions import TypedDict
 
 
-TRANSLATABLE_CONTENT_FORMAT_HTML = 'html'
-TRANSLATABLE_CONTENT_FORMAT_UNICODE_STRING = 'unicode'
-TRANSLATABLE_CONTENT_FORMAT_SET_OF_NORMALIZED_STRING = (
-    'set_of_normalized_string')
-TRANSLATABLE_CONTENT_FORMAT_SET_OF_UNICODE_STRING = 'set_of_unicode_string'
+class TranslatableContentPossibleDataTypes(enum.Enum):
+    """Represents all possible data types for any translatable content."""
+
+    TRANSLATABLE_CONTENT_FORMAT_HTML = 'html'
+    TRANSLATABLE_CONTENT_FORMAT_UNICODE_STRING = 'unicode'
+    TRANSLATABLE_CONTENT_FORMAT_SET_OF_NORMALIZED_STRING = (
+        'set_of_normalized_string')
+    TRANSLATABLE_CONTENT_FORMAT_SET_OF_UNICODE_STRING = 'set_of_unicode_string'
 
 
 # The data type for the content in the TranslatableContent/TranslatedContent
@@ -43,7 +47,7 @@ class TranslatableContentDict(TypedDict):
 
     content_id: str
     content: ContentInTranslatableContent
-    content_type: str
+    content_type: TranslatableContentPossibleDataTypes
 
 
 class TranslatedContentDict(TypedDict):
@@ -76,7 +80,7 @@ class BaseTranslatableObject:
 
     def _register_translatable_field(
         self,
-        field_type: str,
+        field_type: TranslatableContentPossibleDataTypes,
         content_id: str,
         value: ContentInTranslatableContent
     ) -> None:
@@ -198,7 +202,7 @@ class TranslatableContent:
         self,
         content_id: str,
         content: ContentInTranslatableContent,
-        content_type: str
+        content_type: TranslatableContentPossibleDataTypes
     ) -> None:
         self.content_id = content_id
         self.content = content

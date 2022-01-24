@@ -39,7 +39,8 @@ class DummyTranslatableObjectWithTwoParams(
 
     def _register_all_translatable_fields(self) -> None:
         self._register_translatable_field(
-            translation_domain.TRANSLATABLE_CONTENT_FORMAT_UNICODE_STRING,
+            translation_domain.TranslatableContentPossibleDataTypes
+            .TRANSLATABLE_CONTENT_FORMAT_UNICODE_STRING,
             'content_id_1',
             self.param1)
         self._register_translatable_object(self.param2)
@@ -59,7 +60,8 @@ class DummyTranslatableObjectWithSingleParam(
 
     def _register_all_translatable_fields(self) -> None:
         self._register_translatable_field(
-            translation_domain.TRANSLATABLE_CONTENT_FORMAT_UNICODE_STRING,
+            translation_domain.TranslatableContentPossibleDataTypes
+            .TRANSLATABLE_CONTENT_FORMAT_UNICODE_STRING,
             'content_id_2',
             self.param3)
 
@@ -79,11 +81,13 @@ class DummyTranslatableObject(translation_domain.BaseTranslatableObject):
 
     def _register_all_translatable_fields(self) -> None:
         self._register_translatable_field(
-            translation_domain.TRANSLATABLE_CONTENT_FORMAT_UNICODE_STRING,
+            translation_domain.TranslatableContentPossibleDataTypes
+            .TRANSLATABLE_CONTENT_FORMAT_UNICODE_STRING,
             'content_id_2',
             self.param1)
         self._register_translatable_field(
-            translation_domain.TRANSLATABLE_CONTENT_FORMAT_UNICODE_STRING,
+            translation_domain.TranslatableContentPossibleDataTypes
+            .TRANSLATABLE_CONTENT_FORMAT_UNICODE_STRING,
             'content_id_2',
             self.param2)
 
@@ -123,19 +127,23 @@ class DummyTranslatableObjectWithFourParams(
 
     def _register_all_translatable_fields(self) -> None:
         self._register_translatable_field(
-            translation_domain.TRANSLATABLE_CONTENT_FORMAT_UNICODE_STRING,
+            translation_domain.TranslatableContentPossibleDataTypes
+            .TRANSLATABLE_CONTENT_FORMAT_UNICODE_STRING,
             'content_id_1',
             self.param1)
         self._register_translatable_field(
-            translation_domain.TRANSLATABLE_CONTENT_FORMAT_UNICODE_STRING,
+            translation_domain.TranslatableContentPossibleDataTypes
+            .TRANSLATABLE_CONTENT_FORMAT_UNICODE_STRING,
             'content_id_2',
             self.param2)
         self._register_translatable_field(
-            translation_domain.TRANSLATABLE_CONTENT_FORMAT_UNICODE_STRING,
+            translation_domain.TranslatableContentPossibleDataTypes
+            .TRANSLATABLE_CONTENT_FORMAT_UNICODE_STRING,
             'content_id_3',
             self.param3)
         self._register_translatable_field(
-            translation_domain.TRANSLATABLE_CONTENT_FORMAT_UNICODE_STRING,
+            translation_domain.TranslatableContentPossibleDataTypes
+            .TRANSLATABLE_CONTENT_FORMAT_UNICODE_STRING,
             'content_id_4',
             self.param4)
 
@@ -238,14 +246,16 @@ class TranslatableContentUnitTests(test_utils.GenericTestBase):
         translatable_content = translation_domain.TranslatableContent(
             'content_id_1',
             'My name is Jhon.',
-            translation_domain.TRANSLATABLE_CONTENT_FORMAT_HTML
+            translation_domain.TranslatableContentPossibleDataTypes
+            .TRANSLATABLE_CONTENT_FORMAT_HTML
         )
 
         self.assertEqual(translatable_content.content_id, 'content_id_1')
         self.assertEqual(translatable_content.content, 'My name is Jhon.')
         self.assertEqual(
             translatable_content.content_type,
-            translation_domain.TRANSLATABLE_CONTENT_FORMAT_HTML)
+            translation_domain.TranslatableContentPossibleDataTypes
+            .TRANSLATABLE_CONTENT_FORMAT_HTML)
 
     def test_from_dict_method_of_translatable_content_class(self) -> None:
         translatable_content = (
@@ -253,6 +263,7 @@ class TranslatableContentUnitTests(test_utils.GenericTestBase):
                 'content_id': 'content_id_1',
                 'content': 'My name is Jhon.',
                 'content_type': translation_domain
+                .TranslatableContentPossibleDataTypes
                 .TRANSLATABLE_CONTENT_FORMAT_HTML
             })
         )
@@ -261,18 +272,23 @@ class TranslatableContentUnitTests(test_utils.GenericTestBase):
         self.assertEqual(translatable_content.content, 'My name is Jhon.')
         self.assertEqual(
             translatable_content.content_type,
-            translation_domain.TRANSLATABLE_CONTENT_FORMAT_HTML)
+            translation_domain.TranslatableContentPossibleDataTypes
+            .TRANSLATABLE_CONTENT_FORMAT_HTML)
 
     def test_to_dict_method_of_translatable_content_class(self) -> None:
         translatable_content_dict = {
             'content_id': 'content_id_1',
             'content': 'My name is Jhon.',
-            'content_type': translation_domain.TRANSLATABLE_CONTENT_FORMAT_HTML
+            'content_type': translation_domain
+            .TranslatableContentPossibleDataTypes
+            .TRANSLATABLE_CONTENT_FORMAT_HTML
         }
         translatable_content = translation_domain.TranslatableContent(
             'content_id_1',
             'My name is Jhon.',
-            translation_domain.TRANSLATABLE_CONTENT_FORMAT_HTML
+            translation_domain
+            .TranslatableContentPossibleDataTypes
+            .TRANSLATABLE_CONTENT_FORMAT_HTML
         )
 
         self.assertEqual(
