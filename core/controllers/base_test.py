@@ -909,9 +909,7 @@ class I18nDictsTests(test_utils.GenericTestBase):
         hacky_translation_keys = constants.HACKY_TRANSLATION_KEYS
         missing_hacky_translation_keys = list(
             set(hacky_translation_keys) - set(en_key_list))
-        missing_hacky_translation_keys_length = len(
-            missing_hacky_translation_keys)
-        self.assertEqual(missing_hacky_translation_keys_length, 0)
+        self.assertEqual(missing_hacky_translation_keys, [])
 
     def test_keys_match_en_qqq(self):
         """Tests that en.json and qqq.json have the exact same set of keys."""
