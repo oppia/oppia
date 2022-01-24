@@ -129,7 +129,9 @@ class BaseChange:
 
     # This is a list of common commands which is valid for all subclasses.
     # This should not be overriden by subclasses.
-    COMMON_ALLOWED_COMMANDS: List[feconf.ValidCmdAttributeSpecsAttributeDicts] = [{
+    COMMON_ALLOWED_COMMANDS: List[
+        feconf.ValidCmdAttributeSpecsAttributeDicts
+        ] = [{
         'name': feconf.CMD_DELETE_COMMIT,
         'required_attribute_names': [],
         'optional_attribute_names': [],

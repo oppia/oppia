@@ -31,7 +31,7 @@ from typing_extensions import TypedDict
 # This TypedDict is used intentionally so that the type checker can have
 # any of the following keys ommited.
 class ValidCmdAttributeSpecsAttributeDictNotTotal(TypedDict, total=False):
-    """Dictionary representing the 
+    """Dictionary representing the
     optional ValidCmdAttributeSpecsDict object."""
 
     allowed_values: Dict[str, List[str]]
@@ -43,7 +43,7 @@ class ValidCmdAttributeSpecsAttributeDicts(
     total=False
 ):
     """Dictionary representign the required ValidCmdAttributeDict object."""
-    
+
     name: str
     required_attribute_names: List[str]
     optional_attribute_names: List[str]
@@ -1376,7 +1376,8 @@ COMMON_RIGHTS_ALLOWED_COMMANDS: List[ValidCmdAttributeSpecsAttributeDicts] = [{
 }]
 
 COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS: List[
-    ValidCmdAttributeSpecsAttributeDicts] = copy.deepcopy(
+    ValidCmdAttributeSpecsAttributeDicts
+    ] = copy.deepcopy(
     COMMON_RIGHTS_ALLOWED_COMMANDS
 )
 COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS.append({
@@ -1420,8 +1421,8 @@ ALLOWED_TOPIC_ROLES = [ROLE_NONE, ROLE_MANAGER]
 
 # Commands allowed in TopicRightsChange.
 TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS: List[
-    ValidCmdAttributeSpecsAttributeDicts] = [
-{
+    ValidCmdAttributeSpecsAttributeDicts
+    ] = [{
     'name': CMD_CREATE_NEW,
     'required_attribute_names': [],
     'optional_attribute_names': [],
