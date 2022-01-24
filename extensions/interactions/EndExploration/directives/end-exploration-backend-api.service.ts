@@ -32,13 +32,11 @@ export interface RecommendExplorationDict {
   providedIn: 'root'
 })
 export class EndExplorationBackendApiService {
-  constructor(
-        private http: HttpClient
-  ) {}
+  constructor(private http: HttpClient) {}
 
   getRecommendExplorationsData(
-      authorRecommendedExplorationIds: string[]):
-        Promise<RecommendExplorationBackendDict> {
+      authorRecommendedExplorationIds: string[]
+  ): Promise<RecommendExplorationBackendDict> {
     return this.http.get<RecommendExplorationBackendDict>(
       AppConstants.EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, {
         params: {
