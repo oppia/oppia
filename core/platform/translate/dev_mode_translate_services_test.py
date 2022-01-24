@@ -28,7 +28,7 @@ class DevModeCloudTranslateServicesUnitTests(test_utils.TestBase):
     def test_translate_text_with_invalid_source_language_raises_error(
             self
     ) -> None:
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             # Hindi (hi) is not a allowlisted language code.
             ValueError, 'Invalid source language code: hi'):
             dev_mode_translate_services.translate_text(
@@ -37,7 +37,7 @@ class DevModeCloudTranslateServicesUnitTests(test_utils.TestBase):
     def test_translate_text_with_invalid_target_language_raises_error(
             self
     ) -> None:
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             # Hindi (hi) is not a allowlisted language code.
             ValueError, 'Invalid target language code: hi'):
             dev_mode_translate_services.translate_text(

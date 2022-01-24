@@ -107,7 +107,8 @@ angular.module('oppia').component('outcomeEditor', {
       };
 
       ctrl.isFeedbackLengthExceeded = function() {
-        return (ctrl.outcome.feedback._html.length > 1000);
+        // TODO(#13764): Edit this check after appropriate limits are found.
+        return (ctrl.outcome.feedback._html.length > 10000);
       };
 
       ctrl.isSelfLoop = function(outcome) {

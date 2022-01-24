@@ -103,7 +103,7 @@
                   <div class="nav-item-top d-flex justify-content-between">
                     <div class="nav-content d-flex flex-column">
                       <a (keydown)="onMenuKeypress($event, 'learnMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_CLOSE})"
-                         (click)="navigateToClassroomPage('/learn/math')"
+                         (click)="navigateToClassroomPage('/learn/' + DEFAULT_CLASSROOM_URL_FRAGMENT)"
                          class="dropdown-item nav-link oppia-navbar-tab-content protractor-test-classroom-link nav-item-top-link"
                          href="#">
                           {{ 'I18N_TOPNAV_CLASSROOM_BASIC_MATHS' | translate }}
@@ -124,14 +124,14 @@
                     <div *ngIf="classroomData.length > 0">
                       <div class="nav-item-links"  *ngFor="let topicSummary of classroomData.slice(0, 3)">
                         <a (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})"
-                           (click)="navigateToClassroomPage('/learn/math/' + topicSummary.getUrlFragment())"
+                           (click)="navigateToClassroomPage('/learn/' + DEFAULT_CLASSROOM_URL_FRAGMENT + '/' + topicSummary.getUrlFragment())"
                            tabindex="0"
-                           href="/learn/math/{{topicSummary.getUrlFragment()}}">
+                           href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}/{{topicSummary.getUrlFragment()}}">
                             {{ topicSummary.getName() }}
                         </a>
                       </div>
                     </div>
-                    <a (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})" class="nav-item-bottom-link" href="/learn/math">
+                    <a (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})" class="nav-item-bottom-link" href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}">
                       <span>{{ 'I18N_TOPNAV_LEARN_LINK_1' | translate }} </span>
                       <span class="material-icons">arrow_right_alt</span>
                     </a>
@@ -139,7 +139,7 @@
                   <a *ngIf="userIsLoggedIn"
                      (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})"
                      class="nav-item-bottom-link-logged"
-                     href="/learn/math">
+                     href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}">
                     <span>{{ 'I18N_TOPNAV_LEARN_LINK_2' | translate }} </span>
                     <span class="material-icons">arrow_right_alt</span>
                   </a>
@@ -290,7 +290,7 @@
             [hidden]="!navElementsVisibilityStatus.I18N_TOPNAV_DONATE"
             class="nav-item oppia-navbar-clickable-dropdown protractor-test-about-oppia-list-item">
           <a ngbDropdownToggle (keydown)="onMenuKeypress($event, 'donateMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
-             class="nav-link oppia-navbar-tab"
+             class="nav-link oppia-navbar-tab dropdown-toggle donate-tab"
              aria-haspopup="true"
              aria-expanded="false"
              tabindex="0"
@@ -302,6 +302,7 @@
             </span>
           </a>
           <ul ngbDropdownMenu
+              [ngStyle]="{'left.px': donateMenuOffset}"
               class="dropdown-menu oppia-navbar-dropdown oppia-navbar-dropdown-right"
               (mouseover)="openSubmenu($event, 'donateMenu')"
               (mouseleave)="closeSubmenuIfNotMobile($event)">
@@ -335,8 +336,8 @@
                 class="btn dropdown-toggle oppia-navbar-button protractor-test-language-dropdown"
                 (keydown)="onMenuKeypress($event, 'languageMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})">
           <i class="material-icons language-icon"> &#xE894; </i>
-          <span *ngIf="windowIsNarrow"> {{ currentLanguageCode }} </span>
-          <span *ngIf="!windowIsNarrow"> {{ currentLanguageText }} </span>
+          <span class="mobile-view-language-code" *ngIf="windowIsNarrow"> {{ currentLanguageCode }} </span>
+          <span class="desktop-view-language-code" *ngIf="!windowIsNarrow"> {{ currentLanguageText }} </span>
         </button>
       </div>
       <ul ngbDropdownMenu class="dropdown-menu oppia-navbar-dropdown" [style.margin-top]="userIsLoggedIn ? '-10px': '0'"
@@ -538,7 +539,7 @@
   }
   .nav-link:focus {
     background-color: #fff;
-    color: #00645C;
+    color: #00645c;
   }
   .get-involved-dropdown {
     min-width: 574px;
@@ -562,16 +563,16 @@
     text-decoration: underline;
   }
   .get-involved-dropdown .language {
-    color: #F2994A;
+    color: #f2994a;
   }
   .get-involved-dropdown .volunteer {
-    color: #2D9CDB;
+    color: #2d9cdb;
   }
   .get-involved-dropdown .contact {
-    color: #B4BBC3;
+    color: #b4bbc3;
   }
   .get-involved-dropdown .fav {
-    color: #EB5757;
+    color: #eb5757;
   }
   .get-involved-dropdown .des {
     color: #767676;
@@ -595,7 +596,6 @@
   }
   .item:hover, .item:focus {
     background-color: #21212107;
-    text-decoration: underline !important;
   }
   .top-section .item {
     padding-bottom: 27px;
@@ -672,7 +672,7 @@
     width: 224px;
   }
   .learn-dropdown-menu .nav-item-bottom-link {
-    color: #00645C;
+    color: #00645c;
     font-family: 'Inter', 'Roboto', sans-serif;
     font-size: 14px;
     font-weight: 500;
@@ -681,7 +681,7 @@
     padding-top: 16px;
   }
   .learn-dropdown-menu .nav-item-bottom-link-logged {
-    color: #00645C;
+    color: #00645c;
     font-family: 'Inter', 'Roboto', sans-serif;
     font-size: 14px;
     font-weight: 500;
@@ -707,7 +707,7 @@
     outline: auto 5px -webkit-focus-ring-color;
   }
   .oppia-nav-right-dropdown {
-    background-color: #FFF;
+    background-color: #fff;
     border-radius: 5px;
     border-width: 0;
     box-shadow: 1px 1px 0 1px rgba(0,0,0,0.05);
@@ -724,7 +724,7 @@
   .language-element {
     border-radius: 0;
     box-shadow: 0 0;
-    color: #34665C;
+    color: #34665c;
   }
   .language-element:hover {
     background-color: rgb(52, 102, 92, 0.1);
@@ -855,8 +855,11 @@
     position: absolute;
     width: 50.5px;
   }
+  .rtl-navbar-header .oppia-navbar-tab-content-heading:after {
+    right: 28px;
+  }
   .oppia-navbar-dropdown-heart-icon {
-    color: #EB5757;
+    color: #eb5757;
     font-size: 22px;
     padding-right: 6px;
   }
@@ -875,6 +878,19 @@
   .oppia-navbar-profile .profile-dropdown:hover {
     background-color: #fff;
   }
+
+  @media screen and (max-width: 880px) {
+    .oppia-logo-wide {
+      margin-left: 0;
+    }
+  }
+
+  @media screen and (max-width: 840px) {
+    .desktop-view-language-code {
+      display: none;
+    }
+  }
+
   @media screen and (max-width: 768px) {
     .nav-mobile-header-text-container {
       display: inline-block;
@@ -885,13 +901,13 @@
       width: 50%;
     }
     .nav-mobile-header-editor {
-      color: #FFF;
+      color: #fff;
       display: block;
       font-family: Roboto, arial, sans-serif;
       font-size: 19px;
     }
     .nav-mobile-header-text {
-      color: #FFF;
+      color: #fff;
       display: inline-block;
       font-size: 15px;
       max-width: 205px;

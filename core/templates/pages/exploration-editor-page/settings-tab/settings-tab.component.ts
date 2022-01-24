@@ -23,6 +23,7 @@ import { ReassignRoleConfirmationModalComponent } from './templates/reassign-rol
 import { TransferExplorationOwnershipModalComponent } from './templates/transfer-exploration-ownership-modal.component';
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { Subscription } from 'rxjs';
+import { PreviewSummaryTileModalComponent } from './templates/preview-summary-tile-modal.component';
 
 require(
   'components/common-layout-directives/common-elements/' +
@@ -38,10 +39,6 @@ require(
 require(
   'pages/exploration-editor-page/param-changes-editor/' +
   'param-changes-editor.component.ts');
-require(
-  'pages/exploration-editor-page/settings-tab/templates/' +
-  'preview-summary-tile-modal.controller.ts');
-
 require('domain/exploration/editable-exploration-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-editor-page/services/change-list.service.ts');
@@ -100,7 +97,7 @@ angular.module('oppia').component('settingsTab', {
   },
   template: require('./settings-tab.component.html'),
   controller: [
-    '$rootScope', '$uibModal', 'AlertsService', 'ChangeListService',
+    '$rootScope', 'AlertsService', 'ChangeListService',
     'ContextService', 'EditabilityService',
     'EditableExplorationBackendApiService',
     'ExplorationAutomaticTextToSpeechService',
@@ -117,7 +114,7 @@ angular.module('oppia').component('settingsTab', {
     'WindowDimensionsService', 'WindowRef',
     'ALL_CATEGORIES', 'EXPLORATION_TITLE_INPUT_FOCUS_LABEL', 'TAG_REGEX',
     function(
-        $rootScope, $uibModal, AlertsService, ChangeListService,
+        $rootScope, AlertsService, ChangeListService,
         ContextService, EditabilityService,
         EditableExplorationBackendApiService,
         ExplorationAutomaticTextToSpeechService,
@@ -418,12 +415,8 @@ angular.module('oppia').component('settingsTab', {
       // Methods relating to control buttons.
       ctrl.previewSummaryTile = function() {
         AlertsService.clearWarnings();
-        $uibModal.open({
-          template: require(
-            'pages/exploration-editor-page/settings-tab/templates/' +
-            'preview-summary-tile-modal.template.html'),
+        NgbModal.open(PreviewSummaryTileModalComponent, {
           backdrop: true,
-          controller: 'PreviewSummaryTileModalController'
         }).result.then(function() {}, function() {
           AlertsService.clearWarnings();
         });

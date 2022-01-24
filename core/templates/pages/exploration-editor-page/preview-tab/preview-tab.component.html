@@ -3,7 +3,7 @@
     <div ng-if="$ctrl.previewWarning">
       <div class="oppia-preview-state-warning"><[$ctrl.previewWarning]></div>
     </div>
-    <conversation-skin></conversation-skin>
+    <oppia-conversation-skin></oppia-conversation-skin>
     <div class="navbar-fixed-bottom oppia-footer"></div>
 
   </div>
@@ -29,6 +29,18 @@
 </div>
 
 <style>
+  /*
+  Note that this affects both the learner mode and the 'editor preview'
+  mode.
+  */
+  html, body {
+    background: #e8e7e3 no-repeat center center fixed;
+    background-size: cover;
+    color: rgba(0,0,0,0.87);
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 1.0em;
+  }
+
   .oppia-footer {
     height: 42px;
   }

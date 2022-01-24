@@ -40,7 +40,6 @@ export class PlayerPositionService {
   private _helpCardAvailableEventEmitter =
     new EventEmitter<HelpCardEventResponse>();
   private _newCardOpenedEventEmitter = new EventEmitter<StateCard>();
-  private _displayedCardIndexChangedEventEmitter = new EventEmitter<number>();
 
   // The following property is initialized using the class methods.
   // and we need to do non-null assertion, for more information see
@@ -50,13 +49,8 @@ export class PlayerPositionService {
   learnerJustSubmittedAnAnswer = false;
 
   init(callback: Function): void {
-    this.updateDisplayedCardIndexAndEmitEvent(-1);
+    this.displayedCardIndex = -1;
     this.onChangeCallback = callback;
-  }
-
-  updateDisplayedCardIndexAndEmitEvent(index: number): void {
-    this.displayedCardIndex = index;
-    this._displayedCardIndexChangedEventEmitter.emit(index);
   }
 
   /**
@@ -75,7 +69,7 @@ export class PlayerPositionService {
    */
   setDisplayedCardIndex(index: number): void {
     let oldIndex = this.displayedCardIndex;
-    this.updateDisplayedCardIndexAndEmitEvent(index);
+    this.displayedCardIndex = index;
 
     if (oldIndex !== this.displayedCardIndex) {
       if (!this.onChangeCallback) {
@@ -139,10 +133,6 @@ export class PlayerPositionService {
 
   get onCurrentQuestionChange(): EventEmitter<number> {
     return this._currentQuestionChangedEventEmitter;
-  }
-
-  get displayedCardIndexChangedEventEmitter(): EventEmitter<number> {
-    return this._displayedCardIndexChangedEventEmitter;
   }
 }
 

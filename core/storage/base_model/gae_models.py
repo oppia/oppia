@@ -24,8 +24,20 @@ from core import utils
 from core.constants import constants
 from core.platform import models
 
+from typing_extensions import TypedDict
+
 from typing import ( # isort:skip
-    Any, Dict, List, Optional, Sequence, Tuple, Type, Union, TypeVar, cast
+    Any,
+    Dict,
+    List,
+    Mapping,
+    Optional,
+    Sequence,
+    Tuple,
+    Type,
+    Union,
+    TypeVar,
+    cast
 )
 
 SELF_BASE_MODEL = TypeVar(  # pylint: disable=invalid-name
@@ -109,6 +121,15 @@ class MODEL_ASSOCIATION_TO_USER(enum.Enum): # pylint: disable=invalid-name
     MULTIPLE_INSTANCES_PER_USER = 'MULTIPLE_INSTANCES_PER_USER'
     # Indicates that a model should not be exported.
     NOT_CORRESPONDING_TO_USER = 'NOT_CORRESPONDING_TO_USER'
+
+
+class ModelsToPutDict(TypedDict, total=False):
+    """Dict representing models to be put into the datastore."""
+
+    versioned_model: VersionedModel
+    snapshot_metadata_model: BaseSnapshotMetadataModel
+    snapshot_content_model: BaseSnapshotContentModel
+    commit_log_model: BaseCommitLogEntryModel
 
 
 class BaseModel(datastore_services.Model):
@@ -243,9 +264,9 @@ class BaseModel(datastore_services.Model):
 
     @classmethod
     def get(
-            cls: Type[SELF_BASE_MODEL],
-            entity_id: str,
-            strict: bool = True
+        cls: Type[SELF_BASE_MODEL],
+        entity_id: str,
+        strict: bool = True
     ) -> Optional[SELF_BASE_MODEL]:
         """Gets an entity by id.
 
@@ -332,9 +353,9 @@ class BaseModel(datastore_services.Model):
 
     @classmethod
     def update_timestamps_multi(
-            cls,
-            entities: List[SELF_BASE_MODEL],
-            update_last_updated_time: bool = True
+        cls,
+        entities: List[SELF_BASE_MODEL],
+        update_last_updated_time: bool = True
     ) -> None:
         """Update the created_on and last_updated fields of all given entities.
 
@@ -788,15 +809,12 @@ class VersionedModel(BaseModel):
 
     # IMPORTANT: Subclasses should only overwrite things above this line.
 
-    # The possible commit types.
-    _COMMIT_TYPE_CREATE = 'create'
-    _COMMIT_TYPE_REVERT = 'revert'
-    _COMMIT_TYPE_EDIT = 'edit'
-    _COMMIT_TYPE_DELETE = 'delete'
     # A list containing the possible commit types.
     COMMIT_TYPE_CHOICES = [
-        _COMMIT_TYPE_CREATE, _COMMIT_TYPE_REVERT, _COMMIT_TYPE_EDIT,
-        _COMMIT_TYPE_DELETE
+        feconf.COMMIT_TYPE_CREATE,
+        feconf.COMMIT_TYPE_REVERT,
+        feconf.COMMIT_TYPE_EDIT,
+        feconf.COMMIT_TYPE_DELETE
     ]
     # The reserved prefix for keys that are automatically inserted into a
     # commit_cmd dict by this model.
@@ -891,15 +909,32 @@ class VersionedModel(BaseModel):
         return '%s%s%s' % (
             instance_id, VERSION_DELIMITER, version_number)
 
+    # We expect Mapping because we want to allow models that inherit
+    # from BaseModel as the values, if we used Dict this wouldn't be allowed.
+    def _prepare_additional_models(self) -> Mapping[str, BaseModel]:
+        """Prepares additional models needed for the commit process.
+        The default return value is an empty dict; however, this method should
+        be overridden in models that inherit from VersionedModel.
+
+        Returns:
+            dict(str, BaseModel). Additional models needed for
+            the commit process.
+        """
+        return {}
+
     # TODO(#13523): Change 'commit_cmds' to domain object/TypedDict to
     # remove Any from type-annotation below.
-    def _trusted_commit(
-            self,
-            committer_id: str,
-            commit_type: str,
-            commit_message: str,
-            commit_cmds: List[Dict[str, Any]]
-    ) -> None:
+    def compute_models_to_commit(
+        self,
+        committer_id: str,
+        commit_type: str,
+        commit_message: str,
+        commit_cmds: List[Dict[str, Any]],
+        # We expect Mapping because we want to allow models that inherit
+        # from BaseModel as the values, if we used Dict this wouldn't
+        # be allowed.
+        unused_additional_models: Mapping[str, BaseModel]
+    ) -> ModelsToPutDict:
         """Evaluates and executes commit. Main function for all commit types.
 
         Args:
@@ -911,10 +946,16 @@ class VersionedModel(BaseModel):
                 made in this model, should give sufficient information to
                 reconstruct the commit. Dict always contains:
                     cmd: str. Unique command.
-                And then additional arguments for that command. For example:
+                And then additional arguments for that command. For example: {
+                    'cmd': 'AUTO_revert_version_number',
+                    'version_number': 4
+                }
+            unused_additional_models: dict(str, BaseModel). Additional models
+                that are needed for the commit process.
 
-                {'cmd': 'AUTO_revert_version_number'
-                 'version_number': 4}
+        Returns:
+            ModelsToPutDict. A dict of models that should be put into
+            the datastore.
 
         Raises:
             Exception. No snapshot metadata class has been defined.
@@ -935,28 +976,31 @@ class VersionedModel(BaseModel):
         snapshot = self.compute_snapshot()
         snapshot_id = self.get_snapshot_id(self.id, self.version)
 
-        snapshot_metadata_instance: BaseSnapshotMetadataModel = (
-            self.SNAPSHOT_METADATA_CLASS.create(
-                snapshot_id, committer_id, commit_type, commit_message,
-                commit_cmds)
+        snapshot_metadata_instance = self.SNAPSHOT_METADATA_CLASS.create(
+            snapshot_id,
+            committer_id,
+            commit_type,
+            commit_message,
+            commit_cmds
         )
-        snapshot_content_instance: BaseSnapshotContentModel = (
-            self.SNAPSHOT_CONTENT_CLASS.create(snapshot_id, snapshot)
+        snapshot_content_instance = self.SNAPSHOT_CONTENT_CLASS.create(
+            snapshot_id, snapshot
         )
 
-        entities: List[BaseModel] = [
-            snapshot_metadata_instance, snapshot_content_instance, self]
-        BaseModel.update_timestamps_multi(entities)
-        BaseModel.put_multi_transactional(entities)
+        return {
+            'snapshot_metadata_model': snapshot_metadata_instance,
+            'snapshot_content_model': snapshot_content_instance,
+            'versioned_model': self,
+        }
 
     # We have ignored [override] here because the signature of this method
     # doesn't match with BaseModel.delete().
     # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     def delete( # type: ignore[override]
-            self,
-            committer_id: str,
-            commit_message: str,
-            force_deletion: bool = False
+        self,
+        committer_id: str,
+        commit_message: str,
+        force_deletion: bool = False,
     ) -> None:
         """Deletes this model instance.
 
@@ -1010,10 +1054,18 @@ class VersionedModel(BaseModel):
             commit_cmds = [{
                 'cmd': self.CMD_DELETE_COMMIT
             }]
-
-            self._trusted_commit(
-                committer_id, self._COMMIT_TYPE_DELETE, commit_message,
-                commit_cmds)
+            models_to_put = cast(
+                List[BaseModel],
+                self.compute_models_to_commit(
+                    committer_id,
+                    feconf.COMMIT_TYPE_DELETE,
+                    commit_message,
+                    commit_cmds,
+                    self._prepare_additional_models()
+                ).values()
+            )
+            BaseModel.update_timestamps_multi(models_to_put)
+            BaseModel.put_multi(models_to_put)
 
     # We have ignored [override] here because the signature of this method
     # doesn't match with BaseModel.delete_multi().
@@ -1111,8 +1163,13 @@ class VersionedModel(BaseModel):
                 assert model.SNAPSHOT_METADATA_CLASS is not None
                 snapshot_metadata_models.append(
                     model.SNAPSHOT_METADATA_CLASS.create(
-                        snapshot_id, committer_id, cls._COMMIT_TYPE_DELETE,
-                        commit_message, commit_cmds))
+                        snapshot_id,
+                        committer_id,
+                        feconf.COMMIT_TYPE_DELETE,
+                        commit_message,
+                        commit_cmds
+                    )
+                )
 
                 # This assert is used to eliminate the possibility of None
                 # during mypy type checking.
@@ -1142,10 +1199,10 @@ class VersionedModel(BaseModel):
     # TODO(#13523): Change 'commit_cmds' to domain object/TypedDict to
     # remove Any from type-annotation below.
     def commit(
-            self,
-            committer_id: str,
-            commit_message: str,
-            commit_cmds: List[Dict[str, Any]]
+        self,
+        committer_id: str,
+        commit_message: str,
+        commit_cmds: List[Dict[str, Any]]
     ) -> None:
         """Saves a version snapshot and updates the model.
 
@@ -1167,13 +1224,11 @@ class VersionedModel(BaseModel):
         """
         self._require_not_marked_deleted()
 
-        for item in commit_cmds:
-            if not isinstance(item, dict):
+        for commit_cmd in commit_cmds:
+            if not isinstance(commit_cmd, dict):
                 raise Exception(
                     'Expected commit_cmds to be a list of dicts, received %s'
                     % commit_cmds)
-
-        for commit_cmd in commit_cmds:
             if 'cmd' not in commit_cmd:
                 raise Exception(
                     'Invalid commit_cmd: %s. Expected a \'cmd\' key.'
@@ -1183,19 +1238,31 @@ class VersionedModel(BaseModel):
                     'Invalid change list command: %s' % commit_cmd['cmd'])
 
         commit_type = (
-            self._COMMIT_TYPE_CREATE if self.version == 0 else
-            self._COMMIT_TYPE_EDIT)
+            feconf.COMMIT_TYPE_CREATE
+            if self.version == 0
+            else feconf.COMMIT_TYPE_EDIT
+        )
 
-        self._trusted_commit(
-            committer_id, commit_type, commit_message, commit_cmds)
+        models_to_put = cast(
+            List[BaseModel],
+            self.compute_models_to_commit(
+                committer_id,
+                commit_type,
+                commit_message,
+                commit_cmds,
+                self._prepare_additional_models()
+            ).values()
+        )
+        BaseModel.update_timestamps_multi(models_to_put)
+        BaseModel.put_multi_transactional(models_to_put)
 
     @classmethod
     def revert(
-            cls: Type[SELF_VERSIONED_MODEL],
-            model: SELF_VERSIONED_MODEL,
-            committer_id: str,
-            commit_message: str,
-            version_number: int
+        cls: Type[SELF_VERSIONED_MODEL],
+        model: SELF_VERSIONED_MODEL,
+        committer_id: str,
+        commit_message: str,
+        version_number: int
     ) -> None:
         """Reverts model to previous version.
 
@@ -1232,15 +1299,23 @@ class VersionedModel(BaseModel):
         # not have a states_schema_version property, it should revert to the
         # default states_schema_version value rather than taking the
         # states_schema_version value from the latest exploration version.
-
         snapshot_id = model.get_snapshot_id(model.id, version_number)
         new_model = cls(id=model.id)
         new_model._reconstitute_from_snapshot_id(snapshot_id)  # pylint: disable=protected-access
         new_model.version = current_version
 
-        new_model._trusted_commit(  # pylint: disable=protected-access
-            committer_id, cls._COMMIT_TYPE_REVERT, commit_message,
-            commit_cmds)
+        models_to_put = cast(
+            List[BaseModel],
+            new_model.compute_models_to_commit(
+                committer_id,
+                feconf.COMMIT_TYPE_REVERT,
+                commit_message,
+                commit_cmds,
+                new_model._prepare_additional_models()
+            ).values()
+        )
+        BaseModel.update_timestamps_multi(list(models_to_put))
+        BaseModel.put_multi_transactional(list(models_to_put))
 
     @classmethod
     def get_version(
