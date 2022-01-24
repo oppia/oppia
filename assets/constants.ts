@@ -4754,12 +4754,14 @@ export default {
   // This is linked to SUPPORTED_LANGUAGES in android_validation_constants.
   "SUPPORTED_CONTENT_LANGUAGES_FOR_ANDROID": [{
     "code": "en",
-    "description": "English"
+    "description": "English",
+    "decimal_separator": "."
   }],
 
   // List of supported content languages in which we can create explorations or
   // other entities. Each description has a parenthetical part that may be
   // stripped out to give a shorter description.
+  // The decimal separators were derived from https://en.wikipedia.org/w/index.php?title=Decimal_separator&section=9#Usage_worldwide.
   "SUPPORTED_CONTENT_LANGUAGES": [{
     "code": "en",
     "description": "English",
@@ -5031,6 +5033,7 @@ export default {
   // languages are roughly in order of how much support we have for them in
   // terms of lesson content translations.
   // List of supported site languages in which the platform is offered.
+  // The decimal separators were derived from https://en.wikipedia.org/w/index.php?title=Decimal_separator&section=9#Usage_worldwide.
   "SUPPORTED_SITE_LANGUAGES": [{
     "id": "en",
     "text": "English",

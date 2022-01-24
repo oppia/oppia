@@ -231,6 +231,10 @@ export class NumericInputValidationService {
   getErrorString(
       value: number, customizationArgs: boolean, decimalSeparator?: string
   ): string | undefined {
+    if (customizationArgs && value < 0) {
+      return 'The answer must be greater than or equal to zero';
+    }
+
     let stringValue = null;
     // Convert exponential notation to decimal number.
     // Logic derived from https://stackoverflow.com/a/16139848.
@@ -262,13 +266,10 @@ export class NumericInputValidationService {
     if (!decimalSeparator) {
       decimalSeparator = '.';
     }
-    if (
-      customizationArgs &&
-      (stringValueRegExp === null || stringValueRegExp.length > 15)
-    ) {
-      return 'The answer should be greater than or equal to zero and ' +
+    if (stringValueRegExp === null) {
+      return 'The answer should be a valid number and ' +
       `can contain at most 15 digits (0-9) or symbols(${decimalSeparator}).`;
-    } else if (stringValueRegExp === null || stringValueRegExp.length > 15) {
+    } else if (stringValueRegExp.length > 15) {
       return 'The answer can contain at most 15 digits (0-9) or symbols ' +
         `(${decimalSeparator} or -).`;
     }
