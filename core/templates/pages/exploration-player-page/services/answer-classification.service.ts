@@ -91,12 +91,6 @@ export class AnswerClassificationService {
         defaultOutcome, answerGroups.length, 0,
         ExplorationPlayerConstants.DEFAULT_OUTCOME_CLASSIFICATION);
     } else {
-      // The throw new Error statement was added here because if
-      // defaultOutcome is null, then this function will not return
-      // anything. We call this function in getMatchingClassificationResult
-      // and access various properties of the result of this function.
-      // This would cause an error here if throw new Error statement is
-      // not added.
       this.alertsService.addWarning(
         'Something went wrong with the exploration.');
       throw new Error(
