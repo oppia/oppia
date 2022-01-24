@@ -205,7 +205,7 @@ class _Gae(Platform):
 
     @classmethod
     def get_storage_model_classes(
-            cls, model_names: List[Names]
+        cls, model_names: List[Names]
     ) -> List[base_models.BaseModel]:
         """Get the storage model classes that are in the modules listed in
         model_names.
