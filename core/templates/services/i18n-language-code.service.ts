@@ -51,8 +51,8 @@ export class I18nLanguageCodeService {
    * title, description keys which currently cannot be translated from the
    * translations dashboard.
    */
-  private _HACKY_TRANSLATIONS_KEYS: readonly string[] =
-    AppConstants.HACKY_TRANSLATIONS_KEYS;
+  private _HACKY_TRANSLATION_KEYS: readonly string[] =
+    AppConstants.HACKY_TRANSLATION_KEYS;
 
   private _preferredLanguageCodesLoadedEventEmitter =
     new EventEmitter<string[]>();
@@ -157,7 +157,7 @@ export class I18nLanguageCodeService {
    */
   isHackyTranslationAvailable(translationKey: string): boolean {
     return (
-      this._HACKY_TRANSLATIONS_KEYS.indexOf(translationKey) !== -1);
+      this._HACKY_TRANSLATION_KEYS.indexOf(translationKey) !== -1);
   }
 
   get onI18nLanguageCodeChange(): EventEmitter<string> {

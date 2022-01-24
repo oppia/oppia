@@ -83,7 +83,7 @@ export default {
   // any new class, topic, skill, exploration or subtopic is added or a
   // previous one is deleted.
   // TODO(#14645): Remove these keys once translation service is extended.
-  "HACKY_TRANSLATIONS_KEYS": [
+  "HACKY_TRANSLATION_KEYS": [
     "I18N_CLASSROOM_MATH_TITLE",
     "I18N_TOPIC_iX9kYCjnouWN_TITLE",
     "I18N_TOPIC_sWBXKH4PZcK6_TITLE",
@@ -249,12 +249,12 @@ export default {
     "I18N_SUBTOPIC_qW12maD4hiA8_basic-concepts_TITLE",
     "I18N_SUBTOPIC_qW12maD4hiA8_techniques-of-division_TITLE",
     "I18N_SUBTOPIC_qW12maD4hiA8_problem-solving_TITLE",
-    "I18N_SUBTOPIC_qW12maD4hiA8_order-of-operations_TITLE",
-    "I18N_SUBTOPIC_qW12maD4hiA8_variables_TITLE",
-    "I18N_SUBTOPIC_qW12maD4hiA8_modelling-scenarios_TITLE",
-    "I18N_SUBTOPIC_qW12maD4hiA8_problem-solving_TITLE",
-    "I18N_SUBTOPIC_qW12maD4hiA8_algebraic-expressions_TITLE",
-    "I18N_SUBTOPIC_qW12maD4hiA8_solving-equations_TITLE",
+    "I18N_SUBTOPIC_dLmjjMDbCcrf_order-of-operations_TITLE",
+    "I18N_SUBTOPIC_dLmjjMDbCcrf_variables_TITLE",
+    "I18N_SUBTOPIC_dLmjjMDbCcrf_modelling-scenarios_TITLE",
+    "I18N_SUBTOPIC_dLmjjMDbCcrf_problem-solving_TITLE",
+    "I18N_SUBTOPIC_dLmjjMDbCcrf_algebraic-expressions_TITLE",
+    "I18N_SUBTOPIC_dLmjjMDbCcrf_solving-equations_TITLE",
     "I18N_SUBTOPIC_0abdeaJhmfPm_what-is-a-fraction_TITLE",
     "I18N_SUBTOPIC_0abdeaJhmfPm_fractions-of-a-group_TITLE",
     "I18N_SUBTOPIC_0abdeaJhmfPm_equivalent-fractions_TITLE",
