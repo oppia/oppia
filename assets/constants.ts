@@ -5499,7 +5499,6 @@ export default {
       "NumericExpressionInput",
       "AlgebraicExpressionInput",
       "MathEquationInput",
-      "NumberWithUnits",
       "RatioExpressionInput"
     ]
   }],
