@@ -65,6 +65,9 @@
        <!-- ng-attr-uib-popover="{{getSaveInteractionButtonTooltip()}}" -->
   <div class="btn-group"
        *ngIf="hasCustomizationArgs"
+       ngbPopover="getSaveInteractionButtonTooltip()"
+       triggers="isSaveInteractionButtonEnabled() ? 'mouseenter:mouseleave' : 'none'"
+       placement="bottom"
        >
     <button class="btn btn-success protractor-test-save-interaction"
             (click)="save()"
