@@ -59,10 +59,10 @@
     <div class="conversation-skin-congratulations-text" translate="I18N_CHAPTER_COMPLETION"></div>
     <span class="conversation-skin-login-text text-secondary" translate="I18N_SAVE_PROGRESS"></span>
     <div class="mt-2">
-      <button #matButton class="md-raised oppia-login-button text-light protractor-test-login-button" (click)="signIn()">
+      <button mat-button class="md-raised oppia-login-button text-light protractor-test-login-button" (click)="signIn()">
         LOGIN
       </button>
-      <button #matButton class="md-raised oppia-sign-up-button text-light" (click)="signIn()">
+      <button mat-button class="md-raised oppia-sign-up-button text-light" (click)="signIn()">
         SIGN UP
       </button>
     </div>
@@ -147,5 +147,17 @@
       padding-bottom: 24px;
       padding-top: 24px;
       width: 100vw;
+  }
+
+  @media screen and (max-width: 959px) {
+    .conversation-skin-final-summary {
+      margin: 0 auto;
+      max-width: 650px;
+      width: 100%;
+    }
+    .conversation-skin-final-ratings {
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.23);
+      width: 100%;
+    }
   }
 </style>

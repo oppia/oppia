@@ -20,6 +20,7 @@ import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { of, Subscription } from 'rxjs';
+import { NgbModal, NgbModalRef, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { UserService } from 'services/user.service';
 import { WindowDimensionsService } from
@@ -28,8 +29,13 @@ import { WindowDimensionsService } from
 // TODO(#7222): Remove usage of UpgradedServices once upgraded to Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { ChangeListService } from '../services/change-list.service';
+import { HelpModalComponent } from '../modal-templates/help-modal.component';
 
 require('services/ngb-modal.service.ts');
+
+class MockNgbModalRef {
+  componentInstance = {};
+}
 
 describe('Editor Navigation Component', function() {
   var ctrl = null;
@@ -37,7 +43,6 @@ describe('Editor Navigation Component', function() {
   var $q = null;
   var $rootScope = null;
   var $scope = null;
-  var $uibModal = null;
   var $verifyNoPendingTasks = null;
   var contextService = null;
   var explorationFeaturesService = null;
@@ -48,6 +53,8 @@ describe('Editor Navigation Component', function() {
   var userService = null;
   var windowDimensionsService = null;
   var internetConnectivityService = null;
+
+  let ngbModal: NgbModal;
 
   var mockOpenPostTutorialHelpPopover = new EventEmitter();
   var mockConnectionServiceEmitter = new EventEmitter<boolean>();
@@ -70,7 +77,13 @@ describe('Editor Navigation Component', function() {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [
+        HttpClientTestingModule,
+        NgbModule
+      ],
+      declarations: [
+        HelpModalComponent,
+      ],
       providers: [
         ChangeListService
       ]
@@ -83,6 +96,7 @@ describe('Editor Navigation Component', function() {
     windowDimensionsService = TestBed.get(WindowDimensionsService);
     userService = TestBed.get(UserService);
     changeListService = TestBed.inject(ChangeListService);
+    ngbModal = TestBed.inject(NgbModal);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -100,7 +114,6 @@ describe('Editor Navigation Component', function() {
       $flushPendingTasks = $injector.get('$flushPendingTasks');
       $q = $injector.get('$q');
       $rootScope = $injector.get('$rootScope');
-      $uibModal = $injector.get('$uibModal');
       $verifyNoPendingTasks = $injector.get('$verifyNoPendingTasks');
       contextService = $injector.get('ContextService');
       explorationRightsService = $injector.get('ExplorationRightsService');
@@ -148,6 +161,7 @@ describe('Editor Navigation Component', function() {
         mockOpenPostTutorialHelpPopover);
       $scope = $rootScope.$new();
       ctrl = $componentController('editorNavigation', {
+        NgbModal: ngbModal,
         $scope: $scope,
         WindowDimensionsService: windowDimensionsService,
         InternetConnectivityService: internetConnectivityService,
@@ -210,9 +224,13 @@ describe('Editor Navigation Component', function() {
 
     it('should open editor tutorial after closing user help modal with mode' +
       'editor', function() {
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve('editor')
-      });
+      spyOn(ngbModal, 'open').and.returnValue(
+        {
+          componentInstance: new MockNgbModalRef(),
+          result: $q.resolve('editor')
+        } as NgbModalRef
+      );
+
       $scope.showUserHelpModal();
       $scope.$apply();
 
@@ -221,9 +239,13 @@ describe('Editor Navigation Component', function() {
 
     it('should open editor tutorial after closing user help modal with mode' +
       'translation', function() {
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve('translation')
-      });
+      spyOn(ngbModal, 'open').and.returnValue(
+          {
+            componentInstance: new MockNgbModalRef(),
+            result: $q.resolve('translation')
+          } as NgbModalRef
+      );
+
       $scope.showUserHelpModal();
       $scope.$apply();
 
@@ -399,7 +421,6 @@ describe('Editor Navigation Component', function() {
       $flushPendingTasks = $injector.get('$flushPendingTasks');
       $q = $injector.get('$q');
       $rootScope = $injector.get('$rootScope');
-      $uibModal = $injector.get('$uibModal');
       $verifyNoPendingTasks = $injector.get('$verifyNoPendingTasks');
       contextService = $injector.get('ContextService');
       explorationFeaturesService = $injector.get('ExplorationFeaturesService');
