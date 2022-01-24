@@ -4755,6 +4755,18 @@ export default {
   "SUPPORTED_CONTENT_LANGUAGES_FOR_ANDROID": [{
     "code": "en",
     "description": "English"
+  }, {
+    "code": "hi-en",
+    "description": "Hinglish"
+  }, {
+    "code": "ar",
+    "description": "Arabic"
+  }, {
+    "code": "hi",
+    "description": "Hindi"
+  }, {
+    "code": "pt-br",
+    "description": "Português (Brasil)"
   }],
 
   // List of supported content languages in which we can create explorations or

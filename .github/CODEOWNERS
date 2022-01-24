@@ -737,7 +737,8 @@
 /.github/stale.yml @vojtechjelinek
 /.github/workflows/ @DubeySandeep @oppia/automated-qa-reviewers
 # Files needed by the Android team.
-# TODO(#14285): Re-add @BenHenning for the following 3.
+# TODO(#14285): Re-add @BenHenning for the following 4.
+/buf_gen_backend.yaml @BenHenning
 /core/controllers/android_e2e_config*.py @seanlip
 /core/android_validation_constants*.py @seanlip
 /extensions/interactions/rule_templates.json @seanlip

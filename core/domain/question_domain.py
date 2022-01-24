@@ -33,7 +33,7 @@ from core.domain import exp_domain
 from core.domain import expression_parser
 from core.domain import state_domain
 from extensions import domain
-from proto_files.org.oppia.proto.v1.structure import question_pb2
+from proto_files import question_pb2
 
 from pylatexenc import latex2text
 
@@ -138,7 +138,7 @@ class Question:
             self, question_id, question_state_data,
             question_state_data_schema_version, language_code, version,
             linked_skill_ids, inapplicable_skill_misconception_ids,
-            proto_size_in_bytes=0, created_on=None, last_updated=None):
+            created_on=None, last_updated=None):
         """Constructs a Question domain object.
 
         Args:
@@ -156,7 +156,6 @@ class Question:
             inapplicable_skill_misconception_ids: list(str). Optional
                 misconception ids that are marked as not relevant to the
                 question.
-            proto_size_in_bytes: int. Size of question.
             created_on: datetime.datetime. Date and time when the question was
                 created.
             last_updated: datetime.datetime. Date and time when the
@@ -171,9 +170,10 @@ class Question:
         self.linked_skill_ids = linked_skill_ids
         self.inapplicable_skill_misconception_ids = (
             inapplicable_skill_misconception_ids)
-        self.proto_size_in_bytes = proto_size_in_bytes
         self.created_on = created_on
         self.last_updated = last_updated
+        self._cached_android_proto_size_is_stale = True
+        self._cached_android_proto_size_in_bytes = 0
 
     def to_dict(self):
         """Returns a dict representing this Question domain object.
@@ -1321,12 +1321,53 @@ class Question:
                 'Expected version to be an integer, received %s' %
                 self.version)
 
-        if not isinstance(self.proto_size_in_bytes, int):
+        if not isinstance(self.android_proto_size_in_bytes, int):
             raise utils.ValidationError(
-                'Expected proto size to be a int, received %s'
-                % self.proto_size_in_bytes)
+                'Expected proto size to be an int, received %s'
+                % self.android_proto_size_in_bytes)
+
+        if self.android_proto_size_in_bytes <= 0:
+            raise utils.ValidationError(
+                'Expected proto size to be a positive integer, received %s'
+                % self.android_proto_size_in_bytes)
 
         self.partial_validate()
+
+    @property
+    def android_proto_size_in_bytes(self):
+        """Returns the most up-to-date size of the question proto,
+        recomputing from scratch if necessary.
+
+        Returns:
+            int. Updated question's proto size, in bytes.
+        """
+        if self._cached_android_proto_size_is_stale:
+            self._cached_android_proto_size_in_bytes = self.get_proto_size()
+            self._cached_android_proto_size_is_stale = False
+
+        return self._cached_android_proto_size_in_bytes
+
+    def __setattr__(self, attrname, new_value):
+        """Set _cached_android_proto_size_is_stale to True every time
+        the Question object is updated.
+
+        Args:
+            attrname: str. The name of the Question class attribute.
+            new_value: *. The value of the attribute on which
+                function is called.
+        """
+
+        # If the value of _cached_android_proto_size_in_bytes or
+        # _cached_android_proto_size_is_stale gets updated, we don't want to
+        # recompute the question's proto size. These attributes are
+        # both supporting attributes which aren't included in the
+        # proto size calculation.
+        if attrname not in (
+            '_cached_android_proto_size_in_bytes',
+            '_cached_android_proto_size_is_stale'
+        ):
+            self._cached_android_proto_size_is_stale = True
+        super().__setattr__(attrname, new_value)
 
     @classmethod
     def from_dict(cls, question_dict):
@@ -1357,18 +1398,10 @@ class Question:
             Question. A Question domain object with default values.
         """
         default_question_state_data = cls.create_default_question_state()
-        question = cls(
+        return cls(
             question_id, default_question_state_data,
             feconf.CURRENT_STATE_SCHEMA_VERSION,
             constants.DEFAULT_LANGUAGE_CODE, 0, skill_ids, [])
-
-        question_android_proto = cls.to_proto(
-            question_id, default_question_state_data, 0, skill_ids)
-        question_android_proto_size = cls.calculate_size_of_proto(
-            question_android_proto)
-        cls.update_proto_size_in_bytes(cls, question_android_proto_size)
-
-        return question
 
     def update_language_code(self, language_code):
         """Updates the language code of the question.
@@ -1386,14 +1419,6 @@ class Question:
             linked_skill_ids: list(str). The skill ids linked to the question.
         """
         self.linked_skill_ids = list(set(linked_skill_ids))
-
-    def update_proto_size_in_bytes(self, proto_size_in_bytes):
-        """Update question's size in proto.
-
-        Args:
-            proto_size_in_bytes: int. Size of exploration.
-        """
-        self.proto_size_in_bytes = proto_size_in_bytes
 
     def update_inapplicable_skill_misconception_ids(
             self, inapplicable_skill_misconception_ids):
@@ -1417,36 +1442,26 @@ class Question:
         """
         self.question_state_data = question_state_data
 
-    @classmethod
-    def to_proto(
-            cls, question_id, question_state_data,
-            question_state_data_schema_version, skill_ids):
-        """Calculate the question size by setting question proto.
-
-        Args:
-            question_id: str. The unique ID of the question.
-            question_state_data_schema_version: int. The schema version of the
-                question states (equivalent to the states schema version of
-                explorations).
-            skill_ids: list(str). List of skill IDs attached to this question.
-            question_state_data: list. The list of state
-                domain objects.
+    def to_android_question_proto(self):
+        """Returns a proto representation of the question object.
 
         Returns:
-            Proto Object. The exploration proto object.
+            QuestionDto. The question proto object.
         """
-        state_protos = None
-        if question_state_data is not None:
-            state_protos = state_domain.State.to_state_proto(
-                question_state_data)
-
-        question_proto = question_pb2.Question(
-            id=question_id,
-            linked_skill_ids=skill_ids,
-            content_version=question_state_data_schema_version,
-            question_state=state_protos
+        return question_pb2.QuestionDto(
+            id=self.id,
+            linked_skill_ids=self.linked_skill_ids,
+            content_version=self.question_state_data_schema_version,
+            question_state=self.question_state_data.to_android_state_proto()
         )
-        return question_proto
+
+    def get_proto_size(self):
+        """Calculate the byte size of the proto object.
+
+        Returns:
+            int. The byte size of the proto object.
+        """
+        return int(self.to_android_question_proto().ByteSize())
 
 
 class QuestionSummary:
