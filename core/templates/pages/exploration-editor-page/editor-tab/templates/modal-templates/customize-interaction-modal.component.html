@@ -20,7 +20,9 @@
           <div *ngIf="isinteractionOpen">
           <div *ngFor="let interactionId of category.interaction_ids"
                (click)="onChangeInteractionId(interactionId)"
-               class="oppia-interaction-tile protractor-test-interaction-tile-{{interactionId}}">
+               class="oppia-interaction-tile protractor-test-interaction-tile-{{interactionId}}"
+               ngbPopover=""
+               triggers="mouseenter:mouseleave">
             <img [src]="getInteractionThumbnailImageUrl(interactionId)">
             <div class="oppia-interaction-tile-name fx-row fx-main-center fx-cross-center">
               {{getTitle(interactionId)}}
@@ -59,16 +61,10 @@
   <button class="btn btn-secondary float-left" (click)="returnToInteractionSelector()" *ngIf="!isinteractionOpen && !stateInteractionIdService.savedMemento && hasCustomizationArgs">Change Interaction</button>
 
   <button class="btn btn-secondary" (click)="cancelWithConfirm()" *ngIf="hasCustomizationArgs">Cancel</button>
-       <!-- popover-append-to-body -->
-       <!-- popover-placement="bottom" -->
-       <!-- popover-trigger="{{isSaveInteractionButtonEnabled() ? 'none' : 'mouseenter'}}" -->
-       <!-- ng-attr-uib-popover="{{getSaveInteractionButtonTooltip()}}" -->
   <div class="btn-group"
        *ngIf="hasCustomizationArgs"
-       ngbPopover="getSaveInteractionButtonTooltip()"
-       triggers="isSaveInteractionButtonEnabled() ? 'mouseenter:mouseleave' : 'none'"
-       placement="bottom"
-       >
+       ngbPopover="{{isSaveInteractionButtonEnabled() ? '' : getSaveInteractionButtonTooltip()}}"
+       triggers="mouseenter:mouseleave">
     <button class="btn btn-success protractor-test-save-interaction"
             (click)="save()"
             [disabled]="!isSaveInteractionButtonEnabled()">
