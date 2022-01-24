@@ -57,8 +57,7 @@
 
 <div *ngIf="isEditable && feedbackEditorIsOpen">
   <form role="form"
-        class="form-inline protractor-test-edit-outcome-feedback"
-        name="editOutcomeForm.editFeedbackForm">
+        class="form-inline protractor-test-edit-outcome-feedback">
     <oppia-outcome-feedback-editor [outcome]="outcome">
     </oppia-outcome-feedback-editor>
   </form>
@@ -76,7 +75,7 @@
       </button>
       <button type="button"
               class="btn btn-success protractor-test-save-outcome-feedback"
-              [disabled]="invalidStateAfterFeedbackSave() || editOutcomeForm.editFeedbackForm.$invalid || isFeedbackLengthExceeded()"
+              [disabled]="invalidStateAfterFeedbackSave() || isFeedbackLengthExceeded()"
               (click)="saveThisFeedback(true)">
         Save Feedback
       </button>
@@ -143,7 +142,7 @@
       </button>
       <button type="button"
               class="btn btn-success protractor-test-save-outcome-dest"
-              [disabled]="invalidStateAfterDestinationSave() || editOutcomeForm.editDestForm.$invalid"
+              [disabled]="invalidStateAfterDestinationSave()"
               (click)="saveThisDestination()">
         Save Destination
       </button>

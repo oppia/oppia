@@ -45,7 +45,6 @@ export class OutcomeEditorComponent implements OnInit {
   ENABLE_PREREQUISITE_SKILLS = AppConstants.ENABLE_PREREQUISITE_SKILLS;
   canAddPrerequisiteSkill: boolean;
   feedbackEditorIsOpen: boolean;
-  editOutcomeForm;
   destinationEditorIsOpen;
   correctnessLabelEditorIsOpen;
   savedOutcome;
@@ -82,8 +81,7 @@ export class OutcomeEditorComponent implements OnInit {
     }
 
     if (this.feedbackEditorIsOpen) {
-      if (this.editOutcomeForm.editFeedbackForm.$valid &&
-          !this.invalidStateAfterFeedbackSave()) {
+      if (!this.invalidStateAfterFeedbackSave()) {
         this.saveThisFeedback(false);
       } else {
         this.cancelThisFeedbackEdit();
@@ -91,8 +89,7 @@ export class OutcomeEditorComponent implements OnInit {
     }
 
     if (this.destinationEditorIsOpen) {
-      if (this.editOutcomeForm.editDestForm.$valid &&
-          !this.invalidStateAfterDestinationSave()) {
+      if (!this.invalidStateAfterDestinationSave()) {
         this.saveThisDestination();
       } else {
         this.cancelThisDestinationEdit();
@@ -226,7 +223,6 @@ export class OutcomeEditorComponent implements OnInit {
       this.stateInteractionIdService.onInteractionIdChanged.subscribe(
         () => this.onExternalSave())
     );
-    this.editOutcomeForm = {};
     this.canAddPrerequisiteSkill = (
       this.ENABLE_PREREQUISITE_SKILLS &&
       this.stateEditorService.isExplorationWhitelisted());

@@ -118,12 +118,12 @@
                         [add-state]="$ctrl.addState"
                         (show-mark-all-audio-as-needing-update-modal-if-required)="$ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired">
   </oppia-outcome-editor>
-  <question-misconception-editor is-editable="$ctrl.isEditable"
-                                 ng-if="$ctrl.isInQuestionMode()"
-                                 on-save-tagged-misconception="$ctrl.onSaveTaggedMisconception"
-                                 on-save-answer-group-feedback="$ctrl.getOnSaveAnswerGroupFeedbackFn()"
-                                 outcome="$ctrl.outcome"
-                                 rules="$ctrl.rules"
-                                 tagged-skill-misconception-id="$ctrl.taggedSkillMisconceptionId">
-  </question-misconception-editor>
+  <oppia-question-misconception-editor [is-editable]="$ctrl.isEditable"
+                                       ng-if="$ctrl.isInQuestionMode()"
+                                       (save-tagged-misconception)="$ctrl.onSaveTaggedMisconception"
+                                       (save-answer-group-feedback)="$ctrl.getOnSaveAnswerGroupFeedbackFn()"
+                                       [outcome]="$ctrl.outcome"
+                                       [rules]="$ctrl.rules"
+                                       [tagged-skill-misconception-id]="$ctrl.taggedSkillMisconceptionId">
+  </oppia-question-misconception-editor>
 </div>
