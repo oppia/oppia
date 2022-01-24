@@ -656,7 +656,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             0.0
         )
 
-
     def test_question_state_dict_conversion_from_v31_to_v32(self):
 
         question_data = (
@@ -754,19 +753,19 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
         question_data['interaction']['id'] = 'MathExpressionInput'
         question_data['interaction']['solution'] = {
-			'answer_is_exclusive': False,
-			'correct_answer': {
+            'answer_is_exclusive': False,
+            'correct_answer': {
                 'ascii': '1'
             },
-			'explanation': {
-				'content_id': 'temp_id',
-				'html': '<p>This is a solution.</p>'
-			}
+            'explanation': {
+                'content_id': 'temp_id',
+                'html': '<p>This is a solution.</p>'
+            }
         }
         question_data['interaction']['answer_groups'] = [
             {
                 'rule_specs': [{
-                    'inputs':{
+                    'inputs': {
                         'x': '1',
                         'y': None
                     },
@@ -780,7 +779,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             },
             {
                 'rule_specs': [{
-                    'inputs':{
+                    'inputs': {
                         'x': 'x+1',
                         'y': None
                     },
@@ -794,7 +793,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             },
             {
                 'rule_specs': [{
-                    'inputs':{
+                    'inputs': {
                         'x': 'x=1',
                         'y': None
                     },
@@ -816,10 +815,10 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             }
         ]
         question_data['recorded_voiceovers']['voiceovers_mapping'] = {
-            'temp_id':{}, 'temp_id_2':{}, 'temp_id_3':{}, 'temp_id_4':{}
+            'temp_id': {}, 'temp_id_2': {}, 'temp_id_3': {}, 'temp_id_4': {}
         }
         question_data['written_translations']['translations_mapping'] = {
-            'temp_id':{}, 'temp_id_2':{}, 'temp_id_3':{}, 'temp_id_4':{}
+            'temp_id': {}, 'temp_id_2': {}, 'temp_id_3': {}, 'temp_id_4': {}
         }
 
         test_value = {
@@ -868,19 +867,19 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         # Testing with only AlgebraicExpressionInput i.e ('x': 'x+1').
         test_value['state']['interaction']['id'] = 'MathExpressionInput'
         test_value['state']['interaction']['solution'] = {
-			'answer_is_exclusive': False,
-			'correct_answer': {
+            'answer_is_exclusive': False,
+            'correct_answer': {
                 'ascii': '1'
             },
-			'explanation': {
-				'content_id': 'temp_id',
-				'html': '<p>This is a solution.</p>'
-			}
+            'explanation': {
+                'content_id': 'temp_id',
+                'html': '<p>This is a solution.</p>'
+            }
         }
         test_value['state']['interaction']['answer_groups'] = [
             {
                 'rule_specs': [{
-                    'inputs':{
+                    'inputs': {
                         'x': 'x+1',
                         'y': None
                     },
@@ -894,13 +893,12 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             }
         ]
         test_value['state']['recorded_voiceovers']['voiceovers_mapping'] = {
-            'temp_id':{}
+            'temp_id': {}
         }
         test_value['state']['written_translations']['translations_mapping'] = {
-            'temp_id':{}
+            'temp_id': {}
         }
         test_value['state_schema_version'] = 34
-
 
         question_domain.Question.update_state_from_model(
             test_value, test_value['state_schema_version'])
@@ -923,19 +921,19 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         # Testing with only NumericExpressionInput i.e ('x': '1').
         test_value['state']['interaction']['id'] = 'MathExpressionInput'
         test_value['state']['interaction']['solution'] = {
-			'answer_is_exclusive': False,
-			'correct_answer': {
+            'answer_is_exclusive': False,
+            'correct_answer': {
                 'ascii': '1'
             },
-			'explanation': {
-				'content_id': 'temp_id',
-				'html': '<p>This is a solution.</p>'
-			}
+            'explanation': {
+                'content_id': 'temp_id',
+                'html': '<p>This is a solution.</p>'
+            }
         }
         test_value['state']['interaction']['answer_groups'] = [
             {
                 'rule_specs': [{
-                    'inputs':{
+                    'inputs': {
                         'x': '1',
                         'y': None
                     },
@@ -949,13 +947,12 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             }
         ]
         test_value['state']['recorded_voiceovers']['voiceovers_mapping'] = {
-            'temp_id':{}
+            'temp_id': {}
         }
         test_value['state']['written_translations']['translations_mapping'] = {
-            'temp_id':{}
+            'temp_id': {}
         }
         test_value['state_schema_version'] = 34
-
 
         question_domain.Question.update_state_from_model(
             test_value, test_value['state_schema_version'])
@@ -981,12 +978,12 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             question_domain.Question.create_default_question_state().to_dict())
 
         question_data['written_translations']['translations_mapping'] = {
-            'temp_id_1':{
+            'temp_id_1': {
                 'en': {
                     'html': 'html_body_1'
                 }
             },
-            'temp_id_2':{
+            'temp_id_2': {
                 'en': {
                     'html': 'html_body_2'
                 }
@@ -1023,12 +1020,12 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             'initial_code': {}
         }
         test_value['state']['written_translations']['translations_mapping'] = {
-            'temp_id_1':{
+            'temp_id_1': {
                 'en': {
                     'html': 'html_body_1'
                 }
             },
-            'temp_id_2':{
+            'temp_id_2': {
                 'en': {
                     'html': 'html_body_2'
                 }
@@ -1064,12 +1061,12 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             }
         }
         test_value['state']['written_translations']['translations_mapping'] = {
-            'temp_id_1':{
+            'temp_id_1': {
                 'en': {
                     'html': 'html_body_1'
                 }
             },
-            'temp_id_2':{
+            'temp_id_2': {
                 'en': {
                     'html': 'html_body_2'
                 }
@@ -1093,12 +1090,12 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             }
         }
         test_value['state']['written_translations']['translations_mapping'] = {
-            'temp_id_1':{
+            'temp_id_1': {
                 'en': {
                     'html': 'html_body_1'
                 }
             },
-            'temp_id_2':{
+            'temp_id_2': {
                 'en': {
                     'html': 'html_body_2'
                 }
@@ -1158,12 +1155,12 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         test_value['state']['interaction']['id'] = 'ItemSelectionInput'
         test_value['state']['interaction']['customization_args'] = {}
         test_value['state']['written_translations']['translations_mapping'] = {
-            'temp_id_1':{
+            'temp_id_1': {
                 'en': {
                     'html': 'html_body_1'
                 }
             },
-            'temp_id_2':{
+            'temp_id_2': {
                 'en': {
                     'html': 'html_body_2'
                 }
@@ -1425,7 +1422,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             {'rule_input_0': {}}
         )
 
-
     def test_question_state_dict_conversion_from_v41_to_v42(self):
 
         question_data = (
@@ -1438,9 +1434,9 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         question_data['interaction']['customization_args'] = {
             'choices': {
                 'value': [
-                    {'html' : 'correct_value', 'content_id': 'content_id_1'},
-                    {'html' : 'value_2', 'content_id': 'content_id_2'},
-                    {'html' : 'value_3', 'content_id': 'content_id_3'}
+                    {'html': 'correct_value', 'content_id': 'content_id_1'},
+                    {'html': 'value_2', 'content_id': 'content_id_2'},
+                    {'html': 'value_3', 'content_id': 'content_id_3'}
                 ]
             }
         }
@@ -1480,7 +1476,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         test_value['state']['interaction']['customization_args'] = {
             'choices': {
                 'value': [
-                    {'html' : 'correct_value', 'content_id': 'content_id_1'},
+                    {'html': 'correct_value', 'content_id': 'content_id_1'},
                 ]
             }
         }
@@ -1508,7 +1504,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             {'correct_answer': ['content_id_1']}
         )
 
-
         # Testing with interaction id 'DragAndDropSortInput'.
         test_value['state']['interaction']['id'] = 'DragAndDropSortInput'
         test_value['state']['interaction']['solution'] = {
@@ -1517,9 +1512,9 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         test_value['state']['interaction']['customization_args'] = {
             'choices': {
                 'value': [
-                    {'html' : 'correct_value', 'content_id': 'content_id_1'},
-                    {'html' : 'value_2', 'content_id': 'content_id_2'},
-                    {'html' : 'value_3', 'content_id': 'content_id_3'}
+                    {'html': 'correct_value', 'content_id': 'content_id_1'},
+                    {'html': 'value_2', 'content_id': 'content_id_2'},
+                    {'html': 'value_3', 'content_id': 'content_id_3'}
                 ]
             }
         }
@@ -1712,8 +1707,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
         self.assertEqual(test_value['state_schema_version'], 48)
         self.assertEqual(test_value['state']['content']['html'], ' ')
-
-
 
     def test_question_state_dict_conversion_from_v48_to_v49(self):
 
