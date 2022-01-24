@@ -28,10 +28,10 @@ with the result of the super function.
 from __future__ import annotations
 
 import datetime
+import enum
 import re
 
 from core import feconf
-from core import python_utils
 from core.jobs import job_utils
 from core.jobs.decorators import validation_decorators
 from core.jobs.types import base_validation_errors
@@ -45,7 +45,13 @@ import apache_beam as beam
 BASE_MODEL_ID_PATTERN = r'^[A-Za-z0-9-_]{1,%s}$' % base_models.ID_LENGTH
 MAX_CLOCK_SKEW_SECS = datetime.timedelta(seconds=1)
 
-VALIDATION_MODES = python_utils.create_enum('neutral', 'strict', 'non_strict') # pylint: disable=invalid-name
+
+class ValidationModes(enum.Enum):
+    """Enum for validation modes."""
+
+    NEUTRAL = 'neutral'
+    STRICT = 'strict'
+    NON_STRICT = 'non_strict'
 
 
 class ValidateDeletedModel(beam.DoFn):
@@ -264,7 +270,7 @@ class ValidateModelDomainObjectInstances(beam.DoFn):
         Returns:
             str. The type of validation mode: neutral, strict or non strict.
         """
-        return VALIDATION_MODES.neutral
+        return ValidationModes.NEUTRAL
 
     def process(self, entity):
         """Function that defines how to process each entity in a pipeline of
@@ -281,11 +287,11 @@ class ValidateModelDomainObjectInstances(beam.DoFn):
             validation_type = self._get_domain_object_validation_type(entity)
             if domain_object is None:
                 return
-            if validation_type == VALIDATION_MODES.neutral:
+            if validation_type == ValidationModes.NEUTRAL:
                 domain_object.validate()
-            elif validation_type == VALIDATION_MODES.strict:
+            elif validation_type == ValidationModes.STRICT:
                 domain_object.validate(strict=True)
-            elif validation_type == VALIDATION_MODES.non_strict:
+            elif validation_type == ValidationModes.NON_STRICT:
                 domain_object.validate(strict=False)
             else:
                 raise Exception(

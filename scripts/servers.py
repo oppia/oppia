@@ -100,7 +100,7 @@ def managed_process(
             procs_gone, procs_still_alive = (
                 psutil.wait_procs(procs_to_kill, timeout=timeout_secs))
             for proc in procs_still_alive:
-                logging.warn('Forced to kill %s!' % get_proc_info(proc))
+                logging.warning('Forced to kill %s!' % get_proc_info(proc))
                 proc.kill()
             for proc in procs_gone:
                 logging.info('%s has already ended.' % get_proc_info(proc))
@@ -448,7 +448,7 @@ def managed_portserver():
         # standalone scripts do not. Because of this, the following line cannot
         # be covered. This is fine since we want to cleanup this code anyway in
         # #11549.
-        sys.path.insert(1, common.PSUTIL_DIR) # pragma: nocover
+        sys.path.insert(1, common.PSUTIL_DIR) # pragma: no cover
     import psutil
 
     # Check if a socket file exists. This file can exist when previous instance

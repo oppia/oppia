@@ -47,7 +47,7 @@ class MockNumbersModel(datastore_services.Model):
 class BaseEventHandlerTests(test_utils.GenericTestBase):
 
     def test_handle_event_raises_not_implemented_error(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             NotImplementedError,
             re.escape(
                 'Subclasses of BaseEventHandler should implement the '

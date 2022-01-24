@@ -26,11 +26,15 @@ import sys
 from core import feconf
 from core import utils
 from core.constants import constants
-from core.domain import action_registry
 from core.domain import customization_args_util
 from core.domain import exp_domain
-from core.domain import interaction_registry
-from core.domain import playthrough_issue_registry
+
+from core.domain import action_registry  # pylint: disable=invalid-import-from # isort:skip
+from core.domain import interaction_registry  # pylint: disable=invalid-import-from # isort:skip
+from core.domain import playthrough_issue_registry  # pylint: disable=invalid-import-from # isort:skip
+
+# TODO(#14537): Refactor this file and remove imports marked
+# with 'invalid-import-from'.
 
 # These are special sentinel values attributed to answers migrated from the old
 # answer storage model. Those answers could not have session IDs or time spent
@@ -874,6 +878,15 @@ class ExplorationIssue:
         self.playthrough_ids = playthrough_ids
         self.schema_version = schema_version
         self.is_valid = is_valid
+
+    def __eq__(self, other):
+        return (
+            self.issue_type == other.issue_type and
+            self.issue_customization_args == other.issue_customization_args and
+            self.playthrough_ids == other.playthrough_ids and
+            self.schema_version == other.schema_version and
+            self.is_valid == other.is_valid
+        )
 
     def to_dict(self):
         """Returns a dict representation of the ExplorationIssue domain object.
@@ -1737,8 +1750,8 @@ class LearnerAnswerDetails:
                     learner_answer_info.get_learner_answer_info_dict_size())
         if self.learner_answer_info_list == new_learner_answer_info_list:
             raise Exception('Learner answer info with the given id not found.')
-        else:
-            self.learner_answer_info_list = new_learner_answer_info_list
+
+        self.learner_answer_info_list = new_learner_answer_info_list
 
     def update_state_reference(self, new_state_reference):
         """Updates the state_reference of the LearnerAnswerDetails object.

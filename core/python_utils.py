@@ -26,11 +26,11 @@ import sys
 _THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party', 'python_libs')
 sys.path.insert(0, _THIRD_PARTY_PATH)
 
-_YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-5.4.1')
+_YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-6.0')
 sys.path.insert(0, _YAML_PATH)
 
 _CERTIFI_PATH = os.path.join(
-    os.getcwd(), '..', 'oppia_tools', 'certifi-2021.5.30')
+    os.getcwd(), '..', 'oppia_tools', 'certifi-2021.10.8')
 sys.path.insert(0, _CERTIFI_PATH)
 
 import yaml  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
@@ -174,24 +174,6 @@ def get_package_file_contents(package: str, filepath: str) -> str:
         return pkgutil.get_data(package, filepath).decode('utf-8')
 
 
-def url_unsplit(url_parts):
-    """Combine the elements of a tuple as returned by urlsplit() into a complete
-    URL as a string using urlparse.urlunsplit if run under Python 2 and
-    urllib.parse.urlunsplit if run under Python 3.
-
-    Args:
-        url_parts: tuple(str). The components of a URL.
-
-    Returns:
-        str. The complete URL.
-    """
-    try:
-        import urllib.parse as urlparse
-    except ImportError:
-        import urlparse
-    return urlparse.urlunsplit(url_parts)  # pylint: disable=disallowed-function-calls
-
-
 def parse_query_string(query_string):
     """Parse a query string given as a string argument
     (data of type application/x-www-form-urlencoded) using urlparse.parse_qs if
@@ -209,24 +191,6 @@ def parse_query_string(query_string):
     except ImportError:
         import urlparse
     return urlparse.parse_qs(query_string)  # pylint: disable=disallowed-function-calls
-
-
-def urllib_unquote(content) -> str:
-    """Replace %xx escapes by their single-character equivalent using
-    urllib.unquote if run under Python 2 and urllib.parse.unquote if run under
-    Python 3.
-
-    Args:
-        content: str. The string to be unquoted.
-
-    Returns:
-        str. The unquoted string.
-    """
-    try:
-        import urllib.parse as urlparse
-    except ImportError:
-        import urllib as urlparse
-    return urlparse.unquote(content)
 
 
 def url_quote(content):
@@ -264,26 +228,6 @@ def url_encode(query, doseq=False):
     except ImportError:
         import urllib as urlparse
     return urlparse.urlencode(query, doseq=doseq)
-
-
-def url_request(source_url, data, headers):
-    """This function provides an abstraction of a URL request. It uses
-    urllib2.Request if run under Python 2 and urllib.request.Request if
-    run under Python 3.
-
-    Args:
-        source_url: str. The URL.
-        data: str. Additional data to send to the server.
-        headers: dict. The request headers.
-
-    Returns:
-        Request. The 'Request' object.
-    """
-    try:
-        import urllib.request as urlrequest
-    except ImportError:
-        import urllib2 as urlrequest
-    return urlrequest.Request(source_url, data, headers)
 
 
 def divide(number1, number2):
@@ -343,29 +287,3 @@ def yaml_from_dict(dictionary, width=80):
     """
     dictionary = _recursively_convert_to_str(dictionary)
     return yaml.safe_dump(dictionary, default_flow_style=False, width=width)
-
-
-def create_enum(*sequential):
-    """Creates a enumerated constant.
-
-    Args:
-        *sequential: *. Sequence List to generate the enumerations.
-
-    Returns:
-        dict. Dictionary containing the enumerated constants.
-    """
-    enum_values = dict(ZIP(sequential, sequential))
-    try:
-        from enum import Enum  # pylint: disable=import-only-modules
-
-        # The type() of argument 1 in Enum must be str, not unicode.
-        return Enum(str('Enum'), enum_values)  # pylint: disable=disallowed-function-calls
-    except ImportError:
-        _enums = {}
-        for name, value in enum_values.items():
-            _value = {
-                'name': name,
-                'value': value
-            }
-            _enums[name] = type('Enum', (), _value)
-        return type('Enum', (), _enums)

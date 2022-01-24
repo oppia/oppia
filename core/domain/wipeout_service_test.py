@@ -500,7 +500,7 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         exp_summary_model = exp_models.ExpSummaryModel.get_by_id('exp_id')
         self.assertEqual(exp_summary_model.editor_ids, [])
 
-    def test_pre_delete_user_exp_user_with_voice_artist_role_is_deassigned(
+    def test_exp_user_with_voice_artist_role_is_deassigned_from_public_exp(
         self
     ):
         self.save_new_valid_exploration('exp_id', self.user_1_id)
@@ -511,6 +511,29 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
             self.user_2_id,
             feconf.ROLE_VOICE_ARTIST
         )
+
+        exp_summary_model = exp_models.ExpSummaryModel.get_by_id('exp_id')
+        self.assertEqual(exp_summary_model.voice_artist_ids, [self.user_2_id])
+
+        wipeout_service.pre_delete_user(self.user_2_id)
+        self.process_and_flush_pending_tasks()
+
+        exp_summary_model = exp_models.ExpSummaryModel.get_by_id('exp_id')
+        self.assertEqual(exp_summary_model.voice_artist_ids, [])
+
+    def test_exp_user_with_voice_artist_role_is_deassigned_from_private_exp(
+        self
+    ):
+        self.save_new_valid_exploration('exp_id', self.user_1_id)
+        self.publish_exploration(self.user_1_id, 'exp_id')
+        rights_manager.assign_role_for_exploration(
+            user_services.get_system_user(),
+            'exp_id',
+            self.user_2_id,
+            feconf.ROLE_VOICE_ARTIST
+        )
+        rights_manager.unpublish_exploration(
+            user_services.get_system_user(), 'exp_id')
 
         exp_summary_model = exp_models.ExpSummaryModel.get_by_id('exp_id')
         self.assertEqual(exp_summary_model.voice_artist_ids, [self.user_2_id])
@@ -4633,11 +4656,11 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
 
         self.assertIsNone(user_services.get_user_settings(self.user_1_id))
         self.assertIsNone(user_services.get_user_settings(self.profile_user_id))
-        with self.assertRaisesRegexp(Exception, 'User not found.'):
+        with self.assertRaisesRegex(Exception, 'User not found.'):
             # Try to do some action with the deleted user.
             user_services.update_preferred_language_codes(
                 self.user_1_id, ['en'])
-        with self.assertRaisesRegexp(Exception, 'User not found.'):
+        with self.assertRaisesRegex(Exception, 'User not found.'):
             # Try to do some action with the deleted user.
             user_services.update_preferred_language_codes(
                 self.profile_user_id, ['en'])

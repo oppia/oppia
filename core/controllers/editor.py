@@ -28,7 +28,6 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.controllers import domain_objects_validator as objects_validator
 from core.domain import email_manager
-from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import fs_domain
@@ -195,12 +194,7 @@ class ExplorationHandler(EditorHandler):
                 % (exploration.version, version))
 
         commit_message = self.normalized_payload.get('commit_message')
-        change_list_dict = self.normalized_payload.get('change_list')
-
-        change_list = [
-            exp_domain.ExplorationChange(change)
-            for change in change_list_dict
-        ]
+        change_list = self.normalized_payload.get('change_list')
 
         changes_are_mergeable = exp_services.are_changes_mergeable(
             exploration_id, version, change_list)
@@ -884,7 +878,8 @@ class ResolveIssueHandler(EditorHandler):
             'exp_issue_dict': {
                 'schema': {
                     'type': 'object_dict',
-                    'object_class': stats_domain.ExplorationIssue
+                    'object_class': stats_domain.ExplorationIssue,
+                    'new_key_for_argument': 'exp_issue_object'
                 },
                 'default_value': None
             },
@@ -897,7 +892,7 @@ class ResolveIssueHandler(EditorHandler):
     @acl_decorators.can_edit_exploration
     def post(self, exp_id):
         """Handles POST requests."""
-        exp_issue_dict = self.normalized_payload.get('exp_issue_dict')
+        exp_issue_object = self.normalized_payload.get('exp_issue_object')
         exp_version = self.normalized_payload.get('exp_version')
 
         exp_issues = stats_services.get_exp_issues(exp_id, exp_version)
@@ -909,7 +904,7 @@ class ResolveIssueHandler(EditorHandler):
         # issues instance.
         issue_to_remove = None
         for issue in exp_issues.unresolved_issues:
-            if issue.to_dict() == exp_issue_dict:
+            if issue == exp_issue_object:
                 issue_to_remove = issue
                 break
 
@@ -1071,12 +1066,7 @@ class EditorAutosaveHandler(ExplorationHandler):
         """Handles PUT requests for draft updation."""
         # Raise an Exception if the draft change list fails non-strict
         # validation.
-        change_list_dict = self.normalized_payload.get('change_list')
-        change_list = [
-            exp_domain.ExplorationChange(change)
-            for change in change_list_dict
-        ]
-
+        change_list = self.normalized_payload.get('change_list')
         version = self.normalized_payload.get('version')
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id)

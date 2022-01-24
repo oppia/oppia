@@ -18,8 +18,6 @@
  */
 
 require('domain/utilities/url-interpolation.service.ts');
-require(
-  'pages/exploration-editor-page/services/exploration-property.service.ts');
 require('pages/exploration-editor-page/services/exploration-title.service.ts');
 require('pages/exploration-editor-page/services/router.service.ts');
 require('services/stateful/focus-manager.service.ts');
@@ -29,12 +27,12 @@ import { Subscription } from 'rxjs';
 angular.module('oppia').component('editorNavbarBreadcrumb', {
   template: require('./editor-navbar-breadcrumb.component.html'),
   controller: [
-    '$rootScope', '$scope', 'ExplorationPropertyService',
-    'ExplorationTitleService', 'FocusManagerService', 'RouterService',
+    '$rootScope', '$scope', 'ExplorationTitleService',
+    'FocusManagerService', 'RouterService',
     'EXPLORATION_TITLE_INPUT_FOCUS_LABEL',
     function(
-        $rootScope, $scope, ExplorationPropertyService,
-        ExplorationTitleService, FocusManagerService, RouterService,
+        $rootScope, $scope, ExplorationTitleService,
+        FocusManagerService, RouterService,
         EXPLORATION_TITLE_INPUT_FOCUS_LABEL) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
@@ -65,18 +63,16 @@ angular.module('oppia').component('editorNavbarBreadcrumb', {
       ctrl.$onInit = function() {
         $scope.navbarTitle = null;
         ctrl.directiveSubscriptions.add(
-          ExplorationPropertyService.onExplorationPropertyChanged.subscribe(
+          ExplorationTitleService.onExplorationPropertyChanged.subscribe(
             (propertyName) => {
-              if (propertyName === ExplorationTitleService.propertyName) {
-                const _MAX_TITLE_LENGTH = 20;
-                $scope.navbarTitle = ExplorationTitleService.savedMemento;
-                if ($scope.navbarTitle.length > _MAX_TITLE_LENGTH) {
-                  $scope.navbarTitle = (
-                    $scope.navbarTitle.substring(
-                      0, _MAX_TITLE_LENGTH - 3) + '...');
-                }
-                $rootScope.$applyAsync();
+              const _MAX_TITLE_LENGTH = 20;
+              $scope.navbarTitle = ExplorationTitleService.savedMemento;
+              if ($scope.navbarTitle.length > _MAX_TITLE_LENGTH) {
+                $scope.navbarTitle = (
+                  $scope.navbarTitle.substring(
+                    0, _MAX_TITLE_LENGTH - 3) + '...');
               }
+              $rootScope.$applyAsync();
             }
           )
         );
