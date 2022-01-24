@@ -45,7 +45,7 @@
         <h3 class="oppia-result-detail-header" translate="I18N_QUESTION_PLAYER_LEARN_MORE_ABOUT_SCORE"></h3>
 
         <div class="skill-score-body">
-          <div class="score" ng-repeat="(skillId, scorePerSkill) in $ctrl.scorePerSkillMapping">
+          <div class="score" ng-repeat="(skillId, scorePerSkill) in $ctrl.scorePerSkillMapping" ng-if="scorePerSkill.total > 0">
             <div class="list-item" ng-click="$ctrl.openSkillMasteryModal(skillId)"><[scorePerSkill.description]></div>
             <div class="score-outer d-flex justify-content-between align-items-center">
               <div class="oppia-skill-score-container">
