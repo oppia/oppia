@@ -22,7 +22,7 @@ import copy
 
 from core import utils
 
-from typing import Dict, List
+from typing import Dict, List, Union
 from typing_extensions import TypedDict
 
 
@@ -33,23 +33,33 @@ TRANSLATABLE_CONTENT_FORMAT_SET_OF_NORMALIZED_STRING = (
 TRANSLATABLE_CONTENT_FORMAT_SET_OF_UNICODE_STRING = 'set_of_unicode_string'
 
 
+# The data type for the content in the TranslatableContent/TranslatedContent
+# object.
+ContentInTranslatableContent = Union[str, List[str]]
+
+
 class TranslatableContentDict(TypedDict):
     """Dictionary representing TranslatableContent object."""
 
     content_id: str
-    content: str|List[str]
+    content: ContentInTranslatableContent
     content_type: str
 
 
 class TranslatedContentDict(TypedDict):
     """Dictionary representing TranslatedContent object."""
 
-    content: str|List[str]
+    content: ContentInTranslatableContent
     needs_update: bool
 
 
 class BaseTranslatableObject:
-    """Base class for all translatable objects."""
+    """Base class for all translatable objects which contain translatable
+    fields/objects. For example, a State is a translatable object in
+    Exploration, a Hint is a translatable object in State, and a hint_content
+    is a translatable field in Hint. So Exploration, State, and Hint all should
+    be the child class of BaseTranslatableObject.
+    """
 
     # Private field to track translatable contents in a BaseTranslatableObject.
     _translatable_contents: Dict[str, TranslatableContent] = {}
@@ -59,8 +69,8 @@ class BaseTranslatableObject:
 
         Raises:
             NotImplementedError. The derived child class must implement the
-                necessary logic to register all translatable fields in an
-                entity.
+                necessary logic to register all translatable fields in a
+                translatable object.
         """
         raise NotImplementedError('Must be implemented in subclasses.')
 
@@ -68,14 +78,15 @@ class BaseTranslatableObject:
         self,
         field_type: str,
         content_id: str,
-        value: str|List[str]
+        value: ContentInTranslatableContent
     ) -> None:
         """Method to register a translatable field in a translatable object.
 
         Args:
             field_type: str. The type of the corresponding translatable content.
             content_id: str. The id of the corresponding translatable content.
-            value: str|list(str). Value of the content which is translatable.
+            value: ContentInTranslatableContent. Value of the content which is
+                translatable.
         """
         if content_id in self._translatable_contents:
             raise Exception(
@@ -89,7 +100,7 @@ class BaseTranslatableObject:
         self,
         value: BaseTranslatableObject
     ) -> None:
-        """Method to register translatable field in a translatable object.
+        """Method to register a translatable field in a translatable object.
 
         Args:
             value: BaseTranslatableObject. An object representing
@@ -110,33 +121,34 @@ class BaseTranslatableObject:
 
     def get_all_contents_which_needs_translations(
         self,
-        entityTranslation: EntityTranslation
+        entity_translation: EntityTranslation
     ) -> List[TranslatableContent]:
-        """Returns a list of TranslatableContent instances which needs
-        translation or which needs updates in an existing translations.
+        """Returns a list of TranslatableContent instances which need
+        translation or which need updates in existing translation.
 
         Args:
-            entityTranslation: EntityTranslation. An object storing existing
-                translation of an entity.
+            entity_translation: EntityTranslation. An object storing the
+                existing translations of an entity.
 
         Returns:
             list(TranslatableContent). Returns a list of TranslatableContents.
         """
         contents_which_need_translation = []
         content_ids_for_translated_contents = (
-            entityTranslation.translations.keys())
+            entity_translation.translations.keys())
 
         for translatable_item in self.get_translatable_fields().values():
             # translatable_item is of type TranslatableContent.
             if translatable_item.content == '':
                 continue
+
             if (
-                not translatable_item.content_id in
+                translatable_item.content_id not in
                 content_ids_for_translated_contents
             ):
                 contents_which_need_translation.append(translatable_item)
             elif (
-                entityTranslation.translations[
+                entity_translation.translations[
                 translatable_item.content_id].needs_update
             ):
                 contents_which_need_translation.append(translatable_item)
@@ -145,14 +157,14 @@ class BaseTranslatableObject:
 
 
 class EntityTranslation:
-    """The EntityTranslation represents an EntityTransaltionsModel for a given
+    """The EntityTranslation represents an EntityTranslationsModel for a given
     version of an entity in a given language.
 
     Args:
         entity_id: str. The id of the corresponding entity.
         entity_type: str. The type of the corresponding entity.
         entity_version: str. The version of the corresponding entity.
-        language_code: str. The language code for a corresponding entity.
+        language_code: str. The language code for the corresponding entity.
         translations: dict(str, TranslatedContent). The translated content.
     """
 
@@ -177,14 +189,15 @@ class TranslatableContent:
 
     Args:
         content_id: str. The id of the corresponding content.
-        content: str|list(str). The content which can be translated.
+        content: ContentInTranslatableContent. The content which can be
+            translated.
         content_type: str. The type of the corresponding content.
     """
 
     def __init__(
         self,
         content_id: str,
-        content: str|List[str],
+        content: ContentInTranslatableContent,
         content_type: str
     ) -> None:
         self.content_id = content_id
@@ -224,18 +237,18 @@ class TranslatableContent:
 
 
 class TranslatedContent:
-    """Represents the translated contents of TranslatableContent
-    object.
+    """Represents the translated content of the TranslatableContent object.
 
     Args:
-        content: str|list(str). The content which is already translated.
-        needs_update: bool. A boolean value which represents that whether any
-            translation needs update or not.
+        content: ContentInTranslatableContent. Represents already translated
+            content in a translated object.
+        needs_update: bool. A boolean value represents whether any translation
+            needs an update or not.
     """
 
     def __init__(
         self,
-        content: str|List[str],
+        content: ContentInTranslatableContent,
         needs_update: bool
     ) -> None:
         self.content = content

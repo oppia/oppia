@@ -23,13 +23,16 @@ from core.domain import translation_domain
 from core.tests import test_utils
 
 
-class TranslatableObject1(translation_domain.BaseTranslatableObject):
-    """Dummy translatable object for testing of BasetranslatableObject class."""
+class DummyTranslatableObjectWithTwoParams(
+        translation_domain.BaseTranslatableObject):
+    """A dummy translatable object with a translatable field and a
+    TranslatableObject as its properties.
+    """
 
     def __init__(
         self,
         param1: str,
-        param2: TranslatableObject2
+        param2: DummyTranslatableObjectWithSingleParam
     ) -> None:
         self.param1 = param1
         self.param2 = param2
@@ -42,8 +45,11 @@ class TranslatableObject1(translation_domain.BaseTranslatableObject):
         self._register_translatable_object(self.param2)
 
 
-class TranslatableObject2(translation_domain.BaseTranslatableObject):
-    """Dummy translatable object for testing of BasetranslatableObject class."""
+class DummyTranslatableObjectWithSingleParam(
+        translation_domain.BaseTranslatableObject):
+    """A dummy translatable object with a translatable field as its
+    properties.
+    """
 
     def __init__(
         self,
@@ -58,8 +64,10 @@ class TranslatableObject2(translation_domain.BaseTranslatableObject):
             self.param3)
 
 
-class TranslatableObject3(translation_domain.BaseTranslatableObject):
-    """Dummy translatable object for testing of BasetranslatableObject class."""
+class DummyTranslatableObject(translation_domain.BaseTranslatableObject):
+    """A dummy translatable object with two translatable fields and on
+    registering with same content_id an error is raised.
+    """
 
     def __init__(
         self,
@@ -80,8 +88,11 @@ class TranslatableObject3(translation_domain.BaseTranslatableObject):
             self.param2)
 
 
-class TranslatableObject4(translation_domain.BaseTranslatableObject):
-    """Dummy translatable object for testing of BasetranslatableObject class."""
+class DummyTranslatableObjectWithoutRegisterMethod(
+        translation_domain.BaseTranslatableObject):
+    """A dummy translatable object without _register_all_translatable_fields()
+    method should raise an exception.
+    """
 
     def __init__(
         self,
@@ -92,8 +103,11 @@ class TranslatableObject4(translation_domain.BaseTranslatableObject):
         self.param2 = param2
 
 
-class TranslatableObject5(translation_domain.BaseTranslatableObject):
-    """Dummy translatable object for testing of BasetranslatableObject class."""
+class DummyTranslatableObjectWithFourParams(
+        translation_domain.BaseTranslatableObject):
+    """A dummy translatable object with four translatable fields as its
+    properties.
+    """
 
     def __init__(
         self,
@@ -131,8 +145,9 @@ class BaseTranslatableObjectUnitTest(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super(BaseTranslatableObjectUnitTest, self).setUp()
-        self.translatable_object1 = TranslatableObject1(
-            'My name is jhon.', TranslatableObject2('My name is jack.'))
+        self.translatable_object1 = DummyTranslatableObjectWithTwoParams(
+            'My name is jhon.', DummyTranslatableObjectWithSingleParam(
+                'My name is jack.'))
 
     def test_get_all_translatable_content_returns_correct_items(self) -> None:
         expected_contents = [
@@ -148,7 +163,7 @@ class BaseTranslatableObjectUnitTest(test_utils.GenericTestBase):
         ])
 
     def test_contents_having_same_content_id_raises_exception(self) -> None:
-        translatable_object = TranslatableObject3(
+        translatable_object = DummyTranslatableObject(
             'My name is jack.', 'My name is jhon.')
 
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
@@ -158,7 +173,7 @@ class BaseTranslatableObjectUnitTest(test_utils.GenericTestBase):
             translatable_object.get_translatable_fields()
 
     def test_unregistered_translatable_object_raises_exception(self) -> None:
-        translatable_object = TranslatableObject4(
+        translatable_object = DummyTranslatableObjectWithoutRegisterMethod(
             'My name is jack.', 'My name is jhon.')
 
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
@@ -173,7 +188,7 @@ class BaseTranslatableObjectUnitTest(test_utils.GenericTestBase):
         entity_translations = translation_domain.EntityTranslation(
             'exp_id', 'exploration', 1, 'en', translation_dict)
 
-        translatable_object = TranslatableObject5(
+        translatable_object = DummyTranslatableObjectWithFourParams(
             'My name is jack.', 'My name is jhon.', 'My name is Nikhil.', '')
         contents_which_need_translation = (
             translatable_object.get_all_contents_which_needs_translations(
