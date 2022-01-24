@@ -17,7 +17,6 @@
 from __future__ import annotations
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
@@ -329,7 +328,7 @@ class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
             messages.pop(0)
             authors_settings.pop(0)
 
-        for m, author_settings in python_utils.ZIP(messages, authors_settings):
+        for m, author_settings in zip(messages, authors_settings):
 
             if author_settings is None:
                 author_username = None
