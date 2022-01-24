@@ -206,15 +206,15 @@ export class NumericInputValidationService {
     return warningsList;
   }
   // Returns 'undefined' when no error occurs.
-  getError(value: string): string | undefined {
+  getError(value: string, decimalSeparator: string): string | undefined {
     value = value.toString().trim();
-    const trailingDot = /\.\d/g;
-    const twoDecimals = /.*\..*\./g;
+    const trailingDot = /[\.|\,|\u066B]\d/g;
+    const twoDecimals = /.*[\.|\,|\u066B].*[\.|\,|\u066B]/g;
     const trailingMinus = /^-/g;
     const extraMinus = /-.*-/g;
     const extraExponent = /e.*e/g;
 
-    if (value.includes('.') && !value.match(trailingDot)) {
+    if (value.includes(decimalSeparator) && !value.match(trailingDot)) {
       return 'Trailing decimals are not allowed.';
     } else if (value.match(twoDecimals)) {
       return 'At most 1 decimal point should be present.';
@@ -229,7 +229,7 @@ export class NumericInputValidationService {
 
   // Returns 'undefined' when no error occurs.
   getErrorString(
-      value: number, customizationArgs: boolean, decimalSeparator?: string
+      value: number, customizationArgs: boolean, decimalSeparator: string = '.'
   ): string | undefined {
     if (customizationArgs && value < 0) {
       return 'The answer must be greater than or equal to zero';
@@ -263,9 +263,6 @@ export class NumericInputValidationService {
     }
     const stringValueRegExp = stringValue.match(/\d/g);
 
-    if (!decimalSeparator) {
-      decimalSeparator = '.';
-    }
     if (stringValueRegExp === null) {
       return 'The answer should be a valid number and ' +
       `can contain at most 15 digits (0-9) or symbols(${decimalSeparator}).`;

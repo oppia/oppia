@@ -121,7 +121,9 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
             } else {
               // Make sure number is in a correct format.
               let error = NumericInputValidationService
-                .getError(ctrl.localStringValue);
+                .getError(
+                  ctrl.localStringValue,
+                  ctrl.currentDecimalSeparator());
               if (error !== undefined) {
                 ctrl.localValue = null;
                 ctrl.errorString = error;

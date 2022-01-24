@@ -86,7 +86,7 @@ export class I18nLanguageCodeService {
 
     // Check if number is in proper format.
     // eslint-disable-next-line max-len
-    let validRegex = new RegExp('-{0,1}[0-9]+([\.|\,|\٫][0-9]+)?(e[0-9]+)?', 'g');
+    let validRegex = new RegExp('-{0,1}[0-9]?([\.|\,|\٫]?[0-9]+)?(e[0-9]+)?', 'g');
 
     let engNum: number;
 
