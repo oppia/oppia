@@ -124,10 +124,13 @@
                 <div ng-if="notesEditorIsShown" class="protractor-test-story-notes-rte">
                   <schema-based-editor schema="NOTES_SCHEMA" local-value="editableNotes">
                   </schema-based-editor>
+                  <div ng-if="editableNotes.length > 4000" class="story-length-validation-error">
+                    The notes length is too long. Please make it under 4000 characters.
+                  </div>
                   <div class="editor-buttons">
                     <button type="button"
                             class="btn btn-success oppia-save-state-item-button float-right protractor-test-save-story-notes-button"
-                            ng-disabled="!editableNotes"
+                            ng-disabled="!editableNotes || editableNotes.length > 4000"
                             ng-click="updateNotes(editableNotes)">
                       Save
                     </button>
@@ -228,6 +231,17 @@
 </div>
 
 <style>
+  .story-length-validation-error {
+    align-items: center;
+    background-color: #f8d7da;
+    border: 0.0625rem solid #dc3545;
+    border-radius: 0.25rem;
+    color: #dc3545;
+    display: flex;
+    justify-content: center;
+    padding: 0.25rem;
+  }
+
   story-editor .no-chapters-message {
     font-family: 'Capriola', 'Roboto', Arial, sans-serif;
     font-size: 18px;
@@ -272,7 +286,7 @@
   }
 
   story-editor .story-nodes-container {
-    background-color: #FFF;
+    background-color: #fff;
     text-align: left;
     white-space: initial;
   }
@@ -364,7 +378,7 @@
   }
   story-editor .add-chapter-btn {
     background-color: #008098;
-    color: #FFF;
+    color: #fff;
     font-weight: bold;
     margin: 15px 0 15px;
     text-align: left;

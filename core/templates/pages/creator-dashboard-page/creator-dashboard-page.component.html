@@ -260,7 +260,7 @@
               layout-wrap
               class="metrics"
               fxLayoutAlign="space-between center">
-            <div class="rowOne">
+            <div class="row-one">
               <li flex="50" class="protractor-test-exp-summary-tile-rating">
                 <span>
                   <span class="fa fa-star oppia-dashboard-card-statistic-icon"
@@ -290,7 +290,7 @@
               </li>
             </div>
 
-            <div class="rowTwo">
+            <div class="row-two">
               <li flex="50" class="protractor-test-exp-summary-tile-num-views">
                 <span class="fa fa-eye oppia-dashboard-card-statistic-icon"
                       ngbTooltip="{{ 'I18N_LIBRARY_VIEWS_TOOLTIP' | translate }}"
@@ -414,12 +414,15 @@
     margin-left: 0;
     margin-top: 0;
   }
-  .rowOne, .rowTwo {
+  .row-one, .row-two {
     display: flex;
     justify-content: space-between;
     padding-left: 10px;
     padding-right: 10px;
     padding-top: 7px;
+  }
+  .row-two {
+    margin-bottom: 12px;
   }
   .oppia-mat-card {
     display: flex;

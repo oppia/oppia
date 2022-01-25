@@ -1,22 +1,31 @@
 <div class="practice-tab">
-  <div class="oppia-practice-tab-container" [ngClass]="{'practice-tab-for-learner-dashboard': displayArea === 'progressTab'}">
+  <div class="oppia-practice-tab-container"
+       [ngClass]="{'practice-tab-for-learner-dashboard': displayArea === 'progressTab'}">
     <mat-card class="oppia-page-card oppia-long-text">
-      <h2 class="tab-title" *ngIf="displayArea === 'topicViewer'">
+      <h2 class="tab-title"
+          *ngIf="displayArea === 'topicViewer'">
         <span [innerHTML]="'I18N_TOPIC_VIEWER_MASTER_SKILLS' | translate: {topicName: topicName}"></span>
       </h2>
-      <div class="practice-content" *ngIf="displayArea === 'topicViewer'">
+      <div class="practice-content"
+           *ngIf="displayArea === 'topicViewer'">
         <span [innerHTML]="'I18N_TOPIC_VIEWER_SELECT_SKILLS' | translate: {topicName: topicName}"></span>
       </div>
       <mat-card-content>
-        <div *ngFor="let subtopic of availableSubtopics; let i = index" class="practice-tab-subtopic-item">
-          <mat-checkbox color="primary" class="practice-tab-mat-checkbox protractor-test-skill-checkbox" [(ngModel)]="selectedSubtopicIndices[i]"
+        <div *ngFor="let subtopic of availableSubtopics; let i = index"
+             class="practice-tab-subtopic-item">
+          <mat-checkbox color="primary"
+                        class="practice-tab-mat-checkbox protractor-test-skill-checkbox"
+                        [(ngModel)]="selectedSubtopicIndices[i]"
                         (change)="checkIfQuestionsExist(selectedSubtopicIndices)">
             <span [ngClass]="{'subtopic-title': displayArea === 'progressTab'}">
               {{ subtopic.getTitle() }}
             </span>
           </mat-checkbox>
-          <div class="capsule-progress" *ngIf="displayArea === 'progressTab'" [ngStyle]="{'background': 'linear-gradient(to right, #205D86 ' + getBackgroundForProgress(i) + '%,white ' + getBackgroundForProgress(i) + '%)'}">
-            <span class="subtopic-mastery" [ngStyle]="{'right': subtopicMasteryPosition(i) + 'px', 'color': masteryTextColor(i)}">
+          <div class="capsule-progress"
+               *ngIf="displayArea === 'progressTab'"
+               [ngStyle]="{'background': 'linear-gradient(to right, #205D86 ' + getBackgroundForProgress(i) + '%,white ' + getBackgroundForProgress(i) + '%)'}">
+            <span class="subtopic-mastery"
+                  [ngStyle]="{'right': subtopicMasteryPosition(i) + 'px', 'color': masteryTextColor(i)}">
               {{subtopicMasteryArray[i]}}%
             </span>
           </div>
@@ -24,14 +33,24 @@
       </mat-card-content>
       <mat-card-actions class="card-actions">
         <div class="fx-row fx-main-center fx-cross-center full-width">
-          <button mat-raised-button [disabled]="isStartButtonDisabled()" (click)="openNewPracticeSession()" class="practice-session-button protractor-test-practice-start-button">
-            <span *ngIf="questionsStatusCallIsComplete" class="font-heavy" [innerHTML]="'I18N_TOPIC_VIEWER_START_PRACTICE' | translate"></span>
-            <mat-spinner [diameter]="20" class="question-status-spinner" *ngIf="!questionsStatusCallIsComplete"></mat-spinner>
+          <button mat-raised-button
+                  [disabled]="isStartButtonDisabled() && questionsStatusCallIsComplete"
+                  [ngClass]="{'practice-button-background-status-pending': !questionsStatusCallIsComplete, 'practice-button-background-status-complete': questionsStatusCallIsComplete}"
+                  (click)="openNewPracticeSession()"
+                  class="practice-session-button protractor-test-practice-start-button" >
+            <span *ngIf="questionsStatusCallIsComplete"
+                  class="font-heavy"
+                  [innerHTML]="'I18N_TOPIC_VIEWER_START_PRACTICE' | translate">
+            </span>
+            <mat-spinner [diameter]="20"
+                         class="question-status-spinner"
+                         *ngIf="!questionsStatusCallIsComplete">
+            </mat-spinner>
           </button>
         </div>
-        <div class="mt-3" *ngIf="questionsStatusCallIsComplete && !questionsAreAvailable && isAtLeastOneSubtopicSelected()">
-          <em class="text-danger">
-            There are no questions created yet for the selected subtopic(s).
+        <div class="mt-3"
+             *ngIf="questionsStatusCallIsComplete && !questionsAreAvailable && isAtLeastOneSubtopicSelected()">
+          <em class="text-danger" [innerHTML]="'I18N_TOPIC_VIEWER_NO_QUESTION_WARNING' | translate">
           </em>
         </div>
       </mat-card-actions>
@@ -100,9 +119,17 @@
     border-bottom: 1px solid;
   }
 
+  .practice-button-background-status-complete {
+    background-color: #00645c;
+  }
+
+  .practice-button-background-status-pending {
+    background-color: rgba(0, 0, 0, .26);
+    box-shadow: none;
+  }
+
   .practice-tab .practice-session-button {
     align-self: center;
-    background-color: #00645C;
     border-radius: 0.4em;
     color: white;
     font-family: "Roboto", Arial, sans-serif;

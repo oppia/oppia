@@ -53,7 +53,7 @@ class PendingDeletionRequestUnitTests(test_utils.GenericTestBase):
         pending_deletion_request.pseudonymizable_entity_mappings = {
             'wrong_key': {}
         }
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError,
             'pseudonymizable_entity_mappings contain wrong key'
         ):
