@@ -110,7 +110,7 @@ export class I18nLanguageCodeService {
     return engNum;
   }
 
-  convertToLocalizedNumber(number: number): string {
+  convertToLocalizedNumber(number: number|string): string {
     let decimalSeparator = this.currentDecimalSeparator();
     let stringNumber = number.toString();
     let convertedNumber: string = stringNumber;
