@@ -101,6 +101,7 @@ import { SupplementalCardComponent } from 'pages/exploration-player-page/learner
 import { SavePendingChangesModalComponent } from './save-pending-changes/save-pending-changes-modal.component';
 import { AddHintModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-hint-modal.component';
 import { SmoothHeightAnimatorComponent } from './smooth-height/smooth-height-animator.component';
+import { QuestionMisconceptionSelectorComponent } from './question-directives/question-misconception-selector/question-misconception-selector.component';
 import { ConversationSkinComponent } from 'pages/exploration-player-page/learner-experience/conversation-skin.component';
 import { RatingsAndRecommendationsComponent } from 'pages/exploration-player-page/learner-experience/ratings-and-recommendations.component';
 import { LearnerAnswerInfoCard } from 'pages/exploration-player-page/learner-experience/learner-answer-info-card.component';
@@ -114,6 +115,10 @@ import { HintEditorComponent } from 'components/state-directives/hint-editor/hin
 import { ResponseHeaderComponent } from './state-directives/response-header/response-header.component';
 import { StateHintsEditorComponent } from 'components/state-editor/state-hints-editor/state-hints-editor.component';
 import { ReviewMaterialEditorComponent } from './review-material-editor/review-material-editor.component';
+import { TagMisconceptionModalComponent } from './question-directives/question-misconception-editor/tag-misconception-modal-component';
+import { QuestionMisconceptionEditorComponent } from './question-directives/question-misconception-editor/question-misconception-editor.component';
+import { SolutionExplanationEditor } from './state-directives/solution-editor/solution-explanation-editor.component';
+import { SolutionEditor } from './state-directives/solution-editor/solution-editor.component';
 
 // Pipes.
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
@@ -239,6 +244,8 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     SortByPipe,
     LearnerDashboardIconsComponent,
     PreviewThumbnailComponent,
+    AddHintModalComponent,
+    QuestionMisconceptionSelectorComponent,
     QuestionsOpportunitiesSelectDifficultyModalComponent,
     QuestionsListSelectSkillAndDifficultyModalComponent,
     DeleteInteractionModalComponent,
@@ -247,7 +254,11 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     DeleteSolutionModalComponent,
     SavePendingChangesModalComponent,
     AddHintModalComponent,
-    ReviewMaterialEditorComponent
+    ReviewMaterialEditorComponent,
+    TagMisconceptionModalComponent,
+    QuestionMisconceptionEditorComponent,
+    SolutionEditor,
+    SolutionExplanationEditor,
   ],
 
   entryComponents: [
@@ -322,6 +333,8 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     LearnerDashboardIconsComponent,
     PreviewThumbnailComponent,
+    AddHintModalComponent,
+    QuestionMisconceptionSelectorComponent,
     QuestionsOpportunitiesSelectDifficultyModalComponent,
     QuestionsListSelectSkillAndDifficultyModalComponent,
     DeleteInteractionModalComponent,
@@ -330,7 +343,11 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     DeleteSolutionModalComponent,
     SavePendingChangesModalComponent,
     AddHintModalComponent,
-    ReviewMaterialEditorComponent
+    ReviewMaterialEditorComponent,
+    TagMisconceptionModalComponent,
+    QuestionMisconceptionEditorComponent,
+    SolutionEditor,
+    SolutionExplanationEditor
   ],
 
   exports: [
@@ -422,13 +439,18 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     SortByPipe,
     SavePendingChangesModalComponent,
     LearnerDashboardIconsComponent,
+    QuestionMisconceptionSelectorComponent,
     QuestionsOpportunitiesSelectDifficultyModalComponent,
     QuestionsListSelectSkillAndDifficultyModalComponent,
     DeleteInteractionModalComponent,
     DeleteHintModalComponent,
     DeleteLastHintModalComponent,
     DeleteSolutionModalComponent,
-    ReviewMaterialEditorComponent
+    ReviewMaterialEditorComponent,
+    TagMisconceptionModalComponent,
+    QuestionMisconceptionEditorComponent,
+    SolutionEditor,
+    SolutionExplanationEditor
   ],
 })
 
