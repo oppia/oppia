@@ -390,18 +390,18 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         feedback_services.create_message(
             thread_id, self.user_id, None, None, 'Another text')
         messages_on_page = feedback_services.get_messages(thread_id)
-        dictionary_list_message_on_page_1 = []
-        dictionary_list_message_on_page_2 = []
+        dictionary_list_from_test_method = []
+        dictionary_list_from_page_message = []
         method_result = (
             feedback_services.get_next_page_of_all_feedback_messages())
         for i in (method_result)[0]:
-            dictionary_list_message_on_page_1.append(i.to_dict().items())
+            dictionary_list_from_test_method.append(i.to_dict().items())
         for i in messages_on_page:
-            dictionary_list_message_on_page_2.append(i.to_dict().items())
-        dictionary_list_message_on_page_2.reverse()
+            dictionary_list_from_page_message.append(i.to_dict().items())
+        dictionary_list_from_page_message.reverse()
         self.assertListEqual(
-            dictionary_list_message_on_page_1,
-            dictionary_list_message_on_page_2,
+            dictionary_list_from_test_method,
+            dictionary_list_from_page_message,
         )
         genral_feedback_result = (
         feedback_models.GeneralFeedbackMessageModel.get_all_messages(
@@ -437,9 +437,9 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         self.assertEqual(feedback_services.get_total_open_threads(
             [feedback_services.get_thread_analytics(self.EXP_ID_1)]), 0)
         feedback_services.handle_thread_status_changed(
-        self.EXP_ID_1,
-        feedback_models.STATUS_CHOICES_FIXED,
-        feedback_models.STATUS_CHOICES_OPEN)
+                self.EXP_ID_1,
+                feedback_models.STATUS_CHOICES_FIXED,
+                feedback_models.STATUS_CHOICES_OPEN)
         self.assertEqual(feedback_services.get_total_open_threads(
             [feedback_services.get_thread_analytics(self.EXP_ID_1)]
         ), 1)
