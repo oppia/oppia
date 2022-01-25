@@ -1398,6 +1398,7 @@ class Question:
             Question. A Question domain object with default values.
         """
         default_question_state_data = cls.create_default_question_state()
+
         return cls(
             question_id, default_question_state_data,
             feconf.CURRENT_STATE_SCHEMA_VERSION,

@@ -156,10 +156,8 @@ class AlgebraicExpressionInput(base.BaseInteraction):
             'MatchesExactlyWith': (
                 cls._convert_matches_exactly_rule_spec_to_proto),
             'IsEquivalentTo': cls._convert_is_equivalent_rule_spec_to_proto,
-            'ContainsSomeOf': cls._convert_contains_some_rule_spec_to_proto,
-            'OmitsSomeOf': cls._convert_omit_some_rule_spec_to_proto,
-            'MatchesWithGeneralForm': (
-                cls._convert_matches_with_form_rule_spec_to_proto)
+            'MatchesUpToTrivialManipulations': (
+                cls._convert_matches_upto_rule_spec_to_proto)
         }
 
         rule_type_to_proto_mapping = {
@@ -169,15 +167,9 @@ class AlgebraicExpressionInput(base.BaseInteraction):
             'IsEquivalentTo': lambda x: (
                 state_pb2.AlgebraicExpressionInputInstanceDto.RuleSpecDto(
                     is_equivalent_to=x)),
-            'ContainsSomeOf': lambda x: (
+            'MatchesUpToTrivialManipulations': lambda x: (
                 state_pb2.AlgebraicExpressionInputInstanceDto.RuleSpecDto(
-                    contains_some_of=x)),
-            'OmitsSomeOf': lambda x: (
-                state_pb2.AlgebraicExpressionInputInstanceDto.RuleSpecDto(
-                    omits_some_of=x)),
-            'MatchesWithGeneralForm': lambda x: (
-                state_pb2.AlgebraicExpressionInputInstanceDto.RuleSpecDto(
-                    matches_with_general_form=x))
+                    matches_upTo_trivial_manipulations=x))
         }
 
         for rule_spec in rule_specs_list:
@@ -219,46 +211,17 @@ class AlgebraicExpressionInput(base.BaseInteraction):
         )
 
     @classmethod
-    def _convert_contains_some_rule_spec_to_proto(cls, inputs):
-        """Creates a proto object for ContainsSomeOfSpecDto.
+    def _convert_matches_upto_rule_spec_to_proto(cls, inputs):
+        """Creates a proto object for MatchesUpToTrivialManipulationsSpecDto.
 
         Args:
             inputs: dict. The input items.
 
         Returns:
-            ContainsSomeOfSpecDto. The proto object.
+            MatchesUpToTrivialManipulationsSpecDto. The proto object.
         """
-        return RULE_SPEC_DTO.ContainsSomeOfSpecDto(
+        return RULE_SPEC_DTO.MatchesUpToTrivialManipulationsSpecDto(
             algebraic_expression=inputs['x']
-        )
-
-    @classmethod
-    def _convert_omit_some_rule_spec_to_proto(cls, inputs):
-        """Creates a proto object for OmitsSomeOfSpecDto.
-
-        Args:
-            inputs: dict. The input items.
-
-        Returns:
-            OmitsSomeOfSpecDto. The proto object.
-        """
-        return RULE_SPEC_DTO.OmitsSomeOfSpecDto(
-            algebraic_expression=inputs['x']
-        )
-
-    @classmethod
-    def _convert_matches_with_form_rule_spec_to_proto(cls, inputs):
-        """Creates a proto object for MatchesWithGeneralFormSpecDto.
-
-        Args:
-            inputs: dict. The input items.
-
-        Returns:
-            MatchesWithGeneralFormSpecDto. The proto object.
-        """
-        return RULE_SPEC_DTO.MatchesWithGeneralFormSpecDto(
-            algebraic_expression=inputs['x'],
-            set_of_algebraic_identifier=list(inputs['y'])
         )
 
     @classmethod

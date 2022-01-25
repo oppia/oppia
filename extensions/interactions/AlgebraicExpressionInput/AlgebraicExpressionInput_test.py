@@ -59,20 +59,9 @@ class AlgebraicExpressionInputInteractionTests(test_utils.GenericTestBase):
                         'x': 'pi*r^2'
                     }
                 }, {
-                    'rule_type': 'ContainsSomeOf',
+                    'rule_type': 'MatchesUpToTrivialManipulations',
                     'inputs': {
                         'x': 'pi*r^2'
-                    }
-                }, {
-                    'rule_type': 'OmitsSomeOf',
-                    'inputs': {
-                        'x': 'pi*r^2'
-                    }
-                }, {
-                    'rule_type': 'MatchesWithGeneralForm',
-                    'inputs': {
-                        'x': 'pi*r^2',
-                        'y': ['pi*r^2', 'pi*r^2']
                     }
                 }],
                 'training_data': [],
@@ -200,24 +189,9 @@ class AlgebraicExpressionInputInteractionTests(test_utils.GenericTestBase):
             algebric_rule_specs.algebraic_expression,
             'pi*r^2')
 
-        algebric_rule_specs = (
-            algebric_answer_group.rule_specs[2]
-                .contains_some_of)
+        algebric_rule_specs = algebric_answer_group.rule_specs[2]
+        matches_trival_rule = (
+            algebric_rule_specs.matches_upTo_trivial_manipulations)
         self.assertEqual(
-            algebric_rule_specs.algebraic_expression,
-            'pi*r^2')
-
-        algebric_rule_specs = (
-            algebric_answer_group.rule_specs[3].omits_some_of)
-        self.assertEqual(
-            algebric_rule_specs.algebraic_expression,
-            'pi*r^2')
-
-        algebric_rule_specs = (
-            algebric_answer_group.rule_specs[4].matches_with_general_form)
-        self.assertEqual(
-            algebric_rule_specs.algebraic_expression,
-            'pi*r^2')
-        self.assertEqual(
-            algebric_rule_specs.set_of_algebraic_identifier[0],
+            matches_trival_rule.algebraic_expression,
             'pi*r^2')
