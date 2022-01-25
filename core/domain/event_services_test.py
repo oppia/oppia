@@ -518,7 +518,7 @@ class UserStatsEventsFunctionsTests(test_utils.GenericTestBase):
 
         admin_average_ratings = (
             user_services.get_dashboard_stats(self.admin_id)['average_ratings'])
-        self.assertEqual(admin_average_ratings, None)
+        self.assertIsNone(admin_average_ratings)
 
         event_services.handle_exploration_rating('exp_id', 5, None)
         admin_average_ratings = (
@@ -531,7 +531,7 @@ class UserStatsEventsFunctionsTests(test_utils.GenericTestBase):
 
         admin_average_ratings = (
             user_services.get_dashboard_stats(self.admin_id)['average_ratings'])
-        self.assertEqual(admin_average_ratings, None)
+        self.assertIsNone(admin_average_ratings)
 
         event_services.handle_exploration_rating('exp_id', 5, None)
         admin_average_ratings = (
