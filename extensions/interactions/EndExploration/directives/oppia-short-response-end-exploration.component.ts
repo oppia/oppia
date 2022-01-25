@@ -28,9 +28,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
   templateUrl: './end-exploration-short-response.component.html',
   styleUrls: []
 })
-export class ShortResponseEndExplorationComponent {
-  constructor() {}
-}
+export class ShortResponseEndExplorationComponent {}
 
 angular.module('oppia').directive('oppiaShortResponseEndExploration',
   downgradeComponent({

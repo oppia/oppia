@@ -21,11 +21,11 @@ import { Injectable } from '@angular/core';
 import { AppConstants } from 'app.constants';
 
 export interface RecommendExplorationBackendDict {
-  'summaries': RecommendExplorationDict[];
+  summaries: RecommendExplorationDict[];
 }
 
 export interface RecommendExplorationDict {
-  'id': string;
+  id: string;
 }
 
 @Injectable({
