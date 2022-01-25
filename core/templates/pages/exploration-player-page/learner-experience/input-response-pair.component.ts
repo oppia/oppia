@@ -84,6 +84,15 @@ export class InputResponsePairComponent {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
+  isNumber(value: string): boolean {
+    const validRegex = /.*[a-b]+.*/;
+    // eslint-disable-next-line max-len
+    if (validRegex.test(value)) {
+      return false;
+    }
+    return true;
+  }
+
   convertAnswerToLocalFormat(data: string|number): string {
     if (this.contextService.getPageContext() === 'learner') {
       return this.contentTranslationLanguageService
@@ -97,9 +106,15 @@ export class InputResponsePairComponent {
     let displayedCard = this.playerTranscriptService.getCard(
       this.playerPositionService.getDisplayedCardIndex());
     let interaction = displayedCard.getInteraction();
-    return this.explorationHtmlFormatterService.getAnswerHtml(
-      this.convertAnswerToLocalFormat(this.data.learnerInput), interaction.id,
-      interaction.customizationArgs);
+    if (this.isNumber(this.data.learnerInput)) {
+      return this.explorationHtmlFormatterService.getAnswerHtml(
+        this.convertAnswerToLocalFormat(this.data.learnerInput), interaction.id,
+        interaction.customizationArgs);
+    } else {
+      return this.explorationHtmlFormatterService.getAnswerHtml(
+        this.data.learnerInput, interaction.id,
+        interaction.customizationArgs);
+    }
   }
 
   // Returns a HTML string representing a short summary of the answer
@@ -110,21 +125,34 @@ export class InputResponsePairComponent {
     let interaction: Interaction = displayedCard.getInteraction();
     let shortAnswerHtml = '';
     if (this.data.learnerInput.hasOwnProperty('answerDetails')) {
-      shortAnswerHtml = (
+      if (this.isNumber(this.data.learnerInput)) {
+        shortAnswerHtml = (
         this.convertAnswerToLocalFormat(
           this.data.learnerInput) as unknown as { answerDetails: string })
-        .answerDetails;
+          .answerDetails;
+      } else {
+        shortAnswerHtml = (
+            this.data.learnerInput as unknown as { answerDetails: string })
+          .answerDetails;
+      }
     } else if (
       this.data && interaction.id &&
       InteractionSpecsConstants.INTERACTION_SPECS[
         interaction.id as InteractionSpecsKey
       ].needs_summary
     ) {
-      shortAnswerHtml = (
-        this.explorationHtmlFormatterService.getShortAnswerHtml(
-          this.convertAnswerToLocalFormat(
-            this.data.learnerInput), interaction.id,
-          interaction.customizationArgs));
+      if (this.isNumber(this.data.learnerInput)) {
+        shortAnswerHtml = (
+          this.explorationHtmlFormatterService.getShortAnswerHtml(
+            this.convertAnswerToLocalFormat(
+              this.data.learnerInput), interaction.id,
+            interaction.customizationArgs));
+      } else {
+        shortAnswerHtml = (
+          this.explorationHtmlFormatterService.getShortAnswerHtml(
+            this.data.learnerInput, interaction.id,
+            interaction.customizationArgs));
+      }
     }
     return shortAnswerHtml;
   }

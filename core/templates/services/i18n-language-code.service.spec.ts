@@ -49,6 +49,51 @@ describe('I18nLanguageCodeService', () => {
     expect(latestCode).toBe('es');
   });
 
+  it('should get the decimal separator of the current language', ()=>{
+    i18nLanguageCodeService.setI18nLanguageCode('en');
+    expect(i18nLanguageCodeService.currentDecimalSeparator()).toEqual('.');
+    i18nLanguageCodeService.setI18nLanguageCode('pt-br');
+    expect(i18nLanguageCodeService.currentDecimalSeparator()).toEqual(',');
+    i18nLanguageCodeService.setI18nLanguageCode('ar');
+    expect(i18nLanguageCodeService.currentDecimalSeparator()).toEqual('٫');
+  });
+
+  it('should return regex for numeric validation', ()=>{
+    const dot = new RegExp('[^e0-9\.\-]', 'g');
+    const comma = new RegExp('[^e0-9\,\-]', 'g');
+    const arabic = new RegExp('[^e0-9\٫\-]', 'g');
+
+    i18nLanguageCodeService.setI18nLanguageCode('en');
+    expect(i18nLanguageCodeService.getInputValidationRegex()).toEqual(dot);
+    i18nLanguageCodeService.setI18nLanguageCode('pt-br');
+    expect(i18nLanguageCodeService.getInputValidationRegex()).toEqual(comma);
+    i18nLanguageCodeService.setI18nLanguageCode('ar');
+    expect(i18nLanguageCodeService.getInputValidationRegex()).toEqual(arabic);
+  });
+
+  it(`should convert a number string to the English decimal number`, ()=>{
+    let number1 = '-1.22';
+    let number2 = '1,5';
+    let number3 = '1٫31e1';
+
+    spyOn(i18nLanguageCodeService, 'currentDecimalSeparator').and.returnValues('.', ',', '٫');
+
+    expect(i18nLanguageCodeService.convertToEnglishDecimal(number1)).toEqual(-1.22);
+    expect(i18nLanguageCodeService.convertToEnglishDecimal(number2)).toEqual(1.5);
+    expect(i18nLanguageCodeService.convertToEnglishDecimal(number3)).toEqual(13.1);
+  });
+
+  it('should convert a number to the local format', ()=>{
+    let number = -198.234;
+
+    i18nLanguageCodeService.setI18nLanguageCode('en');
+    expect(i18nLanguageCodeService.convertToLocalizedNumber(number)).toEqual('-198.234');
+    i18nLanguageCodeService.setI18nLanguageCode('pt-br');
+    expect(i18nLanguageCodeService.convertToLocalizedNumber(number)).toEqual('-198,234');
+    i18nLanguageCodeService.setI18nLanguageCode('ar');
+    expect(i18nLanguageCodeService.convertToLocalizedNumber(number)).toEqual('-198٫234');
+  });
+
   it('should get whether the current language is RTL correctly', () => {
     i18nLanguageCodeService.setI18nLanguageCode('es');
     expect(i18nLanguageCodeService.isCurrentLanguageRTL()).toBe(false);

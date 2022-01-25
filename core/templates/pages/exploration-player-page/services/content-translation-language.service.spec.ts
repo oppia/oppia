@@ -94,4 +94,50 @@ describe('Content translation language service', () => {
     expect(ctls.getCurrentContentLanguageCode()).toBe('fr');
     expect(displayTranslationsSpy).toHaveBeenCalledWith('fr');
   });
+
+  it('should get the decimal separator of the current language', ()=>{
+    ctls.setCurrentContentLanguageCode('en');
+    expect(ctls.currentDecimalSeparator()).toEqual('.');
+    ctls.setCurrentContentLanguageCode('es');
+    expect(ctls.currentDecimalSeparator()).toEqual(',');
+    ctls.setCurrentContentLanguageCode('ar');
+    expect(ctls.currentDecimalSeparator()).toEqual('٫');
+  });
+
+  it('should return regex for numeric validation', ()=>{
+    const dot = new RegExp('[^e0-9\.\-]', 'g');
+    const comma = new RegExp('[^e0-9\,\-]', 'g');
+    const arabic = new RegExp('[^e0-9\٫\-]', 'g');
+
+    ctls.setCurrentContentLanguageCode('en');
+    expect(ctls.getInputValidationRegex()).toEqual(dot);
+    ctls.setCurrentContentLanguageCode('es');
+    expect(ctls.getInputValidationRegex()).toEqual(comma);
+    ctls.setCurrentContentLanguageCode('ar');
+    expect(ctls.getInputValidationRegex()).toEqual(arabic);
+  });
+
+  it(`should convert a number string to the English decimal number`, ()=>{
+    let number1 = '-1.22';
+    let number2 = '1,5';
+    let number3 = '1٫31e1';
+
+    spyOn(ctls, 'currentDecimalSeparator').and.returnValues('.', ',', '٫');
+
+    expect(ctls.convertToEnglishDecimal(number1)).toEqual(-1.22);
+    expect(ctls.convertToEnglishDecimal(number2)).toEqual(1.5);
+    expect(ctls.convertToEnglishDecimal(number3)).toEqual(13.1);
+  });
+
+  it('should convert a number to the local format', ()=>{
+    let number = -198.234;
+
+    ctls.setCurrentContentLanguageCode('en');
+    expect(ctls.convertToLocalizedNumber(number)).toEqual('-198.234');
+    ctls.setCurrentContentLanguageCode('es');
+    expect(ctls.convertToLocalizedNumber(number)).toEqual('-198,234');
+    ctls.setCurrentContentLanguageCode('ar');
+    expect(ctls.convertToLocalizedNumber(number)).toEqual('-198٫234');
+  });
+
 });
