@@ -30,6 +30,7 @@ import { DateTimeFormatService } from 'services/date-time-format.service';
 import { UserInfo } from 'domain/user/user-info.model';
 import { UserService } from 'services/user.service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 
 @Component({selector: 'learner-dashboard-icons', template: ''})
@@ -66,7 +67,8 @@ describe('Collection Summary Tile Component', () => {
       declarations: [
         CollectionSummaryTileComponent,
         MockTruncteAndCapitalizePipe,
-        LearnerDashboardIconsComponentStub
+        LearnerDashboardIconsComponentStub,
+        MockTranslatePipe
       ],
       providers: [
         WindowRef,

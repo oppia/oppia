@@ -30,6 +30,7 @@ import { UrlService } from 'services/contextual/url.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 describe('Subtopic viewer page', function() {
   let component: SubtopicViewerPageComponent;
@@ -41,9 +42,10 @@ describe('Subtopic viewer page', function() {
   let subtopicViewerBackendApiService: SubtopicViewerBackendApiService;
   let urlService: UrlService;
   let loaderService: LoaderService;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
 
   let topicName = 'Topic Name';
-  let topicId = '1';
+  let topicId = '123abcd';
   let subtopicTitle = 'Subtopic Title';
   let subtopicUrlFragment = 'subtopic-title';
   let subtopicDataObject: ReadOnlySubtopicPageData = (
@@ -61,7 +63,7 @@ describe('Subtopic viewer page', function() {
         }
       },
       next_subtopic_dict: {
-        id: 1,
+        id: 2,
         title: '',
         skill_ids: [],
         thumbnail_filename: '',
@@ -103,6 +105,7 @@ describe('Subtopic viewer page', function() {
       SubtopicViewerBackendApiService);
     urlService = TestBed.inject(UrlService);
     loaderService = TestBed.inject(LoaderService);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
   });
 
   it('should succesfully get subtopic data and set context', fakeAsync(() => {
@@ -121,6 +124,12 @@ describe('Subtopic viewer page', function() {
     expect(component.nextSubtopicSummaryIsShown).toBe(false);
     spyOn(subtopicViewerBackendApiService, 'fetchSubtopicDataAsync')
       .and.returnValue(Promise.resolve(subtopicDataObject));
+    spyOn(i18nLanguageCodeService, 'getSubtopicTranslationKey')
+      .and.returnValue('I18N_SUBTOPIC_123abcd_test_TITLE');
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
+      .and.returnValue(false);
+    spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
+      .and.returnValue(true);
 
     component.ngOnInit();
     tick();
@@ -135,6 +144,11 @@ describe('Subtopic viewer page', function() {
       subtopicDataObject.getNextSubtopic());
     expect(component.nextSubtopicSummaryIsShown).toBeTrue();
 
+    expect(component.subtopicTitleTranslationKey).toEqual(
+      'I18N_SUBTOPIC_123abcd_test_TITLE');
+    let hackySubtopicTitleTranslationIsDisplayed =
+      component.isHackySubtopicTitleTranslationDisplayed();
+    expect(hackySubtopicTitleTranslationIsDisplayed).toBe(true);
     expect(contextService.setCustomEntityContext).toHaveBeenCalled();
     expect(pageTitleService.setDocumentTitle).toHaveBeenCalled();
     expect(pageTitleService.updateMetaTag).toHaveBeenCalled();
