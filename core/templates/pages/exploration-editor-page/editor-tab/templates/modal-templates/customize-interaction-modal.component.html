@@ -18,23 +18,24 @@
         <a ngbNavLink class="protractor-test-interaction-tab-{{getHyphenatedLowercaseCategoryName(category.name)}}" *ngIf="isinteractionOpen">{{category.name}}</a>
         <ng-template ngbNavContent>
           <div *ngIf="isinteractionOpen">
-          <div *ngFor="let interactionId of category.interaction_ids"
-               (click)="onChangeInteractionId(interactionId)"
-               class="oppia-interaction-tile protractor-test-interaction-tile-{{interactionId}}"
-               ngbPopover=""
-               triggers="mouseenter:mouseleave">
-            <img [src]="getInteractionThumbnailImageUrl(interactionId)">
-            <div class="oppia-interaction-tile-name fx-row fx-main-center fx-cross-center">
-              {{getTitle(interactionId)}}
+            <div *ngFor="let interactionId of category.interaction_ids"
+                 (click)="onChangeInteractionId(interactionId)"
+                 class="oppia-interaction-tile protractor-test-interaction-tile-{{interactionId}}"
+                 ngbPopover="{{getDescription(interactionId)}}"
+                 placement="bottom"
+                 triggers="mouseenter:mouseleave">
+              <img [src]="getInteractionThumbnailImageUrl(interactionId)">
+              <div class="oppia-interaction-tile-name fx-row fx-main-center fx-cross-center">
+                {{getTitle(interactionId)}}
+              </div>
             </div>
           </div>
-        </div>
         </ng-template>
       </ng-container>
     </nav>
     <div [ngbNavOutlet]="nav" class="mt-4"></div>
   </div>
-  
+
   <div *ngIf="!isinteractionOpen && stateInteractionIdService.displayed && hasCustomizationArgs" class="interaction-editor-form protractor-test-interaction-editor">
     <div class="protractor-test-multiple-options" *ngFor="let customizationArgSpec of customizationArgSpecs">
       <div *ngIf="customizationArgSpec.schema.type !== 'bool'" class="oppia-interaction-customization-label">{{customizationArgSpec.description}}</div>
@@ -64,6 +65,7 @@
   <div class="btn-group"
        *ngIf="hasCustomizationArgs"
        ngbPopover="{{isSaveInteractionButtonEnabled() ? '' : getSaveInteractionButtonTooltip()}}"
+       placement="bottom"
        triggers="mouseenter:mouseleave">
     <button class="btn btn-success protractor-test-save-interaction"
             (click)="save()"

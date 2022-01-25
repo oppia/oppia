@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 // Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +11,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
 
 /**
  * @fileoverview Component for the Customize Interaction Modal Component.
@@ -58,6 +55,42 @@ import { InteractiveMapValidationService } from 'interactions/InteractiveMap/dir
 import { MusicNotesInputValidationService } from 'interactions/MusicNotesInput/directives/music-notes-input-validation.service';
 import { FractionInputValidationService } from 'interactions/FractionInput/directives/fraction-input-validation.service';
 import { RatioExpressionInputValidationService } from 'interactions/RatioExpressionInput/directives/ratio-expression-input-validation.service';
+import { Warning } from 'interactions/base-interaction-validation.service';
+import cloneDeep from 'lodash/cloneDeep';
+
+interface CustomizationArgSpecsInterface {
+  name: string;
+  value: unknown;
+  'default_value': unknown;
+}
+
+const INTERACTION_SERVICE_MAPPING = {
+  ContinueValidationService: ContinueValidationService,
+  EndExplorationValidationService: EndExplorationValidationService,
+  AlgebraicExpressionInputValidationService:
+    AlgebraicExpressionInputValidationService,
+  ImageClickInputValidationService: ImageClickInputValidationService,
+  ItemSelectionInputValidationService: ItemSelectionInputValidationService,
+  NumberWithUnitsValidationService: NumberWithUnitsValidationService,
+  NumericExpressionInputValidationService:
+    NumericExpressionInputValidationService,
+  NumericInputValidationService: NumericInputValidationService,
+  DragAndDropSortInputValidationService:
+    DragAndDropSortInputValidationService,
+  GraphInputValidationService: GraphInputValidationService,
+  SetInputValidationService: SetInputValidationService,
+  CodeReplValidationService: CodeReplValidationService,
+  MathEquationInputValidationService: MathEquationInputValidationService,
+  MultipleChoiceInputValidationService:
+    MultipleChoiceInputValidationService,
+  PencilCodeEditorValidationService: PencilCodeEditorValidationService,
+  TextInputValidationService: TextInputValidationService,
+  InteractiveMapValidationService: InteractiveMapValidationService,
+  MusicNotesInputValidationService: MusicNotesInputValidationService,
+  FractionInputValidationService: FractionInputValidationService,
+  RatioExpressionInputValidationService:
+    RatioExpressionInputValidationService,
+};
 
 @Component({
   selector: 'oppia-customize-interaction',
@@ -67,11 +100,11 @@ export class CustomizeInteractionModalComponent
   extends ConfirmOrCancelModal implements OnInit, AfterContentChecked {
   @Input() showMarkAllAudioAsNeedingUpdateModalIfRequired;
 
-  originalContentIdToContent: any;
-  hasCustomizationArgs: any;
-  allowedInteractionCategories: any;
-  explorationIsLinkedToStory: any;
-  customizationArgSpecs: any;
+  customizationArgSpecs: CustomizationArgSpecsInterface[];
+  originalContentIdToContent: object;
+  hasCustomizationArgs: boolean;
+  allowedInteractionCategories: object;
+  explorationIsLinkedToStory: boolean;
   customizationModalReopened: boolean;
   isinteractionOpen: boolean;
 
@@ -97,10 +130,8 @@ export class CustomizeInteractionModalComponent
     return INTERACTION_SPECS[interactionId].name;
   }
 
-  getValue(index: number): any {
-    return (
-      this.stateCustomizationArgsService.displayed[
-        this.customizationArgSpecs[index].name].value);
+  getDescription(interactionId: string): string {
+    return INTERACTION_SPECS[interactionId].description;
   }
 
   getSchemaCallback(schema: Schema): () => Schema {
@@ -109,40 +140,14 @@ export class CustomizeInteractionModalComponent
     };
   }
 
-  getCustomizationArgsWarningsList(): any {
-    const INTERACTION_SERVICE_MAPPING = {
-      ContinueValidationService: ContinueValidationService,
-      EndExplorationValidationService: EndExplorationValidationService,
-      AlgebraicExpressionInputValidationService:
-        AlgebraicExpressionInputValidationService,
-      ImageClickInputValidationService: ImageClickInputValidationService,
-      ItemSelectionInputValidationService: ItemSelectionInputValidationService,
-      NumberWithUnitsValidationService: NumberWithUnitsValidationService,
-      NumericExpressionInputValidationService:
-        NumericExpressionInputValidationService,
-      NumericInputValidationService: NumericInputValidationService,
-      DragAndDropSortInputValidationService:
-        DragAndDropSortInputValidationService,
-      GraphInputValidationService: GraphInputValidationService,
-      SetInputValidationService: SetInputValidationService,
-      CodeReplValidationService: CodeReplValidationService,
-      MathEquationInputValidationService: MathEquationInputValidationService,
-      MultipleChoiceInputValidationService:
-        MultipleChoiceInputValidationService,
-      PencilCodeEditorValidationService: PencilCodeEditorValidationService,
-      TextInputValidationService: TextInputValidationService,
-      InteractiveMapValidationService: InteractiveMapValidationService,
-      MusicNotesInputValidationService: MusicNotesInputValidationService,
-      FractionInputValidationService: FractionInputValidationService,
-      RatioExpressionInputValidationService:
-        RatioExpressionInputValidationService,
-    };
+  getCustomizationArgsWarningsList(): Warning[] {
     const validationServiceName: string = (
       INTERACTION_SPECS[this.stateInteractionIdService.displayed].id +
       'ValidationService');
 
     var validationService =
-      this.injector.get(INTERACTION_SERVICE_MAPPING[validationServiceName]);
+      this.injector.get(
+        INTERACTION_SERVICE_MAPPING[validationServiceName]);
     var warningsList = validationService.getCustomizationArgsWarnings(
       this.stateCustomizationArgsService.displayed);
     return warningsList;
@@ -152,7 +157,7 @@ export class CustomizeInteractionModalComponent
     this.changeDetectorRef.detectChanges();
   }
 
-  getCustomizationArgsWarningMessage(): any {
+  getCustomizationArgsWarningMessage(): string {
     var warningsList = (
       this.getCustomizationArgsWarningsList());
     var warningMessage = '';
@@ -451,7 +456,7 @@ export class CustomizeInteractionModalComponent
         this.stateInteractionIdService.savedMemento];
       this.customizationArgSpecs = interactionSpec.customization_arg_specs;
 
-      this.stateInteractionIdService.displayed = angular.copy(
+      this.stateInteractionIdService.displayed = cloneDeep(
         this.stateInteractionIdService.savedMemento);
       this.stateCustomizationArgsService.displayed = (
         this.stateCustomizationArgsService.savedMemento);
