@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Jobs for adding android_proto_size_in_bytes attribute to exploration."""
+"""Jobs for updating exploration model."""
 
 from __future__ import annotations
 
@@ -48,8 +48,10 @@ if MYPY: # pragma: no cover
 datastore_services = models.Registry.import_datastore_services()
 
 
-class MigrateExplorationJob(base_jobs.JobBase):
-    """Job that migrates exploration models."""
+class PopulateExplorationWithAndroidProtoSizeInBytesJob(base_jobs.JobBase):
+    """Job that populate exploration models with
+    android_proto_size_in_bytes attribute.
+    """
 
     @staticmethod
     def _migrate_exploration(
@@ -179,9 +181,9 @@ class MigrateExplorationJob(base_jobs.JobBase):
         exp_model: exp_models.ExplorationModel,
         exploration: exp_domain.Exploration
     ) -> Iterable[Tuple[str, exp_domain.ExplorationChange]]:
-        """Generates exploration change objects. Exploration
-        change object is generated when schema version for some field
-        is lower than the latest schema version.
+        """Generates exploration change objects. Exploration change object
+        is generated if the existing model doesn't contain
+        android_proto_size_in_bytes attribute.
 
         Args:
             exp_model: ExplorationModel. The exploration for which to generate
@@ -339,7 +341,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
             exploration_objects_list
             | 'Transform exploration objects into job run results' >> (
                 job_result_transforms.CountObjectsToJobRunResult(
-                    'EXPLORATION MIGRATED'))
+                    'EXPLORATION POPULATED WITH android_proto_size_in_bytes'))
         )
 
         cache_deletion_job_run_results = (

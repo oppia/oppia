@@ -25,7 +25,7 @@ from core.domain import exp_domain
 from core.domain import rights_domain
 from core.domain import state_domain
 from core.jobs import job_test_utils
-from core.jobs.batch_jobs import exploration_migration_jobs
+from core.jobs.batch_jobs import exploration_population_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 
@@ -36,14 +36,14 @@ if MYPY: # pragma: no cover
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
 
-class MigrateExplorationJobTests(job_test_utils.JobTestBase):
+class PopulateExplorationWithAndroidProtoSizeInBytesJobTests(job_test_utils.JobTestBase):
 
     EXP_1_ID = 'exp_1_id'
     USER_ID_1 = 'id_1'
     USER_ID_2 = 'id_2'
     USER_ID_COMMITTER = 'id_committer'
 
-    JOB_CLASS = exploration_migration_jobs.MigrateExplorationJob
+    JOB_CLASS = exploration_population_jobs.PopulateExplorationWithAndroidProtoSizeInBytesJob # pylint: disable=line-too-long
 
     def setUp(self):
         super().setUp()
@@ -114,7 +114,7 @@ class MigrateExplorationJobTests(job_test_utils.JobTestBase):
                 job_run_result.JobRunResult(
                     stderr='CACHE DELETION ERROR: "cache deletion error": 1'),
                 job_run_result.JobRunResult(
-                    stdout='EXPLORATION MIGRATED SUCCESS: 1'),
+                    stdout='EXPLORATION POPULATED WITH android_proto_size_in_bytes SUCCESS: 1'), # pylint: disable=line-too-long
             ])
 
         migrated_exp_model = exp_models.ExplorationModel.get(self.EXP_1_ID)
@@ -143,7 +143,7 @@ class MigrateExplorationJobTests(job_test_utils.JobTestBase):
             job_run_result.JobRunResult(
                 stdout='EXPLORATION PROCESSED SUCCESS: 1'),
             job_run_result.JobRunResult(
-                stdout='EXPLORATION MIGRATED SUCCESS: 1'),
+                stdout='EXPLORATION POPULATED WITH android_proto_size_in_bytes SUCCESS: 1'),
             job_run_result.JobRunResult(
                 stdout='CACHE DELETION SUCCESS: 1')
         ])
