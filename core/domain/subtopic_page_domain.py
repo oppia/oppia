@@ -27,7 +27,6 @@ from core.domain import state_domain
 from typing import Callable, Dict
 from typing_extensions import TypedDict
 
-(topic_models,) = models.Registry.import_models([models.NAMES.topic])
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
 
 # TODO(#14537): Refactor this file and remove imports marked
@@ -77,9 +76,9 @@ class SubtopicPageChange(change_domain.BaseChange):
 class SubtopicPageContentsDict(TypedDict):
     """Dictionary representing the SubtopicPageContents object."""
 
-    subtitled_html: state_domain.SubtitledHtml.to_dict()
-    recorded_voiceovers: state_domain.RecordedVoiceovers.to_dict()
-    written_translations: state_domain.WrittenTranslations.to_dict()
+    subtitled_html: state_domain.SubtitledHtml
+    recorded_voiceovers: state_domain.RecordedVoiceovers
+    written_translations: state_domain.WrittenTranslations
 
 
 class SubtopicPageContents:
@@ -145,7 +144,7 @@ class SubtopicPageContents:
     @classmethod
     def from_dict(
         cls,
-        page_contents_dict: SubtopicPageContentsDict
+        page_contents_dict: Dict[str, object]
     ) -> SubtopicPageContents:
         """Creates a subtopic page contents object from a dictionary.
 
@@ -293,9 +292,11 @@ class SubtopicPage:
             state_domain.WrittenTranslations.convert_html_in_written_translations( # type: ignore[no-untyped-call]
                 subtopic_page_contents_dict['written_translations'],
                 conversion_fn))
-        subtopic_page_contents_dict['subtitled_html']['html'] = (
+        (subtopic_page_contents_dict['subtitled_html'].to_dict( # type: ignore[no-untyped-call]
+        ))['html'] = (
             conversion_fn(
-                subtopic_page_contents_dict['subtitled_html']['html']))
+                (subtopic_page_contents_dict['subtitled_html'].to_dict( # type: ignore[no-untyped-call]
+                ))['html']))
         return subtopic_page_contents_dict
 
     @classmethod
