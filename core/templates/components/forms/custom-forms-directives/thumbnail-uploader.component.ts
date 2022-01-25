@@ -165,7 +165,7 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
     if (this.disabled) {
       return;
     }
-    this.openInUploadMode = true;
+    this.openInUploadMode = false;
     // This refers to the temporary thumbnail background
     // color used for preview.
     this.tempBgColor = (
