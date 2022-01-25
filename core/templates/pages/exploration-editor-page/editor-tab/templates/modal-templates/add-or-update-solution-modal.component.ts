@@ -19,29 +19,29 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import cloneDeep from 'lodash/cloneDeep';
-import { Subscription } from 'rxjs';
+import { AppConstants } from 'app.constants';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import { ContextService } from 'services/context.service';
+import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
+import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
+import { InteractionAnswer } from 'interactions/answer-defs';
 import { StateCustomizationArgsService } from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
-import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
-import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
-import { ContextService } from 'services/context.service';
-import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
+import { Solution, SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
-import { AppConstants } from 'app.constants';
 
 interface HtmlFormSchema {
   type: 'html';
-  'ui_config': object;
+  ui_config: object;
 }
 
 interface SolutionInterface {
-  'answerIsExclusive': boolean;
-  'correctAnswer': string;
-  'explanationHtml': string;
-  'explanationContentId': string;
-  'explanation'?: string;
+  answerIsExclusive: boolean;
+  correctAnswer: string;
+  explanationHtml: string;
+  explanationContentId: string;
+  explanation?: string;
 }
 
 @Component({
@@ -50,18 +50,16 @@ interface SolutionInterface {
 })
 export class AddOrUpdateSolutionModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-  directiveSubscriptions: Subscription = new Subscription();
-  answerIsValid: boolean;
-  data: SolutionInterface;
-  tempAnsOption: string;
   ansOptions: string[];
-  isSubmitButtonDisabled: boolean;
+  answerIsValid: boolean;
+  correctAnswerEditorHtml: string;
+  data: SolutionInterface;
+  savedMemento: InteractionAnswer;
+  solutionType: Solution;
+  tempAnsOption: string;
   COMPONENT_NAME_SOLUTION: string = (
     AppConstants.COMPONENT_NAME_SOLUTION);
-  correctAnswerEditorHtml;
-  EMPTY_SOLUTION_DATA;
-  savedMemento;
-  solutionType;
+  EMPTY_SOLUTION_DATA: SolutionInterface;
   SOLUTION_EDITOR_FOCUS_LABEL: string = (
     'currentCorrectAnswerEditorHtmlForSolutionEditor');
   EXPLANATION_FORM_SCHEMA: HtmlFormSchema = {
@@ -123,6 +121,10 @@ export class AddOrUpdateSolutionModalComponent
     }
   }
 
+  isSubmitButtonDisabled(): boolean {
+    return this.currentInteractionService.isSubmitButtonDisabled();
+  }
+
   saveSolution(): void {
     if (typeof this.data.answerIsExclusive === 'boolean' &&
        this.data.correctAnswer !== null &&
@@ -168,8 +170,6 @@ export class AddOrUpdateSolutionModalComponent
         this.stateSolutionService.savedMemento.explanation
           .contentId)
     } : cloneDeep(this.EMPTY_SOLUTION_DATA);
-    this.isSubmitButtonDisabled = (
-      this.currentInteractionService.isSubmitButtonDisabled());
     this.currentInteractionService.setOnSubmitFn((answer) => {
       this.data.correctAnswer = answer;
     });
@@ -177,4 +177,3 @@ export class AddOrUpdateSolutionModalComponent
     this.tempAnsOption = this.ansOptions[1];
   }
 }
-
