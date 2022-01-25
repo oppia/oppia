@@ -83,7 +83,6 @@ class NdbIoTests(job_test_utils.PipelinedTestBase):
 
         self.assert_pcoll_empty(
             self.pipeline | beam.Create(model_list) | ndb_io.PutModels())
-
         self.assertItemsEqual(self.get_base_models(), model_list) # type: ignore[no-untyped-call]
 
     def test_delete_from_datastore(self) -> None:

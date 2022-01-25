@@ -19,8 +19,6 @@ from __future__ import annotations
 import datetime
 import os
 
-from core import python_utils
-
 import requests
 
 FLAKE_CHECK_AND_REPORT_URL = (
@@ -56,6 +54,15 @@ REQUEST_EXCEPTIONS = (
     requests.RequestException, requests.ConnectionError,
     requests.HTTPError, requests.TooManyRedirects, requests.Timeout)
 
+# Rerun policy overrides from logging server.
+
+# Yes, rerun, even if rerun policy says otherwise.
+RERUN_YES = 'rerun yes'
+# No, do not rerun, even if rerun policy says otherwise.
+RERUN_NO = 'rerun no'
+# No instructions from logging server, so follow rerun policy.
+RERUN_UNKNOWN = 'rerun unknown'
+
 
 def _print_color_message(message):
     """Prints the given message in red color.
@@ -64,7 +71,7 @@ def _print_color_message(message):
         message: str. The success message to print.
     """
     # \033[91m is the ANSI escape sequences for green color.
-    python_utils.PRINT('\033[92m' + message + '\033[0m\n')
+    print('\033[92m' + message + '\033[0m\n')
 
 
 def check_if_on_ci():
@@ -152,12 +159,12 @@ def is_test_output_flaky(output_lines, suite_name):
             'Please report to E2E team in case server is down.'
             'Exception: %s') % (FLAKE_CHECK_AND_REPORT_URL, e))
 
-        return False
+        return False, RERUN_UNKNOWN
 
     if not response.ok:
         _print_color_message('Failed request with response code: %s (%s)' % (
             response.status_code, response.reason))
-        return False
+        return False, RERUN_UNKNOWN
 
     report = {}
     try:
@@ -180,4 +187,5 @@ def is_test_output_flaky(output_lines, suite_name):
         _print_color_message('    Test: %s' % flake['test'])
         _print_color_message(
             '    Error Message: %s' % flake['flake_id'])
-    return flaky
+    rerun = report.get('rerun', '')
+    return flaky, rerun or RERUN_UNKNOWN

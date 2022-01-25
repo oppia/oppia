@@ -25,8 +25,9 @@ import argparse
 import json
 import re
 import sys
+import urllib
 
-from core import python_utils
+from core import utils
 from scripts import common
 
 
@@ -87,9 +88,7 @@ def load_diff(base_branch):
             continue
         split = line.split()
         if len(split) < 2 or len(split) > 3:
-            python_utils.PRINT(
-                'Failed to parse diff --name-status line "%s"'
-                % line)
+            print('Failed to parse diff --name-status line "%s"' % line)
             return [], {}
         elif len(split) == 2:
             diff_files.append((split[1], split[1]))
@@ -120,9 +119,7 @@ def load_diff(base_branch):
             if i == len(file_diff_split):
                 # We reached the end of the diff without finding the
                 # header, or the header consumes the entire diff.
-                python_utils.PRINT(
-                    'Failed to find end of header in "%s" diff'
-                    % filename)
+                print('Failed to find end of header in "%s" diff' % filename)
                 return [], {}
             file_diffs[filename] = file_diff_split[i:]
     return diff_files, file_diffs
@@ -141,11 +138,11 @@ def lookup_pr(owner, repo, pull_number):
         empty dictionary if the response code from the GitHub API is not
         200.
     """
-    request = python_utils.url_request(
+    request = urllib.request.Request(
         GITHUB_API_PR_ENDPOINT % (owner, repo, pull_number),
         None,
         {'Accept': 'application/vnd.github.v3+json'})
-    response = python_utils.url_open(request)
+    response = utils.url_open(request)
     if response.getcode() != 200:
         return {}
     pr = json.load(response)
@@ -310,13 +307,13 @@ def main(tokens=None):
         reason_not_low_risk = low_risk_checker(
             pr, diff_files, file_diffs)
         if reason_not_low_risk:
-            python_utils.PRINT(
+            print(
                 'PR is not a low-risk PR of type %s because: %s' %
                 (low_risk_type, reason_not_low_risk))
         else:
-            python_utils.PRINT('PR is low-risk. Skipping some CI checks.')
+            print('PR is low-risk. Skipping some CI checks.')
             return 0
-    python_utils.PRINT('PR is not low-risk. Running all CI checks.')
+    print('PR is not low-risk. Running all CI checks.')
     return 1
 
 

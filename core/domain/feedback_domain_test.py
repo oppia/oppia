@@ -23,24 +23,26 @@ from core import utils
 from core.domain import feedback_domain
 from core.tests import test_utils
 
+from typing import Dict
+
 
 class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
     EXP_ID = 'exp0'
     THREAD_ID = 'exp0.thread0'
 
-    def setUp(self):
+    def setUp(self) -> None:
         super(FeedbackThreadDomainUnitTests, self).setUp()
 
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
-        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL) # type: ignore[no-untyped-call]
 
-    def test_to_dict(self):
+    def test_to_dict(self) -> None:
         fake_date = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
-        expected_thread_dict = {
+        expected_thread_dict: feedback_domain.FeedbackThreadDict = {
             'thread_id': self.THREAD_ID,
             'status': u'open',
             'state_name': u'a_state_name',
-            'summary': None,
+            'summary': 'test summary',
             'original_author_username': self.VIEWER_USERNAME,
             'message_count': 1,
             'subject': u'a subject',
@@ -54,28 +56,36 @@ class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
             expected_thread_dict['status'], expected_thread_dict['subject'],
             expected_thread_dict['summary'], False, 1, fake_date, fake_date,
             'last message', self.viewer_id)
+        # Using type ignore[arg-type] here because assertDictEqual method
+        # expects both arguments to be of type Dict[Any, Any].
         self.assertDictEqual(
-            expected_thread_dict, observed_thread.to_dict())
+            expected_thread_dict, observed_thread.to_dict()) # type: ignore[arg-type]
 
-    def test_get_last_two_message_ids_from_thread_with_many_messages(self):
+    def test_get_last_two_message_ids_from_thread_with_many_messages(
+        self
+    ) -> None:
         fake_date = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
         thread = feedback_domain.FeedbackThread(
             self.THREAD_ID, feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID,
-            u'a_state_name', self.viewer_id, u'open', u'a subject', None, False,
+            u'a_state_name', self.viewer_id, u'open', u'a subject',
             # This value of "5" decides the number of messages.
-            5, fake_date, fake_date, 'last message', self.VIEWER_USERNAME)
+            'test summary', False, 5, fake_date, fake_date, 'last message',
+            self.VIEWER_USERNAME)
 
         self.assertEqual(
             thread.get_last_two_message_ids(),
             ['exp0.thread0.4', 'exp0.thread0.3'])
 
-    def test_get_last_two_message_ids_from_thread_with_only_one_message(self):
+    def test_get_last_two_message_ids_from_thread_with_only_one_message(
+        self
+    ) -> None:
         fake_date = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
         thread = feedback_domain.FeedbackThread(
             self.THREAD_ID, feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID,
-            u'a_state_name', self.viewer_id, u'open', u'a subject', None, False,
+            u'a_state_name', self.viewer_id, u'open', u'a subject',
             # This value of "1" decides the number of messages.
-            1, fake_date, fake_date, 'last message', self.VIEWER_USERNAME)
+            'test summary', False, 1, fake_date, fake_date, 'last message',
+            self.VIEWER_USERNAME)
 
         self.assertEqual(
             thread.get_last_two_message_ids(), ['exp0.thread0.0', None])
@@ -87,14 +97,14 @@ class FeedbackMessageDomainUnitTests(test_utils.GenericTestBase):
     THREAD_ID = 'exploration.exp0.thread0'
     FULL_MESSAGE_ID = THREAD_ID + '.' + MESSAGE_ID
 
-    def setUp(self):
+    def setUp(self) -> None:
         super(FeedbackMessageDomainUnitTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL) # type: ignore[no-untyped-call]
 
-    def test_to_dict(self):
+    def test_to_dict(self) -> None:
         fake_date = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
-        expected_message_dict = {
+        expected_message_dict: feedback_domain.FeedbackMessageDict = {
             'author_username': self.OWNER_USERNAME,
             'created_on_msecs': utils.get_time_in_millisecs(fake_date),
             'entity_type': feconf.ENTITY_TYPE_EXPLORATION,
@@ -109,14 +119,16 @@ class FeedbackMessageDomainUnitTests(test_utils.GenericTestBase):
             self.owner_id, expected_message_dict['updated_status'],
             expected_message_dict['updated_subject'],
             expected_message_dict['text'], fake_date, fake_date, False)
+        # Using type ignore[arg-type] here because assertDictEqual method
+        # expects both arguments to be of type Dict[Any, Any].
         self.assertDictEqual(
-            expected_message_dict, observed_message.to_dict())
+            expected_message_dict, observed_message.to_dict()) # type: ignore[arg-type]
 
 
 class FeedbackAnalyticsDomainUnitTests(test_utils.GenericTestBase):
     EXP_ID = 'exp0'
 
-    def test_to_dict(self):
+    def test_to_dict(self) -> None:
         expected_thread_analytics = feedback_domain.FeedbackAnalytics(
             feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID, 1, 2)
         self.assertDictEqual(expected_thread_analytics.to_dict(), {
@@ -127,14 +139,14 @@ class FeedbackAnalyticsDomainUnitTests(test_utils.GenericTestBase):
 
 class FeedbackMessageReferenceDomainTests(test_utils.GenericTestBase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         super(FeedbackMessageReferenceDomainTests, self).setUp()
         self.exp_id = 'exp'
         self.message_id = 'message'
         self.thread_id = 'exp.thread'
 
-    def test_to_dict(self):
-        expected_feedback_message_reference = {
+    def test_to_dict(self) -> None:
+        expected_feedback_message_reference: Dict[str, str] = {
             'entity_type': feconf.ENTITY_TYPE_EXPLORATION,
             'entity_id': self.exp_id,
             'thread_id': self.thread_id,

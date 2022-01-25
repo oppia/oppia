@@ -37,29 +37,28 @@ AFFIRMATIVE_CONFIRMATIONS = ['y', 'ye', 'yes']
 CURRENT_PYTHON_BIN = sys.executable
 
 # Versions of libraries used in devflow.
-COVERAGE_VERSION = '5.3'
+COVERAGE_VERSION = '6.1.2'
 ESPRIMA_VERSION = '4.0.1'
-ISORT_VERSION = '5.8.0'
-PYCODESTYLE_VERSION = '2.6.0'
+ISORT_VERSION = '5.10.1'
+PYCODESTYLE_VERSION = '2.8.0'
 PSUTIL_VERSION = '5.8.0'
-PYLINT_VERSION = '2.8.3'
-PYLINT_QUOTES_VERSION = '0.1.9'
-PYGITHUB_VERSION = '1.45'
-WEBTEST_VERSION = '2.0.35'
-PIP_TOOLS_VERSION = '6.0.1'
-GRPCIO_VERSION = '1.38.0'
-ENUM_VERSION = '1.1.10'
+PYLINT_VERSION = '2.11.1'
+PYLINT_QUOTES_VERSION = '0.2.3'
+PYGITHUB_VERSION = '1.55'
+WEBTEST_VERSION = '3.0.0'
+PIP_TOOLS_VERSION = '6.4.0'
+GRPCIO_VERSION = '1.41.1'
 PROTOBUF_VERSION = '3.13.0'
-SETUPTOOLS_VERSION = '36.6.0'
+SETUPTOOLS_VERSION = '58.5.3'
 
 # Node version.
-NODE_VERSION = '14.15.0'
+NODE_VERSION = '16.13.0'
 
 # NB: Please ensure that the version is consistent with the version in .yarnrc.
-YARN_VERSION = '1.22.10'
+YARN_VERSION = '1.22.15'
 
 # Versions of libraries used in backend.
-PILLOW_VERSION = '6.2.2'
+PILLOW_VERSION = '8.4.0'
 
 # Buf version.
 BUF_VERSION = '0.29.0'
@@ -92,7 +91,7 @@ OPPIA_TOOLS_DIR_ABS_PATH = os.path.abspath(OPPIA_TOOLS_DIR)
 THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
 THIRD_PARTY_PYTHON_LIBS_DIR = os.path.join(THIRD_PARTY_DIR, 'python_libs')
 GOOGLE_CLOUD_SDK_HOME = os.path.join(
-    OPPIA_TOOLS_DIR_ABS_PATH, 'google-cloud-sdk-335.0.0', 'google-cloud-sdk')
+    OPPIA_TOOLS_DIR_ABS_PATH, 'google-cloud-sdk-364.0.0', 'google-cloud-sdk')
 GOOGLE_APP_ENGINE_SDK_HOME = os.path.join(
     GOOGLE_CLOUD_SDK_HOME, 'platform', 'google_appengine')
 GOOGLE_CLOUD_SDK_BIN = os.path.join(GOOGLE_CLOUD_SDK_HOME, 'bin')
@@ -273,32 +272,28 @@ def require_cwd_to_be_oppia(allow_deploy_dir=False):
 def open_new_tab_in_browser_if_possible(url):
     """Opens the given URL in a new browser tab, if possible."""
     if USER_PREFERENCES['open_new_tab_in_browser'] is None:
-        python_utils.PRINT(
+        print(
             '\nDo you want the url to be opened in the browser? '
             'Confirm by entering y/ye/yes.')
         USER_PREFERENCES['open_new_tab_in_browser'] = input()
     if USER_PREFERENCES['open_new_tab_in_browser'] not in ['y', 'ye', 'yes']:
-        python_utils.PRINT(
-            'Please open the following link in browser: %s' % url)
+        print('Please open the following link in browser: %s' % url)
         return
     browser_cmds = ['brave', 'chromium-browser', 'google-chrome', 'firefox']
     for cmd in browser_cmds:
         if subprocess.call(['which', cmd]) == 0:
             subprocess.check_call([cmd, url])
             return
-    python_utils.PRINT(
-        '******************************************************************')
-    python_utils.PRINT(
+    print('******************************************************************')
+    print(
         'WARNING: Unable to open browser. Please manually open the following')
-    python_utils.PRINT('URL in a browser window, then press Enter to confirm.')
-    python_utils.PRINT('')
-    python_utils.PRINT('    %s' % url)
-    python_utils.PRINT('')
-    python_utils.PRINT(
-        'NOTE: To get rid of this message, open scripts/common.py and fix')
-    python_utils.PRINT(
-        'the function open_new_tab_in_browser_if_possible() to work on your')
-    python_utils.PRINT('system.')
+    print('URL in a browser window, then press Enter to confirm.')
+    print('')
+    print('    %s' % url)
+    print('')
+    print('NOTE: To get rid of this message, open scripts/common.py and fix')
+    print('the function open_new_tab_in_browser_if_possible() to work on your')
+    print('system.')
     input()
 
 
@@ -469,7 +464,7 @@ def print_each_string_after_two_new_lines(strings):
         strings: list(str). The strings to print.
     """
     for string in strings:
-        python_utils.PRINT('%s\n' % string)
+        print('%s\n' % string)
 
 
 def install_npm_library(library_name, version, path):
@@ -480,10 +475,9 @@ def install_npm_library(library_name, version, path):
         version: str. The library version.
         path: str. The installation path for the library.
     """
-    python_utils.PRINT(
-        'Checking whether %s is installed in %s' % (library_name, path))
+    print('Checking whether %s is installed in %s' % (library_name, path))
     if not os.path.exists(os.path.join(NODE_MODULES_PATH, library_name)):
-        python_utils.PRINT('Installing %s' % library_name)
+        print('Installing %s' % library_name)
         subprocess.check_call([
             'yarn', 'add', '%s@%s' % (library_name, version)])
 
@@ -496,10 +490,9 @@ def ask_user_to_confirm(message):
             to do.
     """
     while True:
-        python_utils.PRINT(
-            '******************************************************')
-        python_utils.PRINT(message)
-        python_utils.PRINT('Confirm once you are done by entering y/ye/yes.\n')
+        print('******************************************************')
+        print(message)
+        print('Confirm once you are done by entering y/ye/yes.\n')
         answer = input().lower()
         if answer in AFFIRMATIVE_CONFIRMATIONS:
             return
@@ -686,10 +679,8 @@ def wait_for_port_to_be_in_use(port_number):
         waited_seconds += 1
     if (waited_seconds == MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS
             and not is_port_in_use(port_number)):
-        python_utils.PRINT(
-            'Failed to start server on port %s, exiting ...' %
-            port_number)
-        python_utils.PRINT(
+        print('Failed to start server on port %s, exiting ...' % port_number)
+        print(
             'This may be because you do not have enough available '
             'memory. Please refer to '
             'https://github.com/oppia/oppia/wiki/Troubleshooting#low-ram')
@@ -811,5 +802,5 @@ def write_stdout_safe(string):
         except OSError as e:
             if e.errno == errno.EAGAIN:
                 continue
-            else:
-                raise
+
+            raise

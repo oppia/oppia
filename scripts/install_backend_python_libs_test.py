@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import builtins
 import itertools
 import json
 import os
@@ -94,7 +95,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
         def mock_print(msg):
             self.print_arr.append(msg)
-        self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
+        self.print_swap = self.swap(builtins, 'print', mock_print)
 
         self.file_arr = []
         def mock_write(msg):
@@ -192,7 +193,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             self.INVALID_GIT_REQUIREMENTS_TEST_TXT_FILE_PATH)
 
         with swap_requirements:
-            self.assertRaisesRegexp(
+            self.assertRaisesRegex(
                 Exception, 'does not match GIT_DIRECT_URL_REQUIREMENT_PATTERN',
                 install_backend_python_libs.get_mismatches)
 
@@ -476,7 +477,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             install_backend_python_libs, 'get_mismatches',
             mock_get_mismatches)
         swap_call = self.swap(subprocess, 'check_call', mock_call)
-        swap_print = self.swap(python_utils, 'PRINT', mock_print)
+        swap_print = self.swap(builtins, 'print', mock_print)
         with swap_call, swap_get_mismatches, swap_print, self.open_file_swap:
             with swap_validate_metadata_directories:
                 install_backend_python_libs.main()
@@ -642,7 +643,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             os.path, 'isdir', mock_is_dir
         )
 
-        metadata_exception = self.assertRaisesRegexp(
+        metadata_exception = self.assertRaisesRegex(
             Exception,
             'The python library dependency5 was installed without the correct '
             'metadata folders which may indicate that the convention for '
@@ -683,7 +684,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             install_backend_python_libs.pip_install('pkg==ver', 'path')
 
     def test_pip_install_exception_handling(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Error installing package'
         ):
             install_backend_python_libs.pip_install('package==version', 'path')
@@ -695,7 +696,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         try:
             sys.modules['pip'] = None
             with os_name_swap, self.print_swap, self.swap_check_call:
-                with self.assertRaisesRegexp(
+                with self.assertRaisesRegex(
                     ImportError,
                     'Error importing pip: import of pip halted; '
                     'None in sys.modules'
@@ -715,7 +716,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         try:
             sys.modules['pip'] = None
             with os_name_swap, self.print_swap, self.swap_check_call:
-                with self.assertRaisesRegexp(
+                with self.assertRaisesRegex(
                     ImportError,
                     'Error importing pip: import of pip halted; '
                     'None in sys.modules'
@@ -734,7 +735,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         try:
             sys.modules['pip'] = None
             with os_name_swap, self.print_swap, self.swap_check_call:
-                with self.assertRaisesRegexp(
+                with self.assertRaisesRegex(
                     ImportError,
                     'Error importing pip: import of pip halted; '
                     'None in sys.modules'

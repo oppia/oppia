@@ -219,7 +219,6 @@ def _get_linters_for_file_extension(file_extension_to_lint, namespace, files):
     """
     namespace.files = FileCache()
     file_cache = namespace.files
-    parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
     custom_linters = []
     third_party_linters = []
 
@@ -248,17 +247,13 @@ def _get_linters_for_file_extension(file_extension_to_lint, namespace, files):
         custom_linters.append(custom_linter)
         third_party_linters.append(third_party_linter)
 
-        config_path_for_css_in_html = os.path.join(
-            parent_dir, 'oppia', '.stylelintrc')
-        custom_linter, third_party_linter = css_linter.get_linters(
-            config_path_for_css_in_html, files['.html'])
+        custom_linter, third_party_linter = (
+            css_linter.get_linters(files['.html']))
         third_party_linters.append(third_party_linter)
 
     elif file_extension_to_lint == 'css':
-        config_path_for_oppia_css = os.path.join(
-            parent_dir, 'oppia', 'core', 'templates', 'css', '.stylelintrc')
-        custom_linter, third_party_linter = css_linter.get_linters(
-            config_path_for_oppia_css, files['.css'])
+        custom_linter, third_party_linter = (
+            css_linter.get_linters(files['.css']))
         third_party_linters.append(third_party_linter)
 
     elif file_extension_to_lint == 'py':
@@ -336,11 +331,11 @@ def _get_file_extensions(file_extensions_to_lint):
             'ts' in file_extensions_to_lint)
 
         if js_and_ts_is_present:
-            python_utils.PRINT(
+            print(
                 'Please use only one of "js" or "ts", as we do not have '
                 'separate linters for JS and TS files. If both these options '
                 'are used together, then the JS/TS linter will be run twice.')
-            python_utils.PRINT('Exiting...')
+            print('Exiting...')
             sys.exit(1)
 
         return set(file_extensions_to_lint)
@@ -366,9 +361,8 @@ def _get_filepaths_from_path(input_path, namespace=None):
     file_cache = namespace.files
     input_path = os.path.join(os.getcwd(), input_path)
     if not os.path.exists(input_path):
-        python_utils.PRINT(
-            'Could not locate file or directory %s. Exiting.' % input_path)
-        python_utils.PRINT('----------------------------------------')
+        print('Could not locate file or directory %s. Exiting.' % input_path)
+        print('----------------------------------------')
         sys.exit(1)
     if os.path.isfile(input_path):
         return [input_path]
@@ -463,7 +457,7 @@ def _get_all_filepaths(
             else:
                 invalid_filepaths.append(filename)
         if invalid_filepaths:
-            python_utils.PRINT(
+            print(
                 'The following file(s) do not exist: %s\n'
                 'Exiting.' % invalid_filepaths)
             sys.exit(1)
@@ -568,17 +562,17 @@ def _print_errors_stacktrace(errors_stacktrace):
         errors_stacktrace: list(str). List of error stacktrace of lint
             execution failure.
     """
-    python_utils.PRINT('')
-    python_utils.PRINT(
+    print('')
+    print(
         'Unable to run the complete lint test, please check '
         'the following stack trace and fix the errors:')
-    python_utils.PRINT('+--------------------------+')
+    print('+--------------------------+')
     for stacktrace in errors_stacktrace:
-        python_utils.PRINT(stacktrace)
-        python_utils.PRINT('--------------------------------------------------')
-        python_utils.PRINT('')
-    python_utils.PRINT('--------------------------------------------------')
-    python_utils.PRINT(
+        print(stacktrace)
+        print('--------------------------------------------------')
+        print('')
+    print('--------------------------------------------------')
+    print(
         'Some of the linting functions may not run until the'
         ' above errors gets fixed')
 
@@ -623,12 +617,12 @@ def main(args=None):
     install_third_party_libs.main()
     common.fix_third_party_imports()
 
-    python_utils.PRINT('Starting Linter....')
+    print('Starting Linter....')
 
     if len(all_filepaths) == 0:
-        python_utils.PRINT('---------------------------')
-        python_utils.PRINT('No files to check.')
-        python_utils.PRINT('---------------------------')
+        print('---------------------------')
+        print('No files to check.')
+        print('---------------------------')
         return
 
     read_files(all_filepaths, namespace=namespace)

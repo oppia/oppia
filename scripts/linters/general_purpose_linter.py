@@ -196,7 +196,8 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'message': 'Please do not use print statement.',
         'excluded_files': (
             'core/tests/test_utils.py',
-            'core/tests/performance_framework/perf_domain.py'),
+            'core/tests/performance_framework/perf_domain.py',
+            'core/tests/test_utils_test.py'),
         'excluded_dirs': ('scripts/',)
     },
     {
@@ -206,18 +207,6 @@ BAD_PATTERNS_PYTHON_REGEXP = [
                    'The id-to-message list can be seen '
                    'here->http://pylint-messages.wikidot.com/all-codes',
         'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'urllib(2)?\..*urlopen\('),
-        'message': 'Please use python_utils.url_open().',
-        'excluded_files': ('core/python_utils.py', 'core/python_utils_test.py'),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'urllib(2)?\..*Request\('),
-        'message': 'Please use python_utils.url_request().',
-        'excluded_files': ('core/python_utils.py', 'core/python_utils_test.py'),
         'excluded_dirs': ()
     },
 ]

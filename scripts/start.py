@@ -23,7 +23,8 @@ import argparse
 import contextlib
 import time
 
-
+# Do not import any Oppia modules here,
+# import them below the "install_third_party_libs.main()" line.
 from . import install_third_party_libs
 # This installs third party libraries before importing other files or importing
 # libraries that use the builtins python module (e.g. build, python_utils).
@@ -31,11 +32,10 @@ install_third_party_libs.main()
 
 from . import build # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import common # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from . import extend_index_yaml # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import servers # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 from core.constants import constants # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-from core import python_utils # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-
 
 _PARSER = argparse.ArgumentParser(
     description="""
@@ -90,7 +90,7 @@ def alert_on_exit():
     try:
         yield
     finally:
-        python_utils.PRINT(
+        print(
             '\n\n'
             # ANSI escape sequence for bright yellow text color.
             '\033[93m'
@@ -106,7 +106,7 @@ def alert_on_exit():
 
 def notify_about_successful_shutdown():
     """Notifies developers that the servers have shutdown gracefully."""
-    python_utils.PRINT(
+    print(
         '\n\n'
         # ANSI escape sequence for bright green text color.
         '\033[92m'
@@ -117,6 +117,12 @@ def notify_about_successful_shutdown():
         # ANSI escape sequence for resetting formatting.
         '\033[0m'
         '\n\n')
+
+
+def call_extend_index_yaml():
+    """Calls the extend_index_yaml.py script."""
+    print('\033[94m' + 'Extending index.yaml...' + '\033[0m')
+    extend_index_yaml.main()
 
 
 def main(args=None):
@@ -136,6 +142,7 @@ def main(args=None):
     with contextlib.ExitStack() as stack, alert_on_exit():
         # ExitStack unwinds in reverse-order, so this will be the final action.
         stack.callback(notify_about_successful_shutdown)
+        stack.callback(call_extend_index_yaml)
 
         build_args = []
         if parsed_args.prod_env:

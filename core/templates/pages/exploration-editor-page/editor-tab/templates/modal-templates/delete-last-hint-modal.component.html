@@ -1,0 +1,18 @@
+<div class="modal-header">
+  <h3>Delete Hint</h3>
+</div>
+
+<div class="modal-body">
+  <p>
+    Looks like you have a solution specified. There needs to be at least one
+    hint for a solution to exist. Do you want to delete the solution as well?
+  </p>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
+  <button class="btn btn-danger"
+          (click)="confirm()">
+    Yes, delete both solution and hint
+  </button>
+</div>

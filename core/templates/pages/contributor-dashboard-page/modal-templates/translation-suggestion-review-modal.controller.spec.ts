@@ -57,11 +57,11 @@ describe('Translation Suggestion Review Modal Controller', function() {
       suggestion_type: 'translate_content',
       change: {
         content_id: 'hint_1',
-        content_html: 'Translation',
+        content_html: '<p>content</p><p>&nbsp;</p>',
         translation_html: 'Tradução',
         state_name: 'StateName'
       },
-      exploration_content_html: 'Translation'
+      exploration_content_html: '<p>content</p><p>&nbsp;</p>'
     };
     const suggestion2 = {
       suggestion_id: 'suggestion_2',
@@ -69,11 +69,11 @@ describe('Translation Suggestion Review Modal Controller', function() {
       suggestion_type: 'translate_content',
       change: {
         content_id: 'hint_1',
-        content_html: 'Translation',
+        content_html: '<p>content</p>',
         translation_html: 'Tradução',
         state_name: 'StateName'
       },
-      exploration_content_html: 'Translation CHANGED'
+      exploration_content_html: '<p>content CHANGED</p>'
     };
 
     const contribution1 = {
@@ -360,12 +360,49 @@ describe('Translation Suggestion Review Modal Controller', function() {
             jasmine.any(Function),
             jasmine.any(Function));
       });
+
+    describe('isHtmlContentEqual', function() {
+      it('should return true regardless of &nbsp; differences', function() {
+        expect($scope.isHtmlContentEqual(
+          '<p>content</p><p>&nbsp;&nbsp;</p>', '<p>content</p><p> </p>'))
+          .toBe(true);
+      });
+
+      it('should return true regardless of new line differences', function() {
+        expect($scope.isHtmlContentEqual(
+          '<p>content</p>\r\n\n<p>content2</p>',
+          '<p>content</p><p>content2</p>'))
+          .toBe(true);
+      });
+
+      it('should return false if html content differ', function() {
+        expect($scope.isHtmlContentEqual(
+          '<p>content</p>', '<p>content CHANGED</p>'))
+          .toBe(false);
+      });
+
+      it('should return false if array contents differ', function() {
+        expect($scope.isHtmlContentEqual(
+          ['<p>content1</p>', '<p>content2</p>'],
+          ['<p>content1</p>', '<p>content2 CHANGED</p>']))
+          .toBe(false);
+      });
+
+      it('should return true if array contents are equal', function() {
+        expect($scope.isHtmlContentEqual(
+          ['<p>content1</p>', '<p>content2</p>'],
+          ['<p>content1</p>', '<p>content2</p>']))
+          .toBe(true);
+      });
+    });
   });
 
   describe('when viewing suggestion', function() {
     const reviewable = false;
-    let $httpBackend = null;
+    let $q = null;
+    let $rootScope = null;
     const subheading = 'subheading_title';
+    let ThreadDataBackendApiService = null;
 
     const suggestion1 = {
       suggestion_id: 'suggestion_1',
@@ -412,10 +449,12 @@ describe('Translation Suggestion Review Modal Controller', function() {
     };
 
     beforeEach(angular.mock.inject(function($injector, $controller) {
-      const $rootScope = $injector.get('$rootScope');
+      $rootScope = $injector.get('$rootScope');
       $uibModalInstance = jasmine.createSpyObj(
         '$uibModalInstance', ['close', 'dismiss']);
-      $httpBackend = $injector.get('$httpBackend');
+      $q = $injector.get('$q');
+      ThreadDataBackendApiService = $injector.get(
+        'ThreadDataBackendApiService');
 
       $scope = $rootScope.$new();
       $controller('TranslationSuggestionReviewModalController', {
@@ -439,7 +478,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
         // content_html.
         expect($scope.hasExplorationContentChanged()).toBe(true);
 
-        var messages = [{
+        const messages = [{
           author_username: '',
           created_om_msecs: 0,
           entity_type: '',
@@ -449,11 +488,17 @@ describe('Translation Suggestion Review Modal Controller', function() {
           updated_status: '',
           updated_subject: '',
         }];
-        $httpBackend.expect('GET', '/threadhandler/' + 'suggestion_1').respond({
-          messages: messages
-        });
-        $httpBackend.flush();
 
+        const fetchMessagesAsyncSpy = spyOn(
+          ThreadDataBackendApiService, 'fetchMessagesAsync')
+          .and.returnValue($q.resolve({
+            messages: messages
+          }));
+
+        $scope.init();
+        $rootScope.$apply();
+
+        expect(fetchMessagesAsyncSpy).toHaveBeenCalledWith('suggestion_1');
         expect($scope.reviewMessage).toBe('');
       });
   });

@@ -46,6 +46,10 @@ describe('Schema Based Editor Directive', () => {
     };
     ctrl.$onInit();
   }));
+
+  it('should be defined', () => {
+    expect(directive).toBeDefined();
+  });
 });
 
 describe('Schema Based Editor Component', () => {
