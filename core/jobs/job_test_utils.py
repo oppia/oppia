@@ -282,8 +282,8 @@ def decorate_beam_errors() -> Iterator[None]:
             unexpected_elements = (
                 ast.literal_eval(unexpected_elements)
                 if unexpected_elements else None)
-        except (SyntaxError, ValueError) as errors:
-            raise AssertionError(exception_message) from errors
+        except (SyntaxError, ValueError) as e:
+            raise AssertionError(exception_message) from e
 
         missing_elements = groupdict.get('missing', None)
         try:
