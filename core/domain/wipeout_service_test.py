@@ -20,6 +20,7 @@ import datetime
 import logging
 
 from core import feconf
+from core import utils
 from core.constants import constants
 from core.domain import auth_services
 from core.domain import collection_services
@@ -111,6 +112,20 @@ class WipeoutServiceHelpersTests(test_utils.GenericTestBase):
         number_of_pending_deletion_requests = (
             wipeout_service.get_number_of_pending_deletion_requests())
         self.assertEqual(number_of_pending_deletion_requests, 2)
+
+    def test_validate_fails_for_wrong_key_in_activity_mappings(self) -> None:
+        """Tests the create_default_topic() function."""
+        pending_deletion_request = (
+            wipeout_domain.PendingDeletionRequest.create_default(
+                self.user_1_id, self.USER_1_EMAIL))
+        pending_deletion_request.pseudonymizable_entity_mappings = {
+            'wrong_key': {}
+        }
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+            utils.ValidationError,
+            'pseudonymizable_entity_mappings contain wrong key'
+        ):
+            wipeout_service.validate(pending_deletion_request)
 
     def test_saves_pending_deletion_request_when_new(self):
         pending_deletion_request = (

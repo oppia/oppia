@@ -44,17 +44,3 @@ class PendingDeletionRequestUnitTests(test_utils.GenericTestBase):
         self.assertEqual(default_pending_deletion.deletion_complete, False)
         self.assertEqual(
             default_pending_deletion.pseudonymizable_entity_mappings, {})
-
-    def test_validate_fails_for_wrong_key_in_activity_mappings(self) -> None:
-        """Tests the create_default_topic() function."""
-        pending_deletion_request = (
-            wipeout_domain.PendingDeletionRequest.create_default(
-                self.user_id_a, 'a@example.com'))
-        pending_deletion_request.pseudonymizable_entity_mappings = {
-            'wrong_key': {}
-        }
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            utils.ValidationError,
-            'pseudonymizable_entity_mappings contain wrong key'
-        ):
-            pending_deletion_request.validate()

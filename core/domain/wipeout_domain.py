@@ -20,11 +20,6 @@ from core import utils
 
 from typing import Dict, Optional
 
-from core.platform import models  # pylint: disable=invalid-import-from # isort:skip
-
-# TODO(#14537): Refactor this file and remove imports marked
-# with 'invalid-import-from'.
-
 USER_DELETION_SUCCESS = 'SUCCESS'
 USER_DELETION_ALREADY_DONE = 'ALREADY DONE'
 
@@ -86,15 +81,3 @@ class PendingDeletionRequest:
         """
         return cls(
             user_id, email, normalized_long_term_username, False, {})
-
-    def validate(self) -> None:
-        """Checks that the domain object is valid.
-
-        Raises:
-            ValidationError. The field pseudonymizable_entity_mappings
-                contains wrong key.
-        """
-        for key in self.pseudonymizable_entity_mappings.keys():
-            if key not in [name.value for name in models.NAMES]:
-                raise utils.ValidationError(
-                    'pseudonymizable_entity_mappings contain wrong key')
