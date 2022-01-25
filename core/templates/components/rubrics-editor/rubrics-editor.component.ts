@@ -113,17 +113,13 @@ export class RubricsEditorComponent {
 
   hasReachedExplanationCountLimit(): boolean {
     let totalExplanations: number = 0;
-    let easyDifficulty = 'Easy';
-    let mediumDifficulty = 'Medium';
-    let hardDifficulty = 'Hard';
-
-    let totalEasyExplanations = this.editableExplanations[easyDifficulty].length;
-    let totalMediumExplanations = this.editableExplanations[mediumDifficulty].length;
-    let totalHardExplanations = this.editableExplanations[hardDifficulty].length;
-
-    totalExplanations = totalEasyExplanations + totalMediumExplanations +
-    totalHardExplanations;
-    return (totalExplanations >= this.maximumNumberofExplanations);
+    for (let difficulty in this.editableExplanations) {
+      if (this.editableExplanations[difficulty]) {
+        totalExplanations += this.editableExplanations[difficulty].length;
+      }
+    }
+    
+    return totalExplanations >= this.maximumNumberofExplanations;
   }
 
   updateExplanation($event: string, idx: number): void {
