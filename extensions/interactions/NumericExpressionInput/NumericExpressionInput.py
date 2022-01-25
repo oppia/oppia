@@ -155,8 +155,8 @@ class NumericExpressionInput(base.BaseInteraction):
             'MatchesExactlyWith': (
                 cls._convert_matches_exactly_rule_spec_to_proto),
             'IsEquivalentTo': cls._convert_is_equivalent_rule_spec_to_proto,
-            'ContainsSomeOf': cls._convert_contains_some_rule_spec_to_proto,
-            'OmitsSomeOf': cls._convert_omit_some_rule_spec_to_proto
+            'MatchesUpToTrivialManipulations': (
+                cls._convert_matches_upto_rule_spec_to_proto)
         }
 
         rule_type_to_proto_mapping = {
@@ -166,12 +166,9 @@ class NumericExpressionInput(base.BaseInteraction):
             'IsEquivalentTo': lambda x: (
                 state_pb2.NumericExpressionInputInstanceDto.RuleSpecDto(
                     is_equivalent_to=x)),
-            'ContainsSomeOf': lambda x: (
+            'MatchesUpToTrivialManipulations': lambda x: (
                 state_pb2.NumericExpressionInputInstanceDto.RuleSpecDto(
-                    contains_some_of=x)),
-            'OmitsSomeOf': lambda x: (
-                state_pb2.NumericExpressionInputInstanceDto.RuleSpecDto(
-                    omits_some_of=x))
+                    matches_upTo_trivial_manipulations=x))
         }
 
         for rule_spec in rule_specs_list:
@@ -220,34 +217,18 @@ class NumericExpressionInput(base.BaseInteraction):
         )
 
     @classmethod
-    def _convert_contains_some_rule_spec_to_proto(cls, numeric_expression):
-        """Creates a proto object for ContainsSomeOfSpecDto.
+    def _convert_matches_upto_rule_spec_to_proto(cls, numeric_expression):
+        """Creates a proto object for MatchesUpToTrivialManipulationsSpecDto.
 
         Args:
             numeric_expression: str. The numeric expression.
 
         Returns:
-            ContainsSomeOfSpecDto. The proto object.
+            MatchesUpToTrivialManipulationsSpecDto. The proto object.
         """
         rule_spec = state_pb2.NumericExpressionInputInstanceDto.RuleSpecDto
 
-        return rule_spec.ContainsSomeOfSpecDto(
-            numeric_expression=numeric_expression
-        )
-
-    @classmethod
-    def _convert_omit_some_rule_spec_to_proto(cls, numeric_expression):
-        """Creates a proto object for OmitsSomeOfSpecDto.
-
-        Args:
-            numeric_expression: str. The numeric expression.
-
-        Returns:
-            OmitsSomeOfSpecDto. The proto object.
-        """
-        rule_spec = state_pb2.NumericExpressionInputInstanceDto.RuleSpecDto
-
-        return rule_spec.OmitsSomeOfSpecDto(
+        return rule_spec.MatchesUpToTrivialManipulationsSpecDto(
             numeric_expression=numeric_expression
         )
 

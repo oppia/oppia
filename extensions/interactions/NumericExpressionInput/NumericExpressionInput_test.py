@@ -62,12 +62,7 @@ class NumericExpressionInputInteractionTests(test_utils.GenericTestBase):
                         'x': '1000 + 200 + 30 + 4 + 0.5 + 0.06'
                     }
                 }, {
-                    'rule_type': 'ContainsSomeOf',
-                    'inputs': {
-                        'x': '1000 + 200 + 30 + 4 + 0.5 + 0.06'
-                    }
-                }, {
-                    'rule_type': 'OmitsSomeOf',
+                    'rule_type': 'MatchesUpToTrivialManipulations',
                     'inputs': {
                         'x': '1000 + 200 + 30 + 4 + 0.5 + 0.06'
                     }
@@ -198,12 +193,8 @@ class NumericExpressionInputInteractionTests(test_utils.GenericTestBase):
             math_rule_specs.numeric_expression,
             '1000 + 200 + 30 + 4 + 0.5 + 0.06')
 
-        math_rule_specs = numeric_answer_group.rule_specs[2].contains_some_of
+        math_rule_specs = numeric_answer_group.rule_specs[2]
+        matches_trival_rule = math_rule_specs.matches_upTo_trivial_manipulations
         self.assertEqual(
-            math_rule_specs.numeric_expression,
-            '1000 + 200 + 30 + 4 + 0.5 + 0.06')
-
-        math_rule_specs = numeric_answer_group.rule_specs[3].omits_some_of
-        self.assertEqual(
-            math_rule_specs.numeric_expression,
+            matches_trival_rule.numeric_expression,
             '1000 + 200 + 30 + 4 + 0.5 + 0.06')

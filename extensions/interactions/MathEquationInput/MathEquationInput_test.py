@@ -60,22 +60,9 @@ class MathEquationInputInteractionTests(test_utils.GenericTestBase):
                         'x': 'a+b=c'
                     }
                 }, {
-                    'rule_type': 'ContainsSomeOf',
+                    'rule_type': 'MatchesUpToTrivialManipulations',
                     'inputs': {
-                        'x': 'a+b=c',
-                        'y': 'both'
-                    }
-                }, {
-                    'rule_type': 'OmitsSomeOf',
-                    'inputs': {
-                        'x': 'a+b=c',
-                        'y': 'both'
-                    }
-                }, {
-                    'rule_type': 'MatchesWithGeneralForm',
-                    'inputs': {
-                        'x': 'a+b=c',
-                        'y': ['a+b=c', 'a+b=c']
+                        'x': 'a+b=c'
                     }
                 }],
                 'training_data': [],
@@ -195,17 +182,6 @@ class MathEquationInputInteractionTests(test_utils.GenericTestBase):
             math_answer_group.rule_specs[1].is_equivalent_to)
         self.assertEqual(math_rule_specs.math_equation, 'a+b=c')
 
-        math_rule_specs = math_answer_group.rule_specs[2].contains_some_of
-        self.assertEqual(math_rule_specs.math_equation, 'a+b=c')
-        self.assertEqual(math_rule_specs.position_of_terms, 'both')
-
-        math_rule_specs = math_answer_group.rule_specs[3].omits_some_of
-        self.assertEqual(math_rule_specs.math_equation, 'a+b=c')
-        self.assertEqual(math_rule_specs.position_of_terms, 'both')
-
         math_rule_specs = (
-            math_answer_group.rule_specs[4].matches_with_general_form)
+            math_answer_group.rule_specs[2].matches_upTo_trivial_manipulations)
         self.assertEqual(math_rule_specs.math_equation, 'a+b=c')
-        self.assertEqual(
-            math_rule_specs.set_of_algebraic_identifier[0],
-            'a+b=c')

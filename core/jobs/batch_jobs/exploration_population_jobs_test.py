@@ -36,7 +36,8 @@ if MYPY: # pragma: no cover
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
 
-class PopulateExplorationWithAndroidProtoSizeInBytesJobTests(job_test_utils.JobTestBase):
+class PopulateExplorationWithAndroidProtoSizeInBytesJobTests(
+    job_test_utils.JobTestBase):
 
     EXP_1_ID = 'exp_1_id'
     USER_ID_1 = 'id_1'
@@ -143,7 +144,8 @@ class PopulateExplorationWithAndroidProtoSizeInBytesJobTests(job_test_utils.JobT
             job_run_result.JobRunResult(
                 stdout='EXPLORATION PROCESSED SUCCESS: 1'),
             job_run_result.JobRunResult(
-                stdout='EXPLORATION POPULATED WITH android_proto_size_in_bytes SUCCESS: 1'),
+                stdout='EXPLORATION POPULATED WITH android_proto_size_in_bytes'
+                ' SUCCESS: 1'),
             job_run_result.JobRunResult(
                 stdout='CACHE DELETION SUCCESS: 1')
         ])
@@ -174,7 +176,10 @@ class PopulateExplorationWithAndroidProtoSizeInBytesJobTests(job_test_utils.JobT
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
-                stderr='EXPLORATION PROCESSED ERROR: \'(\'exp_1_id\', ValidationError(\'There is no state in [\'state\'] corresponding to the exploration\'s initial state name wrong_init_state_name.\'))\': 1' # pylint: disable=line-too-long
+                stderr='EXPLORATION PROCESSED ERROR: \'(\'exp_1_id\', '
+                'ValidationError(\'There is no state in [\'state\'] '
+                'corresponding to the exploration\'s initial state name '
+                'wrong_init_state_name.\'))\': 1'
             )
         ])
 

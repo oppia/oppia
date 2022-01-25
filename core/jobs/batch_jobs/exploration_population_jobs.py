@@ -122,61 +122,6 @@ class PopulateExplorationWithAndroidProtoSizeInBytesJob(base_jobs.JobBase):
         return models_to_put
 
     @staticmethod
-    def _update_exploration_summary(
-        migrated_exploration: exp_domain.Exploration,
-        exp_summary_model: exp_models.ExpSummaryModel,
-        exp_rights: exp_models.ExplorationRightsModel
-    ) -> exp_models.ExpSummaryModel:
-        """Generates newly updated exploration summary model.
-
-        Args:
-            migrated_exploration: Exploration. The migrated exploration
-                domain object.
-            exp_summary_model: ExpSummaryModel. The exploration
-                summary model to update.
-            exp_rights: ExplorationRightsModel. The exploration
-                rights model.
-
-        Returns:
-            ExpSummaryModel. The updated exploration summary model to put into
-            the datastore.
-        """
-        old_exp_summary = exp_fetchers.get_exploration_summary_from_model(
-            exp_summary_model)
-        ratings = old_exp_summary.ratings or feconf.get_empty_ratings()
-        scaled_average_rating = (
-            exp_services.get_scaled_average_rating(ratings))
-
-        contributors_summary = (
-            exp_summary_model.contributors_summary if exp_summary_model else {})
-        contributor_ids = list(contributors_summary.keys())
-
-        exploration_model_created_on = migrated_exploration.created_on
-        first_published_msec = exp_rights.first_published_msec
-
-        exp_summary = exp_domain.ExplorationSummary(
-            migrated_exploration.id, migrated_exploration.title,
-            migrated_exploration.category, migrated_exploration.objective,
-            migrated_exploration.language_code, migrated_exploration.tags,
-            ratings, scaled_average_rating,
-            exp_rights.status, exp_rights.community_owned,
-            exp_rights.owner_ids, exp_rights.editor_ids,
-            exp_rights.voice_artist_ids, exp_rights.viewer_ids,
-            contributor_ids, contributors_summary, migrated_exploration.version,
-            exploration_model_created_on,
-            exp_summary_model.exploration_model_last_updated,
-            first_published_msec, exp_summary_model.deleted
-        )
-
-        updated_exploration_summary_model = (
-            exp_services.populate_exploration_summary_model_fields(
-                exp_summary_model, exp_summary
-            )
-        )
-
-        return updated_exploration_summary_model
-
-    @staticmethod
     def _generate_exploration_changes(
         exp_model: exp_models.ExplorationModel,
         exploration: exp_domain.Exploration
@@ -246,19 +191,6 @@ class PopulateExplorationWithAndroidProtoSizeInBytesJob(base_jobs.JobBase):
             | 'Add exploration keys' >> beam.WithKeys( # pylint: disable=no-value-for-parameter
                 lambda exp_model: exp_model.id)
         )
-        exploration_summary_models = (
-            self.pipeline
-            | 'Get all non-deleted exploration summary models' >> (
-                ndb_io.GetModels(
-                    exp_models.ExpSummaryModel.get_all(
-                        include_deleted=False)
-                    )
-                )
-            # Pylint disable is needed because pylint is not able to correctly
-            # detect that the value is passed through the pipe.
-            | 'Add exploration summary keys' >> beam.WithKeys( # pylint: disable=no-value-for-parameter
-                lambda exploration_summary_model: exploration_summary_model.id)
-        )
         exploration_rights_models = (
             self.pipeline
             | 'Get all non-deleted exploration rights models' >> (
@@ -282,7 +214,7 @@ class PopulateExplorationWithAndroidProtoSizeInBytesJob(base_jobs.JobBase):
             migrated_exploration_results
             | 'Filter oks' >> beam.Filter(
                 lambda result_item: result_item.is_ok())
-            | 'Unwrap ok' >> beam.Map(
+            | 'Unwrap oks' >> beam.Map(
                 lambda result_item: result_item.unwrap())
         )
         migrated_exploration_job_run_results = (
@@ -317,7 +249,6 @@ class PopulateExplorationWithAndroidProtoSizeInBytesJob(base_jobs.JobBase):
         exploration_objects_list = (
             {
                 'exp_model': unmigrated_exploration_models,
-                'exploration_summary_model': exploration_summary_models,
                 'exploration': migrated_explorations,
                 'exploration_changes': exploration_changes,
                 'exploration_rights_model': exploration_rights_models
@@ -328,8 +259,6 @@ class PopulateExplorationWithAndroidProtoSizeInBytesJob(base_jobs.JobBase):
                 lambda x: len(x['exploration_changes']) > 0 and len(x['exploration']) > 0) # pylint: disable=line-too-long
             | 'Reorganize the exploration objects' >> beam.Map(lambda objects: {
                     'exp_model': objects['exp_model'][0],
-                    'exploration_summary_model': (
-                        objects['exploration_summary_model'][0]),
                     'exploration': objects['exploration'][0],
                     'exploration_changes': objects['exploration_changes'],
                     'exploration_rights_model': (
@@ -365,19 +294,8 @@ class PopulateExplorationWithAndroidProtoSizeInBytesJob(base_jobs.JobBase):
                 ))
         )
 
-        exp_summary_models_to_put = (
-            exploration_objects_list
-            | 'Generate exploration summary models to put' >> beam.Map(
-                lambda exp_objects: self._update_exploration_summary(
-                    exp_objects['exploration'],
-                    exp_objects['exploration_summary_model'],
-                    exp_objects['exploration_rights_model']
-                ))
-        )
-
         unused_put_results = (
-            (exp_models_to_put, exp_summary_models_to_put)
-            | 'Merge models' >> beam.Flatten()
+            exp_models_to_put
             | 'Put models into the datastore' >> ndb_io.PutModels()
         )
 
