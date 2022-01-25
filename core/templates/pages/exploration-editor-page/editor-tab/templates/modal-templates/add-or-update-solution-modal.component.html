@@ -8,9 +8,9 @@
       <select class="protractor-test-answer-is-exclusive-select"
               [(ngModel)]="tempAnsOption"
               (ngModelChange)="onAnswerChange()">
-              <option *ngFor="let item of ansOptions">
-                {{ item }}
-              </option>
+        <option *ngFor="let item of ansOptions">
+          {{ item }}
+        </option>
       </select> <strong>solution is...</strong>
       <br>
       <br>
