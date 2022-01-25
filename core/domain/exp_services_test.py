@@ -5190,6 +5190,39 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         self.assertItemsEqual(actual_summaries, expected_summaries)
 
 
+    def test_get_top_rated_exploration_summaries(self):
+        exploration_summeries =(
+            exp_services.get_top_rated_exploration_summaries(3))
+        top_rated_sumeries = (
+            exp_models.ExpSummaryModel.get_top_rated(3) )
+        top_rated_sumeries_model =(
+            exp_fetchers.get_exploration_summaries_from_models(
+                top_rated_sumeries)
+        )
+        self.assertLessEqual(len(exploration_summeries), 3)
+        self.assertItemsEqual(exploration_summeries, top_rated_sumeries_model)
+
+    def test_get_recently_published_exp_summaries(self):
+        exploration_summeries = (
+            exp_services.get_recently_published_exp_summaries(3)
+        )
+        recently_published_sumeries = (
+            exp_models.ExpSummaryModel.get_recently_published(3) )
+        recently_publshed_sumeries_model =(
+            exp_fetchers.get_exploration_summaries_from_models(
+                recently_published_sumeries)
+        )
+        self.assertLessEqual(len(exploration_summeries), 3)
+        self.assertItemsEqual(
+        exploration_summeries,
+        recently_publshed_sumeries_model)
+
+    def test_get_story_id_linked_to_exploration(self):
+        linked_story_id = exp_services.get_story_id_linked_to_exploration(
+            self.EXP_ID_1
+        )
+        self.assertIsNone(linked_story_id)
+
 class ExplorationConversionPipelineTests(ExplorationServicesUnitTests):
     """Tests the exploration model -> exploration conversion pipeline."""
 
