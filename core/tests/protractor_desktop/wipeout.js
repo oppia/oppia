@@ -55,9 +55,7 @@ describe('When account is deleted it', function() {
     await deleteAccountPage.requestAccountDeletion('userToDelete1');
 
     await users.login('user1@delete.com');
-    await waitFor.visibilityOf(
-      pendingAccountDeletionHeading,
-      'Pending Account Deletion Page takes too long to appear');
+    await waitFor.urlRedirection('http://localhost:9001/pending-account-deletion');
     expect(await browser.getCurrentUrl()).toEqual(
       'http://localhost:9001/pending-account-deletion');
   });
