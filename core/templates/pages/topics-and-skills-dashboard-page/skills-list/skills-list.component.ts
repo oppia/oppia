@@ -51,17 +51,21 @@ interface MergeModalResult {
   templateUrl: './skills-list.component.html'
 })
 export class SkillsListComponent {
-  @Input() skillSummaries: AugmentedSkillSummary[];
-  @Input() pageNumber: number;
-  @Input() itemsPerPage: number;
-  @Input() editableTopicSummaries: CreatorTopicSummary[];
-  @Input() mergeableSkillSummaries: SkillSummary[];
-  @Input() untriagedSkillSummaries: SkillSummary[];
-  @Input() userCanDeleteSkill: boolean;
-  @Input() userCanCreateSkill: boolean;
-  @Input() skillsCategorizedByTopics: SkillsCategorizedByTopics;
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() skillSummaries!: AugmentedSkillSummary[];
+  @Input() pageNumber!: number;
+  @Input() itemsPerPage!: number;
+  @Input() editableTopicSummaries!: CreatorTopicSummary[];
+  @Input() mergeableSkillSummaries!: SkillSummary[];
+  @Input() skillsCategorizedByTopics!: SkillsCategorizedByTopics;
+  @Input() untriagedSkillSummaries!: SkillSummary[];
+  @Input() userCanCreateSkill: boolean = true;
+  @Input() userCanDeleteSkill: boolean = true;
+
+  selectedIndex!: string;
   directiveSubscriptions: Subscription = new Subscription();
-  selectedIndex: string;
   SKILL_HEADINGS: string[] = [
     'index', 'description', 'worked_examples_count',
     'misconception_count', 'status'];
@@ -105,7 +109,7 @@ export class SkillsListComponent {
           }, 100);
         }
       ).catch((errorMessage: string) => {
-        let errorToast: string = null;
+        let errorToast: string;
         // This error is thrown as part of a final validation check in
         // the backend, hence the message does not include instructions
         // for the user to follow.

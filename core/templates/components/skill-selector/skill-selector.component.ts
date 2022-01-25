@@ -37,15 +37,19 @@ export class SkillSelectorComponent implements OnInit {
   // If countOfSkillsToPrioritize > 0, then sortedSkillSummaries should
   // have the initial 'countOfSkillsToPrioritize' entries of skills with
   // the same priority.
-  @Input() sortedSkillSummaries: GroupedSkillSummaries;
-  @Input() selectedSkillId: string;
-  @Input() countOfSkillsToPrioritize: number;
-  @Input() categorizedSkills: CategorizedSkills;
-  @Input() untriagedSkillSummaries: SkillSummary[];
-  @Input() allowSkillsFromOtherTopics: boolean;
+
+  // Some properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() sortedSkillSummaries!: GroupedSkillSummaries;
+  @Input() selectedSkillId!: string;
+  @Input() countOfSkillsToPrioritize!: number;
+  @Input() categorizedSkills!: CategorizedSkills;
+  @Input() untriagedSkillSummaries!: SkillSummary[];
+  @Input() allowSkillsFromOtherTopics!: boolean;
   @Output() selectedSkillIdChange: EventEmitter<string> = new EventEmitter();
-  currCategorizedSkills: CategorizedSkills = null;
-  selectedSkill: string = null;
+  currCategorizedSkills!: CategorizedSkills;
+  selectedSkill!: string;
   skillFilterText: string = '';
   topicFilterList: { topicName: string ; checked: boolean }[] = [];
   subTopicFilterDict: SubTopicFilterDict = {};
