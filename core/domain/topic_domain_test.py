@@ -26,6 +26,7 @@ from core import python_utils
 from core import utils
 from core.constants import constants
 from core.domain import fs_domain
+from core.domain import story_domain
 from core.domain import topic_domain
 from core.domain import user_services
 from core.tests import test_utils
@@ -998,12 +999,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         """Test proto size calculation function."""
         topic = topic_domain.Topic.create_default_topic(
             'topic_id_new', 'Name', 'abbrev', 'description')
-        self.assertEqual(topic.android_proto_size_in_bytes, 141)
-
-        topic.language_code = 'en'
-        topic.practice_tab_is_displayed = False
-
-        self.assertEqual(topic.android_proto_size_in_bytes, 148)
+        self.assertEqual(topic.android_proto_size_in_bytes, 33)
 
 
 class TopicChangeTests(test_utils.GenericTestBase):
