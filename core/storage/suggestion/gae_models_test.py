@@ -183,7 +183,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             )
             self.assertEqual(suggestion.author_id, 'author_1')
 
-    def test_get_user_created_suggestions_of_suggestion_type(self) -> None:
+    def test_get_suggestions_of_type_edit_exploration_state(self) -> None:
         suggestion_model = suggestion_models.GeneralSuggestionModel
         # Disabling pylint, long-line because of the long method name.
         result = suggestion_model.get_user_created_suggestions_of_suggestion_type( # pylint: disable=line-too-long
@@ -1876,7 +1876,7 @@ class TranslationContributionStatsModelUnitTests(test_utils.GenericTestBase):
             translation_model.get_model_association_to_user()
         )
 
-    def test_get_all_by_user_id(self) -> None:
+    def test_get_all_translations_by_user_id(self) -> None:
         translation_model = suggestion_models.TranslationContributionStatsModel
         suggestion_models.TranslationContributionStatsModel.create(
             language_code=self.LANGUAGE_CODE,
