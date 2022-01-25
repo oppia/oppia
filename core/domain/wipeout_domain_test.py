@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-from core import utils
 from core.domain import wipeout_domain
 from core.tests import test_utils
 
