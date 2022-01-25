@@ -2930,7 +2930,7 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
         question = self.save_new_question(
             question_id, self.owner_id,
             self._create_valid_question_data('ABC'), ['skill_1'])
-        self.assertNotEqual(question, None)
+        self.assertIsNotNone(question)
         interaction_id = question.question_state_data.interaction.id
         customization_args = (
             question.question_state_data.interaction.to_dict()[
@@ -2979,7 +2979,7 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
                 len(learner_answer_details.learner_answer_info_list), 1)
             learner_answer_info_id = (
                 learner_answer_details.learner_answer_info_list[0].id)
-            self.assertNotEqual(learner_answer_info_id, None)
+            self.assertIsNotNone(learner_answer_info_id)
             self.delete_json(
                 '%s/%s/%s?state_name=%s&learner_answer_info_id=%s' % (
                     feconf.LEARNER_ANSWER_INFO_HANDLER_URL,
@@ -3007,7 +3007,7 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
         question = self.save_new_question(
             question_id, self.owner_id,
             self._create_valid_question_data('ABC'), ['skill_1'])
-        self.assertNotEqual(question, None)
+        self.assertIsNotNone(question)
         state_reference = (
             stats_services.get_state_reference_for_question(question_id))
         self.assertEqual(state_reference, question_id)
@@ -3022,7 +3022,7 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
                 len(learner_answer_details.learner_answer_info_list), 1)
             learner_answer_info_id = (
                 learner_answer_details.learner_answer_info_list[0].id)
-            self.assertNotEqual(learner_answer_info_id, None)
+            self.assertIsNotNone(learner_answer_info_id)
             self.delete_json(
                 '%s/%s/%s?learner_answer_info_id=%s' % (
                     feconf.LEARNER_ANSWER_INFO_HANDLER_URL,
