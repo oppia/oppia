@@ -346,6 +346,7 @@
     "I18N_LEARNER_DASHBOARD_EMPTY_FEEDBACK_THREADS": "You don’t have any active feedback threads yet. Your feedback helps improve the quality of our lessons. You can do so by starting any of our lessons and submitting your valuable feedback!",
     "I18N_LEARNER_DASHBOARD_EMPTY_INCOMPLETE_COLLECTIONS": "It looks like you have no partially-complete collections at the moment. Head over to the library to start an exciting new collection!",
     "I18N_LEARNER_DASHBOARD_EMPTY_INCOMPLETE_EXPLORATIONS": "It looks like you have no partially-complete explorations at the moment. Head over to the library to start an exciting new exploration!",
+    "I18N_LEARNER_DASHBOARD_EMPTY_LEARN_SOMETHING_NEW_SECTION": "It looks like you reached the goal selection limit.Head over to the library and explore more explorations.",
     "I18N_LEARNER_DASHBOARD_EMPTY_SKILL_PROFICIENCY": "Get started by&nbsp;",
     "I18N_LEARNER_DASHBOARD_EMPTY_SKILL_PROFICIENCY_REASON_FOR_SETTING_A_GOAL": "Setting a goal allows Oppia to give you better recommendations in your dashboard that contribute to your learning journey.",
     "I18N_LEARNER_DASHBOARD_EMPTY_SKILL_PROFICIENCY_SET_A_GOAL": "setting a goal!&nbsp;",
