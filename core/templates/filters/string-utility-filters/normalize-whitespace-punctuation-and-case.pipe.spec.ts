@@ -17,42 +17,39 @@
  */
 
 import { NormalizeWhitespacePunctuationAndCasePipe } from
-'filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe';
+  './normalize-whitespace-punctuation-and-case.pipe';
 import { TestBed } from '@angular/core/testing';
 
 describe('Testing NormalizeWhitespacePunctuationAndCasePipe', () => {
-    let nwpcp: NormalizeWhitespacePunctuationAndCasePipe;
-    beforeEach(() => {
-      TestBed.configureTestingModule({
-        providers: [NormalizeWhitespacePunctuationAndCasePipe]
-      });
-      nwpcp = TestBed.inject(NormalizeWhitespacePunctuationAndCasePipe);
+  let nwpcp: NormalizeWhitespacePunctuationAndCasePipe;
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [NormalizeWhitespacePunctuationAndCasePipe]
     });
+    nwpcp = TestBed.inject(NormalizeWhitespacePunctuationAndCasePipe);
+  });
 
-    it('should have all expected pipes', () => {
-        expect(nwpcp).not.toEqual(null);
-    });
+  it('should have all expected pipes', () => {
+    expect(nwpcp).not.toEqual(null);
+  });
 
-    it('should normalize spaces and turn characters to lower case',
-    () => {
+  it('should normalize spaces and turn characters to lower case', () => {
+    expect(nwpcp.transform('')).toEqual('');
 
-      expect(nwpcp.transform('')).toEqual('');
+    expect(nwpcp.transform('  remove '))
+      .toEqual('remove');
 
-      expect(nwpcp.transform('  remove '))
-        .toEqual('remove');
-      
-      //Should remove the space if it does not
-      //separate two alphanumeric strings.
-      expect(nwpcp.transform('  remove ? '))
-        .toEqual('remove?');
-      
-      expect(nwpcp.transform(' teSTstrinG12  '))
-        .toEqual('teststring12');
-      expect(nwpcp.transform(' tesT1 teSt2 '))
-        .toEqual('test1 test2');
-      
-      expect(nwpcp.transform('tesT1\n teSt2'))
-        .toEqual('test1\ntest2');
-    });
+    //  Should remove the space if it does not
+    //  separate two alphanumeric strings.
+    expect(nwpcp.transform('  remove ? '))
+      .toEqual('remove?');
 
+    expect(nwpcp.transform(' teSTstrinG12  '))
+      .toEqual('teststring12');
+    expect(nwpcp.transform(' tesT1 teSt2 '))
+      .toEqual('test1 test2');
+
+    expect(nwpcp.transform('tesT1\n teSt2'))
+      .toEqual('test1\ntest2');
+  });
 });
