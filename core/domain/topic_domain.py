@@ -405,7 +405,7 @@ class Subtopic:
         """
         skill_summaries_list = []
 
-        from core.domain import skill_fetchers
+        from core.domain import skill_fetchers # pylint: disable=invalid-import-from # isort:skip
         for skill_id in self.skill_ids:
             skill = skill_fetchers.get_skill_by_id(
                 skill_id, strict=False)
@@ -1237,7 +1237,7 @@ class Topic:
         subtopic_summaries_proto_list = []
 
         if self.canonical_story_references is not None:
-            from core.domain import story_fetchers
+            from core.domain import story_fetchers # pylint: disable=invalid-import-from # isort:skip
             for reference in self.canonical_story_references:
                 story = story_fetchers.get_story_by_id(
                     reference.story_id, strict=False)
