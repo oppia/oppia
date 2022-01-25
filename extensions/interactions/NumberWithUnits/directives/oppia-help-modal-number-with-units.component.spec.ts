@@ -20,7 +20,7 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { HelpModalNumberWithUnitsComponent } from './oppia-help-modal-number-with-units.component';
 
-describe('Delete Hint Modal Component', () => {
+describe('Number With Units Help Modal Component', () => {
   let fixture: ComponentFixture<HelpModalNumberWithUnitsComponent>;
   let componentInstance: HelpModalNumberWithUnitsComponent;
 

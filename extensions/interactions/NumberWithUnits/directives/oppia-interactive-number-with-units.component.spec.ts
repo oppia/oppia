@@ -24,7 +24,7 @@ import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { TranslateModule } from '@ngx-translate/core';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 
-describe('Interactive number with units interaction', () => {
+describe('Number with units interaction component', () => {
   let component: InteractiveNumberWithUnitsComponent;
   let fixture: ComponentFixture<InteractiveNumberWithUnitsComponent>;
   let currentInteractionService: CurrentInteractionService;
@@ -85,28 +85,34 @@ describe('Interactive number with units interaction', () => {
 
   it('should not display warning when the answer format is correct',
     fakeAsync(() => {
-      component.ngOnInit();
-
+      // PreChecks.
       expect(component.errorMessage).toBe('');
+      expect(component.isValid).toBeTrue();
 
+      // Test: Correct answer.
       component.answer = '24 km';
+
       component.answerValueChanged();
       tick(150);
 
+      // PostChecks: No error message as the Unit is correct.
       expect(component.errorMessage).toBe('');
       expect(component.isValid).toBeTrue();
     }));
 
   it('should display warning when the answer format is incorrect',
     fakeAsync(() => {
-      component.ngOnInit();
-
+      // PreChecks.
       expect(component.errorMessage).toBe('');
+      expect(component.isValid).toBeTrue();
 
+      // Test: Incorrect answer.
       component.answer = '24 k';
+
       component.answerValueChanged();
       tick(150);
 
+      // PostChecks: Error message as the Unit is incorrect.
       expect(component.errorMessage).toBe('Unit "k" not found.');
       expect(component.isValid).toBeFalse();
     }));
