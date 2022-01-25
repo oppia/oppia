@@ -56,7 +56,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'google-analytics.initializer.ts',
     'learner-answer-info.service.ts',
     'mathjax-bind.directive.ts',
-    'normalize-whitespace-punctuation-and-case.pipe.ts',
     'object-editor.directive.ts',
     'oppia-footer.component.ts',
     'oppia-interactive-music-notes-input.directive.ts',
