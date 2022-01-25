@@ -42,7 +42,7 @@ from typing import (
     Any, Callable, Dict, Iterable, Iterator, List, Optional, Tuple, TypeVar,
     Union)
 
-_YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-5.1.2')
+_YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-6.0')
 sys.path.insert(0, _YAML_PATH)
 
 import yaml  # isort:skip  # pylint: disable=wrong-import-position
