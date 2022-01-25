@@ -7,8 +7,8 @@
     <div class="oppia-rule-details-header">
       <select class="protractor-test-answer-is-exclusive-select"
               [(ngModel)]="tempAnsOption"
-              (ngModelChange)="onAnswerChange($event)">
-              <option *ngFor="let item of ['The only', 'One']">
+              (ngModelChange)="onAnswerChange()">
+              <option *ngFor="let item of ansOptions">
                 {{ item }}
               </option>
       </select> <strong>solution is...</strong>
@@ -20,11 +20,13 @@
         </angular-html-bind-wrapper>
       </div>
       <br>
-      <button class="oppia-learner-confirm-button protractor-test-submit-answer-button"
+      <button mat-button class="oppia-learner-confirm-button protractor-test-submit-answer-button"
               (click)="onSubmitFromSubmitButton()"
-              *ngIf="data.correctAnswer === null && shouldAdditionalSubmitButtonBeShown()">
-        Submit
-      </button>
+              *ngIf="data.correctAnswer === null && shouldAdditionalSubmitButtonBeShown()"
+              [disabled]="">
+          Submit
+        </button>
+      </div>
       <br>
       <div [hidden]="!(data.correctAnswer !== null)">
         <strong>Explanation:</strong>
@@ -45,8 +47,18 @@
   <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
   <button class="btn btn-success protractor-test-submit-solution-button"
           (click)="saveSolution()"
-          [disabled]="data.correctAnswer === null || !data.explanationHtml || isSolutionExplanationLengthExceeded(data.explanationHtml)"
+          [disabled]="data.correctAnswer === null || !correctAnswerEditorHtml || !data.explanationHtml || isSolutionExplanationLengthExceeded(data.explanationHtml)"
           title="Check if the solution corresponds to a correct answer and save it.">
     Check and Save Solution
   </button>
 </div>
+
+<style>
+  .oppia-learner-confirm-button {
+    background: #0d48a1;
+    color: #fff;
+    font-size: 16px;
+    line-height: 22px;
+    padding: 6px 12px;
+  }
+</style>

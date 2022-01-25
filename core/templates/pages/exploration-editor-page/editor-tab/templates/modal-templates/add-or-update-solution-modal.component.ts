@@ -54,6 +54,7 @@ export class AddOrUpdateSolutionModalComponent
   answerIsValid: boolean;
   data: SolutionInterface;
   tempAnsOption: string;
+  ansOptions: string[];
   isSubmitButtonDisabled: boolean;
   COMPONENT_NAME_SOLUTION: string = (
     AppConstants.COMPONENT_NAME_SOLUTION);
@@ -107,8 +108,8 @@ export class AddOrUpdateSolutionModalComponent
     return this.EXPLANATION_FORM_SCHEMA;
   }
 
-  onAnswerChange($event: string): void {
-    if ($event === 'The only') {
+  onAnswerChange(): void {
+    if (this.tempAnsOption === this.ansOptions[0]) {
       this.data.answerIsExclusive = true;
     } else {
       this.data.answerIsExclusive = false;
@@ -172,6 +173,8 @@ export class AddOrUpdateSolutionModalComponent
     this.currentInteractionService.setOnSubmitFn((answer) => {
       this.data.correctAnswer = answer;
     });
+    this.ansOptions = ['The only', 'One'];
+    this.tempAnsOption = this.ansOptions[1];
   }
 }
 
