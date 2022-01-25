@@ -49,6 +49,7 @@
     background-color: #fff;
     border-radius: 4px;
     box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
+    cursor: pointer;
     display: flex;
     justify-content: space-between;
     padding: 10px 20px;
@@ -63,6 +64,7 @@
 
   .oppia-translation-language-selector-inner-container-arrow {
     color: #009688;
+    cursor: pointer;
   }
 
   .oppia-translation-language-selector-dropdown-container {
@@ -110,10 +112,15 @@
 
   .oppia-translation-language-selector-dropdown-option {
     color: rgb(104, 104, 104);
+    cursor: pointer;
     display: flex;
     flex: 1;
     margin-left: 16px;
     padding: 8px;
+  }
+
+  .oppia-translation-language-selector-dropdown-option:hover {
+    background-color: rgb(238, 238, 238);
   }
 
   .oppia-translation-language-selector-dropdown-option-selected {
