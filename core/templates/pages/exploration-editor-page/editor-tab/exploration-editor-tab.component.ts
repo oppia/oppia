@@ -343,7 +343,7 @@ angular.module('oppia').component('explorationEditorTab', {
           })
         );
 
-        $scope.$watch(ExplorationStatesService.getStates, function() {
+        $scope.$watch('ExplorationStatesService.getStates()', function() {
           if (ExplorationStatesService.getStates()) {
             StateEditorService.setStateNames(
               ExplorationStatesService.getStateNames());
