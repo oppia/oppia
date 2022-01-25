@@ -1642,7 +1642,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             test_value, test_value['state_schema_version'])
 
         self.assertEqual(test_value['state_schema_version'], 45)
-        self.assertEqual(test_value['state']['linked_skill_id'], None)
+        self.assertIsNone(test_value['state']['linked_skill_id'])
 
     def test_question_state_dict_conversion_from_v45_to_v46(self):
 
