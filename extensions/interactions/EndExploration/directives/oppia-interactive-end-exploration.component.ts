@@ -63,14 +63,17 @@ export class InteractiveEndExplorationComponent implements OnInit {
     const authorRecommendedExplorationIds = recommendedExplorationIds.value;
 
     this.isInEditorPage = (
-      this.contextService.getPageContext() === (
-        ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR));
+      this.contextService.getPageContext() ===
+      ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR
+    );
     this.isInEditorPreviewMode = this.isInEditorPage && (
-      this.contextService.getEditorTabContext() === (
-        ServicesConstants.EXPLORATION_EDITOR_TAB_CONTEXT.PREVIEW));
+      this.contextService.getEditorTabContext() ===
+      ServicesConstants.EXPLORATION_EDITOR_TAB_CONTEXT.PREVIEW
+    );
     this.isInEditorMainTab = this.isInEditorPage && (
-      this.contextService.getEditorTabContext() === (
-        ServicesConstants.EXPLORATION_EDITOR_TAB_CONTEXT.EDITOR));
+      this.contextService.getEditorTabContext() ===
+      ServicesConstants.EXPLORATION_EDITOR_TAB_CONTEXT.EDITOR
+    );
 
     if (this.isInEditorPage) {
       // Display a message if any author-recommended explorations are
@@ -85,7 +88,7 @@ export class InteractiveEndExplorationComponent implements OnInit {
 
         let missingExpIds = [];
         authorRecommendedExplorationIds.forEach((expId) => {
-          if (foundExpIds.indexOf(expId) === -1) {
+          if (!foundExpIds.includes(expId)) {
             missingExpIds.push(expId);
           }
         });
@@ -95,8 +98,8 @@ export class InteractiveEndExplorationComponent implements OnInit {
         } else {
           let listOfIds = missingExpIds.join('", "');
           this.errorMessage = (
-            `Warning: exploration(s) with the IDs "${listOfIds}` +
-            '" will not be shown as recommendations because ' +
+            `Warning: exploration(s) with the IDs "${listOfIds}" ` +
+            'will not be shown as recommendations because ' +
             'they either do not exist, or are not publicly viewable.');
         }
       });

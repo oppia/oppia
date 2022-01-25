@@ -82,8 +82,8 @@ describe('Interactive ratio expression input', () => {
 
     beforeEach(() => {
       contextService = TestBed.inject(ContextService);
-      endExplorationBackendApiService =
-        TestBed.inject(EndExplorationBackendApiService);
+      endExplorationBackendApiService = (
+        TestBed.inject(EndExplorationBackendApiService));
       fixture = (
         TestBed.createComponent(InteractiveEndExplorationComponent));
       component = fixture.componentInstance;
@@ -100,23 +100,23 @@ describe('Interactive ratio expression input', () => {
 
     it('should initialize ctrl variables', function() {
       component.ngOnInit();
-      expect(component.isInEditorPage).toBe(true);
-      expect(component.isInEditorPreviewMode).toBe(true);
-      expect(component.isInEditorMainTab).toBe(false);
+      expect(component.isInEditorPage).toBeTrue();
+      expect(component.isInEditorPreviewMode).toBeTrue();
+      expect(component.isInEditorMainTab).toBeFalse();
     });
 
     it('should not display error message', fakeAsync(() => {
       const recommendExplorationSpy = spyOn(
-        endExplorationBackendApiService, 'getRecommendExplorationsData')
-        .and.callThrough();
+        endExplorationBackendApiService, 'getRecommendExplorationsData'
+      ).and.callThrough();
 
       component.ngOnInit();
       tick(150);
       fixture.detectChanges();
 
-      expect(component.isInEditorPage).toBe(true);
-      expect(component.isInEditorPreviewMode).toBe(true);
-      expect(component.isInEditorMainTab).toBe(false);
+      expect(component.isInEditorPage).toBeTrue();
+      expect(component.isInEditorPreviewMode).toBeTrue();
+      expect(component.isInEditorMainTab).toBeFalse();
       expect(recommendExplorationSpy).toHaveBeenCalled();
       expect(component.errorMessage).toBe('');
     }));
@@ -127,8 +127,8 @@ describe('Interactive ratio expression input', () => {
 
     beforeEach(() => {
       contextService = TestBed.inject(ContextService);
-      endExplorationBackendApiService =
-        TestBed.inject(EndExplorationBackendApiService);
+      endExplorationBackendApiService = (
+        TestBed.inject(EndExplorationBackendApiService));
       fixture = (
         TestBed.createComponent(InteractiveEndExplorationComponent));
       component = fixture.componentInstance;
@@ -145,21 +145,21 @@ describe('Interactive ratio expression input', () => {
 
     it('should display error message', fakeAsync(() => {
       const recommendExplorationSpy = spyOn(
-        endExplorationBackendApiService, 'getRecommendExplorationsData')
-        .and.callThrough();
+        endExplorationBackendApiService, 'getRecommendExplorationsData'
+      ).and.callThrough();
 
       component.ngOnInit();
       tick(150);
       fixture.detectChanges();
 
-      expect(component.isInEditorPage).toBe(true);
-      expect(component.isInEditorPreviewMode).toBe(true);
-      expect(component.isInEditorMainTab).toBe(false);
+      expect(component.isInEditorPage).toBeTrue();
+      expect(component.isInEditorPreviewMode).toBeTrue();
+      expect(component.isInEditorMainTab).toBeFalse();
       expect(recommendExplorationSpy).toHaveBeenCalled();
       expect(component.errorMessage).toBe(
         'Warning: exploration(s) with the IDs "' + '1' +
-      '" will not be shown as recommendations because ' +
-      'they either do not exist, or are not publicly viewable.');
+        '" will not be shown as recommendations because ' +
+        'they either do not exist, or are not publicly viewable.');
     }));
   });
 
@@ -168,8 +168,8 @@ describe('Interactive ratio expression input', () => {
 
     beforeEach(() => {
       contextService = TestBed.inject(ContextService);
-      endExplorationBackendApiService =
-        TestBed.inject(EndExplorationBackendApiService);
+      endExplorationBackendApiService = (
+        TestBed.inject(EndExplorationBackendApiService));
       fixture = (
         TestBed.createComponent(InteractiveEndExplorationComponent));
       component = fixture.componentInstance;
@@ -188,7 +188,7 @@ describe('Interactive ratio expression input', () => {
     it('should not check if any author-recommended explorations are' +
     ' invalid.', function() {
       component.ngOnInit();
-      expect(component.isInEditorPage).toBe(false);
+      expect(component.isInEditorPage).toBeFalse();
     });
   });
 });
