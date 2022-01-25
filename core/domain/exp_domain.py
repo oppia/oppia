@@ -681,6 +681,10 @@ class Exploration:
 
         Returns:
             Exploration. The corresponding Exploration domain object.
+
+        Raises:
+            Exception. Some parameter was used in a state but not declared
+                in the exploration_dict.
         """
         # NOTE TO DEVELOPERS: It is absolutely ESSENTIAL this conversion to and
         # from an ExplorationModel/dictionary MUST be exhaustive and complete.
@@ -1407,6 +1411,9 @@ class Exploration:
 
         Args:
             init_state_name: str. The new name of the initial state.
+
+        Raises:
+            Exception. Invalid init_state_name.
         """
         old_init_state_name = self.init_state_name
         if init_state_name not in self.states:

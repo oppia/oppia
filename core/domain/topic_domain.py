@@ -941,6 +941,10 @@ class Topic:
 
         Args:
             story_id: str. The story id to add to the list.
+
+        Raises:
+            Exception. The story_id is already present in the canonical
+                story references list of the topic.
         """
         canonical_story_ids = self.get_canonical_story_ids()
         if story_id in canonical_story_ids:
@@ -956,6 +960,10 @@ class Topic:
 
         Args:
             story_id: str. The story id to add to the list.
+
+        Raises:
+            Exception. The story_id is already present in the additional
+                story references list of the topic.
         """
         additional_story_ids = self.get_additional_story_ids()
         if story_id in additional_story_ids:
@@ -1314,6 +1322,10 @@ class Topic:
         Args:
             new_thumbnail_filename: str|None. The updated thumbnail filename
                 for the topic.
+
+        Raises:
+            Exception. The thumbnail new_thumbnail_filename does not exixt for
+                expected topic in the filesystem.
         """
         file_system_class = fs_services.get_entity_file_system_class()
         fs = fs_domain.AbstractFileSystem(file_system_class(
@@ -1546,6 +1558,9 @@ class Topic:
         Args:
             subtopic_id: str. The id of the subtopic to edit.
             new_url_fragment: str. The new url fragment of the subtopic.
+
+        Raises:
+            Exception. The subtopic with the given id doesn't exist.
         """
         subtopic_index = self.get_subtopic_index(subtopic_id)
         if subtopic_index is None:

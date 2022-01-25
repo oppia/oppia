@@ -91,6 +91,10 @@ def validate_new_config_property_values(new_config_property):
 
     Returns:
         dict(str, *). Returns a dict for new config properties.
+
+    Raises:
+        Exception. The keys in new_config_property is not a string.
+        Exception. The values in new_config_property don't have any schema.
     """
     for (name, value) in new_config_property.items():
         if not isinstance(name, str):
@@ -117,6 +121,9 @@ def validate_change_dict_for_blog_post(change_dict):
 
     Returns:
         dict. Returns the change_dict after validation.
+
+    Raises:
+        Exception. Invalid tags provided in change_dict.
     """
     if 'title' in change_dict:
         blog_domain.BlogPost.require_valid_title( # type: ignore[no-untyped-call]
@@ -189,6 +196,9 @@ def validate_email_dashboard_data(
 
     Returns:
         dict. Returns the dict after validation.
+
+    Raises:
+        Exception. The key in 'data' is not one of the allowed keys.
     """
     predicates = constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION
     possible_keys = [predicate['backend_attr'] for predicate in predicates]
@@ -302,6 +312,9 @@ def validate_params_dict(params):
 
     Returns:
         dict. Returns the params argument in dict form.
+
+    Raises:
+        Exception. The given params is not of type dict as expected.
     """
     if not isinstance(params, dict):
         raise Exception('Excepted dict, received %s' % params)

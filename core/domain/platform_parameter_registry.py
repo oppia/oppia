@@ -60,6 +60,9 @@ class Registry:
 
         Returns:
             PlatformParameter. The created platform parameter.
+
+        Raises:
+            Exception. The data_type not in DEFAULT_VALUE_BY_TYPE_DICT.
         """
         if data_type in cls.DEFAULT_VALUE_BY_TYPE_DICT:
             default = cls.DEFAULT_VALUE_BY_TYPE_DICT[data_type]
@@ -111,6 +114,9 @@ class Registry:
         Args:
             name: str. The name of the platform parameter.
             instance: PlatformParameter. The instance of the platform parameter.
+
+        Raises:
+            Exception. The given name of the platform parameter already exists.
         """
         if cls.parameter_registry.get(name):
             raise Exception('Parameter with name %s already exists.' % name)
@@ -127,6 +133,9 @@ class Registry:
         Returns:
             PlatformParameter. The instance of the specified platform
             parameter.
+
+        Raises:
+            Exception. The given name of the platform parameter doesn't exist.
         """
         parameter_from_cache = cls.load_platform_parameter_from_memcache(
             name)

@@ -48,6 +48,10 @@ class JobOptions(pipeline_options.PipelineOptions): # type: ignore[misc]
                 (unmodified) because PipelineOptions, a parent class, needs it.
             **job_options: dict(str: *). One of the options defined in the class
                 JOB_OPTIONS dict.
+
+        Raises:
+            ValueError. The given job_options not defined in the class
+                JOB_OPTIONS dict.
         """
         unsupported_options = set(job_options).difference(self.JOB_OPTIONS)
         if unsupported_options:

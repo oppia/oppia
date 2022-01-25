@@ -129,6 +129,9 @@ def get_filepath_from_filename(filename, rootdir):
     Returns:
         str | None. The path of the file if file is found otherwise
         None.
+
+    Raises:
+        Exception. Multiple files found with name 'filename'.
     """
     # This is required since error files are served according to error status
     # code. The file served is error-page.mainpage.html but it is compiled and
@@ -1324,6 +1327,9 @@ class TestBase(unittest.TestCase):
 
         Returns:
             bool. Whether the code raised exception in the expected format.
+
+        Raises:
+            Exception. No expected_regex given.
         """
         if not expected_regex:
             raise Exception(
@@ -1926,6 +1932,9 @@ title: Title
 
         Yields:
             None. Empty yield statement.
+
+        Raises:
+            Exception. Given mocked_now is not datetime.
         """
         if not isinstance(mocked_now, datetime.datetime):
             raise Exception('mocked_now must be datetime, got: %r' % mocked_now)
@@ -2634,6 +2643,10 @@ title: Title
 
         Returns:
             Exploration. The exploration domain object.
+
+        Raises:
+            ValueError. No state_names provided.
+            ValueError. No interaction_ids provided.
         """
         if not state_names:
             raise ValueError('must provide at least one state name')
@@ -3768,6 +3781,10 @@ class FailingFunction(FunctionWrapper):
                 exception, before a call succeeds. If this is 0, all calls will
                 succeed, if it is FailingFunction. INFINITY, all calls will
                 fail.
+
+        Raises:
+            ValueError. The num_tries_before_success is neither greater or
+                equal to 0 nor FailingFunction.INFINITY.
         """
         super(FailingFunction, self).__init__(f)
         self._exception = exception

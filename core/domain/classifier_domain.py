@@ -280,6 +280,10 @@ class ClassifierTrainingJob:
 
         Args:
             status: str. The status of the classifier training job.
+
+        Raises:
+            Exception. The status is not present in
+                feconf.ALLOWED_TRAINING_JOB_STATUS_CHANGES.
         """
         initial_status = self._status
         if status not in (

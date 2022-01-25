@@ -131,6 +131,9 @@ def _update_stats_transactional(
         exp_version: int. Version of the exploration.
         aggregated_stats: dict. Dict representing an ExplorationStatsModel
             instance with stats aggregated in the frontend.
+
+    Raises:
+        Exception. Parameters to update ExplorationStatsModel does not exist.
     """
     exp_stats = get_exploration_stats_by_id(exp_id, exp_version)
     if exp_stats is None:

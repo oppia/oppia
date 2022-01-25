@@ -74,7 +74,7 @@ def defer(fn_identifier, queue_name, *args, **kwargs):
         **kwargs: dict(str : *). Keyword arguments for fn.
 
     Raises:
-        Exception. The arguments and keyword arguments that are passed in are
+        ValueError. The arguments and keyword arguments that are passed in are
             not JSON serializable.
     """
     payload = {
@@ -107,7 +107,7 @@ def enqueue_task(url, params, countdown):
             task.
 
     Raises:
-        Exception. The params that are passed in are not JSON serializable.
+        ValueError. The params that are passed in are not JSON serializable.
     """
     try:
         json.dumps(params)

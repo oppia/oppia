@@ -460,6 +460,9 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
 
         Args:
             obj: dict. Argument which needs to be validated.
+
+        Raises:
+            Exception. If 'Any' type is not the dictionary value type.
         """
         if 'any_arg' not in obj:
             raise Exception('Missing \'any_arg\'.')
@@ -1338,6 +1341,9 @@ def validation_method_for_testing(obj: Dict[str, str]) -> Dict[str, str]:
 
     Returns:
         dict(str, str). Returns a dict value after validation.
+
+    Raises:
+        Exception. If any one argument is missing.
     """
     if 'arg_a' not in obj:
         raise Exception('Missing arg_a in argument.')

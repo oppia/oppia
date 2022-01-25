@@ -440,6 +440,9 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             each skill. If not evenly divisible, it will be rounded up.
             If not enough questions for a skill, just return all questions
             it links to.
+
+        Raises:
+            Exception. If the number of elements in skill_ids crosses 20.
         """
         if len(skill_ids) > feconf.MAX_NUMBER_OF_SKILL_IDS:
             raise Exception('Please keep the number of skill IDs below 20.')
@@ -582,6 +585,9 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             each skill. If not evenly divisible, it will be rounded up.
             If not enough questions for a skill, just return all questions
             it links to.
+
+        Raises:
+            Exception. If the number of elements in skill_ids crosses 20.
         """
         if len(skill_ids) > feconf.MAX_NUMBER_OF_SKILL_IDS:
             raise Exception('Please keep the number of skill IDs below 20.')

@@ -112,6 +112,9 @@ def run_job(
     Returns:
         BeamJobRun. Contains metadata related to the execution status of the
         job.
+
+    Raises:
+        RuntimeError. Failed to deploy given job to the Dataflow service.
     """
     if pipeline is None:
         pipeline = beam.Pipeline(
@@ -204,6 +207,9 @@ def cancel_job(beam_job_run_model: beam_job_models.BeamJobRunModel) -> None:
 
     Args:
         beam_job_run_model: BeamJobRunModel. The model to update.
+
+    Raises:
+        ValueError. The dataflow_job_id is None.
     """
     job_id = beam_job_run_model.dataflow_job_id
     if job_id is None:

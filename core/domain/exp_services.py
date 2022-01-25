@@ -1742,6 +1742,9 @@ def get_composite_change_list(exp_id, from_version, to_version):
     Returns:
         list(ExplorationChange). List of ExplorationChange domain objects
         consisting of changes from from_version to to_version.
+
+    Raises:
+        Exception. If the value of from_version is greater than to_version.
     """
     if from_version > to_version:
         raise Exception(

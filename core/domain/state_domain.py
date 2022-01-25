@@ -166,6 +166,11 @@ class AnswerGroup:
 
         Returns:
             list(str). The list of all html content strings in the interaction.
+
+        Raises:
+            Exception. If the Rule spec is of invalid format.
+            Exception. If the Rule spec has no valid input variable
+                with html in it.
         """
         html_list = []
 
@@ -426,6 +431,9 @@ class Solution:
 
         Returns:
             dict. The converted Solution dict.
+
+        Raises:
+            Exception. If the solution_dict have invalid correct_answer type.
         """
         if interaction_id is None:
             return solution_dict
@@ -783,6 +791,9 @@ class InteractionInstance:
 
         Returns:
             list(str). The list of all html content strings in the interaction.
+
+        Raises:
+            Exception. If the solution_dict have invalid correct_answer type.
         """
         html_list = []
 
@@ -2171,6 +2182,11 @@ class RuleSpec:
 
         Returns:
             dict. The converted Rule Spec dict.
+
+        Raises:
+            Exception. If the Rule spec is of invalid format.
+            Exception. If the Rule spec has no valid input variable
+                with html in it.
         """
         # TODO(#9413): Find a way to include a reference to the interaction
         # type in the Draft change lists.
@@ -2774,6 +2790,12 @@ class State:
             new_ids_list: list(str). A list of content ids currently present
                 within the substructure (like answer groups, hints etc.) of
                 state.
+
+        Raises:
+            Exception. If the content_id not present in recorded_voiceovers
+                or written_translations and deleted.
+            Exception. If the content_id is present in recorded_voiceovers
+                or written_translations and added again.
         """
         content_ids_to_delete = set(old_ids_list) - set(new_ids_list)
         content_ids_to_add = set(new_ids_list) - set(old_ids_list)
@@ -2927,6 +2949,9 @@ class State:
 
         Args:
             customization_args_dict: dict. The new customization_args to set.
+
+        Raises:
+            Exception. Elements of customization_args_dict are not unique.
         """
         customization_args = (
             InteractionInstance.
@@ -2960,6 +2985,9 @@ class State:
         Args:
             answer_groups_list: list(AnswerGroup). List of AnswerGroup domain
                 objects.
+
+        Raises:
+            Exception. Type of AnswerGroup domain objects is not as expected.
         """
         if not isinstance(answer_groups_list, list):
             raise Exception(
@@ -3157,6 +3185,9 @@ class State:
         Args:
             solicit_answer_details: bool. The new value of
                 solicit_answer_details for the state.
+
+        Raises:
+            Exception. The 'solicit_answer_details' is not of type bool.
         """
         if not isinstance(solicit_answer_details, bool):
             raise Exception(
@@ -3170,6 +3201,9 @@ class State:
         Args:
             card_is_checkpoint: bool. The new value of
                 card_is_checkpoint for the state.
+
+        Raises:
+            Exception. The 'card_is_checkpoint' is not of type bool.
         """
         if not isinstance(card_is_checkpoint, bool):
             raise Exception(

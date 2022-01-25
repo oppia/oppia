@@ -2168,6 +2168,10 @@ def get_contributor_usernames(category, language_code=None):
 
     Returns:
         list(str). A list of usernames.
+
+    Raises:
+        Exception. The language_code is not of None type.
+        Exception. Invalid category.
     """
     user_ids = []
     if category == constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION:

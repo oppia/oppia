@@ -849,6 +849,9 @@ def regenerate_opportunities_related_to_topic(
 
     Returns:
         int. The number of opportunity models created.
+
+    Raises:
+        Exception. Failure to regenerate opportunities for topic_id.
     """
     if delete_existing_opportunities:
         exp_opportunity_models = (

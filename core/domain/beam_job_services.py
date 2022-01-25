@@ -51,6 +51,9 @@ def run_beam_job(
 
     Returns:
         BeamJobRun. Metadata about the run's execution.
+
+    Raises:
+        ValueError. If both job_name and job_class is not specified.
     """
     if job_class is None and job_name is None:
         raise ValueError('Must specify the job class or name to run')
@@ -73,6 +76,9 @@ def cancel_beam_job(job_id: str) -> beam_job_domain.BeamJobRun:
 
     Returns:
         BeamJobRun. Metadata about the updated run's execution.
+
+    Raises:
+        ValueError. If job_id does not exist.
     """
     beam_job_run_model = (
         beam_job_models.BeamJobRunModel.get(job_id, strict=False))

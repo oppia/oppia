@@ -114,6 +114,9 @@ def apply_change_list(story_id, change_list):
         Story, list(str), list(str). The resulting story domain object, the
         exploration IDs removed from story and the exploration IDs added to
         the story.
+
+    Raises:
+        Exception. The elements in change_list is not of domain object type.
     """
     story = story_fetchers.get_story_by_id(story_id)
     exp_ids_in_old_story = story.story_contents.get_all_linked_exp_ids()
@@ -333,6 +336,7 @@ def validate_explorations_for_story(exp_ids, strict):
             explorations before adding them to a story.
         ValidationError. All explorations in a story should be of the same
             category.
+        Exception. Exploration validation failed for exploration with exp_ids.
     """
     validation_error_messages = []
 
@@ -499,6 +503,10 @@ def is_story_published_and_present_in_topic(story):
 
     Returns:
         bool. Whether the supplied story is published.
+
+    Raises:
+        ValidationError. The story does not belong to any valid topic.
+        Exception. The story does not belong to the expected topic.
     """
     topic = topic_fetchers.get_topic_by_id(
         story.corresponding_topic_id, strict=False)
@@ -540,7 +548,9 @@ def update_story(
             story.
 
     Raises:
+        ValueError. Expected a commit message but received none.
         ValidationError. Exploration is already linked to a different story.
+        ValidationError. Story Url Fragment is not unique across the site.
     """
     if not commit_message:
         raise ValueError('Expected a commit message but received none.')

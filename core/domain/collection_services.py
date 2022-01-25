@@ -631,6 +631,9 @@ def apply_change_list(collection_id, change_list):
 
     Returns:
         Collection. The resulting collection domain object.
+
+    Raises:
+        Exception. The change_list is not applicable on given collection_id.
     """
     collection = get_collection_by_id(collection_id)
 
@@ -953,6 +956,9 @@ def update_collection(
         commit_message: str or None. A description of changes made to the
             collection. For published collections, this must be present; for
             unpublished collections, it may be equal to None.
+
+    Raises:
+        ValueError. Collection is public but no commit message recieved.
     """
     is_public = rights_manager.is_collection_public(collection_id)
 
@@ -1171,6 +1177,9 @@ def delete_demo(collection_id):
 
     Args:
         collection_id: str. ID of the demo collection to be deleted.
+
+    Raises:
+        Exception. Invalid collection_id.
     """
     if not collection_domain.Collection.is_demo_collection_id(collection_id):
         raise Exception('Invalid demo collection id %s' % collection_id)

@@ -1826,6 +1826,10 @@ def send_email_to_new_contribution_reviewer(
         review_category: str. The category in which user can review.
         language_code: None|str. The language code for a language if the review
             item is translation or voiceover else None.
+
+    Raises:
+        Exception. The review_category is not present in
+            NEW_REVIEWER_EMAIL_DATA.
     """
     if review_category not in NEW_REVIEWER_EMAIL_DATA:
         raise Exception('Invalid review_category: %s' % review_category)
@@ -1890,6 +1894,10 @@ def send_email_to_removed_contribution_reviewer(
             removed.
         language_code: None|str. The language code for a language if the review
             item is translation or voiceover else None.
+
+    Raises:
+        Exception. The review_category is not present in
+            REMOVED_REVIEWER_EMAIL_DATA.
     """
     if review_category not in REMOVED_REVIEWER_EMAIL_DATA:
         raise Exception('Invalid review_category: %s' % review_category)

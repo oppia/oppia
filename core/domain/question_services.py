@@ -247,6 +247,10 @@ def get_questions_by_skill_ids(
         skill is random when require_medium_difficulty is false, otherwise
         the order is sorted by absolute value of the difference between
         skill difficulty and the medium difficulty.
+
+    Raises:
+        Exception. The total_question_count is higher than
+            feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME.
     """
 
     if total_question_count > feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME:
@@ -536,6 +540,9 @@ def apply_change_list(question_id, change_list):
 
     Returns:
         Question. The resulting question domain object.
+
+    Raises:
+        Exception. The change_list is not applicable to the question_id.
     """
     question = get_question_by_id(question_id)
     question_property_inapplicable_skill_misconception_ids = (

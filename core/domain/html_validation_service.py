@@ -814,6 +814,9 @@ def add_math_content_to_math_rte_components(html_string):
     Returns:
         str. Updated HTML string with all Math component tags having the new
         attribute.
+
+    Raises:
+        Exception. Invalid raw_latex string found while parsing html_string.
     """
     soup = bs4.BeautifulSoup(html_string, 'html.parser')
     for math_tag in soup.findAll(name='oppia-noninteractive-math'):

@@ -275,6 +275,9 @@ class PlatformParameterFilter:
 
         Returns:
             bool. True if the filter is matched.
+
+        Raises:
+            Exception. The 'op' is not present in SUPPORTED_OP_FOR_FILTERS.
         """
         if op not in self.SUPPORTED_OP_FOR_FILTERS[self._type]:
             raise Exception(
@@ -790,6 +793,10 @@ class PlatformParameter:
         Returns:
             PlatformParameter. The corresponding PlatformParameter domain
             object.
+
+        Raises:
+            Exception. The given schema version not matches with
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION.
         """
         if (param_dict['rule_schema_version'] !=
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION):

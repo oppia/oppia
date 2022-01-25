@@ -68,6 +68,7 @@ class AuditsExisting:
                 targeted as well.
 
         Raises:
+            ValueError. No model_types given.
             TypeError. When a non-model type is provided.
         """
         if not model_types:

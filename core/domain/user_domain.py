@@ -1116,6 +1116,11 @@ class ModifiableUserData:
         Returns:
             ModifiableUserData. The domain object representing the user data
             dict transformed according to the latest schema version.
+
+        Raises:
+            Exception. No schema version specified.
+            Exception. Schema version is not of type int.
+            Exception. Schema version is not the CURRENT_SCHEMA_VERSION.
         """
         data_schema_version = raw_user_data_dict.get('schema_version')
 
