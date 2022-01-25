@@ -13,7 +13,9 @@
       <div class="title-section" [ngStyle]="{'background-color': getThumbnailBgColor}">
         <img class="collection-corner-image" [src]="getStaticImageUrl('/general/collection_corner.svg')" alt="">
         <img class="thumbnail-image" [src]="getCompleteThumbnailIconUrl()" alt="{{ getCategory }}">
-        <h3 class="activity-title protractor-test-collection-summary-tile-title">{{ getCollectionTitle || defaultEmptyTitle }}</h3>
+        <h3 class="activity-title protractor-test-collection-summary-tile-title">
+          {{ getCollectionTitle || defaultEmptyTitle }}
+        </h3>
       </div>
 
       <div [ngStyle]="isPlaylistTile && {'float': 'right', 'width': '67%', 'margin-top': '3%'}">
@@ -24,7 +26,7 @@
         <ul class="metrics layout-align-space-between-center layout-row">
           <li>
             <span>
-              COLLECTION ({{ getNodeCount }})
+              {{ 'I18N_COMMUNITY_LIBRARY_PAGE_COLLECTION' | translate }} ({{ getNodeCount }})
             </span>
           </li>
           <li>

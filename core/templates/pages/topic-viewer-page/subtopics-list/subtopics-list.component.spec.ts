@@ -13,82 +13,69 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for storiesList.
+ * @fileoverview Unit tests for subtopicsList.
  */
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { SubtopicSummaryTileComponent } from 'components/summary-tile/subtopic-summary-tile.component';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { StoriesListComponent } from './topic-viewer-stories-list.component';
+import { SubtopicsListComponent } from './subtopics-list.component';
 
-describe('Topic Viewer Stories List Component', () => {
-  let component: StoriesListComponent;
-  let fixture: ComponentFixture<StoriesListComponent>;
+describe('Subtopics List Component', () => {
+  let component: SubtopicsListComponent;
+  let fixture: ComponentFixture<SubtopicsListComponent>;
   let i18nLanguageCodeService: I18nLanguageCodeService;
-  let windowDimensionsService: WindowDimensionsService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
-        StoriesListComponent,
-        MockTranslatePipe
+        MockTranslatePipe,
+        SubtopicsListComponent,
+        SubtopicSummaryTileComponent
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
-    fixture = TestBed.createComponent(StoriesListComponent);
+    fixture = TestBed.createComponent(SubtopicsListComponent);
     component = fixture.componentInstance;
-    component.canonicalStorySummaries = [];
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+    component.subtopicsList = [];
     component.classroomUrlFragment = 'classroom';
     component.topicUrlFragment = 'topic';
     component.topicName = 'Topic Name';
-    component.topicDescription = 'Topic Description';
     component.topicId = 'topicId';
-    windowDimensionsService = TestBed.inject(WindowDimensionsService);
+  });
+
+  it('should create', () => {
+    expect(component).toBeDefined();
   });
 
   it('should initialize properties after successfully', () => {
     spyOn(i18nLanguageCodeService, 'getTopicTranslationKey')
-      .and.returnValues(
-        'I18N_TOPIC_123abcd_TITLE', 'I18N_TOPIC_123abcd_DESCRIPTION');
-    expect(component).toBeDefined();
+      .and.returnValue('I18N_TOPIC_123abcd_TITLE');
 
     component.ngOnInit();
 
     expect(component.topicNameTranslationKey).toBe(
       'I18N_TOPIC_123abcd_TITLE');
-    expect(component.topicDescTranslationKey).toBe(
-      'I18N_TOPIC_123abcd_DESCRIPTION');
   });
 
   it('should check if topic name, desc translation is displayed correctly',
     () => {
       spyOn(i18nLanguageCodeService, 'getTopicTranslationKey')
-        .and.returnValues(
-          'I18N_TOPIC_123abcd_TITLE', 'I18N_TOPIC_123abcd_DESCRIPTION');
+        .and.returnValue('I18N_TOPIC_123abcd_TITLE');
       spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
-        .and.returnValues(true, true);
+        .and.returnValue(true);
       spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
-        .and.returnValues(false, false);
+        .and.returnValue(false);
 
       component.ngOnInit();
 
       expect(component.isHackyTopicNameTranslationDisplayed()).toBe(true);
-      expect(component.isHackyTopicDescTranslationDisplayed()).toBe(true);
     }
   );
-
-  it('should check if the view is tablet or not', () => {
-    var widthSpy = spyOn(windowDimensionsService, 'getWidth');
-    widthSpy.and.returnValue(730);
-    expect(component.checkTabletView()).toBe(true);
-
-    widthSpy.and.returnValue(800);
-    expect(component.checkTabletView()).toBe(false);
-  });
 });

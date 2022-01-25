@@ -30,6 +30,7 @@ import { PageTitleService } from 'services/page-title.service';
 import { AlertsService } from 'services/alerts.service';
 import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
 import { ReadOnlyStoryNode } from 'domain/story_viewer/read-only-story-node.model';
+import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
 
 interface IconParametersArray {
   thumbnailIconUrl: string;
@@ -51,12 +52,16 @@ export class StoryViewerPageComponent implements OnInit {
   classroomUrlFragment: string;
   storyUrlFragment: string;
   storyTitle: string;
+  storyTitleTranslationKey: string;
   storyDescription: string;
+  storyDescTranslationKey: string;
   pathIconParameters: IconParametersArray[];
   topicName: string;
   thumbnailFilename: string;
   thumbnailBgColor: string;
   storyNodes: ReadOnlyStoryNode[];
+  storyNodesTitleTranslationKeys: string[] = [];
+  storyNodesDescTranslationKeys: string[] = [];
   iconUrl: string;
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -67,7 +72,8 @@ export class StoryViewerPageComponent implements OnInit {
     private loaderService: LoaderService,
     private storyViewerBackendApiService: StoryViewerBackendApiService,
     private pageTitleService: PageTitleService,
-    private alertsService: AlertsService
+    private alertsService: AlertsService,
+    private i18nLanguageCodeService: I18nLanguageCodeService
   ) {}
 
   getStaticImageUrl(imagePath: string): string {
@@ -160,10 +166,36 @@ export class StoryViewerPageComponent implements OnInit {
         this.pageTitleService.updateMetaTag(
           storyDataDict.getMetaTagContent());
         this.storyTitle = storyDataDict.title;
+        this.storyTitleTranslationKey = (
+          this.i18nLanguageCodeService
+            .getStoryTranslationKey(
+              this.storyId, TranslationKeyType.TITLE)
+        );
         this.storyDescription = storyDataDict.description;
-
+        this.storyDescTranslationKey = (
+          this.i18nLanguageCodeService
+            .getStoryTranslationKey(
+              this.storyId, TranslationKeyType.DESCRIPTION)
+        );
         this.loaderService.hideLoadingScreen();
         this.pathIconParameters = this.generatePathIconParameters();
+        for (let idx in this.storyNodes) {
+          let storyNode: ReadOnlyStoryNode = this.storyNodes[idx];
+          let storyNodeTitleTranslationKey = (
+            this.i18nLanguageCodeService.
+              getExplorationTranslationKey(
+                storyNode.getExplorationId(), TranslationKeyType.TITLE)
+          );
+          let storyNodeDescTranslationKey = (
+            this.i18nLanguageCodeService.
+              getExplorationTranslationKey(
+                storyNode.getExplorationId(), TranslationKeyType.DESCRIPTION)
+          );
+          this.storyNodesTitleTranslationKeys.push(
+            storyNodeTitleTranslationKey);
+          this.storyNodesDescTranslationKeys.push(
+            storyNodeDescTranslationKey);
+        }
       },
       (errorResponse) => {
         let errorCodes = AppConstants.FATAL_ERROR_CODES;
@@ -177,6 +209,38 @@ export class StoryViewerPageComponent implements OnInit {
     // background color and icon url for the icons generated on the
     // path.
     this.pathIconParameters = [];
+  }
+
+  isHackyStoryTitleTranslationDisplayed(): boolean {
+    return (
+      this.i18nLanguageCodeService.isHackyTranslationAvailable(
+        this.storyTitleTranslationKey
+      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    );
+  }
+
+  isHackyStoryDescTranslationDisplayed(): boolean {
+    return (
+      this.i18nLanguageCodeService.isHackyTranslationAvailable(
+        this.storyDescTranslationKey
+      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    );
+  }
+
+  isHackyStoryNodeTitleTranslationDisplayed(index: number): boolean {
+    return (
+      this.i18nLanguageCodeService.isHackyTranslationAvailable(
+        this.storyNodesTitleTranslationKeys[index]
+      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    );
+  }
+
+  isHackyStoryNodeDescTranslationDisplayed(index: number): boolean {
+    return (
+      this.i18nLanguageCodeService.isHackyTranslationAvailable(
+        this.storyNodesDescTranslationKeys[index]
+      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    );
   }
 }
 

@@ -24,6 +24,7 @@ import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { AppConstants } from 'app.constants';
 import { Subtopic } from 'domain/topic/subtopic.model';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'oppia-subtopic-summary-tile',
@@ -39,12 +40,14 @@ export class SubtopicSummaryTileComponent implements OnInit {
   @Input() topicUrlFragment!: string;
   thumbnailUrl!: string;
   thumbnailBgColor!: string;
-  subtopicTitle !: string;
+  subtopicTitle!: string;
+  subtopicTitleTranslationKey!: string;
 
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
-    private windowRef: WindowRef
+    private windowRef: WindowRef,
+    private i18nLanguageCodeService: I18nLanguageCodeService
   ) {}
 
   openSubtopicPage(): void {
@@ -75,6 +78,18 @@ export class SubtopicSummaryTileComponent implements OnInit {
     } else {
       this.thumbnailUrl = null;
     }
+    this.subtopicTitleTranslationKey = this.i18nLanguageCodeService.
+      getSubtopicTranslationKey(
+        this.topicId, this.subtopic.getUrlFragment(),
+        TranslationKeyType.TITLE);
+  }
+
+  isHackySubtopicTitleTranslationDisplayed(): boolean {
+    return (
+      this.i18nLanguageCodeService.isHackyTranslationAvailable(
+        this.subtopicTitleTranslationKey
+      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    );
   }
 }
 

@@ -14,8 +14,14 @@
       <div class="title-section protractor-test-exp-hover" [ngStyle]="{'background-color': thumbnailBgColor}">
         <img class="thumbnail-image" [src]="thumbnailIcon" alt="{{ category }}">
         <h3 class="activity-title protractor-test-exp-summary-tile-title">
-          <span *ngIf="isWindowLarge">{{ explorationTitle | truncate:40 }}</span>
-          <span *ngIf="!isWindowLarge">{{ explorationTitle | truncate:40 }}</span>
+          <span *ngIf="isWindowLarge">
+            <span *ngIf="!isHackyExpTitleTranslationDisplayed()">{{ explorationTitle | truncate:40 }}</span>
+            <span *ngIf="isHackyExpTitleTranslationDisplayed()">{{ expTitleTranslationKey | translate | truncate:40 }}</span>
+          </span>
+          <span *ngIf="!isWindowLarge">
+            <span *ngIf="!isHackyExpTitleTranslationDisplayed()">{{ explorationTitle | truncate:40 }}</span>
+            <span *ngIf="isHackyExpTitleTranslationDisplayed()">{{ expTitleTranslationKey | translate | truncate:40 }}</span>
+          </span>
         </h3>
       </div>
       <div *ngIf="!isPlaylistTile" class="title-section-mask"
@@ -23,7 +29,9 @@
       </div>
       <div class="summary-section"
            section="{isWindowLarge?undefined:'right-section'}">
-        <div *ngIf="isWindowLarge" class="objective protractor-test-exp-summary-tile-objective" [innerHTML]="objective | truncateAndCapitalize:95">
+        <div *ngIf="isWindowLarge" class="objective protractor-test-exp-summary-tile-objective">
+          <span *ngIf="!isHackyExpObjectiveTranslationDisplayed()">{{ objective | truncateAndCapitalize:95 }}</span>
+          <span *ngIf="isHackyExpObjectiveTranslationDisplayed()">{{ expObjectiveTranslationKey | translate | truncateAndCapitalize:95 }}</span>
         </div>
         <div *ngIf="!objective" class="objective">
           <span [innerHTML]="'I18N_LIBRARY_NO_OBJECTIVE' | translate">
@@ -82,7 +90,8 @@
       </div>
       <div class="mobile-activity-card-details">
         <h3 class="mobile-exploration-title protractor-test-exp-summary-tile-title">
-          <span>{{ explorationTitle | truncate:40 }}</span>
+          <span *ngIf="!isHackyExpTitleTranslationDisplayed()">{{ explorationTitle | truncate:40 }}</span>
+          <span *ngIf="isHackyExpTitleTranslationDisplayed()">{{ expTitleTranslationKey | translate | truncate:40 }}</span>
         </h3>
         <div class="mobile-activity-card-summary-section">
           <ul *ngIf="!isCollectionPreviewTile" class="mobile-activity-card-summary-elements">

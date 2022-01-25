@@ -9,7 +9,12 @@
          [ngStyle]="{background: thumbnailBgColor}">
   </div>
   <div class="subtopic-title">
-    {{ subtopicTitle }}
+    <span *ngIf="!isHackySubtopicTitleTranslationDisplayed()">
+      {{ subtopicTitle }}
+    </span>
+    <span *ngIf="isHackySubtopicTitleTranslationDisplayed()">
+      {{ subtopicTitleTranslationKey | translate  }}
+    </span>
   </div>
 </div>
 <style>

@@ -2,7 +2,12 @@
 <div class="oppia-subtopic-viewer-container">
   <div class="oppia-subtopic-viewer-container-card">
     <div class="oppia-subtopic-title">
-      {{ subtopicTitle }}
+      <span *ngIf="!isHackySubtopicTitleTranslationDisplayed()">
+        {{ subtopicTitle }}
+      </span>
+      <span *ngIf="isHackySubtopicTitleTranslationDisplayed()">
+        {{ subtopicTitleTranslationKey | translate }}
+      </span>
     </div>
     <div class="oppia-page-contents-viewer">
       <div>
