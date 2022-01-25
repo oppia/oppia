@@ -118,7 +118,6 @@ export class RubricsEditorComponent {
         totalExplanations += this.editableExplanations[difficulty].length;
       }
     }
-    
     return totalExplanations >= this.maximumNumberofExplanations;
   }
 
