@@ -16,25 +16,39 @@
  * @fileoverview Component for the DragAndDropSortInput short response.
  */
 
-require('services/html-escaper.service.ts');
+import { Component, Input, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { HtmlEscaperService } from 'services/html-escaper.service';
+import { DragAndDropAnswer } from 'interactions/answer-defs';
 
-angular.module('oppia').component('oppiaShortResponseDragAndDropSortInput', {
-  template: require(
-    './drag-and-drop-sort-input-short-response.component.html'),
-  controllerAs: '$ctrl',
-  controller: ['$attrs', 'HtmlEscaperService',
-    function($attrs, HtmlEscaperService) {
-      var ctrl = this;
-      ctrl.chooseItemType = (index) => {
-        return (
-          index === 0 ?
-          'drag-and-drop-response-item' :
-          'drag-and-drop-response-subitem'
-        );
-      };
-      ctrl.$onInit = function() {
-        ctrl.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        ctrl.isAnswerLengthGreaterThanZero = ctrl.answer.length > 0;
-      };
-    }]
-});
+@Component({
+  selector: 'oppia-short-response-drag-and-drop-sort-input',
+  templateUrl: './drag-and-drop-sort-input-short-response.component.html',
+  styleUrls: []
+})
+export class ShortResponseDragAndDropSortInputComponent implements OnInit {
+  @Input() answer!: string;
+  isAnswerLengthGreaterThanZero: boolean;
+  responseLists: DragAndDropAnswer;
+
+  constructor(private htmlEscaperService: HtmlEscaperService) {}
+
+  ngOnInit(): void {
+    this.responseLists = this.htmlEscaperService.escapedJsonToObj(
+      this.answer) as DragAndDropAnswer;
+    this.isAnswerLengthGreaterThanZero = this.responseLists.length > 0;
+  }
+
+  chooseItemType(index: number): string {
+    return (
+      index === 0 ?
+      'drag-and-drop-response-item' :
+      'drag-and-drop-response-subitem'
+    );
+  }
+}
+
+angular.module('oppia').directive(
+  'oppiaShortResponseDragAndDropSortInput', downgradeComponent({
+    component: ShortResponseDragAndDropSortInputComponent
+  }) as angular.IDirectiveFactory);

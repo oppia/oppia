@@ -23,6 +23,7 @@ import { NgModule } from '@angular/core';
 
 import { AlgebraicExpressionInputExtensionsModule } from './AlgebraicExpressionInput/algebraic-expression-input-interactions.module';
 import { ContinueExtensionsModule } from './Continue/continue-interactions.module';
+import { DragAndDropSortInputInteractionModule } from './DragAndDropSortInput/drag-and-drop-sort-input-interactions.module';
 import { FractionInputInteractionModule } from './FractionInput/fraction-input-interactions.module';
 import { GraphInputInteractionModule } from './GraphInput/graph-input-interactions.module';
 import { ImageClickInputInteractionModule } from './ImageClickInput/image-click-input-interactions.module';
@@ -43,6 +44,7 @@ import { PencilCodeEditorModule } from './PencilCodeEditor/pencil-code-editor-in
     AlgebraicExpressionInputExtensionsModule,
     CodeReplInteractionModule,
     ContinueExtensionsModule,
+    DragAndDropSortInputInteractionModule,
     FractionInputInteractionModule,
     GraphInputInteractionModule,
     ImageClickInputInteractionModule,
@@ -62,6 +64,7 @@ import { PencilCodeEditorModule } from './PencilCodeEditor/pencil-code-editor-in
     AlgebraicExpressionInputExtensionsModule,
     CodeReplInteractionModule,
     ContinueExtensionsModule,
+    DragAndDropSortInputInteractionModule,
     FractionInputInteractionModule,
     GraphInputInteractionModule,
     ImageClickInputInteractionModule,
