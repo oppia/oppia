@@ -531,7 +531,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v27_to_v28(self):
-
         question_data = (
             question_domain.Question.create_default_question_state().to_dict())
 
@@ -558,7 +557,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             test_value['state']['recorded_voiceovers'], test_data)
 
     def test_question_state_dict_conversion_from_v28_to_v29(self):
-
         question_data = (
             question_domain.Question.create_default_question_state().to_dict())
 
@@ -581,7 +579,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             test_value['state']['solicit_answer_details'], False)
 
     def test_question_state_dict_conversion_from_v29_to_v30(self):
-
         question_data = (
             question_domain.Question.create_default_question_state().to_dict())
 
@@ -613,14 +610,10 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             'tagged_skill_misconception_id',
             test_value['state']['interaction']['answer_groups'][0]
         )
-        self.assertEqual(
-            test_value['state']['interaction']['answer_groups'][0][
-                'tagged_skill_misconception_id'],
-            None
-        )
+        self.assertIsNone(test_value['state']['interaction'][
+            'answer_groups'][0]['tagged_skill_misconception_id'])
 
     def test_question_state_dict_conversion_from_v30_to_v31(self):
-
         question_data = (
             question_domain.Question.create_default_question_state().to_dict())
 
@@ -657,7 +650,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v31_to_v32(self):
-
         question_data = (
             question_domain.Question.create_default_question_state().to_dict())
 
@@ -685,7 +677,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v32_to_v33(self):
-
         question_data = (
             question_domain.Question.create_default_question_state().to_dict())
 
@@ -713,7 +704,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v33_to_v34(self):
-
         question_data = (
             question_domain.Question.create_default_question_state().to_dict())
 
@@ -747,7 +737,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v34_to_v35(self):
-
         question_data = (
             question_domain.Question.create_default_question_state().to_dict())
 
@@ -973,7 +962,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v35_to_v36(self):
-
         question_data = (
             question_domain.Question.create_default_question_state().to_dict())
 
@@ -1208,7 +1196,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v36_to_v37(self):
-
         question_data = (
             question_domain.Question.create_default_question_state().to_dict())
 
@@ -1235,7 +1222,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v37_to_v38(self):
-
         question_data = (
             question_domain.Question.create_default_question_state().to_dict())
 
@@ -1268,7 +1254,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v38_to_v39(self):
-
         question_data = (
             question_domain.Question.create_default_question_state().to_dict())
 
@@ -1308,7 +1293,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v39_to_v40(self):
-
         question_data = (
             question_domain.Question.create_default_question_state().to_dict())
 
@@ -1341,7 +1325,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v40_to_v41(self):
-
         question_data = (
             question_domain.Question.create_default_question_state().to_dict())
 
@@ -1423,7 +1406,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v41_to_v42(self):
-
         question_data = (
             question_domain.Question.create_default_question_state().to_dict())
 
@@ -1577,7 +1559,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v42_to_v43(self):
-
         question_data = (
             question_domain.Question.create_default_question_state().to_dict())
 
@@ -1607,7 +1588,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v43_to_v44(self):
-
         question_data = (
             question_domain.Question.create_default_question_state().to_dict())
         del question_data['card_is_checkpoint']
@@ -1626,7 +1606,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self.assertEqual(test_value['state']['card_is_checkpoint'], False)
 
     def test_question_state_dict_conversion_from_v44_to_v45(self):
-
         question_data = (
             question_domain.Question.create_default_question_state().to_dict())
         del question_data['linked_skill_id']
@@ -1645,7 +1624,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self.assertIsNone(test_value['state']['linked_skill_id'])
 
     def test_question_state_dict_conversion_from_v45_to_v46(self):
-
         question_data = (
             question_domain.Question.create_default_question_state().to_dict())
 
@@ -1663,7 +1641,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self.assertEqual(test_value['state'], initial_json)
 
     def test_question_state_dict_conversion_from_v46_to_v47(self):
-
         question_data = (
             question_domain.Question.create_default_question_state().to_dict())
 
@@ -1691,7 +1668,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v47_to_v48(self):
-
         question_data = (
             question_domain.Question.create_default_question_state().to_dict())
 
@@ -1709,7 +1685,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self.assertEqual(test_value['state']['content']['html'], ' ')
 
     def test_question_state_dict_conversion_from_v48_to_v49(self):
-
         question_data = (
             question_domain.Question.create_default_question_state().to_dict())
 
