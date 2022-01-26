@@ -61,7 +61,7 @@ import cloneDeep from 'lodash/cloneDeep';
 interface CustomizationArgSpecsInterface {
   name: string;
   value: unknown;
-  'default_value': unknown;
+  default_value: unknown;
 }
 
 const INTERACTION_SERVICE_MAPPING = {
