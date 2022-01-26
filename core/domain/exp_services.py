@@ -1043,7 +1043,7 @@ def validate_exploration_for_story(exp, strict):
 
     if exp.param_specs or exp.param_changes:
         error_string = (
-            'Expected no exploration to have parameter '
+            'Expected no exploration in a story to have parameter '
             'values in it. Invalid exploration: %s' % exp.id)
         if strict:
             raise utils.ValidationError(error_string)
@@ -1051,7 +1051,8 @@ def validate_exploration_for_story(exp, strict):
 
     if not exp.correctness_feedback_enabled:
         error_string = (
-            'Expected all explorations to have correctness feedback '
+            'Expected all explorations in a story to '
+            'have correctness feedback '
             'enabled. Invalid exploration: %s' % exp.id)
         if strict:
             raise utils.ValidationError(error_string)
@@ -1062,7 +1063,8 @@ def validate_exploration_for_story(exp, strict):
         if not state.interaction.is_supported_on_android_app():
             error_string = (
                 'Invalid interaction %s in exploration '
-                'with ID: %s.' % (state.interaction.id, exp.id))
+                'with ID: %s. This interaction is not supported on '
+                'the mobile app.' % (state.interaction.id, exp.id))
             if strict:
                 raise utils.ValidationError(error_string)
             validation_error_messages.append(error_string)
