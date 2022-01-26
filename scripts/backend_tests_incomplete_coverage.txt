@@ -33,7 +33,6 @@ core.controllers.blog_homepage_test
 core.utils_test
 scripts.install_backend_python_libs_test
 core.domain.subtopic_page_domain_test
-core.domain.event_services_test
 core.domain.user_services_test
 core.storage.skill.gae_models_test
 core.storage.topic.gae_models_test
