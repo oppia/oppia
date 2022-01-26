@@ -29,7 +29,6 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
 import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
 import { LoaderService } from 'services/loader.service';
 import { PageTitleService } from 'services/page-title.service';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'oppia-subtopic-viewer-page',
@@ -56,8 +55,7 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
     private pageTitleService: PageTitleService,
     private subtopicViewerBackendApiService: SubtopicViewerBackendApiService,
     private urlService: UrlService,
-    private windowDimensionsService: WindowDimensionsService,
-    private i18nLanguageCodeService: I18nLanguageCodeService
+    private windowDimensionsService: WindowDimensionsService
   ) {}
 
   checkMobileView(): boolean {
