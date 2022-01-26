@@ -38,6 +38,7 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
   @Input() showChoicesInShuffledOrderWithValue: string;
   choices;
   answer;
+  questionIsOnceAnswered: boolean = false;
 
   constructor(
     private browserCheckerService: BrowserCheckerService,
@@ -89,14 +90,45 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
       }
       return choices;
     };
-    // If choices need to be shuffled, shuffle them, otherwise order the
+    // If choices need to be shuffled, shuffle them, if question is answered
+    // once before, get the previous order of choices, otherwise order the
     // choices based on their original index.
-    this.choices = (
-      showChoicesInShuffledOrder.value ? shuffleChoices(choicesWithIndex) :
-      choicesWithIndex.sort((c1, c2) => c1.originalIndex - c2.originalIndex));
+    this.questionIsOnceAnswered = this.isQuestionOnceAnswered();
+    if(this.questionIsOnceAnswered){
+      this.choices = this.getPreviousOrderOfChoices();
+    }else {
+      this.choices = (
+        showChoicesInShuffledOrder.value ? shuffleChoices(choicesWithIndex) :
+        choicesWithIndex.sort((c1, c2) => c1.originalIndex - c2.originalIndex)
+      );
+    }   
     this.answer = null;
     this.currentInteractionService.registerCurrentInteraction(
       () => this.submitAnswer(), () => this.validityCheckFn());
+  }
+
+  isQuestionOnceAnswered(): boolean {
+    // Check if choice-order attribute is present in question
+    // element which indicates that the question has been answered
+    // once previously
+    let questionElement = document.querySelector(
+      '.oppia-rte-viewer.oppia-learner-view-card-top-content');
+    if(questionElement){
+      if(questionElement.getAttribute('choice-order')){
+        return true;
+      }
+    }
+    return false;
+  }
+
+  getPreviousOrderOfChoices(): string {
+    // Get stored choices order from question element to
+    // prevent shuffling of choices
+    let questionElement = document.querySelector(
+      '.oppia-rte-viewer.oppia-learner-view-card-top-content');
+    let choices = questionElement.getAttribute('choice-order');
+    const choicesInOrder = JSON.parse(choices);
+    return choicesInOrder;
   }
 
   selectAnswer(event: MouseEvent, answer: string): void {
@@ -114,6 +146,14 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
     // Selected current option.
     (event.currentTarget as HTMLDivElement).classList.add('selected');
     this.answer = parseInt(answer, 10);
+    // Store current choice order in question element to
+    // prevent shuffling of choices
+    let questionElement = document.querySelector(
+      '.oppia-rte-viewer.oppia-learner-view-card-top-content');
+    if(questionElement){
+      questionElement.setAttribute(
+        'choice-order', JSON.stringify(this.choices));
+    }
     if (!this.browserCheckerService.isMobileDevice()) {
       this.submitAnswer();
     }

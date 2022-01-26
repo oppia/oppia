@@ -133,6 +133,7 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
     spyOn(currentInteractionService, 'registerCurrentInteraction')
       .and.callThrough();
     component.showChoicesInShuffledOrderWithValue = 'true';
+    spyOn(component, 'isQuestionOnceAnswered').and.returnValue(false);
 
     component.ngOnInit();
 
@@ -163,7 +164,9 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
             return;
           }
         }
-      });
+      })
+      .withArgs('.oppia-rte-viewer.oppia-learner-view-card-top-content')
+        .and.returnValue(null);      
     spyOnProperty(dummyMouseEvent, 'currentTarget').and.returnValue(
       {
         classList: {
@@ -252,5 +255,38 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
     component.submitAnswer();
 
     expect(currentInteractionService.onSubmit).not.toHaveBeenCalled();
+  });
+
+  it('should get previous order of choices if re-answered', () => {
+    // Create the question element to mock the question element needed
+    // for this test as this element exists outside the scope of the
+    // MCQ component and we will not be able to find this in the test
+    // of MCQ component otherwise.
+    let questionElement = document.createElement('div');
+    questionElement.className =
+      'oppia-rte-viewer oppia-learner-view-card-top-content';
+    questionElement.innerHTML = '<p>Question</p>';
+    document.body.appendChild(questionElement);
+
+    spyOn(document, 'querySelector')
+      .withArgs('.oppia-rte-viewer.oppia-learner-view-card-top-content')
+        .and.returnValue(questionElement);
+
+    let encodedChoices = JSON.stringify(component.choicesWithValue);
+    spyOn(browserCheckerService, 'isMobileDevice').and.returnValue(true);
+    spyOn(questionElement, 'getAttribute')
+      .withArgs('choice-order').and.returnValues(
+        null, encodedChoices, encodedChoices);
+
+    let questionIsOnceAnswered = component.isQuestionOnceAnswered();
+    expect(questionIsOnceAnswered).toBe(false);
+
+    component.answer = 1;
+    component.submitAnswer();
+    component.ngOnInit();
+
+    let previousChoicesInOrder = JSON.parse(encodedChoices);
+    expect(component.questionIsOnceAnswered).toBe(true);
+    expect(component.choices).toEqual(previousChoicesInOrder);
   });
 });
