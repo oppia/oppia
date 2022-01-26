@@ -196,7 +196,7 @@ describe('ThumbnailUploaderComponent', () => {
 
     expect(component.tempImageName).toBe(undefined);
     expect(component.uploadedImage).toBe(undefined);
-    expect(component.thumbnailIsLoading).toBe(false);
+    expect(component.thumbnailIsLoading).toBe(true);
 
     component.showEditThumbnailModal();
     tick();
@@ -316,7 +316,7 @@ describe('ThumbnailUploaderComponent', () => {
       EditThumbnailModalComponent,
       {backdrop: 'static'}
     );
-    expect(component.thumbnailIsLoading).toBe(true);
+    expect(component.thumbnailIsLoading).toBe(false);
     expect(imageLocalStorageService.saveImage).toHaveBeenCalledWith(
       'image_file_name.svg', 'data:image/png;base64,xyz');
     expect(imageLocalStorageService.setThumbnailBgColor).toHaveBeenCalledWith(
