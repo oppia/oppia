@@ -1036,7 +1036,8 @@ def validate_exploration_for_story(exp, strict):
             android_validation_constants.SUPPORTED_LANGUAGES):
         error_string = (
             'Invalid language %s found for exploration '
-            'with ID %s.' % (exp.language_code, exp.id))
+            'with ID %s. This language is not supported for explorations '
+            'in a story on the mobile app.' % (exp.language_code, exp.id))
         if strict:
             raise utils.ValidationError(error_string)
         validation_error_messages.append(error_string)
@@ -1063,8 +1064,9 @@ def validate_exploration_for_story(exp, strict):
         if not state.interaction.is_supported_on_android_app():
             error_string = (
                 'Invalid interaction %s in exploration '
-                'with ID: %s. This interaction is not supported on '
-                'the mobile app.' % (state.interaction.id, exp.id))
+                'with ID: %s. This interaction is not supported for '
+                'explorations in a story on the '
+                'mobile app.' % (state.interaction.id, exp.id))
             if strict:
                 raise utils.ValidationError(error_string)
             validation_error_messages.append(error_string)
@@ -1072,8 +1074,8 @@ def validate_exploration_for_story(exp, strict):
         if not state.is_rte_content_supported_on_android():
             error_string = (
                 'RTE content in state %s of exploration '
-                'with ID %s is not supported on mobile.'
-                % (state_name, exp.id))
+                'with ID %s is not supported on mobile for explorations '
+                'in a story.' % (state_name, exp.id))
             if strict:
                 raise utils.ValidationError(error_string)
             validation_error_messages.append(error_string)
@@ -1084,9 +1086,10 @@ def validate_exploration_for_story(exp, strict):
                     'recommendedExplorationIds'].value)
             if len(recommended_exploration_ids) != 0:
                 error_string = (
-                    'Exploration with ID: %s contains exploration '
-                    'recommendations in its EndExploration interaction.'
-                    % (exp.id))
+                    'Explorations in a story are not expected to contain '
+                    'exploration recommendations. Exploration with ID: '
+                    '%s contains exploration recommendations in its '
+                    'EndExploration interaction.' % (exp.id))
                 if strict:
                     raise utils.ValidationError(error_string)
                 validation_error_messages.append(error_string)
