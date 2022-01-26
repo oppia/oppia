@@ -185,7 +185,7 @@ class JsTsLintChecksManager:
             and ts files after validating and parsing the files.
 
         Raises:
-            Exception. filepath ends with '.js'.
+            Exception. The filepath ends with '.js'.
         """
 
         # Select JS files which need to be checked.
