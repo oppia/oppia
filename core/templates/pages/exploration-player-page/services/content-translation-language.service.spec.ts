@@ -97,6 +97,13 @@ describe('Content translation language service', () => {
 
   it('should get the decimal separator of the current language', ()=>{
     ctls.setCurrentContentLanguageCode('en');
+    expect(ctls.isContentLanguageRTL()).toEqual(false);
+    ctls.setCurrentContentLanguageCode('ar');
+    expect(ctls.isContentLanguageRTL()).toEqual(true);
+  });
+
+  it('should get the decimal separator of the current language', ()=>{
+    ctls.setCurrentContentLanguageCode('en');
     expect(ctls.currentDecimalSeparator()).toEqual('.');
     ctls.setCurrentContentLanguageCode('es');
     expect(ctls.currentDecimalSeparator()).toEqual(',');
@@ -121,12 +128,15 @@ describe('Content translation language service', () => {
     let number1 = '-1.22';
     let number2 = '1,5';
     let number3 = '1٫31e1';
-
-    spyOn(ctls, 'currentDecimalSeparator').and.returnValues('.', ',', '٫');
+    let number4 = 'abc';
+    let number5 ='e';
+    spyOn(ctls, 'currentDecimalSeparator').and.returnValues('.', ',', '٫', '.', ',');
 
     expect(ctls.convertToEnglishDecimal(number1)).toEqual(-1.22);
     expect(ctls.convertToEnglishDecimal(number2)).toEqual(1.5);
     expect(ctls.convertToEnglishDecimal(number3)).toEqual(13.1);
+    expect(ctls.convertToEnglishDecimal(number4)).toEqual(null);
+    expect(ctls.convertToEnglishDecimal(number5)).toEqual(null);
   });
 
   it('should convert a number to the local format', ()=>{

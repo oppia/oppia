@@ -335,6 +335,24 @@ describe('NumericInputValidationService', () => {
       }]);
     });
 
+  it('should generate errors for string representation of the input', ()=>{
+    expect(validatorService.getError('12.', '.')).toEqual(
+      'Trailing decimals are not allowed.'
+    );
+    expect(validatorService.getError('12.22.1', '.')).toEqual(
+      'At most 1 decimal point should be present.'
+    );
+    expect(validatorService.getError('12-', '.')).toEqual(
+      'Minus (-) sign is only allowed in beginning.'
+    );
+    expect(validatorService.getError('--12', '.')).toEqual(
+      'At most 1 minus (-) sign should be present.'
+    );
+    expect(validatorService.getError('12e12e', '.')).toEqual(
+      'At most 1 exponent sign (e) should be present.'
+    );
+  });
+
   it('should generate errors in the given input', () => {
     expect(validatorService.getErrorString(1200000000E+27, false)).toEqual(
       'The answer can contain at most 15 digits (0-9) or symbols (. or -).');
@@ -352,7 +370,8 @@ describe('NumericInputValidationService', () => {
     expect(validatorService.getErrorString(99999999999999, true)).toEqual(
       undefined);
     expect(validatorService.getErrorString(9999999999999999, true)).toEqual(
-      'The answer should be greater than or equal to zero and can contain' +
-      ' at most 15 digits (0-9) or symbols(.).');
+      'The answer can contain at most 15 digits (0-9) or symbols (. or -).');
+    expect(validatorService.getErrorString(-9, true)).toEqual(
+      'The answer must be greater than or equal to zero');
   });
 });

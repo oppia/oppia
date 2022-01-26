@@ -139,8 +139,6 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
 
                 // Generate errors (if any).
                 ctrl.generateErrors();
-
-                // Oppia short response.
               }
             }
           };

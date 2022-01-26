@@ -109,12 +109,6 @@ export class I18nLanguageCodeService {
 
     // Get the valid part of input.
     let numberMatch = number.match(validRegex);
-
-    // If a valid match cannot be found, return null.
-    if (numberMatch === null) {
-      return null;
-    }
-
     number = numberMatch[0];
 
     let numString = number.replace(`${decimalSeparator}`, '.');

@@ -75,12 +75,15 @@ describe('I18nLanguageCodeService', () => {
     let number1 = '-1.22';
     let number2 = '1,5';
     let number3 = '1٫31e1';
-
-    spyOn(i18nLanguageCodeService, 'currentDecimalSeparator').and.returnValues('.', ',', '٫');
+    let number4 = 'abc';
+    let number5 ='e';
+    spyOn(i18nLanguageCodeService, 'currentDecimalSeparator').and.returnValues('.', ',', '٫', '.', ',');
 
     expect(i18nLanguageCodeService.convertToEnglishDecimal(number1)).toEqual(-1.22);
     expect(i18nLanguageCodeService.convertToEnglishDecimal(number2)).toEqual(1.5);
     expect(i18nLanguageCodeService.convertToEnglishDecimal(number3)).toEqual(13.1);
+    expect(i18nLanguageCodeService.convertToEnglishDecimal(number4)).toEqual(null);
+    expect(i18nLanguageCodeService.convertToEnglishDecimal(number5)).toEqual(null);
   });
 
   it('should convert a number to the local format', ()=>{

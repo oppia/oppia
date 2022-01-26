@@ -23,9 +23,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HtmlEscaperService } from 'services/html-escaper.service';
-import { ContextService } from 'services/context.service';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { ContentTranslationLanguageService } from 'pages/exploration-player-page/services/content-translation-language.service';
 
 @Component({
   selector: 'oppia-short-response-numeric-input',
@@ -37,25 +34,13 @@ export class ShortResponseNumericInput implements OnInit {
   displayAnswer: Object;
 
   constructor(
-    private htmlEscaperService: HtmlEscaperService,
-    private contextService: ContextService,
-    private i18nLanguageCodeService: I18nLanguageCodeService,
-    private contentTranslationLanguageService: ContentTranslationLanguageService
+    private htmlEscaperService: HtmlEscaperService
   ) {}
 
   ngOnInit(): void {
     this.displayAnswer = this.htmlEscaperService.escapedJsonToObj(this.answer);
     if ((this.displayAnswer as number) % 1 === 0) {
-      let recievedAnswer = Math.round(this.displayAnswer as number);
-      let finalAnswer: string;
-      if (this.contextService.getPageContext() === 'learner') {
-        finalAnswer = this.contentTranslationLanguageService
-          .convertToLocalizedNumber(recievedAnswer);
-      } else {
-        finalAnswer = this.i18nLanguageCodeService
-          .convertToLocalizedNumber(recievedAnswer);
-      }
-      this.displayAnswer = finalAnswer;
+      this.displayAnswer = Math.round(this.displayAnswer as number);
     }
   }
 }

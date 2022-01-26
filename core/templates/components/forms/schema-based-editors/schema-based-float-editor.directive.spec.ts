@@ -16,6 +16,10 @@
  * @fileoverview Unit tests for Schema Based Float Editor Directive
  */
 
+import { ContentTranslationLanguageService } from 'pages/exploration-player-page/services/content-translation-language.service';
+import { ContextService } from 'services/context.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { NumericInputValidationService } from 'interactions/NumericInput/directives/numeric-input-validation.service';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 describe('Schema Based Float Editor Directive', () => {
@@ -25,11 +29,19 @@ describe('Schema Based Float Editor Directive', () => {
   let $timeout = null;
   let directive = null;
   let SchemaFormSubmittedService = null;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
+  let ctls: ContentTranslationLanguageService;
+  let contextService: ContextService;
+  let validator: NumericInputValidationService;
 
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
 
   beforeEach(angular.mock.inject(function($injector) {
+    i18nLanguageCodeService = $injector.get('I18nLanguageCodeService');
+    ctls = $injector.get('ContentTranslationLanguageService');
+    contextService = $injector.get('ContextService');
+    validator = $injector.get('NumericInputValidationService');
     $rootScope = $injector.get('$rootScope');
     SchemaFormSubmittedService = $injector.get('SchemaFormSubmittedService');
     $timeout = $injector.get('$timeout');
@@ -166,6 +178,64 @@ describe('Schema Based Float Editor Directive', () => {
 
     expect(ctrl.errorString)
       .toBe(
-        'The answer can contain at most 15 digits (0-9) or symbols (. or -).');
+        'The answer should be a valid number ' +
+        'and can contain at most 15 digits (0-9) or symbols(.).');
+  });
+
+  it('should get current decimal separator', ()=>{
+    spyOn(contextService, 'getPageContext')
+      .and.returnValues('question-player', 'learner');
+    spyOn(i18nLanguageCodeService, 'currentDecimalSeparator')
+      .and.returnValue('.');
+    spyOn(ctls, 'currentDecimalSeparator')
+      .and.returnValue(',');
+
+    expect(ctrl.currentDecimalSeparator()).toEqual('.');
+    expect(ctrl.currentDecimalSeparator()).toEqual(',');
+  });
+
+  it('should remove any invalid character from the input', ()=>{
+    spyOn(contextService, 'getPageContext')
+      .and.returnValues('question-player', 'learner');
+    spyOn(i18nLanguageCodeService, 'getInputValidationRegex')
+      .and.returnValue(/[^e0-9\.\-]/g);
+    spyOn(ctls, 'getInputValidationRegex')
+      .and.returnValue(/[^e0-9\,\-]/g);
+
+    ctrl.localStringValue = 'a';
+    ctrl.parseInput();
+    expect(ctrl.localStringValue).toEqual('');
+
+    ctrl.localStringValue = '12.';
+    ctrl.parseInput();
+    expect(ctrl.localStringValue).toEqual('12');
+  });
+
+  it('should parse the string to a number on input', ()=>{
+    spyOn(contextService, 'getPageContext')
+      .and.returnValues('question-player', 'learner', 'learner', 'learner');
+    spyOn(i18nLanguageCodeService, 'getInputValidationRegex')
+      .and.returnValue(/[^e0-9\.\-]/g);
+    spyOn(ctls, 'getInputValidationRegex')
+      .and.returnValue(/[^e0-9\,\-]/g);
+    spyOn(ctrl, 'currentDecimalSeparator').and.returnValues('.', ',');
+
+    ctrl.localStringValue = '';
+    ctrl.parseInput();
+    expect(ctrl.localValue).toEqual(null);
+
+    ctrl.localStringValue = '-12';
+    ctrl.parseInput();
+    expect(ctrl.localValue).toEqual(-12);
+
+    ctrl.localStringValue = '-12e1';
+    ctrl.parseInput();
+    expect(ctrl.localValue).toEqual(-120);
+
+    spyOn(validator, 'getError').and.returnValue('Error');
+    ctrl.localStringValue = '--12';
+    ctrl.parseInput();
+    expect(ctrl.localValue).toEqual(null);
+    expect(ctrl.errorString).toEqual('Error');
   });
 });

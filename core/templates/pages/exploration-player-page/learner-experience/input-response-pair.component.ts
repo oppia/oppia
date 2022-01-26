@@ -85,15 +85,18 @@ export class InputResponsePairComponent {
   }
 
   isNumber(value: string): boolean {
-    const validRegex = /.*[a-b]+.*/;
-    // eslint-disable-next-line max-len
+    const validRegex = /.*[^0-9.\-].*/g;
     if (validRegex.test(value)) {
       return false;
     }
     return true;
   }
 
-  convertAnswerToLocalFormat(data: string|number): string {
+  convertAnswerToLocalFormat(data: string): string {
+    if (!this.isNumber(data)) {
+      return data;
+    }
+
     if (this.contextService.getPageContext() === 'learner') {
       return this.contentTranslationLanguageService
         .convertToLocalizedNumber(data);
@@ -106,15 +109,9 @@ export class InputResponsePairComponent {
     let displayedCard = this.playerTranscriptService.getCard(
       this.playerPositionService.getDisplayedCardIndex());
     let interaction = displayedCard.getInteraction();
-    if (this.isNumber(this.data.learnerInput)) {
-      return this.explorationHtmlFormatterService.getAnswerHtml(
-        this.convertAnswerToLocalFormat(this.data.learnerInput), interaction.id,
-        interaction.customizationArgs);
-    } else {
-      return this.explorationHtmlFormatterService.getAnswerHtml(
-        this.data.learnerInput, interaction.id,
-        interaction.customizationArgs);
-    }
+    return this.explorationHtmlFormatterService.getAnswerHtml(
+      this.convertAnswerToLocalFormat(this.data.learnerInput), interaction.id,
+      interaction.customizationArgs);
   }
 
   // Returns a HTML string representing a short summary of the answer
@@ -125,34 +122,20 @@ export class InputResponsePairComponent {
     let interaction: Interaction = displayedCard.getInteraction();
     let shortAnswerHtml = '';
     if (this.data.learnerInput.hasOwnProperty('answerDetails')) {
-      if (this.isNumber(this.data.learnerInput)) {
-        shortAnswerHtml = (
-        this.convertAnswerToLocalFormat(
-          this.data.learnerInput) as unknown as { answerDetails: string })
-          .answerDetails;
-      } else {
-        shortAnswerHtml = (
-            this.data.learnerInput as unknown as { answerDetails: string })
-          .answerDetails;
-      }
+      shortAnswerHtml = (
+           this.data.learnerInput as unknown as { answerDetails: string })
+        .answerDetails;
     } else if (
       this.data && interaction.id &&
       InteractionSpecsConstants.INTERACTION_SPECS[
         interaction.id as InteractionSpecsKey
       ].needs_summary
     ) {
-      if (this.isNumber(this.data.learnerInput)) {
-        shortAnswerHtml = (
-          this.explorationHtmlFormatterService.getShortAnswerHtml(
-            this.convertAnswerToLocalFormat(
-              this.data.learnerInput), interaction.id,
-            interaction.customizationArgs));
-      } else {
-        shortAnswerHtml = (
-          this.explorationHtmlFormatterService.getShortAnswerHtml(
-            this.data.learnerInput, interaction.id,
-            interaction.customizationArgs));
-      }
+      shortAnswerHtml = (
+        this.explorationHtmlFormatterService.getShortAnswerHtml(
+          this.convertAnswerToLocalFormat(
+            this.data.learnerInput), interaction.id,
+          interaction.customizationArgs));
     }
     return shortAnswerHtml;
   }
