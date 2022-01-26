@@ -16,8 +16,9 @@
  * @fileoverview Directive for a schema-based editor for floats.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
-import { NgForm } from '@angular/forms';
+import { Component, EventEmitter, forwardRef, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { AbstractControl, ControlValueAccessor, NgForm, NG_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, Validator } from '@angular/forms';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { NumericInputValidationService } from 'interactions/NumericInput/directives/numeric-input-validation.service';
 import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
@@ -25,11 +26,23 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
 @Component({
   selector: 'schema-based-float-editor',
   templateUrl: './schema-based-float-editor.directive.html',
-  styleUrls: []
+  styleUrls: [],
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => SchemaBasedFloatEditorComponent),
+      multi: true
+    },
+    {
+      provide: NG_VALIDATORS,
+      multi: true,
+      useExisting: forwardRef(() => SchemaBasedFloatEditorComponent),
+    },
+  ]
 })
-export class SchemaBasedFloatEditorComponent implements OnInit {
-  @Input() localValue;
-  @Output() localValueChange = new EventEmitter();
+export class SchemaBasedFloatEditorComponent
+implements ControlValueAccessor, OnInit, Validator {
+  localValue: number;
   @Input() disabled;
   @Input() validators;
   @Input() labelForFocusTarget;
@@ -41,11 +54,60 @@ export class SchemaBasedFloatEditorComponent implements OnInit {
   errorString: string;
   labelForErrorFocusTarget: string;
   hasLoaded: boolean;
+  onChange: (value: number) => void = () => {};
+  @Input() uiConfig: {checkRequireNonnegativeInput: unknown};
+  checkRequireNonnegativeInputValue: unknown;
+  minValue: number;
   constructor(
     private focusManagerService: FocusManagerService,
     private numericInputValidationService: NumericInputValidationService,
     private schemaFormSubmittedService: SchemaFormSubmittedService
   ) { }
+
+  // Implemented as a part of ControlValueAccessor interface.
+  writeValue(value: number): void {
+    this.localValue = value;
+  }
+
+  // Implemented as a part of ControlValueAccessor interface.
+  registerOnChange(fn: (value: number) => void): void {
+    this.onChange = fn;
+  }
+
+  // Implemented as a part of ControlValueAccessor interface.
+  registerOnTouched(fn: unknown): void {
+  }
+
+  // Implemented as a part of Validator interface.
+  validate(control: AbstractControl): ValidationErrors {
+    if (this._validate(control.value, this.uiConfig)) {
+      return {};
+    }
+    return {error: 'invalid'};
+  }
+
+  private _validate(
+      localValue: number | string,
+      customizationArg: {checkRequireNonnegativeInput: unknown}
+  ): boolean {
+    let { checkRequireNonnegativeInput } = customizationArg || {};
+    let checkRequireNonnegativeInputValue = (
+    checkRequireNonnegativeInput === undefined ? false :
+    checkRequireNonnegativeInput);
+    return (
+      localValue !== undefined &&
+      localValue !== null &&
+      localValue !== '' &&
+      this.numericInputValidationService.getErrorString(
+        +localValue, checkRequireNonnegativeInputValue as boolean
+      ) === undefined)
+    ;
+  }
+
+  updateLocalValue(value: number): void {
+    this.localValue = value;
+    this.onChange(this.localValue);
+  }
 
   ngOnInit(): void {
     this.hasLoaded = false;
@@ -58,6 +120,15 @@ export class SchemaBasedFloatEditorComponent implements OnInit {
     if (this.localValue === undefined) {
       this.localValue = 0.0;
     }
+    // To check checkRequireNonnegativeInput customization argument
+    // Value of numeric input interaction.
+    let { checkRequireNonnegativeInput } = this.uiConfig || {};
+    this.checkRequireNonnegativeInputValue = (
+            checkRequireNonnegativeInput === undefined ? false :
+            checkRequireNonnegativeInput);
+    // If customization argument of numeric input interaction is true
+    // Set Min value as 0 to not let down key go below 0.
+    this.minValue = checkRequireNonnegativeInput && 0;
     // So that focus is applied after all the functions in
     // main thread have executed.
     setTimeout(() => {
@@ -78,18 +149,6 @@ export class SchemaBasedFloatEditorComponent implements OnInit {
   onBlur(): void {
     this.isUserCurrentlyTyping = false;
     this.inputBlur.emit();
-  }
-
-  validate(): boolean {
-    return true;
-    // Return (
-    //   this.localValue !== undefined &&
-    //   this.localValue !== null &&
-    //   this.localValue !== '' &&
-    //   this.numericInputValidationService.getErrorString(
-    //     this.localValue
-    //   ) !== undefined
-    // );
   }
   // TODO(sll): Move these to ng-messages when we move to Angular 1.3.
   getMinValue(): number {
@@ -132,140 +191,6 @@ export class SchemaBasedFloatEditorComponent implements OnInit {
   }
 }
 
-require(
-  'components/forms/custom-forms-directives/apply-validation.directive.ts');
-require(
-  'components/forms/custom-forms-directives/require-is-float.directive.ts');
-require('components/forms/validators/is-float.filter.ts');
-require(
-  'interactions/NumericInput/directives/numeric-input-validation.service.ts');
-require('services/schema-form-submitted.service.ts');
-require('services/stateful/focus-manager.service.ts');
-
-angular.module('oppia').directive('schemaBasedFloatEditor', [
-  function() {
-    return {
-      restrict: 'E',
-      scope: {
-        labelForFocusTarget: '&'
-      },
-      bindToController: {
-        localValue: '=',
-        isDisabled: '&',
-        validators: '&',
-        labelForFocusTarget: '&',
-        onInputBlur: '=',
-        onInputFocus: '=',
-        uiConfig: '&'
-      },
-      template: require('./schema-based-float-editor.directive.html'),
-      controllerAs: '$ctrl',
-      controller: [
-        '$scope', '$timeout', 'FocusManagerService',
-        'NumericInputValidationService',
-        'SchemaFormSubmittedService',
-        function(
-            $scope, $timeout, FocusManagerService,
-            NumericInputValidationService,
-            SchemaFormSubmittedService) {
-          var ctrl = this;
-          var labelForFocus = $scope.labelForFocusTarget();
-          ctrl.validate = function(localValue, customizationArg) {
-            let { checkRequireNonnegativeInput } = customizationArg || {};
-            let checkRequireNonnegativeInputValue = (
-            checkRequireNonnegativeInput === undefined ? false :
-            checkRequireNonnegativeInput);
-            return (
-              !angular.isUndefined(localValue) &&
-              localValue !== null &&
-              localValue !== '' &&
-              angular.isUndefined(
-                NumericInputValidationService.getErrorString(
-                  localValue, checkRequireNonnegativeInputValue)));
-          };
-
-          ctrl.onFocus = function() {
-            ctrl.hasFocusedAtLeastOnce = true;
-            if (ctrl.onInputFocus) {
-              ctrl.onInputFocus();
-            }
-          };
-
-          ctrl.onBlur = function() {
-            ctrl.isUserCurrentlyTyping = false;
-            if (ctrl.onInputBlur) {
-              ctrl.onInputBlur();
-            }
-          };
-
-          // TODO(sll): Move these to ng-messages when we move to Angular 1.3.
-          ctrl.getMinValue = function() {
-            for (var i = 0; i < ctrl.validators().length; i++) {
-              if (ctrl.validators()[i].id === 'is_at_least') {
-                return ctrl.validators()[i].min_value;
-              }
-            }
-          };
-
-          ctrl.getMaxValue = function() {
-            for (var i = 0; i < ctrl.validators().length; i++) {
-              if (ctrl.validators()[i].id === 'is_at_most') {
-                return ctrl.validators()[i].max_value;
-              }
-            }
-          };
-
-          ctrl.generateErrors = function() {
-            ctrl.errorString = (
-              NumericInputValidationService.getErrorString(
-                ctrl.localValue, ctrl.checkRequireNonnegativeInputValue));
-          };
-
-          ctrl.onKeypress = function(evt) {
-            if (evt.keyCode === 13) {
-              if (
-                Object.keys(ctrl.floatForm.floatValue.$error).length !== 0) {
-                ctrl.isUserCurrentlyTyping = false;
-                FocusManagerService.setFocus(ctrl.labelForErrorFocusTarget);
-              } else {
-                SchemaFormSubmittedService.onSubmittedSchemaBasedForm.emit();
-              }
-            } else {
-              ctrl.isUserCurrentlyTyping = true;
-            }
-          };
-
-          ctrl.$onInit = function() {
-            ctrl.hasLoaded = false;
-            ctrl.isUserCurrentlyTyping = false;
-            ctrl.hasFocusedAtLeastOnce = false;
-            ctrl.errorString = '';
-            ctrl.labelForErrorFocusTarget =
-              FocusManagerService.generateFocusLabel();
-            if (ctrl.localValue === undefined) {
-              ctrl.localValue = 0.0;
-            }
-            // To check checkRequireNonnegativeInput customization argument
-            // Value of numeric input interaction.
-            let { checkRequireNonnegativeInput } = ctrl.uiConfig() || {};
-            ctrl.checkRequireNonnegativeInputValue = (
-            checkRequireNonnegativeInput === undefined ? false :
-            checkRequireNonnegativeInput);
-            // If customization argument of numeric input interaction is true
-            // Set Min value as 0 to not let down key go below 0.
-            ctrl.minValue = checkRequireNonnegativeInput && 0;
-            // So that focus is applied after all the functions in
-            // main thread have executed.
-            $timeout(function() {
-              FocusManagerService.setFocusWithoutScroll(labelForFocus);
-            }, 50);
-            // This prevents the red 'invalid input' warning message from
-            // flashing at the outset.
-            $timeout(function() {
-              ctrl.hasLoaded = true;
-            });
-          };
-        }
-      ]
-    };
-  }]);
+angular.module('oppia').directive('schemaBasedFloatEditor', downgradeComponent({
+  component: SchemaBasedFloatEditorComponent
+}));

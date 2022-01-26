@@ -16,24 +16,57 @@
  * @fileoverview Directive for a schema-based editor for dicts.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, forwardRef, Input, OnInit } from '@angular/core';
+import { NG_VALUE_ACCESSOR, NG_VALIDATORS, ControlValueAccessor, Validator, AbstractControl, ValidationErrors } from '@angular/forms';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { IdGenerationService } from 'services/id-generation.service';
 
 @Component({
   selector: 'schema-based-dict-editor',
-  templateUrl: './schema-based-dict-editor.directive.html'
+  templateUrl: './schema-based-dict-editor.directive.html',
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => SchemaBasedDictEditorComponent),
+      multi: true
+    },
+    {
+      provide: NG_VALIDATORS,
+      multi: true,
+      useExisting: forwardRef(() => SchemaBasedDictEditorComponent),
+    },
+  ]
 })
 
-export class SchemaBasedDictEditorComponent implements OnInit {
-  @Input() localValue;
-  @Output() localValueChange = new EventEmitter();
+export class SchemaBasedDictEditorComponent
+implements ControlValueAccessor, OnInit, Validator {
+  localValue;
   @Input() disabled;
   @Input() propertySchemas;
   @Input() labelForFocusTarget;
   fieldIds: Record<string, string> = {};
   JSON = JSON;
+  onChange: (val: unknown) => void = () => {};
   constructor(private idGenerationService: IdGenerationService) { }
+
+  // Implemented as a part of ControlValueAccessor interface.
+  writeValue(value: unknown): void {
+    this.localValue = value;
+  }
+
+  // Implemented as a part of ControlValueAccessor interface.
+  registerOnChange(fn: (val: unknown) => void): void {
+    this.onChange = fn;
+  }
+
+  // Implemented as a part of ControlValueAccessor interface.
+  registerOnTouched(): void {
+  }
+
+  // Implemented as a part of Validator interface.
+  validate(control: AbstractControl): ValidationErrors {
+    return {};
+  }
 
   ngOnInit(): void {
     this.fieldIds = {};
@@ -46,12 +79,12 @@ export class SchemaBasedDictEditorComponent implements OnInit {
 
   updateValue(value: unknown, name: string): void {
     this.localValue[name] = value;
-    this.localValueChange.emit(this.localValue);
+    this.onChange(this.localValue);
   }
 
   getSchema(index: number): unknown {
     const schema = this.propertySchemas[index].schema;
-    return () => schema;
+    return schema;
   }
 
   getLabelForFocusTarget(): string {
@@ -63,17 +96,11 @@ export class SchemaBasedDictEditorComponent implements OnInit {
   }
 
   getHumanReadablePropertyDescription(
-      property: {description: string, name: string}
+      property: {description: string; name: string}
   ): string {
     return property.description || '[' + property.name + ']';
   }
 }
-
-require(
-  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
-
-require('services/id-generation.service.ts');
-require('services/nested-directives-recursion-timeout-prevention.service.ts');
 
 angular.module('oppia').directive('schemaBasedDictEditor', downgradeComponent({
   component: SchemaBasedDictEditorComponent

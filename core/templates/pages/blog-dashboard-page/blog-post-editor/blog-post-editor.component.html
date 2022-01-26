@@ -106,8 +106,8 @@
         </div>
         <div *ngIf="contentEditorIsActive"  class="protractor-test-content-editor">
           <schema-based-editor *ngIf="contentEditorIsActive"
-                               [schema]="getSchema.bind(this)"
-                               [headersEnabled]="headersAreEnabledCallBack.bind(this)"
+                               [schema]="HTML_SCHEMA"
+                               [headersEnabled]="true"
                                [localValue]="this.blogPostData.content"
                                (localValueChange)="this.updateLocalEditedContent($event)">
           </schema-based-editor>

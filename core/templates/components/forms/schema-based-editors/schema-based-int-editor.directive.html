@@ -5,7 +5,7 @@
              matNativeControl
              [(ngModel)]="localValue"
              #phoneNgModel="ngModel"
-             (ngModelChange)="localValueChange.emit($event)"
+             (ngModelChange)="updateValue($event)"
              [disabled]="disabled"
              required="!notRequired"
              applyValidation [validators]="validators"

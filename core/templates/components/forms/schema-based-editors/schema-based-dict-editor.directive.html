@@ -4,10 +4,11 @@
       <label for="{{fieldIds[property.name]}}">{{getHumanReadablePropertyDescription(property)}}</label>
       <!-- TODO(sll): This is in the wrong place. It should be on the input field. -->
       <div id="{{fieldIds[property.name]}}">
-        <schema-based-editor [schema]="getSchema(idx)" [isDisabled]="disabled"
-                             [localValue]="localValue[property.name]"
-                             (localValueChange)="updateValue($event, property.name)"
-                             [labelForFocusTarget]="idx === 0 ? getLabelForFocusTarget.bind(this) : getEmptyString">
+        <schema-based-editor [schema]="getSchema(idx)" [disabled]="disabled"
+                             [ngModel]="localValue[property.name]"
+                             (ngModelChange)="updateValue($event, property.name)"
+                             name="editor"
+                             [labelForFocusTarget]="idx === 0 ? getLabelForFocusTarget() : ''">
         </schema-based-editor>
       </div>
     </div>

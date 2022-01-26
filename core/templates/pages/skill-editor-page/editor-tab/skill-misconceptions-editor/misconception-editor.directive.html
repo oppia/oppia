@@ -86,8 +86,9 @@
     <div ng-if="notesEditorIsOpen && isEditable()">
       <div class="oppia-rule-details-header">
         <strong>Notes for Creator</strong>
-        <schema-based-editor schema="NOTES_FORM_SCHEMA"
-                             local-value="container.misconceptionNotes">
+        <schema-based-editor [schema]="NOTES_FORM_SCHEMA"
+                             ng-model="container.misconceptionNotes"
+                             ng-model-change="$applyAsync()">
         </schema-based-editor>
       </div>
 
@@ -132,8 +133,9 @@
     <div ng-if="feedbackEditorIsOpen && isEditable()">
       <div class="oppia-rule-details-header">
         <strong>Feedback for Learner</strong>
-        <schema-based-editor schema="FEEDBACK_FORM_SCHEMA"
-                             local-value="container.misconceptionFeedback">
+        <schema-based-editor [schema]="FEEDBACK_FORM_SCHEMA"
+                             ng-model="container.misconceptionFeedback"
+                             ng-model-change="$applyAsync()">
         </schema-based-editor>
       </div>
 

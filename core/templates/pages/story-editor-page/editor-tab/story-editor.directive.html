@@ -122,7 +122,7 @@
                 </div>
 
                 <div ng-if="notesEditorIsShown" class="protractor-test-story-notes-rte">
-                  <schema-based-editor schema="NOTES_SCHEMA" local-value="editableNotes">
+                  <schema-based-editor [schema]="NOTES_SCHEMA" ng-model="editableNotes" ng-model-change="$applyAsync()">
                   </schema-based-editor>
                   <div class="editor-buttons">
                     <button type="button"

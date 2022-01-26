@@ -8,14 +8,16 @@
     <div class="oppia-rule-details-header">
       <strong>Example Question</strong>
       <schema-based-editor class="protractor-test-worked-example-question"
-                           schema="WORKED_EXAMPLE_FORM_SCHEMA"
-                           local-value="tmpWorkedExampleQuestionHtml">
+                           [schema]="WORKED_EXAMPLE_FORM_SCHEMA"
+                           ng-model="tmpWorkedExampleQuestionHtml"
+                           ng-model-change="$applyAsync()">
       </schema-based-editor>
       <div class="worked-example-explanation-section">
         <strong>Example Explanation</strong>
         <schema-based-editor class="protractor-test-worked-example-explanation"
-                             schema="WORKED_EXAMPLE_FORM_SCHEMA"
-                             local-value="tmpWorkedExampleExplanationHtml">
+                             [schema]="WORKED_EXAMPLE_FORM_SCHEMA"
+                             ng-model="tmpWorkedExampleExplanationHtml"
+                             ng-model-change="$applyAsync()">
         </schema-based-editor>
       </div>
     </div>

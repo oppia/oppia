@@ -47,12 +47,12 @@
       <div class="protractor-test-state-translation-editor">
         <ck-editor-copy-toolbar *ngIf="activeDataFormat === 'html'"></ck-editor-copy-toolbar>
         <schema-based-editor *ngIf="editorIsShown && activeDataFormat === 'html'"
-                             [schema]="getHtmlSchema.bind(this)"
+                             [schema]="HTML_SCHEMA"
                              [localValue]="activeWrittenTranslation"
                              (localValueChange)="updateHtml($event)">
         </schema-based-editor>
         <schema-based-editor *ngIf="editorIsShown && activeDataFormat === 'unicode'"
-                             [schema]="getUnicodeSchema.bind(this)"
+                             [schema]="UNICODE_SCHEMA"
                              [localValue]="activeWrittenTranslation"
                              (localValueChange)="updateHtml($event)">
         </schema-based-editor>
@@ -61,7 +61,7 @@
           <p class="oppia-rules-translation-tip">
             Because these answer choices will be matched against a learner's input, we want to be extra careful with the translations so as to not block a learner's progress in a lesson.
           </p>
-          <schema-based-editor [schema]="getSetOfStringsSchema.bind(this)"
+          <schema-based-editor [schema]="SET_OF_STRINGS_SCHEMA"
                                [localValue]="activeWrittenTranslation"
                                (localValueChange)="updateHtml($event)">
           </schema-based-editor>

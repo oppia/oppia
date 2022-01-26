@@ -16,19 +16,52 @@
  * @fileoverview Directive for a schema-based editor for booleans.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, forwardRef, Input, OnInit } from '@angular/core';
+import { NG_VALUE_ACCESSOR, NG_VALIDATORS, ControlValueAccessor, Validator, AbstractControl, ValidationErrors } from '@angular/forms';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
   selector: 'schema-based-bool-editor',
-  templateUrl: './schema-based-bool-editor.directive.html'
+  templateUrl: './schema-based-bool-editor.directive.html',
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => SchemaBasedBoolEditorComponent),
+      multi: true
+    },
+    {
+      provide: NG_VALIDATORS,
+      multi: true,
+      useExisting: forwardRef(() => SchemaBasedBoolEditorComponent),
+    },
+  ]
 })
-export class SchemaBasedBoolEditorComponent implements OnInit {
-  @Input() localValue;
-  @Output() localValueChange = new EventEmitter();
+export class SchemaBasedBoolEditorComponent
+implements ControlValueAccessor, OnInit, Validator {
+  localValue;
   @Input() disabled: boolean;
   @Input() labelForFocusTarget: string;
+  onChange: (val: unknown) => void = () => {};
   constructor() { }
+
+  // Implemented as a part of ControlValueAccessor interface.
+  writeValue(value: unknown): void {
+    this.localValue = value;
+  }
+
+  // Implemented as a part of ControlValueAccessor interface.
+  registerOnChange(fn: (val: unknown) => void): void {
+    this.onChange = fn;
+  }
+
+  // Implemented as a part of ControlValueAccessor interface.
+  registerOnTouched(): void {
+  }
+
+  // Implemented as a part of Validator interface.
+  validate(control: AbstractControl): ValidationErrors {
+    return {};
+  }
 
   ngOnInit(): void { }
 
@@ -37,7 +70,7 @@ export class SchemaBasedBoolEditorComponent implements OnInit {
       return;
     }
     this.localValue = val;
-    this.localValueChange.emit(val);
+    this.onChange(val);
   }
 }
 

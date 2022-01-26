@@ -19,7 +19,7 @@
 // Individual object editor directives are in extensions/objects/templates.
 
 import { AfterViewInit, Component, ComponentFactoryResolver, EventEmitter, forwardRef, Input, OnChanges, OnDestroy, Output, SimpleChanges, ViewContainerRef } from '@angular/core';
-import { AbstractControl, ControlValueAccessor, NG_VALUE_ACCESSOR, ValidationErrors, Validator } from '@angular/forms';
+import { AbstractControl, ControlValueAccessor, NG_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, Validator } from '@angular/forms';
 import { AlgebraicExpressionEditorComponent } from 'objects/templates/algebraic-expression-editor.component';
 import { BooleanEditorComponent } from 'objects/templates/boolean-editor.component';
 import { CodeStringEditorComponent } from 'objects/templates/code-string-editor.component';
@@ -125,11 +125,18 @@ interface ObjectEditor {
 @Component({
   selector: 'object-editor',
   template: '',
-  providers: [{
-    provide: NG_VALUE_ACCESSOR,
-    useExisting: forwardRef(() => ObjectEditorComponent),
-    multi: true
-  }]
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => ObjectEditorComponent),
+      multi: true
+    },
+    {
+      provide: NG_VALIDATORS,
+      multi: true,
+      useExisting: forwardRef(() => ObjectEditorComponent)
+    }
+  ]
 })
 export class ObjectEditorComponent
 implements AfterViewInit, OnChanges, OnDestroy,
@@ -171,11 +178,6 @@ ControlValueAccessor, Validator {
 
   registerOnTouched(fn: () => void): void {
     this.onTouch = fn;
-  }
-
-  validate(control: AbstractControl): ValidationErrors {
-    this.onValidatorChange();
-    return {};
   }
 
   registerOnValidatorChange?(fn: () => void): void {
@@ -232,18 +234,15 @@ ControlValueAccessor, Validator {
       if (ref.instance.validityChange) {
         this.componentSubscriptions.add(
           ref.instance.validityChange.subscribe((e) => {
-            if (this.form) {
-              for (const key of Object.keys(e)) {
-                if (e[key] !== true) {
-                  if (this.componentValidationState[key] === undefined) {
-                    this.componentValidationState[key] = e[key];
-                  }
-                } else {
-                  if (this.componentValidationState[key] !== undefined) {
-                    delete this.componentValidationState[key];
-                  }
+            for (const key of Object.keys(e)) {
+              if (e[key] !== true) {
+                if (this.componentValidationState[key] === undefined) {
+                  this.componentValidationState[key] = e[key];
                 }
-                // This.form.$setValidity(key, e[key]);
+              } else {
+                if (this.componentValidationState[key] !== undefined) {
+                  delete this.componentValidationState[key];
+                }
               }
             }
             this.onValidatorChange();
@@ -254,6 +253,12 @@ ControlValueAccessor, Validator {
     } else {
       this.loggerService.error('Editor: ' + editorName + ' not supported');
     }
+  }
+
+  validate(control: AbstractControl): ValidationErrors | null {
+    return Object.keys(
+      this.componentValidationState
+    ).length > 0 ? this.componentValidationState : null;
   }
 
   ngOnChanges(changes: SimpleChanges): void {

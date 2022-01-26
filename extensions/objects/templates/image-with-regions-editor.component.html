@@ -2,7 +2,7 @@
   <div *ngIf="value.imagePath === ''">
     <schema-based-editor [localValue]="value.imagePath"
                          (localValueChange)="imageValueChanged($event)"
-                         [schema]="getSchema.bind(this)">
+                         [schema]="getSchema()">
     </schema-based-editor>
   </div>
   <div class="position-relative" *ngIf="value.imagePath !== ''">

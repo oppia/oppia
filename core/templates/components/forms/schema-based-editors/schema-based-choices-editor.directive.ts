@@ -15,23 +15,64 @@
 /**
  * @fileoverview Directive for a schema-based editor for multiple choice.
  */
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, forwardRef, Input, OnInit } from '@angular/core';
+import { NG_VALUE_ACCESSOR, NG_VALIDATORS, ControlValueAccessor, Validator, AbstractControl, ValidationErrors } from '@angular/forms';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
   selector: 'schema-based-choices-editor',
-  templateUrl: './schema-based-choices-editor.directive.html'
+  templateUrl: './schema-based-choices-editor.directive.html',
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => SchemaBasedChoicesEditorComponent),
+      multi: true
+    },
+    {
+      provide: NG_VALIDATORS,
+      multi: true,
+      useExisting: forwardRef(() => SchemaBasedChoicesEditorComponent),
+    },
+  ]
 })
-export class SchemaBasedChoicesEditorComponent implements OnInit {
-  @Input() localValue;
-  @Output() localValueChange = new EventEmitter();
+export class SchemaBasedChoicesEditorComponent
+implements ControlValueAccessor, OnInit, Validator {
+  localValue;
   @Input() disabled;
   // The choices for the object's value.
   @Input() choices;
   // The schema for this object.
   // TODO(sll): Validate each choice against the schema.
   @Input() schema;
+  onChange: (val: unknown) => void = () => {};
   constructor() { }
+
+  // Implemented as a part of ControlValueAccessor interface.
+  writeValue(value: unknown): void {
+    this.localValue = value;
+  }
+
+  // Implemented as a part of ControlValueAccessor interface.
+  registerOnChange(fn: (val: unknown) => void): void {
+    this.onChange = fn;
+  }
+
+  // Implemented as a part of ControlValueAccessor interface.
+  registerOnTouched(): void {
+  }
+
+  // Implemented as a part of Validator interface.
+  validate(control: AbstractControl): ValidationErrors {
+    return {};
+  }
+
+  updateValue(val: boolean): void {
+    if (this.localValue === val) {
+      return;
+    }
+    this.localValue = val;
+    this.onChange(val);
+  }
 
   ngOnInit(): void { }
 }

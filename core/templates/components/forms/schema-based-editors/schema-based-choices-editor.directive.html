@@ -1,5 +1,5 @@
 <select class="form-control" [(ngModel)]="localValue"
-        (ngModelChange)="localValueChange.emit($event)" required
+        (ngModelChange)="updateValue($event)" required
         [disabled]="disabled">
   <option *ngFor="let choice of choices" [value]="choice" [selected]="choice === localValue">
     {{ choice }}

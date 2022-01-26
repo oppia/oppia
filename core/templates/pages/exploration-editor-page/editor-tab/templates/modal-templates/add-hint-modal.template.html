@@ -9,8 +9,9 @@
     <div class="oppia-rule-details-header">
       <strong>Hint #<[hintIndex]> is...</strong>
       <schema-based-editor class="protractor-test-hint-text"
-                           schema="HINT_FORM_SCHEMA"
-                           local-value="tmpHint">
+                           [schema]="HINT_FORM_SCHEMA"
+                           ng-model="tmpHint"
+                           ng-model-change="$applyAsync()">
       </schema-based-editor>
     </div>
   </form>

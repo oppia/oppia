@@ -16,21 +16,29 @@
  * @fileoverview Directive for a schema-based editor for custom values.
  */
 
-import { Component, EventEmitter, forwardRef, Input, Output } from '@angular/core';
-import { AbstractControl, ControlValueAccessor, NG_VALUE_ACCESSOR, ValidationErrors, Validator } from '@angular/forms';
+import { AfterViewInit, Component, EventEmitter, forwardRef, Input, Output, ViewChild } from '@angular/core';
+import { AbstractControl, ControlValueAccessor, NgForm, NG_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, Validator } from '@angular/forms';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
   selector: 'schema-based-custom-editor',
   templateUrl: './schema-based-custom-editor.directive.html',
-  providers: [{
-    provide: NG_VALUE_ACCESSOR,
-    useExisting: forwardRef(() => SchemaBasedCustomEditorComponent),
-    multi: true
-  }]
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => SchemaBasedCustomEditorComponent),
+      multi: true
+    },
+    {
+      provide: NG_VALIDATORS,
+      multi: true,
+      useExisting: forwardRef(() => SchemaBasedCustomEditorComponent),
+    },
+  ]
 })
 export class SchemaBasedCustomEditorComponent
-implements ControlValueAccessor, Validator {
+implements ControlValueAccessor, Validator, AfterViewInit {
+  @ViewChild('hybridForm') frm: NgForm;
   @Input() localValue;
   @Output() localValueChange = new EventEmitter();
   @Input() schema;
@@ -39,27 +47,19 @@ implements ControlValueAccessor, Validator {
   onTouch: () => void;
   onValidatorChange: () => void = () => {};
 
-  componentValidationState: Record<string, boolean> = {};
   constructor() { }
 
-  getComponentValidationState(): Record<string, boolean> {
-    return this.componentValidationState;
-  }
-
-
+  // Implemented as a part of ControlValueAccessor interface.
   registerOnTouched(fn: () => void): void {
     this.onTouch = fn;
   }
 
-  validate(control: AbstractControl): ValidationErrors {
-    this.onValidatorChange();
-    return {};
+  // Implemented as a part of ControlValueAccessor interface.
+  registerOnChange(fn: (_: unknown) => void): void {
+    this.onChange = fn;
   }
 
-  registerOnValidatorChange(fn: () => void): void {
-    this.onValidatorChange = fn;
-  }
-
+  // Implemented as a part of ControlValueAccessor interface.
   writeValue(obj: unknown): void {
     if (this.localValue === obj) {
       return;
@@ -67,8 +67,9 @@ implements ControlValueAccessor, Validator {
     this.localValue = obj;
   }
 
-  registerOnChange(fn: (_: unknown) => void): void {
-    this.onChange = fn;
+  // Implemented as a part of Validator interface.
+  validate(control: AbstractControl): ValidationErrors {
+    return {};
   }
 
   updateValue(e: unknown): void {
@@ -78,6 +79,16 @@ implements ControlValueAccessor, Validator {
     this.localValueChange.emit(e);
     this.localValue = e;
     this.onChange(e);
+  }
+
+  ngAfterViewInit(): void {
+    this.frm.statusChanges.subscribe((x) => {
+      if (x === 'INVALID') {
+        console.log(this.frm.errors);
+      } else {
+        console.log(x);
+      }
+    });
   }
 }
 

@@ -32,7 +32,7 @@ export class ParameterNameEditorComponent implements OnInit {
   @Output() valueChanged = new EventEmitter();
   @Output() validityChange = new EventEmitter<Record<'error', boolean>>();
   availableParamNames: string[];
-  SCHEMA: { type: 'unicode'; choices: string[]; };
+  SCHEMA: { type: 'unicode'; choices: string[] };
   constructor(
     private explorationParamSpecsService: ExplorationParamSpecsService
   ) { }
@@ -58,7 +58,7 @@ export class ParameterNameEditorComponent implements OnInit {
     };
   }
 
-  getSchema(): { type: 'unicode'; choices: string[]; } {
+  getSchema(): { type: 'unicode'; choices: string[] } {
     return this.SCHEMA;
   }
 

@@ -25,7 +25,8 @@
       <strong>Explanation:</strong>
       <!-- TODO(sll): Find a way to do this without resorting to private properties like _html -->
       <schema-based-editor schema="$ctrl.EXPLANATION_FORM_SCHEMA"
-                           local-value="$ctrl.StateSolutionService.displayed.explanation._html">
+                           ng-model="$ctrl.StateSolutionService.displayed.explanation._html"
+                           ng-model-change="$applyAsync()">
       </schema-based-editor>
     </div>
 

@@ -28,8 +28,9 @@
           ng-submit="saveWorkedExample()">
       <div class="oppia-rule-details-header">
         <strong>Example Question</strong>
-        <schema-based-editor schema="WORKED_EXAMPLE_FORM_SCHEMA"
-                             local-value="container.workedExampleQuestionHtml">
+        <schema-based-editor [schema]="WORKED_EXAMPLE_FORM_SCHEMA"
+                             ng-model="container.workedExampleQuestionHtml"
+                             ng-model-change="$applyAsync()">
         </schema-based-editor>
       </div>
     </form>
@@ -81,8 +82,9 @@
           ng-submit="saveWorkedExample()">
       <div class="oppia-rule-details-header">
         <strong>Example Explanation</strong>
-        <schema-based-editor schema="WORKED_EXAMPLE_FORM_SCHEMA"
-                             local-value="container.workedExampleExplanationHtml">
+        <schema-based-editor [schema]="WORKED_EXAMPLE_FORM_SCHEMA"
+                             ng-model="container.workedExampleExplanationHtml"
+                             ng-model-change="$applyAsync()">
         </schema-based-editor>
       </div>
     </form>

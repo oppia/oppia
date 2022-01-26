@@ -20,7 +20,7 @@
 </div>
 
 <div ng-if="$ctrl.conceptCardExplanationEditorIsShown">
-  <schema-based-editor schema="$ctrl.HTML_SCHEMA" class="protractor-test-concept-card-text" local-value="$ctrl.editableExplanation">
+  <schema-based-editor [schema]="$ctrl.HTML_SCHEMA" class="protractor-test-concept-card-text" ng-model="$ctrl.editableExplanation" ng-model-change="$applyAsync()">
   </schema-based-editor>
   <div class="editor-buttons">
     <button type="button"
