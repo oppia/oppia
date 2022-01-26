@@ -18,7 +18,7 @@
 
 import { from, Observable } from 'rxjs';
 import { HttpRequest, HttpInterceptor,
-  HttpEvent, HttpHandler, HttpParams } from '@angular/common/http';
+  HttpEvent, HttpHandler } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { switchMap } from 'rxjs/operators';
 import { CsrfTokenService } from './csrf-token.service';
