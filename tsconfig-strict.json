@@ -39,6 +39,9 @@
     }
   },
   "files": [
+    "extensions/interactions/PencilCodeEditor/directives/oppia-interactive-pencil-code-editor.component.ts",
+    "core/templates/pages/exploration-player-page/services/current-interaction.service.ts",
+    "core/templates/pages/exploration-player-page/services/current-interaction.service.spec.ts",
     "core/templates/app.constants.ts",
     "core/templates/base-components/base-content.component.ts",
     "core/templates/base-components/base-content.component.spec.ts",

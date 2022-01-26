@@ -23,27 +23,50 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { ContextService } from 'services/context.service';
-import { PlayerPositionService } from
-  'pages/exploration-player-page/services/player-position.service';
-import { PlayerTranscriptService } from
-  'pages/exploration-player-page/services/player-transcript.service';
-import { InteractionAnswer } from 'interactions/answer-defs';
-import { InteractionRuleInputs } from 'interactions/rule-input-defs';
+import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
+import { PlayerTranscriptService } from 'pages/exploration-player-page/services/player-transcript.service';
 import { Observable, Subject } from 'rxjs';
-
-export interface InteractionRulesService {
-  [ruleName: string]: (
-    answer: InteractionAnswer, ruleInputs: InteractionRuleInputs) => boolean;
-}
+import { AlgebraicExpressionInputRulesService } from 'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service';
+import { CodeReplRulesService } from 'interactions/CodeRepl/directives/code-repl-rules.service';
+import { ContinueRulesService } from 'interactions/Continue/directives/continue-rules.service';
+import { FractionInputRulesService } from 'interactions/FractionInput/directives/fraction-input-rules.service';
+import { ImageClickInputRulesService } from 'interactions/ImageClickInput/directives/image-click-input-rules.service';
+import { InteractiveMapRulesService } from 'interactions/InteractiveMap/directives/interactive-map-rules.service';
+import { MathEquationInputRulesService } from 'interactions/MathEquationInput/directives/math-equation-input-rules.service';
+import { NumericExpressionInputRulesService } from 'interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service';
+import { NumericInputRulesService } from 'interactions/NumericInput/directives/numeric-input-rules.service';
+import { PencilCodeEditorRulesService } from 'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service';
+import { GraphInputRulesService } from 'interactions/GraphInput/directives/graph-input-rules.service';
+import { SetInputRulesService } from 'interactions/SetInput/directives/set-input-rules.service';
+import { TextInputRulesService } from 'interactions/TextInput/directives/text-input-rules.service';
+import { InteractionAnswer } from 'interactions/answer-defs';
 
 type SubmitAnswerFn = () => void;
 
-type OnSubmitFn = (
-  answer: string, interactionRulesService: InteractionRulesService) => void;
+type InteractionRulesService = (
+  AlgebraicExpressionInputRulesService |
+  CodeReplRulesService |
+  ContinueRulesService |
+  FractionInputRulesService |
+  ImageClickInputRulesService |
+  InteractiveMapRulesService |
+  MathEquationInputRulesService |
+  NumericExpressionInputRulesService |
+  NumericInputRulesService |
+  PencilCodeEditorRulesService |
+  GraphInputRulesService |
+  SetInputRulesService |
+  TextInputRulesService
+);
 
-type ValidityCheckFn = () => boolean;
+export type OnSubmitFn = (
+  answer: InteractionAnswer,
+  interactionRulesService: InteractionRulesService
+) => void;
 
-type PresubmitHookFn = () => void;
+export type ValidityCheckFn = () => boolean;
+
+export type PresubmitHookFn = () => void;
 
 @Injectable({
   providedIn: 'root'
@@ -53,11 +76,11 @@ export class CurrentInteractionService {
     private contextService: ContextService,
     private playerPositionService: PlayerPositionService,
     private playerTranscriptService: PlayerTranscriptService) {}
-  private static submitAnswerFn: SubmitAnswerFn = null;
-  private static onSubmitFn: OnSubmitFn = null;
-  private static validityCheckFn: ValidityCheckFn = null;
-  private static presubmitHooks: PresubmitHookFn[] = [];
-  private static answerChangedSubject: Subject<void> = new Subject<void>();
+  submitAnswerFn: SubmitAnswerFn | null = null;
+  onSubmitFn: OnSubmitFn | null = null;
+  validityCheckFn: ValidityCheckFn | null = null;
+  presubmitHooks: PresubmitHookFn[] = [];
+  answerChangedSubject: Subject<void> = new Subject<void>();
 
   setOnSubmitFn(onSubmit: OnSubmitFn): void {
     /**
@@ -66,11 +89,13 @@ export class CurrentInteractionService {
      *
      * @param {function(answer, interactionRulesService)} onSubmit
      */
-    CurrentInteractionService.onSubmitFn = onSubmit;
+    this.onSubmitFn = onSubmit;
   }
 
   registerCurrentInteraction(
-      submitAnswerFn: SubmitAnswerFn, validityCheckFn: ValidityCheckFn): void {
+      submitAnswerFn: SubmitAnswerFn | null,
+      validityCheckFn: ValidityCheckFn | null
+  ): void {
     /**
      * Each interaction directive should call registerCurrentInteraction
      * when the interaction directive is first created.
@@ -84,8 +109,8 @@ export class CurrentInteractionService {
      *   interaction passes in null, the submit button will remain
      *   enabled (for the entire duration of the current interaction).
      */
-    CurrentInteractionService.submitAnswerFn = submitAnswerFn || null;
-    CurrentInteractionService.validityCheckFn = validityCheckFn || null;
+    this.submitAnswerFn = submitAnswerFn || null;
+    this.validityCheckFn = validityCheckFn || null;
   }
 
   registerPresubmitHook(hookFn: PresubmitHookFn): void {
@@ -93,30 +118,34 @@ export class CurrentInteractionService {
      * All hooks for the current interaction will be cleared right
      * before loading the next card.
      */
-    CurrentInteractionService.presubmitHooks.push(hookFn);
+    this.presubmitHooks.push(hookFn);
   }
 
   clearPresubmitHooks(): void {
     /* Clear out all the hooks for the current interaction. Should
      * be called before loading the next card.
      */
-    CurrentInteractionService.presubmitHooks = [];
+    this.presubmitHooks = [];
   }
 
   onSubmit(
-      answer: string, interactionRulesService: InteractionRulesService): void {
+      answer: InteractionAnswer,
+      interactionRulesService: InteractionRulesService
+  ): void {
     for (
-      let i = 0; i < CurrentInteractionService.presubmitHooks.length; i++) {
-      CurrentInteractionService.presubmitHooks[i]();
+      let i = 0; i < this.presubmitHooks.length; i++) {
+      this.presubmitHooks[i]();
     }
-    CurrentInteractionService.onSubmitFn(answer, interactionRulesService);
+    if (this.onSubmitFn) {
+      this.onSubmitFn(answer, interactionRulesService);
+    }
   }
 
   submitAnswer(): void {
     /* This starts the answer submit process, it should be called once the
      * learner presses the "Submit" button.
      */
-    if (CurrentInteractionService.submitAnswerFn === null) {
+    if (this.submitAnswerFn === null) {
       let index = this.playerPositionService.getDisplayedCardIndex();
       let displayedCard = this.playerTranscriptService.getCard(index);
       let additionalInfo = (
@@ -130,7 +159,7 @@ export class CurrentInteractionService {
         'The current interaction did not ' +
         'register a _submitAnswerFn.' + additionalInfo);
     } else {
-      CurrentInteractionService.submitAnswerFn();
+      this.submitAnswerFn();
     }
   }
 
@@ -140,7 +169,7 @@ export class CurrentInteractionService {
      * low-bandwidth scenarios where the interaction has not finished
      * loading.
      */
-    if (CurrentInteractionService.submitAnswerFn === null) {
+    if (this.submitAnswerFn === null) {
       return true;
     }
     /* Returns whether or not the Submit button should be disabled based on
@@ -149,18 +178,18 @@ export class CurrentInteractionService {
      * default we assume the answer is valid, so the submit button should
      * not be disabled.
      */
-    if (CurrentInteractionService.validityCheckFn === null) {
+    if (this.validityCheckFn === null) {
       return false;
     }
-    return !CurrentInteractionService.validityCheckFn();
+    return !this.validityCheckFn();
   }
 
   updateViewWithNewAnswer(): void {
-    CurrentInteractionService.answerChangedSubject.next();
+    this.answerChangedSubject.next();
   }
 
   get onAnswerChanged$(): Observable<void> {
-    return CurrentInteractionService.answerChangedSubject.asObservable();
+    return this.answerChangedSubject.asObservable();
   }
 }
 angular.module('oppia').factory('CurrentInteractionService',

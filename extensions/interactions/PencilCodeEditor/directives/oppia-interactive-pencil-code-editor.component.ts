@@ -22,7 +22,7 @@
 
 import { downgradeComponent } from '@angular/upgrade/static';
 import { Component, Input, OnDestroy, OnInit, ElementRef } from '@angular/core';
-import { CurrentInteractionService, InteractionRulesService } from 'pages/exploration-player-page/services/current-interaction.service';
+import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -37,13 +37,13 @@ import { Subscription } from 'rxjs';
   templateUrl: './pencil-code-editor-interaction.component.html'
 })
 export class PencilCodeEditor implements OnInit, OnDestroy {
-  @Input() lastAnswer: { code: string };
-  @Input() initialCodeWithValue: string;
+  @Input() lastAnswer!: { code: string };
+  @Input() initialCodeWithValue!: string;
+  iframeDiv!: NodeListOf<Element>;
+  pce!: PencilCodeEmbed;
+  someInitialCode!: string;
+  interactionIsActive: boolean = false;
   directiveSubscriptions = new Subscription();
-  iframeDiv: NodeListOf<Element>;
-  pce: PencilCodeEmbed;
-  interactionIsActive: boolean;
-  someInitialCode: string;
 
   constructor(
     private currentInteractionService: CurrentInteractionService,
@@ -161,7 +161,7 @@ export class PencilCodeEditor implements OnInit, OnDestroy {
       // issue in this case.
       this.pce.eval(
         'document.body.innerHTML', // disable-bad-pattern-check
-        (pencilCodeHtml) => {
+        (pencilCodeHtml: string) => {
           let normalizedCode = this.getNormalizedCode();
 
           // Get all the divs, and extract their textual content.
@@ -187,13 +187,11 @@ export class PencilCodeEditor implements OnInit, OnDestroy {
             output: output || '',
             evaluation: '',
             error: ''
-          } as unknown as string,
-           this.pencilCodeEditorRulesService as
-           unknown as InteractionRulesService);
+          }, this.pencilCodeEditorRulesService);
         }, true);
     });
 
-    this.pce.on('error', (error: { message }) => {
+    this.pce.on('error', (error: { message: string }) => {
       if (hasSubmittedAnswer) {
         return;
       }
@@ -208,8 +206,7 @@ export class PencilCodeEditor implements OnInit, OnDestroy {
         output: '',
         evaluation: '',
         error: error.message
-      } as unknown as string,
-       this.pencilCodeEditorRulesService as unknown as InteractionRulesService);
+      }, this.pencilCodeEditorRulesService);
 
       setTimeout(() => {
         errorIsHappening = false;

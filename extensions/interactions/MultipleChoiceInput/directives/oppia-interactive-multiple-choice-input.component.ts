@@ -124,7 +124,7 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
       return;
     }
     this.currentInteractionService.onSubmit(
-      this.answer as unknown as string,
+      this.answer,
       this.multipleChoiceInputRulesService as unknown as InteractionRulesService
     );
   }

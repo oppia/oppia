@@ -27,7 +27,7 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { ImageClickAnswer } from 'interactions/answer-defs';
 import { ImageClickInputCustomizationArgs, ImageWithRegions, LabeledRegion } from 'interactions/customization-args-defs';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
-import { CurrentInteractionService, InteractionRulesService } from 'pages/exploration-player-page/services/current-interaction.service';
+import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { ImageDimensions, ImagePreloaderService } from 'pages/exploration-player-page/services/image-preloader.service';
 import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
 import { Subscription } from 'rxjs';
@@ -48,7 +48,7 @@ interface ImagePoint {
 
 @Component({
   selector: 'oppia-interactive-image-click-input',
-  templateUrl: './image-click-input-interaction.component',
+  templateUrl: './image-click-input-interaction.component.html',
   styleUrls: []
 })
 export class InteractiveImageClickInput implements OnInit, OnDestroy {
@@ -270,13 +270,13 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
   }
 
   onClickImage(): void {
-    const answer = {
+    const answer: ImageClickAnswer = {
       clickPosition: [this.mouseX, this.mouseY],
       clickedRegions: this.currentlyHoveredRegions
     };
     this.currentInteractionService.onSubmit(
-      answer as unknown as string,
-      this.imageClickInputRulesService as unknown as InteractionRulesService);
+      answer,
+      this.imageClickInputRulesService);
   }
 
   ngOnDestroy(): void {

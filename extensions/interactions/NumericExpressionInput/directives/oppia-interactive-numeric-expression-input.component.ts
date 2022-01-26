@@ -25,7 +25,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { InteractionAnswer } from 'interactions/answer-defs';
 import { NumericExpressionInputCustomizationArgs } from 'interactions/customization-args-defs';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
-import { CurrentInteractionService, InteractionRulesService } from 'pages/exploration-player-page/services/current-interaction.service';
+import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { GuppyConfigurationService } from 'services/guppy-configuration.service';
 import { GuppyInitializationService } from 'services/guppy-initialization.service';
@@ -94,7 +94,7 @@ export class InteractiveNumericExpressionInput implements OnInit {
     }
     this.currentInteractionService.onSubmit(this.value, (
       this.numericExpressionInputRulesService
-    ) as unknown as InteractionRulesService);
+    ));
   }
 
   showOSK(): void {

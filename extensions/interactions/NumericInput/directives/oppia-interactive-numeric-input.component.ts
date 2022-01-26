@@ -24,7 +24,6 @@ import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import isUndefined from 'lodash/isUndefined';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
-import { InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { NumericInputCustomizationArgs } from 'interactions/customization-args-defs';
 import { NumericInputRulesService } from './numeric-input-rules.service';
@@ -69,8 +68,8 @@ export class InteractiveNumericInput implements OnInit {
   submitAnswer(answer: number): void {
     if (this.isAnswerValid()) {
       this.currentInteractionService.onSubmit(
-        answer as unknown as string,
-        this.numericInputRulesService as unknown as InteractionRulesService);
+        answer,
+        this.numericInputRulesService);
     }
   }
 

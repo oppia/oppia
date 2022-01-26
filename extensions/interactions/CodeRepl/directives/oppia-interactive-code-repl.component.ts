@@ -28,7 +28,7 @@ import { Subscription } from 'rxjs';
 
 import { CodeReplCustomizationArgs } from 'interactions/customization-args-defs';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
-import { CurrentInteractionService, InteractionRulesService } from 'pages/exploration-player-page/services/current-interaction.service';
+import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
 import { CodeReplRulesService } from './code-repl-rules.service';
 
@@ -280,8 +280,8 @@ export class InteractiveCodeReplComponent implements
       output: this.output,
       evaluation: this.evaluation,
       error: (err || '')
-    } as unknown as string,
-    this.codeReplRulesService as unknown as InteractionRulesService);
+    },
+    this.codeReplRulesService);
   }
 
   ngOnDestroy(): void {
