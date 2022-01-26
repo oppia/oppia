@@ -1,4 +1,4 @@
-// Copyright 2021 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,63 +13,68 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the MusicNotesInput short response.
+ * @fileoverview Unit tests for the music notes input short response component.
  */
 
-describe('oppiaShortResponseMusicNotesInput', function() {
-  let ctrl = null;
-  let directive = null;
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { HtmlEscaperService } from 'services/html-escaper.service';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ShortResponseMusicNotesInput } from './oppia-short-response-music-notes-input.component';
 
-  let mockHtmlEscaperService = {
-    escapedJsonToObj: function(answer) {
+describe('Short response music notes input component ', () => {
+  let component: ShortResponseMusicNotesInput;
+  let fixture: ComponentFixture<ShortResponseMusicNotesInput>;
+
+  class MockHtmlEscaperService {
+    escapedJsonToObj(answer: string): string {
       return answer;
     }
-  };
+  }
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('HtmlEscaperService', mockHtmlEscaperService);
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      declarations: [
+        ShortResponseMusicNotesInput,
+      ],
+      providers: [
+        {
+          provide: HtmlEscaperService,
+          useClass: MockHtmlEscaperService
+        }
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
 
   describe('when user provides an answer', () => {
-    beforeEach(angular.mock.module('oppia', function($provide) {
-      $provide.value('$attrs', {
-        answer: [{
-          readableNoteName: 'B4',
-          noteDuration: {
-            num: 1,
-            den: 1
-          }
-        }]
-      });
-    }));
+    beforeEach(() => {
+      fixture = TestBed.createComponent(ShortResponseMusicNotesInput);
+      component = fixture.componentInstance;
+      component.answer = [{
+        readableNoteName: 'B4',
+        noteDuration: {
+          num: 1,
+          den: 1
+        }
+      }];
+    });
 
-    beforeEach(angular.mock.inject(function($injector) {
-      directive =
-        $injector.get('oppiaShortResponseMusicNotesInputDirective')[0];
-      ctrl = $injector.instantiate(directive.controller);
-    }));
-
-    it('should initialise the component when submits answer', function() {
-      ctrl.$onInit();
-      expect(ctrl.displayedAnswer).toEqual('B4');
+    it('should initialise the component when submits answer', () => {
+      component.ngOnInit();
+      expect(component.displayedAnswer).toEqual('B4');
     });
   });
 
   describe('when user does not provides an answer', () => {
-    beforeEach(angular.mock.module('oppia', function($provide) {
-      $provide.value('$attrs', {
-        answer: []
-      });
-    }));
+    beforeEach(() => {
+      fixture = TestBed.createComponent(ShortResponseMusicNotesInput);
+      component = fixture.componentInstance;
+      component.answer = [];
+    });
 
-    beforeEach(angular.mock.inject(function($componentController) {
-      ctrl = $componentController('oppiaShortResponseMusicNotesInput');
-    }));
-
-    it('should initialise the component when submits answer', function() {
-      ctrl.$onInit();
-      expect(ctrl.displayedAnswer).toEqual('No answer given.');
+    it('should initialise the component when submits answer', () => {
+      component.ngOnInit();
+      expect(component.displayedAnswer).toEqual('No answer given.');
     });
   });
 });

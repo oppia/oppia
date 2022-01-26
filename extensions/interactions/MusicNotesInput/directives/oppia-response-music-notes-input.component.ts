@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,41 +13,47 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directives for the MusicNotesInput response.
+ * @fileoverview Component for the music notes input response.
  *
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  */
 
-require('services/html-escaper.service.ts');
+import { Component, Input, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { HtmlEscaperService } from 'services/html-escaper.service';
 
-angular.module('oppia').directive('oppiaResponseMusicNotesInput', [
-  'HtmlEscaperService', function(HtmlEscaperService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {},
-      template: require('./music-notes-input-response.directive.html'),
-      controllerAs: '$ctrl',
-      controller: ['$attrs', function($attrs) {
-        var ctrl = this;
-        ctrl.$onInit = function() {
-          var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-          var _notes = [];
-          for (var i = 0; i < _answer.length; i++) {
-            if (_answer[i].readableNoteName) {
-              _notes.push(_answer[i].readableNoteName);
-            }
-          }
+@Component({
+  selector: 'oppia-response-music-notes-input',
+  templateUrl: './music-notes-input-response.component.html'
+})
+export class ResponseMusicNotesInput implements OnInit {
+  @Input() answer: string;
+  displayedAnswer: string;
 
-          if (_notes.length > 0) {
-            ctrl.displayedAnswer = _notes.join(', ');
-          } else {
-            ctrl.displayedAnswer = 'No answer given.';
-          }
-        };
-      }]
-    };
+  constructor(
+    private htmlEscaperService: HtmlEscaperService
+  ) {}
+
+  ngOnInit(): void {
+    let _answer = this.htmlEscaperService.escapedJsonToObj(this.answer);
+    let _notes = [];
+    for (let i = 0; i < Object.keys(_answer).length; i++) {
+      if (_answer[i].readableNoteName) {
+        _notes.push(_answer[i].readableNoteName);
+      }
+    }
+
+    if (_notes.length > 0) {
+      this.displayedAnswer = _notes.join(', ');
+    } else {
+      this.displayedAnswer = 'No answer given.';
+    }
   }
-]);
+}
+
+angular.module('oppia').directive(
+  'oppiaResponseMusicNotesInput', downgradeComponent(
+    {component: ResponseMusicNotesInput}
+  ) as angular.IDirectiveFactory);
