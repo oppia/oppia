@@ -75,12 +75,12 @@ export class CurrentInteractionService {
   constructor(
     private contextService: ContextService,
     private playerPositionService: PlayerPositionService,
-    private playerTranscriptService: PlayerTranscriptService) {}
-  submitAnswerFn: SubmitAnswerFn | null = null;
-  onSubmitFn: OnSubmitFn | null = null;
-  validityCheckFn: ValidityCheckFn | null = null;
-  presubmitHooks: PresubmitHookFn[] = [];
-  answerChangedSubject: Subject<void> = new Subject<void>();
+    private playerTranscriptService: PlayerTranscriptService) { }
+  private static submitAnswerFn: SubmitAnswerFn | null = null;
+  private static onSubmitFn: OnSubmitFn | null = null;
+  private static validityCheckFn: ValidityCheckFn | null = null;
+  private static presubmitHooks: PresubmitHookFn[] = [];
+  private static answerChangedSubject: Subject<void> = new Subject<void>();
 
   setOnSubmitFn(onSubmit: OnSubmitFn): void {
     /**
@@ -89,7 +89,7 @@ export class CurrentInteractionService {
      *
      * @param {function(answer, interactionRulesService)} onSubmit
      */
-    this.onSubmitFn = onSubmit;
+    CurrentInteractionService.onSubmitFn = onSubmit;
   }
 
   registerCurrentInteraction(
@@ -109,8 +109,8 @@ export class CurrentInteractionService {
      *   interaction passes in null, the submit button will remain
      *   enabled (for the entire duration of the current interaction).
      */
-    this.submitAnswerFn = submitAnswerFn || null;
-    this.validityCheckFn = validityCheckFn || null;
+    CurrentInteractionService.submitAnswerFn = submitAnswerFn || null;
+    CurrentInteractionService.validityCheckFn = validityCheckFn || null;
   }
 
   registerPresubmitHook(hookFn: PresubmitHookFn): void {
@@ -118,14 +118,14 @@ export class CurrentInteractionService {
      * All hooks for the current interaction will be cleared right
      * before loading the next card.
      */
-    this.presubmitHooks.push(hookFn);
+    CurrentInteractionService.presubmitHooks.push(hookFn);
   }
 
   clearPresubmitHooks(): void {
     /* Clear out all the hooks for the current interaction. Should
      * be called before loading the next card.
      */
-    this.presubmitHooks = [];
+    CurrentInteractionService.presubmitHooks = [];
   }
 
   onSubmit(
@@ -133,11 +133,11 @@ export class CurrentInteractionService {
       interactionRulesService: InteractionRulesService
   ): void {
     for (
-      let i = 0; i < this.presubmitHooks.length; i++) {
-      this.presubmitHooks[i]();
+      let i = 0; i < CurrentInteractionService.presubmitHooks.length; i++) {
+      CurrentInteractionService.presubmitHooks[i]();
     }
-    if (this.onSubmitFn) {
-      this.onSubmitFn(answer, interactionRulesService);
+    if (CurrentInteractionService.onSubmitFn) {
+      CurrentInteractionService.onSubmitFn(answer, interactionRulesService);
     }
   }
 
@@ -145,7 +145,7 @@ export class CurrentInteractionService {
     /* This starts the answer submit process, it should be called once the
      * learner presses the "Submit" button.
      */
-    if (this.submitAnswerFn === null) {
+    if (CurrentInteractionService.submitAnswerFn === null) {
       let index = this.playerPositionService.getDisplayedCardIndex();
       let displayedCard = this.playerTranscriptService.getCard(index);
       let additionalInfo = (
@@ -159,7 +159,7 @@ export class CurrentInteractionService {
         'The current interaction did not ' +
         'register a _submitAnswerFn.' + additionalInfo);
     } else {
-      this.submitAnswerFn();
+      CurrentInteractionService.submitAnswerFn();
     }
   }
 
@@ -169,7 +169,7 @@ export class CurrentInteractionService {
      * low-bandwidth scenarios where the interaction has not finished
      * loading.
      */
-    if (this.submitAnswerFn === null) {
+    if (CurrentInteractionService.submitAnswerFn === null) {
       return true;
     }
     /* Returns whether or not the Submit button should be disabled based on
@@ -178,18 +178,18 @@ export class CurrentInteractionService {
      * default we assume the answer is valid, so the submit button should
      * not be disabled.
      */
-    if (this.validityCheckFn === null) {
+    if (CurrentInteractionService.validityCheckFn === null) {
       return false;
     }
-    return !this.validityCheckFn();
+    return !CurrentInteractionService.validityCheckFn();
   }
 
   updateViewWithNewAnswer(): void {
-    this.answerChangedSubject.next();
+    CurrentInteractionService.answerChangedSubject.next();
   }
 
   get onAnswerChanged$(): Observable<void> {
-    return this.answerChangedSubject.asObservable();
+    return CurrentInteractionService.answerChangedSubject.asObservable();
   }
 }
 angular.module('oppia').factory('CurrentInteractionService',

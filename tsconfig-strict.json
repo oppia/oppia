@@ -39,9 +39,6 @@
     }
   },
   "files": [
-    "extensions/interactions/PencilCodeEditor/directives/oppia-interactive-pencil-code-editor.component.ts",
-    "core/templates/pages/exploration-player-page/services/current-interaction.service.ts",
-    "core/templates/pages/exploration-player-page/services/current-interaction.service.spec.ts",
     "core/templates/app.constants.ts",
     "core/templates/base-components/base-content.component.ts",
     "core/templates/base-components/base-content.component.spec.ts",
@@ -409,6 +406,8 @@
     "core/templates/pages/exploration-player-page/services/content-translation-language.service.spec.ts",
     "core/templates/pages/exploration-player-page/services/content-translation-manager.service.ts",
     "core/templates/pages/exploration-player-page/services/content-translation-manager.service.spec.ts",
+    "core/templates/pages/exploration-player-page/services/current-interaction.service.ts",
+    "core/templates/pages/exploration-player-page/services/current-interaction.service.spec.ts",
     "core/templates/pages/exploration-player-page/services/exploration-recommendations.service.ts",
     "core/templates/pages/exploration-player-page/services/exploration-recommendations.service.spec.ts",
     "core/templates/pages/exploration-player-page/services/fatigue-detection.service.ts",
@@ -710,6 +709,7 @@
     "extensions/interactions/NumericInput/directives/numeric-input-rules.service.spec.ts",
     "extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts",
     "extensions/interactions/NumericInput/directives/numeric-input-validation.service.spec.ts",
+    "extensions/interactions/PencilCodeEditor/directives/oppia-interactive-pencil-code-editor.component.ts",
     "extensions/interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service.ts",
     "extensions/interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service.spec.ts",
     "extensions/interactions/PencilCodeEditor/directives/pencil-code-editor-validation.service.ts",

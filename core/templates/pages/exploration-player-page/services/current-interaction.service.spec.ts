@@ -93,6 +93,21 @@ describe('Current Interaction Service', () => {
       !dummyValidityCheckFn());
   });
 
+  it('should handle case where validityCheckFn is null', () => {
+    let dummySubmitAnswerFn = () => {
+      return false;
+    };
+    currentInteractionService.registerCurrentInteraction(
+      dummySubmitAnswerFn, null);
+    expect(currentInteractionService.isSubmitButtonDisabled()).toBe(false);
+  });
+
+  it('should handle case where submitAnswerFn is null', () => {
+    currentInteractionService.registerCurrentInteraction(
+      null, null);
+    expect(currentInteractionService.isSubmitButtonDisabled()).toBe(true);
+  });
+
   it('should properly register and clear presubmit hooks', () => {
     let hookStateA = 0;
     let hookStateB = 1;

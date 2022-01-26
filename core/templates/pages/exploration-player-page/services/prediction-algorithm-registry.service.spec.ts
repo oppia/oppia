@@ -27,9 +27,9 @@ describe('Prediction Algorithm Registry Service', () => {
   let textInputPredictionService: TextInputPredictionService;
 
   beforeEach(() => {
-    predictionAlgorithmRegistryService = TestBed.get(
+    predictionAlgorithmRegistryService = TestBed.inject(
       PredictionAlgorithmRegistryService);
-    textInputPredictionService = TestBed.get(TextInputPredictionService);
+    textInputPredictionService = TestBed.inject(TextInputPredictionService);
   });
 
   it('should return service for TextClassifier at schema version 1.', () => {
@@ -73,7 +73,7 @@ describe('Prediction Algorithm Registry Service', () => {
       ).toBe(textInputPredictionService);
 
       predictionAlgorithmRegistryService.testOnlySetPredictionService(
-        'TextClassifier', 1, mockPredictionService);
+        'TextClassifier', 1, textInputPredictionService);
 
       expect(
         predictionAlgorithmRegistryService
@@ -88,7 +88,7 @@ describe('Prediction Algorithm Registry Service', () => {
       ).toBeNull();
 
       predictionAlgorithmRegistryService.testOnlySetPredictionService(
-        'NullClassifier', 1, mockPredictionService);
+        'NullClassifier', 1, textInputPredictionService);
 
       expect(
         predictionAlgorithmRegistryService
@@ -105,7 +105,7 @@ describe('Prediction Algorithm Registry Service', () => {
         ).toBeNull();
 
         predictionAlgorithmRegistryService.testOnlySetPredictionService(
-          'TextClassifier', 999, mockPredictionService);
+          'TextClassifier', 999, textInputPredictionService);
 
         expect(
           predictionAlgorithmRegistryService
