@@ -57,10 +57,10 @@
     </oppia-state-hints-editor>
   </div>
   <div ng-if="currentInteractionCanHaveSolution">
-    <state-solution-editor on-save-solution="$ctrl.onSaveSolution"
-                           refresh-warnings="$ctrl.refreshWarnings"
-                           show-mark-all-audio-as-needing-update-modal-if-required="$ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired">
-    </state-solution-editor>
+    <oppia-state-solution-editor (save-solution)="$ctrl.onSaveSolution($event)"
+                                 (refresh-warnings)="$ctrl.refreshWarnings()"
+                                 (show-mark-all-audio-as-needing-update-modal-if-required)="$ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired($event)">
+    </oppia-state-solution-editor>
   </div>
   <div ng-if="$ctrl.explorationIsLinkedToStory">
     <state-skill-editor (on-save-state-content)="$ctrl.onSaveStateContent($event)"
