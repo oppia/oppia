@@ -146,6 +146,9 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
 
   it('should update selected answer when user selects an option', () => {
     let dummyMouseEvent = new MouseEvent('Mouse');
+    let questionElement = document.createElement('div');
+    questionElement.className =
+      'oppia-rte-viewer oppia-learner-view-card-top-content';
     spyOn(browserCheckerService, 'isMobileDevice').and.returnValue(false);
     spyOn(document, 'querySelector')
       .withArgs('button.multiple-choice-option.selected').and.returnValue({
@@ -166,7 +169,7 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
         }
       })
       .withArgs('.oppia-rte-viewer.oppia-learner-view-card-top-content')
-      .and.returnValue(null);
+      .and.returnValue(questionElement);
     spyOnProperty(dummyMouseEvent, 'currentTarget').and.returnValue(
       {
         classList: {
@@ -265,7 +268,6 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
     let questionElement = document.createElement('div');
     questionElement.className =
       'oppia-rte-viewer oppia-learner-view-card-top-content';
-    document.body.appendChild(questionElement);
 
     spyOn(document, 'querySelector')
       .withArgs('.oppia-rte-viewer.oppia-learner-view-card-top-content')
@@ -279,9 +281,9 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
 
     let questionIsOnceAnswered = component.isQuestionOnceAnswered();
     expect(questionIsOnceAnswered).toBe(false);
-
     component.answer = 1;
     component.submitAnswer();
+
     component.ngOnInit();
 
     let previousChoicesInOrder = JSON.parse(encodedChoices);
