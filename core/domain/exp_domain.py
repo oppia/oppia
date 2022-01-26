@@ -350,6 +350,16 @@ class ExplorationChange(change_domain.BaseChange):
         'required_attribute_names': ['version_number'],
         'optional_attribute_names': [],
         'user_id_attribute_names': []
+    }, {
+        'name': CMD_MARK_TRANSLATION_NEEDS_UPDATE,
+        'required_attribute_names': ['content_id', 'state_name'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
+    }, {
+        'name': CMD_REMOVE_TRANSLATION,
+        'required_attribute_names': ['content_id', 'state_name'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }]
 
     # TODO(#12991): Remove this once once we use the migration jobs to remove
