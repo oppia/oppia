@@ -485,8 +485,8 @@ def _build_exp_id_to_translation_suggestion_in_review_count(
     suggestion in review count.
 
     Args:
-        exp_opportunity_summary_models: list(
-            ExplorationOpportunitySummaryModel). List of
+        exp_opportunity_summary_models:
+            list(ExplorationOpportunitySummaryModel). List of
             ExplorationOpportunitySummaryModels.
         language_code: str. The language for which translation opportunities
             should be fetched.
