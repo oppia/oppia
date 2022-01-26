@@ -25,7 +25,7 @@ module.exports = {
     type: 'problem',
     docs: {
       description: `Use nested awaits without any exception for
-       await (await browser.switchTo().activeElement()).sendKeys(explanation);`,
+        await (await browser.switchTo().activeElement()).sendKeys(explanation);`,
       category: 'Best Practices',
       recommended: true,
     },
@@ -33,43 +33,41 @@ module.exports = {
     schema: [],
     messages: {
       nestedAwaits: `Only use nested awaits for 
-       await (await browser.switchTo().activeElement()).sendKeys(explanation);`,
+        await (await browser.switchTo().activeElement()).sendKeys(explanation);`,
     },
   },
-
+ 
   create: function(context) {
+    var activeElementSelector1 = (
+      'CallExpression[callee.property.name = activeElement]' +
+      '[callee.object.callee.object.name = browser]' +
+      '[callee.object.callee.property.name = switchTo]'
+    );
+
+    var activeElementSelector2 = (
+      'CallExpression[callee.object.type = AwaitExpression]' +
+      '[callee.object.argument.callee.property.name = activeElement]' +
+      '[callee.object.argument.callee.object.callee.property.name = switchTo]' +
+      '[callee.object.argument.callee.object.callee.object.name = browser]'
+    );
+
+    var reportNestedAwaits = function(node){
+      if (node.parent.type !== 'AwaitExpression') {
+        context.report({
+          node: node,
+          message: 'Please use nested awaits like: ' +
+            'await (await browser.switchTo().activeElement())' +
+            '.sendKeys(explanation);'
+        });
+      }
+    };
+
     return {
-      CallExpression(node) {
-        if (node && node.callee && node.callee.property &&
-          node.callee.property.name === 'activeElement' &&
-          node.callee.object.callee.property.name === 'switchTo' &&
-          node.callee.object.callee.object.name === 'browser') {
-          if (node.parent.type !== 'AwaitExpression') {
-            context.report({
-              node: node,
-              message: 'Please use nested awaits like: ' +
-              'await (await browser.switchTo().activeElement())' +
-              '.sendKeys(explanation);'
-            });
-          }
-        }
-        if (node && node.callee && node.callee.property &&
-          node.callee.object.type === 'AwaitExpression' &&
-          node.callee.object.argument.callee.property.name ===
-          'activeElement' &&
-          node.callee.object.argument.callee.object.callee.property.name ===
-          'switchTo' &&
-          node.callee.object.argument.callee.object.callee.object.name ===
-          'browser') {
-          if (node.parent.type !== 'AwaitExpression') {
-            context.report({
-              node: node,
-              message: 'Please use nested awaits like: ' +
-              'await (await browser.switchTo().activeElement())' +
-              '.sendKeys(explanation);'
-            });
-          }
-        }
+      [activeElementSelector1]: function(node){
+        reportNestedAwaits(node);
+      },
+      [activeElementSelector2]: function(node){
+        reportNestedAwaits(node);
       }
     };
   }
