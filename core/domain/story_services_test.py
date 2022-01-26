@@ -1288,7 +1288,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             validation_error_messages, [
                 'Expected all explorations in a story to '
-                'have correctness feedback enabled. Invalid exploration: exp_id_1'])
+                'have correctness feedback enabled. Invalid '
+                'exploration: exp_id_1'])
         with self.assertRaisesRegex(
             Exception, 'Expected all explorations in a story to '
             'have correctness feedback enabled. Invalid exploration: exp_id_1'):
@@ -1319,10 +1320,12 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             validation_error_messages, [
                 'Invalid interaction GraphInput in exploration with ID: '
-                'exp_id_1. This interaction is not supported on the mobile app.'])
+                'exp_id_1. This interaction is not supported '
+                'on the mobile app.'])
         with self.assertRaisesRegex(
             Exception, 'Invalid interaction GraphInput in exploration with '
-            'ID: exp_id_1. This interaction is not supported on the mobile app.'):
+            'ID: exp_id_1. This interaction is not supported '
+            'on the mobile app.'):
             story_services.update_story(
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
