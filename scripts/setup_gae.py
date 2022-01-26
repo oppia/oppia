@@ -40,7 +40,7 @@ def main(args=None):
 
     sys.path.append('.')
     sys.path.append(common.GOOGLE_APP_ENGINE_SDK_HOME)
-    sys.path.append(os.path.join(common.OPPIA_TOOLS_DIR, 'webtest-2.0.35'))
+    sys.path.append(os.path.join(common.OPPIA_TOOLS_DIR, 'webtest-3.0.0'))
 
     # Delete old *.pyc files.
     for directory, _, files in os.walk('.'):
@@ -61,7 +61,7 @@ def main(args=None):
             # should also be updated.
             urlrequest.urlretrieve(
                 'https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/'
-                'google-cloud-sdk-335.0.0-linux-x86_64.tar.gz',
+                'google-cloud-sdk-364.0.0-linux-x86_64.tar.gz',
                 filename='gcloud-sdk.tar.gz')
         except Exception:
             print('Error downloading Google Cloud SDK. Exiting.')
@@ -70,7 +70,7 @@ def main(args=None):
         tar = tarfile.open(name='gcloud-sdk.tar.gz')
         tar.extractall(
             path=os.path.join(
-                common.OPPIA_TOOLS_DIR, 'google-cloud-sdk-335.0.0/'))
+                common.OPPIA_TOOLS_DIR, 'google-cloud-sdk-364.0.0/'))
         tar.close()
 
         os.remove('gcloud-sdk.tar.gz')

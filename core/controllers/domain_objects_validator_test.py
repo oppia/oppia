@@ -16,6 +16,10 @@
 
 from __future__ import annotations
 
+import os
+
+from core import feconf
+from core import python_utils
 from core import utils
 from core.controllers import domain_objects_validator
 from core.tests import test_utils
@@ -30,7 +34,7 @@ class ValidateExplorationChangeTests(test_utils.GenericTestBase):
             'property_name': 'title',
             'new_value': 'newValue'
         }
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception, 'Missing cmd key in change dict'):
             domain_objects_validator.validate_exploration_change(
                 incorrect_change_dict)
@@ -46,6 +50,53 @@ class ValidateExplorationChangeTests(test_utils.GenericTestBase):
             correct_change_dict)
 
 
+class ValidateSuggestionChangeTests(test_utils.GenericTestBase):
+    """Tests to validate domain objects coming from frontend."""
+
+    def test_incorrect_exp_domain_object_raises_exception(self) -> None:
+        incorrect_change_dict = {
+            'state_name': 'State 3',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '<p>old content html</p>',
+            'translation_html': '<p>In Hindi</p>',
+            'data_format': 'html'
+        }
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+            Exception, 'Missing cmd key in change dict'
+        ):
+            domain_objects_validator.validate_suggestion_change(
+                incorrect_change_dict)
+
+        incorrect_change_dict = {
+            'cmd': 'add_subtopic',
+            'state_name': 'State 3',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '<p>old content html</p>',
+            'translation_html': '<p>In Hindi</p>',
+            'data_format': 'html'
+        }
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+            Exception, '%s cmd is not allowed.' % incorrect_change_dict['cmd']
+        ):
+            domain_objects_validator.validate_suggestion_change(
+                incorrect_change_dict)
+
+    def test_correct_exp_domain_object_do_not_raises_exception(self) -> None:
+        correct_change_dict = {
+            'cmd': 'add_written_translation',
+            'state_name': 'State 3',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '<p>old content html</p>',
+            'translation_html': '<p>In Hindi</p>',
+            'data_format': 'html'
+        }
+        domain_objects_validator.validate_suggestion_change(
+            correct_change_dict)
+
+
 class ValidateCollectionChangeTests(test_utils.GenericTestBase):
     """Tests to validate domain objects coming from API."""
 
@@ -55,7 +106,7 @@ class ValidateCollectionChangeTests(test_utils.GenericTestBase):
             'property_name': 'title',
             'new_value': 'newValue'
         }
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception, 'Missing cmd key in change dict'):
             domain_objects_validator.validate_collection_change(
                 incorrect_change_dict)
@@ -76,13 +127,13 @@ class ValidateNewConfigPropertyValuesTests(test_utils.GenericTestBase):
 
     def test_invalid_object_raises_exception(self) -> None:
         config_properties = {'some_config_property': 20, }
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception, 'some_config_property do not have any schema.'):
             domain_objects_validator.validate_new_config_property_values(
                 config_properties)
 
         config_properties = {1234: 20, } # type: ignore[dict-item]
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception, 'config property name should be a string, received'
             ': %s' % 1234):
             domain_objects_validator.validate_new_config_property_values(
@@ -105,7 +156,7 @@ class ValidateChangeDictForBlogPost(test_utils.GenericTestBase):
             'title': 123,
             'tags': ['News'],
         }
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, 'Title should be a string'):
             domain_objects_validator.validate_change_dict_for_blog_post(
                 blog_post_change)
@@ -115,7 +166,7 @@ class ValidateChangeDictForBlogPost(test_utils.GenericTestBase):
             'title': 'Hello Bloggers',
             'tags': ['News', 'Some Tag'],
         }
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception, 'Invalid tags provided. Tags not in default'
             ' tags list.'):
             domain_objects_validator.validate_change_dict_for_blog_post(
@@ -125,7 +176,7 @@ class ValidateChangeDictForBlogPost(test_utils.GenericTestBase):
             'title': 'Hello',
             'tags': ['News', 123], # type: ignore[list-item]
         }
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception, 'Expected each tag in \'tags\' to be a string,'
             ' received: \'123\''):
             domain_objects_validator.validate_change_dict_for_blog_post(
@@ -221,8 +272,29 @@ class ValidateStateDictInStateYamlHandler(test_utils.GenericTestBase):
             'solicit_answer_details': False
         }
         # The error is representing the keyerror.
-        with self.assertRaisesRegexp(Exception, 'content'): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'content'): # type: ignore[no-untyped-call]
             domain_objects_validator.validate_state_dict(invalid_state_dict)
+
+
+class ValidateSuggestionImagesTests(test_utils.GenericTestBase):
+    """Tests to validate suggestion images coming from frontend."""
+
+    def test_invalid_images_raises_exception(self) -> None:
+        files = {'file.svg': None}
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+            Exception, 'No image supplied'
+        ):
+            domain_objects_validator.validate_suggestion_images(files)
+
+    def test_valid_images_do_not_raises_exception(self) -> None:
+        files = {'img.png': None, 'test2_svg.svg': None}
+        for filename in files:
+            with python_utils.open_file(
+                os.path.join(feconf.TESTS_DATA_DIR, filename), 'rb',
+                encoding=None
+            ) as f:
+                files[filename] = f.read()
+        domain_objects_validator.validate_suggestion_images(files)
 
 
 class ValidateParamsDict(test_utils.GenericTestBase):
@@ -230,15 +302,63 @@ class ValidateParamsDict(test_utils.GenericTestBase):
 
     def test_invalid_type_raises_exception(self):
         incorrect_type = 13
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Excepted dict, received %s' % incorrect_type):
             domain_objects_validator.validate_params_dict(incorrect_type)
 
         incorrect_type = 'param1'
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Excepted dict, received %s' % incorrect_type):
             domain_objects_validator.validate_params_dict(incorrect_type)
 
     def test_valid_type_raises_no_exception(self):
         correct_type = {}
         domain_objects_validator.validate_params_dict(correct_type)
+
+
+class ValidateTopicChangeDict(test_utils.GenericTestBase):
+    """Tests to validate change_dict of TopicEditHandler."""
+
+    def test_valid_dict_raises_no_exception(self) -> None:
+        valid_change_dict = {
+            'cmd': 'update_topic_property',
+            'property_name': 'name',
+            'old_value': '',
+            'new_value': 'a'
+        }
+        self.assertEqual(
+            domain_objects_validator.
+            validate_topic_and_sub_topic_change(valid_change_dict),
+            valid_change_dict)
+
+    def test_invalid_dict_raises_exception(self) -> None:
+        cmd_none = {
+            'cmd': None,
+            'property_name': 'name',
+            'old_value': '',
+            'new_value': 'a'
+        }
+        cmd_invalid = {
+            'cmd': 'invalid_cmd',
+            'property_name': 'name',
+            'old_value': '',
+            'new_value': 'a'
+        }
+        cmd_missing = {
+            'property_name': 'name',
+            'old_value': '',
+            'new_value': 'a'
+        }
+
+        with self.assertRaisesRegex(
+            Exception, 'cmd is not allowed.'): # type: ignore[no-untyped-call]
+            domain_objects_validator.validate_topic_and_sub_topic_change(
+                cmd_none)
+        with self.assertRaisesRegex(
+            Exception, 'cmd is not allowed.'): # type: ignore[no-untyped-call]
+            domain_objects_validator.validate_topic_and_sub_topic_change(
+                cmd_invalid)
+        with self.assertRaisesRegex(
+            Exception, 'cmd is not allowed.'): # type: ignore[no-untyped-call]
+            domain_objects_validator.validate_topic_and_sub_topic_change(
+                cmd_missing)

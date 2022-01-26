@@ -518,6 +518,17 @@ class ElasticSearchStub:
 class AuthServicesStub:
     """Test-only implementation of the public API in core.platform.auth."""
 
+    class AuthUser:
+        """Authentication user with ID and deletion status."""
+
+        def __init__(self, user_id, deleted=False):
+            self.id = user_id
+            self.deleted = deleted
+
+        def mark_as_deleted(self):
+            """Marks the user as deleted."""
+            self.deleted = True
+
     def __init__(self):
         """Initializes a new instance that emulates an empty auth server."""
         self._user_id_by_auth_id = {}
@@ -640,9 +651,9 @@ class AuthServicesStub:
             user_id: str. The unique ID of the user whose associations should be
                 deleted.
         """
-        self._user_id_by_auth_id = {
-            a: u for a, u in self._user_id_by_auth_id.items() if u != user_id
-        }
+        for user in self._user_id_by_auth_id.values():
+            if user.id == user_id:
+                user.mark_as_deleted()
 
     def delete_external_auth_associations(self, user_id):
         """Deletes all associations that refer to the user outside of Oppia.
@@ -677,21 +688,31 @@ class AuthServicesStub:
             str|None. The auth ID associated with the given user ID, or None if
             no association exists.
         """
-        return next(
-            (a for a, u in self._user_id_by_auth_id.items() if u == user_id),
-            None)
+        return next((
+            auth_id for auth_id, user in self._user_id_by_auth_id.items()
+            if user.id == user_id and not user.deleted
+        ), None)
 
-    def get_user_id_from_auth_id(self, auth_id):
+    def get_user_id_from_auth_id(self, auth_id, include_deleted=False):
         """Returns the user ID associated with the given auth ID.
 
         Args:
             auth_id: str. The auth ID.
+            include_deleted: bool. Whether to return the ID of models marked for
+                deletion.
 
         Returns:
             str|None. The user ID associated with the given auth ID, or None if
             no association exists.
         """
-        return self._user_id_by_auth_id.get(auth_id, None)
+        user = self._user_id_by_auth_id.get(auth_id, None)
+        if user is None:
+            return None
+
+        if include_deleted or not user.deleted:
+            return user.id
+
+        return None
 
     def get_multi_user_ids_from_auth_ids(self, auth_ids):
         """Returns the user IDs associated with the given auth IDs.
@@ -703,7 +724,7 @@ class AuthServicesStub:
             list(str|None). The user IDs associated with each of the given auth
             IDs, or None for associations which don't exist.
         """
-        return [self._user_id_by_auth_id.get(a, None) for a in auth_ids]
+        return [self.get_user_id_from_auth_id(auth_id) for auth_id in auth_ids]
 
     def get_multi_auth_ids_from_user_ids(self, user_ids):
         """Returns the auth IDs associated with the given user IDs.
@@ -715,8 +736,11 @@ class AuthServicesStub:
             list(str|None). The auth IDs associated with each of the given user
             IDs, or None for associations which don't exist.
         """
-        auth_id_by_user_id = {u: a for a, u in self._user_id_by_auth_id.items()}
-        return [auth_id_by_user_id.get(u, None) for u in user_ids]
+        auth_id_by_user_id = {
+            user.id: auth_id
+            for auth_id, user in self._user_id_by_auth_id.items()
+        }
+        return [auth_id_by_user_id.get(user_id, None) for user_id in user_ids]
 
     def associate_auth_id_with_user_id(self, auth_id_user_id_pair):
         """Commits the association between auth ID and user ID.
@@ -734,11 +758,11 @@ class AuthServicesStub:
         if auth_id in self._user_id_by_auth_id:
             raise Exception(
                 'auth_id=%r is already associated with user_id=%r' % (
-                    auth_id, self._user_id_by_auth_id[auth_id]))
+                    auth_id, self._user_id_by_auth_id[auth_id].id))
         auth_models.UserAuthDetailsModel(
             id=user_id, firebase_auth_id=auth_id).put()
         self._external_user_id_associations.add(user_id)
-        self._user_id_by_auth_id[auth_id] = user_id
+        self._user_id_by_auth_id[auth_id] = AuthServicesStub.AuthUser(user_id)
 
     def associate_multi_auth_ids_with_user_ids(self, auth_id_user_id_pairs):
         """Commits the associations between auth IDs and user IDs.
@@ -753,7 +777,7 @@ class AuthServicesStub:
             Exception. One or more auth associations already exist.
         """
         collisions = ', '.join(
-            '{auth_id=%r: user_id=%r}' % (a, self._user_id_by_auth_id[a])
+            '{auth_id=%r: user_id=%r}' % (a, self._user_id_by_auth_id[a].id)
             for a, _ in auth_id_user_id_pairs if a in self._user_id_by_auth_id)
         if collisions:
             raise Exception('already associated: %s' % collisions)
@@ -763,7 +787,11 @@ class AuthServicesStub:
              for auth_id, user_id in auth_id_user_id_pairs])
         self._external_user_id_associations.add(
             u for _, u in auth_id_user_id_pairs)
-        self._user_id_by_auth_id.update(auth_id_user_id_pairs)
+        auth_id_user_id_pairs_with_deletion = {
+            auth_id: AuthServicesStub.AuthUser(user_id)
+            for auth_id, user_id in auth_id_user_id_pairs
+        }
+        self._user_id_by_auth_id.update(auth_id_user_id_pairs_with_deletion)
 
 
 class TaskqueueServicesStub:
@@ -984,7 +1012,7 @@ class TestBase(unittest.TestCase):
 
     def _assert_validation_error(self, item, error_substring):
         """Checks that the given item passes default validation."""
-        with self.assertRaisesRegexp(utils.ValidationError, error_substring):
+        with self.assertRaisesRegex(utils.ValidationError, error_substring):
             item.validate()
 
     def log_line(self, line):
@@ -1278,9 +1306,9 @@ class TestBase(unittest.TestCase):
     def assertRaises(self, *args, **kwargs):
         raise NotImplementedError(
             'self.assertRaises should not be used in these tests. Please use '
-            'self.assertRaisesRegexp instead.')
+            'self.assertRaisesRegex instead.')
 
-    def assertRaisesRegexp(  # pylint: disable=invalid-name
+    def assertRaisesRegex(  # pylint: disable=invalid-name
             self, expected_exception, expected_regex, *args, **kwargs):
         """Asserts that the message in a raised exception matches a regex.
         This is a wrapper around assertRaisesRegex in unittest that enforces
@@ -1302,7 +1330,7 @@ class TestBase(unittest.TestCase):
                 'Please provide a sufficiently strong regexp string to '
                 'validate that the correct error is being raised.')
 
-        return super(TestBase, self).assertRaisesRegexp(
+        return super(TestBase, self).assertRaisesRegex(
             expected_exception, expected_regex, *args, **kwargs)
 
     def assertItemsEqual(self, *args, **kwargs):  # pylint: disable=invalid-name
@@ -1336,7 +1364,7 @@ class TestBase(unittest.TestCase):
         get_match = re.match if full_match else re.search
         differences = [
             '~ [i=%d]:\t%r does not match: %r' % (i, item, regexp)
-            for i, (regexp, item) in enumerate(python_utils.ZIP(regexps, items))
+            for i, (regexp, item) in enumerate(zip(regexps, items))
             if get_match(regexp, item, flags=re.DOTALL) is None
         ]
         if len(items) < len(regexps):
@@ -1982,9 +2010,12 @@ title: Title
 
             response = self.testapp.post(feconf.SIGNUP_DATA_URL, params={
                 'csrf_token': self.get_new_csrf_token(),
-                'payload': json.dumps(
-                    {'username': username, 'agreed_to_terms': True}),
-            })
+                'payload': json.dumps({
+                    'username': username,
+                    'agreed_to_terms': True,
+                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
+                    }),
+                })
             self.assertEqual(response.status_int, 200)
 
     def signup_superadmin_user(self):
@@ -2617,7 +2648,7 @@ title: Title
         exploration.correctness_feedback_enabled = correctness_feedback_enabled
         exploration.add_states(state_names[1:])
         for from_state_name, dest_state_name in (
-                python_utils.ZIP(state_names[:-1], state_names[1:])):
+                zip(state_names[:-1], state_names[1:])):
             from_state = exploration.states[from_state_name]
             self.set_interaction_for_state(
                 from_state, next(interaction_ids))
@@ -3645,7 +3676,11 @@ class FunctionWrapper:
         if self._instance is not None:
             args = [self._instance] + list(args)
 
-        args_dict = inspect.getcallargs(self._func, *args, **kwargs)
+        # Creates a mapping from positional and keyword arguments to parameters
+        # and binds them to the call signature of the method. Serves as a
+        # replacement for inspect.getcallargs() in python versions >= 3.5.
+        sig = inspect.signature(self._func)
+        args_dict = sig.bind_partial(*args, **kwargs).arguments
 
         self.pre_call_hook(args_dict)
 

@@ -17,10 +17,10 @@
 from __future__ import annotations
 
 import datetime
+import enum
 import logging
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.domain import blog_services
@@ -63,8 +63,18 @@ from core.tests import test_utils
 BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
 BOTH_MODERATOR_AND_ADMIN_USERNAME = 'moderatorandadm1n'
 
-PARAM_NAMES = python_utils.create_enum('test_feature_1')  # pylint: disable=invalid-name
-FEATURE_STAGES = platform_parameter_domain.FEATURE_STAGES
+
+# TODO(#14419): Change naming style of Enum class from SCREAMING_SNAKE_CASE
+# to PascalCase and its values to UPPER_CASE. Because we want to be consistent
+# throughout the codebase according to the coding style guide.
+# https://github.com/oppia/oppia/wiki/Coding-style-guide
+class PARAM_NAMES(enum.Enum): # pylint: disable=invalid-name
+    """Enum for parameter names."""
+
+    test_feature_1 = 'test_feature_1' # pylint: disable=invalid-name
+
+
+FeatureStages = platform_parameter_domain.FEATURE_STAGES
 
 
 class AdminIntegrationTest(test_utils.GenericTestBase):
@@ -143,7 +153,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
-        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'Cannot reload an exploration in production.')
         with assert_raises_regexp_context_manager, prod_mode_swap:
             self.post_json(
@@ -159,7 +169,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
-        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'Cannot load new structures data in production.')
         with assert_raises_regexp_context_manager, prod_mode_swap:
             self.post_json(
@@ -171,7 +181,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_non_admins_cannot_load_new_structures_data(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
-        assert_raises_regexp = self.assertRaisesRegexp(
+        assert_raises_regexp = self.assertRaisesRegex(
             Exception, 'User does not have enough rights to generate data.')
         with assert_raises_regexp:
             self.post_json(
@@ -185,7 +195,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
-        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'Cannot generate dummy skills in production.')
         with assert_raises_regexp_context_manager, prod_mode_swap:
             self.post_json(
@@ -197,7 +207,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_non_admins_cannot_generate_dummy_skill_data(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
-        assert_raises_regexp = self.assertRaisesRegexp(
+        assert_raises_regexp = self.assertRaisesRegex(
             Exception, 'User does not have enough rights to generate data.')
         with assert_raises_regexp:
             self.post_json(
@@ -211,7 +221,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
-        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'Cannot reload a collection in production.')
         with assert_raises_regexp_context_manager, prod_mode_swap:
             self.post_json(
@@ -466,7 +476,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_get_handler_includes_all_feature_flags(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         feature = platform_parameter_registry.Registry.create_feature_flag(
-            PARAM_NAMES.test_feature_1, 'feature for test.', FEATURE_STAGES.dev)
+            PARAM_NAMES.test_feature_1, 'feature for test.', FeatureStages.dev)
 
         feature_list_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_LIST',
@@ -488,7 +498,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         feature = platform_parameter_registry.Registry.create_feature_flag(
-            PARAM_NAMES.test_feature_1, 'feature for test.', FEATURE_STAGES.dev)
+            PARAM_NAMES.test_feature_1, 'feature for test.', FeatureStages.dev)
         new_rule_dicts = [
             {
                 'filters': [
@@ -532,7 +542,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         feature = platform_parameter_registry.Registry.create_feature_flag(
-            PARAM_NAMES.test_feature_1, 'feature for test.', FEATURE_STAGES.dev)
+            PARAM_NAMES.test_feature_1, 'feature for test.', FeatureStages.dev)
         new_rule_dicts = [
             {
                 'filters': [
@@ -577,7 +587,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         feature = platform_parameter_registry.Registry.create_feature_flag(
-            PARAM_NAMES.test_feature_1, 'feature for test.', FEATURE_STAGES.dev)
+            PARAM_NAMES.test_feature_1, 'feature for test.', FeatureStages.dev)
         new_rule_dicts = [
             {
                 'filters': [
@@ -745,7 +755,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         feature = platform_parameter_registry.Registry.create_feature_flag(
-            PARAM_NAMES.test_feature_1, 'feature for test.', FEATURE_STAGES.dev)
+            PARAM_NAMES.test_feature_1, 'feature for test.', FeatureStages.dev)
         new_rule_dicts = [
             {
                 'filters': [
@@ -1002,7 +1012,7 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
-        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'Cannot generate dummy explorations in production.')
 
         with assert_raises_regexp_context_manager, prod_mode_swap:

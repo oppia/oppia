@@ -16,15 +16,22 @@
  * @fileoverview Unit tests for previewTab.
  */
 
-import { TestBed } from '@angular/core/testing';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { EventEmitter } from '@angular/core';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 // TODO(#7222): Remove usage of importAllAngularServices once upgraded to
 // Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+
+class MockNgbModalRef {
+  componentInstance: {
+    manualParamChanges: null;
+  };
+}
 
 describe('Preview Tab Component', function() {
   importAllAngularServices();
@@ -35,6 +42,7 @@ describe('Preview Tab Component', function() {
   var $rootScope = null;
   var $scope = null;
   var $uibModal = null;
+  let ngbModal: NgbModal;
   var contextService = null;
   var editableExplorationBackendApiService = null;
   var explorationEngineService = null;
@@ -72,6 +80,15 @@ describe('Preview Tab Component', function() {
     paramName: 'paramName2'
   }];
 
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
   beforeEach(function() {
     paramChangeObjectFactory = TestBed.inject(ParamChangeObjectFactory);
     stateObjectFactory = TestBed.inject(StateObjectFactory);
@@ -87,6 +104,13 @@ describe('Preview Tab Component', function() {
         init_state_name: stateName
       })
     });
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
   }));
 
   describe('when there are manual param changes', function() {
@@ -94,6 +118,7 @@ describe('Preview Tab Component', function() {
       $flushPendingTasks = $injector.get('$flushPendingTasks');
       $rootScope = $injector.get('$rootScope');
       $q = $injector.get('$q');
+      ngbModal = $injector.get('NgbModal');
       $uibModal = $injector.get('$uibModal');
       contextService = $injector.get('ContextService');
       spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
@@ -132,6 +157,7 @@ describe('Preview Tab Component', function() {
         mockPlayerStateChangeEventEmitter);
       $scope = $rootScope.$new();
       ctrl = $componentController('previewTab', {
+        NgbModal: ngbModal,
         $scope: $scope,
         ParamChangeObjectFactory: paramChangeObjectFactory
       });
@@ -220,50 +246,69 @@ describe('Preview Tab Component', function() {
       expect(ctrl.showParameterSummary()).toBe(true);
     });
 
-    it('should open set params modal', function() {
-      spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
-        stateName);
-      spyOn($uibModal, 'open').and.callThrough();
+    it('should open set params modal when opening preview tab',
+      fakeAsync(() => {
+        spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
+          stateName);
+        spyOn(ngbModal, 'open').and.returnValue(
+          {
+            componentInstance: new MockNgbModalRef(),
+            result: Promise.resolve()
+          } as NgbModalRef
+        );
 
-      // Get data from exploration data service.
-      $scope.$apply();
+        // Get data from exploration data service.
+        tick();
+        $scope.$apply();
 
-      expect($uibModal.open).toHaveBeenCalled();
-    });
+        expect(ngbModal.open).toHaveBeenCalled();
+      }));
 
-    it('should load preview state when closing set params modal', function() {
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve()
-      });
-      spyOn(explorationEngineService, 'initSettingsFromEditor');
-      spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
-        stateName);
-      // Get data from exploration data service and resolve promise in open
-      // modal.
-      $scope.$apply();
+    it('should load preview state when closing set params modal',
+      fakeAsync(() => {
+        spyOn(ngbModal, 'open').and.returnValue(
+          {
+            componentInstance: NgbModalRef,
+            result: Promise.resolve()
+          } as NgbModalRef
+        );
+        spyOn(explorationEngineService, 'initSettingsFromEditor');
+        spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
+          stateName);
+        // Get data from exploration data service and resolve promise in open
+        // modal.
+        $scope.$apply();
+        tick();
+        $scope.$apply();
 
-      var expectedParamChanges = parameters.map(parameter => (
-        paramChangeObjectFactory.createEmpty(parameter.paramName)));
-      expect(
-        explorationEngineService.initSettingsFromEditor).toHaveBeenCalledWith(
-        stateName, expectedParamChanges);
-      expect(ctrl.isExplorationPopulated).toBeTrue();
-    });
+        var expectedParamChanges = parameters.map(parameter => (
+          paramChangeObjectFactory.createEmpty(parameter.paramName)));
+        expect(
+          explorationEngineService.initSettingsFromEditor).toHaveBeenCalledWith(
+          stateName, expectedParamChanges);
+        expect(ctrl.isExplorationPopulated).toBeTrue();
+      }));
 
-    it('should go to main tab when dismissing set params modal', function() {
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.reject()
-      });
-      spyOn(routerService, 'navigateToMainTab');
-      spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
-        stateName);
+    it('should go to main tab when dismissing set params modal',
+      fakeAsync(() => {
+        spyOn(ngbModal, 'open').and.callFake(() =>(
+          {
+            componentInstance: {},
+            result: Promise.reject()
+          } as NgbModalRef
+        ));
+        spyOn(routerService, 'navigateToMainTab');
+        spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
+          stateName);
 
-      // Get data from exploration data service and resolve promise in open
-      // modal.
-      $scope.$apply();
+        // Get data from exploration data service and resolve promise in open
+        // modal.
+        $scope.$apply();
+        tick();
+        $scope.$apply();
 
-      expect(routerService.navigateToMainTab).toHaveBeenCalled();
-    });
+        expect(routerService.navigateToMainTab).toHaveBeenCalled();
+      }));
   });
 
   describe('when there are no manual param changes', function() {

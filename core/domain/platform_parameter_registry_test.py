@@ -18,8 +18,9 @@
 
 from __future__ import annotations
 
+import enum
+
 from core import feconf
-from core import python_utils
 from core import utils
 from core.domain import caching_services
 from core.domain import platform_parameter_domain as parameter_domain
@@ -32,7 +33,12 @@ from core.tests import test_utils
 
 DATA_TYPES = parameter_domain.DATA_TYPES # pylint: disable=invalid-name
 FEATURE_STAGES = parameter_domain.FEATURE_STAGES # pylint: disable=invalid-name
-PARAM_NAMES = python_utils.create_enum('parameter_a')  # pylint: disable=invalid-name
+
+
+class ParamNames(enum.Enum):
+    """Enum for parameter names."""
+
+    PARAMETER_A = 'parameter_a'
 
 
 class PlatformParameterRegistryTests(test_utils.GenericTestBase):
@@ -81,27 +87,30 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
 
     def test_create_platform_parameter(self):
         parameter = registry.Registry.create_platform_parameter(
-            PARAM_NAMES.parameter_a, 'test', registry.DATA_TYPES.bool)
+            ParamNames.PARAMETER_A, 'test', registry.DATA_TYPES.bool)
         self.assertIsInstance(parameter, parameter_domain.PlatformParameter)
         parameter.validate()
 
     def test_create_platform_parameter_with_invalid_type_failure(self):
-        _data_type = python_utils.create_enum('invalid')
-        with self.assertRaisesRegexp(
+        class DataType(enum.Enum):
+            """Enum for data type."""
+
+            INVALID = 'invalid'
+        with self.assertRaisesRegex(
             Exception, 'Unsupported data type \'invalid\''):
             registry.Registry.create_platform_parameter(
-                PARAM_NAMES.parameter_a, 'test', _data_type.invalid)
+                ParamNames.PARAMETER_A, 'test', DataType.INVALID)
 
     def test_create_platform_parameter_with_the_same_name_failure(self):
         param_name = 'parameter_a'
         self._create_example_parameter_with_name(param_name)
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Parameter with name %s already exists' % param_name):
             self._create_example_parameter_with_name(param_name)
 
     def test_create_feature_flag(self):
         feature = registry.Registry.create_feature_flag(
-            PARAM_NAMES.parameter_a, 'test feature', FEATURE_STAGES.dev)
+            ParamNames.PARAMETER_A, 'test feature', FEATURE_STAGES.dev)
         self.assertEqual(feature.data_type, registry.DATA_TYPES.bool.value)
         self.assertTrue(feature.is_feature)
         self.assertEqual(feature.feature_stage, FEATURE_STAGES.dev.value)
@@ -109,19 +118,19 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
 
     def test_default_value_of_bool_platform_parameter(self):
         parameter = registry.Registry.create_platform_parameter(
-            PARAM_NAMES.parameter_a, 'test feature', registry.DATA_TYPES.bool)
+            ParamNames.PARAMETER_A, 'test feature', registry.DATA_TYPES.bool)
         parameter.validate()
         self.assertEqual(parameter.default_value, False)
 
     def test_default_value_of_string_platform_parameter(self):
         parameter = registry.Registry.create_platform_parameter(
-            PARAM_NAMES.parameter_a, 'test', DATA_TYPES.string)
+            ParamNames.PARAMETER_A, 'test', DATA_TYPES.string)
         parameter.validate()
         self.assertEqual(parameter.default_value, '')
 
     def test_default_value_of_number_platform_parameter(self):
         parameter = registry.Registry.create_platform_parameter(
-            PARAM_NAMES.parameter_a, 'test', DATA_TYPES.number)
+            ParamNames.PARAMETER_A, 'test', DATA_TYPES.number)
         parameter.validate()
         self.assertEqual(parameter.default_value, 0)
 
@@ -133,7 +142,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         self.assertIsInstance(parameter, parameter_domain.PlatformParameter)
 
     def test_get_non_existing_parameter_failure(self):
-        with self.assertRaisesRegexp(Exception, 'not found'):
+        with self.assertRaisesRegex(Exception, 'not found'):
             registry.Registry.get_platform_parameter('parameter_a')
 
     def test_get_all_parameter_names(self):
@@ -165,7 +174,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             feconf.SYSTEM_COMMITTER_ID,
             'commit message',
             [
-                {
+                parameter_domain.PlatformParameterRule.from_dict({
                     'filters': [
                         {
                             'type': 'server_mode',
@@ -173,7 +182,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                         }
                     ],
                     'value_when_matched': 'updated'
-                }
+                })
             ],
         )
         parameter_updated = registry.Registry.get_platform_parameter(
@@ -193,7 +202,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             feconf.SYSTEM_COMMITTER_ID,
             'commit message',
             [
-                {
+                parameter_domain.PlatformParameterRule.from_dict({
                     'filters': [
                         {
                             'type': 'server_mode',
@@ -201,7 +210,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                         }
                     ],
                     'value_when_matched': 'updated'
-                }
+                })
             ],
         )
         self.assertIsNone(
@@ -215,14 +224,14 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         param = registry.Registry.get_platform_parameter(parameter_name)
         param.validate()
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected string'):
             registry.Registry.update_platform_parameter(
                 parameter_name,
                 feconf.SYSTEM_COMMITTER_ID,
                 'commit message',
                 [
-                    {
+                    parameter_domain.PlatformParameterRule.from_dict({
                         'filters': [
                             {
                                 'type': 'server_mode',
@@ -230,7 +239,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                             }
                         ],
                         'value_when_matched': True
-                    }
+                    })
                 ],
             )
 
@@ -238,9 +247,9 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             self):
         parameter_name = 'parameter_a'
         registry.Registry.create_feature_flag(
-            PARAM_NAMES.parameter_a, 'dev feature', FEATURE_STAGES.dev)
+            ParamNames.PARAMETER_A, 'dev feature', FEATURE_STAGES.dev)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Feature in dev stage cannot be enabled in test or production '
             'environments.'):
@@ -249,7 +258,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                 feconf.SYSTEM_COMMITTER_ID,
                 'commit message',
                 [
-                    {
+                    parameter_domain.PlatformParameterRule.from_dict({
                         'filters': [
                             {
                                 'type': 'server_mode',
@@ -257,7 +266,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                             }
                         ],
                         'value_when_matched': True
-                    }
+                    })
                 ],
             )
 
@@ -265,9 +274,9 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             self):
         parameter_name = 'parameter_a'
         registry.Registry.create_feature_flag(
-            PARAM_NAMES.parameter_a, 'dev feature', FEATURE_STAGES.dev)
+            ParamNames.PARAMETER_A, 'dev feature', FEATURE_STAGES.dev)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Feature in dev stage cannot be enabled in test or production '
             'environments.'):
@@ -276,7 +285,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                 feconf.SYSTEM_COMMITTER_ID,
                 'commit message',
                 [
-                    {
+                    parameter_domain.PlatformParameterRule.from_dict({
                         'filters': [
                             {
                                 'type': 'server_mode',
@@ -284,7 +293,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                             }
                         ],
                         'value_when_matched': True
-                    }
+                    })
                 ],
             )
 
@@ -292,9 +301,9 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             self):
         parameter_name = 'parameter_a'
         registry.Registry.create_feature_flag(
-            PARAM_NAMES.parameter_a, 'dev feature', FEATURE_STAGES.test)
+            ParamNames.PARAMETER_A, 'dev feature', FEATURE_STAGES.test)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Feature in test stage cannot be enabled in production '
             'environment.'):
@@ -303,7 +312,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                 feconf.SYSTEM_COMMITTER_ID,
                 'commit message',
                 [
-                    {
+                    parameter_domain.PlatformParameterRule.from_dict({
                         'filters': [
                             {
                                 'type': 'server_mode',
@@ -311,7 +320,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                             }
                         ],
                         'value_when_matched': True
-                    }
+                    })
                 ],
             )
 
@@ -327,7 +336,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             feconf.SYSTEM_COMMITTER_ID,
             'commit message',
             [
-                {
+                parameter_domain.PlatformParameterRule.from_dict({
                     'filters': [
                         {
                             'type': 'server_mode',
@@ -335,7 +344,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                         }
                     ],
                     'value_when_matched': 'updated'
-                }
+                })
             ],
         )
 

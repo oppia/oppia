@@ -10,7 +10,7 @@
   padding: 5px 6px;
 }
 .oppia-visualization-sorted-tile .oppia-visualization-sorted-tile-content {
-  background: #F5F5F5;
+  background: #f5f5f5;
   border-radius: 27px;
   margin: 0;
   max-height: 250px;
@@ -22,7 +22,7 @@
   background: rgba(65, 152, 137, 0.07);
 }
 .oppia-visualization-sorted-tile.selected .oppia-visualization-sorted-tile-content {
-  background: #E4F1EF;
+  background: #e4f1ef;
 }
 .oppia-visualization-sorted-tile-answer {
   color: rgba(0, 0, 0, 0.87);
@@ -39,7 +39,7 @@
   max-width: 100% !important;
 }
 .oppia-visualization-sorted-tile-answer > .more {
-  background-image: linear-gradient(transparent, #F5F5F5, #F5F5F5);
+  background-image: linear-gradient(transparent, #f5f5f5, #f5f5f5);
   bottom: 0;
   height: 32px;
   padding-top: 16px;
@@ -48,10 +48,10 @@
   width: 100%;
 }
 .selected .oppia-visualization-sorted-tile-answer > .more {
-  background-image: linear-gradient(transparent, #E4F1EF, #E4F1EF);
+  background-image: linear-gradient(transparent, #e4f1ef, #e4f1ef);
 }
 .oppia-visualization-sorted-tile-answer > .more > a {
-  color: #6BA49B;
+  color: #6ba49b;
   font-family: "Roboto", Arial, sans-serif;
   font-size: 14px;
   font-style: normal;
