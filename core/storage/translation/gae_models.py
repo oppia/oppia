@@ -21,7 +21,7 @@ from __future__ import annotations
 from core import utils
 from core.platform import models
 
-from typing import Dict, List, Optional, Sequence
+from typing import Dict, List, Optional, Sequence, Union
 from typing_extensions import TypedDict
 
 MYPY = False
@@ -35,38 +35,46 @@ if MYPY: # pragma: no cover
 datastore_services = models.Registry.import_datastore_services()
 
 
+# TODO(#14537): This is a duplicate of the same TypedDict in translation_domain,
+# it should be removed after we refactor our importing.
 class TranslatedContentDict(TypedDict):
-    """Dict type for TranslatedContent object."""
+    """Dictionary representing TranslatedContent object."""
 
-    content: str|List[str]
+    content: Union[str, List[str]]
     needs_update: bool
 
 
 class EntityTranslationsModel(base_models.BaseModel):
     """Model for storing entity translations ."""
 
+    # The id of the corresponding entity.
     entity_id = datastore_services.StringProperty(required=True, indexed=True)
+    # The type of the corresponding entity.
     entity_type = datastore_services.StringProperty(required=True, indexed=True)
+    # The version of the corresponding entity.
     entity_version = datastore_services.IntegerProperty(
         required=True, indexed=True)
+    # The ISO 639-1 code for the language an entity is written in.
     language_code = datastore_services.StringProperty(
         required=True, indexed=True)
+    # Represents the translated content of the TranslatableContent object. The
+    # format is of type dict(str, TranslatedContent).
     translations = datastore_services.JsonProperty(required=True)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
-        """Model is not associated with users."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
     def get_model_association_to_user(
     ) -> base_models.MODEL_ASSOCIATION_TO_USER:
-        """Model is not associated with users."""
+        """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
-        """Model is not associated with users."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'entity_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'entity_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -109,7 +117,7 @@ class EntityTranslationsModel(base_models.BaseModel):
         entity_version and language_code.
 
         Args:
-            entity_type: str. Type of an entity.
+            entity_type: str. Type of the entity to fetch.
             entity_id: str. Id of an entity.
             entity_version: int. Version of an entity.
             language_code: str. Language code for a given entity.
@@ -130,8 +138,8 @@ class EntityTranslationsModel(base_models.BaseModel):
         entity_id: str,
         entity_version: int
     ) -> Sequence[Optional[EntityTranslationsModel]]:
-        """Gets EntityTranslationsModels by help of entity_type, entity_id,
-        entity_version.
+        """Gets EntityTranslationsModels corresponding to the given entity, for
+        all languages in which such models exist.
 
         Args:
             entity_type: str. Type of an entity.
@@ -140,8 +148,8 @@ class EntityTranslationsModel(base_models.BaseModel):
 
         Returns:
             list(EntityTranslationsModel|None). The EntityTranslationsModel
-            instances corresponding to the given inputs, if such a translation
-            exists, or None if no translation is found.
+            instances corresponding to the given inputs, if such translations
+            exist.
         """
         return cls.query(
             cls.entity_type == entity_type,
