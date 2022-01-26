@@ -1140,18 +1140,18 @@ def update_subject_interests(user_id, subject_interests):
     """
     if not isinstance(subject_interests, list):
         raise utils.ValidationError('Expected subject_interests to be a list.')
-    else:
-        for interest in subject_interests:
-            if not isinstance(interest, str):
-                raise utils.ValidationError(
-                    'Expected each subject interest to be a string.')
-            elif not interest:
-                raise utils.ValidationError(
-                    'Expected each subject interest to be non-empty.')
-            elif not re.match(constants.TAG_REGEX, interest):
-                raise utils.ValidationError(
-                    'Expected each subject interest to consist only of '
-                    'lowercase alphabetic characters and spaces.')
+
+    for interest in subject_interests:
+        if not isinstance(interest, str):
+            raise utils.ValidationError(
+                'Expected each subject interest to be a string.')
+        if not interest:
+            raise utils.ValidationError(
+                'Expected each subject interest to be non-empty.')
+        if not re.match(constants.TAG_REGEX, interest):
+            raise utils.ValidationError(
+                'Expected each subject interest to consist only of '
+                'lowercase alphabetic characters and spaces.')
 
     if len(set(subject_interests)) != len(subject_interests):
         raise utils.ValidationError(
@@ -1662,10 +1662,10 @@ def create_user_contributions(
     if user_contributions:
         raise Exception(
             'User contributions model for user %s already exists.' % user_id)
-    else:
-        user_contributions = user_domain.UserContributions(
-            user_id, created_exploration_ids, edited_exploration_ids)
-        _save_user_contributions(user_contributions)
+
+    user_contributions = user_domain.UserContributions(
+        user_id, created_exploration_ids, edited_exploration_ids)
+    _save_user_contributions(user_contributions)
     return user_contributions
 
 

@@ -137,6 +137,14 @@ angular.module('oppia').component('stateSolutionEditor', {
           ].is_linear);
       };
 
+      $scope.saveSolution = function(value) {
+        ctrl.onSaveSolution(value);
+      };
+
+      $scope.openMarkAllAudioAsNeedingUpdateModalIfRequired = function(value) {
+        ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired(value);
+      };
+
       $scope.openAddOrUpdateSolutionModal = function() {
         AlertsService.clearWarnings();
         ExternalSaveService.onExternalSave.emit();
@@ -174,8 +182,8 @@ angular.module('oppia').component('stateSolutionEditor', {
         });
       };
 
-      $scope.deleteSolution = function(index, evt) {
-        evt.stopPropagation();
+      $scope.deleteSolution = function(value) {
+        value.evt.stopPropagation();
 
         AlertsService.clearWarnings();
         NgbModal.open(DeleteSolutionModalComponent, {

@@ -394,11 +394,11 @@ class Question(translation_domain.BaseTranslatableObject):
                         rule_input)
 
                     type_of_input = exp_domain.TYPE_INVALID_EXPRESSION
-                    if is_valid_algebraic_expression(rule_input):
+                    if is_valid_numeric_expression(rule_input):
+                        type_of_input = exp_domain.TYPE_VALID_NUMERIC_EXPRESSION
+                    elif is_valid_algebraic_expression(rule_input):
                         type_of_input = (
                             exp_domain.TYPE_VALID_ALGEBRAIC_EXPRESSION)
-                    elif is_valid_numeric_expression(rule_input):
-                        type_of_input = exp_domain.TYPE_VALID_NUMERIC_EXPRESSION
                     elif is_valid_math_equation(rule_input):
                         type_of_input = exp_domain.TYPE_VALID_MATH_EQUATION
 
