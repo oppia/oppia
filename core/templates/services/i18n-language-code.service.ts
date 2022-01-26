@@ -73,7 +73,7 @@ export class I18nLanguageCodeService {
   currentDecimalSeparator(): string {
     const currentLanguage = this.getCurrentI18nLanguageCode();
     const supportedLanguages = AppConstants.SUPPORTED_SITE_LANGUAGES;
-    let decimalSeparator: string;
+    let decimalSeparator: string = '.';
     for (let i of supportedLanguages) {
       if (i.id === currentLanguage) {
         decimalSeparator = i.decimal_separator;
@@ -98,7 +98,7 @@ export class I18nLanguageCodeService {
     }
   }
 
-  convertToEnglishDecimal(number: string): number {
+  convertToEnglishDecimal(number: string): (null | number) {
     const decimalSeparator = this.currentDecimalSeparator();
 
     // Check if number is in proper format.
@@ -109,6 +109,11 @@ export class I18nLanguageCodeService {
 
     // Get the valid part of input.
     let numberMatch = number.match(validRegex);
+
+    if (numberMatch === null) {
+      return null;
+    }
+
     number = numberMatch[0];
 
     let numString = number.replace(`${decimalSeparator}`, '.');
@@ -116,7 +121,7 @@ export class I18nLanguageCodeService {
 
     // If the input cannot be parsed, output null.
     if (isNaN(engNum)) {
-      engNum = null;
+      return null;
     }
     return engNum;
   }
