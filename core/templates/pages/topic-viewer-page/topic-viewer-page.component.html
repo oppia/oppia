@@ -37,6 +37,7 @@
     <div *ngIf="activeTab === 'story'">
       <stories-list *ngIf="canonicalStorySummaries.length"
                     [topicName]="topicName"
+                    [topicId]="topicId"
                     [topicDescription]="topicDescription"
                     [canonicalStorySummaries]="canonicalStorySummaries"
                     [classroomUrlFragment]="classroomUrlFragment"

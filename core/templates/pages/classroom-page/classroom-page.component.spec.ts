@@ -26,12 +26,12 @@ import { CapitalizePipe } from 'filters/string-utility-filters/capitalize.pipe';
 import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
 import { AlertsService } from 'services/alerts.service';
 import { UrlService } from 'services/contextual/url.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { LoaderService } from 'services/loader.service';
 import { PageTitleService } from 'services/page-title.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { ClassroomPageComponent } from './classroom-page.component';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 class MockCapitalizePipe {
   transform(input: string): string {
@@ -132,7 +132,12 @@ describe('Classroom Page Component', () => {
       );
     spyOn(classroomBackendApiService, 'fetchClassroomDataAsync')
       .and.returnValue(Promise.resolve(classroomData));
-
+    spyOn(i18nLanguageCodeService, 'getClassroomTranslationKey')
+      .and.returnValue('I18N_CLASSROOM_MATH_TITLE');
+    spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
+      .and.returnValue(true);
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
+      .and.returnValue(false);
     component.ngOnInit();
     tick();
     tick();
@@ -143,6 +148,9 @@ describe('Classroom Page Component', () => {
       .toHaveBeenCalled();
     expect(component.classroomData).toEqual(classroomData);
     expect(component.classroomDisplayName).toEqual(classroomData.getName());
+    expect(component.classroomNameTranslationKey).toBe(
+      'I18N_CLASSROOM_MATH_TITLE');
+    expect(component.isHackyClassroomTranslationDisplayed()).toBe(true);
     expect(pageTitleService.setDocumentTitle).toHaveBeenCalled();
     expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
     expect(classroomBackendApiService.onInitializeTranslation.emit)

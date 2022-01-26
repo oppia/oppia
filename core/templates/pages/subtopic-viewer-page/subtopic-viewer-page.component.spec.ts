@@ -45,7 +45,7 @@ describe('Subtopic viewer page', function() {
   let i18nLanguageCodeService: I18nLanguageCodeService;
 
   let topicName = 'Topic Name';
-  let topicId = '1';
+  let topicId = '123abcd';
   let subtopicTitle = 'Subtopic Title';
   let subtopicUrlFragment = 'subtopic-title';
   let subtopicDataObject: ReadOnlySubtopicPageData = (
@@ -63,7 +63,7 @@ describe('Subtopic viewer page', function() {
         }
       },
       next_subtopic_dict: {
-        id: 1,
+        id: 2,
         title: '',
         skill_ids: [],
         thumbnail_filename: '',
@@ -158,6 +158,12 @@ describe('Subtopic viewer page', function() {
     expect(component.subtopicSummaryIsShown).toBe(false);
     spyOn(subtopicViewerBackendApiService, 'fetchSubtopicDataAsync')
       .and.returnValue(Promise.resolve(subtopicDataObject));
+    spyOn(i18nLanguageCodeService, 'getSubtopicTranslationKey')
+      .and.returnValue('I18N_SUBTOPIC_123abcd_test_TITLE');
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
+      .and.returnValue(false);
+    spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
+      .and.returnValue(true);
 
     component.ngOnInit();
     tick();
@@ -173,6 +179,11 @@ describe('Subtopic viewer page', function() {
     expect(component.prevSubtopic).toBeNull();
     expect(component.subtopicSummaryIsShown).toBeTrue();
 
+    expect(component.subtopicTitleTranslationKey).toEqual(
+      'I18N_SUBTOPIC_123abcd_test_TITLE');
+    let hackySubtopicTitleTranslationIsDisplayed =
+      component.isHackySubtopicTitleTranslationDisplayed();
+    expect(hackySubtopicTitleTranslationIsDisplayed).toBe(true);
     expect(contextService.setCustomEntityContext).toHaveBeenCalled();
     expect(pageTitleService.setDocumentTitle).toHaveBeenCalled();
     expect(pageTitleService.updateMetaTag).toHaveBeenCalled();

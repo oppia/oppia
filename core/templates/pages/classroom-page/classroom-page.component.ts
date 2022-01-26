@@ -27,10 +27,10 @@ import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/acce
 import { AlertsService } from 'services/alerts.service';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { LoaderService } from 'services/loader.service';
 import { PageTitleService } from 'services/page-title.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'oppia-classroom-page',
@@ -41,6 +41,7 @@ export class ClassroomPageComponent {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   classroomDisplayName!: string;
+  classroomNameTranslationKey!: string;
   classroomUrlFragment!: string;
   bannerImageFileUrl!: string;
   classroomData!: ClassroomData;
@@ -75,6 +76,8 @@ export class ClassroomPageComponent {
         this.classroomData = classroomData;
         this.classroomDisplayName = this.capitalizePipe.transform(
           classroomData.getName());
+        this.classroomNameTranslationKey = this.i18nLanguageCodeService.
+          getClassroomTranslationKey(this.classroomDisplayName);
         this.pageTitleService.setDocumentTitle(
           `Learn ${this.classroomDisplayName} with Oppia | Oppia`);
         this.loaderService.hideLoadingScreen();
@@ -100,6 +103,16 @@ export class ClassroomPageComponent {
 
   isLanguageRTL(): boolean {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
+  }
+
+  // This method is used to choose whether to display the classroom name or
+  // the classroom name translation in the UI.
+  isHackyClassroomTranslationDisplayed(): boolean {
+    return (
+      this.i18nLanguageCodeService.isHackyTranslationAvailable(
+        this.classroomNameTranslationKey
+      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    );
   }
 }
 

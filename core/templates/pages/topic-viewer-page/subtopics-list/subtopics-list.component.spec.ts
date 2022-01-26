@@ -1,4 +1,4 @@
-// Copyright 2021 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,28 +16,38 @@
  * @fileoverview Unit tests for subtopicsList.
  */
 
-import { TestBed, waitForAsync } from '@angular/core/testing';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { SubtopicsListComponent } from './subtopics-list.component';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { SubtopicSummaryTileComponent } from 'components/summary-tile/subtopic-summary-tile.component';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { SubtopicsListComponent } from './subtopics-list.component';
 
-describe('Subtopics list component', () => {
+describe('Subtopics List Component', () => {
   let component: SubtopicsListComponent;
+  let fixture: ComponentFixture<SubtopicsListComponent>;
   let i18nLanguageCodeService: I18nLanguageCodeService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [SubtopicsListComponent, MockTranslatePipe],
+      declarations: [
+        MockTranslatePipe,
+        SubtopicsListComponent,
+        SubtopicSummaryTileComponent
+      ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
-
-    let fixture = TestBed.createComponent(SubtopicsListComponent);
+    fixture = TestBed.createComponent(SubtopicsListComponent);
     component = fixture.componentInstance;
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+    component.subtopicsList = [];
+    component.classroomUrlFragment = 'classroom';
+    component.topicUrlFragment = 'topic';
+    component.topicName = 'Topic Name';
+    component.topicId = 'topicId';
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
       true);
   });
@@ -46,4 +56,33 @@ describe('Subtopics list component', () => {
   it('should get RTL language status correctly', () => {
     expect(component.isLanguageRTL()).toEqual(true);
   });
+
+  it('should create', () => {
+    expect(component).toBeDefined();
+  });
+
+  it('should initialize properties after successfully', () => {
+    spyOn(i18nLanguageCodeService, 'getTopicTranslationKey')
+      .and.returnValue('I18N_TOPIC_123abcd_TITLE');
+
+    component.ngOnInit();
+
+    expect(component.topicNameTranslationKey).toBe(
+      'I18N_TOPIC_123abcd_TITLE');
+  });
+
+  it('should check if topic name, desc translation is displayed correctly',
+    () => {
+      spyOn(i18nLanguageCodeService, 'getTopicTranslationKey')
+        .and.returnValue('I18N_TOPIC_123abcd_TITLE');
+      spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
+        .and.returnValue(true);
+      spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
+        .and.returnValue(false);
+
+      component.ngOnInit();
+
+      expect(component.isHackyTopicNameTranslationDisplayed()).toBe(true);
+    }
+  );
 });

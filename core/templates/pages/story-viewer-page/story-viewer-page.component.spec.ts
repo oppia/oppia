@@ -86,6 +86,7 @@ describe('Story Viewer Page component', () => {
     alertsService = TestBed.get(AlertsService);
     storyViewerBackendApiService = TestBed.get(StoryViewerBackendApiService);
     windowRef = TestBed.get(WindowRef);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     let fixture = TestBed.createComponent(StoryViewerPageComponent);
     component = fixture.componentInstance;
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
@@ -489,4 +490,24 @@ describe('Story Viewer Page component', () => {
       expect(component.thumbnailFilename === '');
       expect(component.iconUrl === '');
     }));
+
+  it('should check if hacky translation is displayed correctly', () => {
+    spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
+      .and.returnValues(false, true, false, true);
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
+      .and.returnValues(false, false, true, false);
+
+    let hackyStoryTitleTranslationIsDisplayed =
+      component.isHackyStoryTitleTranslationDisplayed();
+    expect(hackyStoryTitleTranslationIsDisplayed).toBe(false);
+    let hackyStoryDescTranslationIsDisplayed =
+      component.isHackyStoryDescTranslationDisplayed();
+    expect(hackyStoryDescTranslationIsDisplayed).toBe(true);
+    let hackyStoryNodeTitleTranslationIsDisplayed =
+      component.isHackyStoryNodeTitleTranslationDisplayed(0);
+    expect(hackyStoryNodeTitleTranslationIsDisplayed).toBe(false);
+    let hackyStoryNodeDescTranslationIsDisplayed =
+      component.isHackyStoryNodeDescTranslationDisplayed(0);
+    expect(hackyStoryNodeDescTranslationIsDisplayed).toBe(true);
+  });
 });

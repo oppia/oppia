@@ -16,27 +16,44 @@
  * @fileoverview Component for topic-viewer subtopics list.
  */
 
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 import { Subtopic } from 'domain/topic/subtopic.model';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'subtopics-list',
   templateUrl: './subtopics-list.component.html',
   styleUrls: []
 })
-export class SubtopicsListComponent {
+export class SubtopicsListComponent implements OnInit {
   @Input() classroomUrlFragment: string;
   @Input() subtopicsList: Subtopic[];
   @Input() topicId: string;
   @Input() topicUrlFragment: string;
   @Input() topicName: string;
-  constructor(private i18nLanguageCodeService: I18nLanguageCodeService) {}
+  topicNameTranslationKey: string;
+
+  constructor(
+    private i18nLanguageCodeService: I18nLanguageCodeService
+  ) {}
+
+  ngOnInit(): void {
+    this.topicNameTranslationKey = this.i18nLanguageCodeService
+      .getTopicTranslationKey(this.topicId, TranslationKeyType.TITLE);
+  }
 
   isLanguageRTL(): boolean {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
+  }
+
+  isHackyTopicNameTranslationDisplayed(): boolean {
+    return (
+      this.i18nLanguageCodeService.isHackyTranslationAvailable(
+        this.topicNameTranslationKey
+      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    );
   }
 }
 

@@ -26,7 +26,8 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { AppConstants } from 'app.constants';
 import { StorySummary } from 'domain/story/story-summary.model';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
+import { StoryNode } from 'domain/story/story-node.model';
 
 @Component({
   selector: 'oppia-story-summary-tile',
@@ -47,10 +48,12 @@ export class StorySummaryTileComponent implements OnInit {
   storyProgress!: number;
   storyStatus!: string;
   storyTitle!: string;
+  storyTitleTranslationKey!: string;
   strokeDashArrayValues!: string | number;
   completedStrokeDashArrayValues!: string;
   thumbnailBgColor!: string;
   nodeTitles!: string[];
+  nodeTitlesTranslationKeys: string[] = [];
   storyLink!: string;
   thumbnailUrl: string | null = null;
   showButton: boolean = false;
@@ -216,12 +219,38 @@ export class StorySummaryTileComponent implements OnInit {
     this.getStrokeDashArrayValues();
     this.storyLink = this.getStoryLink();
     this.storyTitle = this.storySummary.getTitle();
+    this.storyTitleTranslationKey = this.i18nLanguageCodeService
+      .getStoryTranslationKey(
+        this.storySummary.getId(), TranslationKeyType.TITLE);
     this.strokeDashArrayValues = this.getStrokeDashArrayValues();
     this.completedStrokeDashArrayValues =
       this.getCompletedStrokeDashArrayValues();
     this.thumbnailBgColor = this.storySummary.getThumbnailBgColor();
     this.nodeTitles = this.storySummary.getNodeTitles();
+    for (let idx in this.storySummary.getAllNodes()) {
+      let storyNode: StoryNode = this.storySummary.getAllNodes()[idx];
+      let storyNodeTranslationKey = this.i18nLanguageCodeService.
+        getExplorationTranslationKey(
+          storyNode.getExplorationId() as string, TranslationKeyType.TITLE);
+      this.nodeTitlesTranslationKeys.push(storyNodeTranslationKey);
+    }
     this.getStoryStatus();
+  }
+
+  isHackyStoryTitleTranslationDisplayed(): boolean {
+    return (
+      this.i18nLanguageCodeService.isHackyTranslationAvailable(
+        this.storyTitleTranslationKey
+      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    );
+  }
+
+  isHackyNodeTitleTranslationDisplayed(index: number): boolean {
+    return (
+      this.i18nLanguageCodeService.isHackyTranslationAvailable(
+        this.nodeTitlesTranslationKeys[index]
+      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    );
   }
 }
 

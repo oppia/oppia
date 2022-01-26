@@ -26,6 +26,7 @@ import { AlertsService } from 'services/alerts.service';
 import { ContextService } from 'services/context.service';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
 import { LoaderService } from 'services/loader.service';
 import { PageTitleService } from 'services/page-title.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
@@ -42,6 +43,7 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
   subtopicUrlFragment: string;
   pageContents: SubtopicPageContents;
   subtopicTitle: string;
+  subtopicTitleTranslationKey: string;
   parentTopicId: string;
   nextSubtopic: Subtopic = null;
   prevSubtopic: Subtopic = null;
@@ -54,7 +56,8 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
     private pageTitleService: PageTitleService,
     private subtopicViewerBackendApiService: SubtopicViewerBackendApiService,
     private urlService: UrlService,
-    private windowDimensionsService: WindowDimensionsService
+    private windowDimensionsService: WindowDimensionsService,
+    private i18nLanguageCodeService: I18nLanguageCodeService
   ) {}
 
   checkMobileView(): boolean {
@@ -99,6 +102,13 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
         this.subtopicSummaryIsShown = true;
       }
 
+      this.subtopicTitleTranslationKey = (
+        this.i18nLanguageCodeService.
+          getSubtopicTranslationKey(
+            this.parentTopicId, this.subtopicUrlFragment,
+            TranslationKeyType.TITLE)
+      );
+
       this.loaderService.hideLoadingScreen();
     },
     (errorResponse) => {
@@ -111,6 +121,14 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.contextService.removeCustomEntityContext();
+  }
+
+  isHackySubtopicTitleTranslationDisplayed(): boolean {
+    return (
+      this.i18nLanguageCodeService.isHackyTranslationAvailable(
+        this.subtopicTitleTranslationKey
+      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    );
   }
 }
 
