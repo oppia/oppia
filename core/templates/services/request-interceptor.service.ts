@@ -80,7 +80,7 @@ export class RequestInterceptor implements HttpInterceptor {
       }
     }
 
-    RequestInterceptor.checkForNullParams(request.params);
+    RequestInterceptor.checkForNullParams(request);
 
     if (request.body) {
       return from(this.csrf.getTokenAsync())
@@ -121,9 +121,13 @@ export class RequestInterceptor implements HttpInterceptor {
     }
   }
 
-  private static checkForNullParams(params: HttpParams): void {
-    params.keys().forEach((key: string) => {
-      params.getAll(key)?.forEach((value: string) => {
+  private static checkForNullParams(request: HttpRequest<FormData>): void {
+    // We only disallow null params for GET and DELETE requests.
+    if (request.method !== 'GET' && request.method !== 'DELETE') {
+      return;
+    }
+    request.params.keys().forEach((key: string) => {
+      request.params.getAll(key)?.forEach((value: string) => {
         if (value === 'null' || value === 'None') {
           throw new Error('Cannot supply params with value "None" or "null".');
         }

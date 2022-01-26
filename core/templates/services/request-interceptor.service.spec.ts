@@ -197,4 +197,51 @@ describe('Request Interceptor Service', () => {
           {} as HttpHandler);
     }).toThrowError('Cannot supply params with value "None" or "null".');
   });
+
+  it('should throw error if null param in DELETE request', () => {
+    expect(() => {
+      requestInterceptor.intercept(
+        new HttpRequest(
+          'DELETE',
+          'url',
+          {params: new HttpParams({fromString: 'key=null'})}),
+          {} as HttpHandler);
+    }).toThrowError('Cannot supply params with value "None" or "null".');
+  });
+
+  it('should not throw error if null param in POST request', () => {
+    expect(() => {
+      requestInterceptor.intercept(
+        new HttpRequest(
+          'POST',
+          'url',
+          null,
+          {params: new HttpParams({fromString: 'key=null'})}),
+          {} as HttpHandler);
+    }).toBeTruthy();
+  });
+
+  it('should not throw error if null param in PUT request', () => {
+    expect(() => {
+      requestInterceptor.intercept(
+        new HttpRequest(
+          'PUT',
+          'url',
+          null,
+          {params: new HttpParams({fromString: 'key=null'})}),
+          {} as HttpHandler);
+    }).toBeTruthy();
+  });
+
+  it('should not throw error if null param in PATCH request', () => {
+    expect(() => {
+      requestInterceptor.intercept(
+        new HttpRequest(
+          'PATCH',
+          'url',
+          null,
+          {params: new HttpParams({fromString: 'key=null'})}),
+          {} as HttpHandler);
+    }).toBeTruthy();
+  });
 });
