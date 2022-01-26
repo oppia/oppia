@@ -85,9 +85,12 @@ describe('Number with units interaction component', () => {
 
   it('should not display warning when the answer format is correct',
     fakeAsync(() => {
+      component.errorMessage = 'Unit "xyz" not found';
+      component.isValid = false;
+
       // PreChecks.
-      expect(component.errorMessage).toBe('');
-      expect(component.isValid).toBeTrue();
+      expect(component.errorMessage).toBe('Unit "xyz" not found');
+      expect(component.isValid).toBeFalse();
 
       // Test: Correct answer.
       component.answer = '24 km';
@@ -95,7 +98,8 @@ describe('Number with units interaction component', () => {
       component.answerValueChanged();
       tick(150);
 
-      // PostChecks: No error message as the Unit is correct.
+      // PostChecks: The format of the answer '24 km' is correct,
+      // Therefore we verify that the value of errorMessage is ''.
       expect(component.errorMessage).toBe('');
       expect(component.isValid).toBeTrue();
     }));
