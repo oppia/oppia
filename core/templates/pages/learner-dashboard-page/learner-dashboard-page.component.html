@@ -99,6 +99,7 @@
            [ngClass]="{'pl-5': !windowIsNarrow, 'justify-content-center': windowIsNarrow}">
         <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME">
           <oppia-home-tab [currentGoals]="topicsToLearn"
+                          [goalTopics]="allTopics"
                           [partiallyLearntTopicsList]="partiallyLearntTopicsList"
                           [untrackedTopics]="untrackedTopics"
                           [username]="username"
