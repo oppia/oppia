@@ -347,6 +347,9 @@ class GeneralPurposeLinter:
 
         Returns:
             bool. The failure status of the check.
+
+        Raises:
+            Exception. Given file at filepath not readable.
         """
         # This boolean list keeps track of the regex matches
         # found in the file.

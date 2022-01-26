@@ -183,6 +183,9 @@ class JsTsLintChecksManager:
         Returns:
             dict. A dict which has key as filepath and value as contents of js
             and ts files after validating and parsing the files.
+
+        Raises:
+            Exception. filepath ends with '.js'.
         """
 
         # Select JS files which need to be checked.
@@ -504,6 +507,9 @@ class ThirdPartyJsTsLintChecksManager:
         Returns:
             TaskResult. A TaskResult object representing the result of the lint
             check.
+
+        Raises:
+            Exception. The start.sh file not executed.
         """
         node_path = os.path.join(common.NODE_PATH, 'bin', 'node')
         eslint_path = os.path.join(

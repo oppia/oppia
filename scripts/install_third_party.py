@@ -278,6 +278,9 @@ def validate_dependencies(filepath):
 
     Args:
         filepath: str. The path to the json file.
+
+    Raises:
+        Exception. 'downloadFormat' not specified in dependency_contents.
     """
     dependencies_data = return_json(filepath)
     dependencies = dependencies_data['dependencies']

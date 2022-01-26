@@ -168,6 +168,10 @@ class CustomHTMLParser(html.parser.HTMLParser):
 
         Args:
             tag: str. End tag of a HTML line.
+
+        Raises:
+            TagMismatchException. Identation mismatch between starting tag and
+                given tag.
         """
         line_number, _ = self.getpos()
         tag_line = self.file_lines[line_number - 1]
@@ -285,6 +289,10 @@ class HTMLLintChecksManager:
         Returns:
             TaskResult. A TaskResult object representing the result of the lint
             check.
+
+        Raises:
+            TagMismatchException. Proper identation absent in specified
+                html file.
         """
         html_files_to_lint = self.html_filepaths
         failed = False

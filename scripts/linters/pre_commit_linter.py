@@ -387,6 +387,10 @@ def _get_filepaths_from_non_other_shard(shard, namespace=None):
 
     Returns:
         list(str). Paths to lintable files.
+
+    Raises:
+        RuntimeError. Invalid Shards because of a duplicate file.
+        AssertionError. A file duplicated across shards.
     """
     filepaths = []
     assert shard != OTHER_SHARD_NAME
