@@ -59,7 +59,7 @@ class DraftUpgradeUnitTests(test_utils.GenericTestBase):
                 self.DRAFT_CHANGELIST, 1, 1, self.EXP_ID))
 
     def test_try_upgrade_raises_exception_if_versions_are_invalid(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             utils.InvalidInputException,
             'Current draft version is greater than the exploration version.'):
             draft_upgrade_services.try_upgrading_draft_to_exp_version(

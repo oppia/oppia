@@ -212,7 +212,10 @@ export class ChangeListService {
    */
 
   editExplorationProperty(
-      backendName: string, newValue: unknown, oldValue: unknown): void {
+      backendName: string,
+      newValue: string | boolean,
+      oldValue: string | boolean
+  ): void {
     if (!this.ALLOWED_EXPLORATION_BACKEND_NAMES.hasOwnProperty(backendName)) {
       this.alertsService.addWarning(
         'Invalid exploration property: ' + backendName);

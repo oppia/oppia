@@ -19,22 +19,26 @@
 
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { ExplorationPropertyService } from 'pages/exploration-editor-page/services/exploration-property.service';
 import { AlertsService } from 'services/alerts.service';
-import { LoggerService } from 'services/contextual/logger.service';
 import { ChangeListService } from './change-list.service';
-import { ExplorationPropertyService } from './exploration-property.service';
+import { LoggerService } from 'services/contextual/logger.service';
 
-@Injectable({providedIn: 'root'})
-export class ExplorationParamSpecsService extends ExplorationPropertyService {
+@Injectable({
+  providedIn: 'root'
+})
+export class ExplorationParamSpecsService extends
+  ExplorationPropertyService {
+  propertyName: string = 'param_specs';
+
   constructor(
-      alertsService: AlertsService,
-      changeListService: ChangeListService,
-      loggerService: LoggerService,
+    protected alertsService: AlertsService,
+    protected changeListService: ChangeListService,
+    protected loggerService: LoggerService
   ) {
     super(alertsService, changeListService, loggerService);
-    this.propertyName = 'param_specs';
   }
 }
-angular.module('oppia').factory(
-  'ExplorationParamSpecsService', downgradeInjectable(
-    ExplorationParamSpecsService));
+
+angular.module('oppia').factory('ExplorationParamSpecsService',
+  downgradeInjectable(ExplorationParamSpecsService));
