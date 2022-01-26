@@ -262,6 +262,9 @@ def _check_shards_match_tests(include_load_tests=True):
     Returns:
         str. A description of any problems found, or an empty string if
         the shards match the tests.
+
+    Raises:
+        Exception. Failed to find duplicated module in shards.
     """
     with python_utils.open_file(SHARDS_SPEC_PATH, 'r') as shards_file:
         shards_spec = json.load(shards_file)
@@ -550,6 +553,9 @@ def _check_coverage(
     Returns:
         str, float. Tuple of the coverage report and the coverage
         percentage.
+
+    Raises:
+        RuntimeError. Subprocess failure.
     """
     if combine:
         combine_process = subprocess.run(

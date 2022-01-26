@@ -62,6 +62,9 @@ class ThirdPartyCSSLintChecksManager:
         Returns:
             TaskResult. A TaskResult object representing the result of the lint
             check.
+
+        Raises:
+            Exception. The start.sh file not executed.
         """
         node_path = os.path.join(common.NODE_PATH, 'bin', 'node')
         stylelint_path = os.path.join(

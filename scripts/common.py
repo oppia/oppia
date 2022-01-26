@@ -351,6 +351,9 @@ def get_current_release_version_number(release_branch_name):
 
     Returns:
         str. The version of release.
+
+    Raises:
+        Exception. Invalid release_branch_name.
     """
     release_match = re.match(RELEASE_BRANCH_REGEX, release_branch_name)
     release_maintenance_match = re.match(
@@ -595,6 +598,11 @@ def inplace_replace_file(
         replacement_string: str. The content to be replaced.
         expected_number_of_replacements: optional(int). The number of
             replacements that should be made. When None no check is done.
+
+    Raises:
+        ValueError. The total_number_of_replacements not same as
+            expected_number_of_replacements.
+        Exception. The content failed to get replaced.
     """
     backup_filename = '%s.bak' % filename
     shutil.copyfile(filename, backup_filename)
@@ -784,6 +792,9 @@ def write_stdout_safe(string):
 
     Args:
         string: str|bytes. The string to write to stdout.
+
+    Raises:
+        OSError. Failed to write the input string.
     """
     string_bytes = string.encode('utf-8') if isinstance(string, str) else string
 

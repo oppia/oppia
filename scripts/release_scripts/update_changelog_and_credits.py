@@ -365,6 +365,9 @@ def remove_updates_and_delete_branch(repo_fork, target_branch):
         repo_fork: github.Repository.Repository. The PyGithub object for the
             forked repo.
         target_branch: str. The name of the target branch.
+
+    Raises:
+        Exception. The target_branch not deleted before re-run.
     """
 
     common.run_cmd(GIT_CMD_CHECKOUT.split(' '))
