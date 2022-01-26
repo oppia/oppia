@@ -95,43 +95,6 @@ def get_exploration_opportunity_summary_from_model(model):
         {})
 
 
-def get_exp_opportunity_summary_with_in_review_translations_from_model(
-    model, translations_in_review):
-    """Returns the ExplorationOpportunitySummary object out of the model when
-    there are translations that are in review.
-
-    Args:
-        model: ExplorationOpportunitySummaryModel. The exploration opportunity
-            summary model.
-        translations_in_review: list(SuggestionModel). The list of translations
-            which are in review.
-
-    Returns:
-        ExplorationOpportunitySummary. The corresponding
-        ExplorationOpportunitySummary object.
-    """
-    translation_opportunity = get_exploration_opportunity_summary_from_model(
-        model)
-    translation_in_review_counts = {}
-
-    for language_code in constants.SUPPORTED_CONTENT_LANGUAGES:
-        in_review_count = 0
-        for suggestion in translations_in_review:
-            if (
-                suggestion is not None and
-                suggestion.language_code == language_code['code'] and
-                suggestion.target_id == model.id):
-                in_review_count = in_review_count + 1
-        if in_review_count > 0:
-            translation_in_review_counts[
-                language_code['code']] = in_review_count
-
-    translation_opportunity.translation_in_review_counts = (
-        translation_in_review_counts)
-
-    return translation_opportunity
-
-
 def _save_multi_exploration_opportunity_summary(
         exploration_opportunity_summary_list):
     """Stores multiple ExplorationOpportunitySummary into datastore as a
