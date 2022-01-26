@@ -1397,8 +1397,12 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         self.login(self.COLLABORATOR4_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        # Since check edit_activity_always return False, therefore
-        # user will behave as voiceover artist.
+        reader_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        self.assertNotIn('State 4', reader_dict['states'])
+
+        # Since check_can_edit_activity always return False, therefore
+        # user will behave as a voiceover artist.
         get_voiceover_swap = self.swap_to_always_return(
             rights_manager, 'check_can_edit_activity', value=False)
 
@@ -1423,6 +1427,10 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             reader_dict = self.get_json(
                 '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
             self.assertNotIn('State 4', reader_dict['states'])
+            self.assertNotIn(
+                self.COLLABORATOR3_USERNAME,
+                reader_dict['rights']['editor_names']
+            )
 
             # Check that collaborator 4 cannot add new members.
             exploration = exp_fetchers.get_exploration_by_id(exp_id)
@@ -1455,6 +1463,14 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         self.assert_can_edit(exp_id)
         self.assert_can_voiceover(exp_id)
         csrf_token = self.get_new_csrf_token()
+
+        reader_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        self.assertNotIn('State 4', reader_dict['states'])
+        self.assertNotIn(
+            self.COLLABORATOR3_USERNAME,
+            reader_dict['rights']['editor_names']
+        )
 
         # Check that collaborator can add a new state called 'State 4'.
         response_dict = self.put_json(
@@ -1502,6 +1518,14 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         self.assert_can_edit(exp_id)
         csrf_token = self.get_new_csrf_token()
 
+        reader_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        self.assertNotIn('State 5', reader_dict['states'])
+        self.assertNotIn(
+            self.COLLABORATOR3_USERNAME,
+            reader_dict['rights']['editor_names']
+        )
+
         # Check that collaborator2 can add a new state called 'State 5'.
         response_dict = self.put_json(
             '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id),
@@ -1544,12 +1568,35 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         # Check that existing editor can be assigned to any other role.
         self.login(self.OWNER_EMAIL)
         csrf_token = self.get_new_csrf_token()
+
+        reader_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        self.assertIn(
+            self.COLLABORATOR_USERNAME,
+            reader_dict['rights']['editor_names']
+        )
+        self.assertNotIn(
+            self.COLLABORATOR_USERNAME,
+            reader_dict['rights']['owner_names']
+        )
+
         self.put_json(
             rights_url, {
                 'version': exploration.version,
                 'new_member_username': self.COLLABORATOR_USERNAME,
                 'new_member_role': rights_domain.ROLE_OWNER
             }, csrf_token=csrf_token)
+
+        reader_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        self.assertIn(
+            self.COLLABORATOR_USERNAME,
+            reader_dict['rights']['owner_names']
+        )
+        self.assertNotIn(
+            self.COLLABORATOR_USERNAME,
+            reader_dict['rights']['editor_names']
+        )
         self.logout()
 
     def test_for_deassign_editor_role(self):
@@ -2732,6 +2779,13 @@ class EditorAutosaveTest(BaseEditorControllerTests):
             'version': 10,
         }
 
+        exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
+            '%s.%s' % (self.owner_id, self.EXP_ID2))
+        self.assertNotEqual(
+            exp_user_data.draft_change_list, self.NEW_CHANGELIST)
+        self.assertNotEqual(exp_user_data.draft_change_list_exp_version, 10)
+        self.assertNotEqual(exp_user_data.draft_change_list_id, 2)
+
         # User will behave as a voice artist because check_can_edit_activity
         # is false but check_can_voiceover_activity is still true.
         get_voiceover_swap = self.swap_to_always_return(
@@ -3080,6 +3134,13 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
             feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX,
             feconf.ENTITY_TYPE_EXPLORATION, exp_id)
 
+        # Check if the file is already present or not.
+        file_system_class = fs_services.get_entity_file_system_class()
+        fs = fs_domain.AbstractFileSystem(
+            file_system_class(feconf.ENTITY_TYPE_EXPLORATION, exp_id))
+        filepath = '%s/%s' % (filename_prefix, filename)
+        self.assertFalse(fs.isfile(filepath))
+
         response = self.post_json(
             publish_url, {
                 'image': 'sample_image',
@@ -3119,6 +3180,13 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
         publish_url = '%s/%s/%s' % (
             feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX,
             feconf.ENTITY_TYPE_EXPLORATION, exp_id)
+
+        # Check if the file is already present or not.
+        file_system_class = fs_services.get_entity_file_system_class()
+        fs = fs_domain.AbstractFileSystem(
+            file_system_class(feconf.ENTITY_TYPE_EXPLORATION, exp_id))
+        filepath = '%s/%s' % (filename_prefix, filename)
+        self.assertFalse(fs.isfile(filepath))
 
         # Read raw image for testing.
         with python_utils.open_file(
@@ -3173,6 +3241,12 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
             feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX,
             feconf.ENTITY_TYPE_EXPLORATION, exp_id)
 
+        # Check if the file is already present or not.
+        file_system_class = fs_services.get_entity_file_system_class()
+        fs = fs_domain.AbstractFileSystem(
+            file_system_class(feconf.ENTITY_TYPE_EXPLORATION, exp_id))
+        filepath = '%s/%s' % (filename_prefix, filename)
+        self.assertFalse(fs.isfile(filepath))
         # Read raw image for testing.
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
@@ -3190,7 +3264,13 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
             expected_status_int=200,
             upload_files=(('image', 'unused_filename', raw_image),)
         )
-
         self.assertEqual(response['filename'], filename)
+
+        # Check if current file is uploaded successfully or not.
+        file_system_class = fs_services.get_entity_file_system_class()
+        fs = fs_domain.AbstractFileSystem(
+            file_system_class(feconf.ENTITY_TYPE_EXPLORATION, exp_id))
+        filepath = '%s/%s' % (filename_prefix, filename)
+        self.assertTrue(fs.isfile(filepath))
 
         self.logout()
