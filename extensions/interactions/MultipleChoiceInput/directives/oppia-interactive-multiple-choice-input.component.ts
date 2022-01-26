@@ -94,14 +94,14 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
     // once before, get the previous order of choices, otherwise order the
     // choices based on their original index.
     this.questionIsOnceAnswered = this.isQuestionOnceAnswered();
-    if(this.questionIsOnceAnswered){
+    if (this.questionIsOnceAnswered) {
       this.choices = this.getPreviousOrderOfChoices();
-    }else {
+    } else {
       this.choices = (
         showChoicesInShuffledOrder.value ? shuffleChoices(choicesWithIndex) :
         choicesWithIndex.sort((c1, c2) => c1.originalIndex - c2.originalIndex)
       );
-    }   
+    }
     this.answer = null;
     this.currentInteractionService.registerCurrentInteraction(
       () => this.submitAnswer(), () => this.validityCheckFn());
@@ -110,11 +110,11 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
   isQuestionOnceAnswered(): boolean {
     // Check if choice-order attribute is present in question
     // element which indicates that the question has been answered
-    // once previously
+    // once previously.
     let questionElement = document.querySelector(
       '.oppia-rte-viewer.oppia-learner-view-card-top-content');
-    if(questionElement){
-      if(questionElement.getAttribute('choice-order')){
+    if (questionElement) {
+      if (questionElement.getAttribute('choice-order')) {
         return true;
       }
     }
@@ -123,7 +123,7 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
 
   getPreviousOrderOfChoices(): string {
     // Get stored choices order from question element to
-    // prevent shuffling of choices
+    // prevent shuffling of choices.
     let questionElement = document.querySelector(
       '.oppia-rte-viewer.oppia-learner-view-card-top-content');
     let choices = questionElement.getAttribute('choice-order');
@@ -147,10 +147,10 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
     (event.currentTarget as HTMLDivElement).classList.add('selected');
     this.answer = parseInt(answer, 10);
     // Store current choice order in question element to
-    // prevent shuffling of choices
+    // prevent shuffling of choices.
     let questionElement = document.querySelector(
       '.oppia-rte-viewer.oppia-learner-view-card-top-content');
-    if(questionElement){
+    if (questionElement) {
       questionElement.setAttribute(
         'choice-order', JSON.stringify(this.choices));
     }

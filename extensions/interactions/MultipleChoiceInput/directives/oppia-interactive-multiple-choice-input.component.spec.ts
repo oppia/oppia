@@ -166,7 +166,7 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
         }
       })
       .withArgs('.oppia-rte-viewer.oppia-learner-view-card-top-content')
-        .and.returnValue(null);      
+      .and.returnValue(null);
     spyOnProperty(dummyMouseEvent, 'currentTarget').and.returnValue(
       {
         classList: {
@@ -265,12 +265,11 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
     let questionElement = document.createElement('div');
     questionElement.className =
       'oppia-rte-viewer oppia-learner-view-card-top-content';
-    questionElement.innerHTML = '<p>Question</p>';
     document.body.appendChild(questionElement);
 
     spyOn(document, 'querySelector')
       .withArgs('.oppia-rte-viewer.oppia-learner-view-card-top-content')
-        .and.returnValue(questionElement);
+      .and.returnValue(questionElement);
 
     let encodedChoices = JSON.stringify(component.choicesWithValue);
     spyOn(browserCheckerService, 'isMobileDevice').and.returnValue(true);
