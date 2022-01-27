@@ -28,8 +28,7 @@
           </div>
           <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist"
               *ngIf="savedMemento()">
-            <li [ngClass]="!inlineSolutionEditorIsActive"
-                class="oppia-rule-block oppia-sortable-hint oppia-prevent-selection">
+            <li class="oppia-rule-block oppia-sortable-hint oppia-prevent-selection">
               <div class="oppia-rule-header-warning-placement"
                    *ngIf="!isSolutionValid()"
                    (click)="toggleInlineSolutionEditorIsActive()"

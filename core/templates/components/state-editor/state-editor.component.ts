@@ -98,7 +98,8 @@ angular.module('oppia').component('stateEditor', {
   },
   template: require('./state-editor.component.html'),
   controller: [
-    '$scope', 'StateCardIsCheckpointService', 'StateContentService',
+    '$rootScope', '$scope', 'StateCardIsCheckpointService',
+    'StateContentService',
     'StateCustomizationArgsService', 'StateEditorService',
     'StateHintsService', 'StateInteractionIdService',
     'StateLinkedSkillIdService', 'StateNameService',
@@ -106,7 +107,7 @@ angular.module('oppia').component('stateEditor', {
     'StateSolicitAnswerDetailsService', 'StateSolutionService',
     'UrlInterpolationService', 'WindowDimensionsService', 'INTERACTION_SPECS',
     function(
-        $scope, StateCardIsCheckpointService, StateContentService,
+        $rootScope, $scope, StateCardIsCheckpointService, StateContentService,
         StateCustomizationArgsService, StateEditorService,
         StateHintsService, StateInteractionIdService,
         StateLinkedSkillIdService, StateNameService,
@@ -123,6 +124,10 @@ angular.module('oppia').component('stateEditor', {
         $scope.currentStateIsTerminal = Boolean(
           $scope.interactionIdIsSet && INTERACTION_SPECS[
             newInteractionId].is_terminal);
+      };
+
+      $scope.getSolutionsChange = function() {
+        $rootScope.$applyAsync();
       };
 
       $scope.reinitializeEditor = function() {

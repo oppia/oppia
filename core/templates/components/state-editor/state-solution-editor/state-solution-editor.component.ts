@@ -34,11 +34,11 @@ import { StateEditorService } from '../state-editor-properties-services/state-ed
 import { StateHintsService } from '../state-editor-properties-services/state-hints.service';
 import { StateInteractionIdService } from '../state-editor-properties-services/state-interaction-id.service';
 import { StateSolutionService } from '../state-editor-properties-services/state-solution.service';
-import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { Solution } from 'domain/exploration/SolutionObjectFactory';
 import { AppConstants } from 'app.constants';
 import { StateEditorConstants } from '../state-editor.constants';
 import { ConvertToPlainTextPipe } from 'filters/string-utility-filters/convert-to-plain-text.pipe';
+import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 
 interface DeleteValue {
   index: number;
@@ -51,6 +51,7 @@ interface DeleteValue {
 export class StateSolutionEditorComponent implements OnInit {
   @Output() saveSolution: EventEmitter<Solution> = new EventEmitter();
   @Output() refreshWarnings: EventEmitter<void> = new EventEmitter();
+  @Output() getSolutionsChange: EventEmitter<void> = new EventEmitter();
   @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired:
   EventEmitter<Solution> = (new EventEmitter());
   correctAnswer: string;
@@ -162,7 +163,7 @@ export class StateSolutionEditorComponent implements OnInit {
     }).result.then((result) => {
       this.stateSolutionService.displayed = result.solution;
       this.stateSolutionService.saveDisplayedValue();
-      this.saveSolution.emit(this.stateSolutionService.displayed);
+      this.onSaveSolution(this.stateSolutionService.displayed);
       let solutionIsValid = this.solutionVerificationService.verifySolution(
         this.stateEditorService.getActiveStateName(),
         this.stateEditorService.getInteraction(),
@@ -172,6 +173,7 @@ export class StateSolutionEditorComponent implements OnInit {
       this.solutionValidityService.updateValidity(
         this.stateEditorService.getActiveStateName(), solutionIsValid);
       this.refreshWarnings.emit();
+      this.getSolutionsChange.emit();
       if (!solutionIsValid) {
         if (this.stateEditorService.isInQuestionMode()) {
           this.alertsService.addInfoMessage(
@@ -181,9 +183,11 @@ export class StateSolutionEditorComponent implements OnInit {
             this.INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION, 4000);
         }
       }
-      () => {
-        this.alertsService.clearWarnings();
-      };
+    }, () => {
+      this.alertsService.clearWarnings();
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
     });
   }
 
@@ -199,9 +203,12 @@ export class StateSolutionEditorComponent implements OnInit {
       this.onSaveSolution(this.stateSolutionService.displayed);
       this.stateEditorService.deleteCurrentSolutionValidity();
       this.refreshWarnings.emit();
-      () => {
-        this.alertsService.clearWarnings();
-      };
+      this.getSolutionsChange.emit();
+    }, () => {
+      this.alertsService.clearWarnings();
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
     });
   }
 
@@ -211,4 +218,6 @@ export class StateSolutionEditorComponent implements OnInit {
 }
 
 angular.module('oppia').directive('oppiaStateSolutionEditor',
-  downgradeComponent({component: StateSolutionEditorComponent}));
+downgradeComponent({
+  component: StateSolutionEditorComponent
+}) as angular.IDirectiveFactory);

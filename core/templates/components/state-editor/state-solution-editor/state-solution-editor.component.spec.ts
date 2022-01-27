@@ -16,17 +16,22 @@
  * @fileoverview Unit test for state solution editor component.
  */
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { HintBackendDict } from 'domain/exploration/HintObjectFactory';
 import { Solution, SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { ConvertToPlainTextPipe } from 'filters/string-utility-filters/convert-to-plain-text.pipe';
 import { SolutionValidityService } from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import { SolutionVerificationService } from 'pages/exploration-editor-page/editor-tab/services/solution-verification.service';
 import { AlertsService } from 'services/alerts.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { EditabilityService } from 'services/editability.service';
 import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
 import { StateEditorService } from '../state-editor-properties-services/state-editor.service';
+import { StateHintsService } from '../state-editor-properties-services/state-hints.service';
 import { StateInteractionIdService } from '../state-editor-properties-services/state-interaction-id.service';
 import { StateSolutionService } from '../state-editor-properties-services/state-solution.service';
 import { StateSolutionEditorComponent } from './state-solution-editor.component';
@@ -36,11 +41,13 @@ describe('State Solution Editor Component', () => {
   let fixture: ComponentFixture<StateSolutionEditorComponent>;
   let alertsService: AlertsService;
   let convertToPlainTextPipe: ConvertToPlainTextPipe;
+  let editabilityService: EditabilityService;
   let explorationHtmlFormatterService: ExplorationHtmlFormatterService;
   let ngbModal: NgbModal;
   let solutionValidityService: SolutionValidityService;
   let solutionVerificationService: SolutionVerificationService;
   let stateEditorService: StateEditorService;
+  let stateHintsService: StateHintsService;
   let stateSolutionService: StateSolutionService;
   let stateInteractionIdService: StateInteractionIdService;
   let windowDimensionsService: WindowDimensionsService;
@@ -50,15 +57,18 @@ describe('State Solution Editor Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
       declarations: [
         StateSolutionEditorComponent
       ],
       providers: [
         AlertsService,
+        EditabilityService,
         ExplorationHtmlFormatterService,
         SolutionValidityService,
         SolutionVerificationService,
         StateEditorService,
+        StateHintsService,
         StateSolutionService,
         ConvertToPlainTextPipe,
         StateInteractionIdService,
@@ -76,8 +86,10 @@ describe('State Solution Editor Component', () => {
     convertToPlainTextPipe = TestBed.inject(ConvertToPlainTextPipe);
     explorationHtmlFormatterService = TestBed.inject(
       ExplorationHtmlFormatterService);
+    editabilityService = TestBed.inject(EditabilityService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     stateEditorService = TestBed.inject(StateEditorService);
+    stateHintsService = TestBed.inject(StateHintsService);
     stateSolutionService = TestBed.inject(StateSolutionService);
     stateInteractionIdService = TestBed.inject(StateInteractionIdService);
     solutionValidityService = TestBed.inject(SolutionValidityService);
@@ -187,6 +199,42 @@ describe('State Solution Editor Component', () => {
     expect(component.isSolutionValid()).toBeTrue();
   });
 
+  it('should return the number of displayed hints', () => {
+    stateHintsService.displayed = [
+      {
+        hintContent: SubtitledHtml.createDefault('<h1>work</h1>', '1'),
+        toBackendDict(): HintBackendDict {
+          return {
+            hint_content: this.hintContent.toBackendDict()
+          };
+        }
+      },
+      {
+        hintContent: SubtitledHtml.createDefault('<h1>work</h1>', '1'),
+        toBackendDict(): HintBackendDict {
+          return {
+            hint_content: this.hintContent.toBackendDict()
+          };
+        }
+      }
+    ];
+
+    expect(component.displayedHintsLength()).toBe(2);
+  });
+
+  it('should check if in editable tutorial mode or not', () => {
+    spyOn(editabilityService, 'isEditableOutsideTutorialMode')
+      .and.returnValue(true);
+
+    expect(component.isEditableOutsideTutorialMode()).toBeTrue();
+  });
+
+  it('should return the saved solution', () => {
+    stateSolutionService.savedMemento = solution;
+
+    expect(component.savedMemento()).toEqual(solution);
+  });
+
   it('should toggle activity of inline solution editor', () => {
     component.inlineSolutionEditorIsActive = true;
 
@@ -206,7 +254,7 @@ describe('State Solution Editor Component', () => {
     });
 
     expect(component.getSolutionSummary()).toBe(
-      'One solution is "This is a correct answer!".' +
+      'One solution is "&quot;This is a correct answer!&quot;".' +
       ' This is the explanation to the answer.');
   });
 
@@ -257,17 +305,21 @@ describe('State Solution Editor Component', () => {
       expect(ngbModal.open).toHaveBeenCalled();
     }));
 
-  it('should save solution and open showMarkAllAudioAsNeedingUpdateModal' +
-    ' when user click', () => {
-    spyOn(component, 'showMarkAllAudioAsNeedingUpdateModalIfRequired').and
-      .callThrough();
-    spyOn(component, 'onSaveSolution').and.callThrough();
+  it('should open showMarkAllAudioAsNeedingUpdateModalIfRequired when' +
+    ' user clicks', () => {
+    spyOn(component.showMarkAllAudioAsNeedingUpdateModalIfRequired, 'emit');
 
     component.openMarkAllAudioAsNeedingUpdateModalIfRequired(solution);
+
+    expect(component.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit)
+      .toHaveBeenCalled();
+  });
+
+  it('should save solution when user click', () => {
+    spyOn(component.saveSolution, 'emit');
+
     component.onSaveSolution(solution);
 
-    expect(component.showMarkAllAudioAsNeedingUpdateModalIfRequired)
-      .toHaveBeenCalledWith(solution);
-    expect(component.onSaveSolution).toHaveBeenCalledWith(solution);
+    expect(component.saveSolution.emit).toHaveBeenCalled();
   });
 });
