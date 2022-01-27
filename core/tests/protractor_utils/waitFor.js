@@ -26,6 +26,7 @@ var Constants = require('./ProtractorConstants');
 // mobile device.
 var DEFAULT_WAIT_TIME_MSECS = browser.isMobile ? 20000 : 10000;
 var DEFAULT_WAIT_TIME_MSECS_FOR_NEW_TAB = 15000;
+var DEFAULT_WAIT_TIME_MSECS_FOR_CLIENT_SIDE_REDIRECT = 15000;
 
 var toastInfoElement = element(by.css('.toast-info'));
 var toastSuccessElement = element(by.css('.toast-success'));
@@ -196,15 +197,39 @@ var clientSideRedirection = async function(
   // complete. Manually waiting for redirection here.
   await browser.driver.wait(async() => {
     var url = await browser.driver.getCurrentUrl();
+
     // Condition to wait on.
     return check(decodeURIComponent(url));
-  }, DEFAULT_WAIT_TIME_MSECS);
+  }, DEFAULT_WAIT_TIME_MSECS_FOR_CLIENT_SIDE_REDIRECT,
+  'Client Side Redirection taking too long');
 
   // Waiting for caller specified conditions.
   await waitForCallerSpecifiedConditions();
 
   // Client side redirection is complete, enabling wait for angular here.
   await browser.waitForAngularEnabled(true);
+};
+
+var clientSideRedirectionT = async function(
+  action, url, waitForCallerSpecifiedConditions) {
+// Client side redirection is known to cause "both angularJS testability
+// and angular testability are undefined" flake.
+// As suggested by protractor devs here (http://git.io/v4gXM), waiting for
+// angular is disabled during client side redirects.
+await browser.waitForAngularEnabled(false);
+
+// Action triggering redirection.
+await action();
+
+// The action only triggers the redirection but does not wait for it to
+// complete. Manually waiting for redirection here.
+await urlRedirection(url);
+
+// Waiting for caller specified conditions.
+await waitForCallerSpecifiedConditions();
+
+// Client side redirection is complete, enabling wait for angular here.
+await browser.waitForAngularEnabled(true);
 };
 
 exports.DEFAULT_WAIT_TIME_MSECS = DEFAULT_WAIT_TIME_MSECS;
@@ -226,3 +251,4 @@ exports.fadeInToComplete = fadeInToComplete;
 exports.modalPopupToAppear = modalPopupToAppear;
 exports.fileToBeDownloaded = fileToBeDownloaded;
 exports.clientSideRedirection = clientSideRedirection;
+exports.clientSideRedirectionT = clientSideRedirectionT;

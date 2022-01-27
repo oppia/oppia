@@ -41,11 +41,10 @@ var DeleteAccountPage = function() {
     await waitFor.modalPopupToAppear();
     await action.sendKeys(
       'Fill username', confirmDeletionUsernameField, username);
-    await waitFor.clientSideRedirection(async() => {
+    await waitFor.clientSideRedirectionT(async() => {
       await action.click('Confirm deletion button', confirmDeletionButton);
-    }, (url) => {
-      return url === 'http://localhost:9001/pending-account-deletion';
-    }, async() => {
+    }, 'http://localhost:9001/pending-account-deletion',
+    async() => {
       await waitFor.visibilityOf(
         pendingAccountDeletionHeading,
         'Pending Account Deletion Page takes too long to appear');
