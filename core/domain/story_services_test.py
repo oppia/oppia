@@ -1375,8 +1375,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 'interaction.'])
         with self.assertRaisesRegex(
             Exception, 'Explorations in a story are not expected to contain '
-            'exploration recommendations. Exploration with ID: exp_id_1 contains'
-            ' exploration recommendations in its EndExploration interaction.'):
+            'exploration recommendations. Exploration with ID: exp_id_1 '
+            'contains exploration recommendations in its EndExploration '
+            'interaction.'):
             story_services.update_story(
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
