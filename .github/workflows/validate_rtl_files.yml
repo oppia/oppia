@@ -33,6 +33,10 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
+      - uses: ./.github/actions/install-oppia-dependencies
+      - name: Third Party Size Check
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        run: python -m scripts.third_party_size_check
       - name: Run RTL Checks
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: PYTHONIOENCODING=utf-8 python -m scripts.rtl_css --mode validate
