@@ -69,6 +69,10 @@ MODULES_WITH_PSEUDONYMIZABLE_CLASSES = (
     Names.SUBTOPIC, Names.SUGGESTION, Names.TOPIC
 )
 
+# Types of deletion policies. The pragma comment is needed because Enums are
+# evaluated as classes in Python and they should use PascalCase, but using
+# UPPER_CASE seems more appropriate here.
+
 GAE_PLATFORM = 'gae'
 
 
@@ -98,6 +102,10 @@ class _Gae(Platform):
     @classmethod
     def import_models(cls, model_names: List[Names]) -> Tuple[ModuleType, ...]:
         """Imports and returns the storage modules listed in model_names.
+
+        # We have ignored [override] here because the signature of this method
+        # doesn't match with BaseModel.delete_multi().
+        # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
 
         Args:
             model_names: list(Names). List of storage module names.
@@ -417,6 +425,8 @@ class Registry:
             class. The corresponding platform-specific interface class.
         """
         klass = cls._PLATFORM_MAPPING.get(GAE_PLATFORM)
+        
+        # Ruling out the possibility of None for mypy type checking.
 
         assert klass is not None
         return klass
