@@ -19,7 +19,7 @@
         <span [innerHTML]="'I18N_INTERACTIONS_ITEM_SELECTION_MORE' | translate"></span>
       </span>
     </small>
-    <div class="item-selection-input-container" *ngFor="let choice of choices; index as idx">
+    <div class="protractor-test-item-selection-input-container" *ngFor="let choice of choices; index as idx">
       <div *ngIf="displayCheckboxes">
         <label dir="auto" class="item-selection-input-item protractor-test-item-selection-input-item">
           <mat-checkbox class="item-selection-input-checkbox protractor-test-item-selection-input-checkbox"
