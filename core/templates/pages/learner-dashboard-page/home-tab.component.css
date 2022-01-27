@@ -135,7 +135,7 @@
   }
   .home-tab .continue-where-you-left-off, .home-tab .suggested-for-you,
   .home-tab .empty-suggested-for-you {
-    margin: 18px 0 25px 20px;
+    margin-left: auto;
     width: 465px;
   }
   .home-tab .continue-where-you-left-off .continue-where-you-left-off-heading,

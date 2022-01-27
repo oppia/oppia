@@ -6,6 +6,36 @@
   Some additional rules that can be added to the CSS files can be found here:
   https://rtlcss.com/learn/usage-guide/control-directives .
 */
+.login-buttons {
+  margin-top: 40px;
+}
+.skip-container {
+  margin-top: 50px;
+}
+
+.skip-btn {
+  border: 1px solid #eee;
+  color: #fff;
+  font-weight: bold;
+}
+
+.skip-btn:focus, .skip-btn:hover {
+  background-color: #444;
+}
+
+.skip-btn:focus {
+  border: 2px solid #fff;
+}
+
+.login-text {
+  color: #fff;
+  font-weight: bold;
+}
+
+.oppia-login-or-signup-text {
+  font-weight: bold;
+}
+
 .oppia-story-viewer-container a {
   text-decoration: none;
 }
@@ -23,8 +53,9 @@
 }
 
 .story-viewer-login-container {
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: #000000e1;
   bottom: 0;
+  color: #fff;
   padding: 2em;
   position: sticky;
   text-align: center;

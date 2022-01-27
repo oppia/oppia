@@ -134,11 +134,7 @@
              *ngIf="idx < chaptersDisplayed">
           <a [href]="getChapterUrl(title)" rel="noopener" target="_blank">
             <span class="chapter-identifier" [innerHTML]="'I18N_TOPIC_VIEWER_CHAPTER' | translate">
-            </span>&nbsp;
-            <span class="chapter-identifier">{{ idx + 1 }}:</span>&nbsp;
-            <span dir="auto" *ngIf="!isHackyNodeTitleTranslationDisplayed(idx)">
-              {{ title }}
-            </span>
+            </span>&nbsp;<span class="chapter-identifier">{{ idx + 1 }}:</span>&nbsp;<span dir="auto" *ngIf="!isHackyNodeTitleTranslationDisplayed(idx)">{{ title }}</span>
             <span dir="auto" *ngIf="isHackyNodeTitleTranslationDisplayed(idx)">
               {{ nodeTitlesTranslationKeys[idx] | translate }}
             </span>

@@ -1,7 +1,7 @@
 <link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/story-viewer-page/story-viewer-page.component.css" as="style">
 <link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/story-viewer-page/story-viewer-page.component.rtl.css" as="style">
 
-<div class="oppia-story-viewer-container">
+<div class="oppia-story-viewer-container" (click)="focusSkipButton($event.target, isLoggedIn)">
   <div *ngIf="storyIsLoaded">
     <div class="oppia-story-viewer-inner-container">
       <div *ngIf="storyPlaythroughObject" class="oppia-story-player-tiles-container">
@@ -156,16 +156,19 @@
       </div>
     </div>
     <attribution-guide></attribution-guide>
-    <div *ngIf="!isLoggedIn"  class="story-viewer-login-container">
-      <h2>Learn More about {{ storyPlaythroughObject.topicName }}</h2>
-      <div class="mt-2">
-        <button class="mat-raised-button oppia-login-button text-light protractor-test-login-button" (click)="signIn()">
+    <div *ngIf="!isLoggedIn && showLoginOverlay" class="story-viewer-login-container" #overlay>
+      <h2 class="login-text">Save your progress</h2>
+      <div class="login-buttons">
+        <button class="btn mat-raised-button oppia-login-button text-light protractor-test-login-button" (click)="signIn()">
           LOG IN
         </button>
-        <span class="m-2 oppia-login-or-signup-text">or</span>
-        <button class="mat-raised-button oppia-sign-up-button text-light" (click)="signIn()">
+        <span class="m-3 oppia-login-or-signup-text">or</span>
+        <button class="btn mat-raised-button oppia-sign-up-button text-light" (click)="signIn()">
           SIGN UP
         </button>
+      </div>
+      <div class="skip-container d-flex justify-content-end">
+        <button class="btn skip-btn px-5" (click)="hideLoginOverlay()" #skip>SKIP</button>
       </div>
     </div>
   </div>

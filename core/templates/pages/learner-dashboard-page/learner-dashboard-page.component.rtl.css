@@ -99,8 +99,12 @@ body {
 }
 
 .oppia-learner-dashboard-section-active {
-  background-color: #00645c1a;
+  background-color: rgba(0, 100, 92, 0.1);
   color: #00645c;
+}
+
+.oppia-learner-dashborad-menu-hover:hover {
+  background-color: rgba(0, 100, 92, 0.1);
 }
 
 .oppia-learner-dashboard-side-content {
@@ -366,7 +370,7 @@ body {
   left: 0;
 }
 .oppia-learner-dashboard-buttons.headroom--top {
-  margin-bottom: 70px;
+  margin-bottom: 5px;
 }
 
 .oppia-learner-dashboard-buttons.headroom--unfixed {
@@ -380,7 +384,7 @@ body {
   bottom: -30px;
 }
 .oppia-learner-dashboard-buttons.headroom--pinned {
-  margin-bottom: 50px;
+  margin-bottom: 38px;
   position: fixed;
   transform: translateY(-100%);
 }
