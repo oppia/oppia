@@ -209,6 +209,10 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
     };
 
     $scope.isSaveInteractionButtonEnabled = function() {
+      console.log(StateInteractionIdService.displayed);
+      if(StateInteractionIdService.displayed === 'NumericExpressionInput') {
+        return false
+      }
       return !!(
         $scope.hasCustomizationArgs &&
         $scope.StateInteractionIdService.displayed &&
