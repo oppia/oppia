@@ -17,14 +17,17 @@
 from __future__ import annotations
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.domain import change_domain
-from core.domain import user_services
 
 from typing import List, Optional
 from typing_extensions import TypedDict
+
+from core.domain import user_services  # pylint: disable=invalid-import-from # isort:skip
+
+# TODO(#14537): Refactor this file and remove imports marked
+# with 'invalid-import-from'.
 
 # IMPORTANT: Ensure that all changes to how these cmds are interpreted preserve
 # backward-compatibility with previous exploration snapshots in the datastore.
@@ -274,7 +277,7 @@ class ActivityRights:
                 raise Exception(
                     'Public explorations can be viewed by anyone.')
 
-        for role, user_ids in python_utils.ZIP(
+        for role, user_ids in zip(
                 [ROLE_OWNER, ROLE_EDITOR, ROLE_VIEWER, ROLE_VOICE_ARTIST],
                 [self.owner_ids, self.editor_ids, self.viewer_ids,
                  self.voice_artist_ids]):
@@ -289,13 +292,16 @@ class ActivityRights:
             if old_role == ROLE_OWNER:
                 raise Exception(
                     'This user already owns this exploration.')
-            elif old_role == ROLE_EDITOR:
+
+            if old_role == ROLE_EDITOR:
                 raise Exception(
                     'This user already can edit this exploration.')
-            elif old_role == ROLE_VOICE_ARTIST:
+
+            if old_role == ROLE_VOICE_ARTIST:
                 raise Exception(
                     'This user already can voiceover this exploration.')
-            elif old_role == ROLE_VIEWER:
+
+            if old_role == ROLE_VIEWER:
                 raise Exception(
                     'This user already can view this exploration.')
 

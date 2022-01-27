@@ -20,7 +20,6 @@ import collections
 import logging
 
 from core import feconf
-from core import python_utils
 from core.constants import constants
 from core.domain import caching_services
 from core.domain import config_domain
@@ -791,7 +790,8 @@ def _save_skill(committer_id, skill, commit_message, change_list):
             'Unexpected error: trying to update version %s of skill '
             'from version %s. Please reload the page and try again.'
             % (skill_model.version, skill.version))
-    elif skill.version < skill_model.version:
+
+    if skill.version < skill_model.version:
         raise Exception(
             'Trying to update version %s of skill from version %s, '
             'which is too old. Please reload the page and try again.'
@@ -1067,8 +1067,7 @@ def get_multi_user_skill_mastery(user_id, skill_ids):
     skill_mastery_models = user_models.UserSkillMasteryModel.get_multi(
         model_ids)
 
-    for skill_id, skill_mastery_model in python_utils.ZIP(
-            skill_ids, skill_mastery_models):
+    for skill_id, skill_mastery_model in zip(skill_ids, skill_mastery_models):
         if skill_mastery_model is None:
             degrees_of_mastery[skill_id] = None
         else:
