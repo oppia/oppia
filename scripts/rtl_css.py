@@ -71,7 +71,7 @@ def start_subprocess_for_result_with_input(cmd, css):
     task = subprocess.Popen(
         cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
         stderr=subprocess.PIPE)
-    out, err = task.communicate(css)
+    out, err = task.communicate(input=css)
     return out, err
 
 
