@@ -59,8 +59,8 @@ export class CreateActivityButtonComponent implements OnInit {
     this.explorationCreationService.createNewExploration();
   }
 
-  checkMobileView(): boolean {
-    return (this.windowRef.nativeWindow.innerWidth < 500);
+  checkTabletView(): boolean {
+    return (this.windowRef.nativeWindow.innerWidth < 768);
   }
 
   initCreationProcess(): void {

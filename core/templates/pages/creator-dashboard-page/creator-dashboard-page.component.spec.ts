@@ -31,6 +31,7 @@ import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { SortByPipe } from 'filters/string-utility-filters/sort-by.pipe';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 
 @Pipe({name: 'truncate'})
 class MockTruncatePipe {
@@ -46,6 +47,7 @@ describe('Creator Dashboard Page Component', () => {
   let csrfService: CsrfTokenService;
   let userService: UserService;
   let explorationCreationService: ExplorationCreationService;
+  let windowDimensionsService: WindowDimensionsService;
   let userInfo = {
     canCreateCollections: () => true
   };
@@ -72,6 +74,7 @@ describe('Creator Dashboard Page Component', () => {
     csrfService = TestBed.inject(CsrfTokenService);
     explorationCreationService = TestBed.inject(ExplorationCreationService);
     userService = TestBed.inject(UserService);
+    windowDimensionsService = TestBed.inject(WindowDimensionsService);
 
     spyOn(csrfService, 'getTokenAsync').and.returnValue(
       Promise.resolve('sample-csrf-token'));
@@ -101,6 +104,17 @@ describe('Creator Dashboard Page Component', () => {
     let collectionId = '1';
     expect(component.getCollectionUrl(collectionId)).toBe(
       '/collection_editor/create/' + collectionId);
+  });
+
+  it('should check if the view is tablet or not', () => {
+    let widthSpy = spyOn(windowDimensionsService, 'getWidth');
+    widthSpy.and.returnValue(700);
+
+    expect(component.checkTabletView()).toBe(true);
+
+    widthSpy.and.returnValue(800);
+
+    expect(component.checkTabletView()).toBe(false);
   });
 
   it('should get username popover event type according to username length',
