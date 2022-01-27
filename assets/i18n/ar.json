@@ -511,6 +511,7 @@
 	"I18N_PREFERENCES_PROFILE_PICTURE_ERROR": "خطأ: لا يمكن قراءة ملف الصورة.",
 	"I18N_PREFERENCES_PROFILE_PICTURE_UPLOAD": "رفع الصورة الشخصية",
 	"I18N_PREFERENCES_SELECT_EXPLORATION_LANGUAGE": "تحديد اللغات المفضلة...",
+	"I18N_PREFERENCES_SITE_LANGUAGE_LABEL": "لغة الموقع",
 	"I18N_PREFERENCES_SUBJECT_INTERESTS": "الاهتمامات",
 	"I18N_PREFERENCES_SUBJECT_INTERESTS_HELP_BLOCK": "على سبيل المثال: الرياضيات، علم الحاسوب، الفن، ...",
 	"I18N_PREFERENCES_SUBJECT_INTERESTS_INVALID_SEARCH": "إضافة مواضيع اهتمامات جديدة (باستخدام الحروف الصغيرة والمسافات)...",
