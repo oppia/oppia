@@ -900,6 +900,17 @@ class I18nDictsTests(test_utils.GenericTestBase):
                         self.log_line('Bad line in file: %s' % filename)
                 self.assertEqual(sorted(key_list), key_list)
 
+    # TODO(#14645): Remove this method when translation service is extended.
+    def test_hacky_tranlsation_keys_match_constants_en(self):
+        """Tests that the hacky translation keys present in constants file
+        are also present in en.json.
+        """
+        en_key_list = self._extract_keys_from_json_file('en.json')
+        hacky_translation_keys = constants.HACKY_TRANSLATION_KEYS
+        missing_hacky_translation_keys = list(
+            set(hacky_translation_keys) - set(en_key_list))
+        self.assertEqual(missing_hacky_translation_keys, [])
+
     def test_keys_match_en_qqq(self):
         """Tests that en.json and qqq.json have the exact same set of keys."""
         en_key_list = self._extract_keys_from_json_file('en.json')
