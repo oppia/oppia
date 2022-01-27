@@ -19,7 +19,7 @@
       </div>
     </div>
     <div class="oppia-question-player-body">
-      <conversation-skin question-player-config="$ctrl.questionPlayerConfig"></conversation-skin>
+      <oppia-conversation-skin [question-player-config]="$ctrl.questionPlayerConfig"></oppia-conversation-skin>
       <attribution-guide></attribution-guide>
     </div>
   </div>
@@ -62,6 +62,7 @@
             <span class="score-final score-recieved"><[$ctrl.finalCorrect.toFixed(2)]></span>
             <span class="score-final">/ <[$ctrl.allQuestions]></span>
           </div>
+          <div class="score-calculation-text">This score is based on the number of hints you used and incorrect answers you entered during this session.</div>
         </div>
 
         <button class="btn btn-secondary oppia-review-and-retry-button oppia-review-and-retry-button-text mt-4"
@@ -376,6 +377,12 @@
     width: 80%;
   }
 
+  .score-calculation-text {
+    font-size: 0.9em;
+    margin: 30px 0 -20px 0;
+    text-align: right;
+  }
+
   .list-item {
     font-family: 'Roboto', sans-serif;
     font-size: 18px;
@@ -451,6 +458,10 @@
 
   .score-final {
     font-size: 16px;
+  }
+
+  .score-calculation-text {
+    text-align: center;
   }
 }
 
