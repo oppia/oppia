@@ -23,7 +23,7 @@ import { CurrentInteractionService } from 'pages/exploration-player-page/service
 import { InteractiveMultipleChoiceInputComponent } from './oppia-interactive-multiple-choice-input.component';
 import { BrowserCheckerService } from 'domain/utilities/browser-checker.service';
 
-describe('InteractiveMultipleChoiceInputComponent', () => {
+fdescribe('InteractiveMultipleChoiceInputComponent', () => {
   let component: InteractiveMultipleChoiceInputComponent;
   let fixture: ComponentFixture<InteractiveMultipleChoiceInputComponent>;
   let currentInteractionService: CurrentInteractionService;
@@ -273,21 +273,22 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
       .withArgs('.oppia-rte-viewer.oppia-learner-view-card-top-content')
       .and.returnValue(questionElement);
 
-    let encodedChoices = JSON.stringify(component.choicesWithValue);
+    let previousOrderOfChoices = [0, 2, 1, 3];
+    let encodedOrderOfChoices = JSON.stringify(previousOrderOfChoices);
+
     spyOn(browserCheckerService, 'isMobileDevice').and.returnValue(true);
     spyOn(questionElement, 'getAttribute')
-      .withArgs('choice-order').and.returnValues(
-        null, encodedChoices, encodedChoices);
+      .withArgs('oppia-mcq-choice-order').and.returnValues(
+        null, encodedOrderOfChoices, encodedOrderOfChoices);
 
-    let questionIsOnceAnswered = component.isQuestionOnceAnswered();
-    expect(questionIsOnceAnswered).toBe(false);
+    let questionIsAnsweredOnce = component.isQuestionOnceAnswered();
+    expect(questionIsAnsweredOnce).toBe(false);
     component.answer = 1;
     component.submitAnswer();
 
     component.ngOnInit();
 
-    let previousChoicesInOrder = JSON.parse(encodedChoices);
-    expect(component.questionIsOnceAnswered).toBe(true);
-    expect(component.choices).toEqual(previousChoicesInOrder);
+    expect(component.questionIsAnsweredOnce).toBe(true);
+    expect(component.orderOfChoices).toEqual(previousOrderOfChoices);
   });
 });
