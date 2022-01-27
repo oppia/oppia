@@ -51,7 +51,7 @@ module.exports = {
       '[callee.object.argument.callee.object.callee.object.name = browser]'
     );
 
-    var reportNestedAwaits = function (node){
+    var reportNestedAwaits = function(node) {
       if (node.parent.type !== 'AwaitExpression') {
         context.report({
           node: node,
@@ -63,10 +63,10 @@ module.exports = {
     };
 
     return {
-      [activeElementSelector1]: function (node){
+      [activeElementSelector1]: function(node) {
         reportNestedAwaits(node);
       },
-      [activeElementSelector2]: function (node){
+      [activeElementSelector2]: function(node) {
         reportNestedAwaits(node);
       }
     };
