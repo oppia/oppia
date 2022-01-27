@@ -351,7 +351,11 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             question_ids, [self.question_id, question_id_2])
 
         with self.assertRaisesRegex(
-            Exception, 'The given question is already linked to given skill'):
+            Exception,
+            'The question with ID %s is already linked to skill skill_1' % (
+                self.question_id
+            )
+        ):
             question_services.create_new_question_skill_link(
                 self.editor_id, self.question_id, 'skill_1', 0.3)
 
