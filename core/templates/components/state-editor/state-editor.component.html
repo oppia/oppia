@@ -59,7 +59,7 @@
   <div ng-if="currentInteractionCanHaveSolution">
     <oppia-state-solution-editor (save-solution)="$ctrl.onSaveSolution($event)"
                                  (refresh-warnings)="$ctrl.refreshWarnings()"
-                                 (get-solutions-change)="getSolutionsChange()"
+                                 (get-solution-change)="$ctrl.getSolutionChange()"
                                  (show-mark-all-audio-as-needing-update-modal-if-required)="$ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired($event)">
     </oppia-state-solution-editor>
   </div>

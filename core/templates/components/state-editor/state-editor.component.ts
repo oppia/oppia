@@ -126,7 +126,9 @@ angular.module('oppia').component('stateEditor', {
             newInteractionId].is_terminal);
       };
 
-      $scope.getSolutionsChange = function() {
+      // Remove this function once this component is migrated to
+      // Angular 2+.
+      $scope.getSolutionChange = function() {
         $rootScope.$applyAsync();
       };
 

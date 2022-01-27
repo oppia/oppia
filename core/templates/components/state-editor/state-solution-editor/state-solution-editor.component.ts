@@ -51,7 +51,7 @@ interface DeleteValue {
 export class StateSolutionEditorComponent implements OnInit {
   @Output() saveSolution: EventEmitter<Solution> = new EventEmitter();
   @Output() refreshWarnings: EventEmitter<void> = new EventEmitter();
-  @Output() getSolutionsChange: EventEmitter<void> = new EventEmitter();
+  @Output() getSolutionChange: EventEmitter<void> = new EventEmitter();
   @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired:
   EventEmitter<Solution> = (new EventEmitter());
   correctAnswer: string;
@@ -173,7 +173,7 @@ export class StateSolutionEditorComponent implements OnInit {
       this.solutionValidityService.updateValidity(
         this.stateEditorService.getActiveStateName(), solutionIsValid);
       this.refreshWarnings.emit();
-      this.getSolutionsChange.emit();
+      this.getSolutionChange.emit();
       if (!solutionIsValid) {
         if (this.stateEditorService.isInQuestionMode()) {
           this.alertsService.addInfoMessage(
@@ -203,7 +203,7 @@ export class StateSolutionEditorComponent implements OnInit {
       this.onSaveSolution(this.stateSolutionService.displayed);
       this.stateEditorService.deleteCurrentSolutionValidity();
       this.refreshWarnings.emit();
-      this.getSolutionsChange.emit();
+      this.getSolutionChange.emit();
     }, () => {
       this.alertsService.clearWarnings();
       // Note to developers:
