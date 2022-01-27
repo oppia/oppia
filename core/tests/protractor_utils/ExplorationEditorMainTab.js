@@ -679,6 +679,9 @@ var ExplorationEditorMainTab = function() {
     var result = await saveInteractionButton.isPresent();
     if (result) {
       await browser.actions().mouseMove(saveInteractionButton).perform();
+      await browser.actions().mouseMove(saveInteractionButton).perform();
+      await browser.actions().mouseMove(saveInteractionButton).perform();
+      await browser.executeScript('0, document.body.scrollHeight');
       await waitFor.visibilityOf(
         saveInteractionButton, 'Save Interaction Button in not visible');
       await action.click('Save Interaction Button', saveInteractionButton);
