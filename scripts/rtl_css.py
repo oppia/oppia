@@ -22,7 +22,20 @@ system. It can be installed by running 'npm install -g rtlcss'.
 
 from __future__ import annotations
 
+import argparse
 import subprocess
+import os
+
+_PARSER = argparse.ArgumentParser(
+    description="""
+Run the script from the oppia root folder:
+    python -m scripts.rtl_css
+Note that the root folder MUST be named 'oppia'.
+""")
+
+_PARSER.add_argument(
+    '--mode', help='Sets the mode for the rtl css script',
+    required=True, choices=['validate', 'generate'])
 
 css_files_list = [
     'core/templates/pages/learner-dashboard-page/home-tab.component.css',
@@ -53,6 +66,13 @@ css_files_list = [
 ]
 
 
+def start_subprocess_for_result_with_input(cmd, css):
+    """Starts subprocess with stdin and returns (stdout, stderr)."""
+    task = subprocess.Popen(
+        cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    out, err = task.communicate(input=css.encode())
+    return out, err
+
 def start_subprocess_for_result(cmd):
     """Starts subprocess and returns (stdout, stderr)."""
     task = subprocess.Popen(
@@ -61,13 +81,48 @@ def start_subprocess_for_result(cmd):
     return out, err
 
 
-def main():
-    """Main method for generating rtl css files."""
-    for file_path in css_files_list:
-        _, err = start_subprocess_for_result(['rtlcss', file_path])
-        if err:
-            raise ValueError(err)
-    print('All RTL CSS files generated!')
+def main(args=None):
+    """Main method for generating and validating rtl css files."""
+    parsed_args = _PARSER.parse_args(args=args)
+    rtlcss_path = os.path.join(
+        'node_modules', 'rtlcss', 'bin', 'rtlcss.js')
+    if not os.path.exists(rtlcss_path):
+        raise Exception(
+            'ERROR    Please run start.py first to install rtlcss '
+            'and its dependencies.')
+
+    if parsed_args.mode == 'generate':
+        for file_path in css_files_list:
+            _, err = start_subprocess_for_result([rtlcss_path, file_path])
+            if err:
+                raise ValueError(err)
+        print('All RTL CSS files generated!')
+    
+    elif parsed_args.mode == 'validate': 
+        invalid_files = []
+        for file_path in css_files_list:
+            css_file = open(file_path, 'r')
+            out, err = start_subprocess_for_result_with_input(
+                [rtlcss_path, '-'], css_file.read())
+            out = out.replace(b'\n', b'')
+            
+            rtl_file_path = file_path[:-4] + '.rtl' + file_path[-4:]
+            rtl_css_content = open(rtl_file_path, 'r').read().encode()
+            rtl_css_content = rtl_css_content.replace(b'\n', b'')
+            if out != rtl_css_content:
+                invalid_files.append(file_path)
+
+        if invalid_files:
+            raise Exception(
+                'Invalid RTL CSS for the following files: ' + str(invalid_files) + 
+                '. Please run `python -m scripts.rtl_css --mode generate` '
+                'to autogenerate the corresponding files. ')
+        print('All RTL CSS files validated!')
+    
+    else:
+        raise Exception(
+            'Invalid parameter passed in: \'%s\', please choose'
+            'from \'generate\' or \'validate\'' % parsed_args.mode)
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

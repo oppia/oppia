@@ -64,7 +64,6 @@
 .oppia-library-group {
   display: block;
   height: 350px;
-  margin-bottom: 72px;
   margin-top: 36px;
   width: 100vw;
 }
@@ -161,6 +160,28 @@
   top: 0;
   white-space: nowrap;
 }
+.oppia-mobile-activity-cards-container {
+  overflow-y: hidden;
+}
+.limit-cards-shown {
+  max-height: 293px;
+}
+.card-container-height-toggle-btn {
+  background: #04857c;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 18px;
+  padding: 6px 20px 3px 20px;
+}
+.height-toggle-btn-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 12px;
+}
+.button-alignment-div {
+  width: 350px;
+}
 .oppia-library-carousel {
   float: right;
   height: 282px;
@@ -189,9 +210,9 @@
   max-width: 856px;
 }
 .oppia-search-bar-container {
-  margin: 0 25% 5vh 25%;
-  padding-bottom: 40px;
-  width: 100%;
+  margin: 0 auto 5vh auto;
+  padding-bottom: 60px;
+  width: max-content;
 }
 .oppia-library-no-exploration-groups {
   margin: 150px auto;
@@ -252,6 +273,25 @@
     height: 60%;
     left: 10px;
     transform: translateY(45px);
+  }
+}
+@media (max-width: 536px) {
+  .oppia-library-group-header {
+    font-size: 1.2em;
+    margin-right: 7%;
+    width: 80%;
+  }
+  .oppia-search-bar-container {
+    margin-bottom: 90px;
+  }
+  .oppia-library-group {
+    border-top: 3px solid white;
+    height: auto;
+    width: 100%;
+  }
+  .oppia-library-mobile-tile {
+    display: flex;
+    justify-content: center;
   }
 }
 @media (max-width: 450px) {
