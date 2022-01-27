@@ -107,11 +107,7 @@ export class AddOrUpdateSolutionModalComponent
   }
 
   onAnswerChange(): void {
-    if (this.tempAnsOption === this.ansOptions[0]) {
-      this.data.answerIsExclusive = true;
-    } else {
-      this.data.answerIsExclusive = false;
-    }
+    this.data.answerIsExclusive = (this.tempAnsOption === this.ansOptions[0]);
   }
 
   updateLocalHtml($event: string): void {
