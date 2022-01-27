@@ -259,7 +259,7 @@ def rewrite_android_proto_files():
                 r'')
 
 
-def _move_all_proto_files_to_third_party():
+def move_all_proto_files_to_third_party():
     """Move all proto files from subdirectories
     to the third_party folder.
     """
@@ -285,6 +285,8 @@ def _move_all_proto_files_to_third_party():
     # See: https://github.com/protocolbuffers/protobuf/issues/1491
     if os.path.exists(os.path.join(oppia_proto_api_path, 'org')):
         shutil.rmtree(oppia_proto_api_path + '/org')
+    else:
+        pass
 
 
 def main() -> None:
@@ -384,7 +386,7 @@ def main() -> None:
     install_buf_and_protoc()
     print('Updating oppia-proto-api files.')
     rewrite_android_proto_files()
-    _move_all_proto_files_to_third_party()
+    move_all_proto_files_to_third_party()
     print('Compiling protobuf files.')
     compile_protobuf_files(PROTO_FILES_PATHS)
 
