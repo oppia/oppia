@@ -41,7 +41,7 @@ var DeleteAccountPage = function() {
     await waitFor.modalPopupToAppear();
     await action.sendKeys(
       'Fill username', confirmDeletionUsernameField, username);
-    await waitFor.clientSideRedirectionT(async() => {
+    await waitFor.clientSideRedirectionTest(async() => {
       await action.click('Confirm deletion button', confirmDeletionButton);
     }, 'http://localhost:9001/pending-account-deletion',
     async() => {

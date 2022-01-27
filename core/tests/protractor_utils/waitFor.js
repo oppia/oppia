@@ -210,7 +210,7 @@ var clientSideRedirection = async function(
   await browser.waitForAngularEnabled(true);
 };
 
-var clientSideRedirectionT = async function(
+var clientSideRedirectionTest = async function(
   action, url, waitForCallerSpecifiedConditions) {
 // Client side redirection is known to cause "both angularJS testability
 // and angular testability are undefined" flake.
@@ -251,4 +251,4 @@ exports.fadeInToComplete = fadeInToComplete;
 exports.modalPopupToAppear = modalPopupToAppear;
 exports.fileToBeDownloaded = fileToBeDownloaded;
 exports.clientSideRedirection = clientSideRedirection;
-exports.clientSideRedirectionT = clientSideRedirectionT;
+exports.clientSideRedirectionTest = clientSideRedirectionTest;
