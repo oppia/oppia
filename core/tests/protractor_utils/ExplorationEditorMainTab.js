@@ -677,8 +677,10 @@ var ExplorationEditorMainTab = function() {
     // The save interaction button doesn't appear for interactions having no
     // options to customize.
     var result = await saveInteractionButton.isPresent();
-    await browser.actions().mouseMove(saveInteractionButton).perform();
     if (result) {
+      await browser.actions().mouseMove(saveInteractionButton).perform();
+      await waitFor.visibilityOf(
+        saveInteractionButton, 'Save Interaction Button in not visible');
       await action.click('Save Interaction Button', saveInteractionButton);
     }
     await waitFor.invisibilityOf(
