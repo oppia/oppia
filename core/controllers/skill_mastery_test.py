@@ -57,7 +57,7 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
         response_json = self.get_json(
             '%s' % feconf.SKILL_MASTERY_DATA_URL,
             params={
-                'comma_separated_skill_ids': ','.join(skill_ids)
+                'selected_skill_ids': json.dumps(skill_ids)
             })
         degrees_of_mastery = {
             self.skill_id_1: self.degree_of_mastery_1,
@@ -78,7 +78,7 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
         response_json = self.get_json(
             '%s' % feconf.SKILL_MASTERY_DATA_URL,
             params={
-                'comma_separated_skill_ids': ','.join(skill_ids)
+                'selected_skill_ids': json.dumps(skill_ids)
             })
         degrees_of_mastery = {
             self.skill_id_1: self.degree_of_mastery_1,
@@ -97,7 +97,7 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             json_response['error'],
-            'Expected request to contain parameter comma_separated_skill_ids.')
+            'Missing key in handler args: selected_skill_ids.')
 
         self.logout()
 
@@ -108,7 +108,7 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
         json_response = self.get_json(
             '%s' % feconf.SKILL_MASTERY_DATA_URL,
             params={
-                'comma_separated_skill_ids': ','.join(skill_ids)
+                'selected_skill_ids': json.dumps(skill_ids)
             }, expected_status_int=400)
 
         self.assertEqual(
@@ -125,7 +125,7 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
         self.get_json(
             '%s' % feconf.SKILL_MASTERY_DATA_URL,
             params={
-                'comma_separated_skill_ids': ','.join(skill_ids)
+                'selected_skill_ids': json.dumps(skill_ids)
             }, expected_status_int=404)
 
         self.logout()
@@ -265,7 +265,8 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             json_response['error'],
-            'Expected payload to contain mastery_change_per_skill as a dict.'
+            'Schema validation for \'mastery_change_per_skill\' failed: ' +
+            'Expected dict, received %s' % (mastery_change_per_skill)
         )
 
         self.logout()
@@ -281,7 +282,7 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             json_response['error'],
-            'Expected payload to contain mastery_change_per_skill as a dict.'
+            'Missing key in handler args: mastery_change_per_skill.'
         )
 
         self.logout()
@@ -338,8 +339,8 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             json_response['error'],
-            'Expected degree of mastery of skill %s to be a number, '
-            'received %s.' % (self.skill_id_2, '{}'))
+            'Schema validation for \'mastery_change_per_skill\' failed: ' +
+            'Could not convert dict to float: {}')
 
         mastery_change_per_skill = {
             self.skill_id_1: 0.1,
@@ -353,8 +354,8 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             json_response['error'],
-            'Expected degree of mastery of skill %s to be a number, '
-            'received %s.' % (self.skill_id_2, 'True'))
+           'Schema validation for \'mastery_change_per_skill\' failed: ' +
+           'Expected float, received True')
 
         self.logout()
 
