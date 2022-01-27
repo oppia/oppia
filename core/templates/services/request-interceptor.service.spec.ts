@@ -210,38 +210,35 @@ describe('Request Interceptor Service', () => {
   });
 
   it('should not throw error if null param in POST request', () => {
-    expect(() => {
-      requestInterceptor.intercept(
-        new HttpRequest(
-          'POST',
-          'url',
-          null,
-          {params: new HttpParams({fromString: 'key=null'})}),
-          {} as HttpHandler);
-    }).toBeTruthy();
+    httpClient.post(
+      '/api',
+      {data: 'test'},
+      {params: new HttpParams({fromString: 'key=null'})}).subscribe(
+      async(response) => expect(response).toBeTruthy());
+
+    const req = httpTestingController.expectOne('/api?key=null');
+    req.flush({data: 'test'});
   });
 
   it('should not throw error if null param in PUT request', () => {
-    expect(() => {
-      requestInterceptor.intercept(
-        new HttpRequest(
-          'PUT',
-          'url',
-          null,
-          {params: new HttpParams({fromString: 'key=null'})}),
-          {} as HttpHandler);
-    }).toBeTruthy();
+    httpClient.put(
+      '/api',
+      {data: 'test'},
+      {params: new HttpParams({fromString: 'key=null'})}).subscribe(
+      async(response) => expect(response).toBeTruthy());
+
+    const req = httpTestingController.expectOne('/api?key=null');
+    req.flush({data: 'test'});
   });
 
   it('should not throw error if null param in PATCH request', () => {
-    expect(() => {
-      requestInterceptor.intercept(
-        new HttpRequest(
-          'PATCH',
-          'url',
-          null,
-          {params: new HttpParams({fromString: 'key=null'})}),
-          {} as HttpHandler);
-    }).toBeTruthy();
+    httpClient.patch(
+      '/api',
+      {data: 'test'},
+      {params: new HttpParams({fromString: 'key=null'})}).subscribe(
+      async(response) => expect(response).toBeTruthy());
+
+    const req = httpTestingController.expectOne('/api?key=null');
+    req.flush({data: 'test'});
   });
 });
