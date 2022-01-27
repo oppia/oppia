@@ -470,6 +470,7 @@ describe('Core exploration functionality', function() {
     await action.click('Test interaction button', testInteractionButton);
     var saveInteractionBtn = element(
       by.css('.protractor-test-save-interaction'));
+    await browser.actions().mouseMove(saveInteractionBtn).perform();
     await action.click('Save interaction button', saveInteractionBtn);
   });
 
