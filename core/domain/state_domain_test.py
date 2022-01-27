@@ -1208,7 +1208,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         _verify_interaction_supports_android(self, 'ItemSelectionInput')
         _verify_interaction_supports_android(self, 'MathEquationInput')
         _verify_interaction_supports_android(self, 'MultipleChoiceInput')
-        _verify_interaction_supports_android(self, 'NumberWithUnits')
         _verify_interaction_supports_android(self, 'NumericInput')
         _verify_interaction_supports_android(self, 'TextInput')
         _verify_interaction_supports_android(self, 'NumericExpressionInput')
@@ -1219,6 +1218,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         _verify_interaction_does_not_support_android(self, 'GraphInput')
         _verify_interaction_does_not_support_android(self, 'InteractiveMap')
         _verify_interaction_does_not_support_android(self, 'MusicNotesInput')
+        _verify_interaction_does_not_support_android(self, 'NumberWithUnits')
         _verify_interaction_does_not_support_android(self, 'PencilCodeEditor')
         _verify_interaction_does_not_support_android(self, 'SetInput')
 
