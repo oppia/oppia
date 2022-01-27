@@ -2336,13 +2336,11 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
             objective='', end_state_name='End')
-
         self.assertEqual(exploration.android_proto_size_in_bytes, 141)
 
         exploration.title = 'Title'
         exploration.category = 'Category'
         exploration.objective = 'Objective'
-
         self.assertEqual(exploration.android_proto_size_in_bytes, 148)
 
     def test_android_proto_conversion_is_correct(self):
@@ -2871,12 +2869,6 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
         for version_num in range(
                 exp_domain.Exploration.EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION,
                 current_exp_schema_version):
-            # Exploration version 55 is only an update to exploration model
-            # by introducing a android_proto_size_in_bytes attribute.
-            # As this attribute is not needed in the dict, no conversation
-            # method is required.
-            if version_num == 54:
-                continue
             self.assertTrue(hasattr(
                 exp_domain.Exploration,
                 '_convert_v%s_dict_to_v%s_dict' % (
@@ -4334,7 +4326,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 55
+schema_version: 54
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -4587,7 +4579,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 55
+schema_version: 54
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -4812,7 +4804,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 55
+schema_version: 54
 states:
   (untitled state):
     card_is_checkpoint: true

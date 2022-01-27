@@ -110,7 +110,7 @@ class ImageClickInput(base.BaseInteraction):
                 interaction instance.
 
         Returns:
-            list. The AnswerGroupDto proto object list.
+            list(AnswerGroupDto). The proto object list.
         """
         answer_group_list_proto = []
         for answer_group in answer_groups:
@@ -135,7 +135,7 @@ class ImageClickInput(base.BaseInteraction):
             rule_specs_list: list(RuleSpec). List of rule specifications.
 
         Returns:
-            list. The RuleSpecDto proto object list.
+            list(RuleSpecDto). The proto object list.
         """
         rule_specs_list_proto = []
 
@@ -226,7 +226,7 @@ class ImageClickInput(base.BaseInteraction):
                 lable regions.
 
         Returns:
-            list. The LabeledRegionDto proto object list.
+            list(LabeledRegionDto). The proto object list.
         """
         labeled_regions_list_proto = []
         for labeled_regions in labeled_regions_list:

@@ -1,3 +1,5 @@
+# This is the configration for the proto generation which
+# are only used at backend.
 version: v1beta1
 plugins:
   - name: python

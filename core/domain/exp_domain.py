@@ -930,16 +930,6 @@ class Exploration:
                 'Expected correctness_feedback_enabled to be a bool, received '
                 '%s' % self.correctness_feedback_enabled)
 
-        if not isinstance(self.android_proto_size_in_bytes, int):
-            raise utils.ValidationError(
-                'Expected proto size to be an int, received %s'
-                % self.android_proto_size_in_bytes)
-
-        if self.android_proto_size_in_bytes <= 0:
-            raise utils.ValidationError(
-                'Expected proto size to be a positive integer, received %s'
-                % self.android_proto_size_in_bytes)
-
         for param_name in self.param_specs:
             if not isinstance(param_name, str):
                 raise utils.ValidationError(
@@ -2084,7 +2074,7 @@ class Exploration:
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 55
+    CURRENT_EXP_SCHEMA_VERSION = 54
     EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 46
 
     @classmethod

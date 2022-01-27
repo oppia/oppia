@@ -5305,12 +5305,6 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
                         'file_size_bytes': 1234,
                         'needs_update': False,
                         'duration_secs': 1.3
-                    },
-                    'fr': {
-                        'filename': 'abc.mp3',
-                        'file_size_bytes': 1234,
-                        'needs_update': False,
-                        'duration_secs': 1.3
                     }
                 },
                 'feedback_1': {

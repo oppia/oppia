@@ -1238,10 +1238,8 @@ def _compute_summary_of_exploration(exploration):
     Returns:
         ExplorationSummary. The resulting exploration summary domain object.
     """
-    exp_rights = exp_models.ExplorationRightsModel.get(
-        exploration.id, strict=True)
-    exp_summary_model = exp_models.ExpSummaryModel.get(
-        exploration.id, strict=False)
+    exp_rights = exp_models.ExplorationRightsModel.get_by_id(exploration.id)
+    exp_summary_model = exp_models.ExpSummaryModel.get_by_id(exploration.id)
     if exp_summary_model is not None:
         old_exp_summary = exp_fetchers.get_exploration_summary_from_model(
             exp_summary_model)
