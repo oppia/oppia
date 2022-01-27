@@ -96,7 +96,7 @@ var LibraryPage = function() {
   };
 
   this.addSelectedExplorationToPlaylist = async function() {
-    await browser.actions().mouseMove(expHoverElement, {x: 10, y: 20}).perform();
+    await browser.actions().mouseMove(expHoverElement, {x: 100, y: 80}).perform();
 
     await waitFor.elementToBeClickable(
       addToPlayLaterListButton,
