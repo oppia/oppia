@@ -68,7 +68,7 @@ export class TopicViewerPageComponent implements OnInit {
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
     private windowDimensionsService: WindowDimensionsService,
-    private windowRef: WindowRef,
+    private windowRef: WindowRef
   ) {}
 
   ngOnInit(): void {
