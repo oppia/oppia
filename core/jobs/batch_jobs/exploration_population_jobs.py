@@ -122,7 +122,7 @@ class PopulateExplorationWithAndroidProtoSizeInBytesJob(base_jobs.JobBase):
         return models_to_put
 
     @staticmethod
-    def _generate_exploration_changes(
+    def _generate_exploration_change(
         exp_model: exp_models.ExplorationModel,
         exploration: exp_domain.Exploration
     ) -> Iterable[Tuple[str, exp_domain.ExplorationChange]]:
@@ -139,7 +139,7 @@ class PopulateExplorationWithAndroidProtoSizeInBytesJob(base_jobs.JobBase):
             (str, ExplorationChange). Tuple containing exploration
             ID and exploration change object.
         """
-        if not hasattr(exp_model, 'android_proto_size_in_bytes'):
+        if exp_model.android_proto_size_in_bytes is None:
             exp_change = exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'android_proto_size_in_bytes',
@@ -172,11 +172,12 @@ class PopulateExplorationWithAndroidProtoSizeInBytesJob(base_jobs.JobBase):
             return result.Err(e)
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        """Returns a PCollection of results from the exploration migration.
+        """Returns a PCollection of results from the exploration
+        android_proto_size_in_bytes field population.
 
         Returns:
-            PCollection. A PCollection of results from the
-            exploration migration.
+            PCollection. A PCollection of results from the exploration
+            android_proto_size_in_bytes field population.
         """
         unmigrated_exploration_models = (
             self.pipeline
@@ -231,6 +232,8 @@ class PopulateExplorationWithAndroidProtoSizeInBytesJob(base_jobs.JobBase):
             }
             | 'Merge object' >> beam.CoGroupByKey()
             | 'Get rid ID' >> beam.Values()  # pylint: disable=no-value-for-parameter
+            | 'Remove unmigrated exploration object' >> beam.Filter(
+                lambda x: len(x['exploration']) > 0)
             | 'Reorganize the exploration object' >> beam.Map(lambda objects: {
                     'exp_model': objects['exp_model'][0],
                     'exploration': objects['exploration'][0]
@@ -240,7 +243,7 @@ class PopulateExplorationWithAndroidProtoSizeInBytesJob(base_jobs.JobBase):
         exploration_changes = (
             migrated_exploration_object_list
             | 'Generate exploration changes' >> beam.FlatMap(
-                lambda exp_objects: self._generate_exploration_changes(
+                lambda exp_objects: self._generate_exploration_change(
                     exp_objects['exp_model'],
                     exp_objects['exploration']
                 ))

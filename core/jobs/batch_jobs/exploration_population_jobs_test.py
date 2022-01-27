@@ -48,26 +48,6 @@ class PopulateExplorationWithAndroidProtoSizeInBytesJobTests(
 
     def setUp(self):
         super().setUp()
-        exp_summary_model = self.create_model(
-            exp_models.ExpSummaryModel,
-            id=self.EXP_1_ID,
-            deleted=False,
-            title='title',
-            category='category',
-            objective='objective',
-            language_code='en',
-            ratings=feconf.get_empty_ratings(),
-            scaled_average_rating=feconf.EMPTY_SCALED_AVERAGE_RATING,
-            status=constants.ACTIVITY_STATUS_PUBLIC,
-            community_owned=False,
-            owner_ids=[self.USER_ID_1],
-            contributor_ids=[],
-            contributors_summary={},
-            version=1
-        )
-        exp_summary_model.update_timestamps()
-        exp_summary_model.put()
-
         exp_models.ExplorationRightsModel(
             id=self.EXP_1_ID,
             owner_ids=[self.USER_ID_1],
@@ -115,11 +95,12 @@ class PopulateExplorationWithAndroidProtoSizeInBytesJobTests(
                 job_run_result.JobRunResult(
                     stderr='CACHE DELETION ERROR: "cache deletion error": 1'),
                 job_run_result.JobRunResult(
-                    stdout='EXPLORATION POPULATED WITH android_proto_size_in_bytes SUCCESS: 1'), # pylint: disable=line-too-long
+                    stdout='EXPLORATION POPULATED WITH '
+                    'android_proto_size_in_bytes SUCCESS: 1')
             ])
 
         migrated_exp_model = exp_models.ExplorationModel.get(self.EXP_1_ID)
-        self.assertEqual(migrated_exp_model.version, 2)
+        self.assertEqual(migrated_exp_model.android_proto_size_in_bytes, 64)
 
     def test_unmigrated_exp_is_migrated(self) -> None:
         exp_model = self.create_model(
@@ -151,7 +132,6 @@ class PopulateExplorationWithAndroidProtoSizeInBytesJobTests(
         ])
 
         migrated_exp_model = exp_models.ExplorationModel.get(self.EXP_1_ID)
-        self.assertEqual(migrated_exp_model.version, 2)
         self.assertEqual(migrated_exp_model.android_proto_size_in_bytes, 64)
 
     def test_broken_exploration_is_not_migrated(self) -> None:
@@ -176,10 +156,12 @@ class PopulateExplorationWithAndroidProtoSizeInBytesJobTests(
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
-                stderr='EXPLORATION PROCESSED ERROR: \'(\'exp_1_id\', '
-                'ValidationError(\'There is no state in [\'state\'] '
-                'corresponding to the exploration\'s initial state name '
-                'wrong_init_state_name.\'))\': 1'
+                stderr=(
+                    'EXPLORATION PROCESSED ERROR: "(\'exp_1_id\', '
+                    'ValidationError(\"There is no state in [\'state\'] '
+                    'corresponding to the exploration\'s initial state '
+                    'name wrong_init_state_name.\"))": 1'
+                )
             )
         ])
 
@@ -214,4 +196,5 @@ class PopulateExplorationWithAndroidProtoSizeInBytesJobTests(
 
         unmigrated_exploration_model = exp_models.ExplorationModel.get(
             self.EXP_1_ID)
-        self.assertEqual(unmigrated_exploration_model.version, 1)
+        self.assertEqual(
+            unmigrated_exploration_model.android_proto_size_in_bytes, 64)
