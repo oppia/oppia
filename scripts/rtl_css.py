@@ -23,8 +23,8 @@ system. It can be installed by running 'npm install -g rtlcss'.
 from __future__ import annotations
 
 import argparse
-import subprocess
 import os
+import subprocess
 
 _PARSER = argparse.ArgumentParser(
     description="""
@@ -69,9 +69,11 @@ css_files_list = [
 def start_subprocess_for_result_with_input(cmd, css):
     """Starts subprocess with stdin and returns (stdout, stderr)."""
     task = subprocess.Popen(
-        cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    out, err = task.communicate(input=css.encode())
+        cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE)
+    out, err = task.communicate(input=css)
     return out, err
+
 
 def start_subprocess_for_result(cmd):
     """Starts subprocess and returns (stdout, stderr)."""
@@ -97,28 +99,29 @@ def main(args=None):
             if err:
                 raise ValueError(err)
         print('All RTL CSS files generated!')
-    
-    elif parsed_args.mode == 'validate': 
+
+    elif parsed_args.mode == 'validate':
         invalid_files = []
         for file_path in css_files_list:
-            css_file = open(file_path, 'r')
+            css_file = open(file_path, 'rb')
             out, err = start_subprocess_for_result_with_input(
                 [rtlcss_path, '-'], css_file.read())
             out = out.replace(b'\n', b'')
-            
+
             rtl_file_path = file_path[:-4] + '.rtl' + file_path[-4:]
-            rtl_css_content = open(rtl_file_path, 'r').read().encode()
+            rtl_css_content = open(rtl_file_path, 'rb').read()
             rtl_css_content = rtl_css_content.replace(b'\n', b'')
             if out != rtl_css_content:
                 invalid_files.append(file_path)
 
         if invalid_files:
             raise Exception(
-                'Invalid RTL CSS for the following files: ' + str(invalid_files) + 
-                '. Please run `python -m scripts.rtl_css --mode generate` '
+                'Invalid RTL CSS for the following files: ' +
+                str(invalid_files) + '. Please run '
+                '`python -m scripts.rtl_css --mode generate` '
                 'to autogenerate the corresponding files. ')
         print('All RTL CSS files validated!')
-    
+
     else:
         raise Exception(
             'Invalid parameter passed in: \'%s\', please choose'
