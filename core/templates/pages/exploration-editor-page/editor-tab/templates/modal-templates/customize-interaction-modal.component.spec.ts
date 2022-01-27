@@ -185,12 +185,32 @@ fdescribe('Customize Interaction Modal Component', () => {
       .returnValue(true);
     spyOn(interactionDetailsCacheService, 'get').and
       .returnValue({});
-// to resolved.
+
     component.originalContentIdToContent =
       subtitledUnicodeObjectFactory.createDefault('unicode', 'contentId');
     component.onChangeInteractionId('RatioExpressionInput');
 
     expect(component.hasCustomizationArgs).toBe(false);
     expect(component.isinteractionOpen).toBeFalse();
+  });
+
+  it('should open confirm leave modal when user click cancel', () => {
+    spyOn(ngbModal, 'open').and.returnValue({
+      result: Promise.resolve()
+    } as NgbModalRef);
+    spyOn(component, 'cancel').and.stub();
+
+    component.cancelWithConfirm();
+
+    expect(component.cancel).toHaveBeenCalled();
+  });
+
+  it('should ngOnInit', () => {
+    jasmine.createSpy(stateInteractionIdService.displayed).and
+      .returnValue(undefined);
+
+    component.ngOnInit();
+
+    expect(component.isinteractionOpen).toBeTrue();
   });
 });

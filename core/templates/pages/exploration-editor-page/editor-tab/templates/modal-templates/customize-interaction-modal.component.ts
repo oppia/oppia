@@ -244,10 +244,6 @@ export class CustomizeInteractionModalComponent
   }
 
   cancelWithConfirm(): void {
-    // Do nothing if the confirmation modal is already open.
-    if ($('.modal-title').text().includes('Confirmation Required')) {
-      return;
-    }
     this.ngbModal.open(ConfirmLeaveModalComponent, {
       backdrop: 'static',
       keyboard: false,
@@ -383,6 +379,8 @@ export class CustomizeInteractionModalComponent
   }
 
   save(): void {
+    console.log(this.originalContentIdToContent);
+
     const updatedContentIdToContent = this.getContentIdToContent();
     const contentIdsWithModifiedContent = [];
 
@@ -422,6 +420,8 @@ export class CustomizeInteractionModalComponent
     this.originalContentIdToContent = {};
     if (this.stateInteractionIdService.savedMemento) {
       this.originalContentIdToContent = this.getContentIdToContent();
+      console.log('work');
+      console.log(this.originalContentIdToContent);
       // Above called with this.stateCustomizationArgsService.displayed.
     }
     this.explorationIsLinkedToStory = (
