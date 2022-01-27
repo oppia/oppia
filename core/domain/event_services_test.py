@@ -25,6 +25,10 @@ import re
 
 from core import feconf
 from core.domain import event_services
+from core.domain import exp_domain
+from core.domain import exp_fetchers
+from core.domain import feedback_services
+from core.domain import stats_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -61,7 +65,6 @@ class ExplorationActualStartEventHandlerTests(test_utils.GenericTestBase):
     def test_record_exploration_actual_start_events(self):
         all_models = (
             stats_models.ExplorationActualStartEventLogEntryModel.get_all())
-
         self.assertEqual(all_models.count(), 0)
 
         event_services.ExplorationActualStartEventHandler.record(
@@ -69,7 +72,6 @@ class ExplorationActualStartEventHandlerTests(test_utils.GenericTestBase):
 
         all_models = (
             stats_models.ExplorationActualStartEventLogEntryModel.get_all())
-
         self.assertEqual(all_models.count(), 1)
 
         model = all_models.get()
@@ -85,7 +87,6 @@ class SolutionHitEventHandlerTests(test_utils.GenericTestBase):
     def test_record_solution_hit_events(self):
         all_models = (
             stats_models.SolutionHitEventLogEntryModel.get_all())
-
         self.assertEqual(all_models.count(), 0)
 
         event_services.SolutionHitEventHandler.record(
@@ -93,7 +94,6 @@ class SolutionHitEventHandlerTests(test_utils.GenericTestBase):
 
         all_models = (
             stats_models.SolutionHitEventLogEntryModel.get_all())
-
         self.assertEqual(all_models.count(), 1)
 
         model = all_models.get()
@@ -105,12 +105,125 @@ class SolutionHitEventHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(model.time_spent_in_state_secs, 2.0)
 
 
+class StartExplorationEventHandlerTests(test_utils.GenericTestBase):
+
+    def test_recording_exploration_start_events(self):
+
+        all_models = (
+            stats_models.StartExplorationEventLogEntryModel.get_all())
+        self.assertEqual(all_models.count(), 0)
+
+        event_services.StartExplorationEventHandler.record(
+            'exp_id', 1, 'state_name', 'session_id',
+            {}, feconf.PLAY_TYPE_NORMAL)
+
+        all_models = (
+            stats_models.StartExplorationEventLogEntryModel.get_all())
+        self.assertEqual(all_models.count(), 1)
+
+        model = all_models.get()
+
+        self.assertEqual(
+            model.event_type,
+            feconf.EVENT_TYPE_START_EXPLORATION)
+        self.assertEqual(model.exploration_id, 'exp_id')
+        self.assertEqual(model.exploration_version, 1)
+        self.assertEqual(model.state_name, 'state_name')
+        self.assertEqual(model.session_id, 'session_id')
+        self.assertEqual(model.params, {})
+        self.assertEqual(model.play_type, feconf.PLAY_TYPE_NORMAL)
+
+
+class MaybeLeaveExplorationEventHandlerTests(test_utils.GenericTestBase):
+
+    def test_recording_exploration_leave_events(self):
+
+        all_models = (
+            stats_models.MaybeLeaveExplorationEventLogEntryModel.get_all())
+        self.assertEqual(all_models.count(), 0)
+
+        event_services.MaybeLeaveExplorationEventHandler.record(
+            'exp_id', 1, 'state_name', 'session_id', 2,
+            {}, feconf.PLAY_TYPE_NORMAL)
+
+        all_models = (
+            stats_models.MaybeLeaveExplorationEventLogEntryModel.get_all())
+        self.assertEqual(all_models.count(), 1)
+
+        model = all_models.get()
+
+        self.assertEqual(
+            model.event_type,
+            feconf.EVENT_TYPE_MAYBE_LEAVE_EXPLORATION)
+        self.assertEqual(model.exploration_id, 'exp_id')
+        self.assertEqual(model.exploration_version, 1)
+        self.assertEqual(model.state_name, 'state_name')
+        self.assertEqual(model.session_id, 'session_id')
+        self.assertEqual(model.client_time_spent_in_secs, 2)
+        self.assertEqual(model.params, {})
+        self.assertEqual(model.play_type, feconf.PLAY_TYPE_NORMAL)
+
+
+class CompleteExplorationEventHandlerTests(test_utils.GenericTestBase):
+
+    def test_recording_exploration_leave_events(self):
+
+        all_models = (
+            stats_models.CompleteExplorationEventLogEntryModel.get_all())
+        self.assertEqual(all_models.count(), 0)
+
+        event_services.CompleteExplorationEventHandler.record(
+            'exp_id', 1, 'state_name', 'session_id', 2,
+            {}, feconf.PLAY_TYPE_NORMAL)
+
+        all_models = (
+            stats_models.CompleteExplorationEventLogEntryModel.get_all())
+        self.assertEqual(all_models.count(), 1)
+
+        model = all_models.get()
+
+        self.assertEqual(
+            model.event_type,
+            feconf.EVENT_TYPE_COMPLETE_EXPLORATION)
+        self.assertEqual(model.exploration_id, 'exp_id')
+        self.assertEqual(model.exploration_version, 1)
+        self.assertEqual(model.state_name, 'state_name')
+        self.assertEqual(model.session_id, 'session_id')
+        self.assertEqual(model.client_time_spent_in_secs, 2)
+        self.assertEqual(model.params, {})
+        self.assertEqual(model.play_type, feconf.PLAY_TYPE_NORMAL)
+
+
+class RateExplorationEventHandlerTests(test_utils.GenericTestBase):
+
+    def test_recording_exploration_rating_events(self):
+
+        all_models = (
+            stats_models.RateExplorationEventLogEntryModel.get_all())
+        self.assertEqual(all_models.count(), 0)
+
+        event_services.RateExplorationEventHandler.record(
+            'exp_id', 'user_id', 3, 2)
+
+        all_models = (
+            stats_models.RateExplorationEventLogEntryModel.get_all())
+        self.assertEqual(all_models.count(), 1)
+
+        model = all_models.get()
+
+        self.assertEqual(
+            model.event_type,
+            feconf.EVENT_TYPE_RATE_EXPLORATION)
+        self.assertEqual(model.exploration_id, 'exp_id')
+        self.assertEqual(model.rating, 3)
+        self.assertEqual(model.old_rating, 2)
+
+
 class StateHitEventHandlerTests(test_utils.GenericTestBase):
 
     def test_record_state_hit_events(self):
         all_models = (
             stats_models.StateHitEventLogEntryModel.get_all())
-
         self.assertEqual(all_models.count(), 0)
 
         event_services.StateHitEventHandler.record(
@@ -119,7 +232,6 @@ class StateHitEventHandlerTests(test_utils.GenericTestBase):
 
         all_models = (
             stats_models.StateHitEventLogEntryModel.get_all())
-
         self.assertEqual(all_models.count(), 1)
 
         model = all_models.get()
@@ -137,7 +249,6 @@ class StateCompleteEventHandlerTests(test_utils.GenericTestBase):
     def test_record_state_complete_events(self):
         all_models = (
             stats_models.StateCompleteEventLogEntryModel.get_all())
-
         self.assertEqual(all_models.count(), 0)
 
         event_services.StateCompleteEventHandler.record(
@@ -145,7 +256,6 @@ class StateCompleteEventHandlerTests(test_utils.GenericTestBase):
 
         all_models = (
             stats_models.StateCompleteEventLogEntryModel.get_all())
-
         self.assertEqual(all_models.count(), 1)
 
         model = all_models.get()
@@ -163,7 +273,6 @@ class LeaveForRefresherExpEventHandlerTests(test_utils.GenericTestBase):
         all_models = (
             stats_models.LeaveForRefresherExplorationEventLogEntryModel
             .get_all())
-
         self.assertEqual(all_models.count(), 0)
 
         event_services.LeaveForRefresherExpEventHandler.record(
@@ -172,7 +281,6 @@ class LeaveForRefresherExpEventHandlerTests(test_utils.GenericTestBase):
         all_models = (
             stats_models.LeaveForRefresherExplorationEventLogEntryModel
             .get_all())
-
         self.assertEqual(all_models.count(), 1)
 
         model = all_models.get()
@@ -183,6 +291,48 @@ class LeaveForRefresherExpEventHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(model.session_id, 'session_id')
         self.assertEqual(model.exp_version, 1)
         self.assertEqual(model.time_spent_in_state_secs, 2.0)
+
+
+class FeedbackThreadCreatedEventHandlerTests(test_utils.GenericTestBase):
+
+    def test_new_feedback_thread_creation_events(self):
+
+        exp_id = 'exp_id'
+
+        event_services.FeedbackThreadCreatedEventHandler.record(exp_id)
+        thread = feedback_services.get_thread_analytics(exp_id)
+        self.assertEqual(thread.id, exp_id)
+        self.assertEqual(thread.num_open_threads, 1)
+        self.assertEqual(thread.num_total_threads, 1)
+
+        event_services.FeedbackThreadCreatedEventHandler.record(exp_id)
+        thread = feedback_services.get_thread_analytics(exp_id)
+        self.assertEqual(thread.id, exp_id)
+        self.assertEqual(thread.num_open_threads, 2)
+        self.assertEqual(thread.num_total_threads, 2)
+
+
+class FeedbackThreadStatusChangedEventHandlerTests(test_utils.GenericTestBase):
+
+    def test_recording_reopening_feedback_thread_events(self):
+
+        exp_id = 'exp_id'
+
+        # Changing Status from closed to open.
+        event_services.FeedbackThreadStatusChangedEventHandler.record(
+            exp_id, '', feedback_models.STATUS_CHOICES_OPEN)
+
+        thread = feedback_services.get_thread_analytics(exp_id)
+        self.assertEqual(thread.id, exp_id)
+        self.assertEqual(thread.num_open_threads, 1)
+
+        # Changing Status from open to closed.
+        event_services.FeedbackThreadStatusChangedEventHandler.record(
+            exp_id, feedback_models.STATUS_CHOICES_OPEN, '')
+
+        thread = feedback_services.get_thread_analytics(exp_id)
+        self.assertEqual(thread.id, exp_id)
+        self.assertEqual(thread.num_open_threads, 0)
 
 
 class TestEventHandler(event_services.BaseEventHandler):
@@ -239,6 +389,81 @@ class StatsEventsHandlerUnitTests(test_utils.GenericTestBase):
             ]
         )
 
+    def test_stats_events_successfully_updated(self):
+
+        all_models = (
+            stats_models.ExplorationStatsModel.get_all())
+        self.assertEqual(all_models.count(), 0)
+
+        exp_id = 'eid1'
+        self.save_new_valid_exploration(exp_id, self.OWNER_EMAIL)
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        event_services.StatsEventsHandler.record(
+            exp_id, exploration.version, {
+                'state_stats_mapping': {
+                    'Introduction': {}
+                }
+            }
+        )
+
+        all_models = stats_models.ExplorationStatsModel.get_all()
+        self.assertEqual(all_models.count(), 1)
+        model = all_models.get()
+        self.assertEqual(model.exp_id, exp_id)
+        self.assertEqual(model.exp_version, exploration.version)
+
+
+class AnswerSubmissionEventHandlerTests(test_utils.GenericTestBase):
+
+    def test_answer_submission(self):
+        all_models = (
+            stats_models.AnswerSubmittedEventLogEntryModel.get_all())
+        self.assertEqual(all_models.count(), 0)
+
+        exp_id = 'eid1'
+        session_id = 'sid1'
+        category = exp_domain.DEFAULT_OUTCOME_CLASSIFICATION
+        self.save_new_valid_exploration(exp_id, self.OWNER_EMAIL)
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+
+        event_services.AnswerSubmissionEventHandler.record(
+            exp_id,
+            exploration.version,
+            state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            interaction_id='TextInput',
+            answer_group_index=1,
+            rule_spec_index=1,
+            classification_categorization=category,
+            session_id=session_id,
+            time_spent_in_secs=2,
+            params={},
+            normalized_answer='answer_submitted'
+        )
+
+        state_answers = stats_services.get_state_answers(
+            exp_id, exploration.version,
+            exploration.init_state_name)
+
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+            'answer': 'answer_submitted',
+            'time_spent_in_sec': 2.0,
+            'answer_group_index': 1,
+            'rule_spec_index': 1,
+            'classification_categorization': category,
+            'session_id': session_id,
+            'interaction_id': 'TextInput',
+            'params': {}
+        }])
+
+        all_models = (
+            stats_models.AnswerSubmittedEventLogEntryModel.get_all())
+        self.assertEqual(all_models.count(), 1)
+
+        model = all_models.get()
+
+        self.assertEqual(model.exp_id, exp_id)
+        self.assertEqual(model.exp_version, exploration.version)
+
 
 class EventHandlerNameTests(test_utils.GenericTestBase):
 
@@ -290,6 +515,16 @@ class UserStatsEventsFunctionsTests(test_utils.GenericTestBase):
             self.save_new_valid_exploration('exp_id', self.admin_id))
 
     def test_average_ratings_of_users_exps_are_calculated_correctly(self):
+
+        admin_average_ratings = (
+            user_services.get_dashboard_stats(self.admin_id)['average_ratings'])
+        self.assertIsNone(admin_average_ratings)
+
+        event_services.handle_exploration_rating('exp_id', 5, None)
+        admin_average_ratings = (
+            user_services.get_dashboard_stats(self.admin_id)['average_ratings'])
+        self.assertEqual(admin_average_ratings, 5)
+
         user_models.UserStatsModel(
             id=self.admin_id, average_ratings=None, num_ratings=0, total_plays=0
         ).put()
