@@ -108,15 +108,12 @@ export class I18nLanguageCodeService {
     let engNum: number;
 
     // Get the valid part of input.
-    let numberMatch = number.match(validRegex);
+    let validMatch = number.match(validRegex);
 
-    if (numberMatch === null) {
-      return null;
-    }
+    let numMatch = null;
+    numMatch = validMatch?.[0];
 
-    number = numberMatch[0];
-
-    let numString = number.replace(`${decimalSeparator}`, '.');
+    let numString = numMatch.replace(`${decimalSeparator}`, '.');
     engNum = parseFloat(numString);
 
     // If the input cannot be parsed, output null.
