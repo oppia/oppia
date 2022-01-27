@@ -425,7 +425,7 @@ class Registry:
             class. The corresponding platform-specific interface class.
         """
         klass = cls._PLATFORM_MAPPING.get(GAE_PLATFORM)
-        
+
         # Ruling out the possibility of None for mypy type checking.
 
         assert klass is not None
