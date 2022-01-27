@@ -191,6 +191,19 @@ class BeamEntityToAndFromModelTests(test_utils.TestBase):
             FooModel(id='abc', project=feconf.OPPIA_PROJECT_ID, prop='123'),
             job_utils.get_ndb_model_from_beam_entity(beam_entity))
 
+    def test_get_beam_key_from_ndb_key(self):
+        beam_key = beam_datastore_types.Key(
+            ('FooModel', 'abc'),
+            project=feconf.OPPIA_PROJECT_ID,
+            namespace=self.namespace
+        )
+
+        # We use private _from_ds_key here because it provides functionality
+        # for obtaining an NDB key from a Beam key, and writing it ourselves
+        # would be too complicated.
+        ndb_key = datastore_services.Key._from_ds_key(beam_key.to_client_key())  # pylint: disable=protected-access
+        self.assertEqual(job_utils.get_beam_key_from_ndb_key(ndb_key), beam_key)
+
     def test_get_model_from_beam_entity_with_time(self) -> None:
         utcnow = datetime.datetime.utcnow()
 
