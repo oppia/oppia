@@ -24,19 +24,19 @@ module.exports = {
   meta: {
     type: 'problem',
     docs: {
-      description: `Use nested awaits without any exception for
-        await (await browser.switchTo().activeElement()).sendKeys(explanation);`,
+      description: `Use nested awaits without any exception for await
+        (await browser.switchTo().activeElement()).sendKeys(explanation);`,
       category: 'Best Practices',
       recommended: true,
     },
     fixable: null,
     schema: [],
     messages: {
-      nestedAwaits: `Only use nested awaits for 
-        await (await browser.switchTo().activeElement()).sendKeys(explanation);`,
+      nestedAwaits: `Only use nested awaits for await
+        (await browser.switchTo().activeElement()).sendKeys(explanation);`,
     },
   },
- 
+
   create: function(context) {
     var activeElementSelector1 = (
       'CallExpression[callee.property.name = activeElement]' +
@@ -51,7 +51,7 @@ module.exports = {
       '[callee.object.argument.callee.object.callee.object.name = browser]'
     );
 
-    var reportNestedAwaits = function(node){
+    var reportNestedAwaits = function (node){
       if (node.parent.type !== 'AwaitExpression') {
         context.report({
           node: node,
@@ -63,10 +63,10 @@ module.exports = {
     };
 
     return {
-      [activeElementSelector1]: function(node){
+      [activeElementSelector1]: function (node){
         reportNestedAwaits(node);
       },
-      [activeElementSelector2]: function(node){
+      [activeElementSelector2]: function (node){
         reportNestedAwaits(node);
       }
     };
