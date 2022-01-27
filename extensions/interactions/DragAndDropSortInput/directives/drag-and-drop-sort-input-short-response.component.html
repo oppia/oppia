@@ -33,7 +33,7 @@
 </style>
 
 <ul *ngIf="isAnswerLengthGreaterThanZero" class="drag-and-drop-sort-response-content">
-  <li *ngFor="let responses of responseLists">
+  <li *ngFor="let responses of responseList">
     <ul [(ngModel)]="responses">
       <li *ngFor="let response of responses; index as idx">
         <div [ngClass]="chooseItemType(idx)">

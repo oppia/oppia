@@ -252,8 +252,10 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
         if (this.multipleItemsInSamePositionArray[i].length) {
           let items = [];
           for (
-            // eslint-disable-next-line max-len
-            let j = 0; j < this.multipleItemsInSamePositionArray[i].length; j++) {
+            let j = 0;
+            j < this.multipleItemsInSamePositionArray[i].length;
+            j++
+          ) {
             items.push(this.getContentIdOfHtml(
               this.multipleItemsInSamePositionArray[i][j]));
           }

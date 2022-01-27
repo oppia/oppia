@@ -29,14 +29,14 @@ import { DragAndDropAnswer } from 'interactions/answer-defs';
 export class ShortResponseDragAndDropSortInputComponent implements OnInit {
   @Input() answer!: string;
   isAnswerLengthGreaterThanZero: boolean;
-  responseLists: DragAndDropAnswer;
+  responseList: DragAndDropAnswer;
 
   constructor(private htmlEscaperService: HtmlEscaperService) {}
 
   ngOnInit(): void {
-    this.responseLists = this.htmlEscaperService.escapedJsonToObj(
+    this.responseList = this.htmlEscaperService.escapedJsonToObj(
       this.answer) as DragAndDropAnswer;
-    this.isAnswerLengthGreaterThanZero = this.responseLists.length > 0;
+    this.isAnswerLengthGreaterThanZero = this.responseList.length > 0;
   }
 
   chooseItemType(index: number): string {
