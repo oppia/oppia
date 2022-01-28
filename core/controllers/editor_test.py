@@ -1401,8 +1401,8 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
         self.assertNotIn('State 4', reader_dict['states'])
 
-        # Since check_can_edit_activity always return False, therefore
-        # user will behave as a voiceover artist.
+        # Since check_can_edit_activity always return False,
+        # the user will behave as a voiceover artist.
         get_voiceover_swap = self.swap_to_always_return(
             rights_manager, 'check_can_edit_activity', value=False)
 
@@ -3134,7 +3134,7 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
             feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX,
             feconf.ENTITY_TYPE_EXPLORATION, exp_id)
 
-        # Check if the file is already present or not.
+        # Check that the file is not already present.
         file_system_class = fs_services.get_entity_file_system_class()
         fs = fs_domain.AbstractFileSystem(
             file_system_class(feconf.ENTITY_TYPE_EXPLORATION, exp_id))
@@ -3154,7 +3154,7 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
         error_msg = ('No image supplied')
         self.assertEqual(response['error'], error_msg)
 
-        # Check if current file is actually uploaded or not.
+        # Check that the file is not uploaded.
         file_system_class = fs_services.get_entity_file_system_class()
         fs = fs_domain.AbstractFileSystem(
             file_system_class(feconf.ENTITY_TYPE_EXPLORATION, exp_id))
@@ -3181,7 +3181,7 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
             feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX,
             feconf.ENTITY_TYPE_EXPLORATION, exp_id)
 
-        # Check if the file is already present or not.
+        # Check that the file is not already present.
         file_system_class = fs_services.get_entity_file_system_class()
         fs = fs_domain.AbstractFileSystem(
             file_system_class(feconf.ENTITY_TYPE_EXPLORATION, exp_id))
@@ -3216,7 +3216,7 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
         )
         self.assertEqual(response['error'], error_msg)
 
-        # Check if current file is actually uploaded or not.
+        # Check that the file is not uploaded.
         file_system_class = fs_services.get_entity_file_system_class()
         fs = fs_domain.AbstractFileSystem(
             file_system_class(feconf.ENTITY_TYPE_EXPLORATION, exp_id))
@@ -3241,7 +3241,7 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
             feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX,
             feconf.ENTITY_TYPE_EXPLORATION, exp_id)
 
-        # Check if the file is already present or not.
+        # Check that the file is not already present.
         file_system_class = fs_services.get_entity_file_system_class()
         fs = fs_domain.AbstractFileSystem(
             file_system_class(feconf.ENTITY_TYPE_EXPLORATION, exp_id))
@@ -3266,7 +3266,7 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
         )
         self.assertEqual(response['filename'], filename)
 
-        # Check if current file is uploaded successfully or not.
+        # Check that the file is uploaded successfully.
         file_system_class = fs_services.get_entity_file_system_class()
         fs = fs_domain.AbstractFileSystem(
             file_system_class(feconf.ENTITY_TYPE_EXPLORATION, exp_id))
