@@ -89,6 +89,7 @@
             <div class="story-thumbnail protractor-test-story-thumbnail">
               <label class="form-heading">Thumbnail Image*</label>
               <oppia-thumbnail-uploader [filename]="story.getThumbnailFilename()"
+                                        [use-local-storage]="false"
                                         (update-filename)="updateStoryThumbnailFilename($event)"
                                         [bg-color]="story.getThumbnailBgColor()"
                                         (update-bg-color)="updateStoryThumbnailBgColor($event)"
