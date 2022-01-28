@@ -1483,13 +1483,14 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             expected_status_int=404)
         self.logout()
 
-    def test_exploration_editing_rights_of_an_editor(self):
+    def test_that_an_editor_can_edit_the_exploration(self):
         self.signup(
             self.COLLABORATOR_EMAIL, self.COLLABORATOR_USERNAME)
         self.signup(
             self.COLLABORATOR2_EMAIL, self.COLLABORATOR2_USERNAME)
 
         self.login(self.OWNER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
         exp_id = 'eid'
         self.save_new_valid_exploration(
             exp_id, self.owner_id, title='Title for rights handler test!',
@@ -1497,8 +1498,6 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
 
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
         exploration.add_states(['State A'])
-
-        csrf_token = self.get_new_csrf_token()
 
         rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
         self.put_json(
@@ -1532,8 +1531,38 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             expected_status_int=200
         )
         self.assertIn('State B', response['states'])
+        self.logout()
+
+    def test_that_an_editor_cannot_assign_role_to_others(self):
+        self.signup(
+            self.COLLABORATOR_EMAIL, self.COLLABORATOR_USERNAME)
+        self.signup(
+            self.COLLABORATOR2_EMAIL, self.COLLABORATOR2_USERNAME)
+
+        self.login(self.OWNER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        exp_id = 'eid'
+        self.save_new_valid_exploration(
+            exp_id, self.owner_id, title='Title for rights handler test!',
+            category='My category')
+
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        exploration.add_states(['State A'])
+
+        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
+        self.put_json(
+            rights_url, {
+                'version': exploration.version,
+                'new_member_username': self.COLLABORATOR_USERNAME,
+                'new_member_role': rights_domain.ROLE_EDITOR
+            }, csrf_token=csrf_token)
 
         # Check that collaborator cannot add new members.
+        self.login(self.COLLABORATOR_EMAIL)
+        self.assert_can_edit(exp_id)
+        self.assert_can_voiceover(exp_id)
+        csrf_token = self.get_new_csrf_token()
+
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
         rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
 
@@ -1565,13 +1594,14 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         )
         self.logout()
 
-    def test_exploration_editing_rights_of_a_viewer(self):
+    def test_that_a_viewer_cannot_edit_the_exploration(self):
         self.signup(
             self.COLLABORATOR_EMAIL, self.COLLABORATOR_USERNAME)
         self.signup(
             self.COLLABORATOR2_EMAIL, self.COLLABORATOR2_USERNAME)
 
         self.login(self.OWNER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
         exp_id = 'eid'
         self.save_new_valid_exploration(
             exp_id, self.owner_id, title='Title for rights handler test!',
@@ -1579,8 +1609,6 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
 
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
         exploration.add_states(['State A'])
-
-        csrf_token = self.get_new_csrf_token()
 
         rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
         self.put_json(
@@ -1620,8 +1648,38 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         reader_dict = self.get_json(
             '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
         self.assertNotIn('State B', reader_dict['states'])
+        self.logout()
+
+    def test_that_a_viewer_cannot_assign_role_to_others(self):
+        self.signup(
+            self.COLLABORATOR_EMAIL, self.COLLABORATOR_USERNAME)
+        self.signup(
+            self.COLLABORATOR2_EMAIL, self.COLLABORATOR2_USERNAME)
+
+        self.login(self.OWNER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        exp_id = 'eid'
+        self.save_new_valid_exploration(
+            exp_id, self.owner_id, title='Title for rights handler test!',
+            category='My category')
+
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        exploration.add_states(['State A'])
+
+        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
+        self.put_json(
+            rights_url, {
+                'version': exploration.version,
+                'new_member_username': self.COLLABORATOR_USERNAME,
+                'new_member_role': rights_domain.ROLE_VIEWER
+            }, csrf_token=csrf_token)
 
         # Check that collaborator cannot add new members.
+        self.login(self.COLLABORATOR_EMAIL)
+        self.assert_cannot_edit(exp_id)
+        self.assert_cannot_voiceover(exp_id)
+        csrf_token = self.get_new_csrf_token()
+
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
         rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
 
@@ -1653,7 +1711,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         )
         self.logout()
 
-    def test_exploration_editing_rights_of_a_voiceover_artist(self):
+    def test_that_a_voice_artist_cannot_edit_the_exploration(self):
         self.signup(
             self.COLLABORATOR2_EMAIL, self.COLLABORATOR2_USERNAME)
 
@@ -1701,8 +1759,35 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         reader_dict = self.get_json(
             '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
         self.assertNotIn('State B', reader_dict['states'])
+        self.logout()
+
+    def test_that_a_voice_artist_cannot_assign_role_to_others(self):
+        self.signup(
+            self.COLLABORATOR2_EMAIL, self.COLLABORATOR2_USERNAME)
+
+        self.login(self.OWNER_EMAIL)
+        exp_id = 'eid'
+        self.save_new_valid_exploration(
+            exp_id, self.owner_id, title='Title for rights handler test!',
+            category='My category')
+
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        exploration.add_states(['State A'])
+
+        rights_manager.publish_exploration(self.owner, exp_id)
+        rights_manager.assign_role_for_exploration(
+            self.voiceover_admin, exp_id, self.voice_artist_id,
+            rights_domain.ROLE_VOICE_ARTIST)
+
+        voiceover_artist_email = user_services.get_email_from_user_id(
+            self.voice_artist_id)
 
         # Check that voice artist cannot add new members.
+        self.login(voiceover_artist_email)
+        self.assert_cannot_edit(exp_id)
+        self.assert_can_voiceover(exp_id)
+        csrf_token = self.get_new_csrf_token()
+
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
         rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
 
