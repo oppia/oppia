@@ -34,14 +34,14 @@ class GetNumberOfExpExceedsMaxTitleLengthJob(base_jobs.JobBase):
         return (
             self.pipeline
             | 'Get all ExplorationModels' >> ndb_io.GetModels(
-                exp_models.ExplorationModel.get_all())
-            | 'Length of exploration title' >> beam.Map(self.get_length_of_exploration_title)
-            | 'Exploration title having length more than 36' >> (
-                beam.Filter(lambda title: len(title) > 36))
-            | 'Sum Values' >> beam.CombineGlobally(sum)
+                exp_models.ExplorationModel.get_all(include_deleted=False))
+            | 'Get exploration from model' >> beam.Map(
+                exp_fetchers.get_exploration_from_model)
+            | 'Combine exploration title and ids' >> beam.Map(
+                lambda exp: (exp.id, exp.title))
+            | 'Filter exploraton with title length greater than 36' >> beam.Filter(
+                lambda exp: len(exp[1]) > 36)
+            | 'id of exploration' >> beam.Map(
+                lambda exp: exp[0])
             | 'Map as stdout' >> beam.Map(job_run_result.JobRunResult.as_stdout)
         )
-
-    def get_length_of_exploration_title(self, model: exp_models.ExplorationModel) -> int:
-        exploration = exp_fetchers.get_exploration_from_model(model)
-        return len(exploration.title)
