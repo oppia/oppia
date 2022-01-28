@@ -222,7 +222,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         self.exit_stack.enter_context(self.swap_with_checks(
             servers, 'managed_portserver', mock_managed_process))
 
-        with self.assertRaisesRegexp(SystemExit, '1'):
+        with self.assertRaisesRegex(SystemExit, '1'):
             run_e2e_tests.main(args=[])
 
     def test_start_tests_when_no_other_instance_running(self):

@@ -204,7 +204,7 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
                     ca_spec['default_value'], ca_spec['schema'])
 
     def test_get_all_specs_for_state_schema_version_for_unsaved_version(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             IOError, 'No specs JSON file found for state schema'
         ):
             (
