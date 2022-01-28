@@ -47,7 +47,7 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
   @Output() updateBgColor: EventEmitter<string> = new EventEmitter();
   @Output() updateFilename: EventEmitter<string> = new EventEmitter();
   @Output() imageSave: EventEmitter<void> = new EventEmitter();
-  openInUploadMode: boolean;
+  openInUploadMode: boolean = false;
   tempBgColor: string;
   tempImageName: string;
   uploadedImage: string;
@@ -91,6 +91,7 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
           this.contextService.getEntityType(),
           this.contextService.getEntityId()));
       this.uploadedImage = this.editableThumbnailDataUrl;
+      this.thumbnailIsLoading = false;
     }
   }
 
@@ -107,6 +108,7 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
     if (
       changes.filename &&
       changes.filename.currentValue !== changes.filename.previousValue) {
+      this.thumbnailIsLoading = true;
       const newValue = changes.filename.currentValue;
       const previousValue = changes.filename.previousValue;
       this.filenameChanges(newValue, previousValue);
@@ -123,12 +125,13 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
             this.contextService.getEntityId()));
       this.uploadedImage = this.editableThumbnailDataUrl;
     }
-    this.thumbnailIsLoading = true;
+    this.thumbnailIsLoading = false;
     this.hidePlaceholder = false;
   }
 
   saveThumbnailBgColor(newBgColor: string): void {
     if (newBgColor !== this.bgColor) {
+      this.bgColor = newBgColor;
       this.updateBgColor.emit(newBgColor);
     }
   }
@@ -165,7 +168,9 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
     if (this.disabled) {
       return;
     }
-    this.openInUploadMode = true;
+    if (!this.uploadedImage) {
+      this.openInUploadMode = true;
+    }
     // This refers to the temporary thumbnail background
     // color used for preview.
     this.tempBgColor = (
@@ -212,6 +217,7 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
             this.uploadedImage = data.newThumbnailDataUrl;
             this.updateFilename.emit(this.tempImageName);
             this.saveThumbnailBgColor(data.newBgColor);
+            this.thumbnailIsLoading = false;
           });
         } else {
           this.saveThumbnailBgColor(data.newBgColor);

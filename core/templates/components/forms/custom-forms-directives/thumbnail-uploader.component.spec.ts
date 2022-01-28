@@ -71,6 +71,7 @@ describe('ThumbnailUploaderComponent', () => {
 
     expect(component.editableThumbnailDataUrl).toBe(undefined);
     expect(component.uploadedImage).toBe(undefined);
+    expect(component.thumbnailIsLoading).toBeTrue();
 
     component.ngOnInit();
 
@@ -78,6 +79,7 @@ describe('ThumbnailUploaderComponent', () => {
       .toBe('/assetsdevhandler/exploration/expId/assets/thumbnail/thumbnail-1');
     expect(component.uploadedImage)
       .toBe('/assetsdevhandler/exploration/expId/assets/thumbnail/thumbnail-1');
+    expect(component.thumbnailIsLoading).toBeFalse();
   });
 
   it('should update the thumbnail image when thumbnail filename' +
@@ -100,6 +102,7 @@ describe('ThumbnailUploaderComponent', () => {
 
     expect(component.editableThumbnailDataUrl)
       .toBe('/assetsdevhandler/exploration/expId/assets/thumbnail/thumbnail-2');
+    expect(component.thumbnailIsLoading).toBeFalse();
   });
 
   it('should not update the thumbnail image when new thumbnail is same as' +
@@ -115,6 +118,7 @@ describe('ThumbnailUploaderComponent', () => {
         isFirstChange: () => true
       }
     };
+    component.thumbnailIsLoading = false;
     expect(component.editableThumbnailDataUrl).toBe(undefined);
 
     component.ngOnChanges(changes);
@@ -122,6 +126,7 @@ describe('ThumbnailUploaderComponent', () => {
     expect(component.editableThumbnailDataUrl).toBe(undefined);
     expect(imageUploadHelperService.getTrustedResourceUrlForThumbnailFilename)
       .not.toHaveBeenCalled();
+    expect(component.thumbnailIsLoading).toBeFalse();
   });
 
   it('should not show edit thumbnail modal if editing thumbnail is' +
@@ -129,13 +134,13 @@ describe('ThumbnailUploaderComponent', () => {
     component.disabled = true;
     spyOn(ngbModal, 'open');
 
-    expect(component.openInUploadMode).toBe(undefined);
+    expect(component.openInUploadMode).toBe(false);
 
     component.showEditThumbnailModal();
 
     // Here, openInUpload mode is not set as which means, showEditThumbnailModal
     // returned as soon as the first check was executed.
-    expect(component.openInUploadMode).toBe(undefined);
+    expect(component.openInUploadMode).toBe(false);
     expect(ngbModal.open).not.toHaveBeenCalled();
   });
 
@@ -201,7 +206,7 @@ describe('ThumbnailUploaderComponent', () => {
       {backdrop: 'static'});
     expect(component.tempImageName).toBe('image_file_name.svg');
     expect(component.uploadedImage).toBe('data:image/png;base64,xyz');
-    expect(component.thumbnailIsLoading).toBe(true);
+    expect(component.thumbnailIsLoading).toBe(false);
     expect(updateFilenameSpy).toHaveBeenCalledWith('image_file_name.svg');
     expect(updateBgColorSpy).toHaveBeenCalledWith('#newcol');
   }));
