@@ -19,6 +19,7 @@
 
 var until = protractor.ExpectedConditions;
 var fs = require('fs');
+const console = require('node:console');
 var Constants = require('./ProtractorConstants');
 // When running tests on mobile via browserstack, the localhost
 // might take some time to establish a connection with the
@@ -198,13 +199,36 @@ var clientSideRedirection = async function(
     var url = await browser.driver.getCurrentUrl();
     // Condition to wait on.
     return check(decodeURIComponent(url));
-  }, DEFAULT_WAIT_TIME_MSECS);
+  }, DEFAULT_WAIT_TIME_MSECS, 'Client taking too long');
 
   // Waiting for caller specified conditions.
   await waitForCallerSpecifiedConditions();
 
   // Client side redirection is complete, enabling wait for angular here.
   await browser.waitForAngularEnabled(true);
+};
+
+var clientSideRedirectionTest = async function(
+  action, url, waitForCallerSpecifiedConditions) {
+// Client side redirection is known to cause "both angularJS testability
+// and angular testability are undefined" flake.
+// As suggested by protractor devs here (http://git.io/v4gXM), waiting for
+// angular is disabled during client side redirects.
+await browser.waitForAngularEnabled(false);
+
+// Action triggering redirection.
+await action();
+
+// The action only triggers the redirection but does not wait for it to
+// complete. Manually waiting for redirection here.
+console.log("Here");
+await urlRedirection(url);
+
+// Waiting for caller specified conditions.
+await waitForCallerSpecifiedConditions();
+
+// Client side redirection is complete, enabling wait for angular here.
+await browser.waitForAngularEnabled(true);
 };
 
 exports.DEFAULT_WAIT_TIME_MSECS = DEFAULT_WAIT_TIME_MSECS;
@@ -226,3 +250,4 @@ exports.fadeInToComplete = fadeInToComplete;
 exports.modalPopupToAppear = modalPopupToAppear;
 exports.fileToBeDownloaded = fileToBeDownloaded;
 exports.clientSideRedirection = clientSideRedirection;
+exports.clientSideRedirectionTest = clientSideRedirectionTest;

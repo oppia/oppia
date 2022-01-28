@@ -23,6 +23,7 @@ var general = require('./general.js');
 var waitFor = require('./waitFor.js');
 var action = require('./action.js');
 var AdminPage = require('./AdminPage.js');
+const console = require('node:console');
 var adminPage = new AdminPage.AdminPage();
 var splashPage = element(by.css('.protractor-test-splash-page'));
 
@@ -82,8 +83,10 @@ var login = async function(email, useManualNavigation = true) {
     if (returnUrl === '/') {
       // Users will be redirected to preferred dashboard if they are fully
       // registered. Otherwise, they will be redirected to signup page.
+      console.log("One");
       return /(learner-dashboard|creator-dashboard|signup)/.test(url);
     } else {
+      console.log("Two");
       return (new RegExp(returnUrl + '|signup')).test(url);
     }
   }, async() => {
@@ -138,8 +141,10 @@ var _completeSignup = async function(username) {
     await action.click('Register user button', registerUser);
   }, (url) => {
     if (returnUrl === '/') {
+      console.log("Three");
       return /(learner-dashboard|creator-dashboard)/.test(url);
     } else {
+      console.log("Four");
       return (new RegExp(returnUrl)).test(url);
     }
   }, async() => {

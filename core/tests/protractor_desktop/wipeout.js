@@ -62,65 +62,7 @@ describe('When account is deleted it', function() {
       'http://localhost:9001/pending-account-deletion');
   });
 
-  it('should delete private exploration', async function() {
-    await users.createUser('ExpCollaborator@oppia.com', 'ExpCollaborator');
-    await users.createAndLoginUser('user2@delete.com', 'userToDelete2');
-    await workflow.createExploration(true);
-    var explorationId = await general.getExplorationIdFromEditor();
-    await explorationEditorPage.navigateToSettingsTab();
-    await explorationEditorSettingsTab.setTitle('voice artists');
-    await workflow.addExplorationCollaborator('ExpCollaborator');
-    await deleteAccountPage.get();
-    await deleteAccountPage.requestAccountDeletion('userToDelete2');
-
-    await users.login('ExpCollaborator@oppia.com');
-    await general.openEditor(explorationId, false);
-    await general.expectErrorPage(404);
-    expectedConsoleErrors.push(
-      'Failed to load resource: the server responded with a status of 404');
-    expectedConsoleErrors.push(
-      `The requested path /create/${explorationId} is not found.`);
-    await users.logout();
-  });
-
-  it('should set published exploration as community owned', async function() {
-    await users.createUser('user@check.com', 'userForChecking');
-    await users.createAndLoginUser('user3@delete.com', 'userToDelete3');
-    await workflow.createAndPublishExploration(
-      EXPLORATION_TITLE,
-      EXPLORATION_CATEGORY,
-      EXPLORATION_OBJECTIVE,
-      'English',
-      true
-    );
-    var explorationId = await general.getExplorationIdFromEditor();
-    await deleteAccountPage.get();
-    await deleteAccountPage.requestAccountDeletion('userToDelete3');
-
-    await users.login('user@check.com');
-    await general.openEditor(explorationId, true);
-    await workflow.isExplorationCommunityOwned();
-    await users.logout();
-  });
-
-  it('should keep published exploration with other owner', async function() {
-    await users.createUser('secondOwner@check.com', 'secondOwner');
-    await users.createAndLoginUser('user4@delete.com', 'userToDelete4');
-    await workflow.createExploration(true);
-    var explorationId = await general.getExplorationIdFromEditor();
-    await explorationEditorPage.navigateToSettingsTab();
-    await explorationEditorSettingsTab.setTitle('second owner');
-    await workflow.addExplorationManager('secondOwner');
-    await deleteAccountPage.get();
-    await deleteAccountPage.requestAccountDeletion('userToDelete4');
-
-    await users.login('secondOwner@check.com');
-    await general.openEditor(explorationId, true);
-    await explorationEditorPage.navigateToSettingsTab();
-    expect(await workflow.getExplorationManagers()).toEqual(['secondOwner']);
-    await users.logout();
-  });
-
+  
   afterEach(async function() {
     await general.checkForConsoleErrors(expectedConsoleErrors);
   });
