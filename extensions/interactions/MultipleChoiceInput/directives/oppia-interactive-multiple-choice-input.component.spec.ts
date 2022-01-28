@@ -23,7 +23,7 @@ import { CurrentInteractionService } from 'pages/exploration-player-page/service
 import { InteractiveMultipleChoiceInputComponent } from './oppia-interactive-multiple-choice-input.component';
 import { BrowserCheckerService } from 'domain/utilities/browser-checker.service';
 
-fdescribe('InteractiveMultipleChoiceInputComponent', () => {
+describe('InteractiveMultipleChoiceInputComponent', () => {
   let component: InteractiveMultipleChoiceInputComponent;
   let fixture: ComponentFixture<InteractiveMultipleChoiceInputComponent>;
   let currentInteractionService: CurrentInteractionService;

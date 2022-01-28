@@ -100,10 +100,10 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
       // Sort the choices based on the previous order of choices.
       this.choices = (
         choicesWithIndex.sort((c1, c2) => {
-          return (previousOrderOfChoices.indexOf(c1.originalIndex)
-          - previousOrderOfChoices.indexOf(c2.originalIndex));
-          }
-        )
+          return (
+            previousOrderOfChoices.indexOf(c1.originalIndex) -
+            previousOrderOfChoices.indexOf(c2.originalIndex));
+        })
       );
     } else {
       this.choices = (
