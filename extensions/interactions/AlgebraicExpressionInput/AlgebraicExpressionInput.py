@@ -115,7 +115,7 @@ class AlgebraicExpressionInput(base.BaseInteraction):
 
     @classmethod
     def _convert_answer_groups_to_proto(cls, answer_groups):
-        """Creates a AnswerGroup proto object
+        """Creates a AnswerGroupDto proto object
         for AlgebraicExpressionInputInstanceDto.
 
         Args:
@@ -123,7 +123,7 @@ class AlgebraicExpressionInput(base.BaseInteraction):
                 interaction instance.
 
         Returns:
-            list. The AnswerGroup proto object list.
+            list(AnswerGroupDto). The proto object list.
         """
         answer_group_list_proto = []
         for answer_group in answer_groups:
@@ -148,7 +148,7 @@ class AlgebraicExpressionInput(base.BaseInteraction):
             rule_specs_list: list(RuleSpec). List of rule specifications.
 
         Returns:
-            list. The RuleSpecDto proto object list.
+            list(RuleSpecDto). The proto object list.
         """
         rule_specs_list_proto = []
 

@@ -51,6 +51,7 @@ QUESTION_PROPERTY_QUESTION_STATE_DATA = 'question_state_data'
 QUESTION_PROPERTY_LINKED_SKILL_IDS = 'linked_skill_ids'
 QUESTION_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS = (
     'inapplicable_skill_misconception_ids')
+QUESTION_PROPERTY_ANDROID_PROTO_SIZE_IN_BYTES = 'android_proto_size_in_bytes'
 
 # This takes additional 'property_name' and 'new_value' parameters and,
 # optionally, 'old_value'.
@@ -86,7 +87,8 @@ class QuestionChange(change_domain.BaseChange):
         QUESTION_PROPERTY_QUESTION_STATE_DATA,
         QUESTION_PROPERTY_LANGUAGE_CODE,
         QUESTION_PROPERTY_LINKED_SKILL_IDS,
-        QUESTION_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS)
+        QUESTION_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS,
+        QUESTION_PROPERTY_ANDROID_PROTO_SIZE_IN_BYTES)
 
     ALLOWED_COMMANDS = [{
         'name': CMD_CREATE_NEW,
@@ -1320,16 +1322,6 @@ class Question:
             raise utils.ValidationError(
                 'Expected version to be an integer, received %s' %
                 self.version)
-
-        if not isinstance(self.android_proto_size_in_bytes, int):
-            raise utils.ValidationError(
-                'Expected proto size to be an int, received %s'
-                % self.android_proto_size_in_bytes)
-
-        if self.android_proto_size_in_bytes <= 0:
-            raise utils.ValidationError(
-                'Expected proto size to be a positive integer, received %s'
-                % self.android_proto_size_in_bytes)
 
         self.partial_validate()
 

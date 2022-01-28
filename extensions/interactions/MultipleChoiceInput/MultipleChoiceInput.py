@@ -145,7 +145,7 @@ class MultipleChoiceInput(base.BaseInteraction):
                 interaction instance.
 
         Returns:
-            list. The AnswerGroupDto proto object list.
+            list(AnswerGroupDto). The proto object list.
         """
         answer_group_list_proto = []
         for answer_group in answer_groups:
@@ -170,7 +170,7 @@ class MultipleChoiceInput(base.BaseInteraction):
             rule_specs_list: list(RuleSpec). List of rule specifications.
 
         Returns:
-            list. The RuleSpecDto proto object list.
+            list(RuleSpecDto). The proto object list.
         """
         rule_specs_list_proto = []
 

@@ -122,7 +122,7 @@ class NumericExpressionInput(base.BaseInteraction):
                 interaction instance.
 
         Returns:
-            list. The AnswerGroup proto object list.
+            list(AnswerGroup). The proto object list.
         """
         answer_group_list_proto = []
         for answer_group in answer_groups:
@@ -141,13 +141,13 @@ class NumericExpressionInput(base.BaseInteraction):
 
     @classmethod
     def _convert_rule_specs_to_proto(cls, rule_specs_list):
-        """Creates a RuleSpec proto object.
+        """Creates a RuleSpecDto proto object.
 
         Args:
             rule_specs_list: list(RuleSpec). List of rule specifications.
 
         Returns:
-            list. The RuleSpec proto object list.
+            list(RuleSpecDto). The proto object list.
         """
         rule_specs_list_proto = []
 

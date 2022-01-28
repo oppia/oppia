@@ -36,6 +36,7 @@ from core.domain import rules_registry
 from core.domain import state_domain
 from core.domain import translatable_object_registry
 from core.tests import test_utils
+from proto_files import state_pb2
 
 
 class StateDomainUnitTests(test_utils.GenericTestBase):
@@ -4443,6 +4444,390 @@ class InteractionCustomizationArgDomainTests(test_utils.GenericTestBase):
         self.assertEqual(html, ['<p>testing</p>'])
 
 
+class InteractionInstanceDomainTests(test_utils.GenericTestBase):
+
+    def test_interactions_converted_to_proto_correctly(self):
+        interaction = state_domain.InteractionInstance
+        subtitled_html = state_domain.SubtitledHtml(
+            'default_outcome', '')
+        default_outcome = state_domain.Outcome(
+            'end_state_name', subtitled_html, False, [], None, None)
+
+        continue_customization_args = (
+            interaction.convert_customization_args_dict_to_customization_args(
+                'Continue',
+                {
+                    'buttonText': {
+                        'value': {
+                            'content_id': 'ca_buttonText_1',
+                            'unicode_str': 'Click Me!'
+                        }
+                    }
+                }
+            ))
+
+        continue_interaction = state_domain.InteractionInstance(
+            'Continue',
+            continue_customization_args, [], default_outcome, [], [], None)
+        continue_proto = continue_interaction.to_android_interaction_proto()
+        self.assertEqual(
+            type(continue_proto.continue_instance),
+            state_pb2.ContinueInstanceDto
+        )
+
+        fraction_customization_args = (
+            interaction.convert_customization_args_dict_to_customization_args(
+                'FractionInput',
+                {
+                    'requireSimplestForm': {
+                        'value': False
+                    },
+                    'allowImproperFraction': {
+                        'value': True
+                    },
+                    'allowNonzeroIntegerPart': {
+                        'value': True
+                    },
+                    'customPlaceholder': {
+                        'value': {
+                            'content_id': 'ca_customPlaceholder_2',
+                            'unicode_str': '😍😍😍😍'
+                        }
+                    },
+                }
+            ))
+        fraction_interaction = state_domain.InteractionInstance(
+            'FractionInput',
+            fraction_customization_args, [], default_outcome, [], [], None)
+        fraction_input_proto = (
+            fraction_interaction.to_android_interaction_proto())
+        self.assertEqual(
+            type(fraction_input_proto.fraction_input),
+            state_pb2.FractionInputInstanceDto
+        )
+
+        item_customization_args = (
+            interaction.convert_customization_args_dict_to_customization_args(
+                'ItemSelectionInput',
+                {
+                    'choices': {
+                        'value': [{
+                            'content_id': 'ca_choices_2',
+                            'html': '<p>Choice 1</p>'
+                        }, {
+                            'content_id': 'ca_choices_3',
+                            'html': '<p>Choice 2</p>'
+                        }]
+                    },
+                    'maxAllowableSelectionCount': {
+                        'value': 2
+                    },
+                    'minAllowableSelectionCount': {
+                        'value': 1
+                    }
+                }
+            ))
+        item_interaction = state_domain.InteractionInstance(
+            'ItemSelectionInput',
+            item_customization_args, [], default_outcome, [], [], None)
+        item_selection_input_proto = (
+            item_interaction.to_android_interaction_proto())
+        self.assertEqual(
+            type(item_selection_input_proto.item_selection_input),
+            state_pb2.ItemSelectionInputInstanceDto
+        )
+
+        multi_customization_args = (
+            interaction.convert_customization_args_dict_to_customization_args(
+                'MultipleChoiceInput',
+                {
+                    'choices': {
+                        'value': [{
+                            'content_id': 'ca_choices_2',
+                            'html': '<p>Choice 1</p>'
+                        }, {
+                            'content_id': 'ca_choices_3',
+                            'html': '<p>Choice 2</p>'
+                        }]
+                    },
+                    'showChoicesInShuffledOrder': {'value': True}
+                }
+            ))
+        multi_interaction = state_domain.InteractionInstance(
+            'MultipleChoiceInput',
+            multi_customization_args, [], default_outcome, [], [], None)
+        multiple_choice_input_proto = (
+            multi_interaction.to_android_interaction_proto())
+        self.assertEqual(
+            type(multiple_choice_input_proto.multiple_choice_input),
+            state_pb2.MultipleChoiceInputInstanceDto
+        )
+
+        numeric_customization_args = (
+            interaction.convert_customization_args_dict_to_customization_args(
+                'NumericInput',
+                {
+                    'requireNonnegativeInput': {
+                        'value': False
+                    },
+                    'rows': {'value': 1}
+                }
+            ))
+        numeric_interaction = state_domain.InteractionInstance(
+            'NumericInput',
+            numeric_customization_args, [], default_outcome, [], [], None)
+        numeric_input_proto = (
+            numeric_interaction.to_android_interaction_proto())
+        self.assertEqual(
+            type(numeric_input_proto.numeric_input),
+            state_pb2.NumericInputInstanceDto
+        )
+
+        text_customization_args = (
+            interaction.convert_customization_args_dict_to_customization_args(
+                'TextInput',
+                {
+                    'rows': {
+                        'value': 1
+                    },
+                    'placeholder': {
+                        'value': {
+                            'content_id': 'ca_placeholder_0',
+                            'unicode_str': '😍😍😍😍'
+                        }
+                    }
+                }
+            ))
+        text_interaction = state_domain.InteractionInstance(
+            'TextInput',
+            text_customization_args, [], default_outcome, [], [], None)
+        self.assertEqual(
+            type(text_interaction.to_android_interaction_proto().text_input),
+            state_pb2.TextInputInstanceDto
+        )
+
+        ratio_customization_args = (
+            interaction.convert_customization_args_dict_to_customization_args(
+                'RatioExpressionInput',
+                {
+                    'placeholder': {
+                        'value': {
+                            'content_id': 'ca_placeholder_0',
+                            'unicode_str': '😍😍😍😍'
+                        }
+                    },
+                    'numberOfTerms': {
+                        'value': 1
+                    }
+                }
+            ))
+        ratio_interaction = state_domain.InteractionInstance(
+            'RatioExpressionInput',
+            ratio_customization_args, [], default_outcome, [], [], None)
+        ratio_input_proto = ratio_interaction.to_android_interaction_proto()
+        self.assertEqual(
+            type(ratio_input_proto.ratio_expression_input),
+            state_pb2.RatioExpressionInputInstanceDto
+        )
+
+        drag_customization_args = (
+            interaction.convert_customization_args_dict_to_customization_args(
+                'DragAndDropSortInput',
+                {
+                    'allowMultipleItemsInSamePosition': {
+                        'value': True
+                    },
+                    'choices': {
+                        'value': [{
+                            'content_id': 'ca_choices_2',
+                            'html': '<p>Choice 1</p>'
+                        }, {
+                            'content_id': 'ca_choices_3',
+                            'html': '<p>Choice 2</p>'
+                        }]
+                    }
+                }
+            ))
+        drag_interaction = state_domain.InteractionInstance(
+            'DragAndDropSortInput',
+            drag_customization_args, [], default_outcome, [], [], None)
+        drag_drop_input_proto = (
+            drag_interaction.to_android_interaction_proto())
+        self.assertEqual(
+            type(drag_drop_input_proto.drag_and_drop_sort_input),
+            state_pb2.DragAndDropSortInputInstanceDto
+        )
+
+        image_customization_args = (
+            interaction.convert_customization_args_dict_to_customization_args(
+                'ImageClickInput',
+                {
+                    'highlightRegionsOnHover': {'value': True},
+                    'imageAndRegions': {
+                        'value': {
+                            'imagePath': 's1ImagePath.png',
+                            'labeledRegions': [{
+                                'label': 'classdef',
+                                'region': {
+                                    'area': [
+                                        [0.004291845493562232,
+                                            0.004692192192192192],
+                                        [0.40987124463519314,
+                                            0.05874624624624625]
+                                    ],
+                                    'regionType': 'Rectangle'
+                                }
+                            }]
+                        }
+                    }
+                }
+            ))
+        image_interaction = state_domain.InteractionInstance(
+            'ImageClickInput',
+            image_customization_args, [], default_outcome, [], [], None)
+        image_click_input_proto = (
+            image_interaction.to_android_interaction_proto())
+        self.assertEqual(
+            type(image_click_input_proto.image_click_input),
+            state_pb2.ImageClickInputInstanceDto
+        )
+
+        algebric_customization_args = (
+            interaction.convert_customization_args_dict_to_customization_args(
+                'AlgebraicExpressionInput',
+                {
+                    'customOskLetters': {
+                        'value': ['\u03C0', '\u03C0']
+                    },
+                    'useFractionForDivision': {
+                        'value': False
+                    }
+                }
+            ))
+        algebric_interaction = state_domain.InteractionInstance(
+            'AlgebraicExpressionInput',
+            algebric_customization_args, [], default_outcome, [], [], None)
+        algebric_expression_proto = (
+            algebric_interaction.to_android_interaction_proto())
+        self.assertEqual(
+            type(algebric_expression_proto.algebraic_expression_input),
+            state_pb2.AlgebraicExpressionInputInstanceDto
+        )
+
+        math_customization_args = (
+            interaction.convert_customization_args_dict_to_customization_args(
+                'MathEquationInput',
+                {
+                    'customOskLetters': {
+                        'value': ['\u03C0', '\u03C0']
+                    },
+                    'useFractionForDivision': {
+                        'value': False
+                    }
+                }
+            ))
+        math_interaction = state_domain.InteractionInstance(
+            'MathEquationInput',
+            math_customization_args, [], default_outcome, [], [], None)
+        math_equation_input_proto = (
+            math_interaction.to_android_interaction_proto())
+        self.assertEqual(
+            type(math_equation_input_proto.math_equation_input),
+            state_pb2.MathEquationInputInstanceDto
+        )
+
+        numeric_customization_args = (
+            interaction.convert_customization_args_dict_to_customization_args(
+                'NumericExpressionInput',
+                {
+                    'placeholder': {
+                        'value': {
+                            'content_id': 'ca_customPlaceholder_2',
+                            'unicode_str': '😍😍😍😍'
+                        }
+                    },
+                    'useFractionForDivision': {
+                        'value': False
+                    }
+                }
+            ))
+        numeric_interaction = state_domain.InteractionInstance(
+            'NumericExpressionInput',
+            numeric_customization_args, [], default_outcome, [], [], None)
+        numeric_expression_proto = (
+            numeric_interaction.to_android_interaction_proto())
+        self.assertEqual(
+            type(numeric_expression_proto.numeric_expression_input),
+            state_pb2.NumericExpressionInputInstanceDto
+        )
+
+        end_interaction = state_domain.InteractionInstance(
+            'EndExploration',
+            {}, [], default_outcome, [], [], None)
+        end_exploration_proto = (
+            end_interaction.to_android_interaction_proto())
+        self.assertEqual(
+            type(end_exploration_proto.end_exploration),
+            state_pb2.EndExplorationInstanceDto
+        )
+
+        numer_with_units_interaction = state_domain.InteractionInstance(
+            'NumberWithUnits',
+            {}, [], default_outcome, [], [], None)
+        self.assertEqual(
+            numer_with_units_interaction.to_android_interaction_proto(),
+            None)
+
+        code_repl_interaction = state_domain.InteractionInstance(
+            'CodeRepl',
+            {}, [], default_outcome, [], [], None)
+        self.assertEqual(
+            code_repl_interaction.to_android_interaction_proto(), None)
+
+        graph_input_interaction = state_domain.InteractionInstance(
+            'GraphInput',
+            {}, [], default_outcome, [], [], None)
+        self.assertEqual(
+            graph_input_interaction.to_android_interaction_proto(), None)
+
+        interactive_map_interaction = state_domain.InteractionInstance(
+            'InteractiveMap',
+            {}, [], default_outcome, [], [], None)
+        self.assertEqual(
+            interactive_map_interaction.to_android_interaction_proto(),
+            None)
+
+        music_notes_input_interaction = state_domain.InteractionInstance(
+            'MusicNotesInput',
+            {}, [], default_outcome, [], [], None)
+        self.assertEqual(
+            music_notes_input_interaction.to_android_interaction_proto(),
+            None)
+
+        pencil_code_editor_interaction = state_domain.InteractionInstance(
+            'PencilCodeEditor',
+            {}, [], default_outcome, [], [], None)
+        self.assertEqual(
+            pencil_code_editor_interaction.to_android_interaction_proto(),
+            None)
+
+        set_input_interaction = state_domain.InteractionInstance(
+            'SetInput',
+            {}, [], default_outcome, [], [], None)
+        self.assertEqual(
+            set_input_interaction.to_android_interaction_proto(), None)
+
+
+class SubtitledHtmlDomainUnitTests(test_utils.GenericTestBase):
+    """Test SubtitledHtml domain object methods."""
+
+    def test_subtitled_html_converted_to_proto_correctly(self):
+        subtitled_text_proto = state_domain.SubtitledHtml(
+            'ca_placeholder_0', '<p>html</p>').to_android_content_proto()
+        self.assertEqual(subtitled_text_proto.content_id, 'ca_placeholder_0')
+        self.assertEqual(subtitled_text_proto.text, '<p>html</p>')
+
+
 class SubtitledUnicodeDomainUnitTests(test_utils.GenericTestBase):
     """Test SubtitledUnicode domain object methods."""
 
@@ -4464,6 +4849,12 @@ class SubtitledUnicodeDomainUnitTests(test_utils.GenericTestBase):
             'content_id': 'id',
             'unicode_str': ''
         })
+
+    def test_subtitled_unicode_converted_to_proto_correctly(self):
+        subtitled_text_proto = state_domain.SubtitledUnicode(
+            'ca_placeholder_0', '😍😍😍😍').to_android_content_proto()
+        self.assertEqual(subtitled_text_proto.content_id, 'ca_placeholder_0')
+        self.assertEqual(subtitled_text_proto.text, '😍😍😍😍')
 
 
 class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
@@ -4492,8 +4883,8 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
                         'needs_update': False
                     },
                     'fr': {
-                        'data_format': 'set_of_normalized_string',
-                        'translation': ['test1', 'test2'],
+                        'data_format': 'html',
+                        'translation': 'salut',
                         'needs_update': False
                     },
                 },
@@ -4509,8 +4900,8 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
                         'needs_update': False
                     },
                     'fr': {
-                        'data_format': 'set_of_normalized_string',
-                        'translation': ['test1', 'test2'],
+                        'data_format': 'html',
+                        'translation': 'salut',
                         'needs_update': False
                     }
                 }
@@ -4814,6 +5205,87 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             written_translations.get_content_ids_that_are_correctly_translated(
                 'hi'), [])
 
+    def test_written_translations_converted_to_proto_correctly(self):
+        written_translations_dict = {
+            'translations_mapping': {
+                'content1': {
+                    'en': {
+                        'data_format': 'html',
+                        'translation': '<p>English</p>',
+                        'needs_update': True
+                    },
+                    'hi': {
+                        'data_format': 'unicode',
+                        'translation': '<p>Hindi</p>',
+                        'needs_update': True
+                    },
+                    'fr': {
+                        'data_format': 'html',
+                        'translation': '<p>French</p>',
+                        'needs_update': True
+                    }
+                },
+                'feedback_1': {
+                    'hi': {
+                        'data_format': 'html',
+                        'translation': '<p>Hindi</p>',
+                        'needs_update': True
+                    },
+                    'en': {
+                        'data_format': 'html',
+                        'translation': '<p>English</p>',
+                        'needs_update': True
+                    },
+                    'fr': {
+                        'data_format': 'unicode',
+                        'translation': '<p>French</p>',
+                        'needs_update': True
+                    }
+                }
+            }
+        }
+        written_translations = (
+            state_domain.WrittenTranslations.from_dict(
+            written_translations_dict))
+        written_translations_proto = (
+            written_translations.to_android_written_translations_proto())
+        self.assertEqual(
+            written_translations_proto.translation_language_mapping[0].language,
+            1)
+        self.assertEqual(
+            written_translations_proto.translation_language_mapping[1].language,
+            3)
+
+
+class WrittenTranslationDomainUnitTests(test_utils.GenericTestBase):
+
+    def test_written_translation_converted_to_proto_correctly(self):
+        written_translation_proto = (
+            state_domain.WrittenTranslation(
+                'html', 'Test', False).to_android_written_translation_proto())
+        self.assertEqual(
+            written_translation_proto.translatable_text.translation,
+            'Test')
+
+
+class TranslatableItemDomainUnitTests(test_utils.GenericTestBase):
+
+    def test_to_written_translatable_text_proto(self):
+        written_translatable_text_proto = (
+            state_domain.TranslatableItem.to_written_translatable_text_proto(
+                'Test'))
+        self.assertEqual(
+            written_translatable_text_proto.translation,
+            'Test')
+
+    def test_to_written_translatable_set_proto(self):
+        written_translatable_text_proto = (
+            state_domain.TranslatableItem.to_written_translatable_set_proto(
+                ['Test1', 'Test2']))
+        self.assertEqual(
+            written_translatable_text_proto.translations,
+            ['Test1', 'Test2'])
+
 
 class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
     """Test methods operating on recorded voiceovers."""
@@ -5058,6 +5530,60 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
                 'content ids [\'invalid_content\']')):
             recorded_voiceovers.validate(['invalid_content'])
 
+    def test_recorded_voiceovers_converted_to_proto_correctly(self):
+        recorded_voiceovers_dict = {
+            'voiceovers_mapping': {
+                'content1': {
+                    'en': {
+                        'filename': 'xyz.mp3',
+                        'file_size_bytes': 123,
+                        'needs_update': False,
+                        'duration_secs': 1.1
+                    },
+                    'hi': {
+                        'filename': 'abc.mp3',
+                        'file_size_bytes': 1234,
+                        'needs_update': False,
+                        'duration_secs': 1.3
+                    },
+                    'fr': {
+                        'filename': 'abc.mp3',
+                        'file_size_bytes': 1234,
+                        'needs_update': False,
+                        'duration_secs': 1.3
+                    }
+                },
+                'feedback_1': {
+                    'hi': {
+                        'filename': 'xyz.mp3',
+                        'file_size_bytes': 123,
+                        'needs_update': False,
+                        'duration_secs': 1.1
+                    },
+                    'en': {
+                        'filename': 'xyz.mp3',
+                        'file_size_bytes': 123,
+                        'needs_update': False,
+                        'duration_secs': 1.3
+                    },
+                    'fr': {
+                        'filename': 'abc.mp3',
+                        'file_size_bytes': 1234,
+                        'needs_update': False,
+                        'duration_secs': 1.3
+                    }
+                }
+            }
+        }
+        recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict(
+            recorded_voiceovers_dict)
+        recorded_voiceovers_proto = (
+            recorded_voiceovers.to_android_recorded_voiceovers_proto())
+        self.assertEqual(
+            recorded_voiceovers_proto.voiceover_content_mapping[0].language, 1)
+        self.assertEqual(
+            recorded_voiceovers_proto.voiceover_content_mapping[1].language, 3)
+
 
 class VoiceoverDomainTests(test_utils.GenericTestBase):
 
@@ -5130,3 +5656,84 @@ class VoiceoverDomainTests(test_utils.GenericTestBase):
             Exception, 'Expected duration_secs to be positive number, '
             'or zero if not yet specified'):
             self.voiceover.validate()
+
+    def test_voiceover_converted_to_proto_correctly(self):
+        voiceover_proto = state_domain.Voiceover(
+            'filename.mp3', 10, False, 15.0).to_android_voiceover_proto()
+        self.assertEqual(voiceover_proto.filename, 'filename.mp3')
+        self.assertEqual(voiceover_proto.file_size_bytes, 10)
+        self.assertEqual(voiceover_proto.duration_secs, 15.0)
+
+
+class OutcomeDomainTests(test_utils.GenericTestBase):
+
+    def test_outcome_converted_to_proto_correctly(self):
+        subtitled_html_feedback = state_domain.SubtitledHtml(
+            'content_id', '<p>html</p>')
+        outcome_proto = state_domain.Outcome(
+            'Second',
+            subtitled_html_feedback, True, [], None, None
+        ).to_android_outcome_proto()
+        self.assertEqual(outcome_proto.destination_state, 'Second')
+        self.assertEqual(outcome_proto.feedback.content_id, 'content_id')
+        self.assertEqual(outcome_proto.feedback.text, '<p>html</p>')
+
+
+class AnswerGroupDomainTests(test_utils.GenericTestBase):
+
+    def test_answer_group_converted_to_proto_correctly(self):
+        answer_group = state_domain.AnswerGroup(
+            state_domain.Outcome(
+                'Second', state_domain.SubtitledHtml(
+                    'feedback_0', '<p>Feedback</p>'),
+                False, [], None, None),
+            [],
+            [],
+            'skill_id-1')
+        base_answer_proto = answer_group.to_android_answer_group_proto()
+        self.assertEqual(
+            base_answer_proto.outcome.destination_state,
+            'Second')
+        self.assertEqual(
+            base_answer_proto.outcome.feedback.content_id,
+            'feedback_0')
+        self.assertEqual(
+            base_answer_proto.outcome.feedback.text,
+            '<p>Feedback</p>')
+        self.assertEqual(
+            base_answer_proto.outcome.feedback.text,
+            '<p>Feedback</p>')
+        self.assertEqual(
+            base_answer_proto.tagged_skill_misconception.skill_id,
+            'skill_id')
+        self.assertEqual(
+            base_answer_proto.tagged_skill_misconception.misconception_id,
+            '1')
+
+
+class HintDomainTests(test_utils.GenericTestBase):
+
+    def test_hint_converted_to_proto_correctly(self):
+        hint_1 = state_domain.Hint(
+            state_domain.SubtitledHtml(
+                    'hint_id_1', '<p>Hint 1</p>'))
+        hint_proto = hint_1.to_android_hint_proto()
+        self.assertEqual(
+            hint_proto.hint_content.content_id, 'hint_id_1')
+        self.assertEqual(
+            hint_proto.hint_content.text, '<p>Hint 1</p>')
+
+
+class SolutionDomainTests(test_utils.GenericTestBase):
+
+    def test_solution_converted_to_proto_correctly(self):
+        solution = state_domain.Solution(
+            'TextInput', False, 'Solution', state_domain.SubtitledHtml(
+                'solution', '<p>This is a solution.</p>'))
+        solution_proto = solution.to_android_solution_proto()
+        self.assertEqual(
+            solution_proto.explanation.content_id,
+            'solution')
+        self.assertEqual(
+            solution_proto.explanation.text,
+            '<p>This is a solution.</p>')

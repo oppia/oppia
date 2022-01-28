@@ -92,7 +92,8 @@ PROTOC_DIR = os.path.join(BUF_DIR, 'protoc')
 PROTO_FILES_PATHS = [
     (True, os.path.join(common.THIRD_PARTY_DIR, 'oppia-ml-proto-0.0.0')),
     (False, os.path.join(
-        common.THIRD_PARTY_DIR, 'oppia-proto-api-introduce-proto-api-v1'))]
+        common.THIRD_PARTY_DIR,
+        'oppia-proto-api-8f3cde883c31785438e80656a5b6bb26bd01b6a1'))]
 # Path to typescript plugin required to compile ts compatible files from proto.
 PROTOC_GEN_TS_PATH = os.path.join(common.NODE_MODULES_PATH, 'protoc-gen-ts')
 
@@ -227,7 +228,7 @@ def rewrite_android_proto_files():
         pathlib.Path(
             os.path.join(
                 common.THIRD_PARTY_DIR,
-                'oppia-proto-api-introduce-proto-api-v1'))
+                'oppia-proto-api-8f3cde883c31785438e80656a5b6bb26bd01b6a1'))
             .glob('**/*.proto'))
     for p in protobuf_dir:
         if p.suffix == '.proto':
@@ -265,7 +266,7 @@ def move_all_proto_files_to_third_party():
     oppia_proto_api_path = (
         os.path.join(
             common.THIRD_PARTY_DIR,
-            'oppia-proto-api-introduce-proto-api-v1'))
+            'oppia-proto-api-8f3cde883c31785438e80656a5b6bb26bd01b6a1'))
     protobuf_dir = (
         pathlib.Path(
             oppia_proto_api_path).glob('**/*.proto'))
@@ -280,7 +281,7 @@ def move_all_proto_files_to_third_party():
     # If there is any subfolder in the root folder from the
     # oppia_proto_api repository in the third_party directory,
     # then delete it. We are keeping all the proto files under
-    # the root fodler directly to solve the proto compilation issue.
+    # the root folder directly to solve the proto compilation issue.
     # See: https://github.com/protocolbuffers/protobuf/issues/1491
     if os.path.exists(os.path.join(oppia_proto_api_path, 'org')):
         shutil.rmtree(oppia_proto_api_path + '/org')
