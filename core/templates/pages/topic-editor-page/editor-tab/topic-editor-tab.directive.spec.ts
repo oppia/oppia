@@ -392,8 +392,8 @@ describe('Topic editor tab directive', function() {
       expect(topicPageTitleFragmentForWebSpy).not.toHaveBeenCalled();
     });
 
-  fit('should set the practice tab as displayed if there are the defined ' +
-  'minimum number of practice questions in the topic', function() {
+  it('should set the practice tab as displayed if there are the defined ' +
+      'minimum number of practice questions in the topic', function() {
     var topicPracticeTabSpy = (
       spyOn(TopicUpdateService, 'setPracticeTabIsDisplayed'));
     $scope.skillQuestionCountDict = {skill1: 3, skill2: 6};
