@@ -22,8 +22,7 @@ import { TestBed } from '@angular/core/testing';
 import { FatigueDetectionService } from 'pages/exploration-player-page/services/fatigue-detection.service';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Fatigue detection service', () => {
+describe('Fatigue detection service', () => {
   let fatigueDetectionService: FatigueDetectionService;
   let ngbModal: NgbModal;
 
