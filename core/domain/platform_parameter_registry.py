@@ -26,16 +26,14 @@ from core.platform import models
 (config_models,) = models.Registry.import_models(
     [models.NAMES.config])
 
-DATA_TYPES = platform_parameter_domain.DATA_TYPES # pylint: disable=invalid-name
-
 
 class Registry:
     """Registry of all platform parameters."""
 
     DEFAULT_VALUE_BY_TYPE_DICT = {
-        DATA_TYPES.bool: False,
-        DATA_TYPES.number: 0,
-        DATA_TYPES.string: '',
+        platform_parameter_domain.DataTypes.BOOL: False,
+        platform_parameter_domain.DataTypes.NUMBER: 0,
+        platform_parameter_domain.DataTypes.STRING: '',
     }
 
     # The keys of parameter_registry are the property names, and the values
@@ -52,10 +50,10 @@ class Registry:
         Args:
             name: Enum(PARAMS). The name of the platform parameter.
             description: str. The description of the platform parameter.
-            data_type: Enum(DATA_TYPES). The data type of the platform
+            data_type: Enum(DataTypes). The data type of the platform
                 parameter, must be one of the following: bool, number, string.
             is_feature: bool. True if the platform parameter is a feature flag.
-            feature_stage: Enum(FEATURE_STAGES)|None. The stage of the feature,
+            feature_stage: Enum(FeatureStages)|None. The stage of the feature,
                 required if 'is_feature' is True.
 
         Returns:
@@ -94,13 +92,13 @@ class Registry:
         Args:
             name: Enum(PARAMS). The name of the platform parameter.
             description: str. The description of the platform parameter.
-            stage: Enum(FEATURE_STAGES). The stage of the feature.
+            stage: Enum(FeatureStages). The stage of the feature.
 
         Returns:
             PlatformParameter. The created feature flag.
         """
         return cls.create_platform_parameter(
-            name, description, DATA_TYPES.bool,
+            name, description, platform_parameter_domain.DataTypes.BOOL,
             is_feature=True, feature_stage=stage)
 
     @classmethod
