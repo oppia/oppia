@@ -29,8 +29,6 @@ if MYPY: # pragma: no cover
     from mypy_imports import user_models
 
 
-
-
 class UserAuthDetailsModelTests(test_utils.GenericTestBase):
     """Tests for UserAuthDetailsModel."""
 
