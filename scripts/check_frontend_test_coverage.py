@@ -48,7 +48,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'collection-player-page.component.ts',
     'contribution-and-review.service.ts',
     'exploration-states.service.ts',
-    'expression-evaluator.service.ts',
     'expression-interpolation.service.ts',
     'fatigue-detection.service.ts',
     'google-analytics.initializer.ts',
