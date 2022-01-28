@@ -19,7 +19,6 @@
 from __future__ import annotations
 
 from core import feconf
-from core.constants import constants
 from core.domain import caching_services
 from core.domain import question_domain
 from core.domain import state_domain
@@ -162,7 +161,11 @@ class PopulateQuestionWithAndroidProtoSizeInBytesJobTests(
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
-                stderr="QUESTION PROCESSED ERROR: \"('question_1_id', ValidationError('linked_skill_ids is either null or an empty list'))\": 1"
+                stderr=(
+                    'QUESTION PROCESSED ERROR: "(\'question_1_id\', '
+                    'ValidationError(\'linked_skill_ids is either null'
+                    ' or an empty list\'))": 1'
+                )
             )
         ])
 
