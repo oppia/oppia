@@ -813,18 +813,18 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             {})
 
         rubrics = [
-            skill_domain.Rubric( # type: ignore[no-untyped-call]
+            skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[0],
                 ['<p>[NOTE: Creator should fill this in]</p> 😍']),
-            skill_domain.Rubric( # type: ignore[no-untyped-call]
+            skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[1],
                 ['<p>[NOTE: Creator should fill this in]</p> 😍']),
-            skill_domain.Rubric( # type: ignore[no-untyped-call]
+            skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[2],
                 ['<p>[NOTE: Creator should fill this in]</p> 😍'])]
 
         default_skill = (
-            skill_domain.Skill.create_default_skill( # type: ignore[no-untyped-call]
+            skill_domain.Skill.create_default_skill(
                 skill_id, 'Description 😍', rubrics))
 
         caching_services.set_multi(
@@ -840,7 +840,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             default_skill.to_dict(),
-            skills[skill_id].to_dict()) # type: ignore[no-untyped-call]
+            skills[skill_id].to_dict())
 
     def test_topics_with_unicode_characters_are_set_and_get_correctly(
         self

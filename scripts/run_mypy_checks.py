@@ -47,8 +47,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/auth_services_test.py',
     'core/domain/blog_services.py',
     'core/domain/blog_services_test.py',
-    'core/domain/caching_services.py',
-    'core/domain/caching_services_test.py',
     'core/domain/calculation_registry.py',
     'core/domain/calculation_registry_test.py',
     'core/domain/change_domain.py',

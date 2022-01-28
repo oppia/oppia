@@ -149,7 +149,7 @@ DESERIALIZATION_FUNCTIONS: DeserializationFunctionsDict = {
 SERIALIZATION_FUNCTIONS: SerializationFunctionsDict = {
     CACHE_NAMESPACE_COLLECTION: lambda x: cast(str, x.serialize()), # type: ignore[no-untyped-call]
     CACHE_NAMESPACE_EXPLORATION: lambda x: cast(str, x.serialize()), # type: ignore[no-untyped-call]
-    CACHE_NAMESPACE_SKILL: lambda x: cast(str, x.serialize()), # type: ignore[no-untyped-call]
+    CACHE_NAMESPACE_SKILL: lambda x: x.serialize(),
     CACHE_NAMESPACE_STORY: lambda x: cast(str, x.serialize()), # type: ignore[no-untyped-call]
     CACHE_NAMESPACE_TOPIC: lambda x: cast(str, x.serialize()), # type: ignore[no-untyped-call]
     CACHE_NAMESPACE_PLATFORM_PARAMETER: lambda x: cast(str, x.serialize()), # type: ignore[no-untyped-call]
