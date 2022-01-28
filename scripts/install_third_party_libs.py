@@ -283,7 +283,7 @@ def move_all_proto_files_to_third_party():
     # then delete it. We are keeping all the proto files under
     # the root folder directly to solve the proto compilation issue.
     # See: https://github.com/protocolbuffers/protobuf/issues/1491
-    if os.path.isdir(os.path.join(oppia_proto_api_path, 'org')):
+    if os.path.exists(os.path.join(oppia_proto_api_path, 'org')):
         shutil.rmtree(oppia_proto_api_path + '/org')
 
 

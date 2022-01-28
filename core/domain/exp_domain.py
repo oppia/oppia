@@ -1306,6 +1306,9 @@ class Exploration:
         """
         return self.is_demo_exploration_id(self.id)
 
+    # This property is only meant to be used for oppia-android.
+    # This property gives the information about the proto size in bytes of the
+    # exploration, which is used in the oppia-android application.
     @property
     def android_proto_size_in_bytes(self):
         """Returns the most up-to-date size of the exploration proto,
