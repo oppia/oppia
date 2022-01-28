@@ -484,8 +484,6 @@ describe('Story Viewer Page component', () => {
       expect(component.iconUrl === '');
     }));
 
-<<<<<<< HEAD
-=======
   it('should close the login overlay', fakeAsync(()=>{
     spyOn(component, 'hideLoginOverlay').and.callThrough();
 
@@ -525,7 +523,7 @@ describe('Story Viewer Page component', () => {
 
     expect(component.skipButton.nativeElement.focus).toHaveBeenCalled();
   }));
->>>>>>> upstream/develop
+
   it('should check if hacky translation is displayed correctly', () => {
     spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
       .and.returnValues(false, true, false, true);
