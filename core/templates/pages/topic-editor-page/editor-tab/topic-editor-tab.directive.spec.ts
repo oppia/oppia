@@ -392,7 +392,7 @@ describe('Topic editor tab directive', function() {
       expect(topicPageTitleFragmentForWebSpy).not.toHaveBeenCalled();
     });
 
-  it('should set the practice tab as displayed if there are the defined ' +
+  fit('should set the practice tab as displayed if there are the defined ' +
   'minimum number of practice questions in the topic', function() {
     var topicPracticeTabSpy = (
       spyOn(TopicUpdateService, 'setPracticeTabIsDisplayed'));
@@ -402,18 +402,6 @@ describe('Topic editor tab directive', function() {
     $scope.skillQuestionCountDict = {skill1: 3, skill2: 7};
     $scope.updatePracticeTabIsDisplayed(true);
     expect(topicPracticeTabSpy).toHaveBeenCalled();
-  });
-
-  it('should not call the TopicUpdateService if practice tab is displayed ' +
-    'property is same', function() {
-    var topicPracticeTabSpy = (
-      spyOn(TopicUpdateService, 'setPracticeTabIsDisplayed'));
-    $scope.skillQuestionCountDict = {skill1: 3, skill2: 7};
-    $scope.updatePracticeTabIsDisplayed(true);
-    expect(topicPracticeTabSpy).toHaveBeenCalled();
-    topicPracticeTabSpy.calls.reset();
-    $scope.updatePracticeTabIsDisplayed(true);
-    expect(topicPracticeTabSpy).not.toHaveBeenCalled();
   });
 
   it('should call the TopicUpdateService if skill is deleted from topic',

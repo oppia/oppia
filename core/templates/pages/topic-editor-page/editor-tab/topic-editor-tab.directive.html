@@ -177,7 +177,7 @@
       <div ng-if="subtopicsListIsShown" class="oppia-mobile-collapsible-card-content">
         <div>
           <label>
-            <input class="practice-tab-checkbox protractor-test-toggle-practice-tab" type="checkbox" ng-model="editablePracticeIsDisplayed" ng-change="updatePracticeTabIsDisplayed(editablePracticeIsDisplayed)" ng-disabled="!topicRights.canEditTopic() || !topicHasMinimumPracticeQuestions()">
+            <input class="practice-tab-checkbox protractor-test-toggle-practice-tab" type="checkbox" ng-model="editablePracticeIsDisplayed" ng-change="updatePracticeTabIsDisplayed(editablePracticeIsDisplayed)" ng-disabled="!topicRights.canEditTopic() || (!editablePracticeIsDisplayed && !topicHasMinimumPracticeQuestions())">
             <span class="practice-tab-text"> Show Practice Tab to learners.</span>
           </label>
           <i class="fas fa-info-circle practice-tab-info-circle" title="This setting show/hides the practice tab in the topic viewer page. This can only be enabled if there are at least 10 questions attached to the topic."></i>

@@ -334,14 +334,17 @@ angular.module('oppia').directive('topicEditorTab', [
             }
           };
 
+          // Only update the topic if 1) the creator is turning off the
+          // practice tab or 2) the creator is turning on the practice tab
+          // and it has enough practice questions.
           $scope.updatePracticeTabIsDisplayed = function(
               newPracticeTabIsDisplayed) {
-            if (newPracticeTabIsDisplayed !==
-              $scope.topic.getPracticeTabIsDisplayed() &&
+            if (!newPracticeTabIsDisplayed ||
               $scope.topicHasMinimumQuestionsToPractice()
             ) {
               TopicUpdateService.setPracticeTabIsDisplayed(
                 $scope.topic, newPracticeTabIsDisplayed);
+              $scope.editablePracticeIsDisplayed = newPracticeTabIsDisplayed;
             }
           };
 
