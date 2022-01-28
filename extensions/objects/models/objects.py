@@ -306,6 +306,9 @@ class CodeString(BaseObject):
 
         Returns:
             unicode. The normalized object containing string in unicode format.
+
+        Raises:
+            TypeError. Unexpected tab characters in given python object 'raw'.
         """
         if '\t' in raw:
             raise TypeError(
@@ -1515,6 +1518,10 @@ class BaseTranslatableObject(BaseObject):
 
         Returns:
             *. The normalized value.
+
+        Raises:
+            NotImplementedError. The _value_key_name or _value_schema
+                is not set.
         """
         if cls._value_key_name is None or cls._value_schema is None:
             raise NotImplementedError(
@@ -1528,6 +1535,10 @@ class BaseTranslatableObject(BaseObject):
 
         Returns:
             dict. The object schema.
+
+        Raises:
+            NotImplementedError. The _value_key_name or _value_schema
+                is not set.
         """
         if cls._value_key_name is None or cls._value_schema is None:
             raise NotImplementedError(
@@ -1605,6 +1616,9 @@ class JsonEncodedInString(BaseObject):
         Returns:
             *. The normalized value of any type, it depends on the raw value
             which we want to load from json.
+
+        Raises:
+            Exception. Given strings are not of type str.
         """
         if not isinstance(raw, str):
             raise Exception('Expected string received %s of type %s' % (
