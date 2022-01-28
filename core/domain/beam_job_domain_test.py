@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import datetime
+from xml.parsers.expat import model
 
 from core import utils
 from core.domain import beam_job_domain
