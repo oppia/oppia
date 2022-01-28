@@ -1328,277 +1328,6 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
     RANDOM_USER_EMAIL = 'randomuser@example.com'
     RANDOM_USER_USERNAME = 'randomuser'
 
-    def test_for_assign_role_for_exploration(self):
-        """Test exploration rights handler for assign role for exploration."""
-        # Create several users.
-        self.signup(
-            self.COLLABORATOR_EMAIL, self.COLLABORATOR_USERNAME)
-        self.signup(
-            self.COLLABORATOR2_EMAIL, self.COLLABORATOR2_USERNAME)
-        self.signup(
-            self.COLLABORATOR3_EMAIL, self.COLLABORATOR3_USERNAME)
-        self.signup(
-            self.COLLABORATOR4_EMAIL, self.COLLABORATOR4_USERNAME)
-
-        # Owner creates exploration.
-        self.login(self.OWNER_EMAIL)
-        exp_id = 'eid'
-        self.save_new_valid_exploration(
-            exp_id, self.owner_id, title='Title for rights handler test!',
-            category='My category')
-
-        exploration = exp_fetchers.get_exploration_by_id(exp_id)
-        exploration.add_states(['State A', 'State 2', 'State 3'])
-        self.set_interaction_for_state(
-            exploration.states['State A'], 'TextInput')
-        self.set_interaction_for_state(
-            exploration.states['State 2'], 'TextInput')
-        self.set_interaction_for_state(
-            exploration.states['State 3'], 'TextInput')
-
-        csrf_token = self.get_new_csrf_token()
-
-        # Owner adds rights for other users.
-        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
-        self.put_json(
-            rights_url, {
-                'version': exploration.version,
-                'new_member_username': self.VIEWER_USERNAME,
-                'new_member_role': rights_domain.ROLE_VIEWER
-            }, csrf_token=csrf_token)
-        self.put_json(
-            rights_url, {
-                'version': exploration.version,
-                'new_member_username': self.COLLABORATOR_USERNAME,
-                'new_member_role': rights_domain.ROLE_EDITOR
-            }, csrf_token=csrf_token)
-        self.put_json(
-            rights_url, {
-                'version': exploration.version,
-                'new_member_username': self.COLLABORATOR2_USERNAME,
-                'new_member_role': rights_domain.ROLE_EDITOR
-            }, csrf_token=csrf_token)
-        self.put_json(
-            rights_url, {
-                'version': exploration.version,
-                'new_member_username': self.COLLABORATOR4_USERNAME,
-                'new_member_role': rights_domain.ROLE_EDITOR
-            }, csrf_token=csrf_token)
-        self.logout()
-
-        # Check that viewer can access editor page but cannot edit.
-        self.login(self.VIEWER_EMAIL)
-        self.assert_cannot_edit(exp_id)
-        self.assert_cannot_voiceover(exp_id)
-        self.logout()
-
-        # Check that COLLABORATOR 4, who cannot edit but can voiceover,
-        # cannot add a new State 6.
-        self.login(self.COLLABORATOR4_EMAIL)
-        csrf_token = self.get_new_csrf_token()
-
-        reader_dict = self.get_json(
-            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
-        self.assertNotIn('State 4', reader_dict['states'])
-
-        # Since check_can_edit_activity always return False,
-        # the user will behave as a voiceover artist.
-        get_voiceover_swap = self.swap_to_always_return(
-            rights_manager, 'check_can_edit_activity', value=False)
-
-        with get_voiceover_swap:
-            self.assert_cannot_edit(exp_id)
-            self.assert_can_voiceover(exp_id)
-
-            self.put_json(
-                '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id),
-                {
-                    'version': exploration.version,
-                    'commit_message': 'Added State 4',
-                    'change_list': [{
-                        'cmd': 'add_state',
-                        'state_name': 'State 4'
-                    }]
-                },
-                csrf_token=csrf_token,
-                expected_status_int=500
-            )
-
-            reader_dict = self.get_json(
-                '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
-            self.assertNotIn('State 4', reader_dict['states'])
-            self.assertNotIn(
-                self.COLLABORATOR3_USERNAME,
-                reader_dict['rights']['editor_names']
-            )
-
-            # Check that collaborator 4 cannot add new members.
-            exploration = exp_fetchers.get_exploration_by_id(exp_id)
-            rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
-            response = self.put_json(
-                rights_url, {
-                    'version': exploration.version,
-                    'new_member_username': self.COLLABORATOR3_USERNAME,
-                    'new_member_role': rights_domain.ROLE_EDITOR,
-                },
-                csrf_token=csrf_token,
-                expected_status_int=401
-            )
-            error_msg = (
-                'You do not have credentials to change rights '
-                'for this exploration.'
-            )
-            self.assertEqual(response['error'], error_msg)
-            reader_dict = self.get_json(
-                '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
-            self.assertNotIn(
-                self.COLLABORATOR3_USERNAME,
-                reader_dict['rights']['editor_names']
-            )
-
-        self.logout()
-
-        # Check that collaborator can access editor page and can edit.
-        self.login(self.COLLABORATOR_EMAIL)
-        self.assert_can_edit(exp_id)
-        self.assert_can_voiceover(exp_id)
-        csrf_token = self.get_new_csrf_token()
-
-        reader_dict = self.get_json(
-            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
-        self.assertNotIn('State 4', reader_dict['states'])
-        self.assertNotIn(
-            self.COLLABORATOR3_USERNAME,
-            reader_dict['rights']['editor_names']
-        )
-
-        # Check that collaborator can add a new state called 'State 4'.
-        response_dict = self.put_json(
-            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id),
-            {
-                'version': exploration.version,
-                'commit_message': 'Added State 4',
-                'change_list': [{
-                    'cmd': 'add_state',
-                    'state_name': 'State 4'
-                }]
-            },
-            csrf_token=csrf_token,
-            expected_status_int=200
-        )
-        self.assertIn('State 4', response_dict['states'])
-
-        # Check that collaborator cannot add new members.
-        exploration = exp_fetchers.get_exploration_by_id(exp_id)
-        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
-        response = self.put_json(
-            rights_url, {
-                'version': exploration.version,
-                'new_member_username': self.COLLABORATOR3_USERNAME,
-                'new_member_role': rights_domain.ROLE_EDITOR,
-            }, csrf_token=csrf_token,
-            expected_status_int=401)
-        error_msg = (
-            'You do not have credentials to change rights '
-            'for this exploration.'
-        )
-        self.assertEqual(response['error'], error_msg)
-        reader_dict = self.get_json(
-            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
-        self.assertNotIn(
-            self.COLLABORATOR3_USERNAME,
-            reader_dict['rights']['editor_names']
-        )
-
-        self.logout()
-
-        # Check that collaborator2 can access editor page and can edit.
-        self.login(self.COLLABORATOR2_EMAIL)
-        self.get_html_response('/create/%s' % exp_id)
-        self.assert_can_edit(exp_id)
-        csrf_token = self.get_new_csrf_token()
-
-        reader_dict = self.get_json(
-            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
-        self.assertNotIn('State 5', reader_dict['states'])
-        self.assertNotIn(
-            self.COLLABORATOR3_USERNAME,
-            reader_dict['rights']['editor_names']
-        )
-
-        # Check that collaborator2 can add a new state called 'State 5'.
-        response_dict = self.put_json(
-            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id),
-            {
-                'version': exploration.version,
-                'commit_message': 'Added State 5',
-                'change_list': [{
-                    'cmd': 'add_state',
-                    'state_name': 'State 5'
-                }]
-            },
-            csrf_token=csrf_token,
-            expected_status_int=200
-        )
-        self.assertIn('State 5', response_dict['states'])
-
-        # Check that collaborator2 cannot add new members.
-        exploration = exp_fetchers.get_exploration_by_id(exp_id)
-        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
-        response = self.put_json(
-            rights_url, {
-                'version': exploration.version,
-                'new_member_username': self.COLLABORATOR3_USERNAME,
-                'new_member_role': rights_domain.ROLE_EDITOR,
-                }, csrf_token=csrf_token, expected_status_int=401)
-        error_msg = (
-            'You do not have credentials to change rights '
-            'for this exploration.'
-        )
-        self.assertEqual(response['error'], error_msg)
-        reader_dict = self.get_json(
-            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
-        self.assertNotIn(
-            self.COLLABORATOR3_USERNAME,
-            reader_dict['rights']['editor_names']
-        )
-
-        self.logout()
-
-        # Check that existing editor can be assigned to any other role.
-        self.login(self.OWNER_EMAIL)
-        csrf_token = self.get_new_csrf_token()
-
-        reader_dict = self.get_json(
-            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
-        self.assertIn(
-            self.COLLABORATOR_USERNAME,
-            reader_dict['rights']['editor_names']
-        )
-        self.assertNotIn(
-            self.COLLABORATOR_USERNAME,
-            reader_dict['rights']['owner_names']
-        )
-
-        self.put_json(
-            rights_url, {
-                'version': exploration.version,
-                'new_member_username': self.COLLABORATOR_USERNAME,
-                'new_member_role': rights_domain.ROLE_OWNER
-            }, csrf_token=csrf_token)
-
-        reader_dict = self.get_json(
-            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
-        self.assertIn(
-            self.COLLABORATOR_USERNAME,
-            reader_dict['rights']['owner_names']
-        )
-        self.assertNotIn(
-            self.COLLABORATOR_USERNAME,
-            reader_dict['rights']['editor_names']
-        )
-        self.logout()
-
     def test_for_deassign_editor_role(self):
         self.signup(
             self.COLLABORATOR_EMAIL, self.COLLABORATOR_USERNAME)
@@ -1752,6 +1481,258 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         self.get_json(
             '%s/%s' % (feconf.USER_PERMISSIONS_URL_PREFIX, exp_id),
             expected_status_int=404)
+        self.logout()
+
+    def test_exploration_editing_rights_of_an_editor(self):
+        self.signup(
+            self.COLLABORATOR_EMAIL, self.COLLABORATOR_USERNAME)
+        self.signup(
+            self.COLLABORATOR2_EMAIL, self.COLLABORATOR2_USERNAME)
+
+        self.login(self.OWNER_EMAIL)
+        exp_id = 'eid'
+        self.save_new_valid_exploration(
+            exp_id, self.owner_id, title='Title for rights handler test!',
+            category='My category')
+
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        exploration.add_states(['State A'])
+
+        csrf_token = self.get_new_csrf_token()
+
+        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
+        self.put_json(
+            rights_url, {
+                'version': exploration.version,
+                'new_member_username': self.COLLABORATOR_USERNAME,
+                'new_member_role': rights_domain.ROLE_EDITOR
+            }, csrf_token=csrf_token)
+
+        # Check that collaborator can add a new state called 'State B'.
+        self.login(self.COLLABORATOR_EMAIL)
+        self.assert_can_edit(exp_id)
+        self.assert_can_voiceover(exp_id)
+        csrf_token = self.get_new_csrf_token()
+
+        reader_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        self.assertNotIn('State B', reader_dict['states'])
+
+        response = self.put_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id),
+            {
+                'version': exploration.version,
+                'commit_message': 'Added State B',
+                'change_list': [{
+                    'cmd': 'add_state',
+                    'state_name': 'State B'
+                }]
+            },
+            csrf_token=csrf_token,
+            expected_status_int=200
+        )
+        self.assertIn('State B', response['states'])
+
+        # Check that collaborator cannot add new members.
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
+
+        reader_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        self.assertNotIn(
+            self.COLLABORATOR2_USERNAME,
+            reader_dict['rights']['editor_names']
+        )
+
+        response = self.put_json(
+            rights_url, {
+                'version': exploration.version,
+                'new_member_username': self.COLLABORATOR2_USERNAME,
+                'new_member_role': rights_domain.ROLE_EDITOR,
+            }, csrf_token=csrf_token,
+            expected_status_int=401
+        )
+        error_msg = (
+            'You do not have credentials to change rights '
+            'for this exploration.'
+        )
+        self.assertEqual(response['error'], error_msg)
+        reader_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        self.assertNotIn(
+            self.COLLABORATOR2_USERNAME,
+            reader_dict['rights']['editor_names']
+        )
+        self.logout()
+
+    def test_exploration_editing_rights_of_a_viewer(self):
+        self.signup(
+            self.COLLABORATOR_EMAIL, self.COLLABORATOR_USERNAME)
+        self.signup(
+            self.COLLABORATOR2_EMAIL, self.COLLABORATOR2_USERNAME)
+
+        self.login(self.OWNER_EMAIL)
+        exp_id = 'eid'
+        self.save_new_valid_exploration(
+            exp_id, self.owner_id, title='Title for rights handler test!',
+            category='My category')
+
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        exploration.add_states(['State A'])
+
+        csrf_token = self.get_new_csrf_token()
+
+        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
+        self.put_json(
+            rights_url, {
+                'version': exploration.version,
+                'new_member_username': self.COLLABORATOR_USERNAME,
+                'new_member_role': rights_domain.ROLE_VIEWER
+            }, csrf_token=csrf_token)
+
+        # Check that collaborator cannot add a new state called 'State B'.
+        self.login(self.COLLABORATOR_EMAIL)
+        self.assert_cannot_edit(exp_id)
+        self.assert_cannot_voiceover(exp_id)
+        csrf_token = self.get_new_csrf_token()
+
+        reader_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        self.assertNotIn('State B', reader_dict['states'])
+
+        response = self.put_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id),
+            {
+                'version': exploration.version,
+                'commit_message': 'Added State B',
+                'change_list': [{
+                    'cmd': 'add_state',
+                    'state_name': 'State B'
+                }]
+            },
+            csrf_token=csrf_token,
+            expected_status_int=401
+        )
+        error_msg = (
+            'You do not have permissions to save this exploration.'
+        )
+        self.assertEqual(response['error'], error_msg)
+        reader_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        self.assertNotIn('State B', reader_dict['states'])
+
+        # Check that collaborator cannot add new members.
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
+
+        reader_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        self.assertNotIn(
+            self.COLLABORATOR2_USERNAME,
+            reader_dict['rights']['editor_names']
+        )
+
+        response = self.put_json(
+            rights_url, {
+                'version': exploration.version,
+                'new_member_username': self.COLLABORATOR2_USERNAME,
+                'new_member_role': rights_domain.ROLE_EDITOR,
+            }, csrf_token=csrf_token,
+            expected_status_int=401
+        )
+        error_msg = (
+            'You do not have credentials to change rights '
+            'for this exploration.'
+        )
+        self.assertEqual(response['error'], error_msg)
+        reader_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        self.assertNotIn(
+            self.COLLABORATOR2_USERNAME,
+            reader_dict['rights']['editor_names']
+        )
+        self.logout()
+
+    def test_exploration_editing_rights_of_a_voiceover_artist(self):
+        self.signup(
+            self.COLLABORATOR2_EMAIL, self.COLLABORATOR2_USERNAME)
+
+        self.login(self.OWNER_EMAIL)
+        exp_id = 'eid'
+        self.save_new_valid_exploration(
+            exp_id, self.owner_id, title='Title for rights handler test!',
+            category='My category')
+
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        exploration.add_states(['State A'])
+
+        rights_manager.publish_exploration(self.owner, exp_id)
+        rights_manager.assign_role_for_exploration(
+            self.voiceover_admin, exp_id, self.voice_artist_id,
+            rights_domain.ROLE_VOICE_ARTIST)
+
+        voiceover_artist_email = user_services.get_email_from_user_id(
+            self.voice_artist_id)
+
+        # Check that voiceover artist cannot add a new state
+        # called 'State B'.
+        self.login(voiceover_artist_email)
+        self.assert_cannot_edit(exp_id)
+        self.assert_can_voiceover(exp_id)
+        csrf_token = self.get_new_csrf_token()
+
+        reader_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        self.assertNotIn('State B', reader_dict['states'])
+
+        self.put_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id),
+            {
+                'version': exploration.version,
+                'commit_message': 'Added State B',
+                'change_list': [{
+                    'cmd': 'add_state',
+                    'state_name': 'State B'
+                }]
+            },
+            csrf_token=csrf_token,
+            expected_status_int=500
+        )
+        reader_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        self.assertNotIn('State B', reader_dict['states'])
+
+        # Check that voice artist cannot add new members.
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
+
+        reader_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        self.assertNotIn(
+            self.COLLABORATOR2_USERNAME,
+            reader_dict['rights']['editor_names']
+        )
+
+        response = self.put_json(
+            rights_url, {
+                'version': exploration.version,
+                'new_member_username': self.COLLABORATOR2_USERNAME,
+                'new_member_role': rights_domain.ROLE_EDITOR,
+            },
+            csrf_token=csrf_token,
+            expected_status_int=401
+        )
+        error_msg = (
+            'You do not have credentials to change rights '
+            'for this exploration.'
+        )
+        self.assertEqual(response['error'], error_msg)
+        reader_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        self.assertNotIn(
+            self.COLLABORATOR2_USERNAME,
+            reader_dict['rights']['editor_names']
+        )
         self.logout()
 
     def test_for_checking_username_is_valid(self):
