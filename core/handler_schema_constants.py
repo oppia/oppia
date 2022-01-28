@@ -38,7 +38,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'EditableQuestionDataHandler',
     'EditableSkillDataHandler',
     'EditableStoryDataHandler',
-    'ExplorationEmbedPage',
     'ExportAccountHandler',
     'FeedbackThreadStatusChangeEmailHandler',
     'FlagExplorationEmailHandler',
