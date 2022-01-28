@@ -20,12 +20,16 @@
 
 import { TestBed } from '@angular/core/testing';
 import { FatigueDetectionService } from 'pages/exploration-player-page/services/fatigue-detection.service';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
-
-describe('Fatigue detection service', () => {
+// eslint-disable-next-line oppia/no-test-blockers
+fdescribe('Fatigue detection service', () => {
   let fatigueDetectionService: FatigueDetectionService;
+  let ngbModal: NgbModal;
+
   beforeEach(() => {
-    fatigueDetectionService = TestBed.get(FatigueDetectionService);
+    fatigueDetectionService = TestBed.inject(FatigueDetectionService);
+    ngbModal = TestBed.inject(NgbModal);
   });
 
   beforeEach(() => {
@@ -100,5 +104,16 @@ describe('Fatigue detection service', () => {
 
       expect(fatigueDetectionService.isSubmittingTooFast()).toBe(false);
     });
+  });
+
+  it('should display take break message', () => {
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
+      return {
+        result: Promise.resolve()
+      } as NgbModalRef;
+    });
+    fatigueDetectionService.displayTakeBreakMessage();
+
+    expect(modalSpy).toHaveBeenCalled();
   });
 });
