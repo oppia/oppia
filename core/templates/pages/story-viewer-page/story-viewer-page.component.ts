@@ -16,7 +16,7 @@
  * @fileoverview Component for the main page of the story viewer.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { UrlService } from 'services/contextual/url.service';
@@ -44,6 +44,9 @@ interface IconParametersArray {
   templateUrl: './story-viewer-page.component.html'
 })
 export class StoryViewerPageComponent implements OnInit {
+  @ViewChild('overlay') overlay: ElementRef<HTMLDivElement>;
+  @ViewChild('skip') skipButton: ElementRef<HTMLButtonElement>;
+  showLoginOverlay: boolean = true;
   storyPlaythroughObject: StoryPlaythrough;
   storyId: string;
   storyIsLoaded: boolean;
@@ -75,6 +78,17 @@ export class StoryViewerPageComponent implements OnInit {
     private alertsService: AlertsService,
     private i18nLanguageCodeService: I18nLanguageCodeService
   ) {}
+
+  focusSkipButton(eventTarget: Element, isLoggedIn: boolean): void {
+    if (isLoggedIn || !this.showLoginOverlay) {
+      return;
+    }
+    const target = eventTarget;
+    if (target.closest('.story-viewer-login-container') !==
+        this.overlay.nativeElement) {
+      this.skipButton.nativeElement.focus();
+    }
+  }
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
@@ -110,6 +124,10 @@ export class StoryViewerPageComponent implements OnInit {
       });
     }
     return iconParametersArray;
+  }
+
+  hideLoginOverlay(): void {
+    this.showLoginOverlay = false;
   }
 
   signIn(): void {

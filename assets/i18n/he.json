@@ -243,6 +243,8 @@
 	"I18N_PREFERENCES_CANCEL_BUTTON": "ביטול",
 	"I18N_PREFERENCES_CHANGE_PICTURE": "החלפת תמונת פרופיל",
 	"I18N_PREFERENCES_EMAIL": "דוא״ל",
+	"I18N_PREFERENCES_EXPORT_ACCOUNT": "ייצוא חשבון",
+	"I18N_PREFERENCES_SEARCH_LABEL": "חיפוש",
 	"I18N_SPLASH_BENEFITS_ONE": "למידה מותאמת אישית",
 	"I18N_SPLASH_BENEFITS_THREE": "שיעורי שקל לעקוב אחריהם",
 	"I18N_SPLASH_BENEFITS_TITLE": "היתרונות שלנו",
@@ -273,5 +275,6 @@
 	"I18N_SPLASH_VOLUNTEERS_CONTENT": "לא משנה מי אתה או את, יש לך בית ב־Oppia. אנו תמיד צריכים אנשים נוספים לשיפור השיעורים על ידי הצעת שאלות, תרומת עזרים חזותיים או תרגום שיעורים.",
 	"I18N_SPLASH_VOLUNTEERS_TITLE": "מופעל על ידי הקהילה",
 	"I18N_START_HERE": "התחל כאן!",
-	"I18N_STORY_VIEWER_COMPLETED_CHAPTER": "<[title]> - הושלם!"
+	"I18N_STORY_VIEWER_COMPLETED_CHAPTER": "<[title]> - הושלם!",
+	"I18N_TOPIC_VIEWER_COMING_SOON": "בקרוב!"
 }
