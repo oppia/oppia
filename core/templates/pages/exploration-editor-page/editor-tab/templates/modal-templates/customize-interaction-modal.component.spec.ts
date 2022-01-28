@@ -16,9 +16,8 @@
  * @fileoverview Unit tests for CustomizeInteractionModalComponent.
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal, NgbModal, NgbModalModule, NgbModalRef, NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { Subscription } from 'rxjs';
 import { ChangeDetectorRef, EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
@@ -26,23 +25,45 @@ import { CustomizeInteractionModalComponent } from './customize-interaction-moda
 import { InteractionDetailsCacheService } from 'pages/exploration-editor-page/editor-tab/services/interaction-details-cache.service';
 import { StateCustomizationArgsService } from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { StateNextContentIdIndexService } from 'components/state-editor/state-editor-properties-services/state-next-content-id-index.service';
 import { EditorFirstTimeEventsService } from 'pages/exploration-editor-page/services/editor-first-time-events.service';
-import { ImageClickInputValidationService } from 'interactions/ImageClickInput/directives/image-click-input-validation.service';
 import { InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
-import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
-import { SubtitledUnicode, SubtitledUnicodeObjectFactory } from 'domain/exploration/SubtitledUnicodeObjectFactory';
+import { SubtitledUnicodeObjectFactory } from 'domain/exploration/SubtitledUnicodeObjectFactory';
 import { ContextService } from 'services/context.service';
 import { AppConstants } from 'app.constants';
-import { StatePropertyService } from 'components/state-editor/state-editor-properties-services/state-property.service';
+import { RatioExpressionInputValidationService } from 'interactions/RatioExpressionInput/directives/ratio-expression-input-validation.service';
 
 class MockStateCustomizationArgsService {
   displayed = {
     placeholder: {
-      value: undefined
+      value: {
+        _contentId: 'ca_placeholder_0',
+        _unicode: '2:3',
+        contentId: 'ca_placeholder_0',
+        unicode: '2:3',
+      }
     },
     numberOfTerms: {
-      value: undefined
+      value: 0
+    },
+    hasOwnProperty(argName) {
+      return true;
+    }
+  };
+
+  savedMemento = {
+    placeholder: {
+      value: {
+        _contentId: 'ca_placeholder_0',
+        _unicode: '2:3',
+        contentId: 'ca_placeholder_0',
+        unicode: '2:3',
+      }
+    },
+    numberOfTerms: {
+      value: 0
+    },
+    hasOwnProperty(argName) {
+      return true;
     }
   };
 
@@ -51,31 +72,52 @@ class MockStateCustomizationArgsService {
   }
 }
 
-class MockStateInteractionIdService {
-  displayed = 'RatioExpressionInput';
-}
+const mockInteractionState = {
+  RatioExpressionInput: {
+    description: 'xyz',
+    id: 'RatioExpressionInput',
+    customization_arg_specs: [
+      {
+        description: 'Custom placeholder text (optional)',
+        name: 'placeholder',
+        schema: {
+          type: 'custom',
+          obj_type: 'SubtitledUnicode'
+        },
+        default_value: {
+          content_id: null,
+          unicode_str: ''
+        }
+      }
+    ]
+  },
+};
 
 class MockChangeDetectorRef {
   detectChanges(): void {}
 }
 
+class MockStateEditorService {
+  isInQuestionMode(): boolean {
+    return true;
+  }
+}
+
 // eslint-disable-next-line oppia/no-test-blockers
 fdescribe('Customize Interaction Modal Component', () => {
-  const schemaBasedFormsSpy = jasmine.createSpy(
-    'schemaBasedFormsSpy');
-  const stateName = 'Introduction';
   let fixture: ComponentFixture<CustomizeInteractionModalComponent>;
   let component: CustomizeInteractionModalComponent;
   let changeDetectorRef: ChangeDetectorRef;
-  let testSubscriptions: Subscription;
-  let stateCustomizationArgsService: StateCustomizationArgsService;
   let stateEditorService: StateEditorService;
   let stateInteractionIdService: StateInteractionIdService;
   let interactionDetailsCacheService: InteractionDetailsCacheService;
-  let editorFirstTimeEventsService: EditorFirstTimeEventsService;
   let ngbActiveModal: NgbActiveModal;
+  let contextService: ContextService;
   let ngbModal: NgbModal;
+  let interactionObjectFactory: InteractionObjectFactory;
   let subtitledUnicodeObjectFactory: SubtitledUnicodeObjectFactory;
+  let ratioExpressionInputValidationService:
+   RatioExpressionInputValidationService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -97,14 +139,21 @@ fdescribe('Customize Interaction Modal Component', () => {
           useClass: MockStateCustomizationArgsService
         },
         {
-          provide: StateInteractionIdService,
-          useClass: MockStateInteractionIdService
+          provide: StateEditorService,
+          useClass: MockStateEditorService
         },
-        StateEditorService,
+        StateInteractionIdService,
+        InteractionObjectFactory,
         EditorFirstTimeEventsService,
         InteractionDetailsCacheService,
         SubtitledUnicodeObjectFactory,
-        NgbModal
+        NgbModal,
+        RatioExpressionInputValidationService,
+        ContextService,
+        {
+          provide: INTERACTION_SPECS,
+          useValue: mockInteractionState
+        }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -117,17 +166,35 @@ fdescribe('Customize Interaction Modal Component', () => {
     changeDetectorRef = TestBed.inject(ChangeDetectorRef);
     interactionDetailsCacheService =
       TestBed.inject(InteractionDetailsCacheService);
-    stateCustomizationArgsService =
-      TestBed.inject(StateCustomizationArgsService);
+    ngbModal = TestBed.inject(NgbModal);
+    ngbActiveModal = TestBed.inject(NgbActiveModal);
+    interactionObjectFactory =
+    TestBed.inject(InteractionObjectFactory);
+    stateEditorService = TestBed.inject(StateEditorService);
+    stateInteractionIdService = TestBed.inject(StateInteractionIdService);
+    contextService = TestBed.inject(ContextService);
     subtitledUnicodeObjectFactory =
       TestBed.inject(SubtitledUnicodeObjectFactory);
+    ratioExpressionInputValidationService = TestBed.inject(
+      RatioExpressionInputValidationService);
 
+    stateInteractionIdService.displayed = 'RatioExpressionInput';
     component.showMarkAllAudioAsNeedingUpdateModalIfRequired = () => {};
 
     fixture.detectChanges();
   });
 
-  beforeEach(() => {
+  it('should return the hyphenated category name as expected', () => {
+    const categoryName = 'Camel Case CATEGORY Name With Spaces';
+    expect(component.getHyphenatedLowercaseCategoryName(categoryName)).toBe(
+      'camel-case-category-name-with-spaces');
+  });
+
+  it('should get complete interaction thumbnail icon path corresponding to' +
+      ' a given relative path', () => {
+    const interactionId = 'i1';
+    expect(component.getInteractionThumbnailImageUrl(interactionId)).toBe(
+      '/extensions/interactions/i1/static/i1.png');
   });
 
   it('should be defined', () => {
@@ -137,6 +204,10 @@ fdescribe('Customize Interaction Modal Component', () => {
         'The number of terms should be a non-negative integer other than 1.'
       )
     }];
+
+    stateInteractionIdService.displayed = 'RatioExpressionInput';
+    spyOn(ratioExpressionInputValidationService, 'getCustomizationArgsWarnings')
+      .and.returnValue(warningListData);
 
     expect(component).toBeDefined();
     expect(component.getTitle('NumberWithUnits'))
@@ -194,23 +265,153 @@ fdescribe('Customize Interaction Modal Component', () => {
     expect(component.isinteractionOpen).toBeFalse();
   });
 
-  it('should open confirm leave modal when user click cancel', () => {
-    spyOn(ngbModal, 'open').and.returnValue({
-      result: Promise.resolve()
-    } as NgbModalRef);
-    spyOn(component, 'cancel').and.stub();
+  it('should close modal when user click close', fakeAsync(() => {
+    spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return ({
+        result: Promise.resolve()
+      } as NgbModalRef);
+    });
+    spyOn(ngbActiveModal, 'dismiss');
 
     component.cancelWithConfirm();
+    tick();
 
-    expect(component.cancel).toHaveBeenCalled();
-  });
+    expect(ngbActiveModal.dismiss).toHaveBeenCalled();
+  }));
 
-  it('should ngOnInit', () => {
-    jasmine.createSpy(stateInteractionIdService.displayed).and
-      .returnValue(undefined);
+  it('should stay in modal if user click cancel', fakeAsync(() => {
+    spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return ({
+        result: Promise.reject()
+      } as NgbModalRef);
+    });
+    spyOn(ngbActiveModal, 'dismiss');
 
-    component.ngOnInit();
+    component.cancelWithConfirm();
+    tick();
+
+    expect(ngbActiveModal.dismiss).not.toHaveBeenCalled();
+  }));
+
+  it('should display interaction content', () => {
+    component.isinteractionOpen = false;
+    expect(component.isinteractionOpen).toBeFalse();
+
+    component.returnToInteractionSelector();
 
     expect(component.isinteractionOpen).toBeTrue();
   });
+
+  it('should open save intreaction when user click on it', () => {
+    spyOn(interactionDetailsCacheService, 'contains').and
+      .returnValue(false);
+    spyOn(
+      interactionObjectFactory, 'convertFromCustomizationArgsBackendDict').and
+      .returnValue(false);
+
+    component.originalContentIdToContent =
+      subtitledUnicodeObjectFactory.createDefault('unicode', 'contentId');
+    component.onChangeInteractionId('RatioExpressionInput');
+
+    expect(component.hasCustomizationArgs).toBeFalse();
+    expect(component.isinteractionOpen).toBeFalse();
+  });
+
+  it('should show proper warning message on popover', fakeAsync(() => {
+    spyOn(ratioExpressionInputValidationService, 'getCustomizationArgsWarnings')
+      .and.returnValue(
+        [{
+          type: 'string',
+          message: 'warning 1'
+        },
+        {
+          type: 'string',
+          message: 'warning 2'
+        }]
+      );
+
+    component.hasCustomizationArgs = false;
+    tick();
+
+    expect(component.getSaveInteractionButtonTooltip()).toBe(
+      'No customization arguments');
+
+    component.hasCustomizationArgs = true;
+    stateInteractionIdService.displayed = undefined;
+    tick();
+
+    expect(component.getSaveInteractionButtonTooltip()).toBe(
+      'No interaction being displayed');
+
+    component.hasCustomizationArgs = true;
+    stateInteractionIdService.displayed = 'RatioExpressionInput';
+    tick();
+
+    expect(component.getSaveInteractionButtonTooltip()).toBe(
+      'warning 1 warning 2');
+  }));
+
+  it('should show proper popover if warningMessages array is empty',
+    fakeAsync(() => {
+      spyOn(
+        ratioExpressionInputValidationService, 'getCustomizationArgsWarnings')
+        .and.returnValue([]);
+
+      component.hasCustomizationArgs = true;
+      stateInteractionIdService.displayed = 'RatioExpressionInput';
+      tick();
+
+      expect(component.getSaveInteractionButtonTooltip()).toBe(
+        'Some of the form entries are invalid.');
+    }));
+
+  it('should properly open modal if editor is in' +
+    ' question mode and have intreaction', fakeAsync(() => {
+    stateInteractionIdService.displayed = 'RatioExpressionInput';
+    stateInteractionIdService.savedMemento = 'RatioExpressionInput';
+
+    component.ngOnInit();
+    tick();
+
+    expect(component.allowedInteractionCategories).toBe(
+      AppConstants.ALLOWED_QUESTION_INTERACTION_CATEGORIES);
+    expect(component.customizationModalReopened).toBeTrue();
+  }));
+
+  it('should properly open modal if editor is not in' +
+    ' question mode and linked to story', fakeAsync(() => {
+    spyOn(stateEditorService, 'isInQuestionMode')
+      .and.returnValue(false);
+    spyOn(contextService, 'isExplorationLinkedToStory').and.returnValue(true);
+    jasmine.createSpy(
+      'stateCustomizationArgsService.savedMemento.hasOwnProperty')
+      .and.returnValue(false);
+
+    stateInteractionIdService.displayed = 'RatioExpressionInput';
+    stateInteractionIdService.savedMemento = 'RatioExpressionInput';
+
+    component.ngOnInit();
+    tick();
+
+    expect(component.allowedInteractionCategories).toBe(
+      AppConstants.ALLOWED_EXPLORATION_IN_STORY_INTERACTION_CATEGORIES);
+    expect(component.customizationModalReopened).toBeTrue();
+  }));
+
+  it('should properly open modal if editor is not in' +
+    ' question mode and not linked to story', fakeAsync(() => {
+    spyOn(stateEditorService, 'isInQuestionMode')
+      .and.returnValue(false);
+    spyOn(contextService, 'isExplorationLinkedToStory').and.returnValue(false);
+
+    stateInteractionIdService.displayed = '';
+    stateInteractionIdService.savedMemento = '';
+
+    component.ngOnInit();
+    tick();
+
+    expect(component.isinteractionOpen).toBeTrue();
+    expect(component.allowedInteractionCategories).toBe(
+      AppConstants.ALLOWED_INTERACTION_CATEGORIES);
+  }));
 });

@@ -523,7 +523,6 @@ describe('Story Viewer Page component', () => {
 
     expect(component.skipButton.nativeElement.focus).toHaveBeenCalled();
   }));
-
   it('should check if hacky translation is displayed correctly', () => {
     spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
       .and.returnValues(false, true, false, true);

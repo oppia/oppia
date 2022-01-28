@@ -248,7 +248,7 @@ export class CustomizeInteractionModalComponent
       backdrop: 'static',
       keyboard: false,
     }).result.then(() => {
-      this.cancel();
+      this.ngbActiveModal.dismiss();
     }, () => {
       // Note to developers:
       // This callback is triggered when the Cancel button is clicked.
