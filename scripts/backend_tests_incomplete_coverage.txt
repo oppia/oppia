@@ -33,12 +33,10 @@ core.controllers.blog_homepage_test
 core.utils_test
 scripts.install_backend_python_libs_test
 core.domain.subtopic_page_domain_test
-core.domain.event_services_test
 core.domain.user_services_test
 core.storage.skill.gae_models_test
 core.storage.topic.gae_models_test
 core.domain.app_feedback_report_domain_test
-core.storage.question.gae_models_test
 core.domain.collection_services_test
 core.storage.collection.gae_models_test
 core.storage.email.gae_models_test
@@ -60,7 +58,6 @@ scripts.linters.pylint_extensions_test
 core.storage.suggestion.gae_models_test
 core.storage.app_feedback_report.gae_models_test
 core.jobs.job_test_utils_test
-core.jobs.job_utils_test
 core.domain.image_validation_services_test
 scripts.linters.js_ts_linter_test
 core.storage.audit.gae_models_test
