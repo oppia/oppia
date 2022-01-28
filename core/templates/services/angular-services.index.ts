@@ -395,6 +395,7 @@ import { ExplorationParamSpecsService } from 'pages/exploration-editor-page/serv
 import { ExplorationParamChangesService } from 'pages/exploration-editor-page/services/exploration-param-changes.service';
 import { ExplorationObjectiveService } from 'pages/exploration-editor-page/services/exploration-objective.service';
 import { ExplorationTitleService } from 'pages/exploration-editor-page/services/exploration-title.service';
+import { NumberConversionService } from './number-conversion.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -816,5 +817,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['UndoRedoService', UndoRedoService],
   ['QuestionValidationService', QuestionValidationService],
   ['CollectionEditorStateService', CollectionEditorStateService],
-  ['DeleteAccountBackendApiService', DeleteAccountBackendApiService]
+  ['DeleteAccountBackendApiService', DeleteAccountBackendApiService],
+  ['NumberConversionService', NumberConversionService]
 ];

@@ -24,17 +24,29 @@ import { ContextService } from './context.service';
 import { TestBed } from '@angular/core/testing';
 
 describe('NumberConversionService', () => {
-  let numberConversionService: NumberConversionService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let ctls: ContentTranslationLanguageService;
-  let elcs: ExplorationLanguageCodeService;
   let contextService: ContextService;
+  let numberConversionService: NumberConversionService;
+  let elcs: jasmine.SpyObj<ExplorationLanguageCodeService>;
 
   beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [NumberConversionService,
+        ContextService, I18nLanguageCodeService,
+        ContentTranslationLanguageService,
+        {
+          provide: ExplorationLanguageCodeService, useValue: jasmine
+            .createSpyObj(
+              'ExplorationLanguageCodeService', ['getCurrentLanguageCode'])
+        }
+      ]
+    });
     numberConversionService = TestBed.inject(NumberConversionService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     ctls = TestBed.inject(ContentTranslationLanguageService);
-    elcs = TestBed.inject(ExplorationLanguageCodeService);
+    // eslint-disable-next-line max-len
+    elcs = TestBed.inject(ExplorationLanguageCodeService) as jasmine.SpyObj<ExplorationLanguageCodeService>;
     contextService = TestBed.inject(ContextService);
   });
 
@@ -47,7 +59,7 @@ describe('NumberConversionService', () => {
     ctls.setCurrentContentLanguageCode('fr');
     expect(numberConversionService.currentDecimalSeparator()).toEqual(',');
 
-    spyOn(elcs, 'getCurrentLanguageCode').and.returnValue('ar');
+    elcs.getCurrentLanguageCode.and.returnValue('ar');
     expect(numberConversionService.currentDecimalSeparator()).toEqual('٫');
   });
 

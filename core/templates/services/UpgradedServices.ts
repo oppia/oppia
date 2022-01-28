@@ -261,6 +261,7 @@ import { NormalizeWhitespacePunctuationAndCasePipe } from
   'filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe';
 import { NumberAttemptsService } from
   'pages/exploration-player-page/services/number-attempts.service';
+import { NumberConversionService } from './number-conversion.service';
 import { NumericInputRulesService } from
   'interactions/NumericInput/directives/numeric-input-rules.service';
 import { NumericInputValidationService } from
@@ -1156,6 +1157,12 @@ export class UpgradedServices {
       new ExtensionTagAssemblerService(
         upgradedServices['HtmlEscaperService'],
         upgradedServices['CamelCaseToHyphensPipe']);
+    upgradedServices['NumberConversionService'] = new NumberConversionService(
+      upgradedServices['I18nLanguageCodeService'],
+      upgradedServices['ContentTranslationLanguageService'],
+      upgradedServices['ExplorationLanguageCodeService'],
+      upgradedServices['ContextService']
+    );
     upgradedServices['PlatformFeatureService'] = new PlatformFeatureService(
       upgradedServices['PlatformFeatureBackendApiService'],
       upgradedServices['WindowRef'],

@@ -24,11 +24,16 @@ import { NumberConversionService } from 'services/number-conversion.service';
 describe('ShortResponseNumericInput', () => {
   let component: ShortResponseNumericInput;
   let fixture: ComponentFixture<ShortResponseNumericInput>;
-  let numberConversionService: NumberConversionService;
 
   class mockHtmlEscaperService {
     escapedJsonToObj(answer: string): Object {
       return JSON.parse(answer);
+    }
+  }
+
+  class MockNumberConversionService {
+    convertToLocalizedNumber(number: number | string): string {
+      return String(number);
     }
   }
 
@@ -39,6 +44,10 @@ describe('ShortResponseNumericInput', () => {
         {
           provide: HtmlEscaperService,
           useClass: mockHtmlEscaperService
+        },
+        {
+          provide: NumberConversionService,
+          useClass: MockNumberConversionService
         }
       ],
     }).compileComponents();
@@ -47,14 +56,10 @@ describe('ShortResponseNumericInput', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(ShortResponseNumericInput);
     component = fixture.componentInstance;
-    numberConversionService = TestBed.inject(NumberConversionService);
   });
 
   it('should initialise component when users view previous responses', () => {
     component.answer = '20';
-
-    spyOn(numberConversionService, 'currentDecimalSeparator')
-      .and.returnValue('.');
 
     component.ngOnInit();
 
@@ -63,9 +68,6 @@ describe('ShortResponseNumericInput', () => {
 
   it('should not round of decimal answers', () => {
     component.answer = '24.5';
-
-    spyOn(numberConversionService, 'currentDecimalSeparator')
-      .and.returnValue('.');
 
     component.ngOnInit();
 
