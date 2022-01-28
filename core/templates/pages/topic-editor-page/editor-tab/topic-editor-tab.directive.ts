@@ -354,7 +354,7 @@ angular.module('oppia').directive('topicEditorTab', [
               numberOfPracticeQuestions >=
               topicConstants.TOPIC_MINIMUM_QUESTIONS_TO_PRACTICE
             );
-          }
+          };
 
           $scope.deleteUncategorizedSkillFromTopic = function(skillSummary) {
             TopicUpdateService.removeUncategorizedSkill(
