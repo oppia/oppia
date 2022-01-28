@@ -132,10 +132,10 @@ angular.module('oppia').directive('storyNodeEditor', [
                 $scope.skillInfoHasLoaded = true;
                 $rootScope.$applyAsync();
               });
-            for (var idx in skillSummaries) {  
-              $scope.skillIdToSummaryMap[skillSummaries[idx].id] =
-                skillSummaries[idx].description;              
-            }; 
+              for (let summary of skillSummaries) {
+                $scope.skillIdToSummaryMap[skillSummaries[summary].id] =
+                  skillSummaries[summary].description;           
+              }
             $scope.isStoryPublished = StoryEditorStateService.isStoryPublished;
             $scope.currentTitle = $scope.nodeIdToTitleMap[$scope.getId()];
             PageTitleService.setNavbarSubtitleForMobileView(
