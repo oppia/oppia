@@ -19,17 +19,14 @@
 from __future__ import annotations
 
 import datetime
+from pyexpat import model
 
 from core import utils
 from core.domain import beam_job_domain
 from core.jobs.batch_jobs import model_validation_jobs
 from core.tests import test_utils
 
-MYPY = False
-if MYPY:  # pragma: no cover
-    from mypy_imports import beam_job_models
-
-(beam_job_models,) = models.Registry.import_models([models.Names.BEAM_JOB])
+(beam_job_models,) = model.Registry.import_models([model.Names.BEAM_JOB])
 
 
 class BeamJobTests(test_utils.TestBase):

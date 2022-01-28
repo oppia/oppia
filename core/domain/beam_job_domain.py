@@ -27,10 +27,6 @@ from typing import Dict, List, Type, Union
 
 from core.platform import models  # pylint: disable=invalid-import-from # isort:skip
 
-MYPY = False
-if MYPY:  # pragma: no cover
-    from mypy_imports import beam_job_models
-
 (beam_job_models,) = models.Registry.import_models([models.Names.BEAM_JOB])
 
 
