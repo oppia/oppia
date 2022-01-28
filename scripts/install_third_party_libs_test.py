@@ -300,8 +300,16 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
                     [(True, 'mock_path')])
 
     def test_move_all_proto_files_to_third_party(self):
+        check_function_calls = {
+            'move_is_called': False,
+            'rmtree_is_called': False
+        }
         def mock_exists(unused_path):
             return False
+        def mock_move(unused_source_path, unused_destination_path):
+            check_function_calls['move_is_called'] = True
+        def mock_rmtree(unused_path):
+            check_function_calls['rmtree_is_called'] = True
 
         exists_swap = self.swap(os.path, 'exists', mock_exists)
 
@@ -309,10 +317,18 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             os.path.join(
                 common.THIRD_PARTY_DIR,
                 'oppia-proto-api-8f3cde883c31785438e80656a5b6bb26bd01b6a1'))
+        os.mkdir(os.path.join(oppia_proto_api_path, 'org'))
         with exists_swap:
-            install_third_party_libs.move_all_proto_files_to_third_party()
-            self.assertFalse(os.path.exists(
+            self.assertTrue(os.path.isdir(
                 os.path.join(oppia_proto_api_path, 'org')))
+
+        move_swap = self.swap(shutil, 'move', mock_move)
+        with move_swap:
+            install_third_party_libs.move_all_proto_files_to_third_party()
+            rmtree_swap = self.swap(shutil, 'rmtree', mock_rmtree)
+            with rmtree_swap:
+                self.assertFalse(os.path.isdir(
+                    os.path.join(oppia_proto_api_path, 'org')))
 
     def test_ensure_pip_library_is_installed(self):
         check_function_calls = {
