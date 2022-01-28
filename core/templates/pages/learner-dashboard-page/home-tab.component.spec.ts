@@ -216,7 +216,7 @@ describe('Home tab Component', () => {
     expect(component.getWidth(3)).toEqual(662);
   });
 
-  it('should show empty learne something new tab' +
+  it('should show empty learn something new tab' +
     '\'when goal selection limit is reached\'', () => {
     component.currentGoalsLength = constants.MAX_CURRENT_GOALS_COUNT;
 
@@ -227,7 +227,7 @@ describe('Home tab Component', () => {
     expect(component.isGoalLimitReached()).toBeTrue();
   });
 
-  it('should not show empty learne something new tab' +
+  it('should not show empty learn something new tab' +
     '\'when goal selection limit is not reached\'', () => {
     component.goalTopicsLength = 0;
     expect(component.isGoalLimitReached()).toBeFalse();
