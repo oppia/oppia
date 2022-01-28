@@ -93,7 +93,7 @@ export class NumberConversionService {
     }
   }
 
-  convertToEnglishDecimal(number: string): (null | number) {
+  convertToEnglishDecimal(number: string): number {
     const decimalSeparator = this.currentDecimalSeparator();
 
     // Check if number is in proper format.
@@ -108,13 +108,10 @@ export class NumberConversionService {
     let numMatch = null;
     numMatch = validMatch?.[0];
 
-    let numString = numMatch.replace(`${decimalSeparator}`, '.');
+    let numString = null;
+    numString = numMatch?.replace(`${decimalSeparator}`, '.');
     engNum = parseFloat(numString);
 
-    // If the input cannot be parsed, output null.
-    if (isNaN(engNum)) {
-      return null;
-    }
     return engNum;
   }
 

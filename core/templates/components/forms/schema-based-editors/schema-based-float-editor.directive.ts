@@ -113,6 +113,9 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
                 ctrl.localValue = NumberConversionService
                   .convertToEnglishDecimal(ctrl.localStringValue);
 
+                if (isNaN(ctrl.localValue)) {
+                  ctrl.localValue = null;
+                }
                 // Generate errors (if any).
                 ctrl.generateErrors();
               }
