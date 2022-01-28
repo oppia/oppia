@@ -27,7 +27,11 @@ import zipfile
 from core import feconf
 from core import python_utils
 from core import utils
-from core.domain import classifier_services
+from core.domain import classifier_services, opportunity_services
+from core.domain import story_domain
+from core.domain import story_services
+from core.domain import topic_fetchers
+from core.domain import topic_services
 from core.domain import draft_upgrade_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -1061,6 +1065,97 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(retrieved_exp_summary.title, 'A new title')
         self.assertEqual(retrieved_exp_summary.category, 'A new category')
         self.assertEqual(retrieved_exp_summary.contributor_ids, [self.owner_id])
+
+    def test_apply_change_list(self):
+        self.save_new_linear_exp_with_state_names_and_interactions(
+                self.EXP_0_ID, self.owner_id, ['State 1', 'State 2'],
+                ['TextInput'], category='Algebra',
+                correctness_feedback_enabled=True)
+
+        recorded_voiceovers_dict = {
+            'voiceovers_mapping': {
+                'content': {
+                        'en': {
+                        'filename': 'filename3.mp3',
+                        'file_size_bytes': 3000,
+                        'needs_update': False,
+                        'duration_secs': 42.43
+                    }
+                },
+                'default_outcome': {},
+                'ca_placeholder_0': {}
+            }
+        }
+        change_list_voiceover = [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name':(
+                    exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
+                'state_name': 'State 1',
+                'new_value':recorded_voiceovers_dict
+            })]
+        changed_exploration_voiceover = (
+            exp_services.apply_change_list(self.EXP_0_ID,change_list_voiceover))
+        changed_exp_voiceover_obj =(
+            changed_exploration_voiceover.states['State 1'].recorded_voiceovers
+        )
+        self.assertDictEqual(
+            changed_exp_voiceover_obj.to_dict(),
+            recorded_voiceovers_dict)
+        change_list_objective = [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name':'objective',
+                'new_value':'new objective'
+            })]
+        changed_exploration_objective = (
+            exp_services.apply_change_list(
+            self.EXP_0_ID,
+            change_list_objective))
+        self.assertEqual(
+            changed_exploration_objective.objective,
+            'new objective')
+
+    def test_publish_exploration_and_update_user_profiles(self):
+        self.save_new_valid_exploration(self.EXP_0_ID,self.owner_id)
+        exp_summary = exp_fetchers.get_exploration_summary_by_id(self.EXP_0_ID)
+        exp_summary.add_contribution_by_user(self.editor_id)
+        exp_summary.add_contribution_by_user(self.voice_artist_id)
+        owner_action = user_services.get_user_actions_info(self.owner_id)
+        self.assertIsNone(
+            exp_services.publish_exploration_and_update_user_profiles(
+                owner_action,
+                self.EXP_0_ID))
+
+    def test_is_voiceover_change_list(self):
+        recorded_voiceovers_dict = {
+            'voiceovers_mapping': {
+                'content': {
+                        'en': {
+                        'filename': 'filename3.mp3',
+                        'file_size_bytes': 3000,
+                        'needs_update': False,
+                        'duration_secs': 42.43
+                    }
+                },
+                'default_outcome': {},
+                'ca_placeholder_0': {}
+            }
+        }
+        change_list_voiceover = [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name':(
+                    exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
+                'state_name': 'State 1',
+                'new_value':recorded_voiceovers_dict
+            })]
+        self.assertTrue(
+            exp_services.is_voiceover_change_list(change_list_voiceover))
+        not_voiceover_change_list = [exp_domain.ExplorationChange({
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'title',
+                    'new_value': 'New title'
+                })]
+        self.assertFalse(
+            exp_services.is_voiceover_change_list(not_voiceover_change_list))
 
     def test_update_exploration_by_migration_bot(self):
         self.save_new_valid_exploration(
@@ -5218,10 +5313,89 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         recently_publshed_sumeries_model)
 
     def test_get_story_id_linked_to_exploration(self):
-        linked_story_id = exp_services.get_story_id_linked_to_exploration(
-            self.EXP_ID_1
-        )
-        self.assertIsNone(linked_story_id)
+        self.assertIsNone(
+            exp_services.get_story_id_linked_to_exploration(self.EXP_ID_1))
+        story_id = story_services.get_new_story_id()
+        topic_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id, self.albert_id, name='Topic',
+            abbreviated_name='topic-one', url_fragment='topic-one',
+            description='A new topic',
+            canonical_story_ids=[], additional_story_ids=[],
+            uncategorized_skill_ids=['skill_4'], subtopics=[],
+            next_subtopic_id=0)
+        self.save_new_story(story_id, self.albert_id, topic_id)
+        topic_services.add_canonical_story(self.albert_id,topic_id,story_id)
+        change_list = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_ADD_STORY_NODE,
+                'node_id': story_domain.NODE_ID_PREFIX + '1',
+                'title': 'Title 1'
+            }),
+             story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'node_id': story_domain.NODE_ID_PREFIX + '1',
+                'old_value': None,
+                'new_value': self.EXP_ID_1
+            })
+        ]
+        story_services.update_story(
+            self.albert_id,story_id, change_list,
+            'Added node.')
+        self.assertEqual(
+            exp_services.get_story_id_linked_to_exploration(self.EXP_ID_1),
+            story_id)
+
+    def test_get_user_exploration_data(self):
+        self.save_new_valid_exploration(self.EXP_0_ID, self.albert_id)
+        exploration_description =(
+            exp_services.get_user_exploration_data(
+                self.albert_id, self.EXP_0_ID))
+        self.assertIsNotNone(exploration_description)
+
+        exploration = self.save_new_valid_exploration(
+            self.EXP_0_ID,
+            self.albert_id)
+        exp_services._save_exploration(self.albert_id, exploration, '', [])  # pylint: disable=protected-access
+        exploration.param_specs = {
+            'myParam': param_domain.ParamSpec('UnicodeString')}
+        init_state_name = exploration.init_state_name
+        param_changes = [{
+            'customization_args': {
+                'list_of_values': ['1', '2'], 'parse_with_jinja': False
+            },
+            'name': 'myParam',
+            'generator_id': 'RandomSelector'
+        }]
+        draft_change_list = _get_change_list(
+            init_state_name, 'param_changes', param_changes)
+        draft_change_list_dict = [
+            change.to_dict() for change in draft_change_list]
+        date_time = datetime.datetime.strptime('2016-02-16', '%Y-%m-%d')
+        user_models.ExplorationUserDataModel(
+            id='%s.%s' % (self.albert_id, self.EXP_0_ID),
+            user_id=self.albert_id,
+            exploration_id=self.EXP_0_ID,
+            draft_change_list=draft_change_list_dict,
+            draft_change_list_last_updated=date_time,
+            draft_change_list_exp_version=2,
+            draft_change_list_id=2).put()
+        exploration_description_draft_applied = (
+            exp_services.get_user_exploration_data(
+                self.albert_id,
+                self.EXP_0_ID,
+                True))
+        self.assertTrue(
+            exploration_description_draft_applied['is_version_of_draft_valid'])
+
+        self.save_new_valid_exploration(self.EXP_1_ID, self.bob_id)
+        exploration_draft_not_applied =(
+            exp_services.get_user_exploration_data(
+                self.bob_id, self.EXP_1_ID,True))
+        self.assertFalse(
+            exploration_draft_not_applied['is_version_of_draft_valid'])
 
 class ExplorationConversionPipelineTests(ExplorationServicesUnitTests):
     """Tests the exploration model -> exploration conversion pipeline."""
@@ -5354,6 +5528,74 @@ title: Old Title
             'Sorry, we can only process v41-v%d exploration state schemas at '
             'present.' % feconf.CURRENT_STATE_SCHEMA_VERSION):
             exp_fetchers.get_exploration_from_model(exp_model)
+
+    def test_update_exploration_by_voice_artist(self):
+        exp_id = 'exp_id'
+        user_id = 'user_id'
+        self.save_new_default_exploration(exp_id,user_id)
+        change_list = [exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'new title'
+                })]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Voice artist does not have permission to make some '
+            'changes in the change list.'):
+            exp_services.update_exploration(
+                user_id,exp_id,change_list,'By voice artist',
+                False,True)
+
+    def test_update_exploration_linked_to_story(self):
+        story_id = story_services.get_new_story_id()
+        topic_id = topic_fetchers.get_new_topic_id()
+        exp_id = 'exp_id'
+        user_id = 'user_id'
+        self.save_new_default_exploration(exp_id,user_id)
+        exp_services.update_exploration(
+            user_id, exp_id, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'correctness_feedback_enabled',
+                'new_value': True
+            })], 'Changed correctness_feedback_enabled.')
+        self.save_new_topic(
+            topic_id, user_id, name='Topic',
+            abbreviated_name='topic-one', url_fragment='topic-one',
+            description='A new topic',
+            canonical_story_ids=[], additional_story_ids=[],
+            uncategorized_skill_ids=['skill_4'], subtopics=[],
+            next_subtopic_id=0)
+        self.save_new_story(story_id, user_id, topic_id)
+        topic_services.add_canonical_story(user_id,topic_id,story_id)
+        change_list_story = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_ADD_STORY_NODE,
+                'node_id': story_domain.NODE_ID_PREFIX + '1',
+                'title': 'Title 1'
+            }),
+             story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'node_id': story_domain.NODE_ID_PREFIX + '1',
+                'old_value': None,
+                'new_value': exp_id
+            })
+        ]
+        story_services.update_story(
+            user_id,story_id, change_list_story,
+            'Added node.')
+        change_list_exp = [exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'new title'
+                })]
+        opportunity_services.add_new_exploration_opportunities(
+            story_id,[exp_id])
+        exp_services.update_exploration(
+                user_id,exp_id,change_list_exp,'story linked')
+        updated_exp = exp_fetchers.get_exploration_by_id(exp_id)
+        self.assertEqual(updated_exp.title, 'new title')
 
     def test_update_exploration_with_empty_change_list_does_not_update(self):
         exploration = self.save_new_default_exploration('exp_id', 'user_id')
@@ -6308,6 +6550,16 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
             '%s.%s' % (self.USER_ID, self.EXP_ID3))
         self.assertFalse(exp_services.is_version_of_draft_valid(
             self.EXP_ID3, exp_user_data.draft_change_list_exp_version))
+
+
+    def test_create_or_update_draft_when_by_voice_artist(self):
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Voice artist does not have permission to make some '
+            'changes in the change list.'):
+            exp_services.create_or_update_draft(
+            self.EXP_ID1, self.USER_ID, self.NEW_CHANGELIST, 5,
+            self.NEWER_DATETIME,True)
 
     def test_create_or_update_draft_when_older_draft_exists(self):
         exp_services.create_or_update_draft(
