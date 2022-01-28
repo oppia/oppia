@@ -26,7 +26,6 @@ import { ExplorationLanguageInfo } from
   'pages/exploration-player-page/services/audio-translation-language.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { UrlService } from 'services/contextual/url.service';
-import { AppConstants } from 'app.constants';
 
 import { INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM } from 'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
 
@@ -131,74 +130,6 @@ export class ContentTranslationLanguageService {
   getCurrentContentLanguageCode(): string {
     return this.currentContentLanguageCode;
   }
-
-  currentDecimalSeparator(): string {
-    const currentLanguage = this.getCurrentContentLanguageCode();
-    const supportedLanguages = AppConstants.SUPPORTED_SITE_LANGUAGES;
-    let decimalSeparator: string = '.';
-    for (let i of supportedLanguages) {
-      if (i.id === currentLanguage) {
-        decimalSeparator = i.decimal_separator;
-        break;
-      }
-    }
-    return decimalSeparator;
-  }
-
-  getInputValidationRegex(): RegExp {
-    const decimalSeparator: string = this.currentDecimalSeparator();
-    const dot = new RegExp('[^e0-9\.\-]', 'g');
-    const comma = new RegExp('[^e0-9\,\-]', 'g');
-    const arabic = new RegExp('[^e0-9\٫\-]', 'g');
-
-    if (decimalSeparator === ',') {
-      return comma; // Input with a comma as decimal separator.
-    } else if (decimalSeparator === '٫') {
-      return arabic; // Input with the Arabic seperator.
-    } else {
-      return dot; // Input with a period as decimal separator.
-    }
-  }
-
-  convertToEnglishDecimal(number: string): (null | number) {
-    const decimalSeparator = this.currentDecimalSeparator();
-
-    // Check if number is in proper format.
-    // eslint-disable-next-line max-len
-    let validRegex = new RegExp('-{0,1}[0-9]?([\.|\,|\٫]?[0-9]+)?(e[0-9]+)?', 'g');
-
-    let engNum: number;
-
-    // Get the valid part of input.
-    let validMatch = number.match(validRegex);
-
-    let numMatch = null;
-    numMatch = validMatch?.[0];
-
-    let numString = numMatch.replace(`${decimalSeparator}`, '.');
-    engNum = parseFloat(numString);
-
-    // If the input cannot be parsed, output null.
-    if (isNaN(engNum)) {
-      return null;
-    }
-    return engNum;
-  }
-
-  convertToLocalizedNumber(number: number|string): string {
-    let decimalSeparator = this.currentDecimalSeparator();
-    let stringNumber = number.toString();
-    let convertedNumber: string = stringNumber;
-
-    if (decimalSeparator === ',') {
-      convertedNumber = stringNumber.replace('.', ',');
-    } else if (decimalSeparator === '٫') {
-      convertedNumber = stringNumber.replace('.', '٫');
-    }
-
-    return convertedNumber;
-  }
-
   /**
    * @return {Array<ExplorationLanguageInfo>}
    * An array of ExplorationLanguageInfo objects which consist of audio

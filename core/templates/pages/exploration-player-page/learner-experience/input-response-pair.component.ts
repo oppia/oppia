@@ -31,8 +31,7 @@ import { PlayerPositionService } from '../services/player-position.service';
 import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
-import { ContextService } from 'services/context.service';
-import { ContentTranslationLanguageService } from '../services/content-translation-language.service';
+import { NumberConversionService } from 'services/number-conversion.service';
 
 @Component({
   selector: 'oppia-input-response-pair',
@@ -60,8 +59,7 @@ export class InputResponsePairComponent {
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private playerPositionService: PlayerPositionService,
     private playerTranscriptService: PlayerTranscriptService,
-    private contextService: ContextService,
-    private contentTranslationLanguageService: ContentTranslationLanguageService
+    private numberConversionService: NumberConversionService,
   ) {}
 
   ngOnInit(): void {
@@ -97,12 +95,7 @@ export class InputResponsePairComponent {
       return data;
     }
 
-    if (this.contextService.getPageContext() === 'learner') {
-      return this.contentTranslationLanguageService
-        .convertToLocalizedNumber(data);
-    } else {
-      return this.i18nLanguageCodeService.convertToLocalizedNumber(data);
-    }
+    return this.numberConversionService.convertToLocalizedNumber(data);
   }
 
   getAnswerHtml(): string {

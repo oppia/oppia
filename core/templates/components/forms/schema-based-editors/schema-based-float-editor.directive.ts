@@ -25,10 +25,7 @@ require(
   'interactions/NumericInput/directives/numeric-input-validation.service.ts');
 require('services/schema-form-submitted.service.ts');
 require('services/stateful/focus-manager.service.ts');
-require('services/context.service.ts');
-require('services/i18n-language-code.service.ts');
-// eslint-disable-next-line max-len
-require('pages/exploration-player-page/services/content-translation-language.service.ts');
+require('services/number-conversion.service');
 
 angular.module('oppia').directive('schemaBasedFloatEditor', [
   function() {
@@ -49,14 +46,12 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
       template: require('./schema-based-float-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$timeout', 'ContentTranslationLanguageService',
-        'ContextService', 'FocusManagerService',
-        'I18nLanguageCodeService', 'NumericInputValidationService',
+        '$scope', '$timeout', 'FocusManagerService',
+        'NumberConversionService', 'NumericInputValidationService',
         'SchemaFormSubmittedService',
         function(
-            $scope, $timeout, ContentTranslationLanguageService,
-            ContextService, FocusManagerService,
-            I18nLanguageCodeService, NumericInputValidationService,
+            $scope, $timeout, FocusManagerService,
+            NumberConversionService, NumericInputValidationService,
             SchemaFormSubmittedService) {
           var ctrl = this;
           var labelForFocus = $scope.labelForFocusTarget();
@@ -89,26 +84,12 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
           };
 
           ctrl.currentDecimalSeparator = function() {
-            let decimalSeparator = I18nLanguageCodeService
+            return NumberConversionService
               .currentDecimalSeparator();
-
-            // Exploration Player.
-            if (ContextService.getPageContext() === 'learner') {
-              decimalSeparator = ContentTranslationLanguageService
-                .currentDecimalSeparator();
-            }
-
-            return decimalSeparator;
           };
 
           ctrl.parseInput = function(): void {
-            let regex = I18nLanguageCodeService.getInputValidationRegex();
-
-            // Exploration Player.
-            if (ContextService.getPageContext() === 'learner') {
-              regex = ContentTranslationLanguageService
-                .getInputValidationRegex();
-            }
+            let regex = NumberConversionService.getInputValidationRegex();
 
             // Remove any character which is not a number or
             // a decimal seperator.
@@ -129,13 +110,8 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
                 ctrl.errorString = error;
               } else { // Parse number if the string is in proper format.
                 // Exploration Player.
-                if (ContextService.getPageContext() === 'learner') {
-                  ctrl.localValue = ContentTranslationLanguageService
-                    .convertToEnglishDecimal(ctrl.localStringValue);
-                } else { // All other players.
-                  ctrl.localValue = I18nLanguageCodeService
-                    .convertToEnglishDecimal(ctrl.localStringValue);
-                }
+                ctrl.localValue = NumberConversionService
+                  .convertToEnglishDecimal(ctrl.localStringValue);
 
                 // Generate errors (if any).
                 ctrl.generateErrors();
