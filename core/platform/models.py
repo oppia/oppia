@@ -81,7 +81,7 @@ class Platform:
 
     @classmethod
     def import_models(
-            cls, unused_model_names: List[Names]
+        cls, unused_model_names: List[Names]
     ) -> Tuple[ModuleType, ...]:
         """An abstract method that should be implemented on inherited
         classes.
@@ -213,7 +213,7 @@ class _Gae(Platform):
 
     @classmethod
     def get_storage_model_classes(
-            cls, model_names: List[Names]
+        cls, model_names: List[Names]
     ) -> List[base_models.BaseModel]:
         """Get the storage model classes that are in the modules listed in
         model_names.
@@ -445,7 +445,7 @@ class Registry:
 
     @classmethod
     def get_storage_model_classes(
-            cls, model_names: List[Names]
+        cls, model_names: List[Names]
     ) -> List[base_models.BaseModel]:
         """Get the storage model classes that are in the modules listed in
         model_names.
