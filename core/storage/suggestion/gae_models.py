@@ -489,12 +489,14 @@ class GeneralSuggestionModel(base_models.BaseModel):
     def get_in_review_translation_suggestions_by_exp_ids(
         cls, exp_ids: List[str], language_code: str
     ) -> Sequence[GeneralSuggestionModel]:
-        """Gets all in review translation suggestions matching the supplied
+        """Gets all in-review translation suggestions matching the supplied
         exp_ids and language_code.
 
         Args:
-            exp_ids: list(str). Exploration IDs.
-            language_code: str. Language code.
+            exp_ids: list(str). Exploration IDs matching the target ID of the
+                translation suggestions.
+            language_code: str. The ISO 639-1 language code of the translation
+                suggestions.
 
         Returns:
             list(SuggestionModel). A list of suggestions matching the supplied

@@ -22,7 +22,7 @@
       <div [hidden]="opportunityDataIsLoading"  *ngIf="translationProgressBar" class="progress">
         <div class="progress-bar bg-success" role="progressbar" [ngStyle]="translatedProgressStyle" ngbTooltip="{{opportunity.translationsCount}}/{{opportunity.totalCount}} cards accepted" container="body" placement="bottom"></div>
         <div class="progress-bar bg-light-green" role="progressbar" [ngStyle]="inReviewProgressStyle" ngbTooltip="{{opportunity.inReviewCount}}/{{opportunity.totalCount}} cards awaiting review" container="body" placement="bottom"></div>
-        <div class="progress-bar bg-light" role="progressbar" [ngStyle]="untranslatedProgressStyle" ngbTooltip="{{opportunity.totalCount - (opportunity.translationsCount + opportunity.inReviewCount)}}/{{opportunity.totalCount}} cards untranslated" container="body" placement="bottom"></div>
+        <div class="progress-bar bg-light" role="progressbar" [ngStyle]="untranslatedProgressStyle" ngbTooltip="{{opportunity.totalCount - (opportunity.translationsCount + opportunity.inReviewCount)}}/{{opportunity.totalCount}} cards available for translation" container="body" placement="bottom"></div>
       </div>
       <lazy-loading [hidden]="!opportunityDataIsLoading"></lazy-loading>
     </div>
@@ -31,7 +31,7 @@
             *ngIf="translationProgressBar"
             [hidden]="opportunityDataIsLoading"
             [disableTooltip]="!translationProgressBar"
-            ngbTooltip="Percentage of accepted translated cards. {{ opportunity.totalCount - opportunity.translationsCount }}/{{ opportunity.totalCount }} cards remaining."
+            ngbTooltip="Percentage of accepted translated cards"
             placement="bottom">
         ({{ progressPercentage }})
       </span>

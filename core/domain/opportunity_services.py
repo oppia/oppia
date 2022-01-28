@@ -463,48 +463,46 @@ def get_translation_opportunities(language_code, topic_name, cursor):
         .ExplorationOpportunitySummaryModel.get_all_translation_opportunities(
             page_size, cursor, language_code, topic_name))
     opportunities = []
+    opportunity_exp_ids = [
+        opportunity.id for opportunity in exp_opportunity_summary_models]
     exp_id_to_in_review_count = (
         _build_exp_id_to_translation_suggestion_in_review_count(
-            exp_opportunity_summary_models, language_code))
+            opportunity_exp_ids, language_code))
     for exp_opportunity_summary_model in exp_opportunity_summary_models:
-        exp_opportunity_summary = (
+        opportunity = (
             get_exploration_opportunity_summary_from_model(
                 exp_opportunity_summary_model))
-        if exp_opportunity_summary.id in exp_id_to_in_review_count:
-            exp_opportunity_summary.translation_in_review_counts = {
-                language_code: exp_id_to_in_review_count[
-                    exp_opportunity_summary.id]
+        if opportunity.id in exp_id_to_in_review_count:
+            opportunity.translation_in_review_counts = {
+                language_code: exp_id_to_in_review_count[opportunity.id]
             }
-        opportunities.append(exp_opportunity_summary)
+        opportunities.append(opportunity)
     return opportunities, cursor, more
 
 
 def _build_exp_id_to_translation_suggestion_in_review_count(
-        exp_opportunity_summary_models, language_code):
-    """Returns a dict mapping exploration ID to corresponding translation
-    suggestion in review count.
+        exp_ids, language_code):
+    """Returns a dict mapping exploration ID to the count of corresponding
+    translation suggestions that are currently in review.
 
     Args:
-        exp_opportunity_summary_models:
-            list(ExplorationOpportunitySummaryModel). List of
-            ExplorationOpportunitySummaryModels.
-        language_code: str. The language for which translation opportunities
+        exp_ids: list(str). List of exploration IDs for which to count
+            corresponding translations suggestions.
+        language_code: str. The language for which translation suggestions
             should be fetched.
 
     Returns:
-        dict(str, int). Dict of exploration IDs to translation suggestion in
-        review count.
+        dict(str, int). Dict of exploration IDs to counts of corresponding
+        translation suggestions currently in review.
     """
-    translations_in_review = []
-    opportunity_ids = [
-        opportunity.id for opportunity in exp_opportunity_summary_models]
-    if len(opportunity_ids) > 0:
-        translations_in_review = (
-            suggestion_services
-            .get_translation_suggestions_in_review_by_exp_ids(
-                opportunity_ids, language_code))
     exp_id_to_in_review_count = collections.defaultdict(int)
-    for suggestion in translations_in_review:
+    suggestions_in_review = (
+        suggestion_services
+        .get_translation_suggestions_in_review_by_exp_ids(
+            exp_ids, language_code))
+    for suggestion in suggestions_in_review:
+        if suggestion is None:
+            continue
         exp_id_to_in_review_count[suggestion.target_id] += 1
     return exp_id_to_in_review_count
 
