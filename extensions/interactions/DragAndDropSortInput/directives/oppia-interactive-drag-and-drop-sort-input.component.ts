@@ -42,16 +42,13 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
   allowMultipleItemsInSamePosition: boolean;
   choices: string[];
   choicesValue: SubtitledHtml[];
-  dragStarted = false;
-  hide = [];
-  highlightedGroup = -1;
+  dragStarted: boolean = false;
+  hide: number[] = [];
+  highlightedGroup: number = -1;
   multipleItemsInSamePositionArray: string[][];
   singleItemInSamePositionArray: string[];
-  listenToMouseMoveEvent: boolean = false;
-  noShow = -1;
-  prev: number = 0;
-  prevDragDirection = 1;
-  rootHeight = 40;
+  noShow: number = -1;
+  rootHeight: number = 40;
 
   constructor(
     private currentInteractionService: CurrentInteractionService,
@@ -60,10 +57,9 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
     private interactionAttributesExtractorService:
       InteractionAttributesExtractorService) {}
 
-  private _resetArray(): void {
-    // Resets the array. If the array is empty, then the drag is cancelled.
-    // If the array is not empty, then the drag is valid.
-    this.highlightedGroup = -1;
+  resetArray(): void {
+    // Resets the array into the correct format.
+    // For example, [[], [1, 2, 3], []].
     const res = [[]];
     for (let i = 0; i < this.multipleItemsInSamePositionArray.length; i++) {
       if (this.multipleItemsInSamePositionArray[i].length !== 0) {
@@ -71,6 +67,7 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
         res.push([]);
       }
     }
+    this.highlightedGroup = -1;
     this.multipleItemsInSamePositionArray = res;
     this.noShow = -1;
     this.hide = [];
@@ -84,28 +81,23 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
     this.highlightedGroup = i;
   }
 
-  removeHighlight(i: number): void {
+  removeHighlight(): void {
     this.highlightedGroup = -1;
   }
 
-  dropedIt(event: CdkDragDrop<string[]>): void {
-    // Handles the drop event. If the drop is valid, then the list is
-    // reset the drag is cancelled.
-    if (this.allowMultipleItemsInSamePosition) {
-      moveItemInArray(
-        this.multipleItemsInSamePositionArray,
-        event.previousIndex, event.currentIndex);
-      this._resetArray();
-    } else {
-      moveItemInArray(
-        this.singleItemInSamePositionArray,
-        event.previousIndex, event.currentIndex);
-    }
+  dropList(event: CdkDragDrop<string[][]>): void {
+    // Handles the drop event. Drop whole list which is part of list of lists.
+    // If the drop is valid, then the list of lits is reset, otherwise the
+    //  drag is cancelled.
+    moveItemInArray(
+      this.multipleItemsInSamePositionArray,
+      event.previousIndex, event.currentIndex);
+    this.resetArray();
   }
 
-  drop(event: CdkDragDrop<string[]>): void {
-    // Handles the drop event. If the drop is valid, then the list is
-    // reset the drag is cancelled.
+  dropItemInAnyList(event: CdkDragDrop<string[]>): void {
+    // Handles the drop event. Drop item in any list. If the drop is valid,
+    // then the list of lists is reset, otherwise the drag is cancelled.
     if (event.previousContainer === event.container) {
       moveItemInArray(
         event.container.data,
@@ -131,8 +123,16 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
             event.currentIndex, 0, data);
         }
       }
-      this._resetArray();
+      this.resetArray();
     }
+  }
+
+  dropItemInSameList(event: CdkDragDrop<string[]>): void {
+    // Handles the drop event. Drop item in the same list. If the drop is
+    // valid, then the list is reset, otherwise the drag is cancelled.
+    moveItemInArray(
+      this.singleItemInSamePositionArray,
+      event.previousIndex, event.currentIndex);
   }
 
   logEvent(e: CdkDragExit): void {

@@ -1,7 +1,7 @@
 <form (ngSubmit)="submitAnswer()">
   <div class="drag-and-drop-sort-container conversation-skin-interaction-container">
     <!-- Drag and drop, when we allow multiple items in same position of list -->
-    <div *ngIf="allowMultipleItemsInSamePosition" cdkDropList (cdkDropListDropped)="dropedIt($event)">
+    <div *ngIf="allowMultipleItemsInSamePosition" cdkDropList (cdkDropListDropped)="dropList($event)">
       <ng-container cdkDropListGroup>
         <div *ngFor="let items of multipleItemsInSamePositionArray; let idx = index" 
              class="child-dnd child-dnd-{{idx}}">
@@ -15,13 +15,13 @@
                  'zero-height': hide.indexOf(idx) >= 0
                }"
                [class]="idx%2===1 && idx !== noShow ? 'child-dnd-border' : 'child-dnd-borderless'"
-               (cdkDropListDropped)="drop($event)">
+               (cdkDropListDropped)="dropItemInAnyList($event)">
             <div class="root-dnd-placeholder" [ngStyle]="{ 'height': (rootHeight-30) + 'px' }" *cdkDragPlaceholder></div>
             <div *ngIf="idx%2===1 && idx !== noShow && items.length > 1"
                  class="example-handle" 
                  cdkDragHandle
                  (mouseover)="addHighlight(idx)"
-                 (mouseout)="removeHighlight(idx)"
+                 (mouseout)="removeHighlight()"
                  (mousedown)="setRootPlaceHolderHeight(idx)">
             </div>
             <div *ngFor="let item of items" class="child-dnd-item-box" [ngClass]="{'highlight-group': idx === highlightedGroup}" cdkDrag>
@@ -33,7 +33,7 @@
       </ng-container>
     </div>
     <!-- Drag and drop, when we allow only single item in same position of list -->
-    <div *ngIf="!allowMultipleItemsInSamePosition" cdkDropList class="child-dnd-single-item" (cdkDropListDropped)="dropedIt($event)">
+    <div *ngIf="!allowMultipleItemsInSamePosition" cdkDropList class="child-dnd-single-item" (cdkDropListDropped)="dropItemInSameList($event)">
       <div class="child-dnd-item-box" *ngFor="let item of singleItemInSamePositionArray" cdkDrag>
         <div class="child-dnd-single-item-placeholder" *cdkDragPlaceholder></div>
         <angular-html-bind-wrapper [htmlData]="item"></angular-html-bind-wrapper>

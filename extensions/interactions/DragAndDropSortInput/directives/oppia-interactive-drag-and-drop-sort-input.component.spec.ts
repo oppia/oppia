@@ -16,67 +16,138 @@
  * @fileoverview Unit tests for the DragAndDropSortInput interaction.
  */
 
-require(
-  'interactions/DragAndDropSortInput/directives/' +
-  'oppia-interactive-drag-and-drop-sort-input.component.ts');
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { async, ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { InteractiveDragAndDropSortInputComponent } from './oppia-interactive-drag-and-drop-sort-input.component';
+import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
+import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
+import { CdkDragDrop, CdkDropList, CdkDrag } from '@angular/cdk/drag-drop';
 
-describe('oppiaInteractiveDragAndDropSortInput', () => {
-  let ctrl = null;
+interface ContainerModel<T> {
+  id: string;
+  data: T[];
+  index: number;
+}
 
-  let mockCurrentInteractionService = {
-    onSubmit: function(answer, rulesService) {},
-    registerCurrentInteraction: function(submitAnswerFn, isAnswerValid) {
+describe('Drag and drop sort input interactive component', () => {
+  let component: InteractiveDragAndDropSortInputComponent;
+  let fixture: ComponentFixture<InteractiveDragAndDropSortInputComponent>;
+  let currentInteractionService: CurrentInteractionService;
+
+  class MockInteractionAttributesExtractorService {
+    getValuesFromAttributes(interactionId, attributes) {
+      return {
+        choices: {
+          value: JSON.parse(attributes.choicesWithValue)
+        },
+        allowMultipleItemsInSamePosition: {
+          value: JSON.parse(
+            attributes.allowMultipleItemsInSamePositionWithValue)
+        }
+      };
+    }
+  }
+
+  class MockCurrentInteractionService {
+    onSubmit(answer, rulesService) {}
+    registerCurrentInteraction(submitAnswerFn, validateExpressionFn) {
       submitAnswerFn();
     }
-  };
-  let mockDragAndDropSortInputRulesService = {};
-  let mockInteractionAttributesExtractorService = {
-    getValuesFromAttributes: function(interactionId, attrs) {
-      return attrs;
+  }
+  class DragAndDropEventClass<T> {
+    createInContainerEvent(
+        containerId: string, data: T[], fromIndex: number, toIndex: number
+    ): CdkDragDrop<T[], T[]> {
+      const event = this.createEvent(fromIndex, toIndex);
+      const container = { id: containerId, data: data };
+      event.container = container as CdkDropList<T[]>;
+      event.previousContainer = event.container;
+      event.item = { data: data[fromIndex] } as CdkDrag<T>;
+      return event;
     }
-  };
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'CurrentInteractionService', mockCurrentInteractionService);
-    $provide.value(
-      'DragAndDropSortInputRulesService',
-      mockDragAndDropSortInputRulesService);
-    $provide.value(
-      'InteractionAttributesExtractorService',
-      mockInteractionAttributesExtractorService);
+    createCrossContainerEvent(
+        from: ContainerModel<T>, to: ContainerModel<T>
+    ): CdkDragDrop<T[], T[]> {
+      const event = this.createEvent(from.index, to.index);
+      event.container = this.createContainer(to);
+      event.previousContainer = this.createContainer(from);
+      event.item = { data: from.data[from.index] } as CdkDrag<T>;
+      return event;
+    }
+
+    private createEvent(
+        previousIndex: number, currentIndex: number
+    ): CdkDragDrop<T[], T[]> {
+      return {
+        previousIndex: previousIndex,
+        currentIndex: currentIndex,
+        item: undefined,
+        container: undefined,
+        previousContainer: undefined,
+        isPointerOverContainer: true,
+        distance: { x: 0, y: 0 }
+      };
+    }
+
+    private createContainer(
+        model: ContainerModel<T>
+    ): CdkDropList<T[]> {
+      const container = { id: model.id, data: model.data };
+      return container as CdkDropList<T[]>;
+    }
+  }
+
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [
+        InteractiveDragAndDropSortInputComponent,
+      ],
+      providers: [
+        {
+          provide: InteractionAttributesExtractorService,
+          useClass: MockInteractionAttributesExtractorService
+        },
+        {
+          provide: CurrentInteractionService,
+          useClass: MockCurrentInteractionService
+        },
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
 
+  beforeEach(() => {
+    currentInteractionService = TestBed.inject(CurrentInteractionService);
+    fixture = TestBed.createComponent(InteractiveDragAndDropSortInputComponent);
+    component = fixture.componentInstance;
+  });
+
   describe('when multiple items in the same position are allowed', () => {
-    beforeEach(angular.mock.module('oppia', function($provide) {
-      $provide.value('$attrs', {
-        choices: [
-          {
-            html: '<p>choice 1</p>',
-            contentId: 'ca_choices_1'
-          },
-          {
-            html: '<p>choice 2</p>',
-            contentId: 'ca_choices_2'
-          },
-          {
-            html: '<p>choice 3</p>',
-            contentId: 'ca_choices_3'
-          },
-          {
-            html: '<p>choice 4</p>',
-            contentId: 'ca_choices_4'
-          }
-        ],
-        allowMultipleItemsInSamePosition: true
-      });
-    }));
-
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
-      ctrl = $componentController('oppiaInteractiveDragAndDropSortInput');
-
-      ctrl.savedSolution = [
+    beforeEach(() => {
+      fixture = TestBed.createComponent(
+        InteractiveDragAndDropSortInputComponent);
+      component = fixture.componentInstance;
+      component.choicesWithValue = '[' +
+        '{' +
+        '    "html": "<p>choice 1</p>",' +
+        '    "contentId": "ca_choices_1"' +
+        '},' +
+        '{' +
+        '    "html": "<p>choice 2</p>",' +
+        '    "contentId": "ca_choices_2"' +
+        '},' +
+        '{' +
+        '    "html": "<p>choice 3</p>",' +
+        '    "contentId": "ca_choices_3"' +
+        '},' +
+        '{' +
+        '    "html": "<p>choice 4</p>",' +
+        '    "contentId": "ca_choices_4"' +
+        '}' +
+    ']';
+      component.allowMultipleItemsInSamePositionWithValue = 'true';
+      component.savedSolution = [
         [
           'ca_choices_1'
         ],
@@ -88,28 +159,34 @@ describe('oppiaInteractiveDragAndDropSortInput', () => {
           'ca_choices_4'
         ]
       ];
-    }));
+      component.dragStarted = false;
+      component.hide = [];
+      component.highlightedGroup = -1;
+      component.noShow = -1;
+      component.rootHeight = 40;
+    });
 
     it('should initialise component when user adds interaction', () => {
-      ctrl.$onInit();
+      component.ngOnInit();
 
-      expect(ctrl.dataMaxDepth).toBe(2);
-      expect(ctrl.allowMultipleItemsInSamePosition).toBe(true);
-      expect(ctrl.list).toEqual([{
-        title: '<p>choice 1</p>',
-        items: []
-      },
-      {
-        title: '<p>choice 2</p>',
-        items: [
-          {title: '<p>choice 3</p>', items: []}
-        ]
-      },
-      {
-        title: '<p>choice 4</p>',
-        items: []
-      }]);
-      expect(ctrl.choices).toEqual([
+      expect(component.allowMultipleItemsInSamePosition).toBe(true);
+      expect(component.multipleItemsInSamePositionArray).toEqual([
+        [],
+        [
+          '<p>choice 1</p>'
+        ],
+        [],
+        [
+          '<p>choice 2</p>',
+          '<p>choice 3</p>'
+        ],
+        [],
+        [
+          '<p>choice 4</p>'
+        ],
+        []
+      ]);
+      expect(component.choices).toEqual([
         '<p>choice 1</p>',
         '<p>choice 2</p>',
         '<p>choice 3</p>',
@@ -117,29 +194,32 @@ describe('oppiaInteractiveDragAndDropSortInput', () => {
       ]);
     });
 
-    it('should make a default list of dicts when user did not save a solution',
+    it('should make a default list of lists when user did not save a solution',
       () => {
-        ctrl.savedSolution = undefined;
-        ctrl.$onInit();
+        component.savedSolution = undefined;
+        component.ngOnInit();
 
-        expect(ctrl.dataMaxDepth).toBe(2);
-        expect(ctrl.allowMultipleItemsInSamePosition).toBe(true);
-        expect(ctrl.list).toEqual([{
-          title: '<p>choice 1</p>',
-          items: []
-        },
-        {
-          title: '<p>choice 2</p>',
-          items: []
-        },
-        {
-          title: '<p>choice 3</p>',
-          items: []},
-        {
-          title: '<p>choice 4</p>',
-          items: []
-        }]);
-        expect(ctrl.choices).toEqual([
+        expect(component.allowMultipleItemsInSamePosition).toBe(true);
+        expect(component.multipleItemsInSamePositionArray).toEqual([
+          [],
+          [
+            '<p>choice 1</p>'
+          ],
+          [],
+          [
+            '<p>choice 2</p>'
+          ],
+          [],
+          [
+            '<p>choice 3</p>'
+          ],
+          [],
+          [
+            '<p>choice 4</p>'
+          ],
+          []
+        ]);
+        expect(component.choices).toEqual([
           '<p>choice 1</p>',
           '<p>choice 2</p>',
           '<p>choice 3</p>',
@@ -147,113 +227,242 @@ describe('oppiaInteractiveDragAndDropSortInput', () => {
         ]);
       });
 
-    it('should show black dashed box when user drags item', () => {
-      let e = {
-        dest: {
-          nodesScope: {
-            $childNodesScope: undefined
-          }
-        },
-        elements: {
-          placeholder: [
-            {
-              style: {
-                borderColor: null
-              }
-            }
-          ]
-        }
-      };
-      ctrl.$onInit();
+    it('should move items inside same list', () => {
+      component.noShow = 1;
+      component.hide = [1, 2, 3, 4];
+      component.dragStarted = true;
 
-      ctrl.treeOptions.dragMove(e);
+      const containerData = [
+        '<p>choice 1</p>',
+        '<p>choice 2</p>',
+      ];
+      const dragAndDropEventClass = new DragAndDropEventClass<string>();
+      const dragDropEvent = dragAndDropEventClass.createInContainerEvent(
+        'selectedItems', containerData, 1, 0);
 
-      expect(e.elements.placeholder[0].style.borderColor).toBe('#000000');
+      component.dropItemInAnyList(dragDropEvent);
+
+      expect(component.noShow).toBe(-1);
+      expect(component.hide).toEqual([]);
+      expect(component.dragStarted).toBeFalse();
     });
 
-    it('should show blue dashed box when user selects item', () => {
-      let e = {
-        dest: {
-          nodesScope: {
-            $childNodesScope: {}
-          }
-        },
-        elements: {
-          placeholder: [
-            {
-              style: {
-                borderColor: null
-              }
-            }
-          ]
-        }
+    it('should move items between lists', () => {
+      component.noShow = 1;
+      component.hide = [1, 2, 3, 4];
+      component.dragStarted = true;
+      component.highlightedGroup = 1;
+      component.multipleItemsInSamePositionArray = [
+        [],
+        [
+          '<p>choice 1</p>'
+        ],
+        [],
+        [
+          '<p>choice 2</p>',
+          '<p>choice 3</p>',
+          '<p>choice 4</p>',
+          '<p>choice 5</p>'
+        ],
+        [],
+        [
+          '<p>choice 6</p>',
+          '<p>choice 7</p>',
+          '<p>choice 8</p>',
+        ],
+        []
+      ];
+
+      const from: ContainerModel<string> = {
+        id: 'availableItems',
+        data: [
+          '<p>choice 6</p>',
+          '<p>choice 7</p>',
+          '<p>choice 8</p>',
+        ],
+        index: 2
       };
-      ctrl.$onInit();
+      const to: ContainerModel<string> = {
+        id: 'selectedItems',
+        data: [
+          '<p>choice 2</p>',
+          '<p>choice 3</p>',
+          '<p>choice 4</p>',
+          '<p>choice 5</p>'
+        ],
+        index: 3
+      };
+      const dragAndDropEventClass = new DragAndDropEventClass<string>();
+      const dragDropEvent = (
+        dragAndDropEventClass.createCrossContainerEvent(from, to));
 
-      ctrl.treeOptions.dragMove(e);
+      component.dropItemInAnyList(dragDropEvent);
 
-      expect(e.elements.placeholder[0].style.borderColor).toBe('#add8e6');
+      expect(component.multipleItemsInSamePositionArray).toEqual([
+        [],
+        [
+          '<p>choice 1</p>'
+        ],
+        [],
+        [
+          '<p>choice 2</p>',
+          '<p>choice 3</p>',
+          '<p>choice 4</p>',
+          '<p>choice 8</p>',
+          '<p>choice 5</p>'
+        ],
+        [],
+        [
+          '<p>choice 6</p>',
+          '<p>choice 7</p>'
+        ],
+        []
+      ]);
+      expect(component.noShow).toBe(-1);
+      expect(component.hide).toEqual([]);
+      expect(component.dragStarted).toBeFalse();
+      expect(component.highlightedGroup).toBe(-1);
+    });
+
+    it('should move list inside list of lists', fakeAsync(() => {
+      spyOn(component, 'resetArray').and.callFake(() => {});
+
+      component.multipleItemsInSamePositionArray = [
+        [],
+        [
+          '<p>choice 1</p>'
+        ],
+        [],
+        [
+          '<p>choice 2</p>',
+          '<p>choice 3</p>'
+        ],
+        []
+      ];
+      const dragAndDropEventClass = new DragAndDropEventClass<string[]>();
+      const dragDropEvent = dragAndDropEventClass.createInContainerEvent(
+        'selectedlists', component.multipleItemsInSamePositionArray, 3, 0);
+
+      component.dropList(dragDropEvent);
+      tick();
+
+      expect(component.resetArray).toHaveBeenCalled();
+    }));
+
+    it('should remove highlighted group', () => {
+      component.highlightedGroup = 1;
+
+      component.removeHighlight();
+
+      expect(component.highlightedGroup).toBe(-1);
+    });
+
+    it('should add highlighted group', () => {
+      component.highlightedGroup = -1;
+
+      component.addHighlight(2);
+
+      // Value should change, when drag is started
+      // and highlighted group is not yet set.
+      expect(component.highlightedGroup).toBe(2);
+
+      component.dragStarted = true;
+      component.addHighlight(2);
+
+      // Value should not change, when drag started
+      // and highlighted group is already set.
+      expect(component.highlightedGroup).toBe(2);
     });
   });
 
   describe('when multiple items in the same position are not allowed', () => {
-    beforeEach(angular.mock.module('oppia', function($provide) {
-      $provide.value('$attrs', {
-        choices: [
-          {
-            html: '<p>choice 1</p>',
-            contentId: 'ca_choices_1'
-          },
-          {
-            html: '<p>choice 2</p>',
-            contentId: 'ca_choices_2'
-          },
-          {
-            html: '<p>choice 3</p>',
-            contentId: 'ca_choices_3'
-          }
-        ],
-        allowMultipleItemsInSamePosition: false
-      });
-    }));
-
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
-      ctrl = $componentController('oppiaInteractiveDragAndDropSortInput');
-
-      ctrl.savedSolution = [
+    beforeEach(() => {
+      fixture = TestBed.createComponent(
+        InteractiveDragAndDropSortInputComponent);
+      component = fixture.componentInstance;
+      component.choicesWithValue = '[' +
+        '{' +
+        '    "html": "<p>choice 1</p>",' +
+        '    "contentId": "ca_choices_1"' +
+        '},' +
+        '{' +
+        '    "html": "<p>choice 2</p>",' +
+        '    "contentId": "ca_choices_2"' +
+        '},' +
+        '{' +
+        '    "html": "<p>choice 3</p>",' +
+        '    "contentId": "ca_choices_3"' +
+        '}' +
+    ']';
+      component.allowMultipleItemsInSamePositionWithValue = 'false';
+      component.savedSolution = [
         [
           'ca_choices_1'
         ],
         [
-          'ca_choices_2'
+          'ca_choices_3',
         ],
         [
-          'ca_choices_3'
+          'ca_choices_2'
         ]
       ];
-    }));
+      component.dragStarted = false;
+      component.hide = [];
+      component.highlightedGroup = -1;
+      component.noShow = -1;
+      component.rootHeight = 40;
+    });
 
     it('should initialise component when user adds interaction', () => {
-      ctrl.$onInit();
+      component.ngOnInit();
 
-      expect(ctrl.dataMaxDepth).toBe(1);
-      expect(ctrl.allowMultipleItemsInSamePosition).toBe(false);
-      expect(ctrl.list).toEqual([{
-        title: '<p>choice 1</p>',
-        items: []
-      },
-      {
-        title: '<p>choice 2</p>',
-        items: []
-      },
-      {
-        title: '<p>choice 3</p>',
-        items: []
-      }]);
-      expect(ctrl.choices).toEqual([
+      expect(component.allowMultipleItemsInSamePosition).toBe(false);
+      expect(component.singleItemInSamePositionArray).toEqual([
+        '<p>choice 1</p>',
+        '<p>choice 3</p>',
+        '<p>choice 2</p>'
+      ]);
+      expect(component.choices).toEqual([
+        '<p>choice 1</p>',
+        '<p>choice 2</p>',
+        '<p>choice 3</p>',
+      ]);
+    });
+
+    it('should make a default list when user did not save a solution',
+      () => {
+        component.savedSolution = undefined;
+        component.ngOnInit();
+
+        expect(component.allowMultipleItemsInSamePosition).toBe(false);
+        expect(component.singleItemInSamePositionArray).toEqual([
+          '<p>choice 1</p>',
+          '<p>choice 2</p>',
+          '<p>choice 3</p>'
+        ]);
+        expect(component.choices).toEqual([
+          '<p>choice 1</p>',
+          '<p>choice 2</p>',
+          '<p>choice 3</p>',
+        ]);
+      });
+
+    it('should move list inside list of lists', () => {
+      component.singleItemInSamePositionArray = [
         '<p>choice 1</p>',
         '<p>choice 2</p>',
         '<p>choice 3</p>'
+      ];
+      const dragAndDropEventClass = new DragAndDropEventClass<string>();
+      const dragDropEvent = dragAndDropEventClass.createInContainerEvent(
+        'selectedlists', component.singleItemInSamePositionArray, 2, 1);
+
+      component.dropItemInSameList(dragDropEvent);
+
+      expect(component.singleItemInSamePositionArray).toEqual([
+        '<p>choice 1</p>',
+        '<p>choice 3</p>',
+        '<p>choice 2</p>'
       ]);
     });
   });
