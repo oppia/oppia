@@ -19,7 +19,6 @@
 from __future__ import annotations
 
 import datetime
-from pyexpat import model
 
 from core import utils
 from core.domain import beam_job_domain
