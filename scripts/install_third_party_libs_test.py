@@ -299,6 +299,21 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
                 install_third_party_libs.compile_protobuf_files(
                     [(True, 'mock_path')])
 
+    def test_move_all_proto_files_to_third_party(self):
+        def mock_exists(unused_path):
+            return False
+
+        exists_swap = self.swap(os.path, 'exists', mock_exists)
+
+        oppia_proto_api_path = (
+            os.path.join(
+                common.THIRD_PARTY_DIR,
+                'oppia-proto-api-8f3cde883c31785438e80656a5b6bb26bd01b6a1'))
+        with exists_swap:
+            install_third_party_libs.move_all_proto_files_to_third_party()
+            self.assertFalse(os.path.exists(
+                os.path.join(oppia_proto_api_path, 'org')))
+
     def test_ensure_pip_library_is_installed(self):
         check_function_calls = {
             'pip_install_is_called': False
