@@ -19,14 +19,14 @@
 from __future__ import annotations
 
 import datetime
-from xml.parsers.expat import model
 
 from core import utils
 from core.domain import beam_job_domain
 from core.jobs.batch_jobs import model_validation_jobs
+from core.platform import models
 from core.tests import test_utils
 
-(beam_job_models,) = model.Registry.import_models([model.Names.BEAM_JOB])
+(beam_job_models,) = models.Registry.import_models([models.Names.BEAM_JOB])
 
 
 class BeamJobTests(test_utils.TestBase):
