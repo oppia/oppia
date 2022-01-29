@@ -148,9 +148,9 @@ def _get_server_mode():
         in development mode, prod if in production mode.
     """
     return (
-        platform_parameter_domain.SERVER_MODES.dev
+        platform_parameter_domain.ServerModes.DEV
         if constants.DEV_MODE
-        else platform_parameter_domain.SERVER_MODES.prod
+        else platform_parameter_domain.ServerModes.PROD
     )
 
 
