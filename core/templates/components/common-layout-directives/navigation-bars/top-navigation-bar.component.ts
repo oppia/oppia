@@ -425,6 +425,10 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     }, 150);
   }
 
+  navigateToPage(url: string): void {
+    this.windowRef.nativeWindow.location.href = url;
+  }
+
   /**
    * Checks if i18n has been run.
    * If i18n has not yet run, the <a> and <span> tags will have

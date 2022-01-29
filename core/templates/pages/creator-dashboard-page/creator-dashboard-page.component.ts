@@ -37,6 +37,7 @@ import { CreatorExplorationSummary } from 'domain/summary/creator-exploration-su
 import { CollectionSummary } from 'domain/collection/collection-summary.model';
 import { ExplorationRatings } from 'domain/summary/learner-exploration-summary.model';
 import { CreatorDashboardStats } from 'domain/creator_dashboard/creator-dashboard-stats.model';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 
 @Component({
   selector: 'oppia-creator-dashboard-page',
@@ -89,6 +90,7 @@ export class CreatorDashboardPageComponent {
     private loaderService: LoaderService,
     private userService: UserService,
     private alertsService: AlertsService,
+    private windowDimensionsService: WindowDimensionsService,
     private dateTimeFormatService: DateTimeFormatService,
     private threadStatusDisplayService: ThreadStatusDisplayService,
     private explorationCreationService: ExplorationCreationService,
@@ -139,6 +141,10 @@ export class CreatorDashboardPageComponent {
 
   getTrustedResourceUrl(imageFileName: string): string {
     return decodeURIComponent(imageFileName);
+  }
+
+  checkTabletView(): boolean {
+    return (this.windowDimensionsService.getWidth() < 768);
   }
 
   updatesGivenScreenWidth(): void {

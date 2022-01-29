@@ -197,10 +197,14 @@ describe('Edit Thumbnail Modal Component', () => {
     expect(component.invalidImageWarningIsShown).toBeFalse();
   });
 
-  it('should update bgColor on initialization of modal', () => {
+  it('should update bgColor on changing background color', () => {
     component.bgColor = '#FFFFFF';
-    component.ngOnInit();
-    expect(component.updateBackgroundColor).toHaveBeenCalled();
+    component.thumbnailHasChanged = false;
+
+    component.updateBackgroundColor('#B3D8F1');
+
+    expect(component.bgColor).toBe('#B3D8F1');
+    expect(component.thumbnailHasChanged).toBeTrue();
   });
 
   it('should check for uploaded image to be svg', () => {
@@ -240,6 +244,7 @@ describe('Edit Thumbnail Modal Component', () => {
   });
 
   it('should close the modal when clicking on Add Thumbnail Button', () => {
+    component.thumbnailHasChanged = true;
     component.uploadedImage = 'uploaded_img.svg';
     component.bgColor = '#fff';
     component.openInUploadMode = false;
@@ -248,6 +253,7 @@ describe('Edit Thumbnail Modal Component', () => {
       width: 180
     };
     component.confirm();
+    expect(component.thumbnailHasChanged).toBeFalse();
     expect(closeSpy).toHaveBeenCalledWith({
       newThumbnailDataUrl: 'uploaded_img.svg',
       newBgColor: '#fff',

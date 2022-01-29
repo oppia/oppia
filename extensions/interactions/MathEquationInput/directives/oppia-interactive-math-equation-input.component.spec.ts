@@ -122,7 +122,7 @@ describe('MathEquationInputInteractive', () => {
   it('should submit the answer if valid', function() {
     component.hasBeenTouched = true;
     // Invalid answer.
-    component.value = '(x + y) = 3';
+    component.value = 'x + y = 3';
 
     spyOn(guppyInitializationService, 'getCustomOskLetters').and.returnValue(
       ['x', 'y']);

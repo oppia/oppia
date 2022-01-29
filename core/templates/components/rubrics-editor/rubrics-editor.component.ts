@@ -73,6 +73,9 @@ export class RubricsEditorComponent {
 
   rubricsOptions: RubricsOptions[];
   rubric: Rubric;
+  maximumNumberofExplanations: number = 10;
+  maximumCharacterLengthOfExplanation: number = 300;
+  MEDIUM_EXPLANATION_INDEX: number = 1;
 
   constructor(
     private skillCreationService: SkillCreationService,
@@ -97,6 +100,29 @@ export class RubricsEditorComponent {
 
   isExplanationValid(difficulty: string, index: number): boolean {
     return Boolean(this.editableExplanations[difficulty][index]);
+  }
+
+  isExplanationLengthValid(difficulty: string, idx: number): boolean {
+    return this.editableExplanations[difficulty][idx].length <=
+    this.maximumCharacterLengthOfExplanation;
+  }
+
+  isMediumLevelExplanationValid(): boolean {
+    // Checking if medium level rubrics have at least one explantion.
+    return (
+      this.rubrics[this.MEDIUM_EXPLANATION_INDEX] &&
+      this.rubrics[this.MEDIUM_EXPLANATION_INDEX].getExplanations().length >=
+      1);
+  }
+
+  hasReachedExplanationCountLimit(): boolean {
+    let totalExplanations: number = 0;
+    for (let difficulty in this.editableExplanations) {
+      if (this.editableExplanations[difficulty]) {
+        totalExplanations += this.editableExplanations[difficulty].length;
+      }
+    }
+    return totalExplanations >= this.maximumNumberofExplanations;
   }
 
   updateExplanation($event: string, idx: number): void {

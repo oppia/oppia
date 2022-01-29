@@ -20,6 +20,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 
 @Injectable({
   providedIn: 'root'
@@ -100,6 +101,16 @@ export class DateTimeFormatService {
   isRecent(millisSinceEpoch: number): boolean {
     let ONE_WEEK_IN_MILLIS = 7 * 24 * 60 * 60 * 1000;
     return new Date().getTime() - millisSinceEpoch < ONE_WEEK_IN_MILLIS;
+  }
+  /**
+   * This function returns the relative time from now.
+   * @param {number} millisSinceEpoch - milliseconds since Epoch
+   * @returns {string} string representing the relative time from now
+   */
+  getRelativeTimeFromNow(millisSinceEpoch: number): string {
+    dayjs.extend(relativeTime);
+    let date = new Date(millisSinceEpoch);
+    return dayjs(date).fromNow();
   }
 }
 
