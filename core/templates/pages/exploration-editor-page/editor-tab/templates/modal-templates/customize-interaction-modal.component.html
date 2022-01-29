@@ -1,5 +1,6 @@
 <div class="oppia-interaction-header-container">
-  <div class="modal-header oppia-modal-header" [ngClass]="{'modal-header-blue': stateInteractionIdService.displayed && (customizationModalReopened || hasCustomizationArgs)}">
+  <div class="modal-header oppia-modal-header"
+       [ngClass]="{'modal-header-blue': stateInteractionIdService.displayed && (customizationModalReopened || hasCustomizationArgs)}">
     <h3 *ngIf="!stateInteractionIdService.displayed">
       Choose Interaction
     </h3>
@@ -13,9 +14,16 @@
 
 <div class="customize-interaction-body-container modal-body">
   <div [hidden]="!isinteractionOpen">
-    <nav ngbNav #nav="ngbNav" [(activeId)]="active" class="nav-tabs">
-      <ng-container ngbNavItem *ngFor="let category of allowedInteractionCategories">
-        <a ngbNavLink class="protractor-test-interaction-tab-{{getHyphenatedLowercaseCategoryName(category.name)}}">{{category.name}}</a>
+    <nav ngbNav
+         #nav="ngbNav"
+         [(activeId)]="active"
+         class="nav-tabs">
+      <ng-container ngbNavItem
+                    *ngFor="let category of allowedInteractionCategories">
+        <a ngbNavLink
+           class="protractor-test-interaction-tab-{{getHyphenatedLowercaseCategoryName(category.name)}}">
+          {{category.name}}
+        </a>
         <ng-template ngbNavContent>
           <div>
             <div *ngFor="let interactionId of category.interaction_ids"
@@ -36,17 +44,26 @@
     <div [ngbNavOutlet]="nav" class="mt-4"></div>
   </div>
 
-  <div *ngIf="!isinteractionOpen && stateInteractionIdService.displayed && hasCustomizationArgs" class="interaction-editor-form protractor-test-interaction-editor">
-    <div class="protractor-test-multiple-options" *ngFor="let customizationArgSpec of customizationArgSpecs">
-      <div *ngIf="customizationArgSpec.schema.type !== 'bool'" class="oppia-interaction-customization-label">{{customizationArgSpec.description}}</div>
+  <div *ngIf="!isinteractionOpen && stateInteractionIdService.displayed && hasCustomizationArgs"
+       class="interaction-editor-form protractor-test-interaction-editor">
+    <div class="protractor-test-multiple-options"
+         *ngFor="let customizationArgSpec of customizationArgSpecs">
+      <div *ngIf="customizationArgSpec.schema.type !== 'bool'"
+           class="oppia-interaction-customization-label">
+        {{customizationArgSpec.description}}
+      </div>
       <schema-based-editor [ngClass]="{'boolean-checkbox': customizationArgSpec.schema.type === 'bool'}"
                            [schema]="getSchemaCallback(customizationArgSpec.schema)"
                            [(localValue)]="stateCustomizationArgsService.displayed[customizationArgSpec.name].value">
       </schema-based-editor>
-      <div *ngIf="customizationArgSpec.schema.type === 'bool'" class="oppia-interaction-customization-label">{{customizationArgSpec.description}}</div>
+      <div *ngIf="customizationArgSpec.schema.type === 'bool'"
+           class="oppia-interaction-customization-label">
+        {{customizationArgSpec.description}}
+      </div>
       <div class="oppia-interaction-customization-label-container"></div>
     </div>
-    <div *ngIf="getCustomizationArgsWarningMessage()" class="alert alert-danger oppia-units-input-error">
+    <div *ngIf="getCustomizationArgsWarningMessage()"
+         class="alert alert-danger oppia-units-input-error">
       {{getCustomizationArgsWarningMessage()}}
     </div>
   </div>
@@ -57,11 +74,24 @@
 </div>
 
 <div class="modal-footer">
-  <button class="btn btn-secondary" (click)="cancel()" *ngIf="!hasCustomizationArgs">Cancel</button>
+  <button class="btn btn-secondary"
+          (click)="cancel()"
+          *ngIf="!hasCustomizationArgs">
+    Cancel
+  </button>
   <!-- Do not show this button if an interaction is already selected. -->
-  <button class="btn btn-secondary float-left" (click)="returnToInteractionSelector()" *ngIf="!isinteractionOpen && !stateInteractionIdService.savedMemento && hasCustomizationArgs">Change Interaction</button>
+  <button class="btn btn-secondary float-left"
+          (click)="returnToInteractionSelector()"
+          *ngIf="!isinteractionOpen && !stateInteractionIdService.savedMemento && hasCustomizationArgs">
+    Change Interaction
+  </button>
 
-  <button class="btn btn-secondary" (click)="cancelWithConfirm()" *ngIf="hasCustomizationArgs">Cancel</button>
+  <button class="btn btn-secondary"
+          (click)="cancelWithConfirm()"
+          *ngIf="hasCustomizationArgs">
+    Cancel
+  </button>
+
   <div class="btn-group"
        *ngIf="hasCustomizationArgs"
        ngbPopover="{{isSaveInteractionButtonEnabled() ? '' : getSaveInteractionButtonTooltip()}}"
@@ -73,6 +103,7 @@
       Save Interaction
     </button>
   </div>
+
   <button class="btn btn-success protractor-test-close-no-customization-modal"
           (click)="confirm('okay')"
           *ngIf="!hasCustomizationArgs && customizationModalReopened">
@@ -85,16 +116,19 @@
     float: left;
     margin-right: 4px;
   }
+
   .customize-interaction-body-container .oppia-interaction-tile img {
     border: 1px solid #aaa;
     border-bottom: none;
     border-radius: 5px 5px 0 0;
   }
+
   .customize-interaction-body-container ul .active {
     background-color: #e0f2f1;
     border-bottom: 2px solid #00609c;
     color: #00609c;
   }
+
   .customize-interaction-body-container ul :hover:not(.active) {
     background-color: #e0f2f166;
     border-bottom: 2px solid #e0f2f166;
@@ -105,16 +139,20 @@
      max-width: none;
      width: 45vw;
   }
+
   .customize-interaction-modal .modal-header i {
     display: none;
   }
+
   .oppia-interaction-header-container .oppia-modal-header {
     border-bottom: 0;
     padding-bottom: 0;
   }
+
   .oppia-interaction-header-container .oppia-interaction-customization-label-container {
     margin-bottom: 15px;
   }
+
   @media screen and (max-width: 768px) {
     .customize-interaction-modal .modal-content {
       border: 0;
@@ -122,20 +160,24 @@
       margin: 0;
       min-height: 100vh;
     }
+
     .customize-interaction-modal .modal-dialog {
       margin: 0;
       max-width: none;
       min-height: 100vh;
       width: 100vw;
     }
+
     .customize-interaction-modal .modal-header-blue {
       background-color: #00609c;
     }
+
     .customize-interaction-modal .modal-header-blue i {
       color: #fff;
       display: block;
       font-size: 20px;
     }
+
     .customize-interaction-modal .modal-header-blue h3 {
       color: #fff;
     }

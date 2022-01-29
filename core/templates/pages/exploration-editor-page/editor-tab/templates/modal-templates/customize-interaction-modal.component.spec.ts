@@ -13,13 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for CustomizeInteractionModalComponent.
+ * @fileoverview Unit tests for Customize Interaction Modal.
  */
 
+import { ChangeDetectorRef, EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal, NgbModal, NgbModalModule, NgbModalRef, NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { ChangeDetectorRef, EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { CustomizeInteractionModalComponent } from './customize-interaction-modal.component';
 import { InteractionDetailsCacheService } from 'pages/exploration-editor-page/editor-tab/services/interaction-details-cache.service';
@@ -31,6 +30,7 @@ import { SubtitledUnicodeObjectFactory } from 'domain/exploration/SubtitledUnico
 import { ContextService } from 'services/context.service';
 import { AppConstants } from 'app.constants';
 import { RatioExpressionInputValidationService } from 'interactions/RatioExpressionInput/directives/ratio-expression-input-validation.service';
+import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 
 class MockStateCustomizationArgsService {
   displayed = {
@@ -104,19 +104,19 @@ class MockStateEditorService {
 }
 
 describe('Customize Interaction Modal Component', () => {
-  let fixture: ComponentFixture<CustomizeInteractionModalComponent>;
   let component: CustomizeInteractionModalComponent;
+  let contextService: ContextService;
   let changeDetectorRef: ChangeDetectorRef;
+  let fixture: ComponentFixture<CustomizeInteractionModalComponent>;
+  let interactionDetailsCacheService: InteractionDetailsCacheService;
+  let interactionObjectFactory: InteractionObjectFactory;
+  let ngbActiveModal: NgbActiveModal;
+  let ngbModal: NgbModal;
+  let ratioExpressionInputValidationService:
+    RatioExpressionInputValidationService;
   let stateEditorService: StateEditorService;
   let stateInteractionIdService: StateInteractionIdService;
-  let interactionDetailsCacheService: InteractionDetailsCacheService;
-  let ngbActiveModal: NgbActiveModal;
-  let contextService: ContextService;
-  let ngbModal: NgbModal;
-  let interactionObjectFactory: InteractionObjectFactory;
   let subtitledUnicodeObjectFactory: SubtitledUnicodeObjectFactory;
-  let ratioExpressionInputValidationService:
-   RatioExpressionInputValidationService;
   let stateCustomizationArgsService: StateCustomizationArgsService;
 
   beforeEach(waitForAsync(() => {
@@ -130,18 +130,6 @@ describe('Customize Interaction Modal Component', () => {
       ],
       providers: [
         NgbActiveModal,
-        {
-          provide: ChangeDetectorRef,
-          useClass: MockChangeDetectorRef
-        },
-        {
-          provide: StateCustomizationArgsService,
-          useClass: MockStateCustomizationArgsService
-        },
-        {
-          provide: StateEditorService,
-          useClass: MockStateEditorService
-        },
         StateInteractionIdService,
         InteractionObjectFactory,
         EditorFirstTimeEventsService,
@@ -153,6 +141,18 @@ describe('Customize Interaction Modal Component', () => {
         {
           provide: INTERACTION_SPECS,
           useValue: mockInteractionState
+        },
+        {
+          provide: ChangeDetectorRef,
+          useClass: MockChangeDetectorRef
+        },
+        {
+          provide: StateCustomizationArgsService,
+          useClass: MockStateCustomizationArgsService
+        },
+        {
+          provide: StateEditorService,
+          useClass: MockStateEditorService
         }
       ],
       schemas: [NO_ERRORS_SCHEMA]
@@ -207,6 +207,7 @@ describe('Customize Interaction Modal Component', () => {
     }];
 
     stateInteractionIdService.displayed = 'RatioExpressionInput';
+
     spyOn(ratioExpressionInputValidationService, 'getCustomizationArgsWarnings')
       .and.returnValue(warningListData);
 
@@ -234,6 +235,7 @@ describe('Customize Interaction Modal Component', () => {
 
   it('should update Save interaction Button when userinputs data', () => {
     component.hasCustomizationArgs = true;
+
     spyOn(component, 'getCustomizationArgsWarningsList').and
       .returnValue([]);
 
@@ -296,6 +298,7 @@ describe('Customize Interaction Modal Component', () => {
 
   it('should display interaction content', () => {
     component.isinteractionOpen = false;
+
     expect(component.isinteractionOpen).toBeFalse();
 
     component.returnToInteractionSelector();
@@ -453,7 +456,7 @@ describe('Customize Interaction Modal Component', () => {
       expect(component.getContentIdToContent()).toEqual({contentId: 'html'});
     }));
 
-  it('should save and populate Null for ContentIds' +
+  it('should save and populate null for ContentIds' +
     ' for DragAndDropSortInput intreaction', fakeAsync(() => {
     spyOn(component, 'getContentIdToContent').and.returnValue(
       subtitledUnicodeObjectFactory.createDefault('unicode', 'contentId 1')
@@ -492,7 +495,7 @@ describe('Customize Interaction Modal Component', () => {
     component.save();
   }));
 
-  it('should error when a saved customization arg is missing', () => {
+  it('should show error when a saved customization arg is missing', () => {
     stateInteractionIdService.displayed = 'RatioExpressionInput';
     stateInteractionIdService.savedMemento = 'RatioExpressionInput';
     stateCustomizationArgsService.savedMemento = {};
