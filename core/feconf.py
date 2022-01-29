@@ -28,21 +28,21 @@ from typing import Dict, List
 from typing_extensions import TypedDict
 
 
-# This TypedDict is used intentionally so that the type checker can have
-# any of the following keys ommited.
-class ValidCmdAttributeSpecsAttributeDictNotTotal(TypedDict, total=False):
-    """Dictionary representing the
-    optional ValidCmdAttributeSpecsDict object."""
+# This TypedDict is used only to create the TypedDict below, because we want
+# to mark some attributes as optional. 
+class _ValidCmdAttributeSpecsAttributeDictNotTotal(TypedDict, total=False):
+    """Dictionary representing a non-required part
+    of valid commands specs."""
 
     allowed_values: Dict[str, List[str]]
     deprecated_values: Dict[str, List[str]]
 
 
 class ValidCmdAttributeSpecsAttributeDicts(
-    ValidCmdAttributeSpecsAttributeDictNotTotal,
+    _ValidCmdAttributeSpecsAttributeDictNotTotal,
     total=False
 ):
-    """Dictionary representign the required ValidCmdAttributeDict object."""
+    """Dictionary representing valid commands specs."""
 
     name: str
     required_attribute_names: List[str]
@@ -1377,7 +1377,7 @@ COMMON_RIGHTS_ALLOWED_COMMANDS: List[ValidCmdAttributeSpecsAttributeDicts] = [{
 
 COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS: List[
     ValidCmdAttributeSpecsAttributeDicts
-    ] = copy.deepcopy(
+] = copy.deepcopy(
     COMMON_RIGHTS_ALLOWED_COMMANDS
 )
 COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS.append({
@@ -1422,7 +1422,7 @@ ALLOWED_TOPIC_ROLES = [ROLE_NONE, ROLE_MANAGER]
 # Commands allowed in TopicRightsChange.
 TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS: List[
     ValidCmdAttributeSpecsAttributeDicts
-    ] = [{
+] = [{
     'name': CMD_CREATE_NEW,
     'required_attribute_names': [],
     'optional_attribute_names': [],
