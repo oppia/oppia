@@ -20,7 +20,7 @@ import { NormalizeWhitespacePunctuationAndCasePipe } from
   './normalize-whitespace-punctuation-and-case.pipe';
 import { TestBed } from '@angular/core/testing';
 
-fdescribe('Testing NormalizeWhitespacePunctuationAndCasePipe', () => {
+describe('Testing NormalizeWhitespacePunctuationAndCasePipe', () => {
   let nwpcp: NormalizeWhitespacePunctuationAndCasePipe;
   beforeEach(() => {
     TestBed.configureTestingModule({
