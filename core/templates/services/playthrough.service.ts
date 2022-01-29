@@ -76,8 +76,8 @@ import { Stopwatch } from 'domain/utilities/stopwatch.model';
      * tracked number of cycle occurrences.
      * Otherwise, the tracker is completely reset to 1.
      *
-     * Finally, the path of visited states is reset to a value of [ N ], 
-     * in hopes that the exact same cycle is discovered 
+     * Finally, the path of visited states is reset to a value of [ N ],
+     * in hopes that the exact same cycle is discovered
      * enough times to be considered an issue.
      */
    recordStateTransition(destStateName: string): void {
