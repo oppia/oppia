@@ -16,7 +16,7 @@
  * @fileoverview Component for the Customize Interaction Modal Component.
  */
 
-import { AfterContentChecked, ChangeDetectorRef, Component, Injector, Input, OnInit } from '@angular/core';
+import { AfterContentChecked, ChangeDetectorRef, EventEmitter, Component, Injector, OnInit, Output } from '@angular/core';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { SchemaConstants } from 'components/forms/schema-based-editors/schema.constants';
@@ -98,7 +98,8 @@ const INTERACTION_SERVICE_MAPPING = {
 })
 export class CustomizeInteractionModalComponent
   extends ConfirmOrCancelModal implements OnInit, AfterContentChecked {
-  @Input() showMarkAllAudioAsNeedingUpdateModalIfRequired;
+  @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired:
+    EventEmitter<string[]> = new EventEmitter();
 
   customizationArgSpecs: CustomizationArgSpecsInterface[];
   originalContentIdToContent: object;
@@ -298,15 +299,6 @@ export class CustomizeInteractionModalComponent
             `${contentIdPrefix}`);
         }
       }
-      // else if (schema.type === SchemaConstants.SCHEMA_TYPE_DICT) {
-      //   schema.properties.forEach(property => {
-      //     const name = property.name;
-      //     traverseSchemaAndAssignContentIds(
-      //       value[name],
-      //       property.schema,
-      //       `${contentIdPrefix}_${name}`);
-      //   });
-      // }
     };
 
     const caSpecs = INTERACTION_SPECS[interactionId].customization_arg_specs;
@@ -360,12 +352,6 @@ export class CustomizeInteractionModalComponent
           traverseSchemaAndCollectContent(value[i], schema.items as Schema);
         }
       }
-      //  else if (schema.type === SchemaConstants.SCHEMA_TYPE_DICT) {
-      //   schema.properties.forEach(property => {
-      //     const name = property.name;
-      //     traverseSchemaAndCollectContent(value[name], property.schema);
-      //   });
-      // }
     };
 
     const caSpecs = INTERACTION_SPECS[interactionId].customization_arg_specs;
@@ -394,7 +380,7 @@ export class CustomizeInteractionModalComponent
         contentIdsWithModifiedContent.push(contentId);
       }
     });
-    this.showMarkAllAudioAsNeedingUpdateModalIfRequired(
+    this.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit(
       contentIdsWithModifiedContent);
 
     this.populateNullContentIds();

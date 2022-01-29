@@ -181,7 +181,6 @@ describe('Customize Interaction Modal Component', () => {
       TestBed.inject(StateCustomizationArgsService);
 
     stateInteractionIdService.displayed = 'RatioExpressionInput';
-    component.showMarkAllAudioAsNeedingUpdateModalIfRequired = () => {};
 
     fixture.detectChanges();
   });

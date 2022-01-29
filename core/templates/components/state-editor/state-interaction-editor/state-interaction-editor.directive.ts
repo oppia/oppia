@@ -230,14 +230,17 @@ angular.module('oppia').directive('stateInteractionEditor', [
 
               const modalRef = NgbModal
                 .open(CustomizeInteractionModalComponent, {
-                  bkeyboard: false,
+                  keyboard: false,
                   backdrop: 'static',
                   windowClass: 'customize-interaction-modal'
                 });
 
               modalRef.componentInstance
-                .showMarkAllAudioAsNeedingUpdateModalIfRequired =
-              $scope.showMarkAllAudioAsNeedingUpdateModalIfRequired;
+                .showMarkAllAudioAsNeedingUpdateModalIfRequired.subscribe(
+                  (value: Event) => {
+                    $scope.showMarkAllAudioAsNeedingUpdateModalIfRequired(
+                      value);
+                  });
 
               modalRef.result.then(
                 $scope.onCustomizationModalSavePostHook, function() {
