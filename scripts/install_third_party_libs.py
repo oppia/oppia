@@ -94,6 +94,7 @@ PROTO_FILES_PATHS = [
 # Path to typescript plugin required to compile ts compatible files from proto.
 PROTOC_GEN_TS_PATH = os.path.join(common.NODE_MODULES_PATH, 'protoc-gen-ts')
 
+
 def tweak_yarn_executable():
     """When yarn is run on Windows, the file yarn will be executed by default.
     However, this file is a bash script, and can't be executed directly on
@@ -201,7 +202,6 @@ def ensure_system_python_libraries_are_installed(package, version):
     """Installs the pip library with the corresponding version to the system
     globally. This is necessary because the development application server
     requires certain libraries on the host machine.
-    
     Args:
         package: str. The package name.
         version: str. The package version.
