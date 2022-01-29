@@ -351,7 +351,11 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             question_ids, [self.question_id, question_id_2])
 
         with self.assertRaisesRegex(
-            Exception, 'The given question is already linked to given skill'):
+            Exception,
+            'The question with ID %s is already linked to skill skill_1' % (
+                self.question_id
+            )
+        ):
             question_services.create_new_question_skill_link(
                 self.editor_id, self.question_id, 'skill_1', 0.3)
 
@@ -1723,7 +1727,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             question.question_state_data.interaction.id,
             'AlgebraicExpressionInput')
-        self.assertEqual(len(answer_groups[0].rule_specs), 1)
+        self.assertEqual(len(answer_groups[0].rule_specs), 2)
         self.assertEqual(
             answer_groups[0].rule_specs[0].rule_type, 'MatchesExactlyWith')
         self.assertEqual(
@@ -1846,7 +1850,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': 'x+y'
+                    'x': 'x=y'
                 },
                 'rule_type': 'IsMathematicallyEquivalentTo'
             }],
@@ -1941,12 +1945,12 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         answer_groups = question.question_state_data.interaction.answer_groups
         self.assertEqual(
             question.question_state_data.interaction.id,
-            'AlgebraicExpressionInput')
+            'MathEquationInput')
         self.assertEqual(len(answer_groups), 1)
         self.assertEqual(
             answer_groups[0].rule_specs[0].rule_type, 'MatchesExactlyWith')
         self.assertEqual(
-            answer_groups[0].rule_specs[0].inputs, {'x': 'x+y'})
+            answer_groups[0].rule_specs[0].inputs, {'x': 'x=y', 'y': 'both'})
         state_data = question.question_state_data
         self.assertEqual(sorted(
             state_data.recorded_voiceovers.voiceovers_mapping.keys()), [
