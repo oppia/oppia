@@ -467,7 +467,6 @@ def get_translation_opportunities(language_code, topic_name, cursor):
         opportunity.id for opportunity in exp_opportunity_summary_models]
     exp_id_to_in_review_count = {}
     if len(opportunity_exp_ids) > 0:
-        # Skip the datastore fetch if there are no opportunities.
         exp_id_to_in_review_count = (
             _build_exp_id_to_translation_suggestion_in_review_count(
                 opportunity_exp_ids, language_code))
