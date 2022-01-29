@@ -359,7 +359,7 @@ describe('Translation contribution featured languages', () => {
       'List',
       async function(elem) {
         var featured = await elem.addItem('Dictionary');
-        await (await featured.editEntry(0, 'Unicode')).setValue('fr');
+        await (await featured.editEntry(0, 'Unicode')).setValue('de');
         await (await featured.editEntry(1, 'Unicode'))
           .setValue('Partnership with ABC');
       });
@@ -373,7 +373,7 @@ describe('Translation contribution featured languages', () => {
 
   it('should show correct featured languages', async function() {
     await contributorDashboardTranslateTextTab
-      .expectFeaturedLanguagesToBe(['French']);
+      .expectFeaturedLanguagesToBe(['Deutsch (German)']);
   });
 
   it('should show correct explanation', async function() {
