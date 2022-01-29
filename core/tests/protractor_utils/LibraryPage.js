@@ -53,7 +53,7 @@ var LibraryPage = function() {
   var searchButton = element(by.css('.protractor-test-search-button'));
   var addToPlayLaterListButton = element(
     by.css('.protractor-test-add-to-playlist-btn'));
-  var expHoverElement = element(by.css('.protractor-test-exp-hover'));
+  var expHoverElement = element(by.css('.protractor-test-exp-summary-tile-rating'));
   var expSummaryTileObjectiveLocator = by.css(
     '.protractor-test-exp-summary-tile-objective');
   var expSummaryTileRatingLocator = by.css(
@@ -96,7 +96,7 @@ var LibraryPage = function() {
   };
 
   this.addSelectedExplorationToPlaylist = async function() {
-    await browser.actions().mouseMove(addToPlayLaterListButton).perform();
+    await browser.actions().mouseMove(expHoverElement).perform();
 
     await waitFor.elementToBeClickable(
       addToPlayLaterListButton,
