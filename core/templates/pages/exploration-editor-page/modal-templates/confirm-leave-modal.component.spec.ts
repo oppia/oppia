@@ -12,9 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
- * @fileoverview Unit tests for confirm leave modal.
+ * @fileoverview Unit tests for confirm leave modal component.
  */
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';

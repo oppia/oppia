@@ -146,10 +146,10 @@ export class CustomizeInteractionModalComponent
       INTERACTION_SPECS[this.stateInteractionIdService.displayed].id +
       'ValidationService');
 
-    var validationService =
+    let validationService =
       this.injector.get(
         INTERACTION_SERVICE_MAPPING[validationServiceName]);
-    var warningsList = validationService.getCustomizationArgsWarnings(
+    let warningsList = validationService.getCustomizationArgsWarnings(
       this.stateCustomizationArgsService.displayed);
     return warningsList;
   }
@@ -159,9 +159,9 @@ export class CustomizeInteractionModalComponent
   }
 
   getCustomizationArgsWarningMessage(): string {
-    var warningsList = (
+    let warningsList = (
       this.getCustomizationArgsWarningsList());
-    var warningMessage = '';
+    let warningMessage = '';
     if (warningsList.length !== 0) {
       warningMessage = warningsList[0].message;
     }
@@ -173,7 +173,7 @@ export class CustomizeInteractionModalComponent
     this.editorFirstTimeEventsService
       .registerFirstSelectInteractionTypeEvent();
 
-    var interactionSpec = INTERACTION_SPECS[newInteractionId];
+    let interactionSpec = INTERACTION_SPECS[newInteractionId];
     this.customizationArgSpecs = (
       interactionSpec.customization_arg_specs);
     this.stateInteractionIdService.displayed = newInteractionId;
@@ -231,9 +231,9 @@ export class CustomizeInteractionModalComponent
       return 'No interaction being displayed';
     }
 
-    var warningsList =
+    let warningsList =
       this.getCustomizationArgsWarningsList();
-    var warningMessages = warningsList.map((warning) => {
+    let warningMessages = warningsList.map((warning) => {
       return warning.message;
     });
 
@@ -436,7 +436,7 @@ export class CustomizeInteractionModalComponent
 
     if (this.stateInteractionIdService.savedMemento) {
       this.customizationModalReopened = true;
-      var interactionSpec = INTERACTION_SPECS[
+      let interactionSpec = INTERACTION_SPECS[
         this.stateInteractionIdService.savedMemento];
       this.customizationArgSpecs = interactionSpec.customization_arg_specs;
 
@@ -447,8 +447,8 @@ export class CustomizeInteractionModalComponent
 
       // Ensure that StateCustomizationArgsService.displayed is
       // fully populated.
-      for (var i = 0; i < this.customizationArgSpecs.length; i++) {
-        var argName = this.customizationArgSpecs[i].name;
+      for (let i = 0; i < this.customizationArgSpecs.length; i++) {
+        let argName = this.customizationArgSpecs[i].name;
         if (
           !this.stateCustomizationArgsService
             .savedMemento.hasOwnProperty(argName)
