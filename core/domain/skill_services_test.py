@@ -33,8 +33,8 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-(skill_models, suggestion_models) = models.Registry.import_models(
-    [models.NAMES.skill, models.NAMES.suggestion])
+(skill_models, suggestion_models, question_models) = models.Registry.import_models(
+    [models.NAMES.skill, models.NAMES.suggestion, models.NAMES.question])
 
 
 class SkillServicesUnitTests(test_utils.GenericTestBase):
@@ -970,6 +970,29 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 self.user_id_a, self.SKILL_ID, changelist,
                 'Change description.')
 
+    def test_update_skill_property(self):
+        skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
+        old_description = 'Description'
+        new_description = 'New description'
+
+        self.assertEqual(
+            skill.description, old_description)
+
+        changelist = [
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                'property_name': skill_domain.SKILL_PROPERTY_DESCRIPTION,
+                'old_value': old_description,
+                'new_value': new_description
+            })
+        ]
+        skill_services.update_skill(
+            self.user_id_admin, self.SKILL_ID, changelist, 'Change description.')
+
+        skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
+        self.assertEqual(
+            skill.description, new_description)
+
     def test_update_skill_explanation(self):
         skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
         old_explanation = {'content_id': '1', 'html': '<p>Explanation</p>'}
@@ -1047,6 +1070,16 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(skill.misconceptions, [])
 
+    def test_does_skill_with_description_exist(self):
+        self.assertEqual(
+            skill_services.does_skill_with_description_exist('Description'),
+            True
+        )
+        self.assertEqual(
+            skill_services.does_skill_with_description_exist('Does not exist'),
+            False
+        )
+
     def test_update_skill_misconception_notes(self):
         skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
 
@@ -1103,6 +1136,34 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill.misconceptions[0].id, self.MISCONCEPTION_ID_1)
         self.assertEqual(
             skill.misconceptions[0].feedback, '<p>new feedback</p>')
+
+    def test_skill_has_associated_questions(self):
+        skill_id_1 = skill_services.get_new_skill_id() # type: ignore[no-untyped-call]
+        self.save_new_skill(skill_id_1, 'user', description='Description 1') # type: ignore[no-untyped-call]
+
+        # Testing that no question is linked to a skill.
+        self.assertEqual(
+            skill_services.skill_has_associated_questions(skill_id_1),
+            False
+        )
+
+        questionskilllink_model1 = (
+            question_models.QuestionSkillLinkModel.create(
+                'question_id1', skill_id_1, 0.1)
+            )
+        questionskilllink_model2 = (
+            question_models.QuestionSkillLinkModel.create(
+                'question_id2', skill_id_1, 0.2)
+            )
+
+        question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
+            [questionskilllink_model1, questionskilllink_model2]
+        )
+
+        self.assertEqual(
+            skill_services.skill_has_associated_questions(skill_id_1),
+            True
+        )
 
     def test_update_skill_schema(self):
         orig_skill_dict = (
