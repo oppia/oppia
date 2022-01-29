@@ -45,7 +45,7 @@ from core.platform import models  # pylint: disable=invalid-import-from # isort:
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
 
-(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
+(exp_models,) = models.Registry.import_models([models.Names.EXPLORATION])
 
 
 # Do not modify the values of these constants. This is to preserve backwards
