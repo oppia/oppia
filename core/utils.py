@@ -410,7 +410,7 @@ def set_url_query_parameter(
             % param_name)
 
     scheme, netloc, path, query_string, fragment = urllib.parse.urlsplit(url)
-    query_params = python_utils.parse_query_string(query_string) # type: ignore[no-untyped-call]
+    query_params = urllib.parse.parse_qs(query_string)
 
     query_params[param_name] = [param_value]
     new_query_string = urllib.parse.urlencode(query_params, doseq=True)
