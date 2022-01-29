@@ -987,8 +987,8 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             })
         ]
         skill_services.update_skill(
-            self.user_id_admin, 
-            self.SKILL_ID, changelist, 
+            self.user_id_admin,
+            self.SKILL_ID, changelist,
             'Change description.'
             )
 
