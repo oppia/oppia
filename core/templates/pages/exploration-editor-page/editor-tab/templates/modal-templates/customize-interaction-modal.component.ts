@@ -65,31 +65,28 @@ interface CustomizationArgSpecsInterface {
 }
 
 const INTERACTION_SERVICE_MAPPING = {
-  ContinueValidationService: ContinueValidationService,
-  EndExplorationValidationService: EndExplorationValidationService,
   AlgebraicExpressionInputValidationService:
     AlgebraicExpressionInputValidationService,
+  CodeReplValidationService: CodeReplValidationService,
+  ContinueValidationService: ContinueValidationService,
+  DragAndDropSortInputValidationService: DragAndDropSortInputValidationService,
+  EndExplorationValidationService: EndExplorationValidationService,
+  FractionInputValidationService: FractionInputValidationService,
+  GraphInputValidationService: GraphInputValidationService,
   ImageClickInputValidationService: ImageClickInputValidationService,
+  InteractiveMapValidationService: InteractiveMapValidationService,
   ItemSelectionInputValidationService: ItemSelectionInputValidationService,
+  MathEquationInputValidationService: MathEquationInputValidationService,
+  MultipleChoiceInputValidationService: MultipleChoiceInputValidationService,
+  MusicNotesInputValidationService: MusicNotesInputValidationService,
   NumberWithUnitsValidationService: NumberWithUnitsValidationService,
   NumericExpressionInputValidationService:
     NumericExpressionInputValidationService,
   NumericInputValidationService: NumericInputValidationService,
-  DragAndDropSortInputValidationService:
-    DragAndDropSortInputValidationService,
-  GraphInputValidationService: GraphInputValidationService,
-  SetInputValidationService: SetInputValidationService,
-  CodeReplValidationService: CodeReplValidationService,
-  MathEquationInputValidationService: MathEquationInputValidationService,
-  MultipleChoiceInputValidationService:
-    MultipleChoiceInputValidationService,
   PencilCodeEditorValidationService: PencilCodeEditorValidationService,
+  RatioExpressionInputValidationService: RatioExpressionInputValidationService,
+  SetInputValidationService: SetInputValidationService,
   TextInputValidationService: TextInputValidationService,
-  InteractiveMapValidationService: InteractiveMapValidationService,
-  MusicNotesInputValidationService: MusicNotesInputValidationService,
-  FractionInputValidationService: FractionInputValidationService,
-  RatioExpressionInputValidationService:
-    RatioExpressionInputValidationService,
 };
 
 @Component({
