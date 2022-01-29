@@ -72,8 +72,8 @@ import { Stopwatch } from 'domain/utilities/stopwatch.model';
      *
      * If this *exact* cycle has been discovered before (NOTE: rotations of a
      * cycle are considered to be different from each other),
-     * then we increase the
-     * tracked number of cycle occurrences.
+     * then we increase the tracked
+     * number of cycle occurrences.
      * Otherwise, the tracker is completely reset to 1.
      *
      * Finally, the path of visited states is reset to a value of [ N ],
