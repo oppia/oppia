@@ -595,7 +595,7 @@ class SkillDict(TypedDict, total=False):
     language_code: str
     version: int
     next_misconception_id: int
-    superseding_skill_id: str|None
+    superseding_skill_id: Optional[str]
     all_questions_merged: bool
     prerequisite_skill_ids: List[str]
     created_on: Optional[str]
@@ -639,7 +639,7 @@ class Skill:
         language_code: str,
         version: int,
         next_misconception_id: int,
-        superseding_skill_id: str|None,
+        superseding_skill_id: Optional[str],
         all_questions_merged: bool,
         prerequisite_skill_ids: List[str],
         created_on: Optional[datetime.datetime] = None,
