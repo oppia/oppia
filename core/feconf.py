@@ -29,7 +29,7 @@ from typing_extensions import TypedDict
 
 
 # This TypedDict is used only to create the TypedDict below, because we want
-# to mark some attributes as optional. 
+# to mark some attributes as optional.
 class _ValidCmdAttributeSpecsAttributeDictNotTotal(TypedDict, total=False):
     """Dictionary representing a non-required part
     of valid commands specs."""
