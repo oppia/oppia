@@ -22,7 +22,7 @@ from core.domain import auth_domain
 from core.platform import models
 from core.platform.auth import firebase_auth_services
 
-auth_models, = models.Registry.import_models([models.NAMES.auth])
+auth_models, = models.Registry.import_models([models.Names.AUTH])
 
 platform_auth_services = models.Registry.import_auth_services()
 
