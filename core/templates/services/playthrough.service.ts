@@ -376,4 +376,3 @@ export class PlaythroughService {
 angular.module('oppia').factory(
   'PlaythroughService',
   downgradeInjectable(PlaythroughService));
-
