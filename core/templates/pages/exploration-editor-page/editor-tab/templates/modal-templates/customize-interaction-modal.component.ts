@@ -110,19 +110,19 @@ export class CustomizeInteractionModalComponent
   isinteractionOpen: boolean;
 
   constructor(
-    private ngbActiveModal: NgbActiveModal,
-    private stateInteractionIdService: StateInteractionIdService,
-    private stateCustomizationArgsService: StateCustomizationArgsService,
+    private changeDetectorRef: ChangeDetectorRef,
     private contextService: ContextService,
     private editorFirstTimeEventsService: EditorFirstTimeEventsService,
-    private stateNextContentIdIndexService: StateNextContentIdIndexService,
-    private ngbModal: NgbModal,
+    private injector: Injector,
     private interactionDetailsCacheService: InteractionDetailsCacheService,
     private interactionObjectFactory: InteractionObjectFactory,
-    private urlInterpolationService: UrlInterpolationService,
+    private ngbActiveModal: NgbActiveModal,
+    private ngbModal: NgbModal,
+    private stateCustomizationArgsService: StateCustomizationArgsService,
     private stateEditorService: StateEditorService,
-    private injector: Injector,
-    private changeDetectorRef: ChangeDetectorRef,
+    private stateInteractionIdService: StateInteractionIdService,
+    private stateNextContentIdIndexService: StateNextContentIdIndexService,
+    private urlInterpolationService: UrlInterpolationService,
   ) {
     super(ngbActiveModal);
   }
@@ -152,10 +152,6 @@ export class CustomizeInteractionModalComponent
     let warningsList = validationService.getCustomizationArgsWarnings(
       this.stateCustomizationArgsService.displayed);
     return warningsList;
-  }
-
-  ngAfterContentChecked(): void {
-    this.changeDetectorRef.detectChanges();
   }
 
   getCustomizationArgsWarningMessage(): string {
@@ -395,6 +391,10 @@ export class CustomizeInteractionModalComponent
   getInteractionThumbnailImageUrl(interactionId: string): string {
     return this.urlInterpolationService.getInteractionThumbnailImageUrl(
       interactionId);
+  }
+
+  ngAfterContentChecked(): void {
+    this.changeDetectorRef.detectChanges();
   }
 
   ngOnInit(): void {
