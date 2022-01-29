@@ -1,3 +1,4 @@
+
 # Copyright 2019 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the 'License');
@@ -142,6 +143,7 @@ def install_buf_and_protoc():
     common.recursive_chmod(buf_path, 0o744)
     common.recursive_chmod(protoc_path, 0o744)
 
+
 def compile_protobuf_files(proto_files_paths):
     """Compiles protobuf files using buf.
     Raises:
@@ -177,6 +179,7 @@ def compile_protobuf_files(proto_files_paths):
                 p.absolute(),
                 r'^import (\w*_pb2 as)', r'from proto_files import \1')
 
+
 def ensure_pip_library_is_installed(package, version, path):
     """Installs the pip library after ensuring its not already installed.
     Args:
@@ -191,6 +194,7 @@ def ensure_pip_library_is_installed(package, version, path):
         print('Installing %s' % package)
         install_backend_python_libs.pip_install(
             '%s==%s' % (package, version), exact_lib_path)
+
 
 def ensure_system_python_libraries_are_installed(package, version):
     """Installs the pip library with the corresponding version to the system
