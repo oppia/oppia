@@ -72,7 +72,7 @@ class MockStateCustomizationArgsService {
   }
 }
 
-const mockInteractionState = {
+const MockInteractionState = {
   RatioExpressionInput: {
     description: 'xyz',
     id: 'RatioExpressionInput',
@@ -140,7 +140,7 @@ describe('Customize Interaction Modal Component', () => {
         ContextService,
         {
           provide: INTERACTION_SPECS,
-          useValue: mockInteractionState
+          useValue: MockInteractionState
         },
         {
           provide: ChangeDetectorRef,
@@ -164,24 +164,22 @@ describe('Customize Interaction Modal Component', () => {
     component = fixture.componentInstance;
 
     changeDetectorRef = TestBed.inject(ChangeDetectorRef);
-    interactionDetailsCacheService =
-      TestBed.inject(InteractionDetailsCacheService);
+    contextService = TestBed.inject(ContextService);
+    interactionDetailsCacheService = TestBed.inject(
+      InteractionDetailsCacheService);
     ngbModal = TestBed.inject(NgbModal);
     ngbActiveModal = TestBed.inject(NgbActiveModal);
-    interactionObjectFactory =
-    TestBed.inject(InteractionObjectFactory);
+    interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
+    stateCustomizationArgsService = TestBed.inject(
+      StateCustomizationArgsService);
     stateEditorService = TestBed.inject(StateEditorService);
     stateInteractionIdService = TestBed.inject(StateInteractionIdService);
-    contextService = TestBed.inject(ContextService);
-    subtitledUnicodeObjectFactory =
-      TestBed.inject(SubtitledUnicodeObjectFactory);
+    subtitledUnicodeObjectFactory = TestBed.inject(
+      SubtitledUnicodeObjectFactory);
     ratioExpressionInputValidationService = TestBed.inject(
       RatioExpressionInputValidationService);
-    stateCustomizationArgsService =
-      TestBed.inject(StateCustomizationArgsService);
 
     stateInteractionIdService.displayed = 'RatioExpressionInput';
-
     fixture.detectChanges();
   });
 
