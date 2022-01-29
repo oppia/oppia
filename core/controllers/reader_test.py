@@ -2423,7 +2423,7 @@ class ExplorationEmbedPageTests(test_utils.GenericTestBase):
             '%s/invalid_exp_id' % (feconf.EXPLORATION_URL_EMBED_PREFIX),
             params={
                 'collection_id': self.COL_ID
-            }, expected_status_int=404
+            }, expected_status_int=400
         )
 
         self.logout()
@@ -2438,6 +2438,21 @@ class ExplorationEmbedPageTests(test_utils.GenericTestBase):
             params={
                 'v': exploration.version,
                 'collection_id': 'invalid_collection_id'
+            }, expected_status_int=400
+        )
+
+        self.logout()
+
+    def test_handler_raises_error_with_no_collection(self):
+        self.login(self.OWNER_EMAIL)
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.owner_id)
+
+        self.get_html_response(
+            '%s/%s' % (feconf.EXPLORATION_URL_EMBED_PREFIX, self.EXP_ID),
+            params={
+                'v': exploration.version,
+                'collection_id': 'aZ9_______12'
             }, expected_status_int=404
         )
 
