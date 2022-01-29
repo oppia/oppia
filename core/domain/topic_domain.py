@@ -943,7 +943,7 @@ class Topic:
             story_id: str. The story id to add to the list.
 
         Raises:
-            Exception. The story_id is already present in the canonical
+            Exception. The story ID is already present in the canonical
                 story references list of the topic.
         """
         canonical_story_ids = self.get_canonical_story_ids()
@@ -962,7 +962,7 @@ class Topic:
             story_id: str. The story id to add to the list.
 
         Raises:
-            Exception. The story_id is already present in the additional
+            Exception. The story ID is already present in the additional
                 story references list of the topic.
         """
         additional_story_ids = self.get_additional_story_ids()
@@ -981,7 +981,7 @@ class Topic:
             story_id: str. The story id to remove from the list.
 
         Raises:
-            Exception. The story_id is not present in the additional stories
+            Exception. The story ID is not present in the additional stories
                 list of the topic.
         """
         deleted = False
@@ -1324,8 +1324,8 @@ class Topic:
                 for the topic.
 
         Raises:
-            Exception. The thumbnail new_thumbnail_filename does not exixt for
-                expected topic in the filesystem.
+            Exception. The thumbnail does not exist for expected topic in
+                the filesystem.
         """
         file_system_class = fs_services.get_entity_file_system_class()
         fs = fs_domain.AbstractFileSystem(file_system_class(

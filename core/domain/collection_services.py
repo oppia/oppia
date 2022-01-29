@@ -633,7 +633,7 @@ def apply_change_list(collection_id, change_list):
         Collection. The resulting collection domain object.
 
     Raises:
-        Exception. The change_list is not applicable on given collection_id.
+        Exception. The change list is not applicable on the given collection.
     """
     collection = get_collection_by_id(collection_id)
 
@@ -1179,7 +1179,7 @@ def delete_demo(collection_id):
         collection_id: str. ID of the demo collection to be deleted.
 
     Raises:
-        Exception. Invalid collection_id.
+        Exception. Invalid demo collection ID.
     """
     if not collection_domain.Collection.is_demo_collection_id(collection_id):
         raise Exception('Invalid demo collection id %s' % collection_id)

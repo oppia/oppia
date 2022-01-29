@@ -38,8 +38,7 @@ def _get_new_model_id(model_class: base_models.BaseModel) -> str:
         str. The new ID.
 
     Raises:
-        RuntimeError. If the function fails to generate a new ID even after
-            '_MAX_ID_GENERATION_ATTEMPTS' attempts.
+        RuntimeError. The function failed to generate a new ID.
     """
     for _ in range(_MAX_ID_GENERATION_ATTEMPTS):
         new_id = utils.convert_to_hash(uuid.uuid4().hex, 22)

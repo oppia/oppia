@@ -133,7 +133,7 @@ def _update_stats_transactional(
             instance with stats aggregated in the frontend.
 
     Raises:
-        Exception. Parameters to update ExplorationStatsModel does not exist.
+        Exception. Parameters to update ExplorationStatsModel do not exist.
     """
     exp_stats = get_exploration_stats_by_id(exp_id, exp_version)
     if exp_stats is None:

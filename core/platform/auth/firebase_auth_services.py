@@ -463,7 +463,7 @@ def grant_super_admin_privileges(user_id: str) -> None:
         user_id: str. The Oppia user ID to promote to super admin.
 
     Raises:
-        ValueError. No Firebase account associated with user_id.
+        ValueError. No Firebase account associated with given user ID.
     """
     auth_id = get_auth_id_from_user_id(user_id)
     if auth_id is None:
@@ -482,7 +482,7 @@ def revoke_super_admin_privileges(user_id: str) -> None:
         user_id: str. The Oppia user ID to revoke privileges from.
 
     Raises:
-        ValueError. No Firebase account associated with user_id.
+        ValueError. No Firebase account associated with given user ID.
     """
     auth_id = get_auth_id_from_user_id(user_id)
     if auth_id is None:

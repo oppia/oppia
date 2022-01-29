@@ -53,7 +53,7 @@ def run_beam_job(
         BeamJobRun. Metadata about the run's execution.
 
     Raises:
-        ValueError. If both job_name and job_class is not specified.
+        ValueError. If both job_name and job_class are not specified.
     """
     if job_class is None and job_name is None:
         raise ValueError('Must specify the job class or name to run')

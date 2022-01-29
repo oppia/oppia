@@ -287,8 +287,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
             '[platform].[submitted_on_msec].[random hash]'.
 
         Raises:
-            Exception. If the id generator for AppFeedbackReportModel is
-                producing too many collisions.
+            Exception. If the id generator is producing too many collisions.
         """
         submitted_datetime_in_msec = utils.get_time_in_millisecs(
             submitted_on_datetime)
@@ -562,8 +561,7 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
             '[creation_datetime_msec]:[hash(ticket_name)]:[random hash]'.
 
         Raises:
-            Exception. If the id generator for AppFeedbackReportModel is
-                producing too many collisions.
+            Exception. If the id generator is producing too many collisions.
         """
         current_datetime_in_msec = utils.get_time_in_millisecs(
             datetime.datetime.utcnow())

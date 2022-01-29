@@ -486,7 +486,7 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
             obj: dict. Argument which needs to be validated.
 
         Raises:
-            Exception. If 'Any' type is not the dictionary value type.
+            Exception. Given argument is missing 'any_arg'.
         """
         if 'any_arg' not in obj:
             raise Exception('Missing \'any_arg\'.')

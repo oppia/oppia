@@ -433,7 +433,7 @@ class Solution:
             dict. The converted Solution dict.
 
         Raises:
-            Exception. If the solution_dict have invalid correct_answer type.
+            Exception. If the Solution dict have invalid answer type.
         """
         if interaction_id is None:
             return solution_dict
@@ -2736,7 +2736,7 @@ class State:
             str. The YAML version of the state_dict.
 
         Raises:
-            Exception. The state_dict does not represent a valid state.
+            Exception. The state dict does not represent a valid state.
         """
         try:
             # Check if the state_dict can be converted to a State.
@@ -2792,10 +2792,8 @@ class State:
                 state.
 
         Raises:
-            Exception. If the content_id not present in recorded_voiceovers
-                or written_translations and deleted.
-            Exception. If the content_id is present in recorded_voiceovers
-                or written_translations and added again.
+            Exception. The content ID to be deleted doesn't exist.
+            Exception. The content ID to be added already exist.
         """
         content_ids_to_delete = set(old_ids_list) - set(new_ids_list)
         content_ids_to_add = set(new_ids_list) - set(old_ids_list)
@@ -2951,7 +2949,7 @@ class State:
             customization_args_dict: dict. The new customization_args to set.
 
         Raises:
-            Exception. Elements of customization_args_dict are not unique.
+            Exception. Elements of customization_args dict are not unique.
         """
         customization_args = (
             InteractionInstance.
@@ -3101,7 +3099,7 @@ class State:
                 default outcome.
 
         Raises:
-            Exception. The 'confirmed_unclassified_answers' is not a list.
+            Exception. Given answers is not of type list.
         """
         if not isinstance(confirmed_unclassified_answers, list):
             raise Exception(

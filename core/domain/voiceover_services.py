@@ -248,7 +248,7 @@ def reject_voiceover_application(
             reviewer while rejecting the application.
 
     Raises:
-        Exception. If reviewer_id is same as author id.
+        Exception. Reviewer ID is same as the author ID.
     """
     voiceover_application = get_voiceover_application_by_id(
         voiceover_application_id)

@@ -130,8 +130,7 @@ def _get_requirements_file_contents():
         the key and the version string of that library as the value.
 
     Raises:
-        Exception. Given URL does not matches with
-            GIT_DIRECT_URL_REQUIREMENT_PATTERN.
+        Exception. Given URL is invalid.
     """
     requirements_contents = collections.defaultdict()
     with python_utils.open_file(

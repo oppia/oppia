@@ -230,7 +230,7 @@ class GcsFileSystem(GeneralFileSystem):
             list(str). A lexicographically-sorted list of filenames.
 
         Raises:
-            OSError. The dir_name is starting with / or ending with /.
+            OSError. The directory name is starting with / or ending with /.
         """
         if dir_name.startswith('/') or dir_name.endswith('/'):
             raise IOError(

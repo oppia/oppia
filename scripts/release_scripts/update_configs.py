@@ -87,8 +87,7 @@ def apply_changes_based_on_config(
             corresponds to the prefix to extract.
 
     Raises:
-        Exception. Line in given file not matching with
-            expected_config_line_regex.
+        Exception. Line(s) in config file are not matching with the regex.
     """
     with python_utils.open_file(config_filepath, 'r') as config_file:
         config_lines = config_file.read().splitlines()

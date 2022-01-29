@@ -64,14 +64,14 @@ class ThirdPartyCSSLintChecksManager:
             check.
 
         Raises:
-            Exception. The start.sh file not executed.
+            Exception. The start.py file not executed.
         """
         node_path = os.path.join(common.NODE_PATH, 'bin', 'node')
         stylelint_path = os.path.join(
             'node_modules', 'stylelint', 'bin', 'stylelint.js')
         if not os.path.exists(stylelint_path):
             raise Exception(
-                'ERROR    Please run start.sh first to install node-eslint '
+                'ERROR    Please run start.py first to install node-eslint '
                 'or node-stylelint and its dependencies.')
 
         failed = False

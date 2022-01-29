@@ -1828,8 +1828,7 @@ def send_email_to_new_contribution_reviewer(
             item is translation or voiceover else None.
 
     Raises:
-        Exception. The review_category is not present in
-            NEW_REVIEWER_EMAIL_DATA.
+        Exception. The review category is not valid.
     """
     if review_category not in NEW_REVIEWER_EMAIL_DATA:
         raise Exception('Invalid review_category: %s' % review_category)
@@ -1896,8 +1895,7 @@ def send_email_to_removed_contribution_reviewer(
             item is translation or voiceover else None.
 
     Raises:
-        Exception. The review_category is not present in
-            REMOVED_REVIEWER_EMAIL_DATA.
+        Exception. The review category is not valid.
     """
     if review_category not in REMOVED_REVIEWER_EMAIL_DATA:
         raise Exception('Invalid review_category: %s' % review_category)

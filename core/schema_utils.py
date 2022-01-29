@@ -403,7 +403,7 @@ class _Validators:
             validator_id.
 
         Raises:
-            Exception. If the validator_id is invalid.
+            Exception. Given validator method is invalid.
         """
         if not hasattr(cls, validator_id):
             raise Exception('Invalid validator id: %s' % validator_id)

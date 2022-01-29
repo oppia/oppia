@@ -609,7 +609,7 @@ def managed_protractor_server(
         psutil.Process. The protractor process.
 
     Raises:
-        ValueError. Given sharding_instances is not larger than 0.
+        ValueError. Number of sharding instances are less than 0.
     """
     if sharding_instances <= 0:
         raise ValueError('Sharding instance should be larger than 0')

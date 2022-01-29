@@ -353,7 +353,7 @@ def get_current_release_version_number(release_branch_name):
         str. The version of release.
 
     Raises:
-        Exception. Invalid release_branch_name.
+        Exception. Invalid name of the release branch.
     """
     release_match = re.match(RELEASE_BRANCH_REGEX, release_branch_name)
     release_maintenance_match = re.match(
@@ -600,8 +600,8 @@ def inplace_replace_file(
             replacements that should be made. When None no check is done.
 
     Raises:
-        ValueError. The total_number_of_replacements not same as
-            expected_number_of_replacements.
+        ValueError. The number of replacements that should be made exceeds
+            the total number.
         Exception. The content failed to get replaced.
     """
     backup_filename = '%s.bak' % filename

@@ -50,8 +50,7 @@ class JobOptions(pipeline_options.PipelineOptions): # type: ignore[misc]
                 JOB_OPTIONS dict.
 
         Raises:
-            ValueError. The given job_options not defined in the class
-                JOB_OPTIONS dict.
+            ValueError. Unsupported job option(s).
         """
         unsupported_options = set(job_options).difference(self.JOB_OPTIONS)
         if unsupported_options:

@@ -116,7 +116,7 @@ def apply_change_list(story_id, change_list):
         the story.
 
     Raises:
-        Exception. The elements in change_list is not of domain object type.
+        Exception. The elements in change_list are not of a domain object type.
     """
     story = story_fetchers.get_story_by_id(story_id)
     exp_ids_in_old_story = story.story_contents.get_all_linked_exp_ids()
@@ -548,9 +548,9 @@ def update_story(
             story.
 
     Raises:
-        ValueError. Expected a commit message but received none.
+        ValueError. Expected a commit message but received None.
         ValidationError. Exploration is already linked to a different story.
-        ValidationError. Story Url Fragment is not unique across the site.
+        ValidationError. Story url Fragment is not unique across the site.
     """
     if not commit_message:
         raise ValueError('Expected a commit message but received none.')

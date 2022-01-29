@@ -76,8 +76,8 @@ def link_multiple_skills_for_question(
             0 and 1 (inclusive).
 
     Raises:
-        Exception. The lengths of the skill_ids and skill_difficulties
-            lists are different.
+        Exception. Number of elements in skill ids and skill difficulties
+            are different.
     """
     if len(skill_ids) != len(skill_difficulties):
         raise Exception(
@@ -542,7 +542,7 @@ def apply_change_list(question_id, change_list):
         Question. The resulting question domain object.
 
     Raises:
-        Exception. The change_list is not applicable to the question_id.
+        Exception. The change list is not applicable to the question ID.
     """
     question = get_question_by_id(question_id)
     question_property_inapplicable_skill_misconception_ids = (

@@ -62,7 +62,7 @@ class Registry:
             PlatformParameter. The created platform parameter.
 
         Raises:
-            Exception. The data_type not in DEFAULT_VALUE_BY_TYPE_DICT.
+            Exception. The data type is not supported.
         """
         if data_type in cls.DEFAULT_VALUE_BY_TYPE_DICT:
             default = cls.DEFAULT_VALUE_BY_TYPE_DICT[data_type]

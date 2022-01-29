@@ -160,7 +160,7 @@ class JobMetaclass(type):
             class. The class associated to the given job name.
 
         Raises:
-            ValueError. The given job_name is not registered as a job.
+            ValueError. Given job name is not registered as a job.
         """
         if job_name not in cls._JOB_REGISTRY:
             raise ValueError('%s is not registered as a job' % job_name)

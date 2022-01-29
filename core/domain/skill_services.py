@@ -448,7 +448,7 @@ def replace_skill_id_in_all_topics(user_id, old_skill_id, new_skill_id):
         new_skill_id: str. The new skill id.
 
     Raises:
-        Exception. If old_skill_id and new_skill_id are identical.
+        Exception. The old skill ID and new skill ID are identical.
     """
     all_topics = topic_fetchers.get_all_topics()
     for topic in all_topics:

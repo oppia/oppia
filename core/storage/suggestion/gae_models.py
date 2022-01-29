@@ -282,8 +282,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             feconf.DEFAULT_SUGGESTION_QUERY_LIMIT suggestions.
 
         Raises:
-            Exception. If the field to be queried in query_fields_and_values
-                is not present in feconf.ALLOWED_SUGGESTION_QUERY_FIELDS.
+            Exception. The field to be queried is not supported.
         """
         query = cls.query()
         for (field, value) in query_fields_and_values:
@@ -458,7 +457,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             given user.
 
         Raises:
-            Exception. If score_categories is an empty list.
+            Exception. Given list of score categories is empty.
         """
         if len(score_categories) == 0:
             raise Exception('Received empty list of score categories')

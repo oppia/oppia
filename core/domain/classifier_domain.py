@@ -282,8 +282,7 @@ class ClassifierTrainingJob:
             status: str. The status of the classifier training job.
 
         Raises:
-            Exception. The status is not present in
-                feconf.ALLOWED_TRAINING_JOB_STATUS_CHANGES.
+            Exception. The status is not valid.
         """
         initial_status = self._status
         if status not in (

@@ -131,7 +131,7 @@ def get_filepath_from_filename(filename, rootdir):
         None.
 
     Raises:
-        Exception. Multiple files found with name 'filename'.
+        Exception. Multiple files found with given file name.
     """
     # This is required since error files are served according to error status
     # code. The file served is error-page.mainpage.html but it is compiled and
@@ -1329,7 +1329,7 @@ class TestBase(unittest.TestCase):
             bool. Whether the code raised exception in the expected format.
 
         Raises:
-            Exception. No expected_regex given.
+            Exception. No Regex given.
         """
         if not expected_regex:
             raise Exception(
@@ -2645,8 +2645,8 @@ title: Title
             Exploration. The exploration domain object.
 
         Raises:
-            ValueError. No state_names provided.
-            ValueError. No interaction_ids provided.
+            ValueError. Given list of state names is empty.
+            ValueError. Given list of interaction ids is empty.
         """
         if not state_names:
             raise ValueError('must provide at least one state name')
@@ -3783,8 +3783,8 @@ class FailingFunction(FunctionWrapper):
                 fail.
 
         Raises:
-            ValueError. The num_tries_before_success is neither greater or
-                equal to 0 nor FailingFunction.INFINITY.
+            ValueError. The number of times to raise an exception before a call
+                succeeds should be a non-negative interger or INFINITY.
         """
         super(FailingFunction, self).__init__(f)
         self._exception = exception

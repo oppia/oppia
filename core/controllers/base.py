@@ -589,7 +589,7 @@ class BaseHandler(webapp2.RequestHandler):
                     on the same origin as the page itself.
 
         Raises:
-            Exception. Invalid X-Frame-Options iframe_restriction.
+            Exception. Invalid X-Frame-Options.
         """
 
         # The 'no-store' must be used to properly invalidate the cache when we

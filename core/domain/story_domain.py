@@ -596,7 +596,7 @@ class StoryContents:
             exploration id if exist else None.
 
         Raises:
-            Exception. Unable to find the exp_id in any node.
+            Exception. Unable to find the exploration in any node.
         """
         for node in self.nodes:
             if node.exploration_id == exp_id:

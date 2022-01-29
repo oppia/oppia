@@ -509,14 +509,14 @@ class ThirdPartyJsTsLintChecksManager:
             check.
 
         Raises:
-            Exception. The start.sh file not executed.
+            Exception. The start.py file not executed.
         """
         node_path = os.path.join(common.NODE_PATH, 'bin', 'node')
         eslint_path = os.path.join(
             'node_modules', 'eslint', 'bin', 'eslint.js')
         if not os.path.exists(eslint_path):
             raise Exception(
-                'ERROR    Please run start.sh first to install node-eslint '
+                'ERROR    Please run start.py first to install node-eslint '
                 'and its dependencies.')
 
         files_to_lint = self.all_filepaths
