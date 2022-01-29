@@ -22,6 +22,7 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import feedback_services
 from core.domain import suggestion_services
+from core.domain import user_services
 
 
 class ThreadListHandler(base.BaseHandler):
@@ -57,13 +58,36 @@ class ThreadListHandler(base.BaseHandler):
 
     @acl_decorators.can_play_exploration
     def get(self, exploration_id):
+
+        feedback_dicts = [
+            f.to_dict() for f in feedback_services.get_all_threads(
+            feconf.ENTITY_TYPE_EXPLORATION, exploration_id, False)]
+
+        suggestion_dicts = [
+            s.to_dict() for s in feedback_services.get_all_threads(
+            feconf.ENTITY_TYPE_EXPLORATION, exploration_id, True)]
+
+        feedbacks_author_ids = [
+            f['original_author_id'] for f in feedback_dicts]
+
+        suggestions_author_ids = [
+            s['original_author_id'] for s in suggestion_dicts]
+
+        feedbacks_author_usernames = user_services.get_usernames(
+            feedbacks_author_ids)
+
+        suggestions_author_usernames = user_services.get_usernames(
+            suggestions_author_ids)
+
+        for index, f in enumerate(feedback_dicts):
+            f['original_author_id'] = feedbacks_author_usernames[index]
+
+        for index, s in enumerate(suggestion_dicts):
+            s['original_author_id'] = suggestions_author_usernames[index]
+
         self.values.update({
-            'feedback_thread_dicts': (
-                [t.to_dict() for t in feedback_services.get_all_threads(
-                    feconf.ENTITY_TYPE_EXPLORATION, exploration_id, False)]),
-            'suggestion_thread_dicts': (
-                [t.to_dict() for t in feedback_services.get_all_threads(
-                    feconf.ENTITY_TYPE_EXPLORATION, exploration_id, True)])
+            'feedback_thread_dicts': feedback_dicts,
+            'suggestion_thread_dicts': suggestion_dicts
         })
         self.render_json(self.values)
 
@@ -99,10 +123,22 @@ class ThreadListHandlerForTopicsHandler(base.BaseHandler):
 
     @acl_decorators.can_edit_topic
     def get(self, topic_id):
+
+        suggestion_dicts = [
+            s.to_dict() for s in feedback_services.get_all_threads(
+            feconf.ENTITY_TYPE_TOPIC, topic_id, True)]
+
+        suggestions_author_ids = [
+            s['original_author_id'] for s in suggestion_dicts]
+
+        suggestions_author_usernames = user_services.get_usernames(
+            suggestions_author_ids)
+
+        for index, s in enumerate(suggestion_dicts):
+            s['original_author_id'] = suggestions_author_usernames[index]
+
         self.values.update({
-            'suggestion_thread_dicts': (
-                [t.to_dict() for t in feedback_services.get_all_threads(
-                    feconf.ENTITY_TYPE_TOPIC, topic_id, True)])
+            'suggestion_thread_dicts': suggestion_dicts
             })
         self.render_json(self.values)
 
@@ -156,6 +192,13 @@ class ThreadHandler(base.BaseHandler):
         if self.user_id:
             feedback_services.update_messages_read_by_the_user(
                 self.user_id, thread_id, message_ids)
+
+        author_ids = [message['author_id'] for message in messages]
+        author_usernames = user_services.get_usernames(author_ids)
+
+        for index, message in enumerate(messages):
+            message['author_id'] = author_usernames[index]
+
         self.values.update({
             'messages': messages,
             'suggestion': suggestion.to_dict() if suggestion else None
@@ -215,8 +258,18 @@ class RecentFeedbackMessagesHandler(base.BaseHandler):
             feedback_services.get_next_page_of_all_feedback_messages(
                 urlsafe_start_cursor=urlsafe_start_cursor))
 
+        messages_dict = [m.to_dict() for m in all_feedback_messages]
+
+        messages_author_ids = [
+           message['author_id'] for message in messages_dict]
+
+        messages_user_names = user_services.get_usernames(messages_author_ids)
+
+        for index, message in enumerate(messages_dict):
+            message['author_id'] = messages_user_names[index]
+
         self.render_json({
-            'results': [m.to_dict() for m in all_feedback_messages],
+            'results': messages_dict,
             'cursor': new_urlsafe_start_cursor,
             'more': more,
         })

@@ -35,11 +35,11 @@ from core.tests import test_utils
 
 
 EXPECTED_THREAD_KEYS = [
-    'status', 'original_author_username', 'state_name', 'summary',
+    'status', 'original_author_id', 'state_name', 'summary',
     'thread_id', 'subject', 'last_updated_msecs', 'message_count',
-    'last_nonempty_message_text', 'last_nonempty_message_author']
+    'last_nonempty_message_text', 'last_nonempty_message_author_id']
 EXPECTED_MESSAGE_KEYS = [
-    'author_username', 'created_on_msecs', 'entity_type', 'message_id',
+    'author_id', 'created_on_msecs', 'entity_type', 'message_id',
     'entity_id', 'text', 'updated_status', 'updated_subject']
 
 
@@ -149,7 +149,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
             set(threadlist[0].keys()), set(EXPECTED_THREAD_KEYS))
         self.assertDictContainsSubset({
             'status': 'open',
-            'original_author_username': self.EDITOR_USERNAME,
+            'original_author_id': self.EDITOR_USERNAME,
             'subject': u'New Thread ¡unicode!',
         }, threadlist[0])
 
@@ -220,7 +220,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
             set(response_dict['messages'][0].keys()),
             set(EXPECTED_MESSAGE_KEYS))
         self.assertDictContainsSubset({
-            'author_username': self.EDITOR_USERNAME,
+            'author_id': self.editor_id,
             'entity_id': self.EXP_ID,
             'message_id': 0,
             'updated_status': 'open',
@@ -228,7 +228,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
             'text': u'Message 0 ¡unicode!',
         }, response_dict['messages'][0])
         self.assertDictContainsSubset({
-            'author_username': self.EDITOR_USERNAME,
+            'author_id': self.editor_id,
             'entity_id': self.EXP_ID,
             'message_id': 1,
             'updated_status': None,
@@ -258,11 +258,11 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
         response_dict = self.get_json(
             '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, new_exp_id))
         threadlist = response_dict['feedback_thread_dicts']
-        self.assertIsNone(threadlist[0]['original_author_username'])
+        self.assertIsNone(threadlist[0]['original_author_id'])
 
         response_dict = self.get_json('%s/%s' % (
             feconf.FEEDBACK_THREAD_URL_PREFIX, threadlist[0]['thread_id']))
-        self.assertIsNone(response_dict['messages'][0]['author_username'])
+        self.assertIsNone(response_dict['messages'][0]['author_id'])
 
     def test_message_id_assignment_for_multiple_posts_to_same_thread(self):
         # Create a thread for others to post to.
@@ -329,13 +329,13 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
             response_dict['messages'], key=lambda x: x['message_id'])
 
         self.assertEqual(
-            response_dict['messages'][0]['author_username'],
+            response_dict['messages'][0]['author_id'],
             self.EDITOR_USERNAME)
         self.assertEqual(response_dict['messages'][0]['message_id'], 0)
         self.assertEqual(response_dict['messages'][0]['text'], 'Message 0')
         for num in range(num_users):
             self.assertEqual(
-                response_dict['messages'][num + 1]['author_username'],
+                response_dict['messages'][num + 1]['author_id'],
                 _get_username(num))
             self.assertEqual(
                 response_dict['messages'][num + 1]['message_id'], num + 1)
@@ -515,7 +515,7 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
                 feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID))
         self.assertEqual(response['feedback_thread_dicts'], [])
         expected_thread_dict = {
-            'original_author_username': self.USER_USERNAME,
+            'original_author_id': self.USER_USERNAME,
             'status': feedback_models.STATUS_CHOICES_OPEN,
             'subject': 'sample description'
         }
@@ -641,6 +641,8 @@ class ThreadListHandlerForTopicsHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(suggestion_thread_dicts['subject'], 'a subject')
         self.assertEqual(
             suggestion_thread_dicts['thread_id'], topic_thread.id)
+        self.assertEqual(
+            suggestion_thread_dicts['original_author_id'], self.OWNER_USERNAME)
 
         self.logout()
 
@@ -714,6 +716,7 @@ class RecentFeedbackMessagesHandlerTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(results), 2)
 
+        self.assertEqual(results[0]['author_id'], self.MODERATOR_USERNAME)
         self.assertEqual(results[0]['text'], 'new text')
         self.assertEqual(results[0]['updated_subject'], 'new subject')
         self.assertEqual(results[0]['entity_type'], 'exploration')

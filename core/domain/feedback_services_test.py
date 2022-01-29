@@ -266,13 +266,13 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
     EXPECTED_THREAD_DICT = {
         'status': u'open',
         'summary': None,
-        'original_author_username': None,
+        'original_author_id': None,
         'subject': u'a subject'
     }
     EXPECTED_THREAD_DICT_VIEWER = {
         'status': u'open',
         'summary': None,
-        'original_author_username': None,
+        'original_author_id': None,
         'subject': u'a subject second'
     }
 
@@ -334,8 +334,8 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         self.assertDictContainsSubset(
             self.EXPECTED_THREAD_DICT, threads[0].to_dict())
 
-        self.EXPECTED_THREAD_DICT_VIEWER['original_author_username'] = (
-            self.VIEWER_USERNAME)
+        self.EXPECTED_THREAD_DICT_VIEWER['original_author_id'] = (
+            self.viewer_id)
 
         # Viewer creates feedback thread.
         feedback_services.create_thread(

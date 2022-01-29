@@ -981,7 +981,7 @@ def is_pseudonymous_id(user_id: str) -> bool:
     Returns:
         bool. Whether the ID represents a pseudonymous user.
     """
-    return bool(re.match(feconf.PSEUDONYMOUS_ID_REGEX, user_id))
+    return bool(re.match(feconf.PSEUDONYMOUS_ID_REGEX, str(user_id)))
 
 
 def unescape_encoded_uri_component(escaped_string: str) -> str:
