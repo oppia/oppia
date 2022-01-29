@@ -3468,56 +3468,56 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected audio filename to be a string'
-            ):
+        ):
             with self.swap(audio_voiceover, 'filename', 20):
                 audio_voiceover.validate()
         with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid audio filename'
-            ):
+        ):
             with self.swap(audio_voiceover, 'filename', '.invalidext'):
                 audio_voiceover.validate()
         with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid audio filename'
-            ):
+        ):
             with self.swap(audio_voiceover, 'filename', 'justanextension'):
                 audio_voiceover.validate()
         with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid audio filename'
-            ):
+        ):
             with self.swap(audio_voiceover, 'filename', 'a.invalidext'):
                 audio_voiceover.validate()
 
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected file size to be an int'
-            ):
+        ):
             with self.swap(audio_voiceover, 'file_size_bytes', 'abc'):
                 audio_voiceover.validate()
         with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid file size'
-            ):
+        ):
             with self.swap(audio_voiceover, 'file_size_bytes', -3):
                 audio_voiceover.validate()
 
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected needs_update to be a bool'
-            ):
+        ):
             with self.swap(audio_voiceover, 'needs_update', 'hello'):
                 audio_voiceover.validate()
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected duration_secs to be a float'
-            ):
+        ):
             with self.swap(audio_voiceover, 'duration_secs', 'test'):
                 audio_voiceover.validate()
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected duration_secs to be a float'
-            ):
-            with self.swap(audio_voiceover, 'duration_secs', 10):
+        ):
+            with self.swap(audio_voiceover, 'duration_secs', '10'):
                 audio_voiceover.validate()
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected duration_secs to be positive number, '
             'or zero if not yet specified'
-            ):
+        ):
             with self.swap(audio_voiceover, 'duration_secs', -3.45):
                 audio_voiceover.validate()
 
@@ -3534,19 +3534,19 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected needs_update to be a bool'
-            ):
+        ):
             with self.swap(written_translation, 'needs_update', 20):
                 written_translation.validate()
 
         with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid data_format'
-            ):
+        ):
             with self.swap(written_translation, 'data_format', 'int'):
                 written_translation.validate()
 
         with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid data_format'
-            ):
+        ):
             with self.swap(written_translation, 'data_format', 2):
                 written_translation.validate()
 
