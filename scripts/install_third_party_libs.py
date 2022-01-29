@@ -106,11 +106,13 @@ def tweak_yarn_executable():
         renamed_file_path = os.path.join(common.YARN_PATH, 'bin', 'yarn.sh')
         os.rename(origin_file_path, renamed_file_path)
 
+
 def get_yarn_command():
     """Get the executable file for yarn."""
     if common.is_windows_os():
         return 'yarn.cmd'
     return 'yarn'
+
 
 def install_buf_and_protoc():
     """Installs buf and protoc for Linux or Darwin, depending upon the
@@ -140,8 +142,10 @@ def install_buf_and_protoc():
     common.recursive_chmod(buf_path, 0o744)
     common.recursive_chmod(protoc_path, 0o744)
 
+
 def compile_protobuf_files(proto_files_paths):
     """Compiles protobuf files using buf.
+
     Raises:
         Exception. If there is any error in compiling the proto files.
     """
@@ -175,8 +179,10 @@ def compile_protobuf_files(proto_files_paths):
                 p.absolute(),
                 r'^import (\w*_pb2 as)', r'from proto_files import \1')
 
+
 def ensure_pip_library_is_installed(package, version, path):
     """Installs the pip library after ensuring its not already installed.
+
     Args:
         package: str. The package name.
         version: str. The package version.
@@ -190,10 +196,12 @@ def ensure_pip_library_is_installed(package, version, path):
         install_backend_python_libs.pip_install(
             '%s==%s' % (package, version), exact_lib_path)
 
+
 def ensure_system_python_libraries_are_installed(package, version):
     """Installs the pip library with the corresponding version to the system
     globally. This is necessary because the development application server
     requires certain libraries on the host machine.
+    
     Args:
         package: str. The package name.
         version: str. The package version.
