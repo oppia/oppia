@@ -20,7 +20,7 @@ import { NormalizeWhitespacePunctuationAndCasePipe } from
   './normalize-whitespace-punctuation-and-case.pipe';
 import { TestBed } from '@angular/core/testing';
 
-describe('Testing NormalizeWhitespacePunctuationAndCasePipe', () => {
+fdescribe('Testing NormalizeWhitespacePunctuationAndCasePipe', () => {
   let nwpcp: NormalizeWhitespacePunctuationAndCasePipe;
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -40,9 +40,15 @@ describe('Testing NormalizeWhitespacePunctuationAndCasePipe', () => {
       .toEqual('remove');
 
     //  Should remove the space if it does not
-    //  separate two alphanumeric strings.
+    //  separate two alphanumeric "words".
     expect(nwpcp.transform('  remove ? '))
       .toEqual('remove?');
+    expect(nwpcp.transform(' Hello, world '))
+      .toEqual('hello,world');
+    expect(nwpcp.transform('  Test1 tesT2 teSt3 '))
+      .toEqual('test1 test2 test3');
+    expect(nwpcp.transform('  Test1 tesT2! teSt3 '))
+      .toEqual('test1 test2!test3');
 
     expect(nwpcp.transform(' teSTstrinG12  '))
       .toEqual('teststring12');
