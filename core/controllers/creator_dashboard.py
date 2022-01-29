@@ -352,7 +352,7 @@ class UploadExplorationHandler(base.BaseHandler):
     @acl_decorators.can_upload_exploration
     def post(self):
         """Handles POST requests."""
-        yaml_content = self.normalized_payload.get('yaml_file')
+        yaml_content = self.normalized_request.get('yaml_file')
 
         new_exploration_id = exp_fetchers.get_new_exploration_id()
         if constants.ALLOW_YAML_FILE_UPLOAD:
@@ -360,7 +360,7 @@ class UploadExplorationHandler(base.BaseHandler):
                 self.user_id, yaml_content, new_exploration_id, [],
                 strip_voiceovers=True)
             self.render_json({
-                EXPLORATION_ID_KEY: new_exploration_id
+                'explorationId': new_exploration_id
             })
         else:
             raise self.InvalidInputException(
