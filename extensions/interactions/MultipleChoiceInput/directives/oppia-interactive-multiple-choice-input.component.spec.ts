@@ -147,8 +147,8 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
   it('should update selected answer when user selects an option', () => {
     let dummyMouseEvent = new MouseEvent('Mouse');
     let questionElement = document.createElement('div');
-    questionElement.className =
-      'oppia-rte-viewer oppia-learner-view-card-top-content';
+    questionElement.className = (
+      'oppia-rte-viewer oppia-learner-view-card-top-content');
     spyOn(browserCheckerService, 'isMobileDevice').and.returnValue(false);
     spyOn(document, 'querySelector')
       .withArgs('button.multiple-choice-option.selected').and.returnValue({
