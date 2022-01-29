@@ -94,7 +94,6 @@ PROTO_FILES_PATHS = [
 # Path to typescript plugin required to compile ts compatible files from proto.
 PROTOC_GEN_TS_PATH = os.path.join(common.NODE_MODULES_PATH, 'protoc-gen-ts')
 
-
 def tweak_yarn_executable():
     """When yarn is run on Windows, the file yarn will be executed by default.
     However, this file is a bash script, and can't be executed directly on
@@ -107,13 +106,11 @@ def tweak_yarn_executable():
         renamed_file_path = os.path.join(common.YARN_PATH, 'bin', 'yarn.sh')
         os.rename(origin_file_path, renamed_file_path)
 
-
 def get_yarn_command():
     """Get the executable file for yarn."""
     if common.is_windows_os():
         return 'yarn.cmd'
     return 'yarn'
-
 
 def install_buf_and_protoc():
     """Installs buf and protoc for Linux or Darwin, depending upon the
@@ -142,7 +139,6 @@ def install_buf_and_protoc():
         raise Exception('Error installing protoc binary')
     common.recursive_chmod(buf_path, 0o744)
     common.recursive_chmod(protoc_path, 0o744)
-
 
 def compile_protobuf_files(proto_files_paths):
     """Compiles protobuf files using buf.
@@ -179,7 +175,6 @@ def compile_protobuf_files(proto_files_paths):
                 p.absolute(),
                 r'^import (\w*_pb2 as)', r'from proto_files import \1')
 
-
 def ensure_pip_library_is_installed(package, version, path):
     """Installs the pip library after ensuring its not already installed.
     Args:
@@ -194,7 +189,6 @@ def ensure_pip_library_is_installed(package, version, path):
         print('Installing %s' % package)
         install_backend_python_libs.pip_install(
             '%s==%s' % (package, version), exact_lib_path)
-
 
 def ensure_system_python_libraries_are_installed(package, version):
     """Installs the pip library with the corresponding version to the system
