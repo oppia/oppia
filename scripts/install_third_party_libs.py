@@ -145,7 +145,6 @@ def install_buf_and_protoc():
 
 def compile_protobuf_files(proto_files_paths):
     """Compiles protobuf files using buf.
-
     Raises:
         Exception. If there is any error in compiling the proto files.
     """
@@ -182,7 +181,6 @@ def compile_protobuf_files(proto_files_paths):
 
 def ensure_pip_library_is_installed(package, version, path):
     """Installs the pip library after ensuring its not already installed.
-
     Args:
         package: str. The package name.
         version: str. The package version.
@@ -201,7 +199,6 @@ def ensure_system_python_libraries_are_installed(package, version):
     """Installs the pip library with the corresponding version to the system
     globally. This is necessary because the development application server
     requires certain libraries on the host machine.
-
     Args:
         package: str. The package name.
         version: str. The package version.
