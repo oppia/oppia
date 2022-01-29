@@ -297,15 +297,16 @@ export class CustomizeInteractionModalComponent
             schema.items as Schema,
             `${contentIdPrefix}`);
         }
-      } else if (schema.type === SchemaConstants.SCHEMA_TYPE_DICT) {
-        schema.properties.forEach(property => {
-          const name = property.name;
-          traverseSchemaAndAssignContentIds(
-            value[name],
-            property.schema,
-            `${contentIdPrefix}_${name}`);
-        });
       }
+      // else if (schema.type === SchemaConstants.SCHEMA_TYPE_DICT) {
+      //   schema.properties.forEach(property => {
+      //     const name = property.name;
+      //     traverseSchemaAndAssignContentIds(
+      //       value[name],
+      //       property.schema,
+      //       `${contentIdPrefix}_${name}`);
+      //   });
+      // }
     };
 
     const caSpecs = INTERACTION_SPECS[interactionId].customization_arg_specs;
@@ -358,12 +359,13 @@ export class CustomizeInteractionModalComponent
         for (let i = 0; i < (value as Object[]).length; i++) {
           traverseSchemaAndCollectContent(value[i], schema.items as Schema);
         }
-      } else if (schema.type === SchemaConstants.SCHEMA_TYPE_DICT) {
-        schema.properties.forEach(property => {
-          const name = property.name;
-          traverseSchemaAndCollectContent(value[name], property.schema);
-        });
       }
+      //  else if (schema.type === SchemaConstants.SCHEMA_TYPE_DICT) {
+      //   schema.properties.forEach(property => {
+      //     const name = property.name;
+      //     traverseSchemaAndCollectContent(value[name], property.schema);
+      //   });
+      // }
     };
 
     const caSpecs = INTERACTION_SPECS[interactionId].customization_arg_specs;

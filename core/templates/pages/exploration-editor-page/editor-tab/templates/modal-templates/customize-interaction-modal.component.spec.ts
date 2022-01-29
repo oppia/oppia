@@ -103,8 +103,7 @@ class MockStateEditorService {
   }
 }
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Customize Interaction Modal Component', () => {
+describe('Customize Interaction Modal Component', () => {
   let fixture: ComponentFixture<CustomizeInteractionModalComponent>;
   let component: CustomizeInteractionModalComponent;
   let changeDetectorRef: ChangeDetectorRef;
@@ -118,6 +117,7 @@ fdescribe('Customize Interaction Modal Component', () => {
   let subtitledUnicodeObjectFactory: SubtitledUnicodeObjectFactory;
   let ratioExpressionInputValidationService:
    RatioExpressionInputValidationService;
+  let stateCustomizationArgsService: StateCustomizationArgsService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -177,6 +177,8 @@ fdescribe('Customize Interaction Modal Component', () => {
       TestBed.inject(SubtitledUnicodeObjectFactory);
     ratioExpressionInputValidationService = TestBed.inject(
       RatioExpressionInputValidationService);
+    stateCustomizationArgsService =
+      TestBed.inject(StateCustomizationArgsService);
 
     stateInteractionIdService.displayed = 'RatioExpressionInput';
     component.showMarkAllAudioAsNeedingUpdateModalIfRequired = () => {};
@@ -414,4 +416,91 @@ fdescribe('Customize Interaction Modal Component', () => {
     expect(component.allowedInteractionCategories).toBe(
       AppConstants.ALLOWED_INTERACTION_CATEGORIES);
   }));
+
+  it('should get proper contentId of DragAndDropSortInput intreaction',
+    fakeAsync(() => {
+      jasmine.createSpy(
+        'stateCustomizationArgsService.displayed.hasOwnProperty')
+        .and.returnValue(true);
+
+      stateInteractionIdService.displayed = 'DragAndDropSortInput';
+      stateCustomizationArgsService.displayed = {
+        choices: {
+          value: [{
+            _html: 'html',
+            _contentId: 'contentId',
+            isEmpty(): boolean {
+              return !this._html;
+            },
+            get contentId(): string | null {
+              return this._contentId;
+            },
+            set contentId(contentId: string | null) {
+              this._contentId = contentId;
+            },
+            get html(): string {
+              return this._html;
+            },
+            set html(html: string) {
+              this._html = html;
+            }
+          }]
+        },
+        allowMultipleItemsInSamePosition: {
+          value: false
+        }
+      };
+
+      expect(component.getContentIdToContent()).toEqual({contentId: 'html'});
+    }));
+
+  it('should save and populate Null for ContentIds' +
+    ' for DragAndDropSortInput intreaction', fakeAsync(() => {
+    spyOn(component, 'getContentIdToContent').and.returnValue(
+      subtitledUnicodeObjectFactory.createDefault('unicode', 'contentId 1')
+    );
+
+    stateInteractionIdService.displayed = 'DragAndDropSortInput';
+    component.originalContentIdToContent = subtitledUnicodeObjectFactory
+      .createDefault('unicode', 'contentId 2');
+    stateCustomizationArgsService.displayed = {
+      choices: {
+        value: [{
+          _html: 'html',
+          _contentId: null,
+          isEmpty(): boolean {
+            return !this._html;
+          },
+          get contentId(): string | null {
+            return this._contentId;
+          },
+          set contentId(contentId: string | null) {
+            this._contentId = contentId;
+          },
+          get html(): string {
+            return this._html;
+          },
+          set html(html: string) {
+            this._html = html;
+          }
+        }]
+      },
+      allowMultipleItemsInSamePosition: {
+        value: false
+      }
+    };
+
+    component.save();
+  }));
+
+  it('should error when a saved customization arg is missing', () => {
+    stateInteractionIdService.displayed = 'RatioExpressionInput';
+    stateInteractionIdService.savedMemento = 'RatioExpressionInput';
+    stateCustomizationArgsService.savedMemento = {};
+
+    expect(()=>{
+      component.ngOnInit();
+    }).toThrowError(
+      'Interaction is missing customization argument placeholder');
+  });
 });
