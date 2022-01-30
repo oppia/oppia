@@ -18,6 +18,7 @@
 
 import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { AppConstants } from 'app.constants';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { StateCard } from 'domain/state_card/state-card.model';
@@ -33,12 +34,12 @@ import { PlayerTranscriptService } from '../services/player-transcript.service';
   templateUrl: './display-hint-modal.component.html'
 })
 export class DisplayHintModalComponent {
-  index: number;
-  COMPONENT_NAME_HINT: string;
-  hint: SubtitledHtml;
-  displayedCard: StateCard;
-  recordedVoiceovers: RecordedVoiceovers;
-  hintContentId: string;
+  index: number | undefined;
+  COMPONENT_NAME_HINT: string = AppConstants.COMPONENT_NAME_HINT;
+  hint: SubtitledHtml | null | undefined;
+  displayedCard: StateCard | undefined;
+  recordedVoiceovers: RecordedVoiceovers | undefined;
+  hintContentId: string | null | undefined;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -55,12 +56,16 @@ export class DisplayHintModalComponent {
     this.displayedCard = this.playerTranscriptService.getCard(
       this.playerPositionService.getDisplayedCardIndex());
     this.recordedVoiceovers = this.displayedCard.getRecordedVoiceovers();
-    this.hintContentId = this.hint.contentId;
 
-    this.audioTranslationManagerService
-      .setSecondaryAudioTranslations(
-        this.recordedVoiceovers.getBindableVoiceovers(this.hintContentId),
-        this.hint.html, this.COMPONENT_NAME_HINT);
+    if (this.hint) {
+      this.hintContentId = this.hint.contentId;
+      if (this.hintContentId !== null) {
+        this.audioTranslationManagerService
+          .setSecondaryAudioTranslations(
+            this.recordedVoiceovers.getBindableVoiceovers(this.hintContentId),
+            this.hint.html, this.COMPONENT_NAME_HINT);
+      }
+    }
 
     this.audioPlayerService.onAutoplayAudio.emit();
   }

@@ -394,6 +394,7 @@
     "core/templates/pages/exploration-player-page/learner-experience/continue-button.component.ts",
     "core/templates/pages/exploration-player-page/learner-experience/input-response-pair.component.ts",
     "core/templates/pages/exploration-player-page/learner-experience/input-response-pair.component.spec.ts",
+    "core/templates/pages/exploration-player-page/modals/display-hint-modal.component.ts",
     "core/templates/pages/exploration-player-page/modals/display-solution-interstitial-modal.component.ts",
     "core/templates/pages/exploration-player-page/modals/display-solution-interstitial-modal.component.spec.ts",
     "core/templates/pages/exploration-player-page/modals/display-solution-modal.component.ts",
