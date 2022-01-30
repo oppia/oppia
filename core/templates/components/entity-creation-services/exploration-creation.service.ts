@@ -103,7 +103,7 @@ export class ExplorationCreationService {
           this.windowRef.nativeWindow.location.href =
           this.urlInterpolationService.interpolateUrl(
             this.CREATE_NEW_EXPLORATION_URL_TEMPLATE, {
-              exploration_id: data.explorationId
+              exploration_id: data.exploration_id
             }
           );
         }).fail((data) => {

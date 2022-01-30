@@ -360,7 +360,7 @@ class UploadExplorationHandler(base.BaseHandler):
                 self.user_id, yaml_content, new_exploration_id, [],
                 strip_voiceovers=True)
             self.render_json({
-                'explorationId': new_exploration_id
+                EXPLORATION_ID_KEY: new_exploration_id
             })
         else:
             raise self.InvalidInputException(
