@@ -302,6 +302,15 @@ describe('TopNavigationBarComponent', () => {
     expect(mockWindowRef.nativeWindow.location.href).toBe('/classroom/url');
   }));
 
+  it('should navigate to a particular page', fakeAsync(()=>{
+    expect(mockWindowRef.nativeWindow.location.href).toBe('');
+
+    component.navigateToPage('/about');
+    tick();
+
+    expect(mockWindowRef.nativeWindow.location.href).toBe('/about');
+  }));
+
   it('should registers classroom header click event when user clicks' +
     ' on \'Basic Mathematics\'', () => {
     spyOn(siteAnalyticsService, 'registerClassroomHeaderClickEvent');
