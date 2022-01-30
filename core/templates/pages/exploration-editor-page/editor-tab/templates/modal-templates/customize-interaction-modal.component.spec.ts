@@ -375,8 +375,9 @@ describe('Customize Interaction Modal Component', () => {
     component.ngOnInit();
     tick();
 
-    expect(component.allowedInteractionCategories).toBe(
-      AppConstants.ALLOWED_QUESTION_INTERACTION_CATEGORIES);
+    expect(component.allowedInteractionCategories).toEqual(
+      Array.prototype.concat.apply(
+        [], AppConstants.ALLOWED_QUESTION_INTERACTION_CATEGORIES));
     expect(component.customizationModalReopened).toBeTrue();
   }));
 
@@ -395,8 +396,9 @@ describe('Customize Interaction Modal Component', () => {
     component.ngOnInit();
     tick();
 
-    expect(component.allowedInteractionCategories).toBe(
-      AppConstants.ALLOWED_EXPLORATION_IN_STORY_INTERACTION_CATEGORIES);
+    expect(component.allowedInteractionCategories).toEqual(
+      Array.prototype.concat.apply(
+        [], AppConstants.ALLOWED_EXPLORATION_IN_STORY_INTERACTION_CATEGORIES));
     expect(component.customizationModalReopened).toBeTrue();
   }));
 
@@ -413,8 +415,9 @@ describe('Customize Interaction Modal Component', () => {
     tick();
 
     expect(component.isinteractionOpen).toBeTrue();
-    expect(component.allowedInteractionCategories).toBe(
-      AppConstants.ALLOWED_INTERACTION_CATEGORIES);
+    expect(component.allowedInteractionCategories).toEqual(
+      Array.prototype.concat.apply(
+        [], AppConstants.ALLOWED_INTERACTION_CATEGORIES));
   }));
 
   it('should get proper contentId of DragAndDropSortInput intreaction',
