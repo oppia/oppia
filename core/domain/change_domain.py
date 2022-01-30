@@ -249,11 +249,10 @@ class BaseChange:
             ValidationError. One or more attributes of the BaseChange are
                 invalid.
         """
-        # Validating the BaseChange object by converting
+        # We validate the BaseChange object by converting
         # it into a dict and using the validate_dict method.
-        # This is done because the validation of a dict was
-        # already implemented and the same logic is required here.
-
+        # This is done because schema_utils used the validate method
+        # to verify that the domain object is correct.
         self.validate_dict(self.to_dict())
 
     def __getattr__(self, name: str) -> str:

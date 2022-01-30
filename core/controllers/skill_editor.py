@@ -234,7 +234,6 @@ class EditableSkillDataHandler(base.BaseHandler):
     @acl_decorators.can_edit_skill
     def put(self, skill_id):
         """Updates properties of the given skill."""
-        skill_domain.Skill.require_valid_skill_id(skill_id)
         skill = skill_fetchers.get_skill_by_id(skill_id, strict=False)
         if skill is None:
             raise self.PageNotFoundException(
