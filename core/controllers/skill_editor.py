@@ -243,7 +243,7 @@ class EditableSkillDataHandler(base.BaseHandler):
         _require_valid_version(version, skill.version)
 
         commit_message = self.normalized_payload.get('commit_message')
-
+        # asdas
         if (commit_message is not None and
                 len(commit_message) > constants.MAX_COMMIT_MESSAGE_LENGTH):
             raise self.InvalidInputException(
