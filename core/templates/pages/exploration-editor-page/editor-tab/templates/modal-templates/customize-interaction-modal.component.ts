@@ -58,10 +58,58 @@ import { RatioExpressionInputValidationService } from 'interactions/RatioExpress
 import { Warning } from 'interactions/base-interaction-validation.service';
 import cloneDeep from 'lodash/cloneDeep';
 
+interface DefaultValueHtml {
+  content_id: string;
+  html: string;
+}
+
+interface DefaultValueUnicode {
+  content_id: string;
+  unicode_str: string;
+}
+
+interface VerticesInterface {
+  x: number;
+  y: number;
+  label: string;
+}
+
+interface EdgeInterface {
+  src: number;
+  dst: number;
+  weight: string;
+}
+
+interface DefaultValueGraph {
+  isWeighted: boolean;
+  edges: EdgeInterface[];
+  isDirected: boolean;
+  vertices: VerticesInterface[];
+  isLabeled: boolean;
+}
+
+interface DefaultImageValue {
+  imagePath: string;
+  labeledRegions: [];
+}
+
 interface CustomizationArgSpecsInterface {
   name: string;
-  value: unknown;
-  default_value: unknown;
+  default_value: DefaultValueHtml[] |
+                 DefaultValueHtml |
+                 DefaultValueUnicode[] |
+                 DefaultValueUnicode |
+                 DefaultValueGraph |
+                 DefaultImageValue |
+                 [] |
+                 number |
+                 string |
+                 boolean;
+}
+
+interface AllowedInteractionCategories {
+  name: string;
+  interaction_ids: string[];
 }
 
 const INTERACTION_SERVICE_MAPPING = {
@@ -101,7 +149,7 @@ export class CustomizeInteractionModalComponent
   customizationArgSpecs: CustomizationArgSpecsInterface[];
   originalContentIdToContent: object;
   hasCustomizationArgs: boolean;
-  allowedInteractionCategories: object;
+  allowedInteractionCategories: AllowedInteractionCategories[];
   explorationIsLinkedToStory: boolean;
   customizationModalReopened: boolean;
   isinteractionOpen: boolean;
@@ -410,25 +458,25 @@ export class CustomizeInteractionModalComponent
     this.editorFirstTimeEventsService.registerFirstClickAddInteractionEvent();
 
     if (this.stateEditorService.isInQuestionMode()) {
-      this.allowedInteractionCategories = (
-        AppConstants.ALLOWED_QUESTION_INTERACTION_CATEGORIES);
+      this.allowedInteractionCategories = Array.prototype.concat.apply(
+        [], AppConstants.ALLOWED_QUESTION_INTERACTION_CATEGORIES);
     } else if (this.contextService.isExplorationLinkedToStory()) {
-      this.allowedInteractionCategories = (
-        AppConstants.ALLOWED_EXPLORATION_IN_STORY_INTERACTION_CATEGORIES);
+      this.allowedInteractionCategories = Array.prototype.concat.apply(
+        [], AppConstants.ALLOWED_EXPLORATION_IN_STORY_INTERACTION_CATEGORIES);
     } else {
-      this.allowedInteractionCategories = (
-        AppConstants.ALLOWED_INTERACTION_CATEGORIES);
+      this.allowedInteractionCategories = Array.prototype.concat.apply(
+        [], AppConstants.ALLOWED_INTERACTION_CATEGORIES);
     }
 
     if (this.stateEditorService.isInQuestionMode()) {
-      this.allowedInteractionCategories = (
-        AppConstants.ALLOWED_QUESTION_INTERACTION_CATEGORIES);
+      this.allowedInteractionCategories = Array.prototype.concat.apply(
+        [], AppConstants.ALLOWED_QUESTION_INTERACTION_CATEGORIES);
     } else if (this.contextService.isExplorationLinkedToStory()) {
-      this.allowedInteractionCategories = (
-        AppConstants.ALLOWED_EXPLORATION_IN_STORY_INTERACTION_CATEGORIES);
+      this.allowedInteractionCategories = Array.prototype.concat.apply(
+        [], AppConstants.ALLOWED_EXPLORATION_IN_STORY_INTERACTION_CATEGORIES);
     } else {
-      this.allowedInteractionCategories = (
-        AppConstants.ALLOWED_INTERACTION_CATEGORIES);
+      this.allowedInteractionCategories = Array.prototype.concat.apply(
+        [], AppConstants.ALLOWED_INTERACTION_CATEGORIES);
     }
 
     if (this.stateInteractionIdService.savedMemento) {

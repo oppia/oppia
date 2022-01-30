@@ -36,7 +36,6 @@ import { OppiaCkEditor4Module } from './ck-editor-helpers/ckeditor4.module';
 import { BaseModule } from '../base-components/base.module';
 import { NgBootstrapModule } from 'modules/ng-boostrap.module';
 import { DragDropModule } from '@angular/cdk/drag-drop';
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 // Components.
 import { AudioBarComponent } from 'pages/exploration-player-page/layout-directives/audio-bar.component';
@@ -151,7 +150,6 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     HybridRouterModuleProvider.provide(),
     MaterialModule,
     NgBootstrapModule,
-    NgbModule,
     DynamicContentModule,
     FormsModule,
     ReactiveFormsModule,

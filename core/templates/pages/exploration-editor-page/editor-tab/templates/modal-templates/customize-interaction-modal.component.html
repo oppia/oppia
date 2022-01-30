@@ -6,7 +6,7 @@
     </h3>
 
     <h3 *ngIf="stateInteractionIdService.displayed && (customizationModalReopened || hasCustomizationArgs)">
-      Customize Interaction ({{getTitle(stateInteractionIdService.displayed)}})
+      Customize Interaction ({{ getTitle(stateInteractionIdService.displayed) }})
     </h3>
     <i class="fa fa-times" (click)="cancel()"></i>
   </div>
@@ -21,20 +21,20 @@
       <ng-container ngbNavItem
                     *ngFor="let category of allowedInteractionCategories">
         <a ngbNavLink
-           class="protractor-test-interaction-tab-{{getHyphenatedLowercaseCategoryName(category.name)}}">
-          {{category.name}}
+           class="protractor-test-interaction-tab-{{ getHyphenatedLowercaseCategoryName(category.name) }}">
+          {{ category.name }}
         </a>
         <ng-template ngbNavContent>
           <div>
             <div *ngFor="let interactionId of category.interaction_ids"
                  (click)="onChangeInteractionId(interactionId)"
-                 class="oppia-interaction-tile protractor-test-interaction-tile-{{interactionId}}"
-                 ngbPopover="{{getDescription(interactionId)}}"
+                 class="oppia-interaction-tile protractor-test-interaction-tile-{{ interactionId }}"
+                 [ngbPopover]="getDescription(interactionId)"
                  placement="bottom"
                  triggers="mouseenter:mouseleave">
               <img [src]="getInteractionThumbnailImageUrl(interactionId)">
               <div class="oppia-interaction-tile-name fx-row fx-main-center fx-cross-center">
-                {{getTitle(interactionId)}}
+                {{ getTitle(interactionId) }}
               </div>
             </div>
           </div>
@@ -50,7 +50,7 @@
          *ngFor="let customizationArgSpec of customizationArgSpecs">
       <div *ngIf="customizationArgSpec.schema.type !== 'bool'"
            class="oppia-interaction-customization-label">
-        {{customizationArgSpec.description}}
+        {{ customizationArgSpec.description }}
       </div>
       <schema-based-editor [ngClass]="{'boolean-checkbox': customizationArgSpec.schema.type === 'bool'}"
                            [schema]="getSchemaCallback(customizationArgSpec.schema)"
@@ -58,13 +58,13 @@
       </schema-based-editor>
       <div *ngIf="customizationArgSpec.schema.type === 'bool'"
            class="oppia-interaction-customization-label">
-        {{customizationArgSpec.description}}
+        {{ customizationArgSpec.description }}
       </div>
       <div class="oppia-interaction-customization-label-container"></div>
     </div>
     <div *ngIf="getCustomizationArgsWarningMessage()"
          class="alert alert-danger oppia-units-input-error">
-      {{getCustomizationArgsWarningMessage()}}
+      {{ getCustomizationArgsWarningMessage() }}
     </div>
   </div>
 
@@ -94,7 +94,7 @@
 
   <div class="btn-group"
        *ngIf="hasCustomizationArgs"
-       ngbPopover="{{isSaveInteractionButtonEnabled() ? '' : getSaveInteractionButtonTooltip()}}"
+       [ngbPopover]="isSaveInteractionButtonEnabled() ? '' : getSaveInteractionButtonTooltip()"
        placement="bottom"
        triggers="mouseenter:mouseleave">
     <button class="btn btn-success protractor-test-save-interaction"
