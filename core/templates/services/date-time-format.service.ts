@@ -102,6 +102,7 @@ export class DateTimeFormatService {
     let ONE_WEEK_IN_MILLIS = 7 * 24 * 60 * 60 * 1000;
     return new Date().getTime() - millisSinceEpoch < ONE_WEEK_IN_MILLIS;
   }
+
   /**
    * This function returns the relative time from now.
    * @param {number} millisSinceEpoch - milliseconds since Epoch

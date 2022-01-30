@@ -45,6 +45,7 @@ export class ProgressNavComponent {
 
   @Output() clickContinueButton: EventEmitter<void> = (
     new EventEmitter());
+
   @Output() changeCard: EventEmitter<number> = new EventEmitter();
 
   directiveSubscriptions = new Subscription();
