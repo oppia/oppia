@@ -3261,10 +3261,10 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
         ) as f:
             raw_image = f.read()
 
-        get_image_exits_swap = self.swap_to_always_return(
+        get_image_exists_swap = self.swap_to_always_return(
             fs_domain.GcsFileSystem, 'isfile', value=True)
 
-        with get_image_exits_swap:
+        with get_image_exists_swap:
             response = self.post_json(
                 publish_url, {
                     'image': 'img',
