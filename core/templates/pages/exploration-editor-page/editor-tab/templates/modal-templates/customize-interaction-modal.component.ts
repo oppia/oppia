@@ -57,6 +57,7 @@ import { FractionInputValidationService } from 'interactions/FractionInput/direc
 import { RatioExpressionInputValidationService } from 'interactions/RatioExpressionInput/directives/ratio-expression-input-validation.service';
 import { Warning } from 'interactions/base-interaction-validation.service';
 import cloneDeep from 'lodash/cloneDeep';
+import { ImageWithRegions } from 'interactions/customization-args-defs';
 
 interface DefaultValueHtml {
   content_id: string;
@@ -88,11 +89,6 @@ interface DefaultValueGraph {
   isLabeled: boolean;
 }
 
-interface DefaultImageValue {
-  imagePath: string;
-  labeledRegions: [];
-}
-
 interface CustomizationArgSpecsInterface {
   name: string;
   default_value: DefaultValueHtml[] |
@@ -100,7 +96,7 @@ interface CustomizationArgSpecsInterface {
                  DefaultValueUnicode[] |
                  DefaultValueUnicode |
                  DefaultValueGraph |
-                 DefaultImageValue |
+                 ImageWithRegions |
                  [] |
                  number |
                  string |
