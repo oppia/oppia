@@ -46,6 +46,7 @@ export class ExplorationHtmlFormatterService {
     'MathEquationInput',
     'MultipleChoiceInput',
     'NumberWithUnits',
+    'ItemSelectionInput',
     'NumericExpressionInput',
     'NumericInput',
     'PencilCodeEditor',
