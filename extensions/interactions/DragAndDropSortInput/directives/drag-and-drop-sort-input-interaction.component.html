@@ -3,7 +3,7 @@
     <!-- Drag and drop, when we allow multiple items in same position of list -->
     <div *ngIf="allowMultipleItemsInSamePosition" cdkDropList (cdkDropListDropped)="dropList($event)">
       <ng-container cdkDropListGroup>
-        <div *ngFor="let items of multipleItemsInSamePositionArray; let idx = index" 
+        <div *ngFor="let items of multipleItemsInSamePositionArray; let idx = index"
              class="child-dnd child-dnd-{{idx}}">
           <div cdkDrag
                cdkDropList
@@ -18,7 +18,7 @@
                (cdkDropListDropped)="dropItemInAnyList($event)">
             <div class="root-dnd-placeholder" [ngStyle]="{ 'height': (rootHeight-30) + 'px' }" *cdkDragPlaceholder></div>
             <div *ngIf="idx%2===1 && idx !== noShow && items.length > 1"
-                 class="example-handle" 
+                 class="example-handle"
                  cdkDragHandle
                  (mouseover)="addHighlight(idx)"
                  (mouseout)="removeHighlight()"
@@ -38,7 +38,7 @@
         <div class="child-dnd-single-item-placeholder" *cdkDragPlaceholder></div>
         <angular-html-bind-wrapper [htmlData]="item"></angular-html-bind-wrapper>
       </div>
-    </div>    
+    </div>
   </div>
 </form>
 
@@ -58,9 +58,9 @@
        vertical touch movements and zoom touch actions.
     */
     height: 540px;
-    overflow-y:auto;
-    padding: 10px 10px 25px 80px;
     margin: 16px;
+    overflow-y: auto;
+    padding: 10px 10px 25px 80px;
     touch-action: manipulation;
   }
 
@@ -77,37 +77,37 @@
   }
 
   .cdk-drag-preview {
-    opacity: 0.5;
-    box-sizing: border-box;
     border-radius: 4px;
     box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
       0 8px 10px 1px rgba(0, 0, 0, 0.14),
       0 3px 14px 2px rgba(0, 0, 0, 0.12);
+    box-sizing: border-box;
+    opacity: 0.5;
   }
 
   .child-dnd {
-    width: 300px;
-    max-width: 100%;
-    margin: -10px 0 0 0;
     display: inline-block;
-    vertical-align: top;
+    margin: -10px 0 0 0;
+    max-width: 100%;
     position: relative;
+    vertical-align: top;
+    width: 300px;
   }
 
   .child-dnd-single-item {
-    width: 300px;
-    max-width: 100%;
-    margin: 80px 0 0 0;
     display: inline-block;
-    vertical-align: top;
+    margin: 80px 0 0 0;
+    max-width: 100%;
     position: relative;
+    vertical-align: top;
+    width: 300px;
   }
 
   .child-dnd .zero-height {
-    min-height: 0;
     height: 0;
-    padding: 0;
     margin: 0;
+    min-height: 0;
+    padding: 0;
   }
 
   .child-dnd.cdk-drop-list-dragging .child-dnd-item-box:not(.cdk-drag-placeholder) {
@@ -115,12 +115,12 @@
   }
 
   .child-dnd-border {
-    border-top: solid 1px #ccc;
     background: #fff0;
     border-radius: 4px;
-    overflow: hidden;
+    border-top: solid 1px #ccc;
     display: block;
     margin-top: 20px;
+    overflow: hidden;
     padding-bottom: 25px;
   }
 
@@ -132,37 +132,37 @@
   }
 
   .child-dnd-borderless {
-    margin: 2.5px 0 2.5px 0;
-    border: solid 0px #ccc;
-    min-height: 15px;
     background: transparent;
+    border: solid 0px #ccc;
     border-radius: 4px;
-    overflow: hidden;
     display: block;
+    margin: 2.5px 0px 2.5px 0px;
+    min-height: 15px;
+    overflow: hidden;
   }
 
   .child-dnd-borderless .child-dnd-placeholder {
-    margin: 20px 0 0 0;
     background: #cccccc00;
     border: dotted 3px #3db0d6;
+    margin: 20px 0 0 0;
     min-height: 60px;
     transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
   }
 
   .child-dnd-item-box {
-    padding: 20px 10px;
+    align-items: center;
+    background-color: #add8e6;
     border-bottom: solid 1px #000;
     border-left: solid 1px #000;
     border-right: solid 1px #000;
+    box-sizing: border-box;
     color: rgba(0, 0, 0, 0.87);
+    cursor: move;
     display: flex;
     flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    box-sizing: border-box;
-    cursor: move;
-    background-color: #add8e6;
     font-size: 14px;
+    justify-content: space-between;
+    padding: 20px 10px;
   }
 
   .child-dnd-item-box:last-child {
@@ -186,13 +186,13 @@
   }
 
   .example-handle {
-    border-radius: 4px 4px 0 0;
     background-color: #adacac;
+    border-radius: 4px 4px 0px 0px;
     cursor: move;
-    width: calc(100% - 4px);
-    margin: 0px 2px 0 2px;
     height: 10px;
+    margin: 0px 2px 0px 2px;
     position: absolute;
+    width: calc(100% - 4px);
     z-index: 1;
   }
 
@@ -213,5 +213,4 @@
     min-height: 60px;
     transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }
-
 </style>

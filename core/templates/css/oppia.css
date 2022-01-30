@@ -1935,8 +1935,8 @@ pre.oppia-pre-wrapped-text {
 }
 
 .oppia-rte-viewer > p:first-child {
-  margin-top: 0;
   margin-left: 15px;
+  margin-top: 0;
 }
 .oppia-rte-viewer > p:last-child {
   margin-bottom: 0;
