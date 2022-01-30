@@ -1,7 +1,11 @@
-{
+{ 
   "compilerOptions": {
     "allowJs": true,
+    "declaration": true,
     "skipLibCheck": true,
+    "importHelpers": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
     "downlevelIteration": true,
     "lib": ["es2017", "dom", "webworker"],
     "module": "es2020",
@@ -18,6 +22,7 @@
     "resolveJsonModule": true,
     "moduleResolution": "node",
     "baseUrl": ".",
+  
     "paths": {
       "app.constants": ["core/templates/app.constants"],
       "google-analytics.initializer": ["core/templates/google-analytics.initializer"],
@@ -50,4 +55,5 @@
     "core/tests",
     "extensions/classifiers/proto"
   ]
+  
 }
