@@ -122,7 +122,7 @@ class PlatformFeatureListTest(test_utils.GenericTestBase):
             feature_flag = (
                 registry.Registry.get_platform_parameter(feature.value))
             if (feature_flag.feature_stage !=
-                    platform_parameter_domain.FEATURE_STAGES.dev.value):
+                    platform_parameter_domain.FeatureStages.DEV.value):
                 invalid_feature_names.append(feature.value)
         self.assertTrue(
             len(invalid_feature_names) == 0,
@@ -136,7 +136,7 @@ class PlatformFeatureListTest(test_utils.GenericTestBase):
             feature_flag = (
                 registry.Registry.get_platform_parameter(feature.name))
             if (feature_flag.feature_stage !=
-                    platform_parameter_domain.FEATURE_STAGES.test.value):
+                    platform_parameter_domain.FeatureStages.TEST.value):
                 invalid_feature_names.append(feature.name)
         self.assertTrue(
             len(invalid_feature_names) == 0,
@@ -150,7 +150,7 @@ class PlatformFeatureListTest(test_utils.GenericTestBase):
             feature_flag = (
                 registry.Registry.get_platform_parameter(feature.value))
             if (feature_flag.feature_stage !=
-                    platform_parameter_domain.FEATURE_STAGES.prod.value):
+                    platform_parameter_domain.FeatureStages.PROD.value):
                 invalid_feature_names.append(feature.value)
         self.assertTrue(
             len(invalid_feature_names) == 0,
