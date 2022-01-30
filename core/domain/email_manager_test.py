@@ -6037,7 +6037,7 @@ class NotMergeableChangesEmailUnitTest(test_utils.EmailTestBase):
     dummy_admin_address = 'admin@system.com'
 
     def setUp(self):
-        super(NotMergeableChangesEmailUnitTest, self).setUp()
+        super().setUp()
         self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
         self.admin_email_ctx = self.swap(
             feconf, 'ADMIN_EMAIL_ADDRESS', self.dummy_admin_address)
