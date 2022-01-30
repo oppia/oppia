@@ -23,7 +23,6 @@ import datetime
 from core import utils
 from core.domain import beam_job_domain
 from core.jobs.batch_jobs import model_validation_jobs
-from core.platform import models
 from core.tests import test_utils
 
 

@@ -24,6 +24,7 @@ from types import ModuleType  # pylint: disable=import-only-modules
 
 from core import feconf
 from core.constants import constants
+from mypy_imports import base_models
 
 from typing import List, Tuple, Type
 
@@ -101,11 +102,11 @@ class _Gae(Platform):
 
         Args:
             model_names: list(Names). List of storage module names.
-        
+
         # We have ignored [override] here because the signature of this method
         # doesn't match with BaseModel.delete_multi().
         # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
-        
+
         Returns:
             tuple(module). Tuple of storage modules.
 
