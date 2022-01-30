@@ -93,8 +93,6 @@ ignore-imports=yes
 [MESSAGES CONTROL]
 
 disable=abstract-method,
-        bad-super-call,
-        super-with-arguments,
         ungrouped-imports,
         arguments-differ,
         broad-except,
