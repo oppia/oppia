@@ -25,10 +25,6 @@ from core.jobs import base_jobs
 
 from typing import Dict, List, Type, Union
 
-from core.platform import models  # pylint: disable=invalid-import-from # isort:skip
-
-(beam_job_models,) = models.Registry.import_models([models.Names.BEAM_JOB])
-
 
 class BeamJob:
     """Encapsulates the definition of an Apache Beam job.

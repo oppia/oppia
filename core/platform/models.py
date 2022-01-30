@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2018 The Oppia Authors. All Rights Reserved.
+# Copyright 2014 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,16 +20,12 @@ from __future__ import annotations
 
 import enum
 import inspect
-from types import ModuleType # pylint:disable=import-only-modules
+from types import ModuleType  # pylint: disable=import-only-modules
 
 from core import feconf
 from core.constants import constants
 
 from typing import List, Tuple, Type
-
-MYPY = False
-if MYPY:
-    from mypy_imports import base_models
 
 
 class Names(enum.Enum):
@@ -103,13 +99,13 @@ class _Gae(Platform):
     def import_models(cls, model_names: List[Names]) -> Tuple[ModuleType, ...]:
         """Imports and returns the storage modules listed in model_names.
 
+        Args:
+            model_names: list(Names). List of storage module names.
+        
         # We have ignored [override] here because the signature of this method
         # doesn't match with BaseModel.delete_multi().
         # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
-
-        Args:
-            model_names: list(Names). List of storage module names.
-
+        
         Returns:
             tuple(module). Tuple of storage modules.
 

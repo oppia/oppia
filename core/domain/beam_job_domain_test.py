@@ -26,8 +26,6 @@ from core.jobs.batch_jobs import model_validation_jobs
 from core.platform import models
 from core.tests import test_utils
 
-(beam_job_models,) = models.Registry.import_models([models.Names.BEAM_JOB])
-
 
 class BeamJobTests(test_utils.TestBase):
 
