@@ -95,7 +95,7 @@ class _Gae(Platform):
     """Provides platform-specific imports related to
     GAE (Google App Engine).
     """
-    
+
     # We have ignored [override] here because the signature of this method
     # doesn't match with BaseModel.delete_multi().
     # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
