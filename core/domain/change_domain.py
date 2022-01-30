@@ -252,7 +252,7 @@ class BaseChange:
         # We validate the BaseChange object by converting
         # it into a dict and using the validate_dict method.
         # This is done because schema_utils used the validate method
-        # to verify that the domain object is correct.        
+        # to verify that the domain object is correct.
         self.validate_dict(self.to_dict())
 
     def __getattr__(self, name: str) -> str:
