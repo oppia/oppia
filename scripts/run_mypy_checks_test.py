@@ -113,6 +113,13 @@ class MypyScriptChecks(test_utils.GenericTestBase):
             run_mypy_checks, 'install_mypy_prerequisites',
             mock_install_mypy_prerequisites)
 
+    def test_all_files_and_folders_in_not_fully_covered_files_exist(
+        self
+    ) -> None:
+        for path in run_mypy_checks.NOT_FULLY_COVERED_FILES:
+            self.assertTrue(
+                os.path.exists(path), msg='"%s" does not exist' % path)
+
     def test_install_third_party_libraries_with_skip_install_as_true(self):
         run_mypy_checks.install_third_party_libraries(True)
 

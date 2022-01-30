@@ -17,6 +17,7 @@
  */
 
 import { Subscription } from 'rxjs';
+import { SkillEditorSaveModalComponent } from '../modal-templates/skill-editor-save-modal.component';
 import { SavePendingChangesModalComponent } from 'components/save-pending-changes/save-pending-changes-modal.component';
 
 require(
@@ -43,11 +44,11 @@ angular.module('oppia').directive('skillEditorNavbar', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/skill-editor-page/navbar/skill-editor-navbar.directive.html'),
       controller: [
-        '$rootScope', '$scope', '$uibModal', 'AlertsService', 'NgbModal',
+        '$rootScope', '$scope', 'AlertsService', 'NgbModal',
         'SkillEditorRoutingService', 'SkillEditorStateService',
         'SkillUpdateService', 'UndoRedoService', 'UrlService',
         function(
-            $rootScope, $scope, $uibModal, AlertsService, NgbModal,
+            $rootScope, $scope, AlertsService, NgbModal,
             SkillEditorRoutingService, SkillEditorStateService,
             SkillUpdateService, UndoRedoService, UrlService) {
           var ctrl = this;
@@ -88,12 +89,8 @@ angular.module('oppia').directive('skillEditorNavbar', [
           };
 
           $scope.saveChanges = function() {
-            $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/skill-editor-page/modal-templates/' +
-                'skill-editor-save-modal.directive.html'),
+            NgbModal.open(SkillEditorSaveModalComponent, {
               backdrop: 'static',
-              controller: 'ConfirmOrCancelModalController'
             }).result.then(function(commitMessage) {
               SkillEditorStateService.saveSkill(commitMessage, () => {
                 AlertsService.addSuccessMessage('Changes Saved.');
