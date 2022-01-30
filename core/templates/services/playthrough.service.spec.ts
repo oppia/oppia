@@ -30,10 +30,10 @@ import { PlaythroughBackendApiService } from
 import { Stopwatch } from 'domain/utilities/stopwatch.model';
 
 describe('PlaythroughService', () => {
-  let explorationFeaturesService: ExplorationFeaturesService = null;
-  let learnerActionObjectFactory: LearnerActionObjectFactory = null;
-  let playthroughBackendApiService: PlaythroughBackendApiService = null;
-  let playthroughService: PlaythroughService = null;
+  let explorationFeaturesService: ExplorationFeaturesService;
+  let learnerActionObjectFactory: LearnerActionObjectFactory;
+  let playthroughBackendApiService: PlaythroughBackendApiService;
+  let playthroughService: PlaythroughService;
 
   // NOTE TO DEVELOPERS: For the following 3 "record" functions, it is the test
   // writer's responsibility to create a "sensible" set of transitions.
@@ -43,11 +43,11 @@ describe('PlaythroughService', () => {
   //      recordStateTransitions(['A', 'B']);
   //      recordStateTransitions(['F', 'G']); // Wrong, next should be 'B'.
   //
-  //      recordCycle(['A', 'B', 'C'], 3); // Final position is at 'A'.
-  //      recordStateTransitions(['C', 'D', 'E']); // Wrong, next should be 'A'.
+  //     recordCycle(['A', 'B', 'C'], 3); // Final position is at 'A'.
+  //     recordStateTransitions(['C', 'D', 'E']); // Wrong, next should be 'A'.
   //
-  //      recordIncorrectAnswers('A', 3); // Final position is at 'A'.
-  //      recordStateTransitions(['C', 'D', 'E']); // Wrong, next should be 'A'.
+  //     recordIncorrectAnswers('A', 3); // Final position is at 'A'.
+  //     recordStateTransitions(['C', 'D', 'E']); // Wrong, next should be 'A'.
 
   const recordStateTransitions = (stateNames: string[]) => {
     for (let i = 0; i < stateNames.length - 1; ++i) {
@@ -82,7 +82,8 @@ describe('PlaythroughService', () => {
     spyOn(Stopwatch, 'create').and.returnValue(mockStopwatch);
   };
 
-  const spyOnStorePlaythrough = (callback: (p: Playthrough) => void = null) => {
+  const spyOnStorePlaythrough =
+  (callback: ((p: Playthrough) => void) | null = null) => {
     if (callback) {
       return spyOn(playthroughBackendApiService, 'storePlaythroughAsync')
         .and.callFake(async(p: Playthrough, _: number) => callback(p));
@@ -231,7 +232,7 @@ describe('PlaythroughService', () => {
       });
 
       it('should return null if state with multiple incorrect submissions is ' +
-        'eventually completed', () => {
+         'eventually completed', () => {
         const storePlaythroughSpy = spyOnStorePlaythrough();
         mockTimedExplorationDurationInSecs(400);
         playthroughService.recordExplorationStartAction('A');
@@ -285,7 +286,7 @@ describe('PlaythroughService', () => {
       });
 
       it('should identify p-shaped cyclic state transitions with cyclic ' +
-        'portion at the tail', () => {
+         'portion at the tail', () => {
         // P-shaped cycles look like:
         // A - B - C - D
         //         |   |
@@ -310,7 +311,7 @@ describe('PlaythroughService', () => {
       });
 
       it('should identify p-shaped cyclic state transitions with cyclic ' +
-        'portion at the head', () => {
+         'portion at the head', () => {
         // P-shaped cycles look like:
         // D - A - E - F
         // |   |

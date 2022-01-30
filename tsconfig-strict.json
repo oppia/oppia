@@ -576,6 +576,8 @@
     "core/templates/services/platform-feature.service.spec.ts",
     "core/templates/services/playthrough-issues-backend-api.service.ts",
     "core/templates/services/playthrough-issues-backend-api.service.spec.ts",
+    "core/templates/services/playthrough.service.ts",
+    "core/templates/services/playthrough.service.spec.ts",
     "core/templates/services/prevent-page-unload-event.service.ts",
     "core/templates/services/prevent-page-unload-event.service.spec.ts",
     "core/templates/services/promo-bar-backend-api.service.ts",
