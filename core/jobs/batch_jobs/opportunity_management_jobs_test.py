@@ -307,7 +307,24 @@ class GenerateSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
             opportunity_model_2.skill_description,
             self.SKILL_2_DESCRIPTION)
         self.assertEqual(opportunity_model_2.question_count, 2)
+        
+    def test_generation_job_fails_when_validation_failure(self) -> None:
+        all_opportunity_models = list(
+            opportunity_models.SkillOpportunityModel.get_all())
+        self.assertEqual(len(all_opportunity_models), 0)
+        
+        with self.swap(
+            opportunity_management_jobs.GenerateSkillOpportunityModelJob,
+            '_count_unique_question_ids',
+            lambda _: -1
+        ):
 
+            self.assert_job_output_is([
+                job_run_result.JobRunResult(
+                    stdout="", stderr="ERROR: \"Expected question_count to be "
+                    "a non-negative integer, received -1\": 2"
+                )
+            ])
 
 class DeleteExplorationOpportunitySummariesJobTests(job_test_utils.JobTestBase):
 
