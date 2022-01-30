@@ -135,17 +135,17 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
       event.previousIndex, event.currentIndex);
   }
 
-  logEvent(e: CdkDragExit): void {
+  logEvent(event: CdkDragExit<string[]>): void {
     // Logs the event.
     if (this.dragStarted) {
       return;
     }
     this.dragStarted = true;
-    for (let i in this.multipleItemsInSamePositionArray) {
-      if (e.container.data === this.multipleItemsInSamePositionArray[i]) {
+    for (let i = 0; i < this.multipleItemsInSamePositionArray.length; i++) {
+      if (event.container.data === this.multipleItemsInSamePositionArray[i]) {
         if (this.multipleItemsInSamePositionArray[i].length === 1) {
-          this.noShow = +i;
-          this.hide.push(+i, +i + 1);
+          this.noShow = i;
+          this.hide.push(i, i + 1);
         }
       }
     }
@@ -245,7 +245,8 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
   }
 
   submitAnswer(): void {
-    // Convert the list of lists to a list of lists of content ids.
+    // Convert the list of lists of html content to a list of lists
+    // of content ids.
     const answer = [];
     if (this.allowMultipleItemsInSamePosition) {
       for (let i = 0; i < this.multipleItemsInSamePositionArray.length; i++) {
