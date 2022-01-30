@@ -408,8 +408,8 @@ export class CustomizeInteractionModalComponent
   }
 
   save(): void {
-    const updatedContentIdToContent = this.getContentIdToContent();
     const contentIdsWithModifiedContent = [];
+    const updatedContentIdToContent = this.getContentIdToContent();
 
     Object.keys(this.originalContentIdToContent).forEach(contentId => {
       if (
