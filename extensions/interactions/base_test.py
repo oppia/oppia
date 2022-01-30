@@ -58,6 +58,7 @@ INTERACTIONS_THAT_USE_COMPONENTS = [
     'MathEquationInput',
     'MultipleChoiceInput',
     'NumericExpressionInput',
+    'PencilCodeEditor',
     'RatioExpressionInput',
     'NumericInput',
     'NumberWithUnits',

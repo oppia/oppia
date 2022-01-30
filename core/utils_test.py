@@ -670,8 +670,7 @@ class UtilsTests(test_utils.GenericTestBase):
         """Helper method for test_require_valid_image_filename."""
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
-            utils.require_valid_image_filename(
-                image_filename)
+            utils.require_valid_image_filename(image_filename)
 
     def test_require_valid_image_filename(self) -> None:
         """Test image filename validation."""

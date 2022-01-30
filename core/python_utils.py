@@ -169,25 +169,6 @@ def get_package_file_contents(package: str, filepath: str) -> str:
         return pkgutil.get_data(package, filepath).decode('utf-8')
 
 
-def parse_query_string(query_string):
-    """Parse a query string given as a string argument
-    (data of type application/x-www-form-urlencoded) using urlparse.parse_qs if
-    run under Python 2 and urllib.parse.parse_qs if run under Python 3.
-
-    Args:
-        query_string: str. The query string.
-
-    Returns:
-        dict. The keys are the unique query variable names and the values are
-        lists of values for each name.
-    """
-    try:
-        import urllib.parse as urlparse
-    except ImportError:
-        import urlparse
-    return urlparse.parse_qs(query_string)  # pylint: disable=disallowed-function-calls
-
-
 def url_quote(content):
     """Quotes a string using urllib.quote if run under Python 2 and
     urllib.parse.quote if run under Python 3.
