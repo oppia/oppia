@@ -25,6 +25,37 @@ from core.domain import suggestion_services
 from core.domain import user_services
 
 
+def get_updated_thread_dict(entity_type, entity_id, has_suggestion):
+    """Fetches all threads by the give parameters.
+
+    Args:
+        entity_type: str. The type of entity the feedback thread is linked to.
+        entity_id: str. The id of the entity.
+        has_suggestion: bool. Whether the threads have a suggestion or not.
+
+    Returns:
+        list(dict). The updated dictionary with usernames.
+    """
+    thread_dicts = [
+        t.to_dict() for t in feedback_services.get_all_threads(
+            entity_type, entity_id, has_suggestion)]
+
+    original_author_ids = [
+        t['original_author_id'] for t in thread_dicts]
+    last_nonempty_message_author_ids = [
+        t['last_nonempty_message_author_id'] for t in thread_dicts]
+
+    thread_usernames = user_services.get_usernames(original_author_ids)
+    last_nonempty_message_author = user_services.get_usernames(
+        last_nonempty_message_author_ids)
+
+    for index, t in enumerate(thread_dicts):
+        t['original_author_username'] = thread_usernames[index]
+        t['last_nonempty_message_author'] = last_nonempty_message_author[
+            index]
+    return thread_dicts
+
+
 class ThreadListHandler(base.BaseHandler):
     """Handles operations relating to feedback thread lists."""
 
@@ -59,35 +90,11 @@ class ThreadListHandler(base.BaseHandler):
     @acl_decorators.can_play_exploration
     def get(self, exploration_id):
 
-        feedback_dicts = [
-            f.to_dict() for f in feedback_services.get_all_threads(
-            feconf.ENTITY_TYPE_EXPLORATION, exploration_id, False)]
-
-        suggestion_dicts = [
-            s.to_dict() for s in feedback_services.get_all_threads(
-            feconf.ENTITY_TYPE_EXPLORATION, exploration_id, True)]
-
-        feedbacks_author_ids = [
-            f['original_author_id'] for f in feedback_dicts]
-
-        suggestions_author_ids = [
-            s['original_author_id'] for s in suggestion_dicts]
-
-        feedbacks_author_usernames = user_services.get_usernames(
-            feedbacks_author_ids)
-
-        suggestions_author_usernames = user_services.get_usernames(
-            suggestions_author_ids)
-
-        for index, f in enumerate(feedback_dicts):
-            f['original_author_id'] = feedbacks_author_usernames[index]
-
-        for index, s in enumerate(suggestion_dicts):
-            s['original_author_id'] = suggestions_author_usernames[index]
-
         self.values.update({
-            'feedback_thread_dicts': feedback_dicts,
-            'suggestion_thread_dicts': suggestion_dicts
+            'feedback_thread_dicts': get_updated_thread_dict(
+                feconf.ENTITY_TYPE_EXPLORATION, exploration_id, False),
+            'suggestion_thread_dicts': get_updated_thread_dict(
+                feconf.ENTITY_TYPE_EXPLORATION, exploration_id, True)
         })
         self.render_json(self.values)
 
@@ -124,21 +131,9 @@ class ThreadListHandlerForTopicsHandler(base.BaseHandler):
     @acl_decorators.can_edit_topic
     def get(self, topic_id):
 
-        suggestion_dicts = [
-            s.to_dict() for s in feedback_services.get_all_threads(
-            feconf.ENTITY_TYPE_TOPIC, topic_id, True)]
-
-        suggestions_author_ids = [
-            s['original_author_id'] for s in suggestion_dicts]
-
-        suggestions_author_usernames = user_services.get_usernames(
-            suggestions_author_ids)
-
-        for index, s in enumerate(suggestion_dicts):
-            s['original_author_id'] = suggestions_author_usernames[index]
-
         self.values.update({
-            'suggestion_thread_dicts': suggestion_dicts
+            'suggestion_thread_dicts': get_updated_thread_dict(
+                feconf.ENTITY_TYPE_TOPIC, topic_id, True)
             })
         self.render_json(self.values)
 
@@ -197,7 +192,7 @@ class ThreadHandler(base.BaseHandler):
         author_usernames = user_services.get_usernames(author_ids)
 
         for index, message in enumerate(messages):
-            message['author_id'] = author_usernames[index]
+            message['author_username'] = author_usernames[index]
 
         self.values.update({
             'messages': messages,
@@ -266,7 +261,7 @@ class RecentFeedbackMessagesHandler(base.BaseHandler):
         messages_user_names = user_services.get_usernames(messages_author_ids)
 
         for index, message in enumerate(messages_dict):
-            message['author_id'] = messages_user_names[index]
+            message['author_username'] = messages_user_names[index]
 
         self.render_json({
             'results': messages_dict,

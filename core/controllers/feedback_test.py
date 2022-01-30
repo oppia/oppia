@@ -35,9 +35,10 @@ from core.tests import test_utils
 
 
 EXPECTED_THREAD_KEYS = [
-    'status', 'original_author_id', 'state_name', 'summary',
-    'thread_id', 'subject', 'last_updated_msecs', 'message_count',
-    'last_nonempty_message_text', 'last_nonempty_message_author_id']
+    'status', 'original_author_id', 'original_author_username', 'state_name',
+    'summary', 'thread_id', 'subject', 'last_updated_msecs', 'message_count',
+    'last_nonempty_message_text', 'last_nonempty_message_author_id',
+    'last_nonempty_message_author']
 EXPECTED_MESSAGE_KEYS = [
     'author_id', 'created_on_msecs', 'entity_type', 'message_id',
     'entity_id', 'text', 'updated_status', 'updated_subject']
@@ -149,7 +150,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
             set(threadlist[0].keys()), set(EXPECTED_THREAD_KEYS))
         self.assertDictContainsSubset({
             'status': 'open',
-            'original_author_id': self.EDITOR_USERNAME,
+            'original_author_username': self.EDITOR_USERNAME,
             'subject': u'New Thread ¡unicode!',
         }, threadlist[0])
 
@@ -330,12 +331,12 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             response_dict['messages'][0]['author_id'],
-            self.EDITOR_USERNAME)
+            self.editor_id)
         self.assertEqual(response_dict['messages'][0]['message_id'], 0)
         self.assertEqual(response_dict['messages'][0]['text'], 'Message 0')
         for num in range(num_users):
             self.assertEqual(
-                response_dict['messages'][num + 1]['author_id'],
+                response_dict['messages'][num + 1]['author_username'],
                 _get_username(num))
             self.assertEqual(
                 response_dict['messages'][num + 1]['message_id'], num + 1)
@@ -515,7 +516,7 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
                 feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID))
         self.assertEqual(response['feedback_thread_dicts'], [])
         expected_thread_dict = {
-            'original_author_id': self.USER_USERNAME,
+            'original_author_id': self.user_id,
             'status': feedback_models.STATUS_CHOICES_OPEN,
             'subject': 'sample description'
         }
@@ -642,7 +643,7 @@ class ThreadListHandlerForTopicsHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(
             suggestion_thread_dicts['thread_id'], topic_thread.id)
         self.assertEqual(
-            suggestion_thread_dicts['original_author_id'], self.OWNER_USERNAME)
+            suggestion_thread_dicts['original_author_id'], self.owner_id)
 
         self.logout()
 
@@ -716,7 +717,7 @@ class RecentFeedbackMessagesHandlerTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(results), 2)
 
-        self.assertEqual(results[0]['author_id'], self.MODERATOR_USERNAME)
+        self.assertEqual(results[0]['author_id'], self.moderator_id)
         self.assertEqual(results[0]['text'], 'new text')
         self.assertEqual(results[0]['updated_subject'], 'new subject')
         self.assertEqual(results[0]['entity_type'], 'exploration')
