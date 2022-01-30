@@ -38,13 +38,13 @@ module.exports = {
   },
 
   create: function(context) {
-    var activeElementSelector1 = (
+    var activeElementWIthInnerAwaitSelector = (
       'CallExpression[callee.property.name = activeElement]' +
       '[callee.object.callee.object.name = browser]' +
       '[callee.object.callee.property.name = switchTo]'
     );
 
-    var activeElementSelector2 = (
+    var activeElementWIthOuterAwaitSelector = (
       'CallExpression[callee.object.type = AwaitExpression]' +
       '[callee.object.argument.callee.property.name = activeElement]' +
       '[callee.object.argument.callee.object.callee.property.name = switchTo]' +
@@ -63,10 +63,10 @@ module.exports = {
     };
 
     return {
-      [activeElementSelector1]: function(node) {
+      [activeElementWIthInnerAwaitSelector]: function(node) {
         reportNestedAwaits(node);
       },
-      [activeElementSelector2]: function(node) {
+      [activeElementWIthOuterAwaitSelector]: function(node) {
         reportNestedAwaits(node);
       }
     };
