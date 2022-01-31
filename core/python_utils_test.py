@@ -23,6 +23,7 @@ import builtins
 import os
 import sys
 import unittest
+import urllib
 
 from core import python_utils
 from core import utils
@@ -62,7 +63,7 @@ class PythonUtilsTests(test_utils.GenericTestBase):
         self.assertEqual(python_utils.divide(5, 2), 2)
 
     def test_parse_query_string(self):
-        response = python_utils.parse_query_string(
+        response = urllib.parse.parse_qs(
             'http://www.google.com?search=oppia')
         self.assertEqual(response, {'http://www.google.com?search': ['oppia']})
 
