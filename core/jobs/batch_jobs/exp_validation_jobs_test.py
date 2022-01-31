@@ -45,7 +45,7 @@ class GetExpRightsWithDuplicateUsersJobTests(
             exp_models.ExplorationRightsModel,
             id=self.EXPLORATION_ID_1,
             owner_ids=[self.USER_ID_1],
-            # Duplicate user here:
+            # Duplicate user below.
             editor_ids=[self.USER_ID_1],
             voice_artist_ids=[self.USER_ID_2],
             viewer_ids=[self.USER_ID_3],
@@ -72,7 +72,7 @@ class GetExpRightsWithDuplicateUsersJobTests(
             owner_ids=[self.USER_ID_3],
             editor_ids=[self.USER_ID_1],
             voice_artist_ids=[self.USER_ID_2],
-            # Duplicate user here:
+            # Duplicate user below.
             viewer_ids=[self.USER_ID_3],
             community_owned=False,
             status=constants.ACTIVITY_STATUS_PUBLIC,
