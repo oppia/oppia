@@ -25,7 +25,6 @@ file is generated, we must call the CLI in a separate process.
 from __future__ import annotations
 
 import os
-import re
 import sys
 
 from scripts import common
@@ -54,8 +53,6 @@ def main():
     # we need to write our own script and manually add our local pip-tools
     # directory to the python system path in order to import the required
     # libraries correctly.
-    sys.argv[0] = re.sub(
-        r'(-script\.pyw|\.exe)?$', '', common.REQUIREMENTS_FILE_PATH)
     compile.cli() # pylint: disable=no-value-for-parameter
 
 
