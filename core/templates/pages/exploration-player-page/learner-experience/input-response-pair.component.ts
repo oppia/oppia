@@ -91,6 +91,7 @@ export class InputResponsePairComponent {
   }
 
   convertAnswerToLocalFormat(data: string): string {
+    // We need to use the numberConversionService, only if the data is number.
     if (!this.isNumber(data)) {
       return data;
     }
