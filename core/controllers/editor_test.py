@@ -974,7 +974,7 @@ class StateInteractionStatsHandlerTests(test_utils.GenericTestBase):
                 'Available states: [\'Introduction\']'
             ]
         )
-        self.assertRaisesRegexp(Exception, 'Bad response: 503')
+        self.assertRaisesRegex(Exception, 'Bad response: 503')
 
         self.logout()
 
