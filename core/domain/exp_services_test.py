@@ -27,24 +27,25 @@ import zipfile
 from core import feconf
 from core import python_utils
 from core import utils
-from core.domain import classifier_services, opportunity_services
-from core.domain import story_domain
-from core.domain import story_services
-from core.domain import topic_fetchers
-from core.domain import topic_services
+from core.domain import classifier_services
 from core.domain import draft_upgrade_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import fs_domain
+from core.domain import opportunity_services
 from core.domain import param_domain
 from core.domain import rating_services
 from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import state_domain
+from core.domain import story_domain
+from core.domain import story_services
 from core.domain import subscription_services
+from core.domain import topic_fetchers
+from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -1111,7 +1112,8 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                 'new_value': recorded_voiceovers_dict
             })]
         changed_exploration_voiceover = (
-            exp_services.apply_change_list(self.EXP_0_ID, change_list_voiceover))
+            exp_services.apply_change_list(
+                self.EXP_0_ID, change_list_voiceover))
         changed_exp_voiceover_obj = (
             changed_exploration_voiceover.states['State 1'].recorded_voiceovers
         )
@@ -1232,7 +1234,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                             'value': 'python'
                         },
                         'placeholder': {
-                            'value':'# Type your code here.'
+                            'value': '# Type your code here.'
                         },
                         'preCode': {
                             'value': ''
@@ -5480,7 +5482,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         exploration_summeries = (
             exp_services.get_top_rated_exploration_summaries(3))
         top_rated_sumeries = (
-            exp_models.ExpSummaryModel.get_top_rated(3) )
+            exp_models.ExpSummaryModel.get_top_rated(3))
         top_rated_sumeries_model = (
             exp_fetchers.get_exploration_summaries_from_models(
                 top_rated_sumeries))
@@ -5492,7 +5494,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
             exp_services.get_recently_published_exp_summaries(3)
         )
         recently_published_sumeries = (
-            exp_models.ExpSummaryModel.get_recently_published(3) )
+            exp_models.ExpSummaryModel.get_recently_published(3))
         recently_publshed_sumeries_model = (
             exp_fetchers.get_exploration_summaries_from_models(
                 recently_published_sumeries))
@@ -5514,7 +5516,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
             uncategorized_skill_ids=['skill_4'], subtopics=[],
             next_subtopic_id=0)
         self.save_new_story(story_id, self.albert_id, topic_id)
-        topic_services.add_canonical_story(self.albert_id,topic_id,story_id)
+        topic_services.add_canonical_story(self.albert_id, topic_id, story_id)
         change_list = [
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_ADD_STORY_NODE,
@@ -5531,7 +5533,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
             })
         ]
         story_services.update_story(
-            self.albert_id,story_id, change_list,
+            self.albert_id, story_id, change_list,
             'Added node.')
         self.assertEqual(
             exp_services.get_story_id_linked_to_exploration(self.EXP_ID_1),
@@ -5539,7 +5541,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
 
     def test_get_user_exploration_data(self):
         self.save_new_valid_exploration(self.EXP_0_ID, self.albert_id)
-        exploration_description =(
+        exploration_description = (
             exp_services.get_user_exploration_data(
                 self.albert_id, self.EXP_0_ID))
         self.assertIsNotNone(exploration_description)
@@ -5582,9 +5584,10 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         self.save_new_valid_exploration(self.EXP_1_ID, self.bob_id)
         exploration_draft_not_applied = (
             exp_services.get_user_exploration_data(
-                self.bob_id, self.EXP_1_ID,True))
+                self.bob_id, self.EXP_1_ID, True))
         self.assertFalse(
             exploration_draft_not_applied['is_version_of_draft_valid'])
+
 
 class ExplorationConversionPipelineTests(ExplorationServicesUnitTests):
     """Tests the exploration model -> exploration conversion pipeline."""
@@ -5721,7 +5724,7 @@ title: Old Title
     def test_update_exploration_by_voice_artist(self):
         exp_id = 'exp_id'
         user_id = 'user_id'
-        self.save_new_default_exploration(exp_id,user_id)
+        self.save_new_default_exploration(exp_id, user_id)
         change_list = [exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                     'property_name': 'title',
@@ -5732,15 +5735,15 @@ title: Old Title
             'Voice artist does not have permission to make some '
             'changes in the change list.'):
             exp_services.update_exploration(
-                user_id,exp_id,change_list,'By voice artist',
-                False,True)
+                user_id, exp_id, change_list, 'By voice artist',
+                False, True)
 
     def test_update_exploration_linked_to_story(self):
         story_id = story_services.get_new_story_id()
         topic_id = topic_fetchers.get_new_topic_id()
         exp_id = 'exp_id'
         user_id = 'user_id'
-        self.save_new_default_exploration(exp_id,user_id)
+        self.save_new_default_exploration(exp_id, user_id)
         exp_services.update_exploration(
             user_id, exp_id, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
@@ -5755,7 +5758,7 @@ title: Old Title
             uncategorized_skill_ids=['skill_4'], subtopics=[],
             next_subtopic_id=0)
         self.save_new_story(story_id, user_id, topic_id)
-        topic_services.add_canonical_story(user_id,topic_id,story_id)
+        topic_services.add_canonical_story(user_id, topic_id, story_id)
         change_list_story = [
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_ADD_STORY_NODE,
@@ -5772,7 +5775,7 @@ title: Old Title
             })
         ]
         story_services.update_story(
-            user_id,story_id, change_list_story,
+            user_id, story_id, change_list_story,
             'Added node.')
         change_list_exp = [exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
@@ -5780,9 +5783,9 @@ title: Old Title
                     'new_value': 'new title'
                 })]
         opportunity_services.add_new_exploration_opportunities(
-            story_id,[exp_id])
+            story_id, [exp_id])
         exp_services.update_exploration(
-                user_id,exp_id,change_list_exp,'story linked')
+                user_id, exp_id, change_list_exp, 'story linked')
         updated_exp = exp_fetchers.get_exploration_by_id(exp_id)
         self.assertEqual(updated_exp.title, 'new title')
 
@@ -6647,16 +6650,15 @@ title: Old Title
                     'new_value': 'New title'
                 })], 'Changed title')
         user_actions_info = user_services.get_user_actions_info(self.albert_id)
-        rights_manager.publish_exploration(user_actions_info,self.EXP_0_ID)
+        rights_manager.publish_exploration(user_actions_info, self.EXP_0_ID)
         updated_exploration_model = exp_fetchers.get_exploration_by_id(
             self.EXP_0_ID)
         exp_services.revert_exploration(
-            self.albert_id,self.EXP_0_ID,updated_exploration_model.version,1)
+            self.albert_id, self.EXP_0_ID, updated_exploration_model.version, 1)
         reverted_exploration = exp_fetchers.get_exploration_by_id(
             self.EXP_0_ID)
-        self.assertEqual(exploration_model.title,reverted_exploration.title)
-        self.assertEqual(3,reverted_exploration.version)
-
+        self.assertEqual(exploration_model.title, reverted_exploration.title)
+        self.assertEqual(3, reverted_exploration.version)
 
     def test_revert_exploration_with_mismatch_of_versions_raises_error(self):
         self.save_new_valid_exploration('exp_id', 'user_id')
@@ -6764,7 +6766,6 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
         self.assertFalse(exp_services.is_version_of_draft_valid(
             self.EXP_ID3, exp_user_data.draft_change_list_exp_version))
 
-
     def test_create_or_update_draft_when_by_voice_artist(self):
         with self.assertRaisesRegex(
             utils.ValidationError,
@@ -6772,7 +6773,7 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
             'changes in the change list.'):
             exp_services.create_or_update_draft(
             self.EXP_ID1, self.USER_ID, self.NEW_CHANGELIST, 5,
-            self.NEWER_DATETIME,True)
+            self.NEWER_DATETIME, True)
 
     def test_create_or_update_draft_when_older_draft_exists(self):
         exp_services.create_or_update_draft(
