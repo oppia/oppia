@@ -27,7 +27,9 @@ import { EndExplorationExtensionsModule } from './EndExploration/end-exploration
 import { FractionInputInteractionModule } from './FractionInput/fraction-input-interactions.module';
 import { GraphInputInteractionModule } from './GraphInput/graph-input-interactions.module';
 import { ImageClickInputInteractionModule } from './ImageClickInput/image-click-input-interactions.module';
+import { ItemSelectionInputInteractionModule } from './ItemSelectionInput/item-selection-input-interactions.module';
 import { CodeReplInteractionModule } from './CodeRepl/code-repl-interactions.module';
+import { NumberWithUnitsInteractionModule } from './NumberWithUnits/number-with-units-interactions.module';
 import { NumericExpressionInputModule } from './NumericExpressionInput/numeric-expression-input-interactions.module';
 import { NumericInputModule } from './NumericInput/numeric-input-interactions.module';
 import { MathEquationInputModule } from './MathEquationInput/math-equation-input-interactions.module';
@@ -48,6 +50,8 @@ import { PencilCodeEditorModule } from './PencilCodeEditor/pencil-code-editor-in
     FractionInputInteractionModule,
     GraphInputInteractionModule,
     ImageClickInputInteractionModule,
+    ItemSelectionInputInteractionModule,
+    NumberWithUnitsInteractionModule,
     NumericExpressionInputModule,
     NumericInputModule,
     MathEquationInputModule,
@@ -68,6 +72,8 @@ import { PencilCodeEditorModule } from './PencilCodeEditor/pencil-code-editor-in
     FractionInputInteractionModule,
     GraphInputInteractionModule,
     ImageClickInputInteractionModule,
+    ItemSelectionInputInteractionModule,
+    NumberWithUnitsInteractionModule,
     NumericExpressionInputModule,
     PencilCodeEditorModule,
     NumericInputModule,
