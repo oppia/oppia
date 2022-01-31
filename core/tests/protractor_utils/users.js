@@ -74,10 +74,10 @@ var login = async function(email, useManualNavigation = true) {
     // Click the "sign in" button to trigger redirection.
     await action.click('Sign in button', signInButton);
   }, (url) => {
-      // Users will be redirected to preferred dashboard if they are fully
-      // registered. Otherwise, they will be redirected to signup page.
-      // eslint-disable-next-line max-len
-      return /(learner-dashboard|creator-dashboard|signup|pending-account-deletion)/.test(url);
+    // Users will be redirected to preferred dashboard if they are fully
+    // registered. Otherwise, they will be redirected to signup page.
+    // eslint-disable-next-line max-len
+    return /(learner-dashboard|creator-dashboard|signup|pending-account-deletion)/.test(url);
   }, async() => {
     // Cannot predict the new page, so waiting for loading message to disappear.
     await waitFor.pageToFullyLoad();
