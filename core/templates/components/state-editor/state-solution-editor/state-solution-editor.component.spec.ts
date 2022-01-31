@@ -84,7 +84,8 @@ describe('StateSolutionEditorComponent', () => {
       refreshWarnings: () => {
         return () => {};
       },
-      onSaveSolution: () => {}
+      onSaveSolution: () => {},
+      showMarkAllAudioAsNeedingUpdateModalIfRequired: () => {}
     });
 
     solution = sof.createFromBackendDict({
@@ -133,7 +134,12 @@ describe('StateSolutionEditorComponent', () => {
     spyOn(StateEditorService, 'deleteCurrentSolutionValidity');
     spyOn(StateSolutionService, 'saveDisplayedValue');
 
-    $scope.deleteSolution(0, new Event(''));
+    const value = {
+      index: 0,
+      evt: new Event('')
+    };
+
+    $scope.deleteSolution(value);
     $scope.$apply();
 
     expect(StateEditorService.deleteCurrentSolutionValidity).toHaveBeenCalled();
@@ -147,7 +153,12 @@ describe('StateSolutionEditorComponent', () => {
       } as NgbModalRef
     );
 
-    $scope.deleteSolution(0, new Event(''));
+    const value = {
+      index: 0,
+      evt: new Event('')
+    };
+
+    $scope.deleteSolution(value);
     $scope.$apply();
 
     expect(ngbModal.open).toHaveBeenCalled();
@@ -240,5 +251,19 @@ describe('StateSolutionEditorComponent', () => {
     $scope.$apply();
 
     expect($uibModal.open).toHaveBeenCalled();
+  });
+
+  it('should save solution and open showMarkAllAudioAsNeedingUpdateModal' +
+    ' when user click', () => {
+    spyOn(ctrl, 'showMarkAllAudioAsNeedingUpdateModalIfRequired').and
+      .callThrough();
+    spyOn(ctrl, 'onSaveSolution').and.callThrough();
+
+    $scope.openMarkAllAudioAsNeedingUpdateModalIfRequired('oppia');
+    $scope.saveSolution('saveSolution');
+
+    expect(ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired)
+      .toHaveBeenCalledWith('oppia');
+    expect(ctrl.onSaveSolution).toHaveBeenCalledWith('saveSolution');
   });
 });

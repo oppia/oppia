@@ -23,6 +23,7 @@ import builtins
 import os
 import sys
 import unittest
+import urllib
 
 from core import python_utils
 from core.tests import test_utils
@@ -51,7 +52,7 @@ class PythonUtilsTests(test_utils.GenericTestBase):
             self.assertIsNotNone(file_content)
 
     def test_can_not_open_file(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             IOError, 'Unable to open file: invalid_file.py'):
             with python_utils.open_file('invalid_file.py', 'r') as f:
                 f.readlines()
@@ -61,7 +62,7 @@ class PythonUtilsTests(test_utils.GenericTestBase):
         self.assertEqual(python_utils.divide(5, 2), 2)
 
     def test_parse_query_string(self):
-        response = python_utils.parse_query_string(
+        response = urllib.parse.parse_qs(
             'http://www.google.com?search=oppia')
         self.assertEqual(response, {'http://www.google.com?search': ['oppia']})
 

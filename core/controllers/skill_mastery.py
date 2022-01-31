@@ -33,18 +33,40 @@ class SkillMasteryDataHandler(base.BaseHandler):
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'selected_skill_ids': {
+                'schema': {
+                    'type': 'custom',
+                    'obj_type': 'JsonEncodedInString'
+                }
+            }
+        },
+        'PUT': {
+            'mastery_change_per_skill': {
+                'schema': {
+                    'type': 'variable_keys_dict',
+                    'keys': {
+                        'schema': {
+                            'type': 'basestring'
+                        }
+                    },
+                    'values': {
+                         'schema': {
+                             'type': 'float'
+                         }
+                    }
+                }
+            }
+        }
+    }
 
     @acl_decorators.can_access_learner_dashboard
     def get(self):
         """Handles GET requests."""
-        comma_separated_skill_ids = (
-            self.request.get('comma_separated_skill_ids'))
-        if not comma_separated_skill_ids:
-            raise self.InvalidInputException(
-                'Expected request to contain parameter '
-                'comma_separated_skill_ids.')
-
-        skill_ids = comma_separated_skill_ids.split(',')
+        skill_ids = (
+            self.normalized_request.get('selected_skill_ids'))
 
         try:
             for skill_id in skill_ids:
@@ -69,12 +91,7 @@ class SkillMasteryDataHandler(base.BaseHandler):
     def put(self):
         """Handles PUT requests."""
         mastery_change_per_skill = (
-            self.payload.get('mastery_change_per_skill'))
-        if (not mastery_change_per_skill or
-                not isinstance(mastery_change_per_skill, dict)):
-            raise self.InvalidInputException(
-                'Expected payload to contain mastery_change_per_skill '
-                'as a dict.')
+            self.normalized_payload.get('mastery_change_per_skill'))
 
         skill_ids = list(mastery_change_per_skill.keys())
 
@@ -89,22 +106,6 @@ class SkillMasteryDataHandler(base.BaseHandler):
             except utils.ValidationError:
                 raise self.InvalidInputException(
                     'Invalid skill ID %s' % skill_id)
-
-            # float(bool) will not raise an error.
-            if isinstance(mastery_change_per_skill[skill_id], bool):
-                raise self.InvalidInputException(
-                    'Expected degree of mastery of skill %s to be a number, '
-                    'received %s.'
-                    % (skill_id, mastery_change_per_skill[skill_id]))
-
-            try:
-                mastery_change_per_skill[skill_id] = (
-                    float(mastery_change_per_skill[skill_id]))
-            except (TypeError, ValueError):
-                raise self.InvalidInputException(
-                    'Expected degree of mastery of skill %s to be a number, '
-                    'received %s.'
-                    % (skill_id, mastery_change_per_skill[skill_id]))
 
             if current_degrees_of_mastery[skill_id] is None:
                 current_degrees_of_mastery[skill_id] = 0.0
@@ -135,9 +136,10 @@ class SubtopicMasteryDataHandler(base.BaseHandler):
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
-            'comma_separated_topic_ids': {
+            'selected_topic_ids': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'custom',
+                    'obj_type': 'JsonEncodedInString'
                 }
             }
         }
@@ -146,9 +148,7 @@ class SubtopicMasteryDataHandler(base.BaseHandler):
     @acl_decorators.can_access_learner_dashboard
     def get(self):
         """Handles GET requests."""
-        comma_separated_topic_ids = (
-            self.request.get('comma_separated_topic_ids'))
-        topic_ids = comma_separated_topic_ids.split(',')
+        topic_ids = self.normalized_request.get('selected_topic_ids')
         topics = topic_fetchers.get_topics_by_ids(topic_ids)
         all_skill_ids = []
         subtopic_mastery_dict = {}

@@ -41,9 +41,11 @@ export class InteractionAttributesExtractorService {
     'NumericInput',
     'InteractiveMap',
     'MultipleChoiceInput',
+    'ItemSelectionInput',
     'SetInput',
     'TextInput',
-    'MathEquationInput'
+    'MathEquationInput',
+    'PencilCodeEditor',
   ];
 
   constructor(
