@@ -118,6 +118,7 @@
             </div>
             <label class="form-heading">Thumbnail</label>
             <oppia-thumbnail-uploader [disabled]="!topicRights.canEditTopic()"
+                                      [use-local-storage]="false"
                                       [filename]="topic.getThumbnailFilename()"
                                       (update-filename)="updateTopicThumbnailFilename($event)"
                                       [bg-color]="topic.getThumbnailBgColor()"
