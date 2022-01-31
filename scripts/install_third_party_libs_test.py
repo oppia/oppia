@@ -313,14 +313,12 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
 
         exists_swap = self.swap(os.path, 'exists', mock_exists)
 
-        oppia_proto_api_path = (
-            os.path.join(
-                common.THIRD_PARTY_DIR,
-                'oppia-proto-api-8f3cde883c31785438e80656a5b6bb26bd01b6a1'))
-        os.mkdir(os.path.join(oppia_proto_api_path, 'org'))
+        os.mkdir(os.path.join(
+            common.THIRD_PARTY_OPPIA_ANDROID_PROTO_DIR, 'org'))
         with exists_swap:
             self.assertTrue(os.path.isdir(
-                os.path.join(oppia_proto_api_path, 'org')))
+                os.path.join(
+                    common.THIRD_PARTY_OPPIA_ANDROID_PROTO_DIR, 'org')))
 
         move_swap = self.swap(shutil, 'move', mock_move)
         with move_swap:
@@ -328,7 +326,8 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             rmtree_swap = self.swap(shutil, 'rmtree', mock_rmtree)
             with rmtree_swap:
                 self.assertFalse(os.path.isdir(
-                    os.path.join(oppia_proto_api_path, 'org')))
+                    os.path.join(
+                        common.THIRD_PARTY_OPPIA_ANDROID_PROTO_DIR, 'org')))
 
     def test_ensure_pip_library_is_installed(self):
         check_function_calls = {

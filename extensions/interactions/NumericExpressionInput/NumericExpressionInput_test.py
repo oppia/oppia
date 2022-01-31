@@ -98,13 +98,13 @@ class NumericExpressionInputInteractionTests(test_utils.GenericTestBase):
                 'correct_answer': '1000 + 200 + 30 + 4 + 0.5 + 0.06',
                 'explanation': {
                     'content_id': 'solution',
-                    'html': '<p>This is solution for algebric.</p>'
+                    'html': '<p>This is solution for algebraic.</p>'
                 }
             }
         }
-        registery = interaction_registry.Registry
+        registry = interaction_registry.Registry
         numeric_instance = (
-            registery.get_interaction_by_id('NumericExpressionInput'))
+            registry.get_interaction_by_id('NumericExpressionInput'))
 
         interaction_domain = (
             state_domain.InteractionInstance.from_dict(interaction_dict))
@@ -160,7 +160,7 @@ class NumericExpressionInputInteractionTests(test_utils.GenericTestBase):
             'solution')
         self.assertEqual(
             numeric_proto.solution.base_solution.explanation.text,
-            '<p>This is solution for algebric.</p>')
+            '<p>This is solution for algebraic.</p>')
 
         numeric_answer_group = (
             numeric_proto.answer_groups[0].base_answer_group.outcome)
@@ -194,7 +194,8 @@ class NumericExpressionInputInteractionTests(test_utils.GenericTestBase):
             '1000 + 200 + 30 + 4 + 0.5 + 0.06')
 
         math_rule_specs = numeric_answer_group.rule_specs[2]
-        matches_trival_rule = math_rule_specs.matches_upTo_trivial_manipulations
+        matches_trivial_rule = (
+            math_rule_specs.matches_upTo_trivial_manipulations)
         self.assertEqual(
-            matches_trival_rule.numeric_expression,
+            matches_trivial_rule.numeric_expression,
             '1000 + 200 + 30 + 4 + 0.5 + 0.06')

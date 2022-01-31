@@ -1315,7 +1315,8 @@ class Exploration:
          recomputing from scratch if necessary.
 
         Returns:
-            int. Updated exploration's proto size, in bytes.
+            int. The size of the exploration's Android proto representation,
+            in bytes.
         """
         if self._cached_android_proto_size_is_stale:
             self._cached_android_proto_size_in_bytes = self.get_proto_size()

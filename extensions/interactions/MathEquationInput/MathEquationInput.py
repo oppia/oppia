@@ -106,8 +106,8 @@ class MathEquationInput(base.BaseInteraction):
 
         frac_for_division = customization_args['useFractionForDivision'].value
 
-        algebric_expression_dto = state_pb2.MathEquationInputInstanceDto
-        return algebric_expression_dto.CustomizationArgsDto(
+        math_equation_input_dto = state_pb2.MathEquationInputInstanceDto
+        return math_equation_input_dto.CustomizationArgsDto(
             custom_osk_letters=custom_osk_letters_proto,
             use_fraction_for_division=frac_for_division
         )

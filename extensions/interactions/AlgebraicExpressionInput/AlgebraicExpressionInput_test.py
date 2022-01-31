@@ -25,7 +25,7 @@ from core.tests import test_utils
 
 class AlgebraicExpressionInputInteractionTests(test_utils.GenericTestBase):
 
-    def test_algebric_expression_input_converted_to_proto_correctly(self):
+    def test_algebraic_expression_input_converted_to_proto_correctly(self):
         interaction_dict = {
             'id': 'AlgebraicExpressionInput',
             'customization_args': {
@@ -95,103 +95,114 @@ class AlgebraicExpressionInputInteractionTests(test_utils.GenericTestBase):
                 'correct_answer': 'Correct Answer',
                 'explanation': {
                     'content_id': 'solution',
-                    'html': '<p>This is solution for algebric.</p>'
+                    'html': '<p>This is solution for algebraic.</p>'
                 }
             }
         }
-        registery = interaction_registry.Registry
-        algebric_instance = (
-            registery.get_interaction_by_id('AlgebraicExpressionInput')
+        registry = interaction_registry.Registry
+        algebraic_expression_input_interaction = (
+            registry.get_interaction_by_id('AlgebraicExpressionInput')
         )
         interaction_domain = (
             state_domain.InteractionInstance.from_dict(interaction_dict))
-        algebric_proto = algebric_instance.to_android_algebric_expression_proto(
-            interaction_domain.default_outcome,
-            interaction_domain.customization_args,
-            interaction_domain.solution,
-            interaction_domain.hints,
-            interaction_domain.answer_groups)
 
-        algebric_customization_args = algebric_proto.customization_args
+        algebraic_expression_proto = (
+            algebraic_expression_input_interaction.to_android_algebraic_expression_proto( # pylint: disable=line-too-long
+                interaction_domain.default_outcome,
+                interaction_domain.customization_args,
+                interaction_domain.solution,
+                interaction_domain.hints,
+                interaction_domain.answer_groups))
+
+        algebraic_expression_customization_args = (
+            algebraic_expression_proto.customization_args)
         self.assertEqual(
-            algebric_customization_args.custom_osk_letters[0],
+            algebraic_expression_customization_args.custom_osk_letters[0],
             '\u03C0'
         )
-        self.assertFalse(algebric_customization_args.use_fraction_for_division)
+        self.assertFalse(
+            algebraic_expression_customization_args.use_fraction_for_division)
 
-        algebric_outcome = algebric_proto.default_outcome
+        algebraic_expression_outcome = (
+            algebraic_expression_proto.default_outcome)
         self.assertEqual(
-            algebric_outcome.destination_state,
+            algebraic_expression_outcome.destination_state,
             'Introduction')
         self.assertEqual(
-            algebric_outcome.feedback.content_id,
+            algebraic_expression_outcome.feedback.content_id,
             'default_outcome')
         self.assertEqual(
-            algebric_outcome.feedback.text,
+            algebraic_expression_outcome.feedback.text,
             '<p> introduce </p>')
         self.assertFalse(
-            algebric_outcome.labelled_as_correct)
+            algebraic_expression_outcome.labelled_as_correct)
 
         self.assertEqual(
-            algebric_proto.hints[0].hint_content.content_id,
+            algebraic_expression_proto.hints[0].hint_content.content_id,
             'hint_1')
         self.assertEqual(
-            algebric_proto.hints[1].hint_content.content_id,
+            algebraic_expression_proto.hints[1].hint_content.content_id,
             'hint_2')
         self.assertEqual(
-            algebric_proto.hints[0].hint_content.text,
+            algebraic_expression_proto.hints[0].hint_content.text,
             '<p>This is a first hint.</p>')
         self.assertEqual(
-            algebric_proto.hints[1].hint_content.text,
+            algebraic_expression_proto.hints[1].hint_content.text,
             '<p>This is the second hint.</p>')
 
-        algebric_solution = algebric_proto.solution
-        self.assertEqual(algebric_solution.correct_answer, 'Correct Answer')
+        algebraic_expression_solution = algebraic_expression_proto.solution
+        self.assertEqual(
+            algebraic_expression_solution.correct_answer, 'Correct Answer')
 
         self.assertEqual(
-            algebric_proto.solution.base_solution.explanation.content_id,
+            algebraic_expression_solution.base_solution.explanation.content_id,
             'solution')
         self.assertEqual(
-            algebric_proto.solution.base_solution.explanation.text,
-            '<p>This is solution for algebric.</p>')
+            algebraic_expression_solution.base_solution.explanation.text,
+            '<p>This is solution for algebraic.</p>')
 
-        algebric_answer_group = (
-            algebric_proto.answer_groups[0].base_answer_group.outcome)
+        algebraic_expression_answer_group = (
+            algebraic_expression_proto.answer_groups[0]
+                .base_answer_group.outcome)
         self.assertEqual(
-            algebric_answer_group.destination_state,
+            algebraic_expression_answer_group.destination_state,
             'Number With Units')
-        self.assertFalse(algebric_answer_group.labelled_as_correct)
+        self.assertFalse(algebraic_expression_answer_group.labelled_as_correct)
         self.assertEqual(
-            algebric_answer_group.feedback.content_id,
+            algebraic_expression_answer_group.feedback.content_id,
             'feedback_1')
         self.assertEqual(
-            algebric_answer_group.feedback.text,
+            algebraic_expression_answer_group.feedback.text,
             '<p>Yes, well done!</p>')
 
-        algebric_mis_skill = (
-            algebric_proto.answer_groups[0]
+        algebraic_expression_tagged_mis_skill = (
+            algebraic_expression_proto.answer_groups[0]
                 .base_answer_group.tagged_skill_misconception)
-        self.assertEqual(algebric_mis_skill.skill_id, 'skill_id')
         self.assertEqual(
-            algebric_mis_skill.misconception_id, 'misconception_id')
+            algebraic_expression_tagged_mis_skill.skill_id, 'skill_id')
+        self.assertEqual(
+            algebraic_expression_tagged_mis_skill.misconception_id,
+            'misconception_id')
 
-        algebric_answer_group = algebric_proto.answer_groups[0]
-        algebric_rule_specs = (
-            algebric_answer_group.rule_specs[0]
+        algebraic_expression_answer_group = (
+            algebraic_expression_proto.answer_groups[0])
+        algebraic_expression_rule_specs = (
+            algebraic_expression_answer_group.rule_specs[0]
                 .matches_exactly_with)
         self.assertEqual(
-            algebric_rule_specs.algebraic_expression,
+            algebraic_expression_rule_specs.algebraic_expression,
             'pi*r^2')
 
-        algebric_rule_specs = (
-            algebric_answer_group.rule_specs[1].is_equivalent_to)
+        algebraic_expression_rule_specs = (
+            algebraic_expression_answer_group.rule_specs[1].is_equivalent_to)
         self.assertEqual(
-            algebric_rule_specs.algebraic_expression,
+            algebraic_expression_rule_specs.algebraic_expression,
             'pi*r^2')
 
-        algebric_rule_specs = algebric_answer_group.rule_specs[2]
-        matches_trival_rule = (
-            algebric_rule_specs.matches_upTo_trivial_manipulations)
+        algebraic_expression_rule_specs = (
+            algebraic_expression_answer_group.rule_specs[2])
+        matches_trivial_rule = (
+            algebraic_expression_rule_specs.matches_upTo_trivial_manipulations)
         self.assertEqual(
-            matches_trival_rule.algebraic_expression,
+            matches_trivial_rule.algebraic_expression,
             'pi*r^2')

@@ -58,7 +58,7 @@ class AlgebraicExpressionInput(base.BaseInteraction):
     }]
 
     @classmethod
-    def to_android_algebric_expression_proto(
+    def to_android_algebraic_expression_proto(
         cls, default_outcome, customization_args, solution, hints, answer_groups
     ):
         """Creates a AlgebraicExpressionInputInstanceDto proto object.
@@ -106,9 +106,9 @@ class AlgebraicExpressionInput(base.BaseInteraction):
         custom_osk_letters_proto = (
             list(customization_args['customOskLetters'].value))
         frac_for_division = customization_args['useFractionForDivision'].value
-        algebric_expression_dto = state_pb2.AlgebraicExpressionInputInstanceDto
+        algebraic_expression_dto = state_pb2.AlgebraicExpressionInputInstanceDto
 
-        return algebric_expression_dto.CustomizationArgsDto(
+        return algebraic_expression_dto.CustomizationArgsDto(
             custom_osk_letters=custom_osk_letters_proto,
             use_fraction_for_division=frac_for_division
         )

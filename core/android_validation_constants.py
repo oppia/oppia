@@ -39,13 +39,13 @@ VALID_INTERACTION_IDS = [
 ]
 
 # This is linked to SUPPORTED_CONTENT_LANGUAGES_FOR_ANDROID in constants.ts.
-SUPPORTED_LANGUAGES = ['en', 'hi-en', 'ar', 'hi', 'pt-br']
+SUPPORTED_LANGUAGE_CODES = ['en', 'hi-en', 'ar', 'hi', 'pt-br']
 
 LANGUAGE_CODE_TO_ENUM_MAP = {
     'en': languages_pb2.LanguageType.Value('ENGLISH'),
+    'hi-en': languages_pb2.LanguageType.Value('HINGLISH'),
     'ar': languages_pb2.LanguageType.Value('ARABIC'),
     'hi': languages_pb2.LanguageType.Value('HINDI'),
-    'hi-en': languages_pb2.LanguageType.Value('HINGLISH'),
     'pt-br': languages_pb2.LanguageType.Value('BRAZILIAN_PORTUGUESE')
 }
 

@@ -106,8 +106,8 @@ class NumericExpressionInput(base.BaseInteraction):
 
         frac_for_division = customization_args['useFractionForDivision'].value
 
-        algebric_expression_dto = state_pb2.NumericExpressionInputInstanceDto
-        return algebric_expression_dto.CustomizationArgsDto(
+        numeraic_expression_dto = state_pb2.NumericExpressionInputInstanceDto
+        return numeraic_expression_dto.CustomizationArgsDto(
             placeholder=placeholder_proto,
             use_fraction_for_division=frac_for_division
         )

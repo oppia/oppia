@@ -114,13 +114,13 @@ class TextInputInteractionTests(test_utils.GenericTestBase):
                 'tagged_skill_misconception_id': 'skill_id-misconception_id'
             }]
         }
-        text_input_instance = (
+        text_input = (
             interaction_registry.Registry.get_interaction_by_id(
                 'TextInput'))
         interaction_domain = (
             state_domain.InteractionInstance.from_dict(
                 interaction_dict))
-        text_input_proto = text_input_instance.to_android_text_input_proto(
+        text_input_proto = text_input.to_android_text_input_proto(
             interaction_domain.default_outcome,
             interaction_domain.customization_args,
             interaction_domain.solution,
@@ -169,14 +169,14 @@ class TextInputInteractionTests(test_utils.GenericTestBase):
             text_input_answer_group.feedback.text,
             '<p>This is great! ®®</p>')
 
-        text_input_mis_skill = (
+        text_input_tagged_mis_skill = (
             text_input_proto.answer_groups[0]
                 .base_answer_group.tagged_skill_misconception)
         self.assertEqual(
-            text_input_mis_skill.skill_id,
+            text_input_tagged_mis_skill.skill_id,
             'skill_id')
         self.assertEqual(
-            text_input_mis_skill.misconception_id,
+            text_input_tagged_mis_skill.misconception_id,
             'misconception_id')
 
         self.assertEqual(

@@ -611,7 +611,6 @@ def populate_exploration_model_fields(exploration_model, exploration):
         exploration.correctness_feedback_enabled)
     exploration_model.android_proto_size_in_bytes = (
         exploration.android_proto_size_in_bytes)
-    exploration_model.version = exploration.version
 
     return exploration_model
 
@@ -1055,7 +1054,7 @@ def validate_exploration_for_story(exp, strict):
     validation_error_messages = []
     if (
             exp.language_code not in
-            android_validation_constants.SUPPORTED_LANGUAGES):
+            android_validation_constants.SUPPORTED_LANGUAGE_CODES):
         error_string = (
             'Invalid language %s found for exploration '
             'with ID %s.' % (exp.language_code, exp.id))

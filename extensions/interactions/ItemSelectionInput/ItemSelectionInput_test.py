@@ -113,107 +113,115 @@ class ItemSelectionInputInteractionTests(test_utils.GenericTestBase):
             },
             'id': 'ItemSelectionInput'
         }
-        item_selection_input_instance = (
+        item_selection_input = (
             interaction_registry.Registry.get_interaction_by_id(
                 'ItemSelectionInput'))
         interaction_domain = (
             state_domain.InteractionInstance.from_dict(
                 interaction_dict))
-        item_selection_proto = (
-            item_selection_input_instance.to_android_item_selection_input_proto(
+        item_selection_input_proto = (
+            item_selection_input.to_android_item_selection_input_proto(
                 interaction_domain.default_outcome,
                 interaction_domain.customization_args,
                 interaction_domain.hints,
                 interaction_domain.answer_groups))
 
-        item_customization_args = (
-            item_selection_proto.customization_args)
+        item_selection_input_customization_args = (
+            item_selection_input_proto.customization_args)
         self.assertEqual(
-            item_customization_args.max_allowable_selection_count, 2)
+            item_selection_input_customization_args.max_allowable_selection_count, # pylint: disable=line-too-long
+            2)
         self.assertEqual(
-            item_customization_args.min_allowable_selection_count, 1)
+            item_selection_input_customization_args.min_allowable_selection_count, # pylint: disable=line-too-long
+            1)
         self.assertEqual(
-            item_customization_args.choices[0].content_id,
+            item_selection_input_customization_args.choices[0].content_id,
             'ca_choices_2')
         self.assertEqual(
-            item_customization_args.choices[1].content_id,
+            item_selection_input_customization_args.choices[1].content_id,
             'ca_choices_3')
         self.assertEqual(
-            item_customization_args.choices[0].text,
+            item_selection_input_customization_args.choices[0].text,
             '<p>Choice 1</p>')
         self.assertEqual(
-            item_customization_args.choices[1].text,
+            item_selection_input_customization_args.choices[1].text,
             '<p>Choice 2</p>')
 
-        item_default_outcome = item_selection_proto.default_outcome
+        item_selection_input_default_outcome = (
+            item_selection_input_proto.default_outcome)
         self.assertEqual(
-            item_default_outcome.destination_state, 'abc')
+            item_selection_input_default_outcome.destination_state, 'abc')
         self.assertEqual(
-            item_default_outcome.feedback.text, 'Correct Answer')
+            item_selection_input_default_outcome.feedback.text,
+            'Correct Answer')
         self.assertEqual(
-            item_default_outcome.feedback.content_id, 'feedback_1')
-        self.assertTrue(item_default_outcome.labelled_as_correct)
+            item_selection_input_default_outcome.feedback.content_id,
+            'feedback_1')
+        self.assertTrue(
+            item_selection_input_default_outcome.labelled_as_correct)
 
         self.assertEqual(
-            item_selection_proto.hints[0].hint_content.content_id, 'hint_1')
+            item_selection_input_proto.hints[0].hint_content.content_id,
+            'hint_1')
         self.assertEqual(
-            item_selection_proto.hints[1].hint_content.content_id, 'hint_2')
+            item_selection_input_proto.hints[1].hint_content.content_id,
+            'hint_2')
         self.assertEqual(
-            item_selection_proto.hints[0].hint_content.text,
+            item_selection_input_proto.hints[0].hint_content.text,
             '<p>This is a first hint.</p>')
         self.assertEqual(
-            item_selection_proto.hints[1].hint_content.text,
+            item_selection_input_proto.hints[1].hint_content.text,
             '<p>This is the second hint.</p>')
 
-        item_answer_group = (
-            item_selection_proto.answer_groups[0]
+        item_selection_input_answer_group = (
+            item_selection_input_proto.answer_groups[0]
                 .base_answer_group.outcome)
         self.assertEqual(
-            item_answer_group.destination_state, 'abc')
-        self.assertTrue(item_answer_group.labelled_as_correct)
+            item_selection_input_answer_group.destination_state, 'abc')
+        self.assertTrue(item_selection_input_answer_group.labelled_as_correct)
         self.assertEqual(
-            item_answer_group.feedback.content_id,
+            item_selection_input_answer_group.feedback.content_id,
             'feedback_1')
         self.assertEqual(
-            item_answer_group.feedback.text,
+            item_selection_input_answer_group.feedback.text,
             '<p>Feedback</p>')
 
-        item_rule_spec = (
-            item_selection_proto.answer_groups[0]
+        item_selection_input_rule_spec = (
+            item_selection_input_proto.answer_groups[0]
                 .rule_specs[0].equals.input)
         self.assertEqual(
-            item_rule_spec.content_ids[0].content_id,
+            item_selection_input_rule_spec.content_ids[0].content_id,
             '<p>Choice 1</p>')
         self.assertEqual(
-            item_rule_spec.content_ids[1].content_id,
+            item_selection_input_rule_spec.content_ids[1].content_id,
             '<p>Choice 2</p>')
 
-        item_rule_spec = (
-            item_selection_proto.answer_groups[0]
+        item_selection_input_rule_spec = (
+            item_selection_input_proto.answer_groups[0]
                 .rule_specs[1].contains_at_least_one_of.input)
         self.assertEqual(
-            item_rule_spec.content_ids[0].content_id,
+            item_selection_input_rule_spec.content_ids[0].content_id,
             '<p>Choice 1</p>')
         self.assertEqual(
-            item_rule_spec.content_ids[1].content_id,
+            item_selection_input_rule_spec.content_ids[1].content_id,
             '<p>Choice 2</p>')
 
-        item_rule_spec = (
-            item_selection_proto.answer_groups[0]
+        item_selection_input_rule_spec = (
+            item_selection_input_proto.answer_groups[0]
                 .rule_specs[2].does_not_contain_at_least_one_of.input)
         self.assertEqual(
-            item_rule_spec.content_ids[0].content_id,
+            item_selection_input_rule_spec.content_ids[0].content_id,
             '<p>Choice 1</p>')
         self.assertEqual(
-            item_rule_spec.content_ids[1].content_id,
+            item_selection_input_rule_spec.content_ids[1].content_id,
             '<p>Choice 2</p>')
 
-        item_rule_spec = (
-            item_selection_proto.answer_groups[0]
+        item_selection_input_rule_spec = (
+            item_selection_input_proto.answer_groups[0]
                 .rule_specs[3].is_proper_subset_of.input)
         self.assertEqual(
-            item_rule_spec.content_ids[0].content_id,
+            item_selection_input_rule_spec.content_ids[0].content_id,
             '<p>Choice 1</p>')
         self.assertEqual(
-            item_rule_spec.content_ids[1].content_id,
+            item_selection_input_rule_spec.content_ids[1].content_id,
             '<p>Choice 2</p>')

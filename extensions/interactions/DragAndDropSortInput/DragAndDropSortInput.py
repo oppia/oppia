@@ -85,7 +85,7 @@ class DragAndDropSortInput(base.BaseInteraction):
     _answer_visualization_specs = []
 
     @classmethod
-    def to_android_drag_drop_input_proto(
+    def to_android_drag_and_drop_sort_input_proto(
         cls, default_outcome, customization_args,
         solution, hints, answer_groups
     ):
@@ -171,7 +171,8 @@ class DragAndDropSortInput(base.BaseInteraction):
                     is_equal_to_ordering=x)),
             'IsEqualToOrderingWithOneItemAtIncorrectPosition': lambda x: (
                 state_pb2.DragAndDropSortInputInstanceDto.RuleSpecDto(
-                    is_equal_to_ordering_with_one_item_at_incorrect_position=x)), # pylint: disable=line-too-long
+                    is_equal_to_ordering_with_one_item_at_incorrect_position=x)
+                ),
             'HasElementXAtPositionY': lambda x: (
                 state_pb2.DragAndDropSortInputInstanceDto.RuleSpecDto(
                     has_element_x_at_position_y=x)),
@@ -290,7 +291,8 @@ class DragAndDropSortInput(base.BaseInteraction):
         """Creates a ListOfSetsOfTranslatableHtmlContentIdsDto proto object.
 
         Args:
-            correct_answer: list. A list of set of TranslatableHtmlContentId.
+            correct_answer: list(list(str)). A list of set
+                of TranslatableHtmlContentId.
 
         Returns:
             ListOfSetsOfTranslatableHtmlContentIdsDto. The proto object.
@@ -312,7 +314,7 @@ class DragAndDropSortInput(base.BaseInteraction):
         """Creates a SetOfTranslatableHtmlContentIdsDto proto object.
 
         Args:
-            set_of_content_id: list. A list of
+            set_of_content_id: list(str). A list of
                 TranslatableHtmlContentId.
 
         Returns:

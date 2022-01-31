@@ -87,13 +87,12 @@ PROTOC_DARWIN_FILE = 'protoc-%s-osx-x86_64.zip' % (common.PROTOC_VERSION)
 BUF_DIR = os.path.join(
     common.OPPIA_TOOLS_DIR, 'buf-%s' % common.BUF_VERSION)
 PROTOC_DIR = os.path.join(BUF_DIR, 'protoc')
-# Path of files which needs to be compiled by protobuf.
-# Paired with the frontend requirement.
+# List of a tuple represents the path of files that needs to be compiled by
+# protobuf and a boolean value which represents whether buf needs to generate
+# its js and ts file.
 PROTO_FILES_PATHS = [
     (True, os.path.join(common.THIRD_PARTY_DIR, 'oppia-ml-proto-0.0.0')),
-    (False, os.path.join(
-        common.THIRD_PARTY_DIR,
-        'oppia-proto-api-8f3cde883c31785438e80656a5b6bb26bd01b6a1'))]
+    (False, common.THIRD_PARTY_OPPIA_ANDROID_PROTO_DIR)]
 # Path to typescript plugin required to compile ts compatible files from proto.
 PROTOC_GEN_TS_PATH = os.path.join(common.NODE_MODULES_PATH, 'protoc-gen-ts')
 
@@ -159,8 +158,8 @@ def compile_protobuf_files(proto_files_paths):
     buf_path = os.path.join(
         BUF_DIR,
         BUF_DARWIN_FILES[0] if common.is_mac_os() else BUF_LINUX_FILES[0])
-    for is_frontend_required, path in proto_files_paths:
-        if is_frontend_required:
+    for generate_js_and_ts_files, path in proto_files_paths:
+        if generate_js_and_ts_files:
             command = [buf_path, 'generate', path]
         else:
             command = [
@@ -220,41 +219,41 @@ def ensure_system_python_libraries_are_installed(package, version):
 
 
 def rewrite_android_proto_files():
-    """Edit all android proto files."""
-    # Since there is no simple configuration for imports when using protobuf to
-    # generate Python files we need to manually fix the imports.
-    # See: https://github.com/protocolbuffers/protobuf/issues/1491
-    protobuf_dir = (
-        pathlib.Path(
-            os.path.join(
-                common.THIRD_PARTY_DIR,
-                'oppia-proto-api-8f3cde883c31785438e80656a5b6bb26bd01b6a1'))
-            .glob('**/*.proto'))
-    for p in protobuf_dir:
-        if p.suffix == '.proto':
+    """Android proto files are the part of oppia-proto-api-* directory in the
+    third_party_libs directory. Currently, proto files generation doesn't
+    support importing other proto files from a different directory.
+    Because of it, we had to keep all the proto files in the same directory.
+    Since there is no simple configuration for imports when using protobuf to
+    generate Python files we need to manually fix the imports.
+    See: https://github.com/protocolbuffers/protobuf/issues/1491
+    """
+    protobuf_dir = pathlib.Path(
+        common.THIRD_PARTY_OPPIA_ANDROID_PROTO_DIR).glob('**/*.proto')
+    for file in protobuf_dir:
+        if file.suffix == '.proto':
             # Remove package statement.
             # Example: 'package org.oppia.proto.v1.api'.
             common.inplace_replace_file(
-                p.absolute(),
+                file.absolute(),
                 r'^package ([^\s]+)',
                 r'')
             # Remove option statement.
             # Example: 'option java_package = "org.oppia.proto.v1.api";'.
             common.inplace_replace_file(
-                p.absolute(),
+                file.absolute(),
                 r'^option java_.+',
                 r'')
             # Update import statement.
             # Example: 'import "org/oppia/proto/v1/api/state.proto";' to
             # 'import "state.proto";'.
             common.inplace_replace_file(
-                p.absolute(),
+                file.absolute(),
                 r'^import (?!\"google)([^\s]+)[\\/]([^\s]+)',
                 r'import "\2')
             # Remove all subpackage directories.
             # Example: 'org.oppia.'.
             common.inplace_replace_file(
-                p.absolute(),
+                file.absolute(),
                 r'org.oppia.*\.',
                 r'')
 
@@ -263,28 +262,25 @@ def move_all_proto_files_to_third_party():
     """Move all proto files from subdirectories
     to the third_party folder.
     """
-    oppia_proto_api_path = (
-        os.path.join(
-            common.THIRD_PARTY_DIR,
-            'oppia-proto-api-8f3cde883c31785438e80656a5b6bb26bd01b6a1'))
-    protobuf_dir = (
-        pathlib.Path(
-            oppia_proto_api_path).glob('**/*.proto'))
+    protobuf_dir = pathlib.Path(
+        common.THIRD_PARTY_OPPIA_ANDROID_PROTO_DIR).glob('**/*.proto')
 
     for p in protobuf_dir:
         if p.suffix == '.proto':
             shutil.move(
                 str(p.absolute()),
                 str(os.path.join(
-                    oppia_proto_api_path, os.path.basename(p.absolute()))))
+                    common.THIRD_PARTY_OPPIA_ANDROID_PROTO_DIR,
+                    os.path.basename(p.absolute()))))
 
     # If there is any subfolder in the root folder from the
     # oppia_proto_api repository in the third_party directory,
     # then delete it. We are keeping all the proto files under
     # the root folder directly to solve the proto compilation issue.
     # See: https://github.com/protocolbuffers/protobuf/issues/1491
-    if os.path.exists(os.path.join(oppia_proto_api_path, 'org')):
-        shutil.rmtree(oppia_proto_api_path + '/org')
+    if os.path.exists(os.path.join(
+        common.THIRD_PARTY_OPPIA_ANDROID_PROTO_DIR, 'org')):
+        shutil.rmtree(common.THIRD_PARTY_OPPIA_ANDROID_PROTO_DIR + '/org')
 
 
 def main() -> None:

@@ -49,7 +49,7 @@ datastore_services = models.Registry.import_datastore_services()
 
 
 class PopulateExplorationWithAndroidProtoSizeInBytesJob(base_jobs.JobBase):
-    """Job that populate exploration models with
+    """Job that populates exploration models with
     android_proto_size_in_bytes attribute.
     """
 
@@ -83,7 +83,7 @@ class PopulateExplorationWithAndroidProtoSizeInBytesJob(base_jobs.JobBase):
         return result.Ok((exp_id, exploration))
 
     @staticmethod
-    def _update_exploration(
+    def _update_exploration_model(
         exp_model: exp_models.ExplorationModel,
         migrated_exploration: exp_domain.Exploration,
         exploration_changes: Sequence[exp_domain.ExplorationChange],
@@ -92,7 +92,7 @@ class PopulateExplorationWithAndroidProtoSizeInBytesJob(base_jobs.JobBase):
         """Generates newly updated exploration models.
 
         Args:
-            exp_model: ExplorationModel. The exploration which
+            exp_model: ExplorationModel. The exploration model which
                 should be updated.
             migrated_exploration: Exploration. The migrated exploration
                 domain object.
@@ -131,8 +131,8 @@ class PopulateExplorationWithAndroidProtoSizeInBytesJob(base_jobs.JobBase):
         android_proto_size_in_bytes attribute.
 
         Args:
-            exp_model: ExplorationModel. The exploration for which to generate
-                the change objects.
+            exp_model: ExplorationModel. The exploration model for which to
+                generate the change objects.
             exploration: Exploration. The exploration domain object.
 
         Yields:
@@ -143,7 +143,8 @@ class PopulateExplorationWithAndroidProtoSizeInBytesJob(base_jobs.JobBase):
             exp_change = exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'android_proto_size_in_bytes',
-                'new_value': exploration.android_proto_size_in_bytes
+                'new_value': exploration.android_proto_size_in_bytes,
+                'old_value': None
             })
             yield (exploration.id, exp_change)
 
@@ -289,7 +290,7 @@ class PopulateExplorationWithAndroidProtoSizeInBytesJob(base_jobs.JobBase):
         exp_models_to_put = (
             exploration_objects_list
             | 'Generate exploration models to put' >> beam.FlatMap(
-                lambda exp_objects: self._update_exploration(
+                lambda exp_objects: self._update_exploration_model(
                     exp_objects['exp_model'],
                     exp_objects['exploration'],
                     exp_objects['exploration_changes'],

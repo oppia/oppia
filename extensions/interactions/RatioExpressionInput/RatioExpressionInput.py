@@ -69,7 +69,7 @@ class RatioExpressionInput(base.BaseInteraction):
     _answer_visualization_specs = []
 
     @classmethod
-    def to_android_ratio_input_proto(
+    def to_android_ratio_expression_input_proto(
         cls, default_outcome, customization_args,
         solution, hints, answer_groups
     ):
@@ -145,7 +145,7 @@ class RatioExpressionInput(base.BaseInteraction):
             'Equals': cls._convert_equals_rule_spec_to_proto,
             'IsEquivalent': cls._convert_is_equivalent_rule_spec_to_proto,
             'HasNumberOfTermsEqualTo': (
-                cls._convert_has_numer_of_terms_equal_rule_spec_to_proto),
+                cls._convert_has_number_of_terms_equal_rule_spec_to_proto),
             'HasSpecificTermEqualTo': (
                 cls._convert_has_specific_terms_equal_rule_spec_to_proto)
         }
@@ -210,7 +210,7 @@ class RatioExpressionInput(base.BaseInteraction):
         )
 
     @classmethod
-    def _convert_has_numer_of_terms_equal_rule_spec_to_proto(
+    def _convert_has_number_of_terms_equal_rule_spec_to_proto(
         cls, input_dict
     ):
         """Creates a HasNumberOfTermsEqualToSpecDto proto object.
@@ -277,12 +277,12 @@ class RatioExpressionInput(base.BaseInteraction):
         """Creates a RatioExpressionDto proto object.
 
         Args:
-            ratio_list: list. The list of ratios.
+            ratio_list: list(int). The list of ratios.
 
         Returns:
             RatioExpressionDto. The proto object.
         """
-        return objects_pb2.RatioExpressionDto(components=list(ratio_list))
+        return objects_pb2.RatioExpressionDto(components=ratio_list)
 
     @classmethod
     def _convert_customization_args_to_proto(cls, customization_args):

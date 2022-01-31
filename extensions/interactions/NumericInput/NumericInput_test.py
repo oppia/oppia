@@ -108,20 +108,19 @@ class NumericInputInteractionTests(test_utils.GenericTestBase):
                 'answer_is_exclusive': True,
                 'explanation': {
                     'content_id': 'solution',
-                    'html': '<p>This is solution for fraction.</p>'
+                    'html': '<p>This is solution for numeraic input.</p>'
                 },
                 'correct_answer': 1.0
             },
             'id': 'NumericInput'
         }
-        numeric_input_instance = (
-            interaction_registry.Registry.get_interaction_by_id(
-                'NumericInput'))
+        numeric_input = interaction_registry.Registry.get_interaction_by_id(
+            'NumericInput')
         interaction_domain = (
             state_domain.InteractionInstance.from_dict(
                 interaction_dict))
         numeric_input_proto = (
-            numeric_input_instance.to_android_numeric_input_proto(
+            numeric_input.to_android_numeric_input_proto(
                 interaction_domain.default_outcome,
                 interaction_domain.solution,
                 interaction_domain.hints,
@@ -152,7 +151,7 @@ class NumericInputInteractionTests(test_utils.GenericTestBase):
             'solution')
         self.assertEqual(
             numeric_input_proto.solution.base_solution.explanation.text,
-            '<p>This is solution for fraction.</p>')
+            '<p>This is solution for numeraic input.</p>')
         self.assertEqual(
             numeric_input_proto.solution.correct_answer,
             1.0)

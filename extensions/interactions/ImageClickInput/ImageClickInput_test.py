@@ -92,79 +92,79 @@ class ImageClickInputInteractionTests(test_utils.GenericTestBase):
             'id': 'ImageClickInput',
             'solution': None
         }
-        image_input_instance = (
+        image_click_input = (
             interaction_registry.Registry.get_interaction_by_id(
                 'ImageClickInput'))
         interaction_domain = (
             state_domain.InteractionInstance.from_dict(
                 interaction_dict))
-        image_input_proto = (
-            image_input_instance.to_android_image_click_input_proto(
+        image_click_input_proto = (
+            image_click_input.to_android_image_click_input_proto(
                 interaction_domain.default_outcome,
                 interaction_domain.customization_args,
                 interaction_domain.hints,
                 interaction_domain.answer_groups))
 
-        image_input_customization_args = (
-            image_input_proto.customization_args.image_and_regions)
+        image_click_input_customization_args = (
+            image_click_input_proto.customization_args.image_and_regions)
         self.assertEqual(
-            image_input_customization_args.image_file_path,
+            image_click_input_customization_args.image_file_path,
             's1ImagePath.png')
         self.assertEqual(
-            image_input_customization_args.labeled_regions[0]
+            image_click_input_customization_args.labeled_regions[0]
                 .label,
             'classdef')
         self.assertEqual(
-            image_input_customization_args.labeled_regions[0]
+            image_click_input_customization_args.labeled_regions[0]
                 .normalized_rectangle_2d.top_left.x,
             0.004291845493562232)
         self.assertEqual(
-            image_input_customization_args.labeled_regions[0]
+            image_click_input_customization_args.labeled_regions[0]
                 .normalized_rectangle_2d.bottom_right.y,
             0.05874624624624625)
         self.assertEqual(
-            image_input_customization_args.labeled_regions[0]
+            image_click_input_customization_args.labeled_regions[0]
                 .normalized_rectangle_2d.top_left.y,
             0.004692192192192192)
         self.assertEqual(
-            image_input_customization_args.labeled_regions[0]
+            image_click_input_customization_args.labeled_regions[0]
                 .normalized_rectangle_2d.bottom_right.x,
             0.40987124463519314)
 
-        image_input_answer_group = (
-            image_input_proto.answer_groups[0].base_answer_group.outcome)
+        image_click_input_answer_group = (
+            image_click_input_proto.answer_groups[0].base_answer_group.outcome)
         self.assertEqual(
-            image_input_answer_group.destination_state,
+            image_click_input_answer_group.destination_state,
             'Image Region')
-        self.assertFalse(image_input_answer_group.labelled_as_correct)
+        self.assertFalse(image_click_input_answer_group.labelled_as_correct)
         self.assertEqual(
-            image_input_answer_group.feedback.content_id,
+            image_click_input_answer_group.feedback.content_id,
             'feedback_1')
         self.assertEqual(
-            image_input_answer_group.feedback.text,
+            image_click_input_answer_group.feedback.text,
             '<p>That the class definition. Try again.</p>')
 
         self.assertEqual(
-            image_input_proto.answer_groups[0].rule_specs[0]
+            image_click_input_proto.answer_groups[0].rule_specs[0]
                 .is_in_region.input_region,
             'classdef')
 
         self.assertEqual(
-            image_input_proto.default_outcome.destination_state,
+            image_click_input_proto.default_outcome.destination_state,
             'Image Region')
         self.assertEqual(
-            image_input_proto.default_outcome.feedback.content_id,
+            image_click_input_proto.default_outcome.feedback.content_id,
             'default_outcome')
         self.assertEqual(
-            image_input_proto.default_outcome.feedback.text,
+            image_click_input_proto.default_outcome.feedback.text,
             '<p> Default Outcome </p>')
-        self.assertEqual(
-            image_input_proto.default_outcome.labelled_as_correct,
+        self.assertFalse(
+            image_click_input_proto.default_outcome.labelled_as_correct,
             False)
 
         self.assertEqual(
-            image_input_proto.hints[0].hint_content.content_id,
+            image_click_input_proto.hints[0].hint_content.content_id,
             'hint_1')
         self.assertEqual(
-            image_input_proto.hints[0].hint_content.text,
+            image_click_input_proto.hints[0].hint_content.text,
             '<p>This is a copyright character ©.</p>')
