@@ -1,11 +1,23 @@
 <div class="subtopics-list">
   <div class="oppia-subtopics-list-container">
     <mat-card class="oppia-page-card oppia-long-text">
+      <!-- Add topic translation key to replace <topicName> in language constants so topic name is
+        also translated in selected language -->
       <h2 class="tab-title">
-        <span [innerHTML]="'I18N_TOPIC_VIEWER_STUDY_SKILLS' | translate: {topicName: topicName}"></span>
+        <span *ngIf="!isHackyTopicNameTranslationDisplayed()"
+              [innerHTML]="'I18N_TOPIC_VIEWER_STUDY_SKILLS' | translate: {topicName: topicName}">
+        </span>
+        <span *ngIf="isHackyTopicNameTranslationDisplayed()"
+              [innerHTML]="'I18N_TOPIC_VIEWER_STUDY_SKILLS' | translate: {topicName: topicNameTranslationKey | translate}">
+        </span>
       </h2>
       <div class="subtopic-subheading">
-        <span [innerHTML]="'I18N_TOPIC_VIEWER_STUDY_SKILLS_SUBTITLE' | translate: {topicName: topicName}"></span>
+        <span *ngIf="!isHackyTopicNameTranslationDisplayed()"
+              [innerHTML]="'I18N_TOPIC_VIEWER_STUDY_SKILLS_SUBTITLE' | translate: {topicName: topicName}">
+        </span>
+        <span *ngIf="isHackyTopicNameTranslationDisplayed()"
+              [innerHTML]="'I18N_TOPIC_VIEWER_STUDY_SKILLS_SUBTITLE' | translate: {topicName: topicNameTranslationKey | translate}">
+        </span>
       </div>
       <div class="subtopics-container">
         <div *ngFor="let subtopic of subtopicsList">
@@ -31,10 +43,12 @@
   }
 
   .tab-title {
+    color: #00645c;
     margin: .83em 0;
   }
 
   .subtopic-subheading {
+    color: #6c757d;
     font-family: Roboto, Arial, sans-serif;
     font-size: 1.2em;
     margin-bottom: 2.5vh;
@@ -42,45 +56,73 @@
 
   .subtopics-container {
     display: grid;
+    grid-gap: 20px;
     grid-row-gap: 2vh;
-    grid-template-columns: 170px 170px 170px;
+    grid-template-columns: 1fr 1fr 1fr;
     justify-content: space-between;
-    margin-left: 20px;
+    margin-top: 40px;
   }
 
   .subtopic-summary-tile {
     margin-right: 2vw;
   }
 
-  @media(max-width: 1024px) {
+  @media(max-width: 1280px) {
+    .oppia-page-card.oppia-long-text {
+      width: 60vw;
+    }
+
     .subtopics-container {
-      grid-template-columns: 150px 150px 150px;
-      margin-left: 2vw;
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+  }
+
+  @media(max-width: 1024px) {
+    .oppia-page-card.oppia-long-text {
+      width: 65vw;
+    }
+
+    .subtopics-container {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+  }
+
+  @media(max-width: 940px) {
+    .oppia-page-card.oppia-long-text {
+      width: 70vw;
+    }
+  }
+
+  @media(max-width: 880px) {
+    .oppia-page-card.oppia-long-text {
+      width: 75vw;
+    }
+  }
+
+  @media(max-width: 820px) {
+    .oppia-page-card.oppia-long-text {
+      width: 80vw;
     }
   }
 
   @media(max-width: 680px) {
-    .subtopics-container {
-      grid-template-columns: 130px 130px 130px;
-      margin-left: 0;
+    .oppia-page-card.oppia-long-text {
+      width: 90vw;
     }
   }
 
   @media(max-width: 500px) {
-    .subtopics-container {
-      display: grid;
-      grid-template-columns: 130px 130px;
-      justify-content: space-between;
-      margin-left: -10px;
+    .oppia-page-card.oppia-long-text {
+      padding: 50px 25px;
+      width: 100vw;
     }
-  }
 
-  @media(max-width: 350px) {
     .subtopics-container {
       display: grid;
-      grid-template-columns: 120px 120px;
+      grid-column-gap: 30px;
+      grid-row-gap: 10px;
+      grid-template-columns: 1fr 1fr;
       justify-content: space-between;
-      margin-left: -10px;
     }
   }
 </style>

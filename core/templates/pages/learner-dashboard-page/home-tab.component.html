@@ -32,7 +32,7 @@
       </div>
     </div>
   </div>
-  <div class="suggested-for-you protractor-test-suggested-for-you" *ngIf="isNonemptyObject(untrackedTopics)">
+  <div class="suggested-for-you protractor-test-suggested-for-you" *ngIf="isNonemptyObject(untrackedTopics) && !isGoalLimitReached()">
     <p class="suggested-for-you-heading" [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate">
     </p>
     <div class="suggested-for-you-section">
@@ -60,6 +60,17 @@
       </div>
     </div>
   </div>
+  <div class="empty-suggested-for-you"
+       *ngIf="isGoalLimitReached()">
+    <p class="suggested-for-you-heading" [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate"></p>
+    <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_LEARN_SOMETHING_NEW_SECTION' | translate" class="mt-4"></p>
+    <a class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-learner-dashboard-intro-button-link"
+       [innerHTML]="'I18N_ACTION_BROWSE_LESSONS' | translate"
+       href="/community-library"
+       [routerLink]="communityLibraryUrl"
+       [oppiaFocusOn]="'ourLessonsBtn'">
+    </a>
+  </div>
   <div [ngStyle]="isLanguageRTL() ? {'padding': '32px 32px 0 113px'} : {'padding': '32px 113px 0 32px'}"
        class="empty-suggested-for-you"
        *ngIf="!isNonemptyObject(untrackedTopics) && continueWhereYouLeftOffList.length === 0">
@@ -73,7 +84,7 @@
 </div>
 <style>
   .home-tab .greeting {
-    color: #00645C;
+    color: #00645c;
     font-family: 'Capriola', 'Roboto', Arial, sans-serif;
     font-size: 32px;
   }
@@ -106,7 +117,7 @@
   .home-tab .continue-where-you-left-off .continue-where-you-left-off-heading,
   .home-tab .suggested-for-you .suggested-for-you-heading,
   .home-tab .empty-suggested-for-you .suggested-for-you-heading {
-    color: #00645C;
+    color: #00645c;
     font-family: 'Capriola', 'Roboto', Arial, sans-serif;
     font-size: 24px;
     margin: 0;
@@ -117,7 +128,7 @@
     padding-top: 32px;
   }
   .home-tab .suggested-for-you .classroom-card {
-    background-color: #EEE ;
+    background-color: #eee ;
     border-radius: 4px;
     float: right;
     height: 210px;
@@ -141,7 +152,7 @@
     display: inline-block;
   }
   #setting-a-goal-link {
-    color: #00645C;
+    color: #00645c;
     font-weight: bold;
   }
   .home-tab .empty-suggested-for-you-section {
@@ -155,7 +166,7 @@
     box-shadow: 0 0 4px #0000001a;
     margin: 18px 0 25px 0;
     min-height: 206px;
-    padding: 32px 0 30px 40px;
+    padding: 32px 30px 30px 40px;
     width: 736px;
   }
   .home-tab .suggested-for-you .suggested-for-you-section {
@@ -185,7 +196,7 @@
     }
     .home-tab .continue-where-you-left-off .continue-where-you-left-off-scroll::-webkit-scrollbar-thumb,
     .home-tab .suggested-for-you .topic-summary-tile-scroll::-webkit-scrollbar-thumb {
-      background-color: #EEE;
+      background-color: #eee;
       border: 1px solid #fff;
       border-radius: 8px;
     }
@@ -201,7 +212,7 @@
     }
     .home-tab .continue-where-you-left-off, .home-tab .suggested-for-you,
     .home-tab .empty-suggested-for-you {
-      margin: 18px 0 25px 20px;
+      margin-left: auto;
       width: 465px;
     }
     .home-tab .continue-where-you-left-off .continue-where-you-left-off-heading,

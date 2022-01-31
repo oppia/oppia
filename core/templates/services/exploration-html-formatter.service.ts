@@ -42,13 +42,16 @@ export class ExplorationHtmlFormatterService {
     'FractionInput',
     'GraphInput',
     'ImageClickInput',
+    'InteractiveMap',
+    'MathEquationInput',
+    'MultipleChoiceInput',
+    'NumberWithUnits',
+    'ItemSelectionInput',
     'NumericExpressionInput',
     'NumericInput',
-    'InteractiveMap',
-    'MultipleChoiceInput',
+    'PencilCodeEditor',
     'SetInput',
-    'TextInput',
-    'MathEquationInput'
+    'TextInput'
   ];
 
   constructor(
@@ -162,9 +165,14 @@ export class ExplorationHtmlFormatterService {
 
   getAnswerHtml(
       answer: string,
-      interactionId: string,
+      interactionId: string | null,
       interactionCustomizationArgs: InteractionCustomizationArgs
   ): string {
+    // TODO(#14464): Remove this check once interaction ID is
+    // not allowed to be null.
+    if (interactionId === null) {
+      throw new Error('InteractionId cannot be null');
+    }
     var element = document.createElement(
       `oppia-response-${this.camelCaseToHyphens.transform(interactionId)}`);
     element.setAttribute('answer', this.htmlEscaper.objToEscapedJson(answer));

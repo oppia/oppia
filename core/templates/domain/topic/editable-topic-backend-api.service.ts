@@ -109,8 +109,9 @@ export class EditableTopicBackendApiService {
 
   private _fetchTopic(
       topicId: string,
-      successCallback: (value?: FetchTopicResponse) => void,
-      errorCallback: (reason?: string) => void): void {
+      successCallback: (value: FetchTopicResponse) => void,
+      errorCallback: (reason: string) => void
+  ): void {
     let topicDataUrl = this.urlInterpolationService.interpolateUrl(
       AppConstants.EDITABLE_TOPIC_DATA_URL_TEMPLATE, {
         topic_id: topicId
@@ -143,8 +144,9 @@ export class EditableTopicBackendApiService {
 
   private _fetchStories(
       topicId: string,
-      successCallback: (value?: StorySummaryBackendDict[]) => void,
-      errorCallback: (reason?: string) => void): void {
+      successCallback: (value: StorySummaryBackendDict[]) => void,
+      errorCallback: (reason: string) => void
+  ): void {
     let storiesDataUrl = this.urlInterpolationService.interpolateUrl(
       TopicDomainConstants.TOPIC_EDITOR_STORY_URL_TEMPLATE, {
         topic_id: topicId
@@ -164,8 +166,9 @@ export class EditableTopicBackendApiService {
   private _fetchSubtopicPage(
       topicId: string,
       subtopicId: number,
-      successCallback: (value?: SubtopicPageBackendDict) => void,
-      errorCallback: (reason?: string) => void): void {
+      successCallback: (value: SubtopicPageBackendDict) => void,
+      errorCallback: (reason: string) => void
+  ): void {
     let subtopicPageDataUrl = this.urlInterpolationService.interpolateUrl(
       AppConstants.SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE, {
         topic_id: topicId,
@@ -185,8 +188,9 @@ export class EditableTopicBackendApiService {
 
   private _deleteTopic(
       topicId: string,
-      successCallback: (value?: number) => void,
-      errorCallback: (reason?: string) => void): void {
+      successCallback: (value: number) => void,
+      errorCallback: (reason: string) => void
+  ): void {
     let topicDataUrl = this.urlInterpolationService.interpolateUrl(
       AppConstants.EDITABLE_TOPIC_DATA_URL_TEMPLATE, {
         topic_id: topicId
@@ -206,8 +210,9 @@ export class EditableTopicBackendApiService {
       topicVersion: number,
       commitMessage: string,
       changeList: BackendChangeObject[],
-      successCallback: (value?: UpdateTopicResponse) => void,
-      errorCallback: (reason?: string) => void): void {
+      successCallback: (value: UpdateTopicResponse) => void,
+      errorCallback: (reason: string) => void
+  ): void {
     let editableTopicDataUrl = this.urlInterpolationService.interpolateUrl(
       AppConstants.EDITABLE_TOPIC_DATA_URL_TEMPLATE, {
         topic_id: topicId
@@ -236,8 +241,9 @@ export class EditableTopicBackendApiService {
 
   private _doesTopicWithUrlFragmentExist(
       topicUrlFragment: string,
-      successCallback: (value?: boolean) => void,
-      errorCallback: (reason?: string) => void): void {
+      successCallback: (value: boolean) => void,
+      errorCallback: (reason: string) => void
+  ): void {
     let topicUrlFragmentUrl = this.urlInterpolationService.interpolateUrl(
       TopicDomainConstants.TOPIC_URL_FRAGMENT_HANDLER_URL_TEMPLATE, {
         topic_url_fragment: topicUrlFragment
@@ -254,8 +260,9 @@ export class EditableTopicBackendApiService {
 
   private _doesTopicWithNameExist(
       topicName: string,
-      successCallback: (value?: boolean) => void,
-      errorCallback: (reason?: string) => void): void {
+      successCallback: (value: boolean) => void,
+      errorCallback: (reason: string) => void
+  ): void {
     let topicNameUrl = this.urlInterpolationService.interpolateUrl(
       TopicDomainConstants.TOPIC_NAME_HANDLER_URL_TEMPLATE, {
         topic_name: topicName

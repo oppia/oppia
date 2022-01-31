@@ -117,8 +117,8 @@ the <body> of every page:
   /* Enhance the contrast of the text to improve accessibility. We need to use
    `!important` here because inline style rules have a higher priority than CSS
    style rules, but we only want these CSS rules to be respected. */
-  background-color: #FFFFFF !important;
-  color: #CC0000 !important;
+  background-color: #fff !important;
+  color: #c00 !important;
   /* Do not allow the element to swallow pointer/mouse events. */
   pointer-events: none;
 }
@@ -159,20 +159,30 @@ why they need to be overriden.  */
   transform: translate3d(0,-1px,0);
 }
 
-.oppia-learner-confirm-button.protractor-test-submit-answer-button.md-button[disabled] {
+.oppia-learner-confirm-button.protractor-test-submit-answer-button.md-button[disabled],
+.oppia-learner-confirm-button.protractor-test-submit-answer-button.mat-button[disabled] {
   background-color: transparent;
   color: rgba(0,0,0,0.38);
   cursor: default;
 }
 
-.oppia-learner-confirm-button.protractor-test-submit-answer-button.md-button[disabled]:hover {
+.oppia-learner-confirm-button.protractor-test-submit-answer-button.md-button[disabled]:hover,
+.oppia-learner-confirm-button.protractor-test-submit-answer-button.mat-button[disabled]:hover {
   text-decoration: none;
 }
 
-.oppia-learner-confirm-button.protractor-test-submit-answer-button.md-button {
+.oppia-learner-confirm-button.protractor-test-submit-answer-button.md-button,
+.oppia-learner-confirm-button.protractor-test-submit-answer-button.mat-button {
   font: 16px;
   margin: 0;
   min-width: 55px;
+}
+
+.oppia-learner-confirm-button.protractor-test-submit-answer-button.mat-button {
+  border-radius: 2px;
+  font-size: 16px;
+  line-height: 22px;
+  text-transform: uppercase;
 }
 
 .oppia-length-validation-error {
@@ -190,8 +200,8 @@ why they need to be overriden.  */
 .mat-button.oppia-learner-confirm-button,
 .md-button.oppia-learner-got-it-button,
 .md-button.oppia-learner-hint-solution-button {
-  background: #0D48A1;
-  color: #ffffff;
+  background: #0d48a1;
+  color: #fff;
   padding: 6px 12px;
 }
 
@@ -200,10 +210,10 @@ why they need to be overriden.  */
 }
 
 .md-button.oppia-learner-reload-image-button {
-  background: #ffffff;
+  background: #fff;
   border: 2px solid;
-  border-color: #0D48A1;
-  color: #0D48A1;
+  border-color: #0d48a1;
+  color: #0d48a1;
   padding-bottom: 12px;
   padding-left: 20px;
   padding-right: 20px;
@@ -222,7 +232,7 @@ why they need to be overriden.  */
 .md-button.md-default-theme.oppia-learner-got-it-button:hover,
 .md-button.md-default-theme.oppia-learner-hint-solution-button:focus,
 .md-button.md-default-theme.oppia-learner-hint-solution-button:hover {
-  background-color: #115FD4;
+  background-color: #115fd4;
   text-decoration: none;
 }
 
@@ -393,7 +403,7 @@ legend {
 }
 
 .oppia-activity-summary-tile.oppia-activity-playlist-tile {
-  border-bottom: 1px solid #C0C0C0;
+  border-bottom: 1px solid #c0c0c0;
   height: auto;
   margin: 6px;
 }
@@ -447,7 +457,7 @@ a:focus {
 
 /* Change all the borders of an input to red when there is validation errors. */
 input.ng-dirty.ng-invalid, textarea.ng-dirty.ng-invalid, md-input-group.md-default-theme {
-  border-color: #F44336;
+  border-color: #f44336;
 }
 
 ::-webkit-input-placeholder {
@@ -522,6 +532,15 @@ p:last-child {
 .open > a {
   outline: 0;
 }
+
+.mobile-activity-summary-card a {
+  display: flex;
+  height: 100%;
+  justify-content: space-evenly;
+  padding-left: 10px;
+  width: 100%;
+}
+
 .oppia-share-dropdown-menu li > a {
   font-weight: bolder;
   padding: 10px;
@@ -626,7 +645,7 @@ p:last-child {
   background-color: #888;
 }
 .label-info, .badge-info {
-  background-color: #18447E;
+  background-color: #18447e;
 }
 .label-success, .badge-success {
   background-color: #009688;
@@ -795,7 +814,7 @@ textarea {
   color: #009688;
 }
 .modal-body .nav-link {
-  color: #00609C;
+  color: #00609c;
   font-size: 16px;
   font-weight: bold;
 }
@@ -844,12 +863,12 @@ textarea {
 }
 
 .oppia-language-selector:focus {
-  outline: 1px dotted #FFF;
+  outline: 1px dotted #fff;
   outline: auto 5px -webkit-focus-ring-color;
 }
 
 .oppia-topic-selector:focus {
-  outline: 1px dotted #FFF;
+  outline: 1px dotted #fff;
   outline: auto 5px -webkit-focus-ring-color;
 }
 
@@ -1037,7 +1056,7 @@ textarea {
 }
 
 .navbar-light .navbar-container {
-  background: #00645C;
+  background: #00645c;
   height: 56px;
   width: 100%;
 }
@@ -1227,36 +1246,6 @@ textarea {
 
 .btn.oppia-unresolved-answer-button:hover {
   background-color: #eee;
-}
-
-.oppia-exp-summary-tiles-container {
-  display: block;
-  height: 100%;
-  margin-left: auto;
-  margin-right: auto;
-  max-width: 928px;
-  min-height: 300px;
-  padding-bottom: 24px;
-  padding-top: 24px;
-  width: 100vw;
-}
-
-/* Ensure that the summary tiles tiles remain centered. Note that these values
-   would need to be updated if the summary tiles are changed. */
-@media (max-width: 844px) {
-  .oppia-exp-summary-tiles-container {
-    margin-left: 5vw;
-    margin-right: 5vw;
-    max-width: 89vw;
-    width: initial;
-  }
-}
-@media (max-width: 632px) {
-  .oppia-exp-summary-tiles-container {
-    margin-left: 2vw;
-    margin-right: 2vw;
-    max-width: 96vw;
-  }
 }
 
 .oppia-story-tile {
@@ -1486,10 +1475,10 @@ md-card.oppia-dashboard-tile {
   -moz-border-radius: 3px 3px 3px 3px;
   -webkit-border-radius: 3px 3px 3px 3px;
   border-radius: 3px 3px 3px 3px;
-  -moz-box-shadow: 0 0 12px #999999;
-  -webkit-box-shadow: 0 0 12px #999999;
-  box-shadow: 0 0 12px #999999;
-  color: #FFFFFF;
+  -moz-box-shadow: 0 0 12px #999;
+  -webkit-box-shadow: 0 0 12px #999;
+  box-shadow: 0 0 12px #999;
+  color: #fff;
   margin: auto;
   margin-top: 5px;
   opacity: 0.8;
@@ -1500,16 +1489,16 @@ md-card.oppia-dashboard-tile {
   width: 500px;
 }
 .oppia-toast-container > :hover {
-  -moz-box-shadow: 0 0 12px #000000;
-  -webkit-box-shadow: 0 0 12px #000000;
-  box-shadow: 0 0 12px #000000;
+  -moz-box-shadow: 0 0 12px #000;
+  -webkit-box-shadow: 0 0 12px #000;
+  box-shadow: 0 0 12px #000;
   cursor: pointer;
   opacity: 1;
 }
 .oppia-toast:before {
   align-items: center;
   bottom: 0;
-  color: #FFFFFF;
+  color: #fff;
   display: flex;
   float: left;
   font-family: 'Material Icons', sans-serif;
@@ -1547,7 +1536,7 @@ md-card.oppia-dashboard-tile {
 }
 
 .oppia-form input.ng-invalid.ng-dirty {
-  border: 2px solid #FA787E;
+  border: 2px solid #fa787e;
 }
 
 .oppia-help {
@@ -1562,7 +1551,7 @@ md-card.oppia-dashboard-tile {
 }
 
 .oppia-wide-panel {
-  border: 1px solid #dde0FF;
+  border: 1px solid #dde0ff;
   border-radius: 20px;
   width: 100%;
 }
@@ -1797,6 +1786,10 @@ pre.oppia-pre-wrapped-text {
   padding: 6px 12px 6px 12px;
   text-transform: uppercase;
 }
+.rtl-navbar-header .btn.oppia-navbar-button {
+  margin-left: 0;
+  margin-right: 5px;
+}
 .btn.oppia-navbar-button:hover,
 .btn.oppia-navbar-button:focus {
   background-color: #fff;
@@ -1853,7 +1846,7 @@ pre.oppia-pre-wrapped-text {
 }
 
 .toast {
-  background-color: #F89406;
+  background-color: #f89406;
   font-size: 16px;
   max-width: 550px;
 }
@@ -2066,7 +2059,7 @@ pre.oppia-pre-wrapped-text {
 }
 
 .oppia-form-error-text {
-  color: #ff0000;
+  color: #f00;
   font-size: smaller;
 }
 
@@ -2215,7 +2208,7 @@ pre.oppia-pre-wrapped-text {
   background-color: #008098;
   border: 0;
   border-radius: 2px;
-  color: #FFF;
+  color: #fff;
   font-weight: bold;
   padding: 7px 15px;
 }
@@ -2261,7 +2254,7 @@ pre.oppia-pre-wrapped-text {
   outline: 2px solid #009688;
 }
 .oppia-interaction-tile-name {
-  background-color: #E0F2F1;
+  background-color: #e0f2f1;
   border: 1px solid #aaa;
   border-radius: 0 0 5px 5px;
   font-size: 15px;
@@ -2430,7 +2423,7 @@ pre.oppia-pre-wrapped-text {
 
 /* Styles for parameter labels. */
 oppia-parameter {
-  background-color: #18447E;
+  background-color: #18447e;
   border-radius: .25em;
   color: white;
   display: inline;
@@ -2477,7 +2470,7 @@ oppia-parameter {
 }
 
 .oppia-dashboard-tile-metadata {
-  border-left-color: #DADADA;
+  border-left-color: #dadada;
   border-left-style: ridge;
   border-left-width: thin;
   color: #888;
@@ -2612,6 +2605,11 @@ oppia-parameter {
 @media(min-width: 1024px) {
   .modal-lg {
     width: 900px;
+  }
+
+  /* Prevents misalignment of subtopic card in smaller screen sizes */
+  .subtopics-list .subtopic-card {
+    width: 150px;
   }
 }
 
@@ -2771,6 +2769,7 @@ div#ng-curtain {
   display: inline-block;
 }
 .navbar-header {
+  display: flex;
   /* Prevent whitespace from inline-block elements from adding space. */
   font-size: 0;
 }
@@ -2795,7 +2794,7 @@ div#ng-curtain {
 }
 
 .oppia-navbar-dropdown-toggle:focus {
-  color: #FFFFFF;
+  color: #fff;
 }
 
 .oppia-navbar-dropdown {
@@ -2869,7 +2868,7 @@ div#ng-curtain {
   width: 0;
 }
 .oppia-editor-warnings-error-color {
-  border-color: transparent transparent #FFCC00 transparent;
+  border-color: transparent transparent #fc0 transparent;
   color: #333;
 }
 .oppia-editor-warnings-critical-color {
@@ -2967,7 +2966,7 @@ div#ng-curtain {
 
 .oppia-rating-star-active,
 .oppia-rating-star:focus {
-  color: #FFD700;
+  color: #ffd700;
 }
 
 .oppia-transition-200 {
@@ -3079,7 +3078,7 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .trained-feedback-selection-container {
-  border-bottom: thin solid #EEEEEE;
+  border-bottom: thin solid #eee;
   margin-bottom: 5px;
 }
 
@@ -3104,13 +3103,13 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .trained-feedback-selection:hover {
-  color: #00897B;
+  color: #00897b;
 }
 
 .trained-feedback-selected {
   background: whitesmoke;
   border-radius: 5px;
-  color: #00897B;
+  color: #00897b;
 }
 
 .oppia-share-publish-modal > .modal-header {
@@ -3223,7 +3222,7 @@ md-card.preview-conversation-skin-supplemental-card {
   text-align: center;
 }
 .oppia-navbar-nav.oppia-navbar-profile > li:hover {
-  background-color: #00645C
+  background-color: #00645c
 }
 .oppia-activity-summary-tile.small-width .metrics li {
   display: block;
@@ -3573,7 +3572,7 @@ oppia-noninteractive-link {
 
 .oppia-activity-summary-tile .contributor-indicator-background,
 .oppia-activity-summary-tile-mobile .contributor-indicator-background {
-  background-color: #4078C0;
+  background-color: #4078c0;
 }
 
 .oppia-activity-summary-tile .all-avatars .num-remaining-avatars,
@@ -3734,6 +3733,49 @@ oppia-noninteractive-link {
   margin-right: 7.5px;
 }
 
+.mobile-activity-summary-card {
+  height: 85px;
+  margin-bottom: 13px;
+  width: 350px;
+}
+
+.mobile-activity-card-details {
+  display: flex;
+  flex-direction: column;
+  padding: 15px 15px 15px 15px;
+  width: 270px;
+}
+
+.mobile-activity-card-details h3 {
+  font-size: 1em;
+  margin-bottom: auto;
+  margin-top: 0;
+}
+
+.mobile-activity-card-summary-section {
+  align-self: flex-end;
+  color: black;
+  width: 100%;
+}
+
+.mobile-activity-card-summary-elements {
+  align-items: flex-end;
+  display: flex;
+  margin-bottom: -5px;
+  padding-left: 0;
+  width: 100%;
+}
+
+.bullet-separator {
+  font-size: 10px;
+  margin: -3px 13px 0 16px;
+  opacity: 30%;
+}
+
+.mobile-activity-card-summary-elements li::marker {
+  color: transparent;
+}
+
 @media(max-width: 815px) {
   .oppia-dashboard-container {
     padding-left: 10px;
@@ -3801,12 +3843,21 @@ oppia-noninteractive-link {
   padding: 5px 8px 4px 8px;
 }
 
+@media (max-width: 610px) {
+  .oppia-activity-summary-tile.small-width .metrics li .far {
+    margin-top: 10px;
+  }
+}
+
 @media (max-width: 420px) {
   .oppia-activity-summary-tile.small-width .metrics li {
     font-size: 0.6em;
   }
   .oppia-activity-summary-tile.small-width .recently-updated {
     display: none;
+  }
+  .oppia-activity-summary-tile.small-width .metrics li .fas {
+    margin-bottom: 4px;
   }
 }
 
@@ -3824,7 +3875,7 @@ oppia-noninteractive-link {
 }
 
 .oppia-static-header h1 {
-  color: #01645C;
+  color: #01645c;
   display: inline;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 3em;
@@ -4034,7 +4085,7 @@ oppia-noninteractive-link {
   display: none;
 }
 .oppia-on-off-switch-label {
-  border: 2px solid #999999;
+  border: 2px solid #999;
   border-radius: 20px;
   cursor: pointer;
   display: block;
@@ -4060,21 +4111,21 @@ oppia-noninteractive-link {
   width: 50%;
 }
 .oppia-on-off-switch-inner:before {
-  background-color: #04857C;
-  color: #FFFFFF;
+  background-color: #04857c;
+  color: #fff;
   content: "ON";
   padding-left: 10px;
 }
 .oppia-on-off-switch-inner:after {
-  background-color: #EEEEEE;
-  color: #999999;
+  background-color: #eee;
+  color: #999;
   content: "OFF";
   padding-right: 10px;
   text-align: right;
 }
 .oppia-on-off-switch-main {
-  background: #FFFFFF;
-  border: 2px solid #999999;
+  background: #fff;
+  border: 2px solid #999;
   border-radius: 20px;
   bottom: 0;
   display: block;
@@ -4143,17 +4194,17 @@ oppia-noninteractive-link {
     padding: 18px 15px;
   }
   .oppia-mobile-collapsible-card-content {
-    border-top: 1px solid #999999;
+    border-top: 1px solid #999;
     padding: 20px 26px 15px;
   }
   .oppia-mobile-back-to-parent {
-    color: #015F9C;
+    color: #015f9c;
     display: block;
     font-size: 18px;
     margin-left: 3%;
   }
   .oppia-mobile-back-to-parent i {
-    color: #015F9C;
+    color: #015f9c;
     font-size: 18px;
     margin-left: 3%;
   }
@@ -4237,7 +4288,7 @@ div.oppia-issues-learner-action {
 }
 
 .oppia-issues-playthrough-modal-btn {
-  background-color: #009A8B;
+  background-color: #009a8b;
   border: none;
   border-radius: 15px;
   box-shadow: 10px 0 #008080;
@@ -4319,7 +4370,7 @@ div.oppia-issues-learner-action {
 }
 
 .oppia-issues-clr-green {
-  color: #66A79D;
+  color: #66a79d;
 }
 
 .oppia-issues-bg-clr {
@@ -4464,6 +4515,9 @@ div.oppia-issues-learner-action {
   split into multiple lines in the link text in the editor and shouldn't be
   removed.
 */
+.cke_widget_inline.cke_widget_oppiaskillreview {
+  display: inline;
+}
 .cke_widget_inline.cke_widget_oppialink {
   display: inline;
 }
@@ -4482,6 +4536,19 @@ div.oppia-issues-learner-action {
 */
 .forced-modal-stack {
   z-index: 1035 !important;
+}
+
+/*
+  The .forced-modal-stack-over and .forced-modal-backdrop-stack-over styles may be
+  removed once rte-helper-service is migrated to Angular. Currently, these styles
+  are used for correctly stacking AngularJS modals on top of Angular modals.
+*/
+.forced-modal-stack-over {
+  z-index: 1060 !important;
+}
+
+.forced-modal-backdrop-stack-over {
+  z-index: 1055 !important;
 }
 
 .oppia-profile-h1 {
@@ -4617,7 +4684,6 @@ div.oppia-issues-learner-action {
   display: inline;
   font-size: 0.8em;
   line-height: 1;
-  margin: 0 2px;
   padding: .3em .35em .3em .5em;
   text-align: center;
   vertical-align: baseline;
@@ -4672,8 +4738,23 @@ div.oppia-issues-learner-action {
   width: 100%;
 }
 
+/* By using 'grid-template-columns' we specify the number of columns for different display sizes. */
 .mat-card-content.oppia-profile-portfolio-container {
   background-color: transparent;
+  display: grid;
+  grid-template-columns: max-content max-content max-content;
+}
+
+@media (max-width: 1080px) {
+  .mat-card-content.oppia-profile-portfolio-container {
+    grid-template-columns: max-content max-content;
+  }
+}
+
+@media (max-width: 820px) {
+  .mat-card-content.oppia-profile-portfolio-container {
+    grid-template-columns: max-content;
+  }
 }
 
 .oppia-profile-portfolio-pages {
@@ -4742,6 +4823,9 @@ div.oppia-issues-learner-action {
   }
   .oppia-profile-user-bio {
     display: inline-block;
+  }
+  .mat-card-content.oppia-profile-portfolio-container {
+    grid-template-columns: unset;
   }
 }
 
@@ -4837,6 +4921,14 @@ div.oppia-issues-learner-action {
     width: 95%;
   }
 }
+
+@media (max-width: 780px) {
+  /* Prevents misalignment of subtopic card in smaller screen sizes */
+  .subtopics-list .subtopics-container .subtopic-card {
+    width: 100%;
+  }
+}
+
 @media (min-width: 576px) {
   .oppia-welcome-modal .modal-dialog {
     margin: 1.75rem auto;
@@ -4854,4 +4946,79 @@ div.oppia-issues-learner-action {
  */
 .cdk-global-overlay-wrapper, .cdk-overlay-container {
   z-index: 10000 !important;
+}
+
+.oppia-exploration-summary-tile {
+  margin-left: 10px;
+}
+
+.oppia-login-button {
+  background-color: #00645c;
+  font-size: 1em;
+  min-width: max-content;
+  width: 30%;
+}
+
+.oppia-sign-up-button {
+  background-color: #00609c;
+  font-size: 1em;
+  min-width: max-content;
+  width: 30%;
+}
+
+.conversation-skin-oppia-avatar, .conversation-skin-user-avatar {
+  height: 36px;
+  position: absolute;
+  top: 0;
+  width: 36px;
+  z-index: 1;
+}
+
+.conversation-skin-oppia-feedback-container .conversation-skin-oppia-avatar {
+  height: 100px;
+  left: -87px;
+  top: -20px;
+  width: 100px;
+}
+
+.conversation-skin-oppia-feedback-content,
+.conversation-skin-learner-answer-content {
+  margin-bottom: 12px;
+  overflow: auto;
+  padding: 8px 12px;
+  word-wrap: break-word;
+}
+
+.conversation-skin-oppia-feedback-content,
+.conversation-skin-help-card-content {
+  background-color: rgba(224,242,241,1);
+  border-top-left-radius: 0;
+}
+
+.conversation-skin-learner-answer-content {
+  background-color: rgba(236,239,241,1);
+  border-bottom-right-radius: 0;
+}
+
+
+/*
+    This CSS block is for ensuring that only a response from a multi-line text input preserves newlines.
+    Leveraging the parent class ".conversation-skin-learner-answer-content" will render newlines in the
+    other interactions (ie; Multiple Choice, Item Selection) which is not necessary.
+*/
+oppia-response-text-input {
+  white-space: pre-wrap;
+}
+
+@media screen and (max-width: 959px) {
+  .conversation-skin-user-avatar,
+  .conversation-skin-oppia-avatar {
+    display: none;
+  }
+
+  .oppia-learner-view-card {
+    margin-left: 0;
+    padding-bottom: 0;
+    padding-left: 0;
+  }
 }

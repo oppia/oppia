@@ -1,8 +1,8 @@
 <background-banner></background-banner>
 <div class="oppia-dashboard-container position-relative">
   <div class="oppia-dashboard-title"
-       [ngClass]="checkMobileView() ? 'oppia-dashboard-title-mobile-padding': 'oppia-dashboard-title-desktop-padding'">
-    <span class="float-left" [innerHTML]="'I18N_DASHBOARD_CREATOR_DASHBOARD' | translate"></span>
+       [ngClass]="checkTabletView() ? 'oppia-dashboard-title-mobile': 'oppia-dashboard-title-desktop'">
+    <span [innerHTML]="'I18N_DASHBOARD_CREATOR_DASHBOARD' | translate"></span>
     <oppia-create-activity-button></oppia-create-activity-button>
   </div>
 
@@ -260,7 +260,7 @@
               layout-wrap
               class="metrics"
               fxLayoutAlign="space-between center">
-            <div class="rowOne">
+            <div class="row-one">
               <li flex="50" class="protractor-test-exp-summary-tile-rating">
                 <span>
                   <span class="fa fa-star oppia-dashboard-card-statistic-icon"
@@ -290,7 +290,7 @@
               </li>
             </div>
 
-            <div class="rowTwo">
+            <div class="row-two">
               <li flex="50" class="protractor-test-exp-summary-tile-num-views">
                 <span class="fa fa-eye oppia-dashboard-card-statistic-icon"
                       ngbTooltip="{{ 'I18N_LIBRARY_VIEWS_TOOLTIP' | translate }}"
@@ -414,12 +414,15 @@
     margin-left: 0;
     margin-top: 0;
   }
-  .rowOne, .rowTwo {
+  .row-one, .row-two {
     display: flex;
     justify-content: space-between;
     padding-left: 10px;
     padding-right: 10px;
     padding-top: 7px;
+  }
+  .row-two {
+    margin-bottom: 12px;
   }
   .oppia-mat-card {
     display: flex;
@@ -511,13 +514,13 @@
     font-size: 3em;
     margin-bottom: 25px;
     margin-top: 0;
-    text-align: center;
   }
-  .oppia-dashboard-title-desktop-padding {
+  .oppia-dashboard-title-desktop {
     padding-top: 78.5px;
   }
-  .oppia-dashboard-title-mobile-padding {
+  .oppia-dashboard-title-mobile {
     padding-top: 15px;
+    text-align: center;
   }
   .oppia-dashboard-tabs .list-card-view-toggle {
     margin-left: auto;

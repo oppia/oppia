@@ -52,7 +52,7 @@ class PythonUtilsTests(test_utils.GenericTestBase):
             self.assertIsNotNone(file_content)
 
     def test_can_not_open_file(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             IOError, 'Unable to open file: invalid_file.py'):
             with python_utils.open_file('invalid_file.py', 'r') as f:
                 f.readlines()
@@ -61,13 +61,8 @@ class PythonUtilsTests(test_utils.GenericTestBase):
         self.assertEqual(python_utils.divide(4, 2), 2)
         self.assertEqual(python_utils.divide(5, 2), 2)
 
-    def test_url_unsplit(self):
-        response = urllib.parse.urlsplit('http://www.google.com')
-        self.assertEqual(
-            python_utils.url_unsplit(response), 'http://www.google.com')
-
     def test_parse_query_string(self):
-        response = python_utils.parse_query_string(
+        response = urllib.parse.parse_qs(
             'http://www.google.com?search=oppia')
         self.assertEqual(response, {'http://www.google.com?search': ['oppia']})
 

@@ -135,7 +135,7 @@ describe('Topic and Story viewer functionality', function() {
     await topicEditorPage.publishTopic();
     await topicsAndSkillsDashboardPage.editTopic('Topic TASV1');
     await topicEditorPage.createStory(
-      'Story TASV1', 'story-player-tasv-one', 'Story description',
+      'Story TASV1', 'storyplayertasvone', 'Story description',
       Constants.TEST_SVG_PATH);
     await storyEditorPage.updateMetaTagContent('story meta tag');
     for (var i = 0; i < 3; i++) {
@@ -154,7 +154,7 @@ describe('Topic and Story viewer functionality', function() {
 
   it('should play through story and save progress on login.', async function() {
     await topicAndStoryViewerPage.get(
-      'math', 'topic-tasv-one', 'story-player-tasv-one');
+      'math', 'topic-tasv-one', 'storyplayertasvone');
     await topicAndStoryViewerPage.expectCompletedLessonCountToBe(0);
     await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(3);
     await topicAndStoryViewerPage.goToChapterIndex(0);
@@ -169,7 +169,7 @@ describe('Topic and Story viewer functionality', function() {
 
     await explorationPlayerPage.submitAnswer('Continue', null);
     await topicAndStoryViewerPage.get(
-      'math', 'topic-tasv-one', 'story-player-tasv-one');
+      'math', 'topic-tasv-one', 'storyplayertasvone');
     await topicAndStoryViewerPage.expectCompletedLessonCountToBe(2);
     await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(1);
     await users.logout();
