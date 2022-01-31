@@ -274,21 +274,12 @@ describe('Drag and drop sort input interactive component', () => {
 
       const from: ContainerModel<string> = {
         id: 'availableItems',
-        data: [
-          '<p>choice 6</p>',
-          '<p>choice 7</p>',
-          '<p>choice 8</p>',
-        ],
+        data: component.multipleItemsInSamePositionArray[5],
         index: 0
       };
       const to: ContainerModel<string> = {
         id: 'selectedItems',
-        data: [
-          '<p>choice 2</p>',
-          '<p>choice 3</p>',
-          '<p>choice 4</p>',
-          '<p>choice 5</p>'
-        ],
+        data: component.multipleItemsInSamePositionArray[3],
         index: 3
       };
       const dragAndDropEventClass = new DragAndDropEventClass<string>();
@@ -407,9 +398,7 @@ describe('Drag and drop sort input interactive component', () => {
         []
       ];
 
-      const containerData = [
-        '<p>choice 1</p>',
-      ];
+      const containerData = component.multipleItemsInSamePositionArray[1];
       const dragAndDropEventClass = new DragAndDropEventClass<string>();
       const dragDropEvent = dragAndDropEventClass.createInContainerEvent(
         'selectedItems', containerData, undefined, undefined);
