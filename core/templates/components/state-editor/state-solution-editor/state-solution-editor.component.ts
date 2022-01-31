@@ -28,9 +28,6 @@ require(
   'components/state-directives/response-header/response-header.component.ts');
 require(
   'components/state-directives/solution-editor/solution-editor.component.ts');
-require(
-  'pages/exploration-editor-page/editor-tab/templates/modal-templates/' +
-  'add-or-update-solution-modal.controller.ts');
 
 require('domain/exploration/SolutionObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
@@ -72,6 +69,8 @@ require('services/contextual/window-dimensions.service');
 require('services/external-save.service.ts');
 require('services/ngb-modal.service.ts');
 
+import { AddOrUpdateSolutionModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-or-update-solution-modal.component';
+
 angular.module('oppia').component('stateSolutionEditor', {
   bindings: {
     onSaveSolution: '=',
@@ -80,7 +79,7 @@ angular.module('oppia').component('stateSolutionEditor', {
   },
   template: require('./state-solution-editor.component.html'),
   controller: [
-    '$filter', '$rootScope', '$scope', '$uibModal', 'AlertsService',
+    '$filter', '$rootScope', '$scope', 'AlertsService',
     'EditabilityService', 'ExplorationHtmlFormatterService',
     'ExternalSaveService', 'NgbModal', 'SolutionValidityService',
     'SolutionVerificationService', 'StateCustomizationArgsService',
@@ -90,7 +89,7 @@ angular.module('oppia').component('stateSolutionEditor', {
     'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_QUESTION',
     'INTERACTION_SPECS',
     function(
-        $filter, $rootScope, $scope, $uibModal, AlertsService,
+        $filter, $rootScope, $scope, AlertsService,
         EditabilityService, ExplorationHtmlFormatterService,
         ExternalSaveService, NgbModal, SolutionValidityService,
         SolutionVerificationService, StateCustomizationArgsService,
@@ -149,12 +148,8 @@ angular.module('oppia').component('stateSolutionEditor', {
         AlertsService.clearWarnings();
         ExternalSaveService.onExternalSave.emit();
         $scope.inlineSolutionEditorIsActive = false;
-        $uibModal.open({
-          template: require(
-            'pages/exploration-editor-page/editor-tab/templates/' +
-            'modal-templates/add-or-update-solution-modal.template.html'),
-          backdrop: 'static',
-          controller: 'AddOrUpdateSolutionModalController'
+        NgbModal.open(AddOrUpdateSolutionModalComponent, {
+          backdrop: 'static'
         }).result.then(function(result) {
           StateSolutionService.displayed = result.solution;
           StateSolutionService.saveDisplayedValue();
@@ -177,6 +172,9 @@ angular.module('oppia').component('stateSolutionEditor', {
                 INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION, 4000);
             }
           }
+          // TODO(#8521): Remove the use of $rootScope.$apply()
+          // once the controller is migrated to angular.
+          $rootScope.$applyAsync();
         }, function() {
           AlertsService.clearWarnings();
         });
@@ -194,6 +192,8 @@ angular.module('oppia').component('stateSolutionEditor', {
           ctrl.onSaveSolution(StateSolutionService.displayed);
           StateEditorService.deleteCurrentSolutionValidity();
           ctrl.refreshWarnings()();
+          // TODO(#8521): Remove the use of $rootScope.$apply()
+          // once the controller is migrated to angular.
           $rootScope.$applyAsync();
         }, function() {
           AlertsService.clearWarnings();
