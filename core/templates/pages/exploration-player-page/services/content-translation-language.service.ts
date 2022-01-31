@@ -130,6 +130,7 @@ export class ContentTranslationLanguageService {
   getCurrentContentLanguageCode(): string {
     return this.currentContentLanguageCode;
   }
+
   /**
    * @return {Array<ExplorationLanguageInfo>}
    * An array of ExplorationLanguageInfo objects which consist of audio

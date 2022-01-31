@@ -55,14 +55,6 @@ export class ExplorationLanguageCodeService extends ExplorationPropertyService {
     }
   }
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  getCurrentLanguageCode() {
-    for (var i = 0; i < constants.SUPPORTED_CONTENT_LANGUAGES.length; i++) {
-      if (constants.SUPPORTED_CONTENT_LANGUAGES[i].code === this.displayed) {
-        return constants.SUPPORTED_CONTENT_LANGUAGES[i].code;
-      }
-    }
-  }
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   _isValid(value) {
     return constants.SUPPORTED_CONTENT_LANGUAGES.some((elt) => {
       return elt.code === value;

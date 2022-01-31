@@ -570,8 +570,6 @@
     "core/templates/services/messenger.service.spec.ts",
     "core/templates/services/navigation.service.ts",
     "core/templates/services/navigation.service.spec.ts",
-    "core/templates/services/number-conversion.service.ts",
-    "core/templates/services/number-conversion.service.spec.ts",
     "core/templates/services/page-title.service.ts",
     "core/templates/services/page-title.service.spec.ts",
     "core/templates/services/platform-feature.service.ts",
