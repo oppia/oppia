@@ -28,10 +28,10 @@ from core.platform import models
     [models.NAMES.exploration])
 
 
-class GetNumberOfExpRightsWithDuplicateUsersJobTests(
+class GetExpRightsWithDuplicateUsersJobTests(
     job_test_utils.JobTestBase):
 
-    JOB_CLASS = exp_validation_jobs.GetNumberOfExpRightsWithDuplicateUsersJob
+    JOB_CLASS = exp_validation_jobs.GetExpRightsWithDuplicateUsersJob
 
     EXPLORATION_ID_1 = '1'
     EXPLORATION_ID_2 = '2'
@@ -88,6 +88,7 @@ class GetNumberOfExpRightsWithDuplicateUsersJobTests(
 
         self.assert_job_output_is(
             [
-                job_run_result.JobRunResult.as_stdout('2')
+                job_run_result.JobRunResult.as_stdout(
+                    'RESULT: There are 2 invalid exp rights.'),
             ]
         )
