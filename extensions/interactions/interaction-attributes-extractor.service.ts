@@ -37,6 +37,7 @@ export class InteractionAttributesExtractorService {
     'GraphInput',
     'ImageClickInput',
     'CodeRepl',
+    'NumberWithUnits',
     'NumericExpressionInput',
     'NumericInput',
     'InteractiveMap',
