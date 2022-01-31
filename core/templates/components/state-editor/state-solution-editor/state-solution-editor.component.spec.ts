@@ -26,7 +26,6 @@ describe('StateSolutionEditorComponent', () => {
   let ctrl = null;
   let $rootScope = null;
   let $scope = null;
-  let $uibModal = null;
   let $q = null;
   let sof: SolutionObjectFactory;
   let solution;
@@ -63,7 +62,6 @@ describe('StateSolutionEditorComponent', () => {
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
-    $uibModal = $injector.get('$uibModal');
     $q = $injector.get('$q');
     ngbModal = $injector.get('NgbModal');
 
@@ -84,7 +82,8 @@ describe('StateSolutionEditorComponent', () => {
       refreshWarnings: () => {
         return () => {};
       },
-      onSaveSolution: () => {}
+      onSaveSolution: () => {},
+      showMarkAllAudioAsNeedingUpdateModalIfRequired: () => {}
     });
 
     solution = sof.createFromBackendDict({
@@ -214,11 +213,11 @@ describe('StateSolutionEditorComponent', () => {
 
   it('should open add or update solution modal when user clicks on' +
     ' \'+ ADD SOLUTION\'', () => {
-    spyOn($uibModal, 'open').and.returnValue({
+    spyOn(ngbModal, 'open').and.returnValue({
       result: $q.resolve({
         solution: solution
       })
-    });
+    } as NgbModalRef);
     spyOn(SolutionVerificationService, 'verifySolution').and.returnValue(false);
     spyOn(SolutionValidityService, 'updateValidity').and.stub();
     spyOn(StateEditorService, 'isInQuestionMode').and.returnValues(true, false);
@@ -242,13 +241,27 @@ describe('StateSolutionEditorComponent', () => {
   });
 
   it('should close add or update solution modal if user clicks cancel', () => {
-    spyOn($uibModal, 'open').and.returnValue({
+    spyOn(ngbModal, 'open').and.returnValue({
       result: $q.reject()
-    });
+    } as NgbModalRef);
 
     $scope.openAddOrUpdateSolutionModal();
     $scope.$apply();
 
-    expect($uibModal.open).toHaveBeenCalled();
+    expect(ngbModal.open).toHaveBeenCalled();
+  });
+
+  it('should save solution and open showMarkAllAudioAsNeedingUpdateModal' +
+    ' when user click', () => {
+    spyOn(ctrl, 'showMarkAllAudioAsNeedingUpdateModalIfRequired').and
+      .callThrough();
+    spyOn(ctrl, 'onSaveSolution').and.callThrough();
+
+    $scope.openMarkAllAudioAsNeedingUpdateModalIfRequired('oppia');
+    $scope.saveSolution('saveSolution');
+
+    expect(ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired)
+      .toHaveBeenCalledWith('oppia');
+    expect(ctrl.onSaveSolution).toHaveBeenCalledWith('saveSolution');
   });
 });
