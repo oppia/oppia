@@ -24,6 +24,7 @@ import { EventEmitter, Injectable } from '@angular/core';
 
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import cloneDeep from 'lodash/cloneDeep';
+import isEqual from 'lodash/isEqual';
 
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { ConfirmDeleteStateModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/confirm-delete-state-modal.component';
@@ -57,34 +58,36 @@ import { InteractionRulesRegistryService } from 'services/interaction-rules-regi
   providedIn: 'root'
 })
 export class ExplorationStatesService {
+  stateAddedCallbacks: ((addedStateName: string) => void)[] = [];
+  stateDeletedCallbacks: ((deletedStateName: string) => void)[] = [];
+  stateRenamedCallbacks: (
+    (oldStateName: string, newStateName: string) => void
+  )[] = [];
+  stateInteractionSavedCallbacks: ((state: State) => void)[] = [];
+  private _states: States | null = null;
+  private _refreshGraphEventEmitter: EventEmitter<unknown> = new EventEmitter();
+
   constructor(
-    private contextService: ContextService,
-    private changeListService: ChangeListService,
-    private statesObjectFactory: StatesObjectFactory,
-    private solutionValidityService: SolutionValidityService,
-    private answerClassificationService: AnswerClassificationService,
     private angularNameService: AngularNameService,
     private alertsService: AlertsService,
-    private validatorsService: ValidatorsService,
+    private answerClassificationService: AnswerClassificationService,
+    private changeListService: ChangeListService,
+    private contextService: ContextService,
     private explorationInitStateNameService: ExplorationInitStateNameService,
+    private interactionRulesRegistryService: InteractionRulesRegistryService,
+    private location: Location,
     private ngbModal: NgbModal,
+    private normalizeWhitespacePipe: NormalizeWhitespacePipe,
+    private solutionValidityService: SolutionValidityService,
     private stateEditorService: StateEditorService,
     private stateEditorRefreshService: StateEditorRefreshService,
-    private normalizeWhitespacePipe: NormalizeWhitespacePipe,
-    private location: Location,
-    private interactionRulesRegistryService: InteractionRulesRegistryService
+    private statesObjectFactory: StatesObjectFactory,
+    private validatorsService: ValidatorsService,
   ) {}
-
-  stateAddedCallbacks = [];
-  stateDeletedCallbacks = [];
-  stateRenamedCallbacks = [];
-  stateInteractionSavedCallbacks = [];
-  private _states: States = null;
-  private _refreshGraphEventEmitter = new EventEmitter();
 
   // Properties that have a different backend representation from the
   // frontend and must be converted.
-  private BACKEND_CONVERSIONS = {
+  private _BACKEND_CONVERSIONS = {
     answer_groups: (answerGroups: AnswerGroup[]) => {
       return answerGroups.map((answerGroup) => {
         return answerGroup.toBackendDict();
@@ -155,7 +158,7 @@ export class ExplorationStatesService {
     written_translations: ['writtenTranslations']
   };
 
-  private CONTENT_ID_EXTRACTORS = {
+  private _CONTENT_ID_EXTRACTORS = {
     answer_groups: (answerGroups) => {
       let contentIds = new Set();
       answerGroups.forEach((answerGroup) => {
@@ -330,23 +333,23 @@ export class ExplorationStatesService {
     let newBackendValue = cloneDeep(newValue);
     let oldBackendValue = cloneDeep(oldValue);
 
-    if (this.BACKEND_CONVERSIONS.hasOwnProperty(backendName)) {
+    if (this._BACKEND_CONVERSIONS.hasOwnProperty(backendName)) {
       newBackendValue = (
         this.convertToBackendRepresentation(newValue, backendName));
       oldBackendValue = (
         this.convertToBackendRepresentation(oldValue, backendName));
     }
 
-    if (!angular.equals(oldValue, newValue)) {
+    if (!isEqual(oldValue, newValue)) {
       this.changeListService.editStateProperty(
         stateName, backendName, newBackendValue, oldBackendValue);
 
       let newStateData = this._states.getState(stateName);
       let accessorList = this.PROPERTY_REF_DATA[backendName];
 
-      if (this.CONTENT_ID_EXTRACTORS.hasOwnProperty(backendName)) {
-        let oldContentIds = this.CONTENT_ID_EXTRACTORS[backendName](oldValue);
-        let newContentIds = this.CONTENT_ID_EXTRACTORS[backendName](newValue);
+      if (this._CONTENT_ID_EXTRACTORS.hasOwnProperty(backendName)) {
+        let oldContentIds = this._CONTENT_ID_EXTRACTORS[backendName](oldValue);
+        let newContentIds = this._CONTENT_ID_EXTRACTORS[backendName](newValue);
         let contentIdsToDelete = this._getElementsInFirstSetButNotInSecond(
           oldContentIds, newContentIds);
         let contentIdsToAdd = this._getElementsInFirstSetButNotInSecond(
@@ -381,7 +384,7 @@ export class ExplorationStatesService {
   convertToBackendRepresentation(
       frontendValue: StatePropertyValues, backendName: string
   ): string {
-    let conversionFunction = this.BACKEND_CONVERSIONS[backendName];
+    let conversionFunction = this._BACKEND_CONVERSIONS[backendName];
     return conversionFunction(frontendValue);
   }
 
@@ -688,11 +691,11 @@ export class ExplorationStatesService {
       return Promise.reject(message);
     }
 
-    const modelRef = this.ngbModal.open(ConfirmDeleteStateModalComponent, {
+    const modalRef = this.ngbModal.open(ConfirmDeleteStateModalComponent, {
       backdrop: true,
     });
-    modelRef.componentInstance.deleteStateName = deleteStateName;
-    modelRef.result.then(() => {
+    modalRef.componentInstance.deleteStateName = deleteStateName;
+    modalRef.result.then(() => {
       this._states.deleteState(deleteStateName);
 
       this.changeListService.deleteState(deleteStateName);

@@ -19,6 +19,8 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+import cloneDeep from 'lodash/cloneDeep';
+
 import { ComputeGraphService, GraphData } from 'services/compute-graph.service';
 import { ExplorationInitStateNameService } from 'pages/exploration-editor-page/services/exploration-init-state-name.service';
 import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
@@ -40,8 +42,8 @@ export class GraphDataService {
       return;
     }
 
-    var states = this.explorationStatesService.getStates();
-    var initStateId = this.explorationInitStateNameService.savedMemento;
+    let states = this.explorationStatesService.getStates();
+    let initStateId = this.explorationInitStateNameService.savedMemento;
     this._graphData = this.computeGraphService.compute(initStateId, states);
   }
 
@@ -56,7 +58,7 @@ export class GraphDataService {
    * - finalStateName: the name of the final state.
    */
   getGraphData(): GraphData {
-    return angular.copy(this._graphData);
+    return cloneDeep(this._graphData);
   }
 }
 

@@ -39,45 +39,45 @@ import { Outcome, OutcomeBackendDict } from 'domain/exploration/OutcomeObjectFac
 import { RecordedVoiceOverBackendDict, RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 
 export type StatePropertyValues = (
-  SubtitledHtml |
-  ParamChange[] |
-  string |
-  InteractionCustomizationArgsBackendDict |
   AnswerGroup[] |
+  boolean |
   Hint[] |
+  InteractionCustomizationArgs |
   Outcome |
+  ParamChange[] |
   RecordedVoiceovers |
-  boolean
+  string |
+  SubtitledHtml
 );
 export type StatePropertyDictValues = (
-  SubtitledHtmlBackendDict |
-  ParamChangeBackendDict[] |
-  string |
-  InteractionCustomizationArgs |
   AnswerGroupBackendDict[] |
+  boolean |
   HintBackendDict[] |
+  InteractionCustomizationArgsBackendDict |
   OutcomeBackendDict |
+  ParamChangeBackendDict[] |
   RecordedVoiceOverBackendDict |
-  boolean
+  string |
+  SubtitledHtmlBackendDict
 );
 export type StatePropertyNames = (
   'answer_groups' |
   'card_is_checkpoint' |
   'confirmed_unclassified_answers' |
   'content' |
-  'recorded_voiceovers' |
-  'linked_skill_id' |
   'default_outcome' |
+  'hints' |
+  'linked_skill_id' |
+  'next_content_id_index' |
   'param_changes' |
   'param_specs' |
-  'hints' |
-  'next_content_id_index' |
+  'recorded_voiceovers' |
   'solicit_answer_details' |
   'solution' |
-  'widget_id' |
+  'state_name' |
   'widget_customization_args' |
-  'written_translations' |
-  'state_name'
+  'widget_id' |
+  'written_translations'
 );
 
 @Injectable({
