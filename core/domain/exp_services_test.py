@@ -1025,7 +1025,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         state_with_training_data = exploration.states['Home']
         self.assertIsNotNone(
             state_with_training_data)
-        self.assertEqual(len(state_with_training_data.to_dict()),10)
+        self.assertEqual(len(state_with_training_data.to_dict()), 10)
 
     def test_save_and_retrieve_exploration(self):
         self.save_new_valid_exploration(self.EXP_0_ID, self.owner_id)
@@ -1105,14 +1105,14 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         }
         change_list_voiceover = [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'property_name':(
+                'property_name': (
                     exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
                 'state_name': 'State 1',
-                'new_value':recorded_voiceovers_dict
+                'new_value': recorded_voiceovers_dict
             })]
         changed_exploration_voiceover = (
-            exp_services.apply_change_list(self.EXP_0_ID,change_list_voiceover))
-        changed_exp_voiceover_obj =(
+            exp_services.apply_change_list(self.EXP_0_ID, change_list_voiceover))
+        changed_exp_voiceover_obj = (
             changed_exploration_voiceover.states['State 1'].recorded_voiceovers
         )
         self.assertDictEqual(
@@ -1120,8 +1120,8 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             recorded_voiceovers_dict)
         change_list_objective = [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                'property_name':'objective',
-                'new_value':'new objective'
+                'property_name': 'objective',
+                'new_value': 'new objective'
             })]
         changed_exploration_objective = (
             exp_services.apply_change_list(
@@ -1132,7 +1132,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             'new objective')
 
     def test_publish_exploration_and_update_user_profiles(self):
-        self.save_new_valid_exploration(self.EXP_0_ID,self.owner_id)
+        self.save_new_valid_exploration(self.EXP_0_ID, self.owner_id)
         exp_summary = exp_fetchers.get_exploration_summary_by_id(self.EXP_0_ID)
         exp_summary.add_contribution_by_user(self.editor_id)
         exp_summary.add_contribution_by_user(self.voice_artist_id)
@@ -1159,10 +1159,10 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         }
         change_list_voiceover = [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'property_name':(
+                'property_name': (
                     exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
                 'state_name': 'State 1',
-                'new_value':recorded_voiceovers_dict
+                'new_value': recorded_voiceovers_dict
             })]
         self.assertTrue(
             exp_services.is_voiceover_change_list(change_list_voiceover))
@@ -1177,45 +1177,45 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
     def test_validate_exploration_for_invalid_language(self):
         exploration = self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, end_state_name='end',
-            language_code='bn',correctness_feedback_enabled=True)
-        errors = exp_services.validate_exploration_for_story(exploration,False)
-        self.assertEqual(len(errors),1)
+            language_code='bn', correctness_feedback_enabled=True)
+        errors = exp_services.validate_exploration_for_story(exploration, False)
+        self.assertEqual(len(errors), 1)
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Invalid language %s found for exploration '
             'with ID %s.' % (exploration.language_code, exploration.id)):
-            exp_services.validate_exploration_for_story(exploration,True)
+            exp_services.validate_exploration_for_story(exploration, True)
 
     def test_validate_exploration_for_correctness_feedback_not_enabled(self):
         exploration = self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id)
-        errors = exp_services.validate_exploration_for_story(exploration,False)
-        self.assertEqual(len(errors),1)
+        errors = exp_services.validate_exploration_for_story(exploration, False)
+        self.assertEqual(len(errors), 1)
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected all explorations to have correctness feedback '
             'enabled. Invalid exploration: %s' % (exploration.id)):
-            exp_services.validate_exploration_for_story(exploration,True)
+            exp_services.validate_exploration_for_story(exploration, True)
 
     def test_validate_exploration_for_param_specs(self):
         exploration = self.save_new_valid_exploration(
-            self.EXP_0_ID, self.owner_id,correctness_feedback_enabled=True)
+            self.EXP_0_ID, self.owner_id, correctness_feedback_enabled=True)
         exploration.param_specs = {
             'myParam': param_domain.ParamSpec('UnicodeString')}
-        exp_services._save_exploration(self.owner_id, exploration, '',[]) # pylint: disable=protected-access
-        errors = exp_services.validate_exploration_for_story(exploration,False)
-        self.assertEqual(len(errors),1)
+        exp_services._save_exploration(self.owner_id, exploration, '', []) # pylint: disable=protected-access
+        errors = exp_services.validate_exploration_for_story(exploration, False)
+        self.assertEqual(len(errors), 1)
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected no exploration to have parameter '
             'values in it. Invalid exploration: %s' % (exploration.id)):
-            exp_services.validate_exploration_for_story(exploration,True)
+            exp_services.validate_exploration_for_story(exploration, True)
 
     def test_validate_exploration_for_invalid_interaction_id(self):
         exploration = self.save_new_valid_exploration(
-            self.EXP_0_ID, self.owner_id,correctness_feedback_enabled=True)
+            self.EXP_0_ID, self.owner_id, correctness_feedback_enabled=True)
         exp_services.update_exploration(
-            self.owner_id,self.EXP_0_ID,
+            self.owner_id, self.EXP_0_ID,
             [exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'state_name': exploration.init_state_name,
@@ -1225,39 +1225,39 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': exploration.init_state_name,
-                'property_name':(
+                'property_name': (
                     exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS),
-                    'new_value':{
-                        'language':{
-                            'value':'python'
+                    'new_value': {
+                        'language': {
+                            'value': 'python'
                         },
-                        'placeholder':{
+                        'placeholder': {
                             'value':'# Type your code here.'
                         },
-                        'preCode':{
-                            'value':''
+                        'preCode': {
+                            'value': ''
                         },
-                        'postCode':{
-                            'value':''
+                        'postCode': {
+                            'value': ''
                         }
                      }
-                    })],'Changed to CodeRepl')
+                    })], 'Changed to CodeRepl')
         updated_exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         errors = exp_services.validate_exploration_for_story(
-            updated_exploration,False)
-        self.assertEqual(len(errors),1)
+            updated_exploration, False)
+        self.assertEqual(len(errors), 1)
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Invalid interaction %s in exploration '
                 'with ID: %s.' % ('CodeRepl', updated_exploration.id)):
             exp_services.validate_exploration_for_story(
-                updated_exploration,True)
+                updated_exploration, True)
 
     def test_validate_exploration_for_end_exploration(self):
         exploration = self.save_new_valid_exploration(
-            self.EXP_0_ID, self.owner_id,correctness_feedback_enabled=True)
+            self.EXP_0_ID, self.owner_id, correctness_feedback_enabled=True)
         exp_services.update_exploration(
-            self.owner_id,self.EXP_0_ID,
+            self.owner_id, self.EXP_0_ID,
             [
             exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -1268,11 +1268,11 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': exploration.init_state_name,
-                'property_name':(
+                'property_name': (
                     exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS),
-                    'new_value':{
-                        'recommendedExplorationIds':{
-                            'value':[
+                    'new_value': {
+                        'recommendedExplorationIds': {
+                            'value': [
                                 'EXP_1',
                                 'EXP_2'
                             ]
@@ -1285,22 +1285,22 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                         exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME),
                     'state_name': exploration.init_state_name,
                     'new_value': None
-                })],'Changed to EndExploration')
+                })], 'Changed to EndExploration')
         updated_exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         errors = exp_services.validate_exploration_for_story(
-            updated_exploration,False)
-        self.assertEqual(len(errors),1)
+            updated_exploration, False)
+        self.assertEqual(len(errors), 1)
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Exploration with ID: %s contains exploration '
             'recommendations in its EndExploration interaction.'
-            %(updated_exploration.id)):
+            % (updated_exploration.id)):
             exp_services.validate_exploration_for_story(
-                updated_exploration,True)
+                updated_exploration, True)
 
     def test_validate_exploration_for_android_rte_content(self):
         exploration = self.save_new_valid_exploration(
-            self.EXP_0_ID, self.owner_id,correctness_feedback_enabled=True)
+            self.EXP_0_ID, self.owner_id, correctness_feedback_enabled=True)
         init_state = exploration.states[exploration.init_state_name]
         init_state.update_interaction_id('TextInput')
         solution_dict = {
@@ -1321,15 +1321,15 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         init_state.update_interaction_solution(solution)
         exploration.states[exploration.init_state_name] = init_state
         errors = exp_services.validate_exploration_for_story(
-            exploration,False)
-        self.assertEqual(len(errors),1)
+            exploration, False)
+        self.assertEqual(len(errors), 1)
         with self.assertRaisesRegex(
             utils.ValidationError,
             'RTE content in state %s of exploration '
             'with ID %s is not supported on mobile.'
             % (exploration.init_state_name, exploration.id)):
             exp_services.validate_exploration_for_story(
-                exploration,True)
+                exploration, True)
 
     def test_update_exploration_by_migration_bot(self):
         self.save_new_valid_exploration(
@@ -2951,20 +2951,20 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         self.assertIn('new state', exploration.states)
 
     def test_are_changes_mergeable_send_email(self):
-        self.save_new_valid_exploration(self.EXP_0_ID,self.owner_id)
+        self.save_new_valid_exploration(self.EXP_0_ID, self.owner_id)
         exp_services.update_exploration(
-            self.owner_id,self.EXP_0_ID,
+            self.owner_id, self.EXP_0_ID,
             [exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
                     'state_name': 'State 1',
-                })],'Added state')
+                })], 'Added state')
         change_list_same_state_name = [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
                 'state_name': 'State 1',
             })]
         updated_exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         self.assertFalse(exp_services.are_changes_mergeable(
-            self.EXP_0_ID,updated_exploration.version-1,
+            self.EXP_0_ID, updated_exploration.version - 1,
             change_list_same_state_name
         ))
 
@@ -5476,16 +5476,14 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         # Check actual summaries equal expected summaries.
         self.assertItemsEqual(actual_summaries, expected_summaries)
 
-
     def test_get_top_rated_exploration_summaries(self):
-        exploration_summeries =(
+        exploration_summeries = (
             exp_services.get_top_rated_exploration_summaries(3))
         top_rated_sumeries = (
             exp_models.ExpSummaryModel.get_top_rated(3) )
-        top_rated_sumeries_model =(
+        top_rated_sumeries_model = (
             exp_fetchers.get_exploration_summaries_from_models(
-                top_rated_sumeries)
-        )
+                top_rated_sumeries))
         self.assertLessEqual(len(exploration_summeries), 3)
         self.assertItemsEqual(exploration_summeries, top_rated_sumeries_model)
 
@@ -5495,10 +5493,9 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         )
         recently_published_sumeries = (
             exp_models.ExpSummaryModel.get_recently_published(3) )
-        recently_publshed_sumeries_model =(
+        recently_publshed_sumeries_model = (
             exp_fetchers.get_exploration_summaries_from_models(
-                recently_published_sumeries)
-        )
+                recently_published_sumeries))
         self.assertLessEqual(len(exploration_summeries), 3)
         self.assertItemsEqual(
         exploration_summeries,
@@ -5583,7 +5580,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
             exploration_description_draft_applied['is_version_of_draft_valid'])
 
         self.save_new_valid_exploration(self.EXP_1_ID, self.bob_id)
-        exploration_draft_not_applied =(
+        exploration_draft_not_applied = (
             exp_services.get_user_exploration_data(
                 self.bob_id, self.EXP_1_ID,True))
         self.assertFalse(
