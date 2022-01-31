@@ -164,7 +164,7 @@ export class HintsAndSolutionManagerService {
   // pending hint that's being viewed, it starts the timer for the next
   // hint.
   displayHint(index: number | undefined): SubtitledHtml | null {
-    if(typeof index !== 'number'){
+    if (typeof index !== 'number') {
       return null;
     }
     if (index === this.numHintsConsumed &&
