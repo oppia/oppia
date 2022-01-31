@@ -26,7 +26,7 @@ from core.domain import user_services
 
 
 def get_updated_thread_dict(entity_type, entity_id, has_suggestion):
-    """Fetches all threads by the give parameters.
+    """Fetch all threads by the given parameters.
 
     Args:
         entity_type: str. The type of entity the feedback thread is linked to.
@@ -34,7 +34,7 @@ def get_updated_thread_dict(entity_type, entity_id, has_suggestion):
         has_suggestion: bool. Whether the threads have a suggestion or not.
 
     Returns:
-        list(dict). The updated dictionary with usernames.
+        list(dict). The thread dictionary with usernames inserted.
     """
     thread_dicts = [
         t.to_dict() for t in feedback_services.get_all_threads(
@@ -44,11 +44,18 @@ def get_updated_thread_dict(entity_type, entity_id, has_suggestion):
         t['original_author_id'] for t in thread_dicts]
     last_nonempty_message_author_ids = [
         t['last_nonempty_message_author_id'] for t in thread_dicts]
+    thread_usernames = []
+    last_nonempty_message_author = []
 
-    thread_usernames = user_services.get_usernames(original_author_ids)
-    last_nonempty_message_author = user_services.get_usernames(
-        last_nonempty_message_author_ids)
+    for author_id in original_author_ids:
+        thread_usernames.append(
+            user_services.get_username(author_id) # type: ignore[no-untyped-call]
+            if author_id else None)
 
+    for author_id in last_nonempty_message_author_ids:
+        last_nonempty_message_author.append(
+            user_services.get_username(author_id) # type: ignore[no-untyped-call]
+            if author_id else None)
     for index, t in enumerate(thread_dicts):
         t['original_author_username'] = thread_usernames[index]
         t['last_nonempty_message_author'] = last_nonempty_message_author[
