@@ -52,9 +52,7 @@ export class DisplayHintModalComponent {
   ) {}
 
   ngOnInit(): void {
-    if (typeof this.index !== 'undefined') {
-      this.hint = this.hintsAndSolutionManagerService.displayHint(this.index);
-    }
+    this.hint = this.hintsAndSolutionManagerService.displayHint(this.index);
     this.displayedCard = this.playerTranscriptService.getCard(
       this.playerPositionService.getDisplayedCardIndex());
     this.recordedVoiceovers = this.displayedCard.getRecordedVoiceovers();

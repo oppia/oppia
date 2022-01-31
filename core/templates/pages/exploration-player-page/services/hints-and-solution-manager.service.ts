@@ -163,7 +163,10 @@ export class HintsAndSolutionManagerService {
   // WARNING: This method has a side-effect. If the retrieved hint is a
   // pending hint that's being viewed, it starts the timer for the next
   // hint.
-  displayHint(index: number): SubtitledHtml | null {
+  displayHint(index: number | undefined): SubtitledHtml | null {
+    if(typeof index !== 'number'){
+      return null;
+    }
     if (index === this.numHintsConsumed &&
       this.numHintsConsumed < this.numHintsReleased) {
       // The latest hint has been consumed. Start the timer.
