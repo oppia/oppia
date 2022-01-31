@@ -11,7 +11,12 @@
       </picture>
     </div>
     <div class="topic-details" [ngStyle]="{'background-color': getDarkerThumbnailBgColor()}" ng-class="{'mask-effect': !isPublished}">
-      <span class="topic-name">{{ topicSummary.getName() }}</span>
+      <span class="topic-name" *ngIf="!isHackyTopicNameTranslationDisplayed()">
+        {{ topicSummary.getName() }}
+      </span>
+      <span class="topic-name" *ngIf="isHackyTopicNameTranslationDisplayed()">
+        {{ topicNameTranslationKey | translate }}
+      </span>
       {{ topicSummary.getTotalPublishedNodeCount() }}
       <span *ngIf="topicSummary.getTotalPublishedNodeCount() === 1">
         <span>{{ 'I18N_TOPIC_VIEWER_LESSON' | translate }}</span>

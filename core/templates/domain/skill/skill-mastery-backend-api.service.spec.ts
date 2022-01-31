@@ -67,9 +67,10 @@ describe('Skill mastery backend API service', () => {
     fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
+      let skillIds = ['skillId1', 'skillId2'];
 
       let requestUrl = '/skill_mastery_handler/data' +
-        '?comma_separated_skill_ids=skillId1,skillId2';
+        '?selected_skill_ids=' + encodeURI(JSON.stringify(skillIds));
 
       skillMasteryBackendApiService.fetchSkillMasteryDegreesAsync(
         ['skillId1', 'skillId2']).then(successHandler, failHandler);
@@ -89,9 +90,10 @@ describe('Skill mastery backend API service', () => {
     fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
+      let skillIds = ['skillId1', 'skillId2'];
 
       let requestUrl = '/skill_mastery_handler/data' +
-        '?comma_separated_skill_ids=skillId1,skillId2';
+        '?selected_skill_ids=' + encodeURI(JSON.stringify(skillIds));
 
       skillMasteryBackendApiService.fetchSkillMasteryDegreesAsync(
         ['skillId1', 'skillId2']).then(successHandler, failHandler);
