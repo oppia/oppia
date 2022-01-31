@@ -44,6 +44,7 @@ from typing import List, Type
 # registry depends on JobMetaclass to handle the responsibility of keeping track
 # of every job.
 from core.jobs.batch_jobs import blog_validation_jobs                # pylint: disable=unused-import  # isort: skip
+from core.jobs.batch_jobs import collection_info_jobs                # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import email_deletion_jobs                 # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import (                                   # pylint: disable=unused-import  # isort: skip
     exp_recommendation_computation_jobs)
