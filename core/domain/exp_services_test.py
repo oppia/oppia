@@ -1010,6 +1010,23 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             ):
             exploration.validate(strict=True)
 
+    def test_save_new_exploration_with_ml_classifiers(self):
+        exploration_id = 'eid'
+        test_exp_filepath = os.path.join(
+            feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
+        yaml_content = utils.get_file_contents(test_exp_filepath)
+        assets_list = []
+        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
+            exp_services.save_new_exploration_from_yaml_and_assets(
+                feconf.SYSTEM_COMMITTER_ID, yaml_content, exploration_id,
+                assets_list)
+
+        exploration = exp_fetchers.get_exploration_by_id(exploration_id)
+        state_with_training_data = exploration.states['Home']
+        self.assertIsNotNone(
+            state_with_training_data)
+        self.assertEqual(len(state_with_training_data.to_dict()),10)
+
     def test_save_and_retrieve_exploration(self):
         self.save_new_valid_exploration(self.EXP_0_ID, self.owner_id)
         exp_services.update_exploration(
@@ -1156,6 +1173,163 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                 })]
         self.assertFalse(
             exp_services.is_voiceover_change_list(not_voiceover_change_list))
+
+    def test_validate_exploration_for_invalid_language(self):
+        exploration = self.save_new_valid_exploration(
+            self.EXP_0_ID, self.owner_id, end_state_name='end',
+            language_code='bn',correctness_feedback_enabled=True)
+        errors = exp_services.validate_exploration_for_story(exploration,False)
+        self.assertEqual(len(errors),1)
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Invalid language %s found for exploration '
+            'with ID %s.' % (exploration.language_code, exploration.id)):
+            exp_services.validate_exploration_for_story(exploration,True)
+
+    def test_validate_exploration_for_correctness_feedback_not_enabled(self):
+        exploration = self.save_new_valid_exploration(
+            self.EXP_0_ID, self.owner_id)
+        errors = exp_services.validate_exploration_for_story(exploration,False)
+        self.assertEqual(len(errors),1)
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected all explorations to have correctness feedback '
+            'enabled. Invalid exploration: %s' % (exploration.id)):
+            exp_services.validate_exploration_for_story(exploration,True)
+
+    def test_validate_exploration_for_param_specs(self):
+        exploration = self.save_new_valid_exploration(
+            self.EXP_0_ID, self.owner_id,correctness_feedback_enabled=True)
+        exploration.param_specs = {
+            'myParam': param_domain.ParamSpec('UnicodeString')}
+        exp_services._save_exploration(self.owner_id, exploration, '',[]) # pylint: disable=protected-access
+        errors = exp_services.validate_exploration_for_story(exploration,False)
+        self.assertEqual(len(errors),1)
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected no exploration to have parameter '
+            'values in it. Invalid exploration: %s' % (exploration.id)):
+            exp_services.validate_exploration_for_story(exploration,True)
+
+    def test_validate_exploration_for_invalid_interaction_id(self):
+        exploration = self.save_new_valid_exploration(
+            self.EXP_0_ID, self.owner_id,correctness_feedback_enabled=True)
+        exp_services.update_exploration(
+            self.owner_id,self.EXP_0_ID,
+            [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': exploration.init_state_name,
+            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+            'new_value': 'CodeRepl'
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': exploration.init_state_name,
+                'property_name':(
+                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS),
+                    'new_value':{
+                        'language':{
+                            'value':'python'
+                        },
+                        'placeholder':{
+                            'value':'# Type your code here.'
+                        },
+                        'preCode':{
+                            'value':''
+                        },
+                        'postCode':{
+                            'value':''
+                        }
+                     }
+                    })],'Changed to CodeRepl')
+        updated_exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
+        errors = exp_services.validate_exploration_for_story(
+            updated_exploration,False)
+        self.assertEqual(len(errors),1)
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Invalid interaction %s in exploration '
+                'with ID: %s.' % ('CodeRepl', updated_exploration.id)):
+            exp_services.validate_exploration_for_story(
+                updated_exploration,True)
+
+    def test_validate_exploration_for_end_exploration(self):
+        exploration = self.save_new_valid_exploration(
+            self.EXP_0_ID, self.owner_id,correctness_feedback_enabled=True)
+        exp_services.update_exploration(
+            self.owner_id,self.EXP_0_ID,
+            [
+            exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': exploration.init_state_name,
+            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+            'new_value': 'EndExploration'
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': exploration.init_state_name,
+                'property_name':(
+                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS),
+                    'new_value':{
+                        'recommendedExplorationIds':{
+                            'value':[
+                                'EXP_1',
+                                'EXP_2'
+                            ]
+                        }
+                     }
+                    }),
+            exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME),
+                    'state_name': exploration.init_state_name,
+                    'new_value': None
+                })],'Changed to EndExploration')
+        updated_exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
+        errors = exp_services.validate_exploration_for_story(
+            updated_exploration,False)
+        self.assertEqual(len(errors),1)
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Exploration with ID: %s contains exploration '
+            'recommendations in its EndExploration interaction.'
+            %(updated_exploration.id)):
+            exp_services.validate_exploration_for_story(
+                updated_exploration,True)
+
+    def test_validate_exploration_for_android_rte_content(self):
+        exploration = self.save_new_valid_exploration(
+            self.EXP_0_ID, self.owner_id,correctness_feedback_enabled=True)
+        init_state = exploration.states[exploration.init_state_name]
+        init_state.update_interaction_id('TextInput')
+        solution_dict = {
+            'answer_is_exclusive': False,
+            'correct_answer': 'helloworld!',
+            'explanation': {
+                'content_id': 'solution',
+                'html': (
+                    '<oppia-noninteractive-collapsible content-with-value='
+                    '"&amp;quot;&amp;lt;p&amp;gt;Hello&amp;lt;/p&amp;gt;&amp;'
+                    'quot;" heading-with-value="&amp;quot;SubCollapsible&amp;'
+                    'quot;"></oppia-noninteractive-collapsible><p>&nbsp;</p>')
+            },
+        }
+        solution = state_domain.Solution.from_dict(
+            init_state.interaction.id, solution_dict
+        )
+        init_state.update_interaction_solution(solution)
+        exploration.states[exploration.init_state_name] = init_state
+        errors = exp_services.validate_exploration_for_story(
+            exploration,False)
+        self.assertEqual(len(errors),1)
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'RTE content in state %s of exploration '
+            'with ID %s is not supported on mobile.'
+            % (exploration.init_state_name, exploration.id)):
+            exp_services.validate_exploration_for_story(
+                exploration,True)
 
     def test_update_exploration_by_migration_bot(self):
         self.save_new_valid_exploration(
@@ -2775,6 +2949,24 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         self.assertIn('new state', exploration.states)
+
+    def test_are_changes_mergeable_send_email(self):
+        self.save_new_valid_exploration(self.EXP_0_ID,self.owner_id)
+        exp_services.update_exploration(
+            self.owner_id,self.EXP_0_ID,
+            [exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'State 1',
+                })],'Added state')
+        change_list_same_state_name = [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'State 1',
+            })]
+        updated_exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
+        self.assertFalse(exp_services.are_changes_mergeable(
+            self.EXP_0_ID,updated_exploration.version-1,
+            change_list_same_state_name
+        ))
 
     def test_rename_state_cmd(self):
         """Test updating of state name."""
@@ -6444,6 +6636,30 @@ title: Old Title
             exp_services.update_exploration(
                 self.albert_id, self.NEW_EXP_ID, change_list,
                 'Changed recorded_voiceovers.')
+
+    def test_revert_exploration_after_publish(self):
+        self.save_new_valid_exploration(
+        self.EXP_0_ID, self.albert_id,
+        end_state_name='EndState')
+        exploration_model = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
+        exp_services.update_exploration(
+            self.albert_id, self.EXP_0_ID, [
+                exp_domain.ExplorationChange({
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'title',
+                    'new_value': 'New title'
+                })], 'Changed title')
+        user_actions_info = user_services.get_user_actions_info(self.albert_id)
+        rights_manager.publish_exploration(user_actions_info,self.EXP_0_ID)
+        updated_exploration_model = exp_fetchers.get_exploration_by_id(
+            self.EXP_0_ID)
+        exp_services.revert_exploration(
+            self.albert_id,self.EXP_0_ID,updated_exploration_model.version,1)
+        reverted_exploration = exp_fetchers.get_exploration_by_id(
+            self.EXP_0_ID)
+        self.assertEqual(exploration_model.title,reverted_exploration.title)
+        self.assertEqual(3,reverted_exploration.version)
+
 
     def test_revert_exploration_with_mismatch_of_versions_raises_error(self):
         self.save_new_valid_exploration('exp_id', 'user_id')
