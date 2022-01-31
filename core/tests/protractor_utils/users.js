@@ -23,7 +23,6 @@ var general = require('./general.js');
 var waitFor = require('./waitFor.js');
 var action = require('./action.js');
 var AdminPage = require('./AdminPage.js');
-
 var adminPage = new AdminPage.AdminPage();
 var splashPage = element(by.css('.protractor-test-splash-page'));
 
@@ -71,7 +70,6 @@ var login = async function(email, useManualNavigation = true) {
 
   var signInButton = element(by.css('.protractor-test-sign-in-button'));
 
-
   await waitFor.clientSideRedirection(async() => {
     // Click the "sign in" button to trigger redirection.
     await action.click('Sign in button', signInButton);
@@ -79,8 +77,7 @@ var login = async function(email, useManualNavigation = true) {
       // Users will be redirected to preferred dashboard if they are fully
       // registered. Otherwise, they will be redirected to signup page.
       // eslint-disable-next-line max-len
-      return /(learner-dashboard|creator-dashboard|signup|pending-account-deletion)/.test(
-        url);
+      return /(learner-dashboard|creator-dashboard|signup|pending-account-deletion)/.test(url);
   }, async() => {
     // Cannot predict the new page, so waiting for loading message to disappear.
     await waitFor.pageToFullyLoad();
@@ -133,12 +130,8 @@ var _completeSignup = async function(username) {
     await action.click('Register user button', registerUser);
   }, (url) => {
     if (returnUrl === '/') {
-      console.log("Three");
-      console.log(/(learner-dashboard|creator-dashboard)/.test(url));
       return /(learner-dashboard|creator-dashboard)/.test(url);
     } else {
-      console.log("Four");
-      console.log((new RegExp(returnUrl)).test(url));
       return (new RegExp(returnUrl)).test(url);
     }
   }, async() => {
