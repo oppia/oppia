@@ -30,7 +30,14 @@
   <!-- Left-to-right is enforced here due to the formatting of the HTML with the title on the left and chapter count on the right. -->
   <div class="oppia-story-title" dir="ltr" *ngIf="!checkTabletView()">
     <strong class="title-text">
-      <a [href]="storyLink" [ngClass]="{'disabled-link': !classroomUrlFragment}">{{ storyTitle }} </a>
+      <a [href]="storyLink" [ngClass]="{'disabled-link': !classroomUrlFragment}">
+        <span *ngIf="!isHackyStoryTitleTranslationDisplayed()">
+          {{ storyTitle }}
+        </span>
+        <span *ngIf="isHackyStoryTitleTranslationDisplayed()">
+          {{ storyTitleTranslationKey | translate }}
+        </span>
+      </a>
     </strong>
     <span dir="auto" class="oppia-chapters-count">
       <span [innerHTML]="'I18N_TOPIC_VIEWER_CHAPTERS' | translate:{count:nodeCount, messageFormat: true}"></span>
@@ -103,7 +110,12 @@
           </div>
           <div class="chapter-text">
             <a [href]="getChapterUrl(title)" rel="noopener" target="_blank">
-              <span dir="auto">{{ title }}</span>
+              <span dir="auto" *ngIf="!isHackyNodeTitleTranslationDisplayed(idx)">
+                {{ title }}
+              </span>
+              <span dir="auto" *ngIf="isHackyNodeTitleTranslationDisplayed(idx)">
+                {{ nodeTitlesTranslationKeys[idx] | translate }}
+              </span>
             </a>
           </div>
         </div>
@@ -119,9 +131,10 @@
              *ngIf="idx < chaptersDisplayed">
           <a [href]="getChapterUrl(title)" rel="noopener" target="_blank">
             <span class="chapter-identifier" [innerHTML]="'I18N_TOPIC_VIEWER_CHAPTER' | translate">
-            </span>&nbsp;
-            <span class="chapter-identifier">{{ idx + 1 }}:</span>&nbsp;
-            <span dir="auto">{{ title }}</span>
+            </span>&nbsp;<span class="chapter-identifier">{{ idx + 1 }}:</span>&nbsp;<span dir="auto" *ngIf="!isHackyNodeTitleTranslationDisplayed(idx)">{{ title }}</span>
+            <span dir="auto" *ngIf="isHackyNodeTitleTranslationDisplayed(idx)">
+              {{ nodeTitlesTranslationKeys[idx] | translate }}
+            </span>
           </a>
         </div>
       </div>
