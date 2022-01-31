@@ -22,13 +22,10 @@ from core.constants import constants
 from core.domain import rights_manager
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
-from core.jobs.transforms import job_result_transforms
 from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
-
-import result
 
 (exp_models, ) = models.Registry.import_models([
     models.NAMES.exploration
@@ -36,7 +33,7 @@ import result
 
 
 class GetExpRightsWithDuplicateUsersJob(base_jobs.JobBase):
-    """Validates that no user is assigned to multiple roles for 
+    """Validates that no user is assigned to multiple roles for
     any exploration (owner, editor, voice artist, viewer)."""
 
     def run(
@@ -47,11 +44,11 @@ class GetExpRightsWithDuplicateUsersJob(base_jobs.JobBase):
             | 'Get every exploration rights model' >> (
                 ndb_io.GetModels(exp_models.ExplorationRightsModel.query()))
             | 'Get exploration rights from model' >> beam.Map(
-                rights_manager.get_activity_rights_from_model, 
+                rights_manager.get_activity_rights_from_model,
                 constants.ACTIVITY_TYPE_EXPLORATION)
             | 'Combine exp id and list of users with rights' >> beam.Map(
                 lambda rights: (
-                    rights.id, rights.owner_ids + rights.editor_ids + 
+                    rights.id, rights.owner_ids + rights.editor_ids +
                     rights.voice_artist_ids + rights.viewer_ids
                 ))
             | 'Filter exp ids with duplicate users' >> beam.Filter(
@@ -76,6 +73,6 @@ class GetExpRightsWithDuplicateUsersJob(base_jobs.JobBase):
         )
 
         return (
-            (report_number_of_invalid_exps, report_invalid_ids_and_users) 
+            (report_number_of_invalid_exps, report_invalid_ids_and_users)
             | 'Combine results' >> beam.Flatten()
         )
