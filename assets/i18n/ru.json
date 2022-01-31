@@ -122,6 +122,7 @@
 	"I18N_LEARNER_DASHBOARD_CURRENT_GOALS_SECTION": "Текущие цели",
 	"I18N_LEARNER_DASHBOARD_EMPTY_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION": "Начните с изучения&nbsp;",
 	"I18N_LEARNER_DASHBOARD_EMPTY_CURRENT_GOALS_SECTION": "Выберите цель ниже и начните своё обучение!",
+	"I18N_LEARNER_DASHBOARD_EMPTY_LEARN_SOMETHING_NEW_SECTION": "Очевидно, при выборе целей вы достигли предела. Обращайтесь в библиотеку и изучите другие варианты.",
 	"I18N_LEARNER_DASHBOARD_EMPTY_SKILL_PROFICIENCY_SET_A_GOAL": "установка цели!&nbsp;",
 	"I18N_LEARNER_DASHBOARD_EVENING_GREETING": "Добрый вечер",
 	"I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_DEFAULT_MESSAGE": "Ответить",

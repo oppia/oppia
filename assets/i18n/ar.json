@@ -1,4 +1,5 @@
 {
+	"I18N_ABOUT_FOUNDATION_PAGE_BREADCRUMB": "حول مؤسسة أوبيا",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_CREATE": "أنشئ استكشافًا",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_CREATE_TEXT": "عن موضوع يهمك.",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_FEEDBACK": "كسب التغذية الراجعة",
@@ -64,6 +65,10 @@
 	"I18N_ACTION_GUIDE_FOR_TEACHERS": "دليل للمعلم",
 	"I18N_ACTION_TIPS_FOR_PARENTS": "نصائح للوالدين وأولياء الأمور",
 	"I18N_ACTION_VISIT_CLASSROOM": "زيارة غرفة الصف",
+	"I18N_ATTRIBUTION_HTML_STEP_TWO": "تأكد من ظهور الرابط كـ \"<[linkText]>\"",
+	"I18N_ATTRIBUTION_PRINT_STEP_ONE": "انسخ والصق الرصيد",
+	"I18N_ATTRIBUTION_PRINT_STEP_TWO": "إرفاق نسخة من \"<[link]>\"",
+	"I18N_ATTRIBUTION_TITLE": "كيف تنسب هذا الدرس للمشاركة أو إعادة الاستخدام",
 	"I18N_CARD_HEIGHT_LIMIT_WARNING_MESSAGE": "هذه البطاقة طويلة جدا، وقد يفقد الطلاب اهتمامهم; فكر في تقصيرها أو تقسيمها إلى بطاقتين.",
 	"I18N_CLASSROOM_CALLOUT_BUTTON": "استكشف",
 	"I18N_CLASSROOM_CALLOUT_HEADING_1": "أسس الرياضيات",
