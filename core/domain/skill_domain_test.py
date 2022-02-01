@@ -519,6 +519,128 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             ]
         })
 
+    def test_android_proto_size_calculation_is_correct(self):
+        """Test proto size calculation function."""
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], ['<p>Explanation 1</p>']
+            )]
+        skill = skill_domain.Skill.create_default_skill(
+            'skill_id_1', 'Description', rubrics)
+        self.assertEqual(skill.android_proto_size_in_bytes, 44)
+
+        example_1 = skill_domain.WorkedExample(
+            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
+            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>'))
+        skill_contents = skill_domain.SkillContents(
+            state_domain.SubtitledHtml(
+                '1', '<p>Explanation</p>'), [example_1],
+            state_domain.RecordedVoiceovers.from_dict({
+                'voiceovers_mapping': {
+                    '1': {}, '2': {}, '3': {}
+                }
+            }),
+            state_domain.WrittenTranslations.from_dict({
+                'translations_mapping': {
+                    '1': {}, '2': {}, '3': {}
+                }
+            }))
+        skill.skill_contents = skill_contents
+        self.assertEqual(skill.android_proto_size_in_bytes, 123)
+
+    def test_android_proto_conversion_is_correct(self):
+        """Test skill proto is correct."""
+        explanation = state_domain.SubtitledHtml('1', '<p>Explanation</p>')
+        example_1 = skill_domain.WorkedExample(
+            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
+            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>'))
+        recorded_voiceovers_dict = {
+            'voiceovers_mapping': {
+                'content1': {
+                    'en': {
+                        'filename': 'xyz.mp3',
+                        'file_size_bytes': 123,
+                        'needs_update': False,
+                        'duration_secs': 1.1
+                    }
+                },
+                'feedback_1': {
+                    'hi': {
+                        'filename': 'xyz.mp3',
+                        'file_size_bytes': 123,
+                        'needs_update': False,
+                        'duration_secs': 1.1
+                    }
+                }
+            }
+        }
+        recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict(
+            recorded_voiceovers_dict)
+        written_translations_dict = {
+            'translations_mapping': {
+                'content1': {
+                    'en': {
+                        'data_format': 'html',
+                        'translation': '<p>English</p>',
+                        'needs_update': True
+                    }
+                },
+                'feedback_1': {
+                    'hi': {
+                        'data_format': 'html',
+                        'translation': '<p>Hindi</p>',
+                        'needs_update': True
+                    }
+                }
+            }
+        }
+        written_translations = (
+            state_domain.WrittenTranslations.from_dict(
+            written_translations_dict))
+        skill_contents = skill_domain.SkillContents(
+            explanation, [example_1],
+            recorded_voiceovers, written_translations)
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], ['<p>Explanation 1</p>']
+            )]
+        skill = skill_domain.Skill.create_default_skill(
+            'skill_id_1', 'Description', rubrics)
+        skill.skill_contents = skill_contents
+        skill_proto = skill.to_android_skill_proto()
+
+        self.assertEqual(skill_proto.skill_id, 'skill_id_1')
+        self.assertEqual(skill_proto.description, 'Description')
+        self.assertEqual(
+            skill_proto.explanation.content_id, explanation.content_id)
+        self.assertEqual(
+            skill_proto.explanation.text, explanation.html)
+        self.assertEqual(
+            skill_proto.worked_examples[0].question.content_id,
+            example_1.question.content_id)
+        self.assertEqual(
+            skill_proto.worked_examples[0].question.text,
+            example_1.question.html)
+        self.assertEqual(
+            skill_proto.worked_examples[0].explanation.content_id,
+            example_1.explanation.content_id)
+        self.assertEqual(
+            skill_proto.worked_examples[0].explanation.text,
+            example_1.explanation.html)
+        self.assertEqual(
+            skill_proto.recorded_voiceovers.voiceover_content_mapping[0]
+                .language, 1)
+        self.assertEqual(
+            skill_proto.recorded_voiceovers.voiceover_content_mapping[1]
+                .language, 3)
+        self.assertEqual(
+            skill_proto.written_translations.translation_language_mapping[0]
+                .language, 1)
+        self.assertEqual(
+            skill_proto.written_translations.translation_language_mapping[1]
+            .language, 3)
+        self.assertEqual(skill_proto.content_version, skill.version)
+
 
 class SkillChangeTests(test_utils.GenericTestBase):
 

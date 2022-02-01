@@ -141,6 +141,9 @@ class SkillModel(base_models.VersionedModel):
     # for superseding_skill_id and the merge was completed.
     all_questions_merged = (
         datastore_services.BooleanProperty(indexed=True, required=True))
+    # Size in bytes of Android Proto representation.
+    android_proto_size_in_bytes = datastore_services.IntegerProperty(
+        indexed=True)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -237,7 +240,9 @@ class SkillModel(base_models.VersionedModel):
             'prerequisite_skill_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'next_misconception_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'superseding_skill_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'all_questions_merged': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'all_questions_merged': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'android_proto_size_in_bytes':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod

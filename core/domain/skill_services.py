@@ -755,6 +755,8 @@ def populate_skill_model_fields(skill_model, skill):
         rubric.to_dict() for rubric in skill.rubrics
     ]
     skill_model.next_misconception_id = skill.next_misconception_id
+    skill_model.android_proto_size_in_bytes = (
+        skill.android_proto_size_in_bytes)
     return skill_model
 
 

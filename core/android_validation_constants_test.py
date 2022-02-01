@@ -75,4 +75,4 @@ class AndroidValidationConstantsTest(test_utils.GenericTestBase):
             android_validation_constants.VALID_RTE_COMPONENTS)
         self.assertItemsEqual(  # type: ignore[no-untyped-call]
             language_ids_in_constants,
-            android_validation_constants.SUPPORTED_LANGUAGES)
+            android_validation_constants.SUPPORTED_LANGUAGE_CODES)

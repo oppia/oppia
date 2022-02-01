@@ -25,6 +25,7 @@ from core import utils
 from core.constants import constants
 from core.domain import change_domain
 from core.domain import state_domain
+from proto_files import concept_card_pb2
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
@@ -39,6 +40,8 @@ SKILL_PROPERTY_LANGUAGE_CODE = 'language_code'
 SKILL_PROPERTY_SUPERSEDING_SKILL_ID = 'superseding_skill_id'
 SKILL_PROPERTY_ALL_QUESTIONS_MERGED = 'all_questions_merged'
 SKILL_PROPERTY_PREREQUISITE_SKILL_IDS = 'prerequisite_skill_ids'
+SKILL_PROPERTY_ANDROID_PROTO_SIZE_IN_BYTES = (
+    'android_proto_size_in_bytes')
 
 SKILL_CONTENTS_PROPERTY_EXPLANATION = 'explanation'
 SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES = 'worked_examples'
@@ -97,7 +100,8 @@ class SkillChange(change_domain.BaseChange):
         SKILL_PROPERTY_DESCRIPTION, SKILL_PROPERTY_LANGUAGE_CODE,
         SKILL_PROPERTY_SUPERSEDING_SKILL_ID,
         SKILL_PROPERTY_ALL_QUESTIONS_MERGED,
-        SKILL_PROPERTY_PREREQUISITE_SKILL_IDS)
+        SKILL_PROPERTY_PREREQUISITE_SKILL_IDS,
+        SKILL_PROPERTY_ANDROID_PROTO_SIZE_IN_BYTES)
 
     # The allowed list of skill contents properties which can be used in
     # update_skill_contents_property command.
@@ -371,6 +375,17 @@ class WorkedExample:
         self.question = question
         self.explanation = explanation
 
+    def to_android_worked_example_proto(self):
+        """Returns a proto representation of the worked example object.
+
+        Returns:
+            WorkedExampleDto. The proto object.
+        """
+        return concept_card_pb2.ConceptCardDto.WorkedExampleDto(
+            question=self.question.to_android_content_proto(),
+            explanation=self.explanation.to_android_content_proto()
+        )
+
     def validate(self):
         """Validates various properties of the WorkedExample object.
 
@@ -589,6 +604,8 @@ class Skill:
         self.superseding_skill_id = superseding_skill_id
         self.all_questions_merged = all_questions_merged
         self.prerequisite_skill_ids = prerequisite_skill_ids
+        self._cached_android_proto_size_is_stale = True
+        self._cached_android_proto_size_in_bytes = 0
 
     @classmethod
     def require_valid_skill_id(cls, skill_id):
@@ -885,6 +902,46 @@ class Skill:
             skill_last_updated)
 
         return skill
+
+    # This property is only meant to be used for oppia-android.
+    # This property gives the information about the proto size in bytes of the
+    # skill_contents, which is used in the oppia-android application.
+    @property
+    def android_proto_size_in_bytes(self):
+        """Returns the most up-to-date size of the skill proto,
+        recomputing from scratch if necessary.
+
+        Returns:
+            int. The size of the skill Android proto representation,
+            in bytes.
+        """
+        if self._cached_android_proto_size_is_stale:
+            self._cached_android_proto_size_in_bytes = self.get_proto_size()
+            self._cached_android_proto_size_is_stale = False
+
+        return self._cached_android_proto_size_in_bytes
+
+    def __setattr__(self, attrname, new_value):
+        """Set _cached_android_proto_size_is_stale to True every time
+        the Skill object is updated.
+
+        Args:
+            attrname: str. The name of the Skill class attribute.
+            new_value: *. The value of the attribute on which
+                function is called.
+        """
+
+        # If the value of _cached_android_proto_size_in_bytes or
+        # _cached_android_proto_size_is_stale gets updated, we don't want to
+        # recompute the skill's proto size. These attributes are
+        # both supporting attributes which aren't included in the
+        # proto size calculation.
+        if attrname not in (
+            '_cached_android_proto_size_in_bytes',
+            '_cached_android_proto_size_is_stale'
+        ):
+            self._cached_android_proto_size_is_stale = True
+        super().__setattr__(attrname, new_value)
 
     @classmethod
     def create_default_skill(cls, skill_id, description, rubrics):
@@ -1533,6 +1590,47 @@ class Skill:
             raise ValueError(
                 'There is no misconception with the given id.')
         self.misconceptions[index].feedback = feedback
+
+    def to_android_skill_proto(self):
+        """Returns a proto representation of the skill content object with some
+        skill object items.
+
+        Returns:
+            ConceptCardDto. The proto object.
+        """
+        recorded_voiceovers = (
+            self.skill_contents.recorded_voiceovers)
+        written_translations = (
+            self.skill_contents.written_translations)
+        worked_examples = (
+            self.skill_contents.worked_examples)
+
+        worked_examples_proto = []
+        for worked_example in worked_examples:
+            worked_example_proto = (
+                worked_example.to_android_worked_example_proto())
+            worked_examples_proto.append(worked_example_proto)
+
+        return concept_card_pb2.ConceptCardDto(
+            skill_id=self.id,
+            description=self.description,
+            explanation=(
+                self.skill_contents.explanation.to_android_content_proto()),
+            worked_examples=worked_examples_proto,
+            recorded_voiceovers=(
+               recorded_voiceovers.to_android_recorded_voiceovers_proto()),
+            written_translations=(
+                written_translations.to_android_written_translations_proto()),
+            content_version=self.version
+        )
+
+    def get_proto_size(self):
+        """Calculate the byte size of the proto object.
+
+        Returns:
+            int. The byte size of the proto object.
+        """
+        return int(self.to_android_skill_proto().ByteSize())
 
 
 class SkillSummary:

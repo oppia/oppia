@@ -78,15 +78,16 @@ class MigrateSkillJob(base_jobs.JobBase):
 
     @staticmethod
     def _generate_skill_changes(
-        skill_id: str, skill_model: skill_models.SkillModel
+        skill_model: skill_models.SkillModel,
+        skill: skill_domain.Skill
     ) -> Iterable[Tuple[str, skill_domain.SkillChange]]:
         """Generates skill change objects. Skill change object is generated when
         schema version for some field is lower than the latest schema version.
 
         Args:
-            skill_id: str. The id of the skill.
             skill_model: SkillModel. The skill for which to generate
                 the change objects.
+            skill: Skill. The skill domain object.
 
         Yields:
             (str, SkillChange). Tuple containing skill ID and skill change
@@ -100,7 +101,7 @@ class MigrateSkillJob(base_jobs.JobBase):
                 'from_version': skill_model.skill_contents_schema_version,
                 'to_version': feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION
             })
-            yield (skill_id, skill_change)
+            yield (skill.id, skill_change)
 
         misconceptions_version = skill_model.misconceptions_schema_version
         if misconceptions_version < feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION:  # pylint: disable=line-too-long
@@ -112,7 +113,7 @@ class MigrateSkillJob(base_jobs.JobBase):
                 'from_version': skill_model.misconceptions_schema_version,
                 'to_version': feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION
             })
-            yield (skill_id, skill_change)
+            yield (skill.id, skill_change)
 
         rubric_schema_version = skill_model.rubric_schema_version
         if rubric_schema_version < feconf.CURRENT_RUBRIC_SCHEMA_VERSION:
@@ -122,7 +123,17 @@ class MigrateSkillJob(base_jobs.JobBase):
                 'from_version': skill_model.rubric_schema_version,
                 'to_version': feconf.CURRENT_RUBRIC_SCHEMA_VERSION
             })
-            yield (skill_id, skill_change)
+            yield (skill.id, skill_change)
+
+        if skill_model.android_proto_size_in_bytes is None:
+            skill_change = skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                'property_name': (
+                    skill_domain.SKILL_PROPERTY_ANDROID_PROTO_SIZE_IN_BYTES),
+                'new_value': skill.android_proto_size_in_bytes,
+                'old_value': None
+            })
+            yield (skill.id, skill_change)
 
     @staticmethod
     def _delete_skill_from_cache(
@@ -167,7 +178,8 @@ class MigrateSkillJob(base_jobs.JobBase):
         commit_message = (
             'Update skill content schema version to %d and '
             'skill misconceptions schema version to %d and '
-            'skill rubrics schema version to %d.'
+            'skill rubrics schema version to %d'
+            'skill android_proto_size_in_bytes is updated.'
         ) % (
             feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
             feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
@@ -253,10 +265,28 @@ class MigrateSkillJob(base_jobs.JobBase):
                 job_result_transforms.ResultsToJobRunResults('SKILL PROCESSED'))
         )
 
+        migrated_skill_object_list = (
+            {
+                'skill_model': unmigrated_skill_models,
+                'skill': migrated_skills,
+            }
+            | 'Merge object' >> beam.CoGroupByKey()
+            | 'Get rid ID' >> beam.Values()  # pylint: disable=no-value-for-parameter
+            | 'Remove unmigrated exploration object' >> beam.Filter(
+                lambda x: len(x['skill']) > 0)
+            | 'Reorganize the skill object' >> beam.Map(lambda objects: {
+                    'skill_model': objects['skill_model'][0],
+                    'skill': objects['skill'][0]
+                })
+        )
+
         skill_changes = (
-            unmigrated_skill_models
-            | 'Generate skill changes' >> beam.FlatMapTuple(
-                self._generate_skill_changes)
+            migrated_skill_object_list
+            | 'Generate skill changes' >> beam.FlatMap(
+                lambda skill_objects: self._generate_skill_changes(
+                    skill_objects['skill_model'],
+                    skill_objects['skill']
+                ))
         )
 
         skill_objects_list = (
