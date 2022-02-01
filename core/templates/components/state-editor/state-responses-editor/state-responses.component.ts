@@ -111,7 +111,7 @@ angular.module('oppia').component('stateResponses', {
   },
   template: require('./state-responses.component.html'),
   controller: [
-    '$filter', '$scope', '$uibModal', 'AlertsService',
+    '$filter', '$rootScope', '$scope', '$uibModal', 'AlertsService',
     'AnswerGroupObjectFactory',
     'EditabilityService', 'ExternalSaveService', 'NgbModal', 'ResponsesService',
     'StateCustomizationArgsService', 'StateEditorService',
@@ -123,7 +123,7 @@ angular.module('oppia').component('stateResponses', {
     'PLACEHOLDER_OUTCOME_DEST', 'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
     'SHOW_TRAINABLE_UNRESOLVED_ANSWERS',
     function(
-        $filter, $scope, $uibModal, AlertsService,
+        $filter, $rootScope, $scope, $uibModal, AlertsService,
         AnswerGroupObjectFactory,
         EditabilityService, ExternalSaveService, NgbModal, ResponsesService,
         StateCustomizationArgsService, StateEditorService,
@@ -352,20 +352,21 @@ angular.module('oppia').component('stateResponses', {
         });
       };
 
-      $scope.deleteAnswerGroup = function(index, evt) {
+      $scope.deleteAnswerGroup = function(value) {
         // Prevent clicking on the delete button from also toggling the
         // display state of the answer group.
-        evt.stopPropagation();
+        value.evt.stopPropagation();
 
         AlertsService.clearWarnings();
         NgbModal.open(DeleteAnswerGroupModalComponent, {
           backdrop: true,
         }).result.then(function() {
           ResponsesService.deleteAnswerGroup(
-            index, function(newAnswerGroups) {
+            value.index, function(newAnswerGroups) {
               ctrl.onSaveInteractionAnswerGroups(newAnswerGroups);
               ctrl.refreshWarnings()();
             });
+          $rootScope.$apply();
         }, function() {
           AlertsService.clearWarnings();
         });

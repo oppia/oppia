@@ -30,16 +30,19 @@ import re
 import string
 
 from core import feconf
-from core import python_utils
 from core import schema_utils
 from core import utils
 from core.constants import constants
 from core.domain import change_domain
-from core.domain import html_cleaner
-from core.domain import html_validation_service
 from core.domain import param_domain
 from core.domain import state_domain
-from core.platform import models
+
+from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
+from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
+from core.platform import models  # pylint: disable=invalid-import-from # isort:skip
+
+# TODO(#14537): Refactor this file and remove imports marked
+# with 'invalid-import-from'.
 
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
@@ -2325,7 +2328,7 @@ class Exploration:
         # YAML representation.
         del exp_dict['id']
 
-        return python_utils.yaml_from_dict(exp_dict)
+        return utils.yaml_from_dict(exp_dict)
 
     def to_dict(self):
         """Returns a copy of the exploration as a dictionary. It includes all
@@ -3152,8 +3155,7 @@ class ExplorationChangeMergeVerifier:
             if change_is_mergeable:
                 changes_are_mergeable = True
                 continue
-            else:
-                changes_are_mergeable = False
-                break
+            changes_are_mergeable = False
+            break
 
         return changes_are_mergeable, False

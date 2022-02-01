@@ -52,11 +52,11 @@ class JobRunResultTests(test_utils.TestBase):
         self.assertEqual(run_result.stdout, '')
 
     def test_empty_result_raises_value_error(self):
-        with self.assertRaisesRegexp(ValueError, 'must not be empty'):
+        with self.assertRaisesRegex(ValueError, 'must not be empty'):
             job_run_result.JobRunResult()
 
     def test_enormous_result_raises_value_error(self):
-        with self.assertRaisesRegexp(ValueError, r'must not exceed \d+ bytes'):
+        with self.assertRaisesRegex(ValueError, r'must not exceed \d+ bytes'):
             job_run_result.JobRunResult(stdout='a' * 1501)
 
     def test_accumulate(self):

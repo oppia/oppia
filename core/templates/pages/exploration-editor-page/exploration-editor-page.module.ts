@@ -29,7 +29,6 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { StateParamChangesEditorComponent } from './editor-tab/state-param-changes-editor/state-param-changes-editor.component';
-import { DeleteAnswerGroupModalComponent } from './editor-tab/templates/modal-templates/delete-answer-group-modal.component';
 import { DeleteStateSkillModalComponent } from './editor-tab/templates/modal-templates/delete-state-skill-modal.component';
 import { ParamChangesEditorDirective } from './param-changes-editor/param-changes-editor.component';
 import { SwitchContentLanguageRefreshRequiredModalComponent } from 'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
@@ -53,9 +52,11 @@ import { RemoveRoleConfirmationModalComponent } from './settings-tab/templates/r
 import { ReassignRoleConfirmationModalComponent } from './settings-tab/templates/reassign-role-confirmation-modal.component';
 import { ModeratorUnpublishExplorationModalComponent } from './settings-tab/templates/moderator-unpublish-exploration-modal.component';
 import { TransferExplorationOwnershipModalComponent } from './settings-tab/templates/transfer-exploration-ownership-modal.component';
+import { HelpModalComponent } from './modal-templates/help-modal.component';
 import { DeleteAudioTranslationModalComponent } from './translation-tab/modal-templates/delete-audio-translation-modal.component';
 import { TranslationTabBusyModalComponent } from './translation-tab/modal-templates/translation-tab-busy-modal.component';
 import { ConfirmDeleteStateModalComponent } from './editor-tab/templates/modal-templates/confirm-delete-state-modal.component';
+import { PreviewSetParametersModalComponent } from './preview-tab/templates/preview-set-parameters-modal.component';
 import { RevertExplorationModalComponent } from './history-tab/modal-templates/revert-exploration-modal.component';
 
 @NgModule({
@@ -69,7 +70,6 @@ import { RevertExplorationModalComponent } from './history-tab/modal-templates/r
   ],
   declarations: [
     CkEditorCopyToolbarComponent,
-    DeleteAnswerGroupModalComponent,
     DeleteStateSkillModalComponent,
     ParamChangesEditorDirective,
     StateParamChangesEditorComponent,
@@ -91,7 +91,9 @@ import { RevertExplorationModalComponent } from './history-tab/modal-templates/r
     ReassignRoleConfirmationModalComponent,
     ModeratorUnpublishExplorationModalComponent,
     TransferExplorationOwnershipModalComponent,
+    HelpModalComponent,
     ConfirmDeleteStateModalComponent,
+    PreviewSetParametersModalComponent,
     RevertExplorationModalComponent,
     WelcomeTranslationModalComponent,
     ConfirmDeleteStateModalComponent,
@@ -102,7 +104,6 @@ import { RevertExplorationModalComponent } from './history-tab/modal-templates/r
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
-    DeleteAnswerGroupModalComponent,
     DeleteStateSkillModalComponent,
     StateParamChangesEditorComponent,
     SwitchContentLanguageRefreshRequiredModalComponent,
@@ -123,7 +124,9 @@ import { RevertExplorationModalComponent } from './history-tab/modal-templates/r
     ReassignRoleConfirmationModalComponent,
     ModeratorUnpublishExplorationModalComponent,
     TransferExplorationOwnershipModalComponent,
+    HelpModalComponent,
     ConfirmDeleteStateModalComponent,
+    PreviewSetParametersModalComponent,
     RevertExplorationModalComponent,
     WelcomeTranslationModalComponent,
     ConfirmDeleteStateModalComponent,
