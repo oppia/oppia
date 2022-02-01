@@ -44,6 +44,7 @@ interface DeleteValue {
   index: number;
   evt: Event;
 }
+
 @Component({
   selector: 'oppia-state-solution-editor',
   templateUrl: './state-solution-editor.component.html'
