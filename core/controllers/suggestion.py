@@ -459,7 +459,7 @@ class UpdateQuestionSuggestionHandler(base.BaseHandler):
         if suggestion.is_handled:
             raise self.InvalidInputException(
                 'The suggestion with id %s has been accepted or rejected'
-                % (suggestion_id)
+                % suggestion_id
             )
 
         if self.payload.get('skill_difficulty') is None:
@@ -467,7 +467,7 @@ class UpdateQuestionSuggestionHandler(base.BaseHandler):
                 'The parameter \'skill_difficulty\' is missing.'
             )
 
-        if not isinstance(self.payload.get('skill_difficulty'), float):
+        if not isinstance(self.payload.get('skill_difficulty'), (float, int)):
             raise self.InvalidInputException(
                 'The parameter \'skill_difficulty\' should be a decimal.'
             )

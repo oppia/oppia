@@ -1460,7 +1460,7 @@ class Voiceover:
             raise utils.ValidationError(
                 'Expected needs_update to be a bool, received %s' %
                 self.needs_update)
-        if not isinstance(self.duration_secs, float):
+        if not isinstance(self.duration_secs, (float, int)):
             raise utils.ValidationError(
                 'Expected duration_secs to be a float, received %s' %
                 self.duration_secs)
