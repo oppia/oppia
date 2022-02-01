@@ -16,7 +16,7 @@
  * @fileoverview Component for showing learner dashboard icons.
  */
 
-import { Component, OnInit, Input} from '@angular/core';
+import { Component, OnInit, OnChanges, SimpleChanges, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 import constants from 'assets/constants';
@@ -33,7 +33,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
   selector: 'oppia-learner-dashboard-icons',
   templateUrl: './learner-dashboard-icons.component.html',
 })
-export class LearnerDashboardIconsComponent implements OnInit {
+export class LearnerDashboardIconsComponent implements OnInit, OnChanges {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -68,6 +68,11 @@ export class LearnerDashboardIconsComponent implements OnInit {
           this.learnerDashboardActivityIds = learnerDashboardActivityIds;
         }
       );
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    this.setHoverState(changes.activityActive.currentValue);
+    this.canActivityBeAddedToLearnerPlaylist(this.activityId);
   }
 
   enablePlaylistTooltip(): void {
