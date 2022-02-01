@@ -258,7 +258,7 @@ class PreferencesHandler(base.BaseHandler):
                     data['can_receive_editor_role_email'],
                     data['can_receive_feedback_message_email'],
                     data['can_receive_subscription_email'])
-                    
+
 
 class ProfilePictureHandler(base.BaseHandler):
     """Provides the dataURI of the user's profile picture, or none if no user
