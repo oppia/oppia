@@ -198,7 +198,7 @@ export class PlaythroughService {
   private playthroughStopwatch: Stopwatch | null = null;
   private playthroughDurationInSecs: number | null = null;
 
-   constructor(
+  constructor(
          private explorationFeaturesService: ExplorationFeaturesService,
          private learnerActionObjectFactory: LearnerActionObjectFactory,
          private playthroughBackendApiService: PlaythroughBackendApiService,
