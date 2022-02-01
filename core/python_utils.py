@@ -26,14 +26,9 @@ import sys
 _THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party', 'python_libs')
 sys.path.insert(0, _THIRD_PARTY_PATH)
 
-_YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-6.0')
-sys.path.insert(0, _YAML_PATH)
-
 _CERTIFI_PATH = os.path.join(
     os.getcwd(), '..', 'oppia_tools', 'certifi-2021.10.8')
 sys.path.insert(0, _CERTIFI_PATH)
-
-import yaml  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 import builtins  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 import past.builtins  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
@@ -229,18 +224,3 @@ def _recursively_convert_to_str(value):
         return value.decode('utf-8')
     else:
         return value
-
-
-def yaml_from_dict(dictionary, width=80):
-    """Gets the YAML representation of a dict.
-
-    Args:
-        dictionary: dict. Dictionary for conversion into yaml.
-        width: int. Width for the yaml representation, default value
-            is set to be of 80.
-
-    Returns:
-        str. Converted yaml of the passed dictionary.
-    """
-    dictionary = _recursively_convert_to_str(dictionary)
-    return yaml.safe_dump(dictionary, default_flow_style=False, width=width)
