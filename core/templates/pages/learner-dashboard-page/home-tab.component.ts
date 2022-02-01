@@ -16,6 +16,7 @@
  * @fileoverview Component for home tab in the Learner Dashboard page.
  */
 
+import constants from 'assets/constants';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
 import { LearnerDashboardPageConstants } from 'pages/learner-dashboard-page/learner-dashboard-page.constants';
@@ -31,11 +32,14 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 export class HomeTabComponent {
   @Output() setActiveSection: EventEmitter<string> = new EventEmitter();
   @Input() currentGoals: LearnerTopicSummary[];
+  @Input() goalTopics: LearnerTopicSummary[];
   @Input() partiallyLearntTopicsList: LearnerTopicSummary[];
   @Input() untrackedTopics: Record<string, LearnerTopicSummary[]>;
   @Input() username: string;
+  currentGoalsLength!: number;
   CLASSROOM_LINK_URL_TEMPLATE = '/learn/<classroom_url_fragment>';
   classroomUrlFragment: string;
+  goalTopicsLength!: number;
   nextIncompleteNodeTitles: string[] = [];
   widthConst: number = 233;
   width: number;
@@ -52,6 +56,8 @@ export class HomeTabComponent {
   ngOnInit(): void {
     this.width = this.widthConst * (this.currentGoals.length);
     var allGoals = [...this.currentGoals, ...this.partiallyLearntTopicsList];
+    this.currentGoalsLength = this.currentGoals.length;
+    this.goalTopicsLength = this.goalTopics.length;
     if (allGoals.length !== 0) {
       var allGoalIds = [];
       for (var goal of allGoals) {
@@ -96,6 +102,16 @@ export class HomeTabComponent {
         classroom_url_fragment: this.classroomUrlFragment
       }
     );
+  }
+
+  isGoalLimitReached(): boolean {
+    if (this.goalTopicsLength === 0) {
+      return false;
+    } else if (this.currentGoalsLength === this.goalTopicsLength) {
+      return true;
+    } else if (this.currentGoalsLength === constants.MAX_CURRENT_GOALS_COUNT) {
+      return true;
+    }
   }
 
   getWidth(length: number): number {

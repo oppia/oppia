@@ -475,6 +475,7 @@
 	"I18N_LEARNER_DASHBOARD_EMPTY_FEEDBACK_THREADS": "Text displayed in the learner dashboard. - This text is shown when there are no feedback threads to which the user is subscribed.",
 	"I18N_LEARNER_DASHBOARD_EMPTY_INCOMPLETE_COLLECTIONS": "Text displayed in the learner dashboard. - This text is shown when there is at least one collection in the complete section but no collections in the incomplete section of the user.",
 	"I18N_LEARNER_DASHBOARD_EMPTY_INCOMPLETE_EXPLORATIONS": "Text displayed in the learner dashboard. - This text is shown when there is at least one exploration in the complete section but no explorations in the incomplete section of the user.",
+	"I18N_LEARNER_DASHBOARD_EMPTY_LEARN_SOMETHING_NEW_SECTION": "Text displayed in the learner dashboard. - This text is shown when the user has reached the goal selection limit in edit goals section of learner dashboard.",
 	"I18N_LEARNER_DASHBOARD_EMPTY_SKILL_PROFICIENCY": "Text displayed in the learner dashboard. - This text is shown when the user hasn't started any topic.",
 	"I18N_LEARNER_DASHBOARD_EMPTY_SKILL_PROFICIENCY_REASON_FOR_SETTING_A_GOAL": "Text displayed in the learner dashboard. - This text is shown when the user hasn't started any topic.",
 	"I18N_LEARNER_DASHBOARD_EMPTY_SKILL_PROFICIENCY_SET_A_GOAL": "Text displayed in the learner dashboard. - This text is shown when the user hasn't started any topic.",
