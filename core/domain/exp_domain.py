@@ -30,7 +30,6 @@ import re
 import string
 
 from core import feconf
-from core import python_utils
 from core import schema_utils
 from core import utils
 from core.constants import constants
@@ -2329,7 +2328,7 @@ class Exploration:
         # YAML representation.
         del exp_dict['id']
 
-        return python_utils.yaml_from_dict(exp_dict)
+        return utils.yaml_from_dict(exp_dict)
 
     def to_dict(self):
         """Returns a copy of the exploration as a dictionary. It includes all

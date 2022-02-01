@@ -28,7 +28,6 @@ import re
 import string
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.domain import change_domain
@@ -426,7 +425,7 @@ class Collection:
         # YAML representation.
         del collection_dict['id']
 
-        return python_utils.yaml_from_dict(collection_dict)
+        return utils.yaml_from_dict(collection_dict)
 
     @classmethod
     def _convert_v1_dict_to_v2_dict(cls, collection_dict):
