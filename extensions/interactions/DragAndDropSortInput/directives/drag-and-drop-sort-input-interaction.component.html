@@ -16,7 +16,10 @@
                }"
                [class]="idx%2===1 && idx !== noShow ? 'child-dnd-border' : 'child-dnd-borderless'"
                (cdkDropListDropped)="dropItemInAnyList($event)">
-            <div class="root-dnd-placeholder" [ngStyle]="{ 'height': (rootHeight-30) + 'px' }" *cdkDragPlaceholder></div>
+            <div class="root-dnd-placeholder"
+                 [ngStyle]="{ 'height': (rootHeight-30) + 'px' }"
+                 *cdkDragPlaceholder>
+            </div>
             <div *ngIf="idx%2===1 && idx !== noShow && items.length > 1"
                  class="example-handle"
                  cdkDragHandle
@@ -24,7 +27,10 @@
                  (mouseout)="removeHighlight()"
                  (mousedown)="setRootPlaceHolderHeight(idx)">
             </div>
-            <div *ngFor="let item of items" class="child-dnd-item-box" [ngClass]="{'highlight-group': idx === highlightedGroup}" cdkDrag>
+            <div *ngFor="let item of items"
+                 class="child-dnd-item-box"
+                 [ngClass]="{'highlight-group': idx === highlightedGroup}"
+                 cdkDrag>
               <div class="child-dnd-placeholder" *cdkDragPlaceholder></div>
               <angular-html-bind-wrapper [htmlData]="item"></angular-html-bind-wrapper>
             </div>
@@ -33,7 +39,10 @@
       </ng-container>
     </div>
     <!-- Drag and drop, when we allow only single item in same position of list -->
-    <div *ngIf="!allowMultipleItemsInSamePosition" cdkDropList class="child-dnd-single-item" (cdkDropListDropped)="dropItemInSameList($event)">
+    <div *ngIf="!allowMultipleItemsInSamePosition"
+         class="child-dnd-single-item"
+         (cdkDropListDropped)="dropItemInSameList($event)"
+         cdkDropList>
       <div class="child-dnd-item-box" *ngFor="let item of singleItemInSamePositionArray" cdkDrag>
         <div class="child-dnd-single-item-placeholder" *cdkDragPlaceholder></div>
         <angular-html-bind-wrapper [htmlData]="item"></angular-html-bind-wrapper>

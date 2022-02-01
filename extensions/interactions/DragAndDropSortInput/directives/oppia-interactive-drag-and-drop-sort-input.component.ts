@@ -88,7 +88,7 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
   dropList(event: CdkDragDrop<string[][]>): void {
     // Handles the drop event. Drop whole list which is part of list of lists.
     // If the drop is valid, then the list of lits is reset, otherwise the
-    //  drag is cancelled.
+    // drag is cancelled.
     moveItemInArray(
       this.multipleItemsInSamePositionArray,
       event.previousIndex, event.currentIndex);
