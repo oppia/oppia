@@ -48,7 +48,7 @@ class PopulateExplorationWithAndroidProtoSizeInBytesJobTests(
 
     def setUp(self):
         super().setUp()
-        exp_models.ExplorationRightsModel(
+        self.exp_rights_model = exp_models.ExplorationRightsModel(
             id=self.EXP_1_ID,
             owner_ids=[self.USER_ID_1],
             editor_ids=[self.USER_ID_1],
@@ -61,6 +61,26 @@ class PopulateExplorationWithAndroidProtoSizeInBytesJobTests(
         ).save(
             self.USER_ID_COMMITTER, 'Created new exploration right',
             [{'cmd': rights_domain.CMD_CREATE_NEW}])
+
+        self.exp_summary_model = self.create_model(
+            exp_models.ExpSummaryModel,
+            id=self.EXP_1_ID,
+            deleted=False,
+            title='title',
+            category='category',
+            objective='objective',
+            language_code='en',
+            ratings=feconf.get_empty_ratings(),
+            scaled_average_rating=feconf.EMPTY_SCALED_AVERAGE_RATING,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            community_owned=False,
+            owner_ids=[self.USER_ID_1],
+            contributor_ids=[],
+            contributors_summary={},
+            version=1
+        )
+        self.exp_summary_model.update_timestamps()
+        self.exp_summary_model.put()
 
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty()
@@ -101,6 +121,7 @@ class PopulateExplorationWithAndroidProtoSizeInBytesJobTests(
 
         migrated_exp_model = exp_models.ExplorationModel.get(self.EXP_1_ID)
         self.assertEqual(migrated_exp_model.android_proto_size_in_bytes, 64)
+        self.check_exploration_related_models()
 
     def test_unmigrated_exp_is_migrated(self) -> None:
         exp_model = self.create_model(
@@ -133,6 +154,7 @@ class PopulateExplorationWithAndroidProtoSizeInBytesJobTests(
 
         migrated_exp_model = exp_models.ExplorationModel.get(self.EXP_1_ID)
         self.assertEqual(migrated_exp_model.android_proto_size_in_bytes, 64)
+        self.check_exploration_related_models()
 
     def test_broken_exploration_is_not_migrated(self) -> None:
         exp_model = self.create_model(
@@ -167,6 +189,7 @@ class PopulateExplorationWithAndroidProtoSizeInBytesJobTests(
 
         migrated_exp_model = exp_models.ExplorationModel.get(self.EXP_1_ID)
         self.assertEqual(migrated_exp_model.version, 1)
+        self.check_exploration_related_models()
 
     def test_migrated_exploration_is_not_migrated(self) -> None:
         exp_model = self.create_model(
@@ -198,3 +221,21 @@ class PopulateExplorationWithAndroidProtoSizeInBytesJobTests(
             self.EXP_1_ID)
         self.assertEqual(
             unmigrated_exploration_model.android_proto_size_in_bytes, 64)
+        self.check_exploration_related_models()
+
+    def check_exploration_related_models(self) -> None:
+        """Check ExpSummaryModel and ExplorationRightsModel are
+        same as mentioned in the setup function.
+        """
+        exp_summary_model = exp_models.ExpSummaryModel.get_by_id(self.EXP_1_ID)
+        self.assertEqual(self.exp_summary_model, exp_summary_model)
+        self.assertEqual(self.exp_summary_model.version, 1)
+
+        exp_rights_snapshot_id = (
+            exp_models.ExplorationRightsModel.get_snapshot_id(self.EXP_1_ID, 1))
+        self.assertIsNotNone(
+            exp_models.ExplorationRightsSnapshotMetadataModel.get_by_id(
+                exp_rights_snapshot_id))
+        self.assertIsNotNone(
+            exp_models.ExplorationRightsSnapshotContentModel.get_by_id(
+                exp_rights_snapshot_id))

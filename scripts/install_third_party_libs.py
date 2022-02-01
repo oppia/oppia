@@ -259,28 +259,23 @@ def rewrite_android_proto_files():
 
 
 def move_all_proto_files_to_third_party():
-    """Move all proto files from subdirectories
-    to the third_party folder.
+    """Move all the proto files from subdirectories of oppia-proto-api-*
+    to its parent folder. Currently, proto files generation doesn't
+    support importing other proto files from a different directory.
+    Because of it, we had to keep all the proto files in the same directory.
+    Since there is no simple configuration for imports when using protobuf to
+    generate Python files we need to manually fix the imports.
+    See: https://github.com/protocolbuffers/protobuf/issues/1491
     """
-    protobuf_dir = pathlib.Path(
+    android_protobuf_dir = pathlib.Path(
         common.THIRD_PARTY_OPPIA_ANDROID_PROTO_DIR).glob('**/*.proto')
 
-    for p in protobuf_dir:
-        if p.suffix == '.proto':
-            shutil.move(
-                str(p.absolute()),
-                str(os.path.join(
-                    common.THIRD_PARTY_OPPIA_ANDROID_PROTO_DIR,
-                    os.path.basename(p.absolute()))))
-
-    # If there is any subfolder in the root folder from the
-    # oppia_proto_api repository in the third_party directory,
-    # then delete it. We are keeping all the proto files under
-    # the root folder directly to solve the proto compilation issue.
-    # See: https://github.com/protocolbuffers/protobuf/issues/1491
-    if os.path.exists(os.path.join(
-        common.THIRD_PARTY_OPPIA_ANDROID_PROTO_DIR, 'org')):
-        shutil.rmtree(common.THIRD_PARTY_OPPIA_ANDROID_PROTO_DIR + '/org')
+    for proto_file in android_protobuf_dir:
+        shutil.move(
+            str(proto_file.absolute()),
+            str(os.path.join(
+                common.THIRD_PARTY_OPPIA_ANDROID_PROTO_DIR,
+                os.path.basename(proto_file.absolute()))))
 
 
 def main() -> None:

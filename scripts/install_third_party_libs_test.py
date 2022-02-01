@@ -299,36 +299,6 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
                 install_third_party_libs.compile_protobuf_files(
                     [(True, 'mock_path')])
 
-    def test_move_all_proto_files_to_third_party(self):
-        check_function_calls = {
-            'move_is_called': False,
-            'rmtree_is_called': False
-        }
-        def mock_exists(unused_path):
-            return False
-        def mock_move(unused_source_path, unused_destination_path):
-            check_function_calls['move_is_called'] = True
-        def mock_rmtree(unused_path):
-            check_function_calls['rmtree_is_called'] = True
-
-        exists_swap = self.swap(os.path, 'exists', mock_exists)
-
-        os.mkdir(os.path.join(
-            common.THIRD_PARTY_OPPIA_ANDROID_PROTO_DIR, 'org'))
-        with exists_swap:
-            self.assertTrue(os.path.isdir(
-                os.path.join(
-                    common.THIRD_PARTY_OPPIA_ANDROID_PROTO_DIR, 'org')))
-
-        move_swap = self.swap(shutil, 'move', mock_move)
-        with move_swap:
-            install_third_party_libs.move_all_proto_files_to_third_party()
-            rmtree_swap = self.swap(shutil, 'rmtree', mock_rmtree)
-            with rmtree_swap:
-                self.assertFalse(os.path.isdir(
-                    os.path.join(
-                        common.THIRD_PARTY_OPPIA_ANDROID_PROTO_DIR, 'org')))
-
     def test_ensure_pip_library_is_installed(self):
         check_function_calls = {
             'pip_install_is_called': False
