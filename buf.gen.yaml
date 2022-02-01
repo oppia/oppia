@@ -2,7 +2,5 @@ version: v1beta1
 plugins:
   - name: python
     out: proto_files
-
-
   - name: ts
-    out: extensions/classifiers/proto
+    out: extensions/classifiers/prot
