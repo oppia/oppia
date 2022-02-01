@@ -145,7 +145,7 @@ describe('Customize Interaction Modal Controller', function() {
         ).toBe(7);
         expect(
           $scope.ALLOWED_INTERACTION_CATEGORIES[1].interaction_ids.length
-        ).toBe(7);
+        ).toBe(6);
       });
   });
 
