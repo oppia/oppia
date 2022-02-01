@@ -433,7 +433,7 @@ describe('Drag and drop sort input interactive component', () => {
     it('should return true if child element have zero height', () => {
       component.hide = [1, 2];
 
-      expect(component.isChildElementHaveBorder(1)).toBeTrue();
+      expect(component.isChildElementHaveZeroHeight(1)).toBeTrue();
     });
   });
 
