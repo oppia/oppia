@@ -26,14 +26,9 @@ import sys
 _THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party', 'python_libs')
 sys.path.insert(0, _THIRD_PARTY_PATH)
 
-_YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-6.0')
-sys.path.insert(0, _YAML_PATH)
-
 _CERTIFI_PATH = os.path.join(
     os.getcwd(), '..', 'oppia_tools', 'certifi-2021.10.8')
 sys.path.insert(0, _CERTIFI_PATH)
-
-import yaml  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 import builtins  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
@@ -172,25 +167,6 @@ def get_package_file_contents(package: str, filepath: str) -> str:
         return pkgutil.get_data(package, filepath).decode('utf-8')
 
 
-def parse_query_string(query_string):
-    """Parse a query string given as a string argument
-    (data of type application/x-www-form-urlencoded) using urlparse.parse_qs if
-    run under Python 2 and urllib.parse.parse_qs if run under Python 3.
-
-    Args:
-        query_string: str. The query string.
-
-    Returns:
-        dict. The keys are the unique query variable names and the values are
-        lists of values for each name.
-    """
-    try:
-        import urllib.parse as urlparse
-    except ImportError:
-        import urlparse
-    return urlparse.parse_qs(query_string)  # pylint: disable=disallowed-function-calls
-
-
 def url_quote(content):
     """Quotes a string using urllib.quote if run under Python 2 and
     urllib.parse.quote if run under Python 3.
@@ -256,18 +232,3 @@ def _recursively_convert_to_str(value):
         return value.decode('utf-8')
     else:
         return value
-
-
-def yaml_from_dict(dictionary, width=80):
-    """Gets the YAML representation of a dict.
-
-    Args:
-        dictionary: dict. Dictionary for conversion into yaml.
-        width: int. Width for the yaml representation, default value
-            is set to be of 80.
-
-    Returns:
-        str. Converted yaml of the passed dictionary.
-    """
-    dictionary = _recursively_convert_to_str(dictionary)
-    return yaml.safe_dump(dictionary, default_flow_style=False, width=width)
