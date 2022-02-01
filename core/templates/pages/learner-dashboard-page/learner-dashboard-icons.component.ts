@@ -28,6 +28,7 @@ import { LearnerDashboardActivityIds } from
   'domain/learner_dashboard/learner-dashboard-activity-ids.model';
 import { LearnerPlaylistModalComponent } from './modal-templates/learner-playlist-modal.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { LoggerService } from 'services/contextual/logger.service';
 
 @Component({
   selector: 'oppia-learner-dashboard-icons',
@@ -59,6 +60,7 @@ export class LearnerDashboardIconsComponent implements OnInit, OnChanges {
     private learnerDashboardActivityBackendApiService:
       LearnerDashboardActivityBackendApiService,
     private ngbModal: NgbModal,
+    private loggerService: LoggerService
   ) {}
 
   ngOnInit(): void {
@@ -71,8 +73,10 @@ export class LearnerDashboardIconsComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    this.setHoverState(changes.activityActive.currentValue);
-    this.canActivityBeAddedToLearnerPlaylist(this.activityId);
+    if(changes.activityActive!==undefined) {
+      this.setHoverState(changes.activityActive.currentValue);
+      this.canActivityBeAddedToLearnerPlaylist(this.activityId);
+    }
   }
 
   enablePlaylistTooltip(): void {
