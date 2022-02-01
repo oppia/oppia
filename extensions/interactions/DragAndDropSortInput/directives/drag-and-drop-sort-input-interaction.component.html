@@ -1,4 +1,4 @@
-<form (ngSubmit)="submitAnswer()">
+<form (submit)="submitAnswer()">
   <div class="drag-and-drop-sort-container conversation-skin-interaction-container">
     <!-- Drag and drop, when we allow multiple items in same position of list -->
     <div *ngIf="allowMultipleItemsInSamePosition" cdkDropList (cdkDropListDropped)="dropList($event)">

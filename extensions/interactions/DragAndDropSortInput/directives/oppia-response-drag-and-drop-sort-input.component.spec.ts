@@ -25,7 +25,7 @@ describe('Drag and drop sort input response component', () => {
   let component: ResponseDragAndDropSortInputComponent;
   let fixture: ComponentFixture<ResponseDragAndDropSortInputComponent>;
 
-  class mockHtmlEscaperService {
+  class MockHtmlEscaperService {
     escapedJsonToObj(answer: string): string {
       return JSON.parse(answer);
     }
@@ -37,7 +37,7 @@ describe('Drag and drop sort input response component', () => {
       providers: [
         {
           provide: HtmlEscaperService,
-          useClass: mockHtmlEscaperService
+          useClass: MockHtmlEscaperService
         }
       ],
       schemas: [NO_ERRORS_SCHEMA]
