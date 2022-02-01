@@ -74,6 +74,16 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
     this.dragStarted = false;
   }
 
+  isChildElementHaveBorder(idx: number): boolean {
+    // Checks if the child has a border.
+    return idx % 2 === 1 && idx !== this.noShow;
+  }
+
+  isChildElementHaveZeroHeight(idx: number): boolean {
+    // Checks if the child has zero height.
+    return this.hide.indexOf(idx) >= 0;
+  }
+
   addHighlight(i: number): void {
     if (i === this.highlightedGroup && this.dragStarted) {
       return;
@@ -87,7 +97,7 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
 
   dropList(event: CdkDragDrop<string[][]>): void {
     // Handles the drop event. Drop whole list which is part of list of lists.
-    // If the drop is valid, then the list of lits is reset, otherwise the
+    // If the drop is valid, then the list of lists is reset, otherwise the
     // drag is cancelled.
     moveItemInArray(
       this.multipleItemsInSamePositionArray,
@@ -186,7 +196,7 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
     if (this.allowMultipleItemsInSamePosition) {
       // Use list of lists to store the multiple items in the same position.
       // Push empty list along with the list of items in the same position,
-      // to unable the drag and drop in different positions from items in the
+      // to enable the drag and drop in different positions from items in the
       // same position.
       // For example, if the list of items in the same position is [1, 2, 3],
       // then the list of lists will be [[], [1, 2, 3], []].

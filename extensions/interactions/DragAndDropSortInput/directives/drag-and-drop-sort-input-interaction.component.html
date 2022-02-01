@@ -10,11 +10,11 @@
                [cdkDropListData]="items"
                (cdkDropListExited)="logEvent($event)"
                [ngClass]="{
-                 'child-dnd-border': idx%2===1 && idx !== noShow,
-                 'child-dnd-borderless': (idx%2!==1 || idx === noShow) || hide.indexOf(idx) >= 0,
-                 'zero-height': hide.indexOf(idx) >= 0
+                 'child-dnd-border': isChildElementHaveBorder(idx),
+                 'child-dnd-borderless': !isChildElementHaveBorder(idx) || isChildElementHaveZeroHeight(idx),
+                 'zero-height': isChildElementHaveZeroHeight(idx)
                }"
-               [class]="idx%2===1 && idx !== noShow ? 'child-dnd-border' : 'child-dnd-borderless'"
+               [class]="isChildElementHaveBorder(idx) ? 'child-dnd-border' : 'child-dnd-borderless'"
                (cdkDropListDropped)="dropItemInAnyList($event)">
             <div class="root-dnd-placeholder"
                  [ngStyle]="{ 'height': (rootHeight-30) + 'px' }"

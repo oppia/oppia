@@ -423,6 +423,18 @@ describe('Drag and drop sort input interactive component', () => {
       expect(component.noShow).toBe(-1);
       expect(component.hide).toEqual([]);
     });
+
+    it('should return true if child element have border', () => {
+      component.noShow = -1;
+
+      expect(component.isChildElementHaveBorder(1)).toBeTrue();
+    });
+
+    it('should return true if child element have zero height', () => {
+      component.hide = [1, 2];
+
+      expect(component.isChildElementHaveBorder(1)).toBeTrue();
+    });
   });
 
   describe('when multiple items in the same position are not allowed', () => {
