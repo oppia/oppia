@@ -71,6 +71,8 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
             'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'linked_skill_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'inapplicable_skill_misconception_ids': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE),
+            'android_proto_size_in_bytes': (
                 base_models.EXPORT_POLICY.NOT_APPLICABLE)
         }
         self.assertEqual(
