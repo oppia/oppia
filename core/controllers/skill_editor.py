@@ -178,8 +178,7 @@ class EditableSkillDataHandler(base.BaseHandler):
                     'type': 'list',
                     'items': {
                         'type': 'object_dict',
-                        'object_class': (
-                            skill_domain.SkillChange)
+                        'object_class': skill_domain.SkillChange
                     }
                 }
             }
