@@ -30,11 +30,6 @@ from core import constants
 from core import python_utils
 from scripts import common
 
-_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_PY_GITHUB_PATH = os.path.join(
-    _PARENT_DIR, 'oppia_tools', 'PyGithub-%s' % common.PYGITHUB_VERSION)
-sys.path.insert(0, _PY_GITHUB_PATH)
-
 import github  # isort:skip pylint: disable=wrong-import-position
 
 ABOUT_PAGE_CONSTANTS_FILEPATH = os.path.join(

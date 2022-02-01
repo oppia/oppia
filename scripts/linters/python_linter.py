@@ -27,15 +27,6 @@ from . import linter_utils
 from .. import common
 from .. import concurrent_task_utils
 
-_PATHS_TO_INSERT = [
-    common.PYLINT_PATH,
-    common.PYCODESTYLE_PATH,
-    common.PYLINT_QUOTES_PATH,
-    common.ISORT_PATH,
-]
-for path in _PATHS_TO_INSERT:
-    sys.path.insert(1, path)
-
 from pylint import lint  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
 from pylint.reporters import text  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
 import isort.api  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position

@@ -59,8 +59,6 @@ def managed_process(
         psutil.Process. The process managed by the context manager.
     """
     # TODO(#11549): Move this to top of the file.
-    if common.PSUTIL_DIR not in sys.path:
-        sys.path.insert(1, common.PSUTIL_DIR)
     import psutil
 
     get_proc_info = lambda p: (
@@ -443,12 +441,6 @@ def managed_portserver():
         psutil.Popen. The Popen subprocess object.
     """
     # TODO(#11549): Move this to top of the file.
-    if common.PSUTIL_DIR not in sys.path:
-        # Our unit tests already configure sys.path correctly, but the
-        # standalone scripts do not. Because of this, the following line cannot
-        # be covered. This is fine since we want to cleanup this code anyway in
-        # #11549.
-        sys.path.insert(1, common.PSUTIL_DIR) # pragma: no cover
     import psutil
 
     # Check if a socket file exists. This file can exist when previous instance

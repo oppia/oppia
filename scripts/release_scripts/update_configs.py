@@ -27,16 +27,10 @@ import argparse
 import getpass
 import os
 import re
-import sys
 
 from core import python_utils
 from core import utils
 from .. import common
-
-_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_PY_GITHUB_PATH = os.path.join(
-    _PARENT_DIR, 'oppia_tools', 'PyGithub-%s' % common.PYGITHUB_VERSION)
-sys.path.insert(0, _PY_GITHUB_PATH)
 
 import github  # isort:skip pylint: disable=wrong-import-position
 

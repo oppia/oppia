@@ -232,35 +232,17 @@ def main() -> None:
     # and cannot be added to oppia_tools because the dev_appserver python script
     # looks for them in the default system paths when it is run. Therefore, we
     # must install these libraries to the developer's computer.
-    system_pip_dependencies = [
-        ('protobuf', common.PROTOBUF_VERSION),
-        ('grpcio', common.GRPCIO_VERSION),
-    ]
     local_pip_dependencies = [
         ('coverage', common.COVERAGE_VERSION, common.OPPIA_TOOLS_DIR),
-        ('pylint', common.PYLINT_VERSION, common.OPPIA_TOOLS_DIR),
-        ('Pillow', common.PILLOW_VERSION, common.OPPIA_TOOLS_DIR),
-        ('pylint-quotes', common.PYLINT_QUOTES_VERSION, common.OPPIA_TOOLS_DIR),
-        ('webtest', common.WEBTEST_VERSION, common.OPPIA_TOOLS_DIR),
-        ('isort', common.ISORT_VERSION, common.OPPIA_TOOLS_DIR),
-        ('pycodestyle', common.PYCODESTYLE_VERSION, common.OPPIA_TOOLS_DIR),
-        ('esprima', common.ESPRIMA_VERSION, common.OPPIA_TOOLS_DIR),
-        ('PyGithub', common.PYGITHUB_VERSION, common.OPPIA_TOOLS_DIR),
-        ('protobuf', common.PROTOBUF_VERSION, common.OPPIA_TOOLS_DIR),
-        ('psutil', common.PSUTIL_VERSION, common.OPPIA_TOOLS_DIR),
         (
             'git+https://github.com/oppia/pip-tools.git',
             common.PIP_TOOLS_VERSION,
             common.OPPIA_TOOLS_DIR
         ),
-        ('setuptools', common.SETUPTOOLS_VERSION, common.OPPIA_TOOLS_DIR),
     ]
 
     for package, version, path in local_pip_dependencies:
         ensure_pip_library_is_installed(package, version, path)
-
-    for package, version in system_pip_dependencies:
-        ensure_system_python_libraries_are_installed(package, version)
 
     # Download and install required JS and zip files.
     print('Installing third-party JS libraries and zip files.')
