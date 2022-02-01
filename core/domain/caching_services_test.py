@@ -860,7 +860,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             {})
 
         default_topic = (
-            topic_domain.Topic.create_default_topic( # type: ignore[no-untyped-call]
+            topic_domain.Topic.create_default_topic(
                 topic_id, 'Name 😍', 'abbrev 😍',
                 'description 😍'))
 
@@ -877,7 +877,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             default_topic.to_dict(),
-            topics[topic_id].to_dict()) # type: ignore[no-untyped-call]
+            topics[topic_id].to_dict())
 
     def test_stories_with_unicode_characters_are_set_and_get_correctly(
         self
