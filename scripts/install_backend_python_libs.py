@@ -688,13 +688,11 @@ def main():
     """
     verify_pip_is_installed()
 
-    mismatches = get_mismatches()
-    if mismatches:
-        _rectify_third_party_directory(mismatches)
-        validate_metadata_directories()
-    else:
-        print(
-            'All third-party Python libraries are already installed correctly.')
+    subprocess.check_call(
+        ['pip', 'install', '--upgrade', '-r', 'requirements.txt'],
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE
+    )
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

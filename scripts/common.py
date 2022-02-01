@@ -38,7 +38,6 @@ CURRENT_PYTHON_BIN = sys.executable
 
 # Versions of libraries used in devflow.
 COVERAGE_VERSION = '6.1.2'
-PIP_TOOLS_VERSION = '6.4.0'
 
 # Node version.
 NODE_VERSION = '16.13.0'
@@ -164,7 +163,6 @@ PROTRACTOR_CONFIG_FILE_PATH = (
 DIRS_TO_ADD_TO_SYS_PATH = [
     GOOGLE_APP_ENGINE_SDK_HOME,
     os.path.join(CURR_DIR, 'proto_files'),
-    os.path.join(OPPIA_TOOLS_DIR, 'setuptools-%s' % '36.6.0'),
     CURR_DIR,
     THIRD_PARTY_PYTHON_LIBS_DIR,
 ]
@@ -694,21 +692,6 @@ def fix_third_party_imports() -> None:
     # libraries are installed.
     import dev_appserver
     dev_appserver.fix_sys_path()
-    # In the process of migrating Oppia from Python 2 to Python 3, we are using
-    # both google app engine apis that are contained in the Google Cloud SDK
-    # folder, and also google cloud apis that are installed in our
-    # 'third_party/python_libs' directory. Therefore, there is a confusion of
-    # where the google module is located and which google module to import from.
-    # The following code ensures that the google module that python looks at
-    # imports from the 'third_party/python_libs' folder so that the imports are
-    # correct.
-    if 'google' in sys.modules:
-        google_path = os.path.join(THIRD_PARTY_PYTHON_LIBS_DIR, 'google')
-        google_module = sys.modules['google']
-        google_module.__path__ = [google_path]
-        google_module.__file__ = os.path.join(google_path, '__init__.py')
-
-    sys.path.insert(1, THIRD_PARTY_PYTHON_LIBS_DIR)
 
 
 class CD:

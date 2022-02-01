@@ -458,28 +458,6 @@ def check_for_backend_python_library_inconsistencies():
     """
     mismatches = install_backend_python_libs.get_mismatches()
 
-    if mismatches:
-        print(
-            'Your currently installed python libraries do not match the\n'
-            'libraries listed in your "requirements.txt" file. Here is a\n'
-            'full list of library/version discrepancies:\n')
-
-        print(
-            '{:<35} |{:<25}|{:<25}'.format(
-                'Library', 'Requirements Version',
-                'Currently Installed Version'))
-        for library_name, version_strings in mismatches.items():
-            print('{!s:<35} |{!s:<25}|{!s:<25}'.format(
-                library_name, version_strings[0], version_strings[1]))
-        print('\n')
-        common.print_each_string_after_two_new_lines([
-            'Please fix these discrepancies by editing the `requirements.in`\n'
-            'file or running `scripts.install_third_party` to regenerate\n'
-            'the `third_party/python_libs` directory.\n'])
-        sys.exit(1)
-    else:
-        print('Python dependencies consistency check succeeded.')
-
 
 def main(args=None):
     """Main method for pre-push hook that executes the Python/JS linters on all

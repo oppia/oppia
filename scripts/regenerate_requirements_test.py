@@ -18,16 +18,11 @@
 
 from __future__ import annotations
 
-import os
 import sys
 
 from core.tests import test_utils
-from scripts import common
 from scripts import regenerate_requirements
 
-PIP_TOOLS_PATH = os.path.join(
-    common.OPPIA_TOOLS_DIR, 'pip-tools-%s' % common.PIP_TOOLS_VERSION)
-sys.path.insert(0, PIP_TOOLS_PATH)
 from piptools.scripts import compile  # isort:skip pylint: disable=redefined-builtin, wrong-import-position, wrong-import-order
 
 

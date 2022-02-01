@@ -123,15 +123,7 @@ _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 
 _PATHS_TO_INSERT = [
     os.getcwd(),
-    os.path.join(
-        common.GOOGLE_APP_ENGINE_SDK_HOME, 'lib', 'yaml-3.10'),
-    os.path.join(
-        common.GOOGLE_APP_ENGINE_SDK_HOME, 'lib', 'jinja2-2.6'),
-    os.path.join(
-        common.GOOGLE_APP_ENGINE_SDK_HOME),
-    os.path.join(
-        _PARENT_DIR, 'oppia_tools', 'pip-tools-%s' % common.PIP_TOOLS_VERSION),
-    common.THIRD_PARTY_PYTHON_LIBS_DIR
+    os.path.join(common.GOOGLE_APP_ENGINE_SDK_HOME)
 ]
 
 for path in _PATHS_TO_INSERT:

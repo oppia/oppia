@@ -24,14 +24,6 @@ file is generated, we must call the CLI in a separate process.
 
 from __future__ import annotations
 
-import os
-import sys
-
-from scripts import common
-
-PIP_TOOLS_PATH = os.path.join(
-    common.OPPIA_TOOLS_DIR, 'pip-tools-%s' % common.PIP_TOOLS_VERSION)
-sys.path.insert(0, PIP_TOOLS_PATH)
 from piptools.scripts import compile  # isort:skip pylint: disable=redefined-builtin, wrong-import-position, wrong-import-order
 
 
