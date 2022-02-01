@@ -8,8 +8,8 @@
              ng-blur="$ctrl.onBlur()" ng-focus="$ctrl.onFocus()"
              ng-change="$ctrl.generateErrors()">
 
-      <span class="oppia-form-error oppia-numeric-input-error" ng-if="$ctrl.errorString">
-        <[$ctrl.errorString | translate]>
+      <span class="oppia-form-error oppia-numeric-input-error" ng-if="$ctrl.errorStringI18NKey">
+        <[$ctrl.errorStringI18NKey | translate]>
       </span>
       <span ng-if="$ctrl.hasLoaded && !$ctrl.isUserCurrentlyTyping && $ctrl.hasFocusedAtLeastOnce"
             class="position-absolute oppia-form-container"
