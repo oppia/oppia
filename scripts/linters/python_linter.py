@@ -21,10 +21,8 @@ from __future__ import annotations
 import io
 import os
 import re
-import sys
 
 from . import linter_utils
-from .. import common
 from .. import concurrent_task_utils
 
 from pylint import lint  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position

@@ -23,7 +23,6 @@ import os
 import re
 import shutil
 import subprocess
-import sys
 
 from .. import common
 from .. import concurrent_task_utils

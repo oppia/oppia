@@ -24,7 +24,6 @@ import argparse
 import datetime
 import os
 import subprocess
-import sys
 
 from core import constants
 from core import python_utils

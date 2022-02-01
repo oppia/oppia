@@ -525,7 +525,6 @@
 # Python typing
 /mypy.ini @hardikkat24 @vojtechjelinek
 /mypy_imports.py @hardikkat24 @vojtechjelinek
-/mypy_requirements.txt @hardikkat24 @vojtechjelinek
 /stubs/ @oppia/mypy-reviewers
 /scripts/run_mypy_checks*.py @oppia/mypy-reviewers
 
@@ -728,6 +727,8 @@
 /core/domain/user*.py @seanlip
 /requirements.txt @vojtechjelinek
 /requirements.in @vojtechjelinek
+/requirements-dev.txt @vojtechjelinek
+/requirements-dev.in @vojtechjelinek
 /dependencies.json @vojtechjelinek
 /package.json @vojtechjelinek
 /yarn.lock @vojtechjelinek

@@ -44,6 +44,8 @@ CODEOWNER_IMPORTANT_PATHS = [
     '/package.json',
     '/requirements.txt',
     '/requirements.in',
+    '/requirements-dev.txt',
+    '/requirements-dev.in',
     '/yarn.lock',
     '/scripts/install_third_party_libs.py',
     '/.github/',

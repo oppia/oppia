@@ -21,7 +21,6 @@ from __future__ import annotations
 
 import argparse
 import os
-import site
 import subprocess
 import sys
 
@@ -273,75 +272,25 @@ def install_third_party_libraries(skip_install: bool) -> None:
         install_third_party_libs.main()
 
 
-def get_mypy_cmd(files, mypy_exec_path, using_global_mypy):
+def get_mypy_cmd(files):
     """Return the appropriate command to be run.
 
     Args:
         files: list(list(str)). List having first element as list of string.
-        mypy_exec_path: str. Path of mypy executable.
-        using_global_mypy: bool. Whether generated command should run using
-            global mypy.
 
     Returns:
         list(str). List of command line arguments.
     """
-    if using_global_mypy:
-        mypy_cmd = 'mypy'
-    else:
-        mypy_cmd = mypy_exec_path
     if files:
-        cmd = [mypy_cmd, '--config-file', CONFIG_FILE_PATH] + files
+        cmd = ['mypy', '--config-file', CONFIG_FILE_PATH] + files
     else:
         excluded_files_regex = (
             '|'.join(NOT_FULLY_COVERED_FILES + EXCLUDED_DIRECTORIES))
         cmd = [
-            mypy_cmd, '--exclude', excluded_files_regex,
+            'mypy', '--exclude', excluded_files_regex,
             '--config-file', CONFIG_FILE_PATH, '.'
         ]
     return cmd
-
-
-def install_mypy_prerequisites(install_globally):
-    """Install mypy and type stubs from mypy_requirements.txt.
-
-    Args:
-        install_globally: bool. Whether mypy and its requirements are to be
-            installed globally.
-
-    Returns:
-        tuple(int, str). The return code from installing prerequisites and the
-        path of the mypy executable.
-    """
-    # TODO(#13398): Change MyPy installation after Python3 migration. Now, we
-    # install packages globally for CI. In CI, pip installation is not in a way
-    # we expect.
-    if install_globally:
-        cmd = [
-            PYTHON3_CMD, '-m', 'pip', 'install', '-r',
-            MYPY_REQUIREMENTS_FILE_PATH
-        ]
-    else:
-        cmd = [
-            PYTHON3_CMD, '-m', 'pip', 'install', '-r',
-            MYPY_REQUIREMENTS_FILE_PATH, '--target', MYPY_TOOLS_DIR,
-            '--upgrade'
-        ]
-    process = subprocess.Popen(
-        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    output = process.communicate()
-    if b'can\'t combine user with prefix' in output[1]:
-        uextention_text = ['--user', '--prefix=', '--system']
-        new_process = subprocess.Popen(
-            cmd + uextention_text, stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE)
-        new_process.communicate()
-        _PATHS_TO_INSERT.append(os.path.join(site.USER_BASE, 'bin'))
-        mypy_exec_path = os.path.join(site.USER_BASE, 'bin', 'mypy')
-        return (new_process.returncode, mypy_exec_path)
-    else:
-        _PATHS_TO_INSERT.append(os.path.join(MYPY_TOOLS_DIR, 'bin'))
-        mypy_exec_path = os.path.join(MYPY_TOOLS_DIR, 'bin', 'mypy')
-        return (process.returncode, mypy_exec_path)
 
 
 def main(args=None):
@@ -357,18 +306,8 @@ def main(args=None):
     install_third_party_libraries(parsed_args.skip_install)
     common.fix_third_party_imports()
 
-    print('Installing Mypy and stubs for third party libraries.')
-    return_code, mypy_exec_path = install_mypy_prerequisites(
-        parsed_args.install_globally)
-    if return_code != 0:
-        print('Cannot install Mypy and stubs for third party libraries.')
-        sys.exit(1)
-
-    print('Installed Mypy and stubs for third party libraries.')
-
     print('Starting Mypy type checks.')
-    cmd = get_mypy_cmd(
-        parsed_args.files, mypy_exec_path, parsed_args.install_globally)
+    cmd = get_mypy_cmd(parsed_args.files)
 
     env = os.environ.copy()
     for path in _PATHS_TO_INSERT:
