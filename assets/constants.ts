@@ -5163,7 +5163,7 @@ export default {
     "direction": "ltr"
   }, {
     "code": "yo",
-    "description": "Èdè Yorùbá (Yoruba)",
+    "description": "Èdè Yoùbá (Yoruba)",
     "direction": "ltr"
   }],
 
@@ -5248,132 +5248,132 @@ export default {
     "direction": "ltr"
   }, {
     "id": "ak",
-    "description": "Akan",
+    "description": "Ákán (Akan)",
     "relatedLanguages": ["ak"],
     "direction": "ltr"
   }, {
     "id": "sq",
-    "description": "Albanian",
+    "description": "shqip (Albanian)",
     "relatedLanguages": ["sq"],
     "direction": "ltr"
   }, {
     "id": "ar",
-    "description": "Arabic",
+    "description": "العربية (Arabic)",
     "relatedLanguages": ["ar"],
     "direction": "rtl"
   }, {
     "id": "az",
-    "description": "Azerbaijani",
+    "description": "Azeri (Azerbaijani)",
     "relatedLanguages": ["az"],
     "direction": "ltr"
   }, {
     "id": "bg",
-    "description": "Bulgarian",
+    "description": "български (Bulgarian)",
     "relatedLanguages": ["bg"],
     "direction": "ltr"
   }, {
     "id": "bn",
-    "description": "Bangla",
+    "description": "বাংলা (Bangla)",
     "relatedLanguages": ["bn"],
     "direction": "ltr"
   }, {
     "id": "ms",
-    "description": "Bahasa Melayu",
+    "description": "بهاس ملايو(Bahasa Melayu)",
     "relatedLanguages": ["ms"],
     "direction": "ltr"
   }, {
     "id": "ca",
-    "description": "Catalan",
+    "description": "català (Catalan)",
     "relatedLanguages": ["ca"],
     "direction": "ltr"
   }, {
     "id": "zh",
-    "description": "Chinese",
+    "description": "中文 (Chinese)",
     "relatedLanguages": ["zh"],
     "direction": "ltr"
   }, {
     "id": "hr",
-    "description": "Croatian",
+    "description": "hrvatski (Croatian)",
     "relatedLanguages": ["hr"],
     "direction": "ltr"
   }, {
     "id": "cs",
-    "description": "Czech",
+    "description": "čeština (Czech)",
     "relatedLanguages": ["cs"],
     "direction": "ltr"
   }, {
     "id": "da",
-    "description": "Danish",
+    "description": "dansk (Danish)",
     "relatedLanguages": ["da"],
     "direction": "ltr"
   }, {
     "id": "prs",
-    "description": "Dari",
+    "description": "دری (Dari)",
     "relatedLanguages": ["prs"],
     "direction": "rtl"
   }, {
     "id": "nl",
-    "description": "Dutch",
+    "description": "Nederlands (Dutch)",
     "relatedLanguages": ["nl"],
     "direction": "ltr"
   }, {
     "id": "ee",
-    "description": "Ewe",
+    "description": "Eʋegbe (Ewe)",
     "relatedLanguages": ["ee"],
     "direction": "ltr"
   }, {
     "id": "fat",
-    "description": "Fanti",
+    "description": "Fante (Fanti)",
     "relatedLanguages": ["ak", "fat"],
     "direction": "ltr"
   }, {
     "id": "tl",
-    "description": "Filipino",
+    "description": "Filipino (Filipino)",
     "relatedLanguages": ["tl"],
     "direction": "ltr"
   }, {
     "id": "fi",
-    "description": "Finnish",
+    "description": "suomi (Finnish)",
     "relatedLanguages": ["fi"],
     "direction": "ltr"
   }, {
     "id": "fr",
-    "description": "French",
+    "description": "français (French)",
     "relatedLanguages": ["fr"],
     "direction": "ltr"
   }, {
     "id": "lg",
-    "description": "Ganda",
+    "description": "Luganda (Ganda)",
     "relatedLanguages": ["lg"],
     "direction": "ltr"
   }, {
     "id": "de",
-    "description": "German",
+    "description": "Deutsch (German)",
     "relatedLanguages": ["de"],
     "direction": "ltr"
   }, {
     "id": "el",
-    "description": "Greek",
+    "description": "ελληνικά (Greek)",
     "relatedLanguages": ["el"],
     "direction": "ltr"
   }, {
     "id": "gaa",
-    "description": "Ga",
+    "description": "Gã (Ga)",
     "relatedLanguages": ["gaa"],
     "direction": "ltr"
   }, {
     "id": "ha",
-    "description": "Hausa",
+    "description": "Halshen Hausa (Hausa)",
     "relatedLanguages": ["ha"],
     "direction": "ltr"
   }, {
     "id": "he",
-    "description": "Hebrew",
+    "description": "עברית (Hebrew)",
     "relatedLanguages": ["he"],
     "direction": "rtl"
   }, {
     "id": "hi",
-    "description": "Hindi",
+    "description": "हिन्दी (Hindi)",
     "relatedLanguages": ["hi"],
     "direction": "ltr"
   }, {
@@ -5383,157 +5383,157 @@ export default {
     "direction": "ltr"
   }, {
     "id": "hu",
-    "description": "Hungarian",
+    "description": "magyar (Hungarian)",
     "relatedLanguages": ["hu"],
     "direction": "ltr"
   }, {
     "id": "id",
-    "description": "Indonesian",
+    "description": "Bahasa Indonesia (Indonesian)",
     "relatedLanguages": ["id"],
     "direction": "ltr"
   }, {
     "id": "ig",
-    "description": "Igbo",
+    "description": "Ásụ̀sụ́ Ìgbò (Igbo)",
     "relatedLanguages": ["igbo"],
     "direction": "ltr"
   }, {
     "id": "it",
-    "description": "Italian",
+    "description": "italiano (Italian)",
     "relatedLanguages": ["it"],
     "direction": "ltr"
   }, {
     "id": "ja",
-    "description": "Japanese",
+    "description": "日本語 (Japanese)",
     "relatedLanguages": ["ja"],
     "direction": "ltr"
   }, {
     "id": "kab",
-    "description": "Kabyle",
+    "description": "Taqbaylit (Kabyle)",
     "relatedLanguages": ["kab"],
     "direction": "ltr"
   }, {
     "id": "ko",
-    "description": "Korean",
+    "description": "한국어 (Korean)",
     "relatedLanguages": ["ko"],
     "direction": "ltr"
   }, {
     "id": "lv",
-    "description": "Latvian",
+    "description": "latviešu (Latvian)",
     "relatedLanguages": ["lv"],
     "direction": "ltr"
   }, {
     "id": "lt",
-    "description": "Lithuanian",
+    "description": "lietuvių (Lithuanian)",
     "relatedLanguages": ["lt"],
     "direction": "ltr"
   }, {
     "id": "mr",
-    "description": "Marathi",
+    "description": "मराठी (Marathi)",
     "relatedLanguages": ["mr"],
     "direction": "ltr"
   }, {
     "id": "no",
-    "description": "Norwegian",
+    "description": "Norsk (Norwegian)",
     "relatedLanguages": ["no"],
     "direction": "ltr"
   }, {
     "id": "fa",
-    "description": "Persian",
+    "description": "فارسی (Persian)",
     "relatedLanguages": ["fa"],
     "direction": "rtl"
   }, {
     "id": "pl",
-    "description": "Polish",
+    "description": "polszczyzna (Polish)",
     "relatedLanguages": ["pl"],
     "direction": "ltr"
   }, {
     "id": "pt",
-    "description": "Portuguese",
+    "description": "português (Portuguese)",
     "relatedLanguages": ["pt"],
     "direction": "ltr"
   }, {
     "id": "ps",
-    "description": "Pashto",
+    "description": "پښتو (Pashto)",
     "relatedLanguages": ["ps"],
     "direction": "rtl"
   }, {
     "id": "ro",
-    "description": "Romanian",
+    "description": "română (Romanian)",
     "relatedLanguages": ["ro"],
     "direction": "ltr"
   }, {
     "id": "ru",
-    "description": "Russian",
+    "description": "pусский (Russian)",
     "relatedLanguages": ["ru"],
     "direction": "ltr"
   }, {
     "id": "sr",
-    "description": "Serbian",
+    "description": "cрпски (Serbian)",
     "relatedLanguages": ["sr"],
     "direction": "ltr"
   }, {
     "id": "sk",
-    "description": "Slovak",
+    "description": "slovenčina (Slovak)",
     "relatedLanguages": ["sk"],
     "direction": "ltr"
   }, {
     "id": "sl",
-    "description": "Slovenian",
+    "description": "slovenščina (Slovenian)",
     "relatedLanguages": ["sl"],
     "direction": "ltr"
   }, {
     "id": "es",
-    "description": "Spanish",
+    "description": "español (Spanish)",
     "relatedLanguages": ["es"],
     "direction": "ltr"
   }, {
     "id": "sw",
-    "description": "Swahili",
+    "description": "kiswahili (Swahili)",
     "relatedLanguages": ["sw"],
     "direction": "ltr"
   }, {
     "id": "sv",
-    "description": "Swedish",
+    "description": "svenska (Swedish)",
     "relatedLanguages": ["sv"],
     "direction": "ltr"
   }, {
     "id": "ta",
-    "description": "Tamil",
+    "description": "தமிழ் (Tamil)",
     "relatedLanguages": ["ta"],
     "direction": "ltr"
   }, {
     "id": "te",
-    "description": "Telugu",
+    "description": "తెలుగు (Telugu)",
     "relatedLanguages": ["te"],
     "direction": "ltr"
   }, {
     "id": "th",
-    "description": "Thai",
+    "description": "ภาษาไทย (Thai)",
     "relatedLanguages": ["th"],
     "direction": "ltr"
   }, {
     "id": "tr",
-    "description": "Turkish",
+    "description": "Türkçe (Turkish)",
     "relatedLanguages": ["tr"],
     "direction": "ltr"
   }, {
     "id": "uk",
-    "description": "Ukrainian",
+    "description": "yкраїнська (Ukrainian)",
     "relatedLanguages": ["uk"],
     "direction": "ltr"
   }, {
     "id": "ur",
-    "description": "Urdu",
+    "description": "اُردُو (Urdu)",
     "relatedLanguages": ["ur"],
     "direction": "rtl"
   }, {
     "id": "vi",
-    "description": "Vietnamese",
+    "description": "Tiếng Việt (Vietnamese)",
     "relatedLanguages": ["vi"],
     "direction": "ltr"
   }, {
     "id": "yo",
-    "description": "Yoruba",
+    "description": "Èdè Yoùbá (Yoruba)",
     "relatedLanguages": ["yo"],
     "direction": "ltr"
   }],

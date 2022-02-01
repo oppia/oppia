@@ -6,8 +6,10 @@
       {{explanationPopupContent}}
     </span>
   </div>
-  <div class="oppia-translation-language-selector-inner-container protractor-test-language-selector-selected" (click)="toggleDropdown()">
-    {{languageSelection}}
+  <div class="oppia-translation-language-selector-inner-container" (click)="toggleDropdown()">
+    <span class="protractor-test-language-selector-selected">
+      {{languageSelection}}
+    </span>
     <span class="material-icons oppia-translation-language-selector-inner-container-arrow" [ngStyle]="{ 'transform': dropdownShown ? 'scaleY(-1)' : 'scaleY(1)' }">
       arrow_drop_down
     </span>

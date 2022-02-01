@@ -116,6 +116,11 @@ angular.module('oppia').component('contributorDashboardPage', {
         }
       };
 
+      ctrl.provideLanguageForProtractorClass = function(languageDescription) {
+        let lang = languageDescription.replaceAll(' ', '-').toLowerCase();
+        return lang.replace(/\(?\)?/g, '');
+      };
+
       ctrl.$onInit = function() {
         ctrl.profilePictureDataUrl = null;
         ctrl.username = null;

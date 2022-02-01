@@ -615,7 +615,7 @@ class TranslationContributionStatsHandlerTest(test_utils.GenericTestBase):
         expected_response = {
             'translation_contribution_stats': [
                 {
-                    'language': 'Spanish',
+                    'language': 'español (Spanish)',
                     'topic_name': published_topic_name,
                     'submitted_translations_count': (
                         submitted_translations_count),
@@ -632,7 +632,7 @@ class TranslationContributionStatsHandlerTest(test_utils.GenericTestBase):
                     'contribution_months': ['Mar 2021']
                 },
                 {
-                    'language': 'Spanish',
+                    'language': 'español (Spanish)',
                     'topic_name': 'UNKNOWN',
                     'submitted_translations_count': (
                         submitted_translations_count),

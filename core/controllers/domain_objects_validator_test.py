@@ -90,7 +90,7 @@ class ValidateSuggestionChangeTests(test_utils.GenericTestBase):
             'content_id': 'content',
             'language_code': 'hi',
             'content_html': '<p>old content html</p>',
-            'translation_html': '<p>In Hindi</p>',
+            'translation_html': '<p>In हिन्दी (Hindi)</p>',
             'data_format': 'html'
         }
         domain_objects_validator.validate_suggestion_change(

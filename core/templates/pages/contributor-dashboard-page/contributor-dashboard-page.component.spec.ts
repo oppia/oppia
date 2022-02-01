@@ -112,14 +112,21 @@ describe('Contributor dashboard page', function() {
         '/assets/images/avatar/oppia_avatar_100px.svg');
     });
 
+    it('should return language description in kebab case format', function() {
+      let languageDescription = 'Deutsch (German)';
+
+      expect(ctrl.provideLanguageForProtractorClass(
+        languageDescription)).toEqual('deutsch-german');
+    });
+
     it('should initialize $scope properties after controller is initialized' +
       ' and get data from backend', function() {
       expect(ctrl.userIsLoggedIn).toBe(true);
       expect(ctrl.username).toBe('username1');
       expect(ctrl.userCanReviewTranslationSuggestionsInLanguages).toEqual([
-        'English', 'Portuguese', 'Hindi']);
+        'English', 'português (Portuguese)', 'हिन्दी (Hindi)']);
       expect(ctrl.userCanReviewVoiceoverSuggestionsInLanguages).toEqual([
-        'English', 'Portuguese', 'Hindi']);
+        'English', 'português (Portuguese)', 'हिन्दी (Hindi)']);
       expect(ctrl.userCanReviewQuestions).toBe(true);
       expect(ctrl.userIsReviewer).toBe(true);
       expect(ctrl.profilePictureDataUrl).toBe(userProfileImage);
