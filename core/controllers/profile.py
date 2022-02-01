@@ -242,7 +242,7 @@ class PreferencesHandler(base.BaseHandler):
         self.render_json({
             'bulk_email_signup_message_should_be_shown': (
                 bulk_email_signup_message_should_be_shown)
-        """To send all the data all the time"""
+        #To send all the data all the time
         user_services.update_user_bio(self.user_id, data)
         user_services.update_subject_interests(self.user_id, data)
         user_services.update_preferred_language_codes(self.user_id, data)
@@ -258,6 +258,7 @@ class PreferencesHandler(base.BaseHandler):
                     data['can_receive_editor_role_email'],
                     data['can_receive_feedback_message_email'],
                     data['can_receive_subscription_email'])
+                    
 
 class ProfilePictureHandler(base.BaseHandler):
     """Provides the dataURI of the user's profile picture, or none if no user
