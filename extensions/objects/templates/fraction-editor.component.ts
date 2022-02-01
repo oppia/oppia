@@ -36,7 +36,7 @@ export class FractionEditorComponent implements OnInit {
   @Input() modalId!: symbol;
   @Input() value!: FractionAnswer;
   @Output() valueChanged = new EventEmitter();
-  errorMessage: string = '';
+  errorMessageI18NKey: string = '';
   fractionString: string = '0';
   currentFractionValueIsValid = false;
   eventBus: EventBusGroup;
@@ -54,7 +54,7 @@ export class FractionEditorComponent implements OnInit {
 
   validateFraction(newFraction: string): void {
     if (newFraction.length === 0) {
-      this.errorMessage = 'I18N_INTERACTIONS_FRACTIONS_NON_EMPTY';
+      this.errorMessageI18NKey = 'I18N_INTERACTIONS_FRACTIONS_NON_EMPTY';
       this.currentFractionValueIsValid = false;
       return;
     }
@@ -64,11 +64,11 @@ export class FractionEditorComponent implements OnInit {
         this.value = Fraction.fromRawInputString(newFraction);
         this.valueChanged.emit(this.value);
       }
-      this.errorMessage = '';
+      this.errorMessageI18NKey = '';
       this.currentFractionValueIsValid = true;
     } catch (parsingError: unknown) {
       if (parsingError instanceof Error) {
-        this.errorMessage = parsingError.message;
+        this.errorMessageI18NKey = parsingError.message;
       }
       this.currentFractionValueIsValid = false;
     } finally {

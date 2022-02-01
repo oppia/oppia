@@ -42,7 +42,7 @@ export class InteractiveNumberWithUnitsComponent
   @Input() savedSolution: InteractionAnswer;
   componentSubscriptions: Subscription = new Subscription();
   FORM_ERROR_TYPE: string = 'NUMBER_WITH_UNITS_FORMAT_ERROR';
-  errorMessage: string = '';
+  errorMessageI18NKey: string = '';
   answer: string = '';
   isValid: boolean = true;
   answerChanged: Subject<string> = new Subject<string>();
@@ -66,10 +66,10 @@ export class InteractiveNumberWithUnitsComponent
     ).subscribe(newValue => {
       try {
         this.numberWithUnitsObjectFactory.fromRawInputString(newValue);
-        this.errorMessage = '';
+        this.errorMessageI18NKey = '';
         this.isValid = true;
       } catch (parsingError) {
-        this.errorMessage = parsingError.message;
+        this.errorMessageI18NKey = parsingError.message;
         this.isValid = false;
       }
       this.currentInteractionService.updateViewWithNewAnswer();
@@ -111,7 +111,7 @@ export class InteractiveNumberWithUnitsComponent
         numberWithUnits as unknown as string,
         this.numberWithUnitsRulesService as unknown as InteractionRulesService);
     } catch (parsingError) {
-      this.errorMessage = parsingError.message;
+      this.errorMessageI18NKey = parsingError.message;
       this.isValid = false;
     }
   }

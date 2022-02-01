@@ -335,22 +335,32 @@ describe('NumericInputValidationService', () => {
     });
 
   it('should generate errors in the given input', () => {
-    expect(validatorService.getErrorString(1200000000E+27, false)).toEqual(
+    expect(
+      validatorService.getErrorStringI18nKey(1200000000E+27, false)).toEqual(
       'I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_2');
-    expect(validatorService.getErrorString(1200000000E-27, false)).toEqual(
+    expect(
+      validatorService.getErrorStringI18nKey(1200000000E-27, false)).toEqual(
       'I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_2');
-    expect(validatorService.getErrorString(999999999999999, false)).toEqual(
+    expect(
+      validatorService.getErrorStringI18nKey(999999999999999, false)).toEqual(
       undefined);
-    expect(validatorService.getErrorString(99.9999999999999, false)).toEqual(
+    expect(
+      validatorService.getErrorStringI18nKey(99.9999999999999, false)).toEqual(
       undefined);
-    expect(validatorService.getErrorString(-9.9999999999999, false)).toEqual(
+    expect(
+      validatorService.getErrorStringI18nKey(-9.9999999999999, false)).toEqual(
       undefined);
-    expect(validatorService.getErrorString(2.2, false)).toEqual(undefined);
-    expect(validatorService.getErrorString(-2.2, false)).toEqual(undefined);
-    expect(validatorService.getErrorString(34.56, false)).toEqual(undefined);
-    expect(validatorService.getErrorString(99999999999999, true)).toEqual(
+    expect(
+      validatorService.getErrorStringI18nKey(2.2, false)).toEqual(undefined);
+    expect(
+      validatorService.getErrorStringI18nKey(-2.2, false)).toEqual(undefined);
+    expect(
+      validatorService.getErrorStringI18nKey(34.56, false)).toEqual(undefined);
+    expect(
+      validatorService.getErrorStringI18nKey(99999999999999, true)).toEqual(
       undefined);
-    expect(validatorService.getErrorString(9999999999999999, true)).toEqual(
+    expect(
+      validatorService.getErrorStringI18nKey(9999999999999999, true)).toEqual(
       'I18N_INTERACTIONS_NUMERIC_INPUT_ERROR_MESSAGE_1');
   });
 });

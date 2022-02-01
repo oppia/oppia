@@ -85,11 +85,11 @@ describe('Number with units interaction component', () => {
 
   it('should not display warning when the answer format is correct',
     fakeAsync(() => {
-      component.errorMessage = 'Unit "xyz" not found';
+      component.errorMessageI18NKey = 'Unit "xyz" not found';
       component.isValid = false;
 
       // PreChecks.
-      expect(component.errorMessage).toBe('Unit "xyz" not found');
+      expect(component.errorMessageI18NKey).toBe('Unit "xyz" not found');
       expect(component.isValid).toBeFalse();
 
       // Test: Correct answer.
@@ -100,14 +100,14 @@ describe('Number with units interaction component', () => {
 
       // PostChecks: The format of the answer '24 km' is correct,
       // Therefore we verify that the value of errorMessage is ''.
-      expect(component.errorMessage).toBe('');
+      expect(component.errorMessageI18NKey).toBe('');
       expect(component.isValid).toBeTrue();
     }));
 
   it('should display warning when the answer format is incorrect',
     fakeAsync(() => {
       // PreChecks.
-      expect(component.errorMessage).toBe('');
+      expect(component.errorMessageI18NKey).toBe('');
       expect(component.isValid).toBeTrue();
 
       // Test: Incorrect answer.
@@ -117,7 +117,7 @@ describe('Number with units interaction component', () => {
       tick(150);
 
       // PostChecks: Error message as the Unit is incorrect.
-      expect(component.errorMessage).toBe('Unit "k" not found.');
+      expect(component.errorMessageI18NKey).toBe('Unit "k" not found.');
       expect(component.isValid).toBeFalse();
     }));
 
@@ -179,11 +179,11 @@ describe('Number with units interaction component', () => {
   it('should show error when user submits answer in incorrect format', () => {
     component.answer = '24 k';
 
-    expect(component.errorMessage).toBe('');
+    expect(component.errorMessageI18NKey).toBe('');
 
     component.submitAnswer();
 
-    expect(component.errorMessage).toBe('Unit "k" not found.');
+    expect(component.errorMessageI18NKey).toBe('Unit "k" not found.');
   });
 
   it('should unsubscribe when component is destroyed', function() {

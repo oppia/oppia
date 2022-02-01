@@ -56,7 +56,7 @@ describe('FractionEditorComponent', () => {
     component.validateFraction('1/2');
 
     expect(component.currentFractionValueIsValid).toBeTrue();
-    expect(component.errorMessage).toBe('');
+    expect(component.errorMessageI18NKey).toBe('');
     expect(component.eventBus.emit).toHaveBeenCalledWith(
       jasmine.objectContaining({
         message: {
@@ -74,7 +74,7 @@ describe('FractionEditorComponent', () => {
       component.validateFraction('1?2');
 
       expect(component.currentFractionValueIsValid).toBeFalse();
-      expect(component.errorMessage).toBe(
+      expect(component.errorMessageI18NKey).toBe(
         'I18N_INTERACTIONS_FRACTIONS_INVALID_CHARS'
       );
       expect(component.eventBus.emit).toHaveBeenCalledWith(
@@ -91,7 +91,7 @@ describe('FractionEditorComponent', () => {
     component.validateFraction('');
 
     expect(component.currentFractionValueIsValid).toBeFalse();
-    expect(component.errorMessage).toBe(
+    expect(component.errorMessageI18NKey).toBe(
       'I18N_INTERACTIONS_FRACTIONS_NON_EMPTY'
     );
   });

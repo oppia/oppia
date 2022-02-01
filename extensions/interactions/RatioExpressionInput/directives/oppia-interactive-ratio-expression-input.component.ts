@@ -43,11 +43,11 @@ angular.module('oppia').component('oppiaInteractiveRatioExpressionInput', {
         InteractionAttributesExtractorService,
         RatioExpressionInputRulesService) {
       var ctrl = this;
-      var errorMessage = '';
+      var errorMessageI18NKey = '';
       // Label for errors caused whilst parsing ratio expression.
       var FORM_ERROR_TYPE = 'RATIO_EXPRESSION_INPUT_FORMAT_ERROR';
-      ctrl.getWarningText = function() {
-        return errorMessage;
+      ctrl.getWarningTextI18NKey = function() {
+        return errorMessageI18NKey;
       };
 
       ctrl.submitAnswer = function(answer) {
@@ -63,14 +63,14 @@ angular.module('oppia').component('oppiaInteractiveRatioExpressionInput', {
               'The creator has specified the number of terms in' +
               ' the answer to be ' + ctrl.expectedNumberOfTerms + '.');
           }
-          errorMessage = '';
+          errorMessageI18NKey = '';
           ctrl.RatioExpressionInputForm.answer.$setValidity(
             FORM_ERROR_TYPE, true);
           CurrentInteractionService.onSubmit(
             ratioExpression.getComponents(),
             RatioExpressionInputRulesService);
         } catch (parsingError) {
-          errorMessage = parsingError.message;
+          errorMessageI18NKey = parsingError.message;
           ctrl.RatioExpressionInputForm.answer.$setValidity(
             FORM_ERROR_TYPE, false);
         }
@@ -93,7 +93,7 @@ angular.module('oppia').component('oppiaInteractiveRatioExpressionInput', {
 
       ctrl.$onInit = function() {
         $scope.$watch('$ctrl.answer', function(newValue) {
-          errorMessage = '';
+          errorMessageI18NKey = '';
           ctrl.RatioExpressionInputForm.answer.$setValidity(
             FORM_ERROR_TYPE, true);
         });

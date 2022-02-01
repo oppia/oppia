@@ -206,7 +206,7 @@ export class NumericInputValidationService {
     return warningsList;
   }
   // Returns 'undefined' when no error occurs.
-  getErrorString(
+  getErrorStringI18nKey(
       value: number, customizationArgs: boolean
   ): string | undefined {
     let stringValue = null;

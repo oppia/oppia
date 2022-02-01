@@ -83,7 +83,7 @@ describe('RatioExpressionInputInteractive', function() {
         type: 'unicode',
         ui_config: {}
       });
-      expect(ctrl.getWarningText()).toEqual('');
+      expect(ctrl.getWarningTextI18NKey()).toEqual('');
       expect(
         mockCurrentInteractionService.registerCurrentInteraction
       ).toHaveBeenCalled();
@@ -100,7 +100,7 @@ describe('RatioExpressionInputInteractive', function() {
       ctrl.RatioExpressionInputForm.$invalid = false;
       spyOn(mockCurrentInteractionService, 'onSubmit');
       ctrl.submitAnswer(ctrl.answer);
-      expect(ctrl.getWarningText()).toEqual(
+      expect(ctrl.getWarningTextI18NKey()).toEqual(
         'The creator has specified the number of terms in the answer to be 3.');
       expect(mockCurrentInteractionService.onSubmit).not.toHaveBeenCalled();
       expect(ctrl.isAnswerValid()).toBe(false);

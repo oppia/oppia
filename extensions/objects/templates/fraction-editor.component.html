@@ -1,7 +1,7 @@
 <input type="text" [(ngModel)]="fractionString" class="form-control" (ngModelChange)="validateFraction($event)">
 <br>
 <div class="oppia-form-error oppia-fraction-error">
-  {{ errorMessage | translate }}
+  {{ errorMessageI18NKey | translate }}
 </div>
 <br>
 <style>
