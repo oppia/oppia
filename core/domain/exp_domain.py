@@ -2620,7 +2620,7 @@ class ExplorationSummary:
                     'Expected value to be non-negative, received %s' % (
                         value))
 
-        if not isinstance(self.scaled_average_rating, float):
+        if not isinstance(self.scaled_average_rating, (float, int)):
             raise utils.ValidationError(
                 'Expected scaled_average_rating to be float, received %s' % (
                     self.scaled_average_rating))
