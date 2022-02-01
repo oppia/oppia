@@ -27,7 +27,7 @@ import zipfile
 TOOLS_DIR = os.path.join(os.pardir, 'oppia_tools')
 
 subprocess.check_call(
-    ['pip', 'install', '-r', 'requirements-dev.txt'],
+    ['pip', 'install', '--upgrade', '-r', 'requirements-dev.txt'],
     stdin=subprocess.PIPE,
     stdout=subprocess.PIPE
 )
@@ -36,7 +36,6 @@ subprocess.check_call(
 from core import python_utils  # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
 
 from . import common  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-from . import install_backend_python_libs  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import install_third_party  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import pre_commit_hook  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import pre_push_hook  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
@@ -63,12 +62,11 @@ BUF_DARWIN_FILES = [
 PROTOC_URL = (
     'https://github.com/protocolbuffers/protobuf/releases/download/v%s' %
     common.PROTOC_VERSION)
-PROTOC_LINUX_FILE = 'protoc-%s-linux-x86_64.zip' % (common.PROTOC_VERSION)
-PROTOC_DARWIN_FILE = 'protoc-%s-osx-x86_64.zip' % (common.PROTOC_VERSION)
+PROTOC_LINUX_FILE = 'protoc-%s-linux-x86_64.zip' % common.PROTOC_VERSION
+PROTOC_DARWIN_FILE = 'protoc-%s-osx-x86_64.zip' % common.PROTOC_VERSION
 
 # Path of the buf executable.
-BUF_DIR = os.path.join(
-    common.OPPIA_TOOLS_DIR, 'buf-%s' % common.BUF_VERSION)
+BUF_DIR = os.path.join(common.OPPIA_TOOLS_DIR, 'buf-%s' % common.BUF_VERSION)
 PROTOC_DIR = os.path.join(BUF_DIR, 'protoc')
 # Path of files which needs to be compiled by protobuf.
 PROTO_FILES_PATHS = [
@@ -163,69 +161,10 @@ def compile_protobuf_files(proto_files_paths):
                 r'^import (\w*_pb2 as)', r'from proto_files import \1')
 
 
-def ensure_pip_library_is_installed(package, version, path):
-    """Installs the pip library after ensuring its not already installed.
-
-    Args:
-        package: str. The package name.
-        version: str. The package version.
-        path: str. The installation path for the package.
-    """
-    print('Checking if %s is installed in %s' % (package, path))
-
-    if package.startswith('git+'):
-        exact_lib_path = os.path.join(
-            path,
-            '%s-%s' % (
-                package[package.rindex('/') + 1:package.index('.git')],
-                version
-            )
-        )
-    else:
-        exact_lib_path = os.path.join(path, '%s-%s' % (package, version))
-
-    if not os.path.exists(exact_lib_path):
-        print('Installing %s' % package)
-        if package.startswith('git+'):
-            install_backend_python_libs.pip_install(
-                '%s@%s' % (package, version), exact_lib_path)
-        else:
-            install_backend_python_libs.pip_install(
-                '%s==%s' % (package, version), exact_lib_path)
-
-
-def ensure_system_python_libraries_are_installed(package, version):
-    """Installs the pip library with the corresponding version to the system
-    globally. This is necessary because the development application server
-    requires certain libraries on the host machine.
-
-    Args:
-        package: str. The package name.
-        version: str. The package version.
-    """
-    print('Checking if %s is installed.' % (package))
-    install_backend_python_libs.pip_install_to_system(package, version)
-
-
 def main() -> None:
     """Install third-party libraries for Oppia."""
     setup.main(args=[])
     setup_gae.main(args=[])
-    # These system python libraries are REQUIRED to start the development server
-    # and cannot be added to oppia_tools because the dev_appserver python script
-    # looks for them in the default system paths when it is run. Therefore, we
-    # must install these libraries to the developer's computer.
-    local_pip_dependencies = [
-        ('coverage', common.COVERAGE_VERSION, common.OPPIA_TOOLS_DIR),
-        (
-            'git+https://github.com/oppia/pip-tools.git',
-            common.PIP_TOOLS_VERSION,
-            common.OPPIA_TOOLS_DIR
-        ),
-    ]
-
-    for package, version, path in local_pip_dependencies:
-        ensure_pip_library_is_installed(package, version, path)
 
     # Download and install required JS and zip files.
     print('Installing third-party JS libraries and zip files.')
@@ -274,7 +213,8 @@ def main() -> None:
         root_path = path_list[0]
         if not root_path.endswith('__pycache__'):
             with python_utils.open_file(
-                os.path.join(root_path, '__init__.py'), 'a'):
+                os.path.join(root_path, '__init__.py'), 'a'
+            ):
                 # If the file doesn't exist, it is created. If it does exist,
                 # this open does nothing.
                 pass

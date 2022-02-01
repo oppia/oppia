@@ -452,7 +452,7 @@ def main(args=None):
         raise Exception(
             'The redis command line interface will not be installed because '
             'your machine is on the Windows operating system.')
-    unused_parsed_args = _PARSER.parse_args(args=args)
+    _PARSER.parse_args(args=args)
     install_backend_python_libs.main()
     download_all_dependencies(DEPENDENCIES_FILE_PATH)
     install_redis_cli()

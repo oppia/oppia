@@ -644,13 +644,7 @@ def validate_metadata_directories():
                 normalized_library_name)
 
 
-def main():
-    """Compares the state of the current 'third_party/python_libs' directory to
-    the libraries listed in the 'requirements.txt' file. If there are
-    mismatches, regenerate the 'requirements.txt' file and correct the
-    mismatches.
-    """
-    verify_pip_is_installed()
+def regenerate_txt():
     print('Regenerating "requirements.txt" file...')
     # Calls the script to regenerate requirements. The reason we cannot call the
     # regenerate requirements functionality inline is because the python script
@@ -683,6 +677,16 @@ def main():
             '# you want to add, remove, upgrade, or downgrade libraries,\n'
             '# please change the `requirements.in` file, and then follow\n'
             '# the instructions there to regenerate this file.\n' + content)
+
+
+
+def main():
+    """Compares the state of the current 'third_party/python_libs' directory to
+    the libraries listed in the 'requirements.txt' file. If there are
+    mismatches, regenerate the 'requirements.txt' file and correct the
+    mismatches.
+    """
+    verify_pip_is_installed()
 
     mismatches = get_mismatches()
     if mismatches:
