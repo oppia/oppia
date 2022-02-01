@@ -462,24 +462,29 @@ def get_translation_opportunities(language_code, topic_name, cursor):
         opportunity_models
         .ExplorationOpportunitySummaryModel.get_all_translation_opportunities(
             page_size, cursor, language_code, topic_name))
-    opportunities = []
-    opportunity_exp_ids = [
+    opportunity_summaries = []
+    opportunity_summary_exp_ids = [
         opportunity.id for opportunity in exp_opportunity_summary_models]
     exp_id_to_in_review_count = {}
-    if len(opportunity_exp_ids) > 0:
+    if len(opportunity_summary_exp_ids) > 0:
         exp_id_to_in_review_count = (
             _build_exp_id_to_translation_suggestion_in_review_count(
-                opportunity_exp_ids, language_code))
+                opportunity_summary_exp_ids, language_code))
     for exp_opportunity_summary_model in exp_opportunity_summary_models:
-        opportunity = (
+        opportunity_summary = (
             get_exploration_opportunity_summary_from_model(
                 exp_opportunity_summary_model))
-        if opportunity.id in exp_id_to_in_review_count:
-            opportunity.translation_in_review_counts = {
-                language_code: exp_id_to_in_review_count[opportunity.id]
+        if opportunity_summary.id in exp_id_to_in_review_count:
+            # Compute the translation_in_review_counts domain object field
+            # adhoc. Note that this field is not persisted and is only used in
+            # the frontend.
+            # TODO(#14833): Compute this value in the backend controller
+            # instead.
+            opportunity_summary.translation_in_review_counts = {
+                language_code: exp_id_to_in_review_count[opportunity_summary.id]
             }
-        opportunities.append(opportunity)
-    return opportunities, cursor, more
+        opportunity_summaries.append(opportunity_summary)
+    return opportunity_summaries, cursor, more
 
 
 def _build_exp_id_to_translation_suggestion_in_review_count(
@@ -503,9 +508,8 @@ def _build_exp_id_to_translation_suggestion_in_review_count(
         .get_translation_suggestions_in_review_by_exp_ids(
             exp_ids, language_code))
     for suggestion in suggestions_in_review:
-        if suggestion is None:
-            continue
-        exp_id_to_in_review_count[suggestion.target_id] += 1
+        if suggestion is not None:
+            exp_id_to_in_review_count[suggestion.target_id] += 1
     return exp_id_to_in_review_count
 
 
