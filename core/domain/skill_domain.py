@@ -20,7 +20,6 @@ import copy
 import datetime
 import json
 
-
 from core import android_validation_constants
 from core import feconf
 from core import utils
@@ -387,6 +386,13 @@ class Rubric:
                     explanation)
 
 
+class WorkedExampleDict(TypedDict):
+    """Dictionary representing the WorkedExample Domain Object"""
+
+    question: Dict[str, state_domain.SubtitledHtml]
+    explanation: Dict[str, state_domain.SubtitledHtml]
+
+
 class WorkedExample:
     """Domain object for representing the worked_example dict."""
 
@@ -423,7 +429,7 @@ class WorkedExample:
                 'received %s' % self.question)
         self.explanation.validate() # type: ignore[no-untyped-call]
 
-    def to_dict(self) -> Dict[str, Dict[str, state_domain.SubtitledHtml]]:
+    def to_dict(self) -> WorkedExampleDict:
         """Returns a dict representing this WorkedExample domain object.
 
         Returns:
@@ -436,9 +442,7 @@ class WorkedExample:
 
     @classmethod
     def from_dict(
-        cls,
-        worked_example_dict: Dict[str,
-        Dict[str, state_domain.SubtitledHtml]]
+        cls, worked_example_dict: WorkedExampleDict
     ) -> WorkedExample:
         """Return a WorkedExample domain object from a dict.
 
@@ -467,7 +471,7 @@ class SkillContentsDict(TypedDict):
     """Dictionary representing the Skill Contents Domain Object"""
 
     explanation: Dict[str, state_domain.SubtitledHtml]
-    worked_examples: List[Dict[str, Dict[str, state_domain.SubtitledHtml]]]
+    worked_examples: List[WorkedExampleDict]
     recorded_voiceovers: Dict[str, Dict[str, state_domain.RecordedVoiceovers]]
     written_translations: Dict[str, Dict[str, state_domain.WrittenTranslations]]
 
@@ -953,9 +957,9 @@ class Skill:
     def from_dict(
         cls,
         skill_dict: SkillDict,
-        skill_version: int=0,
-        skill_created_on: Optional[datetime.datetime]=None,
-        skill_last_updated: Optional[datetime.datetime]=None
+        skill_version: int = 0,
+        skill_created_on: Optional[datetime.datetime] = None,
+        skill_last_updated: Optional[datetime.datetime] = None
     ) -> Skill:
         """Returns a Skill domain object from a dict.
 
@@ -1056,8 +1060,9 @@ class Skill:
     def convert_html_fields_in_skill_contents(
         cls,
         skill_contents_dict: SkillContentsDict,
-        conversion_fn: Callable[[state_domain.SubtitledHtml],
-        state_domain.SubtitledHtml]
+        conversion_fn: Callable[
+            [state_domain.SubtitledHtml], state_domain.SubtitledHtml
+        ]
     ) -> SkillContentsDict:
         """Applies a conversion function on all the html strings in a skill
         to migrate them to a desired state.
@@ -1089,8 +1094,7 @@ class Skill:
 
     @classmethod
     def _convert_skill_contents_v1_dict_to_v2_dict(
-        cls,
-        skill_contents_dict: SkillContentsDict
+        cls, skill_contents_dict: SkillContentsDict
     ) -> SkillContentsDict:
         """Converts v1 skill contents to the v2 schema. In the v2 schema,
         the new Math components schema is introduced.
@@ -1107,8 +1111,7 @@ class Skill:
 
     @classmethod
     def _convert_skill_contents_v2_dict_to_v3_dict(
-        cls,
-        skill_contents_dict: SkillContentsDict
+        cls, skill_contents_dict: SkillContentsDict
     ) -> SkillContentsDict:
         """Converts v2 skill contents to the v3 schema. The v3 schema
         deprecates oppia-noninteractive-svgdiagram tag and converts existing
@@ -1126,8 +1129,7 @@ class Skill:
 
     @classmethod
     def _convert_skill_contents_v3_dict_to_v4_dict(
-        cls,
-        skill_contents_dict: SkillContentsDict
+        cls, skill_contents_dict: SkillContentsDict
     ) -> SkillContentsDict:
         """Converts v3 skill contents to the v4 schema. The v4 schema
         fixes HTML encoding issues.
@@ -1202,8 +1204,7 @@ class Skill:
 
     @classmethod
     def _convert_misconception_v1_dict_to_v2_dict(
-        cls,
-        misconception_dict: MisconceptionDict
+        cls, misconception_dict: MisconceptionDict
     ) -> MisconceptionDict:
         """Converts v1 misconception schema to the v2 schema. In the v2 schema,
         the field must_be_addressed has been added.
@@ -1219,8 +1220,7 @@ class Skill:
 
     @classmethod
     def _convert_misconception_v2_dict_to_v3_dict(
-        cls,
-        misconception_dict: MisconceptionDict
+        cls, misconception_dict: MisconceptionDict
     ) -> MisconceptionDict:
         """Converts v2 misconception schema to the v3 schema. In the v3 schema,
         the new Math components schema is introduced.
@@ -1241,8 +1241,7 @@ class Skill:
 
     @classmethod
     def _convert_misconception_v3_dict_to_v4_dict(
-        cls,
-        misconception_dict: MisconceptionDict
+        cls, misconception_dict: MisconceptionDict
     ) -> MisconceptionDict:
         """Converts v3 misconception schema to the v4 schema. The v4 schema
         deprecates oppia-noninteractive-svgdiagram tag and converts existing
@@ -1264,8 +1263,7 @@ class Skill:
 
     @classmethod
     def _convert_misconception_v4_dict_to_v5_dict(
-        cls,
-        misconception_dict: MisconceptionDict
+        cls, misconception_dict: MisconceptionDict
     ) -> MisconceptionDict:
         """Converts v4 misconception schema to the v5 schema. The v5 schema
         fixes HTML encoding issues.
@@ -1286,8 +1284,7 @@ class Skill:
 
     @classmethod
     def _convert_rubric_v1_dict_to_v2_dict(
-        cls,
-        rubric_dict: RubricDict
+        cls, rubric_dict: RubricDict
     ) -> RubricDict:
         """Converts v1 rubric schema to the v2 schema. In the v2 schema,
         multiple explanations have been added for each difficulty.
@@ -1298,10 +1295,9 @@ class Skill:
         Returns:
             dict. The converted rubric_dict.
         """
-        # Using type ignore[misc] below because the Rubric domain object
-        # contains an explanations field instead of explanation
-        # Hence RubricDict has an explanations key instead of explanation
-        # but the below code is using explanation.
+        # Using type ignore[misc] below because the existing
+        # Rubric schema contains explanations but the below
+        # code uses explanation.
         explanation = rubric_dict['explanation'] # type: ignore[misc]
         del rubric_dict['explanation'] # type: ignore[misc]
         rubric_dict['explanations'] = [explanation]
@@ -1309,8 +1305,7 @@ class Skill:
 
     @classmethod
     def _convert_rubric_v2_dict_to_v3_dict(
-        cls,
-        rubric_dict: RubricDict
+        cls, rubric_dict: RubricDict
     ) -> RubricDict:
         """Converts v2 rubric schema to the v3 schema. In the v3 schema,
         the new Math components schema is introduced.
@@ -1330,8 +1325,7 @@ class Skill:
 
     @classmethod
     def _convert_rubric_v3_dict_to_v4_dict(
-        cls,
-        rubric_dict: RubricDict
+        cls, rubric_dict: RubricDict
     ) -> RubricDict:
         """Converts v3 rubric schema to the v4 schema. The v4 schema
         deprecates oppia-noninteractive-svgdiagram tag and converts existing
@@ -1352,8 +1346,7 @@ class Skill:
 
     @classmethod
     def _convert_rubric_v4_dict_to_v5_dict(
-        cls,
-        rubric_dict: RubricDict
+        cls, rubric_dict: RubricDict
     ) -> RubricDict:
         """Converts v4 rubric schema to the v5 schema. The v4 schema
         fixes HTML encoding issues.
@@ -1561,8 +1554,7 @@ class Skill:
             misconception.id)
 
     def _find_prerequisite_skill_id_index(
-        self,
-        skill_id_to_find: str
+        self, skill_id_to_find: str
     ) -> Optional[int]:
         """Returns the index of the skill_id in the prerequisite_skill_ids
         array.
@@ -1738,7 +1730,7 @@ class Skill:
 
 
 class SkillSummaryDict(TypedDict):
-    """Dict for Skill Summary Domain Object"""
+    """Dictionary representing the Skill Summary Domain Object"""
 
     id: str
     description: str
@@ -1851,7 +1843,7 @@ class SkillSummary:
 
 
 class AugmentedSkillSummaryDict(TypedDict):
-    """Dict for Augmented Skill Summary Domain Object"""
+    """Dictionary representing the Augmented Skill Summary Domain Object"""
 
     id: str
     description: str
@@ -1938,7 +1930,7 @@ class AugmentedSkillSummary:
 
 
 class TopicAssignmentDict(TypedDict):
-    """Dict for Topic Assignment Domain Object"""
+    """Dictionary representing the Topic Assignment Domain Object"""
 
     topic_id: str
     topic_name: str
@@ -1990,7 +1982,7 @@ class TopicAssignment:
 
 
 class UserSkillMasteryDict(TypedDict):
-    """Dict for User Skill Mastery Domain Object"""
+    """Dictionary representing the User Skill Mastery Domain Object"""
 
     user_id: str
     skill_id: str

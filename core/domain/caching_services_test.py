@@ -839,8 +839,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             '0', [skill_id])
 
         self.assertEqual(
-            default_skill.to_dict(),
-            skills[skill_id].to_dict())
+            default_skill.to_dict(), skills[skill_id].to_dict()
+        )
 
     def test_topics_with_unicode_characters_are_set_and_get_correctly(
         self
