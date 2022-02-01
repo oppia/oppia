@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for LearnerDashboardIconsComponent.
  */
 
+import { SimpleChanges } from '@angular/core';
 import { async, ComponentFixture, fakeAsync, flushMicrotasks, TestBed, tick } from
   '@angular/core/testing';
 
@@ -121,6 +122,24 @@ describe('Learner Dashboard Icons Component', () => {
     expect(learnerDashboardSpy).toHaveBeenCalled();
   }
   ));
+
+  it('should update hover state on changes', fakeAsync(() => {
+    let updateHoverStateSpy = spyOn(
+      component, 'setHoverState');
+    let updateCanActivityBeAddedToLearnerPlaylist = spyOn(
+      component, 'canActivityBeAddedToLearnerPlaylist');
+    const changes: SimpleChanges = {
+      activityActive: {
+        previousValue: false,
+        currentValue: true,
+        firstChange: false,
+        isFirstChange: () => false
+      }
+    };
+    component.ngOnChanges(changes);
+    expect(updateHoverStateSpy).toHaveBeenCalled();
+    expect(updateCanActivityBeAddedToLearnerPlaylist).toHaveBeenCalled();
+  }));
 
   it('should get value of activityActive', fakeAsync(() => {
     component.activityIsCurrentlyHoveredOver = false;
