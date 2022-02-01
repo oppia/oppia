@@ -27,17 +27,6 @@ import zipfile
 TOOLS_DIR = os.path.join(os.pardir, 'oppia_tools')
 
 subprocess.check_call(
-    [
-        'python',
-        '-m',
-        'scripts.regenerate_requirements',
-        '--no-emit-index-url',
-        'requirements-dev.in'
-    ],
-    stdin=subprocess.PIPE,
-    stdout=subprocess.PIPE
-)
-subprocess.check_call(
     ['pip', 'install', '-r', 'requirements-dev.txt'],
     stdin=subprocess.PIPE,
     stdout=subprocess.PIPE
