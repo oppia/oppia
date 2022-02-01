@@ -107,7 +107,7 @@
             <i *ngIf="selectionDetails.languageCodes.selections[item.id]" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
           </a>
           <a (click)="toggleSelection('languageCodes', item.id)" *ngIf="last" (keydown)="onMenuKeypress($event, 'language', {tab: ACTION_CLOSE})"
-            class="dropdown-item">
+             class="dropdown-item">
             <span class="protractor-test-selected">{{ item.text | translate }}</span>
             <i *ngIf="selectionDetails.languageCodes.selections[item.id]" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
           </a>
@@ -128,7 +128,7 @@
             <i *ngIf="selectionDetails.languageCodes.selections[item.id]" class="material-icons md-18  float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
           </a>
           <a (click)="toggleSelection('languageCodes', item.id)" *ngIf="last" (keydown)="onMenuKeypress($event, 'language', {tab: ACTION_CLOSE})"
-            class="dropdown-item">
+             class="dropdown-item">
             <span class="protractor-test-deselected">{{ item.text | translate }}</span>
             <i *ngIf="selectionDetails.languageCodes.selections[item.id]" class="material-icons md-18  float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
           </a>
@@ -139,9 +139,9 @@
   <div class="oppia-same-row-container">
     <div class="search-bar-float-left oppia-navbar-button-container">
       <div *ngIf="searchButtonIsActive"
-          class="oppia-search-button protractor-test-search-button"
-          (click)="onSearchQueryChangeExec()"
-          title="Click here to search">
+           class="oppia-search-button protractor-test-search-button"
+           (click)="onSearchQueryChangeExec()"
+           title="Click here to search">
         <i class="material-icons md-18 search-button-icon">&#xe8b6;</i>
       </div>
     </div>
