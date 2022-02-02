@@ -450,15 +450,6 @@ def does_diff_include_ci_config_or_js_files(diff_files):
     return False
 
 
-def check_for_backend_python_library_inconsistencies():
-    """Checks the state of the 'third_party/python_libs' folder and compares it
-    to the required libraries specified in 'requirements.txt'.
-    If any inconsistencies are found, the script displays the inconsistencies
-    and exits.
-    """
-    mismatches = install_backend_python_libs.get_mismatches()
-
-
 def main(args=None):
     """Main method for pre-push hook that executes the Python/JS linters on all
     files that deviate from develop.
@@ -484,8 +475,6 @@ def main(args=None):
             'Your repo is in a dirty state which prevents the linting from'
             ' working.\nStash your changes or commit them.\n')
         sys.exit(1)
-
-    check_for_backend_python_library_inconsistencies()
 
     for branch, (modified_files, files_to_lint) in collected_files.items():
         with ChangedBranch(branch):
