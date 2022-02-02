@@ -20,8 +20,6 @@ from __future__ import annotations
 
 import contextlib
 
-from core.platform import models
-
 from google.cloud import ndb
 
 from typing import (
