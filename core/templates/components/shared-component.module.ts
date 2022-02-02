@@ -103,6 +103,7 @@ import { AddHintModalComponent } from 'pages/exploration-editor-page/editor-tab/
 import { SmoothHeightAnimatorComponent } from './smooth-height/smooth-height-animator.component';
 import { HintEditorComponent } from 'components/state-directives/hint-editor/hint-editor.component';
 import { ResponseHeaderComponent } from './state-directives/response-header/response-header.component';
+import { StateContentEditorComponent } from './state-editor/state-content-editor/state-content-editor.component';
 import { StateHintsEditorComponent } from 'components/state-editor/state-hints-editor/state-hints-editor.component';
 import { ReviewMaterialEditorComponent } from './review-material-editor/review-material-editor.component';
 
@@ -202,6 +203,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     SmoothHeightAnimatorComponent,
     SkillSelectorComponent,
     SkillMasteryViewerComponent,
+    StateContentEditorComponent,
     StateHintsEditorComponent,
     StateSkillEditorComponent,
     StorySummaryTileComponent,
@@ -280,6 +282,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     RatingDisplayComponent,
     ResponseHeaderComponent,
     RubricsEditorComponent,
+    StateContentEditorComponent,
     StateHintsEditorComponent,
     ScoreRingComponent,
     SearchBarComponent,
@@ -361,6 +364,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     OutcomeFeedbackEditorComponent,
     ProgressNavComponent,
     SearchBarComponent,
+    StateContentEditorComponent,
     StateHintsEditorComponent,
     QuestionDifficultySelectorComponent,
     ScoreRingComponent,

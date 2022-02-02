@@ -16,11 +16,11 @@
     <div class="oppia-editor-card-body oppia-editor-concept-container" ng-if="conceptCardIsShown">
       <img ng-if="!windowIsNarrow" ng-src="<[oppiaBlackImgUrl]>" alt="" class="oppia-editor-card-avatar">
       <div id="tutorialStateContent" class="oppia-editor-card-section state-content-editor-parent-container">
-        <state-content-editor on-save-state-content="$ctrl.onSaveStateContent"
-                              show-mark-all-audio-as-needing-update-modal-if-required="$ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired"
-                              state-content-placeholder="$ctrl.getStateContentPlaceholder()"
-                              state-content-save-button-placeholder="$ctrl.getStateContentSaveButtonPlaceholder()">
-        </state-content-editor>
+        <oppia-state-content-editor (on-save-state-content)="$ctrl.onSaveStateContent($event)"
+                                    (show-mark-all-audio-as-needing-update-modal-if-required)="$ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired($event)"
+                                    [state-content-placeholder]="$ctrl.getStateContentPlaceholder()"
+                                    [state-content-save-button-placeholder]="$ctrl.getStateContentSaveButtonPlaceholder()">
+        </oppia-state-content-editor>
       </div>
     </div>
   </div>
