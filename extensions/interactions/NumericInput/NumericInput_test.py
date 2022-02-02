@@ -108,7 +108,7 @@ class NumericInputInteractionTests(test_utils.GenericTestBase):
                 'answer_is_exclusive': True,
                 'explanation': {
                     'content_id': 'solution',
-                    'html': '<p>This is solution for numeraic input.</p>'
+                    'html': '<p>This is solution for numeric input.</p>'
                 },
                 'correct_answer': 1.0
             },
@@ -151,7 +151,7 @@ class NumericInputInteractionTests(test_utils.GenericTestBase):
             'solution')
         self.assertEqual(
             numeric_input_proto.solution.base_solution.explanation.text,
-            '<p>This is solution for numeraic input.</p>')
+            '<p>This is solution for numeric input.</p>')
         self.assertEqual(
             numeric_input_proto.solution.correct_answer,
             1.0)
