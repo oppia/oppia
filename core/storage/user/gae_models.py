@@ -164,7 +164,7 @@ class UserSettingsModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data to export corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'email': base_models.EXPORT_POLICY.EXPORTED,
             'last_agreed_to_terms': base_models.EXPORT_POLICY.EXPORTED,
             'roles': base_models.EXPORT_POLICY.EXPORTED,
@@ -425,7 +425,7 @@ class CompletedActivitiesModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data to export corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'exploration_ids': base_models.EXPORT_POLICY.EXPORTED,
             'collection_ids': base_models.EXPORT_POLICY.EXPORTED,
             'story_ids': base_models.EXPORT_POLICY.EXPORTED,
@@ -522,7 +522,7 @@ class IncompleteActivitiesModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data to export corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'exploration_ids': base_models.EXPORT_POLICY.EXPORTED,
             'collection_ids': base_models.EXPORT_POLICY.EXPORTED,
             'story_ids': base_models.EXPORT_POLICY.EXPORTED,
@@ -618,7 +618,7 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data to export corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exploration_id':
                 base_models.EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT,
@@ -703,7 +703,7 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
             exploration_id.
         """
         instance_id = cls._generate_id(user_id, exploration_id)
-        return super(ExpUserLastPlaythroughModel, cls).get(
+        return super().get(
             instance_id, strict=False)
 
     @classmethod
@@ -760,7 +760,7 @@ class LearnerGoalsModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data to export corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'topic_ids_to_learn': base_models.EXPORT_POLICY.EXPORTED,
             'topic_ids_to_master': base_models.EXPORT_POLICY.EXPORTED
         })
@@ -837,7 +837,7 @@ class LearnerPlaylistModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data to export corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'exploration_ids': base_models.EXPORT_POLICY.EXPORTED,
             'collection_ids': base_models.EXPORT_POLICY.EXPORTED
         })
@@ -915,7 +915,7 @@ class UserContributionsModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data to export corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'created_exploration_ids':
                 base_models.EXPORT_POLICY.EXPORTED,
             'edited_exploration_ids':
@@ -1022,7 +1022,7 @@ class UserEmailPreferencesModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data to export corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'site_updates': base_models.EXPORT_POLICY.EXPORTED,
             'editor_role_notifications':
                 base_models.EXPORT_POLICY.EXPORTED,
@@ -1084,7 +1084,7 @@ class UserSubscriptionsModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data to export corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'exploration_ids': base_models.EXPORT_POLICY.EXPORTED,
             'collection_ids': base_models.EXPORT_POLICY.EXPORTED,
             'general_feedback_thread_ids':
@@ -1099,7 +1099,7 @@ class UserSubscriptionsModel(base_models.BaseModel):
         for Takeout. Also renames timestamp fields to clearly indicate that
         they represent milliseconds since the epoch.
         """
-        return dict(super(cls, cls).get_field_names_for_takeout(), ** {
+        return dict(super().get_field_names_for_takeout(), ** {
             # We do not want to expose creator_ids, so we instead return
             # creator_usernames.
             'creator_ids': 'creator_usernames',
@@ -1226,7 +1226,7 @@ class UserSubscribersModel(base_models.BaseModel):
         """Model contains data corresponding to a user, but this model is not
         exported because it contains data corresponding to other users.
         """
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'subscriber_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
@@ -1279,7 +1279,7 @@ class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'output': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'job_queued_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
@@ -1350,7 +1350,7 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data to export corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'impact_score': base_models.EXPORT_POLICY.EXPORTED,
             'total_plays': base_models.EXPORT_POLICY.EXPORTED,
             'average_ratings': base_models.EXPORT_POLICY.EXPORTED,
@@ -1515,7 +1515,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data to export corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exploration_id':
                 base_models.EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT,
@@ -1599,7 +1599,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
             which matches with the given user_id and exploration_id.
         """
         instance_id = cls._generate_id(user_id, exploration_id)
-        return super(ExplorationUserDataModel, cls).get(
+        return super().get(
             instance_id, strict=False)
 
     # We have ignored [override] here because the signature of this method
@@ -1622,7 +1622,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
         instance_ids = [
             cls._generate_id(user_id, exploration_id) for user_id in user_ids]
 
-        return super(ExplorationUserDataModel, cls).get_multi(instance_ids)
+        return super().get_multi(instance_ids)
 
     @classmethod
     def export_data(
@@ -1708,7 +1708,7 @@ class CollectionProgressModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data to export corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'collection_id':
                 base_models.EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT,
@@ -1791,7 +1791,7 @@ class CollectionProgressModel(base_models.BaseModel):
             which matches the given user_id and collection_id.
         """
         instance_id = cls._generate_id(user_id, collection_id)
-        return super(CollectionProgressModel, cls).get(
+        return super().get(
             instance_id, strict=False)
 
     # We have ignored [override] here because the signature of this method
@@ -1814,7 +1814,7 @@ class CollectionProgressModel(base_models.BaseModel):
         instance_ids = [cls._generate_id(user_id, collection_id)
                         for collection_id in collection_ids]
 
-        return super(CollectionProgressModel, cls).get_multi(
+        return super().get_multi(
             instance_ids)
 
     @classmethod
@@ -1899,7 +1899,7 @@ class StoryProgressModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data to export corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'story_id':
                 base_models.EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT,
@@ -1980,7 +1980,7 @@ class StoryProgressModel(base_models.BaseModel):
             matches the given user_id and story_id.
         """
         instance_id = cls._generate_id(user_id, story_id)
-        return super(StoryProgressModel, cls).get(
+        return super().get(
             instance_id, strict=strict)
 
     # We have ignored [override] here because the signature of this method
@@ -2003,7 +2003,7 @@ class StoryProgressModel(base_models.BaseModel):
         instance_ids = [cls._generate_id(user_id, story_id)
                         for story_id in story_ids]
 
-        return super(StoryProgressModel, cls).get_multi(
+        return super().get_multi(
             instance_ids)
 
     @classmethod
@@ -2120,7 +2120,7 @@ class UserQueryModel(base_models.BaseModel):
         exported since this is a computed model and because noteworthy details
         that belong to this model have already been exported.
         """
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'inactive_in_last_n_days': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'has_not_logged_in_for_n_days':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -2259,7 +2259,7 @@ class UserBulkEmailsModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'sent_email_model_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
@@ -2298,7 +2298,7 @@ class UserSkillMasteryModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data to export corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'skill_id':
                 base_models.EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT,
@@ -2401,7 +2401,7 @@ class UserContributionProficiencyModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data to export corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'score_category':
                 base_models.EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT,
@@ -2801,7 +2801,7 @@ class PendingDeletionRequestModel(base_models.BaseModel):
         deletion, and does not contain any information relevant to the user for
         data export.
         """
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'email': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'normalized_long_term_username': (
                 base_models.EXPORT_POLICY.NOT_APPLICABLE),
@@ -2855,7 +2855,7 @@ class DeletedUserModel(base_models.BaseModel):
         deleted.
         """
         empty_dict: Dict[str, base_models.EXPORT_POLICY] = {}
-        return dict(super(cls, cls).get_export_policy(), **empty_dict)
+        return dict(super().get_export_policy(), **empty_dict)
 
     @classmethod
     def has_reference_to_user_id(cls, user_id: str) -> bool:
@@ -2890,7 +2890,7 @@ class PseudonymizedUserModel(base_models.BaseModel):
         PseudonymizedUserModel contains only pseudonymous ids.
         """
         empty_dict: Dict[str, base_models.EXPORT_POLICY] = {}
-        return dict(super(cls, cls).get_export_policy(), **empty_dict)
+        return dict(super().get_export_policy(), **empty_dict)
 
     @classmethod
     def get_new_id(cls, unused_entity_name: str) -> str:
@@ -2951,4 +2951,4 @@ class DeletedUsernameModel(base_models.BaseModel):
         deleted.
         """
         empty_dict: Dict[str, base_models.EXPORT_POLICY] = {}
-        return dict(super(cls, cls).get_export_policy(), **empty_dict)
+        return dict(super().get_export_policy(), **empty_dict)

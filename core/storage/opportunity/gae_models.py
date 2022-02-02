@@ -69,7 +69,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'topic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'topic_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'story_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -272,7 +272,7 @@ class SkillOpportunityModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'skill_description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'question_count': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })

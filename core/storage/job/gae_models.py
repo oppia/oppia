@@ -93,7 +93,7 @@ class JobModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'job_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'time_queued_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'time_started_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE,

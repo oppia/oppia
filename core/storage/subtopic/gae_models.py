@@ -81,7 +81,7 @@ class SubtopicPageCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         because the history of commits isn't deemed as useful for users since
         commit logs don't contain relevant data corresponding to those users.
         """
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'subtopic_page_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
@@ -184,7 +184,7 @@ class SubtopicPageModel(base_models.VersionedModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'topic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'page_contents': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'page_contents_schema_version':

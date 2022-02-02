@@ -87,7 +87,7 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         because the history of commits isn't deemed as useful for users since
         commit logs don't contain relevant data corresponding to those users.
         """
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
@@ -112,7 +112,7 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         instance_ids = [cls.get_instance_id(exp_id, exp_version)
                         for exp_version in exp_versions]
 
-        return super(ExplorationCommitLogEntryModel, cls).get_multi(
+        return super().get_multi(
             instance_ids)
 
     @classmethod
@@ -243,7 +243,7 @@ class ExplorationModel(base_models.VersionedModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'category': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'objective': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -366,7 +366,7 @@ class ExplorationModel(base_models.VersionedModel):
                 from storage, otherwise there are only marked as deleted.
                 Default is False.
         """
-        super(ExplorationModel, cls).delete_multi(
+        super().delete_multi(
             entity_ids, committer_id,
             commit_message, force_deletion=force_deletion)
 
@@ -472,7 +472,7 @@ class ExplorationContextModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'story_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
@@ -587,7 +587,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data to export corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'owner_ids': base_models.EXPORT_POLICY.EXPORTED,
             'editor_ids': base_models.EXPORT_POLICY.EXPORTED,
             'voice_artist_ids': base_models.EXPORT_POLICY.EXPORTED,
@@ -1081,7 +1081,7 @@ class ExpSummaryModel(base_models.BaseModel):
         because because noteworthy details that belong to this model have
         already been exported as a part of the ExplorationModel.
         """
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'category': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'objective': base_models.EXPORT_POLICY.NOT_APPLICABLE,

@@ -93,7 +93,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'algorithm_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'interaction_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -293,7 +293,7 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,

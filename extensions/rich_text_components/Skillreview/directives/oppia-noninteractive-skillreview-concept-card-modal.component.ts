@@ -36,7 +36,7 @@ export class OppiaNoninteractiveSkillreviewConceptCardModalComponent extends
   isInTestMode = false;
 
   constructor(protected modalInstance: NgbActiveModal) {
-    super(modalInstance);
+    super();
   }
 
   ngOnInit(): void {

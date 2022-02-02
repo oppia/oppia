@@ -91,7 +91,7 @@ class BlogPostModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls):
         """Model contains data corresponding to a user to export."""
-        return dict(super(BlogPostModel, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             # We do not export the author_id because we should not
             # export internal user ids.
             'author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -266,7 +266,7 @@ class BlogPostSummaryModel(base_models.BaseModel):
         isn't exported because noteworthy details that belong to this
         model have already been exported as a part of the BlogPostModel.
         """
-        return dict(super(BlogPostSummaryModel, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'summary': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -399,7 +399,7 @@ class BlogPostRightsModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls):
         """Model contains data to export corresponding to a user."""
-        return dict(super(BlogPostRightsModel, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'editor_ids': base_models.EXPORT_POLICY.EXPORTED,
             'blog_post_is_published': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })

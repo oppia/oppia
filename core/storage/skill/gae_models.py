@@ -87,7 +87,7 @@ class SkillCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         because the history of commits isn't deemed as useful for users since
         commit logs don't contain relevant data corresponding to those users.
         """
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'skill_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
@@ -223,7 +223,7 @@ class SkillModel(base_models.VersionedModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'misconceptions_schema_version':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -305,7 +305,7 @@ class SkillSummaryModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'misconception_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'worked_examples_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,

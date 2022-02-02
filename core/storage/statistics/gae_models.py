@@ -135,7 +135,7 @@ class StateCounterModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user.."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'first_entry_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'subsequent_entries_count':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -213,7 +213,7 @@ class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -289,7 +289,7 @@ class ExplorationActualStartEventLogEntryModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -499,7 +499,7 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'event_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exploration_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -655,7 +655,7 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'event_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exploration_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -801,7 +801,7 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'event_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exploration_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -903,7 +903,7 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'event_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'rating': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -1032,7 +1032,7 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'event_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exploration_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -1109,7 +1109,7 @@ class StateCompleteEventLogEntryModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -1189,7 +1189,7 @@ class LeaveForRefresherExplorationEventLogEntryModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'refresher_exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -1382,7 +1382,7 @@ class ExplorationStatsModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'num_starts_v1': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -1489,7 +1489,7 @@ class ExplorationIssuesModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'unresolved_issues': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -1601,7 +1601,7 @@ class PlaythroughModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
-        return dict(super(PlaythroughModel, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'issue_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -1783,7 +1783,7 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'state_reference': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'entity_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'interaction_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -1899,7 +1899,7 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'num_starts': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -2309,7 +2309,7 @@ class StateAnswersModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exploration_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -2363,7 +2363,7 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exploration_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,

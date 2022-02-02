@@ -59,7 +59,7 @@ class ExplorationRecommendationsModel(
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'recommended_exploration_ids':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
@@ -94,6 +94,6 @@ class TopicSimilaritiesModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'content': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })

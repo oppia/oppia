@@ -86,7 +86,7 @@ class UserAuthDetailsModel(base_models.BaseModel):
         backend, and no exportable user data. It may contain user data in the
         future.
         """
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'gae_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'firebase_auth_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'parent_user_id': base_models.EXPORT_POLICY.EXPORTED
@@ -182,7 +182,7 @@ class UserIdentifiersModel(base_models.BaseModel):
         backend, and no exportable user data. It may contain user data in the
         future.
         """
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
@@ -264,7 +264,7 @@ class UserIdByFirebaseAuthIdModel(base_models.BaseModel):
         future.
         """
         return dict(
-            super(UserIdByFirebaseAuthIdModel, cls).get_export_policy(),
+            super().get_export_policy(),
             **{'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE})
 
     @classmethod

@@ -123,7 +123,7 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data to export corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'entity_type': base_models.EXPORT_POLICY.EXPORTED,
             'entity_id': base_models.EXPORT_POLICY.EXPORTED,
             # We do not export the original_author_id because we should not
@@ -146,7 +146,7 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
         """Indicates that the last_updated variable is exported under the
         name "last_updated_msec" in Takeout.
         """
-        return dict(super(cls, cls).get_field_names_for_takeout(), ** {
+        return dict(super().get_field_names_for_takeout(), ** {
             'last_updated': 'last_updated_msec'
         })
 
@@ -324,7 +324,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data to export corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'thread_id': base_models.EXPORT_POLICY.EXPORTED,
             'message_id': base_models.EXPORT_POLICY.EXPORTED,
             # We do not export the author_id because we should not export
@@ -516,7 +516,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
                 No error will be raised if strict == False.
         """
         instance_id = cls._generate_id(thread_id, message_id)
-        return super(GeneralFeedbackMessageModel, cls).get(
+        return super().get(
             instance_id, strict=strict)
 
     @classmethod
@@ -649,7 +649,7 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data to export corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'thread_id':
                 base_models.EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT,
@@ -711,7 +711,7 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
             matches with the given user_id, and thread id.
         """
         instance_id = cls.generate_full_id(user_id, thread_id)
-        return super(GeneralFeedbackThreadUserModel, cls).get(
+        return super().get(
             instance_id, strict=False)
 
     @classmethod
@@ -778,7 +778,7 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
             cls.generate_full_id(user_id, thread_id)
             for thread_id in thread_ids]
 
-        return super(GeneralFeedbackThreadUserModel, cls).get_multi(
+        return super().get_multi(
             instance_ids)
 
     @classmethod
@@ -833,7 +833,7 @@ class FeedbackAnalyticsModel(base_models.BaseMapReduceBatchResultsModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'num_open_threads': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'num_total_threads': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
@@ -875,7 +875,7 @@ class UnsentFeedbackEmailModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'feedback_message_references':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'retries': base_models.EXPORT_POLICY.NOT_APPLICABLE

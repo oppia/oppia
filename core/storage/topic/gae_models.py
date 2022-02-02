@@ -90,7 +90,7 @@ class TopicCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         because the history of commits isn't deemed as useful for users since
         commit logs don't contain relevant data corresponding to those users.
         """
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'topic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
@@ -288,7 +288,7 @@ class TopicModel(base_models.VersionedModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'canonical_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'abbreviated_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -393,7 +393,7 @@ class TopicSummaryModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'canonical_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -603,7 +603,7 @@ class TopicRightsModel(base_models.VersionedModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data to export corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'manager_ids': base_models.EXPORT_POLICY.EXPORTED,
             'topic_is_published': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })

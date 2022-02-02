@@ -180,7 +180,7 @@ class MachineTranslationModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model is not associated with users."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'source_text': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'hashed_source_text': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'source_language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,

@@ -141,7 +141,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             pass
 
     def setUp(self):
-        super(BaseHandlerTests, self).setUp()
+        super().setUp()
         self.signup('user@example.com', 'user')
 
         # Create a user to test redirect behavior for the learner.
@@ -498,7 +498,7 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
     """
 
     def setUp(self):
-        super(MaintenanceModeTests, self).setUp()
+        super().setUp()
         self.signup(
             self.RELEASE_COORDINATOR_EMAIL, self.RELEASE_COORDINATOR_USERNAME)
         self.add_user_role(
@@ -511,7 +511,7 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
 
     def tearDown(self):
         self.context_stack.close()
-        super(MaintenanceModeTests, self).tearDown()
+        super().tearDown()
 
     def test_html_response_is_rejected(self):
         destroy_auth_session_call_counter = self.context_stack.enter_context(
@@ -704,7 +704,7 @@ class EscapingTests(test_utils.GenericTestBase):
             self.render_json({'big_value': u'\n<script>马={{'})
 
     def setUp(self):
-        super(EscapingTests, self).setUp()
+        super().setUp()
 
         # Update a config property that shows in all pages.
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
@@ -742,7 +742,7 @@ class RenderDownloadableTests(test_utils.GenericTestBase):
                 file_contents, 'example.pdf', 'text/plain')
 
     def setUp(self):
-        super(RenderDownloadableTests, self).setUp()
+        super().setUp()
 
         # Modify the testapp to use the mock handler.
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
@@ -1194,7 +1194,7 @@ class IframeRestrictionTests(test_utils.GenericTestBase):
                 iframe_restriction=iframe_restriction)
 
     def setUp(self):
-        super(IframeRestrictionTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         # Modify the testapp to use the mock handler.
@@ -1354,7 +1354,7 @@ class OppiaMLVMHandlerTests(test_utils.GenericTestBase):
             self.render_json({'job_id': 'new_job'})
 
     def setUp(self):
-        super(OppiaMLVMHandlerTests, self).setUp()
+        super().setUp()
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication([
             webapp2.Route('/incorrectmock', self.IncorrectMockVMHandler),
             webapp2.Route('/correctmock', self.CorrectMockVMHandler)],
@@ -1660,7 +1660,7 @@ class SchemaValidationUrlArgsTests(test_utils.GenericTestBase):
             return self.render_json({'exploration_id': exploration_id})
 
     def setUp(self):
-        super(SchemaValidationUrlArgsTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.mock_testapp1 = webtest.TestApp(webapp2.WSGIApplication(
@@ -1800,7 +1800,7 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
             return self.render_json({'exploration_id': exploration_id})
 
     def setUp(self):
-        super(SchemaValidationRequestArgsTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.mock_testapp1 = webtest.TestApp(webapp2.WSGIApplication(
@@ -1957,9 +1957,7 @@ class RequestMethodNotInHandlerClassDoNotRaiseMissingSchemaErrorTest(
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     def setUp(self):
-        super(RequestMethodNotInHandlerClassDoNotRaiseMissingSchemaErrorTest,
-            self).setUp()
-
+        super().setUp()
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock', self.MockHandler, name='MockHandler')],
             debug=feconf.DEBUG,
@@ -2007,7 +2005,7 @@ class HandlerClassWithBothRequestAndPayloadTest(test_utils.GenericTestBase):
             self.render_json({'arg_a': arg_a, 'arg_b': arg_b})
 
     def setUp(self):
-        super(HandlerClassWithBothRequestAndPayloadTest, self).setUp()
+        super().setUp()
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock', self.MockHandler, name='MockHandler')],
             debug=feconf.DEBUG,
@@ -2090,7 +2088,7 @@ class ImageUploadHandlerTest(test_utils.GenericTestBase):
             self.render_json({'filename': filename})
 
     def setUp(self):
-        super(ImageUploadHandlerTest, self).setUp()
+        super().setUp()
         self.signup(self.TEST_LEARNER_EMAIL, self.TEST_LEARNER_USERNAME)
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock_upload/<entity_type>/<entity_id>',
@@ -2158,7 +2156,7 @@ class UrlPathNormalizationTest(test_utils.GenericTestBase):
             self.render_json({'mock_list': mock_list, 'mock_int': mock_int})
 
     def setUp(self):
-        super(UrlPathNormalizationTest, self).setUp()
+        super().setUp()
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock_normalization/<mock_int>/<mock_list>',
             self.MockHandler, name='MockHandler')],

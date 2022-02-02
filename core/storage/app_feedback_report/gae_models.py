@@ -377,7 +377,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data referencing user and will be exported."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'platform': base_models.EXPORT_POLICY.EXPORTED,
             'scrubbed_by': base_models.EXPORT_POLICY.EXPORTED,
             'ticket_id': base_models.EXPORT_POLICY.EXPORTED,
@@ -583,7 +583,7 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'ticket_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'platform': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'github_issue_repo_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -738,7 +738,7 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'ticket_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'platform': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'stats_tracking_date': base_models.EXPORT_POLICY.NOT_APPLICABLE,

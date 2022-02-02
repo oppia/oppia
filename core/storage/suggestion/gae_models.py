@@ -179,7 +179,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data to export corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'suggestion_type': base_models.EXPORT_POLICY.EXPORTED,
             'target_type': base_models.EXPORT_POLICY.EXPORTED,
             'target_id': base_models.EXPORT_POLICY.EXPORTED,
@@ -758,7 +758,7 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data to export corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'target_type': base_models.EXPORT_POLICY.EXPORTED,
             'target_id': base_models.EXPORT_POLICY.EXPORTED,
             'language_code': base_models.EXPORT_POLICY.EXPORTED,
@@ -860,8 +860,7 @@ class CommunityContributionStatsModel(base_models.BaseModel):
             return community_contribution_stats_model
 
         else:
-            return super(
-                CommunityContributionStatsModel, cls).get(
+            return super().get(
                     COMMUNITY_CONTRIBUTION_STATS_MODEL_ID)
 
     @classmethod
@@ -883,7 +882,7 @@ class CommunityContributionStatsModel(base_models.BaseModel):
         """Model doesn't contain any data directly corresponding to a user
         because the data is aggregated.
         """
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'translation_reviewer_counts_by_lang_code':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'translation_suggestion_counts_by_lang_code':
@@ -1066,7 +1065,7 @@ class TranslationContributionStatsModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data to export corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super().get_export_policy(), **{
             'language_code':
                 base_models.EXPORT_POLICY.EXPORTED,
             # User ID is not exported in order to keep internal ids private.

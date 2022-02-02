@@ -99,7 +99,7 @@ class Collapsible(BaseRteComponent):
     @classmethod
     def validate(cls, value_dict):
         """Validates Collapsible component."""
-        super(Collapsible, cls).validate(value_dict)
+        super().validate(value_dict)
         content = value_dict['content-with-value']
         inner_soup = bs4.BeautifulSoup(content, 'html.parser')
         collapsible = inner_soup.findAll(
@@ -116,7 +116,7 @@ class Image(BaseRteComponent):
     @classmethod
     def validate(cls, value_dict):
         """Validates Image component."""
-        super(Image, cls).validate(value_dict)
+        super().validate(value_dict)
         filename_re = r'^[A-Za-z0-9+/_-]*\.((png)|(jpeg)|(gif)|(jpg))$'
         filepath = value_dict['filepath-with-value']
         if not re.match(filename_re, filepath):
@@ -135,7 +135,7 @@ class Math(BaseRteComponent):
     @classmethod
     def validate(cls, value_dict):
         """Validates Math component."""
-        super(Math, cls).validate(value_dict)
+        super().validate(value_dict)
         filename_pattern_regex = constants.constants.MATH_SVG_FILENAME_REGEX
         filename = value_dict['math_content-with-value']['svg_filename']
         if not re.match(filename_pattern_regex, filename):
@@ -156,7 +156,7 @@ class Tabs(BaseRteComponent):
     @classmethod
     def validate(cls, value_dict):
         """Validates Tab component."""
-        super(Tabs, cls).validate(value_dict)
+        super().validate(value_dict)
         tab_contents = value_dict['tab_contents-with-value']
         for tab_content in tab_contents:
             inner_soup = (
@@ -175,7 +175,7 @@ class Video(BaseRteComponent):
     @classmethod
     def validate(cls, value_dict):
         """Validates Image component."""
-        super(Video, cls).validate(value_dict)
+        super().validate(value_dict)
         video_id = value_dict['video_id-with-value']
         if len(video_id) != 11:
             raise utils.ValidationError('Video id length is not 11')
