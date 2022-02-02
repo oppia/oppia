@@ -5217,7 +5217,7 @@ export default {
     "decimal_separator": ","
   }, {
     "code": "yo",
-    "description": "Èdè Yorùbá (Yoruba)",
+    "description": "Èdè Yoùbá (Yoruba)",
     "direction": "ltr",
     "decimal_separator": "."
   }],
