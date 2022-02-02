@@ -221,7 +221,7 @@ describe('Contributor dashboard admin backend api service', () => {
   it('should remove user contribution rights given the username' +
     'when calling removeContributionReviewerAsync', fakeAsync(() => {
     let category = 'translation';
-    let languageCode = null;
+    let languageCode = 'en';
     let username = 'validUser';
     let payload = {
       username: username,
@@ -246,7 +246,7 @@ describe('Contributor dashboard admin backend api service', () => {
   it('should fail to remove user contribution rights when user does' +
     'not exist when calling removeContributionReviewerAsync', fakeAsync(() => {
     let category = 'translation';
-    let languageCode = null;
+    let languageCode = 'en';
     let username = 'InvalidUser';
     let payload = {
       username: username,
@@ -278,8 +278,7 @@ describe('Contributor dashboard admin backend api service', () => {
     let category = 'submit_question';
     let username = 'validUser';
     let payload = {
-      username: username,
-      language_code: null
+      username: username
     };
     cdabas.removeContributionReviewerAsync(
       username, category, null).then(successHandler, failHandler);

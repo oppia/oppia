@@ -301,7 +301,7 @@ class ContributionRightsHandlerTest(test_utils.GenericTestBase):
         self.login(self.QUESTION_ADMIN_EMAIL)
         self.delete_json(
             '/contributionrightshandler/question', params={
-                'username': 'question',
+                'username': 'question'
             })
 
         self.assertFalse(user_services.can_review_question_suggestions(
