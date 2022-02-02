@@ -45,12 +45,14 @@ export class ExplorationHtmlFormatterService {
     'InteractiveMap',
     'MathEquationInput',
     'MultipleChoiceInput',
+    'NumberWithUnits',
     'ItemSelectionInput',
     'NumericExpressionInput',
     'NumericInput',
     'PencilCodeEditor',
+    'RatioExpressionInput',
     'SetInput',
-    'TextInput'
+    'TextInput',
   ];
 
   constructor(
