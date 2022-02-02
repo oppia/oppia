@@ -145,7 +145,7 @@
                      (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})"
                      class="nav-item-bottom-link-logged"
                      href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}">
-                    <span class="link">{{ 'I18N_TOPNAV_LEARN_LINK_2' | translate }}</span>
+                    <span class="link">{{ 'I18N_TOPNAV_LEARN_LINK_1' | translate }}</span>
                     <span class="material-icons arrow-forward">arrow_forward</span>
                   </a>
                 </div>
@@ -204,9 +204,11 @@
             <li class="nav-item">
               <a class="dropdown-item nav-link oppia-navbar-tab-content about-link"
                  href="https://medium.com/oppia-org"
+                 target="_blank"
                  (keydown)="onMenuKeypress($event, 'aboutMenu', {enter: ACTION_CLOSE})"
                  rel="noopener">
                 <span class="link">{{'I18N_TOPNAV_BLOG' | translate}}</span>
+                <span class="material-icons launch">launch</span>
               </a>
             </li>
           </ul>
@@ -534,6 +536,10 @@
     color: #00645c;
     font-size: 14px;
     margin-left: 4px;
+  }
+  .launch {
+    margin-left: 90px;
+    font-size: 15px;
   }
   .underline:hover,
   .underline:focus {
