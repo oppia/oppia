@@ -85,7 +85,10 @@
       Review message should be at most <[MAX_REVIEW_MESSAGE_LENGTH]> characters.
     </div>
   </div>
-  <div ng-show="!reviewable && suggestionIsRejected" class="oppia-suggestion-review-message">
+  <div ng-show="reviewMessage == '' && !reviewable && suggestionIsRejected" class="oppia-suggestion-review-message">
+    <i class="fas fa-spinner fa-spin" aria-hidden="true"></i>
+  </div>
+  <div ng-show="reviewMessage!='' && !reviewable && suggestionIsRejected" class="oppia-suggestion-review-message">
     <strong>Review message: </strong><[reviewMessage]>
   </div>
 </div>
