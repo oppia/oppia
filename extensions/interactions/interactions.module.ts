@@ -37,6 +37,7 @@ import { InteractiveMapInteractionModule } from './InteractiveMap/interactive-ma
 import { MultipleChoiceInputInteractionModule } from './MultipleChoiceInput/multiple-choice-input-interactions.module';
 import { SetInputInteractionModule } from './SetInput/set-input-interactions.module';
 import { TextInputInteractionModule } from './TextInput/text-input-interactions.module';
+import { RatioExpressionInputInteractionModule } from './RatioExpressionInput/ratio-expression-input-interactions.module';
 import { TranslateModule } from '@ngx-translate/core';
 import { PencilCodeEditorModule } from './PencilCodeEditor/pencil-code-editor-interactions.module';
 
@@ -58,6 +59,7 @@ import { PencilCodeEditorModule } from './PencilCodeEditor/pencil-code-editor-in
     PencilCodeEditorModule,
     InteractiveMapInteractionModule,
     MultipleChoiceInputInteractionModule,
+    RatioExpressionInputInteractionModule,
     SetInputInteractionModule,
     TextInputInteractionModule,
     TranslateModule
@@ -80,8 +82,9 @@ import { PencilCodeEditorModule } from './PencilCodeEditor/pencil-code-editor-in
     MathEquationInputModule,
     InteractiveMapInteractionModule,
     MultipleChoiceInputInteractionModule,
+    RatioExpressionInputInteractionModule,
     SetInputInteractionModule,
-    TextInputInteractionModule
+    TextInputInteractionModule,
   ],
 })
 export class InteractionExtensionsModule { }

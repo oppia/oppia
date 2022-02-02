@@ -51,8 +51,9 @@ export class ExplorationHtmlFormatterService {
     'NumericExpressionInput',
     'NumericInput',
     'PencilCodeEditor',
+    'RatioExpressionInput',
     'SetInput',
-    'TextInput'
+    'TextInput',
   ];
 
   constructor(
