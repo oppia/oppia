@@ -94,7 +94,8 @@ var ContributorDashboardTranslateTextTab = function() {
       selectorContainer,
       'Selector Container took too long to load'
     );
-    expect(await selectedLanguageElement.getText()).toMatch(language);
+    expect(await selectedLanguageElement.getAttribute('innerText'))
+      .toEqual(language);
   };
 };
 
