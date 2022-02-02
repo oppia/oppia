@@ -808,11 +808,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
         # Test successful update of thumbnail_filename when the thumbnail
         # is found in the filesystem.
-<<<<<<< HEAD
         with utils.open_file(
-=======
-        with python_utils.open_file(  # type: ignore[no-untyped-call]
->>>>>>> d7b89952dbd0a90fe697271fd8b855497a013017
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
             encoding=None) as f:
             raw_image = f.read()
