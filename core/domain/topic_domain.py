@@ -1179,7 +1179,7 @@ class Topic:
         Returns:
             dict. The converted subtopic_dict.
         """
-        file_system_class = fs_domain.GcsFileSystem  # type: ignore[no-untyped-call]
+        file_system_class = fs_domain.GcsFileSystem
         fs = fs_domain.AbstractFileSystem(file_system_class(  # type: ignore[no-untyped-call]
             feconf.ENTITY_TYPE_TOPIC, topic_id))
         filepath = '%s/%s' % (
@@ -1336,7 +1336,7 @@ class Topic:
             new_thumbnail_filename: str|None. The updated thumbnail filename
                 for the topic.
         """
-        file_system_class = fs_domain.GcsFileSystem  # type: ignore[no-untyped-call]
+        file_system_class = fs_domain.GcsFileSystem
         fs = fs_domain.AbstractFileSystem(file_system_class(  # type: ignore[no-untyped-call]
             feconf.ENTITY_TYPE_TOPIC, self.id))
 
@@ -1545,7 +1545,7 @@ class Topic:
         """
         subtopic_index = self.get_subtopic_index(subtopic_id)
 
-        file_system_class = fs_domain.GcsFileSystem  # type: ignore[no-untyped-call]
+        file_system_class = fs_domain.GcsFileSystem
         fs = fs_domain.AbstractFileSystem(file_system_class(  # type: ignore[no-untyped-call]
             feconf.ENTITY_TYPE_TOPIC, self.id))
         filepath = '%s/%s' % (
@@ -1938,7 +1938,7 @@ class TopicRightsDict(TypedDict):
     """Dictionary that represents TopicRights."""
 
     topic_id: str
-    manager_names: List[str]
+    manager_ids: List[str]
     topic_is_published: bool
 
 
