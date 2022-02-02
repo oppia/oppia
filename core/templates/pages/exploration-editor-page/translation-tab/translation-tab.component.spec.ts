@@ -78,15 +78,6 @@ describe('Translation tab component', function() {
   var refreshTranslationTabEmitter = new EventEmitter();
   var enterTranslationForTheFirstTimeEmitter = new EventEmitter();
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('NgbModal', {
-      open: () => {
-        return {
-          result: Promise.resolve()
-        };
-      }
-    });
-  }));
   importAllAngularServices();
 
   beforeEach(function() {
@@ -135,6 +126,11 @@ describe('Translation tab component', function() {
         return {
           result: Promise.resolve()
         };
+      }
+    });
+    $provide.value('ContextService', {
+      getExplorationId: () => {
+        return 'exp1';
       }
     });
   }));
@@ -408,7 +404,9 @@ describe('Translation tab component', function() {
     ' dismissed', fakeAsync(() => {
     ctrl.$onInit();
 
-    spyOn(stateTutorialFirstTimeService, 'markTranslationTutorialFinished');
+    spyOn(stateTutorialFirstTimeService, 'markTranslationTutorialFinished')
+      .and.stub();
+    spyOn(siteAnalyticsService, 'registerDeclineTutorialModalEvent').and.stub();
     spyOn(ngbModal, 'open').and.returnValue({
       result: Promise.reject('exp1')
     } as NgbModalRef);
@@ -416,6 +414,8 @@ describe('Translation tab component', function() {
     tick();
     $scope.$apply();
 
+    expect(siteAnalyticsService.registerDeclineTutorialModalEvent)
+      .toHaveBeenCalledWith('exp1');
     expect(stateTutorialFirstTimeService.markTranslationTutorialFinished)
       .toHaveBeenCalled();
   }));
