@@ -20,7 +20,7 @@
                  [ngStyle]="{ 'height': (rootHeight-30) + 'px' }"
                  *cdkDragPlaceholder>
             </div>
-            <div *ngIf="idx%2===1 && idx !== noShow && items.length > 1"
+            <div *ngIf="isChildElementHaveBorder(idx) && items.length > 1"
                  class="example-handle"
                  cdkDragHandle
                  (mouseover)="addHighlight(idx)"
