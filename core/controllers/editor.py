@@ -52,6 +52,45 @@ def _require_valid_version(version_from_payload, exploration_version):
             % (exploration_version, version_from_payload))
 
 
+def get_updated_rights_by_exploration_id(exploration_id):
+    """Updates the thread with names.
+
+    Args:
+        exploration_id: str. ID of the exploration.
+
+    Returns:
+        dict. The rights dictionary with names inserted.
+    """
+
+    rights_dict = rights_manager.get_exploration_rights(
+        exploration_id).to_dict()
+
+    rights_dict['owner_names'] = rights_dict.pop('owner_ids')
+    rights_dict['editor_names'] = rights_dict.pop('editor_ids')
+    rights_dict['voice_artist_names'] = rights_dict.pop('voice_artist_ids')
+    rights_dict['viewer_names'] = rights_dict.pop('viewer_ids')
+
+    if rights_dict['community_owned']:
+        rights_dict['owner_names'] = []
+        rights_dict['editor_names'] = []
+        rights_dict['voice_artist_names'] = []
+        rights_dict['viewer_names'] = []
+        return rights_dict
+    else:
+        rights_dict['owner_names'] = user_services.get_human_readable_user_ids(
+            rights_dict['owner_names'])
+        rights_dict['editor_names'] = (
+            user_services.get_human_readable_user_ids(
+                rights_dict['editor_names']))
+        rights_dict['voice_artist_names'] = (
+            user_services.get_human_readable_user_ids(
+                rights_dict['voice_artist_names']))
+        rights_dict['viewer_names'] = (
+            user_services.get_human_readable_user_ids(
+                rights_dict['viewer_names']))
+        return rights_dict
+
+
 # Common schemas used in this file.
 SCHEMA_FOR_EXPLORATION_ID = {
     'type': 'basestring',
@@ -379,8 +418,8 @@ class ExplorationRightsHandler(EditorHandler):
                 'No change was made to this exploration.')
 
         self.render_json({
-            'rights': rights_manager.get_exploration_rights(
-                exploration_id).to_dict()
+            'rights': get_updated_rights_by_exploration_id(
+                exploration_id)
         })
 
     @acl_decorators.can_modify_exploration_roles
@@ -398,8 +437,8 @@ class ExplorationRightsHandler(EditorHandler):
         rights_manager.deassign_role_for_exploration(
             self.user, exploration_id, user_id)
         self.render_json({
-            'rights': rights_manager.get_exploration_rights(
-                exploration_id).to_dict()
+            'rights': get_updated_rights_by_exploration_id(
+                exploration_id)
         })
 
 
@@ -449,8 +488,8 @@ class ExplorationStatusHandler(EditorHandler):
             self._publish_exploration(exploration_id)
 
         self.render_json({
-            'rights': rights_manager.get_exploration_rights(
-                exploration_id).to_dict()
+            'rights': get_updated_rights_by_exploration_id(
+                exploration_id)
         })
 
 
@@ -508,7 +547,8 @@ class ExplorationModeratorRightsHandler(EditorHandler):
                     exploration.title, email_body)
 
         self.render_json({
-            'rights': exp_rights.to_dict(),
+            'rights': get_updated_rights_by_exploration_id(
+                exploration_id)
         })
 
 
