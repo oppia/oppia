@@ -87,8 +87,8 @@ def get_number_of_pending_deletion_requests():
     return user_models.PendingDeletionRequestModel.query().count()
 
 
-def validate(pending_deletion_request):
-    """Checks that the domain object is valid.
+def validate_pending_deletion_request(pending_deletion_request):
+    """Checks that the pending deletion request is valid.
 
     Raises:
         ValidationError. The field pseudonymizable_entity_mappings
