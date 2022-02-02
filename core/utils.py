@@ -40,7 +40,7 @@ from core.constants import constants
 
 from typing import (
     IO, Any, Callable, Dict, Iterable, Iterator, List, Optional, Tuple,
-    TypeVar, Union, overload)
+    TypeVar, Union)
 
 from typing_extensions import Literal
 
@@ -103,7 +103,7 @@ def open_file(
 
     Args:
         filename: str. The file to be opened.
-        mode: Literal['r', 'w', 'a', 'x', 'r+', 'w+', 'a+', 'rb', 'wb', 'ab', 'xb', 'r+b', 'w+b', 'a+b', 'x+b']. Mode in which the file is opened.
+        mode: Literal. Mode in which the file is opened.
         encoding: str. Encoding in which the file is opened.
         newline: None|str. Controls how universal newlines work.
 
