@@ -125,7 +125,8 @@ class WipeoutServiceHelpersTests(test_utils.GenericTestBase):
             utils.ValidationError,
             'pseudonymizable_entity_mappings contain wrong key'
         ):
-            wipeout_service.validate(pending_deletion_request)
+            wipeout_service.validate_pending_deletion_request(
+                pending_deletion_request)
 
     def test_saves_pending_deletion_request_when_new(self):
         pending_deletion_request = (

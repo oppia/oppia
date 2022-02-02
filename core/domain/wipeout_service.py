@@ -116,7 +116,7 @@ def save_pending_deletion_requests(pending_deletion_requests):
     final_pending_deletion_request_models = []
     for deletion_request_model, deletion_request in zip(
             pending_deletion_request_models, pending_deletion_requests):
-        validate(deletion_request)
+        validate_pending_deletion_request(deletion_request)
         deletion_request_dict = {
             'email': deletion_request.email,
             'normalized_long_term_username': (
