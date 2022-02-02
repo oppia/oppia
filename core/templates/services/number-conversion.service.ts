@@ -106,21 +106,8 @@ export class NumberConversionService {
   convertToEnglishDecimal(number: string): (null | number) {
     const decimalSeparator = this.currentDecimalSeparator();
 
-    // Check if number is in proper format.
-    // eslint-disable-next-line max-len
-    let validRegex = new RegExp('-{0,1}[0-9]?([\.|\,|\٫]?[0-9]+)?(e[0-9]+)?', 'g');
-
-    let engNum: number;
-
-    // Get the valid part of input.
-    let validMatch = number.match(validRegex);
-
-    // Valid match cannot be null as empty string is never passed.
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    let numMatch = validMatch![0];
-
-    let numString = numMatch.replace(`${decimalSeparator}`, '.');
-    engNum = parseFloat(numString);
+    let numString = number.replace(`${decimalSeparator}`, '.');
+    let engNum = parseFloat(numString);
 
     // If the input cannot be parsed, output null.
     if (isNaN(engNum)) {

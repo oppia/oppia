@@ -42,7 +42,7 @@ describe('NumberConversionService', () => {
 
   it('should get the decimal separator depending on the page context', ()=>{
     spyOn(contextService, 'getPageContext').and
-      .returnValues('question-player', 'learner', 'editor', 'editor');
+      .returnValues('question_player', 'learner', 'editor', 'editor');
     i18nLanguageCodeService.setI18nLanguageCode('en');
     expect(numberConversionService.currentDecimalSeparator()).toEqual('.');
 
