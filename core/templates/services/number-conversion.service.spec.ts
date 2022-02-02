@@ -19,7 +19,6 @@
 import { NumberConversionService } from './number-conversion.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { ContentTranslationLanguageService } from 'pages/exploration-player-page/services/content-translation-language.service';
-import { ExplorationLanguageCodeService } from 'pages/exploration-editor-page/services/exploration-language-code.service';
 import { ContextService } from './context.service';
 import { TestBed } from '@angular/core/testing';
 
@@ -28,39 +27,33 @@ describe('NumberConversionService', () => {
   let ctls: ContentTranslationLanguageService;
   let contextService: ContextService;
   let numberConversionService: NumberConversionService;
-  let elcs: jasmine.SpyObj<ExplorationLanguageCodeService>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [NumberConversionService,
         ContextService, I18nLanguageCodeService,
-        ContentTranslationLanguageService,
-        {
-          provide: ExplorationLanguageCodeService, useValue: jasmine
-            .createSpyObj(
-              'ExplorationLanguageCodeService', ['getCurrentLanguageCode'])
-        }
-      ]
+        ContentTranslationLanguageService]
     });
     numberConversionService = TestBed.inject(NumberConversionService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     ctls = TestBed.inject(ContentTranslationLanguageService);
-    // eslint-disable-next-line max-len
-    elcs = TestBed.inject(ExplorationLanguageCodeService) as jasmine.SpyObj<ExplorationLanguageCodeService>;
     contextService = TestBed.inject(ContextService);
   });
 
   it('should get the decimal separator depending on the page context', ()=>{
     spyOn(contextService, 'getPageContext').and
-      .returnValues('question-player', 'learner', 'editor');
+      .returnValues('question-player', 'learner', 'editor', 'editor');
     i18nLanguageCodeService.setI18nLanguageCode('en');
     expect(numberConversionService.currentDecimalSeparator()).toEqual('.');
 
     ctls.setCurrentContentLanguageCode('fr');
     expect(numberConversionService.currentDecimalSeparator()).toEqual(',');
 
-    elcs.getCurrentLanguageCode.and.returnValue('ar');
+    ctls.setCurrentContentLanguageCode('ar');
     expect(numberConversionService.currentDecimalSeparator()).toEqual('٫');
+
+    ctls.setCurrentContentLanguageCode(undefined);
+    expect(numberConversionService.currentDecimalSeparator()).toEqual('.');
   });
 
   it('should return regex for numeric validation', ()=>{
