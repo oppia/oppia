@@ -22,7 +22,6 @@ import collections
 import datetime
 import hashlib
 import imghdr
-import io
 import itertools
 import json
 import os
@@ -40,8 +39,10 @@ from core import python_utils
 from core.constants import constants
 
 from typing import (
-    Any, Callable, Dict, Iterable, Iterator, List, Optional, Tuple, TypeVar,
-    Union, cast)
+    IO, Any, Callable, Dict, Iterable, Iterator, List, Optional, Tuple,
+    TypeVar, Union, overload)
+
+from typing_extensions import Literal
 
 _YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-6.0')
 sys.path.insert(0, _YAML_PATH)
@@ -57,6 +58,9 @@ SECONDS_IN_HOUR = 60 * 60
 SECONDS_IN_MINUTE = 60
 
 T = TypeVar('T')
+
+TextModeTypes = Literal['r', 'w', 'a', 'x', 'r+', 'w+', 'a+']
+BinaryModeTypes = Literal['rb', 'wb', 'ab', 'xb', 'r+b', 'w+b', 'a+b', 'x+b']
 
 # TODO(#13059): We will be ignoring no-untyped-call and no-any-return here
 # because python_utils is untyped and will be removed in python3.
@@ -93,24 +97,23 @@ class ExplorationConversionError(Exception):
 
 
 def open_file(
-        filename: str, mode: str, encoding: str='utf-8',
-        newline: Union[str, None]=None) -> io.TextIOWrapper:
+        filename: str, mode: Union[TextModeTypes, BinaryModeTypes],
+        encoding: str='utf-8', newline: Union[str, None]=None) -> IO[Any]:
     """Open file and return a corresponding file object.
 
     Args:
         filename: str. The file to be opened.
-        mode: str. Mode in which the file is opened.
+        mode: Literal['r', 'w', 'a', 'x', 'r+', 'w+', 'a+', 'rb', 'wb', 'ab', 'xb', 'r+b', 'w+b', 'a+b', 'x+b']. Mode in which the file is opened.
         encoding: str. Encoding in which the file is opened.
         newline: None|str. Controls how universal newlines work.
 
     Returns:
-        _io.TextIOWrapper. The file object.
+        IO[Any]. The file object.
 
     Raises:
         FileNotFoundError. The file cannot be found.
     """
     file = open(filename, mode, encoding=encoding, newline=newline)
-    file = cast(io.TextIOWrapper, file)
     return file
 
 
@@ -135,9 +138,9 @@ def get_file_contents(
     else:
         encoding = 'utf-8'
 
-    with open_file(
-        filepath, mode, encoding=encoding) as f: # type: ignore[arg-type]
-        return f.read() # type: ignore[return-value]
+    with open(
+        filepath, mode, encoding=encoding) as f:
+        return f.read() # type: ignore[no-any-return]
 
 
 def get_exploration_components_from_dir(

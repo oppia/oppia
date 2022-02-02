@@ -756,7 +756,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         # Save the dummy image to the filesystem to be used as thumbnail.
         with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
-            'rb', encoding=None) as f:
+            'rb', encoding=None) as f: # type: ignore[arg-type]
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(  # type: ignore[no-untyped-call]
             fs_domain.GcsFileSystem(  # type: ignore[no-untyped-call]
@@ -810,7 +810,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         # is found in the filesystem.
         with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
-            encoding=None) as f:
+            encoding=None) as f: # type: ignore[arg-type]
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(  # type: ignore[no-untyped-call]
             fs_domain.GcsFileSystem(  # type: ignore[no-untyped-call]
