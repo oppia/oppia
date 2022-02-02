@@ -1184,10 +1184,12 @@ def regenerate_exploration_summary_with_new_contributor(
         contributor_id: str. ID of the contributor to be added to
             the exploration summary.
     """
-    exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-    exp_summary = _compute_summary_of_exploration(exploration)
-    exp_summary.add_contribution_by_user(contributor_id)
-    save_exploration_summary(exp_summary)
+    exploration = exp_fetchers.get_exploration_by_id(
+        exploration_id, strict=False)
+    if exploration:
+        exp_summary = _compute_summary_of_exploration(exploration)
+        exp_summary.add_contribution_by_user(contributor_id)
+        save_exploration_summary(exp_summary)
 
 
 def regenerate_exploration_and_contributors_summaries(exploration_id):
