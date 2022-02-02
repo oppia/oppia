@@ -68,83 +68,85 @@ export class OutcomeDestinationEditorComponent implements OnInit {
     }
   }
 
-  isCreatingNewState(outcome: Outcome): boolean {
+  isCreatingNewState(): boolean {
     this.maxLen = this.MAX_STATE_NAME_LENGTH;
-    return outcome.dest === this.PLACEHOLDER_OUTCOME_DEST;
+    return this.outcome.dest === this.PLACEHOLDER_OUTCOME_DEST;
   }
 
   updateOptionNames(): void {
-    this.currentStateName = this.stateEditorService.getActiveStateName();
-    let questionModeEnabled = this.stateEditorService.isInQuestionMode();
-    // This is a list of objects, each with an ID and name. These
-    // represent all states, as well as an option to create a
-    // new state.
-    this.destChoices = [{
-      id: (questionModeEnabled ? null : this.currentStateName),
-      text: '(try again)'
-    }];
+    setTimeout(() => {
+      this.currentStateName = this.stateEditorService.getActiveStateName();
+      let questionModeEnabled = this.stateEditorService.isInQuestionMode();
+      // This is a list of objects, each with an ID and name. These
+      // represent all states, as well as an option to create a
+      // new state.
+      this.destChoices = [{
+        id: (questionModeEnabled ? null : this.currentStateName),
+        text: '(try again)'
+      }];
 
-    // Arrange the remaining states based on their order in the state
-    // graph.
-    let lastComputedArrangement = (
-      this.stateGraphLayoutService.getLastComputedArrangement());
-    let allStateNames = this.stateEditorService.getStateNames();
+      // Arrange the remaining states based on their order in the state
+      // graph.
+      let lastComputedArrangement = (
+        this.stateGraphLayoutService.getLastComputedArrangement());
+      let allStateNames = this.stateEditorService.getStateNames();
 
-    // It is possible that lastComputedArrangement is null if the
-    // graph has never been rendered at the time this computation is
-    // being carried out.
-    let stateNames = cloneDeep(allStateNames);
-    let stateName = null;
-    if (lastComputedArrangement) {
-      let maxDepth = 0;
-      let maxOffset = 0;
-      for (let stateName in lastComputedArrangement) {
-        maxDepth = Math.max(
-          maxDepth, lastComputedArrangement[stateName].depth);
-        maxOffset = Math.max(
-          maxOffset, lastComputedArrangement[stateName].offset);
+      // It is possible that lastComputedArrangement is null if the
+      // graph has never been rendered at the time this computation is
+      // being carried out.
+      let stateNames = cloneDeep(allStateNames);
+      let stateName = null;
+      if (lastComputedArrangement) {
+        let maxDepth = 0;
+        let maxOffset = 0;
+        for (let stateName in lastComputedArrangement) {
+          maxDepth = Math.max(
+            maxDepth, lastComputedArrangement[stateName].depth);
+          maxOffset = Math.max(
+            maxOffset, lastComputedArrangement[stateName].offset);
+        }
+
+        // Higher scores come later.
+        let allStateScores = {};
+        let unarrangedStateCount = 0;
+        for (let i = 0; i < allStateNames.length; i++) {
+          stateName = allStateNames[i];
+          if (lastComputedArrangement.hasOwnProperty(stateName)) {
+            allStateScores[stateName] = (
+              lastComputedArrangement[stateName].depth *
+              (maxOffset + 1) +
+              lastComputedArrangement[stateName].offset);
+          } else {
+            // States that have just been added in the rule 'create new'
+            // modal are not yet included as part of
+            // lastComputedArrangement so we account for them here.
+            allStateScores[stateName] = (
+              (maxDepth + 1) * (maxOffset + 1) + unarrangedStateCount);
+            unarrangedStateCount++;
+          }
+        }
+
+        stateNames = allStateNames.sort((a, b) => {
+          return allStateScores[a] - allStateScores[b];
+        });
       }
 
-      // Higher scores come later.
-      let allStateScores = {};
-      let unarrangedStateCount = 0;
-      for (let i = 0; i < allStateNames.length; i++) {
-        stateName = allStateNames[i];
-        if (lastComputedArrangement.hasOwnProperty(stateName)) {
-          allStateScores[stateName] = (
-            lastComputedArrangement[stateName].depth *
-            (maxOffset + 1) +
-            lastComputedArrangement[stateName].offset);
-        } else {
-          // States that have just been added in the rule 'create new'
-          // modal are not yet included as part of
-          // lastComputedArrangement so we account for them here.
-          allStateScores[stateName] = (
-            (maxDepth + 1) * (maxOffset + 1) + unarrangedStateCount);
-          unarrangedStateCount++;
+      for (let i = 0; i < stateNames.length; i++) {
+        if (stateNames[i] !== this.currentStateName) {
+          this.destChoices.push({
+            id: stateNames[i],
+            text: stateNames[i]
+          });
         }
       }
 
-      stateNames = allStateNames.sort((a, b) => {
-        return allStateScores[a] - allStateScores[b];
-      });
-    }
-
-    for (let i = 0; i < stateNames.length; i++) {
-      if (stateNames[i] !== this.currentStateName) {
+      if (!questionModeEnabled) {
         this.destChoices.push({
-          id: stateNames[i],
-          text: stateNames[i]
+          id: this.PLACEHOLDER_OUTCOME_DEST,
+          text: 'A New Card Called...'
         });
       }
-    }
-
-    if (!questionModeEnabled) {
-      this.destChoices.push({
-        id: this.PLACEHOLDER_OUTCOME_DEST,
-        text: 'A New Card Called...'
-      });
-    }
+    }, 0);
   }
 
   ngOnInit(): void {
@@ -181,9 +183,10 @@ export class OutcomeDestinationEditorComponent implements OnInit {
         userInfo.isCurriculumAdmin() || userInfo.isModerator());
     });
 
-    this.explorationAndSkillIdPattern =
-      this.EXPLORATION_AND_SKILL_ID_PATTERN;
+    this.explorationAndSkillIdPattern = (
+      this.EXPLORATION_AND_SKILL_ID_PATTERN);
     this.newStateNamePattern = /^[a-zA-Z0-9.\s-]+$/;
+    this.destChoices = [];
   }
 
   ngOnDestroy(): void {

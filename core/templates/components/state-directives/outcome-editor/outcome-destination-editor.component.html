@@ -7,13 +7,13 @@
     <span>
       <select class="form-control oppia-form-control"
               [(ngModel)]="outcome.dest"
-              (change)="onDestSelectorChange()">
+              (ngModelChange)="onDestSelectorChange()">
         <option *ngFor="let choice of destChoices">{{ choice.text }}</option>
     </select>
     </span>
   </div>
   <div>
-    <span *ngIf="isCreatingNewState(outcome)">
+    <span *ngIf="isCreatingNewState()">
       <input class="form-control protractor-test-add-state-input"
              type="text"
              [oppiaFocusOn]="newStateNameInputField"
