@@ -322,6 +322,15 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
             self.user_id_admin, 'skill model created', commit_cmd_dicts)
 
         skill = skill_fetchers.get_skill_from_model(model)
-        self.assertEqual(skill.misconceptions_schema_version, 5)
-        self.assertEqual(skill.skill_contents_schema_version, 4)
-        self.assertEqual(skill.rubric_schema_version, 5)
+        self.assertEqual(
+            skill.misconceptions_schema_version,
+            feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION
+        )
+        self.assertEqual(
+            skill.skill_contents_schema_version,
+            feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION
+        )
+        self.assertEqual(
+            skill.rubric_schema_version,
+            feconf.CURRENT_RUBRIC_SCHEMA_VERSION
+        )
