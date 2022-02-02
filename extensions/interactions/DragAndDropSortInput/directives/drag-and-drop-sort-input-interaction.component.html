@@ -8,7 +8,7 @@
           <div cdkDrag
                cdkDropList
                [cdkDropListData]="items"
-               (cdkDropListExited)="logEvent($event)"
+               (cdkDropListExited)="hideElement($event)"
                [ngClass]="{
                  'child-dnd-border': isChildElementHaveBorder(idx),
                  'child-dnd-borderless': !isChildElementHaveBorder(idx) || isChildElementHaveZeroHeight(idx),

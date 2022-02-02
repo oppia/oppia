@@ -145,8 +145,9 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
       event.previousIndex, event.currentIndex);
   }
 
-  logEvent(event: CdkDragExit<string[]>): void {
-    // Logs the event.
+  hideElement(event: CdkDragExit<string[]>): void {
+    // Emits when the user removes an element from the container
+    // by dragging it into another container.
     if (this.dragStarted) {
       return;
     }

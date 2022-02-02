@@ -402,7 +402,7 @@ describe('Drag and drop sort input interactive component', () => {
       const dragAndDropEventClass = new DragAndDropEventClass<string>();
       const dragDropEvent = dragAndDropEventClass.createInContainerEvent(
         'selectedItems', containerData, undefined, undefined);
-      component.logEvent(dragDropEvent);
+      component.hideElement(dragDropEvent);
 
       expect(component.noShow).toBe(1);
       expect(component.hide).toEqual([1, 2]);
@@ -418,7 +418,7 @@ describe('Drag and drop sort input interactive component', () => {
       const dragAndDropEventClass = new DragAndDropEventClass<string>();
       const dragDropEvent = dragAndDropEventClass.createInContainerEvent(
         'selectedItems', containerData, undefined, undefined);
-      component.logEvent(dragDropEvent);
+      component.hideElement(dragDropEvent);
 
       expect(component.noShow).toBe(-1);
       expect(component.hide).toEqual([]);
