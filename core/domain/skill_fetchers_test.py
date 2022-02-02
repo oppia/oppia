@@ -133,7 +133,9 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
         expected_skill = self.skill.to_dict()
         skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
         self.assertEqual(skill.to_dict(), expected_skill)
-        self.assertEqual(skill_fetchers.get_skill_by_id('Does Not Exist', strict=False), None)
+        self.assertEqual(
+            skill_fetchers.get_skill_by_id('Does Not Exist', strict=False), None
+        )
 
     def test_get_skill_from_model_with_invalid_skill_contents_schema_version(
             self):
@@ -281,7 +283,6 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill.id, self.SKILL_ID)
         self.assertEqual(skill.language_code, 'bn')
 
-
     def test_get_skill_from_model_with_latest_schemas_version(self):
         commit_cmd = skill_domain.SkillChange({
             'cmd': skill_domain.CMD_CREATE_NEW
@@ -324,4 +325,3 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill.misconceptions_schema_version, 5)
         self.assertEqual(skill.skill_contents_schema_version, 4)
         self.assertEqual(skill.rubric_schema_version, 5)
-            
