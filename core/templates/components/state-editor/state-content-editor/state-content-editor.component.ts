@@ -76,8 +76,6 @@ export class StateContentEditorComponent implements OnInit {
 
     this.contentEditorIsOpen = false;
     this.isEditable = this.editabilityService.isEditable();
-    console.log(this.isEditable);
-    console.log(this.stateContentService.displayed);
     this.cardHeightLimitWarningIsShown = true;
     this.directiveSubscriptions.add(
       this.externalSaveService.onExternalSave.subscribe(
