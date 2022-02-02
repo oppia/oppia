@@ -89,15 +89,6 @@ export class StateContentEditorComponent implements OnInit {
     this.stateEditorService.updateStateContentEditorInitialised();
   }
 
-  ngAfterViewInit(): void {
-    const runAfterTimeout = () => {
-      this.changeDetectorRef.detectChanges();
-    };
-    setTimeout(() => {
-      runAfterTimeout();
-    }, 0);
-  }
-
   isCardContentLengthLimitReached(): boolean {
     if (this.stateContentService.displayed === undefined) {
       return false;
@@ -154,8 +145,8 @@ export class StateContentEditorComponent implements OnInit {
   }
 
   updateHtml($event: string): void {
-    if ($event !== this.stateContentService.displayed._html) {
-      this.stateContentService.displayed._html = $event;
+    if ($event !== this.stateContentService.displayed.html) {
+      this.stateContentService.displayed.html = $event;
       this.changeDetectorRef.detectChanges();
     }
   }
