@@ -40,11 +40,11 @@
     </div>
     <br>
 
-    <outcome-destination-editor outcome="tmpOutcome"
-                                ng-if="!questionModeEnabled"
-                                outcome-has-feedback="!isLinearWithNoFeedback(tmpOutcome)"
-                                add-state="addState">
-    </outcome-destination-editor>
+    <oppia-outcome-destination-editor [outcome]="tmpOutcome"
+                                      ng-if="!questionModeEnabled"
+                                     [outcome-has-feedback]="!isLinearWithNoFeedback(tmpOutcome)"
+                                     [add-state]="addState">
+    </oppia-outcome-destination-editor>
   </form>
 
   <div class="oppia-correctness-label-editor" ng-if="isCorrectnessFeedbackEnabled() && !isCurrentInteractionLinear()">

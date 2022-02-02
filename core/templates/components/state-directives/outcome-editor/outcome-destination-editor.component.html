@@ -19,6 +19,7 @@
              [oppiaFocusOn]="newStateNameInputField"
              [(ngModel)]="outcome.newStateName"
              [attr.maxlength]="maxLen"
+             [pattern]="newStateNamePattern"
              tabindex="0"
              aria-invalid="false" required>
     </span>
@@ -30,6 +31,7 @@
     <input type="text"
            class="form-control protractor-test-add-refresher-exploration-id"
            [(ngModel)]="outcome.refresherExplorationId" 
+           [pattern]="globalIdPattern"
            tabindex="0" 
            aria-invalid="false">
   </div>

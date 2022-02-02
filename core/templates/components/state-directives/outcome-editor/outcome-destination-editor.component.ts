@@ -68,11 +68,10 @@ export class OutcomeDestinationEditorComponent implements OnInit {
     }
   }
 
-  isCreatingNewState(outcome: {dest: string}): boolean {
+  isCreatingNewState(outcome: Outcome): boolean {
     this.maxLen = this.MAX_STATE_NAME_LENGTH;
     return outcome.dest === this.PLACEHOLDER_OUTCOME_DEST;
   }
-
 
   updateOptionNames(): void {
     this.currentStateName = this.stateEditorService.getActiveStateName();
@@ -192,6 +191,7 @@ export class OutcomeDestinationEditorComponent implements OnInit {
   }
 }
 
-angular.module('oppia').directive(
-  'oppiaOutcomeDestinationEditor', downgradeComponent(
-    {component: OutcomeDestinationEditorComponent}));
+angular.module('oppia').directive('oppiaOutcomeDestinationEditor',
+  downgradeComponent({
+    component: OutcomeDestinationEditorComponent
+  }) as angular.IDirectiveFactory);
