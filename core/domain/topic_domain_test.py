@@ -697,7 +697,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         topic_rights = topic_domain.TopicRights(self.topic_id, user_ids, False)
         expected_dict = {
             'topic_id': self.topic_id,
-            'manager_names': ['A', 'B'],
+            'manager_ids': user_ids,
             'topic_is_published': False
         }
 
@@ -1355,7 +1355,7 @@ class TopicRightsTests(test_utils.GenericTestBase):
         self.user_id_b = self.get_user_id_from_email('b@example.com')  # type: ignore[no-untyped-call]
         self.topic_summary_dict = {
             'topic_id': 'topic_id',
-            'manager_names': ['A'],
+            'manager_ids': [self.user_id_a],
             'topic_is_published': False,
         }
 
