@@ -837,9 +837,9 @@ class Playthrough:
         try:
             issue = playthrough_issue_registry.Registry.get_issue_by_type(
                 self.issue_type)
-        except KeyError as key_error:
+        except KeyError as e:
             raise utils.ValidationError('Invalid issue type: %s' % (
-                self.issue_type)) from key_error
+                self.issue_type)) from e
 
         customization_args_util.validate_customization_args_and_values(
             'issue', self.issue_type, self.issue_customization_args,
@@ -974,9 +974,9 @@ class ExplorationIssue:
         try:
             issue = playthrough_issue_registry.Registry.get_issue_by_type(
                 self.issue_type)
-        except KeyError as key_error:
+        except KeyError as e:
             raise utils.ValidationError('Invalid issue type: %s' % (
-                self.issue_type)) from key_error
+                self.issue_type)) from e
 
         customization_args_util.validate_customization_args_and_values(
             'issue', self.issue_type, self.issue_customization_args,
@@ -1081,9 +1081,9 @@ class LearnerAction:
         try:
             action = action_registry.Registry.get_action_by_type(
                 self.action_type)
-        except KeyError as key_error:
+        except KeyError as e:
             raise utils.ValidationError(
-                'Invalid action type: %s' % self.action_type) from key_error
+                'Invalid action type: %s' % self.action_type) from e
         customization_args_util.validate_customization_args_and_values(
             'action', self.action_type, self.action_customization_args,
             action.customization_arg_specs)

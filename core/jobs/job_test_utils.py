@@ -290,8 +290,8 @@ def decorate_beam_errors() -> Iterator[None]:
             missing_elements = (
                 ast.literal_eval(missing_elements)
                 if missing_elements else None)
-        except (SyntaxError, ValueError) as syntax_error:
-            raise AssertionError(exception_message) from syntax_error
+        except (SyntaxError, ValueError) as e:
+            raise AssertionError(exception_message) from e
 
         error_lines = [
             'failed %s' % match.group('context'),

@@ -151,9 +151,9 @@ class EditableSkillDataHandler(base.BaseHandler):
         """Populates the data on the individual skill page."""
         try:
             skill_domain.Skill.require_valid_skill_id(skill_id)
-        except utils.ValidationError as validation_error:
+        except utils.ValidationError as e:
             raise self.PageNotFoundException(
-                'Invalid skill id.') from validation_error
+                'Invalid skill id.') from e
 
         skill = skill_fetchers.get_skill_by_id(skill_id, strict=False)
 
@@ -265,9 +265,9 @@ class SkillDataHandler(base.BaseHandler):
         try:
             for skill_id in skill_ids:
                 skill_domain.Skill.require_valid_skill_id(skill_id)
-        except utils.ValidationError as validation_error:
+        except utils.ValidationError as e:
             raise self.PageNotFoundException(
-                'Invalid skill id.') from validation_error
+                'Invalid skill id.') from e
         try:
             skills = skill_fetchers.get_multi_skills(skill_ids)
         except Exception as e:

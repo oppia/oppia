@@ -228,5 +228,5 @@ class BaseChange:
         # instances of this class picklable.
         try:
             return self.__dict__[name]
-        except KeyError as key_error:
-            raise AttributeError(name) from key_error
+        except KeyError as e:
+            raise AttributeError(name) from e

@@ -56,9 +56,9 @@ class QuestionsListHandler(base.BaseHandler):
 
         try:
             _require_valid_skill_ids(skill_ids)
-        except utils.ValidationError as validation_error:
+        except utils.ValidationError as e:
             raise self.InvalidInputException(
-                'Invalid skill id') from validation_error
+                'Invalid skill id') from e
 
         try:
             skill_fetchers.get_multi_skills(skill_ids)
@@ -127,9 +127,9 @@ class QuestionCountDataHandler(base.BaseHandler):
 
         try:
             _require_valid_skill_ids(skill_ids)
-        except utils.ValidationError as validation_error:
+        except utils.ValidationError as e:
             raise self.InvalidInputException(
-                'Invalid skill id') from validation_error
+                'Invalid skill id') from e
 
         total_question_count = (
             question_services.get_total_question_count_for_skill_ids(skill_ids))

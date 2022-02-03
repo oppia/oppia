@@ -176,9 +176,9 @@ class CustomHTMLParser(html.parser.HTMLParser):
         try:
             last_starttag, last_starttag_line_num, last_starttag_col_num = (
                 self.tag_stack.pop())
-        except IndexError as index_error:
+        except IndexError as e:
             raise TagMismatchException('Error in line %s of file %s\n' % (
-                line_number, self.filepath)) from index_error
+                line_number, self.filepath)) from e
 
         if last_starttag != tag:
             raise TagMismatchException('Error in line %s of file %s\n' % (

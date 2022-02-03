@@ -669,9 +669,9 @@ class InteractionInstance:
         try:
             interaction = interaction_registry.Registry.get_interaction_by_id(
                 self.id)
-        except KeyError as key_error:
+        except KeyError as e:
             raise utils.ValidationError(
-                'Invalid interaction id: %s' % self.id) from key_error
+                'Invalid interaction id: %s' % self.id) from e
 
         self._validate_customization_args()
 
@@ -734,12 +734,12 @@ class InteractionInstance:
                         self.customization_args[
                             ca_name].to_customization_arg_dict()
                     )
-                except AttributeError as attribute_error:
+                except AttributeError as e:
                     raise utils.ValidationError(
                         'Expected customization arg value to be a '
                         'InteractionCustomizationArg domain object, '
                         'received %s' % self.customization_args[ca_name]
-                    ) from attribute_error
+                    ) from e
 
         interaction = interaction_registry.Registry.get_interaction_by_id(
             self.id)
