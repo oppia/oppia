@@ -119,11 +119,11 @@ class PopulateExplorationWithAndroidProtoSizeInBytesJobTests(
                     'android_proto_size_in_bytes SUCCESS: 1')
             ])
 
-        migrated_exp_model = exp_models.ExplorationModel.get(self.EXP_1_ID)
-        self.assertEqual(migrated_exp_model.android_proto_size_in_bytes, 64)
+        populated_exp_model = exp_models.ExplorationModel.get(self.EXP_1_ID)
+        self.assertEqual(populated_exp_model.android_proto_size_in_bytes, 64)
         self.check_exploration_related_models()
 
-    def test_unmigrated_exp_is_migrated(self) -> None:
+    def test_unpopulated_exploration_is_populated(self) -> None:
         exp_model = self.create_model(
             exp_models.ExplorationModel,
             id=self.EXP_1_ID,
@@ -152,11 +152,11 @@ class PopulateExplorationWithAndroidProtoSizeInBytesJobTests(
                 stdout='CACHE DELETION SUCCESS: 1')
         ])
 
-        migrated_exp_model = exp_models.ExplorationModel.get(self.EXP_1_ID)
-        self.assertEqual(migrated_exp_model.android_proto_size_in_bytes, 64)
+        populated_exp_model = exp_models.ExplorationModel.get(self.EXP_1_ID)
+        self.assertEqual(populated_exp_model.android_proto_size_in_bytes, 64)
         self.check_exploration_related_models()
 
-    def test_broken_exploration_is_not_migrated(self) -> None:
+    def test_broken_exploration_is_not_populated(self) -> None:
         exp_model = self.create_model(
             exp_models.ExplorationModel,
             id=self.EXP_1_ID,
@@ -187,11 +187,11 @@ class PopulateExplorationWithAndroidProtoSizeInBytesJobTests(
             )
         ])
 
-        migrated_exp_model = exp_models.ExplorationModel.get(self.EXP_1_ID)
-        self.assertEqual(migrated_exp_model.version, 1)
+        unpopulated_exp_model = exp_models.ExplorationModel.get(self.EXP_1_ID)
+        self.assertEqual(unpopulated_exp_model.version, 1)
         self.check_exploration_related_models()
 
-    def test_migrated_exploration_is_not_migrated(self) -> None:
+    def test_populated_exploration_is_no_populated(self) -> None:
         exp_model = self.create_model(
             exp_models.ExplorationModel,
             id=self.EXP_1_ID,
@@ -217,10 +217,10 @@ class PopulateExplorationWithAndroidProtoSizeInBytesJobTests(
                 stdout='EXPLORATION PROCESSED SUCCESS: 1')
         ])
 
-        unmigrated_exploration_model = exp_models.ExplorationModel.get(
+        unpopulated_exp_model = exp_models.ExplorationModel.get(
             self.EXP_1_ID)
         self.assertEqual(
-            unmigrated_exploration_model.android_proto_size_in_bytes, 64)
+            unpopulated_exp_model.android_proto_size_in_bytes, 64)
         self.check_exploration_related_models()
 
     def check_exploration_related_models(self) -> None:
