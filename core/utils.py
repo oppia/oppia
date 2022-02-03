@@ -98,21 +98,28 @@ class ExplorationConversionError(Exception):
 
 @overload
 def open_file(
-        filename: str, mode: TextModeTypes, encoding: str='utf-8',
-        newline: Union[str, None]=None) -> IO[str]:
-    ...
+    filename: str, 
+    mode: TextModeTypes, 
+    encoding: str = 'utf-8',
+    newline: Union[str, None] = None
+) -> IO[str]: ...
 
 
 @overload
 def open_file(
-        filename: str, mode: BinaryModeTypes, encoding: str='utf-8',
-        newline: Union[str, None]=None) -> IO[bytes]:
-    ...
+    filename: str, 
+    mode: BinaryModeTypes, 
+    encoding: str = 'utf-8',
+    newline: Union[str, None] = None
+) -> IO[bytes]: ...
 
 
 def open_file(
-        filename: str, mode: Union[TextModeTypes, BinaryModeTypes],
-        encoding: str='utf-8', newline: Union[str, None]=None) -> IO[Any]:
+    filename: str, 
+    mode: Union[TextModeTypes, BinaryModeTypes],
+    encoding: str = 'utf-8', 
+    newline: Union[str, None] = None
+) -> IO[Any]: 
     """Open file and return a corresponding file object.
 
     Args:
