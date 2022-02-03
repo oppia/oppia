@@ -1493,6 +1493,9 @@ class Topic:
         Returns:
             int. Returns the index of the subtopic if it exists or else
             None.
+
+        Raises:
+            Exception. The subtopic with ID subtopic_id does not exist.
         """
         for ind, subtopic in enumerate(self.subtopics):
             if subtopic.id == subtopic_id:
