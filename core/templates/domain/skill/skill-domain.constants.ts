@@ -23,7 +23,7 @@ export const SkillDomainConstants = {
     '/skill_editor_handler/data/<skill_id>',
 
   SKILL_DATA_URL_TEMPLATE:
-    '/skill_data_handler/<skill_ids>',
+    '/skill_data_handler/<comma_separated_skill_ids>',
   FETCH_SKILLS_URL_TEMPLATE: '/fetch_skills',
   SKILL_EDITOR_QUESTION_URL_TEMPLATE:
     '/skill_editor_question_handler/<skill_id>?cursor=<cursor>',
