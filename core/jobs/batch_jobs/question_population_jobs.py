@@ -82,7 +82,7 @@ class PopulateQuestionWithAndroidProtoSizeInBytesJob(base_jobs.JobBase):
         return result.Ok((question_id, question))
 
     @staticmethod
-    def _update_question(
+    def _update_question_model(
         question_model: question_models.QuestionModel,
         migrated_question: question_domain.Question,
         question_changes: Sequence[question_domain.QuestionChange]
@@ -269,7 +269,7 @@ class PopulateQuestionWithAndroidProtoSizeInBytesJob(base_jobs.JobBase):
         question_models_to_put = (
             question_objects_list
             | 'Generate question models to put' >> beam.FlatMap(
-                lambda question_objects: self._update_question(
+                lambda question_objects: self._update_question_model(
                     question_objects['question_model'],
                     question_objects['question'],
                     question_objects['question_changes']

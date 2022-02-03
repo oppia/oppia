@@ -281,12 +281,12 @@ class QuestionSuggestionChangeTest(test_utils.GenericTestBase):
         self.assertEqual({}, observed_object.question_dict)
 
 
-class QuestionDomainTest(test_utils.GenericTestBase):
+class QuestionDomainTests(test_utils.GenericTestBase):
     """Tests for Question domain object."""
 
     def setUp(self):
         """Before each individual test, create a question."""
-        super(QuestionDomainTest, self).setUp()
+        super(QuestionDomainTests, self).setUp()
         question_state_data = self._create_valid_question_data('ABC')
         self.question = question_domain.Question(
             'question_id', question_state_data,
@@ -543,17 +543,54 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
     def test_android_proto_conversion_is_correct(self):
         """Test question proto is correct."""
-        question_id = 'col1.random'
+        question_id = 'question_id'
         skill_ids = ['test_skill1', 'test_skill2']
-        question = question_domain.Question.create_default_question(
-            question_id, skill_ids)
+        question_state_data = self._create_valid_question_data('ABC')
+        question = question_domain.Question(
+            'question_id', question_state_data,
+            feconf.CURRENT_STATE_SCHEMA_VERSION, 'en', 1, skill_ids,
+            ['skillId12345-123'])
         question_proto = question.to_android_question_proto()
 
-        self.assertEqual(question_proto.id, 'col1.random')
+        self.assertEqual(question_proto.id, question_id)
         self.assertEqual(
             question_proto.content_version, feconf.CURRENT_STATE_SCHEMA_VERSION)
         self.assertEqual(
             question_proto.linked_skill_ids, skill_ids)
+        self.assertEqual(
+            question_proto.question_state.content.text,
+            feconf.DEFAULT_INIT_STATE_CONTENT_STR)
+        self.assertEqual(
+            question_proto.question_state.content.content_id,
+            feconf.DEFAULT_NEW_STATE_CONTENT_ID)
+
+        question_state_proto = (
+            question_proto.question_state.interaction.text_input)
+        self.assertEqual(
+            question_state_proto.customization_args.placeholder.content_id,
+            'ca_placeholder')
+        self.assertEqual(
+            question_state_proto.customization_args.placeholder.text,
+            'Enter text here')
+        self.assertEqual(
+            question_state_proto.customization_args.rows,
+            1)
+        self.assertEqual(
+            question_state_proto.solution.correct_answer, 'Solution')
+        self.assertEqual(
+            question_state_proto.solution.base_solution.explanation.content_id,
+            'solution')
+        self.assertEqual(
+            question_state_proto.solution.base_solution.explanation.text,
+            '<p>This is a solution.</p>')
+        self.assertEqual(
+            question_state_proto.hints[0].hint_content.content_id,
+            'hint_1')
+        self.assertEqual(
+            question_state_proto.hints[0].hint_content.text,
+            '<p>This is a hint.</p>')
+        self.assertTrue(
+            question_state_proto.default_outcome.labelled_as_correct)
 
 
 class QuestionSummaryTest(test_utils.GenericTestBase):

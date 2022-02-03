@@ -61,30 +61,6 @@ def create_new_question(committer_id, question, commit_message):
     opportunity_services.increment_question_counts(question.linked_skill_ids, 1)
 
 
-def populate_question_model_fields(question_model, question):
-    """Populate question model with the data from question object.
-
-    Args:
-        question_model: QuestionModel. The model to populate.
-        question: Question. The question domain object
-            which should be used to populate the model.
-
-    Returns:
-        QuestionModel. Populated model.
-    """
-    question_model.question_state_data = question.question_state_data.to_dict()
-    question_model.language_code = question.language_code
-    question_model.linked_skill_ids = question.linked_skill_ids
-    question_model.question_state_data_schema_version = (
-        question.question_state_data_schema_version)
-    question_model.inapplicable_skill_misconception_ids = (
-        question.inapplicable_skill_misconception_ids)
-    question_model.android_proto_size_in_bytes = (
-        question.android_proto_size_in_bytes)
-
-    return question_model
-
-
 def link_multiple_skills_for_question(
         user_id, question_id, skill_ids, skill_difficulties):
     """Links multiple skill IDs to a question. To do that, it creates multiple
@@ -593,6 +569,30 @@ def apply_change_list(question_id, change_list):
         raise e
 
 
+def populate_question_model_fields(question_model, question):
+    """Populate question model with the data from question object.
+
+    Args:
+        question_model: QuestionModel. The model to populate.
+        question: Question. The question domain object
+            which should be used to populate the model.
+
+    Returns:
+        QuestionModel. Populated model.
+    """
+    question_model.question_state_data = question.question_state_data.to_dict()
+    question_model.language_code = question.language_code
+    question_model.linked_skill_ids = question.linked_skill_ids
+    question_model.question_state_data_schema_version = (
+        question.question_state_data_schema_version)
+    question_model.inapplicable_skill_misconception_ids = (
+        question.inapplicable_skill_misconception_ids)
+    question_model.android_proto_size_in_bytes = (
+        question.android_proto_size_in_bytes)
+
+    return question_model
+
+
 def _save_question(committer_id, question, change_list, commit_message):
     """Validates a question and commits it to persistent storage.
 
@@ -616,13 +616,7 @@ def _save_question(committer_id, question, change_list, commit_message):
 
     question.validate()
     question_model = question_models.QuestionModel.get(question.id)
-    question_model.question_state_data = question.question_state_data.to_dict()
-    question_model.language_code = question.language_code
-    question_model.question_state_data_schema_version = (
-        question.question_state_data_schema_version)
-    question_model.linked_skill_ids = question.linked_skill_ids
-    question_model.inapplicable_skill_misconception_ids = (
-        question.inapplicable_skill_misconception_ids)
+    populate_question_model_fields(question_model, question)
     change_dicts = [change.to_dict() for change in change_list]
     question_model.commit(committer_id, commit_message, change_dicts)
     question.version += 1
