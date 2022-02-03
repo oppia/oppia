@@ -1,0 +1,272 @@
+# coding: utf-8
+#
+# Copyright 2021 The Oppia Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS-IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""Jobs used for updating the skill models."""
+
+from __future__ import annotations
+
+import logging
+
+from core import feconf
+from core.domain import caching_services
+from core.domain import skill_domain
+from core.domain import skill_fetchers
+from core.domain import skill_services
+from core.jobs import base_jobs
+from core.jobs.io import ndb_io
+from core.jobs.transforms import job_result_transforms
+from core.jobs.types import job_run_result
+from core.platform import models
+
+import apache_beam as beam
+import result
+
+from typing import Iterable, Sequence, Tuple
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import base_models
+    from mypy_imports import datastore_services
+    from mypy_imports import skill_models
+
+(base_models, skill_models,) = models.Registry.import_models([
+    models.NAMES.base_model, models.NAMES.skill
+])
+datastore_services = models.Registry.import_datastore_services()
+
+
+class PopulateSkillWithAndroidProtoSizeInBytesJob(base_jobs.JobBase):
+    """Job that migrates skill models."""
+
+    @staticmethod
+    def _migrate_skill(
+        skill_id: str, skill_model: skill_models.SkillModel
+    ) -> result.Result[Tuple[str, skill_domain.Skill], Tuple[str, Exception]]:
+        """Migrates skill and transform skill model into skill object.
+
+        Args:
+            skill_id: str. The id of the skill.
+            skill_model: SkillModel. The skill model to migrate.
+
+        Returns:
+            Result((str, Skill), (str, Exception)). Result containing tuple that
+            consists of skill ID and either skill object or Exception. Skill
+            object is returned when the migration was successful and Exception
+            is returned otherwise.
+        """
+        try:
+            skill = skill_fetchers.get_skill_from_model(skill_model)
+            skill.validate()
+        except Exception as e:
+            logging.exception(e)
+            return result.Err((skill_id, e))
+
+        return result.Ok((skill_id, skill))
+
+    @staticmethod
+    def _generate_skill_changes(
+        skill_model: skill_models.SkillModel,
+        skill: skill_domain.Skill
+    ) -> Iterable[Tuple[str, skill_domain.SkillChange]]:
+        """Generates skill change objects. Skill change object is generated when
+        schema version for some field is lower than the latest schema version.
+
+        Args:
+            skill_model: SkillModel. The skill for which to generate
+                the change objects.
+            skill: Skill. The skill domain object.
+
+        Yields:
+            (str, SkillChange). Tuple containing skill ID and skill change
+            object.
+        """
+        if skill_model.android_proto_size_in_bytes is None:
+            skill_change = skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                'property_name': (
+                    skill_domain.SKILL_PROPERTY_ANDROID_PROTO_SIZE_IN_BYTES),
+                'new_value': skill.android_proto_size_in_bytes,
+                'old_value': None
+            })
+            yield (skill.id, skill_change)
+
+    @staticmethod
+    def _delete_skill_from_cache(
+        skill: skill_domain.Skill
+    ) -> result.Result[str, Exception]:
+        """Deletes skill from cache.
+
+        Args:
+            skill: Skill. The skill which should be deleted from cache.
+
+        Returns:
+            Result(str,Exception). The id of the skill when the deletion
+            was successful or Exception when the deletion failed.
+        """
+        try:
+            caching_services.delete_multi(
+                caching_services.CACHE_NAMESPACE_SKILL, None, [skill.id])
+            return result.Ok(skill.id)
+        except Exception as e:
+            return result.Err(e)
+
+    @staticmethod
+    def _update_skill_model(
+        skill_model: skill_models.SkillModel,
+        migrated_skill: skill_domain.Skill,
+        skill_changes: Sequence[skill_domain.SkillChange]
+    ) -> Sequence[base_models.BaseModel]:
+        """Generates newly updated skill models.
+
+        Args:
+            skill_model: SkillModel. The skill which should be updated.
+            migrated_skill: Skill. The migrated skill domain object.
+            skill_changes: sequence(SkillChange). The skill changes to apply.
+
+        Returns:
+            sequence(BaseModel). Sequence of models which should be put into
+            the datastore.
+        """
+        updated_skill_model = (
+            skill_services.populate_skill_model_fields(
+                skill_model, migrated_skill))
+        commit_message = 'skill android_proto_size_in_bytes is updated.'
+        change_dicts = [change.to_dict() for change in skill_changes]
+        with datastore_services.get_ndb_context():
+            models_to_put = updated_skill_model.compute_models_to_commit(
+                feconf.MIGRATION_BOT_USERNAME,
+                feconf.COMMIT_TYPE_EDIT,
+                commit_message,
+                change_dicts,
+                additional_models={}
+            ).values()
+        datastore_services.update_timestamps_multi(list(models_to_put))
+        return models_to_put
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        """Returns a PCollection of results from the skill migration.
+
+        Returns:
+            PCollection. A PCollection of results from the skill migration.
+        """
+        unmigrated_skill_models = (
+            self.pipeline
+            | 'Get all non-deleted skill models' >> (
+                ndb_io.GetModels(skill_models.SkillModel.get_all()))
+            # Pylint disable is needed because pylint is not able to correctly
+            # detect that the value is passed through the pipe.
+            | 'Add skill model ID' >> beam.WithKeys( # pylint: disable=no-value-for-parameter
+                lambda skill_model: skill_model.id)
+        )
+
+        migrated_skill_results = (
+            unmigrated_skill_models
+            | 'Transform and migrate model' >> beam.MapTuple(
+                self._migrate_skill)
+        )
+        migrated_skills = (
+            migrated_skill_results
+            | 'Filter oks' >> beam.Filter(
+                lambda result_item: result_item.is_ok())
+            | 'Unwrap ok' >> beam.Map(
+                lambda result_item: result_item.unwrap())
+        )
+        migrated_skill_job_run_results = (
+            migrated_skill_results
+            | 'Generate results for migration' >> (
+                job_result_transforms.ResultsToJobRunResults('SKILL PROCESSED'))
+        )
+
+        migrated_skill_object_list = (
+            {
+                'skill_model': unmigrated_skill_models,
+                'skill': migrated_skills,
+            }
+            | 'Merge object' >> beam.CoGroupByKey()
+            | 'Get rid ID' >> beam.Values()  # pylint: disable=no-value-for-parameter
+            | 'Remove unmigrated exploration object' >> beam.Filter(
+                lambda x: len(x['skill']) > 0)
+            | 'Reorganize the skill object' >> beam.Map(lambda objects: {
+                    'skill_model': objects['skill_model'][0],
+                    'skill': objects['skill'][0]
+                })
+        )
+
+        skill_changes = (
+            migrated_skill_object_list
+            | 'Generate skill changes' >> beam.FlatMap(
+                lambda skill_objects: self._generate_skill_changes(
+                    skill_objects['skill_model'],
+                    skill_objects['skill']
+                ))
+        )
+
+        skill_objects_list = (
+            {
+                'skill_model': unmigrated_skill_models,
+                'skill': migrated_skills,
+                'skill_changes': skill_changes
+            }
+            | 'Merge objects' >> beam.CoGroupByKey()
+            | 'Get rid of ID' >> beam.Values()  # pylint: disable=no-value-for-parameter
+            | 'Remove unmigrated skills' >> beam.Filter(
+                lambda x: len(x['skill_changes']) > 0 and len(x['skill']) > 0)
+            | 'Reorganize the skill objects' >> beam.Map(lambda objects: {
+                    'skill_model': objects['skill_model'][0],
+                    'skill': objects['skill'][0],
+                    'skill_changes': objects['skill_changes']
+                })
+        )
+
+        skill_objects_list_job_run_results = (
+            skill_objects_list
+            | 'Transform skill objects into job run results' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'SKILL POPULATED WITH android_proto_size_in_bytes'))
+        )
+
+        cache_deletion_job_run_results = (
+            skill_objects_list
+            | 'Delete skill from cache' >> beam.Map(
+                lambda skill_object: self._delete_skill_from_cache(
+                    skill_object['skill']))
+            | 'Generate results for cache deletion' >> (
+                job_result_transforms.ResultsToJobRunResults('CACHE DELETION'))
+        )
+
+        skill_models_to_put = (
+            skill_objects_list
+            | 'Generate skill models to put' >> beam.FlatMap(
+                lambda skill_objects: self._update_skill_model(
+                    skill_objects['skill_model'],
+                    skill_objects['skill'],
+                    skill_objects['skill_changes'],
+                ))
+        )
+
+        unused_put_results = (
+            skill_models_to_put
+            | 'Put models into the datastore' >> ndb_io.PutModels()
+        )
+
+        return (
+            (
+                cache_deletion_job_run_results,
+                migrated_skill_job_run_results,
+                skill_objects_list_job_run_results
+            )
+            | beam.Flatten()
+        )
