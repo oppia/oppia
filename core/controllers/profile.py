@@ -235,6 +235,7 @@ class PreferencesHandler(base.BaseHandler):
         self.render_json({
             'bulk_email_signup_message_should_be_shown': (
                 bulk_email_signup_message_should_be_shown)
+        })
 
 
 class ProfilePictureHandler(base.BaseHandler):
