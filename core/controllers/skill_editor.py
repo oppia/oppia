@@ -284,10 +284,7 @@ class FetchSkillsHandler(base.BaseHandler):
 
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {
-        'PUT': {},
         'GET': {},
-        'DELETE': {},
-        'POST': {}
     }
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
