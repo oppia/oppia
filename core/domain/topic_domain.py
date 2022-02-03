@@ -1179,8 +1179,7 @@ class Topic:
         Returns:
             dict. The converted subtopic_dict.
         """
-        file_system_class = fs_domain.GcsFileSystem
-        fs = fs_domain.AbstractFileSystem(file_system_class(  # type: ignore[no-untyped-call]
+        fs = fs_domain.AbstractFileSystem(fs_domain.GcsFileSystem(  # type: ignore[no-untyped-call]
             feconf.ENTITY_TYPE_TOPIC, topic_id))
         filepath = '%s/%s' % (
             constants.ASSET_TYPE_THUMBNAIL, subtopic_dict['thumbnail_filename'])
@@ -1336,8 +1335,7 @@ class Topic:
             new_thumbnail_filename: str|None. The updated thumbnail filename
                 for the topic.
         """
-        file_system_class = fs_domain.GcsFileSystem
-        fs = fs_domain.AbstractFileSystem(file_system_class(  # type: ignore[no-untyped-call]
+        fs = fs_domain.AbstractFileSystem(fs_domain.GcsFileSystem(  # type: ignore[no-untyped-call]
             feconf.ENTITY_TYPE_TOPIC, self.id))
 
         filepath = '%s/%s' % (
@@ -1545,8 +1543,7 @@ class Topic:
         """
         subtopic_index = self.get_subtopic_index(subtopic_id)
 
-        file_system_class = fs_domain.GcsFileSystem
-        fs = fs_domain.AbstractFileSystem(file_system_class(  # type: ignore[no-untyped-call]
+        fs = fs_domain.AbstractFileSystem(fs_domain.GcsFileSystem(  # type: ignore[no-untyped-call]
             feconf.ENTITY_TYPE_TOPIC, self.id))
         filepath = '%s/%s' % (
             constants.ASSET_TYPE_THUMBNAIL, new_thumbnail_filename)
