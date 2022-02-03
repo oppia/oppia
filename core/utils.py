@@ -40,7 +40,7 @@ from core.constants import constants
 
 from typing import (
     IO, Any, Callable, Dict, Iterable, Iterator, List, Optional, Tuple,
-    TypeVar, Union)
+    TypeVar, Union, overload)
 
 from typing_extensions import Literal
 
@@ -94,6 +94,20 @@ class ExplorationConversionError(Exception):
     """
 
     pass
+
+
+@overload
+def open_file(
+        filename: str, mode: TextModeTypes, encoding: str='utf-8',
+        newline: Union[str, None]=None) -> IO[str]:
+    ...
+
+
+@overload
+def open_file(
+        filename: str, mode: BinaryModeTypes, encoding: str='utf-8',
+        newline: Union[str, None]=None) -> IO[bytes]:
+    ...
 
 
 def open_file(
