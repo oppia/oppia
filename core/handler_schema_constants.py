@@ -70,7 +70,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'RecommendationsHandler',
     'ResubmitSuggestionHandler',
     'SiteLanguageHandler',
-    'SkillDataHandler',
     'SkillDescriptionHandler',
     'StartedTranslationTutorialEventHandler',
     'StateCompleteEventHandler',

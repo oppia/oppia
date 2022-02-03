@@ -253,13 +253,23 @@ class EditableSkillDataHandler(base.BaseHandler):
 class SkillDataHandler(base.BaseHandler):
     """A handler for accessing skills data."""
 
+    URL_PATH_ARGS_SCHEMAS = {
+        'skill_ids': {
+            'schema': {
+                'type': 'custom',
+                'obj_type': 'JsonEncodedInString'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.open_access
-    def get(self, comma_separated_skill_ids):
+    def get(self, skill_ids):
         """Populates the data on skill pages of the skill ids."""
-
-        skill_ids = comma_separated_skill_ids.split(',')
 
         try:
             for skill_id in skill_ids:

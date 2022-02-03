@@ -378,7 +378,7 @@ class SkillDataHandlerTest(BaseSkillEditorControllerTests):
 
     def setUp(self):
         super(SkillDataHandlerTest, self).setUp()
-        self.url = '%s/%s,%s' % (
+        self.url = '%s/["%s","%s"]' % (
             feconf.SKILL_DATA_URL_PREFIX, self.skill_id, self.skill_id_2)
         self.put_payload = {
             'version': 1,
@@ -404,7 +404,7 @@ class SkillDataHandlerTest(BaseSkillEditorControllerTests):
         # Check GET returns 404 when cannot get skill by id.
         self.delete_skill_model_and_memcache(self.admin_id, self.skill_id)
         self.get_json(self.url, expected_status_int=404)
-        self.url = '%s/1,%s' % (
+        self.url = '%s/["1","%s"]' % (
             feconf.SKILL_DATA_URL_PREFIX, self.skill_id_2)
         self.get_json(self.url, expected_status_int=404)
         self.logout()
