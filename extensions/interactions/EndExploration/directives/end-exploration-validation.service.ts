@@ -63,14 +63,17 @@ export class EndExplorationValidationService {
     }
     // Validate invalid exploration ids given in author recommended
     // explorations ids.
-    let warningMessage = document.querySelector(
+    let warningMessageElement = document.querySelector(
       'oppia-interactive-end-exploration .oppia-error-message-text span'
-    ).textContent;
-    warningMessage &&
-    warningsList.push({
-      type: AppConstants.WARNING_TYPES.ERROR,
-      message: warningMessage
-    });
+    );
+    if (warningMessageElement) {
+      let warningMessage = warningMessageElement.textContent;
+      warningMessage &&
+      warningsList.push({
+        type: AppConstants.WARNING_TYPES.ERROR,
+        message: warningMessage
+      });
+    }
     return warningsList;
   }
 
