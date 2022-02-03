@@ -65,9 +65,9 @@ export class EndExplorationValidationService {
     // explorations ids.
     let warningMessage = document.querySelector(
       'oppia-interactive-end-exploration .oppia-error-message-text span'
-    ).textContent
-    warningMessage
-    && warningsList.push({
+    ).textContent;
+    warningMessage &&
+    warningsList.push({
       type: AppConstants.WARNING_TYPES.ERROR,
       message: warningMessage
     });

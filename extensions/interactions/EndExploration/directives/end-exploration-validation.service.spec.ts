@@ -29,7 +29,7 @@ import { Outcome, OutcomeObjectFactory } from
 
 import { AppConstants } from 'app.constants';
 
-fdescribe('EndExplorationValidationService', () => {
+describe('EndExplorationValidationService', () => {
   let WARNING_TYPES: typeof AppConstants.WARNING_TYPES;
   let validatorService: EndExplorationValidationService;
 
@@ -94,8 +94,7 @@ fdescribe('EndExplorationValidationService', () => {
     () => {
       // This makes sure that query selector for getting error message does
       // not cause flake in the tests.
-      spyOn(document, 'querySelector')
-      .withArgs(
+      spyOn(document, 'querySelector').withArgs(
         'oppia-interactive-end-exploration .oppia-error-message-text span')
         .and.returnValue(errorMessageElement);
       var warnings = validatorService.getAllWarnings(
@@ -107,8 +106,7 @@ fdescribe('EndExplorationValidationService', () => {
     () => {
       // This makes sure that query selector for getting error message does
       // not cause flake in the tests.
-      spyOn(document, 'querySelector')
-      .withArgs(
+      spyOn(document, 'querySelector').withArgs(
         'oppia-interactive-end-exploration .oppia-error-message-text span')
         .and.returnValue(errorMessageElement);
       var warnings = validatorService.getAllWarnings(
@@ -128,20 +126,20 @@ fdescribe('EndExplorationValidationService', () => {
 
   it('should have warnings if author recommended exploration ids are invalid',
     () => {
-      let missingExpIds = customizationArguments.recommendedExplorationIds.value;
+      let missingExpIds =
+        customizationArguments.recommendedExplorationIds.value;
       let listOfIds = missingExpIds.join('", "');
-      let warningMessage = 'Warning: exploration(s) with the IDs "' + listOfIds +
-      '" will not be shown as recommendations because ' +
+      let warningMessage = 'Warning: exploration(s) with the IDs "' +
+      listOfIds + '" will not be shown as recommendations because ' +
       'they either do not exist, or are not publicly viewable.';
       errorMessageElement.textContent = warningMessage;
 
       let invalidExplorationIdsWarning = {
         type: WARNING_TYPES.ERROR,
         message: warningMessage
-      }
+      };
 
-      spyOn(document, 'querySelector')
-      .withArgs(
+      spyOn(document, 'querySelector').withArgs(
         'oppia-interactive-end-exploration .oppia-error-message-text span')
         .and.returnValue(errorMessageElement);
 
@@ -154,10 +152,9 @@ fdescribe('EndExplorationValidationService', () => {
   it('should throw for missing recommendations argument', () => {
     // This makes sure that query selector for getting error message does
     // not cause flake in the tests.
-    spyOn(document, 'querySelector')
-      .withArgs(
-        'oppia-interactive-end-exploration .oppia-error-message-text span')
-        .and.returnValue(errorMessageElement);
+    spyOn(document, 'querySelector').withArgs(
+      'oppia-interactive-end-exploration .oppia-error-message-text span')
+      .and.returnValue(errorMessageElement);
     expect(() => {
       // This throws "Argument of type '{}'. We need to suppress this error
       // because is not assignable to parameter of type
@@ -173,10 +170,9 @@ fdescribe('EndExplorationValidationService', () => {
   it('should not have warnings for 0 or 8 recommendations', () => {
     // This makes sure that query selector for getting error message does
     // not cause flake in the tests.
-    spyOn(document, 'querySelector')
-      .withArgs(
-        'oppia-interactive-end-exploration .oppia-error-message-text span')
-        .and.returnValue(errorMessageElement);
+    spyOn(document, 'querySelector').withArgs(
+      'oppia-interactive-end-exploration .oppia-error-message-text span')
+      .and.returnValue(errorMessageElement);
     customizationArguments.recommendedExplorationIds.value = [];
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, [], null);
@@ -195,8 +191,7 @@ fdescribe('EndExplorationValidationService', () => {
     () => {
       // This makes sure that query selector for getting error message does
       // not cause flake in the tests.
-      spyOn(document, 'querySelector')
-      .withArgs(
+      spyOn(document, 'querySelector').withArgs(
         'oppia-interactive-end-exploration .oppia-error-message-text span')
         .and.returnValue(errorMessageElement);
       // This throws "Type 'number'. We need to suppress this error because is
@@ -216,8 +211,7 @@ fdescribe('EndExplorationValidationService', () => {
     () => {
       // This makes sure that query selector for getting error message does
       // not cause flake in the tests.
-      spyOn(document, 'querySelector')
-      .withArgs(
+      spyOn(document, 'querySelector').withArgs(
         'oppia-interactive-end-exploration .oppia-error-message-text span')
         .and.returnValue(errorMessageElement);
       // This throws "Type '"ExpID0"'. We need to suppress this error because is
