@@ -40,7 +40,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'EditableStoryDataHandler',
     'ExportAccountHandler',
     'FeedbackThreadStatusChangeEmailHandler',
-    'FetchSkillsHandler',
     'FlagExplorationEmailHandler',
     'IncomingReplyEmailHandler',
     'InstantFeedbackMessageEmailHandler',
