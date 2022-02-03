@@ -130,7 +130,7 @@
         ng-submit="$ctrl.saveThisDestination()">
     <oppia-outcome-destination-editor [outcome]="$ctrl.outcome"
                                       [outcome-has-feedback]="$ctrl.displayFeedback"
-                                      [add-state]="$ctrl.addState">
+                                      (add-state)="$ctrl.addState($event)">
     </oppia-outcome-destination-editor>
   </form>
 

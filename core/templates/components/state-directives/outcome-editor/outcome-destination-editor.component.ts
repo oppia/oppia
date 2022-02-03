@@ -16,7 +16,8 @@
  * @fileoverview Component for the outcome destination editor.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { Subscription } from 'rxjs';
 import cloneDeep from 'lodash/cloneDeep';
 import { StateGraphLayoutService } from 'components/graph-services/graph-layout.service';
@@ -26,7 +27,11 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { UserService } from 'services/user.service';
 import { AppConstants } from 'app.constants';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
-import { downgradeComponent } from '@angular/upgrade/static';
+
+interface DestChoices {
+  id: string;
+  text: string;
+}
 
 @Component({
   selector: 'oppia-outcome-destination-editor',
@@ -35,20 +40,25 @@ import { downgradeComponent } from '@angular/upgrade/static';
 export class OutcomeDestinationEditorComponent implements OnInit {
   @Input() outcome: Outcome;
   @Input() outcomeHasFeedback: boolean;
-  @Input() addState;
-  directiveSubscriptions = new Subscription();
-  ENABLE_PREREQUISITE_SKILLS = AppConstants.ENABLE_PREREQUISITE_SKILLS;
-  EXPLORATION_AND_SKILL_ID_PATTERN = (
-    AppConstants.EXPLORATION_AND_SKILL_ID_PATTERN);
-  MAX_STATE_NAME_LENGTH = AppConstants.MAX_STATE_NAME_LENGTH;
-  PLACEHOLDER_OUTCOME_DEST = AppConstants.PLACEHOLDER_OUTCOME_DEST;
-  canAddPrerequisiteSkill;
-  canEditRefresherExplorationId;
-  explorationAndSkillIdPattern;
-  newStateNamePattern;
-  destChoices;
-  currentStateName = null;
+  @Output() addState:
+  EventEmitter<string> = new EventEmitter<string>();
+  directiveSubscriptions: Subscription = new Subscription();
+  canAddPrerequisiteSkill: boolean;
+  canEditRefresherExplorationId: boolean;
+  explorationAndSkillIdPattern: RegExp;
+  newStateNamePattern: RegExp;
+  destChoices: DestChoices[];
   maxLen: number;
+  outcomeNewStateName: string;
+  currentStateName: string = null;
+  ENABLE_PREREQUISITE_SKILLS: boolean = (
+    AppConstants.ENABLE_PREREQUISITE_SKILLS);
+  EXPLORATION_AND_SKILL_ID_PATTERN: RegExp = (
+    AppConstants.EXPLORATION_AND_SKILL_ID_PATTERN);
+  MAX_STATE_NAME_LENGTH: number = (
+    AppConstants.MAX_STATE_NAME_LENGTH);
+  PLACEHOLDER_OUTCOME_DEST: string = (
+    AppConstants.PLACEHOLDER_OUTCOME_DEST);
 
   constructor(
     private editorFirstTimeEventsService: EditorFirstTimeEventsService,
@@ -74,6 +84,7 @@ export class OutcomeDestinationEditorComponent implements OnInit {
   }
 
   updateOptionNames(): void {
+    // The seTimeout is being used here to update the view.
     setTimeout(() => {
       this.currentStateName = this.stateEditorService.getActiveStateName();
       let questionModeEnabled = this.stateEditorService.isInQuestionMode();
@@ -146,6 +157,7 @@ export class OutcomeDestinationEditorComponent implements OnInit {
           text: 'A New Card Called...'
         });
       }
+    // This value of 10ms is arbitrary, it has no significance.
     }, 0);
   }
 
@@ -160,10 +172,12 @@ export class OutcomeDestinationEditorComponent implements OnInit {
           this.editorFirstTimeEventsService
             .registerFirstCreateSecondStateEvent();
 
-          let newStateName = this.stateEditorService.getActiveStateName();
+          let newStateName = this.outcomeNewStateName;
           this.outcome.dest = newStateName;
 
-          this.addState(newStateName);
+          delete this.outcomeNewStateName;
+
+          this.addState.emit(newStateName);
         }
       }));
     this.updateOptionNames();

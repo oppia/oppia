@@ -8,32 +8,31 @@
       <select class="form-control oppia-form-control"
               [(ngModel)]="outcome.dest"
               (ngModelChange)="onDestSelectorChange()">
-        <option *ngFor="let choice of destChoices">{{ choice.text }}</option>
+        <option *ngFor="let choice of destChoices" [value]="choice.id">{{ choice.text }}</option>
     </select>
     </span>
-  </div>
-  <div>
     <span *ngIf="isCreatingNewState()">
       <input class="form-control protractor-test-add-state-input"
              type="text"
+             name="newStateNameForm"
              [oppiaFocusOn]="newStateNameInputField"
-             [(ngModel)]="outcome.newStateName"
+             [(ngModel)]="outcomeNewStateName"
              [attr.maxlength]="maxLen"
              [pattern]="newStateNamePattern"
              tabindex="0"
-             aria-invalid="false" required>
+             [attr.aria-invalid]="false" required>
     </span>
-    <p class="form-text oppia-form-error oppia-form-error-text">Please pick a card name consisting of alphanumeric characters, spaces and/or hyphens.</p>
   </div>
+  <p class="form-text oppia-form-error oppia-form-error-text">Please pick a card name consisting of alphanumeric characters, spaces and/or hyphens.</p>
 
   <div *ngIf="isSelfLoop() && canEditRefresherExplorationId" class="oppia-id-text">
     <b>Refresher exploration ID (optional):</b>
     <input type="text"
            class="form-control protractor-test-add-refresher-exploration-id"
            [(ngModel)]="outcome.refresherExplorationId" 
-           [pattern]="globalIdPattern"
+           [pattern]="explorationAndSkillIdPattern"
            tabindex="0" 
-           aria-invalid="false">
+           [attr.aria-invalid]="false">
   </div>
   <div class="oppia-id-text" *ngIf="canAddPrerequisiteSkill">
     <b>Prerequisite skill ID (optional):&nbsp;</b>
@@ -41,7 +40,7 @@
            type="text" 
            [(ngModel)]="outcome.missingPrerequisiteSkillId"  
            tabindex="0" 
-           aria-invalid="false" 
+           [attr.aria-invalid]="false" 
            [ngModelOptions]="{allowInvalid: true}">
     <p class="oppia-prerequisite-explanation-text">
       <i> Mention the skill that this state requires so that a learner who is stuck in the state can quickly learn the
