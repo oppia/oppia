@@ -26,7 +26,6 @@ import re
 
 from core import android_validation_constants
 from core import feconf
-from core import python_utils
 from core import schema_utils
 from core import utils
 from core.constants import constants
@@ -1475,7 +1474,7 @@ class Voiceover:
             raise utils.ValidationError(
                 'Expected needs_update to be a bool, received %s' %
                 self.needs_update)
-        if not isinstance(self.duration_secs, float):
+        if not isinstance(self.duration_secs, (float, int)):
             raise utils.ValidationError(
                 'Expected duration_secs to be a float, received %s' %
                 self.duration_secs)
@@ -2745,7 +2744,7 @@ class State:
             logging.exception('Bad state dict: %s' % str(state_dict))
             raise e
 
-        return python_utils.yaml_from_dict(state.to_dict(), width=width)
+        return utils.yaml_from_dict(state.to_dict(), width=width)
 
     def get_translation_counts(self):
         """Return a dict representing the number of translations available in a

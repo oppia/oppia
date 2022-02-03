@@ -42,7 +42,7 @@ from typing import (
     Any, Callable, Dict, Iterable, Iterator, List, Optional, Tuple, TypeVar,
     Union)
 
-_YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-5.1.2')
+_YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-6.0')
 sys.path.insert(0, _YAML_PATH)
 
 import yaml  # isort:skip  # pylint: disable=wrong-import-position
@@ -233,6 +233,24 @@ def dict_from_yaml(yaml_str: str) -> Dict[str, Any]:
         return retrieved_dict
     except (AssertionError, yaml.YAMLError) as e:
         raise InvalidInputException(e)
+
+
+def yaml_from_dict(dictionary: Dict[str, Any], width: int = 80) -> str:
+    """Gets the YAML representation of a dict.
+
+    Args:
+        dictionary: dict. Dictionary for conversion into yaml.
+        width: int. Width for the yaml representation, default value
+            is set to be of 80.
+
+    Returns:
+        str. Converted yaml of the passed dictionary.
+    """
+    # The type ignore is needed, because typestubs define the return type
+    # of 'dump' as 'Any' which is wrong.
+    return yaml.dump( # type: ignore[no-any-return]
+        dictionary, allow_unicode=True, width=width
+    )
 
 
 # Here obj has a recursive structure. The list element or dictionary value

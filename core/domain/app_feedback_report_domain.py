@@ -1277,7 +1277,7 @@ class LessonPlayerEntryPoint(EntryPoint):
         self.require_valid_entry_point_name(
             self.entry_point_name,
             app_feedback_report_constants.ENTRY_POINT.lesson_player)
-        topic_domain.Topic.require_valid_topic_id(self.topic_id) # type: ignore[no-untyped-call]
+        topic_domain.Topic.require_valid_topic_id(self.topic_id)
         story_domain.Story.require_valid_story_id(self.story_id) # type: ignore[no-untyped-call]
         self.require_valid_entry_point_exploration(
             self.exploration_id, self.story_id)
@@ -1323,7 +1323,7 @@ class RevisionCardEntryPoint(EntryPoint):
         self.require_valid_entry_point_name(
             self.entry_point_name,
             app_feedback_report_constants.ENTRY_POINT.revision_card)
-        topic_domain.Topic.require_valid_topic_id(self.topic_id) # type: ignore[no-untyped-call]
+        topic_domain.Topic.require_valid_topic_id(self.topic_id)
         if not isinstance(self.subtopic_id, int):
             raise utils.ValidationError(
                 'Expected subtopic id to be an int, received %s' % (
