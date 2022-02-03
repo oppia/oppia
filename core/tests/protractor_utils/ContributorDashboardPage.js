@@ -82,11 +82,17 @@ var ContributorDashboardPage = function() {
       reviewRightsDiv, 'User does not have rights to review translation');
 
     var translationReviewRightsElement = element(by.css(
-      '.protractor-test-translation-' + language + '-reviewer'));
+      '.protractor-test-translation-' + (
+        _convertlanguageToKebabCase(language)) + '-reviewer'));
     await waitFor.visibilityOf(
       translationReviewRightsElement,
       'User does not have rights to review translation in language: ' + language
     );
+  };
+
+  var _convertlanguageToKebabCase = function(languageDescription) {
+    let lang = languageDescription.replaceAll(' ', '-').toLowerCase();
+    return lang.replace(/\(?\)?/g, '');
   };
 
   var _expectUserToBeReviewer = async function(
@@ -95,10 +101,10 @@ var ContributorDashboardPage = function() {
       reviewRightsDiv,
       'Review rights div is not visible, so user does not have rights to ' +
       'review ' + reviewCategory);
-
     var reviewRightsElementClassName = ('.protractor-test-' + reviewCategory);
     if (langaugeDescription !== null) {
-      reviewRightsElementClassName += '-' + langaugeDescription;
+      let language = _convertlanguageToKebabCase(langaugeDescription);
+      reviewRightsElementClassName += '-' + language;
     }
     reviewRightsElementClassName += '-reviewer';
 
