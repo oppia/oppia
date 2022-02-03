@@ -508,7 +508,7 @@
         <li class="nav-item">
           <a (click)="onLoginButtonClicked()"
              class="nav-link oppia-nav-link">
-            <div class="oppia-nav-right-dropdown">
+            <div class="signin-dropdown oppia-nav-right-dropdown">
               <div class="oppia-signin-g-icon">
                 <img [src]="googleSignInIconUrl" alt="Google signin icon">
               </div>
@@ -620,6 +620,11 @@
   .item:hover,
   .item:focus {
     background-color: #21212107;
+  }
+  .dropdown-menu .signin-dropdown {
+    width: 200px;
+    height: 41px;
+    border-radius: 1px;
   }
   .top-section .item {
     padding-bottom: 27px;
@@ -774,7 +779,7 @@
   }
   .oppia-signin-g-icon {
     float: left;
-    padding: 10px 24px 10px 0;
+    padding: 10px 15px 10px 0;
   }
   .oppia-navbar-menu-icon {
     color: #fff;
@@ -846,7 +851,7 @@
     font-size: 14px;
     font-weight: 500;
     letter-spacing: .21px;
-    line-height: 38px;
+    line-height: 41px;
   }
   .oppia-user-avatar-icon {
     margin-top: -1px;
