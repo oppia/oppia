@@ -42,7 +42,6 @@ import sys
 # the current working directory so that Git knows where to find python_utils.
 sys.path.append(os.getcwd())
 from scripts import common  # isort:skip  # pylint: disable=wrong-import-position
-from scripts import install_backend_python_libs # isort:skip  # pylint: disable=wrong-import-position
 
 GitRef = collections.namedtuple(
     'GitRef', ['local_ref', 'local_sha1', 'remote_ref', 'remote_sha1'])

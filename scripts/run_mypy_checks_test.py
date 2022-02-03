@@ -134,15 +134,13 @@ class MypyScriptChecks(test_utils.GenericTestBase):
         ]
         with self.files_swap:
             with self.directories_swap:
-                cmd = run_mypy_checks.get_mypy_cmd(
-                    None, self.mypy_cmd_path, False)
+                cmd = run_mypy_checks.get_mypy_cmd(None)
                 self.assertEqual(cmd, expected_cmd)
 
     def test_get_mypy_cmd_for_ci(self):
         with self.files_swap:
             with self.directories_swap:
-                cmd = run_mypy_checks.get_mypy_cmd(
-                    None, self.mypy_cmd_path, True)
+                cmd = run_mypy_checks.get_mypy_cmd(None)
                 self.assertEqual(cmd[0], 'mypy')
 
     def test_get_mypy_cmd_with_files(self):
@@ -152,34 +150,8 @@ class MypyScriptChecks(test_utils.GenericTestBase):
         ]
         with self.files_swap:
             with self.directories_swap:
-                cmd = run_mypy_checks.get_mypy_cmd(
-                    ['file1.py', 'file2.py'], self.mypy_cmd_path, False)
+                cmd = run_mypy_checks.get_mypy_cmd(['file1.py', 'file2.py'])
                 self.assertEqual(cmd, expected_cmd)
-
-    def test_install_mypy_prerequisites(self):
-        with self.popen_swap_success:
-            code, path = run_mypy_checks.install_mypy_prerequisites(False)
-            self.assertEqual(code, 0)
-            self.assertEqual(path, self.mypy_cmd_path)
-
-    def test_install_mypy_prerequisites_for_ci(self):
-        with self.popen_swap_success:
-            code, _ = run_mypy_checks.install_mypy_prerequisites(True)
-            self.assertEqual(code, 0)
-
-    def test_install_mypy_prerequisites_with_user_prefix_error(self):
-        with self.popen_swap_user_prefix_error:
-            code, path = run_mypy_checks.install_mypy_prerequisites(False)
-            self.assertEqual(code, 0)
-            self.assertNotEqual(path, self.mypy_cmd_path)
-
-    def test_install_mypy_prerequisites_with_wrong_script(self):
-        with self.popen_swap_failure:
-            with self.swap(
-                run_mypy_checks, 'MYPY_REQUIREMENTS_FILE_PATH', 'scripts.wrong'
-            ):
-                code, _ = run_mypy_checks.install_mypy_prerequisites(False)
-                self.assertEqual(code, 1)
 
     def test_running_script_without_mypy_errors(self):
         with self.popen_swap_success:

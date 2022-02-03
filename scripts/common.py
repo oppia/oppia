@@ -132,11 +132,14 @@ REDIS_DUMP_PATH = os.path.join(CURR_DIR, 'dump.rdb')
 # 'third_party/python_libs' directory.
 # NOTE: Developers should NOT modify this file.
 COMPILED_REQUIREMENTS_FILE_PATH = os.path.join(CURR_DIR, 'requirements.txt')
+COMPILED_DEV_REQUIREMENTS_FILE_PATH = os.path.join(
+    CURR_DIR, 'requirements-dev.txt')
 # The precompiled requirements file is the one that developers should be
 # modifying. It is the file that we use to recompile the
 # "requirements.txt" file so that all installations using "requirements.txt"
 # will be identical.
 REQUIREMENTS_FILE_PATH = os.path.join(CURR_DIR, 'requirements.in')
+DEV_REQUIREMENTS_FILE_PATH = os.path.join(CURR_DIR, 'requirements-dev.in')
 
 WEBPACK_DEV_CONFIG = 'webpack.dev.config.ts'
 WEBPACK_DEV_SOURCE_MAPS_CONFIG = 'webpack.dev.sourcemap.config.ts'
