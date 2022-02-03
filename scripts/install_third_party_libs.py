@@ -87,9 +87,8 @@ PROTOC_DARWIN_FILE = 'protoc-%s-osx-x86_64.zip' % (common.PROTOC_VERSION)
 BUF_DIR = os.path.join(
     common.OPPIA_TOOLS_DIR, 'buf-%s' % common.BUF_VERSION)
 PROTOC_DIR = os.path.join(BUF_DIR, 'protoc')
-# A list of 2-tuples, each representing a proto file. For each tuple,
-# the first element represents whether buf needs to generate its JS/TS file,
-# and the second element represents the path to the file.
+# A dictionary where key represents the path of the proto file and its value
+# represents whether buf needs to generate its JS/TS file.
 PROTO_FILE_COMPILATION_REQS = {
     os.path.join(common.THIRD_PARTY_DIR, 'oppia-ml-proto-0.0.0'): True,
     common.THIRD_PARTY_OPPIA_ANDROID_PROTO_DIR: False
