@@ -348,24 +348,22 @@ export class PlaythroughService {
 
   private isRecordedPlaythroughHelpful(): boolean {
     if (
-      this.recordedLearnerActions !== null &&
-        this.playthroughDurationInSecs !== null
-    ) {
-      return (
-        // Playthroughs are only helpful in their entirety.
-        this.hasRecordingFinished() &&
-        // Playthroughs are only helpful if learners have attempted an answer.
-              this.recordedLearnerActions.some(
-                a => a.actionType === AppConstants.ACTION_TYPE_ANSWER_SUBMIT) &&
-        // Playthroughs are only helpful if learners have invested enough time.
-            this.playthroughDurationInSecs >=
-              ServicesConstants.MIN_PLAYTHROUGH_DURATION_IN_SECS);
-    } else {
-      throw Error(
-        'Value recordedLearnerActions and' +
-           'playthroughDurationInSecs should not be null!');
+      this.recordedLearnerActions === null &&
+        this.playthroughDurationInSecs === null
+    ) { throw new Error (
+      'recordedLearnerActions and playthroughDurationInSecs needs to be' +
+         'initialised');
     }
-  }
+    return (
+      // Playthroughs are only helpful in their entirety.
+      this.hasRecordingFinished() &&
+      // Playthroughs are only helpful if learners have attempted an answer.
+            this.recordedLearnerActions.some(
+              a => a.actionType === AppConstants.ACTION_TYPE_ANSWER_SUBMIT) &&
+      // Playthroughs are only helpful if learners have invested enough time.
+          this.playthroughDurationInSecs >=
+            ServicesConstants.MIN_PLAYTHROUGH_DURATION_IN_SECS);
+    }
 }
 
 angular.module('oppia').factory(
