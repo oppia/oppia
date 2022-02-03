@@ -73,13 +73,11 @@ export class RolesAndActionsVisualizerComponent implements OnInit {
             /^\w/, (c) => c.toUpperCase()));
       });
       return readableTexts.sort();
-    };
-    
+    };    
     this.roleToActions.forEach(role => {
       this.roleToReadableActions[role] = getSortedReadableTexts(
         this.roleToActions[role]);      
     });
-
     this.roles = Object.keys(this.roleToActions).sort();
     this.activeRole = this.roles[3];
   }
