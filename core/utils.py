@@ -39,7 +39,7 @@ from core import python_utils
 from core.constants import constants
 
 from typing import (
-    IO, Any, Callable, Dict, Iterable, Iterator, List, Optional, Tuple,
+    Any, Callable, Dict, IO, Iterable, Iterator, List, Optional, Tuple,
     TypeVar, Union, overload)
 
 from typing_extensions import Literal
