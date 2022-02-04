@@ -39,7 +39,7 @@ from core import python_utils
 from core.constants import constants
 
 from typing import (
-    Any, Callable, Dict, IO, Iterable, Iterator, List, Optional, Tuple,
+    IO, Any, Callable, Dict, Iterable, Iterator, List, Optional, Tuple,
     TypeVar, Union, overload)
 
 from typing_extensions import Literal
@@ -98,8 +98,8 @@ class ExplorationConversionError(Exception):
 
 @overload
 def open_file(
-    filename: str, 
-    mode: TextModeTypes, 
+    filename: str,
+    mode: TextModeTypes,
     encoding: str = 'utf-8',
     newline: Union[str, None] = None
 ) -> IO[str]: ...
@@ -107,19 +107,19 @@ def open_file(
 
 @overload
 def open_file(
-    filename: str, 
-    mode: BinaryModeTypes, 
+    filename: str,
+    mode: BinaryModeTypes,
     encoding: str = 'utf-8',
     newline: Union[str, None] = None
 ) -> IO[bytes]: ...
 
 
 def open_file(
-    filename: str, 
+    filename: str,
     mode: Union[TextModeTypes, BinaryModeTypes],
-    encoding: str = 'utf-8', 
+    encoding: str = 'utf-8',
     newline: Union[str, None] = None
-) -> IO[Any]: 
+) -> IO[Any]:
     """Open file and return a corresponding file object.
 
     Args:
