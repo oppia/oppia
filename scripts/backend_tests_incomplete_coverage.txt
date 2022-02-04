@@ -12,7 +12,6 @@ core.domain.topic_domain_test
 core.controllers.acl_decorators_test
 core.domain.question_domain_test
 core.domain.rights_manager_test
-core.domain.skill_services_test
 core.domain.story_domain_test
 core.domain.suggestion_services_test
 core.domain.stats_services_test
