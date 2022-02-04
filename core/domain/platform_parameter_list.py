@@ -24,8 +24,6 @@ from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_registry as registry
 
 Registry = registry.Registry
-FEATURE_STAGES = platform_parameter_domain.FEATURE_STAGES # pylint: disable=invalid-name
-DATA_TYPES = platform_parameter_domain.DATA_TYPES # pylint: disable=invalid-name
 
 
 # TODO(#14419): Change naming style of Enum class from SCREAMING_SNAKE_CASE
@@ -44,11 +42,11 @@ class PARAM_NAMES(enum.Enum): # pylint: disable=invalid-name
 Registry.create_feature_flag(
     PARAM_NAMES.dummy_feature,
     'This is a dummy feature flag.',
-    FEATURE_STAGES.dev,
+    platform_parameter_domain.FeatureStages.DEV,
 )
 
 Registry.create_platform_parameter(
     PARAM_NAMES.dummy_parameter,
     'This is a dummy platform parameter.',
-    DATA_TYPES.string
+    platform_parameter_domain.DataTypes.STRING
 )
