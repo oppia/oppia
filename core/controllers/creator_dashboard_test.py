@@ -542,8 +542,10 @@ class CreationButtonsTests(test_utils.GenericTestBase):
             self.assertEqual(explorations_list, [])
             exp_a_id = self.post_json(
                 feconf.UPLOAD_EXPLORATION_URL,
-                {'yaml_file': self.SAMPLE_YAML_CONTENT},
-                csrf_token=csrf_token
+                {},
+                csrf_token=csrf_token,
+                upload_files=((
+                'yaml_file', 'unused_filename', self.SAMPLE_YAML_CONTENT),)
             )[creator_dashboard.EXPLORATION_ID_KEY]
             explorations_list = self.get_json(
                 feconf.CREATOR_DASHBOARD_DATA_URL)['explorations_list']
@@ -559,8 +561,10 @@ class CreationButtonsTests(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
         self.post_json(
             feconf.UPLOAD_EXPLORATION_URL,
-            {'yaml_file': self.SAMPLE_YAML_CONTENT},
+            {},
             csrf_token=csrf_token,
+            upload_files=((
+                'yaml_file', 'unused_filename', self.SAMPLE_YAML_CONTENT),),
             expected_status_int=400
         )
 
