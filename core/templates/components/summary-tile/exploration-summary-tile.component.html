@@ -11,7 +11,7 @@
   <mat-card [ngClass]="{'oppia-activity-summary-tile-mobile': isCollectionPreviewTile, 'oppia-activity-summary-tile': !isCollectionPreviewTile, 'small-width': !isWindowLarge, 'oppia-activity-playlist-tile': isPlaylistTile}"
           *ngIf="!isRefresherExploration" [style.padding]="0" class="oppia-exploration-dashboard-card protractor-test-exploration-dashboard-card">
     <a [href]="getExplorationLink()" target="{{ openInNewWindow ? '_blank' : '_self' }}">
-      <div class="title-section" [ngStyle]="{'background-color': thumbnailBgColor}">
+      <div class="title-section protractor-test-exp-hover" (mouseenter)="setHoverState(true)" (mouseleave)="setHoverState(false)" [ngStyle]="{'background-color': thumbnailBgColor}">
         <img class="thumbnail-image" [src]="thumbnailIcon" alt="{{ category }}">
         <h3 class="activity-title protractor-test-exp-summary-tile-title">
           <span *ngIf="isWindowLarge">
@@ -24,7 +24,7 @@
           </span>
         </h3>
       </div>
-      <div *ngIf="!isPlaylistTile" class="title-section-mask protractor-test-exp-hover"
+      <div *ngIf="!isPlaylistTile" class="title-section-mask"
            (mouseenter)="setHoverState(true)" (mouseleave)="setHoverState(false)">
       </div>
       <div class="summary-section"

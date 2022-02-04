@@ -73,7 +73,6 @@ export class LearnerDashboardIconsComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.activityActive !== undefined) {
       this.setHoverState(changes.activityActive.currentValue);
-      this.canActivityBeAddedToLearnerPlaylist(this.activityId);
     }
   }
 
