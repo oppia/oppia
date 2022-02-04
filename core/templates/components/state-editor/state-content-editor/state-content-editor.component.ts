@@ -19,6 +19,7 @@
 import { Component, OnInit, ChangeDetectorRef, Input, Output, EventEmitter } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { ContextService } from 'services/context.service';
+import { EditabilityService } from 'services/editability.service';
 import { StateContentService } from 'components/state-editor/state-editor-properties-services/state-content.service';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { EditorFirstTimeEventsService } from 'pages/exploration-editor-page/services/editor-first-time-events.service';
@@ -53,6 +54,7 @@ export class StateContentEditorComponent implements OnInit {
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
     private contextService: ContextService,
+    private editabilityService: EditabilityService,
     private stateContentService: StateContentService,
     private stateEditorService: StateEditorService,
     private editorFirstTimeEventsService: EditorFirstTimeEventsService,
@@ -73,7 +75,7 @@ export class StateContentEditorComponent implements OnInit {
     }
 
     this.contentEditorIsOpen = false;
-    this.isEditable = true;
+    this.isEditable = this.editabilityService.isEditable();
     this.cardHeightLimitWarningIsShown = true;
     this.directiveSubscriptions.add(
       this.externalSaveService.onExternalSave.subscribe(
@@ -131,27 +133,6 @@ export class StateContentEditorComponent implements OnInit {
       this.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit([contentId]);
     }
     this.saveContent();
-  }
-
-  displayHtml(): string {
-    if (this.stateContentService.displayed === undefined) {
-      return '';
-    }
-    return this.stateContentService.displayed.html;
-  }
-
-  isEmpty(): boolean {
-    if (this.stateContentService.savedMemento === undefined) {
-      return true;
-    }
-    return this.stateContentService.savedMemento.isEmpty();
-  }
-
-  savedMemento(): string {
-    if (this.stateContentService.savedMemento === undefined) {
-      return '';
-    }
-    return this.stateContentService.savedMemento.html;
   }
 
   cancelEdit(): void {
