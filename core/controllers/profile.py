@@ -513,7 +513,7 @@ class UserInfoHandler(base.BaseHandler):
                 'preferred_site_language_code': (
                     user_settings.preferred_site_language_code),
                 'username': user_settings.username,
-                'email': user_settings.email,
+                'email': user_settings.EMAIL,
                 'user_is_logged_in': True
             })
         else:

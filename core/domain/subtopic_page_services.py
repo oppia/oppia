@@ -24,7 +24,7 @@ from core import feconf
 from core.domain import subtopic_page_domain
 from core.platform import models
 
-(subtopic_models,) = models.Registry.import_models([models.NAMES.subtopic])
+(subtopic_models,) = models.Registry.import_models([models.Names.SUBTOPIC])
 datastore_services = models.Registry.import_datastore_services()
 
 

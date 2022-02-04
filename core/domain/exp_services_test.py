@@ -49,8 +49,8 @@ from core.tests import test_utils
     feedback_models, exp_models, opportunity_models,
     recommendations_models, stats_models, user_models
 ) = models.Registry.import_models([
-    models.NAMES.feedback, models.NAMES.exploration, models.NAMES.opportunity,
-    models.NAMES.recommendations, models.NAMES.statistics, models.NAMES.user
+    models.Names.FEEDBACK, models.Names.EXPLORATION, models.Names.OPPORTUNITY,
+    models.Names.RECOMMENDATIONS, models.Names.STATISTICS, models.Names.USER
 ])
 search_services = models.Registry.import_search_services()
 transaction_services = models.Registry.import_transaction_services()
@@ -1449,9 +1449,9 @@ title: Title
         content_id = state.content.content_id
         voiceovers_mapping = state.recorded_voiceovers.voiceovers_mapping
         content_voiceovers = voiceovers_mapping[content_id]
-        feedback_id = interaction.answer_groups[0].outcome.feedback.content_id
+        feedback_id = interaction.answer_groups[0].outcome.FEEDBACK.content_id
         answer_group_voiceovers = voiceovers_mapping[feedback_id]
-        default_outcome_id = interaction.default_outcome.feedback.content_id
+        default_outcome_id = interaction.default_outcome.FEEDBACK.content_id
         default_outcome_voiceovers = voiceovers_mapping[default_outcome_id]
         hint_id = interaction.hints[0].hint_content.content_id
         hint_voiceovers = voiceovers_mapping[hint_id]
@@ -1481,9 +1481,9 @@ title: Title
         content_id = state.content.content_id
         voiceovers_mapping = state.recorded_voiceovers.voiceovers_mapping
         content_voiceovers = voiceovers_mapping[content_id]
-        feedback_id = interaction.answer_groups[0].outcome.feedback.content_id
+        feedback_id = interaction.answer_groups[0].outcome.FEEDBACK.content_id
         answer_group_voiceovers = voiceovers_mapping[feedback_id]
-        default_outcome_id = interaction.default_outcome.feedback.content_id
+        default_outcome_id = interaction.default_outcome.FEEDBACK.content_id
         default_outcome_voiceovers = voiceovers_mapping[default_outcome_id]
         hint_id = interaction.hints[0].hint_content.content_id
         hint_voiceovers = voiceovers_mapping[hint_id]
@@ -3072,7 +3072,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         outcome = init_interaction.answer_groups[0].outcome
         self.assertEqual(rule_specs[0].rule_type, 'Equals')
         self.assertEqual(rule_specs[0].inputs, {'x': 0})
-        self.assertEqual(outcome.feedback.html, '<p>Try again</p>')
+        self.assertEqual(outcome.FEEDBACK.html, '<p>Try again</p>')
         self.assertEqual(outcome.dest, self.init_state_name)
         self.assertEqual(init_interaction.default_outcome.dest, 'State 2')
 
@@ -3149,7 +3149,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         outcome = second_state_interaction.answer_groups[0].outcome
         self.assertEqual(rule_specs[0].rule_type, 'Equals')
         self.assertEqual(rule_specs[0].inputs, {'x': 0})
-        self.assertEqual(outcome.feedback.html, '<p>Try again</p>')
+        self.assertEqual(outcome.FEEDBACK.html, '<p>Try again</p>')
         self.assertEqual(outcome.dest, 'State 2')
         self.assertEqual(
             second_state_interaction.default_outcome.dest, 'State 2')

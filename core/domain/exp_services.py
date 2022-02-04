@@ -64,7 +64,7 @@ from core.platform import models
 
 datastore_services = models.Registry.import_datastore_services()
 (exp_models, feedback_models, user_models) = models.Registry.import_models([
-    models.NAMES.exploration, models.NAMES.feedback, models.NAMES.user
+    models.Names.EXPLORATION, models.Names.FEEDBACK, models.Names.USER
 ])
 
 # Name for the exploration search index.

@@ -24,7 +24,7 @@ from core.jobs.decorators import validation_decorators
 from core.jobs.transforms.validation import base_validation
 from core.platform import models
 
-(config_models,) = models.Registry.import_models([models.NAMES.config])
+(config_models,) = models.Registry.import_models([models.Names.CONFIG])
 
 
 @validation_decorators.AuditsExisting(

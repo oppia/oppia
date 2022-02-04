@@ -26,7 +26,7 @@ from core.domain import state_domain
 from core.platform import models
 
 (question_models, skill_models) = models.Registry.import_models(
-    [models.NAMES.question, models.NAMES.skill])
+    [models.Names.QUESTION, models.Names.SKILL])
 
 
 def get_questions_and_skill_descriptions_by_skill_ids(

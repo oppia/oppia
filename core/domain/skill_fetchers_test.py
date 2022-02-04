@@ -26,7 +26,7 @@ from core.domain import state_domain
 from core.platform import models
 from core.tests import test_utils
 
-(skill_models,) = models.Registry.import_models([models.NAMES.skill])
+(skill_models,) = models.Registry.import_models([models.Names.SKILL])
 
 
 class SkillFetchersUnitTests(test_utils.GenericTestBase):

@@ -24,7 +24,7 @@ import os
 from core import feconf
 from core.platform import models
 
-(stats_models,) = models.Registry.import_models([models.NAMES.statistics])
+(stats_models,) = models.Registry.import_models([models.Names.STATISTICS])
 
 
 class Registry:

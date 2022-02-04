@@ -21,7 +21,7 @@ from core.platform import models
 from core.tests import test_utils
 
 (base_models, beam_job_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.beam_job])
+    [models.Names.BASE_MODEL, models.Names.BEAM_JOB])
 
 
 class BeamJobRunModelTest(test_utils.GenericTestBase):

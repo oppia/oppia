@@ -40,7 +40,7 @@ from extensions import domain
 
 from pylatexenc import latex2text
 
-(question_models,) = models.Registry.import_models([models.NAMES.question])
+(question_models,) = models.Registry.import_models([models.Names.QUESTION])
 
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.

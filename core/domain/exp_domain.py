@@ -41,7 +41,7 @@ from core.domain import param_domain
 from core.domain import state_domain
 from core.platform import models
 
-(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
+(exp_models,) = models.Registry.import_models([models.Names.EXPLORATION])
 
 
 # Do not modify the values of these constants. This is to preserve backwards

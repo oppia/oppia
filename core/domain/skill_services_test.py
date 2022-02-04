@@ -34,7 +34,7 @@ from core.platform import models
 from core.tests import test_utils
 
 (skill_models, suggestion_models) = models.Registry.import_models(
-    [models.NAMES.skill, models.NAMES.suggestion])
+    [models.Names.SKILL, models.Names.SUGGESTION])
 
 
 class SkillServicesUnitTests(test_utils.GenericTestBase):
@@ -1081,7 +1081,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(skill.misconceptions), 1)
         self.assertEqual(skill.misconceptions[0].id, self.MISCONCEPTION_ID_1)
         self.assertEqual(
-            skill.misconceptions[0].feedback, '<p>default_feedback</p>')
+            skill.misconceptions[0].FEEDBACK, '<p>default_feedback</p>')
 
         changelist = [
             skill_domain.SkillChange({
@@ -1102,7 +1102,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(skill.misconceptions), 1)
         self.assertEqual(skill.misconceptions[0].id, self.MISCONCEPTION_ID_1)
         self.assertEqual(
-            skill.misconceptions[0].feedback, '<p>new feedback</p>')
+            skill.misconceptions[0].FEEDBACK, '<p>new feedback</p>')
 
     def test_update_skill_schema(self):
         orig_skill_dict = (
@@ -1533,7 +1533,7 @@ class SkillMigrationTests(test_utils.GenericTestBase):
         self.assertEqual(skill.misconceptions[0].must_be_addressed, True)
         self.assertEqual(skill.misconceptions[0].notes, expected_html_content)
         self.assertEqual(
-            skill.misconceptions[0].feedback, expected_html_content)
+            skill.misconceptions[0].FEEDBACK, expected_html_content)
 
     def test_migrate_rubrics_to_latest_schema(self):
         commit_cmd = skill_domain.SkillChange({

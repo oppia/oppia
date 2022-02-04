@@ -233,7 +233,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             'Expected rubric schema version to be an integer')
 
     def test_misconception_validation(self):
-        self.skill.misconceptions[0].feedback = 0
+        self.skill.misconceptions[0].FEEDBACK = 0
         self._assert_validation_error(
             'Expected misconception feedback to be a string')
 

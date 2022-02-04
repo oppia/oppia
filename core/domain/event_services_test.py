@@ -33,8 +33,8 @@ from core.tests import test_utils
     stats_models, exp_models, feedback_models,
     user_models
 ) = models.Registry.import_models([
-    models.NAMES.statistics, models.NAMES.exploration, models.NAMES.feedback,
-    models.NAMES.user
+    models.Names.STATISTICS, models.Names.EXPLORATION, models.Names.FEEDBACK,
+    models.Names.USER
 ])
 
 datastore_services = models.Registry.import_datastore_services()

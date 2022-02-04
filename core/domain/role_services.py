@@ -29,7 +29,7 @@ import time
 from core import feconf
 from core.platform import models
 
-(audit_models,) = models.Registry.import_models([models.NAMES.audit])
+(audit_models,) = models.Registry.import_models([models.Names.AUDIT])
 
 # Actions that can be performed in the system.
 ACTION_ACCEPT_ANY_SUGGESTION = 'ACCEPT_ANY_SUGGESTION'

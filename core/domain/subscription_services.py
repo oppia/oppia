@@ -21,7 +21,7 @@ from __future__ import annotations
 from core.platform import models
 
 (user_models,) = models.Registry.import_models([
-    models.NAMES.user
+    models.Names.USER
 ])
 
 

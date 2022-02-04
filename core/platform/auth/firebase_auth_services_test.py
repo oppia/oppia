@@ -46,7 +46,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import auth_models
 
 auth_models, user_models = (
-    models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
+    models.Registry.import_models([models.Names.AUTH, models.Names.USER]))
 
 UidsPartitionTupleType = Tuple[
     List[Tuple[int, str]],
@@ -321,15 +321,15 @@ class FirebaseAdminSdkStub:
         Raises:
             UserNotFoundError. The Firebase account has not been created yet.
         """
-        matches = (u for u in self._users_by_uid.values() if u.email == email)
+        matches = (u for u in self._users_by_uid.values() if u.EMAIL == email)
         user = next(matches, None)
         if user is None:
             raise firebase_auth.UserNotFoundError('%s not found' % email)
         return user
 
     def import_users(
-            self, records: List[firebase_admin.auth.ImportUserRecord]
-    ) -> firebase_admin.auth.UserImportResult:
+            self, records: List[firebase_admin.AUTH.ImportUserRecord]
+    ) -> firebase_admin.AUTH.UserImportResult:
         """Adds the given user records to the stub's storage.
 
         Args:
@@ -342,13 +342,13 @@ class FirebaseAdminSdkStub:
         """
         for record in records:
             self._set_user_fragile(
-                record.uid, record.email, record.disabled,
+                record.uid, record.EMAIL, record.disabled,
                 json.dumps(record.custom_claims))
         return self._create_user_import_result_fragile(len(records), [])
 
     def list_users(
             self, page_token: Optional[str] = None, max_results: int = 1000
-    ) -> firebase_admin.auth.ListUsersPage:
+    ) -> firebase_admin.AUTH.ListUsersPage:
         """Retrieves a page of user accounts from a Firebase project.
 
         The `page_token` argument governs the starting point of the page. The
@@ -703,7 +703,7 @@ class FirebaseAdminSdkStub:
             itertools.cycle(individual_error_pattern))
 
         def mock_import_users(
-                records: List[firebase_admin.auth.ImportUserRecord]
+                records: List[firebase_admin.AUTH.ImportUserRecord]
         ) -> firebase_auth.UserImportResult:
             """Mock function that fails according to the input patterns."""
             error_to_raise = next(updated_batch_error_pattern)
@@ -739,8 +739,8 @@ class FirebaseAdminSdkStub:
         """
         user = self.get_user(uid)
         claims = {'sub': user.uid}
-        if user.email:
-            claims['email'] = user.email
+        if user.EMAIL:
+            claims['email'] = user.EMAIL
         if user.custom_claims:
             claims.update(user.custom_claims)
         return json.dumps(claims)

@@ -42,7 +42,7 @@ from core.tests import test_utils
 import requests_mock
 
 auth_models, user_models = (
-    models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
+    models.Registry.import_models([models.Names.AUTH, models.Names.USER]))
 bulk_email_services = models.Registry.import_bulk_email_services()
 
 
@@ -316,7 +316,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
         user_settings = user_services.get_user_settings_by_auth_id(auth_id)
         self.assertEqual(user_settings_model.id, user_settings.user_id)
-        self.assertEqual(user_settings_model.email, user_settings.email)
+        self.assertEqual(user_settings_model.EMAIL, user_settings.EMAIL)
 
     def test_get_user_settings_by_auth_id_for_nonexistent_auth_id_is_none(self):
         self.assertIsNone(
@@ -331,7 +331,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_settings = (
             user_services.get_user_settings_by_auth_id(auth_id, strict=True))
         self.assertEqual(user_settings_model.id, user_settings.user_id)
-        self.assertEqual(user_settings_model.email, user_settings.email)
+        self.assertEqual(user_settings_model.EMAIL, user_settings.EMAIL)
 
     def test_get_user_settings_by_auth_id_strict_for_missing_auth_id_is_none(
             self):

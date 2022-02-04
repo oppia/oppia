@@ -33,7 +33,7 @@ from core.platform import models
 
 datastore_services = models.Registry.import_datastore_services()
 (collection_models, exp_models) = models.Registry.import_models([
-    models.NAMES.collection, models.NAMES.exploration
+    models.Names.COLLECTION, models.Names.EXPLORATION
 ])
 
 

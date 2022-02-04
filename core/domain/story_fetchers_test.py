@@ -26,7 +26,7 @@ from core.platform import models
 from core.tests import test_utils
 
 (story_models, user_models) = models.Registry.import_models(
-    [models.NAMES.story, models.NAMES.user])
+    [models.Names.STORY, models.Names.USER])
 
 
 class StoryFetchersUnitTests(test_utils.GenericTestBase):

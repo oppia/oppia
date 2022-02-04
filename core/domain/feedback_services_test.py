@@ -32,7 +32,7 @@ from core.tests import test_utils
 (
     feedback_models, email_models, suggestion_models
 ) = models.Registry.import_models([
-    models.NAMES.feedback, models.NAMES.email, models.NAMES.suggestion
+    models.Names.FEEDBACK, models.Names.EMAIL, models.Names.SUGGESTION
 ])
 
 

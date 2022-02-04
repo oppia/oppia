@@ -25,7 +25,7 @@ from core.constants import constants
 from core.domain import activity_domain
 from core.platform import models
 
-(activity_models,) = models.Registry.import_models([models.NAMES.activity])
+(activity_models,) = models.Registry.import_models([models.Names.ACTIVITY])
 
 
 def get_featured_activity_references():

@@ -29,7 +29,7 @@ from core.domain import topic_domain
 from core.platform import models
 
 (skill_models, topic_models,) = models.Registry.import_models([
-    models.NAMES.skill, models.NAMES.topic])
+    models.Names.SKILL, models.Names.TOPIC])
 
 
 def _migrate_subtopics_to_latest_schema(versioned_subtopics, topic_id):

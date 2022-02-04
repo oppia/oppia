@@ -22,7 +22,7 @@ from core import feconf
 from core.platform import models
 
 (base_models, job_models, user_models) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.job, models.NAMES.user])
+    models.Names.BASE_MODEL, models.Names.JOB, models.Names.USER])
 datastore_services = models.Registry.import_datastore_services()
 
 # Only non-versioned models should be included in this list. Activities that

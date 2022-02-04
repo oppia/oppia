@@ -27,7 +27,7 @@ from core.tests import test_utils
 
 import apache_beam as beam
 
-(feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
+(feedback_models,) = models.Registry.import_models([models.Names.FEEDBACK])
 
 
 class ValidateEntityTypeTests(job_test_utils.PipelinedTestBase):

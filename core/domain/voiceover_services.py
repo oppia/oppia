@@ -26,7 +26,7 @@ from core.domain import suggestion_registry
 from core.domain import user_services
 from core.platform import models
 
-(suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
+(suggestion_models,) = models.Registry.import_models([models.Names.SUGGESTION])
 
 
 def _get_voiceover_application_class(target_type):

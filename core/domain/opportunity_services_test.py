@@ -43,8 +43,8 @@ from core.tests import test_utils
 (
     feedback_models, opportunity_models, story_models, suggestion_models
 ) = models.Registry.import_models([
-    models.NAMES.feedback, models.NAMES.opportunity, models.NAMES.story,
-    models.NAMES.suggestion
+    models.Names.FEEDBACK, models.Names.OPPORTUNITY, models.Names.STORY,
+    models.Names.SUGGESTION
 ])
 
 

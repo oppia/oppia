@@ -26,7 +26,7 @@ from core.platform import models
 import apache_beam as beam
 
 (improvements_models,) = models.Registry.import_models(
-    [models.NAMES.improvements])
+    [models.Names.IMPROVEMENTS])
 
 
 class ValidateCompositeEntityIdTests(job_test_utils.PipelinedTestBase):

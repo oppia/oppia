@@ -1123,7 +1123,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_interaction_answer_groups(
             [state_answer_group])
         self.assertFalse(init_state.is_rte_content_supported_on_android())
-        state_answer_group.outcome.feedback.html = (
+        state_answer_group.outcome.FEEDBACK.html = (
             '<p><oppia-noninteractive-image caption-with-value="&amp;quot;'
             '&amp;quot;" filepath-with-value="&amp;quot;startBlue.png&amp;'
             'quot;" alt-with-value="&amp;quot;&amp;quot;">'

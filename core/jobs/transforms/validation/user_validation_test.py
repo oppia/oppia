@@ -31,7 +31,7 @@ from core.tests import test_utils
 
 import apache_beam as beam
 
-(user_models,) = models.Registry.import_models([models.NAMES.user])
+(user_models,) = models.Registry.import_models([models.Names.USER])
 
 
 class ValidateModelWithUserIdTests(job_test_utils.PipelinedTestBase):
@@ -85,7 +85,7 @@ class ValidateActivityMappingOnlyAllowedKeysTests(
             created_on=self.NOW,
             last_updated=self.NOW,
             pseudonymizable_entity_mappings={
-                models.NAMES.audit.value: {'key': 'value'}
+                models.Names.AUDIT.value: {'key': 'value'}
             }
         )
 
@@ -108,7 +108,7 @@ class ValidateActivityMappingOnlyAllowedKeysTests(
             created_on=self.NOW,
             last_updated=self.NOW,
             pseudonymizable_entity_mappings={
-                models.NAMES.collection.value: {'key': 'value'}
+                models.Names.COLLECTION.value: {'key': 'value'}
             }
         )
 

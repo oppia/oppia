@@ -38,12 +38,12 @@ from core.tests import test_utils
     feedback_models, improvements_models, question_models, skill_models,
     story_models, subtopic_models, suggestion_models, topic_models, user_models
 ) = models.Registry.import_models([
-    models.NAMES.app_feedback_report, models.NAMES.auth,
-    models.NAMES.base_model, models.NAMES.blog, models.NAMES.collection,
-    models.NAMES.config, models.NAMES.email, models.NAMES.exploration,
-    models.NAMES.feedback, models.NAMES.improvements, models.NAMES.question,
-    models.NAMES.skill, models.NAMES.story, models.NAMES.subtopic,
-    models.NAMES.suggestion, models.NAMES.topic, models.NAMES.user
+    models.Names.APP_FEEDBACK_REPORT, models.Names.AUTH,
+    models.Names.BASE_MODEL, models.Names.BLOG, models.Names.COLLECTION,
+    models.Names.CONFIG, models.Names.EMAIL, models.Names.EXPLORATION,
+    models.Names.FEEDBACK, models.Names.IMPROVEMENTS, models.Names.QUESTION,
+    models.Names.SKILL, models.Names.STORY, models.Names.SUBTOPIC,
+    models.Names.SUGGESTION, models.Names.TOPIC, models.Names.USER
 ])
 
 

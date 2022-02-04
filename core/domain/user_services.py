@@ -39,8 +39,8 @@ import requests
 
 auth_models, user_models, audit_models, suggestion_models = (
     models.Registry.import_models(
-        [models.NAMES.auth, models.NAMES.user, models.NAMES.audit,
-         models.NAMES.suggestion]))
+        [models.Names.AUTH, models.Names.USER, models.Names.AUDIT,
+         models.Names.SUGGESTION]))
 
 bulk_email_services = models.Registry.import_bulk_email_services()
 transaction_services = models.Registry.import_transaction_services()
@@ -629,7 +629,7 @@ def _get_user_settings_from_model(user_settings_model):
     """
     return user_domain.UserSettings(
         user_id=user_settings_model.id,
-        email=user_settings_model.email,
+        email=user_settings_model.EMAIL,
         roles=user_settings_model.roles,
         banned=user_settings_model.banned,
         username=user_settings_model.username,

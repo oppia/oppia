@@ -22,7 +22,7 @@ from core.jobs.types import base_validation_errors_test
 from core.jobs.types import topic_validation_errors
 from core.platform import models
 
-(topic_models,) = models.Registry.import_models([models.NAMES.topic])
+(topic_models,) = models.Registry.import_models([models.Names.TOPIC])
 
 datastore_services = models.Registry.import_datastore_services()
 

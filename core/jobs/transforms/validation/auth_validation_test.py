@@ -28,7 +28,7 @@ from core.tests import test_utils
 
 import apache_beam as beam
 
-(auth_models,) = models.Registry.import_models([models.NAMES.auth])
+(auth_models,) = models.Registry.import_models([models.Names.AUTH])
 
 
 class ValidateFirebaseSeedModelIdTests(job_test_utils.PipelinedTestBase):

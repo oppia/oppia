@@ -30,7 +30,7 @@ from core.platform import models
 from core.tests import test_utils
 
 (base_models, subtopic_models) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.subtopic])
+    models.Names.BASE_MODEL, models.Names.SUBTOPIC])
 
 
 class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):

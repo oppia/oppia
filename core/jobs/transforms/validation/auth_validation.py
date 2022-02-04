@@ -24,7 +24,7 @@ from core.jobs.transforms.validation import base_validation
 from core.platform import models
 
 (auth_models, user_models) = (
-    models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
+    models.Registry.import_models([models.Names.AUTH, models.Names.USER]))
 
 
 @validation_decorators.AuditsExisting(auth_models.FirebaseSeedModel)

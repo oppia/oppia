@@ -24,7 +24,7 @@ from core.domain import fs_domain
 from core.domain import image_services
 from core.platform import models
 
-(suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
+(suggestion_models,) = models.Registry.import_models([models.Names.SUGGESTION])
 
 
 def save_original_and_compressed_versions_of_image(

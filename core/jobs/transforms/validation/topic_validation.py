@@ -27,7 +27,7 @@ from core.platform import models
 
 import apache_beam as beam
 
-(topic_models,) = models.Registry.import_models([models.NAMES.topic])
+(topic_models,) = models.Registry.import_models([models.Names.TOPIC])
 
 
 @validation_decorators.AuditsExisting(topic_models.TopicModel)

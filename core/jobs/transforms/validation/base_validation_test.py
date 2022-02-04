@@ -32,7 +32,7 @@ from core.platform import models
 import apache_beam as beam
 
 (base_models, exp_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.exploration])
+    [models.Names.BASE_MODEL, models.Names.EXPLORATION])
 
 
 class MockDomainObject(base_models.BaseModel):

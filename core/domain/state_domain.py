@@ -173,7 +173,7 @@ class AnswerGroup:
         # type and draft changes use this method. The rules_index_dict below
         # is used to figure out the assembly of the html in the rulespecs.
 
-        outcome_html = self.outcome.feedback.html
+        outcome_html = self.outcome.FEEDBACK.html
         html_list += [outcome_html]
 
         html_field_types_to_rule_specs = (
@@ -611,13 +611,13 @@ class InteractionInstance:
         """
         for answer_group in self.answer_groups:
             if require_valid_component_names(
-                    answer_group.outcome.feedback.html):
+                    answer_group.outcome.FEEDBACK.html):
                 return False
 
         if (
-                self.default_outcome and self.default_outcome.feedback and
+                self.default_outcome and self.default_outcome.FEEDBACK and
                 require_valid_component_names(
-                    self.default_outcome.feedback.html)):
+                    self.default_outcome.FEEDBACK.html)):
             return False
 
         for hint in self.hints:
@@ -786,7 +786,7 @@ class InteractionInstance:
             html_list += answer_group.get_all_html_content_strings(self.id)
 
         if self.default_outcome:
-            default_outcome_html = self.default_outcome.feedback.html
+            default_outcome_html = self.default_outcome.FEEDBACK.html
             html_list += [default_outcome_html]
 
         for hint in self.hints:
@@ -1775,7 +1775,7 @@ class WrittenTranslations:
         if content_id in self.translations_mapping:
             if language_code in self.translations_mapping[content_id]:
                 return self.translations_mapping[
-                    content_id][language_code].translation
+                    content_id][language_code].TRANSLATION
             else:
                 raise Exception(
                     'Translation for the given content_id %s does not exist in '
@@ -1831,7 +1831,7 @@ class WrittenTranslations:
             for written_translation in translations.values():
                 if (written_translation.data_format ==
                         WrittenTranslation.DATA_FORMAT_HTML):
-                    html_string_list.append(written_translation.translation)
+                    html_string_list.append(written_translation.TRANSLATION)
         return html_string_list
 
     @staticmethod
@@ -2521,7 +2521,7 @@ class State:
         content_id_list = []
         content_id_list.append(self.content.content_id)
         for answer_group in self.interaction.answer_groups:
-            feedback_content_id = answer_group.outcome.feedback.content_id
+            feedback_content_id = answer_group.outcome.FEEDBACK.content_id
             if feedback_content_id in content_id_list:
                 raise utils.ValidationError(
                     'Found a duplicate content id %s' % feedback_content_id)
@@ -2543,7 +2543,7 @@ class State:
 
         if self.interaction.default_outcome:
             default_outcome_content_id = (
-                self.interaction.default_outcome.feedback.content_id)
+                self.interaction.default_outcome.FEEDBACK.content_id)
             if default_outcome_content_id in content_id_list:
                 raise utils.ValidationError(
                     'Found a duplicate content id %s'
@@ -2882,7 +2882,7 @@ class State:
         """
         if self.interaction.id:
             old_content_id_list = [
-                answer_group.outcome.feedback.content_id for answer_group in (
+                answer_group.outcome.FEEDBACK.content_id for answer_group in (
                     self.interaction.answer_groups)]
 
             for answer_group in self.interaction.answer_groups:
@@ -2968,7 +2968,7 @@ class State:
         interaction_answer_groups = []
         new_content_id_list = []
         old_content_id_list = [
-            answer_group.outcome.feedback.content_id for answer_group in (
+            answer_group.outcome.FEEDBACK.content_id for answer_group in (
                 self.interaction.answer_groups)]
 
         for answer_group in self.interaction.answer_groups:
@@ -3034,7 +3034,7 @@ class State:
         self.interaction.answer_groups = interaction_answer_groups
 
         new_content_id_list += [
-            answer_group.outcome.feedback.content_id for answer_group in (
+            answer_group.outcome.FEEDBACK.content_id for answer_group in (
                 self.interaction.answer_groups)]
         self._update_content_ids_in_assets(
             old_content_id_list, new_content_id_list)
@@ -3049,12 +3049,12 @@ class State:
         new_content_id_list = []
         if self.interaction.default_outcome:
             old_content_id_list.append(
-                self.interaction.default_outcome.feedback.content_id)
+                self.interaction.default_outcome.FEEDBACK.content_id)
 
         if default_outcome:
             self.interaction.default_outcome = default_outcome
             new_content_id_list.append(
-                self.interaction.default_outcome.feedback.content_id)
+                self.interaction.default_outcome.FEEDBACK.content_id)
         else:
             self.interaction.default_outcome = None
 
@@ -3195,20 +3195,20 @@ class State:
         # TODO(#6178): Remove empty html checks once we add a validation
         # check that ensures each content in state should be non-empty html.
         default_outcome = self.interaction.default_outcome
-        if default_outcome is not None and default_outcome.feedback.html != '':
+        if default_outcome is not None and default_outcome.FEEDBACK.html != '':
             content_id_to_translatable_item[
-                default_outcome.feedback.content_id
+                default_outcome.FEEDBACK.content_id
             ] = TranslatableItem(
-                default_outcome.feedback.html,
+                default_outcome.FEEDBACK.html,
                 TranslatableItem.DATA_FORMAT_HTML,
                 TranslatableItem.CONTENT_TYPE_FEEDBACK)
 
         for answer_group in self.interaction.answer_groups:
-            if answer_group.outcome.feedback.html != '':
+            if answer_group.outcome.FEEDBACK.html != '':
                 content_id_to_translatable_item[
-                    answer_group.outcome.feedback.content_id
+                    answer_group.outcome.FEEDBACK.content_id
                 ] = TranslatableItem(
-                    answer_group.outcome.feedback.html,
+                    answer_group.outcome.FEEDBACK.html,
                     TranslatableItem.DATA_FORMAT_HTML,
                     TranslatableItem.CONTENT_TYPE_FEEDBACK)
             # As of Aug 2021, only TextInput and SetInput have translatable rule

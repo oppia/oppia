@@ -25,7 +25,7 @@ from core.platform import models
 from core.tests import test_utils
 
 (email_models, user_models) = models.Registry.import_models([
-    models.NAMES.email, models.NAMES.user])
+    models.Names.EMAIL, models.Names.USER])
 
 
 class UserQueryServicesTests(test_utils.GenericTestBase):

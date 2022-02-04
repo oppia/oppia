@@ -28,7 +28,7 @@ from core.domain import state_domain
 from core.platform import models
 
 (exp_models, feedback_models, user_models) = models.Registry.import_models([
-    models.NAMES.exploration, models.NAMES.feedback, models.NAMES.user
+    models.Names.EXPLORATION, models.Names.FEEDBACK, models.Names.USER
 ])
 
 

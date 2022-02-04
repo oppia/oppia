@@ -948,7 +948,7 @@ class AdminSuperAdminPrivilegesHandler(base.BaseHandler):
         if user_settings is None:
             raise self.InvalidInputException('No such user exists')
 
-        if user_settings.email == feconf.ADMIN_EMAIL_ADDRESS:
+        if user_settings.EMAIL == feconf.ADMIN_EMAIL_ADDRESS:
             raise self.InvalidInputException(
                 'Cannot revoke privileges from the default super admin account')
 

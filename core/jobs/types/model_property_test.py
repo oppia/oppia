@@ -24,7 +24,7 @@ from core.jobs.types import model_property
 from core.platform import models
 from core.tests import test_utils
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
 datastore_services = models.Registry.import_datastore_services()
 

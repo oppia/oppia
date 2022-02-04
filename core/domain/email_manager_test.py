@@ -37,7 +37,7 @@ from core.platform import models
 from core.tests import test_utils
 
 (email_models, suggestion_models) = models.Registry.import_models(
-    [models.NAMES.email, models.NAMES.suggestion])
+    [models.Names.EMAIL, models.Names.SUGGESTION])
 
 
 class FailedMLTest(test_utils.EmailTestBase):

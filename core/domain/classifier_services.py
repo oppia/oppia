@@ -31,7 +31,7 @@ from core.domain import fs_services
 from core.platform import models
 
 (classifier_models, exp_models) = models.Registry.import_models(
-    [models.NAMES.classifier, models.NAMES.exploration])
+    [models.Names.CLASSIFIER, models.Names.EXPLORATION])
 
 
 # NOTE TO DEVELOPERS: This function should be kept in sync with its counterpart

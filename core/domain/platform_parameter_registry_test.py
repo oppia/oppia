@@ -29,7 +29,7 @@ from core.platform import models
 from core.tests import test_utils
 
 (config_models,) = models.Registry.import_models(
-    [models.NAMES.config])
+    [models.Names.CONFIG])
 
 DATA_TYPES = parameter_domain.DATA_TYPES # pylint: disable=invalid-name
 FEATURE_STAGES = parameter_domain.FEATURE_STAGES # pylint: disable=invalid-name

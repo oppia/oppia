@@ -45,7 +45,7 @@ from core.platform import models
 from core.tests import test_utils
 
 (classifier_models, stats_models) = models.Registry.import_models(
-    [models.NAMES.classifier, models.NAMES.statistics])
+    [models.Names.CLASSIFIER, models.Names.STATISTICS])
 
 
 class ReaderPermissionsTest(test_utils.GenericTestBase):

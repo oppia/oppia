@@ -35,7 +35,7 @@ from core.tests import test_utils
 from proto_files import text_classifier_pb2
 
 (classifier_models,) = models.Registry.import_models(
-    [models.NAMES.classifier])
+    [models.Names.CLASSIFIER])
 
 
 class ClassifierServicesTests(test_utils.ClassifierTestBase):
@@ -101,7 +101,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
 
         # Modify such that job creation is triggered.
         new_answer_group = copy.deepcopy(state.interaction.answer_groups[1])
-        new_answer_group.outcome.feedback.content_id = 'new_feedback'
+        new_answer_group.outcome.FEEDBACK.content_id = 'new_feedback'
         new_answer_group.rule_specs[0].inputs[
             'x']['contentId'] = 'rule_input_4'
         state.recorded_voiceovers.voiceovers_mapping['new_feedback'] = {}
@@ -190,7 +190,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
 
         # Modify such that job creation is triggered.
         new_answer_group = copy.deepcopy(state.interaction.answer_groups[1])
-        new_answer_group.outcome.feedback.content_id = 'new_feedback'
+        new_answer_group.outcome.FEEDBACK.content_id = 'new_feedback'
         new_answer_group.rule_specs[0].inputs[
             'x']['contentId'] = 'rule_input_4'
         state.recorded_voiceovers.voiceovers_mapping['new_feedback'] = {}

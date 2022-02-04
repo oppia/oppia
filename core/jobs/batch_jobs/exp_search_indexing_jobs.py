@@ -35,7 +35,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import exp_models
     from mypy_imports import search_services as platform_search_services
 
-(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
+(exp_models,) = models.Registry.import_models([models.Names.EXPLORATION])
 
 datastore_services = models.Registry.import_datastore_services()
 platform_search_services = models.Registry.import_search_services()

@@ -26,7 +26,7 @@ from core.domain import change_domain
 from core.platform import models
 
 (config_models, suggestion_models,) = models.Registry.import_models(
-    [models.NAMES.config, models.NAMES.suggestion])
+    [models.Names.CONFIG, models.Names.SUGGESTION])
 
 CMD_CHANGE_PROPERTY_VALUE = 'change_property_value'
 

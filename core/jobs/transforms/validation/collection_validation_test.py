@@ -29,7 +29,7 @@ from core.tests import test_utils
 import apache_beam as beam
 
 (base_models, collection_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.collection])
+    [models.Names.BASE_MODEL, models.Names.COLLECTION])
 
 
 class ValidateCollectionSnapshotMetadataModelTests(

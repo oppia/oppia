@@ -34,7 +34,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-(question_models,) = models.Registry.import_models([models.NAMES.question])
+(question_models,) = models.Registry.import_models([models.Names.QUESTION])
 
 
 class QuestionServicesUnitTest(test_utils.GenericTestBase):
@@ -1511,7 +1511,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         migrated_answer_group = (
             question.question_state_data.interaction.answer_groups[0])
         self.assertEqual(
-            migrated_answer_group.outcome.feedback.html,
+            migrated_answer_group.outcome.FEEDBACK.html,
             expected_feeedback_html_content)
 
     def test_migrate_question_state_from_v34_to_latest(self):

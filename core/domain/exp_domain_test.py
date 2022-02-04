@@ -35,7 +35,7 @@ from core.domain import state_domain
 from core.platform import models
 from core.tests import test_utils
 
-(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
+(exp_models,) = models.Registry.import_models([models.Names.EXPLORATION])
 
 
 class ExplorationChangeTests(test_utils.GenericTestBase):
@@ -1182,7 +1182,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         outcome.dest = destination
 
-        outcome.feedback = state_domain.SubtitledHtml('feedback_1', '')
+        outcome.FEEDBACK = state_domain.SubtitledHtml('feedback_1', '')
         exploration.validate()
 
         outcome.labelled_as_correct = 'hello'

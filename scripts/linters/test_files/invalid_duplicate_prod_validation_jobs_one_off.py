@@ -24,7 +24,7 @@ import collections
 
 from core.platform import models
 
-(user_models,) = (models.Registry.import_models([models.NAMES.user]))
+(user_models,) = (models.Registry.import_models([models.Names.USER]))
 datastore_services = models.Registry.import_datastore_services()
 
 

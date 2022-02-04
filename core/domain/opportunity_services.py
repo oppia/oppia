@@ -29,7 +29,7 @@ from core.domain import topic_fetchers
 from core.platform import models
 
 (opportunity_models, suggestion_models) = models.Registry.import_models(
-    [models.NAMES.opportunity, models.NAMES.suggestion])
+    [models.Names.OPPORTUNITY, models.Names.SUGGESTION])
 
 # NOTE TO DEVELOPERS: The functions:
 #   - delete_all_exploration_opportunity_summary_models()

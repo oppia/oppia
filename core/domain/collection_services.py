@@ -46,7 +46,7 @@ from core.domain import user_services
 from core.platform import models
 
 (collection_models, user_models) = models.Registry.import_models([
-    models.NAMES.collection, models.NAMES.user])
+    models.Names.COLLECTION, models.Names.USER])
 datastore_services = models.Registry.import_datastore_services()
 
 # This takes additional 'title' and 'category' parameters.

@@ -34,49 +34,45 @@ if MYPY: # pragma: no cover
 # Valid model names.
 
 
-# TODO(#14419): Change naming style of Enum class from SCREAMING_SNAKE_CASE
-# to PascalCase and its values to UPPER_CASE. Because we want to be consistent
-# throughout the codebase according to the coding style guide.
-# https://github.com/oppia/oppia/wiki/Coding-style-guide
-class NAMES(enum.Enum): # pylint: disable=invalid-name
+class Names(enum.Enum):
     """Enum for valid model names."""
 
-    activity = 'activity' # pylint: disable=invalid-name
-    app_feedback_report = 'app_feedback_report' # pylint: disable=invalid-name
-    audit = 'audit' # pylint: disable=invalid-name
-    base_model = 'base_model' # pylint: disable=invalid-name
-    beam_job = 'beam_job' # pylint: disable=invalid-name
-    blog = 'blog' # pylint: disable=invalid-name
-    classifier = 'classifier' # pylint: disable=invalid-name
-    collection = 'collection' # pylint: disable=invalid-name
-    config = 'config' # pylint: disable=invalid-name
-    email = 'email' # pylint: disable=invalid-name
-    exploration = 'exploration' # pylint: disable=invalid-name
-    feedback = 'feedback' # pylint: disable=invalid-name
-    improvements = 'improvements' # pylint: disable=invalid-name
-    job = 'job' # pylint: disable=invalid-name
-    opportunity = 'opportunity' # pylint: disable=invalid-name
-    question = 'question' # pylint: disable=invalid-name
-    recommendations = 'recommendations' # pylint: disable=invalid-name
-    skill = 'skill' # pylint: disable=invalid-name
-    statistics = 'statistics' # pylint: disable=invalid-name
-    auth = 'auth' # pylint: disable=invalid-name
-    story = 'story' # pylint: disable=invalid-name
-    subtopic = 'subtopic' # pylint: disable=invalid-name
-    suggestion = 'suggestion' # pylint: disable=invalid-name
-    topic = 'topic' # pylint: disable=invalid-name
-    translation = 'translation' # pylint: disable=invalid-name
-    user = 'user' # pylint: disable=invalid-name
+    ACTIVITY = 'activity'
+    APP_FEEDBACK_REPORT = 'app_feedback_report'
+    AUDIT = 'audit'
+    BASE_MODEL = 'base_model'
+    BEAM_JOB = 'beam_job'
+    BLOG = 'blog'
+    CLASSIFIER = 'classifier'
+    COLLECTION = 'collection'
+    CONFIG = 'config'
+    EMAIL = 'email'
+    EXPLORATION = 'exploration'
+    FEEDBACK = 'feedback'
+    IMPROVEMENTS = 'improvements'
+    JOB = 'job'
+    OPPORTUNITY = 'opportunity'
+    QUESTION = 'question'
+    RECOMMENDATIONS = 'recommendations'
+    SKILL = 'skill'
+    STATISTICS = 'statistics'
+    AUTH = 'auth'
+    STORY = 'story'
+    SUBTOPIC = 'subtopic'
+    SUGGESTION = 'suggestion'
+    TOPIC = 'topic'
+    TRANSLATION = 'translation'
+    USER = 'user'
 
 # Types of deletion policies. The pragma comment is needed because Enums are
 # evaluated as classes in Python and they should use PascalCase, but using
 # UPPER_CASE seems more appropriate here.
 
 
-MODULES_WITH_PSEUDONYMIZABLE_CLASSES = (  # pylint: disable=invalid-name
-    NAMES.app_feedback_report, NAMES.blog, NAMES.collection, NAMES.config,
-    NAMES.exploration, NAMES.feedback, NAMES.question, NAMES.skill, NAMES.story,
-    NAMES.subtopic, NAMES.suggestion, NAMES.topic
+MODULES_WITH_PSEUDONYMIZABLE_CLASSES = (
+    Names.APP_FEEDBACK_REPORT, Names.BLOG, Names.COLLECTION, Names.CONFIG,
+    Names.EXPLORATION, Names.FEEDBACK, Names.QUESTION, Names.SKILL, Names.STORY,
+    Names.SUBTOPIC, Names.SUGGESTION, Names.TOPIC
 )
 
 GAE_PLATFORM = 'gae'
@@ -87,7 +83,7 @@ class Platform:
 
     @classmethod
     def import_models(
-            cls, unused_model_names: List[NAMES]
+            cls, unused_model_names: List[Names]
     ) -> Tuple[ModuleType, ...]:
         """An abstract method that should be implemented on inherited
         classes.
@@ -109,7 +105,7 @@ class _Gae(Platform):
     # doesn't match with BaseModel.delete_multi().
     # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     @classmethod
-    def import_models(cls, model_names: List[NAMES]) -> Tuple[ModuleType, ...]:
+    def import_models(cls, model_names: List[Names]) -> Tuple[ModuleType, ...]:
         """Imports and returns the storage modules listed in model_names.
 
         Args:
@@ -127,91 +123,91 @@ class _Gae(Platform):
         # here since when we import modules using this function, we need to add
         # separate imports for mypy anyway.
         for name in model_names:
-            if name == NAMES.activity:
+            if name == Names.ACTIVITY:
                 from core.storage.activity import gae_models as activity_models
                 returned_models.append(activity_models)
-            elif name == NAMES.app_feedback_report:
+            elif name == Names.APP_FEEDBACK_REPORT:
                 from core.storage.app_feedback_report import (
                     gae_models as app_feedback_report_models)
                 returned_models.append(app_feedback_report_models)
-            elif name == NAMES.audit:
+            elif name == Names.AUDIT:
                 from core.storage.audit import gae_models as audit_models
                 returned_models.append(audit_models)
-            elif name == NAMES.auth:
+            elif name == Names.AUTH:
                 from core.storage.auth import gae_models as auth_models
                 returned_models.append(auth_models)
-            elif name == NAMES.base_model:
+            elif name == Names.BASE_MODEL:
                 from core.storage.base_model import gae_models as base_model
                 returned_models.append(base_model)
-            elif name == NAMES.beam_job:
+            elif name == Names.BEAM_JOB:
                 from core.storage.beam_job import gae_models as beam_job_models
                 returned_models.append(beam_job_models)
-            elif name == NAMES.blog:
+            elif name == Names.BLOG:
                 from core.storage.blog import gae_models as blog_models
                 returned_models.append(blog_models)
-            elif name == NAMES.classifier:
+            elif name == Names.CLASSIFIER:
                 from core.storage.classifier import (
                     gae_models as classifier_models)
                 returned_models.append(classifier_models)
-            elif name == NAMES.collection:
+            elif name == Names.COLLECTION:
                 from core.storage.collection import (
                     gae_models as collection_models)
                 returned_models.append(collection_models)
-            elif name == NAMES.config:
+            elif name == Names.CONFIG:
                 from core.storage.config import gae_models as config_models
                 returned_models.append(config_models)
-            elif name == NAMES.email:
+            elif name == Names.EMAIL:
                 from core.storage.email import gae_models as email_models
                 returned_models.append(email_models)
-            elif name == NAMES.exploration:
+            elif name == Names.EXPLORATION:
                 from core.storage.exploration import gae_models as exp_models
                 returned_models.append(exp_models)
-            elif name == NAMES.feedback:
+            elif name == Names.FEEDBACK:
                 from core.storage.feedback import gae_models as feedback_models
                 returned_models.append(feedback_models)
-            elif name == NAMES.improvements:
+            elif name == Names.IMPROVEMENTS:
                 from core.storage.improvements import (
                     gae_models as improvements_models)
                 returned_models.append(improvements_models)
-            elif name == NAMES.job:
+            elif name == Names.JOB:
                 from core.storage.job import gae_models as job_models
                 returned_models.append(job_models)
-            elif name == NAMES.opportunity:
+            elif name == Names.OPPORTUNITY:
                 from core.storage.opportunity import (
                     gae_models as opportunity_models)
                 returned_models.append(opportunity_models)
-            elif name == NAMES.question:
+            elif name == Names.QUESTION:
                 from core.storage.question import gae_models as question_models
                 returned_models.append(question_models)
-            elif name == NAMES.recommendations:
+            elif name == Names.RECOMMENDATIONS:
                 from core.storage.recommendations import (
                     gae_models as recommendations_models)
                 returned_models.append(recommendations_models)
-            elif name == NAMES.skill:
+            elif name == Names.SKILL:
                 from core.storage.skill import gae_models as skill_models
                 returned_models.append(skill_models)
-            elif name == NAMES.statistics:
+            elif name == Names.STATISTICS:
                 from core.storage.statistics import (
                     gae_models as statistics_models)
                 returned_models.append(statistics_models)
-            elif name == NAMES.story:
+            elif name == Names.STORY:
                 from core.storage.story import gae_models as story_models
                 returned_models.append(story_models)
-            elif name == NAMES.subtopic:
+            elif name == Names.SUBTOPIC:
                 from core.storage.subtopic import gae_models as subtopic_models
                 returned_models.append(subtopic_models)
-            elif name == NAMES.suggestion:
+            elif name == Names.SUGGESTION:
                 from core.storage.suggestion import (
                     gae_models as suggestion_models)
                 returned_models.append(suggestion_models)
-            elif name == NAMES.topic:
+            elif name == Names.TOPIC:
                 from core.storage.topic import gae_models as topic_models
                 returned_models.append(topic_models)
-            elif name == NAMES.translation:
+            elif name == Names.TRANSLATION:
                 from core.storage.translation import (
                     gae_models as translation_models)
                 returned_models.append(translation_models)
-            elif name == NAMES.user:
+            elif name == Names.USER:
                 from core.storage.user import gae_models as user_models
                 returned_models.append(user_models)
             else:
@@ -221,7 +217,7 @@ class _Gae(Platform):
 
     @classmethod
     def get_storage_model_classes(
-            cls, model_names: List[NAMES]
+            cls, model_names: List[Names]
     ) -> List[base_models.BaseModel]:
         """Get the storage model classes that are in the modules listed in
         model_names.
@@ -254,7 +250,7 @@ class _Gae(Platform):
         Returns:
             list(class). The corresponding storage-layer model classes.
         """
-        model_names = [name for name in NAMES if name != NAMES.base_model]
+        model_names = [name for name in Names if name != Names.BASE_MODEL]
         return cls.get_storage_model_classes(model_names)
 
     @classmethod
@@ -439,7 +435,7 @@ class Registry:
         return klass
 
     @classmethod
-    def import_models(cls, model_names: List[NAMES]) -> Tuple[ModuleType, ...]:
+    def import_models(cls, model_names: List[Names]) -> Tuple[ModuleType, ...]:
         """Imports and returns the storage modules listed in model_names.
 
         Args:
@@ -452,7 +448,7 @@ class Registry:
 
     @classmethod
     def get_storage_model_classes(
-            cls, model_names: List[NAMES]
+            cls, model_names: List[Names]
     ) -> List[base_models.BaseModel]:
         """Get the storage model classes that are in the modules listed in
         model_names.

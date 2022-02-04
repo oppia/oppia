@@ -24,7 +24,7 @@ from core.domain import platform_parameter_domain
 from core.platform import models
 
 (config_models,) = models.Registry.import_models(
-    [models.NAMES.config])
+    [models.Names.CONFIG])
 
 DATA_TYPES = platform_parameter_domain.DATA_TYPES # pylint: disable=invalid-name
 

@@ -25,7 +25,7 @@ from core.jobs.transforms.validation import base_validation
 from core.platform import models
 
 (question_models, skill_models) = models.Registry.import_models(
-    [models.NAMES.question, models.NAMES.skill])
+    [models.Names.QUESTION, models.Names.SKILL])
 
 
 @validation_decorators.AuditsExisting(

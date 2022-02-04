@@ -24,7 +24,7 @@ from core.platform import models
 from core.tests import test_utils
 
 (translation_models,) = models.Registry.import_models([
-    models.NAMES.translation])
+    models.Names.TRANSLATION])
 
 
 class TranslationFetchersTests(test_utils.GenericTestBase):

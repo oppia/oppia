@@ -27,7 +27,7 @@ from core.domain import topic_services
 from core.platform import models
 from core.tests import test_utils
 
-(user_models,) = models.Registry.import_models([models.NAMES.user])
+(user_models,) = models.Registry.import_models([models.Names.USER])
 
 MAX_CURRENT_GOALS_COUNT = (
     feconf.MAX_CURRENT_GOALS_COUNT)

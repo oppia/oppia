@@ -32,7 +32,7 @@ from core.tests import test_utils
 
 import webapp2
 
-exp_models, = models.Registry.import_models([models.NAMES.exploration])
+exp_models, = models.Registry.import_models([models.Names.EXPLORATION])
 email_services = models.Registry.import_email_services()
 
 

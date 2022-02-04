@@ -28,7 +28,7 @@ from core.domain import html_cleaner
 from core.domain import role_services
 from core.platform import models
 
-(blog_models,) = models.Registry.import_models([models.NAMES.blog])
+(blog_models,) = models.Registry.import_models([models.Names.BLOG])
 datastore_services = models.Registry.import_datastore_services()
 
 

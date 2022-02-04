@@ -27,7 +27,7 @@ from core.domain import rating_services
 from core.platform import models
 from core.tests import test_utils
 
-(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
+(exp_models,) = models.Registry.import_models([models.Names.EXPLORATION])
 
 
 class RatingServicesTests(test_utils.GenericTestBase):

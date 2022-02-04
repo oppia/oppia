@@ -1816,7 +1816,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                 multiple_constructor_func_node)
 
     def test_visit_raise_warns_unknown_style(self):
-        self.checker_test_object.checker.config.accept_no_raise_doc = False
+        self.checker_test_object.checker.CONFIG.accept_no_raise_doc = False
         node = astroid.extract_node(
             """
         def my_func(self):
@@ -2009,7 +2009,7 @@ class RestrictedImportCheckerTests(unittest.TestCase):
         self.checker_test_object.setup_method()
         # The spaces are included on purpose so that we properly test
         # the input sanitization.
-        self.checker_test_object.checker.config.forbidden_imports = (
+        self.checker_test_object.checker.CONFIG.forbidden_imports = (
             '  core.storage: core.domain  ',
             'core.domain  : core.controllers',
             'core.controllers: core.platform  |  core.storage '
@@ -3135,7 +3135,7 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
     def test_disallowed_removals_str(self):
         (
             self.checker_test_object
-            .checker.config.disallowed_functions_and_replacements_str) = [
+            .checker.CONFIG.disallowed_functions_and_replacements_str) = [
                 'example_func',
                 'a.example_attr',
             ]
@@ -3171,7 +3171,7 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
     def test_disallowed_replacements_str(self):
         (
             self.checker_test_object
-            .checker.config.disallowed_functions_and_replacements_str) = [
+            .checker.CONFIG.disallowed_functions_and_replacements_str) = [
                 'datetime.datetime.now=>datetime.datetime.utcnow',
                 'self.assertEquals=>self.assertEqual',
                 'b.next=>python_utils.NEXT',
@@ -3225,7 +3225,7 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
     def test_disallowed_removals_regex(self):
         (
             self.checker_test_object
-            .checker.config.disallowed_functions_and_replacements_regex) = [
+            .checker.CONFIG.disallowed_functions_and_replacements_regex) = [
                 r'.*example_func',
                 r'.*\..*example_attr'
             ]
@@ -3261,7 +3261,7 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
     def test_disallowed_replacements_regex(self):
         (
             self.checker_test_object
-            .checker.config.disallowed_functions_and_replacements_regex) = [
+            .checker.CONFIG.disallowed_functions_and_replacements_regex) = [
                 r'.*example_func=>other_func',
                 r'.*\.example_attr=>other_attr',
             ]

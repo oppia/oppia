@@ -31,13 +31,13 @@ from core.platform import models
 import apache_beam as beam
 from apache_beam import typehints
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
 datastore_services = models.Registry.import_datastore_services()
 
 _ALL_MODEL_TYPES = frozenset(models.Registry.get_all_storage_model_classes())
 _ALL_BASE_MODEL_TYPES = frozenset(
-    models.Registry.get_storage_model_classes([models.NAMES.base_model]))
+    models.Registry.get_storage_model_classes([models.Names.BASE_MODEL]))
 
 _MODEL_TYPES_BY_BASE_CLASS = {
     base_class: frozenset({base_class}).union(

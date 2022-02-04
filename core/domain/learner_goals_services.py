@@ -22,7 +22,7 @@ from core import feconf
 from core.domain import user_domain
 from core.platform import models
 
-(user_models,) = models.Registry.import_models([models.NAMES.user])
+(user_models,) = models.Registry.import_models([models.Names.USER])
 
 
 def get_learner_goals_from_model(learner_goals_model):

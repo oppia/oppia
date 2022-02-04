@@ -37,7 +37,7 @@ from core.domain import state_domain
 from core.domain import user_services
 from core.platform import models
 
-(suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
+(suggestion_models,) = models.Registry.import_models([models.Names.SUGGESTION])
 
 
 class BaseSuggestion:

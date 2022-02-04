@@ -33,7 +33,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-(user_models,) = models.Registry.import_models([models.NAMES.user])
+(user_models,) = models.Registry.import_models([models.Names.USER])
 
 
 class ProfilePageTests(test_utils.GenericTestBase):
@@ -936,7 +936,7 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
         user_settings.validate()
         user_models.UserSettingsModel(
             id=user_settings.user_id,
-            email=user_settings.email,
+            email=user_settings.EMAIL,
             roles=user_settings.roles,
             username=user_settings.username,
             normalized_username=user_settings.normalized_username,
@@ -998,7 +998,7 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
         user_settings.validate()
         user_models.UserSettingsModel(
             id=user_settings.user_id,
-            email=user_settings.email,
+            email=user_settings.EMAIL,
             roles=user_settings.roles,
             username=user_settings.username,
             normalized_username=user_settings.normalized_username,

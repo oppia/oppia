@@ -217,7 +217,7 @@ class BaseHandler(webapp2.RequestHandler):
                 # If the user settings are not yet created and the request leads
                 # to signup page create a new user settings. Otherwise logout
                 # the not-fully registered user.
-                email = auth_claims.email
+                email = auth_claims.EMAIL
                 if 'signup?' in self.request.uri:
                     user_settings = (
                         user_services.create_new_user(auth_id, email))
@@ -228,8 +228,8 @@ class BaseHandler(webapp2.RequestHandler):
                     auth_services.destroy_auth_session(self.response)
                     return
 
-            self.email = user_settings.email
-            self.values['user_email'] = user_settings.email
+            self.email = user_settings.EMAIL
+            self.values['user_email'] = user_settings.EMAIL
             self.user_id = user_settings.user_id
 
             if user_settings.deleted:

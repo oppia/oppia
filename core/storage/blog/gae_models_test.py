@@ -26,7 +26,7 @@ from core.platform import models
 from core.tests import test_utils
 
 (base_models, blog_models, user_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.blog, models.NAMES.user])
+    [models.Names.BASE_MODEL, models.Names.BLOG, models.Names.USER])
 
 
 class BlogPostModelTest(test_utils.GenericTestBase):

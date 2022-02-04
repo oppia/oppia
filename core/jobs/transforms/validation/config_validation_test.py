@@ -27,7 +27,7 @@ from core.platform import models
 import apache_beam as beam
 
 (base_models, config_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.config])
+    [models.Names.BASE_MODEL, models.Names.CONFIG])
 
 
 class ValidateConfigPropertySnapshotMetadataModelTests(

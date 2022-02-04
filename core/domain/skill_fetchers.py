@@ -26,7 +26,7 @@ from core.domain import caching_services
 from core.domain import skill_domain
 from core.platform import models
 
-(skill_models,) = models.Registry.import_models([models.NAMES.skill])
+(skill_models,) = models.Registry.import_models([models.Names.SKILL])
 
 
 def get_multi_skills(skill_ids, strict=True):

@@ -35,7 +35,7 @@ from core.domain import user_services
 from core.platform import models
 
 (email_models, suggestion_models) = models.Registry.import_models(
-    [models.NAMES.email, models.NAMES.suggestion])
+    [models.Names.EMAIL, models.Names.SUGGESTION])
 app_identity_services = models.Registry.import_app_identity_services()
 transaction_services = models.Registry.import_transaction_services()
 
@@ -490,7 +490,7 @@ def _send_bulk_mail(
     require_sender_id_is_valid(intent, sender_id)
 
     recipients_settings = user_services.get_users_settings(recipient_ids)
-    recipient_emails = [user.email for user in recipients_settings]
+    recipient_emails = [user.EMAIL for user in recipients_settings]
 
     cleaned_html_body = html_cleaner.clean(email_html_body)
     if cleaned_html_body != email_html_body:
@@ -1431,7 +1431,7 @@ def _send_suggestions_waiting_too_long_email(
     # Get the emails and usernames of the admins.
     admin_user_settings = user_services.get_users_settings(admin_ids)
     curriculum_admin_usernames, admin_emails = list(python_utils.ZIP(*[
-        (admin_user_setting.username, admin_user_setting.email)
+        (admin_user_setting.username, admin_user_setting.EMAIL)
         if admin_user_setting is not None else (None, None)
         for admin_user_setting in admin_user_settings
     ]))
@@ -1578,7 +1578,7 @@ def _send_reviews_needed_email_to_admins(
     # Get the emails and usernames of the users.
     admin_user_settings = user_services.get_users_settings(admin_ids)
     curriculum_admin_usernames, admin_emails = list(python_utils.ZIP(*[
-        (admin_user_setting.username, admin_user_setting.email)
+        (admin_user_setting.username, admin_user_setting.EMAIL)
         if admin_user_setting is not None else (None, None)
         for admin_user_setting in admin_user_settings
     ]))
@@ -1642,7 +1642,7 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
 
     reviewer_user_settings = user_services.get_users_settings(reviewer_ids)
     reviewer_usernames, reviewer_emails = list(python_utils.ZIP(*[
-        (reviewer_user_setting.username, reviewer_user_setting.email)
+        (reviewer_user_setting.username, reviewer_user_setting.EMAIL)
         if reviewer_user_setting is not None else (None, None)
         for reviewer_user_setting in reviewer_user_settings
     ]))

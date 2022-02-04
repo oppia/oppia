@@ -27,7 +27,7 @@ from core.platform import models
 from core.tests import test_utils
 
 (recommendations_models, exp_models,) = models.Registry.import_models([
-    models.NAMES.recommendations, models.NAMES.exploration])
+    models.Names.RECOMMENDATIONS, models.Names.EXPLORATION])
 
 
 class TopicSimilarityUnitTests(test_utils.GenericTestBase):

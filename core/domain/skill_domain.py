@@ -1245,12 +1245,12 @@ class Skill:
                 html_content_strings.append(explanation)
 
         for example in self.skill_contents.worked_examples:
-            html_content_strings.append(example.question.html)
+            html_content_strings.append(example.QUESTION.html)
             html_content_strings.append(example.explanation.html)
 
         for misconception in self.misconceptions:
             html_content_strings.append(misconception.notes)
-            html_content_strings.append(misconception.feedback)
+            html_content_strings.append(misconception.FEEDBACK)
 
         return html_content_strings
 
@@ -1313,14 +1313,14 @@ class Skill:
         old_content_ids = [
             example_field.content_id
             for example in self.skill_contents.worked_examples
-            for example_field in (example.question, example.explanation)]
+            for example_field in (example.QUESTION, example.explanation)]
 
         self.skill_contents.worked_examples = list(worked_examples)
 
         new_content_ids = [
             example_field.content_id
             for example in self.skill_contents.worked_examples
-            for example_field in (example.question, example.explanation)]
+            for example_field in (example.QUESTION, example.explanation)]
 
         self._update_content_ids_in_assets(old_content_ids, new_content_ids)
 
@@ -1528,7 +1528,7 @@ class Skill:
         if index is None:
             raise ValueError(
                 'There is no misconception with the given id.')
-        self.misconceptions[index].feedback = feedback
+        self.misconceptions[index].FEEDBACK = feedback
 
 
 class SkillSummary:

@@ -40,7 +40,7 @@ from core.domain import topic_fetchers
 from core.platform import models
 
 (exp_models, story_models, user_models,) = models.Registry.import_models(
-    [models.NAMES.exploration, models.NAMES.story, models.NAMES.user])
+    [models.Names.EXPLORATION, models.Names.STORY, models.Names.USER])
 transaction_services = models.Registry.import_transaction_services()
 
 

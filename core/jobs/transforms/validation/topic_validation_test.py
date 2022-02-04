@@ -32,7 +32,7 @@ from core.tests import test_utils
 import apache_beam as beam
 
 (base_models, topic_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.topic])
+    [models.Names.BASE_MODEL, models.Names.TOPIC])
 
 
 class ValidateCanonicalNameMatchesNameInLowercaseTests(

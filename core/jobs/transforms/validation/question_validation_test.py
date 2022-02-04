@@ -28,7 +28,7 @@ from core.tests import test_utils
 import apache_beam as beam
 
 (base_models, question_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.question])
+    [models.Names.BASE_MODEL, models.Names.QUESTION])
 
 
 class ValidateQuestionSnapshotMetadataModelTests(

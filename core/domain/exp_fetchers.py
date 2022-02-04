@@ -33,7 +33,7 @@ from core.domain import exp_domain
 from core.domain import subscription_services
 from core.platform import models
 
-(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
+(exp_models,) = models.Registry.import_models([models.Names.EXPLORATION])
 datastore_services = models.Registry.import_datastore_services()
 
 

@@ -22,7 +22,7 @@ from core.jobs.types import base_validation_errors_test
 from core.jobs.types import feedback_validation_errors
 from core.platform import models
 
-(feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
+(feedback_models,) = models.Registry.import_models([models.Names.FEEDBACK])
 
 datastore_services = models.Registry.import_datastore_services()
 

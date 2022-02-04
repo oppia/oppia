@@ -22,7 +22,7 @@ from core.domain import translation_domain
 from core.platform import models
 
 (translation_models,) = models.Registry.import_models([
-    models.NAMES.translation])
+    models.Names.TRANSLATION])
 
 
 def get_translation_from_model(translation_model):

@@ -28,7 +28,7 @@ from core.platform import models
 (
     exp_models, story_models
 ) = models.Registry.import_models([
-    models.NAMES.exploration, models.NAMES.story
+    models.Names.EXPLORATION, models.Names.STORY
 ])
 
 

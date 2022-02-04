@@ -28,7 +28,7 @@ from core.domain import rights_domain
 from core.platform import models
 
 (exp_models, recommendations_models,) = models.Registry.import_models([
-    models.NAMES.exploration, models.NAMES.recommendations])
+    models.Names.EXPLORATION, models.Names.RECOMMENDATIONS])
 
 # pylint: disable=line-too-long, single-line-pragma
 DEFAULT_TOPIC_SIMILARITIES_STRING = (

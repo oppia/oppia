@@ -26,7 +26,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-(topic_models,) = models.Registry.import_models([models.NAMES.topic])
+(topic_models,) = models.Registry.import_models([models.Names.TOPIC])
 
 
 class TopicFetchersUnitTests(test_utils.GenericTestBase):

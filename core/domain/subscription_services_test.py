@@ -31,7 +31,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-(user_models,) = models.Registry.import_models([models.NAMES.user])
+(user_models,) = models.Registry.import_models([models.Names.USER])
 
 COLLECTION_ID = 'col_id'
 COLLECTION_ID_2 = 'col_id_2'

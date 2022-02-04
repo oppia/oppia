@@ -28,7 +28,7 @@ from core.domain import improvements_domain
 from core.platform import models
 
 (improvements_models,) = (
-    models.Registry.import_models([models.NAMES.improvements]))
+    models.Registry.import_models([models.Names.IMPROVEMENTS]))
 datastore_services = models.Registry.import_datastore_services()
 
 

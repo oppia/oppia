@@ -102,7 +102,7 @@ class AuthClaims:
         # https://docs.python.org/2/library/constants.html#NotImplemented.
         return NotImplemented if not isinstance(other, AuthClaims) else (
             (self.auth_id, self.email, self.role_is_super_admin) ==
-            (other.auth_id, other.email, other.role_is_super_admin))
+            (other.auth_id, other.EMAIL, other.role_is_super_admin))
 
 
 class UserAuthDetails:

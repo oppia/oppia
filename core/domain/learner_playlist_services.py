@@ -23,7 +23,7 @@ from core.domain import subscription_services
 from core.domain import user_domain
 from core.platform import models
 
-(user_models,) = models.Registry.import_models([models.NAMES.user])
+(user_models,) = models.Registry.import_models([models.Names.USER])
 
 MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT = (
     feconf.MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT)

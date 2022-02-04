@@ -33,7 +33,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import datastore_services
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
 datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
@@ -241,7 +241,7 @@ class UserSettingsModel(base_models.BaseModel):
         # Ruling out the possibility of None for mypy type checking.
         assert user is not None
         return {
-            'email': user.email,
+            'email': user.EMAIL,
             'roles': user.roles,
             'banned': user.banned,
             'username': user.username,

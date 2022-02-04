@@ -23,7 +23,7 @@ from core.domain import email_manager
 from core.domain import user_query_domain
 from core.platform import models
 
-(user_models,) = models.Registry.import_models([models.NAMES.user])
+(user_models,) = models.Registry.import_models([models.Names.USER])
 
 
 def _get_user_query_from_model(user_query_model):

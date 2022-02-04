@@ -28,7 +28,7 @@ from core.tests import test_utils
 
 import webapp2
 
-auth_models, = models.Registry.import_models([models.NAMES.auth])
+auth_models, = models.Registry.import_models([models.Names.AUTH])
 
 
 class AuthServicesTests(test_utils.GenericTestBase):

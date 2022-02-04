@@ -35,7 +35,7 @@ from core.platform import models
 from core.tests import test_utils
 
 (collection_models, user_models) = models.Registry.import_models([
-    models.NAMES.collection, models.NAMES.user])
+    models.Names.COLLECTION, models.Names.USER])
 datastore_services = models.Registry.import_datastore_services()
 gae_search_services = models.Registry.import_search_services()
 transaction_services = models.Registry.import_transaction_services()

@@ -27,7 +27,7 @@ from core.platform import models
 import apache_beam as beam
 
 (exp_models, feedback_models) = models.Registry.import_models(
-    [models.NAMES.exploration, models.NAMES.feedback])
+    [models.Names.EXPLORATION, models.Names.FEEDBACK])
 
 
 @validation_decorators.AuditsExisting(

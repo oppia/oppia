@@ -27,7 +27,7 @@ from core.jobs.types import model_property
 from core.platform import models
 
 (auth_models, base_models, user_models) = models.Registry.import_models(
-    [models.NAMES.auth, models.NAMES.base_model, models.NAMES.user])
+    [models.Names.AUTH, models.Names.BASE_MODEL, models.Names.USER])
 
 
 class AuditAllStorageModelsJobTests(job_test_utils.JobTestBase):

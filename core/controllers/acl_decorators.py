@@ -207,7 +207,7 @@ def can_play_exploration(handler):
             raise self.PageNotFoundException
 
         if rights_manager.check_can_access_activity(
-                self.user, exploration_rights):
+                self.USER, exploration_rights):
             return handler(self, exploration_id, **kwargs)
         else:
             raise self.PageNotFoundException
@@ -294,7 +294,7 @@ def can_play_collection(handler):
             raise self.PageNotFoundException
 
         if rights_manager.check_can_access_activity(
-                self.user, collection_rights):
+                self.USER, collection_rights):
             return handler(self, collection_id, **kwargs)
         else:
             raise self.PageNotFoundException
@@ -338,7 +338,7 @@ def can_download_exploration(handler):
             raise self.PageNotFoundException
 
         if rights_manager.check_can_access_activity(
-                self.user, exploration_rights):
+                self.USER, exploration_rights):
             return handler(self, exploration_id, **kwargs)
         else:
             raise self.PageNotFoundException
@@ -382,7 +382,7 @@ def can_view_exploration_stats(handler):
             raise self.PageNotFoundException
 
         if rights_manager.check_can_access_activity(
-                self.user, exploration_rights):
+                self.USER, exploration_rights):
             return handler(self, exploration_id, **kwargs)
         else:
             raise base.UserFacingExceptions.PageNotFoundException
@@ -426,7 +426,7 @@ def can_edit_collection(handler):
             raise base.UserFacingExceptions.PageNotFoundException
 
         if rights_manager.check_can_edit_activity(
-                self.user, collection_rights):
+                self.USER, collection_rights):
             return handler(self, collection_id, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
@@ -502,7 +502,7 @@ def can_access_blog_admin_page(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        if role_services.ACTION_ACCESS_BLOG_ADMIN_PAGE in self.user.actions:
+        if role_services.ACTION_ACCESS_BLOG_ADMIN_PAGE in self.USER.actions:
             return handler(self, **kwargs)
 
         raise self.UnauthorizedUserException(
@@ -542,7 +542,7 @@ def can_manage_blog_post_editors(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        if role_services.ACTION_MANAGE_BLOG_POST_EDITORS in self.user.actions:
+        if role_services.ACTION_MANAGE_BLOG_POST_EDITORS in self.USER.actions:
             return handler(self, **kwargs)
 
         raise self.UnauthorizedUserException(
@@ -579,7 +579,7 @@ def can_access_blog_dashboard(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        if role_services.ACTION_ACCESS_BLOG_DASHBOARD in self.user.actions:
+        if role_services.ACTION_ACCESS_BLOG_DASHBOARD in self.USER.actions:
             return handler(self, **kwargs)
 
         raise self.UnauthorizedUserException(
@@ -624,7 +624,7 @@ def can_delete_blog_post(handler):
             raise self.PageNotFoundException(
                 Exception('The given blog post id is invalid.'))
 
-        if role_services.ACTION_DELETE_ANY_BLOG_POST in self.user.actions:
+        if role_services.ACTION_DELETE_ANY_BLOG_POST in self.USER.actions:
             return handler(self, blog_post_id, **kwargs)
         if self.user_id in blog_post_rights.editor_ids:
             return handler(self, blog_post_id, **kwargs)
@@ -672,7 +672,7 @@ def can_edit_blog_post(handler):
             raise self.PageNotFoundException(
                 Exception('The given blog post id is invalid.'))
 
-        if role_services.ACTION_EDIT_ANY_BLOG_POST in self.user.actions:
+        if role_services.ACTION_EDIT_ANY_BLOG_POST in self.USER.actions:
             return handler(self, blog_post_id, **kwargs)
         if self.user_id in blog_post_rights.editor_ids:
             return handler(self, blog_post_id, **kwargs)
@@ -713,7 +713,7 @@ def can_access_moderator_page(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        if role_services.ACTION_ACCESS_MODERATOR_PAGE in self.user.actions:
+        if role_services.ACTION_ACCESS_MODERATOR_PAGE in self.USER.actions:
             return handler(self, **kwargs)
 
         raise self.UnauthorizedUserException(
@@ -753,7 +753,7 @@ def can_access_release_coordinator_page(handler):
             raise base.UserFacingExceptions.NotLoggedInException
 
         if role_services.ACTION_ACCESS_RELEASE_COORDINATOR_PAGE in (
-                self.user.actions):
+                self.USER.actions):
             return handler(self, **kwargs)
 
         raise self.UnauthorizedUserException(
@@ -791,7 +791,7 @@ def can_manage_memcache(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        if role_services.ACTION_MANAGE_MEMCACHE in self.user.actions:
+        if role_services.ACTION_MANAGE_MEMCACHE in self.USER.actions:
             return handler(self, **kwargs)
 
         raise self.UnauthorizedUserException(
@@ -870,7 +870,7 @@ def can_send_moderator_emails(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        if role_services.ACTION_SEND_MODERATOR_EMAILS in self.user.actions:
+        if role_services.ACTION_SEND_MODERATOR_EMAILS in self.USER.actions:
             return handler(self, **kwargs)
 
         raise self.UnauthorizedUserException(
@@ -908,7 +908,7 @@ def can_manage_own_account(handler):
         if not self.user_id:
             raise self.NotLoggedInException
 
-        if role_services.ACTION_MANAGE_ACCOUNT in self.user.actions:
+        if role_services.ACTION_MANAGE_ACCOUNT in self.USER.actions:
             return handler(self, **kwargs)
 
         raise self.UnauthorizedUserException(
@@ -985,7 +985,7 @@ def can_access_contributor_dashboard_admin_page(handler):
             raise self.NotLoggedInException
 
         if role_services.ACTION_ACCESS_CONTRIBUTOR_DASHBOARD_ADMIN_PAGE in (
-                self.user.actions):
+                self.USER.actions):
             return handler(self, **kwargs)
 
         raise self.UnauthorizedUserException(
@@ -1032,12 +1032,12 @@ def can_manage_contributors_role(handler):
                 constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
                 constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION]:
             if role_services.ACTION_MANAGE_QUESTION_CONTRIBUTOR_ROLES in (
-                    self.user.actions):
+                    self.USER.actions):
                 return handler(self, category, **kwargs)
         elif category == (
                 constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION):
             if role_services.ACTION_MANAGE_TRANSLATION_CONTRIBUTOR_ROLES in (
-                    self.user.actions):
+                    self.USER.actions):
                 return handler(self, category, **kwargs)
         else:
             raise self.InvalidInputException(
@@ -1155,7 +1155,7 @@ def can_create_exploration(handler):
         if self.user_id is None:
             raise self.NotLoggedInException
 
-        if role_services.ACTION_CREATE_EXPLORATION in self.user.actions:
+        if role_services.ACTION_CREATE_EXPLORATION in self.USER.actions:
             return handler(self, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
@@ -1193,7 +1193,7 @@ def can_create_collection(handler):
         if self.user_id is None:
             raise self.NotLoggedInException
 
-        if role_services.ACTION_CREATE_COLLECTION in self.user.actions:
+        if role_services.ACTION_CREATE_COLLECTION in self.USER.actions:
             return handler(self, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
@@ -1231,7 +1231,7 @@ def can_access_creator_dashboard(handler):
         if self.user_id is None:
             raise self.NotLoggedInException
 
-        if role_services.ACTION_ACCESS_CREATOR_DASHBOARD in self.user.actions:
+        if role_services.ACTION_ACCESS_CREATOR_DASHBOARD in self.USER.actions:
             return handler(self, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
@@ -1274,7 +1274,7 @@ def can_create_feedback_thread(handler):
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
         if rights_manager.check_can_access_activity(
-                self.user, exploration_rights):
+                self.USER, exploration_rights):
             return handler(self, exploration_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
@@ -1332,7 +1332,7 @@ def can_view_feedback_thread(handler):
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
         if rights_manager.check_can_access_activity(
-                self.user, exploration_rights):
+                self.USER, exploration_rights):
             return handler(self, thread_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
@@ -1389,7 +1389,7 @@ def can_comment_on_feedback_thread(handler):
             exploration_id, strict=False)
 
         if rights_manager.check_can_access_activity(
-                self.user, exploration_rights):
+                self.USER, exploration_rights):
             return handler(self, thread_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
@@ -1427,7 +1427,7 @@ def can_rate_exploration(handler):
                 rate an exploration.
         """
         if (role_services.ACTION_RATE_ANY_PUBLIC_EXPLORATION in
-                self.user.actions):
+                self.USER.actions):
             return handler(self, exploration_id, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
@@ -1462,7 +1462,7 @@ def can_flag_exploration(handler):
             UnauthorizedUserException. The user does not have credentials to
                 flag an exploration.
         """
-        if role_services.ACTION_FLAG_EXPLORATION in self.user.actions:
+        if role_services.ACTION_FLAG_EXPLORATION in self.USER.actions:
             return handler(self, exploration_id, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
@@ -1496,7 +1496,7 @@ def can_subscribe_to_users(handler):
             UnauthorizedUserException. The user does not have credentials to
                 manage subscriptions.
         """
-        if role_services.ACTION_SUBSCRIBE_TO_USERS in self.user.actions:
+        if role_services.ACTION_SUBSCRIBE_TO_USERS in self.USER.actions:
             return handler(self, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
@@ -1544,7 +1544,7 @@ def can_edit_exploration(handler):
             raise base.UserFacingExceptions.PageNotFoundException
 
         if rights_manager.check_can_edit_activity(
-                self.user, exploration_rights):
+                self.USER, exploration_rights):
             return handler(self, exploration_id, *args, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
@@ -1590,7 +1590,7 @@ def can_voiceover_exploration(handler):
             raise base.UserFacingExceptions.PageNotFoundException
 
         if rights_manager.check_can_voiceover_activity(
-                self.user, exploration_rights):
+                self.USER, exploration_rights):
             return handler(self, exploration_id, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
@@ -1647,7 +1647,7 @@ def can_add_voice_artist(handler):
             raise base.UserFacingExceptions.InvalidInputException(
                 'Could not assign voice artist to private activity.')
         if rights_manager.check_can_manage_voice_artist_in_activity(
-                self.user, exploration_rights):
+                self.USER, exploration_rights):
             return handler(self, entity_type, entity_id, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
@@ -1700,7 +1700,7 @@ def can_remove_voice_artist(handler):
             raise base.UserFacingExceptions.PageNotFoundException
 
         if rights_manager.check_can_manage_voice_artist_in_activity(
-                self.user, exploration_rights):
+                self.USER, exploration_rights):
             return handler(self, entity_type, entity_id, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
@@ -1747,7 +1747,7 @@ def can_save_exploration(handler):
             raise base.UserFacingExceptions.PageNotFoundException
 
         if rights_manager.check_can_save_activity(
-                self.user, exploration_rights):
+                self.USER, exploration_rights):
             return handler(self, exploration_id, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
@@ -1791,7 +1791,7 @@ def can_delete_exploration(handler):
             exploration_id, strict=False)
 
         if rights_manager.check_can_delete_activity(
-                self.user, exploration_rights):
+                self.USER, exploration_rights):
             return handler(self, exploration_id, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
@@ -1828,7 +1828,7 @@ def can_suggest_changes_to_exploration(handler):
             UnauthorizedUserException. The user does not have credentials to
                 give suggestions to an exploration.
         """
-        if role_services.ACTION_SUGGEST_CHANGES in self.user.actions:
+        if role_services.ACTION_SUGGEST_CHANGES in self.USER.actions:
             return handler(self, exploration_id, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
@@ -1863,7 +1863,7 @@ def can_suggest_changes(handler):
             UnauthorizedUserException. The user does not have credentials to
                 make suggestions.
         """
-        if role_services.ACTION_SUGGEST_CHANGES in self.user.actions:
+        if role_services.ACTION_SUGGEST_CHANGES in self.USER.actions:
             return handler(self, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
@@ -1940,7 +1940,7 @@ def can_publish_exploration(handler):
             raise base.UserFacingExceptions.PageNotFoundException
 
         if rights_manager.check_can_publish_activity(
-                self.user, exploration_rights):
+                self.USER, exploration_rights):
             return handler(self, exploration_id, *args, **kwargs)
 
         raise base.UserFacingExceptions.UnauthorizedUserException(
@@ -1982,7 +1982,7 @@ def can_publish_collection(handler):
             raise base.UserFacingExceptions.PageNotFoundException
 
         if rights_manager.check_can_publish_activity(
-                self.user, collection_rights):
+                self.USER, collection_rights):
             return handler(self, collection_id, **kwargs)
 
         raise self.UnauthorizedUserException(
@@ -2025,7 +2025,7 @@ def can_unpublish_collection(handler):
             raise base.UserFacingExceptions.PageNotFoundException
 
         if rights_manager.check_can_unpublish_activity(
-                self.user, collection_rights):
+                self.USER, collection_rights):
             return handler(self, collection_id, **kwargs)
 
         raise self.UnauthorizedUserException(
@@ -2066,7 +2066,7 @@ def can_modify_exploration_roles(handler):
             exploration_id, strict=False)
 
         if rights_manager.check_can_modify_core_activity_roles(
-                self.user, exploration_rights):
+                self.USER, exploration_rights):
             return handler(self, exploration_id, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
@@ -2183,7 +2183,7 @@ def can_access_learner_dashboard(handler):
         Raises:
             NotLoggedInException. The user is not logged in.
         """
-        if role_services.ACTION_ACCESS_LEARNER_DASHBOARD in self.user.actions:
+        if role_services.ACTION_ACCESS_LEARNER_DASHBOARD in self.USER.actions:
             return handler(self, **kwargs)
         else:
             raise self.NotLoggedInException
@@ -2224,7 +2224,7 @@ def can_manage_question_skill_status(handler):
 
         if (
                 role_services.ACTION_MANAGE_QUESTION_SKILL_STATUS in
-                self.user.actions):
+                self.USER.actions):
             return handler(self, **kwargs)
         else:
             raise self.UnauthorizedUserException(
@@ -2300,7 +2300,7 @@ def can_edit_topic(handler):
         if topic_rights is None or topic is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
-        if topic_services.check_can_edit_topic(self.user, topic_rights):
+        if topic_services.check_can_edit_topic(self.USER, topic_rights):
             return handler(self, topic_id, *args, **kwargs)
         else:
             raise self.UnauthorizedUserException(
@@ -2344,7 +2344,7 @@ def can_edit_question(handler):
             question_id, strict=False)
         if question is None:
             raise self.PageNotFoundException
-        if role_services.ACTION_EDIT_ANY_QUESTION in self.user.actions:
+        if role_services.ACTION_EDIT_ANY_QUESTION in self.USER.actions:
             return handler(self, question_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
@@ -2421,7 +2421,7 @@ def can_view_question_editor(handler):
         if question is None:
             raise self.PageNotFoundException
         if role_services.ACTION_VISIT_ANY_QUESTION_EDITOR_PAGE in (
-                self.user.actions):
+                self.USER.actions):
             return handler(self, question_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
@@ -2516,7 +2516,7 @@ def can_add_new_story_to_topic(handler):
         if topic_rights is None or topic is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
-        if topic_services.check_can_edit_topic(self.user, topic_rights):
+        if topic_services.check_can_edit_topic(self.USER, topic_rights):
             return handler(self, topic_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
@@ -2573,7 +2573,7 @@ def can_edit_story(handler):
         if story_id not in canonical_story_ids:
             raise base.UserFacingExceptions.PageNotFoundException
 
-        if topic_services.check_can_edit_topic(self.user, topic_rights):
+        if topic_services.check_can_edit_topic(self.USER, topic_rights):
             return handler(self, story_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
@@ -2614,7 +2614,7 @@ def can_edit_skill(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        if role_services.ACTION_EDIT_SKILL in self.user.actions:
+        if role_services.ACTION_EDIT_SKILL in self.USER.actions:
             return handler(self, skill_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
@@ -2653,7 +2653,7 @@ def can_submit_images_to_questions(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        if role_services.ACTION_SUGGEST_CHANGES in self.user.actions:
+        if role_services.ACTION_SUGGEST_CHANGES in self.USER.actions:
             return handler(self, skill_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
@@ -2784,7 +2784,7 @@ def can_delete_story(handler):
         if topic_rights is None or topic is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
-        if topic_services.check_can_edit_topic(self.user, topic_rights):
+        if topic_services.check_can_edit_topic(self.USER, topic_rights):
             return handler(self, story_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
@@ -3664,7 +3664,7 @@ def can_update_suggestion(handler):
         """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
-        user_actions = self.user.actions
+        user_actions = self.USER.actions
 
         if len(suggestion_id.split('.')) != 3:
             raise self.InvalidInputException(

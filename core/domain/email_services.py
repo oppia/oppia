@@ -21,7 +21,7 @@ import re
 from core import feconf
 from core.platform import models
 
-(email_models,) = models.Registry.import_models([models.NAMES.email])
+(email_models,) = models.Registry.import_models([models.Names.EMAIL])
 platform_email_services = models.Registry.import_email_services()
 
 

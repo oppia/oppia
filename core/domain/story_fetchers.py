@@ -30,7 +30,7 @@ from core.domain import story_domain
 from core.platform import models
 
 (story_models, user_models) = models.Registry.import_models(
-    [models.NAMES.story, models.NAMES.user])
+    [models.Names.STORY, models.Names.USER])
 
 
 def _migrate_story_contents_to_latest_schema(

@@ -25,7 +25,7 @@ from core.domain import config_domain
 from core.platform import models
 from core.tests import test_utils
 
-(config_models,) = models.Registry.import_models([models.NAMES.config])
+(config_models,) = models.Registry.import_models([models.Names.CONFIG])
 
 
 class ConfigPropertyChangeTests(test_utils.GenericTestBase):

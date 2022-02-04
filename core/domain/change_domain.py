@@ -23,7 +23,7 @@ import copy
 from core import utils
 from core.platform import models
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
 
 def validate_cmd(cmd_name, valid_cmd_attribute_specs, actual_cmd_attributes):
