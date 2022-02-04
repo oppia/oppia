@@ -6,6 +6,7 @@
 *.swo
 *.bak
 .*
+__pycache__/
 # Typescript files in core
 core/**.ts
 # Typescript output log file
@@ -17,6 +18,7 @@ core/tests/
 node_modules/
 scripts/
 third_party/python3_libs/
+local_compiled_js_for_test/
 # Some third_party static scripts are directly imported, namely: jquery,
 # jqueryui, angularjs, jqueryui-touch-punch, MathJax, code-mirror,
 # ui-codemirror, d3js, midi-js, ui-map, guppy, skulpt, math-expressions.
