@@ -109,7 +109,8 @@ def normalize_against_schema(
         if name == 'str':
             name = 'basestring'
         assert (name in schema[SCHEMA_KEY_OPTIONS]), (
-            '%s is not present in options' % obj)
+            '%s is not present in options %s' %
+            (obj, schema[SCHEMA_KEY_OPTIONS]))
         schema[SCHEMA_KEY_TYPE] = name
     if schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_BOOL:
         assert isinstance(obj, bool), ('Expected bool, received %s' % obj)
