@@ -699,8 +699,9 @@ class ExplorationStartEventHandler(base.BaseHandler):
         'POST': {
             'params': {
                 'schema': {
-                    'type': 'dict',
-                    'properties': []
+                    'type': 'object_dict',
+                    'validation_method': (
+                        domain_objects_validator.validate_params_dict),
                 }
             },
             'session_id': {
