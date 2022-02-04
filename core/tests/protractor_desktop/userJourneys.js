@@ -202,12 +202,12 @@ describe('Site language', function() {
       await users.createUser('audioPlayer@example.com', 'audioPlayer');
       await users.login('audioPlayer@example.com');
       await preferencesPage.get();
-      await preferencesPage.expectPreferredAudioLanguageNotToBe('Chinese');
-      await preferencesPage.selectPreferredAudioLanguage('Chinese');
+      await preferencesPage.expectPreferredAudioLanguageNotToBe('中文 (Chinese)');
+      await preferencesPage.selectPreferredAudioLanguage('中文 (Chinese)');
       // TODO(DubeySandeep): Add the test to check preferred audio language
       // choice gets reflected to the exploration player. This can be done once
       // we will finalize a way to upload an audio file in e2e test.
-      await preferencesPage.expectPreferredAudioLanguageToBe('Chinese');
+      await preferencesPage.expectPreferredAudioLanguageToBe('中文 (Chinese)');
       await general.ensurePageHasNoTranslationIds();
       await users.logout();
     });
