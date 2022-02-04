@@ -16,6 +16,7 @@
 
 from __future__ import annotations
 
+from core import feconf
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_services
@@ -34,7 +35,7 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
 
     STORY_ID = None
     NODE_ID_1 = story_domain.NODE_ID_PREFIX + '1'
-    NODE_ID_2 = 'node_2'
+    NODE_ID_2 = story_domain.NODE_ID_PREFIX + '2'
     USER_ID = 'user'
     story = None
 
@@ -47,7 +48,9 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
             description='A new topic', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=0)
-        self.save_new_story(self.STORY_ID, self.USER_ID, self.TOPIC_ID)
+        self.save_new_story(
+            self.STORY_ID, self.USER_ID, self.TOPIC_ID, url_fragment='story-one'
+        )
         topic_services.add_canonical_story(
             self.USER_ID, self.TOPIC_ID, self.STORY_ID)
         changelist = [
@@ -79,9 +82,10 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
             self.user_id_admin)
 
     def test_get_story_from_model(self):
+        schema_version = feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION - 1
         story_model = story_models.StoryModel.get(self.STORY_ID)
+        story_model.story_contents_schema_version = schema_version
         story = story_fetchers.get_story_from_model(story_model)
-
         self.assertEqual(story.to_dict(), self.story.to_dict())
 
     def test_get_story_summary_from_model(self):
@@ -95,6 +99,65 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(story_summary.node_titles, ['Title 1'])
         self.assertEqual(story_summary.thumbnail_bg_color, None)
         self.assertEqual(story_summary.thumbnail_filename, None)
+
+    def test_get_story_summaries_by_id(self):
+        story_summaries = story_fetchers.get_story_summaries_by_ids(
+            [self.STORY_ID, 'someID'])
+
+        self.assertEqual(len(story_summaries), 1)
+        self.assertEqual(story_summaries[0].id, self.STORY_ID)
+        self.assertEqual(story_summaries[0].title, 'Title')
+        self.assertEqual(story_summaries[0].description, 'Description')
+        self.assertEqual(story_summaries[0].language_code, 'en')
+        self.assertEqual(story_summaries[0].node_titles, ['Title 1'])
+        self.assertEqual(story_summaries[0].thumbnail_filename, None)
+        self.assertEqual(story_summaries[0].thumbnail_bg_color, None)
+        self.assertEqual(story_summaries[0].version, 2)
+
+    def test_get_latest_completed_node_ids(self):
+        self.assertEqual(story_fetchers.get_latest_completed_node_ids(
+            self.USER_ID, self.STORY_ID), [])
+        story_services.record_completed_node_in_story_context(
+            self.USER_ID, self.STORY_ID, self.NODE_ID_1)
+        self.assertEqual(
+            story_fetchers.get_latest_completed_node_ids(
+                self.USER_ID, self.STORY_ID),
+            [self.NODE_ID_1])
+
+    def test_migrate_story_contents(self):
+        story_id = self.STORY_ID
+        story_model = story_models.StoryModel.get(story_id)
+        versioned_story_contents = {
+        'schema_version': story_model.story_contents_schema_version,
+        'story_contents': story_model.story_contents
+        }
+        # Disable protected function for test.
+        story_fetchers._migrate_story_contents_to_latest_schema( # pylint: disable=protected-access
+            versioned_story_contents, story_id)
+        versioned_story_contents[
+            'schema_version'
+        ] = feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION - 1
+        story_fetchers._migrate_story_contents_to_latest_schema( # pylint: disable=protected-access
+                versioned_story_contents, story_id
+        )
+        versioned_story_contents['schema_version'] = 6
+        with self.assertRaisesRegex(
+            Exception,
+            'Sorry, we can only process v1-v%d story schemas at '
+            'present.' % feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION
+            ):
+            story_fetchers._migrate_story_contents_to_latest_schema( # pylint: disable=protected-access
+                versioned_story_contents, story_id
+            )
+
+    def test_get_story_by_url_fragment(self):
+        story = story_fetchers.get_story_by_url_fragment(
+            url_fragment='story-one')
+        self.assertEqual(story.id, self.STORY_ID)
+        self.assertEqual(story.url_fragment, 'story-one')
+        story = story_fetchers.get_story_by_url_fragment(
+            url_fragment='fake-story')
+        self.assertEqual(story, None)
 
     def test_get_story_by_id_with_valid_ids_returns_correct_dict(self):
         expected_story = self.story.to_dict()
@@ -118,13 +181,57 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
 
     def test_get_story_summary_by_id(self):
         story_summary = story_fetchers.get_story_summary_by_id(self.STORY_ID)
-
         self.assertEqual(story_summary.id, self.STORY_ID)
         self.assertEqual(story_summary.title, 'Title')
         self.assertEqual(story_summary.description, 'Description')
         self.assertEqual(story_summary.node_titles, ['Title 1'])
         self.assertEqual(story_summary.thumbnail_bg_color, None)
         self.assertEqual(story_summary.thumbnail_filename, None)
+        with self.swap_to_always_return(
+            story_models.StorySummaryModel,
+            'get'
+            ):
+            story_summary = story_fetchers.get_story_summary_by_id('fakeID')
+            self.assertEqual(story_summary, None)
+
+    def test_get_completed_node_id(self):
+        self.assertEqual(
+            story_fetchers.get_completed_node_ids('randomID', 'someID'),
+            []
+        )
+        story_services.record_completed_node_in_story_context(
+            self.USER_ID, self.STORY_ID, self.NODE_ID_1)
+        story_services.record_completed_node_in_story_context(
+            self.USER_ID, self.STORY_ID, self.NODE_ID_2)
+        self.assertEqual(
+            story_fetchers.get_completed_node_ids(self.USER_ID, self.STORY_ID),
+            [self.NODE_ID_1, self.NODE_ID_2]
+        )
+
+    def test_get_pending_and_all_nodes_in_story(self):
+        result = story_fetchers.get_pending_and_all_nodes_in_story(
+            self.USER_ID, self.STORY_ID
+        )
+        pending_nodes = result['pending_nodes']
+        self.assertEqual(len(pending_nodes), 1)
+        self.assertEqual(pending_nodes[0].description, '')
+        self.assertEqual(pending_nodes[0].title, 'Title 1')
+        self.assertEqual(pending_nodes[0].id, self.NODE_ID_1)
+        self.assertEqual(pending_nodes[0].exploration_id, None)
+
+    def test_get_completed_nodes_in_story(self):
+        story = story_fetchers.get_story_by_id(self.STORY_ID)
+        story_services.record_completed_node_in_story_context(
+            self.USER_ID, self.STORY_ID, self.NODE_ID_1)
+        story_services.record_completed_node_in_story_context(
+            self.USER_ID, self.STORY_ID, self.NODE_ID_2)
+        for ind, completed_node in enumerate(
+                story_fetchers.get_completed_nodes_in_story(
+                    self.USER_ID, self.STORY_ID)):
+            self.assertEqual(
+                completed_node.to_dict(),
+                story.story_contents.nodes[ind].to_dict()
+            )
 
     def test_get_node_index_by_story_id_and_node_id(self):
         # Tests correct node index should be returned when story and node exist.
