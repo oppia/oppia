@@ -30,6 +30,120 @@ if MYPY: # pragma: no cover
     [models.NAMES.base_model, models.NAMES.translation])
 
 
+class EntityTranslationsModelTest(test_utils.GenericTestBase):
+    """Unit tests for EntityTranslationsModel class."""
+
+    def test_create_new_model(self) -> None:
+        enitity_translation_model = (
+            translation_models.EntityTranslationsModel.create_new(
+                'exploration', 'exp_id', 1, 'hi', {
+                    '123': {
+                        'content': 'Hello world!',
+                        'needs_update': False
+                    }
+                })
+        )
+        self.assertEqual(enitity_translation_model.entity_type, 'exploration')
+        self.assertEqual(enitity_translation_model.entity_id, 'exp_id')
+        self.assertEqual(enitity_translation_model.entity_version, 1)
+        self.assertEqual(enitity_translation_model.language_code, 'hi')
+        self.assertEqual(
+            enitity_translation_model.translations['123']['content'],
+            'Hello world!')
+        self.assertEqual(
+            enitity_translation_model.translations['123']['needs_update'],
+            False)
+
+    def test_get_model_method_returns_correctly(self) -> None:
+        translation_models.EntityTranslationsModel.create_new(
+            'exploration', 'exp_id', 1, 'hi', {
+                '123': {
+                    'content': 'Hello world!',
+                    'needs_update': False
+                }
+            }
+        ).put()
+        enitity_translation_model = (
+            translation_models.EntityTranslationsModel.get_model(
+                'exploration', 'exp_id', 1, 'hi'))
+        self.assertEqual(enitity_translation_model.entity_type, 'exploration')
+        self.assertEqual(enitity_translation_model.entity_id, 'exp_id')
+        self.assertEqual(enitity_translation_model.entity_version, 1)
+        self.assertEqual(enitity_translation_model.language_code, 'hi')
+        self.assertEqual(
+            enitity_translation_model.translations['123']['content'],
+            'Hello world!')
+        self.assertEqual(
+            enitity_translation_model.translations['123']['needs_update'],
+            False)
+
+    def test_get_all_for_entity_returns_correctly(self) -> None:
+        translation_models.EntityTranslationsModel.create_new(
+            'exploration', 'exp_id', 1, 'en', {
+                '123': {
+                    'content': 'Hey I am Jhon.',
+                    'needs_update': False
+                }
+            }
+        ).put()
+        translation_models.EntityTranslationsModel.create_new(
+            'exploration', 'exp_id2', 2, 'hi', {
+                '123': {
+                    'content': 'Hello world!',
+                    'needs_update': False
+                }
+            }
+        ).put()
+        translation_models.EntityTranslationsModel.create_new(
+            'exploration', 'exp_id', 1, 'hi', {
+                '123': {
+                    'content': 'Hey I am Nikhil.',
+                    'needs_update': False
+                }
+            }
+        ).put()
+
+        enitity_translation_models = (
+            translation_models.EntityTranslationsModel.get_all_for_entity(
+                'exploration', 'exp_id', 1))
+        self.assertEqual(len(enitity_translation_models), 2)
+
+        enitity_translation_models = (
+            translation_models.EntityTranslationsModel.get_all_for_entity(
+                'exploration', 'exp_id2', 2))
+        self.assertEqual(len(enitity_translation_models), 1)
+
+    def test_get_export_policy_not_applicable(self) -> None:
+        self.assertEqual(
+            translation_models.EntityTranslationsModel.get_export_policy(),
+            {
+                'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'entity_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'entity_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'entity_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'translations': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            }
+        )
+
+    def test_get_deletion_policy_not_applicable(self) -> None:
+        self.assertEqual(
+            translation_models.EntityTranslationsModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+    def test_get_model_association_to_user_not_corresponding_to_user(
+        self
+    ) -> None:
+        self.assertEqual(
+            (
+                translation_models.EntityTranslationsModel
+                .get_model_association_to_user()
+            ),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
+
+
 class MachineTranslationModelTests(test_utils.GenericTestBase):
     def test_create_model(self) -> None:
         model_id = translation_models.MachineTranslationModel.create(
