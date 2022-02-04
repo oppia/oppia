@@ -121,11 +121,7 @@ export class NumberConversionService {
     let stringNumber = number.toString();
     let convertedNumber: string = stringNumber;
 
-    if (decimalSeparator === ',') {
-      convertedNumber = stringNumber.replace('.', ',');
-    } else if (decimalSeparator === '٫') {
-      convertedNumber = stringNumber.replace('.', '٫');
-    }
+    convertedNumber = stringNumber.replace('.', decimalSeparator);
 
     return convertedNumber;
   }
