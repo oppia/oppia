@@ -68,11 +68,12 @@ export class EndExplorationValidationService {
     );
     if (warningMessageElement) {
       let warningMessage = warningMessageElement.textContent;
-      warningMessage &&
-      warningsList.push({
-        type: AppConstants.WARNING_TYPES.ERROR,
-        message: warningMessage
-      });
+      if (warningMessage) {
+        warningsList.push({
+          type: AppConstants.WARNING_TYPES.ERROR,
+          message: warningMessage
+        });
+      }
     }
     return warningsList;
   }
