@@ -1931,14 +1931,6 @@ class TopicSummary:
         }
 
 
-class TopicRightsDict(TypedDict):
-    """Dictionary that represents TopicRights."""
-
-    topic_id: str
-    manager_ids: List[str]
-    topic_is_published: bool
-
-
 class TopicRights:
     """Domain object for topic rights."""
 
@@ -1960,19 +1952,6 @@ class TopicRights:
         self.id = topic_id
         self.manager_ids = manager_ids
         self.topic_is_published = topic_is_published
-
-    def to_dict(self) -> TopicRightsDict:
-        """Returns a dict suitable for use by the frontend.
-
-        Returns:
-            dict. A dict version of TopicRights suitable for use by the
-            frontend.
-        """
-        return {
-            'topic_id': self.id,
-            'manager_ids': self.manager_ids,
-            'topic_is_published': self.topic_is_published
-        }
 
     def is_manager(self, user_id: str) -> bool:
         """Checks whether given user is a manager of the topic.

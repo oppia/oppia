@@ -692,17 +692,6 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
     def test_get_subtopic_index(self) -> None:
         self.assertEqual(self.topic.get_subtopic_index(1), 0)
 
-    def test_to_dict(self) -> None:
-        user_ids = [self.user_id_a, self.user_id_b]
-        topic_rights = topic_domain.TopicRights(self.topic_id, user_ids, False)
-        expected_dict = {
-            'topic_id': self.topic_id,
-            'manager_ids': user_ids,
-            'topic_is_published': False
-        }
-
-        self.assertEqual(expected_dict, topic_rights.to_dict())
-
     def test_is_manager(self) -> None:
         user_ids = [self.user_id_a, self.user_id_b]
         assert user_ids[0] is not None
@@ -1353,18 +1342,9 @@ class TopicRightsTests(test_utils.GenericTestBase):
         self.signup('b@example.com', 'B')
         self.user_id_a = self.get_user_id_from_email('a@example.com')  # type: ignore[no-untyped-call]
         self.user_id_b = self.get_user_id_from_email('b@example.com')  # type: ignore[no-untyped-call]
-        self.topic_summary_dict = {
-            'topic_id': 'topic_id',
-            'manager_ids': [self.user_id_a],
-            'topic_is_published': False,
-        }
 
         self.topic_summary = topic_domain.TopicRights(
             'topic_id', [self.user_id_a], False)
-
-    def test_topic_summary_gets_created(self) -> None:
-        self.assertEqual(
-            self.topic_summary.to_dict(), self.topic_summary_dict)
 
     def test_is_manager(self) -> None:
         self.assertTrue(self.topic_summary.is_manager(self.user_id_a))
