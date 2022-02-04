@@ -99,16 +99,16 @@
               autofocus>
             <li class="nav-item">
               <div class="nav-item-main d-flex">
-                <div *ngIf="CLASSROOM_PROMOS_ARE_ENABLED" class="nav-item-left d-flex flex-column justify-content-between">
+                <a *ngIf="CLASSROOM_PROMOS_ARE_ENABLED" class="nav-item-left d-flex flex-column justify-content-between"
+                   tabindex="0" href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}"
+                   (click)="navigateToClassroomPage('/learn/' + DEFAULT_CLASSROOM_URL_FRAGMENT)">
                   <div class="nav-item-top d-flex justify-content-between">
                     <div class="nav-content d-flex flex-column">
                       <div class="dropdown-item nav-link oppia-navbar-tab-content protractor-test-classroom-link nav-item-top-link">
-                        <a (keydown)="onMenuKeypress($event, 'learnMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_CLOSE})"
-                           class="underline"
-                           (click)="navigateToClassroomPage('/learn/' + DEFAULT_CLASSROOM_URL_FRAGMENT)"
-                           href="#">
+                        <div (keydown)="onMenuKeypress($event, 'learnMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_CLOSE})"
+                             class="nav-item-left-head">
                              {{ 'I18N_TOPNAV_CLASSROOM_BASIC_MATHS' | translate }}
-                        </a>
+                        </div>
                       </div>
                       <div class="des">{{ 'I18N_TOPNAV_LEARN_DESCRIPTION_1' | translate }}</div>
                     </div>
@@ -134,31 +134,29 @@
                         </a>
                       </div>
                     </div>
-                    <a (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})"
-                       class="nav-item-bottom-link"
-                       href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}">
+                    <div (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})"
+                         class="nav-item-bottom-link">
                       <span class="link">{{ 'I18N_TOPNAV_LEARN_LINK_1' | translate }}</span>
                       <span class="material-icons arrow-forward">arrow_forward</span>
-                    </a>
+                    </div>
                   </div>
-                  <a *ngIf="userIsLoggedIn"
-                     (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})"
-                     class="nav-item-bottom-link-logged"
-                     href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}">
+                  <div *ngIf="userIsLoggedIn"
+                       (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})"
+                       class="nav-item-bottom-link-logged">
                     <span class="link">{{ 'I18N_TOPNAV_LEARN_LINK_2' | translate }}</span>
                     <span class="material-icons arrow-forward">arrow_forward</span>
-                  </a>
-                </div>
-                <div class="nav-content nav-item-right d-flex flex-column">
+                  </div>
+                </a>
+                <a class="nav-content nav-item-right d-flex flex-column" tabindex="0"
+                   href="/community-library" (click)="navigateToClassroomPage('/community-library')">
                   <div class="nav-item-right-head">{{ 'I18N_TOPNAV_LEARN_HEADING' | translate }}</div>
                   <div class="des">{{ 'I18N_TOPNAV_LIBRARY_DESCRIPTION' | translate }}</div>
-                  <a (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})"
-                     class="nav-item-bottom-link"
-                     href="/community-library">
+                  <div (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})"
+                       class="nav-item-bottom-link">
                     <span class="link">{{ 'I18N_TOPNAV_LIBRARY' | translate }}</span>
                     <span class="material-icons arrow-forward">arrow_forward</span>
-                  </a>
-                </div>
+                  </div>
+                </a>
               </div>
             </li>
           </ul>
@@ -234,68 +232,63 @@
               (mouseleave)="closeSubmenuIfNotMobile($event)">
             <div class="d-flex flex-column">
               <div class="top-section d-flex">
-                <div class="item item-border d-flex flex-column innvolved-item"
-                     (click)="navigateToPage('/partnerships')"
-                     (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_CLOSE})">
+                <a class="item item-border d-flex flex-column innvolved-item"
+                   (click)="navigateToPage('/partnerships')" href="/partnerships"
+                   [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.ROUTE"
+                   rel="noopener"
+                   (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_CLOSE})">
                   <div class="heading">
                     <span class="material-icons language mx-1">language</span>
-                    <a class="heading-text underline"
-                       href="/partnerships"
-                       [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.ROUTE"
-                       rel="noopener">{{'I18N_TOPNAV_PARTNERSHIPS' | translate}}
-                    </a>
+                    <span class="heading-text">{{'I18N_TOPNAV_PARTNERSHIPS' | translate}}</span>
                   </div>
                   <div class="des">
                     {{'I18N_TOPNAV_PARTNERSHIPS_DESCRIPTION' | translate}}
                   </div>
-                </div>
-                <div class="item d-flex flex-column innvolved-item"
-                     (click)="navigateToPage('/volunteer')">
+                </a>
+                <a class="item d-flex flex-column innvolved-item"
+                   (click)="navigateToPage('/volunteer')"
+                   href="/volunteer"
+                   [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.VOLUNTEER.ROUTE"
+                   (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {enter: ACTION_CLOSE})"
+                   rel="noopener">
                   <div class="heading">
                     <span class="material-icons volunteer mx-1">supervisor_account</span>
-                    <a class="heading-text underline"
-                       href="/volunteer"
-                       [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.VOLUNTEER.ROUTE"
-                       (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {enter: ACTION_CLOSE})"
-                       rel="noopener">{{'I18N_HEADING_VOLUNTEER'| translate}}
-                    </a>
+                    <span class="heading-text">{{'I18N_HEADING_VOLUNTEER'| translate}}</span>
                   </div>
                   <div class="des">
                     {{'I18N_TOPNAV_VOLUNTEER_DESCRIPTION' | translate}}
                   </div>
-                </div>
+                </a>
               </div>
               <div class="bottom-section d-flex">
-                <div class="item item-border d-flex flex-column innvolved-item"
-                     (click)="navigateToPage('/contact')">
+                <a class="item item-border d-flex flex-column innvolved-item"
+                   (click)="navigateToPage('/contact')"
+                   href="/contact"
+                   [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.CONTACT.ROUTE"
+                   (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {enter: ACTION_CLOSE})"
+                   rel="noopener">
                   <div class="heading">
                     <span class="material-icons contact mx-1">mail</span>
-                    <a href="/contact"
-                       [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.CONTACT.ROUTE"
-                       (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {enter: ACTION_CLOSE})"
-                       rel="noopener"
-                       class="heading-text underline">{{'I18N_TOPNAV_CONTACT_US' | translate}}
-                    </a>
+                    <span class="heading-text">{{'I18N_TOPNAV_CONTACT_US' | translate}}</span>
                   </div>
                   <div class="des">
                     {{'I18N_TOPNAV_CONTACT_US_DESCRIPTION' | translate}}
                   </div>
-                </div>
-                <div class="item d-flex flex-column innvolved-item"
-                     (click)="navigateToPage('/donate')">
+                </a>
+                <a class="item d-flex flex-column innvolved-item"
+                   (click)="navigateToPage('/donate')"
+                   href="/donate"
+                   [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE"
+                   (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {enter: ACTION_CLOSE})"
+                   rel="noopener">
                   <div class="heading">
                     <span class="material-icons fav mx-1">favorite</span>
-                    <a class="heading-text underline"
-                       href="/donate"
-                       [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE"
-                       (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {enter: ACTION_CLOSE})"
-                       rel="noopener">{{'I18N_TOPNAV_DONATE' | translate}}
-                    </a>
+                    <span class="heading-text">{{'I18N_TOPNAV_DONATE' | translate}}</span>
                   </div>
                   <div class="des">
                     {{'I18N_TOPNAV_DONATE_DESCRIPTION' | translate}}
                   </div>
-                </div>
+                </a>
               </div>
             </div>
           </ul>
@@ -683,6 +676,27 @@
     padding: 32px;
     width: 388px;
   }
+  .learn-dropdown-menu .nav-item-left:hover,
+  .learn-dropdown-menu .nav-item-right:hover,
+  .learn-dropdown-menu .nav-item-left:focus,
+  .learn-dropdown-menu .nav-item-right:focus {
+    background-color: #21212107;
+  }
+  .about-dropdown-menu .nav-item a:hover,
+  .about-dropdown-menu .nav-item a:focus {
+    background-color: #21212107;
+  }
+  .about-dropdown-menu .about-link:hover,
+  .about-dropdown-menu .about-link:focus {
+    color: #009688 !important;
+  }
+  .nav-item-left-head {
+    color: #333;
+    font-family: 'Roboto', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 18.75px;
+  }
   .learn-dropdown-menu .nav-item-right {
     min-width: 300px;
     padding: 32px;
@@ -704,11 +718,6 @@
     padding: 0;
     padding-top: 16px;
   }
-  .learn-dropdown-menu .nav-item-bottom-link:hover .link,
-  .learn-dropdown-menu .nav-item-bottom-link:focus .link {
-    border-bottom: #00645c 2px solid;
-    transition: 50ms;
-  }
   .learn-dropdown-menu .nav-item-bottom-link-logged {
     color: #00645c;
     font-family: 'Inter', 'Roboto', sans-serif;
@@ -716,11 +725,6 @@
     font-weight: 500;
     line-height: 16.41px;
     padding: 0;
-  }
-  .learn-dropdown-menu .nav-item-bottom-link-logged:hover .link,
-  .learn-dropdown-menu .nav-item-bottom-link-logged:focus .link {
-    border-bottom: #00645c 2px solid;
-    transition: 50ms;
   }
   .dropdown-menu {
     border-radius: 3px;
