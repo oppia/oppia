@@ -2,4 +2,3 @@ version: v1beta1
 plugins:
   - name: python
     out: proto_files
-
