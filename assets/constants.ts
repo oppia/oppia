@@ -4964,7 +4964,7 @@ export default {
     "code": "ar",
     "description": "العربية (Arabic)",
     "direction": "rtl",
-    "decimal_separator": "٫"
+    "decimal_separator": ","
   }, {
     "code": "sq",
     "description": "shqip (Albanian)",
@@ -5129,7 +5129,7 @@ export default {
     "code": "fa",
     "description": "فارسی (Persian)",
     "direction": "rtl",
-    "decimal_separator": "٫"
+    "decimal_separator": ","
   }, {
     "code": "pl",
     "description": "polszczyzna (Polish)",
@@ -5139,7 +5139,7 @@ export default {
     "code": "prs",
     "description": "دری (Dari)",
     "direction": "rtl",
-    "decimal_separator": "٫"
+    "decimal_separator": ","
   }, {
     "code": "pt",
     "description": "português (Portuguese)",
@@ -5209,7 +5209,7 @@ export default {
     "code": "ur",
     "description": "اُردُو (Urdu)",
     "direction": "rtl",
-    "decimal_separator": "٫"
+    "decimal_separator": ","
   }, {
     "code": "vi",
     "description": "Tiếng Việt (Vietnamese)",
@@ -5241,7 +5241,7 @@ export default {
     "id": "ar",
     "text": "العربية",
     "direction": "rtl",
-    "decimal_separator": "٫"
+    "decimal_separator": ","
   }, {
     "id": "hi",
     "text": "हिन्दी",

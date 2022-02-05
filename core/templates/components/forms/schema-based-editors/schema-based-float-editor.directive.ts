@@ -91,8 +91,8 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
           ctrl.parseInput = function(): void {
             let regex = NumberConversionService.getInputValidationRegex();
 
-            // Remove any character which is not a number or
-            // a decimal seperator.
+            // Remove anything that isn't a number,
+            // minus sign, exponent (e) sign or a decimal separator.
             ctrl.localStringValue = ctrl.localStringValue
               .replace(regex, '');
 
