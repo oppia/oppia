@@ -462,6 +462,8 @@
         "after": true
       }
     ],
+    // The following must be off so that we can enable
+    // "@typescript-eslint/no-dupe-class-members".
     "no-dupe-class-members": "off",
     "@typescript-eslint/no-dupe-class-members": ["error"]
   }
