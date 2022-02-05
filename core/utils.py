@@ -35,7 +35,6 @@ import urllib
 import zlib
 
 from core import feconf
-from core import python_utils
 from core.constants import constants
 
 from typing import (
