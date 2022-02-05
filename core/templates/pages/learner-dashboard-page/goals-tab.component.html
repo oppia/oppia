@@ -11,7 +11,7 @@
         <div class="oppia-trash-button" (click)="removeFromLearnerGoals(topic, topic.id, topic.name, i)">
           <i class="fa fa-trash"></i>
         </div>
-        <label class="oppia-current-goals-topic-name protractor-test-topic-name-in-current-goals">
+        <label class="oppia-current-goals-topic-name protractor-test-topic-name-in-current-goals" (click)="toggleStory(i)">
           Learn {{topic.name}}
         </label>
         <p class="oppia-goals-story-name">
@@ -85,6 +85,7 @@
 <style>
   .oppia-arrow-button {
     color: #00645c;
+    cursor: pointer;
     float: left;
     height: 44px;
     position: relative;
@@ -162,6 +163,7 @@
   }
   .oppia-current-goals-topic-name {
     color: #333;
+    cursor: pointer;
     display: inline-block;
     font-size: 19px;
     font-weight: 100;
