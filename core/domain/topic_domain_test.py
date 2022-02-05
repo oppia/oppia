@@ -1197,7 +1197,7 @@ class TopicRightsChangeTests(test_utils.GenericTestBase):
 
 class TopicSummaryTests(test_utils.GenericTestBase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         current_time = datetime.datetime.utcnow()
         time_in_millisecs = utils.get_time_in_millisecs(current_time)
@@ -1347,7 +1347,7 @@ class TopicSummaryTests(test_utils.GenericTestBase):
 
 class TopicRightsTests(test_utils.GenericTestBase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
