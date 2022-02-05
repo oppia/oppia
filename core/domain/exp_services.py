@@ -1192,7 +1192,7 @@ def regenerate_exploration_summary_with_new_contributor(
         exp_summary.add_contribution_by_user(contributor_id)
         save_exploration_summary(exp_summary)
     else:
-        logging.error("Could not find exploration with ID %s", exploration_id)
+        logging.error('Could not find exploration with ID %s', exploration_id)
 
 
 def regenerate_exploration_and_contributors_summaries(exploration_id):
