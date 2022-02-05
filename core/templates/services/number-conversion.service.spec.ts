@@ -50,34 +50,31 @@ describe('NumberConversionService', () => {
     expect(numberConversionService.currentDecimalSeparator()).toEqual(',');
 
     ctls.setCurrentContentLanguageCode('ar');
-    expect(numberConversionService.currentDecimalSeparator()).toEqual('٫');
+    expect(numberConversionService.currentDecimalSeparator()).toEqual(',');
 
     ctls.setCurrentContentLanguageCode(undefined);
     expect(numberConversionService.currentDecimalSeparator()).toEqual('.');
   });
 
   it('should return regex for numeric validation', ()=>{
-    const dot = new RegExp('[^e0-9\.\-]', 'g');
-    const comma = new RegExp('[^e0-9\,\-]', 'g');
-    const arabic = new RegExp('[^e0-9\٫\-]', 'g');
-
     spyOn(numberConversionService, 'currentDecimalSeparator')
-      .and.returnValues('.', ',', '٫');
+      .and.returnValues('.', ',');
 
-    expect(numberConversionService.getInputValidationRegex()).toEqual(dot);
-    expect(numberConversionService.getInputValidationRegex()).toEqual(comma);
-    expect(numberConversionService.getInputValidationRegex()).toEqual(arabic);
+    expect(numberConversionService.getInputValidationRegex())
+      .toEqual(/[^e0-9\.\-]/g);
+    expect(numberConversionService.getInputValidationRegex())
+      .toEqual(/[^e0-9\,\-]/g);
   });
 
   it('should convert a number string to the English decimal number', ()=>{
     let number1 = '-1.22';
     let number2 = '1,5';
-    let number3 = '1٫31e1';
+    let number3 = '1,31e1';
     let number4 = 'abc';
     let number5 = 'e';
     let number6 = '';
     spyOn(numberConversionService, 'currentDecimalSeparator')
-      .and.returnValues('.', ',', '٫', '.', ',', '.');
+      .and.returnValues('.', ',', ',', '.', ',', '.');
 
     expect(numberConversionService.convertToEnglishDecimal(number1))
       .toEqual(-1.22);
@@ -97,13 +94,11 @@ describe('NumberConversionService', () => {
     let number = -198.234;
 
     spyOn(numberConversionService, 'currentDecimalSeparator')
-      .and.returnValues('.', ',', '٫');
+      .and.returnValues('.', ',');
 
     expect(numberConversionService.convertToLocalizedNumber(number))
       .toEqual('-198.234');
     expect(numberConversionService.convertToLocalizedNumber(number))
       .toEqual('-198,234');
-    expect(numberConversionService.convertToLocalizedNumber(number))
-      .toEqual('-198٫234');
   });
 });
