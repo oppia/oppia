@@ -241,6 +241,22 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 self.target_id, self.target_version_at_submission,
                 self.author_id, add_translation_change_dict, 'test description')
 
+    def test_get_submitted_submissions(self):
+        suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            self.target_id, self.target_version_at_submission,
+            self.author_id, self.change, None)
+        suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            self.target_id, self.target_version_at_submission,
+            self.author_id, self.change, 'test_description')
+        suggestions = suggestion_services.get_submitted_suggestions(self.author_id, feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT)
+        self.assertEqual(len(suggestions), 2)
+        self.assertEqual(suggestions[0].author_id, self.author_id)
+        self.assertEqual(suggestions[1].author_id, self.author_id)
+
     def test_get_all_stale_suggestion_ids(self):
         suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
@@ -1694,6 +1710,28 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
 
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
         self.assertEqual(suggestion.status, suggestion_models.STATUS_ACCEPTED)
+
+    def test_create_translation_contribution_stats_from_model(self):
+        translation_model = suggestion_models.TranslationContributionStatsModel.create(
+            language_code='es',
+            contributor_user_id='user_id',
+            topic_id='topic_id',
+            submitted_translations_count=2,
+            submitted_translation_word_count=100,
+            accepted_translations_count=1,
+            accepted_translations_without_reviewer_edits_count=0,
+            accepted_translation_word_count=50,
+            rejected_translations_count=0,
+            rejected_translation_word_count=0,
+            contribution_dates=[
+        datetime.date.fromtimestamp(1616173836),
+        datetime.date.fromtimestamp(1616173837)
+    ]
+        )
+        translation_suggestion = suggestion_services.get_all_translation_contribution_stats('user_id')
+        self.assertEqual(len(translation_suggestion), 1)
+        self.assertEqual(translation_suggestion[0].language_code, 'es')
+        self.assertEqual(translation_suggestion[0].contributor_user_id, 'user_id')
 
     def test_create_and_reject_suggestion(self):
         with self.swap(
