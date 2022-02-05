@@ -4,3 +4,4 @@ plugins:
     out: proto_files
   - name: ts
     out: extensions/classifiers/prot
+    
