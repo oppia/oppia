@@ -2346,44 +2346,6 @@ class SingleCharAndNewlineAtEOFCheckerTests(unittest.TestCase):
             temp_file.close()
 
 
-class DivisionOperatorCheckerTests(unittest.TestCase):
-
-    def setUp(self):
-        super(DivisionOperatorCheckerTests, self).setUp()
-        self.checker_test_object = testutils.CheckerTestCase()
-        self.checker_test_object.CHECKER_CLASS = (
-            pylint_extensions.DivisionOperatorChecker)
-        self.checker_test_object.setup_method()
-
-    def test_division_operator_with_spaces(self):
-        node_division_operator_with_spaces = astroid.extract_node(
-            u"""
-            a / b #@
-            """)
-
-        message = testutils.Message(
-            msg_id='division-operator-used',
-            node=node_division_operator_with_spaces)
-
-        with self.checker_test_object.assertAddsMessages(message):
-            self.checker_test_object.checker.visit_binop(
-                node_division_operator_with_spaces)
-
-    def test_division_operator_without_spaces(self):
-        node_division_operator_without_spaces = astroid.extract_node(
-            u"""
-            a/b #@
-            """)
-
-        message = testutils.Message(
-            msg_id='division-operator-used',
-            node=node_division_operator_without_spaces)
-
-        with self.checker_test_object.assertAddsMessages(message):
-            self.checker_test_object.checker.visit_binop(
-                node_division_operator_without_spaces)
-
-
 class SingleLineCommentCheckerTests(unittest.TestCase):
 
     def setUp(self):
