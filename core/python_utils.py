@@ -31,8 +31,6 @@ _CERTIFI_PATH = os.path.join(
 sys.path.insert(0, _CERTIFI_PATH)
 
 import builtins  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-import past.builtins  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-import past.utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 
 MAP = builtins.map
@@ -204,20 +202,6 @@ def url_encode(query, doseq=False):
     except ImportError:
         import urllib as urlparse
     return urlparse.urlencode(query, doseq=doseq)
-
-
-def divide(number1, number2):
-    """This function divides number1 by number2 in the Python 2 way, i.e it
-    performs an integer division.
-
-    Args:
-        number1: int. The dividend.
-        number2: int. The divisor.
-
-    Returns:
-        int. The quotent.
-    """
-    return past.utils.old_div(number1, number2)
 
 
 def _recursively_convert_to_str(value):

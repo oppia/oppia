@@ -19,7 +19,6 @@ from __future__ import annotations
 import json
 
 from core import feconf
-from core import python_utils
 from core.domain import skill_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
@@ -537,8 +536,7 @@ class SubtopicMasteryDataHandlerTest(test_utils.GenericTestBase):
                     topic_id_1, topic_id_2])
             })
         degrees_of_mastery_1 = {
-            u'1': python_utils.divide(
-                self.degree_of_mastery_1 + self.degree_of_mastery_2, 2)
+            u'1': (self.degree_of_mastery_1 + self.degree_of_mastery_2) / 2
         }
         degrees_of_mastery_2 = {
             u'2': self.degree_of_mastery_5
@@ -559,8 +557,7 @@ class SubtopicMasteryDataHandlerTest(test_utils.GenericTestBase):
                     topic_id_1, topic_id_2])
             })
         degrees_of_mastery_1 = {
-            u'1': python_utils.divide(
-                self.degree_of_mastery_1 + self.degree_of_mastery_2, 2),
+            u'1': (self.degree_of_mastery_1 + self.degree_of_mastery_2) / 2,
             u'2': self.degree_of_mastery_3
         }
         degrees_of_mastery_2 = {
@@ -582,13 +579,11 @@ class SubtopicMasteryDataHandlerTest(test_utils.GenericTestBase):
                     topic_id_1, topic_id_2])
             })
         degrees_of_mastery_1 = {
-            u'1': python_utils.divide(
-                self.degree_of_mastery_1 + self.degree_of_mastery_2, 2),
+            u'1': (self.degree_of_mastery_1 + self.degree_of_mastery_2) / 2,
             u'2': self.degree_of_mastery_3
         }
         degrees_of_mastery_2 = {
-            u'1': python_utils.divide(
-                self.degree_of_mastery_3 + self.degree_of_mastery_4, 2),
+            u'1': (self.degree_of_mastery_3 + self.degree_of_mastery_4) / 2,
             u'2': self.degree_of_mastery_5
         }
         self.assertEqual(
