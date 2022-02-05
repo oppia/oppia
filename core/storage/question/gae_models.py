@@ -20,7 +20,6 @@ import math
 import random
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.platform import models
@@ -452,8 +451,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             return []
 
         question_count_per_skill = int(
-            math.ceil(python_utils.divide( # type: ignore[no-untyped-call]
-                float(total_question_count), float(len(skill_ids)))))
+            math.ceil(float(total_question_count) / float(len(skill_ids))))
 
         question_skill_link_mapping = {}
 
@@ -598,8 +596,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
         question_count_per_skill = int(
             math.ceil(
-                python_utils.divide( # type: ignore[no-untyped-call]
-                    float(total_question_count), float(len(skill_ids)))))
+                float(total_question_count) / float(len(skill_ids))))
         question_skill_link_models = []
         existing_question_ids = []
 
