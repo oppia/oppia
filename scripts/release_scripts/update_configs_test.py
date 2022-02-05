@@ -49,7 +49,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
     """Test the methods for updating configs."""
 
     def setUp(self):
-        super(UpdateConfigsTests, self).setUp()
+        super().setUp()
         self.mock_repo = github.Repository.Repository(
             requester='', headers='', attributes={}, completed='')
         def mock_get_organization(unused_self, unused_name):
