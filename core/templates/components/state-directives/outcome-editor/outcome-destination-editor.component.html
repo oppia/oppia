@@ -9,7 +9,7 @@
               [(ngModel)]="outcome.dest"
               (ngModelChange)="onDestSelectorChange()">
         <option *ngFor="let choice of destChoices" [value]="choice.id">{{ choice.text }}</option>
-    </select>
+      </select>
     </span>
   </div>
   <form #newStateNameForm="ngForm">
@@ -31,18 +31,18 @@
     <b>Refresher exploration ID (optional):</b>
     <input type="text"
            class="form-control protractor-test-add-refresher-exploration-id"
-           [(ngModel)]="outcome.refresherExplorationId" 
+           [(ngModel)]="outcome.refresherExplorationId"
            [pattern]="explorationAndSkillIdPattern"
-           tabindex="0" 
+           tabindex="0"
            [attr.aria-invalid]="false">
   </div>
   <div class="oppia-id-text" *ngIf="canAddPrerequisiteSkill">
     <b>Prerequisite skill ID (optional):&nbsp;</b>
     <input class="form-control"
-           type="text" 
-           [(ngModel)]="outcome.missingPrerequisiteSkillId"  
-           tabindex="0" 
-           [attr.aria-invalid]="false" 
+           type="text"
+           [(ngModel)]="outcome.missingPrerequisiteSkillId"
+           tabindex="0"
+           [attr.aria-invalid]="false"
            [ngModelOptions]="{allowInvalid: true}">
     <p class="oppia-prerequisite-explanation-text">
       <i> Mention the skill that this state requires so that a learner who is stuck in the state can quickly learn the
