@@ -22,7 +22,7 @@ import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatRadioModule } from '@angular/material/radio';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { MergeSkillModalComponent } from 'components/skill-selector/merge-skill-modal.component';
 import { SkillSelectorComponent } from 'components/skill-selector/skill-selector.component';
 import { AugmentedSkillSummary, AugmentedSkillSummaryBackendDict } from 'domain/skill/augmented-skill-summary.model';
@@ -34,7 +34,7 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { AlertsService } from 'services/alerts.service';
 import { AssignSkillToTopicModalComponent } from '../modals/assign-skill-to-topic-modal.component';
 import { DeleteSkillModalComponent } from '../modals/delete-skill-modal.component';
-import { TopicAssignmentsSummary, UnassignSkillFromTopicsModalComponent } from '../modals/unassign-skill-from-topics-modal.component';
+import { TopicAssignments, UnassignSkillFromTopicsModalComponent } from '../modals/unassign-skill-from-topics-modal.component';
 import { SelectTopicsComponent } from '../topic-selector/select-topics.component';
 import { SkillsListComponent } from './skills-list.component';
 
@@ -58,7 +58,7 @@ describe('Skills List Component', () => {
     topic_names: ['a'],
     classroom_names: ['a']
   };
-  let topicAssignmentsSummary: { [key: string]: TopicAssignmentsSummary } = {
+  let topicAssignmentsSummary: TopicAssignments = {
     topic1: {
       subtopicId: 12,
       topicVersion: 7,
@@ -70,7 +70,7 @@ describe('Skills List Component', () => {
   class MockNgbModal {
     modal: string;
     success: boolean = true;
-    open(content, options) {
+    open(content, options: NgbModalOptions) {
       if (this.modal === 'delete_skill') {
         return {
           componentInstance: {
@@ -126,7 +126,7 @@ describe('Skills List Component', () => {
           },
           result: {
             then: (
-                successCallback: (topicsToUnassign) => void,
+                successCallback: (topicsToUnassign: TopicAssignments) => void,
                 cancelCallback: () => void
             ) => {
               if (this.success) {
@@ -144,7 +144,7 @@ describe('Skills List Component', () => {
           },
           result: {
             then: (
-                successCallback: (topicsToUnassign) => void,
+                successCallback: (skillsToAssign: string[]) => void,
                 cancelCallback: () => void
             ) => {
               if (this.success) {
@@ -277,14 +277,14 @@ describe('Skills List Component', () => {
 
     topicsAndSkillsDashboardBackendApiService = (
       TestBed.inject(TopicsAndSkillsDashboardBackendApiService) as
-    unknown) as jasmine.SpyObj<MockTopicsAndSkillsDashboardBackendApiService>;
+      unknown) as jasmine.SpyObj<MockTopicsAndSkillsDashboardBackendApiService>;
     alertsService = TestBed.inject(AlertsService);
     alertsService = (alertsService as unknown) as jasmine.SpyObj<AlertsService>;
     mockNgbModal = (TestBed.inject(NgbModal) as unknown) as
       jasmine.SpyObj<MockNgbModal>;
     mockSkillBackendApiService = (
       TestBed.inject(SkillBackendApiService) as
-    unknown) as jasmine.SpyObj<MockSkillBackendApiService>;
+      unknown) as jasmine.SpyObj<MockSkillBackendApiService>;
   });
 
   it('should create', () => {
