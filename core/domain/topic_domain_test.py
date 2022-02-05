@@ -36,7 +36,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
     topic_id = 'topic_id'
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
