@@ -19,6 +19,7 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { FormsModule } from '@angular/forms';
 import { StateGraphLayoutService } from 'components/graph-services/graph-layout.service';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
@@ -41,7 +42,10 @@ describe('Outcome Destination Editor', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [
+        HttpClientTestingModule,
+        FormsModule
+      ],
       declarations: [
         OutcomeDestinationEditorComponent
       ],
@@ -73,7 +77,7 @@ describe('Outcome Destination Editor', () => {
     component.ngOnDestroy();
   });
 
-  it('should set component properties on initialization', () => {
+  it('should set component properties on initialization', fakeAsync(() => {
     let computedLayout = stateGraphLayoutService.computeLayout(
       {
         Introduction: 'Introduction',
@@ -119,13 +123,13 @@ describe('Outcome Destination Editor', () => {
       id: '/',
       text: 'A New Card Called...'
     }]);
-  });
+  }));
 
   it('should set outcome destination as active state if it is a self loop' +
-    ' when outcome destination details are saved', () => {
+    ' when outcome destination details are saved', fakeAsync(() => {
     component.outcome = new Outcome(
       'Hola',
-      new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
+      new SubtitledHtml('<p> HTML string </p>', 'Id'),
       false,
       [],
       null,
@@ -143,13 +147,13 @@ describe('Outcome Destination Editor', () => {
     onSaveOutcomeDestDetailsEmitter.emit();
 
     expect(component.outcome.dest).toBe('Introduction');
-  });
+  }));
 
   it('should add new state if outcome destination is a placeholder when' +
-    ' outcome destination details are saved', () => {
+    ' outcome destination details are saved', fakeAsync(() => {
     component.outcome = new Outcome(
       PLACEHOLDER_OUTCOME_DEST,
-      new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
+      new SubtitledHtml('<p> HTML string </p>', 'Id'),
       false,
       [],
       null,
@@ -172,7 +176,7 @@ describe('Outcome Destination Editor', () => {
     expect(editorFirstTimeEventsService.registerFirstCreateSecondStateEvent)
       .toHaveBeenCalled();
     expect(component.addState).toHaveBeenCalled();
-  });
+  }));
 
   it('should allow admin and moderators to edit refresher' +
     ' exploration id', fakeAsync(() => {
@@ -191,7 +195,7 @@ describe('Outcome Destination Editor', () => {
     expect(component.canEditRefresherExplorationId).toBeTrue();
   }));
 
-  it('should update option names when state name is changed', () => {
+  it('should update option names when state name is changed', fakeAsync(() => {
     let onStateNamesChangedEmitter = new EventEmitter();
     let computedLayout = stateGraphLayoutService.computeLayout(
       {
@@ -255,13 +259,13 @@ describe('Outcome Destination Editor', () => {
       id: '/',
       text: 'A New Card Called...'
     }]);
-  });
+  }));
 
   it('should set focus to new state name input field on destination' +
     ' selector change', () => {
     component.outcome = new Outcome(
       PLACEHOLDER_OUTCOME_DEST,
-      new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
+      new SubtitledHtml('<p> HTML string </p>', 'Id'),
       false,
       [],
       null,
@@ -279,7 +283,7 @@ describe('Outcome Destination Editor', () => {
   it('should check if new state is being created', () => {
     component.outcome = new Outcome(
       PLACEHOLDER_OUTCOME_DEST,
-      new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
+      new SubtitledHtml('<p> HTML string </p>', 'Id'),
       false,
       [],
       null,
@@ -290,7 +294,7 @@ describe('Outcome Destination Editor', () => {
 
     component.outcome = new Outcome(
       PLACEHOLDER_OUTCOME_DEST,
-      new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
+      new SubtitledHtml('<p> HTML string </p>', 'Id'),
       false,
       [],
       null,

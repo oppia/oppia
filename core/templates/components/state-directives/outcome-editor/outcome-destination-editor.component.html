@@ -11,19 +11,21 @@
         <option *ngFor="let choice of destChoices" [value]="choice.id">{{ choice.text }}</option>
     </select>
     </span>
+  </div>
+  <form #newStateNameForm="ngForm">
     <span *ngIf="isCreatingNewState()">
       <input class="form-control protractor-test-add-state-input"
              type="text"
-             name="newStateNameForm"
-             [oppiaFocusOn]="newStateNameInputField"
+             name="newStateNameInput"
              [(ngModel)]="outcomeNewStateName"
+             [oppiaFocusOn]="newStateNameInputField"
              [attr.maxlength]="maxLen"
              [pattern]="newStateNamePattern"
              tabindex="0"
              [attr.aria-invalid]="false" required>
     </span>
-  </div>
-  <p class="form-text oppia-form-error oppia-form-error-text">Please pick a card name consisting of alphanumeric characters, spaces and/or hyphens.</p>
+  </form>
+  <p [hidden]="newStateNameForm.form.valid ||  outcomeNewStateName === undefined" class="form-text oppia-form-error oppia-form-error-text">Please pick a card name consisting of alphanumeric characters, spaces and/or hyphens.</p>
 
   <div *ngIf="isSelfLoop() && canEditRefresherExplorationId" class="oppia-id-text">
     <b>Refresher exploration ID (optional):</b>
