@@ -98,7 +98,7 @@ class ExplorationConversionError(Exception):
 def open_file(
     filename: str,
     mode: TextModeTypes,
-    encoding: str = 'utf-8',
+    encoding: Union[str, None] = 'utf-8',
     newline: Union[str, None] = None
 ) -> IO[str]: ...
 
@@ -107,7 +107,7 @@ def open_file(
 def open_file(
     filename: str,
     mode: BinaryModeTypes,
-    encoding: str = 'utf-8',
+    encoding: Union[str, None] = 'utf-8',
     newline: Union[str, None] = None
 ) -> IO[bytes]: ...
 
@@ -115,7 +115,7 @@ def open_file(
 def open_file(
     filename: str,
     mode: Union[TextModeTypes, BinaryModeTypes],
-    encoding: str = 'utf-8',
+    encoding: Union[str, None] = 'utf-8',
     newline: Union[str, None] = None
 ) -> IO[Any]:
     """Open file and return a corresponding file object.
