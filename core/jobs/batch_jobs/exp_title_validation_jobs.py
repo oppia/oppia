@@ -1,7 +1,7 @@
 
 # coding: utf-8
 #
-# Copyright 2021 The Oppia Authors. All Rights Reserved.
+# Copyright 2022 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ import apache_beam as beam
 class GetNumberOfExpExceedsMaxTitleLengthJob(base_jobs.JobBase):
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        return (
+        exp_ids_with_exceeding_max_title_len = (
             self.pipeline
             | 'Get all ExplorationModels' >> ndb_io.GetModels(
                 exp_models.ExplorationModel.get_all(include_deleted=False))
@@ -41,7 +41,26 @@ class GetNumberOfExpExceedsMaxTitleLengthJob(base_jobs.JobBase):
                 lambda exp: (exp.id, exp.title))
             | 'Filter exploraton with title length greater than 36' >> beam.Filter(
                 lambda exp: len(exp[1]) > 36)
-            | 'id of exploration' >> beam.Map(
-                lambda exp: exp[0])
-            | 'Map as stdout' >> beam.Map(job_run_result.JobRunResult.as_stdout)
+        )
+
+        report_number_of_invalid_exps = (
+            exp_ids_with_exceeding_max_title_len
+            | 'Count all new models' >> beam.combiners.Count.Globally()
+            | 'Save number of invalid exps' >> beam.Map(
+                lambda object_count: job_run_result.JobRunResult.as_stdout(
+                    'RESULT: There are total %s invalid exp.' % (object_count)
+                ))
+        )
+
+        report_invalid_ids_and_their_actual_len = (
+            exp_ids_with_exceeding_max_title_len
+            | 'Save info on invalid exps' >> beam.Map(
+                lambda objects: job_run_result.JobRunResult.as_stderr(
+                    'The id of exp is %s and its actual len is %s' % (objects[0], len(objects[1]))
+                ))
+        )
+
+        return (
+            (report_number_of_invalid_exps, report_invalid_ids_and_their_actual_len)
+            | 'Combine results' >> beam.Flatten()
         )
