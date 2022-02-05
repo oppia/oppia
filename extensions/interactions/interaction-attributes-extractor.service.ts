@@ -38,6 +38,7 @@ export class InteractionAttributesExtractorService {
     'GraphInput',
     'ImageClickInput',
     'CodeRepl',
+    'NumberWithUnits',
     'NumericExpressionInput',
     'NumericInput',
     'InteractiveMap',
@@ -46,6 +47,7 @@ export class InteractionAttributesExtractorService {
     'SetInput',
     'TextInput',
     'MathEquationInput',
+    'RatioExpressionInput',
     'PencilCodeEditor',
   ];
 
