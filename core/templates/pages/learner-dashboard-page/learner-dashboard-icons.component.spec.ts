@@ -138,7 +138,6 @@ describe('Learner Dashboard Icons Component', () => {
     };
     component.ngOnChanges(changes);
     expect(updateHoverStateSpy).toHaveBeenCalled();
-    expect(updateCanActivityBeAddedToLearnerPlaylist).toHaveBeenCalled();
   }));
 
   it('should get value of activityActive', fakeAsync(() => {
